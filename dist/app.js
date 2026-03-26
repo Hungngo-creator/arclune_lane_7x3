@@ -19921,7 +19921,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       const rosterCellGap = resolveRosterCellGap(78, 0);
       const css = `
       .app--collection{padding:32px 16px 64px;}
-      .collection-view{--collection-tab-icon-size:36px;--collection-hub-left-shift:calc(var(--collection-tab-icon-size) * 1.35);max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
+      .collection-view{--collection-tab-icon-size:36px;--collection-hub-left-shift:calc(var(--collection-tab-icon-size) * 3);max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:28px;color:inherit;}
       .collection-view__header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;}
       .collection-view__title-group{display:flex;align-items:center;gap:12px;}
       .collection-view__back{padding:10px 18px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(16,26,36,.78);color:#aee4ff;letter-spacing:.08em;text-transform:uppercase;font-size:12px;cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;}
@@ -19990,7 +19990,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
       .collection-stage__mini-stats.is-detail-open .collection-stage__mini-stats-item.is-detail{display:flex;}
       .collection-stage__mini-stats-hint{margin:2px 0 0;font-size:10px;color:#7da0c7;line-height:1.4;}
       .collection-stage__mini-stats.is-detail-open .collection-stage__mini-stats-hint{display:none;}
-      .collection-tabs{border-radius:0;border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:flex-end;justify-self:end;gap:10px;z-index:4;min-width:36px;}
+      .collection-tabs{position:relative;border-radius:0;border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:flex-end;justify-self:end;gap:10px;z-index:8;min-width:36px;}
       .collection-tabs__button{width:var(--collection-tab-icon-size);height:var(--collection-tab-icon-size);padding:0;border-radius:50%;border:1px solid rgba(125,211,252,.2);background:rgba(8,16,24,.82);color:inherit;cursor:pointer;display:flex;justify-content:center;align-items:center;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
       .collection-tabs__button:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.42);background:rgba(16,26,36,.92);}
       .collection-tabs__button:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
@@ -32039,8 +32039,10 @@ __define('./turns.ts', (exports, module, __require) => {
           const alreadyPunished = Statuses.has(unit, 'blood_field_silence_once');
           if (markStacks >= 3 && !alreadyPunished) {
               const owner = bloodAvatarFieldOwners[0];
-              Statuses.add(unit, { id: 'silence', kind: 'debuff', tag: 'silence', dur: 1, tick: 'turn', sourceUnitId: owner.id });
-              Statuses.add(unit, { id: 'blood_field_silence_once', kind: 'mark', tag: 'field', dur: 3, tick: 'turn', sourceUnitId: owner.id });
+              if (owner) {
+                  Statuses.add(unit, { id: 'silence', kind: 'debuff', tag: 'silence', dur: 1, tick: 'turn', sourceUnitId: owner.id });
+                  Statuses.add(unit, { id: 'blood_field_silence_once', kind: 'mark', tag: 'field', dur: 3, tick: 'turn', sourceUnitId: owner.id });
+              }
           }
       }
       emitGameEvent(ACTION_START, baseDetail);

@@ -715,8 +715,10 @@ export function doActionOrSkip(
     const alreadyPunished = Statuses.has(unit, 'blood_field_silence_once');
     if (markStacks >= 3 && !alreadyPunished) {
       const owner = bloodAvatarFieldOwners[0];
-      Statuses.add(unit, { id: 'silence', kind: 'debuff', tag: 'silence', dur: 1, tick: 'turn', sourceUnitId: owner.id });
-      Statuses.add(unit, { id: 'blood_field_silence_once', kind: 'mark', tag: 'field', dur: 3, tick: 'turn', sourceUnitId: owner.id });
+      if (owner){
+        Statuses.add(unit, { id: 'silence', kind: 'debuff', tag: 'silence', dur: 1, tick: 'turn', sourceUnitId: owner.id });
+        Statuses.add(unit, { id: 'blood_field_silence_once', kind: 'mark', tag: 'field', dur: 3, tick: 'turn', sourceUnitId: owner.id });
+      }
     }
   }
   emitGameEvent(ACTION_START, baseDetail);
