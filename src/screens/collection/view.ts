@@ -2159,7 +2159,7 @@ const overlayDetailPanel = document.createElement('aside');
       clearSkillDetail();
     }
 
-    if (isArtsTab && shouldAutoOpenArtsHubs){
+    if (isArtsTab){
       artsHubs.classList.add('is-open');
     } else {
       artsHubs.classList.remove('is-open');

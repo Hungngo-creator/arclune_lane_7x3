@@ -21255,7 +21255,7 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
               overlay.classList.remove('is-open');
               clearSkillDetail();
           }
-          if (isArtsTab && shouldAutoOpenArtsHubs) {
+          if (isArtsTab) {
               artsHubs.classList.add('is-open');
           }
           else {
