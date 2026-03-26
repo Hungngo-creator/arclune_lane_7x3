@@ -90,6 +90,12 @@ const RANK_PRIORITY: Readonly<Record<string, number>> = {
   UR: 5,
   Prime: 6,
 };
+const ABSOLUTE_ATTACK_TAG_NEEDLES = ABSOLUTE_ATTACK_TAG_IDS
+  .filter((needle): needle is string => typeof needle === 'string')
+  .map((needle) => needle.toLowerCase());
+const ABSOLUTE_SHIELD_TAG_NEEDLES = ABSOLUTE_SHIELD_TAG_IDS
+  .filter((needle): needle is string => typeof needle === 'string')
+  .map((needle) => needle.toLowerCase());
 
 const toFinite = (value: unknown, fallback = 0): number => {
   const parsed = typeof value === 'number' ? value : Number(value);
@@ -255,8 +261,8 @@ const hasAbsoluteLawTag = (unit: UnitToken | null | undefined, mode: 'attack' | 
   if (!unit) return false;
   const statuses = Array.isArray(unit.statuses) ? unit.statuses : [];
   const modeNeedles = mode === 'attack'
-    ? ABSOLUTE_ATTACK_TAG_IDS
-    : ABSOLUTE_SHIELD_TAG_IDS;
+    ? ABSOLUTE_ATTACK_TAG_NEEDLES
+    : ABSOLUTE_SHIELD_TAG_NEEDLES;
 
   const includesAbsolute = (value: string): boolean => (
     value.includes('absolute') || value.includes('tuyetdoi')
@@ -269,7 +275,7 @@ const hasAbsoluteLawTag = (unit: UnitToken | null | undefined, mode: 'attack' | 
     if (includesAbsolute(id) || includesAbsolute(tag)) return true;
     for (let j = 0; j < modeNeedles.length; j += 1) {
       const needle = modeNeedles[j];
-      if (typeof needle !== 'string') continue;
+      if (!needle) continue;
       if (id.includes(needle) || tag.includes(needle)) return true;
     }
   }
@@ -277,9 +283,12 @@ const hasAbsoluteLawTag = (unit: UnitToken | null | undefined, mode: 'attack' | 
 };
 
 const getSharedHpGroup = (target: UnitToken): string | null => {
-  const ownKey = [target.sharedHpGroup, target.sharedDamageGroup, target.linkGroup]
-    .find((value) => typeof value === 'string' && value.trim());
-  if (typeof ownKey === 'string') return ownKey;
+  const sharedHpGroup = target.sharedHpGroup;
+  if (typeof sharedHpGroup === 'string' && sharedHpGroup.trim()) return sharedHpGroup;
+  const sharedDamageGroup = target.sharedDamageGroup;
+  if (typeof sharedDamageGroup === 'string' && sharedDamageGroup.trim()) return sharedDamageGroup;
+  const linkGroup = target.linkGroup;
+  if (typeof linkGroup === 'string' && linkGroup.trim()) return linkGroup;
   const statuses = Array.isArray(target.statuses) ? target.statuses : [];
   for (let i = 0; i < statuses.length; i += 1) {
     const status = statuses[i] as Record<string, unknown>;
@@ -303,12 +312,13 @@ const getSharedHpRules = (target: UnitToken): { group: string | null; weight: nu
   const capped = toFinite(target.sharedHpCapRatio ?? target.shareCapRatio, Number.NaN);
   let weight = Number.isFinite(weighted) ? Math.max(0.05, weighted) : 1;
   let capRatio = Number.isFinite(capped) ? Math.max(0, capped) : null;
-  for (const status of statuses) {
+  for (let i = 0; i < statuses.length; i += 1) {
+    const status = statuses[i] as Record<string, unknown>;
     const idTag = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
     if (!idTag.includes('share')) continue;
-    const statusWeight = toFinite((status as Record<string, unknown>).weight, Number.NaN);
+    const statusWeight = toFinite(status.weight, Number.NaN);
     if (Number.isFinite(statusWeight)) weight = Math.max(0.05, statusWeight);
-    const statusCap = toFinite((status as Record<string, unknown>).capRatio, Number.NaN);
+    const statusCap = toFinite(status.capRatio, Number.NaN);
     if (Number.isFinite(statusCap)) capRatio = Math.max(0, statusCap);
   }
   return { group, weight, capRatio };
@@ -476,9 +486,15 @@ export function dealAbilityDamage(
     emitPassiveEvent(Game, unit, 'onDeath', { log: getPassiveLog(Game) });
   };
   const sharedRules = getSharedHpRules(target);
-  const sharedTargets = sharedRules.group && Game
-    ? Game.tokens.filter((token) => token.alive && token.side === target.side && getSharedHpGroup(token) === sharedRules.group)
-    : [];
+  const sharedTargets = [] as UnitToken[];
+  if (sharedRules.group && Game) {
+    for (let i = 0; i < Game.tokens.length; i += 1) {
+      const token = Game.tokens[i];
+      if (!token?.alive || token.side !== target.side) continue;
+      const tokenGroup = getSharedHpGroup(token);
+      if (tokenGroup === sharedRules.group) sharedTargets.push(token);
+    }
+  }
 
   if (remain > 0 && sharedTargets.length > 1) {
     const weightedTargets = [] as Array<{ token: UnitToken; weight: number; capRatio: number | null }>;

@@ -228,6 +228,20 @@
 
       if (detectUnsupportedHost()) return;
 
+   function loadAppBundle(){
+        const script = document.createElement('script');
+        script.src = './dist/app.js';
+        script.defer = true;
+        script.fetchPriority = 'high';
+        script.onerror = function onAppBundleError(event){
+          const message = event && typeof event === 'object' && 'message' in event
+            ? String(event.message)
+            : 'Không thể tải gói Arclune.';
+          window.arcluneShowFatal && window.arcluneShowFatal(message);
+        };
+        document.body.appendChild(script);
+      }
+
       window.addEventListener('error', function onWindowError(event){
         const message = event && event.message ? event.message : 'Lỗi runtime không xác định.';
         window.arcluneShowFatal && window.arcluneShowFatal(message);
@@ -253,8 +267,9 @@
           }
         }, 2200);
       });
+
+      loadAppBundle();
     })();
   </script>
-  <script src="./dist/app.js" defer onerror="window.arcluneShowFatal && window.arcluneShowFatal(event?.message || 'Không thể tải gói Arclune.');"></script>
 </body>
 </html>

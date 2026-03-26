@@ -130,12 +130,14 @@ const MODE = (normalizedMode ?? process.env.NODE_ENV) === 'production' ? 'produc
 const ESBUILD_BASE_OPTIONS = {
   platform: 'browser',
   format: 'esm',
-  target: ['es2023'],
+  target: MODE === 'production' ? ['esnext'] : ['es2023'],
   sourcemap: MODE === 'production' ? false : true,
   splitting: true,
   metafile: true,
   treeShaking: true,
   bundle: true,
+  mainFields: ['browser', 'module', 'main'],
+  conditions: ['browser', MODE],
   legalComments: 'none',
 };
 const ESBUILD_DEFINE = {
@@ -147,9 +149,9 @@ const ENABLE_RUNTIME_OPTIMIZATIONS = MODE === 'production';
 const ESBUILD_TRANSFORM_MINIFY_OPTIONS = ENABLE_RUNTIME_OPTIMIZATIONS
   ? {
       minifySyntax: true,
-      minifyIdentifiers: true,
-      minifyWhitespace: true,
-      keepNames: false,
+      minifyIdentifiers: false,
+      minifyWhitespace: false,
+      keepNames: true,
       drop: ['debugger'],
     }
   : {
@@ -823,6 +825,8 @@ async function build(){
     metafile: ESBUILD_BASE_OPTIONS.metafile,
     treeShaking: ESBUILD_BASE_OPTIONS.treeShaking,
     define: ESBUILD_DEFINE,
+    mainFields: ESBUILD_BASE_OPTIONS.mainFields,
+    conditions: ESBUILD_BASE_OPTIONS.conditions,
     legalComments: ESBUILD_BASE_OPTIONS.legalComments,
     ...ESBUILD_TRANSFORM_MINIFY_OPTIONS,
   });

@@ -92,16 +92,17 @@ export function startGame(options?: StartGameOptions | null): SessionState {
   if (!currentSession) {
     currentSession = createPveSession(rootTarget, initialConfig);
   }
-  const startConfig: StartGameOptions = { ...initialConfig, root: rootTarget };
-  const session = currentSession.start(startConfig);
+  const session = currentSession.start({ ...initialConfig, root: rootTarget });
   if (!session) {
     throw new Error('PvE board markup not found; render the layout before calling startGame');
   }
-  if (currentSession && pendingSkins.size > 0) {
-    for (const [unitId, skinKey] of pendingSkins) {
-      const applied = currentSession?.setUnitSkin(unitId, skinKey) ?? false;
-      if (applied) {
-        pendingSkins.delete(unitId);
+  if (pendingSkins.size > 0) {
+    const activeSession = currentSession;
+    if (activeSession) {
+      for (const [unitId, skinKey] of pendingSkins) {
+        if (activeSession.setUnitSkin(unitId, skinKey)) {
+          pendingSkins.delete(unitId);
+        };
       }
     }
   }

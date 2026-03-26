@@ -179,8 +179,10 @@ function coerceFinite(value: unknown, fallback: number): number {
 
 /* ---------- Grid ---------- */
 export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: number, rows: number): GridSpec {
-  const pad = coerceFinite(CFG.UI?.PAD, 12);
-  const boardMaxW = coerceFinite(CFG.UI?.BOARD_MAX_W, 1144);
+  const uiCfg = CFG.UI ?? {};
+  const perfCfg = CFG.PERFORMANCE ?? {};
+  const pad = coerceFinite(uiCfg.PAD, 12);
+  const boardMaxW = coerceFinite(uiCfg.BOARD_MAX_W, 1144);
   let viewportW = boardMaxW + pad * 2;
   const parentElement = (canvas?.parentElement ?? null) as HTMLElement | null;
   let parentClientW: number | null = null;
@@ -204,15 +206,14 @@ export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: num
   const viewportSafeW = parentClientW ? Math.min(viewportW, parentClientW) : viewportW;
   const availableW = Math.max(1, viewportSafeW - pad * 2);
   const w = Math.min(availableW, boardMaxW);
-  const h = Math.max(Math.floor(w * (CFG.UI?.BOARD_H_RATIO ?? 3 / 7)), CFG.UI?.BOARD_MIN_H ?? 220);
+  const h = Math.max(Math.floor(w * (uiCfg.BOARD_H_RATIO ?? 3 / 7)), uiCfg.BOARD_MIN_H ?? 220);
 
-  const maxDprCfg = CFG.UI?.MAX_DPR;
+  const maxDprCfg = uiCfg.MAX_DPR;
   const dprClamp = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 2;
   const dprRaw = typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio)
     ? window.devicePixelRatio
     : 1;
   const dprSafe = dprRaw > 0 ? dprRaw : 1;
-  const perfCfg = CFG.PERFORMANCE || {};
   const lowPowerMode = !!perfCfg.LOW_POWER_MODE;
   const lowPowerDprCfg = perfCfg.LOW_POWER_DPR;
   const lowPowerDpr = Number.isFinite(lowPowerDprCfg) && lowPowerDprCfg > 0
@@ -226,7 +227,7 @@ export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: num
 
   const displayW = w;
   const displayH = h;
-  const maxPixelAreaCfg = CFG.UI?.MAX_PIXEL_AREA;
+  const maxPixelAreaCfg = uiCfg.MAX_PIXEL_AREA;
   const pixelAreaLimit = Number.isFinite(maxPixelAreaCfg) && maxPixelAreaCfg > 0 ? maxPixelAreaCfg : null;
   if (pixelAreaLimit) {
     const cssArea = displayW * displayH;
@@ -268,7 +269,7 @@ export function makeGrid(canvas: HTMLCanvasElement | null | undefined, cols: num
   const rowGapRatio = Number.isFinite(rawRowGapRatio) && rawRowGapRatio > 0
     ? rawRowGapRatio
     : 1;
-  const alignRaw = CFG.UI?.BOARD_VERTICAL_ALIGN;
+  const alignRaw = uiCfg.BOARD_VERTICAL_ALIGN;
   const align = Number.isFinite(alignRaw)
     ? Math.min(Math.max((alignRaw as number), 0), 1)
     : 0.5;

@@ -4284,6 +4284,12 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       UR: 5,
       Prime: 6,
   };
+  const ABSOLUTE_ATTACK_TAG_NEEDLES = ABSOLUTE_ATTACK_TAG_IDS
+      .filter((needle) => typeof needle === 'string')
+      .map((needle) => needle.toLowerCase());
+  const ABSOLUTE_SHIELD_TAG_NEEDLES = ABSOLUTE_SHIELD_TAG_IDS
+      .filter((needle) => typeof needle === 'string')
+      .map((needle) => needle.toLowerCase());
   const toFinite = (value, fallback = 0) => {
       const parsed = typeof value === 'number' ? value : Number(value);
       return Number.isFinite(parsed) ? parsed : fallback;
@@ -4393,8 +4399,8 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           return false;
       const statuses = Array.isArray(unit.statuses) ? unit.statuses : [];
       const modeNeedles = mode === 'attack'
-          ? ABSOLUTE_ATTACK_TAG_IDS
-          : ABSOLUTE_SHIELD_TAG_IDS;
+          ? ABSOLUTE_ATTACK_TAG_NEEDLES
+          : ABSOLUTE_SHIELD_TAG_NEEDLES;
       const includesAbsolute = (value) => (value.includes('absolute') || value.includes('tuyetdoi'));
       for (let i = 0; i < statuses.length; i += 1) {
           const status = statuses[i];
@@ -4404,7 +4410,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
               return true;
           for (let j = 0; j < modeNeedles.length; j += 1) {
               const needle = modeNeedles[j];
-              if (typeof needle !== 'string')
+              if (!needle)
                   continue;
               if (id.includes(needle) || tag.includes(needle))
                   return true;
@@ -4413,10 +4419,15 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       return false;
   };
   const getSharedHpGroup = (target) => {
-      const ownKey = [target.sharedHpGroup, target.sharedDamageGroup, target.linkGroup]
-          .find((value) => typeof value === 'string' && value.trim());
-      if (typeof ownKey === 'string')
-          return ownKey;
+      const sharedHpGroup = target.sharedHpGroup;
+      if (typeof sharedHpGroup === 'string' && sharedHpGroup.trim())
+          return sharedHpGroup;
+      const sharedDamageGroup = target.sharedDamageGroup;
+      if (typeof sharedDamageGroup === 'string' && sharedDamageGroup.trim())
+          return sharedDamageGroup;
+      const linkGroup = target.linkGroup;
+      if (typeof linkGroup === 'string' && linkGroup.trim())
+          return linkGroup;
       const statuses = Array.isArray(target.statuses) ? target.statuses : [];
       for (let i = 0; i < statuses.length; i += 1) {
           const status = statuses[i];
@@ -4444,7 +4455,8 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       const capped = toFinite(target.sharedHpCapRatio ?? target.shareCapRatio, Number.NaN);
       let weight = Number.isFinite(weighted) ? Math.max(0.05, weighted) : 1;
       let capRatio = Number.isFinite(capped) ? Math.max(0, capped) : null;
-      for (const status of statuses) {
+      for (let i = 0; i < statuses.length; i += 1) {
+          const status = statuses[i];
           const idTag = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
           if (!idTag.includes('share'))
               continue;
@@ -4593,9 +4605,17 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           emitPassiveEvent(Game, unit, 'onDeath', { log: getPassiveLog(Game) });
       };
       const sharedRules = getSharedHpRules(target);
-      const sharedTargets = sharedRules.group && Game
-          ? Game.tokens.filter((token) => token.alive && token.side === target.side && getSharedHpGroup(token) === sharedRules.group)
-          : [];
+      const sharedTargets = [];
+      if (sharedRules.group && Game) {
+          for (let i = 0; i < Game.tokens.length; i += 1) {
+              const token = Game.tokens[i];
+              if (!token?.alive || token.side !== target.side)
+                  continue;
+              const tokenGroup = getSharedHpGroup(token);
+              if (tokenGroup === sharedRules.group)
+                  sharedTargets.push(token);
+          }
+      }
       if (remain > 0 && sharedTargets.length > 1) {
           const weightedTargets = [];
           for (const token of sharedTargets) {
@@ -8478,8 +8498,10 @@ __modules['./engine.ts'] = (exports, module, __require) => {
   }
   /* ---------- Grid ---------- */
   function makeGrid(canvas, cols, rows) {
-      const pad = coerceFinite(CFG.UI?.PAD, 12);
-      const boardMaxW = coerceFinite(CFG.UI?.BOARD_MAX_W, 1144);
+      const uiCfg = CFG.UI ?? {};
+      const perfCfg = CFG.PERFORMANCE ?? {};
+      const pad = coerceFinite(uiCfg.PAD, 12);
+      const boardMaxW = coerceFinite(uiCfg.BOARD_MAX_W, 1144);
       let viewportW = boardMaxW + pad * 2;
       const parentElement = (canvas?.parentElement ?? null);
       let parentClientW = null;
@@ -8501,14 +8523,13 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       const viewportSafeW = parentClientW ? Math.min(viewportW, parentClientW) : viewportW;
       const availableW = Math.max(1, viewportSafeW - pad * 2);
       const w = Math.min(availableW, boardMaxW);
-      const h = Math.max(Math.floor(w * (CFG.UI?.BOARD_H_RATIO ?? 3 / 7)), CFG.UI?.BOARD_MIN_H ?? 220);
-      const maxDprCfg = CFG.UI?.MAX_DPR;
+      const h = Math.max(Math.floor(w * (uiCfg.BOARD_H_RATIO ?? 3 / 7)), uiCfg.BOARD_MIN_H ?? 220);
+      const maxDprCfg = uiCfg.MAX_DPR;
       const dprClamp = Number.isFinite(maxDprCfg) && maxDprCfg > 0 ? maxDprCfg : 2;
       const dprRaw = typeof window !== 'undefined' && Number.isFinite(window.devicePixelRatio)
           ? window.devicePixelRatio
           : 1;
       const dprSafe = dprRaw > 0 ? dprRaw : 1;
-      const perfCfg = CFG.PERFORMANCE || {};
       const lowPowerMode = !!perfCfg.LOW_POWER_MODE;
       const lowPowerDprCfg = perfCfg.LOW_POWER_DPR;
       const lowPowerDpr = Number.isFinite(lowPowerDprCfg) && lowPowerDprCfg > 0
@@ -8520,7 +8541,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       }
       const displayW = w;
       const displayH = h;
-      const maxPixelAreaCfg = CFG.UI?.MAX_PIXEL_AREA;
+      const maxPixelAreaCfg = uiCfg.MAX_PIXEL_AREA;
       const pixelAreaLimit = Number.isFinite(maxPixelAreaCfg) && maxPixelAreaCfg > 0 ? maxPixelAreaCfg : null;
       if (pixelAreaLimit) {
           const cssArea = displayW * displayH;
@@ -8559,7 +8580,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       const rowGapRatio = Number.isFinite(rawRowGapRatio) && rawRowGapRatio > 0
           ? rawRowGapRatio
           : 1;
-      const alignRaw = CFG.UI?.BOARD_VERTICAL_ALIGN;
+      const alignRaw = uiCfg.BOARD_VERTICAL_ALIGN;
       const align = Number.isFinite(alignRaw)
           ? Math.min(Math.max(alignRaw, 0), 1)
           : 0.5;
@@ -11303,16 +11324,18 @@ __modules['./main.ts'] = (exports, module, __require) => {
       if (!currentSession) {
           currentSession = createPveSession(rootTarget, initialConfig);
       }
-      const startConfig = { ...initialConfig, root: rootTarget };
-      const session = currentSession.start(startConfig);
+      const session = currentSession.start({ ...initialConfig, root: rootTarget });
       if (!session) {
           throw new Error('PvE board markup not found; render the layout before calling startGame');
       }
-      if (currentSession && pendingSkins.size > 0) {
-          for (const [unitId, skinKey] of pendingSkins) {
-              const applied = currentSession?.setUnitSkin(unitId, skinKey) ?? false;
-              if (applied) {
-                  pendingSkins.delete(unitId);
+      if (pendingSkins.size > 0) {
+          const activeSession = currentSession;
+          if (activeSession) {
+              for (const [unitId, skinKey] of pendingSkins) {
+                  if (activeSession.setUnitSkin(unitId, skinKey)) {
+                      pendingSkins.delete(unitId);
+                  }
+                  ;
               }
           }
       }
