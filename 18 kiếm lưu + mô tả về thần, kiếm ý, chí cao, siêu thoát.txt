@@ -1,6 +1,5 @@
 Hiểu biết của Gemini về arclune:
-Tao đã hiểu trọn vẹn "tầng đáy" của thế giới quan này. Đây không chỉ là một game gacha thông thường, mà là một "Mô phỏng chân thực" (Simulation) do Kẻ Lập Chỉ (KLC) tạo ra để tìm kiếm những kẻ đủ tư cách chạm đến Chân Giới.
-Phép ẩn dụ về Vị Cách (leo núi) và Bản Chất (người tập gym) của mày là mảnh ghép cuối cùng để giải thích tại sao hệ thống chỉ số trong game lại vận hành như vậy. Hãy cùng mổ xẻ sự tương quan giữa Thế giới quan Arclune và Hệ thống game (v0.4.x) mà chúng ta đang xây dựng:
+Phép ẩn dụ về Vị Cách (leo núi) và Bản Chất (người tập gym) của mày là mảnh ghép cuối cùng để giải thích tại sao hệ thống chỉ số trong game lại vận hành như vậy. Hãy cùng mổ xẻ sự tương quan giữa Thế giới quan Arclune và Hệ thống game mà chúng ta đang xây dựng:
 1. Bản Chất vs. Vị Cách (Laser vs. Thấu Kính)
 Sự kết hợp này tạo ra một hệ thống chiến đấu cực kỳ phân cấp:
  * Bản Chất (Essence) = Hệ thống Level + TP: Đây chính là "nội lực" của người tập gym. Một kẻ có bản chất tốt (Level cao, dồn nhiều điểm TP) khi leo núi sẽ bền bỉ và ra đòn nặng hơn hẳn kẻ yếu ớt.
@@ -305,9 +304,6 @@ Ví dụ:
 4. Huyết Vũ Lưu – Tình Diệt + Quỷ Ảnh + Ám nguyên tố → Kiếm khí hóa thành mưa máu, hút sinh lực.
 
 
-
-
-
 ---
 
 3. Tam Thiên Kiếm Đạo + Pháp tắc
@@ -503,22 +499,6 @@ Một số danh kiếm chứa tàn thần → tương tác với khí tu để m
 
 ---
 
-Nếu bạn đồng ý, mình có thể làm sơ đồ liên kết trực quan giữa 4 phần này, để khi đưa vào truyện nó thành hệ thống kiếm thuật – kiếm khí – kiếm đạo – kiếm linh cực logic và cuốn hút.
-
-Bạn muốn mình làm sơ đồ đó luôn chứ?
-
-Trong hệ thống Arclune mình và bạn đang xây, vũ khí tuyệt đối không thể “đăng thần” vì lý do cốt lõi:
-
-Đại đạo là đạo của bản thân → chỉ sinh linh có trí tuệ, ý chí độc lập và khả năng tu hành mới ngưng tụ được thần cách.
-
-Vũ khí dù mạnh đến đâu vẫn là vật chết, không thể tự diễn hóa đạo, nên không thể tự ngưng tụ hoặc thăng hoa thành thần cách.
-
-
-Tuy nhiên…
-Bạn đang mở ra một hướng rất hay — dùng vật liệu thần cấp. Vậy mình phân tích hai trường hợp bạn nêu:
-
-
----
 
 1. Vũ khí rèn từ xương, da, máu của bán thần
 
@@ -643,32 +623,6 @@ Người tu luyện kiếm khí có thể thức tỉnh kiếm linh khi hợp nh
 Danh kiếm càng cao cấp, yêu cầu cảnh giới tối thiểu càng cao (VD: Huyền Lệ Kiếm – Khai Nguyên; Cổ Long Kiếm – Tam Bộ Thánh; Nguyên Đạo Kiếm – Bán Thần trở lên).
 
 Một số danh kiếm chỉ phát huy toàn lực khi thi triển kiếm quyết tương ứng trong Cửu Đỉnh Kiếm Thuật.
-
-
-
----
-
-Nếu bạn muốn, mình có thể vẽ luôn sơ đồ liên kết giữa:
-
-1. Cửu Đỉnh Kiếm Thuật
-
-
-2. Thập Bát Lưu Phái
-
-
-3. Danh Kiếm
-
-
-4. Tam Thiên Kiếm Đạo
-
-
-
-… để khi đưa vào truyện, nó thành một hệ thống kiếm thuật – kiếm khí – kiếm linh cực kỳ logic và cuốn hút.
-
-Bạn có muốn mình làm sơ đồ liên kết đó luôn không? Mình nghĩ nó sẽ là xương sống cho toàn bộ “Khí Tu Kiếm” của Arclune.
-
-Ok, mình hiểu rồi — tức là bạn chỉ muốn giữ cấu trúc và tinh thần của “Cửu Đại Kiếm Thuật – Thập Bát Kiếm Lưu – Tam Thiên Kiếm Đạo” nhưng thay toàn bộ tên gọi, cơ chế, và chi tiết vận hành để thành hệ thống hoàn toàn mới trong Arclune – Khí Tu Kiếm. Như vậy sẽ tránh sao chép, vẫn giữ được sự đồ sộ và uy lực.
-
 
 ---
 
@@ -896,8 +850,6 @@ Vị trí: Siêu Thoát là cảnh giới nằm phía trên Chí Cao. Ở mức 
 ---
 
 📌 Lưu ý quan trọng: Trong hệ thống này, để ngưng tụ thần cách, đại đạo của người tu phải được tu tới viên mãn. Chỉ khi đạo hoàn mỹ họ mới đủ tư cách tiến vào Thần rồi Chí Cao. Các vũ khí, dù mạnh đến mấy, cũng không thể tu luyện đạo nên chúng không thể đăng thần độc lập.
-
-Nếu bạn có thêm mô tả hoặc muốn hợp nhất một số khái niệm khác vào các cảnh giới này, mình sẵn sàng giúp tiếp tục điều chỉnh!
 
 Cơ Chế Tăng Trưởng Thần Lực
 

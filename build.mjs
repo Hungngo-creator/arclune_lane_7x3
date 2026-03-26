@@ -133,7 +133,14 @@ const ESBUILD_BASE_OPTIONS = {
   sourcemap: MODE === 'production' ? false : true,
   splitting: true,
   metafile: true,
+  treeShaking: true,
 };
+const ESBUILD_DEFINE = {
+  'process.env.NODE_ENV': JSON.stringify(MODE),
+  'import.meta.env.MODE': JSON.stringify(MODE),
+  __DEV__: MODE === 'production' ? 'false' : 'true',
+};
+const ENABLE_RUNTIME_OPTIMIZATIONS = MODE === 'production';
 
 const TS_CONFIG_PATH = path.join(__dirname, 'tsconfig.base.json');
 let TS_PATH_ALIASES = [];
@@ -699,6 +706,9 @@ async function build(){
         format: ESBUILD_BASE_OPTIONS.format,
         target: ESBUILD_BASE_OPTIONS.target,
         sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
+        treeShaking: ESBUILD_BASE_OPTIONS.treeShaking,
+        define: ESBUILD_DEFINE,
+        minifySyntax: ENABLE_RUNTIME_OPTIMIZATIONS,
       });
       sourceCode = code;
     }
@@ -706,7 +716,7 @@ async function build(){
     modules.push({ id, code: transformed });
   }
 
-for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
+  for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
     const moduleId = toModuleId(stubPath);
     if (reachableModuleIds && !reachableModuleIds.has(moduleId)){
       continue;
@@ -724,6 +734,9 @@ for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
         format: ESBUILD_BASE_OPTIONS.format,
         target: ESBUILD_BASE_OPTIONS.target,
         sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
+        treeShaking: ESBUILD_BASE_OPTIONS.treeShaking,
+        define: ESBUILD_DEFINE,
+        minifySyntax: ENABLE_RUNTIME_OPTIMIZATIONS,
       });
       sourceCode = code;
     }
@@ -736,25 +749,25 @@ for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
   const parts = [];
   parts.push('// Bundled by build.mjs');
   parts.push('const __modules = Object.create(null);');
+  parts.push('const __cache = Object.create(null);');
   parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }');
   const legacyAliasObject = Object.fromEntries(LEGACY_MODULE_ID_ALIASES);
   parts.push(`const __legacyModuleAliases = ${JSON.stringify(legacyAliasObject)};`);
   parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }');
   parts.push('function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }');
-  parts.push('function __define(id, factory){ __modules[id] = { factory, exports: null, initialized: false }; }');
+  parts.push('function __define(id, factory){ __modules[id] = factory; }');
   parts.push('function __require(id){');
   parts.push('  const normalizedId = __normalizeModuleId(id);');
-  parts.push('  const mod = __modules[normalizedId];');
-  parts.push("  if (!mod) throw new Error('Module not found: ' + normalizedId);");
-  parts.push('  if (!mod.initialized){');
-  parts.push('    mod.initialized = true;');
-  parts.push('    const module = { exports: {} };');
-  parts.push('    mod.exports = module.exports;');
-  parts.push('    mod.factory(module.exports, module, __require);');
-  parts.push('    mod.exports = module.exports;');
-  parts.push('  }');
-  parts.push('  return mod.exports;');
+  parts.push('  const cached = __cache[normalizedId];');
+  parts.push('  if (cached) return cached.exports;');
+  parts.push('  const factory = __modules[normalizedId];');
+  parts.push("  if (!factory) throw new Error('Module not found: ' + normalizedId);");
+  parts.push('  const module = { exports: {} };');
+  parts.push('  __cache[normalizedId] = module;');
+  parts.push('  factory(module.exports, module, __require);');
+  parts.push('  return module.exports;');
   parts.push('}');
+  parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__moduleCache === "undefined"){ globalThis.__moduleCache = __cache; }');
   parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }');
 
   for (const { id, code } of modules){
@@ -782,7 +795,10 @@ for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
     format: ESBUILD_BASE_OPTIONS.format,
     target: ESBUILD_BASE_OPTIONS.target,
     sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
-  metafile: ESBUILD_BASE_OPTIONS.metafile,
+    metafile: ESBUILD_BASE_OPTIONS.metafile,
+    treeShaking: ESBUILD_BASE_OPTIONS.treeShaking,
+    define: ESBUILD_DEFINE,
+    minifySyntax: ENABLE_RUNTIME_OPTIMIZATIONS,
   });
   const outputFile = result.outputFiles?.[0];
   const transpiled = outputFile?.text ?? '';
