@@ -132,26 +132,20 @@ const addStatus = <K extends keyof typeof Statuses.make>(
     expect(Statuses.has(target, 'undying')).toBe(false);
   });
 
-  it('divine-nature blocks external buff/debuff statuses', () => {
+  it('divine-nature blocks buff/debuff/mark statuses from all sources', () => {
     const unit = createUnit({ id: 'lau_khac_ma_chu', tags: ['divine-nature'] });
     const buff = makeStatusEffect('haste', { turns: 2 });
     const debuff = makeStatusEffect('sleep', { turns: 1 });
+    const mark = { id: 'huyet_an', kind: 'mark', tag: 'mark', stacks: 1, maxStacks: 5, sourceUnitId: 'enemy-controller' } as const;
     if (!buff || !debuff) throw new Error('status factory unavailable');
 
+    Statuses.add(unit, { ...buff, sourceUnitId: unit.id });
     Statuses.add(unit, { ...buff, sourceUnitId: 'ally-buffer' });
     Statuses.add(unit, { ...debuff, sourceUnitId: 'enemy-controller' });
+    Statuses.add(unit, mark);
 
     expect(Statuses.has(unit, 'haste')).toBe(false);
     expect(Statuses.has(unit, 'sleep')).toBe(false);
+    expect(Statuses.has(unit, 'huyet_an')).toBe(false);
   });
-
-  it('divine-nature still accepts self-applied statuses', () => {
-    const unit = createUnit({ id: 'lau_khac_ma_chu', tags: ['divine-nature'] });
-    const buff = makeStatusEffect('haste', { turns: 2 });
-    if (!buff) throw new Error('status factory unavailable');
-
-    Statuses.add(unit, { ...buff, sourceUnitId: unit.id });
-
-    expect(Statuses.has(unit, 'haste')).toBe(true);
-  });
-});
+ });

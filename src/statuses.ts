@@ -250,9 +250,8 @@ const statusFactories = {
 
 export const Statuses: StatusService = {
   add(unit, status) {
-    const isBuffDebuff = status.kind === 'buff' || status.kind === 'debuff';
-    const sourceUnitId = typeof status.sourceUnitId === 'string' ? status.sourceUnitId : null;
-    if (isBuffDebuff && hasDivineNatureTag(unit) && sourceUnitId && sourceUnitId !== unit.id) {
+    const isBlockedByDivineAxiom = status.kind === 'buff' || status.kind === 'debuff' || status.kind === 'mark';
+    if (isBlockedByDivineAxiom && hasDivineNatureTag(unit)) {
       return status;
     }
     const list = ensureStatusList(unit);

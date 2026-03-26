@@ -532,6 +532,23 @@ export function dealAbilityDamage(
   if (isKill) {
     attackerState._directKills = Math.max(0, Math.floor(Number(attackerState._directKills ?? 0))) + 1;
     emitPassiveEvent(Game, attacker, 'onEnemyDeath', { log: getPassiveLog(Game), target, attackType, isDirectKill: true });
+    const bloodAvatarObservers = Game?.tokens?.filter((token) =>
+      token.alive
+      && token.id === 'blood_avatar'
+      && token.side !== target.side
+      && token.iid !== attacker.iid
+    ) ?? [];
+    if (bloodAvatarObservers.length > 0) {
+      const observerLog = getPassiveLog(Game);
+      for (const observer of bloodAvatarObservers) {
+        emitPassiveEvent(Game, observer, 'onEnemyDeath', {
+          log: observerLog,
+          target,
+          attackType,
+          isDirectKill: false,
+        });
+      }
+    }
   }
 
   gainFury(attacker, {

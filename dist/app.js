@@ -4645,6 +4645,21 @@ __define('./combat.ts', (exports, module, __require) => {
       if (isKill) {
           attackerState._directKills = Math.max(0, Math.floor(Number(attackerState._directKills ?? 0))) + 1;
           emitPassiveEvent(Game, attacker, 'onEnemyDeath', { log: getPassiveLog(Game), target, attackType, isDirectKill: true });
+          const bloodAvatarObservers = Game?.tokens?.filter((token) => token.alive
+              && token.id === 'blood_avatar'
+              && token.side !== target.side
+              && token.iid !== attacker.iid) ?? [];
+          if (bloodAvatarObservers.length > 0) {
+              const observerLog = getPassiveLog(Game);
+              for (const observer of bloodAvatarObservers) {
+                  emitPassiveEvent(Game, observer, 'onEnemyDeath', {
+                      log: observerLog,
+                      target,
+                      attackType,
+                      isDirectKill: false,
+                  });
+              }
+          }
       }
       gainFury(attacker, {
           type: attackType === 'basic' ? 'basic' : 'ability',
@@ -5244,7 +5259,7 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
                   return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0, reason: 'blocked' };
               }
               casterState._bloodFieldUsed = true;
-              Statuses.add(caster, { id: 'blood_field_active', kind: 'buff', tag: 'field', dur: 2, tick: 'turn', sourceUnitId: caster.id });
+              Statuses.add(caster, { id: 'blood_field_active', kind: 'field', tag: 'field', dur: 2, tick: 'turn', sourceUnitId: caster.id });
               for (const token of game.tokens) {
                   if (!token.alive)
                       continue;
@@ -30992,9 +31007,8 @@ __define('./statuses.ts', (exports, module, __require) => {
   };
   const Statuses = {
       add(unit, status) {
-          const isBuffDebuff = status.kind === 'buff' || status.kind === 'debuff';
-          const sourceUnitId = typeof status.sourceUnitId === 'string' ? status.sourceUnitId : null;
-          if (isBuffDebuff && hasDivineNatureTag(unit) && sourceUnitId && sourceUnitId !== unit.id) {
+          const isBlockedByDivineAxiom = status.kind === 'buff' || status.kind === 'debuff' || status.kind === 'mark';
+          if (isBlockedByDivineAxiom && hasDivineNatureTag(unit)) {
               return status;
           }
           const list = ensureStatusList(unit);
@@ -31973,7 +31987,24 @@ __define('./turns.ts', (exports, module, __require) => {
           if (emitOnActionEnd) {
               emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
           }
+          const wasAliveBeforeTurnEnd = !!unit?.alive;
+          const hadBleedBeforeTurnEnd = !!unit && Statuses.has(unit, 'bleed');
           Statuses.onTurnEnd(unit, {});
+          if (wasAliveBeforeTurnEnd && unit && !unit.alive && hadBleedBeforeTurnEnd) {
+              const bloodAvatarObservers = Game.tokens.filter((token) => token.alive
+                  && token.id === 'blood_avatar'
+                  && token.side !== unit.side);
+              if (bloodAvatarObservers.length > 0) {
+                  for (const observer of bloodAvatarObservers) {
+                      emitPassiveEvent(Game, observer, 'onEnemyDeath', {
+                          log: passiveLog,
+                          target: unit,
+                          attackType: 'dot',
+                          isDirectKill: false,
+                      });
+                  }
+              }
+          }
           ensureBusyReset();
           resolution.consumedTurn = consumedTurn;
           resolution.acted = acted;

@@ -151,7 +151,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
         return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0, reason: 'blocked' };
       }
       casterState._bloodFieldUsed = true;
-      Statuses.add(caster, { id: 'blood_field_active', kind: 'buff', tag: 'field', dur: 2, tick: 'turn', sourceUnitId: caster.id });
+      Statuses.add(caster, { id: 'blood_field_active', kind: 'field', tag: 'field', dur: 2, tick: 'turn', sourceUnitId: caster.id });
       for (const token of game.tokens) {
         if (!token.alive) continue;
         if (token.side === caster.side) {

@@ -640,7 +640,7 @@ export function doActionOrSkip(
     }
   };
 
-const completeTurn = ({
+  const completeTurn = ({
     consumedTurn,
     acted,
     reason,
@@ -656,7 +656,26 @@ const completeTurn = ({
     if (emitOnActionEnd) {
       emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
     }
+    const wasAliveBeforeTurnEnd = !!unit?.alive;
+    const hadBleedBeforeTurnEnd = !!unit && Statuses.has(unit, 'bleed');
     Statuses.onTurnEnd(unit, {});
+    if (wasAliveBeforeTurnEnd && unit && !unit.alive && hadBleedBeforeTurnEnd) {
+      const bloodAvatarObservers = Game.tokens.filter((token) =>
+        token.alive
+        && token.id === 'blood_avatar'
+        && token.side !== unit.side
+      );
+      if (bloodAvatarObservers.length > 0) {
+        for (const observer of bloodAvatarObservers) {
+          emitPassiveEvent(Game, observer, 'onEnemyDeath', {
+            log: passiveLog,
+            target: unit,
+            attackType: 'dot',
+            isDirectKill: false,
+          });
+        }
+      }
+    }
     ensureBusyReset();
     resolution.consumedTurn = consumedTurn;
     resolution.acted = acted;
