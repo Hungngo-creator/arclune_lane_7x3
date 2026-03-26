@@ -255,13 +255,18 @@ const hasAbsoluteLawTag = (unit: UnitToken | null | undefined, mode: 'attack' | 
   if (!unit) return false;
   const statuses = Array.isArray(unit.statuses) ? unit.statuses : [];
   const modeNeedles = mode === 'attack'
-   ? ABSOLUTE_ATTACK_TAG_IDS
+    ? ABSOLUTE_ATTACK_TAG_IDS
     : ABSOLUTE_SHIELD_TAG_IDS;
-  return statuses.some((status: { id?: string; tag?: string }) => {
+  for (let i = 0; i < statuses.length; i += 1) {
+    const status = statuses[i] as { id?: string; tag?: string };
     const haystack = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
     if (haystack.includes('absolute') || haystack.includes('tuyetdoi')) return true;
-    return modeNeedles.some((needle) => haystack.includes(needle));
-  });
+    for (let j = 0; j < modeNeedles.length; j += 1) {
+      const needle = modeNeedles[j];
+      if (typeof needle === 'string' && haystack.includes(needle)) return true;
+    }
+  }
+  return false;
 };
 
 const getSharedHpGroup = (target: UnitToken): string | null => {
@@ -269,12 +274,16 @@ const getSharedHpGroup = (target: UnitToken): string | null => {
     .find((value) => typeof value === 'string' && value.trim());
   if (typeof ownKey === 'string') return ownKey;
   const statuses = Array.isArray(target.statuses) ? target.statuses : [];
-  for (const status of statuses) {
+  for (let i = 0; i < statuses.length; i += 1) {
+    const status = statuses[i] as Record<string, unknown>;
     const idTag = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
     if (!idTag.includes('share')) continue;
-    const linked = [status.group, status.link, status.key]
-      .find((value) => typeof value === 'string' && value.trim());
-    if (typeof linked === 'string') return linked;
+    const group = status.group;
+    if (typeof group === 'string' && group.trim()) return group;
+    const link = status.link;
+    if (typeof link === 'string' && link.trim()) return link;
+    const key = status.key;
+    if (typeof key === 'string' && key.trim()) return key;
   }
   return null;
 };

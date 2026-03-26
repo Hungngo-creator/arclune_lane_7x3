@@ -1,25 +1,34 @@
 // Bundled by build.mjs
 const __modules = Object.create(null);
 const __cache = Object.create(null);
+const __hasOwn = Object.prototype.hasOwnProperty;
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
 const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
-function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }
-function __define(id, factory){ __modules[id] = factory; }
+const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
-  const normalizedId = __normalizeModuleId(id);
-  const cached = __cache[normalizedId];
+  let moduleId = id;
+  let cached = __cache[moduleId];
   if (cached) return cached.exports;
-  const factory = __modules[normalizedId];
-  if (!factory) throw new Error('Module not found: ' + normalizedId);
+  let factory = __modules[moduleId];
+  if (!factory && !__emptyAliases){
+    const aliased = __legacyModuleAliases[moduleId];
+    if (aliased){
+      moduleId = aliased;
+      cached = __cache[moduleId];
+      if (cached) return cached.exports;
+      factory = __modules[moduleId];
+    }
+  }
+  if (!factory) throw new Error('Module not found: ' + moduleId);
   const module = { exports: {} };
-  __cache[normalizedId] = module;
+  __cache[moduleId] = module;
   factory(module.exports, module, __require);
   return module.exports;
 }
 if (typeof globalThis !== "undefined" && typeof globalThis.__moduleCache === "undefined"){ globalThis.__moduleCache = __cache; }
 if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }
-__define('./aether.ts', (exports, module, __require) => {
+__modules['./aether.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/aether.ts
   class SharedAetherPool {
       max = 0;
@@ -314,8 +323,8 @@ __define('./aether.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'globalAetherPool')) exports.globalAetherPool = globalAetherPool;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveActionAetherRegen')) exports.resolveActionAetherRegen = resolveActionAetherRegen;
   if (!Object.prototype.hasOwnProperty.call(exports, 'SharedAetherPool')) exports.SharedAetherPool = SharedAetherPool;
-});
-__define('./ai.ts', (exports, module, __require) => {
+};
+__modules['./ai.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/ai.ts
   const __dep0 = __require('./engine.ts');
   const pickRandom = __dep0.pickRandom;
@@ -1021,8 +1030,8 @@ __define('./ai.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'queueEnemyAt')) exports.queueEnemyAt = queueEnemyAt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'aiMaybeAct')) exports.aiMaybeAct = aiMaybeAct;
   if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateGambitLogic')) exports.evaluateGambitLogic = evaluateGambitLogic;
-});
-__define('./app/shell.ts', (exports, module, __require) => {
+};
+__modules['./app/shell.ts'] = (exports, module, __require) => {
   const DEFAULT_SCREEN = 'main-menu';
   function cloneParams(params) {
       if (params === null) {
@@ -1184,8 +1193,8 @@ __define('./app/shell.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createAppShell')) exports.createAppShell = createAppShell;
-});
-__define('./art.ts', (exports, module, __require) => {
+};
+__modules['./art.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/art.ts
   function svgData(width, height, body) {
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">${body}</svg>`;
@@ -1894,8 +1903,8 @@ __define('./art.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'setUnitSkin')) exports.setUnitSkin = setUnitSkin;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitSkin')) exports.getUnitSkin = getUnitSkin;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitArt')) exports.getUnitArt = getUnitArt;
-});
-__define('./background.ts', (exports, module, __require) => {
+};
+__modules['./background.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/background.ts
   const __dep0 = __require('./config.ts');
   const CFG = __dep0.CFG;
@@ -2372,8 +2381,8 @@ __define('./background.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ENVIRONMENT_PROP_TYPES')) exports.ENVIRONMENT_PROP_TYPES = ENVIRONMENT_PROP_TYPES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'drawEnvironmentProps')) exports.drawEnvironmentProps = drawEnvironmentProps;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getEnvironmentBackground')) exports.getEnvironmentBackground = getEnvironmentBackground;
-});
-__define('./catalog.ts', (exports, module, __require) => {
+};
+__modules['./catalog.ts'] = (exports, module, __require) => {
   // @ts-check
   //home (termux)/arclune_lane_7x3/src/catalog.ts
   // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
@@ -4227,8 +4236,8 @@ __define('./catalog.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'isSummoner')) exports.isSummoner = isSummoner;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CLASS_GROWTH')) exports.CLASS_GROWTH = CLASS_GROWTH;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyRankAndMods')) exports.applyRankAndMods = applyRankAndMods;
-});
-__define('./combat.ts', (exports, module, __require) => {
+};
+__modules['./combat.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/combat.ts
   const __dep0 = __require('./catalog.ts');
   const getMetaById = __dep0.getMetaById;
@@ -4392,12 +4401,18 @@ __define('./combat.ts', (exports, module, __require) => {
       const modeNeedles = mode === 'attack'
           ? ABSOLUTE_ATTACK_TAG_IDS
           : ABSOLUTE_SHIELD_TAG_IDS;
-      return statuses.some((status) => {
+      for (let i = 0; i < statuses.length; i += 1) {
+          const status = statuses[i];
           const haystack = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
           if (haystack.includes('absolute') || haystack.includes('tuyetdoi'))
               return true;
-          return modeNeedles.some((needle) => haystack.includes(needle));
-      });
+          for (let j = 0; j < modeNeedles.length; j += 1) {
+              const needle = modeNeedles[j];
+              if (typeof needle === 'string' && haystack.includes(needle))
+                  return true;
+          }
+      }
+      return false;
   };
   const getSharedHpGroup = (target) => {
       const ownKey = [target.sharedHpGroup, target.sharedDamageGroup, target.linkGroup]
@@ -4405,14 +4420,20 @@ __define('./combat.ts', (exports, module, __require) => {
       if (typeof ownKey === 'string')
           return ownKey;
       const statuses = Array.isArray(target.statuses) ? target.statuses : [];
-      for (const status of statuses) {
+      for (let i = 0; i < statuses.length; i += 1) {
+          const status = statuses[i];
           const idTag = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
           if (!idTag.includes('share'))
               continue;
-          const linked = [status.group, status.link, status.key]
-              .find((value) => typeof value === 'string' && value.trim());
-          if (typeof linked === 'string')
-              return linked;
+          const group = status.group;
+          if (typeof group === 'string' && group.trim())
+              return group;
+          const link = status.link;
+          if (typeof link === 'string' && link.trim())
+              return link;
+          const key = status.key;
+          if (typeof key === 'string' && key.trim())
+              return key;
       }
       return null;
   };
@@ -4864,8 +4885,8 @@ __define('./combat.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'healUnit')) exports.healUnit = healUnit;
   if (!Object.prototype.hasOwnProperty.call(exports, 'basicAttack')) exports.basicAttack = basicAttack;
   if (!Object.prototype.hasOwnProperty.call(exports, 'doBasicWithFollowups')) exports.doBasicWithFollowups = doBasicWithFollowups;
-});
-__define('./combat/apply-damage.ts', (exports, module, __require) => {
+};
+__modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/combat/apply-damage.ts
   const __dep0 = __require('./utils/time.ts');
   const sessionNow = __dep0.sessionNow;
@@ -4910,8 +4931,8 @@ __define('./combat/apply-damage.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyDamage')) exports.applyDamage = applyDamage;
   if (!Object.prototype.hasOwnProperty.call(exports, 'grantShield')) exports.grantShield = grantShield;
-});
-__define('./combat/calculate-final-damage.ts', (exports, module, __require) => {
+};
+__modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) => {
   const clampDamage = (value) => {
       const parsed = typeof value === 'number' ? value : Number(value);
       if (!Number.isFinite(parsed))
@@ -4955,8 +4976,8 @@ __define('./combat/calculate-final-damage.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'calculateFinalDamage')) exports.calculateFinalDamage = calculateFinalDamage;
-});
-__define('./combat/counter-matrix.ts', (exports, module, __require) => {
+};
+__modules['./combat/counter-matrix.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./utils/domain-normalization.ts');
   const normalizeClassName = __dep0.normalizeClassName;
   const normalizeElementKey = __dep0.normalizeElementKey;
@@ -5116,8 +5137,8 @@ __define('./combat/counter-matrix.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getClassBonus')) exports.getClassBonus = getClassBonus;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getSynergyBonus')) exports.getSynergyBonus = getSynergyBonus;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCounterBonusMetadata')) exports.getCounterBonusMetadata = getCounterBonusMetadata;
-});
-__define('./combat/perform-active-skill.ts', (exports, module, __require) => {
+};
+__modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
   const healUnit = __dep0.healUnit;
@@ -5353,8 +5374,8 @@ __define('./combat/perform-active-skill.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'performActiveSkill')) exports.performActiveSkill = performActiveSkill;
-});
-__define('./combat/tag-dispatch.ts', (exports, module, __require) => {
+};
+__modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/apply-damage.ts');
   const applyDamage = __dep0.applyDamage;
   const grantShield = __dep0.grantShield;
@@ -5632,8 +5653,8 @@ __define('./combat/tag-dispatch.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'dispatchGameplayTags')) exports.dispatchGameplayTags = dispatchGameplayTags;
-});
-__define('./config.ts', (exports, module, __require) => {
+};
+__modules['./config.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/config.ts
   const __dep0 = __require('./config/schema.ts');
   const parseGameConfig = __dep0.parseGameConfig;
@@ -5834,18 +5855,18 @@ __define('./config.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'CAM')) exports.CAM = CAM;
   if (!Object.prototype.hasOwnProperty.call(exports, 'TOKEN_STYLE')) exports.TOKEN_STYLE = TOKEN_STYLE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CHIBI')) exports.CHIBI = CHIBI;
-});
-__define('./config/package-lock.json', (exports, module, __require) => {
+};
+__modules['./config/package-lock.json'] = (exports, module, __require) => {
   const data = JSON.parse('{"name":"arclune_lane_7x3","version":"1.0.0","lockfileVersion":3,"requires":true,"packages":{"":{"name":"arclune_lane_7x3","version":"1.0.0","license":"ISC","dependencies":{"zod":"file:tools/zod-stub"},"devDependencies":{"esbuild":"file:tools/esbuild-stub","tsx":"file:tools/tsx-stub"}},"node_modules/esbuild":{"resolved":"tools/esbuild-stub","link":true},"node_modules/zod":{"resolved":"tools/zod-stub","link":true},"node_modules/tsx":{"resolved":"tools/tsx-stub","link":true},"tools/esbuild-stub":{"name":"esbuild","version":"0.0.0-stub","dev":true},"tools/zod-stub":{"name":"zod","version":"0.0.0-stub"},"tools/tsx-stub":{"name":"tsx","version":"4.7.1","dev":true,"bin":{"tsx":"bin.js"}}}}');
   module.exports = data;
   module.exports.default = data;
-});
-__define('./config/package.json', (exports, module, __require) => {
+};
+__modules['./config/package.json'] = (exports, module, __require) => {
   const data = JSON.parse('{"name":"arclune_lane_7x3","version":"1.0.0","description":"","scripts":{"build":"npm run build:prod","build:dev":"node ../../tools/generate-loithienanh-svg.mjs && node ../../build.mjs --mode=development","build:prod":"node ../../tools/generate-loithienanh-svg.mjs && node ../../build.mjs --mode=production","dev":"APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx watch $APP_ENTRY","start":"NODE_ENV=${NODE_ENV:-production} APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx $APP_ENTRY","test":"jest --runInBand","typecheck":"tsc --noEmit"},"keywords":[],"author":"","license":"ISC","type":"commonjs","dependencies":{"zod":"file:tools/zod-stub"},"devDependencies":{"@types/jest":"^29.5.12","esbuild":"file:tools/esbuild-stub","jest":"^29.7.0","ts-jest":"^29.2.5","ts-node":"^10.9.2","tsx":"file:tools/tsx-stub","typescript":"^5.4.0"}}');
   module.exports = data;
   module.exports.default = data;
-});
-__define('./config/schema.ts', (exports, module, __require) => {
+};
+__modules['./config/schema.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/config/schema.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
@@ -6061,8 +6082,8 @@ __define('./config/schema.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseSceneConfig')) exports.parseSceneConfig = parseSceneConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseWorldMapConfig')) exports.parseWorldMapConfig = parseWorldMapConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseGameConfig')) exports.parseGameConfig = parseGameConfig;
-});
-__define('./cultivation.ts', (exports, module, __require) => {
+};
+__modules['./cultivation.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./data/economy.ts');
   const getCultivationRealmEconomy = __dep0.getCultivationRealmEconomy;
   const __dep1 = __require('./utils/currency.ts');
@@ -6383,8 +6404,8 @@ __define('./cultivation.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'canBreakthrough')) exports.canBreakthrough = canBreakthrough;
   if (!Object.prototype.hasOwnProperty.call(exports, 'upgradeCultivation')) exports.upgradeCultivation = upgradeCultivation;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyCultivationBonus')) exports.applyCultivationBonus = applyCultivationBonus;
-});
-__define('./data/campaign-stages.ts', (exports, module, __require) => {
+};
+__modules['./data/campaign-stages.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./catalog.ts');
   const ROSTER = __dep0.ROSTER;
   const __dep1 = __require('./data/skills.ts');
@@ -6500,8 +6521,8 @@ __define('./data/campaign-stages.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'CAMPAIGN_STAGE_DATA')) exports.CAMPAIGN_STAGE_DATA = CAMPAIGN_STAGE_DATA;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveBossName')) exports.resolveBossName = resolveBossName;
-});
-__define('./data/cost-budget.ts', (exports, module, __require) => {
+};
+__modules['./data/cost-budget.ts'] = (exports, module, __require) => {
   const COST_MIN = 7;
   const COST_MAX = 22;
   const RANK_MULTIPLIER = Object.freeze({
@@ -6829,8 +6850,8 @@ __define('./data/cost-budget.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'deriveBudgetFromRankRole')) exports.deriveBudgetFromRankRole = deriveBudgetFromRankRole;
   if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateCostBudget')) exports.evaluateCostBudget = evaluateCostBudget;
   if (!Object.prototype.hasOwnProperty.call(exports, 'estimateCostFromTags')) exports.estimateCostFromTags = estimateCostFromTags;
-});
-__define('./data/economy.config.ts', (exports, module, __require) => {
+};
+__modules['./data/economy.config.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/economy.config.ts
   const economyConfig = {
       currencies: [
@@ -7061,8 +7082,8 @@ __define('./data/economy.config.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'default')) exports.default = economyConfig;
   module.exports.default = exports.default;
-});
-__define('./data/economy.ts', (exports, module, __require) => {
+};
+__modules['./data/economy.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/economy.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
@@ -7295,8 +7316,8 @@ __define('./data/economy.ts', (exports, module, __require) => {
   exports.listCultivationRealmsEconomy = listCultivationRealmsEconomy;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
-});
-__define('./data/load-config.ts', (exports, module, __require) => {
+};
+__modules['./data/load-config.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/load-config.ts
   function loadConfig(rawConfig, schema) {
       try {
@@ -7311,8 +7332,8 @@ __define('./data/load-config.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'loadConfig')) exports.loadConfig = loadConfig;
-});
-__define('./data/modes.ts', (exports, module, __require) => {
+};
+__modules['./data/modes.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/mode.ts
   const __dep0 = __require('./data/economy.ts');
   const getLotterySplit = __dep0.getLotterySplit;
@@ -7672,8 +7693,8 @@ __define('./data/modes.ts', (exports, module, __require) => {
   exports.listModesForSection = listModesForSection;
   exports.getMenuSections = getMenuSections;
   //# sourceMappingURL=stdin.js.map
-});
-__define('./data/roster-preview.config.ts', (exports, module, __require) => {
+};
+__modules['./data/roster-preview.config.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/roster-preview.config.ts
   const rosterPreviewConfig = {
       tpDelta: {
@@ -7712,8 +7733,8 @@ __define('./data/roster-preview.config.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'default')) exports.default = rosterPreviewConfig;
   module.exports.default = exports.default;
-});
-__define('./data/roster-preview.ts', (exports, module, __require) => {
+};
+__modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/roster-preview.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
@@ -7882,8 +7903,8 @@ __define('./data/roster-preview.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'deriveTpFromMods')) exports.deriveTpFromMods = deriveTpFromMods;
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildRosterPreviews')) exports.buildRosterPreviews = buildRosterPreviews;
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildPreviewRows')) exports.buildPreviewRows = buildPreviewRows;
-});
-__define('./data/skills.config.ts', (exports, module, __require) => {
+};
+__modules['./data/skills.config.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/skills.config.ts
   /**
    * skills.config chỉ giữ phần override/metadata đặc thù.
@@ -7916,8 +7937,8 @@ __define('./data/skills.config.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'default')) exports.default = skillsConfig;
   module.exports.default = exports.default;
-});
-__define('./data/skills.ts', (exports, module, __require) => {
+};
+__modules['./data/skills.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/skills.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
@@ -8174,8 +8195,8 @@ __define('./data/skills.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'listSkillSets')) exports.listSkillSets = listSkillSets;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasSkillSet')) exports.hasSkillSet = hasSkillSet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'validateSkillSetStructure')) exports.validateSkillSetStructure = validateSkillSetStructure;
-});
-__define('./data/tags.ts', (exports, module, __require) => {
+};
+__modules['./data/tags.ts'] = (exports, module, __require) => {
   const CURRENT_TAG_ALIAS_VERSION = 'v1';
   const TAG_DEFINITIONS = [
       { id: 'instant', label: 'Lập tức', domain: 'timing', aliases: ['instant-cast', 'instantCast', 'lap_tuc'] },
@@ -8366,13 +8387,13 @@ __define('./data/tags.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getTagDefinition')) exports.getTagDefinition = getTagDefinition;
   if (!Object.prototype.hasOwnProperty.call(exports, 'listUnknownTags')) exports.listUnknownTags = listUnknownTags;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasAnyTag')) exports.hasAnyTag = hasAnyTag;
-});
-__define('./data/vfx_anchors/loithienanh.json', (exports, module, __require) => {
+};
+__modules['./data/vfx_anchors/loithienanh.json'] = (exports, module, __require) => {
   const data = JSON.parse('{"unitId":"loithienanh","bodyAnchors":{"root":{"x":0.5,"y":0.5},"head":{"x":0.5,"y":0.86},"chest":{"x":0.5,"y":0.68},"pelvis":{"x":0.5,"y":0.44},"right_fist":{"x":0.66,"y":0.58},"left_fist":{"x":0.34,"y":0.58},"right_elbow":{"x":0.63,"y":0.66},"left_elbow":{"x":0.37,"y":0.66},"right_foot":{"x":0.6,"y":0.1},"left_foot":{"x":0.4,"y":0.1},"back_core":{"x":0.5,"y":0.64}},"vfxBindings":{"basic_combo":{"description":"Đòn đấm thường hai hit, ưu tiên tay phải sau đó tay trái.","anchors":[{"id":"right_fist","timing":"hit1","radius":0.12},{"id":"left_fist","timing":"hit2","radius":0.11}]},"loi_anh_tam_kich":{"description":"Skill1 tung ba cú đấm lôi, tái sử dụng anchor tay phải cho tia hồ quang và tay trái khi chuyển mục tiêu.","anchors":[{"id":"right_fist","timing":"arc_spawn","radius":0.14},{"id":"left_fist","timing":"follow_through","radius":0.12}]},"ngu_loi_phe_than":{"description":"Skill2 đốt máu phát lôi cầu quanh thân, xuất phát từ ngực lan ra 5 hướng.","anchors":[{"id":"chest","timing":"charge","radius":0.18},{"id":"right_fist","timing":"launch_major","radius":0.14},{"id":"left_fist","timing":"launch_minor","radius":0.13}]},"loi_the_bach_chien":{"description":"Skill3 dựng lớp bảo hộ bằng trường điện quấn quanh thân.","anchors":[{"id":"chest","timing":"shield_core","radius":0.22},{"id":"back_core","timing":"shield_back","radius":0.24}]},"huyet_hon_loi_quyet":{"description":"Tuyệt kỹ bùng nổ lôi huyết: hút năng lượng ở ngực, nổ ra trước bụng và chân.","anchors":[{"id":"chest","timing":"charge_up","radius":0.2},{"id":"root","timing":"burst_core","radius":0.26},{"id":"right_foot","timing":"ground_crack","radius":0.15},{"id":"left_foot","timing":"ground_crack","radius":0.15}]}},"ambientEffects":{"lightning_scars":{"description":"Hoa văn lôi văn chạy trên tay và ngực, phát sáng nhịp tim.","anchors":[{"id":"right_elbow","timing":"pulse","radius":0.1},{"id":"left_elbow","timing":"pulse","radius":0.1},{"id":"chest","timing":"pulse","radius":0.12}]},"thermal_noise":{"description":"Nhiễu nhiệt nhẹ trên toàn thân khi đứng yên.","anchors":[{"id":"chest","timing":"idle","radius":0.3}]},"storm_backdrop":{"description":"Hiệu ứng hậu cảnh vòng ấn lôi huyết và mây dông trong các cảnh ult.","anchors":[{"id":"back_core","timing":"ult_only","radius":0.35}]}}}');
   module.exports = data;
   module.exports.default = data;
-});
-__define('./data/vfx_anchors/schema.ts', (exports, module, __require) => {
+};
+__modules['./data/vfx_anchors/schema.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/vfx_anchors/schema.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
@@ -8407,8 +8428,8 @@ __define('./data/vfx_anchors/schema.ts', (exports, module, __require) => {
   };
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseVfxAnchorDataset')) exports.parseVfxAnchorDataset = parseVfxAnchorDataset;
-});
-__define('./engine.ts', (exports, module, __require) => {
+};
+__modules['./engine.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/engine.ts
   const __dep0 = __require('./config.ts');
   const TOKEN_STYLE = __dep0.TOKEN_STYLE;
@@ -8425,6 +8446,19 @@ __define('./engine.ts', (exports, module, __require) => {
   };
   const CHIBI_PROPS = CHIBI;
   const TOKEN_STYLE_VALUE = TOKEN_STYLE;
+  const TOKEN_DRAW_BUFFER = [];
+  const sortByProjectionDepth = (a, b) => {
+      const ya = a.projection.y;
+      const yb = b.projection.y;
+      if (ya === yb)
+          return a.token.cx - b.token.cx;
+      return ya - yb;
+  };
+  const normalizeShadowPreset = (value, fallback = null) => {
+      if (value === 'off' || value === 'soft' || value === 'medium')
+          return value;
+      return fallback;
+  };
   const tokenVisualKey = (token) => {
       if (!token)
           return null;
@@ -9128,7 +9162,9 @@ __define('./engine.ts', (exports, module, __require) => {
       const baseR = Math.floor(g.tile * 0.36);
       const sig = contextSignature(g, C);
       const meleeOffsets = options?.meleeOffsets ?? null;
-      const alive = [];
+      const meleeOffsetMap = meleeOffsets instanceof Map ? meleeOffsets : null;
+      const alive = TOKEN_DRAW_BUFFER;
+      alive.length = 0;
       for (const token of tokens) {
           if (!token || !token.alive) {
               if (token && !token.alive) {
@@ -9145,25 +9181,14 @@ __define('./engine.ts', (exports, module, __require) => {
           if (!projection)
               continue;
           const key = tokenVisualKey(token);
-          const offset = key && meleeOffsets instanceof Map ? meleeOffsets.get(key) ?? null : null;
+          const offset = key && meleeOffsetMap ? meleeOffsetMap.get(key) ?? null : null;
           const adjusted = offset
               ? { x: projection.x + offset.x, y: projection.y + offset.y, scale: projection.scale }
               : projection;
           alive.push({ token, projection: adjusted });
       }
-      alive.sort((a, b) => {
-          const ya = a.projection.y;
-          const yb = b.projection.y;
-          if (ya === yb)
-              return a.token.cx - b.token.cx;
-          return ya - yb;
-      });
+      alive.sort(sortByProjectionDepth);
       const perfCfg = CFG?.PERFORMANCE || {};
-      const normalizePreset = (value, fallback = null) => {
-          if (value === 'off' || value === 'soft' || value === 'medium')
-              return value;
-          return fallback;
-      };
       const mediumThreshold = Number.isFinite(perfCfg.SHADOW_MEDIUM_THRESHOLD)
           ? perfCfg.SHADOW_MEDIUM_THRESHOLD
           : null;
@@ -9176,17 +9201,17 @@ __define('./engine.ts', (exports, module, __require) => {
       const gridDpr = Number.isFinite(g?.dpr) ? g.dpr : null;
       let shadowPreset = null;
       if (perfCfg.LOW_POWER_SHADOWS) {
-          shadowPreset = normalizePreset(perfCfg.LOW_SHADOW_PRESET, 'off');
+          shadowPreset = normalizeShadowPreset(perfCfg.LOW_SHADOW_PRESET, 'off');
       }
       else {
           if (!shadowPreset && highDprCutoff !== null && gridDpr !== null && gridDpr >= highDprCutoff) {
-              shadowPreset = normalizePreset(perfCfg.HIGH_DPR_SHADOW_PRESET, 'off');
+              shadowPreset = normalizeShadowPreset(perfCfg.HIGH_DPR_SHADOW_PRESET, 'off');
           }
           if (!shadowPreset && shadowThreshold !== null && alive.length >= shadowThreshold) {
-              shadowPreset = normalizePreset(perfCfg.HIGH_LOAD_SHADOW_PRESET, normalizePreset(perfCfg.LOW_SHADOW_PRESET, 'off'));
+              shadowPreset = normalizeShadowPreset(perfCfg.HIGH_LOAD_SHADOW_PRESET, normalizeShadowPreset(perfCfg.LOW_SHADOW_PRESET, 'off'));
           }
           if (!shadowPreset && mediumThreshold !== null && alive.length >= mediumThreshold) {
-              shadowPreset = normalizePreset(perfCfg.MEDIUM_SHADOW_PRESET, 'medium');
+              shadowPreset = normalizeShadowPreset(perfCfg.MEDIUM_SHADOW_PRESET, 'medium');
           }
       }
       const reduceShadows = shadowPreset !== null;
@@ -9359,8 +9384,8 @@ __define('./engine.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'slotIndex')) exports.slotIndex = slotIndex;
   if (!Object.prototype.hasOwnProperty.call(exports, 'slotToCell')) exports.slotToCell = slotToCell;
   if (!Object.prototype.hasOwnProperty.call(exports, 'zoneCode')) exports.zoneCode = zoneCode;
-});
-__define('./entry.ts', (exports, module, __require) => {
+};
+__modules['./entry.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/entry.ts
   __require('./aether.ts');
   const __dep0 = __require('./app/shell.ts');
@@ -10817,8 +10842,8 @@ __define('./entry.ts', (exports, module, __require) => {
       }
   })();
   //# sourceMappingURL=stdin.js.map
-});
-__define('./events.ts', (exports, module, __require) => {
+};
+__modules['./events.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/events.ts
   const TURN_START = 'turn:start';
   const TURN_END = 'turn:end';
@@ -11074,8 +11099,8 @@ __define('./events.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'isEventEmitterLike')) exports.isEventEmitterLike = isEventEmitterLike;
   if (!Object.prototype.hasOwnProperty.call(exports, 'emitGameEvent')) exports.emitGameEvent = emitGameEvent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'addGameEventListener')) exports.addGameEventListener = addGameEventListener;
-});
-__define('./leader-uyen.ts', (exports, module, __require) => {
+};
+__modules['./leader-uyen.ts'] = (exports, module, __require) => {
   function isSystemLeader(unit) {
       return !!unit && typeof unit.id === 'string' && unit.id.startsWith('leader');
   }
@@ -11226,8 +11251,8 @@ __define('./leader-uyen.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'queueUyenUltCast')) exports.queueUyenUltCast = queueUyenUltCast;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasQueuedUyenUlt')) exports.hasQueuedUyenUlt = hasQueuedUyenUlt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearQueuedUyenUlt')) exports.clearQueuedUyenUlt = clearQueuedUyenUlt;
-});
-__define('./main.ts', (exports, module, __require) => {
+};
+__modules['./main.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/main.ts
   const __dep1 = __require('./events.ts');
   const addGameEventListener = __dep1.addGameEventListener;
@@ -11288,17 +11313,19 @@ __define('./main.ts', (exports, module, __require) => {
       }
       if (currentSession && pendingSkins.size > 0) {
           const appliedUnitIds = [];
-          pendingSkins.forEach((skinKey, unitId) => {
+          for (const [unitId, skinKey] of pendingSkins) {
               const applied = currentSession?.setUnitSkin(unitId, skinKey) ?? false;
               if (applied) {
                   appliedUnitIds.push(unitId);
               }
-          });
+          }
           if (appliedUnitIds.length === pendingSkins.size) {
               pendingSkins.clear();
           }
           else {
-              appliedUnitIds.forEach((unitId) => pendingSkins.delete(unitId));
+              for (const unitId of appliedUnitIds) {
+                  pendingSkins.delete(unitId);
+              }
           }
       }
       return session;
@@ -11323,7 +11350,7 @@ __define('./main.ts', (exports, module, __require) => {
           pendingSkins.set(unitId, normalizedSkinKey);
           return true;
       }
-      const applied = currentSession.setUnitSkin(unitId, skinKey);
+      const applied = currentSession.setUnitSkin(unitId, normalizedSkinKey);
       if (applied) {
           pendingSkins.set(unitId, normalizedSkinKey);
       }
@@ -11350,8 +11377,8 @@ __define('./main.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrentSession')) exports.getCurrentSession = getCurrentSession;
   if (!Object.prototype.hasOwnProperty.call(exports, 'setUnitSkin')) exports.setUnitSkin = setUnitSkin;
   if (!Object.prototype.hasOwnProperty.call(exports, 'onGameEvent')) exports.onGameEvent = onGameEvent;
-});
-__define('./meta.ts', (exports, module, __require) => {
+};
+__modules['./meta.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/meta.ts — gom lookup + stat khởi tạo + nộ khởi điểm
   const __dep0 = __require('./catalog.ts');
   const CLASS_BASE = __dep0.CLASS_BASE;
@@ -11509,8 +11536,8 @@ __define('./meta.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'metaServiceAdapter')) exports.metaServiceAdapter = metaServiceAdapter;
   if (!Object.prototype.hasOwnProperty.call(exports, 'makeInstanceStats')) exports.makeInstanceStats = makeInstanceStats;
   if (!Object.prototype.hasOwnProperty.call(exports, 'initialRageFor')) exports.initialRageFor = initialRageFor;
-});
-__define('./modes/coming-soon.stub.ts', (exports, module, __require) => {
+};
+__modules['./modes/coming-soon.stub.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/modes/coming-soon.stub.ts
   const comingSoon = true;
   const COMING_SOON_MODULE = {
@@ -11519,8 +11546,8 @@ __define('./modes/coming-soon.stub.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'comingSoon')) exports.comingSoon = comingSoon;
   if (!Object.prototype.hasOwnProperty.call(exports, 'COMING_SOON_MODULE')) exports.COMING_SOON_MODULE = COMING_SOON_MODULE;
-});
-__define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
+};
+__modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./meta.ts');
   const Meta = __dep0.Meta;
   const makeInstanceStats = __dep0.makeInstanceStats;
@@ -11720,8 +11747,8 @@ __define('./modes/pve/collection-mapper.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'mapUnitProgressById')) exports.mapUnitProgressById = mapUnitProgressById;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveRuntimeUnitStats')) exports.resolveRuntimeUnitStats = resolveRuntimeUnitStats;
-});
-__define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
+};
+__modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./units.ts');
   const lookupUnit = __dep0.lookupUnit;
   const __dep1 = __require('./modes/pve/collection-mapper.ts');
@@ -11953,8 +11980,8 @@ __define('./modes/pve/creep-builder.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildAICreepDeckFromLineup')) exports.buildAICreepDeckFromLineup = buildAICreepDeckFromLineup;
-});
-__define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => {
+};
+__modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime-impl.ts
   const __dep2 = __require('./aether.ts');
   const globalAetherPool = __dep2.globalAetherPool;
@@ -16016,8 +16043,8 @@ __define('./modes/pve/session-runtime-impl.ts', (exports, module, __require) => 
   if (!Object.prototype.hasOwnProperty.call(exports, 'createPveSession')) exports.createPveSession = createPveSession;
   if (!Object.prototype.hasOwnProperty.call(exports, '__getStoredConfig')) exports.__getStoredConfig = __getStoredConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, '__getActiveGame')) exports.__getActiveGame = __getActiveGame;
-});
-__define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
+};
+__modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime.ts
   const __dep0 = __require('./events.ts');
   const gameEvents = __dep0.gameEvents;
@@ -16262,8 +16289,8 @@ __define('./modes/pve/session-runtime.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyReward')) exports.applyReward = applyReward;
   if (!Object.prototype.hasOwnProperty.call(exports, 'onSessionEvent')) exports.onSessionEvent = onSessionEvent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createPveSession')) exports.createPveSession = createPveSession;
-});
-__define('./modes/pve/session-state.ts', (exports, module, __require) => {
+};
+__modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/modes/pve/session-state.ts
   const __dep0 = __require('./shared-types/units.ts');
   const createSummonQueue = __dep0.createSummonQueue;
@@ -17025,8 +17052,8 @@ __define('./modes/pve/session-state.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSceneCacheCanvas')) exports.createSceneCacheCanvas = createSceneCacheCanvas;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureSceneCache')) exports.ensureSceneCache = ensureSceneCache;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeDeckEntries')) exports.normalizeDeckEntries = normalizeDeckEntries;
-});
-__define('./modes/pve/session.ts', (exports, module, __require) => {
+};
+__modules['./modes/pve/session.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/modes/pve/session.ts
   const __reexport0 = __require('./modes/pve/session-state.ts');
   for (const key of Object.keys(__reexport0)) {
@@ -17041,8 +17068,8 @@ __define('./modes/pve/session.ts', (exports, module, __require) => {
     exports[key] = __reexport1[key];
   }
   //# sourceMappingURL=stdin.js.map
-});
-__define('./passives.ts', (exports, module, __require) => {
+};
+__modules['./passives.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/passives.ts — passive event dispatch & helpers
   const __dep0 = __require('./statuses.ts');
   const Statuses = __dep0.Statuses;
@@ -17900,8 +17927,8 @@ __define('./passives.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'emitPassiveEvent')) exports.emitPassiveEvent = emitPassiveEvent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyOnSpawnEffects')) exports.applyOnSpawnEffects = applyOnSpawnEffects;
   if (!Object.prototype.hasOwnProperty.call(exports, 'prepareUnitForPassives')) exports.prepareUnitForPassives = prepareUnitForPassives;
-});
-__define('./scene.ts', (exports, module, __require) => {
+};
+__modules['./scene.ts'] = (exports, module, __require) => {
   const DEFAULT_THEME = {
       sky: {
           top: '#1b2434',
@@ -18183,8 +18210,8 @@ __define('./scene.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'invalidateBattlefieldSceneCache')) exports.invalidateBattlefieldSceneCache = invalidateBattlefieldSceneCache;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCachedBattlefieldScene')) exports.getCachedBattlefieldScene = getCachedBattlefieldScene;
   if (!Object.prototype.hasOwnProperty.call(exports, 'drawBattlefieldScene')) exports.drawBattlefieldScene = drawBattlefieldScene;
-});
-__define('./screens/arena-hub/index.ts', (exports, module, __require) => {
+};
+__modules['./screens/arena-hub/index.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/arena-hub/index.ts
   const __dep0 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep0.ensureStyleTag;
@@ -18370,8 +18397,8 @@ __define('./screens/arena-hub/index.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
-});
-__define('./screens/campaign-world-map/index.ts', (exports, module, __require) => {
+};
+__modules['./screens/campaign-world-map/index.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep0.ensureStyleTag;
   const mountSection = __dep0.mountSection;
@@ -18794,8 +18821,8 @@ __define('./screens/campaign-world-map/index.ts', (exports, module, __require) =
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
-});
-__define('./screens/collection/helpers.ts', (exports, module, __require) => {
+};
+__modules['./screens/collection/helpers.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/collection/helpers.ts
   const __dep0 = __require('./catalog.ts');
   const ROSTER = __dep0.ROSTER;
@@ -19294,8 +19321,8 @@ __define('./screens/collection/helpers.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrencyCatalog')) exports.getCurrencyCatalog = getCurrencyCatalog;
   if (!Object.prototype.hasOwnProperty.call(exports, 'toIntlNumberFormatter')) exports.toIntlNumberFormatter = toIntlNumberFormatter;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureNumberFormatter')) exports.ensureNumberFormatter = ensureNumberFormatter;
-});
-__define('./screens/collection/index.ts', (exports, module, __require) => {
+};
+__modules['./screens/collection/index.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/collection/index.ts
   const __dep1 = __require('./screens/collection/view.ts');
   const renderCollectionView = __dep1.renderCollectionView;
@@ -19368,8 +19395,8 @@ __define('./screens/collection/index.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionView')) exports.renderCollectionView = __reexport0.renderCollectionView;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionScreen')) exports.renderCollectionScreen = renderCollectionScreen;
-});
-__define('./screens/collection/state.ts', (exports, module, __require) => {
+};
+__modules['./screens/collection/state.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/collection/state.ts
   function createFilterState(initial) {
       return {
@@ -19387,13 +19414,13 @@ __define('./screens/collection/state.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createFilterState')) exports.createFilterState = createFilterState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateActiveTab')) exports.updateActiveTab = updateActiveTab;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateSelectedUnit')) exports.updateSelectedUnit = updateSelectedUnit;
-});
-__define('./screens/collection/types.ts', (exports, module, __require) => {
+};
+__modules['./screens/collection/types.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/collection/types.ts
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./screens/collection/view.ts', (exports, module, __require) => {
+};
+__modules['./screens/collection/view.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/collection/view.ts
   const __dep0 = __require('./art.ts');
   const getUnitArt = __dep0.getUnitArt;
@@ -21576,8 +21603,8 @@ __define('./screens/collection/view.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionView')) exports.renderCollectionView = renderCollectionView;
-});
-__define('./screens/gacha/view.ts', (exports, module, __require) => {
+};
+__modules['./screens/gacha/view.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/gacha/view.ts
   const __dep0 = __require('./ui/dom.ts');
   const assertElement = __dep0.assertElement;
@@ -21769,8 +21796,8 @@ __define('./screens/gacha/view.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderGachaView')) exports.renderGachaView = renderGachaView;
-});
-__define('./screens/lineup/index.ts', (exports, module, __require) => {
+};
+__modules['./screens/lineup/index.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/lineup/index.ts
   const __dep1 = __require('./screens/lineup/view/index.ts');
   const renderLineupView = __dep1.renderLineupView;
@@ -21916,8 +21943,8 @@ __define('./screens/lineup/index.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = __reexport0.renderLineupView;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupScreen')) exports.renderLineupScreen = renderLineupScreen;
-});
-__define('./screens/lineup/view/events.ts', (exports, module, __require) => {
+};
+__modules['./screens/lineup/view/events.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/lineup/view/event.ts
   const __dep0 = __require('./screens/lineup/view/state.ts');
   const assignUnitToCell = __dep0.assignUnitToCell;
@@ -22262,14 +22289,14 @@ __define('./screens/lineup/view/events.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'bindLineupEvents')) exports.bindLineupEvents = bindLineupEvents;
-});
-__define('./screens/lineup/view/index.ts', (exports, module, __require) => {
+};
+__modules['./screens/lineup/view/index.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/lineup/view/index.ts
   const __reexport0 = __require('./screens/lineup/view/render.ts');
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = __reexport0.renderLineupView;
-});
-__define('./screens/lineup/view/render.ts', (exports, module, __require) => {
+};
+__modules['./screens/lineup/view/render.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/lineup/view/render.ts
   const __dep0 = __require('./data/skills.ts');
   const getSkillSet = __dep0.getSkillSet;
@@ -24066,8 +24093,8 @@ __define('./screens/lineup/view/render.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'serializeSelectedLineup')) exports.serializeSelectedLineup = serializeSelectedLineup;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderLineupView')) exports.renderLineupView = renderLineupView;
-});
-__define('./screens/lineup/view/state.ts', (exports, module, __require) => {
+};
+__modules['./screens/lineup/view/state.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/lineup/view/stage.ts
   const __dep0 = __require('./catalog.ts');
   const ROSTER = __dep0.ROSTER;
@@ -24671,8 +24698,8 @@ __define('./screens/lineup/view/state.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'unlockCell')) exports.unlockCell = unlockCell;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isUnitPlaced')) exports.isUnitPlaced = isUnitPlaced;
   if (!Object.prototype.hasOwnProperty.call(exports, 'setLeader')) exports.setLeader = setLeader;
-});
-__define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
+};
+__modules['./screens/main-menu/dialogues.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/main-menu/dialogues.ts
   const __dep0 = __require('./art.ts');
   const getUnitArt = __dep0.getUnitArt;
@@ -24989,13 +25016,13 @@ __define('./screens/main-menu/dialogues.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getHeroHotspots')) exports.getHeroHotspots = getHeroHotspots;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getHeroDialogue')) exports.getHeroDialogue = getHeroDialogue;
   if (!Object.prototype.hasOwnProperty.call(exports, 'listAvailableHeroes')) exports.listAvailableHeroes = listAvailableHeroes;
-});
-__define('./screens/main-menu/types.ts', (exports, module, __require) => {
+};
+__modules['./screens/main-menu/types.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/main-menu/types.ts
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
+};
+__modules['./screens/main-menu/view/events.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/main-menu/view/events.ts
   const TONE_ICONS = {
       greeting: '✨',
@@ -25344,8 +25371,8 @@ __define('./screens/main-menu/view/events.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'cueTone')) exports.cueTone = cueTone;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModeCard')) exports.createModeCard = createModeCard;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModeGroupCard')) exports.createModeGroupCard = createModeGroupCard;
-});
-__define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
+};
+__modules['./screens/main-menu/view/index.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/main-menu/view/index.ts
   const __dep1 = __require('./ui/dom.ts');
   const mountSection = __dep1.mountSection;
@@ -25543,8 +25570,8 @@ __define('./screens/main-menu/view/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = __reexport0.createHeader;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModesSection')) exports.createModesSection = __reexport0.createModesSection;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderMainMenuView')) exports.renderMainMenuView = renderMainMenuView;
-});
-__define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
+};
+__modules['./screens/main-menu/view/layout.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/main-menu/view/layout.ts
   const __dep0 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep0.ensureStyleTag;
@@ -25719,8 +25746,8 @@ __define('./screens/main-menu/view/layout.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyles')) exports.ensureStyles = ensureStyles;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createModesSection')) exports.createModesSection = createModesSection;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHeader')) exports.createHeader = createHeader;
-});
-__define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
+};
+__modules['./screens/monopoly/house-module.ts'] = (exports, module, __require) => {
   const MONOPOLY_HOUSE_SPAWN_LIMIT = 16;
   const HOUSE_TIER_BUY_COST = Object.freeze({
       1: 50,
@@ -26017,8 +26044,8 @@ __define('./screens/monopoly/house-module.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'applySpiritGainWithHouseOverflow')) exports.applySpiritGainWithHouseOverflow = applySpiritGainWithHouseOverflow;
   if (!Object.prototype.hasOwnProperty.call(exports, 'shouldTriggerAssassinTaxPunishment')) exports.shouldTriggerAssassinTaxPunishment = shouldTriggerAssassinTaxPunishment;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getHouseOwnerEffectSpec')) exports.getHouseOwnerEffectSpec = getHouseOwnerEffectSpec;
-});
-__define('./screens/monopoly/index.ts', (exports, module, __require) => {
+};
+__modules['./screens/monopoly/index.ts'] = (exports, module, __require) => {
   const __dep1 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep1.ensureStyleTag;
   const mountSection = __dep1.mountSection;
@@ -28582,8 +28609,8 @@ __define('./screens/monopoly/index.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveMonopolyCollisionCombat')) exports.resolveMonopolyCollisionCombat = resolveMonopolyCollisionCombat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceMonopolyMovement')) exports.advanceMonopolyMovement = advanceMonopolyMovement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
-});
-__define('./screens/monopoly/ready.ts', (exports, module, __require) => {
+};
+__modules['./screens/monopoly/ready.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep0.ensureStyleTag;
   const mountSection = __dep0.mountSection;
@@ -28680,8 +28707,8 @@ __define('./screens/monopoly/ready.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
-});
-__define('./screens/sect/index.ts', (exports, module, __require) => {
+};
+__modules['./screens/sect/index.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep0.ensureStyleTag;
   const mountSection = __dep0.mountSection;
@@ -28832,8 +28859,8 @@ __define('./screens/sect/index.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
-});
-__define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
+};
+__modules['./screens/sect/tactical-ai.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep0.ensureStyleTag;
   const mountSection = __dep0.mountSection;
@@ -29204,13 +29231,13 @@ __define('./screens/sect/tactical-ai.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
-});
-__define('./screens/ui-gacha/gacha.css', (exports, module, __require) => {
+};
+__modules['./screens/ui-gacha/gacha.css'] = (exports, module, __require) => {
   const css = "//home (termux)/arclune_lane_7x3/src/screens/ui-gacha/gacha.css\n\n:root {\n  color-scheme: dark;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n  --bg-page: #05090f;\n  --bg-panel: rgba(12, 18, 28, 0.88);\n  --bg-accent: rgba(16, 28, 42, 0.74);\n  --border-accent: rgba(120, 196, 255, 0.28);\n  --text-main: #e9f2ff;\n  --text-muted: rgba(192, 220, 244, 0.8);\n  --primary: #76d4ff;\n  --highlight: linear-gradient(135deg, rgba(118, 212, 255, 0.45), rgba(255, 154, 255, 0.4));\n  --rarity-n: #7b869a;\n  --rarity-r: #57a8ff;\n  --rarity-sr: #a47dff;\n  --rarity-ssr: #ffc866;\n  --rarity-ur: #ff6a9f;\n  --rarity-prime: #6cffeb;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-ui {\n  margin: 0;\n  min-height: 100vh;\n  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),\n    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);\n  color: var(--text-main);\n  display: flex;\n  justify-content: center;\n  padding: 32px;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-topbar {\n  display: grid;\n  grid-template-columns: auto auto 1fr auto;\n  align-items: center;\n  gap: 16px;\n  padding: 16px 20px;\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  background: var(--bg-panel);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);\n}\n\n.gacha-topbar__back-button {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  padding: 10px 18px;\n  border-radius: 999px;\n  border: 1px solid rgba(118, 212, 255, 0.32);\n  background: rgba(12, 18, 28, 0.78);\n  color: var(--text-main);\n  font-size: 14px;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n  cursor: pointer;\n  text-decoration: none;\n  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease,\n    box-shadow 0.18s ease;\n}\n\n.gacha-topbar__back-button:hover,\n.gacha-topbar__back-button:focus-visible {\n  background: rgba(18, 28, 42, 0.92);\n  border-color: rgba(118, 212, 255, 0.68);\n  transform: translateY(-1px);\n  box-shadow: 0 0 0 3px rgba(118, 212, 255, 0.24);\n  outline: none;\n}\n\n.gacha-topbar__back-button:active {\n  background: rgba(10, 18, 30, 0.95);\n  border-color: rgba(118, 212, 255, 0.8);\n  transform: translateY(0);\n  box-shadow: 0 0 0 2px rgba(118, 212, 255, 0.18);\n}\n\n.gacha-ui-root {\n  width: min(1280px, 100%);\n  display: flex;\n  flex-direction: column;\n  gap: 24px;\n}\n\n.banner-panel__toolbar {\n  display: flex;\n  align-items: stretch;\n  justify-content: flex-end;\n  gap: 12px;\n}\n\n.currency-bar {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-end;\n  gap: 10px;\n}\n\n.currency-chip {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  padding: 10px 14px;\n  border-radius: 16px;\n  border: 1px solid transparent;\n  background: var(--bg-accent);\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.currency-chip:hover,\n.currency-chip:focus-visible {\n  transform: translateY(-3px);\n  border-color: rgba(118, 212, 255, 0.65);\n  outline: none;\n}\n\n.currency-chip__icon {\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: rgba(118, 212, 255, 0.18);\n  display: grid;\n  place-items: center;\n}\n\n.currency-chip__icon img {\n  width: 24px;\n  height: 24px;\n}\n\n.currency-chip__info {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  font-size: 12px;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  color: var(--text-muted);\n}\n\n.currency-chip__code {\n  font-weight: 600;\n  color: var(--text-main);\n}\n\n.currency-chip__value {\n  font-weight: 600;\n  font-variant-numeric: tabular-nums;\n}\n\n.currency-chip {\n  min-width: 122px;\n}\n\n.currency-chip__icon {\n  width: 30px;\n  height: 30px;\n}\n\n.currency-chip__icon img {\n  width: 18px;\n  height: 18px;\n}\n\n.currency-chip__label {\n  font-size: 11px;\n}\n\n.rules-button {\n  padding: 10px 16px;\n  border-radius: 16px;\n  border: 1px solid rgba(118, 212, 255, 0.5);\n  background: rgba(10, 16, 24, 0.86);\n  cursor: pointer;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  font-size: 12px;\n}\n\n.gacha-body {\n  display: grid;\n  grid-template-columns: 280px 1fr;\n  gap: 24px;\n}\n\n.banner-sidebar {\n  background: var(--bg-panel);\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  padding: 18px;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  overflow-y: auto;\n  max-height: calc(100vh - 220px);\n}\n\n.banner-entry {\n  width: 100%;\n  text-align: left;\n  padding: 14px 16px;\n  border-radius: 18px;\n  border: 1px solid transparent;\n  background: rgba(16, 26, 40, 0.88);\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  transition: transform 0.18s ease, border-color 0.18s ease;\n}\n\n.banner-entry__title {\n  font-weight: 600;\n}\n\n.banner-entry__timer {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.banner-entry:hover,\n.banner-entry:focus-visible {\n  transform: translateX(6px);\n  border-color: rgba(118, 212, 255, 0.6);\n  outline: none;\n}\n\n.banner-entry.is-active {\n  border-color: rgba(255, 154, 255, 0.65);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n}\n\n.banner-panel {\n  background: var(--bg-panel);\n  border-radius: 28px;\n  border: 1px solid var(--border-accent);\n  padding: 24px;\n  display: grid;\n  gap: 18px;\n  position: relative;\n  overflow: hidden;\n}\n\n.banner-panel__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.banner-title {\n  margin: 0;\n  font-size: 26px;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.banner-desc {\n  margin: 6px 0 0;\n  color: var(--text-muted);\n}\n\n.banner-timer {\n  font-size: 13px;\n  color: var(--primary);\n}\n\n.banner-panel__art {\n  border-radius: 22px;\n  background: rgba(10, 16, 24, 0.7);\n  overflow: hidden;\n  min-height: 180px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.banner-panel__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  filter: saturate(120%);\n}\n\n.rate-list {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));\n  gap: 8px 16px;\n  margin: 0;\n}\n\n.rate-list dt {\n  font-weight: 600;\n}\n\n.rate-list dd {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.banner-panel__pity {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pity-meter {\n  display: grid;\n  grid-template-columns: 80px 1fr 80px;\n  align-items: center;\n  gap: 12px;\n}\n\n.pity-meter__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: var(--text-muted);\n}\n\n.pity-meter__bar {\n  position: relative;\n  height: 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.15);\n  overflow: hidden;\n}\n\n.pity-meter__progress {\n  position: absolute;\n  inset: 0;\n  border-radius: 999px;\n  background: var(--highlight);\n}\n\n.pity-meter__value {\n  font-variant-numeric: tabular-nums;\n  justify-self: end;\n}\n\n.featured__heading {\n  margin: 0;\n  font-size: 16px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.featured__note {\n  margin: 2px 0 12px;\n  color: var(--text-muted);\n  font-size: 12px;\n}\n\n.featured-card {\n  display: flex;\n  gap: 10px;\n  align-items: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.9);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  font-weight: 600;\n}\n\n.featured-card + .featured-card {\n  margin-top: 8px;\n}\n\n.featured-card__rarity {\n  font-size: 13px;\n  padding: 4px 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.18);\n}\n\n.featured-card__name {\n  font-size: 15px;\n}\n\n.banner-panel__cost {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 12px;\n}\n\n.cost-entry {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.86);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.cost-entry__value {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-weight: 600;\n}\n\n.cost-entry__value img {\n  width: 18px;\n  height: 18px;\n}\n\n.banner-panel__actions {\n  display: flex;\n  gap: 12px;\n}\n\n.banner-panel__actions button {\n  flex: 1;\n  padding: 14px 18px;\n  border-radius: 18px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(16, 28, 42, 0.9);\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.banner-panel__actions button:hover,\n.banner-panel__actions button:focus-visible {\n  transform: translateY(-2px);\n  border-color: rgba(255, 154, 255, 0.6);\n  outline: none;\n}\n\n.banner-panel__results {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 10px;\n}\n\n.result-entry {\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  display: grid;\n  gap: 6px;\n}\n\n.result-entry__rarity {\n  font-weight: 700;\n  text-transform: uppercase;\n}\n\n.result-entry__name {\n  color: var(--text-muted);\n}\n\n.result-entry__pity {\n  font-size: 12px;\n  color: var(--primary);\n}\n\n.modal-overlay {\n  position: fixed;\n  inset: 0;\n  backdrop-filter: blur(12px);\n  background: rgba(5, 10, 18, 0.68);\n  display: grid;\n  place-items: center;\n  z-index: 2000;\n}\n\n.modal-content {\n  width: min(420px, 92vw);\n  background: rgba(10, 16, 24, 0.92);\n  border-radius: 20px;\n  border: 1px solid rgba(118, 212, 255, 0.3);\n  padding: 24px;\n  color: var(--text-main);\n  box-shadow: 0 24px 64px rgba(5, 12, 20, 0.55);\n}\n\n.modal-content h2 {\n  margin-top: 0;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.modal-content ul {\n  margin: 12px 0 0;\n  padding-left: 20px;\n  color: var(--text-muted);\n}\n\n.gacha-toast {\n  position: fixed;\n  right: 24px;\n  bottom: 24px;\n  background: rgba(16, 28, 42, 0.92);\n  border-radius: 16px;\n  padding: 12px 18px;\n  border: 1px solid rgba(118, 212, 255, 0.35);\n  opacity: 0;\n  transform: translateY(12px);\n  transition: opacity 0.2s ease, transform 0.2s ease;\n  pointer-events: none;\n}\n\n.gacha-toast.is-visible {\n  opacity: 1;\n  transform: translateY(0);\n}\n\n@media (max-width: 960px) {\n  .gacha-body {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-sidebar {\n    flex-direction: row;\n    overflow-x: auto;\n    max-height: none;\n  }\n\n  .banner-entry {\n    min-width: 220px;\n  }\n}\n\n@media (max-width: 720px) {\n  body.gacha-ui {\n    padding: 24px 16px;\n  }\n\n.banner-panel__toolbar {\n    flex-direction: column;\n    align-items: stretch;\n  }\n\n.currency-bar {\n    justify-content: flex-start;\n  }\n\n  .currency-chip {\n    flex: 1 1 calc(50% - 8px);\n    min-width: 140px;\n  }\n}";
   module.exports = css;
   module.exports.default = css;
-});
-__define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
+};
+__modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/gacha.ts
   const __dep0 = __require('./screens/ui-gacha/logic/config.ts');
   const CURRENCY_LABELS = __dep0.CURRENCY_LABELS;
@@ -29733,8 +29760,8 @@ __define('./screens/ui-gacha/gacha.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'mountGachaUI')) exports.mountGachaUI = mountGachaUI;
-});
-__define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
+};
+__modules['./screens/ui-gacha/index.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/index.ts
   const __dep0 = __require('./screens/ui-gacha/gacha.css');
   const gachaStyles = __dep0.default ?? __dep0;
@@ -30089,8 +30116,8 @@ __define('./screens/ui-gacha/index.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
-});
-__define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
+};
+__modules['./screens/ui-gacha/logic/config.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/config.ts
   const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
   const CURRENCY_ORDER = __dep0.CURRENCY_ORDER;
@@ -30190,8 +30217,8 @@ __define('./screens/ui-gacha/logic/config.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'GACHA_CONFIG')) exports.GACHA_CONFIG = GACHA_CONFIG;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_LABELS')) exports.CURRENCY_LABELS = CURRENCY_LABELS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createWallet')) exports.createWallet = createWallet;
-});
-__define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) => {
+};
+__modules['./screens/ui-gacha/logic/currency.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/currency.ts
   const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
   const CURRENCY_ORDER = __dep0.CURRENCY_ORDER;
@@ -30486,8 +30513,8 @@ __define('./screens/ui-gacha/logic/currency.ts', (exports, module, __require) =>
   if (!Object.prototype.hasOwnProperty.call(exports, 'totalTTEquivalent')) exports.totalTTEquivalent = totalTTEquivalent;
   if (!Object.prototype.hasOwnProperty.call(exports, 'convertCurrency')) exports.convertCurrency = convertCurrency;
   if (!Object.prototype.hasOwnProperty.call(exports, 'payForRoll')) exports.payForRoll = payForRoll;
-});
-__define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
+};
+__modules['./screens/ui-gacha/logic/gacha.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/gacha.ts
   const __dep0 = __require('./screens/ui-gacha/logic/config.ts');
   const GACHA_CONFIG = __dep0.GACHA_CONFIG;
@@ -30583,8 +30610,8 @@ __define('./screens/ui-gacha/logic/gacha.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollBanner')) exports.rollBanner = rollBanner;
   if (!Object.prototype.hasOwnProperty.call(exports, 'multiRoll')) exports.multiRoll = multiRoll;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerById')) exports.getBannerById = getBannerById;
-});
-__define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
+};
+__modules['./screens/ui-gacha/logic/pity.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/pity.ts
   const __dep0 = __require('./screens/ui-gacha/logic/types.ts');
   const RARITY_ORDER = __dep0.RARITY_ORDER;
@@ -30789,8 +30816,8 @@ __define('./screens/ui-gacha/logic/pity.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerState')) exports.getBannerState = getBannerState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollOnce')) exports.rollOnce = rollOnce;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyRoll')) exports.applyRoll = applyRoll;
-});
-__define('./screens/ui-gacha/logic/types.ts', (exports, module, __require) => {
+};
+__modules['./screens/ui-gacha/logic/types.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/types.ts
   const __dep0 = __require('./utils/currency.ts');
   const getCurrencyOrder = __dep0.getCurrencyOrder;
@@ -30799,8 +30826,8 @@ __define('./screens/ui-gacha/logic/types.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
   if (!Object.prototype.hasOwnProperty.call(exports, 'RARITY_ORDER')) exports.RARITY_ORDER = RARITY_ORDER;
-});
-__define('./shared-types/units.ts', (exports, module, __require) => {
+};
+__modules['./shared-types/units.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/shared-types/units.ts
   const __reexport0 = __require('./types/units.ts');
   for (const key of Object.keys(__reexport0)) {
@@ -30809,8 +30836,8 @@ __define('./shared-types/units.ts', (exports, module, __require) => {
     exports[key] = __reexport0[key];
   }
   //# sourceMappingURL=stdin.js.map
-});
-__define('./statuses.ts', (exports, module, __require) => {
+};
+__modules['./statuses.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/statuses.ts
   const __dep0 = __require('./combat/apply-damage.ts');
   const applyDamage = __dep0.applyDamage;
@@ -31273,8 +31300,8 @@ __define('./statuses.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyStatus')) exports.applyStatus = applyStatus;
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearStatus')) exports.clearStatus = clearStatus;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hookOnLethalDamage')) exports.hookOnLethalDamage = hookOnLethalDamage;
-});
-__define('./summon.ts', (exports, module, __require) => {
+};
+__modules['./summon.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/summon.ts
   const __dep0 = __require('./engine.ts');
   const slotToCell = __dep0.slotToCell;
@@ -31425,8 +31452,8 @@ __define('./summon.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'enqueueImmediate')) exports.enqueueImmediate = enqueueImmediate;
   if (!Object.prototype.hasOwnProperty.call(exports, 'processActionChain')) exports.processActionChain = processActionChain;
-});
-__define('./turns.ts', (exports, module, __require) => {
+};
+__modules['./turns.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/turn.ts
   const __dep0 = __require('./aether.ts');
   const globalAetherPool = __dep0.globalAetherPool;
@@ -32296,8 +32323,8 @@ __define('./turns.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'tickMinionTTL')) exports.tickMinionTTL = tickMinionTTL;
   if (!Object.prototype.hasOwnProperty.call(exports, 'doActionOrSkip')) exports.doActionOrSkip = doActionOrSkip;
   if (!Object.prototype.hasOwnProperty.call(exports, 'stepTurn')) exports.stepTurn = stepTurn;
-});
-__define('./turns/interleaved.ts', (exports, module, __require) => {
+};
+__modules['./turns/interleaved.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/turns/interleaved.ts
   const __dep0 = __require('./engine.ts');
   const slotIndex = __dep0.slotIndex;
@@ -32504,24 +32531,24 @@ __define('./turns/interleaved.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'predictSpawnCycleByTurnOrder')) exports.predictSpawnCycleByTurnOrder = predictSpawnCycleByTurnOrder;
   if (!Object.prototype.hasOwnProperty.call(exports, 'findNextOccupiedPos')) exports.findNextOccupiedPos = findNextOccupiedPos;
   if (!Object.prototype.hasOwnProperty.call(exports, 'nextTurnInterleaved')) exports.nextTurnInterleaved = nextTurnInterleaved;
-});
-__define('./types/art.ts', (exports, module, __require) => {
+};
+__modules['./types/art.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/combat.ts', (exports, module, __require) => {
+};
+__modules['./types/combat.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/common.ts', (exports, module, __require) => {
+};
+__modules['./types/common.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/config.ts', (exports, module, __require) => {
+};
+__modules['./types/config.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/currency.ts', (exports, module, __require) => {
+};
+__modules['./types/currency.ts'] = (exports, module, __require) => {
   const isCurrencyEntry = (value) => (value != null
       && typeof value === 'object'
       && !Array.isArray(value));
@@ -32553,51 +32580,51 @@ __define('./types/currency.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'isLineupCurrencyConfig')) exports.isLineupCurrencyConfig = isLineupCurrencyConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isLineupCurrencies')) exports.isLineupCurrencies = isLineupCurrencies;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeCurrencyBalances')) exports.normalizeCurrencyBalances = normalizeCurrencyBalances;
-});
-__define('./types/index.ts', (exports, module, __require) => {
+};
+__modules['./types/index.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/lineup.ts', (exports, module, __require) => {
+};
+__modules['./types/lineup.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/pve.ts', (exports, module, __require) => {
+};
+__modules['./types/pve.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/rng.ts', (exports, module, __require) => {
+};
+__modules['./types/rng.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/telemetry.ts', (exports, module, __require) => {
+};
+__modules['./types/telemetry.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/turn-order.ts', (exports, module, __require) => {
+};
+__modules['./types/turn-order.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/ui.ts', (exports, module, __require) => {
+};
+__modules['./types/ui.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/units.ts', (exports, module, __require) => {
+};
+__modules['./types/units.ts'] = (exports, module, __require) => {
   function createSummonQueue() {
       return new Map();
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSummonQueue')) exports.createSummonQueue = createSummonQueue;
-});
-__define('./types/utils.ts', (exports, module, __require) => {
+};
+__modules['./types/utils.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./types/vfx.ts', (exports, module, __require) => {
+};
+__modules['./types/vfx.ts'] = (exports, module, __require) => {
 
   //# sourceMappingURL=stdin.js.map
-});
-__define('./ui.ts', (exports, module, __require) => {
+};
+__modules['./ui.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/ui.ts
   const __dep0 = __require('./config.ts');
   const CFG = __dep0.CFG;
@@ -32931,8 +32958,8 @@ __define('./ui.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'initHUD')) exports.initHUD = initHUD;
   if (!Object.prototype.hasOwnProperty.call(exports, 'startSummonBar')) exports.startSummonBar = startSummonBar;
-});
-__define('./ui/dom.ts', (exports, module, __require) => {
+};
+__modules['./ui/dom.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/ui/dom.ts
   const DEFAULT_ASSERT_MESSAGE = 'Cần một phần tử DOM hợp lệ.';
   function assertElement(value, options) {
@@ -33034,8 +33061,8 @@ __define('./ui/dom.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'assertElement')) exports.assertElement = assertElement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyleTag')) exports.ensureStyleTag = ensureStyleTag;
   if (!Object.prototype.hasOwnProperty.call(exports, 'mountSection')) exports.mountSection = mountSection;
-});
-__define('./units.ts', (exports, module, __require) => {
+};
+__modules['./units.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/units.ts
   const __dep0 = __require('./data/cost-budget.ts');
   const deriveBudgetFromRankRole = __dep0.deriveBudgetFromRankRole;
@@ -33089,8 +33116,8 @@ __define('./units.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_INDEX')) exports.UNIT_INDEX = UNIT_INDEX;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveUnitCost')) exports.resolveUnitCost = resolveUnitCost;
   if (!Object.prototype.hasOwnProperty.call(exports, 'lookupUnit')) exports.lookupUnit = lookupUnit;
-});
-__define('./utils/assert.ts', (exports, module, __require) => {
+};
+__modules['./utils/assert.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/utils/assert.ts
   function assertDefined(value, message) {
       if (value === undefined || value === null) {
@@ -33100,8 +33127,8 @@ __define('./utils/assert.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'assertDefined')) exports.assertDefined = assertDefined;
-});
-__define('./utils/currency.ts', (exports, module, __require) => {
+};
+__modules['./utils/currency.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./data/economy.ts');
   const CURRENCY_ORDER = __dep0.CURRENCY_ORDER;
   const convertCurrencyInternal = __dep0.convertCurrency;
@@ -33284,8 +33311,8 @@ __define('./utils/currency.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'syncSharedCurrencyWallet')) exports.syncSharedCurrencyWallet = syncSharedCurrencyWallet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'subscribeSharedCurrencyWallet')) exports.subscribeSharedCurrencyWallet = subscribeSharedCurrencyWallet;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resetSharedCurrencyWallet')) exports.resetSharedCurrencyWallet = resetSharedCurrencyWallet;
-});
-__define('./utils/domain-normalization.ts', (exports, module, __require) => {
+};
+__modules['./utils/domain-normalization.ts'] = (exports, module, __require) => {
   const ELEMENT_KEYS = [
       'fire',
       'metal',
@@ -33387,16 +33414,16 @@ __define('./utils/domain-normalization.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeElementKey')) exports.normalizeElementKey = normalizeElementKey;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeElementList')) exports.normalizeElementList = normalizeElementList;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeClassName')) exports.normalizeClassName = normalizeClassName;
-});
-__define('./utils/dummy.ts', (exports, module, __require) => {
+};
+__modules['./utils/dummy.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/utils/dummy.ts
   function ensureNestedModuleSupport() {
       return true;
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureNestedModuleSupport')) exports.ensureNestedModuleSupport = ensureNestedModuleSupport;
-});
-__define('./utils/format.ts', (exports, module, __require) => {
+};
+__modules['./utils/format.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/utils/format.ts
   const HAS_INTL_NUMBER_FORMAT = typeof Intl === 'object' && typeof Intl.NumberFormat === 'function';
   function stableStringify(value, seen = new WeakSet()) {
@@ -33465,8 +33492,8 @@ __define('./utils/format.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'stableStringify')) exports.stableStringify = stableStringify;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createNumberFormatter')) exports.createNumberFormatter = createNumberFormatter;
-});
-__define('./utils/fury.ts', (exports, module, __require) => {
+};
+__modules['./utils/fury.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/utils/fury.ts
   const __dep0 = __require('./config.ts');
   const CFG = __dep0.CFG;
@@ -33929,8 +33956,8 @@ __define('./utils/fury.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'furyValue')) exports.furyValue = furyValue;
   if (!Object.prototype.hasOwnProperty.call(exports, 'furyRoom')) exports.furyRoom = furyRoom;
   if (!Object.prototype.hasOwnProperty.call(exports, 'furyState')) exports.furyState = furyState;
-});
-__define('./utils/kit.ts', (exports, module, __require) => {
+};
+__modules['./utils/kit.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./data/tags.ts');
   const DEFENSIVE_TAG_IDS = __dep0.DEFENSIVE_TAG_IDS;
   const INSTANT_TAG_IDS = __dep0.INSTANT_TAG_IDS;
@@ -34396,8 +34423,8 @@ __define('./utils/kit.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'detectUltBehavior')) exports.detectUltBehavior = detectUltBehavior;
   if (!Object.prototype.hasOwnProperty.call(exports, 'extractOnSpawnRage')) exports.extractOnSpawnRage = extractOnSpawnRage;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveSummonSlots')) exports.resolveSummonSlots = resolveSummonSlots;
-});
-__define('./utils/module-resolution.ts', (exports, module, __require) => {
+};
+__modules['./utils/module-resolution.ts'] = (exports, module, __require) => {
   function pickFunctionFromSource(source, preferredKeys = [], fallbackKeys = []) {
       if (!source)
           return null;
@@ -34428,8 +34455,8 @@ __define('./utils/module-resolution.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'pickFunctionFromSource')) exports.pickFunctionFromSource = pickFunctionFromSource;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveModuleFunction')) exports.resolveModuleFunction = resolveModuleFunction;
-});
-__define('./utils/player-profile.ts', (exports, module, __require) => {
+};
+__modules['./utils/player-profile.ts'] = (exports, module, __require) => {
   const STORAGE_KEY = 'arclune.playerProfile.v1';
   const isObject = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value));
   function loadPlayerProfile() {
@@ -34518,8 +34545,8 @@ __define('./utils/player-profile.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'savePlayerProfile')) exports.savePlayerProfile = savePlayerProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'patchPlayerProfile')) exports.patchPlayerProfile = patchPlayerProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resetPlayerProfileData')) exports.resetPlayerProfileData = resetPlayerProfileData;
-});
-__define('./utils/rarity.ts', (exports, module, __require) => {
+};
+__modules['./utils/rarity.ts'] = (exports, module, __require) => {
   const RARITY_SEQUENCE = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
   const RARITY_ALIASES = {
       Prime: 'PRIME',
@@ -34546,8 +34573,8 @@ __define('./utils/rarity.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeRarity')) exports.normalizeRarity = normalizeRarity;
   if (!Object.prototype.hasOwnProperty.call(exports, 'coerceRarity')) exports.coerceRarity = coerceRarity;
-});
-__define('./utils/rng.ts', (exports, module, __require) => {
+};
+__modules['./utils/rng.ts'] = (exports, module, __require) => {
   const UINT32_MAX = 0x100000000;
   const DEFAULT_SEED = 0x9e3779b9;
   function toUint32(value, fallback = DEFAULT_SEED) {
@@ -34573,8 +34600,8 @@ __define('./utils/rng.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createRngState')) exports.createRngState = createRngState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'nextRngValue')) exports.nextRngValue = nextRngValue;
-});
-__define('./utils/time.ts', (exports, module, __require) => {
+};
+__modules['./utils/time.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/utils/time.ts
   const perf = typeof globalThis !== 'undefined' ? globalThis.performance : undefined;
   const hasPerfNow = !!(perf && typeof perf.now === 'function');
@@ -34663,8 +34690,8 @@ __define('./utils/time.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'toSessionTime')) exports.toSessionTime = toSessionTime;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeAnimationFrameTimestamp')) exports.normalizeAnimationFrameTimestamp = normalizeAnimationFrameTimestamp;
   if (!Object.prototype.hasOwnProperty.call(exports, 'mergeBusyUntil')) exports.mergeBusyUntil = mergeBusyUntil;
-});
-__define('./utils/unique-global.ts', (exports, module, __require) => {
+};
+__modules['./utils/unique-global.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./data/skills.ts');
   const getSkillSet = __dep0.getSkillSet;
   const __dep1 = __require('./data/tags.ts');
@@ -34705,8 +34732,8 @@ __define('./utils/unique-global.ts', (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'isCampaignMode')) exports.isCampaignMode = isCampaignMode;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isUniqueGlobalSummonBlocked')) exports.isUniqueGlobalSummonBlocked = isUniqueGlobalSummonBlocked;
-});
-__define('./utils/unit-id.ts', (exports, module, __require) => {
+};
+__modules['./utils/unit-id.ts'] = (exports, module, __require) => {
   function normalizeUnitId(id) {
       if (typeof id === 'string') {
           return id;
@@ -34722,8 +34749,8 @@ __define('./utils/unit-id.ts', (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeUnitId')) exports.normalizeUnitId = normalizeUnitId;
-});
-__define('./vfx.ts', (exports, module, __require) => {
+};
+__modules['./vfx.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/vfx.ts
   const __dep0 = __require('./engine.ts');
   const projectCellOblique = __dep0.projectCellOblique;
@@ -35674,8 +35701,8 @@ __define('./vfx.ts', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxAddShieldWrap')) exports.vfxAddShieldWrap = vfxAddShieldWrap;
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxAddGroundBurst')) exports.vfxAddGroundBurst = vfxAddGroundBurst;
   if (!Object.prototype.hasOwnProperty.call(exports, 'vfxDraw')) exports.vfxDraw = vfxDraw;
-});
-__define('./../tools/zod-stub/index.js', (exports, module, __require) => {
+};
+__modules['./../tools/zod-stub/index.js'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/tools/zod-stub/index.js
 
   const objectProto = Object.prototype;
@@ -35987,7 +36014,7 @@ __define('./../tools/zod-stub/index.js', (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'z')) exports.z = z;
   if (!Object.prototype.hasOwnProperty.call(exports, 'default')) exports.default = z;
   module.exports.default = exports.default;
-});
+};
 try {
   __require('./entry.ts');
 } catch (err) {

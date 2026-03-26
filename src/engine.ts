@@ -131,6 +131,24 @@ const DEFAULT_OBLIQUE_CAMERA = {
 
 const CHIBI_PROPS: ChibiProportions = CHIBI as ChibiProportions;
 const TOKEN_STYLE_VALUE = TOKEN_STYLE as 'chibi' | 'disk';
+const TOKEN_DRAW_BUFFER: Array<{ token: TokenWithArt; projection: ProjectionState }> = [];
+const sortByProjectionDepth = (
+  a: { token: TokenWithArt; projection: ProjectionState },
+  b: { token: TokenWithArt; projection: ProjectionState },
+): number => {
+  const ya = a.projection.y;
+  const yb = b.projection.y;
+  if (ya === yb) return a.token.cx - b.token.cx;
+  return ya - yb;
+};
+
+const normalizeShadowPreset = (
+  value: unknown,
+  fallback: TokenShadowPreset = null,
+): TokenShadowPreset => {
+  if (value === 'off' || value === 'soft' || value === 'medium') return value;
+  return fallback;
+};
 
 const tokenVisualKey = (token: Pick<UnitToken, 'iid' | 'id'> | null | undefined): string | null => {
   if (!token) return null;
@@ -914,8 +932,10 @@ export function drawTokensOblique(
   const baseR = Math.floor(g.tile * 0.36);
   const sig = contextSignature(g, C);
   const meleeOffsets = options?.meleeOffsets ?? null;
+  const meleeOffsetMap = meleeOffsets instanceof Map ? meleeOffsets : null;
 
-  const alive: Array<{ token: TokenWithArt; projection: ProjectionState }> = [];
+  const alive = TOKEN_DRAW_BUFFER;
+  alive.length = 0;
   for (const token of tokens) {
     if (!token || !token.alive) {
       if (token && !token.alive) {
@@ -930,25 +950,16 @@ export function drawTokensOblique(
     const projection = getTokenProjection(token, g, C, sig);
     if (!projection) continue;
     const key = tokenVisualKey(token);
-    const offset = key && meleeOffsets instanceof Map ? meleeOffsets.get(key) ?? null : null;
+    const offset = key && meleeOffsetMap ? meleeOffsetMap.get(key) ?? null : null;
     const adjusted: ProjectionState = offset
       ? { x: projection.x + offset.x, y: projection.y + offset.y, scale: projection.scale }
       : projection;
     alive.push({ token, projection: adjusted });
   }
 
-  alive.sort((a, b) => {
-    const ya = a.projection.y;
-    const yb = b.projection.y;
-    if (ya === yb) return a.token.cx - b.token.cx;
-    return ya - yb;
-  });
+  alive.sort(sortByProjectionDepth);
 
   const perfCfg = CFG?.PERFORMANCE || {};
-  const normalizePreset = (value: unknown, fallback: TokenShadowPreset = null): TokenShadowPreset => {
-    if (value === 'off' || value === 'soft' || value === 'medium') return value;
-    return fallback;
-  };
   const mediumThreshold = Number.isFinite(perfCfg.SHADOW_MEDIUM_THRESHOLD)
     ? (perfCfg.SHADOW_MEDIUM_THRESHOLD as number)
     : null;
@@ -962,19 +973,19 @@ export function drawTokensOblique(
 
   let shadowPreset: TokenShadowPreset = null;
   if (perfCfg.LOW_POWER_SHADOWS) {
-    shadowPreset = normalizePreset(perfCfg.LOW_SHADOW_PRESET, 'off');
+    shadowPreset = normalizeShadowPreset(perfCfg.LOW_SHADOW_PRESET, 'off');
   } else {
     if (!shadowPreset && highDprCutoff !== null && gridDpr !== null && gridDpr >= highDprCutoff) {
-      shadowPreset = normalizePreset(perfCfg.HIGH_DPR_SHADOW_PRESET, 'off');
+      shadowPreset = normalizeShadowPreset(perfCfg.HIGH_DPR_SHADOW_PRESET, 'off');
     }
     if (!shadowPreset && shadowThreshold !== null && alive.length >= shadowThreshold) {
-      shadowPreset = normalizePreset(
+      shadowPreset = normalizeShadowPreset(
         perfCfg.HIGH_LOAD_SHADOW_PRESET,
-        normalizePreset(perfCfg.LOW_SHADOW_PRESET, 'off'),
+        normalizeShadowPreset(perfCfg.LOW_SHADOW_PRESET, 'off'),
       );
     }
     if (!shadowPreset && mediumThreshold !== null && alive.length >= mediumThreshold) {
-      shadowPreset = normalizePreset(perfCfg.MEDIUM_SHADOW_PRESET, 'medium');
+      shadowPreset = normalizeShadowPreset(perfCfg.MEDIUM_SHADOW_PRESET, 'medium');
     }
   }
   const reduceShadows = shadowPreset !== null;

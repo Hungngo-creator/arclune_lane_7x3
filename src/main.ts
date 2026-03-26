@@ -99,16 +99,18 @@ export function startGame(options?: StartGameOptions | null): SessionState {
   }
   if (currentSession && pendingSkins.size > 0) {
     const appliedUnitIds: string[] = [];
-    pendingSkins.forEach((skinKey, unitId) => {
+    for (const [unitId, skinKey] of pendingSkins) {
       const applied = currentSession?.setUnitSkin(unitId, skinKey) ?? false;
       if (applied) {
         appliedUnitIds.push(unitId);
       }
-    });
+    }
     if (appliedUnitIds.length === pendingSkins.size) {
       pendingSkins.clear();
     } else {
-      appliedUnitIds.forEach((unitId) => pendingSkins.delete(unitId));
+      for (const unitId of appliedUnitIds) {
+        pendingSkins.delete(unitId);
+      }
     }
   }
   return session;
@@ -130,12 +132,12 @@ export function getCurrentSession(): ActiveSessionHandle | null {
 }
 
 export function setUnitSkin(unitId: string, skinKey: string | null | undefined): boolean {
- const normalizedSkinKey = skinKey ?? null;
+  const normalizedSkinKey = skinKey ?? null;
   if (!currentSession) {
     pendingSkins.set(unitId, normalizedSkinKey);
     return true;
   }
-  const applied = currentSession.setUnitSkin(unitId, skinKey);
+  const applied = currentSession.setUnitSkin(unitId, normalizedSkinKey);
   if (applied) {
     pendingSkins.set(unitId, normalizedSkinKey);
   }

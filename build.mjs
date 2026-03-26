@@ -128,12 +128,15 @@ if (normalizedMode) {
 }
 const MODE = (normalizedMode ?? process.env.NODE_ENV) === 'production' ? 'production' : 'development';
 const ESBUILD_BASE_OPTIONS = {
+  platform: 'browser',
   format: 'esm',
   target: ['es2023'],
   sourcemap: MODE === 'production' ? false : true,
   splitting: true,
   metafile: true,
   treeShaking: true,
+  bundle: true,
+  legalComments: 'none',
 };
 const ESBUILD_DEFINE = {
   'process.env.NODE_ENV': JSON.stringify(MODE),
@@ -141,6 +144,17 @@ const ESBUILD_DEFINE = {
   __DEV__: MODE === 'production' ? 'false' : 'true',
 };
 const ENABLE_RUNTIME_OPTIMIZATIONS = MODE === 'production';
+const ESBUILD_TRANSFORM_MINIFY_OPTIONS = ENABLE_RUNTIME_OPTIMIZATIONS
+  ? {
+      minifySyntax: true,
+      minifyIdentifiers: false,
+      minifyWhitespace: false,
+    }
+  : {
+      minifySyntax: false,
+      minifyIdentifiers: false,
+      minifyWhitespace: false,
+    };
 
 const TS_CONFIG_PATH = path.join(__dirname, 'tsconfig.base.json');
 let TS_PATH_ALIASES = [];
@@ -703,12 +717,14 @@ async function build(){
       const loader = ext === '.ts' ? 'ts' : ext === '.tsx' ? 'tsx' : 'js';
       const { code } = await esbuild.transform(raw, {
         loader,
+        platform: ESBUILD_BASE_OPTIONS.platform,
         format: ESBUILD_BASE_OPTIONS.format,
         target: ESBUILD_BASE_OPTIONS.target,
         sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
         treeShaking: ESBUILD_BASE_OPTIONS.treeShaking,
         define: ESBUILD_DEFINE,
-        minifySyntax: ENABLE_RUNTIME_OPTIMIZATIONS,
+        legalComments: ESBUILD_BASE_OPTIONS.legalComments,
+        ...ESBUILD_TRANSFORM_MINIFY_OPTIONS,
       });
       sourceCode = code;
     }
@@ -731,12 +747,14 @@ async function build(){
       const loader = ext === '.ts' ? 'ts' : ext === '.tsx' ? 'tsx' : 'js';
       const { code } = await esbuild.transform(raw, {
         loader,
+        platform: ESBUILD_BASE_OPTIONS.platform,
         format: ESBUILD_BASE_OPTIONS.format,
         target: ESBUILD_BASE_OPTIONS.target,
         sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
         treeShaking: ESBUILD_BASE_OPTIONS.treeShaking,
         define: ESBUILD_DEFINE,
-        minifySyntax: ENABLE_RUNTIME_OPTIMIZATIONS,
+        legalComments: ESBUILD_BASE_OPTIONS.legalComments,
+        ...ESBUILD_TRANSFORM_MINIFY_OPTIONS,
       });
       sourceCode = code;
     }
@@ -750,20 +768,29 @@ async function build(){
   parts.push('// Bundled by build.mjs');
   parts.push('const __modules = Object.create(null);');
   parts.push('const __cache = Object.create(null);');
+  parts.push('const __hasOwn = Object.prototype.hasOwnProperty;');
   parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }');
   const legacyAliasObject = Object.fromEntries(LEGACY_MODULE_ID_ALIASES);
   parts.push(`const __legacyModuleAliases = ${JSON.stringify(legacyAliasObject)};`);
   parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }');
-  parts.push('function __normalizeModuleId(id){ return __legacyModuleAliases[id] || id; }');
-  parts.push('function __define(id, factory){ __modules[id] = factory; }');
+  parts.push('const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;');
   parts.push('function __require(id){');
-  parts.push('  const normalizedId = __normalizeModuleId(id);');
-  parts.push('  const cached = __cache[normalizedId];');
+  parts.push('  let moduleId = id;');
+  parts.push('  let cached = __cache[moduleId];');
   parts.push('  if (cached) return cached.exports;');
-  parts.push('  const factory = __modules[normalizedId];');
-  parts.push("  if (!factory) throw new Error('Module not found: ' + normalizedId);");
+  parts.push('  let factory = __modules[moduleId];');
+  parts.push('  if (!factory && !__emptyAliases){');
+  parts.push('    const aliased = __legacyModuleAliases[moduleId];');
+  parts.push('    if (aliased){');
+  parts.push('      moduleId = aliased;');
+  parts.push('      cached = __cache[moduleId];');
+  parts.push('      if (cached) return cached.exports;');
+  parts.push('      factory = __modules[moduleId];');
+  parts.push('    }');
+  parts.push('  }');
+  parts.push("  if (!factory) throw new Error('Module not found: ' + moduleId);");
   parts.push('  const module = { exports: {} };');
-  parts.push('  __cache[normalizedId] = module;');
+  parts.push('  __cache[moduleId] = module;');
   parts.push('  factory(module.exports, module, __require);');
   parts.push('  return module.exports;');
   parts.push('}');
@@ -771,9 +798,9 @@ async function build(){
   parts.push('if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }');
 
   for (const { id, code } of modules){
-    parts.push(`__define('${id}', (exports, module, __require) => {`);
+    parts.push(`__modules['${id}'] = (exports, module, __require) => {`);
     parts.push(indent(code));
-    parts.push('});');
+    parts.push('};');
   }
 
   parts.push('try {');
@@ -791,6 +818,8 @@ async function build(){
       sourcefile: 'virtual-entry.js',
       loader: 'js',
     },
+    platform: ESBUILD_BASE_OPTIONS.platform,
+    bundle: ESBUILD_BASE_OPTIONS.bundle,
     write: false,
     format: ESBUILD_BASE_OPTIONS.format,
     target: ESBUILD_BASE_OPTIONS.target,
@@ -798,7 +827,8 @@ async function build(){
     metafile: ESBUILD_BASE_OPTIONS.metafile,
     treeShaking: ESBUILD_BASE_OPTIONS.treeShaking,
     define: ESBUILD_DEFINE,
-    minifySyntax: ENABLE_RUNTIME_OPTIMIZATIONS,
+    legalComments: ESBUILD_BASE_OPTIONS.legalComments,
+    ...ESBUILD_TRANSFORM_MINIFY_OPTIONS,
   });
   const outputFile = result.outputFiles?.[0];
   const transpiled = outputFile?.text ?? '';
