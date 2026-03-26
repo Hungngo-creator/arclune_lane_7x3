@@ -1,7 +1,5 @@
 # Arclune Lane 7x3 — README kỹ thuật (cập nhật 2026-03-26)
 
-Tài liệu này thay thế phần “Phân loại hàm và chức năng” cũ trong `lưu ý.txt`, đồng thời kế thừa các luật gameplay cốt lõi từ `readme.txt` nhưng map lại theo code hiện tại trong `src/`.
-
 ## 1) Tổng quan kiến trúc
 
 - App chạy theo kiến trúc **Shell + Screen renderer**:
