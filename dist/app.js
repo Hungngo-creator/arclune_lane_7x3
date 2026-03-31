@@ -19313,8 +19313,11 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const resolvePlayerUnits = __dep1.resolvePlayerUnits;
   const resolveValidSeed = __dep1.resolveValidSeed;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
-  const ISO_TILE_W = 56;
-  const ISO_TILE_H = 30;
+  const ISO_TILE_BASE_W = 56;
+  const ISO_TILE_BASE_H = 30;
+  const ISO_TILE_SCALE = 4;
+  const ISO_TILE_W = ISO_TILE_BASE_W * ISO_TILE_SCALE;
+  const ISO_TILE_H = ISO_TILE_BASE_H * ISO_TILE_SCALE;
   const ISO_PADDING_X = 220;
   const ISO_PADDING_Y = 160;
   const CSS = /* css */ `
@@ -19323,14 +19326,14 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
     .chess-rpg-match__top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
     .chess-rpg-match__back{border:1px solid rgba(143,198,255,.5);background:rgba(8,19,31,.85);color:#e6f2ff;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;padding:0;cursor:pointer;font-size:18px;line-height:1;}
     .chess-rpg-match__meta{font-size:13px;color:#8ec4df;}
-    .chess-rpg-match__field{position:relative;overflow:auto;border:1px solid rgba(121,187,228,.32);border-radius:14px;background:radial-gradient(circle at 35% 20%, rgba(43,106,146,.26), rgba(5,13,23,.95));padding:18px;min-height:640px;max-height:72dvh;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;cursor:grab;}
+    .chess-rpg-match__field{position:relative;overflow:auto;border:1px solid rgba(121,187,228,.32);border-radius:14px;background:radial-gradient(circle at 35% 20%, rgba(43,106,146,.26), rgba(5,13,23,.95));padding:18px;min-height:520px;max-height:72dvh;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;cursor:grab;}
     .chess-rpg-match__field:active{cursor:grabbing;}
     .chess-rpg-match__iso{position:relative;}
     .chess-rpg-match__tile{position:absolute;width:${ISO_TILE_W}px;height:${ISO_TILE_H}px;transform:translate(-50%, -50%) skewY(-26deg) scaleY(.86);border-radius:8px;border:1px solid rgba(140,201,236,.22);background:rgba(35,87,116,.4);}
     .chess-rpg-match__tile--void{opacity:.18;border-style:dashed;}
     .chess-rpg-match__tile--player{background:rgba(32,137,96,.88);border-color:rgba(151,255,225,.85);}
     .chess-rpg-match__tile--enemy{background:rgba(170,51,94,.84);border-color:rgba(255,184,217,.84);}
-    .chess-rpg-match__unit{position:absolute;transform:translate(-50%, -88%);padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(4,16,28,.9);border:1px solid rgba(188,225,255,.4);white-space:nowrap;}
+    .chess-rpg-match__unit{position:absolute;transform:translate(-50%, -88%);padding:8px 16px;border-radius:999px;font-size:28px;font-weight:700;background:rgba(4,16,28,.9);border:1px solid rgba(188,225,255,.4);white-space:nowrap;}
     .chess-rpg-match__unit--player{color:#95ffd9;}
     .chess-rpg-match__unit--enemy{color:#ffc3dd;}
   `;
