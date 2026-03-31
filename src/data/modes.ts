@@ -25,6 +25,7 @@ const ARENA_HUB_SCREEN_MODULE_ID = '@screens/arena-hub/index.ts' as const;
 const CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID = '@screens/campaign-world-map/index.ts' as const;
 const MONOPOLY_SCREEN_MODULE_ID = '@screens/monopoly/index.ts' as const;
 const MONOPOLY_READY_SCREEN_MODULE_ID = '@screens/monopoly/ready.ts' as const;
+const CHESS_STRATEGY_RPG_READY_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/ready.ts' as const;
 const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
 
 const MODE_TYPES = {
@@ -260,6 +261,23 @@ const MODES = [
       fallbackModuleId: COMING_SOON_MODULE_ID
     }
   },
+  {
+    id: 'chess-strategy-rpg',
+    title: 'Chess Strategy RPG',
+    type: MODE_TYPES.PVE,
+    status: MODE_STATUS.AVAILABLE,
+    icon: '♞',
+    shortDescription: 'Mode chiến thuật bàn cờ theo turn với luồng điều hướng riêng; hiện tại dựng hub UI trước khi mở trận.',
+    unlockNotes: 'MVP hiện mở màn hình hub riêng để chốt UX/UI và checklist spec trước khi tích hợp gameplay.',
+    tags: ['PvE'],
+    menuSections: ['core-pve'],
+    parentId: 'arena-hub',
+    shell: {
+      screenId: 'chess-strategy-rpg-ready',
+      moduleId: CHESS_STRATEGY_RPG_READY_SCREEN_MODULE_ID
+    }
+  },
+
   {
     id: 'co-ty-phu',
     title: 'Cờ Tỷ Phú',

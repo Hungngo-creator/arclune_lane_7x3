@@ -17,7 +17,8 @@
     "smoke:long-battle": "node simulations/long-battle-smoke.mjs",
     "release:gate": "npm test && npm run smoke:long-battle",
     "check:duplicate-declarations": "node tools/check-duplicate-declarations.mjs",
-    "verify:tag-runtime": "jest --runInBand test/combat-tag-dispatch.test.ts test/tag-effect-e2e.test.ts"
+    "verify:tag-runtime": "jest --runInBand test/combat-tag-dispatch.test.ts test/tag-effect-e2e.test.ts",
+    "build:dev:chess-strategy-rpg": "node tools/generate-loithienanh-svg.mjs && node build.mjs --mode=development --prune-unreachable --skip-bundle-verify"
   },
   "keywords": [],
   "author": "",

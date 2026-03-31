@@ -488,7 +488,7 @@ describe('renderCollectionScreen', () => {
 });
 
 describe('renderArenaHubScreen', () => {
-  it('hiển thị đủ 6 card trong Chiến Trường và điều hướng vào Cờ Tỷ Phú', () => {
+  it('hiển thị đủ 7 card trong Chiến Trường và điều hướng vào Chess Strategy RPG', () => {
     const root = document.createElement('div');
     document.body.appendChild(root);
 
@@ -507,20 +507,20 @@ describe('renderArenaHubScreen', () => {
     expect(grid).not.toBeNull();
 
     const cards = root.querySelectorAll<HTMLButtonElement>('.arena-hub__grid .mode-card');
-    expect(cards).toHaveLength(6);
+    expect(cards).toHaveLength(7);
 
     const cardOrder = Array.from(cards).map(card => card.dataset.mode ?? null);
-    expect(cardOrder).toEqual(['arena', 'beast-arena', 'co-ty-phu', 'ares', 'challenge', 'campaign']);
+    expect(cardOrder).toEqual(['arena', 'beast-arena', 'co-ty-phu', 'chess-strategy-rpg', 'ares', 'challenge', 'campaign']);
 
-    const monopolyCard = root.querySelector<HTMLButtonElement>('.arena-hub__grid .mode-card[data-mode="co-ty-phu"]');
-    expect(monopolyCard).not.toBeNull();
-    expect(monopolyCard?.classList.contains('mode-card--coming')).toBe(false);
+    const chessModeCard = root.querySelector<HTMLButtonElement>('.arena-hub__grid .mode-card[data-mode="chess-strategy-rpg"]');
+    expect(chessModeCard).not.toBeNull();
+    expect(chessModeCard?.classList.contains('mode-card--coming')).toBe(false);
 
-    const tags = Array.from(monopolyCard?.querySelectorAll('.mode-tag') ?? []).map(tag => tag.textContent?.trim());
-    expect(tags).toEqual(['PvP']);
+    const tags = Array.from(chessModeCard?.querySelectorAll('.mode-tag') ?? []).map(tag => tag.textContent?.trim());
+    expect(tags).toEqual(['PvE']);
 
-    monopolyCard?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(enterScreen).toHaveBeenCalledWith('co-ty-phu', null);
+    chessModeCard?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(enterScreen).toHaveBeenCalledWith('chess-strategy-rpg-ready', null);
 
     const backButton = root.querySelector<HTMLButtonElement>('.arena-hub__back');
     backButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
