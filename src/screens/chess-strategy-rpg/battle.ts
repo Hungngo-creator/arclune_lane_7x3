@@ -6,9 +6,7 @@ import { createRngState, nextRngValue } from '../../utils/rng.ts';
 import { listCultivationRealmOptions } from '../../cultivation.ts';
 
 const STYLE_ID = 'chess-strategy-rpg-battle-style';
-const BOARD_CELL_BASE_SIZE = 38;
-const BOARD_CELL_SCALE = 4;
-const BOARD_CELL_SIZE = BOARD_CELL_BASE_SIZE * BOARD_CELL_SCALE;
+const PREVIEW_CELL_SIZE = 30;
 
 const CSS = /* css */ `
   .app--chess-strategy-rpg-battle{min-height:100dvh;padding:16px;box-sizing:border-box;}
@@ -46,22 +44,8 @@ const CSS = /* css */ `
   .chess-hub__select{background:rgba(6,13,22,.8);border:1px solid rgba(189,221,255,.25);color:#eff7ff;border-radius:10px;padding:7px 10px;}
   .chess-hub__ok{width:max-content;border:1px solid rgba(189,221,255,.35);background:rgba(13,46,73,.82);color:#dff0ff;border-radius:9px;padding:6px 12px;cursor:pointer;font-weight:700;}
   .chess-rpg-battle__meta{font-size:13px;color:#8ec4df;}
-  .chess-rpg-battle__board-viewport{
-    align-self:start;
-    justify-self:start;
-    width:min(100%, 1040px);
-    min-height:420px;
-    max-height:72dvh;
-    overflow:auto;
-    border-radius:12px;
-    border:1px solid rgba(131,213,255,.2);
-    background:rgba(8,20,29,.82);
-    padding:8px;
-    touch-action:pan-x pan-y;
-    -webkit-overflow-scrolling:touch;
-  }
-  .chess-rpg-battle__board{display:grid;gap:2px;align-self:start;justify-self:start;}
-  .chess-rpg-battle__cell{width:${BOARD_CELL_SIZE}px;height:${BOARD_CELL_SIZE}px;border-radius:8px;border:1px solid rgba(145,198,228,.2);display:grid;place-items:center;font-size:${Math.round(11 * BOARD_CELL_SCALE)}px;}
+  .chess-rpg-battle__board{display:grid;gap:2px;align-self:start;justify-self:start;background:rgba(8,20,29,.82);padding:8px;border-radius:12px;border:1px solid rgba(131,213,255,.2);}
+  .chess-rpg-battle__cell{width:${PREVIEW_CELL_SIZE}px;height:${PREVIEW_CELL_SIZE}px;border-radius:8px;border:1px solid rgba(145,198,228,.2);display:grid;place-items:center;font-size:10px;}
   .chess-rpg-battle__cell--void{opacity:.2;border-style:dashed;}
   .chess-rpg-battle__cell--play{background:rgba(22,66,92,.56);}
   .chess-rpg-battle__cell--player{background:rgba(26,117,90,.74);border-color:rgba(130,255,219,.6);font-weight:700;}
@@ -257,7 +241,7 @@ function renderBattleBoard(host: HTMLElement, units: BattleUnit[], seedText: str
     `${coreEnd - 3},${coreEnd}`,
   ];
 
-  host.style.gridTemplateColumns = `repeat(${board.width}, ${BOARD_CELL_SIZE}px)`;
+  host.style.gridTemplateColumns = `repeat(${board.width}, ${PREVIEW_CELL_SIZE}px)`;
   host.innerHTML = '';
   for (let y = 0; y < board.height; y += 1) {
     for (let x = 0; x < board.width; x += 1) {
