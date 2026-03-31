@@ -78,8 +78,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       <h2 class="chess-strategy-rpg-ready__spec-title">Checklist áp dụng từ spec</h2>
       <ul class="chess-strategy-rpg-ready__spec-list">
         <li>4 tướng người chơi lấy theo lineup 10 ô (ưu tiên từ trái qua, trên xuống).</li>
-        <li>Map trận tạo ngẫu nhiên bất quy tắc, lõi tối thiểu 7x7 ô.</li>
-        <li>Hub giữa chọn mặt bằng tu vi từ Khai Nguyên đến Thánh Tôn.</li>
+        <li>Map trận tạo từ seed chữ+số, lõi tối thiểu 9x9 ô vuông + ô ngẫu nhiên mở rộng.</li>
+        <li>Hub giữa dùng dữ liệu tu vi chuẩn từ cultivation.ts (đồng bộ economy hiện tại).</li>
         <li>Vào trận sẽ import HP/ATK/WIL/RES/ARM/AE và kit của 4 tướng.</li>
       </ul>
     </section>

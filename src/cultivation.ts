@@ -2,6 +2,7 @@ import type { StatBlock } from './types/units';
 
 import {
   getCultivationRealmEconomy,
+  listCultivationRealmsEconomy,
   type CultivationRealmEconomy,
 } from './data/economy.ts';
 import {
@@ -70,6 +71,11 @@ export interface CultivationUpgradePayload {
   newSubRealm: number;
   isBreakthrough: boolean;
   playerState: CultivationPlayerState;
+}
+
+export interface CultivationRealmOption {
+  realm: number;
+  name: string;
 }
 
 const REALM_CONFIGS: Record<number, RealmConfig> = {
@@ -225,6 +231,15 @@ const scaleStat = (rawValue: unknown, ratio: number): number | undefined => {
 };
 
 const resolveRealmEconomy = (realm: number): CultivationRealmEconomy | null => getCultivationRealmEconomy(realm);
+
+export function listCultivationRealmOptions(): CultivationRealmOption[] {
+  return listCultivationRealmsEconomy()
+    .map((entry) => ({
+      realm: Math.max(1, Math.floor(entry.realm)),
+      name: entry.name,
+    }))
+    .sort((a, b) => a.realm - b.realm);
+}
 
 export function getCultivationCost(realm: number, subRealm: number): CultivationCostInfo | null {
   const realmNo = asNonNegativeInt(realm);

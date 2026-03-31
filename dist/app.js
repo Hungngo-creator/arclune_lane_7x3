@@ -6104,6 +6104,7 @@ __modules['./config/schema.ts'] = (exports, module, __require) => {
 __modules['./cultivation.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./data/economy.ts');
   const getCultivationRealmEconomy = __dep0.getCultivationRealmEconomy;
+  const listCultivationRealmsEconomy = __dep0.listCultivationRealmsEconomy;
   const __dep1 = __require('./utils/currency.ts');
   const spendAetherWithPriority = __dep1.spendAetherWithPriority;
   const REALM_CONFIGS = {
@@ -6254,6 +6255,14 @@ __modules['./cultivation.ts'] = (exports, module, __require) => {
       return roundStat(rawValue * (1 + ratio));
   };
   const resolveRealmEconomy = (realm) => getCultivationRealmEconomy(realm);
+  function listCultivationRealmOptions() {
+      return listCultivationRealmsEconomy()
+          .map((entry) => ({
+          realm: Math.max(1, Math.floor(entry.realm)),
+          name: entry.name,
+      }))
+          .sort((a, b) => a.realm - b.realm);
+  }
   function getCultivationCost(realm, subRealm) {
       const realmNo = asNonNegativeInt(realm);
       const subNo = asNonNegativeInt(subRealm);
@@ -6418,6 +6427,7 @@ __modules['./cultivation.ts'] = (exports, module, __require) => {
       };
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'listCultivationRealmOptions')) exports.listCultivationRealmOptions = listCultivationRealmOptions;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCultivationCost')) exports.getCultivationCost = getCultivationCost;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canBreakthrough')) exports.canBreakthrough = canBreakthrough;
   if (!Object.prototype.hasOwnProperty.call(exports, 'upgradeCultivation')) exports.upgradeCultivation = upgradeCultivation;
@@ -18880,16 +18890,12 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
   const makeInstanceStats = __dep2.makeInstanceStats;
   const __dep3 = __require('./utils/player-profile.ts');
   const loadPlayerProfile = __dep3.loadPlayerProfile;
+  const __dep4 = __require('./utils/rng.ts');
+  const createRngState = __dep4.createRngState;
+  const nextRngValue = __dep4.nextRngValue;
+  const __dep5 = __require('./cultivation.ts');
+  const listCultivationRealmOptions = __dep5.listCultivationRealmOptions;
   const STYLE_ID = 'chess-strategy-rpg-battle-style';
-  const REALM_OPTIONS = [
-      { value: 1, label: 'Khai Nguyên' },
-      { value: 2, label: 'Linh Động' },
-      { value: 3, label: 'Địa Nguyên' },
-      { value: 4, label: 'Thiên Nguyên' },
-      { value: 5, label: 'Thánh Nhân' },
-      { value: 6, label: 'Thánh Hoàng' },
-      { value: 7, label: 'Thánh Tôn' },
-  ];
   const CSS = /* css */ `
     .app--chess-strategy-rpg-battle{min-height:100dvh;padding:16px;box-sizing:border-box;}
     .chess-rpg-battle{max-width:1200px;margin:0 auto;min-height:calc(100dvh - 32px);border-radius:20px;border:1px solid rgba(126,208,255,.26);background:linear-gradient(170deg,rgba(10,18,30,.95),rgba(10,28,40,.92));padding:20px;color:#e7f3ff;display:grid;gap:16px;}
@@ -18901,6 +18907,28 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
     .chess-hub--center{border-color:rgba(250,205,106,.56);background:linear-gradient(175deg,rgba(62,45,17,.78),rgba(22,32,45,.86));}
     .chess-hub__action{width:max-content;border:1px solid rgba(246,198,99,.66);background:linear-gradient(140deg,#f9cb84,#f0a85e);color:#2b2211;border-radius:11px;padding:8px 12px;cursor:pointer;font-weight:800;}
     .chess-hub__realm{display:grid;gap:8px;}
+    .chess-hub__seed-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+    .chess-hub__seed{
+      flex:1 1 200px;
+      background:rgba(6,13,22,.8);
+      border:1px solid rgba(189,221,255,.25);
+      color:#eff7ff;
+      border-radius:10px;
+      padding:7px 10px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+    .chess-hub__seed-random{
+      border:1px solid rgba(189,221,255,.35);
+      background:rgba(13,46,73,.82);
+      color:#dff0ff;
+      border-radius:9px;
+      padding:6px 10px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .chess-hub__seed-help{margin:0;color:#9dc8eb;font-size:12px;line-height:1.4;}
     .chess-hub__select{background:rgba(6,13,22,.8);border:1px solid rgba(189,221,255,.25);color:#eff7ff;border-radius:10px;padding:7px 10px;}
     .chess-hub__ok{width:max-content;border:1px solid rgba(189,221,255,.35);background:rgba(13,46,73,.82);color:#dff0ff;border-radius:9px;padding:6px 12px;cursor:pointer;font-weight:700;}
     .chess-rpg-battle__meta{font-size:13px;color:#8ec4df;}
@@ -18915,24 +18943,91 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
     .chess-card__name{font-weight:700;}
     .chess-card__stat{font-size:12px;color:#b7dbf2;}
   `;
-  function createIrregularBoard() {
-      const width = 11;
-      const height = 11;
+  const MIN_SEED_LENGTH = 8;
+  const MIN_CORE_SIZE = 9;
+  const MIN_CORE_VOID = 8;
+  const MIN_OUTER_RANDOM_TILES = 20;
+  const BOARD_SIZE = 15;
+  const sanitizeSeed = (raw) => raw.replace(/[^a-z0-9]/gi, '').toUpperCase();
+  const hashSeedText = (seedText) => {
+      let hash = 2166136261 >>> 0;
+      for (let i = 0; i < seedText.length; i += 1) {
+          hash ^= seedText.charCodeAt(i);
+          hash = Math.imul(hash, 16777619) >>> 0;
+      }
+      return hash >>> 0;
+  };
+  const randomSeedText = (length = MIN_SEED_LENGTH) => {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < length; i += 1) {
+          result += chars[Math.floor(Math.random() * chars.length)] ?? 'A';
+      }
+      return result;
+  };
+  const pickFromPool = (rng, pool, count) => {
+      const clone = [...pool];
+      for (let i = clone.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(nextRngValue(rng) * (i + 1));
+          const current = clone[i];
+          const picked = clone[j];
+          if (typeof current !== 'string' || typeof picked !== 'string')
+              continue;
+          clone[i] = picked;
+          clone[j] = current;
+      }
+      return clone.slice(0, Math.max(0, Math.min(count, clone.length)));
+  };
+  function createIrregularBoard(seedText) {
+      const width = BOARD_SIZE;
+      const height = BOARD_SIZE;
       const playable = new Set();
-      for (let y = 2; y <= 8; y += 1) {
-          for (let x = 2; x <= 8; x += 1) {
+      const rng = createRngState(hashSeedText(seedText));
+      const coreStart = Math.floor((width - MIN_CORE_SIZE) / 2);
+      const coreEnd = coreStart + MIN_CORE_SIZE - 1;
+      for (let y = coreStart; y <= coreEnd; y += 1) {
+          for (let x = coreStart; x <= coreEnd; x += 1) {
               playable.add(`${x},${y}`);
           }
       }
+      const protectedCoreSlots = new Set([
+          `${coreStart},${coreStart}`,
+          `${coreStart + 1},${coreStart}`,
+          `${coreStart + 2},${coreStart}`,
+          `${coreStart + 3},${coreStart}`,
+          `${coreStart},${coreStart + 1}`,
+          `${coreStart + 1},${coreStart + 1}`,
+          `${coreEnd},${coreEnd}`,
+          `${coreEnd - 1},${coreEnd}`,
+          `${coreEnd - 2},${coreEnd}`,
+          `${coreEnd - 3},${coreEnd}`,
+      ]);
+      const coreCandidates = [];
+      for (let y = coreStart; y <= coreEnd; y += 1) {
+          for (let x = coreStart; x <= coreEnd; x += 1) {
+              const key = `${x},${y}`;
+              if (!protectedCoreSlots.has(key))
+                  coreCandidates.push(key);
+          }
+      }
+      const coreVoids = pickFromPool(rng, coreCandidates, MIN_CORE_VOID);
+      for (const key of coreVoids)
+          playable.delete(key);
+      const outerCandidates = [];
       for (let y = 0; y < height; y += 1) {
           for (let x = 0; x < width; x += 1) {
               const key = `${x},${y}`;
               if (playable.has(key))
                   continue;
-              if (Math.random() > 0.72)
-                  playable.add(key);
+              const isOutsideCore = x < coreStart || x > coreEnd || y < coreStart || y > coreEnd;
+              if (isOutsideCore)
+                  outerCandidates.push(key);
           }
       }
+      const bonusOuterCount = MIN_OUTER_RANDOM_TILES + Math.floor(nextRngValue(rng) * 16);
+      const outerTiles = pickFromPool(rng, outerCandidates, bonusOuterCount);
+      for (const key of outerTiles)
+          playable.add(key);
       return { width, height, playable };
   }
   function realmMultiplier(fromRealm, toRealm) {
@@ -18971,10 +19066,24 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
           };
       });
   }
-  function renderBattleBoard(host, units) {
-      const board = createIrregularBoard();
-      const playerSlots = ['0,0', '1,0', '2,0', '3,0', '4,0', '0,1', '1,1', '2,1', '3,1', '4,1'];
-      const enemySlots = ['10,10', '9,10', '8,10', '7,10'];
+  function renderBattleBoard(host, units, seedText) {
+      const board = createIrregularBoard(seedText);
+      const coreStart = Math.floor((board.width - MIN_CORE_SIZE) / 2);
+      const coreEnd = coreStart + MIN_CORE_SIZE - 1;
+      const playerSlots = [
+          `${coreStart},${coreStart}`,
+          `${coreStart + 1},${coreStart}`,
+          `${coreStart + 2},${coreStart}`,
+          `${coreStart + 3},${coreStart}`,
+          `${coreStart},${coreStart + 1}`,
+          `${coreStart + 1},${coreStart + 1}`,
+      ];
+      const enemySlots = [
+          `${coreEnd},${coreEnd}`,
+          `${coreEnd - 1},${coreEnd}`,
+          `${coreEnd - 2},${coreEnd}`,
+          `${coreEnd - 3},${coreEnd}`,
+      ];
       host.style.gridTemplateColumns = `repeat(${board.width}, 38px)`;
       host.innerHTML = '';
       for (let y = 0; y < board.height; y += 1) {
@@ -19002,8 +19111,14 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
   function renderScreen(context) {
       const { root, shell = null } = context;
       ensureStyleTag(STYLE_ID, { css: CSS });
-      let selectedRealm = REALM_OPTIONS[0]?.value ?? 1;
+      const realmOptions = listCultivationRealmOptions().map((option) => ({
+          value: option.realm,
+          label: option.name,
+      }));
+      let selectedRealm = realmOptions[0]?.value ?? 1;
       let lockedRealm = selectedRealm;
+      let selectedSeed = randomSeedText();
+      let lockedSeed = selectedSeed;
       const section = document.createElement('section');
       section.className = 'chess-rpg-battle';
       const mount = mountSection({ root, section, rootClasses: 'app--chess-strategy-rpg-battle' });
@@ -19018,8 +19133,13 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
           <h2 class="chess-hub__title">Hub giữa · Chọn map tu vi</h2>
           <button class="chess-hub__action" type="button" data-role="open-realm">⚔️ Mở chọn map</button>
           <div class="chess-hub__realm" data-role="realm-wrap" hidden>
+          <div class="chess-hub__seed-row">
+              <input class="chess-hub__seed" data-role="seed-input" type="text" minlength="${MIN_SEED_LENGTH}" maxlength="32" value="${selectedSeed}" placeholder="Nhập seed chữ+số (>= ${MIN_SEED_LENGTH})" />
+              <button class="chess-hub__seed-random" type="button" data-role="seed-random">Random seed</button>
+            </div>
+            <p class="chess-hub__seed-help">Seed dạng chữ+số, tối thiểu ${MIN_SEED_LENGTH} ký tự. Map lõi 9x9 có ít nhất ${MIN_CORE_VOID} ô lõm + tối thiểu ${MIN_OUTER_RANDOM_TILES} ô ngoài lõi.</p>
             <select class="chess-hub__select" data-role="realm-select">
-              ${REALM_OPTIONS.map((option) => `<option value="${option.value}">${option.label}</option>`).join('')}
+              ${realmOptions.map((option) => `<option value="${option.value}">${option.label}</option>`).join('')}
             </select>
             <button class="chess-hub__ok" type="button" data-role="realm-ok">Bắt đầu</button>
           </div>
@@ -19037,6 +19157,8 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
       const openButton = section.querySelector('[data-role="open-realm"]');
       const realmWrap = section.querySelector('[data-role="realm-wrap"]');
       const realmSelect = section.querySelector('[data-role="realm-select"]');
+      const seedInput = section.querySelector('[data-role="seed-input"]');
+      const randomSeedButton = section.querySelector('[data-role="seed-random"]');
       const okButton = section.querySelector('[data-role="realm-ok"]');
       const boardHost = section.querySelector('[data-role="board"]');
       const cardsHost = section.querySelector('[data-role="cards"]');
@@ -19051,15 +19173,38 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
               return;
           selectedRealm = Math.max(1, Math.floor(Number(realmSelect.value) || 1));
       };
+      const syncSeedInput = (seed) => {
+          if (seedInput instanceof HTMLInputElement)
+              seedInput.value = seed;
+      };
+      const resolveValidSeed = (rawValue) => {
+          const compact = sanitizeSeed(rawValue);
+          if (compact.length >= MIN_SEED_LENGTH)
+              return compact;
+          const padLength = MIN_SEED_LENGTH - compact.length;
+          return `${compact}${randomSeedText(Math.max(0, padLength))}`;
+      };
+      const onSeedInputChange = () => {
+          if (!(seedInput instanceof HTMLInputElement))
+              return;
+          selectedSeed = resolveValidSeed(seedInput.value);
+          syncSeedInput(selectedSeed);
+      };
+      const onRandomSeed = () => {
+          selectedSeed = randomSeedText(10);
+          syncSeedInput(selectedSeed);
+      };
       const onStart = () => {
           lockedRealm = selectedRealm;
+          lockedSeed = resolveValidSeed(selectedSeed);
+          syncSeedInput(lockedSeed);
           const units = resolvePlayerUnits(lockedRealm);
           if (metaHost instanceof HTMLElement) {
-              const realmLabel = REALM_OPTIONS.find((option) => option.value === lockedRealm)?.label ?? `Cảnh giới ${lockedRealm}`;
-              metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel}. 4 unit player đã đồng bộ tu vi theo map (đơn vị thấp được nâng, đơn vị cao bị hạ tạm thời), dữ liệu collection gốc không bị thay đổi; unit AI sẽ bổ sung hành vi ở bước sau.`;
+              const realmLabel = realmOptions.find((option) => option.value === lockedRealm)?.label ?? `Cảnh giới ${lockedRealm}`;
+              metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel} · seed ${lockedSeed}. Bàn cờ vuông 15x15, lõi 9x9 có ít nhất ${MIN_CORE_VOID} ô lõm ngẫu nhiên, ngoài lõi thêm tối thiểu ${MIN_OUTER_RANDOM_TILES} ô ngẫu nhiên.`;
           }
           if (boardHost instanceof HTMLElement) {
-              renderBattleBoard(boardHost, units);
+              renderBattleBoard(boardHost, units, lockedSeed);
           }
           if (cardsHost instanceof HTMLElement) {
               cardsHost.innerHTML = units.map((unit, index) => `
@@ -19075,6 +19220,8 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
       backButton?.addEventListener('click', onBack);
       openButton?.addEventListener('click', onOpen);
       realmSelect?.addEventListener('change', onRealmChange);
+      seedInput?.addEventListener('change', onSeedInputChange);
+      randomSeedButton?.addEventListener('click', onRandomSeed);
       okButton?.addEventListener('click', onStart);
       onStart();
       return {
@@ -19082,6 +19229,8 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
               backButton?.removeEventListener('click', onBack);
               openButton?.removeEventListener('click', onOpen);
               realmSelect?.removeEventListener('change', onRealmChange);
+              seedInput?.removeEventListener('change', onSeedInputChange);
+              randomSeedButton?.removeEventListener('click', onRandomSeed);
               okButton?.removeEventListener('click', onStart);
               mount.destroy();
           },
@@ -19164,8 +19313,8 @@ __modules['./screens/chess-strategy-rpg/ready.ts'] = (exports, module, __require
         <h2 class="chess-strategy-rpg-ready__spec-title">Checklist áp dụng từ spec</h2>
         <ul class="chess-strategy-rpg-ready__spec-list">
           <li>4 tướng người chơi lấy theo lineup 10 ô (ưu tiên từ trái qua, trên xuống).</li>
-          <li>Map trận tạo ngẫu nhiên bất quy tắc, lõi tối thiểu 7x7 ô.</li>
-          <li>Hub giữa chọn mặt bằng tu vi từ Khai Nguyên đến Thánh Tôn.</li>
+          <li>Map trận tạo từ seed chữ+số, lõi tối thiểu 9x9 ô vuông + ô ngẫu nhiên mở rộng.</li>
+          <li>Hub giữa dùng dữ liệu tu vi chuẩn từ cultivation.ts (đồng bộ economy hiện tại).</li>
           <li>Vào trận sẽ import HP/ATK/WIL/RES/ARM/AE và kit của 4 tướng.</li>
         </ul>
       </section>
