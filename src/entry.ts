@@ -139,6 +139,7 @@ const APP_SCREEN_CLASSES = [
   'app--co-ty-phu-ready',
   'app--chess-strategy-rpg-ready',
   'app--chess-strategy-rpg-battle',
+  'app--chess-strategy-rpg-match',
   'app--co-ty-phu',
   `app--${SCREEN_SECT}`,
   `app--${SCREEN_SECT_TACTICAL_AI}`,

@@ -27,6 +27,7 @@ const MONOPOLY_SCREEN_MODULE_ID = '@screens/monopoly/index.ts' as const;
 const MONOPOLY_READY_SCREEN_MODULE_ID = '@screens/monopoly/ready.ts' as const;
 const CHESS_STRATEGY_RPG_READY_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/ready.ts' as const;
 const CHESS_STRATEGY_RPG_BATTLE_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/battle.ts' as const;
+const CHESS_STRATEGY_RPG_MATCH_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/match.ts' as const;
 const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
 
 const MODE_TYPES = {
@@ -292,6 +293,22 @@ const MODES = [
     shell: {
       screenId: 'chess-strategy-rpg-battle',
       moduleId: CHESS_STRATEGY_RPG_BATTLE_SCREEN_MODULE_ID
+    }
+  },
+  {
+    id: 'chess-strategy-rpg-match',
+    title: 'Chess Strategy RPG · Trận Chính',
+    type: MODE_TYPES.PVE,
+    status: MODE_STATUS.AVAILABLE,
+    icon: '🧭',
+    shortDescription: 'Màn hình trận chính tách riêng khỏi mô phỏng hub, hiển thị bàn cờ lớn với góc nhìn nghiêng.',
+    unlockNotes: 'Từ hub giữa, bấm Bắt đầu để mở trận chính theo seed và cảnh giới đã chọn.',
+    tags: ['PvE'],
+    menuSections: [],
+    parentId: 'chess-strategy-rpg',
+    shell: {
+      screenId: 'chess-strategy-rpg-match',
+      moduleId: CHESS_STRATEGY_RPG_MATCH_SCREEN_MODULE_ID
     }
   },
 

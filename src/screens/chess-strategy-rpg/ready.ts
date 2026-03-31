@@ -25,10 +25,16 @@ const CSS = /* css */ `
     align-self:flex-start;
     border:1px solid rgba(148,199,255,.5);
     background:rgba(10,20,33,.85);
-    border-radius:999px;
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
     color:#e8f2ff;
-    padding:10px 18px;
+    padding:0;
     cursor:pointer;
+    font-size:18px;
+    line-height:1;
   }
   .chess-strategy-rpg-ready__title{margin:0;font-size:30px;letter-spacing:.04em;text-transform:uppercase;}
   .chess-strategy-rpg-ready__desc{max-width:700px;margin:0;color:#9ec3e8;line-height:1.6;}
@@ -71,7 +77,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   const mount = mountSection({ root, section, rootClasses: 'app--chess-strategy-rpg-ready' });
 
   section.innerHTML = `
-    <button type="button" class="chess-strategy-rpg-ready__back">← Trở về Chiến Trường</button>
+    <button type="button" class="chess-strategy-rpg-ready__back" aria-label="Trở về Chiến Trường">←</button>
     <h1 class="chess-strategy-rpg-ready__title">Chess Strategy RPG</h1>
     <p class="chess-strategy-rpg-ready__desc">Đã mở nhánh chiến đấu riêng của mode ngang cấp Campaign: bấm nút tấn công để vào cụm 3 hub chọn map và bắt đầu trận bàn cờ.</p>
     <section class="chess-strategy-rpg-ready__spec">

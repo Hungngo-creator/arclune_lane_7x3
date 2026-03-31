@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -7384,6 +7384,7 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
   const MONOPOLY_READY_SCREEN_MODULE_ID = '@screens/monopoly/ready.ts';
   const CHESS_STRATEGY_RPG_READY_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/ready.ts';
   const CHESS_STRATEGY_RPG_BATTLE_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/battle.ts';
+  const CHESS_STRATEGY_RPG_MATCH_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/match.ts';
   const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts';
   const MODE_TYPES = {
       PVE: '',
@@ -7642,6 +7643,22 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
           shell: {
               screenId: 'chess-strategy-rpg-battle',
               moduleId: CHESS_STRATEGY_RPG_BATTLE_SCREEN_MODULE_ID
+          }
+      },
+      {
+          id: 'chess-strategy-rpg-match',
+          title: 'Chess Strategy RPG · Trận Chính',
+          type: MODE_TYPES.PVE,
+          status: MODE_STATUS.AVAILABLE,
+          icon: '🧭',
+          shortDescription: 'Màn hình trận chính tách riêng khỏi mô phỏng hub, hiển thị bàn cờ lớn với góc nhìn nghiêng.',
+          unlockNotes: 'Từ hub giữa, bấm Bắt đầu để mở trận chính theo seed và cảnh giới đã chọn.',
+          tags: ['PvE'],
+          menuSections: [],
+          parentId: 'chess-strategy-rpg',
+          shell: {
+              screenId: 'chess-strategy-rpg-match',
+              moduleId: CHESS_STRATEGY_RPG_MATCH_SCREEN_MODULE_ID
           }
       },
       {
@@ -9495,6 +9512,7 @@ __modules['./entry.ts'] = (exports, module, __require) => {
       'app--co-ty-phu-ready',
       'app--chess-strategy-rpg-ready',
       'app--chess-strategy-rpg-battle',
+      'app--chess-strategy-rpg-match',
       'app--co-ty-phu',
       `app--${SCREEN_SECT}`,
       `app--${SCREEN_SECT_TACTICAL_AI}`,
@@ -18899,7 +18917,7 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
   const CSS = /* css */ `
     .app--chess-strategy-rpg-battle{min-height:100dvh;padding:16px;box-sizing:border-box;}
     .chess-rpg-battle{max-width:1200px;margin:0 auto;min-height:calc(100dvh - 32px);border-radius:20px;border:1px solid rgba(126,208,255,.26);background:linear-gradient(170deg,rgba(10,18,30,.95),rgba(10,28,40,.92));padding:20px;color:#e7f3ff;display:grid;gap:16px;}
-    .chess-rpg-battle__back{justify-self:start;border:1px solid rgba(143,198,255,.5);background:rgba(8,19,31,.85);color:#e6f2ff;border-radius:999px;padding:8px 14px;cursor:pointer;}
+    .chess-rpg-battle__back{justify-self:start;border:1px solid rgba(143,198,255,.5);background:rgba(8,19,31,.85);color:#e6f2ff;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;padding:0;cursor:pointer;font-size:18px;line-height:1;}
     .chess-rpg-battle__hubs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
     .chess-hub{border:1px solid rgba(145,208,255,.24);background:rgba(13,31,45,.8);border-radius:16px;min-height:138px;padding:14px;display:grid;gap:10px;align-content:flex-start;}
     .chess-hub__title{margin:0;text-transform:uppercase;letter-spacing:.04em;font-size:14px;color:#d8ecff;}
@@ -19034,6 +19052,13 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
       const diff = toRealm - fromRealm;
       return Math.max(0.55, 1 + diff * 0.06);
   }
+  function resolveValidSeed(rawValue) {
+      const compact = sanitizeSeed(rawValue);
+      if (compact.length >= MIN_SEED_LENGTH)
+          return compact;
+      const padLength = MIN_SEED_LENGTH - compact.length;
+      return `${compact}${randomSeedText(Math.max(0, padLength))}`;
+  }
   function resolvePlayerUnits(targetRealm) {
       const profile = loadPlayerProfile();
       const order = Array.isArray(profile.lineupDeck) ? profile.lineupDeck : [];
@@ -19116,14 +19141,12 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
           label: option.name,
       }));
       let selectedRealm = realmOptions[0]?.value ?? 1;
-      let lockedRealm = selectedRealm;
       let selectedSeed = randomSeedText();
-      let lockedSeed = selectedSeed;
       const section = document.createElement('section');
       section.className = 'chess-rpg-battle';
       const mount = mountSection({ root, section, rootClasses: 'app--chess-strategy-rpg-battle' });
       section.innerHTML = `
-      <button type="button" class="chess-rpg-battle__back">← Về màn ready</button>
+      <button type="button" class="chess-rpg-battle__back" aria-label="Về màn ready">←</button>
       <div class="chess-rpg-battle__hubs">
         <article class="chess-hub">
           <h2 class="chess-hub__title">Hub trái</h2>
@@ -19133,7 +19156,7 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
           <h2 class="chess-hub__title">Hub giữa · Chọn map tu vi</h2>
           <button class="chess-hub__action" type="button" data-role="open-realm">⚔️ Mở chọn map</button>
           <div class="chess-hub__realm" data-role="realm-wrap" hidden>
-          <div class="chess-hub__seed-row">
+           <div class="chess-hub__seed-row">
               <input class="chess-hub__seed" data-role="seed-input" type="text" minlength="${MIN_SEED_LENGTH}" maxlength="32" value="${selectedSeed}" placeholder="Nhập seed chữ+số (>= ${MIN_SEED_LENGTH})" />
               <button class="chess-hub__seed-random" type="button" data-role="seed-random">Random seed</button>
             </div>
@@ -19163,48 +19186,21 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
       const boardHost = section.querySelector('[data-role="board"]');
       const cardsHost = section.querySelector('[data-role="cards"]');
       const metaHost = section.querySelector('[data-role="meta"]');
-      const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-ready');
-      const onOpen = () => {
-          if (realmWrap instanceof HTMLElement)
-              realmWrap.hidden = !realmWrap.hidden;
-      };
-      const onRealmChange = () => {
-          if (!(realmSelect instanceof HTMLSelectElement))
-              return;
-          selectedRealm = Math.max(1, Math.floor(Number(realmSelect.value) || 1));
-      };
       const syncSeedInput = (seed) => {
           if (seedInput instanceof HTMLInputElement)
               seedInput.value = seed;
       };
-      const resolveValidSeed = (rawValue) => {
-          const compact = sanitizeSeed(rawValue);
-          if (compact.length >= MIN_SEED_LENGTH)
-              return compact;
-          const padLength = MIN_SEED_LENGTH - compact.length;
-          return `${compact}${randomSeedText(Math.max(0, padLength))}`;
-      };
-      const onSeedInputChange = () => {
-          if (!(seedInput instanceof HTMLInputElement))
-              return;
-          selectedSeed = resolveValidSeed(seedInput.value);
-          syncSeedInput(selectedSeed);
-      };
-      const onRandomSeed = () => {
-          selectedSeed = randomSeedText(10);
-          syncSeedInput(selectedSeed);
-      };
-      const onStart = () => {
-          lockedRealm = selectedRealm;
-          lockedSeed = resolveValidSeed(selectedSeed);
-          syncSeedInput(lockedSeed);
-          const units = resolvePlayerUnits(lockedRealm);
+      const refreshPreview = () => {
+          const validSeed = resolveValidSeed(selectedSeed);
+          syncSeedInput(validSeed);
+          selectedSeed = validSeed;
+          const units = resolvePlayerUnits(selectedRealm);
           if (metaHost instanceof HTMLElement) {
-              const realmLabel = realmOptions.find((option) => option.value === lockedRealm)?.label ?? `Cảnh giới ${lockedRealm}`;
-              metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel} · seed ${lockedSeed}. Bàn cờ vuông 15x15, lõi 9x9 có ít nhất ${MIN_CORE_VOID} ô lõm ngẫu nhiên, ngoài lõi thêm tối thiểu ${MIN_OUTER_RANDOM_TILES} ô ngẫu nhiên.`;
+              const realmLabel = realmOptions.find((option) => option.value === selectedRealm)?.label ?? `Cảnh giới ${selectedRealm}`;
+              metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel} · seed ${validSeed}. Bàn cờ vuông 15x15, lõi 9x9 có ít nhất ${MIN_CORE_VOID} ô lõm ngẫu nhiên, ngoài lõi thêm tối thiểu ${MIN_OUTER_RANDOM_TILES} ô ngẫu nhiên.`;
           }
           if (boardHost instanceof HTMLElement) {
-              renderBattleBoard(boardHost, units, lockedSeed);
+              renderBattleBoard(boardHost, units, validSeed);
           }
           if (cardsHost instanceof HTMLElement) {
               cardsHost.innerHTML = units.map((unit, index) => `
@@ -19217,21 +19213,180 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
         `).join('');
           }
       };
+      const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-ready');
+      const onOpen = () => {
+          if (realmWrap instanceof HTMLElement)
+              realmWrap.hidden = !realmWrap.hidden;
+      };
+      const onRealmChange = () => {
+          if (!(realmSelect instanceof HTMLSelectElement))
+              return;
+          selectedRealm = Math.max(1, Math.floor(Number(realmSelect.value) || 1));
+          refreshPreview();
+      };
+      const onSeedInputChange = () => {
+          if (!(seedInput instanceof HTMLInputElement))
+              return;
+          selectedSeed = seedInput.value;
+          refreshPreview();
+      };
+      const onRandomSeed = () => {
+          selectedSeed = randomSeedText(10);
+          refreshPreview();
+      };
+      const onStart = () => {
+          const seed = resolveValidSeed(selectedSeed);
+          const realm = selectedRealm;
+          shell?.enterScreen?.('chess-strategy-rpg-match', { seed, realm });
+      };
       backButton?.addEventListener('click', onBack);
       openButton?.addEventListener('click', onOpen);
       realmSelect?.addEventListener('change', onRealmChange);
+      seedInput?.addEventListener('input', onSeedInputChange);
       seedInput?.addEventListener('change', onSeedInputChange);
       randomSeedButton?.addEventListener('click', onRandomSeed);
       okButton?.addEventListener('click', onStart);
-      onStart();
+      refreshPreview();
       return {
           destroy() {
               backButton?.removeEventListener('click', onBack);
               openButton?.removeEventListener('click', onOpen);
               realmSelect?.removeEventListener('change', onRealmChange);
+              seedInput?.removeEventListener('input', onSeedInputChange);
               seedInput?.removeEventListener('change', onSeedInputChange);
               randomSeedButton?.removeEventListener('click', onRandomSeed);
               okButton?.removeEventListener('click', onStart);
+              mount.destroy();
+          },
+      };
+  }
+  const render = renderScreen;
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'MIN_SEED_LENGTH')) exports.MIN_SEED_LENGTH = MIN_SEED_LENGTH;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'MIN_CORE_SIZE')) exports.MIN_CORE_SIZE = MIN_CORE_SIZE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'MIN_CORE_VOID')) exports.MIN_CORE_VOID = MIN_CORE_VOID;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'MIN_OUTER_RANDOM_TILES')) exports.MIN_OUTER_RANDOM_TILES = MIN_OUTER_RANDOM_TILES;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'randomSeedText')) exports.randomSeedText = randomSeedText;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createIrregularBoard')) exports.createIrregularBoard = createIrregularBoard;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveValidSeed')) exports.resolveValidSeed = resolveValidSeed;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolvePlayerUnits')) exports.resolvePlayerUnits = resolvePlayerUnits;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
+};
+__modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep0.ensureStyleTag;
+  const mountSection = __dep0.mountSection;
+  const __dep1 = __require('./screens/chess-strategy-rpg/battle.ts');
+  const createIrregularBoard = __dep1.createIrregularBoard;
+  const MIN_CORE_SIZE = __dep1.MIN_CORE_SIZE;
+  const randomSeedText = __dep1.randomSeedText;
+  const resolvePlayerUnits = __dep1.resolvePlayerUnits;
+  const resolveValidSeed = __dep1.resolveValidSeed;
+  const STYLE_ID = 'chess-strategy-rpg-match-style';
+  const ISO_TILE_W = 56;
+  const ISO_TILE_H = 30;
+  const CSS = /* css */ `
+    .app--chess-strategy-rpg-match{min-height:100dvh;padding:16px;box-sizing:border-box;}
+    .chess-rpg-match{max-width:1320px;margin:0 auto;min-height:calc(100dvh - 32px);border-radius:20px;border:1px solid rgba(126,208,255,.3);background:linear-gradient(170deg,rgba(8,18,31,.98),rgba(14,35,57,.92));padding:18px;color:#e7f3ff;display:grid;gap:14px;}
+    .chess-rpg-match__top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+    .chess-rpg-match__back{border:1px solid rgba(143,198,255,.5);background:rgba(8,19,31,.85);color:#e6f2ff;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;padding:0;cursor:pointer;font-size:18px;line-height:1;}
+    .chess-rpg-match__meta{font-size:13px;color:#8ec4df;}
+    .chess-rpg-match__field{position:relative;overflow:auto;border:1px solid rgba(121,187,228,.32);border-radius:14px;background:radial-gradient(circle at 35% 20%, rgba(43,106,146,.26), rgba(5,13,23,.95));padding:18px;min-height:640px;}
+    .chess-rpg-match__iso{position:relative;left:50%;top:44px;transform:translateX(-50%);width:100%;height:560px;}
+    .chess-rpg-match__tile{position:absolute;width:${ISO_TILE_W}px;height:${ISO_TILE_H}px;transform:translate(-50%, -50%) skewY(-26deg) scaleY(.86);border-radius:8px;border:1px solid rgba(140,201,236,.22);background:rgba(35,87,116,.4);}
+    .chess-rpg-match__tile--void{opacity:.18;border-style:dashed;}
+    .chess-rpg-match__tile--player{background:rgba(32,137,96,.88);border-color:rgba(151,255,225,.85);}
+    .chess-rpg-match__tile--enemy{background:rgba(170,51,94,.84);border-color:rgba(255,184,217,.84);}
+    .chess-rpg-match__unit{position:absolute;transform:translate(-50%, -88%);padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(4,16,28,.9);border:1px solid rgba(188,225,255,.4);white-space:nowrap;}
+    .chess-rpg-match__unit--player{color:#95ffd9;}
+    .chess-rpg-match__unit--enemy{color:#ffc3dd;}
+  `;
+  function numberParam(input, fallback = 1) {
+      const value = Number(input);
+      if (!Number.isFinite(value))
+          return fallback;
+      return Math.max(1, Math.floor(value));
+  }
+  function renderScreen(context) {
+      const { root, shell = null, params = null } = context;
+      ensureStyleTag(STYLE_ID, { css: CSS });
+      const seedInput = typeof params?.seed === 'string' ? params.seed : randomSeedText(10);
+      const seed = resolveValidSeed(seedInput);
+      const realm = numberParam(params?.realm, 1);
+      const units = resolvePlayerUnits(realm);
+      const section = document.createElement('section');
+      section.className = 'chess-rpg-match';
+      const mount = mountSection({ root, section, rootClasses: 'app--chess-strategy-rpg-match' });
+      section.innerHTML = `
+      <div class="chess-rpg-match__top">
+        <button type="button" class="chess-rpg-match__back" aria-label="Về hub mô phỏng">←</button>
+        <div class="chess-rpg-match__meta">Trận chính · Seed ${seed} · Tu vi mục tiêu ${realm} · Góc nhìn nghiêng kiểu Monopoly.</div>
+      </div>
+      <div class="chess-rpg-match__field">
+        <div class="chess-rpg-match__iso" data-role="iso"></div>
+      </div>
+    `;
+      const isoHost = section.querySelector('[data-role="iso"]');
+      const backButton = section.querySelector('.chess-rpg-match__back');
+      if (isoHost instanceof HTMLElement) {
+          const board = createIrregularBoard(seed);
+          const centerX = (board.width * ISO_TILE_W) / 2;
+          const centerY = 96;
+          const coreStart = Math.floor((board.width - MIN_CORE_SIZE) / 2);
+          const coreEnd = coreStart + MIN_CORE_SIZE - 1;
+          const playerSlots = [
+              `${coreStart},${coreStart}`,
+              `${coreStart + 1},${coreStart}`,
+              `${coreStart + 2},${coreStart}`,
+              `${coreStart + 3},${coreStart}`,
+          ];
+          const enemySlots = [
+              `${coreEnd},${coreEnd}`,
+              `${coreEnd - 1},${coreEnd}`,
+              `${coreEnd - 2},${coreEnd}`,
+              `${coreEnd - 3},${coreEnd}`,
+          ];
+          for (let y = 0; y < board.height; y += 1) {
+              for (let x = 0; x < board.width; x += 1) {
+                  const key = `${x},${y}`;
+                  const isoX = (x - y) * (ISO_TILE_W / 2) + centerX;
+                  const isoY = (x + y) * (ISO_TILE_H / 2) + centerY;
+                  const tile = document.createElement('div');
+                  tile.className = board.playable.has(key)
+                      ? 'chess-rpg-match__tile'
+                      : 'chess-rpg-match__tile chess-rpg-match__tile--void';
+                  tile.style.left = `${isoX}px`;
+                  tile.style.top = `${isoY}px`;
+                  const playerIndex = playerSlots.indexOf(key);
+                  if (playerIndex >= 0 && playerIndex < units.length) {
+                      tile.className = 'chess-rpg-match__tile chess-rpg-match__tile--player';
+                      const unit = document.createElement('div');
+                      unit.className = 'chess-rpg-match__unit chess-rpg-match__unit--player';
+                      unit.style.left = `${isoX}px`;
+                      unit.style.top = `${isoY}px`;
+                      unit.textContent = `P${playerIndex + 1} ${units[playerIndex]?.name ?? ''}`.trim();
+                      isoHost.appendChild(unit);
+                  }
+                  const enemyIndex = enemySlots.indexOf(key);
+                  if (enemyIndex >= 0) {
+                      tile.className = 'chess-rpg-match__tile chess-rpg-match__tile--enemy';
+                      const enemy = document.createElement('div');
+                      enemy.className = 'chess-rpg-match__unit chess-rpg-match__unit--enemy';
+                      enemy.style.left = `${isoX}px`;
+                      enemy.style.top = `${isoY}px`;
+                      enemy.textContent = `E${enemyIndex + 1}`;
+                      isoHost.appendChild(enemy);
+                  }
+                  isoHost.appendChild(tile);
+              }
+          }
+      }
+      const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
+      backButton?.addEventListener('click', onBack);
+      return {
+          destroy() {
+              backButton?.removeEventListener('click', onBack);
               mount.destroy();
           },
       };
@@ -19269,10 +19424,16 @@ __modules['./screens/chess-strategy-rpg/ready.ts'] = (exports, module, __require
       align-self:flex-start;
       border:1px solid rgba(148,199,255,.5);
       background:rgba(10,20,33,.85);
-      border-radius:999px;
+      width:34px;
+      height:34px;
+      display:grid;
+      place-items:center;
+      border-radius:10px;
       color:#e8f2ff;
-      padding:10px 18px;
+      padding:0;
       cursor:pointer;
+      font-size:18px;
+      line-height:1;
     }
     .chess-strategy-rpg-ready__title{margin:0;font-size:30px;letter-spacing:.04em;text-transform:uppercase;}
     .chess-strategy-rpg-ready__desc{max-width:700px;margin:0;color:#9ec3e8;line-height:1.6;}
@@ -19306,7 +19467,7 @@ __modules['./screens/chess-strategy-rpg/ready.ts'] = (exports, module, __require
       section.className = 'chess-strategy-rpg-ready';
       const mount = mountSection({ root, section, rootClasses: 'app--chess-strategy-rpg-ready' });
       section.innerHTML = `
-      <button type="button" class="chess-strategy-rpg-ready__back">← Trở về Chiến Trường</button>
+      <button type="button" class="chess-strategy-rpg-ready__back" aria-label="Trở về Chiến Trường">←</button>
       <h1 class="chess-strategy-rpg-ready__title">Chess Strategy RPG</h1>
       <p class="chess-strategy-rpg-ready__desc">Đã mở nhánh chiến đấu riêng của mode ngang cấp Campaign: bấm nút tấn công để vào cụm 3 hub chọn map và bắt đầu trận bàn cờ.</p>
       <section class="chess-strategy-rpg-ready__spec">

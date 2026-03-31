@@ -110,6 +110,7 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['@screens/monopoly/ready.ts', './screens/monopoly/ready.ts'],
   ['@screens/chess-strategy-rpg/ready.ts', './screens/chess-strategy-rpg/ready.ts'],
   ['@screens/chess-strategy-rpg/battle.ts', './screens/chess-strategy-rpg/battle.ts'],
+  ['@screens/chess-strategy-rpg/match.ts', './screens/chess-strategy-rpg/match.ts'],
   ['@screens/collection/index.ts', './screens/collection/index.ts'],
   ['@screens/lineup/index.ts', './screens/lineup/index.ts'],
   ['@screens/ui-gacha/index.ts', './screens/ui-gacha/index.ts'],

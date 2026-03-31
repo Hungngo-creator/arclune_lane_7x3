@@ -10,7 +10,7 @@ const STYLE_ID = 'chess-strategy-rpg-battle-style';
 const CSS = /* css */ `
   .app--chess-strategy-rpg-battle{min-height:100dvh;padding:16px;box-sizing:border-box;}
   .chess-rpg-battle{max-width:1200px;margin:0 auto;min-height:calc(100dvh - 32px);border-radius:20px;border:1px solid rgba(126,208,255,.26);background:linear-gradient(170deg,rgba(10,18,30,.95),rgba(10,28,40,.92));padding:20px;color:#e7f3ff;display:grid;gap:16px;}
-  .chess-rpg-battle__back{justify-self:start;border:1px solid rgba(143,198,255,.5);background:rgba(8,19,31,.85);color:#e6f2ff;border-radius:999px;padding:8px 14px;cursor:pointer;}
+  .chess-rpg-battle__back{justify-self:start;border:1px solid rgba(143,198,255,.5);background:rgba(8,19,31,.85);color:#e6f2ff;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;padding:0;cursor:pointer;font-size:18px;line-height:1;}
   .chess-rpg-battle__hubs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
   .chess-hub{border:1px solid rgba(145,208,255,.24);background:rgba(13,31,45,.8);border-radius:16px;min-height:138px;padding:14px;display:grid;gap:10px;align-content:flex-start;}
   .chess-hub__title{margin:0;text-transform:uppercase;letter-spacing:.04em;font-size:14px;color:#d8ecff;}
@@ -57,10 +57,10 @@ const CSS = /* css */ `
 
 interface RenderContext {
   readonly root: HTMLElement;
-  readonly shell?: { enterScreen?: (screenId: string) => void } | null;
+  readonly shell?: { enterScreen?: (screenId: string, params?: Record<string, unknown>) => void } | null;
 }
 
-interface BattleUnit {
+export interface BattleUnit {
   id: string;
   name: string;
   hp: number;
@@ -72,16 +72,16 @@ interface BattleUnit {
   kitLabel: string;
 }
 
-interface BattleBoard {
+export interface BattleBoard {
   width: number;
   height: number;
   playable: Set<string>;
 }
 
-const MIN_SEED_LENGTH = 8;
-const MIN_CORE_SIZE = 9;
-const MIN_CORE_VOID = 8;
-const MIN_OUTER_RANDOM_TILES = 20;
+export const MIN_SEED_LENGTH = 8;
+export const MIN_CORE_SIZE = 9;
+export const MIN_CORE_VOID = 8;
+export const MIN_OUTER_RANDOM_TILES = 20;
 const BOARD_SIZE = 15;
 
 const sanitizeSeed = (raw: string): string => raw.replace(/[^a-z0-9]/gi, '').toUpperCase();
@@ -95,7 +95,7 @@ const hashSeedText = (seedText: string): number => {
   return hash >>> 0;
 };
 
-const randomSeedText = (length = MIN_SEED_LENGTH): string => {
+export const randomSeedText = (length = MIN_SEED_LENGTH): string => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
   for (let i = 0; i < length; i += 1) {
@@ -117,7 +117,7 @@ const pickFromPool = (rng: { seed: number; calls: number }, pool: string[], coun
   return clone.slice(0, Math.max(0, Math.min(count, clone.length)));
 };
 
-function createIrregularBoard(seedText: string): BattleBoard {
+export function createIrregularBoard(seedText: string): BattleBoard {
   const width = BOARD_SIZE;
   const height = BOARD_SIZE;
   const playable = new Set<string>();
@@ -132,7 +132,7 @@ function createIrregularBoard(seedText: string): BattleBoard {
     }
   }
 
-const protectedCoreSlots = new Set<string>([
+ const protectedCoreSlots = new Set<string>([
     `${coreStart},${coreStart}`,
     `${coreStart + 1},${coreStart}`,
     `${coreStart + 2},${coreStart}`,
@@ -152,6 +152,7 @@ const protectedCoreSlots = new Set<string>([
       if (!protectedCoreSlots.has(key)) coreCandidates.push(key);
     }
   }
+
   const coreVoids = pickFromPool(rng, coreCandidates, MIN_CORE_VOID);
   for (const key of coreVoids) playable.delete(key);
 
@@ -164,6 +165,7 @@ const protectedCoreSlots = new Set<string>([
       if (isOutsideCore) outerCandidates.push(key);
     }
   }
+
   const bonusOuterCount = MIN_OUTER_RANDOM_TILES + Math.floor(nextRngValue(rng) * 16);
   const outerTiles = pickFromPool(rng, outerCandidates, bonusOuterCount);
   for (const key of outerTiles) playable.add(key);
@@ -176,7 +178,14 @@ function realmMultiplier(fromRealm: number, toRealm: number): number {
   return Math.max(0.55, 1 + diff * 0.06);
 }
 
-function resolvePlayerUnits(targetRealm: number): BattleUnit[] {
+export function resolveValidSeed(rawValue: string): string {
+  const compact = sanitizeSeed(rawValue);
+  if (compact.length >= MIN_SEED_LENGTH) return compact;
+  const padLength = MIN_SEED_LENGTH - compact.length;
+  return `${compact}${randomSeedText(Math.max(0, padLength))}`;
+}
+
+export function resolvePlayerUnits(targetRealm: number): BattleUnit[] {
   const profile = loadPlayerProfile();
   const order = Array.isArray(profile.lineupDeck) ? profile.lineupDeck : [];
   const selected = order
@@ -269,16 +278,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   }));
 
   let selectedRealm = realmOptions[0]?.value ?? 1;
-  let lockedRealm = selectedRealm;
   let selectedSeed = randomSeedText();
-  let lockedSeed = selectedSeed;
 
   const section = document.createElement('section');
   section.className = 'chess-rpg-battle';
   const mount = mountSection({ root, section, rootClasses: 'app--chess-strategy-rpg-battle' });
 
   section.innerHTML = `
-    <button type="button" class="chess-rpg-battle__back">← Về màn ready</button>
+    <button type="button" class="chess-rpg-battle__back" aria-label="Về màn ready">←</button>
     <div class="chess-rpg-battle__hubs">
       <article class="chess-hub">
         <h2 class="chess-hub__title">Hub trái</h2>
@@ -288,7 +295,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         <h2 class="chess-hub__title">Hub giữa · Chọn map tu vi</h2>
         <button class="chess-hub__action" type="button" data-role="open-realm">⚔️ Mở chọn map</button>
         <div class="chess-hub__realm" data-role="realm-wrap" hidden>
-        <div class="chess-hub__seed-row">
+         <div class="chess-hub__seed-row">
             <input class="chess-hub__seed" data-role="seed-input" type="text" minlength="${MIN_SEED_LENGTH}" maxlength="32" value="${selectedSeed}" placeholder="Nhập seed chữ+số (>= ${MIN_SEED_LENGTH})" />
             <button class="chess-hub__seed-random" type="button" data-role="seed-random">Random seed</button>
           </div>
@@ -320,50 +327,23 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   const cardsHost = section.querySelector('[data-role="cards"]');
   const metaHost = section.querySelector('[data-role="meta"]');
 
-  const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-ready');
-  const onOpen = () => {
-    if (realmWrap instanceof HTMLElement) realmWrap.hidden = !realmWrap.hidden;
-  };
-
-  const onRealmChange = () => {
-    if (!(realmSelect instanceof HTMLSelectElement)) return;
-    selectedRealm = Math.max(1, Math.floor(Number(realmSelect.value) || 1));
-  };
-
   const syncSeedInput = (seed: string): void => {
     if (seedInput instanceof HTMLInputElement) seedInput.value = seed;
   };
 
-  const resolveValidSeed = (rawValue: string): string => {
-    const compact = sanitizeSeed(rawValue);
-    if (compact.length >= MIN_SEED_LENGTH) return compact;
-    const padLength = MIN_SEED_LENGTH - compact.length;
-    return `${compact}${randomSeedText(Math.max(0, padLength))}`;
-  };
+  const refreshPreview = () => {
+    const validSeed = resolveValidSeed(selectedSeed);
+    syncSeedInput(validSeed);
+    selectedSeed = validSeed;
 
-  const onSeedInputChange = () => {
-    if (!(seedInput instanceof HTMLInputElement)) return;
-    selectedSeed = resolveValidSeed(seedInput.value);
-    syncSeedInput(selectedSeed);
-  };
-
-  const onRandomSeed = () => {
-    selectedSeed = randomSeedText(10);
-    syncSeedInput(selectedSeed);
-  };
-
-  const onStart = () => {
-    lockedRealm = selectedRealm;
-    lockedSeed = resolveValidSeed(selectedSeed);
-    syncSeedInput(lockedSeed);
-    const units = resolvePlayerUnits(lockedRealm);
+  const units = resolvePlayerUnits(selectedRealm);
     if (metaHost instanceof HTMLElement) {
-      const realmLabel = realmOptions.find((option) => option.value === lockedRealm)?.label ?? `Cảnh giới ${lockedRealm}`;
-      metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel} · seed ${lockedSeed}. Bàn cờ vuông 15x15, lõi 9x9 có ít nhất ${MIN_CORE_VOID} ô lõm ngẫu nhiên, ngoài lõi thêm tối thiểu ${MIN_OUTER_RANDOM_TILES} ô ngẫu nhiên.`;
+      const realmLabel = realmOptions.find((option) => option.value === selectedRealm)?.label ?? `Cảnh giới ${selectedRealm}`;
+      metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel} · seed ${validSeed}. Bàn cờ vuông 15x15, lõi 9x9 có ít nhất ${MIN_CORE_VOID} ô lõm ngẫu nhiên, ngoài lõi thêm tối thiểu ${MIN_OUTER_RANDOM_TILES} ô ngẫu nhiên.`;
     }
 
     if (boardHost instanceof HTMLElement) {
-      renderBattleBoard(boardHost, units, lockedSeed);
+      renderBattleBoard(boardHost, units, validSeed);
     }
 
     if (cardsHost instanceof HTMLElement) {
@@ -378,20 +358,50 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     }
   };
 
+  const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-ready');
+  const onOpen = () => {
+    if (realmWrap instanceof HTMLElement) realmWrap.hidden = !realmWrap.hidden;
+  };
+
+  const onRealmChange = () => {
+    if (!(realmSelect instanceof HTMLSelectElement)) return;
+    selectedRealm = Math.max(1, Math.floor(Number(realmSelect.value) || 1));
+    refreshPreview();
+  };
+
+  const onSeedInputChange = () => {
+    if (!(seedInput instanceof HTMLInputElement)) return;
+    selectedSeed = seedInput.value;
+    refreshPreview();
+  };
+
+  const onRandomSeed = () => {
+    selectedSeed = randomSeedText(10);
+    refreshPreview();
+  };
+
+  const onStart = () => {
+    const seed = resolveValidSeed(selectedSeed);
+    const realm = selectedRealm;
+    shell?.enterScreen?.('chess-strategy-rpg-match', { seed, realm });
+  };
+
   backButton?.addEventListener('click', onBack);
   openButton?.addEventListener('click', onOpen);
   realmSelect?.addEventListener('change', onRealmChange);
+  seedInput?.addEventListener('input', onSeedInputChange);
   seedInput?.addEventListener('change', onSeedInputChange);
   randomSeedButton?.addEventListener('click', onRandomSeed);
   okButton?.addEventListener('click', onStart);
 
-  onStart();
+  refreshPreview();
 
   return {
     destroy() {
       backButton?.removeEventListener('click', onBack);
       openButton?.removeEventListener('click', onOpen);
       realmSelect?.removeEventListener('change', onRealmChange);
+      seedInput?.removeEventListener('input', onSeedInputChange);
       seedInput?.removeEventListener('change', onSeedInputChange);
       randomSeedButton?.removeEventListener('click', onRandomSeed);
       okButton?.removeEventListener('click', onStart);
