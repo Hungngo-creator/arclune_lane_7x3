@@ -79,10 +79,10 @@ export interface BattleBoard {
 }
 
 export const MIN_SEED_LENGTH = 8;
-export const MIN_CORE_SIZE = 9;
-export const MIN_CORE_VOID = 8;
-export const MIN_OUTER_RANDOM_TILES = 20;
-const BOARD_SIZE = 15;
+export const MIN_CORE_SIZE = 13;
+export const MIN_CORE_VOID = 20;
+export const MIN_OUTER_RANDOM_TILES = 48;
+const BOARD_SIZE = 23;
 
 const sanitizeSeed = (raw: string): string => raw.replace(/[^a-z0-9]/gi, '').toUpperCase();
 
@@ -335,11 +335,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     const validSeed = resolveValidSeed(selectedSeed);
     syncSeedInput(validSeed);
     selectedSeed = validSeed;
+    const boardPreview = createIrregularBoard(validSeed);
 
-  const units = resolvePlayerUnits(selectedRealm);
+    const units = resolvePlayerUnits(selectedRealm);
     if (metaHost instanceof HTMLElement) {
       const realmLabel = realmOptions.find((option) => option.value === selectedRealm)?.label ?? `Cảnh giới ${selectedRealm}`;
-      metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel} · seed ${validSeed}. Bàn cờ vuông 15x15, lõi 9x9 có ít nhất ${MIN_CORE_VOID} ô lõm ngẫu nhiên, ngoài lõi thêm tối thiểu ${MIN_OUTER_RANDOM_TILES} ô ngẫu nhiên.`;
+      metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel} · seed ${validSeed}. Bàn cờ vuông ${boardPreview.width}x${boardPreview.height}, lõi ${MIN_CORE_SIZE}x${MIN_CORE_SIZE} có ít nhất ${MIN_CORE_VOID} ô lõm ngẫu nhiên, ngoài lõi thêm tối thiểu ${MIN_OUTER_RANDOM_TILES} ô ngẫu nhiên.`;
     }
 
     if (boardHost instanceof HTMLElement) {
