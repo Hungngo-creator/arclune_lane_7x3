@@ -36,18 +36,21 @@ const CSS = /* css */ `
   .chess-strategy-rpg-ready__spec-title{margin:0;font-size:16px;letter-spacing:.05em;text-transform:uppercase;color:#dff0ff;}
   .chess-strategy-rpg-ready__spec-list{margin:0;padding-left:20px;display:grid;gap:8px;color:#e6f2ff;line-height:1.55;}
   .chess-strategy-rpg-ready__footer{margin-top:auto;display:flex;justify-content:flex-end;}
-  .chess-strategy-rpg-ready__start{
-    border:1px solid rgba(255,224,102,.4);
-    background:rgba(52,38,16,.84);
-    color:#ffe89b;
+  .chess-strategy-rpg-ready__attack{
+    border:1px solid rgba(246,198,99,.66);
+    background:linear-gradient(140deg,#f9cb84,#f0a85e);
+    color:#2b2211;
     border-radius:14px;
     padding:12px 24px;
     text-transform:uppercase;
     letter-spacing:.08em;
-    font-weight:700;
-    cursor:not-allowed;
-    opacity:.95;
+    font-weight:800;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
   }
+ .chess-strategy-rpg-ready__attack-icon{font-size:18px;line-height:1;}
 `;
 
 interface RenderContext {
@@ -70,28 +73,33 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   section.innerHTML = `
     <button type="button" class="chess-strategy-rpg-ready__back">← Trở về Chiến Trường</button>
     <h1 class="chess-strategy-rpg-ready__title">Chess Strategy RPG</h1>
-    <p class="chess-strategy-rpg-ready__desc">Hub chuẩn bị cho mode chiến thuật theo lượt. Trước mắt chỉ dựng UI mode mới và luồng điều hướng, chưa vào trận.</p>
+    <p class="chess-strategy-rpg-ready__desc">Đã mở nhánh chiến đấu riêng của mode ngang cấp Campaign: bấm nút tấn công để vào cụm 3 hub chọn map và bắt đầu trận bàn cờ.</p>
     <section class="chess-strategy-rpg-ready__spec">
-      <h2 class="chess-strategy-rpg-ready__spec-title">Spec đã khóa (tóm tắt v1)</h2>
+      <h2 class="chess-strategy-rpg-ready__spec-title">Checklist áp dụng từ spec</h2>
       <ul class="chess-strategy-rpg-ready__spec-list">
-        <li>4v4 theo lượt phe, mỗi tướng có Move + 1 Action.</li>
-        <li>Base timer 8 giây/tướng + bank time theo phe.</li>
-        <li>Turn cap mặc định: 7 lượt phe Player.</li>
-        <li>Map seed + near-symmetry fairness, có cơ chế shrink từ turn 4.</li>
+        <li>4 tướng người chơi lấy theo lineup 10 ô (ưu tiên từ trái qua, trên xuống).</li>
+        <li>Map trận tạo ngẫu nhiên bất quy tắc, lõi tối thiểu 7x7 ô.</li>
+        <li>Hub giữa chọn mặt bằng tu vi từ Khai Nguyên đến Thánh Tôn.</li>
+        <li>Vào trận sẽ import HP/ATK/WIL/RES/ARM/AE và kit của 4 tướng.</li>
       </ul>
     </section>
     <div class="chess-strategy-rpg-ready__footer">
-      <button type="button" class="chess-strategy-rpg-ready__start" disabled>Đang hoàn thiện trận đấu</button>
+      <button type="button" class="chess-strategy-rpg-ready__attack"><span class="chess-strategy-rpg-ready__attack-icon">⚔️</span>Tấn Công</button>
     </div>
   `;
 
   const backButton = section.querySelector('.chess-strategy-rpg-ready__back');
+  const attackButton = section.querySelector('.chess-strategy-rpg-ready__attack');
+
   const onBack = () => shell?.enterScreen?.('arena-hub');
+  const onAttack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
   backButton?.addEventListener('click', onBack);
+  attackButton?.addEventListener('click', onAttack);
 
   return {
     destroy() {
       backButton?.removeEventListener('click', onBack);
+      attackButton?.removeEventListener('click', onAttack);
       mount.destroy();
     }
   };

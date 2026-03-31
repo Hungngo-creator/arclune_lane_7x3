@@ -26,6 +26,7 @@ const CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID = '@screens/campaign-world-map/index.t
 const MONOPOLY_SCREEN_MODULE_ID = '@screens/monopoly/index.ts' as const;
 const MONOPOLY_READY_SCREEN_MODULE_ID = '@screens/monopoly/ready.ts' as const;
 const CHESS_STRATEGY_RPG_READY_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/ready.ts' as const;
+const CHESS_STRATEGY_RPG_BATTLE_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/battle.ts' as const;
 const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
 
 const MODE_TYPES = {
@@ -275,6 +276,22 @@ const MODES = [
     shell: {
       screenId: 'chess-strategy-rpg-ready',
       moduleId: CHESS_STRATEGY_RPG_READY_SCREEN_MODULE_ID
+    }
+  },
+  {
+    id: 'chess-strategy-rpg-battle',
+    title: 'Chess Strategy RPG · Trận Đấu',
+    type: MODE_TYPES.PVE,
+    status: MODE_STATUS.AVAILABLE,
+    icon: '⚔️',
+    shortDescription: 'Màn hình chiến đấu chiến thuật gồm 3 hub chọn map, chọn tu vi và khởi tạo bàn cờ bất quy tắc.',
+    unlockNotes: 'Bấm nút Tấn Công từ ready screen để mở chọn map/tu vi rồi bắt đầu trận mô phỏng.',
+    tags: ['PvE'],
+    menuSections: [],
+    parentId: 'chess-strategy-rpg',
+    shell: {
+      screenId: 'chess-strategy-rpg-battle',
+      moduleId: CHESS_STRATEGY_RPG_BATTLE_SCREEN_MODULE_ID
     }
   },
 
