@@ -18942,8 +18942,9 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
   function resolvePlayerUnits(targetRealm) {
       const profile = loadPlayerProfile();
       const order = Array.isArray(profile.lineupDeck) ? profile.lineupDeck : [];
-      const unique = order.filter((unitId, index) => typeof unitId === 'string' && unitId.trim().length > 0 && order.indexOf(unitId) === index);
-      const selected = unique.slice(0, 4);
+      const selected = order
+          .filter((unitId) => typeof unitId === 'string' && unitId.trim().length > 0)
+          .slice(0, 4);
       return selected.map((unitId) => {
           const meta = getMetaById(unitId);
           const base = makeInstanceStats(unitId);
@@ -19055,7 +19056,7 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
           const units = resolvePlayerUnits(lockedRealm);
           if (metaHost instanceof HTMLElement) {
               const realmLabel = REALM_OPTIONS.find((option) => option.value === lockedRealm)?.label ?? `Cảnh giới ${lockedRealm}`;
-              metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel}. 4 unit player đã đồng bộ tu vi theo map; unit AI sẽ bổ sung hành vi ở bước sau.`;
+              metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel}. 4 unit player đã đồng bộ tu vi theo map (đơn vị thấp được nâng, đơn vị cao bị hạ tạm thời), dữ liệu collection gốc không bị thay đổi; unit AI sẽ bổ sung hành vi ở bước sau.`;
           }
           if (boardHost instanceof HTMLElement) {
               renderBattleBoard(boardHost, units);
