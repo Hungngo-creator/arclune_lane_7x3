@@ -18904,6 +18904,7 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
   const __dep1 = __require('./catalog.ts');
   const getMetaById = __dep1.getMetaById;
   const getUnitKitById = __dep1.getUnitKitById;
+  const ROSTER = __dep1.ROSTER;
   const __dep2 = __require('./meta.ts');
   const makeInstanceStats = __dep2.makeInstanceStats;
   const __dep3 = __require('./utils/player-profile.ts');
@@ -19082,12 +19083,55 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
           return {
               id: unitId,
               name: resolvedName,
+              rank: typeof meta?.rank === 'string' ? meta.rank : 'N',
               hp: Math.max(1, Math.floor(base.hpMax * ratio)),
               atk: Math.max(1, Math.floor(base.atk * ratio)),
               wil: Math.max(1, Math.floor(base.wil * ratio)),
               res: Number((base.res * ratio).toFixed(2)),
               arm: Number((base.arm * ratio).toFixed(2)),
               ae: Math.max(1, Math.floor(base.aeMax * ratio)),
+              kitLabel: `${skills} skill, ${hasUlt}`,
+          };
+      });
+  }
+  const CHESS_AI_POOL_EXCLUDED_IDS = new Set(['creep_1', 'creep_2', 'creep_3']);
+  const pickRandomFromPool = (pool, rng) => {
+      if (pool.length <= 0)
+          return null;
+      const index = Math.floor(nextRngValue(rng) * pool.length);
+      return pool[index] ?? null;
+  };
+  function resolveEnemyUnitsForChess(targetRealm, seedText, playerUnits) {
+      const sourcePool = ROSTER.filter((entry) => !CHESS_AI_POOL_EXCLUDED_IDS.has(entry.id));
+      const poolByRank = new Map();
+      for (const entry of sourcePool) {
+          const rank = typeof entry.rank === 'string' ? entry.rank.toUpperCase() : 'N';
+          if (!poolByRank.has(rank))
+              poolByRank.set(rank, []);
+          poolByRank.get(rank)?.push(entry);
+      }
+      const targetRanks = playerUnits.map((unit) => (typeof unit.rank === 'string' ? unit.rank.toUpperCase() : 'N'));
+      const rng = createRngState(hashSeedText(`${seedText}:enemy:${targetRealm}`));
+      return targetRanks.map((rankKey, index) => {
+          const byRank = poolByRank.get(rankKey) ?? [];
+          const picked = pickRandomFromPool(byRank.length > 0 ? byRank : sourcePool, rng) ?? sourcePool[0];
+          const pickedId = picked?.id ?? 'thien_luu';
+          const baseUnit = makeInstanceStats(pickedId);
+          const ownRealm = 1;
+          const ratio = realmMultiplier(ownRealm, targetRealm);
+          const kit = getUnitKitById(pickedId);
+          const skills = Array.isArray(kit?.skills) ? kit.skills.length : 0;
+          const hasUlt = kit?.ult ? 'có ult' : 'không ult';
+          return {
+              id: pickedId,
+              name: typeof picked?.name === 'string' ? picked.name : `Enemy ${index + 1}`,
+              rank: typeof picked?.rank === 'string' ? picked.rank : rankKey,
+              hp: Math.max(1, Math.floor(baseUnit.hpMax * ratio)),
+              atk: Math.max(1, Math.floor(baseUnit.atk * ratio)),
+              wil: Math.max(1, Math.floor(baseUnit.wil * ratio)),
+              res: Number((baseUnit.res * ratio).toFixed(2)),
+              arm: Number((baseUnit.arm * ratio).toFixed(2)),
+              ae: Math.max(1, Math.floor(baseUnit.aeMax * ratio)),
               kitLabel: `${skills} skill, ${hasUlt}`,
           };
       });
@@ -19284,6 +19328,7 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
   if (!Object.prototype.hasOwnProperty.call(exports, 'createIrregularBoard')) exports.createIrregularBoard = createIrregularBoard;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveValidSeed')) exports.resolveValidSeed = resolveValidSeed;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolvePlayerUnits')) exports.resolvePlayerUnits = resolvePlayerUnits;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveEnemyUnitsForChess')) exports.resolveEnemyUnitsForChess = resolveEnemyUnitsForChess;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 };
 __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require) => {
@@ -19294,13 +19339,14 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const createIrregularBoard = __dep1.createIrregularBoard;
   const MIN_CORE_SIZE = __dep1.MIN_CORE_SIZE;
   const randomSeedText = __dep1.randomSeedText;
+  const resolveEnemyUnitsForChess = __dep1.resolveEnemyUnitsForChess;
   const resolvePlayerUnits = __dep1.resolvePlayerUnits;
   const resolveValidSeed = __dep1.resolveValidSeed;
   const __dep2 = __require('./utils/rng.ts');
   const createRngState = __dep2.createRngState;
   const nextRngValue = __dep2.nextRngValue;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
-  const MAX_LINEAR_STEPS = 6;
+  const MAX_LINEAR_MOVE_STEPS = 6;
   const CSS = /* css */ `
     .app--chess-strategy-rpg-match{min-height:100dvh;padding:16px;box-sizing:border-box;}
     .chess-rpg-match{max-width:1320px;margin:0 auto;min-height:calc(100dvh - 32px);border-radius:20px;border:1px solid rgba(126,208,255,.3);background:linear-gradient(170deg,rgba(8,18,31,.98),rgba(14,35,57,.92));padding:18px;color:#e7f3ff;display:grid;gap:14px;}
@@ -19364,7 +19410,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   function collectLinearMoves(origin, vectors, playable, occupied) {
       const moves = [];
       for (const vector of vectors) {
-          for (let step = 1; step <= MAX_LINEAR_STEPS; step += 1) {
+          for (let step = 1; step <= MAX_LINEAR_MOVE_STEPS; step += 1) {
               const x = origin.x + vector.dx * step;
               const y = origin.y + vector.dy * step;
               const key = keyOf(x, y);
@@ -19426,14 +19472,15 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
       const seedInput = typeof params?.seed === 'string' ? params.seed : randomSeedText(10);
       const seed = resolveValidSeed(seedInput);
       const realm = numberParam(params?.realm, 1);
-      const units = resolvePlayerUnits(realm);
+      const playerUnits = resolvePlayerUnits(realm);
+      const enemyUnits = resolveEnemyUnitsForChess(realm, seed, playerUnits);
       const section = document.createElement('section');
       section.className = 'chess-rpg-match';
       const mount = mountSection({ root, section, rootClasses: 'app--chess-strategy-rpg-match' });
       section.innerHTML = `
       <div class="chess-rpg-match__top">
         <button type="button" class="chess-rpg-match__back" aria-label="Về hub mô phỏng">←</button>
-        <div class="chess-rpg-match__meta">Trận chính · Seed ${seed} · Tu vi ${realm} · Xe/Tượng đi tối đa ${MAX_LINEAR_STEPS} ô mỗi lượt.</div>
+        <div class="chess-rpg-match__meta">Trận chính · Seed ${seed} · Tu vi ${realm} · Luật quân cờ chuẩn cờ vua.</div>
       </div>
       <p class="chess-rpg-match__turn" data-role="turn"></p>
       <div class="chess-rpg-match__pieces" data-role="pieces"></div>
@@ -19453,24 +19500,28 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           boardHost.style.setProperty('--chess-cell-size', `${cellSize}px`);
           boardHost.style.gridTemplateColumns = `repeat(${board.width}, var(--chess-cell-size))`;
           const coreStart = Math.floor((board.width - MIN_CORE_SIZE) / 2);
-          const lineupSlots = [
+          const playerSlots = [
               `${coreStart},${coreStart}`,
               `${coreStart + 1},${coreStart}`,
               `${coreStart + 2},${coreStart}`,
               `${coreStart + 3},${coreStart}`,
-              `${coreStart},${coreStart + 1}`,
-              `${coreStart + 1},${coreStart + 1}`,
-              `${coreStart + 2},${coreStart + 1}`,
-              `${coreStart + 3},${coreStart + 1}`,
           ];
-          const unitsState = units
-              .slice(0, lineupSlots.length)
+          const coreEnd = coreStart + MIN_CORE_SIZE - 1;
+          const enemySlots = [
+              `${coreEnd},${coreEnd}`,
+              `${coreEnd - 1},${coreEnd}`,
+              `${coreEnd - 2},${coreEnd}`,
+              `${coreEnd - 3},${coreEnd}`,
+          ];
+          const playerStates = playerUnits
+              .slice(0, playerSlots.length)
               .map((unit, index) => {
-              const parsed = parseKey(lineupSlots[index] ?? '');
+              const parsed = parseKey(playerSlots[index] ?? '');
               return parsed
                   ? {
                       id: unit.id,
                       label: `P${index + 1}`,
+                      team: 'player',
                       x: parsed.x,
                       y: parsed.y,
                       pieces: randomPieces(seed, unit.id),
@@ -19478,6 +19529,23 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   : null;
           })
               .filter((item) => item !== null);
+          const enemyStates = enemyUnits
+              .slice(0, enemySlots.length)
+              .map((unit, index) => {
+              const parsed = parseKey(enemySlots[index] ?? '');
+              return parsed
+                  ? {
+                      id: `${unit.id}#${index + 1}`,
+                      label: `E${index + 1}`,
+                      team: 'enemy',
+                      x: parsed.x,
+                      y: parsed.y,
+                      pieces: randomPieces(`${seed}:enemy`, unit.id),
+                  }
+                  : null;
+          })
+              .filter((item) => item !== null);
+          const unitsState = [...playerStates, ...enemyStates];
           let turnIndex = 0;
           let selectedUnitId = unitsState[0]?.id ?? null;
           const reachableById = new Map();
@@ -19494,7 +19562,9 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                           : 'chess-rpg-match__cell chess-rpg-match__cell--void';
                       const unit = unitsState.find((entry) => entry.x === x && entry.y === y);
                       if (unit) {
-                          cell.className = 'chess-rpg-match__cell chess-rpg-match__cell--player';
+                          cell.className = unit.team === 'player'
+                              ? 'chess-rpg-match__cell chess-rpg-match__cell--player'
+                              : 'chess-rpg-match__cell chess-rpg-match__cell--enemy';
                           cell.textContent = unit.label;
                           if (unit.id === selectedUnitId) {
                               cell.classList.add('chess-rpg-match__cell--selected');
@@ -19508,6 +19578,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       if (board.playable.has(key)) {
                           cell.addEventListener('click', () => {
                               const actingUnit = unitsState[turnIndex] ?? null;
+                              if (actingUnit?.team !== 'player')
+                                  return;
                               if (!actingUnit)
                                   return;
                               const target = unitsState.find((entry) => entry.x === x && entry.y === y);
@@ -19538,7 +19610,9 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               const active = unitsState[turnIndex] ?? null;
               if (turnHost instanceof HTMLElement) {
                   turnHost.textContent = active
-                      ? `Đến lượt ${active.label}. Chọn ô xanh lá để di chuyển, xong sẽ tự qua lượt tiếp theo.`
+                      ? active.team === 'player'
+                          ? `Đến lượt ${active.label}. Chọn ô xanh lá để di chuyển, xong sẽ tự qua lượt tiếp theo.`
+                          : `Đến lượt ${active.label} (AI). AI sẽ tự đi nước hợp lệ ngẫu nhiên.`
                       : 'Không có nhân vật khả dụng.';
               }
               if (piecesHost instanceof HTMLElement) {
@@ -19562,9 +19636,34 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               occupied.delete(keyOf(active.x, active.y));
               reachableById.set(active.id, resolveReachableCells(active, board.playable, occupied));
           };
+          const processEnemyTurn = () => {
+              const active = unitsState[turnIndex] ?? null;
+              if (!active || active.team !== 'enemy')
+                  return;
+              const moves = Array.from(reachableById.get(active.id) ?? []);
+              if (moves.length > 0) {
+                  const aiRng = createRngState(hashSeedText(`${seed}:${active.id}:${active.x},${active.y}:${turnIndex}`));
+                  const picked = moves[Math.floor(nextRngValue(aiRng) * moves.length)] ?? null;
+                  const parsed = picked ? parseKey(picked) : null;
+                  if (parsed) {
+                      active.x = parsed.x;
+                      active.y = parsed.y;
+                  }
+              }
+              turnIndex = unitsState.length > 0 ? (turnIndex + 1) % unitsState.length : 0;
+              prepareReachable();
+              renderHUD();
+              renderBoard();
+              if ((unitsState[turnIndex]?.team ?? 'player') === 'enemy') {
+                  window.setTimeout(processEnemyTurn, 240);
+              }
+          };
           prepareReachable();
           renderHUD();
           renderBoard();
+          if ((unitsState[turnIndex]?.team ?? 'player') === 'enemy') {
+              window.setTimeout(processEnemyTurn, 240);
+          }
       }
       const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
       backButton?.addEventListener('click', onBack);

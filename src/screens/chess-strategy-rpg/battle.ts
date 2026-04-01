@@ -1,5 +1,5 @@
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
-import { getMetaById, getUnitKitById } from '../../catalog.ts';
+import { getMetaById, getUnitKitById, ROSTER } from '../../catalog.ts';
 import { makeInstanceStats } from '../../meta.ts';
 import { loadPlayerProfile } from '../../utils/player-profile.ts';
 import { createRngState, nextRngValue } from '../../utils/rng.ts';
@@ -64,6 +64,7 @@ interface RenderContext {
 export interface BattleUnit {
   id: string;
   name: string;
+  rank: string;
   hp: number;
   atk: number;
   wil: number;
@@ -211,6 +212,7 @@ export function resolvePlayerUnits(targetRealm: number): BattleUnit[] {
     return {
       id: unitId,
       name: resolvedName,
+      rank: typeof meta?.rank === 'string' ? meta.rank : 'N',
       hp: Math.max(1, Math.floor(base.hpMax * ratio)),
       atk: Math.max(1, Math.floor(base.atk * ratio)),
       wil: Math.max(1, Math.floor(base.wil * ratio)),
@@ -219,6 +221,51 @@ export function resolvePlayerUnits(targetRealm: number): BattleUnit[] {
       ae: Math.max(1, Math.floor(base.aeMax * ratio)),
       kitLabel: `${skills} skill, ${hasUlt}`,
     };
+  });
+}
+
+const CHESS_AI_POOL_EXCLUDED_IDS = new Set(['creep_1', 'creep_2', 'creep_3']);
+
+const pickRandomFromPool = <T>(pool: readonly T[], rng: { seed: number; calls: number }): T | null => {
+  if (pool.length <= 0) return null;
+  const index = Math.floor(nextRngValue(rng) * pool.length);
+  return pool[index] ?? null;
+};
+
+export function resolveEnemyUnitsForChess(targetRealm: number, seedText: string, playerUnits: BattleUnit[]): BattleUnit[] {
+  const sourcePool = ROSTER.filter((entry) => !CHESS_AI_POOL_EXCLUDED_IDS.has(entry.id));
+  const poolByRank = new Map<string, typeof sourcePool>();
+  for (const entry of sourcePool) {
+    const rank = typeof entry.rank === 'string' ? entry.rank.toUpperCase() : 'N';
+    if (!poolByRank.has(rank)) poolByRank.set(rank, []);
+    poolByRank.get(rank)?.push(entry);
+  }
+
+  const targetRanks = playerUnits.map((unit) => (typeof unit.rank === 'string' ? unit.rank.toUpperCase() : 'N'));
+  const rng = createRngState(hashSeedText(`${seedText}:enemy:${targetRealm}`));
+
+  return targetRanks.map((rankKey, index) => {
+    const byRank = poolByRank.get(rankKey) ?? [];
+    const picked = pickRandomFromPool(byRank.length > 0 ? byRank : sourcePool, rng) ?? sourcePool[0];
+    const pickedId = picked?.id ?? 'thien_luu';
+    const baseUnit = makeInstanceStats(pickedId);
+    const ownRealm = 1;
+    const ratio = realmMultiplier(ownRealm, targetRealm);
+    const kit = getUnitKitById(pickedId) as Record<string, unknown> | null;
+    const skills = Array.isArray(kit?.skills) ? kit.skills.length : 0;
+    const hasUlt = kit?.ult ? 'có ult' : 'không ult';
+    return {
+      id: pickedId,
+      name: typeof picked?.name === 'string' ? picked.name : `Enemy ${index + 1}`,
+      rank: typeof picked?.rank === 'string' ? picked.rank : rankKey,
+      hp: Math.max(1, Math.floor(baseUnit.hpMax * ratio)),
+      atk: Math.max(1, Math.floor(baseUnit.atk * ratio)),
+      wil: Math.max(1, Math.floor(baseUnit.wil * ratio)),
+      res: Number((baseUnit.res * ratio).toFixed(2)),
+      arm: Number((baseUnit.arm * ratio).toFixed(2)),
+      ae: Math.max(1, Math.floor(baseUnit.aeMax * ratio)),
+      kitLabel: `${skills} skill, ${hasUlt}`,
+    } satisfies BattleUnit;
   });
 }
 

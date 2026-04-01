@@ -3,13 +3,14 @@ import {
   createIrregularBoard,
   MIN_CORE_SIZE,
   randomSeedText,
+  resolveEnemyUnitsForChess,
   resolvePlayerUnits,
   resolveValidSeed,
 } from './battle.ts';
 import { createRngState, nextRngValue } from '../../utils/rng.ts';
 
 const STYLE_ID = 'chess-strategy-rpg-match-style';
-const MAX_LINEAR_STEPS = 6;
+const MAX_LINEAR_MOVE_STEPS = 6;
 
 const CSS = /* css */ `
   .app--chess-strategy-rpg-match{min-height:100dvh;padding:16px;box-sizing:border-box;}
@@ -43,6 +44,7 @@ type PieceType = 'rook' | 'knight' | 'bishop';
 interface UnitState {
   id: string;
   label: string;
+  team: 'player' | 'enemy';
   x: number;
   y: number;
   pieces: PieceType[];
@@ -100,7 +102,7 @@ function collectLinearMoves(
 ): string[] {
   const moves: string[] = [];
   for (const vector of vectors) {
-    for (let step = 1; step <= MAX_LINEAR_STEPS; step += 1) {
+    for (let step = 1; step <= MAX_LINEAR_MOVE_STEPS; step += 1) {
       const x = origin.x + vector.dx * step;
       const y = origin.y + vector.dy * step;
       const key = keyOf(x, y);
@@ -162,7 +164,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   const seedInput = typeof params?.seed === 'string' ? params.seed : randomSeedText(10);
   const seed = resolveValidSeed(seedInput);
   const realm = numberParam(params?.realm, 1);
-  const units = resolvePlayerUnits(realm);
+  const playerUnits = resolvePlayerUnits(realm);
+  const enemyUnits = resolveEnemyUnitsForChess(realm, seed, playerUnits);
 
   const section = document.createElement('section');
   section.className = 'chess-rpg-match';
@@ -171,7 +174,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   section.innerHTML = `
     <div class="chess-rpg-match__top">
       <button type="button" class="chess-rpg-match__back" aria-label="Về hub mô phỏng">←</button>
-      <div class="chess-rpg-match__meta">Trận chính · Seed ${seed} · Tu vi ${realm} · Xe/Tượng đi tối đa ${MAX_LINEAR_STEPS} ô mỗi lượt.</div>
+      <div class="chess-rpg-match__meta">Trận chính · Seed ${seed} · Tu vi ${realm} · Luật quân cờ chuẩn cờ vua.</div>
     </div>
     <p class="chess-rpg-match__turn" data-role="turn"></p>
     <div class="chess-rpg-match__pieces" data-role="pieces"></div>
@@ -193,24 +196,28 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     boardHost.style.setProperty('--chess-cell-size', `${cellSize}px`);
     boardHost.style.gridTemplateColumns = `repeat(${board.width}, var(--chess-cell-size))`;
     const coreStart = Math.floor((board.width - MIN_CORE_SIZE) / 2);
-    const lineupSlots = [
+    const playerSlots = [
       `${coreStart},${coreStart}`,
       `${coreStart + 1},${coreStart}`,
       `${coreStart + 2},${coreStart}`,
       `${coreStart + 3},${coreStart}`,
-      `${coreStart},${coreStart + 1}`,
-      `${coreStart + 1},${coreStart + 1}`,
-      `${coreStart + 2},${coreStart + 1}`,
-      `${coreStart + 3},${coreStart + 1}`,
     ];
-    const unitsState: UnitState[] = units
-      .slice(0, lineupSlots.length)
+    const coreEnd = coreStart + MIN_CORE_SIZE - 1;
+    const enemySlots = [
+      `${coreEnd},${coreEnd}`,
+      `${coreEnd - 1},${coreEnd}`,
+      `${coreEnd - 2},${coreEnd}`,
+      `${coreEnd - 3},${coreEnd}`,
+    ];
+    const playerStates: UnitState[] = playerUnits
+      .slice(0, playerSlots.length)
       .map((unit, index) => {
-        const parsed = parseKey(lineupSlots[index] ?? '');
+        const parsed = parseKey(playerSlots[index] ?? '');
         return parsed
           ? {
               id: unit.id,
               label: `P${index + 1}`,
+              team: 'player',
               x: parsed.x,
               y: parsed.y,
               pieces: randomPieces(seed, unit.id),
@@ -218,6 +225,23 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           : null;
       })
       .filter((item): item is UnitState => item !== null);
+      const enemyStates: UnitState[] = enemyUnits
+      .slice(0, enemySlots.length)
+      .map((unit, index) => {
+        const parsed = parseKey(enemySlots[index] ?? '');
+        return parsed
+          ? {
+              id: `${unit.id}#${index + 1}`,
+              label: `E${index + 1}`,
+              team: 'enemy',
+              x: parsed.x,
+              y: parsed.y,
+              pieces: randomPieces(`${seed}:enemy`, unit.id),
+            }
+          : null;
+      })
+      .filter((item): item is UnitState => item !== null);
+    const unitsState: UnitState[] = [...playerStates, ...enemyStates];
 
     let turnIndex = 0;
     let selectedUnitId = unitsState[0]?.id ?? null;
@@ -238,7 +262,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   const unit = unitsState.find((entry) => entry.x === x && entry.y === y);
           if (unit) {
-            cell.className = 'chess-rpg-match__cell chess-rpg-match__cell--player';
+            cell.className = unit.team === 'player'
+              ? 'chess-rpg-match__cell chess-rpg-match__cell--player'
+              : 'chess-rpg-match__cell chess-rpg-match__cell--enemy';
             cell.textContent = unit.label;
             if (unit.id === selectedUnitId) {
               cell.classList.add('chess-rpg-match__cell--selected');
@@ -254,6 +280,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           if (board.playable.has(key)) {
             cell.addEventListener('click', () => {
               const actingUnit = unitsState[turnIndex] ?? null;
+              if (actingUnit?.team !== 'player') return;
               if (!actingUnit) return;
               const target = unitsState.find((entry) => entry.x === x && entry.y === y);
               if (target) {
@@ -279,12 +306,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       }
     };
 
-  const renderHUD = (): void => {
+   const renderHUD = (): void => {
       const active = unitsState[turnIndex] ?? null;
       if (turnHost instanceof HTMLElement) {
         turnHost.textContent = active
-          ? `Đến lượt ${active.label}. Chọn ô xanh lá để di chuyển, xong sẽ tự qua lượt tiếp theo.`
-          : 'Không có nhân vật khả dụng.';
+          ? active.team === 'player'
+            ? `Đến lượt ${active.label}. Chọn ô xanh lá để di chuyển, xong sẽ tự qua lượt tiếp theo.`
+            : `Đến lượt ${active.label} (AI). AI sẽ tự đi nước hợp lệ ngẫu nhiên.`
+            : 'Không có nhân vật khả dụng.';
       }
   if (piecesHost instanceof HTMLElement) {
         piecesHost.innerHTML = '';
@@ -308,9 +337,34 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       reachableById.set(active.id, resolveReachableCells(active, board.playable, occupied));
     };
 
+    const processEnemyTurn = (): void => {
+      const active = unitsState[turnIndex] ?? null;
+      if (!active || active.team !== 'enemy') return;
+      const moves = Array.from(reachableById.get(active.id) ?? []);
+      if (moves.length > 0) {
+        const aiRng = createRngState(hashSeedText(`${seed}:${active.id}:${active.x},${active.y}:${turnIndex}`));
+        const picked = moves[Math.floor(nextRngValue(aiRng) * moves.length)] ?? null;
+        const parsed = picked ? parseKey(picked) : null;
+        if (parsed) {
+          active.x = parsed.x;
+          active.y = parsed.y;
+        }
+      }
+      turnIndex = unitsState.length > 0 ? (turnIndex + 1) % unitsState.length : 0;
+      prepareReachable();
+      renderHUD();
+      renderBoard();
+      if ((unitsState[turnIndex]?.team ?? 'player') === 'enemy') {
+        window.setTimeout(processEnemyTurn, 240);
+      }
+    };
+
     prepareReachable();
     renderHUD();
     renderBoard();
+    if ((unitsState[turnIndex]?.team ?? 'player') === 'enemy') {
+      window.setTimeout(processEnemyTurn, 240);
+    }
   }
 
   const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
