@@ -12,7 +12,7 @@ import {
   advanceTurn,
   canUseCommand,
   createInitialMatchState,
-  markActionUsed,
+  applyActionCommandu,
   recordMove,
   type MatchCommandType,
   type MatchState,
@@ -57,6 +57,13 @@ interface UnitState {
   team: 'player' | 'enemy';
   x: number;
   y: number;
+  hp: number;
+  maxHp: number;
+  atk: number;
+  arm: number;
+  rage: number;
+  maxRage: number;
+  skillCost: number;
   pieces: PieceType[];
 }
 
@@ -236,6 +243,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               team: 'player',
               x: parsed.x,
               y: parsed.y,
+              hp: unit.hp,
+              maxHp: unit.hp,
+              atk: unit.atk,
+              arm: unit.arm,
+              rage: 0,
+              maxRage: 100,
+              skillCost: 4,
               pieces: randomPieces(seed, unit.id),
             }
           : null;
@@ -252,13 +266,18 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               team: 'enemy',
               x: parsed.x,
               y: parsed.y,
+              hp: unit.hp,
+              maxHp: unit.hp,
+              atk: unit.atk,
+              arm: unit.arm,
+              rage: 0,
+              maxRage: 100,
+              skillCost: 4,
               pieces: randomPieces(`${seed}:enemy`, unit.id),
             }
           : null;
       })
       .filter((item): item is UnitState => item !== null);
-    const unitsState: UnitState[] = [...playerStates, ...enemyStates];
-
     const lineupSize = Math.min(playerStates.length, enemyStates.length);
     let matchState: MatchState = createInitialMatchState(lineupSize);
     let selectedUnitId = playerStates[0]?.id ?? null;
@@ -273,18 +292,60 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       return teamUnits[matchState.activeIndexInLineup] ?? null;
     };
 
+    const allUnits = (): UnitState[] => [...aliveByTeam.player, ...aliveByTeam.enemy];
+
+    const removeDeadUnits = (): void => {
+      for (const team of ['player', 'enemy'] as const) {
+        const survivors = aliveByTeam[team].filter((unit) => unit.hp > 0);
+        aliveByTeam[team].splice(0, aliveByTeam[team].length, ...survivors);
+      }
+    };
+
+    const basicDamage = (attacker: UnitState, defender: UnitState): number => Math.max(1, Math.floor(attacker.atk - defender.arm));
+
+    const isAdjacent = (a: UnitState, b: UnitState): boolean => Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1;
+
+    const performBasicAttack = (attacker: UnitState, defender: UnitState): void => {
+      defender.hp = Math.max(0, defender.hp - basicDamage(attacker, defender));
+      attacker.rage = Math.min(attacker.maxRage, attacker.rage + 35);
+      removeDeadUnits();
+    };
+
+
     const executeCommand = (command: MatchCommand): void => {
       const active = resolveActiveUnit();
       if (!active || command.team !== matchState.activeTeam) return;
-      if (!canUseCommand(matchState, command.type)) return;
+
       if (command.type === 'move') {
+        if (!canUseCommand(matchState, command.type)) return;
         matchState = recordMove(matchState, command.payload?.tileSteps ?? 0);
         return;
       }
-      if (command.type === 'basicAttack' || command.type === 'castSkill' || command.type === 'castUlt') {
-        matchState = markActionUsed(matchState);
+
+      if (command.type === 'basicAttack') {
+        const targetX = command.payload?.targetX;
+        const targetY = command.payload?.targetY;
+        const target = allUnits().find((unit) => unit.team !== active.team && unit.x === targetX && unit.y === targetY);
+        if (!target || !isAdjacent(active, target)) return;
+        if (!canUseCommand(matchState, command.type)) return;
+        performBasicAttack(active, target);
+        matchState = applyActionCommand(matchState, 'basicAttack');
         return;
       }
+
+      if (command.type === 'castSkill') {
+        if (!canUseCommand(matchState, command.type, { skillCost: active.skillCost })) return;
+        matchState = applyActionCommand(matchState, 'castSkill', { skillCost: active.skillCost });
+        return;
+      }
+
+      if (command.type === 'castUlt') {
+        if (!canUseCommand(matchState, command.type, { manualUlt: true, rage: active.rage, ultCost: active.maxRage })) return;
+        active.rage = 0;
+        matchState = applyActionCommand(matchState, 'castUlt');
+        return;
+      }
+
       matchState = advanceTurn(matchState);
       const newActive = resolveActiveUnit();
       selectedUnitId = newActive?.id ?? null;
@@ -292,7 +353,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
     const renderBoard = (): void => {
       boardHost.innerHTML = '';
-      const occupied = new Set(unitsState.map((unit) => keyOf(unit.x, unit.y)));
+      const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
 
       for (let y = 0; y < board.height; y += 1) {
         for (let x = 0; x < board.width; x += 1) {
@@ -303,7 +364,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
             ? 'chess-rpg-match__cell chess-rpg-match__cell--play'
             : 'chess-rpg-match__cell chess-rpg-match__cell--void';
 
-  const unit = unitsState.find((entry) => entry.x === x && entry.y === y);
+  const unit = allUnits().find((entry) => entry.x === x && entry.y === y);
           if (unit) {
             cell.className = unit.team === 'player'
               ? 'chess-rpg-match__cell chess-rpg-match__cell--player'
@@ -329,6 +390,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               if (target) {
                 if (target.id === actingUnit.id) {
                   selectedUnitId = actingUnit.id;
+                  renderHUD();
+                  renderBoard();
+               return;
+                }
+                if (target.team !== actingUnit.team) {
+                  executeCommand({ type: 'basicAttack', team: 'player', payload: { targetX: x, targetY: y } });
+                  executeCommand({ type: 'endTurn', team: 'player' });
+                  prepareReachable();
                   renderHUD();
                   renderBoard();
                 }
@@ -362,6 +431,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   if (piecesHost instanceof HTMLElement) {
         piecesHost.innerHTML = '';
         if (active) {
+          const teamResource = matchState.resources[active.team];
+          const status = document.createElement('span');
+          const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
+          const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
+          status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
+          status.textContent = `AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'}`;
+          piecesHost.appendChild(status);
           active.pieces.forEach((piece) => {
             const pill = document.createElement('span');
             pill.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
@@ -376,7 +452,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       reachableById.clear();
       const active = resolveActiveUnit();
       if (!active) return;
-      const occupied = new Set(unitsState.map((unit) => keyOf(unit.x, unit.y)));
+      const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
       occupied.delete(keyOf(active.x, active.y));
       reachableById.set(active.id, resolveReachableCells(active, board.playable, occupied));
     };
@@ -396,7 +472,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps } });
         }
       }
-      executeCommand({ type: 'basicAttack', team: 'enemy' });
+      const enemyTarget = aliveByTeam.player.find((unit) => isAdjacent(active, unit));
+      if (enemyTarget) {
+        executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
+      }
       executeCommand({ type: 'endTurn', team: 'enemy' });
       prepareReachable();
       renderHUD();

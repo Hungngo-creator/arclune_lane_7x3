@@ -19349,7 +19349,6 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const advanceTurn = __dep3.advanceTurn;
   const canUseCommand = __dep3.canUseCommand;
   const createInitialMatchState = __dep3.createInitialMatchState;
-  const markActionUsed = __dep3.markActionUsed;
   const recordMove = __dep3.recordMove;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
   const MAX_LINEAR_MOVE_STEPS = 6;
@@ -19530,6 +19529,13 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       team: 'player',
                       x: parsed.x,
                       y: parsed.y,
+                      hp: unit.hp,
+                      maxHp: unit.hp,
+                      atk: unit.atk,
+                      arm: unit.arm,
+                      rage: 0,
+                      maxRage: 100,
+                      skillCost: 4,
                       pieces: randomPieces(seed, unit.id),
                   }
                   : null;
@@ -19546,12 +19552,18 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       team: 'enemy',
                       x: parsed.x,
                       y: parsed.y,
+                      hp: unit.hp,
+                      maxHp: unit.hp,
+                      atk: unit.atk,
+                      arm: unit.arm,
+                      rage: 0,
+                      maxRage: 100,
+                      skillCost: 4,
                       pieces: randomPieces(`${seed}:enemy`, unit.id),
                   }
                   : null;
           })
               .filter((item) => item !== null);
-          const unitsState = [...playerStates, ...enemyStates];
           const lineupSize = Math.min(playerStates.length, enemyStates.length);
           let matchState = createInitialMatchState(lineupSize);
           let selectedUnitId = playerStates[0]?.id ?? null;
@@ -19564,18 +19576,53 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               const teamUnits = aliveByTeam[matchState.activeTeam];
               return teamUnits[matchState.activeIndexInLineup] ?? null;
           };
+          const allUnits = () => [...aliveByTeam.player, ...aliveByTeam.enemy];
+          const removeDeadUnits = () => {
+              for (const team of ['player', 'enemy']) {
+                  const survivors = aliveByTeam[team].filter((unit) => unit.hp > 0);
+                  aliveByTeam[team].splice(0, aliveByTeam[team].length, ...survivors);
+              }
+          };
+          const basicDamage = (attacker, defender) => Math.max(1, Math.floor(attacker.atk - defender.arm));
+          const isAdjacent = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1;
+          const performBasicAttack = (attacker, defender) => {
+              defender.hp = Math.max(0, defender.hp - basicDamage(attacker, defender));
+              attacker.rage = Math.min(attacker.maxRage, attacker.rage + 35);
+              removeDeadUnits();
+          };
           const executeCommand = (command) => {
               const active = resolveActiveUnit();
               if (!active || command.team !== matchState.activeTeam)
                   return;
-              if (!canUseCommand(matchState, command.type))
-                  return;
               if (command.type === 'move') {
+                  if (!canUseCommand(matchState, command.type))
+                      return;
                   matchState = recordMove(matchState, command.payload?.tileSteps ?? 0);
                   return;
               }
-              if (command.type === 'basicAttack' || command.type === 'castSkill' || command.type === 'castUlt') {
-                  matchState = markActionUsed(matchState);
+              if (command.type === 'basicAttack') {
+                  const targetX = command.payload?.targetX;
+                  const targetY = command.payload?.targetY;
+                  const target = allUnits().find((unit) => unit.team !== active.team && unit.x === targetX && unit.y === targetY);
+                  if (!target || !isAdjacent(active, target))
+                      return;
+                  if (!canUseCommand(matchState, command.type))
+                      return;
+                  performBasicAttack(active, target);
+                  matchState = applyActionCommand(matchState, 'basicAttack');
+                  return;
+              }
+              if (command.type === 'castSkill') {
+                  if (!canUseCommand(matchState, command.type, { skillCost: active.skillCost }))
+                      return;
+                  matchState = applyActionCommand(matchState, 'castSkill', { skillCost: active.skillCost });
+                  return;
+              }
+              if (command.type === 'castUlt') {
+                  if (!canUseCommand(matchState, command.type, { manualUlt: true, rage: active.rage, ultCost: active.maxRage }))
+                      return;
+                  active.rage = 0;
+                  matchState = applyActionCommand(matchState, 'castUlt');
                   return;
               }
               matchState = advanceTurn(matchState);
@@ -19584,7 +19631,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           };
           const renderBoard = () => {
               boardHost.innerHTML = '';
-              const occupied = new Set(unitsState.map((unit) => keyOf(unit.x, unit.y)));
+              const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
               for (let y = 0; y < board.height; y += 1) {
                   for (let x = 0; x < board.width; x += 1) {
                       const key = keyOf(x, y);
@@ -19593,7 +19640,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       cell.className = board.playable.has(key)
                           ? 'chess-rpg-match__cell chess-rpg-match__cell--play'
                           : 'chess-rpg-match__cell chess-rpg-match__cell--void';
-                      const unit = unitsState.find((entry) => entry.x === x && entry.y === y);
+                      const unit = allUnits().find((entry) => entry.x === x && entry.y === y);
                       if (unit) {
                           cell.className = unit.team === 'player'
                               ? 'chess-rpg-match__cell chess-rpg-match__cell--player'
@@ -19619,6 +19666,14 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                               if (target) {
                                   if (target.id === actingUnit.id) {
                                       selectedUnitId = actingUnit.id;
+                                      renderHUD();
+                                      renderBoard();
+                                      return;
+                                  }
+                                  if (target.team !== actingUnit.team) {
+                                      executeCommand({ type: 'basicAttack', team: 'player', payload: { targetX: x, targetY: y } });
+                                      executeCommand({ type: 'endTurn', team: 'player' });
+                                      prepareReachable();
                                       renderHUD();
                                       renderBoard();
                                   }
@@ -19652,6 +19707,13 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               if (piecesHost instanceof HTMLElement) {
                   piecesHost.innerHTML = '';
                   if (active) {
+                      const teamResource = matchState.resources[active.team];
+                      const status = document.createElement('span');
+                      const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
+                      const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
+                      status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
+                      status.textContent = `AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'}`;
+                      piecesHost.appendChild(status);
                       active.pieces.forEach((piece) => {
                           const pill = document.createElement('span');
                           pill.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
@@ -19666,7 +19728,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               const active = resolveActiveUnit();
               if (!active)
                   return;
-              const occupied = new Set(unitsState.map((unit) => keyOf(unit.x, unit.y)));
+              const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
               occupied.delete(keyOf(active.x, active.y));
               reachableById.set(active.id, resolveReachableCells(active, board.playable, occupied));
           };
@@ -19686,7 +19748,10 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps } });
                   }
               }
-              executeCommand({ type: 'basicAttack', team: 'enemy' });
+              const enemyTarget = aliveByTeam.player.find((unit) => isAdjacent(active, unit));
+              if (enemyTarget) {
+                  executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
+              }
               executeCommand({ type: 'endTurn', team: 'enemy' });
               prepareReachable();
               renderHUD();
@@ -19823,6 +19888,11 @@ __modules['./screens/chess-strategy-rpg/ready.ts'] = (exports, module, __require
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 };
 __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __require) => {
+  const MOVE_AE_PER_TILE = 1;
+  const MOVE_AE_CAP_PER_TURN = 3;
+  const BASIC_ATTACK_AE_GAIN = 2;
+  const ANTI_HOARD_DECAY_AFTER_TURNS = 2;
+  const ANTI_HOARD_AE_DECAY = 3;
   function createInitialMatchState(lineupSize) {
       return {
           phase: 'player',
@@ -19832,19 +19902,50 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           actionUsed: false,
           movedTiles: 0,
           lineupSize: Math.max(1, Math.floor(lineupSize)),
+          resources: {
+              player: { ae: 0, noSkillTurns: 0 },
+              enemy: { ae: 0, noSkillTurns: 0 },
+          },
+          roundSkillUsed: {
+              player: false,
+              enemy: false,
+          },
       };
   }
-  function canUseCommand(state, command) {
+  function canUseCommand(state, command, options = {}) {
       if (command === 'endTurn')
           return true;
       if (command === 'move')
           return true;
-      return !state.actionUsed;
+      if (state.actionUsed)
+          return false;
+      if (command === 'castSkill') {
+          return (options.ae ?? state.resources[state.activeTeam].ae) >= (options.skillCost ?? 0);
+      }
+      if (command === 'castUlt') {
+          if (!options.manualUlt)
+              return false;
+          return (options.rage ?? 0) >= (options.ultCost ?? 100);
+      }
+      return true;
   }
   function recordMove(state, tileSteps) {
+      const steps = Math.max(0, Math.floor(tileSteps));
+      const nextMovedTiles = state.movedTiles + steps;
+      const prevEligible = Math.min(MOVE_AE_CAP_PER_TURN, state.movedTiles);
+      const nextEligible = Math.min(MOVE_AE_CAP_PER_TURN, nextMovedTiles);
+      const aeGain = Math.max(0, nextEligible - prevEligible) * MOVE_AE_PER_TILE;
+      const activeResources = state.resources[state.activeTeam];
       return {
           ...state,
-          movedTiles: state.movedTiles + Math.max(0, Math.floor(tileSteps)),
+          movedTiles: nextMovedTiles,
+          resources: {
+              ...state.resources,
+              [state.activeTeam]: {
+                  ...activeResources,
+                  ae: Number((activeResources.ae + aeGain).toFixed(1)),
+              },
+          },
       };
   }
   function markActionUsed(state) {
@@ -19852,6 +19953,40 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           ...state,
           actionUsed: true,
       };
+  }
+  function applyActionCommand(state, command, options = {}) {
+      const activeResources = state.resources[state.activeTeam];
+      if (command === 'basicAttack') {
+          return {
+              ...markActionUsed(state),
+              resources: {
+                  ...state.resources,
+                  [state.activeTeam]: {
+                      ...activeResources,
+                      ae: Number((activeResources.ae + BASIC_ATTACK_AE_GAIN).toFixed(1)),
+                  },
+              },
+          };
+      }
+      if (command === 'castSkill') {
+          const skillCost = Math.max(0, options.skillCost ?? 0);
+          return {
+              ...markActionUsed(state),
+              resources: {
+                  ...state.resources,
+                  [state.activeTeam]: {
+                      ...activeResources,
+                      ae: Number(Math.max(0, activeResources.ae - skillCost).toFixed(1)),
+                      noSkillTurns: 0,
+                  },
+              },
+              roundSkillUsed: {
+                  ...state.roundSkillUsed,
+                  [state.activeTeam]: true,
+              },
+          };
+      }
+      return markActionUsed(state);
   }
   function advanceTurn(state) {
       const nextIndex = state.activeIndexInLineup + 1;
@@ -19863,6 +19998,14 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
               movedTiles: 0,
           };
       }
+      const previousTeam = state.activeTeam;
+      const previousResources = state.resources[previousTeam];
+      const noSkillTurns = state.roundSkillUsed[previousTeam] ? 0 : previousResources.noSkillTurns + 1;
+      const shouldDecay = noSkillTurns >= ANTI_HOARD_DECAY_AFTER_TURNS;
+      const previousTeamResources = {
+          ae: shouldDecay ? Math.max(0, previousResources.ae - ANTI_HOARD_AE_DECAY) : previousResources.ae,
+          noSkillTurns: shouldDecay ? 0 : noSkillTurns,
+      };
       const nextPhase = state.activeTeam === 'player' ? 'enemy' : 'player';
       const nextTurnCountPlayer = nextPhase === 'player' ? state.turnCountPlayer + 1 : state.turnCountPlayer;
       return {
@@ -19873,13 +20016,27 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           turnCountPlayer: nextTurnCountPlayer,
           actionUsed: false,
           movedTiles: 0,
+          resources: {
+              ...state.resources,
+              [previousTeam]: previousTeamResources,
+          },
+          roundSkillUsed: {
+              ...state.roundSkillUsed,
+              [previousTeam]: false,
+          },
       };
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'MOVE_AE_PER_TILE')) exports.MOVE_AE_PER_TILE = MOVE_AE_PER_TILE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'MOVE_AE_CAP_PER_TURN')) exports.MOVE_AE_CAP_PER_TURN = MOVE_AE_CAP_PER_TURN;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BASIC_ATTACK_AE_GAIN')) exports.BASIC_ATTACK_AE_GAIN = BASIC_ATTACK_AE_GAIN;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ANTI_HOARD_DECAY_AFTER_TURNS')) exports.ANTI_HOARD_DECAY_AFTER_TURNS = ANTI_HOARD_DECAY_AFTER_TURNS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ANTI_HOARD_AE_DECAY')) exports.ANTI_HOARD_AE_DECAY = ANTI_HOARD_AE_DECAY;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createInitialMatchState')) exports.createInitialMatchState = createInitialMatchState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canUseCommand')) exports.canUseCommand = canUseCommand;
   if (!Object.prototype.hasOwnProperty.call(exports, 'recordMove')) exports.recordMove = recordMove;
   if (!Object.prototype.hasOwnProperty.call(exports, 'markActionUsed')) exports.markActionUsed = markActionUsed;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyActionCommand')) exports.applyActionCommand = applyActionCommand;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceTurn')) exports.advanceTurn = advanceTurn;
 };
 __modules['./screens/collection/helpers.ts'] = (exports, module, __require) => {

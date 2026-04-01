@@ -1,9 +1,10 @@
 import { describe, expect, test } from '@jest/globals';
 import {
   advanceTurn,
+  ANTI_HOARD_AE_DECAY,
+  applyActionCommand,
   canUseCommand,
   createInitialMatchState,
-  markActionUsed,
   recordMove,
 } from '../src/screens/chess-strategy-rpg/turn-state.ts';
 
@@ -15,12 +16,14 @@ describe('chess strategy rpg turn state', () => {
     expect(state.activeIndexInLineup).toBe(0);
     expect(state.turnCountPlayer).toBe(1);
 
-    state = recordMove(state, 3);
-    expect(state.movedTiles).toBe(3);
+    state = recordMove(state, 4);
+    expect(state.movedTiles).toBe(4);
+    expect(state.resources.player.ae).toBe(3);
     expect(canUseCommand(state, 'basicAttack')).toBe(true);
 
-    state = markActionUsed(state);
+    state = applyActionCommand(state, 'basicAttack');
     expect(state.actionUsed).toBe(true);
+    expect(state.resources.player.ae).toBe(5);
     expect(canUseCommand(state, 'castSkill')).toBe(false);
     expect(canUseCommand(state, 'endTurn')).toBe(true);
   });
@@ -48,5 +51,29 @@ describe('chess strategy rpg turn state', () => {
     expect(state.phase).toBe('player');
     expect(state.activeIndexInLineup).toBe(0);
     expect(state.turnCountPlayer).toBe(2);
+  });
+
+  test('locks skill by team AE and ult by manual rage gate', () => {
+    const state = createInitialMatchState(2);
+
+    expect(canUseCommand(state, 'castSkill', { skillCost: 4 })).toBe(false);
+    expect(canUseCommand(state, 'castUlt', { manualUlt: false, rage: 100, ultCost: 100 })).toBe(false);
+    expect(canUseCommand(state, 'castUlt', { manualUlt: true, rage: 99, ultCost: 100 })).toBe(false);
+    expect(canUseCommand(state, 'castUlt', { manualUlt: true, rage: 100, ultCost: 100 })).toBe(true);
+  });
+
+  test('applies anti-hoard AE decay after two team turns without skill', () => {
+    let state = createInitialMatchState(1);
+    state.resources.player.ae = 10;
+
+    state = applyActionCommand(state, 'basicAttack');
+    state = advanceTurn(state);
+    state = applyActionCommand(state, 'basicAttack');
+    state = advanceTurn(state);
+    state = applyActionCommand(state, 'basicAttack');
+    state = advanceTurn(state);
+
+    expect(state.resources.player.ae).toBe(10 + 2 + 2 - ANTI_HOARD_AE_DECAY);
+    expect(state.resources.player.noSkillTurns).toBe(0);
   });
 });
