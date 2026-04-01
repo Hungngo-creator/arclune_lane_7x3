@@ -357,7 +357,28 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
     const basicDamage = (attacker: UnitState, defender: UnitState): number => Math.max(1, Math.floor(attacker.atk - defender.arm));
 
-    const isAdjacent = (a: UnitState, b: UnitState): boolean => Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1;
+    const distance = (a: UnitState, b: UnitState): number => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    const isAdjacent = (a: UnitState, b: UnitState): boolean => distance(a, b) === 1;
+    const resolveActionRange = (action: 'basicAttack' | 'castSkill' | 'castUlt'): number => {
+      if (action === 'basicAttack') return 1;
+      if (action === 'castSkill') return 2;
+      return 3;
+    };
+    const resolveDefaultTarget = (actor: UnitState, action: 'basicAttack' | 'castSkill' | 'castUlt'): UnitState | null => {
+      const range = resolveActionRange(action);
+      const enemies = allUnits().filter((unit) => unit.team !== actor.team);
+      let picked: UnitState | null = null;
+      let bestDistance = Number.POSITIVE_INFINITY;
+      for (const enemy of enemies) {
+        const d = distance(actor, enemy);
+        if (d > range) continue;
+        if (d < bestDistance) {
+          picked = enemy;
+          bestDistance = d;
+        }
+      }
+      return picked;
+    };
 
     const applyCollapseResolution = (): void => {
       if (matchState.collapseRings <= 0) return;
@@ -392,70 +413,51 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         return;
       }
 
-      if (command.type === 'basicAttack') {
+      if (command.type === 'basicAttack' || command.type === 'castSkill' || command.type === 'castUlt') {
+        const actionType = command.type;
         const targetX = command.payload?.targetX;
         const targetY = command.payload?.targetY;
-        const target = allUnits().find((unit) => unit.team !== active.team && unit.x === targetX && unit.y === targetY);
-        if (!target || !isAdjacent(active, target)) return;
-        if (!canUseCommand(matchState, command.type)) return;
+        const explicitTarget = allUnits().find((unit) => unit.team !== active.team && unit.x === targetX && unit.y === targetY) ?? null;
+        const target = explicitTarget ?? resolveDefaultTarget(active, actionType);
+        const actionRange = resolveActionRange(actionType);
+        const hasValidTarget = Boolean(target);
+        const inRange = target ? distance(active, target) <= actionRange : false;
+        if (actionType === 'castSkill' && !canUseCommand(matchState, actionType, { skillCost: active.skillCost })) return;
+        if (actionType === 'castUlt' && !canUseCommand(matchState, actionType, { manualUlt: true, rage: active.rage, ultCost: active.maxRage })) return;
+        if (actionType === 'basicAttack' && !canUseCommand(matchState, actionType)) return;
         resolveCollapseAt('beforeAction');
         const actionResult = resolveAction({
           actorTeam: matchState.activeTeam,
-          action: 'basicAttack',
-          inRange: true,
-          validTarget: true,
+          action: actionType,
+          inRange,
+          validTarget: hasValidTarget,
           aeBefore: matchState.resources[matchState.activeTeam].ae,
-          damage: basicDamage(active, target),
-          targetHp: target.hp,
+          skillCost: actionType === 'castSkill' ? active.skillCost : undefined,
+          actorRage: actionType === 'castUlt' ? active.rage : undefined,
+          requireManualUlt: actionType === 'castUlt' ? true : undefined,
+          ultCost: actionType === 'castUlt' ? active.maxRage : undefined,
+          damage: target ? (actionType === 'castUlt' ? basicDamage(active, target) + 12 : actionType === 'castSkill' ? basicDamage(active, target) + 5 : basicDamage(active, target)) : undefined,
+          targetHp: target?.hp,
+          buffIds: actionType === 'castSkill' ? ['skill-cast'] : actionType === 'castUlt' ? ['ult-cast'] : undefined,
         });
-        if (!actionResult.ok || actionResult.targetHp == null) return;
-        target.hp = actionResult.targetHp;
-        active.rage = Math.min(active.maxRage, active.rage + 35);
+        if (!actionResult.ok) return;
+        if (target && actionResult.targetHp != null) {
+          target.hp = actionResult.targetHp;
+          if (target.team === 'enemy' && matchState.objectiveMode === 'boss' && target.slotIndex === 0 && target.hp <= 0) {
+            bossAlive = false;
+          }
+        }
+        if (actionType === 'castUlt') {
+          active.rage = actionResult.nextRage ?? 0;
+        } else {
+          active.rage = Math.min(active.maxRage, active.rage + (actionType === 'basicAttack' ? 35 : 20));
+        }
         removeDeadUnits();
-        matchState = applyActionCommand(matchState, 'basicAttack');
-        resolveActionUiEffects(actionResult);
-        resolveCollapseAt('afterAction');
-        syncMatchResult('onAction');
-        return;
-      }
-
-      if (command.type === 'castSkill') {
-        if (!canUseCommand(matchState, command.type, { skillCost: active.skillCost })) return;
-        resolveCollapseAt('beforeAction');
-        const actionResult = resolveAction({
-          actorTeam: matchState.activeTeam,
-          action: 'castSkill',
-          inRange: true,
-          validTarget: true,
-          aeBefore: matchState.resources[matchState.activeTeam].ae,
-          skillCost: active.skillCost,
-          buffIds: ['skill-cast'],
-        });
-        if (!actionResult.ok) return;
-        matchState = applyActionCommand(matchState, 'castSkill', { skillCost: active.skillCost });
-        resolveActionUiEffects(actionResult);
-        resolveCollapseAt('afterAction');
-        syncMatchResult('onAction');
-        return;
-      }
-
-      if (command.type === 'castUlt') {
-        if (!canUseCommand(matchState, command.type, { manualUlt: true, rage: active.rage, ultCost: active.maxRage })) return;
-        resolveCollapseAt('beforeAction');
-        const actionResult = resolveAction({
-          actorTeam: matchState.activeTeam,
-          action: 'castUlt',
-          inRange: true,
-          validTarget: true,
-          aeBefore: matchState.resources[matchState.activeTeam].ae,
-          actorRage: active.rage,
-          requireManualUlt: true,
-          ultCost: active.maxRage,
-          buffIds: ['ult-cast'],
-        });
-        if (!actionResult.ok) return;
-        active.rage = 0;
-        matchState = applyActionCommand(matchState, 'castUlt');
+        if (actionType === 'castSkill') {
+          matchState = applyActionCommand(matchState, actionType, { skillCost: active.skillCost });
+        } else {
+          matchState = applyActionCommand(matchState, actionType);
+        }
         resolveActionUiEffects(actionResult);
         resolveCollapseAt('afterAction');
         syncMatchResult('onAction');
@@ -464,7 +466,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
       if (command.type === 'skipAction') {
         if (!canUseCommand(matchState, command.type)) return;
+        resolveCollapseAt('beforeAction');
         matchState = applySkipAction(matchState);
+        resolveCollapseAt('afterAction');
+        syncMatchResult('onAction');
         return;
       }
 
