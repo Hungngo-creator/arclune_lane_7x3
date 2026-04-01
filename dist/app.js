@@ -19350,6 +19350,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const canUseCommand = __dep3.canUseCommand;
   const createInitialMatchState = __dep3.createInitialMatchState;
   const applyActionCommand = __dep3.applyActionCommand;
+  const evaluateMatchResult = __dep3.evaluateMatchResult;
+  const PLAYER_TURN_CAP = __dep3.PLAYER_TURN_CAP;
   const recordMove = __dep3.recordMove;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
   const MAX_LINEAR_MOVE_STEPS = 6;
@@ -19372,6 +19374,10 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
     .chess-rpg-match__pieces{display:flex;flex-wrap:wrap;gap:6px;}
     .chess-rpg-match__piece{font-size:12px;border:1px solid rgba(161,216,255,.4);border-radius:999px;padding:2px 8px;background:rgba(31,74,107,.5);color:#e6f3ff;}
     .chess-rpg-match__piece--active{border-color:rgba(163,255,183,.78);background:rgba(43,121,72,.52);color:#ebffef;}
+    .chess-rpg-match__actions{display:flex;flex-wrap:wrap;gap:8px;}
+    .chess-rpg-match__action-btn{border:1px solid rgba(149,210,248,.5);background:rgba(19,47,73,.82);color:#ecf7ff;border-radius:10px;padding:6px 12px;font-size:12px;cursor:pointer;}
+    .chess-rpg-match__action-btn:disabled{opacity:.45;cursor:not-allowed;}
+    .chess-rpg-match__result{padding:10px 12px;border-radius:10px;border:1px solid rgba(247,192,124,.6);background:rgba(76,38,19,.4);font-size:13px;color:#ffe4ca;}
   `;
   const PIECE_LABEL = {
       rook: 'Xe',
@@ -19490,6 +19496,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
       </div>
       <p class="chess-rpg-match__turn" data-role="turn"></p>
       <div class="chess-rpg-match__pieces" data-role="pieces"></div>
+      <div class="chess-rpg-match__actions" data-role="actions"></div>
+      <p class="chess-rpg-match__result" data-role="result"></p>
       <div class="chess-rpg-match__field">
         <div class="chess-rpg-match__board" data-role="board"></div>
       </div>
@@ -19498,6 +19506,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
       const backButton = section.querySelector('.chess-rpg-match__back');
       const turnHost = section.querySelector('[data-role="turn"]');
       const piecesHost = section.querySelector('[data-role="pieces"]');
+      const actionsHost = section.querySelector('[data-role="actions"]');
+      const resultHost = section.querySelector('[data-role="result"]');
       if (boardHost instanceof HTMLElement) {
           const board = createIrregularBoard(seed);
           const viewportWidth = Math.max(320, root.clientWidth || window.innerWidth || 360);
@@ -19584,6 +19594,12 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   aliveByTeam[team].splice(0, aliveByTeam[team].length, ...survivors);
               }
           };
+          const syncMatchResult = () => {
+              matchState = evaluateMatchResult(matchState, {
+                  player: aliveByTeam.player.length,
+                  enemy: aliveByTeam.enemy.length,
+              });
+          };
           const basicDamage = (attacker, defender) => Math.max(1, Math.floor(attacker.atk - defender.arm));
           const isAdjacent = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1;
           const performBasicAttack = (attacker, defender) => {
@@ -19594,6 +19610,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           const executeCommand = (command) => {
               const active = resolveActiveUnit();
               if (!active || command.team !== matchState.activeTeam)
+                  return;
+              if (matchState.result.status !== 'ongoing')
                   return;
               if (command.type === 'move') {
                   if (!canUseCommand(matchState, command.type))
@@ -19611,6 +19629,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       return;
                   performBasicAttack(active, target);
                   matchState = applyActionCommand(matchState, 'basicAttack');
+                  syncMatchResult();
                   return;
               }
               if (command.type === 'castSkill') {
@@ -19627,6 +19646,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   return;
               }
               matchState = advanceTurn(matchState);
+              syncMatchResult();
               const newActive = resolveActiveUnit();
               selectedUnitId = newActive?.id ?? null;
           };
@@ -19659,6 +19679,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       if (board.playable.has(key)) {
                           cell.addEventListener('click', () => {
                               const actingUnit = resolveActiveUnit();
+                              if (matchState.result.status !== 'ongoing')
+                                  return;
                               if (actingUnit?.team !== 'player')
                                   return;
                               if (!actingUnit)
@@ -19677,6 +19699,9 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                                       prepareReachable();
                                       renderHUD();
                                       renderBoard();
+                                      if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
+                                          window.setTimeout(processEnemyTurn, 240);
+                                      }
                                   }
                                   return;
                               }
@@ -19686,7 +19711,6 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                               actingUnit.x = x;
                               actingUnit.y = y;
                               executeCommand({ type: 'move', team: 'player', payload: { tileSteps } });
-                              executeCommand({ type: 'endTurn', team: 'player' });
                               prepareReachable();
                               renderHUD();
                               renderBoard();
@@ -19699,9 +19723,10 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           const renderHUD = () => {
               const active = resolveActiveUnit();
               if (turnHost instanceof HTMLElement) {
+                  const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : '';
                   turnHost.textContent = active
                       ? active.team === 'player'
-                          ? `Pha Player · lượt ${matchState.turnCountPlayer} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}).`
+                          ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel}.`
                           : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
                       : 'Không có nhân vật khả dụng.';
               }
@@ -19723,6 +19748,59 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       });
                   }
               }
+              if (resultHost instanceof HTMLElement) {
+                  if (matchState.result.status === 'ongoing') {
+                      resultHost.hidden = true;
+                  }
+                  else {
+                      resultHost.hidden = false;
+                      resultHost.textContent = matchState.result.status === 'win'
+                          ? 'Thắng trận (elimination).'
+                          : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 7 lượt Player' : 'bị tiêu diệt'}).`;
+                  }
+              }
+              if (actionsHost instanceof HTMLElement) {
+                  actionsHost.innerHTML = '';
+                  const activePlayer = active && active.team === 'player' ? active : null;
+                  const buildActionButton = (label, onClick, disabled) => {
+                      const button = document.createElement('button');
+                      button.type = 'button';
+                      button.className = 'chess-rpg-match__action-btn';
+                      button.textContent = label;
+                      button.disabled = disabled;
+                      button.addEventListener('click', onClick);
+                      actionsHost.appendChild(button);
+                  };
+                  buildActionButton('Dùng Skill', () => {
+                      if (!activePlayer)
+                          return;
+                      executeCommand({ type: 'castSkill', team: 'player' });
+                      executeCommand({ type: 'endTurn', team: 'player' });
+                      prepareReachable();
+                      renderHUD();
+                      renderBoard();
+                  }, !activePlayer || !canUseCommand(matchState, 'castSkill', { skillCost: activePlayer.skillCost }) || matchState.result.status !== 'ongoing');
+                  buildActionButton('Dùng Ultimate', () => {
+                      if (!activePlayer)
+                          return;
+                      executeCommand({ type: 'castUlt', team: 'player' });
+                      executeCommand({ type: 'endTurn', team: 'player' });
+                      prepareReachable();
+                      renderHUD();
+                      renderBoard();
+                  }, !activePlayer || !canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: activePlayer.rage, ultCost: activePlayer.maxRage }) || matchState.result.status !== 'ongoing');
+                  buildActionButton('Kết thúc lượt', () => {
+                      if (!activePlayer)
+                          return;
+                      executeCommand({ type: 'endTurn', team: 'player' });
+                      prepareReachable();
+                      renderHUD();
+                      renderBoard();
+                      if (matchState.activeTeam === 'enemy') {
+                          window.setTimeout(processEnemyTurn, 240);
+                      }
+                  }, !activePlayer || matchState.result.status !== 'ongoing');
+              }
           };
           const prepareReachable = () => {
               reachableById.clear();
@@ -19736,6 +19814,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           const processEnemyTurn = () => {
               const active = resolveActiveUnit();
               if (!active || active.team !== 'enemy')
+                  return;
+              if (matchState.result.status !== 'ongoing')
                   return;
               const moves = Array.from(reachableById.get(active.id) ?? []);
               if (moves.length > 0) {
@@ -19757,7 +19837,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               prepareReachable();
               renderHUD();
               renderBoard();
-              if (matchState.activeTeam === 'enemy') {
+              if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
                   window.setTimeout(processEnemyTurn, 240);
               }
           };
@@ -19894,6 +19974,7 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
   const BASIC_ATTACK_AE_GAIN = 2;
   const ANTI_HOARD_DECAY_AFTER_TURNS = 2;
   const ANTI_HOARD_AE_DECAY = 3;
+  const PLAYER_TURN_CAP = 9;
   function createInitialMatchState(lineupSize) {
       return {
           phase: 'player',
@@ -19903,6 +19984,7 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           actionUsed: false,
           movedTiles: 0,
           lineupSize: Math.max(1, Math.floor(lineupSize)),
+          objectiveMode: 'elimination',
           resources: {
               player: { ae: 0, noSkillTurns: 0 },
               enemy: { ae: 0, noSkillTurns: 0 },
@@ -19911,9 +19993,16 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
               player: false,
               enemy: false,
           },
+          result: {
+              status: 'ongoing',
+              reason: null,
+              winner: null,
+          },
       };
   }
   function canUseCommand(state, command, options = {}) {
+      if (state.result.status !== 'ongoing')
+          return false;
       if (command === 'endTurn')
           return true;
       if (command === 'move')
@@ -19990,6 +20079,8 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
       return markActionUsed(state);
   }
   function advanceTurn(state) {
+      if (state.result.status !== 'ongoing')
+          return state;
       const nextIndex = state.activeIndexInLineup + 1;
       if (nextIndex < state.lineupSize) {
           return {
@@ -20027,18 +20118,57 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           },
       };
   }
+  function evaluateMatchResult(state, aliveByTeam) {
+      if (state.result.status !== 'ongoing')
+          return state;
+      const playerAlive = Math.max(0, Math.floor(aliveByTeam.player));
+      const enemyAlive = Math.max(0, Math.floor(aliveByTeam.enemy));
+      if (enemyAlive <= 0) {
+          return {
+              ...state,
+              result: {
+                  status: 'win',
+                  reason: 'elimination',
+                  winner: 'player',
+              },
+          };
+      }
+      if (playerAlive <= 0) {
+          return {
+              ...state,
+              result: {
+                  status: 'lose',
+                  reason: 'elimination',
+                  winner: 'enemy',
+              },
+          };
+      }
+      if (state.turnCountPlayer > PLAYER_TURN_CAP) {
+          return {
+              ...state,
+              result: {
+                  status: 'lose',
+                  reason: 'turn-cap',
+                  winner: 'enemy',
+              },
+          };
+      }
+      return state;
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'MOVE_AE_PER_TILE')) exports.MOVE_AE_PER_TILE = MOVE_AE_PER_TILE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'MOVE_AE_CAP_PER_TURN')) exports.MOVE_AE_CAP_PER_TURN = MOVE_AE_CAP_PER_TURN;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BASIC_ATTACK_AE_GAIN')) exports.BASIC_ATTACK_AE_GAIN = BASIC_ATTACK_AE_GAIN;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ANTI_HOARD_DECAY_AFTER_TURNS')) exports.ANTI_HOARD_DECAY_AFTER_TURNS = ANTI_HOARD_DECAY_AFTER_TURNS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ANTI_HOARD_AE_DECAY')) exports.ANTI_HOARD_AE_DECAY = ANTI_HOARD_AE_DECAY;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'PLAYER_TURN_CAP')) exports.PLAYER_TURN_CAP = PLAYER_TURN_CAP;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createInitialMatchState')) exports.createInitialMatchState = createInitialMatchState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canUseCommand')) exports.canUseCommand = canUseCommand;
   if (!Object.prototype.hasOwnProperty.call(exports, 'recordMove')) exports.recordMove = recordMove;
   if (!Object.prototype.hasOwnProperty.call(exports, 'markActionUsed')) exports.markActionUsed = markActionUsed;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyActionCommand')) exports.applyActionCommand = applyActionCommand;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceTurn')) exports.advanceTurn = advanceTurn;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateMatchResult')) exports.evaluateMatchResult = evaluateMatchResult;
 };
 __modules['./screens/collection/helpers.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/collection/helpers.ts

@@ -13,6 +13,8 @@ import {
   canUseCommand,
   createInitialMatchState,
   applyActionCommand,
+  evaluateMatchResult,
+  PLAYER_TURN_CAP,
   recordMove,
   type MatchCommandType,
   type MatchState,
@@ -41,6 +43,10 @@ const CSS = /* css */ `
   .chess-rpg-match__pieces{display:flex;flex-wrap:wrap;gap:6px;}
   .chess-rpg-match__piece{font-size:12px;border:1px solid rgba(161,216,255,.4);border-radius:999px;padding:2px 8px;background:rgba(31,74,107,.5);color:#e6f3ff;}
   .chess-rpg-match__piece--active{border-color:rgba(163,255,183,.78);background:rgba(43,121,72,.52);color:#ebffef;}
+  .chess-rpg-match__actions{display:flex;flex-wrap:wrap;gap:8px;}
+  .chess-rpg-match__action-btn{border:1px solid rgba(149,210,248,.5);background:rgba(19,47,73,.82);color:#ecf7ff;border-radius:10px;padding:6px 12px;font-size:12px;cursor:pointer;}
+  .chess-rpg-match__action-btn:disabled{opacity:.45;cursor:not-allowed;}
+  .chess-rpg-match__result{padding:10px 12px;border-radius:10px;border:1px solid rgba(247,192,124,.6);background:rgba(76,38,19,.4);font-size:13px;color:#ffe4ca;}
 `;
 
 interface RenderContext {
@@ -201,6 +207,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     </div>
     <p class="chess-rpg-match__turn" data-role="turn"></p>
     <div class="chess-rpg-match__pieces" data-role="pieces"></div>
+    <div class="chess-rpg-match__actions" data-role="actions"></div>
+    <p class="chess-rpg-match__result" data-role="result"></p>
     <div class="chess-rpg-match__field">
       <div class="chess-rpg-match__board" data-role="board"></div>
     </div>
@@ -210,6 +218,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   const backButton = section.querySelector('.chess-rpg-match__back');
   const turnHost = section.querySelector('[data-role="turn"]');
   const piecesHost = section.querySelector('[data-role="pieces"]');
+  const actionsHost = section.querySelector('[data-role="actions"]');
+  const resultHost = section.querySelector('[data-role="result"]');
 
   if (boardHost instanceof HTMLElement) {
     const board = createIrregularBoard(seed);
@@ -300,6 +310,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         aliveByTeam[team].splice(0, aliveByTeam[team].length, ...survivors);
       }
     };
+    const syncMatchResult = (): void => {
+      matchState = evaluateMatchResult(matchState, {
+        player: aliveByTeam.player.length,
+        enemy: aliveByTeam.enemy.length,
+      });
+    };
 
     const basicDamage = (attacker: UnitState, defender: UnitState): number => Math.max(1, Math.floor(attacker.atk - defender.arm));
 
@@ -315,6 +331,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     const executeCommand = (command: MatchCommand): void => {
       const active = resolveActiveUnit();
       if (!active || command.team !== matchState.activeTeam) return;
+      if (matchState.result.status !== 'ongoing') return;
 
       if (command.type === 'move') {
         if (!canUseCommand(matchState, command.type)) return;
@@ -330,6 +347,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         if (!canUseCommand(matchState, command.type)) return;
         performBasicAttack(active, target);
         matchState = applyActionCommand(matchState, 'basicAttack');
+        syncMatchResult();
         return;
       }
 
@@ -347,6 +365,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       }
 
       matchState = advanceTurn(matchState);
+      syncMatchResult();
       const newActive = resolveActiveUnit();
       selectedUnitId = newActive?.id ?? null;
     };
@@ -384,6 +403,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           if (board.playable.has(key)) {
             cell.addEventListener('click', () => {
               const actingUnit = resolveActiveUnit();
+              if (matchState.result.status !== 'ongoing') return;
               if (actingUnit?.team !== 'player') return;
               if (!actingUnit) return;
               const target = allUnits().find((entry) => entry.x === x && entry.y === y);
@@ -400,6 +420,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
                   prepareReachable();
                   renderHUD();
                   renderBoard();
+                  if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
+                    window.setTimeout(processEnemyTurn, 240);
+                  }
                 }
                 return;
               }
@@ -408,7 +431,6 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               actingUnit.x = x;
               actingUnit.y = y;
               executeCommand({ type: 'move', team: 'player', payload: { tileSteps } });
-              executeCommand({ type: 'endTurn', team: 'player' });
               prepareReachable();
               renderHUD();
               renderBoard();
@@ -422,9 +444,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
    const renderHUD = (): void => {
       const active = resolveActiveUnit();
       if (turnHost instanceof HTMLElement) {
+        const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : '';
         turnHost.textContent = active
           ? active.team === 'player'
-            ? `Pha Player · lượt ${matchState.turnCountPlayer} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}).`
+            ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel}.`
             : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
             : 'Không có nhân vật khả dụng.';
       }
@@ -446,6 +469,67 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           });
         }
       }
+      if (resultHost instanceof HTMLElement) {
+        if (matchState.result.status === 'ongoing') {
+          resultHost.hidden = true;
+        } else {
+          resultHost.hidden = false;
+          resultHost.textContent = matchState.result.status === 'win'
+            ? 'Thắng trận (elimination).'
+            : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 7 lượt Player' : 'bị tiêu diệt'}).`;
+        }
+      }
+      if (actionsHost instanceof HTMLElement) {
+        actionsHost.innerHTML = '';
+        const activePlayer = active && active.team === 'player' ? active : null;
+        const buildActionButton = (label: string, onClick: () => void, disabled: boolean): void => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'chess-rpg-match__action-btn';
+          button.textContent = label;
+          button.disabled = disabled;
+          button.addEventListener('click', onClick);
+          actionsHost.appendChild(button);
+        };
+        buildActionButton(
+          'Dùng Skill',
+          () => {
+            if (!activePlayer) return;
+            executeCommand({ type: 'castSkill', team: 'player' });
+            executeCommand({ type: 'endTurn', team: 'player' });
+            prepareReachable();
+            renderHUD();
+            renderBoard();
+          },
+          !activePlayer || !canUseCommand(matchState, 'castSkill', { skillCost: activePlayer.skillCost }) || matchState.result.status !== 'ongoing',
+        );
+        buildActionButton(
+          'Dùng Ultimate',
+          () => {
+            if (!activePlayer) return;
+            executeCommand({ type: 'castUlt', team: 'player' });
+            executeCommand({ type: 'endTurn', team: 'player' });
+            prepareReachable();
+            renderHUD();
+            renderBoard();
+          },
+          !activePlayer || !canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: activePlayer.rage, ultCost: activePlayer.maxRage }) || matchState.result.status !== 'ongoing',
+        );
+        buildActionButton(
+          'Kết thúc lượt',
+          () => {
+            if (!activePlayer) return;
+            executeCommand({ type: 'endTurn', team: 'player' });
+            prepareReachable();
+            renderHUD();
+            renderBoard();
+            if (matchState.activeTeam === 'enemy') {
+              window.setTimeout(processEnemyTurn, 240);
+            }
+          },
+          !activePlayer || matchState.result.status !== 'ongoing',
+        );
+      }
     };
 
     const prepareReachable = (): void => {
@@ -460,6 +544,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     const processEnemyTurn = (): void => {
       const active = resolveActiveUnit();
       if (!active || active.team !== 'enemy') return;
+      if (matchState.result.status !== 'ongoing') return;
       const moves = Array.from(reachableById.get(active.id) ?? []);
       if (moves.length > 0) {
         const aiRng = createRngState(hashSeedText(`${seed}:${active.id}:${active.x},${active.y}:${matchState.activeIndexInLineup}`));
@@ -480,7 +565,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       prepareReachable();
       renderHUD();
       renderBoard();
-      if (matchState.activeTeam === 'enemy') {
+      if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
         window.setTimeout(processEnemyTurn, 240);
       }
     };

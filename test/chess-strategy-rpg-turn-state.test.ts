@@ -5,6 +5,8 @@ import {
   applyActionCommand,
   canUseCommand,
   createInitialMatchState,
+  evaluateMatchResult,
+  PLAYER_TURN_CAP,
   recordMove,
 } from '../src/screens/chess-strategy-rpg/turn-state.ts';
 
@@ -75,5 +77,18 @@ describe('chess strategy rpg turn state', () => {
 
     expect(state.resources.player.ae).toBe(10 + 2 + 2 - ANTI_HOARD_AE_DECAY);
     expect(state.resources.player.noSkillTurns).toBe(0);
+  });
+
+  test('resolves elimination objective and turn cap defeat', () => {
+    let state = createInitialMatchState(1);
+    state = evaluateMatchResult(state, { player: 1, enemy: 0 });
+    expect(state.result.status).toBe('win');
+    expect(state.result.reason).toBe('elimination');
+
+    let capState = createInitialMatchState(1);
+    capState.turnCountPlayer = PLAYER_TURN_CAP + 1;
+    capState = evaluateMatchResult(capState, { player: 1, enemy: 1 });
+    expect(capState.result.status).toBe('lose');
+    expect(capState.result.reason).toBe('turn-cap');
   });
 });

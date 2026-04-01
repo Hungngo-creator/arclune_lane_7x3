@@ -58,7 +58,7 @@
 ## 3) Match Length, Victory, Defeat, Draw
 
 ### 3.1 Turn cap
-- Mặc định: **7 turn của phe Player**.
+- Mặc định: **9 turn của phe Player**.
 - Hết turn cap mà chưa đạt điều kiện thắng thì Player thua (v1).
 
 ### 3.2 Win/Lose chính

@@ -1,4 +1,6 @@
 export type TeamId = 'player' | 'enemy';
+export type ObjectiveMode = 'elimination';
+export type MatchResultStatus = 'ongoing' | 'win' | 'lose';
 
 export type MatchCommandType = 'move' | 'basicAttack' | 'castSkill' | 'castUlt' | 'endTurn';
 
@@ -15,8 +17,14 @@ export interface MatchState {
   actionUsed: boolean;
   movedTiles: number;
   readonly lineupSize: number;
+  readonly objectiveMode: ObjectiveMode;
   resources: Record<TeamId, TeamResourceState>;
   roundSkillUsed: Record<TeamId, boolean>;
+  result: {
+    status: MatchResultStatus;
+    reason: string | null;
+    winner: TeamId | null;
+  };
 }
 
 export interface CommandCheckOptions {
@@ -36,6 +44,7 @@ export const MOVE_AE_CAP_PER_TURN = 3;
 export const BASIC_ATTACK_AE_GAIN = 2;
 export const ANTI_HOARD_DECAY_AFTER_TURNS = 2;
 export const ANTI_HOARD_AE_DECAY = 3;
+export const PLAYER_TURN_CAP = 9;
 
 export function createInitialMatchState(lineupSize: number): MatchState {
   return {
@@ -46,6 +55,7 @@ export function createInitialMatchState(lineupSize: number): MatchState {
     actionUsed: false,
     movedTiles: 0,
     lineupSize: Math.max(1, Math.floor(lineupSize)),
+    objectiveMode: 'elimination',
     resources: {
       player: { ae: 0, noSkillTurns: 0 },
       enemy: { ae: 0, noSkillTurns: 0 },
@@ -54,10 +64,16 @@ export function createInitialMatchState(lineupSize: number): MatchState {
       player: false,
       enemy: false,
     },
+    result: {
+      status: 'ongoing',
+      reason: null,
+      winner: null,
+    },
   };
 }
 
 export function canUseCommand(state: MatchState, command: MatchCommandType, options: CommandCheckOptions = {}): boolean {
+  if (state.result.status !== 'ongoing') return false;
   if (command === 'endTurn') return true;
   if (command === 'move') return true;
   if (state.actionUsed) return false;
@@ -136,6 +152,7 @@ export function applyActionCommand(state: MatchState, command: 'basicAttack' | '
 }
 
 export function advanceTurn(state: MatchState): MatchState {
+  if (state.result.status !== 'ongoing') return state;
   const nextIndex = state.activeIndexInLineup + 1;
   if (nextIndex < state.lineupSize) {
     return {
@@ -174,4 +191,44 @@ export function advanceTurn(state: MatchState): MatchState {
       [previousTeam]: false,
     },
   };
+}
+
+export function evaluateMatchResult(
+  state: MatchState,
+  aliveByTeam: Readonly<Record<TeamId, number>>,
+): MatchState {
+  if (state.result.status !== 'ongoing') return state;
+  const playerAlive = Math.max(0, Math.floor(aliveByTeam.player));
+  const enemyAlive = Math.max(0, Math.floor(aliveByTeam.enemy));
+  if (enemyAlive <= 0) {
+    return {
+      ...state,
+      result: {
+        status: 'win',
+        reason: 'elimination',
+        winner: 'player',
+      },
+    };
+  }
+  if (playerAlive <= 0) {
+    return {
+      ...state,
+      result: {
+        status: 'lose',
+        reason: 'elimination',
+        winner: 'enemy',
+      },
+    };
+  }
+  if (state.turnCountPlayer > PLAYER_TURN_CAP) {
+    return {
+      ...state,
+      result: {
+        status: 'lose',
+        reason: 'turn-cap',
+        winner: 'enemy',
+      },
+    };
+  }
+  return state;
 }
