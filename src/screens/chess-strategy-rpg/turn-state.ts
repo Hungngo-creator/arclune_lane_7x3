@@ -40,6 +40,7 @@ export interface MatchState {
   activeIndexInLineup: number;
   turnCountPlayer: number;
   turn: TurnFlags;
+  inputLocked: boolean;
   movedTiles: number;
   readonly lineupSize: number;
   readonly objectiveMode: ObjectiveMode;
@@ -90,6 +91,7 @@ export interface ActionResolverInput {
 export interface ActionResolverResult {
   ok: boolean;
   nextAe: number;
+  nextRage?: number;
   targetHp: number | null;
   isTargetDead: boolean;
   log: string[];
@@ -130,6 +132,7 @@ export function createInitialMatchState(lineupSize: number, objectiveMode: Objec
       hasMoved: false,
       hasActed: false,
     },
+    inputLocked: false,
     movedTiles: 0,
     lineupSize: Math.max(1, Math.floor(lineupSize)),
     objectiveMode,
@@ -158,7 +161,8 @@ export function createInitialMatchState(lineupSize: number, objectiveMode: Objec
 
 export function canUseCommand(state: MatchState, command: MatchCommandType, options: CommandCheckOptions = {}): boolean {
   if (state.result.status !== 'ongoing') return false;
-  if (command === 'endTurn') return true;
+  if (command === 'endTurn') return state.turn.hasActed;
+  if (state.inputLocked) return false;
   if (command === 'move') return !state.turn.hasMoved && !state.turn.hasActed;
   if (command === 'skipAction') return !state.turn.hasActed;
   if (state.turn.hasActed) return false;
@@ -200,6 +204,7 @@ export function recordMove(state: MatchState, tileSteps: number): MatchState {
 export function markActionUsed(state: MatchState): MatchState {
   return {
     ...state,
+    inputLocked: true,
     turn: {
       ...state.turn,
       hasActed: true,
@@ -245,6 +250,11 @@ export function applyActionCommand(state: MatchState, command: ActionKind, optio
   return markActionUsed(state);
 }
 
+export function applySkipAction(state: MatchState): MatchState {
+  if (!canUseCommand(state, 'skipAction')) return state;
+  return markActionUsed(state);
+}
+
 export function resolveAction(input: ActionResolverInput): ActionResolverResult {
   const log: string[] = [];
   const normalizedSkillCost = Math.max(0, input.skillCost ?? 0);
@@ -273,13 +283,16 @@ export function resolveAction(input: ActionResolverInput): ActionResolverResult 
   const buffsApplied = Array.isArray(input.buffIds) ? input.buffIds.filter((buff): buff is string => typeof buff === 'string' && buff.length > 0) : [];
 
   let nextAe = input.aeBefore;
+  let nextRage = actorRage;
   if (input.action === 'basicAttack') nextAe = Number((nextAe + BASIC_ATTACK_AE_GAIN).toFixed(1));
   if (input.action === 'castSkill') nextAe = Number(Math.max(0, nextAe - normalizedSkillCost).toFixed(1));
+  if (input.action === 'castUlt') nextRage = Math.max(0, actorRage - normalizedUltCost);
 
   log.push('validate:ok', 'apply:delta', buffsApplied.length > 0 ? 'apply:buff' : 'apply:no-buff', isTargetDead ? 'death-check:dead' : 'death-check:alive', 'resource:update');
   return {
     ok: true,
     nextAe,
+    nextRage,
     targetHp: afterDeltaHp,
     isTargetDead,
     log,
@@ -299,33 +312,64 @@ export function resolveActionUiEffects(result: ActionResolverResult): ActionUiEf
 
 export function evaluateObjectiveResult(state: MatchState, payload: ObjectiveEvaluationPayload): MatchState {
   if (state.result.status !== 'ongoing') return state;
-  const { aliveByTeam, objectiveState } = payload.context;
-  const playerAlive = Math.max(0, Math.floor(aliveByTeam.player));
-  const enemyAlive = Math.max(0, Math.floor(aliveByTeam.enemy));
-
-  if (state.objectiveMode === 'rescue' && objectiveState?.rescueTargetAlive === false) {
-    return {
-      ...state,
-      result: { status: 'lose', reason: `rescue-failed:${payload.hook}`, winner: 'enemy' },
-    };
-  }
-
-  if (state.objectiveMode === 'boss') {
+   type ObjectiveRuleHandler = (current: MatchState, runtime: ObjectiveEvaluationPayload) => MatchState | null;
+  const eliminationObjectiveHandler: ObjectiveRuleHandler = (current, runtime) => (
+    evaluateMatchResult(current, runtime.context.aliveByTeam)
+  );
+  const rescueObjectiveHandler: ObjectiveRuleHandler = (current, runtime) => {
+    if (runtime.context.objectiveState?.rescueTargetAlive === false) {
+      return {
+        ...current,
+        result: { status: 'lose', reason: `rescue-failed:${runtime.hook}`, winner: 'enemy' },
+      };
+    }
+    return null;
+  };
+  const bossObjectiveHandler: ObjectiveRuleHandler = (current, runtime) => {
+    const { objectiveState, aliveByTeam } = runtime.context;
     if (objectiveState?.bossAlive === false) {
       return {
-        ...state,
-        result: { status: 'win', reason: `boss-eliminated:${payload.hook}`, winner: 'player' },
+       ...current,
+        result: { status: 'win', reason: `boss-eliminated:${runtime.hook}`, winner: 'player' },
       };
     }
-    if (playerAlive <= 0) {
+    if (Math.max(0, Math.floor(aliveByTeam.player)) <= 0) {
       return {
-        ...state,
-        result: { status: 'lose', reason: `boss-player-wiped:${payload.hook}`, winner: 'enemy' },
+        ...current,
+        result: { status: 'lose', reason: `boss-player-wiped:${runtime.hook}`, winner: 'enemy' },
       };
+    }
+  return null;
+  };
+
+  const objectiveFramework: Record<ObjectiveMode, Record<ObjectiveHook, ReadonlyArray<ObjectiveRuleHandler>>> = {
+    elimination: {
+      onTurnStart: [eliminationObjectiveHandler],
+      onAction: [eliminationObjectiveHandler],
+      onTurnEnd: [eliminationObjectiveHandler],
+    },
+    rescue: {
+      onTurnStart: [rescueObjectiveHandler, eliminationObjectiveHandler],
+      onAction: [rescueObjectiveHandler, eliminationObjectiveHandler],
+      onTurnEnd: [rescueObjectiveHandler, eliminationObjectiveHandler],
+    },
+    boss: {
+      onTurnStart: [bossObjectiveHandler, eliminationObjectiveHandler],
+      onAction: [bossObjectiveHandler, eliminationObjectiveHandler],
+      onTurnEnd: [bossObjectiveHandler, eliminationObjectiveHandler],
+    },
+  };
+
+  let next = state;
+  const handlers = objectiveFramework[state.objectiveMode]?.[payload.hook] ?? [];
+  for (const handler of handlers) {
+    const resolved = handler(next, payload);
+    if (resolved) {
+      next = resolved;
+      if (next.result.status !== 'ongoing') return next;
     }
   }
-
-  return evaluateMatchResult(state, aliveByTeam);
+  return next;
 }
 
 export function consumeDecisionTime(state: MatchState, spentMs: number): { state: MatchState; timeout: boolean } {
@@ -402,6 +446,7 @@ export function advanceTurn(state: MatchState): MatchState {
       ...state,
       activeIndexInLineup: nextIndex,
       turn: { hasMoved: false, hasActed: false },
+      inputLocked: false,
       movedTiles: 0,
       unitTimer: {
         ...state.unitTimer,
@@ -430,6 +475,7 @@ export function advanceTurn(state: MatchState): MatchState {
     activeIndexInLineup: 0,
     turnCountPlayer: nextTurnCountPlayer,
     turn: { hasMoved: false, hasActed: false },
+    inputLocked: false,
     movedTiles: 0,
     unitTimer: {
       ...state.unitTimer,

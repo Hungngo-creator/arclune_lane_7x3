@@ -3,6 +3,7 @@ import {
   advanceTurn,
   ANTI_HOARD_AE_DECAY,
   applyActionCommand,
+  applySkipAction,
   canUseCommand,
   chooseFallbackAction,
   consumeDecisionTime,
@@ -23,6 +24,7 @@ describe('chess strategy rpg turn state', () => {
     expect(state.activeTeam).toBe('player');
     expect(state.activeIndexInLineup).toBe(0);
     expect(state.turnCountPlayer).toBe(1);
+    expect(canUseCommand(state, 'endTurn')).toBe(false);
 
     state = recordMove(state, 4);
     expect(state.turn.hasMoved).toBe(true);
@@ -69,6 +71,15 @@ describe('chess strategy rpg turn state', () => {
     expect(canUseCommand(state, 'castUlt', { manualUlt: false, rage: 100, ultCost: 100 })).toBe(false);
     expect(canUseCommand(state, 'castUlt', { manualUlt: true, rage: 99, ultCost: 100 })).toBe(false);
     expect(canUseCommand(state, 'castUlt', { manualUlt: true, rage: 100, ultCost: 100 })).toBe(true);
+  });
+
+  test('supports skip action and locks non-endturn input after action', () => {
+    let state = createInitialMatchState(1);
+    state = applySkipAction(state);
+    expect(state.turn.hasActed).toBe(true);
+    expect(state.inputLocked).toBe(true);
+    expect(canUseCommand(state, 'move')).toBe(false);
+    expect(canUseCommand(state, 'endTurn')).toBe(true);
   });
 
   test('applies anti-hoard AE decay after two team turns without skill', () => {
@@ -145,6 +156,20 @@ describe('chess strategy rpg turn state', () => {
     expect(buffedSkill.ok).toBe(true);
     expect(buffedSkill.log).toContain('apply:buff');
     expect(buffedSkill.buffsApplied).toEqual(['haste']);
+
+    const ultOk = resolveAction({
+      actorTeam: 'player',
+      action: 'castUlt',
+      inRange: true,
+      validTarget: true,
+      aeBefore: 2,
+      actorRage: 100,
+      ultCost: 100,
+      requireManualUlt: true,
+      targetHp: 30,
+    });
+    expect(ultOk.ok).toBe(true);
+    expect(ultOk.nextRage).toBe(0);
   });
 
   test('objective framework hooks rescue and boss', () => {

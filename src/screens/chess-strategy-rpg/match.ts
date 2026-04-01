@@ -13,6 +13,7 @@ import {
   canUseCommand,
   createInitialMatchState,
   applyActionCommand,
+  applySkipAction,
   evaluateObjectiveResult,
   chooseFallbackAction,
   consumeDecisionTime,
@@ -302,6 +303,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     let rescueTargetAlive = true;
     let bossAlive = true;
     let matchState: MatchState = createInitialMatchState(lineupSize, objectiveMode);
+    let unitTurnStartedAtMs = Date.now();
     let selectedUnitId = playerStates[0]?.id ?? null;
     const reachableById = new Map<string, Set<string>>();
     const aliveByTeam = {
@@ -460,13 +462,42 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         return;
       }
 
+      if (command.type === 'skipAction') {
+        if (!canUseCommand(matchState, command.type)) return;
+        matchState = applySkipAction(matchState);
+        return;
+      }
+
       matchState = advanceTurn(matchState);
-      applyCollapseResolution();
       syncMatchResult('onTurnEnd');
       normalizeActiveSlot();
       syncMatchResult('onTurnStart');
       const newActive = resolveActiveUnit();
       selectedUnitId = newActive?.id ?? null;
+      unitTurnStartedAtMs = Date.now();
+    };
+
+    const consumeTurnBudgetOrFallback = (): boolean => {
+      const now = Date.now();
+      const spentMs = Math.max(0, now - unitTurnStartedAtMs);
+      const timed = consumeDecisionTime(matchState, spentMs);
+      matchState = timed.state;
+      unitTurnStartedAtMs = now;
+      if (!timed.timeout) return false;
+      const active = resolveActiveUnit();
+      if (!active) return true;
+      const adjacentTarget = allUnits().find((unit) => unit.team !== active.team && isAdjacent(active, unit));
+      const fallback = chooseFallbackAction(matchState, {
+        hasSafeBasicTarget: Boolean(adjacentTarget),
+        lethalRisk: adjacentTarget ? 0 : 1,
+      });
+      if (fallback.type === 'basicAttack' && adjacentTarget) {
+        executeCommand({ type: 'basicAttack', team: active.team, payload: { targetX: adjacentTarget.x, targetY: adjacentTarget.y } });
+      } else {
+        executeCommand({ type: 'skipAction', team: active.team });
+      }
+      executeCommand({ type: 'endTurn', team: active.team });
+      return true;
     };
 
     const renderBoard = (): void => {
@@ -505,6 +536,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               if (matchState.result.status !== 'ongoing') return;
               if (actingUnit?.team !== 'player') return;
               if (!actingUnit) return;
+              if (consumeTurnBudgetOrFallback()) {
+                prepareReachable();
+                renderHUD();
+                renderBoard();
+                if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
+                  window.setTimeout(processEnemyTurn, 240);
+                }
+                return;
+              }
               const target = allUnits().find((entry) => entry.x === x && entry.y === y);
               if (target) {
                 if (target.id === actingUnit.id) {
@@ -615,6 +655,21 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           !activePlayer || !canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: activePlayer.rage, ultCost: activePlayer.maxRage }) || matchState.result.status !== 'ongoing',
         );
         buildActionButton(
+          'Bỏ qua hành động',
+          () => {
+            if (!activePlayer) return;
+            executeCommand({ type: 'skipAction', team: 'player' });
+            executeCommand({ type: 'endTurn', team: 'player' });
+            prepareReachable();
+            renderHUD();
+            renderBoard();
+            if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
+              window.setTimeout(processEnemyTurn, 240);
+            }
+          },
+          !activePlayer || !canUseCommand(matchState, 'skipAction') || matchState.result.status !== 'ongoing',
+        );
+        buildActionButton(
           'Kết thúc lượt',
           () => {
             if (!activePlayer) return;
@@ -645,6 +700,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       const active = resolveActiveUnit();
       if (!active || active.team !== 'enemy') return;
       if (matchState.result.status !== 'ongoing') return;
+      if (consumeTurnBudgetOrFallback()) {
+        prepareReachable();
+        renderHUD();
+        renderBoard();
+        if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
+          window.setTimeout(processEnemyTurn, 240);
+        }
+        return;
+      }
       const moves = Array.from(reachableById.get(active.id) ?? []);
       if (moves.length > 0) {
         const aiRng = createRngState(hashSeedText(`${seed}:${active.id}:${active.x},${active.y}:${matchState.activeIndexInLineup}`));
@@ -657,7 +721,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps } });
         }
       }
-      const timerStep = consumeDecisionTime(matchState, 8_000);
+      const timerStep = consumeDecisionTime(matchState, 7_600);
       matchState = timerStep.state;
       const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && isAdjacent(active, unit));
       if (timerStep.timeout) {
@@ -667,9 +731,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         });
         if (fallback.type === 'basicAttack' && enemyTarget) {
           executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
+        } else {
+          executeCommand({ type: 'skipAction', team: 'enemy' });
         }
       } else if (enemyTarget) {
         executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
+      } else {
+        executeCommand({ type: 'skipAction', team: 'enemy' });
       }
       executeCommand({ type: 'endTurn', team: 'enemy' });
       prepareReachable();
