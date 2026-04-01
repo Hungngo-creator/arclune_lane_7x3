@@ -8,6 +8,16 @@ import {
   resolveValidSeed,
 } from './battle.ts';
 import { createRngState, nextRngValue } from '../../utils/rng.ts';
+import {
+  advanceTurn,
+  canUseCommand,
+  createInitialMatchState,
+  markActionUsed,
+  recordMove,
+  type MatchCommandType,
+  type MatchState,
+  type TeamId,
+} from './turn-state.ts';
 
 const STYLE_ID = 'chess-strategy-rpg-match-style';
 const MAX_LINEAR_MOVE_STEPS = 6;
@@ -48,6 +58,12 @@ interface UnitState {
   x: number;
   y: number;
   pieces: PieceType[];
+}
+
+interface MatchCommand {
+  readonly type: MatchCommandType;
+  readonly team: TeamId;
+  readonly payload?: Record<string, number>;
 }
 
 const PIECE_LABEL: Record<PieceType, string> = {
@@ -243,9 +259,36 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       .filter((item): item is UnitState => item !== null);
     const unitsState: UnitState[] = [...playerStates, ...enemyStates];
 
-    let turnIndex = 0;
-    let selectedUnitId = unitsState[0]?.id ?? null;
+    const lineupSize = Math.min(playerStates.length, enemyStates.length);
+    let matchState: MatchState = createInitialMatchState(lineupSize);
+    let selectedUnitId = playerStates[0]?.id ?? null;
     const reachableById = new Map<string, Set<string>>();
+    const aliveByTeam = {
+      player: playerStates,
+      enemy: enemyStates,
+    };
+
+    const resolveActiveUnit = (): UnitState | null => {
+      const teamUnits = aliveByTeam[matchState.activeTeam];
+      return teamUnits[matchState.activeIndexInLineup] ?? null;
+    };
+
+    const executeCommand = (command: MatchCommand): void => {
+      const active = resolveActiveUnit();
+      if (!active || command.team !== matchState.activeTeam) return;
+      if (!canUseCommand(matchState, command.type)) return;
+      if (command.type === 'move') {
+        matchState = recordMove(matchState, command.payload?.tileSteps ?? 0);
+        return;
+      }
+      if (command.type === 'basicAttack' || command.type === 'castSkill' || command.type === 'castUlt') {
+        matchState = markActionUsed(matchState);
+        return;
+      }
+      matchState = advanceTurn(matchState);
+      const newActive = resolveActiveUnit();
+      selectedUnitId = newActive?.id ?? null;
+    };
 
     const renderBoard = (): void => {
       boardHost.innerHTML = '';
@@ -271,7 +314,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
             }
           }
 
-          const currentUnit = unitsState[turnIndex] ?? null;
+          const currentUnit = resolveActiveUnit();
           const canMoveTo = currentUnit ? reachableById.get(currentUnit.id)?.has(key) : false;
           if (canMoveTo) {
             cell.classList.add('chess-rpg-match__cell--move');
@@ -279,7 +322,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
           if (board.playable.has(key)) {
             cell.addEventListener('click', () => {
-              const actingUnit = unitsState[turnIndex] ?? null;
+              const actingUnit = resolveActiveUnit();
               if (actingUnit?.team !== 'player') return;
               if (!actingUnit) return;
               const target = unitsState.find((entry) => entry.x === x && entry.y === y);
@@ -292,10 +335,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
                 return;
               }
               if (!reachableById.get(actingUnit.id)?.has(key)) return;
+              const tileSteps = Math.abs(actingUnit.x - x) + Math.abs(actingUnit.y - y);
               actingUnit.x = x;
               actingUnit.y = y;
-              selectedUnitId = actingUnit.id;
-              turnIndex = unitsState.length > 0 ? (turnIndex + 1) % unitsState.length : 0;
+              executeCommand({ type: 'move', team: 'player', payload: { tileSteps } });
+              executeCommand({ type: 'endTurn', team: 'player' });
               prepareReachable();
               renderHUD();
               renderBoard();
@@ -307,12 +351,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     };
 
    const renderHUD = (): void => {
-      const active = unitsState[turnIndex] ?? null;
+      const active = resolveActiveUnit();
       if (turnHost instanceof HTMLElement) {
         turnHost.textContent = active
           ? active.team === 'player'
-            ? `Đến lượt ${active.label}. Chọn ô xanh lá để di chuyển, xong sẽ tự qua lượt tiếp theo.`
-            : `Đến lượt ${active.label} (AI). AI sẽ tự đi nước hợp lệ ngẫu nhiên.`
+            ? `Pha Player · lượt ${matchState.turnCountPlayer} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}).`
+            : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
             : 'Không có nhân vật khả dụng.';
       }
   if (piecesHost instanceof HTMLElement) {
@@ -330,7 +374,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
     const prepareReachable = (): void => {
       reachableById.clear();
-      const active = unitsState[turnIndex] ?? null;
+      const active = resolveActiveUnit();
       if (!active) return;
       const occupied = new Set(unitsState.map((unit) => keyOf(unit.x, unit.y)));
       occupied.delete(keyOf(active.x, active.y));
@@ -338,23 +382,26 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     };
 
     const processEnemyTurn = (): void => {
-      const active = unitsState[turnIndex] ?? null;
+      const active = resolveActiveUnit();
       if (!active || active.team !== 'enemy') return;
       const moves = Array.from(reachableById.get(active.id) ?? []);
       if (moves.length > 0) {
-        const aiRng = createRngState(hashSeedText(`${seed}:${active.id}:${active.x},${active.y}:${turnIndex}`));
+        const aiRng = createRngState(hashSeedText(`${seed}:${active.id}:${active.x},${active.y}:${matchState.activeIndexInLineup}`));
         const picked = moves[Math.floor(nextRngValue(aiRng) * moves.length)] ?? null;
         const parsed = picked ? parseKey(picked) : null;
         if (parsed) {
+          const tileSteps = Math.abs(active.x - parsed.x) + Math.abs(active.y - parsed.y);
           active.x = parsed.x;
           active.y = parsed.y;
+          executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps } });
         }
       }
-      turnIndex = unitsState.length > 0 ? (turnIndex + 1) % unitsState.length : 0;
+      executeCommand({ type: 'basicAttack', team: 'enemy' });
+      executeCommand({ type: 'endTurn', team: 'enemy' });
       prepareReachable();
       renderHUD();
       renderBoard();
-      if ((unitsState[turnIndex]?.team ?? 'player') === 'enemy') {
+      if (matchState.activeTeam === 'enemy') {
         window.setTimeout(processEnemyTurn, 240);
       }
     };
@@ -362,7 +409,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     prepareReachable();
     renderHUD();
     renderBoard();
-    if ((unitsState[turnIndex]?.team ?? 'player') === 'enemy') {
+    if (matchState.activeTeam === 'enemy') {
       window.setTimeout(processEnemyTurn, 240);
     }
   }
