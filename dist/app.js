@@ -19548,6 +19548,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       maxRage: 100,
                       skillCost: 4,
                       pieces: randomPieces(seed, unit.id),
+                      slotIndex: index,
                   }
                   : null;
           })
@@ -19571,11 +19572,12 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       maxRage: 100,
                       skillCost: 4,
                       pieces: randomPieces(`${seed}:enemy`, unit.id),
+                      slotIndex: index,
                   }
                   : null;
           })
               .filter((item) => item !== null);
-          const lineupSize = Math.min(playerStates.length, enemyStates.length);
+          const lineupSize = Math.min(4, Math.max(playerSlots.length, enemySlots.length));
           let matchState = createInitialMatchState(lineupSize);
           let selectedUnitId = playerStates[0]?.id ?? null;
           const reachableById = new Map();
@@ -19585,20 +19587,38 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           };
           const resolveActiveUnit = () => {
               const teamUnits = aliveByTeam[matchState.activeTeam];
-              return teamUnits[matchState.activeIndexInLineup] ?? null;
+              return teamUnits.find((unit) => unit.slotIndex === matchState.activeIndexInLineup && unit.hp > 0) ?? null;
           };
-          const allUnits = () => [...aliveByTeam.player, ...aliveByTeam.enemy];
+          const allUnits = () => [...aliveByTeam.player, ...aliveByTeam.enemy].filter((unit) => unit.hp > 0);
           const removeDeadUnits = () => {
               for (const team of ['player', 'enemy']) {
-                  const survivors = aliveByTeam[team].filter((unit) => unit.hp > 0);
-                  aliveByTeam[team].splice(0, aliveByTeam[team].length, ...survivors);
+                  for (const unit of aliveByTeam[team]) {
+                      if (unit.hp <= 0)
+                          unit.hp = 0;
+                  }
               }
           };
           const syncMatchResult = () => {
               matchState = evaluateMatchResult(matchState, {
-                  player: aliveByTeam.player.length,
-                  enemy: aliveByTeam.enemy.length,
+                  player: aliveByTeam.player.filter((unit) => unit.hp > 0).length,
+                  enemy: aliveByTeam.enemy.filter((unit) => unit.hp > 0).length,
               });
+          };
+          const normalizeActiveSlot = () => {
+              if (matchState.result.status !== 'ongoing')
+                  return;
+              let guard = 0;
+              const maxGuard = Math.max(1, lineupSize * 4);
+              while (!resolveActiveUnit() && guard < maxGuard) {
+                  const nextState = advanceTurn(matchState);
+                  if (nextState === matchState)
+                      break;
+                  matchState = nextState;
+                  guard += 1;
+                  syncMatchResult();
+                  if (matchState.result.status !== 'ongoing')
+                      return;
+              }
           };
           const basicDamage = (attacker, defender) => Math.max(1, Math.floor(attacker.atk - defender.arm));
           const isAdjacent = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1;
@@ -19647,6 +19667,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               }
               matchState = advanceTurn(matchState);
               syncMatchResult();
+              normalizeActiveSlot();
               const newActive = resolveActiveUnit();
               selectedUnitId = newActive?.id ?? null;
           };
@@ -19829,7 +19850,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps } });
                   }
               }
-              const enemyTarget = aliveByTeam.player.find((unit) => isAdjacent(active, unit));
+              const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && isAdjacent(active, unit));
               if (enemyTarget) {
                   executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
               }
@@ -19841,6 +19862,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   window.setTimeout(processEnemyTurn, 240);
               }
           };
+          normalizeActiveSlot();
           prepareReachable();
           renderHUD();
           renderBoard();

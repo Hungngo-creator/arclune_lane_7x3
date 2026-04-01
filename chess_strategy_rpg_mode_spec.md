@@ -291,5 +291,5 @@
 
 ## 16) One-line Summary for Future Chat Context
 
-Mode này là tactical PvE 4v4 theo turn với thứ tự lineup cố định, mỗi char move+1 action trong 8s có bank time phe, dùng AE bể chung (decimal, anti-hoard decay), Rage riêng để manual ultimate, map seed near-symmetry có shrink từ turn 4, turn cap player 7, có rescue/boss event, summon cap 3 và AI công bằng theo personality random có hiển thị trước trận.
+Mode này là tactical PvE 4v4 theo turn với thứ tự lineup cố định, mỗi char move+1 action trong 8s có bank time phe, dùng AE bể chung (decimal, anti-hoard decay), Rage riêng để manual ultimate, map seed near-symmetry có shrink từ turn 4, turn cap player 9, có rescue/boss event, summon cap 3 và AI công bằng theo personality random có hiển thị trước trận.
 

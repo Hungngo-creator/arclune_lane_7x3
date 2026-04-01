@@ -71,6 +71,7 @@ interface UnitState {
   maxRage: number;
   skillCost: number;
   pieces: PieceType[];
+  slotIndex: number;
 }
 
 interface MatchCommand {
@@ -261,6 +262,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               maxRage: 100,
               skillCost: 4,
               pieces: randomPieces(seed, unit.id),
+              slotIndex: index,
             }
           : null;
       })
@@ -284,11 +286,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               maxRage: 100,
               skillCost: 4,
               pieces: randomPieces(`${seed}:enemy`, unit.id),
+              slotIndex: index,
             }
           : null;
       })
       .filter((item): item is UnitState => item !== null);
-    const lineupSize = Math.min(playerStates.length, enemyStates.length);
+    const lineupSize = Math.min(4, Math.max(playerSlots.length, enemySlots.length));
     let matchState: MatchState = createInitialMatchState(lineupSize);
     let selectedUnitId = playerStates[0]?.id ?? null;
     const reachableById = new Map<string, Set<string>>();
@@ -299,22 +302,37 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
     const resolveActiveUnit = (): UnitState | null => {
       const teamUnits = aliveByTeam[matchState.activeTeam];
-      return teamUnits[matchState.activeIndexInLineup] ?? null;
+      return teamUnits.find((unit) => unit.slotIndex === matchState.activeIndexInLineup && unit.hp > 0) ?? null;
     };
 
-    const allUnits = (): UnitState[] => [...aliveByTeam.player, ...aliveByTeam.enemy];
+    const allUnits = (): UnitState[] => [...aliveByTeam.player, ...aliveByTeam.enemy].filter((unit) => unit.hp > 0);
 
     const removeDeadUnits = (): void => {
       for (const team of ['player', 'enemy'] as const) {
-        const survivors = aliveByTeam[team].filter((unit) => unit.hp > 0);
-        aliveByTeam[team].splice(0, aliveByTeam[team].length, ...survivors);
+        for (const unit of aliveByTeam[team]) {
+          if (unit.hp <= 0) unit.hp = 0;
+        }
       }
     };
     const syncMatchResult = (): void => {
       matchState = evaluateMatchResult(matchState, {
-        player: aliveByTeam.player.length,
-        enemy: aliveByTeam.enemy.length,
+        player: aliveByTeam.player.filter((unit) => unit.hp > 0).length,
+        enemy: aliveByTeam.enemy.filter((unit) => unit.hp > 0).length,
       });
+    };
+
+    const normalizeActiveSlot = (): void => {
+      if (matchState.result.status !== 'ongoing') return;
+      let guard = 0;
+      const maxGuard = Math.max(1, lineupSize * 4);
+      while (!resolveActiveUnit() && guard < maxGuard) {
+        const nextState = advanceTurn(matchState);
+        if (nextState === matchState) break;
+        matchState = nextState;
+        guard += 1;
+        syncMatchResult();
+        if (matchState.result.status !== 'ongoing') return;
+      }
     };
 
     const basicDamage = (attacker: UnitState, defender: UnitState): number => Math.max(1, Math.floor(attacker.atk - defender.arm));
@@ -366,6 +384,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
       matchState = advanceTurn(matchState);
       syncMatchResult();
+      normalizeActiveSlot();
       const newActive = resolveActiveUnit();
       selectedUnitId = newActive?.id ?? null;
     };
@@ -557,7 +576,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps } });
         }
       }
-      const enemyTarget = aliveByTeam.player.find((unit) => isAdjacent(active, unit));
+      const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && isAdjacent(active, unit));
       if (enemyTarget) {
         executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
       }
@@ -570,6 +589,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       }
     };
 
+    normalizeActiveSlot();
     prepareReachable();
     renderHUD();
     renderBoard();
