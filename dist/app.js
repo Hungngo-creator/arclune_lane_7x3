@@ -19083,6 +19083,7 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
           return {
               id: unitId,
               name: resolvedName,
+              classId: typeof meta?.class === 'string' ? meta.class : 'Warrior',
               rank: typeof meta?.rank === 'string' ? meta.rank : 'N',
               hp: Math.max(1, Math.floor(base.hpMax * ratio)),
               atk: Math.max(1, Math.floor(base.atk * ratio)),
@@ -19125,6 +19126,7 @@ __modules['./screens/chess-strategy-rpg/battle.ts'] = (exports, module, __requir
           return {
               id: pickedId,
               name: typeof picked?.name === 'string' ? picked.name : `Enemy ${index + 1}`,
+              classId: typeof picked?.class === 'string' ? picked.class : 'Warrior',
               rank: typeof picked?.rank === 'string' ? picked.rank : rankKey,
               hp: Math.max(1, Math.floor(baseUnit.hpMax * ratio)),
               atk: Math.max(1, Math.floor(baseUnit.atk * ratio)),
@@ -19359,7 +19361,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const resolveAction = __dep3.resolveAction;
   const resolveActionUiEffects = __dep3.resolveActionUiEffects;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
-  const MAX_LINEAR_MOVE_STEPS = 6;
+  const CARDINAL_DIRS = Object.freeze([{ dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 }]);
   const CSS = /* css */ `
     .app--chess-strategy-rpg-match{min-height:100dvh;padding:16px;box-sizing:border-box;}
     .chess-rpg-match{max-width:1320px;margin:0 auto;min-height:calc(100dvh - 32px);border-radius:20px;border:1px solid rgba(126,208,255,.3);background:linear-gradient(170deg,rgba(8,18,31,.98),rgba(14,35,57,.92));padding:18px;color:#e7f3ff;display:grid;gap:14px;}
@@ -19384,10 +19386,14 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
     .chess-rpg-match__action-btn:disabled{opacity:.45;cursor:not-allowed;}
     .chess-rpg-match__result{padding:10px 12px;border-radius:10px;border:1px solid rgba(247,192,124,.6);background:rgba(76,38,19,.4);font-size:13px;color:#ffe4ca;}
   `;
-  const PIECE_LABEL = {
-      rook: 'Xe',
-      knight: 'Ngựa',
-      bishop: 'Tượng',
+  const CLASS_PROFILE = {
+      tanker: { move: 3, basicRange: 1 },
+      warrior: { move: 3, basicRange: 1 },
+      assassin: { move: 4, basicRange: 1, zocImmune: true },
+      mage: { move: 3, basicRange: 2 },
+      support: { move: 3, basicRange: 2 },
+      summoner: { move: 3, basicRange: 2 },
+      ranger: { move: 3, basicRange: 3 },
   };
   function hashSeedText(seedText) {
       let hash = 2166136261 >>> 0;
@@ -19414,74 +19420,60 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           return null;
       return { x, y };
   }
-  function randomPieces(seed, unitId) {
-      const pool = ['rook', 'knight', 'bishop'];
-      const rng = createRngState(hashSeedText(`${seed}:${unitId}`));
-      const picks = [];
-      for (let i = 0; i < 3; i += 1) {
-          const index = Math.floor(nextRngValue(rng) * pool.length);
-          picks.push(pool[index] ?? 'rook');
-      }
-      return picks;
+  function resolveClassProfile(classId) {
+      const normalized = classId.trim().toLowerCase();
+      const profile = CLASS_PROFILE[normalized] ?? CLASS_PROFILE.warrior ?? { move: 3, basicRange: 1 };
+      return {
+          move: profile.move,
+          basicRange: profile.basicRange,
+          zocImmune: Boolean(profile.zocImmune),
+      };
   }
-  function collectLinearMoves(origin, vectors, playable, occupied) {
-      const moves = [];
-      for (const vector of vectors) {
-          for (let step = 1; step <= MAX_LINEAR_MOVE_STEPS; step += 1) {
-              const x = origin.x + vector.dx * step;
-              const y = origin.y + vector.dy * step;
-              const key = keyOf(x, y);
-              if (!playable.has(key))
-                  break;
-              if (occupied.has(key))
-                  break;
-              moves.push(key);
-          }
+  function hasEnemyZoc(unit, x, y, all) {
+      if (unit.zocImmune)
+          return false;
+      for (const other of all) {
+          if (other.hp <= 0 || other.team === unit.team)
+              continue;
+          if (Math.abs(other.x - x) + Math.abs(other.y - y) === 1)
+              return true;
       }
-      return moves;
+      return false;
   }
-  function resolveReachableCells(unit, playable, occupied) {
-      const unique = new Set();
-      const origin = { x: unit.x, y: unit.y };
-      for (const piece of unit.pieces) {
-          if (piece === 'rook') {
-              const options = collectLinearMoves(origin, [
-                  { dx: 1, dy: 0 },
-                  { dx: -1, dy: 0 },
-                  { dx: 0, dy: 1 },
-                  { dx: 0, dy: -1 },
-              ], playable, occupied);
-              options.forEach((move) => unique.add(move));
+  function findShortestPaths(unit, playable, occupied, all) {
+      const startKey = keyOf(unit.x, unit.y);
+      const queue = [{ x: unit.x, y: unit.y, cost: 0, path: [startKey] }];
+      const best = new Map([[startKey, 0]]);
+      const paths = new Map([[startKey, [startKey]]]);
+      while (queue.length > 0) {
+          const node = queue.shift();
+          if (!node)
               continue;
-          }
-          if (piece === 'bishop') {
-              const options = collectLinearMoves(origin, [
-                  { dx: 1, dy: 1 },
-                  { dx: 1, dy: -1 },
-                  { dx: -1, dy: 1 },
-                  { dx: -1, dy: -1 },
-              ], playable, occupied);
-              options.forEach((move) => unique.add(move));
-              continue;
-          }
-          const knightOffsets = [
-              { dx: 1, dy: 2 },
-              { dx: 1, dy: -2 },
-              { dx: -1, dy: 2 },
-              { dx: -1, dy: -2 },
-              { dx: 2, dy: 1 },
-              { dx: 2, dy: -1 },
-              { dx: -2, dy: 1 },
-              { dx: -2, dy: -1 },
-          ];
-          for (const offset of knightOffsets) {
-              const targetKey = keyOf(origin.x + offset.dx, origin.y + offset.dy);
-              if (!playable.has(targetKey) || occupied.has(targetKey))
+          for (const dir of CARDINAL_DIRS) {
+              const nx = node.x + dir.dx;
+              const ny = node.y + dir.dy;
+              const key = keyOf(nx, ny);
+              if (!playable.has(key) || occupied.has(key))
                   continue;
-              unique.add(targetKey);
+              let cost = 1;
+              if (hasEnemyZoc(unit, node.x, node.y, all) && !hasEnemyZoc(unit, nx, ny, all))
+                  cost += 1;
+              if (hasEnemyZoc(unit, nx, ny, all))
+                  cost = unit.moveRange + 1;
+              const nextCost = node.cost + cost;
+              if (nextCost > unit.moveRange)
+                  continue;
+              const currentBest = best.get(key);
+              if (currentBest != null && currentBest <= nextCost)
+                  continue;
+              best.set(key, nextCost);
+              const nextPath = [...node.path, key];
+              paths.set(key, nextPath);
+              queue.push({ x: nx, y: ny, cost: nextCost, path: nextPath });
           }
       }
-      return unique;
+      paths.delete(startKey);
+      return paths;
   }
   function renderScreen(context) {
       const { root, shell = null, params = null } = context;
@@ -19538,10 +19530,12 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               .slice(0, playerSlots.length)
               .map((unit, index) => {
               const parsed = parseKey(playerSlots[index] ?? '');
+              const classProfile = resolveClassProfile(unit.classId);
               return parsed
                   ? {
                       id: unit.id,
                       label: `P${index + 1}`,
+                      classId: unit.classId,
                       team: 'player',
                       x: parsed.x,
                       y: parsed.y,
@@ -19552,7 +19546,9 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       rage: 0,
                       maxRage: 100,
                       skillCost: 4,
-                      pieces: randomPieces(seed, unit.id),
+                      moveRange: classProfile.move,
+                      basicRange: classProfile.basicRange,
+                      zocImmune: classProfile.zocImmune,
                       slotIndex: index,
                   }
                   : null;
@@ -19562,10 +19558,12 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               .slice(0, enemySlots.length)
               .map((unit, index) => {
               const parsed = parseKey(enemySlots[index] ?? '');
+              const classProfile = resolveClassProfile(unit.classId);
               return parsed
                   ? {
                       id: `${unit.id}#${index + 1}`,
                       label: `E${index + 1}`,
+                      classId: unit.classId,
                       team: 'enemy',
                       x: parsed.x,
                       y: parsed.y,
@@ -19576,7 +19574,9 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       rage: 0,
                       maxRage: 100,
                       skillCost: 4,
-                      pieces: randomPieces(`${seed}:enemy`, unit.id),
+                      moveRange: classProfile.move,
+                      basicRange: classProfile.basicRange,
+                      zocImmune: classProfile.zocImmune,
                       slotIndex: index,
                   }
                   : null;
@@ -19640,17 +19640,18 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               }
           };
           const basicDamage = (attacker, defender) => Math.max(1, Math.floor(attacker.atk - defender.arm));
+          const aiProfileRoll = nextRngValue(createRngState(hashSeedText(`${seed}:ai-profile`)));
+          const aiProfile = aiProfileRoll < 0.2 ? 'Aggressive' : aiProfileRoll < 0.4 ? 'Defensive' : 'Neutral';
           const distance = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-          const isAdjacent = (a, b) => distance(a, b) === 1;
-          const resolveActionRange = (action) => {
+          const resolveActionRange = (actor, action) => {
               if (action === 'basicAttack')
-                  return 1;
+                  return Math.max(1, actor.basicRange);
               if (action === 'castSkill')
                   return 2;
               return 3;
           };
           const resolveDefaultTarget = (actor, action) => {
-              const range = resolveActionRange(action);
+              const range = resolveActionRange(actor, action);
               const enemies = allUnits().filter((unit) => unit.team !== actor.team);
               let picked = null;
               let bestDistance = Number.POSITIVE_INFINITY;
@@ -19683,6 +19684,16 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               }
               removeDeadUnits();
           };
+          const hasRescueLethalThreat = () => {
+              if (matchState.objectiveMode !== 'rescue')
+                  return false;
+              const rescueUnit = aliveByTeam.player[0];
+              if (!rescueUnit || rescueUnit.hp <= 0)
+                  return false;
+              return aliveByTeam.enemy.some((enemy) => (enemy.hp > 0
+                  && distance(enemy, rescueUnit) <= enemy.basicRange
+                  && basicDamage(enemy, rescueUnit) >= rescueUnit.hp));
+          };
           const executeCommand = (command) => {
               const active = resolveActiveUnit();
               if (!active || command.team !== matchState.activeTeam)
@@ -19706,7 +19717,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   const targetY = command.payload?.targetY;
                   const explicitTarget = allUnits().find((unit) => unit.team !== active.team && unit.x === targetX && unit.y === targetY) ?? null;
                   const target = explicitTarget ?? resolveDefaultTarget(active, actionType);
-                  const actionRange = resolveActionRange(actionType);
+                  const actionRange = resolveActionRange(active, actionType);
                   const hasValidTarget = Boolean(target);
                   const inRange = target ? distance(active, target) <= actionRange : false;
                   if (actionType === 'castSkill' && !canUseCommand(matchState, actionType, { skillCost: active.skillCost }))
@@ -19791,13 +19802,13 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               const active = resolveActiveUnit();
               if (!active)
                   return true;
-              const adjacentTarget = allUnits().find((unit) => unit.team !== active.team && isAdjacent(active, unit));
+              const inBasicRangeTarget = allUnits().find((unit) => unit.team !== active.team && distance(active, unit) <= active.basicRange);
               const fallback = chooseFallbackAction(matchState, {
-                  hasSafeBasicTarget: Boolean(adjacentTarget),
-                  lethalRisk: adjacentTarget ? 0 : 1,
+                  hasSafeBasicTarget: Boolean(inBasicRangeTarget),
+                  lethalRisk: inBasicRangeTarget ? 0 : 1,
               });
-              if (fallback.type === 'basicAttack' && adjacentTarget) {
-                  executeCommand({ type: 'basicAttack', team: active.team, payload: { targetX: adjacentTarget.x, targetY: adjacentTarget.y } });
+              if (fallback.type === 'basicAttack' && inBasicRangeTarget) {
+                  executeCommand({ type: 'basicAttack', team: active.team, payload: { targetX: inBasicRangeTarget.x, targetY: inBasicRangeTarget.y } });
               }
               else {
                   executeCommand({ type: 'skipAction', team: active.team });
@@ -19869,9 +19880,10 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                                   }
                                   return;
                               }
-                              if (!reachableById.get(actingUnit.id)?.has(key))
+                              const path = reachableById.get(actingUnit.id)?.get(key);
+                              if (!path)
                                   return;
-                              const tileSteps = Math.abs(actingUnit.x - x) + Math.abs(actingUnit.y - y);
+                              const tileSteps = Math.max(1, path.length - 1);
                               actingUnit.x = x;
                               actingUnit.y = y;
                               executeCommand({ type: 'move', team: 'player', payload: { tileSteps } });
@@ -19888,9 +19900,10 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               const active = resolveActiveUnit();
               if (turnHost instanceof HTMLElement) {
                   const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : matchState.objectiveMode === 'rescue' ? 'Objective: Bảo vệ mục tiêu giải cứu' : 'Objective: Hạ boss';
+                  const missionAlert = hasRescueLethalThreat() ? ' | 🚨 Cảnh báo: NPC có nguy cơ bị kết liễu lượt kế.' : '';
                   turnHost.textContent = active
                       ? active.team === 'player'
-                          ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel} · Move:${matchState.turn.hasMoved ? 'xong' : 'chưa'} · Action:${matchState.turn.hasActed ? 'xong' : 'chưa'} · Timer:${Math.ceil(matchState.unitTimer.remainingMs / 1000)}s + Bank ${Math.ceil(matchState.resources.player.bankTimeMs / 1000)}s.`
+                          ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel}${missionAlert} · Move:${matchState.turn.hasMoved ? 'xong' : 'chưa'} · Action:${matchState.turn.hasActed ? 'xong' : 'chưa'} · Timer:${Math.ceil(matchState.unitTimer.remainingMs / 1000)}s + Bank ${Math.ceil(matchState.resources.player.bankTimeMs / 1000)}s.`
                           : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
                       : 'Không có nhân vật khả dụng.';
               }
@@ -19902,14 +19915,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
                       const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
                       status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
-                      status.textContent = `AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'}`;
+                      status.textContent = `Class ${active.classId} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}`;
                       piecesHost.appendChild(status);
-                      active.pieces.forEach((piece) => {
-                          const pill = document.createElement('span');
-                          pill.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
-                          pill.textContent = PIECE_LABEL[piece];
-                          piecesHost.appendChild(pill);
-                      });
                   }
               }
               if (resultHost instanceof HTMLElement) {
@@ -19987,7 +19994,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   return;
               const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
               occupied.delete(keyOf(active.x, active.y));
-              reachableById.set(active.id, resolveReachableCells(active, board.playable, occupied));
+              reachableById.set(active.id, findShortestPaths(active, board.playable, occupied, allUnits()));
           };
           const processEnemyTurn = () => {
               const active = resolveActiveUnit();
@@ -20004,21 +20011,32 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   }
                   return;
               }
-              const moves = Array.from(reachableById.get(active.id) ?? []);
-              if (moves.length > 0) {
-                  const aiRng = createRngState(hashSeedText(`${seed}:${active.id}:${active.x},${active.y}:${matchState.activeIndexInLineup}`));
-                  const picked = moves[Math.floor(nextRngValue(aiRng) * moves.length)] ?? null;
-                  const parsed = picked ? parseKey(picked) : null;
-                  if (parsed) {
-                      const tileSteps = Math.abs(active.x - parsed.x) + Math.abs(active.y - parsed.y);
+              const moves = Array.from(reachableById.get(active.id)?.entries() ?? []);
+              const enemies = aliveByTeam.player.filter((unit) => unit.hp > 0);
+              if (moves.length > 0 && enemies.length > 0) {
+                  let bestMove = null;
+                  for (const [key, path] of moves) {
+                      const parsed = parseKey(key);
+                      if (!parsed)
+                          continue;
+                      const nearest = enemies.reduce((min, enemy) => Math.min(min, Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y)), Number.POSITIVE_INFINITY);
+                      const defensiveBias = aiProfile === 'Defensive' ? active.hp / Math.max(1, active.maxHp) : 0;
+                      const aggressiveBias = aiProfile === 'Aggressive' ? 1.3 : aiProfile === 'Neutral' ? 1 : 0.7;
+                      const score = aggressiveBias * (10 - nearest) + defensiveBias * 2 - path.length * 0.05;
+                      if (!bestMove || score > bestMove.score) {
+                          bestMove = { key, score, steps: Math.max(1, path.length - 1) };
+                      }
+                  }
+                  const parsed = bestMove ? parseKey(bestMove.key) : null;
+                  if (parsed && bestMove) {
                       active.x = parsed.x;
                       active.y = parsed.y;
-                      executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps } });
+                      executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps: bestMove.steps } });
                   }
               }
               const timerStep = consumeDecisionTime(matchState, 7_600);
               matchState = timerStep.state;
-              const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && isAdjacent(active, unit));
+              const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && distance(active, unit) <= active.basicRange);
               if (timerStep.timeout) {
                   const fallback = chooseFallbackAction(matchState, {
                       hasSafeBasicTarget: Boolean(enemyTarget),

@@ -64,6 +64,7 @@ interface RenderContext {
 export interface BattleUnit {
   id: string;
   name: string;
+  classId: string;
   rank: string;
   hp: number;
   atk: number;
@@ -212,6 +213,7 @@ export function resolvePlayerUnits(targetRealm: number): BattleUnit[] {
     return {
       id: unitId,
       name: resolvedName,
+      classId: typeof meta?.class === 'string' ? meta.class : 'Warrior',
       rank: typeof meta?.rank === 'string' ? meta.rank : 'N',
       hp: Math.max(1, Math.floor(base.hpMax * ratio)),
       atk: Math.max(1, Math.floor(base.atk * ratio)),
@@ -257,6 +259,7 @@ export function resolveEnemyUnitsForChess(targetRealm: number, seedText: string,
     return {
       id: pickedId,
       name: typeof picked?.name === 'string' ? picked.name : `Enemy ${index + 1}`,
+      classId: typeof picked?.class === 'string' ? picked.class : 'Warrior',
       rank: typeof picked?.rank === 'string' ? picked.rank : rankKey,
       hp: Math.max(1, Math.floor(baseUnit.hpMax * ratio)),
       atk: Math.max(1, Math.floor(baseUnit.atk * ratio)),

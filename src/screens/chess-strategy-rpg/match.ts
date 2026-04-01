@@ -28,7 +28,7 @@ import {
 } from './turn-state.ts';
 
 const STYLE_ID = 'chess-strategy-rpg-match-style';
-const MAX_LINEAR_MOVE_STEPS = 6;
+const CARDINAL_DIRS = Object.freeze([{ dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 }]);
 
 const CSS = /* css */ `
   .app--chess-strategy-rpg-match{min-height:100dvh;padding:16px;box-sizing:border-box;}
@@ -61,11 +61,12 @@ interface RenderContext {
   readonly params?: Record<string, unknown> | null;
 }
 
-type PieceType = 'rook' | 'knight' | 'bishop';
+type TacticalAiProfile = 'Neutral' | 'Aggressive' | 'Defensive';
 
 interface UnitState {
   id: string;
   label: string;
+  classId: string;
   team: 'player' | 'enemy';
   x: number;
   y: number;
@@ -76,7 +77,9 @@ interface UnitState {
   rage: number;
   maxRage: number;
   skillCost: number;
-  pieces: PieceType[];
+  moveRange: number;
+  basicRange: number;
+  zocImmune: boolean;
   slotIndex: number;
 }
 
@@ -86,10 +89,14 @@ interface MatchCommand {
   readonly payload?: Record<string, number>;
 }
 
-const PIECE_LABEL: Record<PieceType, string> = {
-  rook: 'Xe',
-  knight: 'Ngựa',
-  bishop: 'Tượng',
+const CLASS_PROFILE: Record<string, { move: number; basicRange: number; zocImmune?: boolean }> = {
+  tanker: { move: 3, basicRange: 1 },
+  warrior: { move: 3, basicRange: 1 },
+  assassin: { move: 4, basicRange: 1, zocImmune: true },
+  mage: { move: 3, basicRange: 2 },
+  support: { move: 3, basicRange: 2 },
+  summoner: { move: 3, basicRange: 2 },
+  ranger: { move: 3, basicRange: 3 },
 };
 
 function hashSeedText(seedText: string): number {
@@ -119,78 +126,53 @@ function parseKey(key: string): { x: number; y: number } | null {
   return { x, y };
 }
 
-function randomPieces(seed: string, unitId: string): PieceType[] {
-  const pool: PieceType[] = ['rook', 'knight', 'bishop'];
-  const rng = createRngState(hashSeedText(`${seed}:${unitId}`));
-  const picks: PieceType[] = [];
-  for (let i = 0; i < 3; i += 1) {
-    const index = Math.floor(nextRngValue(rng) * pool.length);
-    picks.push(pool[index] ?? 'rook');
-  }
-  return picks;
+function resolveClassProfile(classId: string): { move: number; basicRange: number; zocImmune: boolean } {
+  const normalized = classId.trim().toLowerCase();
+  const profile = CLASS_PROFILE[normalized] ?? CLASS_PROFILE.warrior ?? { move: 3, basicRange: 1 };
+  return {
+    move: profile.move,
+    basicRange: profile.basicRange,
+    zocImmune: Boolean(profile.zocImmune),
+  };
 }
 
-function collectLinearMoves(
-  origin: { x: number; y: number },
-  vectors: Array<{ dx: number; dy: number }>,
-  playable: Set<string>,
-  occupied: Set<string>,
-): string[] {
-  const moves: string[] = [];
-  for (const vector of vectors) {
-    for (let step = 1; step <= MAX_LINEAR_MOVE_STEPS; step += 1) {
-      const x = origin.x + vector.dx * step;
-      const y = origin.y + vector.dy * step;
-      const key = keyOf(x, y);
-      if (!playable.has(key)) break;
-      if (occupied.has(key)) break;
-      moves.push(key);
-    }
+function hasEnemyZoc(unit: UnitState, x: number, y: number, all: UnitState[]): boolean {
+  if (unit.zocImmune) return false;
+  for (const other of all) {
+    if (other.hp <= 0 || other.team === unit.team) continue;
+    if (Math.abs(other.x - x) + Math.abs(other.y - y) === 1) return true;
   }
-  return moves;
+  return false;
 }
 
-function resolveReachableCells(unit: UnitState, playable: Set<string>, occupied: Set<string>): Set<string> {
-  const unique = new Set<string>();
-  const origin = { x: unit.x, y: unit.y };
-  for (const piece of unit.pieces) {
-    if (piece === 'rook') {
-      const options = collectLinearMoves(origin, [
-        { dx: 1, dy: 0 },
-        { dx: -1, dy: 0 },
-        { dx: 0, dy: 1 },
-        { dx: 0, dy: -1 },
-      ], playable, occupied);
-      options.forEach((move) => unique.add(move));
-      continue;
-    }
-    if (piece === 'bishop') {
-      const options = collectLinearMoves(origin, [
-        { dx: 1, dy: 1 },
-        { dx: 1, dy: -1 },
-        { dx: -1, dy: 1 },
-        { dx: -1, dy: -1 },
-      ], playable, occupied);
-      options.forEach((move) => unique.add(move));
-      continue;
-    }
-    const knightOffsets = [
-      { dx: 1, dy: 2 },
-      { dx: 1, dy: -2 },
-      { dx: -1, dy: 2 },
-      { dx: -1, dy: -2 },
-      { dx: 2, dy: 1 },
-      { dx: 2, dy: -1 },
-      { dx: -2, dy: 1 },
-      { dx: -2, dy: -1 },
-    ];
-    for (const offset of knightOffsets) {
-      const targetKey = keyOf(origin.x + offset.dx, origin.y + offset.dy);
-      if (!playable.has(targetKey) || occupied.has(targetKey)) continue;
-      unique.add(targetKey);
+function findShortestPaths(unit: UnitState, playable: Set<string>, occupied: Set<string>, all: UnitState[]): Map<string, string[]> {
+  const startKey = keyOf(unit.x, unit.y);
+  const queue: Array<{ x: number; y: number; cost: number; path: string[] }> = [{ x: unit.x, y: unit.y, cost: 0, path: [startKey] }];
+  const best = new Map<string, number>([[startKey, 0]]);
+  const paths = new Map<string, string[]>([[startKey, [startKey]]]);
+  while (queue.length > 0) {
+    const node = queue.shift();
+    if (!node) continue;
+    for (const dir of CARDINAL_DIRS) {
+      const nx = node.x + dir.dx;
+      const ny = node.y + dir.dy;
+      const key = keyOf(nx, ny);
+      if (!playable.has(key) || occupied.has(key)) continue;
+      let cost = 1;
+      if (hasEnemyZoc(unit, node.x, node.y, all) && !hasEnemyZoc(unit, nx, ny, all)) cost += 1;
+      if (hasEnemyZoc(unit, nx, ny, all)) cost = unit.moveRange + 1;
+      const nextCost = node.cost + cost;
+      if (nextCost > unit.moveRange) continue;
+      const currentBest = best.get(key);
+      if (currentBest != null && currentBest <= nextCost) continue;
+      best.set(key, nextCost);
+      const nextPath = [...node.path, key];
+      paths.set(key, nextPath);
+      queue.push({ x: nx, y: ny, cost: nextCost, path: nextPath });
     }
   }
-  return unique;
+  paths.delete(startKey);
+  return paths;
 }
 
 export function renderScreen(context: RenderContext): { destroy: () => void } {
@@ -253,10 +235,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       .slice(0, playerSlots.length)
       .map((unit, index) => {
         const parsed = parseKey(playerSlots[index] ?? '');
+        const classProfile = resolveClassProfile(unit.classId);
         return parsed
           ? {
               id: unit.id,
               label: `P${index + 1}`,
+              classId: unit.classId,
               team: 'player',
               x: parsed.x,
               y: parsed.y,
@@ -267,7 +251,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               rage: 0,
               maxRage: 100,
               skillCost: 4,
-              pieces: randomPieces(seed, unit.id),
+              moveRange: classProfile.move,
+              basicRange: classProfile.basicRange,
+              zocImmune: classProfile.zocImmune,
               slotIndex: index,
             }
           : null;
@@ -277,10 +263,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       .slice(0, enemySlots.length)
       .map((unit, index) => {
         const parsed = parseKey(enemySlots[index] ?? '');
+        const classProfile = resolveClassProfile(unit.classId);
         return parsed
           ? {
               id: `${unit.id}#${index + 1}`,
               label: `E${index + 1}`,
+              classId: unit.classId,
               team: 'enemy',
               x: parsed.x,
               y: parsed.y,
@@ -291,7 +279,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               rage: 0,
               maxRage: 100,
               skillCost: 4,
-              pieces: randomPieces(`${seed}:enemy`, unit.id),
+              moveRange: classProfile.move,
+              basicRange: classProfile.basicRange,
+              zocImmune: classProfile.zocImmune,
               slotIndex: index,
             }
           : null;
@@ -305,7 +295,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     let matchState: MatchState = createInitialMatchState(lineupSize, objectiveMode);
     let unitTurnStartedAtMs = Date.now();
     let selectedUnitId = playerStates[0]?.id ?? null;
-    const reachableById = new Map<string, Set<string>>();
+    const reachableById = new Map<string, Map<string, string[]>>();
     const aliveByTeam = {
       player: playerStates,
       enemy: enemyStates,
@@ -356,16 +346,16 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     };
 
     const basicDamage = (attacker: UnitState, defender: UnitState): number => Math.max(1, Math.floor(attacker.atk - defender.arm));
-
+    const aiProfileRoll = nextRngValue(createRngState(hashSeedText(`${seed}:ai-profile`)));
+    const aiProfile: TacticalAiProfile = aiProfileRoll < 0.2 ? 'Aggressive' : aiProfileRoll < 0.4 ? 'Defensive' : 'Neutral';
     const distance = (a: UnitState, b: UnitState): number => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-    const isAdjacent = (a: UnitState, b: UnitState): boolean => distance(a, b) === 1;
-    const resolveActionRange = (action: 'basicAttack' | 'castSkill' | 'castUlt'): number => {
-      if (action === 'basicAttack') return 1;
+    const resolveActionRange = (actor: UnitState, action: 'basicAttack' | 'castSkill' | 'castUlt'): number => {
+      if (action === 'basicAttack') return Math.max(1, actor.basicRange);
       if (action === 'castSkill') return 2;
       return 3;
     };
     const resolveDefaultTarget = (actor: UnitState, action: 'basicAttack' | 'castSkill' | 'castUlt'): UnitState | null => {
-      const range = resolveActionRange(action);
+      const range = resolveActionRange(actor, action);
       const enemies = allUnits().filter((unit) => unit.team !== actor.team);
       let picked: UnitState | null = null;
       let bestDistance = Number.POSITIVE_INFINITY;
@@ -397,6 +387,16 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       }
       removeDeadUnits();
     };
+    const hasRescueLethalThreat = (): boolean => {
+      if (matchState.objectiveMode !== 'rescue') return false;
+      const rescueUnit = aliveByTeam.player[0];
+      if (!rescueUnit || rescueUnit.hp <= 0) return false;
+      return aliveByTeam.enemy.some((enemy) => (
+        enemy.hp > 0
+        && distance(enemy, rescueUnit) <= enemy.basicRange
+        && basicDamage(enemy, rescueUnit) >= rescueUnit.hp
+      ));
+    };
 
     const executeCommand = (command: MatchCommand): void => {
       const active = resolveActiveUnit();
@@ -419,7 +419,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         const targetY = command.payload?.targetY;
         const explicitTarget = allUnits().find((unit) => unit.team !== active.team && unit.x === targetX && unit.y === targetY) ?? null;
         const target = explicitTarget ?? resolveDefaultTarget(active, actionType);
-        const actionRange = resolveActionRange(actionType);
+        const actionRange = resolveActionRange(active, actionType);
         const hasValidTarget = Boolean(target);
         const inRange = target ? distance(active, target) <= actionRange : false;
         if (actionType === 'castSkill' && !canUseCommand(matchState, actionType, { skillCost: active.skillCost })) return;
@@ -497,13 +497,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       if (!timed.timeout) return false;
       const active = resolveActiveUnit();
       if (!active) return true;
-      const adjacentTarget = allUnits().find((unit) => unit.team !== active.team && isAdjacent(active, unit));
+      const inBasicRangeTarget = allUnits().find((unit) => unit.team !== active.team && distance(active, unit) <= active.basicRange);
       const fallback = chooseFallbackAction(matchState, {
-        hasSafeBasicTarget: Boolean(adjacentTarget),
-        lethalRisk: adjacentTarget ? 0 : 1,
+        hasSafeBasicTarget: Boolean(inBasicRangeTarget),
+        lethalRisk: inBasicRangeTarget ? 0 : 1,
       });
-      if (fallback.type === 'basicAttack' && adjacentTarget) {
-        executeCommand({ type: 'basicAttack', team: active.team, payload: { targetX: adjacentTarget.x, targetY: adjacentTarget.y } });
+      if (fallback.type === 'basicAttack' && inBasicRangeTarget) {
+        executeCommand({ type: 'basicAttack', team: active.team, payload: { targetX: inBasicRangeTarget.x, targetY: inBasicRangeTarget.y } });
       } else {
         executeCommand({ type: 'skipAction', team: active.team });
       }
@@ -576,8 +576,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
                 }
                 return;
               }
-              if (!reachableById.get(actingUnit.id)?.has(key)) return;
-              const tileSteps = Math.abs(actingUnit.x - x) + Math.abs(actingUnit.y - y);
+              const path = reachableById.get(actingUnit.id)?.get(key);
+              if (!path) return;
+              const tileSteps = Math.max(1, path.length - 1);
               actingUnit.x = x;
               actingUnit.y = y;
               executeCommand({ type: 'move', team: 'player', payload: { tileSteps } });
@@ -595,9 +596,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       const active = resolveActiveUnit();
       if (turnHost instanceof HTMLElement) {
         const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : matchState.objectiveMode === 'rescue' ? 'Objective: Bảo vệ mục tiêu giải cứu' : 'Objective: Hạ boss';
+        const missionAlert = hasRescueLethalThreat() ? ' | 🚨 Cảnh báo: NPC có nguy cơ bị kết liễu lượt kế.' : '';
         turnHost.textContent = active
           ? active.team === 'player'
-           ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel} · Move:${matchState.turn.hasMoved ? 'xong' : 'chưa'} · Action:${matchState.turn.hasActed ? 'xong' : 'chưa'} · Timer:${Math.ceil(matchState.unitTimer.remainingMs / 1000)}s + Bank ${Math.ceil(matchState.resources.player.bankTimeMs / 1000)}s.`
+           ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel}${missionAlert} · Move:${matchState.turn.hasMoved ? 'xong' : 'chưa'} · Action:${matchState.turn.hasActed ? 'xong' : 'chưa'} · Timer:${Math.ceil(matchState.unitTimer.remainingMs / 1000)}s + Bank ${Math.ceil(matchState.resources.player.bankTimeMs / 1000)}s.`
             : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
             : 'Không có nhân vật khả dụng.';
       }
@@ -609,14 +611,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
           const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
           status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
-          status.textContent = `AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'}`;
+          status.textContent = `Class ${active.classId} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}`;
           piecesHost.appendChild(status);
-          active.pieces.forEach((piece) => {
-            const pill = document.createElement('span');
-            pill.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
-            pill.textContent = PIECE_LABEL[piece];
-            piecesHost.appendChild(pill);
-          });
         }
       }
       if (resultHost instanceof HTMLElement) {
@@ -704,7 +700,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       if (!canUseCommand(matchState, 'move')) return;
       const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
       occupied.delete(keyOf(active.x, active.y));
-      reachableById.set(active.id, resolveReachableCells(active, board.playable, occupied));
+      reachableById.set(active.id, findShortestPaths(active, board.playable, occupied, allUnits()));
     };
 
     const processEnemyTurn = (): void => {
@@ -720,21 +716,31 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         }
         return;
       }
-      const moves = Array.from(reachableById.get(active.id) ?? []);
-      if (moves.length > 0) {
-        const aiRng = createRngState(hashSeedText(`${seed}:${active.id}:${active.x},${active.y}:${matchState.activeIndexInLineup}`));
-        const picked = moves[Math.floor(nextRngValue(aiRng) * moves.length)] ?? null;
-        const parsed = picked ? parseKey(picked) : null;
-        if (parsed) {
-          const tileSteps = Math.abs(active.x - parsed.x) + Math.abs(active.y - parsed.y);
+      const moves = Array.from(reachableById.get(active.id)?.entries() ?? []);
+      const enemies = aliveByTeam.player.filter((unit) => unit.hp > 0);
+      if (moves.length > 0 && enemies.length > 0) {
+        let bestMove: { key: string; score: number; steps: number } | null = null;
+        for (const [key, path] of moves) {
+          const parsed = parseKey(key);
+          if (!parsed) continue;
+          const nearest = enemies.reduce((min, enemy) => Math.min(min, Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y)), Number.POSITIVE_INFINITY);
+          const defensiveBias = aiProfile === 'Defensive' ? active.hp / Math.max(1, active.maxHp) : 0;
+          const aggressiveBias = aiProfile === 'Aggressive' ? 1.3 : aiProfile === 'Neutral' ? 1 : 0.7;
+          const score = aggressiveBias * (10 - nearest) + defensiveBias * 2 - path.length * 0.05;
+          if (!bestMove || score > bestMove.score) {
+            bestMove = { key, score, steps: Math.max(1, path.length - 1) };
+          }
+        }
+        const parsed = bestMove ? parseKey(bestMove.key) : null;
+        if (parsed && bestMove) {
           active.x = parsed.x;
           active.y = parsed.y;
-          executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps } });
+          executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps: bestMove.steps } });
         }
       }
       const timerStep = consumeDecisionTime(matchState, 7_600);
       matchState = timerStep.state;
-      const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && isAdjacent(active, unit));
+      const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && distance(active, unit) <= active.basicRange);
       if (timerStep.timeout) {
         const fallback = chooseFallbackAction(matchState, {
           hasSafeBasicTarget: Boolean(enemyTarget),
