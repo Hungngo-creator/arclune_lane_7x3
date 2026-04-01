@@ -70,6 +70,9 @@ export interface CommandCheckOptions {
 
 export interface ApplyActionOptions {
   skillCost?: number;
+  manualUlt?: boolean;
+  rage?: number;
+  ultCost?: number;
 }
 
 export interface ActionResolverInput {
@@ -213,7 +216,12 @@ export function markActionUsed(state: MatchState): MatchState {
 }
 
 export function applyActionCommand(state: MatchState, command: ActionKind, options: ApplyActionOptions = {}): MatchState {
-  if (!canUseCommand(state, command, { skillCost: options.skillCost })) return state;
+  if (!canUseCommand(state, command, {
+    skillCost: options.skillCost,
+    manualUlt: options.manualUlt,
+    rage: options.rage,
+    ultCost: options.ultCost,
+  })) return state;
   const activeResources = state.resources[state.activeTeam];
   if (command === 'basicAttack') {
     return {

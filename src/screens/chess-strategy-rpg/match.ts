@@ -455,6 +455,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         removeDeadUnits();
         if (actionType === 'castSkill') {
           matchState = applyActionCommand(matchState, actionType, { skillCost: active.skillCost });
+        } else if (actionType === 'castUlt') {
+          matchState = applyActionCommand(matchState, actionType, {
+            manualUlt: true,
+            rage: active.rage,
+            ultCost: active.maxRage,
+          });
         } else {
           matchState = applyActionCommand(matchState, actionType);
         }

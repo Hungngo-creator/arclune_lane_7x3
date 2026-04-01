@@ -82,6 +82,18 @@ describe('chess strategy rpg turn state', () => {
     expect(canUseCommand(state, 'endTurn')).toBe(true);
   });
 
+  test('marks ult as acted when manual gate and rage cost are met', () => {
+    let state = createInitialMatchState(1);
+    state = applyActionCommand(state, 'castUlt', {
+      manualUlt: true,
+      rage: 100,
+      ultCost: 100,
+    });
+    expect(state.turn.hasActed).toBe(true);
+    expect(state.inputLocked).toBe(true);
+    expect(canUseCommand(state, 'endTurn')).toBe(true);
+  });
+
   test('applies anti-hoard AE decay after two team turns without skill', () => {
     let state = createInitialMatchState(1);
     state.resources.player.ae = 10;

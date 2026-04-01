@@ -19748,6 +19748,13 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   if (actionType === 'castSkill') {
                       matchState = applyActionCommand(matchState, actionType, { skillCost: active.skillCost });
                   }
+                  else if (actionType === 'castUlt') {
+                      matchState = applyActionCommand(matchState, actionType, {
+                          manualUlt: true,
+                          rage: active.rage,
+                          ultCost: active.maxRage,
+                      });
+                  }
                   else {
                       matchState = applyActionCommand(matchState, actionType);
                   }
@@ -20270,7 +20277,12 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
       };
   }
   function applyActionCommand(state, command, options = {}) {
-      if (!canUseCommand(state, command, { skillCost: options.skillCost }))
+      if (!canUseCommand(state, command, {
+          skillCost: options.skillCost,
+          manualUlt: options.manualUlt,
+          rage: options.rage,
+          ultCost: options.ultCost,
+      }))
           return state;
       const activeResources = state.resources[state.activeTeam];
       if (command === 'basicAttack') {
