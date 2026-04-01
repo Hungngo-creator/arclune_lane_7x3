@@ -12,7 +12,7 @@ import {
   advanceTurn,
   canUseCommand,
   createInitialMatchState,
-  applyActionCommandu,
+  applyActionCommand,
   recordMove,
   type MatchCommandType,
   type MatchState,
@@ -386,7 +386,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               const actingUnit = resolveActiveUnit();
               if (actingUnit?.team !== 'player') return;
               if (!actingUnit) return;
-              const target = unitsState.find((entry) => entry.x === x && entry.y === y);
+              const target = allUnits().find((entry) => entry.x === x && entry.y === y);
               if (target) {
                 if (target.id === actingUnit.id) {
                   selectedUnitId = actingUnit.id;

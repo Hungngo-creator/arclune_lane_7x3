@@ -19349,6 +19349,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const advanceTurn = __dep3.advanceTurn;
   const canUseCommand = __dep3.canUseCommand;
   const createInitialMatchState = __dep3.createInitialMatchState;
+  const applyActionCommand = __dep3.applyActionCommand;
   const recordMove = __dep3.recordMove;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
   const MAX_LINEAR_MOVE_STEPS = 6;
@@ -19662,7 +19663,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                                   return;
                               if (!actingUnit)
                                   return;
-                              const target = unitsState.find((entry) => entry.x === x && entry.y === y);
+                              const target = allUnits().find((entry) => entry.x === x && entry.y === y);
                               if (target) {
                                   if (target.id === actingUnit.id) {
                                       selectedUnitId = actingUnit.id;
