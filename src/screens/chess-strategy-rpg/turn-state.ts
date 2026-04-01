@@ -82,6 +82,9 @@ export interface ActionResolverInput {
   readonly heal?: number;
   readonly actorRage?: number;
   readonly targetHp?: number;
+  readonly buffIds?: ReadonlyArray<string>;
+  readonly requireManualUlt?: boolean;
+  readonly ultCost?: number;
 }
 
 export interface ActionResolverResult {
@@ -90,11 +93,22 @@ export interface ActionResolverResult {
   targetHp: number | null;
   isTargetDead: boolean;
   log: string[];
+  buffsApplied?: string[];
 }
 
 export interface FallbackAction {
   type: 'basicAttack' | 'skipAction';
   reason: 'timeout' | 'no-safe-attack';
+}
+
+export interface FallbackHeuristicInput {
+  hasSafeBasicTarget?: boolean;
+  lethalRisk?: number;
+}
+
+export interface ActionUiEffect {
+  type: 'floatingText' | 'flash' | 'sound';
+  key: string;
 }
 
 export const MOVE_AE_PER_TILE = 1;
@@ -233,12 +247,22 @@ export function applyActionCommand(state: MatchState, command: ActionKind, optio
 
 export function resolveAction(input: ActionResolverInput): ActionResolverResult {
   const log: string[] = [];
+  const normalizedSkillCost = Math.max(0, input.skillCost ?? 0);
+  const normalizedUltCost = Math.max(0, input.ultCost ?? 100);
+  const actorRage = Math.max(0, input.actorRage ?? 0);
+
   if (!input.inRange || !input.validTarget) {
     return { ok: false, nextAe: input.aeBefore, targetHp: input.targetHp ?? null, isTargetDead: false, log: ['invalid-target'] };
   }
 
-  if (input.action === 'castSkill' && input.aeBefore < Math.max(0, input.skillCost ?? 0)) {
+  if (input.action === 'castSkill' && input.aeBefore < normalizedSkillCost) {
     return { ok: false, nextAe: input.aeBefore, targetHp: input.targetHp ?? null, isTargetDead: false, log: ['insufficient-ae'] };
+  }
+  if (input.action === 'castUlt' && input.requireManualUlt === false) {
+    return { ok: false, nextAe: input.aeBefore, targetHp: input.targetHp ?? null, isTargetDead: false, log: ['ult-not-manual'] };
+  }
+  if (input.action === 'castUlt' && actorRage < normalizedUltCost) {
+    return { ok: false, nextAe: input.aeBefore, targetHp: input.targetHp ?? null, isTargetDead: false, log: ['insufficient-rage'] };
   }
 
   const damage = Math.max(0, Math.floor(input.damage ?? 0));
@@ -246,19 +270,31 @@ export function resolveAction(input: ActionResolverInput): ActionResolverResult 
   const currentHp = Math.max(0, Math.floor(input.targetHp ?? 0));
   const afterDeltaHp = Math.max(0, currentHp - damage + heal);
   const isTargetDead = afterDeltaHp <= 0 && damage > 0;
+  const buffsApplied = Array.isArray(input.buffIds) ? input.buffIds.filter((buff): buff is string => typeof buff === 'string' && buff.length > 0) : [];
 
   let nextAe = input.aeBefore;
   if (input.action === 'basicAttack') nextAe = Number((nextAe + BASIC_ATTACK_AE_GAIN).toFixed(1));
-  if (input.action === 'castSkill') nextAe = Number(Math.max(0, nextAe - Math.max(0, input.skillCost ?? 0)).toFixed(1));
+  if (input.action === 'castSkill') nextAe = Number(Math.max(0, nextAe - normalizedSkillCost).toFixed(1));
 
-  log.push('validate:ok', 'apply:delta', isTargetDead ? 'death-check:dead' : 'death-check:alive', 'resource:update');
+  log.push('validate:ok', 'apply:delta', buffsApplied.length > 0 ? 'apply:buff' : 'apply:no-buff', isTargetDead ? 'death-check:dead' : 'death-check:alive', 'resource:update');
   return {
     ok: true,
     nextAe,
     targetHp: afterDeltaHp,
     isTargetDead,
     log,
+    buffsApplied,
   };
+}
+
+export function resolveActionUiEffects(result: ActionResolverResult): ActionUiEffect[] {
+  if (!result.ok) {
+    return [{ type: 'floatingText', key: 'action-invalid' }];
+  }
+  const effects: ActionUiEffect[] = [{ type: 'flash', key: 'action-hit' }];
+  if (result.isTargetDead) effects.push({ type: 'sound', key: 'target-down' });
+  if ((result.buffsApplied?.length ?? 0) > 0) effects.push({ type: 'floatingText', key: 'buff-applied' });
+  return effects;
 }
 
 export function evaluateObjectiveResult(state: MatchState, payload: ObjectiveEvaluationPayload): MatchState {
@@ -341,8 +377,10 @@ export function consumeDecisionTime(state: MatchState, spentMs: number): { state
   };
 }
 
-export function chooseFallbackAction(state: MatchState): FallbackAction {
-  if (!state.turn.hasActed && canUseCommand(state, 'basicAttack')) {
+export function chooseFallbackAction(state: MatchState, heuristic: FallbackHeuristicInput = {}): FallbackAction {
+  const hasSafeTarget = heuristic.hasSafeBasicTarget ?? true;
+  const lethalRisk = Math.max(0, heuristic.lethalRisk ?? 0);
+  if (!state.turn.hasActed && hasSafeTarget && lethalRisk < 1 && canUseCommand(state, 'basicAttack')) {
     return { type: 'basicAttack', reason: 'timeout' };
   }
   return { type: 'skipAction', reason: 'no-safe-attack' };

@@ -114,6 +114,37 @@ describe('chess strategy rpg turn state', () => {
     expect(result.nextAe).toBe(2);
     expect(result.isTargetDead).toBe(true);
     expect(result.log).toContain('resource:update');
+    expect(result.log).toContain('apply:no-buff');
+  });
+
+  test('action resolver validates ult manual/rage gate and buff application', () => {
+    const invalidUlt = resolveAction({
+      actorTeam: 'player',
+      action: 'castUlt',
+      inRange: true,
+      validTarget: true,
+      aeBefore: 3,
+      actorRage: 90,
+      ultCost: 100,
+      requireManualUlt: true,
+      targetHp: 30,
+    });
+    expect(invalidUlt.ok).toBe(false);
+    expect(invalidUlt.log).toContain('insufficient-rage');
+
+    const buffedSkill = resolveAction({
+      actorTeam: 'player',
+      action: 'castSkill',
+      inRange: true,
+      validTarget: true,
+      aeBefore: 8,
+      skillCost: 4,
+      buffIds: ['haste'],
+      targetHp: 20,
+    });
+    expect(buffedSkill.ok).toBe(true);
+    expect(buffedSkill.log).toContain('apply:buff');
+    expect(buffedSkill.buffsApplied).toEqual(['haste']);
   });
 
   test('objective framework hooks rescue and boss', () => {
@@ -148,6 +179,7 @@ describe('chess strategy rpg turn state', () => {
     const timeout = consumeDecisionTime(useBudget.state, 10_000);
     expect(timeout.timeout).toBe(true);
     expect(chooseFallbackAction(timeout.state).type).toBe('basicAttack');
+    expect(chooseFallbackAction(timeout.state, { hasSafeBasicTarget: false, lethalRisk: 1 }).type).toBe('skipAction');
   });
 
   test('shrink starts from player turn 4 and increments per side end turn', () => {

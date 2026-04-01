@@ -19355,6 +19355,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const consumeDecisionTime = __dep3.consumeDecisionTime;
   const PLAYER_TURN_CAP = __dep3.PLAYER_TURN_CAP;
   const recordMove = __dep3.recordMove;
+  const resolveAction = __dep3.resolveAction;
+  const resolveActionUiEffects = __dep3.resolveActionUiEffects;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
   const MAX_LINEAR_MOVE_STEPS = 6;
   const CSS = /* css */ `
@@ -19637,11 +19639,6 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           };
           const basicDamage = (attacker, defender) => Math.max(1, Math.floor(attacker.atk - defender.arm));
           const isAdjacent = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1;
-          const performBasicAttack = (attacker, defender) => {
-              defender.hp = Math.max(0, defender.hp - basicDamage(attacker, defender));
-              attacker.rage = Math.min(attacker.maxRage, attacker.rage + 35);
-              removeDeadUnits();
-          };
           const applyCollapseResolution = () => {
               if (matchState.collapseRings <= 0)
                   return;
@@ -19666,6 +19663,11 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   return;
               if (matchState.result.status !== 'ongoing')
                   return;
+              const resolveCollapseAt = (timing) => {
+                  if (matchState.collapseTiming !== timing)
+                      return;
+                  applyCollapseResolution();
+              };
               if (command.type === 'move') {
                   if (!canUseCommand(matchState, command.type))
                       return;
@@ -19680,22 +19682,70 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       return;
                   if (!canUseCommand(matchState, command.type))
                       return;
-                  performBasicAttack(active, target);
+                  resolveCollapseAt('beforeAction');
+                  const actionResult = resolveAction({
+                      actorTeam: matchState.activeTeam,
+                      action: 'basicAttack',
+                      inRange: true,
+                      validTarget: true,
+                      aeBefore: matchState.resources[matchState.activeTeam].ae,
+                      damage: basicDamage(active, target),
+                      targetHp: target.hp,
+                  });
+                  if (!actionResult.ok || actionResult.targetHp == null)
+                      return;
+                  target.hp = actionResult.targetHp;
+                  active.rage = Math.min(active.maxRage, active.rage + 35);
+                  removeDeadUnits();
                   matchState = applyActionCommand(matchState, 'basicAttack');
-                  syncMatchResult();
+                  resolveActionUiEffects(actionResult);
+                  resolveCollapseAt('afterAction');
+                  syncMatchResult('onAction');
                   return;
               }
               if (command.type === 'castSkill') {
                   if (!canUseCommand(matchState, command.type, { skillCost: active.skillCost }))
                       return;
+                  resolveCollapseAt('beforeAction');
+                  const actionResult = resolveAction({
+                      actorTeam: matchState.activeTeam,
+                      action: 'castSkill',
+                      inRange: true,
+                      validTarget: true,
+                      aeBefore: matchState.resources[matchState.activeTeam].ae,
+                      skillCost: active.skillCost,
+                      buffIds: ['skill-cast'],
+                  });
+                  if (!actionResult.ok)
+                      return;
                   matchState = applyActionCommand(matchState, 'castSkill', { skillCost: active.skillCost });
+                  resolveActionUiEffects(actionResult);
+                  resolveCollapseAt('afterAction');
+                  syncMatchResult('onAction');
                   return;
               }
               if (command.type === 'castUlt') {
                   if (!canUseCommand(matchState, command.type, { manualUlt: true, rage: active.rage, ultCost: active.maxRage }))
                       return;
+                  resolveCollapseAt('beforeAction');
+                  const actionResult = resolveAction({
+                      actorTeam: matchState.activeTeam,
+                      action: 'castUlt',
+                      inRange: true,
+                      validTarget: true,
+                      aeBefore: matchState.resources[matchState.activeTeam].ae,
+                      actorRage: active.rage,
+                      requireManualUlt: true,
+                      ultCost: active.maxRage,
+                      buffIds: ['ult-cast'],
+                  });
+                  if (!actionResult.ok)
+                      return;
                   active.rage = 0;
                   matchState = applyActionCommand(matchState, 'castUlt');
+                  resolveActionUiEffects(actionResult);
+                  resolveCollapseAt('afterAction');
+                  syncMatchResult('onAction');
                   return;
               }
               matchState = advanceTurn(matchState);
@@ -19891,7 +19941,10 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               matchState = timerStep.state;
               const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && isAdjacent(active, unit));
               if (timerStep.timeout) {
-                  const fallback = chooseFallbackAction(matchState);
+                  const fallback = chooseFallbackAction(matchState, {
+                      hasSafeBasicTarget: Boolean(enemyTarget),
+                      lethalRisk: enemyTarget ? 0 : 1,
+                  });
                   if (fallback.type === 'basicAttack' && enemyTarget) {
                       executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
                   }
@@ -20172,30 +20225,52 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
   }
   function resolveAction(input) {
       const log = [];
+      const normalizedSkillCost = Math.max(0, input.skillCost ?? 0);
+      const normalizedUltCost = Math.max(0, input.ultCost ?? 100);
+      const actorRage = Math.max(0, input.actorRage ?? 0);
       if (!input.inRange || !input.validTarget) {
           return { ok: false, nextAe: input.aeBefore, targetHp: input.targetHp ?? null, isTargetDead: false, log: ['invalid-target'] };
       }
-      if (input.action === 'castSkill' && input.aeBefore < Math.max(0, input.skillCost ?? 0)) {
+      if (input.action === 'castSkill' && input.aeBefore < normalizedSkillCost) {
           return { ok: false, nextAe: input.aeBefore, targetHp: input.targetHp ?? null, isTargetDead: false, log: ['insufficient-ae'] };
+      }
+      if (input.action === 'castUlt' && input.requireManualUlt === false) {
+          return { ok: false, nextAe: input.aeBefore, targetHp: input.targetHp ?? null, isTargetDead: false, log: ['ult-not-manual'] };
+      }
+      if (input.action === 'castUlt' && actorRage < normalizedUltCost) {
+          return { ok: false, nextAe: input.aeBefore, targetHp: input.targetHp ?? null, isTargetDead: false, log: ['insufficient-rage'] };
       }
       const damage = Math.max(0, Math.floor(input.damage ?? 0));
       const heal = Math.max(0, Math.floor(input.heal ?? 0));
       const currentHp = Math.max(0, Math.floor(input.targetHp ?? 0));
       const afterDeltaHp = Math.max(0, currentHp - damage + heal);
       const isTargetDead = afterDeltaHp <= 0 && damage > 0;
+      const buffsApplied = Array.isArray(input.buffIds) ? input.buffIds.filter((buff) => typeof buff === 'string' && buff.length > 0) : [];
       let nextAe = input.aeBefore;
       if (input.action === 'basicAttack')
           nextAe = Number((nextAe + BASIC_ATTACK_AE_GAIN).toFixed(1));
       if (input.action === 'castSkill')
-          nextAe = Number(Math.max(0, nextAe - Math.max(0, input.skillCost ?? 0)).toFixed(1));
-      log.push('validate:ok', 'apply:delta', isTargetDead ? 'death-check:dead' : 'death-check:alive', 'resource:update');
+          nextAe = Number(Math.max(0, nextAe - normalizedSkillCost).toFixed(1));
+      log.push('validate:ok', 'apply:delta', buffsApplied.length > 0 ? 'apply:buff' : 'apply:no-buff', isTargetDead ? 'death-check:dead' : 'death-check:alive', 'resource:update');
       return {
           ok: true,
           nextAe,
           targetHp: afterDeltaHp,
           isTargetDead,
           log,
+          buffsApplied,
       };
+  }
+  function resolveActionUiEffects(result) {
+      if (!result.ok) {
+          return [{ type: 'floatingText', key: 'action-invalid' }];
+      }
+      const effects = [{ type: 'flash', key: 'action-hit' }];
+      if (result.isTargetDead)
+          effects.push({ type: 'sound', key: 'target-down' });
+      if ((result.buffsApplied?.length ?? 0) > 0)
+          effects.push({ type: 'floatingText', key: 'buff-applied' });
+      return effects;
   }
   function evaluateObjectiveResult(state, payload) {
       if (state.result.status !== 'ongoing')
@@ -20271,8 +20346,10 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           },
       };
   }
-  function chooseFallbackAction(state) {
-      if (!state.turn.hasActed && canUseCommand(state, 'basicAttack')) {
+  function chooseFallbackAction(state, heuristic = {}) {
+      const hasSafeTarget = heuristic.hasSafeBasicTarget ?? true;
+      const lethalRisk = Math.max(0, heuristic.lethalRisk ?? 0);
+      if (!state.turn.hasActed && hasSafeTarget && lethalRisk < 1 && canUseCommand(state, 'basicAttack')) {
           return { type: 'basicAttack', reason: 'timeout' };
       }
       return { type: 'skipAction', reason: 'no-safe-attack' };
@@ -20387,6 +20464,7 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
   if (!Object.prototype.hasOwnProperty.call(exports, 'markActionUsed')) exports.markActionUsed = markActionUsed;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyActionCommand')) exports.applyActionCommand = applyActionCommand;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveAction')) exports.resolveAction = resolveAction;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveActionUiEffects')) exports.resolveActionUiEffects = resolveActionUiEffects;
   if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateObjectiveResult')) exports.evaluateObjectiveResult = evaluateObjectiveResult;
   if (!Object.prototype.hasOwnProperty.call(exports, 'consumeDecisionTime')) exports.consumeDecisionTime = consumeDecisionTime;
   if (!Object.prototype.hasOwnProperty.call(exports, 'chooseFallbackAction')) exports.chooseFallbackAction = chooseFallbackAction;

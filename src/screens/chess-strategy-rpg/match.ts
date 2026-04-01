@@ -18,6 +18,8 @@ import {
   consumeDecisionTime,
   PLAYER_TURN_CAP,
   recordMove,
+  resolveAction,
+  resolveActionUiEffects,
   type MatchCommandType,
   type MatchState,
   type TeamId,
@@ -355,13 +357,6 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
     const isAdjacent = (a: UnitState, b: UnitState): boolean => Math.abs(a.x - b.x) + Math.abs(a.y - b.y) === 1;
 
-    const performBasicAttack = (attacker: UnitState, defender: UnitState): void => {
-      defender.hp = Math.max(0, defender.hp - basicDamage(attacker, defender));
-      attacker.rage = Math.min(attacker.maxRage, attacker.rage + 35);
-      removeDeadUnits();
-    };
-
-
     const applyCollapseResolution = (): void => {
       if (matchState.collapseRings <= 0) return;
       const ring = matchState.collapseRings;
@@ -384,6 +379,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       const active = resolveActiveUnit();
       if (!active || command.team !== matchState.activeTeam) return;
       if (matchState.result.status !== 'ongoing') return;
+      const resolveCollapseAt = (timing: 'beforeAction' | 'afterAction'): void => {
+        if (matchState.collapseTiming !== timing) return;
+        applyCollapseResolution();
+      };
 
       if (command.type === 'move') {
         if (!canUseCommand(matchState, command.type)) return;
@@ -397,22 +396,67 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         const target = allUnits().find((unit) => unit.team !== active.team && unit.x === targetX && unit.y === targetY);
         if (!target || !isAdjacent(active, target)) return;
         if (!canUseCommand(matchState, command.type)) return;
-        performBasicAttack(active, target);
+        resolveCollapseAt('beforeAction');
+        const actionResult = resolveAction({
+          actorTeam: matchState.activeTeam,
+          action: 'basicAttack',
+          inRange: true,
+          validTarget: true,
+          aeBefore: matchState.resources[matchState.activeTeam].ae,
+          damage: basicDamage(active, target),
+          targetHp: target.hp,
+        });
+        if (!actionResult.ok || actionResult.targetHp == null) return;
+        target.hp = actionResult.targetHp;
+        active.rage = Math.min(active.maxRage, active.rage + 35);
+        removeDeadUnits();
         matchState = applyActionCommand(matchState, 'basicAttack');
-        syncMatchResult();
+        resolveActionUiEffects(actionResult);
+        resolveCollapseAt('afterAction');
+        syncMatchResult('onAction');
         return;
       }
 
       if (command.type === 'castSkill') {
         if (!canUseCommand(matchState, command.type, { skillCost: active.skillCost })) return;
+        resolveCollapseAt('beforeAction');
+        const actionResult = resolveAction({
+          actorTeam: matchState.activeTeam,
+          action: 'castSkill',
+          inRange: true,
+          validTarget: true,
+          aeBefore: matchState.resources[matchState.activeTeam].ae,
+          skillCost: active.skillCost,
+          buffIds: ['skill-cast'],
+        });
+        if (!actionResult.ok) return;
         matchState = applyActionCommand(matchState, 'castSkill', { skillCost: active.skillCost });
+        resolveActionUiEffects(actionResult);
+        resolveCollapseAt('afterAction');
+        syncMatchResult('onAction');
         return;
       }
 
       if (command.type === 'castUlt') {
         if (!canUseCommand(matchState, command.type, { manualUlt: true, rage: active.rage, ultCost: active.maxRage })) return;
+        resolveCollapseAt('beforeAction');
+        const actionResult = resolveAction({
+          actorTeam: matchState.activeTeam,
+          action: 'castUlt',
+          inRange: true,
+          validTarget: true,
+          aeBefore: matchState.resources[matchState.activeTeam].ae,
+          actorRage: active.rage,
+          requireManualUlt: true,
+          ultCost: active.maxRage,
+          buffIds: ['ult-cast'],
+        });
+        if (!actionResult.ok) return;
         active.rage = 0;
         matchState = applyActionCommand(matchState, 'castUlt');
+        resolveActionUiEffects(actionResult);
+        resolveCollapseAt('afterAction');
+        syncMatchResult('onAction');
         return;
       }
 
@@ -617,7 +661,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       matchState = timerStep.state;
       const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && isAdjacent(active, unit));
       if (timerStep.timeout) {
-        const fallback = chooseFallbackAction(matchState);
+        const fallback = chooseFallbackAction(matchState, {
+          hasSafeBasicTarget: Boolean(enemyTarget),
+          lethalRisk: enemyTarget ? 0 : 1,
+        });
         if (fallback.type === 'basicAttack' && enemyTarget) {
           executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
         }
