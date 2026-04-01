@@ -4,10 +4,16 @@ import {
   ANTI_HOARD_AE_DECAY,
   applyActionCommand,
   canUseCommand,
+  chooseFallbackAction,
+  consumeDecisionTime,
   createInitialMatchState,
   evaluateMatchResult,
+  evaluateObjectiveResult,
   PLAYER_TURN_CAP,
   recordMove,
+  resolveAction,
+  SHRINK_START_PLAYER_TURN,
+  UNIT_TURN_BASE_TIME_MS,
 } from '../src/screens/chess-strategy-rpg/turn-state.ts';
 
 describe('chess strategy rpg turn state', () => {
@@ -19,14 +25,15 @@ describe('chess strategy rpg turn state', () => {
     expect(state.turnCountPlayer).toBe(1);
 
     state = recordMove(state, 4);
-    expect(state.movedTiles).toBe(4);
+    expect(state.turn.hasMoved).toBe(true);
     expect(state.resources.player.ae).toBe(3);
     expect(canUseCommand(state, 'basicAttack')).toBe(true);
 
     state = applyActionCommand(state, 'basicAttack');
-    expect(state.actionUsed).toBe(true);
+    expect(state.turn.hasActed).toBe(true);
     expect(state.resources.player.ae).toBe(5);
     expect(canUseCommand(state, 'castSkill')).toBe(false);
+    expect(canUseCommand(state, 'move')).toBe(false);
     expect(canUseCommand(state, 'endTurn')).toBe(true);
   });
 
@@ -90,5 +97,65 @@ describe('chess strategy rpg turn state', () => {
     capState = evaluateMatchResult(capState, { player: 1, enemy: 1 });
     expect(capState.result.status).toBe('lose');
     expect(capState.result.reason).toBe('turn-cap');
+  });
+
+  test('action resolver follows common pipeline', () => {
+    const result = resolveAction({
+      actorTeam: 'player',
+      action: 'castSkill',
+      inRange: true,
+      validTarget: true,
+      skillCost: 4,
+      aeBefore: 6,
+      damage: 11,
+      targetHp: 10,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.nextAe).toBe(2);
+    expect(result.isTargetDead).toBe(true);
+    expect(result.log).toContain('resource:update');
+  });
+
+  test('objective framework hooks rescue and boss', () => {
+    const rescueState = createInitialMatchState(1, 'rescue');
+    const rescueLose = evaluateObjectiveResult(rescueState, {
+      hook: 'onTurnEnd',
+      context: {
+        aliveByTeam: { player: 1, enemy: 1 },
+        objectiveState: { rescueTargetAlive: false },
+      },
+    });
+    expect(rescueLose.result.status).toBe('lose');
+
+    const bossState = createInitialMatchState(1, 'boss');
+    const bossWin = evaluateObjectiveResult(bossState, {
+      hook: 'onAction',
+      context: {
+        aliveByTeam: { player: 1, enemy: 1 },
+        objectiveState: { bossAlive: false },
+      },
+    });
+    expect(bossWin.result.status).toBe('win');
+  });
+
+  test('timer and bank fallback', () => {
+    let state = createInitialMatchState(1);
+    state.resources.player.bankTimeMs = 500;
+    const useBudget = consumeDecisionTime(state, UNIT_TURN_BASE_TIME_MS + 300);
+    expect(useBudget.timeout).toBe(false);
+    expect(useBudget.state.resources.player.bankTimeMs).toBe(200);
+
+    const timeout = consumeDecisionTime(useBudget.state, 10_000);
+    expect(timeout.timeout).toBe(true);
+    expect(chooseFallbackAction(timeout.state).type).toBe('basicAttack');
+  });
+
+  test('shrink starts from player turn 4 and increments per side end turn', () => {
+    let state = createInitialMatchState(1);
+    state.turnCountPlayer = SHRINK_START_PLAYER_TURN;
+    const s1 = advanceTurn(state);
+    expect(s1.collapseRings).toBe(1);
+    const s2 = advanceTurn(s1);
+    expect(s2.collapseRings).toBe(2);
   });
 });

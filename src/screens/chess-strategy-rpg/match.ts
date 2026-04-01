@@ -13,12 +13,15 @@ import {
   canUseCommand,
   createInitialMatchState,
   applyActionCommand,
-  evaluateMatchResult,
+  evaluateObjectiveResult,
+  chooseFallbackAction,
+  consumeDecisionTime,
   PLAYER_TURN_CAP,
   recordMove,
   type MatchCommandType,
   type MatchState,
   type TeamId,
+  type ObjectiveMode,
 } from './turn-state.ts';
 
 const STYLE_ID = 'chess-strategy-rpg-match-style';
@@ -292,7 +295,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       })
       .filter((item): item is UnitState => item !== null);
     const lineupSize = Math.min(4, Math.max(playerSlots.length, enemySlots.length));
-    let matchState: MatchState = createInitialMatchState(lineupSize);
+    const objectiveFromParam = typeof params?.objective === 'string' ? params.objective : 'elimination';
+    const objectiveMode: ObjectiveMode = objectiveFromParam === 'rescue' || objectiveFromParam === 'boss' ? objectiveFromParam : 'elimination';
+    let rescueTargetAlive = true;
+    let bossAlive = true;
+    let matchState: MatchState = createInitialMatchState(lineupSize, objectiveMode);
     let selectedUnitId = playerStates[0]?.id ?? null;
     const reachableById = new Map<string, Set<string>>();
     const aliveByTeam = {
@@ -314,10 +321,19 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         }
       }
     };
-    const syncMatchResult = (): void => {
-      matchState = evaluateMatchResult(matchState, {
-        player: aliveByTeam.player.filter((unit) => unit.hp > 0).length,
-        enemy: aliveByTeam.enemy.filter((unit) => unit.hp > 0).length,
+    const syncMatchResult = (hook: 'onTurnStart' | 'onAction' | 'onTurnEnd' = 'onAction'): void => {
+      matchState = evaluateObjectiveResult(matchState, {
+        hook,
+        context: {
+          aliveByTeam: {
+            player: aliveByTeam.player.filter((unit) => unit.hp > 0).length,
+            enemy: aliveByTeam.enemy.filter((unit) => unit.hp > 0).length,
+          },
+          objectiveState: {
+            rescueTargetAlive,
+            bossAlive,
+          },
+        },
       });
     };
 
@@ -345,6 +361,24 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       removeDeadUnits();
     };
 
+
+    const applyCollapseResolution = (): void => {
+      if (matchState.collapseRings <= 0) return;
+      const ring = matchState.collapseRings;
+      const min = ring;
+      const maxX = board.width - 1 - ring;
+      const maxY = board.height - 1 - ring;
+      for (const unit of allUnits()) {
+        const outside = unit.x < min || unit.y < min || unit.x > maxX || unit.y > maxY;
+        if (outside) {
+          unit.hp = 0;
+          if (unit.team === 'enemy' && matchState.objectiveMode === 'boss' && unit.slotIndex === 0) {
+            bossAlive = false;
+          }
+        }
+      }
+      removeDeadUnits();
+    };
 
     const executeCommand = (command: MatchCommand): void => {
       const active = resolveActiveUnit();
@@ -383,8 +417,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       }
 
       matchState = advanceTurn(matchState);
-      syncMatchResult();
+      applyCollapseResolution();
+      syncMatchResult('onTurnEnd');
       normalizeActiveSlot();
+      syncMatchResult('onTurnStart');
       const newActive = resolveActiveUnit();
       selectedUnitId = newActive?.id ?? null;
     };
@@ -463,10 +499,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
    const renderHUD = (): void => {
       const active = resolveActiveUnit();
       if (turnHost instanceof HTMLElement) {
-        const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : '';
+        const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : matchState.objectiveMode === 'rescue' ? 'Objective: Bảo vệ mục tiêu giải cứu' : 'Objective: Hạ boss';
         turnHost.textContent = active
           ? active.team === 'player'
-            ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel}.`
+           ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel} · Move:${matchState.turn.hasMoved ? 'xong' : 'chưa'} · Action:${matchState.turn.hasActed ? 'xong' : 'chưa'} · Timer:${Math.ceil(matchState.unitTimer.remainingMs / 1000)}s + Bank ${Math.ceil(matchState.resources.player.bankTimeMs / 1000)}s.`
             : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
             : 'Không có nhân vật khả dụng.';
       }
@@ -495,7 +531,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           resultHost.hidden = false;
           resultHost.textContent = matchState.result.status === 'win'
             ? 'Thắng trận (elimination).'
-            : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 7 lượt Player' : 'bị tiêu diệt'}).`;
+            : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
         }
       }
       if (actionsHost instanceof HTMLElement) {
@@ -555,6 +591,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       reachableById.clear();
       const active = resolveActiveUnit();
       if (!active) return;
+      if (!canUseCommand(matchState, 'move')) return;
       const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
       occupied.delete(keyOf(active.x, active.y));
       reachableById.set(active.id, resolveReachableCells(active, board.playable, occupied));
@@ -576,8 +613,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps } });
         }
       }
+      const timerStep = consumeDecisionTime(matchState, 8_000);
+      matchState = timerStep.state;
       const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && isAdjacent(active, unit));
-      if (enemyTarget) {
+      if (timerStep.timeout) {
+        const fallback = chooseFallbackAction(matchState);
+        if (fallback.type === 'basicAttack' && enemyTarget) {
+          executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
+        }
+      } else if (enemyTarget) {
         executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
       }
       executeCommand({ type: 'endTurn', team: 'enemy' });
