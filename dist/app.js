@@ -19300,32 +19300,26 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const createRngState = __dep2.createRngState;
   const nextRngValue = __dep2.nextRngValue;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
-  const MATCH_CELL_SIZE = 38;
+  const MAX_LINEAR_STEPS = 6;
   const CSS = /* css */ `
     .app--chess-strategy-rpg-match{min-height:100dvh;padding:16px;box-sizing:border-box;}
     .chess-rpg-match{max-width:1320px;margin:0 auto;min-height:calc(100dvh - 32px);border-radius:20px;border:1px solid rgba(126,208,255,.3);background:linear-gradient(170deg,rgba(8,18,31,.98),rgba(14,35,57,.92));padding:18px;color:#e7f3ff;display:grid;gap:14px;}
     .chess-rpg-match__top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
     .chess-rpg-match__back{border:1px solid rgba(143,198,255,.5);background:rgba(8,19,31,.85);color:#e6f2ff;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;padding:0;cursor:pointer;font-size:18px;line-height:1;}
     .chess-rpg-match__meta{font-size:13px;color:#8ec4df;}
-    .chess-rpg-match__field{position:relative;overflow:hidden;border:1px solid rgba(121,187,228,.32);border-radius:14px;background:radial-gradient(circle at 35% 20%, rgba(43,106,146,.26), rgba(5,13,23,.95));padding:18px;min-height:640px;display:grid;align-content:start;justify-content:start;}
+    .chess-rpg-match__field{position:relative;overflow:auto;border:1px solid rgba(121,187,228,.32);border-radius:14px;background:radial-gradient(circle at 35% 20%, rgba(43,106,146,.26), rgba(5,13,23,.95));padding:12px;min-height:78dvh;display:grid;align-content:start;justify-content:start;}
     .chess-rpg-match__board{display:grid;gap:2px;align-self:start;justify-self:start;background:rgba(8,20,29,.82);padding:8px;border-radius:12px;border:1px solid rgba(131,213,255,.2);}
-    .chess-rpg-match__cell{width:${MATCH_CELL_SIZE}px;height:${MATCH_CELL_SIZE}px;border-radius:8px;border:1px solid rgba(145,198,228,.2);display:grid;place-items:center;font-size:11px;}
+    .chess-rpg-match__cell{width:var(--chess-cell-size, 42px);height:var(--chess-cell-size, 42px);border-radius:8px;border:1px solid rgba(145,198,228,.2);display:grid;place-items:center;font-size:11px;}
     .chess-rpg-match__cell--void{opacity:.2;border-style:dashed;}
     .chess-rpg-match__cell--play{background:rgba(22,66,92,.56);}
     .chess-rpg-match__cell--player{background:rgba(26,117,90,.74);border-color:rgba(130,255,219,.6);font-weight:700;color:#95ffd9;}
     .chess-rpg-match__cell--enemy{background:rgba(126,42,72,.68);border-color:rgba(255,149,196,.56);font-weight:700;color:#ffc3dd;}
     .chess-rpg-match__cell--selected{outline:2px solid rgba(255,229,142,.96);outline-offset:-2px;}
     .chess-rpg-match__cell--move{background:rgba(50,170,83,.72);border-color:rgba(150,255,176,.94);color:#e8fff0;cursor:pointer;}
-    .chess-rpg-match__panel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
-    .chess-rpg-match__card{border:1px solid rgba(121,187,228,.28);border-radius:12px;padding:10px;background:rgba(6,15,25,.72);display:grid;gap:8px;}
-    .chess-rpg-match__card-title{margin:0;font-size:14px;color:#cbebff;text-transform:uppercase;letter-spacing:.05em;}
-    .chess-rpg-match__turn{margin:0;color:#bce2ff;font-size:13px;}
+    .chess-rpg-match__turn{margin:0;font-size:13px;color:#bce2ff;}
     .chess-rpg-match__pieces{display:flex;flex-wrap:wrap;gap:6px;}
     .chess-rpg-match__piece{font-size:12px;border:1px solid rgba(161,216,255,.4);border-radius:999px;padding:2px 8px;background:rgba(31,74,107,.5);color:#e6f3ff;}
     .chess-rpg-match__piece--active{border-color:rgba(163,255,183,.78);background:rgba(43,121,72,.52);color:#ebffef;}
-    .chess-rpg-match__lineup{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
-    .chess-rpg-match__lineup-item{font-size:12px;border:1px solid rgba(136,181,219,.34);border-radius:8px;padding:5px 6px;background:rgba(18,43,64,.52);color:#abd9fb;}
-    .chess-rpg-match__lineup-item--active{border-color:rgba(255,232,151,.74);color:#fff7cb;background:rgba(78,66,29,.56);}
   `;
   const PIECE_LABEL = {
       rook: 'Xe',
@@ -19370,7 +19364,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   function collectLinearMoves(origin, vectors, playable, occupied) {
       const moves = [];
       for (const vector of vectors) {
-          for (let step = 1; step <= 7; step += 1) {
+          for (let step = 1; step <= MAX_LINEAR_STEPS; step += 1) {
               const x = origin.x + vector.dx * step;
               const y = origin.y + vector.dy * step;
               const key = keyOf(x, y);
@@ -19439,31 +19433,25 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
       section.innerHTML = `
       <div class="chess-rpg-match__top">
         <button type="button" class="chess-rpg-match__back" aria-label="Về hub mô phỏng">←</button>
-        <div class="chess-rpg-match__meta">Trận chính · Seed ${seed} · Tu vi mục tiêu ${realm} · Góc nhìn top-down như màn mô phỏng.</div>
+        <div class="chess-rpg-match__meta">Trận chính · Seed ${seed} · Tu vi ${realm} · Xe/Tượng đi tối đa ${MAX_LINEAR_STEPS} ô mỗi lượt.</div>
       </div>
+      <p class="chess-rpg-match__turn" data-role="turn"></p>
+      <div class="chess-rpg-match__pieces" data-role="pieces"></div>
       <div class="chess-rpg-match__field">
         <div class="chess-rpg-match__board" data-role="board"></div>
-      </div>
-      <div class="chess-rpg-match__panel">
-        <section class="chess-rpg-match__card">
-          <h2 class="chess-rpg-match__card-title">Lượt hiện tại</h2>
-          <p class="chess-rpg-match__turn" data-role="turn"></p>
-          <div class="chess-rpg-match__pieces" data-role="pieces"></div>
-        </section>
-        <section class="chess-rpg-match__card">
-          <h2 class="chess-rpg-match__card-title">Thứ tự lineup</h2>
-          <div class="chess-rpg-match__lineup" data-role="lineup"></div>
-        </section>
       </div>
     `;
       const boardHost = section.querySelector('[data-role="board"]');
       const backButton = section.querySelector('.chess-rpg-match__back');
       const turnHost = section.querySelector('[data-role="turn"]');
       const piecesHost = section.querySelector('[data-role="pieces"]');
-      const lineupHost = section.querySelector('[data-role="lineup"]');
       if (boardHost instanceof HTMLElement) {
           const board = createIrregularBoard(seed);
-          boardHost.style.gridTemplateColumns = `repeat(${board.width}, ${MATCH_CELL_SIZE}px)`;
+          const viewportWidth = Math.max(320, root.clientWidth || window.innerWidth || 360);
+          const availableWidth = Math.max(240, viewportWidth - 72);
+          const cellSize = Math.max(30, Math.floor(availableWidth / board.width));
+          boardHost.style.setProperty('--chess-cell-size', `${cellSize}px`);
+          boardHost.style.gridTemplateColumns = `repeat(${board.width}, var(--chess-cell-size))`;
           const coreStart = Math.floor((board.width - MIN_CORE_SIZE) / 2);
           const lineupSlots = [
               `${coreStart},${coreStart}`,
@@ -19563,17 +19551,6 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                           piecesHost.appendChild(pill);
                       });
                   }
-              }
-              if (lineupHost instanceof HTMLElement) {
-                  lineupHost.innerHTML = '';
-                  unitsState.forEach((unit, index) => {
-                      const item = document.createElement('div');
-                      item.className = 'chess-rpg-match__lineup-item';
-                      if (index === turnIndex)
-                          item.classList.add('chess-rpg-match__lineup-item--active');
-                      item.textContent = `${unit.label} (${unit.x},${unit.y})`;
-                      lineupHost.appendChild(item);
-                  });
               }
           };
           const prepareReachable = () => {
