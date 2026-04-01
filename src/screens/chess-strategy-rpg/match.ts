@@ -415,6 +415,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
       if (command.type === 'basicAttack' || command.type === 'castSkill' || command.type === 'castUlt') {
         const actionType = command.type;
+        const actorRageBeforeAction = active.rage;
         const targetX = command.payload?.targetX;
         const targetY = command.payload?.targetY;
         const explicitTarget = allUnits().find((unit) => unit.team !== active.team && unit.x === targetX && unit.y === targetY) ?? null;
@@ -458,7 +459,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         } else if (actionType === 'castUlt') {
           matchState = applyActionCommand(matchState, actionType, {
             manualUlt: true,
-            rage: active.rage,
+            rage: actorRageBeforeAction,
             ultCost: active.maxRage,
           });
         } else {
@@ -766,6 +767,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     };
 
     normalizeActiveSlot();
+    syncMatchResult('onTurnStart');
     prepareReachable();
     renderHUD();
     renderBoard();
