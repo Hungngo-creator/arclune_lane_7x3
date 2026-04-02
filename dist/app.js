@@ -19380,7 +19380,9 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const resolveAction = __dep2.resolveAction;
   const resolveActionUiEffects = __dep2.resolveActionUiEffects;
   const resolveRescueBarrier = __dep2.resolveRescueBarrier;
+  const resolveSummonCapAfterSpawn = __dep2.resolveSummonCapAfterSpawn;
   const scoreAliveUnitPoints = __dep2.scoreAliveUnitPoints;
+  const SUMMON_CAP_PER_TEAM = __dep2.SUMMON_CAP_PER_TEAM;
   const __dep3 = __require('./screens/chess-strategy-rpg/seed.ts');
   const resolveTacticalAiProfile = __dep3.resolveTacticalAiProfile;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
@@ -19501,6 +19503,59 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           }
       }
       return incoming;
+  }
+  function pickAdjacentSpawnTile(origin, playable, occupied) {
+      for (const dir of CARDINAL_DIRS) {
+          const x = origin.x + dir.dx;
+          const y = origin.y + dir.dy;
+          const key = keyOf(x, y);
+          if (!playable.has(key) || occupied.has(key))
+              continue;
+          return { x, y };
+      }
+      return null;
+  }
+  function resolveSummonerSkillSpawn(context) {
+      const spawnTile = pickAdjacentSpawnTile(context.caster, context.playable, context.occupied);
+      if (!spawnTile)
+          return { nextSpawnedOrder: context.spawnedOrder, created: null, replacedId: null };
+      const incoming = {
+          id: `${context.caster.id}-summon-${context.spawnedOrder}`,
+          label: `S${context.caster.team === 'player' ? 'P' : 'E'}`,
+          classId: 'summon',
+          team: context.caster.team,
+          x: spawnTile.x,
+          y: spawnTile.y,
+          hp: Math.max(1, Math.floor(context.caster.maxHp * 0.35)),
+          maxHp: Math.max(1, Math.floor(context.caster.maxHp * 0.35)),
+          atk: Math.max(1, Math.floor(context.caster.atk * 0.55)),
+          arm: Math.max(0, Math.floor(context.caster.arm * 0.5)),
+          rage: 0,
+          maxRage: 100,
+          skillCost: 0,
+          moveRange: 0,
+          basicRange: 1,
+          zocImmune: true,
+          slotIndex: -1,
+          isSummon: true,
+      };
+      const rosterBefore = context.teamSummons.map((entry) => ({
+          id: entry.id,
+          hp: entry.hp,
+          maxHp: entry.maxHp,
+          spawnedOrder: Math.max(1, context.teamSummons.findIndex((summon) => summon.id === entry.id) + 1),
+      }));
+      const capResolution = resolveSummonCapAfterSpawn(rosterBefore, {
+          id: incoming.id,
+          hp: incoming.hp,
+          maxHp: incoming.maxHp,
+          spawnedOrder: context.spawnedOrder,
+      }, SUMMON_CAP_PER_TEAM);
+      return {
+          nextSpawnedOrder: context.spawnedOrder + 1,
+          created: capResolution.roster.some((entry) => entry.id === incoming.id) ? incoming : null,
+          replacedId: capResolution.replacedId,
+      };
   }
   function chooseBestCombatAction(params) {
       const { actor, enemies, teamAe, aiProfile, canUse } = params;
@@ -19694,19 +19749,34 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               player: playerStates,
               enemy: enemyStates,
           };
+          const summonsByTeam = {
+              player: [],
+              enemy: [],
+          };
+          let nextSummonOrder = 1;
           const resolveActiveUnit = () => {
               const teamUnits = aliveByTeam[matchState.activeTeam];
               return teamUnits.find((unit) => unit.slotIndex === matchState.activeIndexInLineup && unit.hp > 0) ?? null;
           };
           const allUnits = () => {
               const objectiveUnits = rescueNpc && rescueNpc.hp > 0 ? [rescueNpc] : [];
-              return [...aliveByTeam.player, ...aliveByTeam.enemy, ...objectiveUnits].filter((unit) => unit.hp > 0);
+              return [
+                  ...aliveByTeam.player,
+                  ...aliveByTeam.enemy,
+                  ...summonsByTeam.player,
+                  ...summonsByTeam.enemy,
+                  ...objectiveUnits,
+              ].filter((unit) => unit.hp > 0);
           };
           const removeDeadUnits = () => {
               for (const team of ['player', 'enemy']) {
                   for (const unit of aliveByTeam[team]) {
                       if (unit.hp <= 0)
                           unit.hp = 0;
+                  }
+                  for (const summon of summonsByTeam[team]) {
+                      if (summon.hp <= 0)
+                          summon.hp = 0;
                   }
               }
           };
@@ -19732,8 +19802,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                           enemy: summarizeTeamHpPct('enemy'),
                       },
                       unitPointsByTeam: {
-                          player: scoreAliveUnitPoints(aliveByTeam.player),
-                          enemy: scoreAliveUnitPoints(aliveByTeam.enemy),
+                          player: scoreAliveUnitPoints([...aliveByTeam.player, ...summonsByTeam.player]),
+                          enemy: scoreAliveUnitPoints([...aliveByTeam.enemy, ...summonsByTeam.enemy]),
                       },
                       objectiveState: {
                           rescueTargetAlive,
@@ -19897,6 +19967,22 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       target.hp = actionResult.targetHp;
                       if (target.team === 'enemy' && matchState.objectiveMode === 'boss' && target.slotIndex === 0 && target.hp <= 0) {
                           bossAlive = false;
+                      }
+                  }
+                  if (actionType === 'castSkill' && active.classId.trim().toLowerCase() === 'summoner') {
+                      const summonResolution = resolveSummonerSkillSpawn({
+                          caster: active,
+                          playable: board.playable,
+                          occupied: new Set(allUnits().map((unit) => keyOf(unit.x, unit.y))),
+                          teamSummons: summonsByTeam[active.team],
+                          spawnedOrder: nextSummonOrder,
+                      });
+                      nextSummonOrder = summonResolution.nextSpawnedOrder;
+                      if (summonResolution.replacedId) {
+                          summonsByTeam[active.team] = summonsByTeam[active.team].filter((unit) => unit.id !== summonResolution.replacedId);
+                      }
+                      if (summonResolution.created) {
+                          summonsByTeam[active.team].push(summonResolution.created);
                       }
                   }
                   if (actionType === 'castUlt') {
@@ -20076,11 +20162,12 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       const status = document.createElement('span');
                       const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
                       const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
+                      const teamSummonCount = summonsByTeam[active.team].filter((unit) => unit.hp > 0).length;
                       status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
                       const rescueBarrierInfo = matchState.objectiveMode === 'rescue'
                           ? ` | Barrier NPC ${rescueBarrierCharges > 0 ? 'sẵn sàng' : 'đã vỡ'}`
                           : '';
-                      status.textContent = `Class ${active.classId} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
+                      status.textContent = `Class ${active.classId} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Summon ${teamSummonCount}/${SUMMON_CAP_PER_TEAM} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
                       piecesHost.appendChild(status);
                   }
               }
@@ -20257,6 +20344,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const render = renderScreen;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveSummonerSkillSpawn')) exports.resolveSummonerSkillSpawn = resolveSummonerSkillSpawn;
   if (!Object.prototype.hasOwnProperty.call(exports, 'chooseBestCombatAction')) exports.chooseBestCombatAction = chooseBestCombatAction;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 };

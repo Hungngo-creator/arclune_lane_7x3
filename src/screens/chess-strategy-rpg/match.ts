@@ -21,7 +21,10 @@ import {
   resolveAction,
   resolveActionUiEffects,
   resolveRescueBarrier,
+  resolveSummonCapAfterSpawn,
   scoreAliveUnitPoints,
+  SUMMON_CAP_PER_TEAM,
+  type SummonPresence,
   type MatchCommandType,
   type MatchState,
   type TeamId,
@@ -83,6 +86,14 @@ interface UnitState {
   slotIndex: number;
   isSummon: boolean;
   isObjectiveNpc?: boolean;
+}
+
+interface SummonSpawnContext {
+  caster: UnitState;
+  playable: Set<string>;
+  occupied: Set<string>;
+  teamSummons: ReadonlyArray<UnitState>;
+  spawnedOrder: number;
 }
 
 interface MatchCommand {
@@ -192,6 +203,67 @@ function expectedIncomingDamageAt(
     }
   }
   return incoming;
+}
+
+function pickAdjacentSpawnTile(origin: UnitState, playable: Set<string>, occupied: Set<string>): { x: number; y: number } | null {
+  for (const dir of CARDINAL_DIRS) {
+    const x = origin.x + dir.dx;
+    const y = origin.y + dir.dy;
+    const key = keyOf(x, y);
+    if (!playable.has(key) || occupied.has(key)) continue;
+    return { x, y };
+  }
+  return null;
+}
+
+export function resolveSummonerSkillSpawn(context: SummonSpawnContext): {
+  nextSpawnedOrder: number;
+  created: UnitState | null;
+  replacedId: string | null;
+} {
+  const spawnTile = pickAdjacentSpawnTile(context.caster, context.playable, context.occupied);
+  if (!spawnTile) return { nextSpawnedOrder: context.spawnedOrder, created: null, replacedId: null };
+  const incoming: UnitState = {
+    id: `${context.caster.id}-summon-${context.spawnedOrder}`,
+    label: `S${context.caster.team === 'player' ? 'P' : 'E'}`,
+    classId: 'summon',
+    team: context.caster.team,
+    x: spawnTile.x,
+    y: spawnTile.y,
+    hp: Math.max(1, Math.floor(context.caster.maxHp * 0.35)),
+    maxHp: Math.max(1, Math.floor(context.caster.maxHp * 0.35)),
+    atk: Math.max(1, Math.floor(context.caster.atk * 0.55)),
+    arm: Math.max(0, Math.floor(context.caster.arm * 0.5)),
+    rage: 0,
+    maxRage: 100,
+    skillCost: 0,
+    moveRange: 0,
+    basicRange: 1,
+    zocImmune: true,
+    slotIndex: -1,
+    isSummon: true,
+  };
+  const rosterBefore: SummonPresence[] = context.teamSummons.map((entry) => ({
+    id: entry.id,
+    hp: entry.hp,
+    maxHp: entry.maxHp,
+    spawnedOrder: Math.max(1, context.teamSummons.findIndex((summon) => summon.id === entry.id) + 1),
+  }));
+  const capResolution = resolveSummonCapAfterSpawn(
+    rosterBefore,
+    {
+      id: incoming.id,
+      hp: incoming.hp,
+      maxHp: incoming.maxHp,
+      spawnedOrder: context.spawnedOrder,
+    },
+    SUMMON_CAP_PER_TEAM,
+  );
+  return {
+    nextSpawnedOrder: context.spawnedOrder + 1,
+    created: capResolution.roster.some((entry) => entry.id === incoming.id) ? incoming : null,
+    replacedId: capResolution.replacedId,
+  };
 }
 
 export function chooseBestCombatAction(params: {
@@ -397,6 +469,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       player: playerStates,
       enemy: enemyStates,
     };
+    const summonsByTeam: Record<TeamId, UnitState[]> = {
+      player: [],
+      enemy: [],
+    };
+    let nextSummonOrder = 1;
 
     const resolveActiveUnit = (): UnitState | null => {
       const teamUnits = aliveByTeam[matchState.activeTeam];
@@ -405,13 +482,22 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
     const allUnits = (): UnitState[] => {
       const objectiveUnits = rescueNpc && rescueNpc.hp > 0 ? [rescueNpc] : [];
-      return [...aliveByTeam.player, ...aliveByTeam.enemy, ...objectiveUnits].filter((unit) => unit.hp > 0);
+      return [
+        ...aliveByTeam.player,
+        ...aliveByTeam.enemy,
+        ...summonsByTeam.player,
+        ...summonsByTeam.enemy,
+        ...objectiveUnits,
+      ].filter((unit) => unit.hp > 0);
     };
 
     const removeDeadUnits = (): void => {
       for (const team of ['player', 'enemy'] as const) {
         for (const unit of aliveByTeam[team]) {
           if (unit.hp <= 0) unit.hp = 0;
+        }
+        for (const summon of summonsByTeam[team]) {
+          if (summon.hp <= 0) summon.hp = 0;
         }
       }
     };
@@ -437,8 +523,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
             enemy: summarizeTeamHpPct('enemy'),
           },
           unitPointsByTeam: {
-            player: scoreAliveUnitPoints(aliveByTeam.player),
-            enemy: scoreAliveUnitPoints(aliveByTeam.enemy),
+            player: scoreAliveUnitPoints([...aliveByTeam.player, ...summonsByTeam.player]),
+            enemy: scoreAliveUnitPoints([...aliveByTeam.enemy, ...summonsByTeam.enemy]),
           },
           objectiveState: {
             rescueTargetAlive,
@@ -593,6 +679,22 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           target.hp = actionResult.targetHp;
           if (target.team === 'enemy' && matchState.objectiveMode === 'boss' && target.slotIndex === 0 && target.hp <= 0) {
             bossAlive = false;
+          }
+        }
+        if (actionType === 'castSkill' && active.classId.trim().toLowerCase() === 'summoner') {
+          const summonResolution = resolveSummonerSkillSpawn({
+            caster: active,
+            playable: board.playable,
+            occupied: new Set(allUnits().map((unit) => keyOf(unit.x, unit.y))),
+            teamSummons: summonsByTeam[active.team],
+            spawnedOrder: nextSummonOrder,
+          });
+          nextSummonOrder = summonResolution.nextSpawnedOrder;
+          if (summonResolution.replacedId) {
+            summonsByTeam[active.team] = summonsByTeam[active.team].filter((unit) => unit.id !== summonResolution.replacedId);
+          }
+          if (summonResolution.created) {
+            summonsByTeam[active.team].push(summonResolution.created);
           }
         }
         if (actionType === 'castUlt') {
@@ -769,11 +871,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           const status = document.createElement('span');
           const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
           const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
+          const teamSummonCount = summonsByTeam[active.team].filter((unit) => unit.hp > 0).length;
           status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
           const rescueBarrierInfo = matchState.objectiveMode === 'rescue'
             ? ` | Barrier NPC ${rescueBarrierCharges > 0 ? 'sẵn sàng' : 'đã vỡ'}`
             : '';
-          status.textContent = `Class ${active.classId} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
+          status.textContent = `Class ${active.classId} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Summon ${teamSummonCount}/${SUMMON_CAP_PER_TEAM} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
           piecesHost.appendChild(status);
         }
       }
