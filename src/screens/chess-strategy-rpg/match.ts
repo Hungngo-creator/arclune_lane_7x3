@@ -91,6 +91,13 @@ interface MatchCommand {
 }
 
 type OffensiveAction = Extract<MatchCommandType, 'basicAttack' | 'castSkill' | 'castUlt'>;
+type ActionChoice = OffensiveAction | 'skipAction';
+
+interface ScoredAction {
+  action: ActionChoice;
+  target: UnitState | null;
+  score: number;
+}
 
 const CLASS_PROFILE: Record<string, { move: number; basicRange: number; zocImmune?: boolean }> = {
   tanker: { move: 3, basicRange: 1 },
@@ -176,6 +183,74 @@ function findShortestPaths(unit: UnitState, playable: Set<string>, occupied: Set
   }
   paths.delete(startKey);
   return paths;
+}
+
+function expectedIncomingDamageAt(
+  candidateX: number,
+  candidateY: number,
+  actor: UnitState,
+  enemies: UnitState[],
+): number {
+  let incoming = 0;
+  for (const enemy of enemies) {
+    if (enemy.hp <= 0 || enemy.team === actor.team) continue;
+    const distance = Math.abs(enemy.x - candidateX) + Math.abs(enemy.y - candidateY);
+    if (distance <= enemy.basicRange) {
+      incoming += Math.max(1, Math.floor(enemy.atk - actor.arm));
+    }
+  }
+  return incoming;
+}
+
+export function chooseBestCombatAction(params: {
+  actor: UnitState;
+  enemies: UnitState[];
+  teamAe: number;
+  aiProfile: TacticalAiProfile;
+  canUse: (command: MatchCommandType, options?: { skillCost?: number; ae?: number; manualUlt?: boolean; rage?: number; ultCost?: number }) => boolean;
+}): ScoredAction {
+  const { actor, enemies, teamAe, aiProfile, canUse } = params;
+  const evaluateBaseScore = (action: OffensiveAction, target: UnitState): number => {
+    const distance = Math.abs(actor.x - target.x) + Math.abs(actor.y - target.y);
+    const actionRange = action === 'basicAttack' ? actor.basicRange : action === 'castSkill' ? 2 : 3;
+    if (distance > actionRange) return Number.NEGATIVE_INFINITY;
+    const projectedDamage = action === 'castUlt'
+      ? Math.max(1, Math.floor(actor.atk - target.arm)) + 12
+      : action === 'castSkill'
+        ? Math.max(1, Math.floor(actor.atk - target.arm)) + 5
+        : Math.max(1, Math.floor(actor.atk - target.arm));
+    const lethalBonus = projectedDamage >= target.hp ? 10 : 0;
+    const pressureBias = aiProfile === 'Aggressive' ? 1.35 : aiProfile === 'Defensive' ? 0.9 : 1.1;
+    const defensivePenalty = aiProfile === 'Defensive'
+      ? expectedIncomingDamageAt(actor.x, actor.y, actor, enemies) * 0.5
+      : 0;
+    const resourcePenalty = action === 'castSkill' ? Math.max(0, 6 - teamAe) * 0.15 : 0;
+    return pressureBias * projectedDamage + lethalBonus - distance * 0.3 - defensivePenalty - resourcePenalty;
+  };
+
+  const bestOfAction = (action: OffensiveAction): ScoredAction => {
+    let best: ScoredAction = { action, target: null, score: Number.NEGATIVE_INFINITY };
+    for (const target of enemies) {
+      const score = evaluateBaseScore(action, target);
+      if (score > best.score) best = { action, target, score };
+    }
+    return best;
+  };
+
+  const candidates: ScoredAction[] = [];
+  if (canUse('basicAttack')) candidates.push(bestOfAction('basicAttack'));
+  if (canUse('castSkill', { skillCost: actor.skillCost, ae: teamAe })) {
+    candidates.push(bestOfAction('castSkill'));
+  }
+  if (canUse('castUlt', { manualUlt: true, rage: actor.rage, ultCost: actor.maxRage })) {
+    candidates.push(bestOfAction('castUlt'));
+  }
+
+  const viable = candidates
+    .filter((item) => item.target && Number.isFinite(item.score))
+    .sort((a, b) => b.score - a.score)[0];
+  if (viable && viable.target) return viable;
+  return { action: 'skipAction', target: null, score: 0 };
 }
 
 export function renderScreen(context: RenderContext): { destroy: () => void } {
@@ -544,13 +619,20 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       if (!timed.timeout) return false;
       const active = resolveActiveUnit();
       if (!active) return true;
-      const inBasicRangeTarget = allUnits().find((unit) => unit.team !== active.team && distance(active, unit) <= active.basicRange);
-      const fallback = chooseFallbackAction(matchState, {
-        hasSafeBasicTarget: Boolean(inBasicRangeTarget),
-        lethalRisk: inBasicRangeTarget ? 0 : 1,
+      const enemies = allUnits().filter((unit) => unit.team !== active.team);
+      const choice = chooseBestCombatAction({
+        actor: active,
+        enemies,
+        teamAe: matchState.resources[active.team].ae,
+        aiProfile: active.team === 'enemy' ? aiProfile : 'Defensive',
+        canUse: (command, options) => canUseCommand(matchState, command, options),
       });
-      if (fallback.type === 'basicAttack' && inBasicRangeTarget) {
-        executeCommand({ type: 'basicAttack', team: active.team, payload: { targetX: inBasicRangeTarget.x, targetY: inBasicRangeTarget.y } });
+      const fallback = chooseFallbackAction(matchState, {
+        hasSafeBasicTarget: choice.action === 'basicAttack' && Boolean(choice.target),
+        lethalRisk: choice.action === 'skipAction' ? 1 : 0,
+      });
+      if (fallback.type === 'basicAttack' && choice.target) {
+        executeCommand({ type: 'basicAttack', team: active.team, payload: { targetX: choice.target.x, targetY: choice.target.y } });
       } else {
         executeCommand({ type: 'skipAction', team: active.team });
       }
@@ -786,19 +868,29 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       }
       const timerStep = consumeDecisionTime(matchState, 7_600);
       matchState = timerStep.state;
-      const enemyTarget = aliveByTeam.player.find((unit) => unit.hp > 0 && distance(active, unit) <= active.basicRange);
+      const actionChoice = chooseBestCombatAction({
+        actor: active,
+        enemies: aliveByTeam.player.filter((unit) => unit.hp > 0),
+        teamAe: matchState.resources.enemy.ae,
+        aiProfile,
+        canUse: (command, options) => canUseCommand(matchState, command, options),
+      });
       if (timerStep.timeout) {
         const fallback = chooseFallbackAction(matchState, {
-          hasSafeBasicTarget: Boolean(enemyTarget),
-          lethalRisk: enemyTarget ? 0 : 1,
+          hasSafeBasicTarget: actionChoice.action === 'basicAttack' && Boolean(actionChoice.target),
+          lethalRisk: actionChoice.action === 'skipAction' ? 1 : 0,
         });
-        if (fallback.type === 'basicAttack' && enemyTarget) {
-          executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
+        if (fallback.type === 'basicAttack' && actionChoice.target) {
+          executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
         } else {
           executeCommand({ type: 'skipAction', team: 'enemy' });
         }
-      } else if (enemyTarget) {
-        executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: enemyTarget.x, targetY: enemyTarget.y } });
+      } else if (actionChoice.action === 'castUlt' && actionChoice.target) {
+        executeCommand({ type: 'castUlt', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
+      } else if (actionChoice.action === 'castSkill' && actionChoice.target) {
+        executeCommand({ type: 'castSkill', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
+      } else if (actionChoice.action === 'basicAttack' && actionChoice.target) {
+        executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
       } else {
         executeCommand({ type: 'skipAction', team: 'enemy' });
       }
