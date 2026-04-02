@@ -19646,7 +19646,31 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           const lineupSize = Math.min(4, Math.max(playerSlots.length, enemySlots.length));
           const objectiveFromParam = typeof params?.objective === 'string' ? params.objective : 'elimination';
           const objectiveMode = objectiveFromParam === 'rescue' || objectiveFromParam === 'boss' ? objectiveFromParam : 'elimination';
-          let rescueTargetAlive = true;
+          const rescueNpcSpawn = parseKey(`${coreStart + 1},${coreStart + 1}`);
+          const rescueNpc = objectiveMode === 'rescue' && rescueNpcSpawn
+              ? {
+                  id: 'rescue-npc',
+                  label: 'NPC',
+                  classId: 'npc',
+                  team: 'player',
+                  x: rescueNpcSpawn.x,
+                  y: rescueNpcSpawn.y,
+                  hp: Math.max(1, Math.floor((playerStates[0]?.maxHp ?? 100) * 0.75)),
+                  maxHp: Math.max(1, Math.floor((playerStates[0]?.maxHp ?? 100) * 0.75)),
+                  atk: 0,
+                  arm: playerStates[0]?.arm ?? 0,
+                  rage: 0,
+                  maxRage: 100,
+                  skillCost: 0,
+                  moveRange: 0,
+                  basicRange: 0,
+                  zocImmune: true,
+                  slotIndex: -1,
+                  isSummon: false,
+                  isObjectiveNpc: true,
+              }
+              : null;
+          let rescueTargetAlive = rescueNpc ? rescueNpc.hp > 0 : true;
           let rescueBarrierCharges = objectiveMode === 'rescue' ? 1 : 0;
           let bossAlive = true;
           let matchState = createInitialMatchState(lineupSize, objectiveMode);
@@ -19661,7 +19685,10 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               const teamUnits = aliveByTeam[matchState.activeTeam];
               return teamUnits.find((unit) => unit.slotIndex === matchState.activeIndexInLineup && unit.hp > 0) ?? null;
           };
-          const allUnits = () => [...aliveByTeam.player, ...aliveByTeam.enemy].filter((unit) => unit.hp > 0);
+          const allUnits = () => {
+              const objectiveUnits = rescueNpc && rescueNpc.hp > 0 ? [rescueNpc] : [];
+              return [...aliveByTeam.player, ...aliveByTeam.enemy, ...objectiveUnits].filter((unit) => unit.hp > 0);
+          };
           const removeDeadUnits = () => {
               for (const team of ['player', 'enemy']) {
                   for (const unit of aliveByTeam[team]) {
@@ -19671,6 +19698,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               }
           };
           const syncMatchResult = (hook = 'onAction') => {
+              rescueTargetAlive = rescueNpc ? rescueNpc.hp > 0 : true;
               const summarizeTeamHpPct = (team) => {
                   const units = aliveByTeam[team];
                   return units.reduce((total, unit) => {
@@ -19773,7 +19801,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           const hasRescueLethalThreat = () => {
               if (matchState.objectiveMode !== 'rescue')
                   return false;
-              const rescueUnit = aliveByTeam.player[0];
+              const rescueUnit = rescueNpc;
               if (!rescueUnit || rescueUnit.hp <= 0)
                   return false;
               return aliveByTeam.enemy.some((enemy) => (enemy.hp > 0
@@ -19819,8 +19847,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   const rescueBarrier = resolveRescueBarrier({
                       enabled: Boolean(target
                           && matchState.objectiveMode === 'rescue'
-                          && target.team === 'player'
-                          && target.slotIndex === 0
+                          && target.isObjectiveNpc
                           && active.team === 'enemy'),
                       charges: rescueBarrierCharges,
                       targetHp: target?.hp ?? 0,
@@ -19993,6 +20020,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                                       renderBoard();
                                       return;
                                   }
+                                  if (target.isObjectiveNpc)
+                                      return;
                                   if (target.team !== actingUnit.team) {
                                       executeCommand({ type: 'basicAttack', team: 'player', payload: { targetX: x, targetY: y } });
                                       executeCommand({ type: 'endTurn', team: 'player' });
