@@ -21,6 +21,7 @@ import {
   recordMove,
   resolveAction,
   resolveActionUiEffects,
+  resolveRescueBarrier,
   type MatchCommandType,
   type MatchState,
   type TeamId,
@@ -88,6 +89,8 @@ interface MatchCommand {
   readonly team: TeamId;
   readonly payload?: Record<string, number>;
 }
+
+type OffensiveAction = Extract<MatchCommandType, 'basicAttack' | 'castSkill' | 'castUlt'>;
 
 const CLASS_PROFILE: Record<string, { move: number; basicRange: number; zocImmune?: boolean }> = {
   tanker: { move: 3, basicRange: 1 },
@@ -192,7 +195,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   section.innerHTML = `
     <div class="chess-rpg-match__top">
       <button type="button" class="chess-rpg-match__back" aria-label="Về hub mô phỏng">←</button>
-      <div class="chess-rpg-match__meta">Trận chính · Seed ${seed} · Tu vi ${realm} · Luật quân cờ chuẩn cờ vua.</div>
+      <div class="chess-rpg-match__meta">Trận chính · Seed ${seed} · Tu vi ${realm} · Tactical loop: move 1 lần + 1 action.</div>
     </div>
     <p class="chess-rpg-match__turn" data-role="turn"></p>
     <div class="chess-rpg-match__pieces" data-role="pieces"></div>
@@ -291,6 +294,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     const objectiveFromParam = typeof params?.objective === 'string' ? params.objective : 'elimination';
     const objectiveMode: ObjectiveMode = objectiveFromParam === 'rescue' || objectiveFromParam === 'boss' ? objectiveFromParam : 'elimination';
     let rescueTargetAlive = true;
+    let rescueBarrierCharges = objectiveMode === 'rescue' ? 1 : 0;
     let bossAlive = true;
     let matchState: MatchState = createInitialMatchState(lineupSize, objectiveMode);
     let unitTurnStartedAtMs = Date.now();
@@ -358,6 +362,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     };
 
     const basicDamage = (attacker: UnitState, defender: UnitState): number => Math.max(1, Math.floor(attacker.atk - defender.arm));
+    const resolveActionDamage = (action: OffensiveAction, attacker: UnitState, defender: UnitState): number => {
+      const base = basicDamage(attacker, defender);
+      if (action === 'castUlt') return base + 12;
+      if (action === 'castSkill') return base + 5;
+      return base;
+    };
     const aiProfileRoll = nextRngValue(createRngState(hashSeedText(`${seed}:ai-profile`)));
     const aiProfile: TacticalAiProfile = aiProfileRoll < 0.2 ? 'Aggressive' : aiProfileRoll < 0.4 ? 'Defensive' : 'Neutral';
     const distance = (a: UnitState, b: UnitState): number => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
@@ -405,6 +415,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       if (!rescueUnit || rescueUnit.hp <= 0) return false;
       return aliveByTeam.enemy.some((enemy) => (
         enemy.hp > 0
+        && rescueBarrierCharges <= 0
         && distance(enemy, rescueUnit) <= enemy.basicRange
         && basicDamage(enemy, rescueUnit) >= rescueUnit.hp
       ));
@@ -439,6 +450,22 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         if (actionType === 'castUlt' && !canUseCommand(matchState, actionType, { manualUlt: true, rage: active.rage, ultCost: active.maxRage })) return;
         if (actionType === 'basicAttack' && !canUseCommand(matchState, actionType)) return;
         resolveCollapseAt('beforeAction');
+        const rawDamage = target ? resolveActionDamage(actionType, active, target) : 0;
+        const rescueBarrier = resolveRescueBarrier({
+          enabled: Boolean(
+            target
+            && matchState.objectiveMode === 'rescue'
+            && target.team === 'player'
+            && target.slotIndex === 0
+            && active.team === 'enemy',
+          ),
+          charges: rescueBarrierCharges,
+          targetHp: target?.hp ?? 0,
+          incomingDamage: rawDamage,
+        });
+        if (rescueBarrier.triggered) {
+          rescueBarrierCharges = rescueBarrier.remainingCharges;
+        }
         const actionResult = resolveAction({
           actorTeam: matchState.activeTeam,
           action: actionType,
@@ -449,9 +476,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           actorRage: actionType === 'castUlt' ? active.rage : undefined,
           requireManualUlt: actionType === 'castUlt' ? true : undefined,
           ultCost: actionType === 'castUlt' ? active.maxRage : undefined,
-          damage: target ? (actionType === 'castUlt' ? basicDamage(active, target) + 12 : actionType === 'castSkill' ? basicDamage(active, target) + 5 : basicDamage(active, target)) : undefined,
+          damage: target ? rescueBarrier.damageAfterBarrier : undefined,
           targetHp: target?.hp,
-          buffIds: actionType === 'castSkill' ? ['skill-cast'] : actionType === 'castUlt' ? ['ult-cast'] : undefined,
+          buffIds: actionType === 'castSkill'
+            ? ['skill-cast']
+            : actionType === 'castUlt'
+              ? ['ult-cast']
+              : rescueBarrier.triggered
+                ? ['rescue-barrier']
+                : undefined,
         });
         if (!actionResult.ok) return;
         if (target && actionResult.targetHp != null) {
@@ -525,9 +558,23 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       return true;
     };
 
+    const refreshBoardUi = (): void => {
+      prepareReachable();
+      renderHUD();
+      renderBoard();
+    };
+    const queueEnemyIfNeeded = (): void => {
+      if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
+        window.setTimeout(processEnemyTurn, 240);
+      }
+    };
+    const finalizePlayerProgress = (): void => {
+      refreshBoardUi();
+      queueEnemyIfNeeded();
+    };
+
     const renderBoard = (): void => {
       boardHost.innerHTML = '';
-      const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
 
       for (let y = 0; y < board.height; y += 1) {
         for (let x = 0; x < board.width; x += 1) {
@@ -562,12 +609,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               if (actingUnit?.team !== 'player') return;
               if (!actingUnit) return;
               if (consumeTurnBudgetOrFallback()) {
-                prepareReachable();
-                renderHUD();
-                renderBoard();
-                if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
-                  window.setTimeout(processEnemyTurn, 240);
-                }
+                finalizePlayerProgress();
                 return;
               }
               const target = allUnits().find((entry) => entry.x === x && entry.y === y);
@@ -581,12 +623,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
                 if (target.team !== actingUnit.team) {
                   executeCommand({ type: 'basicAttack', team: 'player', payload: { targetX: x, targetY: y } });
                   executeCommand({ type: 'endTurn', team: 'player' });
-                  prepareReachable();
-                  renderHUD();
-                  renderBoard();
-                  if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
-                    window.setTimeout(processEnemyTurn, 240);
-                  }
+                  finalizePlayerProgress();
                 }
                 return;
               }
@@ -596,9 +633,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               actingUnit.x = x;
               actingUnit.y = y;
               executeCommand({ type: 'move', team: 'player', payload: { tileSteps } });
-              prepareReachable();
-              renderHUD();
-              renderBoard();
+              refreshBoardUi();
             });
           }
           boardHost.appendChild(cell);
@@ -617,15 +652,18 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
             : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
             : 'Không có nhân vật khả dụng.';
       }
-  if (piecesHost instanceof HTMLElement) {
-        piecesHost.innerHTML = '';
-        if (active) {
+          if (piecesHost instanceof HTMLElement) {
+          piecesHost.innerHTML = '';
+          if (active) {
           const teamResource = matchState.resources[active.team];
           const status = document.createElement('span');
           const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
           const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
           status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
-          status.textContent = `Class ${active.classId} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}`;
+          const rescueBarrierInfo = matchState.objectiveMode === 'rescue'
+            ? ` | Barrier NPC ${rescueBarrierCharges > 0 ? 'sẵn sàng' : 'đã vỡ'}`
+            : '';
+          status.textContent = `Class ${active.classId} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
           piecesHost.appendChild(status);
         }
       }
@@ -665,9 +703,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
             if (!activePlayer) return;
             executeCommand({ type: 'castSkill', team: 'player' });
             executeCommand({ type: 'endTurn', team: 'player' });
-            prepareReachable();
-            renderHUD();
-            renderBoard();
+            finalizePlayerProgress();
           },
           !activePlayer || !canUseCommand(matchState, 'castSkill', { skillCost: activePlayer.skillCost }) || matchState.result.status !== 'ongoing',
         );
@@ -677,9 +713,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
             if (!activePlayer) return;
             executeCommand({ type: 'castUlt', team: 'player' });
             executeCommand({ type: 'endTurn', team: 'player' });
-            prepareReachable();
-            renderHUD();
-            renderBoard();
+            finalizePlayerProgress();
           },
           !activePlayer || !canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: activePlayer.rage, ultCost: activePlayer.maxRage }) || matchState.result.status !== 'ongoing',
         );
@@ -689,12 +723,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
             if (!activePlayer) return;
             executeCommand({ type: 'skipAction', team: 'player' });
             executeCommand({ type: 'endTurn', team: 'player' });
-            prepareReachable();
-            renderHUD();
-            renderBoard();
-            if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
-              window.setTimeout(processEnemyTurn, 240);
-            }
+            finalizePlayerProgress();
           },
           !activePlayer || !canUseCommand(matchState, 'skipAction') || matchState.result.status !== 'ongoing',
         );
@@ -703,12 +732,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           () => {
             if (!activePlayer) return;
             executeCommand({ type: 'endTurn', team: 'player' });
-            prepareReachable();
-            renderHUD();
-            renderBoard();
-            if (matchState.activeTeam === 'enemy') {
-              window.setTimeout(processEnemyTurn, 240);
-            }
+            finalizePlayerProgress();
           },
           !activePlayer || !canUseCommand(matchState, 'endTurn') || matchState.result.status !== 'ongoing',
         );

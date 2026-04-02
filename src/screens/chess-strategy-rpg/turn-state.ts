@@ -117,6 +117,19 @@ export interface ActionUiEffect {
   key: string;
 }
 
+export interface RescueBarrierInput {
+  readonly enabled: boolean;
+  readonly charges: number;
+  readonly targetHp: number;
+  readonly incomingDamage: number;
+}
+
+export interface RescueBarrierResult {
+  readonly damageAfterBarrier: number;
+  readonly remainingCharges: number;
+  readonly triggered: boolean;
+}
+
 export const MOVE_AE_PER_TILE = 1;
 export const MOVE_AE_CAP_PER_TURN = 3;
 export const BASIC_ATTACK_AE_GAIN = 2;
@@ -317,6 +330,25 @@ export function resolveActionUiEffects(result: ActionResolverResult): ActionUiEf
   if (result.isTargetDead) effects.push({ type: 'sound', key: 'target-down' });
   if ((result.buffsApplied?.length ?? 0) > 0) effects.push({ type: 'floatingText', key: 'buff-applied' });
   return effects;
+}
+
+export function resolveRescueBarrier(input: RescueBarrierInput): RescueBarrierResult {
+  const charges = Math.max(0, Math.floor(input.charges));
+  const targetHp = Math.max(0, Math.floor(input.targetHp));
+  const incomingDamage = Math.max(0, Math.floor(input.incomingDamage));
+  const lethal = incomingDamage >= targetHp && targetHp > 0;
+  if (!input.enabled || charges <= 0 || !lethal) {
+    return {
+      damageAfterBarrier: incomingDamage,
+      remainingCharges: charges,
+      triggered: false,
+    };
+  }
+  return {
+    damageAfterBarrier: 0,
+    remainingCharges: charges - 1,
+    triggered: true,
+  };
 }
 
 export function evaluateObjectiveResult(state: MatchState, payload: ObjectiveEvaluationPayload): MatchState {

@@ -13,6 +13,7 @@ import {
   PLAYER_TURN_CAP,
   recordMove,
   resolveAction,
+  resolveRescueBarrier,
   SHRINK_START_PLAYER_TURN,
   UNIT_TURN_BASE_TIME_MS,
 } from '../src/screens/chess-strategy-rpg/turn-state.ts';
@@ -247,5 +248,26 @@ describe('chess strategy rpg turn state', () => {
     expect(s1.collapseRings).toBe(1);
     const s2 = advanceTurn(s1);
     expect(s2.collapseRings).toBe(2);
+  });
+
+  test('rescue barrier absorbs first lethal hit only', () => {
+    const blocked = resolveRescueBarrier({
+      enabled: true,
+      charges: 1,
+      targetHp: 30,
+      incomingDamage: 40,
+    });
+    expect(blocked.triggered).toBe(true);
+    expect(blocked.damageAfterBarrier).toBe(0);
+    expect(blocked.remainingCharges).toBe(0);
+
+    const noCharge = resolveRescueBarrier({
+      enabled: true,
+      charges: blocked.remainingCharges,
+      targetHp: 30,
+      incomingDamage: 40,
+    });
+    expect(noCharge.triggered).toBe(false);
+    expect(noCharge.damageAfterBarrier).toBe(40);
   });
 });
