@@ -19784,6 +19784,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   syncMatchResult('onAction');
                   return;
               }
+              if (!canUseCommand(matchState, 'endTurn'))
+                  return;
               matchState = advanceTurn(matchState);
               syncMatchResult('onTurnEnd');
               normalizeActiveSlot();
@@ -19983,7 +19985,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       if (matchState.activeTeam === 'enemy') {
                           window.setTimeout(processEnemyTurn, 240);
                       }
-                  }, !activePlayer || matchState.result.status !== 'ongoing');
+                  }, !activePlayer || !canUseCommand(matchState, 'endTurn') || matchState.result.status !== 'ongoing');
               }
           };
           const prepareReachable = () => {

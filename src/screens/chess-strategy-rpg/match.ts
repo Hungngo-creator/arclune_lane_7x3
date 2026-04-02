@@ -480,6 +480,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         return;
       }
 
+      if (!canUseCommand(matchState, 'endTurn')) return;
       matchState = advanceTurn(matchState);
       syncMatchResult('onTurnEnd');
       normalizeActiveSlot();
@@ -689,7 +690,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               window.setTimeout(processEnemyTurn, 240);
             }
           },
-          !activePlayer || matchState.result.status !== 'ongoing',
+          !activePlayer || !canUseCommand(matchState, 'endTurn') || matchState.result.status !== 'ongoing',
         );
       }
     };
