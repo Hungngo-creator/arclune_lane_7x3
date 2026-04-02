@@ -7,7 +7,6 @@ import {
   resolvePlayerUnits,
   resolveValidSeed,
 } from './battle.ts';
-import { createRngState, nextRngValue } from '../../utils/rng.ts';
 import {
   advanceTurn,
   canUseCommand,
@@ -28,6 +27,7 @@ import {
   type TeamId,
   type ObjectiveMode,
 } from './turn-state.ts';
+import { resolveTacticalAiProfile, type TacticalAiProfile } from './seed.ts';
 
 const STYLE_ID = 'chess-strategy-rpg-match-style';
 const CARDINAL_DIRS = Object.freeze([{ dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 }]);
@@ -63,8 +63,6 @@ interface RenderContext {
   readonly params?: Record<string, unknown> | null;
 }
 
-type TacticalAiProfile = 'Neutral' | 'Aggressive' | 'Defensive';
-
 interface UnitState {
   id: string;
   label: string;
@@ -83,7 +81,7 @@ interface UnitState {
   basicRange: number;
   zocImmune: boolean;
   slotIndex: number;
-  isSummon?: boolean;
+  isSummon: boolean;
   isObjectiveNpc?: boolean;
 }
 
@@ -111,15 +109,6 @@ const CLASS_PROFILE: Record<string, { move: number; basicRange: number; zocImmun
   summoner: { move: 3, basicRange: 2 },
   ranger: { move: 3, basicRange: 3 },
 };
-
-function hashSeedText(seedText: string): number {
-  let hash = 2166136261 >>> 0;
-  for (let i = 0; i < seedText.length; i += 1) {
-    hash ^= seedText.charCodeAt(i);
-    hash = Math.imul(hash, 16777619) >>> 0;
-  }
-  return hash >>> 0;
-}
 
 function numberParam(input: unknown, fallback = 1): number {
   const value = Number(input);
@@ -480,8 +469,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       if (action === 'castSkill') return base + 5;
       return base;
     };
-    const aiProfileRoll = nextRngValue(createRngState(hashSeedText(`${seed}:ai-profile`)));
-    const aiProfile: TacticalAiProfile = aiProfileRoll < 0.2 ? 'Aggressive' : aiProfileRoll < 0.4 ? 'Defensive' : 'Neutral';
+    const aiProfileFromParam = params?.aiProfile;
+    const aiProfile: TacticalAiProfile = aiProfileFromParam === 'Aggressive' || aiProfileFromParam === 'Defensive' || aiProfileFromParam === 'Neutral'
+      ? aiProfileFromParam
+      : resolveTacticalAiProfile(seed);
     const distance = (a: UnitState, b: UnitState): number => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
     const resolveActionRange = (actor: UnitState, action: 'basicAttack' | 'castSkill' | 'castUlt'): number => {
       if (action === 'basicAttack') return Math.max(1, actor.basicRange);

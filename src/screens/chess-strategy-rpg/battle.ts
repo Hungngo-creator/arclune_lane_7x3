@@ -4,6 +4,7 @@ import { makeInstanceStats } from '../../meta.ts';
 import { loadPlayerProfile } from '../../utils/player-profile.ts';
 import { createRngState, nextRngValue } from '../../utils/rng.ts';
 import { listCultivationRealmOptions } from '../../cultivation.ts';
+import { hashSeedText, resolveTacticalAiProfile } from './seed.ts';
 
 const STYLE_ID = 'chess-strategy-rpg-battle-style';
 const PREVIEW_CELL_SIZE = 30;
@@ -61,6 +62,14 @@ interface RenderContext {
   readonly shell?: { enterScreen?: (screenId: string, params?: Record<string, unknown>) => void } | null;
 }
 
+const OBJECTIVE_OPTIONS = [
+  { value: 'elimination', label: 'Tiêu diệt toàn bộ' },
+  { value: 'rescue', label: 'Giải cứu (NPC sống sót)' },
+  { value: 'boss', label: 'Hạ boss mục tiêu' },
+] as const;
+
+type ObjectiveMode = typeof OBJECTIVE_OPTIONS[number]['value'];
+
 export interface BattleUnit {
   id: string;
   name: string;
@@ -88,15 +97,6 @@ export const MIN_OUTER_RANDOM_TILES = 48;
 const BOARD_SIZE = 23;
 
 const sanitizeSeed = (raw: string): string => raw.replace(/[^a-z0-9]/gi, '').toUpperCase();
-
-const hashSeedText = (seedText: string): number => {
-  let hash = 2166136261 >>> 0;
-  for (let i = 0; i < seedText.length; i += 1) {
-    hash ^= seedText.charCodeAt(i);
-    hash = Math.imul(hash, 16777619) >>> 0;
-  }
-  return hash >>> 0;
-};
 
 export const randomSeedText = (length = MIN_SEED_LENGTH): string => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -330,6 +330,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
 
   let selectedRealm = realmOptions[0]?.value ?? 1;
   let selectedSeed = randomSeedText();
+  let selectedObjective: ObjectiveMode = 'elimination';
 
   const section = document.createElement('section');
   section.className = 'chess-rpg-battle';
@@ -354,6 +355,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           <select class="chess-hub__select" data-role="realm-select">
             ${realmOptions.map((option) => `<option value="${option.value}">${option.label}</option>`).join('')}
           </select>
+          <select class="chess-hub__select" data-role="objective-select">
+            ${OBJECTIVE_OPTIONS.map((option) => `<option value="${option.value}">${option.label}</option>`).join('')}
+          </select>
           <button class="chess-hub__ok" type="button" data-role="realm-ok">Bắt đầu</button>
         </div>
       </article>
@@ -373,6 +377,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   const openButton = section.querySelector('[data-role="open-realm"]');
   const realmWrap = section.querySelector('[data-role="realm-wrap"]');
   const realmSelect = section.querySelector('[data-role="realm-select"]');
+  const objectiveSelect = section.querySelector('[data-role="objective-select"]');
   const seedInput = section.querySelector('[data-role="seed-input"]');
   const randomSeedButton = section.querySelector('[data-role="seed-random"]');
   const okButton = section.querySelector('[data-role="realm-ok"]');
@@ -394,7 +399,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     const units = resolvePlayerUnits(selectedRealm);
     if (metaHost instanceof HTMLElement) {
       const realmLabel = realmOptions.find((option) => option.value === selectedRealm)?.label ?? `Cảnh giới ${selectedRealm}`;
-      metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel} · seed ${validSeed}. Bàn cờ vuông ${boardPreview.width}x${boardPreview.height}, lõi ${MIN_CORE_SIZE}x${MIN_CORE_SIZE} có ít nhất ${MIN_CORE_VOID} ô lõm ngẫu nhiên, ngoài lõi thêm tối thiểu ${MIN_OUTER_RANDOM_TILES} ô ngẫu nhiên.`;
+      const objectiveLabel = OBJECTIVE_OPTIONS.find((option) => option.value === selectedObjective)?.label ?? OBJECTIVE_OPTIONS[0].label;
+      const aiProfile = resolveTacticalAiProfile(validSeed);
+      metaHost.textContent = `Đang mô phỏng trận tại ${realmLabel} · seed ${validSeed} · objective ${objectiveLabel} · AI profile theo seed: ${aiProfile}. Bàn cờ vuông ${boardPreview.width}x${boardPreview.height}, lõi ${MIN_CORE_SIZE}x${MIN_CORE_SIZE} có ít nhất ${MIN_CORE_VOID} ô lõm ngẫu nhiên, ngoài lõi thêm tối thiểu ${MIN_OUTER_RANDOM_TILES} ô ngẫu nhiên.`;
     }
 
     if (boardHost instanceof HTMLElement) {
@@ -438,6 +445,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     refreshPreview();
   };
 
+  const onObjectiveChange = () => {
+    if (!(objectiveSelect instanceof HTMLSelectElement)) return;
+    selectedObjective = objectiveSelect.value === 'rescue' || objectiveSelect.value === 'boss'
+      ? objectiveSelect.value
+      : 'elimination';
+    refreshPreview();
+  };
+
   const onRandomSeed = () => {
     selectedSeed = randomSeedText(10);
     refreshPreview();
@@ -446,12 +461,18 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   const onStart = () => {
     const seed = resolveValidSeed(selectedSeed);
     const realm = selectedRealm;
-    shell?.enterScreen?.('chess-strategy-rpg-match', { seed, realm });
+    shell?.enterScreen?.('chess-strategy-rpg-match', {
+      seed,
+      realm,
+      objective: selectedObjective,
+      aiProfile: resolveTacticalAiProfile(seed),
+    });
   };
 
   backButton?.addEventListener('click', onBack);
   openButton?.addEventListener('click', onOpen);
   realmSelect?.addEventListener('change', onRealmChange);
+  objectiveSelect?.addEventListener('change', onObjectiveChange);
   seedInput?.addEventListener('input', onSeedInputChange);
   seedInput?.addEventListener('change', onSeedInputChange);
   randomSeedButton?.addEventListener('click', onRandomSeed);
@@ -464,6 +485,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       backButton?.removeEventListener('click', onBack);
       openButton?.removeEventListener('click', onOpen);
       realmSelect?.removeEventListener('change', onRealmChange);
+      objectiveSelect?.removeEventListener('change', onObjectiveChange);
       seedInput?.removeEventListener('input', onSeedInputChange);
       seedInput?.removeEventListener('change', onSeedInputChange);
       randomSeedButton?.removeEventListener('click', onRandomSeed);
