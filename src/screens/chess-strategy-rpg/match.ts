@@ -316,12 +316,24 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       }
     };
     const syncMatchResult = (hook: 'onTurnStart' | 'onAction' | 'onTurnEnd' = 'onAction'): void => {
+      const summarizeTeamHpPct = (team: TeamId): number => {
+        const units = aliveByTeam[team];
+        return units.reduce((total, unit) => {
+          const max = Math.max(1, unit.maxHp);
+          const ratio = Math.max(0, Math.min(1, unit.hp / max));
+          return total + ratio;
+        }, 0);
+      };
       matchState = evaluateObjectiveResult(matchState, {
         hook,
         context: {
           aliveByTeam: {
             player: aliveByTeam.player.filter((unit) => unit.hp > 0).length,
             enemy: aliveByTeam.enemy.filter((unit) => unit.hp > 0).length,
+          },
+          hpPctByTeam: {
+            player: summarizeTeamHpPct('player'),
+            enemy: summarizeTeamHpPct('enemy'),
           },
           objectiveState: {
             rescueTargetAlive,
@@ -622,9 +634,17 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           resultHost.hidden = true;
         } else {
           resultHost.hidden = false;
-          resultHost.textContent = matchState.result.status === 'win'
-            ? 'Thắng trận (elimination).'
-            : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
+          if (matchState.result.status === 'win') {
+            resultHost.textContent = matchState.result.reason?.startsWith('turn-cap-tiebreak')
+              ? 'Thắng trận (tie-break khi hết turn cap).'
+              : 'Thắng trận (hoàn thành objective).';
+          } else if (matchState.result.status === 'lose') {
+            resultHost.textContent = matchState.result.reason === 'turn-cap-tiebreak:alive-units' || matchState.result.reason === 'turn-cap-tiebreak:hp-pct'
+              ? 'Thua trận (tie-break khi hết turn cap).'
+              : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
+          } else {
+            resultHost.textContent = 'Hòa trận (tie-break không phân thắng bại).';
+          }
         }
       }
       if (actionsHost instanceof HTMLElement) {

@@ -118,8 +118,29 @@ describe('chess strategy rpg turn state', () => {
     let capState = createInitialMatchState(1);
     capState.turnCountPlayer = PLAYER_TURN_CAP + 1;
     capState = evaluateMatchResult(capState, { player: 1, enemy: 1 });
-    expect(capState.result.status).toBe('lose');
-    expect(capState.result.reason).toBe('turn-cap');
+    expect(capState.result.status).toBe('draw');
+    expect(capState.result.reason).toBe('turn-cap-draw');
+  });
+
+  test('applies turn-cap tie-break by alive units then hp percentage', () => {
+    let byAlive = createInitialMatchState(1);
+    byAlive.turnCountPlayer = PLAYER_TURN_CAP + 1;
+    byAlive = evaluateMatchResult(byAlive, { player: 2, enemy: 1 });
+    expect(byAlive.result.status).toBe('win');
+    expect(byAlive.result.reason).toBe('turn-cap-tiebreak:alive-units');
+
+    let byHpPct = createInitialMatchState(1);
+    byHpPct.turnCountPlayer = PLAYER_TURN_CAP + 1;
+    byHpPct = evaluateMatchResult(byHpPct, { player: 1, enemy: 1 }, { player: 1.2, enemy: 0.6 });
+    expect(byHpPct.result.status).toBe('win');
+    expect(byHpPct.result.reason).toBe('turn-cap-tiebreak:hp-pct');
+  });
+
+  test('resolves simultaneous wipe as draw', () => {
+    let state = createInitialMatchState(1);
+    state = evaluateMatchResult(state, { player: 0, enemy: 0 });
+    expect(state.result.status).toBe('draw');
+    expect(state.result.reason).toBe('simultaneous-elimination');
   });
 
   test('action resolver follows common pipeline', () => {

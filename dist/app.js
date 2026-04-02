@@ -19609,12 +19609,24 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               }
           };
           const syncMatchResult = (hook = 'onAction') => {
+              const summarizeTeamHpPct = (team) => {
+                  const units = aliveByTeam[team];
+                  return units.reduce((total, unit) => {
+                      const max = Math.max(1, unit.maxHp);
+                      const ratio = Math.max(0, Math.min(1, unit.hp / max));
+                      return total + ratio;
+                  }, 0);
+              };
               matchState = evaluateObjectiveResult(matchState, {
                   hook,
                   context: {
                       aliveByTeam: {
                           player: aliveByTeam.player.filter((unit) => unit.hp > 0).length,
                           enemy: aliveByTeam.enemy.filter((unit) => unit.hp > 0).length,
+                      },
+                      hpPctByTeam: {
+                          player: summarizeTeamHpPct('player'),
+                          enemy: summarizeTeamHpPct('enemy'),
                       },
                       objectiveState: {
                           rescueTargetAlive,
@@ -19928,9 +19940,19 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   }
                   else {
                       resultHost.hidden = false;
-                      resultHost.textContent = matchState.result.status === 'win'
-                          ? 'Thắng trận (elimination).'
-                          : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
+                      if (matchState.result.status === 'win') {
+                          resultHost.textContent = matchState.result.reason?.startsWith('turn-cap-tiebreak')
+                              ? 'Thắng trận (tie-break khi hết turn cap).'
+                              : 'Thắng trận (hoàn thành objective).';
+                      }
+                      else if (matchState.result.status === 'lose') {
+                          resultHost.textContent = matchState.result.reason === 'turn-cap-tiebreak:alive-units' || matchState.result.reason === 'turn-cap-tiebreak:hp-pct'
+                              ? 'Thua trận (tie-break khi hết turn cap).'
+                              : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
+                      }
+                      else {
+                          resultHost.textContent = 'Hòa trận (tie-break không phân thắng bại).';
+                      }
                   }
               }
               if (actionsHost instanceof HTMLElement) {
@@ -20400,7 +20422,7 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
   function evaluateObjectiveResult(state, payload) {
       if (state.result.status !== 'ongoing')
           return state;
-      const eliminationObjectiveHandler = (current, runtime) => (evaluateMatchResult(current, runtime.context.aliveByTeam));
+      const eliminationObjectiveHandler = (current, runtime) => (evaluateMatchResult(current, runtime.context.aliveByTeam, runtime.context.hpPctByTeam));
       const rescueObjectiveHandler = (current, runtime) => {
           if (runtime.context.objectiveState?.rescueTargetAlive === false) {
               return {
@@ -20569,11 +20591,23 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           },
       };
   }
-  function evaluateMatchResult(state, aliveByTeam) {
+  function evaluateMatchResult(state, aliveByTeam, hpPctByTeam) {
       if (state.result.status !== 'ongoing')
           return state;
       const playerAlive = Math.max(0, Math.floor(aliveByTeam.player));
       const enemyAlive = Math.max(0, Math.floor(aliveByTeam.enemy));
+      const playerHpPct = Math.max(0, Number(hpPctByTeam?.player ?? 0));
+      const enemyHpPct = Math.max(0, Number(hpPctByTeam?.enemy ?? 0));
+      if (playerAlive <= 0 && enemyAlive <= 0) {
+          return {
+              ...state,
+              result: {
+                  status: 'draw',
+                  reason: 'simultaneous-elimination',
+                  winner: null,
+              },
+          };
+      }
       if (enemyAlive <= 0) {
           return {
               ...state,
@@ -20595,12 +20629,52 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           };
       }
       if (state.turnCountPlayer > PLAYER_TURN_CAP) {
+          if (playerAlive > enemyAlive) {
+              return {
+                  ...state,
+                  result: {
+                      status: 'win',
+                      reason: 'turn-cap-tiebreak:alive-units',
+                      winner: 'player',
+                  },
+              };
+          }
+          if (enemyAlive > playerAlive) {
+              return {
+                  ...state,
+                  result: {
+                      status: 'lose',
+                      reason: 'turn-cap-tiebreak:alive-units',
+                      winner: 'enemy',
+                  },
+              };
+          }
+          if (playerHpPct > enemyHpPct) {
+              return {
+                  ...state,
+                  result: {
+                      status: 'win',
+                      reason: 'turn-cap-tiebreak:hp-pct',
+                      winner: 'player',
+                  },
+              };
+          }
+          if (enemyHpPct > playerHpPct) {
+              return {
+                  ...state,
+                  result: {
+                      status: 'lose',
+                      reason: 'turn-cap-tiebreak:hp-pct',
+                      winner: 'enemy',
+                  },
+              };
+          }
           return {
               ...state,
               result: {
-                  status: 'lose',
-                  reason: 'turn-cap',
-                  winner: 'enemy',
+                  status: 'draw',
+                  reason: 'turn-cap-draw',
+                  winner: null,
               },
           };
       }

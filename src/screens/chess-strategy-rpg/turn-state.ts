@@ -1,6 +1,6 @@
 export type TeamId = 'player' | 'enemy';
 export type ObjectiveMode = 'elimination' | 'rescue' | 'boss';
-export type MatchResultStatus = 'ongoing' | 'win' | 'lose';
+export type MatchResultStatus = 'ongoing' | 'win' | 'lose' | 'draw';
 export type ObjectiveHook = 'onTurnStart' | 'onAction' | 'onTurnEnd';
 export type CollapseTiming = 'beforeAction' | 'afterAction';
 
@@ -26,6 +26,7 @@ export interface ObjectiveRuntimeState {
 
 export interface ObjectiveContext {
   readonly aliveByTeam: Readonly<Record<TeamId, number>>;
+  readonly hpPctByTeam?: Readonly<Record<TeamId, number>>;
   readonly objectiveState?: ObjectiveRuntimeState;
 }
 
@@ -322,7 +323,7 @@ export function evaluateObjectiveResult(state: MatchState, payload: ObjectiveEva
   if (state.result.status !== 'ongoing') return state;
    type ObjectiveRuleHandler = (current: MatchState, runtime: ObjectiveEvaluationPayload) => MatchState | null;
   const eliminationObjectiveHandler: ObjectiveRuleHandler = (current, runtime) => (
-    evaluateMatchResult(current, runtime.context.aliveByTeam)
+    evaluateMatchResult(current, runtime.context.aliveByTeam, runtime.context.hpPctByTeam)
   );
   const rescueObjectiveHandler: ObjectiveRuleHandler = (current, runtime) => {
     if (runtime.context.objectiveState?.rescueTargetAlive === false) {
@@ -503,10 +504,23 @@ export function advanceTurn(state: MatchState): MatchState {
 export function evaluateMatchResult(
   state: MatchState,
   aliveByTeam: Readonly<Record<TeamId, number>>,
+  hpPctByTeam?: Readonly<Record<TeamId, number>>,
 ): MatchState {
   if (state.result.status !== 'ongoing') return state;
   const playerAlive = Math.max(0, Math.floor(aliveByTeam.player));
   const enemyAlive = Math.max(0, Math.floor(aliveByTeam.enemy));
+  const playerHpPct = Math.max(0, Number(hpPctByTeam?.player ?? 0));
+  const enemyHpPct = Math.max(0, Number(hpPctByTeam?.enemy ?? 0));
+  if (playerAlive <= 0 && enemyAlive <= 0) {
+    return {
+      ...state,
+      result: {
+        status: 'draw',
+        reason: 'simultaneous-elimination',
+        winner: null,
+      },
+    };
+  }
   if (enemyAlive <= 0) {
     return {
       ...state,
@@ -528,12 +542,52 @@ export function evaluateMatchResult(
     };
   }
   if (state.turnCountPlayer > PLAYER_TURN_CAP) {
+    if (playerAlive > enemyAlive) {
+      return {
+        ...state,
+        result: {
+          status: 'win',
+          reason: 'turn-cap-tiebreak:alive-units',
+          winner: 'player',
+        },
+      };
+    }
+    if (enemyAlive > playerAlive) {
+      return {
+        ...state,
+        result: {
+          status: 'lose',
+          reason: 'turn-cap-tiebreak:alive-units',
+          winner: 'enemy',
+        },
+      };
+    }
+    if (playerHpPct > enemyHpPct) {
+      return {
+        ...state,
+        result: {
+          status: 'win',
+          reason: 'turn-cap-tiebreak:hp-pct',
+          winner: 'player',
+        },
+      };
+    }
+    if (enemyHpPct > playerHpPct) {
+      return {
+        ...state,
+        result: {
+          status: 'lose',
+          reason: 'turn-cap-tiebreak:hp-pct',
+          winner: 'enemy',
+        },
+      };
+    }
     return {
       ...state,
       result: {
-        status: 'lose',
-        reason: 'turn-cap',
-        winner: 'enemy',
+        status: 'draw',
+        reason: 'turn-cap-draw',
+        winner: null,
       },
     };
   }
