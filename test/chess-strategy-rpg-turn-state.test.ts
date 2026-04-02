@@ -12,8 +12,11 @@ import {
   evaluateObjectiveResult,
   PLAYER_TURN_CAP,
   recordMove,
+  resolveSummonCapAfterSpawn,
   resolveAction,
   resolveRescueBarrier,
+  scoreAliveUnitPoints,
+  SUMMON_CAP_PER_TEAM,
   SHRINK_START_PLAYER_TURN,
   UNIT_TURN_BASE_TIME_MS,
 } from '../src/screens/chess-strategy-rpg/turn-state.ts';
@@ -128,13 +131,26 @@ describe('chess strategy rpg turn state', () => {
     byAlive.turnCountPlayer = PLAYER_TURN_CAP + 1;
     byAlive = evaluateMatchResult(byAlive, { player: 2, enemy: 1 });
     expect(byAlive.result.status).toBe('win');
-    expect(byAlive.result.reason).toBe('turn-cap-tiebreak:alive-units');
+    expect(byAlive.result.reason).toBe('turn-cap-tiebreak:unit-points');
 
     let byHpPct = createInitialMatchState(1);
     byHpPct.turnCountPlayer = PLAYER_TURN_CAP + 1;
     byHpPct = evaluateMatchResult(byHpPct, { player: 1, enemy: 1 }, { player: 1.2, enemy: 0.6 });
     expect(byHpPct.result.status).toBe('win');
     expect(byHpPct.result.reason).toBe('turn-cap-tiebreak:hp-pct');
+  });
+
+  test('supports summon weighted points tie-break before hp percentage', () => {
+    let bySummonPoints = createInitialMatchState(1);
+    bySummonPoints.turnCountPlayer = PLAYER_TURN_CAP + 1;
+    bySummonPoints = evaluateMatchResult(
+      bySummonPoints,
+      { player: 1, enemy: 1 },
+      { player: 0.8, enemy: 0.8 },
+      { player: 1.5, enemy: 1.0 },
+    );
+    expect(bySummonPoints.result.status).toBe('win');
+    expect(bySummonPoints.result.reason).toBe('turn-cap-tiebreak:unit-points');
   });
 
   test('resolves simultaneous wipe as draw', () => {
@@ -269,5 +285,26 @@ describe('chess strategy rpg turn state', () => {
     });
     expect(noCharge.triggered).toBe(false);
     expect(noCharge.damageAfterBarrier).toBe(40);
+  });
+
+  test('scores alive unit points with summon weight and resolves summon overflow by lowest hp', () => {
+    const points = scoreAliveUnitPoints([
+      { hp: 120, isSummon: false },
+      { hp: 40, isSummon: true },
+      { hp: 0, isSummon: true },
+    ]);
+    expect(points).toBe(1.5);
+
+    const overflow = resolveSummonCapAfterSpawn(
+      [
+        { id: 's1', hp: 12, maxHp: 60, spawnedOrder: 1 },
+        { id: 's2', hp: 30, maxHp: 60, spawnedOrder: 2 },
+        { id: 's3', hp: 20, maxHp: 60, spawnedOrder: 3 },
+      ],
+      { id: 's4', hp: 50, maxHp: 60, spawnedOrder: 4 },
+      SUMMON_CAP_PER_TEAM,
+    );
+    expect(overflow.replacedId).toBe('s1');
+    expect(overflow.roster.map((entry) => entry.id).sort()).toEqual(['s2', 's3', 's4']);
   });
 });

@@ -22,6 +22,7 @@ import {
   resolveAction,
   resolveActionUiEffects,
   resolveRescueBarrier,
+  scoreAliveUnitPoints,
   type MatchCommandType,
   type MatchState,
   type TeamId,
@@ -82,6 +83,7 @@ interface UnitState {
   basicRange: number;
   zocImmune: boolean;
   slotIndex: number;
+  isSummon?: boolean;
 }
 
 interface MatchCommand {
@@ -333,6 +335,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               basicRange: classProfile.basicRange,
               zocImmune: classProfile.zocImmune,
               slotIndex: index,
+              isSummon: false,
             }
           : null;
       })
@@ -361,6 +364,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               basicRange: classProfile.basicRange,
               zocImmune: classProfile.zocImmune,
               slotIndex: index,
+              isSummon: false,
             }
           : null;
       })
@@ -413,6 +417,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           hpPctByTeam: {
             player: summarizeTeamHpPct('player'),
             enemy: summarizeTeamHpPct('enemy'),
+          },
+          unitPointsByTeam: {
+            player: scoreAliveUnitPoints(aliveByTeam.player),
+            enemy: scoreAliveUnitPoints(aliveByTeam.enemy),
           },
           objectiveState: {
             rescueTargetAlive,
@@ -759,7 +767,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               ? 'Thắng trận (tie-break khi hết turn cap).'
               : 'Thắng trận (hoàn thành objective).';
           } else if (matchState.result.status === 'lose') {
-            resultHost.textContent = matchState.result.reason === 'turn-cap-tiebreak:alive-units' || matchState.result.reason === 'turn-cap-tiebreak:hp-pct'
+            resultHost.textContent = matchState.result.reason === 'turn-cap-tiebreak:unit-points' || matchState.result.reason === 'turn-cap-tiebreak:hp-pct'
               ? 'Thua trận (tie-break khi hết turn cap).'
               : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
           } else {

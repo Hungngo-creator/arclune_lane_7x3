@@ -27,6 +27,7 @@ export interface ObjectiveRuntimeState {
 export interface ObjectiveContext {
   readonly aliveByTeam: Readonly<Record<TeamId, number>>;
   readonly hpPctByTeam?: Readonly<Record<TeamId, number>>;
+  readonly unitPointsByTeam?: Readonly<Record<TeamId, number>>;
   readonly objectiveState?: ObjectiveRuntimeState;
 }
 
@@ -130,6 +131,18 @@ export interface RescueBarrierResult {
   readonly triggered: boolean;
 }
 
+export interface SummonPresence {
+  readonly id: string;
+  readonly hp: number;
+  readonly maxHp: number;
+  readonly spawnedOrder: number;
+}
+
+export interface SummonCapResolution {
+  readonly roster: ReadonlyArray<SummonPresence>;
+  readonly replacedId: string | null;
+}
+
 export const MOVE_AE_PER_TILE = 1;
 export const MOVE_AE_CAP_PER_TURN = 3;
 export const BASIC_ATTACK_AE_GAIN = 2;
@@ -138,6 +151,9 @@ export const ANTI_HOARD_AE_DECAY = 3;
 export const PLAYER_TURN_CAP = 9;
 export const UNIT_TURN_BASE_TIME_MS = 8_000;
 export const SHRINK_START_PLAYER_TURN = 4;
+export const SUMMON_CAP_PER_TEAM = 3;
+export const SUMMON_UNIT_POINT_WEIGHT = 0.5;
+export const CORE_UNIT_POINT_WEIGHT = 1;
 
 export function createInitialMatchState(lineupSize: number, objectiveMode: ObjectiveMode = 'elimination'): MatchState {
   return {
@@ -332,6 +348,44 @@ export function resolveActionUiEffects(result: ActionResolverResult): ActionUiEf
   return effects;
 }
 
+export function scoreAliveUnitPoints(units: ReadonlyArray<{ hp: number; isSummon?: boolean }>): number {
+  return units.reduce((total, unit) => {
+    const hp = Math.max(0, Math.floor(unit.hp));
+    if (hp <= 0) return total;
+    return total + (unit.isSummon ? SUMMON_UNIT_POINT_WEIGHT : CORE_UNIT_POINT_WEIGHT);
+  }, 0);
+}
+
+export function resolveSummonCapAfterSpawn(
+  current: ReadonlyArray<SummonPresence>,
+  incoming: SummonPresence,
+  cap = SUMMON_CAP_PER_TEAM,
+): SummonCapResolution {
+  const normalizedCap = Math.max(1, Math.floor(cap));
+  const living = current.filter((entry) => entry.hp > 0);
+  if (living.length < normalizedCap) {
+    return {
+      roster: [...living, incoming],
+      replacedId: null,
+    };
+  }
+
+  const ranked = [...living].sort((a, b) => {
+    const hpRatioA = Math.max(0, a.hp) / Math.max(1, a.maxHp);
+    const hpRatioB = Math.max(0, b.hp) / Math.max(1, b.maxHp);
+    if (hpRatioA !== hpRatioB) return hpRatioA - hpRatioB;
+    if (a.hp !== b.hp) return a.hp - b.hp;
+    return a.spawnedOrder - b.spawnedOrder;
+  });
+  const toReplace = ranked[0];
+  const replacedId = toReplace?.id ?? null;
+  const roster = living
+    .filter((entry) => entry.id !== replacedId)
+    .concat(incoming)
+    .slice(0, normalizedCap);
+  return { roster, replacedId };
+}
+
 export function resolveRescueBarrier(input: RescueBarrierInput): RescueBarrierResult {
   const charges = Math.max(0, Math.floor(input.charges));
   const targetHp = Math.max(0, Math.floor(input.targetHp));
@@ -355,7 +409,7 @@ export function evaluateObjectiveResult(state: MatchState, payload: ObjectiveEva
   if (state.result.status !== 'ongoing') return state;
    type ObjectiveRuleHandler = (current: MatchState, runtime: ObjectiveEvaluationPayload) => MatchState | null;
   const eliminationObjectiveHandler: ObjectiveRuleHandler = (current, runtime) => (
-    evaluateMatchResult(current, runtime.context.aliveByTeam, runtime.context.hpPctByTeam)
+    evaluateMatchResult(current, runtime.context.aliveByTeam, runtime.context.hpPctByTeam, runtime.context.unitPointsByTeam)
   );
   const rescueObjectiveHandler: ObjectiveRuleHandler = (current, runtime) => {
     if (runtime.context.objectiveState?.rescueTargetAlive === false) {
@@ -380,7 +434,7 @@ export function evaluateObjectiveResult(state: MatchState, payload: ObjectiveEva
         result: { status: 'lose', reason: `boss-player-wiped:${runtime.hook}`, winner: 'enemy' },
       };
     }
-  return null;
+   return null;
   };
 
   const objectiveFramework: Record<ObjectiveMode, Record<ObjectiveHook, ReadonlyArray<ObjectiveRuleHandler>>> = {
@@ -537,12 +591,15 @@ export function evaluateMatchResult(
   state: MatchState,
   aliveByTeam: Readonly<Record<TeamId, number>>,
   hpPctByTeam?: Readonly<Record<TeamId, number>>,
+  unitPointsByTeam?: Readonly<Record<TeamId, number>>,
 ): MatchState {
   if (state.result.status !== 'ongoing') return state;
   const playerAlive = Math.max(0, Math.floor(aliveByTeam.player));
   const enemyAlive = Math.max(0, Math.floor(aliveByTeam.enemy));
   const playerHpPct = Math.max(0, Number(hpPctByTeam?.player ?? 0));
   const enemyHpPct = Math.max(0, Number(hpPctByTeam?.enemy ?? 0));
+  const playerUnitPoints = Math.max(0, Number(unitPointsByTeam?.player ?? playerAlive));
+  const enemyUnitPoints = Math.max(0, Number(unitPointsByTeam?.enemy ?? enemyAlive));
   if (playerAlive <= 0 && enemyAlive <= 0) {
     return {
       ...state,
@@ -574,22 +631,22 @@ export function evaluateMatchResult(
     };
   }
   if (state.turnCountPlayer > PLAYER_TURN_CAP) {
-    if (playerAlive > enemyAlive) {
+    if (playerUnitPoints > enemyUnitPoints) {
       return {
         ...state,
         result: {
           status: 'win',
-          reason: 'turn-cap-tiebreak:alive-units',
+          reason: 'turn-cap-tiebreak:unit-points',
           winner: 'player',
         },
       };
     }
-    if (enemyAlive > playerAlive) {
+    if (enemyUnitPoints > playerUnitPoints) {
       return {
         ...state,
         result: {
           status: 'lose',
-          reason: 'turn-cap-tiebreak:alive-units',
+          reason: 'turn-cap-tiebreak:unit-points',
           winner: 'enemy',
         },
       };

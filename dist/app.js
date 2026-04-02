@@ -19361,6 +19361,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const resolveAction = __dep3.resolveAction;
   const resolveActionUiEffects = __dep3.resolveActionUiEffects;
   const resolveRescueBarrier = __dep3.resolveRescueBarrier;
+  const scoreAliveUnitPoints = __dep3.scoreAliveUnitPoints;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
   const CARDINAL_DIRS = Object.freeze([{ dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 }]);
   const CSS = /* css */ `
@@ -19608,6 +19609,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       basicRange: classProfile.basicRange,
                       zocImmune: classProfile.zocImmune,
                       slotIndex: index,
+                      isSummon: false,
                   }
                   : null;
           })
@@ -19636,6 +19638,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       basicRange: classProfile.basicRange,
                       zocImmune: classProfile.zocImmune,
                       slotIndex: index,
+                      isSummon: false,
                   }
                   : null;
           })
@@ -19686,6 +19689,10 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       hpPctByTeam: {
                           player: summarizeTeamHpPct('player'),
                           enemy: summarizeTeamHpPct('enemy'),
+                      },
+                      unitPointsByTeam: {
+                          player: scoreAliveUnitPoints(aliveByTeam.player),
+                          enemy: scoreAliveUnitPoints(aliveByTeam.enemy),
                       },
                       objectiveState: {
                           rescueTargetAlive,
@@ -20045,7 +20052,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                               : 'Thắng trận (hoàn thành objective).';
                       }
                       else if (matchState.result.status === 'lose') {
-                          resultHost.textContent = matchState.result.reason === 'turn-cap-tiebreak:alive-units' || matchState.result.reason === 'turn-cap-tiebreak:hp-pct'
+                          resultHost.textContent = matchState.result.reason === 'turn-cap-tiebreak:unit-points' || matchState.result.reason === 'turn-cap-tiebreak:hp-pct'
                               ? 'Thua trận (tie-break khi hết turn cap).'
                               : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
                       }
@@ -20324,6 +20331,9 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
   const PLAYER_TURN_CAP = 9;
   const UNIT_TURN_BASE_TIME_MS = 8_000;
   const SHRINK_START_PLAYER_TURN = 4;
+  const SUMMON_CAP_PER_TEAM = 3;
+  const SUMMON_UNIT_POINT_WEIGHT = 0.5;
+  const CORE_UNIT_POINT_WEIGHT = 1;
   function createInitialMatchState(lineupSize, objectiveMode = 'elimination') {
       return {
           phase: 'player',
@@ -20517,6 +20527,40 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           effects.push({ type: 'floatingText', key: 'buff-applied' });
       return effects;
   }
+  function scoreAliveUnitPoints(units) {
+      return units.reduce((total, unit) => {
+          const hp = Math.max(0, Math.floor(unit.hp));
+          if (hp <= 0)
+              return total;
+          return total + (unit.isSummon ? SUMMON_UNIT_POINT_WEIGHT : CORE_UNIT_POINT_WEIGHT);
+      }, 0);
+  }
+  function resolveSummonCapAfterSpawn(current, incoming, cap = SUMMON_CAP_PER_TEAM) {
+      const normalizedCap = Math.max(1, Math.floor(cap));
+      const living = current.filter((entry) => entry.hp > 0);
+      if (living.length < normalizedCap) {
+          return {
+              roster: [...living, incoming],
+              replacedId: null,
+          };
+      }
+      const ranked = [...living].sort((a, b) => {
+          const hpRatioA = Math.max(0, a.hp) / Math.max(1, a.maxHp);
+          const hpRatioB = Math.max(0, b.hp) / Math.max(1, b.maxHp);
+          if (hpRatioA !== hpRatioB)
+              return hpRatioA - hpRatioB;
+          if (a.hp !== b.hp)
+              return a.hp - b.hp;
+          return a.spawnedOrder - b.spawnedOrder;
+      });
+      const toReplace = ranked[0];
+      const replacedId = toReplace?.id ?? null;
+      const roster = living
+          .filter((entry) => entry.id !== replacedId)
+          .concat(incoming)
+          .slice(0, normalizedCap);
+      return { roster, replacedId };
+  }
   function resolveRescueBarrier(input) {
       const charges = Math.max(0, Math.floor(input.charges));
       const targetHp = Math.max(0, Math.floor(input.targetHp));
@@ -20538,7 +20582,7 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
   function evaluateObjectiveResult(state, payload) {
       if (state.result.status !== 'ongoing')
           return state;
-      const eliminationObjectiveHandler = (current, runtime) => (evaluateMatchResult(current, runtime.context.aliveByTeam, runtime.context.hpPctByTeam));
+      const eliminationObjectiveHandler = (current, runtime) => (evaluateMatchResult(current, runtime.context.aliveByTeam, runtime.context.hpPctByTeam, runtime.context.unitPointsByTeam));
       const rescueObjectiveHandler = (current, runtime) => {
           if (runtime.context.objectiveState?.rescueTargetAlive === false) {
               return {
@@ -20707,13 +20751,15 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           },
       };
   }
-  function evaluateMatchResult(state, aliveByTeam, hpPctByTeam) {
+  function evaluateMatchResult(state, aliveByTeam, hpPctByTeam, unitPointsByTeam) {
       if (state.result.status !== 'ongoing')
           return state;
       const playerAlive = Math.max(0, Math.floor(aliveByTeam.player));
       const enemyAlive = Math.max(0, Math.floor(aliveByTeam.enemy));
       const playerHpPct = Math.max(0, Number(hpPctByTeam?.player ?? 0));
       const enemyHpPct = Math.max(0, Number(hpPctByTeam?.enemy ?? 0));
+      const playerUnitPoints = Math.max(0, Number(unitPointsByTeam?.player ?? playerAlive));
+      const enemyUnitPoints = Math.max(0, Number(unitPointsByTeam?.enemy ?? enemyAlive));
       if (playerAlive <= 0 && enemyAlive <= 0) {
           return {
               ...state,
@@ -20745,22 +20791,22 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
           };
       }
       if (state.turnCountPlayer > PLAYER_TURN_CAP) {
-          if (playerAlive > enemyAlive) {
+          if (playerUnitPoints > enemyUnitPoints) {
               return {
                   ...state,
                   result: {
                       status: 'win',
-                      reason: 'turn-cap-tiebreak:alive-units',
+                      reason: 'turn-cap-tiebreak:unit-points',
                       winner: 'player',
                   },
               };
           }
-          if (enemyAlive > playerAlive) {
+          if (enemyUnitPoints > playerUnitPoints) {
               return {
                   ...state,
                   result: {
                       status: 'lose',
-                      reason: 'turn-cap-tiebreak:alive-units',
+                      reason: 'turn-cap-tiebreak:unit-points',
                       winner: 'enemy',
                   },
               };
@@ -20805,6 +20851,9 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
   if (!Object.prototype.hasOwnProperty.call(exports, 'PLAYER_TURN_CAP')) exports.PLAYER_TURN_CAP = PLAYER_TURN_CAP;
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_TURN_BASE_TIME_MS')) exports.UNIT_TURN_BASE_TIME_MS = UNIT_TURN_BASE_TIME_MS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'SHRINK_START_PLAYER_TURN')) exports.SHRINK_START_PLAYER_TURN = SHRINK_START_PLAYER_TURN;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SUMMON_CAP_PER_TEAM')) exports.SUMMON_CAP_PER_TEAM = SUMMON_CAP_PER_TEAM;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SUMMON_UNIT_POINT_WEIGHT')) exports.SUMMON_UNIT_POINT_WEIGHT = SUMMON_UNIT_POINT_WEIGHT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CORE_UNIT_POINT_WEIGHT')) exports.CORE_UNIT_POINT_WEIGHT = CORE_UNIT_POINT_WEIGHT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createInitialMatchState')) exports.createInitialMatchState = createInitialMatchState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canUseCommand')) exports.canUseCommand = canUseCommand;
   if (!Object.prototype.hasOwnProperty.call(exports, 'recordMove')) exports.recordMove = recordMove;
@@ -20813,6 +20862,8 @@ __modules['./screens/chess-strategy-rpg/turn-state.ts'] = (exports, module, __re
   if (!Object.prototype.hasOwnProperty.call(exports, 'applySkipAction')) exports.applySkipAction = applySkipAction;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveAction')) exports.resolveAction = resolveAction;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveActionUiEffects')) exports.resolveActionUiEffects = resolveActionUiEffects;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'scoreAliveUnitPoints')) exports.scoreAliveUnitPoints = scoreAliveUnitPoints;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveSummonCapAfterSpawn')) exports.resolveSummonCapAfterSpawn = resolveSummonCapAfterSpawn;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveRescueBarrier')) exports.resolveRescueBarrier = resolveRescueBarrier;
   if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateObjectiveResult')) exports.evaluateObjectiveResult = evaluateObjectiveResult;
   if (!Object.prototype.hasOwnProperty.call(exports, 'consumeDecisionTime')) exports.consumeDecisionTime = consumeDecisionTime;
