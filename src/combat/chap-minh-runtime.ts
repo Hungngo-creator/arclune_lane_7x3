@@ -72,6 +72,13 @@ function hasRuleBypassTag(skill: unknown): boolean {
   return tags.includes('global-rule');
 }
 
+function inferAoEFromSkill(skill: unknown): boolean {
+  if (!skill || typeof skill !== 'object') return false;
+  const rawTags = (skill as { tags?: unknown }).tags;
+  const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
+  return tags.includes('aoe') || tags.includes('random-aoe');
+}
+
 function resolveMitigationRatio(
   target: UnitToken,
   attackerSkill: unknown,
@@ -127,7 +134,8 @@ export function applyChapMinhMitigation(
 ): { finalDamage: number; prevented: number; owner: ChapMinhStateCarrier | null } {
   const inputDamage = Math.max(0, Math.floor(incomingDamage));
   if (inputDamage <= 0) return { finalDamage: 0, prevented: 0, owner: null };
-  const { ratio, owner } = resolveMitigationRatio(target, options.skill, !!options.isAoE);
+  const isAoE = !!options.isAoE || inferAoEFromSkill(options.skill);
+  const { ratio, owner } = resolveMitigationRatio(target, options.skill, isAoE);
   if (ratio <= 0 || !owner) return { finalDamage: inputDamage, prevented: 0, owner: null };
   const reduced = Math.max(0, Math.floor(inputDamage * (1 - ratio)));
   return {

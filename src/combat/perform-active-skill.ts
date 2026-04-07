@@ -170,6 +170,15 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
         targetCount: 1,
       };
     }
+    return {
+      ok: false,
+      skillKey,
+      skill,
+      tags,
+      appliedTags: dispatch.applied,
+      targetCount: 0,
+      reason: 'blocked',
+    };
   }
 
   if (caster.id === 'blood_avatar') {

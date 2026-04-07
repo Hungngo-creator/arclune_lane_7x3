@@ -5188,6 +5188,13 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
       return tags.includes('global-rule');
   }
+  function inferAoEFromSkill(skill) {
+      if (!skill || typeof skill !== 'object')
+          return false;
+      const rawTags = skill.tags;
+      const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
+      return tags.includes('aoe') || tags.includes('random-aoe');
+  }
   function resolveMitigationRatio(target, attackerSkill, isAoE) {
       let bestRatio = 0;
       let owner = null;
@@ -5236,7 +5243,8 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       const inputDamage = Math.max(0, Math.floor(incomingDamage));
       if (inputDamage <= 0)
           return { finalDamage: 0, prevented: 0, owner: null };
-      const { ratio, owner } = resolveMitigationRatio(target, options.skill, !!options.isAoE);
+      const isAoE = !!options.isAoE || inferAoEFromSkill(options.skill);
+      const { ratio, owner } = resolveMitigationRatio(target, options.skill, isAoE);
       if (ratio <= 0 || !owner)
           return { finalDamage: inputDamage, prevented: 0, owner: null };
       const reduced = Math.max(0, Math.floor(inputDamage * (1 - ratio)));
@@ -5629,6 +5637,15 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
                   targetCount: 1,
               };
           }
+          return {
+              ok: false,
+              skillKey,
+              skill,
+              tags,
+              appliedTags: dispatch.applied,
+              targetCount: 0,
+              reason: 'blocked',
+          };
       }
       if (caster.id === 'blood_avatar') {
           const enemies = game.tokens.filter((token) => token.alive && token.side !== caster.side);

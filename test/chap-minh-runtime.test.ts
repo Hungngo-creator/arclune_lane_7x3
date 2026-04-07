@@ -77,4 +77,23 @@ describe('chap minh runtime', () => {
     expect(chapMinh.hp).toBe(250);
     expect(chapMinh._chapMinhLostMaxHp).toBe(400);
   });
+
+  test('infers aoe mitigation from normalized skill tags', () => {
+    const chapMinh = makeUnit({
+      id: 'huyen_vu_chap_minh',
+      side: 'ally',
+      cx: 1,
+      cy: 1,
+      hp: 1000,
+      hpMax: 1000,
+    }) as UnitToken & { _chapMinhLinkOwner?: UnitToken; _chapMinhLinkedSlots?: number[] };
+    activateChapMinhLink(chapMinh);
+
+    const allyInColumnOnly = makeUnit({ side: 'ally', cx: 0, cy: 1 }) as UnitToken & { _chapMinhLinkOwner?: UnitToken };
+    allyInColumnOnly._chapMinhLinkOwner = chapMinh;
+
+    const reduced = applyChapMinhMitigation(allyInColumnOnly, 1000, { skill: { tags: ['aoe'] } });
+    expect(reduced.finalDamage).toBe(350);
+    expect(reduced.prevented).toBe(650);
+  });
 });
