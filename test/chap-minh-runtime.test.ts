@@ -38,15 +38,17 @@ describe('chap minh runtime', () => {
     expect(chapMinhMeta?.rank).toBe('UR');
     expect(normalizeElementKey(chapMinhMeta?.base_element)).toBe('light');
 
-    const session = createSession({
-      modeKey: 'campaign',
-      lineupDeck: ['huyen_vu_chap_minh'],
-      collectionState: {
-        units: [{ id: 'huyen_vu_chap_minh', owned: true, level: 80, realm: 6 }],
-      },
-    });
-
-    expect(session.playerDeckLocked.some((entry) => entry.id === 'huyen_vu_chap_minh')).toBe(true);
+    const modeKeys = ['campaign', 'chess-strategy-rpg', 'monopoly'] as const;
+    for (const modeKey of modeKeys) {
+      const session = createSession({
+        modeKey,
+        lineupDeck: ['huyen_vu_chap_minh'],
+        collectionState: {
+          units: [{ id: 'huyen_vu_chap_minh', owned: true, level: 80, realm: 6 }],
+        },
+      });
+      expect(session.playerDeckLocked.some((entry) => entry.id === 'huyen_vu_chap_minh')).toBe(true);
+    }
   });
 
   test('normalizes element alias ánh sáng to light', () => {
@@ -96,6 +98,25 @@ describe('chap minh runtime', () => {
     const reducedByRuleBypass = applyChapMinhMitigation(ally, 1000, { skill: { tags: ['quy_tac', 'aoe-random'] } });
     expect(reducedByRuleBypass.finalDamage).toBe(650);
     expect(reducedByRuleBypass.prevented).toBe(350);
+  });
+
+  test('supports global-rule alias with spacing/diacritics to avoid duplicated bypass logic', () => {
+    const chapMinh = makeUnit({
+      id: 'huyen_vu_chap_minh',
+      side: 'ally',
+      cx: 1,
+      cy: 1,
+      hp: 1000,
+      hpMax: 1000,
+    }) as UnitToken & { _chapMinhLinkOwner?: UnitToken; _chapMinhLinkedSlots?: number[] };
+    activateChapMinhLink(chapMinh);
+
+    const ally = makeUnit({ side: 'ally', cx: 0, cy: 1 }) as UnitToken & { _chapMinhLinkOwner?: UnitToken };
+    ally._chapMinhLinkOwner = chapMinh;
+
+    const reducedByAlias = applyChapMinhMitigation(ally, 1000, { skill: { tags: ['Quy Tắc', 'AOE'] } });
+    expect(reducedByAlias.finalDamage).toBe(650);
+    expect(reducedByAlias.prevented).toBe(350);
   });
 
   test('phase shift cuts max hp once and restores max hp per turn without healing', () => {

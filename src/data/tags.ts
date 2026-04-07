@@ -31,7 +31,7 @@ const TAG_DEFINITIONS = [
   { id: 'self', label: 'Bản thân', domain: 'targeting', aliases: ['ban_than'] },
   { id: 'ally', label: 'Đồng minh', domain: 'targeting', aliases: ['dong_minh'] },
   { id: 'enemy', label: 'Kẻ địch', domain: 'targeting', aliases: ['ke_dich'] },
-  { id: 'global-rule', label: 'Toàn sân/Quy tắc', domain: 'rule', aliases: ['quy_tac', 'all-board'] },
+  { id: 'global-rule', label: 'Toàn sân/Quy tắc', domain: 'rule', aliases: ['quy_tac', 'quy tac', 'quy tắc', 'all-board'] },
   { id: 'heal', label: 'Hồi phục', domain: 'effect', aliases: ['hoi_phuc'] },
   { id: 'non-heal-hp-change', label: 'Không phải hồi phục', domain: 'effect', aliases: ['khong_phai_hoi_phuc'] },
   { id: 'shield', label: 'Tạo khiên', domain: 'effect', aliases: ['barrier'] },
