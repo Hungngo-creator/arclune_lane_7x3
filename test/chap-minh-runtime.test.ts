@@ -60,6 +60,25 @@ describe('chap minh runtime', () => {
     expect(chapMinh.hp).toBeLessThan(1000);
   });
 
+  test('global-rule tag bypasses link reduction but still keeps aoe column aura', () => {
+    const chapMinh = makeUnit({
+      id: 'huyen_vu_chap_minh',
+      side: 'ally',
+      cx: 1,
+      cy: 1,
+      hp: 1000,
+      hpMax: 1000,
+    }) as UnitToken & { _chapMinhLinkOwner?: UnitToken; _chapMinhLinkedSlots?: number[] };
+    activateChapMinhLink(chapMinh);
+
+    const ally = makeUnit({ side: 'ally', cx: 0, cy: 1 }) as UnitToken & { _chapMinhLinkOwner?: UnitToken };
+    ally._chapMinhLinkOwner = chapMinh;
+
+    const reducedByRuleBypass = applyChapMinhMitigation(ally, 1000, { skill: { tags: ['global-rule', 'aoe'] } });
+    expect(reducedByRuleBypass.finalDamage).toBe(650);
+    expect(reducedByRuleBypass.prevented).toBe(350);
+  });
+
   test('phase shift cuts max hp once and restores max hp per turn without healing', () => {
     const chapMinh = makeUnit({
       id: 'huyen_vu_chap_minh',
