@@ -8,6 +8,8 @@ import type { UnitToken } from '@shared-types/units';
 const CHAP_MINH_ID = 'huyen_vu_chap_minh';
 const CHAP_MINH_LINK_REDUCTION = 0.30;
 const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
+const RULE_BYPASS_TAGS = new Set(['global-rule']);
+const AOE_TAGS = new Set(['aoe', 'random-aoe']);
 
 type ChapMinhStateCarrier = UnitToken & {
   _chapMinhLinkedSlots?: number[];
@@ -69,14 +71,14 @@ function hasRuleBypassTag(skill: unknown): boolean {
   if (!skill || typeof skill !== 'object') return false;
   const rawTags = (skill as { tags?: unknown }).tags;
   const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
-  return tags.includes('global-rule');
+  return tags.some((tag) => RULE_BYPASS_TAGS.has(tag));
 }
 
 function inferAoEFromSkill(skill: unknown): boolean {
   if (!skill || typeof skill !== 'object') return false;
   const rawTags = (skill as { tags?: unknown }).tags;
   const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
-  return tags.includes('aoe') || tags.includes('random-aoe');
+  return tags.some((tag) => AOE_TAGS.has(tag));
 }
 
 function resolveMitigationRatio(

@@ -5135,6 +5135,8 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const CHAP_MINH_LINK_REDUCTION = 0.30;
   const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
+  const RULE_BYPASS_TAGS = new Set(['global-rule']);
+  const AOE_TAGS = new Set(['aoe', 'random-aoe']);
   const toFinite = (value, fallback = 0) => {
       const n = typeof value === 'number' ? value : Number(value);
       return Number.isFinite(n) ? n : fallback;
@@ -5186,14 +5188,14 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
           return false;
       const rawTags = skill.tags;
       const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
-      return tags.includes('global-rule');
+      return tags.some((tag) => RULE_BYPASS_TAGS.has(tag));
   }
   function inferAoEFromSkill(skill) {
       if (!skill || typeof skill !== 'object')
           return false;
       const rawTags = skill.tags;
       const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
-      return tags.includes('aoe') || tags.includes('random-aoe');
+      return tags.some((tag) => AOE_TAGS.has(tag));
   }
   function resolveMitigationRatio(target, attackerSkill, isAoE) {
       let bestRatio = 0;

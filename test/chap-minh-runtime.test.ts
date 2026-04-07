@@ -8,6 +8,8 @@ import {
   recoverChapMinhMaxHpPerTurn,
 } from '../src/combat/chap-minh-runtime.ts';
 import { normalizeElementKey } from '../src/utils/domain-normalization.ts';
+import { ROSTER } from '../src/catalog.ts';
+import { createSession } from '../src/modes/pve/session-state.ts';
 
 import type { UnitToken } from '../src/types/units.ts';
 
@@ -30,6 +32,23 @@ function makeUnit(overrides: Partial<UnitToken>): UnitToken {
 }
 
 describe('chap minh runtime', () => {
+  test('is present in roster and can be imported to session lineup from collection', () => {
+    const chapMinhMeta = ROSTER.find((unit) => unit.id === 'huyen_vu_chap_minh');
+    expect(chapMinhMeta).toBeTruthy();
+    expect(chapMinhMeta?.rank).toBe('UR');
+    expect(normalizeElementKey(chapMinhMeta?.base_element)).toBe('light');
+
+    const session = createSession({
+      modeKey: 'campaign',
+      lineupDeck: ['huyen_vu_chap_minh'],
+      collectionState: {
+        units: [{ id: 'huyen_vu_chap_minh', owned: true, level: 80, realm: 6 }],
+      },
+    });
+
+    expect(session.playerDeckLocked.some((entry) => entry.id === 'huyen_vu_chap_minh')).toBe(true);
+  });
+
   test('normalizes element alias ánh sáng to light', () => {
     expect(normalizeElementKey('ánh sáng')).toBe('light');
     expect(normalizeElementKey('anh sang')).toBe('light');
@@ -74,7 +93,7 @@ describe('chap minh runtime', () => {
     const ally = makeUnit({ side: 'ally', cx: 0, cy: 1 }) as UnitToken & { _chapMinhLinkOwner?: UnitToken };
     ally._chapMinhLinkOwner = chapMinh;
 
-    const reducedByRuleBypass = applyChapMinhMitigation(ally, 1000, { skill: { tags: ['global-rule', 'aoe'] } });
+    const reducedByRuleBypass = applyChapMinhMitigation(ally, 1000, { skill: { tags: ['quy_tac', 'aoe-random'] } });
     expect(reducedByRuleBypass.finalDamage).toBe(650);
     expect(reducedByRuleBypass.prevented).toBe(350);
   });
