@@ -16,6 +16,11 @@ import { applyUyenBasicExtras } from './leader-uyen.ts';
 import { nextRngValue } from './utils/rng.ts';
 import { normalizeClassName } from './utils/domain-normalization.ts';
 import { getCounterBonusMetadata } from './combat/counter-matrix.ts';
+import {
+  applyChapMinhMitigation,
+  applyChapMinhPhaseShift,
+  recordChapMinhPreventedDamage,
+} from './combat/chap-minh-runtime.ts';
 
 export { applyDamage, grantShield };
 
@@ -468,7 +473,14 @@ export function dealAbilityDamage(
     reductionMultiplier: pre.inMul,
     breakdown: bonusBreakdown,
   });
-  const dmg = finalDamage.total;
+  const chapMinhMitigation = applyChapMinhMitigation(target, finalDamage.total, {
+    isAoE: !!opts.isAoE,
+    skill: opts.skill,
+  });
+  const dmg = chapMinhMitigation.finalDamage;
+  if (chapMinhMitigation.prevented > 0) {
+    recordChapMinhPreventedDamage(chapMinhMitigation.owner, chapMinhMitigation.prevented);
+  }
 
   const abs = bypassShieldByLaw
     ? { remain: dmg, absorbed: 0, broke: false }
@@ -538,6 +550,7 @@ export function dealAbilityDamage(
   if (target.hp <= 0) {
     hookOnLethalDamage(target);
   }
+  applyChapMinhPhaseShift(target);
 
   const damageResult: DamageResult = {
     dealt: dealtTotal,

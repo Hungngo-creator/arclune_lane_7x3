@@ -7,6 +7,7 @@ import { cellReserved, slotToCell } from '../engine.ts';
 import { globalAetherPool } from '../aether.ts';
 import { Statuses } from '../statuses.ts';
 import { grantShield } from './apply-damage.ts';
+import { activateChapMinhLink, refreshChapMinhOwnership } from './chap-minh-runtime.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -128,6 +129,48 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
 
   const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
   const turns = Math.max(1, Math.round(readNumberish(payload.turns ?? payload.duration, 1)));
+
+  if (caster.id === 'huyen_vu_chap_minh' && skillKey === 'skill1') {
+    activateChapMinhLink(caster);
+    refreshChapMinhOwnership(game);
+    return {
+      ok: true,
+      skillKey,
+      skill,
+      tags,
+      appliedTags: dispatch.applied,
+      targetCount: 0,
+    };
+  }
+
+  if (caster.id === 'huyen_vu_chap_minh' && skillKey === 'skill2') {
+    const shield = Array.isArray(caster.statuses)
+      ? caster.statuses.find((status: { id?: string }) => status.id === 'shield')
+      : null;
+    const currentShield = Math.max(0, Math.floor(readNumberish(shield?.amount, 0)));
+    const shieldCost = Math.floor(currentShield * 0.1);
+    if (shieldCost > 0 && shield) {
+      shield.amount = Math.max(0, currentShield - shieldCost);
+      if ((shield.amount ?? 0) <= 0 && Array.isArray(caster.statuses)) {
+        caster.statuses = caster.statuses.filter((status: { id?: string; amount?: number }) => status !== shield);
+      }
+    }
+    const target = pickTarget(game, caster);
+    if (target?.alive) {
+      const base = Math.max(1, Math.floor((caster.atk ?? 0) + (caster.wil ?? 0)));
+      for (let hit = 0; hit < 3; hit += 1) {
+        dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill });
+      }
+      return {
+        ok: true,
+        skillKey,
+        skill,
+        tags,
+        appliedTags: dispatch.applied,
+        targetCount: 1,
+      };
+    }
+  }
 
   if (caster.id === 'blood_avatar') {
     const enemies = game.tokens.filter((token) => token.alive && token.side !== caster.side);

@@ -115,6 +115,7 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['@screens/chess-strategy-rpg/turn-state.ts', './screens/chess-strategy-rpg/turn-state.ts'],
   ['./screens/chess-strategy-rpg/seed.js', './screens/chess-strategy-rpg/seed.ts'],
   ['./screens/chess-strategy-rpg/turn-state.js', './screens/chess-strategy-rpg/turn-state.ts'],
+  ['./combat/chap-minh-runtime.js', './combat/chap-minh-runtime.ts'],
   ['@screens/collection/index.ts', './screens/collection/index.ts'],
   ['@screens/lineup/index.ts', './screens/lineup/index.ts'],
   ['@screens/ui-gacha/index.ts', './screens/ui-gacha/index.ts'],
