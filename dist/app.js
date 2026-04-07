@@ -1632,6 +1632,7 @@ __modules['./art.ts'] = (exports, module, __require) => {
       laky: { primary: '#ffc9ec', secondary: '#7c336a', accent: '#ffeef9', outline: '#5a214b' },
       kydieu: { primary: '#a0f2d4', secondary: '#1f4f47', accent: '#e7fff5', outline: '#1b3c36' },
       doanminh: { primary: '#ffe6a5', secondary: '#3e2b12', accent: '#fff8da', outline: '#2f2110' },
+      chapminh: { primary: '#ffe28f', secondary: '#3b2d16', accent: '#fff6d6', outline: '#2d2312' },
       tranquat: { primary: '#89f5ff', secondary: '#1a3651', accent: '#d0fbff', outline: '#223e58' },
       linhgac: { primary: '#9ec4ff', secondary: '#2a3f5c', accent: '#e4f1ff', outline: '#24364c' },
       minion: { primary: '#ffd27d', secondary: '#5a3a17', accent: '#fff4cc', outline: '#452b0f' }
@@ -1804,6 +1805,19 @@ __modules['./art.ts'] = (exports, module, __require) => {
                   scale: 1.08,
                   aspect: 0.8,
                   shadow: { color: 'rgba(22,52,70,0.55)', blur: 26, offsetX: 0, offsetY: 12 }
+              }
+          }
+      }),
+      huyen_vu_chap_minh: makeArt('sentinel', getBasePalette('chapminh'), {
+          layout: { labelOffset: 1.2, hpOffset: 1.48, spriteAspect: 0.8 },
+          hpBar: { fill: '#ffe18b' },
+          skins: {
+              default: {
+                  src: './dist/assets/units/doanminh/default.svg',
+                  anchor: 0.86,
+                  scale: 1.08,
+                  aspect: 0.8,
+                  shadow: { color: 'rgba(58,44,20,0.58)', blur: 24, offsetX: 0, offsetY: 12 }
               }
           }
       }),
@@ -3850,6 +3864,109 @@ __modules['./catalog.ts'] = (exports, module, __require) => {
                   { id: 'hp_trade_limits', text: 'Mọi kỹ năng đốt máu không thể khiến Lôi Thiên Ảnh tự sát (tối thiểu còn 1 HP).' },
                   { id: 'spd_burn', text: 'Giảm SPD cộng dồn tối đa 5 tầng từ đòn đánh thường và tuyệt kỹ.' },
                   { id: 'body_fortify_lock', text: 'Lôi Thể Bách Chiến bị khoá vĩnh viễn sau 3 lần sử dụng.' }
+              ])
+          }
+      },
+      {
+          id: 'huyen_vu_chap_minh', name: 'Huyền Vũ – Chấp Minh', class: 'Tanker', rank: 'UR', base_element: 'light',
+          mods: { HP: 0.12, ARM: 0.10, RES: 0.10 },
+          kit: {
+              onSpawn: createOnSpawn(),
+              basic: asUnknownRecord({
+                  name: 'Quang Thương',
+                  tags: ['single-target'],
+                  range: 'ranged',
+                  damageMultiplier: 1.00,
+                  damageMix: { atk: 1, wil: 1 },
+                  notes: 'Đánh xa: triệu hồi 1 ngọn giáo ánh sáng đâm 1 mục tiêu, gây 100% (ATK + WIL).'
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Liên Kết Tứ Tượng',
+                      tags: ['active', 'instant', 'aoe', 'aether-cost', 'shield', 'support'],
+                      cost: { aether: 25 },
+                      targeting: 'cross-neighbors',
+                      linkedSlots: 4,
+                      reduceDamageLinked: 0.30,
+                      reduceAoeDamageColumnAura: 0.35,
+                      backlash: {
+                          triggerAtCasterMaxHpRatio: 0.70,
+                          selfDamageRatioFromAccumulated: 0.70,
+                          selfDamageExtraReduction: 0.30,
+                          resetAfterTrigger: true
+                      },
+                      ignorePenetrationUnlessRuleTag: true,
+                      notes: 'Liên kết 4 ô chữ thập quanh bản thân. Đồng minh liên kết giảm 30% mọi sát thương (bỏ qua xuyên giáp/sát thương chuẩn, trừ kỹ năng có tag [Quy Tắc]). Sát thương giảm trừ được tích lũy và phản phệ khi vượt ngưỡng.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Tam Thương Truy Kích',
+                      tags: ['active', 'single-target', 'aether-cost', 'chain'],
+                      cost: { aether: 10 },
+                      hits: 3,
+                      eachHitTriggersPseudoBasic: true,
+                      pseudoBasicDoesNotCountAsBasic: true,
+                      shieldCostRatioCurrent: 0.10,
+                      notes: 'Triệu hồi 3 ngọn giáo ánh sáng đánh 1 mục tiêu. Mỗi hit gây 1 đòn theo công thức đánh thường nhưng không được tính là đánh thường.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Huyền Vũ Chuyển Mệnh',
+                      tags: ['passive', 'heal', 'self', 'non-heal-hp-change'],
+                      trigger: { hpRatioLte: 0.10, maxUses: 1 },
+                      hpMaxReductionRatio: 0.50,
+                      healToRemainingMaxHp: true,
+                      recoverLostMaxHpPerTurn: 0.20,
+                      notes: 'Tự kích hoạt 1 lần/trận khi HP <= 10%: giảm 50% Max HP hiện thời, hồi đầy phần còn lại; mỗi lượt hồi dần Max HP đã mất (20%) cho đến khi hoàn nguyên, không tự hồi HP theo phần Max HP tăng lại.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  name: 'Quy Tắc – Bất Động Như Sơn',
+                  tags: ['passive', 'global-rule', 'heal', 'support', 'aoe'],
+                  autoCast: true,
+                  healPercentMaxHP: 0.35,
+                  buffStats: { ARM: 0.50, RES: 0.50 },
+                  duration: 2,
+                  damageMultiplier: 1.00,
+                  bonusDamageFromShieldRatio: 0.50,
+                  notes: 'Tự động: hồi 35% Max HP, tăng 50% ARM/RES trong 2 lượt, đồng thời gây chấn động toàn sân theo 100% (ATK+WIL) + 50% khiên hiện có.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Bắc Minh Hộ Thể',
+                  tags: ['passive', 'aoe', 'shield', 'support', 'line'],
+                  trigger: 'onActionEnd',
+                  shieldPercentCasterMaxHP: 0.15,
+                  shieldTargets: 'self_and_column_allies',
+                  shieldDurationTurns: 1,
+                  aura: {
+                      whileAlive: true,
+                      reduceAoeDamageTaken: 0.35,
+                      targets: 'self_and_column_allies'
+                  },
+                  notes: 'Sau khi hành động: tạo khiên 15% Max HP Chấp Minh cho bản thân + đồng minh cùng cột. Hào quang khi còn sống: giảm 35% sát thương AOE nhận vào cho cùng nhóm mục tiêu.'
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'chap_minh_column_aura',
+                      name: 'Bắc Minh Hộ Thể',
+                      when: 'onActionEnd',
+                      effect: 'grantColumnShieldAndAura',
+                      params: { shieldPctCasterMaxHP: 0.15, aoeReduction: 0.35, duration: 1, stackWithLink: true }
+                  },
+                  {
+                      id: 'chap_minh_hp_phase_shift',
+                      name: 'Huyền Vũ Chuyển Mệnh',
+                      when: 'onDamageTaken',
+                      effect: 'phaseShiftWhenCriticalHP',
+                      params: { hpThreshold: 0.10, maxHpCut: 0.50, restoreLostMaxHpPerTurn: 0.20, maxUses: 1 }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'aoe_guardian', text: 'Giảm mạnh sát thương AOE cho cùng cột và đồng minh liên kết chữ thập.' },
+                  { id: 'linked_backlash', text: 'Sát thương đã chặn từ liên kết được tích lũy; khi vượt ngưỡng sẽ phản phệ về Chấp Minh rồi reset.' },
+                  { id: 'single_use_phase_shift', text: 'Huyền Vũ Chuyển Mệnh chỉ kích hoạt 1 lần mỗi trận.' }
               ])
           }
       },
@@ -35297,6 +35414,7 @@ __modules['./units.ts'] = (exports, module, __require) => {
       { id: 'phe', name: 'Phệ', rank: 'UR', role: 'Mage' },
       { id: 'kiemtruongda', name: 'Kiếm Trường Dạ', rank: 'UR', role: 'Warrior' },
       { id: 'loithienanh', name: 'Lôi Thiên Ảnh', rank: 'SSR', role: 'Tanker' },
+      { id: 'huyen_vu_chap_minh', name: 'Huyền Vũ – Chấp Minh', rank: 'UR', role: 'Tanker' },
       { id: 'laky', name: 'La Kỳ', rank: 'SSR', role: 'Support' },
       { id: 'kydieu', name: 'Kỳ Diêu', rank: 'SSR', role: 'Support' },
       { id: 'doanminh', name: 'Doãn Minh', rank: 'SR', role: 'Support' },

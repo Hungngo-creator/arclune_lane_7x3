@@ -72,7 +72,6 @@ PHÂN TÍCH CÂN BẰNG (Balance Check):
  * Điểm yếu:
    * Sợ sát thương Đơn Mục Tiêu (Single Target) dồn vào bản thân. Vì Nội tại chỉ giảm AOE, còn Skill 1 giảm dmg cho đệ chứ không giảm cho bản thân (trừ khi nổ dmg phản phệ mới được giảm).
    * Nếu kẻ địch có skill "Bỏ qua Giáp/Xuyên thủ", cú nổ phản phệ sẽ rất đau.
-Mày thấy Ult tao thêm vào có hợp lý không? Nếu ok thì ta chốt con này.
 
 
 Đại khái là sàn đấu thế này:

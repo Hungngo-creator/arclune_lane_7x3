@@ -527,6 +527,7 @@ const basePalettes: Record<string, UnitArtPalette> = {
   laky:      { primary:'#ffc9ec', secondary:'#7c336a', accent:'#ffeef9', outline:'#5a214b' },
   kydieu:    { primary:'#a0f2d4', secondary:'#1f4f47', accent:'#e7fff5', outline:'#1b3c36' },
   doanminh:  { primary:'#ffe6a5', secondary:'#3e2b12', accent:'#fff8da', outline:'#2f2110' },
+  chapminh:  { primary:'#ffe28f', secondary:'#3b2d16', accent:'#fff6d6', outline:'#2d2312' },
   tranquat:  { primary:'#89f5ff', secondary:'#1a3651', accent:'#d0fbff', outline:'#223e58' },
   linhgac:   { primary:'#9ec4ff', secondary:'#2a3f5c', accent:'#e4f1ff', outline:'#24364c' },
   minion:    { primary:'#ffd27d', secondary:'#5a3a17', accent:'#fff4cc', outline:'#452b0f' }
@@ -701,6 +702,19 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
         scale: 1.08,
         aspect: 0.8,
         shadow: { color: 'rgba(22,52,70,0.55)', blur: 26, offsetX: 0, offsetY: 12 }
+      }
+    }
+  }),
+  huyen_vu_chap_minh: makeArt('sentinel', getBasePalette('chapminh'), {
+    layout: { labelOffset: 1.2, hpOffset: 1.48, spriteAspect: 0.8 },
+    hpBar: { fill: '#ffe18b' },
+    skins: {
+      default: {
+        src: './dist/assets/units/doanminh/default.svg',
+        anchor: 0.86,
+        scale: 1.08,
+        aspect: 0.8,
+        shadow: { color: 'rgba(58,44,20,0.58)', blur: 24, offsetX: 0, offsetY: 12 }
       }
     }
   }),

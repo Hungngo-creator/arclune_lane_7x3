@@ -1528,6 +1528,109 @@ export const ROSTER = [
     }
   },
   {
+    id: 'huyen_vu_chap_minh', name: 'Huyền Vũ – Chấp Minh', class: 'Tanker', rank: 'UR',  base_element: 'light',
+    mods: { HP: 0.12, ARM: 0.10, RES: 0.10 },
+    kit: {
+      onSpawn: createOnSpawn(),
+      basic: asUnknownRecord({
+        name: 'Quang Thương',
+        tags: ['single-target'],
+        range: 'ranged',
+        damageMultiplier: 1.00,
+        damageMix: { atk: 1, wil: 1 },
+        notes: 'Đánh xa: triệu hồi 1 ngọn giáo ánh sáng đâm 1 mục tiêu, gây 100% (ATK + WIL).'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Liên Kết Tứ Tượng',
+          tags: ['active', 'instant', 'aoe', 'aether-cost', 'shield', 'support'],
+          cost: { aether: 25 },
+          targeting: 'cross-neighbors',
+          linkedSlots: 4,
+          reduceDamageLinked: 0.30,
+          reduceAoeDamageColumnAura: 0.35,
+          backlash: {
+            triggerAtCasterMaxHpRatio: 0.70,
+            selfDamageRatioFromAccumulated: 0.70,
+            selfDamageExtraReduction: 0.30,
+            resetAfterTrigger: true
+          },
+          ignorePenetrationUnlessRuleTag: true,
+          notes: 'Liên kết 4 ô chữ thập quanh bản thân. Đồng minh liên kết giảm 30% mọi sát thương (bỏ qua xuyên giáp/sát thương chuẩn, trừ kỹ năng có tag [Quy Tắc]). Sát thương giảm trừ được tích lũy và phản phệ khi vượt ngưỡng.'
+        },
+        {
+          key: 'skill2',
+          name: 'Tam Thương Truy Kích',
+          tags: ['active', 'single-target', 'aether-cost', 'chain'],
+          cost: { aether: 10 },
+          hits: 3,
+          eachHitTriggersPseudoBasic: true,
+          pseudoBasicDoesNotCountAsBasic: true,
+          shieldCostRatioCurrent: 0.10,
+          notes: 'Triệu hồi 3 ngọn giáo ánh sáng đánh 1 mục tiêu. Mỗi hit gây 1 đòn theo công thức đánh thường nhưng không được tính là đánh thường.'
+        },
+        {
+          key: 'skill3',
+          name: 'Huyền Vũ Chuyển Mệnh',
+          tags: ['passive', 'heal', 'self', 'non-heal-hp-change'],
+          trigger: { hpRatioLte: 0.10, maxUses: 1 },
+          hpMaxReductionRatio: 0.50,
+          healToRemainingMaxHp: true,
+          recoverLostMaxHpPerTurn: 0.20,
+          notes: 'Tự kích hoạt 1 lần/trận khi HP <= 10%: giảm 50% Max HP hiện thời, hồi đầy phần còn lại; mỗi lượt hồi dần Max HP đã mất (20%) cho đến khi hoàn nguyên, không tự hồi HP theo phần Max HP tăng lại.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        name: 'Quy Tắc – Bất Động Như Sơn',
+        tags: ['passive', 'global-rule', 'heal', 'support', 'aoe'],
+        autoCast: true,
+        healPercentMaxHP: 0.35,
+        buffStats: { ARM: 0.50, RES: 0.50 },
+        duration: 2,
+        damageMultiplier: 1.00,
+        bonusDamageFromShieldRatio: 0.50,
+        notes: 'Tự động: hồi 35% Max HP, tăng 50% ARM/RES trong 2 lượt, đồng thời gây chấn động toàn sân theo 100% (ATK+WIL) + 50% khiên hiện có.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Bắc Minh Hộ Thể',
+        tags: ['passive', 'aoe', 'shield', 'support', 'line'],
+        trigger: 'onActionEnd',
+        shieldPercentCasterMaxHP: 0.15,
+        shieldTargets: 'self_and_column_allies',
+        shieldDurationTurns: 1,
+        aura: {
+          whileAlive: true,
+          reduceAoeDamageTaken: 0.35,
+          targets: 'self_and_column_allies'
+        },
+        notes: 'Sau khi hành động: tạo khiên 15% Max HP Chấp Minh cho bản thân + đồng minh cùng cột. Hào quang khi còn sống: giảm 35% sát thương AOE nhận vào cho cùng nhóm mục tiêu.'
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'chap_minh_column_aura',
+          name: 'Bắc Minh Hộ Thể',
+          when: 'onActionEnd',
+          effect: 'grantColumnShieldAndAura',
+          params: { shieldPctCasterMaxHP: 0.15, aoeReduction: 0.35, duration: 1, stackWithLink: true }
+        },
+        {
+          id: 'chap_minh_hp_phase_shift',
+          name: 'Huyền Vũ Chuyển Mệnh',
+          when: 'onDamageTaken',
+          effect: 'phaseShiftWhenCriticalHP',
+          params: { hpThreshold: 0.10, maxHpCut: 0.50, restoreLostMaxHpPerTurn: 0.20, maxUses: 1 }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'aoe_guardian', text: 'Giảm mạnh sát thương AOE cho cùng cột và đồng minh liên kết chữ thập.' },
+        { id: 'linked_backlash', text: 'Sát thương đã chặn từ liên kết được tích lũy; khi vượt ngưỡng sẽ phản phệ về Chấp Minh rồi reset.' },
+        { id: 'single_use_phase_shift', text: 'Huyền Vũ Chuyển Mệnh chỉ kích hoạt 1 lần mỗi trận.' }
+      ])
+    }
+  },
+  {
     id: 'laky', name: 'La Kỳ', class: 'Support', rank: 'SSR',
     mods: { WIL: 0.10, PER: 0.10 },
     kit: {

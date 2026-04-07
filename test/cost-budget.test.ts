@@ -118,8 +118,8 @@ describe('resolveUnitCost and roster auto-cost', () => {
     expect(resolved).toBeLessThanOrEqual(COST_MAX);
   });
 
-  test('22 unit hiện có đều được auto-cost hợp lệ', () => {
-    expect(UNITS).toHaveLength(22);
+  test('23 unit hiện có đều được auto-cost hợp lệ', () => {
+    expect(UNITS).toHaveLength(23);
     for (const unit of UNITS) {
       expect(unit.cost).toBeGreaterThanOrEqual(COST_MIN);
       expect(unit.cost).toBeLessThanOrEqual(COST_MAX);
