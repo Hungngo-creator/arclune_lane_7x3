@@ -72,6 +72,7 @@ import {
   resolveEnemyUnits,
 } from './session-state';
 import { mapUnitProgressById } from './collection-mapper.ts';
+import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
 import {
   ensureUyenState,
   getUyenUltChoice,
@@ -1799,56 +1800,12 @@ function performUlt(unit: UnitToken): void {
   if (!u){ spendFury(unit, resolveUltCost(unit)); return; }
 
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
-
-  if (unit.id === 'huyen_vu_chap_minh') {
-    const healAmount = Math.max(0, Math.round((parseFiniteNumber(unit.hpMax) ?? 0) * 0.35));
-    if (healAmount > 0) {
-      healUnit(unit, healAmount);
-    }
-
-    const buffDuration = 2;
-    const statBuffAmount = 0.5;
-    Statuses.add(unit, {
-      id: 'chap_minh_ult_arm_up',
-      kind: 'buff',
-      tag: 'stat',
-      attr: 'arm',
-      mode: 'percent',
-      amount: statBuffAmount,
-      dur: buffDuration,
-      tick: 'turn',
-      sourceUnitId: unit.id,
-    });
-    Statuses.add(unit, {
-      id: 'chap_minh_ult_res_up',
-      kind: 'buff',
-      tag: 'stat',
-      attr: 'res',
-      mode: 'percent',
-      amount: statBuffAmount,
-      dur: buffDuration,
-      tick: 'turn',
-      sourceUnitId: unit.id,
-    });
-    if (typeof unit._recalcStats === 'function') {
-      unit._recalcStats();
-    }
-
-    const shield = Statuses.get(unit, 'shield');
-    const currentShield = Math.max(0, toFiniteOrZero((shield as { amount?: unknown } | null)?.amount));
-    const base = Math.max(1, Math.round((parseFiniteNumber(unit.atk) ?? 0) + (parseFiniteNumber(unit.wil) ?? 0) + currentShield * 0.5));
-    const foes = (game.tokens || []).filter((token) => token.alive && token.side === foeSide);
-    for (const target of foes) {
-      dealAbilityDamage(game, unit, target, {
-        base,
-        dtype: 'mixed',
-        attackType: 'skill',
-        isAoE: true,
-        skill: u,
-      });
-    }
-
-    extendBusy(1100);
+  if (runPveRuntimeUltHook({
+    game,
+    unit,
+    ultSkill: u,
+    extendBusy,
+  })) {
     return;
   }
   const normalizedUltTags = getNormalizedUltTags(u);

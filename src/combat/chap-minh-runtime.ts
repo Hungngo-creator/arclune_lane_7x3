@@ -28,6 +28,10 @@ const isAliveChapMinh = (token: UnitToken | null | undefined): token is ChapMinh
   !!token && token.alive && token.id === CHAP_MINH_ID
 );
 
+const isChapMinh = (token: UnitToken | null | undefined): token is ChapMinhStateCarrier => (
+  !!token && token.id === CHAP_MINH_ID
+);
+
 const resolveCrossSlots = (centerSlot: number): number[] => {
   const row = Math.floor((centerSlot - 1) / 3);
   const col = (centerSlot - 1) % 3;
@@ -174,7 +178,7 @@ export function recordChapMinhPreventedDamage(owner: UnitToken | null | undefine
 }
 
 export function applyChapMinhPhaseShift(unit: UnitToken | null | undefined): void {
-  if (!isAliveChapMinh(unit)) return;
+  if (!isChapMinh(unit)) return;
   if (unit._chapMinhPhaseShiftUsed) return;
   const hpMax = Math.max(1, Math.floor(toFinite(unit.hpMax, 1)));
   const hp = Math.max(0, Math.floor(toFinite(unit.hp, hpMax)));
@@ -184,6 +188,8 @@ export function applyChapMinhPhaseShift(unit: UnitToken | null | undefined): voi
   const nextHpMax = Math.max(1, hpMax - lost);
   unit.hpMax = nextHpMax;
   unit.hp = nextHpMax;
+  unit.alive = true;
+  delete unit.deadAt;
   unit._chapMinhLostMaxHp = lost;
   unit._chapMinhRecoverPerTurn = Math.max(1, Math.floor(lost * 0.2));
   unit._chapMinhPhaseShiftUsed = true;

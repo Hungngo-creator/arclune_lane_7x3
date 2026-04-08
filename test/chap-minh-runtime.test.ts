@@ -140,6 +140,22 @@ describe('chap minh runtime', () => {
     expect(chapMinh._chapMinhLostMaxHp).toBe(400);
   });
 
+  test('phase shift revives chap minh when lethal hit drops hp to 0 under threshold', () => {
+    const chapMinh = makeUnit({
+      id: 'huyen_vu_chap_minh',
+      hpMax: 1000,
+      hp: 0,
+      alive: false,
+      deadAt: 123456,
+    }) as UnitToken;
+
+    applyChapMinhPhaseShift(chapMinh);
+    expect(chapMinh.alive).toBe(true);
+    expect(chapMinh.deadAt).toBeUndefined();
+    expect(chapMinh.hpMax).toBe(500);
+    expect(chapMinh.hp).toBe(500);
+  });
+
   test('accepts aoe alias tags to avoid duplicated aoe detection logic', () => {
     const chapMinh = makeUnit({
       id: 'huyen_vu_chap_minh',
