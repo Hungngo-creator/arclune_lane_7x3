@@ -67,18 +67,18 @@ export function applyChapMinhActionEnd(game: SessionState | null | undefined, ca
   }
 }
 
-function hasRuleBypassTag(skill: unknown): boolean {
-  if (!skill || typeof skill !== 'object') return false;
+function extractNormalizedSkillTags(skill: unknown): string[] {
+  if (!skill || typeof skill !== 'object') return [];
   const rawTags = (skill as { tags?: unknown }).tags;
-  const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
-  return tags.some((tag) => RULE_BYPASS_TAGS.has(tag));
+  return normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
+}
+
+function hasRuleBypassTag(skill: unknown): boolean {
+  return extractNormalizedSkillTags(skill).some((tag) => RULE_BYPASS_TAGS.has(tag));
 }
 
 function inferAoEFromSkill(skill: unknown): boolean {
-  if (!skill || typeof skill !== 'object') return false;
-  const rawTags = (skill as { tags?: unknown }).tags;
-  const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
-  return tags.some((tag) => AOE_TAGS.has(tag));
+  return extractNormalizedSkillTags(skill).some((tag) => AOE_TAGS.has(tag));
 }
 
 function resolveMitigationRatio(

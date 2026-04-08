@@ -5183,19 +5183,17 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
           grantShield(token, shieldAmount);
       }
   }
-  function hasRuleBypassTag(skill) {
+  function extractNormalizedSkillTags(skill) {
       if (!skill || typeof skill !== 'object')
-          return false;
+          return [];
       const rawTags = skill.tags;
-      const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
-      return tags.some((tag) => RULE_BYPASS_TAGS.has(tag));
+      return normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
+  }
+  function hasRuleBypassTag(skill) {
+      return extractNormalizedSkillTags(skill).some((tag) => RULE_BYPASS_TAGS.has(tag));
   }
   function inferAoEFromSkill(skill) {
-      if (!skill || typeof skill !== 'object')
-          return false;
-      const rawTags = skill.tags;
-      const tags = normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
-      return tags.some((tag) => AOE_TAGS.has(tag));
+      return extractNormalizedSkillTags(skill).some((tag) => AOE_TAGS.has(tag));
   }
   function resolveMitigationRatio(target, attackerSkill, isAoE) {
       let bestRatio = 0;
