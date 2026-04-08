@@ -6,6 +6,7 @@ import {
   recoverChapMinhMaxHpPerTurn,
   refreshChapMinhOwnership,
 } from './chap-minh-runtime.ts';
+import { consumeShieldByCurrentRatio } from './apply-damage.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -69,17 +70,7 @@ const chapMinhRuntimeHook: UnitRuntimeHook = {
 
     if (skillKey !== 'skill2') return null;
 
-    const shield = Array.isArray(caster.statuses)
-      ? caster.statuses.find((status: { id?: string }) => status.id === 'shield')
-      : null;
-    const currentShield = Math.max(0, Math.floor(Number(shield?.amount ?? 0)));
-    const shieldCost = Math.floor(currentShield * 0.1);
-    if (shieldCost > 0 && shield) {
-      shield.amount = Math.max(0, currentShield - shieldCost);
-      if ((shield.amount ?? 0) <= 0 && Array.isArray(caster.statuses)) {
-        caster.statuses = caster.statuses.filter((status: { id?: string; amount?: number }) => status !== shield);
-      }
-    }
+    consumeShieldByCurrentRatio(caster, 0.1);
 
     const target = pickTarget(game, caster);
     if (!target?.alive) {

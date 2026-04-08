@@ -5050,6 +5050,15 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       }
       return unit.statuses;
   };
+  function findShieldStatus(target) {
+      if (!target || !Array.isArray(target.statuses) || target.statuses.length === 0)
+          return null;
+      for (const status of target.statuses) {
+          if (status?.id === 'shield')
+              return status;
+      }
+      return null;
+  }
   function applyDamage(target, amount) {
       const maxHp = Number.isFinite(target.hpMax) ? Math.floor(target.hpMax ?? 0) : 0;
       if (maxHp <= 0)
@@ -5096,9 +5105,43 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       }
       return amt;
   }
+  function consumeShield(target, amount) {
+      if (!target || !Array.isArray(target.statuses) || target.statuses.length === 0)
+          return 0;
+      const shield = findShieldStatus(target);
+      if (!shield)
+          return 0;
+      const currentShield = Math.max(0, Math.floor(Number(shield.amount ?? 0)));
+      if (currentShield <= 0)
+          return 0;
+      const requested = Math.max(0, Math.floor(Number(amount ?? 0)));
+      if (requested <= 0)
+          return 0;
+      const consumed = Math.min(currentShield, requested);
+      const remain = currentShield - consumed;
+      if (remain > 0) {
+          shield.amount = remain;
+          return consumed;
+      }
+      target.statuses = target.statuses.filter((status) => status !== shield);
+      return consumed;
+  }
+  function consumeShieldByCurrentRatio(target, ratio) {
+      if (!target || !Number.isFinite(ratio) || ratio <= 0)
+          return 0;
+      const shield = findShieldStatus(target);
+      if (!shield)
+          return 0;
+      const current = Math.max(0, Math.floor(Number(shield.amount ?? 0)));
+      if (current <= 0)
+          return 0;
+      return consumeShield(target, Math.floor(current * ratio));
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyDamage')) exports.applyDamage = applyDamage;
   if (!Object.prototype.hasOwnProperty.call(exports, 'grantShield')) exports.grantShield = grantShield;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'consumeShield')) exports.consumeShield = consumeShield;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'consumeShieldByCurrentRatio')) exports.consumeShieldByCurrentRatio = consumeShieldByCurrentRatio;
 };
 __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) => {
   const clampDamage = (value) => {
@@ -6039,6 +6082,8 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const applyChapMinhPhaseShift = __dep1.applyChapMinhPhaseShift;
   const recoverChapMinhMaxHpPerTurn = __dep1.recoverChapMinhMaxHpPerTurn;
   const refreshChapMinhOwnership = __dep1.refreshChapMinhOwnership;
+  const __dep2 = __require('./combat/apply-damage.ts');
+  const consumeShieldByCurrentRatio = __dep2.consumeShieldByCurrentRatio;
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const chapMinhRuntimeHook = {
       onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
@@ -6067,17 +6112,7 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
           }
           if (skillKey !== 'skill2')
               return null;
-          const shield = Array.isArray(caster.statuses)
-              ? caster.statuses.find((status) => status.id === 'shield')
-              : null;
-          const currentShield = Math.max(0, Math.floor(Number(shield?.amount ?? 0)));
-          const shieldCost = Math.floor(currentShield * 0.1);
-          if (shieldCost > 0 && shield) {
-              shield.amount = Math.max(0, currentShield - shieldCost);
-              if ((shield.amount ?? 0) <= 0 && Array.isArray(caster.statuses)) {
-                  caster.statuses = caster.statuses.filter((status) => status !== shield);
-              }
-          }
+          consumeShieldByCurrentRatio(caster, 0.1);
           const target = pickTarget(game, caster);
           if (!target?.alive) {
               return {
