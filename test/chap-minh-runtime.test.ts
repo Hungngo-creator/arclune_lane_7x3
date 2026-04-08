@@ -273,6 +273,41 @@ describe('chap minh runtime', () => {
     expect(enemy.hp).toBeLessThan(2000);
   });
 
+  test('skill3 is runtime-auto only and cannot be manually cast', () => {
+    allyAetherPool.current = 50;
+    allyAetherPool.max = 999;
+
+    const chapMinh = makeUnit({
+      id: 'huyen_vu_chap_minh',
+      side: 'ally',
+      iid: 'chap-minh',
+      hp: 150,
+      hpMax: 1800,
+      statuses: [],
+    });
+    const enemy = makeUnit({
+      id: 'enemy',
+      side: 'enemy',
+      iid: 'enemy-1',
+      hp: 2000,
+      hpMax: 2000,
+      statuses: [],
+    });
+    const game = {
+      tokens: [chapMinh, enemy],
+      queued: { ally: new Map(), enemy: new Map() },
+      battle: { over: false, winner: null },
+      meta: new Map(),
+      turn: { cycle: 1 },
+    } as unknown as SessionState;
+
+    const result = performActiveSkill(game, chapMinh, 'skill3');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('blocked');
+    expect(allyAetherPool.current).toBe(50);
+    expect(chapMinh.hpMax).toBe(1800);
+  });
+
   test('basic attack uses mixed damage profile for chap minh (light spear ranged profile)', () => {
     const chapMinh = makeUnit({
       id: 'huyen_vu_chap_minh',

@@ -1,5 +1,10 @@
 import { slotIndex } from '../engine.ts';
-import { normalizeTagList } from '../data/tags.ts';
+import {
+  AOE_TARGET_TAG_IDS,
+  RULE_BYPASS_TAG_IDS,
+  hasAnyTag,
+  normalizeTagList,
+} from '../data/tags.ts';
 import { applyDamage, grantShield } from './apply-damage.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -8,9 +13,6 @@ import type { UnitToken } from '@shared-types/units';
 const CHAP_MINH_ID = 'huyen_vu_chap_minh';
 const CHAP_MINH_LINK_REDUCTION = 0.30;
 const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
-const RULE_BYPASS_TAGS = new Set(['global-rule']);
-const AOE_TAGS = new Set(['aoe', 'random-aoe']);
-
 type ChapMinhStateCarrier = UnitToken & {
   _chapMinhLinkedSlots?: number[];
   _chapMinhAccumulated?: number;
@@ -79,14 +81,10 @@ function extractNormalizedSkillTags(skill: unknown): string[] {
 
 function classifyMitigationSkill(skill: unknown): { hasRuleBypassTag: boolean; isAoE: boolean } {
   const tags = extractNormalizedSkillTags(skill);
-  let hasRuleBypassTag = false;
-  let isAoE = false;
-  for (const tag of tags) {
-    if (RULE_BYPASS_TAGS.has(tag)) hasRuleBypassTag = true;
-    if (AOE_TAGS.has(tag)) isAoE = true;
-    if (hasRuleBypassTag && isAoE) break;
-  }
-  return { hasRuleBypassTag, isAoE };
+  return {
+    hasRuleBypassTag: hasAnyTag(tags, RULE_BYPASS_TAG_IDS),
+    isAoE: hasAnyTag(tags, AOE_TARGET_TAG_IDS),
+  };
 }
 
 function resolveMitigationRatio(

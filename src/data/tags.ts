@@ -150,6 +150,8 @@ export const INSTANT_TAG_IDS = Object.freeze(['instant']);
 export const DEFENSIVE_TAG_IDS = Object.freeze(['defense', 'shield', 'support']);
 export const ABSOLUTE_ATTACK_TAG_IDS = Object.freeze(['absolute-attack']);
 export const ABSOLUTE_SHIELD_TAG_IDS = Object.freeze(['absolute-shield']);
+export const RULE_BYPASS_TAG_IDS = Object.freeze(['global-rule']);
+export const AOE_TARGET_TAG_IDS = Object.freeze(['aoe', 'random-aoe']);
 
 function resolveVersionAlias(
   tag: string,

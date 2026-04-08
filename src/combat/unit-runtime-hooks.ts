@@ -55,6 +55,18 @@ const chapMinhRuntimeHook: UnitRuntimeHook = {
       };
     }
 
+    if (skillKey === 'skill3') {
+      return {
+        ok: false,
+        skillKey,
+        skill,
+        tags,
+        appliedTags,
+        targetCount: 0,
+        reason: 'blocked',
+      };
+    }
+
     if (skillKey !== 'skill2') return null;
 
     const shield = Array.isArray(caster.statuses)

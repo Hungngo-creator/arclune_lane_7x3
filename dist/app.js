@@ -5149,6 +5149,9 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./engine.ts');
   const slotIndex = __dep0.slotIndex;
   const __dep1 = __require('./data/tags.ts');
+  const AOE_TARGET_TAG_IDS = __dep1.AOE_TARGET_TAG_IDS;
+  const RULE_BYPASS_TAG_IDS = __dep1.RULE_BYPASS_TAG_IDS;
+  const hasAnyTag = __dep1.hasAnyTag;
   const normalizeTagList = __dep1.normalizeTagList;
   const __dep2 = __require('./combat/apply-damage.ts');
   const applyDamage = __dep2.applyDamage;
@@ -5156,8 +5159,6 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const CHAP_MINH_LINK_REDUCTION = 0.30;
   const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
-  const RULE_BYPASS_TAGS = new Set(['global-rule']);
-  const AOE_TAGS = new Set(['aoe', 'random-aoe']);
   const toFinite = (value, fallback = 0) => {
       const n = typeof value === 'number' ? value : Number(value);
       return Number.isFinite(n) ? n : fallback;
@@ -5213,17 +5214,10 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   }
   function classifyMitigationSkill(skill) {
       const tags = extractNormalizedSkillTags(skill);
-      let hasRuleBypassTag = false;
-      let isAoE = false;
-      for (const tag of tags) {
-          if (RULE_BYPASS_TAGS.has(tag))
-              hasRuleBypassTag = true;
-          if (AOE_TAGS.has(tag))
-              isAoE = true;
-          if (hasRuleBypassTag && isAoE)
-              break;
-      }
-      return { hasRuleBypassTag, isAoE };
+      return {
+          hasRuleBypassTag: hasAnyTag(tags, RULE_BYPASS_TAG_IDS),
+          isAoE: hasAnyTag(tags, AOE_TARGET_TAG_IDS),
+      };
   }
   function resolveMitigationRatio(target, hasRuleBypassTag, isAoE) {
       let bestRatio = 0;
@@ -6058,6 +6052,17 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
                   tags,
                   appliedTags,
                   targetCount: 0,
+              };
+          }
+          if (skillKey === 'skill3') {
+              return {
+                  ok: false,
+                  skillKey,
+                  skill,
+                  tags,
+                  appliedTags,
+                  targetCount: 0,
+                  reason: 'blocked',
               };
           }
           if (skillKey !== 'skill2')
@@ -8877,6 +8882,8 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
   const DEFENSIVE_TAG_IDS = Object.freeze(['defense', 'shield', 'support']);
   const ABSOLUTE_ATTACK_TAG_IDS = Object.freeze(['absolute-attack']);
   const ABSOLUTE_SHIELD_TAG_IDS = Object.freeze(['absolute-shield']);
+  const RULE_BYPASS_TAG_IDS = Object.freeze(['global-rule']);
+  const AOE_TARGET_TAG_IDS = Object.freeze(['aoe', 'random-aoe']);
   function resolveVersionAlias(tag, version = CURRENT_TAG_ALIAS_VERSION) {
       return TAG_ALIAS_BY_VERSION_KEY.get(`${version}:${normalizeKey(tag)}`) ?? tag;
   }
@@ -8941,6 +8948,8 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'DEFENSIVE_TAG_IDS')) exports.DEFENSIVE_TAG_IDS = DEFENSIVE_TAG_IDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ABSOLUTE_ATTACK_TAG_IDS')) exports.ABSOLUTE_ATTACK_TAG_IDS = ABSOLUTE_ATTACK_TAG_IDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ABSOLUTE_SHIELD_TAG_IDS')) exports.ABSOLUTE_SHIELD_TAG_IDS = ABSOLUTE_SHIELD_TAG_IDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'RULE_BYPASS_TAG_IDS')) exports.RULE_BYPASS_TAG_IDS = RULE_BYPASS_TAG_IDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'AOE_TARGET_TAG_IDS')) exports.AOE_TARGET_TAG_IDS = AOE_TARGET_TAG_IDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeTagId')) exports.normalizeTagId = normalizeTagId;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeTagList')) exports.normalizeTagList = normalizeTagList;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveTagVersionAliases')) exports.resolveTagVersionAliases = resolveTagVersionAliases;
