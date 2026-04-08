@@ -7,11 +7,14 @@ import {
   applyChapMinhPhaseShift,
   recoverChapMinhMaxHpPerTurn,
 } from '../src/combat/chap-minh-runtime.ts';
+import { performActiveSkill } from '../src/combat/perform-active-skill.ts';
 import { normalizeElementKey } from '../src/utils/domain-normalization.ts';
 import { ROSTER } from '../src/catalog.ts';
 import { createSession } from '../src/modes/pve/session-state.ts';
+import { allyAetherPool } from '../src/aether.ts';
 
 import type { UnitToken } from '../src/types/units.ts';
+import type { SessionState } from '../src/types/combat.ts';
 
 function makeUnit(overrides: Partial<UnitToken>): UnitToken {
   return {
@@ -173,5 +176,45 @@ describe('chap minh runtime', () => {
     const reduced = applyChapMinhMitigation(allyInColumnOnly, 1000, { skill: { tags: ['aoe'] } });
     expect(reduced.finalDamage).toBe(350);
     expect(reduced.prevented).toBe(650);
+  });
+
+  test('skill2 consumes Aether + 10% current shield and resolves 3 pseudo-basic hits', () => {
+    allyAetherPool.current = 10;
+    allyAetherPool.max = 999;
+
+    const chapMinh = makeUnit({
+      id: 'huyen_vu_chap_minh',
+      side: 'ally',
+      iid: 'chap-minh',
+      hp: 1800,
+      hpMax: 1800,
+      atk: 220,
+      wil: 180,
+      statuses: [{ id: 'shield', kind: 'buff', tag: 'shield', amount: 1000 }],
+    });
+    const enemy = makeUnit({
+      id: 'enemy',
+      side: 'enemy',
+      iid: 'enemy-1',
+      hp: 2000,
+      hpMax: 2000,
+      arm: 0,
+      res: 0,
+      statuses: [],
+    });
+    const game = {
+      tokens: [chapMinh, enemy],
+      queued: { ally: new Map(), enemy: new Map() },
+      battle: { over: false, winner: null },
+      meta: new Map(),
+      turn: { cycle: 1 },
+    } as unknown as SessionState;
+
+    const result = performActiveSkill(game, chapMinh, 'skill2');
+    expect(result.ok).toBe(true);
+    expect(result.targetCount).toBe(1);
+    expect(allyAetherPool.current).toBe(0);
+    expect(chapMinh.statuses?.find((status) => status.id === 'shield')?.amount).toBe(900);
+    expect(enemy.hp).toBeLessThan(2000);
   });
 });

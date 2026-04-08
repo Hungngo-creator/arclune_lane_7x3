@@ -73,29 +73,32 @@ function extractNormalizedSkillTags(skill: unknown): string[] {
   return normalizeTagList(Array.isArray(rawTags) ? rawTags : []);
 }
 
-function hasRuleBypassTag(skill: unknown): boolean {
-  return extractNormalizedSkillTags(skill).some((tag) => RULE_BYPASS_TAGS.has(tag));
-}
-
-function inferAoEFromSkill(skill: unknown): boolean {
-  return extractNormalizedSkillTags(skill).some((tag) => AOE_TAGS.has(tag));
+function classifyMitigationSkill(skill: unknown): { hasRuleBypassTag: boolean; isAoE: boolean } {
+  const tags = extractNormalizedSkillTags(skill);
+  let hasRuleBypassTag = false;
+  let isAoE = false;
+  for (const tag of tags) {
+    if (RULE_BYPASS_TAGS.has(tag)) hasRuleBypassTag = true;
+    if (AOE_TAGS.has(tag)) isAoE = true;
+    if (hasRuleBypassTag && isAoE) break;
+  }
+  return { hasRuleBypassTag, isAoE };
 }
 
 function resolveMitigationRatio(
   target: UnitToken,
-  attackerSkill: unknown,
+  hasRuleBypassTag: boolean,
   isAoE: boolean,
 ): { ratio: number; owner: ChapMinhStateCarrier | null } {
   let bestRatio = 0;
   let owner: ChapMinhStateCarrier | null = null;
-  const bypassByRule = hasRuleBypassTag(attackerSkill);
 
   const candidate = (target._chapMinhLinkOwner as ChapMinhStateCarrier | undefined) ?? null;
   if (isAliveChapMinh(candidate) && candidate.side === target.side) {
     const slot = slotIndex(target.side, target.cx, target.cy);
     const inLink = Array.isArray(candidate._chapMinhLinkedSlots) && candidate._chapMinhLinkedSlots.includes(slot);
     const inColumn = (((slot - 1) % 3) + 1) === ((((slotIndex(candidate.side, candidate.cx, candidate.cy) - 1) % 3) + 1));
-    if (inLink && !bypassByRule) {
+    if (inLink && !hasRuleBypassTag) {
       bestRatio += CHAP_MINH_LINK_REDUCTION;
       owner = candidate;
     }
@@ -136,8 +139,9 @@ export function applyChapMinhMitigation(
 ): { finalDamage: number; prevented: number; owner: ChapMinhStateCarrier | null } {
   const inputDamage = Math.max(0, Math.floor(incomingDamage));
   if (inputDamage <= 0) return { finalDamage: 0, prevented: 0, owner: null };
-  const isAoE = !!options.isAoE || inferAoEFromSkill(options.skill);
-  const { ratio, owner } = resolveMitigationRatio(target, options.skill, isAoE);
+  const skillFlags = classifyMitigationSkill(options.skill);
+  const isAoE = !!options.isAoE || skillFlags.isAoE;
+  const { ratio, owner } = resolveMitigationRatio(target, skillFlags.hasRuleBypassTag, isAoE);
   if (ratio <= 0 || !owner) return { finalDamage: inputDamage, prevented: 0, owner: null };
   const reduced = Math.max(0, Math.floor(inputDamage * (1 - ratio)));
   return {
