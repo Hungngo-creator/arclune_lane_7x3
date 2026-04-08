@@ -1,4 +1,5 @@
 import { applyDamage, grantShield } from './apply-damage.ts';
+import { toFiniteNumber, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { Statuses } from '../statuses.ts';
 import { normalizeTagList } from '../data/tags.ts';
 import { dealAbilityDamage, healUnit } from '../combat.ts';
@@ -18,6 +19,7 @@ export interface TagDispatchContext {
   onAetherCost?: (amount: number, side: Side) => boolean;
   deferEffects?: boolean;
   onSummon?: () => void;
+  tagsNormalized?: boolean;
 }
 
 export interface TagDispatchResult {
@@ -41,14 +43,10 @@ type NormalizedContext = {
   deferEffects: boolean;
   allyTokens: UnitToken[];
   enemyTokens: UnitToken[];
+  enemySide: Side | null;
 };
 
 type TagHandler = (ctx: NormalizedContext, result: TagDispatchResult) => void;
-
-const asFinite = (value: unknown, fallback = 0): number => {
-  const parsed = typeof value === 'number' ? value : Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
-};
 
 const resolveTargets = (targets: UnitToken[] | undefined, target: UnitToken | null): UnitToken[] => {
   if (Array.isArray(targets) && targets.length > 0) {
@@ -90,18 +88,58 @@ const collectSideTokens = (ctx: Pick<NormalizedContext, 'attacker' | 'allyTokens
   return isAttackerSide ? ctx.allyTokens : ctx.enemyTokens;
 };
 
+const sampleTargets = (tokens: ReadonlyArray<UnitToken>, limit: number): UnitToken[] => {
+  if (limit <= 0 || tokens.length === 0) return [];
+  if (tokens.length <= limit) return [...tokens];
+
+  const pool = [...tokens];
+  for (let i = 0; i < limit; i += 1) {
+    const swapIndex = i + Math.floor(Math.random() * (pool.length - i));
+    [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
+  }
+  return pool.slice(0, limit);
+};
+
+const sampleTargetsWithReplacement = (tokens: ReadonlyArray<UnitToken>, limit: number): UnitToken[] => {
+  if (limit <= 0 || tokens.length === 0) return [];
+  const sampled: UnitToken[] = [];
+  for (let i = 0; i < limit; i += 1) {
+    const picked = tokens[Math.floor(Math.random() * tokens.length)];
+    if (picked) sampled.push(picked);
+  }
+  return sampled;
+};
+
+const readEnemyTargets = (ctx: NormalizedContext, fallbackLimit: number): UnitToken[] => {
+  if (!ctx.enemySide) return EMPTY_TOKENS;
+  const limit = readTargetLimit(ctx, fallbackLimit);
+  return collectSideTokens(ctx, ctx.enemySide).slice(0, limit);
+};
+
 const readTargetLimit = (ctx: Pick<NormalizedContext, 'payload'>, fallback: number): number => (
-  Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, fallback)))
+  Math.max(1, toRoundedInt(ctx.payload?.targetCount ?? ctx.payload?.targets, fallback))
 );
+
+const readAllowDuplicateTargets = (ctx: Pick<NormalizedContext, 'payload'>): boolean => (
+  ctx.payload?.allowDuplicateTargets === true
+  || ctx.payload?.allowDuplicates === true
+);
+
+const sampleFromCandidates = (ctx: Pick<NormalizedContext, 'payload'>, candidates: ReadonlyArray<UnitToken>, limit: number): UnitToken[] => {
+  if (readAllowDuplicateTargets(ctx)) {
+    return sampleTargetsWithReplacement(candidates, limit);
+  }
+  return sampleTargets(candidates, limit);
+};
 
 const readTurns = (payload: Record<string, unknown> | null, ...keys: string[]): number => {
   for (const key of keys){
     const raw = (payload?.[key] ?? null) as unknown;
-    const direct = asFinite(raw, NaN);
-    if (Number.isFinite(direct) && direct > 0) return Math.max(1, Math.round(direct));
+    const direct = toFiniteNumber(raw, NaN);
+    if (Number.isFinite(direct) && direct > 0) return toPositiveTurns(direct);
     if (raw && typeof raw === 'object'){
-      const nestedTurns = asFinite((raw as Record<string, unknown>).turns, NaN);
-      if (Number.isFinite(nestedTurns) && nestedTurns > 0) return Math.max(1, Math.round(nestedTurns));
+      const nestedTurns = toFiniteNumber((raw as Record<string, unknown>).turns, NaN);
+      if (Number.isFinite(nestedTurns) && nestedTurns > 0) return toPositiveTurns(nestedTurns);
     }
   }
   return 1;
@@ -112,14 +150,26 @@ const addStatus = (target: UnitToken, id: string, turns: number): void => {
     id,
     kind: 'debuff',
     tag: id,
-    dur: Math.max(1, Math.round(turns)),
+    dur: toPositiveTurns(turns),
     tick: 'turn',
   });
 };
 
+const applyTaggedStatus = (
+  ctx: NormalizedContext,
+  result: TagDispatchResult,
+  statusId: string,
+  ...turnKeys: string[]
+): void => {
+  if (ctx.deferEffects) return;
+  const turns = readTurns(ctx.payload, ...turnKeys);
+  for (const token of result.targets) addStatus(token, statusId, turns);
+  if (result.targets.length > 0) result.sideEffects.push(`${statusId}:${turns}`);
+};
+
 const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   'aether-cost': (ctx, result) => {
-    const amount = Math.max(0, Math.round(asFinite(ctx.cost, 0)));
+    const amount = Math.max(0, toRoundedInt(ctx.cost, 0));
     if (!ctx.side || amount <= 0 || typeof ctx.onAetherCost !== 'function') return;
     const consumed = ctx.onAetherCost(amount, ctx.side);
     if (consumed) result.sideEffects.push(`aether:${ctx.side}:${amount}`);
@@ -138,40 +188,33 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     result.targets = collectSideTokens(ctx, 'ally').slice(0, limit);
   },
   enemy: (ctx, result) => {
-    if (!ctx.attacker) return;
+    if (!ctx.attacker || !ctx.enemySide) return;
     if (result.targets.length > 0) return;
-    const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-    const limit = readTargetLimit(ctx, 1);
-    result.targets = collectSideTokens(ctx, foeSide).slice(0, limit);
+    result.targets = readEnemyTargets(ctx, 1);
   },
   'random-target': (ctx, result) => {
-    if (!ctx.attacker) return;
+    if (!ctx.attacker || !ctx.enemySide) return;
     if (result.targets.length > 0) return;
-    const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-    const candidates = collectSideTokens(ctx, foeSide);
-    if (candidates.length > 0) result.targets = [candidates[0]];
+    const candidates = collectSideTokens(ctx, ctx.enemySide);
+    if (candidates.length > 0) result.targets = sampleFromCandidates(ctx, candidates, 1);
   },
   'random-aoe': (ctx, result) => {
-    if (!ctx.attacker) return;
-    const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
+    if (!ctx.attacker || !ctx.enemySide) return;
     const limit = readTargetLimit(ctx, 2);
-    result.targets = collectSideTokens(ctx, foeSide).slice(0, limit);
+    result.targets = sampleFromCandidates(ctx, collectSideTokens(ctx, ctx.enemySide), limit);
   },
   'multi-target': (ctx, result) => {
-    if (!ctx.attacker) return;
+    if (!ctx.attacker || !ctx.enemySide) return;
     if (result.targets.length > 0) return;
-    const limit = readTargetLimit(ctx, 2);
-    const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-    result.targets = collectSideTokens(ctx, foeSide).slice(0, limit);
+    result.targets = readEnemyTargets(ctx, 2);
   },
   aoe: (ctx, result) => {
-    if (!ctx.attacker) return;
-    const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-    result.targets = collectSideTokens(ctx, foeSide);
+    if (!ctx.attacker || !ctx.enemySide) return;
+    result.targets = collectSideTokens(ctx, ctx.enemySide);
   },
   heal: (ctx, result) => {
     if (ctx.deferEffects) return;
-    const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
+    const amount = Math.max(0, toRoundedInt(ctx.payload?.healAmount ?? ctx.payload?.heal, 0));
     if (amount <= 0) return;
     const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
     for (const token of targets) {
@@ -181,43 +224,31 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   },
   'team-heal': (ctx, result) => {
     if (ctx.deferEffects) return;
-    const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
+    const amount = Math.max(0, toRoundedInt(ctx.payload?.healAmount ?? ctx.payload?.heal, 0));
     if (amount <= 0 || !ctx.attacker) return;
     for (const token of collectSideTokens(ctx, 'ally')) healUnit(token, amount);
     result.sideEffects.push(`team-heal:${amount}`);
   },
   shield: (ctx, result) => {
     if (ctx.deferEffects) return;
-    const amount = Math.max(0, Math.round(asFinite(ctx.payload?.shieldAmount ?? ctx.payload?.shield, 0)));
+    const amount = Math.max(0, toRoundedInt(ctx.payload?.shieldAmount ?? ctx.payload?.shield, 0));;
     if (amount <= 0) return;
     const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
     for (const token of targets) grantShield(token, amount);
     result.sideEffects.push(`shield:${amount}`);
   },
   silence: (ctx, result) => {
-    if (ctx.deferEffects) return;
-    const turns = readTurns(ctx.payload, 'silenceTurns', 'turns', 'duration');
-    for (const token of result.targets) addStatus(token, 'silence', turns);
-    if (result.targets.length > 0) result.sideEffects.push(`silence:${turns}`);
+    applyTaggedStatus(ctx, result, 'silence', 'silenceTurns', 'turns', 'duration');
   },
   sleep: (ctx, result) => {
-    if (ctx.deferEffects) return;
-    const turns = readTurns(ctx.payload, 'sleepTurns', 'turns', 'duration');
-    for (const token of result.targets) addStatus(token, 'sleep', turns);
-    if (result.targets.length > 0) result.sideEffects.push(`sleep:${turns}`);
+    applyTaggedStatus(ctx, result, 'sleep', 'sleepTurns', 'turns', 'duration');
   },
   mark: (ctx, result) => {
-    if (ctx.deferEffects) return;
-    const turns = readTurns(ctx.payload, 'markTurns', 'turns', 'duration');
-    for (const token of result.targets) addStatus(token, 'mark', turns);
-    if (result.targets.length > 0) result.sideEffects.push(`mark:${turns}`);
+    applyTaggedStatus(ctx, result, 'mark', 'markTurns', 'turns', 'duration');
   },
   control: (ctx, result) => {
-    if (ctx.deferEffects) return;
-    const turns = readTurns(ctx.payload, 'controlTurns', 'turns', 'duration');
     const statusId = String(ctx.payload?.controlStatus ?? 'control');
-    for (const token of result.targets) addStatus(token, statusId, turns);
-    if (result.targets.length > 0) result.sideEffects.push(`${statusId}:${turns}`);
+    applyTaggedStatus(ctx, result, statusId, 'controlTurns', 'turns', 'duration');
   },
   summon: (ctx, result) => {
     if (ctx.deferEffects) return;
@@ -228,7 +259,7 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   },
   'non-heal-hp-change': (ctx, result) => {
     if (ctx.deferEffects) return;
-    const amount = Math.max(0, Math.round(asFinite(ctx.payload?.hpDelta ?? ctx.payload?.damage, 0)));
+    const amount = Math.max(0, toRoundedInt(ctx.payload?.hpDelta ?? ctx.payload?.damage, 0));
     if (amount <= 0) return;
     for (const token of result.targets) {
       if (ctx.game && ctx.attacker) {
@@ -245,7 +276,9 @@ export function dispatchGameplayTags(
   rawTags: ReadonlyArray<string> | null | undefined,
   context: TagDispatchContext,
 ): TagDispatchResult {
-  const tags = normalizeTagList(rawTags);
+  const tags = context.tagsNormalized
+    ? (Array.isArray(rawTags) ? [...rawTags] : [])
+    : normalizeTagList(rawTags);
   const target = context.target ?? null;
   const attacker = context.attacker ?? null;
   const { allyTokens, enemyTokens } = context.game
@@ -257,7 +290,7 @@ export function dispatchGameplayTags(
     attacker,
     target,
     targets: resolveTargets(context.targets, target),
-    cost: Math.max(0, Math.round(asFinite(context.cost, 0))),
+    cost: Math.max(0, toRoundedInt(context.cost, 0)),
     side: context.side ?? context.attacker?.side ?? null,
     turn: context.turn ?? null,
     payload: context.payload ?? null,
@@ -266,6 +299,7 @@ export function dispatchGameplayTags(
     deferEffects: Boolean(context.deferEffects),
     allyTokens,
     enemyTokens,
+    enemySide: attacker ? (attacker.side === 'ally' ? 'enemy' : 'ally') : null,
   };
 
   const result: TagDispatchResult = {

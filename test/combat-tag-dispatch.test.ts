@@ -66,6 +66,21 @@ describe('combat tag dispatcher matrix', () => {
     expect(aoe.targets).toHaveLength(3);
   });
 
+  it('supports duplicate random targets when payload allows replacement', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally' });
+    const target = makeToken({ id: 'e1', side: 'enemy', cx: 1 });
+    const game = makeGame([attacker, target]);
+
+    const randomAoE = dispatchGameplayTags(normalizeTagList(['random-aoe']), {
+      game,
+      attacker,
+      payload: { targetCount: 3, allowDuplicateTargets: true },
+    });
+
+    expect(randomAoE.targets).toHaveLength(3);
+    expect(randomAoE.targets.every((entry) => entry.id === 'e1')).toBe(true);
+  });
+
   it('handles heal and shield', () => {
     const attacker = makeToken({ id: 'attacker', side: 'ally', hp: 40, hpMax: 100 });
     const result = dispatchGameplayTags(normalizeTagList(['heal', 'barrier']), {

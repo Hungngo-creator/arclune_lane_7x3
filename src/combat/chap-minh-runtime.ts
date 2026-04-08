@@ -6,6 +6,7 @@ import {
   normalizeTagList,
 } from '../data/tags.ts';
 import { applyDamage, grantShield } from './apply-damage.ts';
+import { toFiniteNumber, toFloorInt } from './number-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -19,11 +20,6 @@ type ChapMinhStateCarrier = UnitToken & {
   _chapMinhPhaseShiftUsed?: boolean;
   _chapMinhLostMaxHp?: number;
   _chapMinhRecoverPerTurn?: number;
-};
-
-const toFinite = (value: unknown, fallback = 0): number => {
-  const n = typeof value === 'number' ? value : Number(value);
-  return Number.isFinite(n) ? n : fallback;
 };
 
 const isAliveChapMinh = (token: UnitToken | null | undefined): token is ChapMinhStateCarrier => (
@@ -55,7 +51,7 @@ export function activateChapMinhLink(caster: UnitToken): void {
   if (!isAliveChapMinh(caster)) return;
   const slot = slotIndex(caster.side, caster.cx, caster.cy);
   caster._chapMinhLinkedSlots = resolveCrossSlots(slot);
-  caster._chapMinhAccumulated = Math.max(0, toFinite(caster._chapMinhAccumulated, 0));
+  caster._chapMinhAccumulated = Math.max(0, toFiniteNumber(caster._chapMinhAccumulated, 0));
 }
 
 export function applyChapMinhActionEnd(game: SessionState | null | undefined, caster: UnitToken | null | undefined): void {
@@ -155,14 +151,14 @@ export function applyChapMinhMitigation(
 
 export function applyChapMinhBacklash(owner: UnitToken | null | undefined): void {
   if (!isAliveChapMinh(owner)) return;
-  const accumulated = Math.max(0, toFinite(owner._chapMinhAccumulated, 0));
+  const accumulated = Math.max(0, toFiniteNumber(owner._chapMinhAccumulated, 0));
   const threshold = Math.max(1, Math.floor((owner.hpMax ?? 0) * 0.7));
   if (accumulated <= threshold) return;
 
   const initial = accumulated * 0.7;
   const postSelfReduction = initial * 0.7;
-  const arm = Math.max(0, toFinite(owner.arm, 0));
-  const res = Math.max(0, toFinite(owner.res, 0));
+  const arm = Math.max(0, toFiniteNumber(owner.arm, 0));
+  const res = Math.max(0, toFiniteNumber(owner.res, 0));
   const defenseMultiplier = 0.5 * (100 / (100 + arm)) + 0.5 * (100 / (100 + res));
   const finalDamage = Math.max(1, Math.floor(postSelfReduction * defenseMultiplier));
   applyDamage(owner, finalDamage);
@@ -171,15 +167,15 @@ export function applyChapMinhBacklash(owner: UnitToken | null | undefined): void
 
 export function recordChapMinhPreventedDamage(owner: UnitToken | null | undefined, prevented: number): void {
   if (!isAliveChapMinh(owner) || prevented <= 0) return;
-  owner._chapMinhAccumulated = Math.max(0, toFinite(owner._chapMinhAccumulated, 0) + prevented);
+  owner._chapMinhAccumulated = Math.max(0, toFiniteNumber(owner._chapMinhAccumulated, 0) + prevented);
   applyChapMinhBacklash(owner);
 }
 
 export function applyChapMinhPhaseShift(unit: UnitToken | null | undefined): void {
   if (!isChapMinh(unit)) return;
   if (unit._chapMinhPhaseShiftUsed) return;
-  const hpMax = Math.max(1, Math.floor(toFinite(unit.hpMax, 1)));
-  const hp = Math.max(0, Math.floor(toFinite(unit.hp, hpMax)));
+  const hpMax = Math.max(1, toFloorInt(unit.hpMax, 1));
+  const hp = Math.max(0, toFloorInt(unit.hp, hpMax));
   if (hp > Math.floor(hpMax * 0.1)) return;
 
   const lost = Math.max(1, Math.floor(hpMax * 0.5));
@@ -195,10 +191,10 @@ export function applyChapMinhPhaseShift(unit: UnitToken | null | undefined): voi
 
 export function recoverChapMinhMaxHpPerTurn(unit: UnitToken | null | undefined): void {
   if (!isAliveChapMinh(unit) || !unit._chapMinhPhaseShiftUsed) return;
-  const lostRemain = Math.max(0, Math.floor(toFinite(unit._chapMinhLostMaxHp, 0)));
+  const lostRemain = Math.max(0, toFloorInt(unit._chapMinhLostMaxHp, 0));
   if (lostRemain <= 0) return;
-  const step = Math.max(1, Math.floor(toFinite(unit._chapMinhRecoverPerTurn, 0)));
+  const step = Math.max(1, toFloorInt(unit._chapMinhRecoverPerTurn, 0));
   const gain = Math.min(lostRemain, step);
-  unit.hpMax = Math.max(1, Math.floor(toFinite(unit.hpMax, 1)) + gain);
+  unit.hpMax = Math.max(1, toFloorInt(unit.hpMax, 1) + gain);
   unit._chapMinhLostMaxHp = Math.max(0, lostRemain - gain);
 }

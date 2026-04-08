@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -5042,6 +5042,9 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/combat/apply-damage.ts
   const __dep0 = __require('./utils/time.ts');
   const sessionNow = __dep0.sessionNow;
+  const __dep1 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep1.toFiniteNumber;
+  const toFloorInt = __dep1.toFloorInt;
   const ensureStatusList = (unit) => {
       if (!unit)
           return [];
@@ -5050,23 +5053,32 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       }
       return unit.statuses;
   };
-  function findShieldStatus(target) {
+  function findShieldStatusIndex(statuses) {
+      for (let i = 0; i < statuses.length; i += 1) {
+          if (statuses[i]?.id === 'shield')
+              return i;
+      }
+      return -1;
+  }
+  function findShieldEntry(target) {
       if (!target || !Array.isArray(target.statuses) || target.statuses.length === 0)
           return null;
-      for (const status of target.statuses) {
-          if (status?.id === 'shield')
-              return status;
-      }
-      return null;
+      const index = findShieldStatusIndex(target.statuses);
+      if (index < 0)
+          return null;
+      const status = target.statuses[index];
+      if (!status)
+          return null;
+      return { statuses: target.statuses, index, status };
   }
   function applyDamage(target, amount) {
-      const maxHp = Number.isFinite(target.hpMax) ? Math.floor(target.hpMax ?? 0) : 0;
+      const maxHp = Math.max(0, toFloorInt(target.hpMax, 0));
       if (maxHp <= 0)
           return;
-      const damage = Math.max(0, Math.floor(amount));
+      const damage = Math.max(0, toFloorInt(amount, 0));
       if (damage <= 0)
           return;
-      const currentHp = Math.max(0, Math.min(maxHp, Math.floor(target.hp ?? 0)));
+      const currentHp = Math.max(0, Math.min(maxHp, toFloorInt(target.hp, 0)));
       const newHp = Math.max(0, currentHp - damage);
       target.hp = newHp;
       if (target.hp <= 0) {
@@ -5079,13 +5091,13 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   function grantShield(target, amount, options = {}) {
       if (!target)
           return 0;
-      const amt = Math.max(0, Math.floor(amount ?? 0));
+      const amt = Math.max(0, toFloorInt(amount, 0));
       if (amt <= 0)
           return 0;
       const list = ensureStatusList(target);
       const shield = list.find(status => status.id === 'shield');
       const durationTurns = Number.isFinite(options.durationTurns)
-          ? Math.max(1, Math.floor(options.durationTurns))
+          ? Math.max(1, toFloorInt(options.durationTurns, 1))
           : null;
       if (shield) {
           shield.amount = (shield.amount ?? 0) + amt;
@@ -5106,36 +5118,34 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       return amt;
   }
   function consumeShield(target, amount) {
-      if (!target || !Array.isArray(target.statuses) || target.statuses.length === 0)
+      const entry = findShieldEntry(target);
+      if (!entry)
           return 0;
-      const shield = findShieldStatus(target);
-      if (!shield)
-          return 0;
-      const currentShield = Math.max(0, Math.floor(Number(shield.amount ?? 0)));
+      const currentShield = Math.max(0, toFloorInt(entry.status.amount, 0));
       if (currentShield <= 0)
           return 0;
-      const requested = Math.max(0, Math.floor(Number(amount ?? 0)));
+      const requested = Math.max(0, toFloorInt(amount, 0));
       if (requested <= 0)
           return 0;
       const consumed = Math.min(currentShield, requested);
       const remain = currentShield - consumed;
       if (remain > 0) {
-          shield.amount = remain;
+          entry.status.amount = remain;
           return consumed;
       }
-      target.statuses = target.statuses.filter((status) => status !== shield);
+      entry.statuses.splice(entry.index, 1);
       return consumed;
   }
   function consumeShieldByCurrentRatio(target, ratio) {
       if (!target || !Number.isFinite(ratio) || ratio <= 0)
           return 0;
-      const shield = findShieldStatus(target);
-      if (!shield)
+      const entry = findShieldEntry(target);
+      if (!entry)
           return 0;
-      const current = Math.max(0, Math.floor(Number(shield.amount ?? 0)));
+      const current = Math.max(0, toFloorInt(entry.status.amount, 0));
       if (current <= 0)
           return 0;
-      return consumeShield(target, Math.floor(current * ratio));
+      return consumeShield(target, toFloorInt(current * toFiniteNumber(ratio, 0), 0));
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyDamage')) exports.applyDamage = applyDamage;
@@ -5144,14 +5154,14 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'consumeShieldByCurrentRatio')) exports.consumeShieldByCurrentRatio = consumeShieldByCurrentRatio;
 };
 __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep0.toFiniteNumber;
+  const toFloorInt = __dep0.toFloorInt;
   const clampDamage = (value) => {
-      const parsed = typeof value === 'number' ? value : Number(value);
-      if (!Number.isFinite(parsed))
-          return 0;
-      return Math.max(0, Math.floor(parsed));
+      return Math.max(0, toFloorInt(value, 0));
   };
   const normalizeBonus = (value) => {
-      const parsed = typeof value === 'number' ? value : Number(value);
+      const parsed = toFiniteNumber(value, NaN);
       if (!Number.isFinite(parsed))
           return 0;
       return Math.max(-1, parsed);
@@ -5159,7 +5169,7 @@ __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) =
   const applyMitigationLayer = (damage, factor) => (Math.max(0, Math.floor(Math.max(0, damage) * Math.max(0, factor))));
   const applyHardRuleLayer = (damage, blocked) => (blocked ? 0 : Math.max(0, damage));
   const toNonNegativeFactor = (value, fallback = 1) => {
-      const parsed = typeof value === 'number' ? value : Number(value);
+      const parsed = toFiniteNumber(value, NaN);
       if (!Number.isFinite(parsed))
           return Math.max(0, fallback);
       return Math.max(0, parsed);
@@ -5199,13 +5209,12 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   const __dep2 = __require('./combat/apply-damage.ts');
   const applyDamage = __dep2.applyDamage;
   const grantShield = __dep2.grantShield;
+  const __dep3 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep3.toFiniteNumber;
+  const toFloorInt = __dep3.toFloorInt;
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const CHAP_MINH_LINK_REDUCTION = 0.30;
   const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
-  const toFinite = (value, fallback = 0) => {
-      const n = typeof value === 'number' ? value : Number(value);
-      return Number.isFinite(n) ? n : fallback;
-  };
   const isAliveChapMinh = (token) => (!!token && token.alive && token.id === CHAP_MINH_ID);
   const isChapMinh = (token) => (!!token && token.id === CHAP_MINH_ID);
   const resolveCrossSlots = (centerSlot) => {
@@ -5230,7 +5239,7 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
           return;
       const slot = slotIndex(caster.side, caster.cx, caster.cy);
       caster._chapMinhLinkedSlots = resolveCrossSlots(slot);
-      caster._chapMinhAccumulated = Math.max(0, toFinite(caster._chapMinhAccumulated, 0));
+      caster._chapMinhAccumulated = Math.max(0, toFiniteNumber(caster._chapMinhAccumulated, 0));
   }
   function applyChapMinhActionEnd(game, caster) {
       if (!game || !isAliveChapMinh(caster))
@@ -5324,14 +5333,14 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   function applyChapMinhBacklash(owner) {
       if (!isAliveChapMinh(owner))
           return;
-      const accumulated = Math.max(0, toFinite(owner._chapMinhAccumulated, 0));
+      const accumulated = Math.max(0, toFiniteNumber(owner._chapMinhAccumulated, 0));
       const threshold = Math.max(1, Math.floor((owner.hpMax ?? 0) * 0.7));
       if (accumulated <= threshold)
           return;
       const initial = accumulated * 0.7;
       const postSelfReduction = initial * 0.7;
-      const arm = Math.max(0, toFinite(owner.arm, 0));
-      const res = Math.max(0, toFinite(owner.res, 0));
+      const arm = Math.max(0, toFiniteNumber(owner.arm, 0));
+      const res = Math.max(0, toFiniteNumber(owner.res, 0));
       const defenseMultiplier = 0.5 * (100 / (100 + arm)) + 0.5 * (100 / (100 + res));
       const finalDamage = Math.max(1, Math.floor(postSelfReduction * defenseMultiplier));
       applyDamage(owner, finalDamage);
@@ -5340,7 +5349,7 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   function recordChapMinhPreventedDamage(owner, prevented) {
       if (!isAliveChapMinh(owner) || prevented <= 0)
           return;
-      owner._chapMinhAccumulated = Math.max(0, toFinite(owner._chapMinhAccumulated, 0) + prevented);
+      owner._chapMinhAccumulated = Math.max(0, toFiniteNumber(owner._chapMinhAccumulated, 0) + prevented);
       applyChapMinhBacklash(owner);
   }
   function applyChapMinhPhaseShift(unit) {
@@ -5348,8 +5357,8 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
           return;
       if (unit._chapMinhPhaseShiftUsed)
           return;
-      const hpMax = Math.max(1, Math.floor(toFinite(unit.hpMax, 1)));
-      const hp = Math.max(0, Math.floor(toFinite(unit.hp, hpMax)));
+      const hpMax = Math.max(1, toFloorInt(unit.hpMax, 1));
+      const hp = Math.max(0, toFloorInt(unit.hp, hpMax));
       if (hp > Math.floor(hpMax * 0.1))
           return;
       const lost = Math.max(1, Math.floor(hpMax * 0.5));
@@ -5365,12 +5374,12 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   function recoverChapMinhMaxHpPerTurn(unit) {
       if (!isAliveChapMinh(unit) || !unit._chapMinhPhaseShiftUsed)
           return;
-      const lostRemain = Math.max(0, Math.floor(toFinite(unit._chapMinhLostMaxHp, 0)));
+      const lostRemain = Math.max(0, toFloorInt(unit._chapMinhLostMaxHp, 0));
       if (lostRemain <= 0)
           return;
-      const step = Math.max(1, Math.floor(toFinite(unit._chapMinhRecoverPerTurn, 0)));
+      const step = Math.max(1, toFloorInt(unit._chapMinhRecoverPerTurn, 0));
       const gain = Math.min(lostRemain, step);
-      unit.hpMax = Math.max(1, Math.floor(toFinite(unit.hpMax, 1)) + gain);
+      unit.hpMax = Math.max(1, toFloorInt(unit.hpMax, 1) + gain);
       unit._chapMinhLostMaxHp = Math.max(0, lostRemain - gain);
   }
   //# sourceMappingURL=stdin.js.map
@@ -5500,6 +5509,11 @@ __modules['./combat/counter-matrix.ts'] = (exports, module, __require) => {
       return CLASS_BONUS_MAP[attacker]?.[defender] ?? 0;
   }
   function getSynergyBonus(attacker, sideUnits, context) {
+      const mode = context?.synergyMode ?? 'auto';
+      if (mode === 'damage')
+          return 0;
+      if (mode === 'burn' && context?.canApplyBurn === false)
+          return 0;
       const attackerElement = resolveAttackerElement(attacker, context?.skill);
       if (attackerElement !== 'fire')
           return 0;
@@ -5544,6 +5558,29 @@ __modules['./combat/counter-matrix.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getSynergyBonus')) exports.getSynergyBonus = getSynergyBonus;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCounterBonusMetadata')) exports.getCounterBonusMetadata = getCounterBonusMetadata;
 };
+__modules['./combat/number-utils.ts'] = (exports, module, __require) => {
+  function toFiniteNumber(value, fallback = 0) {
+      const parsed = typeof value === 'number' ? value : Number(value);
+      return Number.isFinite(parsed) ? parsed : fallback;
+  }
+  function toFloorInt(value, fallback = 0) {
+      return Math.floor(toFiniteNumber(value, fallback));
+  }
+  function toRoundedInt(value, fallback = 0) {
+      return Math.round(toFiniteNumber(value, fallback));
+  }
+  function toPositiveTurns(value, fallback = 1) {
+      const direct = toFiniteNumber(value, NaN);
+      if (!Number.isFinite(direct) || direct <= 0)
+          return Math.max(1, Math.round(fallback));
+      return Math.max(1, Math.round(direct));
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'toFiniteNumber')) exports.toFiniteNumber = toFiniteNumber;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'toFloorInt')) exports.toFloorInt = toFloorInt;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'toRoundedInt')) exports.toRoundedInt = toRoundedInt;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'toPositiveTurns')) exports.toPositiveTurns = toPositiveTurns;
+};
 __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
@@ -5568,6 +5605,11 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const grantShield = __dep8.grantShield;
   const __dep9 = __require('./combat/unit-runtime-hooks.ts');
   const runRuntimeActiveSkill = __dep9.runRuntimeActiveSkill;
+  const __dep10 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep10.toFiniteNumber;
+  const toFloorInt = __dep10.toFloorInt;
+  const toPositiveTurns = __dep10.toPositiveTurns;
+  const toRoundedInt = __dep10.toRoundedInt;
   function resolveActiveSkill(caster, skillKey) {
       const set = skillSets[caster.id];
       if (!set)
@@ -5576,10 +5618,6 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       if (!Number.isFinite(idx) || idx < 0)
           return null;
       return set.skills[idx] ?? (idx === 0 ? set.skill : null) ?? null;
-  }
-  function readNumberish(value, fallback = 0) {
-      const n = typeof value === 'number' ? value : Number(value);
-      return Number.isFinite(n) ? n : fallback;
   }
   function resolvePayload(skill) {
       const nested = [skill.payload, skill.metadata?.payload, skill.meta?.payload]
@@ -5598,6 +5636,43 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           tick: 'turn',
           sourceUnitId: source.id,
       });
+  }
+  function applyStatusToTargets(targets, statusId, turns, source) {
+      for (const target of targets)
+          addTaggedStatus(target, statusId, turns, source);
+  }
+  function listAliveBySide(game, side) {
+      const alive = [];
+      for (const token of game.tokens) {
+          if (token.alive && token.side === side)
+              alive.push(token);
+      }
+      return alive;
+  }
+  function canApplyUniqueGlobal(game, caster, summonId) {
+      for (const token of game.tokens) {
+          if (!token.alive || token.id !== summonId)
+              continue;
+          if (token.side !== caster.side)
+              return false;
+      }
+      return true;
+  }
+  function applyHpCost(caster, payload) {
+      const hpMax = Math.max(1, toFloorInt(caster.hpMax, 1));
+      const currentHp = Math.max(0, toFloorInt(caster.hp, hpMax));
+      const ratio = Math.max(0, toFiniteNumber(payload.hpCostRatio ?? payload.hpCostPercent, 0));
+      const flat = Math.max(0, toFloorInt(payload.hpCostFlat ?? payload.hpCost, 0));
+      const minRemainRatio = Math.max(0, toFiniteNumber(payload.minRemainingHpRatio ?? payload.minHpRatio, 0));
+      const hpCost = Math.max(flat, Math.floor(hpMax * ratio));
+      if (hpCost <= 0)
+          return true;
+      const minRemain = Math.max(1, Math.floor(hpMax * minRemainRatio));
+      const nextHp = currentHp - hpCost;
+      if (nextHp < minRemain)
+          return false;
+      caster.hp = Math.max(1, nextHp);
+      return true;
   }
   function firstOpenSlot(game, side) {
       const alive = [];
@@ -5620,8 +5695,9 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       const tags = normalizeTagList(skill.tags ?? []);
       const tagSet = new Set(tags);
       const hasTag = (tag) => tagSet.has(tag);
+      const hasDamageTag = hasTag('single-target') || hasTag('multi-target') || hasTag('aoe') || hasTag('non-heal-hp-change');
       const payload = resolvePayload(skill);
-      const skillCost = Math.max(0, Math.round(readNumberish(skill.cost?.aether, 0)));
+      const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
       if (skillCost > 0 && hasTag('aether-cost') && globalAetherPool.current(caster.side) < skillCost) {
           return {
               ok: false,
@@ -5642,6 +5718,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           cost: skillCost,
           payload,
           deferEffects: true,
+          tagsNormalized: true,
           onAetherCost: (amount, side) => {
               if (amount <= 0) {
                   consumedAether = true;
@@ -5665,7 +5742,18 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           };
       }
       const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
-      const turns = Math.max(1, Math.round(readNumberish(payload.turns ?? payload.duration, 1)));
+      const turns = toPositiveTurns(payload.turns ?? payload.duration, 1);
+      if (!applyHpCost(caster, payload)) {
+          return {
+              ok: false,
+              skillKey,
+              skill,
+              tags,
+              appliedTags: dispatch.applied,
+              targetCount: 0,
+              reason: 'blocked',
+          };
+      }
       const runtimeSkillResult = runRuntimeActiveSkill({
           game,
           caster,
@@ -5677,13 +5765,14 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       if (runtimeSkillResult)
           return runtimeSkillResult;
       if (caster.id === 'blood_avatar') {
-          const enemies = game.tokens.filter((token) => token.alive && token.side !== caster.side);
+          const enemySide = caster.side === 'ally' ? 'enemy' : 'ally';
+          const enemies = listAliveBySide(game, enemySide);
           if (skillKey === 'skill1') {
               if (globalAetherPool.current(caster.side) < 25) {
                   return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length, reason: 'insufficient-aether' };
               }
               globalAetherPool.consume(caster.side, 25);
-              const base = Math.max(1, Math.round(((caster.atk ?? 0) + (caster.wil ?? 0)) * 1.4));
+              const base = Math.max(1, toRoundedInt(((caster.atk ?? 0) + (caster.wil ?? 0)) * 1.4, 1));
               const picked = enemies.slice(0, 6);
               for (const target of picked) {
                   dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill, isAoE: true, targetsHit: picked.length });
@@ -5717,7 +5806,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               }
               globalAetherPool.consume(caster.side, 25);
               const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
-              caster.hp = Math.max(1, Math.floor((caster.hp ?? 0) - hpCost));
+              caster.hp = Math.max(1, toFloorInt((caster.hp ?? 0) - hpCost, 1));
               globalAetherPool.gain(caster.side, 15);
               return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0 };
           }
@@ -5726,55 +5815,63 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           const openSlot = firstOpenSlot(game, caster.side);
           if (openSlot) {
               const summon = (payload.summon ?? skill.summon ?? {});
+              const summonId = typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`;
+              if (hasTag('unique-global') && !canApplyUniqueGlobal(game, caster, summonId)) {
+                  return {
+                      ok: false,
+                      skillKey,
+                      skill,
+                      tags,
+                      appliedTags: dispatch.applied,
+                      targetCount: 0,
+                      reason: 'blocked',
+                  };
+              }
               enqueueImmediate(game, {
                   side: caster.side,
                   slot: openSlot,
                   unit: {
-                      id: typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`,
+                      id: summonId,
                       name: typeof summon.name === 'string' ? summon.name : 'Creep',
                       ownerIid: caster.iid,
                       isMinion: true,
-                      ttlTurns: Math.max(1, Math.round(readNumberish(summon.ttlTurns ?? summon.ttl, 3))),
+                      ttlTurns: toPositiveTurns(summon.ttlTurns ?? summon.ttl, 3),
                   },
               });
           }
       }
       if (hasTag('heal')) {
-          const amount = Math.max(0, Math.round(readNumberish(payload.healAmount ?? payload.heal, 0)));
+          const amount = Math.max(0, toRoundedInt(payload.healAmount ?? payload.heal, 0));
           for (const target of targets)
               healUnit(target, amount);
       }
       if (hasTag('team-heal')) {
-          const amount = Math.max(0, Math.round(readNumberish(payload.healAmount ?? payload.heal, 0)));
-          const allies = game.tokens.filter((token) => token.alive && token.side === caster.side);
+          const amount = Math.max(0, toRoundedInt(payload.healAmount ?? payload.heal, 0));
+          const allies = listAliveBySide(game, caster.side);
           for (const ally of allies)
               healUnit(ally, amount);
       }
       if (hasTag('shield')) {
-          const amount = Math.max(0, Math.round(readNumberish(payload.shieldAmount ?? payload.shield, 0)));
+          const amount = Math.max(0, toRoundedInt(payload.shieldAmount ?? payload.shield, 0));
           for (const target of targets)
               grantShield(target, amount);
       }
       if (hasTag('silence')) {
-          for (const target of targets)
-              addTaggedStatus(target, 'silence', turns, caster);
+          applyStatusToTargets(targets, 'silence', turns, caster);
       }
       if (hasTag('sleep')) {
-          for (const target of targets)
-              addTaggedStatus(target, 'sleep', turns, caster);
+          applyStatusToTargets(targets, 'sleep', turns, caster);
       }
       if (hasTag('mark')) {
-          for (const target of targets)
-              addTaggedStatus(target, 'mark', turns, caster);
+          applyStatusToTargets(targets, 'mark', turns, caster);
       }
       if (hasTag('control')) {
           const statusId = typeof payload.controlStatus === 'string' ? payload.controlStatus : 'control';
-          for (const target of targets)
-              addTaggedStatus(target, statusId, turns, caster);
+          applyStatusToTargets(targets, statusId, turns, caster);
       }
-      if (hasTag('single-target') || hasTag('multi-target') || hasTag('aoe') || hasTag('non-heal-hp-change') || skill.damage) {
-          const multiplier = Math.max(0, readNumberish(skill.damage?.multiplier ?? skill.damageMultiplier ?? 1, 1));
-          const base = Math.max(1, Math.round(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier));
+      if (hasDamageTag || skill.damage) {
+          const multiplier = Math.max(0, toFiniteNumber(skill.damage?.multiplier ?? skill.damageMultiplier ?? 1, 1));
+          const base = Math.max(1, toRoundedInt(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier, 1));
           for (const target of targets) {
               if (target.side === caster.side)
                   continue;
@@ -5797,17 +5894,17 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/apply-damage.ts');
   const applyDamage = __dep0.applyDamage;
   const grantShield = __dep0.grantShield;
-  const __dep1 = __require('./statuses.ts');
-  const Statuses = __dep1.Statuses;
-  const __dep2 = __require('./data/tags.ts');
-  const normalizeTagList = __dep2.normalizeTagList;
-  const __dep3 = __require('./combat.ts');
-  const dealAbilityDamage = __dep3.dealAbilityDamage;
-  const healUnit = __dep3.healUnit;
-  const asFinite = (value, fallback = 0) => {
-      const parsed = typeof value === 'number' ? value : Number(value);
-      return Number.isFinite(parsed) ? parsed : fallback;
-  };
+  const __dep1 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep1.toFiniteNumber;
+  const toPositiveTurns = __dep1.toPositiveTurns;
+  const toRoundedInt = __dep1.toRoundedInt;
+  const __dep2 = __require('./statuses.ts');
+  const Statuses = __dep2.Statuses;
+  const __dep3 = __require('./data/tags.ts');
+  const normalizeTagList = __dep3.normalizeTagList;
+  const __dep4 = __require('./combat.ts');
+  const dealAbilityDamage = __dep4.dealAbilityDamage;
+  const healUnit = __dep4.healUnit;
   const resolveTargets = (targets, target) => {
       if (Array.isArray(targets) && targets.length > 0) {
           return targets.filter((token) => Boolean(token?.alive));
@@ -5844,17 +5941,54 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       const isAttackerSide = ctx.attacker.side === side;
       return isAttackerSide ? ctx.allyTokens : ctx.enemyTokens;
   };
-  const readTargetLimit = (ctx, fallback) => (Math.max(1, Math.round(asFinite(ctx.payload?.targetCount ?? ctx.payload?.targets, fallback))));
+  const sampleTargets = (tokens, limit) => {
+      if (limit <= 0 || tokens.length === 0)
+          return [];
+      if (tokens.length <= limit)
+          return [...tokens];
+      const pool = [...tokens];
+      for (let i = 0; i < limit; i += 1) {
+          const swapIndex = i + Math.floor(Math.random() * (pool.length - i));
+          [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
+      }
+      return pool.slice(0, limit);
+  };
+  const sampleTargetsWithReplacement = (tokens, limit) => {
+      if (limit <= 0 || tokens.length === 0)
+          return [];
+      const sampled = [];
+      for (let i = 0; i < limit; i += 1) {
+          const picked = tokens[Math.floor(Math.random() * tokens.length)];
+          if (picked)
+              sampled.push(picked);
+      }
+      return sampled;
+  };
+  const readEnemyTargets = (ctx, fallbackLimit) => {
+      if (!ctx.enemySide)
+          return EMPTY_TOKENS;
+      const limit = readTargetLimit(ctx, fallbackLimit);
+      return collectSideTokens(ctx, ctx.enemySide).slice(0, limit);
+  };
+  const readTargetLimit = (ctx, fallback) => (Math.max(1, toRoundedInt(ctx.payload?.targetCount ?? ctx.payload?.targets, fallback)));
+  const readAllowDuplicateTargets = (ctx) => (ctx.payload?.allowDuplicateTargets === true
+      || ctx.payload?.allowDuplicates === true);
+  const sampleFromCandidates = (ctx, candidates, limit) => {
+      if (readAllowDuplicateTargets(ctx)) {
+          return sampleTargetsWithReplacement(candidates, limit);
+      }
+      return sampleTargets(candidates, limit);
+  };
   const readTurns = (payload, ...keys) => {
       for (const key of keys) {
           const raw = (payload?.[key] ?? null);
-          const direct = asFinite(raw, NaN);
+          const direct = toFiniteNumber(raw, NaN);
           if (Number.isFinite(direct) && direct > 0)
-              return Math.max(1, Math.round(direct));
+              return toPositiveTurns(direct);
           if (raw && typeof raw === 'object') {
-              const nestedTurns = asFinite(raw.turns, NaN);
+              const nestedTurns = toFiniteNumber(raw.turns, NaN);
               if (Number.isFinite(nestedTurns) && nestedTurns > 0)
-                  return Math.max(1, Math.round(nestedTurns));
+                  return toPositiveTurns(nestedTurns);
           }
       }
       return 1;
@@ -5864,13 +5998,22 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           id,
           kind: 'debuff',
           tag: id,
-          dur: Math.max(1, Math.round(turns)),
+          dur: toPositiveTurns(turns),
           tick: 'turn',
       });
   };
+  const applyTaggedStatus = (ctx, result, statusId, ...turnKeys) => {
+      if (ctx.deferEffects)
+          return;
+      const turns = readTurns(ctx.payload, ...turnKeys);
+      for (const token of result.targets)
+          addStatus(token, statusId, turns);
+      if (result.targets.length > 0)
+          result.sideEffects.push(`${statusId}:${turns}`);
+  };
   const HANDLERS = Object.freeze({
       'aether-cost': (ctx, result) => {
-          const amount = Math.max(0, Math.round(asFinite(ctx.cost, 0)));
+          const amount = Math.max(0, toRoundedInt(ctx.cost, 0));
           if (!ctx.side || amount <= 0 || typeof ctx.onAetherCost !== 'function')
               return;
           const consumed = ctx.onAetherCost(amount, ctx.side);
@@ -5896,50 +6039,43 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           result.targets = collectSideTokens(ctx, 'ally').slice(0, limit);
       },
       enemy: (ctx, result) => {
-          if (!ctx.attacker)
+          if (!ctx.attacker || !ctx.enemySide)
               return;
           if (result.targets.length > 0)
               return;
-          const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-          const limit = readTargetLimit(ctx, 1);
-          result.targets = collectSideTokens(ctx, foeSide).slice(0, limit);
+          result.targets = readEnemyTargets(ctx, 1);
       },
       'random-target': (ctx, result) => {
-          if (!ctx.attacker)
+          if (!ctx.attacker || !ctx.enemySide)
               return;
           if (result.targets.length > 0)
               return;
-          const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-          const candidates = collectSideTokens(ctx, foeSide);
+          const candidates = collectSideTokens(ctx, ctx.enemySide);
           if (candidates.length > 0)
-              result.targets = [candidates[0]];
+              result.targets = sampleFromCandidates(ctx, candidates, 1);
       },
       'random-aoe': (ctx, result) => {
-          if (!ctx.attacker)
+          if (!ctx.attacker || !ctx.enemySide)
               return;
-          const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
           const limit = readTargetLimit(ctx, 2);
-          result.targets = collectSideTokens(ctx, foeSide).slice(0, limit);
+          result.targets = sampleFromCandidates(ctx, collectSideTokens(ctx, ctx.enemySide), limit);
       },
       'multi-target': (ctx, result) => {
-          if (!ctx.attacker)
+          if (!ctx.attacker || !ctx.enemySide)
               return;
           if (result.targets.length > 0)
               return;
-          const limit = readTargetLimit(ctx, 2);
-          const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-          result.targets = collectSideTokens(ctx, foeSide).slice(0, limit);
+          result.targets = readEnemyTargets(ctx, 2);
       },
       aoe: (ctx, result) => {
-          if (!ctx.attacker)
+          if (!ctx.attacker || !ctx.enemySide)
               return;
-          const foeSide = ctx.attacker.side === 'ally' ? 'enemy' : 'ally';
-          result.targets = collectSideTokens(ctx, foeSide);
+          result.targets = collectSideTokens(ctx, ctx.enemySide);
       },
       heal: (ctx, result) => {
           if (ctx.deferEffects)
               return;
-          const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
+          const amount = Math.max(0, toRoundedInt(ctx.payload?.healAmount ?? ctx.payload?.heal, 0));
           if (amount <= 0)
               return;
           const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
@@ -5951,7 +6087,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       'team-heal': (ctx, result) => {
           if (ctx.deferEffects)
               return;
-          const amount = Math.max(0, Math.round(asFinite(ctx.payload?.healAmount ?? ctx.payload?.heal, 0)));
+          const amount = Math.max(0, toRoundedInt(ctx.payload?.healAmount ?? ctx.payload?.heal, 0));
           if (amount <= 0 || !ctx.attacker)
               return;
           for (const token of collectSideTokens(ctx, 'ally'))
@@ -5961,7 +6097,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       shield: (ctx, result) => {
           if (ctx.deferEffects)
               return;
-          const amount = Math.max(0, Math.round(asFinite(ctx.payload?.shieldAmount ?? ctx.payload?.shield, 0)));
+          const amount = Math.max(0, toRoundedInt(ctx.payload?.shieldAmount ?? ctx.payload?.shield, 0));
+          ;
           if (amount <= 0)
               return;
           const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
@@ -5970,41 +6107,17 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           result.sideEffects.push(`shield:${amount}`);
       },
       silence: (ctx, result) => {
-          if (ctx.deferEffects)
-              return;
-          const turns = readTurns(ctx.payload, 'silenceTurns', 'turns', 'duration');
-          for (const token of result.targets)
-              addStatus(token, 'silence', turns);
-          if (result.targets.length > 0)
-              result.sideEffects.push(`silence:${turns}`);
+          applyTaggedStatus(ctx, result, 'silence', 'silenceTurns', 'turns', 'duration');
       },
       sleep: (ctx, result) => {
-          if (ctx.deferEffects)
-              return;
-          const turns = readTurns(ctx.payload, 'sleepTurns', 'turns', 'duration');
-          for (const token of result.targets)
-              addStatus(token, 'sleep', turns);
-          if (result.targets.length > 0)
-              result.sideEffects.push(`sleep:${turns}`);
+          applyTaggedStatus(ctx, result, 'sleep', 'sleepTurns', 'turns', 'duration');
       },
       mark: (ctx, result) => {
-          if (ctx.deferEffects)
-              return;
-          const turns = readTurns(ctx.payload, 'markTurns', 'turns', 'duration');
-          for (const token of result.targets)
-              addStatus(token, 'mark', turns);
-          if (result.targets.length > 0)
-              result.sideEffects.push(`mark:${turns}`);
+          applyTaggedStatus(ctx, result, 'mark', 'markTurns', 'turns', 'duration');
       },
       control: (ctx, result) => {
-          if (ctx.deferEffects)
-              return;
-          const turns = readTurns(ctx.payload, 'controlTurns', 'turns', 'duration');
           const statusId = String(ctx.payload?.controlStatus ?? 'control');
-          for (const token of result.targets)
-              addStatus(token, statusId, turns);
-          if (result.targets.length > 0)
-              result.sideEffects.push(`${statusId}:${turns}`);
+          applyTaggedStatus(ctx, result, statusId, 'controlTurns', 'turns', 'duration');
       },
       summon: (ctx, result) => {
           if (ctx.deferEffects)
@@ -6017,7 +6130,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       'non-heal-hp-change': (ctx, result) => {
           if (ctx.deferEffects)
               return;
-          const amount = Math.max(0, Math.round(asFinite(ctx.payload?.hpDelta ?? ctx.payload?.damage, 0)));
+          const amount = Math.max(0, toRoundedInt(ctx.payload?.hpDelta ?? ctx.payload?.damage, 0));
           if (amount <= 0)
               return;
           for (const token of result.targets) {
@@ -6033,7 +6146,9 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       },
   });
   function dispatchGameplayTags(rawTags, context) {
-      const tags = normalizeTagList(rawTags);
+      const tags = context.tagsNormalized
+          ? (Array.isArray(rawTags) ? [...rawTags] : [])
+          : normalizeTagList(rawTags);
       const target = context.target ?? null;
       const attacker = context.attacker ?? null;
       const { allyTokens, enemyTokens } = context.game
@@ -6044,7 +6159,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           attacker,
           target,
           targets: resolveTargets(context.targets, target),
-          cost: Math.max(0, Math.round(asFinite(context.cost, 0))),
+          cost: Math.max(0, toRoundedInt(context.cost, 0)),
           side: context.side ?? context.attacker?.side ?? null,
           turn: context.turn ?? null,
           payload: context.payload ?? null,
@@ -6053,6 +6168,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           deferEffects: Boolean(context.deferEffects),
           allyTokens,
           enemyTokens,
+          enemySide: attacker ? (attacker.side === 'ally' ? 'enemy' : 'ally') : null,
       };
       const result = {
           tags,

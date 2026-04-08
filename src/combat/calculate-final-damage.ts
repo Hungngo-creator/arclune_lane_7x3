@@ -1,4 +1,5 @@
 import type { UnitToken } from '@shared-types/units';
+import { toFiniteNumber, toFloorInt } from './number-utils.ts';
 
 export interface DamageBreakdownMetadata {
   classBonus: number;
@@ -19,13 +20,11 @@ export interface CalculateFinalDamageResult {
 }
 
 const clampDamage = (value: unknown): number => {
-  const parsed = typeof value === 'number' ? value : Number(value);
-  if (!Number.isFinite(parsed)) return 0;
-  return Math.max(0, Math.floor(parsed));
+  return Math.max(0, toFloorInt(value, 0));
 };
 
 const normalizeBonus = (value: unknown): number => {
-  const parsed = typeof value === 'number' ? value : Number(value);
+  const parsed = toFiniteNumber(value, NaN);
   if (!Number.isFinite(parsed)) return 0;
   return Math.max(-1, parsed);
 };
@@ -39,7 +38,7 @@ const applyHardRuleLayer = (damage: number, blocked: boolean): number => (
 );
 
 const toNonNegativeFactor = (value: unknown, fallback = 1): number => {
-  const parsed = typeof value === 'number' ? value : Number(value);
+  const parsed = toFiniteNumber(value, NaN);
   if (!Number.isFinite(parsed)) return Math.max(0, fallback);
   return Math.max(0, parsed);
 };

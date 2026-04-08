@@ -131,6 +131,10 @@ export type SynergyContext = {
 };
 
 export function getSynergyBonus(attacker: unknown, sideUnits: unknown, context?: SynergyContext | null): number {
+  const mode = context?.synergyMode ?? 'auto';
+  if (mode === 'damage') return 0;
+  if (mode === 'burn' && context?.canApplyBurn === false) return 0;
+
   const attackerElement = resolveAttackerElement(attacker, context?.skill);
   if (attackerElement !== 'fire') return 0;
 
