@@ -28,7 +28,11 @@ export function applyDamage(target: UnitToken, amount: number): void {
   }
 }
 
-export function grantShield(target: UnitToken | null | undefined, amount: number): number {
+export interface GrantShieldOptions {
+  durationTurns?: number;
+}
+
+export function grantShield(target: UnitToken | null | undefined, amount: number, options: GrantShieldOptions = {}): number {
   if (!target) return 0;
 
   const amt = Math.max(0, Math.floor(amount ?? 0));
@@ -37,10 +41,24 @@ export function grantShield(target: UnitToken | null | undefined, amount: number
   const list = ensureStatusList(target);
   const shield = list.find(status => status.id === 'shield');
 
+  const durationTurns = Number.isFinite(options.durationTurns)
+    ? Math.max(1, Math.floor(options.durationTurns as number))
+    : null;
+
   if (shield) {
     shield.amount = (shield.amount ?? 0) + amt;
+    if (durationTurns != null) {
+      shield.dur = durationTurns;
+      shield.tick = 'turn';
+    }
   } else {
-    list.push({ id: 'shield', kind: 'buff', tag: 'shield', amount: amt });
+    list.push({
+      id: 'shield',
+      kind: 'buff',
+      tag: 'shield',
+      amount: amt,
+      ...(durationTurns != null ? { dur: durationTurns, tick: 'turn' as const } : {}),
+    });
   }
 
   return amt;

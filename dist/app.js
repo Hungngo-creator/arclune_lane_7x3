@@ -5064,7 +5064,7 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
           target.alive = false;
       }
   }
-  function grantShield(target, amount) {
+  function grantShield(target, amount, options = {}) {
       if (!target)
           return 0;
       const amt = Math.max(0, Math.floor(amount ?? 0));
@@ -5072,11 +5072,24 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
           return 0;
       const list = ensureStatusList(target);
       const shield = list.find(status => status.id === 'shield');
+      const durationTurns = Number.isFinite(options.durationTurns)
+          ? Math.max(1, Math.floor(options.durationTurns))
+          : null;
       if (shield) {
           shield.amount = (shield.amount ?? 0) + amt;
+          if (durationTurns != null) {
+              shield.dur = durationTurns;
+              shield.tick = 'turn';
+          }
       }
       else {
-          list.push({ id: 'shield', kind: 'buff', tag: 'shield', amount: amt });
+          list.push({
+              id: 'shield',
+              kind: 'buff',
+              tag: 'shield',
+              amount: amt,
+              ...(durationTurns != null ? { dur: durationTurns, tick: 'turn' } : {}),
+          });
       }
       return amt;
   }
@@ -5186,7 +5199,7 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
           const tokenColumn = ((slotIndex(token.side, token.cx, token.cy) - 1) % 3) + 1;
           if (tokenColumn !== column)
               continue;
-          grantShield(token, shieldAmount);
+          grantShield(token, shieldAmount, { durationTurns: 1 });
       }
   }
   function extractNormalizedSkillTags(skill) {

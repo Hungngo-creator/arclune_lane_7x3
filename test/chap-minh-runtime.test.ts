@@ -2,6 +2,7 @@ import { describe, expect, test } from '@jest/globals';
 
 import {
   activateChapMinhLink,
+  applyChapMinhActionEnd,
   applyChapMinhMitigation,
   recordChapMinhPreventedDamage,
   applyChapMinhPhaseShift,
@@ -58,6 +59,43 @@ describe('chap minh runtime', () => {
   test('normalizes element alias ánh sáng to light', () => {
     expect(normalizeElementKey('ánh sáng')).toBe('light');
     expect(normalizeElementKey('anh sang')).toBe('light');
+  });
+
+  test('column shield from passive is timed to 1 turn', () => {
+    const chapMinh = makeUnit({
+      id: 'huyen_vu_chap_minh',
+      side: 'ally',
+      cx: 1,
+      cy: 1,
+      hp: 2000,
+      hpMax: 2000,
+      statuses: [],
+    });
+    const allySameColumn = makeUnit({
+      id: 'ally_col',
+      side: 'ally',
+      cx: 0,
+      cy: 1,
+      statuses: [],
+    });
+    const allyOtherColumn = makeUnit({
+      id: 'ally_other',
+      side: 'ally',
+      cx: 0,
+      cy: 0,
+      statuses: [],
+    });
+    const game = { tokens: [chapMinh, allySameColumn, allyOtherColumn] } as SessionState;
+
+    applyChapMinhActionEnd(game, chapMinh);
+
+    const sameColumnShield = allySameColumn.statuses?.find((status) => status.id === 'shield') ?? null;
+    expect(sameColumnShield?.amount).toBe(300);
+    expect(sameColumnShield?.dur).toBe(1);
+    expect(sameColumnShield?.tick).toBe('turn');
+
+    const otherColumnShield = allyOtherColumn.statuses?.find((status) => status.id === 'shield') ?? null;
+    expect(otherColumnShield).toBeNull();
   });
 
   test('link mitigation accumulates prevented damage and triggers backlash', () => {

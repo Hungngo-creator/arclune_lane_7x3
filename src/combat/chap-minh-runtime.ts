@@ -67,7 +67,7 @@ export function applyChapMinhActionEnd(game: SessionState | null | undefined, ca
     if (!token.alive || token.side !== caster.side) continue;
     const tokenColumn = ((slotIndex(token.side, token.cx, token.cy) - 1) % 3) + 1;
     if (tokenColumn !== column) continue;
-    grantShield(token, shieldAmount);
+    grantShield(token, shieldAmount, { durationTurns: 1 });
   }
 }
 
