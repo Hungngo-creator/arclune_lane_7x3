@@ -5053,23 +5053,21 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       }
       return unit.statuses;
   };
-  function findShieldStatusIndex(statuses) {
-      for (let i = 0; i < statuses.length; i += 1) {
-          if (statuses[i]?.id === 'shield')
-              return i;
+  function getShieldEntry(target, statuses) {
+      const list = statuses ?? (Array.isArray(target?.statuses) ? target.statuses : null);
+      if (!target || !list || list.length === 0)
+          return null;
+      for (let i = 0; i < list.length; i += 1) {
+          const status = list[i];
+          if (status?.id !== 'shield')
+              continue;
+          return {
+              statuses: list,
+              index: i,
+              status,
+          };
       }
-      return -1;
-  }
-  function findShieldEntry(target) {
-      if (!target || !Array.isArray(target.statuses) || target.statuses.length === 0)
-          return null;
-      const index = findShieldStatusIndex(target.statuses);
-      if (index < 0)
-          return null;
-      const status = target.statuses[index];
-      if (!status)
-          return null;
-      return { statuses: target.statuses, index, status };
+      return null;
   }
   function applyDamage(target, amount) {
       const maxHp = Math.max(0, toFloorInt(target.hpMax, 0));
@@ -5095,15 +5093,15 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       if (amt <= 0)
           return 0;
       const list = ensureStatusList(target);
-      const shield = list.find(status => status.id === 'shield');
+      const entry = getShieldEntry(target, list);
       const durationTurns = Number.isFinite(options.durationTurns)
           ? Math.max(1, toFloorInt(options.durationTurns, 1))
           : null;
-      if (shield) {
-          shield.amount = (shield.amount ?? 0) + amt;
+      if (entry) {
+          entry.status.amount = (entry.status.amount ?? 0) + amt;
           if (durationTurns != null) {
-              shield.dur = durationTurns;
-              shield.tick = 'turn';
+              entry.status.dur = durationTurns;
+              entry.status.tick = 'turn';
           }
       }
       else {
@@ -5118,7 +5116,7 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       return amt;
   }
   function consumeShield(target, amount) {
-      const entry = findShieldEntry(target);
+      const entry = getShieldEntry(target);
       if (!entry)
           return 0;
       const currentShield = Math.max(0, toFloorInt(entry.status.amount, 0));
@@ -5139,13 +5137,23 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   function consumeShieldByCurrentRatio(target, ratio) {
       if (!target || !Number.isFinite(ratio) || ratio <= 0)
           return 0;
-      const entry = findShieldEntry(target);
+      const entry = getShieldEntry(target);
       if (!entry)
           return 0;
       const current = Math.max(0, toFloorInt(entry.status.amount, 0));
       if (current <= 0)
           return 0;
-      return consumeShield(target, toFloorInt(current * toFiniteNumber(ratio, 0), 0));
+      const requested = Math.max(0, toFloorInt(current * toFiniteNumber(ratio, 0), 0));
+      if (requested <= 0)
+          return 0;
+      const consumed = Math.min(current, requested);
+      const remain = current - consumed;
+      if (remain > 0) {
+          entry.status.amount = remain;
+          return consumed;
+      }
+      entry.statuses.splice(entry.index, 1);
+      return consumed;
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyDamage')) exports.applyDamage = applyDamage;
@@ -5167,7 +5175,6 @@ __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) =
       return Math.max(-1, parsed);
   };
   const applyMitigationLayer = (damage, factor) => (Math.max(0, Math.floor(Math.max(0, damage) * Math.max(0, factor))));
-  const applyHardRuleLayer = (damage, blocked) => (blocked ? 0 : Math.max(0, damage));
   const toNonNegativeFactor = (value, fallback = 1) => {
       const parsed = toFiniteNumber(value, NaN);
       if (!Number.isFinite(parsed))
@@ -5185,14 +5192,19 @@ __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) =
   const resolveCounterMultiplier = (breakdown) => (Math.max(0, 1 + breakdown.classBonus + breakdown.elementBonus + breakdown.synergyBonus));
   function calculateFinalDamage(_attacker, _defender, _skill, rawDamage, context = {}) {
       const breakdown = resolveBreakdown(context);
+      if (context.ignoreAll) {
+          return { total: 0, breakdown };
+      }
       const counterMultiplier = resolveCounterMultiplier(breakdown);
       const defenseMultiplier = toNonNegativeFactor(context.defenseMultiplier, 1);
       const reductionMultiplier = toNonNegativeFactor(context.reductionMultiplier, 1);
       let total = clampDamage(rawDamage);
-      total = applyMitigationLayer(total, counterMultiplier);
-      total = applyHardRuleLayer(total, !!context.ignoreAll);
-      total = applyMitigationLayer(total, defenseMultiplier);
-      total = applyMitigationLayer(total, reductionMultiplier);
+      if (counterMultiplier !== 1)
+          total = applyMitigationLayer(total, counterMultiplier);
+      if (defenseMultiplier !== 1)
+          total = applyMitigationLayer(total, defenseMultiplier);
+      if (reductionMultiplier !== 1)
+          total = applyMitigationLayer(total, reductionMultiplier);
       return { total, breakdown };
   }
   //# sourceMappingURL=stdin.js.map
@@ -5217,6 +5229,13 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
   const isAliveChapMinh = (token) => (!!token && token.alive && token.id === CHAP_MINH_ID);
   const isChapMinh = (token) => (!!token && token.id === CHAP_MINH_ID);
+  const resolveSlotAndColumn = (token) => {
+      const slot = slotIndex(token.side, token.cx, token.cy);
+      return {
+          slot,
+          column: ((slot - 1) % 3) + 1,
+      };
+  };
   const resolveCrossSlots = (centerSlot) => {
       const row = Math.floor((centerSlot - 1) / 3);
       const col = (centerSlot - 1) % 3;
@@ -5237,22 +5256,21 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   function activateChapMinhLink(caster) {
       if (!isAliveChapMinh(caster))
           return;
-      const slot = slotIndex(caster.side, caster.cx, caster.cy);
+      const { slot } = resolveSlotAndColumn(caster);
       caster._chapMinhLinkedSlots = resolveCrossSlots(slot);
       caster._chapMinhAccumulated = Math.max(0, toFiniteNumber(caster._chapMinhAccumulated, 0));
   }
   function applyChapMinhActionEnd(game, caster) {
       if (!game || !isAliveChapMinh(caster))
           return;
-      const casterSlot = slotIndex(caster.side, caster.cx, caster.cy);
-      const column = ((casterSlot - 1) % 3) + 1;
+      const { column } = resolveSlotAndColumn(caster);
       const shieldAmount = Math.max(0, Math.floor((caster.hpMax ?? 0) * 0.15));
       if (shieldAmount <= 0)
           return;
       for (const token of game.tokens) {
           if (!token.alive || token.side !== caster.side)
               continue;
-          const tokenColumn = ((slotIndex(token.side, token.cx, token.cy) - 1) % 3) + 1;
+          const { column: tokenColumn } = resolveSlotAndColumn(token);
           if (tokenColumn !== column)
               continue;
           grantShield(token, shieldAmount, { durationTurns: 1 });
@@ -5276,9 +5294,10 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       let owner = null;
       const candidate = target._chapMinhLinkOwner ?? null;
       if (isAliveChapMinh(candidate) && candidate.side === target.side) {
-          const slot = slotIndex(target.side, target.cx, target.cy);
+          const { slot, column: tokenColumn } = resolveSlotAndColumn(target);
+          const { column: ownerColumn } = resolveSlotAndColumn(candidate);
           const inLink = Array.isArray(candidate._chapMinhLinkedSlots) && candidate._chapMinhLinkedSlots.includes(slot);
-          const inColumn = (((slot - 1) % 3) + 1) === ((((slotIndex(candidate.side, candidate.cx, candidate.cy) - 1) % 3) + 1));
+          const inColumn = tokenColumn === ownerColumn;
           if (inLink && !hasRuleBypassTag) {
               bestRatio += CHAP_MINH_LINK_REDUCTION;
               owner = candidate;
@@ -5299,13 +5318,11 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       for (const owner of game.tokens) {
           if (!isAliveChapMinh(owner) || !Array.isArray(owner._chapMinhLinkedSlots))
               continue;
-          const ownerSlot = slotIndex(owner.side, owner.cx, owner.cy);
-          const ownerColumn = ((ownerSlot - 1) % 3) + 1;
+          const { column: ownerColumn } = resolveSlotAndColumn(owner);
           for (const token of game.tokens) {
               if (!token.alive || token.side !== owner.side)
                   continue;
-              const tokenSlot = slotIndex(token.side, token.cx, token.cy);
-              const tokenColumn = ((tokenSlot - 1) % 3) + 1;
+              const { slot: tokenSlot, column: tokenColumn } = resolveSlotAndColumn(token);
               const inLink = owner._chapMinhLinkedSlots.includes(tokenSlot);
               const inColumn = tokenColumn === ownerColumn;
               if (!inLink && !inColumn)
@@ -5627,19 +5644,39 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           ...skill,
       };
   }
-  function addTaggedStatus(target, id, turns, source) {
-      Statuses.add(target, {
-          id,
-          kind: 'debuff',
-          tag: id,
-          dur: Math.max(1, turns),
-          tick: 'turn',
-          sourceUnitId: source.id,
-      });
-  }
-  function applyStatusToTargets(targets, statusId, turns, source) {
-      for (const target of targets)
-          addTaggedStatus(target, statusId, turns, source);
+  function applyTaggedStatusesFromSkill(targets, caster, tagSet, payload, turns) {
+      const defaultStatusRules = [
+          { tag: 'silence', statusId: 'silence' },
+          { tag: 'sleep', statusId: 'sleep' },
+          { tag: 'mark', statusId: 'mark' },
+      ];
+      for (const rule of defaultStatusRules) {
+          if (!tagSet.has(rule.tag))
+              continue;
+          for (const target of targets) {
+              Statuses.add(target, {
+                  id: rule.statusId,
+                  kind: 'debuff',
+                  tag: rule.statusId,
+                  dur: Math.max(1, turns),
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+          }
+      }
+      if (tagSet.has('control')) {
+          const statusId = typeof payload.controlStatus === 'string' ? payload.controlStatus : 'control';
+          for (const target of targets) {
+              Statuses.add(target, {
+                  id: statusId,
+                  kind: 'debuff',
+                  tag: statusId,
+                  dur: Math.max(1, turns),
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+          }
+      }
   }
   function listAliveBySide(game, side) {
       const alive = [];
@@ -5687,7 +5724,26 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       }
       return null;
   }
+  function consumeSideAether(side, amount) {
+      const normalized = Math.max(0, toRoundedInt(amount, 0));
+      if (normalized <= 0)
+          return true;
+      if (globalAetherPool.current(side) < normalized)
+          return false;
+      return globalAetherPool.consume(side, normalized);
+  }
   function performActiveSkill(game, caster, skillKey) {
+      if (!caster.alive) {
+          return {
+              ok: false,
+              skillKey,
+              skill: null,
+              tags: [],
+              appliedTags: [],
+              targetCount: 0,
+              reason: 'blocked',
+          };
+      }
       const skill = resolveActiveSkill(caster, skillKey);
       if (!skill) {
           return { ok: false, skillKey, skill: null, tags: [], appliedTags: [], targetCount: 0, reason: 'missing-skill' };
@@ -5698,7 +5754,8 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       const hasDamageTag = hasTag('single-target') || hasTag('multi-target') || hasTag('aoe') || hasTag('non-heal-hp-change');
       const payload = resolvePayload(skill);
       const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
-      if (skillCost > 0 && hasTag('aether-cost') && globalAetherPool.current(caster.side) < skillCost) {
+      const usesTagAetherCost = skillCost > 0 && hasTag('aether-cost');
+      if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
           return {
               ok: false,
               skillKey,
@@ -5730,7 +5787,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           },
           onSummon: () => undefined,
       });
-      if (skillCost > 0 && hasTag('aether-cost') && !consumedAether) {
+      if (usesTagAetherCost && !consumedAether) {
           return {
               ok: false,
               skillKey,
@@ -5768,10 +5825,9 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           const enemySide = caster.side === 'ally' ? 'enemy' : 'ally';
           const enemies = listAliveBySide(game, enemySide);
           if (skillKey === 'skill1') {
-              if (globalAetherPool.current(caster.side) < 25) {
+              if (!usesTagAetherCost && !consumeSideAether(caster.side, 25)) {
                   return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length, reason: 'insufficient-aether' };
               }
-              globalAetherPool.consume(caster.side, 25);
               const base = Math.max(1, toRoundedInt(((caster.atk ?? 0) + (caster.wil ?? 0)) * 1.4, 1));
               const picked = enemies.slice(0, 6);
               for (const target of picked) {
@@ -5801,10 +5857,9 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length };
           }
           if (skillKey === 'skill3') {
-              if (globalAetherPool.current(caster.side) < 25) {
+              if (!usesTagAetherCost && !consumeSideAether(caster.side, 25)) {
                   return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0, reason: 'insufficient-aether' };
               }
-              globalAetherPool.consume(caster.side, 25);
               const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
               caster.hp = Math.max(1, toFloorInt((caster.hp ?? 0) - hpCost, 1));
               globalAetherPool.gain(caster.side, 15);
@@ -5856,19 +5911,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           for (const target of targets)
               grantShield(target, amount);
       }
-      if (hasTag('silence')) {
-          applyStatusToTargets(targets, 'silence', turns, caster);
-      }
-      if (hasTag('sleep')) {
-          applyStatusToTargets(targets, 'sleep', turns, caster);
-      }
-      if (hasTag('mark')) {
-          applyStatusToTargets(targets, 'mark', turns, caster);
-      }
-      if (hasTag('control')) {
-          const statusId = typeof payload.controlStatus === 'string' ? payload.controlStatus : 'control';
-          applyStatusToTargets(targets, statusId, turns, caster);
-      }
+      applyTaggedStatusesFromSkill(targets, caster, tagSet, payload, turns);
       if (hasDamageTag || skill.damage) {
           const multiplier = Math.max(0, toFiniteNumber(skill.damage?.multiplier ?? skill.damageMultiplier ?? 1, 1));
           const base = Math.max(1, toRoundedInt(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier, 1));
@@ -5905,6 +5948,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep4 = __require('./combat.ts');
   const dealAbilityDamage = __dep4.dealAbilityDamage;
   const healUnit = __dep4.healUnit;
+  const __dep5 = __require('./utils/rng.ts');
+  const nextRngValue = __dep5.nextRngValue;
   const resolveTargets = (targets, target) => {
       if (Array.isArray(targets) && targets.length > 0) {
           return targets.filter((token) => Boolean(token?.alive));
@@ -5914,6 +5959,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       return [];
   };
   const EMPTY_TOKENS = [];
+  const resolveRandom = (ctx) => (ctx.game?.rng ? () => nextRngValue(ctx.game?.rng) : Math.random);
   function splitAliveTokensBySide(tokens, attacker) {
       if (!attacker) {
           return {
@@ -5935,49 +5981,38 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       enemyTokens.sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx));
       return { allyTokens, enemyTokens };
   }
-  const collectSideTokens = (ctx, side) => {
-      if (!ctx.attacker)
-          return EMPTY_TOKENS;
-      const isAttackerSide = ctx.attacker.side === side;
-      return isAttackerSide ? ctx.allyTokens : ctx.enemyTokens;
-  };
-  const sampleTargets = (tokens, limit) => {
+  const sampleTargets = (tokens, limit, randomFn) => {
       if (limit <= 0 || tokens.length === 0)
           return [];
       if (tokens.length <= limit)
           return [...tokens];
       const pool = [...tokens];
       for (let i = 0; i < limit; i += 1) {
-          const swapIndex = i + Math.floor(Math.random() * (pool.length - i));
+          const swapIndex = i + randomFn(Math.random() * (pool.length - i));
           [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
       }
       return pool.slice(0, limit);
   };
-  const sampleTargetsWithReplacement = (tokens, limit) => {
+  const sampleTargetsWithReplacement = (tokens, limit, randomFn) => {
       if (limit <= 0 || tokens.length === 0)
           return [];
       const sampled = [];
       for (let i = 0; i < limit; i += 1) {
-          const picked = tokens[Math.floor(Math.random() * tokens.length)];
+          const picked = tokens[Math.floor(randomFn() * tokens.length)];
           if (picked)
               sampled.push(picked);
       }
       return sampled;
   };
-  const readEnemyTargets = (ctx, fallbackLimit) => {
-      if (!ctx.enemySide)
-          return EMPTY_TOKENS;
-      const limit = readTargetLimit(ctx, fallbackLimit);
-      return collectSideTokens(ctx, ctx.enemySide).slice(0, limit);
-  };
   const readTargetLimit = (ctx, fallback) => (Math.max(1, toRoundedInt(ctx.payload?.targetCount ?? ctx.payload?.targets, fallback)));
   const readAllowDuplicateTargets = (ctx) => (ctx.payload?.allowDuplicateTargets === true
       || ctx.payload?.allowDuplicates === true);
   const sampleFromCandidates = (ctx, candidates, limit) => {
+      const randomFn = resolveRandom(ctx);
       if (readAllowDuplicateTargets(ctx)) {
-          return sampleTargetsWithReplacement(candidates, limit);
+          return sampleTargetsWithReplacement(candidates, limit, randomFn);
       }
-      return sampleTargets(candidates, limit);
+      return sampleTargets(candidates, limit, randomFn);
   };
   const readTurns = (payload, ...keys) => {
       for (const key of keys) {
@@ -5993,24 +6028,73 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       }
       return 1;
   };
-  const addStatus = (target, id, turns) => {
+  const addStatus = (target, id, turns, sourceUnitId) => {
       Statuses.add(target, {
           id,
           kind: 'debuff',
           tag: id,
           dur: toPositiveTurns(turns),
           tick: 'turn',
+          ...(sourceUnitId ? { sourceUnitId } : {}),
       });
   };
   const applyTaggedStatus = (ctx, result, statusId, ...turnKeys) => {
       if (ctx.deferEffects)
           return;
       const turns = readTurns(ctx.payload, ...turnKeys);
+      const sourceUnitId = ctx.attacker?.id;
       for (const token of result.targets)
-          addStatus(token, statusId, turns);
+          addStatus(token, statusId, turns, sourceUnitId);
       if (result.targets.length > 0)
           result.sideEffects.push(`${statusId}:${turns}`);
   };
+  function applyMarkStackingStatus(ctx, result) {
+      if (ctx.deferEffects)
+          return;
+      const payload = ctx.payload ?? {};
+      const statusId = String(payload.markId ?? 'mark');
+      const stacksPerApply = Math.max(1, toRoundedInt(payload.markStacks ?? payload.stacks ?? 1, 1));
+      const maxStacks = Math.max(1, toRoundedInt(payload.markMaxStacks ?? payload.maxStacks ?? 3, 3));
+      const sleepTurnsOnCap = Math.max(0, toRoundedInt(payload.sleepTurnsOnCap ?? payload.markSleepTurns ?? 0, 0));
+      const nonPurgeableByTag = result.tags.includes('sleep-setup');
+      const purgeable = typeof payload.markPurgeable === 'boolean' ? payload.markPurgeable : !nonPurgeableByTag;
+      for (const target of result.targets) {
+          const statuses = Array.isArray(target.statuses) ? target.statuses : (target.statuses = []);
+          let index = -1;
+          for (let i = 0; i < statuses.length; i += 1) {
+              if (statuses[i]?.id === statusId) {
+                  index = i;
+                  break;
+              }
+          }
+          if (index < 0) {
+              Statuses.add(target, {
+                  id: statusId,
+                  kind: 'mark',
+                  tag: 'mark',
+                  stacks: Math.min(maxStacks, stacksPerApply),
+                  maxStacks,
+                  purgeable,
+                  ...(ctx.attacker?.id ? { sourceUnitId: ctx.attacker.id } : {}),
+              });
+              continue;
+          }
+          const status = statuses[index];
+          const currentStacks = Math.max(0, toRoundedInt(status?.stacks ?? 0, 0));
+          const nextStacks = Math.min(maxStacks, currentStacks + stacksPerApply);
+          status.stacks = nextStacks;
+          status.maxStacks = maxStacks;
+          status.purgeable = purgeable;
+          if (nextStacks < maxStacks)
+              continue;
+          if (sleepTurnsOnCap > 0 || nonPurgeableByTag) {
+              addStatus(target, 'sleep', Math.max(1, sleepTurnsOnCap || 1), ctx.attacker?.id);
+              result.sideEffects.push(`sleep:${Math.max(1, sleepTurnsOnCap || 1)}`);
+          }
+          statuses.splice(index, 1);
+          result.sideEffects.push(`mark-cap:${statusId}`);
+      }
+  }
   const HANDLERS = Object.freeze({
       'aether-cost': (ctx, result) => {
           const amount = Math.max(0, toRoundedInt(ctx.cost, 0));
@@ -6036,41 +6120,41 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           if (result.targets.length > 0)
               return;
           const limit = readTargetLimit(ctx, 1);
-          result.targets = collectSideTokens(ctx, 'ally').slice(0, limit);
+          result.targets = ctx.attackerTokens.slice(0, limit);
       },
       enemy: (ctx, result) => {
-          if (!ctx.attacker || !ctx.enemySide)
+          if (!ctx.attacker)
               return;
           if (result.targets.length > 0)
               return;
-          result.targets = readEnemyTargets(ctx, 1);
+          result.targets = ctx.opponentTokens.slice(0, readTargetLimit(ctx, 1));
       },
       'random-target': (ctx, result) => {
-          if (!ctx.attacker || !ctx.enemySide)
+          if (!ctx.attacker)
               return;
           if (result.targets.length > 0)
               return;
-          const candidates = collectSideTokens(ctx, ctx.enemySide);
+          const candidates = ctx.opponentTokens;
           if (candidates.length > 0)
               result.targets = sampleFromCandidates(ctx, candidates, 1);
       },
       'random-aoe': (ctx, result) => {
-          if (!ctx.attacker || !ctx.enemySide)
+          if (!ctx.attacker)
               return;
           const limit = readTargetLimit(ctx, 2);
-          result.targets = sampleFromCandidates(ctx, collectSideTokens(ctx, ctx.enemySide), limit);
+          result.targets = sampleFromCandidates(ctx, ctx.opponentTokens, limit);
       },
       'multi-target': (ctx, result) => {
-          if (!ctx.attacker || !ctx.enemySide)
+          if (!ctx.attacker)
               return;
           if (result.targets.length > 0)
               return;
-          result.targets = readEnemyTargets(ctx, 2);
+          result.targets = ctx.opponentTokens.slice(0, readTargetLimit(ctx, 2));
       },
       aoe: (ctx, result) => {
-          if (!ctx.attacker || !ctx.enemySide)
+          if (!ctx.attacker)
               return;
-          result.targets = collectSideTokens(ctx, ctx.enemySide);
+          result.targets = ctx.opponentTokens;
       },
       heal: (ctx, result) => {
           if (ctx.deferEffects)
@@ -6090,7 +6174,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           const amount = Math.max(0, toRoundedInt(ctx.payload?.healAmount ?? ctx.payload?.heal, 0));
           if (amount <= 0 || !ctx.attacker)
               return;
-          for (const token of collectSideTokens(ctx, 'ally'))
+          for (const token of ctx.attackerTokens)
               healUnit(token, amount);
           result.sideEffects.push(`team-heal:${amount}`);
       },
@@ -6098,7 +6182,6 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           if (ctx.deferEffects)
               return;
           const amount = Math.max(0, toRoundedInt(ctx.payload?.shieldAmount ?? ctx.payload?.shield, 0));
-          ;
           if (amount <= 0)
               return;
           const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
@@ -6113,7 +6196,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           applyTaggedStatus(ctx, result, 'sleep', 'sleepTurns', 'turns', 'duration');
       },
       mark: (ctx, result) => {
-          applyTaggedStatus(ctx, result, 'mark', 'markTurns', 'turns', 'duration');
+          applyMarkStackingStatus(ctx, result);
       },
       control: (ctx, result) => {
           const statusId = String(ctx.payload?.controlStatus ?? 'control');
@@ -6161,14 +6244,12 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           targets: resolveTargets(context.targets, target),
           cost: Math.max(0, toRoundedInt(context.cost, 0)),
           side: context.side ?? context.attacker?.side ?? null,
-          turn: context.turn ?? null,
           payload: context.payload ?? null,
           onAetherCost: context.onAetherCost ?? (() => false),
           onSummon: context.onSummon ?? (() => undefined),
           deferEffects: Boolean(context.deferEffects),
-          allyTokens,
-          enemyTokens,
-          enemySide: attacker ? (attacker.side === 'ally' ? 'enemy' : 'ally') : null,
+          attackerTokens: attacker ? allyTokens : EMPTY_TOKENS,
+          opponentTokens: attacker ? enemyTokens : EMPTY_TOKENS,
       };
       const result = {
           tags,

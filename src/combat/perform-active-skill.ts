@@ -43,19 +43,46 @@ function resolvePayload(skill: SkillSection): Record<string, unknown> {
   };
 }
 
-function addTaggedStatus(target: UnitToken, id: string, turns: number, source: UnitToken): void {
-  Statuses.add(target, {
-    id,
-    kind: 'debuff',
-    tag: id,
-    dur: Math.max(1, turns),
-    tick: 'turn',
-    sourceUnitId: source.id,
-  });
-}
+function applyTaggedStatusesFromSkill(
+  targets: ReadonlyArray<UnitToken>,
+  caster: UnitToken,
+  tagSet: ReadonlySet<string>,
+  payload: Record<string, unknown>,
+  turns: number,
+): void {
+  const defaultStatusRules: ReadonlyArray<{ tag: string; statusId: string }> = [
+    { tag: 'silence', statusId: 'silence' },
+    { tag: 'sleep', statusId: 'sleep' },
+    { tag: 'mark', statusId: 'mark' },
+  ];
 
-function applyStatusToTargets(targets: ReadonlyArray<UnitToken>, statusId: string, turns: number, source: UnitToken): void {
-  for (const target of targets) addTaggedStatus(target, statusId, turns, source);
+  for (const rule of defaultStatusRules) {
+    if (!tagSet.has(rule.tag)) continue;
+    for (const target of targets) {
+      Statuses.add(target, {
+        id: rule.statusId,
+        kind: 'debuff',
+        tag: rule.statusId,
+        dur: Math.max(1, turns),
+        tick: 'turn',
+        sourceUnitId: caster.id,
+      });
+    }
+  }
+
+if (tagSet.has('control')) {
+    const statusId = typeof payload.controlStatus === 'string' ? payload.controlStatus : 'control';
+    for (const target of targets) {
+      Statuses.add(target, {
+        id: statusId,
+        kind: 'debuff',
+        tag: statusId,
+        dur: Math.max(1, turns),
+        tick: 'turn',
+        sourceUnitId: caster.id,
+      });
+    }
+  }
 }
 
 function listAliveBySide(game: SessionState, side: UnitToken['side']): UnitToken[] {
@@ -103,7 +130,26 @@ function firstOpenSlot(game: SessionState, side: UnitToken['side']): number | nu
   return null;
 }
 
+function consumeSideAether(side: UnitToken['side'], amount: number): boolean {
+  const normalized = Math.max(0, toRoundedInt(amount, 0));
+  if (normalized <= 0) return true;
+  if (globalAetherPool.current(side) < normalized) return false;
+  return globalAetherPool.consume(side, normalized);
+}
+
 export function performActiveSkill(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey): PerformActiveSkillResult {
+  if (!caster.alive) {
+    return {
+      ok: false,
+      skillKey,
+      skill: null,
+      tags: [],
+      appliedTags: [],
+      targetCount: 0,
+      reason: 'blocked',
+    };
+  }
+
   const skill = resolveActiveSkill(caster, skillKey);
   if (!skill) {
     return { ok: false, skillKey, skill: null, tags: [], appliedTags: [], targetCount: 0, reason: 'missing-skill' };
@@ -115,7 +161,8 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   const hasDamageTag = hasTag('single-target') || hasTag('multi-target') || hasTag('aoe') || hasTag('non-heal-hp-change');
   const payload = resolvePayload(skill);
   const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
-  if (skillCost > 0 && hasTag('aether-cost') && globalAetherPool.current(caster.side) < skillCost) {
+  const usesTagAetherCost = skillCost > 0 && hasTag('aether-cost');
+  if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
     return {
       ok: false,
       skillKey,
@@ -150,7 +197,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     onSummon: () => undefined,
   });
 
-  if (skillCost > 0 && hasTag('aether-cost') && !consumedAether) {
+  if (usesTagAetherCost && !consumedAether) {
     return {
       ok: false,
       skillKey,
@@ -190,10 +237,9 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     const enemySide = caster.side === 'ally' ? 'enemy' : 'ally';
     const enemies = listAliveBySide(game, enemySide);
     if (skillKey === 'skill1') {
-      if (globalAetherPool.current(caster.side) < 25) {
+      if (!usesTagAetherCost && !consumeSideAether(caster.side, 25)) {
         return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length, reason: 'insufficient-aether' };
       }
-      globalAetherPool.consume(caster.side, 25);
       const base = Math.max(1, toRoundedInt(((caster.atk ?? 0) + (caster.wil ?? 0)) * 1.4, 1));
       const picked = enemies.slice(0, 6);
       for (const target of picked) {
@@ -221,10 +267,9 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
       return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length };
     }
     if (skillKey === 'skill3') {
-      if (globalAetherPool.current(caster.side) < 25) {
+      if (!usesTagAetherCost && !consumeSideAether(caster.side, 25)) {
         return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0, reason: 'insufficient-aether' };
       }
-      globalAetherPool.consume(caster.side, 25);
       const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
       caster.hp = Math.max(1, toFloorInt((caster.hp ?? 0) - hpCost, 1));
       globalAetherPool.gain(caster.side, 15);
@@ -278,19 +323,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     for (const target of targets) grantShield(target, amount);
   }
 
-  if (hasTag('silence')) {
-    applyStatusToTargets(targets, 'silence', turns, caster);
-  }
-  if (hasTag('sleep')) {
-    applyStatusToTargets(targets, 'sleep', turns, caster);
-  }
-  if (hasTag('mark')) {
-    applyStatusToTargets(targets, 'mark', turns, caster);
-  }
-  if (hasTag('control')) {
-    const statusId = typeof payload.controlStatus === 'string' ? payload.controlStatus : 'control';
-    applyStatusToTargets(targets, statusId, turns, caster);
-  }
+  applyTaggedStatusesFromSkill(targets, caster, tagSet, payload, turns);
 
   if (hasDamageTag || skill.damage) {
     const multiplier = Math.max(0, toFiniteNumber((skill.damage as Record<string, unknown> | undefined)?.multiplier ?? skill.damageMultiplier ?? 1, 1));

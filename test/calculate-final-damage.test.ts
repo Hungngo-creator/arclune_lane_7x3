@@ -29,4 +29,19 @@ describe('calculate final damage', () => {
 
     expect(result.total).toBe(0);
   });
+
+  test('ignoreAll returns zero damage immediately', () => {
+    const attacker = { id: 'a', side: 'ally', cx: 0, cy: 0, alive: true } as any;
+    const defender = { id: 'd', side: 'enemy', cx: 1, cy: 0, alive: true } as any;
+
+    const result = calculateFinalDamage(attacker, defender, null, 250, {
+      ignoreAll: true,
+      breakdown: { classBonus: 0.2, elementBonus: 0.1, synergyBonus: 0.05 },
+      defenseMultiplier: 0.1,
+      reductionMultiplier: 0.1,
+    });
+
+    expect(result.total).toBe(0);
+    expect(result.breakdown).toEqual({ classBonus: 0.2, elementBonus: 0.1, synergyBonus: 0.05 });
+  });
 });

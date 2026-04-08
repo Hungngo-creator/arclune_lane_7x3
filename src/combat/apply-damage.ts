@@ -13,20 +13,25 @@ const ensureStatusList = (unit?: UnitToken | null): StatusEffect[] => {
   return unit.statuses;
 };
 
-function findShieldStatusIndex(statuses: ReadonlyArray<StatusEffect>): number {
-  for (let i = 0; i < statuses.length; i += 1) {
-    if (statuses[i]?.id === 'shield') return i;
-  }
-  return -1;
+interface ShieldEntry {
+  statuses: StatusEffect[];
+  index: number;
+  status: StatusEffect;
 }
 
-function findShieldEntry(target: UnitToken | null | undefined): { statuses: StatusEffect[]; index: number; status: StatusEffect } | null {
-  if (!target || !Array.isArray(target.statuses) || target.statuses.length === 0) return null;
-  const index = findShieldStatusIndex(target.statuses);
-  if (index < 0) return null;
-  const status = target.statuses[index];
-  if (!status) return null;
-  return { statuses: target.statuses, index, status };
+function getShieldEntry(target: UnitToken | null | undefined, statuses?: StatusEffect[]): ShieldEntry | null {
+  const list = statuses ?? (Array.isArray(target?.statuses) ? target.statuses : null);
+  if (!target || !list || list.length === 0) return null;
+  for (let i = 0; i < list.length; i += 1) {
+    const status = list[i];
+    if (status?.id !== 'shield') continue;
+    return {
+      statuses: list,
+      index: i,
+      status,
+    };
+  }
+  return null;
 }
 
 export function applyDamage(target: UnitToken, amount: number): void {
@@ -58,17 +63,17 @@ export function grantShield(target: UnitToken | null | undefined, amount: number
   if (amt <= 0) return 0;
 
   const list = ensureStatusList(target);
-  const shield = list.find(status => status.id === 'shield');
+  const entry = getShieldEntry(target, list);
 
   const durationTurns = Number.isFinite(options.durationTurns)
     ? Math.max(1, toFloorInt(options.durationTurns as number, 1))
     : null;
 
-  if (shield) {
-    shield.amount = (shield.amount ?? 0) + amt;
+  if (entry) {
+    entry.status.amount = (entry.status.amount ?? 0) + amt;
     if (durationTurns != null) {
-      shield.dur = durationTurns;
-      shield.tick = 'turn';
+      entry.status.dur = durationTurns;
+      entry.status.tick = 'turn';
     }
   } else {
     list.push({
@@ -84,7 +89,7 @@ export function grantShield(target: UnitToken | null | undefined, amount: number
 }
 
 export function consumeShield(target: UnitToken | null | undefined, amount: number): number {
-  const entry = findShieldEntry(target);
+  const entry = getShieldEntry(target);
   if (!entry) return 0;
 
   const currentShield = Math.max(0, toFloorInt(entry.status.amount, 0));
@@ -105,9 +110,19 @@ export function consumeShield(target: UnitToken | null | undefined, amount: numb
 
 export function consumeShieldByCurrentRatio(target: UnitToken | null | undefined, ratio: number): number {
   if (!target || !Number.isFinite(ratio) || ratio <= 0) return 0;
-  const entry = findShieldEntry(target);
+  const entry = getShieldEntry(target);
   if (!entry) return 0;
   const current = Math.max(0, toFloorInt(entry.status.amount, 0));
   if (current <= 0) return 0;
-  return consumeShield(target, toFloorInt(current * toFiniteNumber(ratio, 0), 0));
+  const requested = Math.max(0, toFloorInt(current * toFiniteNumber(ratio, 0), 0));
+  if (requested <= 0) return 0;
+  const consumed = Math.min(current, requested);
+  const remain = current - consumed;
+  if (remain > 0) {
+    entry.status.amount = remain;
+    return consumed;
+  }
+
+  entry.statuses.splice(entry.index, 1);
+  return consumed;
 }

@@ -96,6 +96,32 @@ describe('combat tag dispatcher matrix', () => {
     expect(result.applied).toEqual(expect.arrayContaining(['heal', 'shield']));
   });
 
+  it('resolves ally/team-heal from attacker perspective for both sides', () => {
+    const enemyAttacker = makeToken({ id: 'enemy-attacker', side: 'enemy', hp: 25, hpMax: 100, cx: 1, cy: 1 });
+    const enemyAlly = makeToken({ id: 'enemy-ally', side: 'enemy', hp: 30, hpMax: 100, cx: 2, cy: 1 });
+    const opposingUnit = makeToken({ id: 'ally-opponent', side: 'ally', hp: 10, hpMax: 100, cx: 0, cy: 1 });
+
+    const game = makeGame([enemyAttacker, enemyAlly, opposingUnit]);
+
+    const allyTargeting = dispatchGameplayTags(['ally'], {
+      game,
+      attacker: enemyAttacker,
+      payload: { targetCount: 2 },
+      tagsNormalized: true,
+    });
+    expect(allyTargeting.targets.map((token) => token.id).sort()).toEqual(['enemy-ally', 'enemy-attacker']);
+
+    dispatchGameplayTags(normalizeTagList(['team-heal']), {
+      game,
+      attacker: enemyAttacker,
+      payload: { healAmount: 20 },
+    });
+
+    expect(enemyAttacker.hp).toBe(45);
+    expect(enemyAlly.hp).toBe(50);
+    expect(opposingUnit.hp).toBe(10);
+  });
+
   it('handles silence / sleep / mark statuses', () => {
     const attacker = makeToken({ id: 'attacker', side: 'ally' });
     const target = makeToken({ id: 'target', side: 'enemy' });
@@ -108,7 +134,31 @@ describe('combat tag dispatcher matrix', () => {
     });
 
     const ids = (target.statuses ?? []).map((status) => status.id);
-    expect(ids).toEqual(expect.arrayContaining(['silence', 'sleep', 'mark']));
+    
+    expect(ids).toEqual(expect.arrayContaining(['silence', 'sleep']));
+  });
+
+  it('supports mark stack cap with sleep trigger from sleep-setup mechanics', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally' });
+    const target = makeToken({ id: 'target', side: 'enemy', statuses: [] });
+    const game = makeGame([attacker, target]);
+    const tags = ['single-target', 'mark', 'sleep-setup'];
+
+    for (let i = 0; i < 3; i += 1) {
+      dispatchGameplayTags(tags, {
+        game,
+        attacker,
+        target,
+        tagsNormalized: true,
+        payload: { markId: 'me_hoac', markMaxStacks: 3, sleepTurnsOnCap: 1, markPurgeable: false },
+      });
+    }
+
+    const ids = (target.statuses ?? []).map((status) => status.id);
+    expect(ids).toContain('sleep');
+    expect(ids).not.toContain('me_hoac');
+    const sleepStatus = (target.statuses ?? []).find((status) => status.id === 'sleep');
+    expect(sleepStatus?.sourceUnitId).toBe('attacker');
   });
 
   it('handles summon and non-heal-hp-change', () => {

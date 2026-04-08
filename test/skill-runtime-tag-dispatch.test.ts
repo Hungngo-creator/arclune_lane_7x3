@@ -95,4 +95,34 @@ consumeSpy.mockRestore();
     expect(three.tags).toContain('single-target');
     expect(enemy.hp).toBeLessThan(200);
   });
+
+  it('does not double-consume aether for blood_avatar active skills with aether-cost tag', () => {
+    const currentSpy = jest.spyOn(globalAetherPool, 'current').mockReturnValue(100);
+    const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(true);
+
+    const caster = makeToken({ id: 'blood_avatar', side: 'ally', cx: 0, cy: 0 });
+    const enemyA = makeToken({ id: 'enemy-a', side: 'enemy', iid: 5, cx: 1, cy: 1, hp: 200, hpMax: 200 });
+    const enemyB = makeToken({ id: 'enemy-b', side: 'enemy', iid: 6, cx: 2, cy: 1, hp: 200, hpMax: 200 });
+    const game = makeGame([caster, enemyA, enemyB]);
+
+    const result = performActiveSkill(game, caster, 'skill1');
+
+    expect(result.ok).toBe(true);
+    const callsWith25 = consumeSpy.mock.calls.filter(([, amount]) => amount === 25);
+    expect(callsWith25).toHaveLength(1);
+
+    currentSpy.mockRestore();
+    consumeSpy.mockRestore();
+  });
+
+  it('blocks active skill execution for dead casters', () => {
+    const caster = makeToken({ id: 'mong_yem', side: 'ally', alive: false, hp: 0 });
+    const enemy = makeToken({ id: 'enemy', side: 'enemy', iid: 8, cx: 1, cy: 1, hp: 200, hpMax: 200 });
+    const game = makeGame([caster, enemy]);
+
+    const result = performActiveSkill(game, caster, 'skill1');
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('blocked');
+    expect(enemy.hp).toBe(200);
+  });
 });

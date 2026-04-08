@@ -30,6 +30,14 @@ const isChapMinh = (token: UnitToken | null | undefined): token is ChapMinhState
   !!token && token.id === CHAP_MINH_ID
 );
 
+const resolveSlotAndColumn = (token: Pick<UnitToken, 'side' | 'cx' | 'cy'>): { slot: number; column: number } => {
+  const slot = slotIndex(token.side, token.cx, token.cy);
+  return {
+    slot,
+    column: ((slot - 1) % 3) + 1,
+  };
+};
+
 const resolveCrossSlots = (centerSlot: number): number[] => {
   const row = Math.floor((centerSlot - 1) / 3);
   const col = (centerSlot - 1) % 3;
@@ -49,21 +57,20 @@ const resolveCrossSlots = (centerSlot: number): number[] => {
 
 export function activateChapMinhLink(caster: UnitToken): void {
   if (!isAliveChapMinh(caster)) return;
-  const slot = slotIndex(caster.side, caster.cx, caster.cy);
+  const { slot } = resolveSlotAndColumn(caster);
   caster._chapMinhLinkedSlots = resolveCrossSlots(slot);
   caster._chapMinhAccumulated = Math.max(0, toFiniteNumber(caster._chapMinhAccumulated, 0));
 }
 
 export function applyChapMinhActionEnd(game: SessionState | null | undefined, caster: UnitToken | null | undefined): void {
   if (!game || !isAliveChapMinh(caster)) return;
-  const casterSlot = slotIndex(caster.side, caster.cx, caster.cy);
-  const column = ((casterSlot - 1) % 3) + 1;
+  const { column } = resolveSlotAndColumn(caster);
   const shieldAmount = Math.max(0, Math.floor((caster.hpMax ?? 0) * 0.15));
   if (shieldAmount <= 0) return;
 
   for (const token of game.tokens) {
     if (!token.alive || token.side !== caster.side) continue;
-    const tokenColumn = ((slotIndex(token.side, token.cx, token.cy) - 1) % 3) + 1;
+    const { column: tokenColumn } = resolveSlotAndColumn(token);
     if (tokenColumn !== column) continue;
     grantShield(token, shieldAmount, { durationTurns: 1 });
   }
@@ -93,9 +100,10 @@ function resolveMitigationRatio(
 
   const candidate = (target._chapMinhLinkOwner as ChapMinhStateCarrier | undefined) ?? null;
   if (isAliveChapMinh(candidate) && candidate.side === target.side) {
-    const slot = slotIndex(target.side, target.cx, target.cy);
+    const { slot, column: tokenColumn } = resolveSlotAndColumn(target);
+    const { column: ownerColumn } = resolveSlotAndColumn(candidate);
     const inLink = Array.isArray(candidate._chapMinhLinkedSlots) && candidate._chapMinhLinkedSlots.includes(slot);
-    const inColumn = (((slot - 1) % 3) + 1) === ((((slotIndex(candidate.side, candidate.cx, candidate.cy) - 1) % 3) + 1));
+    const inColumn = tokenColumn === ownerColumn;
     if (inLink && !hasRuleBypassTag) {
       bestRatio += CHAP_MINH_LINK_REDUCTION;
       owner = candidate;
@@ -116,12 +124,10 @@ export function refreshChapMinhOwnership(game: SessionState | null | undefined):
   }
   for (const owner of game.tokens) {
     if (!isAliveChapMinh(owner) || !Array.isArray(owner._chapMinhLinkedSlots)) continue;
-    const ownerSlot = slotIndex(owner.side, owner.cx, owner.cy);
-    const ownerColumn = ((ownerSlot - 1) % 3) + 1;
+    const { column: ownerColumn } = resolveSlotAndColumn(owner);
     for (const token of game.tokens) {
       if (!token.alive || token.side !== owner.side) continue;
-      const tokenSlot = slotIndex(token.side, token.cx, token.cy);
-      const tokenColumn = ((tokenSlot - 1) % 3) + 1;
+      const { slot: tokenSlot, column: tokenColumn } = resolveSlotAndColumn(token);
       const inLink = owner._chapMinhLinkedSlots.includes(tokenSlot);
       const inColumn = tokenColumn === ownerColumn;
       if (!inLink && !inColumn) continue;

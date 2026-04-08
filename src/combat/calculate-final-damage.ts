@@ -33,10 +33,6 @@ const applyMitigationLayer = (damage: number, factor: number): number => (
   Math.max(0, Math.floor(Math.max(0, damage) * Math.max(0, factor)))
 );
 
-const applyHardRuleLayer = (damage: number, blocked: boolean): number => (
-  blocked ? 0 : Math.max(0, damage)
-);
-
 const toNonNegativeFactor = (value: unknown, fallback = 1): number => {
   const parsed = toFiniteNumber(value, NaN);
   if (!Number.isFinite(parsed)) return Math.max(0, fallback);
@@ -64,15 +60,18 @@ export function calculateFinalDamage(
   context: CalculateFinalDamageContext = {}
 ): CalculateFinalDamageResult {
   const breakdown = resolveBreakdown(context);
+  if (context.ignoreAll) {
+    return { total: 0, breakdown };
+  }
+
   const counterMultiplier = resolveCounterMultiplier(breakdown);
   const defenseMultiplier = toNonNegativeFactor(context.defenseMultiplier, 1);
   const reductionMultiplier = toNonNegativeFactor(context.reductionMultiplier, 1);
 
   let total = clampDamage(rawDamage);
-  total = applyMitigationLayer(total, counterMultiplier);
-  total = applyHardRuleLayer(total, !!context.ignoreAll);
-  total = applyMitigationLayer(total, defenseMultiplier);
-  total = applyMitigationLayer(total, reductionMultiplier);
+  if (counterMultiplier !== 1) total = applyMitigationLayer(total, counterMultiplier);
+  if (defenseMultiplier !== 1) total = applyMitigationLayer(total, defenseMultiplier);
+  if (reductionMultiplier !== 1) total = applyMitigationLayer(total, reductionMultiplier);
 
   return { total, breakdown };
 }
