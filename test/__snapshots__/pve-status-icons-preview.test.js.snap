@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`pve HUD status icon render rules giới hạn icon, ưu tiên control/debuff và tooltip ngắn 1`] = `
 [

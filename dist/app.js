@@ -1813,7 +1813,7 @@ __modules['./art.ts'] = (exports, module, __require) => {
           hpBar: { fill: '#ffe18b' },
           skins: {
               default: {
-                  src: './dist/assets/units/doanminh/default.svg',
+                  src: './dist/assets/units/huyen_vu_chap_minh/default.svg',
                   anchor: 0.86,
                   scale: 1.08,
                   aspect: 0.8,
@@ -5051,11 +5051,14 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       return unit.statuses;
   };
   function applyDamage(target, amount) {
-      if (!Number.isFinite(target.hpMax))
+      const maxHp = Number.isFinite(target.hpMax) ? Math.floor(target.hpMax ?? 0) : 0;
+      if (maxHp <= 0)
           return;
-      const currentHp = target.hp ?? 0;
-      const maxHp = target.hpMax ?? 0;
-      const newHp = Math.max(0, Math.min(maxHp, Math.floor(currentHp) - Math.floor(amount)));
+      const damage = Math.max(0, Math.floor(amount));
+      if (damage <= 0)
+          return;
+      const currentHp = Math.max(0, Math.min(maxHp, Math.floor(target.hp ?? 0)));
+      const newHp = Math.max(0, currentHp - damage);
       target.hp = newHp;
       if (target.hp <= 0) {
           if (target.alive !== false && !target.deadAt) {
@@ -13226,7 +13229,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
   const STATUS_ICON_PATHS = {
       blind: 'assets/blind.svg',
-      dmgCut: 'assets/damageCut.svg',
       damageCut: 'assets/damageCut.svg',
       exalt: 'assets/exalt.svg',
       weaken: 'assets/weaken.svg',
@@ -13257,7 +13259,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const CONTROL_TAGS = new Set(['control', 'silence', 'taunt', 'stun', 'sleep', 'fear']);
   const STATUS_META_BY_ID = {
       blind: { id: 'blind', label: 'Blind', icon: STATUS_ICON_PATHS.blind },
-      dmgCut: { id: 'dmgCut', label: 'Damage Cut', icon: STATUS_ICON_PATHS.dmgCut },
       damageCut: { id: 'damageCut', label: 'Damage Cut', icon: STATUS_ICON_PATHS.damageCut },
       exalt: { id: 'exalt', label: 'Exalt', icon: STATUS_ICON_PATHS.exalt },
       weaken: { id: 'weaken', label: 'Weaken', icon: STATUS_ICON_PATHS.weaken },
@@ -13283,6 +13284,9 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       loithienanh_spd_burn: { id: 'loithienanh_spd_burn', label: 'SPD Burn', icon: STATUS_ICON_PATHS.loithienanh_spd_burn },
       accuracy_down: { id: 'accuracy_down', label: 'Accuracy Down', icon: STATUS_ICON_PATHS.accuracy_down },
   };
+  const STATUS_ID_ALIAS_TO_CANONICAL = Object.freeze({
+      dmgCut: 'damageCut',
+  });
   const STATUS_META_BY_TAG = {
       control: { id: 'control', label: 'Control', icon: 'assets/silence.svg' },
       silence: { id: 'silence', label: 'Silence', icon: 'assets/silence.svg' },
@@ -16015,7 +16019,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       return Math.max(0, Math.min(1, shieldAmount / hpMax));
   }
   function getStatusMeta(status) {
-      const id = typeof status?.id === 'string' ? status.id : '';
+      const rawId = typeof status?.id === 'string' ? status.id : '';
+      const id = STATUS_ID_ALIAS_TO_CANONICAL[rawId] ?? rawId;
       const tag = typeof status?.tag === 'string' ? status.tag : '';
       const byId = id ? STATUS_META_BY_ID[id] : null;
       const byTag = tag ? STATUS_META_BY_TAG[tag] : null;
@@ -28831,6 +28836,7 @@ __modules['./screens/monopoly/index.ts'] = (exports, module, __require) => {
   const getUnitArt = __dep2.getUnitArt;
   const __dep3 = __require('./catalog.ts');
   const CLASS_BASE = __dep3.CLASS_BASE;
+  const RANK_MULT = __dep3.RANK_MULT;
   const ROSTER = __dep3.ROSTER;
   const __dep4 = __require('./data/roster-preview.ts');
   const computeFinalStats = __dep4.computeFinalStats;
@@ -29921,15 +29927,15 @@ __modules['./screens/monopoly/index.ts'] = (exports, module, __require) => {
   const HOUSE_PURCHASE_PROMPT_TIMEOUT_MS = 3000;
   const START_CELL_ONE_BASED = 21;
   const AVATAR_COUNT = 8;
-  const MONOPOLY_RANK = 'SSR';
+  const MONOPOLY_DEFAULT_RANK = 'SSR';
+  const isRankName = (value) => (typeof value === 'string' && Object.prototype.hasOwnProperty.call(RANK_MULT, value));
   function buildMonopolyImportPool(count) {
-      const ssr = ROSTER.filter(unit => String(unit.rank).toUpperCase() === MONOPOLY_RANK);
-      const pool = [...ssr];
+      const pool = [...ROSTER];
       if (!pool.length) {
           return Array.from({ length: count }, (_, index) => ({
               unitId: `fallback-${index + 1}`,
               unitName: `Avatar ${index + 1}`,
-              rank: MONOPOLY_RANK,
+              rank: MONOPOLY_DEFAULT_RANK,
               className: 'Warrior'
           }));
       }
@@ -29938,7 +29944,7 @@ __modules['./screens/monopoly/index.ts'] = (exports, module, __require) => {
           return {
               unitId: picked?.id ?? `fallback-${index + 1}`,
               unitName: picked?.name ?? `Avatar ${index + 1}`,
-              rank: picked?.rank ?? MONOPOLY_RANK,
+              rank: picked?.rank ?? MONOPOLY_DEFAULT_RANK,
               className: (picked?.class && picked.class in CLASS_BASE ? picked.class : 'Warrior')
           };
       });
@@ -30290,7 +30296,8 @@ __modules['./screens/monopoly/index.ts'] = (exports, module, __require) => {
           const role = avatarId === playerAvatarId ? 'player' : 'npc';
           node.className = `monopoly-avatar monopoly-avatar--${role}`;
           const imported = importedUnits[avatarId - 1];
-          const statBlock = computeFinalStats(imported?.className ?? 'Warrior', MONOPOLY_RANK);
+          const resolvedRank = isRankName(imported?.rank) ? imported.rank : MONOPOLY_DEFAULT_RANK;
+          const statBlock = computeFinalStats(imported?.className ?? 'Warrior', resolvedRank);
           const hpBarNode = document.createElement('span');
           hpBarNode.className = 'monopoly-avatar__hp';
           const hpFillNode = document.createElement('span');

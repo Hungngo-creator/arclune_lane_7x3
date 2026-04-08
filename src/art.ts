@@ -710,7 +710,7 @@ export const UNIT_ART: Record<string, UnitArtDefinition> = {
     hpBar: { fill: '#ffe18b' },
     skins: {
       default: {
-        src: './dist/assets/units/doanminh/default.svg',
+        src: './dist/assets/units/huyen_vu_chap_minh/default.svg',
         anchor: 0.86,
         scale: 1.08,
         aspect: 0.8,

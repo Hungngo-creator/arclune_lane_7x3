@@ -1,6 +1,6 @@
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { getUnitArt } from '../../art.ts';
-import { CLASS_BASE, ROSTER, type ClassName } from '../../catalog.ts';
+import { CLASS_BASE, RANK_MULT, ROSTER, type ClassName, type RankName } from '../../catalog.ts';
 import { computeFinalStats } from '../../data/roster-preview.ts';
 import {
   applySpiritGainWithHouseOverflow,
@@ -1354,7 +1354,10 @@ const TURN_ADVANCE_DELAY_MS = 500;
 const HOUSE_PURCHASE_PROMPT_TIMEOUT_MS = 3000;
 const START_CELL_ONE_BASED = 21;
 const AVATAR_COUNT = 8;
-const MONOPOLY_RANK = 'SSR' as const;
+const MONOPOLY_DEFAULT_RANK = 'SSR' as const;
+const isRankName = (value: unknown): value is RankName => (
+  typeof value === 'string' && Object.prototype.hasOwnProperty.call(RANK_MULT, value)
+);
 
 interface MonopolyAttackEvent {
   attackerId: number;
@@ -1368,13 +1371,12 @@ interface MonopolyCombatResolution {
 }
 
 function buildMonopolyImportPool(count: number): Array<{ unitId: string; unitName: string; rank: string; className: ClassName }> {
-  const ssr = ROSTER.filter(unit => String(unit.rank).toUpperCase() === MONOPOLY_RANK);
-  const pool = [...ssr];
+  const pool = [...ROSTER];
   if (!pool.length) {
     return Array.from({ length: count }, (_, index) => ({
       unitId: `fallback-${index + 1}`,
       unitName: `Avatar ${index + 1}`,
-      rank: MONOPOLY_RANK,
+      rank: MONOPOLY_DEFAULT_RANK,
       className: 'Warrior' as ClassName
     }));
   }
@@ -1383,7 +1385,7 @@ function buildMonopolyImportPool(count: number): Array<{ unitId: string; unitNam
     return {
       unitId: picked?.id ?? `fallback-${index + 1}`,
       unitName: picked?.name ?? `Avatar ${index + 1}`,
-      rank: picked?.rank ?? MONOPOLY_RANK,
+      rank: picked?.rank ?? MONOPOLY_DEFAULT_RANK,
       className: (picked?.class && picked.class in CLASS_BASE ? picked.class : 'Warrior') as ClassName
     };
   });
@@ -1791,7 +1793,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     const role = avatarId === playerAvatarId ? 'player' : 'npc';
     node.className = `monopoly-avatar monopoly-avatar--${role}`;
     const imported = importedUnits[avatarId - 1];
-    const statBlock = computeFinalStats(imported?.className ?? 'Warrior', MONOPOLY_RANK);
+    const resolvedRank: RankName = isRankName(imported?.rank) ? imported.rank : MONOPOLY_DEFAULT_RANK;
+    const statBlock = computeFinalStats(imported?.className ?? 'Warrior', resolvedRank);
     const hpBarNode = document.createElement('span');
     hpBarNode.className = 'monopoly-avatar__hp';
     const hpFillNode = document.createElement('span');

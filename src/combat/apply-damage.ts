@@ -13,11 +13,13 @@ const ensureStatusList = (unit?: UnitToken | null): StatusEffect[] => {
 };
 
 export function applyDamage(target: UnitToken, amount: number): void {
-  if (!Number.isFinite(target.hpMax)) return;
+  const maxHp = Number.isFinite(target.hpMax) ? Math.floor(target.hpMax ?? 0) : 0;
+  if (maxHp <= 0) return;
+  const damage = Math.max(0, Math.floor(amount));
+  if (damage <= 0) return;
 
-  const currentHp = target.hp ?? 0;
-  const maxHp = target.hpMax ?? 0;
-  const newHp = Math.max(0, Math.min(maxHp, Math.floor(currentHp) - Math.floor(amount)));
+  const currentHp = Math.max(0, Math.min(maxHp, Math.floor(target.hp ?? 0)));
+  const newHp = Math.max(0, currentHp - damage);
   target.hp = newHp;
 
   if (target.hp <= 0) {

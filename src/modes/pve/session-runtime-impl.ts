@@ -823,7 +823,6 @@ type StatusAggregateCacheEntry = {
 const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
 type StatusIconId =
   | 'blind'
-  | 'dmgCut'
   | 'damageCut'
   | 'exalt'
   | 'weaken'
@@ -851,7 +850,6 @@ type StatusIconId =
 
 const STATUS_ICON_PATHS: Record<StatusIconId, string> = {
   blind: 'assets/blind.svg',
-  dmgCut: 'assets/damageCut.svg',
   damageCut: 'assets/damageCut.svg',
   exalt: 'assets/exalt.svg',
   weaken: 'assets/weaken.svg',
@@ -882,7 +880,6 @@ const MAX_STATUS_ICONS_PER_TOKEN = 5;
 const CONTROL_TAGS = new Set(['control', 'silence', 'taunt', 'stun', 'sleep', 'fear']);
 const STATUS_META_BY_ID: Record<string, StatusMeta> = {
   blind: { id: 'blind', label: 'Blind', icon: STATUS_ICON_PATHS.blind },
-  dmgCut: { id: 'dmgCut', label: 'Damage Cut', icon: STATUS_ICON_PATHS.dmgCut },
   damageCut: { id: 'damageCut', label: 'Damage Cut', icon: STATUS_ICON_PATHS.damageCut },
   exalt: { id: 'exalt', label: 'Exalt', icon: STATUS_ICON_PATHS.exalt },
   weaken: { id: 'weaken', label: 'Weaken', icon: STATUS_ICON_PATHS.weaken },
@@ -908,6 +905,9 @@ const STATUS_META_BY_ID: Record<string, StatusMeta> = {
   loithienanh_spd_burn: { id: 'loithienanh_spd_burn', label: 'SPD Burn', icon: STATUS_ICON_PATHS.loithienanh_spd_burn },
   accuracy_down: { id: 'accuracy_down', label: 'Accuracy Down', icon: STATUS_ICON_PATHS.accuracy_down },
 };
+const STATUS_ID_ALIAS_TO_CANONICAL: Readonly<Record<string, string>> = Object.freeze({
+  dmgCut: 'damageCut',
+});
 const STATUS_META_BY_TAG: Record<string, StatusMeta> = {
   control: { id: 'control', label: 'Control', icon: 'assets/silence.svg' },
   silence: { id: 'silence', label: 'Silence', icon: 'assets/silence.svg' },
@@ -3652,7 +3652,8 @@ function getShieldRatio(unit: UnitToken): number {
 }
 
 function getStatusMeta(status: Record<string, unknown> | null | undefined): StatusMeta {
-  const id = typeof status?.id === 'string' ? status.id : '';
+  const rawId = typeof status?.id === 'string' ? status.id : '';
+  const id = STATUS_ID_ALIAS_TO_CANONICAL[rawId] ?? rawId;
   const tag = typeof status?.tag === 'string' ? status.tag : '';
   const byId = id ? STATUS_META_BY_ID[id] : null;
   const byTag = tag ? STATUS_META_BY_TAG[tag] : null;
