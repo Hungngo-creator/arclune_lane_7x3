@@ -84,7 +84,7 @@ const chapMinhRuntimeHook: UnitRuntimeHook = {
 
     const base = Math.max(1, Math.floor((caster.atk ?? 0) + (caster.wil ?? 0)));
     for (let hit = 0; hit < 3; hit += 1) {
-      dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill });
+      dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill });
     }
 
     return {

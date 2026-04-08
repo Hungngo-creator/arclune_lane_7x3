@@ -8,6 +8,7 @@ import {
   recoverChapMinhMaxHpPerTurn,
 } from '../src/combat/chap-minh-runtime.ts';
 import { performActiveSkill } from '../src/combat/perform-active-skill.ts';
+import { basicAttack, dealAbilityDamage } from '../src/combat.ts';
 import { normalizeElementKey } from '../src/utils/domain-normalization.ts';
 import { ROSTER } from '../src/catalog.ts';
 import { createSession } from '../src/modes/pve/session-state.ts';
@@ -232,5 +233,60 @@ describe('chap minh runtime', () => {
     expect(allyAetherPool.current).toBe(0);
     expect(chapMinh.statuses?.find((status) => status.id === 'shield')?.amount).toBe(900);
     expect(enemy.hp).toBeLessThan(2000);
+  });
+
+  test('basic attack uses mixed damage profile for chap minh (light spear ranged profile)', () => {
+    const chapMinh = makeUnit({
+      id: 'huyen_vu_chap_minh',
+      side: 'ally',
+      atk: 200,
+      wil: 200,
+      statuses: [],
+    });
+    const enemyMixed = makeUnit({
+      id: 'enemy_mixed',
+      side: 'enemy',
+      hp: 2000,
+      hpMax: 2000,
+      arm: 900,
+      res: 0,
+      statuses: [],
+    });
+    const enemyPhysicalBaseline = makeUnit({
+      id: 'enemy_physical',
+      side: 'enemy',
+      hp: 2000,
+      hpMax: 2000,
+      arm: 900,
+      res: 0,
+      statuses: [],
+    });
+
+    const mixedGame = {
+      tokens: [chapMinh, enemyMixed],
+      queued: { ally: new Map(), enemy: new Map() },
+      battle: { over: false, winner: null },
+      meta: new Map(),
+      turn: { cycle: 1 },
+    } as unknown as SessionState;
+    basicAttack(mixedGame, chapMinh);
+    const mixedDamage = 2000 - (enemyMixed.hp ?? 0);
+
+    const physicalGame = {
+      tokens: [chapMinh, enemyPhysicalBaseline],
+      queued: { ally: new Map(), enemy: new Map() },
+      battle: { over: false, winner: null },
+      meta: new Map(),
+      turn: { cycle: 1 },
+    } as unknown as SessionState;
+    dealAbilityDamage(physicalGame, chapMinh, enemyPhysicalBaseline, {
+      base: Math.max(1, (chapMinh.atk ?? 0) + (chapMinh.wil ?? 0)),
+      dtype: 'physical',
+      attackType: 'basic',
+    });
+    const physicalDamage = 2000 - (enemyPhysicalBaseline.hp ?? 0);
+
+    expect(mixedDamage).toBeGreaterThan(0);
+    expect(mixedDamage).toBeGreaterThan(physicalDamage);
   });
 });

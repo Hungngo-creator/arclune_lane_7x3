@@ -691,6 +691,8 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   if (!resolved) return;
 
   const isLoithienanh = unit.id === 'loithienanh';
+  const isChapMinh = unit.id === 'huyen_vu_chap_minh';
+  const basicDamageType = isChapMinh ? 'mixed' : 'physical';
   const sessionVfx = asSessionWithVfx(Game);
 
   const updateTurnBusy = (startedAt: number, busyMs: number): void => {
@@ -721,19 +723,21 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   };
   emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
 
-  const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 2000;
-  const meleeStartMs = sessionNow();
-  let meleeTriggered = false;
-  if (sessionVfx) {
-    try {
-      vfxAddMelee(sessionVfx, unit, resolved, { dur: meleeDur });
-      meleeTriggered = true;
-    } catch {
-      // bỏ qua lỗi VFX runtime
+  if (!isChapMinh) {
+    const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 2000;
+    const meleeStartMs = sessionNow();
+    let meleeTriggered = false;
+    if (sessionVfx) {
+      try {
+        vfxAddMelee(sessionVfx, unit, resolved, { dur: meleeDur });
+        meleeTriggered = true;
+      } catch {
+        // bỏ qua lỗi VFX runtime
+      }
     }
-  }
-  if (meleeTriggered && Game.turn) {
-    Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, meleeStartMs, meleeDur);
+    if (meleeTriggered && Game.turn) {
+      Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, meleeStartMs, meleeDur);
+    }
   }
 
   const rawBase = Math.max(1, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
@@ -746,7 +750,7 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   triggerLightningArc('hit2');
   const hitResult = dealAbilityDamage(Game, unit, resolved, {
     base: modBase,
-    dtype: 'physical',
+    dtype: basicDamageType,
     attackType: 'basic',
   });
 

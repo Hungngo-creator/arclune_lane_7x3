@@ -4911,6 +4911,8 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       if (!resolved)
           return;
       const isLoithienanh = unit.id === 'loithienanh';
+      const isChapMinh = unit.id === 'huyen_vu_chap_minh';
+      const basicDamageType = isChapMinh ? 'mixed' : 'physical';
       const sessionVfx = asSessionWithVfx(Game);
       const updateTurnBusy = (startedAt, busyMs) => {
           if (!Game.turn)
@@ -4941,20 +4943,22 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           log: getPassiveLog(Game),
       };
       emitPassiveEvent(Game, unit, 'onBasicHit', passiveCtx);
-      const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 2000;
-      const meleeStartMs = sessionNow();
-      let meleeTriggered = false;
-      if (sessionVfx) {
-          try {
-              vfxAddMelee(sessionVfx, unit, resolved, { dur: meleeDur });
-              meleeTriggered = true;
+      if (!isChapMinh) {
+          const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 2000;
+          const meleeStartMs = sessionNow();
+          let meleeTriggered = false;
+          if (sessionVfx) {
+              try {
+                  vfxAddMelee(sessionVfx, unit, resolved, { dur: meleeDur });
+                  meleeTriggered = true;
+              }
+              catch {
+                  // bỏ qua lỗi VFX runtime
+              }
           }
-          catch {
-              // bỏ qua lỗi VFX runtime
+          if (meleeTriggered && Game.turn) {
+              Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, meleeStartMs, meleeDur);
           }
-      }
-      if (meleeTriggered && Game.turn) {
-          Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, meleeStartMs, meleeDur);
       }
       const rawBase = Math.max(1, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
       const modBase = Math.max(1, Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0)));
@@ -4962,7 +4966,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       triggerLightningArc('hit2');
       const hitResult = dealAbilityDamage(Game, unit, resolved, {
           base: modBase,
-          dtype: 'physical',
+          dtype: basicDamageType,
           attackType: 'basic',
       });
       if (sessionVfx) {
@@ -6067,7 +6071,7 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
           }
           const base = Math.max(1, Math.floor((caster.atk ?? 0) + (caster.wil ?? 0)));
           for (let hit = 0; hit < 3; hit += 1) {
-              dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill });
+              dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill });
           }
           return {
               ok: true,
