@@ -7,11 +7,10 @@ import { Statuses } from './statuses.ts';
 import { doBasicWithFollowups } from './combat.ts';
 import { performActiveSkill } from './combat/perform-active-skill.ts';
 import {
-  applyChapMinhActionEnd,
-  applyChapMinhPhaseShift,
-  recoverChapMinhMaxHpPerTurn,
-  refreshChapMinhOwnership,
-} from './combat/chap-minh-runtime.ts';
+  runRuntimeActionEnd,
+  runRuntimeTurnEnd,
+  runRuntimeTurnStart,
+} from './combat/unit-runtime-hooks.ts';
 import { CFG } from './config.ts';
 import { initialRageFor } from './meta.ts';
 import { vfxAddSpawn, vfxAddBloodPulse, asSessionWithVfx } from './vfx.ts';
@@ -661,13 +660,12 @@ export function doActionOrSkip(
   }): ActionResolution => {
     if (emitOnActionEnd) {
       emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
-      applyChapMinhActionEnd(Game, unit);
-      refreshChapMinhOwnership(Game);
+      runRuntimeActionEnd(Game, unit);
     }
     const wasAliveBeforeTurnEnd = !!unit?.alive;
     const hadBleedBeforeTurnEnd = !!unit && Statuses.has(unit, 'bleed');
     Statuses.onTurnEnd(unit, {});
-    applyChapMinhPhaseShift(unit);
+    runRuntimeTurnEnd(Game, unit);
     if (wasAliveBeforeTurnEnd && unit && !unit.alive && hadBleedBeforeTurnEnd) {
       const bloodAvatarObservers = Game.tokens.filter((token) =>
         token.alive
@@ -713,8 +711,7 @@ export function doActionOrSkip(
   startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
   applyTurnRegen(Game, unit);
   Statuses.onTurnStart(unit, {});
-  recoverChapMinhMaxHpPerTurn(unit);
-  refreshChapMinhOwnership(Game);
+  runRuntimeTurnStart(Game, unit);
   const bloodAvatarFieldOwners = Game.tokens.filter((token) =>
     token.alive
     && token.id === 'blood_avatar'

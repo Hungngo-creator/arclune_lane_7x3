@@ -18,9 +18,9 @@ import { normalizeClassName } from './utils/domain-normalization.ts';
 import { getCounterBonusMetadata } from './combat/counter-matrix.ts';
 import {
   applyChapMinhMitigation,
-  applyChapMinhPhaseShift,
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
+import { runRuntimeDamageResolved } from './combat/unit-runtime-hooks.ts';
 
 export { applyDamage, grantShield };
 
@@ -550,7 +550,7 @@ export function dealAbilityDamage(
   if (target.hp <= 0) {
     hookOnLethalDamage(target);
   }
-  applyChapMinhPhaseShift(target);
+  runRuntimeDamageResolved(target);
 
   const damageResult: DamageResult = {
     dealt: dealtTotal,
