@@ -77,14 +77,16 @@ describe('skill runtime tag contract', () => {
     expect(summoned).toBe(1);
   });
 
-  it('resolves skill1..3 from skillSets and performs active damage path', () => {
+  it('resolves skill1..3 from skillSets; only skill3 follows direct-damage path for Mộng Yểm', () => {
     const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(true);
     const caster = makeToken({ id: 'mong_yem', side: 'ally', cx: 0, cy: 0 });
     const enemy = makeToken({ id: 'enemy', side: 'enemy', iid: 5, cx: 1, cy: 1, hp: 200, hpMax: 200 });
     const game = makeGame([caster, enemy]);
 
     const one = performActiveSkill(game, caster, 'skill1');
+    const hpAfterOne = enemy.hp;
     const two = performActiveSkill(game, caster, 'skill2');
+    const hpAfterTwo = enemy.hp;
     const three = performActiveSkill(game, caster, 'skill3');
 
     consumeSpy.mockRestore();
@@ -93,7 +95,11 @@ describe('skill runtime tag contract', () => {
     expect(two.ok).toBe(true);
     expect(three.ok).toBe(true);
     expect(three.tags).toContain('single-target');
+    expect(hpAfterOne).toBe(200);
+    expect(hpAfterTwo).toBe(200);
     expect(enemy.hp).toBeLessThan(200);
+    expect(one.targetCount).toBe(0);
+    expect(two.targetCount).toBe(0);
   });
 
   it('does not double-consume aether for blood_avatar active skills with aether-cost tag', () => {

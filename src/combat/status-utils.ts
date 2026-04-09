@@ -7,6 +7,13 @@ export interface StatusEntry {
   status: StatusEffect;
 }
 
+function findStatusIndexInList(statuses: ReadonlyArray<StatusEffect>, statusId: string): number {
+  for (let i = 0; i < statuses.length; i += 1) {
+    if (statuses[i]?.id === statusId) return i;
+  }
+  return -1;
+}
+
 export function ensureStatusList(unit?: UnitToken | null): StatusEffect[] {
   if (!unit) return [];
   if (!Array.isArray(unit.statuses)) {
@@ -20,10 +27,10 @@ export function getStatusEntryById(
   statusId: string,
   statuses?: StatusEffect[],
 ): StatusEntry | null {
-  const index = findStatusIndexById(target, statusId, statuses);
-  if (index < 0) return null;
   const list = statuses ?? (Array.isArray(target?.statuses) ? target.statuses : null);
-  if (!list) return null;
+  if (!list || !statusId) return null;
+  const index = findStatusIndexInList(list, statusId);
+  if (index < 0) return null;
   const status = list[index];
   if (!status) return null;
   return { statuses: list, index, status };
@@ -37,8 +44,5 @@ export function findStatusIndexById(
   if (!target || !statusId) return -1;
   const list = statuses ?? (Array.isArray(target.statuses) ? target.statuses : null);
   if (!list || list.length === 0) return -1;
-  for (let i = 0; i < list.length; i += 1) {
-    if (list[i]?.id === statusId) return i;
-  }
-  return -1;
+  return findStatusIndexInList(list, statusId);
 }

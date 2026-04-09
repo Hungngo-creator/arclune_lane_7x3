@@ -29,12 +29,6 @@ const EFFECT_APPLICATION_TAGS = new Set([
   'non-heal-hp-change',
 ]);
 const DAMAGE_TARGET_TAGS = new Set([
-  'single-target',
-  'multi-target',
-  'aoe',
-  'random-target',
-  'random-aoe',
-  'global-rule',
   'non-heal-hp-change',
 ]);
 const MENG_YEM_ID = 'mong_yem';
@@ -119,6 +113,13 @@ function consumeSideAether(side: UnitToken['side'], amount: number): boolean {
   if (normalized <= 0) return true;
   if (globalAetherPool.current(side) < normalized) return false;
   return globalAetherPool.consume(side, normalized);
+}
+
+function resolveDirectDamageMultiplier(skill: SkillSection): number | null {
+  const direct = (skill.damage as Record<string, unknown> | undefined)?.multiplier ?? skill.damageMultiplier;
+  const parsed = toFiniteNumber(direct, NaN);
+  if (!Number.isFinite(parsed) || parsed <= 0) return null;
+  return parsed;
 }
 
 export function performActiveSkill(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey): PerformActiveSkillResult {
@@ -273,8 +274,9 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   }
 
   const damagedEnemies: UnitToken[] = [];
-  if (hasDamageTag || skill.damage) {
-    const multiplier = Math.max(0, toFiniteNumber((skill.damage as Record<string, unknown> | undefined)?.multiplier ?? skill.damageMultiplier ?? 1, 1));
+  const directDamageMultiplier = resolveDirectDamageMultiplier(skill);
+  if (hasDamageTag || directDamageMultiplier != null) {
+    const multiplier = Math.max(0, directDamageMultiplier ?? 1);
     const base = Math.max(1, toRoundedInt(casterPower * multiplier, 1));
     for (const target of targets) {
       if (target.side === caster.side) continue;

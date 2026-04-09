@@ -5039,7 +5039,6 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'doBasicWithFollowups')) exports.doBasicWithFollowups = doBasicWithFollowups;
 };
 __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/combat/apply-damage.ts
   const __dep0 = __require('./utils/time.ts');
   const sessionNow = __dep0.sessionNow;
   const __dep1 = __require('./combat/number-utils.ts');
@@ -5047,7 +5046,6 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   const toFloorInt = __dep1.toFloorInt;
   const __dep2 = __require('./combat/status-utils.ts');
   const ensureStatusList = __dep2.ensureStatusList;
-  const findStatusIndexById = __dep2.findStatusIndexById;
   const getStatusEntryById = __dep2.getStatusEntryById;
   const SHIELD_STATUS_ID = 'shield';
   function getShieldEntry(target) {
@@ -5121,12 +5119,10 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       return consumeShieldEntryAmount(getShieldEntry(target), amount);
   }
   function readShieldAmount(target) {
-      if (!target || !Array.isArray(target.statuses))
+      const entry = getShieldEntry(target);
+      if (!entry)
           return 0;
-      const index = findStatusIndexById(target, SHIELD_STATUS_ID, target.statuses);
-      if (index < 0)
-          return 0;
-      return Math.max(0, toFloorInt(target.statuses[index]?.amount, 0));
+      return Math.max(0, toFloorInt(entry.status.amount, 0));
   }
   function consumeShieldByCurrentRatio(target, ratio) {
       if (!target || !Number.isFinite(ratio) || ratio <= 0)
@@ -5182,14 +5178,12 @@ __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) =
       const defenseMultiplier = toNonNegativeFactor(context.defenseMultiplier, 1);
       const reductionMultiplier = toNonNegativeFactor(context.reductionMultiplier, 1);
       let total = clampDamage(rawDamage);
-      const mitigationFactors = [counterMultiplier, defenseMultiplier, reductionMultiplier];
-      for (const factor of mitigationFactors) {
-          if (factor === 1)
-              continue;
-          total = Math.max(0, Math.floor(total * factor));
-          if (total <= 0)
-              break;
-      }
+      if (counterMultiplier !== 1)
+          total = Math.max(0, Math.floor(total * counterMultiplier));
+      if (total > 0 && defenseMultiplier !== 1)
+          total = Math.max(0, Math.floor(total * defenseMultiplier));
+      if (total > 0 && reductionMultiplier !== 1)
+          total = Math.max(0, Math.floor(total * reductionMultiplier));
       return { total, breakdown };
   }
   //# sourceMappingURL=stdin.js.map
@@ -5634,12 +5628,6 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       'non-heal-hp-change',
   ]);
   const DAMAGE_TARGET_TAGS = new Set([
-      'single-target',
-      'multi-target',
-      'aoe',
-      'random-target',
-      'random-aoe',
-      'global-rule',
       'non-heal-hp-change',
   ]);
   const MENG_YEM_ID = 'mong_yem';
@@ -5713,6 +5701,13 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       if (globalAetherPool.current(side) < normalized)
           return false;
       return globalAetherPool.consume(side, normalized);
+  }
+  function resolveDirectDamageMultiplier(skill) {
+      const direct = skill.damage?.multiplier ?? skill.damageMultiplier;
+      const parsed = toFiniteNumber(direct, NaN);
+      if (!Number.isFinite(parsed) || parsed <= 0)
+          return null;
+      return parsed;
   }
   function performActiveSkill(game, caster, skillKey) {
       if (!caster.alive) {
@@ -5857,8 +5852,9 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           });
       }
       const damagedEnemies = [];
-      if (hasDamageTag || skill.damage) {
-          const multiplier = Math.max(0, toFiniteNumber(skill.damage?.multiplier ?? skill.damageMultiplier ?? 1, 1));
+      const directDamageMultiplier = resolveDirectDamageMultiplier(skill);
+      if (hasDamageTag || directDamageMultiplier != null) {
+          const multiplier = Math.max(0, directDamageMultiplier ?? 1);
           const base = Math.max(1, toRoundedInt(casterPower * multiplier, 1));
           for (const target of targets) {
               if (target.side === caster.side)
@@ -5902,6 +5898,13 @@ __modules['./combat/skill-result.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildSkillResult')) exports.buildSkillResult = buildSkillResult;
 };
 __modules['./combat/status-utils.ts'] = (exports, module, __require) => {
+  function findStatusIndexInList(statuses, statusId) {
+      for (let i = 0; i < statuses.length; i += 1) {
+          if (statuses[i]?.id === statusId)
+              return i;
+      }
+      return -1;
+  }
   function ensureStatusList(unit) {
       if (!unit)
           return [];
@@ -5911,11 +5914,11 @@ __modules['./combat/status-utils.ts'] = (exports, module, __require) => {
       return unit.statuses;
   }
   function getStatusEntryById(target, statusId, statuses) {
-      const index = findStatusIndexById(target, statusId, statuses);
-      if (index < 0)
-          return null;
       const list = statuses ?? (Array.isArray(target?.statuses) ? target.statuses : null);
-      if (!list)
+      if (!list || !statusId)
+          return null;
+      const index = findStatusIndexInList(list, statusId);
+      if (index < 0)
           return null;
       const status = list[index];
       if (!status)
@@ -5928,11 +5931,7 @@ __modules['./combat/status-utils.ts'] = (exports, module, __require) => {
       const list = statuses ?? (Array.isArray(target.statuses) ? target.statuses : null);
       if (!list || list.length === 0)
           return -1;
-      for (let i = 0; i < list.length; i += 1) {
-          if (list[i]?.id === statusId)
-              return i;
-      }
-      return -1;
+      return findStatusIndexInList(list, statusId);
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStatusList')) exports.ensureStatusList = ensureStatusList;
@@ -6310,25 +6309,18 @@ __modules['./combat/token-side-utils.ts'] = (exports, module, __require) => {
       return buckets;
   }
   function partitionTokensBySide(tokens, perspectiveSide, options = {}) {
-      const ownTokens = [];
-      const oppositeTokens = [];
-      for (const token of tokens) {
-          if (!shouldIncludeToken(token, options))
-              continue;
-          if (token.side === perspectiveSide)
-              ownTokens.push(token);
-          else
-              oppositeTokens.push(token);
+      const buckets = bucketTokensByActualSide(tokens, options);
+      if (perspectiveSide === 'ally') {
+          return {
+              allyTokens: buckets.ally,
+              enemyTokens: buckets.enemy,
+          };
+          ;
       }
-      if (options.sortByBoardPosition) {
-          sortBucketsByBoardPosition({
-              ally: ownTokens,
-              enemy: oppositeTokens,
-          });
-      }
-      const allyTokens = ownTokens;
-      const enemyTokens = oppositeTokens;
-      return { allyTokens, enemyTokens };
+      return {
+          allyTokens: buckets.enemy,
+          enemyTokens: buckets.ally,
+      };
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'bucketTokensByActualSide')) exports.bucketTokensByActualSide = bucketTokensByActualSide;
@@ -6351,10 +6343,21 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const Statuses = __dep3.Statuses;
   const __dep4 = __require('./combat/skill-result.ts');
   const buildSkillResult = __dep4.buildSkillResult;
+  const __dep5 = __require('./combat/tag-dispatch.ts');
+  const dispatchGameplayTags = __dep5.dispatchGameplayTags;
+  const __dep6 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep6.toFiniteNumber;
+  const toPositiveTurns = __dep6.toPositiveTurns;
+  const toRoundedInt = __dep6.toRoundedInt;
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
+  const MONG_YEM_ID = 'mong_yem';
   const CHAP_MINH_ULT_ARM_RES_BUFF = 0.5;
   const CHAP_MINH_ULT_HEAL_RATIO = 0.35;
   const CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO = 0.5;
+  const MONG_YEM_SELF_SLEEP_FLAG = 'mong_yem_self_sleep';
+  const MONG_YEM_SELF_SLEEP_GROWTH_RATIO = 0.07;
+  const MONG_YEM_SELF_SLEEP_WAKE_HP_RATIO = 0.35;
+  const MONG_YEM_MARK_ID = 'me_hoac';
   const chapMinhRuntimeHook = {
       onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
           if (skillKey === 'skill1') {
@@ -6430,8 +6433,176 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
           applyChapMinhPhaseShift(target);
       },
   };
+  function resolveSkillMetaNumber(skill, fallback, ...keys) {
+      for (const key of keys) {
+          const direct = toFiniteNumber(skill[key], NaN);
+          if (Number.isFinite(direct))
+              return direct;
+      }
+      return fallback;
+  }
+  function clearMongYemSelfSleep(unit) {
+      unit._mongYemSelfSleepActive = false;
+      if (!Array.isArray(unit.statuses) || unit.statuses.length === 0)
+          return;
+      unit.statuses = unit.statuses.filter((status) => (status.id !== 'sleep'
+          && status.id !== MONG_YEM_SELF_SLEEP_FLAG));
+  }
+  function applyMongYemSelfSleepGrowth(unit) {
+      const atk = Math.max(0, toFiniteNumber(unit.atk, 0));
+      const wil = Math.max(0, toFiniteNumber(unit.wil, 0));
+      unit.atk = Math.max(0, Math.floor(atk * (1 + MONG_YEM_SELF_SLEEP_GROWTH_RATIO)));
+      unit.wil = Math.max(0, Math.floor(wil * (1 + MONG_YEM_SELF_SLEEP_GROWTH_RATIO)));
+  }
+  function maybeWakeMongYem(unit) {
+      const hpMax = Math.max(1, toFiniteNumber(unit.hpMax, 1));
+      const hp = Math.max(0, toFiniteNumber(unit.hp, hpMax));
+      if (hp > hpMax * MONG_YEM_SELF_SLEEP_WAKE_HP_RATIO)
+          return;
+      clearMongYemSelfSleep(unit);
+  }
+  function readStatusStacks(unit, statusId) {
+      if (!Array.isArray(unit.statuses) || unit.statuses.length === 0)
+          return 0;
+      for (const status of unit.statuses) {
+          if (status?.id !== statusId)
+              continue;
+          return Math.max(0, toRoundedInt(status.stacks ?? 0, 0));
+      }
+      return 0;
+  }
+  function hasStatus(unit, statusId) {
+      if (!Array.isArray(unit.statuses) || unit.statuses.length === 0)
+          return false;
+      for (const status of unit.statuses) {
+          if (status?.id === statusId)
+              return true;
+      }
+      return false;
+  }
+  const mongYemRuntimeHook = {
+      onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
+          if (skillKey === 'skill1') {
+              const duration = toPositiveTurns(resolveSkillMetaNumber(skill, 3, 'duration', 'turns'));
+              Statuses.add(caster, {
+                  id: 'mong_yem_evade_basic',
+                  kind: 'buff',
+                  tag: 'self-buff',
+                  amount: 0.5,
+                  dur: duration,
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
+          }
+          if (skillKey === 'skill2') {
+              const duration = toPositiveTurns(resolveSkillMetaNumber(skill, 99, 'duration', 'turns'));
+              Statuses.add(caster, {
+                  id: 'sleep',
+                  kind: 'debuff',
+                  tag: 'sleep',
+                  dur: duration,
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+              Statuses.add(caster, {
+                  id: MONG_YEM_SELF_SLEEP_FLAG,
+                  kind: 'buff',
+                  tag: 'defense',
+                  amount: 0.5,
+                  dur: duration,
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+              caster._mongYemSelfSleepActive = true;
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
+          }
+          if (skillKey !== 'skill3')
+              return null;
+          const target = pickTarget(game, caster);
+          if (!target?.alive) {
+              return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
+          }
+          const baseMultiplier = Math.max(0, toFiniteNumber(skill.damageMultiplier, 1.8));
+          const bonusConfig = skill.bonusPerMark;
+          const markId = typeof bonusConfig?.id === 'string' ? bonusConfig.id : MONG_YEM_MARK_ID;
+          const markBonusAmount = Math.max(0, toFiniteNumber(bonusConfig?.amount, 0));
+          const markBonusMax = Math.max(0, toFiniteNumber(bonusConfig?.max, 0));
+          const markStacks = readStatusStacks(target, markId);
+          const markBonus = Math.min(markBonusMax, markStacks * markBonusAmount);
+          const finalMultiplier = baseMultiplier * (1 + markBonus);
+          const base = Math.max(1, Math.floor(((caster.atk ?? 0) + (caster.wil ?? 0)) * finalMultiplier));
+          const pierceConfig = skill.pierceIfSleeping;
+          const sleeping = hasStatus(target, 'sleep');
+          const defPen = sleeping
+              ? Math.max(0, toFiniteNumber(pierceConfig?.ARM ?? 0, 0), toFiniteNumber(pierceConfig?.RES ?? 0, 0))
+              : 0;
+          dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill, defPen });
+          dispatchGameplayTags(['mark', 'sleep-setup'], {
+              game,
+              attacker: caster,
+              target,
+              targets: [target],
+              side: caster.side,
+              payload: {
+                  markId,
+                  markStacks: 1,
+                  markMaxStacks: 3,
+                  markPurgeable: false,
+                  sleepTurnsOnCap: 1,
+              },
+              deferEffects: false,
+              tagsNormalized: true,
+          });
+          let spreadHits = 0;
+          const spreadConfig = skill.spreadMark;
+          const spreadTargets = Math.max(0, toRoundedInt(spreadConfig?.targets, 0));
+          if (sleeping && spreadTargets > 0) {
+              const spreadMarkId = typeof spreadConfig?.id === 'string' ? spreadConfig.id : markId;
+              const spreadStacks = Math.max(1, toRoundedInt(spreadConfig?.stacks, 1));
+              for (const token of game.tokens) {
+                  if (spreadHits >= spreadTargets)
+                      break;
+                  if (!token.alive || token.side === caster.side || token.iid === target.iid)
+                      continue;
+                  spreadHits += 1;
+                  dispatchGameplayTags(['mark', 'sleep-setup'], {
+                      game,
+                      attacker: caster,
+                      target: token,
+                      targets: [token],
+                      side: caster.side,
+                      payload: {
+                          markId: spreadMarkId,
+                          markStacks: spreadStacks,
+                          markMaxStacks: 3,
+                          markPurgeable: false,
+                          sleepTurnsOnCap: 1,
+                      },
+                      deferEffects: false,
+                      tagsNormalized: true,
+                  });
+              }
+          }
+          return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1 + spreadHits);
+      },
+      onTurnStart({ unit }) {
+          const mongYem = unit;
+          if (!mongYem?.alive || !mongYem._mongYemSelfSleepActive)
+              return;
+          applyMongYemSelfSleepGrowth(mongYem);
+          maybeWakeMongYem(mongYem);
+      },
+      onDamageResolved({ target }) {
+          const mongYem = target;
+          if (!mongYem?.alive || !mongYem._mongYemSelfSleepActive)
+              return;
+          maybeWakeMongYem(mongYem);
+      },
+  };
   const UNIT_RUNTIME_HOOKS = Object.freeze({
       [CHAP_MINH_ID]: chapMinhRuntimeHook,
+      [MONG_YEM_ID]: mongYemRuntimeHook,
   });
   function getUnitRuntimeHook(unitId) {
       if (!unitId)

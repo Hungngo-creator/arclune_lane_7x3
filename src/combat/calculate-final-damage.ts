@@ -65,12 +65,9 @@ export function calculateFinalDamage(
   const reductionMultiplier = toNonNegativeFactor(context.reductionMultiplier, 1);
 
   let total = clampDamage(rawDamage);
-  const mitigationFactors = [counterMultiplier, defenseMultiplier, reductionMultiplier];
-  for (const factor of mitigationFactors) {
-    if (factor === 1) continue;
-    total = Math.max(0, Math.floor(total * factor));
-    if (total <= 0) break;
-  }
+  if (counterMultiplier !== 1) total = Math.max(0, Math.floor(total * counterMultiplier));
+  if (total > 0 && defenseMultiplier !== 1) total = Math.max(0, Math.floor(total * defenseMultiplier));
+  if (total > 0 && reductionMultiplier !== 1) total = Math.max(0, Math.floor(total * reductionMultiplier));
 
   return { total, breakdown };
 }
