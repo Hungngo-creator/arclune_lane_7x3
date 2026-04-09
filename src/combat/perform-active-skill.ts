@@ -7,8 +7,9 @@ import { cellReserved, slotToCell } from '../engine.ts';
 import { globalAetherPool } from '../aether.ts';
 import { Statuses } from '../statuses.ts';
 import { runRuntimeActiveSkill } from './unit-runtime-hooks.ts';
+import { resolveSkillPayload } from './skill-metadata-utils.ts';
 import { toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
-import { forEachPartitionToken } from './token-side-utils.ts';
+import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -68,15 +69,6 @@ function resolveActiveSkill(caster: UnitToken, skillKey: ActiveSkillKey): SkillS
   return set.skills[idx] ?? (idx === 0 ? set.skill : null) ?? null;
 }
 
-function resolvePayload(skill: SkillSection): Record<string, unknown> {
-  const nested = [skill.payload, skill.metadata?.payload, skill.meta?.payload]
-    .find((value) => value && typeof value === 'object' && !Array.isArray(value));
-  return {
-    ...(nested as Record<string, unknown> | undefined),
-    ...skill,
-  };
-}
-
 function canApplyUniqueGlobal(game: SessionState, summonId: string): boolean {
   return !game.tokens.some((token) => token.alive && token.id === summonId);
 }
@@ -132,10 +124,22 @@ function parseSkillTags(tags: ReadonlyArray<string>): ParsedSkillTags {
   let hasUniqueGlobalTag = false;
   let hasDamageTag = false;
   for (const tag of tags) {
-    if (tag === 'aether-cost') hasAetherCostTag = true;
-    if (tag === 'summon') hasSummonTag = true;
-    if (tag === 'unique-global') hasUniqueGlobalTag = true;
-    if (tag === DAMAGE_TARGET_TAG) hasDamageTag = true;
+    switch (tag) {
+      case 'aether-cost':
+        hasAetherCostTag = true;
+        break;
+      case 'summon':
+        hasSummonTag = true;
+        break;
+      case 'unique-global':
+        hasUniqueGlobalTag = true;
+        break;
+      case DAMAGE_TARGET_TAG:
+        hasDamageTag = true;
+        break;
+      default:
+        break;
+    }
     if (EFFECT_APPLICATION_TAGS.has(tag)) effectTags.push(tag);
   }
   return {
@@ -165,7 +169,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     hasUniqueGlobalTag,
     hasDamageTag,
   } = parseSkillTags(tags);
-  const payload = resolvePayload(skill);
+  const payload = resolveSkillPayload(skill);
   const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
   const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;
   if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
@@ -216,10 +220,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   const casterPower = (caster.atk ?? 0) + (caster.wil ?? 0);
 
   if (caster.id === BLOOD_AVATAR_ID) {
-    const enemies: UnitToken[] = [];
-    forEachPartitionToken(game.tokens, caster.side, 'enemy', (token) => {
-      enemies.push(token);
-    });
+    const enemies = partitionTokensBySide(game.tokens, caster.side).enemyTokens;
     const consumeBloodAether = (): boolean => (
       usesTagAetherCost || consumeSideAether(caster.side, BLOOD_AVATAR_SKILL_COST)
     );

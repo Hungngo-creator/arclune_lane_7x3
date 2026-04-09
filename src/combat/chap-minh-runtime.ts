@@ -17,6 +17,7 @@ const CHAP_MINH_LINK_REDUCTION = 0.30;
 const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
 type ChapMinhStateCarrier = UnitToken & {
   _chapMinhLinkedSlots?: number[];
+  _chapMinhLinkedSlotLookup?: Record<number, true>;
   _chapMinhAccumulated?: number;
   _chapMinhPhaseShiftUsed?: boolean;
   _chapMinhLostMaxHp?: number;
@@ -59,7 +60,13 @@ const resolveCrossSlots = (centerSlot: number): number[] => {
 export function activateChapMinhLink(caster: UnitToken): void {
   if (!isAliveChapMinh(caster)) return;
   const { slot } = resolveSlotAndColumn(caster);
-  caster._chapMinhLinkedSlots = resolveCrossSlots(slot);
+  const linkedSlots = resolveCrossSlots(slot);
+  caster._chapMinhLinkedSlots = linkedSlots;
+  const lookup: Record<number, true> = {};
+  for (const linkedSlot of linkedSlots) {
+    lookup[linkedSlot] = true;
+  }
+  caster._chapMinhLinkedSlotLookup = lookup;
   caster._chapMinhAccumulated = Math.max(0, toFiniteNumber(caster._chapMinhAccumulated, 0));
 }
 
@@ -102,7 +109,10 @@ function resolveMitigationRatio(
   if (isAliveChapMinh(candidate) && candidate.side === target.side) {
     const { slot, column: tokenColumn } = resolveSlotAndColumn(target);
     const { column: ownerColumn } = resolveSlotAndColumn(candidate);
-    const inLink = Array.isArray(candidate._chapMinhLinkedSlots) && candidate._chapMinhLinkedSlots.includes(slot);
+    const linkedLookup = candidate._chapMinhLinkedSlotLookup as Record<number, true> | undefined;
+    const inLink = linkedLookup
+      ? linkedLookup[slot] === true
+      : (Array.isArray(candidate._chapMinhLinkedSlots) && candidate._chapMinhLinkedSlots.includes(slot));
     const inColumn = tokenColumn === ownerColumn;
     if (inLink && !hasRuleBypassTag) {
       bestRatio += CHAP_MINH_LINK_REDUCTION;
@@ -119,19 +129,38 @@ function resolveMitigationRatio(
 
 export function refreshChapMinhOwnership(game: SessionState | null | undefined): void {
   if (!game) return;
+  let hasAliveOwner = false;
   for (const token of game.tokens) {
-    delete (token as UnitToken & { _chapMinhLinkOwner?: UnitToken })._chapMinhLinkOwner;
+    if (!isAliveChapMinh(token)) continue;
+    if (!Array.isArray(token._chapMinhLinkedSlots) || token._chapMinhLinkedSlots.length === 0) continue;
+    const linkedLookup = token._chapMinhLinkedSlotLookup as Record<number, true> | undefined;
+    if (!linkedLookup || Object.keys(linkedLookup).length === 0) {
+      const lookup: Record<number, true> = {};
+      for (const linkedSlot of token._chapMinhLinkedSlots) {
+        lookup[linkedSlot] = true;
+      }
+      token._chapMinhLinkedSlotLookup = lookup;
+    }
+    hasAliveOwner = true;
   }
+
+  for (const token of game.tokens) {
+    if ((token as UnitToken & { _chapMinhLinkOwner?: UnitToken })._chapMinhLinkOwner) {
+      delete (token as UnitToken & { _chapMinhLinkOwner?: UnitToken })._chapMinhLinkOwner;
+    }
+  }
+  if (!hasAliveOwner) return;
 
   const groupedAliveBySide = bucketTokensByActualSide(game.tokens);
 
   for (const owner of game.tokens) {
-    if (!isAliveChapMinh(owner) || !Array.isArray(owner._chapMinhLinkedSlots)) continue;
+    const linkedLookup = (owner as ChapMinhStateCarrier)._chapMinhLinkedSlotLookup as Record<number, true> | undefined;
+    if (!isAliveChapMinh(owner) || !linkedLookup || Object.keys(linkedLookup).length === 0) continue;
     const { column: ownerColumn } = resolveSlotAndColumn(owner);
     const sideTokens = owner.side === 'ally' ? groupedAliveBySide.ally : groupedAliveBySide.enemy;
     for (const token of sideTokens) {
       const { slot: tokenSlot, column: tokenColumn } = resolveSlotAndColumn(token);
-      const inLink = owner._chapMinhLinkedSlots.includes(tokenSlot);
+      const inLink = linkedLookup[tokenSlot] === true;
       const inColumn = tokenColumn === ownerColumn;
       if (!inLink && !inColumn) continue;
       (token as UnitToken & { _chapMinhLinkOwner?: UnitToken })._chapMinhLinkOwner = owner;

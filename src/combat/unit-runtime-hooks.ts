@@ -11,6 +11,7 @@ import { Statuses } from '../statuses.ts';
 import { buildSkillResult } from './skill-result.ts';
 import { applyMarkSleepSetupTag } from './tag-dispatch.ts';
 import { toFiniteNumber, toPositiveTurns, toRoundedInt } from './number-utils.ts';
+import { createSkillMetadataReader } from './skill-metadata-utils.ts';
 import { getStatusEntryById } from './status-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -141,18 +142,6 @@ const chapMinhRuntimeHook: UnitRuntimeHook = {
   },
 };
 
-function resolveSkillMetaNumber(
-  skill: SkillSection,
-  fallback: number,
-  ...keys: string[]
-): number {
-  for (const key of keys) {
-    const direct = toFiniteNumber((skill as Record<string, unknown>)[key], NaN);
-    if (Number.isFinite(direct)) return direct;
-  }
-  return fallback;
-}
-
 function clearMongYemSelfSleep(unit: MongYemStateCarrier): void {
   unit._mongYemSelfSleepActive = false;
   if (!Array.isArray(unit.statuses) || unit.statuses.length === 0) return;
@@ -186,8 +175,9 @@ function readStatusStacks(unit: UnitToken, statusId: string): number {
 
 const mongYemRuntimeHook: UnitRuntimeHook = {
   onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
+    const skillMeta = createSkillMetadataReader(skill);
     if (skillKey === 'skill1') {
-      const duration = toPositiveTurns(resolveSkillMetaNumber(skill, 3, 'duration', 'turns'));
+      const duration = toPositiveTurns(skillMeta.readNumber(3, 'duration', 'turns'));
       Statuses.add(caster, {
         id: 'mong_yem_evade_basic',
         kind: 'buff',
@@ -201,7 +191,11 @@ const mongYemRuntimeHook: UnitRuntimeHook = {
     }
 
     if (skillKey === 'skill2') {
-      const duration = toPositiveTurns(resolveSkillMetaNumber(skill, 99, 'duration', 'turns'));
+      const duration = toPositiveTurns(skillMeta.readNumber(99, 'duration', 'turns'));
+      const selfSleepDamageReduction = Math.max(
+        0,
+        skillMeta.readNumber(0.5, 'selfSleepDamageReduction', 'selfDamageReduction', 'damageReduction'),
+      );
       Statuses.add(caster, {
         id: 'sleep',
         kind: 'debuff',
@@ -214,7 +208,7 @@ const mongYemRuntimeHook: UnitRuntimeHook = {
         id: MONG_YEM_SELF_SLEEP_FLAG,
         kind: 'buff',
         tag: 'defense',
-        amount: 0.5,
+        amount: selfSleepDamageReduction,
         dur: duration,
         tick: 'turn',
         sourceUnitId: caster.id,
@@ -231,16 +225,21 @@ const mongYemRuntimeHook: UnitRuntimeHook = {
     }
 
     const baseMultiplier = Math.max(0, toFiniteNumber(skill.damageMultiplier, 1.8));
-    const bonusConfig = (skill as Record<string, unknown>).bonusPerMark as Record<string, unknown> | undefined;
+    const bonusConfig = skillMeta.readRecord('bonusPerMark');
     const markId = typeof bonusConfig?.id === 'string' ? bonusConfig.id : MONG_YEM_MARK_ID;
     const markBonusAmount = Math.max(0, toFiniteNumber(bonusConfig?.amount, 0));
     const markBonusMax = Math.max(0, toFiniteNumber(bonusConfig?.max, 0));
+    const markMaxStacks = Math.max(1, toRoundedInt(
+      skillMeta.readNumber(3, 'markMaxStacks', 'maxMarkStacks'),
+      3
+    ));
+    const sleepTurnsOnCap = toPositiveTurns(skillMeta.readNumber(1, 'sleepTurnsOnCap', 'sleepTurns'));
     const markStacks = readStatusStacks(target, markId);
     const markBonus = Math.min(markBonusMax, markStacks * markBonusAmount);
     const finalMultiplier = baseMultiplier * (1 + markBonus);
     const base = Math.max(1, Math.floor(((caster.atk ?? 0) + (caster.wil ?? 0)) * finalMultiplier));
 
-    const pierceConfig = (skill as Record<string, unknown>).pierceIfSleeping as Record<string, unknown> | undefined;
+    const pierceConfig = skillMeta.readRecord('pierceIfSleeping');
     const sleeping = getStatusEntryById(target, 'sleep') != null;
     const defPen = sleeping
       ? Math.max(0, toFiniteNumber(pierceConfig?.ARM ?? 0, 0), toFiniteNumber(pierceConfig?.RES ?? 0, 0))
@@ -251,17 +250,19 @@ const mongYemRuntimeHook: UnitRuntimeHook = {
     applyMarkSleepSetupTag(game, caster, target, {
       markId,
       markStacks: 1,
-      markMaxStacks: 3,
+      markMaxStacks,
       markPurgeable: false,
-      sleepTurnsOnCap: 1,
+      sleepTurnsOnCap,
     });
 
     let spreadHits = 0;
-    const spreadConfig = (skill as Record<string, unknown>).spreadMark as Record<string, unknown> | undefined;
+    const spreadConfig = skillMeta.readRecord('spreadMark');
     const spreadTargets = Math.max(0, toRoundedInt(spreadConfig?.targets, 0));
     if (sleeping && spreadTargets > 0) {
       const spreadMarkId = typeof spreadConfig?.id === 'string' ? spreadConfig.id : markId;
       const spreadStacks = Math.max(1, toRoundedInt(spreadConfig?.stacks, 1));
+      const spreadMaxStacks = Math.max(1, toRoundedInt(spreadConfig?.maxStacks, markMaxStacks));
+      const spreadSleepTurnsOnCap = toPositiveTurns(toFiniteNumber(spreadConfig?.sleepTurnsOnCap, sleepTurnsOnCap));
       for (const token of game.tokens) {
         if (spreadHits >= spreadTargets) break;
         if (!token.alive || token.side === caster.side || token.iid === target.iid) continue;
@@ -269,9 +270,9 @@ const mongYemRuntimeHook: UnitRuntimeHook = {
         applyMarkSleepSetupTag(game, caster, token, {
           markId: spreadMarkId,
           markStacks: spreadStacks,
-          markMaxStacks: 3,
+          markMaxStacks: spreadMaxStacks,
           markPurgeable: false,
-          sleepTurnsOnCap: 1,
+          sleepTurnsOnCap: spreadSleepTurnsOnCap,
         });
       }
     }
