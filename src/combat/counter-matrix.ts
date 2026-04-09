@@ -23,6 +23,8 @@ const asRecord = (value: unknown): Record<string, unknown> | null => {
 
 const readRecordElement = (record: Record<string, unknown> | null): ElementKey | null => {
   if (!record) return null;
+  const metadata = asRecord(record.metadata);
+  const meta = asRecord(record.meta);
   return (
     normalizeElementKey(record.base_element)
     ?? normalizeElementKey(record.baseElement)
@@ -30,12 +32,12 @@ const readRecordElement = (record: Record<string, unknown> | null): ElementKey |
     ?? normalizeElementKey(record.nguyen_to)
     ?? normalizeElementKey(record.nguyenTo)
     ?? normalizeElementKey(record.he)
-    ?? normalizeElementKey(asRecord(record.metadata)?.base_element)
-    ?? normalizeElementKey(asRecord(record.metadata)?.baseElement)
-    ?? normalizeElementKey(asRecord(record.metadata)?.element)
-    ?? normalizeElementKey(asRecord(record.meta)?.base_element)
-    ?? normalizeElementKey(asRecord(record.meta)?.baseElement)
-    ?? normalizeElementKey(asRecord(record.meta)?.element)
+    ?? normalizeElementKey(metadata?.base_element)
+    ?? normalizeElementKey(metadata?.baseElement)
+    ?? normalizeElementKey(metadata?.element)
+    ?? normalizeElementKey(meta?.base_element)
+    ?? normalizeElementKey(meta?.baseElement)
+    ?? normalizeElementKey(meta?.element)
     ?? null
   );
 };
@@ -49,18 +51,21 @@ const readBaseElement = (value: unknown): ElementKey => {
 const readSkillElement = (skill: unknown): ElementKey | null => {
   const record = asRecord(skill);
   if (!record) return normalizeElementKey(skill);
+  const metadata = asRecord(record.metadata);
+  const meta = asRecord(record.meta);
+  const payload = asRecord(record.payload);
 
   const fromField = (
     normalizeElementKey(record.element)
     ?? normalizeElementKey(record.skill_element)
     ?? normalizeElementKey(record.skillElement)
-    ?? normalizeElementKey(asRecord(record.metadata)?.element)
-    ?? normalizeElementKey(asRecord(record.meta)?.element)
-    ?? normalizeElementKey(asRecord(record.payload)?.element)
+    ?? normalizeElementKey(metadata?.element)
+    ?? normalizeElementKey(meta?.element)
+    ?? normalizeElementKey(payload?.element)
   );
   if (fromField) return fromField;
 
-  const tags = [record.tags, asRecord(record.metadata)?.tags, asRecord(record.meta)?.tags]
+  const tags = [record.tags, metadata?.tags, meta?.tags]
     .find((entry) => Array.isArray(entry));
   if (!Array.isArray(tags)) return null;
 
@@ -81,11 +86,12 @@ const readClass = (value: unknown): ReturnType<typeof normalizeClassName> => {
   if (direct) return direct;
   const record = asRecord(value);
   if (!record) return null;
+  const metadata = asRecord(record.metadata);
   return (
     normalizeClassName(record.class)
     ?? normalizeClassName(record.className)
-    ?? normalizeClassName(asRecord(record.metadata)?.class)
-    ?? normalizeClassName(asRecord(record.metadata)?.className)
+    ?? normalizeClassName(metadata?.class)
+    ?? normalizeClassName(metadata?.className)
     ?? null
   );
 };

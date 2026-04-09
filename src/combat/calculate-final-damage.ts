@@ -29,10 +29,6 @@ const normalizeBonus = (value: unknown): number => {
   return Math.max(-1, parsed);
 };
 
-const applyMitigationLayer = (damage: number, factor: number): number => (
-  Math.max(0, Math.floor(Math.max(0, damage) * Math.max(0, factor)))
-);
-
 const toNonNegativeFactor = (value: unknown, fallback = 1): number => {
   const parsed = toFiniteNumber(value, NaN);
   if (!Number.isFinite(parsed)) return Math.max(0, fallback);
@@ -69,9 +65,12 @@ export function calculateFinalDamage(
   const reductionMultiplier = toNonNegativeFactor(context.reductionMultiplier, 1);
 
   let total = clampDamage(rawDamage);
-  if (counterMultiplier !== 1) total = applyMitigationLayer(total, counterMultiplier);
-  if (defenseMultiplier !== 1) total = applyMitigationLayer(total, defenseMultiplier);
-  if (reductionMultiplier !== 1) total = applyMitigationLayer(total, reductionMultiplier);
+  const mitigationFactors = [counterMultiplier, defenseMultiplier, reductionMultiplier];
+  for (const factor of mitigationFactors) {
+    if (factor === 1) continue;
+    total = Math.max(0, Math.floor(total * factor));
+    if (total <= 0) break;
+  }
 
   return { total, breakdown };
 }

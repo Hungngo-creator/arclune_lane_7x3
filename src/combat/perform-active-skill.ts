@@ -25,6 +25,16 @@ const EFFECT_APPLICATION_TAGS = new Set([
   'sleep',
   'mark',
   'control',
+  'taunt',
+  'non-heal-hp-change',
+]);
+const DAMAGE_TARGET_TAGS = new Set([
+  'single-target',
+  'multi-target',
+  'aoe',
+  'random-target',
+  'random-aoe',
+  'global-rule',
   'non-heal-hp-change',
 ]);
 const MENG_YEM_ID = 'mong_yem';
@@ -35,6 +45,10 @@ const MENG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
   markPurgeable: false,
   sleepTurnsOnCap: 1,
 });
+const BLOOD_AVATAR_ID = 'blood_avatar';
+const BLOOD_AVATAR_SKILL_COST = 25;
+
+type BloodAvatarState = UnitToken & { _bloodFieldUsed?: boolean };
 
 export interface PerformActiveSkillResult {
   ok: boolean;
@@ -63,10 +77,10 @@ function resolvePayload(skill: SkillSection): Record<string, unknown> {
   };
 }
 
-function canApplyUniqueGlobal(game: SessionState, caster: UnitToken, summonId: string): boolean {
+function canApplyUniqueGlobal(game: SessionState, summonId: string): boolean {
   for (const token of game.tokens) {
     if (!token.alive || token.id !== summonId) continue;
-    if (token.side !== caster.side) return false;
+    return false;
   }
   return true;
 }
@@ -119,11 +133,10 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
 
   const tags = normalizeTagList(skill.tags ?? []);
   const tagSet = new Set(tags);
-  const hasTag = (tag: string): boolean => tagSet.has(tag);
-  const hasDamageTag = hasTag('single-target') || hasTag('multi-target') || hasTag('aoe') || hasTag('non-heal-hp-change');
+  const hasDamageTag = tags.some((tag) => DAMAGE_TARGET_TAGS.has(tag));
   const payload = resolvePayload(skill);
   const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
-  const usesTagAetherCost = skillCost > 0 && hasTag('aether-cost');
+  const usesTagAetherCost = skillCost > 0 && tagSet.has('aether-cost');
   if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
       return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'insufficient-aether');
   }
@@ -169,16 +182,19 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     appliedTags: dispatch.applied,
   });
   if (runtimeSkillResult) return runtimeSkillResult;
+  const casterPower = (caster.atk ?? 0) + (caster.wil ?? 0);
 
-  const { enemyTokens } = partitionTokensBySide(game.tokens, caster.side);
-
-  if (caster.id === 'blood_avatar') {
+  if (caster.id === BLOOD_AVATAR_ID) {
+    const { enemyTokens } = partitionTokensBySide(game.tokens, caster.side);
     const enemies = enemyTokens;
+    const consumeBloodAether = (): boolean => (
+      usesTagAetherCost || consumeSideAether(caster.side, BLOOD_AVATAR_SKILL_COST)
+    );
     if (skillKey === 'skill1') {
-      if (!usesTagAetherCost && !consumeSideAether(caster.side, 25)) {
+      if (!consumeBloodAether()) {
         return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, enemies.length, 'insufficient-aether');
       }
-      const base = Math.max(1, toRoundedInt(((caster.atk ?? 0) + (caster.wil ?? 0)) * 1.4, 1));
+      const base = Math.max(1, toRoundedInt(casterPower * 1.4, 1));
       const picked = enemies.slice(0, 6);
       for (const target of picked) {
         dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill, isAoE: true, targetsHit: picked.length });
@@ -188,7 +204,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, picked.length);
     }
     if (skillKey === 'skill2') {
-      const casterState = caster as UnitToken & { _bloodFieldUsed?: boolean };
+      const casterState = caster as BloodAvatarState;
       if (casterState._bloodFieldUsed) {
         return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
@@ -205,7 +221,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, enemies.length);
     }
     if (skillKey === 'skill3') {
-      if (!usesTagAetherCost && !consumeSideAether(caster.side, 25)) {
+      if (!consumeBloodAether()) {
         return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'insufficient-aether');
       }
       const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
@@ -215,12 +231,12 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     }
   }
 
-  if (hasTag('summon')) {
+  if (tagSet.has('summon')) {
     const openSlot = firstOpenSlot(game, caster.side);
     if (openSlot) {
       const summon = (payload.summon ?? skill.summon ?? {}) as Record<string, unknown>;
       const summonId = typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`;
-      if (hasTag('unique-global') && !canApplyUniqueGlobal(game, caster, summonId)) {
+      if (tagSet.has('unique-global') && !canApplyUniqueGlobal(game, summonId)) {
         return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
       enqueueImmediate(game, {
@@ -237,7 +253,10 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     }
   }
 
-  const effectTags = tags.filter((tag) => EFFECT_APPLICATION_TAGS.has(tag));
+  const effectTags: string[] = [];
+  for (const tag of tags) {
+    if (EFFECT_APPLICATION_TAGS.has(tag)) effectTags.push(tag);
+  }
   if (effectTags.length > 0) {
     dispatchGameplayTags(effectTags, {
       game,
@@ -256,7 +275,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   const damagedEnemies: UnitToken[] = [];
   if (hasDamageTag || skill.damage) {
     const multiplier = Math.max(0, toFiniteNumber((skill.damage as Record<string, unknown> | undefined)?.multiplier ?? skill.damageMultiplier ?? 1, 1));
-    const base = Math.max(1, toRoundedInt(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier, 1));
+    const base = Math.max(1, toRoundedInt(casterPower * multiplier, 1));
     for (const target of targets) {
       if (target.side === caster.side) continue;
       dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill });

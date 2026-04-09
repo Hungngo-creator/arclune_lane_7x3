@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 import { dispatchGameplayTags } from '../src/combat/tag-dispatch.ts';
+import { performActiveSkill } from '../src/combat/perform-active-skill.ts';
 import { normalizeTagList } from '../src/data/tags.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -81,6 +82,21 @@ describe('combat tag dispatcher matrix', () => {
     expect(randomAoE.targets.every((entry) => entry.id === 'e1')).toBe(true);
   });
 
+  it('prioritizes global-rule targeting over narrower target tags', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally' });
+    const ally = makeToken({ id: 'ally', side: 'ally', cx: 1, cy: 0 });
+    const enemy = makeToken({ id: 'enemy', side: 'enemy', cx: 0, cy: 1 });
+    const game = makeGame([attacker, ally, enemy]);
+
+    const result = dispatchGameplayTags(normalizeTagList(['enemy', 'global-rule']), {
+      game,
+      attacker,
+    });
+
+    expect(result.targets.map((token) => token.id).sort()).toEqual(['ally', 'attacker', 'enemy']);
+    expect(result.applied).toEqual(expect.arrayContaining(['enemy', 'global-rule']));
+  });
+
   it('handles heal and shield', () => {
     const attacker = makeToken({ id: 'attacker', side: 'ally', hp: 40, hpMax: 100 });
     const result = dispatchGameplayTags(normalizeTagList(['heal', 'barrier']), {
@@ -94,6 +110,20 @@ describe('combat tag dispatcher matrix', () => {
     const shield = (attacker.statuses ?? []).find((status) => status.id === 'shield');
     expect(shield?.amount ?? 0).toBe(30);
     expect(result.applied).toEqual(expect.arrayContaining(['heal', 'shield']));
+  });
+
+  it('converts overheal into shield when payload enables overflow shield ratio', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally', hp: 95, hpMax: 100, statuses: [] });
+    dispatchGameplayTags(normalizeTagList(['self', 'heal']), {
+      game: makeGame([attacker]),
+      attacker,
+      payload: { healAmount: 20, overhealToShieldRatio: 1, overflowShieldTurns: 2 },
+    });
+
+    expect(attacker.hp).toBe(100);
+    const shield = (attacker.statuses ?? []).find((status) => status.id === 'shield');
+    expect(shield?.amount).toBe(15);
+    expect(shield?.dur).toBe(2);
   });
 
   it('resolves ally/team-heal from attacker perspective for both sides', () => {

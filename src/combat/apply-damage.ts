@@ -1,7 +1,7 @@
 //home (termux)/arclune_lane_7x3/src/combat/apply-damage.ts
 import { sessionNow } from '../utils/time.ts';
 import { toFiniteNumber, toFloorInt } from './number-utils.ts';
-import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
+import { ensureStatusList, findStatusIndexById, getStatusEntryById } from './status-utils.ts';
 
 import type { UnitToken } from '@shared-types/units';
 
@@ -90,7 +90,10 @@ export function consumeShield(target: UnitToken | null | undefined, amount: numb
 }
 
 export function readShieldAmount(target: UnitToken | null | undefined): number {
-  return Math.max(0, toFloorInt(getShieldEntry(target)?.status.amount, 0));
+  if (!target || !Array.isArray(target.statuses)) return 0;
+  const index = findStatusIndexById(target, SHIELD_STATUS_ID, target.statuses);
+  if (index < 0) return 0;
+  return Math.max(0, toFloorInt(target.statuses[index]?.amount, 0));
 }
 
 export function consumeShieldByCurrentRatio(target: UnitToken | null | undefined, ratio: number): number {

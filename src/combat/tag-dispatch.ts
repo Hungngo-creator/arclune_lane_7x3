@@ -30,6 +30,7 @@ export interface TagDispatchResult {
   applied: string[];
   sideEffects: string[];
 }
+const RULE_TARGET_OVERRIDE_TAGS = new Set(['global-rule']);
 
 type NormalizedContext = {
   game: SessionState | null;
@@ -48,9 +49,17 @@ type NormalizedContext = {
 
 type TagHandler = (ctx: NormalizedContext, result: TagDispatchResult) => void;
 
+function collectAliveTargets(tokens: ReadonlyArray<UnitToken>): UnitToken[] {
+  const alive: UnitToken[] = [];
+  for (const token of tokens) {
+    if (token?.alive) alive.push(token);
+  }
+  return alive;
+}
+
 const resolveTargets = (targets: UnitToken[] | undefined, target: UnitToken | null): UnitToken[] => {
   if (Array.isArray(targets) && targets.length > 0) {
-    return targets.filter((token): token is UnitToken => Boolean(token?.alive));
+    return collectAliveTargets(targets);
   }
   if (target?.alive) return [target];
   return [];
@@ -58,30 +67,33 @@ const resolveTargets = (targets: UnitToken[] | undefined, target: UnitToken | nu
 
 const EMPTY_TOKENS: UnitToken[] = [];
 
-const resolveRandom = (ctx: Pick<NormalizedContext, 'game'>): (() => number) => (
-  ctx.game?.rng ? () => nextRngValue(ctx.game?.rng) : Math.random
+const resolveRandomValue = (ctx: Pick<NormalizedContext, 'game'>): number => (
+  ctx.game?.rng ? nextRngValue(ctx.game.rng) : Math.random()
 );
 
-const sampleTargets = (tokens: ReadonlyArray<UnitToken>, limit: number, randomFn: () => number): UnitToken[] => {
+const sampleTargets = (
+  ctx: Pick<NormalizedContext, 'game'>,
+  tokens: ReadonlyArray<UnitToken>,
+  limit: number,
+  allowDuplicates: boolean,
+): UnitToken[] => {
   if (limit <= 0 || tokens.length === 0) return [];
+  if (allowDuplicates) {
+    const sampled: UnitToken[] = [];
+    for (let i = 0; i < limit; i += 1) {
+      const picked = tokens[Math.floor(resolveRandomValue(ctx) * tokens.length)];
+      if (picked) sampled.push(picked);
+    }
+    return sampled;
+  }
   if (tokens.length <= limit) return [...tokens];
 
   const pool = [...tokens];
   for (let i = 0; i < limit; i += 1) {
-    const swapIndex = i + Math.floor(randomFn() * (pool.length - i));
+    const swapIndex = i + Math.floor(resolveRandomValue(ctx) * (pool.length - i));
     [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
   }
   return pool.slice(0, limit);
-};
-
-const sampleTargetsWithReplacement = (tokens: ReadonlyArray<UnitToken>, limit: number, randomFn: () => number): UnitToken[] => {
-  if (limit <= 0 || tokens.length === 0) return [];
-  const sampled: UnitToken[] = [];
-  for (let i = 0; i < limit; i += 1) {
-    const picked = tokens[Math.floor(randomFn() * tokens.length)];
-    if (picked) sampled.push(picked);
-  }
-  return sampled;
 };
 
 const readTargetLimit = (ctx: Pick<NormalizedContext, 'payload'>, fallback: number): number => (
@@ -94,11 +106,7 @@ const readAllowDuplicateTargets = (ctx: Pick<NormalizedContext, 'payload'>): boo
 );
 
 const sampleFromCandidates = (ctx: Pick<NormalizedContext, 'payload' | 'game'>, candidates: ReadonlyArray<UnitToken>, limit: number): UnitToken[] => {
-  const randomFn = resolveRandom(ctx);
-  if (readAllowDuplicateTargets(ctx)) {
-    return sampleTargetsWithReplacement(candidates, limit, randomFn);
-  }
-  return sampleTargets(candidates, limit, randomFn);
+  return sampleTargets(ctx, candidates, limit, readAllowDuplicateTargets(ctx));
 };
 
 const readTurns = (payload: Record<string, unknown> | null, ...keys: string[]): number => {
@@ -119,6 +127,21 @@ const readEffectAmount = (
   primaryKey: string,
   fallbackKey: string,
 ): number => Math.max(0, toRoundedInt(payload?.[primaryKey] ?? payload?.[fallbackKey], 0));
+
+const readOverhealShieldRatio = (payload: Record<string, unknown> | null): number => {
+  const explicit = toFiniteNumber(
+    payload?.overhealToShieldRatio
+      ?? payload?.overflowToShieldRatio
+      ?? payload?.overflowShieldRatio,
+    NaN,
+  );
+  if (Number.isFinite(explicit)) return Math.max(0, explicit);
+  return payload?.overflowAsShield === true ? 1 : 0;
+};
+
+const resolveEffectTargets = (ctx: NormalizedContext, result: TagDispatchResult): UnitToken[] => (
+  result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : EMPTY_TOKENS)
+);
 
 const addStatus = (target: UnitToken, id: string, turns: number, sourceUnitId?: string): void => {
   Statuses.add(target, {
@@ -142,6 +165,35 @@ const applyTaggedStatus = (
   const sourceUnitId = ctx.attacker?.id;
   for (const token of result.targets) addStatus(token, statusId, turns, sourceUnitId);
   if (result.targets.length > 0) result.sideEffects.push(`${statusId}:${turns}`);
+};
+
+const assignTargetsIfEmpty = (result: TagDispatchResult, nextTargets: UnitToken[]): void => {
+  if (result.targets.length > 0 || nextTargets.length === 0) return;
+  result.targets = nextTargets;
+};
+
+const assignSliceTargetsIfEmpty = (
+  result: TagDispatchResult,
+  source: ReadonlyArray<UnitToken>,
+  limit: number,
+): void => {
+  assignTargetsIfEmpty(result, source.slice(0, limit));
+};
+
+const applyDamageLikeEffect = (
+  ctx: NormalizedContext,
+  result: TagDispatchResult,
+  amount: number,
+): void => {
+  if (amount <= 0) return;
+  for (const token of result.targets) {
+    if (ctx.game && ctx.attacker) {
+      dealAbilityDamage(ctx.game, ctx.attacker, token, { base: amount, attackType: 'skill' });
+    } else {
+      applyDamage(token, amount);
+    }
+  }
+  if (result.targets.length > 0) result.sideEffects.push(`hp-change:${amount}`);
 };
 
 function applyMarkStackingStatus(ctx: NormalizedContext, result: TagDispatchResult): void {
@@ -191,33 +243,28 @@ function applyMarkStackingStatus(ctx: NormalizedContext, result: TagDispatchResu
 const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   'aether-cost': (ctx, result) => {
     const amount = Math.max(0, toRoundedInt(ctx.cost, 0));
-    if (!ctx.side || amount <= 0 || typeof ctx.onAetherCost !== 'function') return;
+    if (!ctx.side || amount <= 0) return;
     const consumed = ctx.onAetherCost(amount, ctx.side);
     if (consumed) result.sideEffects.push(`aether:${ctx.side}:${amount}`);
   },
   'single-target': (ctx, result) => {
-    if (result.targets.length > 0) return;
-    if (ctx.target?.alive) result.targets = [ctx.target];
+    assignTargetsIfEmpty(result, ctx.target?.alive ? [ctx.target] : EMPTY_TOKENS);
   },
   self: (ctx, result) => {
     if (ctx.attacker?.alive) result.targets = [ctx.attacker];
   },
   ally: (ctx, result) => {
     if (!ctx.attacker) return;
-    if (result.targets.length > 0) return;
-    const limit = readTargetLimit(ctx, 1);
-    result.targets = ctx.attackerTokens.slice(0, limit);
+    assignSliceTargetsIfEmpty(result, ctx.attackerTokens, readTargetLimit(ctx, 1));
   },
   enemy: (ctx, result) => {
     if (!ctx.attacker) return;
-    if (result.targets.length > 0) return;
-    result.targets = ctx.opponentTokens.slice(0, readTargetLimit(ctx, 1));
+    assignSliceTargetsIfEmpty(result, ctx.opponentTokens, readTargetLimit(ctx, 1));
   },
   'random-target': (ctx, result) => {
     if (!ctx.attacker) return;
-    if (result.targets.length > 0) return;
     const candidates = ctx.opponentTokens;
-    if (candidates.length > 0) result.targets = sampleFromCandidates(ctx, candidates, 1);
+    assignTargetsIfEmpty(result, candidates.length > 0 ? sampleFromCandidates(ctx, candidates, 1) : EMPTY_TOKENS);
   },
   'random-aoe': (ctx, result) => {
     if (!ctx.attacker) return;
@@ -226,20 +273,34 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   },
   'multi-target': (ctx, result) => {
     if (!ctx.attacker) return;
-    if (result.targets.length > 0) return;
-    result.targets = ctx.opponentTokens.slice(0, readTargetLimit(ctx, 2));
+    assignSliceTargetsIfEmpty(result, ctx.opponentTokens, readTargetLimit(ctx, 2));
   },
   aoe: (ctx, result) => {
     if (!ctx.attacker) return;
     result.targets = ctx.opponentTokens;
   },
+  'global-rule': (ctx, result) => {
+    if (!ctx.game) return;
+    result.targets = collectAliveTargets(ctx.game.tokens);
+  },
   heal: (ctx, result) => {
     if (ctx.deferEffects) return;
     const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
     if (amount <= 0) return;
-    const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
-    for (const token of targets) {
-      healUnit(token, amount);
+    const overhealShieldRatio = readOverhealShieldRatio(ctx.payload);
+    const overflowShieldTurns = toPositiveTurns(
+      toFiniteNumber(ctx.payload?.overflowShieldTurns ?? ctx.payload?.shieldTurns, 2),
+      2,
+    );
+    for (const token of resolveEffectTargets(ctx, result)) {
+      const healResult = healUnit(token, amount);
+      if (overhealShieldRatio > 0 && healResult.overheal > 0) {
+        const shieldAmount = Math.max(0, Math.floor(healResult.overheal * overhealShieldRatio));
+        if (shieldAmount > 0) {
+          grantShield(token, shieldAmount, { durationTurns: overflowShieldTurns });
+          result.sideEffects.push(`overheal-shield:${shieldAmount}`);
+        }
+      }
     }
     result.sideEffects.push(`heal:${amount}`);
   },
@@ -254,8 +315,7 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     if (ctx.deferEffects) return;
     const amount = readEffectAmount(ctx.payload, 'shieldAmount', 'shield');
     if (amount <= 0) return;
-    const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
-    for (const token of targets) grantShield(token, amount);
+    for (const token of resolveEffectTargets(ctx, result)) grantShield(token, amount);
     result.sideEffects.push(`shield:${amount}`);
   },
   silence: (ctx, result) => {
@@ -271,25 +331,18 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     const statusId = String(ctx.payload?.controlStatus ?? 'control');
     applyTaggedStatus(ctx, result, statusId, 'controlTurns', 'turns', 'duration');
   },
+  taunt: (ctx, result) => {
+    applyTaggedStatus(ctx, result, 'taunt', 'tauntTurns', 'turns', 'duration');
+  },
   summon: (ctx, result) => {
     if (ctx.deferEffects) return;
-    if (typeof ctx.onSummon === 'function') {
-      ctx.onSummon();
-      result.sideEffects.push('summon');
-    }
+    ctx.onSummon();
+    result.sideEffects.push('summon');
   },
   'non-heal-hp-change': (ctx, result) => {
     if (ctx.deferEffects) return;
     const amount = readEffectAmount(ctx.payload, 'hpDelta', 'damage');
-    if (amount <= 0) return;
-    for (const token of result.targets) {
-      if (ctx.game && ctx.attacker) {
-        dealAbilityDamage(ctx.game, ctx.attacker, token, { base: amount, attackType: 'skill' });
-      } else {
-        applyDamage(token, amount);
-      }
-    }
-    if (result.targets.length > 0) result.sideEffects.push(`hp-change:${amount}`);
+    applyDamageLikeEffect(ctx, result, amount);
   },
 });
 
@@ -297,9 +350,12 @@ export function dispatchGameplayTags(
   rawTags: ReadonlyArray<string> | null | undefined,
   context: TagDispatchContext,
 ): TagDispatchResult {
-  const tags = context.tagsNormalized
+  const normalizedTags = context.tagsNormalized
     ? (Array.isArray(rawTags) ? [...rawTags] : [])
     : normalizeTagList(rawTags);
+    const tags = normalizedTags
+    .filter((tag) => !RULE_TARGET_OVERRIDE_TAGS.has(tag))
+    .concat(normalizedTags.filter((tag) => RULE_TARGET_OVERRIDE_TAGS.has(tag)));
   const target = context.target ?? null;
   const attacker = context.attacker ?? null;
   const { allyTokens, enemyTokens } = context.game && attacker

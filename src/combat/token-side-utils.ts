@@ -54,9 +54,24 @@ export function partitionTokensBySide(
   perspectiveSide: Side,
   options: PartitionOptions = {},
 ): SidePartition {
-  const buckets = bucketTokensByActualSide(tokens, options);
-  const allyTokens = perspectiveSide === 'ally' ? buckets.ally : buckets.enemy;
-  const enemyTokens = perspectiveSide === 'ally' ? buckets.enemy : buckets.ally;
+  const ownTokens: UnitToken[] = [];
+  const oppositeTokens: UnitToken[] = [];
+
+  for (const token of tokens) {
+    if (!shouldIncludeToken(token, options)) continue;
+    if (token.side === perspectiveSide) ownTokens.push(token);
+    else oppositeTokens.push(token);
+  }
+
+  if (options.sortByBoardPosition) {
+    sortBucketsByBoardPosition({
+      ally: ownTokens,
+      enemy: oppositeTokens,
+    });
+  }
+
+  const allyTokens = ownTokens;
+  const enemyTokens = oppositeTokens;
 
   return { allyTokens, enemyTokens };
 }

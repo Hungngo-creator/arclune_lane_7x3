@@ -20,14 +20,25 @@ export function getStatusEntryById(
   statusId: string,
   statuses?: StatusEffect[],
 ): StatusEntry | null {
-  if (!target || !statusId) return null;
-  const list = statuses ?? (Array.isArray(target.statuses) ? target.statuses : null);
-  if (!list || list.length === 0) return null;
+  const index = findStatusIndexById(target, statusId, statuses);
+  if (index < 0) return null;
+  const list = statuses ?? (Array.isArray(target?.statuses) ? target.statuses : null);
+  if (!list) return null;
+  const status = list[index];
+  if (!status) return null;
+  return { statuses: list, index, status };
+}
 
+export function findStatusIndexById(
+  target: UnitToken | null | undefined,
+  statusId: string,
+  statuses?: StatusEffect[],
+): number {
+  if (!target || !statusId) return -1;
+  const list = statuses ?? (Array.isArray(target.statuses) ? target.statuses : null);
+  if (!list || list.length === 0) return -1;
   for (let i = 0; i < list.length; i += 1) {
-    const status = list[i];
-    if (status?.id !== statusId) continue;
-    return { statuses: list, index: i, status };
+    if (list[i]?.id === statusId) return i;
   }
-  return null;
+  return -1;
 }

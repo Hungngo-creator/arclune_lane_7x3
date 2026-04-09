@@ -87,7 +87,7 @@ describe('skill runtime tag contract', () => {
     const two = performActiveSkill(game, caster, 'skill2');
     const three = performActiveSkill(game, caster, 'skill3');
 
-consumeSpy.mockRestore();
+    consumeSpy.mockRestore();
 
     expect(one.ok).toBe(true);
     expect(two.ok).toBe(true);
@@ -125,4 +125,5 @@ consumeSpy.mockRestore();
     expect(result.reason).toBe('blocked');
     expect(enemy.hp).toBe(200);
   });
+
 });
