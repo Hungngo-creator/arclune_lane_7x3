@@ -87,7 +87,11 @@ export function grantShield(target: UnitToken | null | undefined, amount: number
 
 export function consumeShield(target: UnitToken | null | undefined, amount: number): number {
   return consumeShieldEntryAmount(getShieldEntry(target), amount);
-  }
+}
+
+export function readShieldAmount(target: UnitToken | null | undefined): number {
+  return Math.max(0, toFloorInt(getShieldEntry(target)?.status.amount, 0));
+}
 
 export function consumeShieldByCurrentRatio(target: UnitToken | null | undefined, ratio: number): number {
   if (!target || !Number.isFinite(ratio) || ratio <= 0) return 0;

@@ -273,7 +273,7 @@ describe('chap minh runtime', () => {
     expect(enemy.hp).toBeLessThan(2000);
   });
 
-  test('skill3 is runtime-auto only and cannot be manually cast', () => {
+  test('skill3 heals, buffs ARM/RES and deals aoe damage scaled by current shield', () => {
     allyAetherPool.current = 50;
     allyAetherPool.max = 999;
 
@@ -283,7 +283,11 @@ describe('chap minh runtime', () => {
       iid: 'chap-minh',
       hp: 150,
       hpMax: 1800,
-      statuses: [],
+      atk: 220,
+      wil: 180,
+      statuses: [
+        { id: 'shield', kind: 'buff', tag: 'shield', amount: 300 },
+      ],
     });
     const enemy = makeUnit({
       id: 'enemy',
@@ -302,10 +306,15 @@ describe('chap minh runtime', () => {
     } as unknown as SessionState;
 
     const result = performActiveSkill(game, chapMinh, 'skill3');
-    expect(result.ok).toBe(false);
-    expect(result.reason).toBe('blocked');
+    expect(result.ok).toBe(true);
+    expect(result.reason).toBeUndefined();
+    expect(result.targetCount).toBe(1);
     expect(allyAetherPool.current).toBe(50);
+    expect(chapMinh.hp).toBe(780);
     expect(chapMinh.hpMax).toBe(1800);
+    expect(chapMinh.statuses?.some((status) => status.id === 'chap_minh_ult_arm_up')).toBe(true);
+    expect(chapMinh.statuses?.some((status) => status.id === 'chap_minh_ult_res_up')).toBe(true);
+    expect(enemy.hp).toBeLessThan(2000);
   });
 
   test('basic attack uses mixed damage profile for chap minh (light spear ranged profile)', () => {

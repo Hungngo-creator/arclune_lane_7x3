@@ -114,6 +114,12 @@ const readTurns = (payload: Record<string, unknown> | null, ...keys: string[]): 
   return 1;
 };
 
+const readEffectAmount = (
+  payload: Record<string, unknown> | null,
+  primaryKey: string,
+  fallbackKey: string,
+): number => Math.max(0, toRoundedInt(payload?.[primaryKey] ?? payload?.[fallbackKey], 0));
+
 const addStatus = (target: UnitToken, id: string, turns: number, sourceUnitId?: string): void => {
   Statuses.add(target, {
     id,
@@ -229,7 +235,7 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   },
   heal: (ctx, result) => {
     if (ctx.deferEffects) return;
-    const amount = Math.max(0, toRoundedInt(ctx.payload?.healAmount ?? ctx.payload?.heal, 0));
+    const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
     if (amount <= 0) return;
     const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
     for (const token of targets) {
@@ -239,14 +245,14 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   },
   'team-heal': (ctx, result) => {
     if (ctx.deferEffects) return;
-    const amount = Math.max(0, toRoundedInt(ctx.payload?.healAmount ?? ctx.payload?.heal, 0));
+    const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
     if (amount <= 0 || !ctx.attacker) return;
     for (const token of ctx.attackerTokens) healUnit(token, amount);
     result.sideEffects.push(`team-heal:${amount}`);
   },
   shield: (ctx, result) => {
     if (ctx.deferEffects) return;
-    const amount = Math.max(0, toRoundedInt(ctx.payload?.shieldAmount ?? ctx.payload?.shield, 0));
+    const amount = readEffectAmount(ctx.payload, 'shieldAmount', 'shield');
     if (amount <= 0) return;
     const targets = result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : []);
     for (const token of targets) grantShield(token, amount);
@@ -274,7 +280,7 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   },
   'non-heal-hp-change': (ctx, result) => {
     if (ctx.deferEffects) return;
-    const amount = Math.max(0, toRoundedInt(ctx.payload?.hpDelta ?? ctx.payload?.damage, 0));
+    const amount = readEffectAmount(ctx.payload, 'hpDelta', 'damage');
     if (amount <= 0) return;
     for (const token of result.targets) {
       if (ctx.game && ctx.attacker) {

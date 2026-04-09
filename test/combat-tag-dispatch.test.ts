@@ -179,4 +179,19 @@ describe('combat tag dispatcher matrix', () => {
     expect(summoned).toBe(1);
     expect(target.hp).toBe(75);
   });
+
+  it('applies Mong Yem dream-mark stack and sleep-on-cap via combat tag runtime', () => {
+    const caster = makeToken({ id: 'mong_yem', side: 'ally', cx: 0, cy: 0, atk: 70, wil: 70 });
+    const enemy = makeToken({ id: 'enemy', side: 'enemy', iid: 9, cx: 1, cy: 1, hp: 600, hpMax: 600, statuses: [] });
+    const game = makeGame([caster, enemy]);
+
+    for (let i = 0; i < 3; i += 1) {
+      const result = performActiveSkill(game, caster, 'skill1');
+      expect(result.ok).toBe(true);
+    }
+
+    const statusIds = enemy.statuses?.map((status) => status.id) ?? [];
+    expect(statusIds).toContain('sleep');
+    expect(statusIds).not.toContain('me_hoac');
+  });
 });

@@ -9,6 +9,7 @@ import { Statuses } from '../statuses.ts';
 import { runRuntimeActiveSkill } from './unit-runtime-hooks.ts';
 import { toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { partitionTokensBySide } from './token-side-utils.ts';
+import { buildSkillResult } from './skill-result.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -26,6 +27,14 @@ const EFFECT_APPLICATION_TAGS = new Set([
   'control',
   'non-heal-hp-change',
 ]);
+const MENG_YEM_ID = 'mong_yem';
+const MENG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
+  markId: 'me_hoac',
+  markStacks: 1,
+  markMaxStacks: 3,
+  markPurgeable: false,
+  sleepTurnsOnCap: 1,
+});
 
 export interface PerformActiveSkillResult {
   ok: boolean;
@@ -36,24 +45,6 @@ export interface PerformActiveSkillResult {
   targetCount: number;
   reason?: 'missing-skill' | 'insufficient-aether' | 'blocked';
 }
-
-const buildSkillResult = (
-  ok: boolean,
-  skillKey: ActiveSkillKey,
-  skill: SkillSection | null,
-  tags: string[],
-  appliedTags: string[],
-  targetCount: number,
-  reason?: PerformActiveSkillResult['reason'],
-): PerformActiveSkillResult => ({
-  ok,
-  skillKey,
-  skill,
-  tags,
-  appliedTags,
-  targetCount,
-  ...(reason ? { reason } : {}),
-});
 
 function resolveActiveSkill(caster: UnitToken, skillKey: ActiveSkillKey): SkillSection | null {
   const set = skillSets[caster.id as keyof typeof skillSets];
@@ -262,12 +253,29 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     });
   }
 
+  const damagedEnemies: UnitToken[] = [];
   if (hasDamageTag || skill.damage) {
     const multiplier = Math.max(0, toFiniteNumber((skill.damage as Record<string, unknown> | undefined)?.multiplier ?? skill.damageMultiplier ?? 1, 1));
     const base = Math.max(1, toRoundedInt(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier, 1));
     for (const target of targets) {
       if (target.side === caster.side) continue;
       dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill });
+      damagedEnemies.push(target);
+    }
+  }
+
+  if (caster.id === MENG_YEM_ID && damagedEnemies.length > 0) {
+    for (const target of damagedEnemies) {
+      dispatchGameplayTags(['mark', 'sleep-setup'], {
+        game,
+        attacker: caster,
+        target,
+        targets: [target],
+        side: caster.side,
+        payload: MENG_YEM_DREAM_MARK_PAYLOAD,
+        deferEffects: false,
+        tagsNormalized: true,
+      });
     }
   }
 
