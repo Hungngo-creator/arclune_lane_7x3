@@ -1,5 +1,5 @@
 import { sessionNow } from '../utils/time.ts';
-import { toFiniteNumber, toFloorInt } from './number-utils.ts';
+import { toFiniteNumber, toFloorInt, toNonNegativeFloorInt } from './number-utils.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 
 import type { UnitToken } from '@shared-types/units';
@@ -13,10 +13,10 @@ function getShieldEntry(target: UnitToken | null | undefined) {
 function consumeShieldEntryAmount(entry: ReturnType<typeof getShieldEntry>, amount: number): number {
   if (!entry) return 0;
 
-  const current = Math.max(0, toFloorInt(entry.status.amount, 0));
+  const current = toNonNegativeFloorInt(entry.status.amount, 0);
   if (current <= 0) return 0;
 
-  const requested = Math.max(0, toFloorInt(amount, 0));
+  const requested = toNonNegativeFloorInt(amount, 0);
   if (requested <= 0) return 0;
 
   const consumed = Math.min(current, requested);
@@ -31,9 +31,9 @@ function consumeShieldEntryAmount(entry: ReturnType<typeof getShieldEntry>, amou
 }
 
 export function applyDamage(target: UnitToken, amount: number): void {
-  const maxHp = Math.max(0, toFloorInt(target.hpMax, 0));
+  const maxHp = toNonNegativeFloorInt(target.hpMax, 0);
   if (maxHp <= 0) return;
-  const damage = Math.max(0, toFloorInt(amount, 0));
+  const damage = toNonNegativeFloorInt(amount, 0);
   if (damage <= 0) return;
 
   const currentHp = Math.max(0, Math.min(maxHp, toFloorInt(target.hp, 0)));
@@ -55,7 +55,7 @@ export interface GrantShieldOptions {
 export function grantShield(target: UnitToken | null | undefined, amount: number, options: GrantShieldOptions = {}): number {
   if (!target) return 0;
 
-  const amt = Math.max(0, toFloorInt(amount, 0));
+  const amt = toNonNegativeFloorInt(amount, 0);
   if (amt <= 0) return 0;
 
   const list = ensureStatusList(target);
@@ -91,14 +91,14 @@ export function consumeShield(target: UnitToken | null | undefined, amount: numb
 export function readShieldAmount(target: UnitToken | null | undefined): number {
   const entry = getShieldEntry(target);
   if (!entry) return 0;
-  return Math.max(0, toFloorInt(entry.status.amount, 0));
+  return toNonNegativeFloorInt(entry.status.amount, 0);
 }
 
 export function consumeShieldByCurrentRatio(target: UnitToken | null | undefined, ratio: number): number {
   if (!target || !Number.isFinite(ratio) || ratio <= 0) return 0;
   const entry = getShieldEntry(target);
-  const current = Math.max(0, toFloorInt(entry?.status.amount, 0));
+  const current = toNonNegativeFloorInt(entry?.status.amount, 0);
   if (current <= 0) return 0;
-  const requested = Math.max(0, toFloorInt(current * toFiniteNumber(ratio, 0), 0));
+  const requested = toNonNegativeFloorInt(current * toFiniteNumber(ratio, 0), 0);
   return consumeShieldEntryAmount(entry, requested);
 }

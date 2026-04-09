@@ -1,5 +1,5 @@
 import type { UnitToken } from '@shared-types/units';
-import { toFiniteNumber, toFloorInt } from './number-utils.ts';
+import { clampMin, toFiniteNumber, toFloorInt } from './number-utils.ts';
 
 export interface DamageBreakdownMetadata {
   classBonus: number;
@@ -26,13 +26,13 @@ const clampDamage = (value: unknown): number => {
 const normalizeBonus = (value: unknown): number => {
   const parsed = toFiniteNumber(value, NaN);
   if (!Number.isFinite(parsed)) return 0;
-  return Math.max(-1, parsed);
+  return clampMin(parsed, -1, -1);
 };
 
 const toNonNegativeFactor = (value: unknown, fallback = 1): number => {
   const parsed = toFiniteNumber(value, NaN);
-  if (!Number.isFinite(parsed)) return Math.max(0, fallback);
-  return Math.max(0, parsed);
+  if (!Number.isFinite(parsed)) return clampMin(fallback, 0, 0);
+  return clampMin(parsed, 0, 0);
 };
 
 const resolveBreakdown = (context?: CalculateFinalDamageContext | null): DamageBreakdownMetadata => {

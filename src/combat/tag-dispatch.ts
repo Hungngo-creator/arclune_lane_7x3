@@ -46,6 +46,14 @@ const DISPATCH_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'đơn mục tiêu ngẫu nhiên': 'random-target',
   'all-enemy': 'aoe',
   'kẻ địch': 'enemy',
+  'lap-tuc': 'instant',
+  'lập tức': 'instant',
+  'quy tắc': 'global-rule',
+  'quy-tac': 'global-rule',
+  'muc-tieu-leader': 'leader-target',
+  'mục tiêu leader': 'leader-target',
+  'mục tiêu: leader': 'leader-target',
+  'target-leader': 'leader-target',
 });
 
 type NormalizedContext = {
@@ -157,7 +165,10 @@ const isLeaderToken = (token: UnitToken): boolean => {
 
 const filterTokensByRole = (ctx: Pick<NormalizedContext, 'targetRole'>, tokens: ReadonlyArray<UnitToken>): ReadonlyArray<UnitToken> => {
   if (ctx.targetRole !== 'leader') return tokens;
-  const leaders = tokens.filter((token) => isLeaderToken(token));
+  const leaders: UnitToken[] = [];
+  for (const token of tokens) {
+    if (isLeaderToken(token)) leaders.push(token);
+  }
   return leaders;
 };
 
@@ -180,10 +191,72 @@ const pickSingleByMetric = (
   return [best];
 };
 
+const insertMetricSorted = (
+  entries: Array<{ token: UnitToken; metric: number }>,
+  candidate: { token: UnitToken; metric: number },
+  findLowest: boolean,
+): void => {
+  let inserted = false;
+  for (let i = 0; i < entries.length; i += 1) {
+    const existing = entries[i];
+    if (!existing) continue;
+    const shouldInsertBefore = findLowest
+      ? candidate.metric < existing.metric
+      : candidate.metric > existing.metric;
+    if (!shouldInsertBefore) continue;
+    entries.splice(i, 0, candidate);
+    inserted = true;
+    break;
+  }
+  if (!inserted) entries.push(candidate);
+};
+
+const pickTopByMetric = (
+  tokens: ReadonlyArray<UnitToken>,
+  limit: number,
+  metricReader: (token: UnitToken) => number,
+  findLowest: boolean,
+): UnitToken[] => {
+  if (limit <= 0 || tokens.length === 0) return [];
+  if (limit >= tokens.length) {
+    const cloned = [...tokens];
+    cloned.sort((a, b) => {
+      const aMetric = metricReader(a);
+      const bMetric = metricReader(b);
+      return findLowest ? aMetric - bMetric : bMetric - aMetric;
+    });
+    return cloned;
+  }
+
+  const selected: Array<{ token: UnitToken; metric: number }> = [];
+  for (const token of tokens) {
+    const metric = metricReader(token);
+    if (selected.length < limit) {
+      insertMetricSorted(selected, { token, metric }, findLowest);
+      continue;
+    }
+    const tail = selected[selected.length - 1];
+    if (!tail) continue;
+    const shouldReplaceTail = findLowest ? metric < tail.metric : metric > tail.metric;
+    if (!shouldReplaceTail) continue;
+    selected.pop();
+    insertMetricSorted(selected, { token, metric }, findLowest);
+  }
+
+  return selected.map((entry) => entry.token);
+};
+
 const readHpRatio = (unit: UnitToken): number => {
   const hpMax = Math.max(1, toFiniteNumber(unit.hpMax, 1));
   const hp = Math.max(0, toFiniteNumber(unit.hp, 0));
   return hp / hpMax;
+};
+
+const findLeaderToken = (tokens: ReadonlyArray<UnitToken>): UnitToken | null => {
+  for (const token of tokens) {
+    if (isLeaderToken(token)) return token;
+  }
+  return null;
 };
 
 const pickTargetsByPriority = (
@@ -218,18 +291,14 @@ const pickTargetsByPriority = (
     }
     return [...leaders, ...nonLeaders].slice(0, limit);
   }
-  const sorted = [...tokens];
-  sorted.sort((a, b) => {
-    const aMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio'
-      ? readHpRatio(a)
-      : toFiniteNumber(a.hp, 0);
-    const bMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio'
-      ? readHpRatio(b)
-      : toFiniteNumber(b.hp, 0);
-    if (priority === 'lowest-hp' || priority === 'lowest-hp-ratio') return aMetric - bMetric;
-    return bMetric - aMetric;
-  });
-  return sorted.slice(0, limit);
+  const useRatioMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio';
+  const findLowest = priority === 'lowest-hp' || priority === 'lowest-hp-ratio';
+  return pickTopByMetric(
+    tokens,
+    limit,
+    (token) => (useRatioMetric ? readHpRatio(token) : toFiniteNumber(token.hp, 0)),
+    findLowest,
+  );
 };
 
 const readTurns = (payload: Record<string, unknown> | null, ...keys: string[]): number => {
@@ -385,6 +454,11 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   enemy: (ctx, result) => {
     if (!ctx.attacker) return;
     assignSliceTargetsIfEmpty(ctx, result, ctx.opponentTokens, readTargetLimit(ctx, 1));
+  },
+  'leader-target': (ctx, result) => {
+    if (!ctx.attacker) return;
+    const leader = findLeaderToken(ctx.opponentTokens);
+    assignTargetsIfEmpty(result, leader ? [leader] : EMPTY_TOKENS);
   },
   'random-target': (ctx, result) => {
     if (!ctx.attacker) return;

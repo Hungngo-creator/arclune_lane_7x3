@@ -3,12 +3,20 @@ export function toFiniteNumber(value: unknown, fallback = 0): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+export function clampMin(value: unknown, min: number, fallback = 0): number {
+  return Math.max(min, toFiniteNumber(value, fallback));
+}
+
 export function toFloorInt(value: unknown, fallback = 0): number {
   return Math.floor(toFiniteNumber(value, fallback));
 }
 
 export function toRoundedInt(value: unknown, fallback = 0): number {
   return Math.round(toFiniteNumber(value, fallback));
+}
+
+export function toNonNegativeFloorInt(value: unknown, fallback = 0): number {
+  return Math.max(0, toFloorInt(value, fallback));
 }
 
 export function toPositiveTurns(value: unknown, fallback = 1): number {

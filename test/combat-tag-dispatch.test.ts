@@ -226,6 +226,22 @@ describe('combat tag dispatcher matrix', () => {
     expect(leaderOnly.targets.map((token) => token.id)).toEqual(['enemy-leader']);
   });
 
+  it('maps character-doc leader-target aliases to leader-target runtime selection', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally', cx: 2, cy: 0 });
+    const enemyLeader = makeToken({ id: 'enemy-leader', side: 'enemy', cx: 6, cy: 1 }); // slot 8
+    const enemyOther = makeToken({ id: 'enemy-other', side: 'enemy', cx: 3, cy: 0 });
+    const game = makeGame([attacker, enemyLeader, enemyOther]);
+
+    const result = dispatchGameplayTags(['mục tiêu: leader'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+    });
+
+    expect(result.targets.map((token) => token.id)).toEqual(['enemy-leader']);
+    expect(result.applied).toContain('leader-target');
+  });
+
   it('handles silence / sleep / mark statuses', () => {
     const attacker = makeToken({ id: 'attacker', side: 'ally' });
     const target = makeToken({ id: 'target', side: 'enemy' });

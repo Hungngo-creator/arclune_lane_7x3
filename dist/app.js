@@ -5044,6 +5044,7 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   const __dep1 = __require('./combat/number-utils.ts');
   const toFiniteNumber = __dep1.toFiniteNumber;
   const toFloorInt = __dep1.toFloorInt;
+  const toNonNegativeFloorInt = __dep1.toNonNegativeFloorInt;
   const __dep2 = __require('./combat/status-utils.ts');
   const ensureStatusList = __dep2.ensureStatusList;
   const getStatusEntryById = __dep2.getStatusEntryById;
@@ -5054,10 +5055,10 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   function consumeShieldEntryAmount(entry, amount) {
       if (!entry)
           return 0;
-      const current = Math.max(0, toFloorInt(entry.status.amount, 0));
+      const current = toNonNegativeFloorInt(entry.status.amount, 0);
       if (current <= 0)
           return 0;
-      const requested = Math.max(0, toFloorInt(amount, 0));
+      const requested = toNonNegativeFloorInt(amount, 0);
       if (requested <= 0)
           return 0;
       const consumed = Math.min(current, requested);
@@ -5070,10 +5071,10 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       return consumed;
   }
   function applyDamage(target, amount) {
-      const maxHp = Math.max(0, toFloorInt(target.hpMax, 0));
+      const maxHp = toNonNegativeFloorInt(target.hpMax, 0);
       if (maxHp <= 0)
           return;
-      const damage = Math.max(0, toFloorInt(amount, 0));
+      const damage = toNonNegativeFloorInt(amount, 0);
       if (damage <= 0)
           return;
       const currentHp = Math.max(0, Math.min(maxHp, toFloorInt(target.hp, 0)));
@@ -5089,7 +5090,7 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   function grantShield(target, amount, options = {}) {
       if (!target)
           return 0;
-      const amt = Math.max(0, toFloorInt(amount, 0));
+      const amt = toNonNegativeFloorInt(amount, 0);
       if (amt <= 0)
           return 0;
       const list = ensureStatusList(target);
@@ -5122,16 +5123,16 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       const entry = getShieldEntry(target);
       if (!entry)
           return 0;
-      return Math.max(0, toFloorInt(entry.status.amount, 0));
+      return toNonNegativeFloorInt(entry.status.amount, 0);
   }
   function consumeShieldByCurrentRatio(target, ratio) {
       if (!target || !Number.isFinite(ratio) || ratio <= 0)
           return 0;
       const entry = getShieldEntry(target);
-      const current = Math.max(0, toFloorInt(entry?.status.amount, 0));
+      const current = toNonNegativeFloorInt(entry?.status.amount, 0);
       if (current <= 0)
           return 0;
-      const requested = Math.max(0, toFloorInt(current * toFiniteNumber(ratio, 0), 0));
+      const requested = toNonNegativeFloorInt(current * toFiniteNumber(ratio, 0), 0);
       return consumeShieldEntryAmount(entry, requested);
   }
   //# sourceMappingURL=stdin.js.map
@@ -5143,6 +5144,7 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
 };
 __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/number-utils.ts');
+  const clampMin = __dep0.clampMin;
   const toFiniteNumber = __dep0.toFiniteNumber;
   const toFloorInt = __dep0.toFloorInt;
   const clampDamage = (value) => {
@@ -5152,13 +5154,13 @@ __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) =
       const parsed = toFiniteNumber(value, NaN);
       if (!Number.isFinite(parsed))
           return 0;
-      return Math.max(-1, parsed);
+      return clampMin(parsed, -1, -1);
   };
   const toNonNegativeFactor = (value, fallback = 1) => {
       const parsed = toFiniteNumber(value, NaN);
       if (!Number.isFinite(parsed))
-          return Math.max(0, fallback);
-      return Math.max(0, parsed);
+          return clampMin(fallback, 0, 0);
+      return clampMin(parsed, 0, 0);
   };
   const resolveBreakdown = (context) => {
       const raw = context?.breakdown ?? null;
@@ -5566,11 +5568,17 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
       const parsed = typeof value === 'number' ? value : Number(value);
       return Number.isFinite(parsed) ? parsed : fallback;
   }
+  function clampMin(value, min, fallback = 0) {
+      return Math.max(min, toFiniteNumber(value, fallback));
+  }
   function toFloorInt(value, fallback = 0) {
       return Math.floor(toFiniteNumber(value, fallback));
   }
   function toRoundedInt(value, fallback = 0) {
       return Math.round(toFiniteNumber(value, fallback));
+  }
+  function toNonNegativeFloorInt(value, fallback = 0) {
+      return Math.max(0, toFloorInt(value, fallback));
   }
   function toPositiveTurns(value, fallback = 1) {
       const direct = toFiniteNumber(value, NaN);
@@ -5580,8 +5588,10 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'toFiniteNumber')) exports.toFiniteNumber = toFiniteNumber;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'clampMin')) exports.clampMin = clampMin;
   if (!Object.prototype.hasOwnProperty.call(exports, 'toFloorInt')) exports.toFloorInt = toFloorInt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'toRoundedInt')) exports.toRoundedInt = toRoundedInt;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'toNonNegativeFloorInt')) exports.toNonNegativeFloorInt = toNonNegativeFloorInt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'toPositiveTurns')) exports.toPositiveTurns = toPositiveTurns;
 };
 __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => {
@@ -5656,12 +5666,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       };
   }
   function canApplyUniqueGlobal(game, summonId) {
-      for (const token of game.tokens) {
-          if (!token.alive || token.id !== summonId)
-              continue;
-          return false;
-      }
-      return true;
+      return !game.tokens.some((token) => token.alive && token.id === summonId);
   }
   function applyHpCost(caster, payload) {
       const hpMax = Math.max(1, toFloorInt(caster.hpMax, 1));
@@ -5680,14 +5685,14 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       return true;
   }
   function firstOpenSlot(game, side) {
-      const alive = [];
+      const aliveTokens = [];
       for (const token of game.tokens) {
           if (token.alive)
-              alive.push(token);
+              aliveTokens.push(token);
       }
       for (let slot = 1; slot <= 9; slot += 1) {
           const { cx, cy } = slotToCell(side, slot);
-          if (!cellReserved(alive, game.queued, cx, cy))
+          if (!cellReserved(aliveTokens, game.queued, cx, cy))
               return slot;
       }
       return null;
@@ -5979,6 +5984,14 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       'đơn mục tiêu ngẫu nhiên': 'random-target',
       'all-enemy': 'aoe',
       'kẻ địch': 'enemy',
+      'lap-tuc': 'instant',
+      'lập tức': 'instant',
+      'quy tắc': 'global-rule',
+      'quy-tac': 'global-rule',
+      'muc-tieu-leader': 'leader-target',
+      'mục tiêu leader': 'leader-target',
+      'mục tiêu: leader': 'leader-target',
+      'target-leader': 'leader-target',
   });
   function resolveDispatchTag(tag) {
       return DISPATCH_TAG_ALIASES[tag] ?? tag;
@@ -6056,7 +6069,11 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const filterTokensByRole = (ctx, tokens) => {
       if (ctx.targetRole !== 'leader')
           return tokens;
-      const leaders = tokens.filter((token) => isLeaderToken(token));
+      const leaders = [];
+      for (const token of tokens) {
+          if (isLeaderToken(token))
+              leaders.push(token);
+      }
       return leaders;
   };
   const pickSingleByMetric = (tokens, metric, findLowest) => {
@@ -6074,10 +6091,65 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       }
       return [best];
   };
+  const insertMetricSorted = (entries, candidate, findLowest) => {
+      let inserted = false;
+      for (let i = 0; i < entries.length; i += 1) {
+          const existing = entries[i];
+          if (!existing)
+              continue;
+          const shouldInsertBefore = findLowest
+              ? candidate.metric < existing.metric
+              : candidate.metric > existing.metric;
+          if (!shouldInsertBefore)
+              continue;
+          entries.splice(i, 0, candidate);
+          inserted = true;
+          break;
+      }
+      if (!inserted)
+          entries.push(candidate);
+  };
+  const pickTopByMetric = (tokens, limit, metricReader, findLowest) => {
+      if (limit <= 0 || tokens.length === 0)
+          return [];
+      if (limit >= tokens.length) {
+          const cloned = [...tokens];
+          cloned.sort((a, b) => {
+              const aMetric = metricReader(a);
+              const bMetric = metricReader(b);
+              return findLowest ? aMetric - bMetric : bMetric - aMetric;
+          });
+          return cloned;
+      }
+      const selected = [];
+      for (const token of tokens) {
+          const metric = metricReader(token);
+          if (selected.length < limit) {
+              insertMetricSorted(selected, { token, metric }, findLowest);
+              continue;
+          }
+          const tail = selected[selected.length - 1];
+          if (!tail)
+              continue;
+          const shouldReplaceTail = findLowest ? metric < tail.metric : metric > tail.metric;
+          if (!shouldReplaceTail)
+              continue;
+          selected.pop();
+          insertMetricSorted(selected, { token, metric }, findLowest);
+      }
+      return selected.map((entry) => entry.token);
+  };
   const readHpRatio = (unit) => {
       const hpMax = Math.max(1, toFiniteNumber(unit.hpMax, 1));
       const hp = Math.max(0, toFiniteNumber(unit.hp, 0));
       return hp / hpMax;
+  };
+  const findLeaderToken = (tokens) => {
+      for (const token of tokens) {
+          if (isLeaderToken(token))
+              return token;
+      }
+      return null;
   };
   const pickTargetsByPriority = (ctx, tokens, limit) => {
       if (tokens.length <= 1 || limit <= 0)
@@ -6108,19 +6180,9 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           }
           return [...leaders, ...nonLeaders].slice(0, limit);
       }
-      const sorted = [...tokens];
-      sorted.sort((a, b) => {
-          const aMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio'
-              ? readHpRatio(a)
-              : toFiniteNumber(a.hp, 0);
-          const bMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio'
-              ? readHpRatio(b)
-              : toFiniteNumber(b.hp, 0);
-          if (priority === 'lowest-hp' || priority === 'lowest-hp-ratio')
-              return aMetric - bMetric;
-          return bMetric - aMetric;
-      });
-      return sorted.slice(0, limit);
+      const useRatioMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio';
+      const findLowest = priority === 'lowest-hp' || priority === 'lowest-hp-ratio';
+      return pickTopByMetric(tokens, limit, (token) => (useRatioMetric ? readHpRatio(token) : toFiniteNumber(token.hp, 0)), findLowest);
   };
   const readTurns = (payload, ...keys) => {
       for (const key of keys) {
@@ -6255,6 +6317,12 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           if (!ctx.attacker)
               return;
           assignSliceTargetsIfEmpty(ctx, result, ctx.opponentTokens, readTargetLimit(ctx, 1));
+      },
+      'leader-target': (ctx, result) => {
+          if (!ctx.attacker)
+              return;
+          const leader = findLeaderToken(ctx.opponentTokens);
+          assignTargetsIfEmpty(result, leader ? [leader] : EMPTY_TOKENS);
       },
       'random-target': (ctx, result) => {
           if (!ctx.attacker)

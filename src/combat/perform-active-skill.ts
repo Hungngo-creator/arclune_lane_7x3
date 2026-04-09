@@ -78,11 +78,7 @@ function resolvePayload(skill: SkillSection): Record<string, unknown> {
 }
 
 function canApplyUniqueGlobal(game: SessionState, summonId: string): boolean {
-  for (const token of game.tokens) {
-    if (!token.alive || token.id !== summonId) continue;
-    return false;
-  }
-  return true;
+  return !game.tokens.some((token) => token.alive && token.id === summonId);
 }
 
 function applyHpCost(caster: UnitToken, payload: Record<string, unknown>): boolean {
@@ -103,13 +99,14 @@ function applyHpCost(caster: UnitToken, payload: Record<string, unknown>): boole
 }
 
 function firstOpenSlot(game: SessionState, side: UnitToken['side']): number | null {
-  const alive: UnitToken[] = [];
+  const aliveTokens: UnitToken[] = [];
   for (const token of game.tokens) {
-    if (token.alive) alive.push(token);
+    if (token.alive) aliveTokens.push(token);
   }
+
   for (let slot = 1; slot <= 9; slot += 1) {
     const { cx, cy } = slotToCell(side, slot);
-    if (!cellReserved(alive, game.queued, cx, cy)) return slot;
+    if (!cellReserved(aliveTokens, game.queued, cx, cy)) return slot;
   }
   return null;
 }
