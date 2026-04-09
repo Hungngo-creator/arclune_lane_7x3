@@ -1,37 +1,34 @@
 //home (termux)/arclune_lane_7x3/src/combat/apply-damage.ts
 import { sessionNow } from '../utils/time.ts';
 import { toFiniteNumber, toFloorInt } from './number-utils.ts';
+import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 
-import type { StatusEffect } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
 
-const ensureStatusList = (unit?: UnitToken | null): StatusEffect[] => {
-  if (!unit) return [];
-  if (!Array.isArray(unit.statuses)) {
-    unit.statuses = [];
-  }
-  return unit.statuses;
-};
+const SHIELD_STATUS_ID = 'shield';
 
-interface ShieldEntry {
-  statuses: StatusEffect[];
-  index: number;
-  status: StatusEffect;
+function getShieldEntry(target: UnitToken | null | undefined) {
+  return getStatusEntryById(target, SHIELD_STATUS_ID);
 }
 
-function getShieldEntry(target: UnitToken | null | undefined, statuses?: StatusEffect[]): ShieldEntry | null {
-  const list = statuses ?? (Array.isArray(target?.statuses) ? target.statuses : null);
-  if (!target || !list || list.length === 0) return null;
-  for (let i = 0; i < list.length; i += 1) {
-    const status = list[i];
-    if (status?.id !== 'shield') continue;
-    return {
-      statuses: list,
-      index: i,
-      status,
-    };
+function consumeShieldEntryAmount(entry: ReturnType<typeof getShieldEntry>, amount: number): number {
+  if (!entry) return 0;
+
+  const current = Math.max(0, toFloorInt(entry.status.amount, 0));
+  if (current <= 0) return 0;
+
+  const requested = Math.max(0, toFloorInt(amount, 0));
+  if (requested <= 0) return 0;
+
+  const consumed = Math.min(current, requested);
+  const remain = current - consumed;
+  if (remain > 0) {
+    entry.status.amount = remain;
+    return consumed;
   }
-  return null;
+
+  entry.statuses.splice(entry.index, 1);
+  return consumed;
 }
 
 export function applyDamage(target: UnitToken, amount: number): void {
@@ -63,7 +60,7 @@ export function grantShield(target: UnitToken | null | undefined, amount: number
   if (amt <= 0) return 0;
 
   const list = ensureStatusList(target);
-  const entry = getShieldEntry(target, list);
+  const entry = getStatusEntryById(target, SHIELD_STATUS_ID, list);
 
   const durationTurns = Number.isFinite(options.durationTurns)
     ? Math.max(1, toFloorInt(options.durationTurns as number, 1))
@@ -89,40 +86,14 @@ export function grantShield(target: UnitToken | null | undefined, amount: number
 }
 
 export function consumeShield(target: UnitToken | null | undefined, amount: number): number {
-  const entry = getShieldEntry(target);
-  if (!entry) return 0;
-
-  const currentShield = Math.max(0, toFloorInt(entry.status.amount, 0));
-  if (currentShield <= 0) return 0;
-  const requested = Math.max(0, toFloorInt(amount, 0));
-  if (requested <= 0) return 0;
-
-  const consumed = Math.min(currentShield, requested);
-  const remain = currentShield - consumed;
-  if (remain > 0) {
-    entry.status.amount = remain;
-    return consumed;
+  return consumeShieldEntryAmount(getShieldEntry(target), amount);
   }
-
-  entry.statuses.splice(entry.index, 1);
-  return consumed;
-}
 
 export function consumeShieldByCurrentRatio(target: UnitToken | null | undefined, ratio: number): number {
   if (!target || !Number.isFinite(ratio) || ratio <= 0) return 0;
   const entry = getShieldEntry(target);
-  if (!entry) return 0;
-  const current = Math.max(0, toFloorInt(entry.status.amount, 0));
+  const current = Math.max(0, toFloorInt(entry?.status.amount, 0));
   if (current <= 0) return 0;
   const requested = Math.max(0, toFloorInt(current * toFiniteNumber(ratio, 0), 0));
-  if (requested <= 0) return 0;
-  const consumed = Math.min(current, requested);
-  const remain = current - consumed;
-  if (remain > 0) {
-    entry.status.amount = remain;
-    return consumed;
-  }
-
-  entry.statuses.splice(entry.index, 1);
-  return consumed;
+  return consumeShieldEntryAmount(entry, requested);
 }

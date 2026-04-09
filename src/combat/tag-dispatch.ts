@@ -4,6 +4,8 @@ import { Statuses } from '../statuses.ts';
 import { normalizeTagList } from '../data/tags.ts';
 import { dealAbilityDamage, healUnit } from '../combat.ts';
 import { nextRngValue } from '../utils/rng.ts';
+import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
+import { partitionTokensBySide } from './token-side-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { Side, UnitToken } from '@shared-types/units';
@@ -60,37 +62,13 @@ const resolveRandom = (ctx: Pick<NormalizedContext, 'game'>): (() => number) => 
   ctx.game?.rng ? () => nextRngValue(ctx.game?.rng) : Math.random
 );
 
-function splitAliveTokensBySide(
-  tokens: ReadonlyArray<UnitToken>,
-  attacker: UnitToken | null,
-): { allyTokens: UnitToken[]; enemyTokens: UnitToken[] } {
-  if (!attacker) {
-    return {
-      allyTokens: EMPTY_TOKENS,
-      enemyTokens: EMPTY_TOKENS,
-    };
-  }
-
-  const allyTokens: UnitToken[] = [];
-  const enemyTokens: UnitToken[] = [];
-  for (const token of tokens) {
-    if (!token?.alive) continue;
-    if (token.side === attacker.side) allyTokens.push(token);
-    else enemyTokens.push(token);
-  }
-
-  allyTokens.sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx));
-  enemyTokens.sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx));
-  return { allyTokens, enemyTokens };
-}
-
 const sampleTargets = (tokens: ReadonlyArray<UnitToken>, limit: number, randomFn: () => number): UnitToken[] => {
   if (limit <= 0 || tokens.length === 0) return [];
   if (tokens.length <= limit) return [...tokens];
 
   const pool = [...tokens];
   for (let i = 0; i < limit; i += 1) {
-    const swapIndex = i + randomFn(Math.random() * (pool.length - i));
+    const swapIndex = i + Math.floor(randomFn() * (pool.length - i));
     [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
   }
   return pool.slice(0, limit);
@@ -171,16 +149,10 @@ function applyMarkStackingStatus(ctx: NormalizedContext, result: TagDispatchResu
   const purgeable = typeof payload.markPurgeable === 'boolean' ? payload.markPurgeable : !nonPurgeableByTag;
 
   for (const target of result.targets) {
-    const statuses = Array.isArray(target.statuses) ? target.statuses : (target.statuses = []);
-    let index = -1;
-    for (let i = 0; i < statuses.length; i += 1) {
-      if (statuses[i]?.id === statusId) {
-        index = i;
-        break;
-      }
-    }
+    const statuses = ensureStatusList(target);
+    const existingEntry = getStatusEntryById(target, statusId, statuses);
 
-    if (index < 0) {
+    if (!existingEntry) {
       Statuses.add(target, {
         id: statusId,
         kind: 'mark',
@@ -193,7 +165,7 @@ function applyMarkStackingStatus(ctx: NormalizedContext, result: TagDispatchResu
       continue;
     }
 
-    const status = statuses[index];
+    const status = existingEntry.status;
     const currentStacks = Math.max(0, toRoundedInt(status?.stacks ?? 0, 0));
     const nextStacks = Math.min(maxStacks, currentStacks + stacksPerApply);
     status.stacks = nextStacks;
@@ -205,7 +177,7 @@ function applyMarkStackingStatus(ctx: NormalizedContext, result: TagDispatchResu
       addStatus(target, 'sleep', Math.max(1, sleepTurnsOnCap || 1), ctx.attacker?.id);
       result.sideEffects.push(`sleep:${Math.max(1, sleepTurnsOnCap || 1)}`);
     }
-    statuses.splice(index, 1);
+    statuses.splice(existingEntry.index, 1);
     result.sideEffects.push(`mark-cap:${statusId}`);
   }
 }
@@ -324,8 +296,8 @@ export function dispatchGameplayTags(
     : normalizeTagList(rawTags);
   const target = context.target ?? null;
   const attacker = context.attacker ?? null;
-  const { allyTokens, enemyTokens } = context.game
-    ? splitAliveTokensBySide(context.game.tokens, attacker)
+  const { allyTokens, enemyTokens } = context.game && attacker
+    ? partitionTokensBySide(context.game.tokens, attacker.side, { sortByBoardPosition: true })
     : { allyTokens: EMPTY_TOKENS, enemyTokens: EMPTY_TOKENS };
 
   const ctx: NormalizedContext = {

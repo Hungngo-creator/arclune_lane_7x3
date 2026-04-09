@@ -1815,7 +1815,6 @@ function performUlt(unit: UnitToken): void {
     target: pickTarget(game, unit),
     cost: resolveUltCost(unit, CFG),
     side: unit.side,
-    turn: game.turn?.cycle ?? null,
     payload: u,
   });
   

@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -5045,29 +5045,30 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   const __dep1 = __require('./combat/number-utils.ts');
   const toFiniteNumber = __dep1.toFiniteNumber;
   const toFloorInt = __dep1.toFloorInt;
-  const ensureStatusList = (unit) => {
-      if (!unit)
-          return [];
-      if (!Array.isArray(unit.statuses)) {
-          unit.statuses = [];
+  const __dep2 = __require('./combat/status-utils.ts');
+  const ensureStatusList = __dep2.ensureStatusList;
+  const getStatusEntryById = __dep2.getStatusEntryById;
+  const SHIELD_STATUS_ID = 'shield';
+  function getShieldEntry(target) {
+      return getStatusEntryById(target, SHIELD_STATUS_ID);
+  }
+  function consumeShieldEntryAmount(entry, amount) {
+      if (!entry)
+          return 0;
+      const current = Math.max(0, toFloorInt(entry.status.amount, 0));
+      if (current <= 0)
+          return 0;
+      const requested = Math.max(0, toFloorInt(amount, 0));
+      if (requested <= 0)
+          return 0;
+      const consumed = Math.min(current, requested);
+      const remain = current - consumed;
+      if (remain > 0) {
+          entry.status.amount = remain;
+          return consumed;
       }
-      return unit.statuses;
-  };
-  function getShieldEntry(target, statuses) {
-      const list = statuses ?? (Array.isArray(target?.statuses) ? target.statuses : null);
-      if (!target || !list || list.length === 0)
-          return null;
-      for (let i = 0; i < list.length; i += 1) {
-          const status = list[i];
-          if (status?.id !== 'shield')
-              continue;
-          return {
-              statuses: list,
-              index: i,
-              status,
-          };
-      }
-      return null;
+      entry.statuses.splice(entry.index, 1);
+      return consumed;
   }
   function applyDamage(target, amount) {
       const maxHp = Math.max(0, toFloorInt(target.hpMax, 0));
@@ -5093,7 +5094,7 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       if (amt <= 0)
           return 0;
       const list = ensureStatusList(target);
-      const entry = getShieldEntry(target, list);
+      const entry = getStatusEntryById(target, SHIELD_STATUS_ID, list);
       const durationTurns = Number.isFinite(options.durationTurns)
           ? Math.max(1, toFloorInt(options.durationTurns, 1))
           : null;
@@ -5116,44 +5117,17 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       return amt;
   }
   function consumeShield(target, amount) {
-      const entry = getShieldEntry(target);
-      if (!entry)
-          return 0;
-      const currentShield = Math.max(0, toFloorInt(entry.status.amount, 0));
-      if (currentShield <= 0)
-          return 0;
-      const requested = Math.max(0, toFloorInt(amount, 0));
-      if (requested <= 0)
-          return 0;
-      const consumed = Math.min(currentShield, requested);
-      const remain = currentShield - consumed;
-      if (remain > 0) {
-          entry.status.amount = remain;
-          return consumed;
-      }
-      entry.statuses.splice(entry.index, 1);
-      return consumed;
+      return consumeShieldEntryAmount(getShieldEntry(target), amount);
   }
   function consumeShieldByCurrentRatio(target, ratio) {
       if (!target || !Number.isFinite(ratio) || ratio <= 0)
           return 0;
       const entry = getShieldEntry(target);
-      if (!entry)
-          return 0;
-      const current = Math.max(0, toFloorInt(entry.status.amount, 0));
+      const current = Math.max(0, toFloorInt(entry?.status.amount, 0));
       if (current <= 0)
           return 0;
       const requested = Math.max(0, toFloorInt(current * toFiniteNumber(ratio, 0), 0));
-      if (requested <= 0)
-          return 0;
-      const consumed = Math.min(current, requested);
-      const remain = current - consumed;
-      if (remain > 0) {
-          entry.status.amount = remain;
-          return consumed;
-      }
-      entry.statuses.splice(entry.index, 1);
-      return consumed;
+      return consumeShieldEntryAmount(entry, requested);
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyDamage')) exports.applyDamage = applyDamage;
@@ -5224,6 +5198,9 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   const __dep3 = __require('./combat/number-utils.ts');
   const toFiniteNumber = __dep3.toFiniteNumber;
   const toFloorInt = __dep3.toFloorInt;
+  const __dep4 = __require('./combat/token-side-utils.ts');
+  const bucketTokensByActualSide = __dep4.bucketTokensByActualSide;
+  const partitionTokensBySide = __dep4.partitionTokensBySide;
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const CHAP_MINH_LINK_REDUCTION = 0.30;
   const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
@@ -5267,9 +5244,8 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       const shieldAmount = Math.max(0, Math.floor((caster.hpMax ?? 0) * 0.15));
       if (shieldAmount <= 0)
           return;
-      for (const token of game.tokens) {
-          if (!token.alive || token.side !== caster.side)
-              continue;
+      const { allyTokens } = partitionTokensBySide(game.tokens, caster.side);
+      for (const token of allyTokens) {
           const { column: tokenColumn } = resolveSlotAndColumn(token);
           if (tokenColumn !== column)
               continue;
@@ -5315,13 +5291,13 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       for (const token of game.tokens) {
           delete token._chapMinhLinkOwner;
       }
+      const groupedAliveBySide = bucketTokensByActualSide(game.tokens);
       for (const owner of game.tokens) {
           if (!isAliveChapMinh(owner) || !Array.isArray(owner._chapMinhLinkedSlots))
               continue;
           const { column: ownerColumn } = resolveSlotAndColumn(owner);
-          for (const token of game.tokens) {
-              if (!token.alive || token.side !== owner.side)
-                  continue;
+          const sideTokens = owner.side === 'ally' ? groupedAliveBySide.ally : groupedAliveBySide.enemy;
+          for (const token of sideTokens) {
               const { slot: tokenSlot, column: tokenColumn } = resolveSlotAndColumn(token);
               const inLink = owner._chapMinhLinkedSlots.includes(tokenSlot);
               const inColumn = tokenColumn === ownerColumn;
@@ -5601,7 +5577,6 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
 __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
-  const healUnit = __dep0.healUnit;
   const pickTarget = __dep0.pickTarget;
   const __dep1 = __require('./combat/tag-dispatch.ts');
   const dispatchGameplayTags = __dep1.dispatchGameplayTags;
@@ -5618,15 +5593,35 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const globalAetherPool = __dep6.globalAetherPool;
   const __dep7 = __require('./statuses.ts');
   const Statuses = __dep7.Statuses;
-  const __dep8 = __require('./combat/apply-damage.ts');
-  const grantShield = __dep8.grantShield;
-  const __dep9 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeActiveSkill = __dep9.runRuntimeActiveSkill;
-  const __dep10 = __require('./combat/number-utils.ts');
-  const toFiniteNumber = __dep10.toFiniteNumber;
-  const toFloorInt = __dep10.toFloorInt;
-  const toPositiveTurns = __dep10.toPositiveTurns;
-  const toRoundedInt = __dep10.toRoundedInt;
+  const __dep8 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeActiveSkill = __dep8.runRuntimeActiveSkill;
+  const __dep9 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep9.toFiniteNumber;
+  const toFloorInt = __dep9.toFloorInt;
+  const toPositiveTurns = __dep9.toPositiveTurns;
+  const toRoundedInt = __dep9.toRoundedInt;
+  const __dep10 = __require('./combat/token-side-utils.ts');
+  const partitionTokensBySide = __dep10.partitionTokensBySide;
+  const EMPTY_TAGS = [];
+  const EFFECT_APPLICATION_TAGS = new Set([
+      'heal',
+      'team-heal',
+      'shield',
+      'silence',
+      'sleep',
+      'mark',
+      'control',
+      'non-heal-hp-change',
+  ]);
+  const buildSkillResult = (ok, skillKey, skill, tags, appliedTags, targetCount, reason) => ({
+      ok,
+      skillKey,
+      skill,
+      tags,
+      appliedTags,
+      targetCount,
+      ...(reason ? { reason } : {}),
+  });
   function resolveActiveSkill(caster, skillKey) {
       const set = skillSets[caster.id];
       if (!set)
@@ -5643,48 +5638,6 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           ...nested,
           ...skill,
       };
-  }
-  function applyTaggedStatusesFromSkill(targets, caster, tagSet, payload, turns) {
-      const defaultStatusRules = [
-          { tag: 'silence', statusId: 'silence' },
-          { tag: 'sleep', statusId: 'sleep' },
-          { tag: 'mark', statusId: 'mark' },
-      ];
-      for (const rule of defaultStatusRules) {
-          if (!tagSet.has(rule.tag))
-              continue;
-          for (const target of targets) {
-              Statuses.add(target, {
-                  id: rule.statusId,
-                  kind: 'debuff',
-                  tag: rule.statusId,
-                  dur: Math.max(1, turns),
-                  tick: 'turn',
-                  sourceUnitId: caster.id,
-              });
-          }
-      }
-      if (tagSet.has('control')) {
-          const statusId = typeof payload.controlStatus === 'string' ? payload.controlStatus : 'control';
-          for (const target of targets) {
-              Statuses.add(target, {
-                  id: statusId,
-                  kind: 'debuff',
-                  tag: statusId,
-                  dur: Math.max(1, turns),
-                  tick: 'turn',
-                  sourceUnitId: caster.id,
-              });
-          }
-      }
-  }
-  function listAliveBySide(game, side) {
-      const alive = [];
-      for (const token of game.tokens) {
-          if (token.alive && token.side === side)
-              alive.push(token);
-      }
-      return alive;
   }
   function canApplyUniqueGlobal(game, caster, summonId) {
       for (const token of game.tokens) {
@@ -5734,19 +5687,11 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   }
   function performActiveSkill(game, caster, skillKey) {
       if (!caster.alive) {
-          return {
-              ok: false,
-              skillKey,
-              skill: null,
-              tags: [],
-              appliedTags: [],
-              targetCount: 0,
-              reason: 'blocked',
-          };
+          return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'blocked');
       }
       const skill = resolveActiveSkill(caster, skillKey);
       if (!skill) {
-          return { ok: false, skillKey, skill: null, tags: [], appliedTags: [], targetCount: 0, reason: 'missing-skill' };
+          return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
       }
       const tags = normalizeTagList(skill.tags ?? []);
       const tagSet = new Set(tags);
@@ -5756,15 +5701,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
       const usesTagAetherCost = skillCost > 0 && hasTag('aether-cost');
       if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
-          return {
-              ok: false,
-              skillKey,
-              skill,
-              tags,
-              appliedTags: [],
-              targetCount: 0,
-              reason: 'insufficient-aether',
-          };
+          return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'insufficient-aether');
       }
       let consumedAether = skillCost <= 0;
       const dispatch = dispatchGameplayTags(tags, {
@@ -5788,28 +5725,11 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           onSummon: () => undefined,
       });
       if (usesTagAetherCost && !consumedAether) {
-          return {
-              ok: false,
-              skillKey,
-              skill,
-              tags,
-              appliedTags: dispatch.applied,
-              targetCount: dispatch.targets.length,
-              reason: 'insufficient-aether',
-          };
+          return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, dispatch.targets.length, 'insufficient-aether');
       }
       const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
-      const turns = toPositiveTurns(payload.turns ?? payload.duration, 1);
       if (!applyHpCost(caster, payload)) {
-          return {
-              ok: false,
-              skillKey,
-              skill,
-              tags,
-              appliedTags: dispatch.applied,
-              targetCount: 0,
-              reason: 'blocked',
-          };
+          return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
       const runtimeSkillResult = runRuntimeActiveSkill({
           game,
@@ -5821,12 +5741,12 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       });
       if (runtimeSkillResult)
           return runtimeSkillResult;
+      const { enemyTokens } = partitionTokensBySide(game.tokens, caster.side);
       if (caster.id === 'blood_avatar') {
-          const enemySide = caster.side === 'ally' ? 'enemy' : 'ally';
-          const enemies = listAliveBySide(game, enemySide);
+          const enemies = enemyTokens;
           if (skillKey === 'skill1') {
               if (!usesTagAetherCost && !consumeSideAether(caster.side, 25)) {
-                  return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length, reason: 'insufficient-aether' };
+                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, enemies.length, 'insufficient-aether');
               }
               const base = Math.max(1, toRoundedInt(((caster.atk ?? 0) + (caster.wil ?? 0)) * 1.4, 1));
               const picked = enemies.slice(0, 6);
@@ -5835,12 +5755,12 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
                   Statuses.add(target, { id: 'bleed', kind: 'debuff', tag: 'bleed', dur: 2, tick: 'turn', sourceUnitId: caster.id });
                   Statuses.add(target, { id: 'huyet_an', kind: 'mark', tag: 'mark', stacks: 1, maxStacks: 5, purgeable: false, sourceUnitId: caster.id });
               }
-              return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: picked.length };
+              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, picked.length);
           }
           if (skillKey === 'skill2') {
               const casterState = caster;
               if (casterState._bloodFieldUsed) {
-                  return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0, reason: 'blocked' };
+                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
               }
               casterState._bloodFieldUsed = true;
               Statuses.add(caster, { id: 'blood_field_active', kind: 'field', tag: 'field', dur: 2, tick: 'turn', sourceUnitId: caster.id });
@@ -5854,16 +5774,16 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
                       Statuses.add(token, { id: 'heal_efficiency_down', kind: 'debuff', tag: 'field', dur: 2, tick: 'turn', amount: 0.25, sourceUnitId: caster.id });
                   }
               }
-              return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: enemies.length };
+              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, enemies.length);
           }
           if (skillKey === 'skill3') {
               if (!usesTagAetherCost && !consumeSideAether(caster.side, 25)) {
-                  return { ok: false, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0, reason: 'insufficient-aether' };
+                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'insufficient-aether');
               }
               const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
               caster.hp = Math.max(1, toFloorInt((caster.hp ?? 0) - hpCost, 1));
               globalAetherPool.gain(caster.side, 15);
-              return { ok: true, skillKey, skill, tags, appliedTags: dispatch.applied, targetCount: 0 };
+              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
           }
       }
       if (hasTag('summon')) {
@@ -5872,15 +5792,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               const summon = (payload.summon ?? skill.summon ?? {});
               const summonId = typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`;
               if (hasTag('unique-global') && !canApplyUniqueGlobal(game, caster, summonId)) {
-                  return {
-                      ok: false,
-                      skillKey,
-                      skill,
-                      tags,
-                      appliedTags: dispatch.applied,
-                      targetCount: 0,
-                      reason: 'blocked',
-                  };
+                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
               }
               enqueueImmediate(game, {
                   side: caster.side,
@@ -5895,23 +5807,21 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               });
           }
       }
-      if (hasTag('heal')) {
-          const amount = Math.max(0, toRoundedInt(payload.healAmount ?? payload.heal, 0));
-          for (const target of targets)
-              healUnit(target, amount);
+      const effectTags = tags.filter((tag) => EFFECT_APPLICATION_TAGS.has(tag));
+      if (effectTags.length > 0) {
+          dispatchGameplayTags(effectTags, {
+              game,
+              attacker: caster,
+              target: targets[0] ?? null,
+              targets,
+              side: caster.side,
+              payload,
+              deferEffects: false,
+              tagsNormalized: true,
+              onAetherCost: () => false,
+              onSummon: () => undefined,
+          });
       }
-      if (hasTag('team-heal')) {
-          const amount = Math.max(0, toRoundedInt(payload.healAmount ?? payload.heal, 0));
-          const allies = listAliveBySide(game, caster.side);
-          for (const ally of allies)
-              healUnit(ally, amount);
-      }
-      if (hasTag('shield')) {
-          const amount = Math.max(0, toRoundedInt(payload.shieldAmount ?? payload.shield, 0));
-          for (const target of targets)
-              grantShield(target, amount);
-      }
-      applyTaggedStatusesFromSkill(targets, caster, tagSet, payload, turns);
       if (hasDamageTag || skill.damage) {
           const multiplier = Math.max(0, toFiniteNumber(skill.damage?.multiplier ?? skill.damageMultiplier ?? 1, 1));
           const base = Math.max(1, toRoundedInt(((caster.atk ?? 0) + (caster.wil ?? 0)) * multiplier, 1));
@@ -5921,17 +5831,37 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill });
           }
       }
-      return {
-          ok: true,
-          skillKey,
-          skill,
-          tags,
-          appliedTags: dispatch.applied,
-          targetCount: dispatch.targets.length,
-      };
+      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, dispatch.targets.length);
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'performActiveSkill')) exports.performActiveSkill = performActiveSkill;
+};
+__modules['./combat/status-utils.ts'] = (exports, module, __require) => {
+  function ensureStatusList(unit) {
+      if (!unit)
+          return [];
+      if (!Array.isArray(unit.statuses)) {
+          unit.statuses = [];
+      }
+      return unit.statuses;
+  }
+  function getStatusEntryById(target, statusId, statuses) {
+      if (!target || !statusId)
+          return null;
+      const list = statuses ?? (Array.isArray(target.statuses) ? target.statuses : null);
+      if (!list || list.length === 0)
+          return null;
+      for (let i = 0; i < list.length; i += 1) {
+          const status = list[i];
+          if (status?.id !== statusId)
+              continue;
+          return { statuses: list, index: i, status };
+      }
+      return null;
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStatusList')) exports.ensureStatusList = ensureStatusList;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getStatusEntryById')) exports.getStatusEntryById = getStatusEntryById;
 };
 __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/apply-damage.ts');
@@ -5950,6 +5880,11 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const healUnit = __dep4.healUnit;
   const __dep5 = __require('./utils/rng.ts');
   const nextRngValue = __dep5.nextRngValue;
+  const __dep6 = __require('./combat/status-utils.ts');
+  const ensureStatusList = __dep6.ensureStatusList;
+  const getStatusEntryById = __dep6.getStatusEntryById;
+  const __dep7 = __require('./combat/token-side-utils.ts');
+  const partitionTokensBySide = __dep7.partitionTokensBySide;
   const resolveTargets = (targets, target) => {
       if (Array.isArray(targets) && targets.length > 0) {
           return targets.filter((token) => Boolean(token?.alive));
@@ -5960,27 +5895,6 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   };
   const EMPTY_TOKENS = [];
   const resolveRandom = (ctx) => (ctx.game?.rng ? () => nextRngValue(ctx.game?.rng) : Math.random);
-  function splitAliveTokensBySide(tokens, attacker) {
-      if (!attacker) {
-          return {
-              allyTokens: EMPTY_TOKENS,
-              enemyTokens: EMPTY_TOKENS,
-          };
-      }
-      const allyTokens = [];
-      const enemyTokens = [];
-      for (const token of tokens) {
-          if (!token?.alive)
-              continue;
-          if (token.side === attacker.side)
-              allyTokens.push(token);
-          else
-              enemyTokens.push(token);
-      }
-      allyTokens.sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx));
-      enemyTokens.sort((a, b) => (a.cy - b.cy) || (a.cx - b.cx));
-      return { allyTokens, enemyTokens };
-  }
   const sampleTargets = (tokens, limit, randomFn) => {
       if (limit <= 0 || tokens.length === 0)
           return [];
@@ -5988,7 +5902,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           return [...tokens];
       const pool = [...tokens];
       for (let i = 0; i < limit; i += 1) {
-          const swapIndex = i + randomFn(Math.random() * (pool.length - i));
+          const swapIndex = i + Math.floor(randomFn() * (pool.length - i));
           [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
       }
       return pool.slice(0, limit);
@@ -6059,15 +5973,9 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       const nonPurgeableByTag = result.tags.includes('sleep-setup');
       const purgeable = typeof payload.markPurgeable === 'boolean' ? payload.markPurgeable : !nonPurgeableByTag;
       for (const target of result.targets) {
-          const statuses = Array.isArray(target.statuses) ? target.statuses : (target.statuses = []);
-          let index = -1;
-          for (let i = 0; i < statuses.length; i += 1) {
-              if (statuses[i]?.id === statusId) {
-                  index = i;
-                  break;
-              }
-          }
-          if (index < 0) {
+          const statuses = ensureStatusList(target);
+          const existingEntry = getStatusEntryById(target, statusId, statuses);
+          if (!existingEntry) {
               Statuses.add(target, {
                   id: statusId,
                   kind: 'mark',
@@ -6079,7 +5987,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
               });
               continue;
           }
-          const status = statuses[index];
+          const status = existingEntry.status;
           const currentStacks = Math.max(0, toRoundedInt(status?.stacks ?? 0, 0));
           const nextStacks = Math.min(maxStacks, currentStacks + stacksPerApply);
           status.stacks = nextStacks;
@@ -6091,7 +5999,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
               addStatus(target, 'sleep', Math.max(1, sleepTurnsOnCap || 1), ctx.attacker?.id);
               result.sideEffects.push(`sleep:${Math.max(1, sleepTurnsOnCap || 1)}`);
           }
-          statuses.splice(index, 1);
+          statuses.splice(existingEntry.index, 1);
           result.sideEffects.push(`mark-cap:${statusId}`);
       }
   }
@@ -6234,8 +6142,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           : normalizeTagList(rawTags);
       const target = context.target ?? null;
       const attacker = context.attacker ?? null;
-      const { allyTokens, enemyTokens } = context.game
-          ? splitAliveTokensBySide(context.game.tokens, attacker)
+      const { allyTokens, enemyTokens } = context.game && attacker
+          ? partitionTokensBySide(context.game.tokens, attacker.side, { sortByBoardPosition: true })
           : { allyTokens: EMPTY_TOKENS, enemyTokens: EMPTY_TOKENS };
       const ctx = {
           game: context.game ?? null,
@@ -6268,6 +6176,45 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'dispatchGameplayTags')) exports.dispatchGameplayTags = dispatchGameplayTags;
+};
+__modules['./combat/token-side-utils.ts'] = (exports, module, __require) => {
+  const BOARD_POSITION_SORT = (a, b) => (a.cy - b.cy) || (a.cx - b.cx);
+  function shouldIncludeToken(token, options) {
+      if (options.includeDead === true)
+          return true;
+      return !!token?.alive;
+  }
+  function sortBucketsByBoardPosition(buckets) {
+      buckets.ally.sort(BOARD_POSITION_SORT);
+      buckets.enemy.sort(BOARD_POSITION_SORT);
+  }
+  function bucketTokensByActualSide(tokens, options = {}) {
+      const buckets = {
+          ally: [],
+          enemy: [],
+      };
+      for (const token of tokens) {
+          if (!shouldIncludeToken(token, options))
+              continue;
+          if (token.side === 'ally')
+              buckets.ally.push(token);
+          else
+              buckets.enemy.push(token);
+      }
+      if (options.sortByBoardPosition) {
+          sortBucketsByBoardPosition(buckets);
+      }
+      return buckets;
+  }
+  function partitionTokensBySide(tokens, perspectiveSide, options = {}) {
+      const buckets = bucketTokensByActualSide(tokens, options);
+      const allyTokens = perspectiveSide === 'ally' ? buckets.ally : buckets.enemy;
+      const enemyTokens = perspectiveSide === 'ally' ? buckets.enemy : buckets.ally;
+      return { allyTokens, enemyTokens };
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'bucketTokensByActualSide')) exports.bucketTokensByActualSide = bucketTokensByActualSide;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'partitionTokensBySide')) exports.partitionTokensBySide = partitionTokensBySide;
 };
 __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
@@ -14458,7 +14405,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           target: pickTarget(game, unit),
           cost: resolveUltCost(unit, CFG),
           side: unit.side,
-          turn: game.turn?.cycle ?? null,
           payload: u,
       });
       const allTokens = game.tokens || [];

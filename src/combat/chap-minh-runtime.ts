@@ -7,6 +7,7 @@ import {
 } from '../data/tags.ts';
 import { applyDamage, grantShield } from './apply-damage.ts';
 import { toFiniteNumber, toFloorInt } from './number-utils.ts';
+import { bucketTokensByActualSide, partitionTokensBySide } from './token-side-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -68,8 +69,8 @@ export function applyChapMinhActionEnd(game: SessionState | null | undefined, ca
   const shieldAmount = Math.max(0, Math.floor((caster.hpMax ?? 0) * 0.15));
   if (shieldAmount <= 0) return;
 
-  for (const token of game.tokens) {
-    if (!token.alive || token.side !== caster.side) continue;
+  const { allyTokens } = partitionTokensBySide(game.tokens, caster.side);
+  for (const token of allyTokens) {
     const { column: tokenColumn } = resolveSlotAndColumn(token);
     if (tokenColumn !== column) continue;
     grantShield(token, shieldAmount, { durationTurns: 1 });
@@ -122,11 +123,14 @@ export function refreshChapMinhOwnership(game: SessionState | null | undefined):
   for (const token of game.tokens) {
     delete (token as UnitToken & { _chapMinhLinkOwner?: UnitToken })._chapMinhLinkOwner;
   }
+
+  const groupedAliveBySide = bucketTokensByActualSide(game.tokens);
+
   for (const owner of game.tokens) {
     if (!isAliveChapMinh(owner) || !Array.isArray(owner._chapMinhLinkedSlots)) continue;
     const { column: ownerColumn } = resolveSlotAndColumn(owner);
-    for (const token of game.tokens) {
-      if (!token.alive || token.side !== owner.side) continue;
+    const sideTokens = owner.side === 'ally' ? groupedAliveBySide.ally : groupedAliveBySide.enemy;
+    for (const token of sideTokens) {
       const { slot: tokenSlot, column: tokenColumn } = resolveSlotAndColumn(token);
       const inLink = owner._chapMinhLinkedSlots.includes(tokenSlot);
       const inColumn = tokenColumn === ownerColumn;
