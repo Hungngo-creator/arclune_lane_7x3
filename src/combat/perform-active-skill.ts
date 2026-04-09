@@ -8,7 +8,7 @@ import { globalAetherPool } from '../aether.ts';
 import { Statuses } from '../statuses.ts';
 import { runRuntimeActiveSkill } from './unit-runtime-hooks.ts';
 import { resolveSkillPayload } from './skill-metadata-utils.ts';
-import { toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
+import { readAtkWilPower, toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
 
@@ -217,7 +217,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     appliedTags: dispatch.applied,
   });
   if (runtimeSkillResult) return runtimeSkillResult;
-  const casterPower = (caster.atk ?? 0) + (caster.wil ?? 0);
+  const casterPower = readAtkWilPower(caster);
 
   if (caster.id === BLOOD_AVATAR_ID) {
     const enemies = partitionTokensBySide(game.tokens, caster.side).enemyTokens;

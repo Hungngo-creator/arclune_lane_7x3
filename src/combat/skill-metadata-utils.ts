@@ -1,13 +1,8 @@
-import { toFiniteNumber } from './number-utils.ts';
+import { asRecord, toFiniteNumber } from './number-utils.ts';
 
 import type { SkillSection } from '@shared-types/config';
 
 type SkillRecord = Record<string, unknown>;
-
-function asRecord(value: unknown): SkillRecord | null {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
-  return value as SkillRecord;
-}
 
 function collectSkillRecords(skill: SkillSection): SkillRecord[] {
   const root = skill as SkillRecord;

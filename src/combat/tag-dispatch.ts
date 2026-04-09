@@ -5,7 +5,7 @@ import { normalizeTagList } from '../data/tags.ts';
 import { dealAbilityDamage, healUnit } from '../combat.ts';
 import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
-import { partitionTokensBySide } from './token-side-utils.ts';
+import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
 import { slotIndex } from '../engine.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -97,35 +97,6 @@ const resolveTargets = (targets: UnitToken[] | undefined, target: UnitToken | nu
 
 const EMPTY_TOKENS: UnitToken[] = [];
 
-const resolveRandomValue = (ctx: Pick<NormalizedContext, 'game'>): number => (
-  ctx.game?.rng ? nextRngValue(ctx.game.rng) : Math.random()
-);
-
-const sampleTargets = (
-  ctx: Pick<NormalizedContext, 'game'>,
-  tokens: ReadonlyArray<UnitToken>,
-  limit: number,
-  allowDuplicates: boolean,
-): UnitToken[] => {
-  if (limit <= 0 || tokens.length === 0) return [];
-  if (allowDuplicates) {
-    const sampled: UnitToken[] = [];
-    for (let i = 0; i < limit; i += 1) {
-      const picked = tokens[Math.floor(resolveRandomValue(ctx) * tokens.length)];
-      if (picked) sampled.push(picked);
-    }
-    return sampled;
-  }
-  if (tokens.length <= limit) return [...tokens];
-
-  const pool = [...tokens];
-  for (let i = 0; i < limit; i += 1) {
-    const swapIndex = i + Math.floor(resolveRandomValue(ctx) * (pool.length - i));
-    [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
-  }
-  return pool.slice(0, limit);
-};
-
 const readTargetLimit = (ctx: Pick<NormalizedContext, 'payload'>, fallback: number): number => (
   Math.max(1, toRoundedInt(ctx.payload?.targetCount ?? ctx.payload?.targets, fallback))
 );
@@ -136,7 +107,10 @@ const readAllowDuplicateTargets = (ctx: Pick<NormalizedContext, 'payload'>): boo
 );
 
 const sampleFromCandidates = (ctx: Pick<NormalizedContext, 'payload' | 'game'>, candidates: ReadonlyArray<UnitToken>, limit: number): UnitToken[] => {
-  return sampleTargets(ctx, candidates, limit, readAllowDuplicateTargets(ctx));
+  return sampleTokens(candidates, limit, {
+    allowDuplicates: readAllowDuplicateTargets(ctx),
+    randomValue: () => (ctx.game?.rng ? nextRngValue(ctx.game.rng) : Math.random()),
+  });
 };
 
 type TargetPriority = 'board' | 'leader-first' | 'lowest-hp' | 'highest-hp' | 'lowest-hp-ratio' | 'highest-hp-ratio';

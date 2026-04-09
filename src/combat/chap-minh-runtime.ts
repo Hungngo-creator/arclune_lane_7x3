@@ -1,4 +1,5 @@
 import { slotIndex } from '../engine.ts';
+import { gainFury } from '../utils/fury.ts';
 import {
   AOE_TARGET_TAG_IDS,
   RULE_BYPASS_TAG_IDS,
@@ -15,6 +16,8 @@ import type { UnitToken } from '@shared-types/units';
 const CHAP_MINH_ID = 'huyen_vu_chap_minh';
 const CHAP_MINH_LINK_REDUCTION = 0.30;
 const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
+const CHAP_MINH_ACTION_END_FURY_GAIN = 2;
+const CHAP_MINH_BACKLASH_SELF_REDUCTION = 0.3;
 type ChapMinhStateCarrier = UnitToken & {
   _chapMinhLinkedSlots?: number[];
   _chapMinhLinkedSlotLookup?: Record<number, true>;
@@ -40,6 +43,23 @@ const resolveSlotAndColumn = (token: Pick<UnitToken, 'side' | 'cx' | 'cy'>): { s
   };
 };
 
+function hasLookupEntries(lookup: Record<number, true> | null | undefined): boolean {
+  if (!lookup) return false;
+  for (const _slot in lookup) {
+    return true;
+  }
+  return false;
+}
+
+function buildLinkedLookup(slots: ReadonlyArray<number> | null | undefined): Record<number, true> {
+  const lookup: Record<number, true> = {};
+  if (!Array.isArray(slots)) return lookup;
+  for (const linkedSlot of slots) {
+    lookup[linkedSlot] = true;
+  }
+  return lookup;
+}
+
 const resolveCrossSlots = (centerSlot: number): number[] => {
   const row = Math.floor((centerSlot - 1) / 3);
   const col = (centerSlot - 1) % 3;
@@ -62,16 +82,13 @@ export function activateChapMinhLink(caster: UnitToken): void {
   const { slot } = resolveSlotAndColumn(caster);
   const linkedSlots = resolveCrossSlots(slot);
   caster._chapMinhLinkedSlots = linkedSlots;
-  const lookup: Record<number, true> = {};
-  for (const linkedSlot of linkedSlots) {
-    lookup[linkedSlot] = true;
-  }
-  caster._chapMinhLinkedSlotLookup = lookup;
+  caster._chapMinhLinkedSlotLookup = buildLinkedLookup(linkedSlots);
   caster._chapMinhAccumulated = Math.max(0, toFiniteNumber(caster._chapMinhAccumulated, 0));
 }
 
 export function applyChapMinhActionEnd(game: SessionState | null | undefined, caster: UnitToken | null | undefined): void {
   if (!game || !isAliveChapMinh(caster)) return;
+  gainFury(caster, { amount: CHAP_MINH_ACTION_END_FURY_GAIN, type: 'generic' });
   const { column } = resolveSlotAndColumn(caster);
   const shieldAmount = Math.max(0, Math.floor((caster.hpMax ?? 0) * 0.15));
   if (shieldAmount <= 0) return;
@@ -134,12 +151,8 @@ export function refreshChapMinhOwnership(game: SessionState | null | undefined):
     if (!isAliveChapMinh(token)) continue;
     if (!Array.isArray(token._chapMinhLinkedSlots) || token._chapMinhLinkedSlots.length === 0) continue;
     const linkedLookup = token._chapMinhLinkedSlotLookup as Record<number, true> | undefined;
-    if (!linkedLookup || Object.keys(linkedLookup).length === 0) {
-      const lookup: Record<number, true> = {};
-      for (const linkedSlot of token._chapMinhLinkedSlots) {
-        lookup[linkedSlot] = true;
-      }
-      token._chapMinhLinkedSlotLookup = lookup;
+    if (!hasLookupEntries(linkedLookup)) {
+      token._chapMinhLinkedSlotLookup = buildLinkedLookup(token._chapMinhLinkedSlots);
     }
     hasAliveOwner = true;
   }
@@ -155,12 +168,13 @@ export function refreshChapMinhOwnership(game: SessionState | null | undefined):
 
   for (const owner of game.tokens) {
     const linkedLookup = (owner as ChapMinhStateCarrier)._chapMinhLinkedSlotLookup as Record<number, true> | undefined;
-    if (!isAliveChapMinh(owner) || !linkedLookup || Object.keys(linkedLookup).length === 0) continue;
+    if (!isAliveChapMinh(owner) || !hasLookupEntries(linkedLookup)) continue;
+    const safeLookup = linkedLookup as Record<number, true>;
     const { column: ownerColumn } = resolveSlotAndColumn(owner);
     const sideTokens = owner.side === 'ally' ? groupedAliveBySide.ally : groupedAliveBySide.enemy;
     for (const token of sideTokens) {
       const { slot: tokenSlot, column: tokenColumn } = resolveSlotAndColumn(token);
-      const inLink = linkedLookup[tokenSlot] === true;
+      const inLink = safeLookup[tokenSlot] === true;
       const inColumn = tokenColumn === ownerColumn;
       if (!inLink && !inColumn) continue;
       (token as UnitToken & { _chapMinhLinkOwner?: UnitToken })._chapMinhLinkOwner = owner;
@@ -193,12 +207,11 @@ export function applyChapMinhBacklash(owner: UnitToken | null | undefined): void
   const threshold = Math.max(1, Math.floor((owner.hpMax ?? 0) * 0.7));
   if (accumulated <= threshold) return;
 
-  const initial = accumulated * 0.7;
-  const postSelfReduction = initial * 0.7;
+  const backlashBase = Math.max(1, Math.floor(accumulated * (1 - CHAP_MINH_BACKLASH_SELF_REDUCTION)));
   const arm = Math.max(0, toFiniteNumber(owner.arm, 0));
   const res = Math.max(0, toFiniteNumber(owner.res, 0));
   const defenseMultiplier = 0.5 * (100 / (100 + arm)) + 0.5 * (100 / (100 + res));
-  const finalDamage = Math.max(1, Math.floor(postSelfReduction * defenseMultiplier));
+  const finalDamage = Math.max(1, Math.floor(backlashBase * defenseMultiplier));
   applyDamage(owner, finalDamage);
   owner._chapMinhAccumulated = 0;
 }

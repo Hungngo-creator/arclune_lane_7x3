@@ -1,4 +1,5 @@
 import { normalizeClassName, normalizeElementKey, type ElementKey } from '../utils/domain-normalization.ts';
+import { asRecord } from './number-utils.ts';
 
 const ELEMENT_CYCLE = ['fire', 'metal', 'wood', 'earth', 'lightning', 'blood', 'water'] as const;
 const ELEMENT_BONUS = 0.1;
@@ -14,11 +15,6 @@ const CLASS_BONUS_MAP: Readonly<Record<string, BonusMap>> = {
   Ranger: { Mage: 0.1, Support: 0.05 },
   Summoner: { Ranger: 0.1, Warrior: 0.05 },
   Support: { Summoner: 0.1, Mage: 0.05 },
-};
-
-const asRecord = (value: unknown): Record<string, unknown> | null => {
-  if (!value || typeof value !== 'object') return null;
-  return value as Record<string, unknown>;
 };
 
 const readRecordElement = (record: Record<string, unknown> | null): ElementKey | null => {

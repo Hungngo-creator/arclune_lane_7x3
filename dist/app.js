@@ -5194,23 +5194,27 @@ __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) =
 __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./engine.ts');
   const slotIndex = __dep0.slotIndex;
-  const __dep1 = __require('./data/tags.ts');
-  const AOE_TARGET_TAG_IDS = __dep1.AOE_TARGET_TAG_IDS;
-  const RULE_BYPASS_TAG_IDS = __dep1.RULE_BYPASS_TAG_IDS;
-  const hasAnyTag = __dep1.hasAnyTag;
-  const normalizeTagList = __dep1.normalizeTagList;
-  const __dep2 = __require('./combat/apply-damage.ts');
-  const applyDamage = __dep2.applyDamage;
-  const grantShield = __dep2.grantShield;
-  const __dep3 = __require('./combat/number-utils.ts');
-  const toFiniteNumber = __dep3.toFiniteNumber;
-  const toFloorInt = __dep3.toFloorInt;
-  const __dep4 = __require('./combat/token-side-utils.ts');
-  const bucketTokensByActualSide = __dep4.bucketTokensByActualSide;
-  const forEachPartitionToken = __dep4.forEachPartitionToken;
+  const __dep1 = __require('./utils/fury.ts');
+  const gainFury = __dep1.gainFury;
+  const __dep2 = __require('./data/tags.ts');
+  const AOE_TARGET_TAG_IDS = __dep2.AOE_TARGET_TAG_IDS;
+  const RULE_BYPASS_TAG_IDS = __dep2.RULE_BYPASS_TAG_IDS;
+  const hasAnyTag = __dep2.hasAnyTag;
+  const normalizeTagList = __dep2.normalizeTagList;
+  const __dep3 = __require('./combat/apply-damage.ts');
+  const applyDamage = __dep3.applyDamage;
+  const grantShield = __dep3.grantShield;
+  const __dep4 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep4.toFiniteNumber;
+  const toFloorInt = __dep4.toFloorInt;
+  const __dep5 = __require('./combat/token-side-utils.ts');
+  const bucketTokensByActualSide = __dep5.bucketTokensByActualSide;
+  const forEachPartitionToken = __dep5.forEachPartitionToken;
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const CHAP_MINH_LINK_REDUCTION = 0.30;
   const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
+  const CHAP_MINH_ACTION_END_FURY_GAIN = 2;
+  const CHAP_MINH_BACKLASH_SELF_REDUCTION = 0.3;
   const isAliveChapMinh = (token) => (!!token && token.alive && token.id === CHAP_MINH_ID);
   const isChapMinh = (token) => (!!token && token.id === CHAP_MINH_ID);
   const resolveSlotAndColumn = (token) => {
@@ -5220,6 +5224,23 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
           column: ((slot - 1) % 3) + 1,
       };
   };
+  function hasLookupEntries(lookup) {
+      if (!lookup)
+          return false;
+      for (const _slot in lookup) {
+          return true;
+      }
+      return false;
+  }
+  function buildLinkedLookup(slots) {
+      const lookup = {};
+      if (!Array.isArray(slots))
+          return lookup;
+      for (const linkedSlot of slots) {
+          lookup[linkedSlot] = true;
+      }
+      return lookup;
+  }
   const resolveCrossSlots = (centerSlot) => {
       const row = Math.floor((centerSlot - 1) / 3);
       const col = (centerSlot - 1) % 3;
@@ -5243,16 +5264,13 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       const { slot } = resolveSlotAndColumn(caster);
       const linkedSlots = resolveCrossSlots(slot);
       caster._chapMinhLinkedSlots = linkedSlots;
-      const lookup = {};
-      for (const linkedSlot of linkedSlots) {
-          lookup[linkedSlot] = true;
-      }
-      caster._chapMinhLinkedSlotLookup = lookup;
+      caster._chapMinhLinkedSlotLookup = buildLinkedLookup(linkedSlots);
       caster._chapMinhAccumulated = Math.max(0, toFiniteNumber(caster._chapMinhAccumulated, 0));
   }
   function applyChapMinhActionEnd(game, caster) {
       if (!game || !isAliveChapMinh(caster))
           return;
+      gainFury(caster, { amount: CHAP_MINH_ACTION_END_FURY_GAIN, type: 'generic' });
       const { column } = resolveSlotAndColumn(caster);
       const shieldAmount = Math.max(0, Math.floor((caster.hpMax ?? 0) * 0.15));
       if (shieldAmount <= 0)
@@ -5310,12 +5328,8 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
           if (!Array.isArray(token._chapMinhLinkedSlots) || token._chapMinhLinkedSlots.length === 0)
               continue;
           const linkedLookup = token._chapMinhLinkedSlotLookup;
-          if (!linkedLookup || Object.keys(linkedLookup).length === 0) {
-              const lookup = {};
-              for (const linkedSlot of token._chapMinhLinkedSlots) {
-                  lookup[linkedSlot] = true;
-              }
-              token._chapMinhLinkedSlotLookup = lookup;
+          if (!hasLookupEntries(linkedLookup)) {
+              token._chapMinhLinkedSlotLookup = buildLinkedLookup(token._chapMinhLinkedSlots);
           }
           hasAliveOwner = true;
       }
@@ -5329,13 +5343,14 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       const groupedAliveBySide = bucketTokensByActualSide(game.tokens);
       for (const owner of game.tokens) {
           const linkedLookup = owner._chapMinhLinkedSlotLookup;
-          if (!isAliveChapMinh(owner) || !linkedLookup || Object.keys(linkedLookup).length === 0)
+          if (!isAliveChapMinh(owner) || !hasLookupEntries(linkedLookup))
               continue;
+          const safeLookup = linkedLookup;
           const { column: ownerColumn } = resolveSlotAndColumn(owner);
           const sideTokens = owner.side === 'ally' ? groupedAliveBySide.ally : groupedAliveBySide.enemy;
           for (const token of sideTokens) {
               const { slot: tokenSlot, column: tokenColumn } = resolveSlotAndColumn(token);
-              const inLink = linkedLookup[tokenSlot] === true;
+              const inLink = safeLookup[tokenSlot] === true;
               const inColumn = tokenColumn === ownerColumn;
               if (!inLink && !inColumn)
                   continue;
@@ -5366,12 +5381,11 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       const threshold = Math.max(1, Math.floor((owner.hpMax ?? 0) * 0.7));
       if (accumulated <= threshold)
           return;
-      const initial = accumulated * 0.7;
-      const postSelfReduction = initial * 0.7;
+      const backlashBase = Math.max(1, Math.floor(accumulated * (1 - CHAP_MINH_BACKLASH_SELF_REDUCTION)));
       const arm = Math.max(0, toFiniteNumber(owner.arm, 0));
       const res = Math.max(0, toFiniteNumber(owner.res, 0));
       const defenseMultiplier = 0.5 * (100 / (100 + arm)) + 0.5 * (100 / (100 + res));
-      const finalDamage = Math.max(1, Math.floor(postSelfReduction * defenseMultiplier));
+      const finalDamage = Math.max(1, Math.floor(backlashBase * defenseMultiplier));
       applyDamage(owner, finalDamage);
       owner._chapMinhAccumulated = 0;
   }
@@ -5425,6 +5439,8 @@ __modules['./combat/counter-matrix.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./utils/domain-normalization.ts');
   const normalizeClassName = __dep0.normalizeClassName;
   const normalizeElementKey = __dep0.normalizeElementKey;
+  const __dep1 = __require('./combat/number-utils.ts');
+  const asRecord = __dep1.asRecord;
   const ELEMENT_CYCLE = ['fire', 'metal', 'wood', 'earth', 'lightning', 'blood', 'water'];
   const ELEMENT_BONUS = 0.1;
   const SYNERGY_BONUS = 0.05;
@@ -5436,11 +5452,6 @@ __modules['./combat/counter-matrix.ts'] = (exports, module, __require) => {
       Ranger: { Mage: 0.1, Support: 0.05 },
       Summoner: { Ranger: 0.1, Warrior: 0.05 },
       Support: { Summoner: 0.1, Mage: 0.05 },
-  };
-  const asRecord = (value) => {
-      if (!value || typeof value !== 'object')
-          return null;
-      return value;
   };
   const readRecordElement = (record) => {
       if (!record)
@@ -5616,6 +5627,16 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
           return Math.max(1, Math.round(fallback));
       return Math.max(1, Math.round(direct));
   }
+  function readAtkWilPower(unit) {
+      if (!unit)
+          return 0;
+      return Math.max(0, toFiniteNumber(unit.atk, 0) + toFiniteNumber(unit.wil, 0));
+  }
+  function asRecord(value) {
+      if (!value || typeof value !== 'object' || Array.isArray(value))
+          return null;
+      return value;
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'toFiniteNumber')) exports.toFiniteNumber = toFiniteNumber;
   if (!Object.prototype.hasOwnProperty.call(exports, 'clampMin')) exports.clampMin = clampMin;
@@ -5623,6 +5644,8 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'toRoundedInt')) exports.toRoundedInt = toRoundedInt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'toNonNegativeFloorInt')) exports.toNonNegativeFloorInt = toNonNegativeFloorInt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'toPositiveTurns')) exports.toPositiveTurns = toPositiveTurns;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'readAtkWilPower')) exports.readAtkWilPower = readAtkWilPower;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'asRecord')) exports.asRecord = asRecord;
 };
 __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
@@ -5649,6 +5672,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const __dep9 = __require('./combat/skill-metadata-utils.ts');
   const resolveSkillPayload = __dep9.resolveSkillPayload;
   const __dep10 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep10.readAtkWilPower;
   const toFiniteNumber = __dep10.toFiniteNumber;
   const toFloorInt = __dep10.toFloorInt;
   const toPositiveTurns = __dep10.toPositiveTurns;
@@ -5824,7 +5848,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       });
       if (runtimeSkillResult)
           return runtimeSkillResult;
-      const casterPower = (caster.atk ?? 0) + (caster.wil ?? 0);
+      const casterPower = readAtkWilPower(caster);
       if (caster.id === BLOOD_AVATAR_ID) {
           const enemies = partitionTokensBySide(game.tokens, caster.side).enemyTokens;
           const consumeBloodAether = () => (usesTagAetherCost || consumeSideAether(caster.side, BLOOD_AVATAR_SKILL_COST));
@@ -5929,12 +5953,8 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
 };
 __modules['./combat/skill-metadata-utils.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/number-utils.ts');
+  const asRecord = __dep0.asRecord;
   const toFiniteNumber = __dep0.toFiniteNumber;
-  function asRecord(value) {
-      if (!value || typeof value !== 'object' || Array.isArray(value))
-          return null;
-      return value;
-  }
   function collectSkillRecords(skill) {
       const root = skill;
       const metadata = asRecord(root.metadata);
@@ -6066,6 +6086,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const getStatusEntryById = __dep6.getStatusEntryById;
   const __dep7 = __require('./combat/token-side-utils.ts');
   const partitionTokensBySide = __dep7.partitionTokensBySide;
+  const sampleTokens = __dep7.sampleTokens;
   const __dep8 = __require('./engine.ts');
   const slotIndex = __dep8.slotIndex;
   const RULE_TARGET_OVERRIDE_TAGS = new Set(['global-rule']);
@@ -6112,33 +6133,14 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       return [];
   };
   const EMPTY_TOKENS = [];
-  const resolveRandomValue = (ctx) => (ctx.game?.rng ? nextRngValue(ctx.game.rng) : Math.random());
-  const sampleTargets = (ctx, tokens, limit, allowDuplicates) => {
-      if (limit <= 0 || tokens.length === 0)
-          return [];
-      if (allowDuplicates) {
-          const sampled = [];
-          for (let i = 0; i < limit; i += 1) {
-              const picked = tokens[Math.floor(resolveRandomValue(ctx) * tokens.length)];
-              if (picked)
-                  sampled.push(picked);
-          }
-          return sampled;
-      }
-      if (tokens.length <= limit)
-          return [...tokens];
-      const pool = [...tokens];
-      for (let i = 0; i < limit; i += 1) {
-          const swapIndex = i + Math.floor(resolveRandomValue(ctx) * (pool.length - i));
-          [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
-      }
-      return pool.slice(0, limit);
-  };
   const readTargetLimit = (ctx, fallback) => (Math.max(1, toRoundedInt(ctx.payload?.targetCount ?? ctx.payload?.targets, fallback)));
   const readAllowDuplicateTargets = (ctx) => (ctx.payload?.allowDuplicateTargets === true
       || ctx.payload?.allowDuplicates === true);
   const sampleFromCandidates = (ctx, candidates, limit) => {
-      return sampleTargets(ctx, candidates, limit, readAllowDuplicateTargets(ctx));
+      return sampleTokens(candidates, limit, {
+          allowDuplicates: readAllowDuplicateTargets(ctx),
+          randomValue: () => (ctx.game?.rng ? nextRngValue(ctx.game.rng) : Math.random()),
+      });
   };
   const readTargetPriority = (payload) => {
       const raw = String(payload?.targetPriority ?? payload?.priority ?? '').trim().toLowerCase();
@@ -6640,10 +6642,45 @@ __modules['./combat/token-side-utils.ts'] = (exports, module, __require) => {
           visitor(token);
       }
   }
+  function sampleTokens(tokens, limit, options = {}) {
+      if (limit <= 0 || tokens.length === 0)
+          return [];
+      const randomValue = options.randomValue ?? (() => Math.random());
+      const pool = [];
+      if (typeof options.exclude === 'function') {
+          for (const token of tokens) {
+              if (options.exclude(token))
+                  continue;
+              pool.push(token);
+          }
+      }
+      else {
+          pool.push(...tokens);
+      }
+      if (pool.length === 0)
+          return [];
+      if (options.allowDuplicates) {
+          const sampled = [];
+          for (let i = 0; i < limit; i += 1) {
+              const picked = pool[Math.floor(randomValue() * pool.length)];
+              if (picked)
+                  sampled.push(picked);
+          }
+          return sampled;
+      }
+      if (pool.length <= limit)
+          return pool;
+      for (let i = 0; i < limit; i += 1) {
+          const swapIndex = i + Math.floor(randomValue() * (pool.length - i));
+          [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
+      }
+      return pool.slice(0, limit);
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'bucketTokensByActualSide')) exports.bucketTokensByActualSide = bucketTokensByActualSide;
   if (!Object.prototype.hasOwnProperty.call(exports, 'partitionTokensBySide')) exports.partitionTokensBySide = partitionTokensBySide;
   if (!Object.prototype.hasOwnProperty.call(exports, 'forEachPartitionToken')) exports.forEachPartitionToken = forEachPartitionToken;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'sampleTokens')) exports.sampleTokens = sampleTokens;
 };
 __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
@@ -6665,6 +6702,7 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const __dep5 = __require('./combat/tag-dispatch.ts');
   const applyMarkSleepSetupTag = __dep5.applyMarkSleepSetupTag;
   const __dep6 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep6.readAtkWilPower;
   const toFiniteNumber = __dep6.toFiniteNumber;
   const toPositiveTurns = __dep6.toPositiveTurns;
   const toRoundedInt = __dep6.toRoundedInt;
@@ -6672,6 +6710,11 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const createSkillMetadataReader = __dep7.createSkillMetadataReader;
   const __dep8 = __require('./combat/status-utils.ts');
   const getStatusEntryById = __dep8.getStatusEntryById;
+  const __dep9 = __require('./utils/rng.ts');
+  const nextRngValue = __dep9.nextRngValue;
+  const __dep10 = __require('./combat/token-side-utils.ts');
+  const partitionTokensBySide = __dep10.partitionTokensBySide;
+  const sampleTokens = __dep10.sampleTokens;
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const MONG_YEM_ID = 'mong_yem';
   const CHAP_MINH_ULT_ARM_RES_BUFF = 0.5;
@@ -6717,7 +6760,7 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
                   sourceUnitId: caster.id,
               });
               const shieldBonusDamage = Math.max(0, Math.floor(readShieldAmount(caster) * CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO));
-              const base = Math.max(1, Math.floor((caster.atk ?? 0) + (caster.wil ?? 0) + shieldBonusDamage));
+              const base = Math.max(1, Math.floor(readAtkWilPower(caster) + shieldBonusDamage));
               let hits = 0;
               for (const token of game.tokens) {
                   if (!token.alive || token.side === caster.side)
@@ -6734,7 +6777,7 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
           if (!target?.alive) {
               return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
           }
-          const base = Math.max(1, Math.floor((caster.atk ?? 0) + (caster.wil ?? 0)));
+          const base = Math.max(1, Math.floor(readAtkWilPower(caster)));
           for (let hit = 0; hit < 3; hit += 1) {
               dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill });
           }
@@ -6841,7 +6884,7 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
           const markStacks = readStatusStacks(target, markId);
           const markBonus = Math.min(markBonusMax, markStacks * markBonusAmount);
           const finalMultiplier = baseMultiplier * (1 + markBonus);
-          const base = Math.max(1, Math.floor(((caster.atk ?? 0) + (caster.wil ?? 0)) * finalMultiplier));
+          const base = Math.max(1, Math.floor(readAtkWilPower(caster) * finalMultiplier));
           const pierceConfig = skillMeta.readRecord('pierceIfSleeping');
           const sleeping = getStatusEntryById(target, 'sleep') != null;
           const defPen = sleeping
@@ -6863,13 +6906,14 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
               const spreadStacks = Math.max(1, toRoundedInt(spreadConfig?.stacks, 1));
               const spreadMaxStacks = Math.max(1, toRoundedInt(spreadConfig?.maxStacks, markMaxStacks));
               const spreadSleepTurnsOnCap = toPositiveTurns(toFiniteNumber(spreadConfig?.sleepTurnsOnCap, sleepTurnsOnCap));
-              for (const token of game.tokens) {
-                  if (spreadHits >= spreadTargets)
-                      break;
-                  if (!token.alive || token.side === caster.side || token.iid === target.iid)
-                      continue;
+              const enemies = partitionTokensBySide(game.tokens, caster.side, { sortByBoardPosition: true }).enemyTokens;
+              const spreadCandidates = sampleTokens(enemies, spreadTargets, {
+                  exclude: (enemy) => enemy.iid === target.iid,
+                  randomValue: () => nextRngValue(game.rng),
+              });
+              for (const enemy of spreadCandidates) {
                   spreadHits += 1;
-                  applyMarkSleepSetupTag(game, caster, token, {
+                  applyMarkSleepSetupTag(game, caster, enemy, {
                       markId: spreadMarkId,
                       markStacks: spreadStacks,
                       markMaxStacks: spreadMaxStacks,

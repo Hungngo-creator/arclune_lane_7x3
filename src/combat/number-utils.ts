@@ -24,3 +24,13 @@ export function toPositiveTurns(value: unknown, fallback = 1): number {
   if (!Number.isFinite(direct) || direct <= 0) return Math.max(1, Math.round(fallback));
   return Math.max(1, Math.round(direct));
 }
+export function readAtkWilPower(unit: { atk?: unknown; wil?: unknown } | null | undefined): number {
+  if (!unit) return 0;
+  return Math.max(0, toFiniteNumber(unit.atk, 0) + toFiniteNumber(unit.wil, 0));
+}
+
+
+export function asRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  return value as Record<string, unknown>;
+}

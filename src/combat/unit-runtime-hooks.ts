@@ -10,9 +10,11 @@ import { consumeShieldByCurrentRatio, readShieldAmount } from './apply-damage.ts
 import { Statuses } from '../statuses.ts';
 import { buildSkillResult } from './skill-result.ts';
 import { applyMarkSleepSetupTag } from './tag-dispatch.ts';
-import { toFiniteNumber, toPositiveTurns, toRoundedInt } from './number-utils.ts';
+import { readAtkWilPower, toFiniteNumber, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { createSkillMetadataReader } from './skill-metadata-utils.ts';
 import { getStatusEntryById } from './status-utils.ts';
+import { nextRngValue } from '../utils/rng.ts';
+import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -98,7 +100,7 @@ const chapMinhRuntimeHook: UnitRuntimeHook = {
       });
 
       const shieldBonusDamage = Math.max(0, Math.floor(readShieldAmount(caster) * CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO));
-      const base = Math.max(1, Math.floor((caster.atk ?? 0) + (caster.wil ?? 0) + shieldBonusDamage));
+      const base = Math.max(1, Math.floor(readAtkWilPower(caster) + shieldBonusDamage));
       let hits = 0;
       for (const token of game.tokens) {
         if (!token.alive || token.side === caster.side) continue;
@@ -118,7 +120,7 @@ const chapMinhRuntimeHook: UnitRuntimeHook = {
       return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
     }
 
-    const base = Math.max(1, Math.floor((caster.atk ?? 0) + (caster.wil ?? 0)));
+    const base = Math.max(1, Math.floor(readAtkWilPower(caster)));
     for (let hit = 0; hit < 3; hit += 1) {
       dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill });
     }
@@ -237,7 +239,7 @@ const mongYemRuntimeHook: UnitRuntimeHook = {
     const markStacks = readStatusStacks(target, markId);
     const markBonus = Math.min(markBonusMax, markStacks * markBonusAmount);
     const finalMultiplier = baseMultiplier * (1 + markBonus);
-    const base = Math.max(1, Math.floor(((caster.atk ?? 0) + (caster.wil ?? 0)) * finalMultiplier));
+    const base = Math.max(1, Math.floor(readAtkWilPower(caster) * finalMultiplier));
 
     const pierceConfig = skillMeta.readRecord('pierceIfSleeping');
     const sleeping = getStatusEntryById(target, 'sleep') != null;
@@ -263,11 +265,14 @@ const mongYemRuntimeHook: UnitRuntimeHook = {
       const spreadStacks = Math.max(1, toRoundedInt(spreadConfig?.stacks, 1));
       const spreadMaxStacks = Math.max(1, toRoundedInt(spreadConfig?.maxStacks, markMaxStacks));
       const spreadSleepTurnsOnCap = toPositiveTurns(toFiniteNumber(spreadConfig?.sleepTurnsOnCap, sleepTurnsOnCap));
-      for (const token of game.tokens) {
-        if (spreadHits >= spreadTargets) break;
-        if (!token.alive || token.side === caster.side || token.iid === target.iid) continue;
+      const enemies = partitionTokensBySide(game.tokens, caster.side, { sortByBoardPosition: true }).enemyTokens;
+      const spreadCandidates = sampleTokens(enemies, spreadTargets, {
+        exclude: (enemy) => enemy.iid === target.iid,
+        randomValue: () => nextRngValue(game.rng),
+      });
+      for (const enemy of spreadCandidates) {
         spreadHits += 1;
-        applyMarkSleepSetupTag(game, caster, token, {
+        applyMarkSleepSetupTag(game, caster, enemy, {
           markId: spreadMarkId,
           markStacks: spreadStacks,
           markMaxStacks: spreadMaxStacks,

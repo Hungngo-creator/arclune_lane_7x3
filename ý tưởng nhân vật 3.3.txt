@@ -430,8 +430,36 @@ skill 3: mỗi khi gây sát thương lên tối thiểu 2 kẻ địch trở l�
 ultimate: gây sát thương đơn mục tiêu lên leader địch = 200% đánh thường, không tính là đánh thường, nếu sát thương gây ra thành công lên leader địch vượt 20% hp của leader địch nhân vật này tự hồi hp của bản thân = 10% max hp, không tăng max hp. Pháp tắc.
 
 38)
-Ur, ranger.
-nội tại: mỗi khi 1 nhân vật đồng minh nhận sát thương từ kẻ địch, tấn công kẻ địch đó = 1 đánh thường, tính là đánh thường, pháp tắc. dù kẻ thù đó gây sát thương nhiều lần lên đồng minh trong 1 turn thì nội tại này chỉ kích hoạt 1 lần lên char đó trong turn của char đó. giới hạn kích hoạt nội tại/turn lên từng char của chính turn của char đó là 1. Nên nếu follow up ATK hoặc phản đòn hoặc cơ chế khác gây sát thương lên đồng minh thì nội tại này cũng chỉ kích hoạt 1 lần lên 1 char trong 1 turn của char đó. hay thiết lập kiểu mỗi lần char này hành động sẽ có budget nội tại là 9, mỗi khi kẻ thù tấn công đồng minh thì char này sẽ tấn công kẻ thù đó tương ứng với số lượng kẻ thù tấn công lên đồng minh? kiểu mage đối phương gây aoe toàn sân lên phe đồng minh mà phe ally hiện có 9 đơn vị kể cả bản thân char này thì char này sẽ tấn công mage đối phương 9 lần, sau đó vì budget nội tại đã hết nên không kích hoạt nội tại nữa, budget nội tại chỉ reset khi đến lượt của char này tấn công ( tấn công từ nội tại không tính), nghĩ sao? 
+Nội tại: Pháp Tắc Trả Đũa (Ur)
+1) Hiệu ứng cốt lõi
+Mỗi khi một đồng minh của Ur (bao gồm cả Ur) nhận sát thương trực tiếp từ hành động của kẻ địch, Ur lập tức thực hiện 1 đòn Đánh Thường vào chính kẻ địch vừa gây sát thương đó.
+Đòn này:
+được tính là Đánh Thường, mang thuộc tính Pháp Tắc, là đòn phản kích từ nội tại (không phải hành động chủ động trong lượt Ur).
+
+2) Giới hạn theo mục tiêu địch (tầng 1 của hybrid)
+Trong cùng một chu kỳ lượt của Ur, mỗi kẻ địch chỉ có thể bị kích hoạt phản kích từ nội tại này tối đa 1 lần.
+Nói đơn giản:
+Nếu địch A đã bị Ur phản kích bởi nội tại trong chu kỳ hiện tại, thì mọi lần sau địch A tiếp tục gây sát thương lên đồng minh trong cùng chu kỳ đó không kích hoạt thêm từ nội tại này.
+
+Địch B, C… vẫn có thể kích hoạt bình thường (nếu chưa chạm giới hạn cá nhân của chúng).
+3) Giới hạn tổng phản kích của Ur (tầng 2 của hybrid)
+Trong mỗi chu kỳ lượt của Ur, nội tại có tối đa 5 lần phản kích. Mỗi lần nội tại kích hoạt thành công sẽ tiêu tốn 1 lượt trong hạn mức 5. Khi đã đạt 5/5, nội tại ngừng kích hoạt cho tới khi reset. Hạn mức này áp dụng cho tổng toàn bộ kẻ địch, không phân biệt nguồn sát thương.
+4) Thời điểm reset
+Toàn bộ bộ đếm của nội tại được reset khi đến lượt hành động chủ động của Ur.
+Cụ thể reset gồm:
+Bộ đếm tổng phản kích: về 0/5. Dấu đã-bị-phản-kích của từng kẻ địch: xóa toàn bộ.
+Lưu ý:
+
+Các đòn phản kích sinh ra từ nội tại không tính là “Ur bắt đầu lượt mới”, nên không reset nội tại.
+Chỉ lượt chủ động thực sự của Ur mới reset.
+5) Quy tắc áp dụng cho các tình huống thường gặp
+a) Địch dùng AoE đánh trúng nhiều đồng minh cùng lúc
+Ur kiểm tra kẻ gây sát thương. Nếu kẻ đó chưa bị phản kích trong chu kỳ này và Ur chưa hết 5 lượt tổng, Ur chỉ phản kích 1 lần vào kẻ đó. Không nhân theo số đồng minh bị trúng bởi cùng một nguồn địch đó (do giới hạn theo địch: 1 lần/chu kỳ).
+b) Một địch đánh nhiều hit liên tiếp / follow-up liên tục
+Hit đầu tiên đủ điều kiện có thể kích hoạt.Các hit sau từ cùng địch trong cùng chu kỳ không kích hoạt thêm (vì đã chạm giới hạn cá nhân của địch đó, xem d)).
+c) Nhiều địch khác nhau lần lượt tấn công đồng minh
+Mỗi địch mới (chưa bị đánh dấu) có thể kích hoạt 1 lần, cho tới khi Ur chạm trần 5 lần tổng trong chu kỳ.
+d) Phản đòn/follow-up của kẻ thù/cơ chế gây sát thương ngoài lượt của kẻ thù lên đồng minh qua debuff không kích hoạt nội tại này.
 
 
 

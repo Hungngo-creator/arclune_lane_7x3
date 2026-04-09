@@ -83,3 +83,45 @@ export function forEachPartitionToken(
     visitor(token);
   }
 }
+
+export interface TokenSampleOptions {
+  allowDuplicates?: boolean;
+  randomValue?: () => number;
+  exclude?: (token: UnitToken) => boolean;
+}
+
+export function sampleTokens(
+  tokens: ReadonlyArray<UnitToken>,
+  limit: number,
+  options: TokenSampleOptions = {},
+): UnitToken[] {
+  if (limit <= 0 || tokens.length === 0) return [];
+  const randomValue = options.randomValue ?? (() => Math.random());
+
+  const pool: UnitToken[] = [];
+  if (typeof options.exclude === 'function') {
+    for (const token of tokens) {
+      if (options.exclude(token)) continue;
+      pool.push(token);
+    }
+  } else {
+    pool.push(...tokens);
+  }
+
+  if (pool.length === 0) return [];
+  if (options.allowDuplicates) {
+    const sampled: UnitToken[] = [];
+    for (let i = 0; i < limit; i += 1) {
+      const picked = pool[Math.floor(randomValue() * pool.length)];
+      if (picked) sampled.push(picked);
+    }
+    return sampled;
+  }
+
+  if (pool.length <= limit) return pool;
+  for (let i = 0; i < limit; i += 1) {
+    const swapIndex = i + Math.floor(randomValue() * (pool.length - i));
+    [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
+  }
+  return pool.slice(0, limit);
+}
