@@ -1,5 +1,5 @@
 import { dealAbilityDamage, pickTarget } from '../combat.ts';
-import { dispatchGameplayTags } from './tag-dispatch.ts';
+import { applyMarkSleepSetupTag, dispatchGameplayTags } from './tag-dispatch.ts';
 import { skillSets } from '../data/skills.ts';
 import { normalizeTagList } from '../data/tags.ts';
 import { enqueueImmediate } from '../summon.ts';
@@ -133,11 +133,21 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   }
 
   const tags = normalizeTagList(skill.tags ?? []);
-  const tagSet = new Set(tags);
-  const hasDamageTag = tags.some((tag) => DAMAGE_TARGET_TAGS.has(tag));
+  const effectTags: string[] = [];
+  let hasAetherCostTag = false;
+  let hasSummonTag = false;
+  let hasUniqueGlobalTag = false;
+  let hasDamageTag = false;
+  for (const tag of tags) {
+    if (!hasAetherCostTag && tag === 'aether-cost') hasAetherCostTag = true;
+    if (!hasSummonTag && tag === 'summon') hasSummonTag = true;
+    if (!hasUniqueGlobalTag && tag === 'unique-global') hasUniqueGlobalTag = true;
+    if (!hasDamageTag && DAMAGE_TARGET_TAGS.has(tag)) hasDamageTag = true;
+    if (EFFECT_APPLICATION_TAGS.has(tag)) effectTags.push(tag);
+  }
   const payload = resolvePayload(skill);
   const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
-  const usesTagAetherCost = skillCost > 0 && tagSet.has('aether-cost');
+  const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;
   if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
       return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'insufficient-aether');
   }
@@ -232,12 +242,12 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     }
   }
 
-  if (tagSet.has('summon')) {
+  if (hasSummonTag) {
     const openSlot = firstOpenSlot(game, caster.side);
     if (openSlot) {
       const summon = (payload.summon ?? skill.summon ?? {}) as Record<string, unknown>;
       const summonId = typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`;
-      if (tagSet.has('unique-global') && !canApplyUniqueGlobal(game, summonId)) {
+      if (hasUniqueGlobalTag && !canApplyUniqueGlobal(game, summonId)) {
         return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
       enqueueImmediate(game, {
@@ -254,10 +264,6 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     }
   }
 
-  const effectTags: string[] = [];
-  for (const tag of tags) {
-    if (EFFECT_APPLICATION_TAGS.has(tag)) effectTags.push(tag);
-  }
   if (effectTags.length > 0) {
     dispatchGameplayTags(effectTags, {
       game,
@@ -287,16 +293,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
 
   if (caster.id === MENG_YEM_ID && damagedEnemies.length > 0) {
     for (const target of damagedEnemies) {
-      dispatchGameplayTags(['mark', 'sleep-setup'], {
-        game,
-        attacker: caster,
-        target,
-        targets: [target],
-        side: caster.side,
-        payload: MENG_YEM_DREAM_MARK_PAYLOAD,
-        deferEffects: false,
-        tagsNormalized: true,
-      });
+      applyMarkSleepSetupTag(game, caster, target, MENG_YEM_DREAM_MARK_PAYLOAD);
     }
   }
 

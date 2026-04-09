@@ -31,6 +31,8 @@ export interface TagDispatchResult {
   sideEffects: string[];
 }
 const RULE_TARGET_OVERRIDE_TAGS = new Set(['global-rule']);
+const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup'] as const);
+const EMPTY_TAGS: string[] = [];
 
 type NormalizedContext = {
   game: SessionState | null;
@@ -351,11 +353,15 @@ export function dispatchGameplayTags(
   context: TagDispatchContext,
 ): TagDispatchResult {
   const normalizedTags = context.tagsNormalized
-    ? (Array.isArray(rawTags) ? [...rawTags] : [])
+    ? (Array.isArray(rawTags) ? rawTags : EMPTY_TAGS)
     : normalizeTagList(rawTags);
-    const tags = normalizedTags
-    .filter((tag) => !RULE_TARGET_OVERRIDE_TAGS.has(tag))
-    .concat(normalizedTags.filter((tag) => RULE_TARGET_OVERRIDE_TAGS.has(tag)));
+    const tags: string[] = [];
+  const deferredRuleTags: string[] = [];
+  for (const tag of normalizedTags) {
+    if (RULE_TARGET_OVERRIDE_TAGS.has(tag)) deferredRuleTags.push(tag);
+    else tags.push(tag);
+  }
+  if (deferredRuleTags.length > 0) tags.push(...deferredRuleTags);
   const target = context.target ?? null;
   const attacker = context.attacker ?? null;
   const { allyTokens, enemyTokens } = context.game && attacker
@@ -392,4 +398,30 @@ export function dispatchGameplayTags(
   }
 
   return result;
+}
+
+export interface MarkStackPayload extends Record<string, unknown> {
+  markId?: string;
+  markStacks?: number;
+  markMaxStacks?: number;
+  markPurgeable?: boolean;
+  sleepTurnsOnCap?: number;
+}
+
+export function applyMarkSleepSetupTag(
+  game: SessionState,
+  attacker: UnitToken,
+  target: UnitToken,
+  payload: MarkStackPayload,
+): void {
+  dispatchGameplayTags(MARK_APPLICATION_TAGS, {
+    game,
+    attacker,
+    target,
+    targets: [target],
+    side: attacker.side,
+    payload,
+    deferEffects: false,
+    tagsNormalized: true,
+  });
 }

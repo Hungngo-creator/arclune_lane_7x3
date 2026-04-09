@@ -59,7 +59,7 @@ export function partitionTokensBySide(
     return {
       allyTokens: buckets.ally,
       enemyTokens: buckets.enemy,
-    };;
+    };
   }
   return {
     allyTokens: buckets.enemy,

@@ -5590,6 +5590,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const dealAbilityDamage = __dep0.dealAbilityDamage;
   const pickTarget = __dep0.pickTarget;
   const __dep1 = __require('./combat/tag-dispatch.ts');
+  const applyMarkSleepSetupTag = __dep1.applyMarkSleepSetupTag;
   const dispatchGameplayTags = __dep1.dispatchGameplayTags;
   const __dep2 = __require('./data/skills.ts');
   const skillSets = __dep2.skillSets;
@@ -5718,11 +5719,26 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
       }
       const tags = normalizeTagList(skill.tags ?? []);
-      const tagSet = new Set(tags);
-      const hasDamageTag = tags.some((tag) => DAMAGE_TARGET_TAGS.has(tag));
+      const effectTags = [];
+      let hasAetherCostTag = false;
+      let hasSummonTag = false;
+      let hasUniqueGlobalTag = false;
+      let hasDamageTag = false;
+      for (const tag of tags) {
+          if (!hasAetherCostTag && tag === 'aether-cost')
+              hasAetherCostTag = true;
+          if (!hasSummonTag && tag === 'summon')
+              hasSummonTag = true;
+          if (!hasUniqueGlobalTag && tag === 'unique-global')
+              hasUniqueGlobalTag = true;
+          if (!hasDamageTag && DAMAGE_TARGET_TAGS.has(tag))
+              hasDamageTag = true;
+          if (EFFECT_APPLICATION_TAGS.has(tag))
+              effectTags.push(tag);
+      }
       const payload = resolvePayload(skill);
       const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
-      const usesTagAetherCost = skillCost > 0 && tagSet.has('aether-cost');
+      const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;
       if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
           return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'insufficient-aether');
       }
@@ -5811,12 +5827,12 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
           }
       }
-      if (tagSet.has('summon')) {
+      if (hasSummonTag) {
           const openSlot = firstOpenSlot(game, caster.side);
           if (openSlot) {
               const summon = (payload.summon ?? skill.summon ?? {});
               const summonId = typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`;
-              if (tagSet.has('unique-global') && !canApplyUniqueGlobal(game, summonId)) {
+              if (hasUniqueGlobalTag && !canApplyUniqueGlobal(game, summonId)) {
                   return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
               }
               enqueueImmediate(game, {
@@ -5831,11 +5847,6 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
                   },
               });
           }
-      }
-      const effectTags = [];
-      for (const tag of tags) {
-          if (EFFECT_APPLICATION_TAGS.has(tag))
-              effectTags.push(tag);
       }
       if (effectTags.length > 0) {
           dispatchGameplayTags(effectTags, {
@@ -5865,16 +5876,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       }
       if (caster.id === MENG_YEM_ID && damagedEnemies.length > 0) {
           for (const target of damagedEnemies) {
-              dispatchGameplayTags(['mark', 'sleep-setup'], {
-                  game,
-                  attacker: caster,
-                  target,
-                  targets: [target],
-                  side: caster.side,
-                  payload: MENG_YEM_DREAM_MARK_PAYLOAD,
-                  deferEffects: false,
-                  tagsNormalized: true,
-              });
+              applyMarkSleepSetupTag(game, caster, target, MENG_YEM_DREAM_MARK_PAYLOAD);
           }
       }
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, dispatch.targets.length);
@@ -5961,6 +5963,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep7 = __require('./combat/token-side-utils.ts');
   const partitionTokensBySide = __dep7.partitionTokensBySide;
   const RULE_TARGET_OVERRIDE_TAGS = new Set(['global-rule']);
+  const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
+  const EMPTY_TAGS = [];
   function collectAliveTargets(tokens) {
       const alive = [];
       for (const token of tokens) {
@@ -6237,11 +6241,18 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   });
   function dispatchGameplayTags(rawTags, context) {
       const normalizedTags = context.tagsNormalized
-          ? (Array.isArray(rawTags) ? [...rawTags] : [])
+          ? (Array.isArray(rawTags) ? rawTags : EMPTY_TAGS)
           : normalizeTagList(rawTags);
-      const tags = normalizedTags
-          .filter((tag) => !RULE_TARGET_OVERRIDE_TAGS.has(tag))
-          .concat(normalizedTags.filter((tag) => RULE_TARGET_OVERRIDE_TAGS.has(tag)));
+      const tags = [];
+      const deferredRuleTags = [];
+      for (const tag of normalizedTags) {
+          if (RULE_TARGET_OVERRIDE_TAGS.has(tag))
+              deferredRuleTags.push(tag);
+          else
+              tags.push(tag);
+      }
+      if (deferredRuleTags.length > 0)
+          tags.push(...deferredRuleTags);
       const target = context.target ?? null;
       const attacker = context.attacker ?? null;
       const { allyTokens, enemyTokens } = context.game && attacker
@@ -6276,8 +6287,21 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       }
       return result;
   }
+  function applyMarkSleepSetupTag(game, attacker, target, payload) {
+      dispatchGameplayTags(MARK_APPLICATION_TAGS, {
+          game,
+          attacker,
+          target,
+          targets: [target],
+          side: attacker.side,
+          payload,
+          deferEffects: false,
+          tagsNormalized: true,
+      });
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'dispatchGameplayTags')) exports.dispatchGameplayTags = dispatchGameplayTags;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyMarkSleepSetupTag')) exports.applyMarkSleepSetupTag = applyMarkSleepSetupTag;
 };
 __modules['./combat/token-side-utils.ts'] = (exports, module, __require) => {
   const BOARD_POSITION_SORT = (a, b) => (a.cy - b.cy) || (a.cx - b.cx);
@@ -6315,7 +6339,6 @@ __modules['./combat/token-side-utils.ts'] = (exports, module, __require) => {
               allyTokens: buckets.ally,
               enemyTokens: buckets.enemy,
           };
-          ;
       }
       return {
           allyTokens: buckets.enemy,
@@ -6344,11 +6367,13 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const __dep4 = __require('./combat/skill-result.ts');
   const buildSkillResult = __dep4.buildSkillResult;
   const __dep5 = __require('./combat/tag-dispatch.ts');
-  const dispatchGameplayTags = __dep5.dispatchGameplayTags;
+  const applyMarkSleepSetupTag = __dep5.applyMarkSleepSetupTag;
   const __dep6 = __require('./combat/number-utils.ts');
   const toFiniteNumber = __dep6.toFiniteNumber;
   const toPositiveTurns = __dep6.toPositiveTurns;
   const toRoundedInt = __dep6.toRoundedInt;
+  const __dep7 = __require('./combat/status-utils.ts');
+  const getStatusEntryById = __dep7.getStatusEntryById;
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const MONG_YEM_ID = 'mong_yem';
   const CHAP_MINH_ULT_ARM_RES_BUFF = 0.5;
@@ -6445,8 +6470,14 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
       unit._mongYemSelfSleepActive = false;
       if (!Array.isArray(unit.statuses) || unit.statuses.length === 0)
           return;
-      unit.statuses = unit.statuses.filter((status) => (status.id !== 'sleep'
-          && status.id !== MONG_YEM_SELF_SLEEP_FLAG));
+      for (let index = unit.statuses.length - 1; index >= 0; index -= 1) {
+          const status = unit.statuses[index];
+          if (!status)
+              continue;
+          if (status.id === 'sleep' || status.id === MONG_YEM_SELF_SLEEP_FLAG) {
+              unit.statuses.splice(index, 1);
+          }
+      }
   }
   function applyMongYemSelfSleepGrowth(unit) {
       const atk = Math.max(0, toFiniteNumber(unit.atk, 0));
@@ -6462,23 +6493,11 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
       clearMongYemSelfSleep(unit);
   }
   function readStatusStacks(unit, statusId) {
-      if (!Array.isArray(unit.statuses) || unit.statuses.length === 0)
-          return 0;
-      for (const status of unit.statuses) {
-          if (status?.id !== statusId)
-              continue;
-          return Math.max(0, toRoundedInt(status.stacks ?? 0, 0));
-      }
-      return 0;
+      const statusEntry = getStatusEntryById(unit, statusId);
+      return Math.max(0, toRoundedInt(statusEntry?.status.stacks ?? 0, 0));
   }
   function hasStatus(unit, statusId) {
-      if (!Array.isArray(unit.statuses) || unit.statuses.length === 0)
-          return false;
-      for (const status of unit.statuses) {
-          if (status?.id === statusId)
-              return true;
-      }
-      return false;
+      return getStatusEntryById(unit, statusId) != null;
   }
   const mongYemRuntimeHook = {
       onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
@@ -6538,21 +6557,12 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
               ? Math.max(0, toFiniteNumber(pierceConfig?.ARM ?? 0, 0), toFiniteNumber(pierceConfig?.RES ?? 0, 0))
               : 0;
           dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill, defPen });
-          dispatchGameplayTags(['mark', 'sleep-setup'], {
-              game,
-              attacker: caster,
-              target,
-              targets: [target],
-              side: caster.side,
-              payload: {
-                  markId,
-                  markStacks: 1,
-                  markMaxStacks: 3,
-                  markPurgeable: false,
-                  sleepTurnsOnCap: 1,
-              },
-              deferEffects: false,
-              tagsNormalized: true,
+          applyMarkSleepSetupTag(game, caster, target, {
+              markId,
+              markStacks: 1,
+              markMaxStacks: 3,
+              markPurgeable: false,
+              sleepTurnsOnCap: 1,
           });
           let spreadHits = 0;
           const spreadConfig = skill.spreadMark;
@@ -6566,21 +6576,12 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
                   if (!token.alive || token.side === caster.side || token.iid === target.iid)
                       continue;
                   spreadHits += 1;
-                  dispatchGameplayTags(['mark', 'sleep-setup'], {
-                      game,
-                      attacker: caster,
-                      target: token,
-                      targets: [token],
-                      side: caster.side,
-                      payload: {
-                          markId: spreadMarkId,
-                          markStacks: spreadStacks,
-                          markMaxStacks: 3,
-                          markPurgeable: false,
-                          sleepTurnsOnCap: 1,
-                      },
-                      deferEffects: false,
-                      tagsNormalized: true,
+                  applyMarkSleepSetupTag(game, caster, token, {
+                      markId: spreadMarkId,
+                      markStacks: spreadStacks,
+                      markMaxStacks: 3,
+                      markPurgeable: false,
+                      sleepTurnsOnCap: 1,
                   });
               }
           }

@@ -399,11 +399,24 @@ kỹ năng 2: hồi hp cho đồng minh = 200% wil + atk của bản thân cho h
 kỹ năng 3: quy tắc: khiến mọi đồng minh trên sân thực thi 1 turn đánh thường, giảm animation tấn công từ 2,2s xuống 1s khi có đồng minh thực thi tấn công từ kỹ năng này. quy tắc. 30 aether.
 ultimate: quy tắc: hồi hp cho mọi đơn vị đồng minh trên sân = 30% max hp của họ, bản thân hắn được + 10% wil và atk trong 3 turn sau khi dùng ultimate, không cộng dồn.
 
+35)
+Kiếm sĩ, UR.
+nội tại: mỗi lần giết 1 mục tiêu thành công nhận miễn nhiễm với 1 debuff ngẫu nhiên từ pool: độc, choáng, ngủ, chảy máu, yếu đuối. Cũng đồng thời tăng vĩnh viễn 5% atk và wil của bản thân ở lúc giết kẻ thù ( tính luôn atk/wil bị ảnh hưởng từ buff/debuff và mọi nguồn khác) đến khi chết.
+skill 1: mỗi khi nhận sát thương vượt 20% max hp, tự hồi hp cho bản thân = 50% wil /atk của bản thân, tự kích hoạt, mỗi lần kích hoạt - 10 aether từ aepool, nếu ae không đủ sẽ không kích hoạt skill này.
+skill 2: chém 1 nhát ngang gây sát thương lên hàng 1/2/3 hoặc 4/5/5 hoặc 7/8/9, ưu tiên hàng có nhiều kẻ địch đứng nhất, mỗi kẻ địch nhận sát thương = 150% đánh thường, cost - 7 ae/kẻ địch nhận sát thương ( tối đa - 21 ae).
+skill 3: tăng 50% wil và atk trong 2 turn kế tiếp, 20 ae.
+ultimate: gây 1 đòn aoe cố định hình chữ T lên ô 1/2/3/5/8 của kẻ địch, mỗi kẻ địch đứng ở vị trí tấn công này nhận sát thương = 2 đòn đánh thường của nhân vật này, (biến động sát thương theo atk và wil của nhân vật).
 
+36)
+Support, ssr, element tag: water.
+nội tại: mỗi lần xoá thành công 1 debuff từ đồng minh và bản thân sẽ tự hồi HP = 5% wil và atk của bản thân, không thể vượt max hp và không thể tạo khiên khi overheal.
+skill 1: Mỗi 3 lần đánh thường/ sài skill hoặc ultimate thành công thì lần ultimate tiếp theo sẽ hồi cho mọi đồng minh trên sân nếu có thể (không ảnh hưởng được thần tính) = 25% wil/atk của bản thân cho mọi đồng minh trên sân nếu có thể và bản thân. Luôn kích hoạt kể cả tử vong rồi được hồi sinh, bị động, -10 ae mỗi lần kích hoạt hồi hp.
+skill 2: đánh 2 quả cầu nước vào 2 mục tiêu từ xa, gây sát thương aoe ngẫu nhiên lên 2 mục tiêu này, mỗi kẻ nhận 1 đòn đánh thường, tính là đánh thường, 15 ae.
+skill 3: khi nhận sát thương vượt 20% max hp sẽ giảm 20% sát thương phải nhận vào, ví dụ sát thương đang đến phải nhận là 100% thì char này chỉ nhận 80 thôi, không ảnh hưởng được pháp tắc hay quy tắc. đây là skill bị động, không cần tốn turn để kích hoạt mà sẽ luôn kích hoạt từ lúc char này ra sân kể cả được hồi sinh, mỗi lần kích hoạt thành công - 20 ae.
+ultimate: xoá 2 debuff (không xoá mark)ngẫu nhiên trên người đồng minh và bản thân, không ảnh hưởng được debuff/mark cấp quy/pháp tắc. sau đó +10% wil và atk của bản thân trong 1 turn và trạng thái này không tính là buff.
 
-
-
-
+36)
+nội tại: hồi hp = 3% max hp của bản thân mỗi lần nhận sát thương vượt quá 5% max hp. sau đó tăng 10% res và arm so với hiện tại tính từ lúc nhận sát thương, cộng dồn tối đa 3 lần. ví dụ char này có 100 hp, 5 res cùng arm thì sau khi bị nhận sát thương vượt hoặc = 5% max hp thì hp và res/arm là 98%/100% max hp, 5,5 res/arm, sau lần 2 nhận sát thương vượt 5% mx hp thì hp là 96/100% max hp, 5,5 +10% res cùng arm, lần 3 thì 94/100% max hp + (5,5 +10%) + 10%, đương nhiên sát thương không thể lúc nào cũng bằng 5% max hp của char này được, đương nhiên sẽ có lúc nhận sát thương hơn 5% max hp, tao ví dụ sát thương nhận là 5% cho dễ ví dụ.
 
 
 

@@ -9,14 +9,14 @@ import {
 import { consumeShieldByCurrentRatio, readShieldAmount } from './apply-damage.ts';
 import { Statuses } from '../statuses.ts';
 import { buildSkillResult } from './skill-result.ts';
-import { dispatchGameplayTags } from './tag-dispatch.ts';
+import { applyMarkSleepSetupTag } from './tag-dispatch.ts';
 import { toFiniteNumber, toPositiveTurns, toRoundedInt } from './number-utils.ts';
+import { getStatusEntryById } from './status-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
 import type { UnitToken } from '@shared-types/units';
 import type { ActiveSkillKey, PerformActiveSkillResult } from './perform-active-skill.ts';
-import type { StatusEffect } from '@shared-types/combat';
 
 interface RuntimeSkillContext {
   game: SessionState;
@@ -156,10 +156,13 @@ function resolveSkillMetaNumber(
 function clearMongYemSelfSleep(unit: MongYemStateCarrier): void {
   unit._mongYemSelfSleepActive = false;
   if (!Array.isArray(unit.statuses) || unit.statuses.length === 0) return;
-  unit.statuses = unit.statuses.filter((status: StatusEffect) => (
-    status.id !== 'sleep'
-    && status.id !== MONG_YEM_SELF_SLEEP_FLAG
-  ));
+  for (let index = unit.statuses.length - 1; index >= 0; index -= 1) {
+    const status = unit.statuses[index];
+    if (!status) continue;
+    if (status.id === 'sleep' || status.id === MONG_YEM_SELF_SLEEP_FLAG) {
+      unit.statuses.splice(index, 1);
+    }
+  }
 }
 
 function applyMongYemSelfSleepGrowth(unit: MongYemStateCarrier): void {
@@ -177,20 +180,12 @@ function maybeWakeMongYem(unit: MongYemStateCarrier): void {
 }
 
 function readStatusStacks(unit: UnitToken, statusId: string): number {
-  if (!Array.isArray(unit.statuses) || unit.statuses.length === 0) return 0;
-  for (const status of unit.statuses) {
-    if (status?.id !== statusId) continue;
-    return Math.max(0, toRoundedInt(status.stacks ?? 0, 0));
-  }
-  return 0;
+  const statusEntry = getStatusEntryById(unit, statusId);
+  return Math.max(0, toRoundedInt(statusEntry?.status.stacks ?? 0, 0));
 }
 
 function hasStatus(unit: UnitToken, statusId: string): boolean {
-  if (!Array.isArray(unit.statuses) || unit.statuses.length === 0) return false;
-  for (const status of unit.statuses) {
-    if (status?.id === statusId) return true;
-  }
-  return false;
+  return getStatusEntryById(unit, statusId) != null;
 }
 
 const mongYemRuntimeHook: UnitRuntimeHook = {
@@ -257,21 +252,12 @@ const mongYemRuntimeHook: UnitRuntimeHook = {
 
     dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill, defPen });
 
-    dispatchGameplayTags(['mark', 'sleep-setup'], {
-      game,
-      attacker: caster,
-      target,
-      targets: [target],
-      side: caster.side,
-      payload: {
-        markId,
-        markStacks: 1,
-        markMaxStacks: 3,
-        markPurgeable: false,
-        sleepTurnsOnCap: 1,
-      },
-      deferEffects: false,
-      tagsNormalized: true,
+    applyMarkSleepSetupTag(game, caster, target, {
+      markId,
+      markStacks: 1,
+      markMaxStacks: 3,
+      markPurgeable: false,
+      sleepTurnsOnCap: 1,
     });
 
     let spreadHits = 0;
@@ -284,21 +270,12 @@ const mongYemRuntimeHook: UnitRuntimeHook = {
         if (spreadHits >= spreadTargets) break;
         if (!token.alive || token.side === caster.side || token.iid === target.iid) continue;
         spreadHits += 1;
-        dispatchGameplayTags(['mark', 'sleep-setup'], {
-          game,
-          attacker: caster,
-          target: token,
-          targets: [token],
-          side: caster.side,
-          payload: {
-            markId: spreadMarkId,
-            markStacks: spreadStacks,
-            markMaxStacks: 3,
-            markPurgeable: false,
-            sleepTurnsOnCap: 1,
-          },
-          deferEffects: false,
-          tagsNormalized: true,
+        applyMarkSleepSetupTag(game, caster, token, {
+          markId: spreadMarkId,
+          markStacks: spreadStacks,
+          markMaxStacks: 3,
+          markPurgeable: false,
+          sleepTurnsOnCap: 1,
         });
       }
     }
