@@ -6,6 +6,7 @@ import { dealAbilityDamage, healUnit } from '../combat.ts';
 import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 import { partitionTokensBySide } from './token-side-utils.ts';
+import { slotIndex } from '../engine.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { Side, UnitToken } from '@shared-types/units';
@@ -33,6 +34,19 @@ export interface TagDispatchResult {
 const RULE_TARGET_OVERRIDE_TAGS = new Set(['global-rule']);
 const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup'] as const);
 const EMPTY_TAGS: string[] = [];
+const DISPATCH_TAG_ALIASES = Object.freeze<Record<string, string>>({
+  'self-and-ally': 'ally',
+  'ally-and-self': 'ally',
+  'ban_than_lan_dong_minh': 'ally',
+  'ban-than-lan-dong-minh': 'ally',
+  'ban than lan dong minh': 'ally',
+  'bản thân lẫn đồng minh': 'ally',
+  'random-single': 'random-target',
+  'single-target-random': 'random-target',
+  'đơn mục tiêu ngẫu nhiên': 'random-target',
+  'all-enemy': 'aoe',
+  'kẻ địch': 'enemy',
+});
 
 type NormalizedContext = {
   game: SessionState | null;
@@ -47,9 +61,15 @@ type NormalizedContext = {
   deferEffects: boolean;
   attackerTokens: UnitToken[];
   opponentTokens: UnitToken[];
+  targetPriority: TargetPriority;
+  targetRole: TargetRole;
 };
 
 type TagHandler = (ctx: NormalizedContext, result: TagDispatchResult) => void;
+
+function resolveDispatchTag(tag: string): string {
+  return DISPATCH_TAG_ALIASES[tag] ?? tag;
+}
 
 function collectAliveTargets(tokens: ReadonlyArray<UnitToken>): UnitToken[] {
   const alive: UnitToken[] = [];
@@ -109,6 +129,107 @@ const readAllowDuplicateTargets = (ctx: Pick<NormalizedContext, 'payload'>): boo
 
 const sampleFromCandidates = (ctx: Pick<NormalizedContext, 'payload' | 'game'>, candidates: ReadonlyArray<UnitToken>, limit: number): UnitToken[] => {
   return sampleTargets(ctx, candidates, limit, readAllowDuplicateTargets(ctx));
+};
+
+type TargetPriority = 'board' | 'leader-first' | 'lowest-hp' | 'highest-hp' | 'lowest-hp-ratio' | 'highest-hp-ratio';
+type TargetRole = 'any' | 'leader';
+
+const readTargetPriority = (payload: Record<string, unknown> | null): TargetPriority => {
+  const raw = String(payload?.targetPriority ?? payload?.priority ?? '').trim().toLowerCase();
+  if (raw === 'leader-first' || raw === 'leader_first' || raw === 'leader') return 'leader-first';
+  if (raw === 'lowest-hp' || raw === 'lowest_hp' || raw === 'hp-asc') return 'lowest-hp';
+  if (raw === 'highest-hp' || raw === 'highest_hp' || raw === 'hp-desc') return 'highest-hp';
+  if (raw === 'lowest-hp-ratio' || raw === 'lowest_hp_ratio' || raw === 'lowest-hp-percent') return 'lowest-hp-ratio';
+  if (raw === 'highest-hp-ratio' || raw === 'highest_hp_ratio' || raw === 'highest-hp-percent') return 'highest-hp-ratio';
+  return 'board';
+};
+
+const readTargetRole = (payload: Record<string, unknown> | null): TargetRole => {
+  const raw = String(payload?.targetRole ?? '').trim().toLowerCase();
+  if (raw === 'leader') return 'leader';
+  return 'any';
+};
+
+const isLeaderToken = (token: UnitToken): boolean => {
+  if (!Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side) return false;
+  return slotIndex(token.side, token.cx, token.cy) === 8;
+};
+
+const filterTokensByRole = (ctx: Pick<NormalizedContext, 'targetRole'>, tokens: ReadonlyArray<UnitToken>): ReadonlyArray<UnitToken> => {
+  if (ctx.targetRole !== 'leader') return tokens;
+  const leaders = tokens.filter((token) => isLeaderToken(token));
+  return leaders;
+};
+
+const pickSingleByMetric = (
+  tokens: ReadonlyArray<UnitToken>,
+  metric: (token: UnitToken) => number,
+  findLowest: boolean,
+): UnitToken[] => {
+  if (tokens.length === 0) return [];
+  let best = tokens[0];
+  let bestValue = metric(best);
+  for (let i = 1; i < tokens.length; i += 1) {
+    const candidate = tokens[i];
+    const candidateValue = metric(candidate);
+    if ((findLowest && candidateValue < bestValue) || (!findLowest && candidateValue > bestValue)) {
+      best = candidate;
+      bestValue = candidateValue;
+    }
+  }
+  return [best];
+};
+
+const readHpRatio = (unit: UnitToken): number => {
+  const hpMax = Math.max(1, toFiniteNumber(unit.hpMax, 1));
+  const hp = Math.max(0, toFiniteNumber(unit.hp, 0));
+  return hp / hpMax;
+};
+
+const pickTargetsByPriority = (
+  ctx: Pick<NormalizedContext, 'targetPriority'>,
+  tokens: ReadonlyArray<UnitToken>,
+  limit: number,
+): UnitToken[] => {
+  if (tokens.length <= 1 || limit <= 0) return tokens.slice(0, Math.max(0, limit));
+  const priority = ctx.targetPriority;
+  if (priority === 'board') return tokens.slice(0, limit);
+  if (limit === 1) {
+    if (priority === 'leader-first') {
+      for (const token of tokens) {
+        if (isLeaderToken(token)) return [token];
+      }
+      return [tokens[0]];
+    }
+    const useRatioMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio';
+    const findLowest = priority === 'lowest-hp' || priority === 'lowest-hp-ratio';
+    return pickSingleByMetric(
+      tokens,
+      (token) => (useRatioMetric ? readHpRatio(token) : toFiniteNumber(token.hp, 0)),
+      findLowest,
+    );
+  }
+  if (priority === 'leader-first') {
+    const leaders: UnitToken[] = [];
+    const nonLeaders: UnitToken[] = [];
+    for (const token of tokens) {
+      if (isLeaderToken(token)) leaders.push(token);
+      else nonLeaders.push(token);
+    }
+    return [...leaders, ...nonLeaders].slice(0, limit);
+  }
+  const sorted = [...tokens];
+  sorted.sort((a, b) => {
+    const aMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio'
+      ? readHpRatio(a)
+      : toFiniteNumber(a.hp, 0);
+    const bMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio'
+      ? readHpRatio(b)
+      : toFiniteNumber(b.hp, 0);
+    if (priority === 'lowest-hp' || priority === 'lowest-hp-ratio') return aMetric - bMetric;
+    return bMetric - aMetric;
+  });
+  return sorted.slice(0, limit);
 };
 
 const readTurns = (payload: Record<string, unknown> | null, ...keys: string[]): number => {
@@ -175,11 +296,13 @@ const assignTargetsIfEmpty = (result: TagDispatchResult, nextTargets: UnitToken[
 };
 
 const assignSliceTargetsIfEmpty = (
+  ctx: Pick<NormalizedContext, 'targetPriority' | 'targetRole'>,
   result: TagDispatchResult,
   source: ReadonlyArray<UnitToken>,
   limit: number,
 ): void => {
-  assignTargetsIfEmpty(result, source.slice(0, limit));
+  const filtered = filterTokensByRole(ctx, source);
+  assignTargetsIfEmpty(result, pickTargetsByPriority(ctx, filtered, limit));
 };
 
 const applyDamageLikeEffect = (
@@ -257,11 +380,11 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   },
   ally: (ctx, result) => {
     if (!ctx.attacker) return;
-    assignSliceTargetsIfEmpty(result, ctx.attackerTokens, readTargetLimit(ctx, 1));
+    assignSliceTargetsIfEmpty(ctx, result, ctx.attackerTokens, readTargetLimit(ctx, 1));
   },
   enemy: (ctx, result) => {
     if (!ctx.attacker) return;
-    assignSliceTargetsIfEmpty(result, ctx.opponentTokens, readTargetLimit(ctx, 1));
+    assignSliceTargetsIfEmpty(ctx, result, ctx.opponentTokens, readTargetLimit(ctx, 1));
   },
   'random-target': (ctx, result) => {
     if (!ctx.attacker) return;
@@ -275,7 +398,7 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   },
   'multi-target': (ctx, result) => {
     if (!ctx.attacker) return;
-    assignSliceTargetsIfEmpty(result, ctx.opponentTokens, readTargetLimit(ctx, 2));
+    assignSliceTargetsIfEmpty(ctx, result, ctx.opponentTokens, readTargetLimit(ctx, 2));
   },
   aoe: (ctx, result) => {
     if (!ctx.attacker) return;
@@ -355,9 +478,10 @@ export function dispatchGameplayTags(
   const normalizedTags = context.tagsNormalized
     ? (Array.isArray(rawTags) ? rawTags : EMPTY_TAGS)
     : normalizeTagList(rawTags);
-    const tags: string[] = [];
+  const tags: string[] = [];
   const deferredRuleTags: string[] = [];
-  for (const tag of normalizedTags) {
+  for (const rawTag of normalizedTags) {
+    const tag = resolveDispatchTag(rawTag);
     if (RULE_TARGET_OVERRIDE_TAGS.has(tag)) deferredRuleTags.push(tag);
     else tags.push(tag);
   }
@@ -381,6 +505,8 @@ export function dispatchGameplayTags(
     deferEffects: Boolean(context.deferEffects),
     attackerTokens: attacker ? allyTokens : EMPTY_TOKENS,
     opponentTokens: attacker ? enemyTokens : EMPTY_TOKENS,
+    targetPriority: readTargetPriority(context.payload ?? null),
+    targetRole: readTargetRole(context.payload ?? null),
   };
 
   const result: TagDispatchResult = {

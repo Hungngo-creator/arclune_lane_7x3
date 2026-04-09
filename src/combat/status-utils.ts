@@ -35,14 +35,3 @@ export function getStatusEntryById(
   if (!status) return null;
   return { statuses: list, index, status };
 }
-
-export function findStatusIndexById(
-  target: UnitToken | null | undefined,
-  statusId: string,
-  statuses?: StatusEffect[],
-): number {
-  if (!target || !statusId) return -1;
-  const list = statuses ?? (Array.isArray(target.statuses) ? target.statuses : null);
-  if (!list || list.length === 0) return -1;
-  return findStatusIndexInList(list, statusId);
-}

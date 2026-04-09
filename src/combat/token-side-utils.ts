@@ -66,3 +66,20 @@ export function partitionTokensBySide(
     enemyTokens: buckets.ally,
   };
 }
+
+export function forEachPartitionToken(
+  tokens: ReadonlyArray<UnitToken>,
+  perspectiveSide: Side,
+  kind: 'ally' | 'enemy',
+  visitor: (token: UnitToken) => void,
+  options: PartitionOptions = {},
+): void {
+  const includeDead = options.includeDead === true;
+  for (const token of tokens) {
+    if (!includeDead && !token?.alive) continue;
+    const isAllyFromPerspective = token.side === perspectiveSide;
+    const matches = kind === 'ally' ? isAllyFromPerspective : !isAllyFromPerspective;
+    if (!matches) continue;
+    visitor(token);
+  }
+}

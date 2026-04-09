@@ -152,6 +152,80 @@ describe('combat tag dispatcher matrix', () => {
     expect(opposingUnit.hp).toBe(10);
   });
 
+  it('supports lowest-hp targeting priority for ally/enemy selectors', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally', hp: 80, hpMax: 100 });
+    const allyLow = makeToken({ id: 'ally-low', side: 'ally', hp: 10, hpMax: 100, cx: 2, cy: 0 });
+    const allyHigh = makeToken({ id: 'ally-high', side: 'ally', hp: 90, hpMax: 100, cx: 1, cy: 0 });
+    const enemyLow = makeToken({ id: 'enemy-low', side: 'enemy', hp: 5, hpMax: 100, cx: 2, cy: 1 });
+    const enemyHigh = makeToken({ id: 'enemy-high', side: 'enemy', hp: 95, hpMax: 100, cx: 1, cy: 1 });
+    const game = makeGame([attacker, allyLow, allyHigh, enemyLow, enemyHigh]);
+
+    const allyResult = dispatchGameplayTags(['ally'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+      payload: { targetCount: 2, targetPriority: 'lowest-hp' },
+    });
+    expect(allyResult.targets.map((token) => token.id)).toEqual(['ally-low', 'attacker']);
+
+    const enemyResult = dispatchGameplayTags(['enemy'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+      payload: { targetCount: 1, targetPriority: 'lowest-hp' },
+    });
+    expect(enemyResult.targets.map((token) => token.id)).toEqual(['enemy-low']);
+  });
+
+  it('accepts character-spec style targeting aliases and hp-ratio priority', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally', hp: 90, hpMax: 100 });
+    const allyA = makeToken({ id: 'ally-a', side: 'ally', hp: 20, hpMax: 40, cx: 1, cy: 0 }); // 50%
+    const allyB = makeToken({ id: 'ally-b', side: 'ally', hp: 30, hpMax: 100, cx: 2, cy: 0 }); // 30%
+    const enemyA = makeToken({ id: 'enemy-a', side: 'enemy', hp: 10, hpMax: 100, cx: 1, cy: 1 });
+    const enemyB = makeToken({ id: 'enemy-b', side: 'enemy', hp: 60, hpMax: 100, cx: 2, cy: 1 });
+    const game = makeGame([attacker, allyA, allyB, enemyA, enemyB]);
+
+    const allyAliasResult = dispatchGameplayTags(['bản thân lẫn đồng minh'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+      payload: { targetCount: 1, targetPriority: 'lowest-hp-ratio' },
+    });
+    expect(allyAliasResult.targets.map((token) => token.id)).toEqual(['ally-b']);
+
+    const enemyAliasResult = dispatchGameplayTags(['đơn mục tiêu ngẫu nhiên', 'kẻ địch'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+      payload: { targetCount: 1 },
+    });
+    expect(enemyAliasResult.targets).toHaveLength(1);
+    expect(['enemy-a', 'enemy-b']).toContain(enemyAliasResult.targets[0]?.id);
+  });
+
+  it('supports leader-first priority and leader-only target role', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally', cx: 2, cy: 0 });
+    const enemyLeader = makeToken({ id: 'enemy-leader', side: 'enemy', cx: 6, cy: 1 }); // slot 8
+    const enemyOther = makeToken({ id: 'enemy-other', side: 'enemy', cx: 3, cy: 0 }); // slot 1
+    const game = makeGame([attacker, enemyLeader, enemyOther]);
+
+    const leaderFirst = dispatchGameplayTags(['enemy'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+      payload: { targetCount: 1, targetPriority: 'leader-first' },
+    });
+    expect(leaderFirst.targets.map((token) => token.id)).toEqual(['enemy-leader']);
+
+    const leaderOnly = dispatchGameplayTags(['enemy'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+      payload: { targetCount: 2, targetRole: 'leader' },
+    });
+    expect(leaderOnly.targets.map((token) => token.id)).toEqual(['enemy-leader']);
+  });
+
   it('handles silence / sleep / mark statuses', () => {
     const attacker = makeToken({ id: 'attacker', side: 'ally' });
     const target = makeToken({ id: 'target', side: 'enemy' });

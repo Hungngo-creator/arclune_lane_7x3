@@ -7,7 +7,7 @@ import {
 } from '../data/tags.ts';
 import { applyDamage, grantShield } from './apply-damage.ts';
 import { toFiniteNumber, toFloorInt } from './number-utils.ts';
-import { bucketTokensByActualSide, partitionTokensBySide } from './token-side-utils.ts';
+import { bucketTokensByActualSide, forEachPartitionToken } from './token-side-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -69,12 +69,11 @@ export function applyChapMinhActionEnd(game: SessionState | null | undefined, ca
   const shieldAmount = Math.max(0, Math.floor((caster.hpMax ?? 0) * 0.15));
   if (shieldAmount <= 0) return;
 
-  const { allyTokens } = partitionTokensBySide(game.tokens, caster.side);
-  for (const token of allyTokens) {
+  forEachPartitionToken(game.tokens, caster.side, 'ally', (token) => {
     const { column: tokenColumn } = resolveSlotAndColumn(token);
-    if (tokenColumn !== column) continue;
+    if (tokenColumn !== column) return;
     grantShield(token, shieldAmount, { durationTurns: 1 });
-  }
+  });
 }
 
 function extractNormalizedSkillTags(skill: unknown): string[] {

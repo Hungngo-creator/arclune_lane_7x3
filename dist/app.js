@@ -5205,7 +5205,7 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   const toFloorInt = __dep3.toFloorInt;
   const __dep4 = __require('./combat/token-side-utils.ts');
   const bucketTokensByActualSide = __dep4.bucketTokensByActualSide;
-  const partitionTokensBySide = __dep4.partitionTokensBySide;
+  const forEachPartitionToken = __dep4.forEachPartitionToken;
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const CHAP_MINH_LINK_REDUCTION = 0.30;
   const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
@@ -5249,13 +5249,12 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       const shieldAmount = Math.max(0, Math.floor((caster.hpMax ?? 0) * 0.15));
       if (shieldAmount <= 0)
           return;
-      const { allyTokens } = partitionTokensBySide(game.tokens, caster.side);
-      for (const token of allyTokens) {
+      forEachPartitionToken(game.tokens, caster.side, 'ally', (token) => {
           const { column: tokenColumn } = resolveSlotAndColumn(token);
           if (tokenColumn !== column)
-              continue;
+              return;
           grantShield(token, shieldAmount, { durationTurns: 1 });
-      }
+      });
   }
   function extractNormalizedSkillTags(skill) {
       if (!skill || typeof skill !== 'object')
@@ -5613,7 +5612,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const toPositiveTurns = __dep9.toPositiveTurns;
   const toRoundedInt = __dep9.toRoundedInt;
   const __dep10 = __require('./combat/token-side-utils.ts');
-  const partitionTokensBySide = __dep10.partitionTokensBySide;
+  const forEachPartitionToken = __dep10.forEachPartitionToken;
   const __dep11 = __require('./combat/skill-result.ts');
   const buildSkillResult = __dep11.buildSkillResult;
   const EMPTY_TAGS = [];
@@ -5628,9 +5627,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       'taunt',
       'non-heal-hp-change',
   ]);
-  const DAMAGE_TARGET_TAGS = new Set([
-      'non-heal-hp-change',
-  ]);
+  const DAMAGE_TARGET_TAG = 'non-heal-hp-change';
   const MENG_YEM_ID = 'mong_yem';
   const MENG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
       markId: 'me_hoac',
@@ -5710,6 +5707,32 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           return null;
       return parsed;
   }
+  function parseSkillTags(tags) {
+      const effectTags = [];
+      let hasAetherCostTag = false;
+      let hasSummonTag = false;
+      let hasUniqueGlobalTag = false;
+      let hasDamageTag = false;
+      for (const tag of tags) {
+          if (tag === 'aether-cost')
+              hasAetherCostTag = true;
+          if (tag === 'summon')
+              hasSummonTag = true;
+          if (tag === 'unique-global')
+              hasUniqueGlobalTag = true;
+          if (tag === DAMAGE_TARGET_TAG)
+              hasDamageTag = true;
+          if (EFFECT_APPLICATION_TAGS.has(tag))
+              effectTags.push(tag);
+      }
+      return {
+          effectTags,
+          hasAetherCostTag,
+          hasSummonTag,
+          hasUniqueGlobalTag,
+          hasDamageTag,
+      };
+  }
   function performActiveSkill(game, caster, skillKey) {
       if (!caster.alive) {
           return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'blocked');
@@ -5719,23 +5742,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
       }
       const tags = normalizeTagList(skill.tags ?? []);
-      const effectTags = [];
-      let hasAetherCostTag = false;
-      let hasSummonTag = false;
-      let hasUniqueGlobalTag = false;
-      let hasDamageTag = false;
-      for (const tag of tags) {
-          if (!hasAetherCostTag && tag === 'aether-cost')
-              hasAetherCostTag = true;
-          if (!hasSummonTag && tag === 'summon')
-              hasSummonTag = true;
-          if (!hasUniqueGlobalTag && tag === 'unique-global')
-              hasUniqueGlobalTag = true;
-          if (!hasDamageTag && DAMAGE_TARGET_TAGS.has(tag))
-              hasDamageTag = true;
-          if (EFFECT_APPLICATION_TAGS.has(tag))
-              effectTags.push(tag);
-      }
+      const { effectTags, hasAetherCostTag, hasSummonTag, hasUniqueGlobalTag, hasDamageTag, } = parseSkillTags(tags);
       const payload = resolvePayload(skill);
       const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
       const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;
@@ -5782,8 +5789,10 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           return runtimeSkillResult;
       const casterPower = (caster.atk ?? 0) + (caster.wil ?? 0);
       if (caster.id === BLOOD_AVATAR_ID) {
-          const { enemyTokens } = partitionTokensBySide(game.tokens, caster.side);
-          const enemies = enemyTokens;
+          const enemies = [];
+          forEachPartitionToken(game.tokens, caster.side, 'enemy', (token) => {
+              enemies.push(token);
+          });
           const consumeBloodAether = () => (usesTagAetherCost || consumeSideAether(caster.side, BLOOD_AVATAR_SKILL_COST));
           if (skillKey === 'skill1') {
               if (!consumeBloodAether()) {
@@ -5927,18 +5936,9 @@ __modules['./combat/status-utils.ts'] = (exports, module, __require) => {
           return null;
       return { statuses: list, index, status };
   }
-  function findStatusIndexById(target, statusId, statuses) {
-      if (!target || !statusId)
-          return -1;
-      const list = statuses ?? (Array.isArray(target.statuses) ? target.statuses : null);
-      if (!list || list.length === 0)
-          return -1;
-      return findStatusIndexInList(list, statusId);
-  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStatusList')) exports.ensureStatusList = ensureStatusList;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getStatusEntryById')) exports.getStatusEntryById = getStatusEntryById;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'findStatusIndexById')) exports.findStatusIndexById = findStatusIndexById;
 };
 __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/apply-damage.ts');
@@ -5962,9 +5962,27 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const getStatusEntryById = __dep6.getStatusEntryById;
   const __dep7 = __require('./combat/token-side-utils.ts');
   const partitionTokensBySide = __dep7.partitionTokensBySide;
+  const __dep8 = __require('./engine.ts');
+  const slotIndex = __dep8.slotIndex;
   const RULE_TARGET_OVERRIDE_TAGS = new Set(['global-rule']);
   const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
   const EMPTY_TAGS = [];
+  const DISPATCH_TAG_ALIASES = Object.freeze({
+      'self-and-ally': 'ally',
+      'ally-and-self': 'ally',
+      'ban_than_lan_dong_minh': 'ally',
+      'ban-than-lan-dong-minh': 'ally',
+      'ban than lan dong minh': 'ally',
+      'bản thân lẫn đồng minh': 'ally',
+      'random-single': 'random-target',
+      'single-target-random': 'random-target',
+      'đơn mục tiêu ngẫu nhiên': 'random-target',
+      'all-enemy': 'aoe',
+      'kẻ địch': 'enemy',
+  });
+  function resolveDispatchTag(tag) {
+      return DISPATCH_TAG_ALIASES[tag] ?? tag;
+  }
   function collectAliveTargets(tokens) {
       const alive = [];
       for (const token of tokens) {
@@ -6009,6 +6027,100 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       || ctx.payload?.allowDuplicates === true);
   const sampleFromCandidates = (ctx, candidates, limit) => {
       return sampleTargets(ctx, candidates, limit, readAllowDuplicateTargets(ctx));
+  };
+  const readTargetPriority = (payload) => {
+      const raw = String(payload?.targetPriority ?? payload?.priority ?? '').trim().toLowerCase();
+      if (raw === 'leader-first' || raw === 'leader_first' || raw === 'leader')
+          return 'leader-first';
+      if (raw === 'lowest-hp' || raw === 'lowest_hp' || raw === 'hp-asc')
+          return 'lowest-hp';
+      if (raw === 'highest-hp' || raw === 'highest_hp' || raw === 'hp-desc')
+          return 'highest-hp';
+      if (raw === 'lowest-hp-ratio' || raw === 'lowest_hp_ratio' || raw === 'lowest-hp-percent')
+          return 'lowest-hp-ratio';
+      if (raw === 'highest-hp-ratio' || raw === 'highest_hp_ratio' || raw === 'highest-hp-percent')
+          return 'highest-hp-ratio';
+      return 'board';
+  };
+  const readTargetRole = (payload) => {
+      const raw = String(payload?.targetRole ?? '').trim().toLowerCase();
+      if (raw === 'leader')
+          return 'leader';
+      return 'any';
+  };
+  const isLeaderToken = (token) => {
+      if (!Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side)
+          return false;
+      return slotIndex(token.side, token.cx, token.cy) === 8;
+  };
+  const filterTokensByRole = (ctx, tokens) => {
+      if (ctx.targetRole !== 'leader')
+          return tokens;
+      const leaders = tokens.filter((token) => isLeaderToken(token));
+      return leaders;
+  };
+  const pickSingleByMetric = (tokens, metric, findLowest) => {
+      if (tokens.length === 0)
+          return [];
+      let best = tokens[0];
+      let bestValue = metric(best);
+      for (let i = 1; i < tokens.length; i += 1) {
+          const candidate = tokens[i];
+          const candidateValue = metric(candidate);
+          if ((findLowest && candidateValue < bestValue) || (!findLowest && candidateValue > bestValue)) {
+              best = candidate;
+              bestValue = candidateValue;
+          }
+      }
+      return [best];
+  };
+  const readHpRatio = (unit) => {
+      const hpMax = Math.max(1, toFiniteNumber(unit.hpMax, 1));
+      const hp = Math.max(0, toFiniteNumber(unit.hp, 0));
+      return hp / hpMax;
+  };
+  const pickTargetsByPriority = (ctx, tokens, limit) => {
+      if (tokens.length <= 1 || limit <= 0)
+          return tokens.slice(0, Math.max(0, limit));
+      const priority = ctx.targetPriority;
+      if (priority === 'board')
+          return tokens.slice(0, limit);
+      if (limit === 1) {
+          if (priority === 'leader-first') {
+              for (const token of tokens) {
+                  if (isLeaderToken(token))
+                      return [token];
+              }
+              return [tokens[0]];
+          }
+          const useRatioMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio';
+          const findLowest = priority === 'lowest-hp' || priority === 'lowest-hp-ratio';
+          return pickSingleByMetric(tokens, (token) => (useRatioMetric ? readHpRatio(token) : toFiniteNumber(token.hp, 0)), findLowest);
+      }
+      if (priority === 'leader-first') {
+          const leaders = [];
+          const nonLeaders = [];
+          for (const token of tokens) {
+              if (isLeaderToken(token))
+                  leaders.push(token);
+              else
+                  nonLeaders.push(token);
+          }
+          return [...leaders, ...nonLeaders].slice(0, limit);
+      }
+      const sorted = [...tokens];
+      sorted.sort((a, b) => {
+          const aMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio'
+              ? readHpRatio(a)
+              : toFiniteNumber(a.hp, 0);
+          const bMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio'
+              ? readHpRatio(b)
+              : toFiniteNumber(b.hp, 0);
+          if (priority === 'lowest-hp' || priority === 'lowest-hp-ratio')
+              return aMetric - bMetric;
+          return bMetric - aMetric;
+      });
+      return sorted.slice(0, limit);
   };
   const readTurns = (payload, ...keys) => {
       for (const key of keys) {
@@ -6059,8 +6171,9 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           return;
       result.targets = nextTargets;
   };
-  const assignSliceTargetsIfEmpty = (result, source, limit) => {
-      assignTargetsIfEmpty(result, source.slice(0, limit));
+  const assignSliceTargetsIfEmpty = (ctx, result, source, limit) => {
+      const filtered = filterTokensByRole(ctx, source);
+      assignTargetsIfEmpty(result, pickTargetsByPriority(ctx, filtered, limit));
   };
   const applyDamageLikeEffect = (ctx, result, amount) => {
       if (amount <= 0)
@@ -6136,12 +6249,12 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       ally: (ctx, result) => {
           if (!ctx.attacker)
               return;
-          assignSliceTargetsIfEmpty(result, ctx.attackerTokens, readTargetLimit(ctx, 1));
+          assignSliceTargetsIfEmpty(ctx, result, ctx.attackerTokens, readTargetLimit(ctx, 1));
       },
       enemy: (ctx, result) => {
           if (!ctx.attacker)
               return;
-          assignSliceTargetsIfEmpty(result, ctx.opponentTokens, readTargetLimit(ctx, 1));
+          assignSliceTargetsIfEmpty(ctx, result, ctx.opponentTokens, readTargetLimit(ctx, 1));
       },
       'random-target': (ctx, result) => {
           if (!ctx.attacker)
@@ -6158,7 +6271,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       'multi-target': (ctx, result) => {
           if (!ctx.attacker)
               return;
-          assignSliceTargetsIfEmpty(result, ctx.opponentTokens, readTargetLimit(ctx, 2));
+          assignSliceTargetsIfEmpty(ctx, result, ctx.opponentTokens, readTargetLimit(ctx, 2));
       },
       aoe: (ctx, result) => {
           if (!ctx.attacker)
@@ -6245,7 +6358,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           : normalizeTagList(rawTags);
       const tags = [];
       const deferredRuleTags = [];
-      for (const tag of normalizedTags) {
+      for (const rawTag of normalizedTags) {
+          const tag = resolveDispatchTag(rawTag);
           if (RULE_TARGET_OVERRIDE_TAGS.has(tag))
               deferredRuleTags.push(tag);
           else
@@ -6271,6 +6385,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           deferEffects: Boolean(context.deferEffects),
           attackerTokens: attacker ? allyTokens : EMPTY_TOKENS,
           opponentTokens: attacker ? enemyTokens : EMPTY_TOKENS,
+          targetPriority: readTargetPriority(context.payload ?? null),
+          targetRole: readTargetRole(context.payload ?? null),
       };
       const result = {
           tags,
@@ -6345,9 +6461,22 @@ __modules['./combat/token-side-utils.ts'] = (exports, module, __require) => {
           enemyTokens: buckets.ally,
       };
   }
+  function forEachPartitionToken(tokens, perspectiveSide, kind, visitor, options = {}) {
+      const includeDead = options.includeDead === true;
+      for (const token of tokens) {
+          if (!includeDead && !token?.alive)
+              continue;
+          const isAllyFromPerspective = token.side === perspectiveSide;
+          const matches = kind === 'ally' ? isAllyFromPerspective : !isAllyFromPerspective;
+          if (!matches)
+              continue;
+          visitor(token);
+      }
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'bucketTokensByActualSide')) exports.bucketTokensByActualSide = bucketTokensByActualSide;
   if (!Object.prototype.hasOwnProperty.call(exports, 'partitionTokensBySide')) exports.partitionTokensBySide = partitionTokensBySide;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'forEachPartitionToken')) exports.forEachPartitionToken = forEachPartitionToken;
 };
 __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
@@ -6496,9 +6625,6 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
       const statusEntry = getStatusEntryById(unit, statusId);
       return Math.max(0, toRoundedInt(statusEntry?.status.stacks ?? 0, 0));
   }
-  function hasStatus(unit, statusId) {
-      return getStatusEntryById(unit, statusId) != null;
-  }
   const mongYemRuntimeHook = {
       onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
           if (skillKey === 'skill1') {
@@ -6552,7 +6678,7 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
           const finalMultiplier = baseMultiplier * (1 + markBonus);
           const base = Math.max(1, Math.floor(((caster.atk ?? 0) + (caster.wil ?? 0)) * finalMultiplier));
           const pierceConfig = skill.pierceIfSleeping;
-          const sleeping = hasStatus(target, 'sleep');
+          const sleeping = getStatusEntryById(target, 'sleep') != null;
           const defPen = sleeping
               ? Math.max(0, toFiniteNumber(pierceConfig?.ARM ?? 0, 0), toFiniteNumber(pierceConfig?.RES ?? 0, 0))
               : 0;

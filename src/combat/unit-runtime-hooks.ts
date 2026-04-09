@@ -184,10 +184,6 @@ function readStatusStacks(unit: UnitToken, statusId: string): number {
   return Math.max(0, toRoundedInt(statusEntry?.status.stacks ?? 0, 0));
 }
 
-function hasStatus(unit: UnitToken, statusId: string): boolean {
-  return getStatusEntryById(unit, statusId) != null;
-}
-
 const mongYemRuntimeHook: UnitRuntimeHook = {
   onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
     if (skillKey === 'skill1') {
@@ -245,7 +241,7 @@ const mongYemRuntimeHook: UnitRuntimeHook = {
     const base = Math.max(1, Math.floor(((caster.atk ?? 0) + (caster.wil ?? 0)) * finalMultiplier));
 
     const pierceConfig = (skill as Record<string, unknown>).pierceIfSleeping as Record<string, unknown> | undefined;
-    const sleeping = hasStatus(target, 'sleep');
+    const sleeping = getStatusEntryById(target, 'sleep') != null;
     const defPen = sleeping
       ? Math.max(0, toFiniteNumber(pierceConfig?.ARM ?? 0, 0), toFiniteNumber(pierceConfig?.RES ?? 0, 0))
       : 0;
