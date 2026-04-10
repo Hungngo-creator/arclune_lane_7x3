@@ -6,6 +6,7 @@ import { dealAbilityDamage, healUnit } from '../combat.ts';
 import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
+import { normalizeCombatTag } from './tag-aliases.ts';
 import { slotIndex } from '../engine.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -23,6 +24,7 @@ export interface TagDispatchContext {
   deferEffects?: boolean;
   onSummon?: () => void;
   tagsNormalized?: boolean;
+  tagsCanonical?: boolean;
 }
 
 export interface TagDispatchResult {
@@ -34,28 +36,6 @@ export interface TagDispatchResult {
 const RULE_TARGET_OVERRIDE_TAGS = new Set(['global-rule']);
 const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup'] as const);
 const EMPTY_TAGS: string[] = [];
-const DISPATCH_TAG_ALIASES = Object.freeze<Record<string, string>>({
-  'self-and-ally': 'ally',
-  'ally-and-self': 'ally',
-  'ban_than_lan_dong_minh': 'ally',
-  'ban-than-lan-dong-minh': 'ally',
-  'ban than lan dong minh': 'ally',
-  'bản thân lẫn đồng minh': 'ally',
-  'random-single': 'random-target',
-  'single-target-random': 'random-target',
-  'đơn mục tiêu ngẫu nhiên': 'random-target',
-  'all-enemy': 'aoe',
-  'kẻ địch': 'enemy',
-  'lap-tuc': 'instant',
-  'lập tức': 'instant',
-  'quy tắc': 'global-rule',
-  'quy-tac': 'global-rule',
-  'muc-tieu-leader': 'leader-target',
-  'mục tiêu leader': 'leader-target',
-  'mục tiêu: leader': 'leader-target',
-  'target-leader': 'leader-target',
-});
-
 type NormalizedContext = {
   game: SessionState | null;
   attacker: UnitToken | null;
@@ -76,7 +56,7 @@ type NormalizedContext = {
 type TagHandler = (ctx: NormalizedContext, result: TagDispatchResult) => void;
 
 function resolveDispatchTag(tag: string): string {
-  return DISPATCH_TAG_ALIASES[tag] ?? tag;
+  return normalizeCombatTag(tag);
 }
 
 function collectAliveTargets(tokens: ReadonlyArray<UnitToken>): UnitToken[] {
@@ -517,6 +497,15 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     const amount = readEffectAmount(ctx.payload, 'hpDelta', 'damage');
     applyDamageLikeEffect(ctx, result, amount);
   },
+  instant: (_ctx, result) => {
+    result.sideEffects.push('instant');
+  },
+  condition: () => {
+    // Condition tags are validated at skill execution stage.
+  },
+  'hp-cost': () => {
+    // HP costs are resolved centrally in performActiveSkill payload processing.
+  },
 });
 
 export function dispatchGameplayTags(
@@ -528,8 +517,9 @@ export function dispatchGameplayTags(
     : normalizeTagList(rawTags);
   const tags: string[] = [];
   const deferredRuleTags: string[] = [];
+  const treatAsCanonical = context.tagsCanonical === true;
   for (const rawTag of normalizedTags) {
-    const tag = resolveDispatchTag(rawTag);
+    const tag = treatAsCanonical ? rawTag : resolveDispatchTag(rawTag);
     if (RULE_TARGET_OVERRIDE_TAGS.has(tag)) deferredRuleTags.push(tag);
     else tags.push(tag);
   }
@@ -597,5 +587,6 @@ export function applyMarkSleepSetupTag(
     payload,
     deferEffects: false,
     tagsNormalized: true,
+    tagsCanonical: true,
   });
 }

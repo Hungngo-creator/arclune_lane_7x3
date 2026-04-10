@@ -11,6 +11,7 @@ import { resolveSkillPayload } from './skill-metadata-utils.ts';
 import { readAtkWilPower, toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
+import { normalizeCombatTagList } from './tag-aliases.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -90,6 +91,23 @@ function applyHpCost(caster: UnitToken, payload: Record<string, unknown>): boole
   return true;
 }
 
+function checkHpCondition(caster: UnitToken, payload: Record<string, unknown>): boolean {
+  const hpMax = Math.max(1, toFloorInt(caster.hpMax, 1));
+  const currentHp = Math.max(0, toFloorInt(caster.hp, hpMax));
+  const requiredRatio = Math.max(
+    0,
+    toFiniteNumber(
+      payload.minCurrentHpRatio
+      ?? payload.requireCurrentHpRatioMin
+      ?? payload.requiredHpRatio
+      ?? payload.conditionMinHpRatio,
+      0,
+    ),
+  );
+  if (requiredRatio <= 0) return true;
+  return currentHp / hpMax >= requiredRatio;
+}
+
 function firstOpenSlot(game: SessionState, side: UnitToken['side']): number | null {
   const aliveTokens: UnitToken[] = [];
   for (const token of game.tokens) {
@@ -119,6 +137,7 @@ function resolveDirectDamageMultiplier(skill: SkillSection): number | null {
 
 function parseSkillTags(tags: ReadonlyArray<string>): ParsedSkillTags {
   const effectTags: string[] = [];
+  const seenEffects = new Set<string>();
   let hasAetherCostTag = false;
   let hasSummonTag = false;
   let hasUniqueGlobalTag = false;
@@ -140,7 +159,10 @@ function parseSkillTags(tags: ReadonlyArray<string>): ParsedSkillTags {
       default:
         break;
     }
-    if (EFFECT_APPLICATION_TAGS.has(tag)) effectTags.push(tag);
+    if (EFFECT_APPLICATION_TAGS.has(tag) && !seenEffects.has(tag)) {
+      seenEffects.add(tag);
+      effectTags.push(tag);
+    }
   }
   return {
     effectTags,
@@ -161,7 +183,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
   }
 
-  const tags = normalizeTagList(skill.tags ?? []);
+  const tags = normalizeCombatTagList(normalizeTagList(skill.tags ?? []));
   const {
     effectTags,
     hasAetherCostTag,
@@ -187,6 +209,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     payload,
     deferEffects: true,
     tagsNormalized: true,
+    tagsCanonical: true,
     onAetherCost: (amount, side) => {
       if (amount <= 0) {
         consumedAether = true;
@@ -204,6 +227,9 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   }
 
   const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
+  if (!checkHpCondition(caster, payload)) {
+    return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+  }
   if (!applyHpCost(caster, payload)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
@@ -297,6 +323,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
       payload,
       deferEffects: false,
       tagsNormalized: true,
+      tagsCanonical: true,
       onAetherCost: () => false,
       onSummon: () => undefined,
     });

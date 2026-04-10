@@ -117,6 +117,7 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['./screens/chess-strategy-rpg/turn-state.js', './screens/chess-strategy-rpg/turn-state.ts'],
   ['./combat/chap-minh-runtime.js', './combat/chap-minh-runtime.ts'],
   ['./combat/number-utils.js', './combat/number-utils.ts'],
+  ['./combat/tag-aliases.js', './combat/tag-aliases.ts'],
   ['./combat/status-utils.js', './combat/status-utils.ts'],
   ['./combat/skill-result.js', './combat/skill-result.ts'],
   ['./combat/skill-metadata-utils.js', './combat/skill-metadata-utils.ts'],
