@@ -13,12 +13,18 @@ function collectSkillRecords(skill: SkillSection): SkillRecord[] {
   const metaPayload = asRecord(meta?.payload);
 
   const records: SkillRecord[] = [];
-  if (root) records.push(root);
-  if (payload) records.push(payload);
-  if (metadata) records.push(metadata);
-  if (metadataPayload) records.push(metadataPayload);
-  if (meta) records.push(meta);
-  if (metaPayload) records.push(metaPayload);
+  const seen = new Set<SkillRecord>();
+  const pushUnique = (record: SkillRecord | null): void => {
+    if (!record || seen.has(record)) return;
+    seen.add(record);
+    records.push(record);
+  };
+  pushUnique(root);
+  pushUnique(payload);
+  pushUnique(metadata);
+  pushUnique(metadataPayload);
+  pushUnique(meta);
+  pushUnique(metaPayload);
   return records;
 }
 

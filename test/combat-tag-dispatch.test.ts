@@ -3,7 +3,7 @@ import { describe, expect, it } from '@jest/globals';
 import { dispatchGameplayTags } from '../src/combat/tag-dispatch.ts';
 import { performActiveSkill } from '../src/combat/perform-active-skill.ts';
 import { normalizeTagList } from '../src/data/tags.ts';
-import { slotToCell } from '../src/engine.ts';y
+import { slotToCell } from '../src/engine.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';

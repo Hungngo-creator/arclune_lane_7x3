@@ -6061,18 +6061,19 @@ __modules['./combat/skill-metadata-utils.ts'] = (exports, module, __require) => 
       const metadataPayload = asRecord(metadata?.payload);
       const metaPayload = asRecord(meta?.payload);
       const records = [];
-      if (root)
-          records.push(root);
-      if (payload)
-          records.push(payload);
-      if (metadata)
-          records.push(metadata);
-      if (metadataPayload)
-          records.push(metadataPayload);
-      if (meta)
-          records.push(meta);
-      if (metaPayload)
-          records.push(metaPayload);
+      const seen = new Set();
+      const pushUnique = (record) => {
+          if (!record || seen.has(record))
+              return;
+          seen.add(record);
+          records.push(record);
+      };
+      pushUnique(root);
+      pushUnique(payload);
+      pushUnique(metadata);
+      pushUnique(metadataPayload);
+      pushUnique(meta);
+      pushUnique(metaPayload);
       return records;
   }
   function resolveSkillPayload(skill) {
@@ -6180,6 +6181,8 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'lập tức': 'instant',
       'quy tắc': 'global-rule',
       'quy-tac': 'global-rule',
+      'pháp tắc': 'doctrine-rule',
+      'phap-tac': 'doctrine-rule',
       'muc-tieu-leader': 'leader-target',
       'mục tiêu leader': 'leader-target',
       'mục tiêu: leader': 'leader-target',
@@ -6235,10 +6238,18 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'da-muc-tieu-ngau-nhien': 'random-aoe',
       'quy tắc: tái sinh': 'global-rule',
       'quy-tac-tai-sinh': 'global-rule',
-      'pháp tắc: kiên định': 'global-rule',
-      'phap-tac-kien-dinh': 'global-rule',
-      'quy tắc': 'global-rule',
-      'quy-tac': 'global-rule',
+      'pháp tắc: kiên định': 'doctrine-rule',
+      'phap-tac-kien-dinh': 'doctrine-rule',
+      'tuyệt đối': 'axiom-rule',
+      'tuyet-doi': 'axiom-rule',
+      'axiom': 'axiom-rule',
+      'axiom-rule': 'axiom-rule',
+      'tiên đề': 'axiom-rule',
+      'tien-de': 'axiom-rule',
+      'tag cấp độ cao': 'axiom-rule',
+      'tag-cap-do-cao': 'axiom-rule',
+      'cấp độ cao hơn pháp tắc': 'axiom-rule',
+      'cap-do-cao-hon-phap-tac': 'axiom-rule',
       'sát thương tự thân': 'non-heal-hp-change',
       'sat-thuong-tu-than': 'non-heal-hp-change',
       'aoe: hàng dọc': 'column-aoe',
@@ -6310,9 +6321,53 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const normalizeCombatTag = __dep8.normalizeCombatTag;
   const __dep9 = __require('./engine.ts');
   const slotIndex = __dep9.slotIndex;
-  const RULE_TARGET_OVERRIDE_TAGS = new Set(['global-rule']);
   const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
   const EMPTY_TAGS = [];
+  const DOCTRINE_NO_HEAL_STATUS_ID = 'doctrine-no-heal';
+  const TAG_PRIORITY_ORDER = Object.freeze({
+      'axiom-rule': 400,
+      'global-rule': 300,
+      'single-target': 220,
+      'leader-target': 220,
+      self: 220,
+      ally: 220,
+      enemy: 220,
+      'random-target': 210,
+      'multi-target': 210,
+      'random-aoe': 210,
+      'column-aoe': 210,
+      'cross-aoe': 210,
+      aoe: 200,
+      'doctrine-rule': 120,
+  });
+  function normalizeDispatchTags(rawTags, treatAsCanonical) {
+      const seen = new Set();
+      const normalized = [];
+      for (const rawTag of rawTags) {
+          const tag = treatAsCanonical ? rawTag : normalizeCombatTag(rawTag);
+          if (!tag || seen.has(tag))
+              continue;
+          seen.add(tag);
+          normalized.push(tag);
+      }
+      const hasAxiomRule = seen.has('axiom-rule');
+      const hasGlobalRule = seen.has('global-rule');
+      const filtered = normalized.filter((tag) => {
+          if (hasAxiomRule && (tag === 'global-rule' || tag === 'doctrine-rule'))
+              return false;
+          if (hasGlobalRule && tag === 'doctrine-rule')
+              return false;
+          return true;
+      });
+      filtered.sort((left, right) => {
+          const leftPriority = TAG_PRIORITY_ORDER[left] ?? 0;
+          const rightPriority = TAG_PRIORITY_ORDER[right] ?? 0;
+          if (leftPriority === rightPriority)
+              return 0;
+          return rightPriority - leftPriority;
+      });
+      return filtered;
+  }
   function collectAliveTargets(tokens) {
       const alive = [];
       for (const token of tokens) {
@@ -6594,6 +6649,19 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           ...(sourceUnitId ? { sourceUnitId } : {}),
       });
   };
+  const hasDoctrineNoHeal = (target, fromSide) => {
+      if (!Array.isArray(target.statuses) || target.statuses.length === 0)
+          return false;
+      for (const status of target.statuses) {
+          if (!status || status.id !== DOCTRINE_NO_HEAL_STATUS_ID)
+              continue;
+          if (!fromSide)
+              return true;
+          if (status.sourceSide == null || status.sourceSide !== fromSide)
+              return true;
+      }
+      return false;
+  };
   const applyTaggedStatus = (ctx, result, statusId, ...turnKeys) => {
       if (ctx.deferEffects)
           return;
@@ -6743,15 +6811,49 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
               return;
           result.targets = collectAliveTargets(ctx.game.tokens);
       },
+      'axiom-rule': (ctx, result) => {
+          if (!ctx.game)
+              return;
+          result.targets = collectAliveTargets(ctx.game.tokens);
+      },
+      'doctrine-rule': (ctx, result) => {
+          if (!ctx.game)
+              return;
+          result.targets = collectAliveTargets(ctx.game.tokens);
+          if (ctx.deferEffects || !ctx.attacker)
+              return;
+          const turns = readTurns(ctx.payload, 'forbidEnemyHealTurns', 'noHealTurns', 'turns', 'duration');
+          const shouldForbidEnemyHeal = (ctx.payload?.forbidEnemyHeal === true
+              || ctx.payload?.forbidHeal === true
+              || (turns > 0 && (ctx.payload?.forbidEnemyHealTurns != null
+                  || ctx.payload?.noHealTurns != null)));
+          if (!shouldForbidEnemyHeal)
+              return;
+          for (const token of ctx.opponentTokens) {
+              Statuses.add(token, {
+                  id: DOCTRINE_NO_HEAL_STATUS_ID,
+                  kind: 'debuff',
+                  tag: 'no-heal',
+                  dur: turns,
+                  tick: 'turn',
+                  sourceUnitId: ctx.attacker.id,
+                  sourceSide: ctx.attacker.side,
+              });
+          }
+          result.sideEffects.push(`doctrine-no-heal:${turns}`);
+      },
       heal: (ctx, result) => {
           if (ctx.deferEffects)
               return;
           const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
           if (amount <= 0)
               return;
+          const bypassDoctrineNoHeal = result.tags.includes('global-rule') || result.tags.includes('axiom-rule');
           const overhealShieldRatio = readOverhealShieldRatio(ctx.payload);
           const overflowShieldTurns = toPositiveTurns(toFiniteNumber(ctx.payload?.overflowShieldTurns ?? ctx.payload?.shieldTurns, 2), 2);
           for (const token of resolveEffectTargets(ctx, result)) {
+              if (!bypassDoctrineNoHeal && hasDoctrineNoHeal(token, ctx.attacker?.side ?? null))
+                  continue;
               const healResult = healUnit(token, amount);
               if (overhealShieldRatio > 0 && healResult.overheal > 0) {
                   const shieldAmount = Math.max(0, Math.floor(healResult.overheal * overhealShieldRatio));
@@ -6825,18 +6927,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       const normalizedTags = context.tagsNormalized
           ? (Array.isArray(rawTags) ? rawTags : EMPTY_TAGS)
           : normalizeTagList(rawTags);
-      const tags = [];
-      const deferredRuleTags = [];
       const treatAsCanonical = context.tagsCanonical === true;
-      for (const rawTag of normalizedTags) {
-          const tag = treatAsCanonical ? rawTag : normalizeCombatTag(rawTag);
-          if (RULE_TARGET_OVERRIDE_TAGS.has(tag))
-              deferredRuleTags.push(tag);
-          else
-              tags.push(tag);
-      }
-      if (deferredRuleTags.length > 0)
-          tags.push(...deferredRuleTags);
+      const tags = normalizeDispatchTags(normalizedTags, treatAsCanonical);
       const target = context.target ?? null;
       const attacker = context.attacker ?? null;
       const { allyTokens, enemyTokens } = context.game && attacker
