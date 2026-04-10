@@ -6,7 +6,7 @@ import { dealAbilityDamage, healUnit } from '../combat.ts';
 import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
-import { canonicalizeCombatTags, resolveHighestRuleTag } from './tag-aliases.ts';y
+import { canonicalizeCombatTags, resolveHighestRuleTag } from './tag-aliases.ts';
 import { slotIndex } from '../engine.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -466,6 +466,21 @@ const applyDamageLikeEffect = (
   if (result.targets.length > 0) result.sideEffects.push(`hp-change:${amount}`);
 };
 
+const applyHealToTokens = (
+  tokens: ReadonlyArray<UnitToken>,
+  amount: number,
+  attackerSide: Side | null,
+  bypassDoctrineNoHeal: boolean,
+): Array<{ token: UnitToken; overheal: number }> => {
+  const healed: Array<{ token: UnitToken; overheal: number }> = [];
+  for (const token of tokens) {
+    if (!canReceiveHealUnderDoctrine(token, attackerSide, bypassDoctrineNoHeal)) continue;
+    const healResult = healUnit(token, amount);
+    healed.push({ token, overheal: Math.max(0, toFiniteNumber(healResult.overheal, 0)) });
+  }
+  return healed;
+};
+
 const assignAllAliveTargets = (ctx: NormalizedContext, result: TagDispatchResult): boolean => {
   if (!ctx.game) return false;
   result.targets = collectAliveTargets(ctx.game.tokens);
@@ -610,13 +625,13 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
       toFiniteNumber(ctx.payload?.overflowShieldTurns ?? ctx.payload?.shieldTurns, 2),
       2,
     );
-    for (const token of resolveEffectTargets(ctx, result)) {
-      if (!canReceiveHealUnderDoctrine(token, ctx.attacker?.side ?? null, bypassDoctrineNoHeal)) continue;
-      const healResult = healUnit(token, amount);
-      if (overhealShieldRatio > 0 && healResult.overheal > 0) {
-        const shieldAmount = Math.max(0, Math.floor(healResult.overheal * overhealShieldRatio));
+    const healTargets = resolveEffectTargets(ctx, result);
+    const healedEntries = applyHealToTokens(healTargets, amount, ctx.attacker?.side ?? null, bypassDoctrineNoHeal);
+    for (const entry of healedEntries) {
+      if (overhealShieldRatio > 0 && entry.overheal > 0) {
+        const shieldAmount = Math.max(0, Math.floor(entry.overheal * overhealShieldRatio));
         if (shieldAmount > 0) {
-          grantShield(token, shieldAmount, { durationTurns: overflowShieldTurns });
+          grantShield(entry.token, shieldAmount, { durationTurns: overflowShieldTurns });
           result.sideEffects.push(`overheal-shield:${shieldAmount}`);
         }
       }
@@ -628,10 +643,7 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
     if (amount <= 0 || !ctx.attacker) return;
     const bypassDoctrineNoHeal = hasRuleBasedDoctrineBypass(result.highestRuleTag);
-    for (const token of ctx.attackerTokens) {
-      if (!canReceiveHealUnderDoctrine(token, ctx.attacker.side, bypassDoctrineNoHeal)) continue;
-      healUnit(token, amount);
-    }
+    applyHealToTokens(ctx.attackerTokens, amount, ctx.attacker.side, bypassDoctrineNoHeal);
     result.sideEffects.push(`team-heal:${amount}`);
   },
   shield: (ctx, result) => {

@@ -120,6 +120,8 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'huyet-than-linh-vuc': 'global-rule',
   'huyết thần': 'axiom-rule',
   'huyet-than': 'axiom-rule',
+  'thần tính': 'axiom-rule',
+  'than-tinh': 'axiom-rule',
   'hư kỹ': 'instant',
   'hu-ky': 'instant',
   'hư quyết': 'condition',
@@ -135,8 +137,9 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
 });
 
 const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
-  'axiom-rule': 400,
-  'global-rule': 300,
+  'axiom-rule': 500,
+  'global-rule': 400,
+  'doctrine-rule': 300,
   'single-target': 220,
   'leader-target': 220,
   self: 220,
@@ -148,10 +151,10 @@ const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
   'column-aoe': 210,
   'cross-aoe': 210,
   aoe: 200,
-  'doctrine-rule': 120,
 });
 
 type RuleTag = 'doctrine-rule' | 'global-rule' | 'axiom-rule';
+const RULE_TAG_SET = new Set<RuleTag>(['doctrine-rule', 'global-rule', 'axiom-rule']);
 
 const RULE_TAG_PRIORITY = Object.freeze<Record<RuleTag, number>>({
   'doctrine-rule': COMBAT_TAG_PRIORITY['doctrine-rule'] ?? 0,
@@ -211,7 +214,7 @@ export function canonicalizeCombatTags(
   const highestRuleTag = resolveHighestRuleTag(unique);
   const filtered = unique.filter((tag) => {
     if (!highestRuleTag) return true;
-    if (tag !== 'doctrine-rule' && tag !== 'global-rule' && tag !== 'axiom-rule') return true;
+    if (!RULE_TAG_SET.has(tag as RuleTag)) return true;
     return tag === highestRuleTag;
   });
 

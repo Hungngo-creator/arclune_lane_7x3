@@ -6282,6 +6282,8 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'huyet-than-linh-vuc': 'global-rule',
       'huyết thần': 'axiom-rule',
       'huyet-than': 'axiom-rule',
+      'thần tính': 'axiom-rule',
+      'than-tinh': 'axiom-rule',
       'hư kỹ': 'instant',
       'hu-ky': 'instant',
       'hư quyết': 'condition',
@@ -6296,8 +6298,9 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'rung-cam': 'taunt',
   });
   const COMBAT_TAG_PRIORITY = Object.freeze({
-      'axiom-rule': 400,
-      'global-rule': 300,
+      'axiom-rule': 500,
+      'global-rule': 400,
+      'doctrine-rule': 300,
       'single-target': 220,
       'leader-target': 220,
       self: 220,
@@ -6309,8 +6312,8 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'column-aoe': 210,
       'cross-aoe': 210,
       aoe: 200,
-      'doctrine-rule': 120,
   });
+  const RULE_TAG_SET = new Set(['doctrine-rule', 'global-rule', 'axiom-rule']);
   const RULE_TAG_PRIORITY = Object.freeze({
       'doctrine-rule': COMBAT_TAG_PRIORITY['doctrine-rule'] ?? 0,
       'global-rule': COMBAT_TAG_PRIORITY['global-rule'] ?? 0,
@@ -6365,7 +6368,7 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       const filtered = unique.filter((tag) => {
           if (!highestRuleTag)
               return true;
-          if (tag !== 'doctrine-rule' && tag !== 'global-rule' && tag !== 'axiom-rule')
+          if (!RULE_TAG_SET.has(tag))
               return true;
           return tag === highestRuleTag;
       });
@@ -6408,7 +6411,6 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep8 = __require('./combat/tag-aliases.ts');
   const canonicalizeCombatTags = __dep8.canonicalizeCombatTags;
   const resolveHighestRuleTag = __dep8.resolveHighestRuleTag;
-  y;
   const __dep9 = __require('./engine.ts');
   const slotIndex = __dep9.slotIndex;
   const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
@@ -6759,6 +6761,16 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       if (result.targets.length > 0)
           result.sideEffects.push(`hp-change:${amount}`);
   };
+  const applyHealToTokens = (tokens, amount, attackerSide, bypassDoctrineNoHeal) => {
+      const healed = [];
+      for (const token of tokens) {
+          if (!canReceiveHealUnderDoctrine(token, attackerSide, bypassDoctrineNoHeal))
+              continue;
+          const healResult = healUnit(token, amount);
+          healed.push({ token, overheal: Math.max(0, toFiniteNumber(healResult.overheal, 0)) });
+      }
+      return healed;
+  };
   const assignAllAliveTargets = (ctx, result) => {
       if (!ctx.game)
           return false;
@@ -6912,14 +6924,13 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           const bypassDoctrineNoHeal = hasRuleBasedDoctrineBypass(result.highestRuleTag);
           const overhealShieldRatio = readOverhealShieldRatio(ctx.payload);
           const overflowShieldTurns = toPositiveTurns(toFiniteNumber(ctx.payload?.overflowShieldTurns ?? ctx.payload?.shieldTurns, 2), 2);
-          for (const token of resolveEffectTargets(ctx, result)) {
-              if (!canReceiveHealUnderDoctrine(token, ctx.attacker?.side ?? null, bypassDoctrineNoHeal))
-                  continue;
-              const healResult = healUnit(token, amount);
-              if (overhealShieldRatio > 0 && healResult.overheal > 0) {
-                  const shieldAmount = Math.max(0, Math.floor(healResult.overheal * overhealShieldRatio));
+          const healTargets = resolveEffectTargets(ctx, result);
+          const healedEntries = applyHealToTokens(healTargets, amount, ctx.attacker?.side ?? null, bypassDoctrineNoHeal);
+          for (const entry of healedEntries) {
+              if (overhealShieldRatio > 0 && entry.overheal > 0) {
+                  const shieldAmount = Math.max(0, Math.floor(entry.overheal * overhealShieldRatio));
                   if (shieldAmount > 0) {
-                      grantShield(token, shieldAmount, { durationTurns: overflowShieldTurns });
+                      grantShield(entry.token, shieldAmount, { durationTurns: overflowShieldTurns });
                       result.sideEffects.push(`overheal-shield:${shieldAmount}`);
                   }
               }
@@ -6933,11 +6944,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           if (amount <= 0 || !ctx.attacker)
               return;
           const bypassDoctrineNoHeal = hasRuleBasedDoctrineBypass(result.highestRuleTag);
-          for (const token of ctx.attackerTokens) {
-              if (!canReceiveHealUnderDoctrine(token, ctx.attacker.side, bypassDoctrineNoHeal))
-                  continue;
-              healUnit(token, amount);
-          }
+          applyHealToTokens(ctx.attackerTokens, amount, ctx.attacker.side, bypassDoctrineNoHeal);
           result.sideEffects.push(`team-heal:${amount}`);
       },
       shield: (ctx, result) => {
