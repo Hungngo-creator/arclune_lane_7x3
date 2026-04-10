@@ -6,7 +6,7 @@ import { dealAbilityDamage, healUnit } from '../combat.ts';
 import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
-import { canonicalizeCombatTags, resolveHighestRuleTag } from './tag-aliases.ts';
+import { canonicalizeCombatTagsWithRule } from './tag-aliases.ts';
 import { slotIndex } from '../engine.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -227,25 +227,6 @@ const filterTokensByRole = (ctx: Pick<NormalizedContext, 'targetRole'>, tokens: 
   return leaders;
 };
 
-const pickSingleByMetric = (
-  tokens: ReadonlyArray<UnitToken>,
-  metric: (token: UnitToken) => number,
-  findLowest: boolean,
-): UnitToken[] => {
-  if (tokens.length === 0) return [];
-  let best = tokens[0];
-  let bestValue = metric(best);
-  for (let i = 1; i < tokens.length; i += 1) {
-    const candidate = tokens[i];
-    const candidateValue = metric(candidate);
-    if ((findLowest && candidateValue < bestValue) || (!findLowest && candidateValue > bestValue)) {
-      best = candidate;
-      bestValue = candidateValue;
-    }
-  }
-  return [best];
-};
-
 const insertMetricSorted = (
   entries: Array<{ token: UnitToken; metric: number }>,
   candidate: { token: UnitToken; metric: number },
@@ -329,8 +310,9 @@ const pickTargetsByPriority = (
     }
     const useRatioMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio';
     const findLowest = priority === 'lowest-hp' || priority === 'lowest-hp-ratio';
-    return pickSingleByMetric(
+    return pickTopByMetric(
       tokens,
+      1,
       (token) => (useRatioMetric ? readHpRatio(token) : toFiniteNumber(token.hp, 0)),
       findLowest,
     );
@@ -698,8 +680,7 @@ export function dispatchGameplayTags(
     ? (Array.isArray(rawTags) ? rawTags : EMPTY_TAGS)
     : normalizeTagList(rawTags);
   const treatAsCanonical = context.tagsCanonical === true;
-  const tags = canonicalizeCombatTags(normalizedTags, treatAsCanonical);
-  const highestRuleTag = resolveHighestRuleTag(tags);
+  const { tags, highestRuleTag } = canonicalizeCombatTagsWithRule(normalizedTags, treatAsCanonical);
   const target = context.target ?? null;
   const attacker = context.attacker ?? null;
   const { allyTokens, enemyTokens } = context.game && attacker

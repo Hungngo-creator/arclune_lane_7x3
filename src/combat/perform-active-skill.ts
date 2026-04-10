@@ -11,7 +11,7 @@ import { resolveSkillPayload } from './skill-metadata-utils.ts';
 import { readAtkWilPower, readUnitHpState, toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
-import { canonicalizeCombatTags } from './tag-aliases.ts';
+import { canonicalizeCombatTagsWithRule } from './tag-aliases.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -207,7 +207,6 @@ function resolveDirectDamageMultiplier(skill: SkillSection): number | null {
 
 function parseSkillTags(tags: ReadonlyArray<string>): ParsedSkillTags {
   const effectTags: string[] = [];
-  const seenEffects = new Set<string>();
   let hasAetherCostTag = false;
   let hasSummonTag = false;
   let hasUniqueGlobalTag = false;
@@ -229,8 +228,7 @@ function parseSkillTags(tags: ReadonlyArray<string>): ParsedSkillTags {
       default:
         break;
     }
-    if (EFFECT_APPLICATION_TAGS.has(tag) && !seenEffects.has(tag)) {
-      seenEffects.add(tag);
+    if (EFFECT_APPLICATION_TAGS.has(tag)) {
       effectTags.push(tag);
     }
   }
@@ -253,7 +251,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
   }
 
-  const tags = canonicalizeCombatTags(normalizeTagList(skill.tags ?? []));
+  const { tags } = canonicalizeCombatTagsWithRule(normalizeTagList(skill.tags ?? []));
   const {
     effectTags,
     hasAetherCostTag,

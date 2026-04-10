@@ -128,6 +128,9 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'huyet-than': 'axiom-rule',
   'thần tính': 'axiom-rule',
   'than-tinh': 'axiom-rule',
+  'divine-nature': 'axiom-rule',
+  'than_tinh': 'axiom-rule',
+  'thần_tính': 'axiom-rule',
   'hư kỹ': 'instant',
   'hu-ky': 'instant',
   'hư quyết': 'condition',
@@ -161,6 +164,23 @@ const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
 
 type RuleTag = 'doctrine-rule' | 'global-rule' | 'axiom-rule';
 const RULE_TAG_SET = new Set<RuleTag>(['doctrine-rule', 'global-rule', 'axiom-rule']);
+const RULE_TAG_ALIAS_TO_CANONICAL = Object.freeze<Record<string, RuleTag>>({
+  axiom: 'axiom-rule',
+  'axiom-rule': 'axiom-rule',
+  'tien-de': 'axiom-rule',
+  'tiên đề': 'axiom-rule',
+  'than-tinh': 'axiom-rule',
+  'thần tính': 'axiom-rule',
+  'thần_tính': 'axiom-rule',
+  'than_tinh': 'axiom-rule',
+  'divine-nature': 'axiom-rule',
+  'global-rule': 'global-rule',
+  'quy tắc': 'global-rule',
+  'quy-tac': 'global-rule',
+  'doctrine-rule': 'doctrine-rule',
+  'pháp tắc': 'doctrine-rule',
+  'phap-tac': 'doctrine-rule',
+});
 
 const RULE_TAG_PRIORITY = Object.freeze<Record<RuleTag, number>>({
   'doctrine-rule': COMBAT_TAG_PRIORITY['doctrine-rule'] ?? 0,
@@ -177,17 +197,9 @@ export function hasRuleTagAtLeast(tags: ReadonlyArray<string>, minimum: RuleTag)
   return false;
 }
 
-export function resolveHighestRuleTag(tags: ReadonlyArray<string>): RuleTag | null {
-  let highest: RuleTag | null = null;
-  let highestPriority = -1;
-  for (const tag of tags) {
-    const normalized = tag as RuleTag;
-    const priority = RULE_TAG_PRIORITY[normalized];
-    if (priority == null || priority <= highestPriority) continue;
-    highest = normalized;
-    highestPriority = priority;
-  }
-  return highest;
+export interface CanonicalizedCombatTags {
+  tags: string[];
+  highestRuleTag: RuleTag | null;
 }
 
 function normalizeAliasLookupKey(tag: string): string {
@@ -200,14 +212,28 @@ function normalizeAliasLookupKey(tag: string): string {
 
 export function normalizeCombatTag(tag: string): string {
   const normalized = normalizeAliasLookupKey(tag);
-  return COMBAT_TAG_ALIASES[normalized] ?? normalized;
+  return RULE_TAG_ALIAS_TO_CANONICAL[normalized] ?? COMBAT_TAG_ALIASES[normalized] ?? normalized;
+}
+
+function normalizeCanonicalInputTag(tag: string): string {
+  const normalized = normalizeAliasLookupKey(tag);
+  return RULE_TAG_ALIAS_TO_CANONICAL[normalized] ?? normalized;
 }
 
 export function canonicalizeCombatTags(
   tags: ReadonlyArray<string> | null | undefined,
   treatAsCanonical = false,
 ): string[] {
-  if (!Array.isArray(tags) || tags.length === 0) return [];
+  return canonicalizeCombatTagsWithRule(tags, treatAsCanonical).tags;
+}
+
+export function canonicalizeCombatTagsWithRule(
+  tags: ReadonlyArray<string> | null | undefined,
+  treatAsCanonical = false,
+): CanonicalizedCombatTags {
+  if (!Array.isArray(tags) || tags.length === 0) {
+    return { tags: [], highestRuleTag: null };
+  }
 
   const unique: string[] = [];
   const seen = new Set<string>();
@@ -215,7 +241,7 @@ export function canonicalizeCombatTags(
   let highestRulePriority = -1;
 
   for (const rawTag of tags) {
-    const tag = treatAsCanonical ? normalizeAliasLookupKey(rawTag) : normalizeCombatTag(rawTag);
+    const tag = treatAsCanonical ? normalizeCanonicalInputTag(rawTag) : normalizeCombatTag(rawTag);
     if (!tag || seen.has(tag)) continue;
     seen.add(tag);
     unique.push(tag);
@@ -230,12 +256,20 @@ export function canonicalizeCombatTags(
   const filtered = highestRuleTag
     ? unique.filter((tag) => !RULE_TAG_SET.has(tag as RuleTag) || tag === highestRuleTag)
     : unique;
-  if (filtered.length <= 1) return filtered;
+  if (filtered.length <= 1) {
+    return {
+      tags: filtered,
+      highestRuleTag,
+    };
+  }
 
   filtered.sort((left, right) => {
     const leftPriority = COMBAT_TAG_PRIORITY[left] ?? 0;
     const rightPriority = COMBAT_TAG_PRIORITY[right] ?? 0;
     return rightPriority - leftPriority;
   });
-  return filtered;
+  return {
+    tags: filtered,
+    highestRuleTag,
+  };
 }
