@@ -107,6 +107,31 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'vung-chu-+': 'cross-aoe',
   'tự động': 'instant',
   'tu-dong': 'instant',
+  // Lore/character idea tag aliases (Huyết, Hư giới, Nhân vật mới)
+  'huyết giáp': 'shield',
+  'huyet-giap': 'shield',
+  'huyết nô': 'summon',
+  'huyet-no': 'summon',
+  'huyết tế': 'hp-cost',
+  'huyet-te': 'hp-cost',
+  'huyết hải lĩnh vực': 'global-rule',
+  'huyet-hai-linh-vuc': 'global-rule',
+  'huyết thần lĩnh vực': 'global-rule',
+  'huyet-than-linh-vuc': 'global-rule',
+  'huyết thần': 'axiom-rule',
+  'huyet-than': 'axiom-rule',
+  'hư kỹ': 'instant',
+  'hu-ky': 'instant',
+  'hư quyết': 'condition',
+  'hu-quyet': 'condition',
+  'kiếm vực': 'global-rule',
+  'kiem-vuc': 'global-rule',
+  'huyễn ảnh': 'random-aoe',
+  'huyen-anh': 'random-aoe',
+  'trăng và bóng tối': 'silence',
+  'trang-va-bong-toi': 'silence',
+  'rừng cấm': 'taunt',
+  'rung-cam': 'taunt',
 });
 
 const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
@@ -125,6 +150,36 @@ const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
   aoe: 200,
   'doctrine-rule': 120,
 });
+
+type RuleTag = 'doctrine-rule' | 'global-rule' | 'axiom-rule';
+
+const RULE_TAG_PRIORITY = Object.freeze<Record<RuleTag, number>>({
+  'doctrine-rule': COMBAT_TAG_PRIORITY['doctrine-rule'] ?? 0,
+  'global-rule': COMBAT_TAG_PRIORITY['global-rule'] ?? 0,
+  'axiom-rule': COMBAT_TAG_PRIORITY['axiom-rule'] ?? 0,
+});
+
+export function hasRuleTagAtLeast(tags: ReadonlyArray<string>, minimum: RuleTag): boolean {
+  const minimumPriority = RULE_TAG_PRIORITY[minimum] ?? 0;
+  for (const tag of tags) {
+    const priority = RULE_TAG_PRIORITY[tag as RuleTag];
+    if ((priority ?? -1) >= minimumPriority) return true;
+  }
+  return false;
+}
+
+export function resolveHighestRuleTag(tags: ReadonlyArray<string>): RuleTag | null {
+  let highest: RuleTag | null = null;
+  let highestPriority = -1;
+  for (const tag of tags) {
+    const normalized = tag as RuleTag;
+    const priority = RULE_TAG_PRIORITY[normalized];
+    if (priority == null || priority <= highestPriority) continue;
+    highest = normalized;
+    highestPriority = priority;
+  }
+  return highest;
+}
 
 function normalizeAliasLookupKey(tag: string): string {
   return tag
@@ -153,12 +208,11 @@ export function canonicalizeCombatTags(
     unique.push(tag);
   }
 
-  const hasAxiomRule = seen.has('axiom-rule');
-  const hasGlobalRule = seen.has('global-rule');
+  const highestRuleTag = resolveHighestRuleTag(unique);
   const filtered = unique.filter((tag) => {
-    if (hasAxiomRule && (tag === 'global-rule' || tag === 'doctrine-rule')) return false;
-    if (hasGlobalRule && tag === 'doctrine-rule') return false;
-    return true;
+    if (!highestRuleTag) return true;
+    if (tag !== 'doctrine-rule' && tag !== 'global-rule' && tag !== 'axiom-rule') return true;
+    return tag === highestRuleTag;
   });
 
   filtered.sort((left, right) => {

@@ -6,7 +6,7 @@ import { dealAbilityDamage, healUnit } from '../combat.ts';
 import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
-import { canonicalizeCombatTags } from './tag-aliases.ts';
+import { canonicalizeCombatTags, resolveHighestRuleTag } from './tag-aliases.ts';y
 import { slotIndex } from '../engine.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -29,6 +29,7 @@ export interface TagDispatchContext {
 
 export interface TagDispatchResult {
   tags: string[];
+  highestRuleTag: 'doctrine-rule' | 'global-rule' | 'axiom-rule' | null;
   targets: UnitToken[];
   applied: string[];
   sideEffects: string[];
@@ -54,6 +55,10 @@ type NormalizedContext = {
 };
 
 type TagHandler = (ctx: NormalizedContext, result: TagDispatchResult) => void;
+
+const applyAllAliveRuleTargets: TagHandler = (ctx, result) => {
+  assignAllAliveTargets(ctx, result);
+};
 
 function collectAliveTargets(tokens: ReadonlyArray<UnitToken>): UnitToken[] {
   const alive: UnitToken[] = [];
@@ -404,6 +409,19 @@ const hasDoctrineNoHeal = (target: UnitToken, fromSide: Side | null): boolean =>
   return false;
 };
 
+const hasRuleBasedDoctrineBypass = (highestRuleTag: TagDispatchResult['highestRuleTag']): boolean => (
+  highestRuleTag === 'global-rule' || highestRuleTag === 'axiom-rule'
+);
+
+const canReceiveHealUnderDoctrine = (
+  token: UnitToken,
+  attackerSide: Side | null,
+  bypassDoctrineNoHeal: boolean,
+): boolean => {
+  if (bypassDoctrineNoHeal) return true;
+  return !hasDoctrineNoHeal(token, attackerSide);
+};
+
 const applyTaggedStatus = (
   ctx: NormalizedContext,
   result: TagDispatchResult,
@@ -554,12 +572,8 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     if (!ctx.attacker) return;
     result.targets = ctx.opponentTokens;
   },
-  'global-rule': (ctx, result) => {
-    assignAllAliveTargets(ctx, result);
-  },
-  'axiom-rule': (ctx, result) => {
-    assignAllAliveTargets(ctx, result);
-  },
+  'global-rule': applyAllAliveRuleTargets,
+  'axiom-rule': applyAllAliveRuleTargets,
   'doctrine-rule': (ctx, result) => {
     if (!assignAllAliveTargets(ctx, result)) return;
     if (ctx.deferEffects || !ctx.attacker) return;
@@ -590,14 +604,14 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     if (ctx.deferEffects) return;
     const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
     if (amount <= 0) return;
-    const bypassDoctrineNoHeal = result.tags.includes('global-rule') || result.tags.includes('axiom-rule');
+    const bypassDoctrineNoHeal = hasRuleBasedDoctrineBypass(result.highestRuleTag);
     const overhealShieldRatio = readOverhealShieldRatio(ctx.payload);
     const overflowShieldTurns = toPositiveTurns(
       toFiniteNumber(ctx.payload?.overflowShieldTurns ?? ctx.payload?.shieldTurns, 2),
       2,
     );
     for (const token of resolveEffectTargets(ctx, result)) {
-      if (!bypassDoctrineNoHeal && hasDoctrineNoHeal(token, ctx.attacker?.side ?? null)) continue;
+      if (!canReceiveHealUnderDoctrine(token, ctx.attacker?.side ?? null, bypassDoctrineNoHeal)) continue;
       const healResult = healUnit(token, amount);
       if (overhealShieldRatio > 0 && healResult.overheal > 0) {
         const shieldAmount = Math.max(0, Math.floor(healResult.overheal * overhealShieldRatio));
@@ -613,7 +627,11 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     if (ctx.deferEffects) return;
     const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
     if (amount <= 0 || !ctx.attacker) return;
-    for (const token of ctx.attackerTokens) healUnit(token, amount);
+    const bypassDoctrineNoHeal = hasRuleBasedDoctrineBypass(result.highestRuleTag);
+    for (const token of ctx.attackerTokens) {
+      if (!canReceiveHealUnderDoctrine(token, ctx.attacker.side, bypassDoctrineNoHeal)) continue;
+      healUnit(token, amount);
+    }
     result.sideEffects.push(`team-heal:${amount}`);
   },
   shield: (ctx, result) => {
@@ -669,6 +687,7 @@ export function dispatchGameplayTags(
     : normalizeTagList(rawTags);
   const treatAsCanonical = context.tagsCanonical === true;
   const tags = canonicalizeCombatTags(normalizedTags, treatAsCanonical);
+  const highestRuleTag = resolveHighestRuleTag(tags);
   const target = context.target ?? null;
   const attacker = context.attacker ?? null;
   const { allyTokens, enemyTokens } = context.game && attacker
@@ -694,6 +713,7 @@ export function dispatchGameplayTags(
 
   const result: TagDispatchResult = {
     tags,
+    highestRuleTag,
     targets: [...ctx.targets],
     applied: [],
     sideEffects: [],

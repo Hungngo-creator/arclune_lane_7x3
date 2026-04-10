@@ -158,8 +158,7 @@ function readSkillUseCap(payload: Record<string, unknown>): number {
   );
 }
 
-function hasSkillUseQuota(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey, payload: Record<string, unknown>): boolean {
-  const maxUses = readSkillUseCap(payload);
+function hasSkillUseQuota(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey, maxUses: number): boolean {
   if (maxUses <= 0) return true;
   const runtimeRoot = game.runtime;
   const usageStore = runtimeRoot?._skillUsageByCaster as Record<string, SkillUsageStore> | undefined;
@@ -168,8 +167,7 @@ function hasSkillUseQuota(game: SessionState, caster: UnitToken, skillKey: Activ
   return currentUses < maxUses;
 }
 
-function recordSkillUseQuota(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey, payload: Record<string, unknown>): void {
-  const maxUses = readSkillUseCap(payload);
+function recordSkillUseQuota(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey, maxUses: number): void {
   if (maxUses <= 0) return;
 
   const runtimeRoot = (game.runtime ??= {});
@@ -255,7 +253,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
   }
 
-  const tags = canonicalizeCombatTags(normalizeTagList(skill.tags ?? []), true);
+  const tags = canonicalizeCombatTags(normalizeTagList(skill.tags ?? []));
   const {
     effectTags,
     hasAetherCostTag,
@@ -264,8 +262,8 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     hasDamageTag,
   } = parseSkillTags(tags);
   const payload = resolveSkillPayload(skill);
-  if (!hasSkillUseQuota(game, caster, skillKey, payload)) {
-    return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
+  const maxSkillUses = readSkillUseCap(payload);
+  if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
   }
   const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
   const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;
@@ -322,7 +320,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     appliedTags: dispatch.applied,
   });
   if (runtimeSkillResult) {
-    if (runtimeSkillResult.ok) recordSkillUseQuota(game, caster, skillKey, payload);
+    if (runtimeSkillResult.ok) recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
     return runtimeSkillResult;
   }
   const casterPower = readAtkWilPower(caster);
@@ -343,7 +341,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
         Statuses.add(target, { ...BLOOD_AVATAR_BLEED_STATUS, sourceUnitId: caster.id });
         Statuses.add(target, { ...BLOOD_AVATAR_MARK_STATUS, sourceUnitId: caster.id });
       }
-      recordSkillUseQuota(game, caster, skillKey, payload);
+      recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, picked.length);
     }
     if (skillKey === 'skill2') {
@@ -361,7 +359,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
           Statuses.add(token, { id: 'heal_efficiency_down', kind: 'debuff', tag: 'field', dur: 2, tick: 'turn', amount: 0.25, sourceUnitId: caster.id });
         }
       }
-      recordSkillUseQuota(game, caster, skillKey, payload);
+      recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, enemies.length);
     }
     if (skillKey === 'skill3') {
@@ -371,7 +369,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
       const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
       caster.hp = Math.max(1, toFloorInt((caster.hp ?? 0) - hpCost, 1));
       globalAetherPool.gain(caster.side, 15);
-      recordSkillUseQuota(game, caster, skillKey, payload);
+      recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
     }
   }
@@ -432,7 +430,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     }
   }
 
-  recordSkillUseQuota(game, caster, skillKey, payload);
+  recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
   return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, dispatch.targets.length);
 }
 
