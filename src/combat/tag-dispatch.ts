@@ -6,7 +6,7 @@ import { dealAbilityDamage, healUnit } from '../combat.ts';
 import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
-import { normalizeCombatTag } from './tag-aliases.ts';
+import { canonicalizeCombatTags } from './tag-aliases.ts';
 import { slotIndex } from '../engine.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -36,22 +36,6 @@ export interface TagDispatchResult {
 const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup'] as const);
 const EMPTY_TAGS: string[] = [];
 const DOCTRINE_NO_HEAL_STATUS_ID = 'doctrine-no-heal';
-const TAG_PRIORITY_ORDER = Object.freeze<Record<string, number>>({
-  'axiom-rule': 400,
-  'global-rule': 300,
-  'single-target': 220,
-  'leader-target': 220,
-  self: 220,
-  ally: 220,
-  enemy: 220,
-  'random-target': 210,
-  'multi-target': 210,
-  'random-aoe': 210,
-  'column-aoe': 210,
-  'cross-aoe': 210,
-  aoe: 200,
-  'doctrine-rule': 120,
-});
 type NormalizedContext = {
   game: SessionState | null;
   attacker: UnitToken | null;
@@ -70,36 +54,6 @@ type NormalizedContext = {
 };
 
 type TagHandler = (ctx: NormalizedContext, result: TagDispatchResult) => void;
-
-function normalizeDispatchTags(
-  rawTags: ReadonlyArray<string>,
-  treatAsCanonical: boolean,
-): string[] {
-  const seen = new Set<string>();
-  const normalized: string[] = [];
-  for (const rawTag of rawTags) {
-    const tag = treatAsCanonical ? rawTag : normalizeCombatTag(rawTag);
-    if (!tag || seen.has(tag)) continue;
-    seen.add(tag);
-    normalized.push(tag);
-  }
-
-  const hasAxiomRule = seen.has('axiom-rule');
-  const hasGlobalRule = seen.has('global-rule');
-  const filtered = normalized.filter((tag) => {
-    if (hasAxiomRule && (tag === 'global-rule' || tag === 'doctrine-rule')) return false;
-    if (hasGlobalRule && tag === 'doctrine-rule') return false;
-    return true;
-  });
-
-  filtered.sort((left, right) => {
-    const leftPriority = TAG_PRIORITY_ORDER[left] ?? 0;
-    const rightPriority = TAG_PRIORITY_ORDER[right] ?? 0;
-    if (leftPriority === rightPriority) return 0;
-    return rightPriority - leftPriority;
-  });
-  return filtered;
-}
 
 function collectAliveTargets(tokens: ReadonlyArray<UnitToken>): UnitToken[] {
   const alive: UnitToken[] = [];
@@ -160,20 +114,39 @@ const TARGET_PRIORITY_ALIASES: Readonly<Record<string, TargetPriority>> = Object
   lowhp: 'lowest-hp',
   'thap-mau-nhat': 'lowest-hp',
   'mau-thap-nhat': 'lowest-hp',
+  'hp-thap-nhat': 'lowest-hp',
+  'thap-hp-nhat': 'lowest-hp',
+  'hp-hien-tai-thap-nhat': 'lowest-hp',
+  'mau-hien-tai-thap-nhat': 'lowest-hp',
+  'thấp-máu-nhất': 'lowest-hp',
+  'máu-thấp-nhất': 'lowest-hp',
+  'hp-hiện-tại-thấp-nhất': 'lowest-hp',
+  'máu-hiện-tại-thấp-nhất': 'lowest-hp',
   'highest-current-hp': 'highest-hp',
   high_hp: 'highest-hp',
   highhp: 'highest-hp',
   'mau-cao-nhat': 'highest-hp',
+  'hp-hien-tai-cao-nhat': 'highest-hp',
+  'máu-cao-nhất': 'highest-hp',
+  'hp-hiện-tại-cao-nhất': 'highest-hp',
 });
 
+const normalizePriorityLookupKey = (value: unknown): string => (
+  String(value ?? '')
+    .normalize('NFC')
+    .trim()
+    .toLowerCase()
+    .replace(/[_\s]+/g, '-')
+);
+
 const readTargetPriority = (payload: Record<string, unknown> | null): TargetPriority => {
-  const raw = String(payload?.targetPriority ?? payload?.priority ?? '').trim().toLowerCase();
+  const raw = normalizePriorityLookupKey(payload?.targetPriority ?? payload?.priority);
   return TARGET_PRIORITY_ALIASES[raw] ?? 'board';
 };
 
 const readTargetRole = (payload: Record<string, unknown> | null): TargetRole => {
-  const raw = String(payload?.targetRole ?? '').trim().toLowerCase();
-  if (raw === 'leader') return 'leader';
+  const raw = normalizePriorityLookupKey(payload?.targetRole);
+  if (raw === 'leader' || raw === 'muc-tieu-leader' || raw === 'mục-tiêu-leader') return 'leader';
   return 'any';
 };
 
@@ -205,10 +178,17 @@ const resolvePrimaryEnemyTarget = (ctx: NormalizedContext, result: TagDispatchRe
 const selectColumnTargets = (pool: ReadonlyArray<UnitToken>, anchor: UnitToken | null): UnitToken[] => {
   const anchorPos = readBoardPosition(anchor);
   if (!anchorPos) return [];
+  return selectTargetsBySlotPredicate(pool, (pos) => pos.col === anchorPos.col);
+};
+
+const selectTargetsBySlotPredicate = (
+  pool: ReadonlyArray<UnitToken>,
+  predicate: (position: BoardPosition) => boolean,
+): UnitToken[] => {
   const selected: UnitToken[] = [];
   for (const token of pool) {
     const pos = readBoardPosition(token);
-    if (!pos || pos.col !== anchorPos.col) continue;
+    if (!pos || !predicate(pos)) continue;
     selected.push(token);
   }
   return selected;
@@ -230,13 +210,7 @@ const selectCrossTargets = (pool: ReadonlyArray<UnitToken>, anchor: UnitToken | 
     if (nextCol < 0 || nextCol > 2 || nextRow < 0 || nextRow > 2) continue;
     crossSlots.add(nextRow * 3 + nextCol + 1);
   }
-  const selected: UnitToken[] = [];
-  for (const token of pool) {
-    const pos = readBoardPosition(token);
-    if (!pos || !crossSlots.has(pos.slot)) continue;
-    selected.push(token);
-  }
-  return selected;
+  return selectTargetsBySlotPredicate(pool, (pos) => crossSlots.has(pos.slot));
 };
 
 const filterTokensByRole = (ctx: Pick<NormalizedContext, 'targetRole'>, tokens: ReadonlyArray<UnitToken>): ReadonlyArray<UnitToken> => {
@@ -345,10 +319,8 @@ const pickTargetsByPriority = (
   if (priority === 'board') return tokens.slice(0, limit);
   if (limit === 1) {
     if (priority === 'leader-first') {
-      for (const token of tokens) {
-        if (isLeaderToken(token)) return [token];
-      }
-      return [tokens[0]];
+      const leader = findLeaderToken(tokens);
+      return leader ? [leader] : [tokens[0]];
     }
     const useRatioMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio';
     const findLowest = priority === 'lowest-hp' || priority === 'lowest-hp-ratio';
@@ -476,6 +448,12 @@ const applyDamageLikeEffect = (
   if (result.targets.length > 0) result.sideEffects.push(`hp-change:${amount}`);
 };
 
+const assignAllAliveTargets = (ctx: NormalizedContext, result: TagDispatchResult): boolean => {
+  if (!ctx.game) return false;
+  result.targets = collectAliveTargets(ctx.game.tokens);
+  return true;
+};
+
 function applyMarkStackingStatus(ctx: NormalizedContext, result: TagDispatchResult): void {
   if (ctx.deferEffects) return;
   const payload = ctx.payload ?? {};
@@ -577,16 +555,13 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     result.targets = ctx.opponentTokens;
   },
   'global-rule': (ctx, result) => {
-    if (!ctx.game) return;
-    result.targets = collectAliveTargets(ctx.game.tokens);
+    assignAllAliveTargets(ctx, result);
   },
   'axiom-rule': (ctx, result) => {
-    if (!ctx.game) return;
-    result.targets = collectAliveTargets(ctx.game.tokens);
+    assignAllAliveTargets(ctx, result);
   },
   'doctrine-rule': (ctx, result) => {
-    if (!ctx.game) return;
-    result.targets = collectAliveTargets(ctx.game.tokens);
+    if (!assignAllAliveTargets(ctx, result)) return;
     if (ctx.deferEffects || !ctx.attacker) return;
     const turns = readTurns(ctx.payload, 'forbidEnemyHealTurns', 'noHealTurns', 'turns', 'duration');
     const shouldForbidEnemyHeal = (
@@ -693,7 +668,7 @@ export function dispatchGameplayTags(
     ? (Array.isArray(rawTags) ? rawTags : EMPTY_TAGS)
     : normalizeTagList(rawTags);
   const treatAsCanonical = context.tagsCanonical === true;
-  const tags = normalizeDispatchTags(normalizedTags, treatAsCanonical);
+  const tags = canonicalizeCombatTags(normalizedTags, treatAsCanonical);
   const target = context.target ?? null;
   const attacker = context.attacker ?? null;
   const { allyTokens, enemyTokens } = context.game && attacker

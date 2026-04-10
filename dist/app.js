@@ -5688,7 +5688,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const __dep12 = __require('./combat/skill-result.ts');
   const buildSkillResult = __dep12.buildSkillResult;
   const __dep13 = __require('./combat/tag-aliases.ts');
-  const normalizeCombatTagList = __dep13.normalizeCombatTagList;
+  const canonicalizeCombatTags = __dep13.canonicalizeCombatTags;
   const EMPTY_TAGS = [];
   const EFFECT_APPLICATION_TAGS = new Set([
       'heal',
@@ -5747,8 +5747,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   function canApplyUniqueGlobal(game, summonId) {
       return !game.tokens.some((token) => token.alive && token.id === summonId);
   }
-  function applyHpCost(caster, payload) {
-      const { hpMax, hp: currentHp } = readUnitHpState(caster);
+  function applyHpCostWithState(caster, hpMax, currentHp, payload) {
       const ratio = Math.max(0, readPayloadNumber(payload, 0, 'hpCostRatio', 'hpCostPercent'));
       const flat = Math.max(0, toFloorInt(readPayloadNumber(payload, 0, 'hpCostFlat', 'hpCost'), 0));
       const minRemainRatio = Math.max(0, readPayloadNumber(payload, 0, 'minRemainingHpRatio', 'minHpRatio'));
@@ -5762,8 +5761,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       caster.hp = Math.max(1, nextHp);
       return true;
   }
-  function checkHpCondition(caster, payload) {
-      const { hpMax, hp: currentHp } = readUnitHpState(caster);
+  function checkHpConditionWithState(hpMax, currentHp, payload) {
       const requiredRatio = Math.max(0, readPayloadNumber(payload, 0, 'minCurrentHpRatio', 'requireCurrentHpRatioMin', 'requiredHpRatio', 'conditionMinHpRatio'));
       if (requiredRatio <= 0)
           return true;
@@ -5882,7 +5880,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       if (!skill) {
           return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
       }
-      const tags = normalizeCombatTagList(normalizeTagList(skill.tags ?? []));
+      const tags = canonicalizeCombatTags(normalizeTagList(skill.tags ?? []), true);
       const { effectTags, hasAetherCostTag, hasSummonTag, hasUniqueGlobalTag, hasDamageTag, } = parseSkillTags(tags);
       const payload = resolveSkillPayload(skill);
       if (!hasSkillUseQuota(game, caster, skillKey, payload)) {
@@ -5919,13 +5917,14 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, dispatch.targets.length, 'insufficient-aether');
       }
       const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
-      if (!checkHpCondition(caster, payload)) {
+      const { hpMax: casterHpMax, hp: casterCurrentHp } = readUnitHpState(caster);
+      if (!checkHpConditionWithState(casterHpMax, casterCurrentHp, payload)) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
       if (!checkTurnParityCondition(game, payload)) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
-      if (!applyHpCost(caster, payload)) {
+      if (!applyHpCostWithState(caster, casterHpMax, casterCurrentHp, payload)) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
       const runtimeSkillResult = runRuntimeActiveSkill({
@@ -6238,8 +6237,16 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'da-muc-tieu-ngau-nhien': 'random-aoe',
       'quy tắc: tái sinh': 'global-rule',
       'quy-tac-tai-sinh': 'global-rule',
+      'quy tắc: cấm hồi sinh': 'global-rule',
+      'quy-tac-cam-hoi-sinh': 'global-rule',
+      'quy tắc: bất tử': 'global-rule',
+      'quy-tac-bat-tu': 'global-rule',
       'pháp tắc: kiên định': 'doctrine-rule',
       'phap-tac-kien-dinh': 'doctrine-rule',
+      'pháp tắc: cấm chữa trị': 'doctrine-rule',
+      'phap-tac-cam-chua-tri': 'doctrine-rule',
+      'pháp tắc: cấm hồi phục': 'doctrine-rule',
+      'phap-tac-cam-hoi-phuc': 'doctrine-rule',
       'tuyệt đối': 'axiom-rule',
       'tuyet-doi': 'axiom-rule',
       'axiom': 'axiom-rule',
@@ -6265,6 +6272,22 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'tự động': 'instant',
       'tu-dong': 'instant',
   });
+  const COMBAT_TAG_PRIORITY = Object.freeze({
+      'axiom-rule': 400,
+      'global-rule': 300,
+      'single-target': 220,
+      'leader-target': 220,
+      self: 220,
+      ally: 220,
+      enemy: 220,
+      'random-target': 210,
+      'multi-target': 210,
+      'random-aoe': 210,
+      'column-aoe': 210,
+      'cross-aoe': 210,
+      aoe: 200,
+      'doctrine-rule': 120,
+  });
   function normalizeAliasLookupKey(tag) {
       return tag
           .normalize('NFC')
@@ -6276,23 +6299,37 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       const normalized = normalizeAliasLookupKey(tag);
       return COMBAT_TAG_ALIASES[normalized] ?? normalized;
   }
-  function normalizeCombatTagList(tags) {
+  function canonicalizeCombatTags(tags, treatAsCanonical = false) {
       if (!Array.isArray(tags) || tags.length === 0)
           return [];
-      const normalized = [];
+      const unique = [];
       const seen = new Set();
-      for (const tag of tags) {
-          const next = normalizeCombatTag(tag);
-          if (seen.has(next))
+      for (const rawTag of tags) {
+          const tag = treatAsCanonical ? normalizeAliasLookupKey(rawTag) : normalizeCombatTag(rawTag);
+          if (!tag || seen.has(tag))
               continue;
-          seen.add(next);
-          normalized.push(next);
+          seen.add(tag);
+          unique.push(tag);
       }
-      return normalized;
+      const hasAxiomRule = seen.has('axiom-rule');
+      const hasGlobalRule = seen.has('global-rule');
+      const filtered = unique.filter((tag) => {
+          if (hasAxiomRule && (tag === 'global-rule' || tag === 'doctrine-rule'))
+              return false;
+          if (hasGlobalRule && tag === 'doctrine-rule')
+              return false;
+          return true;
+      });
+      filtered.sort((left, right) => {
+          const leftPriority = COMBAT_TAG_PRIORITY[left] ?? 0;
+          const rightPriority = COMBAT_TAG_PRIORITY[right] ?? 0;
+          return rightPriority - leftPriority;
+      });
+      return filtered;
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeCombatTag')) exports.normalizeCombatTag = normalizeCombatTag;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeCombatTagList')) exports.normalizeCombatTagList = normalizeCombatTagList;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'canonicalizeCombatTags')) exports.canonicalizeCombatTags = canonicalizeCombatTags;
 };
 __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/apply-damage.ts');
@@ -6318,56 +6355,12 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const partitionTokensBySide = __dep7.partitionTokensBySide;
   const sampleTokens = __dep7.sampleTokens;
   const __dep8 = __require('./combat/tag-aliases.ts');
-  const normalizeCombatTag = __dep8.normalizeCombatTag;
+  const canonicalizeCombatTags = __dep8.canonicalizeCombatTags;
   const __dep9 = __require('./engine.ts');
   const slotIndex = __dep9.slotIndex;
   const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
   const EMPTY_TAGS = [];
   const DOCTRINE_NO_HEAL_STATUS_ID = 'doctrine-no-heal';
-  const TAG_PRIORITY_ORDER = Object.freeze({
-      'axiom-rule': 400,
-      'global-rule': 300,
-      'single-target': 220,
-      'leader-target': 220,
-      self: 220,
-      ally: 220,
-      enemy: 220,
-      'random-target': 210,
-      'multi-target': 210,
-      'random-aoe': 210,
-      'column-aoe': 210,
-      'cross-aoe': 210,
-      aoe: 200,
-      'doctrine-rule': 120,
-  });
-  function normalizeDispatchTags(rawTags, treatAsCanonical) {
-      const seen = new Set();
-      const normalized = [];
-      for (const rawTag of rawTags) {
-          const tag = treatAsCanonical ? rawTag : normalizeCombatTag(rawTag);
-          if (!tag || seen.has(tag))
-              continue;
-          seen.add(tag);
-          normalized.push(tag);
-      }
-      const hasAxiomRule = seen.has('axiom-rule');
-      const hasGlobalRule = seen.has('global-rule');
-      const filtered = normalized.filter((tag) => {
-          if (hasAxiomRule && (tag === 'global-rule' || tag === 'doctrine-rule'))
-              return false;
-          if (hasGlobalRule && tag === 'doctrine-rule')
-              return false;
-          return true;
-      });
-      filtered.sort((left, right) => {
-          const leftPriority = TAG_PRIORITY_ORDER[left] ?? 0;
-          const rightPriority = TAG_PRIORITY_ORDER[right] ?? 0;
-          if (leftPriority === rightPriority)
-              return 0;
-          return rightPriority - leftPriority;
-      });
-      return filtered;
-  }
   function collectAliveTargets(tokens) {
       const alive = [];
       for (const token of tokens) {
@@ -6415,18 +6408,34 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       lowhp: 'lowest-hp',
       'thap-mau-nhat': 'lowest-hp',
       'mau-thap-nhat': 'lowest-hp',
+      'hp-thap-nhat': 'lowest-hp',
+      'thap-hp-nhat': 'lowest-hp',
+      'hp-hien-tai-thap-nhat': 'lowest-hp',
+      'mau-hien-tai-thap-nhat': 'lowest-hp',
+      'thấp-máu-nhất': 'lowest-hp',
+      'máu-thấp-nhất': 'lowest-hp',
+      'hp-hiện-tại-thấp-nhất': 'lowest-hp',
+      'máu-hiện-tại-thấp-nhất': 'lowest-hp',
       'highest-current-hp': 'highest-hp',
       high_hp: 'highest-hp',
       highhp: 'highest-hp',
       'mau-cao-nhat': 'highest-hp',
+      'hp-hien-tai-cao-nhat': 'highest-hp',
+      'máu-cao-nhất': 'highest-hp',
+      'hp-hiện-tại-cao-nhất': 'highest-hp',
   });
+  const normalizePriorityLookupKey = (value) => (String(value ?? '')
+      .normalize('NFC')
+      .trim()
+      .toLowerCase()
+      .replace(/[_\s]+/g, '-'));
   const readTargetPriority = (payload) => {
-      const raw = String(payload?.targetPriority ?? payload?.priority ?? '').trim().toLowerCase();
+      const raw = normalizePriorityLookupKey(payload?.targetPriority ?? payload?.priority);
       return TARGET_PRIORITY_ALIASES[raw] ?? 'board';
   };
   const readTargetRole = (payload) => {
-      const raw = String(payload?.targetRole ?? '').trim().toLowerCase();
-      if (raw === 'leader')
+      const raw = normalizePriorityLookupKey(payload?.targetRole);
+      if (raw === 'leader' || raw === 'muc-tieu-leader' || raw === 'mục-tiêu-leader')
           return 'leader';
       return 'any';
   };
@@ -6461,10 +6470,13 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       const anchorPos = readBoardPosition(anchor);
       if (!anchorPos)
           return [];
+      return selectTargetsBySlotPredicate(pool, (pos) => pos.col === anchorPos.col);
+  };
+  const selectTargetsBySlotPredicate = (pool, predicate) => {
       const selected = [];
       for (const token of pool) {
           const pos = readBoardPosition(token);
-          if (!pos || pos.col !== anchorPos.col)
+          if (!pos || !predicate(pos))
               continue;
           selected.push(token);
       }
@@ -6488,14 +6500,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
               continue;
           crossSlots.add(nextRow * 3 + nextCol + 1);
       }
-      const selected = [];
-      for (const token of pool) {
-          const pos = readBoardPosition(token);
-          if (!pos || !crossSlots.has(pos.slot))
-              continue;
-          selected.push(token);
-      }
-      return selected;
+      return selectTargetsBySlotPredicate(pool, (pos) => crossSlots.has(pos.slot));
   };
   const filterTokensByRole = (ctx, tokens) => {
       if (ctx.targetRole !== 'leader')
@@ -6590,11 +6595,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           return tokens.slice(0, limit);
       if (limit === 1) {
           if (priority === 'leader-first') {
-              for (const token of tokens) {
-                  if (isLeaderToken(token))
-                      return [token];
-              }
-              return [tokens[0]];
+              const leader = findLeaderToken(tokens);
+              return leader ? [leader] : [tokens[0]];
           }
           const useRatioMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio';
           const findLowest = priority === 'lowest-hp' || priority === 'lowest-hp-ratio';
@@ -6694,6 +6696,12 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       }
       if (result.targets.length > 0)
           result.sideEffects.push(`hp-change:${amount}`);
+  };
+  const assignAllAliveTargets = (ctx, result) => {
+      if (!ctx.game)
+          return false;
+      result.targets = collectAliveTargets(ctx.game.tokens);
+      return true;
   };
   function applyMarkStackingStatus(ctx, result) {
       if (ctx.deferEffects)
@@ -6807,19 +6815,14 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           result.targets = ctx.opponentTokens;
       },
       'global-rule': (ctx, result) => {
-          if (!ctx.game)
-              return;
-          result.targets = collectAliveTargets(ctx.game.tokens);
+          assignAllAliveTargets(ctx, result);
       },
       'axiom-rule': (ctx, result) => {
-          if (!ctx.game)
-              return;
-          result.targets = collectAliveTargets(ctx.game.tokens);
+          assignAllAliveTargets(ctx, result);
       },
       'doctrine-rule': (ctx, result) => {
-          if (!ctx.game)
+          if (!assignAllAliveTargets(ctx, result))
               return;
-          result.targets = collectAliveTargets(ctx.game.tokens);
           if (ctx.deferEffects || !ctx.attacker)
               return;
           const turns = readTurns(ctx.payload, 'forbidEnemyHealTurns', 'noHealTurns', 'turns', 'duration');
@@ -6928,7 +6931,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           ? (Array.isArray(rawTags) ? rawTags : EMPTY_TAGS)
           : normalizeTagList(rawTags);
       const treatAsCanonical = context.tagsCanonical === true;
-      const tags = normalizeDispatchTags(normalizedTags, treatAsCanonical);
+      const tags = canonicalizeCombatTags(normalizedTags, treatAsCanonical);
       const target = context.target ?? null;
       const attacker = context.attacker ?? null;
       const { allyTokens, enemyTokens } = context.game && attacker

@@ -73,8 +73,16 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'da-muc-tieu-ngau-nhien': 'random-aoe',
   'quy tắc: tái sinh': 'global-rule',
   'quy-tac-tai-sinh': 'global-rule',
+  'quy tắc: cấm hồi sinh': 'global-rule',
+  'quy-tac-cam-hoi-sinh': 'global-rule',
+  'quy tắc: bất tử': 'global-rule',
+  'quy-tac-bat-tu': 'global-rule',
   'pháp tắc: kiên định': 'doctrine-rule',
   'phap-tac-kien-dinh': 'doctrine-rule',
+  'pháp tắc: cấm chữa trị': 'doctrine-rule',
+  'phap-tac-cam-chua-tri': 'doctrine-rule',
+  'pháp tắc: cấm hồi phục': 'doctrine-rule',
+  'phap-tac-cam-hoi-phuc': 'doctrine-rule',
   'tuyệt đối': 'axiom-rule',
   'tuyet-doi': 'axiom-rule',
   'axiom': 'axiom-rule',
@@ -101,6 +109,23 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'tu-dong': 'instant',
 });
 
+const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
+  'axiom-rule': 400,
+  'global-rule': 300,
+  'single-target': 220,
+  'leader-target': 220,
+  self: 220,
+  ally: 220,
+  enemy: 220,
+  'random-target': 210,
+  'multi-target': 210,
+  'random-aoe': 210,
+  'column-aoe': 210,
+  'cross-aoe': 210,
+  aoe: 200,
+  'doctrine-rule': 120,
+});
+
 function normalizeAliasLookupKey(tag: string): string {
   return tag
     .normalize('NFC')
@@ -114,15 +139,32 @@ export function normalizeCombatTag(tag: string): string {
   return COMBAT_TAG_ALIASES[normalized] ?? normalized;
 }
 
-export function normalizeCombatTagList(tags: ReadonlyArray<string> | null | undefined): string[] {
+export function canonicalizeCombatTags(
+  tags: ReadonlyArray<string> | null | undefined,
+  treatAsCanonical = false,
+): string[] {
   if (!Array.isArray(tags) || tags.length === 0) return [];
-  const normalized: string[] = [];
+  const unique: string[] = [];
   const seen = new Set<string>();
-  for (const tag of tags) {
-    const next = normalizeCombatTag(tag);
-    if (seen.has(next)) continue;
-    seen.add(next);
-    normalized.push(next);
+  for (const rawTag of tags) {
+    const tag = treatAsCanonical ? normalizeAliasLookupKey(rawTag) : normalizeCombatTag(rawTag);
+    if (!tag || seen.has(tag)) continue;
+    seen.add(tag);
+    unique.push(tag);
   }
-  return normalized;
+
+  const hasAxiomRule = seen.has('axiom-rule');
+  const hasGlobalRule = seen.has('global-rule');
+  const filtered = unique.filter((tag) => {
+    if (hasAxiomRule && (tag === 'global-rule' || tag === 'doctrine-rule')) return false;
+    if (hasGlobalRule && tag === 'doctrine-rule') return false;
+    return true;
+  });
+
+  filtered.sort((left, right) => {
+    const leftPriority = COMBAT_TAG_PRIORITY[left] ?? 0;
+    const rightPriority = COMBAT_TAG_PRIORITY[right] ?? 0;
+    return rightPriority - leftPriority;
+  });
+  return filtered;
 }

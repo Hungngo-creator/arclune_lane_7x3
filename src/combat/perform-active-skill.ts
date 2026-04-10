@@ -11,7 +11,7 @@ import { resolveSkillPayload } from './skill-metadata-utils.ts';
 import { readAtkWilPower, readUnitHpState, toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
-import { normalizeCombatTagList } from './tag-aliases.ts';
+import { canonicalizeCombatTags } from './tag-aliases.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -98,8 +98,12 @@ function canApplyUniqueGlobal(game: SessionState, summonId: string): boolean {
   return !game.tokens.some((token) => token.alive && token.id === summonId);
 }
 
-function applyHpCost(caster: UnitToken, payload: Record<string, unknown>): boolean {
-  const { hpMax, hp: currentHp } = readUnitHpState(caster);
+function applyHpCostWithState(
+  caster: UnitToken,
+  hpMax: number,
+  currentHp: number,
+  payload: Record<string, unknown>,
+): boolean {
   const ratio = Math.max(0, readPayloadNumber(payload, 0, 'hpCostRatio', 'hpCostPercent'));
   const flat = Math.max(0, toFloorInt(readPayloadNumber(payload, 0, 'hpCostFlat', 'hpCost'), 0));
   const minRemainRatio = Math.max(0, readPayloadNumber(payload, 0, 'minRemainingHpRatio', 'minHpRatio'));
@@ -114,8 +118,11 @@ function applyHpCost(caster: UnitToken, payload: Record<string, unknown>): boole
   return true;
 }
 
-function checkHpCondition(caster: UnitToken, payload: Record<string, unknown>): boolean {
-  const { hpMax, hp: currentHp } = readUnitHpState(caster);
+function checkHpConditionWithState(
+  hpMax: number,
+  currentHp: number,
+  payload: Record<string, unknown>,
+): boolean {
   const requiredRatio = Math.max(
     0,
     readPayloadNumber(
@@ -248,7 +255,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
   }
 
-  const tags = normalizeCombatTagList(normalizeTagList(skill.tags ?? []));
+  const tags = canonicalizeCombatTags(normalizeTagList(skill.tags ?? []), true);
   const {
     effectTags,
     hasAetherCostTag,
@@ -295,13 +302,14 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   }
 
   const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
-  if (!checkHpCondition(caster, payload)) {
+  const { hpMax: casterHpMax, hp: casterCurrentHp } = readUnitHpState(caster);
+  if (!checkHpConditionWithState(casterHpMax, casterCurrentHp, payload)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
   if (!checkTurnParityCondition(game, payload)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
-  if (!applyHpCost(caster, payload)) {
+  if (!applyHpCostWithState(caster, casterHpMax, casterCurrentHp, payload)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
 
