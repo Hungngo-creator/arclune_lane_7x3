@@ -355,6 +355,47 @@ describe('combat tag dispatcher matrix', () => {
     expect(sleepStatus?.sourceUnitId).toBe('attacker');
   });
 
+  it('keeps only highest rule tag and honors axiom > rule > doctrine hierarchy', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally' });
+    const ally = makeToken({ id: 'ally', side: 'ally', cx: 1, cy: 0 });
+    const enemy = makeToken({ id: 'enemy', side: 'enemy', cx: 1, cy: 1 });
+    const game = makeGame([attacker, ally, enemy]);
+
+    const result = dispatchGameplayTags(['pháp tắc', 'quy tắc', 'axiom', 'heal'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+      payload: { healAmount: 10 },
+    });
+
+    expect(result.tags).toEqual(expect.arrayContaining(['axiom-rule', 'heal']));
+    expect(result.tags).not.toEqual(expect.arrayContaining(['doctrine-rule', 'global-rule']));
+    expect(result.highestRuleTag).toBe('axiom-rule');
+    expect(result.targets.map((token) => token.id).sort()).toEqual(['ally', 'attacker', 'enemy']);
+  });
+
+  it('maps than tinh and cap-do-cao aliases to correct hierarchy levels', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally' });
+    const enemy = makeToken({ id: 'enemy', side: 'enemy', cx: 1, cy: 1 });
+    const game = makeGame([attacker, enemy]);
+
+    const thanTinh = dispatchGameplayTags(['Thần Tính'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+    });
+    expect(thanTinh.highestRuleTag).toBe('axiom-rule');
+    expect(thanTinh.applied).toContain('axiom-rule');
+
+    const capDoCao = dispatchGameplayTags(['cấp độ cao hơn pháp tắc'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+    });
+    expect(capDoCao.highestRuleTag).toBe('global-rule');
+    expect(capDoCao.applied).toContain('global-rule');
+  });
+
   it('handles summon and non-heal-hp-change', () => {
     const attacker = makeToken({ id: 'attacker', side: 'ally' });
     const target = makeToken({ id: 'target', side: 'enemy', hp: 100, hpMax: 100 });

@@ -5883,6 +5883,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       const payload = resolveSkillPayload(skill);
       const maxSkillUses = readSkillUseCap(payload);
       if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
+          return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
       }
       const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
       const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;
@@ -6050,13 +6051,17 @@ __modules['./combat/skill-metadata-utils.ts'] = (exports, module, __require) => 
   const __dep0 = __require('./combat/number-utils.ts');
   const asRecord = __dep0.asRecord;
   const toFiniteNumber = __dep0.toFiniteNumber;
-  function collectSkillRecords(skill) {
+  function resolveSkillRootRecords(skill) {
       const root = skill;
       const metadata = asRecord(root.metadata);
       const meta = asRecord(root.meta);
       const payload = asRecord(root.payload);
       const metadataPayload = asRecord(metadata?.payload);
       const metaPayload = asRecord(meta?.payload);
+      return { root, metadata, meta, payload, metadataPayload, metaPayload };
+  }
+  function collectSkillRecords(skill) {
+      const { root, metadata, meta, payload, metadataPayload, metaPayload } = resolveSkillRootRecords(skill);
       const records = [];
       const seen = new Set();
       const pushUnique = (record) => {
@@ -6074,10 +6079,8 @@ __modules['./combat/skill-metadata-utils.ts'] = (exports, module, __require) => 
       return records;
   }
   function resolveSkillPayload(skill) {
-      const root = skill;
-      const metadata = asRecord(root.metadata);
-      const meta = asRecord(root.meta);
-      const payloadCandidates = [asRecord(root.payload), asRecord(metadata?.payload), asRecord(meta?.payload)];
+      const { root, payload, metadataPayload, metaPayload } = resolveSkillRootRecords(skill);
+      const payloadCandidates = [payload, metadataPayload, metaPayload];
       const payloadRecord = payloadCandidates.find((entry) => !!entry) ?? null;
       return {
           ...(payloadRecord ?? {}),
@@ -6180,6 +6183,8 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'quy-tac': 'global-rule',
       'pháp tắc': 'doctrine-rule',
       'phap-tac': 'doctrine-rule',
+      'pháp tắc: luyện ngục kiếm trận': 'doctrine-rule',
+      'phap-tac-luyen-nguc-kiem-tran': 'doctrine-rule',
       'muc-tieu-leader': 'leader-target',
       'mục tiêu leader': 'leader-target',
       'mục tiêu: leader': 'leader-target',
@@ -6247,14 +6252,18 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'phap-tac-cam-hoi-phuc': 'doctrine-rule',
       'tuyệt đối': 'axiom-rule',
       'tuyet-doi': 'axiom-rule',
+      'quy tắc: bất động như sơn': 'global-rule',
+      'quy-tac-bat-dong-nhu-son': 'global-rule',
+      'quy tắc: sự trở về của hư không': 'global-rule',
+      'quy-tac-su-tro-ve-cua-hu-khong': 'global-rule',
       'axiom': 'axiom-rule',
       'axiom-rule': 'axiom-rule',
       'tiên đề': 'axiom-rule',
       'tien-de': 'axiom-rule',
-      'tag cấp độ cao': 'axiom-rule',
-      'tag-cap-do-cao': 'axiom-rule',
-      'cấp độ cao hơn pháp tắc': 'axiom-rule',
-      'cap-do-cao-hon-phap-tac': 'axiom-rule',
+      'tag cấp độ cao': 'global-rule',
+      'tag-cap-do-cao': 'global-rule',
+      'cấp độ cao hơn pháp tắc': 'global-rule',
+      'cap-do-cao-hon-phap-tac': 'global-rule',
       'sát thương tự thân': 'non-heal-hp-change',
       'sat-thuong-tu-than': 'non-heal-hp-change',
       'aoe: hàng dọc': 'column-aoe',
@@ -6357,21 +6366,26 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
           return [];
       const unique = [];
       const seen = new Set();
+      let highestRuleTag = null;
+      let highestRulePriority = -1;
       for (const rawTag of tags) {
           const tag = treatAsCanonical ? normalizeAliasLookupKey(rawTag) : normalizeCombatTag(rawTag);
           if (!tag || seen.has(tag))
               continue;
           seen.add(tag);
           unique.push(tag);
+          const normalizedRuleTag = tag;
+          const rulePriority = RULE_TAG_PRIORITY[normalizedRuleTag];
+          if (rulePriority == null || rulePriority <= highestRulePriority)
+              continue;
+          highestRuleTag = normalizedRuleTag;
+          highestRulePriority = rulePriority;
       }
-      const highestRuleTag = resolveHighestRuleTag(unique);
-      const filtered = unique.filter((tag) => {
-          if (!highestRuleTag)
-              return true;
-          if (!RULE_TAG_SET.has(tag))
-              return true;
-          return tag === highestRuleTag;
-      });
+      const filtered = highestRuleTag
+          ? unique.filter((tag) => !RULE_TAG_SET.has(tag) || tag === highestRuleTag)
+          : unique;
+      if (filtered.length <= 1)
+          return filtered;
       filtered.sort((left, right) => {
           const leftPriority = COMBAT_TAG_PRIORITY[left] ?? 0;
           const rightPriority = COMBAT_TAG_PRIORITY[right] ?? 0;

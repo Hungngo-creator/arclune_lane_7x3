@@ -4,14 +4,25 @@ import type { SkillSection } from '@shared-types/config';
 
 type SkillRecord = Record<string, unknown>;
 
-function collectSkillRecords(skill: SkillSection): SkillRecord[] {
+function resolveSkillRootRecords(skill: SkillSection): {
+  root: SkillRecord;
+  metadata: SkillRecord | null;
+  meta: SkillRecord | null;
+  payload: SkillRecord | null;
+  metadataPayload: SkillRecord | null;
+  metaPayload: SkillRecord | null;
+} {
   const root = skill as SkillRecord;
   const metadata = asRecord(root.metadata);
   const meta = asRecord(root.meta);
   const payload = asRecord(root.payload);
   const metadataPayload = asRecord(metadata?.payload);
   const metaPayload = asRecord(meta?.payload);
+  return { root, metadata, meta, payload, metadataPayload, metaPayload };
+}
 
+function collectSkillRecords(skill: SkillSection): SkillRecord[] {
+  const { root, metadata, meta, payload, metadataPayload, metaPayload } = resolveSkillRootRecords(skill);
   const records: SkillRecord[] = [];
   const seen = new Set<SkillRecord>();
   const pushUnique = (record: SkillRecord | null): void => {
@@ -29,10 +40,8 @@ function collectSkillRecords(skill: SkillSection): SkillRecord[] {
 }
 
 export function resolveSkillPayload(skill: SkillSection): SkillRecord {
-  const root = skill as SkillRecord;
-  const metadata = asRecord(root.metadata);
-  const meta = asRecord(root.meta);
-  const payloadCandidates = [asRecord(root.payload), asRecord(metadata?.payload), asRecord(meta?.payload)];
+  const { root, payload, metadataPayload, metaPayload } = resolveSkillRootRecords(skill);
+  const payloadCandidates = [payload, metadataPayload, metaPayload];
   const payloadRecord = payloadCandidates.find((entry) => !!entry) ?? null;
   return {
     ...(payloadRecord ?? {}),

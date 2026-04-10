@@ -264,6 +264,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   const payload = resolveSkillPayload(skill);
   const maxSkillUses = readSkillUseCap(payload);
   if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
+    return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
   }
   const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
   const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;

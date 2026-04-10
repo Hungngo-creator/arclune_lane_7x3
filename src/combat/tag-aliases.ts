@@ -17,6 +17,8 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'quy-tac': 'global-rule',
   'pháp tắc': 'doctrine-rule',
   'phap-tac': 'doctrine-rule',
+  'pháp tắc: luyện ngục kiếm trận': 'doctrine-rule',
+  'phap-tac-luyen-nguc-kiem-tran': 'doctrine-rule',
   'muc-tieu-leader': 'leader-target',
   'mục tiêu leader': 'leader-target',
   'mục tiêu: leader': 'leader-target',
@@ -85,14 +87,18 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'phap-tac-cam-hoi-phuc': 'doctrine-rule',
   'tuyệt đối': 'axiom-rule',
   'tuyet-doi': 'axiom-rule',
+  'quy tắc: bất động như sơn': 'global-rule',
+  'quy-tac-bat-dong-nhu-son': 'global-rule',
+  'quy tắc: sự trở về của hư không': 'global-rule',
+  'quy-tac-su-tro-ve-cua-hu-khong': 'global-rule',
   'axiom': 'axiom-rule',
   'axiom-rule': 'axiom-rule',
   'tiên đề': 'axiom-rule',
   'tien-de': 'axiom-rule',
-  'tag cấp độ cao': 'axiom-rule',
-  'tag-cap-do-cao': 'axiom-rule',
-  'cấp độ cao hơn pháp tắc': 'axiom-rule',
-  'cap-do-cao-hon-phap-tac': 'axiom-rule',
+  'tag cấp độ cao': 'global-rule',
+  'tag-cap-do-cao': 'global-rule',
+  'cấp độ cao hơn pháp tắc': 'global-rule',
+  'cap-do-cao-hon-phap-tac': 'global-rule',
   'sát thương tự thân': 'non-heal-hp-change',
   'sat-thuong-tu-than': 'non-heal-hp-change',
   'aoe: hàng dọc': 'column-aoe',
@@ -202,21 +208,29 @@ export function canonicalizeCombatTags(
   treatAsCanonical = false,
 ): string[] {
   if (!Array.isArray(tags) || tags.length === 0) return [];
+
   const unique: string[] = [];
   const seen = new Set<string>();
+  let highestRuleTag: RuleTag | null = null;
+  let highestRulePriority = -1;
+
   for (const rawTag of tags) {
     const tag = treatAsCanonical ? normalizeAliasLookupKey(rawTag) : normalizeCombatTag(rawTag);
     if (!tag || seen.has(tag)) continue;
     seen.add(tag);
     unique.push(tag);
+
+    const normalizedRuleTag = tag as RuleTag;
+    const rulePriority = RULE_TAG_PRIORITY[normalizedRuleTag];
+    if (rulePriority == null || rulePriority <= highestRulePriority) continue;
+    highestRuleTag = normalizedRuleTag;
+    highestRulePriority = rulePriority;
   }
 
-  const highestRuleTag = resolveHighestRuleTag(unique);
-  const filtered = unique.filter((tag) => {
-    if (!highestRuleTag) return true;
-    if (!RULE_TAG_SET.has(tag as RuleTag)) return true;
-    return tag === highestRuleTag;
-  });
+  const filtered = highestRuleTag
+    ? unique.filter((tag) => !RULE_TAG_SET.has(tag as RuleTag) || tag === highestRuleTag)
+    : unique;
+  if (filtered.length <= 1) return filtered;
 
   filtered.sort((left, right) => {
     const leftPriority = COMBAT_TAG_PRIORITY[left] ?? 0;
