@@ -5045,17 +5045,13 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   const toFiniteNumber = __dep1.toFiniteNumber;
   const toFloorInt = __dep1.toFloorInt;
   const toNonNegativeFloorInt = __dep1.toNonNegativeFloorInt;
+  const toPositiveTurns = __dep1.toPositiveTurns;
   const __dep2 = __require('./combat/status-utils.ts');
   const ensureStatusList = __dep2.ensureStatusList;
   const getStatusEntryById = __dep2.getStatusEntryById;
   const SHIELD_STATUS_ID = 'shield';
   function getShieldEntry(target) {
       return getStatusEntryById(target, SHIELD_STATUS_ID);
-  }
-  function normalizeDurationTurns(value) {
-      if (!Number.isFinite(value))
-          return null;
-      return Math.max(1, toFloorInt(value, 1));
   }
   function consumeShieldEntryAmount(entry, amount) {
       if (!entry)
@@ -5100,7 +5096,7 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
           return 0;
       const list = ensureStatusList(target);
       const entry = getStatusEntryById(target, SHIELD_STATUS_ID, list);
-      const durationTurns = normalizeDurationTurns(options.durationTurns);
+      const durationTurns = options.durationTurns == null ? null : toPositiveTurns(options.durationTurns, 1);
       if (entry) {
           entry.status.amount = (entry.status.amount ?? 0) + amt;
           if (durationTurns != null) {
@@ -5635,6 +5631,11 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
           return 0;
       return Math.max(0, toFiniteNumber(unit.atk, 0) + toFiniteNumber(unit.wil, 0));
   }
+  function readUnitHpState(unit) {
+      const hpMax = Math.max(1, toFloorInt(unit?.hpMax, 1));
+      const hp = Math.max(0, Math.min(hpMax, toFloorInt(unit?.hp, hpMax)));
+      return { hp, hpMax };
+  }
   function asRecord(value) {
       if (!value || typeof value !== 'object' || Array.isArray(value))
           return null;
@@ -5648,6 +5649,7 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'toNonNegativeFloorInt')) exports.toNonNegativeFloorInt = toNonNegativeFloorInt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'toPositiveTurns')) exports.toPositiveTurns = toPositiveTurns;
   if (!Object.prototype.hasOwnProperty.call(exports, 'readAtkWilPower')) exports.readAtkWilPower = readAtkWilPower;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'readUnitHpState')) exports.readUnitHpState = readUnitHpState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'asRecord')) exports.asRecord = asRecord;
 };
 __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => {
@@ -5676,6 +5678,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const resolveSkillPayload = __dep9.resolveSkillPayload;
   const __dep10 = __require('./combat/number-utils.ts');
   const readAtkWilPower = __dep10.readAtkWilPower;
+  const readUnitHpState = __dep10.readUnitHpState;
   const toFiniteNumber = __dep10.toFiniteNumber;
   const toFloorInt = __dep10.toFloorInt;
   const toPositiveTurns = __dep10.toPositiveTurns;
@@ -5737,8 +5740,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       return !game.tokens.some((token) => token.alive && token.id === summonId);
   }
   function applyHpCost(caster, payload) {
-      const hpMax = Math.max(1, toFloorInt(caster.hpMax, 1));
-      const currentHp = Math.max(0, toFloorInt(caster.hp, hpMax));
+      const { hpMax, hp: currentHp } = readUnitHpState(caster);
       const ratio = Math.max(0, toFiniteNumber(payload.hpCostRatio ?? payload.hpCostPercent, 0));
       const flat = Math.max(0, toFloorInt(payload.hpCostFlat ?? payload.hpCost, 0));
       const minRemainRatio = Math.max(0, toFiniteNumber(payload.minRemainingHpRatio ?? payload.minHpRatio, 0));
@@ -5753,8 +5755,8 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       return true;
   }
   function checkHpCondition(caster, payload) {
-      const hpMax = Math.max(1, toFloorInt(caster.hpMax, 1));
-      const currentHp = Math.max(0, toFloorInt(caster.hp, hpMax));
+      const { hpMax, hp: currentHp } = readUnitHpState(caster);
+      x(0, toFloorInt(caster.hp, hpMax));
       const requiredRatio = Math.max(0, toFiniteNumber(payload.minCurrentHpRatio
           ?? payload.requireCurrentHpRatioMin
           ?? payload.requiredHpRatio
@@ -5762,6 +5764,46 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       if (requiredRatio <= 0)
           return true;
       return currentHp / hpMax >= requiredRatio;
+  }
+  function checkTurnParityCondition(game, payload) {
+      const turn = game.turn;
+      const turnCount = turn && typeof turn === 'object' && Number.isFinite(turn.turnCount)
+          ? toFloorInt(turn.turnCount, 0)
+          : NaN;
+      if (!Number.isFinite(turnCount) || turnCount <= 0)
+          return true;
+      const mode = String(payload.turnParity ?? payload.requireTurnParity ?? payload.conditionTurnParity ?? '').trim().toLowerCase();
+      if (!mode)
+          return true;
+      if (mode === 'odd' || mode === 'le')
+          return (turnCount % 2) === 1;
+      if (mode === 'even' || mode === 'chan')
+          return (turnCount % 2) === 0;
+      return true;
+  }
+  function readSkillUseCap(payload) {
+      return Math.max(0, toRoundedInt(payload.maxUsesPerBattle ?? payload.maxUses ?? payload.battleUseCap, 0));
+  }
+  function hasSkillUseQuota(game, caster, skillKey, payload) {
+      const maxUses = readSkillUseCap(payload);
+      if (maxUses <= 0)
+          return true;
+      const runtimeRoot = game.runtime;
+      const usageStore = runtimeRoot?._skillUsageByCaster;
+      const casterUsage = usageStore?.[String(caster.iid ?? caster.id)];
+      const currentUses = Math.max(0, toRoundedInt(casterUsage?.[skillKey] ?? 0, 0));
+      return currentUses < maxUses;
+  }
+  function recordSkillUseQuota(game, caster, skillKey, payload) {
+      const maxUses = readSkillUseCap(payload);
+      if (maxUses <= 0)
+          return;
+      const runtimeRoot = (game.runtime ??= {});
+      const usageStore = (runtimeRoot._skillUsageByCaster ??= {});
+      const casterKey = String(caster.iid ?? caster.id);
+      const casterUsage = (usageStore[casterKey] ??= {});
+      const currentUses = Math.max(0, toRoundedInt(casterUsage[skillKey] ?? 0, 0));
+      casterUsage[skillKey] = Math.min(maxUses, currentUses + 1);
   }
   function firstOpenSlot(game, side) {
       const aliveTokens = [];
@@ -5839,6 +5881,9 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       const tags = normalizeCombatTagList(normalizeTagList(skill.tags ?? []));
       const { effectTags, hasAetherCostTag, hasSummonTag, hasUniqueGlobalTag, hasDamageTag, } = parseSkillTags(tags);
       const payload = resolveSkillPayload(skill);
+      if (!hasSkillUseQuota(game, caster, skillKey, payload)) {
+          return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
+      }
       const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
       const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;
       if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
@@ -5873,6 +5918,9 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       if (!checkHpCondition(caster, payload)) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
+      if (!checkTurnParityCondition(game, payload)) {
+          return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+      }
       if (!applyHpCost(caster, payload)) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
@@ -5884,8 +5932,11 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           tags,
           appliedTags: dispatch.applied,
       });
-      if (runtimeSkillResult)
+      if (runtimeSkillResult) {
+          if (runtimeSkillResult.ok)
+              recordSkillUseQuota(game, caster, skillKey, payload);
           return runtimeSkillResult;
+      }
       const casterPower = readAtkWilPower(caster);
       if (caster.id === BLOOD_AVATAR_ID) {
           const enemies = partitionTokensBySide(game.tokens, caster.side).enemyTokens;
@@ -5901,6 +5952,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
                   Statuses.add(target, { ...BLOOD_AVATAR_BLEED_STATUS, sourceUnitId: caster.id });
                   Statuses.add(target, { ...BLOOD_AVATAR_MARK_STATUS, sourceUnitId: caster.id });
               }
+              recordSkillUseQuota(game, caster, skillKey, payload);
               return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, picked.length);
           }
           if (skillKey === 'skill2') {
@@ -5920,6 +5972,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
                       Statuses.add(token, { id: 'heal_efficiency_down', kind: 'debuff', tag: 'field', dur: 2, tick: 'turn', amount: 0.25, sourceUnitId: caster.id });
                   }
               }
+              recordSkillUseQuota(game, caster, skillKey, payload);
               return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, enemies.length);
           }
           if (skillKey === 'skill3') {
@@ -5929,6 +5982,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
               caster.hp = Math.max(1, toFloorInt((caster.hp ?? 0) - hpCost, 1));
               globalAetherPool.gain(caster.side, 15);
+              recordSkillUseQuota(game, caster, skillKey, payload);
               return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
           }
       }
@@ -5985,6 +6039,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               applyMarkSleepSetupTag(game, caster, target, MONG_YEM_DREAM_MARK_PAYLOAD);
           }
       }
+      recordSkillUseQuota(game, caster, skillKey, payload);
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, dispatch.targets.length);
   }
   //# sourceMappingURL=stdin.js.map
@@ -6154,9 +6209,25 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'doc-nhat': 'unique-global',
       'điều kiện': 'condition',
       'dieu-kien': 'condition',
+      'aoe cố định': 'aoe',
+      'aoe co dinh': 'aoe',
+      'aoe ngẫu nhiên': 'random-aoe',
+      'aoe ngau nhien': 'random-aoe',
+      'đa mục tiêu: đồng minh': 'ally',
+      'da muc tieu: dong minh': 'ally',
+      'aoe: toàn bộ kẻ địch': 'aoe',
+      'aoe: toan bo ke dich': 'aoe',
   });
+  function normalizeAliasLookupKey(tag) {
+      return tag
+          .normalize('NFC')
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, ' ');
+  }
   function normalizeCombatTag(tag) {
-      return COMBAT_TAG_ALIASES[tag] ?? tag;
+      const normalized = normalizeAliasLookupKey(tag);
+      return COMBAT_TAG_ALIASES[normalized] ?? normalized;
   }
   function normalizeCombatTagList(tags) {
       if (!Array.isArray(tags) || tags.length === 0)

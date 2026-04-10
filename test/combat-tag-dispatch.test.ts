@@ -203,6 +203,29 @@ describe('combat tag dispatcher matrix', () => {
     expect(['enemy-a', 'enemy-b']).toContain(enemyAliasResult.targets[0]?.id);
   });
 
+  it('normalizes combat-tag aliases with mixed case/spacing from character idea docs', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally', hp: 90, hpMax: 100 });
+    const enemyA = makeToken({ id: 'enemy-a', side: 'enemy', hp: 10, hpMax: 100, cx: 1, cy: 1 });
+    const enemyB = makeToken({ id: 'enemy-b', side: 'enemy', hp: 60, hpMax: 100, cx: 2, cy: 1 });
+    const game = makeGame([attacker, enemyA, enemyB]);
+
+    const randomAoeResult = dispatchGameplayTags(['  AOE NGẪU NHIÊN  ', 'Kẻ Địch'], {
+      game,
+      attacker,
+      tagsNormalized: true,
+      payload: { targetCount: 2 },
+    });
+    expect(randomAoeResult.targets).toHaveLength(2);
+
+    const allyAliasResult = dispatchGameplayTags([' Đa   Mục   Tiêu:   Đồng   Minh '], {
+      game,
+      attacker,
+      tagsNormalized: true,
+      payload: { targetCount: 1, targetPriority: 'highest-hp-ratio' },
+    });
+    expect(allyAliasResult.targets.map((token) => token.id)).toEqual(['attacker']);
+  });
+
   it('supports leader-first priority and leader-only target role', () => {
     const attacker = makeToken({ id: 'attacker', side: 'ally', cx: 2, cy: 0 });
     const enemyLeader = makeToken({ id: 'enemy-leader', side: 'enemy', cx: 6, cy: 1 }); // slot 8

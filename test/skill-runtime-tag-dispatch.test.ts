@@ -4,6 +4,7 @@ import { dispatchGameplayTags } from '../src/combat/tag-dispatch.ts';
 import { performActiveSkill } from '../src/combat/perform-active-skill.ts';
 import { normalizeTagList } from '../src/data/tags.ts';
 import { globalAetherPool } from '../src/aether.ts';
+import * as skillMetadataUtils from '../src/combat/skill-metadata-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -130,6 +131,24 @@ describe('skill runtime tag contract', () => {
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('blocked');
     expect(enemy.hp).toBe(200);
+  });
+
+  it('respects payload maxUsesPerBattle cap for active skills', () => {
+    const payloadSpy = jest.spyOn(skillMetadataUtils, 'resolveSkillPayload');
+    payloadSpy.mockImplementation((skill) => ({ ...(skill as Record<string, unknown>), maxUsesPerBattle: 1 }));
+
+    const caster = makeToken({ id: 'mong_yem', side: 'ally', cx: 0, cy: 0 });
+    const enemy = makeToken({ id: 'enemy', side: 'enemy', iid: 8, cx: 1, cy: 1, hp: 200, hpMax: 200 });
+    const game = makeGame([caster, enemy]);
+
+    const first = performActiveSkill(game, caster, 'skill1');
+    const second = performActiveSkill(game, caster, 'skill1');
+
+    expect(first.ok).toBe(true);
+    expect(second.ok).toBe(false);
+    expect(second.reason).toBe('blocked');
+
+    payloadSpy.mockRestore();
   });
 
 });

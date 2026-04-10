@@ -1,5 +1,5 @@
 import { sessionNow } from '../utils/time.ts';
-import { toFiniteNumber, toFloorInt, toNonNegativeFloorInt } from './number-utils.ts';
+import { toFiniteNumber, toFloorInt, toNonNegativeFloorInt, toPositiveTurns } from './number-utils.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 
 import type { UnitToken } from '@shared-types/units';
@@ -8,11 +8,6 @@ const SHIELD_STATUS_ID = 'shield';
 
 function getShieldEntry(target: UnitToken | null | undefined) {
   return getStatusEntryById(target, SHIELD_STATUS_ID);
-}
-
-function normalizeDurationTurns(value: unknown): number | null {
-  if (!Number.isFinite(value as number)) return null;
-  return Math.max(1, toFloorInt(value, 1));
 }
 
 function consumeShieldEntryAmount(entry: ReturnType<typeof getShieldEntry>, amount: number): number {
@@ -66,7 +61,7 @@ export function grantShield(target: UnitToken | null | undefined, amount: number
   const list = ensureStatusList(target);
   const entry = getStatusEntryById(target, SHIELD_STATUS_ID, list);
 
-  const durationTurns = normalizeDurationTurns(options.durationTurns);
+  const durationTurns = options.durationTurns == null ? null : toPositiveTurns(options.durationTurns, 1);
 
   if (entry) {
     entry.status.amount = (entry.status.amount ?? 0) + amt;

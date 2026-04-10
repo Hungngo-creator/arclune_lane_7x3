@@ -49,10 +49,27 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'doc-nhat': 'unique-global',
   'điều kiện': 'condition',
   'dieu-kien': 'condition',
+  'aoe cố định': 'aoe',
+  'aoe co dinh': 'aoe',
+  'aoe ngẫu nhiên': 'random-aoe',
+  'aoe ngau nhien': 'random-aoe',
+  'đa mục tiêu: đồng minh': 'ally',
+  'da muc tieu: dong minh': 'ally',
+  'aoe: toàn bộ kẻ địch': 'aoe',
+  'aoe: toan bo ke dich': 'aoe',
 });
 
+function normalizeAliasLookupKey(tag: string): string {
+  return tag
+    .normalize('NFC')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
 export function normalizeCombatTag(tag: string): string {
-  return COMBAT_TAG_ALIASES[tag] ?? tag;
+  const normalized = normalizeAliasLookupKey(tag);
+  return COMBAT_TAG_ALIASES[normalized] ?? normalized;
 }
 
 export function normalizeCombatTagList(tags: ReadonlyArray<string> | null | undefined): string[] {

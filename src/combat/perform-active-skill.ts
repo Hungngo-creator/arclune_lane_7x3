@@ -8,7 +8,7 @@ import { globalAetherPool } from '../aether.ts';
 import { Statuses } from '../statuses.ts';
 import { runRuntimeActiveSkill } from './unit-runtime-hooks.ts';
 import { resolveSkillPayload } from './skill-metadata-utils.ts';
-import { readAtkWilPower, toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
+import { readAtkWilPower, readUnitHpState, toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
 import { normalizeCombatTagList } from './tag-aliases.ts';
@@ -76,6 +76,7 @@ interface ParsedSkillTags {
   hasUniqueGlobalTag: boolean;
   hasDamageTag: boolean;
 }
+type SkillUsageStore = Record<string, number>;
 
 function resolveActiveSkill(caster: UnitToken, skillKey: ActiveSkillKey): SkillSection | null {
   const set = skillSets[caster.id as keyof typeof skillSets];
@@ -90,8 +91,7 @@ function canApplyUniqueGlobal(game: SessionState, summonId: string): boolean {
 }
 
 function applyHpCost(caster: UnitToken, payload: Record<string, unknown>): boolean {
-  const hpMax = Math.max(1, toFloorInt(caster.hpMax, 1));
-  const currentHp = Math.max(0, toFloorInt(caster.hp, hpMax));
+  const { hpMax, hp: currentHp } = readUnitHpState(caster);
   const ratio = Math.max(0, toFiniteNumber(payload.hpCostRatio ?? payload.hpCostPercent, 0));
   const flat = Math.max(0, toFloorInt(payload.hpCostFlat ?? payload.hpCost, 0));
   const minRemainRatio = Math.max(0, toFiniteNumber(payload.minRemainingHpRatio ?? payload.minHpRatio, 0));
@@ -107,8 +107,7 @@ function applyHpCost(caster: UnitToken, payload: Record<string, unknown>): boole
 }
 
 function checkHpCondition(caster: UnitToken, payload: Record<string, unknown>): boolean {
-  const hpMax = Math.max(1, toFloorInt(caster.hpMax, 1));
-  const currentHp = Math.max(0, toFloorInt(caster.hp, hpMax));
+  const { hpMax, hp: currentHp } = readUnitHpState(caster);x(0, toFloorInt(caster.hp, hpMax));
   const requiredRatio = Math.max(
     0,
     toFiniteNumber(
@@ -121,6 +120,48 @@ function checkHpCondition(caster: UnitToken, payload: Record<string, unknown>): 
   );
   if (requiredRatio <= 0) return true;
   return currentHp / hpMax >= requiredRatio;
+}
+
+function checkTurnParityCondition(game: SessionState, payload: Record<string, unknown>): boolean {
+  const turn = game.turn;
+  const turnCount = turn && typeof turn === 'object' && Number.isFinite((turn as { turnCount?: unknown }).turnCount)
+    ? toFloorInt((turn as { turnCount?: unknown }).turnCount, 0)
+    : NaN;
+  if (!Number.isFinite(turnCount) || turnCount <= 0) return true;
+  const mode = String(payload.turnParity ?? payload.requireTurnParity ?? payload.conditionTurnParity ?? '').trim().toLowerCase();
+  if (!mode) return true;
+  if (mode === 'odd' || mode === 'le') return (turnCount % 2) === 1;
+  if (mode === 'even' || mode === 'chan') return (turnCount % 2) === 0;
+  return true;
+}
+
+function readSkillUseCap(payload: Record<string, unknown>): number {
+  return Math.max(
+    0,
+    toRoundedInt(payload.maxUsesPerBattle ?? payload.maxUses ?? payload.battleUseCap, 0),
+  );
+}
+
+function hasSkillUseQuota(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey, payload: Record<string, unknown>): boolean {
+  const maxUses = readSkillUseCap(payload);
+  if (maxUses <= 0) return true;
+  const runtimeRoot = game.runtime;
+  const usageStore = runtimeRoot?._skillUsageByCaster as Record<string, SkillUsageStore> | undefined;
+  const casterUsage = usageStore?.[String(caster.iid ?? caster.id)];
+  const currentUses = Math.max(0, toRoundedInt(casterUsage?.[skillKey] ?? 0, 0));
+  return currentUses < maxUses;
+}
+
+function recordSkillUseQuota(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey, payload: Record<string, unknown>): void {
+  const maxUses = readSkillUseCap(payload);
+  if (maxUses <= 0) return;
+
+  const runtimeRoot = (game.runtime ??= {});
+  const usageStore = ((runtimeRoot._skillUsageByCaster as Record<string, SkillUsageStore> | undefined) ??= {});
+  const casterKey = String(caster.iid ?? caster.id);
+  const casterUsage = (usageStore[casterKey] ??= {});
+  const currentUses = Math.max(0, toRoundedInt(casterUsage[skillKey] ?? 0, 0));
+  casterUsage[skillKey] = Math.min(maxUses, currentUses + 1);
 }
 
 function firstOpenSlot(game: SessionState, side: UnitToken['side']): number | null {
@@ -207,6 +248,9 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     hasDamageTag,
   } = parseSkillTags(tags);
   const payload = resolveSkillPayload(skill);
+  if (!hasSkillUseQuota(game, caster, skillKey, payload)) {
+    return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
+  }
   const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
   const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;
   if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
@@ -245,6 +289,9 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   if (!checkHpCondition(caster, payload)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
+  if (!checkTurnParityCondition(game, payload)) {
+    return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+  }
   if (!applyHpCost(caster, payload)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
@@ -257,7 +304,10 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     tags,
     appliedTags: dispatch.applied,
   });
-  if (runtimeSkillResult) return runtimeSkillResult;
+  if (runtimeSkillResult) {
+    if (runtimeSkillResult.ok) recordSkillUseQuota(game, caster, skillKey, payload);
+    return runtimeSkillResult;
+  }
   const casterPower = readAtkWilPower(caster);
 
   if (caster.id === BLOOD_AVATAR_ID) {
@@ -276,6 +326,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
         Statuses.add(target, { ...BLOOD_AVATAR_BLEED_STATUS, sourceUnitId: caster.id });
         Statuses.add(target, { ...BLOOD_AVATAR_MARK_STATUS, sourceUnitId: caster.id });
       }
+      recordSkillUseQuota(game, caster, skillKey, payload);
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, picked.length);
     }
     if (skillKey === 'skill2') {
@@ -293,6 +344,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
           Statuses.add(token, { id: 'heal_efficiency_down', kind: 'debuff', tag: 'field', dur: 2, tick: 'turn', amount: 0.25, sourceUnitId: caster.id });
         }
       }
+      recordSkillUseQuota(game, caster, skillKey, payload);
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, enemies.length);
     }
     if (skillKey === 'skill3') {
@@ -302,6 +354,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
       const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
       caster.hp = Math.max(1, toFloorInt((caster.hp ?? 0) - hpCost, 1));
       globalAetherPool.gain(caster.side, 15);
+      recordSkillUseQuota(game, caster, skillKey, payload);
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
     }
   }
@@ -362,6 +415,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     }
   }
 
+  recordSkillUseQuota(game, caster, skillKey, payload);
   return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, dispatch.targets.length);
 }
 

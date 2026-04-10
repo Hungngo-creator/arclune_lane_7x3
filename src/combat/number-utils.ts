@@ -29,6 +29,11 @@ export function readAtkWilPower(unit: { atk?: unknown; wil?: unknown } | null | 
   return Math.max(0, toFiniteNumber(unit.atk, 0) + toFiniteNumber(unit.wil, 0));
 }
 
+export function readUnitHpState(unit: { hp?: unknown; hpMax?: unknown } | null | undefined): { hp: number; hpMax: number } {
+  const hpMax = Math.max(1, toFloorInt(unit?.hpMax, 1));
+  const hp = Math.max(0, Math.min(hpMax, toFloorInt(unit?.hp, hpMax)));
+  return { hp, hpMax };
+}
 
 export function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
