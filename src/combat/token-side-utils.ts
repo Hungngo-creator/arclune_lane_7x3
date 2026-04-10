@@ -90,6 +90,13 @@ export interface TokenSampleOptions {
   exclude?: (token: UnitToken) => boolean;
 }
 
+const clampRandomIndex = (value: number, size: number): number => {
+  if (size <= 1) return 0;
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  if (value >= 1) return size - 1;
+  return Math.floor(value * size);
+};
+
 export function sampleTokens(
   tokens: ReadonlyArray<UnitToken>,
   limit: number,
@@ -97,22 +104,26 @@ export function sampleTokens(
 ): UnitToken[] {
   if (limit <= 0 || tokens.length === 0) return [];
   const randomValue = options.randomValue ?? (() => Math.random());
+  const allowDuplicates = options.allowDuplicates === true;
+  let pool: UnitToken[];
 
-  const pool: UnitToken[] = [];
   if (typeof options.exclude === 'function') {
+    pool = [];
     for (const token of tokens) {
       if (options.exclude(token)) continue;
       pool.push(token);
     }
+  } else if (allowDuplicates) {
+    pool = tokens as UnitToken[];
   } else {
-    pool.push(...tokens);
+    pool = [...tokens];
   }
 
   if (pool.length === 0) return [];
-  if (options.allowDuplicates) {
+  if (allowDuplicates) {
     const sampled: UnitToken[] = [];
     for (let i = 0; i < limit; i += 1) {
-      const picked = pool[Math.floor(randomValue() * pool.length)];
+      const picked = pool[clampRandomIndex(randomValue(), pool.length)];
       if (picked) sampled.push(picked);
     }
     return sampled;
@@ -120,7 +131,7 @@ export function sampleTokens(
 
   if (pool.length <= limit) return pool;
   for (let i = 0; i < limit; i += 1) {
-    const swapIndex = i + Math.floor(randomValue() * (pool.length - i));
+    const swapIndex = i + clampRandomIndex(randomValue(), pool.length - i);
     [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
   }
   return pool.slice(0, limit);

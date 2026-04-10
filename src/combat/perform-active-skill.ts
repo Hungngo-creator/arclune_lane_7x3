@@ -31,8 +31,8 @@ const EFFECT_APPLICATION_TAGS = new Set([
   'non-heal-hp-change',
 ]);
 const DAMAGE_TARGET_TAG = 'non-heal-hp-change';
-const MENG_YEM_ID = 'mong_yem';
-const MENG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
+const MONG_YEM_ID = 'mong_yem';
+const MONG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
   markId: 'me_hoac',
   markStacks: 1,
   markMaxStacks: 3,
@@ -41,6 +41,21 @@ const MENG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
 });
 const BLOOD_AVATAR_ID = 'blood_avatar';
 const BLOOD_AVATAR_SKILL_COST = 25;
+const BLOOD_AVATAR_BLEED_STATUS = Object.freeze({
+  id: 'bleed',
+  kind: 'debuff',
+  tag: 'bleed',
+  dur: 2,
+  tick: 'turn',
+} as const);
+const BLOOD_AVATAR_MARK_STATUS = Object.freeze({
+  id: 'huyet_an',
+  kind: 'mark',
+  tag: 'mark',
+  stacks: 1,
+  maxStacks: 5,
+  purgeable: false,
+} as const);
 
 type BloodAvatarState = UnitToken & { _bloodFieldUsed?: boolean };
 
@@ -258,8 +273,8 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
       const picked = enemies.slice(0, 6);
       for (const target of picked) {
         dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill, isAoE: true, targetsHit: picked.length });
-        Statuses.add(target, { id: 'bleed', kind: 'debuff', tag: 'bleed', dur: 2, tick: 'turn', sourceUnitId: caster.id });
-        Statuses.add(target, { id: 'huyet_an', kind: 'mark', tag: 'mark', stacks: 1, maxStacks: 5, purgeable: false, sourceUnitId: caster.id });
+        Statuses.add(target, { ...BLOOD_AVATAR_BLEED_STATUS, sourceUnitId: caster.id });
+        Statuses.add(target, { ...BLOOD_AVATAR_MARK_STATUS, sourceUnitId: caster.id });
       }
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, picked.length);
     }
@@ -341,9 +356,9 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     }
   }
 
-  if (caster.id === MENG_YEM_ID && damagedEnemies.length > 0) {
+  if (caster.id === MONG_YEM_ID && damagedEnemies.length > 0) {
     for (const target of damagedEnemies) {
-      applyMarkSleepSetupTag(game, caster, target, MENG_YEM_DREAM_MARK_PAYLOAD);
+      applyMarkSleepSetupTag(game, caster, target, MONG_YEM_DREAM_MARK_PAYLOAD);
     }
   }
 

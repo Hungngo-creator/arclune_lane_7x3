@@ -5052,6 +5052,11 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   function getShieldEntry(target) {
       return getStatusEntryById(target, SHIELD_STATUS_ID);
   }
+  function normalizeDurationTurns(value) {
+      if (!Number.isFinite(value))
+          return null;
+      return Math.max(1, toFloorInt(value, 1));
+  }
   function consumeShieldEntryAmount(entry, amount) {
       if (!entry)
           return 0;
@@ -5095,9 +5100,7 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
           return 0;
       const list = ensureStatusList(target);
       const entry = getStatusEntryById(target, SHIELD_STATUS_ID, list);
-      const durationTurns = Number.isFinite(options.durationTurns)
-          ? Math.max(1, toFloorInt(options.durationTurns, 1))
-          : null;
+      const durationTurns = normalizeDurationTurns(options.durationTurns);
       if (entry) {
           entry.status.amount = (entry.status.amount ?? 0) + amt;
           if (durationTurns != null) {
@@ -5107,7 +5110,7 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       }
       else {
           list.push({
-              id: 'shield',
+              id: SHIELD_STATUS_ID,
               kind: 'buff',
               tag: 'shield',
               amount: amt,
@@ -5696,8 +5699,8 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       'non-heal-hp-change',
   ]);
   const DAMAGE_TARGET_TAG = 'non-heal-hp-change';
-  const MENG_YEM_ID = 'mong_yem';
-  const MENG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
+  const MONG_YEM_ID = 'mong_yem';
+  const MONG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
       markId: 'me_hoac',
       markStacks: 1,
       markMaxStacks: 3,
@@ -5706,6 +5709,21 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   });
   const BLOOD_AVATAR_ID = 'blood_avatar';
   const BLOOD_AVATAR_SKILL_COST = 25;
+  const BLOOD_AVATAR_BLEED_STATUS = Object.freeze({
+      id: 'bleed',
+      kind: 'debuff',
+      tag: 'bleed',
+      dur: 2,
+      tick: 'turn',
+  });
+  const BLOOD_AVATAR_MARK_STATUS = Object.freeze({
+      id: 'huyet_an',
+      kind: 'mark',
+      tag: 'mark',
+      stacks: 1,
+      maxStacks: 5,
+      purgeable: false,
+  });
   function resolveActiveSkill(caster, skillKey) {
       const set = skillSets[caster.id];
       if (!set)
@@ -5880,8 +5898,8 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               const picked = enemies.slice(0, 6);
               for (const target of picked) {
                   dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill, isAoE: true, targetsHit: picked.length });
-                  Statuses.add(target, { id: 'bleed', kind: 'debuff', tag: 'bleed', dur: 2, tick: 'turn', sourceUnitId: caster.id });
-                  Statuses.add(target, { id: 'huyet_an', kind: 'mark', tag: 'mark', stacks: 1, maxStacks: 5, purgeable: false, sourceUnitId: caster.id });
+                  Statuses.add(target, { ...BLOOD_AVATAR_BLEED_STATUS, sourceUnitId: caster.id });
+                  Statuses.add(target, { ...BLOOD_AVATAR_MARK_STATUS, sourceUnitId: caster.id });
               }
               return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, picked.length);
           }
@@ -5962,9 +5980,9 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               damagedEnemies.push(target);
           }
       }
-      if (caster.id === MENG_YEM_ID && damagedEnemies.length > 0) {
+      if (caster.id === MONG_YEM_ID && damagedEnemies.length > 0) {
           for (const target of damagedEnemies) {
-              applyMarkSleepSetupTag(game, caster, target, MENG_YEM_DREAM_MARK_PAYLOAD);
+              applyMarkSleepSetupTag(game, caster, target, MONG_YEM_DREAM_MARK_PAYLOAD);
           }
       }
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, dispatch.targets.length);
@@ -6217,19 +6235,35 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           randomValue: () => (ctx.game?.rng ? nextRngValue(ctx.game.rng) : Math.random()),
       });
   };
+  const TARGET_PRIORITY_ALIASES = Object.freeze({
+      'leader-first': 'leader-first',
+      leader_first: 'leader-first',
+      leader: 'leader-first',
+      'lowest-hp': 'lowest-hp',
+      lowest_hp: 'lowest-hp',
+      'hp-asc': 'lowest-hp',
+      'highest-hp': 'highest-hp',
+      highest_hp: 'highest-hp',
+      'hp-desc': 'highest-hp',
+      'lowest-hp-ratio': 'lowest-hp-ratio',
+      lowest_hp_ratio: 'lowest-hp-ratio',
+      'lowest-hp-percent': 'lowest-hp-ratio',
+      'highest-hp-ratio': 'highest-hp-ratio',
+      highest_hp_ratio: 'highest-hp-ratio',
+      'highest-hp-percent': 'highest-hp-ratio',
+      'lowest-current-hp': 'lowest-hp',
+      low_hp: 'lowest-hp',
+      lowhp: 'lowest-hp',
+      'thap-mau-nhat': 'lowest-hp',
+      'mau-thap-nhat': 'lowest-hp',
+      'highest-current-hp': 'highest-hp',
+      high_hp: 'highest-hp',
+      highhp: 'highest-hp',
+      'mau-cao-nhat': 'highest-hp',
+  });
   const readTargetPriority = (payload) => {
       const raw = String(payload?.targetPriority ?? payload?.priority ?? '').trim().toLowerCase();
-      if (raw === 'leader-first' || raw === 'leader_first' || raw === 'leader')
-          return 'leader-first';
-      if (raw === 'lowest-hp' || raw === 'lowest_hp' || raw === 'hp-asc')
-          return 'lowest-hp';
-      if (raw === 'highest-hp' || raw === 'highest_hp' || raw === 'hp-desc')
-          return 'highest-hp';
-      if (raw === 'lowest-hp-ratio' || raw === 'lowest_hp_ratio' || raw === 'lowest-hp-percent')
-          return 'lowest-hp-ratio';
-      if (raw === 'highest-hp-ratio' || raw === 'highest_hp_ratio' || raw === 'highest-hp-percent')
-          return 'highest-hp-ratio';
-      return 'board';
+      return TARGET_PRIORITY_ALIASES[raw] ?? 'board';
   };
   const readTargetRole = (payload) => {
       const raw = String(payload?.targetRole ?? '').trim().toLowerCase();
@@ -6728,27 +6762,41 @@ __modules['./combat/token-side-utils.ts'] = (exports, module, __require) => {
           visitor(token);
       }
   }
+  const clampRandomIndex = (value, size) => {
+      if (size <= 1)
+          return 0;
+      if (!Number.isFinite(value) || value <= 0)
+          return 0;
+      if (value >= 1)
+          return size - 1;
+      return Math.floor(value * size);
+  };
   function sampleTokens(tokens, limit, options = {}) {
       if (limit <= 0 || tokens.length === 0)
           return [];
       const randomValue = options.randomValue ?? (() => Math.random());
-      const pool = [];
+      const allowDuplicates = options.allowDuplicates === true;
+      let pool;
       if (typeof options.exclude === 'function') {
+          pool = [];
           for (const token of tokens) {
               if (options.exclude(token))
                   continue;
               pool.push(token);
           }
       }
+      else if (allowDuplicates) {
+          pool = tokens;
+      }
       else {
-          pool.push(...tokens);
+          pool = [...tokens];
       }
       if (pool.length === 0)
           return [];
-      if (options.allowDuplicates) {
+      if (allowDuplicates) {
           const sampled = [];
           for (let i = 0; i < limit; i += 1) {
-              const picked = pool[Math.floor(randomValue() * pool.length)];
+              const picked = pool[clampRandomIndex(randomValue(), pool.length)];
               if (picked)
                   sampled.push(picked);
           }
@@ -6757,7 +6805,7 @@ __modules['./combat/token-side-utils.ts'] = (exports, module, __require) => {
       if (pool.length <= limit)
           return pool;
       for (let i = 0; i < limit; i += 1) {
-          const swapIndex = i + Math.floor(randomValue() * (pool.length - i));
+          const swapIndex = i + clampRandomIndex(randomValue(), pool.length - i);
           [pool[i], pool[swapIndex]] = [pool[swapIndex], pool[i]];
       }
       return pool.slice(0, limit);

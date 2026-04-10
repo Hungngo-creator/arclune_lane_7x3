@@ -96,14 +96,36 @@ const sampleFromCandidates = (ctx: Pick<NormalizedContext, 'payload' | 'game'>, 
 type TargetPriority = 'board' | 'leader-first' | 'lowest-hp' | 'highest-hp' | 'lowest-hp-ratio' | 'highest-hp-ratio';
 type TargetRole = 'any' | 'leader';
 
+const TARGET_PRIORITY_ALIASES: Readonly<Record<string, TargetPriority>> = Object.freeze({
+  'leader-first': 'leader-first',
+  leader_first: 'leader-first',
+  leader: 'leader-first',
+  'lowest-hp': 'lowest-hp',
+  lowest_hp: 'lowest-hp',
+  'hp-asc': 'lowest-hp',
+  'highest-hp': 'highest-hp',
+  highest_hp: 'highest-hp',
+  'hp-desc': 'highest-hp',
+  'lowest-hp-ratio': 'lowest-hp-ratio',
+  lowest_hp_ratio: 'lowest-hp-ratio',
+  'lowest-hp-percent': 'lowest-hp-ratio',
+  'highest-hp-ratio': 'highest-hp-ratio',
+  highest_hp_ratio: 'highest-hp-ratio',
+  'highest-hp-percent': 'highest-hp-ratio',
+  'lowest-current-hp': 'lowest-hp',
+  low_hp: 'lowest-hp',
+  lowhp: 'lowest-hp',
+  'thap-mau-nhat': 'lowest-hp',
+  'mau-thap-nhat': 'lowest-hp',
+  'highest-current-hp': 'highest-hp',
+  high_hp: 'highest-hp',
+  highhp: 'highest-hp',
+  'mau-cao-nhat': 'highest-hp',
+});
+
 const readTargetPriority = (payload: Record<string, unknown> | null): TargetPriority => {
   const raw = String(payload?.targetPriority ?? payload?.priority ?? '').trim().toLowerCase();
-  if (raw === 'leader-first' || raw === 'leader_first' || raw === 'leader') return 'leader-first';
-  if (raw === 'lowest-hp' || raw === 'lowest_hp' || raw === 'hp-asc') return 'lowest-hp';
-  if (raw === 'highest-hp' || raw === 'highest_hp' || raw === 'hp-desc') return 'highest-hp';
-  if (raw === 'lowest-hp-ratio' || raw === 'lowest_hp_ratio' || raw === 'lowest-hp-percent') return 'lowest-hp-ratio';
-  if (raw === 'highest-hp-ratio' || raw === 'highest_hp_ratio' || raw === 'highest-hp-percent') return 'highest-hp-ratio';
-  return 'board';
+  return TARGET_PRIORITY_ALIASES[raw] ?? 'board';
 };
 
 const readTargetRole = (payload: Record<string, unknown> | null): TargetRole => {

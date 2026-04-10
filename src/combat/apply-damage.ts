@@ -10,6 +10,11 @@ function getShieldEntry(target: UnitToken | null | undefined) {
   return getStatusEntryById(target, SHIELD_STATUS_ID);
 }
 
+function normalizeDurationTurns(value: unknown): number | null {
+  if (!Number.isFinite(value as number)) return null;
+  return Math.max(1, toFloorInt(value, 1));
+}
+
 function consumeShieldEntryAmount(entry: ReturnType<typeof getShieldEntry>, amount: number): number {
   if (!entry) return 0;
 
@@ -61,9 +66,7 @@ export function grantShield(target: UnitToken | null | undefined, amount: number
   const list = ensureStatusList(target);
   const entry = getStatusEntryById(target, SHIELD_STATUS_ID, list);
 
-  const durationTurns = Number.isFinite(options.durationTurns)
-    ? Math.max(1, toFloorInt(options.durationTurns as number, 1))
-    : null;
+  const durationTurns = normalizeDurationTurns(options.durationTurns);
 
   if (entry) {
     entry.status.amount = (entry.status.amount ?? 0) + amt;
@@ -73,7 +76,7 @@ export function grantShield(target: UnitToken | null | undefined, amount: number
     }
   } else {
     list.push({
-      id: 'shield',
+      id: SHIELD_STATUS_ID,
       kind: 'buff',
       tag: 'shield',
       amount: amt,
