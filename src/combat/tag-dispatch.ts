@@ -55,10 +55,6 @@ type NormalizedContext = {
 
 type TagHandler = (ctx: NormalizedContext, result: TagDispatchResult) => void;
 
-function resolveDispatchTag(tag: string): string {
-  return normalizeCombatTag(tag);
-}
-
 function collectAliveTargets(tokens: ReadonlyArray<UnitToken>): UnitToken[] {
   const alive: UnitToken[] = [];
   for (const token of tokens) {
@@ -95,6 +91,7 @@ const sampleFromCandidates = (ctx: Pick<NormalizedContext, 'payload' | 'game'>, 
 
 type TargetPriority = 'board' | 'leader-first' | 'lowest-hp' | 'highest-hp' | 'lowest-hp-ratio' | 'highest-hp-ratio';
 type TargetRole = 'any' | 'leader';
+type BoardPosition = { row: number; col: number; slot: number };
 
 const TARGET_PRIORITY_ALIASES: Readonly<Record<string, TargetPriority>> = Object.freeze({
   'leader-first': 'leader-first',
@@ -137,6 +134,63 @@ const readTargetRole = (payload: Record<string, unknown> | null): TargetRole => 
 const isLeaderToken = (token: UnitToken): boolean => {
   if (!Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side) return false;
   return slotIndex(token.side, token.cx, token.cy) === 8;
+};
+
+const readBoardPosition = (token: UnitToken | null | undefined): BoardPosition | null => {
+  if (!token || !Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side) return null;
+  const slot = slotIndex(token.side, token.cx, token.cy);
+  if (!Number.isFinite(slot) || slot < 1) return null;
+  const normalizedSlot = Math.floor(slot);
+  return {
+    slot: normalizedSlot,
+    row: Math.floor((normalizedSlot - 1) / 3),
+    col: (normalizedSlot - 1) % 3,
+  };
+};
+
+const resolvePrimaryEnemyTarget = (ctx: NormalizedContext, result: TagDispatchResult): UnitToken | null => {
+  for (const token of result.targets) {
+    if (token.side !== ctx.attacker?.side) return token;
+  }
+  if (ctx.target && ctx.target.side !== ctx.attacker?.side) return ctx.target;
+  return ctx.opponentTokens[0] ?? null;
+};
+
+const selectColumnTargets = (pool: ReadonlyArray<UnitToken>, anchor: UnitToken | null): UnitToken[] => {
+  const anchorPos = readBoardPosition(anchor);
+  if (!anchorPos) return [];
+  const selected: UnitToken[] = [];
+  for (const token of pool) {
+    const pos = readBoardPosition(token);
+    if (!pos || pos.col !== anchorPos.col) continue;
+    selected.push(token);
+  }
+  return selected;
+};
+
+const selectCrossTargets = (pool: ReadonlyArray<UnitToken>, anchor: UnitToken | null): UnitToken[] => {
+  const anchorPos = readBoardPosition(anchor);
+  if (!anchorPos) return [];
+  const crossSlots = new Set<number>([anchorPos.slot]);
+  const deltas = [
+    [0, -1],
+    [0, 1],
+    [-1, 0],
+    [1, 0],
+  ] as const;
+  for (const [dx, dy] of deltas) {
+    const nextCol = anchorPos.col + dx;
+    const nextRow = anchorPos.row + dy;
+    if (nextCol < 0 || nextCol > 2 || nextRow < 0 || nextRow > 2) continue;
+    crossSlots.add(nextRow * 3 + nextCol + 1);
+  }
+  const selected: UnitToken[] = [];
+  for (const token of pool) {
+    const pos = readBoardPosition(token);
+    if (!pos || !crossSlots.has(pos.slot)) continue;
+    selected.push(token);
+  }
+  return selected;
 };
 
 const filterTokensByRole = (ctx: Pick<NormalizedContext, 'targetRole'>, tokens: ReadonlyArray<UnitToken>): ReadonlyArray<UnitToken> => {
@@ -450,6 +504,18 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     if (!ctx.attacker) return;
     assignSliceTargetsIfEmpty(ctx, result, ctx.opponentTokens, readTargetLimit(ctx, 2));
   },
+  'column-aoe': (ctx, result) => {
+    if (!ctx.attacker) return;
+    const anchor = resolvePrimaryEnemyTarget(ctx, result);
+    const selected = selectColumnTargets(ctx.opponentTokens, anchor);
+    if (selected.length > 0) result.targets = selected;
+  },
+  'cross-aoe': (ctx, result) => {
+    if (!ctx.attacker) return;
+    const anchor = resolvePrimaryEnemyTarget(ctx, result);
+    const selected = selectCrossTargets(ctx.opponentTokens, anchor);
+    if (selected.length > 0) result.targets = selected;
+  },
   aoe: (ctx, result) => {
     if (!ctx.attacker) return;
     result.targets = ctx.opponentTokens;
@@ -541,7 +607,7 @@ export function dispatchGameplayTags(
   const deferredRuleTags: string[] = [];
   const treatAsCanonical = context.tagsCanonical === true;
   for (const rawTag of normalizedTags) {
-    const tag = treatAsCanonical ? rawTag : resolveDispatchTag(rawTag);
+    const tag = treatAsCanonical ? rawTag : normalizeCombatTag(rawTag);
     if (RULE_TARGET_OVERRIDE_TAGS.has(tag)) deferredRuleTags.push(tag);
     else tags.push(tag);
   }

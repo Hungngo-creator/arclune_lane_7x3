@@ -5727,6 +5727,14 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       maxStacks: 5,
       purgeable: false,
   });
+  function readPayloadNumber(payload, fallback, ...keys) {
+      for (const key of keys) {
+          const parsed = toFiniteNumber(payload[key], NaN);
+          if (Number.isFinite(parsed))
+              return parsed;
+      }
+      return fallback;
+  }
   function resolveActiveSkill(caster, skillKey) {
       const set = skillSets[caster.id];
       if (!set)
@@ -5741,9 +5749,9 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   }
   function applyHpCost(caster, payload) {
       const { hpMax, hp: currentHp } = readUnitHpState(caster);
-      const ratio = Math.max(0, toFiniteNumber(payload.hpCostRatio ?? payload.hpCostPercent, 0));
-      const flat = Math.max(0, toFloorInt(payload.hpCostFlat ?? payload.hpCost, 0));
-      const minRemainRatio = Math.max(0, toFiniteNumber(payload.minRemainingHpRatio ?? payload.minHpRatio, 0));
+      const ratio = Math.max(0, readPayloadNumber(payload, 0, 'hpCostRatio', 'hpCostPercent'));
+      const flat = Math.max(0, toFloorInt(readPayloadNumber(payload, 0, 'hpCostFlat', 'hpCost'), 0));
+      const minRemainRatio = Math.max(0, readPayloadNumber(payload, 0, 'minRemainingHpRatio', 'minHpRatio'));
       const hpCost = Math.max(flat, Math.floor(hpMax * ratio));
       if (hpCost <= 0)
           return true;
@@ -5756,11 +5764,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   }
   function checkHpCondition(caster, payload) {
       const { hpMax, hp: currentHp } = readUnitHpState(caster);
-      x(0, toFloorInt(caster.hp, hpMax));
-      const requiredRatio = Math.max(0, toFiniteNumber(payload.minCurrentHpRatio
-          ?? payload.requireCurrentHpRatioMin
-          ?? payload.requiredHpRatio
-          ?? payload.conditionMinHpRatio, 0));
+      const requiredRatio = Math.max(0, readPayloadNumber(payload, 0, 'minCurrentHpRatio', 'requireCurrentHpRatioMin', 'requiredHpRatio', 'conditionMinHpRatio'));
       if (requiredRatio <= 0)
           return true;
       return currentHp / hpMax >= requiredRatio;
@@ -5782,7 +5786,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       return true;
   }
   function readSkillUseCap(payload) {
-      return Math.max(0, toRoundedInt(payload.maxUsesPerBattle ?? payload.maxUses ?? payload.battleUseCap, 0));
+      return Math.max(0, toRoundedInt(readPayloadNumber(payload, 0, 'maxUsesPerBattle', 'maxUses', 'battleUseCap'), 0));
   }
   function hasSkillUseQuota(game, caster, skillKey, payload) {
       const maxUses = readSkillUseCap(payload);
@@ -6217,6 +6221,38 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'da muc tieu: dong minh': 'ally',
       'aoe: toàn bộ kẻ địch': 'aoe',
       'aoe: toan bo ke dich': 'aoe',
+      'khống chế: ngủ': 'sleep',
+      'khong-che-ngu': 'sleep',
+      'khống chế: khiêu khích': 'taunt',
+      'khong-che-khieu-khich': 'taunt',
+      'câm lặng': 'silence',
+      'cam-lang': 'silence',
+      'tạo khiên': 'shield',
+      'tao-khien': 'shield',
+      'hồi phục đội': 'team-heal',
+      'hoi-phuc-doi': 'team-heal',
+      'đa mục tiêu ngẫu nhiên': 'random-aoe',
+      'da-muc-tieu-ngau-nhien': 'random-aoe',
+      'quy tắc: tái sinh': 'global-rule',
+      'quy-tac-tai-sinh': 'global-rule',
+      'pháp tắc: kiên định': 'global-rule',
+      'phap-tac-kien-dinh': 'global-rule',
+      'quy tắc': 'global-rule',
+      'quy-tac': 'global-rule',
+      'sát thương tự thân': 'non-heal-hp-change',
+      'sat-thuong-tu-than': 'non-heal-hp-change',
+      'aoe: hàng dọc': 'column-aoe',
+      'aoe-hang-doc': 'column-aoe',
+      'aoe hàng dọc': 'column-aoe',
+      'hang-doc': 'column-aoe',
+      'aoe: vùng chữ thập': 'cross-aoe',
+      'aoe-vung-chu-thap': 'cross-aoe',
+      'vùng chữ thập': 'cross-aoe',
+      'vung-chu-thap': 'cross-aoe',
+      'vùng chữ +': 'cross-aoe',
+      'vung-chu-+': 'cross-aoe',
+      'tự động': 'instant',
+      'tu-dong': 'instant',
   });
   function normalizeAliasLookupKey(tag) {
       return tag
@@ -6277,9 +6313,6 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const RULE_TARGET_OVERRIDE_TAGS = new Set(['global-rule']);
   const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
   const EMPTY_TAGS = [];
-  function resolveDispatchTag(tag) {
-      return normalizeCombatTag(tag);
-  }
   function collectAliveTargets(tokens) {
       const alive = [];
       for (const token of tokens) {
@@ -6346,6 +6379,68 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       if (!Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side)
           return false;
       return slotIndex(token.side, token.cx, token.cy) === 8;
+  };
+  const readBoardPosition = (token) => {
+      if (!token || !Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side)
+          return null;
+      const slot = slotIndex(token.side, token.cx, token.cy);
+      if (!Number.isFinite(slot) || slot < 1)
+          return null;
+      const normalizedSlot = Math.floor(slot);
+      return {
+          slot: normalizedSlot,
+          row: Math.floor((normalizedSlot - 1) / 3),
+          col: (normalizedSlot - 1) % 3,
+      };
+  };
+  const resolvePrimaryEnemyTarget = (ctx, result) => {
+      for (const token of result.targets) {
+          if (token.side !== ctx.attacker?.side)
+              return token;
+      }
+      if (ctx.target && ctx.target.side !== ctx.attacker?.side)
+          return ctx.target;
+      return ctx.opponentTokens[0] ?? null;
+  };
+  const selectColumnTargets = (pool, anchor) => {
+      const anchorPos = readBoardPosition(anchor);
+      if (!anchorPos)
+          return [];
+      const selected = [];
+      for (const token of pool) {
+          const pos = readBoardPosition(token);
+          if (!pos || pos.col !== anchorPos.col)
+              continue;
+          selected.push(token);
+      }
+      return selected;
+  };
+  const selectCrossTargets = (pool, anchor) => {
+      const anchorPos = readBoardPosition(anchor);
+      if (!anchorPos)
+          return [];
+      const crossSlots = new Set([anchorPos.slot]);
+      const deltas = [
+          [0, -1],
+          [0, 1],
+          [-1, 0],
+          [1, 0],
+      ];
+      for (const [dx, dy] of deltas) {
+          const nextCol = anchorPos.col + dx;
+          const nextRow = anchorPos.row + dy;
+          if (nextCol < 0 || nextCol > 2 || nextRow < 0 || nextRow > 2)
+              continue;
+          crossSlots.add(nextRow * 3 + nextCol + 1);
+      }
+      const selected = [];
+      for (const token of pool) {
+          const pos = readBoardPosition(token);
+          if (!pos || !crossSlots.has(pos.slot))
+              continue;
+          selected.push(token);
+      }
+      return selected;
   };
   const filterTokensByRole = (ctx, tokens) => {
       if (ctx.targetRole !== 'leader')
@@ -6622,6 +6717,22 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
               return;
           assignSliceTargetsIfEmpty(ctx, result, ctx.opponentTokens, readTargetLimit(ctx, 2));
       },
+      'column-aoe': (ctx, result) => {
+          if (!ctx.attacker)
+              return;
+          const anchor = resolvePrimaryEnemyTarget(ctx, result);
+          const selected = selectColumnTargets(ctx.opponentTokens, anchor);
+          if (selected.length > 0)
+              result.targets = selected;
+      },
+      'cross-aoe': (ctx, result) => {
+          if (!ctx.attacker)
+              return;
+          const anchor = resolvePrimaryEnemyTarget(ctx, result);
+          const selected = selectCrossTargets(ctx.opponentTokens, anchor);
+          if (selected.length > 0)
+              result.targets = selected;
+      },
       aoe: (ctx, result) => {
           if (!ctx.attacker)
               return;
@@ -6718,7 +6829,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       const deferredRuleTags = [];
       const treatAsCanonical = context.tagsCanonical === true;
       for (const rawTag of normalizedTags) {
-          const tag = treatAsCanonical ? rawTag : resolveDispatchTag(rawTag);
+          const tag = treatAsCanonical ? rawTag : normalizeCombatTag(rawTag);
           if (RULE_TARGET_OVERRIDE_TAGS.has(tag))
               deferredRuleTags.push(tag);
           else

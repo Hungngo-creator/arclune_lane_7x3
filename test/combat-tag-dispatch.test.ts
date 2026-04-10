@@ -3,6 +3,7 @@ import { describe, expect, it } from '@jest/globals';
 import { dispatchGameplayTags } from '../src/combat/tag-dispatch.ts';
 import { performActiveSkill } from '../src/combat/perform-active-skill.ts';
 import { normalizeTagList } from '../src/data/tags.ts';
+import { slotToCell } from '../src/engine.ts';y
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -20,6 +21,10 @@ const makeToken = (overrides: Partial<UnitToken>): UnitToken => ({
 });
 
 const makeGame = (tokens: UnitToken[]): SessionState => ({ tokens } as SessionState);
+const makeTokenAtSlot = (id: string, side: UnitToken['side'], slot: number): UnitToken => {
+  const { cx, cy } = slotToCell(side, slot);
+  return makeToken({ id, side, cx, cy });
+};
 
 describe('combat tag dispatcher matrix', () => {
   it('handles aether-cost', () => {
@@ -263,6 +268,52 @@ describe('combat tag dispatcher matrix', () => {
 
     expect(result.targets.map((token) => token.id)).toEqual(['enemy-leader']);
     expect(result.applied).toContain('leader-target');
+  });
+
+  it('supports column-aoe targeting from character idea tags', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally', cx: 1, cy: 1 });
+    const anchor = makeTokenAtSlot('enemy-anchor', 'enemy', 5);
+    const sameColumnA = makeTokenAtSlot('enemy-col-top', 'enemy', 2);
+    const sameColumnB = makeTokenAtSlot('enemy-col-bot', 'enemy', 8);
+    const otherColumn = makeTokenAtSlot('enemy-other', 'enemy', 6);
+    const game = makeGame([attacker, anchor, sameColumnA, sameColumnB, otherColumn]);
+
+    const result = dispatchGameplayTags(['aoe: hàng dọc'], {
+      game,
+      attacker,
+      target: anchor,
+      tagsNormalized: true,
+    });
+
+    expect(result.applied).toContain('column-aoe');
+    expect(result.targets.map((token) => token.id).sort()).toEqual(['enemy-anchor', 'enemy-col-bot', 'enemy-col-top']);
+  });
+
+  it('supports cross-aoe targeting from character idea tags', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally', cx: 1, cy: 1 });
+    const center = makeTokenAtSlot('enemy-center', 'enemy', 5);
+    const up = makeTokenAtSlot('enemy-up', 'enemy', 2);
+    const down = makeTokenAtSlot('enemy-down', 'enemy', 8);
+    const left = makeTokenAtSlot('enemy-left', 'enemy', 4);
+    const right = makeTokenAtSlot('enemy-right', 'enemy', 6);
+    const diagonal = makeTokenAtSlot('enemy-diag', 'enemy', 9);
+    const game = makeGame([attacker, center, up, down, left, right, diagonal]);
+
+    const result = dispatchGameplayTags(['aoe: vùng chữ thập'], {
+      game,
+      attacker,
+      target: center,
+      tagsNormalized: true,
+    });
+
+    expect(result.applied).toContain('cross-aoe');
+    expect(result.targets.map((token) => token.id).sort()).toEqual([
+      'enemy-center',
+      'enemy-down',
+      'enemy-left',
+      'enemy-right',
+      'enemy-up',
+    ]);
   });
 
   it('handles silence / sleep / mark statuses', () => {

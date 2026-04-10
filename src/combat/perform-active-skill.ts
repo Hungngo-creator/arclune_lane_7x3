@@ -78,6 +78,14 @@ interface ParsedSkillTags {
 }
 type SkillUsageStore = Record<string, number>;
 
+function readPayloadNumber(payload: Record<string, unknown>, fallback: number, ...keys: string[]): number {
+  for (const key of keys) {
+    const parsed = toFiniteNumber(payload[key], NaN);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return fallback;
+}
+
 function resolveActiveSkill(caster: UnitToken, skillKey: ActiveSkillKey): SkillSection | null {
   const set = skillSets[caster.id as keyof typeof skillSets];
   if (!set) return null;
@@ -92,9 +100,9 @@ function canApplyUniqueGlobal(game: SessionState, summonId: string): boolean {
 
 function applyHpCost(caster: UnitToken, payload: Record<string, unknown>): boolean {
   const { hpMax, hp: currentHp } = readUnitHpState(caster);
-  const ratio = Math.max(0, toFiniteNumber(payload.hpCostRatio ?? payload.hpCostPercent, 0));
-  const flat = Math.max(0, toFloorInt(payload.hpCostFlat ?? payload.hpCost, 0));
-  const minRemainRatio = Math.max(0, toFiniteNumber(payload.minRemainingHpRatio ?? payload.minHpRatio, 0));
+  const ratio = Math.max(0, readPayloadNumber(payload, 0, 'hpCostRatio', 'hpCostPercent'));
+  const flat = Math.max(0, toFloorInt(readPayloadNumber(payload, 0, 'hpCostFlat', 'hpCost'), 0));
+  const minRemainRatio = Math.max(0, readPayloadNumber(payload, 0, 'minRemainingHpRatio', 'minHpRatio'));
 
   const hpCost = Math.max(flat, Math.floor(hpMax * ratio));
   if (hpCost <= 0) return true;
@@ -107,15 +115,16 @@ function applyHpCost(caster: UnitToken, payload: Record<string, unknown>): boole
 }
 
 function checkHpCondition(caster: UnitToken, payload: Record<string, unknown>): boolean {
-  const { hpMax, hp: currentHp } = readUnitHpState(caster);x(0, toFloorInt(caster.hp, hpMax));
+  const { hpMax, hp: currentHp } = readUnitHpState(caster);
   const requiredRatio = Math.max(
     0,
-    toFiniteNumber(
-      payload.minCurrentHpRatio
-      ?? payload.requireCurrentHpRatioMin
-      ?? payload.requiredHpRatio
-      ?? payload.conditionMinHpRatio,
+    readPayloadNumber(
+      payload,
       0,
+      'minCurrentHpRatio',
+      'requireCurrentHpRatioMin',
+      'requiredHpRatio',
+      'conditionMinHpRatio',
     ),
   );
   if (requiredRatio <= 0) return true;
@@ -138,7 +147,7 @@ function checkTurnParityCondition(game: SessionState, payload: Record<string, un
 function readSkillUseCap(payload: Record<string, unknown>): number {
   return Math.max(
     0,
-    toRoundedInt(payload.maxUsesPerBattle ?? payload.maxUses ?? payload.battleUseCap, 0),
+    toRoundedInt(readPayloadNumber(payload, 0, 'maxUsesPerBattle', 'maxUses', 'battleUseCap'), 0),
   );
 }
 

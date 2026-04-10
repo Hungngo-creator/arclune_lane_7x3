@@ -430,7 +430,7 @@ skill 3: mỗi khi gây sát thương lên tối thiểu 2 kẻ địch trở l�
 ultimate: gây sát thương đơn mục tiêu lên leader địch = 200% đánh thường, không tính là đánh thường, nếu sát thương gây ra thành công lên leader địch vượt 20% hp của leader địch nhân vật này tự hồi hp của bản thân = 10% max hp, không tăng max hp. Pháp tắc.
 
 38)
-Nội tại: Pháp Tắc Trả Đũa (Ur)
+Nội tại: Pháp Tắc Trả Đũa
 1) Hiệu ứng cốt lõi
 Mỗi khi một đồng minh của Ur (bao gồm cả Ur) nhận sát thương trực tiếp từ hành động của kẻ địch, Ur lập tức thực hiện 1 đòn Đánh Thường vào chính kẻ địch vừa gây sát thương đó.
 Đòn này:
@@ -461,7 +461,8 @@ c) Nhiều địch khác nhau lần lượt tấn công đồng minh
 Mỗi địch mới (chưa bị đánh dấu) có thể kích hoạt 1 lần, cho tới khi Ur chạm trần 5 lần tổng trong chu kỳ.
 d) Phản đòn/follow-up của kẻ thù/cơ chế gây sát thương ngoài lượt của kẻ thù lên đồng minh qua debuff không kích hoạt nội tại này.
 
-
+39)
+nội tại: khi HP về 0, tử vong sau đó xoá sạch mọi debuff lẫn buff từ nguồn khác ngoài bản thân trên người kể cả ảnh hưởng từ pháp tắc, nếu pháp tắc từ nguồn ngoài bản thân là hiệu ứng kéo dài thì char này miễn nhiễm pháp tắc đó trong 1 turn đầu tức turn hồi sinh. Pháp tắc tag.
 
 
 
