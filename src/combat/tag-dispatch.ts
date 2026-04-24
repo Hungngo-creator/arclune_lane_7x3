@@ -41,7 +41,6 @@ type NormalizedContext = {
   game: SessionState | null;
   attacker: UnitToken | null;
   target: UnitToken | null;
-  targets: UnitToken[];
   cost: number;
   side: Side | null;
   payload: Record<string, unknown> | null;
@@ -55,10 +54,6 @@ type NormalizedContext = {
 };
 
 type TagHandler = (ctx: NormalizedContext, result: TagDispatchResult) => void;
-
-const applyAllAliveRuleTargets: TagHandler = (ctx, result) => {
-  assignAllAliveTargets(ctx, result);
-};
 
 function collectAliveTargets(tokens: ReadonlyArray<UnitToken>): UnitToken[] {
   const alive: UnitToken[] = [];
@@ -569,8 +564,12 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     if (!ctx.attacker) return;
     result.targets = ctx.opponentTokens;
   },
-  'global-rule': applyAllAliveRuleTargets,
-  'axiom-rule': applyAllAliveRuleTargets,
+  'global-rule': (ctx, result) => {
+    assignAllAliveTargets(ctx, result);
+  },
+  'axiom-rule': (ctx, result) => {
+    assignAllAliveTargets(ctx, result);
+  },
   'doctrine-rule': (ctx, result) => {
     if (!assignAllAliveTargets(ctx, result)) return;
     if (ctx.deferEffects || !ctx.attacker) return;
@@ -687,11 +686,12 @@ export function dispatchGameplayTags(
     ? partitionTokensBySide(context.game.tokens, attacker.side, { sortByBoardPosition: true })
     : { allyTokens: EMPTY_TOKENS, enemyTokens: EMPTY_TOKENS };
 
+  const initialTargets = resolveTargets(context.targets, target);
+
   const ctx: NormalizedContext = {
     game: context.game ?? null,
     attacker,
     target,
-    targets: resolveTargets(context.targets, target),
     cost: Math.max(0, toRoundedInt(context.cost, 0)),
     side: context.side ?? context.attacker?.side ?? null,
     payload: context.payload ?? null,
@@ -707,7 +707,7 @@ export function dispatchGameplayTags(
   const result: TagDispatchResult = {
     tags,
     highestRuleTag,
-    targets: [...ctx.targets],
+    targets: [...initialTargets],
     applied: [],
     sideEffects: [],
   };

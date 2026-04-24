@@ -6172,8 +6172,32 @@ __modules['./combat/status-utils.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getStatusEntryById')) exports.getStatusEntryById = getStatusEntryById;
 };
 __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
+  const RULE_TAG_ALIASES = Object.freeze({
+      axiom: 'axiom-rule',
+      'axiom-rule': 'axiom-rule',
+      'tiên đề': 'axiom-rule',
+      'tien-de': 'axiom-rule',
+      'than-tinh': 'axiom-rule',
+      'thần tính': 'axiom-rule',
+      'thần_tính': 'axiom-rule',
+      'than_tinh': 'axiom-rule',
+      'divine-nature': 'axiom-rule',
+      'thần tính thuộc axiom': 'axiom-rule',
+      'than-tinh-thuoc-axiom': 'axiom-rule',
+      'global-rule': 'global-rule',
+      'quy tắc': 'global-rule',
+      'quy-tac': 'global-rule',
+      'tag cấp độ cao': 'global-rule',
+      'tag-cap-do-cao': 'global-rule',
+      'tag cấp độ cao hơn pháp tắc': 'global-rule',
+      'tag-cap-do-cao-hon-phap-tac': 'global-rule',
+      'cấp độ cao hơn pháp tắc': 'global-rule',
+      'cap-do-cao-hon-phap-tac': 'global-rule',
+      'doctrine-rule': 'doctrine-rule',
+      'pháp tắc': 'doctrine-rule',
+      'phap-tac': 'doctrine-rule',
+  });
   const COMBAT_TAG_ALIASES = Object.freeze({
-      // Existing aliases
       'self-and-ally': 'ally',
       'ally-and-self': 'ally',
       'ban_than_lan_dong_minh': 'ally',
@@ -6187,17 +6211,12 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'kẻ địch': 'enemy',
       'lap-tuc': 'instant',
       'lập tức': 'instant',
-      'quy tắc': 'global-rule',
-      'quy-tac': 'global-rule',
-      'pháp tắc': 'doctrine-rule',
-      'phap-tac': 'doctrine-rule',
       'pháp tắc: luyện ngục kiếm trận': 'doctrine-rule',
       'phap-tac-luyen-nguc-kiem-tran': 'doctrine-rule',
       'muc-tieu-leader': 'leader-target',
       'mục tiêu leader': 'leader-target',
       'mục tiêu: leader': 'leader-target',
       'target-leader': 'leader-target',
-      // Character-design aliases from idea documents
       'đơn mục tiêu': 'single-target',
       'don-muc-tieu': 'single-target',
       'đa mục tiêu': 'multi-target',
@@ -6264,16 +6283,6 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'quy-tac-bat-dong-nhu-son': 'global-rule',
       'quy tắc: sự trở về của hư không': 'global-rule',
       'quy-tac-su-tro-ve-cua-hu-khong': 'global-rule',
-      'axiom': 'axiom-rule',
-      'axiom-rule': 'axiom-rule',
-      'tiên đề': 'axiom-rule',
-      'tien-de': 'axiom-rule',
-      'tag cấp độ cao': 'global-rule',
-      'tag-cap-do-cao': 'global-rule',
-      'tag cấp độ cao hơn pháp tắc': 'global-rule',
-      'tag-cap-do-cao-hon-phap-tac': 'global-rule',
-      'cấp độ cao hơn pháp tắc': 'global-rule',
-      'cap-do-cao-hon-phap-tac': 'global-rule',
       'sát thương tự thân': 'non-heal-hp-change',
       'sat-thuong-tu-than': 'non-heal-hp-change',
       'aoe: hàng dọc': 'column-aoe',
@@ -6288,7 +6297,6 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'vung-chu-+': 'cross-aoe',
       'tự động': 'instant',
       'tu-dong': 'instant',
-      // Lore/character idea tag aliases (Huyết, Hư giới, Nhân vật mới)
       'huyết giáp': 'shield',
       'huyet-giap': 'shield',
       'huyết nô': 'summon',
@@ -6301,27 +6309,6 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'huyet-than-linh-vuc': 'global-rule',
       'huyết thần': 'axiom-rule',
       'huyet-than': 'axiom-rule',
-      'thần tính': 'axiom-rule',
-      'than-tinh': 'axiom-rule',
-      'divine-nature': 'axiom-rule',
-      'than_tinh': 'axiom-rule',
-      'thần_tính': 'axiom-rule',
-      'thần tính thuộc axiom': 'axiom-rule',
-      'than-tinh-thuoc-axiom': 'axiom-rule',
-      'axiom/pháp tắc và quy tắc': 'axiom-rule',
-      'axiom-phap-tac-va-quy-tac': 'axiom-rule',
-      'hư kỹ': 'instant',
-      'hu-ky': 'instant',
-      'hư quyết': 'condition',
-      'hu-quyet': 'condition',
-      'kiếm vực': 'global-rule',
-      'kiem-vuc': 'global-rule',
-      'huyễn ảnh': 'random-aoe',
-      'huyen-anh': 'random-aoe',
-      'trăng và bóng tối': 'silence',
-      'trang-va-bong-toi': 'silence',
-      'rừng cấm': 'taunt',
-      'rung-cam': 'taunt',
   });
   const COMBAT_TAG_PRIORITY = Object.freeze({
       'axiom-rule': 500,
@@ -6340,27 +6327,6 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       aoe: 200,
   });
   const RULE_TAG_SET = new Set(['doctrine-rule', 'global-rule', 'axiom-rule']);
-  const RULE_TAG_ALIAS_TO_CANONICAL = Object.freeze({
-      axiom: 'axiom-rule',
-      'axiom-rule': 'axiom-rule',
-      'tien-de': 'axiom-rule',
-      'tiên đề': 'axiom-rule',
-      'than-tinh': 'axiom-rule',
-      'thần tính': 'axiom-rule',
-      'thần_tính': 'axiom-rule',
-      'thần tính thuộc axiom': 'axiom-rule',
-      'than-tinh-thuoc-axiom': 'axiom-rule',
-      'axiom/pháp tắc và quy tắc': 'axiom-rule',
-      'axiom-phap-tac-va-quy-tac': 'axiom-rule',
-      'than_tinh': 'axiom-rule',
-      'divine-nature': 'axiom-rule',
-      'global-rule': 'global-rule',
-      'quy tắc': 'global-rule',
-      'quy-tac': 'global-rule',
-      'doctrine-rule': 'doctrine-rule',
-      'pháp tắc': 'doctrine-rule',
-      'phap-tac': 'doctrine-rule',
-  });
   const RULE_TAG_PRIORITY = Object.freeze({
       'doctrine-rule': COMBAT_TAG_PRIORITY['doctrine-rule'] ?? 0,
       'global-rule': COMBAT_TAG_PRIORITY['global-rule'] ?? 0,
@@ -6384,11 +6350,11 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
   }
   function normalizeCombatTag(tag) {
       const normalized = normalizeAliasLookupKey(tag);
-      return RULE_TAG_ALIAS_TO_CANONICAL[normalized] ?? COMBAT_TAG_ALIASES[normalized] ?? normalized;
+      return RULE_TAG_ALIASES[normalized] ?? COMBAT_TAG_ALIASES[normalized] ?? normalized;
   }
   function normalizeCanonicalInputTag(tag) {
       const normalized = normalizeAliasLookupKey(tag);
-      return RULE_TAG_ALIAS_TO_CANONICAL[normalized] ?? normalized;
+      return RULE_TAG_ALIASES[normalized] ?? normalized;
   }
   function canonicalizeCombatTags(tags, treatAsCanonical = false) {
       return canonicalizeCombatTagsWithRule(tags, treatAsCanonical).tags;
@@ -6418,20 +6384,10 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
           ? unique.filter((tag) => !RULE_TAG_SET.has(tag) || tag === highestRuleTag)
           : unique;
       if (filtered.length <= 1) {
-          return {
-              tags: filtered,
-              highestRuleTag,
-          };
+          return { tags: filtered, highestRuleTag };
       }
-      filtered.sort((left, right) => {
-          const leftPriority = COMBAT_TAG_PRIORITY[left] ?? 0;
-          const rightPriority = COMBAT_TAG_PRIORITY[right] ?? 0;
-          return rightPriority - leftPriority;
-      });
-      return {
-          tags: filtered,
-          highestRuleTag,
-      };
+      filtered.sort((left, right) => (COMBAT_TAG_PRIORITY[right] ?? 0) - (COMBAT_TAG_PRIORITY[left] ?? 0));
+      return { tags: filtered, highestRuleTag };
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasRuleTagAtLeast')) exports.hasRuleTagAtLeast = hasRuleTagAtLeast;
@@ -6469,9 +6425,6 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
   const EMPTY_TAGS = [];
   const DOCTRINE_NO_HEAL_STATUS_ID = 'doctrine-no-heal';
-  const applyAllAliveRuleTargets = (ctx, result) => {
-      assignAllAliveTargets(ctx, result);
-  };
   function collectAliveTargets(tokens) {
       const alive = [];
       for (const token of tokens) {
@@ -6926,8 +6879,12 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
               return;
           result.targets = ctx.opponentTokens;
       },
-      'global-rule': applyAllAliveRuleTargets,
-      'axiom-rule': applyAllAliveRuleTargets,
+      'global-rule': (ctx, result) => {
+          assignAllAliveTargets(ctx, result);
+      },
+      'axiom-rule': (ctx, result) => {
+          assignAllAliveTargets(ctx, result);
+      },
       'doctrine-rule': (ctx, result) => {
           if (!assignAllAliveTargets(ctx, result))
               return;
@@ -7044,11 +7001,11 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       const { allyTokens, enemyTokens } = context.game && attacker
           ? partitionTokensBySide(context.game.tokens, attacker.side, { sortByBoardPosition: true })
           : { allyTokens: EMPTY_TOKENS, enemyTokens: EMPTY_TOKENS };
+      const initialTargets = resolveTargets(context.targets, target);
       const ctx = {
           game: context.game ?? null,
           attacker,
           target,
-          targets: resolveTargets(context.targets, target),
           cost: Math.max(0, toRoundedInt(context.cost, 0)),
           side: context.side ?? context.attacker?.side ?? null,
           payload: context.payload ?? null,
@@ -7063,7 +7020,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       const result = {
           tags,
           highestRuleTag,
-          targets: [...ctx.targets],
+          targets: [...initialTargets],
           applied: [],
           sideEffects: [],
       };

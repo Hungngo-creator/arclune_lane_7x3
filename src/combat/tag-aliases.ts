@@ -1,5 +1,32 @@
+const RULE_TAG_ALIASES = Object.freeze<Record<string, RuleTag>>({
+  axiom: 'axiom-rule',
+  'axiom-rule': 'axiom-rule',
+  'tiên đề': 'axiom-rule',
+  'tien-de': 'axiom-rule',
+  'than-tinh': 'axiom-rule',
+  'thần tính': 'axiom-rule',
+  'thần_tính': 'axiom-rule',
+  'than_tinh': 'axiom-rule',
+  'divine-nature': 'axiom-rule',
+  'thần tính thuộc axiom': 'axiom-rule',
+  'than-tinh-thuoc-axiom': 'axiom-rule',
+
+  'global-rule': 'global-rule',
+  'quy tắc': 'global-rule',
+  'quy-tac': 'global-rule',
+  'tag cấp độ cao': 'global-rule',
+  'tag-cap-do-cao': 'global-rule',
+  'tag cấp độ cao hơn pháp tắc': 'global-rule',
+  'tag-cap-do-cao-hon-phap-tac': 'global-rule',
+  'cấp độ cao hơn pháp tắc': 'global-rule',
+  'cap-do-cao-hon-phap-tac': 'global-rule',
+
+  'doctrine-rule': 'doctrine-rule',
+  'pháp tắc': 'doctrine-rule',
+  'phap-tac': 'doctrine-rule',
+});
+
 const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
-  // Existing aliases
   'self-and-ally': 'ally',
   'ally-and-self': 'ally',
   'ban_than_lan_dong_minh': 'ally',
@@ -13,10 +40,6 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'kẻ địch': 'enemy',
   'lap-tuc': 'instant',
   'lập tức': 'instant',
-  'quy tắc': 'global-rule',
-  'quy-tac': 'global-rule',
-  'pháp tắc': 'doctrine-rule',
-  'phap-tac': 'doctrine-rule',
   'pháp tắc: luyện ngục kiếm trận': 'doctrine-rule',
   'phap-tac-luyen-nguc-kiem-tran': 'doctrine-rule',
   'muc-tieu-leader': 'leader-target',
@@ -24,7 +47,6 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'mục tiêu: leader': 'leader-target',
   'target-leader': 'leader-target',
 
-  // Character-design aliases from idea documents
   'đơn mục tiêu': 'single-target',
   'don-muc-tieu': 'single-target',
   'đa mục tiêu': 'multi-target',
@@ -91,16 +113,6 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'quy-tac-bat-dong-nhu-son': 'global-rule',
   'quy tắc: sự trở về của hư không': 'global-rule',
   'quy-tac-su-tro-ve-cua-hu-khong': 'global-rule',
-  'axiom': 'axiom-rule',
-  'axiom-rule': 'axiom-rule',
-  'tiên đề': 'axiom-rule',
-  'tien-de': 'axiom-rule',
-  'tag cấp độ cao': 'global-rule',
-  'tag-cap-do-cao': 'global-rule',
-  'tag cấp độ cao hơn pháp tắc': 'global-rule',
-  'tag-cap-do-cao-hon-phap-tac': 'global-rule',
-  'cấp độ cao hơn pháp tắc': 'global-rule',
-  'cap-do-cao-hon-phap-tac': 'global-rule',
   'sát thương tự thân': 'non-heal-hp-change',
   'sat-thuong-tu-than': 'non-heal-hp-change',
   'aoe: hàng dọc': 'column-aoe',
@@ -115,7 +127,7 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'vung-chu-+': 'cross-aoe',
   'tự động': 'instant',
   'tu-dong': 'instant',
-  // Lore/character idea tag aliases (Huyết, Hư giới, Nhân vật mới)
+
   'huyết giáp': 'shield',
   'huyet-giap': 'shield',
   'huyết nô': 'summon',
@@ -128,27 +140,6 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'huyet-than-linh-vuc': 'global-rule',
   'huyết thần': 'axiom-rule',
   'huyet-than': 'axiom-rule',
-  'thần tính': 'axiom-rule',
-  'than-tinh': 'axiom-rule',
-  'divine-nature': 'axiom-rule',
-  'than_tinh': 'axiom-rule',
-  'thần_tính': 'axiom-rule',
-  'thần tính thuộc axiom': 'axiom-rule',
-  'than-tinh-thuoc-axiom': 'axiom-rule',
-  'axiom/pháp tắc và quy tắc': 'axiom-rule',
-  'axiom-phap-tac-va-quy-tac': 'axiom-rule',
-  'hư kỹ': 'instant',
-  'hu-ky': 'instant',
-  'hư quyết': 'condition',
-  'hu-quyet': 'condition',
-  'kiếm vực': 'global-rule',
-  'kiem-vuc': 'global-rule',
-  'huyễn ảnh': 'random-aoe',
-  'huyen-anh': 'random-aoe',
-  'trăng và bóng tối': 'silence',
-  'trang-va-bong-toi': 'silence',
-  'rừng cấm': 'taunt',
-  'rung-cam': 'taunt',
 });
 
 const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
@@ -170,27 +161,6 @@ const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
 
 type RuleTag = 'doctrine-rule' | 'global-rule' | 'axiom-rule';
 const RULE_TAG_SET = new Set<RuleTag>(['doctrine-rule', 'global-rule', 'axiom-rule']);
-const RULE_TAG_ALIAS_TO_CANONICAL = Object.freeze<Record<string, RuleTag>>({
-  axiom: 'axiom-rule',
-  'axiom-rule': 'axiom-rule',
-  'tien-de': 'axiom-rule',
-  'tiên đề': 'axiom-rule',
-  'than-tinh': 'axiom-rule',
-  'thần tính': 'axiom-rule',
-  'thần_tính': 'axiom-rule',
-  'thần tính thuộc axiom': 'axiom-rule',
-  'than-tinh-thuoc-axiom': 'axiom-rule',
-  'axiom/pháp tắc và quy tắc': 'axiom-rule',
-  'axiom-phap-tac-va-quy-tac': 'axiom-rule',
-  'than_tinh': 'axiom-rule',
-  'divine-nature': 'axiom-rule',
-  'global-rule': 'global-rule',
-  'quy tắc': 'global-rule',
-  'quy-tac': 'global-rule',
-  'doctrine-rule': 'doctrine-rule',
-  'pháp tắc': 'doctrine-rule',
-  'phap-tac': 'doctrine-rule',
-});
 
 const RULE_TAG_PRIORITY = Object.freeze<Record<RuleTag, number>>({
   'doctrine-rule': COMBAT_TAG_PRIORITY['doctrine-rule'] ?? 0,
@@ -222,12 +192,12 @@ function normalizeAliasLookupKey(tag: string): string {
 
 export function normalizeCombatTag(tag: string): string {
   const normalized = normalizeAliasLookupKey(tag);
-  return RULE_TAG_ALIAS_TO_CANONICAL[normalized] ?? COMBAT_TAG_ALIASES[normalized] ?? normalized;
+  return RULE_TAG_ALIASES[normalized] ?? COMBAT_TAG_ALIASES[normalized] ?? normalized;
 }
 
 function normalizeCanonicalInputTag(tag: string): string {
   const normalized = normalizeAliasLookupKey(tag);
-  return RULE_TAG_ALIAS_TO_CANONICAL[normalized] ?? normalized;
+  return RULE_TAG_ALIASES[normalized] ?? normalized;
 }
 
 export function canonicalizeCombatTags(
@@ -266,20 +236,11 @@ export function canonicalizeCombatTagsWithRule(
   const filtered = highestRuleTag
     ? unique.filter((tag) => !RULE_TAG_SET.has(tag as RuleTag) || tag === highestRuleTag)
     : unique;
+
   if (filtered.length <= 1) {
-    return {
-      tags: filtered,
-      highestRuleTag,
-    };
+    return { tags: filtered, highestRuleTag };
   }
 
-  filtered.sort((left, right) => {
-    const leftPriority = COMBAT_TAG_PRIORITY[left] ?? 0;
-    const rightPriority = COMBAT_TAG_PRIORITY[right] ?? 0;
-    return rightPriority - leftPriority;
-  });
-  return {
-    tags: filtered,
-    highestRuleTag,
-  };
+  filtered.sort((left, right) => (COMBAT_TAG_PRIORITY[right] ?? 0) - (COMBAT_TAG_PRIORITY[left] ?? 0));
+  return { tags: filtered, highestRuleTag };
 }
