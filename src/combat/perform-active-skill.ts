@@ -7,7 +7,7 @@ import { cellReserved, slotToCell } from '../engine.ts';
 import { globalAetherPool } from '../aether.ts';
 import { Statuses } from '../statuses.ts';
 import { runRuntimeActiveSkill } from './unit-runtime-hooks.ts';
-import { resolveSkillPayload } from './skill-metadata-utils.ts';
+import { createSkillMetadataContext } from './skill-metadata-utils.ts';
 import { readAtkWilPower, readUnitHpState, toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
@@ -78,14 +78,6 @@ interface ParsedSkillTags {
 }
 type SkillUsageStore = Record<string, number>;
 
-function readPayloadNumber(payload: Record<string, unknown>, fallback: number, ...keys: string[]): number {
-  for (const key of keys) {
-    const parsed = toFiniteNumber(payload[key], NaN);
-    if (Number.isFinite(parsed)) return parsed;
-  }
-  return fallback;
-}
-
 function resolveActiveSkill(caster: UnitToken, skillKey: ActiveSkillKey): SkillSection | null {
   const set = skillSets[caster.id as keyof typeof skillSets];
   if (!set) return null;
@@ -102,11 +94,11 @@ function applyHpCostWithState(
   caster: UnitToken,
   hpMax: number,
   currentHp: number,
-  payload: Record<string, unknown>,
+  readMetaNumber: (fallback: number, ...keys: string[]) => number,
 ): boolean {
-  const ratio = Math.max(0, readPayloadNumber(payload, 0, 'hpCostRatio', 'hpCostPercent'));
-  const flat = Math.max(0, toFloorInt(readPayloadNumber(payload, 0, 'hpCostFlat', 'hpCost'), 0));
-  const minRemainRatio = Math.max(0, readPayloadNumber(payload, 0, 'minRemainingHpRatio', 'minHpRatio'));
+  const ratio = Math.max(0, readMetaNumber(0, 'hpCostRatio', 'hpCostPercent'));
+  const flat = Math.max(0, toFloorInt(readMetaNumber(0, 'hpCostFlat', 'hpCost'), 0));
+  const minRemainRatio = Math.max(0, readMetaNumber(0, 'minRemainingHpRatio', 'minHpRatio'));
 
   const hpCost = Math.max(flat, Math.floor(hpMax * ratio));
   if (hpCost <= 0) return true;
@@ -121,19 +113,15 @@ function applyHpCostWithState(
 function checkHpConditionWithState(
   hpMax: number,
   currentHp: number,
-  payload: Record<string, unknown>,
+  readMetaNumber: (fallback: number, ...keys: string[]) => number,
 ): boolean {
-  const requiredRatio = Math.max(
+  const requiredRatio = Math.max(0, readMetaNumber(
     0,
-    readPayloadNumber(
-      payload,
-      0,
-      'minCurrentHpRatio',
-      'requireCurrentHpRatioMin',
-      'requiredHpRatio',
-      'conditionMinHpRatio',
-    ),
-  );
+    'minCurrentHpRatio',
+    'requireCurrentHpRatioMin',
+    'requiredHpRatio',
+    'conditionMinHpRatio',
+  ));
   if (requiredRatio <= 0) return true;
   return currentHp / hpMax >= requiredRatio;
 }
@@ -154,7 +142,7 @@ function checkTurnParityCondition(game: SessionState, payload: Record<string, un
 function readSkillUseCap(payload: Record<string, unknown>): number {
   return Math.max(
     0,
-    toRoundedInt(readPayloadNumber(payload, 0, 'maxUsesPerBattle', 'maxUses', 'battleUseCap'), 0),
+    toRoundedInt(toFiniteNumber(payload.maxUsesPerBattle ?? payload.maxUses ?? payload.battleUseCap, 0), 0),
   );
 }
 
@@ -259,7 +247,8 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     hasUniqueGlobalTag,
     hasDamageTag,
   } = parseSkillTags(tags);
-  const payload = resolveSkillPayload(skill);
+  const skillMeta = createSkillMetadataContext(skill);
+  const { payload } = skillMeta;
   const maxSkillUses = readSkillUseCap(payload);
   if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
     return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
@@ -300,13 +289,13 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
 
   const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
   const { hpMax: casterHpMax, hp: casterCurrentHp } = readUnitHpState(caster);
-  if (!checkHpConditionWithState(casterHpMax, casterCurrentHp, payload)) {
+  if (!checkHpConditionWithState(casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
   if (!checkTurnParityCondition(game, payload)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
-  if (!applyHpCostWithState(caster, casterHpMax, casterCurrentHp, payload)) {
+  if (!applyHpCostWithState(caster, casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
 

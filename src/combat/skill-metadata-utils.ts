@@ -3,6 +3,7 @@ import { asRecord, toFiniteNumber } from './number-utils.ts';
 import type { SkillSection } from '@shared-types/config';
 
 type SkillRecord = Record<string, unknown>;
+type SkillNumberReader = (fallback: number, ...keys: string[]) => number;
 
 function resolveSkillRootRecords(skill: SkillSection): {
   root: SkillRecord;
@@ -21,14 +22,16 @@ function resolveSkillRootRecords(skill: SkillSection): {
   return { root, metadata, meta, payload, metadataPayload, metaPayload };
 }
 
-function collectSkillRecords(skill: SkillSection): SkillRecord[] {
-  const { root, metadata, meta, payload, metadataPayload, metaPayload } = resolveSkillRootRecords(skill);
-  const records: SkillRecord[] = [];
+function collectSkillRecords(
+  rootRecords: ReturnType<typeof resolveSkillRootRecords>,
+): SkillRecord[] {
+  const { root, metadata, meta, payload, metadataPayload, metaPayload } = rootRecords;
+  const collected: SkillRecord[] = [];
   const seen = new Set<SkillRecord>();
   const pushUnique = (record: SkillRecord | null): void => {
     if (!record || seen.has(record)) return;
     seen.add(record);
-    records.push(record);
+    collected.push(record);
   };
   pushUnique(root);
   pushUnique(payload);
@@ -36,11 +39,11 @@ function collectSkillRecords(skill: SkillSection): SkillRecord[] {
   pushUnique(metadataPayload);
   pushUnique(meta);
   pushUnique(metaPayload);
-  return records;
+  return collected;
 }
 
-export function resolveSkillPayload(skill: SkillSection): SkillRecord {
-  const { root, payload, metadataPayload, metaPayload } = resolveSkillRootRecords(skill);
+function buildSkillPayload(records: ReturnType<typeof resolveSkillRootRecords>): SkillRecord {
+  const { root, payload, metadataPayload, metaPayload } = records;
   const payloadCandidates = [payload, metadataPayload, metaPayload];
   const payloadRecord = payloadCandidates.find((entry) => !!entry) ?? null;
   return {
@@ -49,18 +52,31 @@ export function resolveSkillPayload(skill: SkillSection): SkillRecord {
   };
 }
 
-export function createSkillMetadataReader(skill: SkillSection) {
-  const records = collectSkillRecords(skill);
-  return {
-    readNumber(fallback: number, ...keys: string[]): number {
-      for (const key of keys) {
-        for (const record of records) {
-          const value = toFiniteNumber(record[key], NaN);
-          if (Number.isFinite(value)) return value;
-        }
+function createSkillNumberReader(records: ReadonlyArray<SkillRecord>): SkillNumberReader {
+  return (fallback: number, ...keys: string[]): number => {
+    for (const key of keys) {
+      for (const record of records) {
+        const value = toFiniteNumber(record[key], NaN);
+        if (Number.isFinite(value)) return value;
       }
-      return fallback;
-    },
+    }
+    return fallback;
+  };
+}
+
+export interface SkillMetadataContext {
+  payload: SkillRecord;
+  readNumber: SkillNumberReader;
+  readRecord: (...keys: string[]) => SkillRecord | undefined;
+}
+
+export function createSkillMetadataContext(skill: SkillSection): SkillMetadataContext {
+  const rootRecords = resolveSkillRootRecords(skill);
+  const records = collectSkillRecords(rootRecords);
+  const readNumber = createSkillNumberReader(records);
+  return {
+    payload: buildSkillPayload(rootRecords),
+    readNumber,
     readRecord(...keys: string[]): SkillRecord | undefined {
       for (const key of keys) {
         for (const record of records) {
@@ -70,5 +86,17 @@ export function createSkillMetadataReader(skill: SkillSection) {
       }
       return undefined;
     },
+  };
+}
+
+export function resolveSkillPayload(skill: SkillSection): SkillRecord {
+  return createSkillMetadataContext(skill).payload;
+}
+
+export function createSkillMetadataReader(skill: SkillSection) {
+  const context = createSkillMetadataContext(skill);
+  return {
+    readNumber: context.readNumber,
+    readRecord: context.readRecord,
   };
 }

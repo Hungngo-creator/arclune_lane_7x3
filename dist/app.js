@@ -5675,7 +5675,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const __dep8 = __require('./combat/unit-runtime-hooks.ts');
   const runRuntimeActiveSkill = __dep8.runRuntimeActiveSkill;
   const __dep9 = __require('./combat/skill-metadata-utils.ts');
-  const resolveSkillPayload = __dep9.resolveSkillPayload;
+  const createSkillMetadataContext = __dep9.createSkillMetadataContext;
   const __dep10 = __require('./combat/number-utils.ts');
   const readAtkWilPower = __dep10.readAtkWilPower;
   const readUnitHpState = __dep10.readUnitHpState;
@@ -5727,14 +5727,6 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       maxStacks: 5,
       purgeable: false,
   });
-  function readPayloadNumber(payload, fallback, ...keys) {
-      for (const key of keys) {
-          const parsed = toFiniteNumber(payload[key], NaN);
-          if (Number.isFinite(parsed))
-              return parsed;
-      }
-      return fallback;
-  }
   function resolveActiveSkill(caster, skillKey) {
       const set = skillSets[caster.id];
       if (!set)
@@ -5747,10 +5739,10 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   function canApplyUniqueGlobal(game, summonId) {
       return !game.tokens.some((token) => token.alive && token.id === summonId);
   }
-  function applyHpCostWithState(caster, hpMax, currentHp, payload) {
-      const ratio = Math.max(0, readPayloadNumber(payload, 0, 'hpCostRatio', 'hpCostPercent'));
-      const flat = Math.max(0, toFloorInt(readPayloadNumber(payload, 0, 'hpCostFlat', 'hpCost'), 0));
-      const minRemainRatio = Math.max(0, readPayloadNumber(payload, 0, 'minRemainingHpRatio', 'minHpRatio'));
+  function applyHpCostWithState(caster, hpMax, currentHp, readMetaNumber) {
+      const ratio = Math.max(0, readMetaNumber(0, 'hpCostRatio', 'hpCostPercent'));
+      const flat = Math.max(0, toFloorInt(readMetaNumber(0, 'hpCostFlat', 'hpCost'), 0));
+      const minRemainRatio = Math.max(0, readMetaNumber(0, 'minRemainingHpRatio', 'minHpRatio'));
       const hpCost = Math.max(flat, Math.floor(hpMax * ratio));
       if (hpCost <= 0)
           return true;
@@ -5761,8 +5753,8 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       caster.hp = Math.max(1, nextHp);
       return true;
   }
-  function checkHpConditionWithState(hpMax, currentHp, payload) {
-      const requiredRatio = Math.max(0, readPayloadNumber(payload, 0, 'minCurrentHpRatio', 'requireCurrentHpRatioMin', 'requiredHpRatio', 'conditionMinHpRatio'));
+  function checkHpConditionWithState(hpMax, currentHp, readMetaNumber) {
+      const requiredRatio = Math.max(0, readMetaNumber(0, 'minCurrentHpRatio', 'requireCurrentHpRatioMin', 'requiredHpRatio', 'conditionMinHpRatio'));
       if (requiredRatio <= 0)
           return true;
       return currentHp / hpMax >= requiredRatio;
@@ -5784,7 +5776,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       return true;
   }
   function readSkillUseCap(payload) {
-      return Math.max(0, toRoundedInt(readPayloadNumber(payload, 0, 'maxUsesPerBattle', 'maxUses', 'battleUseCap'), 0));
+      return Math.max(0, toRoundedInt(toFiniteNumber(payload.maxUsesPerBattle ?? payload.maxUses ?? payload.battleUseCap, 0), 0));
   }
   function hasSkillUseQuota(game, caster, skillKey, maxUses) {
       if (maxUses <= 0)
@@ -5878,7 +5870,8 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       }
       const { tags } = canonicalizeCombatTagsWithRule(normalizeTagList(skill.tags ?? []));
       const { effectTags, hasAetherCostTag, hasSummonTag, hasUniqueGlobalTag, hasDamageTag, } = parseSkillTags(tags);
-      const payload = resolveSkillPayload(skill);
+      const skillMeta = createSkillMetadataContext(skill);
+      const { payload } = skillMeta;
       const maxSkillUses = readSkillUseCap(payload);
       if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
           return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
@@ -5915,13 +5908,13 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       }
       const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
       const { hpMax: casterHpMax, hp: casterCurrentHp } = readUnitHpState(caster);
-      if (!checkHpConditionWithState(casterHpMax, casterCurrentHp, payload)) {
+      if (!checkHpConditionWithState(casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
       if (!checkTurnParityCondition(game, payload)) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
-      if (!applyHpCostWithState(caster, casterHpMax, casterCurrentHp, payload)) {
+      if (!applyHpCostWithState(caster, casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
       const runtimeSkillResult = runRuntimeActiveSkill({
@@ -6058,15 +6051,15 @@ __modules['./combat/skill-metadata-utils.ts'] = (exports, module, __require) => 
       const metaPayload = asRecord(meta?.payload);
       return { root, metadata, meta, payload, metadataPayload, metaPayload };
   }
-  function collectSkillRecords(skill) {
-      const { root, metadata, meta, payload, metadataPayload, metaPayload } = resolveSkillRootRecords(skill);
-      const records = [];
+  function collectSkillRecords(rootRecords) {
+      const { root, metadata, meta, payload, metadataPayload, metaPayload } = rootRecords;
+      const collected = [];
       const seen = new Set();
       const pushUnique = (record) => {
           if (!record || seen.has(record))
               return;
           seen.add(record);
-          records.push(record);
+          collected.push(record);
       };
       pushUnique(root);
       pushUnique(payload);
@@ -6074,10 +6067,10 @@ __modules['./combat/skill-metadata-utils.ts'] = (exports, module, __require) => 
       pushUnique(metadataPayload);
       pushUnique(meta);
       pushUnique(metaPayload);
-      return records;
+      return collected;
   }
-  function resolveSkillPayload(skill) {
-      const { root, payload, metadataPayload, metaPayload } = resolveSkillRootRecords(skill);
+  function buildSkillPayload(records) {
+      const { root, payload, metadataPayload, metaPayload } = records;
       const payloadCandidates = [payload, metadataPayload, metaPayload];
       const payloadRecord = payloadCandidates.find((entry) => !!entry) ?? null;
       return {
@@ -6085,19 +6078,25 @@ __modules['./combat/skill-metadata-utils.ts'] = (exports, module, __require) => 
           ...root,
       };
   }
-  function createSkillMetadataReader(skill) {
-      const records = collectSkillRecords(skill);
-      return {
-          readNumber(fallback, ...keys) {
-              for (const key of keys) {
-                  for (const record of records) {
-                      const value = toFiniteNumber(record[key], NaN);
-                      if (Number.isFinite(value))
-                          return value;
-                  }
+  function createSkillNumberReader(records) {
+      return (fallback, ...keys) => {
+          for (const key of keys) {
+              for (const record of records) {
+                  const value = toFiniteNumber(record[key], NaN);
+                  if (Number.isFinite(value))
+                      return value;
               }
-              return fallback;
-          },
+          }
+          return fallback;
+      };
+  }
+  function createSkillMetadataContext(skill) {
+      const rootRecords = resolveSkillRootRecords(skill);
+      const records = collectSkillRecords(rootRecords);
+      const readNumber = createSkillNumberReader(records);
+      return {
+          payload: buildSkillPayload(rootRecords),
+          readNumber,
           readRecord(...keys) {
               for (const key of keys) {
                   for (const record of records) {
@@ -6110,7 +6109,18 @@ __modules['./combat/skill-metadata-utils.ts'] = (exports, module, __require) => 
           },
       };
   }
+  function resolveSkillPayload(skill) {
+      return createSkillMetadataContext(skill).payload;
+  }
+  function createSkillMetadataReader(skill) {
+      const context = createSkillMetadataContext(skill);
+      return {
+          readNumber: context.readNumber,
+          readRecord: context.readRecord,
+      };
+  }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createSkillMetadataContext')) exports.createSkillMetadataContext = createSkillMetadataContext;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveSkillPayload')) exports.resolveSkillPayload = resolveSkillPayload;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSkillMetadataReader')) exports.createSkillMetadataReader = createSkillMetadataReader;
 };
@@ -6260,6 +6270,8 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'tien-de': 'axiom-rule',
       'tag cấp độ cao': 'global-rule',
       'tag-cap-do-cao': 'global-rule',
+      'tag cấp độ cao hơn pháp tắc': 'global-rule',
+      'tag-cap-do-cao-hon-phap-tac': 'global-rule',
       'cấp độ cao hơn pháp tắc': 'global-rule',
       'cap-do-cao-hon-phap-tac': 'global-rule',
       'sát thương tự thân': 'non-heal-hp-change',
@@ -6294,6 +6306,10 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'divine-nature': 'axiom-rule',
       'than_tinh': 'axiom-rule',
       'thần_tính': 'axiom-rule',
+      'thần tính thuộc axiom': 'axiom-rule',
+      'than-tinh-thuoc-axiom': 'axiom-rule',
+      'axiom/pháp tắc và quy tắc': 'axiom-rule',
+      'axiom-phap-tac-va-quy-tac': 'axiom-rule',
       'hư kỹ': 'instant',
       'hu-ky': 'instant',
       'hư quyết': 'condition',
@@ -6332,6 +6348,10 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'than-tinh': 'axiom-rule',
       'thần tính': 'axiom-rule',
       'thần_tính': 'axiom-rule',
+      'thần tính thuộc axiom': 'axiom-rule',
+      'than-tinh-thuoc-axiom': 'axiom-rule',
+      'axiom/pháp tắc và quy tắc': 'axiom-rule',
+      'axiom-phap-tac-va-quy-tac': 'axiom-rule',
       'than_tinh': 'axiom-rule',
       'divine-nature': 'axiom-rule',
       'global-rule': 'global-rule',
