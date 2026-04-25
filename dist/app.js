@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -4050,6 +4050,81 @@ __modules['./catalog.ts'] = (exports, module, __require) => {
           }
       },
       {
+          id: 'nguyen_le', name: 'Nguyên Lễ', class: 'Warrior', rank: 'UR',
+          mods: { ATK: 0.14, WIL: 0.14, PER: 0.04 },
+          kit: {
+              onSpawn: createOnSpawn(),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target'],
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Bất Khuất Hoàn Sinh',
+                      tags: ['passive', 'self', 'heal', 'rule'],
+                      trigger: {
+                          onDamageTakenPercentMaxHpOver: 0.2,
+                          aetherCost: 10,
+                          healPowerRatioAtkWil: 0.5,
+                      },
+                      notes: 'Tự động: khi nhận một hit vượt 20% Max HP, tiêu hao 10 Aether để hồi HP bằng 50% (ATK + WIL). Nếu Aether không đủ thì không kích hoạt.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Hoành Kiếm Đoạn Trận',
+                      tags: ['active', 'aoe', 'rule'],
+                      targeting: { rows: [[1, 2, 3], [4, 5, 6], [7, 8, 9]], pickMostOccupied: true },
+                      cost: { aether: 0 },
+                      variableCost: { aetherPerEnemyHit: 7, maxAether: 21 },
+                      damageMultiplier: 1.5,
+                      notes: 'Chém ngang vào hàng có nhiều địch nhất, mỗi mục tiêu trúng chịu 150% sát thương đánh thường. Cost biến thiên 7 Aether/mục tiêu trúng (tối đa 21).'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Khai Mệnh Kiếm Tâm',
+                      tags: ['active', 'self', 'buff', 'rule'],
+                      cost: { aether: 20 },
+                      buffStats: { ATK: 0.5, WIL: 0.5 },
+                      duration: 2,
+                      notes: 'Tăng 50% ATK và 50% WIL trong 2 lượt.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  name: 'Tận Kiếp Trảm',
+                  tags: ['active', 'aoe', 'rule'],
+                  targetPattern: [1, 2, 3, 5, 8],
+                  damageMultiplier: 2.0,
+                  notes: 'Gây 2 đòn đánh thường lên các ô hình chữ T phía địch: 1/2/3/5/8.'
+              }),
+              talent: asUnknownRecord({
+                  name: 'Sát Ý Tích Mệnh',
+                  onKill: {
+                      gainRandomDebuffImmunityFrom: ['poison', 'stun', 'sleep', 'bleed', 'fatigue'],
+                      gainStatsFromCurrent: { ATK: 0.05, WIL: 0.05 },
+                      resetOnDeath: true,
+                  },
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'nguyen_le_kill_scaling',
+                      name: 'Sát Ý Tích Mệnh',
+                      when: 'onEnemyDeath',
+                      effect: 'gainKillScalingAndDebuffImmunity',
+                      params: {
+                          statGainFromCurrent: { ATK: 0.05, WIL: 0.05 },
+                          immunityPool: ['poison', 'stun', 'sleep', 'bleed', 'fatigue'],
+                          resetOnDeath: true,
+                      },
+                  },
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'rule-domain', text: 'Nội tại và kỹ năng mang miền Quy Tắc theo mô tả thiết kế.' },
+              ]),
+          }
+      },
+      {
           id: 'laky', name: 'La Kỳ', class: 'Support', rank: 'SSR',
           mods: { WIL: 0.10, PER: 0.10 },
           kit: {
@@ -4873,6 +4948,15 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           hookOnLethalDamage(target);
           emitOnDeathPassive(target);
       }
+      {
+          const targetCarrier = target;
+          const runtimeRoot = Game ? (Game.runtime ??= {}) : {};
+          const damageSerial = Math.max(0, Math.floor(Number(runtimeRoot._damageEventSerial ?? 0))) + 1;
+          runtimeRoot._damageEventSerial = damageSerial;
+          targetCarrier._lastDamageTaken = dealtTotal;
+          targetCarrier._lastDamageTakenSerial = damageSerial;
+          targetCarrier._lastDamageTakenTurn = Number(Game?.turn?.turnCount ?? 0);
+      }
       runRuntimeDamageResolved(target);
       applyChapMinhPhaseShift(target);
       const damageResult = {
@@ -4885,7 +4969,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       const dealt = Math.max(0, dealtTotal);
       resolveReflectDamage(attacker, target, dealt, dtype);
       const sessionVfx = asSessionWithVfx(Game);
-      if (sessionVfx) {
+      if (sessionVfx != null) {
           try {
               const hasAdvantage = (finalDamage.breakdown.classBonus + finalDamage.breakdown.elementBonus + finalDamage.breakdown.synergyBonus) > 0;
               vfxAddHit(sessionVfx, target, { isCrit: !!opts.isCrit, advantage: hasAdvantage });
@@ -4951,7 +5035,8 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           summary: buildDamageSummary(metadataBase),
       };
       const previous = attackerCarrier._lastDamageContext;
-      if (!previous || snapshot.finalDamage >= previous.finalDamage) {
+      const previousFinalDamage = previous?.finalDamage ?? Number.NEGATIVE_INFINITY;
+      if (snapshot.finalDamage >= previousFinalDamage) {
           attackerCarrier._lastDamageContext = snapshot;
           attackerCarrier._lastCounterBreakdown = { ...finalDamage.breakdown };
           attackerCarrier._lastDamageSummary = snapshot.summary;
@@ -5031,7 +5116,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 2000;
           const meleeStartMs = sessionNow();
           let meleeTriggered = false;
-          if (sessionVfx) {
+          if (sessionVfx != null) {
               try {
                   vfxAddMelee(sessionVfx, unit, resolved, { dur: meleeDur });
                   meleeTriggered = true;
@@ -5053,7 +5138,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           dtype: basicDamageType,
           attackType: 'basic',
       });
-      if (sessionVfx) {
+      if (sessionVfx != null) {
           try {
               vfxAddHit(sessionVfx, resolved);
           }
@@ -6718,14 +6803,215 @@ __modules['./combat/runtime-hooks/mong-yem.ts'] = (exports, module, __require) =
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'mongYemRuntimeHook')) exports.mongYemRuntimeHook = mongYemRuntimeHook;
 };
+__modules['./combat/runtime-hooks/nguyen-le.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat.ts');
+  const dealAbilityDamage = __dep0.dealAbilityDamage;
+  const __dep1 = __require('./engine.ts');
+  const slotToCell = __dep1.slotToCell;
+  const __dep2 = __require('./aether.ts');
+  const globalAetherPool = __dep2.globalAetherPool;
+  const __dep3 = __require('./statuses.ts');
+  const Statuses = __dep3.Statuses;
+  const __dep4 = __require('./utils/rng.ts');
+  const nextRngValue = __dep4.nextRngValue;
+  const __dep5 = __require('./combat/skill-result.ts');
+  const buildSkillResult = __dep5.buildSkillResult;
+  const __dep6 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep6.readAtkWilPower;
+  const toFiniteNumber = __dep6.toFiniteNumber;
+  const NGUYEN_LE_ID = 'nguyen_le';
+  const IMMUNITY_POOL = ['poison', 'stun', 'sleep', 'bleed', 'fatigue'];
+  function findUnitAtSlot(game, side, slot) {
+      const { cx, cy } = slotToCell(side, slot);
+      for (const token of game.tokens) {
+          if (!token.alive || token.side !== side)
+              continue;
+          if (token.cx === cx && token.cy === cy)
+              return token;
+      }
+      return null;
+  }
+  function countAliveInRow(game, side, slots) {
+      let count = 0;
+      for (const slot of slots) {
+          if (findUnitAtSlot(game, side, slot))
+              count += 1;
+      }
+      return count;
+  }
+  function ensureImmunityStore(unit) {
+      const list = Array.isArray(unit._nguyenLeDebuffImmunities) ? unit._nguyenLeDebuffImmunities : [];
+      const store = new Set();
+      for (const id of list) {
+          if (typeof id === 'string' && id.trim())
+              store.add(id.trim().toLowerCase());
+      }
+      unit._nguyenLeDebuffImmunities = [...store];
+      return store;
+  }
+  function grantRandomDebuffImmunity(game, unit) {
+      const store = ensureImmunityStore(unit);
+      const options = IMMUNITY_POOL.filter((id) => !store.has(id));
+      const pickPool = options.length > 0 ? options : [...IMMUNITY_POOL];
+      if (pickPool.length <= 0)
+          return;
+      const roll = nextRngValue(game.rng);
+      const idx = Math.max(0, Math.floor(roll * pickPool.length)) % pickPool.length;
+      const picked = pickPool[idx] ?? pickPool[0];
+      if (!picked)
+          return;
+      store.add(picked);
+      unit._nguyenLeDebuffImmunities = [...store];
+  }
+  function resetKillPassive(unit) {
+      const atkBonus = Math.max(0, toFiniteNumber(unit._nguyenLeAtkBonus, 0));
+      const wilBonus = Math.max(0, toFiniteNumber(unit._nguyenLeWilBonus, 0));
+      if (atkBonus > 0) {
+          unit.atk = Math.max(0, Math.floor(toFiniteNumber(unit.atk, 0) - atkBonus));
+      }
+      if (wilBonus > 0) {
+          unit.wil = Math.max(0, Math.floor(toFiniteNumber(unit.wil, 0) - wilBonus));
+      }
+      unit._nguyenLeKillStacks = 0;
+      unit._nguyenLeAtkBonus = 0;
+      unit._nguyenLeWilBonus = 0;
+      unit._nguyenLeDebuffImmunities = [];
+  }
+  const nguyenLeRuntimeHook = {
+      onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
+          if (caster.id !== NGUYEN_LE_ID)
+              return null;
+          const enemySide = caster.side === 'ally' ? 'enemy' : 'ally';
+          if (skillKey === 'skill2') {
+              const rows = [
+                  [1, 2, 3],
+                  [4, 5, 6],
+                  [7, 8, 9],
+              ];
+              let chosen = rows[0];
+              let chosenCount = -1;
+              for (const row of rows) {
+                  const count = countAliveInRow(game, enemySide, row);
+                  if (count > chosenCount) {
+                      chosen = row;
+                      chosenCount = count;
+                  }
+              }
+              if (chosenCount <= 0) {
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
+              }
+              const cost = Math.max(0, Math.min(21, chosenCount * 7));
+              if (!globalAetherPool.consume(caster.side, cost)) {
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
+              }
+              const base = Math.max(1, Math.floor(readAtkWilPower(caster) * 1.5));
+              let hits = 0;
+              for (const slot of chosen) {
+                  const target = findUnitAtSlot(game, enemySide, slot);
+                  if (!target)
+                      continue;
+                  dealAbilityDamage(game, caster, target, {
+                      base,
+                      dtype: 'mixed',
+                      attackType: 'skill',
+                      skill,
+                      isAoE: true,
+                  });
+                  hits += 1;
+              }
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, hits);
+          }
+          if (skillKey === 'skill3') {
+              if (!globalAetherPool.consume(caster.side, 20)) {
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
+              }
+              Statuses.add(caster, {
+                  id: 'nguyen_le_skill3_atk_up',
+                  kind: 'buff',
+                  tag: 'stat',
+                  attr: 'atk',
+                  mode: 'percent',
+                  amount: 0.5,
+                  dur: 2,
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+              Statuses.add(caster, {
+                  id: 'nguyen_le_skill3_wil_up',
+                  kind: 'buff',
+                  tag: 'stat',
+                  attr: 'wil',
+                  mode: 'percent',
+                  amount: 0.5,
+                  dur: 2,
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+              if (typeof caster._recalcStats === 'function') {
+                  caster._recalcStats();
+              }
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
+          }
+          return null;
+      },
+      onDamageResolved({ target }) {
+          const unit = target;
+          if (!unit || !unit.alive || unit.id !== NGUYEN_LE_ID)
+              return;
+          const damageTaken = Math.max(0, toFiniteNumber(unit._lastDamageTaken, 0));
+          const hpMax = Math.max(0, toFiniteNumber(unit.hpMax, 0));
+          if (hpMax <= 0 || damageTaken <= hpMax * 0.2)
+              return;
+          const serial = Math.max(0, Math.floor(toFiniteNumber(unit._lastDamageTakenSerial, 0)));
+          const turnStamp = Math.max(1, Math.floor(toFiniteNumber(unit._lastDamageTakenTurn, 1)));
+          if (unit._nguyenLeSkill1LastDamageSerial === serial && unit._nguyenLeSkill1LastDamageTurn === turnStamp)
+              return;
+          if (!globalAetherPool.consume(unit.side, 10))
+              return;
+          const heal = Math.max(1, Math.floor(readAtkWilPower(unit) * 0.5));
+          unit.hp = Math.min(hpMax, Math.max(0, toFiniteNumber(unit.hp, 0)) + heal);
+          unit._nguyenLeSkill1LastDamageSerial = serial;
+          unit._nguyenLeSkill1LastDamageTurn = turnStamp;
+      },
+      onUnitDeath({ deadUnit, killer, game }) {
+          if (killer && killer.id === NGUYEN_LE_ID) {
+              const unit = killer;
+              const stacks = Math.max(0, Math.floor(toFiniteNumber(unit._nguyenLeKillStacks, 0)));
+              const atkNow = Math.max(0, toFiniteNumber(unit.atk, 0));
+              const wilNow = Math.max(0, toFiniteNumber(unit.wil, 0));
+              const atkGain = Math.max(0, Math.floor(atkNow * 0.05));
+              const wilGain = Math.max(0, Math.floor(wilNow * 0.05));
+              unit.atk = Math.max(0, Math.floor(atkNow + atkGain));
+              unit.wil = Math.max(0, Math.floor(wilNow + wilGain));
+              unit._nguyenLeKillStacks = stacks + 1;
+              unit._nguyenLeAtkBonus = Math.max(0, toFiniteNumber(unit._nguyenLeAtkBonus, 0) + atkGain);
+              unit._nguyenLeWilBonus = Math.max(0, toFiniteNumber(unit._nguyenLeWilBonus, 0) + wilGain);
+              grantRandomDebuffImmunity(game, unit);
+          }
+          if (deadUnit.id === NGUYEN_LE_ID) {
+              resetKillPassive(deadUnit);
+          }
+      },
+      onUnitRevive({ unit }) {
+          if (unit.id !== NGUYEN_LE_ID)
+              return;
+          resetKillPassive(unit);
+      },
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'nguyenLeRuntimeHook')) exports.nguyenLeRuntimeHook = nguyenLeRuntimeHook;
+};
 __modules['./combat/runtime-hooks/registry.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/runtime-hooks/mong-yem.ts');
   const mongYemRuntimeHook = __dep0.mongYemRuntimeHook;
   const __dep1 = __require('./combat/runtime-hooks/ly-thanh-thu.ts');
   const lyThanhThuRuntimeHook = __dep1.lyThanhThuRuntimeHook;
+  const __dep2 = __require('./combat/runtime-hooks/nguyen-le.ts');
+  const nguyenLeRuntimeHook = __dep2.nguyenLeRuntimeHook;
   const UNIT_RUNTIME_HOOKS = Object.freeze({
       mong_yem: mongYemRuntimeHook,
       ly_thanh_thu: lyThanhThuRuntimeHook,
+      nguyen_le: nguyenLeRuntimeHook,
   });
   function getUnitRuntimeHook(unitId) {
       if (!unitId)
@@ -14427,6 +14713,93 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildAICreepDeckFromLineup')) exports.buildAICreepDeckFromLineup = buildAICreepDeckFromLineup;
 };
+__modules['./modes/pve/ly-thanh-thu-runtime.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat.ts');
+  const dealAbilityDamage = __dep0.dealAbilityDamage;
+  const healUnit = __dep0.healUnit;
+  const __dep1 = __require('./combat/board-position-utils.ts');
+  const isLeaderToken = __dep1.isLeaderToken;
+  const toFiniteOrZero = (value) => {
+      const parsed = typeof value === 'number' ? value : Number(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+  };
+  function performLyThanhThuUltRuntime(ctx) {
+      const { game, unit, extendBusy } = ctx;
+      if (!game || !unit || unit.id !== 'ly_thanh_thu')
+          return false;
+      const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
+      const enemyLeader = (game.tokens || []).find((token) => (token.alive
+          && token.side === foeSide
+          && isLeaderToken(token))) ?? null;
+      if (!enemyLeader) {
+          return false;
+      }
+      const basePower = Math.max(0, Math.floor((toFiniteOrZero(unit.atk) || 0) + (toFiniteOrZero(unit.wil) || 0)));
+      const base = Math.max(1, Math.floor(basePower * 2));
+      const dealtResult = dealAbilityDamage(game, unit, enemyLeader, {
+          base,
+          dtype: 'mixed',
+          attackType: 'skill',
+      });
+      const overThreshold = dealtResult.dealt > Math.max(0, Math.floor((toFiniteOrZero(enemyLeader.hpMax) ?? 0) * 0.2));
+      if (overThreshold) {
+          const heal = Math.max(1, Math.floor((toFiniteOrZero(unit.hpMax) ?? 0) * 0.1));
+          healUnit(unit, heal);
+      }
+      extendBusy(900);
+      return true;
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'performLyThanhThuUltRuntime')) exports.performLyThanhThuUltRuntime = performLyThanhThuUltRuntime;
+};
+__modules['./modes/pve/nguyen-le-runtime.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat.ts');
+  const dealAbilityDamage = __dep0.dealAbilityDamage;
+  const __dep1 = __require('./engine.ts');
+  const slotToCell = __dep1.slotToCell;
+  const TARGET_PATTERN = [1, 2, 3, 5, 8];
+  const toFiniteOrZero = (value) => {
+      const parsed = typeof value === 'number' ? value : Number(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+  };
+  function findUnitAtSlot(game, side, slot) {
+      const { cx, cy } = slotToCell(side, slot);
+      for (const token of game.tokens) {
+          if (!token.alive || token.side !== side)
+              continue;
+          if (token.cx === cx && token.cy === cy)
+              return token;
+      }
+      return null;
+  }
+  function performNguyenLeUltRuntime(ctx) {
+      const { game, unit, ultSkill, extendBusy } = ctx;
+      if (!game || !unit || unit.id !== 'nguyen_le')
+          return false;
+      const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
+      const base = Math.max(1, Math.floor((toFiniteOrZero(unit.atk) + toFiniteOrZero(unit.wil)) * 2));
+      let hits = 0;
+      for (const slot of TARGET_PATTERN) {
+          const target = findUnitAtSlot(game, foeSide, slot);
+          if (!target)
+              continue;
+          dealAbilityDamage(game, unit, target, {
+              base,
+              dtype: 'mixed',
+              attackType: 'skill',
+              skill: ultSkill,
+              isAoE: true,
+          });
+          hits += 1;
+      }
+      if (hits <= 0)
+          return false;
+      extendBusy(1100);
+      return true;
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'performNguyenLeUltRuntime')) exports.performNguyenLeUltRuntime = performNguyenLeUltRuntime;
+};
 __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime-impl.ts
   const __dep2 = __require('./aether.ts');
@@ -14522,29 +14895,27 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const normalizeTagList = __dep23.normalizeTagList;
   const __dep24 = __require('./combat/tag-dispatch.ts');
   const dispatchGameplayTags = __dep24.dispatchGameplayTags;
-  const __dep25 = __require('./combat/board-position-utils.ts');
-  const isLeaderToken = __dep25.isLeaderToken;
-  const __dep26 = __require('./modes/pve/session-state.ts');
-  const normalizeConfig = __dep26.normalizeConfig;
-  const createSession = __dep26.createSession;
-  const invalidateSceneCache = __dep26.invalidateSceneCache;
-  const ensureSceneCache = __dep26.ensureSceneCache;
-  const clearBackgroundSignatureCache = __dep26.clearBackgroundSignatureCache;
-  const normalizeDeckEntries = __dep26.normalizeDeckEntries;
-  const getPreferredDeckInput = __dep26.getPreferredDeckInput;
-  const resolveEnemyUnits = __dep26.resolveEnemyUnits;
-  const __dep27 = __require('./modes/pve/collection-mapper.ts');
-  const mapUnitProgressById = __dep27.mapUnitProgressById;
-  const __dep28 = __require('./modes/pve/unit-runtime-hooks.ts');
-  const runPveRuntimeUltHook = __dep28.runPveRuntimeUltHook;
-  const __dep29 = __require('./leader-uyen.ts');
-  const ensureUyenState = __dep29.ensureUyenState;
-  const getUyenUltChoice = __dep29.getUyenUltChoice;
-  const grantUyenSummonRage = __dep29.grantUyenSummonRage;
-  const canCastLeaderUltChoice = __dep29.canCastLeaderUltChoice;
-  const isAnyLeaderUltReady = __dep29.isAnyLeaderUltReady;
-  const isUyenLeader = __dep29.isUyenLeader;
-  const queueUyenUltCast = __dep29.queueUyenUltCast;
+  const __dep25 = __require('./modes/pve/session-state.ts');
+  const normalizeConfig = __dep25.normalizeConfig;
+  const createSession = __dep25.createSession;
+  const invalidateSceneCache = __dep25.invalidateSceneCache;
+  const ensureSceneCache = __dep25.ensureSceneCache;
+  const clearBackgroundSignatureCache = __dep25.clearBackgroundSignatureCache;
+  const normalizeDeckEntries = __dep25.normalizeDeckEntries;
+  const getPreferredDeckInput = __dep25.getPreferredDeckInput;
+  const resolveEnemyUnits = __dep25.resolveEnemyUnits;
+  const __dep26 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep26.mapUnitProgressById;
+  const __dep27 = __require('./modes/pve/unit-runtime-hooks.ts');
+  const runPveRuntimeUltHook = __dep27.runPveRuntimeUltHook;
+  const __dep28 = __require('./leader-uyen.ts');
+  const ensureUyenState = __dep28.ensureUyenState;
+  const getUyenUltChoice = __dep28.getUyenUltChoice;
+  const grantUyenSummonRage = __dep28.grantUyenSummonRage;
+  const canCastLeaderUltChoice = __dep28.canCastLeaderUltChoice;
+  const isAnyLeaderUltReady = __dep28.isAnyLeaderUltReady;
+  const isUyenLeader = __dep28.isUyenLeader;
+  const queueUyenUltCast = __dep28.queueUyenUltCast;
   const ULT_TAG_CACHE = new WeakMap();
   const getNormalizedUltTags = (ult) => {
       const cached = ULT_TAG_CACHE.get(ult);
@@ -16027,30 +16398,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return;
       }
       const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
-      if (unit.id === 'ly_thanh_thu') {
-          const enemyLeader = (game.tokens || []).find((token) => (token.alive
-              && token.side === foeSide
-              && isLeaderToken(token))) ?? null;
-          if (!enemyLeader) {
-              spendFury(unit, resolveUltCost(unit));
-              return;
-          }
-          const basePower = Math.max(0, Math.floor((parseFiniteNumber(unit.atk) ?? 0) + (parseFiniteNumber(unit.wil) ?? 0)));
-          const base = Math.max(1, Math.floor(basePower * 2));
-          const dealtResult = dealAbilityDamage(game, unit, enemyLeader, {
-              base,
-              dtype: 'mixed',
-              attackType: 'skill',
-          });
-          const overThreshold = dealtResult.dealt > Math.max(0, Math.floor((parseFiniteNumber(enemyLeader.hpMax) ?? 0) * 0.2));
-          if (overThreshold) {
-              const heal = Math.max(1, Math.floor((parseFiniteNumber(unit.hpMax) ?? 0) * 0.1));
-              healUnit(unit, heal);
-          }
-          extendBusy(900);
-          spendFury(unit, resolveUltCost(unit));
-          return;
-      }
       if (runPveRuntimeUltHook({
           game,
           unit,
@@ -19555,9 +19902,19 @@ __modules['./modes/pve/session.ts'] = (exports, module, __require) => {
 __modules['./modes/pve/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./modes/pve/chap-minh-runtime.ts');
   const performChapMinhUltRuntime = __dep0.performChapMinhUltRuntime;
+  const __dep1 = __require('./modes/pve/ly-thanh-thu-runtime.ts');
+  const performLyThanhThuUltRuntime = __dep1.performLyThanhThuUltRuntime;
+  const __dep2 = __require('./modes/pve/nguyen-le-runtime.ts');
+  const performNguyenLeUltRuntime = __dep2.performNguyenLeUltRuntime;
   const PVE_UNIT_RUNTIME_HOOKS = Object.freeze({
       huyen_vu_chap_minh: {
           onUlt: performChapMinhUltRuntime,
+      },
+      ly_thanh_thu: {
+          onUlt: performLyThanhThuUltRuntime,
+      },
+      nguyen_le: {
+          onUlt: performNguyenLeUltRuntime,
       },
   });
   function runPveRuntimeUltHook(ctx) {
@@ -35665,10 +36022,29 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
           return { id: 'haste', kind: 'buff', tag: 'stat', power: pct, dur: turns, tick: 'turn' };
       },
   };
+  const hasDebuffImmunity = (unit, statusId) => {
+      const carrier = unit;
+      const list = carrier._nguyenLeDebuffImmunities;
+      if (!Array.isArray(list) || list.length <= 0)
+          return false;
+      const id = String(statusId || '').trim().toLowerCase();
+      if (!id)
+          return false;
+      for (const entry of list) {
+          if (typeof entry !== 'string')
+              continue;
+          if (entry.trim().toLowerCase() === id)
+              return true;
+      }
+      return false;
+  };
   const Statuses = {
       add(unit, status) {
           const isBlockedByDivineAxiom = status.kind === 'buff' || status.kind === 'debuff' || status.kind === 'mark';
           if (isBlockedByDivineAxiom && hasDivineNatureTag(unit)) {
+              return status;
+          }
+          if (status.kind === 'debuff' && hasDebuffImmunity(unit, status.id)) {
               return status;
           }
           const list = ensureStatusList(unit);

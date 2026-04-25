@@ -419,7 +419,7 @@ ultimate: xoá 2 debuff (không xoá mark)ngẫu nhiên trên người đồng m
 ssr
 nội tại: hồi hp = 3% max hp của bản thân mỗi lần nhận sát thương vượt quá 5% max hp. sau đó tăng 10% res và arm so với hiện tại tính từ lúc nhận sát thương, cộng dồn tối đa 3 lần. ví dụ char này có 100 hp, 5 res cùng arm thì sau khi bị nhận sát thương vượt hoặc = 5% max hp thì hp và res/arm là 98%/100% max hp, 5,5 res/arm, sau lần 2 nhận sát thương vượt 5% mx hp thì hp là 96/100% max hp, 5,5 +10% res cùng arm, lần 3 thì 94/100% max hp + (5,5 +10%) + 10%, đương nhiên sát thương không thể lúc nào cũng bằng 5% max hp của char này được, đương nhiên sẽ có lúc nhận sát thương hơn 5% max hp, tao ví dụ sát thương nhận là 5% cho dễ ví dụ.
 
-37)
+37) Lý Thanh Thu
 Ur, Warrior. 
 nội tại: với mỗi đơn vị đồng minh lẫn enemy chết (không tính đơn vị triệu hồi bởi summoner) nhân vật này được + 10% wil/atk/mỗi đơn vị chết, giới hạn số lần kích hoạt trong 1 turn là 3, stack tối đa 25 lần trong trận (reset bộ đếm khi chết rồi được hồi sinh). khi nhân vật này tử vong, chuyển 50% số atk và wil có được từ nội tại này cho leader (leader đồng minh với char này), khi được hồi sinh, số stack từ nội tại này sẽ về 0. cộng wil/atk tính từ lúc kích hoạt nội tại, chỉ số của char này lúc đó bao nhiêu thì cứ + 10% wil/atk của lúc đó.
 hồi hp = 20% max hp (không tăng max hp) mỗi khi đạt 5 stack từ nội tại. skill/Nội tại/ult của char này đều là Pháp tắc.

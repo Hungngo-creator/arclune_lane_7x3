@@ -553,6 +553,19 @@ export function dealAbilityDamage(
     hookOnLethalDamage(target);
     emitOnDeathPassive(target);
   }
+  {
+    const targetCarrier = target as UnitToken & {
+      _lastDamageTaken?: number;
+      _lastDamageTakenTurn?: number;
+      _lastDamageTakenSerial?: number;
+    };
+    const runtimeRoot = Game ? (Game.runtime ??= {}) : {};
+    const damageSerial = Math.max(0, Math.floor(Number((runtimeRoot as { _damageEventSerial?: unknown })._damageEventSerial ?? 0))) + 1;
+    (runtimeRoot as { _damageEventSerial?: number })._damageEventSerial = damageSerial;
+    targetCarrier._lastDamageTaken = dealtTotal;
+    targetCarrier._lastDamageTakenSerial = damageSerial;
+    targetCarrier._lastDamageTakenTurn = Number((Game?.turn as { turnCount?: unknown } | null | undefined)?.turnCount ?? 0);
+  }
   runRuntimeDamageResolved(target);
   applyChapMinhPhaseShift(target);
 
@@ -568,7 +581,7 @@ export function dealAbilityDamage(
 
   const sessionVfx = asSessionWithVfx(Game);
 
-  if (sessionVfx) {
+  if (sessionVfx != null) {
     try {
       const hasAdvantage = (finalDamage.breakdown.classBonus + finalDamage.breakdown.elementBonus + finalDamage.breakdown.synergyBonus) > 0;
       vfxAddHit(sessionVfx, target, { isCrit: !!opts.isCrit, advantage: hasAdvantage });
@@ -640,7 +653,8 @@ export function dealAbilityDamage(
     summary: buildDamageSummary(metadataBase),
   };
   const previous = attackerCarrier._lastDamageContext;
-  if (!previous || snapshot.finalDamage >= previous.finalDamage) {
+  const previousFinalDamage = previous?.finalDamage ?? Number.NEGATIVE_INFINITY;
+  if (snapshot.finalDamage >= previousFinalDamage) {
     attackerCarrier._lastDamageContext = snapshot;
     attackerCarrier._lastCounterBreakdown = { ...finalDamage.breakdown };
     attackerCarrier._lastDamageSummary = snapshot.summary;
@@ -731,7 +745,7 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
     const meleeDur = GAME_CONFIG.ANIMATION?.meleeDurationMs ?? 2000;
     const meleeStartMs = sessionNow();
     let meleeTriggered = false;
-    if (sessionVfx) {
+    if (sessionVfx != null) {
       try {
         vfxAddMelee(sessionVfx, unit, resolved, { dur: meleeDur });
         meleeTriggered = true;
@@ -758,7 +772,7 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
     attackType: 'basic',
   });
 
-  if (sessionVfx) {
+  if (sessionVfx != null) {
     try {
       vfxAddHit(sessionVfx, resolved);
     } catch {

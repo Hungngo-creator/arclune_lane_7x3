@@ -248,10 +248,26 @@ const statusFactories = {
   },
 } satisfies StatusRegistry;
 
+const hasDebuffImmunity = (unit: UnitToken, statusId: string): boolean => {
+  const carrier = unit as UnitToken & { _nguyenLeDebuffImmunities?: unknown };
+  const list = carrier._nguyenLeDebuffImmunities;
+  if (!Array.isArray(list) || list.length <= 0) return false;
+  const id = String(statusId || '').trim().toLowerCase();
+  if (!id) return false;
+  for (const entry of list) {
+    if (typeof entry !== 'string') continue;
+    if (entry.trim().toLowerCase() === id) return true;
+  }
+  return false;
+};
+
 export const Statuses: StatusService = {
   add(unit, status) {
     const isBlockedByDivineAxiom = status.kind === 'buff' || status.kind === 'debuff' || status.kind === 'mark';
     if (isBlockedByDivineAxiom && hasDivineNatureTag(unit)) {
+      return status;
+    }
+    if (status.kind === 'debuff' && hasDebuffImmunity(unit, status.id)) {
       return status;
     }
     const list = ensureStatusList(unit);

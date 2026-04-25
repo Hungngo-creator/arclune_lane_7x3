@@ -1710,6 +1710,81 @@ export const ROSTER = [
     }
   },
   {
+    id: 'nguyen_le', name: 'Nguyên Lễ', class: 'Warrior', rank: 'UR',
+    mods: { ATK: 0.14, WIL: 0.14, PER: 0.04 },
+    kit: {
+      onSpawn: createOnSpawn(),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target'],
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Bất Khuất Hoàn Sinh',
+          tags: ['passive', 'self', 'heal', 'rule'],
+          trigger: {
+            onDamageTakenPercentMaxHpOver: 0.2,
+            aetherCost: 10,
+            healPowerRatioAtkWil: 0.5,
+          },
+          notes: 'Tự động: khi nhận một hit vượt 20% Max HP, tiêu hao 10 Aether để hồi HP bằng 50% (ATK + WIL). Nếu Aether không đủ thì không kích hoạt.'
+        },
+        {
+          key: 'skill2',
+          name: 'Hoành Kiếm Đoạn Trận',
+          tags: ['active', 'aoe', 'rule'],
+          targeting: { rows: [[1, 2, 3], [4, 5, 6], [7, 8, 9]], pickMostOccupied: true },
+          cost: { aether: 0 },
+          variableCost: { aetherPerEnemyHit: 7, maxAether: 21 },
+          damageMultiplier: 1.5,
+          notes: 'Chém ngang vào hàng có nhiều địch nhất, mỗi mục tiêu trúng chịu 150% sát thương đánh thường. Cost biến thiên 7 Aether/mục tiêu trúng (tối đa 21).'
+        },
+        {
+          key: 'skill3',
+          name: 'Khai Mệnh Kiếm Tâm',
+          tags: ['active', 'self', 'buff', 'rule'],
+          cost: { aether: 20 },
+          buffStats: { ATK: 0.5, WIL: 0.5 },
+          duration: 2,
+          notes: 'Tăng 50% ATK và 50% WIL trong 2 lượt.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        name: 'Tận Kiếp Trảm',
+        tags: ['active', 'aoe', 'rule'],
+        targetPattern: [1, 2, 3, 5, 8],
+        damageMultiplier: 2.0,
+        notes: 'Gây 2 đòn đánh thường lên các ô hình chữ T phía địch: 1/2/3/5/8.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Sát Ý Tích Mệnh',
+        onKill: {
+          gainRandomDebuffImmunityFrom: ['poison', 'stun', 'sleep', 'bleed', 'fatigue'],
+          gainStatsFromCurrent: { ATK: 0.05, WIL: 0.05 },
+          resetOnDeath: true,
+        },
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'nguyen_le_kill_scaling',
+          name: 'Sát Ý Tích Mệnh',
+          when: 'onEnemyDeath',
+          effect: 'gainKillScalingAndDebuffImmunity',
+          params: {
+            statGainFromCurrent: { ATK: 0.05, WIL: 0.05 },
+            immunityPool: ['poison', 'stun', 'sleep', 'bleed', 'fatigue'],
+            resetOnDeath: true,
+          },
+        },
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'rule-domain', text: 'Nội tại và kỹ năng mang miền Quy Tắc theo mô tả thiết kế.' },
+      ]),
+    }
+  },
+  {
     id: 'laky', name: 'La Kỳ', class: 'Support', rank: 'SSR',
     mods: { WIL: 0.10, PER: 0.10 },
     kit: {
