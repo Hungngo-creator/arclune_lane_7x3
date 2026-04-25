@@ -15142,22 +15142,18 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   };
   const getUltTargetCount = (ult, fallback) => {
       const runtime = ult?.runtime;
-      return resolveCount([
-          ult?.targets,
-          runtime?.targets,
-          runtime?.targetCount,
-          runtime?.count,
-      ], fallback, { min: 0 });
+      return resolveUltScopedCount(ult?.targets, runtime, fallback);
   };
   const getUltAlliesCount = (ult, fallback) => {
       const runtime = ult?.runtime;
-      return resolveCount([
-          ult?.allies,
-          runtime?.targets,
-          runtime?.targetCount,
-          runtime?.count,
-      ], fallback, { min: 0 });
+      return resolveUltScopedCount(ult?.allies, runtime, fallback);
   };
+  const resolveUltScopedCount = (primary, runtime, fallback) => resolveCount([
+      primary,
+      runtime?.targets,
+      runtime?.targetCount,
+      runtime?.count,
+  ], fallback, { min: 0 });
   const getUltDurationTurns = (ult, fallback) => {
       const runtime = ult?.runtime;
       const resolved = resolveCount([
@@ -15559,17 +15555,34 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const statusIconHitboxes = [];
   let statusIconHoverTooltip = '';
   let canvasMouseMoveHandler = null;
-  const getRequestAnimationFrame = () => {
-      if (winRef && typeof winRef.requestAnimationFrame === 'function') {
-          return winRef.requestAnimationFrame.bind(winRef);
+  let cachedRafWindowRef = null;
+  let cachedRafFn = null;
+  let cachedCancelRafFn = null;
+  const refreshAnimationFrameFns = () => {
+      const win = winRef;
+      if (win === cachedRafWindowRef)
+          return;
+      cachedRafWindowRef = win;
+      if (win && typeof win.requestAnimationFrame === 'function') {
+          cachedRafFn = win.requestAnimationFrame.bind(win);
       }
-      return typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null;
+      else {
+          cachedRafFn = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null;
+      }
+      if (win && typeof win.cancelAnimationFrame === 'function') {
+          cachedCancelRafFn = win.cancelAnimationFrame.bind(win);
+      }
+      else {
+          cachedCancelRafFn = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null;
+      }
+  };
+  const getRequestAnimationFrame = () => {
+      refreshAnimationFrameFns();
+      return cachedRafFn;
   };
   const getCancelAnimationFrame = () => {
-      if (winRef && typeof winRef.cancelAnimationFrame === 'function') {
-          return winRef.cancelAnimationFrame.bind(winRef);
-      }
-      return typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null;
+      refreshAnimationFrameFns();
+      return cachedCancelRafFn;
   };
   const makeMeleeTokenKey = (token) => {
       if (Number.isFinite(token?.iid)) {
@@ -18647,6 +18660,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           docRef = typeof document !== 'undefined' ? document : null;
       }
       winRef = docRef?.defaultView ?? (typeof window !== 'undefined' ? window : null);
+      refreshAnimationFrameFns();
       resolveTimerElement();
   }
   function clearSessionTimers() {

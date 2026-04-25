@@ -467,12 +467,7 @@ const getUltTargetCount = (
   fallback: number,
 ): number => {
   const runtime = ult?.runtime;
-  return resolveCount([
-    ult?.targets,
-    runtime?.targets,
-    runtime?.targetCount,
-    runtime?.count,
-  ], fallback, { min: 0 });
+  return resolveUltScopedCount(ult?.targets, runtime, fallback);
 };
 
 const getUltAlliesCount = (
@@ -480,13 +475,19 @@ const getUltAlliesCount = (
   fallback: number,
 ): number => {
   const runtime = ult?.runtime;
-  return resolveCount([
-    ult?.allies,
-    runtime?.targets,
-    runtime?.targetCount,
-    runtime?.count,
-  ], fallback, { min: 0 });
+  return resolveUltScopedCount(ult?.allies, runtime, fallback);
 };
+
+const resolveUltScopedCount = (
+  primary: unknown,
+  runtime: SkillRuntime | null | undefined,
+  fallback: number,
+): number => resolveCount([
+  primary,
+  runtime?.targets,
+  runtime?.targetCount,
+  runtime?.count,
+], fallback, { min: 0 });
 
 const getUltDurationTurns = (
   ult: UltSpec | null | undefined,
@@ -1014,18 +1015,34 @@ let canvasMouseMoveHandler: ((event: MouseEvent) => void) | null = null;
 type RequestAnimationFrameFn = (callback: FrameRequestCallback) => number;
 type CancelAnimationFrameFn = (handle: number) => void;
 
-const getRequestAnimationFrame = (): RequestAnimationFrameFn | null => {
-  if (winRef && typeof winRef.requestAnimationFrame === 'function'){
-    return winRef.requestAnimationFrame.bind(winRef);
+let cachedRafWindowRef: (Window & typeof globalThis) | null = null;
+let cachedRafFn: RequestAnimationFrameFn | null = null;
+let cachedCancelRafFn: CancelAnimationFrameFn | null = null;
+
+const refreshAnimationFrameFns = (): void => {
+  const win = winRef;
+  if (win === cachedRafWindowRef) return;
+  cachedRafWindowRef = win;
+  if (win && typeof win.requestAnimationFrame === 'function'){
+    cachedRafFn = win.requestAnimationFrame.bind(win);
+  } else {
+    cachedRafFn = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null;
   }
-  return typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null;
+  if (win && typeof win.cancelAnimationFrame === 'function'){
+    cachedCancelRafFn = win.cancelAnimationFrame.bind(win);
+  } else {
+    cachedCancelRafFn = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null;
+  }
+};
+
+const getRequestAnimationFrame = (): RequestAnimationFrameFn | null => {
+  refreshAnimationFrameFns();
+  return cachedRafFn;
 };
 
 const getCancelAnimationFrame = (): CancelAnimationFrameFn | null => {
-  if (winRef && typeof winRef.cancelAnimationFrame === 'function'){
-    return winRef.cancelAnimationFrame.bind(winRef);
-  }
-  return typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null;
+  refreshAnimationFrameFns();
+  return cachedCancelRafFn;
 };
 
 const makeMeleeTokenKey = (token: Partial<UnitToken> | null | undefined): string | null => {
@@ -4142,7 +4159,8 @@ function configureRoot(root: RootLike): void {
     docRef = typeof document !== 'undefined' ? document : null;
   }
   winRef = docRef?.defaultView ?? (typeof window !== 'undefined' ? window : null);
- resolveTimerElement();
+ refreshAnimationFrameFns();
+  resolveTimerElement();
 }
 
 function clearSessionTimers(): void {
