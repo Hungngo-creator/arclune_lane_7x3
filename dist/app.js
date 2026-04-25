@@ -15425,6 +15425,21 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const CLOCK_DRIFT_TOLERANCE_MS = RAF_DRIFT_TOLERANCE_MS;
   const LOGIC_MIN_INTERVAL_MS = 40;
   const MAX_TURNS_PER_TICK = 6;
+  const resolveConfiguredTurnIntervalMs = () => {
+      const intervalCandidate = CFG?.ANIMATION?.turnIntervalMs;
+      const parsedInterval = Number(intervalCandidate);
+      return Number.isFinite(parsedInterval) && parsedInterval > 0
+          ? parsedInterval
+          : 600;
+  };
+  const resolveClockTurnIntervalMs = (clock) => {
+      const current = clock.turnEveryMs;
+      if (Number.isFinite(current) && current > 0)
+          return current;
+      const fallback = resolveConfiguredTurnIntervalMs();
+      clock.turnEveryMs = fallback;
+      return fallback;
+  };
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
   let _BORN = 1;
@@ -15937,11 +15952,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   function createClock() {
       const safe = safeNow();
       const now = getNow();
-      const intervalCandidate = CFG?.ANIMATION?.turnIntervalMs;
-      const parsedInterval = Number(intervalCandidate);
-      const turnEveryMs = Number.isFinite(parsedInterval) && parsedInterval > 0
-          ? parsedInterval
-          : 600;
+      const turnEveryMs = resolveConfiguredTurnIntervalMs();
       return {
           startMs: now,
           startSafeMs: safe,
@@ -17145,12 +17156,20 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       }
   }
   function resolveAllyLeaderForControl() {
-      if (!Game || !Array.isArray(Game.tokens))
+      const tokens = Game?.tokens;
+      if (!Array.isArray(tokens))
           return null;
-      const alive = Game.tokens.find((token) => token.alive && token.side === 'ally' && isUyenLeader(token));
-      if (alive)
-          return alive;
-      return Game.tokens.find((token) => token.side === 'ally' && isUyenLeader(token)) ?? null;
+      let fallback = null;
+      for (let i = 0; i < tokens.length; i += 1) {
+          const token = tokens[i];
+          if (!token || token.side !== 'ally' || !isUyenLeader(token))
+              continue;
+          if (token.alive)
+              return token;
+          if (!fallback)
+              fallback = token;
+      }
+      return fallback;
   }
   function syncLeaderUltControls() {
       if (!leaderUltControlsEl)
@@ -17494,15 +17513,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               const previousTurnStep = Number.isFinite(CLOCK.lastTurnStepMs)
                   ? CLOCK.lastTurnStepMs
                   : null;
-              let turnEveryMs = CLOCK.turnEveryMs;
-              const cfgTurnEvery = CFG?.ANIMATION?.turnIntervalMs;
-              const parsedTurnEvery = Number(cfgTurnEvery);
-              if (!Number.isFinite(turnEveryMs) || turnEveryMs <= 0) {
-                  turnEveryMs = Number.isFinite(parsedTurnEvery) && parsedTurnEvery > 0
-                      ? parsedTurnEvery
-                      : 600;
-                  CLOCK.turnEveryMs = turnEveryMs;
-              }
+              const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
               const previousElapsedMs = Math.max(0, previousElapsedSec) * 1000;
               let sessionForRebase = sessionNowMsRaw;
               if (!Number.isFinite(sessionForRebase)) {
@@ -17699,15 +17710,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   turnState.busyUntil = busyUntil;
               }
           }
-          const cfgTurnEvery = CFG?.ANIMATION?.turnIntervalMs;
-          const defaultTurnEveryMs = Number.isFinite(cfgTurnEvery) && cfgTurnEvery && cfgTurnEvery > 0
-              ? cfgTurnEvery
-              : 600;
-          let turnEveryMs = CLOCK.turnEveryMs;
-          if (!Number.isFinite(turnEveryMs) || turnEveryMs <= 0) {
-              turnEveryMs = defaultTurnEveryMs;
-              CLOCK.turnEveryMs = turnEveryMs;
-          }
+          const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
           const stallDeltaEpsilon = 1;
           const initialTurnBaseline = Number.isFinite(CLOCK.startMs)
               ? CLOCK.startMs - turnEveryMs
@@ -17744,7 +17747,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   }
                   processCreepDeathHealing(sessionNowMs);
                   cleanupDead(sessionNowMs);
-                  const postTurnResult = checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
+                  checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
                   scheduleDraw();
                   aiMaybeAct(Game, 'board');
                   if (Game.battle?.over) {
