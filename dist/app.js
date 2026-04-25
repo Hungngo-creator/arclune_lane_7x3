@@ -15312,6 +15312,16 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return 0;
       return parseFiniteNumber(card.cost) ?? 0;
   };
+  const normalizeTurnBusyUntil = (turnState) => {
+      if (!turnState)
+          return 0;
+      const rawBusy = turnState.busyUntil;
+      const busyUntil = isFiniteNumber(rawBusy) && rawBusy > 0 ? rawBusy : 0;
+      if (!isFiniteNumber(rawBusy) || rawBusy <= 0) {
+          turnState.busyUntil = busyUntil;
+      }
+      return busyUntil;
+  };
   function sanitizeStartConfig(config) {
       if (!isPlainRecord(config)) {
           return { rest: {}, root: null };
@@ -17490,6 +17500,15 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return null;
       };
       timerElement = (queryFromRoot('#timer') || doc.getElementById('timer'));
+      const stepTurnContext = {
+          performUlt,
+          processActionChain,
+          allocIid: nextIid,
+          doActionOrSkip,
+          checkBattleEnd(gameState, info) {
+              return Boolean(checkBattleEndResult(gameState, info));
+          },
+      };
       const updateTimerAndCost = (timestamp) => {
           if (!CLOCK || !Game)
               return;
@@ -17702,14 +17721,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               return;
           }
           let turnState = Game.turn ?? null;
-          let busyUntil = 0;
-          if (turnState) {
-              const rawBusy = turnState.busyUntil;
-              busyUntil = isFiniteNumber(rawBusy) && rawBusy > 0 ? rawBusy : 0;
-              if (!isFiniteNumber(rawBusy) || rawBusy <= 0) {
-                  turnState.busyUntil = busyUntil;
-              }
-          }
+          let busyUntil = normalizeTurnBusyUntil(turnState);
           const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
           const stallDeltaEpsilon = 1;
           const initialTurnBaseline = Number.isFinite(CLOCK.startMs)
@@ -17733,15 +17745,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   CLOCK.lastTurnStepMs += turnEveryMs;
                   elapsedForTurn -= turnEveryMs;
                   turnsProcessed += 1;
-                  stepTurn(Game, {
-                      performUlt,
-                      processActionChain,
-                      allocIid: nextIid,
-                      doActionOrSkip,
-                      checkBattleEnd(gameState, info) {
-                          return Boolean(checkBattleEndResult(gameState, info));
-                      },
-                  });
+                  stepTurn(Game, stepTurnContext);
                   if (finalizeBattleIfLeaderDown(Game, 'leader-immediate', sessionNowMs)) {
                       return;
                   }
@@ -17754,16 +17758,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                       return;
                   }
                   turnState = Game.turn ?? null;
-                  if (turnState) {
-                      const rawBusyAfter = turnState.busyUntil;
-                      busyUntil = isFiniteNumber(rawBusyAfter) && rawBusyAfter > 0 ? rawBusyAfter : 0;
-                      if (!isFiniteNumber(rawBusyAfter) || rawBusyAfter <= 0) {
-                          turnState.busyUntil = busyUntil;
-                      }
-                  }
-                  else {
-                      busyUntil = 0;
-                  }
+                  busyUntil = normalizeTurnBusyUntil(turnState);
                   readyByBusy = sessionNowMs >= busyUntil;
               }
           }
@@ -17805,7 +17800,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   : LOGIC_MIN_INTERVAL_MS;
               const turnSlice = Math.max(1, Math.floor(turnMs / 4));
               const timeoutDelay = Math.max(8, Math.min(LOGIC_MIN_INTERVAL_MS, turnSlice || LOGIC_MIN_INTERVAL_MS));
-              tickLoopHandle = setTimeout(() => runTickLoop(), timeoutDelay);
+              tickLoopHandle = setTimeout(runTickLoop, timeoutDelay);
           }
       }
       updateTimerAndCost();

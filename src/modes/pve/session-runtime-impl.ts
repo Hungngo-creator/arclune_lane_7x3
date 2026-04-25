@@ -6,20 +6,16 @@ import { enqueueImmediate, processActionChain } from '../../summon';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai';
 import { Statuses, makeStatusEffect } from '../../statuses';
 import { CFG, CAM } from '../../config';
-import { UNITS } from '../../units';
-import { Meta, makeInstanceStats, initialRageFor } from '../../meta';
 import { pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat';
 import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury';
 import {
-  ROSTER, ROSTER_MAP,
-  CLASS_BASE, RANK_MULT,
-  getMetaById, isSummoner, applyRankAndMods
+  getMetaById,
 } from '../../catalog';
 import {
   makeGrid, drawGridOblique,
   drawTokensOblique, drawQueuedOblique,
-  hitToCellOblique, projectCellOblique,
-  spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved, ORDER_ENEMY,
+  hitToCellOblique,
+  spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved,
   ART_SPRITE_EVENT,
 } from '../../engine';
 import { drawEnvironmentProps } from '../../background';
@@ -61,7 +57,6 @@ import { isUniqueGlobalSummonBlocked } from '../../utils/unique-global.ts';
 import { nextRngValue } from '../../utils/rng.ts';
 import { normalizeTagList } from '../../data/tags.ts';
 import { dispatchGameplayTags } from '../../combat/tag-dispatch.ts';
-import { isLeaderToken } from '../../combat/board-position-utils.ts';
 import {
   normalizeConfig,
   createSession,
@@ -674,6 +669,18 @@ function isCardInLockedDeck(cardId: string, game: SessionState | null | undefine
 const getCardCost = (card: DeckEntry | null | undefined): number => {
   if (!card) return 0;
   return parseFiniteNumber(card.cost) ?? 0;
+};
+
+const normalizeTurnBusyUntil = (
+  turnState: SessionState['turn'] | null | undefined,
+): number => {
+  if (!turnState) return 0;
+  const rawBusy = turnState.busyUntil;
+  const busyUntil = isFiniteNumber(rawBusy) && rawBusy > 0 ? rawBusy : 0;
+  if (!isFiniteNumber(rawBusy) || rawBusy <= 0){
+    turnState.busyUntil = busyUntil;
+  }
+  return busyUntil;
 };
 
 export type PveSessionHandle = {
@@ -2917,6 +2924,16 @@ function init(): boolean {
 
     timerElement = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
 
+  const stepTurnContext = {
+    performUlt,
+    processActionChain,
+    allocIid: nextIid,
+    doActionOrSkip,
+    checkBattleEnd(gameState: CombatSessionState, info: Record<string, unknown>) {
+      return Boolean(checkBattleEndResult(gameState, info));
+    },
+  };
+
   const updateTimerAndCost = (timestamp?: number): void => {
     if (!CLOCK || !Game) return;
     if (Game.battle?.over) return;
@@ -3146,14 +3163,7 @@ function init(): boolean {
       }
 
       let turnState = Game.turn ?? null;
-      let busyUntil = 0;
-      if (turnState){
-        const rawBusy = turnState.busyUntil;
-        busyUntil = isFiniteNumber(rawBusy) && rawBusy > 0 ? rawBusy : 0;
-        if (!isFiniteNumber(rawBusy) || rawBusy <= 0){
-          turnState.busyUntil = busyUntil;
-        }
-      }
+      let busyUntil = normalizeTurnBusyUntil(turnState);
 
       const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
 
@@ -3181,15 +3191,7 @@ function init(): boolean {
           CLOCK.lastTurnStepMs += turnEveryMs;
           elapsedForTurn -= turnEveryMs;
           turnsProcessed += 1;
-          stepTurn(Game, {
-            performUlt,
-            processActionChain,
-            allocIid: nextIid,
-            doActionOrSkip,
-            checkBattleEnd(gameState, info) {
-              return Boolean(checkBattleEndResult(gameState, info));
-            },
-          });
+          stepTurn(Game, stepTurnContext);
           if (finalizeBattleIfLeaderDown(Game, 'leader-immediate', sessionNowMs)) {
             return;
           }
@@ -3202,15 +3204,7 @@ function init(): boolean {
             return;
           }
           turnState = Game.turn ?? null;
-          if (turnState){
-            const rawBusyAfter = turnState.busyUntil;
-            busyUntil = isFiniteNumber(rawBusyAfter) && rawBusyAfter > 0 ? rawBusyAfter : 0;
-            if (!isFiniteNumber(rawBusyAfter) || rawBusyAfter <= 0){
-              turnState.busyUntil = busyUntil;
-            }
-          } else {
-            busyUntil = 0;
-          }
+          busyUntil = normalizeTurnBusyUntil(turnState);
           readyByBusy = sessionNowMs >= busyUntil;
         }
       }
@@ -3248,7 +3242,7 @@ function init(): boolean {
         : LOGIC_MIN_INTERVAL_MS;
       const turnSlice = Math.max(1, Math.floor(turnMs / 4));
       const timeoutDelay = Math.max(8, Math.min(LOGIC_MIN_INTERVAL_MS, turnSlice || LOGIC_MIN_INTERVAL_MS));
-      tickLoopHandle = setTimeout(() => runTickLoop(), timeoutDelay);
+      tickLoopHandle = setTimeout(runTickLoop, timeoutDelay);
     }
   }
 
