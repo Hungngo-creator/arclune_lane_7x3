@@ -35,7 +35,6 @@ import {
 } from '../../vfx';
 import { drawBattlefieldScene } from '../../scene';
 import {
-  gameEvents,
   TURN_START,
   TURN_END,
   ACTION_START,
@@ -89,16 +88,10 @@ import type {
 } from '@shared-types/combat';
 import type {
   UnitToken,
-  ActionChainEntry,
   QueuedSummonRequest,
   Side,
 } from '@shared-types/units';
-import type { TurnSnapshot } from '@shared-types/turn-order';
 import type {
-  RewardRoll,
-  WaveState,
-  EncounterState,
-  SessionRuntimeState,
   CreateSessionOptions,
   SessionState,
   RuntimeUnitProgress,
@@ -1993,6 +1986,7 @@ function performUlt(unit: UnitToken): void {
 
   const u = coerceUlt(meta.kit?.ult);
   if (!u){ spendFury(unit, resolveUltCost(unit)); return; }
+  const ultTurnsFallback = parseFiniteNumber(u.turns) ?? 1;
 
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
   if (runPveRuntimeUltHook({
@@ -2145,7 +2139,7 @@ function performUlt(unit: UnitToken): void {
       const debuffId = typeof debuffSpec?.id === 'string' && debuffSpec.id ? debuffSpec.id : 'loithienanh_spd_burn';
       const debuffAmount = parseFiniteNumber(debuffSpec?.amount ?? debuffSpec?.amountPercent) ?? 0;
       const debuffMaxStacks = Math.max(1, Math.round(parseFiniteNumber(debuffSpec?.maxStacks) ?? 1));
-      const debuffDuration = Math.max(1, Math.round(parseFiniteNumber(debuffSpec?.turns) ?? getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1)));
+      const debuffDuration = Math.max(1, Math.round(parseFiniteNumber(debuffSpec?.turns) ?? getUltDurationTurns(u, ultTurnsFallback)));
 
       for (const tgt of selected){
         if (!tgt || !tgt.alive) continue;
@@ -2214,7 +2208,7 @@ function performUlt(unit: UnitToken): void {
 
       const reduceDmg = parseFiniteNumber(u.reduceDmg);
       if (reduceDmg && reduceDmg > 0){
-        const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
+        const turns = getUltDurationTurns(u, ultTurnsFallback);
         const damageCut = makeStatusEffect('damageCut', { pct: reduceDmg, turns });
         if (damageCut) {
           Statuses.add(unit, { ...damageCut, sourceUnitId: unit.id });
@@ -2267,7 +2261,7 @@ function performUlt(unit: UnitToken): void {
       applySelfDamageAsUltCost(maxPay);
       const reduce = Math.max(0, parseFiniteNumber(u.reduceDmg) ?? 0);
       if (reduce > 0){
-        const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
+        const turns = getUltDurationTurns(u, ultTurnsFallback);
         const damageCut = makeStatusEffect('damageCut', { pct: reduce, turns });
         if (damageCut) {
           Statuses.add(unit, { ...damageCut, sourceUnitId: unit.id });
@@ -2283,7 +2277,7 @@ function performUlt(unit: UnitToken): void {
       if (!foes.length) break;
       const take = Math.max(1, Math.min(foes.length, getUltScopedCount(u, foes.length, 'targets')));
       const nearestTargets = pickNearestAliveUnits(foes, unit, take);
-      const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
+      const turns = getUltDurationTurns(u, ultTurnsFallback);
       for (let i=0; i<nearestTargets.length; i++){
         const tgt = nearestTargets[i];
         if (!tgt) continue;
@@ -2298,9 +2292,8 @@ function performUlt(unit: UnitToken): void {
     }
 
     case 'revive': {
-      const fallen = allTokens.filter(t => t.side === unit.side && !t.alive);
+      const fallen = collectRecentlyFallenAllies(allTokens, unit.side);
       if (!fallen.length) break;
-      fallen.sort((a,b)=> (b.deadAt||0) - (a.deadAt||0));
       const take = Math.max(1, Math.min(fallen.length, getUltScopedCount(u, 1, 'targets')));
       const allies = getAliveBySide(unit.side);
       const sideLeader = allies.find((token) => isUyenLeader(token));
@@ -2368,7 +2361,7 @@ function performUlt(unit: UnitToken): void {
       const extraAllies = Math.max(0, getUltScopedCount(u, 1, 'targets') - 1);
       const allies = getAliveBySide(unit.side);
       const others = allies.filter(t => t !== unit);
-      const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
+      const turns = getUltDurationTurns(u, ultTurnsFallback);
       others.sort((a,b)=> (a.spd||0) - (b.spd||0));
       for (const ally of others){
         if (targets.size >= extraAllies + 1) break;
@@ -2394,6 +2387,22 @@ function performUlt(unit: UnitToken): void {
   spendFury(unit, resolveUltCost(unit));
 }
 const aliveTokenScratch: UnitToken[] = [];
+const fallenTokenScratch: UnitToken[] = [];
+
+const collectRecentlyFallenAllies = (
+  tokens: ReadonlyArray<UnitToken>,
+  side: Side,
+): UnitToken[] => {
+  fallenTokenScratch.length = 0;
+  for (let i = 0; i < tokens.length; i += 1) {
+    const token = tokens[i];
+    if (!token || token.side !== side || token.alive) continue;
+    fallenTokenScratch.push(token);
+  }
+  fallenTokenScratch.sort((a, b) => (b.deadAt || 0) - (a.deadAt || 0));
+  return fallenTokenScratch;
+};
+
 const getAliveTokensScratch = (): UnitToken[] => {
   aliveTokenScratch.length = 0;
   const tokens = Game?.tokens;
