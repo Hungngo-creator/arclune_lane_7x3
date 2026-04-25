@@ -176,9 +176,11 @@ function triggerSkill3Defense(game: SessionState, caster: LyThanhThuCarrier): vo
   if (stacks.length >= SKILL3_MAX_STACKS) {
     const oldest = stacks.shift();
     if (oldest) {
-      caster.arm = Math.max(0, toFiniteNumber(caster.arm, 0) - oldest.armBonus);
-      caster.res = Math.max(0, toFiniteNumber(caster.res, 0) - oldest.resBonus);
+      oldest.expiresAtTurn = turnStamp;
+      stacks.push(oldest);
     }
+    caster._lyThanhThuDefenseStacks = stacks;
+    return;
   }
 
   const armNow = Math.max(0, toFiniteNumber(caster.arm, 0));
@@ -188,7 +190,7 @@ function triggerSkill3Defense(game: SessionState, caster: LyThanhThuCarrier): vo
 
   caster.arm = Math.max(0, armNow + armBonus);
   caster.res = Math.max(0, resNow + resBonus);
-  const expiresAtTurn = turnStamp + Math.max(0, SKILL3_STACK_DURATION_TURNS - 1);
+  const expiresAtTurn = turnStamp + Math.max(0, SKILL3_STACK_DURATION_TURNS - 2);
   stacks.push({ armBonus, resBonus, expiresAtTurn });
   caster._lyThanhThuDefenseStacks = stacks;
 }
@@ -216,14 +218,16 @@ function runFlyingSwordStage(game: SessionState, caster: LyThanhThuCarrier, stag
   for (const slot of stage.slots) {
     const target = findUnitAtSlot(game, enemySide, slot);
     if (!target) continue;
-    dealAbilityDamage(game, caster, target, {
+    const dealt = dealAbilityDamage(game, caster, target, {
       base,
       dtype: 'mixed',
       attackType: stage.countsAsBasic ? 'basic' : 'skill',
       skill,
-      isAoE: true,
+    isAoE: true,
     });
-    hits += 1;
+    if (Math.max(0, toRoundedInt(dealt.dealt, 0)) > 0) {
+      hits += 1;
+    }
   }
   if (stage.parkSlot != null) {
     applyBleedAtSlot(game, enemySide, stage.parkSlot, caster.id);
