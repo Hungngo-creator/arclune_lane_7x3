@@ -1,4 +1,4 @@
-import { dealAbilityDamage } from '../../combat.ts';
+import { dealAbilityDamage, pickTarget } from '../../combat.ts';
 import { slotToCell } from '../../engine.ts';
 import { Statuses } from '../../statuses.ts';
 import { globalAetherPool } from '../../aether.ts';
@@ -67,7 +67,7 @@ function readTurnStamp(game: SessionState): number {
 }
 
 function isSummonedUnit(unit: UnitToken): boolean {
-  return !!unit.isMinion || Number.isFinite(unit.ownerIid);
+  return !!unit.isMinion || unit.ownerIid != null;
 }
 
 function findLeader(game: SessionState, side: UnitToken['side']): UnitToken | null {
@@ -230,13 +230,32 @@ function runFlyingSwordStage(game: SessionState, caster: LyThanhThuCarrier, stag
   return hits;
 }
 
+function clearDefenseStacks(unit: LyThanhThuCarrier): void {
+  const stacks = unit._lyThanhThuDefenseStacks;
+  if (!Array.isArray(stacks) || stacks.length === 0) {
+    unit._lyThanhThuDefenseStacks = [];
+    return;
+  }
+  for (const stack of stacks) {
+    unit.arm = Math.max(0, toFiniteNumber(unit.arm, 0) - Math.max(0, toFiniteNumber(stack.armBonus, 0)));
+    unit.res = Math.max(0, toFiniteNumber(unit.res, 0) - Math.max(0, toFiniteNumber(stack.resBonus, 0)));
+  }
+  unit._lyThanhThuDefenseStacks = [];
+}
+
+function clearFlyingSwords(game: SessionState, unit: UnitToken): void {
+  const runtime = getRuntimeState(game);
+  const ownerKey = String(unit.iid ?? unit.id);
+  runtime.swords = runtime.swords.filter((sword) => sword.ownerIid !== ownerKey);
+}
+
 export const lyThanhThuRuntimeHook: UnitRuntimeHook = {
   onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
     const ltt = caster as LyThanhThuCarrier;
     const enemySide: UnitToken['side'] = caster.side === 'ally' ? 'enemy' : 'ally';
 
     if (skillKey === 'skill1') {
-      const target = game.tokens.find((token) => token.alive && token.side === enemySide) ?? null;
+      const target = pickTarget(game, caster);
       if (!target) return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
       const base = Math.max(1, Math.floor(readAtkWilPower(caster) * 2.5));
       dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'basic', skill });
@@ -258,7 +277,25 @@ export const lyThanhThuRuntimeHook: UnitRuntimeHook = {
     }
 
     if (skillKey === 'skill3') {
-      return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
+      const enemyLeader = findLeader(game, enemySide);
+      if (!enemyLeader) return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
+      const leaderHpMax = Math.max(1, Math.floor(toFiniteNumber(enemyLeader.hpMax, 1)));
+      const threshold = Math.floor(leaderHpMax * 0.2);
+      const base = Math.max(1, Math.floor(readAtkWilPower(caster) * 2.0));
+      const damage = dealAbilityDamage(game, caster, enemyLeader, {
+        base,
+        dtype: 'mixed',
+        attackType: 'skill',
+        skill,
+      });
+      if (damage.dealt > threshold) {
+        const heal = Math.max(1, Math.floor(Math.max(0, toFiniteNumber(caster.hpMax, 0)) * 0.1));
+        caster.hp = Math.min(
+          Math.max(0, toFiniteNumber(caster.hpMax, 0)),
+          Math.max(0, toFiniteNumber(caster.hp, 0)) + heal,
+        );
+      }
+      return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1);
     }
 
     return null;
@@ -298,7 +335,10 @@ export const lyThanhThuRuntimeHook: UnitRuntimeHook = {
   },
   onUnitDeath({ game, deadUnit }) {
     if (deadUnit.id === LY_THANH_THU_ID) {
-      transferPassiveStatsToLeader(game, deadUnit as LyThanhThuCarrier);
+      const ltt = deadUnit as LyThanhThuCarrier;
+      transferPassiveStatsToLeader(game, ltt);
+      clearDefenseStacks(ltt);
+      clearFlyingSwords(game, ltt);
     }
     if (isSummonedUnit(deadUnit)) return;
     for (const token of game.tokens) {
@@ -308,6 +348,8 @@ export const lyThanhThuRuntimeHook: UnitRuntimeHook = {
   },
   onUnitRevive({ unit }) {
     if (unit.id !== LY_THANH_THU_ID) return;
-    resetPassive(unit as LyThanhThuCarrier);
+    const ltt = unit as LyThanhThuCarrier;
+    resetPassive(ltt);
+    clearDefenseStacks(ltt);
   },
 };

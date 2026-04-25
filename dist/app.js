@@ -6226,6 +6226,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
 __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
+  const pickTarget = __dep0.pickTarget;
   const __dep1 = __require('./engine.ts');
   const slotToCell = __dep1.slotToCell;
   const __dep2 = __require('./statuses.ts');
@@ -6264,7 +6265,7 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
       return Math.max(1, Math.floor(Number(game.turn?.cycle ?? 1)));
   }
   function isSummonedUnit(unit) {
-      return !!unit.isMinion || Number.isFinite(unit.ownerIid);
+      return !!unit.isMinion || unit.ownerIid != null;
   }
   function findLeader(game, side) {
       for (const token of game.tokens) {
@@ -6422,12 +6423,29 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
       }
       return hits;
   }
+  function clearDefenseStacks(unit) {
+      const stacks = unit._lyThanhThuDefenseStacks;
+      if (!Array.isArray(stacks) || stacks.length === 0) {
+          unit._lyThanhThuDefenseStacks = [];
+          return;
+      }
+      for (const stack of stacks) {
+          unit.arm = Math.max(0, toFiniteNumber(unit.arm, 0) - Math.max(0, toFiniteNumber(stack.armBonus, 0)));
+          unit.res = Math.max(0, toFiniteNumber(unit.res, 0) - Math.max(0, toFiniteNumber(stack.resBonus, 0)));
+      }
+      unit._lyThanhThuDefenseStacks = [];
+  }
+  function clearFlyingSwords(game, unit) {
+      const runtime = getRuntimeState(game);
+      const ownerKey = String(unit.iid ?? unit.id);
+      runtime.swords = runtime.swords.filter((sword) => sword.ownerIid !== ownerKey);
+  }
   const lyThanhThuRuntimeHook = {
       onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
           const ltt = caster;
           const enemySide = caster.side === 'ally' ? 'enemy' : 'ally';
           if (skillKey === 'skill1') {
-              const target = game.tokens.find((token) => token.alive && token.side === enemySide) ?? null;
+              const target = pickTarget(game, caster);
               if (!target)
                   return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
               const base = Math.max(1, Math.floor(readAtkWilPower(caster) * 2.5));
@@ -6448,7 +6466,23 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
               return buildSkillResult(true, skillKey, skill, tags, appliedTags, firstStageHits);
           }
           if (skillKey === 'skill3') {
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
+              const enemyLeader = findLeader(game, enemySide);
+              if (!enemyLeader)
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
+              const leaderHpMax = Math.max(1, Math.floor(toFiniteNumber(enemyLeader.hpMax, 1)));
+              const threshold = Math.floor(leaderHpMax * 0.2);
+              const base = Math.max(1, Math.floor(readAtkWilPower(caster) * 2.0));
+              const damage = dealAbilityDamage(game, caster, enemyLeader, {
+                  base,
+                  dtype: 'mixed',
+                  attackType: 'skill',
+                  skill,
+              });
+              if (damage.dealt > threshold) {
+                  const heal = Math.max(1, Math.floor(Math.max(0, toFiniteNumber(caster.hpMax, 0)) * 0.1));
+                  caster.hp = Math.min(Math.max(0, toFiniteNumber(caster.hpMax, 0)), Math.max(0, toFiniteNumber(caster.hp, 0)) + heal);
+              }
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1);
           }
           return null;
       },
@@ -6493,7 +6527,10 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
       },
       onUnitDeath({ game, deadUnit }) {
           if (deadUnit.id === LY_THANH_THU_ID) {
-              transferPassiveStatsToLeader(game, deadUnit);
+              const ltt = deadUnit;
+              transferPassiveStatsToLeader(game, ltt);
+              clearDefenseStacks(ltt);
+              clearFlyingSwords(game, ltt);
           }
           if (isSummonedUnit(deadUnit))
               return;
@@ -6506,7 +6543,9 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
       onUnitRevive({ unit }) {
           if (unit.id !== LY_THANH_THU_ID)
               return;
-          resetPassive(unit);
+          const ltt = unit;
+          resetPassive(ltt);
+          clearDefenseStacks(ltt);
       },
   };
   //# sourceMappingURL=stdin.js.map
