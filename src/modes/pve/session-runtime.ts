@@ -29,6 +29,8 @@ import {
 
 type RewardList = ReadonlyArray<RewardRoll>;
 type MutableRewardList = RewardRoll[];
+type RewardListContainer = SessionRuntimeState | EncounterState;
+type RewardListKey = 'rewardQueue' | 'pendingRewards';
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   if (!entry || typeof entry !== 'object') return false;
@@ -54,24 +56,17 @@ function normalizeRewardList(value: unknown): RewardList {
   return normalized;
 }
 
-function sanitizeRewardList<T extends SessionRuntimeState | EncounterState>(
-  container: T,
-  key: T extends SessionRuntimeState ? 'rewardQueue' : 'pendingRewards',
+function sanitizeRewardList(
+  container: RewardListContainer,
+  key: RewardListKey,
 ): MutableRewardList {
-  const source = container[key as keyof T] as unknown;
+  const store = container as unknown as Record<string, unknown>;
+  const source = store[key];
   const next: MutableRewardList = isRewardArray(source)
     ? source
     : [...normalizeRewardList(source)];
-  (container as unknown as Record<string, unknown>)[key] = next;
+  store[key] = next;
   return next;
-}
-
-function ensureRewardQueue(runtime: SessionRuntimeState): MutableRewardList {
-  return sanitizeRewardList(runtime, 'rewardQueue');
-}
-
-function ensurePendingRewards(encounter: EncounterState): MutableRewardList {
-  return sanitizeRewardList(encounter, 'pendingRewards');
 }
 
 const SMALL_REWARD_MERGE_SIZE = 6;
@@ -118,14 +113,9 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
   return mergeRewardsInPlaceIndexed(list, additions);
 }
 
-function updateRuntimeRewards(runtime: SessionRuntimeState, additions: RewardList): RewardRoll[] {
-  const queue = ensureRewardQueue(runtime);
-  return mergeRewardsInPlace(queue, additions);
-}
-
-function updateEncounterRewards(encounter: EncounterState, additions: RewardList): RewardRoll[] {
-  const pending = ensurePendingRewards(encounter);
-  return mergeRewardsInPlace(pending, additions);
+function updateRewards(container: RewardListContainer, key: RewardListKey, additions: RewardList): RewardRoll[] {
+  const target = sanitizeRewardList(container, key);
+  return mergeRewardsInPlace(target, additions);
 }
 
 function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
@@ -141,12 +131,6 @@ function removeRewardById(list: MutableRewardList, rewardId: string): MutableRew
   return list;
 }
 
-function getWaveAt(value: unknown, index: number): WaveState | null {
-  if (!Array.isArray(value)) return null;
-  const wave = value[index];
-  return wave ? (wave as WaveState) : null;
-}
-
 export function advanceSession(session: SessionState | null | undefined): EncounterState | null {
   const runtime = session?.runtime;
   if (!runtime) return null;
@@ -159,7 +143,7 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
   const waves = encounter.waves;
   const waveCount = Array.isArray(waves) ? waves.length : 0;
   const index = Math.max(0, encounter.waveIndex | 0);
-  const wave = getWaveAt(waves, index);
+  const wave = Array.isArray(waves) ? (waves[index] as WaveState | null | undefined) ?? null : null;
 
   if (!wave) {
     encounter.status = 'completed';
@@ -184,8 +168,8 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
       encounter.waveIndex = index + 1;
       const rewards = normalizeRewardList(wave.rewards);
       if (rewards.length) {
-        updateEncounterRewards(encounter, rewards);
-        updateRuntimeRewards(runtime, rewards);
+        updateRewards(encounter, 'pendingRewards', rewards);
+        updateRewards(runtime, 'rewardQueue', rewards);
       }
       break;
     }
@@ -213,10 +197,10 @@ export function applyReward(
   if (!session?.runtime) return null;
   if (!isReward(reward)) return null;
   const runtime = session.runtime;
-  removeRewardById(ensureRewardQueue(runtime), reward.id);
+  removeRewardById(sanitizeRewardList(runtime, 'rewardQueue'), reward.id);h
   const encounter = runtime.encounter;
   if (encounter) {
-    removeRewardById(ensurePendingRewards(encounter), reward.id);
+    removeRewardById(sanitizeRewardList(encounter, 'pendingRewards'), reward.id);
   }
   return reward;
 }

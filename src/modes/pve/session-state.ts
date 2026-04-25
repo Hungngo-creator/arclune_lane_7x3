@@ -145,22 +145,21 @@ function buildAutoPlayerDeckFromCollection(
   progressById: ReadonlyMap<string, RuntimeUnitProgress>,
 ): SessionState['unitsAll'] {
   if (progressById.size === 0) return [];
-  const ranked = Array.from(progressById.entries())
-    .filter(([unitId, progress]) => {
-      if (!unitId || progress?.owned === false) return false;
-      return !!lookupUnit(unitId);
-    })
-    .map(([unitId, progress]) => ({
+  const ranked: Array<{ unitId: string; score: number }> = [];
+  for (const [unitId, progress] of progressById.entries()) {
+    if (!unitId || progress?.owned === false || !lookupUnit(unitId)) continue;
+    ranked.push({
       unitId,
       score: estimateUnitStrength(unitId, progress),
-    }))
-    .sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score;
-      return a.unitId.localeCompare(b.unitId);
-    })
-    .slice(0, AUTO_PLAYER_DECK_SIZE)
-    .map((entry) => entry.unitId);
-  return normalizeDeckEntries(ranked);
+    });
+  }
+  if (!ranked.length) return [];
+  ranked.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.unitId.localeCompare(b.unitId);
+  });
+  const pickedIds = ranked.slice(0, AUTO_PLAYER_DECK_SIZE).map((entry) => entry.unitId);
+  return normalizeDeckEntries(pickedIds);
 }
 
 function normalizePositiveLimit(value: unknown, fallback: number): number {
@@ -297,7 +296,7 @@ const backgroundSignatureCache = new Map<string, BackgroundCacheEntry>();
 let camPresetSignatureCache = new WeakMap<object, string>();
 let sceneCache: SceneCacheEntry | null = null;
 
-function getCamPresetSignature(camPreset: CameraPreset | undefined): string {
+export function getCamPresetSignature(camPreset: CameraPreset | undefined): string {
   if (!camPreset || typeof camPreset !== 'object') {
     return stableStringify(camPreset ?? null);
   }
@@ -520,7 +519,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
   const autoPlayerDeck = preferredPlayerDeck.length === 0
     ? buildAutoPlayerDeckFromCollection(unitProgressById)
     : [];
-  const fallbackDeck = normalizeDeckEntries(DEFAULT_UNIT_ROSTER).slice(0, AUTO_PLAYER_DECK_SIZE);
+  const fallbackDeck = DEFAULT_UNIT_ROSTER.slice(0, AUTO_PLAYER_DECK_SIZE) as SessionState['unitsAll'];
   const lockedPlayerDeck = preferredPlayerDeck.length > 0
     ? preferredPlayerDeck
     : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackDeck.slice(0, 1));

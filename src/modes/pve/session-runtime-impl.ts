@@ -61,6 +61,7 @@ import {
   createSession,
   invalidateSceneCache,
   ensureSceneCache,
+  getCamPresetSignature,
   clearBackgroundSignatureCache,
   normalizeDeckEntries,
   getPreferredDeckInput,
@@ -803,33 +804,7 @@ function emitAetherDebug(rect: DOMRect, elapsedMs: number): void {
   aetherDebugState.lastRectLeft = rect.left;
   globalAetherPool.resetDebugSnapshot();
 }
-const getCameraPresetSignature = (preset: CameraPreset | null | undefined): string => {
-  if (!preset) return 'null';
-  const record = preset as Record<string, unknown>;
-  return Object.keys(record)
-    .sort()
-    .map((key) => {
-      const value = record[key];
-      if (typeof value === 'number') return `${key}:${Number.isFinite(value) ? value : 'NaN'}`;
-      if (typeof value === 'boolean') return `${key}:${value ? 'true' : 'false'}`;
-      if (typeof value === 'string') return `${key}:"${value}"`;
-      if (value === null) return `${key}:null`;
-      if (typeof value === 'undefined') return `${key}:undefined`;
-      return `${key}:${String(value)}`;
-    })
-    .join('|');
-};
-const cameraPresetSignatureCache = new WeakMap<object, string>();
-const getCachedCameraPresetSignature = (preset: CameraPreset | null | undefined): string => {
-  if (!preset || typeof preset !== 'object') return 'null';
-  const key = preset as object;
-  const cached = cameraPresetSignatureCache.get(key);
-  if (cached) return cached;
-  const signature = getCameraPresetSignature(preset);
-  cameraPresetSignatureCache.set(key, signature);
-  return signature;
-};
-let lastCamPresetSignature = getCachedCameraPresetSignature(CAM_PRESET);
+let lastCamPresetSignature = getCamPresetSignature(CAM_PRESET);
 const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
 ensureNestedModuleSupport();
@@ -3403,7 +3378,7 @@ function draw(): void {
   const clearW = Game.grid?.w ?? canvas.width;
   const clearH = Game.grid?.h ?? canvas.height;
   ctx.clearRect(0, 0, clearW, clearH);
-  const camSignature = getCachedCameraPresetSignature(CAM_PRESET);
+  const camSignature = getCamPresetSignature(CAM_PRESET);
   if (camSignature !== lastCamPresetSignature) {
     lastCamPresetSignature = camSignature;
     invalidateSceneCache();

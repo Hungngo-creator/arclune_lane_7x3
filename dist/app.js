@@ -14888,6 +14888,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const createSession = __dep25.createSession;
   const invalidateSceneCache = __dep25.invalidateSceneCache;
   const ensureSceneCache = __dep25.ensureSceneCache;
+  const getCamPresetSignature = __dep25.getCamPresetSignature;
   const clearBackgroundSignatureCache = __dep25.clearBackgroundSignatureCache;
   const normalizeDeckEntries = __dep25.normalizeDeckEntries;
   const getPreferredDeckInput = __dep25.getPreferredDeckInput;
@@ -15417,41 +15418,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       aetherDebugState.lastRectLeft = rect.left;
       globalAetherPool.resetDebugSnapshot();
   }
-  const getCameraPresetSignature = (preset) => {
-      if (!preset)
-          return 'null';
-      const record = preset;
-      return Object.keys(record)
-          .sort()
-          .map((key) => {
-          const value = record[key];
-          if (typeof value === 'number')
-              return `${key}:${Number.isFinite(value) ? value : 'NaN'}`;
-          if (typeof value === 'boolean')
-              return `${key}:${value ? 'true' : 'false'}`;
-          if (typeof value === 'string')
-              return `${key}:"${value}"`;
-          if (value === null)
-              return `${key}:null`;
-          if (typeof value === 'undefined')
-              return `${key}:undefined`;
-          return `${key}:${String(value)}`;
-      })
-          .join('|');
-  };
-  const cameraPresetSignatureCache = new WeakMap();
-  const getCachedCameraPresetSignature = (preset) => {
-      if (!preset || typeof preset !== 'object')
-          return 'null';
-      const key = preset;
-      const cached = cameraPresetSignatureCache.get(key);
-      if (cached)
-          return cached;
-      const signature = getCameraPresetSignature(preset);
-      cameraPresetSignatureCache.set(key, signature);
-      return signature;
-  };
-  let lastCamPresetSignature = getCachedCameraPresetSignature(CAM_PRESET);
+  let lastCamPresetSignature = getCamPresetSignature(CAM_PRESET);
   const HAND_SIZE = CFG.HAND_SIZE ?? 4;
   ensureNestedModuleSupport();
   const getNow = () => sessionNow();
@@ -17943,7 +17910,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const clearW = Game.grid?.w ?? canvas.width;
       const clearH = Game.grid?.h ?? canvas.height;
       ctx.clearRect(0, 0, clearW, clearH);
-      const camSignature = getCachedCameraPresetSignature(CAM_PRESET);
+      const camSignature = getCamPresetSignature(CAM_PRESET);
       if (camSignature !== lastCamPresetSignature) {
           lastCamPresetSignature = camSignature;
           invalidateSceneCache();
@@ -18958,18 +18925,13 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       return normalized;
   }
   function sanitizeRewardList(container, key) {
-      const source = container[key];
+      const store = container;
+      const source = store[key];
       const next = isRewardArray(source)
           ? source
           : [...normalizeRewardList(source)];
-      container[key] = next;
+      store[key] = next;
       return next;
-  }
-  function ensureRewardQueue(runtime) {
-      return sanitizeRewardList(runtime, 'rewardQueue');
-  }
-  function ensurePendingRewards(encounter) {
-      return sanitizeRewardList(encounter, 'pendingRewards');
   }
   const SMALL_REWARD_MERGE_SIZE = 6;
   function mergeRewardsInPlaceLinear(list, additions) {
@@ -19017,13 +18979,9 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           return mergeRewardsInPlaceLinear(list, additions);
       return mergeRewardsInPlaceIndexed(list, additions);
   }
-  function updateRuntimeRewards(runtime, additions) {
-      const queue = ensureRewardQueue(runtime);
-      return mergeRewardsInPlace(queue, additions);
-  }
-  function updateEncounterRewards(encounter, additions) {
-      const pending = ensurePendingRewards(encounter);
-      return mergeRewardsInPlace(pending, additions);
+  function updateRewards(container, key, additions) {
+      const target = sanitizeRewardList(container, key);
+      return mergeRewardsInPlace(target, additions);
   }
   function removeRewardById(list, rewardId) {
       if (!list.length)
@@ -19041,12 +18999,6 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           list.length = writeIndex;
       return list;
   }
-  function getWaveAt(value, index) {
-      if (!Array.isArray(value))
-          return null;
-      const wave = value[index];
-      return wave ? wave : null;
-  }
   function advanceSession(session) {
       const runtime = session?.runtime;
       if (!runtime)
@@ -19059,7 +19011,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       const waves = encounter.waves;
       const waveCount = Array.isArray(waves) ? waves.length : 0;
       const index = Math.max(0, encounter.waveIndex | 0);
-      const wave = getWaveAt(waves, index);
+      const wave = Array.isArray(waves) ? waves[index] ?? null : null;
       if (!wave) {
           encounter.status = 'completed';
           runtime.wave = null;
@@ -19083,8 +19035,8 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               encounter.waveIndex = index + 1;
               const rewards = normalizeRewardList(wave.rewards);
               if (rewards.length) {
-                  updateEncounterRewards(encounter, rewards);
-                  updateRuntimeRewards(runtime, rewards);
+                  updateRewards(encounter, 'pendingRewards', rewards);
+                  updateRewards(runtime, 'rewardQueue', rewards);
               }
               break;
           }
@@ -19108,10 +19060,11 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       if (!isReward(reward))
           return null;
       const runtime = session.runtime;
-      removeRewardById(ensureRewardQueue(runtime), reward.id);
+      removeRewardById(sanitizeRewardList(runtime, 'rewardQueue'), reward.id);
+      h;
       const encounter = runtime.encounter;
       if (encounter) {
-          removeRewardById(ensurePendingRewards(encounter), reward.id);
+          removeRewardById(sanitizeRewardList(encounter, 'pendingRewards'), reward.id);
       }
       return reward;
   }
@@ -19252,24 +19205,24 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   function buildAutoPlayerDeckFromCollection(progressById) {
       if (progressById.size === 0)
           return [];
-      const ranked = Array.from(progressById.entries())
-          .filter(([unitId, progress]) => {
-          if (!unitId || progress?.owned === false)
-              return false;
-          return !!lookupUnit(unitId);
-      })
-          .map(([unitId, progress]) => ({
-          unitId,
-          score: estimateUnitStrength(unitId, progress),
-      }))
-          .sort((a, b) => {
+      const ranked = [];
+      for (const [unitId, progress] of progressById.entries()) {
+          if (!unitId || progress?.owned === false || !lookupUnit(unitId))
+              continue;
+          ranked.push({
+              unitId,
+              score: estimateUnitStrength(unitId, progress),
+          });
+      }
+      if (!ranked.length)
+          return [];
+      ranked.sort((a, b) => {
           if (b.score !== a.score)
               return b.score - a.score;
           return a.unitId.localeCompare(b.unitId);
-      })
-          .slice(0, AUTO_PLAYER_DECK_SIZE)
-          .map((entry) => entry.unitId);
-      return normalizeDeckEntries(ranked);
+      });
+      const pickedIds = ranked.slice(0, AUTO_PLAYER_DECK_SIZE).map((entry) => entry.unitId);
+      return normalizeDeckEntries(pickedIds);
   }
   function normalizePositiveLimit(value, fallback) {
       if (Number.isFinite(value)) {
@@ -19571,7 +19524,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       const autoPlayerDeck = preferredPlayerDeck.length === 0
           ? buildAutoPlayerDeckFromCollection(unitProgressById)
           : [];
-      const fallbackDeck = normalizeDeckEntries(DEFAULT_UNIT_ROSTER).slice(0, AUTO_PLAYER_DECK_SIZE);
+      const fallbackDeck = DEFAULT_UNIT_ROSTER.slice(0, AUTO_PLAYER_DECK_SIZE);
       const lockedPlayerDeck = preferredPlayerDeck.length > 0
           ? preferredPlayerDeck
           : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackDeck.slice(0, 1));
@@ -19895,6 +19848,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getPreferredDeckInput')) exports.getPreferredDeckInput = getPreferredDeckInput;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveEnemyUnits')) exports.resolveEnemyUnits = resolveEnemyUnits;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getCamPresetSignature')) exports.getCamPresetSignature = getCamPresetSignature;
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearBackgroundSignatureCache')) exports.clearBackgroundSignatureCache = clearBackgroundSignatureCache;
   if (!Object.prototype.hasOwnProperty.call(exports, 'computeBackgroundSignature')) exports.computeBackgroundSignature = computeBackgroundSignature;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeConfig')) exports.normalizeConfig = normalizeConfig;
