@@ -122,6 +122,7 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['./combat/skill-result.js', './combat/skill-result.ts'],
   ['./combat/skill-metadata-utils.js', './combat/skill-metadata-utils.ts'],
   ['./combat/token-side-utils.js', './combat/token-side-utils.ts'],
+  ['./combat/board-position-utils.js', './combat/board-position-utils.ts'],
   ['./combat/unit-runtime-hooks.js', './combat/unit-runtime-hooks.ts'],
   ['@screens/collection/index.ts', './screens/collection/index.ts'],
   ['@screens/lineup/index.ts', './screens/lineup/index.ts'],

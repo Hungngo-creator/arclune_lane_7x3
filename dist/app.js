@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -5141,6 +5141,67 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'readShieldAmount')) exports.readShieldAmount = readShieldAmount;
   if (!Object.prototype.hasOwnProperty.call(exports, 'consumeShieldByCurrentRatio')) exports.consumeShieldByCurrentRatio = consumeShieldByCurrentRatio;
 };
+__modules['./combat/board-position-utils.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./engine.ts');
+  const slotIndex = __dep0.slotIndex;
+  function readBoardPosition(token) {
+      if (!token || !Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side)
+          return null;
+      const slot = slotIndex(token.side, token.cx, token.cy);
+      if (!Number.isFinite(slot) || slot < 1)
+          return null;
+      const normalizedSlot = Math.floor(slot);
+      return {
+          slot: normalizedSlot,
+          row: Math.floor((normalizedSlot - 1) / 3),
+          col: (normalizedSlot - 1) % 3,
+      };
+  }
+  function isLeaderToken(token) {
+      const position = readBoardPosition(token);
+      return !!position && position.slot === 8;
+  }
+  function readTokenSlotAndColumn(token) {
+      const slot = slotIndex(token.side, token.cx, token.cy);
+      return {
+          slot,
+          column: ((slot - 1) % 3) + 1,
+      };
+  }
+  function selectTargetsByBoardPredicate(pool, predicate) {
+      const selected = [];
+      for (const token of pool) {
+          const pos = readBoardPosition(token);
+          if (!pos || !predicate(pos))
+              continue;
+          selected.push(token);
+      }
+      return selected;
+  }
+  function createCrossSlotLookup(centerSlot) {
+      const row = Math.floor((centerSlot - 1) / 3);
+      const col = (centerSlot - 1) % 3;
+      const slots = new Set([centerSlot]);
+      const candidates = [
+          [row - 1, col],
+          [row + 1, col],
+          [row, col - 1],
+          [row, col + 1],
+      ];
+      for (const [r, c] of candidates) {
+          if (r < 0 || r > 2 || c < 0 || c > 2)
+              continue;
+          slots.add(r * 3 + c + 1);
+      }
+      return slots;
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'readBoardPosition')) exports.readBoardPosition = readBoardPosition;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isLeaderToken')) exports.isLeaderToken = isLeaderToken;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'readTokenSlotAndColumn')) exports.readTokenSlotAndColumn = readTokenSlotAndColumn;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'selectTargetsByBoardPredicate')) exports.selectTargetsByBoardPredicate = selectTargetsByBoardPredicate;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createCrossSlotLookup')) exports.createCrossSlotLookup = createCrossSlotLookup;
+};
 __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/number-utils.ts');
   const clampMin = __dep0.clampMin;
@@ -5191,24 +5252,25 @@ __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) =
   if (!Object.prototype.hasOwnProperty.call(exports, 'calculateFinalDamage')) exports.calculateFinalDamage = calculateFinalDamage;
 };
 __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./engine.ts');
-  const slotIndex = __dep0.slotIndex;
-  const __dep1 = __require('./utils/fury.ts');
-  const gainFury = __dep1.gainFury;
-  const __dep2 = __require('./data/tags.ts');
-  const AOE_TARGET_TAG_IDS = __dep2.AOE_TARGET_TAG_IDS;
-  const RULE_BYPASS_TAG_IDS = __dep2.RULE_BYPASS_TAG_IDS;
-  const hasAnyTag = __dep2.hasAnyTag;
-  const normalizeTagList = __dep2.normalizeTagList;
-  const __dep3 = __require('./combat/apply-damage.ts');
-  const applyDamage = __dep3.applyDamage;
-  const grantShield = __dep3.grantShield;
-  const __dep4 = __require('./combat/number-utils.ts');
-  const toFiniteNumber = __dep4.toFiniteNumber;
-  const toFloorInt = __dep4.toFloorInt;
-  const __dep5 = __require('./combat/token-side-utils.ts');
-  const bucketTokensByActualSide = __dep5.bucketTokensByActualSide;
-  const forEachPartitionToken = __dep5.forEachPartitionToken;
+  const __dep0 = __require('./utils/fury.ts');
+  const gainFury = __dep0.gainFury;
+  const __dep1 = __require('./data/tags.ts');
+  const AOE_TARGET_TAG_IDS = __dep1.AOE_TARGET_TAG_IDS;
+  const RULE_BYPASS_TAG_IDS = __dep1.RULE_BYPASS_TAG_IDS;
+  const hasAnyTag = __dep1.hasAnyTag;
+  const normalizeTagList = __dep1.normalizeTagList;
+  const __dep2 = __require('./combat/apply-damage.ts');
+  const applyDamage = __dep2.applyDamage;
+  const grantShield = __dep2.grantShield;
+  const __dep3 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep3.toFiniteNumber;
+  const toFloorInt = __dep3.toFloorInt;
+  const __dep4 = __require('./combat/token-side-utils.ts');
+  const bucketTokensByActualSide = __dep4.bucketTokensByActualSide;
+  const forEachPartitionToken = __dep4.forEachPartitionToken;
+  const __dep5 = __require('./combat/board-position-utils.ts');
+  const createCrossSlotLookup = __dep5.createCrossSlotLookup;
+  const readTokenSlotAndColumn = __dep5.readTokenSlotAndColumn;
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const CHAP_MINH_LINK_REDUCTION = 0.30;
   const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
@@ -5216,13 +5278,6 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   const CHAP_MINH_BACKLASH_SELF_REDUCTION = 0.3;
   const isAliveChapMinh = (token) => (!!token && token.alive && token.id === CHAP_MINH_ID);
   const isChapMinh = (token) => (!!token && token.id === CHAP_MINH_ID);
-  const resolveSlotAndColumn = (token) => {
-      const slot = slotIndex(token.side, token.cx, token.cy);
-      return {
-          slot,
-          column: ((slot - 1) % 3) + 1,
-      };
-  };
   function hasLookupEntries(lookup) {
       if (!lookup)
           return false;
@@ -5240,28 +5295,11 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       }
       return lookup;
   }
-  const resolveCrossSlots = (centerSlot) => {
-      const row = Math.floor((centerSlot - 1) / 3);
-      const col = (centerSlot - 1) % 3;
-      const slots = [];
-      const candidates = [
-          [row - 1, col],
-          [row + 1, col],
-          [row, col - 1],
-          [row, col + 1],
-      ];
-      for (const [r, c] of candidates) {
-          if (r < 0 || r > 2 || c < 0 || c > 2)
-              continue;
-          slots.push(r * 3 + c + 1);
-      }
-      return slots;
-  };
   function activateChapMinhLink(caster) {
       if (!isAliveChapMinh(caster))
           return;
-      const { slot } = resolveSlotAndColumn(caster);
-      const linkedSlots = resolveCrossSlots(slot);
+      const { slot } = readTokenSlotAndColumn(caster);
+      const linkedSlots = [...createCrossSlotLookup(slot)];
       caster._chapMinhLinkedSlots = linkedSlots;
       caster._chapMinhLinkedSlotLookup = buildLinkedLookup(linkedSlots);
       caster._chapMinhAccumulated = Math.max(0, toFiniteNumber(caster._chapMinhAccumulated, 0));
@@ -5270,12 +5308,12 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       if (!game || !isAliveChapMinh(caster))
           return;
       gainFury(caster, { amount: CHAP_MINH_ACTION_END_FURY_GAIN, type: 'generic' });
-      const { column } = resolveSlotAndColumn(caster);
+      const { column } = readTokenSlotAndColumn(caster);
       const shieldAmount = Math.max(0, Math.floor((caster.hpMax ?? 0) * 0.15));
       if (shieldAmount <= 0)
           return;
       forEachPartitionToken(game.tokens, caster.side, 'ally', (token) => {
-          const { column: tokenColumn } = resolveSlotAndColumn(token);
+          const { column: tokenColumn } = readTokenSlotAndColumn(token);
           if (tokenColumn !== column)
               return;
           grantShield(token, shieldAmount, { durationTurns: 1 });
@@ -5299,8 +5337,8 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       let owner = null;
       const candidate = target._chapMinhLinkOwner ?? null;
       if (isAliveChapMinh(candidate) && candidate.side === target.side) {
-          const { slot, column: tokenColumn } = resolveSlotAndColumn(target);
-          const { column: ownerColumn } = resolveSlotAndColumn(candidate);
+          const { slot, column: tokenColumn } = readTokenSlotAndColumn(target);
+          const { column: ownerColumn } = readTokenSlotAndColumn(candidate);
           const linkedLookup = candidate._chapMinhLinkedSlotLookup;
           const inLink = linkedLookup
               ? linkedLookup[slot] === true
@@ -5345,10 +5383,10 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
           if (!isAliveChapMinh(owner) || !hasLookupEntries(linkedLookup))
               continue;
           const safeLookup = linkedLookup;
-          const { column: ownerColumn } = resolveSlotAndColumn(owner);
+          const { column: ownerColumn } = readTokenSlotAndColumn(owner);
           const sideTokens = owner.side === 'ally' ? groupedAliveBySide.ally : groupedAliveBySide.enemy;
           for (const token of sideTokens) {
-              const { slot: tokenSlot, column: tokenColumn } = resolveSlotAndColumn(token);
+              const { slot: tokenSlot, column: tokenColumn } = readTokenSlotAndColumn(token);
               const inLink = safeLookup[tokenSlot] === true;
               const inColumn = tokenColumn === ownerColumn;
               if (!inLink && !inColumn)
@@ -6455,8 +6493,11 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep8 = __require('./combat/tag-aliases.ts');
   const canonicalizeCombatTagsWithRule = __dep8.canonicalizeCombatTagsWithRule;
   const hasRuleTagPriorityAtLeast = __dep8.hasRuleTagPriorityAtLeast;
-  const __dep9 = __require('./engine.ts');
-  const slotIndex = __dep9.slotIndex;
+  const __dep9 = __require('./combat/board-position-utils.ts');
+  const createCrossSlotLookup = __dep9.createCrossSlotLookup;
+  const isLeaderToken = __dep9.isLeaderToken;
+  const readBoardPosition = __dep9.readBoardPosition;
+  const selectTargetsByBoardPredicate = __dep9.selectTargetsByBoardPredicate;
   const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
   const EMPTY_TAGS = [];
   const DOCTRINE_NO_HEAL_STATUS_ID = 'doctrine-no-heal';
@@ -6538,24 +6579,6 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           return 'leader';
       return 'any';
   };
-  const isLeaderToken = (token) => {
-      if (!Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side)
-          return false;
-      return slotIndex(token.side, token.cx, token.cy) === 8;
-  };
-  const readBoardPosition = (token) => {
-      if (!token || !Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side)
-          return null;
-      const slot = slotIndex(token.side, token.cx, token.cy);
-      if (!Number.isFinite(slot) || slot < 1)
-          return null;
-      const normalizedSlot = Math.floor(slot);
-      return {
-          slot: normalizedSlot,
-          row: Math.floor((normalizedSlot - 1) / 3),
-          col: (normalizedSlot - 1) % 3,
-      };
-  };
   const resolvePrimaryEnemyTarget = (ctx, result) => {
       for (const token of result.targets) {
           if (token.side !== ctx.attacker?.side)
@@ -6569,37 +6592,14 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       const anchorPos = readBoardPosition(anchor);
       if (!anchorPos)
           return [];
-      return selectTargetsBySlotPredicate(pool, (pos) => pos.col === anchorPos.col);
-  };
-  const selectTargetsBySlotPredicate = (pool, predicate) => {
-      const selected = [];
-      for (const token of pool) {
-          const pos = readBoardPosition(token);
-          if (!pos || !predicate(pos))
-              continue;
-          selected.push(token);
-      }
-      return selected;
+      return selectTargetsByBoardPredicate(pool, (pos) => pos.col === anchorPos.col);
   };
   const selectCrossTargets = (pool, anchor) => {
       const anchorPos = readBoardPosition(anchor);
       if (!anchorPos)
           return [];
-      const crossSlots = new Set([anchorPos.slot]);
-      const deltas = [
-          [0, -1],
-          [0, 1],
-          [-1, 0],
-          [1, 0],
-      ];
-      for (const [dx, dy] of deltas) {
-          const nextCol = anchorPos.col + dx;
-          const nextRow = anchorPos.row + dy;
-          if (nextCol < 0 || nextCol > 2 || nextRow < 0 || nextRow > 2)
-              continue;
-          crossSlots.add(nextRow * 3 + nextCol + 1);
-      }
-      return selectTargetsBySlotPredicate(pool, (pos) => crossSlots.has(pos.slot));
+      const crossSlots = createCrossSlotLookup(anchorPos.slot);
+      return selectTargetsByBoardPredicate(pool, (pos) => crossSlots.has(pos.slot));
   };
   const filterTokensByRole = (ctx, tokens) => {
       if (ctx.targetRole !== 'leader')

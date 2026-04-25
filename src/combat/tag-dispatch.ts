@@ -7,7 +7,12 @@ import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
 import { canonicalizeCombatTagsWithRule, hasRuleTagPriorityAtLeast } from './tag-aliases.ts';
-import { slotIndex } from '../engine.ts';
+import {
+  createCrossSlotLookup,
+  isLeaderToken,
+  readBoardPosition,
+  selectTargetsByBoardPredicate,
+} from './board-position-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { Side, UnitToken } from '@shared-types/units';
@@ -91,7 +96,6 @@ const sampleFromCandidates = (ctx: Pick<NormalizedContext, 'payload' | 'game'>, 
 
 type TargetPriority = 'board' | 'leader-first' | 'lowest-hp' | 'highest-hp' | 'lowest-hp-ratio' | 'highest-hp-ratio';
 type TargetRole = 'any' | 'leader';
-type BoardPosition = { row: number; col: number; slot: number };
 
 const TARGET_PRIORITY_ALIASES: Readonly<Record<string, TargetPriority>> = Object.freeze({
   'leader-first': 'leader-first',
@@ -150,23 +154,6 @@ const readTargetRole = (payload: Record<string, unknown> | null): TargetRole => 
   return 'any';
 };
 
-const isLeaderToken = (token: UnitToken): boolean => {
-  if (!Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side) return false;
-  return slotIndex(token.side, token.cx, token.cy) === 8;
-};
-
-const readBoardPosition = (token: UnitToken | null | undefined): BoardPosition | null => {
-  if (!token || !Number.isFinite(token.cx) || !Number.isFinite(token.cy) || !token.side) return null;
-  const slot = slotIndex(token.side, token.cx, token.cy);
-  if (!Number.isFinite(slot) || slot < 1) return null;
-  const normalizedSlot = Math.floor(slot);
-  return {
-    slot: normalizedSlot,
-    row: Math.floor((normalizedSlot - 1) / 3),
-    col: (normalizedSlot - 1) % 3,
-  };
-};
-
 const resolvePrimaryEnemyTarget = (ctx: NormalizedContext, result: TagDispatchResult): UnitToken | null => {
   for (const token of result.targets) {
     if (token.side !== ctx.attacker?.side) return token;
@@ -178,39 +165,14 @@ const resolvePrimaryEnemyTarget = (ctx: NormalizedContext, result: TagDispatchRe
 const selectColumnTargets = (pool: ReadonlyArray<UnitToken>, anchor: UnitToken | null): UnitToken[] => {
   const anchorPos = readBoardPosition(anchor);
   if (!anchorPos) return [];
-  return selectTargetsBySlotPredicate(pool, (pos) => pos.col === anchorPos.col);
-};
-
-const selectTargetsBySlotPredicate = (
-  pool: ReadonlyArray<UnitToken>,
-  predicate: (position: BoardPosition) => boolean,
-): UnitToken[] => {
-  const selected: UnitToken[] = [];
-  for (const token of pool) {
-    const pos = readBoardPosition(token);
-    if (!pos || !predicate(pos)) continue;
-    selected.push(token);
-  }
-  return selected;
+  return selectTargetsByBoardPredicate(pool, (pos) => pos.col === anchorPos.col);
 };
 
 const selectCrossTargets = (pool: ReadonlyArray<UnitToken>, anchor: UnitToken | null): UnitToken[] => {
   const anchorPos = readBoardPosition(anchor);
   if (!anchorPos) return [];
-  const crossSlots = new Set<number>([anchorPos.slot]);
-  const deltas = [
-    [0, -1],
-    [0, 1],
-    [-1, 0],
-    [1, 0],
-  ] as const;
-  for (const [dx, dy] of deltas) {
-    const nextCol = anchorPos.col + dx;
-    const nextRow = anchorPos.row + dy;
-    if (nextCol < 0 || nextCol > 2 || nextRow < 0 || nextRow > 2) continue;
-    crossSlots.add(nextRow * 3 + nextCol + 1);
-  }
-  return selectTargetsBySlotPredicate(pool, (pos) => crossSlots.has(pos.slot));
+  const crossSlots = createCrossSlotLookup(anchorPos.slot);
+  return selectTargetsByBoardPredicate(pool, (pos) => crossSlots.has(pos.slot));
 };
 
 const filterTokensByRole = (ctx: Pick<NormalizedContext, 'targetRole'>, tokens: ReadonlyArray<UnitToken>): ReadonlyArray<UnitToken> => {

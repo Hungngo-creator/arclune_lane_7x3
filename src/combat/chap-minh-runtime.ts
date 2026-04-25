@@ -1,4 +1,3 @@
-import { slotIndex } from '../engine.ts';
 import { gainFury } from '../utils/fury.ts';
 import {
   AOE_TARGET_TAG_IDS,
@@ -9,6 +8,7 @@ import {
 import { applyDamage, grantShield } from './apply-damage.ts';
 import { toFiniteNumber, toFloorInt } from './number-utils.ts';
 import { bucketTokensByActualSide, forEachPartitionToken } from './token-side-utils.ts';
+import { createCrossSlotLookup, readTokenSlotAndColumn } from './board-position-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -35,14 +35,6 @@ const isChapMinh = (token: UnitToken | null | undefined): token is ChapMinhState
   !!token && token.id === CHAP_MINH_ID
 );
 
-const resolveSlotAndColumn = (token: Pick<UnitToken, 'side' | 'cx' | 'cy'>): { slot: number; column: number } => {
-  const slot = slotIndex(token.side, token.cx, token.cy);
-  return {
-    slot,
-    column: ((slot - 1) % 3) + 1,
-  };
-};
-
 function hasLookupEntries(lookup: Record<number, true> | null | undefined): boolean {
   if (!lookup) return false;
   for (const _slot in lookup) {
@@ -60,27 +52,10 @@ function buildLinkedLookup(slots: ReadonlyArray<number> | null | undefined): Rec
   return lookup;
 }
 
-const resolveCrossSlots = (centerSlot: number): number[] => {
-  const row = Math.floor((centerSlot - 1) / 3);
-  const col = (centerSlot - 1) % 3;
-  const slots: number[] = [];
-  const candidates = [
-    [row - 1, col],
-    [row + 1, col],
-    [row, col - 1],
-    [row, col + 1],
-  ] as const;
-  for (const [r, c] of candidates) {
-    if (r < 0 || r > 2 || c < 0 || c > 2) continue;
-    slots.push(r * 3 + c + 1);
-  }
-  return slots;
-};
-
 export function activateChapMinhLink(caster: UnitToken): void {
   if (!isAliveChapMinh(caster)) return;
-  const { slot } = resolveSlotAndColumn(caster);
-  const linkedSlots = resolveCrossSlots(slot);
+  const { slot } = readTokenSlotAndColumn(caster);
+  const linkedSlots = [...createCrossSlotLookup(slot)];
   caster._chapMinhLinkedSlots = linkedSlots;
   caster._chapMinhLinkedSlotLookup = buildLinkedLookup(linkedSlots);
   caster._chapMinhAccumulated = Math.max(0, toFiniteNumber(caster._chapMinhAccumulated, 0));
@@ -89,12 +64,12 @@ export function activateChapMinhLink(caster: UnitToken): void {
 export function applyChapMinhActionEnd(game: SessionState | null | undefined, caster: UnitToken | null | undefined): void {
   if (!game || !isAliveChapMinh(caster)) return;
   gainFury(caster, { amount: CHAP_MINH_ACTION_END_FURY_GAIN, type: 'generic' });
-  const { column } = resolveSlotAndColumn(caster);
+  const { column } = readTokenSlotAndColumn(caster);
   const shieldAmount = Math.max(0, Math.floor((caster.hpMax ?? 0) * 0.15));
   if (shieldAmount <= 0) return;
 
   forEachPartitionToken(game.tokens, caster.side, 'ally', (token) => {
-    const { column: tokenColumn } = resolveSlotAndColumn(token);
+    const { column: tokenColumn } = readTokenSlotAndColumn(token);
     if (tokenColumn !== column) return;
     grantShield(token, shieldAmount, { durationTurns: 1 });
   });
@@ -124,8 +99,8 @@ function resolveMitigationRatio(
 
   const candidate = (target._chapMinhLinkOwner as ChapMinhStateCarrier | undefined) ?? null;
   if (isAliveChapMinh(candidate) && candidate.side === target.side) {
-    const { slot, column: tokenColumn } = resolveSlotAndColumn(target);
-    const { column: ownerColumn } = resolveSlotAndColumn(candidate);
+    const { slot, column: tokenColumn } = readTokenSlotAndColumn(target);
+    const { column: ownerColumn } = readTokenSlotAndColumn(candidate);
     const linkedLookup = candidate._chapMinhLinkedSlotLookup as Record<number, true> | undefined;
     const inLink = linkedLookup
       ? linkedLookup[slot] === true
@@ -170,10 +145,10 @@ export function refreshChapMinhOwnership(game: SessionState | null | undefined):
     const linkedLookup = (owner as ChapMinhStateCarrier)._chapMinhLinkedSlotLookup as Record<number, true> | undefined;
     if (!isAliveChapMinh(owner) || !hasLookupEntries(linkedLookup)) continue;
     const safeLookup = linkedLookup as Record<number, true>;
-    const { column: ownerColumn } = resolveSlotAndColumn(owner);
+    const { column: ownerColumn } = readTokenSlotAndColumn(owner);
     const sideTokens = owner.side === 'ally' ? groupedAliveBySide.ally : groupedAliveBySide.enemy;
     for (const token of sideTokens) {
-      const { slot: tokenSlot, column: tokenColumn } = resolveSlotAndColumn(token);
+      const { slot: tokenSlot, column: tokenColumn } = readTokenSlotAndColumn(token);
       const inLink = safeLookup[tokenSlot] === true;
       const inColumn = tokenColumn === ownerColumn;
       if (!inLink && !inColumn) continue;
