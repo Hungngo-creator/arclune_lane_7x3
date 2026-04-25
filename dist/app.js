@@ -16330,6 +16330,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const state = ensureUyenState(unit);
       if (!state)
           return false;
+      const aliveIndex = buildAliveTokenIndex(game.tokens || []);
+      const getAliveBySide = (side) => aliveIndex.bySide.get(side) ?? [];
       const furyNow = Math.max(0, Math.floor(parseFiniteNumber(unit.fury) ?? 0));
       const choice = getUyenUltChoice(unit);
       if (choice === 'A') {
@@ -16347,7 +16349,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               state.a1Stacks += 1;
           }
           else if (roll === 'A2') {
-              const allies = (game.tokens || []).filter((token) => token.alive && token.side === unit.side);
+              const allies = getAliveBySide(unit.side);
               for (const ally of allies) {
                   const haste = makeStatusEffect('haste', { pct: 0.25, turns: 3 });
                   if (haste)
@@ -16380,7 +16382,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return false;
       spendFury(unit, 100);
       const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
-      const enemies = (game.tokens || []).filter((token) => token.alive && token.side === enemySide);
+      const enemies = getAliveBySide(enemySide);
       const bonus = Math.min(state.bUses * 0.05, 0.35);
       for (const enemy of enemies) {
           const hpBase = 0.5 * (parseFiniteNumber(unit.hpMax) ?? 0);
@@ -16966,7 +16968,19 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       extendBusy(busyMs);
       spendFury(unit, resolveUltCost(unit));
   }
-  const tokensAlive = () => (Game?.tokens || []).filter((t) => t.alive);
+  const aliveTokenScratch = [];
+  const getAliveTokensScratch = () => {
+      aliveTokenScratch.length = 0;
+      const tokens = Game?.tokens;
+      if (!Array.isArray(tokens) || !tokens.length)
+          return aliveTokenScratch;
+      for (let i = 0; i < tokens.length; i += 1) {
+          const token = tokens[i];
+          if (token?.alive)
+              aliveTokenScratch.push(token);
+      }
+      return aliveTokenScratch;
+  };
   function ensureBattleState(game) {
       if (!game || typeof game !== 'object')
           return null;
@@ -17178,38 +17192,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           ? normalizeAnimationFrameTimestamp(timestampCandidate)
           : undefined;
       return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
-  }
-  // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
-  function tickMinionTTL(side) {
-      if (!Game?.tokens)
-          return;
-      const tokens = Game.tokens;
-      let writeIndex = 0;
-      for (const t of tokens) {
-          if (!t)
-              continue;
-          let shouldRemove = false;
-          if (!t.alive)
-              continue;
-          if (t.side === side && t.isMinion) {
-              const ttl = t.ttlTurns;
-              if (typeof ttl === 'number' && Number.isFinite(ttl)) {
-                  const nextTtl = ttl - 1;
-                  t.ttlTurns = nextTtl;
-                  if (nextTtl <= 0) {
-                      t.alive = false;
-                      shouldRemove = true;
-                  }
-              }
-          }
-          if (!shouldRemove) {
-              tokens[writeIndex] = t;
-              writeIndex += 1;
-          }
-      }
-      if (writeIndex < tokens.length) {
-          tokens.length = writeIndex;
-      }
   }
   function resolveAllyLeaderForControl() {
       const tokens = Game?.tokens;
@@ -17469,7 +17451,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               return;
           if (isUniqueGlobalSummonBlocked(game, { unitId: card.id, tags: card.tags ?? null }))
               return;
-          if (cellReserved(tokensAlive(), game.queued, cell.cx, cell.cy))
+          if (cellReserved(getAliveTokensScratch(), game.queued, cell.cx, cell.cy))
               return;
           const cardCost = getCardCost(card);
           if (game.cost < cardCost)

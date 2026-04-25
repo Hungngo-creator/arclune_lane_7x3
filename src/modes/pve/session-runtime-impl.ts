@@ -1766,6 +1766,8 @@ function extendBusy(duration: number): void {
 function performUyenLeaderUlt(game: SessionState, unit: UnitToken): boolean {
   const state = ensureUyenState(unit);
   if (!state) return false;
+  const aliveIndex = buildAliveTokenIndex(game.tokens || []);
+  const getAliveBySide = (side: Side): UnitToken[] => aliveIndex.bySide.get(side) ?? [];
   const furyNow = Math.max(0, Math.floor(parseFiniteNumber(unit.fury) ?? 0));
   const choice = getUyenUltChoice(unit);
 
@@ -1780,7 +1782,7 @@ function performUyenLeaderUlt(game: SessionState, unit: UnitToken): boolean {
     if (roll === 'A1') {
       state.a1Stacks += 1;
     } else if (roll === 'A2') {
-      const allies = (game.tokens || []).filter((token) => token.alive && token.side === unit.side);
+      const allies = getAliveBySide(unit.side);
       for (const ally of allies) {
         const haste = makeStatusEffect('haste', { pct: 0.25, turns: 3 });
         if (haste) Statuses.add(ally, { ...haste, sourceUnitId: unit.id });
@@ -1811,7 +1813,7 @@ function performUyenLeaderUlt(game: SessionState, unit: UnitToken): boolean {
   if (furyNow < 100) return false;
   spendFury(unit, 100);
   const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
-  const enemies = (game.tokens || []).filter((token) => token.alive && token.side === enemySide);
+  const enemies = getAliveBySide(enemySide);
   const bonus = Math.min(state.bUses * 0.05, 0.35);
   for (const enemy of enemies) {
     const hpBase = 0.5 * (parseFiniteNumber(unit.hpMax) ?? 0);
@@ -2395,7 +2397,17 @@ function performUlt(unit: UnitToken): void {
   extendBusy(busyMs);
   spendFury(unit, resolveUltCost(unit));
 }
-const tokensAlive = (): UnitToken[] => (Game?.tokens || []).filter((t) => t.alive);
+const aliveTokenScratch: UnitToken[] = [];
+const getAliveTokensScratch = (): UnitToken[] => {
+  aliveTokenScratch.length = 0;
+  const tokens = Game?.tokens;
+  if (!Array.isArray(tokens) || !tokens.length) return aliveTokenScratch;
+  for (let i = 0; i < tokens.length; i += 1) {
+    const token = tokens[i];
+    if (token?.alive) aliveTokenScratch.push(token);
+  }
+  return aliveTokenScratch;
+};
 
 function ensureBattleState(game: (SessionState | CombatSessionState) | null): BattleState | null {
   if (!game || typeof game !== 'object') return null;
@@ -2618,36 +2630,6 @@ function checkBattleEndResult(
     : undefined;
   return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
 }
-// Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
-function tickMinionTTL(side: Side): void {
-  if (!Game?.tokens) return;
-  const tokens = Game.tokens;
-  let writeIndex = 0;
-  for (const t of tokens){
-    if (!t) continue;
-    let shouldRemove = false;
-    if (!t.alive) continue;
-   if (t.side === side && t.isMinion) {
-      const ttl = t.ttlTurns;
-      if (typeof ttl === 'number' && Number.isFinite(ttl)) {
-        const nextTtl = ttl - 1;
-        t.ttlTurns = nextTtl;
-        if (nextTtl <= 0) {
-          t.alive = false;
-          shouldRemove = true;
-        }
-      }
-    }
-    if (!shouldRemove) {
-      tokens[writeIndex] = t;
-      writeIndex += 1;
-    }
-  }
-  if (writeIndex < tokens.length) {
-    tokens.length = writeIndex;
-  }
-}
-
 function resolveAllyLeaderForControl(): UnitToken | null {
   const tokens = Game?.tokens;
   if (!Array.isArray(tokens)) return null;
@@ -2893,7 +2875,7 @@ function init(): boolean {
     if (!isCardInLockedDeck(card.id, game)) return;
     if (isUniqueGlobalSummonBlocked(game, { unitId: card.id, tags: card.tags ?? null })) return;
 
-    if (cellReserved(tokensAlive(), game.queued, cell.cx, cell.cy)) return;
+    if (cellReserved(getAliveTokensScratch(), game.queued, cell.cx, cell.cy)) return;
     const cardCost = getCardCost(card);
     if (game.cost < cardCost) return;
     if (game.summoned >= game.summonLimit) return;
