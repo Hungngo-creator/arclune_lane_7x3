@@ -6308,8 +6308,10 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
           return;
       const atkNow = Math.max(0, toFiniteNumber(unit.atk, 0));
       const wilNow = Math.max(0, toFiniteNumber(unit.wil, 0));
-      const atkGain = Math.max(1, Math.floor(atkNow * PASSIVE_GAIN_RATIO));
-      const wilGain = Math.max(1, Math.floor(wilNow * PASSIVE_GAIN_RATIO));
+      const atkGain = Math.max(0, Math.floor(atkNow * PASSIVE_GAIN_RATIO));
+      const wilGain = Math.max(0, Math.floor(wilNow * PASSIVE_GAIN_RATIO));
+      if (atkGain <= 0 && wilGain <= 0)
+          return;
       unit.atk = Math.max(0, Math.floor(atkNow + atkGain));
       unit.wil = Math.max(0, Math.floor(wilNow + wilGain));
       unit._lyThanhThuPassiveAtkBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveAtkBonus, 0) + atkGain);
@@ -6333,6 +6335,14 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
           leader.wil = Math.max(0, Math.floor(toFiniteNumber(leader.wil, 0) + wilBonus));
   }
   function resetPassive(unit) {
+      const atkBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveAtkBonus, 0));
+      const wilBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveWilBonus, 0));
+      if (atkBonus > 0) {
+          unit.atk = Math.max(0, Math.floor(toFiniteNumber(unit.atk, 0) - atkBonus));
+      }
+      if (wilBonus > 0) {
+          unit.wil = Math.max(0, Math.floor(toFiniteNumber(unit.wil, 0) - wilBonus));
+      }
       unit._lyThanhThuPassiveStacks = 0;
       unit._lyThanhThuPassiveTurnStamp = undefined;
       unit._lyThanhThuPassiveTurnGain = 0;
@@ -6370,7 +6380,8 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
       const resBonus = resNow * SKILL3_RES_ARM_RATIO;
       caster.arm = Math.max(0, armNow + armBonus);
       caster.res = Math.max(0, resNow + resBonus);
-      stacks.push({ armBonus, resBonus, expiresAtTurn: turnStamp + (SKILL3_STACK_DURATION_TURNS - 1) });
+      const expiresAtTurn = turnStamp + Math.max(0, SKILL3_STACK_DURATION_TURNS - 2);
+      stacks.push({ armBonus, resBonus, expiresAtTurn });
       caster._lyThanhThuDefenseStacks = stacks;
   }
   function expireDefenseStacks(game, unit) {
@@ -14475,27 +14486,29 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const normalizeTagList = __dep23.normalizeTagList;
   const __dep24 = __require('./combat/tag-dispatch.ts');
   const dispatchGameplayTags = __dep24.dispatchGameplayTags;
-  const __dep25 = __require('./modes/pve/session-state.ts');
-  const normalizeConfig = __dep25.normalizeConfig;
-  const createSession = __dep25.createSession;
-  const invalidateSceneCache = __dep25.invalidateSceneCache;
-  const ensureSceneCache = __dep25.ensureSceneCache;
-  const clearBackgroundSignatureCache = __dep25.clearBackgroundSignatureCache;
-  const normalizeDeckEntries = __dep25.normalizeDeckEntries;
-  const getPreferredDeckInput = __dep25.getPreferredDeckInput;
-  const resolveEnemyUnits = __dep25.resolveEnemyUnits;
-  const __dep26 = __require('./modes/pve/collection-mapper.ts');
-  const mapUnitProgressById = __dep26.mapUnitProgressById;
-  const __dep27 = __require('./modes/pve/unit-runtime-hooks.ts');
-  const runPveRuntimeUltHook = __dep27.runPveRuntimeUltHook;
-  const __dep28 = __require('./leader-uyen.ts');
-  const ensureUyenState = __dep28.ensureUyenState;
-  const getUyenUltChoice = __dep28.getUyenUltChoice;
-  const grantUyenSummonRage = __dep28.grantUyenSummonRage;
-  const canCastLeaderUltChoice = __dep28.canCastLeaderUltChoice;
-  const isAnyLeaderUltReady = __dep28.isAnyLeaderUltReady;
-  const isUyenLeader = __dep28.isUyenLeader;
-  const queueUyenUltCast = __dep28.queueUyenUltCast;
+  const __dep25 = __require('./combat/board-position-utils.ts');
+  const isLeaderToken = __dep25.isLeaderToken;
+  const __dep26 = __require('./modes/pve/session-state.ts');
+  const normalizeConfig = __dep26.normalizeConfig;
+  const createSession = __dep26.createSession;
+  const invalidateSceneCache = __dep26.invalidateSceneCache;
+  const ensureSceneCache = __dep26.ensureSceneCache;
+  const clearBackgroundSignatureCache = __dep26.clearBackgroundSignatureCache;
+  const normalizeDeckEntries = __dep26.normalizeDeckEntries;
+  const getPreferredDeckInput = __dep26.getPreferredDeckInput;
+  const resolveEnemyUnits = __dep26.resolveEnemyUnits;
+  const __dep27 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep27.mapUnitProgressById;
+  const __dep28 = __require('./modes/pve/unit-runtime-hooks.ts');
+  const runPveRuntimeUltHook = __dep28.runPveRuntimeUltHook;
+  const __dep29 = __require('./leader-uyen.ts');
+  const ensureUyenState = __dep29.ensureUyenState;
+  const getUyenUltChoice = __dep29.getUyenUltChoice;
+  const grantUyenSummonRage = __dep29.grantUyenSummonRage;
+  const canCastLeaderUltChoice = __dep29.canCastLeaderUltChoice;
+  const isAnyLeaderUltReady = __dep29.isAnyLeaderUltReady;
+  const isUyenLeader = __dep29.isUyenLeader;
+  const queueUyenUltCast = __dep29.queueUyenUltCast;
   const ULT_TAG_CACHE = new WeakMap();
   const getNormalizedUltTags = (ult) => {
       const cached = ULT_TAG_CACHE.get(ult);
@@ -15978,6 +15991,30 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return;
       }
       const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
+      if (unit.id === 'ly_thanh_thu') {
+          const enemyLeader = (game.tokens || []).find((token) => (token.alive
+              && token.side === foeSide
+              && isLeaderToken(token))) ?? null;
+          if (!enemyLeader) {
+              spendFury(unit, resolveUltCost(unit));
+              return;
+          }
+          const basePower = Math.max(0, Math.floor((parseFiniteNumber(unit.atk) ?? 0) + (parseFiniteNumber(unit.wil) ?? 0)));
+          const base = Math.max(1, Math.floor(basePower * 2));
+          const dealtResult = dealAbilityDamage(game, unit, enemyLeader, {
+              base,
+              dtype: 'mixed',
+              attackType: 'skill',
+          });
+          const overThreshold = dealtResult.dealt > Math.max(0, Math.floor((parseFiniteNumber(enemyLeader.hpMax) ?? 0) * 0.2));
+          if (overThreshold) {
+              const heal = Math.max(1, Math.floor((parseFiniteNumber(unit.hpMax) ?? 0) * 0.1));
+              healUnit(unit, heal);
+          }
+          extendBusy(900);
+          spendFury(unit, resolveUltCost(unit));
+          return;
+      }
       if (runPveRuntimeUltHook({
           game,
           unit,

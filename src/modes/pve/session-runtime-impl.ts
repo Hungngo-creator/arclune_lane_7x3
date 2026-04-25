@@ -61,6 +61,7 @@ import { isUniqueGlobalSummonBlocked } from '../../utils/unique-global.ts';
 import { nextRngValue } from '../../utils/rng.ts';
 import { normalizeTagList } from '../../data/tags.ts';
 import { dispatchGameplayTags } from '../../combat/tag-dispatch.ts';
+import { isLeaderToken } from '../../combat/board-position-utils.ts';
 import {
   normalizeConfig,
   createSession,
@@ -1800,6 +1801,34 @@ function performUlt(unit: UnitToken): void {
   if (!u){ spendFury(unit, resolveUltCost(unit)); return; }
 
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
+  if (unit.id === 'ly_thanh_thu') {
+    const enemyLeader = (game.tokens || []).find((token) => (
+      token.alive
+      && token.side === foeSide
+      && isLeaderToken(token)
+    )) ?? null;
+    if (!enemyLeader) {
+      spendFury(unit, resolveUltCost(unit));
+      return;
+    }
+
+    const basePower = Math.max(0, Math.floor((parseFiniteNumber(unit.atk) ?? 0) + (parseFiniteNumber(unit.wil) ?? 0)));
+    const base = Math.max(1, Math.floor(basePower * 2));
+    const dealtResult = dealAbilityDamage(game, unit, enemyLeader, {
+      base,
+      dtype: 'mixed',
+      attackType: 'skill',
+    });
+
+    const overThreshold = dealtResult.dealt > Math.max(0, Math.floor((parseFiniteNumber(enemyLeader.hpMax) ?? 0) * 0.2));
+    if (overThreshold) {
+      const heal = Math.max(1, Math.floor((parseFiniteNumber(unit.hpMax) ?? 0) * 0.1));
+      healUnit(unit, heal);
+    }
+    extendBusy(900);
+    spendFury(unit, resolveUltCost(unit));
+    return;
+  }
   if (runPveRuntimeUltHook({
     game,
     unit,

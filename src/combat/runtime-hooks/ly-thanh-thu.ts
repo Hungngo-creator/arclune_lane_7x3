@@ -110,8 +110,9 @@ function addPassiveStack(game: SessionState, unit: LyThanhThuCarrier): void {
 
   const atkNow = Math.max(0, toFiniteNumber(unit.atk, 0));
   const wilNow = Math.max(0, toFiniteNumber(unit.wil, 0));
-  const atkGain = Math.max(1, Math.floor(atkNow * PASSIVE_GAIN_RATIO));
-  const wilGain = Math.max(1, Math.floor(wilNow * PASSIVE_GAIN_RATIO));
+  const atkGain = Math.max(0, Math.floor(atkNow * PASSIVE_GAIN_RATIO));
+  const wilGain = Math.max(0, Math.floor(wilNow * PASSIVE_GAIN_RATIO));
+  if (atkGain <= 0 && wilGain <= 0) return;
 
   unit.atk = Math.max(0, Math.floor(atkNow + atkGain));
   unit.wil = Math.max(0, Math.floor(wilNow + wilGain));
@@ -139,6 +140,14 @@ function transferPassiveStatsToLeader(game: SessionState, unit: LyThanhThuCarrie
 }
 
 function resetPassive(unit: LyThanhThuCarrier): void {
+  const atkBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveAtkBonus, 0));
+  const wilBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveWilBonus, 0));
+  if (atkBonus > 0) {
+    unit.atk = Math.max(0, Math.floor(toFiniteNumber(unit.atk, 0) - atkBonus));
+  }
+  if (wilBonus > 0) {
+    unit.wil = Math.max(0, Math.floor(toFiniteNumber(unit.wil, 0) - wilBonus));
+  }
   unit._lyThanhThuPassiveStacks = 0;
   unit._lyThanhThuPassiveTurnStamp = undefined;
   unit._lyThanhThuPassiveTurnGain = 0;
@@ -178,7 +187,8 @@ function triggerSkill3Defense(game: SessionState, caster: LyThanhThuCarrier): vo
 
   caster.arm = Math.max(0, armNow + armBonus);
   caster.res = Math.max(0, resNow + resBonus);
-  stacks.push({ armBonus, resBonus, expiresAtTurn: turnStamp + (SKILL3_STACK_DURATION_TURNS - 1) });
+  const expiresAtTurn = turnStamp + Math.max(0, SKILL3_STACK_DURATION_TURNS - 2);
+  stacks.push({ armBonus, resBonus, expiresAtTurn });
   caster._lyThanhThuDefenseStacks = stacks;
 }
 
