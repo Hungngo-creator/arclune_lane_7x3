@@ -7,11 +7,13 @@ import { cellReserved, slotToCell } from '../engine.ts';
 import { globalAetherPool } from '../aether.ts';
 import { Statuses } from '../statuses.ts';
 import { runRuntimeActiveSkill } from './unit-runtime-hooks.ts';
-import { createSkillMetadataContext } from './skill-metadata-utils.ts';
+import { activateChapMinhLink, refreshChapMinhOwnership } from './chap-minh-runtime.ts';
+import { createSkillMetadataContext, resolveSkillPayload } from './skill-metadata-utils.ts';
 import { readAtkWilPower, readUnitHpState, toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
 import { canonicalizeCombatTagsWithRule } from './tag-aliases.ts';
+import { consumeShieldByCurrentRatio, readShieldAmount } from './apply-damage.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -40,6 +42,7 @@ const MONG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
   sleepTurnsOnCap: 1,
 });
 const BLOOD_AVATAR_ID = 'blood_avatar';
+const CHAP_MINH_ID = 'huyen_vu_chap_minh';
 const BLOOD_AVATAR_SKILL_COST = 25;
 const BLOOD_AVATAR_BLEED_STATUS = Object.freeze({
   id: 'bleed',
@@ -250,7 +253,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     hasDamageTag,
   } = parseSkillTags(tags);
   const skillMeta = createSkillMetadataContext(skill);
-  const { payload } = skillMeta;
+  const payload = resolveSkillPayload(skill);
   const maxSkillUses = readSkillUseCap(payload);
   if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
     return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
@@ -314,6 +317,60 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     return runtimeSkillResult;
   }
   const casterPower = readAtkWilPower(caster);
+
+  if (caster.id === CHAP_MINH_ID) {
+    if (skillKey === 'skill1') {
+      activateChapMinhLink(caster);
+      refreshChapMinhOwnership(game);
+      recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
+      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
+    }
+    if (skillKey === 'skill2') {
+      consumeShieldByCurrentRatio(caster, 0.1);
+      const target = pickTarget(game, caster);
+      if (!target?.alive) {
+        return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+      }
+      const base = Math.max(1, Math.floor(casterPower));
+      for (let hit = 0; hit < 3; hit += 1) {
+        dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill });
+      }
+      recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
+      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 1);
+    }
+    if (skillKey === 'skill3') {
+      const heal = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.35));
+      caster.hp = Math.max(0, Math.min(caster.hpMax ?? 0, (caster.hp ?? 0) + heal));
+      Statuses.add(caster, {
+        id: 'chap_minh_ult_arm_up',
+        kind: 'buff',
+        tag: 'arm-up',
+        amount: 0.5,
+        dur: 2,
+        tick: 'turn',
+        sourceUnitId: caster.id,
+      });
+      Statuses.add(caster, {
+        id: 'chap_minh_ult_res_up',
+        kind: 'buff',
+        tag: 'res-up',
+        amount: 0.5,
+        dur: 2,
+        tick: 'turn',
+        sourceUnitId: caster.id,
+      });
+      const shieldBonusDamage = Math.max(0, Math.floor(readShieldAmount(caster) * 0.5));
+      const base = Math.max(1, Math.floor(casterPower + shieldBonusDamage));
+      let hits = 0;
+      for (const token of game.tokens) {
+        if (!token.alive || token.side === caster.side) continue;
+        dealAbilityDamage(game, caster, token, { base, dtype: 'mixed', attackType: 'skill', skill, isAoE: true });
+        hits += 1;
+      }
+      recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
+      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, hits);
+    }
+  }
 
   if (caster.id === BLOOD_AVATAR_ID) {
     const enemies = partitionTokensBySide(game.tokens, caster.side).enemyTokens;

@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -3971,6 +3971,85 @@ __modules['./catalog.ts'] = (exports, module, __require) => {
           }
       },
       {
+          id: 'ly_thanh_thu', name: 'Lý Thanh Thu', class: 'Warrior', rank: 'UR', base_element: 'law',
+          mods: { ATK: 0.12, WIL: 0.12, ARM: 0.06, RES: 0.06 },
+          kit: {
+              onSpawn: createOnSpawn(),
+              basic: asUnknownRecord({
+                  name: 'Đánh Thường',
+                  tags: ['single-target'],
+              }),
+              skills: asUnknownRecordArray([
+                  {
+                      key: 'skill1',
+                      name: 'Phi Kiếm Trảm Đích',
+                      tags: ['active', 'single-target', 'aether-cost', 'counts-as-basic', 'rule'],
+                      cost: { aether: 25 },
+                      damageMultiplier: 2.5,
+                      notes: 'Gây sát thương đơn mục tiêu = 250% đánh thường, vẫn tính là đánh thường.'
+                  },
+                  {
+                      key: 'skill2',
+                      name: 'Tuần Thiên Phi Kiếm',
+                      tags: ['active', 'aoe', 'aether-cost', 'non-heal-hp-change', 'rule'],
+                      cost: { aether: 45 },
+                      cooldown: 0,
+                      path: [1, 4, 7, 8, 9, 6, 3, 2, 5, 8],
+                      lingerSlots: [7, 9, 3, 2],
+                      lingerTurns: 1,
+                      bleedOnLinger: true,
+                      notes: 'Phi kiếm gây sát thương theo lộ trình cố định, để lại chảy máu khi đỗ tại các ô mốc.'
+                  },
+                  {
+                      key: 'skill3',
+                      name: 'Pháp Tắc Chiến Ý',
+                      tags: ['passive', 'rule'],
+                      trigger: {
+                          onDamageAtLeastEnemiesPerTurn: 2,
+                          gainResArmPercent: 0.2,
+                          maxStacks: 3,
+                          durationTurns: 2,
+                          aeCostPerTrigger: 8,
+                      },
+                      notes: 'Mỗi lần gây sát thương thành công lên >=2 địch trong lượt: cộng dồn ARM/RES theo tỷ lệ tại thời điểm kích hoạt.'
+                  }
+              ]),
+              ult: asUnknownRecord({
+                  name: 'Quy Tắc – Đoạn Chủ',
+                  tags: ['active', 'single-target', 'rule'],
+                  target: 'enemy_leader',
+                  damageMultiplier: 2.0,
+                  countsAsBasic: false,
+                  healSelfIfDamageOverTargetMaxHp: 0.2,
+                  healSelfPercentMaxHp: 0.1,
+              }),
+              talent: asUnknownRecord({
+                  name: 'Sát Ý Quy Luật',
+                  stackPerNonSummonDeath: 1,
+                  statGainPerStackFromCurrent: { ATK: 0.1, WIL: 0.1 },
+                  maxTriggersPerTurn: 3,
+                  maxStacksPerBattle: 25,
+                  resetOnRevive: true,
+                  transferToLeaderOnDeath: { ratio: 0.5, stats: ['ATK', 'WIL'] },
+                  healEveryStacks: { stacks: 5, healPercentMaxHp: 0.2 },
+              }),
+              technique: null,
+              passives: asUnknownRecordArray([
+                  {
+                      id: 'ly_thanh_thu_death_stack',
+                      name: 'Sát Ý Quy Luật',
+                      when: 'onAnyNonSummonDeath',
+                      effect: 'gainDynamicAtkWilStack',
+                      params: { ratio: 0.1, maxPerTurn: 3, maxStacks: 25, resetOnRevive: true }
+                  }
+              ]),
+              traits: asUnknownRecordArray([
+                  { id: 'law-domain', text: 'Nội tại, kỹ năng và tuyệt kỹ đều thuộc miền Pháp tắc.' },
+                  { id: 'stack-transfer', text: 'Khi tử vong, chuyển 50% ATK/WIL tích lũy từ nội tại cho Leader đồng minh.' },
+              ]),
+          }
+      },
+      {
           id: 'laky', name: 'La Kỳ', class: 'Support', rank: 'SSR',
           mods: { WIL: 0.10, PER: 0.10 },
           kit: {
@@ -4392,9 +4471,11 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   const getCounterBonusMetadata = __dep14.getCounterBonusMetadata;
   const __dep15 = __require('./combat/chap-minh-runtime.ts');
   const applyChapMinhMitigation = __dep15.applyChapMinhMitigation;
+  const applyChapMinhPhaseShift = __dep15.applyChapMinhPhaseShift;
   const recordChapMinhPreventedDamage = __dep15.recordChapMinhPreventedDamage;
   const __dep16 = __require('./combat/unit-runtime-hooks.ts');
   const runRuntimeDamageResolved = __dep16.runRuntimeDamageResolved;
+  const runRuntimeUnitDeath = __dep16.runRuntimeUnitDeath;
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
@@ -4732,6 +4813,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
               return;
           unit._passiveDeathAt = deadAt;
           emitPassiveEvent(Game, unit, 'onDeath', { log: getPassiveLog(Game) });
+          runRuntimeUnitDeath({ game: Game, deadUnit: unit, killer: attacker });
       };
       const sharedRules = getSharedHpRules(target);
       const sharedTargets = [];
@@ -4789,8 +4871,10 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       }
       if (target.hp <= 0) {
           hookOnLethalDamage(target);
+          emitOnDeathPassive(target);
       }
       runRuntimeDamageResolved(target);
+      applyChapMinhPhaseShift(target);
       const damageResult = {
           dealt: dealtTotal,
           absorbed: abs.absorbed,
@@ -5712,21 +5796,28 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const Statuses = __dep7.Statuses;
   const __dep8 = __require('./combat/unit-runtime-hooks.ts');
   const runRuntimeActiveSkill = __dep8.runRuntimeActiveSkill;
-  const __dep9 = __require('./combat/skill-metadata-utils.ts');
-  const createSkillMetadataContext = __dep9.createSkillMetadataContext;
-  const __dep10 = __require('./combat/number-utils.ts');
-  const readAtkWilPower = __dep10.readAtkWilPower;
-  const readUnitHpState = __dep10.readUnitHpState;
-  const toFiniteNumber = __dep10.toFiniteNumber;
-  const toFloorInt = __dep10.toFloorInt;
-  const toPositiveTurns = __dep10.toPositiveTurns;
-  const toRoundedInt = __dep10.toRoundedInt;
-  const __dep11 = __require('./combat/token-side-utils.ts');
-  const partitionTokensBySide = __dep11.partitionTokensBySide;
-  const __dep12 = __require('./combat/skill-result.ts');
-  const buildSkillResult = __dep12.buildSkillResult;
-  const __dep13 = __require('./combat/tag-aliases.ts');
-  const canonicalizeCombatTagsWithRule = __dep13.canonicalizeCombatTagsWithRule;
+  const __dep9 = __require('./combat/chap-minh-runtime.ts');
+  const activateChapMinhLink = __dep9.activateChapMinhLink;
+  const refreshChapMinhOwnership = __dep9.refreshChapMinhOwnership;
+  const __dep10 = __require('./combat/skill-metadata-utils.ts');
+  const createSkillMetadataContext = __dep10.createSkillMetadataContext;
+  const resolveSkillPayload = __dep10.resolveSkillPayload;
+  const __dep11 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep11.readAtkWilPower;
+  const readUnitHpState = __dep11.readUnitHpState;
+  const toFiniteNumber = __dep11.toFiniteNumber;
+  const toFloorInt = __dep11.toFloorInt;
+  const toPositiveTurns = __dep11.toPositiveTurns;
+  const toRoundedInt = __dep11.toRoundedInt;
+  const __dep12 = __require('./combat/token-side-utils.ts');
+  const partitionTokensBySide = __dep12.partitionTokensBySide;
+  const __dep13 = __require('./combat/skill-result.ts');
+  const buildSkillResult = __dep13.buildSkillResult;
+  const __dep14 = __require('./combat/tag-aliases.ts');
+  const canonicalizeCombatTagsWithRule = __dep14.canonicalizeCombatTagsWithRule;
+  const __dep15 = __require('./combat/apply-damage.ts');
+  const consumeShieldByCurrentRatio = __dep15.consumeShieldByCurrentRatio;
+  const readShieldAmount = __dep15.readShieldAmount;
   const EMPTY_TAGS = [];
   const EFFECT_APPLICATION_TAGS = new Set([
       'heal',
@@ -5749,6 +5840,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       sleepTurnsOnCap: 1,
   });
   const BLOOD_AVATAR_ID = 'blood_avatar';
+  const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const BLOOD_AVATAR_SKILL_COST = 25;
   const BLOOD_AVATAR_BLEED_STATUS = Object.freeze({
       id: 'bleed',
@@ -5910,7 +6002,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       const { tags } = canonicalizeCombatTagsWithRule(normalizeTagList(skill.tags ?? []));
       const { effectTags, hasAetherCostTag, hasSummonTag, hasUniqueGlobalTag, hasDamageTag, } = parseSkillTags(tags);
       const skillMeta = createSkillMetadataContext(skill);
-      const { payload } = skillMeta;
+      const payload = resolveSkillPayload(skill);
       const maxSkillUses = readSkillUseCap(payload);
       if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
           return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
@@ -5970,6 +6062,60 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           return runtimeSkillResult;
       }
       const casterPower = readAtkWilPower(caster);
+      if (caster.id === CHAP_MINH_ID) {
+          if (skillKey === 'skill1') {
+              activateChapMinhLink(caster);
+              refreshChapMinhOwnership(game);
+              recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
+              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
+          }
+          if (skillKey === 'skill2') {
+              consumeShieldByCurrentRatio(caster, 0.1);
+              const target = pickTarget(game, caster);
+              if (!target?.alive) {
+                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+              }
+              const base = Math.max(1, Math.floor(casterPower));
+              for (let hit = 0; hit < 3; hit += 1) {
+                  dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill });
+              }
+              recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
+              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 1);
+          }
+          if (skillKey === 'skill3') {
+              const heal = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.35));
+              caster.hp = Math.max(0, Math.min(caster.hpMax ?? 0, (caster.hp ?? 0) + heal));
+              Statuses.add(caster, {
+                  id: 'chap_minh_ult_arm_up',
+                  kind: 'buff',
+                  tag: 'arm-up',
+                  amount: 0.5,
+                  dur: 2,
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+              Statuses.add(caster, {
+                  id: 'chap_minh_ult_res_up',
+                  kind: 'buff',
+                  tag: 'res-up',
+                  amount: 0.5,
+                  dur: 2,
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+              const shieldBonusDamage = Math.max(0, Math.floor(readShieldAmount(caster) * 0.5));
+              const base = Math.max(1, Math.floor(casterPower + shieldBonusDamage));
+              let hits = 0;
+              for (const token of game.tokens) {
+                  if (!token.alive || token.side === caster.side)
+                      continue;
+                  dealAbilityDamage(game, caster, token, { base, dtype: 'mixed', attackType: 'skill', skill, isAoE: true });
+                  hits += 1;
+              }
+              recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
+              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, hits);
+          }
+      }
       if (caster.id === BLOOD_AVATAR_ID) {
           const enemies = partitionTokensBySide(game.tokens, caster.side).enemyTokens;
           const consumeBloodAether = () => (usesTagAetherCost || consumeSideAether(caster.side, BLOOD_AVATAR_SKILL_COST));
@@ -6076,6 +6222,476 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'performActiveSkill')) exports.performActiveSkill = performActiveSkill;
+};
+__modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat.ts');
+  const dealAbilityDamage = __dep0.dealAbilityDamage;
+  const __dep1 = __require('./engine.ts');
+  const slotToCell = __dep1.slotToCell;
+  const __dep2 = __require('./statuses.ts');
+  const Statuses = __dep2.Statuses;
+  const __dep3 = __require('./aether.ts');
+  const globalAetherPool = __dep3.globalAetherPool;
+  const __dep4 = __require('./combat/skill-result.ts');
+  const buildSkillResult = __dep4.buildSkillResult;
+  const __dep5 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep5.readAtkWilPower;
+  const toFiniteNumber = __dep5.toFiniteNumber;
+  const toRoundedInt = __dep5.toRoundedInt;
+  const __dep6 = __require('./combat/board-position-utils.ts');
+  const isLeaderToken = __dep6.isLeaderToken;
+  const LY_THANH_THU_ID = 'ly_thanh_thu';
+  const PASSIVE_GAIN_RATIO = 0.1;
+  const PASSIVE_MAX_PER_TURN = 3;
+  const PASSIVE_MAX_STACKS = 25;
+  const PASSIVE_HEAL_EVERY_STACKS = 5;
+  const PASSIVE_HEAL_RATIO = 0.2;
+  const PASSIVE_TRANSFER_RATIO = 0.5;
+  const SKILL3_RES_ARM_RATIO = 0.2;
+  const SKILL3_MAX_STACKS = 3;
+  const SKILL3_STACK_DURATION_TURNS = 2;
+  const BLEED_DURATION = 1;
+  const FLYING_SWORD_STAGES = [
+      { slots: [7, 8, 9], countsAsBasic: true, parkSlot: 9 },
+      { slots: [9, 6, 3], countsAsBasic: false, parkSlot: 3 },
+      { slots: [2, 3], countsAsBasic: false, parkSlot: 2 },
+      { slots: [2, 5, 8], countsAsBasic: true },
+  ];
+  function readTurnStamp(game) {
+      const count = Number(game.turn?.turnCount ?? Number.NaN);
+      if (Number.isFinite(count) && count > 0)
+          return Math.floor(count);
+      return Math.max(1, Math.floor(Number(game.turn?.cycle ?? 1)));
+  }
+  function isSummonedUnit(unit) {
+      return !!unit.isMinion || Number.isFinite(unit.ownerIid);
+  }
+  function findLeader(game, side) {
+      for (const token of game.tokens) {
+          if (!token.alive || token.side !== side)
+              continue;
+          if (isLeaderToken(token))
+              return token;
+      }
+      return null;
+  }
+  function findUnitAtSlot(game, side, slot) {
+      const { cx, cy } = slotToCell(side, slot);
+      for (const token of game.tokens) {
+          if (!token.alive || token.side !== side)
+              continue;
+          if (token.cx === cx && token.cy === cy)
+              return token;
+      }
+      return null;
+  }
+  function getRuntimeState(game) {
+      const runtimeRoot = (game.runtime ??= {});
+      const current = runtimeRoot._lyThanhThuRuntime;
+      if (current)
+          return current;
+      const created = { swords: [] };
+      runtimeRoot._lyThanhThuRuntime = created;
+      return created;
+  }
+  function addPassiveStack(game, unit) {
+      const turnStamp = readTurnStamp(game);
+      if ((unit._lyThanhThuPassiveTurnStamp ?? -1) !== turnStamp) {
+          unit._lyThanhThuPassiveTurnStamp = turnStamp;
+          unit._lyThanhThuPassiveTurnGain = 0;
+      }
+      const turnGain = Math.max(0, toRoundedInt(unit._lyThanhThuPassiveTurnGain ?? 0, 0));
+      if (turnGain >= PASSIVE_MAX_PER_TURN)
+          return;
+      const stacks = Math.max(0, toRoundedInt(unit._lyThanhThuPassiveStacks ?? 0, 0));
+      if (stacks >= PASSIVE_MAX_STACKS)
+          return;
+      const atkNow = Math.max(0, toFiniteNumber(unit.atk, 0));
+      const wilNow = Math.max(0, toFiniteNumber(unit.wil, 0));
+      const atkGain = Math.max(1, Math.floor(atkNow * PASSIVE_GAIN_RATIO));
+      const wilGain = Math.max(1, Math.floor(wilNow * PASSIVE_GAIN_RATIO));
+      unit.atk = Math.max(0, Math.floor(atkNow + atkGain));
+      unit.wil = Math.max(0, Math.floor(wilNow + wilGain));
+      unit._lyThanhThuPassiveAtkBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveAtkBonus, 0) + atkGain);
+      unit._lyThanhThuPassiveWilBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveWilBonus, 0) + wilGain);
+      unit._lyThanhThuPassiveStacks = stacks + 1;
+      unit._lyThanhThuPassiveTurnGain = turnGain + 1;
+      if ((unit._lyThanhThuPassiveStacks % PASSIVE_HEAL_EVERY_STACKS) === 0) {
+          const heal = Math.max(1, Math.floor(Math.max(0, toFiniteNumber(unit.hpMax, 0)) * PASSIVE_HEAL_RATIO));
+          unit.hp = Math.min(Math.max(0, toFiniteNumber(unit.hpMax, 0)), Math.max(0, toFiniteNumber(unit.hp, 0)) + heal);
+      }
+  }
+  function transferPassiveStatsToLeader(game, unit) {
+      const leader = findLeader(game, unit.side);
+      if (!leader || leader.iid === unit.iid)
+          return;
+      const atkBonus = Math.max(0, Math.floor(toFiniteNumber(unit._lyThanhThuPassiveAtkBonus, 0) * PASSIVE_TRANSFER_RATIO));
+      const wilBonus = Math.max(0, Math.floor(toFiniteNumber(unit._lyThanhThuPassiveWilBonus, 0) * PASSIVE_TRANSFER_RATIO));
+      if (atkBonus > 0)
+          leader.atk = Math.max(0, Math.floor(toFiniteNumber(leader.atk, 0) + atkBonus));
+      if (wilBonus > 0)
+          leader.wil = Math.max(0, Math.floor(toFiniteNumber(leader.wil, 0) + wilBonus));
+  }
+  function resetPassive(unit) {
+      unit._lyThanhThuPassiveStacks = 0;
+      unit._lyThanhThuPassiveTurnStamp = undefined;
+      unit._lyThanhThuPassiveTurnGain = 0;
+      unit._lyThanhThuPassiveAtkBonus = 0;
+      unit._lyThanhThuPassiveWilBonus = 0;
+  }
+  function applyBleedAtSlot(game, side, slot, sourceUnitId) {
+      const target = findUnitAtSlot(game, side, slot);
+      if (!target)
+          return;
+      Statuses.add(target, {
+          id: 'bleed',
+          kind: 'debuff',
+          tag: 'bleed',
+          dur: BLEED_DURATION,
+          tick: 'turn',
+          sourceUnitId,
+      });
+  }
+  function triggerSkill3Defense(game, caster) {
+      if (!globalAetherPool.consume(caster.side, 8))
+          return;
+      const turnStamp = readTurnStamp(game);
+      const stacks = caster._lyThanhThuDefenseStacks ?? [];
+      if (stacks.length >= SKILL3_MAX_STACKS) {
+          const oldest = stacks.shift();
+          if (oldest) {
+              caster.arm = Math.max(0, toFiniteNumber(caster.arm, 0) - oldest.armBonus);
+              caster.res = Math.max(0, toFiniteNumber(caster.res, 0) - oldest.resBonus);
+          }
+      }
+      const armNow = Math.max(0, toFiniteNumber(caster.arm, 0));
+      const resNow = Math.max(0, toFiniteNumber(caster.res, 0));
+      const armBonus = armNow * SKILL3_RES_ARM_RATIO;
+      const resBonus = resNow * SKILL3_RES_ARM_RATIO;
+      caster.arm = Math.max(0, armNow + armBonus);
+      caster.res = Math.max(0, resNow + resBonus);
+      stacks.push({ armBonus, resBonus, expiresAtTurn: turnStamp + (SKILL3_STACK_DURATION_TURNS - 1) });
+      caster._lyThanhThuDefenseStacks = stacks;
+  }
+  function expireDefenseStacks(game, unit) {
+      const stacks = unit._lyThanhThuDefenseStacks;
+      if (!Array.isArray(stacks) || stacks.length === 0)
+          return;
+      const turnStamp = readTurnStamp(game);
+      const remain = [];
+      for (const stack of stacks) {
+          if (stack.expiresAtTurn >= turnStamp) {
+              remain.push(stack);
+              continue;
+          }
+          unit.arm = Math.max(0, toFiniteNumber(unit.arm, 0) - Math.max(0, stack.armBonus));
+          unit.res = Math.max(0, toFiniteNumber(unit.res, 0) - Math.max(0, stack.resBonus));
+      }
+      unit._lyThanhThuDefenseStacks = remain;
+  }
+  function runFlyingSwordStage(game, caster, stage, skill) {
+      let hits = 0;
+      const base = Math.max(1, Math.floor(readAtkWilPower(caster)));
+      const enemySide = caster.side === 'ally' ? 'enemy' : 'ally';
+      for (const slot of stage.slots) {
+          const target = findUnitAtSlot(game, enemySide, slot);
+          if (!target)
+              continue;
+          dealAbilityDamage(game, caster, target, {
+              base,
+              dtype: 'mixed',
+              attackType: stage.countsAsBasic ? 'basic' : 'skill',
+              skill,
+              isAoE: true,
+          });
+          hits += 1;
+      }
+      if (stage.parkSlot != null) {
+          applyBleedAtSlot(game, enemySide, stage.parkSlot, caster.id);
+      }
+      return hits;
+  }
+  const lyThanhThuRuntimeHook = {
+      onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
+          const ltt = caster;
+          const enemySide = caster.side === 'ally' ? 'enemy' : 'ally';
+          if (skillKey === 'skill1') {
+              const target = game.tokens.find((token) => token.alive && token.side === enemySide) ?? null;
+              if (!target)
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
+              const base = Math.max(1, Math.floor(readAtkWilPower(caster) * 2.5));
+              dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'basic', skill });
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1);
+          }
+          if (skillKey === 'skill2') {
+              const firstStageHits = runFlyingSwordStage(game, ltt, { slots: [1, 4, 7], countsAsBasic: false, parkSlot: 7 }, skill);
+              if (firstStageHits >= 2) {
+                  triggerSkill3Defense(game, ltt);
+              }
+              const runtime = getRuntimeState(game);
+              runtime.swords.push({
+                  ownerIid: String(caster.iid ?? caster.id),
+                  stageIndex: 0,
+                  waitTurns: 1,
+              });
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, firstStageHits);
+          }
+          if (skillKey === 'skill3') {
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
+          }
+          return null;
+      },
+      onTurnStart({ game, unit }) {
+          const ltt = unit;
+          if (!ltt || ltt.id !== LY_THANH_THU_ID || !ltt.alive)
+              return;
+          const runtime = getRuntimeState(game);
+          const ownerKey = String(ltt.iid ?? ltt.id);
+          for (let index = runtime.swords.length - 1; index >= 0; index -= 1) {
+              const sword = runtime.swords[index];
+              if (!sword)
+                  continue;
+              if (sword.ownerIid !== ownerKey)
+                  continue;
+              sword.waitTurns -= 1;
+              if (sword.waitTurns > 0)
+                  continue;
+              const stage = FLYING_SWORD_STAGES[sword.stageIndex];
+              if (!stage) {
+                  runtime.swords.splice(index, 1);
+                  continue;
+              }
+              const hits = runFlyingSwordStage(game, ltt, stage, null);
+              if (hits >= 2) {
+                  triggerSkill3Defense(game, ltt);
+              }
+              sword.stageIndex += 1;
+              if (sword.stageIndex >= FLYING_SWORD_STAGES.length) {
+                  runtime.swords.splice(index, 1);
+              }
+              else {
+                  sword.waitTurns = 1;
+              }
+          }
+      },
+      onTurnEnd({ game, unit }) {
+          const ltt = unit;
+          if (!ltt || ltt.id !== LY_THANH_THU_ID)
+              return;
+          expireDefenseStacks(game, ltt);
+      },
+      onUnitDeath({ game, deadUnit }) {
+          if (deadUnit.id === LY_THANH_THU_ID) {
+              transferPassiveStatsToLeader(game, deadUnit);
+          }
+          if (isSummonedUnit(deadUnit))
+              return;
+          for (const token of game.tokens) {
+              if (!token.alive || token.id !== LY_THANH_THU_ID)
+                  continue;
+              addPassiveStack(game, token);
+          }
+      },
+      onUnitRevive({ unit }) {
+          if (unit.id !== LY_THANH_THU_ID)
+              return;
+          resetPassive(unit);
+      },
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'lyThanhThuRuntimeHook')) exports.lyThanhThuRuntimeHook = lyThanhThuRuntimeHook;
+};
+__modules['./combat/runtime-hooks/mong-yem.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat.ts');
+  const dealAbilityDamage = __dep0.dealAbilityDamage;
+  const pickTarget = __dep0.pickTarget;
+  const __dep1 = __require('./statuses.ts');
+  const Statuses = __dep1.Statuses;
+  const __dep2 = __require('./combat/skill-result.ts');
+  const buildSkillResult = __dep2.buildSkillResult;
+  const __dep3 = __require('./combat/tag-dispatch.ts');
+  const applyMarkSleepSetupTag = __dep3.applyMarkSleepSetupTag;
+  const __dep4 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep4.readAtkWilPower;
+  const toFiniteNumber = __dep4.toFiniteNumber;
+  const toPositiveTurns = __dep4.toPositiveTurns;
+  const toRoundedInt = __dep4.toRoundedInt;
+  const __dep5 = __require('./combat/skill-metadata-utils.ts');
+  const createSkillMetadataReader = __dep5.createSkillMetadataReader;
+  const __dep6 = __require('./combat/status-utils.ts');
+  const getStatusEntryById = __dep6.getStatusEntryById;
+  const __dep7 = __require('./utils/rng.ts');
+  const nextRngValue = __dep7.nextRngValue;
+  const __dep8 = __require('./combat/token-side-utils.ts');
+  const partitionTokensBySide = __dep8.partitionTokensBySide;
+  const sampleTokens = __dep8.sampleTokens;
+  const MONG_YEM_SELF_SLEEP_FLAG = 'mong_yem_self_sleep';
+  const MONG_YEM_SELF_SLEEP_GROWTH_RATIO = 0.07;
+  const MONG_YEM_SELF_SLEEP_WAKE_HP_RATIO = 0.35;
+  const MONG_YEM_MARK_ID = 'me_hoac';
+  function clearMongYemSelfSleep(unit) {
+      unit._mongYemSelfSleepActive = false;
+      if (!Array.isArray(unit.statuses) || unit.statuses.length === 0)
+          return;
+      for (let index = unit.statuses.length - 1; index >= 0; index -= 1) {
+          const status = unit.statuses[index];
+          if (!status)
+              continue;
+          if (status.id === 'sleep' || status.id === MONG_YEM_SELF_SLEEP_FLAG) {
+              unit.statuses.splice(index, 1);
+          }
+      }
+  }
+  function applyMongYemSelfSleepGrowth(unit) {
+      const atk = Math.max(0, toFiniteNumber(unit.atk, 0));
+      const wil = Math.max(0, toFiniteNumber(unit.wil, 0));
+      unit.atk = Math.max(0, Math.floor(atk * (1 + MONG_YEM_SELF_SLEEP_GROWTH_RATIO)));
+      unit.wil = Math.max(0, Math.floor(wil * (1 + MONG_YEM_SELF_SLEEP_GROWTH_RATIO)));
+  }
+  function maybeWakeMongYem(unit) {
+      const hpMax = Math.max(1, toFiniteNumber(unit.hpMax, 1));
+      const hp = Math.max(0, toFiniteNumber(unit.hp, hpMax));
+      if (hp > hpMax * MONG_YEM_SELF_SLEEP_WAKE_HP_RATIO)
+          return;
+      clearMongYemSelfSleep(unit);
+  }
+  function readStatusStacks(unit, statusId) {
+      const statusEntry = getStatusEntryById(unit, statusId);
+      return Math.max(0, toRoundedInt(statusEntry?.status.stacks ?? 0, 0));
+  }
+  const mongYemRuntimeHook = {
+      onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
+          const skillMeta = createSkillMetadataReader(skill);
+          if (skillKey === 'skill1') {
+              const duration = toPositiveTurns(skillMeta.readNumber(3, 'duration', 'turns'));
+              Statuses.add(caster, {
+                  id: 'mong_yem_evade_basic',
+                  kind: 'buff',
+                  tag: 'self-buff',
+                  amount: 0.5,
+                  dur: duration,
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
+          }
+          if (skillKey === 'skill2') {
+              const duration = toPositiveTurns(skillMeta.readNumber(99, 'duration', 'turns'));
+              const selfSleepDamageReduction = Math.max(0, skillMeta.readNumber(0.5, 'selfSleepDamageReduction', 'selfDamageReduction', 'damageReduction'));
+              Statuses.add(caster, {
+                  id: 'sleep',
+                  kind: 'debuff',
+                  tag: 'sleep',
+                  dur: duration,
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+              Statuses.add(caster, {
+                  id: MONG_YEM_SELF_SLEEP_FLAG,
+                  kind: 'buff',
+                  tag: 'defense',
+                  amount: selfSleepDamageReduction,
+                  dur: duration,
+                  tick: 'turn',
+                  sourceUnitId: caster.id,
+              });
+              caster._mongYemSelfSleepActive = true;
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
+          }
+          if (skillKey !== 'skill3')
+              return null;
+          const target = pickTarget(game, caster);
+          if (!target?.alive) {
+              return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
+          }
+          const baseMultiplier = Math.max(0, toFiniteNumber(skill.damageMultiplier, 1.8));
+          const bonusConfig = skillMeta.readRecord('bonusPerMark');
+          const markId = typeof bonusConfig?.id === 'string' ? bonusConfig.id : MONG_YEM_MARK_ID;
+          const markBonusAmount = Math.max(0, toFiniteNumber(bonusConfig?.amount, 0));
+          const markBonusMax = Math.max(0, toFiniteNumber(bonusConfig?.max, 0));
+          const markMaxStacks = Math.max(1, toRoundedInt(skillMeta.readNumber(3, 'markMaxStacks', 'maxMarkStacks'), 3));
+          const sleepTurnsOnCap = toPositiveTurns(skillMeta.readNumber(1, 'sleepTurnsOnCap', 'sleepTurns'));
+          const markStacks = readStatusStacks(target, markId);
+          const markBonus = Math.min(markBonusMax, markStacks * markBonusAmount);
+          const finalMultiplier = baseMultiplier * (1 + markBonus);
+          const base = Math.max(1, Math.floor(readAtkWilPower(caster) * finalMultiplier));
+          const pierceConfig = skillMeta.readRecord('pierceIfSleeping');
+          const sleeping = getStatusEntryById(target, 'sleep') != null;
+          const defPen = sleeping
+              ? Math.max(0, toFiniteNumber(pierceConfig?.ARM ?? 0, 0), toFiniteNumber(pierceConfig?.RES ?? 0, 0))
+              : 0;
+          dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill, defPen });
+          applyMarkSleepSetupTag(game, caster, target, {
+              markId,
+              markStacks: 1,
+              markMaxStacks,
+              markPurgeable: false,
+              sleepTurnsOnCap,
+          });
+          let spreadHits = 0;
+          const spreadConfig = skillMeta.readRecord('spreadMark');
+          const spreadTargets = Math.max(0, toRoundedInt(spreadConfig?.targets, 0));
+          if (sleeping && spreadTargets > 0) {
+              const spreadMarkId = typeof spreadConfig?.id === 'string' ? spreadConfig.id : markId;
+              const spreadStacks = Math.max(1, toRoundedInt(spreadConfig?.stacks, 1));
+              const spreadMaxStacks = Math.max(1, toRoundedInt(spreadConfig?.maxStacks, markMaxStacks));
+              const spreadSleepTurnsOnCap = toPositiveTurns(toFiniteNumber(spreadConfig?.sleepTurnsOnCap, sleepTurnsOnCap));
+              const enemies = partitionTokensBySide(game.tokens, caster.side, { sortByBoardPosition: true }).enemyTokens;
+              const spreadCandidates = sampleTokens(enemies, spreadTargets, {
+                  exclude: (enemy) => enemy.iid === target.iid,
+                  randomValue: () => nextRngValue(game.rng),
+              });
+              for (const enemy of spreadCandidates) {
+                  spreadHits += 1;
+                  applyMarkSleepSetupTag(game, caster, enemy, {
+                      markId: spreadMarkId,
+                      markStacks: spreadStacks,
+                      markMaxStacks: spreadMaxStacks,
+                      markPurgeable: false,
+                      sleepTurnsOnCap: spreadSleepTurnsOnCap,
+                  });
+              }
+          }
+          return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1 + spreadHits);
+      },
+      onTurnStart({ unit }) {
+          const mongYem = unit;
+          if (!mongYem?.alive || !mongYem._mongYemSelfSleepActive)
+              return;
+          applyMongYemSelfSleepGrowth(mongYem);
+          maybeWakeMongYem(mongYem);
+      },
+      onDamageResolved({ target }) {
+          const mongYem = target;
+          if (!mongYem?.alive || !mongYem._mongYemSelfSleepActive)
+              return;
+          maybeWakeMongYem(mongYem);
+      },
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'mongYemRuntimeHook')) exports.mongYemRuntimeHook = mongYemRuntimeHook;
+};
+__modules['./combat/runtime-hooks/registry.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat/runtime-hooks/mong-yem.ts');
+  const mongYemRuntimeHook = __dep0.mongYemRuntimeHook;
+  const __dep1 = __require('./combat/runtime-hooks/ly-thanh-thu.ts');
+  const lyThanhThuRuntimeHook = __dep1.lyThanhThuRuntimeHook;
+  const UNIT_RUNTIME_HOOKS = Object.freeze({
+      mong_yem: mongYemRuntimeHook,
+      ly_thanh_thu: lyThanhThuRuntimeHook,
+  });
+  function getUnitRuntimeHook(unitId) {
+      if (!unitId)
+          return null;
+      return UNIT_RUNTIME_HOOKS[unitId] ?? null;
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_RUNTIME_HOOKS')) exports.UNIT_RUNTIME_HOOKS = UNIT_RUNTIME_HOOKS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitRuntimeHook')) exports.getUnitRuntimeHook = getUnitRuntimeHook;
+};
+__modules['./combat/runtime-hooks/types.ts'] = (exports, module, __require) => {
+
+  //# sourceMappingURL=stdin.js.map
 };
 __modules['./combat/skill-metadata-utils.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/number-utils.ts');
@@ -7244,270 +7860,20 @@ __modules['./combat/token-side-utils.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'sampleTokens')) exports.sampleTokens = sampleTokens;
 };
 __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./combat.ts');
-  const dealAbilityDamage = __dep0.dealAbilityDamage;
-  const pickTarget = __dep0.pickTarget;
-  const __dep1 = __require('./combat/chap-minh-runtime.ts');
-  const activateChapMinhLink = __dep1.activateChapMinhLink;
-  const applyChapMinhActionEnd = __dep1.applyChapMinhActionEnd;
-  const applyChapMinhPhaseShift = __dep1.applyChapMinhPhaseShift;
-  const recoverChapMinhMaxHpPerTurn = __dep1.recoverChapMinhMaxHpPerTurn;
-  const refreshChapMinhOwnership = __dep1.refreshChapMinhOwnership;
-  const __dep2 = __require('./combat/apply-damage.ts');
-  const consumeShieldByCurrentRatio = __dep2.consumeShieldByCurrentRatio;
-  const readShieldAmount = __dep2.readShieldAmount;
-  const __dep3 = __require('./statuses.ts');
-  const Statuses = __dep3.Statuses;
-  const __dep4 = __require('./combat/skill-result.ts');
-  const buildSkillResult = __dep4.buildSkillResult;
-  const __dep5 = __require('./combat/tag-dispatch.ts');
-  const applyMarkSleepSetupTag = __dep5.applyMarkSleepSetupTag;
-  const __dep6 = __require('./combat/number-utils.ts');
-  const readAtkWilPower = __dep6.readAtkWilPower;
-  const toFiniteNumber = __dep6.toFiniteNumber;
-  const toPositiveTurns = __dep6.toPositiveTurns;
-  const toRoundedInt = __dep6.toRoundedInt;
-  const __dep7 = __require('./combat/skill-metadata-utils.ts');
-  const createSkillMetadataReader = __dep7.createSkillMetadataReader;
-  const __dep8 = __require('./combat/status-utils.ts');
-  const getStatusEntryById = __dep8.getStatusEntryById;
-  const __dep9 = __require('./utils/rng.ts');
-  const nextRngValue = __dep9.nextRngValue;
-  const __dep10 = __require('./combat/token-side-utils.ts');
-  const partitionTokensBySide = __dep10.partitionTokensBySide;
-  const sampleTokens = __dep10.sampleTokens;
-  const CHAP_MINH_ID = 'huyen_vu_chap_minh';
-  const MONG_YEM_ID = 'mong_yem';
-  const CHAP_MINH_ULT_ARM_RES_BUFF = 0.5;
-  const CHAP_MINH_ULT_HEAL_RATIO = 0.35;
-  const CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO = 0.5;
-  const MONG_YEM_SELF_SLEEP_FLAG = 'mong_yem_self_sleep';
-  const MONG_YEM_SELF_SLEEP_GROWTH_RATIO = 0.07;
-  const MONG_YEM_SELF_SLEEP_WAKE_HP_RATIO = 0.35;
-  const MONG_YEM_MARK_ID = 'me_hoac';
-  const chapMinhRuntimeHook = {
-      onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
-          if (skillKey === 'skill1') {
-              activateChapMinhLink(caster);
-              refreshChapMinhOwnership(game);
-              return {
-                  ok: true,
-                  skillKey,
-                  skill,
-                  tags,
-                  appliedTags,
-                  targetCount: 0,
-              };
-          }
-          if (skillKey === 'skill3') {
-              const heal = Math.max(1, Math.floor((caster.hpMax ?? 0) * CHAP_MINH_ULT_HEAL_RATIO));
-              caster.hp = Math.max(0, Math.min(caster.hpMax ?? 0, (caster.hp ?? 0) + heal));
-              Statuses.add(caster, {
-                  id: 'chap_minh_ult_arm_up',
-                  kind: 'buff',
-                  tag: 'arm-up',
-                  amount: CHAP_MINH_ULT_ARM_RES_BUFF,
-                  dur: 2,
-                  tick: 'turn',
-                  sourceUnitId: caster.id,
-              });
-              Statuses.add(caster, {
-                  id: 'chap_minh_ult_res_up',
-                  kind: 'buff',
-                  tag: 'res-up',
-                  amount: CHAP_MINH_ULT_ARM_RES_BUFF,
-                  dur: 2,
-                  tick: 'turn',
-                  sourceUnitId: caster.id,
-              });
-              const shieldBonusDamage = Math.max(0, Math.floor(readShieldAmount(caster) * CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO));
-              const base = Math.max(1, Math.floor(readAtkWilPower(caster) + shieldBonusDamage));
-              let hits = 0;
-              for (const token of game.tokens) {
-                  if (!token.alive || token.side === caster.side)
-                      continue;
-                  dealAbilityDamage(game, caster, token, { base, dtype: 'mixed', attackType: 'skill', skill, isAoE: true });
-                  hits += 1;
-              }
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, hits);
-          }
-          if (skillKey !== 'skill2')
-              return null;
-          consumeShieldByCurrentRatio(caster, 0.1);
-          const target = pickTarget(game, caster);
-          if (!target?.alive) {
-              return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-          }
-          const base = Math.max(1, Math.floor(readAtkWilPower(caster)));
-          for (let hit = 0; hit < 3; hit += 1) {
-              dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill });
-          }
-          return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1);
-      },
-      onTurnStart({ game, unit }) {
-          recoverChapMinhMaxHpPerTurn(unit);
-          refreshChapMinhOwnership(game);
-      },
-      onActionEnd({ game, unit }) {
-          applyChapMinhActionEnd(game, unit);
-          refreshChapMinhOwnership(game);
-      },
-      onTurnEnd({ game, unit }) {
-          applyChapMinhPhaseShift(unit);
-          refreshChapMinhOwnership(game);
-      },
-      onDamageResolved({ target }) {
-          applyChapMinhPhaseShift(target);
-      },
-  };
-  function clearMongYemSelfSleep(unit) {
-      unit._mongYemSelfSleepActive = false;
-      if (!Array.isArray(unit.statuses) || unit.statuses.length === 0)
-          return;
-      for (let index = unit.statuses.length - 1; index >= 0; index -= 1) {
-          const status = unit.statuses[index];
-          if (!status)
+  const __dep0 = __require('./combat/runtime-hooks/registry.ts');
+  const getUnitRuntimeHook = __dep0.getUnitRuntimeHook;
+  const UNIT_RUNTIME_HOOKS = __dep0.UNIT_RUNTIME_HOOKS;
+  function forEachRuntimeHook(game, callback) {
+      for (const token of game.tokens) {
+          if (!token)
               continue;
-          if (status.id === 'sleep' || status.id === MONG_YEM_SELF_SLEEP_FLAG) {
-              unit.statuses.splice(index, 1);
-          }
+          const hook = getUnitRuntimeHook(token.id);
+          if (!hook)
+              continue;
+          callback(token, hook);
       }
   }
-  function applyMongYemSelfSleepGrowth(unit) {
-      const atk = Math.max(0, toFiniteNumber(unit.atk, 0));
-      const wil = Math.max(0, toFiniteNumber(unit.wil, 0));
-      unit.atk = Math.max(0, Math.floor(atk * (1 + MONG_YEM_SELF_SLEEP_GROWTH_RATIO)));
-      unit.wil = Math.max(0, Math.floor(wil * (1 + MONG_YEM_SELF_SLEEP_GROWTH_RATIO)));
-  }
-  function maybeWakeMongYem(unit) {
-      const hpMax = Math.max(1, toFiniteNumber(unit.hpMax, 1));
-      const hp = Math.max(0, toFiniteNumber(unit.hp, hpMax));
-      if (hp > hpMax * MONG_YEM_SELF_SLEEP_WAKE_HP_RATIO)
-          return;
-      clearMongYemSelfSleep(unit);
-  }
-  function readStatusStacks(unit, statusId) {
-      const statusEntry = getStatusEntryById(unit, statusId);
-      return Math.max(0, toRoundedInt(statusEntry?.status.stacks ?? 0, 0));
-  }
-  const mongYemRuntimeHook = {
-      onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
-          const skillMeta = createSkillMetadataReader(skill);
-          if (skillKey === 'skill1') {
-              const duration = toPositiveTurns(skillMeta.readNumber(3, 'duration', 'turns'));
-              Statuses.add(caster, {
-                  id: 'mong_yem_evade_basic',
-                  kind: 'buff',
-                  tag: 'self-buff',
-                  amount: 0.5,
-                  dur: duration,
-                  tick: 'turn',
-                  sourceUnitId: caster.id,
-              });
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
-          }
-          if (skillKey === 'skill2') {
-              const duration = toPositiveTurns(skillMeta.readNumber(99, 'duration', 'turns'));
-              const selfSleepDamageReduction = Math.max(0, skillMeta.readNumber(0.5, 'selfSleepDamageReduction', 'selfDamageReduction', 'damageReduction'));
-              Statuses.add(caster, {
-                  id: 'sleep',
-                  kind: 'debuff',
-                  tag: 'sleep',
-                  dur: duration,
-                  tick: 'turn',
-                  sourceUnitId: caster.id,
-              });
-              Statuses.add(caster, {
-                  id: MONG_YEM_SELF_SLEEP_FLAG,
-                  kind: 'buff',
-                  tag: 'defense',
-                  amount: selfSleepDamageReduction,
-                  dur: duration,
-                  tick: 'turn',
-                  sourceUnitId: caster.id,
-              });
-              caster._mongYemSelfSleepActive = true;
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
-          }
-          if (skillKey !== 'skill3')
-              return null;
-          const target = pickTarget(game, caster);
-          if (!target?.alive) {
-              return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-          }
-          const baseMultiplier = Math.max(0, toFiniteNumber(skill.damageMultiplier, 1.8));
-          const bonusConfig = skillMeta.readRecord('bonusPerMark');
-          const markId = typeof bonusConfig?.id === 'string' ? bonusConfig.id : MONG_YEM_MARK_ID;
-          const markBonusAmount = Math.max(0, toFiniteNumber(bonusConfig?.amount, 0));
-          const markBonusMax = Math.max(0, toFiniteNumber(bonusConfig?.max, 0));
-          const markMaxStacks = Math.max(1, toRoundedInt(skillMeta.readNumber(3, 'markMaxStacks', 'maxMarkStacks'), 3));
-          const sleepTurnsOnCap = toPositiveTurns(skillMeta.readNumber(1, 'sleepTurnsOnCap', 'sleepTurns'));
-          const markStacks = readStatusStacks(target, markId);
-          const markBonus = Math.min(markBonusMax, markStacks * markBonusAmount);
-          const finalMultiplier = baseMultiplier * (1 + markBonus);
-          const base = Math.max(1, Math.floor(readAtkWilPower(caster) * finalMultiplier));
-          const pierceConfig = skillMeta.readRecord('pierceIfSleeping');
-          const sleeping = getStatusEntryById(target, 'sleep') != null;
-          const defPen = sleeping
-              ? Math.max(0, toFiniteNumber(pierceConfig?.ARM ?? 0, 0), toFiniteNumber(pierceConfig?.RES ?? 0, 0))
-              : 0;
-          dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill, defPen });
-          applyMarkSleepSetupTag(game, caster, target, {
-              markId,
-              markStacks: 1,
-              markMaxStacks,
-              markPurgeable: false,
-              sleepTurnsOnCap,
-          });
-          let spreadHits = 0;
-          const spreadConfig = skillMeta.readRecord('spreadMark');
-          const spreadTargets = Math.max(0, toRoundedInt(spreadConfig?.targets, 0));
-          if (sleeping && spreadTargets > 0) {
-              const spreadMarkId = typeof spreadConfig?.id === 'string' ? spreadConfig.id : markId;
-              const spreadStacks = Math.max(1, toRoundedInt(spreadConfig?.stacks, 1));
-              const spreadMaxStacks = Math.max(1, toRoundedInt(spreadConfig?.maxStacks, markMaxStacks));
-              const spreadSleepTurnsOnCap = toPositiveTurns(toFiniteNumber(spreadConfig?.sleepTurnsOnCap, sleepTurnsOnCap));
-              const enemies = partitionTokensBySide(game.tokens, caster.side, { sortByBoardPosition: true }).enemyTokens;
-              const spreadCandidates = sampleTokens(enemies, spreadTargets, {
-                  exclude: (enemy) => enemy.iid === target.iid,
-                  randomValue: () => nextRngValue(game.rng),
-              });
-              for (const enemy of spreadCandidates) {
-                  spreadHits += 1;
-                  applyMarkSleepSetupTag(game, caster, enemy, {
-                      markId: spreadMarkId,
-                      markStacks: spreadStacks,
-                      markMaxStacks: spreadMaxStacks,
-                      markPurgeable: false,
-                      sleepTurnsOnCap: spreadSleepTurnsOnCap,
-                  });
-              }
-          }
-          return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1 + spreadHits);
-      },
-      onTurnStart({ unit }) {
-          const mongYem = unit;
-          if (!mongYem?.alive || !mongYem._mongYemSelfSleepActive)
-              return;
-          applyMongYemSelfSleepGrowth(mongYem);
-          maybeWakeMongYem(mongYem);
-      },
-      onDamageResolved({ target }) {
-          const mongYem = target;
-          if (!mongYem?.alive || !mongYem._mongYemSelfSleepActive)
-              return;
-          maybeWakeMongYem(mongYem);
-      },
-  };
-  const UNIT_RUNTIME_HOOKS = Object.freeze({
-      [CHAP_MINH_ID]: chapMinhRuntimeHook,
-      [MONG_YEM_ID]: mongYemRuntimeHook,
-  });
-  function getUnitRuntimeHook(unitId) {
-      if (!unitId)
-          return null;
-      return UNIT_RUNTIME_HOOKS[unitId] ?? null;
-  }
+  exports.getUnitRuntimeHook = getUnitRuntimeHook;
   function runRuntimeTurnStart(game, unit) {
       if (!unit)
           return;
@@ -7531,13 +7897,33 @@ __modules['./combat/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   function runRuntimeActiveSkill(ctx) {
       return getUnitRuntimeHook(ctx.caster.id)?.onActiveSkill?.(ctx) ?? null;
   }
+  function runRuntimeUnitDeath(ctx) {
+      const handledUnitIds = new Set();
+      forEachRuntimeHook(ctx.game, (unit, hook) => {
+          if (!hook.onUnitDeath)
+              return;
+          if (handledUnitIds.has(unit.id))
+              return;
+          handledUnitIds.add(unit.id);
+          hook.onUnitDeath(ctx);
+      });
+  }
+  function runRuntimeUnitRevive(ctx) {
+      const hook = getUnitRuntimeHook(ctx.unit.id);
+      hook?.onUnitRevive?.(ctx);
+  }
+  function listRuntimeHookUnitIds() {
+      return Object.keys(UNIT_RUNTIME_HOOKS);
+  }
   //# sourceMappingURL=stdin.js.map
-  if (!Object.prototype.hasOwnProperty.call(exports, 'getUnitRuntimeHook')) exports.getUnitRuntimeHook = getUnitRuntimeHook;
   if (!Object.prototype.hasOwnProperty.call(exports, 'runRuntimeTurnStart')) exports.runRuntimeTurnStart = runRuntimeTurnStart;
   if (!Object.prototype.hasOwnProperty.call(exports, 'runRuntimeActionEnd')) exports.runRuntimeActionEnd = runRuntimeActionEnd;
   if (!Object.prototype.hasOwnProperty.call(exports, 'runRuntimeTurnEnd')) exports.runRuntimeTurnEnd = runRuntimeTurnEnd;
   if (!Object.prototype.hasOwnProperty.call(exports, 'runRuntimeDamageResolved')) exports.runRuntimeDamageResolved = runRuntimeDamageResolved;
   if (!Object.prototype.hasOwnProperty.call(exports, 'runRuntimeActiveSkill')) exports.runRuntimeActiveSkill = runRuntimeActiveSkill;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'runRuntimeUnitDeath')) exports.runRuntimeUnitDeath = runRuntimeUnitDeath;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'runRuntimeUnitRevive')) exports.runRuntimeUnitRevive = runRuntimeUnitRevive;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'listRuntimeHookUnitIds')) exports.listRuntimeHookUnitIds = listRuntimeHookUnitIds;
 };
 __modules['./config.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/config.ts
@@ -35643,64 +36029,70 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   const performActiveSkill = __dep4.performActiveSkill;
   const __dep5 = __require('./combat/unit-runtime-hooks.ts');
   const runRuntimeActionEnd = __dep5.runRuntimeActionEnd;
+  const runRuntimeUnitRevive = __dep5.runRuntimeUnitRevive;
   const runRuntimeTurnEnd = __dep5.runRuntimeTurnEnd;
   const runRuntimeTurnStart = __dep5.runRuntimeTurnStart;
-  const __dep6 = __require('./config.ts');
-  const CFG = __dep6.CFG;
-  const __dep7 = __require('./meta.ts');
-  const initialRageFor = __dep7.initialRageFor;
-  const __dep8 = __require('./vfx.ts');
-  const vfxAddSpawn = __dep8.vfxAddSpawn;
-  const vfxAddBloodPulse = __dep8.vfxAddBloodPulse;
-  const asSessionWithVfx = __dep8.asSessionWithVfx;
-  const __dep9 = __require('./art.ts');
-  const getUnitArt = __dep9.getUnitArt;
-  const __dep10 = __require('./passives.ts');
-  const emitPassiveEvent = __dep10.emitPassiveEvent;
-  const applyOnSpawnEffects = __dep10.applyOnSpawnEffects;
-  const getPassiveLog = __dep10.getPassiveLog;
-  const prepareUnitForPassives = __dep10.prepareUnitForPassives;
-  const __dep11 = __require('./events.ts');
-  const emitGameEvent = __dep11.emitGameEvent;
-  const TURN_START = __dep11.TURN_START;
-  const TURN_END = __dep11.TURN_END;
-  const ACTION_START = __dep11.ACTION_START;
-  const ACTION_END = __dep11.ACTION_END;
-  const TURN_REGEN = __dep11.TURN_REGEN;
-  const __dep12 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep12.mergeBusyUntil;
-  const safeNow = __dep12.safeNow;
-  const sessionNow = __dep12.sessionNow;
-  const __dep13 = __require('./utils/fury.ts');
-  const initializeFury = __dep13.initializeFury;
-  const startFuryTurn = __dep13.startFuryTurn;
-  const spendFury = __dep13.spendFury;
-  const resolveUltCost = __dep13.resolveUltCost;
-  const setFury = __dep13.setFury;
-  const clearFreshSummon = __dep13.clearFreshSummon;
-  const __dep14 = __require('./turns/interleaved.ts');
-  const nextTurnInterleaved = __dep14.nextTurnInterleaved;
-  const getSequentialOrderIndex = __dep14.getSequentialOrderIndex;
-  const predictSpawnCycleByTurnOrder = __dep14.predictSpawnCycleByTurnOrder;
-  const __dep15 = __require('./modes/pve/collection-mapper.ts');
-  const resolveRuntimeUnitStats = __dep15.resolveRuntimeUnitStats;
-  const __dep16 = __require('./cultivation.ts');
-  const applyCultivationBonus = __dep16.applyCultivationBonus;
-  const __dep17 = __require('./ai.ts');
-  const evaluateGambitLogic = __dep17.evaluateGambitLogic;
-  const __dep18 = __require('./utils/rng.ts');
-  const nextRngValue = __dep18.nextRngValue;
-  const __dep19 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep19.normalizeClassName;
-  const normalizeElementKey = __dep19.normalizeElementKey;
-  const __dep20 = __require('./utils/unique-global.ts');
-  const isUniqueGlobalSummonBlocked = __dep20.isUniqueGlobalSummonBlocked;
-  const __dep21 = __require('./leader-uyen.ts');
-  const clearQueuedUyenUlt = __dep21.clearQueuedUyenUlt;
-  const hasQueuedUyenUlt = __dep21.hasQueuedUyenUlt;
-  const isAnyLeaderUltReady = __dep21.isAnyLeaderUltReady;
-  const isUyenLeader = __dep21.isUyenLeader;
-  const grantUyenSummonRage = __dep21.grantUyenSummonRage;
+  const __dep6 = __require('./combat/chap-minh-runtime.ts');
+  const applyChapMinhActionEnd = __dep6.applyChapMinhActionEnd;
+  const applyChapMinhPhaseShift = __dep6.applyChapMinhPhaseShift;
+  const recoverChapMinhMaxHpPerTurn = __dep6.recoverChapMinhMaxHpPerTurn;
+  const refreshChapMinhOwnership = __dep6.refreshChapMinhOwnership;
+  const __dep7 = __require('./config.ts');
+  const CFG = __dep7.CFG;
+  const __dep8 = __require('./meta.ts');
+  const initialRageFor = __dep8.initialRageFor;
+  const __dep9 = __require('./vfx.ts');
+  const vfxAddSpawn = __dep9.vfxAddSpawn;
+  const vfxAddBloodPulse = __dep9.vfxAddBloodPulse;
+  const asSessionWithVfx = __dep9.asSessionWithVfx;
+  const __dep10 = __require('./art.ts');
+  const getUnitArt = __dep10.getUnitArt;
+  const __dep11 = __require('./passives.ts');
+  const emitPassiveEvent = __dep11.emitPassiveEvent;
+  const applyOnSpawnEffects = __dep11.applyOnSpawnEffects;
+  const getPassiveLog = __dep11.getPassiveLog;
+  const prepareUnitForPassives = __dep11.prepareUnitForPassives;
+  const __dep12 = __require('./events.ts');
+  const emitGameEvent = __dep12.emitGameEvent;
+  const TURN_START = __dep12.TURN_START;
+  const TURN_END = __dep12.TURN_END;
+  const ACTION_START = __dep12.ACTION_START;
+  const ACTION_END = __dep12.ACTION_END;
+  const TURN_REGEN = __dep12.TURN_REGEN;
+  const __dep13 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep13.mergeBusyUntil;
+  const safeNow = __dep13.safeNow;
+  const sessionNow = __dep13.sessionNow;
+  const __dep14 = __require('./utils/fury.ts');
+  const initializeFury = __dep14.initializeFury;
+  const startFuryTurn = __dep14.startFuryTurn;
+  const spendFury = __dep14.spendFury;
+  const resolveUltCost = __dep14.resolveUltCost;
+  const setFury = __dep14.setFury;
+  const clearFreshSummon = __dep14.clearFreshSummon;
+  const __dep15 = __require('./turns/interleaved.ts');
+  const nextTurnInterleaved = __dep15.nextTurnInterleaved;
+  const getSequentialOrderIndex = __dep15.getSequentialOrderIndex;
+  const predictSpawnCycleByTurnOrder = __dep15.predictSpawnCycleByTurnOrder;
+  const __dep16 = __require('./modes/pve/collection-mapper.ts');
+  const resolveRuntimeUnitStats = __dep16.resolveRuntimeUnitStats;
+  const __dep17 = __require('./cultivation.ts');
+  const applyCultivationBonus = __dep17.applyCultivationBonus;
+  const __dep18 = __require('./ai.ts');
+  const evaluateGambitLogic = __dep18.evaluateGambitLogic;
+  const __dep19 = __require('./utils/rng.ts');
+  const nextRngValue = __dep19.nextRngValue;
+  const __dep20 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep20.normalizeClassName;
+  const normalizeElementKey = __dep20.normalizeElementKey;
+  const __dep21 = __require('./utils/unique-global.ts');
+  const isUniqueGlobalSummonBlocked = __dep21.isUniqueGlobalSummonBlocked;
+  const __dep22 = __require('./leader-uyen.ts');
+  const clearQueuedUyenUlt = __dep22.clearQueuedUyenUlt;
+  const hasQueuedUyenUlt = __dep22.hasQueuedUyenUlt;
+  const isAnyLeaderUltReady = __dep22.isAnyLeaderUltReady;
+  const isUyenLeader = __dep22.isUyenLeader;
+  const grantUyenSummonRage = __dep22.grantUyenSummonRage;
   const toActiveUnitKey = (side, slot) => `${side}:${slot}`;
   const createActiveUnitIndex = (Game) => {
       const index = new Map();
@@ -35973,6 +36365,9 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       }
       prepareUnitForPassives(obj);
       Game.tokens.push(obj);
+      if (p.revive) {
+          runRuntimeUnitRevive({ game: Game, unit: obj });
+      }
       applyOnSpawnEffects(Game, obj, kit?.onSpawn ?? undefined);
       let allyLeader;
       for (let idx = 0; idx < Game.tokens.length; idx += 1) {
@@ -36192,11 +36587,15 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           if (emitOnActionEnd) {
               emitPassiveEvent(Game, unit, 'onActionEnd', { log: passiveLog });
               runRuntimeActionEnd(Game, unit);
+              applyChapMinhActionEnd(Game, unit);
+              refreshChapMinhOwnership(Game);
           }
           const wasAliveBeforeTurnEnd = !!unit?.alive;
           const hadBleedBeforeTurnEnd = !!unit && Statuses.has(unit, 'bleed');
           Statuses.onTurnEnd(unit, {});
           runRuntimeTurnEnd(Game, unit);
+          applyChapMinhPhaseShift(unit);
+          refreshChapMinhOwnership(Game);
           if (wasAliveBeforeTurnEnd && unit && !unit.alive && hadBleedBeforeTurnEnd) {
               const bloodAvatarObservers = Game.tokens.filter((token) => token.alive
                   && token.id === 'blood_avatar'
@@ -36238,6 +36637,8 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       applyTurnRegen(Game, unit);
       Statuses.onTurnStart(unit, {});
       runRuntimeTurnStart(Game, unit);
+      recoverChapMinhMaxHpPerTurn(unit);
+      refreshChapMinhOwnership(Game);
       const bloodAvatarFieldOwners = Game.tokens.filter((token) => token.alive
           && token.id === 'blood_avatar'
           && token.side !== unit.side

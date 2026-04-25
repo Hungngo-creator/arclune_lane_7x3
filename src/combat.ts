@@ -18,9 +18,10 @@ import { normalizeClassName } from './utils/domain-normalization.ts';
 import { getCounterBonusMetadata } from './combat/counter-matrix.ts';
 import {
   applyChapMinhMitigation,
+  applyChapMinhPhaseShift,
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
-import { runRuntimeDamageResolved } from './combat/unit-runtime-hooks.ts';
+import { runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
 
 export { applyDamage, grantShield };
 
@@ -496,6 +497,7 @@ export function dealAbilityDamage(
     if (Number.isFinite(marker) && marker === deadAt) return;
     (unit as UnitToken & { _passiveDeathAt?: number })._passiveDeathAt = deadAt;
     emitPassiveEvent(Game, unit, 'onDeath', { log: getPassiveLog(Game) });
+    runRuntimeUnitDeath({ game: Game, deadUnit: unit, killer: attacker });
   };
   const sharedRules = getSharedHpRules(target);
   const sharedTargets = [] as UnitToken[];
@@ -549,8 +551,10 @@ export function dealAbilityDamage(
   }
   if (target.hp <= 0) {
     hookOnLethalDamage(target);
+    emitOnDeathPassive(target);
   }
   runRuntimeDamageResolved(target);
+  applyChapMinhPhaseShift(target);
 
   const damageResult: DamageResult = {
     dealt: dealtTotal,

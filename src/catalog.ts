@@ -1631,6 +1631,85 @@ export const ROSTER = [
     }
   },
   {
+    id: 'ly_thanh_thu', name: 'Lý Thanh Thu', class: 'Warrior', rank: 'UR', base_element: 'law',
+    mods: { ATK: 0.12, WIL: 0.12, ARM: 0.06, RES: 0.06 },
+    kit: {
+      onSpawn: createOnSpawn(),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target'],
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Phi Kiếm Trảm Đích',
+          tags: ['active', 'single-target', 'aether-cost', 'counts-as-basic', 'rule'],
+          cost: { aether: 25 },
+          damageMultiplier: 2.5,
+          notes: 'Gây sát thương đơn mục tiêu = 250% đánh thường, vẫn tính là đánh thường.'
+        },
+        {
+          key: 'skill2',
+          name: 'Tuần Thiên Phi Kiếm',
+          tags: ['active', 'aoe', 'aether-cost', 'non-heal-hp-change', 'rule'],
+          cost: { aether: 45 },
+          cooldown: 0,
+          path: [1, 4, 7, 8, 9, 6, 3, 2, 5, 8],
+          lingerSlots: [7, 9, 3, 2],
+          lingerTurns: 1,
+          bleedOnLinger: true,
+          notes: 'Phi kiếm gây sát thương theo lộ trình cố định, để lại chảy máu khi đỗ tại các ô mốc.'
+        },
+        {
+          key: 'skill3',
+          name: 'Pháp Tắc Chiến Ý',
+          tags: ['passive', 'rule'],
+          trigger: {
+            onDamageAtLeastEnemiesPerTurn: 2,
+            gainResArmPercent: 0.2,
+            maxStacks: 3,
+            durationTurns: 2,
+            aeCostPerTrigger: 8,
+          },
+          notes: 'Mỗi lần gây sát thương thành công lên >=2 địch trong lượt: cộng dồn ARM/RES theo tỷ lệ tại thời điểm kích hoạt.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        name: 'Quy Tắc – Đoạn Chủ',
+        tags: ['active', 'single-target', 'rule'],
+        target: 'enemy_leader',
+        damageMultiplier: 2.0,
+        countsAsBasic: false,
+        healSelfIfDamageOverTargetMaxHp: 0.2,
+        healSelfPercentMaxHp: 0.1,
+      }),
+      talent: asUnknownRecord({
+        name: 'Sát Ý Quy Luật',
+        stackPerNonSummonDeath: 1,
+        statGainPerStackFromCurrent: { ATK: 0.1, WIL: 0.1 },
+        maxTriggersPerTurn: 3,
+        maxStacksPerBattle: 25,
+        resetOnRevive: true,
+        transferToLeaderOnDeath: { ratio: 0.5, stats: ['ATK', 'WIL'] },
+        healEveryStacks: { stacks: 5, healPercentMaxHp: 0.2 },
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'ly_thanh_thu_death_stack',
+          name: 'Sát Ý Quy Luật',
+          when: 'onAnyNonSummonDeath',
+          effect: 'gainDynamicAtkWilStack',
+          params: { ratio: 0.1, maxPerTurn: 3, maxStacks: 25, resetOnRevive: true }
+        }
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'law-domain', text: 'Nội tại, kỹ năng và tuyệt kỹ đều thuộc miền Pháp tắc.' },
+        { id: 'stack-transfer', text: 'Khi tử vong, chuyển 50% ATK/WIL tích lũy từ nội tại cho Leader đồng minh.' },
+      ]),
+    }
+  },
+  {
     id: 'laky', name: 'La Kỳ', class: 'Support', rank: 'SSR',
     mods: { WIL: 0.10, PER: 0.10 },
     kit: {
