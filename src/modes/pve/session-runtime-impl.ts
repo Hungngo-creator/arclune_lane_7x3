@@ -2954,15 +2954,7 @@ function init(): boolean {
     viewport.addEventListener('scroll', visualViewportScrollHandler);
   }
 
-  const queryFromRoot = (selector: string): Element | null => {
-    if (root && typeof (root as ParentNode).querySelector === 'function'){
-      const el = (root as ParentNode).querySelector(selector);
-      if (el) return el;
-    }
-    return null;
-  };
-
-    timerElement = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
+  resolveTimerElement();
 
   const stepTurnContext = {
     performUlt,
@@ -3126,23 +3118,19 @@ function init(): boolean {
         : Math.max(0, 240 - Math.floor(elapsedSecPrecise));
       const remainSecPrecise = Math.max(0, 240 - elapsedSecPrecise);
       const remainDisplay = Math.max(0, Math.floor(remainSecPrecise));
-      const mm = String(Math.floor(remainDisplay / 60)).padStart(2, '0');
-      const ss = String(remainDisplay % 60).padStart(2, '0');
-      const nextTimerText = `${mm}:${ss}`;
-      if (nextTimerText !== CLOCK.lastTimerText){
+      if (remainDisplay !== prevRemainDisplay || CLOCK.lastTimerText === null){
+        const mm = String(Math.floor(remainDisplay / 60)).padStart(2, '0');
+        const ss = String(remainDisplay % 60).padStart(2, '0');
+        const nextTimerText = `${mm}:${ss}`;
         let tEl = timerElement;
         if (!tEl || !tEl.isConnected){
-          const refreshed = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
-          timerElement = refreshed ?? null;
+          resolveTimerElement();
           tEl = timerElement;
         }
         if (tEl) tEl.textContent = nextTimerText;
         CLOCK.lastTimerText = nextTimerText;
       }
       CLOCK.lastTimerRemain = remainDisplay;
-      if (CLOCK.lastTimerText === null){
-        CLOCK.lastTimerText = nextTimerText;
-      }
 
       if (remainSecPrecise <= 0 && prevRemainDisplay > 0){
         const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain: remainDisplay, timestamp: sessionNowMs });
@@ -4127,21 +4115,22 @@ function unbindVisibility(): void {
   visibilityHandlerBound = false;
 }
 
+function queryElementFromRoot(selector: string): Element | null {
+  const root = rootElement ?? null;
+  if (root && typeof (root as ParentNode).querySelector === 'function'){
+    const el = (root as ParentNode).querySelector(selector);
+    if (el) return el;
+  }
+  return null;
+}
+
 function resolveTimerElement(): void {
   const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
-  const root = rootElement ?? null;
   if (!doc){
     timerElement = null;
     return;
   }
-  const queryFromRoot = (selector: string): Element | null => {
-    if (root && typeof (root as ParentNode).querySelector === 'function'){
-      const el = (root as ParentNode).querySelector(selector);
-      if (el) return el;
-    }
-    return null;
-  };
-  timerElement = (queryFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
+  timerElement = (queryElementFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
 }
 
 function isDocumentNode(value: Element | Document): value is Document {

@@ -17523,15 +17523,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           visualViewportScrollHandler = () => { scheduleViewportResizeIfChanged('scroll'); };
           viewport.addEventListener('scroll', visualViewportScrollHandler);
       }
-      const queryFromRoot = (selector) => {
-          if (root && typeof root.querySelector === 'function') {
-              const el = root.querySelector(selector);
-              if (el)
-                  return el;
-          }
-          return null;
-      };
-      timerElement = (queryFromRoot('#timer') || doc.getElementById('timer'));
+      resolveTimerElement();
       const stepTurnContext = {
           performUlt,
           processActionChain,
@@ -17678,14 +17670,13 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               : Math.max(0, 240 - Math.floor(elapsedSecPrecise));
           const remainSecPrecise = Math.max(0, 240 - elapsedSecPrecise);
           const remainDisplay = Math.max(0, Math.floor(remainSecPrecise));
-          const mm = String(Math.floor(remainDisplay / 60)).padStart(2, '0');
-          const ss = String(remainDisplay % 60).padStart(2, '0');
-          const nextTimerText = `${mm}:${ss}`;
-          if (nextTimerText !== CLOCK.lastTimerText) {
+          if (remainDisplay !== prevRemainDisplay || CLOCK.lastTimerText === null) {
+              const mm = String(Math.floor(remainDisplay / 60)).padStart(2, '0');
+              const ss = String(remainDisplay % 60).padStart(2, '0');
+              const nextTimerText = `${mm}:${ss}`;
               let tEl = timerElement;
               if (!tEl || !tEl.isConnected) {
-                  const refreshed = (queryFromRoot('#timer') || doc.getElementById('timer'));
-                  timerElement = refreshed ?? null;
+                  resolveTimerElement();
                   tEl = timerElement;
               }
               if (tEl)
@@ -17693,9 +17684,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               CLOCK.lastTimerText = nextTimerText;
           }
           CLOCK.lastTimerRemain = remainDisplay;
-          if (CLOCK.lastTimerText === null) {
-              CLOCK.lastTimerText = nextTimerText;
-          }
           if (remainSecPrecise <= 0 && prevRemainDisplay > 0) {
               const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain: remainDisplay, timestamp: sessionNowMs });
               if (timeoutResult)
@@ -18627,22 +18615,22 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       }
       visibilityHandlerBound = false;
   }
+  function queryElementFromRoot(selector) {
+      const root = rootElement ?? null;
+      if (root && typeof root.querySelector === 'function') {
+          const el = root.querySelector(selector);
+          if (el)
+              return el;
+      }
+      return null;
+  }
   function resolveTimerElement() {
       const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
-      const root = rootElement ?? null;
       if (!doc) {
           timerElement = null;
           return;
       }
-      const queryFromRoot = (selector) => {
-          if (root && typeof root.querySelector === 'function') {
-              const el = root.querySelector(selector);
-              if (el)
-                  return el;
-          }
-          return null;
-      };
-      timerElement = (queryFromRoot('#timer') || doc.getElementById('timer'));
+      timerElement = (queryElementFromRoot('#timer') || doc.getElementById('timer'));
   }
   function isDocumentNode(value) {
       const documentNodeType = typeof Node !== 'undefined' ? Node.DOCUMENT_NODE : 9;
