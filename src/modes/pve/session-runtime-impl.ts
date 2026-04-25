@@ -537,6 +537,8 @@ function asDeckEntry<T>(value: T): DeckEntry {
 
 function sanitizeDeckEntries(value: unknown): DeckEntry[] {
   if (!Array.isArray(value)) return [];
+  const cached = sanitizedDeckEntriesCache.get(value);
+  if (cached) return cached as DeckEntry[];
   let normalized: DeckEntry[] | null = null;
   for (let index = 0; index < value.length; index += 1) {
     const entry = value[index];
@@ -548,12 +550,20 @@ function sanitizeDeckEntries(value: unknown): DeckEntry[] {
       normalized = (value.slice(0, index) as DeckEntry[]);
     }
   }
-  return normalized ?? (value as DeckEntry[]);
+  const result = normalized ?? (value as DeckEntry[]);
+  sanitizedDeckEntriesCache.set(value, result);
+  return result;
 }
 
 type LockedDeckCache = {
   deckRef: ReadonlyArray<DeckEntry>;
   ids: ReadonlySet<string>;
+};
+type DeckFilterCache = {
+  gameRef: SessionState;
+  deckRef: ReadonlyArray<DeckEntry>;
+  lockedDeckRef: ReadonlyArray<DeckEntry>;
+  result: ReadonlyArray<DeckEntry>;
 };
 
 let lockedDeckCache: LockedDeckCache | null = null;
@@ -562,10 +572,13 @@ let lockedDeckNormalizeCache: {
   sourceRef: ReadonlyArray<unknown>;
   normalized: ReadonlyArray<DeckEntry>;
 } | null = null;
+let deckFilterCache: DeckFilterCache | null = null;
+const sanitizedDeckEntriesCache = new WeakMap<ReadonlyArray<unknown>, ReadonlyArray<DeckEntry>>();
 
 const invalidateLockedDeckCache = (): void => {
   lockedDeckCache = null;
-  lockedDeckNormalizeCache = null;u
+  lockedDeckNormalizeCache = null;
+  deckFilterCache = null;
 };
 
 const getLockedDeckIdSet = (lockedDeck: ReadonlyArray<DeckEntry>): ReadonlySet<string> => {
@@ -590,6 +603,14 @@ function ensureDeck(): DeckEntry[] {
   if (!game) return [];
   const deck = sanitizeDeckEntries(game.deck3);
   const lockedDeck = ensureLockedPlayerDeck();
+  if (
+    deckFilterCache
+    && deckFilterCache.gameRef === game
+    && deckFilterCache.deckRef === deck
+    && deckFilterCache.lockedDeckRef === lockedDeck
+  ) {
+    return deckFilterCache.result as DeckEntry[];
+  }
   const lockedIds = getLockedDeckIdSet(lockedDeck);
   const filteredDeck: DeckEntry[] = [];
   let removed = false;
@@ -605,10 +626,17 @@ function ensureDeck(): DeckEntry[] {
     }
     filteredDeck.push(entry);
   }
+  const result = removed ? filteredDeck : deck;
   if (removed || deck !== game.deck3) {
-    game.deck3 = removed ? filteredDeck : deck;
+    game.deck3 = result;
   }
-  return removed ? filteredDeck : deck;
+  deckFilterCache = {
+    gameRef: game,
+    deckRef: deck,
+    lockedDeckRef: lockedDeck,
+    result,
+  };
+  return result;
 }
 
 function ensureLockedPlayerDeck(): ReadonlyArray<DeckEntry> {
@@ -617,7 +645,7 @@ function ensureLockedPlayerDeck(): ReadonlyArray<DeckEntry> {
   const lockedSource = Array.isArray(game.playerDeckLocked) && game.playerDeckLocked.length
     ? game.playerDeckLocked
     : game.unitsAll;
-    if (
+  if (
     lockedDeckNormalizeCache
     && lockedDeckNormalizeCache.gameRef === game
     && lockedDeckNormalizeCache.sourceRef === lockedSource

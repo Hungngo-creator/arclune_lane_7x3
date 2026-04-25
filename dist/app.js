@@ -15193,6 +15193,9 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   function sanitizeDeckEntries(value) {
       if (!Array.isArray(value))
           return [];
+      const cached = sanitizedDeckEntriesCache.get(value);
+      if (cached)
+          return cached;
       let normalized = null;
       for (let index = 0; index < value.length; index += 1) {
           const entry = value[index];
@@ -15205,14 +15208,18 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               normalized = value.slice(0, index);
           }
       }
-      return normalized ?? value;
+      const result = normalized ?? value;
+      sanitizedDeckEntriesCache.set(value, result);
+      return result;
   }
   let lockedDeckCache = null;
   let lockedDeckNormalizeCache = null;
+  let deckFilterCache = null;
+  const sanitizedDeckEntriesCache = new WeakMap();
   const invalidateLockedDeckCache = () => {
       lockedDeckCache = null;
       lockedDeckNormalizeCache = null;
-      u;
+      deckFilterCache = null;
   };
   const getLockedDeckIdSet = (lockedDeck) => {
       if (lockedDeckCache?.deckRef === lockedDeck) {
@@ -15237,6 +15244,12 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return [];
       const deck = sanitizeDeckEntries(game.deck3);
       const lockedDeck = ensureLockedPlayerDeck();
+      if (deckFilterCache
+          && deckFilterCache.gameRef === game
+          && deckFilterCache.deckRef === deck
+          && deckFilterCache.lockedDeckRef === lockedDeck) {
+          return deckFilterCache.result;
+      }
       const lockedIds = getLockedDeckIdSet(lockedDeck);
       const filteredDeck = [];
       let removed = false;
@@ -15252,10 +15265,17 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           }
           filteredDeck.push(entry);
       }
+      const result = removed ? filteredDeck : deck;
       if (removed || deck !== game.deck3) {
-          game.deck3 = removed ? filteredDeck : deck;
+          game.deck3 = result;
       }
-      return removed ? filteredDeck : deck;
+      deckFilterCache = {
+          gameRef: game,
+          deckRef: deck,
+          lockedDeckRef: lockedDeck,
+          result,
+      };
+      return result;
   }
   function ensureLockedPlayerDeck() {
       const game = getInitializedGame();
