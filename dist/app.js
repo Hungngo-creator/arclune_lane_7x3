@@ -15228,13 +15228,20 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const deck = sanitizeDeckEntries(game.deck3);
       const lockedDeck = ensureLockedPlayerDeck();
       const lockedIds = getLockedDeckIdSet(lockedDeck);
+      const filteredDeck = [];
       let removed = false;
-      const filteredDeck = deck.filter((entry) => {
-          const keep = lockedIds.has(entry.id);
-          if (!keep)
+      for (let i = 0; i < deck.length; i += 1) {
+          const entry = deck[i];
+          if (!entry) {
               removed = true;
-          return keep;
-      });
+              continue;
+          }
+          if (!lockedIds.has(entry.id)) {
+              removed = true;
+              continue;
+          }
+          filteredDeck.push(entry);
+      }
       if (removed || deck !== game.deck3) {
           game.deck3 = removed ? filteredDeck : deck;
       }
@@ -15263,14 +15270,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const getCardCost = (card) => {
       if (!card)
           return 0;
-      const raw = card.cost;
-      if (typeof raw === 'number' && Number.isFinite(raw))
-          return raw;
-      if (typeof raw === 'string') {
-          const parsed = Number(raw);
-          return Number.isFinite(parsed) ? parsed : 0;
-      }
-      return 0;
+      return parseFiniteNumber(card.cost) ?? 0;
   };
   function sanitizeStartConfig(config) {
       if (!isPlainRecord(config)) {
@@ -15361,7 +15361,19 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       })
           .join('|');
   };
-  let lastCamPresetSignature = getCameraPresetSignature(CAM_PRESET);
+  const cameraPresetSignatureCache = new WeakMap();
+  const getCachedCameraPresetSignature = (preset) => {
+      if (!preset || typeof preset !== 'object')
+          return 'null';
+      const key = preset;
+      const cached = cameraPresetSignatureCache.get(key);
+      if (cached)
+          return cached;
+      const signature = getCameraPresetSignature(preset);
+      cameraPresetSignatureCache.set(key, signature);
+      return signature;
+  };
+  let lastCamPresetSignature = getCachedCameraPresetSignature(CAM_PRESET);
   const HAND_SIZE = CFG.HAND_SIZE ?? 4;
   ensureNestedModuleSupport();
   const getNow = () => sessionNow();
@@ -17887,7 +17899,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const clearW = Game.grid?.w ?? canvas.width;
       const clearH = Game.grid?.h ?? canvas.height;
       ctx.clearRect(0, 0, clearW, clearH);
-      const camSignature = getCameraPresetSignature(CAM_PRESET);
+      const camSignature = getCachedCameraPresetSignature(CAM_PRESET);
       if (camSignature !== lastCamPresetSignature) {
           lastCamPresetSignature = camSignature;
           invalidateSceneCache();

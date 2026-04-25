@@ -583,12 +583,20 @@ function ensureDeck(): DeckEntry[] {
   const deck = sanitizeDeckEntries(game.deck3);
   const lockedDeck = ensureLockedPlayerDeck();
   const lockedIds = getLockedDeckIdSet(lockedDeck);
+  const filteredDeck: DeckEntry[] = [];
   let removed = false;
-  const filteredDeck = deck.filter((entry) => {
-    const keep = lockedIds.has(entry.id);
-    if (!keep) removed = true;
-    return keep;
-  });
+  for (let i = 0; i < deck.length; i += 1) {
+    const entry = deck[i];
+    if (!entry) {
+      removed = true;
+      continue;
+    }
+    if (!lockedIds.has(entry.id)) {
+      removed = true;
+      continue;
+    }
+    filteredDeck.push(entry);
+  }
   if (removed || deck !== game.deck3) {
     game.deck3 = removed ? filteredDeck : deck;
   }
@@ -617,13 +625,7 @@ function isCardInLockedDeck(cardId: string, game: SessionState | null | undefine
 
 const getCardCost = (card: DeckEntry | null | undefined): number => {
   if (!card) return 0;
-  const raw = card.cost;
-  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
-  if (typeof raw === 'string') {
-    const parsed = Number(raw);
-    return Number.isFinite(parsed) ? parsed : 0;
-  }
-  return 0;
+  return parseFiniteNumber(card.cost) ?? 0;
 };
 
 export type PveSessionHandle = {
@@ -737,7 +739,17 @@ const getCameraPresetSignature = (preset: CameraPreset | null | undefined): stri
     })
     .join('|');
 };
-let lastCamPresetSignature = getCameraPresetSignature(CAM_PRESET);
+const cameraPresetSignatureCache = new WeakMap<object, string>();
+const getCachedCameraPresetSignature = (preset: CameraPreset | null | undefined): string => {
+  if (!preset || typeof preset !== 'object') return 'null';
+  const key = preset as object;
+  const cached = cameraPresetSignatureCache.get(key);
+  if (cached) return cached;
+  const signature = getCameraPresetSignature(preset);
+  cameraPresetSignatureCache.set(key, signature);
+  return signature;
+};
+let lastCamPresetSignature = getCachedCameraPresetSignature(CAM_PRESET);
 const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
 ensureNestedModuleSupport();
@@ -3315,7 +3327,7 @@ function draw(): void {
   const clearW = Game.grid?.w ?? canvas.width;
   const clearH = Game.grid?.h ?? canvas.height;
   ctx.clearRect(0, 0, clearW, clearH);
-  const camSignature = getCameraPresetSignature(CAM_PRESET);
+  const camSignature = getCachedCameraPresetSignature(CAM_PRESET);
   if (camSignature !== lastCamPresetSignature) {
     lastCamPresetSignature = camSignature;
     invalidateSceneCache();

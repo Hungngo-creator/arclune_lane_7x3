@@ -402,9 +402,13 @@ ultimate: quy tắc: hồi hp cho mọi đơn vị đồng minh trên sân = 30%
 35) Nguyên Lễ
 Kiếm sĩ, UR. không element tag.
 nội tại: mỗi lần giết 1 mục tiêu thành công nhận miễn nhiễm với 1 debuff ngẫu nhiên từ pool: độc, choáng, ngủ, chảy máu, yếu đuối. Cũng đồng thời tăng vĩnh viễn 5% atk và wil của bản thân ở lúc giết kẻ thù ( tính luôn atk/wil bị ảnh hưởng từ buff/debuff và mọi nguồn khác) đến khi chết.
+
+đánh thường: gây sát thương=100% wil/atk.
+
 skill 1: mỗi khi nhận sát thương vượt 20% max hp, tự hồi hp cho bản thân = 50% wil /atk của bản thân, tự kích hoạt, mỗi lần kích hoạt - 10 aether từ aepool, nếu ae không đủ sẽ không kích hoạt skill này.
 skill 2: chém 1 nhát ngang gây sát thương lên hàng 1/2/3 hoặc 4/5/5 hoặc 7/8/9, ưu tiên hàng có nhiều kẻ địch đứng nhất, mỗi kẻ địch nhận sát thương = 150% đánh thường, cost - 7 ae/kẻ địch nhận sát thương ( tối đa - 21 ae).
 skill 3: tăng 50% wil và atk trong 2 turn kế tiếp, 20 ae.
+
 ultimate: gây 1 đòn aoe cố định hình chữ T lên ô 1/2/3/5/8 của kẻ địch, mỗi kẻ địch đứng ở vị trí tấn công này nhận sát thương = 2 đòn đánh thường của nhân vật này, (biến động sát thương theo atk và wil của nhân vật).
 
 36) Lý Mộng Cầm
@@ -423,6 +427,8 @@ nội tại: hồi hp = 3% max hp của bản thân mỗi lần nhận sát thư
 Ur, Warrior. 
 nội tại: với mỗi đơn vị đồng minh lẫn enemy chết (không tính đơn vị triệu hồi bởi summoner) nhân vật này được + 10% wil/atk/mỗi đơn vị chết, giới hạn số lần kích hoạt trong 1 turn là 3, stack tối đa 25 lần trong trận (reset bộ đếm khi chết rồi được hồi sinh). khi nhân vật này tử vong, chuyển 50% số atk và wil có được từ nội tại này cho leader (leader đồng minh với char này), khi được hồi sinh, số stack từ nội tại này sẽ về 0. cộng wil/atk tính từ lúc kích hoạt nội tại, chỉ số của char này lúc đó bao nhiêu thì cứ + 10% wil/atk của lúc đó.
 hồi hp = 20% max hp (không tăng max hp) mỗi khi đạt 5 stack từ nội tại. skill/Nội tại/ult của char này đều là Pháp tắc.
+
+đánh thường: gây sát thương=100% wil/atk.
 
 skill 1: gây sát thương đơn mục tiêu = 250% đánh thường, tính là đánh thường, 25 ae.
 skill 2: thả 1 phi kiếm gây sát thương aoe hàng dọc cố định ở 3 ô 1/4/7, mỗi đơn vị đứng ở 3 ô này nhận 1 đánh thường, (không tính là đánh thường), sau đó phi kiếm sẽ ở lại ô số 7 1 turn, kẻ đứng ô số 7 này (nếu có) sẽ nhận 1 debuff chảy máu trong 1 turn, sau khi 1 turn đợi kết thúc phi kiếm sẽ phi hàng dọc là ô 7/8/9, mỗi kẻ đứng ở ô này nếu có sẽ nhận sát thương = 1 đánh thường và cũng tính là đánh thường luôn, phi kiếm sẽ đợi 1 turn ở ô 9 1 turn và kẻ đứng ở ô 9 nếu có sẽ nhận 1 debuff chảy máu trong 1 turn, sau 1 turn đợi phi kiếm sẽ rời đi, gây sát thương dọc lên hàng 9/6/3, mỗi kẻ đứng trong 3 ô này nếu có sẽ nhận sát thương = 1 đánh thường nhưng không tính là đánh thường, phi kiếm sẽ đợi 1 turn ở ô 3, kẻ đứng ô này nếu có sẽ nhận 1 debuff chảy máu trong 1 turn, sau 1 turn đợi phi kiếm sẽ phi đến ô 2, gây sát thương lên kẻ đứng ô 2 và 3 = 1 đánh thường nhưng không tính là đánh thường , kẻ đứng ô 2 nếu có sẽ nhận 1 debuff chảy máu trong 1 turn, sau 1 turn đợi phi kiếm sẽ phi đến ô 8, quãng đường là 2/5/8, mỗi kẻ đứng ở 3 ô này nếu có sẽ nhận sát thương = 1 đánh thường và cũng tính là đánh thường của nhân vật này, sau khi gây sát thương lên 3 ô này thì phi kiếm sẽ biến mất (vfx trở về với char này). về triển khai thì tao nghĩ nên thiết lập kẻ nào đứng cùng ô với phi kiếm sẽ nhận 1 debuff chảy máu miễn phi kiếm còn ở ô đó, set time phi kiếm ở là 1 turn là xong việc. cost 45 ae, không cd. Về cơ bản là 1 skill aoe cố định gây sát thương theo thời gian, vị trí ô 7/8/9/3/2 sẽ nhận sát thương 2 lần chưa kể sát thương từ debuff chảy máu. Pháp tắc.
@@ -466,7 +472,14 @@ nội tại: khi HP về 0, tử vong sau đó xoá sạch mọi debuff lẫn bu
 
 40)
 ssr, tanker, không element tag.
-nội tại: mỗi khi HP về 0, không chết, hồi ngay lập tức hp = 20% max hp, ATK và WIL được chuyển 100% thành res và arm, 1 atk = 0,5 arm, 1 wil = 0,5 res, sau đó có thể tấn công nhưng sát thương gây ra là 1 atk và 1 wil, nhận trạng thái taunt vĩnh viễn cho đến khi HP về 0 lần nữa. Khi HP về 0 sau khi kích hoạt nội tại này thì sẽ chết và có thể hồi sinh như bình thường, nội tại này kích hoạt tối đa 2 lần/trận, sau khi kích hoạt nội tại này vẫn có thể nhận heal và hồi hp qua kit/bản thân nếu có. Trạng thái chuyển atk/wil sang res/arm không phải là debuff/buff, có lẽ nên tạo tag chuyển đổi hoặc gì đó tương tự nếu chưa có?.
+nội tại: mỗi khi HP về 0, không chết, hồi ngay lập tức hp = 20% max hp, ATK và WIL hiện có lúc hp về 0 (bị ảnh hưởng  bởi debuff/buff) được chuyển 100% thành res và arm với tỉ lệ 1 atk = 0,5 arm, 1 wil = 0,5 res, sau đó có thể tấn công nhưng sát thương gây ra là 1 atk và 1 wil, nhận trạng thái taunt vĩnh viễn cho đến khi HP về 0 lần nữa. Khi HP về 0 sau khi kích hoạt nội tại này thì sẽ chết và có thể hồi sinh như bình thường, nội tại này kích hoạt tối đa 2 lần/trận, sau khi kích hoạt nội tại này vẫn có thể nhận heal và hồi hp qua kit/bản thân nếu có. Trạng thái chuyển atk/wil sang res/arm không phải là debuff/buff, có lẽ nên tạo tag chuyển đổi hoặc gì đó tương tự nếu chưa có?. nội tại này không phải pháp/quy tắc, không phải axiom.
+
+skill 1: nhận trạng thái phản sát thương trong 3 turn, turn bật skill này tính là 1 trong 3 turn đó. phản sát thương với tỉ lệ là 50%. 25 aether.
+skill 2: giơ cao chiến phủ trong tay chém về kẻ địch (theo SSI trong pve) gây sát thương = 1 đánh thường, sau đó hồi hp = 80% sát thương kỹ năng này gây ra, 25 aether.
+skill 3: đập mạnh chiếc khiên trong tay xuống đất, tăng res/arm của bản thân lên 20% trong 3 turn, turn kích hoạt skill này tính là 1 turn, có thể dùng dù có kích hoạt nội tại hay không, 15 ae.
+ultimate: cast 1 lần skill nhưng sát thương gây ra là 2 lần đánh thường và tỉ lệ hồi hp là 90% thay vì 80%. (có thể code skill 2 như module, lúc code ultimate import skill 2 chỉnh 1 chút là được rồi).
+
+đánh thường: gây sát thương=100% wil/atk.
 
 
 
