@@ -6193,6 +6193,8 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'tag-cap-do-cao-hon-phap-tac': 'global-rule',
       'cấp độ cao hơn pháp tắc': 'global-rule',
       'cap-do-cao-hon-phap-tac': 'global-rule',
+      'quy tắc cấp cao': 'global-rule',
+      'quy-tac-cap-cao': 'global-rule',
       'doctrine-rule': 'doctrine-rule',
       'pháp tắc': 'doctrine-rule',
       'phap-tac': 'doctrine-rule',
@@ -6297,6 +6299,24 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'vung-chu-+': 'cross-aoe',
       'tự động': 'instant',
       'tu-dong': 'instant',
+      'debuff: mê hoặc': 'mark',
+      'debuff-me-hoac': 'mark',
+      'mê hoặc': 'mark',
+      'me-hoac': 'mark',
+      'gắn stack': 'mark',
+      'gan-stack': 'mark',
+      'cộng dồn': 'mark',
+      'cong-don': 'mark',
+      'không thể tẩy xóa': 'non-purgeable-mark',
+      'khong-the-tay-xoa': 'non-purgeable-mark',
+      'không thể bị xóa': 'non-purgeable-mark',
+      'khong-the-bi-xoa': 'non-purgeable-mark',
+      'vfx: biến đổi': 'vfx-transform',
+      'vfx-bien-doi': 'vfx-transform',
+      'nội tại': 'passive',
+      'noi-tai': 'passive',
+      'sát thương hỗn hợp': 'mixed-damage',
+      'sat-thuong-hon-hop': 'mixed-damage',
       'huyết giáp': 'shield',
       'huyet-giap': 'shield',
       'huyết nô': 'summon',
@@ -6325,6 +6345,12 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'column-aoe': 210,
       'cross-aoe': 210,
       aoe: 200,
+      mark: 160,
+      passive: 140,
+      'mixed-damage': 130,
+      'vfx-transform': 120,
+      'sleep-setup': 120,
+      'non-purgeable-mark': 120,
   });
   const RULE_TAG_SET = new Set(['doctrine-rule', 'global-rule', 'axiom-rule']);
   const RULE_TAG_PRIORITY = Object.freeze({
@@ -6340,6 +6366,13 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
               return true;
       }
       return false;
+  }
+  function hasRuleTagPriorityAtLeast(tag, minimum) {
+      if (!tag)
+          return false;
+      const minimumPriority = RULE_TAG_PRIORITY[minimum] ?? 0;
+      const priority = RULE_TAG_PRIORITY[tag];
+      return (priority ?? -1) >= minimumPriority;
   }
   function normalizeAliasLookupKey(tag) {
       return tag
@@ -6391,6 +6424,7 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasRuleTagAtLeast')) exports.hasRuleTagAtLeast = hasRuleTagAtLeast;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'hasRuleTagPriorityAtLeast')) exports.hasRuleTagPriorityAtLeast = hasRuleTagPriorityAtLeast;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeCombatTag')) exports.normalizeCombatTag = normalizeCombatTag;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canonicalizeCombatTags')) exports.canonicalizeCombatTags = canonicalizeCombatTags;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canonicalizeCombatTagsWithRule')) exports.canonicalizeCombatTagsWithRule = canonicalizeCombatTagsWithRule;
@@ -6420,6 +6454,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const sampleTokens = __dep7.sampleTokens;
   const __dep8 = __require('./combat/tag-aliases.ts');
   const canonicalizeCombatTagsWithRule = __dep8.canonicalizeCombatTagsWithRule;
+  const hasRuleTagPriorityAtLeast = __dep8.hasRuleTagPriorityAtLeast;
   const __dep9 = __require('./engine.ts');
   const slotIndex = __dep9.slotIndex;
   const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
@@ -6713,7 +6748,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       }
       return false;
   };
-  const hasRuleBasedDoctrineBypass = (highestRuleTag) => (highestRuleTag === 'global-rule' || highestRuleTag === 'axiom-rule');
+  const hasRuleBasedDoctrineBypass = (highestRuleTag) => (hasRuleTagPriorityAtLeast(highestRuleTag, 'global-rule'));
   const canReceiveHealUnderDoctrine = (token, attackerSide, bypassDoctrineNoHeal) => {
       if (bypassDoctrineNoHeal)
           return true;
@@ -6776,7 +6811,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       const stacksPerApply = Math.max(1, toRoundedInt(payload.markStacks ?? payload.stacks ?? 1, 1));
       const maxStacks = Math.max(1, toRoundedInt(payload.markMaxStacks ?? payload.maxStacks ?? 3, 3));
       const sleepTurnsOnCap = Math.max(0, toRoundedInt(payload.sleepTurnsOnCap ?? payload.markSleepTurns ?? 0, 0));
-      const nonPurgeableByTag = result.tags.includes('sleep-setup');
+      const sleepSetupByTag = result.tags.includes('sleep-setup');
+      const nonPurgeableByTag = result.tags.includes('non-purgeable-mark');
       const purgeable = typeof payload.markPurgeable === 'boolean' ? payload.markPurgeable : !nonPurgeableByTag;
       for (const target of result.targets) {
           const statuses = ensureStatusList(target);
@@ -6801,7 +6837,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           status.purgeable = purgeable;
           if (nextStacks < maxStacks)
               continue;
-          if (sleepTurnsOnCap > 0 || nonPurgeableByTag) {
+          if (sleepTurnsOnCap > 0 || sleepSetupByTag) {
               addStatus(target, 'sleep', Math.max(1, sleepTurnsOnCap || 1), ctx.attacker?.id);
               result.sideEffects.push(`sleep:${Math.max(1, sleepTurnsOnCap || 1)}`);
           }
@@ -6809,6 +6845,9 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           result.sideEffects.push(`mark-cap:${statusId}`);
       }
   }
+  const applyAllAliveRuleTargets = (ctx, result) => {
+      assignAllAliveTargets(ctx, result);
+  };
   const HANDLERS = Object.freeze({
       'aether-cost': (ctx, result) => {
           const amount = Math.max(0, toRoundedInt(ctx.cost, 0));
@@ -6879,12 +6918,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
               return;
           result.targets = ctx.opponentTokens;
       },
-      'global-rule': (ctx, result) => {
-          assignAllAliveTargets(ctx, result);
-      },
-      'axiom-rule': (ctx, result) => {
-          assignAllAliveTargets(ctx, result);
-      },
+      'global-rule': applyAllAliveRuleTargets,
+      'axiom-rule': applyAllAliveRuleTargets,
       'doctrine-rule': (ctx, result) => {
           if (!assignAllAliveTargets(ctx, result))
               return;
@@ -6982,6 +7017,18 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       },
       instant: (_ctx, result) => {
           result.sideEffects.push('instant');
+      },
+      'non-purgeable-mark': () => {
+          // Non-purgeable mark behavior is applied in mark stack resolver.
+      },
+      passive: () => {
+          // Passive is metadata-level tag; runtime behavior is implemented per-unit hooks.
+      },
+      'mixed-damage': () => {
+          // Mixed damage routing is resolved by damage pipeline metadata.
+      },
+      'vfx-transform': () => {
+          // VFX transform is display metadata and does not mutate combat state directly.
       },
       condition: () => {
           // Condition tags are validated at skill execution stage.

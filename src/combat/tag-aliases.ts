@@ -20,6 +20,8 @@ const RULE_TAG_ALIASES = Object.freeze<Record<string, RuleTag>>({
   'tag-cap-do-cao-hon-phap-tac': 'global-rule',
   'cấp độ cao hơn pháp tắc': 'global-rule',
   'cap-do-cao-hon-phap-tac': 'global-rule',
+  'quy tắc cấp cao': 'global-rule',
+  'quy-tac-cap-cao': 'global-rule',
 
   'doctrine-rule': 'doctrine-rule',
   'pháp tắc': 'doctrine-rule',
@@ -128,6 +130,25 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'tự động': 'instant',
   'tu-dong': 'instant',
 
+  'debuff: mê hoặc': 'mark',
+  'debuff-me-hoac': 'mark',
+  'mê hoặc': 'mark',
+  'me-hoac': 'mark',
+  'gắn stack': 'mark',
+  'gan-stack': 'mark',
+  'cộng dồn': 'mark',
+  'cong-don': 'mark',
+  'không thể tẩy xóa': 'non-purgeable-mark',
+  'khong-the-tay-xoa': 'non-purgeable-mark',
+  'không thể bị xóa': 'non-purgeable-mark',
+  'khong-the-bi-xoa': 'non-purgeable-mark',
+  'vfx: biến đổi': 'vfx-transform',
+  'vfx-bien-doi': 'vfx-transform',
+  'nội tại': 'passive',
+  'noi-tai': 'passive',
+  'sát thương hỗn hợp': 'mixed-damage',
+  'sat-thuong-hon-hop': 'mixed-damage',
+
   'huyết giáp': 'shield',
   'huyet-giap': 'shield',
   'huyết nô': 'summon',
@@ -157,9 +178,15 @@ const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
   'column-aoe': 210,
   'cross-aoe': 210,
   aoe: 200,
+  mark: 160,
+  passive: 140,
+  'mixed-damage': 130,
+  'vfx-transform': 120,
+  'sleep-setup': 120,
+  'non-purgeable-mark': 120,
 });
 
-type RuleTag = 'doctrine-rule' | 'global-rule' | 'axiom-rule';
+export type RuleTag = 'doctrine-rule' | 'global-rule' | 'axiom-rule';
 const RULE_TAG_SET = new Set<RuleTag>(['doctrine-rule', 'global-rule', 'axiom-rule']);
 
 const RULE_TAG_PRIORITY = Object.freeze<Record<RuleTag, number>>({
@@ -175,6 +202,16 @@ export function hasRuleTagAtLeast(tags: ReadonlyArray<string>, minimum: RuleTag)
     if ((priority ?? -1) >= minimumPriority) return true;
   }
   return false;
+}
+
+export function hasRuleTagPriorityAtLeast(
+  tag: string | null | undefined,
+  minimum: RuleTag,
+): boolean {
+  if (!tag) return false;
+  const minimumPriority = RULE_TAG_PRIORITY[minimum] ?? 0;
+  const priority = RULE_TAG_PRIORITY[tag as RuleTag];
+  return (priority ?? -1) >= minimumPriority;
 }
 
 export interface CanonicalizedCombatTags {

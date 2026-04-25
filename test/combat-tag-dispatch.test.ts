@@ -332,6 +332,24 @@ describe('combat tag dispatcher matrix', () => {
     expect(ids).toEqual(expect.arrayContaining(['silence', 'sleep']));
   });
 
+  it('treats non-purgeable alias as mark permanence without forcing sleep setup', () => {
+    const attacker = makeToken({ id: 'attacker', side: 'ally' });
+    const target = makeToken({ id: 'target', side: 'enemy', statuses: [] });
+    const game = makeGame([attacker, target]);
+
+    dispatchGameplayTags(['mark', 'không thể tẩy xóa'], {
+      game,
+      attacker,
+      target,
+      tagsNormalized: true,
+      payload: { markId: 'me_hoac', markMaxStacks: 3 },
+    });
+
+    const mark = (target.statuses ?? []).find((status) => status.id === 'me_hoac');
+    expect(mark?.purgeable).toBe(false);
+    expect((target.statuses ?? []).some((status) => status.id === 'sleep')).toBe(false);
+  });
+
   it('supports mark stack cap with sleep trigger from sleep-setup mechanics', () => {
     const attacker = makeToken({ id: 'attacker', side: 'ally' });
     const target = makeToken({ id: 'target', side: 'enemy', statuses: [] });

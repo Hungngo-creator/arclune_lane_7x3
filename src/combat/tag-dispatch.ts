@@ -6,7 +6,7 @@ import { dealAbilityDamage, healUnit } from '../combat.ts';
 import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
-import { canonicalizeCombatTagsWithRule } from './tag-aliases.ts';
+import { canonicalizeCombatTagsWithRule, hasRuleTagPriorityAtLeast } from './tag-aliases.ts';
 import { slotIndex } from '../engine.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -387,7 +387,7 @@ const hasDoctrineNoHeal = (target: UnitToken, fromSide: Side | null): boolean =>
 };
 
 const hasRuleBasedDoctrineBypass = (highestRuleTag: TagDispatchResult['highestRuleTag']): boolean => (
-  highestRuleTag === 'global-rule' || highestRuleTag === 'axiom-rule'
+  hasRuleTagPriorityAtLeast(highestRuleTag, 'global-rule')
 );
 
 const canReceiveHealUnderDoctrine = (
@@ -471,7 +471,8 @@ function applyMarkStackingStatus(ctx: NormalizedContext, result: TagDispatchResu
   const stacksPerApply = Math.max(1, toRoundedInt(payload.markStacks ?? payload.stacks ?? 1, 1));
   const maxStacks = Math.max(1, toRoundedInt(payload.markMaxStacks ?? payload.maxStacks ?? 3, 3));
   const sleepTurnsOnCap = Math.max(0, toRoundedInt(payload.sleepTurnsOnCap ?? payload.markSleepTurns ?? 0, 0));
-  const nonPurgeableByTag = result.tags.includes('sleep-setup');
+  const sleepSetupByTag = result.tags.includes('sleep-setup');
+  const nonPurgeableByTag = result.tags.includes('non-purgeable-mark');
   const purgeable = typeof payload.markPurgeable === 'boolean' ? payload.markPurgeable : !nonPurgeableByTag;
 
   for (const target of result.targets) {
@@ -499,7 +500,7 @@ function applyMarkStackingStatus(ctx: NormalizedContext, result: TagDispatchResu
     status.purgeable = purgeable;
 
     if (nextStacks < maxStacks) continue;
-    if (sleepTurnsOnCap > 0 || nonPurgeableByTag) {
+    if (sleepTurnsOnCap > 0 || sleepSetupByTag) {
       addStatus(target, 'sleep', Math.max(1, sleepTurnsOnCap || 1), ctx.attacker?.id);
       result.sideEffects.push(`sleep:${Math.max(1, sleepTurnsOnCap || 1)}`);
     }
@@ -507,6 +508,10 @@ function applyMarkStackingStatus(ctx: NormalizedContext, result: TagDispatchResu
     result.sideEffects.push(`mark-cap:${statusId}`);
   }
 }
+
+const applyAllAliveRuleTargets: TagHandler = (ctx, result) => {
+  assignAllAliveTargets(ctx, result);
+};
 
 const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   'aether-cost': (ctx, result) => {
@@ -564,12 +569,8 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     if (!ctx.attacker) return;
     result.targets = ctx.opponentTokens;
   },
-  'global-rule': (ctx, result) => {
-    assignAllAliveTargets(ctx, result);
-  },
-  'axiom-rule': (ctx, result) => {
-    assignAllAliveTargets(ctx, result);
-  },
+  'global-rule': applyAllAliveRuleTargets,
+  'axiom-rule': applyAllAliveRuleTargets,
   'doctrine-rule': (ctx, result) => {
     if (!assignAllAliveTargets(ctx, result)) return;
     if (ctx.deferEffects || !ctx.attacker) return;
@@ -662,6 +663,18 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
   },
   instant: (_ctx, result) => {
     result.sideEffects.push('instant');
+  },
+  'non-purgeable-mark': () => {
+    // Non-purgeable mark behavior is applied in mark stack resolver.
+  },
+  passive: () => {
+    // Passive is metadata-level tag; runtime behavior is implemented per-unit hooks.
+  },
+  'mixed-damage': () => {
+    // Mixed damage routing is resolved by damage pipeline metadata.
+  },
+  'vfx-transform': () => {
+    // VFX transform is display metadata and does not mutate combat state directly.
   },
   condition: () => {
     // Condition tags are validated at skill execution stage.
