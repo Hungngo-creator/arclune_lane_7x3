@@ -15243,7 +15243,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return [];
       const deck = sanitizeDeckEntries(session.deck3);
       const lockedDeck = ensureLockedPlayerDeck(session);
-      u;
       if (deckFilterCache
           && deckFilterCache.gameRef === session
           && deckFilterCache.deckRef === deck
@@ -15277,27 +15276,17 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       };
       return result;
   }
-  const findDeckEntryById = (deck, id) => {
+  const findDeckEntryIndexById = (deck, id) => {
       if (!id)
-          return null;
+          return -1;
       for (let i = 0; i < deck.length; i += 1) {
-          const entry = deck[i];
-          if (entry?.id === id)
-              return entry;
+          if (deck[i]?.id === id)
+              return i;
       }
-      return null;
+      return -1;
   };
-  const removeDeckEntryById = (deck, id) => {
-      if (!id || !deck.length)
-          return deck;
-      let removeIndex = -1;
-      for (let i = 0; i < deck.length; i += 1) {
-          if (deck[i]?.id === id) {
-              removeIndex = i;
-              break;
-          }
-      }
-      if (removeIndex < 0)
+  const removeDeckEntryAtIndex = (deck, removeIndex) => {
+      if (removeIndex < 0 || removeIndex >= deck.length)
           return deck;
       if (deck.length === 1)
           return [];
@@ -17440,7 +17429,10 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           if (cell.cx >= CFG.ALLY_COLS)
               return;
           const deck = ensureDeck(game);
-          const card = findDeckEntryById(deck, game.selectedId);
+          const selectedIndex = findDeckEntryIndexById(deck, game.selectedId);
+          if (selectedIndex < 0)
+              return;
+          const card = deck[selectedIndex];
           if (!card)
               return;
           if (!isCardInLockedDeck(card.id, game))
@@ -17478,7 +17470,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               hud.update(game);
           game.summoned += 1;
           game.usedUnitIds.add(card.id);
-          game.deck3 = removeDeckEntryById(deck, card.id);
+          game.deck3 = removeDeckEntryAtIndex(deck, selectedIndex);
           game.selectedId = null;
           refillDeck();
           selectFirstAffordable();
@@ -17816,7 +17808,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   function selectFirstAffordable() {
       if (!Game)
           return;
-      const deck = ensureDeck(game);
+      const deck = ensureDeck(Game);
       if (!deck.length) {
           Game.selectedId = null;
           return;
@@ -17833,8 +17825,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               cheapestOverall = card;
               cheapestOverallCost = cardCost;
           }
-          const costForComparison = Number.isFinite(cardCost) ? cardCost : 0;
-          const affordable = costForComparison <= Game.cost;
+          const affordable = cardCost <= Game.cost;
           if (affordable && cardCost < cheapestAffordableCost) {
               cheapestAffordable = card;
               cheapestAffordableCost = cardCost;
@@ -17847,7 +17838,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   function refillDeck() {
       if (!Game)
           return;
-      const deck = ensureDeck(game);
+      const deck = ensureDeck(Game);
       const need = HAND_SIZE - deck.length;
       if (need <= 0)
           return;
@@ -17858,7 +17849,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               continue;
           exclude.add(entry.id);
       }
-      const lockedDeck = ensureLockedPlayerDeck(game);
+      const lockedDeck = ensureLockedPlayerDeck(Game);
       const more = pickRandom(lockedDeck, exclude).slice(0, need);
       deck.push(...more);
       Game.deck3 = deck;

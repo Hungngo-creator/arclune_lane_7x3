@@ -595,7 +595,7 @@ function ensureDeck(game: SessionState | null | undefined = Game): DeckEntry[] {
   const session = isInitializedGame(game) ? game : null;
   if (!session) return [];
   const deck = sanitizeDeckEntries(session.deck3);
-  const lockedDeck = ensureLockedPlayerDeck(session);u
+  const lockedDeck = ensureLockedPlayerDeck(session);
   if (
     deckFilterCache
     && deckFilterCache.gameRef === session
@@ -632,31 +632,22 @@ function ensureDeck(game: SessionState | null | undefined = Game): DeckEntry[] {
   return result;
 }
 
-const findDeckEntryById = (
+const findDeckEntryIndexById = (
   deck: ReadonlyArray<DeckEntry>,
   id: string | null | undefined,
-): DeckEntry | null => {
-  if (!id) return null;
+): number => {
+  if (!id) return -1;
   for (let i = 0; i < deck.length; i += 1) {
-    const entry = deck[i];
-    if (entry?.id === id) return entry;
+    if (deck[i]?.id === id) return i;
   }
-  return null;
+  return -1;
 };
 
-const removeDeckEntryById = (
+const removeDeckEntryAtIndex = (
   deck: ReadonlyArray<DeckEntry>,
-  id: string | null | undefined,
+  removeIndex: number,
 ): DeckEntry[] => {
-  if (!id || !deck.length) return deck as DeckEntry[];
-  let removeIndex = -1;
-  for (let i = 0; i < deck.length; i += 1) {
-    if (deck[i]?.id === id) {
-      removeIndex = i;
-      break;
-    }
-  }
-  if (removeIndex < 0) return deck as DeckEntry[];
+  if (removeIndex < 0 || removeIndex >= deck.length) return deck as DeckEntry[];
   if (deck.length === 1) return [];
   const nextDeck = deck.slice(0, removeIndex);
   nextDeck.push(...deck.slice(removeIndex + 1));
@@ -2875,7 +2866,9 @@ function init(): boolean {
     if (cell.cx >= CFG.ALLY_COLS) return;
 
     const deck = ensureDeck(game);
-    const card = findDeckEntryById(deck, game.selectedId);
+    const selectedIndex = findDeckEntryIndexById(deck, game.selectedId);
+    if (selectedIndex < 0) return;
+    const card = deck[selectedIndex];
     if (!card) return;
     if (!isCardInLockedDeck(card.id, game)) return;
     if (isUniqueGlobalSummonBlocked(game, { unitId: card.id, tags: card.tags ?? null })) return;
@@ -2913,7 +2906,7 @@ function init(): boolean {
     game.summoned += 1;
     game.usedUnitIds.add(card.id);
 
-    game.deck3 = removeDeckEntryById(deck, card.id);
+    game.deck3 = removeDeckEntryAtIndex(deck, selectedIndex);
     game.selectedId = null;
     refillDeck();
     selectFirstAffordable();
@@ -3276,7 +3269,7 @@ function init(): boolean {
 function selectFirstAffordable(): void {
   if (!Game) return;
 
-  const deck = ensureDeck(game);
+  const deck = ensureDeck(Game);
   if (!deck.length){
     Game.selectedId = null;
     return;
@@ -3297,8 +3290,7 @@ function selectFirstAffordable(): void {
       cheapestOverallCost = cardCost;
     }
 
-    const costForComparison = Number.isFinite(cardCost) ? cardCost : 0;
-    const affordable = costForComparison <= Game.cost;
+    const affordable = cardCost <= Game.cost;
     if (affordable && cardCost < cheapestAffordableCost){
       cheapestAffordable = card;
       cheapestAffordableCost = cardCost;
@@ -3313,7 +3305,7 @@ function selectFirstAffordable(): void {
 function refillDeck(): void {
   if (!Game) return;
 
-  const deck = ensureDeck(game);
+  const deck = ensureDeck(Game);
   const need = HAND_SIZE - deck.length;
   if (need <= 0) return;
 
@@ -3323,7 +3315,7 @@ function refillDeck(): void {
     if (!entry?.id) continue;
     exclude.add(entry.id);
   }
-  const lockedDeck = ensureLockedPlayerDeck(game);
+  const lockedDeck = ensureLockedPlayerDeck(Game);
   const more = pickRandom(lockedDeck, exclude).slice(0, need);
   deck.push(...more);
   Game.deck3 = deck;
