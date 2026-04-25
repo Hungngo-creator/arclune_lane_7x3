@@ -407,7 +407,7 @@ skill 2: chém 1 nhát ngang gây sát thương lên hàng 1/2/3 hoặc 4/5/5 ho
 skill 3: tăng 50% wil và atk trong 2 turn kế tiếp, 20 ae.
 ultimate: gây 1 đòn aoe cố định hình chữ T lên ô 1/2/3/5/8 của kẻ địch, mỗi kẻ địch đứng ở vị trí tấn công này nhận sát thương = 2 đòn đánh thường của nhân vật này, (biến động sát thương theo atk và wil của nhân vật).
 
-36)
+36) Lý Mộng Cầm
 Support, ssr, element tag: water.
 nội tại: mỗi lần xoá thành công 1 debuff từ đồng minh và bản thân sẽ tự hồi HP = 5% wil và atk của bản thân, không thể vượt max hp và không thể tạo khiên khi overheal.
 skill 1: Mỗi 3 lần đánh thường/ sài skill hoặc ultimate thành công thì lần ultimate tiếp theo sẽ hồi cho mọi đồng minh trên sân nếu có thể (không ảnh hưởng được thần tính) = 25% wil/atk của bản thân cho mọi đồng minh trên sân nếu có thể và bản thân. Luôn kích hoạt kể cả tử vong rồi được hồi sinh, bị động, -10 ae mỗi lần kích hoạt hồi hp.
@@ -464,6 +464,9 @@ d) Phản đòn/follow-up của kẻ thù/cơ chế gây sát thương ngoài l�
 39)
 nội tại: khi HP về 0, tử vong sau đó xoá sạch mọi debuff lẫn buff từ nguồn khác ngoài bản thân trên người kể cả ảnh hưởng từ pháp tắc, nếu pháp tắc từ nguồn ngoài bản thân là hiệu ứng kéo dài thì char này miễn nhiễm pháp tắc đó trong 1 turn đầu tức turn hồi sinh. Pháp tắc tag.
 
+40)
+ssr, tanker, không element tag.
+nội tại: mỗi khi HP về 0, không chết, hồi ngay lập tức hp = 20% max hp, ATK và WIL được chuyển 100% thành res và arm, 1 atk = 0,5 arm, 1 wil = 0,5 res, sau đó có thể tấn công nhưng sát thương gây ra là 1 atk và 1 wil, nhận trạng thái taunt vĩnh viễn cho đến khi HP về 0 lần nữa. Khi HP về 0 sau khi kích hoạt nội tại này thì sẽ chết và có thể hồi sinh như bình thường, nội tại này kích hoạt tối đa 2 lần/trận, sau khi kích hoạt nội tại này vẫn có thể nhận heal và hồi hp qua kit/bản thân nếu có. Trạng thái chuyển atk/wil sang res/arm không phải là debuff/buff, có lẽ nên tạo tag chuyển đổi hoặc gì đó tương tự nếu chưa có?.
 
 
 

@@ -1,5 +1,6 @@
 import { dealAbilityDamage, healUnit } from '../../combat.ts';
 import { isLeaderToken } from '../../combat/board-position-utils.ts';
+import { readAtkWilPower, toFiniteNumber } from '../../combat/number-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -10,11 +11,6 @@ export interface LyThanhThuUltRuntimeContext {
   ultSkill: unknown;
   extendBusy: (ms: number) => void;
 }
-
-const toFiniteOrZero = (value: unknown): number => {
-  const parsed = typeof value === 'number' ? value : Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-};
 
 export function performLyThanhThuUltRuntime(ctx: LyThanhThuUltRuntimeContext): boolean {
   const { game, unit, extendBusy } = ctx;
@@ -30,17 +26,16 @@ export function performLyThanhThuUltRuntime(ctx: LyThanhThuUltRuntimeContext): b
     return false;
   }
 
-  const basePower = Math.max(0, Math.floor((toFiniteOrZero(unit.atk) || 0) + (toFiniteOrZero(unit.wil) || 0)));
-  const base = Math.max(1, Math.floor(basePower * 2));
+  const base = Math.max(1, Math.floor(readAtkWilPower(unit) * 2));
   const dealtResult = dealAbilityDamage(game, unit, enemyLeader, {
     base,
     dtype: 'mixed',
     attackType: 'skill',
   });
 
-  const overThreshold = dealtResult.dealt > Math.max(0, Math.floor((toFiniteOrZero(enemyLeader.hpMax) ?? 0) * 0.2));
+  const overThreshold = dealtResult.dealt > Math.max(0, Math.floor(toFiniteNumber(enemyLeader.hpMax, 0) * 0.2));
   if (overThreshold) {
-    const heal = Math.max(1, Math.floor((toFiniteOrZero(unit.hpMax) ?? 0) * 0.1));
+    const heal = Math.max(1, Math.floor(toFiniteNumber(unit.hpMax, 0) * 0.1));
     healUnit(unit, heal);
   }
 

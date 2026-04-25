@@ -14713,10 +14713,9 @@ __modules['./modes/pve/ly-thanh-thu-runtime.ts'] = (exports, module, __require) 
   const healUnit = __dep0.healUnit;
   const __dep1 = __require('./combat/board-position-utils.ts');
   const isLeaderToken = __dep1.isLeaderToken;
-  const toFiniteOrZero = (value) => {
-      const parsed = typeof value === 'number' ? value : Number(value);
-      return Number.isFinite(parsed) ? parsed : 0;
-  };
+  const __dep2 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep2.readAtkWilPower;
+  const toFiniteNumber = __dep2.toFiniteNumber;
   function performLyThanhThuUltRuntime(ctx) {
       const { game, unit, extendBusy } = ctx;
       if (!game || !unit || unit.id !== 'ly_thanh_thu')
@@ -14728,16 +14727,15 @@ __modules['./modes/pve/ly-thanh-thu-runtime.ts'] = (exports, module, __require) 
       if (!enemyLeader) {
           return false;
       }
-      const basePower = Math.max(0, Math.floor((toFiniteOrZero(unit.atk) || 0) + (toFiniteOrZero(unit.wil) || 0)));
-      const base = Math.max(1, Math.floor(basePower * 2));
+      const base = Math.max(1, Math.floor(readAtkWilPower(unit) * 2));
       const dealtResult = dealAbilityDamage(game, unit, enemyLeader, {
           base,
           dtype: 'mixed',
           attackType: 'skill',
       });
-      const overThreshold = dealtResult.dealt > Math.max(0, Math.floor((toFiniteOrZero(enemyLeader.hpMax) ?? 0) * 0.2));
+      const overThreshold = dealtResult.dealt > Math.max(0, Math.floor(toFiniteNumber(enemyLeader.hpMax, 0) * 0.2));
       if (overThreshold) {
-          const heal = Math.max(1, Math.floor((toFiniteOrZero(unit.hpMax) ?? 0) * 0.1));
+          const heal = Math.max(1, Math.floor(toFiniteNumber(unit.hpMax, 0) * 0.1));
           healUnit(unit, heal);
       }
       extendBusy(900);
@@ -14751,17 +14749,15 @@ __modules['./modes/pve/nguyen-le-runtime.ts'] = (exports, module, __require) => 
   const dealAbilityDamage = __dep0.dealAbilityDamage;
   const __dep1 = __require('./combat/board-position-utils.ts');
   const findAliveUnitAtSlot = __dep1.findAliveUnitAtSlot;
+  const __dep2 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep2.readAtkWilPower;
   const TARGET_PATTERN = [1, 2, 3, 5, 8];
-  const toFiniteOrZero = (value) => {
-      const parsed = typeof value === 'number' ? value : Number(value);
-      return Number.isFinite(parsed) ? parsed : 0;
-  };
   function performNguyenLeUltRuntime(ctx) {
       const { game, unit, ultSkill, extendBusy } = ctx;
       if (!game || !unit || unit.id !== 'nguyen_le')
           return false;
       const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
-      const base = Math.max(1, Math.floor((toFiniteOrZero(unit.atk) + toFiniteOrZero(unit.wil)) * 2));
+      const base = Math.max(1, Math.floor(readAtkWilPower(unit) * 2));
       let hits = 0;
       for (const slot of TARGET_PATTERN) {
           const target = findAliveUnitAtSlot(game, foeSide, slot);
