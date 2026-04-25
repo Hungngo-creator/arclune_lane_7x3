@@ -537,16 +537,18 @@ function asDeckEntry<T>(value: T): DeckEntry {
 
 function sanitizeDeckEntries(value: unknown): DeckEntry[] {
   if (!Array.isArray(value)) return [];
-  let changed = false;
-  const normalized: DeckEntry[] = [];
-  for (const entry of value) {
+  let normalized: DeckEntry[] | null = null;
+  for (let index = 0; index < value.length; index += 1) {
+    const entry = value[index];
     if (isDeckEntry(entry)) {
-      normalized.push(entry);
-    } else {
-      changed = true;
+      if (normalized) normalized.push(entry);
+      continue;
+    }
+    if (!normalized) {
+      normalized = (value.slice(0, index) as DeckEntry[]);
     }
   }
-  return changed ? normalized : (value as DeckEntry[]);
+  return normalized ?? (value as DeckEntry[]);
 }
 
 type LockedDeckCache = {
@@ -555,9 +557,15 @@ type LockedDeckCache = {
 };
 
 let lockedDeckCache: LockedDeckCache | null = null;
+let lockedDeckNormalizeCache: {
+  gameRef: SessionState;
+  sourceRef: ReadonlyArray<unknown>;
+  normalized: ReadonlyArray<DeckEntry>;
+} | null = null;
 
 const invalidateLockedDeckCache = (): void => {
   lockedDeckCache = null;
+  lockedDeckNormalizeCache = null;u
 };
 
 const getLockedDeckIdSet = (lockedDeck: ReadonlyArray<DeckEntry>): ReadonlySet<string> => {
@@ -609,11 +617,23 @@ function ensureLockedPlayerDeck(): ReadonlyArray<DeckEntry> {
   const lockedSource = Array.isArray(game.playerDeckLocked) && game.playerDeckLocked.length
     ? game.playerDeckLocked
     : game.unitsAll;
+    if (
+    lockedDeckNormalizeCache
+    && lockedDeckNormalizeCache.gameRef === game
+    && lockedDeckNormalizeCache.sourceRef === lockedSource
+  ) {
+    return lockedDeckNormalizeCache.normalized;
+  }
   const lockedDeck = sanitizeDeckEntries(lockedSource);
   if (lockedDeck !== game.playerDeckLocked) {
     game.playerDeckLocked = lockedDeck;
     invalidateLockedDeckCache();
   }
+  lockedDeckNormalizeCache = {
+    gameRef: game,
+    sourceRef: lockedSource,
+    normalized: lockedDeck,
+  };
   return lockedDeck;
 }
 
@@ -2696,9 +2716,6 @@ function init(): boolean {
       });
       initializeFury(t, t.id, 0);
     }
-}
-  for (const t of tokens){
-    if (!t.iid) t.iid = nextIid();
   }
   if (Game.tokens) { globalAetherPool.init(Game.tokens);
   }
@@ -3254,10 +3271,12 @@ function refillDeck(): void {
   const need = HAND_SIZE - deck.length;
   if (need <= 0) return;
 
-  const exclude = new Set([
-    ...Game.usedUnitIds,
-    ...deck.map((u) => u.id)
-  ]);
+  const exclude = new Set(Game.usedUnitIds);
+  for (let i = 0; i < deck.length; i += 1) {
+    const entry = deck[i];
+    if (!entry?.id) continue;
+    exclude.add(entry.id);
+  }
   const lockedDeck = ensureLockedPlayerDeck();
   const more = pickRandom(lockedDeck, exclude).slice(0, need);
   deck.push(...more);

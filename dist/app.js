@@ -15193,21 +15193,26 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   function sanitizeDeckEntries(value) {
       if (!Array.isArray(value))
           return [];
-      let changed = false;
-      const normalized = [];
-      for (const entry of value) {
+      let normalized = null;
+      for (let index = 0; index < value.length; index += 1) {
+          const entry = value[index];
           if (isDeckEntry(entry)) {
-              normalized.push(entry);
+              if (normalized)
+                  normalized.push(entry);
+              continue;
           }
-          else {
-              changed = true;
+          if (!normalized) {
+              normalized = value.slice(0, index);
           }
       }
-      return changed ? normalized : value;
+      return normalized ?? value;
   }
   let lockedDeckCache = null;
+  let lockedDeckNormalizeCache = null;
   const invalidateLockedDeckCache = () => {
       lockedDeckCache = null;
+      lockedDeckNormalizeCache = null;
+      u;
   };
   const getLockedDeckIdSet = (lockedDeck) => {
       if (lockedDeckCache?.deckRef === lockedDeck) {
@@ -15259,11 +15264,21 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const lockedSource = Array.isArray(game.playerDeckLocked) && game.playerDeckLocked.length
           ? game.playerDeckLocked
           : game.unitsAll;
+      if (lockedDeckNormalizeCache
+          && lockedDeckNormalizeCache.gameRef === game
+          && lockedDeckNormalizeCache.sourceRef === lockedSource) {
+          return lockedDeckNormalizeCache.normalized;
+      }
       const lockedDeck = sanitizeDeckEntries(lockedSource);
       if (lockedDeck !== game.playerDeckLocked) {
           game.playerDeckLocked = lockedDeck;
           invalidateLockedDeckCache();
       }
+      lockedDeckNormalizeCache = {
+          gameRef: game,
+          sourceRef: lockedSource,
+          normalized: lockedDeck,
+      };
       return lockedDeck;
   }
   function isCardInLockedDeck(cardId, game = Game) {
@@ -17283,10 +17298,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               initializeFury(t, t.id, 0);
           }
       }
-      for (const t of tokens) {
-          if (!t.iid)
-              t.iid = nextIid();
-      }
       if (Game.tokens) {
           globalAetherPool.init(Game.tokens);
       }
@@ -17816,10 +17827,13 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const need = HAND_SIZE - deck.length;
       if (need <= 0)
           return;
-      const exclude = new Set([
-          ...Game.usedUnitIds,
-          ...deck.map((u) => u.id)
-      ]);
+      const exclude = new Set(Game.usedUnitIds);
+      for (let i = 0; i < deck.length; i += 1) {
+          const entry = deck[i];
+          if (!entry?.id)
+              continue;
+          exclude.add(entry.id);
+      }
       const lockedDeck = ensureLockedPlayerDeck();
       const more = pickRandom(lockedDeck, exclude).slice(0, need);
       deck.push(...more);
