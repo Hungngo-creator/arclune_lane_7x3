@@ -5,7 +5,7 @@ import { performNguyenLeUltRuntime } from './nguyen-le-runtime.ts';
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
 
-interface PveUltHookContext {
+export interface PveUltHookContext {
   game: SessionState;
   unit: UnitToken;
   ultSkill: unknown;

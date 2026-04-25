@@ -14215,21 +14215,19 @@ __modules['./modes/pve/chap-minh-runtime.ts'] = (exports, module, __require) => 
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
   const healUnit = __dep0.healUnit;
-  const __dep1 = __require('./statuses.ts');
-  const Statuses = __dep1.Statuses;
+  const __dep1 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep1.toFiniteNumber;
+  const __dep2 = __require('./statuses.ts');
+  const Statuses = __dep2.Statuses;
   const CHAP_MINH_ARM_RES_BUFF = 0.5;
   const CHAP_MINH_ARM_RES_BUFF_TURNS = 2;
   const CHAP_MINH_ULT_HEAL_PERCENT = 0.35;
   const CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO = 0.5;
-  const toFiniteOrZero = (value) => {
-      const parsed = typeof value === 'number' ? value : Number(value);
-      return Number.isFinite(parsed) ? parsed : 0;
-  };
   function performChapMinhUltRuntime(ctx) {
       const { game, unit, ultSkill, extendBusy } = ctx;
       if (!game || !unit || unit.id !== 'huyen_vu_chap_minh')
           return false;
-      const healAmount = Math.max(0, Math.round((toFiniteOrZero(unit.hpMax) || 0) * CHAP_MINH_ULT_HEAL_PERCENT));
+      const healAmount = Math.max(0, Math.round(Math.max(0, toFiniteNumber(unit.hpMax, 0)) * CHAP_MINH_ULT_HEAL_PERCENT));
       if (healAmount > 0) {
           healUnit(unit, healAmount);
       }
@@ -14259,11 +14257,16 @@ __modules['./modes/pve/chap-minh-runtime.ts'] = (exports, module, __require) => 
           unit._recalcStats();
       }
       const shieldStatus = Statuses.get(unit, 'shield');
-      const currentShield = Math.max(0, toFiniteOrZero(shieldStatus?.amount));
-      const base = Math.max(1, Math.round(toFiniteOrZero(unit.atk) + toFiniteOrZero(unit.wil) + currentShield * CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO));
+      const currentShield = Math.max(0, toFiniteNumber(shieldStatus?.amount, 0));
+      const base = Math.max(1, Math.round(Math.max(0, toFiniteNumber(unit.atk, 0))
+          + Math.max(0, toFiniteNumber(unit.wil, 0))
+          + currentShield * CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO));
       const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
-      const foes = (game.tokens || []).filter((token) => token.alive && token.side === foeSide);
-      for (const target of foes) {
+      const tokens = Array.isArray(game.tokens) ? game.tokens : [];
+      for (let index = 0; index < tokens.length; index += 1) {
+          const target = tokens[index];
+          if (!target?.alive || target.side !== foeSide)
+              continue;
           dealAbilityDamage(game, unit, target, {
               base,
               dtype: 'mixed',
@@ -16586,6 +16589,25 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           finishFuryHit(unit);
       };
       let busyMs = 900;
+      let sessionVfxCache;
+      const getSessionVfx = () => {
+          if (sessionVfxCache !== undefined)
+              return sessionVfxCache;
+          sessionVfxCache = ensureSessionWithVfx(game, { requireGrid: true });
+          return sessionVfxCache;
+      };
+      const runSafeVfx = (effect) => {
+          const sessionVfx = getSessionVfx();
+          if (!sessionVfx)
+              return;
+          try {
+              effect(sessionVfx);
+          }
+          catch (_) { }
+      };
+      const addHitVfx = (target) => {
+          runSafeVfx((sessionVfx) => vfxAddHit(sessionVfx, target));
+      };
       switch (u.type) {
           case 'drain': {
               const foes = getAliveBySide(foeSide);
@@ -16644,7 +16666,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                       selected.push(foes[0]);
                   }
               }
-              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
               const applyBusyFromVfx = (startedAt, duration) => {
                   if (!Number.isFinite(startedAt) || !Number.isFinite(duration))
                       return;
@@ -16656,6 +16677,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               };
               const bindingKey = 'huyet_hon_loi_quyet';
               const runBurstVfx = (effect) => {
+                  const sessionVfx = getSessionVfx();
                   if (!sessionVfx)
                       return;
                   const startedAt = getNow();
@@ -16771,13 +16793,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               const hits = getUltHitCount(u);
               const scale = parseFiniteNumber(u.scale) ?? 0.9;
               const meleeDur = parseFiniteNumber(CFG?.ANIMATION?.meleeDurationMs) ?? 2000;
-              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
-              if (sessionVfx) {
-                  try {
-                      vfxAddMelee(sessionVfx, unit, primary, { dur: meleeDur });
-                  }
-                  catch (_) { }
-              }
+              runSafeVfx((sessionVfx) => vfxAddMelee(sessionVfx, unit, primary, { dur: meleeDur }));
               busyMs = Math.max(busyMs, meleeDur);
               for (const enemy of laneTargets) {
                   if (!enemy.alive)
@@ -16813,15 +16829,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                       Statuses.add(unit, { ...damageCut, sourceUnitId: unit.id });
                   }
               }
-              {
-                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
-                  if (sessionVfx) {
-                      try {
-                          vfxAddHit(sessionVfx, unit);
-                      }
-                      catch (_) { }
-                  }
-              }
+              addHitVfx(unit);
               busyMs = 800;
               break;
           }
@@ -16830,23 +16838,17 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               if (!foes.length)
                   break;
               const take = Math.max(1, Math.min(foes.length, getUltScopedCount(u, foes.length, 'targets')));
-              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
               const nearestTargets = pickNearestAliveUnits(foes, unit, take);
+              const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
               for (let i = 0; i < nearestTargets.length; i++) {
                   const tgt = nearestTargets[i];
                   if (!tgt)
                       continue;
-                  const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
                   const sleep = makeStatusEffect('sleep', { turns });
                   if (sleep) {
                       Statuses.add(tgt, { ...sleep, sourceUnitId: unit.id });
                   }
-                  if (sessionVfx) {
-                      try {
-                          vfxAddHit(sessionVfx, tgt);
-                      }
-                      catch (_) { }
-                  }
+                  addHitVfx(tgt);
               }
               busyMs = 1000;
               break;
@@ -16859,7 +16861,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               const take = Math.max(1, Math.min(fallen.length, getUltScopedCount(u, 1, 'targets')));
               const allies = getAliveBySide(unit.side);
               const sideLeader = allies.find((token) => isUyenLeader(token));
-              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
               for (let i = 0; i < take; i++) {
                   const ally = fallen[i];
                   if (!ally)
@@ -16882,12 +16883,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                           Statuses.add(ally, { ...silence, sourceUnitId: unit.id });
                       }
                   }
-                  if (sessionVfx) {
-                      try {
-                          vfxAddSpawn(sessionVfx, ally.cx, ally.cy, ally.side);
-                      }
-                      catch (_) { }
-                  }
+                  runSafeVfx((sessionVfx) => vfxAddSpawn(sessionVfx, ally.cx, ally.cy, ally.side));
                   grantUyenSummonRage(sideLeader, { revived: true, isMinion: !!ally.isMinion });
               }
               busyMs = 1500;
@@ -16897,7 +16893,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               let allies = getAliveBySide(unit.side);
               if (!allies.length)
                   break;
-              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
               allies.sort((a, b) => {
                   const ra = (a.hpMax || 1) ? (a.hp || 0) / a.hpMax : 0;
                   const rb = (b.hpMax || 1) ? (b.hp || 0) / b.hpMax : 0;
@@ -16921,12 +16916,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   const goal = Math.min(tgt.hpMax || 0, Math.round((tgt.hpMax || 0) * ratio));
                   if (goal > (tgt.hp || 0)) {
                       healUnit(tgt, goal - (tgt.hp || 0));
-                      if (sessionVfx) {
-                          try {
-                              vfxAddHit(sessionVfx, tgt);
-                          }
-                          catch (_) { }
-                      }
+                      addHitVfx(tgt);
                   }
               }
               busyMs = 1000;
@@ -16938,7 +16928,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               const extraAllies = Math.max(0, getUltScopedCount(u, 1, 'targets') - 1);
               const allies = getAliveBySide(unit.side);
               const others = allies.filter(t => t !== unit);
-              const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+              const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
               others.sort((a, b) => (a.spd || 0) - (b.spd || 0));
               for (const ally of others) {
                   if (targets.size >= extraAllies + 1)
@@ -16947,17 +16937,11 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               }
               const pct = parseFiniteNumber(u.attackSpeed) ?? 0.1;
               for (const tgt of targets) {
-                  const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
                   const haste = makeStatusEffect('haste', { pct, turns });
                   if (haste) {
                       Statuses.add(tgt, { ...haste, sourceUnitId: unit.id });
                   }
-                  if (sessionVfx) {
-                      try {
-                          vfxAddHit(sessionVfx, tgt);
-                      }
-                      catch (_) { }
-                  }
+                  addHitVfx(tgt);
               }
               busyMs = 900;
               break;

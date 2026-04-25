@@ -1,18 +1,9 @@
 import { dealAbilityDamage, healUnit } from '../../combat.ts';
 import { isLeaderToken } from '../../combat/board-position-utils.ts';
 import { readAtkWilPower, toFiniteNumber } from '../../combat/number-utils.ts';
+import type { PveUltHookContext } from './unit-runtime-hooks.ts';
 
-import type { SessionState } from '@shared-types/combat';
-import type { UnitToken } from '@shared-types/units';
-
-export interface LyThanhThuUltRuntimeContext {
-  game: SessionState;
-  unit: UnitToken;
-  ultSkill: unknown;
-  extendBusy: (ms: number) => void;
-}
-
-export function performLyThanhThuUltRuntime(ctx: LyThanhThuUltRuntimeContext): boolean {
+export function performLyThanhThuUltRuntime(ctx: PveUltHookContext): boolean {
   const { game, unit, extendBusy } = ctx;
   if (!game || !unit || unit.id !== 'ly_thanh_thu') return false;
 

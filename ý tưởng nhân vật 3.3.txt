@@ -519,5 +519,14 @@ skill 3: bị động, tự kích hoạt khi đủ điều kiện. Khi hp thấp
 
 ultimate: cast 2 lần skill 1 nhưng không tốn ae.
 
+44)
+warrior, Ur
+nội tại: mỗi turn tự tạo 3 phi kiếm để thi triển skill, mỗi khi tự giết 1 mục tiêu thành công số phi kiếm nhận mỗi turn sẽ +1, tối đa 5 stack. Quy Tắc.
 
+skill 1: phi 2 phi kiếm tấn công ngẫu nhiên 2 mục tiêu, gây sát thương lên mỗi mục tiêu = 150% đánh thường, không tính là đánh thường. 20 ae và 2 phi kiếm. - 8 rage/mỗi kẻ thù nếu skill 3 kích hoạt. Pháp Tắc.
 
+skill 2: gia tốc 3 thanh phi kiếm, tấn công leader kẻ thù, mỗi thanh phi kiếm gây sát thương = 1 đòn đánh thường, hồi hp 3 lần, mỗi lần 55% = sát thương của 1 phi kiếm gây ra lên leader địch, vì gây sát thương 3 lần riêng biệt nên sát thương gây ra cũng khác nhau và heal nhận cũng khác nhau. 35 ae và 3 phi kiếm. - 24 rage lên leader địch nếu 3 lần gây sát thương đều thành công (nếu skill 3 kích hoạt). Pháp Tắc.
+
+skill 3: luôn kích hoạt cho đến khi bể aether đồng minh không đủ để thanh toán cost skill này, skill bị động không cần tốn turn riêng để bật. Mỗi lần gây sát thương lên kẻ địch sẽ - 8 rage của họ, cost/turn bất kể số lần gây sát thương lên kẻ địch/turn là 8 ae.
+
+ultimate: cast skill 3 miễn còn đủ 3 phi kiếm/lần cho đến khi không đủ phi kiếm thì nếu còn phi kiếm sẽ cast skill 2. skill cast từ ultimate sẽ không tốn ae. Ví dụ char này có 4 phi kiếm thì sau khi dùng ultimate sẽ cast 1 lần skill 3, nếu có 5 phi kiếm thì sau khi dùng ultimate sẽ cast skill 3 sau đó là skill 2 hoặc có thể cast cùng lúc skill 2 và 3 nếu code cho phép, nếu có 6 hoặc 7 phi kiếm thì sẽ cast 2 lần skill 3. nếu có 8 phi kiếm thì cast skill 3 2 lần rồi cast skill 2, thực ra ultimate char này chả có vfx gì, player chỉ thấy char này mất nộ do ultimate rồi cast skill theo mô tả ultimate theo lượng phi kiếm hiện có thôi, kiểu thấy char này đến turn thì mất nộ do bị trừ khi kích hoạt ultimate, kiểu đến turn là cast skill luôn không có khựng gì cả. Đương nhiên nộ vẫn phải trừ, các char khác nếu có ultimate là cast skill cũng thế, mất nộ là cast skill theo mô tả của ultimate luôn.

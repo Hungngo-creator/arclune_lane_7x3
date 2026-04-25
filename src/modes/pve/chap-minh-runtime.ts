@@ -1,31 +1,18 @@
 import { dealAbilityDamage, healUnit } from '../../combat.ts';
+import { toFiniteNumber } from '../../combat/number-utils.ts';
 import { Statuses } from '../../statuses.ts';
-
-import type { SessionState } from '@shared-types/combat';
-import type { UnitToken } from '@shared-types/units';
-
-export interface ChapMinhUltRuntimeContext {
-  game: SessionState;
-  unit: UnitToken;
-  ultSkill: unknown;
-  extendBusy: (ms: number) => void;
-}
+import type { PveUltHookContext } from './unit-runtime-hooks.ts';
 
 const CHAP_MINH_ARM_RES_BUFF = 0.5;
 const CHAP_MINH_ARM_RES_BUFF_TURNS = 2;
 const CHAP_MINH_ULT_HEAL_PERCENT = 0.35;
 const CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO = 0.5;
 
-const toFiniteOrZero = (value: unknown): number => {
-  const parsed = typeof value === 'number' ? value : Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-};
-
-export function performChapMinhUltRuntime(ctx: ChapMinhUltRuntimeContext): boolean {
+export function performChapMinhUltRuntime(ctx: PveUltHookContext): boolean {
   const { game, unit, ultSkill, extendBusy } = ctx;
   if (!game || !unit || unit.id !== 'huyen_vu_chap_minh') return false;
 
-  const healAmount = Math.max(0, Math.round((toFiniteOrZero(unit.hpMax) || 0) * CHAP_MINH_ULT_HEAL_PERCENT));
+  const healAmount = Math.max(0, Math.round(Math.max(0, toFiniteNumber(unit.hpMax, 0)) * CHAP_MINH_ULT_HEAL_PERCENT));
   if (healAmount > 0) {
     healUnit(unit, healAmount);
   }
@@ -58,15 +45,21 @@ export function performChapMinhUltRuntime(ctx: ChapMinhUltRuntimeContext): boole
   }
 
   const shieldStatus = Statuses.get(unit, 'shield') as { amount?: unknown } | null;
-  const currentShield = Math.max(0, toFiniteOrZero(shieldStatus?.amount));
+  const currentShield = Math.max(0, toFiniteNumber(shieldStatus?.amount, 0));
   const base = Math.max(
     1,
-    Math.round(toFiniteOrZero(unit.atk) + toFiniteOrZero(unit.wil) + currentShield * CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO),
+    Math.round(
+      Math.max(0, toFiniteNumber(unit.atk, 0))
+      + Math.max(0, toFiniteNumber(unit.wil, 0))
+      + currentShield * CHAP_MINH_ULT_SHIELD_DAMAGE_RATIO,
+    ),
   );
 
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
-  const foes = (game.tokens || []).filter((token) => token.alive && token.side === foeSide);
-  for (const target of foes) {
+  const tokens = Array.isArray(game.tokens) ? game.tokens : [];
+  for (let index = 0; index < tokens.length; index += 1) {
+    const target = tokens[index];
+    if (!target?.alive || target.side !== foeSide) continue;
     dealAbilityDamage(game, unit, target, {
       base,
       dtype: 'mixed',

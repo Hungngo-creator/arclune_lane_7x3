@@ -1,19 +1,11 @@
 import { dealAbilityDamage } from '../../combat.ts';
 import { findAliveUnitAtSlot } from '../../combat/board-position-utils.ts';
 import { readAtkWilPower } from '../../combat/number-utils.ts';
-import type { SessionState } from '@shared-types/combat';
-import type { UnitToken } from '@shared-types/units';
-
-export interface NguyenLeUltRuntimeContext {
-  game: SessionState;
-  unit: UnitToken;
-  ultSkill: unknown;
-  extendBusy: (ms: number) => void;
-}
+import type { PveUltHookContext } from './unit-runtime-hooks.ts';
 
 const TARGET_PATTERN = [1, 2, 3, 5, 8] as const;
 
-export function performNguyenLeUltRuntime(ctx: NguyenLeUltRuntimeContext): boolean {
+export function performNguyenLeUltRuntime(ctx: PveUltHookContext): boolean {
   const { game, unit, ultSkill, extendBusy } = ctx;
   if (!game || !unit || unit.id !== 'nguyen_le') return false;
 

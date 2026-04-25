@@ -2031,6 +2031,20 @@ function performUlt(unit: UnitToken): void {
   };
 
   let busyMs = 900;
+  let sessionVfxCache: SessionWithVfx | null | undefined;
+  const getSessionVfx = (): SessionWithVfx | null => {
+    if (sessionVfxCache !== undefined) return sessionVfxCache;
+    sessionVfxCache = ensureSessionWithVfx(game, { requireGrid: true });
+    return sessionVfxCache;
+  };
+  const runSafeVfx = (effect: (session: SessionWithVfx) => unknown): void => {
+    const sessionVfx = getSessionVfx();
+    if (!sessionVfx) return;
+    try { effect(sessionVfx); } catch (_){}
+  };
+  const addHitVfx = (target: UnitToken): void => {
+    runSafeVfx((sessionVfx) => vfxAddHit(sessionVfx, target));
+  };
 
   switch(u.type){
     case 'drain': {
@@ -2088,8 +2102,6 @@ function performUlt(unit: UnitToken): void {
           selected.push(foes[0]);
         }
       }
-      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
-
       const applyBusyFromVfx = (startedAt: number, duration: number | null | undefined): void => {
         if (!Number.isFinite(startedAt) || !Number.isFinite(duration)) return;
         const resolved = duration as number;
@@ -2104,6 +2116,7 @@ function performUlt(unit: UnitToken): void {
       const runBurstVfx = (
         effect: (session: SessionWithVfx) => number | null | undefined,
       ): void => {
+        const sessionVfx = getSessionVfx();
         if (!sessionVfx) return;
         const startedAt = getNow();
         try {
@@ -2222,10 +2235,7 @@ function performUlt(unit: UnitToken): void {
       const hits = getUltHitCount(u);
       const scale = parseFiniteNumber(u.scale) ?? 0.9;
       const meleeDur = parseFiniteNumber(CFG?.ANIMATION?.meleeDurationMs) ?? 2000;
-      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
-      if (sessionVfx) {
-        try { vfxAddMelee(sessionVfx, unit, primary, { dur: meleeDur }); } catch(_){}
-      }
+      runSafeVfx((sessionVfx) => vfxAddMelee(sessionVfx, unit, primary, { dur: meleeDur }));
       busyMs = Math.max(busyMs, meleeDur);
       for (const enemy of laneTargets){
         if (!enemy.alive) continue;
@@ -2260,12 +2270,7 @@ function performUlt(unit: UnitToken): void {
           Statuses.add(unit, { ...damageCut, sourceUnitId: unit.id });
         }
       }
-      {
-        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
-        if (sessionVfx) {
-          try { vfxAddHit(sessionVfx, unit); } catch(_){}
-        }
-      }
+      addHitVfx(unit);
       busyMs = 800;
       break;
     }
@@ -2274,19 +2279,16 @@ function performUlt(unit: UnitToken): void {
       const foes = getAliveBySide(foeSide);
       if (!foes.length) break;
       const take = Math.max(1, Math.min(foes.length, getUltScopedCount(u, foes.length, 'targets')));
-      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
       const nearestTargets = pickNearestAliveUnits(foes, unit, take);
+      const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
       for (let i=0; i<nearestTargets.length; i++){
         const tgt = nearestTargets[i];
         if (!tgt) continue;
-        const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
         const sleep = makeStatusEffect('sleep', { turns });
         if (sleep) {
           Statuses.add(tgt, { ...sleep, sourceUnitId: unit.id });
         }
-        if (sessionVfx) {
-          try { vfxAddHit(sessionVfx, tgt); } catch(_){}
-        }
+        addHitVfx(tgt);
       }
       busyMs = 1000;
       break;
@@ -2299,7 +2301,6 @@ function performUlt(unit: UnitToken): void {
       const take = Math.max(1, Math.min(fallen.length, getUltScopedCount(u, 1, 'targets')));
       const allies = getAliveBySide(unit.side);
       const sideLeader = allies.find((token) => isUyenLeader(token));
-      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
       for (let i=0; i<take; i++){
         const ally = fallen[i];
         if (!ally) continue;
@@ -2320,9 +2321,7 @@ function performUlt(unit: UnitToken): void {
             Statuses.add(ally, { ...silence, sourceUnitId: unit.id });
           }
         }
-        if (sessionVfx) {
-          try { vfxAddSpawn(sessionVfx, ally.cx, ally.cy, ally.side); } catch(_){}
-        }
+        runSafeVfx((sessionVfx) => vfxAddSpawn(sessionVfx, ally.cx, ally.cy, ally.side));
         grantUyenSummonRage(sideLeader, { revived: true, isMinion: !!ally.isMinion });
       }
       busyMs = 1500;
@@ -2332,7 +2331,6 @@ function performUlt(unit: UnitToken): void {
     case 'equalizeHP': {
       let allies = getAliveBySide(unit.side);
       if (!allies.length) break;
-      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
       allies.sort((a,b)=>{
         const ra = (a.hpMax || 1) ? (a.hp || 0) / a.hpMax : 0;
         const rb = (b.hpMax || 1) ? (b.hp || 0) / b.hpMax : 0;
@@ -2354,9 +2352,7 @@ function performUlt(unit: UnitToken): void {
         const goal = Math.min(tgt.hpMax || 0, Math.round((tgt.hpMax || 0) * ratio));
         if (goal > (tgt.hp || 0)){
           healUnit(tgt, goal - (tgt.hp || 0));
-          if (sessionVfx) {
-            try { vfxAddHit(sessionVfx, tgt); } catch(_){ }
-          }
+          addHitVfx(tgt);
         }
       }
       busyMs = 1000;
@@ -2369,7 +2365,7 @@ function performUlt(unit: UnitToken): void {
       const extraAllies = Math.max(0, getUltScopedCount(u, 1, 'targets') - 1);
       const allies = getAliveBySide(unit.side);
       const others = allies.filter(t => t !== unit);
-      const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
+      const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
       others.sort((a,b)=> (a.spd||0) - (b.spd||0));
       for (const ally of others){
         if (targets.size >= extraAllies + 1) break;
@@ -2377,14 +2373,11 @@ function performUlt(unit: UnitToken): void {
       }
       const pct = parseFiniteNumber(u.attackSpeed) ?? 0.1;
       for (const tgt of targets){
-        const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
         const haste = makeStatusEffect('haste', { pct, turns });
         if (haste) {
           Statuses.add(tgt, { ...haste, sourceUnitId: unit.id });
         }
-        if (sessionVfx) {
-          try { vfxAddHit(sessionVfx, tgt); } catch(_){}
-        }
+        addHitVfx(tgt);
       }
       busyMs = 900;
       break;
