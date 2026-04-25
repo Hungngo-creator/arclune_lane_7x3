@@ -22,7 +22,6 @@ import { gameEvents } from '../../events.ts';
 import { getEnvironmentBackground, drawEnvironmentProps } from '../../background.ts';
 import { getCachedBattlefieldScene } from '../../scene.ts';
 import { drawGridOblique } from '../../engine.ts';
-import { Statuses } from '../../statuses.ts';
 import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { createRngState, nextRngValue } from '../../utils/rng.ts';
@@ -30,8 +29,6 @@ import { stableStringify } from '../../utils/format.ts';
 import { normalizeClassName, normalizeElementKey, normalizeElementList } from '../../utils/domain-normalization.ts';
 import { mapUnitProgressById } from './collection-mapper.ts';
 import { buildAICreepDeckFromLineup } from './creep-builder.ts';
-
-void Statuses;
 
 type SceneConfigWithExtras = (SceneConfig & { CURRENT_BACKGROUND?: string | null | undefined }) | null;
 

@@ -17121,8 +17121,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const { leaderA, leaderB, bossAlive } = resolveBattlefieldSnapshot(game);
       const leaderAAlive = isUnitAlive(leaderA);
       const leaderBAlive = isUnitAlive(leaderB);
-      const contextDetail = context && typeof context === 'object' ? { ...context } : {};
-      const triggerValue = contextDetail['trigger'];
+      const normalizedContext = context && typeof context === 'object' ? context : {};
+      const triggerValue = normalizedContext['trigger'];
       const trigger = typeof triggerValue === 'string' ? triggerValue : null;
       const leaderAHpRatio = getHpRatio(leaderA);
       const leaderBHpRatio = getHpRatio(leaderB);
@@ -17132,14 +17132,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       leaderEndCheckFlags = {
           ally: shouldCheckAlly,
           enemy: shouldCheckEnemy,
-      };
-      contextDetail['leaderCheckFlags'] = { ...leaderEndCheckFlags };
-      const detail = {
-          context: contextDetail,
-          leaders: {
-              ally: snapshotLeader(leaderA),
-              enemy: snapshotLeader(leaderB)
-          }
       };
       let winner = null;
       let reason = null;
@@ -17154,23 +17146,42 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       }
       else if (trigger === 'timeout') {
           reason = 'timeout';
-          const remainRaw = contextDetail['remain'];
+          const remainRaw = normalizedContext['remain'];
           const remainCandidate = typeof remainRaw === 'number' ? remainRaw : Number(remainRaw);
           const remain = Number.isFinite(remainCandidate) ? remainCandidate : 0;
           if (isPvpMode(game)) {
-              const allyRatio = getHpRatio(leaderA);
-              const enemyRatio = getHpRatio(leaderB);
-              detail.timeout = {
-                  mode: 'pvp',
-                  remain,
-                  hpRatio: { ally: allyRatio, enemy: enemyRatio }
-              };
-              if (allyRatio > enemyRatio)
+              if (leaderAHpRatio > leaderBHpRatio)
                   winner = 'ally';
-              else if (enemyRatio > allyRatio)
+              else if (leaderBHpRatio > leaderAHpRatio)
                   winner = 'enemy';
               else
                   winner = 'draw';
+          }
+          else {
+              winner = bossAlive ? 'enemy' : 'ally';
+          }
+      }
+      if (!winner)
+          return null;
+      const contextDetail = { ...normalizedContext };
+      contextDetail['leaderCheckFlags'] = { ...leaderEndCheckFlags };
+      const detail = {
+          context: contextDetail,
+          leaders: {
+              ally: snapshotLeader(leaderA),
+              enemy: snapshotLeader(leaderB)
+          }
+      };
+      if (trigger === 'timeout') {
+          const remainRaw = normalizedContext['remain'];
+          const remainCandidate = typeof remainRaw === 'number' ? remainRaw : Number(remainRaw);
+          const remain = Number.isFinite(remainCandidate) ? remainCandidate : 0;
+          if (isPvpMode(game)) {
+              detail.timeout = {
+                  mode: 'pvp',
+                  remain,
+                  hpRatio: { ally: leaderAHpRatio, enemy: leaderBHpRatio }
+              };
           }
           else {
               detail.timeout = {
@@ -17178,12 +17189,9 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   remain,
                   bossAlive
               };
-              winner = bossAlive ? 'enemy' : 'ally';
           }
       }
-      if (!winner)
-          return null;
-      const timestampRaw = contextDetail['timestamp'];
+      const timestampRaw = normalizedContext['timestamp'];
       const timestampCandidate = typeof timestampRaw === 'number' ? timestampRaw : Number(timestampRaw);
       const finishedAt = Number.isFinite(timestampCandidate)
           ? normalizeAnimationFrameTimestamp(timestampCandidate)
@@ -18951,21 +18959,9 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   }
   function sanitizeRewardList(container, key) {
       const source = container[key];
-      let next;
-      if (isRewardArray(source)) {
-          next = source;
-      }
-      else if (Array.isArray(source)) {
-          next = [];
-          for (let index = 0; index < source.length; index += 1) {
-              const reward = source[index];
-              if (isReward(reward))
-                  next.push(reward);
-          }
-      }
-      else {
-          next = [];
-      }
+      const next = isRewardArray(source)
+          ? source
+          : [...normalizeRewardList(source)];
       container[key] = next;
       return next;
   }
@@ -19171,26 +19167,23 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   const getCachedBattlefieldScene = __dep7.getCachedBattlefieldScene;
   const __dep8 = __require('./engine.ts');
   const drawGridOblique = __dep8.drawGridOblique;
-  const __dep9 = __require('./statuses.ts');
-  const Statuses = __dep9.Statuses;
-  const __dep10 = __require('./art.ts');
-  const getUnitArt = __dep10.getUnitArt;
-  const __dep11 = __require('./utils/unit-id.ts');
-  const normalizeUnitId = __dep11.normalizeUnitId;
-  const __dep12 = __require('./utils/rng.ts');
-  const createRngState = __dep12.createRngState;
-  const nextRngValue = __dep12.nextRngValue;
-  const __dep13 = __require('./utils/format.ts');
-  const stableStringify = __dep13.stableStringify;
-  const __dep14 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep14.normalizeClassName;
-  const normalizeElementKey = __dep14.normalizeElementKey;
-  const normalizeElementList = __dep14.normalizeElementList;
-  const __dep15 = __require('./modes/pve/collection-mapper.ts');
-  const mapUnitProgressById = __dep15.mapUnitProgressById;
-  const __dep16 = __require('./modes/pve/creep-builder.ts');
-  const buildAICreepDeckFromLineup = __dep16.buildAICreepDeckFromLineup;
-  void Statuses;
+  const __dep9 = __require('./art.ts');
+  const getUnitArt = __dep9.getUnitArt;
+  const __dep10 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep10.normalizeUnitId;
+  const __dep11 = __require('./utils/rng.ts');
+  const createRngState = __dep11.createRngState;
+  const nextRngValue = __dep11.nextRngValue;
+  const __dep12 = __require('./utils/format.ts');
+  const stableStringify = __dep12.stableStringify;
+  const __dep13 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep13.normalizeClassName;
+  const normalizeElementKey = __dep13.normalizeElementKey;
+  const normalizeElementList = __dep13.normalizeElementList;
+  const __dep14 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep14.mapUnitProgressById;
+  const __dep15 = __require('./modes/pve/creep-builder.ts');
+  const buildAICreepDeckFromLineup = __dep15.buildAICreepDeckFromLineup;
   const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
       const unitId = normalizeUnitId(unit.id);
       const art = getUnitArt(unitId);

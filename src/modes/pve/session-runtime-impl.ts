@@ -2569,9 +2569,9 @@ function checkBattleEndResult(
   const leaderAAlive = isUnitAlive(leaderA);
   const leaderBAlive = isUnitAlive(leaderB);
 
-  const contextDetail: Record<string, unknown> =
-    context && typeof context === 'object' ? { ...context } : {};
-  const triggerValue = contextDetail['trigger'];
+  const normalizedContext: Record<string, unknown> =
+    context && typeof context === 'object' ? context : {};
+  const triggerValue = normalizedContext['trigger'];
   const trigger = typeof triggerValue === 'string' ? triggerValue : null;
   const leaderAHpRatio = getHpRatio(leaderA);
   const leaderBHpRatio = getHpRatio(leaderB);
@@ -2581,15 +2581,6 @@ function checkBattleEndResult(
   leaderEndCheckFlags = {
     ally: shouldCheckAlly,
     enemy: shouldCheckEnemy,
-  };
-  contextDetail['leaderCheckFlags'] = { ...leaderEndCheckFlags };
-
-  const detail: BattleDetail = {
-    context: contextDetail,
-    leaders: {
-      ally: snapshotLeader(leaderA),
-      enemy: snapshotLeader(leaderB)
-    }
   };
 
   let winner: BattleResult['winner'] | null = null;
@@ -2602,33 +2593,49 @@ function checkBattleEndResult(
     else winner = 'draw';
 } else if (trigger === 'timeout'){
     reason = 'timeout';
-    const remainRaw = contextDetail['remain'];
+    const remainRaw = normalizedContext['remain'];
     const remainCandidate = typeof remainRaw === 'number' ? remainRaw : Number(remainRaw);
     const remain = Number.isFinite(remainCandidate) ? remainCandidate : 0;
     if (isPvpMode(game)){
-      const allyRatio = getHpRatio(leaderA);
-      const enemyRatio = getHpRatio(leaderB);
-      detail.timeout = {
-        mode: 'pvp',
-        remain,
-        hpRatio: { ally: allyRatio, enemy: enemyRatio }
-      };
-      if (allyRatio > enemyRatio) winner = 'ally';
-      else if (enemyRatio > allyRatio) winner = 'enemy';
+      if (leaderAHpRatio > leaderBHpRatio) winner = 'ally';
+      else if (leaderBHpRatio > leaderAHpRatio) winner = 'enemy';
       else winner = 'draw';
     } else {
-      detail.timeout = {
-        mode: 'pve',
-        remain,
-        bossAlive
-      };
       winner = bossAlive ? 'enemy' : 'ally';
     }
   }
 
   if (!winner) return null;
 
-  const timestampRaw = contextDetail['timestamp'];
+  const contextDetail: Record<string, unknown> = { ...normalizedContext };
+  contextDetail['leaderCheckFlags'] = { ...leaderEndCheckFlags };
+  const detail: BattleDetail = {
+    context: contextDetail,
+    leaders: {
+      ally: snapshotLeader(leaderA),
+      enemy: snapshotLeader(leaderB)
+    }
+  };
+  if (trigger === 'timeout'){
+    const remainRaw = normalizedContext['remain'];
+    const remainCandidate = typeof remainRaw === 'number' ? remainRaw : Number(remainRaw);
+    const remain = Number.isFinite(remainCandidate) ? remainCandidate : 0;
+    if (isPvpMode(game)) {
+      detail.timeout = {
+        mode: 'pvp',
+        remain,
+        hpRatio: { ally: leaderAHpRatio, enemy: leaderBHpRatio }
+      };
+    } else {
+      detail.timeout = {
+        mode: 'pve',
+        remain,
+        bossAlive
+      };
+    }
+  }
+
+  const timestampRaw = normalizedContext['timestamp'];
   const timestampCandidate = typeof timestampRaw === 'number' ? timestampRaw : Number(timestampRaw);
   const finishedAt = Number.isFinite(timestampCandidate)
     ? normalizeAnimationFrameTimestamp(timestampCandidate)

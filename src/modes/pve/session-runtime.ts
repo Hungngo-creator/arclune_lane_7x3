@@ -59,18 +59,9 @@ function sanitizeRewardList<T extends SessionRuntimeState | EncounterState>(
   key: T extends SessionRuntimeState ? 'rewardQueue' : 'pendingRewards',
 ): MutableRewardList {
   const source = container[key as keyof T] as unknown;
-  let next: MutableRewardList;
-  if (isRewardArray(source)) {
-    next = source;
-  } else if (Array.isArray(source)) {
-    next = [];
-    for (let index = 0; index < source.length; index += 1) {
-      const reward = source[index] as RewardRoll | null | undefined;
-      if (isReward(reward)) next.push(reward);
-    }
-  } else {
-    next = [];
-  }
+  const next: MutableRewardList = isRewardArray(source)
+    ? source
+    : [...normalizeRewardList(source)];
   (container as unknown as Record<string, unknown>)[key] = next;
   return next;
 }
