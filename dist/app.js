@@ -6381,7 +6381,7 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
       const resBonus = resNow * SKILL3_RES_ARM_RATIO;
       caster.arm = Math.max(0, armNow + armBonus);
       caster.res = Math.max(0, resNow + resBonus);
-      const expiresAtTurn = turnStamp + Math.max(0, SKILL3_STACK_DURATION_TURNS - 2);
+      const expiresAtTurn = turnStamp + Math.max(0, SKILL3_STACK_DURATION_TURNS - 1);
       stacks.push({ armBonus, resBonus, expiresAtTurn });
       caster._lyThanhThuDefenseStacks = stacks;
   }
@@ -6443,7 +6443,6 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
   const lyThanhThuRuntimeHook = {
       onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
           const ltt = caster;
-          const enemySide = caster.side === 'ally' ? 'enemy' : 'ally';
           if (skillKey === 'skill1') {
               const target = pickTarget(game, caster);
               if (!target)
@@ -6462,27 +6461,12 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
                   ownerIid: String(caster.iid ?? caster.id),
                   stageIndex: 0,
                   waitTurns: 1,
+                  parkedSlot: 7,
               });
               return buildSkillResult(true, skillKey, skill, tags, appliedTags, firstStageHits);
           }
           if (skillKey === 'skill3') {
-              const enemyLeader = findLeader(game, enemySide);
-              if (!enemyLeader)
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-              const leaderHpMax = Math.max(1, Math.floor(toFiniteNumber(enemyLeader.hpMax, 1)));
-              const threshold = Math.floor(leaderHpMax * 0.2);
-              const base = Math.max(1, Math.floor(readAtkWilPower(caster) * 2.0));
-              const damage = dealAbilityDamage(game, caster, enemyLeader, {
-                  base,
-                  dtype: 'mixed',
-                  attackType: 'skill',
-                  skill,
-              });
-              if (damage.dealt > threshold) {
-                  const heal = Math.max(1, Math.floor(Math.max(0, toFiniteNumber(caster.hpMax, 0)) * 0.1));
-                  caster.hp = Math.min(Math.max(0, toFiniteNumber(caster.hpMax, 0)), Math.max(0, toFiniteNumber(caster.hp, 0)) + heal);
-              }
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1);
+              return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
           }
           return null;
       },
@@ -6498,6 +6482,10 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
                   continue;
               if (sword.ownerIid !== ownerKey)
                   continue;
+              if (sword.waitTurns > 0 && sword.parkedSlot != null) {
+                  const bleedSide = ltt.side === 'ally' ? 'enemy' : 'ally';
+                  applyBleedAtSlot(game, bleedSide, sword.parkedSlot, ltt.id);
+              }
               sword.waitTurns -= 1;
               if (sword.waitTurns > 0)
                   continue;
@@ -6516,6 +6504,7 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
               }
               else {
                   sword.waitTurns = 1;
+                  sword.parkedSlot = FLYING_SWORD_STAGES[sword.stageIndex - 1]?.parkSlot;
               }
           }
       },
