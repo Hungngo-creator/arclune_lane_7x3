@@ -462,20 +462,15 @@ const getUltHitCount = (ult: UltSpec | null | undefined): number => {
   return Math.max(1, resolved);
 };
 
-const getUltTargetCount = (
+type UltCountScope = 'targets' | 'allies';
+const getUltScopedCount = (
   ult: UltSpec | null | undefined,
   fallback: number,
+  scope: UltCountScope = 'targets',
 ): number => {
   const runtime = ult?.runtime;
-  return resolveUltScopedCount(ult?.targets, runtime, fallback);
-};
-
-const getUltAlliesCount = (
-  ult: UltSpec | null | undefined,
-  fallback: number,
-): number => {
-  const runtime = ult?.runtime;
-  return resolveUltScopedCount(ult?.allies, runtime, fallback);
+  const primary = scope === 'allies' ? ult?.allies : ult?.targets;
+  return resolveUltScopedCount(primary, runtime, fallback);
 };
 
 const resolveUltScopedCount = (
@@ -636,6 +631,37 @@ function ensureDeck(): DeckEntry[] {
   };
   return result;
 }
+
+const findDeckEntryById = (
+  deck: ReadonlyArray<DeckEntry>,
+  id: string | null | undefined,
+): DeckEntry | null => {
+  if (!id) return null;
+  for (let i = 0; i < deck.length; i += 1) {
+    const entry = deck[i];
+    if (entry?.id === id) return entry;
+  }
+  return null;
+};
+
+const removeDeckEntryById = (
+  deck: ReadonlyArray<DeckEntry>,
+  id: string | null | undefined,
+): DeckEntry[] => {
+  if (!id || !deck.length) return deck as DeckEntry[];
+  let removeIndex = -1;
+  for (let i = 0; i < deck.length; i += 1) {
+    if (deck[i]?.id === id) {
+      removeIndex = i;
+      break;
+    }
+  }
+  if (removeIndex < 0) return deck as DeckEntry[];
+  if (deck.length === 1) return [];
+  const nextDeck = deck.slice(0, removeIndex);
+  nextDeck.push(...deck.slice(removeIndex + 1));
+  return nextDeck;
+};
 
 function ensureLockedPlayerDeck(): ReadonlyArray<DeckEntry> {
   const game = getInitializedGame();
@@ -2245,7 +2271,7 @@ function performUlt(unit: UnitToken): void {
     case 'sleep': {
       const foes = getAliveBySide(foeSide);
       if (!foes.length) break;
-      const take = Math.max(1, Math.min(foes.length, getUltTargetCount(u, foes.length)));
+      const take = Math.max(1, Math.min(foes.length, getUltScopedCount(u, foes.length, 'targets')));
       const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
       const nearestTargets = pickNearestAliveUnits(foes, unit, take);
       for (let i=0; i<nearestTargets.length; i++){
@@ -2268,7 +2294,7 @@ function performUlt(unit: UnitToken): void {
       const fallen = allTokens.filter(t => t.side === unit.side && !t.alive);
       if (!fallen.length) break;
       fallen.sort((a,b)=> (b.deadAt||0) - (a.deadAt||0));
-      const take = Math.max(1, Math.min(fallen.length, getUltTargetCount(u, 1)));
+      const take = Math.max(1, Math.min(fallen.length, getUltScopedCount(u, 1, 'targets')));
       const allies = getAliveBySide(unit.side);
       const sideLeader = allies.find((token) => isUyenLeader(token));
       const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
@@ -2310,7 +2336,7 @@ function performUlt(unit: UnitToken): void {
         const rb = (b.hpMax || 1) ? (b.hp || 0) / b.hpMax : 0;
         return ra - rb;
       });
-      const count = Math.max(1, Math.min(allies.length, getUltAlliesCount(u, allies.length)));
+      const count = Math.max(1, Math.min(allies.length, getUltScopedCount(u, allies.length, 'allies')));
       const selected = allies.slice(0, count);
       if (u.healLeader){
         const leaderId = unit.side === 'ally' ? 'leaderA' : 'leaderB';
@@ -2338,7 +2364,7 @@ function performUlt(unit: UnitToken): void {
     case 'haste': {
       const targets = new Set();
       targets.add(unit);
-      const extraAllies = Math.max(0, getUltTargetCount(u, 1) - 1);
+      const extraAllies = Math.max(0, getUltScopedCount(u, 1, 'targets') - 1);
       const allies = getAliveBySide(unit.side);
       const others = allies.filter(t => t !== unit);
       const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
@@ -2862,7 +2888,7 @@ function init(): boolean {
     if (cell.cx >= CFG.ALLY_COLS) return;
 
     const deck = ensureDeck();
-    const card = deck.find((u) => u.id === game.selectedId) ?? null;
+    const card = findDeckEntryById(deck, game.selectedId);
     if (!card) return;
     if (!isCardInLockedDeck(card.id, game)) return;
     if (isUniqueGlobalSummonBlocked(game, { unitId: card.id, tags: card.tags ?? null })) return;
@@ -2900,7 +2926,7 @@ function init(): boolean {
     game.summoned += 1;
     game.usedUnitIds.add(card.id);
 
-    game.deck3 = deck.filter((u) => u.id !== card.id);
+    game.deck3 = removeDeckEntryById(deck, card.id);
     game.selectedId = null;
     refillDeck();
     selectFirstAffordable();
@@ -3214,7 +3240,9 @@ function init(): boolean {
           processCreepDeathHealing(sessionNowMs);
           cleanupDead(sessionNowMs);
           hasBoardMutation = true;
-          checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
+          if (checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs })) {
+            return;
+          }
           aiMaybeAct(Game, 'board');
           if (Game.battle?.over) {
             return;

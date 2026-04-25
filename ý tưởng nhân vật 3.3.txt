@@ -509,9 +509,15 @@ ultimate: cast 2 lần skill 3 nhưng không tốn cost skill 3. hồi hp cho b�
 
 43)
 Assassin, ssr
+Nội Tại: khi gây sát thương lên leader không phải leader đồng minh thì sát thương gây ra tăng 10% và bỏ qua 10% res/arm của leader đó, mỗi khi gây sát thương lên leader địch hồi hp = 40% sát thương gây ra.
 
+Skill 1: Bỏ qua taunt (taunt này cần không có tag pháp/quy tắc/axiom), tấn công gây sát thương lên leader địch = 2 đòn đánh thường trong 1 lần tấn công, không tính là đánh thường, 25 ae.
 
+skill 2: cường hoá 3 lần gây sát thương kế tiếp, sau khi kích hoạt skill này 3 lần gây sát thương tiếp theo tăng 20% sát thương gây ra sau khi đã trừ res/arm/buff/debuff hoặc cơ chế khác nếu có, tức là tính sát thương xong hết rồi mới + 20%, 20 ae.
 
+skill 3: bị động, tự kích hoạt khi đủ điều kiện. Khi hp thấp hơn hoặc = 30%, tự cắn đan dược (vfx thôi), mỗi turn sau khi kích hoạt skill này hồi hp , = 5% hp max trong 3 turn, sau đó cd 1 turn, 30 ae/lần kích hoạt, mỗi trận kích hoạt tối đa 3 lần.
+
+ultimate: cast 2 lần skill 1 nhưng không tốn ae.
 
 
 
