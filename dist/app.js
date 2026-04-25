@@ -15033,9 +15033,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       spec.creep = coerceSummonCreep(spec.creep);
       return spec;
   };
-  const isDamageSpec = (value) => isPlainRecord(value);
   const coerceDamageSpec = (value) => {
-      if (!isDamageSpec(value))
+      if (!isPlainRecord(value))
           return null;
       const record = value;
       const damage = { ...record };
@@ -15150,11 +15149,15 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           runtime?.count,
       ], fallback, { min: 0 });
   };
-  const getUltAlliesCount = (ult, fallback) => resolveCount([
-      ult?.allies,
-      ult?.runtime?.targets,
-      ult?.runtime?.count,
-  ], fallback, { min: 0 });
+  const getUltAlliesCount = (ult, fallback) => {
+      const runtime = ult?.runtime;
+      return resolveCount([
+          ult?.allies,
+          runtime?.targets,
+          runtime?.targetCount,
+          runtime?.count,
+      ], fallback, { min: 0 });
+  };
   const getUltDurationTurns = (ult, fallback) => {
       const runtime = ult?.runtime;
       const resolved = resolveCount([
@@ -16396,6 +16399,25 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       }
       return selected;
   }
+  const buildAliveTokenIndex = (tokens) => {
+      const alive = [];
+      const bySide = new Map();
+      for (let i = 0; i < tokens.length; i += 1) {
+          const token = tokens[i];
+          if (!token?.alive)
+              continue;
+          alive.push(token);
+          const side = token.side;
+          const bucket = bySide.get(side);
+          if (bucket) {
+              bucket.push(token);
+          }
+          else {
+              bySide.set(side, [token]);
+          }
+      }
+      return { alive, bySide };
+  };
   // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
   function performUlt(unit) {
       const game = getInitializedGame();
@@ -16504,21 +16526,18 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           payload: u,
       });
       const allTokens = game.tokens || [];
-      let aliveTokenCache = null;
-      const aliveBySideCache = new Map();
+      let aliveIndex = null;
       const getAliveTokens = () => {
-          if (aliveTokenCache)
-              return aliveTokenCache;
-          aliveTokenCache = allTokens.filter((token) => token.alive);
-          return aliveTokenCache;
+          if (aliveIndex)
+              return aliveIndex.alive;
+          aliveIndex = buildAliveTokenIndex(allTokens);
+          return aliveIndex.alive;
       };
       const getAliveBySide = (side) => {
-          const cached = aliveBySideCache.get(side);
-          if (cached)
-              return cached;
-          const filtered = getAliveTokens().filter((token) => token.side === side);
-          aliveBySideCache.set(side, filtered);
-          return filtered;
+          if (!aliveIndex) {
+              aliveIndex = buildAliveTokenIndex(allTokens);
+          }
+          return aliveIndex.bySide.get(side) ?? [];
       };
       let busyMs = 900;
       switch (u.type) {
@@ -16618,6 +16637,9 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               const attackType = u.countsAsBasic ? 'basic' : 'skill';
               const wilScale = parseFiniteNumber(damageSpec.scaleWIL ?? damageSpec.scaleWil) ?? 0;
               const flatAdd = parseFiniteNumber(damageSpec.flat ?? damageSpec.flatAdd) ?? 0;
+              const pctDefault = parseFiniteNumber(damageSpec.percentTargetMaxHP ?? damageSpec.basePercentMaxHPTarget) ?? 0;
+              const bossPct = parseFiniteNumber(damageSpec.bossPercent);
+              const defPen = parseFiniteNumber(damageSpec.defPen ?? damageSpec.pen) ?? 0;
               const debuffSpec = u.appliesDebuff ?? null;
               const debuffId = typeof debuffSpec?.id === 'string' && debuffSpec.id ? debuffSpec.id : 'loithienanh_spd_burn';
               const debuffAmount = parseFiniteNumber(debuffSpec?.amount ?? debuffSpec?.amountPercent) ?? 0;
@@ -16628,10 +16650,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                       continue;
                   const tgtRank = game.meta?.rankOf?.(tgt.id) || tgt?.rank || '';
                   const isBoss = typeof tgtRank === 'string' && tgtRank.toLowerCase() === 'boss';
-                  const pctDefault = parseFiniteNumber(damageSpec.percentTargetMaxHP ?? damageSpec.basePercentMaxHPTarget) ?? 0;
-                  const pct = isBoss
-                      ? parseFiniteNumber(damageSpec.bossPercent) ?? pctDefault
-                      : pctDefault;
+                  const pct = isBoss ? (bossPct ?? pctDefault) : pctDefault;
                   const baseFromPct = Math.round(Math.max(0, pct) * Math.max(0, tgt.hpMax || 0));
                   const baseFromWil = Math.round(Math.max(0, wilScale) * Math.max(0, unit.wil || 0));
                   const baseFlat = Math.round(Math.max(0, flatAdd));
@@ -16640,7 +16659,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                       base,
                       dtype,
                       attackType,
-                      defPen: parseFiniteNumber(damageSpec.defPen ?? damageSpec.pen) ?? 0
+                      defPen
                   });
                   runBurstVfx((session) => vfxAddLightningArc(session, unit, tgt, {
                       bindingKey,

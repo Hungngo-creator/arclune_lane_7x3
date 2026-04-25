@@ -357,10 +357,8 @@ const coerceSummonSpec = (value: unknown): SummonSpec | null => {
   return spec;
 };
 
-const isDamageSpec = (value: unknown): value is UltDamageSpec => isPlainRecord(value);
-
 const coerceDamageSpec = (value: unknown): UltDamageSpec | null => {
-  if (!isDamageSpec(value)) return null;
+  if (!isPlainRecord(value)) return null;
   const record = value as UltDamageSpec;
   const damage: UltDamageSpec = { ...record };
   const numericKeys: ReadonlyArray<keyof UltDamageSpec> = [
@@ -480,11 +478,15 @@ const getUltTargetCount = (
 const getUltAlliesCount = (
   ult: UltSpec | null | undefined,
   fallback: number,
-): number => resolveCount([
-  ult?.allies,
-  ult?.runtime?.targets,
-  ult?.runtime?.count,
-], fallback, { min: 0 });
+): number => {
+  const runtime = ult?.runtime;
+  return resolveCount([
+    ult?.allies,
+    runtime?.targets,
+    runtime?.targetCount,
+    runtime?.count,
+  ], fallback, { min: 0 });
+};
 
 const getUltDurationTurns = (
   ult: UltSpec | null | undefined,
@@ -1831,6 +1833,29 @@ function pickNearestAliveUnits(
   return selected;
 }
 
+type AliveTokenIndex = {
+  alive: UnitToken[];
+  bySide: Map<Side, UnitToken[]>;
+};
+
+const buildAliveTokenIndex = (tokens: ReadonlyArray<UnitToken>): AliveTokenIndex => {
+  const alive: UnitToken[] = [];
+  const bySide = new Map<Side, UnitToken[]>();
+  for (let i = 0; i < tokens.length; i += 1) {
+    const token = tokens[i];
+    if (!token?.alive) continue;
+    alive.push(token);
+    const side = token.side;
+    const bucket = bySide.get(side);
+    if (bucket) {
+      bucket.push(token);
+    } else {
+      bySide.set(side, [token]);
+    }
+  }
+  return { alive, bySide };
+};
+
 // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
 function performUlt(unit: UnitToken): void {
   const game = getInitializedGame();
@@ -1941,19 +1966,17 @@ function performUlt(unit: UnitToken): void {
   });
   
   const allTokens = game.tokens || [];
-  let aliveTokenCache: UnitToken[] | null = null;
-  const aliveBySideCache = new Map<Side, UnitToken[]>();
+  let aliveIndex: AliveTokenIndex | null = null;
   const getAliveTokens = (): UnitToken[] => {
-    if (aliveTokenCache) return aliveTokenCache;
-    aliveTokenCache = allTokens.filter((token) => token.alive);
-    return aliveTokenCache;
+    if (aliveIndex) return aliveIndex.alive;
+    aliveIndex = buildAliveTokenIndex(allTokens);
+    return aliveIndex.alive;
   };
   const getAliveBySide = (side: Side): UnitToken[] => {
-    const cached = aliveBySideCache.get(side);
-    if (cached) return cached;
-    const filtered = getAliveTokens().filter((token) => token.side === side);
-    aliveBySideCache.set(side, filtered);
-    return filtered;
+    if (!aliveIndex) {
+      aliveIndex = buildAliveTokenIndex(allTokens);
+    }
+    return aliveIndex.bySide.get(side) ?? [];
   };
 
   let busyMs = 900;
@@ -2057,6 +2080,9 @@ function performUlt(unit: UnitToken): void {
       const attackType = u.countsAsBasic ? 'basic' : 'skill';
       const wilScale = parseFiniteNumber(damageSpec.scaleWIL ?? damageSpec.scaleWil) ?? 0;
       const flatAdd = parseFiniteNumber(damageSpec.flat ?? damageSpec.flatAdd) ?? 0;
+      const pctDefault = parseFiniteNumber(damageSpec.percentTargetMaxHP ?? damageSpec.basePercentMaxHPTarget) ?? 0;
+      const bossPct = parseFiniteNumber(damageSpec.bossPercent);
+      const defPen = parseFiniteNumber(damageSpec.defPen ?? damageSpec.pen) ?? 0;
       const debuffSpec = u.appliesDebuff ?? null;
       const debuffId = typeof debuffSpec?.id === 'string' && debuffSpec.id ? debuffSpec.id : 'loithienanh_spd_burn';
       const debuffAmount = parseFiniteNumber(debuffSpec?.amount ?? debuffSpec?.amountPercent) ?? 0;
@@ -2067,10 +2093,7 @@ function performUlt(unit: UnitToken): void {
         if (!tgt || !tgt.alive) continue;
         const tgtRank = game.meta?.rankOf?.(tgt.id) || tgt?.rank || '';
         const isBoss = typeof tgtRank === 'string' && tgtRank.toLowerCase() === 'boss';
-        const pctDefault = parseFiniteNumber(damageSpec.percentTargetMaxHP ?? damageSpec.basePercentMaxHPTarget) ?? 0;
-        const pct = isBoss
-          ? parseFiniteNumber(damageSpec.bossPercent) ?? pctDefault
-          : pctDefault;
+        const pct = isBoss ? (bossPct ?? pctDefault) : pctDefault;
         const baseFromPct = Math.round(Math.max(0, pct) * Math.max(0, tgt.hpMax || 0));
         const baseFromWil = Math.round(Math.max(0, wilScale) * Math.max(0, unit.wil || 0));
         const baseFlat = Math.round(Math.max(0, flatAdd));
@@ -2079,7 +2102,7 @@ function performUlt(unit: UnitToken): void {
           base,
           dtype,
           attackType,
-          defPen: parseFiniteNumber(damageSpec.defPen ?? damageSpec.pen) ?? 0
+          defPen
         });
 
         runBurstVfx((session) => vfxAddLightningArc(session, unit, tgt, {
