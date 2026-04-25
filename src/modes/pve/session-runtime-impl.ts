@@ -591,14 +591,14 @@ const getLockedDeckIdSet = (lockedDeck: ReadonlyArray<DeckEntry>): ReadonlySet<s
   return ids;
 };
 
-function ensureDeck(): DeckEntry[] {
-  const game = getInitializedGame();
-  if (!game) return [];
-  const deck = sanitizeDeckEntries(game.deck3);
-  const lockedDeck = ensureLockedPlayerDeck();
+function ensureDeck(game: SessionState | null | undefined = Game): DeckEntry[] {
+  const session = isInitializedGame(game) ? game : null;
+  if (!session) return [];
+  const deck = sanitizeDeckEntries(session.deck3);
+  const lockedDeck = ensureLockedPlayerDeck(session);u
   if (
     deckFilterCache
-    && deckFilterCache.gameRef === game
+    && deckFilterCache.gameRef === session
     && deckFilterCache.deckRef === deck
     && deckFilterCache.lockedDeckRef === lockedDeck
   ) {
@@ -620,11 +620,11 @@ function ensureDeck(): DeckEntry[] {
     filteredDeck.push(entry);
   }
   const result = removed ? filteredDeck : deck;
-  if (removed || deck !== game.deck3) {
-    game.deck3 = result;
+  if (removed || deck !== session.deck3) {
+    session.deck3 = result;
   }
   deckFilterCache = {
-    gameRef: game,
+    gameRef: session,
     deckRef: deck,
     lockedDeckRef: lockedDeck,
     result,
@@ -663,26 +663,26 @@ const removeDeckEntryById = (
   return nextDeck;
 };
 
-function ensureLockedPlayerDeck(): ReadonlyArray<DeckEntry> {
-  const game = getInitializedGame();
-  if (!game) return [];
-  const lockedSource = Array.isArray(game.playerDeckLocked) && game.playerDeckLocked.length
-    ? game.playerDeckLocked
-    : game.unitsAll;
+function ensureLockedPlayerDeck(game: SessionState | null | undefined = Game): ReadonlyArray<DeckEntry> {
+  const session = isInitializedGame(game) ? game : null;
+  if (!session) return [];
+  const lockedSource = Array.isArray(session.playerDeckLocked) && session.playerDeckLocked.length
+    ? session.playerDeckLocked
+    : session.unitsAll;
   if (
     lockedDeckNormalizeCache
-    && lockedDeckNormalizeCache.gameRef === game
+    && lockedDeckNormalizeCache.gameRef === session
     && lockedDeckNormalizeCache.sourceRef === lockedSource
   ) {
     return lockedDeckNormalizeCache.normalized;
   }
   const lockedDeck = sanitizeDeckEntries(lockedSource);
-  if (lockedDeck !== game.playerDeckLocked) {
-    game.playerDeckLocked = lockedDeck;
+  if (lockedDeck !== session.playerDeckLocked) {
+    session.playerDeckLocked = lockedDeck;
     invalidateLockedDeckCache();
   }
   lockedDeckNormalizeCache = {
-    gameRef: game,
+    gameRef: session,
     sourceRef: lockedSource,
     normalized: lockedDeck,
   };
@@ -690,14 +690,26 @@ function ensureLockedPlayerDeck(): ReadonlyArray<DeckEntry> {
 }
 
 function isCardInLockedDeck(cardId: string, game: SessionState | null | undefined = Game): boolean {
-  if (!game) return false;
-  const lockedDeck = ensureLockedPlayerDeck();
+  if (!isInitializedGame(game)) return false;
+  const lockedDeck = ensureLockedPlayerDeck(game);
   return getLockedDeckIdSet(lockedDeck).has(cardId);
 }
 
 const getCardCost = (card: DeckEntry | null | undefined): number => {
   if (!card) return 0;
   return parseFiniteNumber(card.cost) ?? 0;
+};
+
+const applyCostGain = (
+  holder: { cost: number; costCap: number } | null | undefined,
+  gain: number,
+): boolean => {
+  if (!holder || gain <= 0) return false;
+  if (holder.cost >= holder.costCap) return false;
+  const nextCost = Math.min(holder.costCap, holder.cost + gain);
+  if (nextCost === holder.cost) return false;
+  holder.cost = nextCost;
+  return true;
 };
 
 const normalizeTurnBusyUntil = (
@@ -2829,7 +2841,7 @@ function init(): boolean {
     getDeck: (): DeckEntry[] => {
       const game = getInitializedGame();
       if (!game) return [] as DeckEntry[];
-      return ensureDeck();
+      return ensureDeck(game);
     },
     getSelectedId: (): string | null => {
       const game = getInitializedGame();
@@ -2862,7 +2874,7 @@ function init(): boolean {
 
     if (cell.cx >= CFG.ALLY_COLS) return;
 
-    const deck = ensureDeck();
+    const deck = ensureDeck(game);
     const card = findDeckEntryById(deck, game.selectedId);
     if (!card) return;
     if (!isCardInLockedDeck(card.id, game)) return;
@@ -3147,20 +3159,8 @@ function init(): boolean {
 
       let costChanged = false;
       if (costGranted > 0){
-        if (Game.cost < Game.costCap){
-          const nextCost = Math.min(Game.costCap, Game.cost + costGranted);
-          if (nextCost !== Game.cost){
-            Game.cost = nextCost;
-            costChanged = true;
-          }
-        }
-        if (Game.ai.cost < Game.ai.costCap){
-          const nextAiCost = Math.min(Game.ai.costCap, Game.ai.cost + costGranted);
-          if (nextAiCost !== Game.ai.cost){
-            Game.ai.cost = nextAiCost;
-            costChanged = true;
-          }
-        }
+        costChanged = applyCostGain(Game, costGranted) || costChanged;
+        costChanged = applyCostGain(Game.ai, costGranted) || costChanged;
       }
 
         if (costChanged){
@@ -3276,7 +3276,7 @@ function init(): boolean {
 function selectFirstAffordable(): void {
   if (!Game) return;
 
-  const deck = ensureDeck();
+  const deck = ensureDeck(game);
   if (!deck.length){
     Game.selectedId = null;
     return;
@@ -3313,7 +3313,7 @@ function selectFirstAffordable(): void {
 function refillDeck(): void {
   if (!Game) return;
 
-  const deck = ensureDeck();
+  const deck = ensureDeck(game);
   const need = HAND_SIZE - deck.length;
   if (need <= 0) return;
 
@@ -3323,7 +3323,7 @@ function refillDeck(): void {
     if (!entry?.id) continue;
     exclude.add(entry.id);
   }
-  const lockedDeck = ensureLockedPlayerDeck();
+  const lockedDeck = ensureLockedPlayerDeck(game);
   const more = pickRandom(lockedDeck, exclude).slice(0, need);
   deck.push(...more);
   Game.deck3 = deck;
@@ -4311,7 +4311,7 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
       const deckUnitIds = new Set(deck.map((entry) => entry.id));
       game.unitsAll = deck;
       game.playerDeckLocked = Array.from(deck);
-      game.deck3 = ensureDeck().filter((card) => deckUnitIds.has(card.id));
+      game.deck3 = ensureDeck(game).filter((card) => deckUnitIds.has(card.id));
       if (game.selectedId && !deckUnitIds.has(game.selectedId)) {
         game.selectedId = null;
       }
