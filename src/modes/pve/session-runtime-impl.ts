@@ -8,7 +8,7 @@ import { Statuses, makeStatusEffect } from '../../statuses';
 import { CFG, CAM } from '../../config';
 import { UNITS } from '../../units';
 import { Meta, makeInstanceStats, initialRageFor } from '../../meta';
-import { basicAttack, pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat';
+import { pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat';
 import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury';
 import {
   ROSTER, ROSTER_MAP,
@@ -1722,6 +1722,48 @@ function performUyenLeaderUlt(game: SessionState, unit: UnitToken): boolean {
   return true;
 }
 
+function taxiDistance(from: Pick<UnitToken, 'cx' | 'cy'>, to: Pick<UnitToken, 'cx' | 'cy'>): number {
+  return Math.abs(from.cx - to.cx) + Math.abs(from.cy - to.cy);
+}
+
+function pickNearestAliveUnits(
+  candidates: readonly UnitToken[],
+  origin: Pick<UnitToken, 'cx' | 'cy'>,
+  take: number,
+  exclude?: ReadonlySet<UnitToken>,
+): UnitToken[] {
+  if (!Array.isArray(candidates) || candidates.length <= 0 || take <= 0) return [];
+  const limit = Math.max(0, Math.floor(take));
+  if (limit <= 0) return [];
+
+  const selected: UnitToken[] = [];
+  const selectedDistance: number[] = [];
+
+  for (const candidate of candidates) {
+    if (!candidate?.alive) continue;
+    if (exclude?.has(candidate)) continue;
+    const distance = taxiDistance(origin, candidate);
+    const worstDistance = selectedDistance.length > 0
+      ? selectedDistance[selectedDistance.length - 1] ?? Number.POSITIVE_INFINITY
+      : Number.POSITIVE_INFINITY;
+    if (selected.length >= limit && distance >= worstDistance) continue;
+
+    let insertAt = selectedDistance.length;
+    while (insertAt > 0 && distance < (selectedDistance[insertAt - 1] ?? Number.POSITIVE_INFINITY)) {
+      insertAt -= 1;
+    }
+    selected.splice(insertAt, 0, candidate);
+    selectedDistance.splice(insertAt, 0, distance);
+
+    if (selected.length > limit) {
+      selected.pop();
+      selectedDistance.pop();
+    }
+  }
+
+  return selected;
+}
+
 // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
 function performUlt(unit: UnitToken): void {
   const game = getInitializedGame();
@@ -1903,13 +1945,8 @@ function performUlt(unit: UnitToken): void {
           selected.push(primary);
           selectedSet.add(primary);
         }
-        const pool = foes.filter((t) => !selectedSet.has(t));
-        pool.sort((a, b) => {
-          const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
-          const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
-          return da - db;
-        });
-        for (const enemy of pool){
+        const nearestPool = pickNearestAliveUnits(foes, unit, Math.max(0, hits - selected.length), selectedSet);
+        for (const enemy of nearestPool){
           if (selected.length >= hits) break;
           selected.push(enemy);
           selectedSet.add(enemy);
@@ -2111,13 +2148,9 @@ function performUlt(unit: UnitToken): void {
       if (!foes.length) break;
       const take = Math.max(1, Math.min(foes.length, getUltTargetCount(u, foes.length)));
       const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
-      foes.sort((a,b)=>{
-        const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
-        const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
-        return da - db;
-      });
-      for (let i=0; i<take; i++){
-        const tgt = foes[i];
+      const nearestTargets = pickNearestAliveUnits(foes, unit, take);
+      for (let i=0; i<nearestTargets.length; i++){
+        const tgt = nearestTargets[i];
         if (!tgt) continue;
         const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
         const sleep = makeStatusEffect('sleep', { turns });

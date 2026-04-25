@@ -487,7 +487,13 @@ Nội tại: tăng 5% wil/att/hp/res/arm mỗi khi có 1 kẻ thù chết khi ch
 
 skill 1: mỗi lần đánh thường luôn kèm theo 1 đòn follow up gây sát thương = 50% đòn chính, khin skill này kích hoạt đòn đánh thường chính giảm 10 nộ của kẻ địch khi họ nhận sát thương từ char này khi skill này kích hoạt. Luôn tự kích hoạt miễn đứng trên sân, - 5 ae/turn dù có đánh thường hay không.
 
-skill 2: 
+skill 2: khi kích hoạt đánh thường của char này bỏ qua 20% res/arm của mục tiêu, tự kích hoạt như skill 1, cd 1 turn, tức 1 turn đánh thường có hiệu ứng của skill 2, turn tiếp theo k có, turn tiếp không có, turn sau lại có, khi ra sân (sum từ cost bar, hồi sinh,...) thì skill này sẽ bật, turn sau tắt, turn sau nữa lại bật. cost 3 ae.
+
+skill 3: khi kích hoạt tăng 30% will/atk/agi trong 3 turn tính từ lúc kích hoạt, cd 1 turn. skill này cần tốn 1 turn để kích hoạt chứ không phải "tự kích hoạt" hay "kích hoạt ngầm" như skill 1 và 2.
+
+ultimate: đánh thường 3 lần ( bị ảnh hưởng bởi buff/debuff/skill 1/2/3).
+
+đánh thường: gây sát thương = 100% will/atk.
 
 
 

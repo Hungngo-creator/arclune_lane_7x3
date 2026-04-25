@@ -5132,7 +5132,10 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           }
       }
       const rawBase = Math.max(1, Math.floor(readAtkWilPower(unit)));
-      const modBase = Math.max(1, Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0)));
+      const forceRawBasicDamage = unit.id === 'ly_thanh_thu' || unit.id === 'nguyen_le';
+      const modBase = forceRawBasicDamage
+          ? rawBase
+          : Math.max(1, Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0)));
       triggerLightningArc('hit1');
       triggerLightningArc('hit2');
       const hitResult = dealAbilityDamage(Game, unit, resolved, {
@@ -16302,6 +16305,41 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       }
       return true;
   }
+  function taxiDistance(from, to) {
+      return Math.abs(from.cx - to.cx) + Math.abs(from.cy - to.cy);
+  }
+  function pickNearestAliveUnits(candidates, origin, take, exclude) {
+      if (!Array.isArray(candidates) || candidates.length <= 0 || take <= 0)
+          return [];
+      const limit = Math.max(0, Math.floor(take));
+      if (limit <= 0)
+          return [];
+      const selected = [];
+      const selectedDistance = [];
+      for (const candidate of candidates) {
+          if (!candidate?.alive)
+              continue;
+          if (exclude?.has(candidate))
+              continue;
+          const distance = taxiDistance(origin, candidate);
+          const worstDistance = selectedDistance.length > 0
+              ? selectedDistance[selectedDistance.length - 1] ?? Number.POSITIVE_INFINITY
+              : Number.POSITIVE_INFINITY;
+          if (selected.length >= limit && distance >= worstDistance)
+              continue;
+          let insertAt = selectedDistance.length;
+          while (insertAt > 0 && distance < (selectedDistance[insertAt - 1] ?? Number.POSITIVE_INFINITY)) {
+              insertAt -= 1;
+          }
+          selected.splice(insertAt, 0, candidate);
+          selectedDistance.splice(insertAt, 0, distance);
+          if (selected.length > limit) {
+              selected.pop();
+              selectedDistance.pop();
+          }
+      }
+      return selected;
+  }
   // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
   function performUlt(unit) {
       const game = getInitializedGame();
@@ -16481,13 +16519,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                       selected.push(primary);
                       selectedSet.add(primary);
                   }
-                  const pool = foes.filter((t) => !selectedSet.has(t));
-                  pool.sort((a, b) => {
-                      const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
-                      const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
-                      return da - db;
-                  });
-                  for (const enemy of pool) {
+                  const nearestPool = pickNearestAliveUnits(foes, unit, Math.max(0, hits - selected.length), selectedSet);
+                  for (const enemy of nearestPool) {
                       if (selected.length >= hits)
                           break;
                       selected.push(enemy);
@@ -16690,13 +16723,9 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   break;
               const take = Math.max(1, Math.min(foes.length, getUltTargetCount(u, foes.length)));
               const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
-              foes.sort((a, b) => {
-                  const da = Math.abs(a.cx - unit.cx) + Math.abs(a.cy - unit.cy);
-                  const db = Math.abs(b.cx - unit.cx) + Math.abs(b.cy - unit.cy);
-                  return da - db;
-              });
-              for (let i = 0; i < take; i++) {
-                  const tgt = foes[i];
+              const nearestTargets = pickNearestAliveUnits(foes, unit, take);
+              for (let i = 0; i < nearestTargets.length; i++) {
+                  const tgt = nearestTargets[i];
                   if (!tgt)
                       continue;
                   const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);

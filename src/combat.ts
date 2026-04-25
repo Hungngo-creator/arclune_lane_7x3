@@ -760,10 +760,13 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   }
 
   const rawBase = Math.max(1, Math.floor(readAtkWilPower(unit)));
-  const modBase = Math.max(
-    1,
-    Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0))
-  );
+  const forceRawBasicDamage = unit.id === 'ly_thanh_thu' || unit.id === 'nguyen_le';
+  const modBase = forceRawBasicDamage
+    ? rawBase
+    : Math.max(
+      1,
+      Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0))
+    );
 
   triggerLightningArc('hit1');
   triggerLightningArc('hit2');
