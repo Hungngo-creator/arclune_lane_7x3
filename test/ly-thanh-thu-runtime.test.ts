@@ -39,6 +39,40 @@ const makeGame = (tokens: UnitToken[]): SessionState => ({
 } as unknown as SessionState);
 
 describe('ly_thanh_thu runtime hook', () => {
+  it('caps passive stacks at 3 triggers per turn and 25 per battle for non-summon deaths only', () => {
+    const caster = atSlot('ally', 5, { id: 'ly_thanh_thu', iid: 501, atk: 100, wil: 100 });
+    const game = makeGame([caster]);
+
+    for (let i = 0; i < 4; i += 1) {
+      runRuntimeUnitDeath({
+        game,
+        deadUnit: makeToken({ id: `enemy_${i}`, iid: 600 + i, side: 'enemy', alive: false }),
+        killer: caster,
+      });
+    }
+    expect((caster as UnitToken & { _lyThanhThuPassiveStacks?: number })._lyThanhThuPassiveStacks ?? 0).toBe(3);
+
+    game.turn = { turnCount: 2, cycle: 2 } as SessionState['turn'];
+    runRuntimeUnitDeath({
+      game,
+      deadUnit: makeToken({ id: 'summon_enemy', iid: 999, side: 'enemy', alive: false, ownerIid: 42 }),
+      killer: caster,
+    });
+    expect((caster as UnitToken & { _lyThanhThuPassiveStacks?: number })._lyThanhThuPassiveStacks ?? 0).toBe(3);
+
+    for (let turn = 2; turn <= 12; turn += 1) {
+      game.turn = { turnCount: turn, cycle: turn } as SessionState['turn'];
+      for (let i = 0; i < 3; i += 1) {
+        runRuntimeUnitDeath({
+          game,
+          deadUnit: makeToken({ id: `enemy_t${turn}_${i}`, iid: turn * 100 + i, side: 'enemy', alive: false }),
+          killer: caster,
+        });
+      }
+    }
+    expect((caster as UnitToken & { _lyThanhThuPassiveStacks?: number })._lyThanhThuPassiveStacks ?? 0).toBe(25);
+  });
+
   it('skill2 schedules flying sword stages and triggers skill3 aether drain when >=2 targets are hit', () => {
     const caster = atSlot('ally', 5, { id: 'ly_thanh_thu', iid: 101, atk: 200, wil: 100 });
     const enemy1 = atSlot('enemy', 1, { id: 'enemy_1', iid: 201, hp: 500, hpMax: 500 });

@@ -172,11 +172,12 @@ function applyBleedAtSlot(game: SessionState, side: UnitToken['side'], slot: num
 function triggerSkill3Defense(game: SessionState, caster: LyThanhThuCarrier): void {
   if (!globalAetherPool.consume(caster.side, 8)) return;
   const turnStamp = readTurnStamp(game);
+  const expiresAtTurn = turnStamp + Math.max(0, SKILL3_STACK_DURATION_TURNS - 2);
   const stacks = caster._lyThanhThuDefenseStacks ?? [];
   if (stacks.length >= SKILL3_MAX_STACKS) {
     const oldest = stacks.shift();
     if (oldest) {
-      oldest.expiresAtTurn = turnStamp;
+      oldest.expiresAtTurn = expiresAtTurn;
       stacks.push(oldest);
     }
     caster._lyThanhThuDefenseStacks = stacks;
@@ -190,7 +191,6 @@ function triggerSkill3Defense(game: SessionState, caster: LyThanhThuCarrier): vo
 
   caster.arm = Math.max(0, armNow + armBonus);
   caster.res = Math.max(0, resNow + resBonus);
-  const expiresAtTurn = turnStamp + Math.max(0, SKILL3_STACK_DURATION_TURNS - 2);
   stacks.push({ armBonus, resBonus, expiresAtTurn });
   caster._lyThanhThuDefenseStacks = stacks;
 }
