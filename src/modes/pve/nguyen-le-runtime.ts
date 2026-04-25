@@ -1,5 +1,5 @@
 import { dealAbilityDamage } from '../../combat.ts';
-import { slotToCell } from '../../engine.ts';
+import { findAliveUnitAtSlot } from '../../combat/board-position-utils.ts';
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
 
@@ -17,15 +17,6 @@ const toFiniteOrZero = (value: unknown): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-function findUnitAtSlot(game: SessionState, side: UnitToken['side'], slot: number): UnitToken | null {
-  const { cx, cy } = slotToCell(side, slot);
-  for (const token of game.tokens) {
-    if (!token.alive || token.side !== side) continue;
-    if (token.cx === cx && token.cy === cy) return token;
-  }
-  return null;
-}
-
 export function performNguyenLeUltRuntime(ctx: NguyenLeUltRuntimeContext): boolean {
   const { game, unit, ultSkill, extendBusy } = ctx;
   if (!game || !unit || unit.id !== 'nguyen_le') return false;
@@ -34,7 +25,7 @@ export function performNguyenLeUltRuntime(ctx: NguyenLeUltRuntimeContext): boole
   const base = Math.max(1, Math.floor((toFiniteOrZero(unit.atk) + toFiniteOrZero(unit.wil)) * 2));
   let hits = 0;
   for (const slot of TARGET_PATTERN) {
-    const target = findUnitAtSlot(game, foeSide, slot);
+    const target = findAliveUnitAtSlot(game, foeSide, slot);
     if (!target) continue;
     dealAbilityDamage(game, unit, target, {
       base,

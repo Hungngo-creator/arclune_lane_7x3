@@ -5364,12 +5364,27 @@ __modules['./combat/board-position-utils.ts'] = (exports, module, __require) => 
       }
       return slots;
   }
+  function findAliveUnitAtSlot(game, side, slot) {
+      if (!game || !Number.isFinite(slot) || slot < 1)
+          return null;
+      const normalizedSlot = Math.floor(slot);
+      for (const token of game.tokens) {
+          if (!token?.alive || token.side !== side)
+              continue;
+          const position = readBoardPosition(token);
+          if (!position || position.slot !== normalizedSlot)
+              continue;
+          return token;
+      }
+      return null;
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'readBoardPosition')) exports.readBoardPosition = readBoardPosition;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isLeaderToken')) exports.isLeaderToken = isLeaderToken;
   if (!Object.prototype.hasOwnProperty.call(exports, 'readTokenSlotAndColumn')) exports.readTokenSlotAndColumn = readTokenSlotAndColumn;
   if (!Object.prototype.hasOwnProperty.call(exports, 'selectTargetsByBoardPredicate')) exports.selectTargetsByBoardPredicate = selectTargetsByBoardPredicate;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createCrossSlotLookup')) exports.createCrossSlotLookup = createCrossSlotLookup;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'findAliveUnitAtSlot')) exports.findAliveUnitAtSlot = findAliveUnitAtSlot;
 };
 __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/number-utils.ts');
@@ -6312,20 +6327,19 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
   const pickTarget = __dep0.pickTarget;
-  const __dep1 = __require('./engine.ts');
-  const slotToCell = __dep1.slotToCell;
-  const __dep2 = __require('./statuses.ts');
-  const Statuses = __dep2.Statuses;
-  const __dep3 = __require('./aether.ts');
-  const globalAetherPool = __dep3.globalAetherPool;
-  const __dep4 = __require('./combat/skill-result.ts');
-  const buildSkillResult = __dep4.buildSkillResult;
-  const __dep5 = __require('./combat/number-utils.ts');
-  const readAtkWilPower = __dep5.readAtkWilPower;
-  const toFiniteNumber = __dep5.toFiniteNumber;
-  const toRoundedInt = __dep5.toRoundedInt;
-  const __dep6 = __require('./combat/board-position-utils.ts');
-  const isLeaderToken = __dep6.isLeaderToken;
+  const __dep1 = __require('./statuses.ts');
+  const Statuses = __dep1.Statuses;
+  const __dep2 = __require('./aether.ts');
+  const globalAetherPool = __dep2.globalAetherPool;
+  const __dep3 = __require('./combat/skill-result.ts');
+  const buildSkillResult = __dep3.buildSkillResult;
+  const __dep4 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep4.readAtkWilPower;
+  const toFiniteNumber = __dep4.toFiniteNumber;
+  const toRoundedInt = __dep4.toRoundedInt;
+  const __dep5 = __require('./combat/board-position-utils.ts');
+  const findAliveUnitAtSlot = __dep5.findAliveUnitAtSlot;
+  const isLeaderToken = __dep5.isLeaderToken;
   const LY_THANH_THU_ID = 'ly_thanh_thu';
   const PASSIVE_GAIN_RATIO = 0.1;
   const PASSIVE_MAX_PER_TURN = 3;
@@ -6357,16 +6371,6 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
           if (!token.alive || token.side !== side)
               continue;
           if (isLeaderToken(token))
-              return token;
-      }
-      return null;
-  }
-  function findUnitAtSlot(game, side, slot) {
-      const { cx, cy } = slotToCell(side, slot);
-      for (const token of game.tokens) {
-          if (!token.alive || token.side !== side)
-              continue;
-          if (token.cx === cx && token.cy === cy)
               return token;
       }
       return null;
@@ -6436,7 +6440,7 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
       unit._lyThanhThuPassiveWilBonus = 0;
   }
   function applyBleedAtSlot(game, side, slot, sourceUnitId) {
-      const target = findUnitAtSlot(game, side, slot);
+      const target = findAliveUnitAtSlot(game, side, slot);
       if (!target)
           return;
       Statuses.add(target, {
@@ -6493,7 +6497,7 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
       const base = Math.max(1, Math.floor(readAtkWilPower(caster)));
       const enemySide = caster.side === 'ally' ? 'enemy' : 'ally';
       for (const slot of stage.slots) {
-          const target = findUnitAtSlot(game, enemySide, slot);
+          const target = findAliveUnitAtSlot(game, enemySide, slot);
           if (!target)
               continue;
           const dealt = dealAbilityDamage(game, caster, target, {
@@ -6806,35 +6810,25 @@ __modules['./combat/runtime-hooks/mong-yem.ts'] = (exports, module, __require) =
 __modules['./combat/runtime-hooks/nguyen-le.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
-  const __dep1 = __require('./engine.ts');
-  const slotToCell = __dep1.slotToCell;
-  const __dep2 = __require('./aether.ts');
-  const globalAetherPool = __dep2.globalAetherPool;
-  const __dep3 = __require('./statuses.ts');
-  const Statuses = __dep3.Statuses;
-  const __dep4 = __require('./utils/rng.ts');
-  const nextRngValue = __dep4.nextRngValue;
-  const __dep5 = __require('./combat/skill-result.ts');
-  const buildSkillResult = __dep5.buildSkillResult;
-  const __dep6 = __require('./combat/number-utils.ts');
-  const readAtkWilPower = __dep6.readAtkWilPower;
-  const toFiniteNumber = __dep6.toFiniteNumber;
+  const __dep1 = __require('./aether.ts');
+  const globalAetherPool = __dep1.globalAetherPool;
+  const __dep2 = __require('./statuses.ts');
+  const Statuses = __dep2.Statuses;
+  const __dep3 = __require('./utils/rng.ts');
+  const nextRngValue = __dep3.nextRngValue;
+  const __dep4 = __require('./combat/skill-result.ts');
+  const buildSkillResult = __dep4.buildSkillResult;
+  const __dep5 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep5.readAtkWilPower;
+  const toFiniteNumber = __dep5.toFiniteNumber;
+  const __dep6 = __require('./combat/board-position-utils.ts');
+  const findAliveUnitAtSlot = __dep6.findAliveUnitAtSlot;
   const NGUYEN_LE_ID = 'nguyen_le';
   const IMMUNITY_POOL = ['poison', 'stun', 'sleep', 'bleed', 'fatigue'];
-  function findUnitAtSlot(game, side, slot) {
-      const { cx, cy } = slotToCell(side, slot);
-      for (const token of game.tokens) {
-          if (!token.alive || token.side !== side)
-              continue;
-          if (token.cx === cx && token.cy === cy)
-              return token;
-      }
-      return null;
-  }
   function countAliveInRow(game, side, slots) {
       let count = 0;
       for (const slot of slots) {
-          if (findUnitAtSlot(game, side, slot))
+          if (findAliveUnitAtSlot(game, side, slot))
               count += 1;
       }
       return count;
@@ -6907,7 +6901,7 @@ __modules['./combat/runtime-hooks/nguyen-le.ts'] = (exports, module, __require) 
               const base = Math.max(1, Math.floor(readAtkWilPower(caster) * 1.5));
               let hits = 0;
               for (const slot of chosen) {
-                  const target = findUnitAtSlot(game, enemySide, slot);
+                  const target = findAliveUnitAtSlot(game, enemySide, slot);
                   if (!target)
                       continue;
                   dealAbilityDamage(game, caster, target, {
@@ -14755,23 +14749,13 @@ __modules['./modes/pve/ly-thanh-thu-runtime.ts'] = (exports, module, __require) 
 __modules['./modes/pve/nguyen-le-runtime.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
-  const __dep1 = __require('./engine.ts');
-  const slotToCell = __dep1.slotToCell;
+  const __dep1 = __require('./combat/board-position-utils.ts');
+  const findAliveUnitAtSlot = __dep1.findAliveUnitAtSlot;
   const TARGET_PATTERN = [1, 2, 3, 5, 8];
   const toFiniteOrZero = (value) => {
       const parsed = typeof value === 'number' ? value : Number(value);
       return Number.isFinite(parsed) ? parsed : 0;
   };
-  function findUnitAtSlot(game, side, slot) {
-      const { cx, cy } = slotToCell(side, slot);
-      for (const token of game.tokens) {
-          if (!token.alive || token.side !== side)
-              continue;
-          if (token.cx === cx && token.cy === cy)
-              return token;
-      }
-      return null;
-  }
   function performNguyenLeUltRuntime(ctx) {
       const { game, unit, ultSkill, extendBusy } = ctx;
       if (!game || !unit || unit.id !== 'nguyen_le')
@@ -14780,7 +14764,7 @@ __modules['./modes/pve/nguyen-le-runtime.ts'] = (exports, module, __require) => 
       const base = Math.max(1, Math.floor((toFiniteOrZero(unit.atk) + toFiniteOrZero(unit.wil)) * 2));
       let hits = 0;
       for (const slot of TARGET_PATTERN) {
-          const target = findUnitAtSlot(game, foeSide, slot);
+          const target = findAliveUnitAtSlot(game, foeSide, slot);
           if (!target)
               continue;
           dealAbilityDamage(game, unit, target, {

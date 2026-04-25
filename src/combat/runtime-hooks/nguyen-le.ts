@@ -1,10 +1,10 @@
 import { dealAbilityDamage } from '../../combat.ts';
-import { slotToCell } from '../../engine.ts';
 import { globalAetherPool } from '../../aether.ts';
 import { Statuses } from '../../statuses.ts';
 import { nextRngValue } from '../../utils/rng.ts';
 import { buildSkillResult } from '../skill-result.ts';
 import { readAtkWilPower, toFiniteNumber } from '../number-utils.ts';
+import { findAliveUnitAtSlot } from '../board-position-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -25,19 +25,10 @@ type NguyenLeCarrier = UnitToken & {
   _lastDamageTakenTurn?: number;
 };
 
-function findUnitAtSlot(game: SessionState, side: UnitToken['side'], slot: number): UnitToken | null {
-  const { cx, cy } = slotToCell(side, slot);
-  for (const token of game.tokens) {
-    if (!token.alive || token.side !== side) continue;
-    if (token.cx === cx && token.cy === cy) return token;
-  }
-  return null;
-}
-
 function countAliveInRow(game: SessionState, side: UnitToken['side'], slots: readonly number[]): number {
   let count = 0;
   for (const slot of slots) {
-    if (findUnitAtSlot(game, side, slot)) count += 1;
+    if (findAliveUnitAtSlot(game, side, slot)) count += 1;
   }
   return count;
 }
@@ -112,7 +103,7 @@ export const nguyenLeRuntimeHook: UnitRuntimeHook = {
       const base = Math.max(1, Math.floor(readAtkWilPower(caster) * 1.5));
       let hits = 0;
       for (const slot of chosen) {
-        const target = findUnitAtSlot(game, enemySide, slot);
+        const target = findAliveUnitAtSlot(game, enemySide, slot);
         if (!target) continue;
         dealAbilityDamage(game, caster, target, {
           base,

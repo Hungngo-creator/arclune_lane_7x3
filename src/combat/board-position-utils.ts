@@ -1,5 +1,6 @@
 import { slotIndex } from '../engine.ts';
 
+import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
 
 export type BoardPosition = {
@@ -61,4 +62,20 @@ export function createCrossSlotLookup(centerSlot: number): Set<number> {
     slots.add(r * 3 + c + 1);
   }
   return slots;
+}
+
+export function findAliveUnitAtSlot(
+  game: Pick<SessionState, 'tokens'>,
+  side: UnitToken['side'],
+  slot: number,
+): UnitToken | null {
+  if (!game || !Number.isFinite(slot) || slot < 1) return null;
+  const normalizedSlot = Math.floor(slot);
+  for (const token of game.tokens) {
+    if (!token?.alive || token.side !== side) continue;
+    const position = readBoardPosition(token);
+    if (!position || position.slot !== normalizedSlot) continue;
+    return token;
+  }
+  return null;
 }

@@ -1,10 +1,9 @@
 import { dealAbilityDamage, pickTarget } from '../../combat.ts';
-import { slotToCell } from '../../engine.ts';
 import { Statuses } from '../../statuses.ts';
 import { globalAetherPool } from '../../aether.ts';
 import { buildSkillResult } from '../skill-result.ts';
 import { readAtkWilPower, toFiniteNumber, toRoundedInt } from '../number-utils.ts';
-import { isLeaderToken } from '../board-position-utils.ts';
+import { findAliveUnitAtSlot, isLeaderToken } from '../board-position-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -79,15 +78,6 @@ function findLeader(game: SessionState, side: UnitToken['side']): UnitToken | nu
   return null;
 }
 
-function findUnitAtSlot(game: SessionState, side: UnitToken['side'], slot: number): UnitToken | null {
-  const { cx, cy } = slotToCell(side, slot);
-  for (const token of game.tokens) {
-    if (!token.alive || token.side !== side) continue;
-    if (token.cx === cx && token.cy === cy) return token;
-  }
-  return null;
-}
-
 function getRuntimeState(game: SessionState): RuntimeState {
   const runtimeRoot = (game.runtime ??= {});
   const current = runtimeRoot._lyThanhThuRuntime as RuntimeState | undefined;
@@ -157,7 +147,7 @@ function resetPassive(unit: LyThanhThuCarrier): void {
 }
 
 function applyBleedAtSlot(game: SessionState, side: UnitToken['side'], slot: number, sourceUnitId: string): void {
-  const target = findUnitAtSlot(game, side, slot);
+  const target = findAliveUnitAtSlot(game, side, slot);
   if (!target) return;
   Statuses.add(target, {
     id: 'bleed',
@@ -216,7 +206,7 @@ function runFlyingSwordStage(game: SessionState, caster: LyThanhThuCarrier, stag
   const base = Math.max(1, Math.floor(readAtkWilPower(caster)));
   const enemySide: UnitToken['side'] = caster.side === 'ally' ? 'enemy' : 'ally';
   for (const slot of stage.slots) {
-    const target = findUnitAtSlot(game, enemySide, slot);
+    const target = findAliveUnitAtSlot(game, enemySide, slot);
     if (!target) continue;
     const dealt = dealAbilityDamage(game, caster, target, {
       base,
