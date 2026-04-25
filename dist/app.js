@@ -14958,24 +14958,54 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const isInitializedGame = (game = Game) => Boolean(game && game._inited);
   const getInitializedGame = () => (isInitializedGame() ? Game : null);
   const nextSessionRandom = (game = Game) => (nextRngValue(game?.rng));
+  const SKILL_RUNTIME_NUMERIC_KEYS = [
+      'hits',
+      'hitCount',
+      'count',
+      'targets',
+      'targetCount',
+      'duration',
+      'durationTurns',
+      'turns',
+      'busyMs',
+      'durationMs',
+  ];
+  const ULT_DAMAGE_NUMERIC_KEYS = [
+      'scaleWIL',
+      'scaleWil',
+      'flat',
+      'flatAdd',
+      'percentTargetMaxHP',
+      'basePercentMaxHPTarget',
+      'bossPercent',
+      'defPen',
+      'pen',
+  ];
+  const ULT_NUMERIC_KEYS = [
+      'power',
+      'hpTradePercent',
+      'hits',
+      'scale',
+      'duration',
+      'turns',
+      'reduceDmg',
+      'bonusVsLeader',
+      'penRES',
+      'selfHPTrade',
+      'attackSpeed',
+  ];
+  const sanitizeOptionalString = (input) => {
+      if (typeof input !== 'string')
+          return undefined;
+      const trimmed = input.trim();
+      return trimmed ? trimmed : undefined;
+  };
   const coerceSkillRuntime = (value) => {
       if (!isPlainRecord(value))
           return null;
       const record = value;
       const normalized = { ...record };
-      const numericKeys = [
-          'hits',
-          'hitCount',
-          'count',
-          'targets',
-          'targetCount',
-          'duration',
-          'durationTurns',
-          'turns',
-          'busyMs',
-          'durationMs',
-      ];
-      for (const key of numericKeys) {
+      for (const key of SKILL_RUNTIME_NUMERIC_KEYS) {
           const parsed = parseFiniteNumber(record[key]);
           if (parsed != null)
               normalized[key] = parsed;
@@ -14996,18 +15026,12 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       if (!value || typeof value !== 'object')
           return null;
       const spec = { ...value };
-      const sanitizeString = (input) => {
-          if (typeof input !== 'string')
-              return undefined;
-          const trimmed = input.trim();
-          return trimmed ? trimmed : undefined;
-      };
-      spec.pattern = sanitizeString(spec.pattern);
-      spec.placement = sanitizeString(spec.placement);
-      spec.patternKey = sanitizeString(spec.patternKey);
-      spec.shape = sanitizeString(spec.shape);
-      spec.area = sanitizeString(spec.area);
-      spec.replace = sanitizeString(spec.replace);
+      spec.pattern = sanitizeOptionalString(spec.pattern);
+      spec.placement = sanitizeOptionalString(spec.placement);
+      spec.patternKey = sanitizeOptionalString(spec.patternKey);
+      spec.shape = sanitizeOptionalString(spec.shape);
+      spec.area = sanitizeOptionalString(spec.area);
+      spec.replace = sanitizeOptionalString(spec.replace);
       if (Array.isArray(spec.slots)) {
           spec.slots = spec.slots
               .map((slot) => parseFiniteNumber(slot))
@@ -15042,18 +15066,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return null;
       const record = value;
       const damage = { ...record };
-      const numericKeys = [
-          'scaleWIL',
-          'scaleWil',
-          'flat',
-          'flatAdd',
-          'percentTargetMaxHP',
-          'basePercentMaxHPTarget',
-          'bossPercent',
-          'defPen',
-          'pen',
-      ];
-      for (const key of numericKeys) {
+      for (const key of ULT_DAMAGE_NUMERIC_KEYS) {
           const parsed = parseFiniteNumber(record[key]);
           if (parsed != null)
               damage[key] = parsed;
@@ -15067,20 +15080,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return null;
       const record = value;
       const ult = { ...record };
-      const numericKeys = [
-          'power',
-          'hpTradePercent',
-          'hits',
-          'scale',
-          'duration',
-          'turns',
-          'reduceDmg',
-          'bonusVsLeader',
-          'penRES',
-          'selfHPTrade',
-          'attackSpeed',
-      ];
-      for (const key of numericKeys) {
+      for (const key of ULT_NUMERIC_KEYS) {
           const parsed = parseFiniteNumber(record[key]);
           if (parsed != null)
               ult[key] = parsed;
@@ -18912,8 +18912,6 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       return Array.isArray(value) && value.every(isReward);
   }
   function normalizeRewardList(value) {
-      if (isRewardArray(value))
-          return value;
       if (!Array.isArray(value))
           return [];
       const normalized = [];
@@ -18929,7 +18927,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       const source = store[key];
       const next = isRewardArray(source)
           ? source
-          : [...normalizeRewardList(source)];
+          : normalizeRewardList(source);
       store[key] = next;
       return next;
   }
@@ -18980,6 +18978,8 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       return mergeRewardsInPlaceIndexed(list, additions);
   }
   function updateRewards(container, key, additions) {
+      if (!additions.length)
+          return sanitizeRewardList(container, key);
       const target = sanitizeRewardList(container, key);
       return mergeRewardsInPlace(target, additions);
   }
@@ -19061,7 +19061,6 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           return null;
       const runtime = session.runtime;
       removeRewardById(sanitizeRewardList(runtime, 'rewardQueue'), reward.id);
-      h;
       const encounter = runtime.encounter;
       if (encounter) {
           removeRewardById(sanitizeRewardList(encounter, 'pendingRewards'), reward.id);
@@ -19736,6 +19735,15 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       return null;
   }
   const deckEntrySkeletonCache = new Map();
+  const MAX_PLAYER_DECK_SIZE = 10;
+  function resolveElementFromRecord(record) {
+      return normalizeElementKey(record.element
+          ?? record.base_element
+          ?? record.baseElement
+          ?? record.nguyenTo
+          ?? record.nguyen_to
+          ?? record.he) ?? 'neutral';
+  }
   function cloneDeckEntrySkeleton(entry) {
       return {
           ...entry,
@@ -19776,7 +19784,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       const merged = {
           ...skeleton,
           ...candidate,
-          id: idRaw,
+          id: skeleton.id,
       };
       const costOverride = toFiniteCost(candidate.cost);
       merged.cost = costOverride ?? skeleton.cost ?? null;
@@ -19794,24 +19802,13 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       if (normalizedClass) {
           merged.class = normalizedClass;
       }
-      const normalizedElement = normalizeElementKey(candidate.element
-          ?? candidate.base_element
-          ?? candidate.baseElement
-          ?? candidate.nguyenTo
-          ?? candidate.nguyen_to
-          ?? candidate.he) ?? 'neutral';
+      const normalizedElement = resolveElementFromRecord(candidate);
       merged.element = normalizedElement;
       merged.base_element = normalizedElement;
       const metadataRaw = candidate.metadata;
       if (metadataRaw && typeof metadataRaw === 'object' && !Array.isArray(metadataRaw)) {
           const metadata = { ...metadataRaw };
-          const metadataElement = normalizeElementKey(metadata.element
-              ?? metadata.base_element
-              ?? metadata.baseElement
-              ?? metadata.nguyenTo
-              ?? metadata.nguyen_to
-              ?? metadata.he);
-          metadata.element = metadataElement ?? 'neutral';
+          metadata.element = resolveElementFromRecord(metadata);
           if (metadata.elements != null) {
               metadata.elements = normalizeElementList(metadata.elements);
           }
@@ -19828,7 +19825,6 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   function normalizeDeckEntries(value) {
       if (!Array.isArray(value))
           return [];
-      const MAX_PLAYER_DECK_SIZE = 10;
       const normalized = [];
       const seenIds = new Set();
       for (const item of value) {

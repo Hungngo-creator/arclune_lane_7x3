@@ -532,8 +532,14 @@ skill 3: luôn kích hoạt cho đến khi bể aether đồng minh không đủ
 ultimate: cast skill 3 miễn còn đủ 3 phi kiếm/lần cho đến khi không đủ phi kiếm thì nếu còn phi kiếm sẽ cast skill 2. skill cast từ ultimate sẽ không tốn ae. Ví dụ char này có 4 phi kiếm thì sau khi dùng ultimate sẽ cast 1 lần skill 3, nếu có 5 phi kiếm thì sau khi dùng ultimate sẽ cast skill 3 sau đó là skill 2 hoặc có thể cast cùng lúc skill 2 và 3 nếu code cho phép, nếu có 6 hoặc 7 phi kiếm thì sẽ cast 2 lần skill 3. nếu có 8 phi kiếm thì cast skill 3 2 lần rồi cast skill 2, thực ra ultimate char này chả có vfx gì, player chỉ thấy char này mất nộ do ultimate rồi cast skill theo mô tả ultimate theo lượng phi kiếm hiện có thôi, kiểu thấy char này đến turn thì mất nộ do bị trừ khi kích hoạt ultimate, kiểu đến turn là cast skill luôn không có khựng gì cả. Đương nhiên nộ vẫn phải trừ, các char khác nếu có ultimate là cast skill cũng thế, mất nộ là cast skill theo mô tả của ultimate luôn.
 
 45)
+mô tả: một thiền sư chuyên tu thổ hệ công pháp.
+warrior, ur, element tag: earth.
 nội tại: đánh thường sẽ follow up thêm 1 đòn đanh phụ gây sát thương = 50% dond đánh thường chính, mỗi khi đánh thường hồi hp = 100% sát thương đòn đánh follow up gây ra, đòn đánh thường chính sẽ không có cơ chế hồi hp theo % sát thương gây ra tron nội tại này, có thể có hồi hp qua đánh thường nhưng từ buff/mark hoặc kit của char khác.
 lưu ý không nên code nội tại này để hồi hp = 50% đánh thường chính dù follow up gây sát thương = 50% đòn chính vì gây sát thương=50% đòn chính nhưng nếu thiết lập hồi của follow=50% sát thương đòn chính thay vì 100% của follow up thì sát thương gây ra của follow up và sát thương hồi sẽ có khác nhau.
 
-skill 1:
+skill 1: đánh thường lên 1 mục tiêu (có follow up từ nội tại), cùng lúc đánh thường đó sẽ có 1 nham trụ mọc từ dưới đất lên đâm mục tiêu gây sát thương = 1 đánh thường của char này nhưng không có follow up, sát thương nham trụ gây ra không thể hưởng life steal, bỏ qua res/arm/ không bị buff/debuff ảnh hưởng lên nham trụ vì nó chỉ là 1 cục đá, 20 ae.
+
+skill 2:
+
+
 ultimate: bay lên cao, lao về phía ô số 5 của kẻ thù, ô 5 nhận sát thương chuẩn = 5% máu tối đa của char này + 150% wil/atk của char này, tăng res/arm với tỉ lệ sát thương gây ra là 1 wil/atk = 0.3 res/arm, hiệu ứng tăng res/arm này sẽ cộng trực tiếp vào chỉ số cơ bản của char này trong trận, không tính là buff/mark, reset lại khi rời sân, miễn không còn đứng trên sân là reset, (vfx, hoạt ảnh tấn công không tính).

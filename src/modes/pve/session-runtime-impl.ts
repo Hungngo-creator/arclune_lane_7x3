@@ -278,23 +278,56 @@ const nextSessionRandom = (game: SessionState | null | undefined = Game): number
   nextRngValue(game?.rng)
 );
 
+const SKILL_RUNTIME_NUMERIC_KEYS: ReadonlyArray<keyof SkillRuntime> = [
+  'hits',
+  'hitCount',
+  'count',
+  'targets',
+  'targetCount',
+  'duration',
+  'durationTurns',
+  'turns',
+  'busyMs',
+  'durationMs',
+];
+
+const ULT_DAMAGE_NUMERIC_KEYS: ReadonlyArray<keyof UltDamageSpec> = [
+  'scaleWIL',
+  'scaleWil',
+  'flat',
+  'flatAdd',
+  'percentTargetMaxHP',
+  'basePercentMaxHPTarget',
+  'bossPercent',
+  'defPen',
+  'pen',
+];
+
+const ULT_NUMERIC_KEYS: ReadonlyArray<keyof UltSpec> = [
+  'power',
+  'hpTradePercent',
+  'hits',
+  'scale',
+  'duration',
+  'turns',
+  'reduceDmg',
+  'bonusVsLeader',
+  'penRES',
+  'selfHPTrade',
+  'attackSpeed',
+];
+
+const sanitizeOptionalString = (input: unknown): string | undefined => {
+  if (typeof input !== 'string') return undefined;
+  const trimmed = input.trim();
+  return trimmed ? trimmed : undefined;
+};
+
 const coerceSkillRuntime = (value: unknown): SkillRuntime | null => {
   if (!isPlainRecord(value)) return null;
   const record = value as SkillRuntime;
   const normalized: SkillRuntime = { ...record };
-  const numericKeys: ReadonlyArray<keyof SkillRuntime> = [
-    'hits',
-    'hitCount',
-    'count',
-    'targets',
-    'targetCount',
-    'duration',
-    'durationTurns',
-    'turns',
-    'busyMs',
-    'durationMs',
-  ];
-  for (const key of numericKeys){
+  for (const key of SKILL_RUNTIME_NUMERIC_KEYS){
     const parsed = parseFiniteNumber(record[key]);
     if (parsed != null) normalized[key] = parsed;
   }
@@ -313,17 +346,12 @@ const coerceSummonCreep = (value: unknown): SummonCreepSpec | null => {
 const coerceSummonSpec = (value: unknown): SummonSpec | null => {
   if (!value || typeof value !== 'object') return null;
   const spec = { ...(value as SummonSpec) };
-  const sanitizeString = (input: unknown): string | undefined => {
-    if (typeof input !== 'string') return undefined;
-    const trimmed = input.trim();
-    return trimmed ? trimmed : undefined;
-  };
-  spec.pattern = sanitizeString(spec.pattern);
-  spec.placement = sanitizeString(spec.placement);
-  spec.patternKey = sanitizeString(spec.patternKey);
-  spec.shape = sanitizeString(spec.shape);
-  spec.area = sanitizeString(spec.area);
-  spec.replace = sanitizeString(spec.replace);
+  spec.pattern = sanitizeOptionalString(spec.pattern);
+  spec.placement = sanitizeOptionalString(spec.placement);
+  spec.patternKey = sanitizeOptionalString(spec.patternKey);
+  spec.shape = sanitizeOptionalString(spec.shape);
+  spec.area = sanitizeOptionalString(spec.area);
+  spec.replace = sanitizeOptionalString(spec.replace);
   if (Array.isArray(spec.slots)){
     spec.slots = spec.slots
       .map((slot) => parseFiniteNumber(slot))
@@ -355,18 +383,7 @@ const coerceDamageSpec = (value: unknown): UltDamageSpec | null => {
   if (!isPlainRecord(value)) return null;
   const record = value as UltDamageSpec;
   const damage: UltDamageSpec = { ...record };
-  const numericKeys: ReadonlyArray<keyof UltDamageSpec> = [
-    'scaleWIL',
-    'scaleWil',
-    'flat',
-    'flatAdd',
-    'percentTargetMaxHP',
-    'basePercentMaxHPTarget',
-    'bossPercent',
-    'defPen',
-    'pen',
-  ];
-  for (const key of numericKeys){
+  for (const key of ULT_DAMAGE_NUMERIC_KEYS){
     const parsed = parseFiniteNumber(record[key]);
     if (parsed != null) damage[key] = parsed;
   }
@@ -378,20 +395,7 @@ const coerceUlt = (value: unknown): UltSpec | null => {
   if (!value || typeof value !== 'object') return null;
   const record = value as UltSpec;
   const ult: UltSpec = { ...record };
-  const numericKeys: ReadonlyArray<keyof UltSpec> = [
-    'power',
-    'hpTradePercent',
-    'hits',
-    'scale',
-    'duration',
-    'turns',
-    'reduceDmg',
-    'bonusVsLeader',
-    'penRES',
-    'selfHPTrade',
-    'attackSpeed',
-  ];
-  for (const key of numericKeys){
+  for (const key of ULT_NUMERIC_KEYS){
     const parsed = parseFiniteNumber(record[key]);
     if (parsed != null) ult[key] = parsed;
   }

@@ -46,7 +46,6 @@ function isRewardArray(value: unknown): value is MutableRewardList {
 }
 
 function normalizeRewardList(value: unknown): RewardList {
-  if (isRewardArray(value)) return value;
   if (!Array.isArray(value)) return [];
   const normalized: RewardRoll[] = [];
   for (let index = 0; index < value.length; index += 1) {
@@ -64,7 +63,7 @@ function sanitizeRewardList(
   const source = store[key];
   const next: MutableRewardList = isRewardArray(source)
     ? source
-    : [...normalizeRewardList(source)];
+    : normalizeRewardList(source) as MutableRewardList;
   store[key] = next;
   return next;
 }
@@ -114,6 +113,7 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
 }
 
 function updateRewards(container: RewardListContainer, key: RewardListKey, additions: RewardList): RewardRoll[] {
+  if (!additions.length) return sanitizeRewardList(container, key);
   const target = sanitizeRewardList(container, key);
   return mergeRewardsInPlace(target, additions);
 }
@@ -197,7 +197,7 @@ export function applyReward(
   if (!session?.runtime) return null;
   if (!isReward(reward)) return null;
   const runtime = session.runtime;
-  removeRewardById(sanitizeRewardList(runtime, 'rewardQueue'), reward.id);h
+  removeRewardById(sanitizeRewardList(runtime, 'rewardQueue'), reward.id);
   const encounter = runtime.encounter;
   if (encounter) {
     removeRewardById(sanitizeRewardList(encounter, 'pendingRewards'), reward.id);

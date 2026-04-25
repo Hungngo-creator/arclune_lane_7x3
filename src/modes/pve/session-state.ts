@@ -739,6 +739,18 @@ function toFiniteCost(value: unknown): number | null {
 }
 
 const deckEntrySkeletonCache = new Map<string, SessionState['unitsAll'][number]>();
+const MAX_PLAYER_DECK_SIZE = 10;
+
+function resolveElementFromRecord(record: Record<string, unknown>): string {
+  return normalizeElementKey(
+    record.element
+    ?? record.base_element
+    ?? record.baseElement
+    ?? record.nguyenTo
+    ?? record.nguyen_to
+    ?? record.he,
+  ) ?? 'neutral';
+}
 
 function cloneDeckEntrySkeleton(entry: SessionState['unitsAll'][number]): SessionState['unitsAll'][number] {
   return {
@@ -779,7 +791,7 @@ function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | 
   const merged: SessionState['unitsAll'][number] & Record<string, unknown> = {
     ...skeleton,
     ...(candidate as SessionState['unitsAll'][number]),
-    id: idRaw,
+    id: skeleton.id,
   };
   const costOverride = toFiniteCost(candidate.cost);
   merged.cost = costOverride ?? skeleton.cost ?? null;
@@ -797,29 +809,14 @@ function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | 
     merged.class = normalizedClass;
   }
 
-  const normalizedElement = normalizeElementKey(
-    candidate.element
-    ?? candidate.base_element
-    ?? candidate.baseElement
-    ?? candidate.nguyenTo
-    ?? candidate.nguyen_to
-    ?? candidate.he,
-  ) ?? 'neutral';
+  const normalizedElement = resolveElementFromRecord(candidate);
   merged.element = normalizedElement;
   merged.base_element = normalizedElement;
 
   const metadataRaw = candidate.metadata;
   if (metadataRaw && typeof metadataRaw === 'object' && !Array.isArray(metadataRaw)) {
     const metadata = { ...(metadataRaw as Record<string, unknown>) };
-    const metadataElement = normalizeElementKey(
-      metadata.element
-      ?? metadata.base_element
-      ?? metadata.baseElement
-      ?? metadata.nguyenTo
-      ?? metadata.nguyen_to
-      ?? metadata.he,
-    );
-    metadata.element = metadataElement ?? 'neutral';
+    metadata.element = resolveElementFromRecord(metadata);
 
     if (metadata.elements != null) {
       metadata.elements = normalizeElementList(metadata.elements);
@@ -836,7 +833,6 @@ function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | 
 
 export function normalizeDeckEntries(value: unknown): SessionState['unitsAll'] {
   if (!Array.isArray(value)) return [];
-  const MAX_PLAYER_DECK_SIZE = 10;
   const normalized: SessionState['unitsAll'][number][] = [];
   const seenIds = new Set<string>();
   for (const item of value) {
