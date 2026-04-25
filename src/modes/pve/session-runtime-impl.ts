@@ -217,12 +217,19 @@ const getNormalizedUltTags = (ult: UltSpec): ReadonlyArray<string> => {
   if (cached) {
     return cached;
   }
-  const rawUltTags = [
-    ...(Array.isArray(ult.tags) ? ult.tags : []),
-    ...(Array.isArray(ult.meta?.tags) ? ult.meta.tags : []),
-    ...(Array.isArray(ult.metadata?.tags) ? ult.metadata.tags : []),
-  ].filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0);
-  const normalized = normalizeTagList(rawUltTags);
+  const rawUltTags: string[] = [];
+  const appendTags = (list: ReadonlyArray<string> | null | undefined): void => {
+    if (!Array.isArray(list) || !list.length) return;
+    for (let index = 0; index < list.length; index += 1) {
+      const tag = list[index];
+      if (typeof tag !== 'string' || tag.trim().length === 0) continue;
+      rawUltTags.push(tag);
+    }
+  };
+  appendTags(ult.tags);
+  appendTags(ult.meta?.tags);
+  appendTags(ult.metadata?.tags);
+  const normalized = rawUltTags.length ? normalizeTagList(rawUltTags) : [];
   ULT_TAG_CACHE.set(ult, normalized);
   return normalized;
 };

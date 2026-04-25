@@ -14911,12 +14911,21 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       if (cached) {
           return cached;
       }
-      const rawUltTags = [
-          ...(Array.isArray(ult.tags) ? ult.tags : []),
-          ...(Array.isArray(ult.meta?.tags) ? ult.meta.tags : []),
-          ...(Array.isArray(ult.metadata?.tags) ? ult.metadata.tags : []),
-      ].filter((tag) => typeof tag === 'string' && tag.trim().length > 0);
-      const normalized = normalizeTagList(rawUltTags);
+      const rawUltTags = [];
+      const appendTags = (list) => {
+          if (!Array.isArray(list) || !list.length)
+              return;
+          for (let index = 0; index < list.length; index += 1) {
+              const tag = list[index];
+              if (typeof tag !== 'string' || tag.trim().length === 0)
+                  continue;
+              rawUltTags.push(tag);
+          }
+      };
+      appendTags(ult.tags);
+      appendTags(ult.meta?.tags);
+      appendTags(ult.metadata?.tags);
+      const normalized = rawUltTags.length ? normalizeTagList(rawUltTags) : [];
       ULT_TAG_CACHE.set(ult, normalized);
       return normalized;
   };
@@ -18908,26 +18917,24 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           return false;
       return true;
   }
-  function isRewardArray(value) {
-      return Array.isArray(value) && value.every(isReward);
-  }
-  function normalizeRewardList(value) {
+  function toSanitizedRewardList(value) {
       if (!Array.isArray(value))
           return [];
-      const normalized = [];
-      for (let index = 0; index < value.length; index += 1) {
-          const reward = value[index];
-          if (isReward(reward))
-              normalized.push(reward);
+      let writeIndex = 0;
+      for (let readIndex = 0; readIndex < value.length; readIndex += 1) {
+          const reward = value[readIndex];
+          if (!isReward(reward))
+              continue;
+          value[writeIndex] = reward;
+          writeIndex += 1;
       }
-      return normalized;
+      if (writeIndex !== value.length)
+          value.length = writeIndex;
+      return value;
   }
-  function sanitizeRewardList(container, key) {
+  function getMutableRewardList(container, key) {
       const store = container;
-      const source = store[key];
-      const next = isRewardArray(source)
-          ? source
-          : normalizeRewardList(source);
+      const next = toSanitizedRewardList(store[key]);
       store[key] = next;
       return next;
   }
@@ -18979,8 +18986,8 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   }
   function updateRewards(container, key, additions) {
       if (!additions.length)
-          return sanitizeRewardList(container, key);
-      const target = sanitizeRewardList(container, key);
+          return getMutableRewardList(container, key);
+      const target = getMutableRewardList(container, key);
       return mergeRewardsInPlace(target, additions);
   }
   function removeRewardById(list, rewardId) {
@@ -19033,7 +19040,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               wave.status = 'cleared';
               runtime.wave = null;
               encounter.waveIndex = index + 1;
-              const rewards = normalizeRewardList(wave.rewards);
+              const rewards = toSanitizedRewardList(wave.rewards);
               if (rewards.length) {
                   updateRewards(encounter, 'pendingRewards', rewards);
                   updateRewards(runtime, 'rewardQueue', rewards);
@@ -19060,10 +19067,10 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       if (!isReward(reward))
           return null;
       const runtime = session.runtime;
-      removeRewardById(sanitizeRewardList(runtime, 'rewardQueue'), reward.id);
+      removeRewardById(getMutableRewardList(runtime, 'rewardQueue'), reward.id);
       const encounter = runtime.encounter;
       if (encounter) {
-          removeRewardById(sanitizeRewardList(encounter, 'pendingRewards'), reward.id);
+          removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), reward.id);
       }
       return reward;
   }
@@ -19184,11 +19191,20 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   }
   const EMPTY_UNIT_PROGRESS = new Map();
   const AUTO_PLAYER_DECK_SIZE = 10;
-  function normalizeIntegerWithFallback(value, min, fallback) {
-      if (Number.isFinite(value)) {
-          return Math.max(min, Math.floor(Number(value)));
+  function parseFiniteNumber(value) {
+      if (typeof value === 'number')
+          return Number.isFinite(value) ? value : null;
+      if (typeof value === 'string') {
+          const parsed = Number(value);
+          return Number.isFinite(parsed) ? parsed : null;
       }
-      return fallback;
+      return null;
+  }
+  function normalizeIntegerWithFallback(value, min, fallback) {
+      const numeric = parseFiniteNumber(value);
+      if (numeric == null)
+          return fallback;
+      return Math.max(min, Math.floor(numeric));
   }
   function estimateUnitStrength(unitId, progress) {
       const level = normalizeIntegerWithFallback(progress?.level, 1, 1);
@@ -19224,11 +19240,9 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       return normalizeDeckEntries(pickedIds);
   }
   function normalizePositiveLimit(value, fallback) {
-      if (Number.isFinite(value)) {
-          const numeric = Number(value);
-          if (numeric > 0)
-              return numeric;
-      }
+      const numeric = parseFiniteNumber(value);
+      if (numeric != null && numeric > 0)
+          return numeric;
       return fallback;
   }
   function buildAiState(params) {
@@ -19484,7 +19498,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           ? rawSides.filter((side) => isTurnOrderSide(side))
           : ['ally', 'enemy'];
       const order = [];
-      const scan = Array.isArray(cfg.pairScan) ? [...cfg.pairScan] : [];
+      const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
       for (const entry of scan) {
           const normalized = normalizePairScanEntry(entry, sides);
           if (normalized.length)
@@ -19725,15 +19739,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       return sceneCache;
   }
   exports.__backgroundSignatureCache = backgroundSignatureCache;
-  function toFiniteCost(value) {
-      if (typeof value === 'number')
-          return Number.isFinite(value) ? value : null;
-      if (typeof value === 'string') {
-          const parsed = Number(value);
-          return Number.isFinite(parsed) ? parsed : null;
-      }
-      return null;
-  }
+  const toFiniteCost = parseFiniteNumber;
   const deckEntrySkeletonCache = new Map();
   const MAX_PLAYER_DECK_SIZE = 10;
   function resolveElementFromRecord(record) {
@@ -19833,7 +19839,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           const entry = normalizeDeckEntry(item);
           if (!entry)
               continue;
-          const unitId = normalizeUnitId(entry.id);
+          const unitId = entry.id;
           if (seenIds.has(unitId))
               continue;
           seenIds.add(unitId);

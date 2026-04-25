@@ -122,11 +122,19 @@ interface ResolveEnemyUnitsOptions {
 const EMPTY_UNIT_PROGRESS = new Map<string, RuntimeUnitProgress>();
 const AUTO_PLAYER_DECK_SIZE = 10;
 
-function normalizeIntegerWithFallback(value: unknown, min: number, fallback: number): number {
-  if (Number.isFinite(value)) {
-    return Math.max(min, Math.floor(Number(value)));
+function parseFiniteNumber(value: unknown): number | null {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
-  return fallback;
+  return null;
+}
+
+function normalizeIntegerWithFallback(value: unknown, min: number, fallback: number): number {
+  const numeric = parseFiniteNumber(value);
+  if (numeric == null) return fallback;
+  return Math.max(min, Math.floor(numeric));
 }
 
 function estimateUnitStrength(unitId: string, progress: RuntimeUnitProgress | undefined): number {
@@ -163,10 +171,8 @@ function buildAutoPlayerDeckFromCollection(
 }
 
 function normalizePositiveLimit(value: unknown, fallback: number): number {
-  if (Number.isFinite(value)) {
-    const numeric = Number(value);
-    if (numeric > 0) return numeric;
-  }
+  const numeric = parseFiniteNumber(value);
+  if (numeric != null && numeric > 0) return numeric;
   return fallback;
 }
 
@@ -478,7 +484,7 @@ export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<strin
     ? rawSides.filter((side: unknown): side is TurnOrderSide => isTurnOrderSide(side))
     : (['ally', 'enemy'] as const satisfies ReadonlyArray<TurnOrderSide>);
   const order: TurnOrderEntry[] = [];
-  const scan = Array.isArray(cfg.pairScan) ? [...cfg.pairScan] : [];
+  const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
   for (const entry of scan) {
     const normalized = normalizePairScanEntry(entry, sides);
     if (normalized.length) order.push(...normalized);
@@ -729,14 +735,7 @@ const drawCtx = cacheCtx as CanvasRenderingContext2D;
 }
 
 export { backgroundSignatureCache as __backgroundSignatureCache };
-function toFiniteCost(value: unknown): number | null {
-  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
-  if (typeof value === 'string') {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-}
+const toFiniteCost = parseFiniteNumber;
 
 const deckEntrySkeletonCache = new Map<string, SessionState['unitsAll'][number]>();
 const MAX_PLAYER_DECK_SIZE = 10;
@@ -839,7 +838,7 @@ export function normalizeDeckEntries(value: unknown): SessionState['unitsAll'] {
     if (normalized.length >= MAX_PLAYER_DECK_SIZE) break;
     const entry = normalizeDeckEntry(item);
     if (!entry) continue;
-    const unitId = normalizeUnitId(entry.id);
+    const unitId = entry.id;
     if (seenIds.has(unitId)) continue;
     seenIds.add(unitId);
     normalized.push({ ...entry, id: unitId });
