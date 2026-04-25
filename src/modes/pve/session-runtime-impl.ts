@@ -1984,16 +1984,22 @@ function performUlt(unit: UnitToken): void {
   
   const allTokens = game.tokens || [];
   let aliveIndex: AliveTokenIndex | null = null;
-  const getAliveTokens = (): UnitToken[] => {
-    if (aliveIndex) return aliveIndex.alive;
-    aliveIndex = buildAliveTokenIndex(allTokens);
-    return aliveIndex.alive;
-  };
   const getAliveBySide = (side: Side): UnitToken[] => {
     if (!aliveIndex) {
       aliveIndex = buildAliveTokenIndex(allTokens);
     }
     return aliveIndex.bySide.get(side) ?? [];
+  };
+  const applySelfDamageAsUltCost = (amount: number): void => {
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    applyDamage(unit, amount);
+    gainFury(unit, {
+      type: 'damageTaken',
+      dealt: amount,
+      selfMaxHp: Number.isFinite(unit.hpMax) ? unit.hpMax : undefined,
+      damageTaken: amount,
+    });
+    finishFuryHit(unit);
   };
 
   let busyMs = 900;
@@ -2030,16 +2036,7 @@ function performUlt(unit: UnitToken): void {
       const desiredTrade = Math.round(hpMax * hpTradePct);
       const maxLoss = Math.max(0, currentHp - 1);
       const hpPayment = Math.max(0, Math.min(desiredTrade, maxLoss));
-      if (hpPayment > 0){
-        applyDamage(unit, hpPayment);
-        gainFury(unit, {
-          type: 'damageTaken',
-          dealt: hpPayment,
-          selfMaxHp: Number.isFinite(unit?.hpMax) ? unit.hpMax : undefined,
-          damageTaken: hpPayment
-        });
-        finishFuryHit(unit);
-      }
+      applySelfDamageAsUltCost(hpPayment);
 
       const foes = getAliveBySide(foeSide);
 
@@ -2188,8 +2185,12 @@ function performUlt(unit: UnitToken): void {
       const primary = pickTarget(game, unit);
       if (!primary) break;
       const laneX = primary.cx;
-      const aliveNow = getAliveTokens();
-      const laneTargets = aliveNow.filter(t => t.side === foeSide && t.cx === laneX);
+      const foes = getAliveBySide(foeSide);
+      const laneTargets: UnitToken[] = [];
+      for (let index = 0; index < foes.length; index += 1) {
+        const enemy = foes[index];
+        if (enemy.cx === laneX) laneTargets.push(enemy);
+      }
       const hits = getUltHitCount(u);
       const scale = parseFiniteNumber(u.scale) ?? 0.9;
       const meleeDur = parseFiniteNumber(CFG?.ANIMATION?.meleeDurationMs) ?? 2000;
@@ -2222,16 +2223,7 @@ function performUlt(unit: UnitToken): void {
       const tradePct = Math.max(0, Math.min(0.9, parseFiniteNumber(u.selfHPTrade) ?? 0));
       const pay = Math.round((unit.hpMax || 0) * tradePct);
       const maxPay = Math.max(0, Math.min(pay, Math.max(0, (unit.hp || 0) - 1)));
-      if (maxPay > 0){
-        applyDamage(unit, maxPay);
-        gainFury(unit, {
-          type: 'damageTaken',
-          dealt: maxPay,
-          selfMaxHp: Number.isFinite(unit?.hpMax) ? unit.hpMax : undefined,
-          damageTaken: maxPay
-        });
-        finishFuryHit(unit);
-      }
+      applySelfDamageAsUltCost(maxPay);
       const reduce = Math.max(0, parseFiniteNumber(u.reduceDmg) ?? 0);
       if (reduce > 0){
         const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
@@ -2599,11 +2591,6 @@ function checkBattleEndResult(
     ? normalizeAnimationFrameTimestamp(timestampCandidate)
     : undefined;
   return finalizeBattle(game, { winner, reason, detail, finishedAt }, contextDetail);
-}
-
-function finalizeBattleIfLeaderDown(game: (SessionState | CombatSessionState) | null, trigger: string, timestamp: number): boolean {
-  const result = checkBattleEndResult(game, { trigger, timestamp });
-  return Boolean(result);
 }
 // Giảm TTL minion của 1 phe sau khi phe đó kết thúc phase
 function tickMinionTTL(side: Side): void {
@@ -3186,7 +3173,7 @@ function init(): boolean {
       CLOCK.lastLogicMs = sessionNowMs;
 
       if (Game.battle?.over) return;
-      if (finalizeBattleIfLeaderDown(Game, 'leader-immediate', sessionNowMs)) {
+      if (checkBattleEndResult(Game, { trigger: 'leader-immediate', timestamp: sessionNowMs })) {
         return;
       }
 
@@ -3215,18 +3202,19 @@ function init(): boolean {
 
       if (readyByBusy && elapsedForTurn >= turnEveryMs){
         let turnsProcessed = 0;
+        let hasBoardMutation = false;
         while (readyByBusy && elapsedForTurn >= turnEveryMs && turnsProcessed < MAX_TURNS_PER_TICK){
           CLOCK.lastTurnStepMs += turnEveryMs;
           elapsedForTurn -= turnEveryMs;
           turnsProcessed += 1;
           stepTurn(Game, stepTurnContext);
-          if (finalizeBattleIfLeaderDown(Game, 'leader-immediate', sessionNowMs)) {
+          if (checkBattleEndResult(Game, { trigger: 'leader-immediate', timestamp: sessionNowMs })) {
             return;
           }
           processCreepDeathHealing(sessionNowMs);
           cleanupDead(sessionNowMs);
+          hasBoardMutation = true;
           checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs });
-          scheduleDraw();
           aiMaybeAct(Game, 'board');
           if (Game.battle?.over) {
             return;
@@ -3234,6 +3222,9 @@ function init(): boolean {
           turnState = Game.turn ?? null;
           busyUntil = normalizeTurnBusyUntil(turnState);
           readyByBusy = sessionNowMs >= busyUntil;
+        }
+        if (hasBoardMutation) {
+          scheduleDraw();
         }
       }
   };
