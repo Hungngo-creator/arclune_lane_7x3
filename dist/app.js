@@ -6444,6 +6444,9 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
       const ownerKey = String(unit.iid ?? unit.id);
       runtime.swords = runtime.swords.filter((sword) => sword.ownerIid !== ownerKey);
   }
+  function resetFlyingSwordForOwner(game, owner) {
+      clearFlyingSwords(game, owner);
+  }
   const lyThanhThuRuntimeHook = {
       onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
           const ltt = caster;
@@ -6456,6 +6459,7 @@ __modules['./combat/runtime-hooks/ly-thanh-thu.ts'] = (exports, module, __requir
               return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1);
           }
           if (skillKey === 'skill2') {
+              resetFlyingSwordForOwner(game, caster);
               const firstStageHits = runFlyingSwordStage(game, ltt, { slots: [1, 4, 7], countsAsBasic: false, parkSlot: 7 }, skill);
               if (firstStageHits >= 2) {
                   triggerSkill3Defense(game, ltt);

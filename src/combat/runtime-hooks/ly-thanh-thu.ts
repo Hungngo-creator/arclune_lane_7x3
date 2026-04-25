@@ -254,6 +254,10 @@ function clearFlyingSwords(game: SessionState, unit: UnitToken): void {
   runtime.swords = runtime.swords.filter((sword) => sword.ownerIid !== ownerKey);
 }
 
+function resetFlyingSwordForOwner(game: SessionState, owner: UnitToken): void {
+  clearFlyingSwords(game, owner);
+}
+
 export const lyThanhThuRuntimeHook: UnitRuntimeHook = {
   onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
     const ltt = caster as LyThanhThuCarrier;
@@ -266,6 +270,7 @@ export const lyThanhThuRuntimeHook: UnitRuntimeHook = {
     }
 
     if (skillKey === 'skill2') {
+      resetFlyingSwordForOwner(game, caster);
       const firstStageHits = runFlyingSwordStage(game, ltt, { slots: [1, 4, 7], countsAsBasic: false, parkSlot: 7 }, skill);
       if (firstStageHits >= 2) {
         triggerSkill3Defense(game, ltt);

@@ -381,7 +381,7 @@ Tạo một lớp khiên cho Toàn Đội. Giá trị khiên = 250% WIL + atk c�
 33) Hoá Thân của Thời Không Chi Chủ - Không Gian Chi Chủ, Prime. mage, không element tag.
 mô tả: Thời Không nhất thể, vì sức mạnh quá lớn nên Hắn phải tách ra làm 2 để giáng lâm Arclune - Ảnh Giới, dù chỉ là 1 sợi ý niệm của hắn bị chia làm 2 nhưng vẫn có bản chất áp đảo.
 
-nội tại: Thần Tính: không nhận buff hay debuff ngoài bản thân (trừ Thời Gian Chi Chủ), không thể hồi sinh.
+nội tại: Thần Tính: không nhận buff hay debuff/mark, mọi trạng thái có lợi lẫn hại ngoài bản thân (trừ Thời Gian Chi Chủ), không thể hồi sinh khi hp về 0 trừ hồi sinh = kit của char này hoặc Thời Gian Chi Chủ.
 sau mỗi 2 turn tự dung nhập vào không gian, hồi hp = 20% max hp. ( nói chung sau 2 turn tự hồi 20% max hp, dung nhập vào không gian chỉ là vfx). quy tắc.
 
 Kỹ năng 1: Xáo trộn vị trí của 3 kẻ thù ngẫu nhiên trên sân 1 cách ngẫu nhiên không cố định (không target leader địch), trộn vĩnh viễn cho đến khi đối phương chết, về deck hoặc bị xáo trộn lần nữa bởi kỹ năng này hoặc 1 kỹ năng không gian khác. 25 aether. Quy Tắc.
@@ -399,8 +399,8 @@ kỹ năng 2: hồi hp cho đồng minh = 200% wil + atk của bản thân cho h
 kỹ năng 3: quy tắc: khiến mọi đồng minh trên sân thực thi 1 turn đánh thường, giảm animation tấn công từ 2,2s xuống 1s khi có đồng minh thực thi tấn công từ kỹ năng này. quy tắc. 30 aether.
 ultimate: quy tắc: hồi hp cho mọi đơn vị đồng minh trên sân = 30% max hp của họ, bản thân hắn được + 10% wil và atk trong 3 turn sau khi dùng ultimate, không cộng dồn.
 
-35)
-Kiếm sĩ, UR.
+35) Nguyên Lễ
+Kiếm sĩ, UR. không element tag.
 nội tại: mỗi lần giết 1 mục tiêu thành công nhận miễn nhiễm với 1 debuff ngẫu nhiên từ pool: độc, choáng, ngủ, chảy máu, yếu đuối. Cũng đồng thời tăng vĩnh viễn 5% atk và wil của bản thân ở lúc giết kẻ thù ( tính luôn atk/wil bị ảnh hưởng từ buff/debuff và mọi nguồn khác) đến khi chết.
 skill 1: mỗi khi nhận sát thương vượt 20% max hp, tự hồi hp cho bản thân = 50% wil /atk của bản thân, tự kích hoạt, mỗi lần kích hoạt - 10 aether từ aepool, nếu ae không đủ sẽ không kích hoạt skill này.
 skill 2: chém 1 nhát ngang gây sát thương lên hàng 1/2/3 hoặc 4/5/5 hoặc 7/8/9, ưu tiên hàng có nhiều kẻ địch đứng nhất, mỗi kẻ địch nhận sát thương = 150% đánh thường, cost - 7 ae/kẻ địch nhận sát thương ( tối đa - 21 ae).

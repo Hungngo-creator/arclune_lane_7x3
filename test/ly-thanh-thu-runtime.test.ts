@@ -95,4 +95,27 @@ describe('ly_thanh_thu runtime hook', () => {
     expect(caster.wil).toBeLessThanOrEqual(wilBeforeDeath);
     expect((caster as UnitToken & { _lyThanhThuPassiveStacks?: number })._lyThanhThuPassiveStacks ?? 0).toBe(0);
   });
+
+  it('keeps only one flying sword instance per caster when skill2 is recast', () => {
+    const caster = atSlot('ally', 5, { id: 'ly_thanh_thu', iid: 301, atk: 220, wil: 120 });
+    const enemy1 = atSlot('enemy', 1, { id: 'enemy_1', iid: 401, hp: 600, hpMax: 600 });
+    const enemy4 = atSlot('enemy', 4, { id: 'enemy_4', iid: 402, hp: 600, hpMax: 600 });
+    const enemy7 = atSlot('enemy', 7, { id: 'enemy_7', iid: 403, hp: 600, hpMax: 600 });
+    const game = makeGame([caster, enemy1, enemy4, enemy7]);
+    const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(true);
+    const currentSpy = jest.spyOn(globalAetherPool, 'current').mockReturnValue(999);
+
+    const first = performActiveSkill(game, caster, 'skill2');
+    const second = performActiveSkill(game, caster, 'skill2');
+    expect(first.ok).toBe(true);
+    expect(second.ok).toBe(true);
+
+    const runtimeState = (game.runtime as { _lyThanhThuRuntime?: { swords?: unknown[] } } | undefined)?._lyThanhThuRuntime;
+    expect(Array.isArray(runtimeState?.swords)).toBe(true);
+    expect(runtimeState?.swords?.length ?? 0).toBe(1);
+
+    consumeSpy.mockRestore();
+    currentSpy.mockRestore();
+  });
+
 });
