@@ -16,6 +16,7 @@ import { applyUyenBasicExtras } from './leader-uyen.ts';
 import { nextRngValue } from './utils/rng.ts';
 import { normalizeClassName } from './utils/domain-normalization.ts';
 import { getCounterBonusMetadata } from './combat/counter-matrix.ts';
+import { readAtkWilPower } from './combat/number-utils.ts';
 import {
   applyChapMinhMitigation,
   applyChapMinhPhaseShift,
@@ -758,7 +759,7 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
     }
   }
 
-  const rawBase = Math.max(1, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
+  const rawBase = Math.max(1, Math.floor(readAtkWilPower(unit)));
   const modBase = Math.max(
     1,
     Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0))

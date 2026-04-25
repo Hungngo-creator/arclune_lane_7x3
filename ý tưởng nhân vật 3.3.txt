@@ -481,9 +481,13 @@ ultimate: cast 1 lần skill nhưng sát thương gây ra là 2 lần đánh th�
 
 đánh thường: gây sát thương=100% wil/atk.
 
+41) Dương Hạ
+Ranger, ssr.
+Nội tại: tăng 5% wil/att/hp/res/arm mỗi khi có 1 kẻ thù chết khi char này có trên sân, creep từ summoner cũng tính.
 
+skill 1: mỗi lần đánh thường luôn kèm theo 1 đòn follow up gây sát thương = 50% đòn chính, khin skill này kích hoạt đòn đánh thường chính giảm 10 nộ của kẻ địch khi họ nhận sát thương từ char này khi skill này kích hoạt. Luôn tự kích hoạt miễn đứng trên sân, - 5 ae/turn dù có đánh thường hay không.
 
-
+skill 2: 
 
 
 

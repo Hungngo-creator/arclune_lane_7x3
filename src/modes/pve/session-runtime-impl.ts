@@ -1932,18 +1932,21 @@ function performUlt(unit: UnitToken): void {
 
       const bindingKey = 'huyet_hon_loi_quyet';
 
-      {
+      const runBurstVfx = (
+        effect: (session: SessionWithVfx) => number | null | undefined,
+      ): void => {
+        if (!sessionVfx) return;
         const startedAt = getNow();
-        if (sessionVfx) {
-          try {
-            const dur = vfxAddBloodPulse(sessionVfx, unit, {
-              bindingKey,
-              timing: 'charge_up'
-            });
-            applyBusyFromVfx(startedAt, dur);
-          } catch (_) {}
-        }
-      }
+        try {
+          const dur = effect(sessionVfx);
+          applyBusyFromVfx(startedAt, dur);
+        } catch (_) {}
+      };
+
+      runBurstVfx((session) => vfxAddBloodPulse(session, unit, {
+        bindingKey,
+        timing: 'charge_up'
+      }));
 
       const damageSpec = (u.damage ?? {}) as UltDamageSpec;
       const dtype = typeof damageSpec.type === 'string' && damageSpec.type ? damageSpec.type : 'arcane';
@@ -1975,20 +1978,12 @@ function performUlt(unit: UnitToken): void {
           defPen: parseFiniteNumber(damageSpec.defPen ?? damageSpec.pen) ?? 0
         });
 
-        {
-          const startedAt = getNow();
-          if (sessionVfx) {
-            try {
-              const dur = vfxAddLightningArc(sessionVfx, unit, tgt, {
-                bindingKey,
-                timing: 'burst_core',
-                targetBindingKey: bindingKey,
-                targetTiming: 'burst_core'
-              });
-              applyBusyFromVfx(startedAt, dur);
-            } catch (_) {}
-          }
-        }
+        runBurstVfx((session) => vfxAddLightningArc(session, unit, tgt, {
+          bindingKey,
+          timing: 'burst_core',
+          targetBindingKey: bindingKey,
+          targetTiming: 'burst_core'
+        }));
 
         if (debuffAmount && tgt.alive){
           const existing = Statuses.get(tgt, debuffId);
@@ -2014,48 +2009,23 @@ function performUlt(unit: UnitToken): void {
         }
       }
 
-      {
-        const startedAt = getNow();
-        if (sessionVfx) {
-          try {
-            const dur = vfxAddGroundBurst(sessionVfx, unit, {
-              bindingKey,
-              anchorId: 'right_foot',
-              timing: 'ground_crack'
-            });
-            applyBusyFromVfx(startedAt, dur);
-          } catch (_) {}
-        }
-      }
+       runBurstVfx((session) => vfxAddGroundBurst(session, unit, {
+        bindingKey,
+        anchorId: 'right_foot',
+        timing: 'ground_crack'
+      }));
 
-      {
-        const startedAt = getNow();
-        if (sessionVfx) {
-          try {
-            const dur = vfxAddGroundBurst(sessionVfx, unit, {
-              bindingKey,
-              anchorId: 'left_foot',
-              timing: 'ground_crack'
-            });
-            applyBusyFromVfx(startedAt, dur);
-          } catch (_) {}
-        }
-      }
+      runBurstVfx((session) => vfxAddGroundBurst(session, unit, {
+        bindingKey,
+        anchorId: 'left_foot',
+        timing: 'ground_crack'
+      }));
 
-      {
-        const startedAt = getNow();
-        const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
-        if (sessionVfx) {
-          try {
-            const dur = vfxAddShieldWrap(sessionVfx, unit, {
-              bindingKey,
-              anchorId: 'root',
-              timing: 'burst_core'
-            });
-            applyBusyFromVfx(startedAt, dur);
-          } catch (_) {}
-        }
-      }
+      runBurstVfx((session) => vfxAddShieldWrap(session, unit, {
+        bindingKey,
+        anchorId: 'root',
+        timing: 'burst_core'
+      }));
 
       const reduceDmg = parseFiniteNumber(u.reduceDmg);
       if (reduceDmg && reduceDmg > 0){

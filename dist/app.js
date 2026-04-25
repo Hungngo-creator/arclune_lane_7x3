@@ -4544,13 +4544,15 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   const normalizeClassName = __dep13.normalizeClassName;
   const __dep14 = __require('./combat/counter-matrix.ts');
   const getCounterBonusMetadata = __dep14.getCounterBonusMetadata;
-  const __dep15 = __require('./combat/chap-minh-runtime.ts');
-  const applyChapMinhMitigation = __dep15.applyChapMinhMitigation;
-  const applyChapMinhPhaseShift = __dep15.applyChapMinhPhaseShift;
-  const recordChapMinhPreventedDamage = __dep15.recordChapMinhPreventedDamage;
-  const __dep16 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeDamageResolved = __dep16.runRuntimeDamageResolved;
-  const runRuntimeUnitDeath = __dep16.runRuntimeUnitDeath;
+  const __dep15 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep15.readAtkWilPower;
+  const __dep16 = __require('./combat/chap-minh-runtime.ts');
+  const applyChapMinhMitigation = __dep16.applyChapMinhMitigation;
+  const applyChapMinhPhaseShift = __dep16.applyChapMinhPhaseShift;
+  const recordChapMinhPreventedDamage = __dep16.recordChapMinhPreventedDamage;
+  const __dep17 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeDamageResolved = __dep17.runRuntimeDamageResolved;
+  const runRuntimeUnitDeath = __dep17.runRuntimeUnitDeath;
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
@@ -5129,7 +5131,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
               Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, meleeStartMs, meleeDur);
           }
       }
-      const rawBase = Math.max(1, Math.floor((unit.atk ?? 0) + (unit.wil ?? 0)));
+      const rawBase = Math.max(1, Math.floor(readAtkWilPower(unit)));
       const modBase = Math.max(1, Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0)));
       triggerLightningArc('hit1');
       triggerLightningArc('hit2');
@@ -16508,19 +16510,20 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   }
               };
               const bindingKey = 'huyet_hon_loi_quyet';
-              {
+              const runBurstVfx = (effect) => {
+                  if (!sessionVfx)
+                      return;
                   const startedAt = getNow();
-                  if (sessionVfx) {
-                      try {
-                          const dur = vfxAddBloodPulse(sessionVfx, unit, {
-                              bindingKey,
-                              timing: 'charge_up'
-                          });
-                          applyBusyFromVfx(startedAt, dur);
-                      }
-                      catch (_) { }
+                  try {
+                      const dur = effect(sessionVfx);
+                      applyBusyFromVfx(startedAt, dur);
                   }
-              }
+                  catch (_) { }
+              };
+              runBurstVfx((session) => vfxAddBloodPulse(session, unit, {
+                  bindingKey,
+                  timing: 'charge_up'
+              }));
               const damageSpec = (u.damage ?? {});
               const dtype = typeof damageSpec.type === 'string' && damageSpec.type ? damageSpec.type : 'arcane';
               const attackType = u.countsAsBasic ? 'basic' : 'skill';
@@ -16550,21 +16553,12 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                       attackType,
                       defPen: parseFiniteNumber(damageSpec.defPen ?? damageSpec.pen) ?? 0
                   });
-                  {
-                      const startedAt = getNow();
-                      if (sessionVfx) {
-                          try {
-                              const dur = vfxAddLightningArc(sessionVfx, unit, tgt, {
-                                  bindingKey,
-                                  timing: 'burst_core',
-                                  targetBindingKey: bindingKey,
-                                  targetTiming: 'burst_core'
-                              });
-                              applyBusyFromVfx(startedAt, dur);
-                          }
-                          catch (_) { }
-                      }
-                  }
+                  runBurstVfx((session) => vfxAddLightningArc(session, unit, tgt, {
+                      bindingKey,
+                      timing: 'burst_core',
+                      targetBindingKey: bindingKey,
+                      targetTiming: 'burst_core'
+                  }));
                   if (debuffAmount && tgt.alive) {
                       const existing = Statuses.get(tgt, debuffId);
                       if (existing) {
@@ -16591,49 +16585,21 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                           tgt._recalcStats();
                   }
               }
-              {
-                  const startedAt = getNow();
-                  if (sessionVfx) {
-                      try {
-                          const dur = vfxAddGroundBurst(sessionVfx, unit, {
-                              bindingKey,
-                              anchorId: 'right_foot',
-                              timing: 'ground_crack'
-                          });
-                          applyBusyFromVfx(startedAt, dur);
-                      }
-                      catch (_) { }
-                  }
-              }
-              {
-                  const startedAt = getNow();
-                  if (sessionVfx) {
-                      try {
-                          const dur = vfxAddGroundBurst(sessionVfx, unit, {
-                              bindingKey,
-                              anchorId: 'left_foot',
-                              timing: 'ground_crack'
-                          });
-                          applyBusyFromVfx(startedAt, dur);
-                      }
-                      catch (_) { }
-                  }
-              }
-              {
-                  const startedAt = getNow();
-                  const sessionVfx = ensureSessionWithVfx(game, { requireGrid: true });
-                  if (sessionVfx) {
-                      try {
-                          const dur = vfxAddShieldWrap(sessionVfx, unit, {
-                              bindingKey,
-                              anchorId: 'root',
-                              timing: 'burst_core'
-                          });
-                          applyBusyFromVfx(startedAt, dur);
-                      }
-                      catch (_) { }
-                  }
-              }
+              runBurstVfx((session) => vfxAddGroundBurst(session, unit, {
+                  bindingKey,
+                  anchorId: 'right_foot',
+                  timing: 'ground_crack'
+              }));
+              runBurstVfx((session) => vfxAddGroundBurst(session, unit, {
+                  bindingKey,
+                  anchorId: 'left_foot',
+                  timing: 'ground_crack'
+              }));
+              runBurstVfx((session) => vfxAddShieldWrap(session, unit, {
+                  bindingKey,
+                  anchorId: 'root',
+                  timing: 'burst_core'
+              }));
               const reduceDmg = parseFiniteNumber(u.reduceDmg);
               if (reduceDmg && reduceDmg > 0) {
                   const turns = getUltDurationTurns(u, parseFiniteNumber(u.turns) ?? 1);
