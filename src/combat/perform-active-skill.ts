@@ -77,6 +77,7 @@ interface ParsedSkillTags {
   hasDamageTag: boolean;
 }
 type SkillUsageStore = Record<string, number>;
+type RuntimeSkillUsageStore = Record<string, SkillUsageStore>;
 
 function resolveActiveSkill(caster: UnitToken, skillKey: ActiveSkillKey): SkillSection | null {
   const set = skillSets[caster.id as keyof typeof skillSets];
@@ -146,22 +147,23 @@ function readSkillUseCap(payload: Record<string, unknown>): number {
   );
 }
 
+function resolveCasterSkillUsageStore(game: SessionState, caster: UnitToken): SkillUsageStore {
+  const runtimeRoot = (game.runtime ??= {});
+  const usageStore = ((runtimeRoot._skillUsageByCaster as RuntimeSkillUsageStore | undefined) ??= {});
+  const casterKey = String(caster.iid ?? caster.id);
+  return (usageStore[casterKey] ??= {});
+}
+
 function hasSkillUseQuota(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey, maxUses: number): boolean {
   if (maxUses <= 0) return true;
-  const runtimeRoot = game.runtime;
-  const usageStore = runtimeRoot?._skillUsageByCaster as Record<string, SkillUsageStore> | undefined;
-  const casterUsage = usageStore?.[String(caster.iid ?? caster.id)];
-  const currentUses = Math.max(0, toRoundedInt(casterUsage?.[skillKey] ?? 0, 0));
+  const casterUsage = resolveCasterSkillUsageStore(game, caster);
+  const currentUses = Math.max(0, toRoundedInt(casterUsage[skillKey] ?? 0, 0));
   return currentUses < maxUses;
 }
 
 function recordSkillUseQuota(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey, maxUses: number): void {
   if (maxUses <= 0) return;
-
-  const runtimeRoot = (game.runtime ??= {});
-  const usageStore = ((runtimeRoot._skillUsageByCaster as Record<string, SkillUsageStore> | undefined) ??= {});
-  const casterKey = String(caster.iid ?? caster.id);
-  const casterUsage = (usageStore[casterKey] ??= {});
+  const casterUsage = resolveCasterSkillUsageStore(game, caster);
   const currentUses = Math.max(0, toRoundedInt(casterUsage[skillKey] ?? 0, 0));
   casterUsage[skillKey] = Math.min(maxUses, currentUses + 1);
 }

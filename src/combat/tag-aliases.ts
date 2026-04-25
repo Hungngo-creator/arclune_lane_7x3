@@ -161,6 +161,28 @@ const COMBAT_TAG_ALIASES = Object.freeze<Record<string, string>>({
   'huyet-than-linh-vuc': 'global-rule',
   'huyết thần': 'axiom-rule',
   'huyet-than': 'axiom-rule',
+  
+  'hào quang': 'aura',
+  'hao-quang': 'aura',
+  'buff: hào quang': 'aura',
+  'buff-hao-quang': 'aura',
+  'debuff vĩnh viễn': 'permanent-debuff',
+  'debuff-vinh-vien': 'permanent-debuff',
+  'buff vĩnh viễn': 'permanent-buff',
+  'buff-vinh-vien': 'permanent-buff',
+  'miễn khống chế': 'control-immunity',
+  'mien-khong-che': 'control-immunity',
+  'sát thương chuẩn': 'true-damage',
+  'sat-thuong-chuan': 'true-damage',
+  'combo': 'combo',
+  'vfx: combo': 'combo',
+  'vfx-combo': 'combo',
+  'hoảng sợ': 'control',
+  'hoang-so': 'control',
+  'fear': 'control',
+  'cấm hồi sinh': 'anti-revive',
+  'cam-hoi-sinh': 'anti-revive',
+  'pháp tắc: tái sinh': 'doctrine-rule',
 });
 
 const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
@@ -179,8 +201,14 @@ const COMBAT_TAG_PRIORITY = Object.freeze<Record<string, number>>({
   'cross-aoe': 210,
   aoe: 200,
   mark: 160,
+  'permanent-buff': 160,
+  'permanent-debuff': 160,
+  aura: 150,
   passive: 140,
   'mixed-damage': 130,
+  'true-damage': 130,
+  combo: 125,
+  'control-immunity': 122,
   'vfx-transform': 120,
   'sleep-setup': 120,
   'non-purgeable-mark': 120,
@@ -226,10 +254,19 @@ function normalizeAliasLookupKey(tag: string): string {
     .toLowerCase()
     .replace(/\s+/g, ' ');
 }
+const NORMALIZED_TAG_CACHE = new Map<string, string>();
+const MAX_NORMALIZED_TAG_CACHE_SIZE = 2048;
 
 export function normalizeCombatTag(tag: string): string {
+  const cached = NORMALIZED_TAG_CACHE.get(tag);
+  if (cached) return cached;
   const normalized = normalizeAliasLookupKey(tag);
-  return RULE_TAG_ALIASES[normalized] ?? COMBAT_TAG_ALIASES[normalized] ?? normalized;
+  const resolved = RULE_TAG_ALIASES[normalized] ?? COMBAT_TAG_ALIASES[normalized] ?? normalized;
+  if (NORMALIZED_TAG_CACHE.size >= MAX_NORMALIZED_TAG_CACHE_SIZE) {
+    NORMALIZED_TAG_CACHE.clear();
+  }
+  NORMALIZED_TAG_CACHE.set(tag, resolved);
+  return resolved;
 }
 
 function normalizeCanonicalInputTag(tag: string): string {

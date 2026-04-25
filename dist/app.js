@@ -5816,22 +5816,23 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   function readSkillUseCap(payload) {
       return Math.max(0, toRoundedInt(toFiniteNumber(payload.maxUsesPerBattle ?? payload.maxUses ?? payload.battleUseCap, 0), 0));
   }
+  function resolveCasterSkillUsageStore(game, caster) {
+      const runtimeRoot = (game.runtime ??= {});
+      const usageStore = (runtimeRoot._skillUsageByCaster ??= {});
+      const casterKey = String(caster.iid ?? caster.id);
+      return (usageStore[casterKey] ??= {});
+  }
   function hasSkillUseQuota(game, caster, skillKey, maxUses) {
       if (maxUses <= 0)
           return true;
-      const runtimeRoot = game.runtime;
-      const usageStore = runtimeRoot?._skillUsageByCaster;
-      const casterUsage = usageStore?.[String(caster.iid ?? caster.id)];
-      const currentUses = Math.max(0, toRoundedInt(casterUsage?.[skillKey] ?? 0, 0));
+      const casterUsage = resolveCasterSkillUsageStore(game, caster);
+      const currentUses = Math.max(0, toRoundedInt(casterUsage[skillKey] ?? 0, 0));
       return currentUses < maxUses;
   }
   function recordSkillUseQuota(game, caster, skillKey, maxUses) {
       if (maxUses <= 0)
           return;
-      const runtimeRoot = (game.runtime ??= {});
-      const usageStore = (runtimeRoot._skillUsageByCaster ??= {});
-      const casterKey = String(caster.iid ?? caster.id);
-      const casterUsage = (usageStore[casterKey] ??= {});
+      const casterUsage = resolveCasterSkillUsageStore(game, caster);
       const currentUses = Math.max(0, toRoundedInt(casterUsage[skillKey] ?? 0, 0));
       casterUsage[skillKey] = Math.min(maxUses, currentUses + 1);
   }
@@ -6367,6 +6368,27 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'huyet-than-linh-vuc': 'global-rule',
       'huyết thần': 'axiom-rule',
       'huyet-than': 'axiom-rule',
+      'hào quang': 'aura',
+      'hao-quang': 'aura',
+      'buff: hào quang': 'aura',
+      'buff-hao-quang': 'aura',
+      'debuff vĩnh viễn': 'permanent-debuff',
+      'debuff-vinh-vien': 'permanent-debuff',
+      'buff vĩnh viễn': 'permanent-buff',
+      'buff-vinh-vien': 'permanent-buff',
+      'miễn khống chế': 'control-immunity',
+      'mien-khong-che': 'control-immunity',
+      'sát thương chuẩn': 'true-damage',
+      'sat-thuong-chuan': 'true-damage',
+      'combo': 'combo',
+      'vfx: combo': 'combo',
+      'vfx-combo': 'combo',
+      'hoảng sợ': 'control',
+      'hoang-so': 'control',
+      'fear': 'control',
+      'cấm hồi sinh': 'anti-revive',
+      'cam-hoi-sinh': 'anti-revive',
+      'pháp tắc: tái sinh': 'doctrine-rule',
   });
   const COMBAT_TAG_PRIORITY = Object.freeze({
       'axiom-rule': 500,
@@ -6384,8 +6406,14 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'cross-aoe': 210,
       aoe: 200,
       mark: 160,
+      'permanent-buff': 160,
+      'permanent-debuff': 160,
+      aura: 150,
       passive: 140,
       'mixed-damage': 130,
+      'true-damage': 130,
+      combo: 125,
+      'control-immunity': 122,
       'vfx-transform': 120,
       'sleep-setup': 120,
       'non-purgeable-mark': 120,
@@ -6419,9 +6447,19 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
           .toLowerCase()
           .replace(/\s+/g, ' ');
   }
+  const NORMALIZED_TAG_CACHE = new Map();
+  const MAX_NORMALIZED_TAG_CACHE_SIZE = 2048;
   function normalizeCombatTag(tag) {
+      const cached = NORMALIZED_TAG_CACHE.get(tag);
+      if (cached)
+          return cached;
       const normalized = normalizeAliasLookupKey(tag);
-      return RULE_TAG_ALIASES[normalized] ?? COMBAT_TAG_ALIASES[normalized] ?? normalized;
+      const resolved = RULE_TAG_ALIASES[normalized] ?? COMBAT_TAG_ALIASES[normalized] ?? normalized;
+      if (NORMALIZED_TAG_CACHE.size >= MAX_NORMALIZED_TAG_CACHE_SIZE) {
+          NORMALIZED_TAG_CACHE.clear();
+      }
+      NORMALIZED_TAG_CACHE.set(tag, resolved);
+      return resolved;
   }
   function normalizeCanonicalInputTag(tag) {
       const normalized = normalizeAliasLookupKey(tag);
