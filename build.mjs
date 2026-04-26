@@ -112,6 +112,7 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['@modes/pve/session-deck', './modes/pve/session-deck.ts'],
   ['@modes/pve/session-deck.js', './modes/pve/session-deck.ts'],
   ['@modes/pve/session-deck.ts', './modes/pve/session-deck.ts'],
+  ['@modes/pve/session-deck/index.js', './modes/pve/session-deck.ts'],
   ['@modes/pve/session-deck/index.ts', './modes/pve/session-deck.ts'],
   ['@screens/gacha/view.js', './screens/gacha/view.ts'],
   ['@screens/gacha/view.ts', './screens/gacha/view.ts'],

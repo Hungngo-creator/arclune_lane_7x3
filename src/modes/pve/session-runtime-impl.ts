@@ -675,7 +675,7 @@ const sessionDeckController = createSessionDeckController({
   onQueuedSummon: (game) => {
     if (hud) hud.update(game);
     scheduleDraw();
-  };
+  },
 });
 const {
   ensureDeck,
