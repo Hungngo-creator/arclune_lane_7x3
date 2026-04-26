@@ -1,6 +1,9 @@
 import { ART_SPRITE_EVENT } from '../../engine';
+import type { SessionState } from '@shared-types/pve';
 
 type CanvasClickHandler = (event: MouseEvent) => void;
+
+type StartConfigInput = Record<string, unknown>;
 
 type SessionEventBindingsDeps = {
   getDocRef: () => Document | null;
@@ -51,6 +54,15 @@ type SessionEventBindingsDeps = {
   destroyAetherPool: () => void;
   cleanupGameState: () => void;
   clearAfterStop: () => void;
+  configureRoot: () => void;
+  resolveTimerElement: () => void;
+  normalizeStartConfig: (config: StartConfigInput) => unknown;
+  isRunning: () => boolean;
+  resetSessionState: (config: unknown) => void;
+  setRunning: (running: boolean) => void;
+  initSession: () => boolean;
+  isSessionInitialized: () => boolean;
+  getSession: () => SessionState | null;
 };
 
 type SessionEventBindingsController = {
@@ -64,6 +76,7 @@ type SessionEventBindingsController = {
   bindRuntimeListeners: () => void;
   resetDomRefs: () => void;
   stopSession: () => void;
+  startSession: (config?: StartConfigInput) => SessionState | null;
 };
 
 export const createSessionEventBindings = (
@@ -253,6 +266,33 @@ export const createSessionEventBindings = (
     deps.clearAfterStop();
   };
 
+  const startSession = (config?: StartConfigInput): SessionState | null => {
+    const nextConfig = (typeof config === 'undefined' ? {} : config);
+    deps.configureRoot();
+    deps.resolveTimerElement();
+    const normalizedConfig = deps.normalizeStartConfig(nextConfig);
+    if (deps.isRunning()) stopSession();
+    deps.resetSessionState(normalizedConfig);
+    deps.setRunning(true);
+    try {
+      const initialized = deps.initSession();
+      if (!initialized) {
+        stopSession();
+        return null;
+      }
+      if (!deps.isSessionInitialized()) {
+        throw new Error('Unable to initialise PvE session');
+      }
+      bindSession();
+      bindRuntimeListeners();
+      return deps.getSession();
+    } catch (err) {
+      deps.setRunning(false);
+      stopSession();
+      throw err;
+    }
+  };
+
   return {
     bindArtSpriteListener,
     unbindArtSpriteListener,
@@ -264,5 +304,6 @@ export const createSessionEventBindings = (
     bindRuntimeListeners,
     resetDomRefs,
     stopSession,
+    startSession,
   };
 };

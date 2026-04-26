@@ -2615,8 +2615,6 @@ function init(): boolean {
 
   selectFirstAffordable();
   renderSummonBar();
-  bindRuntimeListeners();
-
   resolveTimerElement();
 
   const stepTurnContext = {
@@ -3562,39 +3560,28 @@ const sessionEventBindings = createSessionEventBindings({
     running = false;
     invalidateSceneCache();
   },
+  configureRoot: () => {
+    configureRoot(rootElement);
+  },
+  resolveTimerElement,
+  normalizeStartConfig: (config: Record<string, unknown>) => toNormalizedSessionConfig(config),
+  isRunning: () => running,
+  resetSessionState: (config: unknown) => {
+    resetSessionState(config as NormalizedSessionConfig);
+  },
+  setRunning: (nextRunning: boolean) => {
+    running = nextRunning;
+  },
+  initSession: () => init(),
+  isSessionInitialized: () => Boolean(Game && Game._inited),
+  getSession: () => Game,
 });
 
 const {
   clearSessionTimers,
-  bindSession,
-  bindRuntimeListeners,
   stopSession,
+  startSession,
 } = sessionEventBindings;
-
-function startSession(config: StartConfigOverrides | null | undefined = {}): SessionState | null {
-  configureRoot(rootElement);
-  resolveTimerElement();
-  const overrides = toNormalizedSessionConfig(config);
-  if (running) stopSession();
-  resetSessionState(overrides);
-  running = true;
-  try {
-    const initialised = init();
-    if (!initialised){
-      stopSession();
-      return null;
-    }
-    if (!Game || !Game._inited){
-      throw new Error('Unable to initialise PvE session');
-    }
-    bindSession();
-    return Game;
-  } catch (err) {
-    running = false;
-    stopSession();
-    throw err;
-  }
-}
 
 function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
   if (!Game) return;

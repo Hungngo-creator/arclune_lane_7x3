@@ -15299,6 +15299,34 @@ __modules['./modes/pve/session-events.ts'] = (exports, module, __require) => {
           resetDomRefs();
           deps.clearAfterStop();
       };
+      const startSession = (config) => {
+          const nextConfig = (typeof config === 'undefined' ? {} : config);
+          deps.configureRoot();
+          deps.resolveTimerElement();
+          const normalizedConfig = deps.normalizeStartConfig(nextConfig);
+          if (deps.isRunning())
+              stopSession();
+          deps.resetSessionState(normalizedConfig);
+          deps.setRunning(true);
+          try {
+              const initialized = deps.initSession();
+              if (!initialized) {
+                  stopSession();
+                  return null;
+              }
+              if (!deps.isSessionInitialized()) {
+                  throw new Error('Unable to initialise PvE session');
+              }
+              bindSession();
+              bindRuntimeListeners();
+              return deps.getSession();
+          }
+          catch (err) {
+              deps.setRunning(false);
+              stopSession();
+              throw err;
+          }
+      };
       return {
           bindArtSpriteListener,
           unbindArtSpriteListener,
@@ -15310,6 +15338,7 @@ __modules['./modes/pve/session-events.ts'] = (exports, module, __require) => {
           bindRuntimeListeners,
           resetDomRefs,
           stopSession,
+          startSession,
       };
   };
   //# sourceMappingURL=stdin.js.map
@@ -18013,7 +18042,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       Game.ui.bar = barHandle;
       selectFirstAffordable();
       renderSummonBar();
-      bindRuntimeListeners();
       resolveTimerElement();
       const stepTurnContext = {
           performUlt,
@@ -18920,34 +18948,23 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           running = false;
           invalidateSceneCache();
       },
+      configureRoot: () => {
+          configureRoot(rootElement);
+      },
+      resolveTimerElement,
+      normalizeStartConfig: (config) => toNormalizedSessionConfig(config),
+      isRunning: () => running,
+      resetSessionState: (config) => {
+          resetSessionState(config);
+      },
+      setRunning: (nextRunning) => {
+          running = nextRunning;
+      },
+      initSession: () => init(),
+      isSessionInitialized: () => Boolean(Game && Game._inited),
+      getSession: () => Game,
   });
-  const { clearSessionTimers, bindSession, bindRuntimeListeners, stopSession, } = sessionEventBindings;
-  function startSession(config = {}) {
-      configureRoot(rootElement);
-      resolveTimerElement();
-      const overrides = toNormalizedSessionConfig(config);
-      if (running)
-          stopSession();
-      resetSessionState(overrides);
-      running = true;
-      try {
-          const initialised = init();
-          if (!initialised) {
-              stopSession();
-              return null;
-          }
-          if (!Game || !Game._inited) {
-              throw new Error('Unable to initialise PvE session');
-          }
-          bindSession();
-          return Game;
-      }
-      catch (err) {
-          running = false;
-          stopSession();
-          throw err;
-      }
-  }
+  const { clearSessionTimers, stopSession, startSession, } = sessionEventBindings;
   function applyConfigToRunningGame(cfg) {
       if (!Game)
           return;
