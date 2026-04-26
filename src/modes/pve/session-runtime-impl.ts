@@ -67,7 +67,7 @@ import {
 } from './session-state';
 import { mapUnitProgressById } from './collection-mapper.ts';
 import { createSessionLoopController } from './session-loop';
-import { createSessionDeckController, isDeckEntry } from './session-deck';
+import { createSessionDeckController } from './session-deck';
 import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
 import {
   ensureUyenState,
@@ -520,17 +520,6 @@ const ensureSessionWithVfx = (
   }
   return session;
 };
-
-function assertDeckEntry(value: unknown): asserts value is DeckEntry {
-  if (!isDeckEntry(value)) {
-    throw new TypeError('Thẻ bài không hợp lệ.');
-  }
-}
-
-function asDeckEntry<T>(value: T): DeckEntry {
-  assertDeckEntry(value);
-  return value;
-}
 
 const applyCostGain = (
   holder: { cost: number; costCap: number } | null | undefined,

@@ -93,6 +93,7 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['./modes/coming-soon.stub.js', './modes/coming-soon.stub.ts'],
   ['./modes/pve/session.js', './modes/pve/session.ts'],
   ['./modes/pve/session-loop.js', './modes/pve/session-loop.ts'],
+  ['./modes/pve/session-deck', './modes/pve/session-deck.ts'],
   ['./modes/pve/session-deck.js', './modes/pve/session-deck.ts'],
   ['./screens/collection/index.js', './screens/collection/index.ts'],
   ['./screens/arena-hub/index.js', './screens/arena-hub/index.ts'],
