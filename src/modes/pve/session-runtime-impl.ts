@@ -138,6 +138,7 @@ type ExtendedQueuedSummon = (QueuedSummonRequest & {
 }) | null;
 type DeckEntry = PveDeckEntry;
 type GridSpec = ReturnType<typeof makeGrid>;
+const EMPTY_DECK_ENTRIES: DeckEntry[] = [];
 
 type InitializedSessionState = SessionState & { _inited: true };
 
@@ -548,7 +549,7 @@ function asDeckEntry<T>(value: T): DeckEntry {
 }
 
 function sanitizeDeckEntries(value: unknown): DeckEntry[] {
-  if (!Array.isArray(value)) return [];
+  if (!Array.isArray(value)) return EMPTY_DECK_ENTRIES;
   const cached = sanitizedDeckEntriesCache.get(value);
   if (cached) return cached as DeckEntry[];
   let normalized: DeckEntry[] | null = null;
@@ -663,16 +664,13 @@ const removeDeckEntryAtIndex = (
 ): DeckEntry[] => {
   if (removeIndex < 0 || removeIndex >= deck.length) return deck as DeckEntry[];
   const mutableDeck = deck as DeckEntry[];
-  for (let i = removeIndex + 1; i < mutableDeck.length; i += 1) {
-    mutableDeck[i - 1] = mutableDeck[i] as DeckEntry;
-  }
-  mutableDeck.length = Math.max(0, mutableDeck.length - 1);
+  mutableDeck.splice(removeIndex, 1);
   return mutableDeck;
 };
 
 function ensureLockedPlayerDeck(game: SessionState | null | undefined = Game): ReadonlyArray<DeckEntry> {
   const session = isInitializedGame(game) ? game : null;
-  if (!session) return [];
+  if (!session) return EMPTY_DECK_ENTRIES;
   const lockedSource = Array.isArray(session.playerDeckLocked) && session.playerDeckLocked.length
     ? session.playerDeckLocked
     : session.unitsAll;
@@ -2817,7 +2815,7 @@ function init(): boolean {
   if (Game.tokens) { globalAetherPool.init(Game.tokens);
   }
 
-  if (hud && Game) hud.update(Game);
+  if (hud) hud.update(Game);
   scheduleDraw();
   leaderEndCheckFlags = { ally: false, enemy: false };
   Game._inited = true;
@@ -2830,7 +2828,8 @@ function init(): boolean {
     onPick: (card): void => {
       const game = getInitializedGame();
       if (!game) return;
-      const entry = asDeckEntry(card);
+      if (!isDeckEntry(card)) return;
+      const entry = card;
       if (!isCardInLockedDeck(entry.id, game)) return;
       game.selectedId = entry.id;
       renderSummonBar();
@@ -2838,13 +2837,14 @@ function init(): boolean {
     canAfford: (card): boolean => {
       const game = getInitializedGame();
       if (!game) return false;
-      const entry = asDeckEntry(card);
+      if (!isDeckEntry(card)) return false;
+      const entry = card;
       if (isUniqueGlobalSummonBlocked(game, { unitId: entry.id, tags: entry.tags ?? null })) return false;
       return game.cost >= getCardCost(entry);
     },
     getDeck: (): DeckEntry[] => {
       const game = getInitializedGame();
-      if (!game) return [] as DeckEntry[];
+      if (!game) return [];
       return ensureDeck(game);
     },
     getSelectedId: (): string | null => {
@@ -2915,7 +2915,7 @@ function init(): boolean {
     game.queued.ally.set(slot, pending);
 
     game.cost = Math.max(0, game.cost - cardCost);
-    if (hud && game) hud.update(game);
+    if (hud) hud.update(game);
     game.summoned += 1;
     game.usedUnitIds.add(card.id);
 
@@ -3170,7 +3170,7 @@ function init(): boolean {
       }
 
         if (costChanged){
-        if (hud && Game) hud.update(Game);
+        if (hud) hud.update(Game);
         if (!Game.selectedId) selectFirstAffordable();
         renderSummonBar();
         aiMaybeAct(Game, 'cost');
@@ -3293,7 +3293,8 @@ function selectFirstAffordable(): void {
   let cheapestOverall: DeckEntry | null = null;
   let cheapestOverallCost = Infinity;
 
-  for (const card of deck){
+  for (let index = 0; index < deck.length; index += 1){
+    const card = deck[index];
     if (!card) continue;
 
     const cardCost = getCardCost(card);
@@ -3329,7 +3330,7 @@ function refillDeck(): void {
     exclude.add(entry.id);
   }
   const lockedDeck = ensureLockedPlayerDeck(Game);
-  const more = pickRandom(lockedDeck, exclude).slice(0, need);
+  const more = pickRandom(lockedDeck, exclude, need);
   deck.push(...more);
   Game.deck3 = deck;
 }
@@ -4313,11 +4314,11 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
   if (preferredDeckInput) {
     const deck = normalizeDeckEntries(preferredDeckInput);
     if (deck.length) {
-      const deckUnitIds = new Set(deck.map((entry) => entry.id));
       game.unitsAll = deck;
-      game.playerDeckLocked = Array.from(deck);
-      game.deck3 = ensureDeck(game).filter((card) => deckUnitIds.has(card.id));
-      if (game.selectedId && !deckUnitIds.has(game.selectedId)) {
+      game.playerDeckLocked = deck;
+      invalidateLockedDeckCache();
+      game.deck3 = ensureDeck(game);
+      if (game.selectedId && !isCardInLockedDeck(game.selectedId, game)) {
         game.selectedId = null;
       }
       refillDeck();
@@ -4330,11 +4331,10 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
     applyCollectionSkinsToSession(game);
   }
   if (cfg.aiPreset){
-    const preset: EnemyAIPreset = cfg.aiPreset || {};
-    const lineupInput = getPreferredDeckInput(cfg);
+    const preset: EnemyAIPreset = cfg.aiPreset;
     const enemyUnits = resolveEnemyUnits({
       aiPreset: preset,
-      preferredDeck: lineupInput,
+      preferredDeck: preferredDeckInput,
       fallbackDeck: game.playerDeckLocked ?? game.unitsAll ?? [],
       ...(collectionProgressById
         ? { unitProgressById: collectionProgressById }

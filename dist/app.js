@@ -14906,6 +14906,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const isAnyLeaderUltReady = __dep28.isAnyLeaderUltReady;
   const isUyenLeader = __dep28.isUyenLeader;
   const queueUyenUltCast = __dep28.queueUyenUltCast;
+  const EMPTY_DECK_ENTRIES = [];
   const ULT_TAG_CACHE = new WeakMap();
   const appendUltTags = (output, list) => {
       if (!Array.isArray(list))
@@ -15191,7 +15192,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   }
   function sanitizeDeckEntries(value) {
       if (!Array.isArray(value))
-          return [];
+          return EMPTY_DECK_ENTRIES;
       const cached = sanitizedDeckEntriesCache.get(value);
       if (cached)
           return cached;
@@ -15286,16 +15287,13 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       if (removeIndex < 0 || removeIndex >= deck.length)
           return deck;
       const mutableDeck = deck;
-      for (let i = removeIndex + 1; i < mutableDeck.length; i += 1) {
-          mutableDeck[i - 1] = mutableDeck[i];
-      }
-      mutableDeck.length = Math.max(0, mutableDeck.length - 1);
+      mutableDeck.splice(removeIndex, 1);
       return mutableDeck;
   };
   function ensureLockedPlayerDeck(game = Game) {
       const session = isInitializedGame(game) ? game : null;
       if (!session)
-          return [];
+          return EMPTY_DECK_ENTRIES;
       const lockedSource = Array.isArray(session.playerDeckLocked) && session.playerDeckLocked.length
           ? session.playerDeckLocked
           : session.unitsAll;
@@ -17347,7 +17345,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       if (Game.tokens) {
           globalAetherPool.init(Game.tokens);
       }
-      if (hud && Game)
+      if (hud)
           hud.update(Game);
       scheduleDraw();
       leaderEndCheckFlags = { ally: false, enemy: false };
@@ -17360,7 +17358,9 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               const game = getInitializedGame();
               if (!game)
                   return;
-              const entry = asDeckEntry(card);
+              if (!isDeckEntry(card))
+                  return;
+              const entry = card;
               if (!isCardInLockedDeck(entry.id, game))
                   return;
               game.selectedId = entry.id;
@@ -17370,7 +17370,9 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               const game = getInitializedGame();
               if (!game)
                   return false;
-              const entry = asDeckEntry(card);
+              if (!isDeckEntry(card))
+                  return false;
+              const entry = card;
               if (isUniqueGlobalSummonBlocked(game, { unitId: entry.id, tags: entry.tags ?? null }))
                   return false;
               return game.cost >= getCardCost(entry);
@@ -17450,7 +17452,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           };
           game.queued.ally.set(slot, pending);
           game.cost = Math.max(0, game.cost - cardCost);
-          if (hud && game)
+          if (hud)
               hud.update(game);
           game.summoned += 1;
           game.usedUnitIds.add(card.id);
@@ -17682,7 +17684,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               costChanged = applyCostGain(Game.ai, costGranted) || costChanged;
           }
           if (costChanged) {
-              if (hud && Game)
+              if (hud)
                   hud.update(Game);
               if (!Game.selectedId)
                   selectFirstAffordable();
@@ -17801,7 +17803,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       let cheapestAffordableCost = Infinity;
       let cheapestOverall = null;
       let cheapestOverallCost = Infinity;
-      for (const card of deck) {
+      for (let index = 0; index < deck.length; index += 1) {
+          const card = deck[index];
           if (!card)
               continue;
           const cardCost = getCardCost(card);
@@ -17834,7 +17837,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           exclude.add(entry.id);
       }
       const lockedDeck = ensureLockedPlayerDeck(Game);
-      const more = pickRandom(lockedDeck, exclude).slice(0, need);
+      const more = pickRandom(lockedDeck, exclude, need);
       deck.push(...more);
       Game.deck3 = deck;
   }
@@ -18780,11 +18783,11 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       if (preferredDeckInput) {
           const deck = normalizeDeckEntries(preferredDeckInput);
           if (deck.length) {
-              const deckUnitIds = new Set(deck.map((entry) => entry.id));
               game.unitsAll = deck;
-              game.playerDeckLocked = Array.from(deck);
-              game.deck3 = ensureDeck(game).filter((card) => deckUnitIds.has(card.id));
-              if (game.selectedId && !deckUnitIds.has(game.selectedId)) {
+              game.playerDeckLocked = deck;
+              invalidateLockedDeckCache();
+              game.deck3 = ensureDeck(game);
+              if (game.selectedId && !isCardInLockedDeck(game.selectedId, game)) {
                   game.selectedId = null;
               }
               refillDeck();
@@ -18797,11 +18800,10 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           applyCollectionSkinsToSession(game);
       }
       if (cfg.aiPreset) {
-          const preset = cfg.aiPreset || {};
-          const lineupInput = getPreferredDeckInput(cfg);
+          const preset = cfg.aiPreset;
           const enemyUnits = resolveEnemyUnits({
               aiPreset: preset,
-              preferredDeck: lineupInput,
+              preferredDeck: preferredDeckInput,
               fallbackDeck: game.playerDeckLocked ?? game.unitsAll ?? [],
               ...(collectionProgressById
                   ? { unitProgressById: collectionProgressById }
@@ -18894,6 +18896,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   const __resolveStatusIconPreview = __dep1.__resolveStatusIconPreview;
   const NOOP_UNSUBSCRIBE = () => { };
   const SMALL_REWARD_MERGE_SIZE = 6;
+  const EMPTY_REWARD_LIST = [];
   function isReward(entry) {
       if (!entry || typeof entry !== 'object')
           return false;
@@ -18909,7 +18912,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   }
   function toSanitizedRewardList(value) {
       if (!Array.isArray(value))
-          return [];
+          return EMPTY_REWARD_LIST;
       const rewards = value;
       let writeIndex = 0;
       for (let readIndex = 0; readIndex < rewards.length; readIndex += 1) {
@@ -18929,9 +18932,6 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       const list = Array.isArray(source) ? toSanitizedRewardList(source) : [];
       store[key] = list;
       return list;
-  }
-  function mergeRewardLists(container, key, additions) {
-      return mergeRewardsInPlace(getMutableRewardList(container, key), additions);
   }
   function mergeRewardsInPlace(list, additions) {
       if (!additions.length)
@@ -18978,10 +18978,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           const entry = list[index];
           if (!entry || entry.id !== rewardId)
               continue;
-          for (let write = index + 1; write < list.length; write += 1) {
-              list[write - 1] = list[write];
-          }
-          list.length -= 1;
+          list.splice(index, 1);
           break;
       }
       return list;
@@ -19022,9 +19019,13 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               encounter.waveIndex = index + 1;
               const rewards = toSanitizedRewardList(wave.rewards);
               if (rewards.length) {
-                  const pendingRewards = mergeRewardLists(encounter, 'pendingRewards', rewards);
                   const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
-                  if (rewardQueue !== pendingRewards) {
+                  const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
+                  if (rewardQueue === pendingRewards) {
+                      mergeRewardsInPlace(rewardQueue, rewards);
+                  }
+                  else {
+                      mergeRewardsInPlace(pendingRewards, rewards);
                       mergeRewardsInPlace(rewardQueue, rewards);
                   }
               }
@@ -19134,6 +19135,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           skinKey: art?.skinKey ?? null,
       };
   });
+  const NORMALIZABLE_DECK_FIELDS = ['lineupDeck', 'playerDeck', 'deck'];
   function normalizeDeckField(config, key) {
       const value = config[key];
       if (Array.isArray(value)) {
@@ -19144,12 +19146,11 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       return Array.isArray(value) && value.length > 0;
   }
   function getPreferredDeckInput(config) {
-      if (hasDeckEntries(config.lineupDeck))
-          return config.lineupDeck;
-      if (hasDeckEntries(config.playerDeck))
-          return config.playerDeck;
-      if (hasDeckEntries(config.deck))
-          return config.deck;
+      for (const key of NORMALIZABLE_DECK_FIELDS) {
+          const value = config[key];
+          if (hasDeckEntries(value))
+              return value;
+      }
       return null;
   }
   const TURN_ORDER_FALLBACK_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -19178,6 +19179,9 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   }
   const EMPTY_UNIT_PROGRESS = new Map();
   const AUTO_PLAYER_DECK_SIZE = 10;
+  const EMPTY_UNIT_DECK = [];
+  const DEFAULT_FALLBACK_DECK = DEFAULT_UNIT_ROSTER.slice(0, AUTO_PLAYER_DECK_SIZE);
+  const DEFAULT_SINGLE_UNIT_DECK = DEFAULT_FALLBACK_DECK.slice(0, 1);
   function parseFiniteNumber(value) {
       if (typeof value === 'number')
           return Number.isFinite(value) ? value : null;
@@ -19377,9 +19381,9 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           else if (typeof sceneConfig.background === 'string')
               out.backgroundKey = sceneConfig.background;
       }
-      normalizeDeckField(out, 'lineupDeck');
-      normalizeDeckField(out, 'playerDeck');
-      normalizeDeckField(out, 'deck');
+      for (const field of NORMALIZABLE_DECK_FIELDS) {
+          normalizeDeckField(out, field);
+      }
       if (typeof out.collectionState === 'undefined') {
           out.collectionState = null;
       }
@@ -19510,13 +19514,15 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           ?? sceneCfg?.CURRENT_THEME
           ?? sceneCfg?.DEFAULT_THEME
           ?? null;
-      const preferredPlayerDeck = normalizeDeckEntries(getPreferredDeckInput(normalized) ?? []);
+      const preferredDeckInput = getPreferredDeckInput(normalized);
+      const preferredPlayerDeck = preferredDeckInput
+          ? normalizeDeckEntries(preferredDeckInput)
+          : EMPTY_UNIT_DECK;
       const hasPreferredDeck = preferredPlayerDeck.length > 0;
-      const autoPlayerDeck = hasPreferredDeck ? [] : buildAutoPlayerDeckFromCollection(unitProgressById);
-      const fallbackDeck = DEFAULT_UNIT_ROSTER.slice(0, AUTO_PLAYER_DECK_SIZE);
+      const autoPlayerDeck = hasPreferredDeck ? EMPTY_UNIT_DECK : buildAutoPlayerDeckFromCollection(unitProgressById);
       const lockedPlayerDeck = hasPreferredDeck
           ? preferredPlayerDeck
-          : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackDeck.slice(0, 1));
+          : (autoPlayerDeck.length > 0 ? autoPlayerDeck : DEFAULT_SINGLE_UNIT_DECK);
       const allyUnits = lockedPlayerDeck.length
           ? [...lockedPlayerDeck]
           : [...DEFAULT_UNIT_ROSTER];
@@ -19524,7 +19530,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       const enemyUnits = resolveEnemyUnits({
           aiPreset: enemyPreset,
           preferredDeck: hasPreferredDeck ? preferredPlayerDeck : autoPlayerDeck,
-          fallbackDeck: fallbackDeck,
+          fallbackDeck: DEFAULT_FALLBACK_DECK,
           unitProgressById,
           collectionState: normalized.collectionState ?? null,
       });

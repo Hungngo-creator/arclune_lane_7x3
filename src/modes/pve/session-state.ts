@@ -58,7 +58,10 @@ export type NormalizedSessionConfig = (CreateSessionOptions & {
   backgroundKey?: string;
 }) & Record<string, unknown>;
 
-function normalizeDeckField(config: NormalizedSessionConfig, key: 'lineupDeck' | 'playerDeck' | 'deck'): void {
+const NORMALIZABLE_DECK_FIELDS = ['lineupDeck', 'playerDeck', 'deck'] as const;
+type NormalizableDeckField = (typeof NORMALIZABLE_DECK_FIELDS)[number];
+
+function normalizeDeckField(config: NormalizedSessionConfig, key: NormalizableDeckField): void {
   const value = config[key];
   if (Array.isArray(value)) {
     config[key] = normalizeDeckEntries(value);
@@ -74,9 +77,10 @@ export function getPreferredDeckInput(config: {
   playerDeck?: unknown;
   deck?: unknown;
 }): ReadonlyArray<unknown> | null {
-  if (hasDeckEntries(config.lineupDeck)) return config.lineupDeck;
-  if (hasDeckEntries(config.playerDeck)) return config.playerDeck;
-  if (hasDeckEntries(config.deck)) return config.deck;
+  for (const key of NORMALIZABLE_DECK_FIELDS) {
+    const value = config[key];
+    if (hasDeckEntries(value)) return value;
+  }
   return null;
 }
 
@@ -129,6 +133,9 @@ interface ResolveEnemyUnitsOptions {
 
 const EMPTY_UNIT_PROGRESS = new Map<string, RuntimeUnitProgress>();
 const AUTO_PLAYER_DECK_SIZE = 10;
+const EMPTY_UNIT_DECK = [] as SessionState['unitsAll'];
+const DEFAULT_FALLBACK_DECK = DEFAULT_UNIT_ROSTER.slice(0, AUTO_PLAYER_DECK_SIZE) as SessionState['unitsAll'];
+const DEFAULT_SINGLE_UNIT_DECK = DEFAULT_FALLBACK_DECK.slice(0, 1) as SessionState['unitsAll'];
 
 export function parseFiniteNumber(value: unknown): number | null {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
@@ -369,9 +376,9 @@ export function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessi
     if (typeof sceneConfig.backgroundKey === 'string') out.backgroundKey = sceneConfig.backgroundKey;
     else if (typeof sceneConfig.background === 'string') out.backgroundKey = sceneConfig.background;
   }
-  normalizeDeckField(out, 'lineupDeck');
-  normalizeDeckField(out, 'playerDeck');
-  normalizeDeckField(out, 'deck');
+  for (const field of NORMALIZABLE_DECK_FIELDS) {
+    normalizeDeckField(out, field);
+  }
   if (typeof out.collectionState === 'undefined') {
     out.collectionState = null;
   }
@@ -517,13 +524,15 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     ?? sceneCfg?.DEFAULT_THEME
     ?? null;
 
-  const preferredPlayerDeck = normalizeDeckEntries(getPreferredDeckInput(normalized) ?? []);
+  const preferredDeckInput = getPreferredDeckInput(normalized);
+  const preferredPlayerDeck = preferredDeckInput
+    ? normalizeDeckEntries(preferredDeckInput)
+    : EMPTY_UNIT_DECK;
   const hasPreferredDeck = preferredPlayerDeck.length > 0;
-  const autoPlayerDeck = hasPreferredDeck ? [] : buildAutoPlayerDeckFromCollection(unitProgressById);
-  const fallbackDeck = DEFAULT_UNIT_ROSTER.slice(0, AUTO_PLAYER_DECK_SIZE) as SessionState['unitsAll'];
+  const autoPlayerDeck = hasPreferredDeck ? EMPTY_UNIT_DECK : buildAutoPlayerDeckFromCollection(unitProgressById);
   const lockedPlayerDeck = hasPreferredDeck
     ? preferredPlayerDeck
-    : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackDeck.slice(0, 1));
+    : (autoPlayerDeck.length > 0 ? autoPlayerDeck : DEFAULT_SINGLE_UNIT_DECK);
 
   const allyUnits: SessionState['unitsAll'] = lockedPlayerDeck.length
     ? [...lockedPlayerDeck]
@@ -533,7 +542,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
   const enemyUnits = resolveEnemyUnits({
     aiPreset: enemyPreset,
     preferredDeck: hasPreferredDeck ? preferredPlayerDeck : autoPlayerDeck,
-    fallbackDeck: fallbackDeck,
+    fallbackDeck: DEFAULT_FALLBACK_DECK,
     unitProgressById,
     collectionState: normalized.collectionState ?? null,
   });
