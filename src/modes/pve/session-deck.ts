@@ -1,8 +1,12 @@
 import { pickRandom } from '../../engine';
+import { cellReserved, slotIndex } from '../../engine';
+import { predictSpawnCycle } from '../../turns';
+import { getUnitArt } from '../../art';
 
 import type { SessionState } from '@shared-types/pve';
 import type { PveDeckEntry } from '@shared-types/combat';
 import type { SummonBarHandles } from '@shared-types/ui';
+import type { UnitToken, QueuedSummonRequest } from '@shared-types/units';
 
 type DeckEntry = PveDeckEntry;
 
@@ -19,13 +23,10 @@ type DeckFilterCache = {
 
 type SessionDeckDeps = {
   getGame: () => SessionState | null;
+  getAliveTokens: () => UnitToken[];
   handSize: number;
   isUniqueGlobalSummonBlocked: (game: SessionState, card: DeckEntry) => boolean;
-  queueSummonFromDeckSelection: (params: {
-    game: SessionState;
-    card: DeckEntry;
-    cell: { cx: number; cy: number };
-  }) => boolean;
+  onQueuedSummon: (game: SessionState) => void;
 };
 
 type SessionDeckController = {
@@ -211,6 +212,50 @@ export const createSessionDeckController = (deps: SessionDeckDeps): SessionDeckC
     return Number.isFinite(parsed) ? parsed : 0;
   };
 
+  const queueSummonFromDeckSelection = ({
+    game,
+    card,
+    cell,
+  }: {
+    game: SessionState;
+    card: DeckEntry;
+    cell: { cx: number; cy: number };
+  }): boolean => {
+    if (cellReserved(deps.getAliveTokens(), game.queued, cell.cx, cell.cy)) return false;
+    const cardCost = getCardCost(card);
+    if (game.cost < cardCost) return false;
+    if (game.summoned >= game.summonLimit) return false;
+
+    const slot = slotIndex('ally', cell.cx, cell.cy);
+    if (game.queued.ally.has(slot)) return false;
+
+    const spawnCycle = predictSpawnCycle(game, 'ally', slot);
+    const pendingArt = getUnitArt(card.id);
+    const pending: QueuedSummonRequest & {
+      art?: ReturnType<typeof getUnitArt> | null;
+      skinKey?: string | null;
+    } = {
+      unitId: card.id,
+      name: typeof card.name === 'string' ? card.name : null,
+      side: 'ally',
+      cx: cell.cx,
+      cy: cell.cy,
+      slot,
+      spawnCycle,
+      source: 'deck',
+      color: pendingArt?.palette?.primary || '#a9f58c',
+      art: pendingArt ?? null,
+      skinKey: pendingArt?.skinKey ?? null,
+    };
+    game.queued.ally.set(slot, pending);
+
+    game.cost = Math.max(0, game.cost - cardCost);
+    game.summoned += 1;
+    game.usedUnitIds.add(card.id);
+    deps.onQueuedSummon(game);
+    return true;
+  };
+
   const selectFirstAffordable = (): void => {
     const game = deps.getGame();
     if (!game) return;
@@ -321,7 +366,7 @@ export const createSessionDeckController = (deps: SessionDeckDeps): SessionDeckC
     const card = deck[selectedIndex];
     if (!card || !isCardInLockedDeck(card.id, game)) return false;
     if (deps.isUniqueGlobalSummonBlocked(game, card)) return false;
-    if (!deps.queueSummonFromDeckSelection({ game, card, cell })) return false;
+    if (!queueSummonFromDeckSelection({ game, card, cell })) return false;
 
     game.deck3 = removeDeckEntryAtIndex(deck, selectedIndex);
     game.selectedId = null;

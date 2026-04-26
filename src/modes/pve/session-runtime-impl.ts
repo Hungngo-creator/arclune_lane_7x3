@@ -1,5 +1,5 @@
 import { globalAetherPool } from '../../aether';
-import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns';
+import { stepTurn, doActionOrSkip } from '../../turns';
 import { enqueueImmediate, processActionChain } from '../../summon';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai';
 import { Statuses, makeStatusEffect } from '../../statuses';
@@ -667,46 +667,15 @@ let Game: SessionState | null = null;
 let sessionLoopController: ReturnType<typeof createSessionLoopController> | null = null;
 const sessionDeckController = createSessionDeckController({
   getGame: () => Game,
+  getAliveTokens: () => getAliveTokensScratch(),
   handSize: HAND_SIZE,
   isUniqueGlobalSummonBlocked: (game, card) => (
     isUniqueGlobalSummonBlocked(game, { unitId: card.id, tags: card.tags ?? null })
   ),
-  queueSummonFromDeckSelection: ({ game, card, cell }) => {
-    if (cellReserved(getAliveTokensScratch(), game.queued, cell.cx, cell.cy)) return false;
-    const cardCost = getCardCost(card);
-    if (game.cost < cardCost) return false;
-    if (game.summoned >= game.summonLimit) return false;
-
-    const slot = slotIndex('ally', cell.cx, cell.cy);
-    if (game.queued.ally.has(slot)) return false;
-
-    const spawnCycle = predictSpawnCycle(game, 'ally', slot);
-    const pendingArt = getUnitArt(card.id);
-    const pending: QueuedSummonRequest & {
-      art?: ReturnType<typeof getUnitArt> | null;
-      skinKey?: string | null;
-    } = {
-      unitId: card.id,
-      name: typeof card.name === 'string' ? card.name : null,
-      side: 'ally',
-      cx: cell.cx,
-      cy: cell.cy,
-      slot,
-      spawnCycle,
-      source: 'deck',
-      color: pendingArt?.palette?.primary || '#a9f58c',
-      art: pendingArt ?? null,
-      skinKey: pendingArt?.skinKey ?? null,
-    };
-    game.queued.ally.set(slot, pending);
-
-    game.cost = Math.max(0, game.cost - cardCost);
+  onQueuedSummon: (game) => {
     if (hud) hud.update(game);
-    game.summoned += 1;
-    game.usedUnitIds.add(card.id);
     scheduleDraw();
-    return true;
-  },
+  };
 });
 const {
   ensureDeck,
