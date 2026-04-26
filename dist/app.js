@@ -14922,6 +14922,13 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       if (cached) {
           return cached;
       }
+      const hasDirectTags = Array.isArray(ult.tags) && ult.tags.length > 0;
+      const hasMetaTags = Array.isArray(ult.meta?.tags) && ult.meta.tags.length > 0;
+      const hasMetadataTags = Array.isArray(ult.metadata?.tags) && ult.metadata.tags.length > 0;
+      if (!hasDirectTags && !hasMetaTags && !hasMetadataTags) {
+          ULT_TAG_CACHE.set(ult, []);
+          return [];
+      }
       const rawUltTags = [];
       appendUltTags(rawUltTags, ult.tags);
       appendUltTags(rawUltTags, ult.meta?.tags);
@@ -18927,7 +18934,8 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   }
   function getMutableRewardList(container, key) {
       const store = container;
-      const list = toSanitizedRewardList(store[key]);
+      const source = store[key];
+      const list = Array.isArray(source) ? toSanitizedRewardList(source) : [];
       store[key] = list;
       return list;
   }
@@ -18972,17 +18980,19 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       }
       return list;
   }
-  function removeRewardById(list, rewardId) {
+  function findRewardIndexById(list, rewardId) {
       if (!list.length)
-          return list;
-      let removeIndex = -1;
+          return -1;
       for (let index = 0; index < list.length; index += 1) {
           const entry = list[index];
           if (!entry || entry.id !== rewardId)
               continue;
-          removeIndex = index;
-          break;
+          return index;
       }
+      return -1;
+  }
+  function removeRewardById(list, rewardId) {
+      const removeIndex = findRewardIndexById(list, rewardId);
       if (removeIndex < 0)
           return list;
       for (let index = removeIndex + 1; index < list.length; index += 1) {
@@ -19027,8 +19037,12 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               encounter.waveIndex = index + 1;
               const rewards = toSanitizedRewardList(wave.rewards);
               if (rewards.length) {
-                  mergeRewardsInPlace(getMutableRewardList(encounter, 'pendingRewards'), rewards);
-                  mergeRewardsInPlace(getMutableRewardList(runtime, 'rewardQueue'), rewards);
+                  const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
+                  const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
+                  mergeRewardsInPlace(pendingRewards, rewards);
+                  if (rewardQueue !== pendingRewards) {
+                      mergeRewardsInPlace(rewardQueue, rewards);
+                  }
               }
               break;
           }
@@ -19228,7 +19242,11 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
               return b.score - a.score;
           return a.unitId.localeCompare(b.unitId);
       });
-      const pickedIds = ranked.slice(0, AUTO_PLAYER_DECK_SIZE).map((entry) => entry.unitId);
+      const limit = Math.min(AUTO_PLAYER_DECK_SIZE, ranked.length);
+      const pickedIds = new Array(limit);
+      for (let index = 0; index < limit; index += 1) {
+          pickedIds[index] = ranked[index].unitId;
+      }
       return normalizeDeckEntries(pickedIds);
   }
   function normalizePositiveLimit(value, fallback) {
@@ -19263,9 +19281,8 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       if (Array.isArray(preset?.unitsAll) && preset.unitsAll.length) {
           return normalizeDeckEntries(preset.unitsAll);
       }
-      const lineupDeck = normalizeDeckEntries(options.preferredDeck
-          ?? options.fallbackDeck
-          ?? []);
+      const deckInput = options.preferredDeck ?? options.fallbackDeck ?? [];
+      const lineupDeck = normalizeDeckEntries(deckInput);
       const progressById = options.unitProgressById
           ?? (lineupDeck.length > 0
               ? mapUnitProgressById(options.collectionState ?? null)

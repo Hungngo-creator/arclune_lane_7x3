@@ -60,7 +60,8 @@ function getMutableRewardList(
   key: RewardListKey,
 ): MutableRewardList {
   const store = container as unknown as Record<string, unknown>;
-  const list = toSanitizedRewardList(store[key]);
+  const source = store[key];
+  const list = Array.isArray(source) ? toSanitizedRewardList(source) : [];
   store[key] = list;
   return list;
 }
@@ -104,15 +105,18 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
   return list;
 }
 
-function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
-  if (!list.length) return list;
-  let removeIndex = -1;
+function findRewardIndexById(list: MutableRewardList, rewardId: string): number {
+  if (!list.length) return -1;
   for (let index = 0; index < list.length; index += 1) {
     const entry = list[index];
     if (!entry || entry.id !== rewardId) continue;
-    removeIndex = index;
-    break;
+    return index;
   }
+  return -1;
+}
+
+function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
+  const removeIndex = findRewardIndexById(list, rewardId);
   if (removeIndex < 0) return list;
   for (let index = removeIndex + 1; index < list.length; index += 1) {
     list[index - 1] = list[index] as RewardRoll;
@@ -158,8 +162,12 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
       encounter.waveIndex = index + 1;
       const rewards = toSanitizedRewardList(wave.rewards);
       if (rewards.length) {
-        mergeRewardsInPlace(getMutableRewardList(encounter, 'pendingRewards'), rewards);
-        mergeRewardsInPlace(getMutableRewardList(runtime, 'rewardQueue'), rewards);
+        const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
+        const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
+        mergeRewardsInPlace(pendingRewards, rewards);
+        if (rewardQueue !== pendingRewards) {
+          mergeRewardsInPlace(rewardQueue, rewards);
+        }
       }
       break;
     }

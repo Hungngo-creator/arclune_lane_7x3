@@ -226,6 +226,13 @@ const getNormalizedUltTags = (ult: UltSpec): ReadonlyArray<string> => {
   if (cached) {
     return cached;
   }
+  const hasDirectTags = Array.isArray(ult.tags) && ult.tags.length > 0;
+  const hasMetaTags = Array.isArray(ult.meta?.tags) && ult.meta.tags.length > 0;
+  const hasMetadataTags = Array.isArray(ult.metadata?.tags) && ult.metadata.tags.length > 0;
+  if (!hasDirectTags && !hasMetaTags && !hasMetadataTags) {
+    ULT_TAG_CACHE.set(ult, []);
+    return [];
+  }
   const rawUltTags: string[] = [];
   appendUltTags(rawUltTags, ult.tags);
   appendUltTags(rawUltTags, ult.meta?.tags);

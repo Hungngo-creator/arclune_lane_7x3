@@ -176,7 +176,11 @@ function buildAutoPlayerDeckFromCollection(
     if (b.score !== a.score) return b.score - a.score;
     return a.unitId.localeCompare(b.unitId);
   });
-  const pickedIds = ranked.slice(0, AUTO_PLAYER_DECK_SIZE).map((entry) => entry.unitId);
+  const limit = Math.min(AUTO_PLAYER_DECK_SIZE, ranked.length);
+  const pickedIds = new Array<string>(limit);
+  for (let index = 0; index < limit; index += 1) {
+    pickedIds[index] = ranked[index]!.unitId;
+  }
   return normalizeDeckEntries(pickedIds);
 }
 
@@ -213,12 +217,8 @@ export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionSta
   if (Array.isArray(preset?.unitsAll) && preset.unitsAll.length) {
     return normalizeDeckEntries(preset.unitsAll);
   }
-
-  const lineupDeck = normalizeDeckEntries(
-    options.preferredDeck
-    ?? options.fallbackDeck
-    ?? [],
-  );
+  const deckInput = options.preferredDeck ?? options.fallbackDeck ?? [];
+  const lineupDeck = normalizeDeckEntries(deckInput);
   const progressById = options.unitProgressById
     ?? (lineupDeck.length > 0
       ? mapUnitProgressById(options.collectionState ?? null)

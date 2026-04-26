@@ -496,7 +496,7 @@ ultimate: đánh thường 3 lần ( bị ảnh hưởng bởi buff/debuff/skill
 đánh thường: gây sát thương = 100% will/atk.
 
 42) Phoebe
-ssr, mage
+ssr, mage element tag:light
 nội tại: +3,5% wil/res và 1,5% max hp (không hồi hp) của hiện tại/ mỗi turn hiện diện trên sân. reset về từ đầu khi chết hoặc về deck, rời sân.
 
 skill 1: mỗi khi đánh thường giảm 10% res/arm của kẻ địch trong 1 turn, skill này luôn kích hoạt cho đến khi không đủ aether, 3 aether/turn bất kể đánh thường bao nhiêu lần/turn.
