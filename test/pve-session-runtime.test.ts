@@ -1,4 +1,11 @@
-import { advanceSession, applyReward, onSessionEvent } from '../src/modes/pve/session-runtime.ts';
+import {
+  ACTION_END,
+  advanceSession,
+  applyReward,
+  createPveSession,
+  emitGameEvent,
+  onSessionEvent,
+} from '../src/modes/pve/session-runtime.ts';
 
 describe('pve session runtime reward + wave flow', () => {
   test('advanceSession chuyển wave và đồng bộ rewardQueue/pendingRewards với dữ liệu đã sanitize', () => {
@@ -121,9 +128,93 @@ describe('pve session runtime reward + wave flow', () => {
     expect(() => unsub()).not.toThrow();
   });
 
+test('event forwarding qua createPveSession.onEvent và unsubscribe hoạt động thật', () => {
+    const session = createPveSession(null as any, {});
+    const seen: string[] = [];
+    const off = session.onEvent(ACTION_END, () => {
+      seen.push('called');
+    });
+
+    emitGameEvent(ACTION_END, {} as any);
+    expect(seen).toHaveLength(1);
+
+    off();
+    emitGameEvent(ACTION_END, {} as any);
+    expect(seen).toHaveLength(1);
+});
+
   test('advanceSession trả null khi thiếu runtime hoặc encounter', () => {
     expect(advanceSession(null)).toBeNull();
     expect(advanceSession({} as any)).toBeNull();
     expect(advanceSession({ runtime: {} } as any)).toBeNull();
   });
 });
+
+test('idempotency: tick nhiều lần sau completed không làm drift state', () => {
+    const reward = { id: 'gold', weight: 1, tier: 1 };
+    const session: any = {
+      runtime: {
+        rewardQueue: [],
+        wave: null,
+        encounter: {
+          status: 'running',
+          waveIndex: 0,
+          pendingRewards: [],
+          waves: [{ status: 'active', rewards: [reward] }],
+        },
+      },
+    };
+
+    const first = advanceSession(session);
+    expect(first?.status).toBe('completed');
+    expect(session.runtime.rewardQueue).toEqual([reward]);
+    expect(session.runtime.encounter.pendingRewards).toEqual([reward]);
+
+    for (let tick = 0; tick < 10; tick += 1) {
+      const next = advanceSession(session);
+      expect(next?.status).toBe('completed');
+      expect(session.runtime.rewardQueue).toEqual([reward]);
+      expect(session.runtime.encounter.pendingRewards).toEqual([reward]);
+      expect(session.runtime.wave).toBeNull();
+      expect(session.runtime.encounter.waveIndex).toBe(1);
+    }
+  });
+
+  test('regression nhỏ: merge reward path lớn giữ đúng unique id và override mới nhất', () => {
+    const size = 2500;
+    const existing = Array.from({ length: size }, (_, index) => ({
+      id: `reward_${index}`,
+      weight: 1,
+      tier: 1,
+    }));
+    const additions = Array.from({ length: size }, (_, index) => ({
+      id: `reward_${index}`,
+      weight: 2,
+      tier: 2,
+    }));
+    additions.push({ id: 'bonus_drop', weight: 5, tier: 3 });
+
+    const session: any = {
+      runtime: {
+        rewardQueue: existing,
+        encounter: {
+          status: 'running',
+          waveIndex: 0,
+          pendingRewards: existing.slice(),
+          waves: [{ status: 'active', rewards: additions }],
+        },
+      },
+    };
+
+    const startedAt = Date.now();
+    const encounter = advanceSession(session);
+    const elapsedMs = Date.now() - startedAt;
+
+    expect(encounter?.status).toBe('completed');
+    expect(session.runtime.rewardQueue).toHaveLength(size + 1);
+    expect(session.runtime.rewardQueue.find((item: any) => item.id === 'reward_0')?.tier).toBe(2);
+    expect(session.runtime.rewardQueue.find((item: any) => item.id === 'bonus_drop')?.tier).toBe(3);
+    expect(session.runtime.encounter.pendingRewards).toHaveLength(size + 1);
+    // Guard regression cơ bản, tránh đặt ngưỡng quá chặt gây flaky theo môi trường CI.
+    expect(elapsedMs).toBeLessThan(2000);
+  });

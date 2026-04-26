@@ -14890,8 +14890,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const ensureSceneCache = __dep25.ensureSceneCache;
   const getCamPresetSignature = __dep25.getCamPresetSignature;
   const clearBackgroundSignatureCache = __dep25.clearBackgroundSignatureCache;
-  const normalizeDeckEntries = __dep25.normalizeDeckEntries;
-  const getPreferredDeckInput = __dep25.getPreferredDeckInput;
+  const getPreferredDeckEntries = __dep25.getPreferredDeckEntries;
   const resolveEnemyUnits = __dep25.resolveEnemyUnits;
   const parseFiniteNumber = __dep25.parseFiniteNumber;
   const __dep26 = __require('./modes/pve/collection-mapper.ts');
@@ -18799,19 +18798,16 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       if (typeof cfg.modeKey !== 'undefined') {
           game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
       }
-      const preferredDeckInput = getPreferredDeckInput(cfg);
-      if (preferredDeckInput) {
-          const deck = normalizeDeckEntries(preferredDeckInput);
-          if (deck.length) {
-              game.unitsAll = deck;
-              game.playerDeckLocked = deck;
-              invalidateLockedDeckCache();
-              game.deck3 = ensureDeck(game);
-              if (game.selectedId && !isCardInLockedDeck(game.selectedId, game)) {
-                  game.selectedId = null;
-              }
-              refillDeck();
+      const preferredDeck = getPreferredDeckEntries(cfg);
+      if (preferredDeck.length) {
+          game.unitsAll = preferredDeck;
+          game.playerDeckLocked = preferredDeck;
+          invalidateLockedDeckCache();
+          game.deck3 = ensureDeck(game);
+          if (game.selectedId && !isCardInLockedDeck(game.selectedId, game)) {
+              game.selectedId = null;
           }
+          refillDeck();
       }
       let collectionProgressById = null;
       if (typeof cfg.collectionState !== 'undefined') {
@@ -18823,7 +18819,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           const preset = cfg.aiPreset;
           const enemyUnits = resolveEnemyUnits({
               aiPreset: preset,
-              preferredDeck: preferredDeckInput,
+              preferredDeck,
               fallbackDeck: game.playerDeckLocked ?? game.unitsAll ?? [],
               ...(collectionProgressById
                   ? { unitProgressById: collectionProgressById }
@@ -18908,6 +18904,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   const NOOP_UNSUBSCRIBE = () => { };
   const SMALL_REWARD_MERGE_SIZE = 6;
   const SANITIZED_REWARD_LIST = Symbol('sanitized-reward-list');
+  const REWARD_INDEX_BY_ID = Symbol('reward-index-by-id');
   function isReward(entry) {
       if (!entry || typeof entry !== 'object')
           return false;
@@ -18938,6 +18935,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           value: true,
           configurable: true,
       });
+      list[REWARD_INDEX_BY_ID] = undefined;
       return list;
   }
   function getMutableRewardList(container, key) {
@@ -18953,13 +18951,18 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       if (!additions.length)
           return list;
       const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
-      const indexById = useIndexedMerge ? new Map() : null;
+      const indexById = useIndexedMerge
+          ? (list[REWARD_INDEX_BY_ID] ?? new Map())
+          : null;
       if (indexById) {
-          for (let index = 0; index < list.length; index += 1) {
-              const entry = list[index];
-              if (entry)
-                  indexById.set(entry.id, index);
+          if (indexById.size === 0) {
+              for (let index = 0; index < list.length; index += 1) {
+                  const entry = list[index];
+                  if (entry)
+                      indexById.set(entry.id, index);
+              }
           }
+          list[REWARD_INDEX_BY_ID] = indexById;
       }
       for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
           const reward = additions[addIndex];
@@ -18992,6 +18995,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       for (let index = 0; index < list.length; index += 1) {
           if (list[index]?.id === rewardId) {
               list.splice(index, 1);
+              list[REWARD_INDEX_BY_ID] = undefined;
               break;
           }
       }
@@ -19000,10 +19004,10 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   function syncWaveRewards(runtime, encounter, rewards) {
       const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
       const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
-      if (rewardQueue !== pendingRewards) {
-          mergeRewardsInPlace(pendingRewards, rewards);
-      }
-      mergeRewardsInPlace(rewardQueue, rewards);
+      const mergedRewardQueue = mergeRewardsInPlace(rewardQueue, rewards);
+      encounter.pendingRewards = rewardQueue === pendingRewards
+          ? mergedRewardQueue
+          : mergeRewardsInPlace(pendingRewards, rewards);
   }
   function removeRewardEverywhere(runtime, rewardId) {
       removeRewardById(getMutableRewardList(runtime, 'rewardQueue'), rewardId);
@@ -19076,7 +19080,8 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   }
   function createPveSession(rootEl, options = {}) {
       const controller = createPveSessionImpl(rootEl, options);
-      return Object.assign(controller, { onEvent: onSessionEvent });
+      controller.onEvent = onSessionEvent;
+      return controller;
   }
   const __reexport0 = __require('./events.ts');
   exports.__resolveStatusIconPreview = __resolveStatusIconPreview;
@@ -19169,6 +19174,11 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       }
       return true;
   }
+  function toDeckEntries(value) {
+      if (!hasDeckEntries(value))
+          return EMPTY_UNIT_DECK;
+      return isNormalizedDeckEntries(value) ? value : normalizeDeckEntries(value);
+  }
   function getPreferredDeckInput(config) {
       for (const key of NORMALIZABLE_DECK_FIELDS) {
           const value = config[key];
@@ -19176,6 +19186,9 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
               return value;
       }
       return null;
+  }
+  function getPreferredDeckEntries(config) {
+      return toDeckEntries(getPreferredDeckInput(config));
   }
   const TURN_ORDER_FALLBACK_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   function getSceneConfig(cfg) {
@@ -19294,9 +19307,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           return normalizeDeckEntries(preset.unitsAll);
       }
       const deckInput = options.preferredDeck ?? options.fallbackDeck;
-      const lineupDeck = hasDeckEntries(deckInput)
-          ? (isNormalizedDeckEntries(deckInput) ? deckInput : normalizeDeckEntries(deckInput))
-          : EMPTY_UNIT_DECK;
+      const lineupDeck = toDeckEntries(deckInput);
       const progressById = options.unitProgressById
           ?? (lineupDeck.length > 0
               ? mapUnitProgressById(options.collectionState ?? null)
@@ -19540,10 +19551,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           ?? sceneCfg?.CURRENT_THEME
           ?? sceneCfg?.DEFAULT_THEME
           ?? null;
-      const preferredDeckInput = getPreferredDeckInput(normalized);
-      const preferredPlayerDeck = preferredDeckInput
-          ? (isNormalizedDeckEntries(preferredDeckInput) ? preferredDeckInput : normalizeDeckEntries(preferredDeckInput))
-          : EMPTY_UNIT_DECK;
+      const preferredPlayerDeck = getPreferredDeckEntries(normalized);
       const hasPreferredDeck = preferredPlayerDeck.length > 0;
       const autoPlayerDeck = hasPreferredDeck ? EMPTY_UNIT_DECK : buildAutoPlayerDeckFromCollection(unitProgressById);
       const lockedPlayerDeck = hasPreferredDeck
@@ -19851,6 +19859,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getPreferredDeckInput')) exports.getPreferredDeckInput = getPreferredDeckInput;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getPreferredDeckEntries')) exports.getPreferredDeckEntries = getPreferredDeckEntries;
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseFiniteNumber')) exports.parseFiniteNumber = parseFiniteNumber;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveEnemyUnits')) exports.resolveEnemyUnits = resolveEnemyUnits;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCamPresetSignature')) exports.getCamPresetSignature = getCamPresetSignature;

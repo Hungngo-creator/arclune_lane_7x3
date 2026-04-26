@@ -81,6 +81,11 @@ function isNormalizedDeckEntries(value: unknown): value is SessionState['unitsAl
   return true;
 }
 
+function toDeckEntries(value: unknown): SessionState['unitsAll'] {
+  if (!hasDeckEntries(value)) return EMPTY_UNIT_DECK;
+  return isNormalizedDeckEntries(value) ? value : normalizeDeckEntries(value);
+}
+
 export function getPreferredDeckInput(config: {
   lineupDeck?: unknown;
   playerDeck?: unknown;
@@ -91,6 +96,14 @@ export function getPreferredDeckInput(config: {
     if (hasDeckEntries(value)) return value;
   }
   return null;
+}
+
+export function getPreferredDeckEntries(config: {
+  lineupDeck?: unknown;
+  playerDeck?: unknown;
+  deck?: unknown;
+}): SessionState['unitsAll'] {
+  return toDeckEntries(getPreferredDeckInput(config));
 }
 
 type TurnOrderEntry = { side: Side; slot: number };
@@ -234,9 +247,7 @@ export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionSta
     return normalizeDeckEntries(preset.unitsAll);
   }
   const deckInput = options.preferredDeck ?? options.fallbackDeck;
-  const lineupDeck = hasDeckEntries(deckInput)
-    ? (isNormalizedDeckEntries(deckInput) ? deckInput : normalizeDeckEntries(deckInput))
-    : EMPTY_UNIT_DECK;
+  const lineupDeck = toDeckEntries(deckInput);
   const progressById = options.unitProgressById
     ?? (lineupDeck.length > 0
       ? mapUnitProgressById(options.collectionState ?? null)
@@ -535,10 +546,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     ?? sceneCfg?.DEFAULT_THEME
     ?? null;
 
-  const preferredDeckInput = getPreferredDeckInput(normalized);
-  const preferredPlayerDeck = preferredDeckInput
-    ? (isNormalizedDeckEntries(preferredDeckInput) ? preferredDeckInput : normalizeDeckEntries(preferredDeckInput))
-    : EMPTY_UNIT_DECK;
+  const preferredPlayerDeck = getPreferredDeckEntries(normalized);
   const hasPreferredDeck = preferredPlayerDeck.length > 0;
   const autoPlayerDeck = hasPreferredDeck ? EMPTY_UNIT_DECK : buildAutoPlayerDeckFromCollection(unitProgressById);
   const lockedPlayerDeck = hasPreferredDeck

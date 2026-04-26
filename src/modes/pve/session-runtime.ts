@@ -22,8 +22,12 @@ type RewardListKey = 'rewardQueue' | 'pendingRewards';
 const NOOP_UNSUBSCRIBE = (): void => {};
 const SMALL_REWARD_MERGE_SIZE = 6;
 const SANITIZED_REWARD_LIST = Symbol('sanitized-reward-list');
+const REWARD_INDEX_BY_ID = Symbol('reward-index-by-id');
 
-type SanitizedRewardList = MutableRewardList & { [SANITIZED_REWARD_LIST]?: true };
+type SanitizedRewardList = MutableRewardList & {
+  [SANITIZED_REWARD_LIST]?: true;
+  [REWARD_INDEX_BY_ID]?: Map<string, number>;
+};
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   if (!entry || typeof entry !== 'object') return false;
@@ -48,6 +52,7 @@ function sanitizeRewardListInPlace(list: SanitizedRewardList): SanitizedRewardLi
     value: true,
     configurable: true,
   });
+  list[REWARD_INDEX_BY_ID] = undefined;
   return list;
 }
 
@@ -64,12 +69,17 @@ function getMutableRewardList(container: RewardListContainer, key: RewardListKey
 function mergeRewardsInPlace(list: SanitizedRewardList, additions: RewardList): SanitizedRewardList {
   if (!additions.length) return list;
   const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
-  const indexById = useIndexedMerge ? new Map<string, number>() : null;
+  const indexById = useIndexedMerge
+    ? (list[REWARD_INDEX_BY_ID] ?? new Map<string, number>())
+    : null;
   if (indexById) {
-    for (let index = 0; index < list.length; index += 1) {
-      const entry = list[index];
-      if (entry) indexById.set(entry.id, index);
+    if (indexById.size === 0) {
+      for (let index = 0; index < list.length; index += 1) {
+        const entry = list[index];
+        if (entry) indexById.set(entry.id, index);
+      }
     }
+    list[REWARD_INDEX_BY_ID] = indexById;
   }
 
   for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
@@ -101,6 +111,7 @@ function removeRewardById(list: SanitizedRewardList, rewardId: string): Sanitize
   for (let index = 0; index < list.length; index += 1) {
     if (list[index]?.id === rewardId) {
       list.splice(index, 1);
+      list[REWARD_INDEX_BY_ID] = undefined;
       break;
     }
   }
@@ -110,10 +121,10 @@ function removeRewardById(list: SanitizedRewardList, rewardId: string): Sanitize
 function syncWaveRewards(runtime: SessionRuntimeState, encounter: EncounterState, rewards: RewardList): void {
   const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
   const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
-  if (rewardQueue !== pendingRewards) {
-    mergeRewardsInPlace(pendingRewards, rewards);
-  }
-  mergeRewardsInPlace(rewardQueue, rewards);
+  const mergedRewardQueue = mergeRewardsInPlace(rewardQueue, rewards);
+  encounter.pendingRewards = rewardQueue === pendingRewards
+    ? mergedRewardQueue
+    : mergeRewardsInPlace(pendingRewards, rewards);
 }
 
 function removeRewardEverywhere(runtime: SessionRuntimeState, rewardId: string): void {
@@ -201,8 +212,9 @@ export function createPveSession(
   rootEl: Parameters<typeof createPveSessionImpl>[0],
   options: Parameters<typeof createPveSessionImpl>[1] = {},
 ): ControllerWithEvents {
-  const controller = createPveSessionImpl(rootEl, options);
-  return Object.assign(controller, { onEvent: onSessionEvent });
+  const controller = createPveSessionImpl(rootEl, options) as ControllerWithEvents;
+  controller.onEvent = onSessionEvent;
+  return controller;
 }
 
 export { __getStoredConfig, __getActiveGame };

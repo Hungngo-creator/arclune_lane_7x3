@@ -63,8 +63,7 @@ import {
   ensureSceneCache,
   getCamPresetSignature,
   clearBackgroundSignatureCache,
-  normalizeDeckEntries,
-  getPreferredDeckInput,
+  getPreferredDeckEntries,
   resolveEnemyUnits,
   parseFiniteNumber,
 } from './session-state';
@@ -4333,19 +4332,16 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
   if (typeof cfg.modeKey !== 'undefined'){
     game.modeKey = typeof cfg.modeKey === 'string' ? cfg.modeKey : (cfg.modeKey || null);
   }
-  const preferredDeckInput = getPreferredDeckInput(cfg);
-  if (preferredDeckInput) {
-    const deck = normalizeDeckEntries(preferredDeckInput);
-    if (deck.length) {
-      game.unitsAll = deck;
-      game.playerDeckLocked = deck;
-      invalidateLockedDeckCache();
-      game.deck3 = ensureDeck(game);
-      if (game.selectedId && !isCardInLockedDeck(game.selectedId, game)) {
-        game.selectedId = null;
-      }
-      refillDeck();
+  const preferredDeck = getPreferredDeckEntries(cfg);
+  if (preferredDeck.length) {
+    game.unitsAll = preferredDeck;
+    game.playerDeckLocked = preferredDeck;
+    invalidateLockedDeckCache();
+    game.deck3 = ensureDeck(game);
+    if (game.selectedId && !isCardInLockedDeck(game.selectedId, game)) {
+      game.selectedId = null;
     }
+    refillDeck();
   }
   let collectionProgressById: Map<string, RuntimeUnitProgress> | null = null;
   if (typeof cfg.collectionState !== 'undefined'){
@@ -4357,7 +4353,7 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
     const preset: EnemyAIPreset = cfg.aiPreset;
     const enemyUnits = resolveEnemyUnits({
       aiPreset: preset,
-      preferredDeck: preferredDeckInput,
+      preferredDeck,
       fallbackDeck: game.playerDeckLocked ?? game.unitsAll ?? [],
       ...(collectionProgressById
         ? { unitProgressById: collectionProgressById }
