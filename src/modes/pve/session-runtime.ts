@@ -63,10 +63,8 @@ function sanitizeRewardListInPlace(list: SanitizedRewardList): SanitizedRewardLi
 }
 
 function toSanitizedRewardList(source: unknown): SanitizedRewardList {
-  const list = Array.isArray(source)
-    ? sanitizeRewardListInPlace(source as SanitizedRewardList)
-    : sanitizeRewardListInPlace([] as SanitizedRewardList);
-  return list;
+  if (Array.isArray(source)) return sanitizeRewardListInPlace(source as SanitizedRewardList);
+  return sanitizeRewardListInPlace([] as SanitizedRewardList);
 }
 
 function getMutableRewardQueue(runtime: SessionRuntimeState): SanitizedRewardList {
@@ -91,17 +89,33 @@ function getRuntimeRewardLists(runtime: SessionRuntimeState, encounter: Encounte
   };
 }
 
+function findRewardIndex(list: SanitizedRewardList, rewardId: string): number {
+  for (let index = 0; index < list.length; index += 1) {
+    if (list[index]?.id === rewardId) return index;
+  }
+  return -1;
+}
+
 function mergeRewardsInPlace(list: SanitizedRewardList, additions: RewardList): SanitizedRewardList {
   if (!additions.length) return list;
   const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
-  const indexById = useIndexedMerge ? getRewardIndexById(list) : null;
 
+  if (!useIndexedMerge) {
+    for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
+      const reward = additions[addIndex]!;
+      const existingIndex = findRewardIndex(list, reward.id);
+      if (existingIndex < 0) list.push(reward);
+      else list[existingIndex] = reward;
+    }
+    return list;
+  }
+
+  const indexById = getRewardIndexById(list);
   for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
-    const reward = additions[addIndex];
-    if (!reward) continue;
-    const existingIndex = resolveRewardIndex(list, reward.id, indexById);
+    const reward = additions[addIndex]!;
+    const existingIndex = indexById.get(reward.id);
     if (existingIndex == null) {
-      if (indexById) indexById.set(reward.id, list.length);
+      indexById.set(reward.id, list.length);
       list.push(reward);
     } else {
       list[existingIndex] = reward;
@@ -110,25 +124,13 @@ function mergeRewardsInPlace(list: SanitizedRewardList, additions: RewardList): 
   return list;
 }
 
-function resolveRewardIndex(
-  list: SanitizedRewardList,
-  rewardId: string,
-  indexById: RewardIndexById | null,
-): number | undefined {
-  if (indexById) return indexById.get(rewardId);
-  for (let index = 0; index < list.length; index += 1) {
-    if (list[index]?.id === rewardId) return index;
-  }
-  return undefined;
-}
-
 function getRewardIndexById(list: SanitizedRewardList): RewardIndexById {
   const existingIndex = list[REWARD_INDEX_BY_ID];
   if (existingIndex) return existingIndex;
   const indexById: RewardIndexById = new Map<string, number>();
   for (let index = 0; index < list.length; index += 1) {
-    const reward = list[index];
-    if (reward) indexById.set(reward.id, index);
+    const reward = list[index]!;
+    indexById.set(reward.id, index);
   }
   list[REWARD_INDEX_BY_ID] = indexById;
   return indexById;
@@ -137,8 +139,8 @@ function getRewardIndexById(list: SanitizedRewardList): RewardIndexById {
 function removeRewardById(list: SanitizedRewardList, rewardId: string): SanitizedRewardList {
   const useIndexedRemoval = list.length > SMALL_REWARD_MERGE_SIZE;
   const indexById = useIndexedRemoval ? getRewardIndexById(list) : null;
-  const index = resolveRewardIndex(list, rewardId, indexById);
-  if (index == null) return list;
+  const index = indexById ? (indexById.get(rewardId) ?? -1) : findRewardIndex(list, rewardId);
+  if (index < 0) return list;
   list.splice(index, 1);
   if (!indexById) {
     list[REWARD_INDEX_BY_ID] = undefined;
@@ -146,8 +148,8 @@ function removeRewardById(list: SanitizedRewardList, rewardId: string): Sanitize
   }
   indexById.delete(rewardId);
   for (let listIndex = index; listIndex < list.length; listIndex += 1) {
-    const reward = list[listIndex];
-    if (reward) indexById.set(reward.id, listIndex);
+    const reward = list[listIndex]!;
+    indexById.set(reward.id, listIndex);
   }
   list[REWARD_INDEX_BY_ID] = indexById;
   return list;

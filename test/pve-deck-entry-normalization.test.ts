@@ -3,6 +3,7 @@ import { describe, expect, test } from '@jest/globals';
 import {
   getPreferredDeckEntries,
   getPreferredDeckInput,
+  normalizeConfig,
   normalizeDeckEntries,
   resolveEnemyUnits,
 } from '../src/modes/pve/session-state.ts';
@@ -63,4 +64,24 @@ test('AI preset deck ưu tiên deck rồi unitsAll qua cùng luồng normalize',
   });
   expect(byUnitsAll).toHaveLength(1);
   expect(byUnitsAll[0]?.id).toBe('nguyen_le');
+});
+
+describe('normalizeConfig deck cache', () => {
+  test('tái sử dụng cùng normalized deck khi nhiều field dùng chung input array', () => {
+    const sharedDeck = ['thien_luu', 'nguyen_le'];
+    const normalized = normalizeConfig({
+      lineupDeck: sharedDeck,
+      playerDeck: sharedDeck,
+      deck: sharedDeck,
+      aiPreset: {
+        deck: sharedDeck,
+        unitsAll: sharedDeck,
+      } as any,
+    });
+
+    expect(normalized.lineupDeck).toBe(normalized.playerDeck);
+    expect(normalized.playerDeck).toBe(normalized.deck);
+    expect(normalized.aiPreset?.deck).toBe(normalized.deck);
+    expect(normalized.aiPreset?.unitsAll).toBe(normalized.deck);
+  });
 });

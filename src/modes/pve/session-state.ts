@@ -61,11 +61,28 @@ const NORMALIZABLE_DECK_FIELDS = ['lineupDeck', 'playerDeck', 'deck'] as const;
 type NormalizableDeckField = (typeof NORMALIZABLE_DECK_FIELDS)[number];
 type DeckInputSource = Partial<Record<NormalizableDeckField, unknown>>;
 
-function normalizeDeckField(config: NormalizedSessionConfig, key: NormalizableDeckField): void {
+type DeckNormalizationCache = WeakMap<ReadonlyArray<unknown>, SessionState['unitsAll']>;
+
+function normalizeDeckEntriesCached(
+  value: ReadonlyArray<unknown>,
+  cache: DeckNormalizationCache,
+): SessionState['unitsAll'] {
+  const cached = cache.get(value);
+  if (cached) return cached;
+  const normalized = normalizeDeckEntries(value);
+  cache.set(value, normalized);
+  return normalized;
+}
+
+
+function normalizeDeckField(
+  config: NormalizedSessionConfig,
+  key: NormalizableDeckField,
+  cache: DeckNormalizationCache,
+): void {
   const value = config[key];
-  if (Array.isArray(value)) {
-    config[key] = normalizeDeckEntries(value);
-  }
+  if (!Array.isArray(value)) return;
+  config[key] = normalizeDeckEntriesCached(value, cache);
 }
 
 function hasDeckEntries(value: unknown): value is ReadonlyArray<unknown> {
@@ -253,9 +270,12 @@ function buildAiState(params: BuildAiStateParams): SessionState['ai'] {
   };
 }
 
-function normalizeAiPresetDeckLists(preset: MutableAiPreset): MutableAiPreset {
-  if (Array.isArray(preset.deck)) preset.deck = normalizeDeckEntries(preset.deck);
-  if (Array.isArray(preset.unitsAll)) preset.unitsAll = normalizeDeckEntries(preset.unitsAll);
+function normalizeAiPresetDeckLists(
+  preset: MutableAiPreset,
+  cache: DeckNormalizationCache,
+): MutableAiPreset {
+  if (Array.isArray(preset.deck)) preset.deck = normalizeDeckEntriesCached(preset.deck, cache);
+  if (Array.isArray(preset.unitsAll)) preset.unitsAll = normalizeDeckEntriesCached(preset.unitsAll, cache);
   return preset;
 }
 
@@ -436,6 +456,7 @@ export function computeBackgroundSignature(backgroundKey: string | null | undefi
 }
 
 export function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessionConfig {
+  const deckNormalizationCache: DeckNormalizationCache = new WeakMap();
   const { scene, ...rest } = input;
   const out = { ...rest } as NormalizedSessionConfig;
   const sceneConfig: NonNullable<SessionConfigInput['scene']> = scene ?? {};
@@ -447,13 +468,13 @@ export function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessi
     else if (typeof sceneConfig.background === 'string') out.backgroundKey = sceneConfig.background;
   }
   for (const field of NORMALIZABLE_DECK_FIELDS) {
-    normalizeDeckField(out, field);
+    normalizeDeckField(out, field, deckNormalizationCache);
   }
   if (typeof out.collectionState === 'undefined') {
     out.collectionState = null;
   }
   if (out.aiPreset) {
-    out.aiPreset = normalizeAiPresetDeckLists({ ...out.aiPreset });
+    out.aiPreset = normalizeAiPresetDeckLists({ ...out.aiPreset }, deckNormalizationCache);
   }
   return out;
 }

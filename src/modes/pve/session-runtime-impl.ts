@@ -3022,107 +3022,107 @@ function init(): boolean {
         : null;
 
         const previousElapsedMs = Math.max(0, previousElapsedSec) * 1000;
-        let sessionForRebase = sessionNowMsRaw;
-        if (!Number.isFinite(sessionForRebase)){
-          sessionForRebase = previousStartMs !== null
-            ? previousStartMs + previousElapsedMs
-            : safeNowMs;
-        }
-
-        let normalizedStart = Number.isFinite(sessionForRebase)
-          ? sessionForRebase - previousElapsedMs
-          : sessionForRebase;
-        if (!Number.isFinite(normalizedStart)){
-          normalizedStart = sessionForRebase;
-        }
-        CLOCK.startMs = Number.isFinite(normalizedStart)
-          ? normalizedStart
-          : sessionForRebase;
-        if (!Number.isFinite(CLOCK.startMs)){
-          CLOCK.startMs = sessionForRebase;
-        }
-        CLOCK.startSafeMs = safeNowMs;
-
-        forcedElapsedSec = previousElapsedSec;
-        CLOCK.lastCostCreditedSec = previousElapsedSec;
-        CLOCK.lastTimerRemain = previousRemain;
-
-        const minTurnStep = Number.isFinite(sessionForRebase)
-          ? sessionForRebase - turnEveryMs
-          : previousTurnStep ?? CLOCK.startMs - turnEveryMs;
-        const maxTurnStep = Number.isFinite(sessionForRebase)
-          ? sessionForRebase
-          : CLOCK.startMs;
-        let normalizedTurnStep = previousTurnStep ?? minTurnStep;
-        if (!Number.isFinite(normalizedTurnStep)){
-          normalizedTurnStep = minTurnStep;
-        }
-        if (Number.isFinite(minTurnStep) && normalizedTurnStep < minTurnStep){
-          normalizedTurnStep = minTurnStep;
-        }
-        if (Number.isFinite(maxTurnStep) && normalizedTurnStep > maxTurnStep){
-          normalizedTurnStep = maxTurnStep;
-        }
-        CLOCK.lastTurnStepMs = normalizedTurnStep;
-
-        const rebaseFrame = Number.isFinite(sessionForRebase)
-          ? sessionForRebase
-          : CLOCK.startMs;
-        CLOCK.lastFrameMs = Number.isFinite(rebaseFrame)
-          ? rebaseFrame
-          : CLOCK.startMs;
-          CLOCK.lastLogicMs = Number.isFinite(rebaseFrame)
-          ? rebaseFrame - LOGIC_MIN_INTERVAL_MS
-          : CLOCK.startMs - LOGIC_MIN_INTERVAL_MS;
-        CLOCK.costAccumulator = 0;
-        CLOCK.lastTimerText = null;
+      let sessionForRebase = sessionNowMsRaw;
+      if (!Number.isFinite(sessionForRebase)){
+        sessionForRebase = previousStartMs !== null
+          ? previousStartMs + previousElapsedMs
+          : safeNowMs;
       }
+
+      let normalizedStart = Number.isFinite(sessionForRebase)
+        ? sessionForRebase - previousElapsedMs
+        : sessionForRebase;
+      if (!Number.isFinite(normalizedStart)){
+        normalizedStart = sessionForRebase;
+      }
+      CLOCK.startMs = Number.isFinite(normalizedStart)
+        ? normalizedStart
+        : sessionForRebase;
+      if (!Number.isFinite(CLOCK.startMs)){
+        CLOCK.startMs = sessionForRebase;
+    }
+      CLOCK.startSafeMs = safeNowMs;
+
+      forcedElapsedSec = previousElapsedSec;
+      CLOCK.lastCostCreditedSec = previousElapsedSec;
+      CLOCK.lastTimerRemain = previousRemain;
+
+      const minTurnStep = Number.isFinite(sessionForRebase)
+        ? sessionForRebase - turnEveryMs
+        : previousTurnStep ?? CLOCK.startMs - turnEveryMs;
+      const maxTurnStep = Number.isFinite(sessionForRebase)
+        ? sessionForRebase
+        : CLOCK.startMs;
+      let normalizedTurnStep = previousTurnStep ?? minTurnStep;
+      if (!Number.isFinite(normalizedTurnStep)){
+        normalizedTurnStep = minTurnStep;
+      }
+      if (Number.isFinite(minTurnStep) && normalizedTurnStep < minTurnStep){
+        normalizedTurnStep = minTurnStep;
+      }
+      if (Number.isFinite(maxTurnStep) && normalizedTurnStep > maxTurnStep){
+        normalizedTurnStep = maxTurnStep;
+      }
+      CLOCK.lastTurnStepMs = normalizedTurnStep;
+
+      const rebaseFrame = Number.isFinite(sessionForRebase)
+        ? sessionForRebase
+        : CLOCK.startMs;
+      CLOCK.lastFrameMs = Number.isFinite(rebaseFrame)
+        ? rebaseFrame
+        : CLOCK.startMs;
+      CLOCK.lastLogicMs = Number.isFinite(rebaseFrame)
+        ? rebaseFrame - LOGIC_MIN_INTERVAL_MS
+        : CLOCK.startMs - LOGIC_MIN_INTERVAL_MS;
+      CLOCK.costAccumulator = 0;
+      CLOCK.lastTimerText = null;
+    }
 
       const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
-      let sessionNowMs = sessionNowMsRaw();
-      const needRebase = !Number.isFinite(sessionNowMs)
-        || Math.abs(sessionNowMs - expectedSessionMs) > CLOCK_DRIFT_TOLERANCE_MS;
+    let sessionNowMs = sessionNowMsRaw;
+    const needRebase = !Number.isFinite(sessionNowMs)
+      || Math.abs(sessionNowMs - expectedSessionMs) > CLOCK_DRIFT_TOLERANCE_MS;
+    if (needRebase){
+      sessionNowMs = expectedSessionMs;
+    }
+    if (isFiniteNumber(timestamp)){
+      const rafTs = timestamp;
+      if (SUPPORTS_PERF_NOW || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)){
+        sessionNowMs = normalizeAnimationFrameTimestamp(rafTs);
+      }
       if (needRebase){
-        sessionNowMs = expectedSessionMs;
-      }
-      if (isFiniteNumber(timestamp)){
-        const rafTs = Number(timestamp);
-        if (SUPPORTS_PERF_NOW || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)){
-          sessionNowMs = normalizeAnimationFrameTimestamp(rafTs);
-        }
-        if (needRebase){
-          const adjusted = expectedSessionMs;
-          if (!Number.isFinite(sessionNowMs)
-            || Math.abs(sessionNowMs - adjusted) > CLOCK_DRIFT_TOLERANCE_MS){
-            sessionNowMs = adjusted;
-          }
+        const adjusted = expectedSessionMs;
+        if (!Number.isFinite(sessionNowMs)
+          || Math.abs(sessionNowMs - adjusted) > CLOCK_DRIFT_TOLERANCE_MS){
+          sessionNowMs = adjusted;
         }
       }
+    }
 
-      if (!Number.isFinite(CLOCK.lastFrameMs)){
-        CLOCK.lastFrameMs = Number.isFinite(CLOCK.startMs)
-          ? CLOCK.startMs
-          : expectedSessionMs;
-      }
-
-      const lastFrameMs = Number.isFinite(CLOCK.lastFrameMs)
-        ? CLOCK.lastFrameMs
+    if (!Number.isFinite(CLOCK.lastFrameMs)){
+      CLOCK.lastFrameMs = Number.isFinite(CLOCK.startMs)
+        ? CLOCK.startMs
         : expectedSessionMs;
-      if (!Number.isFinite(sessionNowMs)){
-        sessionNowMs = expectedSessionMs;
-      }
-      if (sessionNowMs <= lastFrameMs){
-        const fallbackFrame = Math.max(expectedSessionMs, lastFrameMs + 1);
-        sessionNowMs = fallbackFrame;
-      }
-      CLOCK.lastFrameMs = Number.isFinite(sessionNowMs) ? sessionNowMs : expectedSessionMs;
+    }
 
-      if (!Number.isFinite(CLOCK.lastLogicMs)){
-        CLOCK.lastLogicMs = sessionNowMs - LOGIC_MIN_INTERVAL_MS;
-      }
+    const lastFrameMs = Number.isFinite(CLOCK.lastFrameMs)
+      ? CLOCK.lastFrameMs
+      : expectedSessionMs;
+    if (!Number.isFinite(sessionNowMs)){
+      sessionNowMs = expectedSessionMs;
+    }
+    if (sessionNowMs <= lastFrameMs){
+      const fallbackFrame = Math.max(expectedSessionMs, lastFrameMs + 1);
+      sessionNowMs = fallbackFrame;
+    }
+    CLOCK.lastFrameMs = Number.isFinite(sessionNowMs) ? sessionNowMs : expectedSessionMs;
 
-      const logicSinceMs = sessionNowMs - CLOCK.lastLogicMs;
-      if (Number.isFinite(logicSinceMs) && logicSinceMs < LOGIC_MIN_INTERVAL_MS){
+    if (!Number.isFinite(CLOCK.lastLogicMs)){
+      CLOCK.lastLogicMs = sessionNowMs - LOGIC_MIN_INTERVAL_MS;
+    }
+
+    const logicSinceMs = sessionNowMs - CLOCK.lastLogicMs;
+    if (Number.isFinite(logicSinceMs) && logicSinceMs < LOGIC_MIN_INTERVAL_MS){
         return;
       }
 

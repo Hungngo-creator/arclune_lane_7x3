@@ -17595,14 +17595,14 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               CLOCK.lastTimerText = null;
           }
           const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
-          let sessionNowMs = sessionNowMsRaw();
+          let sessionNowMs = sessionNowMsRaw;
           const needRebase = !Number.isFinite(sessionNowMs)
               || Math.abs(sessionNowMs - expectedSessionMs) > CLOCK_DRIFT_TOLERANCE_MS;
           if (needRebase) {
               sessionNowMs = expectedSessionMs;
           }
           if (isFiniteNumber(timestamp)) {
-              const rafTs = Number(timestamp);
+              const rafTs = timestamp;
               if (SUPPORTS_PERF_NOW || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)) {
                   sessionNowMs = normalizeAnimationFrameTimestamp(rafTs);
               }
@@ -18939,10 +18939,9 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       return list;
   }
   function toSanitizedRewardList(source) {
-      const list = Array.isArray(source)
-          ? sanitizeRewardListInPlace(source)
-          : sanitizeRewardListInPlace([]);
-      return list;
+      if (Array.isArray(source))
+          return sanitizeRewardListInPlace(source);
+      return sanitizeRewardListInPlace([]);
   }
   function getMutableRewardQueue(runtime) {
       const list = toSanitizedRewardList(runtime.rewardQueue);
@@ -18963,19 +18962,34 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           shared: rewardQueue === pendingRewards,
       };
   }
+  function findRewardIndex(list, rewardId) {
+      for (let index = 0; index < list.length; index += 1) {
+          if (list[index]?.id === rewardId)
+              return index;
+      }
+      return -1;
+  }
   function mergeRewardsInPlace(list, additions) {
       if (!additions.length)
           return list;
       const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
-      const indexById = useIndexedMerge ? getRewardIndexById(list) : null;
+      if (!useIndexedMerge) {
+          for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
+              const reward = additions[addIndex];
+              const existingIndex = findRewardIndex(list, reward.id);
+              if (existingIndex < 0)
+                  list.push(reward);
+              else
+                  list[existingIndex] = reward;
+          }
+          return list;
+      }
+      const indexById = getRewardIndexById(list);
       for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
           const reward = additions[addIndex];
-          if (!reward)
-              continue;
-          const existingIndex = resolveRewardIndex(list, reward.id, indexById);
+          const existingIndex = indexById.get(reward.id);
           if (existingIndex == null) {
-              if (indexById)
-                  indexById.set(reward.id, list.length);
+              indexById.set(reward.id, list.length);
               list.push(reward);
           }
           else {
@@ -18984,15 +18998,6 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       }
       return list;
   }
-  function resolveRewardIndex(list, rewardId, indexById) {
-      if (indexById)
-          return indexById.get(rewardId);
-      for (let index = 0; index < list.length; index += 1) {
-          if (list[index]?.id === rewardId)
-              return index;
-      }
-      return undefined;
-  }
   function getRewardIndexById(list) {
       const existingIndex = list[REWARD_INDEX_BY_ID];
       if (existingIndex)
@@ -19000,8 +19005,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       const indexById = new Map();
       for (let index = 0; index < list.length; index += 1) {
           const reward = list[index];
-          if (reward)
-              indexById.set(reward.id, index);
+          indexById.set(reward.id, index);
       }
       list[REWARD_INDEX_BY_ID] = indexById;
       return indexById;
@@ -19009,8 +19013,8 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   function removeRewardById(list, rewardId) {
       const useIndexedRemoval = list.length > SMALL_REWARD_MERGE_SIZE;
       const indexById = useIndexedRemoval ? getRewardIndexById(list) : null;
-      const index = resolveRewardIndex(list, rewardId, indexById);
-      if (index == null)
+      const index = indexById ? (indexById.get(rewardId) ?? -1) : findRewardIndex(list, rewardId);
+      if (index < 0)
           return list;
       list.splice(index, 1);
       if (!indexById) {
@@ -19020,8 +19024,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       indexById.delete(rewardId);
       for (let listIndex = index; listIndex < list.length; listIndex += 1) {
           const reward = list[listIndex];
-          if (reward)
-              indexById.set(reward.id, listIndex);
+          indexById.set(reward.id, listIndex);
       }
       list[REWARD_INDEX_BY_ID] = indexById;
       return list;
@@ -19195,11 +19198,19 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       };
   });
   const NORMALIZABLE_DECK_FIELDS = ['lineupDeck', 'playerDeck', 'deck'];
-  function normalizeDeckField(config, key) {
+  function normalizeDeckEntriesCached(value, cache) {
+      const cached = cache.get(value);
+      if (cached)
+          return cached;
+      const normalized = normalizeDeckEntries(value);
+      cache.set(value, normalized);
+      return normalized;
+  }
+  function normalizeDeckField(config, key, cache) {
       const value = config[key];
-      if (Array.isArray(value)) {
-          config[key] = normalizeDeckEntries(value);
-      }
+      if (!Array.isArray(value))
+          return;
+      config[key] = normalizeDeckEntriesCached(value, cache);
   }
   function hasDeckEntries(value) {
       return Array.isArray(value) && value.length > 0;
@@ -19347,11 +19358,11 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           lastDecision: null,
       };
   }
-  function normalizeAiPresetDeckLists(preset) {
+  function normalizeAiPresetDeckLists(preset, cache) {
       if (Array.isArray(preset.deck))
-          preset.deck = normalizeDeckEntries(preset.deck);
+          preset.deck = normalizeDeckEntriesCached(preset.deck, cache);
       if (Array.isArray(preset.unitsAll))
-          preset.unitsAll = normalizeDeckEntries(preset.unitsAll);
+          preset.unitsAll = normalizeDeckEntriesCached(preset.unitsAll, cache);
       return preset;
   }
   function getAiPresetDeckEntries(preset) {
@@ -19482,6 +19493,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       return signature;
   }
   function normalizeConfig(input = {}) {
+      const deckNormalizationCache = new WeakMap();
       const { scene, ...rest } = input;
       const out = { ...rest };
       const sceneConfig = scene ?? {};
@@ -19495,13 +19507,13 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
               out.backgroundKey = sceneConfig.background;
       }
       for (const field of NORMALIZABLE_DECK_FIELDS) {
-          normalizeDeckField(out, field);
+          normalizeDeckField(out, field, deckNormalizationCache);
       }
       if (typeof out.collectionState === 'undefined') {
           out.collectionState = null;
       }
       if (out.aiPreset) {
-          out.aiPreset = normalizeAiPresetDeckLists({ ...out.aiPreset });
+          out.aiPreset = normalizeAiPresetDeckLists({ ...out.aiPreset }, deckNormalizationCache);
       }
       return out;
   }
