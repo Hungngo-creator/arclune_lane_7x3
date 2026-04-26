@@ -66,6 +66,7 @@ import {
   normalizeDeckEntries,
   getPreferredDeckInput,
   resolveEnemyUnits,
+  parseFiniteNumber,
 } from './session-state';
 import { mapUnitProgressById } from './collection-mapper.ts';
 import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
@@ -241,17 +242,6 @@ const isPlainRecord = (value: unknown): value is Record<string, unknown> => (
 const isFiniteNumber = (value: unknown): value is number => (
   typeof value === 'number' && Number.isFinite(value)
 );
-
-const parseFiniteNumber = (value: unknown): number | null => {
-  if (isFiniteNumber(value)) return value;
-  if (typeof value === 'string'){
-    const normalized = value.trim();
-    if (!normalized) return null;
-    const parsed = Number(normalized);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-};
 
 const toFiniteOrZero = (value: unknown): number => parseFiniteNumber(value) ?? 0;
 const toPositiveOrNull = (value: unknown): number | null => {
@@ -616,22 +606,17 @@ function ensureDeck(game: SessionState | null | undefined = Game): DeckEntry[] {
     return deckFilterCache.result as DeckEntry[];
   }
   const lockedIds = getLockedDeckIdSet(lockedDeck);
-  const filteredDeck: DeckEntry[] = [];
-  let removed = false;
+  let filteredDeck: DeckEntry[] | null = null;
   for (let i = 0; i < deck.length; i += 1) {
     const entry = deck[i];
-    if (!entry) {
-      removed = true;
+    if (!entry || !lockedIds.has(entry.id)) {
+      if (!filteredDeck) filteredDeck = deck.slice(0, i) as DeckEntry[];
       continue;
     }
-    if (!lockedIds.has(entry.id)) {
-      removed = true;
-      continue;
-    }
-    filteredDeck.push(entry);
+    if (filteredDeck) filteredDeck.push(entry);
   }
-  const result = removed ? filteredDeck : deck;
-  if (removed || deck !== session.deck3) {
+  const result = filteredDeck ?? deck;
+  if (filteredDeck || deck !== session.deck3) {
     session.deck3 = result;
   }
   deckFilterCache = {
@@ -659,10 +644,12 @@ const removeDeckEntryAtIndex = (
   removeIndex: number,
 ): DeckEntry[] => {
   if (removeIndex < 0 || removeIndex >= deck.length) return deck as DeckEntry[];
-  if (deck.length === 1) return [];
-  const nextDeck = deck.slice(0, removeIndex);
-  nextDeck.push(...deck.slice(removeIndex + 1));
-  return nextDeck;
+  const mutableDeck = deck as DeckEntry[];
+  for (let i = removeIndex + 1; i < mutableDeck.length; i += 1) {
+    mutableDeck[i - 1] = mutableDeck[i] as DeckEntry;
+  }
+  mutableDeck.length = Math.max(0, mutableDeck.length - 1);
+  return mutableDeck;
 };
 
 function ensureLockedPlayerDeck(game: SessionState | null | undefined = Game): ReadonlyArray<DeckEntry> {

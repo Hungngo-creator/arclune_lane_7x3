@@ -105,14 +105,12 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
 
 function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
   if (!list.length) return list;
-  let writeIndex = 0;
-  for (let readIndex = 0; readIndex < list.length; readIndex += 1) {
-    const entry = list[readIndex];
-    if (!entry || entry.id === rewardId) continue;
-    if (writeIndex !== readIndex) list[writeIndex] = entry;
-    writeIndex += 1;
+  const removeIndex = list.findIndex((entry) => !!entry && entry.id === rewardId);
+  if (removeIndex < 0) return list;
+  for (let index = removeIndex + 1; index < list.length; index += 1) {
+    list[index - 1] = list[index] as RewardRoll;
   }
-  if (writeIndex < list.length) list.length = writeIndex;
+  list.length -= 1;
   return list;
 }
 

@@ -123,10 +123,12 @@ interface ResolveEnemyUnitsOptions {
 const EMPTY_UNIT_PROGRESS = new Map<string, RuntimeUnitProgress>();
 const AUTO_PLAYER_DECK_SIZE = 10;
 
-function parseFiniteNumber(value: unknown): number | null {
+export function parseFiniteNumber(value: unknown): number | null {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
   if (typeof value === 'string') {
-    const parsed = Number(value);
+    const normalized = value.trim();
+    if (!normalized) return null;
+    const parsed = Number(normalized);
     return Number.isFinite(parsed) ? parsed : null;
   }
   return null;
