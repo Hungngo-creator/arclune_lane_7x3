@@ -517,7 +517,19 @@ function transformModule(code, id){
     }
     return lines.join('\n');
   });
-  
+
+  const reExportNamespaceRegex = /export\s*\*\s*as\s*([A-Za-z_$][A-Za-z0-9_$]*)\s*from\s*['\"](.+?)['\"];?/g;
+  code = code.replace(reExportNamespaceRegex, (match, alias, source) => {
+    const depId = resolveImport(id, source.trim());
+    const moduleVar = `__reexport${depIndex++}`;
+    const lines = [`const ${moduleVar} = __require('${depId}');`];
+    if (!usedAliases.has(alias)){
+      usedAliases.add(alias);
+      exportsAssignments.push({ alias, expr: moduleVar });
+    }
+    return lines.join('\n');
+  });
+ 
   const reExportAllRegex = /export\s*\*\s*from\s*['\"](.+?)['\"];?/g;
   code = code.replace(reExportAllRegex, (match, source) => {
     const depId = resolveImport(id, source.trim());
@@ -531,21 +543,21 @@ function transformModule(code, id){
     return lines.join('\n');
   });
 
-  const importRegex = /import\s*([\s\S]*?)\s*from\s*['\"](.+?)['\"];?/g;
-  const importTypeRegex = /import\s+type\s+([\s\S]*?)\s*from\s*['\"](.+?)['\"];?/g;
-  const importSideEffectRegex = /import\s*['\"](.+?)['\"];?/g;
-  code = code.replace(importTypeRegex, () => '');
-  code = code.replace(importSideEffectRegex, (match, source) => {
+  const importRegex = /(^|[\n;])\s*import\s+([\s\S]*?)\s+from\s*['\"](.+?)['\"]\s*;?/g;
+  const importTypeRegex = /(^|[\n;])\s*import\s+type\s+([\s\S]*?)\s+from\s*['\"](.+?)['\"]\s*;?/g;
+  const importSideEffectRegex = /(^|[\n;])\s*import\s*['\"](.+?)['\"]\s*;?/g;
+  code = code.replace(importTypeRegex, (match, lead = '') => lead);
+  code = code.replace(importSideEffectRegex, (match, lead = '', source) => {
     const depId = resolveImport(id, source.trim());
-    return `__require('${depId}');`;
+    return `${lead}__require('${depId}');`;
   });
-  code = code.replace(importRegex, (match, clause, source) => {
+  code = code.replace(importRegex, (match, lead = '', clause, source) => {
     const depId = resolveImport(id, source.trim());
     const moduleVar = `__dep${depIndex++}`;
     const lines = [`const ${moduleVar} = __require('${depId}');`];
     const importLines = createImportReplacement(clause, moduleVar);
     lines.push(...importLines);
-    return lines.join('\n');
+    return `${lead}${lines.join('\n')}`;
   });
 
   const exportNamedRegex = /export\s*{([\s\S]*?)}\s*;/g;

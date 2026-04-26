@@ -12055,8 +12055,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
 };
 __modules['./entry.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/entry.ts
-  __require('./aether.ts');
-  const __dep0 = __require('./app/shell.ts');
+  __require('./aether.ts');const __dep0 = __require('./app/shell.ts');
   const createAppShell = __dep0.createAppShell;
   const __dep1 = __require('./screens/main-menu/view/index.ts');
   const renderMainMenuView = __dep1.renderMainMenuView;
@@ -15418,7 +15417,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   let lastCamPresetSignature = getCamPresetSignature(CAM_PRESET);
   const HAND_SIZE = CFG.HAND_SIZE ?? 4;
   ensureNestedModuleSupport();
-  const getNow = () => sessionNow();
   const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
       && !!globalThis.performance
       && typeof globalThis.performance.now === 'function';
@@ -15970,7 +15968,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   };
   function createClock() {
       const safe = safeNow();
-      const now = getNow();
+      const now = sessionNow();
       const turnEveryMs = resolveConfiguredTurnIntervalMs();
       return {
           startMs: now,
@@ -16290,7 +16288,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const game = getInitializedGame();
       if (!game || !game.turn)
           return;
-      const now = getNow();
+      const now = sessionNow();
       const dur = Math.max(0, duration | 0);
       game.turn.busyUntil = mergeBusyUntil(game.turn.busyUntil, now, dur);
   }
@@ -16646,7 +16644,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   const sessionVfx = getSessionVfx();
                   if (!sessionVfx)
                       return;
-                  const startedAt = getNow();
+                  const startedAt = sessionNow();
                   try {
                       const dur = effect(sessionVfx);
                       applyBusyFromVfx(startedAt, dur);
@@ -17040,7 +17038,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const finishedAtRaw = payload?.finishedAt;
       const finishedAt = typeof finishedAtRaw === 'number' && Number.isFinite(finishedAtRaw)
           ? finishedAtRaw
-          : getNow();
+          : sessionNow();
       const result = {
           winner: payload?.winner ?? null,
           reason: payload?.reason ?? null,
@@ -17525,6 +17523,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               return;
           if (Game.battle?.over)
               return;
+          const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
           const safeNowMs = safeNow();
           const sessionNowMsRaw = sessionNow();
           let forcedElapsedSec = null;
@@ -17543,7 +17542,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               const previousTurnStep = Number.isFinite(CLOCK.lastTurnStepMs)
                   ? CLOCK.lastTurnStepMs
                   : null;
-              const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
               const previousElapsedMs = Math.max(0, previousElapsedSec) * 1000;
               let sessionForRebase = sessionNowMsRaw;
               if (!Number.isFinite(sessionForRebase)) {
@@ -17597,7 +17595,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               CLOCK.lastTimerText = null;
           }
           const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
-          let sessionNowMs = getNow();
+          let sessionNowMs = sessionNowMsRaw();
           const needRebase = !Number.isFinite(sessionNowMs)
               || Math.abs(sessionNowMs - expectedSessionMs) > CLOCK_DRIFT_TOLERANCE_MS;
           if (needRebase) {
@@ -17627,7 +17625,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           if (!Number.isFinite(sessionNowMs)) {
               sessionNowMs = expectedSessionMs;
           }
-          if (Number.isFinite(lastFrameMs) && sessionNowMs <= lastFrameMs) {
+          if (sessionNowMs <= lastFrameMs) {
               const fallbackFrame = Math.max(expectedSessionMs, lastFrameMs + 1);
               sessionNowMs = fallbackFrame;
           }
@@ -17717,7 +17715,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           }
           let turnState = Game.turn ?? null;
           let busyUntil = normalizeTurnBusyUntil(turnState);
-          const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
           const stallDeltaEpsilon = 1;
           const initialTurnBaseline = Number.isFinite(CLOCK.startMs)
               ? CLOCK.startMs - turnEveryMs
@@ -18941,14 +18938,30 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       list[REWARD_INDEX_BY_ID] = undefined;
       return list;
   }
-  function getMutableRewardList(container, key) {
-      const store = container;
-      const source = store[key];
+  function toSanitizedRewardList(source) {
       const list = Array.isArray(source)
           ? sanitizeRewardListInPlace(source)
           : sanitizeRewardListInPlace([]);
-      store[key] = list;
       return list;
+  }
+  function getMutableRewardQueue(runtime) {
+      const list = toSanitizedRewardList(runtime.rewardQueue);
+      runtime.rewardQueue = list;
+      return list;
+  }
+  function getMutablePendingRewards(encounter) {
+      const list = toSanitizedRewardList(encounter.pendingRewards);
+      encounter.pendingRewards = list;
+      return list;
+  }
+  function getRuntimeRewardLists(runtime, encounter) {
+      const rewardQueue = getMutableRewardQueue(runtime);
+      const pendingRewards = getMutablePendingRewards(encounter);
+      return {
+          rewardQueue,
+          pendingRewards,
+          shared: rewardQueue === pendingRewards,
+      };
   }
   function mergeRewardsInPlace(list, additions) {
       if (!additions.length)
@@ -18997,38 +19010,35 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       const useIndexedRemoval = list.length > SMALL_REWARD_MERGE_SIZE;
       const indexById = useIndexedRemoval ? getRewardIndexById(list) : null;
       const index = resolveRewardIndex(list, rewardId, indexById);
-      if (index != null) {
-          list.splice(index, 1);
-          if (indexById) {
-              indexById.delete(rewardId);
-              for (let listIndex = index; listIndex < list.length; listIndex += 1) {
-                  const reward = list[listIndex];
-                  if (reward)
-                      indexById.set(reward.id, listIndex);
-              }
-              list[REWARD_INDEX_BY_ID] = indexById;
-          }
-          else {
-              list[REWARD_INDEX_BY_ID] = undefined;
-          }
+      if (index == null)
+          return list;
+      list.splice(index, 1);
+      if (!indexById) {
+          list[REWARD_INDEX_BY_ID] = undefined;
+          return list;
       }
+      indexById.delete(rewardId);
+      for (let listIndex = index; listIndex < list.length; listIndex += 1) {
+          const reward = list[listIndex];
+          if (reward)
+              indexById.set(reward.id, listIndex);
+      }
+      list[REWARD_INDEX_BY_ID] = indexById;
       return list;
   }
   function syncWaveRewards(runtime, encounter, rewards) {
-      const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
-      const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
-      const mergedRewardQueue = mergeRewardsInPlace(rewardQueue, rewards);
-      encounter.pendingRewards = rewardQueue === pendingRewards
-          ? mergedRewardQueue
-          : mergeRewardsInPlace(pendingRewards, rewards);
+      const { rewardQueue, pendingRewards, shared } = getRuntimeRewardLists(runtime, encounter);
+      mergeRewardsInPlace(rewardQueue, rewards);
+      if (!shared)
+          mergeRewardsInPlace(pendingRewards, rewards);
   }
   function removeRewardEverywhere(runtime, rewardId) {
-      const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
-      removeRewardById(rewardQueue, rewardId);
       const encounter = runtime.encounter;
+      const rewardQueue = getMutableRewardQueue(runtime);
+      removeRewardById(rewardQueue, rewardId);
       if (!encounter)
           return;
-      const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
+      const pendingRewards = getMutablePendingRewards(encounter);
       if (pendingRewards !== rewardQueue)
           removeRewardById(pendingRewards, rewardId);
   }
@@ -19036,6 +19046,16 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       encounter.status = 'completed';
       runtime.wave = null;
       return encounter;
+  }
+  function getWaveRewards(wave) {
+      const cached = WAVE_REWARD_CACHE.get(wave);
+      if (cached)
+          return cached;
+      const rewards = Array.isArray(wave.rewards)
+          ? sanitizeRewardListInPlace(wave.rewards)
+          : sanitizeRewardListInPlace([]);
+      WAVE_REWARD_CACHE.set(wave, rewards);
+      return rewards;
   }
   function advanceSession(session) {
       const runtime = session?.runtime;
@@ -19071,11 +19091,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               wave.status = 'cleared';
               runtime.wave = null;
               encounter.waveIndex = index + 1;
-              const rewards = WAVE_REWARD_CACHE.get(wave)
-                  ?? (Array.isArray(wave.rewards)
-                      ? sanitizeRewardListInPlace(wave.rewards)
-                      : []);
-              WAVE_REWARD_CACHE.set(wave, rewards);
+              const rewards = getWaveRewards(wave);
               if (rewards.length)
                   syncWaveRewards(runtime, encounter, rewards);
               break;
@@ -19205,13 +19221,20 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           return EMPTY_UNIT_DECK;
       return isNormalizedDeckEntries(value) ? value : normalizeDeckEntries(value);
   }
-  function getPreferredDeckInput(config) {
-      for (const key of NORMALIZABLE_DECK_FIELDS) {
-          const value = config[key];
-          if (hasDeckEntries(value))
-              return value;
-      }
+  function pickFirstDeckInput(source) {
+      const lineupDeck = source.lineupDeck;
+      if (hasDeckEntries(lineupDeck))
+          return lineupDeck;
+      const playerDeck = source.playerDeck;
+      if (hasDeckEntries(playerDeck))
+          return playerDeck;
+      const deck = source.deck;
+      if (hasDeckEntries(deck))
+          return deck;
       return null;
+  }
+  function getPreferredDeckInput(config) {
+      return pickFirstDeckInput(config);
   }
   function getPreferredDeckEntries(config) {
       return toDeckEntries(getPreferredDeckInput(config));
@@ -19334,13 +19357,12 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   function getAiPresetDeckEntries(preset) {
       if (!preset)
           return null;
-      if (Array.isArray(preset.deck) && preset.deck.length) {
-          return normalizeDeckEntries(preset.deck);
-      }
-      if (Array.isArray(preset.unitsAll) && preset.unitsAll.length) {
-          return normalizeDeckEntries(preset.unitsAll);
-      }
-      return null;
+      const preferredDeckInput = pickFirstDeckInput({
+          lineupDeck: preset.deck,
+          playerDeck: preset.unitsAll,
+          deck: null,
+      });
+      return preferredDeckInput ? toDeckEntries(preferredDeckInput) : null;
   }
   function resolveEnemyUnits(options) {
       const presetDeck = getAiPresetDeckEntries(options.aiPreset);
@@ -19916,19 +19938,24 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeDeckEntries')) exports.normalizeDeckEntries = normalizeDeckEntries;
 };
 __modules['./modes/pve/session.ts'] = (exports, module, __require) => {
+  const __reexport2 = __require('./modes/pve/session-state.ts');
+  for (const key of Object.keys(__reexport2)) {
+    if (key === 'default') continue;
+    if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
+    exports[key] = __reexport2[key];
+  }
+  const __reexport3 = __require('./modes/pve/session-runtime.ts');
+  for (const key of Object.keys(__reexport3)) {
+    if (key === 'default') continue;
+    if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
+    exports[key] = __reexport3[key];
+  }
+  // Namespace re-exports giúp chuyển dần sang module nhỏ mà không vỡ import cũ.
   const __reexport0 = __require('./modes/pve/session-state.ts');
-  for (const key of Object.keys(__reexport0)) {
-    if (key === 'default') continue;
-    if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
-    exports[key] = __reexport0[key];
-  }
   const __reexport1 = __require('./modes/pve/session-runtime.ts');
-  for (const key of Object.keys(__reexport1)) {
-    if (key === 'default') continue;
-    if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
-    exports[key] = __reexport1[key];
-  }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'sessionState')) exports.sessionState = __reexport0;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'sessionRuntime')) exports.sessionRuntime = __reexport1;
 };
 __modules['./modes/pve/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./modes/pve/chap-minh-runtime.ts');

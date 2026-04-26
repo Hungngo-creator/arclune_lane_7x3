@@ -40,5 +40,12 @@ async function runBuild(){
 test('build includes nested source modules', async () => {
   await runBuild();
   const bundled = await fs.readFile(DIST_FILE, 'utf8');
-  assert.match(bundled, /__define\(["']\.\/utils\/dummy\.js["'],/);
+  assert.match(bundled, /__modules\['\.\/utils\/dummy\.ts'\]/);
+});
+
+test('build supports namespace re-exports in barrel modules', async () => {
+  await runBuild();
+  const bundled = await fs.readFile(DIST_FILE, 'utf8');
+  assert.match(bundled, /exports\.sessionState\s*=\s*__reexport\d+;/);
+  assert.match(bundled, /exports\.sessionRuntime\s*=\s*__reexport\d+;/);
 });
