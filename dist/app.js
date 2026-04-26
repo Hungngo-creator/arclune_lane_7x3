@@ -15709,6 +15709,8 @@ __modules['./modes/pve/session-loop.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionLoopController')) exports.createSessionLoopController = createSessionLoopController;
 };
 __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./modes/pve/session-state.ts');
+  const parseFiniteNumber = __dep0.parseFiniteNumber;
   const toAnimationFrameHandle = (handle) => (typeof handle === 'number' ? handle : null);
   const createBrowserFrameFns = (deps) => {
       let cachedRafWindowRef = null;
@@ -15912,9 +15914,198 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
           setDrawPaused,
       };
   };
+  const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
+  const MAX_STATUS_ICONS_PER_TOKEN = 5;
+  const CONTROL_TAGS = new Set(['control', 'silence', 'taunt', 'stun', 'sleep', 'fear']);
+  const STATUS_ICON_PATHS = {
+      blind: 'assets/blind.svg',
+      damageCut: 'assets/damageCut.svg',
+      exalt: 'assets/exalt.svg',
+      weaken: 'assets/weaken.svg',
+      reflect: 'assets/reflect.svg',
+      haste: 'assets/haste.svg',
+      silence: 'assets/silence.svg',
+      pierce: 'assets/pierce.svg',
+      stun: 'assets/silence.svg',
+      sleep: 'assets/silence.svg',
+      taunt: 'assets/silence.svg',
+      bleed: 'assets/weaken.svg',
+      fatigue: 'assets/weaken.svg',
+      daze: 'assets/weaken.svg',
+      fear: 'assets/silence.svg',
+      shield: 'assets/reflect.svg',
+      stealth: 'assets/haste.svg',
+      frenzy: 'assets/exalt.svg',
+      allure: 'assets/haste.svg',
+      execute: 'assets/pierce.svg',
+      venom: 'assets/pierce.svg',
+      undying: 'assets/reflect.svg',
+      me_hoac: 'assets/silence.svg',
+      loithienanh_spd_burn: 'assets/weaken.svg',
+      accuracy_down: 'assets/weaken.svg',
+  };
+  const STATUS_META_BY_ID = {
+      blind: { id: 'blind', label: 'Blind', icon: STATUS_ICON_PATHS.blind },
+      damageCut: { id: 'damageCut', label: 'Damage Cut', icon: STATUS_ICON_PATHS.damageCut },
+      exalt: { id: 'exalt', label: 'Exalt', icon: STATUS_ICON_PATHS.exalt },
+      weaken: { id: 'weaken', label: 'Weaken', icon: STATUS_ICON_PATHS.weaken },
+      reflect: { id: 'reflect', label: 'Reflect', icon: STATUS_ICON_PATHS.reflect },
+      haste: { id: 'haste', label: 'Haste', icon: STATUS_ICON_PATHS.haste },
+      silence: { id: 'silence', label: 'Silence', icon: STATUS_ICON_PATHS.silence },
+      pierce: { id: 'pierce', label: 'Pierce', icon: STATUS_ICON_PATHS.pierce },
+      stun: { id: 'stun', label: 'Stun', icon: STATUS_ICON_PATHS.stun },
+      sleep: { id: 'sleep', label: 'Sleep', icon: STATUS_ICON_PATHS.sleep },
+      taunt: { id: 'taunt', label: 'Taunt', icon: STATUS_ICON_PATHS.taunt },
+      bleed: { id: 'bleed', label: 'Bleed', icon: STATUS_ICON_PATHS.bleed },
+      fatigue: { id: 'fatigue', label: 'Fatigue', icon: STATUS_ICON_PATHS.fatigue },
+      daze: { id: 'daze', label: 'Daze', icon: STATUS_ICON_PATHS.daze },
+      fear: { id: 'fear', label: 'Fear', icon: STATUS_ICON_PATHS.fear },
+      shield: { id: 'shield', label: 'Shield', icon: STATUS_ICON_PATHS.shield },
+      stealth: { id: 'stealth', label: 'Stealth', icon: STATUS_ICON_PATHS.stealth },
+      frenzy: { id: 'frenzy', label: 'Frenzy', icon: STATUS_ICON_PATHS.frenzy },
+      allure: { id: 'allure', label: 'Allure', icon: STATUS_ICON_PATHS.allure },
+      execute: { id: 'execute', label: 'Execute', icon: STATUS_ICON_PATHS.execute },
+      venom: { id: 'venom', label: 'Venom', icon: STATUS_ICON_PATHS.venom },
+      undying: { id: 'undying', label: 'Undying', icon: STATUS_ICON_PATHS.undying },
+      me_hoac: { id: 'me_hoac', label: 'Mê Hoặc', icon: STATUS_ICON_PATHS.me_hoac },
+      loithienanh_spd_burn: { id: 'loithienanh_spd_burn', label: 'SPD Burn', icon: STATUS_ICON_PATHS.loithienanh_spd_burn },
+      accuracy_down: { id: 'accuracy_down', label: 'Accuracy Down', icon: STATUS_ICON_PATHS.accuracy_down },
+  };
+  const STATUS_ID_ALIAS_TO_CANONICAL = Object.freeze({
+      dmgCut: 'damageCut',
+  });
+  const STATUS_META_BY_TAG = {
+      control: { id: 'control', label: 'Control', icon: 'assets/silence.svg' },
+      silence: { id: 'silence', label: 'Silence', icon: 'assets/silence.svg' },
+      shield: { id: 'shield', label: 'Shield', icon: 'assets/reflect.svg' },
+      mitigation: { id: 'mitigation', label: 'Mitigation', icon: 'assets/damageCut.svg' },
+      output: { id: 'output', label: 'Output Down', icon: 'assets/weaken.svg' },
+      stat: { id: 'stat', label: 'Stat', icon: 'assets/haste.svg' },
+      penetration: { id: 'penetration', label: 'Penetration', icon: 'assets/pierce.svg' },
+      dot: { id: 'dot', label: 'Damage over Time', icon: 'assets/weaken.svg' },
+      counter: { id: 'counter', label: 'Counter', icon: 'assets/reflect.svg' },
+  };
+  const statusAggregateCache = new WeakMap();
+  const getStatusMeta = (status) => {
+      const rawId = typeof status?.id === 'string' ? status.id : '';
+      const id = STATUS_ID_ALIAS_TO_CANONICAL[rawId] ?? rawId;
+      const tag = typeof status?.tag === 'string' ? status.tag : '';
+      const byId = id ? STATUS_META_BY_ID[id] : null;
+      const byTag = tag ? STATUS_META_BY_TAG[tag] : null;
+      if (byId)
+          return byId;
+      if (byTag)
+          return byTag;
+      const fallbackId = id || tag || 'default';
+      const fallbackLabel = id || tag || 'Effect';
+      const fallbackIcon = fallbackId in STATUS_ICON_PATHS
+          ? STATUS_ICON_PATHS[fallbackId]
+          : DEFAULT_STATUS_ICON_PATH;
+      return { id: fallbackId, label: fallbackLabel, icon: fallbackIcon };
+  };
+  const computeStatusTurnsLeft = (status) => {
+      const candidates = [status?.dur, status?.ttlTurns, status?.turns, status?.ttl];
+      for (const value of candidates) {
+          const parsed = parseFiniteNumber(value);
+          if (parsed !== null) {
+              return Math.max(0, Math.round(parsed));
+          }
+      }
+      return null;
+  };
+  const buildStatusTooltip = (label, stacks, turnsLeft) => {
+      const stacksText = `x${Math.max(1, stacks)}`;
+      const turnsText = turnsLeft === null ? '∞T' : `${turnsLeft}T`;
+      return `${label} ${stacksText} · ${turnsText}`;
+  };
+  const buildStatusAggregateSignature = (statuses) => {
+      let signature = `len:${statuses.length}`;
+      for (const status of statuses) {
+          if (!status || typeof status !== 'object') {
+              signature += '|_';
+              continue;
+          }
+          const id = typeof status.id === 'string' ? status.id : '';
+          const tag = typeof status.tag === 'string' ? status.tag : '';
+          const kind = typeof status.kind === 'string' ? status.kind : '';
+          const stacks = parseFiniteNumber(status.stacks) ?? 1;
+          const turnsLeft = computeStatusTurnsLeft(status);
+          signature += `|${id}:${tag}:${kind}:${stacks}:${turnsLeft ?? 'inf'}`;
+      }
+      return signature;
+  };
+  const aggregateStatuses = (statusesInput) => {
+      const statuses = Array.isArray(statusesInput) ? statusesInput : [];
+      if (!statuses.length)
+          return [];
+      const signature = buildStatusAggregateSignature(statuses);
+      const cached = statusAggregateCache.get(statuses);
+      if (cached && cached.signature === signature) {
+          return cached.aggregates;
+      }
+      const byStatusId = new Map();
+      for (const rawStatus of statuses) {
+          if (!rawStatus || typeof rawStatus !== 'object')
+              continue;
+          const statusRecord = rawStatus;
+          const statusId = typeof statusRecord.id === 'string' ? statusRecord.id : null;
+          if (!statusId)
+              continue;
+          const tag = typeof statusRecord.tag === 'string' ? statusRecord.tag : '';
+          const kind = typeof statusRecord.kind === 'string' ? statusRecord.kind : '';
+          const isControl = CONTROL_TAGS.has(tag) || CONTROL_TAGS.has(statusId);
+          const isDebuff = kind === 'debuff';
+          const priority = isControl ? 0 : (isDebuff ? 1 : 2);
+          const turnsLeft = computeStatusTurnsLeft(statusRecord);
+          const stacks = Math.max(1, Math.round(parseFiniteNumber(statusRecord.stacks) ?? 1));
+          const existing = byStatusId.get(statusId);
+          if (!existing) {
+              byStatusId.set(statusId, {
+                  statusId,
+                  meta: getStatusMeta(statusRecord),
+                  priority,
+                  stacks,
+                  turnsLeft,
+              });
+              continue;
+          }
+          existing.stacks += stacks;
+          if (turnsLeft !== null) {
+              existing.turnsLeft = existing.turnsLeft === null
+                  ? turnsLeft
+                  : Math.max(existing.turnsLeft, turnsLeft);
+          }
+          existing.priority = Math.min(existing.priority, priority);
+      }
+      const aggregates = Array.from(byStatusId.values());
+      aggregates.sort((a, b) => (a.priority - b.priority
+          || ((b.turnsLeft ?? Number.MAX_SAFE_INTEGER) - (a.turnsLeft ?? Number.MAX_SAFE_INTEGER))
+          || a.meta.label.localeCompare(b.meta.label)));
+      statusAggregateCache.set(statuses, { signature, aggregates });
+      return aggregates;
+  };
+  const resolveStatusIconPreview = (statusesInput) => {
+      const preview = [];
+      const aggregates = aggregateStatuses(statusesInput);
+      for (const aggregate of aggregates) {
+          if (preview.length >= MAX_STATUS_ICONS_PER_TOKEN)
+              break;
+          preview.push({
+              id: aggregate.statusId,
+              tooltip: buildStatusTooltip(aggregate.meta.label, aggregate.stacks, aggregate.turnsLeft),
+              priority: aggregate.priority,
+          });
+      }
+      return preview;
+  };
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createBrowserFrameFns')) exports.createBrowserFrameFns = createBrowserFrameFns;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionRenderController')) exports.createSessionRenderController = createSessionRenderController;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'DEFAULT_STATUS_ICON_PATH')) exports.DEFAULT_STATUS_ICON_PATH = DEFAULT_STATUS_ICON_PATH;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'MAX_STATUS_ICONS_PER_TOKEN')) exports.MAX_STATUS_ICONS_PER_TOKEN = MAX_STATUS_ICONS_PER_TOKEN;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'buildStatusTooltip')) exports.buildStatusTooltip = buildStatusTooltip;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'aggregateStatuses')) exports.aggregateStatuses = aggregateStatuses;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusIconPreview')) exports.resolveStatusIconPreview = resolveStatusIconPreview;
 };
 __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) => {
   const __dep2 = __require('./aether.ts');
@@ -16026,8 +16217,13 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const __dep30 = __require('./modes/pve/session-events.ts');
   const createSessionEventBindings = __dep30.createSessionEventBindings;
   const __dep31 = __require('./modes/pve/session-render.ts');
+  const aggregateStatuses = __dep31.aggregateStatuses;
+  const buildStatusTooltip = __dep31.buildStatusTooltip;
   const createBrowserFrameFns = __dep31.createBrowserFrameFns;
   const createSessionRenderController = __dep31.createSessionRenderController;
+  const DEFAULT_STATUS_ICON_PATH = __dep31.DEFAULT_STATUS_ICON_PATH;
+  const MAX_STATUS_ICONS_PER_TOKEN = __dep31.MAX_STATUS_ICONS_PER_TOKEN;
+  const resolveStatusIconPreview = __dep31.resolveStatusIconPreview;
   const __dep32 = __require('./leader-uyen.ts');
   const ensureUyenState = __dep32.ensureUyenState;
   const getUyenUltChoice = __dep32.getUyenUltChoice;
@@ -16442,80 +16638,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   let leaderEndCheckFlags = { ally: false, enemy: false };
   const hpBarGradientCache = new Map();
   const meleeOffsetTokenKeys = new Set();
-  const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
-  const STATUS_ICON_PATHS = {
-      blind: 'assets/blind.svg',
-      damageCut: 'assets/damageCut.svg',
-      exalt: 'assets/exalt.svg',
-      weaken: 'assets/weaken.svg',
-      reflect: 'assets/reflect.svg',
-      haste: 'assets/haste.svg',
-      silence: 'assets/silence.svg',
-      pierce: 'assets/pierce.svg',
-      stun: 'assets/silence.svg',
-      sleep: 'assets/silence.svg',
-      taunt: 'assets/silence.svg',
-      bleed: 'assets/weaken.svg',
-      fatigue: 'assets/weaken.svg',
-      daze: 'assets/weaken.svg',
-      fear: 'assets/silence.svg',
-      shield: 'assets/reflect.svg',
-      stealth: 'assets/haste.svg',
-      frenzy: 'assets/exalt.svg',
-      allure: 'assets/haste.svg',
-      execute: 'assets/pierce.svg',
-      venom: 'assets/pierce.svg',
-      undying: 'assets/reflect.svg',
-      me_hoac: 'assets/silence.svg',
-      loithienanh_spd_burn: 'assets/weaken.svg',
-      accuracy_down: 'assets/weaken.svg',
-  };
   const ATTACK_EVENT_TYPES = new Set(['melee', 'tracer', 'lightning_arc', 'blood_pulse', 'ground_burst']);
-  const MAX_STATUS_ICONS_PER_TOKEN = 5;
-  const CONTROL_TAGS = new Set(['control', 'silence', 'taunt', 'stun', 'sleep', 'fear']);
-  const STATUS_META_BY_ID = {
-      blind: { id: 'blind', label: 'Blind', icon: STATUS_ICON_PATHS.blind },
-      damageCut: { id: 'damageCut', label: 'Damage Cut', icon: STATUS_ICON_PATHS.damageCut },
-      exalt: { id: 'exalt', label: 'Exalt', icon: STATUS_ICON_PATHS.exalt },
-      weaken: { id: 'weaken', label: 'Weaken', icon: STATUS_ICON_PATHS.weaken },
-      reflect: { id: 'reflect', label: 'Reflect', icon: STATUS_ICON_PATHS.reflect },
-      haste: { id: 'haste', label: 'Haste', icon: STATUS_ICON_PATHS.haste },
-      silence: { id: 'silence', label: 'Silence', icon: STATUS_ICON_PATHS.silence },
-      pierce: { id: 'pierce', label: 'Pierce', icon: STATUS_ICON_PATHS.pierce },
-      stun: { id: 'stun', label: 'Stun', icon: STATUS_ICON_PATHS.stun },
-      sleep: { id: 'sleep', label: 'Sleep', icon: STATUS_ICON_PATHS.sleep },
-      taunt: { id: 'taunt', label: 'Taunt', icon: STATUS_ICON_PATHS.taunt },
-      bleed: { id: 'bleed', label: 'Bleed', icon: STATUS_ICON_PATHS.bleed },
-      fatigue: { id: 'fatigue', label: 'Fatigue', icon: STATUS_ICON_PATHS.fatigue },
-      daze: { id: 'daze', label: 'Daze', icon: STATUS_ICON_PATHS.daze },
-      fear: { id: 'fear', label: 'Fear', icon: STATUS_ICON_PATHS.fear },
-      shield: { id: 'shield', label: 'Shield', icon: STATUS_ICON_PATHS.shield },
-      stealth: { id: 'stealth', label: 'Stealth', icon: STATUS_ICON_PATHS.stealth },
-      frenzy: { id: 'frenzy', label: 'Frenzy', icon: STATUS_ICON_PATHS.frenzy },
-      allure: { id: 'allure', label: 'Allure', icon: STATUS_ICON_PATHS.allure },
-      execute: { id: 'execute', label: 'Execute', icon: STATUS_ICON_PATHS.execute },
-      venom: { id: 'venom', label: 'Venom', icon: STATUS_ICON_PATHS.venom },
-      undying: { id: 'undying', label: 'Undying', icon: STATUS_ICON_PATHS.undying },
-      me_hoac: { id: 'me_hoac', label: 'Mê Hoặc', icon: STATUS_ICON_PATHS.me_hoac },
-      loithienanh_spd_burn: { id: 'loithienanh_spd_burn', label: 'SPD Burn', icon: STATUS_ICON_PATHS.loithienanh_spd_burn },
-      accuracy_down: { id: 'accuracy_down', label: 'Accuracy Down', icon: STATUS_ICON_PATHS.accuracy_down },
-  };
-  const STATUS_ID_ALIAS_TO_CANONICAL = Object.freeze({
-      dmgCut: 'damageCut',
-  });
-  const STATUS_META_BY_TAG = {
-      control: { id: 'control', label: 'Control', icon: 'assets/silence.svg' },
-      silence: { id: 'silence', label: 'Silence', icon: 'assets/silence.svg' },
-      shield: { id: 'shield', label: 'Shield', icon: 'assets/reflect.svg' },
-      mitigation: { id: 'mitigation', label: 'Mitigation', icon: 'assets/damageCut.svg' },
-      output: { id: 'output', label: 'Output Down', icon: 'assets/weaken.svg' },
-      stat: { id: 'stat', label: 'Stat', icon: 'assets/haste.svg' },
-      penetration: { id: 'penetration', label: 'Penetration', icon: 'assets/pierce.svg' },
-      dot: { id: 'dot', label: 'Damage over Time', icon: 'assets/weaken.svg' },
-      counter: { id: 'counter', label: 'Counter', icon: 'assets/reflect.svg' },
-  };
   const statusIconCache = new Map();
-  const statusAggregateCache = new WeakMap();
   const statusIconHitboxes = [];
   let statusIconHoverTooltip = '';
   let canvasMouseMoveHandler = null;
@@ -18562,104 +18686,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const hpMax = Math.max(1, toFiniteOrZero(unit.hpMax));
       return Math.max(0, Math.min(1, shieldAmount / hpMax));
   }
-  function getStatusMeta(status) {
-      const rawId = typeof status?.id === 'string' ? status.id : '';
-      const id = STATUS_ID_ALIAS_TO_CANONICAL[rawId] ?? rawId;
-      const tag = typeof status?.tag === 'string' ? status.tag : '';
-      const byId = id ? STATUS_META_BY_ID[id] : null;
-      const byTag = tag ? STATUS_META_BY_TAG[tag] : null;
-      if (byId)
-          return byId;
-      if (byTag)
-          return byTag;
-      const fallbackId = id || tag || 'default';
-      const fallbackLabel = id || tag || 'Effect';
-      const fallbackIcon = fallbackId in STATUS_ICON_PATHS
-          ? STATUS_ICON_PATHS[fallbackId]
-          : DEFAULT_STATUS_ICON_PATH;
-      return { id: fallbackId, label: fallbackLabel, icon: fallbackIcon };
-  }
-  function computeStatusTurnsLeft(status) {
-      const candidates = [status?.dur, status?.ttlTurns, status?.turns, status?.ttl];
-      for (const value of candidates) {
-          const parsed = parseFiniteNumber(value);
-          if (parsed !== null) {
-              return Math.max(0, Math.round(parsed));
-          }
-      }
-      return null;
-  }
-  function buildStatusTooltip(label, stacks, turnsLeft) {
-      const stacksText = `x${Math.max(1, stacks)}`;
-      const turnsText = turnsLeft === null ? '∞T' : `${turnsLeft}T`;
-      return `${label} ${stacksText} · ${turnsText}`;
-  }
-  function buildStatusAggregateSignature(statuses) {
-      let signature = `len:${statuses.length}`;
-      for (const status of statuses) {
-          if (!status || typeof status !== 'object') {
-              signature += '|_';
-              continue;
-          }
-          const id = typeof status.id === 'string' ? status.id : '';
-          const tag = typeof status.tag === 'string' ? status.tag : '';
-          const kind = typeof status.kind === 'string' ? status.kind : '';
-          const stacks = parseFiniteNumber(status.stacks) ?? 1;
-          const turnsLeft = computeStatusTurnsLeft(status);
-          signature += `|${id}:${tag}:${kind}:${stacks}:${turnsLeft ?? 'inf'}`;
-      }
-      return signature;
-  }
-  function aggregateStatuses(statusesInput) {
-      const statuses = Array.isArray(statusesInput) ? statusesInput : [];
-      if (!statuses.length)
-          return [];
-      const signature = buildStatusAggregateSignature(statuses);
-      const cached = statusAggregateCache.get(statuses);
-      if (cached && cached.signature === signature) {
-          return cached.aggregates;
-      }
-      const byStatusId = new Map();
-      for (const rawStatus of statuses) {
-          if (!rawStatus || typeof rawStatus !== 'object')
-              continue;
-          const statusRecord = rawStatus;
-          const statusId = typeof statusRecord.id === 'string' ? statusRecord.id : null;
-          if (!statusId)
-              continue;
-          const tag = typeof statusRecord.tag === 'string' ? statusRecord.tag : '';
-          const kind = typeof statusRecord.kind === 'string' ? statusRecord.kind : '';
-          const isControl = CONTROL_TAGS.has(tag) || CONTROL_TAGS.has(statusId);
-          const isDebuff = kind === 'debuff';
-          const priority = isControl ? 0 : (isDebuff ? 1 : 2);
-          const turnsLeft = computeStatusTurnsLeft(statusRecord);
-          const stacks = Math.max(1, Math.round(parseFiniteNumber(statusRecord.stacks) ?? 1));
-          const existing = byStatusId.get(statusId);
-          if (!existing) {
-              byStatusId.set(statusId, {
-                  statusId,
-                  meta: getStatusMeta(statusRecord),
-                  priority,
-                  stacks,
-                  turnsLeft,
-              });
-              continue;
-          }
-          existing.stacks += stacks;
-          if (turnsLeft !== null) {
-              existing.turnsLeft = existing.turnsLeft === null
-                  ? turnsLeft
-                  : Math.max(existing.turnsLeft, turnsLeft);
-          }
-          existing.priority = Math.min(existing.priority, priority);
-      }
-      const aggregates = Array.from(byStatusId.values());
-      aggregates.sort((a, b) => (a.priority - b.priority
-          || ((b.turnsLeft ?? Number.MAX_SAFE_INTEGER) - (a.turnsLeft ?? Number.MAX_SAFE_INTEGER))
-          || a.meta.label.localeCompare(b.meta.label)));
-      statusAggregateCache.set(statuses, { signature, aggregates });
-      return aggregates;
-  }
   function ensureStatusIconLoaded(iconId, iconPath) {
       if (typeof Image === 'undefined')
           return null;
@@ -18732,18 +18758,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       return icons;
   }
   function __resolveStatusIconPreview(statusesInput) {
-      const preview = [];
-      const aggregates = aggregateStatuses(statusesInput);
-      for (const aggregate of aggregates) {
-          if (preview.length >= MAX_STATUS_ICONS_PER_TOKEN)
-              break;
-          preview.push({
-              id: aggregate.statusId,
-              tooltip: buildStatusTooltip(aggregate.meta.label, aggregate.stacks, aggregate.turnsLeft),
-              priority: aggregate.priority,
-          });
-      }
-      return preview;
+      return resolveStatusIconPreview(statusesInput);
   }
   function updateStatusIconHoverTooltip(clientX, clientY) {
       if (!canvas)

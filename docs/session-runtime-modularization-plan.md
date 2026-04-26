@@ -228,12 +228,97 @@ Di chuyển theo nguyên tắc **copy-move, không đổi hành vi**:
   2. gom toàn bộ phần “render scheduling + frame source” về cùng module `session-render`;
   3. giữ nguyên call site và deps injection nên rủi ro drift thấp.
 
+### Nâng cấp D1 (D1.2) — tách status aggregation/tooltip resolver sang `session-render`
+
+- Động cơ:
+  - `drawHPBars` cần status aggregates + tooltip text nhưng phần này độc lập với `Game/ctx`.
+  - Đây là bước tách “an toàn trước” trong nhóm render pipeline vì chỉ move pure resolver + cache, không đụng draw geometry.
+- Scope move khỏi `session-runtime-impl.ts`:
+  - metadata resolver (`STATUS_*` map cho status icon/meta/tag),
+  - aggregate/signature cache (`statusAggregateCache`, `aggregateStatuses`),
+  - tooltip formatter + preview resolver.
+- Scope giữ ở impl:
+  - image loading/cache (`ensureStatusIconLoaded`, `statusIconCache`),
+  - hitbox hover + draw trực tiếp (`drawHPBars`, `statusIconHitboxes`).
+- Contract sau tách:
+  - `session-render` export:
+    - `aggregateStatuses(statusesInput)`
+    - `buildStatusTooltip(label, stacks, turnsLeft)`
+    - `resolveStatusIconPreview(statusesInput)`
+    - constants dùng chung (`DEFAULT_STATUS_ICON_PATH`, `MAX_STATUS_ICONS_PER_TOKEN`).
+  - `session-runtime-impl` chỉ gọi lại API này, không giữ bản triển khai shadow.
+
 ### Prompt QA re-run cho `session-render` (để chốt D1)
 
 > Re-run checklist sau khi tách D1:
 > 1. `session-runtime-impl.ts` không còn implementation trực tiếp của `scheduleDraw/cancelScheduledDraw/scheduleResize/cancelScheduledResize/scheduleViewportResizeIfChanged/setDrawPaused`.
 > 2. `session-render.ts` là single source cho scheduler logic.
 > 3. Event bindings và loop vẫn gọi cùng API scheduler như trước (không đổi luồng runtime).
+
+---
+
+## 4.4 Có nên nâng cấp thêm `src/combat.ts`, `main.ts`, `events.ts`, `entry.ts`, `engine.ts` ngay trong đợt tách `session-render`?
+
+**Kết luận ngắn:** **Có**, nhưng theo thứ tự ưu tiên và theo nguyên tắc **reuse-first** để tránh “đập đi làm lại” không cần thiết.
+
+### Nguyên tắc quyết định
+
+1. **Không mở rộng scope thuật toán combat trong cùng commit tách module render.**
+2. **Chỉ gom/chuẩn hóa điểm nối (adapter, scheduler, event bridge) trước.**
+3. **Mọi tối ưu phải ưu tiên gọi lại hàm đã có, không dựng song song helper tương đương.**
+
+### Ưu tiên theo file (đề xuất thực thi)
+
+1. **`src/events.ts` (ưu tiên cao)**
+   - Mục tiêu: giảm overhead phân nhánh runtime emitter.
+   - Việc nên làm:
+     - gom chuẩn hóa payload vào một đường duy nhất (native event hoặc record fallback),
+     - tái dùng `isGameEventRecord`, `createNativeEvent`, `isEventEmitterLike` thay vì thêm bộ check mới.
+   - Lợi ích: giảm duplicate guard trong các caller (`main.ts`, `session-events`).
+
+2. **`src/main.ts` (ưu tiên cao)**
+   - Mục tiêu: giữ `startGame/stopGame/updateGameConfig` mỏng, ít nhánh.
+   - Việc nên làm:
+     - tiếp tục coi đây là **facade**: root resolution + session lifecycle + onEvent passthrough,
+     - không đưa thêm logic gameplay vào đây,
+     - tái dùng converter hiện có (`toRootSource`, `toSessionConfigOverrides`, `resolveRoot`) thay vì phát sinh parser mới.
+
+3. **`src/entry.ts` (ưu tiên trung bình-cao)**
+   - Mục tiêu: giảm coupling giữa shell navigation và load module.
+   - Việc nên làm:
+     - giữ `loadBundledModule` là đường vào duy nhất cho lazy module,
+     - gom các hằng screen/module id về cấu trúc map để tránh dead constant rải rác,
+     - tận dụng cache module (`MODULE_PROMISE_CACHE`) hiện có, không tạo cache lớp mới.
+
+4. **`src/engine.ts` (ưu tiên trung bình)**
+   - Mục tiêu: giảm chi phí render-frame phụ trợ (không đổi output hình ảnh).
+   - Việc nên làm:
+     - tái dùng buffer/sort có sẵn (`TOKEN_DRAW_BUFFER`, `sortByProjectionDepth`),
+     - hạn chế parse/cast lặp lại trong hot path bằng helper đã có (`coerceFinite`, `tokenVisualKey`),
+     - tránh tạo object tạm mới trong loop nếu có thể mutate entry cache hiện hữu.
+
+5. **`src/combat.ts` (ưu tiên có kiểm soát)**
+   - Mục tiêu: giảm deadcode và duplicate utility trước, chưa đụng công thức damage.
+   - Việc nên làm:
+     - chuẩn hóa helper numeric/tag check theo các util combat đã tách (`calculate-final-damage`, `number-utils`, `counter-matrix`),
+     - gom nhánh log metadata vào 1 pipeline để giảm trạng thái tạm,
+     - giữ nguyên thứ tự gọi runtime hooks/passive hooks để không lệch hành vi.
+
+### Guardrail để không vỡ hiệu năng/logic
+
+- **Không đổi public API** của `createPveSession`, `startGame`, event constants.
+- **Không đổi thứ tự side-effect** trong turn/combat/event dispatch.
+- **Mỗi commit chỉ một trục tối ưu chính**:
+  1) render scheduler,
+  2) event bridge,
+  3) facade/main-entry cleanup,
+  4) engine hot path,
+  5) combat cleanup.
+
+### Chốt đề xuất áp dụng
+
+- Nếu mục tiêu hiện tại là tách `session-render`: chỉ nên “nâng cấp” các file trên ở mức **adapter-level cleanup** (giảm overhead, gom module, bỏ dead branch).
+- Các thay đổi sâu trong `combat.ts`/`engine.ts` nên để ở commit kế tiếp có benchmark hoặc test snapshot đi kèm.
 
 ---
 
