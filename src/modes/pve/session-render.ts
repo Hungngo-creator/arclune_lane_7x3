@@ -1,9 +1,10 @@
 export type FrameHandle = number | ReturnType<typeof setTimeout>;
+export type RequestAnimationFrameFn = (callback: FrameRequestCallback) => number;
+export type CancelAnimationFrameFn = (handle: number) => void;
+type NullableRequestAnimationFrameFn = RequestAnimationFrameFn | null;
+type NullableCancelAnimationFrameFn = CancelAnimationFrameFn | null;
 
-type RequestAnimationFrameFn = ((callback: FrameRequestCallback) => number) | null;
-type CancelAnimationFrameFn = ((handle: number) => void) | null;
-
-type ViewportResizeDebugState = {
+export type ViewportResizeDebugState = {
   width: number;
   height: number;
   scale: number;
@@ -19,8 +20,8 @@ type SessionRenderControllerDeps = {
   shouldKeepDrawing: () => boolean;
   onResize: () => void;
   onResizeError: (error: unknown) => void;
-  getRequestAnimationFrame: () => RequestAnimationFrameFn;
-  getCancelAnimationFrame: () => CancelAnimationFrameFn;
+  getRequestAnimationFrame: () => NullableRequestAnimationFrameFn;
+  getCancelAnimationFrame: () => NullableCancelAnimationFrameFn;
   getWindowRef: () => (Window & typeof globalThis) | null;
   getViewportResizeDebugState: () => ViewportResizeDebugState | null;
   setViewportResizeDebugState: (state: ViewportResizeDebugState | null) => void;
@@ -39,6 +40,50 @@ type SessionRenderController = {
 const toAnimationFrameHandle = (handle: FrameHandle): number | null => (
   typeof handle === 'number' ? handle : null
 );
+
+type BrowserFrameDeps = {
+  getWindowRef: () => (Window & typeof globalThis) | null;
+};
+
+type BrowserFrameFns = {
+  getRequestAnimationFrame: () => NullableRequestAnimationFrameFn;
+  getCancelAnimationFrame: () => NullableCancelAnimationFrameFn;
+};
+
+export const createBrowserFrameFns = (
+  deps: BrowserFrameDeps,
+): BrowserFrameFns => {
+  let cachedRafWindowRef: (Window & typeof globalThis) | null = null;
+  let cachedRafFn: NullableRequestAnimationFrameFn = null;
+  let cachedCancelRafFn: NullableCancelAnimationFrameFn = null;
+
+  const refreshAnimationFrameFns = (): void => {
+    const win = deps.getWindowRef();
+    if (win === cachedRafWindowRef) return;
+    cachedRafWindowRef = win;
+    if (win && typeof win.requestAnimationFrame === 'function'){
+      cachedRafFn = win.requestAnimationFrame.bind(win);
+    } else {
+      cachedRafFn = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null;
+    }
+    if (win && typeof win.cancelAnimationFrame === 'function'){
+      cachedCancelRafFn = win.cancelAnimationFrame.bind(win);
+    } else {
+      cachedCancelRafFn = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null;
+    }
+  };
+
+  return {
+    getRequestAnimationFrame: (): NullableRequestAnimationFrameFn => {
+      refreshAnimationFrameFns();
+      return cachedRafFn;
+    },
+    getCancelAnimationFrame: (): NullableCancelAnimationFrameFn => {
+      refreshAnimationFrameFns();
+      return cachedCancelRafFn;
+    },
+  };
+};
 
 export const createSessionRenderController = (
   deps: SessionRenderControllerDeps,

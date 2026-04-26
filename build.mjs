@@ -95,6 +95,7 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['./modes/pve/session-loop.js', './modes/pve/session-loop.ts'],
   ['./modes/pve/session-render', './modes/pve/session-render.ts'],
   ['./modes/pve/session-render.js', './modes/pve/session-render.ts'],
+  ['./modes/pve/session-render.ts', './modes/pve/session-render.ts'],
   ['./modes/pve/session-render/index.js', './modes/pve/session-render.ts'],
   ['./modes/pve/session-events', './modes/pve/session-events.ts'],
   ['./modes/pve/session-events.js', './modes/pve/session-events.ts'],

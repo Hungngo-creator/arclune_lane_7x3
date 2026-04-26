@@ -15710,6 +15710,39 @@ __modules['./modes/pve/session-loop.ts'] = (exports, module, __require) => {
 };
 __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
   const toAnimationFrameHandle = (handle) => (typeof handle === 'number' ? handle : null);
+  const createBrowserFrameFns = (deps) => {
+      let cachedRafWindowRef = null;
+      let cachedRafFn = null;
+      let cachedCancelRafFn = null;
+      const refreshAnimationFrameFns = () => {
+          const win = deps.getWindowRef();
+          if (win === cachedRafWindowRef)
+              return;
+          cachedRafWindowRef = win;
+          if (win && typeof win.requestAnimationFrame === 'function') {
+              cachedRafFn = win.requestAnimationFrame.bind(win);
+          }
+          else {
+              cachedRafFn = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null;
+          }
+          if (win && typeof win.cancelAnimationFrame === 'function') {
+              cachedCancelRafFn = win.cancelAnimationFrame.bind(win);
+          }
+          else {
+              cachedCancelRafFn = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null;
+          }
+      };
+      return {
+          getRequestAnimationFrame: () => {
+              refreshAnimationFrameFns();
+              return cachedRafFn;
+          },
+          getCancelAnimationFrame: () => {
+              refreshAnimationFrameFns();
+              return cachedCancelRafFn;
+          },
+      };
+  };
   const createSessionRenderController = (deps) => {
       let drawFrameHandle = null;
       let drawFrameUsesTimeout = false;
@@ -15880,6 +15913,7 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
       };
   };
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createBrowserFrameFns')) exports.createBrowserFrameFns = createBrowserFrameFns;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionRenderController')) exports.createSessionRenderController = createSessionRenderController;
 };
 __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) => {
@@ -15992,6 +16026,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const __dep30 = __require('./modes/pve/session-events.ts');
   const createSessionEventBindings = __dep30.createSessionEventBindings;
   const __dep31 = __require('./modes/pve/session-render.ts');
+  const createBrowserFrameFns = __dep31.createBrowserFrameFns;
   const createSessionRenderController = __dep31.createSessionRenderController;
   const __dep32 = __require('./leader-uyen.ts');
   const ensureUyenState = __dep32.ensureUyenState;
@@ -16484,34 +16519,12 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const statusIconHitboxes = [];
   let statusIconHoverTooltip = '';
   let canvasMouseMoveHandler = null;
-  let cachedRafWindowRef = null;
-  let cachedRafFn = null;
-  let cachedCancelRafFn = null;
+  const { getRequestAnimationFrame, getCancelAnimationFrame, } = createBrowserFrameFns({
+      getWindowRef: () => winRef,
+  });
   const refreshAnimationFrameFns = () => {
-      const win = winRef;
-      if (win === cachedRafWindowRef)
-          return;
-      cachedRafWindowRef = win;
-      if (win && typeof win.requestAnimationFrame === 'function') {
-          cachedRafFn = win.requestAnimationFrame.bind(win);
-      }
-      else {
-          cachedRafFn = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null;
-      }
-      if (win && typeof win.cancelAnimationFrame === 'function') {
-          cachedCancelRafFn = win.cancelAnimationFrame.bind(win);
-      }
-      else {
-          cachedCancelRafFn = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null;
-      }
-  };
-  const getRequestAnimationFrame = () => {
-      refreshAnimationFrameFns();
-      return cachedRafFn;
-  };
-  const getCancelAnimationFrame = () => {
-      refreshAnimationFrameFns();
-      return cachedCancelRafFn;
+      getRequestAnimationFrame();
+      getCancelAnimationFrame();
   };
   const makeMeleeTokenKey = (token) => {
       if (Number.isFinite(token?.iid)) {
@@ -19004,7 +19017,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       isSessionInitialized: () => Boolean(Game && Game._inited),
       getSession: () => Game,
   });
-  const { clearSessionTimers, configureRoot, stopSession, startSession, } = sessionEventBindings;
+  const { clearSessionTimers, configureRoot, resolveTimerElement, stopSession, startSession, } = sessionEventBindings;
   function applyConfigToRunningGame(cfg) {
       if (!Game)
           return;

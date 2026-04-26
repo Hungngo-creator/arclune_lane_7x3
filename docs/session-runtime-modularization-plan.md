@@ -214,6 +214,20 @@ Di chuyển theo nguyên tắc **copy-move, không đổi hành vi**:
   - tạo `createSessionRenderController(deps)` và destructure API ở impl.
   - giữ nguyên listener gọi `scheduleDraw/scheduleResize` để không đổi luồng event.
 
+### Nâng cấp D1 (D1.1) — tách thêm browser frame resolver để giảm logic render còn sót trong impl
+
+- Reuse-first: tận dụng lại scheduler đã có trong `session-render`, **không đổi thuật toán scheduling**.
+- Move khỏi `session-runtime-impl.ts`:
+  - cache resolver `requestAnimationFrame/cancelAnimationFrame` theo `winRef`.
+  - kiểu state viewport debug dùng cho resize gate.
+- Thêm trong `session-render.ts`:
+  - `createBrowserFrameFns({ getWindowRef })` để cấp `getRequestAnimationFrame/getCancelAnimationFrame`.
+  - export type `ViewportResizeDebugState` để impl dùng chung type thay vì tự định nghĩa lại.
+- Lợi ích:
+  1. giảm shadow implementation của render scheduler dependencies trong impl;
+  2. gom toàn bộ phần “render scheduling + frame source” về cùng module `session-render`;
+  3. giữ nguyên call site và deps injection nên rủi ro drift thấp.
+
 ### Prompt QA re-run cho `session-render` (để chốt D1)
 
 > Re-run checklist sau khi tách D1:

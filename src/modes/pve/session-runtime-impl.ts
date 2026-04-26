@@ -69,7 +69,10 @@ import { createSessionLoopController } from './session-loop';
 import { createSessionDeckController } from './session-deck';
 import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
 import { createSessionEventBindings } from './session-events';
-import { createSessionRenderController } from './session-render';
+import {
+  createBrowserFrameFns,
+  createSessionRenderController,
+} from './session-render';
 import {
   ensureUyenState,
   getUyenUltChoice,
@@ -107,6 +110,7 @@ import type { NormalizedSessionConfig } from './session-state';
 import type { SessionWithVfx, TokenMeleeOffsetMap } from '../../vfx';
 import type { GameEventDetailMap, GameEventHandler, GameEventType } from '../../events';
 import type { UnitArtLayout } from '@shared-types/art';
+import type { ViewportResizeDebugState } from './session-render';
 
 type RootLike = Element | Document | null | undefined;
 type StartConfigOverrides = Partial<CreateSessionOptions> & Record<string, unknown>;
@@ -692,13 +696,7 @@ const {
 let resizeHandler: (() => void) | null = null;
 let visualViewportResizeHandler: (() => void) | null = null;
 let visualViewportScrollHandler: (() => void) | null = null;
-let viewportResizeDebugState: {
-  width: number;
-  height: number;
-  scale: number;
-  offsetTop: number;
-  offsetLeft: number;
-} | null = null;
+let viewportResizeDebugState: ViewportResizeDebugState | null = null;
 let canvasClickHandler: CanvasClickHandler | null = null;
 let winRef: (Window & typeof globalThis) | null = null;
 let docRef: Document | null = null;
@@ -850,37 +848,15 @@ const statusIconHitboxes: StatusIconHitbox[] = [];
 let statusIconHoverTooltip = '';
 let canvasMouseMoveHandler: ((event: MouseEvent) => void) | null = null;
 
-type RequestAnimationFrameFn = (callback: FrameRequestCallback) => number;
-type CancelAnimationFrameFn = (handle: number) => void;
-
-let cachedRafWindowRef: (Window & typeof globalThis) | null = null;
-let cachedRafFn: RequestAnimationFrameFn | null = null;
-let cachedCancelRafFn: CancelAnimationFrameFn | null = null;
-
+const {
+  getRequestAnimationFrame,
+  getCancelAnimationFrame,
+} = createBrowserFrameFns({
+  getWindowRef: () => winRef,
+});
 const refreshAnimationFrameFns = (): void => {
-  const win = winRef;
-  if (win === cachedRafWindowRef) return;
-  cachedRafWindowRef = win;
-  if (win && typeof win.requestAnimationFrame === 'function'){
-    cachedRafFn = win.requestAnimationFrame.bind(win);
-  } else {
-    cachedRafFn = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : null;
-  }
-  if (win && typeof win.cancelAnimationFrame === 'function'){
-    cachedCancelRafFn = win.cancelAnimationFrame.bind(win);
-  } else {
-    cachedCancelRafFn = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null;
-  }
-};
-
-const getRequestAnimationFrame = (): RequestAnimationFrameFn | null => {
-  refreshAnimationFrameFns();
-  return cachedRafFn;
-};
-
-const getCancelAnimationFrame = (): CancelAnimationFrameFn | null => {
-  refreshAnimationFrameFns();
-  return cachedCancelRafFn;
+  getRequestAnimationFrame();
+  getCancelAnimationFrame();
 };
 
 const makeMeleeTokenKey = (token: Partial<UnitToken> | null | undefined): string | null => {
@@ -3409,6 +3385,7 @@ const sessionEventBindings = createSessionEventBindings({
 const {
   clearSessionTimers,
   configureRoot,
+  resolveTimerElement,
   stopSession,
   startSession,
 } = sessionEventBindings;
