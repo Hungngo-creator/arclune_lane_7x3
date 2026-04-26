@@ -60,6 +60,7 @@ type NormalizableDeckField = (typeof NORMALIZABLE_DECK_FIELDS)[number];
 type DeckInputSource = Partial<Record<NormalizableDeckField, unknown>>;
 
 type DeckNormalizationCache = WeakMap<ReadonlyArray<unknown>, SessionState['unitsAll']>;
+const GLOBAL_DECK_NORMALIZATION_CACHE: DeckNormalizationCache = new WeakMap();
 
 function normalizeDeckEntriesCached(
   value: ReadonlyArray<unknown>,
@@ -88,7 +89,14 @@ function isNormalizedDeckEntries(value: unknown): value is SessionState['unitsAl
 
 function toDeckEntries(value: unknown): SessionState['unitsAll'] {
   if (!hasDeckEntries(value)) return EMPTY_UNIT_DECK;
-  return isNormalizedDeckEntries(value) ? value : normalizeDeckEntries(value);
+  const cached = GLOBAL_DECK_NORMALIZATION_CACHE.get(value);
+  if (cached) return cached;
+  if (isNormalizedDeckEntries(value)) {
+    GLOBAL_DECK_NORMALIZATION_CACHE.set(value, value);
+    return value;
+  }
+  const normalized = normalizeDeckEntriesCached(value, GLOBAL_DECK_NORMALIZATION_CACHE);
+  return normalized;
 }
 
 function pickFirstDeckInput(source: DeckInputSource): ReadonlyArray<unknown> | null {

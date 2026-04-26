@@ -122,6 +122,21 @@ describe('pve session runtime reward + wave flow', () => {
     expect(session.runtime.encounter.pendingRewards).toEqual([{ id: 'ticket', weight: 1, tier: 1 }]);
   });
 
+  test('applyReward vẫn hoạt động khi runtime không có encounter', () => {
+    const selected = { id: 'gem', weight: 1, tier: 1 };
+    const session: any = {
+      runtime: {
+        rewardQueue: [
+          { id: 'gold', weight: 1, tier: 1 },
+          { ...selected },
+        ],
+        encounter: null,
+      },
+    };
+    expect(applyReward(session, selected)).toEqual(selected);
+    expect(session.runtime.rewardQueue).toEqual([{ id: 'gold', weight: 1, tier: 1 }]);
+  });
+
   test('applyReward không remove lặp khi rewardQueue và pendingRewards trỏ cùng mảng', () => {
     const sharedRewards = [
       { id: 'gold', weight: 1, tier: 1 },
@@ -257,6 +272,37 @@ describe('pve session runtime reward + wave flow', () => {
       expect(session.runtime.rewardQueue).toHaveLength(size);
       expect(session.runtime.encounter.pendingRewards).toHaveLength(size);
     }
+  });
+
+  test('index cache reward không stale khi chuyển từ large merge sang small merge', () => {
+    const makeReward = (id: string, tier = 1) => ({ id, weight: 1, tier });
+    const session: any = {
+      runtime: {
+        rewardQueue: [],
+        wave: null,
+        encounter: {
+          status: 'running',
+          waveIndex: 0,
+          pendingRewards: [],
+          waves: [
+            { status: 'active', rewards: Array.from({ length: 7 }, (_, idx) => makeReward(`r${idx + 1}`)) },
+            { status: 'active', rewards: [makeReward('r2', 9), makeReward('r8', 1)] },
+          ],
+        },
+      },
+    };
+
+    expect(advanceSession(session)?.status).toBe('running');
+    expect(session.runtime.rewardQueue).toHaveLength(7);
+
+    // xóa bớt để list <= SMALL_REWARD_MERGE_SIZE nhưng map index cũ vẫn có thể còn.
+    expect(applyReward(session, makeReward('r7'))?.id).toBe('r7');
+    expect(applyReward(session, makeReward('r6'))?.id).toBe('r6');
+    expect(session.runtime.rewardQueue).toHaveLength(5);
+
+    expect(advanceSession(session)?.status).toBe('completed');
+    expect(session.runtime.rewardQueue.find((item: any) => item.id === 'r2')?.tier).toBe(9);
+    expect(session.runtime.rewardQueue.map((item: any) => item.id)).toContain('r8');
   });
 
   test('encounter completed thì advanceSession trả sớm, không mutate thêm', () => {

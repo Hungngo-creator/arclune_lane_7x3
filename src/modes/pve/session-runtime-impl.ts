@@ -1808,10 +1808,15 @@ function performUyenLeaderUlt(game: SessionState, unit: UnitToken): boolean {
   const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
   const enemies = getAliveBySide(enemySide);
   const bonus = Math.min(state.bUses * 0.05, 0.35);
+  const unitHpMax = parseFiniteNumber(unit.hpMax) ?? 0;
+  const unitAtk = parseFiniteNumber(unit.atk) ?? 0;
+  const unitWil = parseFiniteNumber(unit.wil) ?? 0;
+  const hpBase = 0.5 * unitHpMax;
+  const leaderHpBase = Math.min(hpBase, 0.1 * unitHpMax);
+  const statBase = 0.6 * unitAtk + 0.6 * unitWil;
   for (const enemy of enemies) {
-    const hpBase = 0.5 * (parseFiniteNumber(unit.hpMax) ?? 0);
-    const hpComp = isUyenLeader(enemy) ? Math.min(hpBase, 0.1 * (parseFiniteNumber(unit.hpMax) ?? 0)) : hpBase;
-    const base = hpComp + 0.6 * (parseFiniteNumber(unit.atk) ?? 0) + 0.6 * (parseFiniteNumber(unit.wil) ?? 0);
+    const hpComp = isUyenLeader(enemy) ? leaderHpBase : hpBase;
+    const base = hpComp + statBase;
     const scaled = Math.max(1, Math.round(base * (1 + bonus)));
     dealAbilityDamage(game, unit, enemy, {
       base: Math.round(scaled * 0.5),

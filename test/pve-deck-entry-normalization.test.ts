@@ -39,8 +39,14 @@ describe('preferred deck resolution', () => {
     expect(fallbackDeck).toHaveLength(1);
     expect(fallbackDeck[0]?.id).toBe('thien_luu');
   });
-});
 
+  test('cache normalize toàn cục: cùng raw deck reference trả cùng normalized reference qua nhiều lần gọi', () => {
+    const rawDeck = ['thien_luu', 'nguyen_le'];
+    const first = getPreferredDeckEntries({ lineupDeck: rawDeck });
+    const second = getPreferredDeckEntries({ lineupDeck: rawDeck });
+    expect(second).toBe(first);
+  });
+});
 
 test('AI preset deck ưu tiên deck rồi unitsAll qua cùng luồng normalize', () => {
   const byDeck = resolveEnemyUnits({

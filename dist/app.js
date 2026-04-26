@@ -16349,10 +16349,15 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const enemySide = unit.side === 'ally' ? 'enemy' : 'ally';
       const enemies = getAliveBySide(enemySide);
       const bonus = Math.min(state.bUses * 0.05, 0.35);
+      const unitHpMax = parseFiniteNumber(unit.hpMax) ?? 0;
+      const unitAtk = parseFiniteNumber(unit.atk) ?? 0;
+      const unitWil = parseFiniteNumber(unit.wil) ?? 0;
+      const hpBase = 0.5 * unitHpMax;
+      const leaderHpBase = Math.min(hpBase, 0.1 * unitHpMax);
+      const statBase = 0.6 * unitAtk + 0.6 * unitWil;
       for (const enemy of enemies) {
-          const hpBase = 0.5 * (parseFiniteNumber(unit.hpMax) ?? 0);
-          const hpComp = isUyenLeader(enemy) ? Math.min(hpBase, 0.1 * (parseFiniteNumber(unit.hpMax) ?? 0)) : hpBase;
-          const base = hpComp + 0.6 * (parseFiniteNumber(unit.atk) ?? 0) + 0.6 * (parseFiniteNumber(unit.wil) ?? 0);
+          const hpComp = isUyenLeader(enemy) ? leaderHpBase : hpBase;
+          const base = hpComp + statBase;
           const scaled = Math.max(1, Math.round(base * (1 + bonus)));
           dealAbilityDamage(game, unit, enemy, {
               base: Math.round(scaled * 0.5),
@@ -18948,14 +18953,15 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       ownerRecord[key] = list;
       return list;
   }
-  function getRuntimeRewardLists(runtime, encounter) {
+  function forEachRuntimeRewardList(runtime, mutator) {
       const rewardQueue = ensureSanitizedRewardList(runtime, 'rewardQueue');
+      mutator(rewardQueue);
+      const encounter = runtime.encounter;
+      if (!encounter)
+          return;
       const pendingRewards = ensureSanitizedRewardList(encounter, 'pendingRewards');
-      return {
-          rewardQueue,
-          pendingRewards,
-          shared: rewardQueue === pendingRewards,
-      };
+      if (pendingRewards !== rewardQueue)
+          mutator(pendingRewards);
   }
   function findRewardIndex(list, rewardId) {
       for (let index = 0; index < list.length; index += 1) {
@@ -18977,6 +18983,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               else
                   list[existingIndex] = reward;
           }
+          list[REWARD_INDEX_BY_ID] = undefined;
           return list;
       }
       const indexById = getRewardIndexById(list);
@@ -19024,21 +19031,15 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       list[REWARD_INDEX_BY_ID] = indexById;
       return list;
   }
-  function syncWaveRewards(runtime, encounter, rewards) {
-      const { rewardQueue, pendingRewards, shared } = getRuntimeRewardLists(runtime, encounter);
-      mergeRewardsInPlace(rewardQueue, rewards);
-      if (!shared)
-          mergeRewardsInPlace(pendingRewards, rewards);
+  function syncWaveRewards(runtime, rewards) {
+      forEachRuntimeRewardList(runtime, (list) => {
+          mergeRewardsInPlace(list, rewards);
+      });
   }
   function removeRewardEverywhere(runtime, rewardId) {
-      const encounter = runtime.encounter;
-      const rewardQueue = ensureSanitizedRewardList(runtime, 'rewardQueue');
-      removeRewardById(rewardQueue, rewardId);
-      if (!encounter)
-          return;
-      const pendingRewards = ensureSanitizedRewardList(encounter, 'pendingRewards');
-      if (pendingRewards !== rewardQueue)
-          removeRewardById(pendingRewards, rewardId);
+      forEachRuntimeRewardList(runtime, (list) => {
+          removeRewardById(list, rewardId);
+      });
   }
   function markEncounterCompleted(runtime, encounter) {
       encounter.status = 'completed';
@@ -19091,7 +19092,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               encounter.waveIndex = index + 1;
               const rewards = getWaveRewards(wave);
               if (rewards.length)
-                  syncWaveRewards(runtime, encounter, rewards);
+                  syncWaveRewards(runtime, rewards);
               break;
           }
           case 'cleared':
@@ -19192,6 +19193,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       };
   });
   const NORMALIZABLE_DECK_FIELDS = ['lineupDeck', 'playerDeck', 'deck'];
+  const GLOBAL_DECK_NORMALIZATION_CACHE = new WeakMap();
   function normalizeDeckEntriesCached(value, cache) {
       const cached = cache.get(value);
       if (cached)
@@ -19218,7 +19220,15 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   function toDeckEntries(value) {
       if (!hasDeckEntries(value))
           return EMPTY_UNIT_DECK;
-      return isNormalizedDeckEntries(value) ? value : normalizeDeckEntries(value);
+      const cached = GLOBAL_DECK_NORMALIZATION_CACHE.get(value);
+      if (cached)
+          return cached;
+      if (isNormalizedDeckEntries(value)) {
+          GLOBAL_DECK_NORMALIZATION_CACHE.set(value, value);
+          return value;
+      }
+      const normalized = normalizeDeckEntriesCached(value, GLOBAL_DECK_NORMALIZATION_CACHE);
+      return normalized;
   }
   function pickFirstDeckInput(source) {
       const lineupDeck = source.lineupDeck;
@@ -19943,24 +19953,28 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeDeckEntries')) exports.normalizeDeckEntries = normalizeDeckEntries;
 };
 __modules['./modes/pve/session.ts'] = (exports, module, __require) => {
-  const __reexport2 = __require('./modes/pve/session-state.ts');
-  for (const key of Object.keys(__reexport2)) {
+  const __dep2 = __require('./modes/pve/session-state.ts');
+  const sessionState = __dep2;
+  const __dep3 = __require('./modes/pve/session-runtime.ts');
+  const sessionRuntime = __dep3;
+  const __reexport0 = __require('./modes/pve/session-state.ts');
+  for (const key of Object.keys(__reexport0)) {
     if (key === 'default') continue;
     if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
-    exports[key] = __reexport2[key];
+    exports[key] = __reexport0[key];
   }
-  const __reexport3 = __require('./modes/pve/session-runtime.ts');
-  for (const key of Object.keys(__reexport3)) {
+  const __reexport1 = __require('./modes/pve/session-runtime.ts');
+  for (const key of Object.keys(__reexport1)) {
     if (key === 'default') continue;
     if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
-    exports[key] = __reexport3[key];
+    exports[key] = __reexport1[key];
   }
   // Namespace re-exports giúp chuyển dần sang module nhỏ mà không vỡ import cũ.
-  const __reexport0 = __require('./modes/pve/session-state.ts');
-  const __reexport1 = __require('./modes/pve/session-runtime.ts');
+  exports.sessionState = sessionState;
+  exports.sessionRuntime = sessionRuntime;
+  const sessionModules = { sessionState, sessionRuntime };
   //# sourceMappingURL=stdin.js.map
-  if (!Object.prototype.hasOwnProperty.call(exports, 'sessionState')) exports.sessionState = __reexport0;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'sessionRuntime')) exports.sessionRuntime = __reexport1;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'sessionModules')) exports.sessionModules = sessionModules;
 };
 __modules['./modes/pve/unit-runtime-hooks.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./modes/pve/chap-minh-runtime.ts');

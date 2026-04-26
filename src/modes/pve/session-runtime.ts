@@ -33,11 +33,7 @@ type SanitizedRewardList = MutableRewardList & {
   [REWARD_INDEX_BY_ID]?: RewardIndexById;
 };
 
-type RuntimeRewardLists = {
-  rewardQueue: SanitizedRewardList;
-  pendingRewards: SanitizedRewardList;
-  shared: boolean;
-};
+type RewardListMutator = (list: SanitizedRewardList) => void;
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   if (!entry || typeof entry !== 'object') return false;
@@ -81,14 +77,16 @@ function ensureSanitizedRewardList<K extends keyof RewardListOwnerByKey>(
   return list;
 }
 
-function getRuntimeRewardLists(runtime: SessionRuntimeState, encounter: EncounterState): RuntimeRewardLists {
+function forEachRuntimeRewardList(
+  runtime: SessionRuntimeState,
+  mutator: RewardListMutator,
+): void {
   const rewardQueue = ensureSanitizedRewardList(runtime, 'rewardQueue');
+  mutator(rewardQueue);
+  const encounter = runtime.encounter;
+  if (!encounter) return;
   const pendingRewards = ensureSanitizedRewardList(encounter, 'pendingRewards');
-  return {
-    rewardQueue,
-    pendingRewards,
-    shared: rewardQueue === pendingRewards,
-  };
+  if (pendingRewards !== rewardQueue) mutator(pendingRewards);
 }
 
 function findRewardIndex(list: SanitizedRewardList, rewardId: string): number {
@@ -109,6 +107,7 @@ function mergeRewardsInPlace(list: SanitizedRewardList, additions: RewardList): 
       if (existingIndex < 0) list.push(reward);
       else list[existingIndex] = reward;
     }
+    list[REWARD_INDEX_BY_ID] = undefined;
     return list;
   }
 
@@ -157,19 +156,16 @@ function removeRewardById(list: SanitizedRewardList, rewardId: string): Sanitize
   return list;
 }
 
-function syncWaveRewards(runtime: SessionRuntimeState, encounter: EncounterState, rewards: RewardList): void {
-  const { rewardQueue, pendingRewards, shared } = getRuntimeRewardLists(runtime, encounter);
-  mergeRewardsInPlace(rewardQueue, rewards);
-  if (!shared) mergeRewardsInPlace(pendingRewards, rewards);
+function syncWaveRewards(runtime: SessionRuntimeState, rewards: RewardList): void {
+  forEachRuntimeRewardList(runtime, (list) => {
+    mergeRewardsInPlace(list, rewards);
+  });
 }
 
 function removeRewardEverywhere(runtime: SessionRuntimeState, rewardId: string): void {
-  const encounter = runtime.encounter;
-  const rewardQueue = ensureSanitizedRewardList(runtime, 'rewardQueue');
-  removeRewardById(rewardQueue, rewardId);
-  if (!encounter) return;
-  const pendingRewards = ensureSanitizedRewardList(encounter, 'pendingRewards');
-  if (pendingRewards !== rewardQueue) removeRewardById(pendingRewards, rewardId);
+  forEachRuntimeRewardList(runtime, (list) => {
+    removeRewardById(list, rewardId);
+  });
 }
 
 function markEncounterCompleted(runtime: SessionRuntimeState, encounter: EncounterState): EncounterState {
@@ -222,7 +218,7 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
       runtime.wave = null;
       encounter.waveIndex = index + 1;
       const rewards = getWaveRewards(wave);
-      if (rewards.length) syncWaveRewards(runtime, encounter, rewards);
+      if (rewards.length) syncWaveRewards(runtime, rewards);
       break;
     }
     case 'cleared':

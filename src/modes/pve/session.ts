@@ -1,6 +1,9 @@
+import * as sessionState from './session-state.ts';
+import * as sessionRuntime from './session-runtime.ts';
+
 export * from './session-state.ts';
 export * from './session-runtime.ts';
 
 // Namespace re-exports giúp chuyển dần sang module nhỏ mà không vỡ import cũ.
-export * as sessionState from './session-state.ts';
-export * as sessionRuntime from './session-runtime.ts';
+export { sessionState, sessionRuntime };
+export const sessionModules = { sessionState, sessionRuntime } as const;
