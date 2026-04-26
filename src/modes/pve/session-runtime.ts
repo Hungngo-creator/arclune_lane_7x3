@@ -59,9 +59,9 @@ function getMutableRewardList(
   key: RewardListKey,
 ): MutableRewardList {
   const store = container as unknown as Record<string, unknown>;
-  const next = toSanitizedRewardList(store[key]);
-  store[key] = next;
-  return next;
+  const list = toSanitizedRewardList(store[key]);
+  store[key] = list;
+  return list;
 }
 
 const SMALL_REWARD_MERGE_SIZE = 6;
@@ -136,10 +136,10 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
     return null;
   }
 
-  const waves = encounter.waves;
-  const waveCount = Array.isArray(waves) ? waves.length : 0;
+  const waves = Array.isArray(encounter.waves) ? encounter.waves : [];
+  const waveCount = waves.length;
   const index = Math.max(0, encounter.waveIndex | 0);
-  const wave = Array.isArray(waves) ? (waves[index] as WaveState | null | undefined) ?? null : null;
+  const wave = (waves[index] as WaveState | null | undefined) ?? null;
 
   if (!wave) {
     encounter.status = 'completed';

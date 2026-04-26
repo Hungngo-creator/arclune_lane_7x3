@@ -74,6 +74,7 @@ export function getPreferredDeckInput(config: {
 }
 
 type TurnOrderEntry = { side: Side; slot: number };
+const TURN_ORDER_FALLBACK_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
 type BackgroundConfig = ReturnType<typeof getEnvironmentBackground>;
 
@@ -427,13 +428,13 @@ function clampTurnOrderSlot(slot: number): number {
   return Math.max(1, Math.min(9, rounded));
 }
 
-function normalizePairScanEntry(
+function appendNormalizedPairScanEntry(
+  output: TurnOrderEntry[],
   entry: TurnOrderPairScanEntry,
   sides: readonly TurnOrderSide[],
-): TurnOrderEntry[] {
-  const normalized: TurnOrderEntry[] = [];
+): void {
   const pushPair = (side: TurnOrderSide, slot: number): void => {
-    normalized.push({ side, slot: clampTurnOrderSlot(slot) });
+    output.push({ side, slot: clampTurnOrderSlot(slot) });
   };
   const pushForSides = (slot: number, targetSides?: readonly TurnOrderSide[]): void => {
     const resolvedSides = targetSides && targetSides.length ? targetSides : sides;
@@ -443,8 +444,10 @@ function normalizePairScanEntry(
   };
 
   if (typeof entry === 'number') {
-    if (Number.isFinite(entry)) pushForSides(entry);
-    return normalized;
+    if (Number.isFinite(entry)) {
+      pushForSides(entry);
+    }
+    return;
   }
 
   if (Array.isArray(entry)) {
@@ -452,12 +455,12 @@ function normalizePairScanEntry(
       const [, slot] = entry;
       const side: Side = entry[0] === 'enemy' ? 'enemy' : 'ally';
       pushPair(side, slot);
-      return normalized;
+      return;
     }
     for (const value of entry) {
       if (typeof value === 'number' && Number.isFinite(value)) pushForSides(value);
     }
-    return normalized;
+    return;
   }
 
   if (isPairScanObjectWithSide(entry)) {
@@ -466,15 +469,13 @@ function normalizePairScanEntry(
       const side: Side = entry.side === 'enemy' ? 'enemy' : 'ally';
       pushPair(side, slot);
     }
-    return normalized;
+    returny;
   }
 
   if (isPairScanObjectWithoutSide(entry)) {
     const slot = parseSlotValue(entry);
     if (slot !== null) pushForSides(slot);
   }
-
-  return normalized;
 }
 
 export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<string, number> } {
@@ -486,13 +487,11 @@ export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<strin
   const order: TurnOrderEntry[] = [];
   const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
   for (const entry of scan) {
-    const normalized = normalizePairScanEntry(entry, sides);
-    if (normalized.length) order.push(...normalized);
+    appendNormalizedPairScanEntry(order, entry, sides);
   }
   if (!order.length) {
-    const fallback = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
-    for (const slot of fallback) {
-      order.push(...normalizePairScanEntry(slot, sides));
+    for (const slot of TURN_ORDER_FALLBACK_SLOTS) {
+      appendNormalizedPairScanEntry(order, slot, sides);
     }
   }
 
@@ -531,8 +530,8 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackDeck.slice(0, 1));
 
   const allyUnits: SessionState['unitsAll'] = lockedPlayerDeck.length
-    ? Array.from(lockedPlayerDeck)
-    : Array.from(DEFAULT_UNIT_ROSTER);
+    ? [...lockedPlayerDeck]
+    : [...DEFAULT_UNIT_ROSTER];
 
   const enemyPreset = normalized.aiPreset ?? null;
   const enemyUnits = resolveEnemyUnits({

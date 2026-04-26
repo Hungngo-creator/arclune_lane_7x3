@@ -219,7 +219,7 @@ const getNormalizedUltTags = (ult: UltSpec): ReadonlyArray<string> => {
   }
   const rawUltTags: string[] = [];
   const appendTags = (list: ReadonlyArray<string> | null | undefined): void => {
-    if (!Array.isArray(list) || !list.length) return;
+    if (!Array.isArray(list)) return;
     for (let index = 0; index < list.length; index += 1) {
       const tag = list[index];
       if (typeof tag !== 'string' || tag.trim().length === 0) continue;
