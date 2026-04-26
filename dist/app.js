@@ -15130,28 +15130,50 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       }
       return null;
   };
-  const resolveCount = (candidates, fallback, { min, max } = {}) => {
-      for (const candidate of candidates) {
-          const value = readCountCandidate(candidate);
-          if (value != null) {
-              let resolved = Math.round(value);
-              if (typeof min === 'number')
-                  resolved = Math.max(min, resolved);
-              if (typeof max === 'number')
-                  resolved = Math.min(max, resolved);
-              return resolved;
-          }
-      }
+  const clampResolvedCount = (value, { min, max } = {}) => {
+      let resolved = Math.round(value);
+      if (typeof min === 'number')
+          resolved = Math.max(min, resolved);
+      if (typeof max === 'number')
+          resolved = Math.min(max, resolved);
+      return resolved;
+  };
+  const resolveCount4 = (v1, v2, v3, v4, fallback, clamp = {}) => {
+      const c1 = readCountCandidate(v1);
+      if (c1 != null)
+          return clampResolvedCount(c1, clamp);
+      const c2 = readCountCandidate(v2);
+      if (c2 != null)
+          return clampResolvedCount(c2, clamp);
+      const c3 = readCountCandidate(v3);
+      if (c3 != null)
+          return clampResolvedCount(c3, clamp);
+      const c4 = readCountCandidate(v4);
+      if (c4 != null)
+          return clampResolvedCount(c4, clamp);
+      return fallback;
+  };
+  const resolveCount5 = (v1, v2, v3, v4, v5, fallback, clamp = {}) => {
+      const c1 = readCountCandidate(v1);
+      if (c1 != null)
+          return clampResolvedCount(c1, clamp);
+      const c2 = readCountCandidate(v2);
+      if (c2 != null)
+          return clampResolvedCount(c2, clamp);
+      const c3 = readCountCandidate(v3);
+      if (c3 != null)
+          return clampResolvedCount(c3, clamp);
+      const c4 = readCountCandidate(v4);
+      if (c4 != null)
+          return clampResolvedCount(c4, clamp);
+      const c5 = readCountCandidate(v5);
+      if (c5 != null)
+          return clampResolvedCount(c5, clamp);
       return fallback;
   };
   const getUltHitCount = (ult) => {
       const runtime = ult?.runtime;
-      const resolved = resolveCount([
-          ult?.hits,
-          runtime?.hits,
-          runtime?.hitCount,
-          runtime?.count,
-      ], 1, { min: 1 });
+      const resolved = resolveCount4(ult?.hits, runtime?.hits, runtime?.hitCount, runtime?.count, 1, { min: 1 });
       return Math.max(1, resolved);
   };
   const getUltScopedCount = (ult, fallback, scope = 'targets') => {
@@ -15159,21 +15181,10 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const primary = scope === 'allies' ? ult?.allies : ult?.targets;
       return resolveUltScopedCount(primary, runtime, fallback);
   };
-  const resolveUltScopedCount = (primary, runtime, fallback) => resolveCount([
-      primary,
-      runtime?.targets,
-      runtime?.targetCount,
-      runtime?.count,
-  ], fallback, { min: 0 });
+  const resolveUltScopedCount = (primary, runtime, fallback) => resolveCount4(primary, runtime?.targets, runtime?.targetCount, runtime?.count, fallback, { min: 0 });
   const getUltDurationTurns = (ult, fallback) => {
       const runtime = ult?.runtime;
-      const resolved = resolveCount([
-          ult?.duration,
-          ult?.turns,
-          runtime?.duration,
-          runtime?.turns,
-          runtime?.durationTurns,
-      ], fallback, { min: 1 });
+      const resolved = resolveCount5(ult?.duration, ult?.turns, runtime?.duration, runtime?.turns, runtime?.durationTurns, fallback, { min: 1 });
       return Math.max(1, resolved);
   };
   const ensureSessionWithVfx = (game, options) => {
@@ -18904,6 +18915,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   const __getActiveGame = __dep1.__getActiveGame;
   const __resolveStatusIconPreview = __dep1.__resolveStatusIconPreview;
   const NOOP_UNSUBSCRIBE = () => { };
+  const SMALL_REWARD_MERGE_SIZE = 6;
   function isReward(entry) {
       if (!entry || typeof entry !== 'object')
           return false;
@@ -18920,17 +18932,18 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   function toSanitizedRewardList(value) {
       if (!Array.isArray(value))
           return [];
+      const rewards = value;
       let writeIndex = 0;
-      for (let readIndex = 0; readIndex < value.length; readIndex += 1) {
-          const reward = value[readIndex];
+      for (let readIndex = 0; readIndex < rewards.length; readIndex += 1) {
+          const reward = rewards[readIndex];
           if (!isReward(reward))
               continue;
-          value[writeIndex] = reward;
+          rewards[writeIndex] = reward;
           writeIndex += 1;
       }
-      if (writeIndex !== value.length)
-          value.length = writeIndex;
-      return value;
+      if (writeIndex !== rewards.length)
+          rewards.length = writeIndex;
+      return rewards;
   }
   function getMutableRewardList(container, key) {
       const store = container;
@@ -18939,7 +18952,6 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       store[key] = list;
       return list;
   }
-  const SMALL_REWARD_MERGE_SIZE = 6;
   function mergeRewardsInPlace(list, additions) {
       if (!additions.length)
           return list;
@@ -18980,25 +18992,11 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       }
       return list;
   }
-  function findRewardIndexById(list, rewardId) {
-      if (!list.length)
-          return -1;
-      for (let index = 0; index < list.length; index += 1) {
-          const entry = list[index];
-          if (!entry || entry.id !== rewardId)
-              continue;
-          return index;
-      }
-      return -1;
-  }
   function removeRewardById(list, rewardId) {
-      const removeIndex = findRewardIndexById(list, rewardId);
+      const removeIndex = list.findIndex((entry) => entry.id === rewardId);
       if (removeIndex < 0)
           return list;
-      for (let index = removeIndex + 1; index < list.length; index += 1) {
-          list[index - 1] = list[index];
-      }
-      list.length -= 1;
+      list.splice(removeIndex, 1);
       return list;
   }
   function advanceSession(session) {

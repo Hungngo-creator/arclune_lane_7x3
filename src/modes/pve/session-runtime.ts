@@ -32,6 +32,7 @@ type MutableRewardList = RewardRoll[];
 type RewardListContainer = SessionRuntimeState | EncounterState;
 type RewardListKey = 'rewardQueue' | 'pendingRewards';
 const NOOP_UNSUBSCRIBE = (): void => {};
+const SMALL_REWARD_MERGE_SIZE = 6;
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   if (!entry || typeof entry !== 'object') return false;
@@ -44,15 +45,16 @@ function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
 
 function toSanitizedRewardList(value: unknown): MutableRewardList {
   if (!Array.isArray(value)) return [];
+  const rewards = value as MutableRewardList;
   let writeIndex = 0;
-  for (let readIndex = 0; readIndex < value.length; readIndex += 1) {
-    const reward = value[readIndex] as RewardRoll | null | undefined;
+  for (let readIndex = 0; readIndex < rewards.length; readIndex += 1) {
+    const reward = rewards[readIndex];
     if (!isReward(reward)) continue;
-    value[writeIndex] = reward;
+    rewards[writeIndex] = reward;
     writeIndex += 1;
- }
- if (writeIndex !== value.length) value.length = writeIndex;
-  return value as MutableRewardList;
+  }
+  if (writeIndex !== rewards.length) rewards.length = writeIndex;
+  return rewards;
 }
 
 function getMutableRewardList(
@@ -66,8 +68,6 @@ function getMutableRewardList(
   return list;
 }
 
-const SMALL_REWARD_MERGE_SIZE = 6;
-
 function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): MutableRewardList {
   if (!additions.length) return list;
   const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
@@ -80,7 +80,7 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
     }
   }
 
-    for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
+  for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
     const reward = additions[addIndex];
     if (!reward) continue;
     let existingIndex: number | undefined;
@@ -105,23 +105,10 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
   return list;
 }
 
-function findRewardIndexById(list: MutableRewardList, rewardId: string): number {
-  if (!list.length) return -1;
-  for (let index = 0; index < list.length; index += 1) {
-    const entry = list[index];
-    if (!entry || entry.id !== rewardId) continue;
-    return index;
-  }
-  return -1;
-}
-
 function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
-  const removeIndex = findRewardIndexById(list, rewardId);
+  const removeIndex = list.findIndex((entry) => entry.id === rewardId);
   if (removeIndex < 0) return list;
-  for (let index = removeIndex + 1; index < list.length; index += 1) {
-    list[index - 1] = list[index] as RewardRoll;
-  }
-  list.length -= 1;
+  list.splice(removeIndex, 1);
   return list;
 }
 

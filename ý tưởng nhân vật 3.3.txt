@@ -546,3 +546,30 @@ skill 2: đứng tại chỗ, giơ mạnh nấm đấm lên cao, cùng lúc đó
 skill 3: tích tụ sát thương nhận vào trong 3 turn, hiện số sát thương nhận vào ngay trên thanh hp bar, trên nữa là các icon buff/debuff(hiện đã có) trên nữa là sát thương đang tích của char này, sau 3 turn tự động - ae để kích hoạt skill này, heal bản thân = 70% sát thương đã tích tụ, nếu overheal sẽ được chuyển sang shield, cap khiên tối đa = 100% max hp, -20 ae/lần kích hoạt, mỗi trận tối đa tự kích hoạt 5 lần, khiên từ skill này chỉ mất khi nhận sát thương, nếu có khiên từ nguồn khác phải ưu tiên trừ khiên từ skill này trước. Bị Động, Quy Tắc. Vì arm/res sẽ tăng dần do ultimate dẫn đến sát thương nhận vào được tích tụ sẽ giảm nên đây là 1 loại cân bằng.
 
 ultimate: bay lên cao, lao về phía ô số 5 của kẻ thù, ô 5 nhận sát thương chuẩn = 5% máu tối đa của char này + 150% wil/atk của char này, tăng res/arm với tỉ lệ sát thương gây ra là 1 wil/atk = 0.3 res/arm, hiệu ứng tăng res/arm này sẽ cộng trực tiếp vào chỉ số cơ bản của char này trong trận, không tính là buff/mark, reset lại khi rời sân, miễn không còn đứng trên sân là reset, (vfx, hoạt ảnh tấn công không tính).
+
+46)
+Support, ssr, element tag: mộc ( là plant nhỉ)
+nội tại: 
+
+đánh thường: gây sát thương= 100% wil/atk, hồi hp cho bản thân = 35% sát thương đánh thường gây ra.
+
+skill 1: bị động, luôn kích hoạt, không cần tốn turn riêng để bật. Mỗi khi đánh thường cũng hồi hp cho leader đồng minh = 20% sát thương gây ra bởi đánh thường, sau khi hồi cho leader đồng minh = skill này 3 lần bản thân nhân vật này sẽ nhận 1 lớp khiên tồn tại max 3 turn = 25% max hp của nhân vật này. - 3 ae/ turn bất kể có đánh thường hay không.
+
+skill 2: hồi hp cho leader đồng minh và 3 đồng.minh ngẫu nhiên = 100% wil/atk của nhân vật này. 20 ae.
+
+skill 3: áp dụng debuff phản hồi phục lên leader địch và 3 kẻ thù ngẫu nhiên có mặt trên sân, 20 ae, skill này có tag Pháp Tắc.
+
+ultimate:
+
+
+47)
+
+
+48)
+
+
+49)
+
+
+50)
+
