@@ -66,6 +66,7 @@ import {
   parseFiniteNumber,
 } from './session-state';
 import { mapUnitProgressById } from './collection-mapper.ts';
+import { createSessionLoopController } from './session-loop';
 import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
 import {
   ensureUyenState,
@@ -115,18 +116,6 @@ type PveSessionStartConfig = StartConfigOverrides & {
 type FrameHandle = number | ReturnType<typeof setTimeout>;
 type GradientValue = CanvasGradient | string;
 type CanvasClickHandler = (event: MouseEvent) => void;
-type ClockState = {
-  startMs: number;
-  startSafeMs: number;
-  lastTimerRemain: number;
-  lastCostCreditedSec: number;
-  turnEveryMs: number;
-  lastTurnStepMs: number;
-  lastFrameMs: number;
-  lastLogicMs: number;
-  costAccumulator: number;
-  lastTimerText: string | null;
-};
 type ExtendedQueuedSummon = (QueuedSummonRequest & {
   art?: ReturnType<typeof getUnitArt> | null;
   skinKey?: string | null;
@@ -835,11 +824,7 @@ ensureNestedModuleSupport();
 const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
   && !!globalThis.performance
   && typeof globalThis.performance.now === 'function';
-const RAF_TIMESTAMP_MAX = 2_147_483_647; // ~24 ngày tính từ mốc điều hướng
 const RAF_DRIFT_TOLERANCE_MS = 120_000;   // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
-const CLOCK_DRIFT_TOLERANCE_MS = RAF_DRIFT_TOLERANCE_MS;
-const LOGIC_MIN_INTERVAL_MS = 40;
-const MAX_TURNS_PER_TICK = 6;
 
 const resolveConfiguredTurnIntervalMs = (): number => {
   const intervalCandidate = CFG?.ANIMATION?.turnIntervalMs;
@@ -849,22 +834,13 @@ const resolveConfiguredTurnIntervalMs = (): number => {
     : 600;
 };
 
-const resolveClockTurnIntervalMs = (clock: ClockState): number => {
-  const current = clock.turnEveryMs;
-  if (Number.isFinite(current) && current > 0) return current;
-  const fallback = resolveConfiguredTurnIntervalMs();
-  clock.turnEveryMs = fallback;
-  return fallback;
-};
-
 // --- Instance counters (để gắn id cho token/minion) ---
 let _IID = 1;
 let _BORN = 1;
 const nextIid = (): number => _IID++;
 
 let Game: SessionState | null = null;
-let tickLoopHandle: FrameHandle | null = null;
-let tickLoopUsesTimeout = false;
+let sessionLoopController: ReturnType<typeof createSessionLoopController> | null = null;
 let resizeHandler: (() => void) | null = null;
 let visualViewportResizeHandler: (() => void) | null = null;
 let visualViewportScrollHandler: (() => void) | null = null;
@@ -1124,7 +1100,6 @@ function resetSessionState(overrides: NormalizedSessionConfig): void {
   applyCollectionSkinsToSession(Game);
   _IID = 1;
   _BORN = 1;
-  CLOCK = createClock();
   invalidateSceneCache();
   meleeOffsetTokenKeys.clear();
   creepDeathHealProcessed.clear();
@@ -1439,8 +1414,6 @@ function unbindArtSpriteListener(): void {
   winRef.removeEventListener(ART_SPRITE_EVENT, artSpriteHandler);
   artSpriteHandler = null;
 }
-// Master clock theo timestamp – tránh drift giữa nhiều interval
-let CLOCK: ClockState | null = null;
 const creepDeathHealProcessed = new Set<string>();
 const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
 const normalizedTagsByUnitId = new Map<string, string[]>();
@@ -1451,24 +1424,6 @@ const FALLBACK_CREEP_DEATH_HEAL_BY_ID: Readonly<Record<string, number>> = {
   creep_2: 0.04,
   creep_3: 0.05,
 };
-
-function createClock(): ClockState {
-  const safe = safeNow();
-  const now = sessionNow();
-  const turnEveryMs = resolveConfiguredTurnIntervalMs();
-  return {
-    startMs: now,
-    startSafeMs: safe,
-    lastTimerRemain: 240,
-    lastCostCreditedSec: 0,
-    turnEveryMs,
-    lastTurnStepMs: now - turnEveryMs,
-    lastFrameMs: now,
-    lastLogicMs: now - LOGIC_MIN_INTERVAL_MS,
-    costAccumulator: 0,
-    lastTimerText: null,
-  };
-}
 
 const readTokenTags = (token: UnitToken | null | undefined): string[] => {
   if (!token) return EMPTY_TAG_LIST;
@@ -2997,309 +2952,35 @@ function init(): boolean {
     return checkBattleEndResult(Game, battleCheckInfo);
   };
 
-  const updateTimerAndCost = (timestamp?: number): void => {
-    if (!CLOCK) return;
-    const game = Game;
-    if (!game) return;
-    if (game.battle?.over) return;
+  sessionLoopController = createSessionLoopController({
+    getGame: () => Game,
+    isRunning: () => running,
+    isBattleOver: (game) => Boolean(game.battle?.over),
+    resolveTurnIntervalMs: resolveConfiguredTurnIntervalMs,
+    normalizeTurnBusyUntil,
+    runBattleEndCheck,
+    getTimerElement: () => timerElement,
+    resolveTimerElement,
+    applyCostGain,
+    onHudUpdate: (game) => {
+      if (hud) hud.update(game);
+    },
+    onDeckReevaluate: selectFirstAffordable,
+    onRenderSummonBar: renderSummonBar,
+    onSyncLeaderUltControls: syncLeaderUltControls,
+    onBoardMutation: scheduleDraw,
+    processCreepDeathHealing,
+    cleanupDead,
+    stepTurnContext,
+    getRequestAnimationFrame,
+    getCancelAnimationFrame,
+    logError: (message, error) => {
+      console.error(message, error);
+    },
+    supportsPerfNow: SUPPORTS_PERF_NOW,
+  });
 
-    const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
-    const safeNowMs = safeNow();
-    const sessionNowMsRaw = sessionNow();
-    let forcedElapsedSec: number | null = null;
-    const safeDelta = safeNowMs - CLOCK.startSafeMs;
-    const previousStartMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : null;
-    const sessionWentBack = previousStartMs !== null
-      && Number.isFinite(sessionNowMsRaw)
-      && sessionNowMsRaw < previousStartMs;
-    if (safeDelta < -CLOCK_DRIFT_TOLERANCE_MS || sessionWentBack){
-      const previousElapsedSec = Number.isFinite(CLOCK.lastCostCreditedSec)
-        ? Math.max(0, CLOCK.lastCostCreditedSec)
-        : Math.max(
-          0,
-          240 - (Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 240),
-        );
-      const previousRemain = Number.isFinite(CLOCK.lastTimerRemain)
-        ? Math.max(0, CLOCK.lastTimerRemain)
-        : Math.max(0, 240 - previousElapsedSec);
-      const previousTurnStep = Number.isFinite(CLOCK.lastTurnStepMs)
-        ? CLOCK.lastTurnStepMs
-        : null;
-
-        const previousElapsedMs = Math.max(0, previousElapsedSec) * 1000;
-      let sessionForRebase = sessionNowMsRaw;
-      if (!Number.isFinite(sessionForRebase)){
-        sessionForRebase = previousStartMs !== null
-          ? previousStartMs + previousElapsedMs
-          : safeNowMs;
-      }
-
-      let normalizedStart = Number.isFinite(sessionForRebase)
-        ? sessionForRebase - previousElapsedMs
-        : sessionForRebase;
-      if (!Number.isFinite(normalizedStart)){
-        normalizedStart = sessionForRebase;
-      }
-      CLOCK.startMs = Number.isFinite(normalizedStart)
-        ? normalizedStart
-        : sessionForRebase;
-      if (!Number.isFinite(CLOCK.startMs)){
-        CLOCK.startMs = sessionForRebase;
-    }
-      CLOCK.startSafeMs = safeNowMs;
-
-      forcedElapsedSec = previousElapsedSec;
-      CLOCK.lastCostCreditedSec = previousElapsedSec;
-      CLOCK.lastTimerRemain = previousRemain;
-
-      const minTurnStep = Number.isFinite(sessionForRebase)
-        ? sessionForRebase - turnEveryMs
-        : previousTurnStep ?? CLOCK.startMs - turnEveryMs;
-      const maxTurnStep = Number.isFinite(sessionForRebase)
-        ? sessionForRebase
-        : CLOCK.startMs;
-      let normalizedTurnStep = previousTurnStep ?? minTurnStep;
-      if (!Number.isFinite(normalizedTurnStep)){
-        normalizedTurnStep = minTurnStep;
-      }
-      if (Number.isFinite(minTurnStep) && normalizedTurnStep < minTurnStep){
-        normalizedTurnStep = minTurnStep;
-      }
-      if (Number.isFinite(maxTurnStep) && normalizedTurnStep > maxTurnStep){
-        normalizedTurnStep = maxTurnStep;
-      }
-      CLOCK.lastTurnStepMs = normalizedTurnStep;
-
-      const rebaseFrame = Number.isFinite(sessionForRebase)
-        ? sessionForRebase
-        : CLOCK.startMs;
-      CLOCK.lastFrameMs = Number.isFinite(rebaseFrame)
-        ? rebaseFrame
-        : CLOCK.startMs;
-      CLOCK.lastLogicMs = Number.isFinite(rebaseFrame)
-        ? rebaseFrame - LOGIC_MIN_INTERVAL_MS
-        : CLOCK.startMs - LOGIC_MIN_INTERVAL_MS;
-      CLOCK.costAccumulator = 0;
-      CLOCK.lastTimerText = null;
-    }
-
-      const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
-    let sessionNowMs = sessionNowMsRaw;
-    const needRebase = !Number.isFinite(sessionNowMs)
-      || Math.abs(sessionNowMs - expectedSessionMs) > CLOCK_DRIFT_TOLERANCE_MS;
-    if (needRebase){
-      sessionNowMs = expectedSessionMs;
-    }
-    if (isFiniteNumber(timestamp)){
-      const rafTs = timestamp;
-      if (SUPPORTS_PERF_NOW || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)){
-        sessionNowMs = normalizeAnimationFrameTimestamp(rafTs);
-      }
-      if (needRebase){
-        const adjusted = expectedSessionMs;
-        if (!Number.isFinite(sessionNowMs)
-          || Math.abs(sessionNowMs - adjusted) > CLOCK_DRIFT_TOLERANCE_MS){
-          sessionNowMs = adjusted;
-        }
-      }
-    }
-
-    if (!Number.isFinite(CLOCK.lastFrameMs)){
-      CLOCK.lastFrameMs = Number.isFinite(CLOCK.startMs)
-        ? CLOCK.startMs
-        : expectedSessionMs;
-    }
-
-    const lastFrameMs = Number.isFinite(CLOCK.lastFrameMs)
-      ? CLOCK.lastFrameMs
-      : expectedSessionMs;
-    if (!Number.isFinite(sessionNowMs)){
-      sessionNowMs = expectedSessionMs;
-    }
-    if (sessionNowMs <= lastFrameMs){
-      const fallbackFrame = Math.max(expectedSessionMs, lastFrameMs + 1);
-      sessionNowMs = fallbackFrame;
-    }
-    CLOCK.lastFrameMs = Number.isFinite(sessionNowMs) ? sessionNowMs : expectedSessionMs;
-
-    if (!Number.isFinite(CLOCK.lastLogicMs)){
-      CLOCK.lastLogicMs = sessionNowMs - LOGIC_MIN_INTERVAL_MS;
-    }
-
-    const logicSinceMs = sessionNowMs - CLOCK.lastLogicMs;
-    if (Number.isFinite(logicSinceMs) && logicSinceMs < LOGIC_MIN_INTERVAL_MS){
-        return;
-      }
-
-      const startMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : CLOCK.lastFrameMs;
-      let elapsedMsPrecise = Number.isFinite(startMs) ? sessionNowMs - startMs : 0;
-      if (!Number.isFinite(elapsedMsPrecise)){
-        elapsedMsPrecise = (forcedElapsedSec ?? 0) * 1000;
-      }
-      if (elapsedMsPrecise < 0){
-        elapsedMsPrecise = 0;
-      }
-      let elapsedSecPrecise = elapsedMsPrecise / 1000;
-      if (forcedElapsedSec !== null && elapsedSecPrecise < forcedElapsedSec){
-        elapsedSecPrecise = forcedElapsedSec;
-        elapsedMsPrecise = elapsedSecPrecise * 1000;
-      }
-
-      const prevRemainDisplay = Number.isFinite(CLOCK.lastTimerRemain)
-        ? CLOCK.lastTimerRemain
-        : Math.max(0, 240 - Math.floor(elapsedSecPrecise));
-      const remainSecPrecise = Math.max(0, 240 - elapsedSecPrecise);
-      const remainDisplay = Math.max(0, Math.floor(remainSecPrecise));
-      if (remainDisplay !== prevRemainDisplay || CLOCK.lastTimerText === null){
-        const mm = String(Math.floor(remainDisplay / 60)).padStart(2, '0');
-        const ss = String(remainDisplay % 60).padStart(2, '0');
-        const nextTimerText = `${mm}:${ss}`;
-        let tEl = timerElement;
-        if (!tEl || !tEl.isConnected){
-          resolveTimerElement();
-          tEl = timerElement;
-        }
-        if (tEl) tEl.textContent = nextTimerText;
-        CLOCK.lastTimerText = nextTimerText;
-      }
-      CLOCK.lastTimerRemain = remainDisplay;
-
-      if (remainSecPrecise <= 0 && prevRemainDisplay > 0){
-      const timeoutResult = runBattleEndCheck('timeout', sessionNowMs, remainDisplay);
-        if (timeoutResult) return;
-      }
-
-      const lastCredited = Number.isFinite(CLOCK.lastCostCreditedSec)
-        ? CLOCK.lastCostCreditedSec
-        : 0;
-      let deltaSec = elapsedSecPrecise - lastCredited;
-      if (!Number.isFinite(deltaSec) || deltaSec < 0){
-        deltaSec = 0;
-      }
-      const accumulatorBase = Number.isFinite(CLOCK.costAccumulator) ? CLOCK.costAccumulator : 0;
-      let nextAccumulator = accumulatorBase + deltaSec;
-      let costGranted = 0;
-      if (nextAccumulator >= 1){
-        costGranted = Math.floor(nextAccumulator);
-        nextAccumulator -= costGranted;
-      }
-      if (!Number.isFinite(nextAccumulator) || nextAccumulator < 0){
-        nextAccumulator = 0;
-      }
-      CLOCK.costAccumulator = nextAccumulator;
-      CLOCK.lastCostCreditedSec = Math.max(lastCredited, elapsedSecPrecise);
-
-      let costChanged = false;
-      if (costGranted > 0){
-        costChanged = applyCostGain(game, costGranted) || costChanged;
-        costChanged = applyCostGain(game.ai, costGranted) || costChanged;
-      }
-
-        if (costChanged){
-        if (hud) hud.update(game);
-        if (!game.selectedId) selectFirstAffordable();
-        renderSummonBar();
-        aiMaybeAct(game, 'cost');
-      }
-      syncLeaderUltControls();
-
-      CLOCK.lastLogicMs = sessionNowMs;
-
-      if (game.battle?.over) return;
-      if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
-        return;
-      }
-
-      let turnState = game.turn ?? null;
-      let busyUntil = normalizeTurnBusyUntil(turnState);
-
-      const stallDeltaEpsilon = 1;
-      const initialTurnBaseline = Number.isFinite(CLOCK.startMs)
-        ? CLOCK.startMs - turnEveryMs
-        : sessionNowMs - turnEveryMs;
-      if (!Number.isFinite(CLOCK.lastTurnStepMs)){
-        CLOCK.lastTurnStepMs = initialTurnBaseline;
-      } else if (CLOCK.lastTurnStepMs > sessionNowMs){
-        CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
-      }
-
-      let readyByBusy = sessionNowMs >= busyUntil;
-      let elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
-
-      if (readyByBusy && (!Number.isFinite(elapsedForTurn) || elapsedForTurn < -stallDeltaEpsilon)){
-        CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
-        elapsedForTurn = turnEveryMs;
-      }
-
-      if (readyByBusy && elapsedForTurn >= turnEveryMs){
-        let turnsProcessed = 0;
-        let hasBoardMutation = false;
-        while (readyByBusy && elapsedForTurn >= turnEveryMs && turnsProcessed < MAX_TURNS_PER_TICK){
-          CLOCK.lastTurnStepMs += turnEveryMs;
-          elapsedForTurn -= turnEveryMs;
-          turnsProcessed += 1;
-          stepTurn(game, stepTurnContext);
-          if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
-            return;
-          }
-          processCreepDeathHealing(sessionNowMs);
-          cleanupDead(sessionNowMs);
-          hasBoardMutation = true;
-          if (runBattleEndCheck('post-turn', sessionNowMs)) {
-            return;
-          }
-          aiMaybeAct(game, 'board');
-          if (game.battle?.over) {
-            return;
-          }
-          turnState = game.turn ?? null;
-          busyUntil = normalizeTurnBusyUntil(turnState);
-          readyByBusy = sessionNowMs >= busyUntil;
-        }
-        if (hasBoardMutation) {
-          scheduleDraw();
-        }
-      }
-  };
-
-  const runTickLoop = (timestamp?: number): void => {
-    tickLoopHandle = null;
-    try {
-      updateTimerAndCost(timestamp);
-    } catch (err) {
-      console.error('[pve] tick loop error', err);
-      if (hud && typeof hud.update === 'function'){
-        try {
-          hud.update({ cost: Game?.cost ?? null, costCap: Game?.costCap ?? null });
-        } catch (hudErr) {
-          console.error('[pve] HUD update fallback sau lỗi tick thất bại', hudErr);
-        }
-      }
-    }
-    if (!running || !CLOCK) return;
-    scheduleTickLoop();
-  };
-
-  function scheduleTickLoop(): void {
-    if (!running || !CLOCK) return;
-    if (tickLoopHandle !== null) return;
-    const raf = getRequestAnimationFrame();
-    if (raf){
-      tickLoopUsesTimeout = false;
-      tickLoopHandle = raf(runTickLoop);
-    } else {
-      tickLoopUsesTimeout = true;
-      const turnMs = Number.isFinite(CLOCK.turnEveryMs) && CLOCK.turnEveryMs > 0
-        ? CLOCK.turnEveryMs
-        : LOGIC_MIN_INTERVAL_MS;
-      const turnSlice = Math.max(1, Math.floor(turnMs / 4));
-      const timeoutDelay = Math.max(8, Math.min(LOGIC_MIN_INTERVAL_MS, turnSlice || LOGIC_MIN_INTERVAL_MS));
-      tickLoopHandle = setTimeout(runTickLoop, timeoutDelay);
-    }
-  }
-
-  updateTimerAndCost();
-  scheduleTickLoop();
+  sessionLoopController.startLoop();
   return true;
 }
 
@@ -4183,19 +3864,7 @@ function configureRoot(root: RootLike): void {
 }
 
 function clearSessionTimers(): void {
-  if (tickLoopHandle !== null){
-    if (tickLoopUsesTimeout){
-      clearTimeout(tickLoopHandle);
-    } else {
-      const cancel = getCancelAnimationFrame();
-      const frameHandle = toAnimationFrameHandle(tickLoopHandle);
-      if (cancel && frameHandle !== null){
-        cancel(frameHandle);
-      }
-    }
-    tickLoopHandle = null;
-    tickLoopUsesTimeout = false;
-  }
+  sessionLoopController?.stopLoop();
   cancelScheduledDraw();
   cancelScheduledResize();
 }
@@ -4280,7 +3949,7 @@ function stopSession(): void {
   }
   resetDomRefs();
   timerElement = null;
-  CLOCK = null;
+  sessionLoopController = null;
   Game = null;
   running = false;
   invalidateSceneCache();

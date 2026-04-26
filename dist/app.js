@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -14787,11 +14787,333 @@ __modules['./modes/pve/nguyen-le-runtime.ts'] = (exports, module, __require) => 
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'performNguyenLeUltRuntime')) exports.performNguyenLeUltRuntime = performNguyenLeUltRuntime;
 };
+__modules['./modes/pve/session-loop.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./ai.ts');
+  const aiMaybeAct = __dep0.aiMaybeAct;
+  const __dep1 = __require('./turns.ts');
+  const stepTurn = __dep1.stepTurn;
+  const __dep2 = __require('./utils/time.ts');
+  const normalizeAnimationFrameTimestamp = __dep2.normalizeAnimationFrameTimestamp;
+  const safeNow = __dep2.safeNow;
+  const sessionNow = __dep2.sessionNow;
+  const RAF_TIMESTAMP_MAX = 2_147_483_647;
+  const CLOCK_DRIFT_TOLERANCE_MS = 120_000;
+  const LOGIC_MIN_INTERVAL_MS = 40;
+  const MAX_TURNS_PER_TICK = 6;
+  const resolveClockTurnIntervalMs = (clock, resolveTurnIntervalMs) => {
+      const current = clock.turnEveryMs;
+      if (Number.isFinite(current) && current > 0)
+          return current;
+      const fallback = resolveTurnIntervalMs();
+      clock.turnEveryMs = fallback;
+      return fallback;
+  };
+  const createClock = (resolveTurnIntervalMs) => {
+      const safe = safeNow();
+      const now = sessionNow();
+      const turnEveryMs = resolveTurnIntervalMs();
+      return {
+          startMs: now,
+          startSafeMs: safe,
+          lastTimerRemain: 240,
+          lastCostCreditedSec: 0,
+          turnEveryMs,
+          lastTurnStepMs: now - turnEveryMs,
+          lastFrameMs: now,
+          lastLogicMs: now - LOGIC_MIN_INTERVAL_MS,
+          costAccumulator: 0,
+          lastTimerText: null,
+      };
+  };
+  function createSessionLoopController(deps) {
+      let clock = null;
+      let tickLoopHandle = null;
+      let tickLoopUsesTimeout = false;
+      const stopLoop = () => {
+          if (tickLoopHandle === null)
+              return;
+          if (tickLoopUsesTimeout) {
+              clearTimeout(tickLoopHandle);
+          }
+          else {
+              const cancel = deps.getCancelAnimationFrame();
+              if (cancel && Number.isFinite(Number(tickLoopHandle)))
+                  cancel(Number(tickLoopHandle));
+          }
+          tickLoopHandle = null;
+          tickLoopUsesTimeout = false;
+      };
+      const updateTimerAndCost = (timestamp) => {
+          if (!clock)
+              return;
+          const game = deps.getGame();
+          if (!game)
+              return;
+          if (deps.isBattleOver(game))
+              return;
+          const turnEveryMs = resolveClockTurnIntervalMs(clock, deps.resolveTurnIntervalMs);
+          const safeNowMs = safeNow();
+          const sessionNowMsRaw = sessionNow();
+          let forcedElapsedSec = null;
+          const safeDelta = safeNowMs - clock.startSafeMs;
+          const previousStartMs = Number.isFinite(clock.startMs) ? clock.startMs : null;
+          const sessionWentBack = previousStartMs !== null
+              && Number.isFinite(sessionNowMsRaw)
+              && sessionNowMsRaw < previousStartMs;
+          if (safeDelta < -CLOCK_DRIFT_TOLERANCE_MS || sessionWentBack) {
+              const previousElapsedSec = Number.isFinite(clock.lastCostCreditedSec)
+                  ? Math.max(0, clock.lastCostCreditedSec)
+                  : Math.max(0, 240 - (Number.isFinite(clock.lastTimerRemain) ? clock.lastTimerRemain : 240));
+              const previousRemain = Number.isFinite(clock.lastTimerRemain)
+                  ? Math.max(0, clock.lastTimerRemain)
+                  : Math.max(0, 240 - previousElapsedSec);
+              const previousTurnStep = Number.isFinite(clock.lastTurnStepMs)
+                  ? clock.lastTurnStepMs
+                  : null;
+              const previousElapsedMs = Math.max(0, previousElapsedSec) * 1000;
+              let sessionForRebase = sessionNowMsRaw;
+              if (!Number.isFinite(sessionForRebase)) {
+                  sessionForRebase = previousStartMs !== null
+                      ? previousStartMs + previousElapsedMs
+                      : safeNowMs;
+              }
+              let normalizedStart = Number.isFinite(sessionForRebase)
+                  ? sessionForRebase - previousElapsedMs
+                  : sessionForRebase;
+              if (!Number.isFinite(normalizedStart))
+                  normalizedStart = sessionForRebase;
+              clock.startMs = Number.isFinite(normalizedStart) ? normalizedStart : sessionForRebase;
+              if (!Number.isFinite(clock.startMs))
+                  clock.startMs = sessionForRebase;
+              clock.startSafeMs = safeNowMs;
+              forcedElapsedSec = previousElapsedSec;
+              clock.lastCostCreditedSec = previousElapsedSec;
+              clock.lastTimerRemain = previousRemain;
+              const minTurnStep = Number.isFinite(sessionForRebase)
+                  ? sessionForRebase - turnEveryMs
+                  : previousTurnStep ?? clock.startMs - turnEveryMs;
+              const maxTurnStep = Number.isFinite(sessionForRebase)
+                  ? sessionForRebase
+                  : clock.startMs;
+              let normalizedTurnStep = previousTurnStep ?? minTurnStep;
+              if (!Number.isFinite(normalizedTurnStep))
+                  normalizedTurnStep = minTurnStep;
+              if (Number.isFinite(minTurnStep) && normalizedTurnStep < minTurnStep)
+                  normalizedTurnStep = minTurnStep;
+              if (Number.isFinite(maxTurnStep) && normalizedTurnStep > maxTurnStep)
+                  normalizedTurnStep = maxTurnStep;
+              clock.lastTurnStepMs = normalizedTurnStep;
+              const rebaseFrame = Number.isFinite(sessionForRebase) ? sessionForRebase : clock.startMs;
+              clock.lastFrameMs = Number.isFinite(rebaseFrame) ? rebaseFrame : clock.startMs;
+              clock.lastLogicMs = Number.isFinite(rebaseFrame)
+                  ? rebaseFrame - LOGIC_MIN_INTERVAL_MS
+                  : clock.startMs - LOGIC_MIN_INTERVAL_MS;
+              clock.costAccumulator = 0;
+              clock.lastTimerText = null;
+          }
+          const expectedSessionMs = safeNowMs - clock.startSafeMs + clock.startMs;
+          let sessionNowMs = sessionNowMsRaw;
+          const needRebase = !Number.isFinite(sessionNowMs)
+              || Math.abs(sessionNowMs - expectedSessionMs) > CLOCK_DRIFT_TOLERANCE_MS;
+          if (needRebase)
+              sessionNowMs = expectedSessionMs;
+          if (typeof timestamp === 'number' && Number.isFinite(timestamp)) {
+              const rafTs = timestamp;
+              if (deps.supportsPerfNow || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)) {
+                  sessionNowMs = normalizeAnimationFrameTimestamp(rafTs);
+              }
+              if (needRebase) {
+                  const adjusted = expectedSessionMs;
+                  if (!Number.isFinite(sessionNowMs) || Math.abs(sessionNowMs - adjusted) > CLOCK_DRIFT_TOLERANCE_MS) {
+                      sessionNowMs = adjusted;
+                  }
+              }
+          }
+          if (!Number.isFinite(clock.lastFrameMs)) {
+              clock.lastFrameMs = Number.isFinite(clock.startMs) ? clock.startMs : expectedSessionMs;
+          }
+          const lastFrameMs = Number.isFinite(clock.lastFrameMs) ? clock.lastFrameMs : expectedSessionMs;
+          if (!Number.isFinite(sessionNowMs))
+              sessionNowMs = expectedSessionMs;
+          if (sessionNowMs <= lastFrameMs)
+              sessionNowMs = Math.max(expectedSessionMs, lastFrameMs + 1);
+          clock.lastFrameMs = Number.isFinite(sessionNowMs) ? sessionNowMs : expectedSessionMs;
+          if (!Number.isFinite(clock.lastLogicMs))
+              clock.lastLogicMs = sessionNowMs - LOGIC_MIN_INTERVAL_MS;
+          const logicSinceMs = sessionNowMs - clock.lastLogicMs;
+          if (Number.isFinite(logicSinceMs) && logicSinceMs < LOGIC_MIN_INTERVAL_MS)
+              return;
+          const startMs = Number.isFinite(clock.startMs) ? clock.startMs : clock.lastFrameMs;
+          let elapsedMsPrecise = Number.isFinite(startMs) ? sessionNowMs - startMs : 0;
+          if (!Number.isFinite(elapsedMsPrecise))
+              elapsedMsPrecise = (forcedElapsedSec ?? 0) * 1000;
+          if (elapsedMsPrecise < 0)
+              elapsedMsPrecise = 0;
+          let elapsedSecPrecise = elapsedMsPrecise / 1000;
+          if (forcedElapsedSec !== null && elapsedSecPrecise < forcedElapsedSec) {
+              elapsedSecPrecise = forcedElapsedSec;
+              elapsedMsPrecise = elapsedSecPrecise * 1000;
+          }
+          const prevRemainDisplay = Number.isFinite(clock.lastTimerRemain)
+              ? clock.lastTimerRemain
+              : Math.max(0, 240 - Math.floor(elapsedSecPrecise));
+          const remainSecPrecise = Math.max(0, 240 - elapsedSecPrecise);
+          const remainDisplay = Math.max(0, Math.floor(remainSecPrecise));
+          if (remainDisplay !== prevRemainDisplay || clock.lastTimerText === null) {
+              const mm = String(Math.floor(remainDisplay / 60)).padStart(2, '0');
+              const ss = String(remainDisplay % 60).padStart(2, '0');
+              const nextTimerText = `${mm}:${ss}`;
+              let tEl = deps.getTimerElement();
+              if (!tEl || !tEl.isConnected) {
+                  deps.resolveTimerElement();
+                  tEl = deps.getTimerElement();
+              }
+              if (tEl)
+                  tEl.textContent = nextTimerText;
+              clock.lastTimerText = nextTimerText;
+          }
+          clock.lastTimerRemain = remainDisplay;
+          if (remainSecPrecise <= 0 && prevRemainDisplay > 0) {
+              const timeoutResult = deps.runBattleEndCheck('timeout', sessionNowMs, remainDisplay);
+              if (timeoutResult)
+                  return;
+          }
+          const lastCredited = Number.isFinite(clock.lastCostCreditedSec) ? clock.lastCostCreditedSec : 0;
+          let deltaSec = elapsedSecPrecise - lastCredited;
+          if (!Number.isFinite(deltaSec) || deltaSec < 0)
+              deltaSec = 0;
+          const accumulatorBase = Number.isFinite(clock.costAccumulator) ? clock.costAccumulator : 0;
+          let nextAccumulator = accumulatorBase + deltaSec;
+          let costGranted = 0;
+          if (nextAccumulator >= 1) {
+              costGranted = Math.floor(nextAccumulator);
+              nextAccumulator -= costGranted;
+          }
+          if (!Number.isFinite(nextAccumulator) || nextAccumulator < 0)
+              nextAccumulator = 0;
+          clock.costAccumulator = nextAccumulator;
+          clock.lastCostCreditedSec = Math.max(lastCredited, elapsedSecPrecise);
+          let costChanged = false;
+          if (costGranted > 0) {
+              costChanged = deps.applyCostGain(game, costGranted) || costChanged;
+              costChanged = deps.applyCostGain(game.ai, costGranted) || costChanged;
+          }
+          if (costChanged) {
+              deps.onHudUpdate(game);
+              if (!game.selectedId)
+                  deps.onDeckReevaluate();
+              deps.onRenderSummonBar();
+              aiMaybeAct(game, 'cost');
+          }
+          deps.onSyncLeaderUltControls();
+          clock.lastLogicMs = sessionNowMs;
+          if (deps.isBattleOver(game))
+              return;
+          if (deps.runBattleEndCheck('leader-immediate', sessionNowMs))
+              return;
+          let turnState = game.turn ?? null;
+          let busyUntil = deps.normalizeTurnBusyUntil(turnState);
+          const stallDeltaEpsilon = 1;
+          const initialTurnBaseline = Number.isFinite(clock.startMs)
+              ? clock.startMs - turnEveryMs
+              : sessionNowMs - turnEveryMs;
+          if (!Number.isFinite(clock.lastTurnStepMs)) {
+              clock.lastTurnStepMs = initialTurnBaseline;
+          }
+          else if (clock.lastTurnStepMs > sessionNowMs) {
+              clock.lastTurnStepMs = sessionNowMs - turnEveryMs;
+          }
+          let readyByBusy = sessionNowMs >= busyUntil;
+          let elapsedForTurn = sessionNowMs - clock.lastTurnStepMs;
+          if (readyByBusy && (!Number.isFinite(elapsedForTurn) || elapsedForTurn < -stallDeltaEpsilon)) {
+              clock.lastTurnStepMs = sessionNowMs - turnEveryMs;
+              elapsedForTurn = turnEveryMs;
+          }
+          if (readyByBusy && elapsedForTurn >= turnEveryMs) {
+              let turnsProcessed = 0;
+              let hasBoardMutation = false;
+              while (readyByBusy && elapsedForTurn >= turnEveryMs && turnsProcessed < MAX_TURNS_PER_TICK) {
+                  clock.lastTurnStepMs += turnEveryMs;
+                  elapsedForTurn -= turnEveryMs;
+                  turnsProcessed += 1;
+                  stepTurn(game, deps.stepTurnContext);
+                  if (deps.runBattleEndCheck('leader-immediate', sessionNowMs))
+                      return;
+                  deps.processCreepDeathHealing(sessionNowMs);
+                  deps.cleanupDead(sessionNowMs);
+                  hasBoardMutation = true;
+                  if (deps.runBattleEndCheck('post-turn', sessionNowMs))
+                      return;
+                  aiMaybeAct(game, 'board');
+                  if (deps.isBattleOver(game))
+                      return;
+                  turnState = game.turn ?? null;
+                  busyUntil = deps.normalizeTurnBusyUntil(turnState);
+                  readyByBusy = sessionNowMs >= busyUntil;
+              }
+              if (hasBoardMutation)
+                  deps.onBoardMutation();
+          }
+      };
+      const scheduleTickLoop = () => {
+          if (!deps.isRunning() || !clock)
+              return;
+          if (tickLoopHandle !== null)
+              return;
+          const raf = deps.getRequestAnimationFrame();
+          if (raf) {
+              tickLoopUsesTimeout = false;
+              tickLoopHandle = raf(runTickLoop);
+              return;
+          }
+          tickLoopUsesTimeout = true;
+          const turnMs = Number.isFinite(clock.turnEveryMs) && clock.turnEveryMs > 0
+              ? clock.turnEveryMs
+              : LOGIC_MIN_INTERVAL_MS;
+          const turnSlice = Math.max(1, Math.floor(turnMs / 4));
+          const timeoutDelay = Math.max(8, Math.min(LOGIC_MIN_INTERVAL_MS, turnSlice || LOGIC_MIN_INTERVAL_MS));
+          tickLoopHandle = setTimeout(runTickLoop, timeoutDelay);
+      };
+      const runTickLoop = (timestamp) => {
+          tickLoopHandle = null;
+          try {
+              updateTimerAndCost(timestamp);
+          }
+          catch (err) {
+              deps.logError('[pve] tick loop error', err);
+              const game = deps.getGame();
+              if (game) {
+                  try {
+                      deps.onHudUpdate(game);
+                  }
+                  catch (hudErr) {
+                      deps.logError('[pve] HUD update fallback sau lỗi tick thất bại', hudErr);
+                  }
+              }
+          }
+          if (!deps.isRunning() || !clock)
+              return;
+          scheduleTickLoop();
+      };
+      const startLoop = () => {
+          stopLoop();
+          clock = createClock(deps.resolveTurnIntervalMs);
+          updateTimerAndCost();
+          scheduleTickLoop();
+      };
+      return {
+          startLoop,
+          stopLoop,
+          tick: updateTimerAndCost,
+      };
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionLoopController')) exports.createSessionLoopController = createSessionLoopController;
+};
 __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) => {
   const __dep2 = __require('./aether.ts');
   const globalAetherPool = __dep2.globalAetherPool;
   const __dep3 = __require('./turns.ts');
-  const stepTurn = __dep3.stepTurn;
   const doActionOrSkip = __dep3.doActionOrSkip;
   const predictSpawnCycle = __dep3.predictSpawnCycle;
   const __dep4 = __require('./summon.ts');
@@ -14799,7 +15121,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const processActionChain = __dep4.processActionChain;
   const __dep5 = __require('./ai.ts');
   const refillDeckEnemy = __dep5.refillDeckEnemy;
-  const aiMaybeAct = __dep5.aiMaybeAct;
   const __dep6 = __require('./statuses.ts');
   const Statuses = __dep6.Statuses;
   const makeStatusEffect = __dep6.makeStatusEffect;
@@ -14893,16 +15214,18 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const parseFiniteNumber = __dep25.parseFiniteNumber;
   const __dep26 = __require('./modes/pve/collection-mapper.ts');
   const mapUnitProgressById = __dep26.mapUnitProgressById;
-  const __dep27 = __require('./modes/pve/unit-runtime-hooks.ts');
-  const runPveRuntimeUltHook = __dep27.runPveRuntimeUltHook;
-  const __dep28 = __require('./leader-uyen.ts');
-  const ensureUyenState = __dep28.ensureUyenState;
-  const getUyenUltChoice = __dep28.getUyenUltChoice;
-  const grantUyenSummonRage = __dep28.grantUyenSummonRage;
-  const canCastLeaderUltChoice = __dep28.canCastLeaderUltChoice;
-  const isAnyLeaderUltReady = __dep28.isAnyLeaderUltReady;
-  const isUyenLeader = __dep28.isUyenLeader;
-  const queueUyenUltCast = __dep28.queueUyenUltCast;
+  const __dep27 = __require('./modes/pve/session-loop.ts');
+  const createSessionLoopController = __dep27.createSessionLoopController;
+  const __dep28 = __require('./modes/pve/unit-runtime-hooks.ts');
+  const runPveRuntimeUltHook = __dep28.runPveRuntimeUltHook;
+  const __dep29 = __require('./leader-uyen.ts');
+  const ensureUyenState = __dep29.ensureUyenState;
+  const getUyenUltChoice = __dep29.getUyenUltChoice;
+  const grantUyenSummonRage = __dep29.grantUyenSummonRage;
+  const canCastLeaderUltChoice = __dep29.canCastLeaderUltChoice;
+  const isAnyLeaderUltReady = __dep29.isAnyLeaderUltReady;
+  const isUyenLeader = __dep29.isUyenLeader;
+  const queueUyenUltCast = __dep29.queueUyenUltCast;
   const EMPTY_DECK_ENTRIES = [];
   const ULT_TAG_CACHE = new WeakMap();
   const appendUltTags = (output, list) => {
@@ -15419,11 +15742,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
       && !!globalThis.performance
       && typeof globalThis.performance.now === 'function';
-  const RAF_TIMESTAMP_MAX = 2_147_483_647; // ~24 ngày tính từ mốc điều hướng
   const RAF_DRIFT_TOLERANCE_MS = 120_000; // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
-  const CLOCK_DRIFT_TOLERANCE_MS = RAF_DRIFT_TOLERANCE_MS;
-  const LOGIC_MIN_INTERVAL_MS = 40;
-  const MAX_TURNS_PER_TICK = 6;
   const resolveConfiguredTurnIntervalMs = () => {
       const intervalCandidate = CFG?.ANIMATION?.turnIntervalMs;
       const parsedInterval = Number(intervalCandidate);
@@ -15431,21 +15750,12 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           ? parsedInterval
           : 600;
   };
-  const resolveClockTurnIntervalMs = (clock) => {
-      const current = clock.turnEveryMs;
-      if (Number.isFinite(current) && current > 0)
-          return current;
-      const fallback = resolveConfiguredTurnIntervalMs();
-      clock.turnEveryMs = fallback;
-      return fallback;
-  };
   // --- Instance counters (để gắn id cho token/minion) ---
   let _IID = 1;
   let _BORN = 1;
   const nextIid = () => _IID++;
   let Game = null;
-  let tickLoopHandle = null;
-  let tickLoopUsesTimeout = false;
+  let sessionLoopController = null;
   let resizeHandler = null;
   let visualViewportResizeHandler = null;
   let visualViewportScrollHandler = null;
@@ -15631,7 +15941,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       applyCollectionSkinsToSession(Game);
       _IID = 1;
       _BORN = 1;
-      CLOCK = createClock();
       invalidateSceneCache();
       meleeOffsetTokenKeys.clear();
       creepDeathHealProcessed.clear();
@@ -15953,8 +16262,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       winRef.removeEventListener(ART_SPRITE_EVENT, artSpriteHandler);
       artSpriteHandler = null;
   }
-  // Master clock theo timestamp – tránh drift giữa nhiều interval
-  let CLOCK = null;
   const creepDeathHealProcessed = new Set();
   const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
   const normalizedTagsByUnitId = new Map();
@@ -15965,23 +16272,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       creep_2: 0.04,
       creep_3: 0.05,
   };
-  function createClock() {
-      const safe = safeNow();
-      const now = sessionNow();
-      const turnEveryMs = resolveConfiguredTurnIntervalMs();
-      return {
-          startMs: now,
-          startSafeMs: safe,
-          lastTimerRemain: 240,
-          lastCostCreditedSec: 0,
-          turnEveryMs,
-          lastTurnStepMs: now - turnEveryMs,
-          lastFrameMs: now,
-          lastLogicMs: now - LOGIC_MIN_INTERVAL_MS,
-          costAccumulator: 0,
-          lastTimerText: null,
-      };
-  }
   const readTokenTags = (token) => {
       if (!token)
           return EMPTY_TAG_LIST;
@@ -17522,294 +17812,35 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           }
           return checkBattleEndResult(Game, battleCheckInfo);
       };
-      const updateTimerAndCost = (timestamp) => {
-          if (!CLOCK)
-              return;
-          const game = Game;
-          if (!game)
-              return;
-          if (game.battle?.over)
-              return;
-          const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
-          const safeNowMs = safeNow();
-          const sessionNowMsRaw = sessionNow();
-          let forcedElapsedSec = null;
-          const safeDelta = safeNowMs - CLOCK.startSafeMs;
-          const previousStartMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : null;
-          const sessionWentBack = previousStartMs !== null
-              && Number.isFinite(sessionNowMsRaw)
-              && sessionNowMsRaw < previousStartMs;
-          if (safeDelta < -CLOCK_DRIFT_TOLERANCE_MS || sessionWentBack) {
-              const previousElapsedSec = Number.isFinite(CLOCK.lastCostCreditedSec)
-                  ? Math.max(0, CLOCK.lastCostCreditedSec)
-                  : Math.max(0, 240 - (Number.isFinite(CLOCK.lastTimerRemain) ? CLOCK.lastTimerRemain : 240));
-              const previousRemain = Number.isFinite(CLOCK.lastTimerRemain)
-                  ? Math.max(0, CLOCK.lastTimerRemain)
-                  : Math.max(0, 240 - previousElapsedSec);
-              const previousTurnStep = Number.isFinite(CLOCK.lastTurnStepMs)
-                  ? CLOCK.lastTurnStepMs
-                  : null;
-              const previousElapsedMs = Math.max(0, previousElapsedSec) * 1000;
-              let sessionForRebase = sessionNowMsRaw;
-              if (!Number.isFinite(sessionForRebase)) {
-                  sessionForRebase = previousStartMs !== null
-                      ? previousStartMs + previousElapsedMs
-                      : safeNowMs;
-              }
-              let normalizedStart = Number.isFinite(sessionForRebase)
-                  ? sessionForRebase - previousElapsedMs
-                  : sessionForRebase;
-              if (!Number.isFinite(normalizedStart)) {
-                  normalizedStart = sessionForRebase;
-              }
-              CLOCK.startMs = Number.isFinite(normalizedStart)
-                  ? normalizedStart
-                  : sessionForRebase;
-              if (!Number.isFinite(CLOCK.startMs)) {
-                  CLOCK.startMs = sessionForRebase;
-              }
-              CLOCK.startSafeMs = safeNowMs;
-              forcedElapsedSec = previousElapsedSec;
-              CLOCK.lastCostCreditedSec = previousElapsedSec;
-              CLOCK.lastTimerRemain = previousRemain;
-              const minTurnStep = Number.isFinite(sessionForRebase)
-                  ? sessionForRebase - turnEveryMs
-                  : previousTurnStep ?? CLOCK.startMs - turnEveryMs;
-              const maxTurnStep = Number.isFinite(sessionForRebase)
-                  ? sessionForRebase
-                  : CLOCK.startMs;
-              let normalizedTurnStep = previousTurnStep ?? minTurnStep;
-              if (!Number.isFinite(normalizedTurnStep)) {
-                  normalizedTurnStep = minTurnStep;
-              }
-              if (Number.isFinite(minTurnStep) && normalizedTurnStep < minTurnStep) {
-                  normalizedTurnStep = minTurnStep;
-              }
-              if (Number.isFinite(maxTurnStep) && normalizedTurnStep > maxTurnStep) {
-                  normalizedTurnStep = maxTurnStep;
-              }
-              CLOCK.lastTurnStepMs = normalizedTurnStep;
-              const rebaseFrame = Number.isFinite(sessionForRebase)
-                  ? sessionForRebase
-                  : CLOCK.startMs;
-              CLOCK.lastFrameMs = Number.isFinite(rebaseFrame)
-                  ? rebaseFrame
-                  : CLOCK.startMs;
-              CLOCK.lastLogicMs = Number.isFinite(rebaseFrame)
-                  ? rebaseFrame - LOGIC_MIN_INTERVAL_MS
-                  : CLOCK.startMs - LOGIC_MIN_INTERVAL_MS;
-              CLOCK.costAccumulator = 0;
-              CLOCK.lastTimerText = null;
-          }
-          const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
-          let sessionNowMs = sessionNowMsRaw;
-          const needRebase = !Number.isFinite(sessionNowMs)
-              || Math.abs(sessionNowMs - expectedSessionMs) > CLOCK_DRIFT_TOLERANCE_MS;
-          if (needRebase) {
-              sessionNowMs = expectedSessionMs;
-          }
-          if (isFiniteNumber(timestamp)) {
-              const rafTs = timestamp;
-              if (SUPPORTS_PERF_NOW || (rafTs >= 0 && rafTs <= RAF_TIMESTAMP_MAX)) {
-                  sessionNowMs = normalizeAnimationFrameTimestamp(rafTs);
-              }
-              if (needRebase) {
-                  const adjusted = expectedSessionMs;
-                  if (!Number.isFinite(sessionNowMs)
-                      || Math.abs(sessionNowMs - adjusted) > CLOCK_DRIFT_TOLERANCE_MS) {
-                      sessionNowMs = adjusted;
-                  }
-              }
-          }
-          if (!Number.isFinite(CLOCK.lastFrameMs)) {
-              CLOCK.lastFrameMs = Number.isFinite(CLOCK.startMs)
-                  ? CLOCK.startMs
-                  : expectedSessionMs;
-          }
-          const lastFrameMs = Number.isFinite(CLOCK.lastFrameMs)
-              ? CLOCK.lastFrameMs
-              : expectedSessionMs;
-          if (!Number.isFinite(sessionNowMs)) {
-              sessionNowMs = expectedSessionMs;
-          }
-          if (sessionNowMs <= lastFrameMs) {
-              const fallbackFrame = Math.max(expectedSessionMs, lastFrameMs + 1);
-              sessionNowMs = fallbackFrame;
-          }
-          CLOCK.lastFrameMs = Number.isFinite(sessionNowMs) ? sessionNowMs : expectedSessionMs;
-          if (!Number.isFinite(CLOCK.lastLogicMs)) {
-              CLOCK.lastLogicMs = sessionNowMs - LOGIC_MIN_INTERVAL_MS;
-          }
-          const logicSinceMs = sessionNowMs - CLOCK.lastLogicMs;
-          if (Number.isFinite(logicSinceMs) && logicSinceMs < LOGIC_MIN_INTERVAL_MS) {
-              return;
-          }
-          const startMs = Number.isFinite(CLOCK.startMs) ? CLOCK.startMs : CLOCK.lastFrameMs;
-          let elapsedMsPrecise = Number.isFinite(startMs) ? sessionNowMs - startMs : 0;
-          if (!Number.isFinite(elapsedMsPrecise)) {
-              elapsedMsPrecise = (forcedElapsedSec ?? 0) * 1000;
-          }
-          if (elapsedMsPrecise < 0) {
-              elapsedMsPrecise = 0;
-          }
-          let elapsedSecPrecise = elapsedMsPrecise / 1000;
-          if (forcedElapsedSec !== null && elapsedSecPrecise < forcedElapsedSec) {
-              elapsedSecPrecise = forcedElapsedSec;
-              elapsedMsPrecise = elapsedSecPrecise * 1000;
-          }
-          const prevRemainDisplay = Number.isFinite(CLOCK.lastTimerRemain)
-              ? CLOCK.lastTimerRemain
-              : Math.max(0, 240 - Math.floor(elapsedSecPrecise));
-          const remainSecPrecise = Math.max(0, 240 - elapsedSecPrecise);
-          const remainDisplay = Math.max(0, Math.floor(remainSecPrecise));
-          if (remainDisplay !== prevRemainDisplay || CLOCK.lastTimerText === null) {
-              const mm = String(Math.floor(remainDisplay / 60)).padStart(2, '0');
-              const ss = String(remainDisplay % 60).padStart(2, '0');
-              const nextTimerText = `${mm}:${ss}`;
-              let tEl = timerElement;
-              if (!tEl || !tEl.isConnected) {
-                  resolveTimerElement();
-                  tEl = timerElement;
-              }
-              if (tEl)
-                  tEl.textContent = nextTimerText;
-              CLOCK.lastTimerText = nextTimerText;
-          }
-          CLOCK.lastTimerRemain = remainDisplay;
-          if (remainSecPrecise <= 0 && prevRemainDisplay > 0) {
-              const timeoutResult = runBattleEndCheck('timeout', sessionNowMs, remainDisplay);
-              if (timeoutResult)
-                  return;
-          }
-          const lastCredited = Number.isFinite(CLOCK.lastCostCreditedSec)
-              ? CLOCK.lastCostCreditedSec
-              : 0;
-          let deltaSec = elapsedSecPrecise - lastCredited;
-          if (!Number.isFinite(deltaSec) || deltaSec < 0) {
-              deltaSec = 0;
-          }
-          const accumulatorBase = Number.isFinite(CLOCK.costAccumulator) ? CLOCK.costAccumulator : 0;
-          let nextAccumulator = accumulatorBase + deltaSec;
-          let costGranted = 0;
-          if (nextAccumulator >= 1) {
-              costGranted = Math.floor(nextAccumulator);
-              nextAccumulator -= costGranted;
-          }
-          if (!Number.isFinite(nextAccumulator) || nextAccumulator < 0) {
-              nextAccumulator = 0;
-          }
-          CLOCK.costAccumulator = nextAccumulator;
-          CLOCK.lastCostCreditedSec = Math.max(lastCredited, elapsedSecPrecise);
-          let costChanged = false;
-          if (costGranted > 0) {
-              costChanged = applyCostGain(game, costGranted) || costChanged;
-              costChanged = applyCostGain(game.ai, costGranted) || costChanged;
-          }
-          if (costChanged) {
+      sessionLoopController = createSessionLoopController({
+          getGame: () => Game,
+          isRunning: () => running,
+          isBattleOver: (game) => Boolean(game.battle?.over),
+          resolveTurnIntervalMs: resolveConfiguredTurnIntervalMs,
+          normalizeTurnBusyUntil,
+          runBattleEndCheck,
+          getTimerElement: () => timerElement,
+          resolveTimerElement,
+          applyCostGain,
+          onHudUpdate: (game) => {
               if (hud)
                   hud.update(game);
-              if (!game.selectedId)
-                  selectFirstAffordable();
-              renderSummonBar();
-              aiMaybeAct(game, 'cost');
-          }
-          syncLeaderUltControls();
-          CLOCK.lastLogicMs = sessionNowMs;
-          if (game.battle?.over)
-              return;
-          if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
-              return;
-          }
-          let turnState = game.turn ?? null;
-          let busyUntil = normalizeTurnBusyUntil(turnState);
-          const stallDeltaEpsilon = 1;
-          const initialTurnBaseline = Number.isFinite(CLOCK.startMs)
-              ? CLOCK.startMs - turnEveryMs
-              : sessionNowMs - turnEveryMs;
-          if (!Number.isFinite(CLOCK.lastTurnStepMs)) {
-              CLOCK.lastTurnStepMs = initialTurnBaseline;
-          }
-          else if (CLOCK.lastTurnStepMs > sessionNowMs) {
-              CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
-          }
-          let readyByBusy = sessionNowMs >= busyUntil;
-          let elapsedForTurn = sessionNowMs - CLOCK.lastTurnStepMs;
-          if (readyByBusy && (!Number.isFinite(elapsedForTurn) || elapsedForTurn < -stallDeltaEpsilon)) {
-              CLOCK.lastTurnStepMs = sessionNowMs - turnEveryMs;
-              elapsedForTurn = turnEveryMs;
-          }
-          if (readyByBusy && elapsedForTurn >= turnEveryMs) {
-              let turnsProcessed = 0;
-              let hasBoardMutation = false;
-              while (readyByBusy && elapsedForTurn >= turnEveryMs && turnsProcessed < MAX_TURNS_PER_TICK) {
-                  CLOCK.lastTurnStepMs += turnEveryMs;
-                  elapsedForTurn -= turnEveryMs;
-                  turnsProcessed += 1;
-                  stepTurn(game, stepTurnContext);
-                  if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
-                      return;
-                  }
-                  processCreepDeathHealing(sessionNowMs);
-                  cleanupDead(sessionNowMs);
-                  hasBoardMutation = true;
-                  if (runBattleEndCheck('post-turn', sessionNowMs)) {
-                      return;
-                  }
-                  aiMaybeAct(game, 'board');
-                  if (game.battle?.over) {
-                      return;
-                  }
-                  turnState = game.turn ?? null;
-                  busyUntil = normalizeTurnBusyUntil(turnState);
-                  readyByBusy = sessionNowMs >= busyUntil;
-              }
-              if (hasBoardMutation) {
-                  scheduleDraw();
-              }
-          }
-      };
-      const runTickLoop = (timestamp) => {
-          tickLoopHandle = null;
-          try {
-              updateTimerAndCost(timestamp);
-          }
-          catch (err) {
-              console.error('[pve] tick loop error', err);
-              if (hud && typeof hud.update === 'function') {
-                  try {
-                      hud.update({ cost: Game?.cost ?? null, costCap: Game?.costCap ?? null });
-                  }
-                  catch (hudErr) {
-                      console.error('[pve] HUD update fallback sau lỗi tick thất bại', hudErr);
-                  }
-              }
-          }
-          if (!running || !CLOCK)
-              return;
-          scheduleTickLoop();
-      };
-      function scheduleTickLoop() {
-          if (!running || !CLOCK)
-              return;
-          if (tickLoopHandle !== null)
-              return;
-          const raf = getRequestAnimationFrame();
-          if (raf) {
-              tickLoopUsesTimeout = false;
-              tickLoopHandle = raf(runTickLoop);
-          }
-          else {
-              tickLoopUsesTimeout = true;
-              const turnMs = Number.isFinite(CLOCK.turnEveryMs) && CLOCK.turnEveryMs > 0
-                  ? CLOCK.turnEveryMs
-                  : LOGIC_MIN_INTERVAL_MS;
-              const turnSlice = Math.max(1, Math.floor(turnMs / 4));
-              const timeoutDelay = Math.max(8, Math.min(LOGIC_MIN_INTERVAL_MS, turnSlice || LOGIC_MIN_INTERVAL_MS));
-              tickLoopHandle = setTimeout(runTickLoop, timeoutDelay);
-          }
-      }
-      updateTimerAndCost();
-      scheduleTickLoop();
+          },
+          onDeckReevaluate: selectFirstAffordable,
+          onRenderSummonBar: renderSummonBar,
+          onSyncLeaderUltControls: syncLeaderUltControls,
+          onBoardMutation: scheduleDraw,
+          processCreepDeathHealing,
+          cleanupDead,
+          stepTurnContext,
+          getRequestAnimationFrame,
+          getCancelAnimationFrame,
+          logError: (message, error) => {
+              console.error(message, error);
+          },
+          supportsPerfNow: SUPPORTS_PERF_NOW,
+      });
+      sessionLoopController.startLoop();
       return true;
   }
   function selectFirstAffordable() {
@@ -18643,20 +18674,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       resolveTimerElement();
   }
   function clearSessionTimers() {
-      if (tickLoopHandle !== null) {
-          if (tickLoopUsesTimeout) {
-              clearTimeout(tickLoopHandle);
-          }
-          else {
-              const cancel = getCancelAnimationFrame();
-              const frameHandle = toAnimationFrameHandle(tickLoopHandle);
-              if (cancel && frameHandle !== null) {
-                  cancel(frameHandle);
-              }
-          }
-          tickLoopHandle = null;
-          tickLoopUsesTimeout = false;
-      }
+      sessionLoopController?.stopLoop();
       cancelScheduledDraw();
       cancelScheduledResize();
   }
@@ -18744,7 +18762,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       }
       resetDomRefs();
       timerElement = null;
-      CLOCK = null;
+      sessionLoopController = null;
       Game = null;
       running = false;
       invalidateSceneCache();
