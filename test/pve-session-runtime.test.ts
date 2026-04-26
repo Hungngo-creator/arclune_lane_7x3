@@ -163,6 +163,24 @@ describe('pve session runtime reward + wave flow', () => {
     expect(seen).toHaveLength(1);
   });
 
+  test('event forwarding unsubscribe chỉ gỡ handler tương ứng', () => {
+    const session = createPveSession(null as any, {});
+    const seen: string[] = [];
+    const offA = session.onEvent(ACTION_END, () => {
+      seen.push('A');
+    });
+    session.onEvent(ACTION_END, () => {
+      seen.push('B');
+    });
+
+    emitGameEvent(ACTION_END, {} as any);
+    expect(seen).toEqual(['A', 'B']);
+
+    offA();
+    emitGameEvent(ACTION_END, {} as any);
+    expect(seen).toEqual(['A', 'B', 'B']);
+  });
+
   test('onSessionEvent unsubscribe hoạt động thật', () => {
     const seen: string[] = [];
     const off = onSessionEvent(ACTION_END, () => {
@@ -211,6 +229,36 @@ describe('pve session runtime reward + wave flow', () => {
     }
   });
 
+  test('idempotency nhiều tick completed không tạo reward trùng (large path)', () => {
+    const size = 1000;
+    const rewards = Array.from({ length: size }, (_, index) => ({
+      id: `reward_${index}`,
+      weight: 1,
+      tier: 1,
+    }));
+    const session: any = {
+      runtime: {
+        rewardQueue: [],
+        wave: null,
+        encounter: {
+          status: 'running',
+          waveIndex: 0,
+          pendingRewards: [],
+          waves: [{ status: 'active', rewards }],
+        },
+      },
+    };
+
+    expect(advanceSession(session)?.status).toBe('completed');
+    expect(session.runtime.rewardQueue).toHaveLength(size);
+
+    for (let tick = 0; tick < 50; tick += 1) {
+      expect(advanceSession(session)?.status).toBe('completed');
+      expect(session.runtime.rewardQueue).toHaveLength(size);
+      expect(session.runtime.encounter.pendingRewards).toHaveLength(size);
+    }
+  });
+
   test('encounter completed thì advanceSession trả sớm, không mutate thêm', () => {
     const reward = { id: 'gold', weight: 1, tier: 1 };
     const wave = { status: 'active', rewards: [reward] };
@@ -233,6 +281,39 @@ describe('pve session runtime reward + wave flow', () => {
     expect(session.runtime.encounter.waveIndex).toBe(99);
     expect(session.runtime.rewardQueue).toEqual([reward]);
     expect(session.runtime.encounter.pendingRewards).toEqual([reward]);
+  });
+
+  test('active wave sanitize/cache chỉ chạy một lần và giữ reference reward list đã làm sạch', () => {
+    const reward = { id: 'gold', weight: 1, tier: 1 };
+    const dirtyRewards: any[] = [reward, { id: '', weight: 1, tier: 1 }, null];
+    const wave: any = { status: 'active', rewards: dirtyRewards };
+    const session: any = {
+      runtime: {
+        rewardQueue: [],
+        encounter: {
+          status: 'running',
+          waveIndex: 0,
+          pendingRewards: [],
+          waves: [wave],
+        },
+      },
+    };
+
+    expect(advanceSession(session)?.status).toBe('completed');
+    expect(wave.rewards).toBe(dirtyRewards);
+    expect(wave.rewards).toEqual([reward]);
+
+    // gọi lặp sau completed không append lại reward
+    for (let tick = 0; tick < 5; tick += 1) {
+      expect(advanceSession(session)?.status).toBe('completed');
+      expect(session.runtime.rewardQueue).toEqual([reward]);
+    }
+  });
+
+  test('applyReward trả null khi input không hợp lệ', () => {
+    expect(applyReward(null as any, { id: 'x', weight: 1, tier: 1 } as any)).toBeNull();
+    expect(applyReward({ runtime: {} } as any, { id: 'x', weight: 1, tier: 1 } as any)).toEqual({ id: 'x', weight: 1, tier: 1 });
+    expect(applyReward({ runtime: {} } as any, { id: '', weight: 1, tier: 1 } as any)).toBeNull();
   });
 
   test('regression nhỏ: merge reward path lớn giữ đúng unique id và override mới nhất', () => {

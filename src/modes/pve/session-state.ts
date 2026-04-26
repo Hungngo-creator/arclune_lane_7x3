@@ -59,6 +59,7 @@ export type NormalizedSessionConfig = (CreateSessionOptions & {
 
 const NORMALIZABLE_DECK_FIELDS = ['lineupDeck', 'playerDeck', 'deck'] as const;
 type NormalizableDeckField = (typeof NORMALIZABLE_DECK_FIELDS)[number];
+type DeckInputSource = Partial<Record<NormalizableDeckField, unknown>>;
 
 function normalizeDeckField(config: NormalizedSessionConfig, key: NormalizableDeckField): void {
   const value = config[key];
@@ -86,16 +87,22 @@ function toDeckEntries(value: unknown): SessionState['unitsAll'] {
   return isNormalizedDeckEntries(value) ? value : normalizeDeckEntries(value);
 }
 
+function pickFirstDeckInput(source: DeckInputSource): ReadonlyArray<unknown> | null {
+  const lineupDeck = source.lineupDeck;
+  if (hasDeckEntries(lineupDeck)) return lineupDeck;
+  const playerDeck = source.playerDeck;
+  if (hasDeckEntries(playerDeck)) return playerDeck;
+  const deck = source.deck;
+  if (hasDeckEntries(deck)) return deck;
+  return null;
+}
+
 export function getPreferredDeckInput(config: {
   lineupDeck?: unknown;
   playerDeck?: unknown;
   deck?: unknown;
 }): ReadonlyArray<unknown> | null {
-  for (const key of NORMALIZABLE_DECK_FIELDS) {
-    const value = config[key];
-    if (hasDeckEntries(value)) return value;
-  }
-  return null;
+  return pickFirstDeckInput(config);
 }
 
 export function getPreferredDeckEntries(config: {
@@ -256,13 +263,12 @@ function getAiPresetDeckEntries(
   preset: ResolveEnemyUnitsOptions['aiPreset'] | null | undefined,
 ): SessionState['ai']['unitsAll'] | null {
   if (!preset) return null;
-  if (Array.isArray(preset.deck) && preset.deck.length) {
-    return normalizeDeckEntries(preset.deck);
-  }
-  if (Array.isArray(preset.unitsAll) && preset.unitsAll.length) {
-    return normalizeDeckEntries(preset.unitsAll);
-  }
-  return null;
+  const preferredDeckInput = pickFirstDeckInput({
+    lineupDeck: preset.deck,
+    playerDeck: preset.unitsAll,
+    deck: null,
+  });
+  return preferredDeckInput ? toDeckEntries(preferredDeckInput) : null;
 }
 
 export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionState['ai']['unitsAll'] {

@@ -834,7 +834,6 @@ const HAND_SIZE  = CFG.HAND_SIZE ?? 4;
 
 ensureNestedModuleSupport();
 
-const getNow = (): number => sessionNow();
 const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
   && !!globalThis.performance
   && typeof globalThis.performance.now === 'function';
@@ -1457,7 +1456,7 @@ const FALLBACK_CREEP_DEATH_HEAL_BY_ID: Readonly<Record<string, number>> = {
 
 function createClock(): ClockState {
   const safe = safeNow();
-  const now = getNow();
+  const now = sessionNow();
   const turnEveryMs = resolveConfiguredTurnIntervalMs();
   return {
     startMs: now,
@@ -1754,7 +1753,7 @@ function removeOldestMinions(masterIid: number, count: number): void {
 function extendBusy(duration: number): void {
   const game = getInitializedGame();
   if (!game || !game.turn) return;
-  const now = getNow();
+  const now = sessionNow();
   const dur = Math.max(0, duration|0);
   game.turn.busyUntil = mergeBusyUntil(game.turn.busyUntil, now, dur);
 }
@@ -2115,7 +2114,7 @@ function performUlt(unit: UnitToken): void {
       ): void => {
         const sessionVfx = getSessionVfx();
         if (!sessionVfx) return;
-        const startedAt = getNow();
+        const startedAt = sessionNow();
         try {
           const dur = effect(sessionVfx);
           applyBusyFromVfx(startedAt, dur);
@@ -2524,7 +2523,7 @@ function finalizeBattle(
   const finishedAtRaw = payload?.finishedAt;
   const finishedAt = typeof finishedAtRaw === 'number' && Number.isFinite(finishedAtRaw)
     ? finishedAtRaw
-    : getNow();
+    : sessionNow();
   const result: BattleResult = {
     winner: payload?.winner ?? null,
     reason: payload?.reason ?? null,
@@ -2999,6 +2998,7 @@ function init(): boolean {
     if (!CLOCK || !Game) return;
     if (Game.battle?.over) return;
 
+    const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
     const safeNowMs = safeNow();
     const sessionNowMsRaw = sessionNow();
     let forcedElapsedSec: number | null = null;
@@ -3020,8 +3020,6 @@ function init(): boolean {
       const previousTurnStep = Number.isFinite(CLOCK.lastTurnStepMs)
         ? CLOCK.lastTurnStepMs
         : null;
-
-        const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
 
         const previousElapsedMs = Math.max(0, previousElapsedSec) * 1000;
         let sessionForRebase = sessionNowMsRaw;
@@ -3081,7 +3079,7 @@ function init(): boolean {
       }
 
       const expectedSessionMs = safeNowMs - CLOCK.startSafeMs + CLOCK.startMs;
-      let sessionNowMs = getNow();
+      let sessionNowMs = sessionNowMsRaw();
       const needRebase = !Number.isFinite(sessionNowMs)
         || Math.abs(sessionNowMs - expectedSessionMs) > CLOCK_DRIFT_TOLERANCE_MS;
       if (needRebase){
@@ -3113,7 +3111,7 @@ function init(): boolean {
       if (!Number.isFinite(sessionNowMs)){
         sessionNowMs = expectedSessionMs;
       }
-      if (Number.isFinite(lastFrameMs) && sessionNowMs <= lastFrameMs){
+      if (sessionNowMs <= lastFrameMs){
         const fallbackFrame = Math.max(expectedSessionMs, lastFrameMs + 1);
         sessionNowMs = fallbackFrame;
       }
@@ -3209,8 +3207,6 @@ function init(): boolean {
 
       let turnState = Game.turn ?? null;
       let busyUntil = normalizeTurnBusyUntil(turnState);
-
-      const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
 
       const stallDeltaEpsilon = 1;
       const initialTurnBaseline = Number.isFinite(CLOCK.startMs)
