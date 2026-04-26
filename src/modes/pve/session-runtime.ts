@@ -66,46 +66,41 @@ function getMutableRewardList(
 
 const SMALL_REWARD_MERGE_SIZE = 6;
 
-function mergeRewardsInPlaceLinear(list: MutableRewardList, additions: RewardList): MutableRewardList {
-  for (const reward of additions) {
-    let replaced = false;
-    for (let index = 0; index < list.length; index += 1) {
-      const existing = list[index];
-      if (!existing || existing.id !== reward.id) continue;
-      list[index] = reward;
-      replaced = true;
-      break;
-    }
-    if (!replaced) list.push(reward);
-  }
-  return list;
-}
-
-function mergeRewardsInPlaceIndexed(list: MutableRewardList, additions: RewardList): MutableRewardList {
+function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): MutableRewardList {
   if (!additions.length) return list;
-  const indexById = new Map<string, number>();
-  for (let index = 0; index < list.length; index += 1) {
-    const entry = list[index];
-    if (!entry) continue;
-    indexById.set(entry.id, index);
+  const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
+  const indexById = useIndexedMerge ? new Map<string, number>() : null;
+  if (indexById) {
+    for (let index = 0; index < list.length; index += 1) {
+      const entry = list[index];
+      if (!entry) continue;
+      indexById.set(entry.id, index);
+    }
   }
-  for (const reward of additions) {
-    const index = indexById.get(reward.id);
-    if (index == null) {
-      indexById.set(reward.id, list.length);
+
+    for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
+    const reward = additions[addIndex];
+    if (!reward) continue;
+    let existingIndex: number | undefined;
+    if (indexById) {
+      existingIndex = indexById.get(reward.id);
+    } else {
+      for (let listIndex = 0; listIndex < list.length; listIndex += 1) {
+        const existing = list[listIndex];
+        if (!existing || existing.id !== reward.id) continue;
+        existingIndex = listIndex;
+        break;
+      }
+    }
+
+    if (existingIndex == null) {
+      if (indexById) indexById.set(reward.id, list.length);
       list.push(reward);
       continue;
     }
-    list[index] = reward;
+    list[existingIndex] = reward;
   }
   return list;
-}
-
-function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): MutableRewardList {
-  if (!additions.length) return list;
-  const useLinearMerge = list.length <= SMALL_REWARD_MERGE_SIZE && additions.length <= SMALL_REWARD_MERGE_SIZE;
-  if (useLinearMerge) return mergeRewardsInPlaceLinear(list, additions);
-  return mergeRewardsInPlaceIndexed(list, additions);
 }
 
 function updateRewards(container: RewardListContainer, key: RewardListKey, additions: RewardList): RewardRoll[] {

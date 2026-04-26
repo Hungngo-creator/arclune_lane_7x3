@@ -441,11 +441,11 @@ Cái giá phải trả và thời điểm kích hoạt.
  * [Nội Tại] (Passive): Luôn hoạt động hoặc tự kích hoạt khi đủ điều kiện.
  * [Tự Động] (Auto-cast): Dùng cho Ult hoặc Skill tự kích hoạt khi đầy thanh nộ/điều kiện.
  * [Hồi Chiêu] (Cooldown): Số turn phải chờ để dùng lại.
-PHÂN TÍCH XUNG ĐỘT (CONFLICT RESOLUTION FLOW)
+PHÂN TÍCH XUNG ĐỘT các tag Pháp Tắc/Quy Tắc/ Axiom (CONFLICT RESOLUTION FLOW)
+Axiom là cao nhất sau đó đến Quy Tắc, đến Pháp Tắc rồi còn lại là skill/ultimate/nội tại không có 3 tag này. Nếu skill/ult/nội tại (gọi chung là kit) xung đột nhau và có cùng tag thì sẽ phán định dựa theo rank của 2 nhân vật có kit xung đột đó, nếu 2 char có rank = nhau thì so sánh tu vi của 2 char, nếu tu vi = nhau thì so sánh sao, nếu = nhau thì so sánh sao awaken, nếu = nhau nữa thì so sánh CP, sở dĩ so sánh CP cuối cùng là vì có class CP cao có class CP thấp do chi số của class đó thấp sẵn, cũng tránh tình trạng char mặc đồ xịn cp cao nhưng số sao, tu vi thấp đè char có sao, tu vi cao nhưng CP thấp vì class hoặc trang bị không đủ mạnh.
 Ví dụ: Nhân vật A có "Quy Tắc: Đánh là chết" đánh vào Nhân vật B có "Quy Tắc: Bất tử":
  * Check 1: Phẩm Bậc (Rank Priority):
    * Prime > UR > SSR > SR...
-   * Lý do: Rank cao hơn đại diện cho Vị Cách cao hơn.
  * Check 2 (Nếu cùng Rank): Game Tự so sánh Level (tu vi) > So Sánh sao, Tinh Cấp (tối đa 5*) nếu cả 2 bên có 1 char chưa đạt awaken > So số sao Awaken (tối đa awa 2) nếu 2 bên đều có char awaken > so sánh điểm chiến lực nếu 2 bên có lv bằng nhau, đã awaken + 2(awaken + 2 thì cần full * trước nên không đề cập), chiến lực chắc chắn sẽ khác nhau và không thể giống nhau đến từng con số vì build còn quyết định bởi trang bị.
  
  H. Giải thích về lượt đánh

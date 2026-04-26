@@ -436,10 +436,9 @@ function appendNormalizedPairScanEntry(
   const pushPair = (side: TurnOrderSide, slot: number): void => {
     output.push({ side, slot: clampTurnOrderSlot(slot) });
   };
-  const pushForSides = (slot: number, targetSides?: readonly TurnOrderSide[]): void => {
-    const resolvedSides = targetSides && targetSides.length ? targetSides : sides;
-    for (const side of resolvedSides) {
-      pushPair(side, slot);
+  const pushForSides = (slot: number): void => {
+    for (let sideIndex = 0; sideIndex < sides.length; sideIndex += 1) {
+      pushPair(sides[sideIndex], slot);
     }
   };
 
@@ -469,7 +468,7 @@ function appendNormalizedPairScanEntry(
       const side: Side = entry.side === 'enemy' ? 'enemy' : 'ally';
       pushPair(side, slot);
     }
-    returny;
+    return;
   }
 
   if (isPairScanObjectWithoutSide(entry)) {
@@ -496,10 +495,12 @@ export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<strin
   }
 
   const indexMap = new Map<string, number>();
-  order.forEach((entry, idx) => {
+  for (let idx = 0; idx < order.length; idx += 1) {
+    const entry = order[idx];
+    if (!entry) continue;
     const key = `${entry.side}:${entry.slot}`;
     if (!indexMap.has(key)) indexMap.set(key, idx);
-  });
+  }
 
   return { order, indexMap };
 }

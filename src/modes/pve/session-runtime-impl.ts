@@ -211,6 +211,14 @@ interface UltSpec extends Record<string, unknown> {
 }
 
 const ULT_TAG_CACHE = new WeakMap<UltSpec, ReadonlyArray<string>>();
+const appendUltTags = (output: string[], list: ReadonlyArray<string> | null | undefined): void => {
+  if (!Array.isArray(list)) return;
+  for (let index = 0; index < list.length; index += 1) {
+    const tag = list[index];
+    if (typeof tag !== 'string' || tag.trim().length === 0) continue;
+    output.push(tag);
+  }
+};
 
 const getNormalizedUltTags = (ult: UltSpec): ReadonlyArray<string> => {
   const cached = ULT_TAG_CACHE.get(ult);
@@ -218,17 +226,9 @@ const getNormalizedUltTags = (ult: UltSpec): ReadonlyArray<string> => {
     return cached;
   }
   const rawUltTags: string[] = [];
-  const appendTags = (list: ReadonlyArray<string> | null | undefined): void => {
-    if (!Array.isArray(list)) return;
-    for (let index = 0; index < list.length; index += 1) {
-      const tag = list[index];
-      if (typeof tag !== 'string' || tag.trim().length === 0) continue;
-      rawUltTags.push(tag);
-    }
-  };
-  appendTags(ult.tags);
-  appendTags(ult.meta?.tags);
-  appendTags(ult.metadata?.tags);
+  appendUltTags(rawUltTags, ult.tags);
+  appendUltTags(rawUltTags, ult.meta?.tags);
+  appendUltTags(rawUltTags, ult.metadata?.tags);
   const normalized = rawUltTags.length ? normalizeTagList(rawUltTags) : [];
   ULT_TAG_CACHE.set(ult, normalized);
   return normalized;
@@ -244,8 +244,10 @@ const isFiniteNumber = (value: unknown): value is number => (
 
 const parseFiniteNumber = (value: unknown): number | null => {
   if (isFiniteNumber(value)) return value;
-  if (typeof value === 'string' && value.trim() !== ''){
-    const parsed = Number(value);
+  if (typeof value === 'string'){
+    const normalized = value.trim();
+    if (!normalized) return null;
+    const parsed = Number(normalized);
     return Number.isFinite(parsed) ? parsed : null;
   }
   return null;

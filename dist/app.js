@@ -14906,25 +14906,25 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const isUyenLeader = __dep28.isUyenLeader;
   const queueUyenUltCast = __dep28.queueUyenUltCast;
   const ULT_TAG_CACHE = new WeakMap();
+  const appendUltTags = (output, list) => {
+      if (!Array.isArray(list))
+          return;
+      for (let index = 0; index < list.length; index += 1) {
+          const tag = list[index];
+          if (typeof tag !== 'string' || tag.trim().length === 0)
+              continue;
+          output.push(tag);
+      }
+  };
   const getNormalizedUltTags = (ult) => {
       const cached = ULT_TAG_CACHE.get(ult);
       if (cached) {
           return cached;
       }
       const rawUltTags = [];
-      const appendTags = (list) => {
-          if (!Array.isArray(list))
-              return;
-          for (let index = 0; index < list.length; index += 1) {
-              const tag = list[index];
-              if (typeof tag !== 'string' || tag.trim().length === 0)
-                  continue;
-              rawUltTags.push(tag);
-          }
-      };
-      appendTags(ult.tags);
-      appendTags(ult.meta?.tags);
-      appendTags(ult.metadata?.tags);
+      appendUltTags(rawUltTags, ult.tags);
+      appendUltTags(rawUltTags, ult.meta?.tags);
+      appendUltTags(rawUltTags, ult.metadata?.tags);
       const normalized = rawUltTags.length ? normalizeTagList(rawUltTags) : [];
       ULT_TAG_CACHE.set(ult, normalized);
       return normalized;
@@ -14934,8 +14934,11 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const parseFiniteNumber = (value) => {
       if (isFiniteNumber(value))
           return value;
-      if (typeof value === 'string' && value.trim() !== '') {
-          const parsed = Number(value);
+      if (typeof value === 'string') {
+          const normalized = value.trim();
+          if (!normalized)
+              return null;
+          const parsed = Number(normalized);
           return Number.isFinite(parsed) ? parsed : null;
       }
       return null;
@@ -18939,50 +18942,45 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       return list;
   }
   const SMALL_REWARD_MERGE_SIZE = 6;
-  function mergeRewardsInPlaceLinear(list, additions) {
-      for (const reward of additions) {
-          let replaced = false;
-          for (let index = 0; index < list.length; index += 1) {
-              const existing = list[index];
-              if (!existing || existing.id !== reward.id)
-                  continue;
-              list[index] = reward;
-              replaced = true;
-              break;
-          }
-          if (!replaced)
-              list.push(reward);
-      }
-      return list;
-  }
-  function mergeRewardsInPlaceIndexed(list, additions) {
-      if (!additions.length)
-          return list;
-      const indexById = new Map();
-      for (let index = 0; index < list.length; index += 1) {
-          const entry = list[index];
-          if (!entry)
-              continue;
-          indexById.set(entry.id, index);
-      }
-      for (const reward of additions) {
-          const index = indexById.get(reward.id);
-          if (index == null) {
-              indexById.set(reward.id, list.length);
-              list.push(reward);
-              continue;
-          }
-          list[index] = reward;
-      }
-      return list;
-  }
   function mergeRewardsInPlace(list, additions) {
       if (!additions.length)
           return list;
-      const useLinearMerge = list.length <= SMALL_REWARD_MERGE_SIZE && additions.length <= SMALL_REWARD_MERGE_SIZE;
-      if (useLinearMerge)
-          return mergeRewardsInPlaceLinear(list, additions);
-      return mergeRewardsInPlaceIndexed(list, additions);
+      const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
+      const indexById = useIndexedMerge ? new Map() : null;
+      if (indexById) {
+          for (let index = 0; index < list.length; index += 1) {
+              const entry = list[index];
+              if (!entry)
+                  continue;
+              indexById.set(entry.id, index);
+          }
+      }
+      for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
+          const reward = additions[addIndex];
+          if (!reward)
+              continue;
+          let existingIndex;
+          if (indexById) {
+              existingIndex = indexById.get(reward.id);
+          }
+          else {
+              for (let listIndex = 0; listIndex < list.length; listIndex += 1) {
+                  const existing = list[listIndex];
+                  if (!existing || existing.id !== reward.id)
+                      continue;
+                  existingIndex = listIndex;
+                  break;
+              }
+          }
+          if (existingIndex == null) {
+              if (indexById)
+                  indexById.set(reward.id, list.length);
+              list.push(reward);
+              continue;
+          }
+          list[existingIndex] = reward;
+      }
+      return list;
   }
   function updateRewards(container, key, additions) {
       if (!additions.length)
@@ -19452,10 +19450,9 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       const pushPair = (side, slot) => {
           output.push({ side, slot: clampTurnOrderSlot(slot) });
       };
-      const pushForSides = (slot, targetSides) => {
-          const resolvedSides = targetSides && targetSides.length ? targetSides : sides;
-          for (const side of resolvedSides) {
-              pushPair(side, slot);
+      const pushForSides = (slot) => {
+          for (let sideIndex = 0; sideIndex < sides.length; sideIndex += 1) {
+              pushPair(sides[sideIndex], slot);
           }
       };
       if (typeof entry === 'number') {
@@ -19483,7 +19480,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
               const side = entry.side === 'enemy' ? 'enemy' : 'ally';
               pushPair(side, slot);
           }
-          returny;
+          return;
       }
       if (isPairScanObjectWithoutSide(entry)) {
           const slot = parseSlotValue(entry);
@@ -19508,11 +19505,14 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           }
       }
       const indexMap = new Map();
-      order.forEach((entry, idx) => {
+      for (let idx = 0; idx < order.length; idx += 1) {
+          const entry = order[idx];
+          if (!entry)
+              continue;
           const key = `${entry.side}:${entry.slot}`;
           if (!indexMap.has(key))
               indexMap.set(key, idx);
-      });
+      }
       return { order, indexMap };
   }
   function createSession(options = {}) {
