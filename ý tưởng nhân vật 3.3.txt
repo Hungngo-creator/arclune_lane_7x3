@@ -553,7 +553,7 @@ nội tại:
 
 đánh thường: gây sát thương= 100% wil/atk, hồi hp cho bản thân = 35% sát thương đánh thường gây ra.
 
-skill 1: bị động, luôn kích hoạt, không cần tốn turn riêng để bật. Mỗi khi đánh thường cũng hồi hp cho leader đồng minh = 20% sát thương gây ra bởi đánh thường, sau khi hồi cho leader đồng minh = skill này 3 lần bản thân nhân vật này sẽ nhận 1 lớp khiên tồn tại max 3 turn = 25% max hp của nhân vật này. - 3 ae/ turn bất kể có đánh thường hay không.
+skill 1: bị động, luôn kích hoạt, không cần tốn turn riêng để bật. Mỗi khi đánh thường cũng hồi hp cho leader đồng minh = 20% sát thương gây ra bởi đánh thường, sau khi hồi cho leader đồng minh = skill này 3 lần bản thân nhân vật này sẽ nhận 1 lớp khiên tồn tại max 3 turn = 25% max hp của nhân vật này. - 3 ae/ turn bất kể có đánh thường hay không. sau khi đạt lần lần heal cho leader = skill này thì ở ngay lần thứ 3 sau khi heal cho leader thì nhận khiên ngay lập tức, nếu đã có khiên đạt cap từ trước thì vẫn tạo thêm khiên = 25% max hp, ví dụ có kit của char khác tạo khiên cho char này nhưng khiên đã đầy cap của kit char đó ví dụ như = 75% max hp của bản thân char này chẳng hạn thì skill 3 này có thể tạo thêm khiên được nữa, nói chung khiên từ skill này không có cap và có thể cộng dồn với khiên từ kit của char khác dù đã đạt cap.
 
 skill 2: hồi hp cho leader đồng minh và 3 đồng.minh ngẫu nhiên = 100% wil/atk của nhân vật này. 20 ae.
 

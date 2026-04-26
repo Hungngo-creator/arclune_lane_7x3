@@ -7,7 +7,17 @@ import type {
 } from '@shared-types/pve';
 import type { GameEventHandler, GameEventType } from '../../events.ts';
 
-import { addGameEventListener } from '../../events.ts';
+import {
+  addGameEventListener,
+  gameEvents,
+  emitGameEvent,
+  TURN_START,
+  TURN_END,
+  ACTION_START,
+  ACTION_END,
+  TURN_REGEN,
+  BATTLE_END,
+} from '../../events.ts';
 import {
   createPveSession as createPveSessionImpl,
   __getStoredConfig,
@@ -269,5 +279,5 @@ export {
   ACTION_END,
   TURN_REGEN,
   BATTLE_END,
-} from '../../events.ts';
+};
 export { __resolveStatusIconPreview };
