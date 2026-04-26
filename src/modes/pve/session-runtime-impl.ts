@@ -362,9 +362,13 @@ const coerceSummonSpec = (value: unknown): SummonSpec | null => {
   spec.area = sanitizeOptionalString(spec.area);
   spec.replace = sanitizeOptionalString(spec.replace);
   if (Array.isArray(spec.slots)){
-    spec.slots = spec.slots
-      .map((slot) => parseFiniteNumber(slot))
-      .filter((slot): slot is number => slot != null);
+    const normalizedSlots: number[] = [];
+    for (let index = 0; index < spec.slots.length; index += 1) {
+      const parsed = parseFiniteNumber(spec.slots[index]);
+      if (parsed == null) continue;
+      normalizedSlots.push(parsed);
+    }
+    spec.slots = normalizedSlots;
   }
   const count = parseFiniteNumber(spec.count);
   const summonCount = parseFiniteNumber(spec.summonCount);

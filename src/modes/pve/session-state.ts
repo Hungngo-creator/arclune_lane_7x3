@@ -834,14 +834,15 @@ export function normalizeDeckEntries(value: unknown): SessionState['unitsAll'] {
   if (!Array.isArray(value)) return [];
   const normalized: SessionState['unitsAll'][number][] = [];
   const seenIds = new Set<string>();
-  for (const item of value) {
+  for (let index = 0; index < value.length; index += 1) {
+    const item = value[index];
     if (normalized.length >= MAX_PLAYER_DECK_SIZE) break;
     const entry = normalizeDeckEntry(item);
     if (!entry) continue;
     const unitId = entry.id;
     if (seenIds.has(unitId)) continue;
     seenIds.add(unitId);
-    normalized.push({ ...entry, id: unitId });
+    normalized.push(entry);
   }
   return normalized as SessionState['unitsAll'];
 }

@@ -15045,9 +15045,14 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       spec.area = sanitizeOptionalString(spec.area);
       spec.replace = sanitizeOptionalString(spec.replace);
       if (Array.isArray(spec.slots)) {
-          spec.slots = spec.slots
-              .map((slot) => parseFiniteNumber(slot))
-              .filter((slot) => slot != null);
+          const normalizedSlots = [];
+          for (let index = 0; index < spec.slots.length; index += 1) {
+              const parsed = parseFiniteNumber(spec.slots[index]);
+              if (parsed == null)
+                  continue;
+              normalizedSlots.push(parsed);
+          }
+          spec.slots = normalizedSlots;
       }
       const count = parseFiniteNumber(spec.count);
       const summonCount = parseFiniteNumber(spec.summonCount);
@@ -18982,12 +18987,6 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       }
       return list;
   }
-  function updateRewards(container, key, additions) {
-      if (!additions.length)
-          return getMutableRewardList(container, key);
-      const target = getMutableRewardList(container, key);
-      return mergeRewardsInPlace(target, additions);
-  }
   function removeRewardById(list, rewardId) {
       if (!list.length)
           return list;
@@ -19040,8 +19039,8 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               encounter.waveIndex = index + 1;
               const rewards = toSanitizedRewardList(wave.rewards);
               if (rewards.length) {
-                  updateRewards(encounter, 'pendingRewards', rewards);
-                  updateRewards(runtime, 'rewardQueue', rewards);
+                  mergeRewardsInPlace(getMutableRewardList(encounter, 'pendingRewards'), rewards);
+                  mergeRewardsInPlace(getMutableRewardList(runtime, 'rewardQueue'), rewards);
               }
               break;
           }
@@ -19830,7 +19829,8 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           return [];
       const normalized = [];
       const seenIds = new Set();
-      for (const item of value) {
+      for (let index = 0; index < value.length; index += 1) {
+          const item = value[index];
           if (normalized.length >= MAX_PLAYER_DECK_SIZE)
               break;
           const entry = normalizeDeckEntry(item);
@@ -19840,7 +19840,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           if (seenIds.has(unitId))
               continue;
           seenIds.add(unitId);
-          normalized.push({ ...entry, id: unitId });
+          normalized.push(entry);
       }
       return normalized;
   }

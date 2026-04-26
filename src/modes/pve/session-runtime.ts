@@ -103,12 +103,6 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
   return list;
 }
 
-function updateRewards(container: RewardListContainer, key: RewardListKey, additions: RewardList): RewardRoll[] {
-  if (!additions.length) return getMutableRewardList(container, key);
-  const target = getMutableRewardList(container, key);
-  return mergeRewardsInPlace(target, additions);
-}
-
 function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
   if (!list.length) return list;
   let writeIndex = 0;
@@ -159,8 +153,8 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
       encounter.waveIndex = index + 1;
       const rewards = toSanitizedRewardList(wave.rewards);
       if (rewards.length) {
-        updateRewards(encounter, 'pendingRewards', rewards);
-        updateRewards(runtime, 'rewardQueue', rewards);
+        mergeRewardsInPlace(getMutableRewardList(encounter, 'pendingRewards'), rewards);
+        mergeRewardsInPlace(getMutableRewardList(runtime, 'rewardQueue'), rewards);
       }
       break;
     }
