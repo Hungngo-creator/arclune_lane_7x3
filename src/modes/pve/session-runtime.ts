@@ -1,5 +1,3 @@
-//home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime.ts
-
 import type {
   EncounterState,
   RewardRoll,
@@ -9,17 +7,7 @@ import type {
 } from '@shared-types/pve';
 import type { GameEventHandler, GameEventType } from '../../events.ts';
 
-import {
-  gameEvents,
-  emitGameEvent,
-  TURN_START,
-  TURN_END,
-  ACTION_START,
-  ACTION_END,
-  TURN_REGEN,
-  BATTLE_END,
-  addGameEventListener,
-} from '../../events.ts';
+import { addGameEventListener } from '../../events.ts';
 import {
   createPveSession as createPveSessionImpl,
   __getStoredConfig,
@@ -33,6 +21,9 @@ type RewardListContainer = SessionRuntimeState | EncounterState;
 type RewardListKey = 'rewardQueue' | 'pendingRewards';
 const NOOP_UNSUBSCRIBE = (): void => {};
 const SMALL_REWARD_MERGE_SIZE = 6;
+const SANITIZED_REWARD_LIST = Symbol('sanitized-reward-list');
+
+type SanitizedRewardList = MutableRewardList & { [SANITIZED_REWARD_LIST]?: true };
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   if (!entry || typeof entry !== 'object') return false;
@@ -43,40 +34,41 @@ function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   return true;
 }
 
-function toSanitizedRewardList(value: unknown): MutableRewardList {
-  if (!Array.isArray(value)) return [];
-  const rewards = value as MutableRewardList;
+function sanitizeRewardListInPlace(list: SanitizedRewardList): SanitizedRewardList {
+  if (list[SANITIZED_REWARD_LIST]) return list;
   let writeIndex = 0;
-  for (let readIndex = 0; readIndex < rewards.length; readIndex += 1) {
-    const reward = rewards[readIndex];
+  for (let readIndex = 0; readIndex < list.length; readIndex += 1) {
+    const reward = list[readIndex];
     if (!isReward(reward)) continue;
-    rewards[writeIndex] = reward;
+    list[writeIndex] = reward;
     writeIndex += 1;
   }
-  if (writeIndex !== rewards.length) rewards.length = writeIndex;
-  return rewards;
+  if (writeIndex !== list.length) list.length = writeIndex;
+  Object.defineProperty(list, SANITIZED_REWARD_LIST, {
+    value: true,
+    configurable: true,
+  });
+  return list;
 }
 
-function getMutableRewardList(
-  container: RewardListContainer,
-  key: RewardListKey,
-): MutableRewardList {
+function getMutableRewardList(container: RewardListContainer, key: RewardListKey): SanitizedRewardList {
   const store = container as unknown as Record<string, unknown>;
   const source = store[key];
-  const list = Array.isArray(source) ? toSanitizedRewardList(source) : [];
+  const list = Array.isArray(source)
+    ? sanitizeRewardListInPlace(source as SanitizedRewardList)
+    : sanitizeRewardListInPlace([] as SanitizedRewardList);
   store[key] = list;
   return list;
 }
 
-function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): MutableRewardList {
+function mergeRewardsInPlace(list: SanitizedRewardList, additions: RewardList): SanitizedRewardList {
   if (!additions.length) return list;
   const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
   const indexById = useIndexedMerge ? new Map<string, number>() : null;
   if (indexById) {
     for (let index = 0; index < list.length; index += 1) {
       const entry = list[index];
-      if (!entry) continue;
-      indexById.set(entry.id, index);
+      if (entry) indexById.set(entry.id, index);
     }
   }
 
@@ -88,29 +80,29 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
       existingIndex = indexById.get(reward.id);
     } else {
       for (let listIndex = 0; listIndex < list.length; listIndex += 1) {
-        const existing = list[listIndex];
-        if (!existing || existing.id !== reward.id) continue;
-        existingIndex = listIndex;
-        break;
+        if (list[listIndex]?.id === reward.id) {
+          existingIndex = listIndex;
+          break;
+        }
       }
     }
 
     if (existingIndex == null) {
       if (indexById) indexById.set(reward.id, list.length);
       list.push(reward);
-      continue;
+    } else {
+      list[existingIndex] = reward;
     }
-    list[existingIndex] = reward;
   }
   return list;
 }
 
-function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
+function removeRewardById(list: SanitizedRewardList, rewardId: string): SanitizedRewardList {
   for (let index = 0; index < list.length; index += 1) {
-    const entry = list[index];
-    if (!entry || entry.id !== rewardId) continue;
-    list.splice(index, 1);
-    break;
+    if (list[index]?.id === rewardId) {
+      list.splice(index, 1);
+      break;
+    }
   }
   return list;
 }
@@ -118,19 +110,22 @@ function removeRewardById(list: MutableRewardList, rewardId: string): MutableRew
 function syncWaveRewards(runtime: SessionRuntimeState, encounter: EncounterState, rewards: RewardList): void {
   const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
   const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
-  if (rewardQueue === pendingRewards) {
-    mergeRewardsInPlace(rewardQueue, rewards);
-    return;
+  if (rewardQueue !== pendingRewards) {
+    mergeRewardsInPlace(pendingRewards, rewards);
   }
-  mergeRewardsInPlace(pendingRewards, rewards);
   mergeRewardsInPlace(rewardQueue, rewards);
 }
 
 function removeRewardEverywhere(runtime: SessionRuntimeState, rewardId: string): void {
   removeRewardById(getMutableRewardList(runtime, 'rewardQueue'), rewardId);
   const encounter = runtime.encounter;
-  if (!encounter) return;
-  removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), rewardId);
+  if (encounter) removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), rewardId);
+}
+
+function markEncounterCompleted(runtime: SessionRuntimeState, encounter: EncounterState): EncounterState {
+  encounter.status = 'completed';
+  runtime.wave = null;
+  return encounter;
 }
 
 export function advanceSession(session: SessionState | null | undefined): EncounterState | null {
@@ -143,49 +138,36 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
   }
 
   const waves = Array.isArray(encounter.waves) ? encounter.waves : [];
-  const waveCount = waves.length;
   const index = Math.max(0, encounter.waveIndex | 0);
   const wave = (waves[index] as WaveState | null | undefined) ?? null;
+  if (!wave) return markEncounterCompleted(runtime, encounter);
 
-  if (!wave) {
-    encounter.status = 'completed';
+  if (wave.status === 'pending') {
+    wave.status = 'spawning';
+    runtime.wave = wave;
+    if (encounter.status === 'idle') encounter.status = 'running';
+  } else if (wave.status === 'spawning') {
+    wave.status = 'active';
+    runtime.wave = wave;
+    encounter.status = 'running';
+  } else if (wave.status === 'active') {
+    wave.status = 'cleared';
     runtime.wave = null;
-    return encounter;
-  }
-
-  switch (wave.status) {
-    case 'pending':
-      wave.status = 'spawning';
-      runtime.wave = wave;
-      if (encounter.status === 'idle') encounter.status = 'running';
-      break;
-    case 'spawning':
-      wave.status = 'active';
-      runtime.wave = wave;
-      encounter.status = 'running';
-      break;
-    case 'active': {
-      wave.status = 'cleared';
-      runtime.wave = null;
-      encounter.waveIndex = index + 1;
-      const rewards = toSanitizedRewardList(wave.rewards);
-      if (rewards.length) syncWaveRewards(runtime, encounter, rewards);
-      break;
-    }
-    case 'cleared':
-      runtime.wave = null;
-      encounter.waveIndex = index + 1;
-      break;
-    default:
-      runtime.wave = null;
-      break;
-  }
-
-  if (encounter.waveIndex >= waveCount) {
-    encounter.status = 'completed';
+  encounter.waveIndex = index + 1;
+    const rewards = Array.isArray(wave.rewards)
+      ? sanitizeRewardListInPlace(wave.rewards as SanitizedRewardList)
+      : ([] as SanitizedRewardList);
+    if (rewards.length) syncWaveRewards(runtime, encounter, rewards);
+  } else if (wave.status === 'cleared') {
+    runtime.wave = null;
+    encounter.waveIndex = index + 1;
+  } else {
     runtime.wave = null;
   }
 
+  if (encounter.waveIndex >= waves.length) {
+    return markEncounterCompleted(runtime, encounter);
+  }
   return encounter;
 }
 
@@ -193,10 +175,8 @@ export function applyReward(
   session: SessionState | null | undefined,
   reward: RewardRoll | null | undefined,
 ): RewardRoll | null {
-  if (!session?.runtime) return null;
-  if (!isReward(reward)) return null;
-  const runtime = session.runtime;
-  removeRewardEverywhere(runtime, reward.id);
+  if (!session?.runtime || !isReward(reward)) return null;
+  removeRewardEverywhere(session.runtime, reward.id);
   return reward;
 }
 
@@ -204,9 +184,7 @@ export function onSessionEvent<T extends GameEventType>(
   type: T,
   handler: GameEventHandler<T>,
 ): () => void {
-  if (!type || typeof handler !== 'function') {
-    return NOOP_UNSUBSCRIBE;
-  }
+  if (!type || typeof handler !== 'function') return NOOP_UNSUBSCRIBE;
   return addGameEventListener(type, handler);
 }
 
@@ -237,5 +215,5 @@ export {
   ACTION_END,
   TURN_REGEN,
   BATTLE_END,
-};
+} from '../../events.ts';
 export { __resolveStatusIconPreview };

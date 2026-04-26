@@ -18898,24 +18898,16 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   if (!Object.prototype.hasOwnProperty.call(exports, '__getActiveGame')) exports.__getActiveGame = __getActiveGame;
 };
 __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime.ts
-  const __dep0 = __require('./events.ts');
-  const gameEvents = __dep0.gameEvents;
-  const emitGameEvent = __dep0.emitGameEvent;
-  const TURN_START = __dep0.TURN_START;
-  const TURN_END = __dep0.TURN_END;
-  const ACTION_START = __dep0.ACTION_START;
-  const ACTION_END = __dep0.ACTION_END;
-  const TURN_REGEN = __dep0.TURN_REGEN;
-  const BATTLE_END = __dep0.BATTLE_END;
-  const addGameEventListener = __dep0.addGameEventListener;
-  const __dep1 = __require('./modes/pve/session-runtime-impl.ts');
-  const createPveSessionImpl = __dep1.createPveSession;
-  const __getStoredConfig = __dep1.__getStoredConfig;
-  const __getActiveGame = __dep1.__getActiveGame;
-  const __resolveStatusIconPreview = __dep1.__resolveStatusIconPreview;
+  const __dep1 = __require('./events.ts');
+  const addGameEventListener = __dep1.addGameEventListener;
+  const __dep2 = __require('./modes/pve/session-runtime-impl.ts');
+  const createPveSessionImpl = __dep2.createPveSession;
+  const __getStoredConfig = __dep2.__getStoredConfig;
+  const __getActiveGame = __dep2.__getActiveGame;
+  const __resolveStatusIconPreview = __dep2.__resolveStatusIconPreview;
   const NOOP_UNSUBSCRIBE = () => { };
   const SMALL_REWARD_MERGE_SIZE = 6;
+  const SANITIZED_REWARD_LIST = Symbol('sanitized-reward-list');
   function isReward(entry) {
       if (!entry || typeof entry !== 'object')
           return false;
@@ -18929,26 +18921,31 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           return false;
       return true;
   }
-  function toSanitizedRewardList(value) {
-      if (!Array.isArray(value))
-          return [];
-      const rewards = value;
+  function sanitizeRewardListInPlace(list) {
+      if (list[SANITIZED_REWARD_LIST])
+          return list;
       let writeIndex = 0;
-      for (let readIndex = 0; readIndex < rewards.length; readIndex += 1) {
-          const reward = rewards[readIndex];
+      for (let readIndex = 0; readIndex < list.length; readIndex += 1) {
+          const reward = list[readIndex];
           if (!isReward(reward))
               continue;
-          rewards[writeIndex] = reward;
+          list[writeIndex] = reward;
           writeIndex += 1;
       }
-      if (writeIndex !== rewards.length)
-          rewards.length = writeIndex;
-      return rewards;
+      if (writeIndex !== list.length)
+          list.length = writeIndex;
+      Object.defineProperty(list, SANITIZED_REWARD_LIST, {
+          value: true,
+          configurable: true,
+      });
+      return list;
   }
   function getMutableRewardList(container, key) {
       const store = container;
       const source = store[key];
-      const list = Array.isArray(source) ? toSanitizedRewardList(source) : [];
+      const list = Array.isArray(source)
+          ? sanitizeRewardListInPlace(source)
+          : sanitizeRewardListInPlace([]);
       store[key] = list;
       return list;
   }
@@ -18960,9 +18957,8 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       if (indexById) {
           for (let index = 0; index < list.length; index += 1) {
               const entry = list[index];
-              if (!entry)
-                  continue;
-              indexById.set(entry.id, index);
+              if (entry)
+                  indexById.set(entry.id, index);
           }
       }
       for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
@@ -18975,49 +18971,50 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           }
           else {
               for (let listIndex = 0; listIndex < list.length; listIndex += 1) {
-                  const existing = list[listIndex];
-                  if (!existing || existing.id !== reward.id)
-                      continue;
-                  existingIndex = listIndex;
-                  break;
+                  if (list[listIndex]?.id === reward.id) {
+                      existingIndex = listIndex;
+                      break;
+                  }
               }
           }
           if (existingIndex == null) {
               if (indexById)
                   indexById.set(reward.id, list.length);
               list.push(reward);
-              continue;
           }
-          list[existingIndex] = reward;
+          else {
+              list[existingIndex] = reward;
+          }
       }
       return list;
   }
   function removeRewardById(list, rewardId) {
       for (let index = 0; index < list.length; index += 1) {
-          const entry = list[index];
-          if (!entry || entry.id !== rewardId)
-              continue;
-          list.splice(index, 1);
-          break;
+          if (list[index]?.id === rewardId) {
+              list.splice(index, 1);
+              break;
+          }
       }
       return list;
   }
   function syncWaveRewards(runtime, encounter, rewards) {
       const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
       const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
-      if (rewardQueue === pendingRewards) {
-          mergeRewardsInPlace(rewardQueue, rewards);
-          return;
+      if (rewardQueue !== pendingRewards) {
+          mergeRewardsInPlace(pendingRewards, rewards);
       }
-      mergeRewardsInPlace(pendingRewards, rewards);
       mergeRewardsInPlace(rewardQueue, rewards);
   }
   function removeRewardEverywhere(runtime, rewardId) {
       removeRewardById(getMutableRewardList(runtime, 'rewardQueue'), rewardId);
       const encounter = runtime.encounter;
-      if (!encounter)
-          return;
-      removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), rewardId);
+      if (encounter)
+          removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), rewardId);
+  }
+  function markEncounterCompleted(runtime, encounter) {
+      encounter.status = 'completed';
+      runtime.wave = null;
+      return encounter;
   }
   function advanceSession(session) {
       const runtime = session?.runtime;
@@ -19029,80 +19026,73 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           return null;
       }
       const waves = Array.isArray(encounter.waves) ? encounter.waves : [];
-      const waveCount = waves.length;
       const index = Math.max(0, encounter.waveIndex | 0);
       const wave = waves[index] ?? null;
-      if (!wave) {
-          encounter.status = 'completed';
-          runtime.wave = null;
-          return encounter;
-      }
-      switch (wave.status) {
-          case 'pending':
-              wave.status = 'spawning';
-              runtime.wave = wave;
-              if (encounter.status === 'idle')
-                  encounter.status = 'running';
-              break;
-          case 'spawning':
-              wave.status = 'active';
-              runtime.wave = wave;
+      if (!wave)
+          return markEncounterCompleted(runtime, encounter);
+      if (wave.status === 'pending') {
+          wave.status = 'spawning';
+          runtime.wave = wave;
+          if (encounter.status === 'idle')
               encounter.status = 'running';
-              break;
-          case 'active': {
-              wave.status = 'cleared';
-              runtime.wave = null;
-              encounter.waveIndex = index + 1;
-              const rewards = toSanitizedRewardList(wave.rewards);
-              if (rewards.length)
-                  syncWaveRewards(runtime, encounter, rewards);
-              break;
-          }
-          case 'cleared':
-              runtime.wave = null;
-              encounter.waveIndex = index + 1;
-              break;
-          default:
-              runtime.wave = null;
-              break;
       }
-      if (encounter.waveIndex >= waveCount) {
-          encounter.status = 'completed';
+      else if (wave.status === 'spawning') {
+          wave.status = 'active';
+          runtime.wave = wave;
+          encounter.status = 'running';
+      }
+      else if (wave.status === 'active') {
+          wave.status = 'cleared';
           runtime.wave = null;
+          encounter.waveIndex = index + 1;
+          const rewards = Array.isArray(wave.rewards)
+              ? sanitizeRewardListInPlace(wave.rewards)
+              : [];
+          if (rewards.length)
+              syncWaveRewards(runtime, encounter, rewards);
+      }
+      else if (wave.status === 'cleared') {
+          runtime.wave = null;
+          encounter.waveIndex = index + 1;
+      }
+      else {
+          runtime.wave = null;
+      }
+      if (encounter.waveIndex >= waves.length) {
+          return markEncounterCompleted(runtime, encounter);
       }
       return encounter;
   }
   function applyReward(session, reward) {
-      if (!session?.runtime)
+      if (!session?.runtime || !isReward(reward))
           return null;
-      if (!isReward(reward))
-          return null;
-      const runtime = session.runtime;
-      removeRewardEverywhere(runtime, reward.id);
+      removeRewardEverywhere(session.runtime, reward.id);
       return reward;
   }
   function onSessionEvent(type, handler) {
-      if (!type || typeof handler !== 'function') {
+      if (!type || typeof handler !== 'function')
           return NOOP_UNSUBSCRIBE;
-      }
       return addGameEventListener(type, handler);
   }
   function createPveSession(rootEl, options = {}) {
       const controller = createPveSessionImpl(rootEl, options);
       return Object.assign(controller, { onEvent: onSessionEvent });
   }
-  exports.__getStoredConfig = __getStoredConfig;
-  exports.__getActiveGame = __getActiveGame;
-  exports.gameEvents = gameEvents;
-  exports.emitGameEvent = emitGameEvent;
-  exports.TURN_START = TURN_START;
-  exports.TURN_END = TURN_END;
-  exports.ACTION_START = ACTION_START;
-  exports.ACTION_END = ACTION_END;
-  exports.TURN_REGEN = TURN_REGEN;
-  exports.BATTLE_END = BATTLE_END;
+  const __reexport0 = __require('./events.ts');
   exports.__resolveStatusIconPreview = __resolveStatusIconPreview;
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, '__getStoredConfig')) exports.__getStoredConfig = __reexport0.__getStoredConfig;
+  if (!Object.prototype.hasOwnProperty.call(exports, '__getActiveGame };
+  export { gameEvents')) exports.__getActiveGame };
+  export { gameEvents = __reexport0.__getActiveGame };
+  export { gameEvents;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'emitGameEvent')) exports.emitGameEvent = __reexport0.emitGameEvent;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'TURN_START')) exports.TURN_START = __reexport0.TURN_START;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'TURN_END')) exports.TURN_END = __reexport0.TURN_END;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ACTION_START')) exports.ACTION_START = __reexport0.ACTION_START;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ACTION_END')) exports.ACTION_END = __reexport0.ACTION_END;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'TURN_REGEN')) exports.TURN_REGEN = __reexport0.TURN_REGEN;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BATTLE_END')) exports.BATTLE_END = __reexport0.BATTLE_END;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceSession')) exports.advanceSession = advanceSession;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyReward')) exports.applyReward = applyReward;
   if (!Object.prototype.hasOwnProperty.call(exports, 'onSessionEvent')) exports.onSessionEvent = onSessionEvent;

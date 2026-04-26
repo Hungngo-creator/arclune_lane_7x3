@@ -1,4 +1,4 @@
-import { advanceSession, applyReward } from '../src/modes/pve/session-runtime.ts';
+import { advanceSession, applyReward, onSessionEvent } from '../src/modes/pve/session-runtime.ts';
 
 describe('pve session runtime reward + wave flow', () => {
   test('advanceSession chuyển wave và đồng bộ rewardQueue/pendingRewards với dữ liệu đã sanitize', () => {
@@ -65,6 +65,34 @@ describe('pve session runtime reward + wave flow', () => {
     expect(session.runtime.wave).toBeNull();
   });
 
+  test('merge reward path lớn vẫn ghi đè theo id và sanitize dữ liệu rác', () => {
+    const makeReward = (id: string, tier = 1) => ({ id, weight: 1, tier });
+    const existing = Array.from({ length: 8 }, (_, index) => makeReward(`r${index + 1}`));
+    const additions = [
+      makeReward('r2', 3),
+      makeReward('r9', 1),
+      makeReward('r10', 2),
+    ];
+
+    const session: any = {
+      runtime: {
+        rewardQueue: [...existing, { id: '', weight: 1, tier: 1 }, null],
+        encounter: {
+          status: 'running',
+          waveIndex: 0,
+          pendingRewards: [...existing],
+          waves: [{ status: 'active', rewards: [...additions, { bad: true }] }],
+        },
+      },
+    };
+
+    const encounter = advanceSession(session);
+    expect(encounter?.status).toBe('completed');
+    expect(session.runtime.rewardQueue.find((item: any) => item.id === 'r2')?.tier).toBe(3);
+    expect(session.runtime.rewardQueue.some((item: any) => !item?.id)).toBe(false);
+    expect(session.runtime.rewardQueue.map((item: any) => item.id)).toContain('r10');
+  });
+
   test('applyReward xóa reward theo id ở cả runtime.rewardQueue và encounter.pendingRewards', () => {
     const selected = { id: 'gem', weight: 1, tier: 1 };
     const session: any = {
@@ -85,6 +113,12 @@ describe('pve session runtime reward + wave flow', () => {
     expect(applyReward(session, selected)).toEqual(selected);
     expect(session.runtime.rewardQueue).toEqual([{ id: 'gold', weight: 1, tier: 1 }]);
     expect(session.runtime.encounter.pendingRewards).toEqual([{ id: 'ticket', weight: 1, tier: 1 }]);
+  });
+
+  test('onSessionEvent trả noop khi input không hợp lệ', () => {
+    const unsub = onSessionEvent('' as any, null as any);
+    expect(typeof unsub).toBe('function');
+    expect(() => unsub()).not.toThrow();
   });
 
   test('advanceSession trả null khi thiếu runtime hoặc encounter', () => {
