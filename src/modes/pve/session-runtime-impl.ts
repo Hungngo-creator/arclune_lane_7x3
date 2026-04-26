@@ -4373,7 +4373,7 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
 
 function updateSessionConfig(next: StartConfigOverrides | null | undefined = {}): void {
   const normalized = normalizeConfig(toStartConfigOverrides(next));
-  storedConfig = normalizeConfig({ ...storedConfig, ...normalized });
+  storedConfig = { ...storedConfig, ...normalized };
   applyConfigToRunningGame(normalized);
 }
 

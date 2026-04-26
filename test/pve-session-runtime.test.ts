@@ -122,6 +122,26 @@ describe('pve session runtime reward + wave flow', () => {
     expect(session.runtime.encounter.pendingRewards).toEqual([{ id: 'ticket', weight: 1, tier: 1 }]);
   });
 
+  test('applyReward không remove lặp khi rewardQueue và pendingRewards trỏ cùng mảng', () => {
+    const sharedRewards = [
+      { id: 'gold', weight: 1, tier: 1 },
+      { id: 'gem', weight: 1, tier: 1 },
+    ];
+    const session: any = {
+      runtime: {
+        rewardQueue: sharedRewards,
+        encounter: {
+          pendingRewards: sharedRewards,
+        },
+      },
+    };
+
+    const picked = { id: 'gold', weight: 1, tier: 1 };
+    expect(applyReward(session, picked)).toEqual(picked);
+    expect(session.runtime.rewardQueue).toEqual([{ id: 'gem', weight: 1, tier: 1 }]);
+    expect(session.runtime.encounter.pendingRewards).toEqual([{ id: 'gem', weight: 1, tier: 1 }]);
+  });
+
   test('onSessionEvent trả noop khi input không hợp lệ', () => {
     const unsub = onSessionEvent('' as any, null as any);
     expect(typeof unsub).toBe('function');

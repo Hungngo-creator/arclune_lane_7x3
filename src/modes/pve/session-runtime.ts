@@ -23,6 +23,7 @@ const NOOP_UNSUBSCRIBE = (): void => {};
 const SMALL_REWARD_MERGE_SIZE = 6;
 const SANITIZED_REWARD_LIST = Symbol('sanitized-reward-list');
 const REWARD_INDEX_BY_ID = Symbol('reward-index-by-id');
+const WAVE_REWARD_CACHE = new WeakMap<WaveState, SanitizedRewardList>();
 
 type SanitizedRewardList = MutableRewardList & {
   [SANITIZED_REWARD_LIST]?: true;
@@ -107,13 +108,34 @@ function mergeRewardsInPlace(list: SanitizedRewardList, additions: RewardList): 
   return list;
 }
 
-function removeRewardById(list: SanitizedRewardList, rewardId: string): SanitizedRewardList {
+function getRewardIndexById(list: SanitizedRewardList): Map<string, number> {
+  const existingIndex = list[REWARD_INDEX_BY_ID];
+  if (existingIndex) return existingIndex;
+  const indexById = new Map<string, number>();
   for (let index = 0; index < list.length; index += 1) {
-    if (list[index]?.id === rewardId) {
-      list.splice(index, 1);
-      list[REWARD_INDEX_BY_ID] = undefined;
-      break;
+  const reward = list[index];
+    if (reward) indexById.set(reward.id, index);
+  }
+  list[REWARD_INDEX_BY_ID] = indexById;
+  return indexById;
+}
+
+function removeRewardById(list: SanitizedRewardList, rewardId: string): SanitizedRewardList {
+  const useIndexedRemoval = list.length > SMALL_REWARD_MERGE_SIZE;
+  let index = -1;
+  if (useIndexedRemoval) {
+    index = getRewardIndexById(list).get(rewardId) ?? -1;
+  } else {
+    for (let scanIndex = 0; scanIndex < list.length; scanIndex += 1) {
+      if (list[scanIndex]?.id === rewardId) {
+        index = scanIndex;
+        break;
+      }
     }
+  }
+  if (index >= 0) {
+    list.splice(index, 1);
+    list[REWARD_INDEX_BY_ID] = undefined;
   }
   return list;
 }
@@ -128,9 +150,12 @@ function syncWaveRewards(runtime: SessionRuntimeState, encounter: EncounterState
 }
 
 function removeRewardEverywhere(runtime: SessionRuntimeState, rewardId: string): void {
-  removeRewardById(getMutableRewardList(runtime, 'rewardQueue'), rewardId);
+  const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
+  removeRewardById(rewardQueue, rewardId);
   const encounter = runtime.encounter;
-  if (encounter) removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), rewardId);
+  if (!encounter) return;
+  const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
+  if (pendingRewards !== rewardQueue) removeRewardById(pendingRewards, rewardId);
 }
 
 function markEncounterCompleted(runtime: SessionRuntimeState, encounter: EncounterState): EncounterState {
@@ -153,27 +178,36 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
   const wave = (waves[index] as WaveState | null | undefined) ?? null;
   if (!wave) return markEncounterCompleted(runtime, encounter);
 
-  if (wave.status === 'pending') {
-    wave.status = 'spawning';
-    runtime.wave = wave;
-    if (encounter.status === 'idle') encounter.status = 'running';
-  } else if (wave.status === 'spawning') {
-    wave.status = 'active';
-    runtime.wave = wave;
-    encounter.status = 'running';
-  } else if (wave.status === 'active') {
-    wave.status = 'cleared';
-    runtime.wave = null;
-  encounter.waveIndex = index + 1;
-    const rewards = Array.isArray(wave.rewards)
-      ? sanitizeRewardListInPlace(wave.rewards as SanitizedRewardList)
-      : ([] as SanitizedRewardList);
-    if (rewards.length) syncWaveRewards(runtime, encounter, rewards);
-  } else if (wave.status === 'cleared') {
-    runtime.wave = null;
-    encounter.waveIndex = index + 1;
-  } else {
-    runtime.wave = null;
+  switch (wave.status) {
+    case 'pending':
+      wave.status = 'spawning';
+      runtime.wave = wave;
+      if (encounter.status === 'idle') encounter.status = 'running';
+      break;
+    case 'spawning':
+      wave.status = 'active';
+      runtime.wave = wave;
+      encounter.status = 'running';
+      break;
+    case 'active': {
+      wave.status = 'cleared';
+      runtime.wave = null;
+      encounter.waveIndex = index + 1;
+      const rewards = WAVE_REWARD_CACHE.get(wave)
+        ?? (Array.isArray(wave.rewards)
+          ? sanitizeRewardListInPlace(wave.rewards as SanitizedRewardList)
+          : ([] as SanitizedRewardList));
+      WAVE_REWARD_CACHE.set(wave, rewards);
+      if (rewards.length) syncWaveRewards(runtime, encounter, rewards);
+      break;
+    }
+    case 'cleared':
+      runtime.wave = null;
+      encounter.waveIndex = index + 1;
+      break;
+    default:
+      runtime.wave = null;
+      break;
   }
 
   if (encounter.waveIndex >= waves.length) {

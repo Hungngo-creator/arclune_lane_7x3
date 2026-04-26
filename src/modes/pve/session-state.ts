@@ -152,6 +152,12 @@ interface ResolveEnemyUnitsOptions {
   unitProgressById?: ReadonlyMap<string, RuntimeUnitProgress> | null;
   collectionState?: CreateSessionOptions['collectionState'] | null;
 }
+interface ResolvePlayerDeckOptions {
+  preferredDeck: SessionState['unitsAll'];
+  fallbackSingleDeck: SessionState['unitsAll'];
+  defaultRoster: ReadonlyArray<SessionState['unitsAll'][number]>;
+  unitProgressById: ReadonlyMap<string, RuntimeUnitProgress>;
+}
 
 const EMPTY_UNIT_PROGRESS = new Map<string, RuntimeUnitProgress>();
 const AUTO_PLAYER_DECK_SIZE = 10;
@@ -257,6 +263,26 @@ export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionSta
     lineup: lineupDeck,
     progressById,
   });
+}
+
+function resolvePlayerDeck(options: ResolvePlayerDeckOptions): {
+  hasPreferredDeck: boolean;
+  autoPlayerDeck: SessionState['unitsAll'];
+  lockedPlayerDeck: SessionState['unitsAll'];
+  allyUnits: SessionState['unitsAll'];
+} {
+  const { preferredDeck, fallbackSingleDeck, defaultRoster, unitProgressById } = options;
+  const hasPreferredDeck = preferredDeck.length > 0;
+  const autoPlayerDeck = hasPreferredDeck ? EMPTY_UNIT_DECK : buildAutoPlayerDeckFromCollection(unitProgressById);
+  const lockedPlayerDeck = hasPreferredDeck
+    ? preferredDeck
+    : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackSingleDeck);
+  return {
+    hasPreferredDeck,
+    autoPlayerDeck,
+    lockedPlayerDeck,
+    allyUnits: lockedPlayerDeck.length ? [...lockedPlayerDeck] : [...defaultRoster],
+  };
 }
 
 interface BuildBaseStateParams {
@@ -547,15 +573,17 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     ?? null;
 
   const preferredPlayerDeck = getPreferredDeckEntries(normalized);
-  const hasPreferredDeck = preferredPlayerDeck.length > 0;
-  const autoPlayerDeck = hasPreferredDeck ? EMPTY_UNIT_DECK : buildAutoPlayerDeckFromCollection(unitProgressById);
-  const lockedPlayerDeck = hasPreferredDeck
-    ? preferredPlayerDeck
-    : (autoPlayerDeck.length > 0 ? autoPlayerDeck : DEFAULT_SINGLE_UNIT_DECK);
-
-  const allyUnits: SessionState['unitsAll'] = lockedPlayerDeck.length
-    ? [...lockedPlayerDeck]
-    : [...DEFAULT_UNIT_ROSTER];
+  const {
+    hasPreferredDeck,
+    autoPlayerDeck,
+    lockedPlayerDeck,
+    allyUnits,
+  } = resolvePlayerDeck({
+    preferredDeck: preferredPlayerDeck,
+    fallbackSingleDeck: DEFAULT_SINGLE_UNIT_DECK,
+    defaultRoster: DEFAULT_UNIT_ROSTER,
+    unitProgressById,
+  });
 
   const enemyPreset = normalized.aiPreset ?? null;
   const enemyUnits = resolveEnemyUnits({
@@ -580,29 +608,28 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
   const initialTurnRng = createRngState(normalized.rngSeed);
   const randomStartSide = nextRngValue(initialTurnRng) < 0.5 ? 'ALLY' : 'ENEMY';
 
-  const buildTurnState = (): TurnSnapshot => {
-    if (useInterleaved) {
+  const turnState: TurnSnapshot = useInterleaved
+    ? {
+      mode: 'interleaved_by_position',
+      nextSide: randomStartSide,
+      lastPos: { ALLY: 0, ENEMY: 0 },
+      wrapCount: { ALLY: 0, ENEMY: 0 },
+      turnCount: 0,
+      slotCount: slotsPerSide,
+      cycle: 0,
+      busyUntil: 0,
+    } satisfies TurnSnapshot
+    : (() => {
+      const { order, indexMap } = buildTurnOrder();
       return {
-        mode: 'interleaved_by_position',
-        nextSide: randomStartSide,
-        lastPos: { ALLY: 0, ENEMY: 0 },
-        wrapCount: { ALLY: 0, ENEMY: 0 },
-        turnCount: 0,
-        slotCount: slotsPerSide,
+        mode: 'sequential',
+        order,
+        orderIndex: indexMap,
+        cursor: 0,
         cycle: 0,
         busyUntil: 0,
       } satisfies TurnSnapshot;
-    }
-    const { order, indexMap } = buildTurnOrder();
-    return {
-      mode: 'sequential',
-      order,
-      orderIndex: indexMap,
-      cursor: 0,
-      cycle: 0,
-      busyUntil: 0,
-    } satisfies TurnSnapshot;
-  };
+})();
 
   const aiState = buildAiState({
     preset: enemyPreset,
@@ -611,13 +638,9 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     defaultSummonLimit: CFG.SUMMON_LIMIT,
   });
 
-  const costCap = Number.isFinite(normalized.costCap)
-    ? Number(normalized.costCap)
-    : CFG.COST_CAP;
-  const summonLimit = Number.isFinite(normalized.summonLimit)
-    ? Number(normalized.summonLimit)
-    : CFG.SUMMON_LIMIT;
-  const rngSeed = Number.isFinite(normalized.rngSeed) ? Number(normalized.rngSeed) : undefined;
+  const costCap = parseFiniteNumber(normalized.costCap) ?? CFG.COST_CAP;
+  const summonLimit = parseFiniteNumber(normalized.summonLimit) ?? CFG.SUMMON_LIMIT;
+  const rngSeed = parseFiniteNumber(normalized.rngSeed) ?? undefined;
 
   return buildBaseState({
     modeKey,
@@ -627,7 +650,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     summonLimit,
     sceneTheme,
     backgroundKey,
-    turn: buildTurnState(),
+    turn: turnState,
     ai: aiState,
     unitProgressById,
     rngSeed,

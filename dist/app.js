@@ -18841,7 +18841,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   }
   function updateSessionConfig(next = {}) {
       const normalized = normalizeConfig(toStartConfigOverrides(next));
-      storedConfig = normalizeConfig({ ...storedConfig, ...normalized });
+      storedConfig = { ...storedConfig, ...normalized };
       applyConfigToRunningGame(normalized);
   }
   function createPveSession(rootEl, options = null) {
@@ -18905,6 +18905,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   const SMALL_REWARD_MERGE_SIZE = 6;
   const SANITIZED_REWARD_LIST = Symbol('sanitized-reward-list');
   const REWARD_INDEX_BY_ID = Symbol('reward-index-by-id');
+  const WAVE_REWARD_CACHE = new WeakMap();
   function isReward(entry) {
       if (!entry || typeof entry !== 'object')
           return false;
@@ -18991,13 +18992,36 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       }
       return list;
   }
-  function removeRewardById(list, rewardId) {
+  function getRewardIndexById(list) {
+      const existingIndex = list[REWARD_INDEX_BY_ID];
+      if (existingIndex)
+          return existingIndex;
+      const indexById = new Map();
       for (let index = 0; index < list.length; index += 1) {
-          if (list[index]?.id === rewardId) {
-              list.splice(index, 1);
-              list[REWARD_INDEX_BY_ID] = undefined;
-              break;
+          const reward = list[index];
+          if (reward)
+              indexById.set(reward.id, index);
+      }
+      list[REWARD_INDEX_BY_ID] = indexById;
+      return indexById;
+  }
+  function removeRewardById(list, rewardId) {
+      const useIndexedRemoval = list.length > SMALL_REWARD_MERGE_SIZE;
+      let index = -1;
+      if (useIndexedRemoval) {
+          index = getRewardIndexById(list).get(rewardId) ?? -1;
+      }
+      else {
+          for (let scanIndex = 0; scanIndex < list.length; scanIndex += 1) {
+              if (list[scanIndex]?.id === rewardId) {
+                  index = scanIndex;
+                  break;
+              }
           }
+      }
+      if (index >= 0) {
+          list.splice(index, 1);
+          list[REWARD_INDEX_BY_ID] = undefined;
       }
       return list;
   }
@@ -19010,10 +19034,14 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           : mergeRewardsInPlace(pendingRewards, rewards);
   }
   function removeRewardEverywhere(runtime, rewardId) {
-      removeRewardById(getMutableRewardList(runtime, 'rewardQueue'), rewardId);
+      const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
+      removeRewardById(rewardQueue, rewardId);
       const encounter = runtime.encounter;
-      if (encounter)
-          removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), rewardId);
+      if (!encounter)
+          return;
+      const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
+      if (pendingRewards !== rewardQueue)
+          removeRewardById(pendingRewards, rewardId);
   }
   function markEncounterCompleted(runtime, encounter) {
       encounter.status = 'completed';
@@ -19034,33 +19062,38 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       const wave = waves[index] ?? null;
       if (!wave)
           return markEncounterCompleted(runtime, encounter);
-      if (wave.status === 'pending') {
-          wave.status = 'spawning';
-          runtime.wave = wave;
-          if (encounter.status === 'idle')
+      switch (wave.status) {
+          case 'pending':
+              wave.status = 'spawning';
+              runtime.wave = wave;
+              if (encounter.status === 'idle')
+                  encounter.status = 'running';
+              break;
+          case 'spawning':
+              wave.status = 'active';
+              runtime.wave = wave;
               encounter.status = 'running';
-      }
-      else if (wave.status === 'spawning') {
-          wave.status = 'active';
-          runtime.wave = wave;
-          encounter.status = 'running';
-      }
-      else if (wave.status === 'active') {
-          wave.status = 'cleared';
-          runtime.wave = null;
-          encounter.waveIndex = index + 1;
-          const rewards = Array.isArray(wave.rewards)
-              ? sanitizeRewardListInPlace(wave.rewards)
-              : [];
-          if (rewards.length)
-              syncWaveRewards(runtime, encounter, rewards);
-      }
-      else if (wave.status === 'cleared') {
-          runtime.wave = null;
-          encounter.waveIndex = index + 1;
-      }
-      else {
-          runtime.wave = null;
+              break;
+          case 'active': {
+              wave.status = 'cleared';
+              runtime.wave = null;
+              encounter.waveIndex = index + 1;
+              const rewards = WAVE_REWARD_CACHE.get(wave)
+                  ?? (Array.isArray(wave.rewards)
+                      ? sanitizeRewardListInPlace(wave.rewards)
+                      : []);
+              WAVE_REWARD_CACHE.set(wave, rewards);
+              if (rewards.length)
+                  syncWaveRewards(runtime, encounter, rewards);
+              break;
+          }
+          case 'cleared':
+              runtime.wave = null;
+              encounter.waveIndex = index + 1;
+              break;
+          default:
+              runtime.wave = null;
+              break;
       }
       if (encounter.waveIndex >= waves.length) {
           return markEncounterCompleted(runtime, encounter);
@@ -19317,6 +19350,20 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           progressById,
       });
   }
+  function resolvePlayerDeck(options) {
+      const { preferredDeck, fallbackSingleDeck, defaultRoster, unitProgressById } = options;
+      const hasPreferredDeck = preferredDeck.length > 0;
+      const autoPlayerDeck = hasPreferredDeck ? EMPTY_UNIT_DECK : buildAutoPlayerDeckFromCollection(unitProgressById);
+      const lockedPlayerDeck = hasPreferredDeck
+          ? preferredDeck
+          : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackSingleDeck);
+      return {
+          hasPreferredDeck,
+          autoPlayerDeck,
+          lockedPlayerDeck,
+          allyUnits: lockedPlayerDeck.length ? [...lockedPlayerDeck] : [...defaultRoster],
+      };
+  }
   function buildBaseState(params) {
       return {
           modeKey: params.modeKey,
@@ -19552,14 +19599,12 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           ?? sceneCfg?.DEFAULT_THEME
           ?? null;
       const preferredPlayerDeck = getPreferredDeckEntries(normalized);
-      const hasPreferredDeck = preferredPlayerDeck.length > 0;
-      const autoPlayerDeck = hasPreferredDeck ? EMPTY_UNIT_DECK : buildAutoPlayerDeckFromCollection(unitProgressById);
-      const lockedPlayerDeck = hasPreferredDeck
-          ? preferredPlayerDeck
-          : (autoPlayerDeck.length > 0 ? autoPlayerDeck : DEFAULT_SINGLE_UNIT_DECK);
-      const allyUnits = lockedPlayerDeck.length
-          ? [...lockedPlayerDeck]
-          : [...DEFAULT_UNIT_ROSTER];
+      const { hasPreferredDeck, autoPlayerDeck, lockedPlayerDeck, allyUnits, } = resolvePlayerDeck({
+          preferredDeck: preferredPlayerDeck,
+          fallbackSingleDeck: DEFAULT_SINGLE_UNIT_DECK,
+          defaultRoster: DEFAULT_UNIT_ROSTER,
+          unitProgressById,
+      });
       const enemyPreset = normalized.aiPreset ?? null;
       const enemyUnits = resolveEnemyUnits({
           aiPreset: enemyPreset,
@@ -19581,42 +19626,37 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       const slotsPerSide = Math.max(1, allyCols * gridRows);
       const initialTurnRng = createRngState(normalized.rngSeed);
       const randomStartSide = nextRngValue(initialTurnRng) < 0.5 ? 'ALLY' : 'ENEMY';
-      const buildTurnState = () => {
-          if (useInterleaved) {
+      const turnState = useInterleaved
+          ? {
+              mode: 'interleaved_by_position',
+              nextSide: randomStartSide,
+              lastPos: { ALLY: 0, ENEMY: 0 },
+              wrapCount: { ALLY: 0, ENEMY: 0 },
+              turnCount: 0,
+              slotCount: slotsPerSide,
+              cycle: 0,
+              busyUntil: 0,
+          }
+          : (() => {
+              const { order, indexMap } = buildTurnOrder();
               return {
-                  mode: 'interleaved_by_position',
-                  nextSide: randomStartSide,
-                  lastPos: { ALLY: 0, ENEMY: 0 },
-                  wrapCount: { ALLY: 0, ENEMY: 0 },
-                  turnCount: 0,
-                  slotCount: slotsPerSide,
+                  mode: 'sequential',
+                  order,
+                  orderIndex: indexMap,
+                  cursor: 0,
                   cycle: 0,
                   busyUntil: 0,
               };
-          }
-          const { order, indexMap } = buildTurnOrder();
-          return {
-              mode: 'sequential',
-              order,
-              orderIndex: indexMap,
-              cursor: 0,
-              cycle: 0,
-              busyUntil: 0,
-          };
-      };
+          })();
       const aiState = buildAiState({
           preset: enemyPreset,
           unitsAll: enemyUnits,
           defaultCostCap: CFG.COST_CAP,
           defaultSummonLimit: CFG.SUMMON_LIMIT,
       });
-      const costCap = Number.isFinite(normalized.costCap)
-          ? Number(normalized.costCap)
-          : CFG.COST_CAP;
-      const summonLimit = Number.isFinite(normalized.summonLimit)
-          ? Number(normalized.summonLimit)
-          : CFG.SUMMON_LIMIT;
-      const rngSeed = Number.isFinite(normalized.rngSeed) ? Number(normalized.rngSeed) : undefined;
+      const costCap = parseFiniteNumber(normalized.costCap) ?? CFG.COST_CAP;
+      const summonLimit = parseFiniteNumber(normalized.summonLimit) ?? CFG.SUMMON_LIMIT;
+      const rngSeed = parseFiniteNumber(normalized.rngSeed) ?? undefined;
       return buildBaseState({
           modeKey,
           allyUnits,
@@ -19625,7 +19665,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           summonLimit,
           sceneTheme,
           backgroundKey,
-          turn: buildTurnState(),
+          turn: turnState,
           ai: aiState,
           unitProgressById,
           rngSeed,
