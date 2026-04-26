@@ -1,5 +1,3 @@
-//home (termux)/arclune_lane_7x3/src/modes/pve/session-state.ts
-
 import type { CreateSessionOptions, RuntimeUnitProgress, SessionState } from '@shared-types/pve';
 import type {
   CameraPreset,
@@ -74,17 +72,6 @@ function normalizeDeckEntriesCached(
   return normalized;
 }
 
-
-function normalizeDeckField(
-  config: NormalizedSessionConfig,
-  key: NormalizableDeckField,
-  cache: DeckNormalizationCache,
-): void {
-  const value = config[key];
-  if (!Array.isArray(value)) return;
-  config[key] = normalizeDeckEntriesCached(value, cache);
-}
-
 function hasDeckEntries(value: unknown): value is ReadonlyArray<unknown> {
   return Array.isArray(value) && value.length > 0;
 }
@@ -127,7 +114,7 @@ export function getPreferredDeckEntries(config: {
   playerDeck?: unknown;
   deck?: unknown;
 }): SessionState['unitsAll'] {
-  return toDeckEntries(getPreferredDeckInput(config));
+  return toDeckEntries(pickFirstDeckInput(config));
 }
 
 type TurnOrderEntry = { side: Side; slot: number };
@@ -468,7 +455,10 @@ export function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessi
     else if (typeof sceneConfig.background === 'string') out.backgroundKey = sceneConfig.background;
   }
   for (const field of NORMALIZABLE_DECK_FIELDS) {
-    normalizeDeckField(out, field, deckNormalizationCache);
+    const value = out[field];
+    if (Array.isArray(value)) {
+      out[field] = normalizeDeckEntriesCached(value, deckNormalizationCache);
+    }
   }
   if (typeof out.collectionState === 'undefined') {
     out.collectionState = null;
@@ -520,21 +510,21 @@ function clampTurnOrderSlot(slot: number): number {
   return Math.max(1, Math.min(9, rounded));
 }
 
+function pushTurnOrderForSides(output: TurnOrderEntry[], sides: readonly TurnOrderSide[], slot: number): void {
+  const normalizedSlot = clampTurnOrderSlot(slot);
+  for (let sideIndex = 0; sideIndex < sides.length; sideIndex += 1) {
+    output.push({ side: sides[sideIndex], slot: normalizedSlot });
+  }
+}
+
 function appendNormalizedPairScanEntry(
   output: TurnOrderEntry[],
   entry: TurnOrderPairScanEntry,
   sides: readonly TurnOrderSide[],
 ): void {
-  const pushForSides = (slot: number): void => {
-    const normalizedSlot = clampTurnOrderSlot(slot);
-    for (let sideIndex = 0; sideIndex < sides.length; sideIndex += 1) {
-      output.push({ side: sides[sideIndex], slot: normalizedSlot });
-    }
-  };
-
   if (typeof entry === 'number') {
     if (Number.isFinite(entry)) {
-      pushForSides(entry);
+      pushTurnOrderForSides(output, sides, entry);
     }
     return;
   }
@@ -548,7 +538,9 @@ function appendNormalizedPairScanEntry(
     }
     for (let index = 0; index < entry.length; index += 1) {
       const value = entry[index];
-      if (typeof value === 'number' && Number.isFinite(value)) pushForSides(value);
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        pushTurnOrderForSides(output, sides, value);
+      }
     }
     return;
   }
@@ -564,8 +556,20 @@ function appendNormalizedPairScanEntry(
 
   if (isPairScanObjectWithoutSide(entry)) {
     const slot = parseSlotValue(entry);
-    if (slot !== null) pushForSides(slot);
+    if (slot !== null) pushTurnOrderForSides(output, sides, slot);
   }
+}
+
+function createSequentialTurnSnapshot(): TurnSnapshot {
+  const { order, indexMap } = buildTurnOrder();
+  return {
+    mode: 'sequential',
+    order,
+    orderIndex: indexMap,
+    cursor: 0,
+    cycle: 0,
+    busyUntil: 0,
+  } satisfies TurnSnapshot;
 }
 
 export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<string, number> } {
@@ -659,17 +663,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
       cycle: 0,
       busyUntil: 0,
     } satisfies TurnSnapshot
-    : (() => {
-      const { order, indexMap } = buildTurnOrder();
-      return {
-        mode: 'sequential',
-        order,
-        orderIndex: indexMap,
-        cursor: 0,
-        cycle: 0,
-        busyUntil: 0,
-      } satisfies TurnSnapshot;
-})();
+    : createSequentialTurnSnapshot();
 
   const aiState = buildAiState({
     preset: enemyPreset,

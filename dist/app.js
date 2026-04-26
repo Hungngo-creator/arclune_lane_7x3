@@ -14788,7 +14788,6 @@ __modules['./modes/pve/nguyen-le-runtime.ts'] = (exports, module, __require) => 
   if (!Object.prototype.hasOwnProperty.call(exports, 'performNguyenLeUltRuntime')) exports.performNguyenLeUltRuntime = performNguyenLeUltRuntime;
 };
 __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime-impl.ts
   const __dep2 = __require('./aether.ts');
   const globalAetherPool = __dep2.globalAetherPool;
   const __dep3 = __require('./turns.ts');
@@ -18943,19 +18942,15 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           return sanitizeRewardListInPlace(source);
       return sanitizeRewardListInPlace([]);
   }
-  function getMutableRewardQueue(runtime) {
-      const list = toSanitizedRewardList(runtime.rewardQueue);
-      runtime.rewardQueue = list;
-      return list;
-  }
-  function getMutablePendingRewards(encounter) {
-      const list = toSanitizedRewardList(encounter.pendingRewards);
-      encounter.pendingRewards = list;
+  function ensureSanitizedRewardList(owner, key) {
+      const ownerRecord = owner;
+      const list = toSanitizedRewardList(ownerRecord[key]);
+      ownerRecord[key] = list;
       return list;
   }
   function getRuntimeRewardLists(runtime, encounter) {
-      const rewardQueue = getMutableRewardQueue(runtime);
-      const pendingRewards = getMutablePendingRewards(encounter);
+      const rewardQueue = ensureSanitizedRewardList(runtime, 'rewardQueue');
+      const pendingRewards = ensureSanitizedRewardList(encounter, 'pendingRewards');
       return {
           rewardQueue,
           pendingRewards,
@@ -19037,11 +19032,11 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   }
   function removeRewardEverywhere(runtime, rewardId) {
       const encounter = runtime.encounter;
-      const rewardQueue = getMutableRewardQueue(runtime);
+      const rewardQueue = ensureSanitizedRewardList(runtime, 'rewardQueue');
       removeRewardById(rewardQueue, rewardId);
       if (!encounter)
           return;
-      const pendingRewards = getMutablePendingRewards(encounter);
+      const pendingRewards = ensureSanitizedRewardList(encounter, 'pendingRewards');
       if (pendingRewards !== rewardQueue)
           removeRewardById(pendingRewards, rewardId);
   }
@@ -19149,7 +19144,6 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createPveSession')) exports.createPveSession = createPveSession;
 };
 __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/modes/pve/session-state.ts
   const __dep0 = __require('./shared-types/units.ts');
   const createSummonQueue = __dep0.createSummonQueue;
   const __dep1 = __require('./config.ts');
@@ -19206,12 +19200,6 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       cache.set(value, normalized);
       return normalized;
   }
-  function normalizeDeckField(config, key, cache) {
-      const value = config[key];
-      if (!Array.isArray(value))
-          return;
-      config[key] = normalizeDeckEntriesCached(value, cache);
-  }
   function hasDeckEntries(value) {
       return Array.isArray(value) && value.length > 0;
   }
@@ -19248,7 +19236,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       return pickFirstDeckInput(config);
   }
   function getPreferredDeckEntries(config) {
-      return toDeckEntries(getPreferredDeckInput(config));
+      return toDeckEntries(pickFirstDeckInput(config));
   }
   const TURN_ORDER_FALLBACK_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   function getSceneConfig(cfg) {
@@ -19507,7 +19495,10 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
               out.backgroundKey = sceneConfig.background;
       }
       for (const field of NORMALIZABLE_DECK_FIELDS) {
-          normalizeDeckField(out, field, deckNormalizationCache);
+          const value = out[field];
+          if (Array.isArray(value)) {
+              out[field] = normalizeDeckEntriesCached(value, deckNormalizationCache);
+          }
       }
       if (typeof out.collectionState === 'undefined') {
           out.collectionState = null;
@@ -19551,16 +19542,16 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       const rounded = Math.round(slot);
       return Math.max(1, Math.min(9, rounded));
   }
+  function pushTurnOrderForSides(output, sides, slot) {
+      const normalizedSlot = clampTurnOrderSlot(slot);
+      for (let sideIndex = 0; sideIndex < sides.length; sideIndex += 1) {
+          output.push({ side: sides[sideIndex], slot: normalizedSlot });
+      }
+  }
   function appendNormalizedPairScanEntry(output, entry, sides) {
-      const pushForSides = (slot) => {
-          const normalizedSlot = clampTurnOrderSlot(slot);
-          for (let sideIndex = 0; sideIndex < sides.length; sideIndex += 1) {
-              output.push({ side: sides[sideIndex], slot: normalizedSlot });
-          }
-      };
       if (typeof entry === 'number') {
           if (Number.isFinite(entry)) {
-              pushForSides(entry);
+              pushTurnOrderForSides(output, sides, entry);
           }
           return;
       }
@@ -19573,8 +19564,9 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           }
           for (let index = 0; index < entry.length; index += 1) {
               const value = entry[index];
-              if (typeof value === 'number' && Number.isFinite(value))
-                  pushForSides(value);
+              if (typeof value === 'number' && Number.isFinite(value)) {
+                  pushTurnOrderForSides(output, sides, value);
+              }
           }
           return;
       }
@@ -19589,8 +19581,19 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       if (isPairScanObjectWithoutSide(entry)) {
           const slot = parseSlotValue(entry);
           if (slot !== null)
-              pushForSides(slot);
+              pushTurnOrderForSides(output, sides, slot);
       }
+  }
+  function createSequentialTurnSnapshot() {
+      const { order, indexMap } = buildTurnOrder();
+      return {
+          mode: 'sequential',
+          order,
+          orderIndex: indexMap,
+          cursor: 0,
+          cycle: 0,
+          busyUntil: 0,
+      };
   }
   function buildTurnOrder() {
       const cfg = CFG.turnOrder;
@@ -19673,17 +19676,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
               cycle: 0,
               busyUntil: 0,
           }
-          : (() => {
-              const { order, indexMap } = buildTurnOrder();
-              return {
-                  mode: 'sequential',
-                  order,
-                  orderIndex: indexMap,
-                  cursor: 0,
-                  cycle: 0,
-                  busyUntil: 0,
-              };
-          })();
+          : createSequentialTurnSnapshot();
       const aiState = buildAiState({
           preset: enemyPreset,
           unitsAll: enemyUnits,

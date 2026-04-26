@@ -18,6 +18,10 @@ import {
 type RewardList = ReadonlyArray<RewardRoll>;
 type MutableRewardList = RewardRoll[];
 type RewardIndexById = Map<string, number>;
+type RewardListOwnerByKey = {
+  rewardQueue: SessionRuntimeState;
+  pendingRewards: EncounterState;
+};
 const NOOP_UNSUBSCRIBE = (): void => {};
 const SMALL_REWARD_MERGE_SIZE = 6;
 const SANITIZED_REWARD_LIST = Symbol('sanitized-reward-list');
@@ -67,21 +71,19 @@ function toSanitizedRewardList(source: unknown): SanitizedRewardList {
   return sanitizeRewardListInPlace([] as SanitizedRewardList);
 }
 
-function getMutableRewardQueue(runtime: SessionRuntimeState): SanitizedRewardList {
-  const list = toSanitizedRewardList(runtime.rewardQueue);
-  runtime.rewardQueue = list;
-  return list;
-}
-
-function getMutablePendingRewards(encounter: EncounterState): SanitizedRewardList {
-  const list = toSanitizedRewardList(encounter.pendingRewards);
-  encounter.pendingRewards = list;
+function ensureSanitizedRewardList<K extends keyof RewardListOwnerByKey>(
+  owner: RewardListOwnerByKey[K],
+  key: K,
+): SanitizedRewardList {
+  const ownerRecord = owner as RewardListOwnerByKey[K] & Record<K, unknown>;
+  const list = toSanitizedRewardList(ownerRecord[key]);
+  ownerRecord[key] = list as unknown as (RewardListOwnerByKey[K] & Record<K, unknown>)[K];
   return list;
 }
 
 function getRuntimeRewardLists(runtime: SessionRuntimeState, encounter: EncounterState): RuntimeRewardLists {
-  const rewardQueue = getMutableRewardQueue(runtime);
-  const pendingRewards = getMutablePendingRewards(encounter);
+  const rewardQueue = ensureSanitizedRewardList(runtime, 'rewardQueue');
+  const pendingRewards = ensureSanitizedRewardList(encounter, 'pendingRewards');
   return {
     rewardQueue,
     pendingRewards,
@@ -163,10 +165,10 @@ function syncWaveRewards(runtime: SessionRuntimeState, encounter: EncounterState
 
 function removeRewardEverywhere(runtime: SessionRuntimeState, rewardId: string): void {
   const encounter = runtime.encounter;
-  const rewardQueue = getMutableRewardQueue(runtime);
+  const rewardQueue = ensureSanitizedRewardList(runtime, 'rewardQueue');
   removeRewardById(rewardQueue, rewardId);
   if (!encounter) return;
-  const pendingRewards = getMutablePendingRewards(encounter);
+  const pendingRewards = ensureSanitizedRewardList(encounter, 'pendingRewards');
   if (pendingRewards !== rewardQueue) removeRewardById(pendingRewards, rewardId);
 }
 

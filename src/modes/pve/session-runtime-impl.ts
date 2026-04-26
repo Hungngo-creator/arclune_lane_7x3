@@ -1,5 +1,3 @@
-//home (termux)/arclune_lane_7x3/src/modes/pve/session-runtime-impl.ts
-
 import { globalAetherPool } from '../../aether';
 import { stepTurn, doActionOrSkip, predictSpawnCycle } from '../../turns';
 import { enqueueImmediate, processActionChain } from '../../summon';
