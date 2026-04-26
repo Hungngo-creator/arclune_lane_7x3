@@ -14953,6 +14953,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return {};
       return { ...value };
   };
+  const toNormalizedSessionConfig = (value) => (normalizeConfig(toStartConfigOverrides(value)));
   const toRootLike = (value) => {
       if (value == null)
           return value;
@@ -14968,6 +14969,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const isInitializedGame = (game = Game) => Boolean(game && game._inited);
   const getInitializedGame = () => (isInitializedGame() ? Game : null);
   const nextSessionRandom = (game = Game) => (nextRngValue(game?.rng));
+  const RESOLVED_PROMISE = Promise.resolve();
   const SKILL_RUNTIME_NUMERIC_KEYS = [
       'hits',
       'hitCount',
@@ -15339,8 +15341,9 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       if (!turnState)
           return 0;
       const rawBusy = turnState.busyUntil;
-      const busyUntil = isFiniteNumber(rawBusy) && rawBusy > 0 ? rawBusy : 0;
-      if (!isFiniteNumber(rawBusy) || rawBusy <= 0) {
+      const hasPositiveBusy = isFiniteNumber(rawBusy) && rawBusy > 0;
+      const busyUntil = hasPositiveBusy ? rawBusy : 0;
+      if (!hasPositiveBusy) {
           turnState.busyUntil = busyUntil;
       }
       return busyUntil;
@@ -15609,7 +15612,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           queueMicrotask(flushSummonBarRender);
           return;
       }
-      Promise.resolve().then(flushSummonBarRender);
+      RESOLVED_PROMISE.then(flushSummonBarRender);
   };
   function cleanupSummonBar() {
       if (summonBarHandle && typeof summonBarHandle.cleanup === 'function') {
@@ -15624,9 +15627,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           game.ui.bar = null;
       }
   }
-  function resetSessionState(options = {}) {
-      const overrides = toStartConfigOverrides(options);
-      storedConfig = normalizeConfig({ ...storedConfig, ...overrides });
+  function resetSessionState(overrides) {
+      storedConfig = { ...storedConfig, ...overrides };
       resetSessionTimeBase();
       Game = createSession(storedConfig);
       applyCollectionSkinsToSession(Game);
@@ -18754,7 +18756,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   function startSession(config = {}) {
       configureRoot(rootElement);
       resolveTimerElement();
-      const overrides = normalizeConfig(toStartConfigOverrides(config));
+      const overrides = toNormalizedSessionConfig(config);
       if (running)
           stopSession();
       resetSessionState(overrides);
@@ -18840,13 +18842,13 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       }
   }
   function updateSessionConfig(next = {}) {
-      const normalized = normalizeConfig(toStartConfigOverrides(next));
+      const normalized = toNormalizedSessionConfig(next);
       storedConfig = { ...storedConfig, ...normalized };
       applyConfigToRunningGame(normalized);
   }
   function createPveSession(rootEl, options = null) {
       const initial = sanitizeStartConfig(options);
-      const normalized = normalizeConfig(initial.rest);
+      const normalized = toNormalizedSessionConfig(initial.rest);
       storedConfig = { ...normalized };
       configureRoot((rootEl ?? initial.root) ?? null);
       const handle = {
@@ -18952,35 +18954,12 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       if (!additions.length)
           return list;
       const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
-      const indexById = useIndexedMerge
-          ? (list[REWARD_INDEX_BY_ID] ?? new Map())
-          : null;
-      if (indexById) {
-          if (indexById.size === 0) {
-              for (let index = 0; index < list.length; index += 1) {
-                  const entry = list[index];
-                  if (entry)
-                      indexById.set(entry.id, index);
-              }
-          }
-          list[REWARD_INDEX_BY_ID] = indexById;
-      }
+      const indexById = useIndexedMerge ? getRewardIndexById(list) : null;
       for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
           const reward = additions[addIndex];
           if (!reward)
               continue;
-          let existingIndex;
-          if (indexById) {
-              existingIndex = indexById.get(reward.id);
-          }
-          else {
-              for (let listIndex = 0; listIndex < list.length; listIndex += 1) {
-                  if (list[listIndex]?.id === reward.id) {
-                      existingIndex = listIndex;
-                      break;
-                  }
-              }
-          }
+          const existingIndex = resolveRewardIndex(list, reward.id, indexById);
           if (existingIndex == null) {
               if (indexById)
                   indexById.set(reward.id, list.length);
@@ -18991,6 +18970,15 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           }
       }
       return list;
+  }
+  function resolveRewardIndex(list, rewardId, indexById) {
+      if (indexById)
+          return indexById.get(rewardId);
+      for (let index = 0; index < list.length; index += 1) {
+          if (list[index]?.id === rewardId)
+              return index;
+      }
+      return undefined;
   }
   function getRewardIndexById(list) {
       const existingIndex = list[REWARD_INDEX_BY_ID];
@@ -19007,21 +18995,22 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   }
   function removeRewardById(list, rewardId) {
       const useIndexedRemoval = list.length > SMALL_REWARD_MERGE_SIZE;
-      let index = -1;
-      if (useIndexedRemoval) {
-          index = getRewardIndexById(list).get(rewardId) ?? -1;
-      }
-      else {
-          for (let scanIndex = 0; scanIndex < list.length; scanIndex += 1) {
-              if (list[scanIndex]?.id === rewardId) {
-                  index = scanIndex;
-                  break;
-              }
-          }
-      }
-      if (index >= 0) {
+      const indexById = useIndexedRemoval ? getRewardIndexById(list) : null;
+      const index = resolveRewardIndex(list, rewardId, indexById);
+      if (index != null) {
           list.splice(index, 1);
-          list[REWARD_INDEX_BY_ID] = undefined;
+          if (indexById) {
+              indexById.delete(rewardId);
+              for (let listIndex = index; listIndex < list.length; listIndex += 1) {
+                  const reward = list[listIndex];
+                  if (reward)
+                      indexById.set(reward.id, listIndex);
+              }
+              list[REWARD_INDEX_BY_ID] = indexById;
+          }
+          else {
+              list[REWARD_INDEX_BY_ID] = undefined;
+          }
       }
       return list;
   }
@@ -19056,6 +19045,10 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       if (!encounter) {
           runtime.wave = null;
           return null;
+      }
+      if (encounter.status === 'completed') {
+          runtime.wave = null;
+          return encounter;
       }
       const waves = Array.isArray(encounter.waves) ? encounter.waves : [];
       const index = Math.max(0, encounter.waveIndex | 0);
@@ -19331,16 +19324,30 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           lastDecision: null,
       };
   }
-  function resolveEnemyUnits(options) {
-      const preset = options.aiPreset ?? null;
-      if (Array.isArray(preset?.deck) && preset.deck.length) {
+  function normalizeAiPresetDeckLists(preset) {
+      if (Array.isArray(preset.deck))
+          preset.deck = normalizeDeckEntries(preset.deck);
+      if (Array.isArray(preset.unitsAll))
+          preset.unitsAll = normalizeDeckEntries(preset.unitsAll);
+      return preset;
+  }
+  function getAiPresetDeckEntries(preset) {
+      if (!preset)
+          return null;
+      if (Array.isArray(preset.deck) && preset.deck.length) {
           return normalizeDeckEntries(preset.deck);
       }
-      if (Array.isArray(preset?.unitsAll) && preset.unitsAll.length) {
+      if (Array.isArray(preset.unitsAll) && preset.unitsAll.length) {
           return normalizeDeckEntries(preset.unitsAll);
       }
+      return null;
+  }
+  function resolveEnemyUnits(options) {
+      const presetDeck = getAiPresetDeckEntries(options.aiPreset);
+      if (presetDeck)
+          return presetDeck;
       const deckInput = options.preferredDeck ?? options.fallbackDeck;
-      const lineupDeck = toDeckEntries(deckInput);
+      const lineupDeck = deckInput ? toDeckEntries(deckInput) : EMPTY_UNIT_DECK;
       const progressById = options.unitProgressById
           ?? (lineupDeck.length > 0
               ? mapUnitProgressById(options.collectionState ?? null)
@@ -19472,12 +19479,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           out.collectionState = null;
       }
       if (out.aiPreset) {
-          const preset = { ...out.aiPreset };
-          if (Array.isArray(preset.deck))
-              preset.deck = normalizeDeckEntries(preset.deck);
-          if (Array.isArray(preset.unitsAll))
-              preset.unitsAll = normalizeDeckEntries(preset.unitsAll);
-          out.aiPreset = preset;
+          out.aiPreset = normalizeAiPresetDeckLists({ ...out.aiPreset });
       }
       return out;
   }
@@ -19914,7 +19916,6 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeDeckEntries')) exports.normalizeDeckEntries = normalizeDeckEntries;
 };
 __modules['./modes/pve/session.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/modes/pve/session.ts
   const __reexport0 = __require('./modes/pve/session-state.ts');
   for (const key of Object.keys(__reexport0)) {
     if (key === 'default') continue;

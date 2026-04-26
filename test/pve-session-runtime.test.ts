@@ -148,7 +148,7 @@ describe('pve session runtime reward + wave flow', () => {
     expect(() => unsub()).not.toThrow();
   });
 
-test('event forwarding qua createPveSession.onEvent và unsubscribe hoạt động thật', () => {
+  test('event forwarding qua createPveSession.onEvent và unsubscribe hoạt động thật', () => {
     const session = createPveSession(null as any, {});
     const seen: string[] = [];
     const off = session.onEvent(ACTION_END, () => {
@@ -161,16 +161,27 @@ test('event forwarding qua createPveSession.onEvent và unsubscribe hoạt độ
     off();
     emitGameEvent(ACTION_END, {} as any);
     expect(seen).toHaveLength(1);
-});
+  });
+
+  test('onSessionEvent unsubscribe hoạt động thật', () => {
+    const seen: string[] = [];
+    const off = onSessionEvent(ACTION_END, () => {
+      seen.push('ok');
+    });
+    emitGameEvent(ACTION_END, {} as any);
+    expect(seen).toHaveLength(1);
+    off();
+    emitGameEvent(ACTION_END, {} as any);
+    expect(seen).toHaveLength(1);
+  });
 
   test('advanceSession trả null khi thiếu runtime hoặc encounter', () => {
     expect(advanceSession(null)).toBeNull();
     expect(advanceSession({} as any)).toBeNull();
     expect(advanceSession({ runtime: {} } as any)).toBeNull();
   });
-});
 
-test('idempotency: tick nhiều lần sau completed không làm drift state', () => {
+  test('idempotency: tick nhiều lần sau completed không làm drift state', () => {
     const reward = { id: 'gold', weight: 1, tier: 1 };
     const session: any = {
       runtime: {
@@ -200,6 +211,30 @@ test('idempotency: tick nhiều lần sau completed không làm drift state', ()
     }
   });
 
+  test('encounter completed thì advanceSession trả sớm, không mutate thêm', () => {
+    const reward = { id: 'gold', weight: 1, tier: 1 };
+    const wave = { status: 'active', rewards: [reward] };
+    const session: any = {
+      runtime: {
+        rewardQueue: [reward],
+        wave: wave,
+        encounter: {
+          status: 'completed',
+          waveIndex: 99,
+          pendingRewards: [reward],
+          waves: [wave],
+        },
+      },
+    };
+
+    const encounter = advanceSession(session);
+    expect(encounter?.status).toBe('completed');
+    expect(session.runtime.wave).toBeNull();
+    expect(session.runtime.encounter.waveIndex).toBe(99);
+    expect(session.runtime.rewardQueue).toEqual([reward]);
+    expect(session.runtime.encounter.pendingRewards).toEqual([reward]);
+  });
+
   test('regression nhỏ: merge reward path lớn giữ đúng unique id và override mới nhất', () => {
     const size = 2500;
     const existing = Array.from({ length: size }, (_, index) => ({
@@ -226,9 +261,9 @@ test('idempotency: tick nhiều lần sau completed không làm drift state', ()
       },
     };
 
-    const startedAt = Date.now();
+    const startedAt = performance.now();
     const encounter = advanceSession(session);
-    const elapsedMs = Date.now() - startedAt;
+    const elapsedMs = performance.now() - startedAt;
 
     expect(encounter?.status).toBe('completed');
     expect(session.runtime.rewardQueue).toHaveLength(size + 1);
@@ -238,3 +273,6 @@ test('idempotency: tick nhiều lần sau completed không làm drift state', ()
     // Guard regression cơ bản, tránh đặt ngưỡng quá chặt gây flaky theo môi trường CI.
     expect(elapsedMs).toBeLessThan(2000);
   });
+
+
+});

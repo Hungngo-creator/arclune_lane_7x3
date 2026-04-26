@@ -266,6 +266,10 @@ const toStartConfigOverrides = (value: unknown): StartConfigOverrides => {
   return { ...(value as Record<string, unknown>) } as StartConfigOverrides;
 };
 
+const toNormalizedSessionConfig = (value: unknown): NormalizedSessionConfig => (
+  normalizeConfig(toStartConfigOverrides(value))
+);
+
 const toRootLike = (value: unknown): RootLike => {
   if (value == null) return value as null | undefined;
   if (typeof Element !== 'undefined' && value instanceof Element) return value;
@@ -287,6 +291,7 @@ const getInitializedGame = (): InitializedSessionState | null => (
 const nextSessionRandom = (game: SessionState | null | undefined = Game): number => (
   nextRngValue(game?.rng)
 );
+const RESOLVED_PROMISE = Promise.resolve();
 
 const SKILL_RUNTIME_NUMERIC_KEYS: ReadonlyArray<keyof SkillRuntime> = [
   'hits',
@@ -721,8 +726,9 @@ const normalizeTurnBusyUntil = (
 ): number => {
   if (!turnState) return 0;
   const rawBusy = turnState.busyUntil;
-  const busyUntil = isFiniteNumber(rawBusy) && rawBusy > 0 ? rawBusy : 0;
-  if (!isFiniteNumber(rawBusy) || rawBusy <= 0){
+  const hasPositiveBusy = isFiniteNumber(rawBusy) && rawBusy > 0;
+  const busyUntil = hasPositiveBusy ? rawBusy : 0;
+  if (!hasPositiveBusy){
     turnState.busyUntil = busyUntil;
   }
   return busyUntil;
@@ -1098,7 +1104,7 @@ const renderSummonBar = (): void => {
     queueMicrotask(flushSummonBarRender);
     return;
   }
-  Promise.resolve().then(flushSummonBarRender);
+  RESOLVED_PROMISE.then(flushSummonBarRender);
 };
 
 function cleanupSummonBar(): void {
@@ -1114,9 +1120,8 @@ function cleanupSummonBar(): void {
   }
 }
 
-function resetSessionState(options: StartConfigOverrides | null | undefined = {}): void {
-  const overrides = toStartConfigOverrides(options);
-  storedConfig = normalizeConfig({ ...storedConfig, ...overrides });
+function resetSessionState(overrides: NormalizedSessionConfig): void {
+  storedConfig = { ...storedConfig, ...overrides };
   resetSessionTimeBase();
   Game = createSession(storedConfig);
   applyCollectionSkinsToSession(Game);
@@ -4291,7 +4296,7 @@ function bindSession(): void {
 function startSession(config: StartConfigOverrides | null | undefined = {}): SessionState | null {
   configureRoot(rootElement);
   resolveTimerElement();
-  const overrides = normalizeConfig(toStartConfigOverrides(config));
+  const overrides = toNormalizedSessionConfig(config);
   if (running) stopSession();
   resetSessionState(overrides);
   resetDomRefs();
@@ -4372,7 +4377,7 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
 }
 
 function updateSessionConfig(next: StartConfigOverrides | null | undefined = {}): void {
-  const normalized = normalizeConfig(toStartConfigOverrides(next));
+  const normalized = toNormalizedSessionConfig(next);
   storedConfig = { ...storedConfig, ...normalized };
   applyConfigToRunningGame(normalized);
 }
@@ -4382,7 +4387,7 @@ export function createPveSession(
   options: PveSessionStartConfig | null = null,
 ): PveSessionHandle {
   const initial = sanitizeStartConfig(options);
-  const normalized = normalizeConfig(initial.rest);
+  const normalized = toNormalizedSessionConfig(initial.rest);
   storedConfig = { ...normalized };
   configureRoot((rootEl ?? initial.root) ?? null);
 

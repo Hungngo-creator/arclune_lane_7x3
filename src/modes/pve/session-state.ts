@@ -145,6 +145,8 @@ interface BuildAiStateParams {
   defaultSummonLimit: number;
 }
 
+type MutableAiPreset = NonNullable<NormalizedSessionConfig['aiPreset']>;
+
 interface ResolveEnemyUnitsOptions {
   aiPreset?: CreateSessionOptions['aiPreset'] | null;
   preferredDeck?: ReadonlyArray<unknown> | null;
@@ -244,16 +246,30 @@ function buildAiState(params: BuildAiStateParams): SessionState['ai'] {
   };
 }
 
-export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionState['ai']['unitsAll'] {
-  const preset = options.aiPreset ?? null;
-  if (Array.isArray(preset?.deck) && preset.deck.length) {
+function normalizeAiPresetDeckLists(preset: MutableAiPreset): MutableAiPreset {
+  if (Array.isArray(preset.deck)) preset.deck = normalizeDeckEntries(preset.deck);
+  if (Array.isArray(preset.unitsAll)) preset.unitsAll = normalizeDeckEntries(preset.unitsAll);
+  return preset;
+}
+
+function getAiPresetDeckEntries(
+  preset: ResolveEnemyUnitsOptions['aiPreset'] | null | undefined,
+): SessionState['ai']['unitsAll'] | null {
+  if (!preset) return null;
+  if (Array.isArray(preset.deck) && preset.deck.length) {
     return normalizeDeckEntries(preset.deck);
   }
-  if (Array.isArray(preset?.unitsAll) && preset.unitsAll.length) {
+  if (Array.isArray(preset.unitsAll) && preset.unitsAll.length) {
     return normalizeDeckEntries(preset.unitsAll);
   }
+  return null;
+}
+
+export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionState['ai']['unitsAll'] {
+  const presetDeck = getAiPresetDeckEntries(options.aiPreset);
+  if (presetDeck) return presetDeck;
   const deckInput = options.preferredDeck ?? options.fallbackDeck;
-  const lineupDeck = toDeckEntries(deckInput);
+  const lineupDeck = deckInput ? toDeckEntries(deckInput) : EMPTY_UNIT_DECK;
   const progressById = options.unitProgressById
     ?? (lineupDeck.length > 0
       ? mapUnitProgressById(options.collectionState ?? null)
@@ -431,10 +447,7 @@ export function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessi
     out.collectionState = null;
   }
   if (out.aiPreset) {
-    const preset = { ...out.aiPreset };
-    if (Array.isArray(preset.deck)) preset.deck = normalizeDeckEntries(preset.deck);
-    if (Array.isArray(preset.unitsAll)) preset.unitsAll = normalizeDeckEntries(preset.unitsAll);
-    out.aiPreset = preset;
+    out.aiPreset = normalizeAiPresetDeckLists({ ...out.aiPreset });
   }
   return out;
 }

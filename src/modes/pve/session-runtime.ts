@@ -19,6 +19,7 @@ type RewardList = ReadonlyArray<RewardRoll>;
 type MutableRewardList = RewardRoll[];
 type RewardListContainer = SessionRuntimeState | EncounterState;
 type RewardListKey = 'rewardQueue' | 'pendingRewards';
+type RewardIndexById = Map<string, number>;
 const NOOP_UNSUBSCRIBE = (): void => {};
 const SMALL_REWARD_MERGE_SIZE = 6;
 const SANITIZED_REWARD_LIST = Symbol('sanitized-reward-list');
@@ -27,7 +28,7 @@ const WAVE_REWARD_CACHE = new WeakMap<WaveState, SanitizedRewardList>();
 
 type SanitizedRewardList = MutableRewardList & {
   [SANITIZED_REWARD_LIST]?: true;
-  [REWARD_INDEX_BY_ID]?: Map<string, number>;
+  [REWARD_INDEX_BY_ID]?: RewardIndexById;
 };
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
@@ -70,33 +71,12 @@ function getMutableRewardList(container: RewardListContainer, key: RewardListKey
 function mergeRewardsInPlace(list: SanitizedRewardList, additions: RewardList): SanitizedRewardList {
   if (!additions.length) return list;
   const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
-  const indexById = useIndexedMerge
-    ? (list[REWARD_INDEX_BY_ID] ?? new Map<string, number>())
-    : null;
-  if (indexById) {
-    if (indexById.size === 0) {
-      for (let index = 0; index < list.length; index += 1) {
-        const entry = list[index];
-        if (entry) indexById.set(entry.id, index);
-      }
-    }
-    list[REWARD_INDEX_BY_ID] = indexById;
-  }
+  const indexById = useIndexedMerge ? getRewardIndexById(list) : null;
 
   for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
     const reward = additions[addIndex];
     if (!reward) continue;
-    let existingIndex: number | undefined;
-    if (indexById) {
-      existingIndex = indexById.get(reward.id);
-    } else {
-      for (let listIndex = 0; listIndex < list.length; listIndex += 1) {
-        if (list[listIndex]?.id === reward.id) {
-          existingIndex = listIndex;
-          break;
-        }
-      }
-    }
+    const existingIndex = resolveRewardIndex(list, reward.id, indexById);
 
     if (existingIndex == null) {
       if (indexById) indexById.set(reward.id, list.length);
@@ -108,12 +88,24 @@ function mergeRewardsInPlace(list: SanitizedRewardList, additions: RewardList): 
   return list;
 }
 
-function getRewardIndexById(list: SanitizedRewardList): Map<string, number> {
+function resolveRewardIndex(
+  list: SanitizedRewardList,
+  rewardId: string,
+  indexById: RewardIndexById | null,
+): number | undefined {
+  if (indexById) return indexById.get(rewardId);
+  for (let index = 0; index < list.length; index += 1) {
+    if (list[index]?.id === rewardId) return index;
+  }
+  return undefined;
+}
+
+function getRewardIndexById(list: SanitizedRewardList): RewardIndexById {
   const existingIndex = list[REWARD_INDEX_BY_ID];
   if (existingIndex) return existingIndex;
-  const indexById = new Map<string, number>();
+  const indexById: RewardIndexById = new Map<string, number>();
   for (let index = 0; index < list.length; index += 1) {
-  const reward = list[index];
+   const reward = list[index];
     if (reward) indexById.set(reward.id, index);
   }
   list[REWARD_INDEX_BY_ID] = indexById;
@@ -122,20 +114,20 @@ function getRewardIndexById(list: SanitizedRewardList): Map<string, number> {
 
 function removeRewardById(list: SanitizedRewardList, rewardId: string): SanitizedRewardList {
   const useIndexedRemoval = list.length > SMALL_REWARD_MERGE_SIZE;
-  let index = -1;
-  if (useIndexedRemoval) {
-    index = getRewardIndexById(list).get(rewardId) ?? -1;
-  } else {
-    for (let scanIndex = 0; scanIndex < list.length; scanIndex += 1) {
-      if (list[scanIndex]?.id === rewardId) {
-        index = scanIndex;
-        break;
-      }
-    }
-  }
-  if (index >= 0) {
+  const indexById = useIndexedRemoval ? getRewardIndexById(list) : null;
+  const index = resolveRewardIndex(list, rewardId, indexById);
+  if (index != null) {
     list.splice(index, 1);
-    list[REWARD_INDEX_BY_ID] = undefined;
+    if (indexById) {
+      indexById.delete(rewardId);
+      for (let listIndex = index; listIndex < list.length; listIndex += 1) {
+        const reward = list[listIndex];
+        if (reward) indexById.set(reward.id, listIndex);
+      }
+      list[REWARD_INDEX_BY_ID] = indexById;
+    } else {
+      list[REWARD_INDEX_BY_ID] = undefined;
+    }
   }
   return list;
 }
@@ -171,6 +163,10 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
   if (!encounter) {
     runtime.wave = null;
     return null;
+  }
+  if (encounter.status === 'completed') {
+    runtime.wave = null;
+    return encounter;
   }
 
   const waves = Array.isArray(encounter.waves) ? encounter.waves : [];
