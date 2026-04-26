@@ -66,4 +66,43 @@ describe('pve session turn-order cluster', () => {
       CFG.turnOrder.sides = originalSides;
     }
   });
+
+  test('buildTurnOrder fallback sides mặc định khi cấu hình sides rác/empty', () => {
+    const originalPairScan = CFG.turnOrder.pairScan;
+    const originalSides = CFG.turnOrder.sides;
+    try {
+      CFG.turnOrder.pairScan = [] as any;
+      CFG.turnOrder.sides = ['invalid-side'] as any;
+
+      const { order } = buildTurnOrder();
+      expect(order[0]).toEqual({ side: 'ally', slot: 1 });
+      expect(order[1]).toEqual({ side: 'enemy', slot: 1 });
+      expect(order[order.length - 2]).toEqual({ side: 'ally', slot: 9 });
+      expect(order[order.length - 1]).toEqual({ side: 'enemy', slot: 9 });
+      expect(order).toHaveLength(18);
+    } finally {
+      CFG.turnOrder.pairScan = originalPairScan;
+      CFG.turnOrder.sides = originalSides;
+    }
+  });
+
+  test('buildTurnOrder fallback khi sides là mảng rỗng', () => {
+    const originalPairScan = CFG.turnOrder.pairScan;
+    const originalSides = CFG.turnOrder.sides;
+    try {
+      CFG.turnOrder.pairScan = [1] as any;
+      CFG.turnOrder.sides = [] as any;
+
+      const { order } = buildTurnOrder();
+      expect(order).toEqual([
+        { side: 'ally', slot: 1 },
+        { side: 'enemy', slot: 1 },
+      ]);
+    } finally {
+      CFG.turnOrder.pairScan = originalPairScan;
+      CFG.turnOrder.sides = originalSides;
+    }
+  });
+
+  
 });

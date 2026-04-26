@@ -33,8 +33,6 @@ type SanitizedRewardList = MutableRewardList & {
   [REWARD_INDEX_BY_ID]?: RewardIndexById;
 };
 
-type RewardListMutator = (list: SanitizedRewardList) => void;
-
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   if (!entry || typeof entry !== 'object') return false;
   if (typeof entry.id !== 'string' || !entry.id.length) return false;
@@ -77,16 +75,20 @@ function ensureSanitizedRewardList<K extends keyof RewardListOwnerByKey>(
   return list;
 }
 
-function forEachRuntimeRewardList(
+function applyRuntimeRewardListMutation(
   runtime: SessionRuntimeState,
-  mutator: RewardListMutator,
+  payload: RewardList | string,
+  mutation: 'merge' | 'remove',
 ): void {
   const rewardQueue = ensureSanitizedRewardList(runtime, 'rewardQueue');
-  mutator(rewardQueue);
+  if (mutation === 'merge') mergeRewardsInPlace(rewardQueue, payload as RewardList);
+  else removeRewardById(rewardQueue, payload as string);
   const encounter = runtime.encounter;
   if (!encounter) return;
   const pendingRewards = ensureSanitizedRewardList(encounter, 'pendingRewards');
-  if (pendingRewards !== rewardQueue) mutator(pendingRewards);
+  if (pendingRewards === rewardQueue) return;
+  if (mutation === 'merge') mergeRewardsInPlace(pendingRewards, payload as RewardList);
+  else removeRewardById(pendingRewards, payload as string);
 }
 
 function findRewardIndex(list: SanitizedRewardList, rewardId: string): number {
@@ -99,29 +101,19 @@ function findRewardIndex(list: SanitizedRewardList, rewardId: string): number {
 function mergeRewardsInPlace(list: SanitizedRewardList, additions: RewardList): SanitizedRewardList {
   if (!additions.length) return list;
   const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
+  const indexById = useIndexedMerge ? getRewardIndexById(list) : null;
 
-  if (!useIndexedMerge) {
-    for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
-      const reward = additions[addIndex]!;
-      const existingIndex = findRewardIndex(list, reward.id);
-      if (existingIndex < 0) list.push(reward);
-      else list[existingIndex] = reward;
-    }
-    list[REWARD_INDEX_BY_ID] = undefined;
-    return list;
-  }
-
-  const indexById = getRewardIndexById(list);
   for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
     const reward = additions[addIndex]!;
-    const existingIndex = indexById.get(reward.id);
-    if (existingIndex == null) {
-      indexById.set(reward.id, list.length);
+    const existingIndex = indexById ? (indexById.get(reward.id) ?? -1) : findRewardIndex(list, reward.id);
+    if (existingIndex < 0) {
+      if (indexById) indexById.set(reward.id, list.length);
       list.push(reward);
     } else {
       list[existingIndex] = reward;
     }
   }
+  if (!indexById) list[REWARD_INDEX_BY_ID] = undefined;
   return list;
 }
 
@@ -157,15 +149,11 @@ function removeRewardById(list: SanitizedRewardList, rewardId: string): Sanitize
 }
 
 function syncWaveRewards(runtime: SessionRuntimeState, rewards: RewardList): void {
-  forEachRuntimeRewardList(runtime, (list) => {
-    mergeRewardsInPlace(list, rewards);
-  });
+  applyRuntimeRewardListMutation(runtime, rewards, 'merge');
 }
 
 function removeRewardEverywhere(runtime: SessionRuntimeState, rewardId: string): void {
-  forEachRuntimeRewardList(runtime, (list) => {
-    removeRewardById(list, rewardId);
-  });
+  applyRuntimeRewardListMutation(runtime, rewardId, 'remove');
 }
 
 function markEncounterCompleted(runtime: SessionRuntimeState, encounter: EncounterState): EncounterState {

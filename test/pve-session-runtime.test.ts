@@ -137,6 +137,25 @@ describe('pve session runtime reward + wave flow', () => {
     expect(session.runtime.rewardQueue).toEqual([{ id: 'gold', weight: 1, tier: 1 }]);
   });
 
+  test('chuẩn hóa reward list về cùng luồng xử lý khi rewardQueue/pendingRewards bị lệch kiểu dữ liệu', () => {
+    const reward = { id: 'gem', weight: 1, tier: 1 };
+    const session: any = {
+      runtime: {
+        rewardQueue: null,
+        encounter: {
+          status: 'running',
+          waveIndex: 0,
+          pendingRewards: { id: 'not-an-array' },
+          waves: [{ status: 'active', rewards: [reward] }],
+        },
+      },
+    };
+
+    expect(advanceSession(session)?.status).toBe('completed');
+    expect(session.runtime.rewardQueue).toEqual([reward]);
+    expect(session.runtime.encounter.pendingRewards).toEqual([reward]);
+  });
+
   test('applyReward không remove lặp khi rewardQueue và pendingRewards trỏ cùng mảng', () => {
     const sharedRewards = [
       { id: 'gold', weight: 1, tier: 1 },

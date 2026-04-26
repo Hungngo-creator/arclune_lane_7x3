@@ -127,6 +127,7 @@ export function getPreferredDeckEntries(config: {
 
 type TurnOrderEntry = { side: Side; slot: number };
 const TURN_ORDER_FALLBACK_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+const DEFAULT_TURN_ORDER_SIDES = ['ally', 'enemy'] as const satisfies ReadonlyArray<TurnOrderSide>;
 
 type BackgroundConfig = ReturnType<typeof getEnvironmentBackground>;
 
@@ -481,6 +482,18 @@ function isTurnOrderSide(value: unknown): value is TurnOrderSide {
   return value === 'ally' || value === 'enemy';
 }
 
+function resolveTurnOrderSides(rawSides: unknown): readonly TurnOrderSide[] {
+  if (!Array.isArray(rawSides) || rawSides.length === 0) {
+    return DEFAULT_TURN_ORDER_SIDES;
+  }
+  const sides: TurnOrderSide[] = [];
+  for (let index = 0; index < rawSides.length; index += 1) {
+    const side = rawSides[index];
+    if (isTurnOrderSide(side)) sides.push(side);
+  }
+  return sides.length > 0 ? sides : DEFAULT_TURN_ORDER_SIDES;
+}
+
 function isPairScanTuple(entry: readonly unknown[]): entry is readonly [string, number] {
   return entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1]);
 }
@@ -582,10 +595,7 @@ function createSequentialTurnSnapshot(): TurnSnapshot {
 
 export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<string, number> } {
   const cfg = CFG.turnOrder;
-  const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
-  const sides = rawSides && rawSides.length
-    ? rawSides.filter((side: unknown): side is TurnOrderSide => isTurnOrderSide(side))
-    : (['ally', 'enemy'] as const satisfies ReadonlyArray<TurnOrderSide>);
+  const sides = resolveTurnOrderSides(cfg.sides);
   const order: TurnOrderEntry[] = [];
   const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
   for (let index = 0; index < scan.length; index += 1) {
@@ -593,7 +603,7 @@ export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<strin
   }
   if (!order.length) {
     for (const slot of TURN_ORDER_FALLBACK_SLOTS) {
-      appendNormalizedPairScanEntry(order, slot, sides);
+      pushTurnOrderForSides(order, sides, slot);
     }
   }
 

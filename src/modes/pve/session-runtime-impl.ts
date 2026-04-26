@@ -2998,8 +2998,10 @@ function init(): boolean {
   };
 
   const updateTimerAndCost = (timestamp?: number): void => {
-    if (!CLOCK || !Game) return;
-    if (Game.battle?.over) return;
+    if (!CLOCK) return;
+    const game = Game;
+    if (!game) return;
+    if (game.battle?.over) return;
 
     const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
     const safeNowMs = safeNow();
@@ -3163,7 +3165,7 @@ function init(): boolean {
       CLOCK.lastTimerRemain = remainDisplay;
 
       if (remainSecPrecise <= 0 && prevRemainDisplay > 0){
-        const timeoutResult = runBattleEndCheck('timeout', sessionNowMs, remainDisplay);
+      const timeoutResult = runBattleEndCheck('timeout', sessionNowMs, remainDisplay);
         if (timeoutResult) return;
       }
 
@@ -3189,26 +3191,26 @@ function init(): boolean {
 
       let costChanged = false;
       if (costGranted > 0){
-        costChanged = applyCostGain(Game, costGranted) || costChanged;
-        costChanged = applyCostGain(Game.ai, costGranted) || costChanged;
+        costChanged = applyCostGain(game, costGranted) || costChanged;
+        costChanged = applyCostGain(game.ai, costGranted) || costChanged;
       }
 
         if (costChanged){
-        if (hud) hud.update(Game);
-        if (!Game.selectedId) selectFirstAffordable();
+        if (hud) hud.update(game);
+        if (!game.selectedId) selectFirstAffordable();
         renderSummonBar();
-        aiMaybeAct(Game, 'cost');
+        aiMaybeAct(game, 'cost');
       }
       syncLeaderUltControls();
 
       CLOCK.lastLogicMs = sessionNowMs;
 
-      if (Game.battle?.over) return;
+      if (game.battle?.over) return;
       if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
         return;
       }
 
-      let turnState = Game.turn ?? null;
+      let turnState = game.turn ?? null;
       let busyUntil = normalizeTurnBusyUntil(turnState);
 
       const stallDeltaEpsilon = 1;
@@ -3236,7 +3238,7 @@ function init(): boolean {
           CLOCK.lastTurnStepMs += turnEveryMs;
           elapsedForTurn -= turnEveryMs;
           turnsProcessed += 1;
-          stepTurn(Game, stepTurnContext);
+          stepTurn(game, stepTurnContext);
           if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
             return;
           }
@@ -3246,11 +3248,11 @@ function init(): boolean {
           if (runBattleEndCheck('post-turn', sessionNowMs)) {
             return;
           }
-          aiMaybeAct(Game, 'board');
-          if (Game.battle?.over) {
+          aiMaybeAct(game, 'board');
+          if (game.battle?.over) {
             return;
           }
-          turnState = Game.turn ?? null;
+          turnState = game.turn ?? null;
           busyUntil = normalizeTurnBusyUntil(turnState);
           readyByBusy = sessionNowMs >= busyUntil;
         }
@@ -3302,11 +3304,12 @@ function init(): boolean {
 }
 
 function selectFirstAffordable(): void {
-  if (!Game) return;
+  const game = Game;
+  if (!game) return;
 
-  const deck = ensureDeck(Game);
+  const deck = ensureDeck(game);
   if (!deck.length){
-    Game.selectedId = null;
+    game.selectedId = null;
     return;
   }
 
@@ -3326,7 +3329,7 @@ function selectFirstAffordable(): void {
       cheapestOverallCost = cardCost;
     }
 
-    const affordable = cardCost <= Game.cost;
+    const affordable = cardCost <= game.cost;
     if (affordable && cardCost < cheapestAffordableCost){
       cheapestAffordable = card;
       cheapestAffordableCost = cardCost;
@@ -3334,20 +3337,21 @@ function selectFirstAffordable(): void {
   }
 
   const chosen = (cheapestAffordable || cheapestOverall) ?? null;
-  Game.selectedId = chosen ? chosen.id : null;
+  game.selectedId = chosen ? chosen.id : null;
 }
 
 /* ---------- Deck logic ---------- */
 function refillDeck(): void {
-  if (!Game) return;
+  const game = Game;
+  if (!game) return;
 
-  const deck = ensureDeck(Game);
+  const deck = ensureDeck(game);
   const need = HAND_SIZE - deck.length;
   if (need <= 0) return;
 
   const exclude = refillDeckExcludeIds;
   exclude.clear();
-  for (const id of Game.usedUnitIds) {
+  for (const id of game.usedUnitIds) {
     exclude.add(id);
   }
   for (let i = 0; i < deck.length; i += 1) {
@@ -3355,10 +3359,10 @@ function refillDeck(): void {
     if (!entry?.id) continue;
     exclude.add(entry.id);
   }
-  const lockedDeck = ensureLockedPlayerDeck(Game);
+  const lockedDeck = ensureLockedPlayerDeck(game);
   const more = pickRandom(lockedDeck, exclude, need);
   deck.push(...more);
-  Game.deck3 = deck;
+  game.deck3 = deck;
 }
 
 /* ---------- Vẽ ---------- */

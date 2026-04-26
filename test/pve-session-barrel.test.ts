@@ -16,5 +16,6 @@ describe('pve session barrel exports', () => {
     expect(sessionModule.sessionState.createSession).toBe(createSession);
     expect(sessionModule.sessionModules.sessionRuntime.advanceSession).toBe(advanceSession);
     expect(sessionModule.sessionModules.sessionState.createSession).toBe(createSession);
+    expect(Object.isFrozen(sessionModule.sessionModules)).toBe(true);
   });
 });

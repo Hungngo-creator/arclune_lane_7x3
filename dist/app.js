@@ -17523,9 +17523,12 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return checkBattleEndResult(Game, battleCheckInfo);
       };
       const updateTimerAndCost = (timestamp) => {
-          if (!CLOCK || !Game)
+          if (!CLOCK)
               return;
-          if (Game.battle?.over)
+          const game = Game;
+          if (!game)
+              return;
+          if (game.battle?.over)
               return;
           const turnEveryMs = resolveClockTurnIntervalMs(CLOCK);
           const safeNowMs = safeNow();
@@ -17699,25 +17702,25 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           CLOCK.lastCostCreditedSec = Math.max(lastCredited, elapsedSecPrecise);
           let costChanged = false;
           if (costGranted > 0) {
-              costChanged = applyCostGain(Game, costGranted) || costChanged;
-              costChanged = applyCostGain(Game.ai, costGranted) || costChanged;
+              costChanged = applyCostGain(game, costGranted) || costChanged;
+              costChanged = applyCostGain(game.ai, costGranted) || costChanged;
           }
           if (costChanged) {
               if (hud)
-                  hud.update(Game);
-              if (!Game.selectedId)
+                  hud.update(game);
+              if (!game.selectedId)
                   selectFirstAffordable();
               renderSummonBar();
-              aiMaybeAct(Game, 'cost');
+              aiMaybeAct(game, 'cost');
           }
           syncLeaderUltControls();
           CLOCK.lastLogicMs = sessionNowMs;
-          if (Game.battle?.over)
+          if (game.battle?.over)
               return;
           if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
               return;
           }
-          let turnState = Game.turn ?? null;
+          let turnState = game.turn ?? null;
           let busyUntil = normalizeTurnBusyUntil(turnState);
           const stallDeltaEpsilon = 1;
           const initialTurnBaseline = Number.isFinite(CLOCK.startMs)
@@ -17742,7 +17745,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   CLOCK.lastTurnStepMs += turnEveryMs;
                   elapsedForTurn -= turnEveryMs;
                   turnsProcessed += 1;
-                  stepTurn(Game, stepTurnContext);
+                  stepTurn(game, stepTurnContext);
                   if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
                       return;
                   }
@@ -17752,11 +17755,11 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   if (runBattleEndCheck('post-turn', sessionNowMs)) {
                       return;
                   }
-                  aiMaybeAct(Game, 'board');
-                  if (Game.battle?.over) {
+                  aiMaybeAct(game, 'board');
+                  if (game.battle?.over) {
                       return;
                   }
-                  turnState = Game.turn ?? null;
+                  turnState = game.turn ?? null;
                   busyUntil = normalizeTurnBusyUntil(turnState);
                   readyByBusy = sessionNowMs >= busyUntil;
               }
@@ -17810,11 +17813,12 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       return true;
   }
   function selectFirstAffordable() {
-      if (!Game)
+      const game = Game;
+      if (!game)
           return;
-      const deck = ensureDeck(Game);
+      const deck = ensureDeck(game);
       if (!deck.length) {
-          Game.selectedId = null;
+          game.selectedId = null;
           return;
       }
       let cheapestAffordable = null;
@@ -17830,26 +17834,27 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               cheapestOverall = card;
               cheapestOverallCost = cardCost;
           }
-          const affordable = cardCost <= Game.cost;
+          const affordable = cardCost <= game.cost;
           if (affordable && cardCost < cheapestAffordableCost) {
               cheapestAffordable = card;
               cheapestAffordableCost = cardCost;
           }
       }
       const chosen = (cheapestAffordable || cheapestOverall) ?? null;
-      Game.selectedId = chosen ? chosen.id : null;
+      game.selectedId = chosen ? chosen.id : null;
   }
   /* ---------- Deck logic ---------- */
   function refillDeck() {
-      if (!Game)
+      const game = Game;
+      if (!game)
           return;
-      const deck = ensureDeck(Game);
+      const deck = ensureDeck(game);
       const need = HAND_SIZE - deck.length;
       if (need <= 0)
           return;
       const exclude = refillDeckExcludeIds;
       exclude.clear();
-      for (const id of Game.usedUnitIds) {
+      for (const id of game.usedUnitIds) {
           exclude.add(id);
       }
       for (let i = 0; i < deck.length; i += 1) {
@@ -17858,10 +17863,10 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               continue;
           exclude.add(entry.id);
       }
-      const lockedDeck = ensureLockedPlayerDeck(Game);
+      const lockedDeck = ensureLockedPlayerDeck(game);
       const more = pickRandom(lockedDeck, exclude, need);
       deck.push(...more);
-      Game.deck3 = deck;
+      game.deck3 = deck;
   }
   /* ---------- Vẽ ---------- */
   function resize() {
@@ -18953,15 +18958,22 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       ownerRecord[key] = list;
       return list;
   }
-  function forEachRuntimeRewardList(runtime, mutator) {
+  function applyRuntimeRewardListMutation(runtime, payload, mutation) {
       const rewardQueue = ensureSanitizedRewardList(runtime, 'rewardQueue');
-      mutator(rewardQueue);
+      if (mutation === 'merge')
+          mergeRewardsInPlace(rewardQueue, payload);
+      else
+          removeRewardById(rewardQueue, payload);
       const encounter = runtime.encounter;
       if (!encounter)
           return;
       const pendingRewards = ensureSanitizedRewardList(encounter, 'pendingRewards');
-      if (pendingRewards !== rewardQueue)
-          mutator(pendingRewards);
+      if (pendingRewards === rewardQueue)
+          return;
+      if (mutation === 'merge')
+          mergeRewardsInPlace(pendingRewards, payload);
+      else
+          removeRewardById(pendingRewards, payload);
   }
   function findRewardIndex(list, rewardId) {
       for (let index = 0; index < list.length; index += 1) {
@@ -18974,30 +18986,21 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       if (!additions.length)
           return list;
       const useIndexedMerge = list.length > SMALL_REWARD_MERGE_SIZE || additions.length > SMALL_REWARD_MERGE_SIZE;
-      if (!useIndexedMerge) {
-          for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
-              const reward = additions[addIndex];
-              const existingIndex = findRewardIndex(list, reward.id);
-              if (existingIndex < 0)
-                  list.push(reward);
-              else
-                  list[existingIndex] = reward;
-          }
-          list[REWARD_INDEX_BY_ID] = undefined;
-          return list;
-      }
-      const indexById = getRewardIndexById(list);
+      const indexById = useIndexedMerge ? getRewardIndexById(list) : null;
       for (let addIndex = 0; addIndex < additions.length; addIndex += 1) {
           const reward = additions[addIndex];
-          const existingIndex = indexById.get(reward.id);
-          if (existingIndex == null) {
-              indexById.set(reward.id, list.length);
+          const existingIndex = indexById ? (indexById.get(reward.id) ?? -1) : findRewardIndex(list, reward.id);
+          if (existingIndex < 0) {
+              if (indexById)
+                  indexById.set(reward.id, list.length);
               list.push(reward);
           }
           else {
               list[existingIndex] = reward;
           }
       }
+      if (!indexById)
+          list[REWARD_INDEX_BY_ID] = undefined;
       return list;
   }
   function getRewardIndexById(list) {
@@ -19032,14 +19035,10 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       return list;
   }
   function syncWaveRewards(runtime, rewards) {
-      forEachRuntimeRewardList(runtime, (list) => {
-          mergeRewardsInPlace(list, rewards);
-      });
+      applyRuntimeRewardListMutation(runtime, rewards, 'merge');
   }
   function removeRewardEverywhere(runtime, rewardId) {
-      forEachRuntimeRewardList(runtime, (list) => {
-          removeRewardById(list, rewardId);
-      });
+      applyRuntimeRewardListMutation(runtime, rewardId, 'remove');
   }
   function markEncounterCompleted(runtime, encounter) {
       encounter.status = 'completed';
@@ -19249,6 +19248,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       return toDeckEntries(pickFirstDeckInput(config));
   }
   const TURN_ORDER_FALLBACK_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const DEFAULT_TURN_ORDER_SIDES = ['ally', 'enemy'];
   function getSceneConfig(cfg) {
       if (!cfg || typeof cfg !== 'object')
           return null;
@@ -19521,6 +19521,18 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   function isTurnOrderSide(value) {
       return value === 'ally' || value === 'enemy';
   }
+  function resolveTurnOrderSides(rawSides) {
+      if (!Array.isArray(rawSides) || rawSides.length === 0) {
+          return DEFAULT_TURN_ORDER_SIDES;
+      }
+      const sides = [];
+      for (let index = 0; index < rawSides.length; index += 1) {
+          const side = rawSides[index];
+          if (isTurnOrderSide(side))
+              sides.push(side);
+      }
+      return sides.length > 0 ? sides : DEFAULT_TURN_ORDER_SIDES;
+  }
   function isPairScanTuple(entry) {
       return entry.length === 2 && typeof entry[0] === 'string' && Number.isFinite(entry[1]);
   }
@@ -19607,10 +19619,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   }
   function buildTurnOrder() {
       const cfg = CFG.turnOrder;
-      const rawSides = Array.isArray(cfg.sides) ? cfg.sides : null;
-      const sides = rawSides && rawSides.length
-          ? rawSides.filter((side) => isTurnOrderSide(side))
-          : ['ally', 'enemy'];
+      const sides = resolveTurnOrderSides(cfg.sides);
       const order = [];
       const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
       for (let index = 0; index < scan.length; index += 1) {
@@ -19618,7 +19627,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       }
       if (!order.length) {
           for (const slot of TURN_ORDER_FALLBACK_SLOTS) {
-              appendNormalizedPairScanEntry(order, slot, sides);
+              pushTurnOrderForSides(order, sides, slot);
           }
       }
       const indexMap = new Map();
@@ -19972,7 +19981,7 @@ __modules['./modes/pve/session.ts'] = (exports, module, __require) => {
   // Namespace re-exports giúp chuyển dần sang module nhỏ mà không vỡ import cũ.
   exports.sessionState = sessionState;
   exports.sessionRuntime = sessionRuntime;
-  const sessionModules = { sessionState, sessionRuntime };
+  const sessionModules = Object.freeze({ sessionState, sessionRuntime });
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'sessionModules')) exports.sessionModules = sessionModules;
 };
