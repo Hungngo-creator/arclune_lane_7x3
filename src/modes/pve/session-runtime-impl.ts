@@ -69,6 +69,7 @@ import { createSessionLoopController } from './session-loop';
 import { createSessionDeckController } from './session-deck';
 import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
 import { createSessionEventBindings } from './session-events';
+import { createSessionRenderController } from './session-render';
 import {
   ensureUyenState,
   getUyenUltChoice,
@@ -114,7 +115,6 @@ type PveSessionStartConfig = StartConfigOverrides & {
   rootEl?: RootLike;
 };
 
-type FrameHandle = number | ReturnType<typeof setTimeout>;
 type GradientValue = CanvasGradient | string;
 type CanvasClickHandler = (event: MouseEvent) => void;
 type ExtendedQueuedSummon = (QueuedSummonRequest & {
@@ -699,9 +699,6 @@ let viewportResizeDebugState: {
   offsetTop: number;
   offsetLeft: number;
 } | null = null;
-let resizeSchedulerHandle: FrameHandle | null = null;
-let resizeSchedulerUsesTimeout = false;
-let pendingResize = false;
 let canvasClickHandler: CanvasClickHandler | null = null;
 let winRef: (Window & typeof globalThis) | null = null;
 let docRef: Document | null = null;
@@ -983,158 +980,35 @@ if (CFG?.DEBUG?.LOG_EVENTS) {
   }
 });
 
-const toAnimationFrameHandle = (handle: FrameHandle): number | null => (
-  typeof handle === 'number' ? handle : null
-);
-
-let drawFrameHandle: FrameHandle | null = null;
-let drawFrameUsesTimeout = false;
-let drawPending = false;
-let drawPaused = false;
-
-function cancelScheduledDraw(): void {
-  if (drawFrameHandle !== null){
-    if (drawFrameUsesTimeout){
-      clearTimeout(drawFrameHandle);
-    } else {
-      const cancel = getCancelAnimationFrame();
-      const frameHandle = toAnimationFrameHandle(drawFrameHandle);
-      if (typeof cancel === 'function' && frameHandle !== null){
-        cancel(frameHandle);
-      }
-    }
-    drawFrameHandle = null;
-    drawFrameUsesTimeout = false;
-  }
-  drawPending = false;
-}
-
-function scheduleDraw(): void {
-  if (drawPaused) return;
-  if (drawPending) return;
-  if (!canvas || !ctx) return;
-  drawPending = true;
-  const raf = getRequestAnimationFrame();
-  const runDrawFrame = (): void => {
-    drawFrameHandle = null;
-    drawFrameUsesTimeout = false;
-    drawPending = false;
-    if (drawPaused) return;
-    try {
-      draw();
-    } catch (err) {
-      console.error('[draw]', err);
-    }
-    if (Game?.vfx && Game.vfx.length) scheduleDraw();
-  };
-  if (raf){
-    drawFrameUsesTimeout = false;
-    drawFrameHandle = raf(runDrawFrame);
-  } else {
-    drawFrameUsesTimeout = true;
-    drawFrameHandle = setTimeout(runDrawFrame, 16);
-  }
-}
-
-function cancelScheduledResize(): void {
-  if (resizeSchedulerHandle !== null){
-    if (resizeSchedulerUsesTimeout){
-      clearTimeout(resizeSchedulerHandle);
-    } else {
-      const cancel = getCancelAnimationFrame();
-      const frameHandle = toAnimationFrameHandle(resizeSchedulerHandle);
-      if (typeof cancel === 'function' && frameHandle !== null){
-        cancel(frameHandle);
-      }
-    }
-    resizeSchedulerHandle = null;
-    resizeSchedulerUsesTimeout = false;
-  }
-  pendingResize = false;
-}
-
-function flushScheduledResize(): void {
-  resizeSchedulerHandle = null;
-  resizeSchedulerUsesTimeout = false;
-  pendingResize = false;
-  try {
+const sessionRenderController = createSessionRenderController({
+  getCanvas: () => canvas,
+  getContext: () => ctx,
+  drawNow: () => { draw(); },
+  onDrawError: (err) => { console.error('[draw]', err); },
+  shouldKeepDrawing: () => Boolean(Game?.vfx && Game.vfx.length),
+  onResize: () => {
     resize();
     if (hud && typeof hud.update === 'function' && Game){
       hud.update(Game);
     }
-    scheduleDraw();
-  } catch (err) {
-    console.error('[resize]', err);
-  }
-}
+},
+  onResizeError: (err) => { console.error('[resize]', err); },
+  getRequestAnimationFrame,
+  getCancelAnimationFrame,
+  getWindowRef: () => winRef,
+  getViewportResizeDebugState: () => viewportResizeDebugState,
+  setViewportResizeDebugState: (state) => { viewportResizeDebugState = state; },
+  isAetherDebugEnabled: () => AETHER_DEBUG_FLAG,
+});
 
-function scheduleResize(): void {
-  if (pendingResize) return;
-  pendingResize = true;
-  const raf = getRequestAnimationFrame();
-  if (raf){
-    resizeSchedulerUsesTimeout = false;
-    resizeSchedulerHandle = raf(flushScheduledResize);
-  } else {
-    resizeSchedulerUsesTimeout = true;
-    resizeSchedulerHandle = setTimeout(flushScheduledResize, 32);
-  }
-}
-
-function scheduleViewportResizeIfChanged(reason: 'resize' | 'scroll'): void {
-  const viewport = winRef?.visualViewport;
-  if (!viewport) {
-    scheduleResize();
-    return;
-  }
-  const nextState = {
-    width: Number.isFinite(viewport.width) ? viewport.width : 0,
-    height: Number.isFinite(viewport.height) ? viewport.height : 0,
-    scale: Number.isFinite(viewport.scale) ? viewport.scale : 1,
-    offsetTop: Number.isFinite(viewport.offsetTop) ? viewport.offsetTop : 0,
-    offsetLeft: Number.isFinite(viewport.offsetLeft) ? viewport.offsetLeft : 0,
-  };
-
-  const prev = viewportResizeDebugState;
-  viewportResizeDebugState = nextState;
-  if (!prev) {
-    scheduleResize();
-    return;
-  }
-
-  const widthChanged = Math.abs(nextState.width - prev.width) >= 1;
-  const heightChanged = Math.abs(nextState.height - prev.height) >= 1;
-  const scaleChanged = Math.abs(nextState.scale - prev.scale) >= 0.01;
-  const offsetChanged = Math.abs(nextState.offsetTop - prev.offsetTop) >= 1
-    || Math.abs(nextState.offsetLeft - prev.offsetLeft) >= 1;
-
-  if (AETHER_DEBUG_FLAG && reason === 'scroll' && (heightChanged || scaleChanged || offsetChanged)) {
-    console.debug('[aether-debug][viewport-scroll]', {
-      widthChanged,
-      heightChanged,
-      scaleChanged,
-      offsetChanged,
-      prev,
-      next: nextState,
-    });
-  }
-
-  if (widthChanged || heightChanged || scaleChanged || reason === 'resize') {
-    scheduleResize();
-    return;
-  }
-
-  const debugEnabled = !!(winRef && (winRef as unknown as { __ARC_DEBUG_VIEWPORT__?: boolean }).__ARC_DEBUG_VIEWPORT__);
-  if (debugEnabled && reason === 'scroll' && typeof console !== 'undefined' && typeof console.debug === 'function'){
-    console.debug('[pve][viewport-scroll] skip resize: size unchanged', {
-      width: nextState.width,
-      height: nextState.height,
-      scale: nextState.scale,
-      offsetTop: nextState.offsetTop,
-      offsetLeft: nextState.offsetLeft,
-    });
-  }
-}
+const {
+  cancelScheduledDraw,
+  scheduleDraw,
+  cancelScheduledResize,
+  scheduleResize,
+  scheduleViewportResizeIfChanged,
+  setDrawPaused,
+} = sessionRenderController;
 
 const DEFAULT_TOKEN_COLOR = '#a9f58c';
 
@@ -1221,14 +1095,6 @@ function setUnitSkinForSession(unitId: string, skinKey: string | null | undefine
   return true;
 }
 
-function setDrawPaused(paused: boolean): void {
-  drawPaused = !!paused;
-  if (drawPaused){
-    cancelScheduledDraw();
-  } else {
-    scheduleDraw();
-  }
-}
 const creepDeathHealProcessed = new Set<string>();
 const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
 const normalizedTagsByUnitId = new Map<string, string[]>();
@@ -3436,43 +3302,6 @@ function drawHPBars(): void {
 }
 /* ---------- Chạy ---------- */
 
-function queryElementFromRoot(selector: string): Element | null {
-  const root = rootElement ?? null;
-  if (root && typeof (root as ParentNode).querySelector === 'function'){
-    const el = (root as ParentNode).querySelector(selector);
-    if (el) return el;
-  }
-  return null;
-}
-
-function resolveTimerElement(): void {
-  const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
-  if (!doc){
-    timerElement = null;
-    return;
-  }
-  timerElement = (queryElementFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null;
-}
-
-function isDocumentNode(value: Element | Document): value is Document {
-  const documentNodeType = typeof Node !== 'undefined' ? Node.DOCUMENT_NODE : 9;
-  return value.nodeType === documentNodeType;
-}
-
-function configureRoot(root: RootLike): void {
-  rootElement = root || null;
-  if (rootElement && rootElement.ownerDocument){
-    docRef = rootElement.ownerDocument;
-  } else if (rootElement && isDocumentNode(rootElement)){
-    docRef = rootElement;
-  } else {
-    docRef = typeof document !== 'undefined' ? document : null;
-  }
-  winRef = docRef?.defaultView ?? (typeof window !== 'undefined' ? window : null);
- refreshAnimationFrameFns();
-  resolveTimerElement();
-}
-
 const sessionEventBindings = createSessionEventBindings({
   getDocRef: () => docRef,
   getWinRef: () => winRef,
@@ -3560,10 +3389,10 @@ const sessionEventBindings = createSessionEventBindings({
     running = false;
     invalidateSceneCache();
   },
-  configureRoot: () => {
-    configureRoot(rootElement);
-  },
-  resolveTimerElement,
+  getRootElement: () => rootElement,
+  setDocRef: (next) => { docRef = next; },
+  setWinRef: (next) => { winRef = next; },
+  refreshAnimationFrameFns: () => { refreshAnimationFrameFns(); },
   normalizeStartConfig: (config: Record<string, unknown>) => toNormalizedSessionConfig(config),
   isRunning: () => running,
   resetSessionState: (config: unknown) => {
@@ -3579,6 +3408,7 @@ const sessionEventBindings = createSessionEventBindings({
 
 const {
   clearSessionTimers,
+  configureRoot,
   stopSession,
   startSession,
 } = sessionEventBindings;

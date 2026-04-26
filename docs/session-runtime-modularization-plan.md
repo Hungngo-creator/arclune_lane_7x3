@@ -171,6 +171,16 @@ Di chuyển theo nguyên tắc **copy-move, không đổi hành vi**:
   - `bindAll()`, `unbindAll()`, `clearTimers()`, `disposeSessionDomRefs()`.
 - Giữ nguyên hành vi cleanup theo thứ tự hiện tại để tránh rò listener.
 
+### Scope tách tiếp theo cho `session-events` (bổ sung)
+
+- Ưu tiên move trước nhóm lifecycle DOM/root (ít rủi ro hành vi):
+  - `configureRoot`
+  - `resolveTimerElement`
+  - helper liên quan query root/document detection
+- Tiêu chí pass nhanh:
+  - `startSession/stopSession` vẫn giữ contract cũ.
+  - `createPveSession(...).start(...)` vẫn nhận root override và cập nhật timer element đúng.
+
 ## 4.3 `session-render`
 
 - Mục tiêu: tách draw scheduler + draw pipeline + status icon renderer.
@@ -178,6 +188,38 @@ Di chuyển theo nguyên tắc **copy-move, không đổi hành vi**:
   - `createSessionRenderController(deps)`
   - `scheduleDraw()`, `drawNow()`, `scheduleResize()`, `updateTooltip()`.
 - Reuse cache hiện tại (`hpBarGradientCache`, `statusIconCache`) thay vì tạo hệ cache mới.
+
+### Đánh giá hiện trạng `session-render` (bổ sung)
+
+1. **Mức phụ thuộc thực tế cao nhất nằm ở scheduler**, không phải `draw()`:
+   - `scheduleDraw/cancelScheduledDraw` đang chỉ cần `canvas`, `ctx`, `draw()`, RAF/timeout fallback.
+   - `scheduleResize/scheduleViewportResizeIfChanged` chỉ cần `resize()`, `hud.update`, `winRef.visualViewport`, debug flags.
+   - Đây là ứng viên tốt nhất để tách trước vì không đụng công thức render/token/status.
+2. **`draw()` hiện vẫn coupled mạnh với state runtime** (`Game`, `ctx`, grid/token queue, tooltip, status cache).
+   - Nếu move nguyên khối ngay sẽ kéo theo rất nhiều deps và tăng rủi ro behavior drift.
+3. **Kết luận tách theo 2 chặng**:
+   - **Chặng D1 (an toàn):** tách scheduler + viewport resize gate vào `session-render.ts`.
+   - **Chặng D2:** tách dần draw pipeline (`drawHPBars`, status icon aggregation, tooltip hitbox) sau khi có deps contract rõ.
+
+### Scope triển khai ngay cho D1 (đã khóa)
+
+- Move khỏi `session-runtime-impl.ts`:
+  - `cancelScheduledDraw`, `scheduleDraw`
+  - `cancelScheduledResize`, `scheduleResize`
+  - `scheduleViewportResizeIfChanged`
+  - `setDrawPaused`
+- Giữ lại ở impl:
+  - `draw()`, `drawHPBars`, status icon pipeline, gradient cache.
+- Wiring:
+  - tạo `createSessionRenderController(deps)` và destructure API ở impl.
+  - giữ nguyên listener gọi `scheduleDraw/scheduleResize` để không đổi luồng event.
+
+### Prompt QA re-run cho `session-render` (để chốt D1)
+
+> Re-run checklist sau khi tách D1:
+> 1. `session-runtime-impl.ts` không còn implementation trực tiếp của `scheduleDraw/cancelScheduledDraw/scheduleResize/cancelScheduledResize/scheduleViewportResizeIfChanged/setDrawPaused`.
+> 2. `session-render.ts` là single source cho scheduler logic.
+> 3. Event bindings và loop vẫn gọi cùng API scheduler như trước (không đổi luồng runtime).
 
 ---
 

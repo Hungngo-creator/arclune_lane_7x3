@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -15290,6 +15290,44 @@ __modules['./modes/pve/session-events.ts'] = (exports, module, __require) => {
           deps.clearHpBarGradientCache();
           deps.invalidateSceneCache();
       };
+      const queryElementFromRoot = (selector) => {
+          const root = deps.getRootElement() ?? null;
+          if (root && typeof root.querySelector === 'function') {
+              const el = root.querySelector(selector);
+              if (el)
+                  return el;
+          }
+          return null;
+      };
+      const resolveTimerElement = () => {
+          const doc = deps.getDocRef() ?? (typeof document !== 'undefined' ? document : null);
+          if (!doc) {
+              deps.setTimerElement(null);
+              return;
+          }
+          deps.setTimerElement((queryElementFromRoot('#timer') || doc.getElementById('timer')));
+      };
+      const isDocumentNode = (value) => {
+          const documentNodeType = typeof Node !== 'undefined' ? Node.DOCUMENT_NODE : 9;
+          return value.nodeType === documentNodeType;
+      };
+      const configureRoot = (root) => {
+          const nextRoot = root || null;
+          let nextDocRef = null;
+          if (nextRoot && nextRoot.ownerDocument) {
+              nextDocRef = nextRoot.ownerDocument;
+          }
+          else if (nextRoot && isDocumentNode(nextRoot)) {
+              nextDocRef = nextRoot;
+          }
+          else {
+              nextDocRef = typeof document !== 'undefined' ? document : null;
+          }
+          deps.setDocRef(nextDocRef);
+          deps.setWinRef(nextDocRef?.defaultView ?? (typeof window !== 'undefined' ? window : null));
+          deps.refreshAnimationFrameFns();
+          resolveTimerElement();
+      };
       const stopSession = () => {
           clearSessionTimers();
           clearSessionListeners();
@@ -15301,8 +15339,9 @@ __modules['./modes/pve/session-events.ts'] = (exports, module, __require) => {
       };
       const startSession = (config) => {
           const nextConfig = (typeof config === 'undefined' ? {} : config);
-          deps.configureRoot();
-          deps.resolveTimerElement();
+          configureRoot(deps.getRootElement());
+          resolveTimerElement();
+          ;
           const normalizedConfig = deps.normalizeStartConfig(nextConfig);
           if (deps.isRunning())
               stopSession();
@@ -15337,6 +15376,8 @@ __modules['./modes/pve/session-events.ts'] = (exports, module, __require) => {
           bindSession,
           bindRuntimeListeners,
           resetDomRefs,
+          configureRoot,
+          resolveTimerElement,
           stopSession,
           startSession,
       };
@@ -15667,6 +15708,180 @@ __modules['./modes/pve/session-loop.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionLoopController')) exports.createSessionLoopController = createSessionLoopController;
 };
+__modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
+  const toAnimationFrameHandle = (handle) => (typeof handle === 'number' ? handle : null);
+  const createSessionRenderController = (deps) => {
+      let drawFrameHandle = null;
+      let drawFrameUsesTimeout = false;
+      let drawPending = false;
+      let drawPaused = false;
+      let resizeSchedulerHandle = null;
+      let resizeSchedulerUsesTimeout = false;
+      let pendingResize = false;
+      const cancelScheduledDraw = () => {
+          if (drawFrameHandle !== null) {
+              if (drawFrameUsesTimeout) {
+                  clearTimeout(drawFrameHandle);
+              }
+              else {
+                  const cancel = deps.getCancelAnimationFrame();
+                  const frameHandle = toAnimationFrameHandle(drawFrameHandle);
+                  if (typeof cancel === 'function' && frameHandle !== null) {
+                      cancel(frameHandle);
+                  }
+              }
+              drawFrameHandle = null;
+              drawFrameUsesTimeout = false;
+          }
+          drawPending = false;
+      };
+      const scheduleDraw = () => {
+          if (drawPaused)
+              return;
+          if (drawPending)
+              return;
+          if (!deps.getCanvas() || !deps.getContext())
+              return;
+          drawPending = true;
+          const raf = deps.getRequestAnimationFrame();
+          const runDrawFrame = () => {
+              drawFrameHandle = null;
+              drawFrameUsesTimeout = false;
+              drawPending = false;
+              if (drawPaused)
+                  return;
+              try {
+                  deps.drawNow();
+              }
+              catch (err) {
+                  deps.onDrawError(err);
+              }
+              if (deps.shouldKeepDrawing())
+                  scheduleDraw();
+          };
+          if (raf) {
+              drawFrameUsesTimeout = false;
+              drawFrameHandle = raf(runDrawFrame);
+          }
+          else {
+              drawFrameUsesTimeout = true;
+              drawFrameHandle = setTimeout(runDrawFrame, 16);
+          }
+      };
+      const cancelScheduledResize = () => {
+          if (resizeSchedulerHandle !== null) {
+              if (resizeSchedulerUsesTimeout) {
+                  clearTimeout(resizeSchedulerHandle);
+              }
+              else {
+                  const cancel = deps.getCancelAnimationFrame();
+                  const frameHandle = toAnimationFrameHandle(resizeSchedulerHandle);
+                  if (typeof cancel === 'function' && frameHandle !== null) {
+                      cancel(frameHandle);
+                  }
+              }
+              resizeSchedulerHandle = null;
+              resizeSchedulerUsesTimeout = false;
+          }
+          pendingResize = false;
+      };
+      const flushScheduledResize = () => {
+          resizeSchedulerHandle = null;
+          resizeSchedulerUsesTimeout = false;
+          pendingResize = false;
+          try {
+              deps.onResize();
+              scheduleDraw();
+          }
+          catch (err) {
+              deps.onResizeError(err);
+          }
+      };
+      const scheduleResize = () => {
+          if (pendingResize)
+              return;
+          pendingResize = true;
+          const raf = deps.getRequestAnimationFrame();
+          if (raf) {
+              resizeSchedulerUsesTimeout = false;
+              resizeSchedulerHandle = raf(flushScheduledResize);
+          }
+          else {
+              resizeSchedulerUsesTimeout = true;
+              resizeSchedulerHandle = setTimeout(flushScheduledResize, 32);
+          }
+      };
+      const scheduleViewportResizeIfChanged = (reason) => {
+          const viewport = deps.getWindowRef()?.visualViewport;
+          if (!viewport) {
+              scheduleResize();
+              return;
+          }
+          const nextState = {
+              width: Number.isFinite(viewport.width) ? viewport.width : 0,
+              height: Number.isFinite(viewport.height) ? viewport.height : 0,
+              scale: Number.isFinite(viewport.scale) ? viewport.scale : 1,
+              offsetTop: Number.isFinite(viewport.offsetTop) ? viewport.offsetTop : 0,
+              offsetLeft: Number.isFinite(viewport.offsetLeft) ? viewport.offsetLeft : 0,
+          };
+          const prev = deps.getViewportResizeDebugState();
+          deps.setViewportResizeDebugState(nextState);
+          if (!prev) {
+              scheduleResize();
+              return;
+          }
+          const widthChanged = Math.abs(nextState.width - prev.width) >= 1;
+          const heightChanged = Math.abs(nextState.height - prev.height) >= 1;
+          const scaleChanged = Math.abs(nextState.scale - prev.scale) >= 0.01;
+          const offsetChanged = Math.abs(nextState.offsetTop - prev.offsetTop) >= 1
+              || Math.abs(nextState.offsetLeft - prev.offsetLeft) >= 1;
+          if (deps.isAetherDebugEnabled() && reason === 'scroll' && (heightChanged || scaleChanged || offsetChanged)) {
+              console.debug('[aether-debug][viewport-scroll]', {
+                  widthChanged,
+                  heightChanged,
+                  scaleChanged,
+                  offsetChanged,
+                  prev,
+                  next: nextState,
+              });
+          }
+          if (widthChanged || heightChanged || scaleChanged || reason === 'resize') {
+              scheduleResize();
+              return;
+          }
+          const winRef = deps.getWindowRef();
+          const debugEnabled = !!(winRef && winRef.__ARC_DEBUG_VIEWPORT__);
+          if (debugEnabled && reason === 'scroll' && typeof console !== 'undefined' && typeof console.debug === 'function') {
+              console.debug('[pve][viewport-scroll] skip resize: size unchanged', {
+                  width: nextState.width,
+                  height: nextState.height,
+                  scale: nextState.scale,
+                  offsetTop: nextState.offsetTop,
+                  offsetLeft: nextState.offsetLeft,
+              });
+          }
+      };
+      const setDrawPaused = (paused) => {
+          drawPaused = !!paused;
+          if (drawPaused) {
+              cancelScheduledDraw();
+          }
+          else {
+              scheduleDraw();
+          }
+      };
+      return {
+          cancelScheduledDraw,
+          scheduleDraw,
+          cancelScheduledResize,
+          scheduleResize,
+          scheduleViewportResizeIfChanged,
+          setDrawPaused,
+      };
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionRenderController')) exports.createSessionRenderController = createSessionRenderController;
+};
 __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) => {
   const __dep2 = __require('./aether.ts');
   const globalAetherPool = __dep2.globalAetherPool;
@@ -15776,14 +15991,16 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const runPveRuntimeUltHook = __dep29.runPveRuntimeUltHook;
   const __dep30 = __require('./modes/pve/session-events.ts');
   const createSessionEventBindings = __dep30.createSessionEventBindings;
-  const __dep31 = __require('./leader-uyen.ts');
-  const ensureUyenState = __dep31.ensureUyenState;
-  const getUyenUltChoice = __dep31.getUyenUltChoice;
-  const grantUyenSummonRage = __dep31.grantUyenSummonRage;
-  const canCastLeaderUltChoice = __dep31.canCastLeaderUltChoice;
-  const isAnyLeaderUltReady = __dep31.isAnyLeaderUltReady;
-  const isUyenLeader = __dep31.isUyenLeader;
-  const queueUyenUltCast = __dep31.queueUyenUltCast;
+  const __dep31 = __require('./modes/pve/session-render.ts');
+  const createSessionRenderController = __dep31.createSessionRenderController;
+  const __dep32 = __require('./leader-uyen.ts');
+  const ensureUyenState = __dep32.ensureUyenState;
+  const getUyenUltChoice = __dep32.getUyenUltChoice;
+  const grantUyenSummonRage = __dep32.grantUyenSummonRage;
+  const canCastLeaderUltChoice = __dep32.canCastLeaderUltChoice;
+  const isAnyLeaderUltReady = __dep32.isAnyLeaderUltReady;
+  const isUyenLeader = __dep32.isUyenLeader;
+  const queueUyenUltCast = __dep32.queueUyenUltCast;
   const ULT_TAG_CACHE = new WeakMap();
   const appendUltTags = (output, list) => {
       if (!Array.isArray(list))
@@ -16177,9 +16394,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   let visualViewportResizeHandler = null;
   let visualViewportScrollHandler = null;
   let viewportResizeDebugState = null;
-  let resizeSchedulerHandle = null;
-  let resizeSchedulerUsesTimeout = false;
-  let pendingResize = false;
   let canvasClickHandler = null;
   let winRef = null;
   let docRef = null;
@@ -16394,156 +16608,27 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           console.error('[events] status icon refresh listener', err);
       }
   });
-  const toAnimationFrameHandle = (handle) => (typeof handle === 'number' ? handle : null);
-  let drawFrameHandle = null;
-  let drawFrameUsesTimeout = false;
-  let drawPending = false;
-  let drawPaused = false;
-  function cancelScheduledDraw() {
-      if (drawFrameHandle !== null) {
-          if (drawFrameUsesTimeout) {
-              clearTimeout(drawFrameHandle);
-          }
-          else {
-              const cancel = getCancelAnimationFrame();
-              const frameHandle = toAnimationFrameHandle(drawFrameHandle);
-              if (typeof cancel === 'function' && frameHandle !== null) {
-                  cancel(frameHandle);
-              }
-          }
-          drawFrameHandle = null;
-          drawFrameUsesTimeout = false;
-      }
-      drawPending = false;
-  }
-  function scheduleDraw() {
-      if (drawPaused)
-          return;
-      if (drawPending)
-          return;
-      if (!canvas || !ctx)
-          return;
-      drawPending = true;
-      const raf = getRequestAnimationFrame();
-      const runDrawFrame = () => {
-          drawFrameHandle = null;
-          drawFrameUsesTimeout = false;
-          drawPending = false;
-          if (drawPaused)
-              return;
-          try {
-              draw();
-          }
-          catch (err) {
-              console.error('[draw]', err);
-          }
-          if (Game?.vfx && Game.vfx.length)
-              scheduleDraw();
-      };
-      if (raf) {
-          drawFrameUsesTimeout = false;
-          drawFrameHandle = raf(runDrawFrame);
-      }
-      else {
-          drawFrameUsesTimeout = true;
-          drawFrameHandle = setTimeout(runDrawFrame, 16);
-      }
-  }
-  function cancelScheduledResize() {
-      if (resizeSchedulerHandle !== null) {
-          if (resizeSchedulerUsesTimeout) {
-              clearTimeout(resizeSchedulerHandle);
-          }
-          else {
-              const cancel = getCancelAnimationFrame();
-              const frameHandle = toAnimationFrameHandle(resizeSchedulerHandle);
-              if (typeof cancel === 'function' && frameHandle !== null) {
-                  cancel(frameHandle);
-              }
-          }
-          resizeSchedulerHandle = null;
-          resizeSchedulerUsesTimeout = false;
-      }
-      pendingResize = false;
-  }
-  function flushScheduledResize() {
-      resizeSchedulerHandle = null;
-      resizeSchedulerUsesTimeout = false;
-      pendingResize = false;
-      try {
+  const sessionRenderController = createSessionRenderController({
+      getCanvas: () => canvas,
+      getContext: () => ctx,
+      drawNow: () => { draw(); },
+      onDrawError: (err) => { console.error('[draw]', err); },
+      shouldKeepDrawing: () => Boolean(Game?.vfx && Game.vfx.length),
+      onResize: () => {
           resize();
           if (hud && typeof hud.update === 'function' && Game) {
               hud.update(Game);
           }
-          scheduleDraw();
-      }
-      catch (err) {
-          console.error('[resize]', err);
-      }
-  }
-  function scheduleResize() {
-      if (pendingResize)
-          return;
-      pendingResize = true;
-      const raf = getRequestAnimationFrame();
-      if (raf) {
-          resizeSchedulerUsesTimeout = false;
-          resizeSchedulerHandle = raf(flushScheduledResize);
-      }
-      else {
-          resizeSchedulerUsesTimeout = true;
-          resizeSchedulerHandle = setTimeout(flushScheduledResize, 32);
-      }
-  }
-  function scheduleViewportResizeIfChanged(reason) {
-      const viewport = winRef?.visualViewport;
-      if (!viewport) {
-          scheduleResize();
-          return;
-      }
-      const nextState = {
-          width: Number.isFinite(viewport.width) ? viewport.width : 0,
-          height: Number.isFinite(viewport.height) ? viewport.height : 0,
-          scale: Number.isFinite(viewport.scale) ? viewport.scale : 1,
-          offsetTop: Number.isFinite(viewport.offsetTop) ? viewport.offsetTop : 0,
-          offsetLeft: Number.isFinite(viewport.offsetLeft) ? viewport.offsetLeft : 0,
-      };
-      const prev = viewportResizeDebugState;
-      viewportResizeDebugState = nextState;
-      if (!prev) {
-          scheduleResize();
-          return;
-      }
-      const widthChanged = Math.abs(nextState.width - prev.width) >= 1;
-      const heightChanged = Math.abs(nextState.height - prev.height) >= 1;
-      const scaleChanged = Math.abs(nextState.scale - prev.scale) >= 0.01;
-      const offsetChanged = Math.abs(nextState.offsetTop - prev.offsetTop) >= 1
-          || Math.abs(nextState.offsetLeft - prev.offsetLeft) >= 1;
-      if (AETHER_DEBUG_FLAG && reason === 'scroll' && (heightChanged || scaleChanged || offsetChanged)) {
-          console.debug('[aether-debug][viewport-scroll]', {
-              widthChanged,
-              heightChanged,
-              scaleChanged,
-              offsetChanged,
-              prev,
-              next: nextState,
-          });
-      }
-      if (widthChanged || heightChanged || scaleChanged || reason === 'resize') {
-          scheduleResize();
-          return;
-      }
-      const debugEnabled = !!(winRef && winRef.__ARC_DEBUG_VIEWPORT__);
-      if (debugEnabled && reason === 'scroll' && typeof console !== 'undefined' && typeof console.debug === 'function') {
-          console.debug('[pve][viewport-scroll] skip resize: size unchanged', {
-              width: nextState.width,
-              height: nextState.height,
-              scale: nextState.scale,
-              offsetTop: nextState.offsetTop,
-              offsetLeft: nextState.offsetLeft,
-          });
-      }
-  }
+      },
+      onResizeError: (err) => { console.error('[resize]', err); },
+      getRequestAnimationFrame,
+      getCancelAnimationFrame,
+      getWindowRef: () => winRef,
+      getViewportResizeDebugState: () => viewportResizeDebugState,
+      setViewportResizeDebugState: (state) => { viewportResizeDebugState = state; },
+      isAetherDebugEnabled: () => AETHER_DEBUG_FLAG,
+  });
+  const { cancelScheduledDraw, scheduleDraw, cancelScheduledResize, scheduleResize, scheduleViewportResizeIfChanged, setDrawPaused, } = sessionRenderController;
   const DEFAULT_TOKEN_COLOR = '#a9f58c';
   function refreshQueuedArtFor(unitId) {
       const updated = getUnitArt(unitId);
@@ -16634,15 +16719,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       renderSummonBar();
       scheduleDraw();
       return true;
-  }
-  function setDrawPaused(paused) {
-      drawPaused = !!paused;
-      if (drawPaused) {
-          cancelScheduledDraw();
-      }
-      else {
-          scheduleDraw();
-      }
   }
   const creepDeathHealProcessed = new Set();
   const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
@@ -18813,42 +18889,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       }
   }
   /* ---------- Chạy ---------- */
-  function queryElementFromRoot(selector) {
-      const root = rootElement ?? null;
-      if (root && typeof root.querySelector === 'function') {
-          const el = root.querySelector(selector);
-          if (el)
-              return el;
-      }
-      return null;
-  }
-  function resolveTimerElement() {
-      const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
-      if (!doc) {
-          timerElement = null;
-          return;
-      }
-      timerElement = (queryElementFromRoot('#timer') || doc.getElementById('timer'));
-  }
-  function isDocumentNode(value) {
-      const documentNodeType = typeof Node !== 'undefined' ? Node.DOCUMENT_NODE : 9;
-      return value.nodeType === documentNodeType;
-  }
-  function configureRoot(root) {
-      rootElement = root || null;
-      if (rootElement && rootElement.ownerDocument) {
-          docRef = rootElement.ownerDocument;
-      }
-      else if (rootElement && isDocumentNode(rootElement)) {
-          docRef = rootElement;
-      }
-      else {
-          docRef = typeof document !== 'undefined' ? document : null;
-      }
-      winRef = docRef?.defaultView ?? (typeof window !== 'undefined' ? window : null);
-      refreshAnimationFrameFns();
-      resolveTimerElement();
-  }
   const sessionEventBindings = createSessionEventBindings({
       getDocRef: () => docRef,
       getWinRef: () => winRef,
@@ -18948,10 +18988,10 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           running = false;
           invalidateSceneCache();
       },
-      configureRoot: () => {
-          configureRoot(rootElement);
-      },
-      resolveTimerElement,
+      getRootElement: () => rootElement,
+      setDocRef: (next) => { docRef = next; },
+      setWinRef: (next) => { winRef = next; },
+      refreshAnimationFrameFns: () => { refreshAnimationFrameFns(); },
       normalizeStartConfig: (config) => toNormalizedSessionConfig(config),
       isRunning: () => running,
       resetSessionState: (config) => {
@@ -18964,7 +19004,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       isSessionInitialized: () => Boolean(Game && Game._inited),
       getSession: () => Game,
   });
-  const { clearSessionTimers, stopSession, startSession, } = sessionEventBindings;
+  const { clearSessionTimers, configureRoot, stopSession, startSession, } = sessionEventBindings;
   function applyConfigToRunningGame(cfg) {
       if (!Game)
           return;

@@ -549,20 +549,20 @@ ultimate: bay lên cao, lao về phía ô số 5 của kẻ thù, ô 5 nhận s�
 
 46)
 Support, ssr, element tag: mộc ( là plant nhỉ)
-nội tại: 
+nội tại: mỗi turn dù có hành động được hay không thì miễn còn sống, đứng trên sân luôn hồi hp = 50% wil/atk của bản thân/turn, tự kích hoạt mỗi turn, kích hoạt 1 lần/turn, không giới hạn lần kích hoạt/trận.
 
 đánh thường: gây sát thương= 100% wil/atk, hồi hp cho bản thân = 35% sát thương đánh thường gây ra.
 
 skill 1: bị động, luôn kích hoạt, không cần tốn turn riêng để bật. Mỗi khi đánh thường cũng hồi hp cho leader đồng minh = 20% sát thương gây ra bởi đánh thường, sau khi hồi cho leader đồng minh = skill này 3 lần bản thân nhân vật này sẽ nhận 1 lớp khiên tồn tại max 3 turn = 25% max hp của nhân vật này. - 3 ae/ turn bất kể có đánh thường hay không. sau khi đạt lần lần heal cho leader = skill này thì ở ngay lần thứ 3 sau khi heal cho leader thì nhận khiên ngay lập tức, nếu đã có khiên đạt cap từ trước thì vẫn tạo thêm khiên = 25% max hp, ví dụ có kit của char khác tạo khiên cho char này nhưng khiên đã đầy cap của kit char đó ví dụ như = 75% max hp của bản thân char này chẳng hạn thì skill 3 này có thể tạo thêm khiên được nữa, nói chung khiên từ skill này không có cap và có thể cộng dồn với khiên từ kit của char khác dù đã đạt cap.
 
-skill 2: hồi hp cho leader đồng minh và 3 đồng.minh ngẫu nhiên = 100% wil/atk của nhân vật này. 20 ae.
+skill 2: hồi hp cho leader đồng minh và 3 đồng minh ngẫu nhiên = 100% wil/atk của nhân vật này. 20 ae.
 
 skill 3: áp dụng debuff phản hồi phục lên leader địch và 3 kẻ thù ngẫu nhiên có mặt trên sân, 20 ae, skill này có tag Pháp Tắc.
 
-ultimate:
-
+ultimate: xoá bỏ 1 debuff/đồng minh cho mọi đồng minh trên sân, cũng đồng thời xoá bỏ 1 buff/mỗi kẻ thù đang có mặt trên sân, pháp tắc.
 
 47)
+nội tại:
 
 
 48)

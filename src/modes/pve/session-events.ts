@@ -4,6 +4,7 @@ import type { SessionState } from '@shared-types/pve';
 type CanvasClickHandler = (event: MouseEvent) => void;
 
 type StartConfigInput = Record<string, unknown>;
+type RootLike = Element | Document | null | undefined;
 
 type SessionEventBindingsDeps = {
   getDocRef: () => Document | null;
@@ -54,8 +55,10 @@ type SessionEventBindingsDeps = {
   destroyAetherPool: () => void;
   cleanupGameState: () => void;
   clearAfterStop: () => void;
-  configureRoot: () => void;
-  resolveTimerElement: () => void;
+  getRootElement: () => RootLike;
+  setDocRef: (next: Document | null) => void;
+  setWinRef: (next: (Window & typeof globalThis) | null) => void;
+  refreshAnimationFrameFns: () => void;
   normalizeStartConfig: (config: StartConfigInput) => unknown;
   isRunning: () => boolean;
   resetSessionState: (config: unknown) => void;
@@ -75,6 +78,8 @@ type SessionEventBindingsController = {
   bindSession: () => void;
   bindRuntimeListeners: () => void;
   resetDomRefs: () => void;
+  configureRoot: (root: RootLike) => void;
+  resolveTimerElement: () => void;
   stopSession: () => void;
   startSession: (config?: StartConfigInput) => SessionState | null;
 };
@@ -256,6 +261,45 @@ export const createSessionEventBindings = (
     deps.invalidateSceneCache();
   };
 
+  const queryElementFromRoot = (selector: string): Element | null => {
+    const root = deps.getRootElement() ?? null;
+    if (root && typeof (root as ParentNode).querySelector === 'function') {
+      const el = (root as ParentNode).querySelector(selector);
+      if (el) return el;
+    }
+    return null;
+  };
+
+  const resolveTimerElement = (): void => {
+    const doc = deps.getDocRef() ?? (typeof document !== 'undefined' ? document : null);
+    if (!doc){
+      deps.setTimerElement(null);
+      return;
+    }
+    deps.setTimerElement((queryElementFromRoot('#timer') || doc.getElementById('timer')) as HTMLElement | null);
+  };
+
+  const isDocumentNode = (value: Element | Document): value is Document => {
+    const documentNodeType = typeof Node !== 'undefined' ? Node.DOCUMENT_NODE : 9;
+    return value.nodeType === documentNodeType;
+  };
+
+  const configureRoot = (root: RootLike): void => {
+    const nextRoot = root || null;
+    let nextDocRef: Document | null = null;
+    if (nextRoot && nextRoot.ownerDocument){
+      nextDocRef = nextRoot.ownerDocument;
+    } else if (nextRoot && isDocumentNode(nextRoot)) {
+      nextDocRef = nextRoot;
+    } else {
+      nextDocRef = typeof document !== 'undefined' ? document : null;
+    }
+    deps.setDocRef(nextDocRef);
+    deps.setWinRef(nextDocRef?.defaultView ?? (typeof window !== 'undefined' ? window : null));
+    deps.refreshAnimationFrameFns();
+    resolveTimerElement();
+  };
+
   const stopSession = (): void => {
     clearSessionTimers();
     clearSessionListeners();
@@ -268,8 +312,8 @@ export const createSessionEventBindings = (
 
   const startSession = (config?: StartConfigInput): SessionState | null => {
     const nextConfig = (typeof config === 'undefined' ? {} : config);
-    deps.configureRoot();
-    deps.resolveTimerElement();
+    configureRoot(deps.getRootElement());
+    resolveTimerElement();;
     const normalizedConfig = deps.normalizeStartConfig(nextConfig);
     if (deps.isRunning()) stopSession();
     deps.resetSessionState(normalizedConfig);
@@ -303,6 +347,8 @@ export const createSessionEventBindings = (
     bindSession,
     bindRuntimeListeners,
     resetDomRefs,
+    configureRoot,
+    resolveTimerElement,
     stopSession,
     startSession,
   };
