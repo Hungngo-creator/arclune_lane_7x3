@@ -106,9 +106,12 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
 }
 
 function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
-  const removeIndex = list.findIndex((entry) => entry.id === rewardId);
-  if (removeIndex < 0) return list;
-  list.splice(removeIndex, 1);
+  for (let index = 0; index < list.length; index += 1) {
+    const entry = list[index];
+    if (!entry || entry.id !== rewardId) continue;
+    list.splice(index, 1);
+    break;
+  }
   return list;
 }
 

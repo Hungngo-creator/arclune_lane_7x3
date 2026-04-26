@@ -226,17 +226,21 @@ const getNormalizedUltTags = (ult: UltSpec): ReadonlyArray<string> => {
   if (cached) {
     return cached;
   }
-  const hasDirectTags = Array.isArray(ult.tags) && ult.tags.length > 0;
-  const hasMetaTags = Array.isArray(ult.meta?.tags) && ult.meta.tags.length > 0;
-  const hasMetadataTags = Array.isArray(ult.metadata?.tags) && ult.metadata.tags.length > 0;
-  if (!hasDirectTags && !hasMetaTags && !hasMetadataTags) {
+  const directTags = ult.tags;
+  const metaTags = ult.meta?.tags;
+  const metadataTags = ult.metadata?.tags;
+  if (
+    (!Array.isArray(directTags) || directTags.length === 0)
+    && (!Array.isArray(metaTags) || metaTags.length === 0)
+    && (!Array.isArray(metadataTags) || metadataTags.length === 0)
+  ) {
     ULT_TAG_CACHE.set(ult, []);
     return [];
   }
   const rawUltTags: string[] = [];
-  appendUltTags(rawUltTags, ult.tags);
-  appendUltTags(rawUltTags, ult.meta?.tags);
-  appendUltTags(rawUltTags, ult.metadata?.tags);
+  appendUltTags(rawUltTags, directTags);
+  appendUltTags(rawUltTags, metaTags);
+  appendUltTags(rawUltTags, metadataTags);
   const normalized = rawUltTags.length ? normalizeTagList(rawUltTags) : [];
   ULT_TAG_CACHE.set(ult, normalized);
   return normalized;

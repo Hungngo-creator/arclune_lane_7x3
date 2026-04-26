@@ -14922,17 +14922,19 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       if (cached) {
           return cached;
       }
-      const hasDirectTags = Array.isArray(ult.tags) && ult.tags.length > 0;
-      const hasMetaTags = Array.isArray(ult.meta?.tags) && ult.meta.tags.length > 0;
-      const hasMetadataTags = Array.isArray(ult.metadata?.tags) && ult.metadata.tags.length > 0;
-      if (!hasDirectTags && !hasMetaTags && !hasMetadataTags) {
+      const directTags = ult.tags;
+      const metaTags = ult.meta?.tags;
+      const metadataTags = ult.metadata?.tags;
+      if ((!Array.isArray(directTags) || directTags.length === 0)
+          && (!Array.isArray(metaTags) || metaTags.length === 0)
+          && (!Array.isArray(metadataTags) || metadataTags.length === 0)) {
           ULT_TAG_CACHE.set(ult, []);
           return [];
       }
       const rawUltTags = [];
-      appendUltTags(rawUltTags, ult.tags);
-      appendUltTags(rawUltTags, ult.meta?.tags);
-      appendUltTags(rawUltTags, ult.metadata?.tags);
+      appendUltTags(rawUltTags, directTags);
+      appendUltTags(rawUltTags, metaTags);
+      appendUltTags(rawUltTags, metadataTags);
       const normalized = rawUltTags.length ? normalizeTagList(rawUltTags) : [];
       ULT_TAG_CACHE.set(ult, normalized);
       return normalized;
@@ -18993,10 +18995,13 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       return list;
   }
   function removeRewardById(list, rewardId) {
-      const removeIndex = list.findIndex((entry) => entry.id === rewardId);
-      if (removeIndex < 0)
-          return list;
-      list.splice(removeIndex, 1);
+      for (let index = 0; index < list.length; index += 1) {
+          const entry = list[index];
+          if (!entry || entry.id !== rewardId)
+              continue;
+          list.splice(index, 1);
+          break;
+      }
       return list;
   }
   function advanceSession(session) {
@@ -19435,26 +19440,17 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       return typeof candidate.side !== 'string';
   }
   function parseSlotValue(entry) {
-      const raw = entry.slot ?? entry.s ?? entry.index;
-      if (typeof raw === 'number' && Number.isFinite(raw))
-          return raw;
-      if (typeof raw === 'string') {
-          const parsed = Number(raw);
-          return Number.isFinite(parsed) ? parsed : null;
-      }
-      return null;
+      return parseFiniteNumber(entry.slot ?? entry.s ?? entry.index);
   }
   function clampTurnOrderSlot(slot) {
       const rounded = Math.round(slot);
       return Math.max(1, Math.min(9, rounded));
   }
   function appendNormalizedPairScanEntry(output, entry, sides) {
-      const pushPair = (side, slot) => {
-          output.push({ side, slot: clampTurnOrderSlot(slot) });
-      };
       const pushForSides = (slot) => {
+          const normalizedSlot = clampTurnOrderSlot(slot);
           for (let sideIndex = 0; sideIndex < sides.length; sideIndex += 1) {
-              pushPair(sides[sideIndex], slot);
+              output.push({ side: sides[sideIndex], slot: normalizedSlot });
           }
       };
       if (typeof entry === 'number') {
@@ -19467,10 +19463,11 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           if (isPairScanTuple(entry)) {
               const [, slot] = entry;
               const side = entry[0] === 'enemy' ? 'enemy' : 'ally';
-              pushPair(side, slot);
+              output.push({ side, slot: clampTurnOrderSlot(slot) });
               return;
           }
-          for (const value of entry) {
+          for (let index = 0; index < entry.length; index += 1) {
+              const value = entry[index];
               if (typeof value === 'number' && Number.isFinite(value))
                   pushForSides(value);
           }
@@ -19480,7 +19477,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           const slot = parseSlotValue(entry);
           if (slot !== null) {
               const side = entry.side === 'enemy' ? 'enemy' : 'ally';
-              pushPair(side, slot);
+              output.push({ side, slot: clampTurnOrderSlot(slot) });
           }
           return;
       }
@@ -19498,8 +19495,8 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           : ['ally', 'enemy'];
       const order = [];
       const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
-      for (const entry of scan) {
-          appendNormalizedPairScanEntry(order, entry, sides);
+      for (let index = 0; index < scan.length; index += 1) {
+          appendNormalizedPairScanEntry(order, scan[index], sides);
       }
       if (!order.length) {
           for (const slot of TURN_ORDER_FALLBACK_SLOTS) {

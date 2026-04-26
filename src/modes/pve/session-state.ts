@@ -417,13 +417,7 @@ function isPairScanObjectWithoutSide(entry: unknown): entry is TurnOrderPairScan
 }
 
 function parseSlotValue(entry: TurnOrderPairScanSideObject | TurnOrderPairScanSlotObject): number | null {
-  const raw = entry.slot ?? entry.s ?? entry.index;
-  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
-  if (typeof raw === 'string') {
-    const parsed = Number(raw);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
+  return parseFiniteNumber(entry.slot ?? entry.s ?? entry.index);
 }
 
 function clampTurnOrderSlot(slot: number): number {
@@ -436,12 +430,10 @@ function appendNormalizedPairScanEntry(
   entry: TurnOrderPairScanEntry,
   sides: readonly TurnOrderSide[],
 ): void {
-  const pushPair = (side: TurnOrderSide, slot: number): void => {
-    output.push({ side, slot: clampTurnOrderSlot(slot) });
-  };
   const pushForSides = (slot: number): void => {
+    const normalizedSlot = clampTurnOrderSlot(slot);
     for (let sideIndex = 0; sideIndex < sides.length; sideIndex += 1) {
-      pushPair(sides[sideIndex], slot);
+      output.push({ side: sides[sideIndex], slot: normalizedSlot });
     }
   };
 
@@ -456,10 +448,11 @@ function appendNormalizedPairScanEntry(
     if (isPairScanTuple(entry)) {
       const [, slot] = entry;
       const side: Side = entry[0] === 'enemy' ? 'enemy' : 'ally';
-      pushPair(side, slot);
+      output.push({ side, slot: clampTurnOrderSlot(slot) });
       return;
     }
-    for (const value of entry) {
+    for (let index = 0; index < entry.length; index += 1) {
+      const value = entry[index];
       if (typeof value === 'number' && Number.isFinite(value)) pushForSides(value);
     }
     return;
@@ -469,7 +462,7 @@ function appendNormalizedPairScanEntry(
     const slot = parseSlotValue(entry);
     if (slot !== null) {
       const side: Side = entry.side === 'enemy' ? 'enemy' : 'ally';
-      pushPair(side, slot);
+      output.push({ side, slot: clampTurnOrderSlot(slot) });
     }
     return;
   }
@@ -488,8 +481,8 @@ export function buildTurnOrder(): { order: TurnOrderEntry[]; indexMap: Map<strin
     : (['ally', 'enemy'] as const satisfies ReadonlyArray<TurnOrderSide>);
   const order: TurnOrderEntry[] = [];
   const scan = Array.isArray(cfg.pairScan) ? cfg.pairScan : [];
-  for (const entry of scan) {
-    appendNormalizedPairScanEntry(order, entry, sides);
+  for (let index = 0; index < scan.length; index += 1) {
+    appendNormalizedPairScanEntry(order, scan[index], sides);
   }
   if (!order.length) {
     for (const slot of TURN_ORDER_FALLBACK_SLOTS) {
@@ -597,7 +590,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
   const summonLimit = Number.isFinite(normalized.summonLimit)
     ? Number(normalized.summonLimit)
     : CFG.SUMMON_LIMIT;
-    const rngSeed = Number.isFinite(normalized.rngSeed) ? Number(normalized.rngSeed) : undefined;
+  const rngSeed = Number.isFinite(normalized.rngSeed) ? Number(normalized.rngSeed) : undefined;
 
   return buildBaseState({
     modeKey,
@@ -711,7 +704,7 @@ export function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | 
     cacheCtx.scale(dprRaw, dprRaw);
   }
 
-const drawCtx = cacheCtx as CanvasRenderingContext2D;
+  const drawCtx = cacheCtx as CanvasRenderingContext2D;
   try {
     drawEnvironmentProps(drawCtx, grid, camPreset, backgroundKey ?? undefined);
     drawGridOblique(drawCtx, grid, camPreset);
