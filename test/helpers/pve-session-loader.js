@@ -172,27 +172,97 @@ function transpileSource(code, filename) {
   return result.outputText;
 }
 
+function splitImportClause(clause) {
+  let depth = 0;
+  for (let i = 0; i < clause.length; i += 1) {
+    const ch = clause[i];
+    if (ch === '{') {
+      depth += 1;
+    } else if (ch === '}') {
+      depth = Math.max(0, depth - 1);
+    } else if (ch === ',' && depth === 0) {
+      const head = clause.slice(0, i).trim();
+      const tail = clause.slice(i + 1).trim();
+      return { head, tail };
+    }
+  }
+  return { head: clause.trim(), tail: '' };
+}
+
+const IMPORT_LOCAL_IDENTIFIER_REGEX = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+const NAMESPACE_IMPORT_REGEX = /^\*\s+as\s+([A-Za-z_$][A-Za-z0-9_$]*)$/;
+
+function parseNamedImports(block) {
+  const trimmed = block.trim();
+  if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
+    throw new Error(`Unsupported import clause: ${block}`);
+  }
+  const inside = trimmed.slice(1, -1);
+  return inside
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => part.replace(/^type\s+/, '').trim())
+    .filter(Boolean)
+    .map((part) => {
+      const [importedRaw, localRaw] = part.split(/\s+as\s+/);
+      const imported = importedRaw.trim();
+      const local = (localRaw || importedRaw).trim();
+      return { imported, local };
+    });
+}
+
+function parseNamespaceImport(clause, specifiers) {
+  const namespaceMatch = clause.match(NAMESPACE_IMPORT_REGEX);
+  if (!namespaceMatch) {
+    throw new Error(`Unsupported import clause: ${specifiers}`);
+  }
+  return namespaceMatch[1];
+}
+
+function appendNamedImportLines(lines, namedBlock, moduleVar) {
+  const entries = parseNamedImports(namedBlock);
+  for (const { imported, local } of entries) {
+    lines.push(`const ${local} = ${moduleVar}.${imported};`);
+  }
+}
+
 function createImportReplacement(specifiers, moduleVar) {
   const lines = [];
   const cleaned = specifiers.trim();
-  if (!cleaned.startsWith('{') || !cleaned.endsWith('}')) {
+  if (!cleaned) {
+    return lines;
+  }
+
+  if (cleaned.startsWith('{')) {
+    appendNamedImportLines(lines, cleaned, moduleVar);
+    return lines;
+  }
+  if (cleaned.startsWith('*')) {
+    const namespaceLocal = parseNamespaceImport(cleaned, specifiers);
+    lines.push(`const ${namespaceLocal} = ${moduleVar};`);
+    return lines;
+  }
+
+  const { head, tail } = splitImportClause(cleaned);
+  if (!IMPORT_LOCAL_IDENTIFIER_REGEX.test(head)) {
     throw new Error(`Unsupported import clause: ${specifiers}`);
   }
-  const inside = cleaned.slice(1, -1);
-  const parts = inside.split(',').map((p) => p.trim()).filter(Boolean);
-  for (const part of parts) {
-    if (!part) continue;
-    const isTypeOnlyImport = /^type\s+/.test(part);
-    if (isTypeOnlyImport) {
-      continue;
-    }
-    const sanitized = part.replace(/^type\s+/, '');
-    const [importedRaw, localRaw] = sanitized.split(/\s+as\s+/);
-    const imported = importedRaw.trim();
-    const local = (localRaw || importedRaw).trim();
-    lines.push(`const ${local} = ${moduleVar}.${imported};`);
+  lines.push(`const ${head} = ${moduleVar}.default ?? ${moduleVar};`);
+
+  if (!tail) {
+    return lines;
   }
-  return lines;
+  if (tail.startsWith('{')) {
+    appendNamedImportLines(lines, tail, moduleVar);
+    return lines;
+  }
+  if (tail.startsWith('*')) {
+    const namespaceLocal = parseNamespaceImport(tail, specifiers);
+    lines.push(`const ${namespaceLocal} = ${moduleVar};`);
+    return lines;
+  }
+  throw new Error(`Unsupported import clause: ${specifiers}`);
 }
 
 function resolveImport(fromId, specifier) {
