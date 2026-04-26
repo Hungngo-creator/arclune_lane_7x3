@@ -33,10 +33,6 @@ type RewardListContainer = SessionRuntimeState | EncounterState;
 type RewardListKey = 'rewardQueue' | 'pendingRewards';
 const NOOP_UNSUBSCRIBE = (): void => {};
 const SMALL_REWARD_MERGE_SIZE = 6;
-const EMPTY_REWARD_LIST = [] as MutableRewardList;
-const hasRewards = (value: ReadonlyArray<unknown> | null | undefined): value is RewardList => (
-  Array.isArray(value) && value.length > 0
-);
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   if (!entry || typeof entry !== 'object') return false;
@@ -48,7 +44,7 @@ function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
 }
 
 function toSanitizedRewardList(value: unknown): MutableRewardList {
-  if (!Array.isArray(value)) return EMPTY_REWARD_LIST;
+  if (!Array.isArray(value)) return [];
   const rewards = value as MutableRewardList;
   let writeIndex = 0;
   for (let readIndex = 0; readIndex < rewards.length; readIndex += 1) {
@@ -172,10 +168,8 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
       wave.status = 'cleared';
       runtime.wave = null;
       encounter.waveIndex = index + 1;
-      if (hasRewards(wave.rewards)) {
-        const rewards = toSanitizedRewardList(wave.rewards);
-        if (rewards.length) syncWaveRewards(runtime, encounter, rewards);
-       }
+      const rewards = toSanitizedRewardList(wave.rewards);
+      if (rewards.length) syncWaveRewards(runtime, encounter, rewards);
       break;
     }
     case 'cleared':

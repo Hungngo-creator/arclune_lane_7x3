@@ -18916,8 +18916,6 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   const __resolveStatusIconPreview = __dep1.__resolveStatusIconPreview;
   const NOOP_UNSUBSCRIBE = () => { };
   const SMALL_REWARD_MERGE_SIZE = 6;
-  const EMPTY_REWARD_LIST = [];
-  const hasRewards = (value) => (Array.isArray(value) && value.length > 0);
   function isReward(entry) {
       if (!entry || typeof entry !== 'object')
           return false;
@@ -18933,7 +18931,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   }
   function toSanitizedRewardList(value) {
       if (!Array.isArray(value))
-          return EMPTY_REWARD_LIST;
+          return [];
       const rewards = value;
       let writeIndex = 0;
       for (let readIndex = 0; readIndex < rewards.length; readIndex += 1) {
@@ -19055,11 +19053,9 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               wave.status = 'cleared';
               runtime.wave = null;
               encounter.waveIndex = index + 1;
-              if (hasRewards(wave.rewards)) {
-                  const rewards = toSanitizedRewardList(wave.rewards);
-                  if (rewards.length)
-                      syncWaveRewards(runtime, encounter, rewards);
-              }
+              const rewards = toSanitizedRewardList(wave.rewards);
+              if (rewards.length)
+                  syncWaveRewards(runtime, encounter, rewards);
               break;
           }
           case 'cleared':
@@ -19170,6 +19166,18 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   }
   function hasDeckEntries(value) {
       return Array.isArray(value) && value.length > 0;
+  }
+  function isNormalizedDeckEntries(value) {
+      if (!Array.isArray(value))
+          return false;
+      for (let index = 0; index < value.length; index += 1) {
+          const entry = value[index];
+          if (!entry || typeof entry !== 'object')
+              return false;
+          if (typeof entry.id !== 'string')
+              return false;
+      }
+      return true;
   }
   function getPreferredDeckInput(config) {
       for (const key of NORMALIZABLE_DECK_FIELDS) {
@@ -19296,7 +19304,9 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           return normalizeDeckEntries(preset.unitsAll);
       }
       const deckInput = options.preferredDeck ?? options.fallbackDeck;
-      const lineupDeck = hasDeckEntries(deckInput) ? normalizeDeckEntries(deckInput) : EMPTY_UNIT_DECK;
+      const lineupDeck = hasDeckEntries(deckInput)
+          ? (isNormalizedDeckEntries(deckInput) ? deckInput : normalizeDeckEntries(deckInput))
+          : EMPTY_UNIT_DECK;
       const progressById = options.unitProgressById
           ?? (lineupDeck.length > 0
               ? mapUnitProgressById(options.collectionState ?? null)
@@ -19542,7 +19552,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           ?? null;
       const preferredDeckInput = getPreferredDeckInput(normalized);
       const preferredPlayerDeck = preferredDeckInput
-          ? normalizeDeckEntries(preferredDeckInput)
+          ? (isNormalizedDeckEntries(preferredDeckInput) ? preferredDeckInput : normalizeDeckEntries(preferredDeckInput))
           : EMPTY_UNIT_DECK;
       const hasPreferredDeck = preferredPlayerDeck.length > 0;
       const autoPlayerDeck = hasPreferredDeck ? EMPTY_UNIT_DECK : buildAutoPlayerDeckFromCollection(unitProgressById);

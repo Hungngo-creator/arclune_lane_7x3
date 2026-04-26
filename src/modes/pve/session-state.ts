@@ -71,6 +71,16 @@ function hasDeckEntries(value: unknown): value is ReadonlyArray<unknown> {
   return Array.isArray(value) && value.length > 0;
 }
 
+function isNormalizedDeckEntries(value: unknown): value is SessionState['unitsAll'] {
+  if (!Array.isArray(value)) return false;
+  for (let index = 0; index < value.length; index += 1) {
+    const entry = value[index];
+    if (!entry || typeof entry !== 'object') return false;
+    if (typeof (entry as { id?: unknown }).id !== 'string') return false;
+  }
+  return true;
+}
+
 export function getPreferredDeckInput(config: {
   lineupDeck?: unknown;
   playerDeck?: unknown;
@@ -224,7 +234,9 @@ export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionSta
     return normalizeDeckEntries(preset.unitsAll);
   }
   const deckInput = options.preferredDeck ?? options.fallbackDeck;
-  const lineupDeck = hasDeckEntries(deckInput) ? normalizeDeckEntries(deckInput) : EMPTY_UNIT_DECK;
+  const lineupDeck = hasDeckEntries(deckInput)
+    ? (isNormalizedDeckEntries(deckInput) ? deckInput : normalizeDeckEntries(deckInput))
+    : EMPTY_UNIT_DECK;
   const progressById = options.unitProgressById
     ?? (lineupDeck.length > 0
       ? mapUnitProgressById(options.collectionState ?? null)
@@ -525,7 +537,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
 
   const preferredDeckInput = getPreferredDeckInput(normalized);
   const preferredPlayerDeck = preferredDeckInput
-    ? normalizeDeckEntries(preferredDeckInput)
+    ? (isNormalizedDeckEntries(preferredDeckInput) ? preferredDeckInput : normalizeDeckEntries(preferredDeckInput))
     : EMPTY_UNIT_DECK;
   const hasPreferredDeck = preferredPlayerDeck.length > 0;
   const autoPlayerDeck = hasPreferredDeck ? EMPTY_UNIT_DECK : buildAutoPlayerDeckFromCollection(unitProgressById);
