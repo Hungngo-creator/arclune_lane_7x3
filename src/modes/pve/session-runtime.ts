@@ -34,6 +34,9 @@ type RewardListKey = 'rewardQueue' | 'pendingRewards';
 const NOOP_UNSUBSCRIBE = (): void => {};
 const SMALL_REWARD_MERGE_SIZE = 6;
 const EMPTY_REWARD_LIST = [] as MutableRewardList;
+const hasRewards = (value: ReadonlyArray<unknown> | null | undefined): value is RewardList => (
+  Array.isArray(value) && value.length > 0
+);
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   if (!entry || typeof entry !== 'object') return false;
@@ -116,6 +119,24 @@ function removeRewardById(list: MutableRewardList, rewardId: string): MutableRew
   return list;
 }
 
+function syncWaveRewards(runtime: SessionRuntimeState, encounter: EncounterState, rewards: RewardList): void {
+  const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
+  const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
+  if (rewardQueue === pendingRewards) {
+    mergeRewardsInPlace(rewardQueue, rewards);
+    return;
+  }
+  mergeRewardsInPlace(pendingRewards, rewards);
+  mergeRewardsInPlace(rewardQueue, rewards);
+}
+
+function removeRewardEverywhere(runtime: SessionRuntimeState, rewardId: string): void {
+  removeRewardById(getMutableRewardList(runtime, 'rewardQueue'), rewardId);
+  const encounter = runtime.encounter;
+  if (!encounter) return;
+  removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), rewardId);
+}
+
 export function advanceSession(session: SessionState | null | undefined): EncounterState | null {
   const runtime = session?.runtime;
   if (!runtime) return null;
@@ -151,17 +172,10 @@ export function advanceSession(session: SessionState | null | undefined): Encoun
       wave.status = 'cleared';
       runtime.wave = null;
       encounter.waveIndex = index + 1;
-      const rewards = toSanitizedRewardList(wave.rewards);
-      if (rewards.length) {
-        const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
-        const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
-        if (rewardQueue === pendingRewards) {
-          mergeRewardsInPlace(rewardQueue, rewards);
-        } else {
-          mergeRewardsInPlace(pendingRewards, rewards);
-          mergeRewardsInPlace(rewardQueue, rewards);
-        }
-      }
+      if (hasRewards(wave.rewards)) {
+        const rewards = toSanitizedRewardList(wave.rewards);
+        if (rewards.length) syncWaveRewards(runtime, encounter, rewards);
+       }
       break;
     }
     case 'cleared':
@@ -188,11 +202,7 @@ export function applyReward(
   if (!session?.runtime) return null;
   if (!isReward(reward)) return null;
   const runtime = session.runtime;
-  removeRewardById(getMutableRewardList(runtime, 'rewardQueue'), reward.id);
-  const encounter = runtime.encounter;
-  if (encounter) {
-    removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), reward.id);
-  }
+  removeRewardEverywhere(runtime, reward.id);
   return reward;
 }
 

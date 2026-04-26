@@ -16,8 +16,7 @@ import { createSummonQueue } from '@shared-types/units.ts';
 
 import { CFG } from '../../config.ts';
 import { UNITS, lookupUnit } from '../../units.ts';
-import { makeInstanceStats } from '../../meta.ts';
-import { metaServiceAdapter } from '../../meta.ts';
+import { makeInstanceStats, metaServiceAdapter } from '../../meta.ts';
 import { gameEvents } from '../../events.ts';
 import { getEnvironmentBackground, drawEnvironmentProps } from '../../background.ts';
 import { getCachedBattlefieldScene } from '../../scene.ts';
@@ -224,8 +223,8 @@ export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionSta
   if (Array.isArray(preset?.unitsAll) && preset.unitsAll.length) {
     return normalizeDeckEntries(preset.unitsAll);
   }
-  const deckInput = options.preferredDeck ?? options.fallbackDeck ?? [];
-  const lineupDeck = normalizeDeckEntries(deckInput);
+  const deckInput = options.preferredDeck ?? options.fallbackDeck;
+  const lineupDeck = hasDeckEntries(deckInput) ? normalizeDeckEntries(deckInput) : EMPTY_UNIT_DECK;
   const progressById = options.unitProgressById
     ?? (lineupDeck.length > 0
       ? mapUnitProgressById(options.collectionState ?? null)

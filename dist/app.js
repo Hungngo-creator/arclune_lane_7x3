@@ -15469,6 +15469,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   let leaderEndCheckFlags = { ally: false, enemy: false };
   const hpBarGradientCache = new Map();
   const meleeOffsetTokenKeys = new Set();
+  const refillDeckExcludeIds = new Set();
   const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
   const STATUS_ICON_PATHS = {
       blind: 'assets/blind.svg',
@@ -17503,6 +17504,21 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               return Boolean(checkBattleEndResult(gameState, info));
           },
       };
+      const battleCheckInfo = {
+          trigger: 'leader-immediate',
+          timestamp: 0,
+      };
+      const runBattleEndCheck = (trigger, timestamp, remain) => {
+          battleCheckInfo.trigger = trigger;
+          battleCheckInfo.timestamp = timestamp;
+          if (typeof remain === 'number') {
+              battleCheckInfo.remain = remain;
+          }
+          else {
+              delete battleCheckInfo.remain;
+          }
+          return checkBattleEndResult(Game, battleCheckInfo);
+      };
       const updateTimerAndCost = (timestamp) => {
           if (!CLOCK || !Game)
               return;
@@ -17655,7 +17671,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           }
           CLOCK.lastTimerRemain = remainDisplay;
           if (remainSecPrecise <= 0 && prevRemainDisplay > 0) {
-              const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain: remainDisplay, timestamp: sessionNowMs });
+              const timeoutResult = runBattleEndCheck('timeout', sessionNowMs, remainDisplay);
               if (timeoutResult)
                   return;
           }
@@ -17695,7 +17711,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           CLOCK.lastLogicMs = sessionNowMs;
           if (Game.battle?.over)
               return;
-          if (checkBattleEndResult(Game, { trigger: 'leader-immediate', timestamp: sessionNowMs })) {
+          if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
               return;
           }
           let turnState = Game.turn ?? null;
@@ -17725,13 +17741,13 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   elapsedForTurn -= turnEveryMs;
                   turnsProcessed += 1;
                   stepTurn(Game, stepTurnContext);
-                  if (checkBattleEndResult(Game, { trigger: 'leader-immediate', timestamp: sessionNowMs })) {
+                  if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
                       return;
                   }
                   processCreepDeathHealing(sessionNowMs);
                   cleanupDead(sessionNowMs);
                   hasBoardMutation = true;
-                  if (checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs })) {
+                  if (runBattleEndCheck('post-turn', sessionNowMs)) {
                       return;
                   }
                   aiMaybeAct(Game, 'board');
@@ -17829,7 +17845,11 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const need = HAND_SIZE - deck.length;
       if (need <= 0)
           return;
-      const exclude = new Set(Game.usedUnitIds);
+      const exclude = refillDeckExcludeIds;
+      exclude.clear();
+      for (const id of Game.usedUnitIds) {
+          exclude.add(id);
+      }
       for (let i = 0; i < deck.length; i += 1) {
           const entry = deck[i];
           if (!entry?.id)
@@ -18897,6 +18917,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   const NOOP_UNSUBSCRIBE = () => { };
   const SMALL_REWARD_MERGE_SIZE = 6;
   const EMPTY_REWARD_LIST = [];
+  const hasRewards = (value) => (Array.isArray(value) && value.length > 0);
   function isReward(entry) {
       if (!entry || typeof entry !== 'object')
           return false;
@@ -18983,6 +19004,23 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       }
       return list;
   }
+  function syncWaveRewards(runtime, encounter, rewards) {
+      const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
+      const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
+      if (rewardQueue === pendingRewards) {
+          mergeRewardsInPlace(rewardQueue, rewards);
+          return;
+      }
+      mergeRewardsInPlace(pendingRewards, rewards);
+      mergeRewardsInPlace(rewardQueue, rewards);
+  }
+  function removeRewardEverywhere(runtime, rewardId) {
+      removeRewardById(getMutableRewardList(runtime, 'rewardQueue'), rewardId);
+      const encounter = runtime.encounter;
+      if (!encounter)
+          return;
+      removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), rewardId);
+  }
   function advanceSession(session) {
       const runtime = session?.runtime;
       if (!runtime)
@@ -19017,17 +19055,10 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               wave.status = 'cleared';
               runtime.wave = null;
               encounter.waveIndex = index + 1;
-              const rewards = toSanitizedRewardList(wave.rewards);
-              if (rewards.length) {
-                  const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
-                  const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
-                  if (rewardQueue === pendingRewards) {
-                      mergeRewardsInPlace(rewardQueue, rewards);
-                  }
-                  else {
-                      mergeRewardsInPlace(pendingRewards, rewards);
-                      mergeRewardsInPlace(rewardQueue, rewards);
-                  }
+              if (hasRewards(wave.rewards)) {
+                  const rewards = toSanitizedRewardList(wave.rewards);
+                  if (rewards.length)
+                      syncWaveRewards(runtime, encounter, rewards);
               }
               break;
           }
@@ -19051,11 +19082,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       if (!isReward(reward))
           return null;
       const runtime = session.runtime;
-      removeRewardById(getMutableRewardList(runtime, 'rewardQueue'), reward.id);
-      const encounter = runtime.encounter;
-      if (encounter) {
-          removeRewardById(getMutableRewardList(encounter, 'pendingRewards'), reward.id);
-      }
+      removeRewardEverywhere(runtime, reward.id);
       return reward;
   }
   function onSessionEvent(type, handler) {
@@ -19096,34 +19123,33 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   const lookupUnit = __dep2.lookupUnit;
   const __dep3 = __require('./meta.ts');
   const makeInstanceStats = __dep3.makeInstanceStats;
-  const __dep4 = __require('./meta.ts');
-  const metaServiceAdapter = __dep4.metaServiceAdapter;
-  const __dep5 = __require('./events.ts');
-  const gameEvents = __dep5.gameEvents;
-  const __dep6 = __require('./background.ts');
-  const getEnvironmentBackground = __dep6.getEnvironmentBackground;
-  const drawEnvironmentProps = __dep6.drawEnvironmentProps;
-  const __dep7 = __require('./scene.ts');
-  const getCachedBattlefieldScene = __dep7.getCachedBattlefieldScene;
-  const __dep8 = __require('./engine.ts');
-  const drawGridOblique = __dep8.drawGridOblique;
-  const __dep9 = __require('./art.ts');
-  const getUnitArt = __dep9.getUnitArt;
-  const __dep10 = __require('./utils/unit-id.ts');
-  const normalizeUnitId = __dep10.normalizeUnitId;
-  const __dep11 = __require('./utils/rng.ts');
-  const createRngState = __dep11.createRngState;
-  const nextRngValue = __dep11.nextRngValue;
-  const __dep12 = __require('./utils/format.ts');
-  const stableStringify = __dep12.stableStringify;
-  const __dep13 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep13.normalizeClassName;
-  const normalizeElementKey = __dep13.normalizeElementKey;
-  const normalizeElementList = __dep13.normalizeElementList;
-  const __dep14 = __require('./modes/pve/collection-mapper.ts');
-  const mapUnitProgressById = __dep14.mapUnitProgressById;
-  const __dep15 = __require('./modes/pve/creep-builder.ts');
-  const buildAICreepDeckFromLineup = __dep15.buildAICreepDeckFromLineup;
+  const metaServiceAdapter = __dep3.metaServiceAdapter;
+  const __dep4 = __require('./events.ts');
+  const gameEvents = __dep4.gameEvents;
+  const __dep5 = __require('./background.ts');
+  const getEnvironmentBackground = __dep5.getEnvironmentBackground;
+  const drawEnvironmentProps = __dep5.drawEnvironmentProps;
+  const __dep6 = __require('./scene.ts');
+  const getCachedBattlefieldScene = __dep6.getCachedBattlefieldScene;
+  const __dep7 = __require('./engine.ts');
+  const drawGridOblique = __dep7.drawGridOblique;
+  const __dep8 = __require('./art.ts');
+  const getUnitArt = __dep8.getUnitArt;
+  const __dep9 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep9.normalizeUnitId;
+  const __dep10 = __require('./utils/rng.ts');
+  const createRngState = __dep10.createRngState;
+  const nextRngValue = __dep10.nextRngValue;
+  const __dep11 = __require('./utils/format.ts');
+  const stableStringify = __dep11.stableStringify;
+  const __dep12 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep12.normalizeClassName;
+  const normalizeElementKey = __dep12.normalizeElementKey;
+  const normalizeElementList = __dep12.normalizeElementList;
+  const __dep13 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep13.mapUnitProgressById;
+  const __dep14 = __require('./modes/pve/creep-builder.ts');
+  const buildAICreepDeckFromLineup = __dep14.buildAICreepDeckFromLineup;
   const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
       const unitId = normalizeUnitId(unit.id);
       const art = getUnitArt(unitId);
@@ -19269,8 +19295,8 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       if (Array.isArray(preset?.unitsAll) && preset.unitsAll.length) {
           return normalizeDeckEntries(preset.unitsAll);
       }
-      const deckInput = options.preferredDeck ?? options.fallbackDeck ?? [];
-      const lineupDeck = normalizeDeckEntries(deckInput);
+      const deckInput = options.preferredDeck ?? options.fallbackDeck;
+      const lineupDeck = hasDeckEntries(deckInput) ? normalizeDeckEntries(deckInput) : EMPTY_UNIT_DECK;
       const progressById = options.unitProgressById
           ?? (lineupDeck.length > 0
               ? mapUnitProgressById(options.collectionState ?? null)

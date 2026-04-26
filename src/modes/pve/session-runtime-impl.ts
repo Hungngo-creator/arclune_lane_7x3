@@ -891,6 +891,7 @@ let running = false;
 let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enemy: false };
 const hpBarGradientCache = new Map<string, GradientValue>();
 const meleeOffsetTokenKeys = new Set<string>();
+const refillDeckExcludeIds = new Set<string>();
 type StatusIconEntry = {
   statusId: string;
   statusName: string;
@@ -2971,6 +2972,24 @@ function init(): boolean {
       return Boolean(checkBattleEndResult(gameState, info));
     },
   };
+  const battleCheckInfo: { trigger: string; timestamp: number; remain?: number } = {
+    trigger: 'leader-immediate',
+    timestamp: 0,
+  };
+  const runBattleEndCheck = (
+    trigger: 'leader-immediate' | 'post-turn' | 'timeout',
+    timestamp: number,
+    remain?: number,
+  ): ReturnType<typeof checkBattleEndResult> => {
+    battleCheckInfo.trigger = trigger;
+    battleCheckInfo.timestamp = timestamp;
+    if (typeof remain === 'number') {
+      battleCheckInfo.remain = remain;
+    } else {
+      delete battleCheckInfo.remain;
+    }
+    return checkBattleEndResult(Game, battleCheckInfo);
+  };
 
   const updateTimerAndCost = (timestamp?: number): void => {
     if (!CLOCK || !Game) return;
@@ -3139,7 +3158,7 @@ function init(): boolean {
       CLOCK.lastTimerRemain = remainDisplay;
 
       if (remainSecPrecise <= 0 && prevRemainDisplay > 0){
-        const timeoutResult = checkBattleEndResult(Game, { trigger: 'timeout', remain: remainDisplay, timestamp: sessionNowMs });
+        const timeoutResult = runBattleEndCheck('timeout', sessionNowMs, remainDisplay);
         if (timeoutResult) return;
       }
 
@@ -3180,7 +3199,7 @@ function init(): boolean {
       CLOCK.lastLogicMs = sessionNowMs;
 
       if (Game.battle?.over) return;
-      if (checkBattleEndResult(Game, { trigger: 'leader-immediate', timestamp: sessionNowMs })) {
+      if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
         return;
       }
 
@@ -3215,13 +3234,13 @@ function init(): boolean {
           elapsedForTurn -= turnEveryMs;
           turnsProcessed += 1;
           stepTurn(Game, stepTurnContext);
-          if (checkBattleEndResult(Game, { trigger: 'leader-immediate', timestamp: sessionNowMs })) {
+          if (runBattleEndCheck('leader-immediate', sessionNowMs)) {
             return;
           }
           processCreepDeathHealing(sessionNowMs);
           cleanupDead(sessionNowMs);
           hasBoardMutation = true;
-          if (checkBattleEndResult(Game, { trigger: 'post-turn', timestamp: sessionNowMs })) {
+          if (runBattleEndCheck('post-turn', sessionNowMs)) {
             return;
           }
           aiMaybeAct(Game, 'board');
@@ -3323,7 +3342,11 @@ function refillDeck(): void {
   const need = HAND_SIZE - deck.length;
   if (need <= 0) return;
 
-  const exclude = new Set(Game.usedUnitIds);
+  const exclude = refillDeckExcludeIds;
+  exclude.clear();
+  for (const id of Game.usedUnitIds) {
+    exclude.add(id);
+  }
   for (let i = 0; i < deck.length; i += 1) {
     const entry = deck[i];
     if (!entry?.id) continue;
