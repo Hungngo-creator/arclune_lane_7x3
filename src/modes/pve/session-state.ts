@@ -58,6 +58,13 @@ export type NormalizedSessionConfig = (CreateSessionOptions & {
   backgroundKey?: string;
 }) & Record<string, unknown>;
 
+function normalizeDeckField(config: NormalizedSessionConfig, key: 'lineupDeck' | 'playerDeck' | 'deck'): void {
+  const value = config[key];
+  if (Array.isArray(value)) {
+    config[key] = normalizeDeckEntries(value);
+  }
+}
+
 function hasDeckEntries(value: unknown): value is ReadonlyArray<unknown> {
   return Array.isArray(value) && value.length > 0;
 }
@@ -362,15 +369,9 @@ export function normalizeConfig(input: SessionConfigInput = {}): NormalizedSessi
     if (typeof sceneConfig.backgroundKey === 'string') out.backgroundKey = sceneConfig.backgroundKey;
     else if (typeof sceneConfig.background === 'string') out.backgroundKey = sceneConfig.background;
   }
-  if (Array.isArray(out.lineupDeck)) {
-    out.lineupDeck = normalizeDeckEntries(out.lineupDeck);
-  }
-  if (Array.isArray(out.playerDeck)) {
-    out.playerDeck = normalizeDeckEntries(out.playerDeck);
-  }
-  if (Array.isArray(out.deck)) {
-    out.deck = normalizeDeckEntries(out.deck);
-  }
+  normalizeDeckField(out, 'lineupDeck');
+  normalizeDeckField(out, 'playerDeck');
+  normalizeDeckField(out, 'deck');
   if (typeof out.collectionState === 'undefined') {
     out.collectionState = null;
   }
@@ -737,8 +738,6 @@ const drawCtx = cacheCtx as CanvasRenderingContext2D;
 }
 
 export { backgroundSignatureCache as __backgroundSignatureCache };
-const toFiniteCost = parseFiniteNumber;
-
 const deckEntrySkeletonCache = new Map<string, SessionState['unitsAll'][number]>();
 const MAX_PLAYER_DECK_SIZE = 10;
 
@@ -770,7 +769,7 @@ function makeDeckEntrySkeleton(unitId: string): SessionState['unitsAll'][number]
   const art = getUnitArt(normalizedId);
   const skeleton = {
     id: normalizedId,
-    cost: toFiniteCost(unitDef?.cost) ?? null,
+    cost: parseFiniteNumber(unitDef?.cost) ?? null,
     name: typeof unitDef?.name === 'string' ? unitDef.name : null,
     art,
     skinKey: art?.skinKey ?? null,
@@ -794,7 +793,7 @@ function normalizeDeckEntry(entry: unknown): SessionState['unitsAll'][number] | 
     ...(candidate as SessionState['unitsAll'][number]),
     id: skeleton.id,
   };
-  const costOverride = toFiniteCost(candidate.cost);
+  const costOverride = parseFiniteNumber(candidate.cost);
   merged.cost = costOverride ?? skeleton.cost ?? null;
   const nameCandidate = candidate.name;
   if (typeof nameCandidate === 'string' && nameCandidate.trim() !== '') {

@@ -322,14 +322,25 @@ const sanitizeOptionalString = (input: unknown): string | undefined => {
   return trimmed ? trimmed : undefined;
 };
 
+const applyParsedNumericKeys = <T extends Record<string, unknown>>(
+  source: T,
+  target: T,
+  keys: ReadonlyArray<keyof T>,
+): void => {
+  for (let index = 0; index < keys.length; index += 1) {
+    const key = keys[index] as keyof T;
+    const parsed = parseFiniteNumber(source[key]);
+    if (parsed != null) {
+      target[key] = parsed as T[keyof T];
+    }
+  }
+};
+
 const coerceSkillRuntime = (value: unknown): SkillRuntime | null => {
   if (!isPlainRecord(value)) return null;
   const record = value as SkillRuntime;
   const normalized: SkillRuntime = { ...record };
-  for (const key of SKILL_RUNTIME_NUMERIC_KEYS){
-    const parsed = parseFiniteNumber(record[key]);
-    if (parsed != null) normalized[key] = parsed;
-  }
+  applyParsedNumericKeys(record, normalized, SKILL_RUNTIME_NUMERIC_KEYS);
   return normalized;
 };
 
@@ -386,10 +397,7 @@ const coerceDamageSpec = (value: unknown): UltDamageSpec | null => {
   if (!isPlainRecord(value)) return null;
   const record = value as UltDamageSpec;
   const damage: UltDamageSpec = { ...record };
-  for (const key of ULT_DAMAGE_NUMERIC_KEYS){
-    const parsed = parseFiniteNumber(record[key]);
-    if (parsed != null) damage[key] = parsed;
-  }
+  applyParsedNumericKeys(record, damage, ULT_DAMAGE_NUMERIC_KEYS);
   if (typeof record.type === 'string') damage.type = record.type;
   return damage;
 };
@@ -398,10 +406,7 @@ const coerceUlt = (value: unknown): UltSpec | null => {
   if (!value || typeof value !== 'object') return null;
   const record = value as UltSpec;
   const ult: UltSpec = { ...record };
-  for (const key of ULT_NUMERIC_KEYS){
-    const parsed = parseFiniteNumber(record[key]);
-    if (parsed != null) ult[key] = parsed;
-  }
+  applyParsedNumericKeys(record, ult, ULT_NUMERIC_KEYS);
   const targetsParsed = parseFiniteNumber(record.targets);
   if (targetsParsed != null) ult.targets = targetsParsed;
   const alliesParsed = parseFiniteNumber(record.allies);

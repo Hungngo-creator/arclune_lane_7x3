@@ -15001,16 +15001,21 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const trimmed = input.trim();
       return trimmed ? trimmed : undefined;
   };
+  const applyParsedNumericKeys = (source, target, keys) => {
+      for (let index = 0; index < keys.length; index += 1) {
+          const key = keys[index];
+          const parsed = parseFiniteNumber(source[key]);
+          if (parsed != null) {
+              target[key] = parsed;
+          }
+      }
+  };
   const coerceSkillRuntime = (value) => {
       if (!isPlainRecord(value))
           return null;
       const record = value;
       const normalized = { ...record };
-      for (const key of SKILL_RUNTIME_NUMERIC_KEYS) {
-          const parsed = parseFiniteNumber(record[key]);
-          if (parsed != null)
-              normalized[key] = parsed;
-      }
+      applyParsedNumericKeys(record, normalized, SKILL_RUNTIME_NUMERIC_KEYS);
       return normalized;
   };
   const coerceSummonCreep = (value) => {
@@ -15072,11 +15077,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return null;
       const record = value;
       const damage = { ...record };
-      for (const key of ULT_DAMAGE_NUMERIC_KEYS) {
-          const parsed = parseFiniteNumber(record[key]);
-          if (parsed != null)
-              damage[key] = parsed;
-      }
+      applyParsedNumericKeys(record, damage, ULT_DAMAGE_NUMERIC_KEYS);
       if (typeof record.type === 'string')
           damage.type = record.type;
       return damage;
@@ -15086,11 +15087,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return null;
       const record = value;
       const ult = { ...record };
-      for (const key of ULT_NUMERIC_KEYS) {
-          const parsed = parseFiniteNumber(record[key]);
-          if (parsed != null)
-              ult[key] = parsed;
-      }
+      applyParsedNumericKeys(record, ult, ULT_NUMERIC_KEYS);
       const targetsParsed = parseFiniteNumber(record.targets);
       if (targetsParsed != null)
           ult.targets = targetsParsed;
@@ -18899,6 +18896,7 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   const __getStoredConfig = __dep1.__getStoredConfig;
   const __getActiveGame = __dep1.__getActiveGame;
   const __resolveStatusIconPreview = __dep1.__resolveStatusIconPreview;
+  const NOOP_UNSUBSCRIBE = () => { };
   function isReward(entry) {
       if (!entry || typeof entry !== 'object')
           return false;
@@ -18977,7 +18975,14 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   function removeRewardById(list, rewardId) {
       if (!list.length)
           return list;
-      const removeIndex = list.findIndex((entry) => !!entry && entry.id === rewardId);
+      let removeIndex = -1;
+      for (let index = 0; index < list.length; index += 1) {
+          const entry = list[index];
+          if (!entry || entry.id !== rewardId)
+              continue;
+          removeIndex = index;
+          break;
+      }
       if (removeIndex < 0)
           return list;
       for (let index = removeIndex + 1; index < list.length; index += 1) {
@@ -19056,16 +19061,13 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
   }
   function onSessionEvent(type, handler) {
       if (!type || typeof handler !== 'function') {
-          return () => { };
+          return NOOP_UNSUBSCRIBE;
       }
       return addGameEventListener(type, handler);
   }
   function createPveSession(rootEl, options = {}) {
       const controller = createPveSessionImpl(rootEl, options);
-      return {
-          ...controller,
-          onEvent: onSessionEvent,
-      };
+      return Object.assign(controller, { onEvent: onSessionEvent });
   }
   exports.__getStoredConfig = __getStoredConfig;
   exports.__getActiveGame = __getActiveGame;
@@ -19134,6 +19136,12 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           skinKey: art?.skinKey ?? null,
       };
   });
+  function normalizeDeckField(config, key) {
+      const value = config[key];
+      if (Array.isArray(value)) {
+          config[key] = normalizeDeckEntries(value);
+      }
+  }
   function hasDeckEntries(value) {
       return Array.isArray(value) && value.length > 0;
   }
@@ -19368,15 +19376,9 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           else if (typeof sceneConfig.background === 'string')
               out.backgroundKey = sceneConfig.background;
       }
-      if (Array.isArray(out.lineupDeck)) {
-          out.lineupDeck = normalizeDeckEntries(out.lineupDeck);
-      }
-      if (Array.isArray(out.playerDeck)) {
-          out.playerDeck = normalizeDeckEntries(out.playerDeck);
-      }
-      if (Array.isArray(out.deck)) {
-          out.deck = normalizeDeckEntries(out.deck);
-      }
+      normalizeDeckField(out, 'lineupDeck');
+      normalizeDeckField(out, 'playerDeck');
+      normalizeDeckField(out, 'deck');
       if (typeof out.collectionState === 'undefined') {
           out.collectionState = null;
       }
@@ -19721,7 +19723,6 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       return sceneCache;
   }
   exports.__backgroundSignatureCache = backgroundSignatureCache;
-  const toFiniteCost = parseFiniteNumber;
   const deckEntrySkeletonCache = new Map();
   const MAX_PLAYER_DECK_SIZE = 10;
   function resolveElementFromRecord(record) {
@@ -19748,7 +19749,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       const art = getUnitArt(normalizedId);
       const skeleton = {
           id: normalizedId,
-          cost: toFiniteCost(unitDef?.cost) ?? null,
+          cost: parseFiniteNumber(unitDef?.cost) ?? null,
           name: typeof unitDef?.name === 'string' ? unitDef.name : null,
           art,
           skinKey: art?.skinKey ?? null,
@@ -19774,7 +19775,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           ...candidate,
           id: skeleton.id,
       };
-      const costOverride = toFiniteCost(candidate.cost);
+      const costOverride = parseFiniteNumber(candidate.cost);
       merged.cost = costOverride ?? skeleton.cost ?? null;
       const nameCandidate = candidate.name;
       if (typeof nameCandidate === 'string' && nameCandidate.trim() !== '') {

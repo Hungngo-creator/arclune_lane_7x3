@@ -31,6 +31,7 @@ type RewardList = ReadonlyArray<RewardRoll>;
 type MutableRewardList = RewardRoll[];
 type RewardListContainer = SessionRuntimeState | EncounterState;
 type RewardListKey = 'rewardQueue' | 'pendingRewards';
+const NOOP_UNSUBSCRIBE = (): void => {};
 
 function isReward(entry: RewardRoll | null | undefined): entry is RewardRoll {
   if (!entry || typeof entry !== 'object') return false;
@@ -105,7 +106,13 @@ function mergeRewardsInPlace(list: MutableRewardList, additions: RewardList): Mu
 
 function removeRewardById(list: MutableRewardList, rewardId: string): MutableRewardList {
   if (!list.length) return list;
-  const removeIndex = list.findIndex((entry) => !!entry && entry.id === rewardId);
+  let removeIndex = -1;
+  for (let index = 0; index < list.length; index += 1) {
+    const entry = list[index];
+    if (!entry || entry.id !== rewardId) continue;
+    removeIndex = index;
+    break;
+  }
   if (removeIndex < 0) return list;
   for (let index = removeIndex + 1; index < list.length; index += 1) {
     list[index - 1] = list[index] as RewardRoll;
@@ -193,7 +200,7 @@ export function onSessionEvent<T extends GameEventType>(
   handler: GameEventHandler<T>,
 ): () => void {
   if (!type || typeof handler !== 'function') {
-    return () => {};
+    return NOOP_UNSUBSCRIBE;
   }
   return addGameEventListener(type, handler);
 }
@@ -212,10 +219,7 @@ export function createPveSession(
   options: Parameters<typeof createPveSessionImpl>[1] = {},
 ): ControllerWithEvents {
   const controller = createPveSessionImpl(rootEl, options);
-  return {
-    ...controller,
-    onEvent: onSessionEvent,
-  };
+  return Object.assign(controller, { onEvent: onSessionEvent });
 }
 
 export { __getStoredConfig, __getActiveGame };
