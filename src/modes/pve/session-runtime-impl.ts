@@ -679,16 +679,57 @@ let sessionLoopController: ReturnType<typeof createSessionLoopController> | null
 const sessionDeckController = createSessionDeckController({
   getGame: () => Game,
   handSize: HAND_SIZE,
+  isUniqueGlobalSummonBlocked: (game, card) => (
+    isUniqueGlobalSummonBlocked(game, { unitId: card.id, tags: card.tags ?? null })
+  ),
+  queueSummonFromDeckSelection: ({ game, card, cell }) => {
+    if (cellReserved(getAliveTokensScratch(), game.queued, cell.cx, cell.cy)) return false;
+    const cardCost = getCardCost(card);
+    if (game.cost < cardCost) return false;
+    if (game.summoned >= game.summonLimit) return false;
+
+    const slot = slotIndex('ally', cell.cx, cell.cy);
+    if (game.queued.ally.has(slot)) return false;
+
+    const spawnCycle = predictSpawnCycle(game, 'ally', slot);
+    const pendingArt = getUnitArt(card.id);
+    const pending: QueuedSummonRequest & {
+      art?: ReturnType<typeof getUnitArt> | null;
+      skinKey?: string | null;
+    } = {
+      unitId: card.id,
+      name: typeof card.name === 'string' ? card.name : null,
+      side: 'ally',
+      cx: cell.cx,
+      cy: cell.cy,
+      slot,
+      spawnCycle,
+      source: 'deck',
+      color: pendingArt?.palette?.primary || '#a9f58c',
+      art: pendingArt ?? null,
+      skinKey: pendingArt?.skinKey ?? null,
+    };
+    game.queued.ally.set(slot, pending);
+
+    game.cost = Math.max(0, game.cost - cardCost);
+    if (hud) hud.update(game);
+    game.summoned += 1;
+    game.usedUnitIds.add(card.id);
+    scheduleDraw();
+    return true;
+  },
 });
 const {
   ensureDeck,
   isCardInLockedDeck,
-  findDeckEntryIndexById,
-  removeDeckEntryAtIndex,
   getCardCost,
   refillDeck,
   selectFirstAffordable,
   renderSummonBar,
+  handleSummonBarPick,
+  canAffordCard,
+  getDeckForSummonBar,
+  handleCanvasSummonCellClick,
 } = sessionDeckController;
 let resizeHandler: (() => void) | null = null;
 let visualViewportResizeHandler: (() => void) | null = null;
@@ -2617,28 +2658,9 @@ function init(): boolean {
 
   cleanupSummonBar();
   const barHandle = startSummonBar(doc, {
-    onPick: (card): void => {
-      const game = getInitializedGame();
-      if (!game) return;
-      if (!isDeckEntry(card)) return;
-      const entry = card;
-      if (!isCardInLockedDeck(entry.id, game)) return;
-      game.selectedId = entry.id;
-      renderSummonBar();
-    },
-    canAfford: (card): boolean => {
-      const game = getInitializedGame();
-      if (!game) return false;
-      if (!isDeckEntry(card)) return false;
-      const entry = card;
-      if (isUniqueGlobalSummonBlocked(game, { unitId: entry.id, tags: entry.tags ?? null })) return false;
-      return game.cost >= getCardCost(entry);
-    },
-    getDeck: (): DeckEntry[] => {
-      const game = getInitializedGame();
-      if (!game) return [];
-      return ensureDeck(game);
-    },
+    onPick: handleSummonBarPick,
+    canAfford: canAffordCard,
+    getDeck: getDeckForSummonBar,
     getSelectedId: (): string | null => {
       const game = getInitializedGame();
       return game ? game.selectedId : null;
@@ -2669,54 +2691,7 @@ function init(): boolean {
     if (!cell) return;
 
     if (cell.cx >= CFG.ALLY_COLS) return;
-
-    const deck = ensureDeck(game);
-    const selectedIndex = findDeckEntryIndexById(deck, game.selectedId);
-    if (selectedIndex < 0) return;
-    const card = deck[selectedIndex];
-    if (!card) return;
-    if (!isCardInLockedDeck(card.id, game)) return;
-    if (isUniqueGlobalSummonBlocked(game, { unitId: card.id, tags: card.tags ?? null })) return;
-
-    if (cellReserved(getAliveTokensScratch(), game.queued, cell.cx, cell.cy)) return;
-    const cardCost = getCardCost(card);
-    if (game.cost < cardCost) return;
-    if (game.summoned >= game.summonLimit) return;
-
-    const slot = slotIndex('ally', cell.cx, cell.cy);
-    if (game.queued.ally.has(slot)) return;
-
-    const spawnCycle = predictSpawnCycle(game, 'ally', slot);
-    const pendingArt = getUnitArt(card.id);
-    const pending: QueuedSummonRequest & {
-      art?: ReturnType<typeof getUnitArt> | null;
-      skinKey?: string | null;
-    } = {
-      unitId: card.id,
-      name: typeof card.name === 'string' ? card.name : null,
-      side: 'ally',
-      cx: cell.cx,
-      cy: cell.cy,
-      slot,
-      spawnCycle,
-      source: 'deck',
-      color: pendingArt?.palette?.primary || '#a9f58c',
-      art: pendingArt ?? null,
-      skinKey: pendingArt?.skinKey ?? null,
-    };
-    game.queued.ally.set(slot, pending);
-
-    game.cost = Math.max(0, game.cost - cardCost);
-    if (hud) hud.update(game);
-    game.summoned += 1;
-    game.usedUnitIds.add(card.id);
-
-    game.deck3 = removeDeckEntryAtIndex(deck, selectedIndex);
-    game.selectedId = null;
-    refillDeck();
-    selectFirstAffordable();
-    renderSummonBar();
-    scheduleDraw();
+  handleCanvasSummonCellClick(cell);
   };
   if (canvas && canvasClickHandler){
     canvas.addEventListener('click', canvasClickHandler);

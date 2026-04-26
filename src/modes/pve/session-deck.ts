@@ -20,6 +20,12 @@ type DeckFilterCache = {
 type SessionDeckDeps = {
   getGame: () => SessionState | null;
   handSize: number;
+  isUniqueGlobalSummonBlocked: (game: SessionState, card: DeckEntry) => boolean;
+  queueSummonFromDeckSelection: (params: {
+    game: SessionState;
+    card: DeckEntry;
+    cell: { cx: number; cy: number };
+  }) => boolean;
 };
 
 type SessionDeckController = {
@@ -33,6 +39,10 @@ type SessionDeckController = {
   selectFirstAffordable: () => void;
   flushSummonBarRender: () => void;
   renderSummonBar: () => void;
+  handleSummonBarPick: (card: unknown) => void;
+  canAffordCard: (card: unknown) => boolean;
+  getDeckForSummonBar: () => DeckEntry[];
+  handleCanvasSummonCellClick: (cell: { cx: number; cy: number }) => boolean;
 };
 
 const EMPTY_DECK_ENTRIES: DeckEntry[] = [];
@@ -279,6 +289,48 @@ export const createSessionDeckController = (deps: SessionDeckDeps): SessionDeckC
     RESOLVED_PROMISE.then(flushSummonBarRender);
   };
 
+  const handleSummonBarPick = (card: unknown): void => {
+    const game = deps.getGame();
+    if (!game || !isDeckEntry(card)) return;
+    const entry = card;
+    if (!isCardInLockedDeck(entry.id, game)) return;
+    game.selectedId = entry.id;
+    renderSummonBar();
+  };
+
+  const canAffordCard = (card: unknown): boolean => {
+    const game = deps.getGame();
+    if (!game || !isDeckEntry(card)) return false;
+    const entry = card;
+    if (deps.isUniqueGlobalSummonBlocked(game, entry)) return false;
+    return game.cost >= getCardCost(entry);
+  };
+
+  const getDeckForSummonBar = (): DeckEntry[] => {
+    const game = deps.getGame();
+    if (!game) return [];
+    return ensureDeck(game);
+  };
+
+  const handleCanvasSummonCellClick = (cell: { cx: number; cy: number }): boolean => {
+    const game = deps.getGame();
+    if (!game) return false;
+    const deck = ensureDeck(game);
+    const selectedIndex = findDeckEntryIndexById(deck, game.selectedId);
+    if (selectedIndex < 0) return false;
+    const card = deck[selectedIndex];
+    if (!card || !isCardInLockedDeck(card.id, game)) return false;
+    if (deps.isUniqueGlobalSummonBlocked(game, card)) return false;
+    if (!deps.queueSummonFromDeckSelection({ game, card, cell })) return false;
+
+    game.deck3 = removeDeckEntryAtIndex(deck, selectedIndex);
+    game.selectedId = null;
+    refillDeck();
+    selectFirstAffordable();
+    renderSummonBar();
+    return true;
+  };
+
   return {
     ensureDeck,
     ensureLockedPlayerDeck,
@@ -290,6 +342,10 @@ export const createSessionDeckController = (deps: SessionDeckDeps): SessionDeckC
     selectFirstAffordable,
     flushSummonBarRender,
     renderSummonBar,
+    handleSummonBarPick,
+    canAffordCard,
+    getDeckForSummonBar,
+    handleCanvasSummonCellClick,
   };
 };
 
