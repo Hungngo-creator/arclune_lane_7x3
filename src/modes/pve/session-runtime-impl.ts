@@ -461,54 +461,23 @@ const clampResolvedCount = (
   return resolved;
 };
 
-const resolveCount4 = (
-  v1: unknown,
-  v2: unknown,
-  v3: unknown,
-  v4: unknown,
+const resolveCountCandidates = (
+  values: ReadonlyArray<unknown>,
   fallback: number,
   clamp: { min?: number; max?: number } = {},
 ): number => {
-  const c1 = readCountCandidate(v1);
-  if (c1 != null) return clampResolvedCount(c1, clamp);
-  const c2 = readCountCandidate(v2);
-  if (c2 != null) return clampResolvedCount(c2, clamp);
-  const c3 = readCountCandidate(v3);
-  if (c3 != null) return clampResolvedCount(c3, clamp);
-  const c4 = readCountCandidate(v4);
-  if (c4 != null) return clampResolvedCount(c4, clamp);
-  return fallback;
-};
-
-const resolveCount5 = (
-  v1: unknown,
-  v2: unknown,
-  v3: unknown,
-  v4: unknown,
-  v5: unknown,
-  fallback: number,
-  clamp: { min?: number; max?: number } = {},
-): number => {
-  const c1 = readCountCandidate(v1);
-  if (c1 != null) return clampResolvedCount(c1, clamp);
-  const c2 = readCountCandidate(v2);
-  if (c2 != null) return clampResolvedCount(c2, clamp);
-  const c3 = readCountCandidate(v3);
-  if (c3 != null) return clampResolvedCount(c3, clamp);
-  const c4 = readCountCandidate(v4);
-  if (c4 != null) return clampResolvedCount(c4, clamp);
-  const c5 = readCountCandidate(v5);
-  if (c5 != null) return clampResolvedCount(c5, clamp);
+for (let index = 0; index < values.length; index += 1) {
+    const candidate = readCountCandidate(values[index]);
+    if (candidate == null) continue;
+    return clampResolvedCount(candidate, clamp);
+  }
   return fallback;
 };
 
 const getUltHitCount = (ult: UltSpec | null | undefined): number => {
   const runtime = ult?.runtime;
-  const resolved = resolveCount4(
-    ult?.hits,
-    runtime?.hits,
-    runtime?.hitCount,
-    runtime?.count,
+  const resolved = resolveCountCandidates(
+    [ult?.hits, runtime?.hits, runtime?.hitCount, runtime?.count],
     1,
     { min: 1 },
   );
@@ -530,11 +499,8 @@ const resolveUltScopedCount = (
   primary: unknown,
   runtime: SkillRuntime | null | undefined,
   fallback: number,
-): number => resolveCount4(
-  primary,
-  runtime?.targets,
-  runtime?.targetCount,
-  runtime?.count,
+): number => resolveCountCandidates(
+  [primary, runtime?.targets, runtime?.targetCount, runtime?.count],
   fallback,
   { min: 0 },
 );
@@ -544,12 +510,8 @@ const getUltDurationTurns = (
   fallback: number,
 ): number => {
   const runtime = ult?.runtime;
-  const resolved = resolveCount5(
-    ult?.duration,
-    ult?.turns,
-    runtime?.duration,
-    runtime?.turns,
-    runtime?.durationTurns,
+  const resolved = resolveCountCandidates(
+    [ult?.duration, ult?.turns, runtime?.duration, runtime?.turns, runtime?.durationTurns],
     fallback,
     { min: 1 },
   );

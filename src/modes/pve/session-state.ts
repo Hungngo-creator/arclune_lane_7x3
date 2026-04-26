@@ -518,11 +518,10 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     ?? null;
 
   const preferredPlayerDeck = normalizeDeckEntries(getPreferredDeckInput(normalized) ?? []);
-  const autoPlayerDeck = preferredPlayerDeck.length === 0
-    ? buildAutoPlayerDeckFromCollection(unitProgressById)
-    : [];
+  const hasPreferredDeck = preferredPlayerDeck.length > 0;
+  const autoPlayerDeck = hasPreferredDeck ? [] : buildAutoPlayerDeckFromCollection(unitProgressById);
   const fallbackDeck = DEFAULT_UNIT_ROSTER.slice(0, AUTO_PLAYER_DECK_SIZE) as SessionState['unitsAll'];
-  const lockedPlayerDeck = preferredPlayerDeck.length > 0
+  const lockedPlayerDeck = hasPreferredDeck
     ? preferredPlayerDeck
     : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackDeck.slice(0, 1));
 
@@ -533,7 +532,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
   const enemyPreset = normalized.aiPreset ?? null;
   const enemyUnits = resolveEnemyUnits({
     aiPreset: enemyPreset,
-    preferredDeck: preferredPlayerDeck.length > 0 ? preferredPlayerDeck : autoPlayerDeck,
+    preferredDeck: hasPreferredDeck ? preferredPlayerDeck : autoPlayerDeck,
     fallbackDeck: fallbackDeck,
     unitProgressById,
     collectionState: normalized.collectionState ?? null,
@@ -667,15 +666,17 @@ export function ensureSceneCache(args: EnsureSceneCacheArgs): SceneCacheEntry | 
   }
   const backgroundSignature = computeBackgroundSignature(backgroundKey);
 
-  let needsRebuild = false;
-  if (!sceneCache) needsRebuild = true;
-  else if (sceneCache.pixelWidth !== pixelWidth || sceneCache.pixelHeight !== pixelHeight) needsRebuild = true;
-  else if (sceneCache.themeKey !== themeKey || sceneCache.backgroundKey !== backgroundKey) needsRebuild = true;
-  else if (sceneCache.backgroundSignature !== backgroundSignature) needsRebuild = true;
-  else if (sceneCache.dpr !== dprRaw) needsRebuild = true;
-  else if (sceneCache.baseKey !== baseKey) needsRebuild = true;
-  else if (sceneCache.camPresetSignature !== camPresetSignature) needsRebuild = true;
-  else if (!sceneCache.includesGrid) needsRebuild = true;
+  const cachedScene = sceneCache;
+  const needsRebuild = !cachedScene
+    || cachedScene.pixelWidth !== pixelWidth
+    || cachedScene.pixelHeight !== pixelHeight
+    || cachedScene.themeKey !== themeKey
+    || cachedScene.backgroundKey !== backgroundKey
+    || cachedScene.backgroundSignature !== backgroundSignature
+    || cachedScene.dpr !== dprRaw
+    || cachedScene.baseKey !== baseKey
+    || cachedScene.camPresetSignature !== camPresetSignature
+    || !cachedScene.includesGrid;
 
   if (!needsRebuild) return sceneCache;
 

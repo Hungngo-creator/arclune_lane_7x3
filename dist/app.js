@@ -15140,42 +15140,18 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           resolved = Math.min(max, resolved);
       return resolved;
   };
-  const resolveCount4 = (v1, v2, v3, v4, fallback, clamp = {}) => {
-      const c1 = readCountCandidate(v1);
-      if (c1 != null)
-          return clampResolvedCount(c1, clamp);
-      const c2 = readCountCandidate(v2);
-      if (c2 != null)
-          return clampResolvedCount(c2, clamp);
-      const c3 = readCountCandidate(v3);
-      if (c3 != null)
-          return clampResolvedCount(c3, clamp);
-      const c4 = readCountCandidate(v4);
-      if (c4 != null)
-          return clampResolvedCount(c4, clamp);
-      return fallback;
-  };
-  const resolveCount5 = (v1, v2, v3, v4, v5, fallback, clamp = {}) => {
-      const c1 = readCountCandidate(v1);
-      if (c1 != null)
-          return clampResolvedCount(c1, clamp);
-      const c2 = readCountCandidate(v2);
-      if (c2 != null)
-          return clampResolvedCount(c2, clamp);
-      const c3 = readCountCandidate(v3);
-      if (c3 != null)
-          return clampResolvedCount(c3, clamp);
-      const c4 = readCountCandidate(v4);
-      if (c4 != null)
-          return clampResolvedCount(c4, clamp);
-      const c5 = readCountCandidate(v5);
-      if (c5 != null)
-          return clampResolvedCount(c5, clamp);
+  const resolveCountCandidates = (values, fallback, clamp = {}) => {
+      for (let index = 0; index < values.length; index += 1) {
+          const candidate = readCountCandidate(values[index]);
+          if (candidate == null)
+              continue;
+          return clampResolvedCount(candidate, clamp);
+      }
       return fallback;
   };
   const getUltHitCount = (ult) => {
       const runtime = ult?.runtime;
-      const resolved = resolveCount4(ult?.hits, runtime?.hits, runtime?.hitCount, runtime?.count, 1, { min: 1 });
+      const resolved = resolveCountCandidates([ult?.hits, runtime?.hits, runtime?.hitCount, runtime?.count], 1, { min: 1 });
       return Math.max(1, resolved);
   };
   const getUltScopedCount = (ult, fallback, scope = 'targets') => {
@@ -15183,10 +15159,10 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const primary = scope === 'allies' ? ult?.allies : ult?.targets;
       return resolveUltScopedCount(primary, runtime, fallback);
   };
-  const resolveUltScopedCount = (primary, runtime, fallback) => resolveCount4(primary, runtime?.targets, runtime?.targetCount, runtime?.count, fallback, { min: 0 });
+  const resolveUltScopedCount = (primary, runtime, fallback) => resolveCountCandidates([primary, runtime?.targets, runtime?.targetCount, runtime?.count], fallback, { min: 0 });
   const getUltDurationTurns = (ult, fallback) => {
       const runtime = ult?.runtime;
-      const resolved = resolveCount5(ult?.duration, ult?.turns, runtime?.duration, runtime?.turns, runtime?.durationTurns, fallback, { min: 1 });
+      const resolved = resolveCountCandidates([ult?.duration, ult?.turns, runtime?.duration, runtime?.turns, runtime?.durationTurns], fallback, { min: 1 });
       return Math.max(1, resolved);
   };
   const ensureSessionWithVfx = (game, options) => {
@@ -18954,6 +18930,9 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
       store[key] = list;
       return list;
   }
+  function mergeRewardLists(container, key, additions) {
+      return mergeRewardsInPlace(getMutableRewardList(container, key), additions);
+  }
   function mergeRewardsInPlace(list, additions) {
       if (!additions.length)
           return list;
@@ -18999,7 +18978,10 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
           const entry = list[index];
           if (!entry || entry.id !== rewardId)
               continue;
-          list.splice(index, 1);
+          for (let write = index + 1; write < list.length; write += 1) {
+              list[write - 1] = list[write];
+          }
+          list.length -= 1;
           break;
       }
       return list;
@@ -19040,9 +19022,8 @@ __modules['./modes/pve/session-runtime.ts'] = (exports, module, __require) => {
               encounter.waveIndex = index + 1;
               const rewards = toSanitizedRewardList(wave.rewards);
               if (rewards.length) {
-                  const pendingRewards = getMutableRewardList(encounter, 'pendingRewards');
+                  const pendingRewards = mergeRewardLists(encounter, 'pendingRewards', rewards);
                   const rewardQueue = getMutableRewardList(runtime, 'rewardQueue');
-                  mergeRewardsInPlace(pendingRewards, rewards);
                   if (rewardQueue !== pendingRewards) {
                       mergeRewardsInPlace(rewardQueue, rewards);
                   }
@@ -19530,11 +19511,10 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           ?? sceneCfg?.DEFAULT_THEME
           ?? null;
       const preferredPlayerDeck = normalizeDeckEntries(getPreferredDeckInput(normalized) ?? []);
-      const autoPlayerDeck = preferredPlayerDeck.length === 0
-          ? buildAutoPlayerDeckFromCollection(unitProgressById)
-          : [];
+      const hasPreferredDeck = preferredPlayerDeck.length > 0;
+      const autoPlayerDeck = hasPreferredDeck ? [] : buildAutoPlayerDeckFromCollection(unitProgressById);
       const fallbackDeck = DEFAULT_UNIT_ROSTER.slice(0, AUTO_PLAYER_DECK_SIZE);
-      const lockedPlayerDeck = preferredPlayerDeck.length > 0
+      const lockedPlayerDeck = hasPreferredDeck
           ? preferredPlayerDeck
           : (autoPlayerDeck.length > 0 ? autoPlayerDeck : fallbackDeck.slice(0, 1));
       const allyUnits = lockedPlayerDeck.length
@@ -19543,7 +19523,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       const enemyPreset = normalized.aiPreset ?? null;
       const enemyUnits = resolveEnemyUnits({
           aiPreset: enemyPreset,
-          preferredDeck: preferredPlayerDeck.length > 0 ? preferredPlayerDeck : autoPlayerDeck,
+          preferredDeck: hasPreferredDeck ? preferredPlayerDeck : autoPlayerDeck,
           fallbackDeck: fallbackDeck,
           unitProgressById,
           collectionState: normalized.collectionState ?? null,
@@ -19664,23 +19644,17 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           return null;
       }
       const backgroundSignature = computeBackgroundSignature(backgroundKey);
-      let needsRebuild = false;
-      if (!sceneCache)
-          needsRebuild = true;
-      else if (sceneCache.pixelWidth !== pixelWidth || sceneCache.pixelHeight !== pixelHeight)
-          needsRebuild = true;
-      else if (sceneCache.themeKey !== themeKey || sceneCache.backgroundKey !== backgroundKey)
-          needsRebuild = true;
-      else if (sceneCache.backgroundSignature !== backgroundSignature)
-          needsRebuild = true;
-      else if (sceneCache.dpr !== dprRaw)
-          needsRebuild = true;
-      else if (sceneCache.baseKey !== baseKey)
-          needsRebuild = true;
-      else if (sceneCache.camPresetSignature !== camPresetSignature)
-          needsRebuild = true;
-      else if (!sceneCache.includesGrid)
-          needsRebuild = true;
+      const cachedScene = sceneCache;
+      const needsRebuild = !cachedScene
+          || cachedScene.pixelWidth !== pixelWidth
+          || cachedScene.pixelHeight !== pixelHeight
+          || cachedScene.themeKey !== themeKey
+          || cachedScene.backgroundKey !== backgroundKey
+          || cachedScene.backgroundSignature !== backgroundSignature
+          || cachedScene.dpr !== dprRaw
+          || cachedScene.baseKey !== baseKey
+          || cachedScene.camPresetSignature !== camPresetSignature
+          || !cachedScene.includesGrid;
       if (!needsRebuild)
           return sceneCache;
       const offscreen = createSceneCacheCanvas(pixelWidth, pixelHeight, documentRef);
