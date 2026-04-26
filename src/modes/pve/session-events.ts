@@ -36,6 +36,21 @@ type SessionEventBindingsDeps = {
   onWindowResize: () => void;
   onViewportResize: () => void;
   onViewportScroll: () => void;
+  setCanvas: (next: HTMLCanvasElement | null) => void;
+  setContext: (next: CanvasRenderingContext2D | null) => void;
+  setHud: (next: unknown | null) => void;
+  setLeaderUltControlsHidden: (hidden: boolean) => void;
+  clearLeaderUltButtons: () => void;
+  setLeaderUltControlsEl: (next: HTMLElement | null) => void;
+  setLeaderUltControlsFingerprint: (next: string | null) => void;
+  setTimerElement: (next: HTMLElement | null) => void;
+  setStatusIconHoverTooltip: (next: string) => void;
+  clearStatusIconHitboxes: () => void;
+  clearHpBarGradientCache: () => void;
+  cleanupSummonBar: () => void;
+  destroyAetherPool: () => void;
+  cleanupGameState: () => void;
+  clearAfterStop: () => void;
 };
 
 type SessionEventBindingsController = {
@@ -47,6 +62,8 @@ type SessionEventBindingsController = {
   clearSessionTimers: () => void;
   bindSession: () => void;
   bindRuntimeListeners: () => void;
+  resetDomRefs: () => void;
+  stopSession: () => void;
 };
 
 export const createSessionEventBindings = (
@@ -210,6 +227,32 @@ export const createSessionEventBindings = (
     deps.setDrawPaused(doc ? !!doc.hidden : false);
   };
 
+  const resetDomRefs = (): void => {
+    deps.setCanvas(null);
+    deps.setContext(null);
+    deps.setHud(null);
+    deps.setHudCleanup(null);
+    deps.setLeaderUltControlsHidden(true);
+    deps.clearLeaderUltButtons();
+    deps.setLeaderUltControlsEl(null);
+    deps.setLeaderUltControlsFingerprint(null);
+    deps.setTimerElement(null);
+    deps.setStatusIconHoverTooltip('');
+    deps.clearStatusIconHitboxes();
+    deps.clearHpBarGradientCache();
+    deps.invalidateSceneCache();
+  };
+
+  const stopSession = (): void => {
+    clearSessionTimers();
+    clearSessionListeners();
+    deps.cleanupSummonBar();
+    deps.destroyAetherPool();
+    deps.cleanupGameState();
+    resetDomRefs();
+    deps.clearAfterStop();
+  };
+
   return {
     bindArtSpriteListener,
     unbindArtSpriteListener,
@@ -219,5 +262,7 @@ export const createSessionEventBindings = (
     clearSessionTimers,
     bindSession,
     bindRuntimeListeners,
+    resetDomRefs,
+    stopSession,
   };
 };

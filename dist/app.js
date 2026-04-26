@@ -15275,6 +15275,30 @@ __modules['./modes/pve/session-events.ts'] = (exports, module, __require) => {
           const doc = deps.getDocRef();
           deps.setDrawPaused(doc ? !!doc.hidden : false);
       };
+      const resetDomRefs = () => {
+          deps.setCanvas(null);
+          deps.setContext(null);
+          deps.setHud(null);
+          deps.setHudCleanup(null);
+          deps.setLeaderUltControlsHidden(true);
+          deps.clearLeaderUltButtons();
+          deps.setLeaderUltControlsEl(null);
+          deps.setLeaderUltControlsFingerprint(null);
+          deps.setTimerElement(null);
+          deps.setStatusIconHoverTooltip('');
+          deps.clearStatusIconHitboxes();
+          deps.clearHpBarGradientCache();
+          deps.invalidateSceneCache();
+      };
+      const stopSession = () => {
+          clearSessionTimers();
+          clearSessionListeners();
+          deps.cleanupSummonBar();
+          deps.destroyAetherPool();
+          deps.cleanupGameState();
+          resetDomRefs();
+          deps.clearAfterStop();
+      };
       return {
           bindArtSpriteListener,
           unbindArtSpriteListener,
@@ -15284,6 +15308,8 @@ __modules['./modes/pve/session-events.ts'] = (exports, module, __require) => {
           clearSessionTimers,
           bindSession,
           bindRuntimeListeners,
+          resetDomRefs,
+          stopSession,
       };
   };
   //# sourceMappingURL=stdin.js.map
@@ -18840,34 +18866,30 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       onWindowResize: () => { scheduleResize(); },
       onViewportResize: () => { scheduleViewportResizeIfChanged('resize'); },
       onViewportScroll: () => { scheduleViewportResizeIfChanged('scroll'); },
-  });
-  const { clearSessionTimers, clearSessionListeners, bindSession, bindRuntimeListeners, } = sessionEventBindings;
-  function resetDomRefs() {
-      canvas = null;
-      ctx = null;
-      hud = null;
-      hudCleanup = null;
-      if (leaderUltControlsEl) {
-          leaderUltControlsEl.hidden = true;
-      }
-      for (const button of leaderUltButtons) {
-          button.onclick = null;
-      }
-      leaderUltButtons = [];
-      leaderUltControlsEl = null;
-      leaderUltControlsFingerprint = null;
-      timerElement = null;
-      statusIconHoverTooltip = '';
-      statusIconHitboxes.length = 0;
-      hpBarGradientCache.clear();
-      invalidateSceneCache();
-  }
-  function stopSession() {
-      clearSessionTimers();
-      clearSessionListeners();
-      cleanupSummonBar();
-      globalAetherPool.destroy();
-      if (Game) {
+      setCanvas: (next) => { canvas = next; },
+      setContext: (next) => { ctx = next; },
+      setHud: (next) => { hud = next; },
+      setLeaderUltControlsHidden: (hidden) => {
+          if (leaderUltControlsEl)
+              leaderUltControlsEl.hidden = hidden;
+      },
+      clearLeaderUltButtons: () => {
+          for (const button of leaderUltButtons) {
+              button.onclick = null;
+          }
+          leaderUltButtons = [];
+      },
+      setLeaderUltControlsEl: (next) => { leaderUltControlsEl = next; },
+      setLeaderUltControlsFingerprint: (next) => { leaderUltControlsFingerprint = next; },
+      setTimerElement: (next) => { timerElement = next; },
+      setStatusIconHoverTooltip: (next) => { statusIconHoverTooltip = next; },
+      clearStatusIconHitboxes: () => { statusIconHitboxes.length = 0; },
+      clearHpBarGradientCache: () => { hpBarGradientCache.clear(); },
+      cleanupSummonBar: () => { cleanupSummonBar(); },
+      destroyAetherPool: () => { globalAetherPool.destroy(); },
+      cleanupGameState: () => {
+          if (!Game)
+              return;
           if (Game.queued?.ally?.clear)
               Game.queued.ally.clear();
           if (Game.queued?.enemy?.clear)
@@ -18890,14 +18912,16 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           Game.summoned = 0;
           Game.selectedId = null;
           Game._inited = false;
-      }
-      resetDomRefs();
-      timerElement = null;
-      sessionLoopController = null;
-      Game = null;
-      running = false;
-      invalidateSceneCache();
-  }
+      },
+      clearAfterStop: () => {
+          timerElement = null;
+          sessionLoopController = null;
+          Game = null;
+          running = false;
+          invalidateSceneCache();
+      },
+  });
+  const { clearSessionTimers, bindSession, bindRuntimeListeners, stopSession, } = sessionEventBindings;
   function startSession(config = {}) {
       configureRoot(rootElement);
       resolveTimerElement();
@@ -18905,7 +18929,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       if (running)
           stopSession();
       resetSessionState(overrides);
-      resetDomRefs();
       running = true;
       try {
           const initialised = init();
