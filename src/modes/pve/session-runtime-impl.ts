@@ -13,7 +13,7 @@ import {
   makeGrid, drawGridOblique,
   drawTokensOblique, drawQueuedOblique,
   hitToCellOblique,
-  spawnLeaders, pickRandom, slotIndex, slotToCell, cellReserved,
+  spawnLeaders, slotIndex, slotToCell, cellReserved,
   ART_SPRITE_EVENT,
 } from '../../engine';
 import { drawEnvironmentProps } from '../../background';
@@ -67,6 +67,7 @@ import {
 } from './session-state';
 import { mapUnitProgressById } from './collection-mapper.ts';
 import { createSessionLoopController } from './session-loop';
+import { createSessionDeckController, isDeckEntry } from './session-deck';
 import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
 import {
   ensureUyenState,
@@ -124,7 +125,6 @@ type ExtendedQueuedSummon = (QueuedSummonRequest & {
 }) | null;
 type DeckEntry = PveDeckEntry;
 type GridSpec = ReturnType<typeof makeGrid>;
-const EMPTY_DECK_ENTRIES: DeckEntry[] = [];
 
 type InitializedSessionState = SessionState & { _inited: true };
 
@@ -278,7 +278,6 @@ const getInitializedGame = (): InitializedSessionState | null => (
 const nextSessionRandom = (game: SessionState | null | undefined = Game): number => (
   nextRngValue(game?.rng)
 );
-const RESOLVED_PROMISE = Promise.resolve();
 
 const SKILL_RUNTIME_NUMERIC_KEYS: ReadonlyArray<keyof SkillRuntime> = [
   'hits',
@@ -522,12 +521,6 @@ const ensureSessionWithVfx = (
   return session;
 };
 
-const isDeckEntry = (value: unknown): value is DeckEntry => {
-  if (!value || typeof value !== 'object') return false;
-  const candidate = value as { id?: unknown };
-  return typeof candidate.id === 'string' && candidate.id.trim() !== '';
-};
-
 function assertDeckEntry(value: unknown): asserts value is DeckEntry {
   if (!isDeckEntry(value)) {
     throw new TypeError('Thẻ bài không hợp lệ.');
@@ -538,163 +531,6 @@ function asDeckEntry<T>(value: T): DeckEntry {
   assertDeckEntry(value);
   return value;
 }
-
-function sanitizeDeckEntries(value: unknown): DeckEntry[] {
-  if (!Array.isArray(value)) return EMPTY_DECK_ENTRIES;
-  const cached = sanitizedDeckEntriesCache.get(value);
-  if (cached) return cached as DeckEntry[];
-  let normalized: DeckEntry[] | null = null;
-  for (let index = 0; index < value.length; index += 1) {
-    const entry = value[index];
-    if (isDeckEntry(entry)) {
-      if (normalized) normalized.push(entry);
-      continue;
-    }
-    if (!normalized) {
-      normalized = (value.slice(0, index) as DeckEntry[]);
-    }
-  }
-  const result = normalized ?? (value as DeckEntry[]);
-  sanitizedDeckEntriesCache.set(value, result);
-  return result;
-}
-
-type LockedDeckCache = {
-  deckRef: ReadonlyArray<DeckEntry>;
-  ids: ReadonlySet<string>;
-};
-type DeckFilterCache = {
-  gameRef: SessionState;
-  deckRef: ReadonlyArray<DeckEntry>;
-  lockedDeckRef: ReadonlyArray<DeckEntry>;
-  result: ReadonlyArray<DeckEntry>;
-};
-
-let lockedDeckCache: LockedDeckCache | null = null;
-let lockedDeckNormalizeCache: {
-  gameRef: SessionState;
-  sourceRef: ReadonlyArray<unknown>;
-  normalized: ReadonlyArray<DeckEntry>;
-} | null = null;
-let deckFilterCache: DeckFilterCache | null = null;
-const sanitizedDeckEntriesCache = new WeakMap<ReadonlyArray<unknown>, ReadonlyArray<DeckEntry>>();
-
-const invalidateLockedDeckCache = (): void => {
-  lockedDeckCache = null;
-  lockedDeckNormalizeCache = null;
-  deckFilterCache = null;
-};
-
-const getLockedDeckIdSet = (lockedDeck: ReadonlyArray<DeckEntry>): ReadonlySet<string> => {
-  if (lockedDeckCache?.deckRef === lockedDeck) {
-    return lockedDeckCache.ids;
-  }
-  const ids = new Set<string>();
-  for (let i = 0; i < lockedDeck.length; i += 1) {
-    const entry = lockedDeck[i];
-    if (!entry?.id) continue;
-    ids.add(entry.id);
-  }
-  lockedDeckCache = {
-    deckRef: lockedDeck,
-    ids,
-  };
-  return ids;
-};
-
-function ensureDeck(game: SessionState | null | undefined = Game): DeckEntry[] {
-  const session = isInitializedGame(game) ? game : null;
-  if (!session) return [];
-  const deck = sanitizeDeckEntries(session.deck3);
-  const lockedDeck = ensureLockedPlayerDeck(session);
-  if (
-    deckFilterCache
-    && deckFilterCache.gameRef === session
-    && deckFilterCache.deckRef === deck
-    && deckFilterCache.lockedDeckRef === lockedDeck
-  ) {
-    return deckFilterCache.result as DeckEntry[];
-  }
-  const lockedIds = getLockedDeckIdSet(lockedDeck);
-  let filteredDeck: DeckEntry[] | null = null;
-  for (let i = 0; i < deck.length; i += 1) {
-    const entry = deck[i];
-    if (!entry || !lockedIds.has(entry.id)) {
-      if (!filteredDeck) filteredDeck = deck.slice(0, i) as DeckEntry[];
-      continue;
-    }
-    if (filteredDeck) filteredDeck.push(entry);
-  }
-  const result = filteredDeck ?? deck;
-  if (filteredDeck || deck !== session.deck3) {
-    session.deck3 = result;
-  }
-  deckFilterCache = {
-    gameRef: session,
-    deckRef: deck,
-    lockedDeckRef: lockedDeck,
-    result,
-  };
-  return result;
-}
-
-const findDeckEntryIndexById = (
-  deck: ReadonlyArray<DeckEntry>,
-  id: string | null | undefined,
-): number => {
-  if (!id) return -1;
-  for (let i = 0; i < deck.length; i += 1) {
-    if (deck[i]?.id === id) return i;
-  }
-  return -1;
-};
-
-const removeDeckEntryAtIndex = (
-  deck: ReadonlyArray<DeckEntry>,
-  removeIndex: number,
-): DeckEntry[] => {
-  if (removeIndex < 0 || removeIndex >= deck.length) return deck as DeckEntry[];
-  const mutableDeck = deck as DeckEntry[];
-  mutableDeck.splice(removeIndex, 1);
-  return mutableDeck;
-};
-
-function ensureLockedPlayerDeck(game: SessionState | null | undefined = Game): ReadonlyArray<DeckEntry> {
-  const session = isInitializedGame(game) ? game : null;
-  if (!session) return EMPTY_DECK_ENTRIES;
-  const lockedSource = Array.isArray(session.playerDeckLocked) && session.playerDeckLocked.length
-    ? session.playerDeckLocked
-    : session.unitsAll;
-  if (
-    lockedDeckNormalizeCache
-    && lockedDeckNormalizeCache.gameRef === session
-    && lockedDeckNormalizeCache.sourceRef === lockedSource
-  ) {
-    return lockedDeckNormalizeCache.normalized;
-  }
-  const lockedDeck = sanitizeDeckEntries(lockedSource);
-  if (lockedDeck !== session.playerDeckLocked) {
-    session.playerDeckLocked = lockedDeck;
-    invalidateLockedDeckCache();
-  }
-  lockedDeckNormalizeCache = {
-    gameRef: session,
-    sourceRef: lockedSource,
-    normalized: lockedDeck,
-  };
-  return lockedDeck;
-}
-
-function isCardInLockedDeck(cardId: string, game: SessionState | null | undefined = Game): boolean {
-  if (!isInitializedGame(game)) return false;
-  const lockedDeck = ensureLockedPlayerDeck(game);
-  return getLockedDeckIdSet(lockedDeck).has(cardId);
-}
-
-const getCardCost = (card: DeckEntry | null | undefined): number => {
-  if (!card) return 0;
-  return parseFiniteNumber(card.cost) ?? 0;
-};
 
 const applyCostGain = (
   holder: { cost: number; costCap: number } | null | undefined,
@@ -840,6 +676,20 @@ const nextIid = (): number => _IID++;
 
 let Game: SessionState | null = null;
 let sessionLoopController: ReturnType<typeof createSessionLoopController> | null = null;
+const sessionDeckController = createSessionDeckController({
+  getGame: () => Game,
+  handSize: HAND_SIZE,
+});
+const {
+  ensureDeck,
+  isCardInLockedDeck,
+  findDeckEntryIndexById,
+  removeDeckEntryAtIndex,
+  getCardCost,
+  refillDeck,
+  selectFirstAffordable,
+  renderSummonBar,
+} = sessionDeckController;
 let resizeHandler: (() => void) | null = null;
 let visualViewportResizeHandler: (() => void) | null = null;
 let visualViewportScrollHandler: (() => void) | null = null;
@@ -868,7 +718,6 @@ let running = false;
 let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enemy: false };
 const hpBarGradientCache = new Map<string, GradientValue>();
 const meleeOffsetTokenKeys = new Set<string>();
-const refillDeckExcludeIds = new Set<string>();
 type StatusIconEntry = {
   statusId: string;
   statusName: string;
@@ -1059,24 +908,6 @@ const syncMeleeOffsetTokens = (
     meleeOffsetTokenKeys.add(key);
   }
   return offsets;
-};
-
-let summonBarRenderPending = false;
-const flushSummonBarRender = (): void => {
-  summonBarRenderPending = false;
-  const game = getInitializedGame();
-  const bar = game?.ui?.bar ?? null;
-  if (bar?.render) bar.render();
-};
-
-const renderSummonBar = (): void => {
-  if (summonBarRenderPending) return;
-  summonBarRenderPending = true;
-  if (typeof queueMicrotask === 'function'){
-    queueMicrotask(flushSummonBarRender);
-    return;
-  }
-  RESOLVED_PROMISE.then(flushSummonBarRender);
 };
 
 function cleanupSummonBar(): void {
@@ -2983,68 +2814,6 @@ function init(): boolean {
   return true;
 }
 
-function selectFirstAffordable(): void {
-  const game = Game;
-  if (!game) return;
-
-  const deck = ensureDeck(game);
-  if (!deck.length){
-    game.selectedId = null;
-    return;
-  }
-
-  let cheapestAffordable: DeckEntry | null = null;
-  let cheapestAffordableCost = Infinity;
-  let cheapestOverall: DeckEntry | null = null;
-  let cheapestOverallCost = Infinity;
-
-  for (let index = 0; index < deck.length; index += 1){
-    const card = deck[index];
-    if (!card) continue;
-
-    const cardCost = getCardCost(card);
-
-    if (cardCost < cheapestOverallCost){
-      cheapestOverall = card;
-      cheapestOverallCost = cardCost;
-    }
-
-    const affordable = cardCost <= game.cost;
-    if (affordable && cardCost < cheapestAffordableCost){
-      cheapestAffordable = card;
-      cheapestAffordableCost = cardCost;
-    }
-  }
-
-  const chosen = (cheapestAffordable || cheapestOverall) ?? null;
-  game.selectedId = chosen ? chosen.id : null;
-}
-
-/* ---------- Deck logic ---------- */
-function refillDeck(): void {
-  const game = Game;
-  if (!game) return;
-
-  const deck = ensureDeck(game);
-  const need = HAND_SIZE - deck.length;
-  if (need <= 0) return;
-
-  const exclude = refillDeckExcludeIds;
-  exclude.clear();
-  for (const id of game.usedUnitIds) {
-    exclude.add(id);
-  }
-  for (let i = 0; i < deck.length; i += 1) {
-    const entry = deck[i];
-    if (!entry?.id) continue;
-    exclude.add(entry.id);
-  }
-  const lockedDeck = ensureLockedPlayerDeck(game);
-  const more = pickRandom(lockedDeck, exclude, need);
-  deck.push(...more);
-  game.deck3 = deck;
-}
-
 /* ---------- Vẽ ---------- */
 function resize(): void {
   if (!canvas || !Game) return;                         // guard
@@ -4012,7 +3781,6 @@ function applyConfigToRunningGame(cfg: NormalizedSessionConfig): void {
   if (preferredDeck.length) {
     game.unitsAll = preferredDeck;
     game.playerDeckLocked = preferredDeck;
-    invalidateLockedDeckCache();
     game.deck3 = ensureDeck(game);
     if (game.selectedId && !isCardInLockedDeck(game.selectedId, game)) {
       game.selectedId = null;
