@@ -824,7 +824,6 @@ ensureNestedModuleSupport();
 const SUPPORTS_PERF_NOW = typeof globalThis !== 'undefined'
   && !!globalThis.performance
   && typeof globalThis.performance.now === 'function';
-const RAF_DRIFT_TOLERANCE_MS = 120_000;   // 2 phút – đủ rộng cho mọi sai lệch hợp lệ
 
 const resolveConfiguredTurnIntervalMs = (): number => {
   const intervalCandidate = CFG?.ANIMATION?.turnIntervalMs;
