@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -15118,6 +15118,177 @@ __modules['./modes/pve/session-deck.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionDeckController')) exports.createSessionDeckController = createSessionDeckController;
 };
+__modules['./modes/pve/session-events.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./engine.ts');
+  const ART_SPRITE_EVENT = __dep0.ART_SPRITE_EVENT;
+  const createSessionEventBindings = (deps) => {
+      let artSpriteHandler = null;
+      let visibilityHandlerBound = false;
+      const handleVisibilityChange = () => {
+          const doc = deps.getDocRef();
+          if (!doc)
+              return;
+          deps.setDrawPaused(!!doc.hidden);
+      };
+      const bindVisibility = () => {
+          if (visibilityHandlerBound)
+              return;
+          const doc = deps.getDocRef();
+          if (!doc || typeof doc.addEventListener !== 'function')
+              return;
+          doc.addEventListener('visibilitychange', handleVisibilityChange);
+          visibilityHandlerBound = true;
+      };
+      const unbindVisibility = () => {
+          if (!visibilityHandlerBound)
+              return;
+          const doc = deps.getDocRef();
+          if (doc && typeof doc.removeEventListener === 'function') {
+              doc.removeEventListener('visibilitychange', handleVisibilityChange);
+          }
+          visibilityHandlerBound = false;
+      };
+      const bindArtSpriteListener = () => {
+          const winRef = deps.getWinRef();
+          if (!winRef || typeof winRef.addEventListener !== 'function')
+              return;
+          if (artSpriteHandler)
+              return;
+          artSpriteHandler = () => {
+              deps.invalidateSceneCache();
+              deps.scheduleDraw();
+          };
+          winRef.addEventListener(ART_SPRITE_EVENT, artSpriteHandler);
+      };
+      const unbindArtSpriteListener = () => {
+          const winRef = deps.getWinRef();
+          if (!winRef || !artSpriteHandler || typeof winRef.removeEventListener !== 'function')
+              return;
+          winRef.removeEventListener(ART_SPRITE_EVENT, artSpriteHandler);
+          artSpriteHandler = null;
+      };
+      const clearSessionListeners = () => {
+          const canvas = deps.getCanvas();
+          const canvasClickHandler = deps.getCanvasClickHandler();
+          if (canvas && canvasClickHandler && typeof canvas.removeEventListener === 'function') {
+              canvas.removeEventListener('click', canvasClickHandler);
+          }
+          const canvasMouseMoveHandler = deps.getCanvasMouseMoveHandler();
+          if (canvas && canvasMouseMoveHandler && typeof canvas.removeEventListener === 'function') {
+              canvas.removeEventListener('mousemove', canvasMouseMoveHandler);
+          }
+          deps.setCanvasClickHandler(null);
+          deps.setCanvasMouseMoveHandler(null);
+          const hudCleanup = deps.getHudCleanup();
+          if (typeof hudCleanup === 'function') {
+              hudCleanup();
+          }
+          deps.setHudCleanup(null);
+          const winRef = deps.getWinRef();
+          const resizeHandler = deps.getResizeHandler();
+          if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function') {
+              winRef.removeEventListener('resize', resizeHandler);
+          }
+          deps.setResizeHandler(null);
+          const viewport = winRef?.visualViewport;
+          if (viewport && typeof viewport.removeEventListener === 'function') {
+              const visualViewportResizeHandler = deps.getVisualViewportResizeHandler();
+              const visualViewportScrollHandler = deps.getVisualViewportScrollHandler();
+              if (visualViewportResizeHandler) {
+                  viewport.removeEventListener('resize', visualViewportResizeHandler);
+              }
+              if (visualViewportScrollHandler) {
+                  viewport.removeEventListener('scroll', visualViewportScrollHandler);
+              }
+          }
+          deps.setVisualViewportResizeHandler(null);
+          deps.setVisualViewportScrollHandler(null);
+          deps.setViewportResizeDebugState(null);
+          deps.cancelScheduledResize();
+          unbindArtSpriteListener();
+          unbindVisibility();
+      };
+      const clearSessionTimers = () => {
+          deps.stopSessionLoop();
+          deps.cancelScheduledDraw();
+          deps.cancelScheduledResize();
+      };
+      const bindRuntimeListeners = () => {
+          const canvas = deps.getCanvas();
+          const existingCanvasClickHandler = deps.getCanvasClickHandler();
+          if (existingCanvasClickHandler && canvas && typeof canvas.removeEventListener === 'function') {
+              canvas.removeEventListener('click', existingCanvasClickHandler);
+          }
+          const existingCanvasMouseMoveHandler = deps.getCanvasMouseMoveHandler();
+          if (existingCanvasMouseMoveHandler && canvas && typeof canvas.removeEventListener === 'function') {
+              canvas.removeEventListener('mousemove', existingCanvasMouseMoveHandler);
+          }
+          const canvasClickHandler = (event) => {
+              deps.onCanvasClick(event);
+          };
+          const canvasMouseMoveHandler = (event) => {
+              deps.onCanvasMouseMove(event);
+          };
+          deps.setCanvasClickHandler(canvasClickHandler);
+          deps.setCanvasMouseMoveHandler(canvasMouseMoveHandler);
+          if (canvas && typeof canvas.addEventListener === 'function') {
+              canvas.addEventListener('click', canvasClickHandler);
+              canvas.addEventListener('mousemove', canvasMouseMoveHandler);
+          }
+          const winRef = deps.getWinRef();
+          const existingResizeHandler = deps.getResizeHandler();
+          if (existingResizeHandler && winRef && typeof winRef.removeEventListener === 'function') {
+              winRef.removeEventListener('resize', existingResizeHandler);
+          }
+          const resizeHandler = () => {
+              deps.onWindowResize();
+          };
+          deps.setResizeHandler(resizeHandler);
+          if (winRef && typeof winRef.addEventListener === 'function') {
+              winRef.addEventListener('resize', resizeHandler);
+          }
+          const viewport = winRef?.visualViewport ?? null;
+          const existingViewportResizeHandler = deps.getVisualViewportResizeHandler();
+          const existingViewportScrollHandler = deps.getVisualViewportScrollHandler();
+          if (viewport && typeof viewport.addEventListener === 'function') {
+              if (existingViewportResizeHandler && typeof viewport.removeEventListener === 'function') {
+                  viewport.removeEventListener('resize', existingViewportResizeHandler);
+              }
+              if (existingViewportScrollHandler && typeof viewport.removeEventListener === 'function') {
+                  viewport.removeEventListener('scroll', existingViewportScrollHandler);
+              }
+              const visualViewportResizeHandler = () => {
+                  deps.onViewportResize();
+              };
+              const visualViewportScrollHandler = () => {
+                  deps.onViewportScroll();
+              };
+              deps.setVisualViewportResizeHandler(visualViewportResizeHandler);
+              deps.setVisualViewportScrollHandler(visualViewportScrollHandler);
+              viewport.addEventListener('resize', visualViewportResizeHandler);
+              viewport.addEventListener('scroll', visualViewportScrollHandler);
+          }
+      };
+      const bindSession = () => {
+          bindArtSpriteListener();
+          bindVisibility();
+          const doc = deps.getDocRef();
+          deps.setDrawPaused(doc ? !!doc.hidden : false);
+      };
+      return {
+          bindArtSpriteListener,
+          unbindArtSpriteListener,
+          bindVisibility,
+          unbindVisibility,
+          clearSessionListeners,
+          clearSessionTimers,
+          bindSession,
+          bindRuntimeListeners,
+      };
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionEventBindings')) exports.createSessionEventBindings = createSessionEventBindings;
+};
 __modules['./modes/pve/session-loop.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./ai.ts');
   const aiMaybeAct = __dep0.aiMaybeAct;
@@ -15482,7 +15653,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const slotIndex = __dep11.slotIndex;
   const slotToCell = __dep11.slotToCell;
   const cellReserved = __dep11.cellReserved;
-  const ART_SPRITE_EVENT = __dep11.ART_SPRITE_EVENT;
   const __dep12 = __require('./background.ts');
   const drawEnvironmentProps = __dep12.drawEnvironmentProps;
   const __dep13 = __require('./art.ts');
@@ -15549,14 +15719,16 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const createSessionDeckController = __dep28.createSessionDeckController;
   const __dep29 = __require('./modes/pve/unit-runtime-hooks.ts');
   const runPveRuntimeUltHook = __dep29.runPveRuntimeUltHook;
-  const __dep30 = __require('./leader-uyen.ts');
-  const ensureUyenState = __dep30.ensureUyenState;
-  const getUyenUltChoice = __dep30.getUyenUltChoice;
-  const grantUyenSummonRage = __dep30.grantUyenSummonRage;
-  const canCastLeaderUltChoice = __dep30.canCastLeaderUltChoice;
-  const isAnyLeaderUltReady = __dep30.isAnyLeaderUltReady;
-  const isUyenLeader = __dep30.isUyenLeader;
-  const queueUyenUltCast = __dep30.queueUyenUltCast;
+  const __dep30 = __require('./modes/pve/session-events.ts');
+  const createSessionEventBindings = __dep30.createSessionEventBindings;
+  const __dep31 = __require('./leader-uyen.ts');
+  const ensureUyenState = __dep31.ensureUyenState;
+  const getUyenUltChoice = __dep31.getUyenUltChoice;
+  const grantUyenSummonRage = __dep31.grantUyenSummonRage;
+  const canCastLeaderUltChoice = __dep31.canCastLeaderUltChoice;
+  const isAnyLeaderUltReady = __dep31.isAnyLeaderUltReady;
+  const isUyenLeader = __dep31.isUyenLeader;
+  const queueUyenUltCast = __dep31.queueUyenUltCast;
   const ULT_TAG_CACHE = new WeakMap();
   const appendUltTags = (output, list) => {
       if (!Array.isArray(list))
@@ -15954,8 +16126,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   let resizeSchedulerUsesTimeout = false;
   let pendingResize = false;
   let canvasClickHandler = null;
-  let artSpriteHandler = null;
-  let visibilityHandlerBound = false;
   let winRef = null;
   let docRef = null;
   let rootElement = null;
@@ -16418,20 +16588,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       else {
           scheduleDraw();
       }
-  }
-  function bindArtSpriteListener() {
-      if (!winRef || typeof winRef.addEventListener !== 'function')
-          return;
-      if (artSpriteHandler)
-          return;
-      artSpriteHandler = () => { invalidateSceneCache(); scheduleDraw(); };
-      winRef.addEventListener(ART_SPRITE_EVENT, artSpriteHandler);
-  }
-  function unbindArtSpriteListener() {
-      if (!winRef || !artSpriteHandler || typeof winRef.removeEventListener !== 'function')
-          return;
-      winRef.removeEventListener(ART_SPRITE_EVENT, artSpriteHandler);
-      artSpriteHandler = null;
   }
   const creepDeathHealProcessed = new Set();
   const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
@@ -17831,60 +17987,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       Game.ui.bar = barHandle;
       selectFirstAffordable();
       renderSummonBar();
-      if (canvasClickHandler && canvas) {
-          canvas.removeEventListener('click', canvasClickHandler);
-          canvasClickHandler = null;
-      }
-      if (canvasMouseMoveHandler && canvas) {
-          canvas.removeEventListener('mousemove', canvasMouseMoveHandler);
-          canvasMouseMoveHandler = null;
-      }
-      canvasClickHandler = (ev) => {
-          const game = getInitializedGame();
-          if (!canvas || !game)
-              return;
-          const { grid } = game;
-          if (!grid)
-              return;
-          const rect = canvas.getBoundingClientRect();
-          const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
-          const cell = hitToCellOblique(grid, p.x, p.y, CAM_PRESET);
-          if (!cell)
-              return;
-          if (cell.cx >= CFG.ALLY_COLS)
-              return;
-          handleCanvasSummonCellClick(cell);
-      };
-      if (canvas && canvasClickHandler) {
-          canvas.addEventListener('click', canvasClickHandler);
-      }
-      canvasMouseMoveHandler = (ev) => {
-          updateStatusIconHoverTooltip(ev.clientX, ev.clientY);
-      };
-      if (canvas && canvasMouseMoveHandler) {
-          canvas.addEventListener('mousemove', canvasMouseMoveHandler);
-      }
-      if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function') {
-          winRef.removeEventListener('resize', resizeHandler);
-          resizeHandler = null;
-      }
-      resizeHandler = () => { scheduleResize(); };
-      if (winRef && typeof winRef.addEventListener === 'function' && resizeHandler) {
-          winRef.addEventListener('resize', resizeHandler);
-      }
-      const viewport = winRef?.visualViewport ?? null;
-      if (viewport && typeof viewport.addEventListener === 'function') {
-          if (visualViewportResizeHandler && typeof viewport.removeEventListener === 'function') {
-              viewport.removeEventListener('resize', visualViewportResizeHandler);
-          }
-          visualViewportResizeHandler = () => { scheduleViewportResizeIfChanged('resize'); };
-          viewport.addEventListener('resize', visualViewportResizeHandler);
-          if (visualViewportScrollHandler && typeof viewport.removeEventListener === 'function') {
-              viewport.removeEventListener('scroll', visualViewportScrollHandler);
-          }
-          visualViewportScrollHandler = () => { scheduleViewportResizeIfChanged('scroll'); };
-          viewport.addEventListener('scroll', visualViewportScrollHandler);
-      }
+      bindRuntimeListeners();
       resolveTimerElement();
       const stepTurnContext = {
           performUlt,
@@ -18656,29 +18759,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       }
   }
   /* ---------- Chạy ---------- */
-  function handleVisibilityChange() {
-      if (!docRef)
-          return;
-      setDrawPaused(!!docRef.hidden);
-  }
-  function bindVisibility() {
-      if (visibilityHandlerBound)
-          return;
-      const doc = docRef;
-      if (!doc || typeof doc.addEventListener !== 'function')
-          return;
-      doc.addEventListener('visibilitychange', handleVisibilityChange);
-      visibilityHandlerBound = true;
-  }
-  function unbindVisibility() {
-      if (!visibilityHandlerBound)
-          return;
-      const doc = docRef;
-      if (doc && typeof doc.removeEventListener === 'function') {
-          doc.removeEventListener('visibilitychange', handleVisibilityChange);
-      }
-      visibilityHandlerBound = false;
-  }
   function queryElementFromRoot(selector) {
       const root = rootElement ?? null;
       if (root && typeof root.querySelector === 'function') {
@@ -18715,44 +18795,53 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       refreshAnimationFrameFns();
       resolveTimerElement();
   }
-  function clearSessionTimers() {
-      sessionLoopController?.stopLoop();
-      cancelScheduledDraw();
-      cancelScheduledResize();
-  }
-  function clearSessionListeners() {
-      if (canvas && canvasClickHandler && typeof canvas.removeEventListener === 'function') {
-          canvas.removeEventListener('click', canvasClickHandler);
-      }
-      if (canvas && canvasMouseMoveHandler && typeof canvas.removeEventListener === 'function') {
-          canvas.removeEventListener('mousemove', canvasMouseMoveHandler);
-      }
-      canvasClickHandler = null;
-      canvasMouseMoveHandler = null;
-      if (typeof hudCleanup === 'function') {
-          hudCleanup();
-      }
-      hudCleanup = null;
-      if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function') {
-          winRef.removeEventListener('resize', resizeHandler);
-      }
-      resizeHandler = null;
-      const viewport = winRef?.visualViewport;
-      if (viewport && typeof viewport.removeEventListener === 'function') {
-          if (visualViewportResizeHandler) {
-              viewport.removeEventListener('resize', visualViewportResizeHandler);
-          }
-          if (visualViewportScrollHandler) {
-              viewport.removeEventListener('scroll', visualViewportScrollHandler);
-          }
-      }
-      visualViewportResizeHandler = null;
-      visualViewportScrollHandler = null;
-      viewportResizeDebugState = null;
-      cancelScheduledResize();
-      unbindArtSpriteListener();
-      unbindVisibility();
-  }
+  const sessionEventBindings = createSessionEventBindings({
+      getDocRef: () => docRef,
+      getWinRef: () => winRef,
+      getCanvas: () => canvas,
+      getCanvasClickHandler: () => canvasClickHandler,
+      setCanvasClickHandler: (handler) => { canvasClickHandler = handler; },
+      getCanvasMouseMoveHandler: () => canvasMouseMoveHandler,
+      setCanvasMouseMoveHandler: (handler) => { canvasMouseMoveHandler = handler; },
+      getHudCleanup: () => hudCleanup,
+      setHudCleanup: (cleanup) => { hudCleanup = cleanup; },
+      getResizeHandler: () => resizeHandler,
+      setResizeHandler: (handler) => { resizeHandler = handler; },
+      getVisualViewportResizeHandler: () => visualViewportResizeHandler,
+      setVisualViewportResizeHandler: (handler) => { visualViewportResizeHandler = handler; },
+      getVisualViewportScrollHandler: () => visualViewportScrollHandler,
+      setVisualViewportScrollHandler: (handler) => { visualViewportScrollHandler = handler; },
+      setViewportResizeDebugState: (state) => { viewportResizeDebugState = state; },
+      stopSessionLoop: () => { sessionLoopController?.stopLoop(); },
+      cancelScheduledDraw,
+      cancelScheduledResize,
+      setDrawPaused,
+      scheduleDraw,
+      invalidateSceneCache,
+      onCanvasClick: (ev) => {
+          const game = getInitializedGame();
+          if (!canvas || !game)
+              return;
+          const { grid } = game;
+          if (!grid)
+              return;
+          const rect = canvas.getBoundingClientRect();
+          const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+          const cell = hitToCellOblique(grid, p.x, p.y, CAM_PRESET);
+          if (!cell)
+              return;
+          if (cell.cx >= CFG.ALLY_COLS)
+              return;
+          handleCanvasSummonCellClick(cell);
+      },
+      onCanvasMouseMove: (ev) => {
+          updateStatusIconHoverTooltip(ev.clientX, ev.clientY);
+      },
+      onWindowResize: () => { scheduleResize(); },
+      onViewportResize: () => { scheduleViewportResizeIfChanged('resize'); },
+      onViewportScroll: () => { scheduleViewportResizeIfChanged('scroll'); },
+  });
+  const { clearSessionTimers, clearSessionListeners, bindSession, bindRuntimeListeners, } = sessionEventBindings;
   function resetDomRefs() {
       canvas = null;
       ctx = null;
@@ -18808,16 +18897,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       Game = null;
       running = false;
       invalidateSceneCache();
-  }
-  function bindSession() {
-      bindArtSpriteListener();
-      bindVisibility();
-      if (docRef) {
-          setDrawPaused(!!docRef.hidden);
-      }
-      else {
-          setDrawPaused(false);
-      }
   }
   function startSession(config = {}) {
       configureRoot(rootElement);

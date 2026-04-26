@@ -14,7 +14,6 @@ import {
   drawTokensOblique, drawQueuedOblique,
   hitToCellOblique,
   spawnLeaders, slotIndex, slotToCell, cellReserved,
-  ART_SPRITE_EVENT,
 } from '../../engine';
 import { drawEnvironmentProps } from '../../background';
 import { getUnitArt, setUnitSkin } from '../../art';
@@ -69,6 +68,7 @@ import { mapUnitProgressById } from './collection-mapper.ts';
 import { createSessionLoopController } from './session-loop';
 import { createSessionDeckController } from './session-deck';
 import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
+import { createSessionEventBindings } from './session-events';
 import {
   ensureUyenState,
   getUyenUltChoice,
@@ -703,8 +703,6 @@ let resizeSchedulerHandle: FrameHandle | null = null;
 let resizeSchedulerUsesTimeout = false;
 let pendingResize = false;
 let canvasClickHandler: CanvasClickHandler | null = null;
-let artSpriteHandler: (() => void) | null = null;
-let visibilityHandlerBound = false;
 let winRef: (Window & typeof globalThis) | null = null;
 let docRef: Document | null = null;
 let rootElement: Element | Document | null = null;
@@ -1230,18 +1228,6 @@ function setDrawPaused(paused: boolean): void {
   } else {
     scheduleDraw();
   }
-}
-function bindArtSpriteListener(): void {
-  if (!winRef || typeof winRef.addEventListener !== 'function') return;
-  if (artSpriteHandler) return;
-  artSpriteHandler = ()=>{ invalidateSceneCache(); scheduleDraw(); };
-  winRef.addEventListener(ART_SPRITE_EVENT, artSpriteHandler);
-}
-
-function unbindArtSpriteListener(): void {
-  if (!winRef || !artSpriteHandler || typeof winRef.removeEventListener !== 'function') return;
-  winRef.removeEventListener(ART_SPRITE_EVENT, artSpriteHandler);
-  artSpriteHandler = null;
 }
 const creepDeathHealProcessed = new Set<string>();
 const CREEP_DEATH_HEAL_DEBUG_KEY = 'pve.creepDeathHeal';
@@ -2629,61 +2615,7 @@ function init(): boolean {
 
   selectFirstAffordable();
   renderSummonBar();
-
-  if (canvasClickHandler && canvas){
-    canvas.removeEventListener('click', canvasClickHandler);
-    canvasClickHandler = null;
-  }
-  if (canvasMouseMoveHandler && canvas){
-    canvas.removeEventListener('mousemove', canvasMouseMoveHandler);
-    canvasMouseMoveHandler = null;
-  }
-  canvasClickHandler = (ev: MouseEvent): void => {
-    const game = getInitializedGame();
-    if (!canvas || !game) return;
-    const { grid } = game;
-    if (!grid) return;
-    const rect = canvas.getBoundingClientRect();
-    const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
-    const cell = hitToCellOblique(grid, p.x, p.y, CAM_PRESET);
-    if (!cell) return;
-
-    if (cell.cx >= CFG.ALLY_COLS) return;
-  handleCanvasSummonCellClick(cell);
-  };
-  if (canvas && canvasClickHandler){
-    canvas.addEventListener('click', canvasClickHandler);
-  }
-  canvasMouseMoveHandler = (ev: MouseEvent): void => {
-    updateStatusIconHoverTooltip(ev.clientX, ev.clientY);
-  };
-  if (canvas && canvasMouseMoveHandler){
-    canvas.addEventListener('mousemove', canvasMouseMoveHandler);
-  }
-
-  if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
-    winRef.removeEventListener('resize', resizeHandler);
-    resizeHandler = null;
-  }
-  resizeHandler = (): void => { scheduleResize(); };
-  if (winRef && typeof winRef.addEventListener === 'function' && resizeHandler){
-    winRef.addEventListener('resize', resizeHandler);
-  }
-
-  const viewport = winRef?.visualViewport ?? null;
-  if (viewport && typeof viewport.addEventListener === 'function'){
-    if (visualViewportResizeHandler && typeof viewport.removeEventListener === 'function'){
-      viewport.removeEventListener('resize', visualViewportResizeHandler);
-    }
-    visualViewportResizeHandler = (): void => { scheduleViewportResizeIfChanged('resize'); };
-    viewport.addEventListener('resize', visualViewportResizeHandler);
-
-    if (visualViewportScrollHandler && typeof viewport.removeEventListener === 'function'){
-      viewport.removeEventListener('scroll', visualViewportScrollHandler);
-    }
-    visualViewportScrollHandler = (): void => { scheduleViewportResizeIfChanged('scroll'); };
-    viewport.addEventListener('scroll', visualViewportScrollHandler);
-  }
+  bindRuntimeListeners();
 
   resolveTimerElement();
 
@@ -3505,27 +3437,6 @@ function drawHPBars(): void {
   }
 }
 /* ---------- Chạy ---------- */
-function handleVisibilityChange(): void {
-  if (!docRef) return;
-  setDrawPaused(!!docRef.hidden);
-}
-
-function bindVisibility(): void {
-  if (visibilityHandlerBound) return;
-  const doc = docRef;
-  if (!doc || typeof doc.addEventListener !== 'function') return;
-  doc.addEventListener('visibilitychange', handleVisibilityChange);
-  visibilityHandlerBound = true;
-}
-
-function unbindVisibility(): void {
-  if (!visibilityHandlerBound) return;
-  const doc = docRef;
-  if (doc && typeof doc.removeEventListener === 'function'){
-    doc.removeEventListener('visibilitychange', handleVisibilityChange);
-  }
-  visibilityHandlerBound = false;
-}
 
 function queryElementFromRoot(selector: string): Element | null {
   const root = rootElement ?? null;
@@ -3564,45 +3475,55 @@ function configureRoot(root: RootLike): void {
   resolveTimerElement();
 }
 
-function clearSessionTimers(): void {
-  sessionLoopController?.stopLoop();
-  cancelScheduledDraw();
-  cancelScheduledResize();
-}
+const sessionEventBindings = createSessionEventBindings({
+  getDocRef: () => docRef,
+  getWinRef: () => winRef,
+  getCanvas: () => canvas,
+  getCanvasClickHandler: () => canvasClickHandler,
+  setCanvasClickHandler: (handler) => { canvasClickHandler = handler; },
+  getCanvasMouseMoveHandler: () => canvasMouseMoveHandler,
+  setCanvasMouseMoveHandler: (handler) => { canvasMouseMoveHandler = handler; },
+  getHudCleanup: () => hudCleanup,
+  setHudCleanup: (cleanup) => { hudCleanup = cleanup; },
+  getResizeHandler: () => resizeHandler,
+  setResizeHandler: (handler) => { resizeHandler = handler; },
+  getVisualViewportResizeHandler: () => visualViewportResizeHandler,
+  setVisualViewportResizeHandler: (handler) => { visualViewportResizeHandler = handler; },
+  getVisualViewportScrollHandler: () => visualViewportScrollHandler,
+  setVisualViewportScrollHandler: (handler) => { visualViewportScrollHandler = handler; },
+  setViewportResizeDebugState: (state) => { viewportResizeDebugState = state; },
+  stopSessionLoop: () => { sessionLoopController?.stopLoop(); },
+  cancelScheduledDraw,
+  cancelScheduledResize,
+  setDrawPaused,
+  scheduleDraw,
+  invalidateSceneCache,
+  onCanvasClick: (ev: MouseEvent) => {
+    const game = getInitializedGame();
+    if (!canvas || !game) return;
+    const { grid } = game;
+    if (!grid) return;
+    const rect = canvas.getBoundingClientRect();
+    const p = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+    const cell = hitToCellOblique(grid, p.x, p.y, CAM_PRESET);
+    if (!cell) return;
+    if (cell.cx >= CFG.ALLY_COLS) return;
+    handleCanvasSummonCellClick(cell);
+  },
+  onCanvasMouseMove: (ev: MouseEvent) => {
+    updateStatusIconHoverTooltip(ev.clientX, ev.clientY);
+  },
+  onWindowResize: () => { scheduleResize(); },
+  onViewportResize: () => { scheduleViewportResizeIfChanged('resize'); },
+  onViewportScroll: () => { scheduleViewportResizeIfChanged('scroll'); },
+});
 
-function clearSessionListeners(): void {
-  if (canvas && canvasClickHandler && typeof canvas.removeEventListener === 'function'){
-    canvas.removeEventListener('click', canvasClickHandler);
-  }
-  if (canvas && canvasMouseMoveHandler && typeof canvas.removeEventListener === 'function'){
-    canvas.removeEventListener('mousemove', canvasMouseMoveHandler);
-  }
-  canvasClickHandler = null;
-  canvasMouseMoveHandler = null;
-  if (typeof hudCleanup === 'function'){
-    hudCleanup();
-  }
-  hudCleanup = null;
-  if (resizeHandler && winRef && typeof winRef.removeEventListener === 'function'){
-    winRef.removeEventListener('resize', resizeHandler);
-  }
-  resizeHandler = null;
-  const viewport = winRef?.visualViewport;
-  if (viewport && typeof viewport.removeEventListener === 'function'){
-    if (visualViewportResizeHandler){
-      viewport.removeEventListener('resize', visualViewportResizeHandler);
-    }
-    if (visualViewportScrollHandler){
-      viewport.removeEventListener('scroll', visualViewportScrollHandler);
-    }
-  }
-  visualViewportResizeHandler = null;
-  visualViewportScrollHandler = null;
-  viewportResizeDebugState = null;
-  cancelScheduledResize();
-  unbindArtSpriteListener();
-  unbindVisibility();
-}
+const {
+  clearSessionTimers,
+  clearSessionListeners,
+  bindSession,
+  bindRuntimeListeners,
+} = sessionEventBindings;
 
 function resetDomRefs(): void {
   canvas = null;
@@ -3654,16 +3575,6 @@ function stopSession(): void {
   Game = null;
   running = false;
   invalidateSceneCache();
-}
-
-function bindSession(): void {
-  bindArtSpriteListener();
-  bindVisibility();
-  if (docRef){
-    setDrawPaused(!!docRef.hidden);
-  } else {
-    setDrawPaused(false);
-  }
 }
 
 function startSession(config: StartConfigOverrides | null | undefined = {}): SessionState | null {
