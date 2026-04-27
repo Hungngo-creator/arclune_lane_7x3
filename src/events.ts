@@ -239,11 +239,6 @@ export function isEventEmitterLike(value: unknown): value is EventEmitterLike {
   );
 }
 
-type EventBackend =
-  | { kind: 'target'; target: EventTarget }
-  | { kind: 'simple'; target: SimpleEventTarget }
-  | { kind: 'emitter'; target: EventEmitterLike };
-
 const makeEventTarget = (): GameEventTargetLike => {
   if (HAS_EVENT_TARGET){
     try {
@@ -253,19 +248,6 @@ const makeEventTarget = (): GameEventTargetLike => {
     }
   }
   return new SimpleEventTarget();
-};
-
-const resolveEventBackend = (target: GameEventTargetLike): EventBackend | null => {
-  if (HAS_EVENT_TARGET && target instanceof EventTarget){
-    return { kind: 'target', target };
-  }
-  if (target instanceof SimpleEventTarget){
-    return { kind: 'simple', target };
-  }
-  if (isEventEmitterLike(target)){
-    return { kind: 'emitter', target };
-  }
-  return null;
 };
 
 const toSyntheticEventRecord = <T extends GameEventType>(
@@ -301,88 +283,107 @@ const toEventRecord = <T extends GameEventType>(
     : toSyntheticEventRecord(type, payload as GameEventDetailMap[T])
 );
 
-const createTargetBackendAdapter = (target: EventTarget) => ({
-  emit: <T extends GameEventType>(type: T, detail?: GameEventDetailMap[T]): boolean => {
-    const nativeEvent = createNativeEvent(type, detail);
-    if (!nativeEvent) return false;
-    return target.dispatchEvent(nativeEvent as Event);
-  },
-  addListener: <T extends GameEventType>(type: T, handler: CompatibleGameEventHandler<T>): (() => void) => {
-    const eventListener = handler as unknown as EventListener;
-    target.addEventListener(type, eventListener);
-    return createIdempotentDispose(() => {
-      target.removeEventListener(type, eventListener);
-    });
-  },
-});
-
-const createSimpleBackendAdapter = (target: SimpleEventTarget) => ({
-  emit: <T extends GameEventType>(type: T, detail?: GameEventDetailMap[T]): boolean => (
-    target.dispatchEvent(toSyntheticEventRecord(type, detail))
-  ),
-  addListener: <T extends GameEventType>(type: T, handler: CompatibleGameEventHandler<T>): (() => void) => {
-    const simpleHandler = handler as unknown as GameEventHandler<T>;
-    target.addEventListener(type, simpleHandler);
-    return createIdempotentDispose(() => {
-      target.removeEventListener(type, simpleHandler);
-    });
-  },
-});
-
 const toEmitterEventRecord = <T extends GameEventType>(
   type: T,
   payload: EventEmitterPayload<T>,
   eventTarget: GameEventTargetLike,
 ): GameEventDetail<T> => withEventTargetRefs(toEventRecord(type, payload), eventTarget);
 
-const createEmitterBackendAdapter = (target: EventEmitterLike, eventTarget: GameEventTargetLike) => ({
-  emit: <T extends GameEventType>(type: T, detail?: GameEventDetailMap[T]): boolean => {
-    target.emit(type, detail);
-    return true;
-  },
-  addListener: <T extends GameEventType>(type: T, handler: CompatibleGameEventHandler<T>): (() => void) => {
-    const emitterHandler = function (
-      this: unknown,
-      payload?: EventEmitterPayload<T>,
-    ): void {
-      handler.call(this, toEmitterEventRecord(type, payload, eventTarget));
-    };
-
-    target.on(type, emitterHandler);
-    return createIdempotentDispose(() => {
-      if (typeof target.off === 'function'){
-        target.off(type, emitterHandler);
-      }
-    });
-  },
-});
-
-type EventBackendAdapter = {
-  emit: <T extends GameEventType>(type: T, detail?: GameEventDetailMap[T]) => boolean;
-  addListener: <T extends GameEventType>(type: T, handler: CompatibleGameEventHandler<T>) => (() => void);
+  export const gameEvents: GameEventTargetLike = makeEventTarget();
+const emitViaTarget = <T extends GameEventType>(target: EventTarget, type: T, detail?: GameEventDetailMap[T]): boolean => {
+  const nativeEvent = createNativeEvent(type, detail);
+  if (!nativeEvent) return false;
+  return target.dispatchEvent(nativeEvent as Event);
+};
+const emitViaSimpleTarget = <T extends GameEventType>(target: SimpleEventTarget, type: T, detail?: GameEventDetailMap[T]): boolean => (
+  target.dispatchEvent(toSyntheticEventRecord(type, detail))
+);
+const emitViaEmitter = <T extends GameEventType>(target: EventEmitterLike, type: T, detail?: GameEventDetailMap[T]): boolean => {
+  target.emit(type, detail);
+  return true;
 };
 
-const createBackendAdapter = (
-  backend: EventBackend | null,
+const addListenerViaTarget = <T extends GameEventType>(
+  target: EventTarget,
+  type: T,
+  handler: CompatibleGameEventHandler<T>,
+): (() => void) => {
+  const eventListener = handler as unknown as EventListener;
+  target.addEventListener(type, eventListener);
+  return createIdempotentDispose(() => {
+    target.removeEventListener(type, eventListener);
+  });
+};
+const addListenerViaSimpleTarget = <T extends GameEventType>(
+  target: SimpleEventTarget,
+  type: T,
+  handler: CompatibleGameEventHandler<T>,
+): (() => void) => {
+  const simpleHandler = handler as unknown as GameEventHandler<T>;
+  target.addEventListener(type, simpleHandler);
+  return createIdempotentDispose(() => {
+    target.removeEventListener(type, simpleHandler);
+  });
+};
+const addListenerViaEmitter = <T extends GameEventType>(
+  target: EventEmitterLike,
   eventTarget: GameEventTargetLike,
-): EventBackendAdapter | null => {
-  if (!backend) return null;
-  if (backend.kind === 'target') return createTargetBackendAdapter(backend.target);
-  if (backend.kind === 'simple') return createSimpleBackendAdapter(backend.target);
-  return createEmitterBackendAdapter(backend.target, eventTarget);
+type: T,
+  handler: CompatibleGameEventHandler<T>,
+): (() => void) => {
+  const emitterHandler = function (
+    this: unknown,
+    payload?: EventEmitterPayload<T>,
+  ): void {
+    handler.call(this, toEmitterEventRecord(type, payload, eventTarget));
+  };
+  target.on(type, emitterHandler);
+  return createIdempotentDispose(() => {
+    if (typeof target.off === 'function'){
+      target.off(type, emitterHandler);
+    }
+  });
 };
 
-export const gameEvents: GameEventTargetLike = makeEventTarget();
-const gameEventBackend = resolveEventBackend(gameEvents);
-const gameEventAdapter = createBackendAdapter(gameEventBackend, gameEvents);
+const emitGameEventInternal = <T extends GameEventType>(type: T, detail?: GameEventDetailMap[T]): boolean => {
+  if (!type) return false;
+  if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget){
+    return emitViaTarget(gameEvents, type, detail);
+  }
+  if (gameEvents instanceof SimpleEventTarget){
+    return emitViaSimpleTarget(gameEvents, type, detail);
+  }
+  if (isEventEmitterLike(gameEvents)){
+    return emitViaEmitter(gameEvents, type, detail);
+  }
+  return false;
+};
+
+const addGameEventListenerInternal = <T extends GameEventType, H extends CompatibleGameEventHandler<T>>(
+  type: T,
+  handler: H,
+): (() => void) => {
+  if (!type || !isCompatibleHandler<T>(handler)){
+    return NOOP_DISPOSE;
+  }
+  if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget){
+    return addListenerViaTarget(gameEvents, type, handler);
+  }
+  if (gameEvents instanceof SimpleEventTarget){
+    return addListenerViaSimpleTarget(gameEvents, type, handler);
+  }
+  if (isEventEmitterLike(gameEvents)){
+    return addListenerViaEmitter(gameEvents, gameEvents, type, handler);
+  }
+  return NOOP_DISPOSE;
+};
 
 export function emitGameEvent<T extends GameEventType>(
   type: T,
   detail?: GameEventDetailMap[T],
 ): boolean {
-  if (!type || !gameEventAdapter) return false;
   try {
-    return gameEventAdapter.emit(type, detail);
+    return emitGameEventInternal.emit(type, detail);
   } catch (error) {
     reportEventError(error);
     return false;
@@ -398,12 +399,9 @@ export function addGameEventListener<T extends GameEventType, H extends Compatib
   type: T,
   handler: H,
 ): () => void {
-  if (!type || !isCompatibleHandler<T>(handler) || !gameEventAdapter){
-    return NOOP_DISPOSE;
-  }
 
   try {
-    return gameEventAdapter.addListener(type, handler);
+    return addGameEventListenerInternal(type, handler);
   } catch (error) {
     reportEventError(error);
     return NOOP_DISPOSE;
