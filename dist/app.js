@@ -19446,35 +19446,40 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
   const __dep2 = __require('./units.ts');
   const UNITS = __dep2.UNITS;
   const lookupUnit = __dep2.lookupUnit;
-  const __dep3 = __require('./meta.ts');
-  const makeInstanceStats = __dep3.makeInstanceStats;
-  const metaServiceAdapter = __dep3.metaServiceAdapter;
-  const __dep4 = __require('./events.ts');
-  const gameEvents = __dep4.gameEvents;
-  const __dep5 = __require('./background.ts');
-  const getEnvironmentBackground = __dep5.getEnvironmentBackground;
-  const drawEnvironmentProps = __dep5.drawEnvironmentProps;
-  const __dep6 = __require('./scene.ts');
-  const getCachedBattlefieldScene = __dep6.getCachedBattlefieldScene;
-  const __dep7 = __require('./engine.ts');
-  const drawGridOblique = __dep7.drawGridOblique;
-  const __dep8 = __require('./art.ts');
-  const getUnitArt = __dep8.getUnitArt;
-  const __dep9 = __require('./utils/unit-id.ts');
-  const normalizeUnitId = __dep9.normalizeUnitId;
-  const __dep10 = __require('./utils/rng.ts');
-  const createRngState = __dep10.createRngState;
-  const nextRngValue = __dep10.nextRngValue;
-  const __dep11 = __require('./utils/format.ts');
-  const stableStringify = __dep11.stableStringify;
-  const __dep12 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep12.normalizeClassName;
-  const normalizeElementKey = __dep12.normalizeElementKey;
-  const normalizeElementList = __dep12.normalizeElementList;
-  const __dep13 = __require('./modes/pve/collection-mapper.ts');
-  const mapUnitProgressById = __dep13.mapUnitProgressById;
-  const __dep14 = __require('./modes/pve/creep-builder.ts');
-  const buildAICreepDeckFromLineup = __dep14.buildAICreepDeckFromLineup;
+  const __dep3 = __require('./catalog.ts');
+  const getMetaById = __dep3.getMetaById;
+  const __dep4 = __require('./data/cost-budget.ts');
+  const deriveBudgetFromRankRole = __dep4.deriveBudgetFromRankRole;
+  const evaluateCostBudget = __dep4.evaluateCostBudget;
+  const __dep5 = __require('./meta.ts');
+  const makeInstanceStats = __dep5.makeInstanceStats;
+  const metaServiceAdapter = __dep5.metaServiceAdapter;
+  const __dep6 = __require('./events.ts');
+  const gameEvents = __dep6.gameEvents;
+  const __dep7 = __require('./background.ts');
+  const getEnvironmentBackground = __dep7.getEnvironmentBackground;
+  const drawEnvironmentProps = __dep7.drawEnvironmentProps;
+  const __dep8 = __require('./scene.ts');
+  const getCachedBattlefieldScene = __dep8.getCachedBattlefieldScene;
+  const __dep9 = __require('./engine.ts');
+  const drawGridOblique = __dep9.drawGridOblique;
+  const __dep10 = __require('./art.ts');
+  const getUnitArt = __dep10.getUnitArt;
+  const __dep11 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep11.normalizeUnitId;
+  const __dep12 = __require('./utils/rng.ts');
+  const createRngState = __dep12.createRngState;
+  const nextRngValue = __dep12.nextRngValue;
+  const __dep13 = __require('./utils/format.ts');
+  const stableStringify = __dep13.stableStringify;
+  const __dep14 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep14.normalizeClassName;
+  const normalizeElementKey = __dep14.normalizeElementKey;
+  const normalizeElementList = __dep14.normalizeElementList;
+  const __dep15 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep15.mapUnitProgressById;
+  const __dep16 = __require('./modes/pve/creep-builder.ts');
+  const buildAICreepDeckFromLineup = __dep16.buildAICreepDeckFromLineup;
   const DEFAULT_UNIT_ROSTER = UNITS.map((unit) => {
       const unitId = normalizeUnitId(unit.id);
       const art = getUnitArt(unitId);
@@ -20149,6 +20154,29 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           skinKey: entry.skinKey ?? null,
       };
   }
+  function resolveUnitDeployCost(unitId) {
+      const normalizedId = normalizeUnitId(unitId);
+      const unitDef = lookupUnit(normalizedId);
+      const directCost = parseFiniteNumber(unitDef?.cost);
+      if (directCost != null && directCost > 0) {
+          return directCost;
+      }
+      const meta = getMetaById(normalizedId);
+      if (!meta) {
+          return null;
+      }
+      const metadataCost = parseFiniteNumber(meta.cost);
+      if (metadataCost != null && metadataCost > 0) {
+          return metadataCost;
+      }
+      const rank = typeof meta.rank === 'string' ? meta.rank : null;
+      const className = typeof meta.class === 'string' ? meta.class : null;
+      const budget = deriveBudgetFromRankRole(rank, className);
+      const evaluated = evaluateCostBudget(budget);
+      return Number.isFinite(evaluated.cost) && evaluated.cost > 0
+          ? evaluated.cost
+          : null;
+  }
   function makeDeckEntrySkeleton(unitId) {
       const normalizedId = normalizeUnitId(unitId);
       const cached = deckEntrySkeletonCache.get(normalizedId);
@@ -20158,7 +20186,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       const art = getUnitArt(normalizedId);
       const skeleton = {
           id: normalizedId,
-          cost: parseFiniteNumber(unitDef?.cost) ?? null,
+          cost: resolveUnitDeployCost(normalizedId),
           name: typeof unitDef?.name === 'string' ? unitDef.name : null,
           art,
           skinKey: art?.skinKey ?? null,

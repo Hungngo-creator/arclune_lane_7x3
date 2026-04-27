@@ -14,6 +14,8 @@ import { createSummonQueue } from '@shared-types/units.ts';
 
 import { CFG } from '../../config.ts';
 import { UNITS, lookupUnit } from '../../units.ts';
+import { getMetaById } from '../../catalog.ts';
+import { deriveBudgetFromRankRole, evaluateCostBudget } from '../../data/cost-budget.ts';
 import { makeInstanceStats, metaServiceAdapter } from '../../meta.ts';
 import { gameEvents } from '../../events.ts';
 import { getEnvironmentBackground, drawEnvironmentProps } from '../../background.ts';
@@ -857,6 +859,33 @@ function cloneDeckEntrySkeleton(entry: SessionState['unitsAll'][number]): Sessio
   } satisfies SessionState['unitsAll'][number];
 }
 
+function resolveUnitDeployCost(unitId: string): number | null {
+  const normalizedId = normalizeUnitId(unitId);
+  const unitDef = lookupUnit(normalizedId);
+  const directCost = parseFiniteNumber(unitDef?.cost);
+  if (directCost != null && directCost > 0) {
+    return directCost;
+  }
+
+  const meta = getMetaById(normalizedId);
+  if (!meta) {
+    return null;
+  }
+
+  const metadataCost = parseFiniteNumber((meta as Record<string, unknown>).cost);
+  if (metadataCost != null && metadataCost > 0) {
+    return metadataCost;
+  }
+
+  const rank = typeof meta.rank === 'string' ? meta.rank : null;
+  const className = typeof meta.class === 'string' ? meta.class : null;
+  const budget = deriveBudgetFromRankRole(rank, className);
+  const evaluated = evaluateCostBudget(budget);
+  return Number.isFinite(evaluated.cost) && evaluated.cost > 0
+    ? evaluated.cost
+    : null;
+}
+
 function makeDeckEntrySkeleton(unitId: string): SessionState['unitsAll'][number] {
   const normalizedId = normalizeUnitId(unitId);
   const cached = deckEntrySkeletonCache.get(normalizedId);
@@ -866,7 +895,7 @@ function makeDeckEntrySkeleton(unitId: string): SessionState['unitsAll'][number]
   const art = getUnitArt(normalizedId);
   const skeleton = {
     id: normalizedId,
-    cost: parseFiniteNumber(unitDef?.cost) ?? null,
+    cost: resolveUnitDeployCost(normalizedId),
     name: typeof unitDef?.name === 'string' ? unitDef.name : null,
     art,
     skinKey: art?.skinKey ?? null,

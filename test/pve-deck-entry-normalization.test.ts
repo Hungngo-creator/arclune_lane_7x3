@@ -27,6 +27,13 @@ describe('normalizeDeckEntries', () => {
     expect((entry.metadata as { element?: string })?.element).toBe('water');
     expect((entry.metadata as { elements?: string[] })?.elements).toEqual(['metal', 'wood']);
   });
+
+  test('fallback sang cost budget theo rank/class khi unit tách runtime không có cost tĩnh', () => {
+    const normalized = normalizeDeckEntries(['ly_thanh_thu', 'nguyen_le']);
+    expect(normalized).toHaveLength(2);
+    expect(Number(normalized[0]?.cost ?? 0)).toBeGreaterThan(0);
+    expect(Number(normalized[1]?.cost ?? 0)).toBeGreaterThan(0);
+  });
 });
 
 describe('preferred deck resolution', () => {
