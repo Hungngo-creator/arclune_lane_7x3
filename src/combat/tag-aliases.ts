@@ -278,6 +278,13 @@ function readUnitAwakenScore(unit: ConflictComparableUnit | null | undefined): n
   return toConflictScore(unit.awaken ?? unit.awakened);
 }
 
+function shouldCompareAwakenScore(
+  left: ConflictComparableUnit | null | undefined,
+  right: ConflictComparableUnit | null | undefined,
+): boolean {
+  return readUnitAwakenScore(left) > 0 && readUnitAwakenScore(right) > 0;
+}
+
 function readUnitCpScore(unit: ConflictComparableUnit | null | undefined): number {
   if (!unit) return 0;
   return toConflictScore(unit.cp ?? unit.power);
@@ -306,13 +313,17 @@ export function compareRuleConflictUnitPriority(
     compareConflictScore(readUnitRankScore(left), readUnitRankScore(right)),
     compareConflictScore(readUnitCultivationScore(left), readUnitCultivationScore(right)),
     compareConflictScore(readUnitStarsScore(left), readUnitStarsScore(right)),
-    compareConflictScore(readUnitAwakenScore(left), readUnitAwakenScore(right)),
-    compareConflictScore(readUnitCpScore(left), readUnitCpScore(right)),
   ];
   for (const result of checks) {
     if (result !== 0) return result;
   }
-  return 0;
+
+  if (shouldCompareAwakenScore(left, right)) {
+    const awakenComparison = compareConflictScore(readUnitAwakenScore(left), readUnitAwakenScore(right));
+    if (awakenComparison !== 0) return awakenComparison;
+  }
+
+  return compareConflictScore(readUnitCpScore(left), readUnitCpScore(right));
 }
 
 export function hasRuleTagAtLeast(tags: ReadonlyArray<string>, minimum: RuleTag): boolean {

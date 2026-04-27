@@ -7416,6 +7416,9 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
           return unit.awakened ? 1 : 0;
       return toConflictScore(unit.awaken ?? unit.awakened);
   }
+  function shouldCompareAwakenScore(left, right) {
+      return readUnitAwakenScore(left) > 0 && readUnitAwakenScore(right) > 0;
+  }
   function readUnitCpScore(unit) {
       if (!unit)
           return 0;
@@ -7438,14 +7441,17 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
           compareConflictScore(readUnitRankScore(left), readUnitRankScore(right)),
           compareConflictScore(readUnitCultivationScore(left), readUnitCultivationScore(right)),
           compareConflictScore(readUnitStarsScore(left), readUnitStarsScore(right)),
-          compareConflictScore(readUnitAwakenScore(left), readUnitAwakenScore(right)),
-          compareConflictScore(readUnitCpScore(left), readUnitCpScore(right)),
       ];
       for (const result of checks) {
           if (result !== 0)
               return result;
       }
-      return 0;
+      if (shouldCompareAwakenScore(left, right)) {
+          const awakenComparison = compareConflictScore(readUnitAwakenScore(left), readUnitAwakenScore(right));
+          if (awakenComparison !== 0)
+              return awakenComparison;
+      }
+      return compareConflictScore(readUnitCpScore(left), readUnitCpScore(right));
   }
   function hasRuleTagAtLeast(tags, minimum) {
       const minimumPriority = RULE_TAG_PRIORITY[minimum] ?? 0;
@@ -25653,22 +25659,22 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
       .collection-tabs__button:focus-visible{outline:2px solid rgba(125,211,252,.65);outline-offset:3px;}
       .collection-tabs__button.is-active{border-color:rgba(125,211,252,.55);background:rgba(18,30,42,.96);box-shadow:0 10px 24px rgba(6,12,20,.42);}
       .collection-tabs__icon{width:78%;height:78%;display:block;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,.45));pointer-events:none;}
-      .collection-skill-overlay{position:absolute;top:15%;left:10%;width:82%;min-height:70%;padding:24px;border-radius:22px;border:1px solid rgba(125,211,252,.45);background:rgba(8,16,26,.92);box-shadow:0 42px 96px rgba(3,6,12,.75);display:flex;flex-direction:column;gap:18px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translateY(12px);backdrop-filter:blur(6px);max-height:80vh;overflow:hidden;}
+      .collection-skill-overlay{position:absolute;top:15%;left:4%;width:61.5%;min-height:0;padding:18px 20px 14px;border-radius:22px;border:1px solid rgba(125,211,252,.45);background:rgba(8,16,26,.92);box-shadow:0 42px 96px rgba(3,6,12,.75);display:flex;flex-direction:column;gap:14px;opacity:0;pointer-events:none;transition:opacity .24s ease,transform .24s ease;transform:translateY(12px);backdrop-filter:blur(6px);max-height:72vh;overflow:hidden;z-index:12;}
       .collection-skill-overlay.is-open{opacity:1;pointer-events:auto;transform:translateY(0);}
       .collection-skill-overlay__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
       .collection-skill-overlay__title{margin:0;font-size:22px;letter-spacing:.06em;}
       .collection-skill-overlay__close{padding:8px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(16,24,34,.85);color:#aee4ff;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease;}
       .collection-skill-overlay__close:hover{transform:translateY(-2px);border-color:rgba(174,228,255,.48);}
       .collection-skill-overlay__close:focus-visible{outline:2px solid rgba(174,228,255,.75);outline-offset:3px;}
-      .collection-skill-overlay__content{display:grid;grid-template-columns:1fr;gap:24px;flex:1;overflow:auto;padding-right:8px;}
+      .collection-skill-overlay__content{display:grid;grid-template-columns:1fr;gap:14px;flex:1;overflow:auto;padding-right:4px;}
       .collection-skill-overlay__content.has-detail{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);}
       .collection-skill-overlay__details{display:flex;flex-direction:column;gap:12px;}
       .collection-skill-overlay__subtitle{margin:0;color:#9cbcd9;font-size:14px;line-height:1.6;}
-      .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:12px;overflow:visible;max-height:none;padding-right:2px;}
-      .collection-skill-card{border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.88);padding:12px;display:flex;flex-direction:row;align-items:center;gap:12px;}
-      .collection-skill-card__header{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+      .collection-skill-overlay__abilities{display:flex;flex-direction:column;gap:10px;overflow:visible;max-height:none;padding-right:2px;width:75%;min-width:0;}
+      .collection-skill-card{border-radius:16px;border:1px solid rgba(125,211,252,.24);background:rgba(12,22,32,.88);padding:10px 12px;display:flex;flex-direction:row;align-items:center;gap:10px;min-height:42px;}
+      .collection-skill-card__header{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
       .collection-skill-card__title{margin:0;font-size:15px;letter-spacing:.04em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-      .collection-skill-card__actions{display:flex;align-items:center;gap:6px;margin-left:auto;}
+      .collection-skill-card__actions{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;}
       .collection-skill-card__badge{padding:3px 8px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(8,18,28,.82);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#7da0c7;}
       .collection-skill-card__upgrade{padding:5px 10px;border-radius:12px;border:1px solid rgba(174,228,255,.32);background:rgba(16,26,36,.88);color:#aee4ff;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;}
       .collection-skill-card__upgrade:hover{transform:translateY(-1px);border-color:rgba(174,228,255,.52);box-shadow:0 8px 18px rgba(6,12,20,.38);}
@@ -25762,7 +25768,7 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
         .collection-view__title{font-size:30px;}
         .collection-roster__entry{padding:0;gap:0;}
         ..collection-roster__avatar{--collection-avatar-size:96px;}
-        .collection-skill-overlay__abilities{gap:10px;}
+        .collection-skill-overlay__abilities{gap:10px;width:100%;}
         .collection-skill-card{padding:8px 12px;gap:8px;flex-wrap:wrap;align-items:flex-start;}
         .collection-skill-card__header{flex-wrap:wrap;gap:8px;}
         .collection-skill-card__title{font-size:14px;white-space:normal;}

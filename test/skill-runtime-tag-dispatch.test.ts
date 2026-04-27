@@ -152,7 +152,7 @@ describe('skill runtime tag contract', () => {
     payloadSpy.mockRestore();
   });
 
-  it('rule conflict comparator follows rank > cultivation > stars > awaken > cp', () => {
+  it('rule conflict comparator follows rank > cultivation > stars > awaken (only if both awakened) > cp', () => {
     expect(compareRuleTagPriority('axiom-rule', 'global-rule')).toBeGreaterThan(0);
     expect(compareRuleTagPriority('global-rule', 'doctrine-rule')).toBeGreaterThan(0);
     expect(compareRuleTagPriority('doctrine-rule', 'axiom-rule')).toBeLessThan(0);
@@ -181,6 +181,11 @@ describe('skill runtime tag contract', () => {
     );
     expect(awakenWins).toBeGreaterThan(0);
 
+  const cpWinsWhenOnlyOneSideAwakened = compareRuleConflictUnitPriority(
+      { rank: 'UR', level: 20, stars: 4, awaken: 2, cp: 1200 },
+      { rank: 'UR', level: 20, stars: 4, awaken: 0, cp: 1500 },
+    );
+    expect(cpWinsWhenOnlyOneSideAwakened).toBeLessThan(0);
     const cpWins = compareRuleConflictUnitPriority(
       { rank: 'UR', level: 20, stars: 4, awaken: 2, cp: 1200 },
       { rank: 'UR', level: 20, stars: 4, awaken: 2, cp: 900 },
