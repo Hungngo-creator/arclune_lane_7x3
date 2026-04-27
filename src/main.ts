@@ -71,11 +71,19 @@ const toSessionConfigOverrides = (value: unknown): SessionConfigOverrides => {
 
 const defaultRootTarget = (): RootTarget => (typeof document !== 'undefined' ? document : null);
 
+const pickRootTarget = (...candidates: Array<unknown>): RootTarget => {
+  for (const candidate of candidates) {
+    const normalized = toRootSource(candidate);
+    if (normalized) return normalized;
+  }
+  return defaultRootTarget();
+};
+
 function resolveRoot(
-  config: Pick<StartGameOptions, 'root' | 'rootEl' | 'element'> | null | undefined,
+  config: Pick<StartGameOptions, 'root' | 'rootEl' | 'element'> | Record<string, unknown> | null | undefined,
 ): RootTarget {
   if (!config) return defaultRootTarget();
-  return config.root ?? config.rootEl ?? config.element ?? defaultRootTarget();
+  return pickRootTarget(config.root, config.rootEl, config.element);
 }
 
 const normalizeStartOptions = (
@@ -83,13 +91,8 @@ const normalizeStartOptions = (
 ): { rootTarget: RootTarget; config: SessionConfigOverrides } => {
   const rawOptions: Record<string, unknown> = isPlainRecord(options) ? options : {};
   const { root, rootEl, element, ...rest } = rawOptions;
-  const normalizedRoots = {
-    root: toRootSource(root),
-    rootEl: toRootSource(rootEl),
-    element: toRootSource(element),
-  } as const;
   return {
-    rootTarget: resolveRoot(normalizedRoots),
+    rootTarget: resolveRoot({ root, rootEl, element }),
     config: toSessionConfigOverrides(rest),
   };
 };

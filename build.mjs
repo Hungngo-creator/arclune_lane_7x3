@@ -24,6 +24,20 @@ const STUB_MODULE_SPECIFIERS = new Map([
   ['zod', path.join(__dirname, 'tools/zod-stub/index.js')],
 ]);
 
+async function copyDirectoryRecursive(fromDir, toDir){
+  const entries = await fs.readdir(fromDir, { withFileTypes: true });
+  await fs.mkdir(toDir, { recursive: true });
+  for (const entry of entries){
+    const sourcePath = path.join(fromDir, entry.name);
+    const targetPath = path.join(toDir, entry.name);
+    if (entry.isDirectory()){
+      await copyDirectoryRecursive(sourcePath, targetPath);
+    } else if (entry.isFile()){
+      await fs.copyFile(sourcePath, targetPath);
+    }
+  }
+}
+
 async function copyStaticAssets(){
   try {
     const stats = await fs.stat(ASSETS_SOURCE_DIR);
@@ -37,22 +51,8 @@ async function copyStaticAssets(){
     return;
   }
 
-  async function copyRecursive(fromDir, toDir){
-    const entries = await fs.readdir(fromDir, { withFileTypes: true });
-    await fs.mkdir(toDir, { recursive: true });
-    for (const entry of entries){
-      const sourcePath = path.join(fromDir, entry.name);
-      const targetPath = path.join(toDir, entry.name);
-      if (entry.isDirectory()){
-        await copyRecursive(sourcePath, targetPath);
-      } else if (entry.isFile()){
-        await fs.copyFile(sourcePath, targetPath);
-      }
-    }
-  }
-
   const targetRoot = path.join(DIST_DIR, 'assets');
-  await copyRecursive(ASSETS_SOURCE_DIR, targetRoot);
+  await copyDirectoryRecursive(ASSETS_SOURCE_DIR, targetRoot);
 }
 function normalizeModuleId(id){
   if (!id){
@@ -172,11 +172,18 @@ const skipBundleVerify = args.includes('--skip-bundle-verify');
 const pruneUnreachableModules = args.includes('--prune-unreachable');
 const modeArg = args.find((arg) => arg.startsWith('--mode='));
 const argMode = modeArg ? modeArg.split('=')[1] : undefined;
-const normalizedMode = argMode && argMode.toLowerCase() === 'production' ? 'production' : argMode && argMode.toLowerCase() === 'development' ? 'development' : undefined;
+const toKnownMode = (value) => {
+  if (typeof value !== 'string') return undefined;
+  const normalized = value.toLowerCase();
+  if (normalized === 'production') return 'production';
+  if (normalized === 'development') return 'development';
+  return undefined;
+};
+const normalizedMode = toKnownMode(argMode);
 if (normalizedMode) {
   process.env.NODE_ENV = normalizedMode;
 }
-const MODE = (normalizedMode ?? process.env.NODE_ENV) === 'production' ? 'production' : 'development';
+const MODE = toKnownMode(normalizedMode ?? process.env.NODE_ENV) ?? 'development';
 const ESBUILD_BASE_OPTIONS = {
   platform: 'browser',
   format: 'esm',

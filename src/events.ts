@@ -176,29 +176,39 @@ const createIdempotentDispose = (dispose: () => void): (() => void) => {
   };
 };
 
-const createCustomEventFactory = (): ((type: string, detail: unknown) => Event | null) => {
-  if (!HAS_CUSTOM_EVENT) return () => null;
+const createEventFactory = (
+  probe: () => void,
+  create: (type: string, detail: unknown) => Event,
+): ((type: string, detail: unknown) => Event | null) => {
   try {
-    new CustomEvent('__probe__');
-    return (type, detail) => new CustomEvent(type, { detail });
+    probe();
+    return create;
   } catch {
     return () => null;
   }
 };
 
-const createLegacyEventFactory = (): ((type: string, detail: unknown) => Event | null) => {
-  if (!HAS_EVENT_CONSTRUCTOR) return () => null;
-  try {
-    new Event('__probe__');
-    return (type, detail) => {
-      const event = new Event(type) as LegacyEvent;
-      event.detail = detail;
-      return event;
-    };
-  } catch {
-    return () => null;
-  }
-};
+const createCustomEventFactory = (): ((type: string, detail: unknown) => Event | null) => (
+  HAS_CUSTOM_EVENT
+    ? createEventFactory(
+      () => { new CustomEvent('__probe__'); },
+      (type, detail) => new CustomEvent(type, { detail }),
+    )
+    : () => null
+);
+
+const createLegacyEventFactory = (): ((type: string, detail: unknown) => Event | null) => (
+  HAS_EVENT_CONSTRUCTOR
+    ? createEventFactory(
+      () => { new Event('__probe__'); },
+      (type, detail) => {
+        const event = new Event(type) as LegacyEvent;
+        event.detail = detail;
+        return event;
+      },
+    )
+    : () => null
+);
 
 const CUSTOM_EVENT_FACTORY = createCustomEventFactory();
 const LEGACY_EVENT_FACTORY = createLegacyEventFactory();

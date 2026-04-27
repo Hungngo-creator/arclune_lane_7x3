@@ -400,7 +400,6 @@ __modules['./ai.ts'] = (exports, module, __require) => {
       }
       return { alive, allies, enemies };
   }
-  const predictSpawnCycleLocal = (Game, side, slot) => (predictSpawnCycleByTurnOrder(Game, side, slot));
   function mergedWeights() {
       const cfg = CFG.AI?.WEIGHTS ?? {};
       const out = { ...DEFAULT_WEIGHTS };
@@ -522,7 +521,7 @@ __modules['./ai.ts'] = (exports, module, __require) => {
       return out;
   }
   function etaScoreEnemy(Game, slot) {
-      return predictSpawnCycleLocal(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1 : 0.5;
+      return predictSpawnCycleByTurnOrder(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1 : 0.5;
   }
   function pressureScore(cx, cy) {
       const dist = Math.abs(cx - 0) + Math.abs(cy - 1);
@@ -690,7 +689,7 @@ __modules['./ai.ts'] = (exports, module, __require) => {
       const queue = ensureEnemyQueue(Game);
       if (queue.has(slot))
           return false;
-      const spawnCycle = predictSpawnCycleLocal(Game, 'enemy', slot);
+      const spawnCycle = predictSpawnCycleByTurnOrder(Game, 'enemy', slot);
       queue.set(slot, {
           unitId: card.id,
           name: typeof card.name === 'string' ? card.name : undefined,
@@ -1356,11 +1355,6 @@ __modules['./art.ts'] = (exports, module, __require) => {
           return baseArt ?? fallback;
       }
       if (id.endsWith('_minion')) {
-          const base = id.replace(/_minion$/, '');
-          const minionKey = `${base}_minion`;
-          if (hasArtEntry(minionKey)) {
-              return getArtEntry(minionKey);
-          }
           if (hasArtEntry('minion')) {
               return getArtEntry('minion');
           }
@@ -2077,15 +2071,10 @@ __modules['./background.ts'] = (exports, module, __require) => {
   function computePropsSignature(props) {
       if (!props || !props.length)
           return 'len:0';
-      try {
-          return stableStringify(props);
-      }
-      catch {
-          return `len:${props.length}`;
-      }
+      return stableStringify(props);
   }
   function joinSignatureParts(parts) {
-      if (!Array.isArray(parts) || parts.length === 0) {
+      if (parts.length === 0) {
           return '';
       }
       const normalized = [];
@@ -8835,6 +8824,25 @@ __modules['./cultivation.ts'] = (exports, module, __require) => {
   const listCultivationRealmsEconomy = __dep0.listCultivationRealmsEconomy;
   const __dep1 = __require('./utils/currency.ts');
   const spendAetherWithPriority = __dep1.spendAetherWithPriority;
+  const emptySpendResult = (wallet) => ({
+      ok: false,
+      wallet: { ...wallet },
+      deducted: {},
+      spentAether: 0,
+      missingAether: 0,
+  });
+  const failedUpgrade = (reason, playerState, currentRealm, currentSubRealm, options = {}) => ({
+      ok: false,
+      reason,
+      spent: options.spent ?? emptySpendResult(playerState.currencies ?? {}),
+      costAether: options.costAether ?? 0,
+      previousRealm: currentRealm,
+      previousSubRealm: currentSubRealm,
+      newRealm: currentRealm,
+      newSubRealm: currentSubRealm,
+      isBreakthrough: options.isBreakthrough ?? false,
+      playerState,
+  });
   const REALM_CONFIGS = {
       1: {
           maxSubRealm: 9,
@@ -9045,59 +9053,20 @@ __modules['./cultivation.ts'] = (exports, module, __require) => {
       const playerState = { ...playerStateInput };
       const costInfo = getCultivationCost(currentRealm, currentSubRealm);
       if (!costInfo) {
-          return {
-              ok: false,
-              reason: 'invalid_realm',
-              spent: {
-                  ok: false,
-                  wallet: { ...(playerState.currencies ?? {}) },
-                  deducted: {},
-                  spentAether: 0,
-                  missingAether: 0,
-              },
-              costAether: 0,
-              previousRealm: currentRealm,
-              previousSubRealm: currentSubRealm,
-              newRealm: currentRealm,
-              newSubRealm: currentSubRealm,
-              isBreakthrough: false,
-              playerState,
-          };
+          return failedUpgrade('invalid_realm', playerState, currentRealm, currentSubRealm);
       }
       if (costInfo.aetherCost <= 0) {
-          return {
-              ok: false,
-              reason: 'invalid_cost',
-              spent: {
-                  ok: false,
-                  wallet: { ...(playerState.currencies ?? {}) },
-                  deducted: {},
-                  spentAether: 0,
-                  missingAether: 0,
-              },
+          return failedUpgrade('invalid_cost', playerState, currentRealm, currentSubRealm, {
               costAether: costInfo.aetherCost,
-              previousRealm: currentRealm,
-              previousSubRealm: currentSubRealm,
-              newRealm: currentRealm,
-              newSubRealm: currentSubRealm,
-              isBreakthrough: false,
-              playerState,
-          };
+          });
       }
       const spent = spendAetherWithPriority(playerState.currencies ?? {}, costInfo.aetherCost);
       if (!spent.ok) {
-          return {
-              ok: false,
-              reason: 'insufficient_currency',
+          return failedUpgrade('insufficient_currency', playerState, currentRealm, currentSubRealm, {
               spent,
               costAether: costInfo.aetherCost,
-              previousRealm: currentRealm,
-              previousSubRealm: currentSubRealm,
-              newRealm: currentRealm,
-              newSubRealm: currentSubRealm,
               isBreakthrough: costInfo.isBreakthrough,
-              playerState,
-          };
+          });
       }
       playerState.currencies = spent.wallet;
       playerState.cultivation = {
@@ -12599,19 +12568,22 @@ __modules['./entry.ts'] = (exports, module, __require) => {
           return;
       APP_SCREEN_CLASSES.forEach(cls => root.classList.remove(cls));
   }
+  const destroyHandle = (handle, label) => {
+      if (!handle || typeof handle.destroy !== 'function')
+          return;
+      try {
+          handle.destroy();
+      }
+      catch (err) {
+          console.error(`[${label}] cleanup error`, err);
+      }
+  };
   function destroyCustomScreen(force = false) {
       const hasActiveScreen = !!(customScreenController || customScreenId);
       if (!force && !hasActiveScreen) {
           return;
       }
-      if (customScreenController && typeof customScreenController.destroy === 'function') {
-          try {
-              customScreenController.destroy();
-          }
-          catch (err) {
-              console.error('[screen] cleanup error', err);
-          }
-      }
+      destroyHandle(customScreenController, 'screen');
       customScreenController = null;
       customScreenId = null;
       const root = rootElement;
@@ -12625,36 +12597,15 @@ __modules['./entry.ts'] = (exports, module, __require) => {
       }
   }
   function destroyCollectionView() {
-      if (collectionView && typeof collectionView.destroy === 'function') {
-          try {
-              collectionView.destroy();
-          }
-          catch (err) {
-              console.error('[collection] cleanup error', err);
-          }
-      }
+      destroyHandle(collectionView, 'collection');
       collectionView = null;
   }
   function destroyLineupView() {
-      if (lineupView && typeof lineupView.destroy === 'function') {
-          try {
-              lineupView.destroy();
-          }
-          catch (err) {
-              console.error('[lineup] cleanup error', err);
-          }
-      }
+      destroyHandle(lineupView, 'lineup');
       lineupView = null;
   }
   function destroySectView() {
-      if (sectView && typeof sectView.destroy === 'function') {
-          try {
-              sectView.destroy();
-          }
-          catch (err) {
-              console.error('[sect] cleanup error', err);
-          }
-      }
+      destroyHandle(sectView, 'sect');
       sectView = null;
   }
   function mergeDefinitionParams(definition, params) {
@@ -13723,32 +13674,25 @@ __modules['./events.ts'] = (exports, module, __require) => {
           dispose();
       };
   };
-  const createCustomEventFactory = () => {
-      if (!HAS_CUSTOM_EVENT)
-          return () => null;
+  const createEventFactory = (probe, create) => {
       try {
-          new CustomEvent('__probe__');
-          return (type, detail) => new CustomEvent(type, { detail });
+          probe();
+          return create;
       }
       catch {
           return () => null;
       }
   };
-  const createLegacyEventFactory = () => {
-      if (!HAS_EVENT_CONSTRUCTOR)
-          return () => null;
-      try {
-          new Event('__probe__');
-          return (type, detail) => {
-              const event = new Event(type);
-              event.detail = detail;
-              return event;
-          };
-      }
-      catch {
-          return () => null;
-      }
-  };
+  const createCustomEventFactory = () => (HAS_CUSTOM_EVENT
+      ? createEventFactory(() => { new CustomEvent('__probe__'); }, (type, detail) => new CustomEvent(type, { detail }))
+      : () => null);
+  const createLegacyEventFactory = () => (HAS_EVENT_CONSTRUCTOR
+      ? createEventFactory(() => { new Event('__probe__'); }, (type, detail) => {
+          const event = new Event(type);
+          event.detail = detail;
+          return event;
+      })
+      : () => null);
   const CUSTOM_EVENT_FACTORY = createCustomEventFactory();
   const LEGACY_EVENT_FACTORY = createLegacyEventFactory();
   function createNativeEvent(type, detail) {
@@ -13978,14 +13922,11 @@ __modules['./leader-uyen.ts'] = (exports, module, __require) => {
       if (!isSystemLeader(unit))
           return false;
       const fury = Math.max(0, Math.floor(Number.isFinite(unit?.fury) ? Number(unit?.fury) : 0));
-      if (unit?.id === 'leaderA' || unit?.id === 'leaderB') {
-          if (choice === 'B') {
-              const state = ensureUyenState(unit);
-              return fury > 0 && Boolean(state) && (state?.bUses ?? 0) < 10;
-          }
-          return fury >= 100;
+      if (choice === 'B' && isUyenLeader(unit)) {
+          const state = ensureUyenState(unit);
+          return fury > 0 && Boolean(state) && (state?.bUses ?? 0) < 10;
       }
-      return fury >= 100;
+      return isLeaderUltReady(unit);
   }
   function isAnyLeaderUltReady(unit) {
       return canCastLeaderUltChoice(unit, 'A')
@@ -13998,9 +13939,7 @@ __modules['./leader-uyen.ts'] = (exports, module, __require) => {
       return canCastLeaderUltChoice(unit, choice);
   }
   function isAnyUyenUltReady(unit) {
-      if (!isUyenLeader(unit))
-          return false;
-      return isAnyLeaderUltReady(unit);
+      return isUyenLeader(unit) && isAnyLeaderUltReady(unit);
   }
   function grantUyenSummonRage(unit, options = {}) {
       if (!isUyenLeader(unit))
@@ -14117,21 +14056,24 @@ __modules['./main.ts'] = (exports, module, __require) => {
       return { ...value };
   };
   const defaultRootTarget = () => (typeof document !== 'undefined' ? document : null);
+  const pickRootTarget = (...candidates) => {
+      for (const candidate of candidates) {
+          const normalized = toRootSource(candidate);
+          if (normalized)
+              return normalized;
+      }
+      return defaultRootTarget();
+  };
   function resolveRoot(config) {
       if (!config)
           return defaultRootTarget();
-      return config.root ?? config.rootEl ?? config.element ?? defaultRootTarget();
+      return pickRootTarget(config.root, config.rootEl, config.element);
   }
   const normalizeStartOptions = (options) => {
       const rawOptions = isPlainRecord(options) ? options : {};
       const { root, rootEl, element, ...rest } = rawOptions;
-      const normalizedRoots = {
-          root: toRootSource(root),
-          rootEl: toRootSource(rootEl),
-          element: toRootSource(element),
-      };
       return {
-          rootTarget: resolveRoot(normalizedRoots),
+          rootTarget: resolveRoot({ root, rootEl, element }),
           config: toSessionConfigOverrides(rest),
       };
   };
@@ -21424,6 +21366,8 @@ __modules['./passives.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'prepareUnitForPassives')) exports.prepareUnitForPassives = prepareUnitForPassives;
 };
 __modules['./scene.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./utils/format.ts');
+  const stableStringify = __dep0.stableStringify;
   const DEFAULT_THEME = {
       sky: {
           top: '#1b2434',
@@ -21480,16 +21424,10 @@ __modules['./scene.ts'] = (exports, module, __require) => {
       return null;
   }
   function themeSignature(theme) {
-      try {
-          const merged = mergeTheme(theme);
-          return JSON.stringify(merged);
-      }
-      catch {
-          return 'default-theme';
-      }
+      return stableStringify(mergeTheme(theme));
   }
   function joinSignatureParts(parts) {
-      if (!Array.isArray(parts) || parts.length === 0) {
+      if (parts.length === 0) {
           return '';
       }
       const normalized = [];
@@ -36566,18 +36504,25 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
               Statuses.remove(unit, status.id);
       }
   }
+  const createTimedStatus = (id, kind, tag, turns) => ({
+      id,
+      kind,
+      tag,
+      dur: turns,
+      tick: 'turn',
+  });
   const statusFactories = {
       stun: (spec) => {
           const { turns = 1 } = (spec ?? {});
-          return { id: 'stun', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
+          return createTimedStatus('stun', 'debuff', 'control', turns);
       },
       sleep: (spec) => {
           const { turns = 1 } = (spec ?? {});
-          return { id: 'sleep', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
+          return createTimedStatus('sleep', 'debuff', 'control', turns);
       },
       taunt: (spec) => {
           const { turns = 1 } = (spec ?? {});
-          return { id: 'taunt', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
+          return createTimedStatus('taunt', 'debuff', 'control', turns);
       },
       reflect: (spec) => {
           const { pct = 0.2, turns = 1 } = (spec ?? {});
@@ -36585,11 +36530,11 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       },
       bleed: (spec) => {
           const { turns = 2 } = (spec ?? {});
-          return { id: 'bleed', kind: 'debuff', tag: 'dot', dur: turns, tick: 'turn' };
+          return createTimedStatus('bleed', 'debuff', 'dot', turns);
       },
       poison: (spec) => {
           const { turns = 2 } = (spec ?? {});
-          return { id: 'poison', kind: 'debuff', tag: 'dot', dur: turns, tick: 'turn' };
+          return createTimedStatus('poison', 'debuff', 'dot', turns);
       },
       damageCut: (spec) => {
           const { pct = 0.2, turns = 1 } = (spec ?? {});
@@ -36597,11 +36542,11 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       },
       fatigue: (spec) => {
           const { turns = 2 } = (spec ?? {});
-          return { id: 'fatigue', kind: 'debuff', tag: 'output', dur: turns, tick: 'turn' };
+          return createTimedStatus('fatigue', 'debuff', 'output', turns);
       },
       silence: (spec) => {
           const { turns = 1 } = (spec ?? {});
-          return { id: 'silence', kind: 'debuff', tag: 'silence', dur: turns, tick: 'turn' };
+          return createTimedStatus('silence', 'debuff', 'silence', turns);
       },
       shield: (spec) => {
           const { pct = 0.2, amount = 0 } = (spec ?? {});
@@ -36616,7 +36561,7 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       },
       exalt: (spec) => {
           const { turns = 2 } = (spec ?? {});
-          return { id: 'exalt', kind: 'buff', tag: 'output', dur: turns, tick: 'turn' };
+          return createTimedStatus('exalt', 'buff', 'output', turns);
       },
       pierce: (spec) => {
           const { pct = 0.1, turns = 2 } = (spec ?? {});
@@ -36624,11 +36569,11 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       },
       daze: (spec) => {
           const { turns = 1 } = (spec ?? {});
-          return { id: 'daze', kind: 'debuff', tag: 'stat', dur: turns, tick: 'turn' };
+          return createTimedStatus('daze', 'debuff', 'stat', turns);
       },
       frenzy: (spec) => {
           const { turns = 2 } = (spec ?? {});
-          return { id: 'frenzy', kind: 'buff', tag: 'basic-boost', dur: turns, tick: 'turn' };
+          return createTimedStatus('frenzy', 'buff', 'basic-boost', turns);
       },
       weaken: (spec) => {
           const { turns = 2, stacks = 1 } = (spec ?? {});
@@ -36644,11 +36589,11 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       },
       fear: (spec) => {
           const { turns = 1 } = (spec ?? {});
-          return { id: 'fear', kind: 'debuff', tag: 'output', dur: turns, tick: 'turn' };
+          return createTimedStatus('fear', 'debuff', 'output', turns);
       },
       stealth: (spec) => {
           const { turns = 1 } = (spec ?? {});
-          return { id: 'stealth', kind: 'buff', tag: 'invuln', dur: turns, tick: 'turn' };
+          return createTimedStatus('stealth', 'buff', 'invuln', turns);
       },
       venom: (spec) => {
           const { pct = 0.15, turns = 2 } = (spec ?? {});
@@ -36656,12 +36601,12 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       },
       execute: (spec) => {
           const { turns = 2 } = (spec ?? {});
-          return { id: 'execute', kind: 'buff', tag: 'execute', dur: turns, tick: 'turn' };
+          return createTimedStatus('execute', 'buff', 'execute', turns);
       },
       undying: () => ({ id: 'undying', kind: 'buff', tag: 'cheat-death', once: true }),
       allure: (spec) => {
           const { turns = 1 } = (spec ?? {});
-          return { id: 'allure', kind: 'buff', tag: 'avoid-basic', dur: turns, tick: 'turn' };
+          return createTimedStatus('allure', 'buff', 'avoid-basic', turns);
       },
       haste: (spec) => {
           const { pct = 0.1, turns = 1 } = (spec ?? {});
@@ -37035,7 +36980,14 @@ __modules['./summon.ts'] = (exports, module, __require) => {
   // xử lý toàn bộ chain của 1 phe sau khi actor vừa hành động
   // trả về slot lớn nhất đã hành động trong chain để tiện logging
   function processActionChain(Game, side, baseSlot, hooks = {}) {
-      const list = Game.actionChain.filter((x) => x.side === side);
+      const list = [];
+      const rest = [];
+      for (const entry of Game.actionChain) {
+          if (entry.side === side)
+              list.push(entry);
+          else
+              rest.push(entry);
+      }
       if (!list.length)
           return baseSlot ?? null;
       const aliveTokens = tokensAlive(Game);
@@ -37077,18 +37029,16 @@ __modules['./summon.ts'] = (exports, module, __require) => {
           catch (_err) {
               // bỏ qua lỗi hiệu ứng
           }
-          const spawned = Game.tokens[Game.tokens.length - 1] ?? null;
-          if (spawned) {
-              const metaEntry = extra.id && typeof Game.meta?.get === 'function'
-                  ? Game.meta.get(extra.id)
-                  : null;
-              const kit = getKitDefinition(metaEntry);
-              const onSpawnConfig = kit?.onSpawn && isRecord(kit.onSpawn) ? kit.onSpawn : null;
-              prepareUnitForPassives(spawned);
-              applyOnSpawnEffects(Game, spawned, onSpawnConfig ?? undefined);
-              spawned.iid = hooks.allocIid?.() ?? spawned.iid ?? 0;
-          }
-          const creep = Game.tokens.find((t) => t.alive && t.side === side && t.cx === cx && t.cy === cy) ?? null;
+          const spawned = newToken;
+          const metaEntry = extra.id && typeof Game.meta?.get === 'function'
+              ? Game.meta.get(extra.id)
+              : null;
+          const kit = getKitDefinition(metaEntry);
+          const onSpawnConfig = kit?.onSpawn && isRecord(kit.onSpawn) ? kit.onSpawn : null;
+          prepareUnitForPassives(spawned);
+          applyOnSpawnEffects(Game, spawned, onSpawnConfig ?? undefined);
+          spawned.iid = hooks.allocIid?.() ?? spawned.iid ?? 0;
+          const creep = spawned.alive ? spawned : null;
           if (creep) {
               const { orderLength, cycle } = getTurnSnapshotInfo(Game.turn);
               const turnContext = {
@@ -37103,7 +37053,7 @@ __modules['./summon.ts'] = (exports, module, __require) => {
           if (item.slot > maxSlot)
               maxSlot = item.slot;
       }
-      Game.actionChain = Game.actionChain.filter((x) => x.side !== side);
+      Game.actionChain = rest;
       return maxSlot;
   }
   //# sourceMappingURL=stdin.js.map
@@ -38317,6 +38267,7 @@ __modules['./ui.ts'] = (exports, module, __require) => {
   const __dep2 = __require('./ui/dom.ts');
   const assertElement = __dep2.assertElement;
   const HUD_EVENT_TYPES = [TURN_START, TURN_END, ACTION_END];
+  const SUMMON_BAR_RERENDER_EVENTS = HUD_EVENT_TYPES;
   function canQuery(node) {
       return !!node && typeof node.querySelector === 'function';
   }
@@ -38486,11 +38437,12 @@ __modules['./ui.ts'] = (exports, module, __require) => {
           if (!card || !canAfford(card))
               return;
           onPick(card);
-          Array.from(host.children).forEach((node) => {
-              if (node instanceof HTMLElement) {
-                  node.classList.toggle('active', node === btn);
-              }
-          });
+          for (let i = 0; i < btns.length; i += 1) {
+              const node = btns[i];
+              if (!node)
+                  continue;
+              node.classList.toggle('active', node === btn);
+          }
       };
       host.addEventListener('click', handleHostClick);
       cleanupFns.push(() => host.removeEventListener('click', handleHostClick));
@@ -38625,8 +38577,7 @@ __modules['./ui.ts'] = (exports, module, __require) => {
       };
       if (gameEvents) {
           const rerender = () => render();
-          const types = [TURN_START, TURN_END, ACTION_END];
-          for (const type of types) {
+          for (const type of SUMMON_BAR_RERENDER_EVENTS) {
               const dispose = addGameEventListener(type, () => rerender());
               if (typeof dispose === 'function') {
                   cleanupFns.push(() => dispose());

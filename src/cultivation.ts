@@ -73,6 +73,37 @@ export interface CultivationUpgradePayload {
   playerState: CultivationPlayerState;
 }
 
+const emptySpendResult = (wallet: CurrencyWallet): SpendAetherResult => ({
+  ok: false,
+  wallet: { ...wallet },
+  deducted: {},
+  spentAether: 0,
+  missingAether: 0,
+});
+
+const failedUpgrade = (
+  reason: CultivationUpgradePayload['reason'],
+  playerState: CultivationPlayerState,
+  currentRealm: number,
+  currentSubRealm: number,
+  options: {
+    costAether?: number;
+    isBreakthrough?: boolean;
+    spent?: SpendAetherResult;
+  } = {},
+): CultivationUpgradePayload => ({
+  ok: false,
+  reason,
+  spent: options.spent ?? emptySpendResult(playerState.currencies ?? {}),
+  costAether: options.costAether ?? 0,
+  previousRealm: currentRealm,
+  previousSubRealm: currentSubRealm,
+  newRealm: currentRealm,
+  newSubRealm: currentSubRealm,
+  isBreakthrough: options.isBreakthrough ?? false,
+  playerState,
+});
+
 export interface CultivationRealmOption {
   realm: number;
   name: string;
@@ -306,61 +337,22 @@ export function upgradeCultivation(
   const costInfo = getCultivationCost(currentRealm, currentSubRealm);
 
   if (!costInfo){
-    return {
-      ok: false,
-      reason: 'invalid_realm',
-      spent: {
-        ok: false,
-        wallet: { ...(playerState.currencies ?? {}) },
-        deducted: {},
-        spentAether: 0,
-        missingAether: 0,
-      },
-      costAether: 0,
-      previousRealm: currentRealm,
-      previousSubRealm: currentSubRealm,
-      newRealm: currentRealm,
-      newSubRealm: currentSubRealm,
-      isBreakthrough: false,
-      playerState,
-    };
+    return failedUpgrade('invalid_realm', playerState, currentRealm, currentSubRealm);
   }
 
   if (costInfo.aetherCost <= 0){
-    return {
-      ok: false,
-      reason: 'invalid_cost',
-      spent: {
-        ok: false,
-        wallet: { ...(playerState.currencies ?? {}) },
-        deducted: {},
-        spentAether: 0,
-        missingAether: 0,
-      },
+    return failedUpgrade('invalid_cost', playerState, currentRealm, currentSubRealm, {
       costAether: costInfo.aetherCost,
-      previousRealm: currentRealm,
-      previousSubRealm: currentSubRealm,
-      newRealm: currentRealm,
-      newSubRealm: currentSubRealm,
-      isBreakthrough: false,
-      playerState,
-    };
+    });
   }
 
   const spent = spendAetherWithPriority(playerState.currencies ?? {}, costInfo.aetherCost);
   if (!spent.ok){
-    return {
-      ok: false,
-      reason: 'insufficient_currency',
+    return failedUpgrade('insufficient_currency', playerState, currentRealm, currentSubRealm, {
       spent,
       costAether: costInfo.aetherCost,
-      previousRealm: currentRealm,
-      previousSubRealm: currentSubRealm,
-      newRealm: currentRealm,
-      newSubRealm: currentSubRealm,
       isBreakthrough: costInfo.isBreakthrough,
-      playerState,
-    };
+    });
   }
 
   playerState.currencies = spent.wallet;

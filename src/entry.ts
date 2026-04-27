@@ -510,18 +510,24 @@ function clearAppScreenClasses(): void{
   APP_SCREEN_CLASSES.forEach(cls => root.classList.remove(cls));
 }
 
+const destroyHandle = (
+  handle: { destroy?: () => void } | null | undefined,
+  label: string,
+): void => {
+  if (!handle || typeof handle.destroy !== 'function') return;
+  try {
+    handle.destroy();
+  } catch (err) {
+    console.error(`[${label}] cleanup error`, err);
+  }
+};
+
 function destroyCustomScreen(force = false): void{
   const hasActiveScreen = !!(customScreenController || customScreenId);
   if (!force && !hasActiveScreen){
     return;
   }
-  if (customScreenController && typeof customScreenController.destroy === 'function'){
-    try {
-      customScreenController.destroy();
-    } catch (err) {
-      console.error('[screen] cleanup error', err);
-    }
-  }
+  destroyHandle(customScreenController, 'screen');
   customScreenController = null;
   customScreenId = null;
   const root = rootElement;
@@ -535,35 +541,17 @@ function destroyCustomScreen(force = false): void{
 }
 
 function destroyCollectionView(): void{
-  if (collectionView && typeof collectionView.destroy === 'function'){
-    try {
-      collectionView.destroy();
-    } catch (err) {
-      console.error('[collection] cleanup error', err);
-    }
-  }
+  destroyHandle(collectionView, 'collection');
   collectionView = null;
 }
 
 function destroyLineupView(): void{
-  if (lineupView && typeof lineupView.destroy === 'function'){
-    try {
-      lineupView.destroy();
-    } catch (err) {
-      console.error('[lineup] cleanup error', err);
-    }
-  }
+  destroyHandle(lineupView, 'lineup');
   lineupView = null;
 }
 
 function destroySectView(): void{
-  if (sectView && typeof sectView.destroy === 'function'){
-    try {
-      sectView.destroy();
-    } catch (err) {
-      console.error('[sect] cleanup error', err);
-    }
-  }
+  destroyHandle(sectView, 'sect');
   sectView = null;
 }
 

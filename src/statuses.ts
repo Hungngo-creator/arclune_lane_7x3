@@ -149,18 +149,31 @@ function decrementDuration(unit: UnitToken, status: StatusEffect): void {
   }
 }
 
+const createTimedStatus = (
+  id: string,
+  kind: 'buff' | 'debuff',
+  tag: string,
+  turns: number,
+): StatusEffect => ({
+  id,
+  kind,
+  tag,
+  dur: turns,
+  tick: 'turn',
+});
+
 const statusFactories = {
   stun: (spec?: Record<string, unknown>) => {
     const { turns = 1 } = (spec ?? {}) as { turns?: number };
-    return { id: 'stun', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
+    return createTimedStatus('stun', 'debuff', 'control', turns);
   },
   sleep: (spec?: Record<string, unknown>) => {
     const { turns = 1 } = (spec ?? {}) as { turns?: number };
-    return { id: 'sleep', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
+    return createTimedStatus('sleep', 'debuff', 'control', turns);
   },
   taunt: (spec?: Record<string, unknown>) => {
     const { turns = 1 } = (spec ?? {}) as { turns?: number };
-    return { id: 'taunt', kind: 'debuff', tag: 'control', dur: turns, tick: 'turn' };
+    return createTimedStatus('taunt', 'debuff', 'control', turns);
   },
   reflect: (spec?: Record<string, unknown>) => {
     const { pct = 0.2, turns = 1 } = (spec ?? {}) as { pct?: number; turns?: number };
@@ -168,11 +181,11 @@ const statusFactories = {
   },
   bleed: (spec?: Record<string, unknown>) => {
     const { turns = 2 } = (spec ?? {}) as { turns?: number };
-    return { id: 'bleed', kind: 'debuff', tag: 'dot', dur: turns, tick: 'turn' };
+    return createTimedStatus('bleed', 'debuff', 'dot', turns);
   },
   poison: (spec?: Record<string, unknown>) => {
     const { turns = 2 } = (spec ?? {}) as { turns?: number };
-    return { id: 'poison', kind: 'debuff', tag: 'dot', dur: turns, tick: 'turn' };
+    return createTimedStatus('poison', 'debuff', 'dot', turns);
   },
   damageCut: (spec?: Record<string, unknown>) => {
     const { pct = 0.2, turns = 1 } = (spec ?? {}) as { pct?: number; turns?: number };
@@ -180,11 +193,11 @@ const statusFactories = {
   },
   fatigue: (spec?: Record<string, unknown>) => {
     const { turns = 2 } = (spec ?? {}) as { turns?: number };
-    return { id: 'fatigue', kind: 'debuff', tag: 'output', dur: turns, tick: 'turn' };
+    return createTimedStatus('fatigue', 'debuff', 'output', turns);
   },
   silence: (spec?: Record<string, unknown>) => {
     const { turns = 1 } = (spec ?? {}) as { turns?: number };
-    return { id: 'silence', kind: 'debuff', tag: 'silence', dur: turns, tick: 'turn' };
+    return createTimedStatus('silence', 'debuff', 'silence', turns);
   },
   shield: (spec?: Record<string, unknown>) => {
     const { pct = 0.2, amount = 0 } = (spec ?? {}) as { pct?: number; amount?: number };
@@ -199,7 +212,7 @@ const statusFactories = {
   },
   exalt: (spec?: Record<string, unknown>) => {
     const { turns = 2 } = (spec ?? {}) as { turns?: number };
-    return { id: 'exalt', kind: 'buff', tag: 'output', dur: turns, tick: 'turn' };
+    return createTimedStatus('exalt', 'buff', 'output', turns);
   },
   pierce: (spec?: Record<string, unknown>) => {
     const { pct = 0.1, turns = 2 } = (spec ?? {}) as { pct?: number; turns?: number };
@@ -207,11 +220,11 @@ const statusFactories = {
   },
   daze: (spec?: Record<string, unknown>) => {
     const { turns = 1 } = (spec ?? {}) as { turns?: number };
-    return { id: 'daze', kind: 'debuff', tag: 'stat', dur: turns, tick: 'turn' };
+    return createTimedStatus('daze', 'debuff', 'stat', turns);
   },
   frenzy: (spec?: Record<string, unknown>) => {
     const { turns = 2 } = (spec ?? {}) as { turns?: number };
-    return { id: 'frenzy', kind: 'buff', tag: 'basic-boost', dur: turns, tick: 'turn' };
+    return createTimedStatus('frenzy', 'buff', 'basic-boost', turns);
   },
   weaken: (spec?: Record<string, unknown>) => {
     const { turns = 2, stacks = 1 } = (spec ?? {}) as { turns?: number; stacks?: number };
@@ -227,11 +240,11 @@ const statusFactories = {
   },
   fear: (spec?: Record<string, unknown>) => {
     const { turns = 1 } = (spec ?? {}) as { turns?: number };
-    return { id: 'fear', kind: 'debuff', tag: 'output', dur: turns, tick: 'turn' };
+    return createTimedStatus('fear', 'debuff', 'output', turns);
   },
   stealth: (spec?: Record<string, unknown>) => {
     const { turns = 1 } = (spec ?? {}) as { turns?: number };
-    return { id: 'stealth', kind: 'buff', tag: 'invuln', dur: turns, tick: 'turn' };
+    return createTimedStatus('stealth', 'buff', 'invuln', turns);
   },
   venom: (spec?: Record<string, unknown>) => {
     const { pct = 0.15, turns = 2 } = (spec ?? {}) as { pct?: number; turns?: number };
@@ -239,12 +252,12 @@ const statusFactories = {
   },
   execute: (spec?: Record<string, unknown>) => {
     const { turns = 2 } = (spec ?? {}) as { turns?: number };
-    return { id: 'execute', kind: 'buff', tag: 'execute', dur: turns, tick: 'turn' };
+    return createTimedStatus('execute', 'buff', 'execute', turns);
   },
   undying: () => ({ id: 'undying', kind: 'buff', tag: 'cheat-death', once: true }),
   allure: (spec?: Record<string, unknown>) => {
     const { turns = 1 } = (spec ?? {}) as { turns?: number };
-    return { id: 'allure', kind: 'buff', tag: 'avoid-basic', dur: turns, tick: 'turn' };
+    return createTimedStatus('allure', 'buff', 'avoid-basic', turns);
   },
   haste: (spec?: Record<string, unknown>) => {
     const { pct = 0.1, turns = 1 } = (spec ?? {}) as { pct?: number; turns?: number };

@@ -260,15 +260,11 @@ function getBackgroundConfigMap(): Map<string, BackgroundDefinitionConfig> {
 
 function computePropsSignature(props: ReadonlyArray<BackgroundPropConfig> | null | undefined): string {
   if (!props || !props.length) return 'len:0';
-  try {
-    return stableStringify(props);
-  } catch {
-    return `len:${props.length}`;
-  }
+  return stableStringify(props);
 }
 
 function joinSignatureParts(parts: Array<string | number | null | undefined>): string {
-  if (!Array.isArray(parts) || parts.length === 0) {
+  if (parts.length === 0) {
     return '';
   }
   const normalized: string[] = [];

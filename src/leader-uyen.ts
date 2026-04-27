@@ -65,15 +65,12 @@ export function canCastLeaderUltChoice(
   if (!isSystemLeader(unit)) return false;
   const fury = Math.max(0, Math.floor(Number.isFinite(unit?.fury) ? Number(unit?.fury) : 0));
 
-  if (unit?.id === 'leaderA' || unit?.id === 'leaderB') {
-    if (choice === 'B') {
-      const state = ensureUyenState(unit);
-      return fury > 0 && Boolean(state) && (state?.bUses ?? 0) < 10;
-    }
-    return fury >= 100;
+  if (choice === 'B' && isUyenLeader(unit)) {
+    const state = ensureUyenState(unit);
+    return fury > 0 && Boolean(state) && (state?.bUses ?? 0) < 10;
   }
 
-  return fury >= 100;
+  return isLeaderUltReady(unit);
 }
 
 export function isAnyLeaderUltReady(unit: UnitToken | null | undefined): boolean {
@@ -91,8 +88,7 @@ export function canCastUyenUltChoice(
 }
 
 export function isAnyUyenUltReady(unit: UnitToken | null | undefined): boolean {
-  if (!isUyenLeader(unit)) return false;
-  return isAnyLeaderUltReady(unit);
+  return isUyenLeader(unit) && isAnyLeaderUltReady(unit);
 }
 
 export function grantUyenSummonRage(unit: UnitToken | null | undefined, options: { revived?: boolean; isMinion?: boolean } = {}): void {

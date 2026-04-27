@@ -227,11 +227,6 @@ function getBaseArt(id: string | null | undefined): UnitArtDefinition {
     return baseArt ?? fallback;
   }
   if (id.endsWith('_minion')){
-    const base = id.replace(/_minion$/, '');
-    const minionKey = `${base}_minion`;
-    if (hasArtEntry(minionKey)){
-      return getArtEntry(minionKey);
-    }
     if (hasArtEntry('minion')){
       return getArtEntry('minion');
     }

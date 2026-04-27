@@ -1,5 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/scene.ts
 import type { SceneTheme } from '@shared-types/config';
+import { stableStringify } from './utils/format.ts';
 
 type SceneGrid = {
   cols: number;
@@ -89,16 +90,11 @@ function createOffscreenCanvas(pixelWidth: number, pixelHeight: number): Offscre
 }
 
 function themeSignature(theme: SceneTheme | null | undefined): string {
-  try {
-    const merged = mergeTheme(theme);
-    return JSON.stringify(merged);
-  } catch {
-    return 'default-theme';
-  }
+  return stableStringify(mergeTheme(theme));
 }
 
 function joinSignatureParts(parts: Array<string | number | null | undefined>): string {
-  if (!Array.isArray(parts) || parts.length === 0) {
+  if (parts.length === 0) {
     return '';
   }
   const normalized: string[] = [];

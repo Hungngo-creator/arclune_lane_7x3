@@ -91,7 +91,12 @@ export function processActionChain(
   baseSlot: number | null | undefined,
   hooks: SummonChainHooks = {},
 ): number | null {
-  const list = Game.actionChain.filter((x): x is ActionChainEntry => x.side === side);
+  const list: ActionChainEntry[] = [];
+  const rest: ActionChainEntry[] = [];
+  for (const entry of Game.actionChain) {
+    if (entry.side === side) list.push(entry);
+    else rest.push(entry);
+  }
   if (!list.length) return baseSlot ?? null;
   const aliveTokens = tokensAlive(Game);
 
@@ -134,20 +139,18 @@ export function processActionChain(
         // bỏ qua lỗi hiệu ứng
       }
 
-    const spawned = Game.tokens[Game.tokens.length - 1] ?? null;
-    if (spawned){
-      const metaEntry =
-        extra.id && typeof Game.meta?.get === 'function'
-          ? Game.meta.get(extra.id)
-          : null;
-      const kit = getKitDefinition(metaEntry);
-      const onSpawnConfig = kit?.onSpawn && isRecord(kit.onSpawn) ? kit.onSpawn : null;
-      prepareUnitForPassives(spawned);
-      applyOnSpawnEffects(Game, spawned, onSpawnConfig ?? undefined);
-      spawned.iid = hooks.allocIid?.() ?? spawned.iid ?? 0;
-    }
+    const spawned = newToken;
+    const metaEntry =
+      extra.id && typeof Game.meta?.get === 'function'
+        ? Game.meta.get(extra.id)
+        : null;
+    const kit = getKitDefinition(metaEntry);
+    const onSpawnConfig = kit?.onSpawn && isRecord(kit.onSpawn) ? kit.onSpawn : null;
+    prepareUnitForPassives(spawned);
+    applyOnSpawnEffects(Game, spawned, onSpawnConfig ?? undefined);
+    spawned.iid = hooks.allocIid?.() ?? spawned.iid ?? 0;
 
-    const creep = Game.tokens.find((t): t is UnitToken => t.alive && t.side === side && t.cx === cx && t.cy === cy) ?? null;
+    const creep = spawned.alive ? spawned : null;
     if (creep){
       const { orderLength, cycle } = getTurnSnapshotInfo(Game.turn);
       const turnContext: TurnContext = {
@@ -163,6 +166,6 @@ export function processActionChain(
     if (item.slot > maxSlot) maxSlot = item.slot;
   }
 
-  Game.actionChain = Game.actionChain.filter((x) => x.side !== side);
+  Game.actionChain = rest;
   return maxSlot;
 }

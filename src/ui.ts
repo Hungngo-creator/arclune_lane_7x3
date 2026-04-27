@@ -15,6 +15,7 @@ import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } fr
 
 type HudGameLike = { cost?: number | null; costCap?: number | null } | null | undefined;
 const HUD_EVENT_TYPES = [TURN_START, TURN_END, ACTION_END] as const;
+const SUMMON_BAR_RERENDER_EVENTS = HUD_EVENT_TYPES;
 
 type QueryableRoot = ParentNode & { querySelector?: typeof Document.prototype.querySelector };
 
@@ -224,11 +225,11 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
     if (!card || !canAfford(card)) return;
 
     onPick(card);
-    Array.from(host.children).forEach((node) => {
-      if (node instanceof HTMLElement){
-        node.classList.toggle('active', node === btn);
-      }
-    });
+    for (let i = 0; i < btns.length; i += 1) {
+      const node = btns[i];
+      if (!node) continue;
+      node.classList.toggle('active', node === btn);
+    }
   };
   host.addEventListener('click', handleHostClick);
   cleanupFns.push(() => host.removeEventListener('click', handleHostClick));
@@ -369,8 +370,7 @@ export function startSummonBar<TCard extends SummonBarCard = SummonBarCard>(
 
   if (gameEvents){
     const rerender = (): void => render();
-    const types = [TURN_START, TURN_END, ACTION_END] as const;
-    for (const type of types){
+    for (const type of SUMMON_BAR_RERENDER_EVENTS){
       const dispose = addGameEventListener(type, () => rerender());
       if (typeof dispose === 'function'){
         cleanupFns.push(() => dispose());

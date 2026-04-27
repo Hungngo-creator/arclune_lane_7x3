@@ -159,10 +159,6 @@ function partitionAliveTokensBySide(
   return { alive, allies, enemies };
 }
 
-const predictSpawnCycleLocal = (Game: SessionState, side: 'ally' | 'enemy', slot: number): number => (
-  predictSpawnCycleByTurnOrder(Game, side, slot)
-);
-
 function mergedWeights(): Record<string, number> {
   const cfg = CFG.AI?.WEIGHTS ?? {};
   const out: Record<string, number> = { ...DEFAULT_WEIGHTS };
@@ -288,7 +284,7 @@ function listEmptyEnemySlots(Game: SessionState, aliveTokens?: readonly UnitToke
 }
 
 function etaScoreEnemy(Game: SessionState, slot: number): number {
-  return predictSpawnCycleLocal(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1 : 0.5;
+  return predictSpawnCycleByTurnOrder(Game, 'enemy', slot) === (Game.turn?.cycle ?? 0) ? 1 : 0.5;
 }
 
 function pressureScore(cx: number, cy: number): number {
@@ -469,7 +465,7 @@ export function queueEnemyAt(
   const queue = ensureEnemyQueue(Game);
   if (queue.has(slot)) return false;
 
-  const spawnCycle = predictSpawnCycleLocal(Game, 'enemy', slot);
+  const spawnCycle = predictSpawnCycleByTurnOrder(Game, 'enemy', slot);
 
   queue.set(slot, {
     unitId: card.id,
