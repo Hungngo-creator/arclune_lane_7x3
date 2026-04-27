@@ -436,6 +436,10 @@ function rowLR(g: GridSpec, r: number, C: Required<CameraOptions>): { left: numb
   return { left, right };
 }
 
+function interpolateRowX(left: number, right: number, cols: number, cx: number): number {
+  return left + (cx / cols) * (right - left);
+}
+
 export function drawGridOblique(
   ctx: CanvasRenderingContext2D,
   g: GridSpec,
@@ -451,18 +455,20 @@ export function drawGridOblique(
     ...(opts.colors ?? {}),
   } satisfies Record<'ally' | 'enemy' | 'mid' | 'line', string>;
   const rowGap = C.rowGapRatio * g.tile;
+  let previousBottom = rowLR(g, 0, C);
 
   for (let cy = 0; cy < g.rows; cy++) {
     const yTop = g.oy + cy * rowGap;
     const yBot = g.oy + (cy + 1) * rowGap;
-    const LRt = rowLR(g, cy, C);
+    const LRt = previousBottom;
     const LRb = rowLR(g, cy + 1, C);
+    previousBottom = LRb;
 
     for (let cx = 0; cx < g.cols; cx++) {
-      const xtL = LRt.left + (cx / g.cols) * (LRt.right - LRt.left);
-      const xtR = LRt.left + ((cx + 1) / g.cols) * (LRt.right - LRt.left);
-      const xbL = LRb.left + (cx / g.cols) * (LRb.right - LRb.left);
-      const xbR = LRb.left + ((cx + 1) / g.cols) * (LRb.right - LRb.left);
+      const xtL = interpolateRowX(LRt.left, LRt.right, g.cols, cx);
+      const xtR = interpolateRowX(LRt.left, LRt.right, g.cols, cx + 1);
+      const xbL = interpolateRowX(LRb.left, LRb.right, g.cols, cx);
+      const xbR = interpolateRowX(LRb.left, LRb.right, g.cols, cx + 1);
 
       let fill: string;
       if (cx < CFG.ALLY_COLS) fill = colors.ally;
@@ -514,10 +520,10 @@ function cellQuadOblique(g: GridSpec, cx: number, cy: number, C: Required<Camera
   const LRt = rowLR(g, cy, C);
   const LRb = rowLR(g, cy + 1, C);
 
-  const xtL = LRt.left + (cx / g.cols) * (LRt.right - LRt.left);
-  const xtR = LRt.left + ((cx + 1) / g.cols) * (LRt.right - LRt.left);
-  const xbL = LRb.left + (cx / g.cols) * (LRb.right - LRb.left);
-  const xbR = LRb.left + ((cx + 1) / g.cols) * (LRb.right - LRb.left);
+  const xtL = interpolateRowX(LRt.left, LRt.right, g.cols, cx);
+  const xtR = interpolateRowX(LRt.left, LRt.right, g.cols, cx + 1);
+  const xbL = interpolateRowX(LRb.left, LRb.right, g.cols, cx);
+  const xbR = interpolateRowX(LRb.left, LRb.right, g.cols, cx + 1);
   return { xtL, xtR, xbL, xbR, yTop, yBot };
 }
 

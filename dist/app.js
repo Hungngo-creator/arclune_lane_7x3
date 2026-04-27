@@ -26,6 +26,7 @@ __modules['./aether.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/aether.ts
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const styleThresholdChanged = (prev, next, threshold = 0.25) => prev == null || Math.abs(prev - next) >= threshold;
+  const finiteOr = (value, fallback) => Number.isFinite(value) ? value : fallback;
   class SharedAetherPool {
       max = 0;
       current = 0;
@@ -120,10 +121,9 @@ __modules['./aether.ts'] = (exports, module, __require) => {
               transition: 'height 0.1s linear',
               // QUAN TRỌNG: Dịch điểm neo về giữa chân đáy
               transform: 'translate(-50%, -100%)',
-              boxShadow: `0 0 10px ${this.side === 'ally' ? '#00ffff' : '#ff3366'}`
+              boxShadow: `0 0 6px ${this.side === 'ally' ? '#00ffff' : '#ff3366'}`
           });
           const color = this.side === 'ally' ? '#00ffff' : '#ff3366';
-          this.container.style.boxShadow = `0 0 6px ${color}`;
           this.container.style.borderColor = color;
           // Gắn vào body (Overlay lên trên Canvas)
           document.body.appendChild(this.container);
@@ -200,15 +200,9 @@ __modules['./aether.ts'] = (exports, module, __require) => {
           const facing = options.facing ?? (this.side === 'ally' ? 1 : -1);
           const defaultBackX = (viewport === 'mobile' ? 18 : 24) * scale;
           const defaultBackY = (viewport === 'mobile' ? 24 : 30) * scale;
-          const extraAnchorLift = Number.isFinite(options.anchorLiftY)
-              ? options.anchorLiftY
-              : 0;
-          const backOffsetX = Number.isFinite(options.backOffsetX)
-              ? options.backOffsetX
-              : defaultBackX;
-          const backOffsetY = Number.isFinite(options.backOffsetY)
-              ? options.backOffsetY
-              : defaultBackY;
+          const extraAnchorLift = finiteOr(options.anchorLiftY, 0);
+          const backOffsetX = finiteOr(options.backOffsetX, defaultBackX);
+          const backOffsetY = finiteOr(options.backOffsetY, defaultBackY);
           const facingSign = Math.sign(facing) || (this.side === 'ally' ? 1 : -1);
           const xOffset = -facingSign * backOffsetX;
           const yOffset = -(backOffsetY + extraAnchorLift);
@@ -258,6 +252,7 @@ __modules['./aether.ts'] = (exports, module, __require) => {
   }
   const allyAetherPool = new SharedAetherPool('ally');
   const enemyAetherPool = new SharedAetherPool('enemy');
+  const getPoolBySide = (side) => (side === 'ally' ? allyAetherPool : enemyAetherPool);
   const AE_ACTION_REGEN_BY_CLASS = {
       Support: 10,
       Mage: 7,
@@ -281,17 +276,12 @@ __modules['./aether.ts'] = (exports, module, __require) => {
           enemyAetherPool.init(units);
       },
       gain: (side, amount) => {
-          if (side === 'ally')
-              allyAetherPool.gain(amount);
-          else if (side === 'enemy')
-              enemyAetherPool.gain(amount);
+          getPoolBySide(side).gain(amount);
       },
       consume: (side, cost) => {
-          if (side === 'ally')
-              return allyAetherPool.consume(cost);
-          return enemyAetherPool.consume(cost);
+          return getPoolBySide(side).consume(cost);
       },
-      current: (side) => (side === 'ally' ? allyAetherPool.current : enemyAetherPool.current),
+      current: (side) => getPoolBySide(side).current,
       // API cho Engine update vị trí
       syncAllVisuals: (allyPos, enemyPos, units, options) => {
           if (Array.isArray(units)) {
@@ -11513,6 +11503,9 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       const right = left + width;
       return { left, right };
   }
+  function interpolateRowX(left, right, cols, cx) {
+      return left + (cx / cols) * (right - left);
+  }
   function drawGridOblique(ctx, g, cam, opts = {}) {
       const C = resolveCameraOptions(cam);
       const colors = {
@@ -11523,16 +11516,18 @@ __modules['./engine.ts'] = (exports, module, __require) => {
           ...(opts.colors ?? {}),
       };
       const rowGap = C.rowGapRatio * g.tile;
+      let previousBottom = rowLR(g, 0, C);
       for (let cy = 0; cy < g.rows; cy++) {
           const yTop = g.oy + cy * rowGap;
           const yBot = g.oy + (cy + 1) * rowGap;
-          const LRt = rowLR(g, cy, C);
+          const LRt = previousBottom;
           const LRb = rowLR(g, cy + 1, C);
+          previousBottom = LRb;
           for (let cx = 0; cx < g.cols; cx++) {
-              const xtL = LRt.left + (cx / g.cols) * (LRt.right - LRt.left);
-              const xtR = LRt.left + ((cx + 1) / g.cols) * (LRt.right - LRt.left);
-              const xbL = LRb.left + (cx / g.cols) * (LRb.right - LRb.left);
-              const xbR = LRb.left + ((cx + 1) / g.cols) * (LRb.right - LRb.left);
+              const xtL = interpolateRowX(LRt.left, LRt.right, g.cols, cx);
+              const xtR = interpolateRowX(LRt.left, LRt.right, g.cols, cx + 1);
+              const xbL = interpolateRowX(LRb.left, LRb.right, g.cols, cx);
+              const xbR = interpolateRowX(LRb.left, LRb.right, g.cols, cx + 1);
               let fill;
               if (cx < CFG.ALLY_COLS)
                   fill = colors.ally;
@@ -11574,10 +11569,10 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       const yBot = yTop + rowGap;
       const LRt = rowLR(g, cy, C);
       const LRb = rowLR(g, cy + 1, C);
-      const xtL = LRt.left + (cx / g.cols) * (LRt.right - LRt.left);
-      const xtR = LRt.left + ((cx + 1) / g.cols) * (LRt.right - LRt.left);
-      const xbL = LRb.left + (cx / g.cols) * (LRb.right - LRb.left);
-      const xbR = LRb.left + ((cx + 1) / g.cols) * (LRb.right - LRb.left);
+      const xtL = interpolateRowX(LRt.left, LRt.right, g.cols, cx);
+      const xtR = interpolateRowX(LRt.left, LRt.right, g.cols, cx + 1);
+      const xbL = interpolateRowX(LRb.left, LRb.right, g.cols, cx);
+      const xbR = interpolateRowX(LRb.left, LRb.right, g.cols, cx + 1);
       return { xtL, xtR, xbL, xbR, yTop, yBot };
   }
   function cellCenterOblique(g, cx, cy, C) {
@@ -36535,18 +36530,6 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       logStatusTick(ctx, id, unit, lost);
       decrementDuration(unit, status);
   }
-  function nearestByDistance(origin, targets) {
-      let best = null;
-      let bestDistance = Number.POSITIVE_INFINITY;
-      for (const target of targets) {
-          const distance = Math.abs(target.cx - origin.cx) + Math.abs(target.cy - origin.cy);
-          if (distance < bestDistance) {
-              best = target;
-              bestDistance = distance;
-          }
-      }
-      return best;
-  }
   const createTimedStatus = (id, kind, tag, turns) => ({
       id,
       kind,
@@ -36725,26 +36708,24 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
           // reserved
       },
       onTurnEnd(unit, ctx) {
-          const statuses = [...ensureStatusList(unit)];
+          const statuses = ensureStatusList(unit);
           let bleed = null;
           let poison = null;
-          for (const status of statuses) {
-              if (status.id === 'bleed' && !bleed)
+          for (let i = statuses.length - 1; i >= 0; i -= 1) {
+              const status = statuses[i];
+              if (!status)
+                  continue;
+              if (!bleed && status.id === 'bleed')
                   bleed = status;
-              else if (status.id === 'poison' && !poison)
+              else if (!poison && status.id === 'poison')
                   poison = status;
-              if (bleed && poison)
-                  break;
+              if (status.tick === TURN_TICK && !isDotStatusId(status.id))
+                  decrementDuration(unit, status);
           }
           if (bleed)
               applyDotTick(unit, bleed, ctx);
           if (poison)
               applyDotTick(unit, poison, ctx);
-          for (const status of statuses) {
-              if (!DOT_STATUS_ID_SET.has(status.id) && status.tick === TURN_TICK) {
-                  decrementDuration(unit, status);
-              }
-          }
       },
       onPhaseStart(_side, _ctx) {
           // reserved
@@ -36762,23 +36743,47 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       },
       resolveTarget(attacker, candidates, ctx = {}) {
           const attackType = ctx.attackType ?? 'basic';
-          const candidatePool = Array.isArray(candidates)
-              ? candidates.filter(isTokenCandidate)
-              : [];
-          if (candidatePool.length === 0)
+          if (!Array.isArray(candidates) || candidates.length <= 0)
               return null;
-          let pool = candidatePool;
-          if (attackType === 'basic') {
-              const filtered = candidatePool.filter(target => !this.has(target, ALLURE_STATUS_ID));
-              if (filtered.length > 0) {
-                  pool = filtered;
+          let nearestTaunter = null;
+          let nearestTaunterDistance = Number.POSITIVE_INFINITY;
+          let nearestTaunterNonAllure = null;
+          let nearestTaunterNonAllureDistance = Number.POSITIVE_INFINITY;
+          let hasNonAllureCandidate = false;
+          for (const candidate of candidates) {
+              if (!isTokenCandidate(candidate))
+                  continue;
+              const distance = Math.abs(candidate.cx - attacker.cx) + Math.abs(candidate.cy - attacker.cy);
+              const candidateStatuses = ensureStatusList(candidate);
+              let isAllure = false;
+              let hasTaunt = false;
+              for (const status of candidateStatuses) {
+                  if (!status)
+                      continue;
+                  if (!isAllure && status.id === ALLURE_STATUS_ID)
+                      isAllure = true;
+                  else if (!hasTaunt && status.id === TAUNT_STATUS_ID)
+                      hasTaunt = true;
+                  if (isAllure && hasTaunt)
+                      break;
+              }
+              if (!isAllure)
+                  hasNonAllureCandidate = true;
+              if (!hasTaunt)
+                  continue;
+              if (distance < nearestTaunterDistance) {
+                  nearestTaunter = candidate;
+                  nearestTaunterDistance = distance;
+              }
+              if (!isAllure && distance < nearestTaunterNonAllureDistance) {
+                  nearestTaunterNonAllure = candidate;
+                  nearestTaunterNonAllureDistance = distance;
               }
           }
-          const taunters = pool.filter(target => this.has(target, TAUNT_STATUS_ID));
-          if (taunters.length > 0) {
-              return nearestByDistance(attacker, taunters);
+          if (attackType === 'basic' && hasNonAllureCandidate) {
+              return nearestTaunterNonAllure;
           }
-          return null;
+          return nearestTaunter;
       },
       modifyStats(unit, base) {
           const statuses = ensureStatusList(unit);
@@ -36813,7 +36818,6 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       },
       beforeDamage(attacker, target, ctx = {}) {
           const attackerStatuses = ensureStatusList(attacker);
-          const targetStatuses = ensureStatusList(target);
           let fatigue = null;
           let exalt = null;
           let frenzy = null;
@@ -36838,6 +36842,7 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
               if (fatigue && exalt && frenzy && weak && fear && pierce)
                   break;
           }
+          const targetStatuses = ensureStatusList(target);
           let cut = null;
           let stealth = null;
           for (const status of targetStatuses) {

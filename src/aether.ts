@@ -26,6 +26,8 @@ export interface AetherVisualPairOptions {
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value));
 const styleThresholdChanged = (prev: number | undefined, next: number, threshold = 0.25): boolean =>
   prev == null || Math.abs(prev - next) >= threshold;
+const finiteOr = (value: number | undefined, fallback: number): number =>
+  Number.isFinite(value) ? (value as number) : fallback;
 
 export class SharedAetherPool {
   public max: number = 0;
@@ -51,7 +53,7 @@ export class SharedAetherPool {
     this.side = side;
   }
 
-private setCurrent(nextValue: number): boolean {
+  private setCurrent(nextValue: number): boolean {
     const safeMax = Math.max(0, this.max);
     const next = clamp(nextValue, 0, safeMax);
     if (next === this.current) return false;
@@ -109,7 +111,7 @@ private setCurrent(nextValue: number): boolean {
 
   public destroyUI() {
       if (this.container && this.container.parentNode) {
-      this.container.parentNode.removeChild(this.container);
+        this.container.parentNode.removeChild(this.container);
       }
       this.container = null;
       this.uiFill = null;
@@ -140,11 +142,10 @@ private setCurrent(nextValue: number): boolean {
         transition: 'height 0.1s linear', 
         // QUAN TRỌNG: Dịch điểm neo về giữa chân đáy
         transform: 'translate(-50%, -100%)',
-        boxShadow: `0 0 10px ${this.side === 'ally' ? '#00ffff' : '#ff3366'}` 
-  });
+        boxShadow: `0 0 6px ${this.side === 'ally' ? '#00ffff' : '#ff3366'}` 
+    });
 
     const color = this.side === 'ally' ? '#00ffff' : '#ff3366';
-    this.container.style.boxShadow = `0 0 6px ${color}`;
     this.container.style.borderColor = color;
 
     // Gắn vào body (Overlay lên trên Canvas)
@@ -185,7 +186,7 @@ private setCurrent(nextValue: number): boolean {
   }
 
   // Hàm này được gọi từ Game Loop (draw) để bám theo nhân vật/vị trí
- public syncVisuals(screenX: number, screenY: number, scale: number, options: AetherVisualOptions = {}) {
+  public syncVisuals(screenX: number, screenY: number, scale: number, options: AetherVisualOptions = {}) {
     if (!this.container) return;
     this.debugSyncCalls += 1;
     
@@ -228,16 +229,9 @@ private setCurrent(nextValue: number): boolean {
 
     const defaultBackX = (viewport === 'mobile' ? 18 : 24) * scale;
     const defaultBackY = (viewport === 'mobile' ? 24 : 30) * scale;
-    const extraAnchorLift = Number.isFinite(options.anchorLiftY)
-      ? (options.anchorLiftY as number)
-      : 0;
-
-    const backOffsetX = Number.isFinite(options.backOffsetX)
-      ? (options.backOffsetX as number)
-      : defaultBackX;
-    const backOffsetY = Number.isFinite(options.backOffsetY)
-      ? (options.backOffsetY as number)
-      : defaultBackY;
+    const extraAnchorLift = finiteOr(options.anchorLiftY, 0);
+    const backOffsetX = finiteOr(options.backOffsetX, defaultBackX);
+    const backOffsetY = finiteOr(options.backOffsetY, defaultBackY);
 
      const facingSign = Math.sign(facing) || (this.side === 'ally' ? 1 : -1);
      const xOffset = -facingSign * backOffsetX;
@@ -291,6 +285,7 @@ private setCurrent(nextValue: number): boolean {
 
 export const allyAetherPool = new SharedAetherPool('ally');
 export const enemyAetherPool = new SharedAetherPool('enemy');
+const getPoolBySide = (side: Side): SharedAetherPool => (side === 'ally' ? allyAetherPool : enemyAetherPool);
 
 export const AE_ACTION_REGEN_BY_CLASS = {
   Support: 10,
@@ -317,16 +312,14 @@ export const globalAetherPool = {
   },
 
   gain: (side: Side, amount: number) => {
-    if (side === 'ally') allyAetherPool.gain(amount);
-    else if (side === 'enemy') enemyAetherPool.gain(amount);
+    getPoolBySide(side).gain(amount);
   },
 
   consume: (side: Side, cost: number) => {
-    if (side === 'ally') return allyAetherPool.consume(cost);
-    return enemyAetherPool.consume(cost);
+    return getPoolBySide(side).consume(cost);
   },
 
-current: (side: Side) => (side === 'ally' ? allyAetherPool.current : enemyAetherPool.current),
+  current: (side: Side) => getPoolBySide(side).current,
 
   // API cho Engine update vị trí
   syncAllVisuals: (

@@ -174,19 +174,6 @@ function applyDotTick(unit: UnitToken, status: StatusEffect, ctx?: StatusTurnCon
   decrementDuration(unit, status);
 }
 
-function nearestByDistance(origin: UnitToken, targets: ReadonlyArray<UnitToken>): UnitToken | null {
-  let best: UnitToken | null = null;
-  let bestDistance = Number.POSITIVE_INFINITY;
-  for (const target of targets) {
-    const distance = Math.abs(target.cx - origin.cx) + Math.abs(target.cy - origin.cy);
-    if (distance < bestDistance) {
-      best = target;
-      bestDistance = distance;
-    }
-  }
-  return best;
-}
-
 const createTimedStatus = (
   id: string,
   kind: 'buff' | 'debuff',
@@ -364,21 +351,18 @@ export const Statuses: StatusService = {
     // reserved
   },
   onTurnEnd(unit, ctx) {
-    const statuses = [...ensureStatusList(unit)];
+    const statuses = ensureStatusList(unit);
     let bleed: StatusEffect | null = null;
     let poison: StatusEffect | null = null;
-    for (const status of statuses) {
-      if (status.id === 'bleed' && !bleed) bleed = status;
-      else if (status.id === 'poison' && !poison) poison = status;
-      if (bleed && poison) break;
+    for (let i = statuses.length - 1; i >= 0; i -= 1) {
+      const status = statuses[i];
+      if (!status) continue;
+      if (!bleed && status.id === 'bleed') bleed = status;
+      else if (!poison && status.id === 'poison') poison = status;
+      if (status.tick === TURN_TICK && !isDotStatusId(status.id)) decrementDuration(unit, status);
     }
     if (bleed) applyDotTick(unit, bleed, ctx);
     if (poison) applyDotTick(unit, poison, ctx);
-    for (const status of statuses) {
-      if (!DOT_STATUS_ID_SET.has(status.id) && status.tick === TURN_TICK) {
-        decrementDuration(unit, status);
-      }
-    }
   },
   onPhaseStart(_side, _ctx) {
     // reserved
@@ -395,23 +379,43 @@ export const Statuses: StatusService = {
   },
   resolveTarget(attacker, candidates, ctx = {}) {
     const attackType = ctx.attackType ?? 'basic';
-    const candidatePool = Array.isArray(candidates)
-      ? candidates.filter(isTokenCandidate)
-      : [];
-    if (candidatePool.length === 0) return null;
+    if (!Array.isArray(candidates) || candidates.length <= 0) return null;
 
-    let pool: ReadonlyArray<UnitToken> = candidatePool;
-    if (attackType === 'basic') {
-      const filtered = candidatePool.filter(target => !this.has(target, ALLURE_STATUS_ID));
-      if (filtered.length > 0) {
-        pool = filtered;
+    let nearestTaunter: UnitToken | null = null;
+    let nearestTaunterDistance = Number.POSITIVE_INFINITY;
+    let nearestTaunterNonAllure: UnitToken | null = null;
+    let nearestTaunterNonAllureDistance = Number.POSITIVE_INFINITY;
+    let hasNonAllureCandidate = false;
+
+    for (const candidate of candidates) {
+      if (!isTokenCandidate(candidate)) continue;
+      const distance = Math.abs(candidate.cx - attacker.cx) + Math.abs(candidate.cy - attacker.cy);
+      const candidateStatuses = ensureStatusList(candidate);
+      let isAllure = false;
+      let hasTaunt = false;
+      for (const status of candidateStatuses) {
+        if (!status) continue;
+        if (!isAllure && status.id === ALLURE_STATUS_ID) isAllure = true;
+        else if (!hasTaunt && status.id === TAUNT_STATUS_ID) hasTaunt = true;
+        if (isAllure && hasTaunt) break;
+      }
+      if (!isAllure) hasNonAllureCandidate = true;
+      if (!hasTaunt) continue;
+
+      if (distance < nearestTaunterDistance) {
+        nearestTaunter = candidate;
+        nearestTaunterDistance = distance;
+      }
+      if (!isAllure && distance < nearestTaunterNonAllureDistance) {
+        nearestTaunterNonAllure = candidate;
+        nearestTaunterNonAllureDistance = distance;
       }
     }
-    const taunters = pool.filter(target => this.has(target, TAUNT_STATUS_ID));
-    if (taunters.length > 0) {
-      return nearestByDistance(attacker, taunters);
+
+    if (attackType === 'basic' && hasNonAllureCandidate) {
+      return nearestTaunterNonAllure;
     }
-    return null;
+    return nearestTaunter;
   },
   modifyStats(unit, base) {
     const statuses = ensureStatusList(unit);
@@ -441,7 +445,6 @@ export const Statuses: StatusService = {
   },
   beforeDamage(attacker, target, ctx = {}) {
     const attackerStatuses = ensureStatusList(attacker);
-    const targetStatuses = ensureStatusList(target);
     let fatigue: StatusEffect | null = null;
     let exalt: StatusEffect | null = null;
     let frenzy: StatusEffect | null = null;
@@ -458,6 +461,7 @@ export const Statuses: StatusService = {
       else if (!pierce && status.id === 'pierce') pierce = status;
       if (fatigue && exalt && frenzy && weak && fear && pierce) break;
     }
+    const targetStatuses = ensureStatusList(target);
     let cut: StatusEffect | null = null;
     let stealth: StatusEffect | null = null;
     for (const status of targetStatuses) {
