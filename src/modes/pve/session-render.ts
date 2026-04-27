@@ -39,6 +39,18 @@ type SessionRenderController = {
   setDrawPaused: (paused: boolean) => void;
 };
 
+type AttackTokenLike = {
+  iid?: unknown;
+  id?: unknown;
+} | null | undefined;
+
+type MeleeActivityTracker = {
+  makeMeleeTokenKey: (token: AttackTokenLike) => string | null;
+  syncMeleeOffsetTokens: (offsets: { keys: () => IterableIterator<string> } | null | undefined) => void;
+  clearMeleeOffsetTokens: () => void;
+  collectActiveAttackTokenKeys: (events: ReadonlyArray<Record<string, unknown> | null | undefined>) => Set<string>;
+};
+
 const toAnimationFrameHandle = (handle: FrameHandle): number | null => (
   typeof handle === 'number' ? handle : null
 );
@@ -85,6 +97,62 @@ export const createBrowserFrameFns = (
     getCancelAnimationFrame: (): NullableCancelAnimationFrameFn => {
       refreshAnimationFrameFns();
       return cachedCancelRafFn;
+    },
+  };
+};
+
+const ATTACK_EVENT_TYPES = new Set(['melee', 'tracer', 'lightning_arc', 'blood_pulse', 'ground_burst']);
+
+export const createMeleeActivityTracker = (
+  getNow: () => number,
+): MeleeActivityTracker => {
+  const meleeOffsetTokenKeys = new Set<string>();
+  const makeMeleeTokenKey = (token: AttackTokenLike): string | null => {
+    const iid = parseFiniteNumber(token?.iid);
+    if (iid !== null){
+      return `iid:${iid}`;
+    }
+    return typeof token?.id === 'string' && token.id.length > 0
+      ? `id:${token.id}`
+      : null;
+  };
+
+  return {
+    makeMeleeTokenKey,
+    syncMeleeOffsetTokens: (offsets): void => {
+      meleeOffsetTokenKeys.clear();
+      if (!offsets || typeof offsets.keys !== 'function') return;
+      for (const key of offsets.keys()){
+        meleeOffsetTokenKeys.add(key);
+      }
+    },
+    clearMeleeOffsetTokens: (): void => {
+      meleeOffsetTokenKeys.clear();
+    },
+    collectActiveAttackTokenKeys: (events): Set<string> => {
+      const active = new Set<string>();
+      for (const key of meleeOffsetTokenKeys){
+        active.add(key);
+      }
+      if (!Array.isArray(events) || !events.length) return active;
+      const nowMs = getNow();
+      for (const event of events){
+        if (!event || typeof event !== 'object') continue;
+        const type = typeof event.type === 'string' ? event.type : '';
+        if (!ATTACK_EVENT_TYPES.has(type)) continue;
+        const dur = parseFiniteNumber(event.dur) ?? 0;
+        if (dur <= 0) continue;
+        const t0 = parseFiniteNumber(event.t0) ?? 0;
+        const tt = (nowMs - t0) / dur;
+        if (!(tt > 0 && tt < 1)) continue;
+        const refA = (event.refA as AttackTokenLike) ?? null;
+        const key = makeMeleeTokenKey({
+          iid: refA?.iid ?? parseFiniteNumber(event.iidA) ?? undefined,
+          id: refA?.id ?? (typeof event.idA === 'string' ? event.idA : undefined),
+        });
+        if (key) active.add(key);
+      }
+      return active;
     },
   };
 };
@@ -309,6 +377,46 @@ export const resolveHpBarGradient = (deps: ResolveHpBarGradientDeps): HpBarGradi
   gradient.addColorStop(1, baseFill);
   deps.cache.set(key, gradient);
   return gradient;
+};
+
+export const roundedRectPath = (
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+): void => {
+  const clampedRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
+  context.beginPath();
+  context.moveTo(x + clampedRadius, y);
+  context.lineTo(x + width - clampedRadius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + clampedRadius);
+  context.lineTo(x + width, y + height - clampedRadius);
+  context.quadraticCurveTo(x + width, y + height, x + width - clampedRadius, y + height);
+  context.lineTo(x + clampedRadius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - clampedRadius);
+  context.lineTo(x, y + clampedRadius);
+  context.quadraticCurveTo(x, y, x + clampedRadius, y);
+  context.closePath();
+};
+
+export const lightenHexColor = (
+  color: string | null | undefined,
+  amount: number,
+): string | null | undefined => {
+  if (typeof color !== 'string') return color;
+  if (!color.startsWith('#')) return color;
+  let hex = color.slice(1);
+  if (hex.length === 3){
+    hex = hex.split('').map((char) => char + char).join('');
+  }
+  if (hex.length !== 6) return color;
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  const mix = (channel: number): number => Math.min(255, Math.round(channel + (255 - channel) * amount));
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
 };
 export type StatusMeta = {
   id: string;

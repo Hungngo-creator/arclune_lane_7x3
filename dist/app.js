@@ -13529,6 +13529,15 @@ __modules['./events.ts'] = (exports, module, __require) => {
           console.error('[events]', error);
       }
   };
+  const withEventErrorFallback = (action, fallback) => {
+      try {
+          return action();
+      }
+      catch (error) {
+          reportEventError(error);
+          return fallback;
+      }
+  };
   const isGameEventRecord = (payload) => {
       if (!payload || typeof payload !== 'object')
           return false;
@@ -13635,9 +13644,8 @@ __modules['./events.ts'] = (exports, module, __require) => {
       }
   }
   function isEventEmitterLike(value) {
-      if (!value || typeof value !== 'object') {
+      if (!value || typeof value !== 'object')
           return false;
-      }
       const candidate = value;
       return (typeof candidate.on === 'function'
           && typeof candidate.emit === 'function');
@@ -13670,9 +13678,14 @@ __modules['./events.ts'] = (exports, module, __require) => {
       }
       return event;
   };
-  const toEventRecord = (type, payload) => (isGameEventRecord(payload)
-      ? payload
-      : toSyntheticEventRecord(type, payload));
+  const toEventRecord = (type, payload) => {
+      if (typeof payload === 'undefined') {
+          return toSyntheticEventRecord(type, undefined);
+      }
+      return isGameEventRecord(payload)
+          ? payload
+          : toSyntheticEventRecord(type, payload);
+  };
   const toEmitterEventRecord = (type, payload, eventTarget) => withEventTargetRefs(toEventRecord(type, payload), eventTarget);
   const gameEvents = makeEventTarget();
   const resolveDispatchMode = (target) => {
@@ -13689,6 +13702,12 @@ __modules['./events.ts'] = (exports, module, __require) => {
   };
   const createDispatchAdapters = (target) => {
       const mode = resolveDispatchMode(target);
+      const registerListener = (type, listener, add, remove) => {
+          add(type, listener);
+          return createIdempotentDispose(() => {
+              remove(type, listener);
+          });
+      };
       if (!mode) {
           return {
               emit: () => false,
@@ -13703,9 +13722,10 @@ __modules['./events.ts'] = (exports, module, __require) => {
               },
               addListener: (type, handler) => {
                   const eventListener = handler;
-                  mode.target.addEventListener(type, eventListener);
-                  return createIdempotentDispose(() => {
-                      mode.target.removeEventListener(type, eventListener);
+                  return registerListener(type, eventListener, (eventType, listener) => {
+                      mode.target.addEventListener(eventType, listener);
+                  }, (eventType, listener) => {
+                      mode.target.removeEventListener(eventType, listener);
                   });
               },
           };
@@ -13715,9 +13735,10 @@ __modules['./events.ts'] = (exports, module, __require) => {
               emit: (type, detail) => (mode.target.dispatchEvent(toSyntheticEventRecord(type, detail))),
               addListener: (type, handler) => {
                   const simpleHandler = handler;
-                  mode.target.addEventListener(type, simpleHandler);
-                  return createIdempotentDispose(() => {
-                      mode.target.removeEventListener(type, simpleHandler);
+                  return registerListener(type, simpleHandler, (eventType, listener) => {
+                      mode.target.addEventListener(eventType, listener);
+                  }, (eventType, listener) => {
+                      mode.target.removeEventListener(eventType, listener);
                   });
               },
           };
@@ -13752,23 +13773,11 @@ __modules['./events.ts'] = (exports, module, __require) => {
       return gameEventDispatchAdapters.addListener(type, handler);
   };
   function emitGameEvent(type, detail) {
-      try {
-          return emitGameEventInternal(type, detail);
-      }
-      catch (error) {
-          reportEventError(error);
-          return false;
-      }
+      return withEventErrorFallback(() => emitGameEventInternal(type, detail), false);
   }
   const dispatchGameEvent = (type, detail) => emitGameEvent(type, detail);
   function addGameEventListener(type, handler) {
-      try {
-          return addGameEventListenerInternal(type, handler);
-      }
-      catch (error) {
-          reportEventError(error);
-          return NOOP_DISPOSE;
-      }
+      return withEventErrorFallback(() => addGameEventListenerInternal(type, handler), NOOP_DISPOSE);
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'TURN_START')) exports.TURN_START = TURN_START;
@@ -15759,6 +15768,64 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
           },
       };
   };
+  const ATTACK_EVENT_TYPES = new Set(['melee', 'tracer', 'lightning_arc', 'blood_pulse', 'ground_burst']);
+  const createMeleeActivityTracker = (getNow) => {
+      const meleeOffsetTokenKeys = new Set();
+      const makeMeleeTokenKey = (token) => {
+          const iid = parseFiniteNumber(token?.iid);
+          if (iid !== null) {
+              return `iid:${iid}`;
+          }
+          return typeof token?.id === 'string' && token.id.length > 0
+              ? `id:${token.id}`
+              : null;
+      };
+      return {
+          makeMeleeTokenKey,
+          syncMeleeOffsetTokens: (offsets) => {
+              meleeOffsetTokenKeys.clear();
+              if (!offsets || typeof offsets.keys !== 'function')
+                  return;
+              for (const key of offsets.keys()) {
+                  meleeOffsetTokenKeys.add(key);
+              }
+          },
+          clearMeleeOffsetTokens: () => {
+              meleeOffsetTokenKeys.clear();
+          },
+          collectActiveAttackTokenKeys: (events) => {
+              const active = new Set();
+              for (const key of meleeOffsetTokenKeys) {
+                  active.add(key);
+              }
+              if (!Array.isArray(events) || !events.length)
+                  return active;
+              const nowMs = getNow();
+              for (const event of events) {
+                  if (!event || typeof event !== 'object')
+                      continue;
+                  const type = typeof event.type === 'string' ? event.type : '';
+                  if (!ATTACK_EVENT_TYPES.has(type))
+                      continue;
+                  const dur = parseFiniteNumber(event.dur) ?? 0;
+                  if (dur <= 0)
+                      continue;
+                  const t0 = parseFiniteNumber(event.t0) ?? 0;
+                  const tt = (nowMs - t0) / dur;
+                  if (!(tt > 0 && tt < 1))
+                      continue;
+                  const refA = event.refA ?? null;
+                  const key = makeMeleeTokenKey({
+                      iid: refA?.iid ?? parseFiniteNumber(event.iidA) ?? undefined,
+                      id: refA?.id ?? (typeof event.idA === 'string' ? event.idA : undefined),
+                  });
+                  if (key)
+                      active.add(key);
+              }
+              return active;
+          },
+      };
+  };
   const createSessionRenderController = (deps) => {
       let drawFrameHandle = null;
       let drawFrameUsesTimeout = false;
@@ -15952,6 +16019,37 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
       gradient.addColorStop(1, baseFill);
       deps.cache.set(key, gradient);
       return gradient;
+  };
+  const roundedRectPath = (context, x, y, width, height, radius) => {
+      const clampedRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
+      context.beginPath();
+      context.moveTo(x + clampedRadius, y);
+      context.lineTo(x + width - clampedRadius, y);
+      context.quadraticCurveTo(x + width, y, x + width, y + clampedRadius);
+      context.lineTo(x + width, y + height - clampedRadius);
+      context.quadraticCurveTo(x + width, y + height, x + width - clampedRadius, y + height);
+      context.lineTo(x + clampedRadius, y + height);
+      context.quadraticCurveTo(x, y + height, x, y + height - clampedRadius);
+      context.lineTo(x, y + clampedRadius);
+      context.quadraticCurveTo(x, y, x + clampedRadius, y);
+      context.closePath();
+  };
+  const lightenHexColor = (color, amount) => {
+      if (typeof color !== 'string')
+          return color;
+      if (!color.startsWith('#'))
+          return color;
+      let hex = color.slice(1);
+      if (hex.length === 3) {
+          hex = hex.split('').map((char) => char + char).join('');
+      }
+      if (hex.length !== 6)
+          return color;
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      const mix = (channel) => Math.min(255, Math.round(channel + (255 - channel) * amount));
+      return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
   };
   const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
   const MAX_STATUS_ICONS_PER_TOKEN = 5;
@@ -16295,8 +16393,11 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
   };
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createBrowserFrameFns')) exports.createBrowserFrameFns = createBrowserFrameFns;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createMeleeActivityTracker')) exports.createMeleeActivityTracker = createMeleeActivityTracker;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionRenderController')) exports.createSessionRenderController = createSessionRenderController;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveHpBarGradient')) exports.resolveHpBarGradient = resolveHpBarGradient;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'roundedRectPath')) exports.roundedRectPath = roundedRectPath;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'lightenHexColor')) exports.lightenHexColor = lightenHexColor;
   if (!Object.prototype.hasOwnProperty.call(exports, 'DEFAULT_STATUS_ICON_PATH')) exports.DEFAULT_STATUS_ICON_PATH = DEFAULT_STATUS_ICON_PATH;
   if (!Object.prototype.hasOwnProperty.call(exports, 'MAX_STATUS_ICONS_PER_TOKEN')) exports.MAX_STATUS_ICONS_PER_TOKEN = MAX_STATUS_ICONS_PER_TOKEN;
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildStatusTooltip')) exports.buildStatusTooltip = buildStatusTooltip;
@@ -16428,9 +16529,12 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const createDefaultStatusIconEntry = __dep31.createDefaultStatusIconEntry;
   const createStatusIconResolver = __dep31.createStatusIconResolver;
   const createBrowserFrameFns = __dep31.createBrowserFrameFns;
+  const createMeleeActivityTracker = __dep31.createMeleeActivityTracker;
   const createSessionRenderController = __dep31.createSessionRenderController;
   const DEFAULT_STATUS_ICON_PATH = __dep31.DEFAULT_STATUS_ICON_PATH;
   const MAX_STATUS_ICONS_PER_TOKEN = __dep31.MAX_STATUS_ICONS_PER_TOKEN;
+  const lightenHexColor = __dep31.lightenHexColor;
+  const roundedRectPath = __dep31.roundedRectPath;
   const isStatusIconReady = __dep31.isStatusIconReady;
   const resolveStatusIconPreview = __dep31.resolveStatusIconPreview;
   const resolveHpBarGradient = __dep31.resolveHpBarGradient;
@@ -16847,8 +16951,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   let running = false;
   let leaderEndCheckFlags = { ally: false, enemy: false };
   const hpBarGradientCache = new Map();
-  const meleeOffsetTokenKeys = new Set();
-  const ATTACK_EVENT_TYPES = new Set(['melee', 'tracer', 'lightning_arc', 'blood_pulse', 'ground_burst']);
   const statusIconCache = new Map();
   const statusIconHitboxes = [];
   let statusIconHoverTooltip = '';
@@ -16856,24 +16958,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const { refreshAnimationFrameFns, getRequestAnimationFrame, getCancelAnimationFrame, } = createBrowserFrameFns({
       getWindowRef: () => winRef,
   });
-  const makeMeleeTokenKey = (token) => {
-      if (Number.isFinite(token?.iid)) {
-          return `iid:${token?.iid}`;
-      }
-      if (typeof token?.id === 'string' && token.id.length > 0) {
-          return `id:${token.id}`;
-      }
-      return null;
-  };
-  const syncMeleeOffsetTokens = (offsets) => {
-      meleeOffsetTokenKeys.clear();
-      if (!offsets || !offsets.size)
-          return null;
-      for (const key of offsets.keys()) {
-          meleeOffsetTokenKeys.add(key);
-      }
-      return offsets;
-  };
+  const meleeActivityTracker = createMeleeActivityTracker(() => safeNow());
+  const { makeMeleeTokenKey, syncMeleeOffsetTokens, clearMeleeOffsetTokens, collectActiveAttackTokenKeys, } = meleeActivityTracker;
   function cleanupSummonBar() {
       if (summonBarHandle && typeof summonBarHandle.cleanup === 'function') {
           try {
@@ -16895,7 +16981,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       _IID = 1;
       _BORN = 1;
       invalidateSceneCache();
-      meleeOffsetTokenKeys.clear();
+      clearMeleeOffsetTokens();
       creepDeathHealProcessed.clear();
   }
   if (CFG?.DEBUG?.LOG_EVENTS) {
@@ -18619,14 +18705,15 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
           if (sessionVfx) {
               const computedOffsets = computeMeleeOffsets(sessionVfx, CAM_PRESET);
-              meleeOffsets = syncMeleeOffsetTokens(computedOffsets);
+              syncMeleeOffsetTokens(computedOffsets);
+              meleeOffsets = computedOffsets;
           }
           else {
-              meleeOffsetTokenKeys.clear();
+              clearMeleeOffsetTokens();
           }
       }
       else {
-          meleeOffsetTokenKeys.clear();
+          clearMeleeOffsetTokens();
       }
       if (Game.grid) {
           if (!gridDrawnViaScene) {
@@ -18792,71 +18879,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const scale = Math.pow(k, g.rows - 1 - cy);
       return { x, y, scale };
   }
-  function roundedRectPathUI(ctx, x, y, w, h, radius) {
-      const r = Math.min(radius, w / 2, h / 2);
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-      ctx.lineTo(x + w, y + h - r);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      ctx.lineTo(x + r, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath();
-  }
-  function lightenColor(color, amount) {
-      if (typeof color !== 'string')
-          return color;
-      if (!color.startsWith('#'))
-          return color;
-      let hex = color.slice(1);
-      if (hex.length === 3) {
-          hex = hex.split('').map(ch => ch + ch).join('');
-      }
-      if (hex.length !== 6)
-          return color;
-      const r = parseInt(hex.slice(0, 2), 16);
-      const g = parseInt(hex.slice(2, 4), 16);
-      const b = parseInt(hex.slice(4, 6), 16);
-      const mix = (c) => Math.min(255, Math.round(c + (255 - c) * amount));
-      return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
-  }
-  function collectActiveAttackTokenKeys() {
-      const active = new Set();
-      for (const key of meleeOffsetTokenKeys) {
-          active.add(key);
-      }
-      const events = Array.isArray(Game?.vfx) ? Game.vfx : [];
-      if (!events.length)
-          return active;
-      const nowMs = safeNow();
-      for (const event of events) {
-          if (!event || typeof event !== 'object')
-              continue;
-          const rec = event;
-          const type = typeof rec.type === 'string' ? rec.type : '';
-          if (!ATTACK_EVENT_TYPES.has(type))
-              continue;
-          const dur = parseFiniteNumber(rec.dur) ?? 0;
-          if (dur <= 0)
-              continue;
-          const t0 = parseFiniteNumber(rec.t0) ?? 0;
-          const tt = (nowMs - t0) / dur;
-          if (!(tt > 0 && tt < 1))
-              continue;
-          const refA = rec.refA;
-          const fallback = {
-              iid: parseFiniteNumber(rec.iidA),
-              id: typeof rec.idA === 'string' ? rec.idA : null,
-          };
-          const key = makeMeleeTokenKey({ iid: refA?.iid ?? fallback.iid ?? undefined, id: refA?.id ?? fallback.id ?? undefined });
-          if (key)
-              active.add(key);
-      }
-      return active;
-  }
   function getShieldRatio(unit) {
       const shield = Statuses.get(unit, 'shield');
       const shieldAmount = Math.max(0, toFiniteOrZero(shield?.amount));
@@ -18883,7 +18905,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const drawCtx = ctx;
       const baseR = Math.floor(Game.grid.tile * 0.36);
       const tokens = Game.tokens || [];
-      const activeAttackKeys = collectActiveAttackTokenKeys();
+      const activeAttackKeys = collectActiveAttackTokenKeys(Array.isArray(Game?.vfx) ? Game.vfx : []);
       for (const t of tokens) {
           if (!t.alive || !Number.isFinite(t.hpMax))
               continue;
@@ -18925,7 +18947,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           drawCtx.save();
           drawCtx.shadowColor = 'transparent';
           drawCtx.shadowBlur = 0;
-          roundedRectPathUI(drawCtx, hpX, hpY, barWidth, barHeight, radius);
+          roundedRectPath(drawCtx, hpX, hpY, barWidth, barHeight, radius);
           drawCtx.fillStyle = bgColor;
           drawCtx.fill();
           if (borderColor && borderColor !== 'none') {
@@ -18947,11 +18969,11 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   innerRadius,
                   startY: hpY + inset,
                   x: hpX + inset,
-                  lightenColor,
+                  lightenColor: lightenHexColor,
               });
               drawCtx.save();
               drawCtx.translate(hpX + inset, hpY + inset);
-              roundedRectPathUI(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);
+              roundedRectPathl(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);
               drawCtx.fillStyle = fillStyle;
               drawCtx.fill();
               drawCtx.restore();
@@ -18960,7 +18982,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               const dimWidth = Math.max(1, Math.round(innerWidth * shieldRatio));
               drawCtx.save();
               drawCtx.beginPath();
-              roundedRectPathUI(drawCtx, hpX + inset, hpY + inset, dimWidth, innerHeight, innerRadius);
+              roundedRectPath(drawCtx, hpX + inset, hpY + inset, dimWidth, innerHeight, innerRadius);
               drawCtx.fillStyle = 'rgba(190, 210, 205, 0.32)';
               drawCtx.fill();
               drawCtx.restore();
@@ -18978,7 +19000,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                       drawCtx.fillStyle = 'rgba(8, 12, 22, 0.92)';
                       drawCtx.strokeStyle = 'rgba(255,255,255,0.82)';
                       drawCtx.lineWidth = 1;
-                      roundedRectPathUI(drawCtx, badgeX, badgeY, badgeSize, badgeSize, Math.max(2, Math.floor(badgeSize / 3)));
+                      roundedRectPath(drawCtx, badgeX, badgeY, badgeSize, badgeSize, Math.max(2, Math.floor(badgeSize / 3)));
                       drawCtx.fill();
                       drawCtx.stroke();
                       drawCtx.fillStyle = '#f3f8ff';
@@ -19009,12 +19031,12 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           const rageHeight = Math.max(2, Math.floor(barHeight * 0.55));
           const rageY = hpY + barHeight + 2;
           const rageRadius = Math.max(1, Math.floor(rageHeight / 2));
-          roundedRectPathUI(drawCtx, hpX, rageY, barWidth, rageHeight, rageRadius);
+          roundedRectPath(drawCtx, hpX, rageY, barWidth, rageHeight, rageRadius);
           drawCtx.fillStyle = 'rgba(9,14,21,0.72)';
           drawCtx.fill();
           const rageFilledWidth = Math.round((barWidth - 2) * furyRatio);
           if (rageFilledWidth > 0) {
-              roundedRectPathUI(drawCtx, hpX + 1, rageY + 1, rageFilledWidth, Math.max(1, rageHeight - 2), Math.max(1, rageRadius - 1));
+              roundedRectPath(drawCtx, hpX + 1, rageY + 1, rageFilledWidth, Math.max(1, rageHeight - 2), Math.max(1, rageRadius - 1));
               drawCtx.fillStyle = '#7b5cff';
               drawCtx.fill();
           }

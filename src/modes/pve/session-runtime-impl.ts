@@ -74,9 +74,12 @@ import {
   createDefaultStatusIconEntry,
   createStatusIconResolver,
   createBrowserFrameFns,
+  createMeleeActivityTracker,
   createSessionRenderController,
   DEFAULT_STATUS_ICON_PATH,
   MAX_STATUS_ICONS_PER_TOKEN,
+  lightenHexColor,
+  roundedRectPath,
   type RenderableStatusIcon,
   type StatusIconCacheEntry,
   isStatusIconReady,
@@ -720,8 +723,6 @@ let storedConfig: NormalizedSessionConfig = normalizeConfig();
 let running = false;
 let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enemy: false };
 const hpBarGradientCache = new Map<string, HpBarGradientValue>();
-const meleeOffsetTokenKeys = new Set<string>();
-const ATTACK_EVENT_TYPES = new Set(['melee', 'tracer', 'lightning_arc', 'blood_pulse', 'ground_burst']);
 type StatusIconEntry = StatusIconCacheEntry & RenderableStatusIcon;
 const statusIconCache = new Map<string, StatusIconEntry>();
 const statusIconHitboxes: StatusIconHitbox[] = [];
@@ -735,27 +736,13 @@ const {
 } = createBrowserFrameFns({
   getWindowRef: () => winRef,
 });
-
-const makeMeleeTokenKey = (token: Partial<UnitToken> | null | undefined): string | null => {
-  if (Number.isFinite(token?.iid)){
-    return `iid:${token?.iid}`;
-  }
-  if (typeof token?.id === 'string' && token.id.length > 0){
-    return `id:${token.id}`;
-  }
-  return null;
-};
-
-const syncMeleeOffsetTokens = (
-  offsets: TokenMeleeOffsetMap | null | undefined,
-): TokenMeleeOffsetMap | null => {
-  meleeOffsetTokenKeys.clear();
-  if (!offsets || !offsets.size) return null;
-  for (const key of offsets.keys()){
-    meleeOffsetTokenKeys.add(key);
-  }
-  return offsets;
-};
+const meleeActivityTracker = createMeleeActivityTracker(() => safeNow());
+const {
+  makeMeleeTokenKey,
+  syncMeleeOffsetTokens,
+  clearMeleeOffsetTokens,
+  collectActiveAttackTokenKeys,
+} = meleeActivityTracker;
 
 function cleanupSummonBar(): void {
   if (summonBarHandle && typeof summonBarHandle.cleanup === 'function'){
@@ -778,7 +765,7 @@ function resetSessionState(overrides: NormalizedSessionConfig): void {
   _IID = 1;
   _BORN = 1;
   invalidateSceneCache();
-  meleeOffsetTokenKeys.clear();
+  clearMeleeOffsetTokens();
   creepDeathHealProcessed.clear();
 }
 
@@ -2494,13 +2481,14 @@ function draw(): void {
     sessionVfx = ensureSessionWithVfx(Game, { requireGrid: true });
     if (sessionVfx){
       const computedOffsets = computeMeleeOffsets(sessionVfx, CAM_PRESET);
-      meleeOffsets = syncMeleeOffsetTokens(computedOffsets);
+      syncMeleeOffsetTokens(computedOffsets);
+      meleeOffsets = computedOffsets;
     } else {
-      meleeOffsetTokenKeys.clear();
+      clearMeleeOffsetTokens();
     }
   } else {
-    meleeOffsetTokenKeys.clear();
-}
+    clearMeleeOffsetTokens();
+ }
   if (Game.grid){
     if (!gridDrawnViaScene) {
       drawGridOblique(ctx, Game.grid, CAM_PRESET);
@@ -2691,65 +2679,6 @@ function cellCenterObliqueLocal(g: GridSpec, cx: number, cy: number, C: CameraPr
   return { x, y, scale };
 }
 
-function roundedRectPathUI(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radius: number): void {
-  const r = Math.min(radius, w / 2, h / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
-
-function lightenColor(color: string | null | undefined, amount: number): string | null | undefined {
-  if (typeof color !== 'string') return color;
-  if (!color.startsWith('#')) return color;
-  let hex = color.slice(1);
-  if (hex.length === 3){
-    hex = hex.split('').map(ch => ch + ch).join('');
-  }
-  if (hex.length !== 6) return color;
-  const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 4), 16);
-  const b = parseInt(hex.slice(4, 6), 16);
-  const mix = (c: number)=> Math.min(255, Math.round(c + (255 - c) * amount));
-  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
-}
-
-function collectActiveAttackTokenKeys(): Set<string> {
-  const active = new Set<string>();
-  for (const key of meleeOffsetTokenKeys){
-    active.add(key);
-  }
-  const events = Array.isArray(Game?.vfx) ? Game.vfx : [];
-  if (!events.length) return active;
-  const nowMs = safeNow();
-  for (const event of events){
-    if (!event || typeof event !== 'object') continue;
-    const rec = event as Record<string, unknown>;
-    const type = typeof rec.type === 'string' ? rec.type : '';
-    if (!ATTACK_EVENT_TYPES.has(type)) continue;
-    const dur = parseFiniteNumber(rec.dur) ?? 0;
-    if (dur <= 0) continue;
-    const t0 = parseFiniteNumber(rec.t0) ?? 0;
-    const tt = (nowMs - t0) / dur;
-    if (!(tt > 0 && tt < 1)) continue;
-    const refA = rec.refA as Partial<UnitToken> | null | undefined;
-    const fallback = {
-      iid: parseFiniteNumber(rec.iidA),
-      id: typeof rec.idA === 'string' ? rec.idA : null,
-    };
-    const key = makeMeleeTokenKey({ iid: refA?.iid ?? fallback.iid ?? undefined, id: refA?.id ?? fallback.id ?? undefined });
-    if (key) active.add(key);
-  }
-  return active;
-}
-
 function getShieldRatio(unit: UnitToken): number {
   const shield = Statuses.get(unit, 'shield');
   const shieldAmount = Math.max(0, toFiniteOrZero((shield as { amount?: unknown } | null)?.amount));
@@ -2780,7 +2709,7 @@ function drawHPBars(): void {
   const drawCtx = ctx;
   const baseR = Math.floor(Game.grid.tile * 0.36);
   const tokens = Game.tokens || [];
-  const activeAttackKeys = collectActiveAttackTokenKeys();
+  const activeAttackKeys = collectActiveAttackTokenKeys(Array.isArray(Game?.vfx) ? Game.vfx : []);
 
   for (const t of tokens){
     if (!t.alive || !Number.isFinite(t.hpMax)) continue;
@@ -2828,7 +2757,7 @@ function drawHPBars(): void {
     drawCtx.shadowColor = 'transparent';
     drawCtx.shadowBlur = 0;
 
-    roundedRectPathUI(drawCtx, hpX, hpY, barWidth, barHeight, radius);
+    roundedRectPath(drawCtx, hpX, hpY, barWidth, barHeight, radius);
     drawCtx.fillStyle = bgColor;
     drawCtx.fill();
     if (borderColor && borderColor !== 'none'){
@@ -2851,11 +2780,11 @@ function drawHPBars(): void {
         innerRadius,
         startY: hpY + inset,
         x: hpX + inset,
-        lightenColor,
+        lightenColor: lightenHexColor,
       });
       drawCtx.save();
       drawCtx.translate(hpX + inset, hpY + inset);
-      roundedRectPathUI(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);
+      roundedRectPathl(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);
       drawCtx.fillStyle = fillStyle;
       drawCtx.fill();
       drawCtx.restore();
@@ -2865,7 +2794,7 @@ function drawHPBars(): void {
       const dimWidth = Math.max(1, Math.round(innerWidth * shieldRatio));
       drawCtx.save();
       drawCtx.beginPath();
-      roundedRectPathUI(drawCtx, hpX + inset, hpY + inset, dimWidth, innerHeight, innerRadius);
+      roundedRectPath(drawCtx, hpX + inset, hpY + inset, dimWidth, innerHeight, innerRadius);
       drawCtx.fillStyle = 'rgba(190, 210, 205, 0.32)';
       drawCtx.fill();
       drawCtx.restore();
@@ -2884,7 +2813,7 @@ function drawHPBars(): void {
           drawCtx.fillStyle = 'rgba(8, 12, 22, 0.92)';
           drawCtx.strokeStyle = 'rgba(255,255,255,0.82)';
           drawCtx.lineWidth = 1;
-          roundedRectPathUI(drawCtx, badgeX, badgeY, badgeSize, badgeSize, Math.max(2, Math.floor(badgeSize / 3)));
+          roundedRectPath(drawCtx, badgeX, badgeY, badgeSize, badgeSize, Math.max(2, Math.floor(badgeSize / 3)));
           drawCtx.fill();
           drawCtx.stroke();
           drawCtx.fillStyle = '#f3f8ff';
@@ -2918,12 +2847,12 @@ function drawHPBars(): void {
     const rageY = hpY + barHeight + 2;
     const rageRadius = Math.max(1, Math.floor(rageHeight / 2));
 
-    roundedRectPathUI(drawCtx, hpX, rageY, barWidth, rageHeight, rageRadius);
+    roundedRectPath(drawCtx, hpX, rageY, barWidth, rageHeight, rageRadius);
     drawCtx.fillStyle = 'rgba(9,14,21,0.72)';
     drawCtx.fill();
     const rageFilledWidth = Math.round((barWidth - 2) * furyRatio);
     if (rageFilledWidth > 0){
-      roundedRectPathUI(drawCtx, hpX + 1, rageY + 1, rageFilledWidth, Math.max(1, rageHeight - 2), Math.max(1, rageRadius - 1));
+      roundedRectPath(drawCtx, hpX + 1, rageY + 1, rageFilledWidth, Math.max(1, rageHeight - 2), Math.max(1, rageRadius - 1));
       drawCtx.fillStyle = '#7b5cff';
       drawCtx.fill();
     }

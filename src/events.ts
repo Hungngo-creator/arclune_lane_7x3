@@ -139,6 +139,15 @@ const reportEventError = (error: unknown): void => {
   }
 };
 
+const withEventErrorFallback = <T>(action: () => T, fallback: T): T => {
+  try {
+    return action();
+  } catch (error) {
+    reportEventError(error);
+    return fallback;
+  }
+};
+
 const isGameEventRecord = <T extends GameEventType>(
   payload: unknown,
 ): payload is GameEventDetail<T> => {
@@ -245,9 +254,7 @@ class SimpleEventTarget {
 export type GameEventTargetLike = EventTarget | SimpleEventTarget | EventEmitterLike;
 
 export function isEventEmitterLike(value: unknown): value is EventEmitterLike {
-  if (!value || typeof value !== 'object'){
-    return false;
-  }
+  if (!value || typeof value !== 'object') return false;
   const candidate = value as Partial<EventEmitterLike>;
   return (
     typeof candidate.on === 'function'
@@ -293,11 +300,14 @@ const withEventTargetRefs = <T extends GameEventType>(
 const toEventRecord = <T extends GameEventType>(
   type: T,
   payload: EventEmitterPayload<T>,
-): GameEventDetail<T> => (
-  isGameEventRecord<T>(payload)
+): GameEventDetail<T> => {
+  if (typeof payload === 'undefined') {
+    return toSyntheticEventRecord(type, undefined);
+  }
+  return isGameEventRecord<T>(payload)
     ? payload
-    : toSyntheticEventRecord(type, payload as GameEventDetailMap[T])
-);
+    : toSyntheticEventRecord(type, payload as GameEventDetailMap[T]);
+};
 
 const toEmitterEventRecord = <T extends GameEventType>(
   type: T,
@@ -332,6 +342,17 @@ const createDispatchAdapters = (target: GameEventTargetLike): {
   ) => (() => void);
 } => {
   const mode = resolveDispatchMode(target);
+  const registerListener = <T extends GameEventType, TListener>(
+    type: T,
+    listener: TListener,
+    add: (eventType: T, eventListener: TListener) => void,
+    remove: (eventType: T, eventListener: TListener) => void,
+  ): (() => void) => {
+    add(type, listener);
+    return createIdempotentDispose(() => {
+      remove(type, listener);
+    });
+  };
   if (!mode) {
     return {
       emit: () => false,
@@ -349,10 +370,16 @@ const createDispatchAdapters = (target: GameEventTargetLike): {
         handler: H,
       ): (() => void) => {
         const eventListener = handler as unknown as EventListener;
-        mode.target.addEventListener(type, eventListener);
-        return createIdempotentDispose(() => {
-          mode.target.removeEventListener(type, eventListener);
-        });
+        return registerListener(
+          type,
+          eventListener,
+          (eventType, listener) => {
+            mode.target.addEventListener(eventType, listener);
+          },
+          (eventType, listener) => {
+            mode.target.removeEventListener(eventType, listener);
+          },
+        );
       },
     };
   }
@@ -366,10 +393,16 @@ const createDispatchAdapters = (target: GameEventTargetLike): {
         handler: H,
       ): (() => void) => {
         const simpleHandler = handler as unknown as GameEventHandler<T>;
-        mode.target.addEventListener(type, simpleHandler);
-        return createIdempotentDispose(() => {
-          mode.target.removeEventListener(type, simpleHandler);
-        });
+        return registerListener(
+          type,
+          simpleHandler,
+          (eventType, listener) => {
+            mode.target.addEventListener(eventType, listener);
+          },
+          (eventType, listener) => {
+            mode.target.removeEventListener(eventType, listener);
+          },
+        );
       },
     };
   }
@@ -417,12 +450,7 @@ export function emitGameEvent<T extends GameEventType>(
   type: T,
   detail?: GameEventDetailMap[T],
 ): boolean {
-  try {
-    return emitGameEventInternal(type, detail);
-  } catch (error) {
-    reportEventError(error);
-    return false;
-  }
+  return withEventErrorFallback(() => emitGameEventInternal(type, detail), false);
 }
 
 export const dispatchGameEvent = <T extends GameEventType>(
@@ -434,11 +462,5 @@ export function addGameEventListener<T extends GameEventType, H extends Compatib
   type: T,
   handler: H,
 ): () => void {
-
-  try {
-    return addGameEventListenerInternal(type, handler);
-  } catch (error) {
-    reportEventError(error);
-    return NOOP_DISPOSE;
-  }
+  return withEventErrorFallback(() => addGameEventListenerInternal(type, handler), NOOP_DISPOSE);
 }
