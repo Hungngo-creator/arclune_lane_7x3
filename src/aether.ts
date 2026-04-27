@@ -23,6 +23,10 @@ export interface AetherVisualPairOptions {
   enemy?: AetherVisualOptions;
 }
 
+const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value));
+const styleThresholdChanged = (prev: number | undefined, next: number, threshold = 0.25): boolean =>
+  prev == null || Math.abs(prev - next) >= threshold;
+
 export class SharedAetherPool {
   public max: number = 0;
   public current: number = 0;
@@ -47,6 +51,14 @@ export class SharedAetherPool {
     this.side = side;
   }
 
+private setCurrent(nextValue: number): boolean {
+    const safeMax = Math.max(0, this.max);
+    const next = clamp(nextValue, 0, safeMax);
+    if (next === this.current) return false;
+    this.current = next;
+    return true;
+  }
+
   // --- LOGIC VÒNG ĐỜI TRẬN ĐẤU ---
   private recalculateFromUnits(teamUnits: UnitToken[], resetCurrent: boolean = false): void {
       let nextMax = 0;
@@ -58,16 +70,10 @@ export class SharedAetherPool {
       this.max = Math.floor(nextMax);
 
       if (resetCurrent) {
-        this.current = Math.floor(this.max / 2); // Khởi đầu 50%
+        this.setCurrent(Math.floor(this.max / 2)); // Khởi đầu 50%
         return;
       }
-
-      if (this.current > this.max) {
-        this.current = this.max;
-      }
-      if (this.current < 0) {
-        this.current = 0;
-      }
+      this.setCurrent(this.current);
   }
 
   public init(teamUnits: UnitToken[]) {
@@ -86,17 +92,16 @@ export class SharedAetherPool {
   }
 
   public gain(amount: number) {
-      this.current += amount;
-      if (this.current > this.max) {
-          this.current = this.max;
+      if (this.setCurrent(this.current + amount)) {
+        this.updateUI();
       }
-      this.updateUI();
   }
 
   public consume(cost: number): boolean {
       if (this.current >= cost) {
-          this.current -= cost;
-          this.updateUI();
+          if (this.setCurrent(this.current - cost)) {
+            this.updateUI();
+          }
           return true;
       }
       return false;
@@ -173,7 +178,7 @@ export class SharedAetherPool {
   public updateUI() {
     if (!this.uiFill || !this.container) return;
     const percent = this.max > 0 ? (this.current / this.max) * 100 : 0;
-    this.uiFill.style.height = `${Math.max(0, Math.min(100, percent))}%`;
+    this.uiFill.style.height = `${clamp(percent, 0, 100)}%`;
     if (this.label) {
         this.label.textContent = `${Math.floor(this.current)}`;
     }
@@ -198,21 +203,21 @@ export class SharedAetherPool {
     const currentW = Math.max(10, 14 * scale);
     const currentH = Math.max(40, 130 * scale);
 
-    if (!this.lastVisualState || Math.abs(this.lastVisualState.width - currentW) >= 0.25) {
+    if (styleThresholdChanged(this.lastVisualState?.width, currentW)) {
       this.container.style.width = `${currentW}px`;
     }
-    if (!this.lastVisualState || Math.abs(this.lastVisualState.height - currentH) >= 0.25) {
+    if (styleThresholdChanged(this.lastVisualState?.height, currentH)) {
       this.container.style.height = `${currentH}px`;
     }
     
     // Scale chữ số
+    const fontSize = Math.max(10, 14 * scale);
+    const labelBottom = -fontSize * 1.5;
     if (this.label) {
-        const fontSize = Math.max(10, 14 * scale);
-        const labelBottom = -fontSize * 1.5;
-        if (!this.lastVisualState || Math.abs(this.lastVisualState.fontSize - fontSize) >= 0.25) {
+        if (styleThresholdChanged(this.lastVisualState?.fontSize, fontSize)) {
           this.label.style.fontSize = `${fontSize}px`;
         }
-        if (!this.lastVisualState || Math.abs(this.lastVisualState.labelBottom - labelBottom) >= 0.25) {
+        if (styleThresholdChanged(this.lastVisualState?.labelBottom, labelBottom)) {
           this.label.style.bottom = `${labelBottom}px`;
         }
     }
@@ -241,20 +246,20 @@ export class SharedAetherPool {
     let nextLeft = screenX + xOffset;
     let nextTop = screenY + yOffset;
 
-    const clamp = options.clamp;
-      if (clamp) {
-      if (Number.isFinite(clamp.minX)) nextLeft = Math.max(nextLeft, clamp.minX as number);
-      if (Number.isFinite(clamp.maxX)) nextLeft = Math.min(nextLeft, clamp.maxX as number);
-      if (Number.isFinite(clamp.minY)) nextTop = Math.max(nextTop, clamp.minY as number);
-      if (Number.isFinite(clamp.maxY)) nextTop = Math.min(nextTop, clamp.maxY as number);
+    const clampBounds = options.clamp;
+      if (clampBounds) {
+      if (Number.isFinite(clampBounds.minX)) nextLeft = Math.max(nextLeft, clampBounds.minX as number);
+      if (Number.isFinite(clampBounds.maxX)) nextLeft = Math.min(nextLeft, clampBounds.maxX as number);
+      if (Number.isFinite(clampBounds.minY)) nextTop = Math.max(nextTop, clampBounds.minY as number);
+      if (Number.isFinite(clampBounds.maxY)) nextTop = Math.min(nextTop, clampBounds.maxY as number);
     }
 
     // Áp dụng toạ độ (đã có transform handle việc căn giữa)
-    if (!this.lastVisualState || Math.abs(this.lastVisualState.left - nextLeft) >= 0.25) {
+    if (styleThresholdChanged(this.lastVisualState?.left, nextLeft)) {
       this.container.style.left = `${nextLeft}px`;
       this.debugStyleWrites += 1;
     }
-    if (!this.lastVisualState || Math.abs(this.lastVisualState.top - nextTop) >= 0.25) {
+    if (styleThresholdChanged(this.lastVisualState?.top, nextTop)) {
       this.container.style.top = `${nextTop}px`;
       this.debugStyleWrites += 1;
     }
@@ -262,8 +267,8 @@ export class SharedAetherPool {
     this.lastVisualState = {
       width: currentW,
       height: currentH,
-      fontSize: Math.max(10, 14 * scale),
-      labelBottom: -Math.max(10, 14 * scale) * 1.5,
+      fontSize,
+      labelBottom,
       left: nextLeft,
       top: nextTop,
       opacity: '1',

@@ -346,6 +346,12 @@ function isSummonMap(value: SummonMap): value is Map<number, QueuedSummonRequest
   return typeof (value as { values?: unknown }).values === 'function';
 }
 
+function shouldShowQueuedSide(side: Side): boolean {
+  if (side === 'ally') return !!CFG.DEBUG?.SHOW_QUEUED;
+  if (side === 'enemy') return !!CFG.DEBUG?.SHOW_QUEUED_ENEMY;
+  return false;
+}
+
 function queueContainsCell(map: SummonMap, cx: number, cy: number): boolean {
   if (!isSummonMap(map)) return false;
   for (const request of map.values()) {
@@ -522,14 +528,25 @@ function cellCenterOblique(g: GridSpec, cx: number, cy: number, C: Required<Came
   return { x, y };
 }
 
-export function projectCellOblique(g: GridSpec, cx: number, cy: number, cam: CameraOptions | null | undefined): ProjectionState {
-  const C = resolveCameraOptions(cam);
+function depthScaleAtRow(g: GridSpec, row: number, depthScale: number): number {
+  const depth = g.rows - 1 - row;
+  return Math.pow(depthScale, depth);
+}
+
+function projectCellObliqueWithCamera(
+  g: GridSpec,
+  cx: number,
+  cy: number,
+  C: Required<CameraOptions>,
+): ProjectionState {
   const { x, y } = cellCenterOblique(g, cx, cy, C);
-  const k = C.depthScale;
-  const depth = g.rows - 1 - cy;
-  const scale = Math.pow(k, depth);
+  const scale = depthScaleAtRow(g, cy, C.depthScale);
   return { x, y, scale };
 }
+
+export function projectCellOblique(g: GridSpec, cx: number, cy: number, cam: CameraOptions | null | undefined): ProjectionState {
+  return projectCellObliqueWithCamera(g, cx, cy, resolveCameraOptions(cam));
+}6
 function drawChibi(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -611,8 +628,7 @@ function joinSignatureParts(parts: Array<string | number | null | undefined>): s
   return normalized.join('|');
 }
 
-function contextSignature(g: GridSpec, cam: CameraOptions | null | undefined): string {
-  const C = resolveCameraOptions(cam);
+function contextSignature(g: GridSpec, C: Required<CameraOptions>): string {
   return joinSignatureParts([
     g.cols,
     g.rows,
@@ -637,7 +653,7 @@ function warnInvalidToken(context: string, token: unknown): void {
 function getTokenProjection(
   token: UnitToken | null | undefined,
   g: GridSpec,
-  cam: CameraOptions | null | undefined,
+  C: Required<CameraOptions>,
   sig: string,
 ): ProjectionState | null {
   if (!token) {
@@ -649,7 +665,7 @@ function getTokenProjection(
   }
   let entry = TOKEN_PROJECTION_CACHE.get(token);
   if (!entry || entry.cx !== token.cx || entry.cy !== token.cy || entry.sig !== sig) {
-    const projection = projectCellOblique(g, token.cx, token.cy, cam);
+    const projection = projectCellObliqueWithCamera(g, token.cx, token.cy, C);
     entry = {
       cx: token.cx,
       cy: token.cy,
@@ -938,7 +954,7 @@ export function drawTokensOblique(
   cam: CameraOptions | null | undefined,
   options: TokenDrawOptions = {},
 ): void {
-  const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
+  const C = resolveCameraOptions(cam);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
@@ -1093,22 +1109,19 @@ export function drawQueuedOblique(
   if (!queued) return;
   const C = resolveCameraOptions(cam);
   const baseR = Math.floor(g.tile * 0.36);
-  const k = C.depthScale;
 
   const drawSide = (map: SummonMap, side: Side): void => {
     if (!isSummonMap(map)) return;
-    if (side === 'ally' && !(CFG.DEBUG?.SHOW_QUEUED)) return;
-    if (side === 'enemy' && !(CFG.DEBUG?.SHOW_QUEUED_ENEMY)) return;
+    if (!shouldShowQueuedSide(side)) return;
     for (const p of map.values()) {
       if (!p) continue;
-      const c = cellCenterOblique(g, p.cx, p.cy, C);
-      const depth = g.rows - 1 - p.cy;
-      const r = Math.max(6, Math.floor(baseR * Math.pow(k, depth)));
+      const projection = projectCellObliqueWithCamera(g, p.cx, p.cy, C);
+      const r = Math.max(6, Math.floor(baseR * projection.scale));
       ctx.save();
       ctx.globalAlpha = 0.5;
       ctx.fillStyle = p.color || '#5b6a78';
       ctx.beginPath();
-      ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+      ctx.arc(projection.x, projection.y, r, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }

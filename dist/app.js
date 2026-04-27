@@ -24,6 +24,8 @@ if (typeof globalThis !== "undefined" && typeof globalThis.__moduleCache === "un
 if (typeof globalThis !== "undefined" && typeof globalThis.__require === "undefined"){ globalThis.__require = __require; }
 __modules['./aether.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/aether.ts
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const styleThresholdChanged = (prev, next, threshold = 0.25) => prev == null || Math.abs(prev - next) >= threshold;
   class SharedAetherPool {
       max = 0;
       current = 0;
@@ -37,6 +39,14 @@ __modules['./aether.ts'] = (exports, module, __require) => {
       constructor(side) {
           this.side = side;
       }
+      setCurrent(nextValue) {
+          const safeMax = Math.max(0, this.max);
+          const next = clamp(nextValue, 0, safeMax);
+          if (next === this.current)
+              return false;
+          this.current = next;
+          return true;
+      }
       // --- LOGIC VÒNG ĐỜI TRẬN ĐẤU ---
       recalculateFromUnits(teamUnits, resetCurrent = false) {
           let nextMax = 0;
@@ -47,15 +57,10 @@ __modules['./aether.ts'] = (exports, module, __require) => {
           }
           this.max = Math.floor(nextMax);
           if (resetCurrent) {
-              this.current = Math.floor(this.max / 2); // Khởi đầu 50%
+              this.setCurrent(Math.floor(this.max / 2)); // Khởi đầu 50%
               return;
           }
-          if (this.current > this.max) {
-              this.current = this.max;
-          }
-          if (this.current < 0) {
-              this.current = 0;
-          }
+          this.setCurrent(this.current);
       }
       init(teamUnits) {
           this.recalculateFromUnits(teamUnits, true);
@@ -71,16 +76,15 @@ __modules['./aether.ts'] = (exports, module, __require) => {
           }
       }
       gain(amount) {
-          this.current += amount;
-          if (this.current > this.max) {
-              this.current = this.max;
+          if (this.setCurrent(this.current + amount)) {
+              this.updateUI();
           }
-          this.updateUI();
       }
       consume(cost) {
           if (this.current >= cost) {
-              this.current -= cost;
-              this.updateUI();
+              if (this.setCurrent(this.current - cost)) {
+                  this.updateUI();
+              }
               return true;
           }
           return false;
@@ -150,7 +154,7 @@ __modules['./aether.ts'] = (exports, module, __require) => {
           if (!this.uiFill || !this.container)
               return;
           const percent = this.max > 0 ? (this.current / this.max) * 100 : 0;
-          this.uiFill.style.height = `${Math.max(0, Math.min(100, percent))}%`;
+          this.uiFill.style.height = `${clamp(percent, 0, 100)}%`;
           if (this.label) {
               this.label.textContent = `${Math.floor(this.current)}`;
           }
@@ -174,20 +178,20 @@ __modules['./aether.ts'] = (exports, module, __require) => {
           // Tính kích thước theo scale
           const currentW = Math.max(10, 14 * scale);
           const currentH = Math.max(40, 130 * scale);
-          if (!this.lastVisualState || Math.abs(this.lastVisualState.width - currentW) >= 0.25) {
+          if (styleThresholdChanged(this.lastVisualState?.width, currentW)) {
               this.container.style.width = `${currentW}px`;
           }
-          if (!this.lastVisualState || Math.abs(this.lastVisualState.height - currentH) >= 0.25) {
+          if (styleThresholdChanged(this.lastVisualState?.height, currentH)) {
               this.container.style.height = `${currentH}px`;
           }
           // Scale chữ số
+          const fontSize = Math.max(10, 14 * scale);
+          const labelBottom = -fontSize * 1.5;
           if (this.label) {
-              const fontSize = Math.max(10, 14 * scale);
-              const labelBottom = -fontSize * 1.5;
-              if (!this.lastVisualState || Math.abs(this.lastVisualState.fontSize - fontSize) >= 0.25) {
+              if (styleThresholdChanged(this.lastVisualState?.fontSize, fontSize)) {
                   this.label.style.fontSize = `${fontSize}px`;
               }
-              if (!this.lastVisualState || Math.abs(this.lastVisualState.labelBottom - labelBottom) >= 0.25) {
+              if (styleThresholdChanged(this.lastVisualState?.labelBottom, labelBottom)) {
                   this.label.style.bottom = `${labelBottom}px`;
               }
           }
@@ -210,31 +214,31 @@ __modules['./aether.ts'] = (exports, module, __require) => {
           const yOffset = -(backOffsetY + extraAnchorLift);
           let nextLeft = screenX + xOffset;
           let nextTop = screenY + yOffset;
-          const clamp = options.clamp;
-          if (clamp) {
-              if (Number.isFinite(clamp.minX))
-                  nextLeft = Math.max(nextLeft, clamp.minX);
-              if (Number.isFinite(clamp.maxX))
-                  nextLeft = Math.min(nextLeft, clamp.maxX);
-              if (Number.isFinite(clamp.minY))
-                  nextTop = Math.max(nextTop, clamp.minY);
-              if (Number.isFinite(clamp.maxY))
-                  nextTop = Math.min(nextTop, clamp.maxY);
+          const clampBounds = options.clamp;
+          if (clampBounds) {
+              if (Number.isFinite(clampBounds.minX))
+                  nextLeft = Math.max(nextLeft, clampBounds.minX);
+              if (Number.isFinite(clampBounds.maxX))
+                  nextLeft = Math.min(nextLeft, clampBounds.maxX);
+              if (Number.isFinite(clampBounds.minY))
+                  nextTop = Math.max(nextTop, clampBounds.minY);
+              if (Number.isFinite(clampBounds.maxY))
+                  nextTop = Math.min(nextTop, clampBounds.maxY);
           }
           // Áp dụng toạ độ (đã có transform handle việc căn giữa)
-          if (!this.lastVisualState || Math.abs(this.lastVisualState.left - nextLeft) >= 0.25) {
+          if (styleThresholdChanged(this.lastVisualState?.left, nextLeft)) {
               this.container.style.left = `${nextLeft}px`;
               this.debugStyleWrites += 1;
           }
-          if (!this.lastVisualState || Math.abs(this.lastVisualState.top - nextTop) >= 0.25) {
+          if (styleThresholdChanged(this.lastVisualState?.top, nextTop)) {
               this.container.style.top = `${nextTop}px`;
               this.debugStyleWrites += 1;
           }
           this.lastVisualState = {
               width: currentW,
               height: currentH,
-              fontSize: Math.max(10, 14 * scale),
-              labelBottom: -Math.max(10, 14 * scale) * 1.5,
+              fontSize,
+              labelBottom,
               left: nextLeft,
               top: nextTop,
               opacity: '1',
@@ -11414,6 +11418,13 @@ __modules['./engine.ts'] = (exports, module, __require) => {
           return true;
       return typeof value.values === 'function';
   }
+  function shouldShowQueuedSide(side) {
+      if (side === 'ally')
+          return !!CFG.DEBUG?.SHOW_QUEUED;
+      if (side === 'enemy')
+          return !!CFG.DEBUG?.SHOW_QUEUED_ENEMY;
+      return false;
+  }
   function queueContainsCell(map, cx, cy) {
       if (!isSummonMap(map))
           return false;
@@ -11575,14 +11586,19 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       const y = (q.yTop + q.yBot) / 2;
       return { x, y };
   }
-  function projectCellOblique(g, cx, cy, cam) {
-      const C = resolveCameraOptions(cam);
+  function depthScaleAtRow(g, row, depthScale) {
+      const depth = g.rows - 1 - row;
+      return Math.pow(depthScale, depth);
+  }
+  function projectCellObliqueWithCamera(g, cx, cy, C) {
       const { x, y } = cellCenterOblique(g, cx, cy, C);
-      const k = C.depthScale;
-      const depth = g.rows - 1 - cy;
-      const scale = Math.pow(k, depth);
+      const scale = depthScaleAtRow(g, cy, C.depthScale);
       return { x, y, scale };
   }
+  function projectCellOblique(g, cx, cy, cam) {
+      return projectCellObliqueWithCamera(g, cx, cy, resolveCameraOptions(cam));
+  }
+  6;
   function drawChibi(ctx, x, y, r, facing = 1, color = '#a9f58c') {
       const lw = Math.max(CHIBI_PROPS.line, Math.floor(r * 0.28));
       const hr = Math.max(3, Math.floor(r * CHIBI_PROPS.headR));
@@ -11646,8 +11662,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       }
       return normalized.join('|');
   }
-  function contextSignature(g, cam) {
-      const C = resolveCameraOptions(cam);
+  function contextSignature(g, C) {
       return joinSignatureParts([
           g.cols,
           g.rows,
@@ -11669,7 +11684,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
           // ignore logging errors
       }
   }
-  function getTokenProjection(token, g, cam, sig) {
+  function getTokenProjection(token, g, C, sig) {
       if (!token) {
           return null;
       }
@@ -11679,7 +11694,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       }
       let entry = TOKEN_PROJECTION_CACHE.get(token);
       if (!entry || entry.cx !== token.cx || entry.cy !== token.cy || entry.sig !== sig) {
-          const projection = projectCellOblique(g, token.cx, token.cy, cam);
+          const projection = projectCellObliqueWithCamera(g, token.cx, token.cy, C);
           entry = {
               cx: token.cx,
               cy: token.cy,
@@ -11945,7 +11960,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       ctx.restore();
   }
   function drawTokensOblique(ctx, g, tokens, cam, options = {}) {
-      const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
+      const C = resolveCameraOptions(cam);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       const baseR = Math.floor(g.tile * 0.36);
@@ -12089,25 +12104,21 @@ __modules['./engine.ts'] = (exports, module, __require) => {
           return;
       const C = resolveCameraOptions(cam);
       const baseR = Math.floor(g.tile * 0.36);
-      const k = C.depthScale;
       const drawSide = (map, side) => {
           if (!isSummonMap(map))
               return;
-          if (side === 'ally' && !(CFG.DEBUG?.SHOW_QUEUED))
-              return;
-          if (side === 'enemy' && !(CFG.DEBUG?.SHOW_QUEUED_ENEMY))
+          if (!shouldShowQueuedSide(side))
               return;
           for (const p of map.values()) {
               if (!p)
                   continue;
-              const c = cellCenterOblique(g, p.cx, p.cy, C);
-              const depth = g.rows - 1 - p.cy;
-              const r = Math.max(6, Math.floor(baseR * Math.pow(k, depth)));
+              const projection = projectCellObliqueWithCamera(g, p.cx, p.cy, C);
+              const r = Math.max(6, Math.floor(baseR * projection.scale));
               ctx.save();
               ctx.globalAlpha = 0.5;
               ctx.fillStyle = p.color || '#5b6a78';
               ctx.beginPath();
-              ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+              ctx.arc(projection.x, projection.y, r, 0, Math.PI * 2);
               ctx.fill();
               ctx.restore();
           }
@@ -36420,6 +36431,16 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
   const __dep4 = __require('./utils/time.ts');
   const safeNow = __dep4.safeNow;
   const clamp01 = (value) => Math.max(0, Math.min(1, value));
+  const TURN_TICK = 'turn';
+  const DOT_DAMAGE_BY_STATUS = Object.freeze({
+      bleed: 0.05,
+      poison: 0.03,
+  });
+  const DOT_STATUS_ID_SET = new Set(Object.keys(DOT_DAMAGE_BY_STATUS));
+  const TAUNT_STATUS_ID = 'taunt';
+  const ALLURE_STATUS_ID = 'allure';
+  const isAxiomBlockedKind = (kind) => kind === 'buff' || kind === 'debuff' || kind === 'mark';
+  const isDotStatusId = (id) => DOT_STATUS_ID_SET.has(id);
   function resolveDefenseMultiplier(target, penetration = 0) {
       const combinedPen = clamp01(penetration);
       const effectiveArm = Math.max(0, (target.arm ?? 0) * (1 - combinedPen));
@@ -36475,13 +36496,7 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       if (unit.hasDivineNature === true)
           return true;
       const rawTags = Array.isArray(unit.tags) ? unit.tags : [];
-      const stringTags = [];
-      for (const tag of rawTags) {
-          if (typeof tag === 'string')
-              stringTags.push(tag);
-      }
-      const tags = normalizeTagList(stringTags);
-      return tags.includes('divine-nature');
+      return normalizeTagList(rawTags.filter((tag) => typeof tag === 'string')).includes('divine-nature');
   };
   const isTokenCandidate = (value) => {
       if (!value || typeof value !== 'object')
@@ -36503,6 +36518,34 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
           if (status.dur <= 0)
               Statuses.remove(unit, status.id);
       }
+  }
+  function logStatusTick(ctx, id, unit, lost) {
+      if (!ctx?.log || !Array.isArray(ctx.log))
+          return;
+      ctx.log.push({ t: id, who: unit.name, lost });
+  }
+  function applyDotTick(unit, status, ctx) {
+      if (!isDotStatusId(status.id))
+          return;
+      const id = status.id;
+      const pct = DOT_DAMAGE_BY_STATUS[id];
+      const lost = Math.round((unit.hpMax ?? 0) * pct);
+      applyDamage(unit, lost);
+      hookOnLethalDamage(unit);
+      logStatusTick(ctx, id, unit, lost);
+      decrementDuration(unit, status);
+  }
+  function nearestByDistance(origin, targets) {
+      let best = null;
+      let bestDistance = Number.POSITIVE_INFINITY;
+      for (const target of targets) {
+          const distance = Math.abs(target.cx - origin.cx) + Math.abs(target.cy - origin.cy);
+          if (distance < bestDistance) {
+              best = target;
+              bestDistance = distance;
+          }
+      }
+      return best;
   }
   const createTimedStatus = (id, kind, tag, turns) => ({
       id,
@@ -36631,15 +36674,15 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
   };
   const Statuses = {
       add(unit, status) {
-          const isBlockedByDivineAxiom = status.kind === 'buff' || status.kind === 'debuff' || status.kind === 'mark';
-          if (isBlockedByDivineAxiom && hasDivineNatureTag(unit)) {
+          if (isAxiomBlockedKind(status.kind) && hasDivineNatureTag(unit)) {
               return status;
           }
           if (status.kind === 'debuff' && hasDebuffImmunity(unit, status.id)) {
               return status;
           }
           const list = ensureStatusList(unit);
-          const [, index, existing] = findStatus(unit, status.id);
+          const index = list.findIndex(existingStatus => existingStatus.id === status.id);
+          const existing = index >= 0 ? list[index] ?? null : null;
           if (existing) {
               if (status.maxStacks && existing.stacks != null) {
                   existing.stacks = Math.min(status.maxStacks, (existing.stacks || 1) + (status.stacks || 1));
@@ -36682,29 +36725,23 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
           // reserved
       },
       onTurnEnd(unit, ctx) {
-          const list = ensureStatusList(unit);
-          const bleed = this.get(unit, 'bleed');
-          if (bleed) {
-              const lost = Math.round((unit.hpMax ?? 0) * 0.05);
-              applyDamage(unit, lost);
-              hookOnLethalDamage(unit);
-              if (ctx?.log && Array.isArray(ctx.log)) {
-                  ctx.log.push({ t: 'bleed', who: unit.name, lost });
-              }
-              decrementDuration(unit, bleed);
+          const statuses = [...ensureStatusList(unit)];
+          let bleed = null;
+          let poison = null;
+          for (const status of statuses) {
+              if (status.id === 'bleed' && !bleed)
+                  bleed = status;
+              else if (status.id === 'poison' && !poison)
+                  poison = status;
+              if (bleed && poison)
+                  break;
           }
-          const poison = this.get(unit, 'poison');
-          if (poison) {
-              const lost = Math.round((unit.hpMax ?? 0) * 0.03);
-              applyDamage(unit, lost);
-              hookOnLethalDamage(unit);
-              if (ctx?.log && Array.isArray(ctx.log)) {
-                  ctx.log.push({ t: 'poison', who: unit.name, lost });
-              }
-              decrementDuration(unit, poison);
-          }
-          for (const status of [...list]) {
-              if (status.id !== 'bleed' && status.id !== 'poison' && status.tick === 'turn') {
+          if (bleed)
+              applyDotTick(unit, bleed, ctx);
+          if (poison)
+              applyDotTick(unit, poison, ctx);
+          for (const status of statuses) {
+              if (!DOT_STATUS_ID_SET.has(status.id) && status.tick === TURN_TICK) {
                   decrementDuration(unit, status);
               }
           }
@@ -36732,36 +36769,42 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
               return null;
           let pool = candidatePool;
           if (attackType === 'basic') {
-              const filtered = candidatePool.filter(target => !this.has(target, 'allure'));
+              const filtered = candidatePool.filter(target => !this.has(target, ALLURE_STATUS_ID));
               if (filtered.length > 0) {
                   pool = filtered;
               }
           }
-          const taunters = pool.filter(target => this.has(target, 'taunt'));
+          const taunters = pool.filter(target => this.has(target, TAUNT_STATUS_ID));
           if (taunters.length > 0) {
-              let best = null;
-              let bestDistance = Number.POSITIVE_INFINITY;
-              for (const target of taunters) {
-                  const distance = Math.abs(target.cx - attacker.cx) + Math.abs(target.cy - attacker.cy);
-                  if (distance < bestDistance) {
-                      best = target;
-                      bestDistance = distance;
-                  }
-              }
-              return best;
+              return nearestByDistance(attacker, taunters);
           }
           return null;
       },
       modifyStats(unit, base) {
+          const statuses = ensureStatusList(unit);
+          let hasDaze = false;
+          let hasFear = false;
+          let haste = null;
+          for (const status of statuses) {
+              if (!status)
+                  continue;
+              if (!hasDaze && status.id === 'daze')
+                  hasDaze = true;
+              else if (!hasFear && status.id === 'fear')
+                  hasFear = true;
+              else if (!haste && status.id === 'haste')
+                  haste = status;
+              if (hasDaze && hasFear && haste)
+                  break;
+          }
           const next = { ...base };
-          if (this.has(unit, 'daze')) {
+          if (hasDaze) {
               next.SPD = (next.SPD ?? 0) * 0.9;
               next.AGI = (next.AGI ?? 0) * 0.9;
           }
-          if (this.has(unit, 'fear')) {
+          if (hasFear) {
               next.SPD = (next.SPD ?? 0) * 0.9;
           }
-          const haste = this.get(unit, 'haste');
           if (haste) {
               const boost = 1 + clamp01(haste.power ?? 0.1);
               next.SPD = (next.SPD ?? 0) * boost;
@@ -36769,6 +36812,44 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
           return next;
       },
       beforeDamage(attacker, target, ctx = {}) {
+          const attackerStatuses = ensureStatusList(attacker);
+          const targetStatuses = ensureStatusList(target);
+          let fatigue = null;
+          let exalt = null;
+          let frenzy = null;
+          let weak = null;
+          let fear = null;
+          let pierce = null;
+          for (const status of attackerStatuses) {
+              if (!status)
+                  continue;
+              if (!fatigue && status.id === 'fatigue')
+                  fatigue = status;
+              else if (!exalt && status.id === 'exalt')
+                  exalt = status;
+              else if (!frenzy && status.id === 'frenzy')
+                  frenzy = status;
+              else if (!weak && status.id === 'weaken')
+                  weak = status;
+              else if (!fear && status.id === 'fear')
+                  fear = status;
+              else if (!pierce && status.id === 'pierce')
+                  pierce = status;
+              if (fatigue && exalt && frenzy && weak && fear && pierce)
+                  break;
+          }
+          let cut = null;
+          let stealth = null;
+          for (const status of targetStatuses) {
+              if (!status)
+                  continue;
+              if (!cut && status.id === 'dmgCut')
+                  cut = status;
+              else if (!stealth && status.id === 'stealth')
+                  stealth = status;
+              if (cut && stealth)
+                  break;
+          }
           const attackType = ctx.attackType ?? 'basic';
           const dtype = ctx.dtype ?? 'phys';
           const base = ctx.base ?? 0;
@@ -36776,25 +36857,22 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
           let inMul = 1;
           let defPen = 0;
           let ignoreAll = false;
-          if (this.has(attacker, 'fatigue'))
+          if (fatigue)
               outMul *= 0.9;
-          if (this.has(attacker, 'exalt'))
+          if (exalt)
               outMul *= 1.1;
-          if (attackType === 'basic' && this.has(attacker, 'frenzy'))
+          if (attackType === 'basic' && frenzy)
               outMul *= 1.2;
-          const weak = this.get(attacker, 'weaken');
           if (weak)
               outMul *= 1 - 0.1 * Math.min(5, weak.stacks ?? 1);
-          if (this.has(attacker, 'fear'))
+          if (fear)
               outMul *= 0.9;
-          const cut = this.get(target, 'dmgCut');
           if (cut)
               inMul *= 1 - clamp01(cut.power ?? 0);
-          if (this.has(target, 'stealth')) {
+          if (stealth) {
               inMul = 0;
               ignoreAll = true;
           }
-          const pierce = this.get(attacker, 'pierce');
           if (pierce)
               defPen = Math.max(defPen, clamp01(pierce.power ?? 0.1));
           const context = {

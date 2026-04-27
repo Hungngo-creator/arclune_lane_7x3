@@ -59,6 +59,20 @@ interface StatusService {
 }
 
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
+const TURN_TICK = 'turn';
+const DOT_DAMAGE_BY_STATUS: Readonly<Record<'bleed' | 'poison', number>> = Object.freeze({
+  bleed: 0.05,
+  poison: 0.03,
+});
+const DOT_STATUS_ID_SET = new Set<string>(Object.keys(DOT_DAMAGE_BY_STATUS));
+const TAUNT_STATUS_ID = 'taunt';
+const ALLURE_STATUS_ID = 'allure';
+
+const isAxiomBlockedKind = (kind: StatusEffect['kind']): boolean =>
+  kind === 'buff' || kind === 'debuff' || kind === 'mark';
+
+const isDotStatusId = (id: string): id is keyof typeof DOT_DAMAGE_BY_STATUS =>
+  DOT_STATUS_ID_SET.has(id);
 
 function resolveDefenseMultiplier(target: UnitToken, penetration = 0): number {
   const combinedPen = clamp01(penetration);
@@ -114,12 +128,7 @@ const hasDivineNatureTag = (unit: UnitToken | null | undefined): boolean => {
   if (!unit) return false;
   if (unit.hasDivineNature === true) return true;
   const rawTags: unknown[] = Array.isArray(unit.tags) ? unit.tags : [];
-  const stringTags: string[] = [];
-  for (const tag of rawTags) {
-    if (typeof tag === 'string') stringTags.push(tag);
-  }
-  const tags = normalizeTagList(stringTags);
-  return tags.includes('divine-nature');
+  return normalizeTagList(rawTags.filter((tag): tag is string => typeof tag === 'string')).includes('divine-nature');
 };
 
 const isTokenCandidate = (value: unknown): value is UnitToken => {
@@ -147,6 +156,35 @@ function decrementDuration(unit: UnitToken, status: StatusEffect): void {
     status.dur -= 1;
     if (status.dur <= 0) Statuses.remove(unit, status.id);
   }
+}
+
+function logStatusTick(ctx: StatusTurnContext | undefined, id: string, unit: UnitToken, lost: number): void {
+  if (!ctx?.log || !Array.isArray(ctx.log)) return;
+  ctx.log.push({ t: id, who: unit.name, lost });
+}
+
+function applyDotTick(unit: UnitToken, status: StatusEffect, ctx?: StatusTurnContext): void {
+  if (!isDotStatusId(status.id)) return;
+  const id = status.id;
+  const pct = DOT_DAMAGE_BY_STATUS[id];
+  const lost = Math.round((unit.hpMax ?? 0) * pct);
+  applyDamage(unit, lost);
+  hookOnLethalDamage(unit);
+  logStatusTick(ctx, id, unit, lost);
+  decrementDuration(unit, status);
+}
+
+function nearestByDistance(origin: UnitToken, targets: ReadonlyArray<UnitToken>): UnitToken | null {
+  let best: UnitToken | null = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (const target of targets) {
+    const distance = Math.abs(target.cx - origin.cx) + Math.abs(target.cy - origin.cy);
+    if (distance < bestDistance) {
+      best = target;
+      bestDistance = distance;
+    }
+  }
+  return best;
 }
 
 const createTimedStatus = (
@@ -280,15 +318,15 @@ const hasDebuffImmunity = (unit: UnitToken, statusId: string): boolean => {
 
 export const Statuses: StatusService = {
   add(unit, status) {
-    const isBlockedByDivineAxiom = status.kind === 'buff' || status.kind === 'debuff' || status.kind === 'mark';
-    if (isBlockedByDivineAxiom && hasDivineNatureTag(unit)) {
+    if (isAxiomBlockedKind(status.kind) && hasDivineNatureTag(unit)) {
       return status;
     }
     if (status.kind === 'debuff' && hasDebuffImmunity(unit, status.id)) {
       return status;
     }
     const list = ensureStatusList(unit);
-    const [, index, existing] = findStatus(unit, status.id);
+    const index = list.findIndex(existingStatus => existingStatus.id === status.id);
+    const existing = index >= 0 ? list[index] ?? null : null;
     if (existing) {
       if (status.maxStacks && existing.stacks != null) {
         existing.stacks = Math.min(status.maxStacks, (existing.stacks || 1) + (status.stacks || 1));
@@ -326,29 +364,18 @@ export const Statuses: StatusService = {
     // reserved
   },
   onTurnEnd(unit, ctx) {
-    const list = ensureStatusList(unit);
-    const bleed = this.get(unit, 'bleed');
-    if (bleed) {
-      const lost = Math.round((unit.hpMax ?? 0) * 0.05);
-      applyDamage(unit, lost);
-      hookOnLethalDamage(unit);
-      if (ctx?.log && Array.isArray(ctx.log)) {
-        ctx.log.push({ t: 'bleed', who: unit.name, lost });
-      }
-      decrementDuration(unit, bleed);
+    const statuses = [...ensureStatusList(unit)];
+    let bleed: StatusEffect | null = null;
+    let poison: StatusEffect | null = null;
+    for (const status of statuses) {
+      if (status.id === 'bleed' && !bleed) bleed = status;
+      else if (status.id === 'poison' && !poison) poison = status;
+      if (bleed && poison) break;
     }
-    const poison = this.get(unit, 'poison');
-    if (poison) {
-      const lost = Math.round((unit.hpMax ?? 0) * 0.03);
-      applyDamage(unit, lost);
-      hookOnLethalDamage(unit);
-      if (ctx?.log && Array.isArray(ctx.log)) {
-        ctx.log.push({ t: 'poison', who: unit.name, lost });
-      }
-      decrementDuration(unit, poison);
-    }
-    for (const status of [...list]) {
-      if (status.id !== 'bleed' && status.id !== 'poison' && status.tick === 'turn') {
+    if (bleed) applyDotTick(unit, bleed, ctx);
+    if (poison) applyDotTick(unit, poison, ctx);
+    for (const status of statuses) {
+      if (!DOT_STATUS_ID_SET.has(status.id) && status.tick === TURN_TICK) {
         decrementDuration(unit, status);
       }
     }
@@ -375,36 +402,37 @@ export const Statuses: StatusService = {
 
     let pool: ReadonlyArray<UnitToken> = candidatePool;
     if (attackType === 'basic') {
-      const filtered = candidatePool.filter(target => !this.has(target, 'allure'));
+      const filtered = candidatePool.filter(target => !this.has(target, ALLURE_STATUS_ID));
       if (filtered.length > 0) {
         pool = filtered;
       }
     }
-    const taunters = pool.filter(target => this.has(target, 'taunt'));
+    const taunters = pool.filter(target => this.has(target, TAUNT_STATUS_ID));
     if (taunters.length > 0) {
-      let best: UnitToken | null = null;
-      let bestDistance = Number.POSITIVE_INFINITY;
-      for (const target of taunters) {
-        const distance = Math.abs(target.cx - attacker.cx) + Math.abs(target.cy - attacker.cy);
-        if (distance < bestDistance) {
-          best = target;
-          bestDistance = distance;
-        }
-      }
-      return best;
+      return nearestByDistance(attacker, taunters);
     }
     return null;
   },
   modifyStats(unit, base) {
+    const statuses = ensureStatusList(unit);
+    let hasDaze = false;
+    let hasFear = false;
+    let haste: StatusEffect | null = null;
+    for (const status of statuses) {
+      if (!status) continue;
+      if (!hasDaze && status.id === 'daze') hasDaze = true;
+      else if (!hasFear && status.id === 'fear') hasFear = true;
+      else if (!haste && status.id === 'haste') haste = status;
+      if (hasDaze && hasFear && haste) break;
+    }
     const next = { ...base };
-    if (this.has(unit, 'daze')) {
+    if (hasDaze) {
       next.SPD = (next.SPD ?? 0) * 0.9;
       next.AGI = (next.AGI ?? 0) * 0.9;
     }
-    if (this.has(unit, 'fear')) {
+    if (hasFear) {
       next.SPD = (next.SPD ?? 0) * 0.9;
     }
-    const haste = this.get(unit, 'haste');
     if (haste) {
       const boost = 1 + clamp01(haste.power ?? 0.1);
       next.SPD = (next.SPD ?? 0) * boost;
@@ -412,6 +440,32 @@ export const Statuses: StatusService = {
     return next;
   },
   beforeDamage(attacker, target, ctx = {}) {
+    const attackerStatuses = ensureStatusList(attacker);
+    const targetStatuses = ensureStatusList(target);
+    let fatigue: StatusEffect | null = null;
+    let exalt: StatusEffect | null = null;
+    let frenzy: StatusEffect | null = null;
+    let weak: StatusEffect | null = null;
+    let fear: StatusEffect | null = null;
+    let pierce: StatusEffect | null = null;
+    for (const status of attackerStatuses) {
+      if (!status) continue;
+      if (!fatigue && status.id === 'fatigue') fatigue = status;
+      else if (!exalt && status.id === 'exalt') exalt = status;
+      else if (!frenzy && status.id === 'frenzy') frenzy = status;
+      else if (!weak && status.id === 'weaken') weak = status;
+      else if (!fear && status.id === 'fear') fear = status;
+      else if (!pierce && status.id === 'pierce') pierce = status;
+      if (fatigue && exalt && frenzy && weak && fear && pierce) break;
+    }
+    let cut: StatusEffect | null = null;
+    let stealth: StatusEffect | null = null;
+    for (const status of targetStatuses) {
+      if (!status) continue;
+      if (!cut && status.id === 'dmgCut') cut = status;
+      else if (!stealth && status.id === 'stealth') stealth = status;
+      if (cut && stealth) break;
+    }
     const attackType = ctx.attackType ?? 'basic';
     const dtype = ctx.dtype ?? 'phys';
     const base = ctx.base ?? 0;
@@ -420,20 +474,17 @@ export const Statuses: StatusService = {
     let defPen = 0;
     let ignoreAll = false;
 
-    if (this.has(attacker, 'fatigue')) outMul *= 0.9;
-    if (this.has(attacker, 'exalt')) outMul *= 1.1;
-    if (attackType === 'basic' && this.has(attacker, 'frenzy')) outMul *= 1.2;
-    const weak = this.get(attacker, 'weaken');
+    if (fatigue) outMul *= 0.9;
+    if (exalt) outMul *= 1.1;
+    if (attackType === 'basic' && frenzy) outMul *= 1.2;
     if (weak) outMul *= 1 - 0.1 * Math.min(5, weak.stacks ?? 1);
-    if (this.has(attacker, 'fear')) outMul *= 0.9;
+    if (fear) outMul *= 0.9;
 
-    const cut = this.get(target, 'dmgCut');
     if (cut) inMul *= 1 - clamp01(cut.power ?? 0);
-    if (this.has(target, 'stealth')) {
+    if (stealth) {
       inMul = 0;
       ignoreAll = true;
     }
-    const pierce = this.get(attacker, 'pierce');
     if (pierce) defPen = Math.max(defPen, clamp01(pierce.power ?? 0.1));
 
     const context: DamageContext = {
