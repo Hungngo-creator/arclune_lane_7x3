@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
 import { dispatchGameplayTags } from '../src/combat/tag-dispatch.ts';
+import { compareRuleConflictUnitPriority, compareRuleTagPriority } from '../src/combat/tag-aliases.ts';
 import { performActiveSkill } from '../src/combat/perform-active-skill.ts';
 import { normalizeTagList } from '../src/data/tags.ts';
 import { globalAetherPool } from '../src/aether.ts';
@@ -151,4 +152,191 @@ describe('skill runtime tag contract', () => {
     payloadSpy.mockRestore();
   });
 
+  it('rule conflict comparator follows rank > cultivation > stars > awaken > cp', () => {
+    expect(compareRuleTagPriority('axiom-rule', 'global-rule')).toBeGreaterThan(0);
+    expect(compareRuleTagPriority('global-rule', 'doctrine-rule')).toBeGreaterThan(0);
+    expect(compareRuleTagPriority('doctrine-rule', 'axiom-rule')).toBeLessThan(0);
+
+    const rankWins = compareRuleConflictUnitPriority(
+      { rank: 'UR', level: 10, stars: 1, awaken: 0, cp: 2000 },
+      { rank: 'SSR', level: 99, stars: 5, awaken: 2, cp: 9000 },
+    );
+    expect(rankWins).toBeGreaterThan(0);
+
+    const cultivationWins = compareRuleConflictUnitPriority(
+      { rank: 'UR', level: 20, stars: 2, awaken: 0, cp: 1000 },
+      { rank: 'UR', level: 19, stars: 5, awaken: 2, cp: 9999 },
+    );
+    expect(cultivationWins).toBeGreaterThan(0);
+
+    const starsWins = compareRuleConflictUnitPriority(
+      { rank: 'UR', level: 20, stars: 4, awaken: 0, cp: 1000 },
+      { rank: 'UR', level: 20, stars: 3, awaken: 2, cp: 9999 },
+    );
+    expect(starsWins).toBeGreaterThan(0);
+
+    const awakenWins = compareRuleConflictUnitPriority(
+      { rank: 'UR', level: 20, stars: 4, awaken: 2, cp: 1000 },
+      { rank: 'UR', level: 20, stars: 4, awaken: 1, cp: 9999 },
+    );
+    expect(awakenWins).toBeGreaterThan(0);
+
+    const cpWins = compareRuleConflictUnitPriority(
+      { rank: 'UR', level: 20, stars: 4, awaken: 2, cp: 1200 },
+      { rank: 'UR', level: 20, stars: 4, awaken: 2, cp: 900 },
+    );
+    expect(cpWins).toBeGreaterThan(0);
+  });
+
+  it('healing under doctrine-no-heal is resolved by equal-tag unit priority', () => {
+    const blocker = makeToken({
+      id: 'blocker',
+      iid: 10,
+      side: 'enemy',
+      rank: 'UR',
+      level: 20,
+      stars: 3,
+      awaken: 1,
+      cp: 1000,
+    });
+    const healer = makeToken({
+      id: 'healer',
+      iid: 11,
+      side: 'ally',
+      hp: 50,
+      rank: 'UR',
+      level: 20,
+      stars: 3,
+      awaken: 1,
+      cp: 900,
+    });
+    const game = makeGame([healer, blocker]);
+
+    dispatchGameplayTags(['doctrine-rule'], {
+      game,
+      attacker: blocker,
+      payload: { forbidEnemyHeal: true, noHealTurns: 2 },
+      tagsNormalized: true,
+      tagsCanonical: true,
+    });
+
+    dispatchGameplayTags(['self', 'heal', 'doctrine-rule'], {
+      game,
+      attacker: healer,
+      payload: { healAmount: 30 },
+      tagsNormalized: true,
+      tagsCanonical: true,
+    });
+    expect(healer.hp).toBe(50);
+
+    const strongerHealer = makeToken({
+      id: 'healer-2',
+      iid: 12,
+      side: 'ally',
+      hp: 50,
+      rank: 'UR',
+      level: 20,
+      stars: 3,
+      awaken: 1,
+      cp: 2000,
+      statuses: [...(healer.statuses ?? [])],
+    });
+    game.tokens = [strongerHealer, blocker];
+    dispatchGameplayTags(['self', 'heal', 'doctrine-rule'], {
+      game,
+      attacker: strongerHealer,
+      payload: { healAmount: 30 },
+      tagsNormalized: true,
+      tagsCanonical: true,
+    });
+    expect(strongerHealer.hp).toBe(80);
+  });
+
+  it('global-rule no-heal and axiom-rule heal resolve by tag priority without unit tie-break', () => {
+    const blocker = makeToken({
+      id: 'blocker-g',
+      iid: 20,
+      side: 'enemy',
+      rank: 'PRIME',
+      level: 99,
+      stars: 5,
+      awaken: 2,
+      cp: 99999,
+    });
+    const healer = makeToken({
+      id: 'healer-g',
+      iid: 21,
+      side: 'ally',
+      hp: 50,
+      rank: 'SSR',
+      level: 1,
+      stars: 1,
+      awaken: 0,
+      cp: 100,
+    });
+    const game = makeGame([healer, blocker]);
+
+    dispatchGameplayTags(['global-rule'], {
+      game,
+      attacker: blocker,
+      payload: { forbidEnemyHeal: true, noHealTurns: 2 },
+      tagsNormalized: true,
+      tagsCanonical: true,
+    });
+
+    dispatchGameplayTags(['self', 'heal', 'axiom-rule'], {
+      game,
+      attacker: healer,
+      payload: { healAmount: 30 },
+      tagsNormalized: true,
+      tagsCanonical: true,
+    });
+    expect(healer.hp).toBe(80);
+  });
+
+  it('deferred dispatch marks heal as blocked when caster has no qualifying rule tag override', () => {
+    const blocker = makeToken({
+      id: 'blocker-d',
+      iid: 30,
+      side: 'enemy',
+      rank: 'UR',
+      level: 30,
+      stars: 4,
+      awaken: 2,
+      cp: 6000,
+    });
+    const healer = makeToken({
+      id: 'healer-d',
+      iid: 31,
+      side: 'ally',
+      hp: 40,
+      rank: 'UR',
+      level: 20,
+      stars: 3,
+      awaken: 1,
+      cp: 2000,
+    });
+    const game = makeGame([healer, blocker]);
+
+    dispatchGameplayTags(['doctrine-rule'], {
+      game,
+      attacker: blocker,
+      payload: { skillKey: 'skill2', forbidEnemyHeal: true, noHealTurns: 2 },
+      tagsNormalized: true,
+      tagsCanonical: true,
+    });
+
+    const dispatch = dispatchGameplayTags(['self', 'heal'], {
+      game,
+      attacker: healer,
+      payload: { skillKey: 'skill1', healAmount: 30 },
+      deferEffects: true,
+      tagsNormalized: true,
+      tagsCanonical: true,
+    });
+
+    expect(dispatch.sideEffects).toContain('heal-blocked');
+  });
+
+  
 });

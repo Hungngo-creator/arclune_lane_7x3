@@ -223,6 +223,98 @@ const RULE_TAG_PRIORITY = Object.freeze<Record<RuleTag, number>>({
   'axiom-rule': COMBAT_TAG_PRIORITY['axiom-rule'] ?? 0,
 });
 
+const CONFLICT_RULE_RANK_PRIORITY = Object.freeze<Record<string, number>>({
+  SSR: 1,
+  UR: 2,
+  PRIME: 3,
+});
+
+type ConflictComparableUnit = {
+  id?: string | number;
+  rank?: unknown;
+  level?: unknown;
+  lv?: unknown;
+  tuVi?: unknown;
+  tuvi?: unknown;
+  stars?: unknown;
+  star?: unknown;
+  awaken?: unknown;
+  awakened?: unknown;
+  cp?: unknown;
+  power?: unknown;
+  [extra: string]: unknown;
+};
+
+function toConflictScore(value: unknown): number {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, numeric);
+}
+
+function readUnitRankScore(unit: ConflictComparableUnit | null | undefined): number {
+  const key = String(unit?.rank ?? '').trim().toUpperCase();
+  return CONFLICT_RULE_RANK_PRIORITY[key] ?? 0;
+}
+
+function readUnitCultivationScore(unit: ConflictComparableUnit | null | undefined): number {
+  if (!unit) return 0;
+  const direct = toConflictScore(unit.tuVi ?? unit.tuvi ?? unit.level ?? unit.lv);
+  if (direct > 0) return direct;
+  const cultivation = unit.cultivation as Record<string, unknown> | undefined;
+  if (!cultivation || typeof cultivation !== 'object') return 0;
+  const realm = toConflictScore(cultivation.realm);
+  const subRealm = toConflictScore(cultivation.subRealm);
+  return realm * 100 + subRealm;
+}
+
+function readUnitStarsScore(unit: ConflictComparableUnit | null | undefined): number {
+  if (!unit) return 0;
+  return toConflictScore(unit.stars ?? unit.star);
+}
+
+function readUnitAwakenScore(unit: ConflictComparableUnit | null | undefined): number {
+  if (!unit) return 0;
+  if (typeof unit.awakened === 'boolean') return unit.awakened ? 1 : 0;
+  return toConflictScore(unit.awaken ?? unit.awakened);
+}
+
+function readUnitCpScore(unit: ConflictComparableUnit | null | undefined): number {
+  if (!unit) return 0;
+  return toConflictScore(unit.cp ?? unit.power);
+}
+
+function compareConflictScore(left: number, right: number): number {
+  if (left > right) return 1;
+  if (left < right) return -1;
+  return 0;
+}
+
+export function compareRuleTagPriority(
+  left: RuleTag | null | undefined,
+  right: RuleTag | null | undefined,
+): number {
+  const leftPriority = left ? (RULE_TAG_PRIORITY[left] ?? 0) : 0;
+  const rightPriority = right ? (RULE_TAG_PRIORITY[right] ?? 0) : 0;
+  return compareConflictScore(leftPriority, rightPriority);
+}
+
+export function compareRuleConflictUnitPriority(
+  left: ConflictComparableUnit | null | undefined,
+  right: ConflictComparableUnit | null | undefined,
+): number {
+  const checks = [
+    compareConflictScore(readUnitRankScore(left), readUnitRankScore(right)),
+    compareConflictScore(readUnitCultivationScore(left), readUnitCultivationScore(right)),
+    compareConflictScore(readUnitStarsScore(left), readUnitStarsScore(right)),
+    compareConflictScore(readUnitAwakenScore(left), readUnitAwakenScore(right)),
+    compareConflictScore(readUnitCpScore(left), readUnitCpScore(right)),
+  ];
+  for (const result of checks) {
+    if (result !== 0) return result;
+  }
+  return 0;
+}
+
 export function hasRuleTagAtLeast(tags: ReadonlyArray<string>, minimum: RuleTag): boolean {
   const minimumPriority = RULE_TAG_PRIORITY[minimum] ?? 0;
   for (const tag of tags) {

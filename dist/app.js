@@ -6108,6 +6108,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       const { effectTags, hasAetherCostTag, hasSummonTag, hasUniqueGlobalTag, hasDamageTag, } = parseSkillTags(tags);
       const skillMeta = createSkillMetadataContext(skill);
       const payload = resolveSkillPayload(skill);
+      const dispatchPayload = { ...(payload ?? {}), skillKey };
       const maxSkillUses = readSkillUseCap(payload);
       if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
           return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
@@ -6124,7 +6125,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           target: pickTarget(game, caster),
           side: caster.side,
           cost: skillCost,
-          payload,
+          payload: dispatchPayload,
           deferEffects: true,
           tagsNormalized: true,
           tagsCanonical: true,
@@ -6141,6 +6142,9 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       });
       if (usesTagAetherCost && !consumedAether) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, dispatch.targets.length, 'insufficient-aether');
+      }
+      if (dispatch.sideEffects.includes('heal-blocked')) {
+          return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
       const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
       const { hpMax: casterHpMax, hp: casterCurrentHp } = readUnitHpState(caster);
@@ -7372,6 +7376,77 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       'global-rule': COMBAT_TAG_PRIORITY['global-rule'] ?? 0,
       'axiom-rule': COMBAT_TAG_PRIORITY['axiom-rule'] ?? 0,
   });
+  const CONFLICT_RULE_RANK_PRIORITY = Object.freeze({
+      SSR: 1,
+      UR: 2,
+      PRIME: 3,
+  });
+  function toConflictScore(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric))
+          return 0;
+      return Math.max(0, numeric);
+  }
+  function readUnitRankScore(unit) {
+      const key = String(unit?.rank ?? '').trim().toUpperCase();
+      return CONFLICT_RULE_RANK_PRIORITY[key] ?? 0;
+  }
+  function readUnitCultivationScore(unit) {
+      if (!unit)
+          return 0;
+      const direct = toConflictScore(unit.tuVi ?? unit.tuvi ?? unit.level ?? unit.lv);
+      if (direct > 0)
+          return direct;
+      const cultivation = unit.cultivation;
+      if (!cultivation || typeof cultivation !== 'object')
+          return 0;
+      const realm = toConflictScore(cultivation.realm);
+      const subRealm = toConflictScore(cultivation.subRealm);
+      return realm * 100 + subRealm;
+  }
+  function readUnitStarsScore(unit) {
+      if (!unit)
+          return 0;
+      return toConflictScore(unit.stars ?? unit.star);
+  }
+  function readUnitAwakenScore(unit) {
+      if (!unit)
+          return 0;
+      if (typeof unit.awakened === 'boolean')
+          return unit.awakened ? 1 : 0;
+      return toConflictScore(unit.awaken ?? unit.awakened);
+  }
+  function readUnitCpScore(unit) {
+      if (!unit)
+          return 0;
+      return toConflictScore(unit.cp ?? unit.power);
+  }
+  function compareConflictScore(left, right) {
+      if (left > right)
+          return 1;
+      if (left < right)
+          return -1;
+      return 0;
+  }
+  function compareRuleTagPriority(left, right) {
+      const leftPriority = left ? (RULE_TAG_PRIORITY[left] ?? 0) : 0;
+      const rightPriority = right ? (RULE_TAG_PRIORITY[right] ?? 0) : 0;
+      return compareConflictScore(leftPriority, rightPriority);
+  }
+  function compareRuleConflictUnitPriority(left, right) {
+      const checks = [
+          compareConflictScore(readUnitRankScore(left), readUnitRankScore(right)),
+          compareConflictScore(readUnitCultivationScore(left), readUnitCultivationScore(right)),
+          compareConflictScore(readUnitStarsScore(left), readUnitStarsScore(right)),
+          compareConflictScore(readUnitAwakenScore(left), readUnitAwakenScore(right)),
+          compareConflictScore(readUnitCpScore(left), readUnitCpScore(right)),
+      ];
+      for (const result of checks) {
+          if (result !== 0)
+              return result;
+      }
+      return 0;
+  }
   function hasRuleTagAtLeast(tags, minimum) {
       const minimumPriority = RULE_TAG_PRIORITY[minimum] ?? 0;
       for (const tag of tags) {
@@ -7447,6 +7522,8 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
       return { tags: filtered, highestRuleTag };
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'compareRuleTagPriority')) exports.compareRuleTagPriority = compareRuleTagPriority;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'compareRuleConflictUnitPriority')) exports.compareRuleConflictUnitPriority = compareRuleConflictUnitPriority;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasRuleTagAtLeast')) exports.hasRuleTagAtLeast = hasRuleTagAtLeast;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasRuleTagPriorityAtLeast')) exports.hasRuleTagPriorityAtLeast = hasRuleTagPriorityAtLeast;
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeCombatTag')) exports.normalizeCombatTag = normalizeCombatTag;
@@ -7478,7 +7555,8 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const sampleTokens = __dep7.sampleTokens;
   const __dep8 = __require('./combat/tag-aliases.ts');
   const canonicalizeCombatTagsWithRule = __dep8.canonicalizeCombatTagsWithRule;
-  const hasRuleTagPriorityAtLeast = __dep8.hasRuleTagPriorityAtLeast;
+  const compareRuleConflictUnitPriority = __dep8.compareRuleConflictUnitPriority;
+  const compareRuleTagPriority = __dep8.compareRuleTagPriority;
   const __dep9 = __require('./combat/board-position-utils.ts');
   const createCrossSlotLookup = __dep9.createCrossSlotLookup;
   const isLeaderToken = __dep9.isLeaderToken;
@@ -7487,6 +7565,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
   const EMPTY_TAGS = [];
   const DOCTRINE_NO_HEAL_STATUS_ID = 'doctrine-no-heal';
+  const RULE_CONFLICT_CACHE = new WeakMap();
   function collectAliveTargets(tokens) {
       const alive = [];
       for (const token of tokens) {
@@ -7721,24 +7800,61 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           ...(sourceUnitId ? { sourceUnitId } : {}),
       });
   };
-  const hasDoctrineNoHeal = (target, fromSide) => {
-      if (!Array.isArray(target.statuses) || target.statuses.length === 0)
-          return false;
-      for (const status of target.statuses) {
+  const resolveRuleConflictBlock = (attacker, attackerKitKey, source, sourceKitKey, sourceRuleTag, attackerRuleTag, cache) => {
+      if (!attacker || !source)
+          return true;
+      const cacheKey = [
+          String(attacker.id),
+          attackerKitKey,
+          attackerRuleTag,
+          String(source.id),
+          sourceKitKey,
+          sourceRuleTag,
+      ].join('::');
+      const cached = cache?.get(cacheKey);
+      if (typeof cached === 'boolean')
+          return cached;
+      const attackerWins = compareRuleConflictUnitPriority(attacker, source) > 0;
+      cache?.set(cacheKey, attackerWins);
+      return attackerWins;
+  };
+  const resolveKitConflictKey = (payload) => (String(payload?.kitKey ?? payload?.skillKey ?? payload?.sourceSkillKey ?? payload?.abilityKey ?? '__kit__'));
+  const getRuleConflictCache = (game) => {
+      if (!game)
+          return null;
+      const existing = RULE_CONFLICT_CACHE.get(game);
+      if (existing)
+          return existing;
+      const next = new Map();
+      RULE_CONFLICT_CACHE.set(game, next);
+      return next;
+  };
+  const canReceiveHealUnderDoctrine = (token, game, attacker, highestRuleTag, attackerSide, attackerKitKey) => {
+      if (!Array.isArray(token.statuses) || token.statuses.length === 0)
+          return true;
+      const cache = getRuleConflictCache(game);
+      for (const status of token.statuses) {
           if (!status || status.id !== DOCTRINE_NO_HEAL_STATUS_ID)
               continue;
-          if (!fromSide)
-              return true;
-          if (status.sourceSide == null || status.sourceSide !== fromSide)
-              return true;
+          if (!attackerSide)
+              return false;
+          if (status.sourceSide != null && status.sourceSide === attackerSide)
+              continue;
+          const sourceRuleTag = status.sourceRuleTag;
+          const ruleTagComparison = compareRuleTagPriority(highestRuleTag, sourceRuleTag ?? 'doctrine-rule');
+          if (ruleTagComparison > 0)
+              continue;
+          if (ruleTagComparison < 0)
+              return false;
+          const sourceUnitId = status.sourceUnitId;
+          const sourceUnit = sourceUnitId && game
+              ? game.tokens.find((entry) => entry?.id === sourceUnitId) ?? null
+              : null;
+          const sourceKitKey = String(status.sourceKitKey ?? status.sourceSkillKey ?? '__kit__');
+          if (!resolveRuleConflictBlock(attacker, attackerKitKey, sourceUnit, sourceKitKey, String(sourceRuleTag ?? 'doctrine-rule'), String(highestRuleTag ?? '__none__'), cache))
+              return false;
       }
-      return false;
-  };
-  const hasRuleBasedDoctrineBypass = (highestRuleTag) => (hasRuleTagPriorityAtLeast(highestRuleTag, 'global-rule'));
-  const canReceiveHealUnderDoctrine = (token, attackerSide, bypassDoctrineNoHeal) => {
-      if (bypassDoctrineNoHeal)
-          return true;
-      return !hasDoctrineNoHeal(token, attackerSide);
+      return true;
   };
   const applyTaggedStatus = (ctx, result, statusId, ...turnKeys) => {
       if (ctx.deferEffects)
@@ -7773,15 +7889,48 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       if (result.targets.length > 0)
           result.sideEffects.push(`hp-change:${amount}`);
   };
-  const applyHealToTokens = (tokens, amount, attackerSide, bypassDoctrineNoHeal) => {
+  const applyHealToTokens = (game, attacker, tokens, highestRuleTag, amount, attackerSide, attackerKitKey) => {
       const healed = [];
       for (const token of tokens) {
-          if (!canReceiveHealUnderDoctrine(token, attackerSide, bypassDoctrineNoHeal))
+          if (!canReceiveHealUnderDoctrine(token, game, attacker, highestRuleTag, attackerSide, attackerKitKey))
               continue;
           const healResult = healUnit(token, amount);
           healed.push({ token, overheal: Math.max(0, toFiniteNumber(healResult.overheal, 0)) });
       }
       return healed;
+  };
+  const hasAnyHealableToken = (game, attacker, tokens, highestRuleTag, attackerSide, attackerKitKey) => {
+      for (const token of tokens) {
+          if (canReceiveHealUnderDoctrine(token, game, attacker, highestRuleTag, attackerSide, attackerKitKey))
+              return true;
+      }
+      return false;
+  };
+  const applyRuleNoHealStatus = (ctx, result) => {
+      if (ctx.deferEffects || !ctx.attacker)
+          return;
+      const turns = readTurns(ctx.payload, 'forbidEnemyHealTurns', 'noHealTurns', 'turns', 'duration');
+      const shouldForbidEnemyHeal = (ctx.payload?.forbidEnemyHeal === true
+          || ctx.payload?.forbidHeal === true
+          || (turns > 0 && (ctx.payload?.forbidEnemyHealTurns != null
+              || ctx.payload?.noHealTurns != null)));
+      if (!shouldForbidEnemyHeal)
+          return;
+      const sourceKitKey = resolveKitConflictKey(ctx.payload);
+      for (const token of ctx.opponentTokens) {
+          Statuses.add(token, {
+              id: DOCTRINE_NO_HEAL_STATUS_ID,
+              kind: 'debuff',
+              tag: 'no-heal',
+              dur: turns,
+              tick: 'turn',
+              sourceUnitId: ctx.attacker.id,
+              sourceSide: ctx.attacker.side,
+              sourceRuleTag: result.highestRuleTag ?? 'doctrine-rule',
+              sourceKitKey,
+          });
+      }
+      result.sideEffects.push(`doctrine-no-heal:${turns}`);
   };
   const assignAllAliveTargets = (ctx, result) => {
       if (!ctx.game)
@@ -7904,44 +8053,34 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
               return;
           result.targets = ctx.opponentTokens;
       },
-      'global-rule': applyAllAliveRuleTargets,
-      'axiom-rule': applyAllAliveRuleTargets,
+      'axiom-rule': (ctx, result) => {
+          applyAllAliveRuleTargets(ctx, result);
+          applyRuleNoHealStatus(ctx, result);
+      },
+      'global-rule': (ctx, result) => {
+          applyAllAliveRuleTargets(ctx, result);
+          applyRuleNoHealStatus(ctx, result);
+      },
       'doctrine-rule': (ctx, result) => {
           if (!assignAllAliveTargets(ctx, result))
               return;
-          if (ctx.deferEffects || !ctx.attacker)
-              return;
-          const turns = readTurns(ctx.payload, 'forbidEnemyHealTurns', 'noHealTurns', 'turns', 'duration');
-          const shouldForbidEnemyHeal = (ctx.payload?.forbidEnemyHeal === true
-              || ctx.payload?.forbidHeal === true
-              || (turns > 0 && (ctx.payload?.forbidEnemyHealTurns != null
-                  || ctx.payload?.noHealTurns != null)));
-          if (!shouldForbidEnemyHeal)
-              return;
-          for (const token of ctx.opponentTokens) {
-              Statuses.add(token, {
-                  id: DOCTRINE_NO_HEAL_STATUS_ID,
-                  kind: 'debuff',
-                  tag: 'no-heal',
-                  dur: turns,
-                  tick: 'turn',
-                  sourceUnitId: ctx.attacker.id,
-                  sourceSide: ctx.attacker.side,
-              });
-          }
-          result.sideEffects.push(`doctrine-no-heal:${turns}`);
+          applyRuleNoHealStatus(ctx, result);
       },
       heal: (ctx, result) => {
-          if (ctx.deferEffects)
+          const healTargets = resolveEffectTargets(ctx, result);
+          const attackerKitKey = resolveKitConflictKey(ctx.payload);
+          if (ctx.deferEffects) {
+              if (!hasAnyHealableToken(ctx.game, ctx.attacker, healTargets, result.highestRuleTag, ctx.attacker?.side ?? null, attackerKitKey)) {
+                  result.sideEffects.push('heal-blocked');
+              }
               return;
+          }
           const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
           if (amount <= 0)
               return;
-          const bypassDoctrineNoHeal = hasRuleBasedDoctrineBypass(result.highestRuleTag);
           const overhealShieldRatio = readOverhealShieldRatio(ctx.payload);
           const overflowShieldTurns = toPositiveTurns(toFiniteNumber(ctx.payload?.overflowShieldTurns ?? ctx.payload?.shieldTurns, 2), 2);
-          const healTargets = resolveEffectTargets(ctx, result);
-          const healedEntries = applyHealToTokens(healTargets, amount, ctx.attacker?.side ?? null, bypassDoctrineNoHeal);
+          const healedEntries = applyHealToTokens(ctx.game, ctx.attacker, healTargets, result.highestRuleTag, amount, ctx.attacker?.side ?? null, attackerKitKey);
           for (const entry of healedEntries) {
               if (overhealShieldRatio > 0 && entry.overheal > 0) {
                   const shieldAmount = Math.max(0, Math.floor(entry.overheal * overhealShieldRatio));
@@ -7954,13 +8093,17 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
           result.sideEffects.push(`heal:${amount}`);
       },
       'team-heal': (ctx, result) => {
-          if (ctx.deferEffects)
+          const attackerKitKey = resolveKitConflictKey(ctx.payload);
+          if (ctx.deferEffects) {
+              if (!hasAnyHealableToken(ctx.game, ctx.attacker, ctx.attackerTokens, result.highestRuleTag, ctx.attacker?.side ?? null, attackerKitKey)) {
+                  result.sideEffects.push('heal-blocked');
+              }
               return;
+          }
           const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
           if (amount <= 0 || !ctx.attacker)
               return;
-          const bypassDoctrineNoHeal = hasRuleBasedDoctrineBypass(result.highestRuleTag);
-          applyHealToTokens(ctx.attackerTokens, amount, ctx.attacker.side, bypassDoctrineNoHeal);
+          applyHealToTokens(ctx.game, ctx.attacker, ctx.attackerTokens, result.highestRuleTag, amount, ctx.attacker.side, attackerKitKey);
           result.sideEffects.push(`team-heal:${amount}`);
       },
       shield: (ctx, result) => {

@@ -254,6 +254,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   } = parseSkillTags(tags);
   const skillMeta = createSkillMetadataContext(skill);
   const payload = resolveSkillPayload(skill);
+  const dispatchPayload = { ...(payload ?? {}), skillKey };
   const maxSkillUses = readSkillUseCap(payload);
   if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
     return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
@@ -272,7 +273,7 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
     target: pickTarget(game, caster),
     side: caster.side,
     cost: skillCost,
-    payload,
+    payload: dispatchPayload,
     deferEffects: true,
     tagsNormalized: true,
     tagsCanonical: true,
@@ -290,6 +291,9 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
 
   if (usesTagAetherCost && !consumedAether) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, dispatch.targets.length, 'insufficient-aether');
+  }
+  if (dispatch.sideEffects.includes('heal-blocked')) {
+    return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
 
   const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
