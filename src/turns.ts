@@ -102,30 +102,33 @@ const INTERLEAVED_ACTION_DELAY_MS = 2200;
 
 const DEFAULT_MUTATION_DEBUFF_POOL: Array<'bleed' | 'stun' | 'poison'> = ['bleed', 'stun', 'poison'];
 const PVE_CREEP_ID_PATTERN = /^creep_\d+$/i;
-const MUTATION_DEBUFF_SET = new Set<'bleed' | 'stun' | 'poison'>(DEFAULT_MUTATION_DEBUFF_POOL);
+const cloneDefaultMutationDebuffPool = (): Array<'bleed' | 'stun' | 'poison'> => [...DEFAULT_MUTATION_DEBUFF_POOL];
+const isMutationDebuffId = (value: unknown): value is 'bleed' | 'stun' | 'poison' => (
+  value === 'bleed' || value === 'stun' || value === 'poison'
+);
 
 const isPveCreepId = (unitId: unknown): boolean => (
   typeof unitId === 'string' && PVE_CREEP_ID_PATTERN.test(unitId)
 );
 
 const sanitizeMutationDebuffPool = (pool: unknown): Array<'bleed' | 'stun' | 'poison'> => {
-  if (!Array.isArray(pool)) return [...DEFAULT_MUTATION_DEBUFF_POOL];
-  const filtered: Array<'bleed' | 'stun' | 'poison'> = [];
+  if (!Array.isArray(pool)) return cloneDefaultMutationDebuffPool();
+  const filteredSet = new Set<'bleed' | 'stun' | 'poison'>();
   for (let i = 0; i < pool.length; i += 1) {
     const id = pool[i];
-    if (id === 'bleed' || id === 'stun' || id === 'poison') {
-      if (!filtered.includes(id)) {
-        filtered.push(id);
-      }
+    if (isMutationDebuffId(id)) {
+      filteredSet.add(id);
       continue;
     }
-    if (typeof id === 'string' && MUTATION_DEBUFF_SET.has(id as 'bleed' | 'stun' | 'poison')) {
-      if (!filtered.includes(id as 'bleed' | 'stun' | 'poison')) {
-        filtered.push(id as 'bleed' | 'stun' | 'poison');
+    if (typeof id === 'string') {
+      const normalizedId = id.toLowerCase();
+      if (isMutationDebuffId(normalizedId)) {
+        filteredSet.add(normalizedId);
       }
     }
   }
-  return filtered.length > 0 ? filtered : [...DEFAULT_MUTATION_DEBUFF_POOL];
+  const filtered = Array.from(filteredSet);
+  return filtered.length > 0 ? filtered : cloneDefaultMutationDebuffPool();
 };
 
 const clampResourceAfterRegen = (value: number, max: number | undefined): number => {

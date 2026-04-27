@@ -327,7 +327,7 @@ __modules['./ai.ts'] = (exports, module, __require) => {
   const __dep1 = __require('./config.ts');
   const CFG = __dep1.CFG;
   const __dep2 = __require('./utils/time.ts');
-  const sharedSafeNow = __dep2.safeNow;
+  const safeNow = __dep2.safeNow;
   const __dep3 = __require('./utils/kit.ts');
   const detectUltBehavior = __dep3.detectUltBehavior;
   const getSummonSpec = __dep3.getSummonSpec;
@@ -354,7 +354,6 @@ __modules['./ai.ts'] = (exports, module, __require) => {
           return null;
       return candidate;
   }
-  const safeNow = () => sharedSafeNow();
   const DEFAULT_WEIGHTS = Object.freeze({
       pressure: 0.42,
       safety: 0.2,
@@ -1215,11 +1214,8 @@ __modules['./art.ts'] = (exports, module, __require) => {
           outline: palette.outline ?? DEFAULT_PALETTE.outline,
       };
   }
-  function ensurePalette(palette) {
-      return normalizePalette(palette);
-  }
   function svgShield(paletteInput) {
-      const palette = ensurePalette(paletteInput);
+      const palette = normalizePalette(paletteInput);
       const gradId = sanitizeId('gradShield', palette);
       const light = palette.accent || '#f4f8ff';
       const outline = palette.outline || 'rgba(12,18,26,0.85)';
@@ -1238,7 +1234,7 @@ __modules['./art.ts'] = (exports, module, __require) => {
       return svgData(96, 120, body);
   }
   function svgWing(paletteInput) {
-      const palette = ensurePalette(paletteInput);
+      const palette = normalizePalette(paletteInput);
       const gradId = sanitizeId('gradWing', palette);
       const accent = palette.accent || '#ffe2e6';
       const outline = palette.outline || 'rgba(24,12,16,0.85)';
@@ -1256,7 +1252,7 @@ __modules['./art.ts'] = (exports, module, __require) => {
       return svgData(120, 128, body);
   }
   function svgRune(paletteInput) {
-      const palette = ensurePalette(paletteInput);
+      const palette = normalizePalette(paletteInput);
       const gradId = sanitizeId('gradRune', palette);
       const accent = palette.accent || '#f1dbff';
       const outline = palette.outline || 'rgba(22,15,35,0.85)';
@@ -1275,7 +1271,7 @@ __modules['./art.ts'] = (exports, module, __require) => {
       return svgData(120, 120, body);
   }
   function svgBloom(paletteInput) {
-      const palette = ensurePalette(paletteInput);
+      const palette = normalizePalette(paletteInput);
       const gradId = sanitizeId('gradBloom', palette);
       const accent = palette.accent || '#ffeef7';
       const outline = palette.outline || 'rgba(22,26,24,0.78)';
@@ -1293,7 +1289,7 @@ __modules['./art.ts'] = (exports, module, __require) => {
       return svgData(120, 128, body);
   }
   function svgPike(paletteInput) {
-      const palette = ensurePalette(paletteInput);
+      const palette = normalizePalette(paletteInput);
       const gradId = sanitizeId('gradPike', palette);
       const accent = palette.accent || '#f9f7e8';
       const outline = palette.outline || 'rgba(28,26,18,0.82)';
@@ -1311,7 +1307,7 @@ __modules['./art.ts'] = (exports, module, __require) => {
       return svgData(120, 120, body);
   }
   function svgSentinel(paletteInput) {
-      const palette = ensurePalette(paletteInput);
+      const palette = normalizePalette(paletteInput);
       const gradId = sanitizeId('gradSentinel', palette);
       const accent = palette.accent || '#e1f7ff';
       const outline = palette.outline || 'rgba(18,25,32,0.85)';
@@ -1439,7 +1435,7 @@ __modules['./art.ts'] = (exports, module, __require) => {
           sprite: selectedSprite,
           skins: clonedSkins,
           defaultSkin: baseArt.defaultSkin,
-          palette: ensurePalette(baseArt.palette),
+          palette: normalizePalette(baseArt.palette),
           shape: baseArt.shape,
           size: baseArt.size,
           shadow: cloneShadow(baseArt.shadow),
@@ -1976,18 +1972,19 @@ __modules['./background.ts'] = (exports, module, __require) => {
       return clone;
   };
   const normalizeVector = (value, fallbackX, fallbackY) => {
+      const pair = normalizePair(value, fallbackX, fallbackY, 'x', 'y');
+      return { x: pair.a, y: pair.b };
+  };
+  const normalizePair = (value, fallbackA, fallbackB, keyA, keyB) => {
       const record = isRecord(value) ? value : {};
       return {
-          x: toNumberOr(record.x, fallbackX),
-          y: toNumberOr(record.y, fallbackY),
+          a: toNumberOr(record[keyA], fallbackA),
+          b: toNumberOr(record[keyB], fallbackB),
       };
   };
   const normalizeSize = (value, fallbackW, fallbackH) => {
-      const record = isRecord(value) ? value : {};
-      return {
-          w: toNumberOr(record.w, fallbackW),
-          h: toNumberOr(record.h, fallbackH),
-      };
+      const pair = normalizePair(value, fallbackW, fallbackH, 'w', 'h');
+      return { w: pair.a, h: pair.b };
   };
   const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
   const SCENERY = {
@@ -4576,6 +4573,11 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   };
   const clamp01 = (value) => Math.max(0, Math.min(1, toFinite(value, 0)));
   const REFLECT_EQUAL_EPSILON = 0.0001;
+  const ZERO_REFLECT_RESULT = Object.freeze({
+      reflectedToAttacker: 0,
+      reflectedToTarget: 0,
+  });
+  const toNonEmptyString = (value) => (typeof value === 'string' && value.trim() ? value : null);
   const applyResolvedReflectDamage = (source, receiver, incomingDamage, dtype) => {
       const normalizedIncoming = Math.max(0, Math.floor(incomingDamage));
       if (normalizedIncoming <= 0)
@@ -4614,7 +4616,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   const resolveReflectDamage = (attacker, target, dealt, dtype) => {
       const targetReflect = clamp01(Statuses.get(target, 'reflect')?.power ?? 0);
       if (dealt <= 0 || targetReflect <= 0) {
-          return { reflectedToAttacker: 0, reflectedToTarget: 0 };
+          return ZERO_REFLECT_RESULT;
       }
       const attackerReflect = clamp01(Statuses.get(attacker, 'reflect')?.power ?? 0);
       const hasEqualReflect = Math.abs(targetReflect - attackerReflect) <= REFLECT_EQUAL_EPSILON;
@@ -4627,7 +4629,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       }
       const netReflectPct = Math.max(0, targetReflect - attackerReflect);
       if (netReflectPct <= 0) {
-          return { reflectedToAttacker: 0, reflectedToTarget: 0 };
+          return ZERO_REFLECT_RESULT;
       }
       const reflectedToAttacker = applyResolvedReflectDamage(target, attacker, Math.round(dealt * netReflectPct), dtype);
       return { reflectedToAttacker, reflectedToTarget: 0 };
@@ -4699,30 +4701,22 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       return false;
   };
   const getSharedHpGroup = (target) => {
-      const sharedHpGroup = target.sharedHpGroup;
-      if (typeof sharedHpGroup === 'string' && sharedHpGroup.trim())
-          return sharedHpGroup;
-      const sharedDamageGroup = target.sharedDamageGroup;
-      if (typeof sharedDamageGroup === 'string' && sharedDamageGroup.trim())
-          return sharedDamageGroup;
-      const linkGroup = target.linkGroup;
-      if (typeof linkGroup === 'string' && linkGroup.trim())
-          return linkGroup;
+      const targetGroup = toNonEmptyString(target.sharedHpGroup)
+          ?? toNonEmptyString(target.sharedDamageGroup)
+          ?? toNonEmptyString(target.linkGroup);
+      if (targetGroup)
+          return targetGroup;
       const statuses = Array.isArray(target.statuses) ? target.statuses : [];
       for (let i = 0; i < statuses.length; i += 1) {
           const status = statuses[i];
           const idTag = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
           if (!idTag.includes('share'))
               continue;
-          const group = status.group;
-          if (typeof group === 'string' && group.trim())
-              return group;
-          const link = status.link;
-          if (typeof link === 'string' && link.trim())
-              return link;
-          const key = status.key;
-          if (typeof key === 'string' && key.trim())
-              return key;
+          const statusGroup = toNonEmptyString(status.group)
+              ?? toNonEmptyString(status.link)
+              ?? toNonEmptyString(status.key);
+          if (statusGroup)
+              return statusGroup;
       }
       return null;
   };
@@ -8585,10 +8579,10 @@ __modules['./config.ts'] = (exports, module, __require) => {
   const parsedConfig = parseGameConfig(rawConfig); // behavior-preserving validation
   Object.freeze(parsedConfig);
   const CFG = parsedConfig;
-  const CAM = {
+  const CAM = Object.freeze({
       landscape_oblique: { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 },
       portrait_leader45: { rowGapRatio: 0.72, topScale: 0.86, depthScale: 0.96 },
-  };
+  });
   // === Token render style ===
   const TOKEN_STYLE = 'chibi';
   // Proportions cho chibi (tính theo bán kính cơ sở r)
@@ -8951,7 +8945,7 @@ __modules['./cultivation.ts'] = (exports, module, __require) => {
           },
       },
   };
-  const ZERO_BONUS = {
+  const ZERO_BONUS = Object.freeze({
       hpMax: 0,
       atk: 0,
       wil: 0,
@@ -8959,7 +8953,7 @@ __modules['./cultivation.ts'] = (exports, module, __require) => {
       res: 0,
       aeMax: 0,
       aeRegen: 0,
-  };
+  });
   const asNonNegativeInt = (value, fallback = 0) => {
       const parsed = typeof value === 'number' ? value : Number(value);
       if (!Number.isFinite(parsed))
@@ -11465,13 +11459,9 @@ __modules['./engine.ts'] = (exports, module, __require) => {
   function cellReserved(tokens, queued, cx, cy) {
       if (cellOccupied(tokens, cx, cy))
           return true;
-      if (queued) {
-          if (queueContainsCell(queued.ally, cx, cy))
-              return true;
-          if (queueContainsCell(queued.enemy, cx, cy))
-              return true;
-      }
-      return false;
+      if (!queued)
+          return false;
+      return queueContainsCell(queued.ally, cx, cy) || queueContainsCell(queued.enemy, cx, cy);
   }
   function spawnLeaders(tokens, g) {
       const artAlly = getUnitArt('leaderA');
@@ -11503,32 +11493,33 @@ __modules['./engine.ts'] = (exports, module, __require) => {
   }
   /* ---------- Helper ---------- */
   function pickRandom(pool, excludeSet, n = 4) {
-      const remain = pool
-          .filter((u) => {
-          if (typeof u === 'undefined') {
-              return false;
-          }
+      if (n <= 0)
+          return [];
+      const remain = [];
+      for (const u of pool) {
+          if (typeof u === 'undefined')
+              continue;
           if (u && typeof u === 'object') {
               const candidate = u;
               const id = candidate.id;
-              if (id !== undefined && id !== null) {
-                  return !excludeSet.has(String(id));
-              }
-              return true;
+              if (id !== undefined && id !== null && excludeSet.has(String(id)))
+                  continue;
+              remain.push(u);
+              continue;
           }
-          if (typeof u === 'string') {
-              return !excludeSet.has(u);
-          }
-          return true;
-      })
-          .slice();
+          if (typeof u === 'string' && excludeSet.has(u))
+              continue;
+          remain.push(u);
+      }
       for (let i = remain.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           const temp = remain[i];
           remain[i] = remain[j];
           remain[j] = temp;
       }
-      return remain.slice(0, n);
+      if (remain.length === 0)
+          return remain;
+      return n >= remain.length ? remain : remain.slice(0, n);
   }
   const pick3Random = (pool, excludeSet) => pickRandom(pool, excludeSet, 3);
   /* ---------- Oblique grid helpers ---------- */
@@ -12237,8 +12228,9 @@ __modules['./entry.ts'] = (exports, module, __require) => {
   const loadPlayerProfile = __dep4.loadPlayerProfile;
   const __dep5 = __require('./utils/unit-id.ts');
   const normalizeUnitId = __dep5.normalizeUnitId;
-  const isStoppableSession = (value) => (Boolean(value) && typeof value.stop === 'function');
-  const isStartableSession = (value) => (Boolean(value) && typeof value.start === 'function');
+  const hasMethod = (value, methodName) => (Boolean(value) && typeof value[methodName] === 'function');
+  const isStoppableSession = (value) => hasMethod(value, 'stop');
+  const isStartableSession = (value) => hasMethod(value, 'start');
   const SUCCESS_EVENT = 'arclune:loaded';
   const SCREEN_MAIN_MENU = 'main-menu';
   const SCREEN_PVE = 'pve-session';
@@ -13735,9 +13727,7 @@ __modules['./events.ts'] = (exports, module, __require) => {
       if (!HAS_CUSTOM_EVENT)
           return () => null;
       try {
-          const probe = new CustomEvent('__probe__');
-          if (!(probe instanceof Event))
-              return () => null;
+          new CustomEvent('__probe__');
           return (type, detail) => new CustomEvent(type, { detail });
       }
       catch {
@@ -13748,8 +13738,7 @@ __modules['./events.ts'] = (exports, module, __require) => {
       if (!HAS_EVENT_CONSTRUCTOR)
           return () => null;
       try {
-          const probe = new Event('__probe__');
-          probe.detail = null;
+          new Event('__probe__');
           return (type, detail) => {
               const event = new Event(type);
               event.detail = detail;
@@ -13953,6 +13942,12 @@ __modules['./leader-uyen.ts'] = (exports, module, __require) => {
       return !!unit && typeof unit.id === 'string' && unit.id.startsWith('leader');
   }
   const stateMap = new WeakMap();
+  const getFury = (unit) => (Number.isFinite(unit?.fury) ? Number(unit?.fury) : 0);
+  const getFuryCap = (unit) => (Math.max(1, Number.isFinite(unit?.furyMax) ? Number(unit?.furyMax) : 100));
+  const addFury = (unit, amount) => {
+      unit.fury = Math.min(getFuryCap(unit), getFury(unit) + amount);
+      unit.rage = unit.fury;
+  };
   function isUyenLeader(unit) {
       return !!unit && (unit.id === 'leaderA' || unit.id === 'leaderB');
   }
@@ -13975,8 +13970,8 @@ __modules['./leader-uyen.ts'] = (exports, module, __require) => {
   function isLeaderUltReady(unit) {
       if (!unit)
           return false;
-      const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
-      const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
+      const fury = getFury(unit);
+      const furyMax = getFuryCap(unit);
       return fury >= furyMax || fury >= 100;
   }
   function canCastLeaderUltChoice(unit, choice) {
@@ -14020,10 +14015,7 @@ __modules['./leader-uyen.ts'] = (exports, module, __require) => {
               return;
           state.reviveRageCount += 1;
       }
-      const current = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
-      const cap = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
-      unit.fury = Math.min(cap, current + 5);
-      unit.rage = unit.fury;
+      addFury(unit, 5);
   }
   function applyUyenBasicExtras(attacker, target, options = {}) {
       if (!isUyenLeader(attacker) || !target)
@@ -14032,19 +14024,13 @@ __modules['./leader-uyen.ts'] = (exports, module, __require) => {
       if (!state)
           return;
       if (state.a1Stacks > 0) {
-          const fury = Number.isFinite(attacker.fury) ? Number(attacker.fury) : 0;
-          const cap = Math.max(1, Number.isFinite(attacker.furyMax) ? Number(attacker.furyMax) : 100);
-          attacker.fury = Math.min(cap, fury + 3);
-          attacker.rage = attacker.fury;
+          addFury(attacker, 3);
       }
       const turnStamp = options.turnStamp ?? null;
       const targetHp = Number.isFinite(target.hp) ? Number(target.hp) : 0;
       const targetHpMax = Math.max(1, Number.isFinite(target.hpMax) ? Number(target.hpMax) : 1);
       if (targetHp / targetHpMax < 0.3 && state.basicTurnStamp !== turnStamp) {
-          const fury = Number.isFinite(attacker.fury) ? Number(attacker.fury) : 0;
-          const cap = Math.max(1, Number.isFinite(attacker.furyMax) ? Number(attacker.furyMax) : 100);
-          attacker.fury = Math.min(cap, fury + 5);
-          attacker.rage = attacker.fury;
+          addFury(attacker, 5);
           state.basicTurnStamp = turnStamp;
       }
       if (options.wasKill) {
@@ -14111,7 +14097,7 @@ __modules['./main.ts'] = (exports, module, __require) => {
   const __reexport0 = __require('./events.ts');
   let currentSession = null;
   const pendingSkins = new Map();
-  const isPlainRecord = (value) => (!!value && typeof value === 'object');
+  const isPlainRecord = (value) => (!!value && typeof value === 'object' && !Array.isArray(value));
   const toRootSource = (value) => {
       if (value == null)
           return value;
@@ -14136,11 +14122,19 @@ __modules['./main.ts'] = (exports, module, __require) => {
           return defaultRootTarget();
       return config.root ?? config.rootEl ?? config.element ?? defaultRootTarget();
   }
-  const resolveRootFromRawOptions = (rawOptions) => resolveRoot({
-      root: toRootSource(rawOptions.root),
-      rootEl: toRootSource(rawOptions.rootEl),
-      element: toRootSource(rawOptions.element),
-  });
+  const normalizeStartOptions = (options) => {
+      const rawOptions = isPlainRecord(options) ? options : {};
+      const { root, rootEl, element, ...rest } = rawOptions;
+      const normalizedRoots = {
+          root: toRootSource(root),
+          rootEl: toRootSource(rootEl),
+          element: toRootSource(element),
+      };
+      return {
+          rootTarget: resolveRoot(normalizedRoots),
+          config: toSessionConfigOverrides(rest),
+      };
+  };
   const flushPendingSkins = (session) => {
       if (!session || pendingSkins.size === 0)
           return;
@@ -14152,10 +14146,7 @@ __modules['./main.ts'] = (exports, module, __require) => {
   };
   function startGame(options) {
       ensureNestedModuleSupport();
-      const rawOptions = isPlainRecord(options) ? options : {};
-      const { root, rootEl, element, ...rest } = rawOptions;
-      const rootTarget = resolveRootFromRawOptions({ root, rootEl, element });
-      const initialConfig = toSessionConfigOverrides(rest);
+      const { rootTarget, config: initialConfig } = normalizeStartOptions(options);
       if (!currentSession) {
           currentSession = createPveSession(rootTarget, initialConfig);
       }
@@ -14172,10 +14163,10 @@ __modules['./main.ts'] = (exports, module, __require) => {
       currentSession.stop();
       currentSession = null;
   }
-  function updateGameConfig(config = {}) {
+  function updateGameConfig(config) {
       if (!currentSession)
           return;
-      currentSession.updateConfig(config ?? {});
+      currentSession.updateConfig(toSessionConfigOverrides(config));
   }
   function getCurrentSession() {
       return currentSession;
@@ -14263,7 +14254,8 @@ __modules['./meta.ts'] = (exports, module, __require) => {
       classOf(id) {
           if (!id)
               return null;
-          return normalizeClassName(Meta.classOf(id));
+          const className = Meta.classOf(id);
+          return typeof className === 'string' ? className : null;
       },
       rankOf(id) {
           if (!id)
@@ -14298,48 +14290,43 @@ __modules['./meta.ts'] = (exports, module, __require) => {
       aeRegen: 0,
       hpRegen: 0,
   };
+  const cloneEmptyStats = () => ({ ...EMPTY_INSTANCE_STATS });
   const isRankName = (value) => (typeof value === 'string' && value in RANK_MULT);
-  const coerceStatMods = (mods) => {
-      if (!mods || typeof mods !== 'object')
-          return undefined;
-      const out = {};
-      for (const [key, raw] of Object.entries(mods)) {
-          if (typeof raw !== 'number' || !Number.isFinite(raw))
-              continue;
-          out[key] = raw;
-      }
-      return out;
-  };
   function makeInstanceStats(unitId, level = 1, stars = 0) {
       const entry = Meta.get(unitId);
       if (!entry)
-          return { ...EMPTY_INSTANCE_STATS };
+          return cloneEmptyStats();
       const className = normalizeClassName(entry.class);
       const rank = entry.rank;
       if (!className || !isRankName(rank))
-          return { ...EMPTY_INSTANCE_STATS };
+          return cloneEmptyStats();
       const base = CLASS_BASE[className];
       const growthByClass = CLASS_GROWTH;
       const delta = growthByClass[className] ?? {};
-      // 1. TÍNH CHỈ SỐ GỐC THEO LEVEL (TIA LASER)
       const currentBase = {
           HP: base.HP + (level - 1) * (delta.HP ?? 0),
           ATK: base.ATK + (level - 1) * (delta.ATK ?? 0),
           WIL: base.WIL + (level - 1) * (delta.WIL ?? 0),
           ARM: base.ARM + (level - 1) * (delta.ARM ?? 0),
           RES: base.RES + (level - 1) * (delta.RES ?? 0),
+          AGI: base.AGI ?? 0,
+          PER: base.PER ?? 0,
+          SPD: base.SPD || 1,
+          AEmax: base.AEmax ?? 0,
+          AEregen: base.AEregen || 0,
+          HPregen: base.HPregen || 0,
       };
-      // 2. TÍNH HỆ SỐ (THẤU KÍNH) = RANK + SAO
       const rankMult = RANK_MULT[rank] + (stars * 0.05);
-      const scaledHp = Math.trunc(currentBase.HP * rankMult);
-      // 3. XUẤT CHỈ SỐ CUỐI (LASER x THẤU KÍNH)
+      const scaleInt = (value) => Math.trunc(value * rankMult);
+      const scaleFixed4 = (value) => Number((value * rankMult).toFixed(4));
+      const scaledHp = scaleInt(currentBase.HP);
       return {
           hpMax: scaledHp,
           hp: scaledHp,
-          atk: Math.trunc(currentBase.ATK * rankMult),
-          wil: Math.trunc(currentBase.WIL * rankMult),
-          arm: Number((currentBase.ARM * rankMult).toFixed(4)),
-          res: Number((currentBase.RES * rankMult).toFixed(4)),
+          atk: scaleInt(currentBase.ATK),
+          wil: scaleInt(currentBase.WIL),
+          arm: scaleFixed4(currentBase.ARM),
+          res: scaleFixed4(currentBase.RES),
           agi: Math.trunc(base.AGI ?? 0),
           per: Math.trunc(base.PER ?? 0),
           spd: base.SPD || 1,
@@ -20632,6 +20619,9 @@ __modules['./passives.ts'] = (exports, module, __require) => {
       const logCandidate = Game?.passiveLog;
       if (!Array.isArray(logCandidate))
           return [];
+      const allRecords = logCandidate.every((entry) => isRecord(entry));
+      if (allRecords)
+          return logCandidate;
       const result = [];
       for (const entry of logCandidate) {
           if (isRecord(entry)) {
@@ -21461,13 +21451,18 @@ __modules['./scene.ts'] = (exports, module, __require) => {
   function normalizeDimension(value) {
       if (!Number.isFinite(value))
           return 0;
-      return value;
+      const dimension = value;
+      return dimension > 0 ? dimension : 0;
+  }
+  function resolvePositiveNumber(value, fallback) {
+      if (!Number.isFinite(value))
+          return fallback;
+      const numeric = value;
+      return numeric > 0 ? numeric : fallback;
   }
   function createOffscreenCanvas(pixelWidth, pixelHeight) {
       const safeW = Math.max(1, Math.floor(pixelWidth || 0));
       const safeH = Math.max(1, Math.floor(pixelHeight || 0));
-      if (!safeW || !safeH)
-          return null;
       if (typeof OffscreenCanvas === 'function') {
           try {
               return new OffscreenCanvas(safeW, safeH);
@@ -21534,9 +21529,7 @@ __modules['./scene.ts'] = (exports, module, __require) => {
           return null;
       const cssWidth = normalizeDimension(options.width ?? g.w);
       const cssHeight = normalizeDimension(options.height ?? g.h);
-      const dpr = Number.isFinite(options.dpr) && (options.dpr ?? 0) > 0
-          ? options.dpr
-          : (Number.isFinite(g.dpr) && (g.dpr ?? 0) > 0 ? g.dpr : 1);
+      const dpr = resolvePositiveNumber(options.dpr, resolvePositiveNumber(g.dpr, 1));
       if (!cssWidth || !cssHeight)
           return null;
       const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
@@ -36544,7 +36537,12 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       if (unit.hasDivineNature === true)
           return true;
       const rawTags = Array.isArray(unit.tags) ? unit.tags : [];
-      const tags = normalizeTagList(rawTags.filter((tag) => typeof tag === 'string'));
+      const stringTags = [];
+      for (const tag of rawTags) {
+          if (typeof tag === 'string')
+              stringTags.push(tag);
+      }
+      const tags = normalizeTagList(stringTags);
       return tags.includes('divine-nature');
   };
   const isTokenCandidate = (value) => {
@@ -37040,11 +37038,12 @@ __modules['./summon.ts'] = (exports, module, __require) => {
       const list = Game.actionChain.filter((x) => x.side === side);
       if (!list.length)
           return baseSlot ?? null;
+      const aliveTokens = tokensAlive(Game);
       list.sort((a, b) => a.slot - b.slot);
       let maxSlot = baseSlot ?? 0;
       for (const item of list) {
           const { cx, cy } = slotToCell(side, item.slot);
-          if (cellReserved(tokensAlive(Game), Game.queued, cx, cy))
+          if (cellReserved(aliveTokens, Game.queued, cx, cy))
               continue;
           const extra = item.unit ?? {};
           const art = getUnitArt(extra.id ?? 'minion');
@@ -37068,6 +37067,7 @@ __modules['./summon.ts'] = (exports, module, __require) => {
               iid: extra.iid,
           };
           Game.tokens.push(newToken);
+          aliveTokens.push(newToken);
           try {
               const sessionVfx = asSessionWithVfx(Game);
               if (sessionVfx) {
@@ -37234,27 +37234,28 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   const INTERLEAVED_ACTION_DELAY_MS = 2200;
   const DEFAULT_MUTATION_DEBUFF_POOL = ['bleed', 'stun', 'poison'];
   const PVE_CREEP_ID_PATTERN = /^creep_\d+$/i;
-  const MUTATION_DEBUFF_SET = new Set(DEFAULT_MUTATION_DEBUFF_POOL);
+  const cloneDefaultMutationDebuffPool = () => [...DEFAULT_MUTATION_DEBUFF_POOL];
+  const isMutationDebuffId = (value) => (value === 'bleed' || value === 'stun' || value === 'poison');
   const isPveCreepId = (unitId) => (typeof unitId === 'string' && PVE_CREEP_ID_PATTERN.test(unitId));
   const sanitizeMutationDebuffPool = (pool) => {
       if (!Array.isArray(pool))
-          return [...DEFAULT_MUTATION_DEBUFF_POOL];
-      const filtered = [];
+          return cloneDefaultMutationDebuffPool();
+      const filteredSet = new Set();
       for (let i = 0; i < pool.length; i += 1) {
           const id = pool[i];
-          if (id === 'bleed' || id === 'stun' || id === 'poison') {
-              if (!filtered.includes(id)) {
-                  filtered.push(id);
-              }
+          if (isMutationDebuffId(id)) {
+              filteredSet.add(id);
               continue;
           }
-          if (typeof id === 'string' && MUTATION_DEBUFF_SET.has(id)) {
-              if (!filtered.includes(id)) {
-                  filtered.push(id);
+          if (typeof id === 'string') {
+              const normalizedId = id.toLowerCase();
+              if (isMutationDebuffId(normalizedId)) {
+                  filteredSet.add(normalizedId);
               }
           }
       }
-      return filtered.length > 0 ? filtered : [...DEFAULT_MUTATION_DEBUFF_POOL];
+      const filtered = Array.from(filteredSet);
+      return filtered.length > 0 ? filtered : cloneDefaultMutationDebuffPool();
   };
   const clampResourceAfterRegen = (value, max) => {
       if (typeof max !== 'number' || !Number.isFinite(max)) {
@@ -38315,6 +38316,7 @@ __modules['./ui.ts'] = (exports, module, __require) => {
   const gameEvents = __dep1.gameEvents;
   const __dep2 = __require('./ui/dom.ts');
   const assertElement = __dep2.assertElement;
+  const HUD_EVENT_TYPES = [TURN_START, TURN_END, ACTION_END];
   function canQuery(node) {
       return !!node && typeof node.querySelector === 'function';
   }
@@ -38394,8 +38396,7 @@ __modules['./ui.ts'] = (exports, module, __require) => {
           }
       };
       if (gameEvents) {
-          const types = [TURN_START, TURN_END, ACTION_END];
-          for (const type of types) {
+          for (const type of HUD_EVENT_TYPES) {
               disposers.push(addGameEventListener(type, handleGameEvent));
           }
       }
@@ -38785,10 +38786,9 @@ __modules['./units.ts'] = (exports, module, __require) => {
       cost: resolveUnitCost(unit),
   }));
   const UNITS = RESOLVED_UNIT_LIST;
-  const UNIT_INDEX_INTERNAL = new Map(RESOLVED_UNIT_LIST.map((unit) => [unit.id, unit]));
-  const UNIT_INDEX = UNIT_INDEX_INTERNAL;
+  const UNIT_INDEX = new Map(RESOLVED_UNIT_LIST.map((unit) => [unit.id, unit]));
   function lookupUnit(unitId) {
-      const unit = UNIT_INDEX_INTERNAL.get(unitId);
+      const unit = UNIT_INDEX.get(unitId);
       return unit ? { ...unit } : null;
   }
   //# sourceMappingURL=stdin.js.map
@@ -40453,7 +40453,6 @@ __modules['./vfx.ts'] = (exports, module, __require) => {
           return null;
       return game;
   }
-  const now = () => safeNow();
   const lerp = (a, b, t) => a + (b - a) * t;
   const easeInOut = (t) => (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, t)))) * 0.5;
   const isFiniteCoord = (value) => Number.isFinite(value);
@@ -40680,7 +40679,7 @@ __modules['./vfx.ts'] = (exports, module, __require) => {
           const duration = Number.isFinite(e.dur) ? e.dur : 0;
           if (!duration)
               continue;
-          const elapsed = now() - e.t0;
+          const elapsed = safeNow() - e.t0;
           const tt = clamp01(elapsed / duration);
           if (tt <= 0 || tt >= 1)
               continue;
@@ -41014,16 +41013,16 @@ __modules['./vfx.ts'] = (exports, module, __require) => {
   }
   /* ------------------- Adders ------------------- */
   function vfxAddSpawn(Game, cx, cy, side) {
-      const spawn = { type: 'spawn', t0: now(), dur: 500, cx, cy, side };
+      const spawn = { type: 'spawn', t0: safeNow(), dur: 500, cx, cy, side };
       pool(Game).push(spawn);
   }
   function vfxAddHit(Game, target, opts = {}) {
-      const event = { type: 'hit', t0: now(), dur: 380, ref: target, ...opts };
+      const event = { type: 'hit', t0: safeNow(), dur: 380, ref: target, ...opts };
       pool(Game).push(event);
   }
   function vfxAddTracer(Game, attacker, target, opts = {}) {
       const dur = Number.isFinite(opts?.dur) ? Number(opts.dur) : 400;
-      const event = { type: 'tracer', t0: now(), dur, refA: attacker, refB: target };
+      const event = { type: 'tracer', t0: safeNow(), dur, refA: attacker, refB: target };
       pool(Game).push(event);
   }
   function vfxAddMelee(Game, attacker, target, { dur = CFG?.ANIMATION?.meleeDurationMs ?? 2000 } = {}) {
@@ -41037,7 +41036,7 @@ __modules['./vfx.ts'] = (exports, module, __require) => {
       const targetCy = typeof target?.cy === 'number' ? target.cy : null;
       const event = {
           type: 'melee',
-          t0: now(),
+          t0: safeNow(),
           dur,
           refA: attacker,
           refB: target,
@@ -41072,7 +41071,7 @@ __modules['./vfx.ts'] = (exports, module, __require) => {
           : null;
       const event = {
           type: 'lightning_arc',
-          t0: now(),
+          t0: safeNow(),
           dur: busyMs,
           refA: source,
           refB: target || null,
@@ -41106,7 +41105,7 @@ __modules['./vfx.ts'] = (exports, module, __require) => {
       });
       const event = {
           type: 'blood_pulse',
-          t0: now(),
+          t0: safeNow(),
           dur: busyMs,
           refA: source,
           anchorA: anchor.id,
@@ -41140,7 +41139,7 @@ __modules['./vfx.ts'] = (exports, module, __require) => {
           : null;
       const event = {
           type: 'shield_wrap',
-          t0: now(),
+          t0: safeNow(),
           dur: busyMs,
           refA: source,
           anchorA: front.id,
@@ -41168,7 +41167,7 @@ __modules['./vfx.ts'] = (exports, module, __require) => {
       });
       const event = {
           type: 'ground_burst',
-          t0: now(),
+          t0: safeNow(),
           dur: busyMs,
           refA: source,
           anchorA: anchor.id,
@@ -41233,7 +41232,7 @@ __modules['./vfx.ts'] = (exports, module, __require) => {
           return;
       const keep = [];
       for (const e of list) {
-          const t = (now() - e.t0) / e.dur;
+          const t = (safeNow() - e.t0) / e.dur;
           const done = t >= 1;
           const tt = Math.max(0, Math.min(1, t));
           switch (e.type) {

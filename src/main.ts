@@ -49,7 +49,7 @@ let currentSession: ActiveSessionHandle | null = null;
 const pendingSkins = new Map<string, string | null>();
 
 const isPlainRecord = (value: unknown): value is Record<string, unknown> => (
-  !!value && typeof value === 'object'
+  !!value && typeof value === 'object' && !Array.isArray(value)
 );
 
 const toRootSource = (value: unknown): RootSource => {
@@ -78,11 +78,21 @@ function resolveRoot(
   return config.root ?? config.rootEl ?? config.element ?? defaultRootTarget();
 }
 
-const resolveRootFromRawOptions = (rawOptions: Record<string, unknown>): RootTarget => resolveRoot({
-  root: toRootSource(rawOptions.root),
-  rootEl: toRootSource(rawOptions.rootEl),
-  element: toRootSource(rawOptions.element),
-});
+const normalizeStartOptions = (
+  options: StartGameOptions | null | undefined,
+): { rootTarget: RootTarget; config: SessionConfigOverrides } => {
+  const rawOptions: Record<string, unknown> = isPlainRecord(options) ? options : {};
+  const { root, rootEl, element, ...rest } = rawOptions;
+  const normalizedRoots = {
+    root: toRootSource(root),
+    rootEl: toRootSource(rootEl),
+    element: toRootSource(element),
+  } as const;
+  return {
+    rootTarget: resolveRoot(normalizedRoots),
+    config: toSessionConfigOverrides(rest),
+  };
+};
 
 const flushPendingSkins = (session: ActiveSessionHandle | null): void => {
   if (!session || pendingSkins.size === 0) return;
@@ -95,10 +105,7 @@ const flushPendingSkins = (session: ActiveSessionHandle | null): void => {
 
 export function startGame(options?: StartGameOptions | null): SessionState {
   ensureNestedModuleSupport();
-  const rawOptions = isPlainRecord(options) ? options : {};
-  const { root, rootEl, element, ...rest } = rawOptions as Record<string, unknown>;
-  const rootTarget = resolveRootFromRawOptions({ root, rootEl, element });
-  const initialConfig = toSessionConfigOverrides(rest);
+  const { rootTarget, config: initialConfig } = normalizeStartOptions(options);
   if (!currentSession) {
     currentSession = createPveSession(rootTarget, initialConfig);
   }
@@ -116,9 +123,9 @@ export function stopGame(): void {
   currentSession = null;
 }
 
-export function updateGameConfig(config: SessionConfigOverrides | null | undefined = {}): void {
+export function updateGameConfig(config?: SessionConfigOverrides | null): void {
   if (!currentSession) return;
-  currentSession.updateConfig(config ?? {});
+  currentSession.updateConfig(toSessionConfigOverrides(config));
 }
 
 export function getCurrentSession(): ActiveSessionHandle | null {

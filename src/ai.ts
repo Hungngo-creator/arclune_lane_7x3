@@ -1,7 +1,7 @@
 //home (termux)/arclune_lane_7x3/src/ai.ts
 import { pickRandom, slotToCell, cellReserved } from './engine.ts';
 import { CFG } from './config.ts';
-import { safeNow as sharedSafeNow } from './utils/time.ts';
+import { safeNow } from './utils/time.ts';
 import { detectUltBehavior, getSummonSpec, resolveSummonSlots } from './utils/kit.ts';
 import { lookupUnit } from './units.ts';
 import { globalAetherPool } from './aether.ts';
@@ -102,8 +102,6 @@ interface AiDecision extends Record<string, unknown> {
   considered: CandidateDebug[];
   skipped: string | null;
 }
-
-const safeNow = (): number => sharedSafeNow();
 
 const DEFAULT_WEIGHTS = Object.freeze({
   pressure: 0.42,

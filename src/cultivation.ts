@@ -189,7 +189,7 @@ const REALM_CONFIGS: Record<number, RealmConfig> = {
   },
 };
 
-const ZERO_BONUS: CultivationStepBonus = {
+const ZERO_BONUS: Readonly<CultivationStepBonus> = Object.freeze({
   hpMax: 0,
   atk: 0,
   wil: 0,
@@ -197,7 +197,7 @@ const ZERO_BONUS: CultivationStepBonus = {
   res: 0,
   aeMax: 0,
   aeRegen: 0,
-};
+});
 
 const asNonNegativeInt = (value: unknown, fallback = 0): number => {
   const parsed = typeof value === 'number' ? value : Number(value);

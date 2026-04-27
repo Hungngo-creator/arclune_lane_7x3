@@ -61,13 +61,11 @@ const RESOLVED_UNIT_LIST = UNIT_LIST.map((unit) => ({
 
 export const UNITS: ReadonlyArray<UnitDefinition> = RESOLVED_UNIT_LIST;
 
-const UNIT_INDEX_INTERNAL = new Map<UnitId, UnitDefinition>(
+export const UNIT_INDEX: ReadonlyMap<UnitId, UnitDefinition> = new Map<UnitId, UnitDefinition>(
   RESOLVED_UNIT_LIST.map((unit) => [unit.id, unit] as const),
 );
 
-export const UNIT_INDEX: ReadonlyMap<UnitId, UnitDefinition> = UNIT_INDEX_INTERNAL;
-
 export function lookupUnit(unitId: UnitId): UnitDefinition | null {
-  const unit = UNIT_INDEX_INTERNAL.get(unitId);
+  const unit = UNIT_INDEX.get(unitId);
   return unit ? { ...unit } : null;
 }

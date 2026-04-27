@@ -195,10 +195,10 @@ export const CFG: GameConfig = parsedConfig;
 // Camera presets (giữ nguyên)
 type CameraPresetMap = Record<string, CameraPreset>;
 
-export const CAM: CameraPresetMap = {
+export const CAM: CameraPresetMap = Object.freeze({
   landscape_oblique: { rowGapRatio: 0.62, topScale: 0.80, depthScale: 0.94 },
   portrait_leader45: { rowGapRatio: 0.72, topScale: 0.86, depthScale: 0.96 },
-};
+});
 // === Token render style ===
 export const TOKEN_STYLE: 'chibi' | 'disk' = 'chibi';
 

@@ -21,6 +21,16 @@ interface UyenState {
 }
 
 const stateMap = new WeakMap<UnitToken, UyenState>();
+const getFury = (unit: UnitToken | null | undefined): number => (
+  Number.isFinite(unit?.fury) ? Number(unit?.fury) : 0
+);
+const getFuryCap = (unit: UnitToken | null | undefined): number => (
+  Math.max(1, Number.isFinite(unit?.furyMax) ? Number(unit?.furyMax) : 100)
+);
+const addFury = (unit: UnitToken, amount: number): void => {
+  unit.fury = Math.min(getFuryCap(unit), getFury(unit) + amount);
+  unit.rage = unit.fury;
+};
 
 export function isUyenLeader(unit: UnitToken | null | undefined): boolean {
   return !!unit && (unit.id === 'leaderA' || unit.id === 'leaderB');
@@ -43,8 +53,8 @@ export function ensureUyenState(unit: UnitToken | null | undefined): UyenState |
 
 export function isLeaderUltReady(unit: UnitToken | null | undefined): boolean {
   if (!unit) return false;
-  const fury = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
-  const furyMax = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
+  const fury = getFury(unit);
+  const furyMax = getFuryCap(unit);
   return fury >= furyMax || fury >= 100;
 }
 
@@ -94,10 +104,7 @@ export function grantUyenSummonRage(unit: UnitToken | null | undefined, options:
     if (state.reviveRageCount >= 5) return;
     state.reviveRageCount += 1;
   }
-  const current = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
-  const cap = Math.max(1, Number.isFinite(unit.furyMax) ? Number(unit.furyMax) : 100);
-  unit.fury = Math.min(cap, current + 5);
-  unit.rage = unit.fury;
+  addFury(unit, 5);
 }
 
 export function applyUyenBasicExtras(
@@ -110,20 +117,14 @@ export function applyUyenBasicExtras(
   if (!state) return;
 
   if (state.a1Stacks > 0) {
-    const fury = Number.isFinite(attacker.fury) ? Number(attacker.fury) : 0;
-    const cap = Math.max(1, Number.isFinite(attacker.furyMax) ? Number(attacker.furyMax) : 100);
-    attacker.fury = Math.min(cap, fury + 3);
-    attacker.rage = attacker.fury;
+    addFury(attacker, 3);
   }
 
   const turnStamp = options.turnStamp ?? null;
   const targetHp = Number.isFinite(target.hp) ? Number(target.hp) : 0;
   const targetHpMax = Math.max(1, Number.isFinite(target.hpMax) ? Number(target.hpMax) : 1);
   if (targetHp / targetHpMax < 0.3 && state.basicTurnStamp !== turnStamp) {
-    const fury = Number.isFinite(attacker.fury) ? Number(attacker.fury) : 0;
-    const cap = Math.max(1, Number.isFinite(attacker.furyMax) ? Number(attacker.furyMax) : 100);
-    attacker.fury = Math.min(cap, fury + 5);
-    attacker.rage = attacker.fury;
+    addFury(attacker, 5);
     state.basicTurnStamp = turnStamp;
   }
 

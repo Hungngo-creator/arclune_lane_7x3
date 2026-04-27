@@ -138,6 +138,13 @@ interface ReflectResolutionResult {
 }
 
 const REFLECT_EQUAL_EPSILON = 0.0001;
+const ZERO_REFLECT_RESULT: Readonly<ReflectResolutionResult> = Object.freeze({
+  reflectedToAttacker: 0,
+  reflectedToTarget: 0,
+});
+const toNonEmptyString = (value: unknown): string | null => (
+  typeof value === 'string' && value.trim() ? value : null
+);
 
 const applyResolvedReflectDamage = (
   source: UnitToken,
@@ -190,7 +197,7 @@ const resolveReflectDamage = (
 ): ReflectResolutionResult => {
   const targetReflect = clamp01(Statuses.get(target, 'reflect')?.power ?? 0);
   if (dealt <= 0 || targetReflect <= 0) {
-    return { reflectedToAttacker: 0, reflectedToTarget: 0 };
+    return ZERO_REFLECT_RESULT;
   }
 
   const attackerReflect = clamp01(Statuses.get(attacker, 'reflect')?.power ?? 0);
@@ -206,7 +213,7 @@ const resolveReflectDamage = (
 
   const netReflectPct = Math.max(0, targetReflect - attackerReflect);
   if (netReflectPct <= 0) {
-    return { reflectedToAttacker: 0, reflectedToTarget: 0 };
+    return ZERO_REFLECT_RESULT;
   }
 
   const reflectedToAttacker = applyResolvedReflectDamage(
@@ -290,23 +297,19 @@ const hasAbsoluteLawTag = (unit: UnitToken | null | undefined, mode: 'attack' | 
 };
 
 const getSharedHpGroup = (target: UnitToken): string | null => {
-  const sharedHpGroup = target.sharedHpGroup;
-  if (typeof sharedHpGroup === 'string' && sharedHpGroup.trim()) return sharedHpGroup;
-  const sharedDamageGroup = target.sharedDamageGroup;
-  if (typeof sharedDamageGroup === 'string' && sharedDamageGroup.trim()) return sharedDamageGroup;
-  const linkGroup = target.linkGroup;
-  if (typeof linkGroup === 'string' && linkGroup.trim()) return linkGroup;
+  const targetGroup = toNonEmptyString(target.sharedHpGroup)
+    ?? toNonEmptyString(target.sharedDamageGroup)
+    ?? toNonEmptyString(target.linkGroup);
+  if (targetGroup) return targetGroup;
   const statuses = Array.isArray(target.statuses) ? target.statuses : [];
   for (let i = 0; i < statuses.length; i += 1) {
     const status = statuses[i] as Record<string, unknown>;
     const idTag = `${status.id ?? ''}|${status.tag ?? ''}`.toLowerCase();
     if (!idTag.includes('share')) continue;
-    const group = status.group;
-    if (typeof group === 'string' && group.trim()) return group;
-    const link = status.link;
-    if (typeof link === 'string' && link.trim()) return link;
-    const key = status.key;
-    if (typeof key === 'string' && key.trim()) return key;
+    const statusGroup = toNonEmptyString(status.group)
+      ?? toNonEmptyString(status.link)
+      ?? toNonEmptyString(status.key);
+    if (statusGroup) return statusGroup;
   }
   return null;
 };

@@ -131,10 +131,21 @@ const normalizeVector = (
   fallbackX: number,
   fallbackY: number,
 ): { x: number; y: number } => {
+  const pair = normalizePair(value, fallbackX, fallbackY, 'x', 'y');
+  return { x: pair.a, y: pair.b };
+};
+
+const normalizePair = (
+  value: unknown,
+  fallbackA: number,
+  fallbackB: number,
+  keyA: string,
+  keyB: string,
+): { a: number; b: number } => {
   const record = isRecord(value) ? value : {};
   return {
-    x: toNumberOr(record.x, fallbackX),
-    y: toNumberOr(record.y, fallbackY),
+    a: toNumberOr(record[keyA], fallbackA),
+    b: toNumberOr(record[keyB], fallbackB),
   };
 };
 
@@ -143,11 +154,8 @@ const normalizeSize = (
   fallbackW: number,
   fallbackH: number,
 ): { w: number; h: number } => {
-  const record = isRecord(value) ? value : {};
-  return {
-    w: toNumberOr(record.w, fallbackW),
-    h: toNumberOr(record.h, fallbackH),
-  };
+  const pair = normalizePair(value, fallbackW, fallbackH, 'w', 'h');
+  return { w: pair.a, h: pair.b };
 };
 
 const hasOwn = <Obj extends object, Key extends PropertyKey>(

@@ -93,13 +93,14 @@ export function processActionChain(
 ): number | null {
   const list = Game.actionChain.filter((x): x is ActionChainEntry => x.side === side);
   if (!list.length) return baseSlot ?? null;
+  const aliveTokens = tokensAlive(Game);
 
   list.sort((a, b) => a.slot - b.slot);
 
   let maxSlot = baseSlot ?? 0;
   for (const item of list){
     const { cx, cy } = slotToCell(side, item.slot);
-    if (cellReserved(tokensAlive(Game), Game.queued, cx, cy)) continue;
+    if (cellReserved(aliveTokens, Game.queued, cx, cy)) continue;
 
     const extra = item.unit ?? {};
     const art = getUnitArt(extra.id ?? 'minion');
@@ -123,6 +124,7 @@ export function processActionChain(
       iid: extra.iid,
     };
     Game.tokens.push(newToken);
+    aliveTokens.push(newToken);
       try {
         const sessionVfx = asSessionWithVfx(Game);
         if (sessionVfx) {

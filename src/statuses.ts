@@ -114,7 +114,11 @@ const hasDivineNatureTag = (unit: UnitToken | null | undefined): boolean => {
   if (!unit) return false;
   if (unit.hasDivineNature === true) return true;
   const rawTags: unknown[] = Array.isArray(unit.tags) ? unit.tags : [];
-  const tags = normalizeTagList(rawTags.filter((tag: unknown): tag is string => typeof tag === 'string'));
+  const stringTags: string[] = [];
+  for (const tag of rawTags) {
+    if (typeof tag === 'string') stringTags.push(tag);
+  }
+  const tags = normalizeTagList(stringTags);
   return tags.includes('divine-nature');
 };
 

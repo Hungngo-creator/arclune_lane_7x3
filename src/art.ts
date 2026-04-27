@@ -75,12 +75,8 @@ function normalizePalette(palette: UnitArtPalette | null | undefined): UnitArtPa
   } satisfies UnitArtPalette;
 }
 
-function ensurePalette(palette: UnitArtPalette | null | undefined): UnitArtPalette {
-  return normalizePalette(palette);
-}
-
 function svgShield(paletteInput: UnitArtPalette): string {
-  const palette = ensurePalette(paletteInput);
+  const palette = normalizePalette(paletteInput);
   const gradId = sanitizeId('gradShield', palette);
   const light = palette.accent || '#f4f8ff';
   const outline = palette.outline || 'rgba(12,18,26,0.85)';
@@ -100,7 +96,7 @@ function svgShield(paletteInput: UnitArtPalette): string {
 }
 
 function svgWing(paletteInput: UnitArtPalette): string {
-  const palette = ensurePalette(paletteInput);
+  const palette = normalizePalette(paletteInput);
   const gradId = sanitizeId('gradWing', palette);
   const accent = palette.accent || '#ffe2e6';
   const outline = palette.outline || 'rgba(24,12,16,0.85)';
@@ -119,7 +115,7 @@ function svgWing(paletteInput: UnitArtPalette): string {
 }
 
 function svgRune(paletteInput: UnitArtPalette): string {
-  const palette = ensurePalette(paletteInput);
+  const palette = normalizePalette(paletteInput);
   const gradId = sanitizeId('gradRune', palette);
   const accent = palette.accent || '#f1dbff';
   const outline = palette.outline || 'rgba(22,15,35,0.85)';
@@ -139,7 +135,7 @@ function svgRune(paletteInput: UnitArtPalette): string {
 }
 
 function svgBloom(paletteInput: UnitArtPalette): string {
-  const palette = ensurePalette(paletteInput);
+  const palette = normalizePalette(paletteInput);
   const gradId = sanitizeId('gradBloom', palette);
   const accent = palette.accent || '#ffeef7';
   const outline = palette.outline || 'rgba(22,26,24,0.78)';
@@ -158,7 +154,7 @@ function svgBloom(paletteInput: UnitArtPalette): string {
 }
 
 function svgPike(paletteInput: UnitArtPalette): string {
-  const palette = ensurePalette(paletteInput);
+  const palette = normalizePalette(paletteInput);
   const gradId = sanitizeId('gradPike', palette);
   const accent = palette.accent || '#f9f7e8';
   const outline = palette.outline || 'rgba(28,26,18,0.82)';
@@ -177,7 +173,7 @@ function svgPike(paletteInput: UnitArtPalette): string {
 }
 
 function svgSentinel(paletteInput: UnitArtPalette): string {
-  const palette = ensurePalette(paletteInput);
+  const palette = normalizePalette(paletteInput);
   const gradId = sanitizeId('gradSentinel', palette);
   const accent = palette.accent || '#e1f7ff';
   const outline = palette.outline || 'rgba(18,25,32,0.85)';
@@ -313,7 +309,7 @@ function instantiateArt(
     sprite: selectedSprite,
     skins: clonedSkins,
     defaultSkin: baseArt.defaultSkin,
-    palette: ensurePalette(baseArt.palette),
+    palette: normalizePalette(baseArt.palette),
     shape: baseArt.shape,
     size: baseArt.size,
     shadow: cloneShadow(baseArt.shadow),

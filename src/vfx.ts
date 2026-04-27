@@ -238,7 +238,6 @@ export function asSessionWithVfx(
   return game as SessionWithVfx;
 }
 
-const now = (): number => safeNow();
 const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
 const easeInOut = (t: number): number => (1 - Math.cos(Math.PI * Math.max(0, Math.min(1, t)))) * 0.5;
 const isFiniteCoord = (value: unknown): value is number => Number.isFinite(value);
@@ -516,7 +515,7 @@ export function computeMeleeOffsets(
     const duration = Number.isFinite(e.dur) ? e.dur : 0;
     if (!duration) continue;
 
-    const elapsed = now() - e.t0;
+    const elapsed = safeNow() - e.t0;
     const tt = clamp01(elapsed / duration);
     if (tt <= 0 || tt >= 1) continue;
 
@@ -917,14 +916,14 @@ function pool(Game: SessionWithVfx): VfxEventList {
 
 /* ------------------- Adders ------------------- */
 export function vfxAddSpawn(Game: SessionWithVfx, cx: number, cy: number, side: Side | null | undefined): void {
-  const spawn: SpawnVfxEvent = { type: 'spawn', t0: now(), dur: 500, cx, cy, side };
+  const spawn: SpawnVfxEvent = { type: 'spawn', t0: safeNow(), dur: 500, cx, cy, side };
   pool(Game).push(spawn);
 }
 
 type HitEventExtras = Partial<Omit<HitVfxEvent, 'type' | 't0' | 'dur' | 'ref'>>;
 
 export function vfxAddHit(Game: SessionWithVfx, target: TokenRef, opts: HitEventExtras = {}): void {
-  const event: HitVfxEvent = { type: 'hit', t0: now(), dur: 380, ref: target, ...opts };
+  const event: HitVfxEvent = { type: 'hit', t0: safeNow(), dur: 380, ref: target, ...opts };
   pool(Game).push(event);
 }
 
@@ -935,7 +934,7 @@ export function vfxAddTracer(
   opts: { dur?: number } = {},
 ): void {
   const dur = Number.isFinite(opts?.dur) ? Number(opts.dur) : 400;
-  const event: TracerVfxEvent = { type: 'tracer', t0: now(), dur, refA: attacker, refB: target };
+  const event: TracerVfxEvent = { type: 'tracer', t0: safeNow(), dur, refA: attacker, refB: target };
   pool(Game).push(event);
 }
 
@@ -956,7 +955,7 @@ const iidA = typeof attacker?.iid === 'number' ? attacker.iid : null;
 
   const event: MeleeVfxEvent = {
     type: 'melee',
-    t0: now(),
+    t0: safeNow(),
     dur,
     refA: attacker,
     refB: target,
@@ -998,7 +997,7 @@ function makeLightningEvent(
 
   const event: LightningArcVfxEvent = {
     type: 'lightning_arc',
-    t0: now(),
+    t0: safeNow(),
     dur: busyMs,
     refA: source,
     refB: target || null,
@@ -1040,7 +1039,7 @@ export function vfxAddBloodPulse(Game: SessionWithVfx, source: TokenRef, opts: B
 
   const event: BloodPulseVfxEvent = {
     type: 'blood_pulse',
-    t0: now(),
+    t0: safeNow(),
     dur: busyMs,
     refA: source,
     anchorA: anchor.id,
@@ -1076,7 +1075,7 @@ export function vfxAddShieldWrap(Game: SessionWithVfx, source: TokenRef, opts: S
 
   const event: ShieldWrapVfxEvent = {
     type: 'shield_wrap',
-    t0: now(),
+    t0: safeNow(),
     dur: busyMs,
     refA: source,
     anchorA: front.id,
@@ -1106,7 +1105,7 @@ export function vfxAddGroundBurst(Game: SessionWithVfx, source: TokenRef, opts: 
 
   const event: GroundBurstVfxEvent = {
     type: 'ground_burst',
-    t0: now(),
+    t0: safeNow(),
     dur: busyMs,
     refA: source,
     anchorA: anchor.id,
@@ -1174,7 +1173,7 @@ export function vfxDraw(
 
   const keep: VfxEventList = [];
   for (const e of list) {
-    const t = (now() - e.t0) / e.dur;
+    const t = (safeNow() - e.t0) / e.dur;
     const done = t >= 1;
     const tt = Math.max(0, Math.min(1, t));
 

@@ -3,7 +3,6 @@ import {
   CLASS_BASE,
   RANK_MULT,
   CLASS_GROWTH,
-  applyRankAndMods,
   getMetaById,
   getUnitKitById,
 } from './catalog.ts';
@@ -58,7 +57,7 @@ const classOfMeta = (entry: MetaEntry | null | undefined): MetaEntry['class'] | 
 
 // Dùng trực tiếp catalog cho tra cứu
 export const Meta = {
-  get: lookupMeta as MetaLookupService['get'],
+  get: lookupMeta,
   classOf(id: MetaId) {
     return classOfMeta(lookupMeta(id));
   },
@@ -91,7 +90,8 @@ export const metaServiceAdapter: SessionMetaService = {
   },
   classOf(id: UnitId | null | undefined): string | null {
     if (!id) return null;
-    return normalizeClassName(Meta.classOf(id));
+    const className = Meta.classOf(id);
+    return typeof className === 'string' ? className : null;
   },
   rankOf(id: UnitId | null | undefined): string | null {
     if (!id) return null;
@@ -124,56 +124,50 @@ const EMPTY_INSTANCE_STATS: InstanceStats = {
   aeRegen: 0,
   hpRegen: 0,
 };
+const cloneEmptyStats = (): InstanceStats => ({ ...EMPTY_INSTANCE_STATS });
 
 const isRankName = (value: unknown): value is RankName => (
   typeof value === 'string' && value in RANK_MULT
 );
 
-const coerceStatMods = (
-  mods: MetaEntry['mods'],
-): Partial<Record<keyof CatalogStatBlock, number>> | undefined => {
-  if (!mods || typeof mods !== 'object') return undefined;
-  const out: Partial<Record<keyof CatalogStatBlock, number>> = {};
-  for (const [key, raw] of Object.entries(mods)) {
-    if (typeof raw !== 'number' || !Number.isFinite(raw)) continue;
-    out[key as keyof CatalogStatBlock] = raw;
-  }
-  return out;
-};
-
 export function makeInstanceStats(unitId: MetaId, level: number = 1, stars: number = 0): InstanceStats {
   const entry = Meta.get(unitId);
-  if (!entry) return { ...EMPTY_INSTANCE_STATS };
+  if (!entry) return cloneEmptyStats();
 
   const className = normalizeClassName(entry.class);
-  const rank = entry.rank as RankName;
+  const rank = entry.rank;
 
-  if (!className || !isRankName(rank)) return { ...EMPTY_INSTANCE_STATS };
+  if (!className || !isRankName(rank)) return cloneEmptyStats();
   const base = CLASS_BASE[className];
   const growthByClass = CLASS_GROWTH as Partial<Record<ClassName, Partial<CatalogStatBlock>>>;
   const delta = growthByClass[className] ?? {};
 
-  // 1. TÍNH CHỈ SỐ GỐC THEO LEVEL (TIA LASER)
-  const currentBase = {
+  const currentBase: CatalogStatBlock = {
     HP:  base.HP  + (level - 1) * (delta.HP ?? 0),
     ATK: base.ATK + (level - 1) * (delta.ATK ?? 0),
     WIL: base.WIL + (level - 1) * (delta.WIL ?? 0),
     ARM: base.ARM + (level - 1) * (delta.ARM ?? 0),
     RES: base.RES + (level - 1) * (delta.RES ?? 0),
+    AGI: base.AGI ?? 0,
+    PER: base.PER ?? 0,
+    SPD: base.SPD || 1,
+    AEmax: base.AEmax ?? 0,
+    AEregen: base.AEregen || 0,
+    HPregen: base.HPregen || 0,
   };
 
-  // 2. TÍNH HỆ SỐ (THẤU KÍNH) = RANK + SAO
   const rankMult = RANK_MULT[rank] + (stars * 0.05);
-  const scaledHp = Math.trunc(currentBase.HP * rankMult);
+  const scaleInt = (value: number): number => Math.trunc(value * rankMult);
+  const scaleFixed4 = (value: number): number => Number((value * rankMult).toFixed(4));
+  const scaledHp = scaleInt(currentBase.HP);
 
-  // 3. XUẤT CHỈ SỐ CUỐI (LASER x THẤU KÍNH)
   return {
     hpMax: scaledHp,
     hp: scaledHp,
-    atk: Math.trunc(currentBase.ATK * rankMult),
-    wil: Math.trunc(currentBase.WIL * rankMult),
-    arm: Number((currentBase.ARM * rankMult).toFixed(4)),
-    res: Number((currentBase.RES * rankMult).toFixed(4)),
+    atk: scaleInt(currentBase.ATK),
+    wil: scaleInt(currentBase.WIL),
+    arm: scaleFixed4(currentBase.ARM),
+    res: scaleFixed4(currentBase.RES),
     agi: Math.trunc(base.AGI ?? 0),
     per: Math.trunc(base.PER ?? 0),
     spd: base.SPD || 1,

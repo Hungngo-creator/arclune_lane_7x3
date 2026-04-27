@@ -75,6 +75,8 @@ export const getPassiveLog = (
 ): Array<Record<string, unknown>> => {
   const logCandidate = Game?.passiveLog;
   if (!Array.isArray(logCandidate)) return [];
+  const allRecords = logCandidate.every((entry) => isRecord(entry));
+  if (allRecords) return logCandidate as Array<Record<string, unknown>>;
   const result: Array<Record<string, unknown>> = [];
   for (const entry of logCandidate){
     if (isRecord(entry)){

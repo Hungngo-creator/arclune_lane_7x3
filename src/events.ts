@@ -179,8 +179,7 @@ const createIdempotentDispose = (dispose: () => void): (() => void) => {
 const createCustomEventFactory = (): ((type: string, detail: unknown) => Event | null) => {
   if (!HAS_CUSTOM_EVENT) return () => null;
   try {
-    const probe = new CustomEvent('__probe__');
-    if (!(probe instanceof Event)) return () => null;
+    new CustomEvent('__probe__');
     return (type, detail) => new CustomEvent(type, { detail });
   } catch {
     return () => null;
@@ -190,8 +189,7 @@ const createCustomEventFactory = (): ((type: string, detail: unknown) => Event |
 const createLegacyEventFactory = (): ((type: string, detail: unknown) => Event | null) => {
   if (!HAS_EVENT_CONSTRUCTOR) return () => null;
   try {
-    const probe = new Event('__probe__') as LegacyEvent;
-    probe.detail = null;
+    new Event('__probe__');
     return (type, detail) => {
       const event = new Event(type) as LegacyEvent;
       event.detail = detail;

@@ -93,13 +93,16 @@ interface PveSession {
   onEvent?: (type: string, handler: (event: { detail?: Record<string, unknown> } | Record<string, unknown>) => void) => (() => void) | void;
 }
 
-const isStoppableSession = (value: unknown): value is { stop: () => void } => (
-  Boolean(value) && typeof (value as { stop?: unknown }).stop === 'function'
+const hasMethod = <TName extends string>(
+  value: unknown,
+  methodName: TName,
+): value is Record<TName, (...args: unknown[]) => unknown> => (
+  Boolean(value) && typeof (value as Record<TName, unknown>)[methodName] === 'function'
 );
 
-const isStartableSession = (value: unknown): value is { start: (config: UnknownRecord) => unknown } => (
-  Boolean(value) && typeof (value as { start?: unknown }).start === 'function'
-);
+const isStoppableSession = (value: unknown): value is { stop: () => void } => hasMethod(value, 'stop');
+
+const isStartableSession = (value: unknown): value is { start: (config: UnknownRecord) => unknown } => hasMethod(value, 'start');
 
 declare global {
   // eslint-disable-next-line no-var

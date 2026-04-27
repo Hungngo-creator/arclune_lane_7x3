@@ -564,19 +564,39 @@ skill 3: áp dụng debuff phản hồi phục lên leader địch và 3 kẻ th
 ultimate: xoá bỏ 1 debuff/đồng minh cho mọi đồng minh trên sân, cũng đồng thời xoá bỏ 1 buff/mỗi kẻ thù đang có mặt trên sân, pháp tắc.
 
 47) Hư Vô Cực
-summoner, ssr
+summoner, ssr, element tag: blood.
 nội tại: mỗi turn tự triệu hồi 1 Ảnh Tử lên sân, mỗi ảnh tử có chỉ số = 50% của hư vô cực, không có aether/skill và không thể tăng ae cho team qua hành động. mỗi ảnh tử chỉ có thể đánh thường = 100% wil/atk của chúng tức = 50% của bản thể, chỉ số của ảnh tử lấy từ bản thể lúc đầu mỗi turn lúc đến turn của hắn chứ không phải biến động theo thời gian thực theo sự biến động chỉ số của bản thể nên chỉ số của mỗi ảnh tử đề sẽ khác nhau đôi chút do snap shot chỉ số của bản thể mỗi khi sinh ra, ảnh tử tồn tại tối đa 3 turn, nếu đầy sân thì ảnh tử mới sẽ thay thế ảnh tử cũ có hp thấp nhất. Hay là ảnh tử snap shot chỉ số của bản thể cố định nhỉ? như vậy khi đầy sân ảnh tử mới thay ảnh tử cũ chỉ cần hồi đầy hp của ảnh tử cũ là được rồi vì chỉ số của chúng là giống nhau, theo mày nên chọn cách nào?
+nội tại tag pháp tắc.
 
 đánh thường: gây sát thương = 100% wil và atk.
 
 skill 1: bản thể tốn 1 turn để niệm chú, sau khi niệm chú xong các ảnh tử sẽ đồng loạt tấn công kẻ thù = 1 đánh thường của chúng, -4 ae/ mỗi ảnh tử tấn công kẻ thù từ skill này, ảnh tử đã tấn công trước từ skill này sẽ bị bỏ qua 1 turn. bản thể sau khi các ảnh tử tấn công kẻ thù sẽ được hồi hp = 3% max hp/mỗi ảnh tử tấn công kẻ thù từ skill này.
 
-skill 2: cường hoá 
+skill 2: liên kết hp bar của bản thân và tối đa 3 ảnh tử, khi bản thể nhận sát thương đơn (baản thể nhận aoe sẽ không chuyển được) 100% sát thương đơn đó sẽ được chia đều (tối đa là 3) lên các ảnh tử được liên kết, liên kết tồn tại mãi nhưng vì ảnh tử có giới hạn thời gian tồn tại nên liên kết sẽ tự biến mất khi các ảnh tử được liên kết biến mất và cần kích hoạt lại, 25 aether. pháp tắc.
 
-48)
+skill 3: hút hp của tối đa 3 ảnh tử có hp thấp nhất cho bản thân khi hp dưới 40%, nhưng có skill 2 mà hp lại thấp thì khả năng cao là ảnh tử không còn, hút hoàn toàn random và có thể hút từ ảnh tử liên kết bởi skill 2, 20 ae.
 
+ultimate: tiếp cận mục tiêu, gây sát thương = 200% wil/atk, các ảnh tử có trên sân cũng sẽ tấn công cùng mục tiêu bản thể đã tấn công = 1 đánh thường của chúng, sau khi tấn công các ảnh tử vẫn có thể đánh thường mà không bị bù trừ 1 turn như skill 1, hồi hp cho bản thân hư vô cực = 10% max hp của hắn. Pháp Tắc.
 
-49)
+đánh thường: gây sát thương = 100% wil/atk.
+
+48) Dạ Hành Giả
+ssr, Assassin, element tag: dark
+
+nội tại: với mỗi summon của class summoner kẻ thù hắn giết được hoặc chết khi hắn có mặt trên sân, ngay lập tức +5% wil/atk/hp của hiện tại, giới hạn kích hoạt/trận là 10.
+
+đánh thường: gây sát thương = 100% wil/atk.
+
+skill 1: đứng tại chỗ triệu hồi 3 ngọn giáo hắc ám tấn công 1 kẻ thù, mỗi ngọn giáo gây sát thương = 90% wil/atk, 25 ae.
+
+skill 2: tiếp cận kẻ thù, tấn công đối phương = dao găm gây sát thương = 200% wil/atk, áp 1 debuff chảy máu lên mục tiêu, 20 ae.
+
+skill 3: niệm chú, hắc ám ma lực sẽ quấn lấy mọi summoner phe kẻ thù trên sân, chúng không thể hồi aether cho bể aether qua hành động trong 3 turn, 30 ae.
+
+ultimate: triệu hồi 1 vùng hắc ám dưới chân mục tiêu (vfx), tấn công mục tiêu gây sát thương = 280% wil/atk, đòn đánh này bỏ qua 20% res/arm của mục tiêu, nếu mục tiêu có khiên cũng khiến khiên của họ mất 20% trước mới gây sát thương.
+
+49) 
+nội tại: 
 
 
 50)

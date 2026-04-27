@@ -357,11 +357,8 @@ function queueContainsCell(map: SummonMap, cx: number, cy: number): boolean {
 
 export function cellReserved(tokens: readonly UnitToken[], queued: QueuedSummonState | null | undefined, cx: number, cy: number): boolean {
   if (cellOccupied(tokens, cx, cy)) return true;
-  if (queued) {
-    if (queueContainsCell(queued.ally, cx, cy)) return true;
-    if (queueContainsCell(queued.enemy, cx, cy)) return true;
-  }
-  return false;
+  if (!queued) return false;
+  return queueContainsCell(queued.ally, cx, cy) || queueContainsCell(queued.enemy, cx, cy);
 }
 
 export function spawnLeaders(tokens: TokenWithArt[], g: GridSpec): void {
@@ -395,25 +392,20 @@ export function spawnLeaders(tokens: TokenWithArt[], g: GridSpec): void {
 
 /* ---------- Helper ---------- */
 export function pickRandom<T>(pool: readonly T[], excludeSet: ReadonlySet<string>, n = 4): T[] {
-  const remain = pool
-    .filter((u): u is T => {
-      if (typeof u === 'undefined') {
-        return false;
-      }
-      if (u && typeof u === 'object') {
-        const candidate = u as { id?: unknown };
-        const id = candidate.id;
-        if (id !== undefined && id !== null) {
-          return !excludeSet.has(String(id));
-        }
-        return true;
-      }
-      if (typeof u === 'string') {
-        return !excludeSet.has(u);
-      }
-      return true;
-     })
-    .slice();
+  if (n <= 0) return [];
+  const remain: T[] = [];
+  for (const u of pool) {
+    if (typeof u === 'undefined') continue;
+    if (u && typeof u === 'object') {
+      const candidate = u as { id?: unknown };
+      const id = candidate.id;
+      if (id !== undefined && id !== null && excludeSet.has(String(id))) continue;
+      remain.push(u);
+      continue;
+    }
+    if (typeof u === 'string' && excludeSet.has(u)) continue;
+    remain.push(u);
+  }
 
   for (let i = remain.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -421,7 +413,8 @@ export function pickRandom<T>(pool: readonly T[], excludeSet: ReadonlySet<string
     remain[i] = remain[j]!;
     remain[j] = temp;
   }
-  return remain.slice(0, n);
+  if (remain.length === 0) return remain;
+  return n >= remain.length ? remain : remain.slice(0, n);
 }
 
 export const pick3Random = <T>(pool: readonly T[], excludeSet: ReadonlySet<string>): T[] => pickRandom(pool, excludeSet, 3);

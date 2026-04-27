@@ -59,13 +59,19 @@ const battlefieldSceneCache = new Map<string, BattlefieldSceneCacheEntry>() sati
 
 function normalizeDimension(value: number | null | undefined): number {
   if (!Number.isFinite(value)) return 0;
-  return value as number;
+  const dimension = value as number;
+  return dimension > 0 ? dimension : 0;
+}
+
+function resolvePositiveNumber(value: number | null | undefined, fallback: number): number {
+  if (!Number.isFinite(value)) return fallback;
+  const numeric = value as number;
+  return numeric > 0 ? numeric : fallback;
 }
 
 function createOffscreenCanvas(pixelWidth: number, pixelHeight: number): OffscreenCanvas | HTMLCanvasElement | null {
   const safeW = Math.max(1, Math.floor(pixelWidth || 0));
   const safeH = Math.max(1, Math.floor(pixelHeight || 0));
-  if (!safeW || !safeH) return null;
   if (typeof OffscreenCanvas === 'function') {
     try {
       return new OffscreenCanvas(safeW, safeH);
@@ -137,9 +143,7 @@ export function getCachedBattlefieldScene(
   if (!g) return null;
   const cssWidth = normalizeDimension(options.width ?? g.w);
   const cssHeight = normalizeDimension(options.height ?? g.h);
-  const dpr = Number.isFinite(options.dpr) && (options.dpr ?? 0) > 0
-    ? (options.dpr as number)
-    : (Number.isFinite(g.dpr) && (g.dpr ?? 0) > 0 ? (g.dpr as number) : 1);
+  const dpr = resolvePositiveNumber(options.dpr, resolvePositiveNumber(g.dpr, 1));
   if (!cssWidth || !cssHeight) return null;
   const pixelWidth = Math.max(1, Math.round(cssWidth * dpr));
   const pixelHeight = Math.max(1, Math.round(cssHeight * dpr));

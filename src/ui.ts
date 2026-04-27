@@ -14,6 +14,7 @@ import { assertElement } from './ui/dom.ts';
 import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from '@shared-types/ui';
 
 type HudGameLike = { cost?: number | null; costCap?: number | null } | null | undefined;
+const HUD_EVENT_TYPES = [TURN_START, TURN_END, ACTION_END] as const;
 
 type QueryableRoot = ParentNode & { querySelector?: typeof Document.prototype.querySelector };
 
@@ -110,8 +111,7 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
   };
 
   if (gameEvents){
-    const types = [TURN_START, TURN_END, ACTION_END] as const;
-    for (const type of types){
+    for (const type of HUD_EVENT_TYPES){
       disposers.push(addGameEventListener(type, handleGameEvent));
     }
   }
