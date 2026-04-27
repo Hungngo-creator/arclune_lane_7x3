@@ -274,6 +274,15 @@ export type StatusAggregate = {
   turnsLeft: number | null;
 };
 
+export type RenderableStatusIcon = {
+  statusId: string;
+  statusName: string;
+  tooltip: string;
+  priority: number;
+  stacks: number;
+  turnsLeft: number | null;
+};
+
 type StatusAggregateCacheEntry = {
   signature: string;
   aggregates: StatusAggregate[];
@@ -499,4 +508,38 @@ export const resolveStatusIconPreview = (
     });
   }
   return preview;
+};
+
+type ResolveReadyStatusIconDeps<TIcon> = {
+  statusesInput: ReadonlyArray<Record<string, unknown> | null | undefined>;
+  maxIcons?: number;
+  ensureStatusIcon: (iconId: string, iconPath: string) => TIcon | null;
+  isIconReady: (icon: TIcon | null) => boolean;
+};
+
+export const collectRenderableStatusIcons = <TIcon>(
+  deps: ResolveReadyStatusIconDeps<TIcon>,
+): Array<RenderableStatusIcon & { icon: TIcon }> => {
+  const statuses = Array.isArray(deps.statusesInput) ? deps.statusesInput : [];
+  if (!statuses.length) return [];
+  const maxIcons = Number.isFinite(deps.maxIcons)
+    ? Math.max(1, Math.round(deps.maxIcons as number))
+    : MAX_STATUS_ICONS_PER_TOKEN;
+  const aggregates = aggregateStatuses(statuses);
+  const icons: Array<RenderableStatusIcon & { icon: TIcon }> = [];
+  for (const aggregate of aggregates) {
+    if (icons.length >= maxIcons) break;
+    const icon = deps.ensureStatusIcon(aggregate.meta.id, aggregate.meta.icon);
+    if (!deps.isIconReady(icon)) continue;
+    icons.push({
+      icon: icon as TIcon,
+      statusId: aggregate.statusId,
+      statusName: aggregate.meta.label,
+      tooltip: buildStatusTooltip(aggregate.meta.label, aggregate.stacks, aggregate.turnsLeft),
+      priority: aggregate.priority,
+      stacks: aggregate.stacks,
+      turnsLeft: aggregate.turnsLeft,
+    });
+  }
+  return icons;
 };

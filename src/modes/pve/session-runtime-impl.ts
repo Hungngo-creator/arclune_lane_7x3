@@ -70,8 +70,7 @@ import { createSessionDeckController } from './session-deck';
 import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
 import { createSessionEventBindings } from './session-events';
 import {
-  aggregateStatuses,
-  buildStatusTooltip,
+  collectRenderableStatusIcons,
   createBrowserFrameFns,
   createSessionRenderController,
   DEFAULT_STATUS_ICON_PATH,
@@ -2857,28 +2856,6 @@ function ensureStatusIconLoaded(iconId: string, iconPath: string): StatusIconEnt
   return cache;
 }
 
-function collectStatusIcons(unit: UnitToken): StatusIconEntry[] {
-  const statuses = Array.isArray(unit.statuses) ? unit.statuses : [];
-  if (!statuses.length) return [];
-  const icons: StatusIconEntry[] = [];
-  const aggregates = aggregateStatuses(statuses);
-  for (const aggregate of aggregates) {
-    if (icons.length >= MAX_STATUS_ICONS_PER_TOKEN) break;
-    const icon = ensureStatusIconLoaded(aggregate.meta.id, aggregate.meta.icon);
-    if (!icon || icon.status !== 'ready' || !icon.image) continue;
-    icons.push({
-      ...icon,
-      statusId: aggregate.statusId,
-      statusName: aggregate.meta.label,
-      tooltip: buildStatusTooltip(aggregate.meta.label, aggregate.stacks, aggregate.turnsLeft),
-      priority: aggregate.priority,
-      stacks: aggregate.stacks,
-      turnsLeft: aggregate.turnsLeft,
-    });
-  }
-  return icons;
-}
-
 export function __resolveStatusIconPreview(statusesInput: ReadonlyArray<Record<string, unknown> | null | undefined>): Array<{ id: string; tooltip: string; priority: number }> {
   return resolveStatusIconPreview(statusesInput);
 }
@@ -2935,7 +2912,20 @@ function drawHPBars(): void {
     const headY = p.y - spriteHeight * anchor;
     const hpY = Math.round(headY - Math.max(6, Math.floor(r * 0.34)) - barHeight);
     const hpX = Math.round(p.x - barWidth / 2);
-    const statusIcons = collectStatusIcons(t);
+    const statusIcons = collectRenderableStatusIcons<StatusIconEntry>({
+      statusesInput: Array.isArray(t.statuses) ? t.statuses : [],
+      maxIcons: MAX_STATUS_ICONS_PER_TOKEN,
+      ensureStatusIcon: ensureStatusIconLoaded,
+      isIconReady: (icon) => Boolean(icon && icon.status === 'ready' && icon.image),
+    }).map((entry) => ({
+      ...entry.icon,
+      statusId: entry.statusId,
+      statusName: entry.statusName,
+      tooltip: entry.tooltip,
+      priority: entry.priority,
+      stacks: entry.stacks,
+      turnsLeft: entry.turnsLeft,
+    }));
     const statusIconSize = Math.max(2, Math.floor(barHeight * 0.9));
     const statusIconGap = Math.max(1, Math.floor(statusIconSize * 0.2));
     const statusRowWidth = statusIcons.length > 0

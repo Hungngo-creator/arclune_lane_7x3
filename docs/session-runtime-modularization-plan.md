@@ -248,6 +248,26 @@ Di chuyển theo nguyên tắc **copy-move, không đổi hành vi**:
     - constants dùng chung (`DEFAULT_STATUS_ICON_PATH`, `MAX_STATUS_ICONS_PER_TOKEN`).
   - `session-runtime-impl` chỉ gọi lại API này, không giữ bản triển khai shadow.
 
+### Nâng cấp D1 (D1.3) — bắt đầu tách phần status icon selection khỏi impl sang `session-render`
+
+- Đánh giá sau D1.2:
+  - `session-runtime-impl.ts` vẫn còn 1 lớp glue lặp logic chọn icon theo aggregate (`aggregate -> ensure icon -> ready check -> tooltip payload`).
+  - Phần này chưa đụng canvas draw geometry, nên có thể tách tiếp theo hướng reuse-first mà không đổi thuật toán render.
+- Scope D1.3:
+  - Thêm helper `collectRenderableStatusIcons(...)` trong `session-render.ts` để gom:
+    1. lặp aggregate theo priority;
+    2. giới hạn `MAX_STATUS_ICONS_PER_TOKEN`;
+    3. build payload tooltip/stacks/turns cho mỗi icon.
+  - `session-runtime-impl.ts` giữ lại:
+    - `ensureStatusIconLoaded` và `statusIconCache` (quản lý image loading + fallback icon path),
+    - map từ payload generic sang `StatusIconEntry` thực tế để phục vụ draw.
+- Invariant bắt buộc giữ:
+  - không đổi thứ tự ưu tiên icon;
+  - không đổi điều kiện “icon phải ready mới vẽ”;
+  - không đổi fallback `DEFAULT_STATUS_ICON_PATH` khi load lỗi.
+- Mục tiêu kế tiếp (D1.4):
+  - cân nhắc move luôn readiness predicate/type alias vào `session-render` nếu không làm tăng coupling với `Image`.y
+
 ### Prompt QA re-run cho `session-render` (để chốt D1)
 
 > Re-run checklist sau khi tách D1:
