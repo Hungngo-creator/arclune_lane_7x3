@@ -71,14 +71,15 @@ import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
 import { createSessionEventBindings } from './session-events';
 import {
   applyStatusIconHoverTooltip,
-  collectRenderableStatusIcons,
-  createStatusIconLoader,
+  createDefaultStatusIconEntry,
+  createStatusIconResolver,
   createBrowserFrameFns,
   createSessionRenderController,
   DEFAULT_STATUS_ICON_PATH,
   MAX_STATUS_ICONS_PER_TOKEN,
+  type RenderableStatusIcon,
+  type StatusIconCacheEntry,
   isStatusIconReady,
-  materializeRenderableStatusIcons,
   resolveStatusIconPreview,
 } from './session-render';
 import type { StatusIconHitbox } from './session-render';
@@ -720,17 +721,7 @@ let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enem
 const hpBarGradientCache = new Map<string, GradientValue>();
 const meleeOffsetTokenKeys = new Set<string>();
 const ATTACK_EVENT_TYPES = new Set(['melee', 'tracer', 'lightning_arc', 'blood_pulse', 'ground_burst']);
-type StatusIconEntry = {
-  statusId: string;
-  statusName: string;
-  tooltip: string;
-  priority: number;
-  stacks: number;
-  turnsLeft: number | null;
-  path: string;
-  image: HTMLImageElement | null;
-  status: 'idle' | 'loading' | 'ready' | 'error';
-};
+type StatusIconEntry = StatusIconCacheEntry & RenderableStatusIcon;
 const statusIconCache = new Map<string, StatusIconEntry>();
 const statusIconHitboxes: StatusIconHitbox[] = [];
 let statusIconHoverTooltip = '';
@@ -2806,23 +2797,17 @@ function getShieldRatio(unit: UnitToken): number {
   return Math.max(0, Math.min(1, shieldAmount / hpMax));
 }
 
-const ensureStatusIconLoaded = createStatusIconLoader<StatusIconEntry>({
+const {
+  resolveStatusIcons: resolveStatusIconsForToken,
+} = createStatusIconResolver<StatusIconEntry>({
   fallbackIconPath: DEFAULT_STATUS_ICON_PATH,
   getCacheEntry: (nextIconId) => statusIconCache.get(nextIconId),
   setCacheEntry: (nextIconId, entry) => {
     statusIconCache.set(nextIconId, entry);
   },
-  createCacheEntry: (nextIconId, nextIconPath) => ({
-    statusId: nextIconId,
-    statusName: nextIconId,
-    tooltip: nextIconId,
-    priority: 0,
-    stacks: 1,
-    turnsLeft: null,
-    path: nextIconPath,
-    image: null,
-    status: 'idle',
-  }),
+  createCacheEntry: (nextIconId, nextIconPath) => createDefaultStatusIconEntry(nextIconId, nextIconPath),
+  maxIcons: MAX_STATUS_ICONS_PER_TOKEN,
+  isIconReady: isStatusIconReady,
 });
 
 export function __resolveStatusIconPreview(statusesInput: ReadonlyArray<Record<string, unknown> | null | undefined>): Array<{ id: string; tooltip: string; priority: number }> {
@@ -2862,12 +2847,7 @@ function drawHPBars(): void {
     const headY = p.y - spriteHeight * anchor;
     const hpY = Math.round(headY - Math.max(6, Math.floor(r * 0.34)) - barHeight);
     const hpX = Math.round(p.x - barWidth / 2);
-    const statusIcons = materializeRenderableStatusIcons<StatusIconEntry>(collectRenderableStatusIcons<StatusIconEntry>({
-      statusesInput: Array.isArray(t.statuses) ? t.statuses : [],
-      maxIcons: MAX_STATUS_ICONS_PER_TOKEN,
-      ensureStatusIcon: ensureStatusIconLoaded,
-      isIconReady: isStatusIconReady,
-    }));
+    const statusIcons = resolveStatusIconsForToken(Array.isArray(t.statuses) ? t.statuses : []);
     const statusIconSize = Math.max(2, Math.floor(barHeight * 0.9));
     const statusIconGap = Math.max(1, Math.floor(statusIconSize * 0.2));
     const statusRowWidth = statusIcons.length > 0

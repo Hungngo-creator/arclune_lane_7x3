@@ -548,6 +548,28 @@ export type StatusIconLoaderFactoryDeps<TEntry extends StatusIconCacheEntry> = {
   createCacheEntry: (iconId: string, iconPath: string) => TEntry;
 };
 
+export type ResolveRenderableStatusIconsDeps<TIcon extends object> = {
+  statusesInput: ReadonlyArray<Record<string, unknown> | null | undefined>;
+  maxIcons?: number;
+  ensureStatusIcon: (iconId: string, iconPath: string) => TIcon | null;
+  isIconReady: (icon: TIcon | null) => boolean;
+};
+
+export type RenderableStatusIconResolverDeps<TIcon extends object> = {
+  maxIcons?: number;
+  ensureStatusIcon: (iconId: string, iconPath: string) => TIcon | null;
+  isIconReady: (icon: TIcon | null) => boolean;
+};
+
+export type StatusIconResolverFactoryDeps<TEntry extends StatusIconCacheEntry & object> = {
+  fallbackIconPath?: string;
+  maxIcons?: number;
+  getCacheEntry: (iconId: string) => TEntry | undefined;
+  setCacheEntry: (iconId: string, entry: TEntry) => void;
+  createCacheEntry: (iconId: string, iconPath: string) => TEntry;
+  isIconReady: (icon: TEntry | null) => boolean;
+};
+
 export const ensureStatusIconLoaded = <TEntry extends StatusIconCacheEntry>(
   deps: StatusIconLoadDeps<TEntry>,
 ): TEntry | null => {
@@ -604,6 +626,21 @@ export const createStatusIconLoader = <TEntry extends StatusIconCacheEntry>(
       createCacheEntry: deps.createCacheEntry,
     })
   );
+
+export const createDefaultStatusIconEntry = (
+  iconId: string,
+  iconPath: string,
+): StatusIconCacheEntry & RenderableStatusIcon => ({
+  statusId: iconId,
+  statusName: iconId,
+  tooltip: iconId,
+  priority: 0,
+  stacks: 1,
+  turnsLeft: null,
+  path: iconPath,
+  image: null,
+  status: 'idle',
+});
 
 export type StatusIconHitbox = {
   x: number;
@@ -698,3 +735,50 @@ export const materializeRenderableStatusIcons = <TIcon extends object>(
   stacks: entry.stacks,
   turnsLeft: entry.turnsLeft,
 }));
+
+export const resolveRenderableStatusIcons = <TIcon extends object>(
+  deps: ResolveRenderableStatusIconsDeps<TIcon>,
+): Array<TIcon & RenderableStatusIcon> => {
+  const collected = collectRenderableStatusIcons<TIcon>({
+    statusesInput: deps.statusesInput,
+    maxIcons: deps.maxIcons,
+    ensureStatusIcon: deps.ensureStatusIcon,
+    isIconReady: deps.isIconReady,
+  });
+  if (!collected.length) return [];
+  return materializeRenderableStatusIcons(collected);
+};
+
+export const createRenderableStatusIconResolver = <TIcon extends object>(
+  deps: RenderableStatusIconResolverDeps<TIcon>,
+): ((statusesInput: ReadonlyArray<Record<string, unknown> | null | undefined>) => Array<TIcon & RenderableStatusIcon>) => (
+    (statusesInput): Array<TIcon & RenderableStatusIcon> => resolveRenderableStatusIcons<TIcon>({
+      statusesInput,
+      maxIcons: deps.maxIcons,
+      ensureStatusIcon: deps.ensureStatusIcon,
+      isIconReady: deps.isIconReady,
+    })
+  );
+
+export const createStatusIconResolver = <TEntry extends StatusIconCacheEntry & object>(
+  deps: StatusIconResolverFactoryDeps<TEntry>,
+): {
+  ensureStatusIcon: (iconId: string, iconPath: string) => TEntry | null;
+  resolveStatusIcons: (statusesInput: ReadonlyArray<Record<string, unknown> | null | undefined>) => Array<TEntry & RenderableStatusIcon>;
+} => {
+  const ensureStatusIcon = createStatusIconLoader<TEntry>({
+    fallbackIconPath: deps.fallbackIconPath,
+    getCacheEntry: deps.getCacheEntry,
+    setCacheEntry: deps.setCacheEntry,
+    createCacheEntry: deps.createCacheEntry,
+  });
+  const resolveStatusIcons = createRenderableStatusIconResolver<TEntry>({
+    maxIcons: deps.maxIcons,
+    ensureStatusIcon,
+    isIconReady: deps.isIconReady,
+  });
+  return {
+    ensureStatusIcon,
+    resolveStatusIcons,
+  };
+};

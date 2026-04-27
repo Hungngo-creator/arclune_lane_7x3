@@ -13655,74 +13655,85 @@ __modules['./events.ts'] = (exports, module, __require) => {
       : toSyntheticEventRecord(type, payload));
   const toEmitterEventRecord = (type, payload, eventTarget) => withEventTargetRefs(toEventRecord(type, payload), eventTarget);
   const gameEvents = makeEventTarget();
-  const emitViaTarget = (target, type, detail) => {
-      const nativeEvent = createNativeEvent(type, detail);
-      if (!nativeEvent)
-          return false;
-      return target.dispatchEvent(nativeEvent);
+  const resolveDispatchMode = (target) => {
+      if (HAS_EVENT_TARGET && target instanceof EventTarget) {
+          return { kind: 'native', target };
+      }
+      if (target instanceof SimpleEventTarget) {
+          return { kind: 'simple', target };
+      }
+      if (isEventEmitterLike(target)) {
+          return { kind: 'emitter', target };
+      }
+      return null;
   };
-  const emitViaSimpleTarget = (target, type, detail) => (target.dispatchEvent(toSyntheticEventRecord(type, detail)));
-  const emitViaEmitter = (target, type, detail) => {
-      target.emit(type, detail);
-      return true;
-  };
-  const addListenerViaTarget = (target, type, handler) => {
-      const eventListener = handler;
-      target.addEventListener(type, eventListener);
-      return createIdempotentDispose(() => {
-          target.removeEventListener(type, eventListener);
-      });
-  };
-  const addListenerViaSimpleTarget = (target, type, handler) => {
-      const simpleHandler = handler;
-      target.addEventListener(type, simpleHandler);
-      return createIdempotentDispose(() => {
-          target.removeEventListener(type, simpleHandler);
-      });
-  };
-  const addListenerViaEmitter = (target, eventTarget, type, handler) => {
-      const emitterHandler = function (payload) {
-          handler.call(this, toEmitterEventRecord(type, payload, eventTarget));
+  const createDispatchAdapters = (target) => {
+      const mode = resolveDispatchMode(target);
+      if (!mode) {
+          return {
+              emit: () => false,
+              addListener: () => NOOP_DISPOSE,
+          };
+      }
+      if (mode.kind === 'native') {
+          return {
+              emit: (type, detail) => {
+                  const nativeEvent = createNativeEvent(type, detail);
+                  return nativeEvent ? mode.target.dispatchEvent(nativeEvent) : false;
+              },
+              addListener: (type, handler) => {
+                  const eventListener = handler;
+                  mode.target.addEventListener(type, eventListener);
+                  return createIdempotentDispose(() => {
+                      mode.target.removeEventListener(type, eventListener);
+                  });
+              },
+          };
+      }
+      if (mode.kind === 'simple') {
+          return {
+              emit: (type, detail) => (mode.target.dispatchEvent(toSyntheticEventRecord(type, detail))),
+              addListener: (type, handler) => {
+                  const simpleHandler = handler;
+                  mode.target.addEventListener(type, simpleHandler);
+                  return createIdempotentDispose(() => {
+                      mode.target.removeEventListener(type, simpleHandler);
+                  });
+              },
+          };
+      }
+      return {
+          emit: (type, detail) => {
+              mode.target.emit(type, detail);
+              return true;
+          },
+          addListener: (type, handler) => {
+              const emitterHandler = function (payload) {
+                  handler.call(this, toEmitterEventRecord(type, payload, target));
+              };
+              mode.target.on(type, emitterHandler);
+              return createIdempotentDispose(() => {
+                  if (typeof mode.target.off === 'function') {
+                      mode.target.off(type, emitterHandler);
+                  }
+              });
+          },
       };
-      target.on(type, emitterHandler);
-      return createIdempotentDispose(() => {
-          if (typeof target.off === 'function') {
-              target.off(type, emitterHandler);
-          }
-      });
   };
+  const gameEventDispatchAdapters = createDispatchAdapters(gameEvents);
   const emitGameEventInternal = (type, detail) => {
       if (!type)
           return false;
-      if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget) {
-          return emitViaTarget(gameEvents, type, detail);
-      }
-      if (gameEvents instanceof SimpleEventTarget) {
-          return emitViaSimpleTarget(gameEvents, type, detail);
-      }
-      if (isEventEmitterLike(gameEvents)) {
-          return emitViaEmitter(gameEvents, type, detail);
-      }
-      return false;
+      return gameEventDispatchAdapters.emit(type, detail);
   };
   const addGameEventListenerInternal = (type, handler) => {
-      if (!type || !isCompatibleHandler(handler)) {
+      if (!type || !isCompatibleHandler(handler))
           return NOOP_DISPOSE;
-      }
-      if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget) {
-          return addListenerViaTarget(gameEvents, type, handler);
-      }
-      if (gameEvents instanceof SimpleEventTarget) {
-          return addListenerViaSimpleTarget(gameEvents, type, handler);
-      }
-      if (isEventEmitterLike(gameEvents)) {
-          return addListenerViaEmitter(gameEvents, gameEvents, type, handler);
-      }
-      return NOOP_DISPOSE;
+      return gameEventDispatchAdapters.addListener(type, handler);
   };
   function emitGameEvent(type, detail) {
       try {
-          return emitGameEventInternal.emit(type, detail);
+          return emitGameEventInternal(type, detail);
       }
       catch (error) {
           reportEventError(error);
@@ -16131,6 +16142,17 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
       setCacheEntry: deps.setCacheEntry,
       createCacheEntry: deps.createCacheEntry,
   }));
+  const createDefaultStatusIconEntry = (iconId, iconPath) => ({
+      statusId: iconId,
+      statusName: iconId,
+      tooltip: iconId,
+      priority: 0,
+      stacks: 1,
+      turnsLeft: null,
+      path: iconPath,
+      image: null,
+      status: 'idle',
+  });
   const resolveStatusIconHoverTooltip = (canvas, hitboxes, clientX, clientY) => {
       if (!canvas)
           return '';
@@ -16192,6 +16214,40 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
       stacks: entry.stacks,
       turnsLeft: entry.turnsLeft,
   }));
+  const resolveRenderableStatusIcons = (deps) => {
+      const collected = collectRenderableStatusIcons({
+          statusesInput: deps.statusesInput,
+          maxIcons: deps.maxIcons,
+          ensureStatusIcon: deps.ensureStatusIcon,
+          isIconReady: deps.isIconReady,
+      });
+      if (!collected.length)
+          return [];
+      return materializeRenderableStatusIcons(collected);
+  };
+  const createRenderableStatusIconResolver = (deps) => ((statusesInput) => resolveRenderableStatusIcons({
+      statusesInput,
+      maxIcons: deps.maxIcons,
+      ensureStatusIcon: deps.ensureStatusIcon,
+      isIconReady: deps.isIconReady,
+  }));
+  const createStatusIconResolver = (deps) => {
+      const ensureStatusIcon = createStatusIconLoader({
+          fallbackIconPath: deps.fallbackIconPath,
+          getCacheEntry: deps.getCacheEntry,
+          setCacheEntry: deps.setCacheEntry,
+          createCacheEntry: deps.createCacheEntry,
+      });
+      const resolveStatusIcons = createRenderableStatusIconResolver({
+          maxIcons: deps.maxIcons,
+          ensureStatusIcon,
+          isIconReady: deps.isIconReady,
+      });
+      return {
+          ensureStatusIcon,
+          resolveStatusIcons,
+      };
+  };
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createBrowserFrameFns')) exports.createBrowserFrameFns = createBrowserFrameFns;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionRenderController')) exports.createSessionRenderController = createSessionRenderController;
@@ -16202,11 +16258,15 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusIconPreview')) exports.resolveStatusIconPreview = resolveStatusIconPreview;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStatusIconLoaded')) exports.ensureStatusIconLoaded = ensureStatusIconLoaded;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createStatusIconLoader')) exports.createStatusIconLoader = createStatusIconLoader;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createDefaultStatusIconEntry')) exports.createDefaultStatusIconEntry = createDefaultStatusIconEntry;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusIconHoverTooltip')) exports.resolveStatusIconHoverTooltip = resolveStatusIconHoverTooltip;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyStatusIconHoverTooltip')) exports.applyStatusIconHoverTooltip = applyStatusIconHoverTooltip;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectRenderableStatusIcons')) exports.collectRenderableStatusIcons = collectRenderableStatusIcons;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isStatusIconReady')) exports.isStatusIconReady = isStatusIconReady;
   if (!Object.prototype.hasOwnProperty.call(exports, 'materializeRenderableStatusIcons')) exports.materializeRenderableStatusIcons = materializeRenderableStatusIcons;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveRenderableStatusIcons')) exports.resolveRenderableStatusIcons = resolveRenderableStatusIcons;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createRenderableStatusIconResolver')) exports.createRenderableStatusIconResolver = createRenderableStatusIconResolver;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createStatusIconResolver')) exports.createStatusIconResolver = createStatusIconResolver;
 };
 __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) => {
   const __dep2 = __require('./aether.ts');
@@ -16319,14 +16379,13 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const createSessionEventBindings = __dep30.createSessionEventBindings;
   const __dep31 = __require('./modes/pve/session-render.ts');
   const applyStatusIconHoverTooltip = __dep31.applyStatusIconHoverTooltip;
-  const collectRenderableStatusIcons = __dep31.collectRenderableStatusIcons;
-  const createStatusIconLoader = __dep31.createStatusIconLoader;
+  const createDefaultStatusIconEntry = __dep31.createDefaultStatusIconEntry;
+  const createStatusIconResolver = __dep31.createStatusIconResolver;
   const createBrowserFrameFns = __dep31.createBrowserFrameFns;
   const createSessionRenderController = __dep31.createSessionRenderController;
   const DEFAULT_STATUS_ICON_PATH = __dep31.DEFAULT_STATUS_ICON_PATH;
   const MAX_STATUS_ICONS_PER_TOKEN = __dep31.MAX_STATUS_ICONS_PER_TOKEN;
   const isStatusIconReady = __dep31.isStatusIconReady;
-  const materializeRenderableStatusIcons = __dep31.materializeRenderableStatusIcons;
   const resolveStatusIconPreview = __dep31.resolveStatusIconPreview;
   const __dep32 = __require('./leader-uyen.ts');
   const ensureUyenState = __dep32.ensureUyenState;
@@ -18786,23 +18845,15 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const hpMax = Math.max(1, toFiniteOrZero(unit.hpMax));
       return Math.max(0, Math.min(1, shieldAmount / hpMax));
   }
-  const ensureStatusIconLoaded = createStatusIconLoader({
+  const { resolveStatusIcons: resolveStatusIconsForToken, } = createStatusIconResolver({
       fallbackIconPath: DEFAULT_STATUS_ICON_PATH,
       getCacheEntry: (nextIconId) => statusIconCache.get(nextIconId),
       setCacheEntry: (nextIconId, entry) => {
           statusIconCache.set(nextIconId, entry);
       },
-      createCacheEntry: (nextIconId, nextIconPath) => ({
-          statusId: nextIconId,
-          statusName: nextIconId,
-          tooltip: nextIconId,
-          priority: 0,
-          stacks: 1,
-          turnsLeft: null,
-          path: nextIconPath,
-          image: null,
-          status: 'idle',
-      }),
+      createCacheEntry: (nextIconId, nextIconPath) => createDefaultStatusIconEntry(nextIconId, nextIconPath),
+      maxIcons: MAX_STATUS_ICONS_PER_TOKEN,
+      isIconReady: isStatusIconReady,
   });
   function __resolveStatusIconPreview(statusesInput) {
       return resolveStatusIconPreview(statusesInput);
@@ -18839,12 +18890,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           const headY = p.y - spriteHeight * anchor;
           const hpY = Math.round(headY - Math.max(6, Math.floor(r * 0.34)) - barHeight);
           const hpX = Math.round(p.x - barWidth / 2);
-          const statusIcons = materializeRenderableStatusIcons(collectRenderableStatusIcons({
-              statusesInput: Array.isArray(t.statuses) ? t.statuses : [],
-              maxIcons: MAX_STATUS_ICONS_PER_TOKEN,
-              ensureStatusIcon: ensureStatusIconLoaded,
-              isIconReady: isStatusIconReady,
-          }));
+          const statusIcons = resolveStatusIconsForToken(Array.isArray(t.statuses) ? t.statuses : []);
           const statusIconSize = Math.max(2, Math.floor(barHeight * 0.9));
           const statusIconGap = Math.max(1, Math.floor(statusIconSize * 0.2));
           const statusRowWidth = statusIcons.length > 0
