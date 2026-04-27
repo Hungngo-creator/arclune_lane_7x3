@@ -266,7 +266,22 @@ Di chuyển theo nguyên tắc **copy-move, không đổi hành vi**:
   - không đổi điều kiện “icon phải ready mới vẽ”;
   - không đổi fallback `DEFAULT_STATUS_ICON_PATH` khi load lỗi.
 - Mục tiêu kế tiếp (D1.4):
-  - cân nhắc move luôn readiness predicate/type alias vào `session-render` nếu không làm tăng coupling với `Image`.y
+  - cân nhắc move luôn readiness predicate/type alias vào `session-render` nếu không làm tăng coupling với `Image`.
+
+### Nâng cấp D1 (D1.4) — move status icon loader + hover resolver sang `session-render` (bắt đầu triển khai)
+
+- Đánh giá:
+  - `ensureStatusIconLoaded` và `updateStatusIconHoverTooltip` trong impl là phần render-support, không phải gameplay.
+  - Hai khối này đang lặp pattern có thể dùng lại ở module khác (cache icon + hitbox hover).
+- Scope move:
+  - thêm helper dùng chung ở `session-render.ts`:
+    - `ensureStatusIconLoaded(deps)` (generic theo cache entry shape),
+    - `resolveStatusIconHoverTooltip(canvas, hitboxes, clientX, clientY)`.
+  - `session-runtime-impl.ts` giữ cache map thực tế (`statusIconCache`) nhưng chỉ gọi helper mới.
+- Invariants cần giữ:
+  1. fallback icon path vẫn về `DEFAULT_STATUS_ICON_PATH` khi load lỗi;
+  2. chỉ update `canvas.title` khi tooltip thay đổi;
+  3. không đổi thứ tự ưu tiên icon và điều kiện icon-ready.
 
 ### Đánh giá bổ sung sau D1.3 và kế hoạch D1.4 (session-render)
 
@@ -295,6 +310,10 @@ Di chuyển theo nguyên tắc **copy-move, không đổi hành vi**:
   - `ensureStatusIconLoaded`,
   - `statusIconCache`,
   - draw/hitbox logic.
+  - Anti-overhead checklist:
+     - bỏ nhánh legacy `document.createEvent` nếu không còn target runtime cần hỗ trợ;
+     - tránh tạo wrapper handler trung gian không cần thiết cho `EventTarget`;
+     - giữ `dispose` idempotent cho mọi backend để tránh leak.
 
 ### Tiêu chí pass cho D1.4
 

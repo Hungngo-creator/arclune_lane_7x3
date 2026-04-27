@@ -75,10 +75,13 @@ import {
   createSessionRenderController,
   DEFAULT_STATUS_ICON_PATH,
   MAX_STATUS_ICONS_PER_TOKEN,
+  ensureStatusIconLoaded as ensureStatusIconLoadedShared,
+  resolveStatusIconHoverTooltip,
   isStatusIconReady,
   materializeRenderableStatusIcons,
   resolveStatusIconPreview,
 } from './session-render';
+import type { StatusIconHitbox } from './session-render';
 import {
   ensureUyenState,
   getUyenUltChoice,
@@ -727,12 +730,6 @@ type StatusIconEntry = {
   path: string;
   image: HTMLImageElement | null;
   status: 'idle' | 'loading' | 'ready' | 'error';
-};
-type StatusIconHitbox = {
-  x: number;
-  y: number;
-  size: number;
-  tooltip: string;
 };
 const statusIconCache = new Map<string, StatusIconEntry>();
 const statusIconHitboxes: StatusIconHitbox[] = [];
@@ -2813,49 +2810,26 @@ function getShieldRatio(unit: UnitToken): number {
 }
 
 function ensureStatusIconLoaded(iconId: string, iconPath: string): StatusIconEntry | null {
-  if (typeof Image === 'undefined') return null;
-  let cache = statusIconCache.get(iconId);
-  if (!cache) {
-    cache = {
-      statusId: iconId,
-      statusName: iconId,
-      tooltip: iconId,
+  return ensureStatusIconLoadedShared<StatusIconEntry>({
+    iconId,
+    iconPath,
+    fallbackIconPath: DEFAULT_STATUS_ICON_PATH,
+    getCacheEntry: (nextIconId) => statusIconCache.get(nextIconId),
+    setCacheEntry: (nextIconId, entry) => {
+      statusIconCache.set(nextIconId, entry);
+    },
+    createCacheEntry: (nextIconId, nextIconPath) => ({
+      statusId: nextIconId,
+      statusName: nextIconId,
+      tooltip: nextIconId,
       priority: 0,
       stacks: 1,
       turnsLeft: null,
-      path: iconPath,
+      path: nextIconPath,
       image: null,
       status: 'idle',
-    };
-    statusIconCache.set(iconId, cache);
-  }
-  if (cache.path !== iconPath){
-    cache.path = iconPath;
-    cache.status = 'idle';
-    cache.image = null;
-  }
-  if (cache.status !== 'idle') return cache;
-  const image = new Image();
-  cache.image = image;
-  cache.status = 'loading';
-  if ('decoding' in image) {
-    (image as HTMLImageElement & { decoding?: string }).decoding = 'async';
-  }
-  image.onload = () => {
-    cache!.status = 'ready';
-  };
-  image.onerror = () => {
-    if (cache!.path !== DEFAULT_STATUS_ICON_PATH) {
-      cache!.status = 'idle';
-      cache!.image = null;
-      cache!.path = DEFAULT_STATUS_ICON_PATH;
-      ensureStatusIconLoaded(iconId, DEFAULT_STATUS_ICON_PATH);
-      return;
-    }
-    cache!.status = 'error';
-  };
-  image.src = iconPath;
-  return cache;
+    }),
+ });
 }
 
 export function __resolveStatusIconPreview(statusesInput: ReadonlyArray<Record<string, unknown> | null | undefined>): Array<{ id: string; tooltip: string; priority: number }> {
@@ -2863,22 +2837,12 @@ export function __resolveStatusIconPreview(statusesInput: ReadonlyArray<Record<s
 }
 
 function updateStatusIconHoverTooltip(clientX: number, clientY: number): void {
-  if (!canvas) return;
-  const rect = canvas.getBoundingClientRect();
-  const x = clientX - rect.left;
-  const y = clientY - rect.top;
-  let nextTooltip = '';
-  for (const hitbox of statusIconHitboxes){
-    const withinX = x >= hitbox.x && x <= hitbox.x + hitbox.size;
-    const withinY = y >= hitbox.y && y <= hitbox.y + hitbox.size;
-    if (withinX && withinY){
-      nextTooltip = hitbox.tooltip;
-      break;
-    }
-  }
+  const nextTooltip = resolveStatusIconHoverTooltip(canvas, statusIconHitboxes, clientX, clientY);
   if (statusIconHoverTooltip === nextTooltip) return;
   statusIconHoverTooltip = nextTooltip;
-  canvas.title = nextTooltip;
+  if (canvas) {
+    canvas.title = nextTooltip;
+  }
 }
 
 function drawHPBars(): void {

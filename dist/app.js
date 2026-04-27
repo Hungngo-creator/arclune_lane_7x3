@@ -13543,24 +13543,6 @@ __modules['./events.ts'] = (exports, module, __require) => {
       if (typeof Event === 'function') {
           try {
               const ev = new Event(type);
-              try {
-                  ev.detail = detail;
-              }
-              catch (_assignErr) {
-                  // ignore assignment failures (readonly in some browsers)
-              }
-              return ev;
-          }
-          catch (_err) {
-              // ignore and fall through
-          }
-      }
-      if (typeof document === 'object' && document && typeof document.createEvent === 'function') {
-          try {
-              const ev = document.createEvent('Event');
-              if (typeof ev.initEvent === 'function') {
-                  ev.initEvent(type, false, false);
-              }
               ev.detail = detail;
               return ev;
           }
@@ -13594,8 +13576,6 @@ __modules['./events.ts'] = (exports, module, __require) => {
           if (!event || !event.type)
               return false;
           const type = event.type;
-          if (!type)
-              return false;
           const set = this.listeners.get(type);
           if (!set || set.size === 0)
               return true;
@@ -13629,133 +13609,116 @@ __modules['./events.ts'] = (exports, module, __require) => {
       return (typeof candidate.on === 'function' &&
           typeof candidate.emit === 'function');
   }
-  function makeEventTarget() {
-      if (!HAS_EVENT_TARGET)
-          return new SimpleEventTarget();
-      const probeType = '__probe__';
-      const probeEvent = createNativeEvent(probeType);
-      const hasEventConstructor = typeof Event === 'function';
-      const isRealEvent = !!probeEvent && (!hasEventConstructor || probeEvent instanceof Event);
-      if (!isRealEvent)
-          return new SimpleEventTarget();
-      try {
-          const target = new EventTarget();
-          let handled = false;
-          const handler = () => {
-              handled = true;
-          };
-          if (typeof target.addEventListener === 'function') {
-              target.addEventListener(probeType, handler);
-              try {
-                  if (typeof target.dispatchEvent === 'function' && isRealEvent) {
-                      target.dispatchEvent(probeEvent);
-                  }
-              }
-              finally {
-                  if (typeof target.removeEventListener === 'function') {
-                      target.removeEventListener(probeType, handler);
-                  }
-              }
+  const makeEventTarget = () => {
+      if (HAS_EVENT_TARGET) {
+          try {
+              return new EventTarget();
           }
-          if (handled)
-              return target;
-      }
-      catch (err) {
-          console.warn('[events] Falling back to SimpleEventTarget:', err);
+          catch (_err) {
+              // ignore and fall through
+          }
       }
       return new SimpleEventTarget();
-  }
+  };
+  const resolveEventBackend = (target) => {
+      if (HAS_EVENT_TARGET && target instanceof EventTarget) {
+          return { kind: 'target', target };
+      }
+      if (target instanceof SimpleEventTarget) {
+          return { kind: 'simple', target };
+      }
+      if (isEventEmitterLike(target)) {
+          return { kind: 'emitter', target };
+      }
+      return null;
+  };
+  const toSyntheticEventRecord = (type, detail) => ({
+      type,
+      detail: detail,
+  });
+  const withEventTargetRefs = (event, target) => {
+      const record = event;
+      try {
+          if (typeof record.target === 'undefined') {
+              record.target = target;
+          }
+          record.currentTarget = target;
+      }
+      catch (_err) {
+          // ignore assignment failures
+      }
+      return event;
+  };
   const gameEvents = makeEventTarget();
+  const gameEventBackend = resolveEventBackend(gameEvents);
   function emitGameEvent(type, detail) {
-      if (!type || !gameEvents)
+      if (!type || !gameEventBackend)
           return false;
       try {
-          if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget) {
+          if (gameEventBackend.kind === 'target') {
               const nativeEvent = createNativeEvent(type, detail);
-              if (nativeEvent) {
-                  return gameEvents.dispatchEvent(nativeEvent);
-              }
+              if (!nativeEvent)
+                  return false;
+              return gameEventBackend.target.dispatchEvent(nativeEvent);
           }
-          if (gameEvents instanceof SimpleEventTarget) {
-              const syntheticEvent = {
-                  type,
-                  detail: detail,
-              };
-              return gameEvents.dispatchEvent(syntheticEvent);
+          if (gameEventBackend.kind === 'simple') {
+              return gameEventBackend.target.dispatchEvent(toSyntheticEventRecord(type, detail));
           }
-          if (isEventEmitterLike(gameEvents)) {
-              gameEvents.emit(type, detail);
-              return true;
-          }
+          gameEventBackend.target.emit(type, detail);
+          return true;
       }
       catch (err) {
           console.error('[events]', err);
+          return false;
       }
-      return false;
   }
   const dispatchGameEvent = (type, detail) => emitGameEvent(type, detail);
   function addGameEventListener(type, handler) {
-      if (!type || !isCompatibleHandler(handler) || !gameEvents) {
+      if (!type || !isCompatibleHandler(handler) || !gameEventBackend) {
           return () => { };
       }
-      const normalizedHandler = function (event) {
-          handler.call(this, event);
+      if (gameEventBackend.kind === 'target') {
+          const eventListener = ((event) => {
+              handler(event);
+          });
+          gameEventBackend.target.addEventListener(type, eventListener);
+          let disposed = false;
+          return () => {
+              if (disposed)
+                  return;
+              disposed = true;
+              gameEventBackend.target.removeEventListener(type, eventListener);
+          };
+      }
+      if (gameEventBackend.kind === 'simple') {
+          const simpleHandler = (event) => {
+              handler(event);
+          };
+          gameEventBackend.target.addEventListener(type, simpleHandler);
+          let disposed = false;
+          return () => {
+              if (disposed)
+                  return;
+              disposed = true;
+              gameEventBackend.target.removeEventListener(type, simpleHandler);
+          };
+      }
+      const emitterHandler = function (payload) {
+          const eventRecord = isGameEventRecord(payload)
+              ? payload
+              : toSyntheticEventRecord(type, payload);
+          handler.call(this, withEventTargetRefs(eventRecord, gameEvents));
       };
-      if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget) {
-          const eventListener = normalizedHandler;
-          gameEvents.addEventListener(type, eventListener);
-          let disposed = false;
-          return () => {
-              if (disposed)
-                  return;
-              disposed = true;
-              if (HAS_EVENT_TARGET && gameEvents instanceof EventTarget) {
-                  gameEvents.removeEventListener(type, eventListener);
-              }
-          };
-      }
-      if (gameEvents instanceof SimpleEventTarget) {
-          gameEvents.addEventListener(type, normalizedHandler);
-          let disposed = false;
-          return () => {
-              if (disposed)
-                  return;
-              disposed = true;
-              gameEvents.removeEventListener(type, normalizedHandler);
-          };
-      }
-      if (isEventEmitterLike(gameEvents)) {
-          const emitterHandler = function (payload) {
-              const eventRecord = isGameEventRecord(payload)
-                  ? payload
-                  : {
-                      type,
-                      detail: payload,
-                  };
-              const record = eventRecord;
-              try {
-                  if (typeof record.target === 'undefined') {
-                      record.target = gameEvents;
-                  }
-                  record.currentTarget = gameEvents;
-              }
-              catch (_err) {
-                  // ignore assignment failures
-              }
-              handler.call(this, eventRecord);
-          };
-          gameEvents.on(type, emitterHandler);
-          let disposed = false;
-          return () => {
-              if (disposed)
-                  return;
-              disposed = true;
-              if (typeof gameEvents.off === 'function') {
-                  gameEvents.off(type, emitterHandler);
-              }
-          };
-      }
-      return () => { };
+      gameEventBackend.target.on(type, emitterHandler);
+      let disposed = false;
+      return () => {
+          if (disposed)
+              return;
+          disposed = true;
+          if (typeof gameEventBackend.target.off === 'function') {
+              gameEventBackend.target.off(type, emitterHandler);
+          }
+      };
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'TURN_START')) exports.TURN_START = TURN_START;
@@ -16098,6 +16061,63 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
       }
       return preview;
   };
+  const ensureStatusIconLoaded = (deps) => {
+      if (typeof Image === 'undefined')
+          return null;
+      const fallbackIconPath = deps.fallbackIconPath ?? DEFAULT_STATUS_ICON_PATH;
+      let cache = deps.getCacheEntry(deps.iconId);
+      if (!cache) {
+          cache = deps.createCacheEntry(deps.iconId, deps.iconPath);
+          deps.setCacheEntry(deps.iconId, cache);
+      }
+      if (cache.path !== deps.iconPath) {
+          cache.path = deps.iconPath;
+          cache.status = 'idle';
+          cache.image = null;
+      }
+      if (cache.status !== 'idle')
+          return cache;
+      const image = new Image();
+      cache.image = image;
+      cache.status = 'loading';
+      if ('decoding' in image) {
+          image.decoding = 'async';
+      }
+      image.onload = () => {
+          cache.status = 'ready';
+      };
+      image.onerror = () => {
+          if (cache.path !== fallbackIconPath) {
+              cache.status = 'idle';
+              cache.image = null;
+              cache.path = fallbackIconPath;
+              ensureStatusIconLoaded({
+                  ...deps,
+                  iconPath: fallbackIconPath,
+                  fallbackIconPath,
+              });
+              return;
+          }
+          cache.status = 'error';
+      };
+      image.src = deps.iconPath;
+      return cache;
+  };
+  const resolveStatusIconHoverTooltip = (canvas, hitboxes, clientX, clientY) => {
+      if (!canvas)
+          return '';
+      const rect = canvas.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      for (const hitbox of hitboxes) {
+          const withinX = x >= hitbox.x && x <= hitbox.x + hitbox.size;
+          const withinY = y >= hitbox.y && y <= hitbox.y + hitbox.size;
+          if (withinX && withinY) {
+              return hitbox.tooltip;
+          }
+      }
+      return '';
+  };
   const collectRenderableStatusIcons = (deps) => {
       const statuses = Array.isArray(deps.statusesInput) ? deps.statusesInput : [];
       if (!statuses.length)
@@ -16143,6 +16163,8 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildStatusTooltip')) exports.buildStatusTooltip = buildStatusTooltip;
   if (!Object.prototype.hasOwnProperty.call(exports, 'aggregateStatuses')) exports.aggregateStatuses = aggregateStatuses;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusIconPreview')) exports.resolveStatusIconPreview = resolveStatusIconPreview;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStatusIconLoaded')) exports.ensureStatusIconLoaded = ensureStatusIconLoaded;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusIconHoverTooltip')) exports.resolveStatusIconHoverTooltip = resolveStatusIconHoverTooltip;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectRenderableStatusIcons')) exports.collectRenderableStatusIcons = collectRenderableStatusIcons;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isStatusIconReady')) exports.isStatusIconReady = isStatusIconReady;
   if (!Object.prototype.hasOwnProperty.call(exports, 'materializeRenderableStatusIcons')) exports.materializeRenderableStatusIcons = materializeRenderableStatusIcons;
@@ -16262,6 +16284,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const createSessionRenderController = __dep31.createSessionRenderController;
   const DEFAULT_STATUS_ICON_PATH = __dep31.DEFAULT_STATUS_ICON_PATH;
   const MAX_STATUS_ICONS_PER_TOKEN = __dep31.MAX_STATUS_ICONS_PER_TOKEN;
+  const ensureStatusIconLoadedShared = __dep31.ensureStatusIconLoaded;
+  const resolveStatusIconHoverTooltip = __dep31.resolveStatusIconHoverTooltip;
   const isStatusIconReady = __dep31.isStatusIconReady;
   const materializeRenderableStatusIcons = __dep31.materializeRenderableStatusIcons;
   const resolveStatusIconPreview = __dep31.resolveStatusIconPreview;
@@ -18728,74 +18752,38 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       return Math.max(0, Math.min(1, shieldAmount / hpMax));
   }
   function ensureStatusIconLoaded(iconId, iconPath) {
-      if (typeof Image === 'undefined')
-          return null;
-      let cache = statusIconCache.get(iconId);
-      if (!cache) {
-          cache = {
-              statusId: iconId,
-              statusName: iconId,
-              tooltip: iconId,
+      return ensureStatusIconLoadedShared({
+          iconId,
+          iconPath,
+          fallbackIconPath: DEFAULT_STATUS_ICON_PATH,
+          getCacheEntry: (nextIconId) => statusIconCache.get(nextIconId),
+          setCacheEntry: (nextIconId, entry) => {
+              statusIconCache.set(nextIconId, entry);
+          },
+          createCacheEntry: (nextIconId, nextIconPath) => ({
+              statusId: nextIconId,
+              statusName: nextIconId,
+              tooltip: nextIconId,
               priority: 0,
               stacks: 1,
               turnsLeft: null,
-              path: iconPath,
+              path: nextIconPath,
               image: null,
               status: 'idle',
-          };
-          statusIconCache.set(iconId, cache);
-      }
-      if (cache.path !== iconPath) {
-          cache.path = iconPath;
-          cache.status = 'idle';
-          cache.image = null;
-      }
-      if (cache.status !== 'idle')
-          return cache;
-      const image = new Image();
-      cache.image = image;
-      cache.status = 'loading';
-      if ('decoding' in image) {
-          image.decoding = 'async';
-      }
-      image.onload = () => {
-          cache.status = 'ready';
-      };
-      image.onerror = () => {
-          if (cache.path !== DEFAULT_STATUS_ICON_PATH) {
-              cache.status = 'idle';
-              cache.image = null;
-              cache.path = DEFAULT_STATUS_ICON_PATH;
-              ensureStatusIconLoaded(iconId, DEFAULT_STATUS_ICON_PATH);
-              return;
-          }
-          cache.status = 'error';
-      };
-      image.src = iconPath;
-      return cache;
+          }),
+      });
   }
   function __resolveStatusIconPreview(statusesInput) {
       return resolveStatusIconPreview(statusesInput);
   }
   function updateStatusIconHoverTooltip(clientX, clientY) {
-      if (!canvas)
-          return;
-      const rect = canvas.getBoundingClientRect();
-      const x = clientX - rect.left;
-      const y = clientY - rect.top;
-      let nextTooltip = '';
-      for (const hitbox of statusIconHitboxes) {
-          const withinX = x >= hitbox.x && x <= hitbox.x + hitbox.size;
-          const withinY = y >= hitbox.y && y <= hitbox.y + hitbox.size;
-          if (withinX && withinY) {
-              nextTooltip = hitbox.tooltip;
-              break;
-          }
-      }
+      const nextTooltip = resolveStatusIconHoverTooltip(canvas, statusIconHitboxes, clientX, clientY);
       if (statusIconHoverTooltip === nextTooltip)
           return;
       statusIconHoverTooltip = nextTooltip;
-      canvas.title = nextTooltip;
+      if (canvas) {
+          canvas.title = nextTooltip;
+      }
   }
   function drawHPBars() {
       if (!ctx || !Game?.grid)

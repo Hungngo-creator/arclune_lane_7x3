@@ -522,6 +522,93 @@ type ResolveReadyStatusIconDeps<TIcon> = {
   isIconReady: (icon: TIcon | null) => boolean;
 };
 
+export type StatusIconLoadState = 'idle' | 'loading' | 'ready' | 'error';
+
+export type StatusIconCacheEntry = {
+  path: string;
+  image: HTMLImageElement | null;
+  status: StatusIconLoadState;
+};
+
+export type StatusIconLoadDeps<TEntry extends StatusIconCacheEntry> = {
+  iconId: string;
+  iconPath: string;
+  fallbackIconPath?: string;
+  getCacheEntry: (iconId: string) => TEntry | undefined;
+  setCacheEntry: (iconId: string, entry: TEntry) => void;
+  createCacheEntry: (iconId: string, iconPath: string) => TEntry;
+};
+
+export const ensureStatusIconLoaded = <TEntry extends StatusIconCacheEntry>(
+  deps: StatusIconLoadDeps<TEntry>,
+): TEntry | null => {
+  if (typeof Image === 'undefined') return null;
+  const fallbackIconPath = deps.fallbackIconPath ?? DEFAULT_STATUS_ICON_PATH;
+  let cache = deps.getCacheEntry(deps.iconId);
+  if (!cache) {
+    cache = deps.createCacheEntry(deps.iconId, deps.iconPath);
+    deps.setCacheEntry(deps.iconId, cache);
+  }
+  if (cache.path !== deps.iconPath){
+    cache.path = deps.iconPath;
+    cache.status = 'idle';
+    cache.image = null;
+  }
+  if (cache.status !== 'idle') return cache;
+
+  const image = new Image();
+  cache.image = image;
+  cache.status = 'loading';
+  if ('decoding' in image) {
+    (image as HTMLImageElement & { decoding?: string }).decoding = 'async';
+  }
+  image.onload = () => {
+    cache!.status = 'ready';
+  };
+  image.onerror = () => {
+    if (cache!.path !== fallbackIconPath) {
+      cache!.status = 'idle';
+      cache!.image = null;
+      cache!.path = fallbackIconPath;
+      ensureStatusIconLoaded({
+        ...deps,
+        iconPath: fallbackIconPath,
+        fallbackIconPath,
+      });
+      return;
+    }
+    cache!.status = 'error';
+  };
+  image.src = deps.iconPath;
+  return cache;
+};
+
+export type StatusIconHitbox = {
+  x: number;
+  y: number;
+  size: number;
+  tooltip: string;
+};
+
+export const resolveStatusIconHoverTooltip = (
+  canvas: HTMLCanvasElement | null,
+  hitboxes: ReadonlyArray<StatusIconHitbox>,
+  clientX: number,
+  clientY: number,
+): string => {
+  if (!canvas) return '';
+  const rect = canvas.getBoundingClientRect();
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+  for (const hitbox of hitboxes){
+    const withinX = x >= hitbox.x && x <= hitbox.x + hitbox.size;
+    const withinY = y >= hitbox.y && y <= hitbox.y + hitbox.size;
+    if (withinX && withinY){
+      return hitbox.tooltip;
+    }
+  }
+  return '';
+};
 export const collectRenderableStatusIcons = <TIcon>(
   deps: ResolveReadyStatusIconDeps<TIcon>,
 ): Array<RenderableStatusIcon & { icon: TIcon }> => {
