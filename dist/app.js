@@ -13521,6 +13521,8 @@ __modules['./events.ts'] = (exports, module, __require) => {
   const TURN_REGEN = 'turn:regen';
   const BATTLE_END = 'battle:end';
   const HAS_EVENT_TARGET = typeof EventTarget === 'function';
+  const HAS_CUSTOM_EVENT = typeof CustomEvent === 'function';
+  const HAS_EVENT_CONSTRUCTOR = typeof Event === 'function';
   const NOOP_DISPOSE = () => { };
   const reportEventError = (error) => {
       if (typeof console !== 'undefined' && typeof console.error === 'function') {
@@ -13533,7 +13535,6 @@ __modules['./events.ts'] = (exports, module, __require) => {
       const record = payload;
       return typeof record.type === 'string' && typeof record.detail !== 'undefined';
   };
-  const isCompatibleHandler = (handler) => typeof handler === 'function';
   const createIdempotentDispose = (dispose) => {
       let disposed = false;
       return () => {
@@ -13543,27 +13544,46 @@ __modules['./events.ts'] = (exports, module, __require) => {
           dispose();
       };
   };
-  function createNativeEvent(type, detail) {
-      if (!type)
-          return null;
-      if (typeof CustomEvent === 'function') {
-          try {
-              return new CustomEvent(type, { detail });
-          }
-          catch {
-              // ignore and fall through
-          }
+  const createCustomEventFactory = () => {
+      if (!HAS_CUSTOM_EVENT)
+          return () => null;
+      try {
+          const probe = new CustomEvent('__probe__');
+          if (!(probe instanceof Event))
+              return () => null;
+          return (type, detail) => new CustomEvent(type, { detail });
       }
-      if (typeof Event === 'function') {
-          try {
+      catch {
+          return () => null;
+      }
+  };
+  const createLegacyEventFactory = () => {
+      if (!HAS_EVENT_CONSTRUCTOR)
+          return () => null;
+      try {
+          const probe = new Event('__probe__');
+          probe.detail = null;
+          return (type, detail) => {
               const event = new Event(type);
               event.detail = detail;
               return event;
-          }
-          catch {
-              // ignore and fall through
-          }
+          };
       }
+      catch {
+          return () => null;
+      }
+  };
+  const CUSTOM_EVENT_FACTORY = createCustomEventFactory();
+  const LEGACY_EVENT_FACTORY = createLegacyEventFactory();
+  function createNativeEvent(type, detail) {
+      if (!type)
+          return null;
+      const customEvent = CUSTOM_EVENT_FACTORY(type, detail);
+      if (customEvent)
+          return customEvent;
+      const legacyEvent = LEGACY_EVENT_FACTORY(type, detail);
+      if (legacyEvent)
+          return legacyEvent;
       return null;
   }
   class SimpleEventTarget {
@@ -13727,7 +13747,7 @@ __modules['./events.ts'] = (exports, module, __require) => {
       return gameEventDispatchAdapters.emit(type, detail);
   };
   const addGameEventListenerInternal = (type, handler) => {
-      if (!type || !isCompatibleHandler(handler))
+      if (!type || typeof handler !== 'function')
           return NOOP_DISPOSE;
       return gameEventDispatchAdapters.addListener(type, handler);
   };
@@ -15908,6 +15928,31 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
           setDrawPaused,
       };
   };
+  const normalizeHpBarGradientCacheKey = (fillColor, innerHeight, innerRadius, startY) => {
+      const color = typeof fillColor === 'string' ? fillColor.trim().toLowerCase() : String(fillColor ?? '');
+      const height = Number.isFinite(innerHeight) ? Math.max(0, Math.round(innerHeight)) : 0;
+      const radius = Number.isFinite(innerRadius) ? Math.max(0, Math.round(innerRadius)) : 0;
+      const start = Number.isFinite(startY) ? Math.round(startY * 100) / 100 : 0;
+      return `${color}|h:${height}|r:${radius}|y:${start}`;
+  };
+  const resolveHpBarGradient = (deps) => {
+      const key = normalizeHpBarGradientCacheKey(deps.fillColor, deps.innerHeight, deps.innerRadius, deps.startY);
+      const cached = deps.cache.get(key);
+      if (cached)
+          return cached;
+      const baseFill = typeof deps.fillColor === 'string' ? deps.fillColor : '#6ff0c0';
+      if (!deps.context || !Number.isFinite(deps.innerHeight) || deps.innerHeight <= 0) {
+          deps.cache.set(key, baseFill);
+          return baseFill;
+      }
+      const startYSafe = Number.isFinite(deps.startY) ? deps.startY : 0;
+      const gradient = deps.context.createLinearGradient(deps.x, startYSafe, deps.x, startYSafe + deps.innerHeight);
+      const topFill = deps.lightenColor(baseFill, 0.25) ?? baseFill;
+      gradient.addColorStop(0, topFill);
+      gradient.addColorStop(1, baseFill);
+      deps.cache.set(key, gradient);
+      return gradient;
+  };
   const DEFAULT_STATUS_ICON_PATH = 'assets/weaken.svg';
   const MAX_STATUS_ICONS_PER_TOKEN = 5;
   const CONTROL_TAGS = new Set(['control', 'silence', 'taunt', 'stun', 'sleep', 'fear']);
@@ -16251,6 +16296,7 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createBrowserFrameFns')) exports.createBrowserFrameFns = createBrowserFrameFns;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionRenderController')) exports.createSessionRenderController = createSessionRenderController;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveHpBarGradient')) exports.resolveHpBarGradient = resolveHpBarGradient;
   if (!Object.prototype.hasOwnProperty.call(exports, 'DEFAULT_STATUS_ICON_PATH')) exports.DEFAULT_STATUS_ICON_PATH = DEFAULT_STATUS_ICON_PATH;
   if (!Object.prototype.hasOwnProperty.call(exports, 'MAX_STATUS_ICONS_PER_TOKEN')) exports.MAX_STATUS_ICONS_PER_TOKEN = MAX_STATUS_ICONS_PER_TOKEN;
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildStatusTooltip')) exports.buildStatusTooltip = buildStatusTooltip;
@@ -16387,6 +16433,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const MAX_STATUS_ICONS_PER_TOKEN = __dep31.MAX_STATUS_ICONS_PER_TOKEN;
   const isStatusIconReady = __dep31.isStatusIconReady;
   const resolveStatusIconPreview = __dep31.resolveStatusIconPreview;
+  const resolveHpBarGradient = __dep31.resolveHpBarGradient;
   const __dep32 = __require('./leader-uyen.ts');
   const ensureUyenState = __dep32.ensureUyenState;
   const getUyenUltChoice = __dep32.getUyenUltChoice;
@@ -18776,35 +18823,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const mix = (c) => Math.min(255, Math.round(c + (255 - c) * amount));
       return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
   }
-  function normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY) {
-      const color = typeof fillColor === 'string' ? fillColor.trim().toLowerCase() : String(fillColor ?? '');
-      const height = Number.isFinite(innerHeight) ? Math.max(0, Math.round(innerHeight)) : 0;
-      const radius = Number.isFinite(innerRadius) ? Math.max(0, Math.round(innerRadius)) : 0;
-      const start = Number.isFinite(startY) ? Math.round(startY * 100) / 100 : 0;
-      return `${color}|h:${height}|r:${radius}|y:${start}`;
-  }
-  function ensureHpBarGradient(fillColor, innerHeight, innerRadius, startY, x) {
-      const key = normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY);
-      const cached = hpBarGradientCache.get(key);
-      if (cached)
-          return cached;
-      const baseFill = typeof fillColor === 'string' ? fillColor : '#6ff0c0';
-      if (!ctx || !Number.isFinite(innerHeight) || innerHeight <= 0) {
-          hpBarGradientCache.set(key, baseFill);
-          return baseFill;
-      }
-      const startYSafe = Number.isFinite(startY) ? startY : 0;
-      const gradient = ctx.createLinearGradient(x, startYSafe, x, startYSafe + innerHeight);
-      if (!gradient) {
-          hpBarGradientCache.set(key, baseFill);
-          return baseFill;
-      }
-      const topFill = lightenColor(baseFill, 0.25) ?? baseFill;
-      gradient.addColorStop(0, topFill);
-      gradient.addColorStop(1, baseFill);
-      hpBarGradientCache.set(key, gradient);
-      return gradient;
-  }
   function collectActiveAttackTokenKeys() {
       const active = new Set();
       for (const key of meleeOffsetTokenKeys) {
@@ -18921,7 +18939,16 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           const innerWidth = Math.max(1, barWidth - inset * 2);
           const filledWidth = Math.round(innerWidth * hpRatio);
           if (filledWidth > 0) {
-              const fillStyle = ensureHpBarGradient(fillColor, innerHeight, innerRadius, hpY + inset, hpX + inset);
+              const fillStyle = resolveHpBarGradient({
+                  cache: hpBarGradientCache,
+                  context: ctx,
+                  fillColor,
+                  innerHeight,
+                  innerRadius,
+                  startY: hpY + inset,
+                  x: hpX + inset,
+                  lightenColor,
+              });
               drawCtx.save();
               drawCtx.translate(hpX + inset, hpY + inset);
               roundedRectPathUI(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);

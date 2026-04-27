@@ -81,6 +81,8 @@ import {
   type StatusIconCacheEntry,
   isStatusIconReady,
   resolveStatusIconPreview,
+  resolveHpBarGradient,
+  type HpBarGradientValue,
 } from './session-render';
 import type { StatusIconHitbox } from './session-render';
 import {
@@ -129,7 +131,6 @@ type PveSessionStartConfig = StartConfigOverrides & {
   rootEl?: RootLike;
 };
 
-type GradientValue = CanvasGradient | string;
 type CanvasClickHandler = (event: MouseEvent) => void;
 type ExtendedQueuedSummon = (QueuedSummonRequest & {
   art?: ReturnType<typeof getUnitArt> | null;
@@ -718,7 +719,7 @@ let leaderUltControlsFingerprint: string | null = null;
 let storedConfig: NormalizedSessionConfig = normalizeConfig();
 let running = false;
 let leaderEndCheckFlags: { ally: boolean; enemy: boolean } = { ally: false, enemy: false };
-const hpBarGradientCache = new Map<string, GradientValue>();
+const hpBarGradientCache = new Map<string, HpBarGradientValue>();
 const meleeOffsetTokenKeys = new Set<string>();
 const ATTACK_EVENT_TYPES = new Set(['melee', 'tracer', 'lightning_arc', 'blood_pulse', 'ground_burst']);
 type StatusIconEntry = StatusIconCacheEntry & RenderableStatusIcon;
@@ -2720,47 +2721,6 @@ function lightenColor(color: string | null | undefined, amount: number): string 
   return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
 }
 
-function normalizeHpBarCacheKey(
-  fillColor: string | undefined,
-  innerHeight: number,
-  innerRadius: number,
-  startY: number,
-): string {
-  const color = typeof fillColor === 'string' ? fillColor.trim().toLowerCase() : String(fillColor ?? '');
-  const height = Number.isFinite(innerHeight) ? Math.max(0, Math.round(innerHeight)) : 0;
-  const radius = Number.isFinite(innerRadius) ? Math.max(0, Math.round(innerRadius)) : 0;
-  const start = Number.isFinite(startY) ? Math.round(startY * 100) / 100 : 0;
-  return `${color}|h:${height}|r:${radius}|y:${start}`;
-}
-
-function ensureHpBarGradient(
-  fillColor: string | undefined,
-  innerHeight: number,
-  innerRadius: number,
-  startY: number,
-  x: number,
-): GradientValue {
-  const key = normalizeHpBarCacheKey(fillColor, innerHeight, innerRadius, startY);
-  const cached = hpBarGradientCache.get(key);
-  if (cached) return cached;
-  const baseFill = typeof fillColor === 'string' ? fillColor : '#6ff0c0';
-  if (!ctx || !Number.isFinite(innerHeight) || innerHeight <= 0){
-    hpBarGradientCache.set(key, baseFill);
-    return baseFill;
-  }
-  const startYSafe = Number.isFinite(startY) ? startY : 0;
-  const gradient = ctx.createLinearGradient(x, startYSafe, x, startYSafe + innerHeight);
-  if (!gradient){
-    hpBarGradientCache.set(key, baseFill);
-    return baseFill;
-  }
-  const topFill = lightenColor(baseFill, 0.25) ?? baseFill;
-  gradient.addColorStop(0, topFill);
-  gradient.addColorStop(1, baseFill);
-  hpBarGradientCache.set(key, gradient);
-  return gradient;
-}
-
 function collectActiveAttackTokenKeys(): Set<string> {
   const active = new Set<string>();
   for (const key of meleeOffsetTokenKeys){
@@ -2883,7 +2843,16 @@ function drawHPBars(): void {
     const innerWidth = Math.max(1, barWidth - inset * 2);
     const filledWidth = Math.round(innerWidth * hpRatio);
     if (filledWidth > 0){
-      const fillStyle = ensureHpBarGradient(fillColor, innerHeight, innerRadius, hpY + inset, hpX + inset);
+      const fillStyle = resolveHpBarGradient({
+        cache: hpBarGradientCache,
+        context: ctx,
+        fillColor,
+        innerHeight,
+        innerRadius,
+        startY: hpY + inset,
+        x: hpX + inset,
+        lightenColor,
+      });
       drawCtx.save();
       drawCtx.translate(hpX + inset, hpY + inset);
       roundedRectPathUI(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);

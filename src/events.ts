@@ -125,8 +125,11 @@ type CompatibleGameEventHandler<T extends GameEventType> = (
 ) => unknown;
 
 const HAS_EVENT_TARGET = typeof EventTarget === 'function';
+const HAS_CUSTOM_EVENT = typeof CustomEvent === 'function';
+const HAS_EVENT_CONSTRUCTOR = typeof Event === 'function';
 
 type LegacyEvent = Event & { detail?: unknown };
+type AnyRecord = Record<string, unknown>;
 
 const NOOP_DISPOSE = (): void => {};
 
@@ -140,13 +143,9 @@ const isGameEventRecord = <T extends GameEventType>(
   payload: unknown,
 ): payload is GameEventDetail<T> => {
   if (!payload || typeof payload !== 'object') return false;
-  const record = payload as Record<string, unknown>;
+  const record = payload as AnyRecord;
   return typeof record.type === 'string' && typeof record.detail !== 'undefined';
 };
-
-const isCompatibleHandler = <T extends GameEventType>(
-  handler: unknown,
-): handler is CompatibleGameEventHandler<T> => typeof handler === 'function';
 
 const createIdempotentDispose = (dispose: () => void): (() => void) => {
   let disposed = false;
@@ -157,27 +156,44 @@ const createIdempotentDispose = (dispose: () => void): (() => void) => {
   };
 };
 
+const createCustomEventFactory = (): ((type: string, detail: unknown) => Event | null) => {
+  if (!HAS_CUSTOM_EVENT) return () => null;
+  try {
+    const probe = new CustomEvent('__probe__');
+    if (!(probe instanceof Event)) return () => null;
+    return (type, detail) => new CustomEvent(type, { detail });
+  } catch {
+    return () => null;
+  }
+};
+
+const createLegacyEventFactory = (): ((type: string, detail: unknown) => Event | null) => {
+  if (!HAS_EVENT_CONSTRUCTOR) return () => null;
+  try {
+    const probe = new Event('__probe__') as LegacyEvent;
+    probe.detail = null;
+    return (type, detail) => {
+      const event = new Event(type) as LegacyEvent;
+      event.detail = detail;
+      return event;
+    };
+  } catch {
+    return () => null;
+  }
+};
+
+const CUSTOM_EVENT_FACTORY = createCustomEventFactory();
+const LEGACY_EVENT_FACTORY = createLegacyEventFactory();
+
 function createNativeEvent<T extends GameEventType>(
   type: T,
   detail?: GameEventDetailMap[T],
 ): GameEventDetail<T> | null {
   if (!type) return null;
-  if (typeof CustomEvent === 'function'){
-    try {
-      return new CustomEvent(type, { detail }) as GameEventDetail<T>;
-    } catch {
-      // ignore and fall through
-    }
-  }
-  if (typeof Event === 'function'){
-    try {
-      const event = new Event(type) as LegacyEvent;
-      event.detail = detail;
-      return event as GameEventDetail<T>;
-    } catch {
-      // ignore and fall through
-    }
-  }
+  const customEvent = CUSTOM_EVENT_FACTORY(type, detail);
+  if (customEvent) return customEvent as GameEventDetail<T>;
+  const legacyEvent = LEGACY_EVENT_FACTORY(type, detail);
+  if (legacyEvent) return legacyEvent as GameEventDetail<T>;
   return null;
 }
 
@@ -262,7 +278,7 @@ const withEventTargetRefs = <T extends GameEventType>(
   event: GameEventDetail<T>,
   target: GameEventTargetLike,
 ): GameEventDetail<T> => {
-  const record = event as Record<string, unknown>;
+  const record = event as AnyRecord;
   try {
     if (typeof record.target === 'undefined'){
       record.target = target;
@@ -393,7 +409,7 @@ const addGameEventListenerInternal = <T extends GameEventType, H extends Compati
   type: T,
   handler: H,
 ): (() => void) => {
-  if (!type || !isCompatibleHandler<T>(handler)) return NOOP_DISPOSE;
+  if (!type || typeof handler !== 'function') return NOOP_DISPOSE;
   return gameEventDispatchAdapters.addListener(type, handler);
 };
 

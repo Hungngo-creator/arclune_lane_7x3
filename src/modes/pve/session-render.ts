@@ -262,6 +262,54 @@ export const createSessionRenderController = (
   };
 };
 
+export type HpBarGradientValue = CanvasGradient | string;
+
+type ResolveHpBarGradientDeps = {
+  cache: Map<string, HpBarGradientValue>;
+  context: CanvasRenderingContext2D | null;
+  fillColor: string | undefined;
+  innerHeight: number;
+  innerRadius: number;
+  startY: number;
+  x: number;
+  lightenColor: (color: string, amount: number) => string | null | undefined;
+};
+
+const normalizeHpBarGradientCacheKey = (
+  fillColor: string | undefined,
+  innerHeight: number,
+  innerRadius: number,
+  startY: number,
+): string => {
+  const color = typeof fillColor === 'string' ? fillColor.trim().toLowerCase() : String(fillColor ?? '');
+  const height = Number.isFinite(innerHeight) ? Math.max(0, Math.round(innerHeight)) : 0;
+  const radius = Number.isFinite(innerRadius) ? Math.max(0, Math.round(innerRadius)) : 0;
+  const start = Number.isFinite(startY) ? Math.round(startY * 100) / 100 : 0;
+  return `${color}|h:${height}|r:${radius}|y:${start}`;
+};
+
+export const resolveHpBarGradient = (deps: ResolveHpBarGradientDeps): HpBarGradientValue => {
+  const key = normalizeHpBarGradientCacheKey(
+    deps.fillColor,
+    deps.innerHeight,
+    deps.innerRadius,
+    deps.startY,
+  );
+  const cached = deps.cache.get(key);
+  if (cached) return cached;
+  const baseFill = typeof deps.fillColor === 'string' ? deps.fillColor : '#6ff0c0';
+  if (!deps.context || !Number.isFinite(deps.innerHeight) || deps.innerHeight <= 0) {
+    deps.cache.set(key, baseFill);
+    return baseFill;
+  }
+  const startYSafe = Number.isFinite(deps.startY) ? deps.startY : 0;
+  const gradient = deps.context.createLinearGradient(deps.x, startYSafe, deps.x, startYSafe + deps.innerHeight);
+  const topFill = deps.lightenColor(baseFill, 0.25) ?? baseFill;
+  gradient.addColorStop(0, topFill);
+  gradient.addColorStop(1, baseFill);
+  deps.cache.set(key, gradient);
+  return gradient;
+};
 export type StatusMeta = {
   id: string;
   label: string;
