@@ -321,6 +321,23 @@ Di chuyển theo nguyên tắc **copy-move, không đổi hành vi**:
 2. `session-runtime-impl.ts` không còn map thủ công payload status icon đã có ở `session-render`.
 3. Render output và tooltip/stacks/priority giữ nguyên theo D1.3.6
 
+### Đánh giá bổ sung D1.5 (session-render) + scope triển khai tiếp theo
+
+- Vấn đề còn sót trong impl:
+  1. wrapper `refreshAnimationFrameFns` chỉ gọi lại hàm có sẵn từ `session-render` (dead glue);
+  2. resolver hover tooltip (`resolve -> compare -> set title`) vẫn nằm ở impl dù logic đã thuộc render-support.
+- Scope D1.5 (reuse-first, ít rủi ro):
+  - Nâng cấp `createBrowserFrameFns(...)` để expose luôn `refreshAnimationFrameFns`.
+  - Thêm `applyStatusIconHoverTooltip(...)` trong `session-render.ts` để gom luồng:
+    - resolve tooltip từ hitbox,
+    - so sánh với tooltip hiện tại,
+    - chỉ update state/canvas title khi thay đổi.
+  - Xóa wrapper/hàm trùng ở `session-runtime-impl.ts`, chỉ giữ wiring state (`statusIconHoverTooltip`, `statusIconHitboxes`, `canvas`).
+- Invariant cần giữ:
+  1. không đổi điều kiện update tooltip (chỉ update khi text đổi);
+  2. không đổi behavior hover hitbox;
+  3. event mousemove vẫn đi qua cùng call-site trong session-events binding.
+
 ### Prompt QA re-run cho `session-render` (để chốt D1)
 
 > Re-run checklist sau khi tách D1:
@@ -347,6 +364,8 @@ Di chuyển theo nguyên tắc **copy-move, không đổi hành vi**:
    - Việc nên làm:
      - gom chuẩn hóa payload vào một đường duy nhất (native event hoặc record fallback),
      - tái dùng `isGameEventRecord`, `createNativeEvent`, `isEventEmitterLike` thay vì thêm bộ check mới.
+     - chuẩn hóa adapter backend tại module init để tránh branch lặp lại trong mỗi lần `emit/listen`.
+     - gom error-report về 1 helper thay vì lặp `console.error` nhiều điểm.
    - Lợi ích: giảm duplicate guard trong các caller (`main.ts`, `session-events`).
 
 2. **`src/main.ts` (ưu tiên cao)**

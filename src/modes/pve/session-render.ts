@@ -50,6 +50,7 @@ type BrowserFrameDeps = {
 type BrowserFrameFns = {
   getRequestAnimationFrame: () => NullableRequestAnimationFrameFn;
   getCancelAnimationFrame: () => NullableCancelAnimationFrameFn;
+  refreshAnimationFrameFns: () => void;
 };
 
 export const createBrowserFrameFns = (
@@ -76,6 +77,7 @@ export const createBrowserFrameFns = (
   };
 
   return {
+    refreshAnimationFrameFns,
     getRequestAnimationFrame: (): NullableRequestAnimationFrameFn => {
       refreshAnimationFrameFns();
       return cachedRafFn;
@@ -608,6 +610,31 @@ export const resolveStatusIconHoverTooltip = (
     }
   }
   return '';
+};
+
+type ApplyStatusIconHoverTooltipDeps = {
+  canvas: HTMLCanvasElement | null;
+  hitboxes: ReadonlyArray<StatusIconHitbox>;
+  clientX: number;
+  clientY: number;
+  currentTooltip: string;
+  setTooltip: (tooltip: string) => void;
+};
+
+export const applyStatusIconHoverTooltip = (
+  deps: ApplyStatusIconHoverTooltipDeps,
+): void => {
+  const nextTooltip = resolveStatusIconHoverTooltip(
+    deps.canvas,
+    deps.hitboxes,
+    deps.clientX,
+    deps.clientY,
+  );
+  if (nextTooltip === deps.currentTooltip) return;
+  deps.setTooltip(nextTooltip);
+  if (deps.canvas){
+    deps.canvas.title = nextTooltip;
+  }
 };
 export const collectRenderableStatusIcons = <TIcon>(
   deps: ResolveReadyStatusIconDeps<TIcon>,

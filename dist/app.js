@@ -13514,21 +13514,23 @@ __modules['./entry.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
 };
 __modules['./events.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/events.ts
   const TURN_START = 'turn:start';
   const TURN_END = 'turn:end';
   const ACTION_START = 'action:start';
   const ACTION_END = 'action:end';
   const TURN_REGEN = 'turn:regen';
   const BATTLE_END = 'battle:end';
+  const HAS_EVENT_TARGET = typeof EventTarget === 'function';
+  const reportEventError = (error) => {
+      console.error('[events]', error);
+  };
   const isGameEventRecord = (payload) => {
       if (!payload || typeof payload !== 'object')
           return false;
       const record = payload;
-      return typeof record.detail !== 'undefined' && typeof record.type === 'string';
+      return typeof record.type === 'string' && typeof record.detail !== 'undefined';
   };
   const isCompatibleHandler = (handler) => typeof handler === 'function';
-  const HAS_EVENT_TARGET = typeof EventTarget === 'function';
   function createNativeEvent(type, detail) {
       if (!type)
           return null;
@@ -13536,17 +13538,17 @@ __modules['./events.ts'] = (exports, module, __require) => {
           try {
               return new CustomEvent(type, { detail });
           }
-          catch (_err) {
+          catch {
               // ignore and fall through
           }
       }
       if (typeof Event === 'function') {
           try {
-              const ev = new Event(type);
-              ev.detail = detail;
-              return ev;
+              const event = new Event(type);
+              event.detail = detail;
+              return event;
           }
-          catch (_err) {
+          catch {
               // ignore and fall through
           }
       }
@@ -13565,19 +13567,18 @@ __modules['./events.ts'] = (exports, module, __require) => {
           if (!type || typeof handler !== 'function')
               return;
           const set = this.listeners.get(type);
-          if (!set || set.size === 0)
+          if (!set?.size)
               return;
           set.delete(handler);
-          if (set.size === 0) {
+          if (!set.size) {
               this.listeners.delete(type);
           }
       }
       dispatchEvent(event) {
-          if (!event || !event.type)
+          if (!event?.type)
               return false;
-          const type = event.type;
-          const set = this.listeners.get(type);
-          if (!set || set.size === 0)
+          const set = this.listeners.get(event.type);
+          if (!set?.size)
               return true;
           const snapshot = Array.from(set);
           const eventRecord = event;
@@ -13587,15 +13588,15 @@ __modules['./events.ts'] = (exports, module, __require) => {
               }
               eventRecord.currentTarget = this;
           }
-          catch (_err) {
+          catch {
               // ignore assignment failures
           }
           for (const handler of snapshot) {
               try {
                   handler.call(this, event);
               }
-              catch (err) {
-                  console.error('[events]', err);
+              catch (error) {
+                  reportEventError(error);
               }
           }
           return true;
@@ -13606,15 +13607,15 @@ __modules['./events.ts'] = (exports, module, __require) => {
           return false;
       }
       const candidate = value;
-      return (typeof candidate.on === 'function' &&
-          typeof candidate.emit === 'function');
+      return (typeof candidate.on === 'function'
+          && typeof candidate.emit === 'function');
   }
   const makeEventTarget = () => {
       if (HAS_EVENT_TARGET) {
           try {
               return new EventTarget();
           }
-          catch (_err) {
+          catch {
               // ignore and fall through
           }
       }
@@ -13644,81 +13645,108 @@ __modules['./events.ts'] = (exports, module, __require) => {
           }
           record.currentTarget = target;
       }
-      catch (_err) {
+      catch {
           // ignore assignment failures
       }
       return event;
   };
+  const toEventRecord = (type, payload) => (isGameEventRecord(payload)
+      ? payload
+      : toSyntheticEventRecord(type, payload));
+  const createTargetBackendAdapter = (target) => ({
+      emit: (type, detail) => {
+          const nativeEvent = createNativeEvent(type, detail);
+          if (!nativeEvent)
+              return false;
+          return target.dispatchEvent(nativeEvent);
+      },
+      addListener: (type, handler) => {
+          const eventListener = ((event) => {
+              handler(event);
+          });
+          target.addEventListener(type, eventListener);
+          let disposed = false;
+          return () => {
+              if (disposed)
+                  return;
+              disposed = true;
+              target.removeEventListener(type, eventListener);
+          };
+      },
+  });
+  const createSimpleBackendAdapter = (target) => ({
+      emit: (type, detail) => (target.dispatchEvent(toSyntheticEventRecord(type, detail))),
+      addListener: (type, handler) => {
+          const simpleHandler = (event) => {
+              handler(event);
+          };
+          target.addEventListener(type, simpleHandler);
+          let disposed = false;
+          return () => {
+              if (disposed)
+                  return;
+              disposed = true;
+              target.removeEventListener(type, simpleHandler);
+          };
+      },
+  });
+  const createEmitterBackendAdapter = (target, eventTarget) => ({
+      emit: (type, detail) => {
+          target.emit(type, detail);
+          return true;
+      },
+      addListener: (type, handler) => {
+          const emitterHandler = function (payload) {
+              const eventRecord = toEventRecord(type, payload);
+              handler.call(this, withEventTargetRefs(eventRecord, eventTarget));
+          };
+          target.on(type, emitterHandler);
+          let disposed = false;
+          return () => {
+              if (disposed)
+                  return;
+              disposed = true;
+              if (typeof target.off === 'function') {
+                  target.off(type, emitterHandler);
+              }
+          };
+      },
+  });
+  const createBackendAdapter = (backend, eventTarget) => {
+      if (!backend)
+          return null;
+      if (backend.kind === 'target')
+          return createTargetBackendAdapter(backend.target);
+      if (backend.kind === 'simple')
+          return createSimpleBackendAdapter(backend.target);
+      return createEmitterBackendAdapter(backend.target, eventTarget);
+  };
   const gameEvents = makeEventTarget();
   const gameEventBackend = resolveEventBackend(gameEvents);
+  const gameEventAdapter = createBackendAdapter(gameEventBackend, gameEvents);
   function emitGameEvent(type, detail) {
-      if (!type || !gameEventBackend)
+      if (!type || !gameEventAdapter)
           return false;
       try {
-          if (gameEventBackend.kind === 'target') {
-              const nativeEvent = createNativeEvent(type, detail);
-              if (!nativeEvent)
-                  return false;
-              return gameEventBackend.target.dispatchEvent(nativeEvent);
-          }
-          if (gameEventBackend.kind === 'simple') {
-              return gameEventBackend.target.dispatchEvent(toSyntheticEventRecord(type, detail));
-          }
-          gameEventBackend.target.emit(type, detail);
-          return true;
+          return gameEventAdapter.emit(type, detail);
       }
-      catch (err) {
-          console.error('[events]', err);
+      catch (error) {
+          reportEventError(error);
           return false;
       }
   }
   const dispatchGameEvent = (type, detail) => emitGameEvent(type, detail);
   function addGameEventListener(type, handler) {
-      if (!type || !isCompatibleHandler(handler) || !gameEventBackend) {
+      if (!type || !isCompatibleHandler(handler) || !gameEventAdapter) {
           return () => { };
       }
-      if (gameEventBackend.kind === 'target') {
-          const eventListener = ((event) => {
-              handler(event);
-          });
-          gameEventBackend.target.addEventListener(type, eventListener);
-          let disposed = false;
-          return () => {
-              if (disposed)
-                  return;
-              disposed = true;
-              gameEventBackend.target.removeEventListener(type, eventListener);
-          };
+      try {
+          return gameEventAdapter.addListener(type, handler);
       }
-      if (gameEventBackend.kind === 'simple') {
-          const simpleHandler = (event) => {
-              handler(event);
-          };
-          gameEventBackend.target.addEventListener(type, simpleHandler);
-          let disposed = false;
-          return () => {
-              if (disposed)
-                  return;
-              disposed = true;
-              gameEventBackend.target.removeEventListener(type, simpleHandler);
-          };
+      catch (error) {
+          reportEventError(error);
+          return () => { };
       }
-      const emitterHandler = function (payload) {
-          const eventRecord = isGameEventRecord(payload)
-              ? payload
-              : toSyntheticEventRecord(type, payload);
-          handler.call(this, withEventTargetRefs(eventRecord, gameEvents));
-      };
-      gameEventBackend.target.on(type, emitterHandler);
-      let disposed = false;
-      return () => {
-          if (disposed)
-              return;
-          disposed = true;
-          if (typeof gameEventBackend.target.off === 'function') {
-              gameEventBackend.target.off(type, emitterHandler);
-          }
-      };
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'TURN_START')) exports.TURN_START = TURN_START;
@@ -15698,6 +15726,7 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
           }
       };
       return {
+          refreshAnimationFrameFns,
           getRequestAnimationFrame: () => {
               refreshAnimationFrameFns();
               return cachedRafFn;
@@ -16118,6 +16147,15 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
       }
       return '';
   };
+  const applyStatusIconHoverTooltip = (deps) => {
+      const nextTooltip = resolveStatusIconHoverTooltip(deps.canvas, deps.hitboxes, deps.clientX, deps.clientY);
+      if (nextTooltip === deps.currentTooltip)
+          return;
+      deps.setTooltip(nextTooltip);
+      if (deps.canvas) {
+          deps.canvas.title = nextTooltip;
+      }
+  };
   const collectRenderableStatusIcons = (deps) => {
       const statuses = Array.isArray(deps.statusesInput) ? deps.statusesInput : [];
       if (!statuses.length)
@@ -16165,6 +16203,7 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusIconPreview')) exports.resolveStatusIconPreview = resolveStatusIconPreview;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStatusIconLoaded')) exports.ensureStatusIconLoaded = ensureStatusIconLoaded;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusIconHoverTooltip')) exports.resolveStatusIconHoverTooltip = resolveStatusIconHoverTooltip;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyStatusIconHoverTooltip')) exports.applyStatusIconHoverTooltip = applyStatusIconHoverTooltip;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectRenderableStatusIcons')) exports.collectRenderableStatusIcons = collectRenderableStatusIcons;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isStatusIconReady')) exports.isStatusIconReady = isStatusIconReady;
   if (!Object.prototype.hasOwnProperty.call(exports, 'materializeRenderableStatusIcons')) exports.materializeRenderableStatusIcons = materializeRenderableStatusIcons;
@@ -16279,13 +16318,13 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const __dep30 = __require('./modes/pve/session-events.ts');
   const createSessionEventBindings = __dep30.createSessionEventBindings;
   const __dep31 = __require('./modes/pve/session-render.ts');
+  const applyStatusIconHoverTooltip = __dep31.applyStatusIconHoverTooltip;
   const collectRenderableStatusIcons = __dep31.collectRenderableStatusIcons;
   const createBrowserFrameFns = __dep31.createBrowserFrameFns;
   const createSessionRenderController = __dep31.createSessionRenderController;
   const DEFAULT_STATUS_ICON_PATH = __dep31.DEFAULT_STATUS_ICON_PATH;
   const MAX_STATUS_ICONS_PER_TOKEN = __dep31.MAX_STATUS_ICONS_PER_TOKEN;
   const ensureStatusIconLoadedShared = __dep31.ensureStatusIconLoaded;
-  const resolveStatusIconHoverTooltip = __dep31.resolveStatusIconHoverTooltip;
   const isStatusIconReady = __dep31.isStatusIconReady;
   const materializeRenderableStatusIcons = __dep31.materializeRenderableStatusIcons;
   const resolveStatusIconPreview = __dep31.resolveStatusIconPreview;
@@ -16708,13 +16747,9 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const statusIconHitboxes = [];
   let statusIconHoverTooltip = '';
   let canvasMouseMoveHandler = null;
-  const { getRequestAnimationFrame, getCancelAnimationFrame, } = createBrowserFrameFns({
+  const { refreshAnimationFrameFns, getRequestAnimationFrame, getCancelAnimationFrame, } = createBrowserFrameFns({
       getWindowRef: () => winRef,
   });
-  const refreshAnimationFrameFns = () => {
-      getRequestAnimationFrame();
-      getCancelAnimationFrame();
-  };
   const makeMeleeTokenKey = (token) => {
       if (Number.isFinite(token?.iid)) {
           return `iid:${token?.iid}`;
@@ -18776,15 +18811,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   function __resolveStatusIconPreview(statusesInput) {
       return resolveStatusIconPreview(statusesInput);
   }
-  function updateStatusIconHoverTooltip(clientX, clientY) {
-      const nextTooltip = resolveStatusIconHoverTooltip(canvas, statusIconHitboxes, clientX, clientY);
-      if (statusIconHoverTooltip === nextTooltip)
-          return;
-      statusIconHoverTooltip = nextTooltip;
-      if (canvas) {
-          canvas.title = nextTooltip;
-      }
-  }
   function drawHPBars() {
       if (!ctx || !Game?.grid)
           return;
@@ -18967,7 +18993,14 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           handleCanvasSummonCellClick(cell);
       },
       onCanvasMouseMove: (ev) => {
-          updateStatusIconHoverTooltip(ev.clientX, ev.clientY);
+          applyStatusIconHoverTooltip({
+              canvas,
+              hitboxes: statusIconHitboxes,
+              clientX: ev.clientX,
+              clientY: ev.clientY,
+              currentTooltip: statusIconHoverTooltip,
+              setTooltip: (nextTooltip) => { statusIconHoverTooltip = nextTooltip; },
+          });
       },
       onWindowResize: () => { scheduleResize(); },
       onViewportResize: () => { scheduleViewportResizeIfChanged('resize'); },

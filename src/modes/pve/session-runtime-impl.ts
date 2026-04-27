@@ -70,13 +70,13 @@ import { createSessionDeckController } from './session-deck';
 import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
 import { createSessionEventBindings } from './session-events';
 import {
+  applyStatusIconHoverTooltip,
   collectRenderableStatusIcons,
   createBrowserFrameFns,
   createSessionRenderController,
   DEFAULT_STATUS_ICON_PATH,
   MAX_STATUS_ICONS_PER_TOKEN,
   ensureStatusIconLoaded as ensureStatusIconLoadedShared,
-  resolveStatusIconHoverTooltip,
   isStatusIconReady,
   materializeRenderableStatusIcons,
   resolveStatusIconPreview,
@@ -737,15 +737,12 @@ let statusIconHoverTooltip = '';
 let canvasMouseMoveHandler: ((event: MouseEvent) => void) | null = null;
 
 const {
+  refreshAnimationFrameFns,
   getRequestAnimationFrame,
   getCancelAnimationFrame,
 } = createBrowserFrameFns({
   getWindowRef: () => winRef,
 });
-const refreshAnimationFrameFns = (): void => {
-  getRequestAnimationFrame();
-  getCancelAnimationFrame();
-};
 
 const makeMeleeTokenKey = (token: Partial<UnitToken> | null | undefined): string | null => {
   if (Number.isFinite(token?.iid)){
@@ -2836,15 +2833,6 @@ export function __resolveStatusIconPreview(statusesInput: ReadonlyArray<Record<s
   return resolveStatusIconPreview(statusesInput);
 }
 
-function updateStatusIconHoverTooltip(clientX: number, clientY: number): void {
-  const nextTooltip = resolveStatusIconHoverTooltip(canvas, statusIconHitboxes, clientX, clientY);
-  if (statusIconHoverTooltip === nextTooltip) return;
-  statusIconHoverTooltip = nextTooltip;
-  if (canvas) {
-    canvas.title = nextTooltip;
-  }
-}
-
 function drawHPBars(): void {
   if (!ctx || !Game?.grid) return;
   statusIconHitboxes.length = 0;
@@ -3036,7 +3024,14 @@ const sessionEventBindings = createSessionEventBindings({
     handleCanvasSummonCellClick(cell);
   },
   onCanvasMouseMove: (ev: MouseEvent) => {
-    updateStatusIconHoverTooltip(ev.clientX, ev.clientY);
+    applyStatusIconHoverTooltip({
+      canvas,
+      hitboxes: statusIconHitboxes,
+      clientX: ev.clientX,
+      clientY: ev.clientY,
+      currentTooltip: statusIconHoverTooltip,
+      setTooltip: (nextTooltip) => { statusIconHoverTooltip = nextTooltip; },
+    });
   },
   onWindowResize: () => { scheduleResize(); },
   onViewportResize: () => { scheduleViewportResizeIfChanged('resize'); },
