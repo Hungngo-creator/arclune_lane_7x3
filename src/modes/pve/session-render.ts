@@ -541,6 +541,13 @@ export type StatusIconLoadDeps<TEntry extends StatusIconCacheEntry> = {
   createCacheEntry: (iconId: string, iconPath: string) => TEntry;
 };
 
+export type StatusIconLoaderFactoryDeps<TEntry extends StatusIconCacheEntry> = {
+  fallbackIconPath?: string;
+  getCacheEntry: (iconId: string) => TEntry | undefined;
+  setCacheEntry: (iconId: string, entry: TEntry) => void;
+  createCacheEntry: (iconId: string, iconPath: string) => TEntry;
+};
+
 export const ensureStatusIconLoaded = <TEntry extends StatusIconCacheEntry>(
   deps: StatusIconLoadDeps<TEntry>,
 ): TEntry | null => {
@@ -584,6 +591,19 @@ export const ensureStatusIconLoaded = <TEntry extends StatusIconCacheEntry>(
   image.src = deps.iconPath;
   return cache;
 };
+
+export const createStatusIconLoader = <TEntry extends StatusIconCacheEntry>(
+  deps: StatusIconLoaderFactoryDeps<TEntry>,
+): ((iconId: string, iconPath: string) => TEntry | null) => (
+    (iconId: string, iconPath: string): TEntry | null => ensureStatusIconLoaded({
+      iconId,
+      iconPath,
+      fallbackIconPath: deps.fallbackIconPath,
+      getCacheEntry: deps.getCacheEntry,
+      setCacheEntry: deps.setCacheEntry,
+      createCacheEntry: deps.createCacheEntry,
+    })
+  );
 
 export type StatusIconHitbox = {
   x: number;

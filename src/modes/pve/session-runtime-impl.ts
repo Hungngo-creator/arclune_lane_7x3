@@ -72,11 +72,11 @@ import { createSessionEventBindings } from './session-events';
 import {
   applyStatusIconHoverTooltip,
   collectRenderableStatusIcons,
+  createStatusIconLoader,
   createBrowserFrameFns,
   createSessionRenderController,
   DEFAULT_STATUS_ICON_PATH,
   MAX_STATUS_ICONS_PER_TOKEN,
-  ensureStatusIconLoaded as ensureStatusIconLoadedShared,
   isStatusIconReady,
   materializeRenderableStatusIcons,
   resolveStatusIconPreview,
@@ -2806,28 +2806,24 @@ function getShieldRatio(unit: UnitToken): number {
   return Math.max(0, Math.min(1, shieldAmount / hpMax));
 }
 
-function ensureStatusIconLoaded(iconId: string, iconPath: string): StatusIconEntry | null {
-  return ensureStatusIconLoadedShared<StatusIconEntry>({
-    iconId,
-    iconPath,
-    fallbackIconPath: DEFAULT_STATUS_ICON_PATH,
-    getCacheEntry: (nextIconId) => statusIconCache.get(nextIconId),
-    setCacheEntry: (nextIconId, entry) => {
-      statusIconCache.set(nextIconId, entry);
-    },
-    createCacheEntry: (nextIconId, nextIconPath) => ({
-      statusId: nextIconId,
-      statusName: nextIconId,
-      tooltip: nextIconId,
-      priority: 0,
-      stacks: 1,
-      turnsLeft: null,
-      path: nextIconPath,
-      image: null,
-      status: 'idle',
-    }),
- });
-}
+const ensureStatusIconLoaded = createStatusIconLoader<StatusIconEntry>({
+  fallbackIconPath: DEFAULT_STATUS_ICON_PATH,
+  getCacheEntry: (nextIconId) => statusIconCache.get(nextIconId),
+  setCacheEntry: (nextIconId, entry) => {
+    statusIconCache.set(nextIconId, entry);
+  },
+  createCacheEntry: (nextIconId, nextIconPath) => ({
+    statusId: nextIconId,
+    statusName: nextIconId,
+    tooltip: nextIconId,
+    priority: 0,
+    stacks: 1,
+    turnsLeft: null,
+    path: nextIconPath,
+    image: null,
+    status: 'idle',
+  }),
+});
 
 export function __resolveStatusIconPreview(statusesInput: ReadonlyArray<Record<string, unknown> | null | undefined>): Array<{ id: string; tooltip: string; priority: number }> {
   return resolveStatusIconPreview(statusesInput);
@@ -3085,7 +3081,7 @@ const sessionEventBindings = createSessionEventBindings({
   getRootElement: () => rootElement,
   setDocRef: (next) => { docRef = next; },
   setWinRef: (next) => { winRef = next; },
-  refreshAnimationFrameFns: () => { refreshAnimationFrameFns(); },
+  refreshAnimationFrameFns,
   normalizeStartConfig: (config: Record<string, unknown>) => toNormalizedSessionConfig(config),
   isRunning: () => running,
   resetSessionState: (config: unknown) => {

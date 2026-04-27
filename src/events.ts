@@ -128,8 +128,12 @@ const HAS_EVENT_TARGET = typeof EventTarget === 'function';
 
 type LegacyEvent = Event & { detail?: unknown };
 
+const NOOP_DISPOSE = (): void => {};
+
 const reportEventError = (error: unknown): void => {
-  console.error('[events]', error);
+  if (typeof console !== 'undefined' && typeof console.error === 'function') {
+    console.error('[events]', error);
+  }
 };
 
 const isGameEventRecord = <T extends GameEventType>(
@@ -143,6 +147,15 @@ const isGameEventRecord = <T extends GameEventType>(
 const isCompatibleHandler = <T extends GameEventType>(
   handler: unknown,
 ): handler is CompatibleGameEventHandler<T> => typeof handler === 'function';
+
+const createIdempotentDispose = (dispose: () => void): (() => void) => {
+  let disposed = false;
+  return () => {
+    if (disposed) return;
+    disposed = true;
+    dispose();
+  };
+};
 
 function createNativeEvent<T extends GameEventType>(
   type: T,
@@ -295,16 +308,11 @@ const createTargetBackendAdapter = (target: EventTarget) => ({
     return target.dispatchEvent(nativeEvent as Event);
   },
   addListener: <T extends GameEventType>(type: T, handler: CompatibleGameEventHandler<T>): (() => void) => {
-    const eventListener = ((event: Event) => {
-      handler(event as GameEventDetail<T>);
-    }) as EventListener;
+    const eventListener = handler as unknown as EventListener;
     target.addEventListener(type, eventListener);
-    let disposed = false;
-    return () => {
-      if (disposed) return;
-      disposed = true;
+    return createIdempotentDispose(() => {
       target.removeEventListener(type, eventListener);
-    };
+    });
   },
 });
 
@@ -313,18 +321,19 @@ const createSimpleBackendAdapter = (target: SimpleEventTarget) => ({
     target.dispatchEvent(toSyntheticEventRecord(type, detail))
   ),
   addListener: <T extends GameEventType>(type: T, handler: CompatibleGameEventHandler<T>): (() => void) => {
-    const simpleHandler: GameEventHandler<T> = (event): void => {
-      handler(event);
-    };
+    const simpleHandler = handler as unknown as GameEventHandler<T>;
     target.addEventListener(type, simpleHandler);
-    let disposed = false;
-    return () => {
-      if (disposed) return;
-      disposed = true;
+    return createIdempotentDispose(() => {
       target.removeEventListener(type, simpleHandler);
-    };
+    });
   },
 });
+
+const toEmitterEventRecord = <T extends GameEventType>(
+  type: T,
+  payload: EventEmitterPayload<T>,
+  eventTarget: GameEventTargetLike,
+): GameEventDetail<T> => withEventTargetRefs(toEventRecord(type, payload), eventTarget);
 
 const createEmitterBackendAdapter = (target: EventEmitterLike, eventTarget: GameEventTargetLike) => ({
   emit: <T extends GameEventType>(type: T, detail?: GameEventDetailMap[T]): boolean => {
@@ -336,19 +345,15 @@ const createEmitterBackendAdapter = (target: EventEmitterLike, eventTarget: Game
       this: unknown,
       payload?: EventEmitterPayload<T>,
     ): void {
-      const eventRecord = toEventRecord(type, payload);
-      handler.call(this, withEventTargetRefs(eventRecord, eventTarget));
+      handler.call(this, toEmitterEventRecord(type, payload, eventTarget));
     };
 
     target.on(type, emitterHandler);
-    let disposed = false;
-    return () => {
-      if (disposed) return;
-      disposed = true;
+    return createIdempotentDispose(() => {
       if (typeof target.off === 'function'){
         target.off(type, emitterHandler);
       }
-    };
+    });
   },
 });
 
@@ -394,13 +399,13 @@ export function addGameEventListener<T extends GameEventType, H extends Compatib
   handler: H,
 ): () => void {
   if (!type || !isCompatibleHandler<T>(handler) || !gameEventAdapter){
-    return () => {};
+    return NOOP_DISPOSE;
   }
 
   try {
     return gameEventAdapter.addListener(type, handler);
   } catch (error) {
     reportEventError(error);
-    return () => {};
+    return NOOP_DISPOSE;
   }
 }

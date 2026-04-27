@@ -13521,8 +13521,11 @@ __modules['./events.ts'] = (exports, module, __require) => {
   const TURN_REGEN = 'turn:regen';
   const BATTLE_END = 'battle:end';
   const HAS_EVENT_TARGET = typeof EventTarget === 'function';
+  const NOOP_DISPOSE = () => { };
   const reportEventError = (error) => {
-      console.error('[events]', error);
+      if (typeof console !== 'undefined' && typeof console.error === 'function') {
+          console.error('[events]', error);
+      }
   };
   const isGameEventRecord = (payload) => {
       if (!payload || typeof payload !== 'object')
@@ -13531,6 +13534,15 @@ __modules['./events.ts'] = (exports, module, __require) => {
       return typeof record.type === 'string' && typeof record.detail !== 'undefined';
   };
   const isCompatibleHandler = (handler) => typeof handler === 'function';
+  const createIdempotentDispose = (dispose) => {
+      let disposed = false;
+      return () => {
+          if (disposed)
+              return;
+          disposed = true;
+          dispose();
+      };
+  };
   function createNativeEvent(type, detail) {
       if (!type)
           return null;
@@ -13661,35 +13673,24 @@ __modules['./events.ts'] = (exports, module, __require) => {
           return target.dispatchEvent(nativeEvent);
       },
       addListener: (type, handler) => {
-          const eventListener = ((event) => {
-              handler(event);
-          });
+          const eventListener = handler;
           target.addEventListener(type, eventListener);
-          let disposed = false;
-          return () => {
-              if (disposed)
-                  return;
-              disposed = true;
+          return createIdempotentDispose(() => {
               target.removeEventListener(type, eventListener);
-          };
+          });
       },
   });
   const createSimpleBackendAdapter = (target) => ({
       emit: (type, detail) => (target.dispatchEvent(toSyntheticEventRecord(type, detail))),
       addListener: (type, handler) => {
-          const simpleHandler = (event) => {
-              handler(event);
-          };
+          const simpleHandler = handler;
           target.addEventListener(type, simpleHandler);
-          let disposed = false;
-          return () => {
-              if (disposed)
-                  return;
-              disposed = true;
+          return createIdempotentDispose(() => {
               target.removeEventListener(type, simpleHandler);
-          };
+          });
       },
   });
+  const toEmitterEventRecord = (type, payload, eventTarget) => withEventTargetRefs(toEventRecord(type, payload), eventTarget);
   const createEmitterBackendAdapter = (target, eventTarget) => ({
       emit: (type, detail) => {
           target.emit(type, detail);
@@ -13697,19 +13698,14 @@ __modules['./events.ts'] = (exports, module, __require) => {
       },
       addListener: (type, handler) => {
           const emitterHandler = function (payload) {
-              const eventRecord = toEventRecord(type, payload);
-              handler.call(this, withEventTargetRefs(eventRecord, eventTarget));
+              handler.call(this, toEmitterEventRecord(type, payload, eventTarget));
           };
           target.on(type, emitterHandler);
-          let disposed = false;
-          return () => {
-              if (disposed)
-                  return;
-              disposed = true;
+          return createIdempotentDispose(() => {
               if (typeof target.off === 'function') {
                   target.off(type, emitterHandler);
               }
-          };
+          });
       },
   });
   const createBackendAdapter = (backend, eventTarget) => {
@@ -13738,14 +13734,14 @@ __modules['./events.ts'] = (exports, module, __require) => {
   const dispatchGameEvent = (type, detail) => emitGameEvent(type, detail);
   function addGameEventListener(type, handler) {
       if (!type || !isCompatibleHandler(handler) || !gameEventAdapter) {
-          return () => { };
+          return NOOP_DISPOSE;
       }
       try {
           return gameEventAdapter.addListener(type, handler);
       }
       catch (error) {
           reportEventError(error);
-          return () => { };
+          return NOOP_DISPOSE;
       }
   }
   //# sourceMappingURL=stdin.js.map
@@ -16132,6 +16128,14 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
       image.src = deps.iconPath;
       return cache;
   };
+  const createStatusIconLoader = (deps) => ((iconId, iconPath) => ensureStatusIconLoaded({
+      iconId,
+      iconPath,
+      fallbackIconPath: deps.fallbackIconPath,
+      getCacheEntry: deps.getCacheEntry,
+      setCacheEntry: deps.setCacheEntry,
+      createCacheEntry: deps.createCacheEntry,
+  }));
   const resolveStatusIconHoverTooltip = (canvas, hitboxes, clientX, clientY) => {
       if (!canvas)
           return '';
@@ -16202,6 +16206,7 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'aggregateStatuses')) exports.aggregateStatuses = aggregateStatuses;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusIconPreview')) exports.resolveStatusIconPreview = resolveStatusIconPreview;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStatusIconLoaded')) exports.ensureStatusIconLoaded = ensureStatusIconLoaded;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createStatusIconLoader')) exports.createStatusIconLoader = createStatusIconLoader;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusIconHoverTooltip')) exports.resolveStatusIconHoverTooltip = resolveStatusIconHoverTooltip;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyStatusIconHoverTooltip')) exports.applyStatusIconHoverTooltip = applyStatusIconHoverTooltip;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectRenderableStatusIcons')) exports.collectRenderableStatusIcons = collectRenderableStatusIcons;
@@ -16320,11 +16325,11 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const __dep31 = __require('./modes/pve/session-render.ts');
   const applyStatusIconHoverTooltip = __dep31.applyStatusIconHoverTooltip;
   const collectRenderableStatusIcons = __dep31.collectRenderableStatusIcons;
+  const createStatusIconLoader = __dep31.createStatusIconLoader;
   const createBrowserFrameFns = __dep31.createBrowserFrameFns;
   const createSessionRenderController = __dep31.createSessionRenderController;
   const DEFAULT_STATUS_ICON_PATH = __dep31.DEFAULT_STATUS_ICON_PATH;
   const MAX_STATUS_ICONS_PER_TOKEN = __dep31.MAX_STATUS_ICONS_PER_TOKEN;
-  const ensureStatusIconLoadedShared = __dep31.ensureStatusIconLoaded;
   const isStatusIconReady = __dep31.isStatusIconReady;
   const materializeRenderableStatusIcons = __dep31.materializeRenderableStatusIcons;
   const resolveStatusIconPreview = __dep31.resolveStatusIconPreview;
@@ -18786,28 +18791,24 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const hpMax = Math.max(1, toFiniteOrZero(unit.hpMax));
       return Math.max(0, Math.min(1, shieldAmount / hpMax));
   }
-  function ensureStatusIconLoaded(iconId, iconPath) {
-      return ensureStatusIconLoadedShared({
-          iconId,
-          iconPath,
-          fallbackIconPath: DEFAULT_STATUS_ICON_PATH,
-          getCacheEntry: (nextIconId) => statusIconCache.get(nextIconId),
-          setCacheEntry: (nextIconId, entry) => {
-              statusIconCache.set(nextIconId, entry);
-          },
-          createCacheEntry: (nextIconId, nextIconPath) => ({
-              statusId: nextIconId,
-              statusName: nextIconId,
-              tooltip: nextIconId,
-              priority: 0,
-              stacks: 1,
-              turnsLeft: null,
-              path: nextIconPath,
-              image: null,
-              status: 'idle',
-          }),
-      });
-  }
+  const ensureStatusIconLoaded = createStatusIconLoader({
+      fallbackIconPath: DEFAULT_STATUS_ICON_PATH,
+      getCacheEntry: (nextIconId) => statusIconCache.get(nextIconId),
+      setCacheEntry: (nextIconId, entry) => {
+          statusIconCache.set(nextIconId, entry);
+      },
+      createCacheEntry: (nextIconId, nextIconPath) => ({
+          statusId: nextIconId,
+          statusName: nextIconId,
+          tooltip: nextIconId,
+          priority: 0,
+          stacks: 1,
+          turnsLeft: null,
+          path: nextIconPath,
+          image: null,
+          status: 'idle',
+      }),
+  });
   function __resolveStatusIconPreview(statusesInput) {
       return resolveStatusIconPreview(statusesInput);
   }
@@ -19062,7 +19063,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       getRootElement: () => rootElement,
       setDocRef: (next) => { docRef = next; },
       setWinRef: (next) => { winRef = next; },
-      refreshAnimationFrameFns: () => { refreshAnimationFrameFns(); },
+      refreshAnimationFrameFns,
       normalizeStartConfig: (config) => toNormalizedSessionConfig(config),
       isRunning: () => running,
       resetSessionState: (config) => {
