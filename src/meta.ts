@@ -51,23 +51,26 @@ interface MetaLookupService {
   isSummoner(id: MetaId): boolean;
 }
 
+const lookupMeta = getMetaById as MetaLookupService['get'];
+const classOfMeta = (entry: MetaEntry | null | undefined): MetaEntry['class'] | null => (
+  normalizeClassName(entry?.class) ?? null
+);
+
 // Dùng trực tiếp catalog cho tra cứu
 export const Meta = {
-  get: getMetaById as MetaLookupService['get'],
+  get: lookupMeta as MetaLookupService['get'],
   classOf(id: MetaId) {
-    const entry = getMetaById(id);
-    return normalizeClassName(entry?.class) ?? null;
+    return classOfMeta(lookupMeta(id));
   },
   rankOf(id: MetaId) {
-    const entry = getMetaById(id);
-    return entry?.rank ?? null;
+    return lookupMeta(id)?.rank ?? null;
   },
   kit(id: MetaId) {
     return getUnitKitById(id);
   },
   isSummoner(id: MetaId) {
-    const entry = getMetaById(id);
-    return !!(entry && normalizeClassName(entry.class) === 'Summoner' && kitSupportsSummon(entry));
+    const entry = lookupMeta(id);
+    return !!(entry && classOfMeta(entry) === 'Summoner' && kitSupportsSummon(entry));
   },
 } satisfies MetaLookupService;
 
@@ -88,8 +91,7 @@ export const metaServiceAdapter: SessionMetaService = {
   },
   classOf(id: UnitId | null | undefined): string | null {
     if (!id) return null;
-    const value = Meta.classOf(id);
-    return normalizeClassName(value);
+    return normalizeClassName(Meta.classOf(id));
   },
   rankOf(id: UnitId | null | undefined): string | null {
     if (!id) return null;
@@ -127,8 +129,6 @@ const isRankName = (value: unknown): value is RankName => (
   typeof value === 'string' && value in RANK_MULT
 );
 
-const isClassName = (value: unknown): value is ClassName => normalizeClassName(value) !== null;
-
 const coerceStatMods = (
   mods: MetaEntry['mods'],
 ): Partial<Record<keyof CatalogStatBlock, number>> | undefined => {
@@ -148,27 +148,28 @@ export function makeInstanceStats(unitId: MetaId, level: number = 1, stars: numb
   const className = normalizeClassName(entry.class);
   const rank = entry.rank as RankName;
 
-  if (!className || !isClassName(className) || !isRankName(rank)) return { ...EMPTY_INSTANCE_STATS };
+  if (!className || !isRankName(rank)) return { ...EMPTY_INSTANCE_STATS };
   const base = CLASS_BASE[className];
-  // Delta tăng trưởng (Laser)
-  const delta = (CLASS_GROWTH as any)[className];
+  const growthByClass = CLASS_GROWTH as Partial<Record<ClassName, Partial<CatalogStatBlock>>>;
+  const delta = growthByClass[className] ?? {};
 
   // 1. TÍNH CHỈ SỐ GỐC THEO LEVEL (TIA LASER)
   const currentBase = {
-    HP:  base.HP  + (level - 1) * (delta?.HP || 0),
-    ATK: base.ATK + (level - 1) * (delta?.ATK || 0),
-    WIL: base.WIL + (level - 1) * (delta?.WIL || 0),
-    ARM: base.ARM + (level - 1) * (delta?.ARM || 0),
-    RES: base.RES + (level - 1) * (delta?.RES || 0)
+    HP:  base.HP  + (level - 1) * (delta.HP ?? 0),
+    ATK: base.ATK + (level - 1) * (delta.ATK ?? 0),
+    WIL: base.WIL + (level - 1) * (delta.WIL ?? 0),
+    ARM: base.ARM + (level - 1) * (delta.ARM ?? 0),
+    RES: base.RES + (level - 1) * (delta.RES ?? 0),
   };
 
   // 2. TÍNH HỆ SỐ (THẤU KÍNH) = RANK + SAO
   const rankMult = RANK_MULT[rank] + (stars * 0.05);
+  const scaledHp = Math.trunc(currentBase.HP * rankMult);
 
   // 3. XUẤT CHỈ SỐ CUỐI (LASER x THẤU KÍNH)
   return {
-    hpMax: Math.trunc(currentBase.HP * rankMult),
-    hp: Math.trunc(currentBase.HP * rankMult),
+    hpMax: scaledHp,
+    hp: scaledHp,
     atk: Math.trunc(currentBase.ATK * rankMult),
     wil: Math.trunc(currentBase.WIL * rankMult),
     arm: Number((currentBase.ARM * rankMult).toFixed(4)),

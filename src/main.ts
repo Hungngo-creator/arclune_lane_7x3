@@ -1,6 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/main.ts
 
-import { globalAetherPool } from './aether.ts';
+import './aether.ts';
 import type { CreateSessionOptions, SessionState } from '@shared-types/pve';
 import type { GameConfig } from '@shared-types/config';
 import type { GameEventHandler, GameEventType } from './events';
@@ -64,30 +64,40 @@ const toRootSource = (value: unknown): RootSource => {
 
 const toSessionConfigOverrides = (value: unknown): SessionConfigOverrides => {
   if (!isPlainRecord(value)){
-    return {} as SessionConfigOverrides;
+    return {};
   }
   return { ...(value as Record<string, unknown>) } as SessionConfigOverrides;
 };
 
+const defaultRootTarget = (): RootTarget => (typeof document !== 'undefined' ? document : null);
+
 function resolveRoot(
   config: Pick<StartGameOptions, 'root' | 'rootEl' | 'element'> | null | undefined,
 ): RootTarget {
-  if (!config) return typeof document !== 'undefined' ? document : null;
-  if (config.root) return config.root;
-  if (config.rootEl) return config.rootEl;
-  if (config.element) return config.element;
-  return typeof document !== 'undefined' ? document : null;
+  if (!config) return defaultRootTarget();
+  return config.root ?? config.rootEl ?? config.element ?? defaultRootTarget();
 }
+
+const resolveRootFromRawOptions = (rawOptions: Record<string, unknown>): RootTarget => resolveRoot({
+  root: toRootSource(rawOptions.root),
+  rootEl: toRootSource(rawOptions.rootEl),
+  element: toRootSource(rawOptions.element),
+});
+
+const flushPendingSkins = (session: ActiveSessionHandle | null): void => {
+  if (!session || pendingSkins.size === 0) return;
+  for (const [unitId, skinKey] of pendingSkins) {
+    if (session.setUnitSkin(unitId, skinKey)) {
+      pendingSkins.delete(unitId);
+    }
+  }
+};
 
 export function startGame(options?: StartGameOptions | null): SessionState {
   ensureNestedModuleSupport();
   const rawOptions = isPlainRecord(options) ? options : {};
   const { root, rootEl, element, ...rest } = rawOptions as Record<string, unknown>;
-  const rootTarget = resolveRoot({
-    root: toRootSource(root),
-    rootEl: toRootSource(rootEl),
-    element: toRootSource(element),
-  });
+  const rootTarget = resolveRootFromRawOptions({ root, rootEl, element });
   const initialConfig = toSessionConfigOverrides(rest);
   if (!currentSession) {
     currentSession = createPveSession(rootTarget, initialConfig);
@@ -96,16 +106,7 @@ export function startGame(options?: StartGameOptions | null): SessionState {
   if (!session) {
     throw new Error('PvE board markup not found; render the layout before calling startGame');
   }
-  if (pendingSkins.size > 0) {
-    const activeSession = currentSession;
-    if (activeSession) {
-      for (const [unitId, skinKey] of pendingSkins) {
-        if (activeSession.setUnitSkin(unitId, skinKey)) {
-          pendingSkins.delete(unitId);
-        };
-      }
-    }
-  }
+  flushPendingSkins(currentSession);
   return session;
 }
 
@@ -126,14 +127,12 @@ export function getCurrentSession(): ActiveSessionHandle | null {
 
 export function setUnitSkin(unitId: string, skinKey: string | null | undefined): boolean {
   const normalizedSkinKey = skinKey ?? null;
+  pendingSkins.set(unitId, normalizedSkinKey);
   if (!currentSession) {
-    pendingSkins.set(unitId, normalizedSkinKey);
     return true;
   }
   const applied = currentSession.setUnitSkin(unitId, normalizedSkinKey);
-  if (applied) {
-    pendingSkins.set(unitId, normalizedSkinKey);
-  }
+  if (applied) pendingSkins.delete(unitId);
   return applied;
 }
 

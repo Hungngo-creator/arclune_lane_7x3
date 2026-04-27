@@ -11256,11 +11256,22 @@ __modules['./engine.ts'] = (exports, module, __require) => {
   const __dep1 = __require('./art.ts');
   const getUnitArt = __dep1.getUnitArt;
   const getUnitSkin = __dep1.getUnitSkin;
+  const SIDE_ROW_COUNT = 3;
+  const SIDE_SLOT_COUNT = SIDE_ROW_COUNT * SIDE_ROW_COUNT;
   const DEFAULT_OBLIQUE_CAMERA = {
       rowGapRatio: 0.62,
       topScale: 0.8,
       depthScale: 0.94,
   };
+  function resolveCameraOptions(cam) {
+      if (!cam)
+          return DEFAULT_OBLIQUE_CAMERA;
+      return {
+          rowGapRatio: coerceFinite(cam.rowGapRatio, DEFAULT_OBLIQUE_CAMERA.rowGapRatio),
+          topScale: coerceFinite(cam.topScale, DEFAULT_OBLIQUE_CAMERA.topScale),
+          depthScale: coerceFinite(cam.depthScale, DEFAULT_OBLIQUE_CAMERA.depthScale),
+      };
+  }
   const CHIBI_PROPS = CHIBI;
   const TOKEN_STYLE_VALUE = TOKEN_STYLE;
   const TOKEN_DRAW_BUFFER = [];
@@ -11440,24 +11451,24 @@ __modules['./engine.ts'] = (exports, module, __require) => {
           return true;
       return typeof value.values === 'function';
   }
+  function queueContainsCell(map, cx, cy) {
+      if (!isSummonMap(map))
+          return false;
+      for (const request of map.values()) {
+          if (!request)
+              continue;
+          if (request.cx === cx && request.cy === cy)
+              return true;
+      }
+      return false;
+  }
   function cellReserved(tokens, queued, cx, cy) {
       if (cellOccupied(tokens, cx, cy))
           return true;
       if (queued) {
-          const checkQueue = (m) => {
-              if (!isSummonMap(m))
-                  return false;
-              for (const request of m.values()) {
-                  if (!request)
-                      continue;
-                  if (request.cx === cx && request.cy === cy)
-                      return true;
-              }
-              return false;
-          };
-          if (checkQueue(queued.ally))
+          if (queueContainsCell(queued.ally, cx, cy))
               return true;
-          if (checkQueue(queued.enemy))
+          if (queueContainsCell(queued.enemy, cx, cy))
               return true;
       }
       return false;
@@ -11523,7 +11534,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
   /* ---------- Oblique grid helpers ---------- */
   function rowLR(g, r, C) {
       const colsW = g.tile * g.cols;
-      const topScale = C.topScale ?? 0.8;
+      const topScale = C.topScale;
       const pinch = (1 - topScale) * colsW;
       const t = r / g.rows;
       const width = colsW - pinch * (1 - t);
@@ -11532,7 +11543,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       return { left, right };
   }
   function drawGridOblique(ctx, g, cam, opts = {}) {
-      const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
+      const C = resolveCameraOptions(cam);
       const colors = {
           ally: CFG.COLORS.ally,
           enemy: CFG.COLORS.enemy,
@@ -11540,7 +11551,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
           line: CFG.COLORS.line,
           ...(opts.colors ?? {}),
       };
-      const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+      const rowGap = C.rowGapRatio * g.tile;
       for (let cy = 0; cy < g.rows; cy++) {
           const yTop = g.oy + cy * rowGap;
           const yBot = g.oy + (cy + 1) * rowGap;
@@ -11573,8 +11584,8 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       }
   }
   function hitToCellOblique(g, px, py, cam) {
-      const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
-      const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+      const C = resolveCameraOptions(cam);
+      const rowGap = C.rowGapRatio * g.tile;
       const r = (py - g.oy) / rowGap;
       if (r < 0 || r >= g.rows)
           return null;
@@ -11587,7 +11598,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       return { cx, cy };
   }
   function cellQuadOblique(g, cx, cy, C) {
-      const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+      const rowGap = C.rowGapRatio * g.tile;
       const yTop = g.oy + cy * rowGap;
       const yBot = yTop + rowGap;
       const LRt = rowLR(g, cy, C);
@@ -11605,9 +11616,9 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       return { x, y };
   }
   function projectCellOblique(g, cx, cy, cam) {
-      const C = cam ?? {};
+      const C = resolveCameraOptions(cam);
       const { x, y } = cellCenterOblique(g, cx, cy, C);
-      const k = C.depthScale ?? 0.94;
+      const k = C.depthScale;
       const depth = g.rows - 1 - cy;
       const scale = Math.pow(k, depth);
       return { x, y, scale };
@@ -11676,16 +11687,16 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       return normalized.join('|');
   }
   function contextSignature(g, cam) {
-      const C = cam ?? {};
+      const C = resolveCameraOptions(cam);
       return joinSignatureParts([
           g.cols,
           g.rows,
           g.tile,
           g.ox,
           g.oy,
-          C.rowGapRatio ?? 0.62,
-          C.topScale ?? 0.8,
-          C.depthScale ?? 0.94,
+          C.rowGapRatio,
+          C.topScale,
+          C.depthScale,
       ]);
   }
   function warnInvalidToken(context, token) {
@@ -12116,9 +12127,9 @@ __modules['./engine.ts'] = (exports, module, __require) => {
   function drawQueuedOblique(ctx, g, queued, cam) {
       if (!queued)
           return;
-      const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
+      const C = resolveCameraOptions(cam);
       const baseR = Math.floor(g.tile * 0.36);
-      const k = C.depthScale ?? 0.94;
+      const k = C.depthScale;
       const drawSide = (map, side) => {
           if (!isSummonMap(map))
               return;
@@ -12148,37 +12159,44 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       ALLY: 'ally',
       ENEMY: 'enemy',
   };
+  function isAllySide(side) {
+      return side === SIDE.ALLY || side === 'ally';
+  }
+  function enemyStartColumn() {
+      return CFG.GRID_COLS - CFG.ENEMY_COLS;
+  }
   function slotIndex(side, cx, cy) {
-      if (side === SIDE.ALLY || side === 'ally') {
-          return (CFG.ALLY_COLS - 1 - cx) * 3 + (cy + 1);
+      if (isAllySide(side)) {
+          return (CFG.ALLY_COLS - 1 - cx) * SIDE_ROW_COUNT + (cy + 1);
       }
-      const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS;
+      const enemyStart = enemyStartColumn();
       const colIndex = cx - enemyStart;
-      return colIndex * 3 + (cy + 1);
+      return colIndex * SIDE_ROW_COUNT + (cy + 1);
   }
   function slotToCell(side, slot) {
-      const s = Math.max(1, Math.min(9, slot | 0));
-      const colIndex = Math.floor((s - 1) / 3);
-      const rowIndex = (s - 1) % 3;
-      if (side === SIDE.ALLY || side === 'ally') {
+      const s = Math.max(1, Math.min(SIDE_SLOT_COUNT, slot | 0));
+      const colIndex = Math.floor((s - 1) / SIDE_ROW_COUNT);
+      const rowIndex = (s - 1) % SIDE_ROW_COUNT;
+      if (isAllySide(side)) {
           const cx = CFG.ALLY_COLS - 1 - colIndex;
           const cy = rowIndex;
           return { cx, cy };
       }
-      const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS;
+      const enemyStart = enemyStartColumn();
       const cx = enemyStart + colIndex;
       const cy = rowIndex;
       return { cx, cy };
   }
   function zoneCode(side, cx, cy, { numeric = false } = {}) {
       const slot = slotIndex(side, cx, cy);
+      const allySide = isAllySide(side);
       if (numeric)
-          return (side === SIDE.ALLY || side === 'ally' ? 0 : 1) * 16 + slot;
-      const prefix = side === SIDE.ALLY || side === 'ally' ? 'A' : 'E';
+          return (allySide ? 0 : 1) * 16 + slot;
+      const prefix = allySide ? 'A' : 'E';
       return prefix + String(slot);
   }
-  const ORDER_ALLY = Array.from({ length: 9 }, (_, i) => slotToCell(SIDE.ALLY, i + 1));
-  const ORDER_ENEMY = Array.from({ length: 9 }, (_, i) => slotToCell(SIDE.ENEMY, i + 1));
+  const ORDER_ALLY = Array.from({ length: SIDE_SLOT_COUNT }, (_, i) => slotToCell(SIDE.ALLY, i + 1));
+  const ORDER_ENEMY = Array.from({ length: SIDE_SLOT_COUNT }, (_, i) => slotToCell(SIDE.ENEMY, i + 1));
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'pick3Random')) exports.pick3Random = pick3Random;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ART_SPRITE_EVENT')) exports.ART_SPRITE_EVENT = ART_SPRITE_EVENT;
@@ -13678,6 +13696,17 @@ __modules['./events.ts'] = (exports, module, __require) => {
           console.error('[events]', error);
       }
   };
+  const assignEventTarget = (eventRecord, target) => {
+      try {
+          if (typeof eventRecord.target === 'undefined') {
+              eventRecord.target = target;
+          }
+          eventRecord.currentTarget = target;
+      }
+      catch {
+          // ignore assignment failures
+      }
+  };
   const withEventErrorFallback = (action, fallback) => {
       try {
           return action();
@@ -13691,7 +13720,7 @@ __modules['./events.ts'] = (exports, module, __require) => {
       if (!payload || typeof payload !== 'object')
           return false;
       const record = payload;
-      return typeof record.type === 'string' && typeof record.detail !== 'undefined';
+      return typeof record.type === 'string' && 'detail' in record;
   };
   const createIdempotentDispose = (dispose) => {
       let disposed = false;
@@ -13772,15 +13801,7 @@ __modules['./events.ts'] = (exports, module, __require) => {
               return true;
           const snapshot = Array.from(set);
           const eventRecord = event;
-          try {
-              if (typeof eventRecord.target === 'undefined') {
-                  eventRecord.target = this;
-              }
-              eventRecord.currentTarget = this;
-          }
-          catch {
-              // ignore assignment failures
-          }
+          assignEventTarget(eventRecord, this);
           for (const handler of snapshot) {
               try {
                   handler.call(this, event);
@@ -13816,20 +13837,12 @@ __modules['./events.ts'] = (exports, module, __require) => {
   });
   const withEventTargetRefs = (event, target) => {
       const record = event;
-      try {
-          if (typeof record.target === 'undefined') {
-              record.target = target;
-          }
-          record.currentTarget = target;
-      }
-      catch {
-          // ignore assignment failures
-      }
+      assignEventTarget(record, target);
       return event;
   };
   const toEventRecord = (type, payload) => {
       if (typeof payload === 'undefined') {
-          return toSyntheticEventRecord(type, undefined);
+          return toSyntheticEventRecord(type);
       }
       return isGameEventRecord(payload)
           ? payload
@@ -13911,22 +13924,16 @@ __modules['./events.ts'] = (exports, module, __require) => {
       };
   };
   const gameEventDispatchAdapters = createDispatchAdapters(gameEvents);
-  const emitGameEventInternal = (type, detail) => {
+  function emitGameEvent(type, detail) {
       if (!type)
           return false;
-      return gameEventDispatchAdapters.emit(type, detail);
-  };
-  const addGameEventListenerInternal = (type, handler) => {
+      return withEventErrorFallback(() => gameEventDispatchAdapters.emit(type, detail), false);
+  }
+  const dispatchGameEvent = emitGameEvent;
+  function addGameEventListener(type, handler) {
       if (!type || typeof handler !== 'function')
           return NOOP_DISPOSE;
-      return gameEventDispatchAdapters.addListener(type, handler);
-  };
-  function emitGameEvent(type, detail) {
-      return withEventErrorFallback(() => emitGameEventInternal(type, detail), false);
-  }
-  const dispatchGameEvent = (type, detail) => emitGameEvent(type, detail);
-  function addGameEventListener(type, handler) {
-      return withEventErrorFallback(() => addGameEventListenerInternal(type, handler), NOOP_DISPOSE);
+      return withEventErrorFallback(() => gameEventDispatchAdapters.addListener(type, handler), NOOP_DISPOSE);
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'TURN_START')) exports.TURN_START = TURN_START;
@@ -14095,7 +14102,7 @@ __modules['./leader-uyen.ts'] = (exports, module, __require) => {
 };
 __modules['./main.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/main.ts
-  const __dep1 = __require('./events.ts');
+  __require('./aether.ts');const __dep1 = __require('./events.ts');
   const addGameEventListener = __dep1.addGameEventListener;
   const __dep2 = __require('./modes/pve/session.ts');
   const createPveSession = __dep2.createPveSession;
@@ -14123,26 +14130,31 @@ __modules['./main.ts'] = (exports, module, __require) => {
       }
       return { ...value };
   };
+  const defaultRootTarget = () => (typeof document !== 'undefined' ? document : null);
   function resolveRoot(config) {
       if (!config)
-          return typeof document !== 'undefined' ? document : null;
-      if (config.root)
-          return config.root;
-      if (config.rootEl)
-          return config.rootEl;
-      if (config.element)
-          return config.element;
-      return typeof document !== 'undefined' ? document : null;
+          return defaultRootTarget();
+      return config.root ?? config.rootEl ?? config.element ?? defaultRootTarget();
   }
+  const resolveRootFromRawOptions = (rawOptions) => resolveRoot({
+      root: toRootSource(rawOptions.root),
+      rootEl: toRootSource(rawOptions.rootEl),
+      element: toRootSource(rawOptions.element),
+  });
+  const flushPendingSkins = (session) => {
+      if (!session || pendingSkins.size === 0)
+          return;
+      for (const [unitId, skinKey] of pendingSkins) {
+          if (session.setUnitSkin(unitId, skinKey)) {
+              pendingSkins.delete(unitId);
+          }
+      }
+  };
   function startGame(options) {
       ensureNestedModuleSupport();
       const rawOptions = isPlainRecord(options) ? options : {};
       const { root, rootEl, element, ...rest } = rawOptions;
-      const rootTarget = resolveRoot({
-          root: toRootSource(root),
-          rootEl: toRootSource(rootEl),
-          element: toRootSource(element),
-      });
+      const rootTarget = resolveRootFromRawOptions({ root, rootEl, element });
       const initialConfig = toSessionConfigOverrides(rest);
       if (!currentSession) {
           currentSession = createPveSession(rootTarget, initialConfig);
@@ -14151,17 +14163,7 @@ __modules['./main.ts'] = (exports, module, __require) => {
       if (!session) {
           throw new Error('PvE board markup not found; render the layout before calling startGame');
       }
-      if (pendingSkins.size > 0) {
-          const activeSession = currentSession;
-          if (activeSession) {
-              for (const [unitId, skinKey] of pendingSkins) {
-                  if (activeSession.setUnitSkin(unitId, skinKey)) {
-                      pendingSkins.delete(unitId);
-                  }
-                  ;
-              }
-          }
-      }
+      flushPendingSkins(currentSession);
       return session;
   }
   function stopGame() {
@@ -14180,14 +14182,13 @@ __modules['./main.ts'] = (exports, module, __require) => {
   }
   function setUnitSkin(unitId, skinKey) {
       const normalizedSkinKey = skinKey ?? null;
+      pendingSkins.set(unitId, normalizedSkinKey);
       if (!currentSession) {
-          pendingSkins.set(unitId, normalizedSkinKey);
           return true;
       }
       const applied = currentSession.setUnitSkin(unitId, normalizedSkinKey);
-      if (applied) {
-          pendingSkins.set(unitId, normalizedSkinKey);
-      }
+      if (applied)
+          pendingSkins.delete(unitId);
       return applied;
   }
   function onGameEvent(type, handler) {
@@ -14225,23 +14226,23 @@ __modules['./meta.ts'] = (exports, module, __require) => {
   const kitSupportsSummon = __dep1.kitSupportsSummon;
   const __dep2 = __require('./utils/domain-normalization.ts');
   const normalizeClassName = __dep2.normalizeClassName;
+  const lookupMeta = getMetaById;
+  const classOfMeta = (entry) => (normalizeClassName(entry?.class) ?? null);
   // Dùng trực tiếp catalog cho tra cứu
   const Meta = {
-      get: getMetaById,
+      get: lookupMeta,
       classOf(id) {
-          const entry = getMetaById(id);
-          return normalizeClassName(entry?.class) ?? null;
+          return classOfMeta(lookupMeta(id));
       },
       rankOf(id) {
-          const entry = getMetaById(id);
-          return entry?.rank ?? null;
+          return lookupMeta(id)?.rank ?? null;
       },
       kit(id) {
           return getUnitKitById(id);
       },
       isSummoner(id) {
-          const entry = getMetaById(id);
-          return !!(entry && normalizeClassName(entry.class) === 'Summoner' && kitSupportsSummon(entry));
+          const entry = lookupMeta(id);
+          return !!(entry && classOfMeta(entry) === 'Summoner' && kitSupportsSummon(entry));
       },
   };
   const adaptMetaEntry = (entry) => {
@@ -14262,8 +14263,7 @@ __modules['./meta.ts'] = (exports, module, __require) => {
       classOf(id) {
           if (!id)
               return null;
-          const value = Meta.classOf(id);
-          return normalizeClassName(value);
+          return normalizeClassName(Meta.classOf(id));
       },
       rankOf(id) {
           if (!id)
@@ -14299,7 +14299,6 @@ __modules['./meta.ts'] = (exports, module, __require) => {
       hpRegen: 0,
   };
   const isRankName = (value) => (typeof value === 'string' && value in RANK_MULT);
-  const isClassName = (value) => normalizeClassName(value) !== null;
   const coerceStatMods = (mods) => {
       if (!mods || typeof mods !== 'object')
           return undefined;
@@ -14317,25 +14316,26 @@ __modules['./meta.ts'] = (exports, module, __require) => {
           return { ...EMPTY_INSTANCE_STATS };
       const className = normalizeClassName(entry.class);
       const rank = entry.rank;
-      if (!className || !isClassName(className) || !isRankName(rank))
+      if (!className || !isRankName(rank))
           return { ...EMPTY_INSTANCE_STATS };
       const base = CLASS_BASE[className];
-      // Delta tăng trưởng (Laser)
-      const delta = CLASS_GROWTH[className];
+      const growthByClass = CLASS_GROWTH;
+      const delta = growthByClass[className] ?? {};
       // 1. TÍNH CHỈ SỐ GỐC THEO LEVEL (TIA LASER)
       const currentBase = {
-          HP: base.HP + (level - 1) * (delta?.HP || 0),
-          ATK: base.ATK + (level - 1) * (delta?.ATK || 0),
-          WIL: base.WIL + (level - 1) * (delta?.WIL || 0),
-          ARM: base.ARM + (level - 1) * (delta?.ARM || 0),
-          RES: base.RES + (level - 1) * (delta?.RES || 0)
+          HP: base.HP + (level - 1) * (delta.HP ?? 0),
+          ATK: base.ATK + (level - 1) * (delta.ATK ?? 0),
+          WIL: base.WIL + (level - 1) * (delta.WIL ?? 0),
+          ARM: base.ARM + (level - 1) * (delta.ARM ?? 0),
+          RES: base.RES + (level - 1) * (delta.RES ?? 0),
       };
       // 2. TÍNH HỆ SỐ (THẤU KÍNH) = RANK + SAO
       const rankMult = RANK_MULT[rank] + (stars * 0.05);
+      const scaledHp = Math.trunc(currentBase.HP * rankMult);
       // 3. XUẤT CHỈ SỐ CUỐI (LASER x THẤU KÍNH)
       return {
-          hpMax: Math.trunc(currentBase.HP * rankMult),
-          hp: Math.trunc(currentBase.HP * rankMult),
+          hpMax: scaledHp,
+          hp: scaledHp,
           atk: Math.trunc(currentBase.ATK * rankMult),
           wil: Math.trunc(currentBase.WIL * rankMult),
           arm: Number((currentBase.ARM * rankMult).toFixed(4)),
@@ -19122,7 +19122,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               });
               drawCtx.save();
               drawCtx.translate(hpX + inset, hpY + inset);
-              roundedRectPathl(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);
+              roundedRectPath(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);
               drawCtx.fillStyle = fillStyle;
               drawCtx.fill();
               drawCtx.restore();

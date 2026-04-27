@@ -139,6 +139,17 @@ const reportEventError = (error: unknown): void => {
   }
 };
 
+const assignEventTarget = (eventRecord: AnyRecord, target: unknown): void => {
+  try {
+    if (typeof eventRecord.target === 'undefined') {
+      eventRecord.target = target;
+    }
+    eventRecord.currentTarget = target;
+  } catch {
+    // ignore assignment failures
+  }
+};
+
 const withEventErrorFallback = <T>(action: () => T, fallback: T): T => {
   try {
     return action();
@@ -153,7 +164,7 @@ const isGameEventRecord = <T extends GameEventType>(
 ): payload is GameEventDetail<T> => {
   if (!payload || typeof payload !== 'object') return false;
   const record = payload as AnyRecord;
-  return typeof record.type === 'string' && typeof record.detail !== 'undefined';
+  return typeof record.type === 'string' && 'detail' in record;
 };
 
 const createIdempotentDispose = (dispose: () => void): (() => void) => {
@@ -232,14 +243,7 @@ class SimpleEventTarget {
     if (!set?.size) return true;
     const snapshot = Array.from(set);
     const eventRecord = event as Record<string, unknown>;
-    try {
-      if (typeof eventRecord.target === 'undefined') {
-        eventRecord.target = this;
-      }
-      eventRecord.currentTarget = this;
-    } catch {
-      // ignore assignment failures
-    }
+    assignEventTarget(eventRecord, this);
     for (const handler of snapshot) {
       try {
         handler.call(this, event);
@@ -286,14 +290,7 @@ const withEventTargetRefs = <T extends GameEventType>(
   target: GameEventTargetLike,
 ): GameEventDetail<T> => {
   const record = event as AnyRecord;
-  try {
-    if (typeof record.target === 'undefined'){
-      record.target = target;
-    }
-    record.currentTarget = target;
-  } catch {
-    // ignore assignment failures
-  }
+  assignEventTarget(record, target);
   return event;
 };
 
@@ -302,7 +299,7 @@ const toEventRecord = <T extends GameEventType>(
   payload: EventEmitterPayload<T>,
 ): GameEventDetail<T> => {
   if (typeof payload === 'undefined') {
-    return toSyntheticEventRecord(type, undefined);
+    return toSyntheticEventRecord(type);
   }
   return isGameEventRecord<T>(payload)
     ? payload
@@ -314,6 +311,7 @@ const toEmitterEventRecord = <T extends GameEventType>(
   payload: EventEmitterPayload<T>,
   eventTarget: GameEventTargetLike,
 ): GameEventDetail<T> => withEventTargetRefs(toEventRecord(type, payload), eventTarget);
+
 export const gameEvents: GameEventTargetLike = makeEventTarget();
 
 type EventDispatchMode =
@@ -433,34 +431,20 @@ const createDispatchAdapters = (target: GameEventTargetLike): {
 
 const gameEventDispatchAdapters = createDispatchAdapters(gameEvents);
 
-const emitGameEventInternal = <T extends GameEventType>(type: T, detail?: GameEventDetailMap[T]): boolean => {
-  if (!type) return false;
-  return gameEventDispatchAdapters.emit(type, detail);
-};
-
-const addGameEventListenerInternal = <T extends GameEventType, H extends CompatibleGameEventHandler<T>>(
-  type: T,
-  handler: H,
-): (() => void) => {
-  if (!type || typeof handler !== 'function') return NOOP_DISPOSE;
-  return gameEventDispatchAdapters.addListener(type, handler);
-};
-
 export function emitGameEvent<T extends GameEventType>(
   type: T,
   detail?: GameEventDetailMap[T],
 ): boolean {
-  return withEventErrorFallback(() => emitGameEventInternal(type, detail), false);
+  if (!type) return false;
+  return withEventErrorFallback(() => gameEventDispatchAdapters.emit(type, detail), false);
 }
 
-export const dispatchGameEvent = <T extends GameEventType>(
-  type: T,
-  detail?: GameEventDetailMap[T],
-): boolean => emitGameEvent(type, detail);
+export const dispatchGameEvent: typeof emitGameEvent = emitGameEvent;
 
 export function addGameEventListener<T extends GameEventType, H extends CompatibleGameEventHandler<T>>(
   type: T,
   handler: H,
 ): () => void {
-  return withEventErrorFallback(() => addGameEventListenerInternal(type, handler), NOOP_DISPOSE);
+  if (!type || typeof handler !== 'function') return NOOP_DISPOSE;
+  return withEventErrorFallback(() => gameEventDispatchAdapters.addListener(type, handler), NOOP_DISPOSE);
 }

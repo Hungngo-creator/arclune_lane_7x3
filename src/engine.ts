@@ -123,11 +123,23 @@ type ChibiProportions = {
   nameAlpha: number;
 };
 
+const SIDE_ROW_COUNT = 3;
+const SIDE_SLOT_COUNT = SIDE_ROW_COUNT * SIDE_ROW_COUNT;
+
 const DEFAULT_OBLIQUE_CAMERA = {
   rowGapRatio: 0.62,
   topScale: 0.8,
   depthScale: 0.94,
 } as const satisfies Required<CameraOptions>;
+
+function resolveCameraOptions(cam: CameraOptions | null | undefined): Required<CameraOptions> {
+  if (!cam) return DEFAULT_OBLIQUE_CAMERA;
+  return {
+    rowGapRatio: coerceFinite(cam.rowGapRatio, DEFAULT_OBLIQUE_CAMERA.rowGapRatio),
+    topScale: coerceFinite(cam.topScale, DEFAULT_OBLIQUE_CAMERA.topScale),
+    depthScale: coerceFinite(cam.depthScale, DEFAULT_OBLIQUE_CAMERA.depthScale),
+  };
+}
 
 const CHIBI_PROPS: ChibiProportions = CHIBI as ChibiProportions;
 const TOKEN_STYLE_VALUE = TOKEN_STYLE as 'chibi' | 'disk';
@@ -334,19 +346,20 @@ function isSummonMap(value: SummonMap): value is Map<number, QueuedSummonRequest
   return typeof (value as { values?: unknown }).values === 'function';
 }
 
+function queueContainsCell(map: SummonMap, cx: number, cy: number): boolean {
+  if (!isSummonMap(map)) return false;
+  for (const request of map.values()) {
+    if (!request) continue;
+    if (request.cx === cx && request.cy === cy) return true;
+  }
+  return false;
+}
+
 export function cellReserved(tokens: readonly UnitToken[], queued: QueuedSummonState | null | undefined, cx: number, cy: number): boolean {
   if (cellOccupied(tokens, cx, cy)) return true;
   if (queued) {
-    const checkQueue = (m: SummonMap): boolean => {
-      if (!isSummonMap(m)) return false;
-      for (const request of m.values()) {
-        if (!request) continue;
-        if (request.cx === cx && request.cy === cy) return true;
-      }
-      return false;
-    };
-    if (checkQueue(queued.ally)) return true;
-    if (checkQueue(queued.enemy)) return true;
+    if (queueContainsCell(queued.ally, cx, cy)) return true;
+    if (queueContainsCell(queued.enemy, cx, cy)) return true;
   }
   return false;
 }
@@ -413,9 +426,9 @@ export function pickRandom<T>(pool: readonly T[], excludeSet: ReadonlySet<string
 
 export const pick3Random = <T>(pool: readonly T[], excludeSet: ReadonlySet<string>): T[] => pickRandom(pool, excludeSet, 3);
 /* ---------- Oblique grid helpers ---------- */
-function rowLR(g: GridSpec, r: number, C: CameraOptions): { left: number; right: number } {
+function rowLR(g: GridSpec, r: number, C: Required<CameraOptions>): { left: number; right: number } {
   const colsW = g.tile * g.cols;
-  const topScale = C.topScale ?? 0.8;
+  const topScale = C.topScale;
   const pinch = (1 - topScale) * colsW;
   const t = r / g.rows;
   const width = colsW - pinch * (1 - t);
@@ -430,7 +443,7 @@ export function drawGridOblique(
   cam: CameraOptions | null | undefined,
   opts: { colors?: Partial<Record<'ally' | 'enemy' | 'mid' | 'line', string>> } = {},
 ): void {
-  const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
+  const C = resolveCameraOptions(cam);
   const colors = {
     ally: CFG.COLORS.ally,
     enemy: CFG.COLORS.enemy,
@@ -438,7 +451,7 @@ export function drawGridOblique(
     line: CFG.COLORS.line,
     ...(opts.colors ?? {}),
   } satisfies Record<'ally' | 'enemy' | 'mid' | 'line', string>;
-  const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+  const rowGap = C.rowGapRatio * g.tile;
 
   for (let cy = 0; cy < g.rows; cy++) {
     const yTop = g.oy + cy * rowGap;
@@ -473,8 +486,8 @@ export function drawGridOblique(
 }
 
 export function hitToCellOblique(g: GridSpec, px: number, py: number, cam: CameraOptions | null | undefined): CellCoords | null {
-  const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
-  const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+  const C = resolveCameraOptions(cam);
+  const rowGap = C.rowGapRatio * g.tile;
 
   const r = (py - g.oy) / rowGap;
   if (r < 0 || r >= g.rows) return null;
@@ -488,7 +501,7 @@ export function hitToCellOblique(g: GridSpec, px: number, py: number, cam: Camer
   return { cx, cy };
 }
 
-function cellQuadOblique(g: GridSpec, cx: number, cy: number, C: CameraOptions): {
+function cellQuadOblique(g: GridSpec, cx: number, cy: number, C: Required<CameraOptions>): {
   xtL: number;
   xtR: number;
   xbL: number;
@@ -496,7 +509,7 @@ function cellQuadOblique(g: GridSpec, cx: number, cy: number, C: CameraOptions):
   yTop: number;
   yBot: number;
 } {
-  const rowGap = (C.rowGapRatio ?? 0.62) * g.tile;
+  const rowGap = C.rowGapRatio * g.tile;
   const yTop = g.oy + cy * rowGap;
   const yBot = yTop + rowGap;
   const LRt = rowLR(g, cy, C);
@@ -509,7 +522,7 @@ function cellQuadOblique(g: GridSpec, cx: number, cy: number, C: CameraOptions):
   return { xtL, xtR, xbL, xbR, yTop, yBot };
 }
 
-function cellCenterOblique(g: GridSpec, cx: number, cy: number, C: CameraOptions): { x: number; y: number } {
+function cellCenterOblique(g: GridSpec, cx: number, cy: number, C: Required<CameraOptions>): { x: number; y: number } {
   const q = cellQuadOblique(g, cx, cy, C);
   const x = (q.xtL + q.xtR + q.xbL + q.xbR) / 4;
   const y = (q.yTop + q.yBot) / 2;
@@ -517,9 +530,9 @@ function cellCenterOblique(g: GridSpec, cx: number, cy: number, C: CameraOptions
 }
 
 export function projectCellOblique(g: GridSpec, cx: number, cy: number, cam: CameraOptions | null | undefined): ProjectionState {
-  const C = cam ?? {};
+  const C = resolveCameraOptions(cam);
   const { x, y } = cellCenterOblique(g, cx, cy, C);
-  const k = C.depthScale ?? 0.94;
+  const k = C.depthScale;
   const depth = g.rows - 1 - cy;
   const scale = Math.pow(k, depth);
   return { x, y, scale };
@@ -606,16 +619,16 @@ function joinSignatureParts(parts: Array<string | number | null | undefined>): s
 }
 
 function contextSignature(g: GridSpec, cam: CameraOptions | null | undefined): string {
-  const C = cam ?? {};
+  const C = resolveCameraOptions(cam);
   return joinSignatureParts([
     g.cols,
     g.rows,
     g.tile,
     g.ox,
     g.oy,
-    C.rowGapRatio ?? 0.62,
-    C.topScale ?? 0.8,
-    C.depthScale ?? 0.94,
+    C.rowGapRatio,
+    C.topScale,
+    C.depthScale,
   ]);
 }
 
@@ -1085,9 +1098,9 @@ export function drawQueuedOblique(
   cam: CameraOptions | null | undefined,
 ): void {
   if (!queued) return;
-  const C = cam ?? DEFAULT_OBLIQUE_CAMERA;
+  const C = resolveCameraOptions(cam);
   const baseR = Math.floor(g.tile * 0.36);
-  const k = C.depthScale ?? 0.94;
+  const k = C.depthScale;
 
   const drawSide = (map: SummonMap, side: Side): void => {
     if (!isSummonMap(map)) return;
@@ -1117,25 +1130,33 @@ export const SIDE = {
   ENEMY: 'enemy',
 } as const satisfies Record<'ALLY' | 'ENEMY', Side>;
 
+function isAllySide(side: SlotSpecifier): boolean {
+  return side === SIDE.ALLY || side === 'ally';
+}
+
+function enemyStartColumn(): number {
+  return CFG.GRID_COLS - CFG.ENEMY_COLS;
+}
+
 export function slotIndex(side: SlotSpecifier, cx: number, cy: number): number {
-  if (side === SIDE.ALLY || side === 'ally') {
-    return (CFG.ALLY_COLS - 1 - cx) * 3 + (cy + 1);
+  if (isAllySide(side)) {
+    return (CFG.ALLY_COLS - 1 - cx) * SIDE_ROW_COUNT + (cy + 1);
   }
-  const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS;
+  const enemyStart = enemyStartColumn();
   const colIndex = cx - enemyStart;
-  return colIndex * 3 + (cy + 1);
+  return colIndex * SIDE_ROW_COUNT + (cy + 1);
 }
 
 export function slotToCell(side: SlotSpecifier, slot: number): CellCoords {
-  const s = Math.max(1, Math.min(9, slot | 0));
-  const colIndex = Math.floor((s - 1) / 3);
-  const rowIndex = (s - 1) % 3;
-  if (side === SIDE.ALLY || side === 'ally') {
+  const s = Math.max(1, Math.min(SIDE_SLOT_COUNT, slot | 0));
+  const colIndex = Math.floor((s - 1) / SIDE_ROW_COUNT);
+  const rowIndex = (s - 1) % SIDE_ROW_COUNT;
+  if (isAllySide(side)) {
     const cx = CFG.ALLY_COLS - 1 - colIndex;
     const cy = rowIndex;
     return { cx, cy };
   }
-  const enemyStart = CFG.GRID_COLS - CFG.ENEMY_COLS;
+  const enemyStart = enemyStartColumn();
   const cx = enemyStart + colIndex;
   const cy = rowIndex;
   return { cx, cy };
@@ -1143,10 +1164,17 @@ export function slotToCell(side: SlotSpecifier, slot: number): CellCoords {
 
 export function zoneCode(side: SlotSpecifier, cx: number, cy: number, { numeric = false }: ZoneCodeOptions = {}): string | number {
   const slot = slotIndex(side, cx, cy);
-  if (numeric) return (side === SIDE.ALLY || side === 'ally' ? 0 : 1) * 16 + slot;
-  const prefix = side === SIDE.ALLY || side === 'ally' ? 'A' : 'E';
+  const allySide = isAllySide(side);
+  if (numeric) return (allySide ? 0 : 1) * 16 + slot;
+  const prefix = allySide ? 'A' : 'E';
   return prefix + String(slot);
 }
 
-export const ORDER_ALLY: ReadonlyArray<CellCoords> = Array.from({ length: 9 }, (_, i) => slotToCell(SIDE.ALLY, i + 1));
-export const ORDER_ENEMY: ReadonlyArray<CellCoords> = Array.from({ length: 9 }, (_, i) => slotToCell(SIDE.ENEMY, i + 1));
+export const ORDER_ALLY: ReadonlyArray<CellCoords> = Array.from(
+  { length: SIDE_SLOT_COUNT },
+  (_, i) => slotToCell(SIDE.ALLY, i + 1),
+);
+export const ORDER_ENEMY: ReadonlyArray<CellCoords> = Array.from(
+  { length: SIDE_SLOT_COUNT },
+  (_, i) => slotToCell(SIDE.ENEMY, i + 1),
+);

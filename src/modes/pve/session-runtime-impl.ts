@@ -2784,7 +2784,7 @@ function drawHPBars(): void {
       });
       drawCtx.save();
       drawCtx.translate(hpX + inset, hpY + inset);
-      roundedRectPathl(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);
+      roundedRectPath(drawCtx, 0, 0, filledWidth, innerHeight, innerRadius);
       drawCtx.fillStyle = fillStyle;
       drawCtx.fill();
       drawCtx.restore();
