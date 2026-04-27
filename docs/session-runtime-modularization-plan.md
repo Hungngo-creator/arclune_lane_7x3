@@ -268,6 +268,40 @@ Di chuyển theo nguyên tắc **copy-move, không đổi hành vi**:
 - Mục tiêu kế tiếp (D1.4):
   - cân nhắc move luôn readiness predicate/type alias vào `session-render` nếu không làm tăng coupling với `Image`.y
 
+### Đánh giá bổ sung sau D1.3 và kế hoạch D1.4 (session-render)
+
+1. **`session-runtime-impl.ts` vẫn còn glue lặp lại sau `collectRenderableStatusIcons`:**
+   - predicate `icon ready` và đoạn map `entry.icon + payload` vẫn nằm trong impl.
+   - Đây là phần đã thuộc phạm vi `session-render` (status rendering adapter), nên để lại ở impl sẽ tạo shadow glue không cần thiết.
+2. **Khả năng reuse hiện có đủ để nâng cấp mà không đổi thuật toán:**
+   - giữ nguyên `collectRenderableStatusIcons(...)` làm core,
+   - bổ sung helper nhỏ trong `session-render` cho 2 việc lặp:
+     - `isStatusIconReady(icon)` (readiness predicate chuẩn),
+     - `materializeRenderableStatusIcons(entries)` (map payload sang entry cuối cùng dùng để draw).
+3. **Kết luận D1.4 (triển khai ngay được, rủi ro thấp):**
+   - impl chỉ truyền `ensureStatusIconLoaded` + statuses vào `session-render`,
+   - toàn bộ glue “ready-check + materialize payload” chuyển về `session-render`,
+   - không chạm `drawHPBars` geometry và không đổi thứ tự chọn icon.
+
+### Scope triển khai ngay cho D1.4 (đã khóa)
+
+- Move khỏi `session-runtime-impl.ts`:
+  - readiness predicate inline của status icon,
+  - mapping inline từ `collectRenderableStatusIcons` sang `StatusIconEntry`.
+- Thêm trong `session-render.ts`:
+  - `isStatusIconReady(...)`,
+  - `materializeRenderableStatusIcons(...)`.
+- Giữ nguyên ở impl:
+  - `ensureStatusIconLoaded`,
+  - `statusIconCache`,
+  - draw/hitbox logic.
+
+### Tiêu chí pass cho D1.4
+
+1. `session-runtime-impl.ts` không còn inline readiness predicate cho status icon.
+2. `session-runtime-impl.ts` không còn map thủ công payload status icon đã có ở `session-render`.
+3. Render output và tooltip/stacks/priority giữ nguyên theo D1.3.6
+
 ### Prompt QA re-run cho `session-render` (để chốt D1)
 
 > Re-run checklist sau khi tách D1:

@@ -16125,6 +16125,16 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
       }
       return icons;
   };
+  const isStatusIconReady = (icon) => (Boolean(icon && icon.status === 'ready' && icon.image));
+  const materializeRenderableStatusIcons = (entries) => entries.map((entry) => ({
+      ...entry.icon,
+      statusId: entry.statusId,
+      statusName: entry.statusName,
+      tooltip: entry.tooltip,
+      priority: entry.priority,
+      stacks: entry.stacks,
+      turnsLeft: entry.turnsLeft,
+  }));
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createBrowserFrameFns')) exports.createBrowserFrameFns = createBrowserFrameFns;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createSessionRenderController')) exports.createSessionRenderController = createSessionRenderController;
@@ -16134,6 +16144,8 @@ __modules['./modes/pve/session-render.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'aggregateStatuses')) exports.aggregateStatuses = aggregateStatuses;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusIconPreview')) exports.resolveStatusIconPreview = resolveStatusIconPreview;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectRenderableStatusIcons')) exports.collectRenderableStatusIcons = collectRenderableStatusIcons;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isStatusIconReady')) exports.isStatusIconReady = isStatusIconReady;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'materializeRenderableStatusIcons')) exports.materializeRenderableStatusIcons = materializeRenderableStatusIcons;
 };
 __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) => {
   const __dep2 = __require('./aether.ts');
@@ -16250,6 +16262,8 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const createSessionRenderController = __dep31.createSessionRenderController;
   const DEFAULT_STATUS_ICON_PATH = __dep31.DEFAULT_STATUS_ICON_PATH;
   const MAX_STATUS_ICONS_PER_TOKEN = __dep31.MAX_STATUS_ICONS_PER_TOKEN;
+  const isStatusIconReady = __dep31.isStatusIconReady;
+  const materializeRenderableStatusIcons = __dep31.materializeRenderableStatusIcons;
   const resolveStatusIconPreview = __dep31.resolveStatusIconPreview;
   const __dep32 = __require('./leader-uyen.ts');
   const ensureUyenState = __dep32.ensureUyenState;
@@ -18815,19 +18829,11 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           const headY = p.y - spriteHeight * anchor;
           const hpY = Math.round(headY - Math.max(6, Math.floor(r * 0.34)) - barHeight);
           const hpX = Math.round(p.x - barWidth / 2);
-          const statusIcons = collectRenderableStatusIcons({
+          const statusIcons = materializeRenderableStatusIcons(collectRenderableStatusIcons({
               statusesInput: Array.isArray(t.statuses) ? t.statuses : [],
               maxIcons: MAX_STATUS_ICONS_PER_TOKEN,
               ensureStatusIcon: ensureStatusIconLoaded,
-              isIconReady: (icon) => Boolean(icon && icon.status === 'ready' && icon.image),
-          }).map((entry) => ({
-              ...entry.icon,
-              statusId: entry.statusId,
-              statusName: entry.statusName,
-              tooltip: entry.tooltip,
-              priority: entry.priority,
-              stacks: entry.stacks,
-              turnsLeft: entry.turnsLeft,
+              isIconReady: isStatusIconReady,
           }));
           const statusIconSize = Math.max(2, Math.floor(barHeight * 0.9));
           const statusIconGap = Math.max(1, Math.floor(statusIconSize * 0.2));

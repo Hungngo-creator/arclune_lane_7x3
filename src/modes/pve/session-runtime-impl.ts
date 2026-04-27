@@ -75,6 +75,8 @@ import {
   createSessionRenderController,
   DEFAULT_STATUS_ICON_PATH,
   MAX_STATUS_ICONS_PER_TOKEN,
+  isStatusIconReady,
+  materializeRenderableStatusIcons,
   resolveStatusIconPreview,
 } from './session-render';
 import {
@@ -2912,19 +2914,11 @@ function drawHPBars(): void {
     const headY = p.y - spriteHeight * anchor;
     const hpY = Math.round(headY - Math.max(6, Math.floor(r * 0.34)) - barHeight);
     const hpX = Math.round(p.x - barWidth / 2);
-    const statusIcons = collectRenderableStatusIcons<StatusIconEntry>({
+    const statusIcons = materializeRenderableStatusIcons<StatusIconEntry>(collectRenderableStatusIcons<StatusIconEntry>({
       statusesInput: Array.isArray(t.statuses) ? t.statuses : [],
       maxIcons: MAX_STATUS_ICONS_PER_TOKEN,
       ensureStatusIcon: ensureStatusIconLoaded,
-      isIconReady: (icon) => Boolean(icon && icon.status === 'ready' && icon.image),
-    }).map((entry) => ({
-      ...entry.icon,
-      statusId: entry.statusId,
-      statusName: entry.statusName,
-      tooltip: entry.tooltip,
-      priority: entry.priority,
-      stacks: entry.stacks,
-      turnsLeft: entry.turnsLeft,
+      isIconReady: isStatusIconReady,
     }));
     const statusIconSize = Math.max(2, Math.floor(barHeight * 0.9));
     const statusIconGap = Math.max(1, Math.floor(statusIconSize * 0.2));

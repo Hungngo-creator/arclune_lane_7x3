@@ -283,6 +283,11 @@ export type RenderableStatusIcon = {
   turnsLeft: number | null;
 };
 
+type BasicStatusIconLike = {
+  status: 'idle' | 'loading' | 'ready' | 'error';
+  image: unknown;
+};
+
 type StatusAggregateCacheEntry = {
   signature: string;
   aggregates: StatusAggregate[];
@@ -543,3 +548,19 @@ export const collectRenderableStatusIcons = <TIcon>(
   }
   return icons;
 };
+
+export const isStatusIconReady = <TIcon extends BasicStatusIconLike>(icon: TIcon | null): icon is TIcon => (
+  Boolean(icon && icon.status === 'ready' && icon.image)
+);
+
+export const materializeRenderableStatusIcons = <TIcon extends object>(
+  entries: Array<RenderableStatusIcon & { icon: TIcon }>,
+): Array<TIcon & RenderableStatusIcon> => entries.map((entry) => ({
+  ...entry.icon,
+  statusId: entry.statusId,
+  statusName: entry.statusName,
+  tooltip: entry.tooltip,
+  priority: entry.priority,
+  stacks: entry.stacks,
+  turnsLeft: entry.turnsLeft,
+}));
