@@ -1,3 +1,5 @@
+import { normalizeTagList } from './tags.ts';
+
 export const COST_MIN = 7;
 export const COST_MAX = 22;
 
@@ -114,6 +116,28 @@ const SCORE_METRIC_KEYS = [
   'consistencyPenalty',
 ] as const;
 type ScoreKey = typeof SCORE_METRIC_KEYS[number];
+type ScoreMetrics = Pick<CostBudgetBreakdown, ScoreKey>;
+interface CostTagScoreRule {
+  metric: ScoreKey;
+  delta?: number;
+  perTag?: number;
+  cap?: number;
+  tagIds?: ReadonlyArray<string>;
+  keywords?: ReadonlyArray<string>;
+  requiresAll?: ReadonlyArray<string>;
+  excludesAny?: ReadonlyArray<string>;
+}
+interface CostTagSynergyRule {
+  requiresAll: ReadonlyArray<string>;
+  metric: ScoreKey;
+  delta: number;
+}
+interface CostTagContext {
+  hasTag: (...needles: string[]) => boolean;
+  countMatchedTags: (tagIds: ReadonlyArray<string> | undefined) => number;
+  hasKeyword: (keywords: ReadonlyArray<string> | undefined) => boolean;
+  totalTags: number;
+}
 
 const RANK_BUDGET_BASE: Readonly<Record<string, CostBudgetInput>> = Object.freeze({
   N: { tagComplexity: 0, battlefieldInfluence: 1, economyPressure: 0, scalingCeiling: 0, tacticalFlexibility: 1 },
@@ -256,6 +280,15 @@ function normalizeMetric(value: number | undefined, min: number, max: number): n
   return Math.round(clamp(value ?? 0, min, max));
 }
 
+function normalizeScoreMetrics(input: CostBudgetInput): ScoreMetrics {
+  const normalized = {} as ScoreMetrics;
+  for (const key of SCORE_METRIC_KEYS){
+    const [min, max] = SCORE_RANGES[key];
+    normalized[key] = normalizeMetric(input[key], min, max);
+  }
+  return normalized;
+}
+
 function normalizeBreakdown(input: CostBudgetInput): CostBudgetBreakdown {
   const hasDivineNature = Boolean(input.hasDivineNature);
   const divineBonus = hasDivineNature
@@ -264,15 +297,7 @@ function normalizeBreakdown(input: CostBudgetInput): CostBudgetBreakdown {
   const divinePenalty = hasDivineNature ? 3 : 0;
 
   return {
-    tagComplexity: normalizeMetric(input.tagComplexity, SCORE_RANGES.tagComplexity[0], SCORE_RANGES.tagComplexity[1]),
-    battlefieldInfluence: normalizeMetric(input.battlefieldInfluence, SCORE_RANGES.battlefieldInfluence[0], SCORE_RANGES.battlefieldInfluence[1]),
-    economyPressure: normalizeMetric(input.economyPressure, SCORE_RANGES.economyPressure[0], SCORE_RANGES.economyPressure[1]),
-    scalingCeiling: normalizeMetric(input.scalingCeiling, SCORE_RANGES.scalingCeiling[0], SCORE_RANGES.scalingCeiling[1]),
-    tacticalFlexibility: normalizeMetric(input.tacticalFlexibility, SCORE_RANGES.tacticalFlexibility[0], SCORE_RANGES.tacticalFlexibility[1]),
-    setupPenalty: normalizeMetric(input.setupPenalty, SCORE_RANGES.setupPenalty[0], SCORE_RANGES.setupPenalty[1]),
-    selfRiskPenalty: normalizeMetric(input.selfRiskPenalty, SCORE_RANGES.selfRiskPenalty[0], SCORE_RANGES.selfRiskPenalty[1]),
-    vanishRiskPenalty: normalizeMetric(input.vanishRiskPenalty, SCORE_RANGES.vanishRiskPenalty[0], SCORE_RANGES.vanishRiskPenalty[1]),
-    consistencyPenalty: normalizeMetric(input.consistencyPenalty, SCORE_RANGES.consistencyPenalty[0], SCORE_RANGES.consistencyPenalty[1]),
+    ...normalizeScoreMetrics(input),
     divineBonus,
     divinePenalty,
   };
@@ -280,6 +305,75 @@ function normalizeBreakdown(input: CostBudgetInput): CostBudgetBreakdown {
 
 function addMetric(base: number | undefined, delta: number | undefined): number {
   return (base ?? 0) + (delta ?? 0);
+}
+
+const COST_TAG_SCORE_RULES: ReadonlyArray<CostTagScoreRule> = Object.freeze([
+  { metric: 'tagComplexity', perTag: 1, cap: 4, tagIds: ['global-rule', 'absolute-attack', 'absolute-shield', 'divine-nature', 'unique-global'] },
+  { metric: 'tagComplexity', delta: 2, keywords: ['pháp tắc'] },
+  { metric: 'battlefieldInfluence', perTag: 2, cap: 5, tagIds: ['aoe', 'random-aoe', 'field', 'line', 'control', 'taunt', 'silence', 'poison'] },
+  { metric: 'battlefieldInfluence', delta: 1, tagIds: ['global-rule'], keywords: ['quy tắc', 'rule'] },
+  { metric: 'battlefieldInfluence', delta: 1, keywords: ['toàn sân', 'global'] },
+  { metric: 'economyPressure', delta: 1, perTag: 1, cap: 3, tagIds: ['aether-cost', 'mark', 'summon'], keywords: ['cost', 'aether', 'nộ', 'energy', 'resource'] },
+  { metric: 'scalingCeiling', delta: 1, perTag: 1, cap: 4, tagIds: ['stance', 'mark', 'chain', 'revive', 'execute', 'pierce'], keywords: ['vĩnh viễn', 'stack', 'tiến hóa', 'evolve', 'evolution'] },
+  { metric: 'tacticalFlexibility', perTag: 1, cap: 4, tagIds: ['support', 'self-buff', 'heal', 'team-heal', 'shield', 'revive', 'summon'] },
+  { metric: 'tacticalFlexibility', delta: 1, requiresAll: ['support', 'heal'], excludesAny: ['summon'] },
+  { metric: 'tacticalFlexibility', delta: 1, keywords: ['buff', 'debuff', 'hồi'] },
+  { metric: 'setupPenalty', delta: 1, perTag: 1, cap: 3, tagIds: ['summon', 'sleep', 'mark'], keywords: ['setup', 'triệu hồi', 'sleep'] },
+  { metric: 'selfRiskPenalty', delta: 2, keywords: ['friendly fire', 'không phân địch ta', 'toàn bộ sinh vật', 'tự tổn thương', 'self-debuff', 'self debuff'] },
+  { metric: 'vanishRiskPenalty', delta: 2, keywords: ['biến mất', 'removed', 'vanish', 'out trận'] },
+  { metric: 'consistencyPenalty', perTag: 1, cap: 3, tagIds: ['random-target', 'random-aoe'], keywords: ['ngẫu nhiên', 'random', 'coin flip', 'coin-flip'] },
+  { metric: 'battlefieldInfluence', perTag: 1, cap: 2, tagIds: ['burst', 'execute'] },
+]);
+const COST_TAG_SYNERGY_RULES: ReadonlyArray<CostTagSynergyRule> = Object.freeze([
+  { requiresAll: ['summon', 'support'], metric: 'tacticalFlexibility', delta: 1 },
+  { requiresAll: ['aoe', 'control'], metric: 'battlefieldInfluence', delta: 1 },
+  { requiresAll: ['revive', 'shield'], metric: 'scalingCeiling', delta: 1 },
+  { requiresAll: ['random-aoe', 'execute'], metric: 'consistencyPenalty', delta: 1 },
+  { requiresAll: ['global-rule', 'aether-cost'], metric: 'economyPressure', delta: 1 },
+  { requiresAll: ['burst', 'execute'], metric: 'scalingCeiling', delta: 1 },
+  { requiresAll: ['heal', 'shield'], metric: 'tacticalFlexibility', delta: 1 },
+  { requiresAll: ['random-target', 'global-rule'], metric: 'consistencyPenalty', delta: 1 },
+]);
+
+function createTagCostContext(tags: readonly string[]): CostTagContext {
+  const normalizedTextTags = tags
+    .map((tag) => String(tag).trim().toLowerCase())
+    .filter(Boolean);
+  const normalizedTagSet = new Set(normalizeTagList(normalizedTextTags));
+  const normalizedTagText = normalizedTextTags.join(' || ');
+  const keywordCache = new Map<string, boolean>();
+
+  const hasTag = (...needles: string[]): boolean => needles.some((needle) => normalizedTagSet.has(needle));
+  const countMatchedTags = (tagIds: ReadonlyArray<string> | undefined): number => {
+    if (!Array.isArray(tagIds) || tagIds.length === 0) return 0;
+    let count = 0;
+    for (const tagId of tagIds){
+      if (hasTag(tagId)) count += 1;
+    }
+    return count;
+  };
+  const hasKeyword = (keywords: ReadonlyArray<string> | undefined): boolean => {
+    if (!Array.isArray(keywords) || keywords.length === 0) return false;
+    return keywords.some((keyword) => {
+      const cached = keywordCache.get(keyword);
+      if (typeof cached === 'boolean') return cached;
+      const matched = normalizedTagText.includes(keyword);
+      keywordCache.set(keyword, matched);
+      return matched;
+    });
+  };
+
+  return { hasTag, countMatchedTags, hasKeyword, totalTags: normalizedTagSet.size };
+}
+
+function isRuleApplicable(rule: CostTagScoreRule, tagContext: CostTagContext): boolean {
+  if (rule.requiresAll && !rule.requiresAll.every((tagId) => tagContext.hasTag(tagId))){
+    return false;
+  }
+  if (rule.excludesAny && rule.excludesAny.some((tagId) => tagContext.hasTag(tagId))){
+    return false;
+  }
+  return true;
 }
 
 export function mergeBudgetInputs(...inputs: Array<CostBudgetInput | null | undefined>): CostBudgetInput {
@@ -375,11 +469,7 @@ export function evaluateCostBudget(input: CostBudgetInput): CostBudgetResult {
 }
 
 export function estimateCostFromTags(tags: readonly string[]): CostBudgetResult {
-  const normalizedTags = tags.map((tag) => String(tag).trim().toLowerCase());
-  const normalizedTagSet = new Set(normalizedTags);
-  const has = (...needles: string[]) => needles.some((needle) => normalizedTagSet.has(needle));
-  const normalizedTagText = normalizedTags.join(' || ');
-  const containsAny = (...needles: string[]) => needles.some((needle) => normalizedTagText.includes(needle));
+  const tagContext = createTagCostContext(tags);
   const input: CostBudgetInput = {
     tagComplexity: 0,
     battlefieldInfluence: 1,
@@ -390,48 +480,38 @@ export function estimateCostFromTags(tags: readonly string[]): CostBudgetResult 
     selfRiskPenalty: 0,
     vanishRiskPenalty: 0,
     consistencyPenalty: 0,
-    hasDivineNature: containsAny('thần tính', 'divine'),
+    hasDivineNature: tagContext.hasTag('divine-nature') || tagContext.hasKeyword(['thần tính', 'divine']),
   };
   const addScore = (key: ScoreKey, delta: number): void => {
     const current = typeof input[key] === 'number' ? (input[key] as number) : 0;
     input[key] = current + delta;
   };
 
-  if (has('quy-tac') || containsAny('quy tắc')){
-    addScore('tagComplexity', 3);
-    addScore('battlefieldInfluence', 2);
+  for (const rule of COST_TAG_SCORE_RULES){
+    if (!isRuleApplicable(rule, tagContext)) continue;
+    const matchedTags = tagContext.countMatchedTags(rule.tagIds);
+    const matchedByKeyword = tagContext.hasKeyword(rule.keywords);
+    const scaledByTags = typeof rule.perTag === 'number'
+      ? matchedTags * rule.perTag
+      : 0;
+    const baseDelta = scaledByTags + (matchedByKeyword ? (rule.delta ?? 0) : 0);
+    if (baseDelta <= 0) continue;
+    const cappedDelta = typeof rule.cap === 'number'
+      ? Math.min(baseDelta, rule.cap)
+      : baseDelta;
+    addScore(rule.metric, cappedDelta);
   }
-  if (has('phap-tac') || containsAny('pháp tắc')){
-    addScore('tagComplexity', 2);
-    addScore('battlefieldInfluence', 1);
+
+  for (const rule of COST_TAG_SYNERGY_RULES){
+    if (!rule.requiresAll.every((tagId) => tagContext.hasTag(tagId))) continue;
+    addScore(rule.metric, rule.delta);
   }
-  if (has('tuyet-doi') || containsAny('tuyệt đối', 'absolute')){
+
+  if (tagContext.totalTags >= 6){
     addScore('tagComplexity', 1);
   }
-  if (containsAny('aoe', 'toàn sân', 'global')){
-    addScore('battlefieldInfluence', 2);
-  }
-  if (containsAny('buff', 'debuff', 'heal', 'shield', 'hồi')){
-    addScore('tacticalFlexibility', 1);
-  }
-  if (containsAny('summon', 'triệu hồi')){
-    addScore('tacticalFlexibility', 1);
-    addScore('setupPenalty', 1);
-  }
-  if (containsAny('cost', 'aether', 'nộ', 'energy', 'resource')){
-    addScore('economyPressure', 1);
-  }
-  if (containsAny('vĩnh viễn', 'stack', 'tiến hóa', 'evolve', 'evolution')){
-    addScore('scalingCeiling', 2);
-  }
-  if (containsAny('friendly fire', 'không phân địch ta', 'toàn bộ sinh vật', 'tự tổn thương', 'self-debuff', 'self debuff')){
-    addScore('selfRiskPenalty', 2);
-  }
-  if (containsAny('biến mất', 'removed', 'vanish', 'out trận')){
-    addScore('vanishRiskPenalty', 2);
-  }
-  if (containsAny('ngẫu nhiên', 'random')){
-    addScore('consistencyPenalty', 1);
+  if (tagContext.totalTags >= 9){
+    addScore('tagComplexity', 1);
   }
 
   return evaluateCostBudget(input);

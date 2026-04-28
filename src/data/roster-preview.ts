@@ -34,6 +34,7 @@ const PRECISION: Readonly<Record<string, number>> = Object.freeze({
 const ROSTER_PREVIEW_META = Object.freeze(
   ROSTER.map((unit) => ({ id: unit.id, name: unit.name }))
 );
+const hasTpDelta = (stat: string): boolean => typeof TP_DELTA[stat] === 'number';
 
 function roundStat(stat: string, value: number) {
   const precision = PRECISION[stat] ?? 1;
@@ -54,7 +55,7 @@ function getClassBase(className: string | null | undefined): CatalogStatBlock {
 function sanitizeTpAllocation(tpAlloc: Record<string, number | null | undefined> = {}) {
   const clean: Record<string, number> = {};
   for (const [stat, value] of Object.entries(tpAlloc)) {
-    if (!(stat in TP_DELTA)) continue;
+    if (!hasTpDelta(stat)) continue;
     const rounded = roundTpValue(value ?? 0);
     if (rounded !== 0) {
       clean[stat] = rounded;
@@ -67,7 +68,7 @@ function mapStatBlock(
   stats: CatalogStatBlock,
   transform: (stat: string, value: number) => number,
 ): CatalogStatBlock {
-  const out: CatalogStatBlock = { ...stats };
+  const out: CatalogStatBlock = {};
   for (const [stat, value] of Object.entries(stats) as Array<[string, number]>) {
     out[stat] = transform(stat, value ?? 0);
   }
@@ -76,7 +77,7 @@ function mapStatBlock(
 
 function applyTpDelta(base: CatalogStatBlock, cleanTp: Record<string, number>): CatalogStatBlock {
   return mapStatBlock(base, (stat, baseValue) => {
-    const delta = TP_DELTA[stat];
+    const delta = TP_DELTA[stat] ?? 0;
     if (delta) {
       return baseValue + delta * (cleanTp[stat] ?? 0);
     }
@@ -125,11 +126,11 @@ export function deriveTpFromMods(
   if (!mods) return {};
   const tp: Record<string, number> = {};
   for (const [stat, modValue] of Object.entries(mods) as Array<[string, number | null | undefined]>) {
-    if (!(stat in TP_DELTA)) continue;
+    if (!hasTpDelta(stat)) continue;
     const baseValue = base[stat];
     if (typeof baseValue !== 'number') continue;
-    const delta = TP_DELTA[stat];
-    const raw = delta ? (baseValue * (modValue ?? 0)) / delta : 0;
+    const delta = TP_DELTA[stat] ?? 1;
+    const raw = (baseValue * (modValue ?? 0)) / delta;
     const rounded = roundTpValue(raw);
     if (rounded !== 0) {
       tp[stat] = rounded;

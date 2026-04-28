@@ -175,20 +175,20 @@ const LEGACY_MODULE_ID_ALIASES = new Map(
 const args = process.argv.slice(2);
 const skipBundleVerify = args.includes('--skip-bundle-verify');
 const pruneUnreachableModules = args.includes('--prune-unreachable');
-const modeArg = args.find((arg) => arg.startsWith('--mode='));
-const argMode = modeArg ? modeArg.split('=')[1] : undefined;
+const MODE_ARG_PREFIX = '--mode=';
+const modeArg = args.find((arg) => arg.startsWith(MODE_ARG_PREFIX));
+const argMode = modeArg ? modeArg.slice(MODE_ARG_PREFIX.length) : undefined;
+const KNOWN_MODES = new Set(['production', 'development']);
 const toKnownMode = (value) => {
   if (typeof value !== 'string') return undefined;
   const normalized = value.toLowerCase();
-  if (normalized === 'production') return 'production';
-  if (normalized === 'development') return 'development';
-  return undefined;
+  return KNOWN_MODES.has(normalized) ? normalized : undefined;
 };
 const normalizedMode = toKnownMode(argMode);
 if (normalizedMode) {
   process.env.NODE_ENV = normalizedMode;
 }
-const MODE = toKnownMode(normalizedMode ?? process.env.NODE_ENV) ?? 'development';
+const MODE = normalizedMode ?? toKnownMode(process.env.NODE_ENV) ?? 'development';
 const ESBUILD_BASE_OPTIONS = {
   platform: 'browser',
   format: 'esm',
@@ -221,7 +221,7 @@ const ESBUILD_TRANSFORM_MINIFY_OPTIONS = ENABLE_RUNTIME_OPTIMIZATIONS
       minifyIdentifiers: false,
       minifyWhitespace: false,
     };
-    const ESBUILD_TRANSFORM_OPTIONS = {
+const ESBUILD_TRANSFORM_OPTIONS = {
   platform: ESBUILD_BASE_OPTIONS.platform,
   format: ESBUILD_BASE_OPTIONS.format,
   target: ESBUILD_BASE_OPTIONS.target,

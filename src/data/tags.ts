@@ -83,8 +83,8 @@ const normalizeKey = (value: string): string => value.trim().toLowerCase();
 const TAG_BY_ID = new Map<string, TagDefinition>();
 for (const definition of TAG_DEFINITIONS){
   TAG_BY_ID.set(normalizeKey(definition.id), definition);
-  const aliases = 'aliases' in definition ? (definition.aliases ?? []) : [];
-  for (const alias of aliases){
+  const aliases = 'aliases' in definition ? definition.aliases : undefined;
+  for (const alias of aliases ?? []){
     TAG_BY_ID.set(normalizeKey(alias), definition);
   }
 }
@@ -126,11 +126,13 @@ export const tagAliasesByVersion: Readonly<Record<TagAliasVersion, Readonly<Reco
   }),
 });
 
-const TAG_ALIAS_BY_VERSION_KEY = new Map<string, string>();
-for (const [version, aliases] of Object.entries(tagAliasesByVersion)){
+const TAG_ALIAS_BY_VERSION = new Map<TagAliasVersion, ReadonlyMap<string, string>>();
+for (const [version, aliases] of Object.entries(tagAliasesByVersion) as Array<[TagAliasVersion, Record<string, string>]>){
+  const aliasByKey = new Map<string, string>();
   for (const [from, to] of Object.entries(aliases)){
-    TAG_ALIAS_BY_VERSION_KEY.set(`${version}:${normalizeKey(from)}`, to);
+    aliasByKey.set(normalizeKey(from), to);
   }
+  TAG_ALIAS_BY_VERSION.set(version, aliasByKey);
 }
 
 export const GAME_TAGS = Object.freeze(TAG_DEFINITIONS);
@@ -163,7 +165,7 @@ function resolveVersionAlias(
   tag: string,
   version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
 ): string {
-  return TAG_ALIAS_BY_VERSION_KEY.get(`${version}:${normalizeKey(tag)}`) ?? tag;
+  return TAG_ALIAS_BY_VERSION.get(version)?.get(normalizeKey(tag)) ?? tag;
 }
 
 export function normalizeTagId(
@@ -180,13 +182,20 @@ export function normalizeTagList(
   tags: ReadonlyArray<string> | null | undefined,
   version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
 ): string[]{
-  if (!Array.isArray(tags)) return [];
+  return [...collectNormalizedTagSet(tags, version)];
+}
+
+function collectNormalizedTagSet(
+  tags: ReadonlyArray<string> | null | undefined,
+  version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
+): Set<string> {
   const unique = new Set<string>();
+  if (!Array.isArray(tags)) return unique;
   for (const tag of tags){
     const normalized = normalizeTagId(tag, version);
     if (normalized) unique.add(normalized);
   }
-  return [...unique];
+  return unique;
 }
 
 export function resolveTagVersionAliases(
@@ -210,8 +219,7 @@ export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined):
     if (typeof rawTag !== 'string') continue;
     const trimmed = rawTag.trim();
     if (!trimmed) continue;
-    const normalized = normalizeTagId(trimmed);
-    if (!normalized || !TAG_BY_ID.has(normalized)){
+    if (!getTagDefinition(trimmed)){
       unknown.add(trimmed);
     }
   }
@@ -219,13 +227,13 @@ export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined):
 }
 
 export function hasAnyTag(haystack: ReadonlyArray<string>, needles: ReadonlyArray<string>): boolean{
-  const normalizedHaystack = new Set(normalizeTagList(haystack));
-  const normalizedNeedles = new Set<string>();
+  if (!Array.isArray(haystack) || !Array.isArray(needles) || haystack.length === 0 || needles.length === 0){
+    return false;
+  }
+  const normalizedHaystack = collectNormalizedTagSet(haystack);
   for (const needle of needles){
     const normalizedNeedle = normalizeTagId(needle);
-    if (normalizedNeedle) normalizedNeedles.add(normalizedNeedle);
-  }
-  for (const normalizedNeedle of normalizedNeedles){
+    if (!normalizedNeedle) continue;
     if (normalizedHaystack.has(normalizedNeedle)) return true;
   }
   return false;

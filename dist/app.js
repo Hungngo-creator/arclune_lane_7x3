@@ -9242,6 +9242,8 @@ __modules['./data/campaign-stages.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveBossName')) exports.resolveBossName = resolveBossName;
 };
 __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./data/tags.ts');
+  const normalizeTagList = __dep0.normalizeTagList;
   const COST_MIN = 7;
   const COST_MAX = 22;
   const RANK_MULTIPLIER = Object.freeze({
@@ -9401,6 +9403,14 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
   function normalizeMetric(value, min, max) {
       return Math.round(clamp(value ?? 0, min, max));
   }
+  function normalizeScoreMetrics(input) {
+      const normalized = {};
+      for (const key of SCORE_METRIC_KEYS) {
+          const [min, max] = SCORE_RANGES[key];
+          normalized[key] = normalizeMetric(input[key], min, max);
+      }
+      return normalized;
+  }
   function normalizeBreakdown(input) {
       const hasDivineNature = Boolean(input.hasDivineNature);
       const divineBonus = hasDivineNature
@@ -9408,21 +9418,81 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
           : 0;
       const divinePenalty = hasDivineNature ? 3 : 0;
       return {
-          tagComplexity: normalizeMetric(input.tagComplexity, SCORE_RANGES.tagComplexity[0], SCORE_RANGES.tagComplexity[1]),
-          battlefieldInfluence: normalizeMetric(input.battlefieldInfluence, SCORE_RANGES.battlefieldInfluence[0], SCORE_RANGES.battlefieldInfluence[1]),
-          economyPressure: normalizeMetric(input.economyPressure, SCORE_RANGES.economyPressure[0], SCORE_RANGES.economyPressure[1]),
-          scalingCeiling: normalizeMetric(input.scalingCeiling, SCORE_RANGES.scalingCeiling[0], SCORE_RANGES.scalingCeiling[1]),
-          tacticalFlexibility: normalizeMetric(input.tacticalFlexibility, SCORE_RANGES.tacticalFlexibility[0], SCORE_RANGES.tacticalFlexibility[1]),
-          setupPenalty: normalizeMetric(input.setupPenalty, SCORE_RANGES.setupPenalty[0], SCORE_RANGES.setupPenalty[1]),
-          selfRiskPenalty: normalizeMetric(input.selfRiskPenalty, SCORE_RANGES.selfRiskPenalty[0], SCORE_RANGES.selfRiskPenalty[1]),
-          vanishRiskPenalty: normalizeMetric(input.vanishRiskPenalty, SCORE_RANGES.vanishRiskPenalty[0], SCORE_RANGES.vanishRiskPenalty[1]),
-          consistencyPenalty: normalizeMetric(input.consistencyPenalty, SCORE_RANGES.consistencyPenalty[0], SCORE_RANGES.consistencyPenalty[1]),
+          ...normalizeScoreMetrics(input),
           divineBonus,
           divinePenalty,
       };
   }
   function addMetric(base, delta) {
       return (base ?? 0) + (delta ?? 0);
+  }
+  const COST_TAG_SCORE_RULES = Object.freeze([
+      { metric: 'tagComplexity', perTag: 1, cap: 4, tagIds: ['global-rule', 'absolute-attack', 'absolute-shield', 'divine-nature', 'unique-global'] },
+      { metric: 'tagComplexity', delta: 2, keywords: ['pháp tắc'] },
+      { metric: 'battlefieldInfluence', perTag: 2, cap: 5, tagIds: ['aoe', 'random-aoe', 'field', 'line', 'control', 'taunt', 'silence', 'poison'] },
+      { metric: 'battlefieldInfluence', delta: 1, tagIds: ['global-rule'], keywords: ['quy tắc', 'rule'] },
+      { metric: 'battlefieldInfluence', delta: 1, keywords: ['toàn sân', 'global'] },
+      { metric: 'economyPressure', delta: 1, perTag: 1, cap: 3, tagIds: ['aether-cost', 'mark', 'summon'], keywords: ['cost', 'aether', 'nộ', 'energy', 'resource'] },
+      { metric: 'scalingCeiling', delta: 1, perTag: 1, cap: 4, tagIds: ['stance', 'mark', 'chain', 'revive', 'execute', 'pierce'], keywords: ['vĩnh viễn', 'stack', 'tiến hóa', 'evolve', 'evolution'] },
+      { metric: 'tacticalFlexibility', perTag: 1, cap: 4, tagIds: ['support', 'self-buff', 'heal', 'team-heal', 'shield', 'revive', 'summon'] },
+      { metric: 'tacticalFlexibility', delta: 1, requiresAll: ['support', 'heal'], excludesAny: ['summon'] },
+      { metric: 'tacticalFlexibility', delta: 1, keywords: ['buff', 'debuff', 'hồi'] },
+      { metric: 'setupPenalty', delta: 1, perTag: 1, cap: 3, tagIds: ['summon', 'sleep', 'mark'], keywords: ['setup', 'triệu hồi', 'sleep'] },
+      { metric: 'selfRiskPenalty', delta: 2, keywords: ['friendly fire', 'không phân địch ta', 'toàn bộ sinh vật', 'tự tổn thương', 'self-debuff', 'self debuff'] },
+      { metric: 'vanishRiskPenalty', delta: 2, keywords: ['biến mất', 'removed', 'vanish', 'out trận'] },
+      { metric: 'consistencyPenalty', perTag: 1, cap: 3, tagIds: ['random-target', 'random-aoe'], keywords: ['ngẫu nhiên', 'random', 'coin flip', 'coin-flip'] },
+      { metric: 'battlefieldInfluence', perTag: 1, cap: 2, tagIds: ['burst', 'execute'] },
+  ]);
+  const COST_TAG_SYNERGY_RULES = Object.freeze([
+      { requiresAll: ['summon', 'support'], metric: 'tacticalFlexibility', delta: 1 },
+      { requiresAll: ['aoe', 'control'], metric: 'battlefieldInfluence', delta: 1 },
+      { requiresAll: ['revive', 'shield'], metric: 'scalingCeiling', delta: 1 },
+      { requiresAll: ['random-aoe', 'execute'], metric: 'consistencyPenalty', delta: 1 },
+      { requiresAll: ['global-rule', 'aether-cost'], metric: 'economyPressure', delta: 1 },
+      { requiresAll: ['burst', 'execute'], metric: 'scalingCeiling', delta: 1 },
+      { requiresAll: ['heal', 'shield'], metric: 'tacticalFlexibility', delta: 1 },
+      { requiresAll: ['random-target', 'global-rule'], metric: 'consistencyPenalty', delta: 1 },
+  ]);
+  function createTagCostContext(tags) {
+      const normalizedTextTags = tags
+          .map((tag) => String(tag).trim().toLowerCase())
+          .filter(Boolean);
+      const normalizedTagSet = new Set(normalizeTagList(normalizedTextTags));
+      const normalizedTagText = normalizedTextTags.join(' || ');
+      const keywordCache = new Map();
+      const hasTag = (...needles) => needles.some((needle) => normalizedTagSet.has(needle));
+      const countMatchedTags = (tagIds) => {
+          if (!Array.isArray(tagIds) || tagIds.length === 0)
+              return 0;
+          let count = 0;
+          for (const tagId of tagIds) {
+              if (hasTag(tagId))
+                  count += 1;
+          }
+          return count;
+      };
+      const hasKeyword = (keywords) => {
+          if (!Array.isArray(keywords) || keywords.length === 0)
+              return false;
+          return keywords.some((keyword) => {
+              const cached = keywordCache.get(keyword);
+              if (typeof cached === 'boolean')
+                  return cached;
+              const matched = normalizedTagText.includes(keyword);
+              keywordCache.set(keyword, matched);
+              return matched;
+          });
+      };
+      return { hasTag, countMatchedTags, hasKeyword, totalTags: normalizedTagSet.size };
+  }
+  function isRuleApplicable(rule, tagContext) {
+      if (rule.requiresAll && !rule.requiresAll.every((tagId) => tagContext.hasTag(tagId))) {
+          return false;
+      }
+      if (rule.excludesAny && rule.excludesAny.some((tagId) => tagContext.hasTag(tagId))) {
+          return false;
+      }
+      return true;
   }
   function mergeBudgetInputs(...inputs) {
       const merged = {};
@@ -9507,11 +9577,7 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       };
   }
   function estimateCostFromTags(tags) {
-      const normalizedTags = tags.map((tag) => String(tag).trim().toLowerCase());
-      const normalizedTagSet = new Set(normalizedTags);
-      const has = (...needles) => needles.some((needle) => normalizedTagSet.has(needle));
-      const normalizedTagText = normalizedTags.join(' || ');
-      const containsAny = (...needles) => needles.some((needle) => normalizedTagText.includes(needle));
+      const tagContext = createTagCostContext(tags);
       const input = {
           tagComplexity: 0,
           battlefieldInfluence: 1,
@@ -9522,47 +9588,38 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
           selfRiskPenalty: 0,
           vanishRiskPenalty: 0,
           consistencyPenalty: 0,
-          hasDivineNature: containsAny('thần tính', 'divine'),
+          hasDivineNature: tagContext.hasTag('divine-nature') || tagContext.hasKeyword(['thần tính', 'divine']),
       };
       const addScore = (key, delta) => {
           const current = typeof input[key] === 'number' ? input[key] : 0;
           input[key] = current + delta;
       };
-      if (has('quy-tac') || containsAny('quy tắc')) {
-          addScore('tagComplexity', 3);
-          addScore('battlefieldInfluence', 2);
+      for (const rule of COST_TAG_SCORE_RULES) {
+          if (!isRuleApplicable(rule, tagContext))
+              continue;
+          const matchedTags = tagContext.countMatchedTags(rule.tagIds);
+          const matchedByKeyword = tagContext.hasKeyword(rule.keywords);
+          const scaledByTags = typeof rule.perTag === 'number'
+              ? matchedTags * rule.perTag
+              : 0;
+          const baseDelta = scaledByTags + (matchedByKeyword ? (rule.delta ?? 0) : 0);
+          if (baseDelta <= 0)
+              continue;
+          const cappedDelta = typeof rule.cap === 'number'
+              ? Math.min(baseDelta, rule.cap)
+              : baseDelta;
+          addScore(rule.metric, cappedDelta);
       }
-      if (has('phap-tac') || containsAny('pháp tắc')) {
-          addScore('tagComplexity', 2);
-          addScore('battlefieldInfluence', 1);
+      for (const rule of COST_TAG_SYNERGY_RULES) {
+          if (!rule.requiresAll.every((tagId) => tagContext.hasTag(tagId)))
+              continue;
+          addScore(rule.metric, rule.delta);
       }
-      if (has('tuyet-doi') || containsAny('tuyệt đối', 'absolute')) {
+      if (tagContext.totalTags >= 6) {
           addScore('tagComplexity', 1);
       }
-      if (containsAny('aoe', 'toàn sân', 'global')) {
-          addScore('battlefieldInfluence', 2);
-      }
-      if (containsAny('buff', 'debuff', 'heal', 'shield', 'hồi')) {
-          addScore('tacticalFlexibility', 1);
-      }
-      if (containsAny('summon', 'triệu hồi')) {
-          addScore('tacticalFlexibility', 1);
-          addScore('setupPenalty', 1);
-      }
-      if (containsAny('cost', 'aether', 'nộ', 'energy', 'resource')) {
-          addScore('economyPressure', 1);
-      }
-      if (containsAny('vĩnh viễn', 'stack', 'tiến hóa', 'evolve', 'evolution')) {
-          addScore('scalingCeiling', 2);
-      }
-      if (containsAny('friendly fire', 'không phân địch ta', 'toàn bộ sinh vật', 'tự tổn thương', 'self-debuff', 'self debuff')) {
-          addScore('selfRiskPenalty', 2);
-      }
-      if (containsAny('biến mất', 'removed', 'vanish', 'out trận')) {
-          addScore('vanishRiskPenalty', 2);
-      }
-      if (containsAny('ngẫu nhiên', 'random')) {
-          addScore('consistencyPenalty', 1);
+      if (tagContext.totalTags >= 9) {
+          addScore('tagComplexity', 1);
       }
       return evaluateCostBudget(input);
   }
@@ -10536,6 +10593,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
       ...rosterPreviewConfig.precision
   });
   const ROSTER_PREVIEW_META = Object.freeze(ROSTER.map((unit) => ({ id: unit.id, name: unit.name })));
+  const hasTpDelta = (stat) => typeof TP_DELTA[stat] === 'number';
   function roundStat(stat, value) {
       const precision = PRECISION[stat] ?? 1;
       return Math.round(value * precision) / precision;
@@ -10549,7 +10607,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   function sanitizeTpAllocation(tpAlloc = {}) {
       const clean = {};
       for (const [stat, value] of Object.entries(tpAlloc)) {
-          if (!(stat in TP_DELTA))
+          if (!hasTpDelta(stat))
               continue;
           const rounded = roundTpValue(value ?? 0);
           if (rounded !== 0) {
@@ -10559,7 +10617,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
       return clean;
   }
   function mapStatBlock(stats, transform) {
-      const out = { ...stats };
+      const out = {};
       for (const [stat, value] of Object.entries(stats)) {
           out[stat] = transform(stat, value ?? 0);
       }
@@ -10567,7 +10625,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   }
   function applyTpDelta(base, cleanTp) {
       return mapStatBlock(base, (stat, baseValue) => {
-          const delta = TP_DELTA[stat];
+          const delta = TP_DELTA[stat] ?? 0;
           if (delta) {
               return baseValue + delta * (cleanTp[stat] ?? 0);
           }
@@ -10599,13 +10657,13 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
           return {};
       const tp = {};
       for (const [stat, modValue] of Object.entries(mods)) {
-          if (!(stat in TP_DELTA))
+          if (!hasTpDelta(stat))
               continue;
           const baseValue = base[stat];
           if (typeof baseValue !== 'number')
               continue;
-          const delta = TP_DELTA[stat];
-          const raw = delta ? (baseValue * (modValue ?? 0)) / delta : 0;
+          const delta = TP_DELTA[stat] ?? 1;
+          const raw = (baseValue * (modValue ?? 0)) / delta;
           const rounded = roundTpValue(raw);
           if (rounded !== 0) {
               tp[stat] = rounded;
@@ -11034,8 +11092,8 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
   const TAG_BY_ID = new Map();
   for (const definition of TAG_DEFINITIONS) {
       TAG_BY_ID.set(normalizeKey(definition.id), definition);
-      const aliases = 'aliases' in definition ? (definition.aliases ?? []) : [];
-      for (const alias of aliases) {
+      const aliases = 'aliases' in definition ? definition.aliases : undefined;
+      for (const alias of aliases ?? []) {
           TAG_BY_ID.set(normalizeKey(alias), definition);
       }
   }
@@ -11075,11 +11133,13 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
           'formation-haste': 'support',
       }),
   });
-  const TAG_ALIAS_BY_VERSION_KEY = new Map();
+  const TAG_ALIAS_BY_VERSION = new Map();
   for (const [version, aliases] of Object.entries(tagAliasesByVersion)) {
+      const aliasByKey = new Map();
       for (const [from, to] of Object.entries(aliases)) {
-          TAG_ALIAS_BY_VERSION_KEY.set(`${version}:${normalizeKey(from)}`, to);
+          aliasByKey.set(normalizeKey(from), to);
       }
+      TAG_ALIAS_BY_VERSION.set(version, aliasByKey);
   }
   const GAME_TAGS = Object.freeze(TAG_DEFINITIONS);
   const TAG_IDS = Object.freeze(TAG_DEFINITIONS.map((definition) => definition.id));
@@ -11100,7 +11160,7 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
   const RULE_BYPASS_TAG_IDS = Object.freeze(['global-rule']);
   const AOE_TARGET_TAG_IDS = Object.freeze(['aoe', 'random-aoe']);
   function resolveVersionAlias(tag, version = CURRENT_TAG_ALIAS_VERSION) {
-      return TAG_ALIAS_BY_VERSION_KEY.get(`${version}:${normalizeKey(tag)}`) ?? tag;
+      return TAG_ALIAS_BY_VERSION.get(version)?.get(normalizeKey(tag)) ?? tag;
   }
   function normalizeTagId(tag, version = CURRENT_TAG_ALIAS_VERSION) {
       if (typeof tag !== 'string')
@@ -11111,15 +11171,18 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
       return TAG_BY_ID.get(normalized)?.id ?? normalized;
   }
   function normalizeTagList(tags, version = CURRENT_TAG_ALIAS_VERSION) {
-      if (!Array.isArray(tags))
-          return [];
+      return [...collectNormalizedTagSet(tags, version)];
+  }
+  function collectNormalizedTagSet(tags, version = CURRENT_TAG_ALIAS_VERSION) {
       const unique = new Set();
+      if (!Array.isArray(tags))
+          return unique;
       for (const tag of tags) {
           const normalized = normalizeTagId(tag, version);
           if (normalized)
               unique.add(normalized);
       }
-      return [...unique];
+      return unique;
   }
   function resolveTagVersionAliases(tags, version = CURRENT_TAG_ALIAS_VERSION) {
       if (!Array.isArray(tags))
@@ -11142,22 +11205,21 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
           const trimmed = rawTag.trim();
           if (!trimmed)
               continue;
-          const normalized = normalizeTagId(trimmed);
-          if (!normalized || !TAG_BY_ID.has(normalized)) {
+          if (!getTagDefinition(trimmed)) {
               unknown.add(trimmed);
           }
       }
       return [...unknown];
   }
   function hasAnyTag(haystack, needles) {
-      const normalizedHaystack = new Set(normalizeTagList(haystack));
-      const normalizedNeedles = new Set();
+      if (!Array.isArray(haystack) || !Array.isArray(needles) || haystack.length === 0 || needles.length === 0) {
+          return false;
+      }
+      const normalizedHaystack = collectNormalizedTagSet(haystack);
       for (const needle of needles) {
           const normalizedNeedle = normalizeTagId(needle);
-          if (normalizedNeedle)
-              normalizedNeedles.add(normalizedNeedle);
-      }
-      for (const normalizedNeedle of normalizedNeedles) {
+          if (!normalizedNeedle)
+              continue;
           if (normalizedHaystack.has(normalizedNeedle))
               return true;
       }
