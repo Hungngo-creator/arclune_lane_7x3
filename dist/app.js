@@ -2523,14 +2523,14 @@ __modules['./catalog.ts'] = (exports, module, __require) => {
                       key: 'skill1',
                       name: 'Truy Kích Hoang Mạch',
                       cost: { aether: 0 },
-                      tags: ['active', 'single-target'],
+                      tags: ['active', 'single-target', 'rule'],
                       notes: 'Nội tại chiến đấu: mỗi đòn đánh thường kèm follow-up 50% và trừ 10 nộ mục tiêu khi đòn chính gây sát thương; duy trì -5 AE mỗi lượt khi còn trên sân.'
                   },
                   {
                       key: 'skill2',
                       name: 'Dã Tức Xuyên Giáp',
                       cost: { aether: 3 },
-                      tags: ['active', 'single-target', 'pierce'],
+                      tags: ['active', 'single-target', 'pierce', 'rule'],
                       cooldown: 1,
                       notes: 'Tự luân phiên bật/tắt theo lượt (vào sân là bật): khi bật, đòn đánh thường bỏ qua 20% ARM/RES.'
                   },
@@ -6456,9 +6456,21 @@ __modules['./combat/runtime-hooks/duong-ha.ts'] = (exports, module, __require) =
       },
       onTurnStart({ unit }) {
           const duongHa = unit;
-          if (!duongHa || !duongHa.alive || duongHa.id !== DUONG_HA_ID)
+          if (!duongHa || duongHa.id !== DUONG_HA_ID)
               return;
-          duongHa.ae = Math.max(0, Math.floor(toFiniteNumber(duongHa.ae, 0) - SKILL1_TURN_DRAIN));
+          if (!duongHa.alive) {
+              resetDuongHaPassive(duongHa);
+              Statuses.remove(duongHa, 'duong_ha_skill2_pierce');
+              duongHa._duongHaSkill1ActiveThisTurn = false;
+              duongHa._duongHaSkill2ActiveThisTurn = false;
+              return;
+          }
+          duongHa._duongHaSkill1ActiveThisTurn = globalAetherPool.consume(duongHa.side, SKILL1_TURN_DRAIN);
+          if (!duongHa._duongHaSkill1ActiveThisTurn) {
+              duongHa._duongHaSkill2ActiveThisTurn = false;
+              Statuses.remove(duongHa, 'duong_ha_skill2_pierce');
+              return;
+          }
           refreshSkill2Toggle(duongHa);
           Statuses.remove(duongHa, 'duong_ha_skill2_pierce');
           if (duongHa._duongHaSkill2ActiveThisTurn) {
@@ -6476,6 +6488,8 @@ __modules['./combat/runtime-hooks/duong-ha.ts'] = (exports, module, __require) =
       onBasicAttackResolved({ game, attacker, target, dealt }) {
           const duongHa = attacker;
           if (duongHa.id !== DUONG_HA_ID || !duongHa.alive)
+              return;
+          if (!duongHa._duongHaSkill1ActiveThisTurn)
               return;
           if (dealt > 0) {
               setFury(target, Math.max(0, toFiniteNumber(target.fury, 0) - SKILL1_RAGE_DRAIN));
@@ -6508,6 +6522,7 @@ __modules['./combat/runtime-hooks/duong-ha.ts'] = (exports, module, __require) =
           const duongHa = unit;
           resetDuongHaPassive(duongHa);
           duongHa._duongHaSkill2NextActive = true;
+          duongHa._duongHaSkill1ActiveThisTurn = false;
           duongHa._duongHaSkill2ActiveThisTurn = false;
           Statuses.remove(duongHa, 'duong_ha_skill2_pierce');
       },

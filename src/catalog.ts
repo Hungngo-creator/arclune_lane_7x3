@@ -203,14 +203,14 @@ export const ROSTER = [
           key: 'skill1',
           name: 'Truy Kích Hoang Mạch',
           cost: { aether: 0 },
-          tags: ['active', 'single-target'],
+          tags: ['active', 'single-target', 'rule'],
           notes: 'Nội tại chiến đấu: mỗi đòn đánh thường kèm follow-up 50% và trừ 10 nộ mục tiêu khi đòn chính gây sát thương; duy trì -5 AE mỗi lượt khi còn trên sân.'
         },
         {
           key: 'skill2',
           name: 'Dã Tức Xuyên Giáp',
           cost: { aether: 3 },
-          tags: ['active', 'single-target', 'pierce'],
+          tags: ['active', 'single-target', 'pierce', 'rule'],
           cooldown: 1,
           notes: 'Tự luân phiên bật/tắt theo lượt (vào sân là bật): khi bật, đòn đánh thường bỏ qua 20% ARM/RES.'
         },

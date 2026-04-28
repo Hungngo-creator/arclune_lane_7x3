@@ -56,32 +56,30 @@ describe('duong_ha runtime hook', () => {
     expect(skill2.reason).toBe('blocked');
   });
 
-  it('skill1 drains 5 AE/turn, drains 10 fury on hit, and adds follow-up damage', () => {
+  it('skill1 consumes 5 ally pool AE/turn, then drains 10 fury on hit and adds follow-up damage', () => {
     const duongHa = atSlot('ally', 5, { id: 'duong_ha', iid: 71, atk: 100, wil: 100, ae: 30 });
     const enemy = atSlot('enemy', 5, { id: 'enemy', iid: 88, hp: 400, hpMax: 400, fury: 80 });
     const game = makeGame([duongHa, enemy]);
-
-    const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(false);
+    const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockImplementation((_side, amount) => amount === 5);
 
     runRuntimeTurnStart(game, duongHa);
-    expect(duongHa.ae).toBe(25);
+    expect(consumeSpy).toHaveBeenCalledWith('ally', 5);
 
     const beforeHp = enemy.hp;
     runRuntimeBasicAttackResolved({ game, attacker: duongHa, target: enemy, dealt: 120 });
 
     expect(enemy.fury).toBeLessThan(80);
     expect(enemy.hp).toBeLessThan(beforeHp);
-
     consumeSpy.mockRestore();
   });
 
-  it('skill2 toggles every turn (spawn starts ON), costs 3 AE when ON, and grants pierce status for basic attacks', () => {
+  it('skill2 toggles every turn (spawn starts ON), costs 3 ally pool AE when ON, and grants pierce status for basic attacks', () => {
     const duongHa = atSlot('ally', 5, { id: 'duong_ha', iid: 71, ae: 40 });
     const game = makeGame([duongHa]);
-
     const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(true);
 
     runRuntimeTurnStart(game, duongHa);
+    expect(consumeSpy).toHaveBeenCalledWith('ally', 5);
     expect(consumeSpy).toHaveBeenCalledWith('ally', 3);
     expect(duongHa.statuses?.some((status) => status.id === 'duong_ha_skill2_pierce')).toBe(true);
 
@@ -91,8 +89,42 @@ describe('duong_ha runtime hook', () => {
     runRuntimeTurnStart(game, duongHa);
     expect(consumeSpy.mock.calls.filter(([side, amount]) => side === 'ally' && amount === 3).length).toBeGreaterThanOrEqual(2);
     expect(duongHa.statuses?.some((status) => status.id === 'duong_ha_skill2_pierce')).toBe(true);
+  consumeSpy.mockRestore();
+  });
 
+  it('skill1 and skill2 do not activate when ally pool lacks AE', () => {
+    const duongHa = atSlot('ally', 5, { id: 'duong_ha', iid: 71, atk: 100, wil: 100 });
+    const enemy = atSlot('enemy', 5, { id: 'enemy', iid: 88, hp: 400, hpMax: 400, fury: 80 });
+    const game = makeGame([duongHa, enemy]);
+    const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(false);
+
+    runRuntimeTurnStart(game, duongHa);
+    expect(duongHa.statuses?.some((status) => status.id === 'duong_ha_skill2_pierce')).toBe(false);
+
+    const beforeHp = enemy.hp;
+    runRuntimeBasicAttackResolved({ game, attacker: duongHa, target: enemy, dealt: 120 });
+
+    expect(enemy.fury).toBe(80);
+    expect(enemy.hp).toBe(beforeHp);
+    expect(consumeSpy).toHaveBeenCalledWith('ally', 5);
+    expect(consumeSpy.mock.calls.some(([, amount]) => amount === 3)).toBe(false);
     consumeSpy.mockRestore();
+  });
+
+  it('resets passive stacks when unit is no longer alive on field', () => {
+    const duongHa = atSlot('ally', 5, { id: 'duong_ha', iid: 71, atk: 100, wil: 100, hp: 1000, hpMax: 1000 });
+    const deadEnemy = atSlot('enemy', 5, { id: 'enemy', iid: 88, alive: false });
+    const game = makeGame([duongHa, deadEnemy]);
+
+    runRuntimeUnitDeath({ game, deadUnit: deadEnemy, killer: null });
+    expect(duongHa.atk).toBe(103);
+
+    duongHa.alive = false;
+    runRuntimeTurnStart(game, duongHa);
+
+    expect(duongHa.atk).toBe(100);
+    expect(duongHa.wil).toBe(100);
+    expect(duongHa.hpMax).toBe(1000);
   });
 
   it('passive gains stack when any enemy dies while duong_ha is alive, including summon/creep units', () => {

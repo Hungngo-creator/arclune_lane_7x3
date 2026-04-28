@@ -25,6 +25,7 @@ type DuongHaCarrier = UnitToken & {
   _duongHaPassiveHpBonus?: number;
   _duongHaSkill2NextActive?: boolean;
   _duongHaSkill2ActiveThisTurn?: boolean;
+  _duongHaSkill1ActiveThisTurn?: boolean;
 };
 
 function resetDuongHaPassive(unit: DuongHaCarrier): void {
@@ -85,8 +86,20 @@ export const duongHaRuntimeHook: UnitRuntimeHook = {
   },
   onTurnStart({ unit }) {
     const duongHa = unit as DuongHaCarrier | null | undefined;
-    if (!duongHa || !duongHa.alive || duongHa.id !== DUONG_HA_ID) return;
-    duongHa.ae = Math.max(0, Math.floor(toFiniteNumber(duongHa.ae, 0) - SKILL1_TURN_DRAIN));
+    if (!duongHa || duongHa.id !== DUONG_HA_ID) return;
+    if (!duongHa.alive) {
+      resetDuongHaPassive(duongHa);
+      Statuses.remove(duongHa, 'duong_ha_skill2_pierce');
+      duongHa._duongHaSkill1ActiveThisTurn = false;
+      duongHa._duongHaSkill2ActiveThisTurn = false;
+      return;
+    }
+    duongHa._duongHaSkill1ActiveThisTurn = globalAetherPool.consume(duongHa.side, SKILL1_TURN_DRAIN);
+    if (!duongHa._duongHaSkill1ActiveThisTurn) {
+      duongHa._duongHaSkill2ActiveThisTurn = false;
+      Statuses.remove(duongHa, 'duong_ha_skill2_pierce');
+      return;
+    }
     refreshSkill2Toggle(duongHa);
     Statuses.remove(duongHa, 'duong_ha_skill2_pierce');
     if (duongHa._duongHaSkill2ActiveThisTurn) {
@@ -104,6 +117,7 @@ export const duongHaRuntimeHook: UnitRuntimeHook = {
   onBasicAttackResolved({ game, attacker, target, dealt }) {
     const duongHa = attacker as DuongHaCarrier;
     if (duongHa.id !== DUONG_HA_ID || !duongHa.alive) return;
+    if (!duongHa._duongHaSkill1ActiveThisTurn) return;
     if (dealt > 0) {
       setFury(target, Math.max(0, toFiniteNumber(target.fury, 0) - SKILL1_RAGE_DRAIN));
     }
@@ -133,6 +147,7 @@ export const duongHaRuntimeHook: UnitRuntimeHook = {
     const duongHa = unit as DuongHaCarrier;
     resetDuongHaPassive(duongHa);
     duongHa._duongHaSkill2NextActive = true;
+    duongHa._duongHaSkill1ActiveThisTurn = false;
     duongHa._duongHaSkill2ActiveThisTurn = false;
     Statuses.remove(duongHa, 'duong_ha_skill2_pierce');
   },
