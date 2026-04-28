@@ -22,7 +22,7 @@ import {
   applyChapMinhPhaseShift,
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
-import { runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
+import { runRuntimeBasicAttackResolved, runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
 
 export { applyDamage, grantShield };
 
@@ -807,6 +807,13 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   applyUyenBasicExtras(unit, resolved, {
     wasKill: !resolved.alive,
     turnStamp,
+  });
+
+  runRuntimeBasicAttackResolved({
+    game: Game,
+    attacker: unit,
+    target: resolved,
+    dealt,
   });
 
   const afterHitHandlers = passiveCtx.afterHit.filter(isBasicAttackAfterHitHandler);

@@ -1,5 +1,5 @@
 //home (termux)/arclune_lane_7x3/src/types/currency.ts
-import type { Maybe, NumericLike, UnknownRecord } from './common.ts';y
+import type { Maybe, NumericLike, UnknownRecord } from './common.ts';
 
 export interface LineupCurrencyEntry extends UnknownRecord {
   id?: string;

@@ -186,6 +186,63 @@ export const ROSTER = [
     }
   },
   {
+    id: 'duong_ha', name: 'Dương Hạ', class: 'Ranger', rank: 'SSR', base_element: 'neutral',
+    mods: { ATK: 0.1, WIL: 0.1, AGI: 0.06 },
+    followupCap: 0,
+    elementTag: 'wild',
+    kit: {
+      onSpawn: createOnSpawn(),
+      basic: asUnknownRecord({
+        name: 'Dã Ảnh Xạ Kích',
+        tags: ['single-target'],
+        damageMultiplier: 1,
+        notes: 'Đánh thường gây sát thương bằng 100% ATK/WIL.'
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Truy Kích Hoang Mạch',
+          cost: { aether: 0 },
+          tags: ['active', 'single-target'],
+          notes: 'Nội tại chiến đấu: mỗi đòn đánh thường kèm follow-up 50% và trừ 10 nộ mục tiêu khi đòn chính gây sát thương; duy trì -5 AE mỗi lượt khi còn trên sân.'
+        },
+        {
+          key: 'skill2',
+          name: 'Dã Tức Xuyên Giáp',
+          cost: { aether: 3 },
+          tags: ['active', 'single-target', 'pierce'],
+          cooldown: 1,
+          notes: 'Tự luân phiên bật/tắt theo lượt (vào sân là bật): khi bật, đòn đánh thường bỏ qua 20% ARM/RES.'
+        },
+        {
+          key: 'skill3',
+          name: 'Hoang Bộ Tăng Áp',
+          cost: { aether: 25 },
+          tags: ['active', 'self-buff'],
+          cooldown: 1,
+          duration: 3,
+          buffStats: { ATK: 0.3, WIL: 0.3, AGI: 0.3 },
+          notes: 'Chủ động dùng lượt để tăng 30% WIL/ATK/AGI trong 3 lượt.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        type: 'ultimate',
+        tags: ['active', 'single-target'],
+        notes: 'Ultimate thực thi 3 đòn đánh thường liên tiếp; chịu toàn bộ buff/debuff và tương tác kỹ năng 1/2/3.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Bản Năng Truy Sát',
+        notes: 'Mỗi kẻ địch tử trận khi Dương Hạ còn trên sân tăng 3% ATK/WIL/HP. Reset toàn bộ cộng dồn khi rời sân.'
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([]),
+      traits: asUnknownRecordArray([
+        { id: 'auto_cast_ult', text: 'Ultimate auto-cast khi đầy nộ theo luật chung.' },
+        { id: 'wild_unit', text: 'Không mang tag pháp/quy tắc/axiom; có thể bị ảnh hưởng bởi các tag đó từ nguồn khác.' }
+      ])
+    }
+  },
+  {
     id: 'mong_yem', name: 'Mộng Yểm', class: 'Mage', rank: 'SSR',
     mods: { WIL: 0.12, AEregen: 0.08 },
     kit: {

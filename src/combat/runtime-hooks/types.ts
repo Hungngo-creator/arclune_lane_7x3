@@ -21,6 +21,13 @@ export interface RuntimeOnDamageContext {
   target: UnitToken | null | undefined;
 }
 
+export interface RuntimeOnBasicAttackContext {
+  game: SessionState;
+  attacker: UnitToken;
+  target: UnitToken;
+  dealt: number;
+}
+
 export interface RuntimeOnUnitDeathContext {
   game: SessionState;
   deadUnit: UnitToken;
@@ -38,6 +45,7 @@ export interface UnitRuntimeHook {
   onActionEnd?: (ctx: RuntimeTurnContext) => void;
   onTurnEnd?: (ctx: RuntimeTurnContext) => void;
   onDamageResolved?: (ctx: RuntimeOnDamageContext) => void;
+  onBasicAttackResolved?: (ctx: RuntimeOnBasicAttackContext) => void;
   onUnitDeath?: (ctx: RuntimeOnUnitDeathContext) => void;
   onUnitRevive?: (ctx: RuntimeOnUnitReviveContext) => void;
 }

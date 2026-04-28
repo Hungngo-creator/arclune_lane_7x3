@@ -193,6 +193,7 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['./combat/board-position-utils.js', './combat/board-position-utils.ts'],
   ['./combat/unit-runtime-hooks.js', './combat/unit-runtime-hooks.ts'],
   ['./combat/runtime-hooks/nguyen-le.js', './combat/runtime-hooks/nguyen-le.ts'],
+  ['./combat/runtime-hooks/duong-ha.js', './combat/runtime-hooks/duong-ha.ts'],
   ['./modes/pve/ly-thanh-thu-runtime.js', './modes/pve/ly-thanh-thu-runtime.ts'],
   ['./modes/pve/nguyen-le-runtime.js', './modes/pve/nguyen-le-runtime.ts'],
   ['@screens/collection/index.ts', './screens/collection/index.ts'],

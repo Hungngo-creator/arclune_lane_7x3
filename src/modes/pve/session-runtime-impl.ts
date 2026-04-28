@@ -4,7 +4,7 @@ import { enqueueImmediate, processActionChain } from '../../summon';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai';
 import { Statuses, makeStatusEffect } from '../../statuses';
 import { CFG, CAM } from '../../config';
-import { pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage } from '../../combat';
+import { pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage, basicAttack } from '../../combat';
 import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury';
 import {
   getMetaById,
@@ -68,6 +68,7 @@ import { mapUnitProgressById } from './collection-mapper.ts';
 import { createSessionLoopController } from './session-loop';
 import { createSessionDeckController } from './session-deck';
 import { runPveRuntimeUltHook } from './unit-runtime-hooks.ts';
+import { getUnitRuntimeHook } from '../../combat/unit-runtime-hooks';
 import { createSessionEventBindings } from './session-events';
 import {
   applyStatusIconHoverTooltip,
@@ -1404,6 +1405,15 @@ function performUlt(unit: UnitToken): void {
       ? (summonSpec.pattern.trim() || undefined)
       : undefined;
   }
+  const runtimeHook = getUnitRuntimeHook(unit.id);
+  if (runtimeHook && unit.id === 'duong_ha') {
+    for (let i = 0; i < 3; i += 1) {
+      if (!unit.alive) break;
+      basicAttack(game, unit);
+    }
+    return;
+  }
+
   if (meta.class === 'Summoner' && summonSpec){
     const allTokens = game.tokens || [];
     const queued = game.queued || { ally: new Map(), enemy: new Map() };

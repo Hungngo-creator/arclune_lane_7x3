@@ -5,6 +5,7 @@ import type { UnitToken } from '@shared-types/units';
 import type { PerformActiveSkillResult } from './perform-active-skill.ts';
 import type {
   RuntimeOnUnitDeathContext,
+  RuntimeOnBasicAttackContext,
   RuntimeOnUnitReviveContext,
   RuntimeSkillContext,
   UnitRuntimeHook,
@@ -67,4 +68,9 @@ export function runRuntimeUnitRevive(ctx: RuntimeOnUnitReviveContext): void {
 
 export function listRuntimeHookUnitIds(): string[] {
   return Object.keys(UNIT_RUNTIME_HOOKS);
+}
+
+export function runRuntimeBasicAttackResolved(ctx: RuntimeOnBasicAttackContext): void {
+  if (!ctx.attacker?.alive || !ctx.target) return;
+  getUnitRuntimeHook(ctx.attacker.id)?.onBasicAttackResolved?.(ctx);
 }
