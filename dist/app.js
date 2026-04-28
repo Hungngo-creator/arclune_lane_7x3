@@ -10986,6 +10986,9 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
       { id: 'economy', title: '' }
   ];
   const MODE_GROUPS = [];
+  const SSI_ENGINE_LABEL = 'SSI (Sequential Simultaneous Instant)';
+  const SSI_ENGINE_SUMMARY = `${SSI_ENGINE_LABEL}: lượt chạy 1A→1B→...→9A→9B, bỏ qua slot trống, cập nhật sát thương/buff tức thời và tạo cảm giác phối hợp theo lane.`;
+  const withSsiDescription = (base) => `${base} ${SSI_ENGINE_SUMMARY}`;
   const MODES = [
       {
           id: 'arena-hub',
@@ -11007,7 +11010,7 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
           type: MODE_TYPES.PVE,
           status: MODE_STATUS.AVAILABLE,
           icon: '🛡️',
-          shortDescription: 'PvE cốt truyện trên bản đồ 2D để đi nhiệm vụ, nhặt vật phẩm đột phá và mở khóa kiến trúc tông môn.',
+          shortDescription: withSsiDescription('PvE cốt truyện trên bản đồ 2D để đi nhiệm vụ, nhặt vật phẩm đột phá và mở khóa kiến trúc tông môn.'),
           unlockNotes: 'Mở từ đầu; tiến trình mở rộng sang hệ tu luyện 15 đại cảnh giới và tái thiết các kiến trúc tông môn.',
           tags: ['PvE'],
           menuSections: ['core-pve'],
@@ -11023,7 +11026,7 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
           type: MODE_TYPES.PVE,
           status: MODE_STATUS.AVAILABLE,
           icon: '🎯',
-          shortDescription: 'Các màn PvE với đội hình cố định cùng phần thưởng đặc biệt dành cho người vượt qua.',
+          shortDescription: withSsiDescription('Các màn PvE với đội hình cố định cùng phần thưởng đặc biệt dành cho người vượt qua.'),
           unlockNotes: 'Có sẵn để thử sức với các đội hình cố định và nhận phần thưởng thử thách đặc biệt.',
           tags: ['PvE'],
           menuSections: ['core-pve'],
@@ -11039,7 +11042,7 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
           type: MODE_TYPES.PVE,
           status: MODE_STATUS.AVAILABLE,
           icon: '🏟️',
-          shortDescription: 'Deck PvE đối đầu deck do AI điều khiển, xoay vòng mùa giải 7 ngày với bảng xếp hạng phần thưởng.',
+          shortDescription: withSsiDescription('Deck PvE đối đầu deck do AI điều khiển, xoay vòng mùa giải 7 ngày với bảng xếp hạng phần thưởng.'),
           unlockNotes: 'Yêu cầu chuẩn bị deck xếp sẵn; tham chiến theo mùa 7 ngày để nhận thưởng và leo bảng.',
           tags: ['PvE'],
           menuSections: ['core-pve'],

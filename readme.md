@@ -13,7 +13,12 @@
 
 ### 2.1 Bàn đấu và lượt
 - Bàn 7x3, 2 phe trái/phải; leader có slot cố định trong mô hình turn hiện tại.
-- Turn engine chạy kiểu **interleaved/sparse cursor**: bỏ qua slot trống, ưu tiên actor hợp lệ, hỗ trợ queue summon.
+- Turn engine PvE chính dùng **SSI (Sequential Simultaneous Instant)**:
+  - **Sequential**: chạy tuần tự theo slot `1A → 1B → 2A → 2B ... → 9A → 9B`, vòng lặp quay về slot 1.
+  - **Simultaneous**: hiệu ứng trong cùng lane được tính để tạo cảm giác phối hợp đồng thời.
+  - **Instant**: mọi cập nhật HP/Fury/Buff-Debuff áp dụng ngay tại thời điểm hành động kế tiếp.
+  - Runtime dùng cơ chế **interleaved/sparse cursor** để bỏ qua slot trống, ưu tiên actor hợp lệ, và xử lý queue summon.
+- Phạm vi: áp dụng cho các mode PvE runtime chung (`campaign`, `challenge`, `arena`), không dùng cho `co-ty-phu` (Monopoly) và `chess-strategy-rpg`.
 - File chính:
   - `src/turns.ts`
   - `src/turns/interleaved.ts`
