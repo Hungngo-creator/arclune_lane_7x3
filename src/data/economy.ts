@@ -122,11 +122,14 @@ function normalizeNonNegativeInt(value: unknown): number {
 
 const CURRENCY_INDEX: Readonly<Record<string, CurrencyDefinition>> = indexBy(CURRENCIES, (currency) => currency.id);
 const normalizeCurrencyId = (currencyId: string): string => String(currencyId ?? '').trim();
+const normalizeKeyUpper = (value: string): string => String(value ?? '').trim().toUpperCase();
 
 function getCurrency(currencyId: string): CurrencyDefinition | null {
   const normalizedCurrencyId = normalizeCurrencyId(currencyId);
   if (!normalizedCurrencyId) return null;
-  const canonicalCurrencyId = CURRENCY_IDS[normalizedCurrencyId as keyof typeof CURRENCY_IDS] ?? normalizedCurrencyId;
+  const canonicalCurrencyId = CURRENCY_IDS[normalizedCurrencyId as keyof typeof CURRENCY_IDS]
+    ?? CURRENCY_IDS[normalizeKeyUpper(normalizedCurrencyId) as keyof typeof CURRENCY_IDS]
+    ?? normalizedCurrencyId;
   return CURRENCY_INDEX[canonicalCurrencyId] ?? null;
 }
 
@@ -279,8 +282,9 @@ const PITY_CONFIG: Readonly<Record<PityTier, PityConfiguration>> = Object.freeze
 );
 
 function getPityConfig(tier: string): PityConfiguration | null {
-  return Object.prototype.hasOwnProperty.call(PITY_CONFIG, tier)
-    ? (PITY_CONFIG[tier as PityTier] ?? null)
+  const normalizedTier = normalizeKeyUpper(tier) as PityTier;
+  return Object.prototype.hasOwnProperty.call(PITY_CONFIG, normalizedTier)
+    ? (PITY_CONFIG[normalizedTier] ?? null)
     : null;
 }
 
@@ -289,12 +293,14 @@ function listPityTiers(): string[] {
 }
 
 const SHOP_TAX_BRACKETS: ReadonlyArray<ShopTaxBracket> = freezeCloneList(economyConfig.shopTaxBrackets);
+
+const SHOP_TAX_INDEX: Readonly<Record<string, ShopTaxBracket>> = indexBy(
+  SHOP_TAX_BRACKETS,
+  (bracket) => normalizeKeyUpper(bracket.rank),
 );
 
-const SHOP_TAX_INDEX: Readonly<Record<string, ShopTaxBracket>> = indexBy(SHOP_TAX_BRACKETS, (bracket) => bracket.rank);
-
 function getShopTaxBracket(rank: string): ShopTaxBracket | null {
-  return SHOP_TAX_INDEX[rank] ?? null;
+  return SHOP_TAX_INDEX[normalizeKeyUpper(rank)] ?? null;
 }
 
 function getShopTaxRate(rank: string): number | null {

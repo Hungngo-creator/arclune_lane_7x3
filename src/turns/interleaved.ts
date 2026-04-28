@@ -13,6 +13,8 @@ const DEFAULT_WRAP_COUNT: Readonly<Record<TurnSideKey, number>> = createZeroBySi
 const SLOT_CAP = 9;
 const clampInt = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, Math.floor(value)));
 type SlotMapBySide = Record<TurnSideKey, Map<number, UnitToken>>;
+const createEmptySlotMaps = (): SlotMapBySide => ({ ALLY: new Map<number, UnitToken>(), ENEMY: new Map<number, UnitToken>() });
+const makeOrderKey = (side: Side, slot: number): string => `${side}:${slot}`;
 type SequentialOrderIndexCache = {
   orderRef: Array<{ side?: string; slot?: number }>;
   size: number;
@@ -62,11 +64,12 @@ function ensureTurnState(turn: InterleavedTurnState): void {
 }
 
 function buildSlotMaps(tokens: ReadonlyArray<UnitToken> | null | undefined): SlotMapBySide {
-  const ally = new Map<number, UnitToken>();
-  const enemy = new Map<number, UnitToken>();
   if (!Array.isArray(tokens)) {
-    return { ALLY: ally, ENEMY: enemy };
+    return createEmptySlotMaps();
   }
+  const slotMaps = createEmptySlotMaps();
+  const ally = slotMaps.ALLY;
+  const enemy = slotMaps.ENEMY;
   for (const unit of tokens){
     if (!unit || !unit.alive) continue;
     if (unit.side !== 'ally' && unit.side !== 'enemy') continue;
@@ -78,7 +81,7 @@ function buildSlotMaps(tokens: ReadonlyArray<UnitToken> | null | undefined): Slo
       map.set(slot, unit);
     }
   }
-  return { ALLY: ally, ENEMY: enemy };
+  return slotMaps;
 }
 
 function isQueueDue(state: SessionState, sideLower: Side, slot: number, cycle: number): boolean {
@@ -112,7 +115,7 @@ export function getSequentialOrderIndex(
 
   const normalizedSide = toLowerSpawnSide(side);
   const normalizedSlot = clampInt(Number.isFinite(slot) ? slot : 0, 0, SLOT_CAP);
-  const key = `${normalizedSide}:${normalizedSlot}`;
+  const key = makeOrderKey(normalizedSide, normalizedSlot);
 
   const cache = turn.orderIndexCache;
   const needsRebuild = !cache
@@ -126,7 +129,7 @@ export function getSequentialOrderIndex(
       const entrySide = entry?.side;
       const entrySlot = entry?.slot;
       if ((entrySide !== 'ally' && entrySide !== 'enemy') || !Number.isFinite(entrySlot)) continue;
-      indexByEntry.set(`${entrySide}:${entrySlot}`, index);
+      indexByEntry.set(makeOrderKey(entrySide, Number(entrySlot)), index);
     }
     turn.orderIndexCache = { orderRef: order, size: order.length, indexByEntry };
   }

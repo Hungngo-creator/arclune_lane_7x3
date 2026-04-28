@@ -14,6 +14,7 @@ import type { TelemetryEvent } from './telemetry';
 import type { GameEventTargetLike } from '../events';
 import type { SummonBarHandles } from './ui';
 import type { VfxEventList } from './vfx';
+import type { Maybe, Nullable, UnknownRecord } from './common';
 
 export interface StatusEffect {
   id: string;
@@ -45,7 +46,7 @@ export type StatusDefinition<
   TTickPayload = unknown,
   TRemovePayload = unknown,
 > = (
-  spec?: Record<string, unknown>,
+  spec?: UnknownRecord,
 ) => StatusEffect & {
   onApply?: (payload: StatusLifecyclePayload<TApplyPayload>) => void;
   onTick?: (payload: StatusLifecyclePayload<TTickPayload>) => void;
@@ -69,7 +70,7 @@ export interface SkillDefinition {
   cost?: SkillCost | null;
   hits?: number;
   countsAsBasic?: boolean;
-  targets?: string | number | Record<string, unknown>;
+  targets?: string | number | UnknownRecord;
   duration?: number | 'battle' | {
     turns?: number | string;
     [extra: string]: unknown;
@@ -78,13 +79,13 @@ export interface SkillDefinition {
   reduceDamage?: number;
   bonusVsLeader?: number;
   damageMultiplier?: number;
-  damage?: Record<string, unknown>;
+  damage?: UnknownRecord;
   buffStats?: Record<string, number>;
-  debuff?: Record<string, unknown>;
-  selfBuff?: Record<string, unknown>;
-  link?: Record<string, unknown>;
+  debuff?: UnknownRecord;
+  selfBuff?: UnknownRecord;
+  link?: UnknownRecord;
   notes?: ReadonlyArray<string> | string | null;
-  metadata?: Record<string, unknown>;
+  metadata?: UnknownRecord;
   [extra: string]: unknown;
 }
 
@@ -113,9 +114,9 @@ export interface LeaderSnapshot {
 }
 
 export interface BattleDetail {
-  context?: Record<string, unknown>;
+  context?: UnknownRecord;
   leaders?: { ally: LeaderSnapshot | null; enemy: LeaderSnapshot | null };
-  timeout?: Record<string, unknown>;
+  timeout?: UnknownRecord;
   [extra: string]: unknown;
 }
 
@@ -178,7 +179,7 @@ export interface SessionAIState {
   deck: AiDeckPool;
   selectedId: UnitId | null;
   lastThinkMs: number;
-  lastDecision: Record<string, unknown> | null;
+  lastDecision: Nullable<UnknownRecord>;
   [extra: string]: unknown;
 }
 
@@ -203,11 +204,11 @@ export interface RuntimeUi {
 }
 
 export interface MetaService {
-  get(id: UnitId | null | undefined): RosterUnitDefinition | null | undefined;
-  classOf?(id: UnitId | null | undefined): string | null;
-  rankOf?(id: UnitId | null | undefined): string | null;
-  kit?(id: UnitId | null | undefined): Record<string, unknown> | null;
-  isSummoner?(id: UnitId | null | undefined): boolean;
+  get(id: Maybe<UnitId>): Maybe<RosterUnitDefinition>;
+  classOf?(id: Maybe<UnitId>): Nullable<string>;
+  rankOf?(id: Maybe<UnitId>): Nullable<string>;
+  kit?(id: Maybe<UnitId>): Nullable<UnknownRecord>;
+  isSummoner?(id: Maybe<UnitId>): boolean;
   [extra: string]: unknown;
 }
 
@@ -239,7 +240,7 @@ export interface SessionState {
   telemetryLog?: TelemetryEvent[];
   vfx?: VfxEventList;
   passiveLog?: Array<Record<string, unknown>> | null;
-  runtime?: Record<string, unknown>;
+  runtime?: UnknownRecord;
   [extra: string]: unknown;
 }
 

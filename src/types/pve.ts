@@ -2,12 +2,13 @@
 import type { PassiveKitDefinition, PveDeckEntry, SessionState as CoreSessionState } from './combat';
 import type { UnitId, UnitToken } from './units';
 import type { RosterUnitDefinition } from './config';
+import type { UnknownRecord } from './common';6
 
 export type MetaEntry = Omit<RosterUnitDefinition, 'kit'> & {
   kit: PassiveKitDefinition | null;
 };
 
-export interface SummonInheritSpec extends Record<string, unknown> {
+export interface SummonInheritSpec extends UnknownRecord {
   HP?: number | string | null;
   hp?: number | string | null;
   HPMax?: number | string | null;
@@ -22,7 +23,7 @@ export interface SummonInheritSpec extends Record<string, unknown> {
   arm?: number | string | null;
 }
 
-export interface SummonCreepSpec extends Record<string, unknown> {
+export interface SummonCreepSpec extends UnknownRecord {
   id?: string | null;
   name?: string | null;
   label?: string | null;
@@ -33,7 +34,7 @@ export interface SummonCreepSpec extends Record<string, unknown> {
   skinKey?: string | null;
 }
 
-export interface SummonSpec extends Record<string, unknown> {
+export interface SummonSpec extends UnknownRecord {
   pattern?: string;
   placement?: string;
   patternKey?: string;
@@ -54,7 +55,7 @@ export interface RewardRoll {
   id: string;
   weight: number;
   tier: number;
-  data?: Record<string, unknown>;
+  data?: UnknownRecord;
 }
 
 export interface WaveState {
@@ -71,7 +72,7 @@ export interface EncounterState {
   waves: WaveState[];
   status: 'idle' | 'running' | 'completed' | 'failed';
   pendingRewards: RewardRoll[];
-  metadata?: Record<string, unknown>;
+  metadata?: UnknownRecord;
 }
 
 export interface SessionRuntimeState {
@@ -93,10 +94,9 @@ export interface PveRuntimeRosterMeta {
   mutationDebuffPool?: Array<'bleed' | 'stun' | 'poison'>;
 }
 
-export interface CollectionProgressUnitInput extends Record<string, unknown> {
+export interface CollectionProgressUnitInput extends UnknownRecord {
   unitId?: string | null;
   id?: string | null;
-  
   key?: string | null;
   realm?: number | string | null;
   subRealm?: number | string | null;
@@ -114,7 +114,7 @@ export interface CollectionProgressUnitInput extends Record<string, unknown> {
   tacticalAi?: ReadonlyArray<GambitSlotInput> | GambitSlotsContainerInput | null;
 }
 
-export interface GambitSlotsContainerInput extends Record<string, unknown> {
+export interface GambitSlotsContainerInput extends UnknownRecord {
   slots?: ReadonlyArray<GambitSlotInput> | null;
   rows?: ReadonlyArray<GambitSlotInput> | null;
   gambit?: ReadonlyArray<GambitSlotInput> | null;
@@ -135,7 +135,7 @@ export type GambitConditionType =
   | 'enemy_has_shield'
   | 'always';
 
-export interface GambitSlotInput extends Record<string, unknown> {
+export interface GambitSlotInput extends UnknownRecord {
   condition?: GambitConditionType | string | null;
   action?: GambitActionType | string | null;
   threshold?: number | string | null;
@@ -151,7 +151,7 @@ export interface RuntimeGambitSlot {
   enabled: boolean;
 }
 
-export interface CollectionStateInput extends Record<string, unknown> {
+export interface CollectionStateInput extends UnknownRecord {
   units?: ReadonlyArray<CollectionProgressUnitInput> | null;
   ownedUnits?: ReadonlyArray<CollectionProgressUnitInput> | null;
   roster?: ReadonlyArray<CollectionProgressUnitInput> | null;

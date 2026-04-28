@@ -9296,6 +9296,14 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
   const TAGS_DIVINE_SUSTAIN = Object.freeze(['heal', 'team-heal', 'shield', 'revive', 'support']);
   const TAGS_RANDOMNESS = Object.freeze(['random-target', 'random-aoe']);
   const TAGS_SETUP = Object.freeze(['sleep', 'summon', 'mark']);
+  const TAG_ARCHETYPE_RULES = Object.freeze([
+      { id: 'frontline-controller', requiresAny: ['taunt', 'shield', 'control'], bonuses: { battlefieldInfluence: 1, tacticalFlexibility: 1 } },
+      { id: 'scaling-carry', requiresAny: ['burst', 'execute', 'pierce', 'chain'], requiresAll: ['burst'], bonuses: { scalingCeiling: 1, battlefieldInfluence: 1 } },
+      { id: 'tempo-support', requiresAny: ['support', 'team-heal', 'self-buff', 'blink'], bonuses: { tacticalFlexibility: 1, economyPressure: 1 } },
+      { id: 'volatile-summoner', requiresAny: ['summon', 'mark', 'random-target', 'random-aoe'], requiresAll: ['summon'], bonuses: { setupPenalty: 1, consistencyPenalty: 1 } },
+      { id: 'global-law', requiresAny: ['global-rule', 'absolute-attack', 'absolute-shield', 'divine-nature'], bonuses: { tagComplexity: 1, battlefieldInfluence: 1 } },
+      { id: 'sustain-anchor', requiresAny: ['heal', 'team-heal', 'shield', 'revive'], bonuses: { tacticalFlexibility: 1, economyPressure: 1 } },
+  ]);
   function calculateRuleDelta(rule, matchedTags, matchedKeywords) {
       const scaledByTags = typeof rule.perTag === 'number' ? matchedTags * rule.perTag : 0;
       const scaledByKeywords = typeof rule.perKeyword === 'number' ? matchedKeywords * rule.perKeyword : 0;
@@ -9466,6 +9474,14 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
   }
   function addMetric(base, delta) {
       return (base ?? 0) + (delta ?? 0);
+  }
+  function mergeMetricTotals(target, source) {
+      for (const key of SCORE_METRIC_KEYS) {
+          const delta = source[key];
+          if (typeof delta !== 'number' || delta === 0)
+              continue;
+          target[key] = addMetric(target[key], delta);
+      }
   }
   const COST_TAG_SCORE_RULES = Object.freeze([
       { id: 'complex-rule-core', label: 'Rule core tags', metric: 'tagComplexity', perTag: 1, cap: 4, tagIds: ['global-rule', 'absolute-attack', 'absolute-shield', 'divine-nature', 'unique-global'] },
@@ -9732,6 +9748,44 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       }
       return riskSignals;
   }
+  function deriveArchetypesFromTags(tagContext) {
+      const archetypes = [];
+      const metricBonuses = {};
+      for (const rule of TAG_ARCHETYPE_RULES) {
+          if (!tagContext.hasTag(...rule.requiresAny))
+              continue;
+          if (rule.requiresAll && !rule.requiresAll.every((tag) => tagContext.hasTag(tag)))
+              continue;
+          archetypes.push(rule.id);
+          mergeMetricTotals(metricBonuses, rule.bonuses);
+      }
+      return { archetypes, metricBonuses };
+  }
+  function resolveProfileSummary(metricTotals) {
+      const aggressiveScore = (metricTotals.battlefieldInfluence ?? 0) + (metricTotals.scalingCeiling ?? 0);
+      const utilityScore = (metricTotals.tacticalFlexibility ?? 0) + (metricTotals.economyPressure ?? 0);
+      const volatileScore = (metricTotals.setupPenalty ?? 0) + (metricTotals.consistencyPenalty ?? 0);
+      if (volatileScore >= Math.max(aggressiveScore, utilityScore, 4))
+          return 'volatile';
+      if (aggressiveScore >= utilityScore + 1)
+          return 'aggressive';
+      if (utilityScore >= aggressiveScore + 1)
+          return 'utility';
+      return 'balanced';
+  }
+  function summarizeMatches(matches) {
+      const metricTotals = {};
+      let keywordHitCount = 0;
+      let riskMatchCount = 0;
+      for (const match of matches) {
+          keywordHitCount += match.matchedKeywords ?? 0;
+          metricTotals[match.metric] = addMetric(metricTotals[match.metric], match.delta);
+          if (RISK_METRICS.has(match.metric)) {
+              riskMatchCount += 1;
+          }
+      }
+      return { keywordHitCount, metricTotals, riskMatchCount };
+  }
   function deriveBudgetFromTagsDetailed(tags) {
       const tagContext = createTagCostContext(tags);
       const input = {
@@ -9756,11 +9810,16 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
               return;
           matches.push({ ruleId, label, metric, delta, matchedTags, matchedKeywords });
       };
-      const applyConditionalMatch = (condition, ruleId, label, metric, delta, matchedTags = 0, matchedKeywords = 0) => {
-          if (!condition)
+      const applyMetricDelta = (ruleId, label, metric, delta, matchedTags = 0, matchedKeywords = 0) => {
+          if (delta <= 0)
               return;
           addScore(metric, delta);
           addMatch(ruleId, label, metric, delta, matchedTags, matchedKeywords);
+      };
+      const applyConditionalMatch = (condition, ruleId, label, metric, delta, matchedTags = 0, matchedKeywords = 0) => {
+          if (!condition)
+              return;
+          applyMetricDelta(ruleId, label, metric, delta, matchedTags, matchedKeywords);
       };
       applyConditionalMatch(tagContext.hasTag('global-rule') && tagContext.hasKeyword('global', 'toàn sân', 'quy tắc'), 'rule-text-alignment', 'Global rule text alignment', 'tagComplexity', 1);
       applyConditionalMatch(tagContext.totalTags >= 10, 'high-tag-overload', 'High tag overload consistency tax', 'consistencyPenalty', 1, tagContext.totalTags);
@@ -9793,11 +9852,11 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       applyConditionalMatch(tagContext.hasTag('global-rule', 'absolute-attack', 'absolute-shield'), 'rule-absolute-economy-tax', 'Rule + absolute economy tax', 'economyPressure', 1, 2);
       applyConditionalMatch(tagContext.hasTag(...TAGS_SETUP) && tagContext.hasTag('support', 'shield', 'team-heal'), 'setup-support-flex', 'Setup + support flexibility', 'tacticalFlexibility', 1, 2);
       applyConditionalMatch(tagContext.hasTag('burst', 'execute', 'pierce'), 'burst-execute-pierce-ceiling', 'Burst execute pierce scaling', 'scalingCeiling', 1, 3);
-      const keywordHitCount = matches.reduce((sum, match) => sum + (match.matchedKeywords ?? 0), 0);
-      const metricTotals = {};
-      for (const match of matches) {
-          metricTotals[match.metric] = (metricTotals[match.metric] ?? 0) + match.delta;
+      const { archetypes, metricBonuses: archetypeWeights } = deriveArchetypesFromTags(tagContext);
+      for (const [metric, delta] of Object.entries(archetypeWeights)) {
+          applyMetricDelta(`archetype:blend:${metric}`, 'Archetype blend', metric, delta);
       }
+      const { keywordHitCount, metricTotals, riskMatchCount, } = summarizeMatches(matches);
       let dominantMetric = null;
       let dominantMetricScore = -1;
       for (const key of SCORE_METRIC_KEYS) {
@@ -9805,12 +9864,6 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
           if (score > dominantMetricScore) {
               dominantMetric = key;
               dominantMetricScore = score;
-          }
-      }
-      let riskMatchCount = 0;
-      for (const match of matches) {
-          if (RISK_METRICS.has(match.metric)) {
-              riskMatchCount += 1;
           }
       }
       const riskSignals = buildRiskSignals(tagContext);
@@ -9829,6 +9882,9 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
               dominantMetric,
               volatilityLevel: resolveVolatilityLevel(riskSignals, riskMatchCount),
               riskSignals,
+              archetypes,
+              archetypeWeights,
+              profileSummary: resolveProfileSummary(metricTotals),
           },
       };
   }
@@ -10179,11 +10235,14 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
   }
   const CURRENCY_INDEX = indexBy(CURRENCIES, (currency) => currency.id);
   const normalizeCurrencyId = (currencyId) => String(currencyId ?? '').trim();
+  const normalizeKeyUpper = (value) => String(value ?? '').trim().toUpperCase();
   function getCurrency(currencyId) {
       const normalizedCurrencyId = normalizeCurrencyId(currencyId);
       if (!normalizedCurrencyId)
           return null;
-      const canonicalCurrencyId = CURRENCY_IDS[normalizedCurrencyId] ?? normalizedCurrencyId;
+      const canonicalCurrencyId = CURRENCY_IDS[normalizedCurrencyId]
+          ?? CURRENCY_IDS[normalizeKeyUpper(normalizedCurrencyId)]
+          ?? normalizedCurrencyId;
       return CURRENCY_INDEX[canonicalCurrencyId] ?? null;
   }
   function listCurrencies() {
@@ -10291,18 +10350,18 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
       }
   ])));
   function getPityConfig(tier) {
-      return Object.prototype.hasOwnProperty.call(PITY_CONFIG, tier)
-          ? (PITY_CONFIG[tier] ?? null)
+      const normalizedTier = normalizeKeyUpper(tier);
+      return Object.prototype.hasOwnProperty.call(PITY_CONFIG, normalizedTier)
+          ? (PITY_CONFIG[normalizedTier] ?? null)
           : null;
   }
   function listPityTiers() {
       return PITY_TIERS.slice();
   }
   const SHOP_TAX_BRACKETS = freezeCloneList(economyConfig.shopTaxBrackets);
-  ;
-  const SHOP_TAX_INDEX = indexBy(SHOP_TAX_BRACKETS, (bracket) => bracket.rank);
+  const SHOP_TAX_INDEX = indexBy(SHOP_TAX_BRACKETS, (bracket) => normalizeKeyUpper(bracket.rank));
   function getShopTaxBracket(rank) {
-      return SHOP_TAX_INDEX[rank] ?? null;
+      return SHOP_TAX_INDEX[normalizeKeyUpper(rank)] ?? null;
   }
   function getShopTaxRate(rank) {
       const bracket = getShopTaxBracket(rank);
@@ -10837,6 +10896,8 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   });
   const ROSTER_PREVIEW_META = Object.freeze(ROSTER.map((unit) => ({ id: unit.id, name: unit.name })));
   const hasTpDelta = (stat) => typeof TP_DELTA[stat] === 'number';
+  const getTpDelta = (stat) => TP_DELTA[stat] ?? 0;
+  const isNonZero = (value) => value !== 0;
   function roundStat(stat, value) {
       const precision = PRECISION[stat] ?? 1;
       return Math.round(value * precision) / precision;
@@ -10846,7 +10907,8 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
       return Math.round(value * TP_ROUND_FACTOR) / TP_ROUND_FACTOR;
   }
   function getClassBase(className) {
-      return assertDefined(CLASS_BASE[className], `Unknown class "${className ?? ''}"`);
+      const normalized = String(className ?? '');
+      return assertDefined(CLASS_BASE[normalized], `Unknown class "${className ?? ''}"`);
   }
   function sanitizeTpAllocation(tpAlloc = {}) {
       const clean = {};
@@ -10854,7 +10916,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
           if (!hasTpDelta(stat))
               continue;
           const rounded = roundTpValue(value ?? 0);
-          if (rounded !== 0) {
+          if (isNonZero(rounded)) {
               clean[stat] = rounded;
           }
       }
@@ -10869,7 +10931,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   }
   function applyTpDelta(base, cleanTp) {
       return mapStatBlock(base, (stat, baseValue) => {
-          const delta = TP_DELTA[stat] ?? 0;
+          const delta = getTpDelta(stat);
           if (delta) {
               return baseValue + delta * (cleanTp[stat] ?? 0);
           }
@@ -10912,9 +10974,9 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
           const baseValue = base[stat];
           if (typeof baseValue !== 'number')
               continue;
-          const delta = TP_DELTA[stat] ?? 1;
+          const delta = getTpDelta(stat) || 1;
           const raw = (baseValue * (modValue ?? 0)) / delta;
-          if (raw !== 0) {
+          if (isNonZero(raw)) {
               rawTp[stat] = raw;
           }
       }
@@ -10947,7 +11009,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
           final,
       };
   }
-  function buildRosterPreviews(tpAllocations = undefined) {
+  function buildRosterPreviews(tpAllocations) {
       const result = {};
       for (const unit of ROSTER) {
           result[unit.id] = resolvePreviewForUnit(unit, tpAllocations);
@@ -11345,15 +11407,20 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
   ];
   const normalizeKey = (value) => value.trim().toLowerCase();
   const getDefinitionAliases = (definition) => definition.aliases ?? [];
+  const normalizeTagInput = (value) => {
+      if (typeof value !== 'string')
+          return null;
+      const normalized = normalizeKey(value);
+      return normalized || null;
+  };
   const TAG_BY_ID = new Map();
-  const KNOWN_TAG_IDS = new Set();
   for (const definition of TAG_DEFINITIONS) {
-      KNOWN_TAG_IDS.add(definition.id);
       TAG_BY_ID.set(normalizeKey(definition.id), definition);
       for (const alias of getDefinitionAliases(definition)) {
           TAG_BY_ID.set(normalizeKey(alias), definition);
       }
   }
+  const KNOWN_TAG_IDS = new Set(TAG_DEFINITIONS.map((definition) => definition.id));
   const isKnownTagId = (tagId) => KNOWN_TAG_IDS.has(tagId);
   const tagAliasesByVersion = Object.freeze({
       v1: Object.freeze({
@@ -11421,9 +11488,10 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
       return TAG_ALIAS_BY_VERSION.get(version)?.get(normalizeKey(tag)) ?? tag;
   }
   function normalizeTagId(tag, version = CURRENT_TAG_ALIAS_VERSION) {
-      if (typeof tag !== 'string')
+      const normalizedInput = normalizeTagInput(tag);
+      if (!normalizedInput)
           return null;
-      const normalized = normalizeKey(resolveVersionAlias(tag, version));
+      const normalized = normalizeKey(resolveVersionAlias(normalizedInput, version));
       if (!normalized)
           return null;
       return TAG_BY_ID.get(normalized)?.id ?? normalized;
@@ -11462,12 +11530,12 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
       for (const rawTag of tags) {
           if (typeof rawTag !== 'string')
               continue;
-          const trimmed = rawTag.trim();
-          if (!trimmed)
+          const original = rawTag.trim();
+          if (!original)
               continue;
-          const normalized = normalizeTagId(trimmed);
+          const normalized = normalizeTagId(original);
           if (!normalized || !isKnownTagId(normalized)) {
-              unknown.add(trimmed);
+              unknown.add(original);
           }
       }
       return [...unknown];
@@ -11477,12 +11545,13 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
           return false;
       }
       const normalizedHaystack = collectNormalizedTagSet(haystack);
-      const normalizedNeedles = collectNormalizedTagSet(needles);
-      const [smallerSet, largerSet] = normalizedHaystack.size <= normalizedNeedles.size
-          ? [normalizedHaystack, normalizedNeedles]
-          : [normalizedNeedles, normalizedHaystack];
-      for (const value of smallerSet) {
-          if (largerSet.has(value))
+      if (!normalizedHaystack.size)
+          return false;
+      for (const rawNeedle of needles) {
+          const needle = normalizeTagId(rawNeedle);
+          if (!needle)
+              continue;
+          if (normalizedHaystack.has(needle))
               return true;
       }
       return false;
@@ -38392,6 +38461,8 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
   const DEFAULT_WRAP_COUNT = createZeroBySide();
   const SLOT_CAP = 9;
   const clampInt = (value, min, max) => Math.max(min, Math.min(max, Math.floor(value)));
+  const createEmptySlotMaps = () => ({ ALLY: new Map(), ENEMY: new Map() });
+  const makeOrderKey = (side, slot) => `${side}:${slot}`;
   function normalizeSide(side) {
       if (side === 'ENEMY')
           return 'ENEMY';
@@ -38425,11 +38496,12 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
       }
   }
   function buildSlotMaps(tokens) {
-      const ally = new Map();
-      const enemy = new Map();
       if (!Array.isArray(tokens)) {
-          return { ALLY: ally, ENEMY: enemy };
+          return createEmptySlotMaps();
       }
+      const slotMaps = createEmptySlotMaps();
+      const ally = slotMaps.ALLY;
+      const enemy = slotMaps.ENEMY;
       for (const unit of tokens) {
           if (!unit || !unit.alive)
               continue;
@@ -38444,7 +38516,7 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
               map.set(slot, unit);
           }
       }
-      return { ALLY: ally, ENEMY: enemy };
+      return slotMaps;
   }
   function isQueueDue(state, sideLower, slot, cycle) {
       const queued = sideLower === 'ally' ? state.queued?.ally : state.queued?.enemy;
@@ -38470,7 +38542,7 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
           return -1;
       const normalizedSide = toLowerSpawnSide(side);
       const normalizedSlot = clampInt(Number.isFinite(slot) ? slot : 0, 0, SLOT_CAP);
-      const key = `${normalizedSide}:${normalizedSlot}`;
+      const key = makeOrderKey(normalizedSide, normalizedSlot);
       const cache = turn.orderIndexCache;
       const needsRebuild = !cache
           || cache.orderRef !== order
@@ -38483,7 +38555,7 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
               const entrySlot = entry?.slot;
               if ((entrySide !== 'ally' && entrySide !== 'enemy') || !Number.isFinite(entrySlot))
                   continue;
-              indexByEntry.set(`${entrySide}:${entrySlot}`, index);
+              indexByEntry.set(makeOrderKey(entrySide, Number(entrySlot)), index);
           }
           turn.orderIndexCache = { orderRef: order, size: order.length, indexByEntry };
       }
@@ -38606,16 +38678,16 @@ __modules['./types/config.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
 };
 __modules['./types/currency.ts'] = (exports, module, __require) => {
-  const isCurrencyEntry = (value) => (value != null
+  y;
+  const isPlainRecord = (value) => (value != null
       && typeof value === 'object'
       && !Array.isArray(value));
+  const isCurrencyEntry = (value) => (isPlainRecord(value));
   const isLineupCurrencyValue = (value) => (value == null
       || typeof value === 'number'
       || typeof value === 'string'
       || isCurrencyEntry(value));
-  const isLineupCurrencyConfig = (value) => (value != null
-      && typeof value === 'object'
-      && !Array.isArray(value));
+  const isLineupCurrencyConfig = (value) => (isPlainRecord(value));
   const isLineupCurrencies = (value) => {
       if (Array.isArray(value)) {
           return value.every(isLineupCurrencyValue);
@@ -38623,7 +38695,7 @@ __modules['./types/currency.ts'] = (exports, module, __require) => {
       return isLineupCurrencyConfig(value);
   };
   const normalizeCurrencyBalances = (playerState) => {
-      if (!playerState || typeof playerState !== 'object') {
+      if (!isPlainRecord(playerState)) {
           return null;
       }
       if (!('currencies' in playerState)) {
@@ -38647,6 +38719,7 @@ __modules['./types/lineup.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
 };
 __modules['./types/pve.ts'] = (exports, module, __require) => {
+  6;
 
   //# sourceMappingURL=stdin.js.map
 };

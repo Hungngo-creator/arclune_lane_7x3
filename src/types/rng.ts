@@ -1,5 +1,7 @@
 //home (termux)/arclune_lane_7x3/src/types/rng.ts
-export interface RngState {
+import type { UnknownRecord } from './common.ts';
+
+export interface RngState extends UnknownRecord {
   seed: number;
   calls: number;
   history?: number[];

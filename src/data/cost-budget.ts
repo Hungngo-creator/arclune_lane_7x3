@@ -143,6 +143,12 @@ interface CostTagSynergyRule {
   metric: ScoreKey;
   delta: number;
 }
+interface CostArchetypeRule {
+  id: string;
+  requiresAny: ReadonlyArray<string>;
+  requiresAll?: ReadonlyArray<string>;
+  bonuses: Readonly<Partial<Record<ScoreKey, number>>>;
+}
 interface CostTagContext {
   hasTag: (...needles: string[]) => boolean;
   hasKeyword: (...keywords: string[]) => boolean;
@@ -155,6 +161,14 @@ const normalizeKeywordTerm = (value: string): string => value.trim().toLowerCase
 const TAGS_DIVINE_SUSTAIN = Object.freeze(['heal', 'team-heal', 'shield', 'revive', 'support']);
 const TAGS_RANDOMNESS = Object.freeze(['random-target', 'random-aoe']);
 const TAGS_SETUP = Object.freeze(['sleep', 'summon', 'mark']);
+const TAG_ARCHETYPE_RULES: ReadonlyArray<CostArchetypeRule> = Object.freeze([
+  { id: 'frontline-controller', requiresAny: ['taunt', 'shield', 'control'], bonuses: { battlefieldInfluence: 1, tacticalFlexibility: 1 } },
+  { id: 'scaling-carry', requiresAny: ['burst', 'execute', 'pierce', 'chain'], requiresAll: ['burst'], bonuses: { scalingCeiling: 1, battlefieldInfluence: 1 } },
+  { id: 'tempo-support', requiresAny: ['support', 'team-heal', 'self-buff', 'blink'], bonuses: { tacticalFlexibility: 1, economyPressure: 1 } },
+  { id: 'volatile-summoner', requiresAny: ['summon', 'mark', 'random-target', 'random-aoe'], requiresAll: ['summon'], bonuses: { setupPenalty: 1, consistencyPenalty: 1 } },
+  { id: 'global-law', requiresAny: ['global-rule', 'absolute-attack', 'absolute-shield', 'divine-nature'], bonuses: { tagComplexity: 1, battlefieldInfluence: 1 } },
+  { id: 'sustain-anchor', requiresAny: ['heal', 'team-heal', 'shield', 'revive'], bonuses: { tacticalFlexibility: 1, economyPressure: 1 } },
+]);
 
 export interface CostTagRuleMatch {
   ruleId: string;
@@ -177,6 +191,9 @@ export interface CostTagBudgetInsights {
   dominantMetric: ScoreKey | null;
   volatilityLevel: 'low' | 'medium' | 'high';
   riskSignals: ReadonlyArray<string>;
+  archetypes: ReadonlyArray<string>;
+  archetypeWeights: Readonly<Partial<Record<ScoreKey, number>>>;
+  profileSummary: 'balanced' | 'aggressive' | 'utility' | 'volatile';
 }
 
 export interface CostTagBudgetDetail {
@@ -400,6 +417,17 @@ function normalizeBreakdown(input: CostBudgetInput): CostBudgetBreakdown {
 
 function addMetric(base: number | undefined, delta: number | undefined): number {
   return (base ?? 0) + (delta ?? 0);
+}
+
+function mergeMetricTotals(
+  target: Partial<Record<ScoreKey, number>>,
+  source: Readonly<Partial<Record<ScoreKey, number>>>,
+): void {
+  for (const key of SCORE_METRIC_KEYS) {
+    const delta = source[key];
+    if (typeof delta !== 'number' || delta === 0) continue;
+    target[key] = addMetric(target[key], delta);
+  }
 }
 
 const COST_TAG_SCORE_RULES: ReadonlyArray<CostTagScoreRule> = Object.freeze([
@@ -686,6 +714,50 @@ function buildRiskSignals(tagContext: CostTagContext): string[] {
   return riskSignals;
 }
 
+function deriveArchetypesFromTags(
+  tagContext: CostTagContext,
+): { archetypes: string[]; metricBonuses: Partial<Record<ScoreKey, number>> } {
+  const archetypes: string[] = [];
+  const metricBonuses: Partial<Record<ScoreKey, number>> = {};
+  for (const rule of TAG_ARCHETYPE_RULES) {
+    if (!tagContext.hasTag(...rule.requiresAny)) continue;
+    if (rule.requiresAll && !rule.requiresAll.every((tag) => tagContext.hasTag(tag))) continue;
+    archetypes.push(rule.id);
+    mergeMetricTotals(metricBonuses, rule.bonuses);
+  }
+  return { archetypes, metricBonuses };
+}
+
+function resolveProfileSummary(
+  metricTotals: Partial<Record<ScoreKey, number>>,
+): 'balanced' | 'aggressive' | 'utility' | 'volatile' {
+  const aggressiveScore = (metricTotals.battlefieldInfluence ?? 0) + (metricTotals.scalingCeiling ?? 0);
+  const utilityScore = (metricTotals.tacticalFlexibility ?? 0) + (metricTotals.economyPressure ?? 0);
+  const volatileScore = (metricTotals.setupPenalty ?? 0) + (metricTotals.consistencyPenalty ?? 0);
+  if (volatileScore >= Math.max(aggressiveScore, utilityScore, 4)) return 'volatile';
+  if (aggressiveScore >= utilityScore + 1) return 'aggressive';
+  if (utilityScore >= aggressiveScore + 1) return 'utility';
+  return 'balanced';
+}
+
+function summarizeMatches(matches: ReadonlyArray<CostTagRuleMatch>): {
+  keywordHitCount: number;
+  metricTotals: Partial<Record<ScoreKey, number>>;
+  riskMatchCount: number;
+} {
+  const metricTotals: Partial<Record<ScoreKey, number>> = {};
+  let keywordHitCount = 0;
+  let riskMatchCount = 0;
+  for (const match of matches) {
+    keywordHitCount += match.matchedKeywords ?? 0;
+    metricTotals[match.metric] = addMetric(metricTotals[match.metric], match.delta);
+    if (RISK_METRICS.has(match.metric)) {
+      riskMatchCount += 1;
+    }
+  }
+  return { keywordHitCount, metricTotals, riskMatchCount };
+}
+
 export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBudgetDetail {
   const tagContext = createTagCostContext(tags);
   const input: CostBudgetInput = {
@@ -717,6 +789,18 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
     if (delta <= 0) return;
     matches.push({ ruleId, label, metric, delta, matchedTags, matchedKeywords });
   };
+  const applyMetricDelta = (
+    ruleId: string,
+    label: string,
+    metric: ScoreKey,
+    delta: number,
+    matchedTags = 0,
+    matchedKeywords = 0,
+  ): void => {
+    if (delta <= 0) return;
+    addScore(metric, delta);
+    addMatch(ruleId, label, metric, delta, matchedTags, matchedKeywords);
+  };
   const applyConditionalMatch = (
     condition: boolean,
     ruleId: string,
@@ -727,8 +811,7 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
     matchedKeywords = 0,
   ): void => {
     if (!condition) return;
-    addScore(metric, delta);
-    addMatch(ruleId, label, metric, delta, matchedTags, matchedKeywords);
+    applyMetricDelta(ruleId, label, metric, delta, matchedTags, matchedKeywords);
   };
 
   applyConditionalMatch(
@@ -805,12 +888,21 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
     1,
     3,
   );
-
-  const keywordHitCount = matches.reduce((sum, match) => sum + (match.matchedKeywords ?? 0), 0);
-  const metricTotals: Partial<Record<ScoreKey, number>> = {};
-  for (const match of matches) {
-    metricTotals[match.metric] = (metricTotals[match.metric] ?? 0) + match.delta;
+  const { archetypes, metricBonuses: archetypeWeights } = deriveArchetypesFromTags(tagContext);
+  for (const [metric, delta] of Object.entries(archetypeWeights) as Array<[ScoreKey, number]>) {
+    applyMetricDelta(
+      `archetype:blend:${metric}`,
+      'Archetype blend',
+      metric,
+      delta,
+    );
   }
+
+  const {
+    keywordHitCount,
+    metricTotals,
+    riskMatchCount,
+  } = summarizeMatches(matches);
   let dominantMetric: ScoreKey | null = null;
   let dominantMetricScore = -1;
   for (const key of SCORE_METRIC_KEYS) {
@@ -818,12 +910,6 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
     if (score > dominantMetricScore) {
       dominantMetric = key;
       dominantMetricScore = score;
-    }
-  }
-  let riskMatchCount = 0;
-  for (const match of matches) {
-    if (RISK_METRICS.has(match.metric)) {
-      riskMatchCount += 1;
     }
   }
   const riskSignals = buildRiskSignals(tagContext);
@@ -842,6 +928,9 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
       dominantMetric,
       volatilityLevel: resolveVolatilityLevel(riskSignals, riskMatchCount),
       riskSignals,
+      archetypes,
+      archetypeWeights,
+      profileSummary: resolveProfileSummary(metricTotals),
     },
   };
 }

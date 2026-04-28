@@ -1,18 +1,18 @@
 //home (termux)/arclune_lane_7x3/src/types/currency.ts
-import type { UnknownRecord } from './common.ts';
+import type { Maybe, NumericLike, UnknownRecord } from './common.ts';y
 
 export interface LineupCurrencyEntry extends UnknownRecord {
   id?: string;
   currencyId?: string;
   key?: string;
   type?: string;
-  balance?: number | string | null;
-  amount?: number | string | null;
-  value?: number | string | null;
-  total?: number | string | null;
+  balance?: Maybe<NumericLike>;
+  amount?: Maybe<NumericLike>;
+  value?: Maybe<NumericLike>;
+  total?: Maybe<NumericLike>;
 }
 
-export type LineupCurrencyValue = number | string | null | undefined | LineupCurrencyEntry;
+export type LineupCurrencyValue = Maybe<NumericLike> | LineupCurrencyEntry;
 
 export interface LineupCurrencyConfig extends UnknownRecord {
   [key: string]:
@@ -25,10 +25,14 @@ export interface LineupCurrencyConfig extends UnknownRecord {
 
 export type LineupCurrencies = ReadonlyArray<LineupCurrencyValue> | LineupCurrencyConfig;
 
-export const isCurrencyEntry = (value: unknown): value is LineupCurrencyEntry => (
+const isPlainRecord = (value: unknown): value is UnknownRecord => (
   value != null
   && typeof value === 'object'
   && !Array.isArray(value)
+);
+
+export const isCurrencyEntry = (value: unknown): value is LineupCurrencyEntry => (
+  isPlainRecord(value)
 );
 
 const isLineupCurrencyValue = (value: unknown): value is LineupCurrencyValue => (
@@ -39,9 +43,7 @@ const isLineupCurrencyValue = (value: unknown): value is LineupCurrencyValue => 
 );
 
 export const isLineupCurrencyConfig = (value: unknown): value is LineupCurrencyConfig => (
-  value != null
-  && typeof value === 'object'
-  && !Array.isArray(value)
+  isPlainRecord(value)
 );
 
 export const isLineupCurrencies = (value: unknown): value is LineupCurrencies => {
@@ -54,7 +56,7 @@ export const isLineupCurrencies = (value: unknown): value is LineupCurrencies =>
 export const normalizeCurrencyBalances = (
   playerState: UnknownRecord | null | undefined,
 ): LineupCurrencies | null => {
-  if (!playerState || typeof playerState !== 'object'){
+  if (!isPlainRecord(playerState)){
     return null;
   }
   if (!('currencies' in playerState)){

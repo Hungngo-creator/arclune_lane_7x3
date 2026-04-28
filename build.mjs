@@ -22,6 +22,7 @@ const DIST_DIR = path.join(__dirname, 'dist');
 const ASSETS_SOURCE_DIR = path.join(__dirname, 'assets');
 const ENTRY_ID = './entry.ts';
 const SOURCE_EXTENSIONS = ['.js', '.ts', '.tsx', '.json', '.css'];
+const SOURCE_EXTENSION_SET = new Set(SOURCE_EXTENSIONS);
 const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
 const STUB_MODULE_SPECIFIERS = new Map([
   ['zod', path.join(__dirname, 'tools/zod-stub/index.js')],
@@ -30,6 +31,12 @@ const IMPORT_FROM_REGEX = /import\s+(?!type\b)[\s\S]*?\s+from\s*['\"](.+?)['\"]/
 const EXPORT_FROM_REGEX = /export\s+(?:\*|{[\s\S]*?})\s+from\s*['\"](.+?)['\"]/g;
 const IMPORT_SIDE_EFFECT_REGEX = /import\s*['\"](.+?)['\"]/g;
 const DYNAMIC_IMPORT_REGEX = /import\(\s*['\"](.+?)['\"]\s*\)/g;
+const IMPORT_SPECIFIER_REGEXES = Object.freeze([
+  IMPORT_FROM_REGEX,
+  EXPORT_FROM_REGEX,
+  IMPORT_SIDE_EFFECT_REGEX,
+  DYNAMIC_IMPORT_REGEX,
+]);
 const NORMALIZED_MODULE_ID_CACHE = new Map();
 function cacheNormalizedModuleId(rawId, normalizedId, normalizedSource){
   NORMALIZED_MODULE_ID_CACHE.set(rawId, normalizedId);
@@ -411,7 +418,7 @@ async function listSourceFiles(){
         await walk(fullPath);
       } else if (entry.isFile()){
         const ext = path.extname(entry.name);
-        if (SOURCE_EXTENSIONS.includes(ext)){
+        if (SOURCE_EXTENSION_SET.has(ext)){
           files.push(fullPath);
         }
       }
@@ -423,7 +430,7 @@ async function listSourceFiles(){
 
 function extractRuntimeSpecifiers(sourceCode){
   const specifiers = [];
-  for (const regex of [IMPORT_FROM_REGEX, EXPORT_FROM_REGEX, IMPORT_SIDE_EFFECT_REGEX, DYNAMIC_IMPORT_REGEX]){
+  for (const regex of IMPORT_SPECIFIER_REGEXES){
     regex.lastIndex = 0;
     let match;
     while ((match = regex.exec(sourceCode)) !== null){

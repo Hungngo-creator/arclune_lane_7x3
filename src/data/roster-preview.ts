@@ -35,6 +35,8 @@ const ROSTER_PREVIEW_META = Object.freeze(
   ROSTER.map((unit) => ({ id: unit.id, name: unit.name }))
 );
 const hasTpDelta = (stat: string): boolean => typeof TP_DELTA[stat] === 'number';
+const getTpDelta = (stat: string): number => TP_DELTA[stat] ?? 0;
+const isNonZero = (value: number): boolean => value !== 0;
 
 function roundStat(stat: string, value: number) {
   const precision = PRECISION[stat] ?? 1;
@@ -48,10 +50,8 @@ function roundTpValue(value: number) {
 }
 
 function getClassBase(className: string | null | undefined): CatalogStatBlock {
-  return assertDefined(
-    CLASS_BASE[className as keyof typeof CLASS_BASE],
-    `Unknown class "${className ?? ''}"`
-  );
+  const normalized = String(className ?? '') as keyof typeof CLASS_BASE;
+  return assertDefined(CLASS_BASE[normalized], `Unknown class "${className ?? ''}"`);
 }
 
 function sanitizeTpAllocation(tpAlloc: Record<string, number | null | undefined> = {}) {
@@ -59,7 +59,7 @@ function sanitizeTpAllocation(tpAlloc: Record<string, number | null | undefined>
   for (const [stat, value] of Object.entries(tpAlloc)) {
     if (!hasTpDelta(stat)) continue;
     const rounded = roundTpValue(value ?? 0);
-    if (rounded !== 0) {
+    if (isNonZero(rounded)) {
       clean[stat] = rounded;
     }
   }
@@ -79,11 +79,11 @@ function mapStatBlock(
 
 function applyTpDelta(base: CatalogStatBlock, cleanTp: Record<string, number>): CatalogStatBlock {
   return mapStatBlock(base, (stat, baseValue) => {
-    const delta = TP_DELTA[stat] ?? 0;
+    const delta = getTpDelta(stat);
     if (delta) {
       return baseValue + delta * (cleanTp[stat] ?? 0);
     }
-  return baseValue;
+   return baseValue;
   });
 }
 
@@ -142,9 +142,9 @@ export function deriveTpFromMods(
     if (!hasTpDelta(stat)) continue;
     const baseValue = base[stat];
     if (typeof baseValue !== 'number') continue;
-    const delta = TP_DELTA[stat] ?? 1;
+    const delta = getTpDelta(stat) || 1;
     const raw = (baseValue * (modValue ?? 0)) / delta;
-    if (raw !== 0) {
+    if (isNonZero(raw)) {
       rawTp[stat] = raw;
     }
   }
@@ -190,7 +190,7 @@ function resolvePreviewForUnit(
 }
 
 export function buildRosterPreviews(
-  tpAllocations: Record<string, Record<string, number>> | undefined = undefined
+  tpAllocations?: Record<string, Record<string, number>>
 ): Record<string, RosterPreview> {
   const result: Record<string, RosterPreview> = {};
   for (const unit of ROSTER as ReadonlyArray<RosterUnitDefinition>) {

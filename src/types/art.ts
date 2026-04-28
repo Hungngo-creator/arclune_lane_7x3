@@ -1,4 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/types/art.ts
+import type { Maybe, Nullable } from './common';
+
 export interface UnitArtPalette {
   primary: string;
   secondary: string;
@@ -14,7 +16,7 @@ export interface UnitArtShadowConfig {
   offsetY: number;
 }
 
-export type UnitArtShadow = UnitArtShadowConfig | string | null;
+export type UnitArtShadow = Nullable<UnitArtShadowConfig | string>;
 
 export interface UnitArtLayout {
   anchor: number;
@@ -47,10 +49,10 @@ export interface UnitArtSprite {
   src: string;
   anchor: number;
   scale: number;
-  aspect: number | null;
-  shadow: UnitArtShadowConfig | null;
-  skinId: string | null;
-  cacheKey: string | null;
+  aspect: Nullable<number>;
+  shadow: Nullable<UnitArtShadowConfig>;
+  skinId: Nullable<string>;
+  cacheKey: Nullable<string>;
   [extra: string]: unknown;
 }
 
@@ -67,14 +69,14 @@ export interface UnitArtDefinition {
   layout: UnitArtLayout;
   label: UnitArtLabel | false;
   hpBar: UnitArtHpBar;
-  skinKey?: string | null;
+  skinKey?: Nullable<string>;
   [extra: string]: unknown;
 }
 
 export interface UnitArt extends UnitArtDefinition {
-  skinKey: string | null;
+  skinKey: Nullable<string>;
 }
 
 export interface GetUnitArtOptions {
-  skinKey?: string | null;
+  skinKey?: Maybe<string>;
 }
