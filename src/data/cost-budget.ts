@@ -102,6 +102,18 @@ const SCORE_RANGES = {
   consistencyPenalty: [0, 3],
   divineSelfSustainBonus: [0, 2],
 } as const;
+const SCORE_METRIC_KEYS = [
+  'tagComplexity',
+  'battlefieldInfluence',
+  'economyPressure',
+  'scalingCeiling',
+  'tacticalFlexibility',
+  'setupPenalty',
+  'selfRiskPenalty',
+  'vanishRiskPenalty',
+  'consistencyPenalty',
+] as const;
+type ScoreKey = typeof SCORE_METRIC_KEYS[number];
 
 const RANK_BUDGET_BASE: Readonly<Record<string, CostBudgetInput>> = Object.freeze({
   N: { tagComplexity: 0, battlefieldInfluence: 1, economyPressure: 0, scalingCeiling: 0, tacticalFlexibility: 1 },
@@ -142,32 +154,26 @@ function normalizeRankKey(rank: string | null | undefined): string {
   return String(rank ?? '').trim().toUpperCase();
 }
 
-function clampCost(cost: number): number {
-  return clamp(cost, COST_MIN, COST_MAX);
+function resolveRankAnchorByKey(rankKey: string): number {
+  return RANK_COST_ANCHOR[rankKey] ?? 12;
 }
 
-function resolveRankAnchor(rank: string | null | undefined): number {
-  const key = normalizeRankKey(rank);
-  return RANK_COST_ANCHOR[key] ?? 12;
-}
-
-function resolveRankMultiplier(rank: string | null | undefined): number {
-  const key = normalizeRankKey(rank);
-  return RANK_MULTIPLIER[key] ?? 0.95;
+function resolveRankMultiplierByKey(rankKey: string): number {
+  return RANK_MULTIPLIER[rankKey] ?? 0.95;
 }
 
 /**
  * V2 Summon Cost logic for manual balancing:
  * Cost = CostNeo(rank) + Σ(điểm cộng) - Σ(điểm trừ)
- * Sau đó clamp vào [8..22].
+ * Sau đó clamp vào [7..22] (hoặc trần mở rộng với PRIME đặc biệt).
  *
  * Rank multiplier giữ vai trò hệ số tham chiếu khi so với hệ cũ,
  * không nhân trực tiếp vào cost neo để tránh làm loãng lợi thế kinh tế của bậc thấp.
  */
 export function evaluateSummonCost(input: SummonCostInput): SummonCostResult {
   const rank = normalizeRankKey(input.rank);
-  const anchorCost = resolveRankAnchor(rank);
-  const multiplier = resolveRankMultiplier(rank);
+  const anchorCost = resolveRankAnchorByKey(rank);
+  const multiplier = resolveRankMultiplierByKey(rank);
 
   const powerPoint = (input.hasRuleTag ? 1 : 0)
     + (input.hasLawTag ? 1 : 0)
@@ -177,7 +183,9 @@ export function evaluateSummonCost(input: SummonCostInput): SummonCostResult {
   const riskPoint = (input.hasDivineNature ? 1 : 0)
     + (input.hasSelfHarmRisk ? 1 : 0)
     + (input.longSetup ? 1 : 0)
-    + (input.hasVanishRisk ? 1 : 0);
+    + (input.hasVanishRisk ? 1 : 0)
+    + (input.hasFriendlyFireRisk ? 1 : 0)
+    + (input.hasRemovedRisk ? 1 : 0);
 
   const powerScore = powerPoint * 1.5;
   const riskScore = riskPoint * 3;
@@ -289,15 +297,9 @@ export function mergeBudgetInputs(...inputs: Array<CostBudgetInput | null | unde
     if (typeof input.rankMultiplier === 'number' && Number.isFinite(input.rankMultiplier)) {
       merged.rankMultiplier = input.rankMultiplier;
     }
-    merged.tagComplexity = addMetric(merged.tagComplexity, input.tagComplexity);
-    merged.battlefieldInfluence = addMetric(merged.battlefieldInfluence, input.battlefieldInfluence);
-    merged.economyPressure = addMetric(merged.economyPressure, input.economyPressure);
-    merged.scalingCeiling = addMetric(merged.scalingCeiling, input.scalingCeiling);
-    merged.tacticalFlexibility = addMetric(merged.tacticalFlexibility, input.tacticalFlexibility);
-    merged.setupPenalty = addMetric(merged.setupPenalty, input.setupPenalty);
-    merged.selfRiskPenalty = addMetric(merged.selfRiskPenalty, input.selfRiskPenalty);
-    merged.vanishRiskPenalty = addMetric(merged.vanishRiskPenalty, input.vanishRiskPenalty);
-    merged.consistencyPenalty = addMetric(merged.consistencyPenalty, input.consistencyPenalty);
+    for (const key of SCORE_METRIC_KEYS){
+      merged[key] = addMetric(merged[key], input[key]);
+    }
     if (input.hasDivineNature){
       merged.hasDivineNature = true;
     }
@@ -312,8 +314,8 @@ export function deriveBudgetFromRankRole(rank?: string | null, role?: string | n
   return mergeBudgetInputs(
     {
       rank: rankKey,
-      rankAnchorCost: resolveRankAnchor(rankKey),
-      rankMultiplier: resolveRankMultiplier(rankKey),
+      rankAnchorCost: resolveRankAnchorByKey(rankKey),
+      rankMultiplier: resolveRankMultiplierByKey(rankKey),
     },
     { battlefieldInfluence: 1, tacticalFlexibility: 1 },
     RANK_BUDGET_BASE[rankKey],
@@ -327,7 +329,7 @@ export function deriveBudgetFromRankRole(rank?: string | null, role?: string | n
  * - PowerScore = tổng nhóm điểm cộng.
  * - RiskScore = tổng nhóm điểm trừ.
  * - NetScore = PowerScore - RiskScore.
- * - Cost = clamp(8, 22, round(14 + NetScore * 0.4)).
+ * - Cost = clamp theo rank-range và biên toàn cục [7..22] (có ngoại lệ PRIME trần mở rộng).
  */
 export function evaluateCostBudget(input: CostBudgetInput): CostBudgetResult {
   const breakdown = normalizeBreakdown(input);
@@ -374,9 +376,10 @@ export function evaluateCostBudget(input: CostBudgetInput): CostBudgetResult {
 
 export function estimateCostFromTags(tags: readonly string[]): CostBudgetResult {
   const normalizedTags = tags.map((tag) => String(tag).trim().toLowerCase());
-  const has = (...needles: string[]) => needles.some((needle) => normalizedTags.includes(needle));
-  const containsAny = (...needles: string[]) => needles.some((needle) => normalizedTags.some((tag) => tag.includes(needle)));
-
+  const normalizedTagSet = new Set(normalizedTags);
+  const has = (...needles: string[]) => needles.some((needle) => normalizedTagSet.has(needle));
+  const normalizedTagText = normalizedTags.join(' || ');
+  const containsAny = (...needles: string[]) => needles.some((needle) => normalizedTagText.includes(needle));
   const input: CostBudgetInput = {
     tagComplexity: 0,
     battlefieldInfluence: 1,
@@ -389,42 +392,46 @@ export function estimateCostFromTags(tags: readonly string[]): CostBudgetResult 
     consistencyPenalty: 0,
     hasDivineNature: containsAny('thần tính', 'divine'),
   };
+  const addScore = (key: ScoreKey, delta: number): void => {
+    const current = typeof input[key] === 'number' ? (input[key] as number) : 0;
+    input[key] = current + delta;
+  };
 
   if (has('quy-tac') || containsAny('quy tắc')){
-    input.tagComplexity = (input.tagComplexity ?? 0) + 3;
-    input.battlefieldInfluence = (input.battlefieldInfluence ?? 0) + 2;
+    addScore('tagComplexity', 3);
+    addScore('battlefieldInfluence', 2);
   }
   if (has('phap-tac') || containsAny('pháp tắc')){
-    input.tagComplexity = (input.tagComplexity ?? 0) + 2;
-    input.battlefieldInfluence = (input.battlefieldInfluence ?? 0) + 1;
+    addScore('tagComplexity', 2);
+    addScore('battlefieldInfluence', 1);
   }
   if (has('tuyet-doi') || containsAny('tuyệt đối', 'absolute')){
-    input.tagComplexity = (input.tagComplexity ?? 0) + 1;
+    addScore('tagComplexity', 1);
   }
   if (containsAny('aoe', 'toàn sân', 'global')){
-    input.battlefieldInfluence = (input.battlefieldInfluence ?? 0) + 2;
+    addScore('battlefieldInfluence', 2);
   }
   if (containsAny('buff', 'debuff', 'heal', 'shield', 'hồi')){
-    input.tacticalFlexibility = (input.tacticalFlexibility ?? 0) + 1;
+    addScore('tacticalFlexibility', 1);
   }
   if (containsAny('summon', 'triệu hồi')){
-    input.tacticalFlexibility = (input.tacticalFlexibility ?? 0) + 1;
-    input.setupPenalty = (input.setupPenalty ?? 0) + 1;
+    addScore('tacticalFlexibility', 1);
+    addScore('setupPenalty', 1);
   }
   if (containsAny('cost', 'aether', 'nộ', 'energy', 'resource')){
-    input.economyPressure = (input.economyPressure ?? 0) + 1;
+    addScore('economyPressure', 1);
   }
   if (containsAny('vĩnh viễn', 'stack', 'tiến hóa', 'evolve', 'evolution')){
-    input.scalingCeiling = (input.scalingCeiling ?? 0) + 2;
+    addScore('scalingCeiling', 2);
   }
   if (containsAny('friendly fire', 'không phân địch ta', 'toàn bộ sinh vật', 'tự tổn thương', 'self-debuff', 'self debuff')){
-    input.selfRiskPenalty = (input.selfRiskPenalty ?? 0) + 2;
+    addScore('selfRiskPenalty', 2);
   }
   if (containsAny('biến mất', 'removed', 'vanish', 'out trận')){
-    input.vanishRiskPenalty = (input.vanishRiskPenalty ?? 0) + 2;
+    addScore('vanishRiskPenalty', 2);
   }
   if (containsAny('ngẫu nhiên', 'random')){
-    input.consistencyPenalty = (input.consistencyPenalty ?? 0) + 1;
+    addScore('consistencyPenalty', 1);
   }
 
   return evaluateCostBudget(input);

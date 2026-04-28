@@ -1,5 +1,3 @@
-//home (termux)/arclune_lane_7x3/src/data/skills.ts
-
 import { z } from 'zod';
 
 import { ROSTER } from '../catalog.ts';
@@ -53,21 +51,34 @@ function normalizeNotes(notes: SkillSection['notes'] | string | null | undefined
   return undefined;
 }
 
-function normalizeSection(section: SkillSection | string | null | undefined): SkillSection | null{
-  if (!section) return null;
-  if (typeof section === 'string'){
-    return normalizeSkillEntry({ name: '', description: section, type: 'active' } as SkillSection);
-  }
-  return normalizeSkillEntry(section);
+function toStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string');
 }
 
-function normalizeSkillEntry(entry: SkillSection | null | undefined): SkillSection | null{
-  if (!entry) return null;
-  const normalized: SkillSection = { ...entry };
-  normalized.tags = ensureDomainTags(entry.tags ?? [], fallbackKitTag(entry.type ?? null));
-  if (entry.cost && typeof entry.cost === 'object'){
-    normalized.cost = { ...entry.cost };
+function cloneCost(cost: unknown): SkillSection['cost'] | undefined {
+  if (!isUnknownRecord(cost)) return undefined;
+  return { ...cost };
+}
+
+function normalizeSection(
+  section: SkillSection | string | null | undefined,
+  fallbackType: SkillSection['type'] = 'active',
+): SkillSection | null{
+  if (!section) return null;
+  if (typeof section === 'string'){
+    return normalizeSkillEntry({ name: '', description: section, type: fallbackType } as SkillSection, fallbackType);
   }
+  return normalizeSkillEntry(section, fallbackType);
+}
+
+function normalizeSkillEntry(entry: SkillSection | null | undefined, fallbackType: SkillSection['type'] = 'active'): SkillSection | null{
+  if (!entry) return null;
+  const type = entry.type ?? fallbackType;
+  const normalized: SkillSection = { ...entry };
+  normalized.type = type;
+  normalized.tags = ensureDomainTags(entry.tags ?? [], fallbackKitTag(type));
+  normalized.cost = cloneCost(entry.cost);
   normalized.notes = normalizeNotes(entry.notes);
   return normalized;
 }
@@ -97,21 +108,19 @@ function toSkillSection(value: unknown, fallbackType: SkillSection['type'] = 'ac
   const description = typeof value.description === 'string'
     ? value.description
     : (typeof value.notes === 'string' ? value.notes : '');
-  const tags = Array.isArray(value.tags) ? value.tags.filter((tag): tag is string => typeof tag === 'string') : [];
+  const tags = toStringArray(value.tags);
   const section: SkillSection = {
     ...value,
     name,
     type,
     description,
-    tags: ensureDomainTags(tags, fallbackKitTag(type))
+    tags
   } as SkillSection;
-  if (isUnknownRecord(value.cost)){
-    section.cost = { ...value.cost };
-  }
+  section.cost = cloneCost(value.cost);
   section.notes = Array.isArray(value.notes)
-    ? value.notes.filter((note): note is string => typeof note === 'string')
-    : normalizeNotes(typeof value.notes === 'string' ? value.notes : undefined);
-  return section;
+    ? toStringArray(value.notes)
+    : normalizeNotes(value.notes);
+  return normalizeSkillEntry(section, fallbackType);
 }
 
 function buildBaseSkillSetsFromRoster(): Record<UnitId, SkillEntry>{
@@ -131,7 +140,6 @@ function buildBaseSkillSetsFromRoster(): Record<UnitId, SkillEntry>{
       technique: toSkillSection(kitRecord.technique, 'technique'),
       notes: []
     };
-    deepFreeze(normalized);
     acc[unitId] = normalized;
     return acc;
   }, {});
@@ -148,6 +156,7 @@ function collectUnknownSkillTags(skill: SkillSection | null | undefined): string
   return listUnknownTags(skill.tags);
 }
 
+const SKILL_SECTION_KEYS = ['basic', 'skill', 'ult', 'talent', 'technique'] as const satisfies ReadonlyArray<keyof SkillEntry>;
 const SKILL_KEYS = ['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes'] as const satisfies ReadonlyArray<keyof SkillEntry | 'skill'>;
 
 const skillSets: Readonly<Record<UnitId, SkillEntry>> = rawSkillSets.reduce<Record<UnitId, SkillEntry>>((acc, entry) => {
@@ -169,25 +178,18 @@ const skillSets: Readonly<Record<UnitId, SkillEntry>> = rawSkillSets.reduce<Reco
     : (('skills' in entry) ? (skills[0] ?? null) : (current.skill ?? skills[0] ?? null));
   const normalized: SkillEntry = {
     unitId: entry.unitId,
-    basic: ('basic' in entry) ? normalizeSection(entry.basic) : current.basic,
+    basic: ('basic' in entry) ? normalizeSection(entry.basic, 'basic') : current.basic,
     skill,
     skills,
-    ult: ('ult' in entry) ? normalizeSection(entry.ult) : current.ult,
-    talent: ('talent' in entry) ? normalizeSection(entry.talent) : current.talent,
-    technique: ('technique' in entry) ? normalizeSection(entry.technique) : current.technique,
+    ult: ('ult' in entry) ? normalizeSection(entry.ult, 'ultimate') : current.ult,
+    talent: ('talent' in entry) ? normalizeSection(entry.talent, 'talent') : current.talent,
+    technique: ('technique' in entry) ? normalizeSection(entry.technique, 'technique') : current.technique,
     notes: ('notes' in entry)
-      ? (Array.isArray(entry.notes) ? [...entry.notes] : (entry.notes ? [entry.notes] : []))
+      ? (normalizeNotes(entry.notes) ?? [])
       : current.notes
   };
-  deepFreeze(normalized);
-  const unknownTags = [
-    ...collectUnknownSkillTags(normalized.basic),
-    ...collectUnknownSkillTags(normalized.skill),
-    ...collectUnknownSkillTags(normalized.ult),
-    ...collectUnknownSkillTags(normalized.talent),
-    ...collectUnknownSkillTags(normalized.technique),
-    ...normalized.skills.flatMap(collectUnknownSkillTags),
-  ];
+  const unknownTags = SKILL_SECTION_KEYS.flatMap((key) => collectUnknownSkillTags(normalized[key]))
+    .concat(normalized.skills.flatMap(collectUnknownSkillTags));
   if (unknownTags.length){
     const uniqueUnknown = Array.from(new Set(unknownTags));
     console.warn(`[skills] Unknown tag(s) for ${entry.unitId}: ${uniqueUnknown.join(', ')}`);
@@ -262,10 +264,10 @@ function collectValidationIssues(): SkillTagValidationIssue[]{
   };
 
   for (const entry of Object.values(skillSets)){
-    if (entry.basic) pushIssue(entry.unitId, 'basic', entry.basic.tags ?? []);
-    if (entry.skill) pushIssue(entry.unitId, 'skill', entry.skill.tags ?? []);
-    if (entry.ult) pushIssue(entry.unitId, 'ult', entry.ult.tags ?? []);
-    if (entry.talent) pushIssue(entry.unitId, 'talent', entry.talent.tags ?? []);
+    for (const key of SKILL_SECTION_KEYS){
+      const section = entry[key];
+      if (section) pushIssue(entry.unitId, key, section.tags ?? []);
+    }
     if (Array.isArray(entry.skills)){
       entry.skills.forEach((skill: SkillSection, index: number) => pushIssue(entry.unitId, `skills[${index}]`, skill.tags ?? []));
     }

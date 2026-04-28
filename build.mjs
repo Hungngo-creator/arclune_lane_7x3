@@ -23,6 +23,10 @@ const SCRIPT_EXTENSIONS = new Set(['.js', '.ts', '.tsx']);
 const STUB_MODULE_SPECIFIERS = new Map([
   ['zod', path.join(__dirname, 'tools/zod-stub/index.js')],
 ]);
+const IMPORT_FROM_REGEX = /import\s+(?!type\b)[\s\S]*?\s+from\s*['\"](.+?)['\"]/g;
+const EXPORT_FROM_REGEX = /export\s+(?:\*|{[\s\S]*?})\s+from\s*['\"](.+?)['\"]/g;
+const IMPORT_SIDE_EFFECT_REGEX = /import\s*['\"](.+?)['\"]/g;
+const DYNAMIC_IMPORT_REGEX = /import\(\s*['\"](.+?)['\"]\s*\)/g;
 
 async function copyDirectoryRecursive(fromDir, toDir){
   const entries = await fs.readdir(fromDir, { withFileTypes: true });
@@ -216,6 +220,33 @@ const ESBUILD_TRANSFORM_MINIFY_OPTIONS = ENABLE_RUNTIME_OPTIMIZATIONS
       minifyIdentifiers: false,
       minifyWhitespace: false,
     };
+    const ESBUILD_TRANSFORM_OPTIONS = {
+  platform: ESBUILD_BASE_OPTIONS.platform,
+  format: ESBUILD_BASE_OPTIONS.format,
+  target: ESBUILD_BASE_OPTIONS.target,
+  sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
+  treeShaking: ESBUILD_BASE_OPTIONS.treeShaking,
+  define: ESBUILD_DEFINE,
+  legalComments: ESBUILD_BASE_OPTIONS.legalComments,
+  ...ESBUILD_TRANSFORM_MINIFY_OPTIONS,
+};
+
+function loaderForExtension(ext){
+  if (ext === '.ts') return 'ts';
+  if (ext === '.tsx') return 'tsx';
+  return 'js';
+}
+
+async function transformIfScript(raw, ext){
+  if (!SCRIPT_EXTENSIONS.has(ext)){
+    return raw;
+  }
+  const { code } = await esbuild.transform(raw, {
+    loader: loaderForExtension(ext),
+    ...ESBUILD_TRANSFORM_OPTIONS,
+  });
+  return code;
+}
 
 const TS_CONFIG_PATH = path.join(__dirname, 'tsconfig.base.json');
 let TS_PATH_ALIASES = [];
@@ -352,12 +383,8 @@ async function listSourceFiles(){
 
 function extractRuntimeSpecifiers(sourceCode){
   const specifiers = [];
-  const importFromRegex = /import\s+(?!type\b)[\s\S]*?\s+from\s*['\"](.+?)['\"]/g;
-  const exportFromRegex = /export\s+(?:\*|{[\s\S]*?})\s+from\s*['\"](.+?)['\"]/g;
-  const importSideEffectRegex = /import\s*['\"](.+?)['\"]/g;
-  const dynamicImportRegex = /import\(\s*['\"](.+?)['\"]\s*\)/g;
-
-  for (const regex of [importFromRegex, exportFromRegex, importSideEffectRegex, dynamicImportRegex]){
+  for (const regex of [IMPORT_FROM_REGEX, EXPORT_FROM_REGEX, IMPORT_SIDE_EFFECT_REGEX, DYNAMIC_IMPORT_REGEX]){
+    regex.lastIndex = 0;
     let match;
     while ((match = regex.exec(sourceCode)) !== null){
       specifiers.push(match[1]);
@@ -371,14 +398,15 @@ function collectReachableModuleIds(entryModuleId, sourceFiles){
   const fileByModuleId = new Map(sourceFiles.map((file) => [toModuleId(file), file]));
   const visited = new Set();
   const queue = [entryModuleId];
+  let queueIndex = 0;
 
   for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
     const stubModuleId = toModuleId(stubPath);
     fileByModuleId.set(stubModuleId, stubPath);
   }
 
-  while (queue.length > 0){
-    const currentId = applyLegacyModuleAlias(queue.shift());
+  while (queueIndex < queue.length){
+    const currentId = applyLegacyModuleAlias(queue[queueIndex++]);
     if (!currentId || visited.has(currentId)){
       continue;
     }
@@ -766,6 +794,11 @@ async function build(){
     console.log(`[build.mjs] Chế độ prune-unreachable bật: đóng gói ${reachableModuleIds.size}/${files.length} module từ điểm vào ${ENTRY_ID}.`);
   }
   const modules = [];
+  const moduleIds = new Set();
+  const pushModule = (id, code) => {
+    modules.push({ id, code });
+    moduleIds.add(id);
+  };
   for (const file of files){
     const id = toModuleId(file);
     if (reachableModuleIds && !reachableModuleIds.has(id)){
@@ -775,19 +808,12 @@ async function build(){
     const ext = path.extname(file);
     if (ext === '.json'){
       const normalizedJson = JSON.stringify(JSON.parse(raw));
-      const escaped = normalizedJson
-        .replace(/\\/g, '\\\\')
-        .replace(/'/g, "\\'")
-        .replace(/\r/g, '\\r')
-        .replace(/\n/g, '\\n')
-        .replace(/\u2028/g, '\\u2028')
-        .replace(/\u2029/g, '\\u2029');
       const moduleCode = [
-        `const data = JSON.parse('${escaped}');`,
+        `const data = ${normalizedJson};`,
         'module.exports = data;',
         'module.exports.default = data;',
       ].join('\n');
-      modules.push({ id, code: moduleCode });
+      pushModule(id, moduleCode);
       continue;
     }
     if (ext === '.css'){
@@ -796,27 +822,12 @@ async function build(){
         'module.exports = css;',
         'module.exports.default = css;',
       ].join('\n');
-      modules.push({ id, code: moduleCode });
+      pushModule(id, moduleCode);
       continue;
     }
-    let sourceCode = raw;
-    if (SCRIPT_EXTENSIONS.has(ext)){
-      const loader = ext === '.ts' ? 'ts' : ext === '.tsx' ? 'tsx' : 'js';
-      const { code } = await esbuild.transform(raw, {
-        loader,
-        platform: ESBUILD_BASE_OPTIONS.platform,
-        format: ESBUILD_BASE_OPTIONS.format,
-        target: ESBUILD_BASE_OPTIONS.target,
-        sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
-        treeShaking: ESBUILD_BASE_OPTIONS.treeShaking,
-        define: ESBUILD_DEFINE,
-        legalComments: ESBUILD_BASE_OPTIONS.legalComments,
-        ...ESBUILD_TRANSFORM_MINIFY_OPTIONS,
-      });
-      sourceCode = code;
-    }
-    const transformed = transformModule(sourceCode, id);
-    modules.push({ id, code: transformed });
+    const sourceCode = await transformIfScript(raw, ext);
+    const transformed = transformModule(sourceCode, 
+    pushModule(id, transformed);
   }
 
   for (const [, stubPath] of STUB_MODULE_SPECIFIERS){
@@ -824,29 +835,14 @@ async function build(){
     if (reachableModuleIds && !reachableModuleIds.has(moduleId)){
       continue;
     }
-    if (modules.some((mod) => mod.id === moduleId)){
+    if (moduleIds.has(moduleId)){
       continue;
     }
     const raw = await fs.readFile(stubPath, 'utf8');
     const ext = path.extname(stubPath);
-    let sourceCode = raw;
-    if (SCRIPT_EXTENSIONS.has(ext)){
-      const loader = ext === '.ts' ? 'ts' : ext === '.tsx' ? 'tsx' : 'js';
-      const { code } = await esbuild.transform(raw, {
-        loader,
-        platform: ESBUILD_BASE_OPTIONS.platform,
-        format: ESBUILD_BASE_OPTIONS.format,
-        target: ESBUILD_BASE_OPTIONS.target,
-        sourcemap: ESBUILD_BASE_OPTIONS.sourcemap,
-        treeShaking: ESBUILD_BASE_OPTIONS.treeShaking,
-        define: ESBUILD_DEFINE,
-        legalComments: ESBUILD_BASE_OPTIONS.legalComments,
-        ...ESBUILD_TRANSFORM_MINIFY_OPTIONS,
-      });
-      sourceCode = code;
-    }
+    const sourceCode = await transformIfScript(raw, ext);
     const transformed = transformModule(sourceCode, moduleId);
-    modules.push({ id: moduleId, code: transformed });
+    pushModule(moduleId, transformed);
   }
 
   await fs.mkdir(DIST_DIR, { recursive: true });

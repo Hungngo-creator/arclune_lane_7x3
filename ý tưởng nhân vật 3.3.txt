@@ -595,7 +595,7 @@ skill 3: niệm chú, hắc ám ma lực sẽ quấn lấy mọi summoner phe k�
 
 ultimate: triệu hồi 1 vùng hắc ám dưới chân mục tiêu (vfx), tấn công mục tiêu gây sát thương = 280% wil/atk, đòn đánh này bỏ qua 20% res/arm của mục tiêu, nếu mục tiêu có khiên cũng khiến khiên của họ mất 20% trước mới gây sát thương.
 
-49) 
+49) Niddhoggr (Hắc Long)
 nội tại: 
 
 

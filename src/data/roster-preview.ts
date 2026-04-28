@@ -1,5 +1,3 @@
-//home (termux)/arclune_lane_7x3/src/data/roster-preview.ts
-
 import { z } from 'zod';
 
 import { CLASS_BASE, RANK_MULT, ROSTER } from '../catalog.ts';
@@ -33,6 +31,9 @@ const STAT_ORDER: ReadonlyArray<string> = Object.freeze([
 const PRECISION: Readonly<Record<string, number>> = Object.freeze({
   ...rosterPreviewConfig.precision
 });
+const ROSTER_PREVIEW_META = Object.freeze(
+  ROSTER.map((unit) => ({ id: unit.id, name: unit.name }))
+);
 
 function roundStat(stat: string, value: number) {
   const precision = PRECISION[stat] ?? 1;
@@ -41,6 +42,13 @@ function roundStat(stat: string, value: number) {
 
 function roundTpValue(value: number) {
   return Math.round(value * 1e6) / 1e6;
+}
+
+function getClassBase(className: string | null | undefined): CatalogStatBlock {
+  return assertDefined(
+    CLASS_BASE[className as keyof typeof CLASS_BASE],
+    `Unknown class "${className ?? ''}"`
+  );
 }
 
 function sanitizeTpAllocation(tpAlloc: Record<string, number | null | undefined> = {}) {
@@ -55,22 +63,32 @@ function sanitizeTpAllocation(tpAlloc: Record<string, number | null | undefined>
   return clean;
 }
 
+function mapStatBlock(
+  stats: CatalogStatBlock,
+  transform: (stat: string, value: number) => number,
+): CatalogStatBlock {
+  const out: CatalogStatBlock = { ...stats };
+  for (const [stat, value] of Object.entries(stats) as Array<[string, number]>) {
+    out[stat] = transform(stat, value ?? 0);
+  }
+  return out;
+}
+
+function applyTpDelta(base: CatalogStatBlock, cleanTp: Record<string, number>): CatalogStatBlock {
+  return mapStatBlock(base, (stat, baseValue) => {
+    const delta = TP_DELTA[stat];
+    if (delta) {
+      return baseValue + delta * (cleanTp[stat] ?? 0);
+    }
+  return baseValue;
+  });
+}
+
 export function applyTpToBase(
   base: CatalogStatBlock,
   tpAlloc: Record<string, number | null | undefined> = {}
 ): CatalogStatBlock {
-  const cleanTp = sanitizeTpAllocation(tpAlloc);
-  const out: CatalogStatBlock = { ...base };
-  for (const [stat, baseValue] of Object.entries(base) as Array<[string, number]>) {
-    const delta = TP_DELTA[stat];
-    if (delta) {
-      const tp = cleanTp[stat] ?? 0;
-      out[stat] = (baseValue ?? 0) + delta * tp;
-    } else {
-      out[stat] = baseValue;
-    }
-  }
-  return out;
+  return applyTpDelta(base, sanitizeTpAllocation(tpAlloc));
 }
 
 function getRankMultiplier(rank: keyof typeof RANK_MULT) {
@@ -82,15 +100,12 @@ function getRankMultiplier(rank: keyof typeof RANK_MULT) {
 
 export function applyRankMultiplier(preRank: CatalogStatBlock, rank: keyof typeof RANK_MULT): CatalogStatBlock {
   const multiplier = getRankMultiplier(rank);
-  const out: CatalogStatBlock = { ...preRank };
-  for (const [stat, value] of Object.entries(preRank) as Array<[string, number]>) {
+  return mapStatBlock(preRank, (stat, value) => {
     if (stat === 'SPD') {
-      out[stat] = roundStat(stat, value ?? 0);
-      continue;
+      return roundStat(stat, value);
     }
-    out[stat] = roundStat(stat, (value ?? 0) * multiplier);
-  }
-  return out;
+    return roundStat(stat, value * multiplier);
+  });
 }
 
 export function computeFinalStats(
@@ -98,7 +113,7 @@ export function computeFinalStats(
   rank: keyof typeof RANK_MULT,
   tpAlloc: Record<string, number | null | undefined> = {}
 ): CatalogStatBlock {
-  const base = assertDefined(CLASS_BASE[className], `Unknown class "${className}"`);
+  const base = getClassBase(className);
   const preRank = applyTpToBase(base, tpAlloc);
   return applyRankMultiplier(preRank, rank);
 }
@@ -134,11 +149,10 @@ export function buildRosterPreviews(
 ): Record<string, RosterPreview> {
   const result: Record<string, RosterPreview> = {};
   for (const unit of ROSTER as ReadonlyArray<RosterUnitDefinition>) {
-    const base = CLASS_BASE[unit.class as keyof typeof CLASS_BASE];
-    if (!base) continue;
+    const base = getClassBase(unit.class);
     const derivedTp = tpAllocations?.[unit.id] ?? deriveTpFromMods(base, unit.mods);
     const cleanTp = sanitizeTpAllocation(derivedTp);
-    const preRank = applyTpToBase(base, cleanTp);
+    const preRank = applyTpDelta(base, cleanTp);
     const rankKey = unit.rank as keyof typeof RANK_MULT;
     const multiplier = getRankMultiplier(rankKey);
     const final = applyRankMultiplier(preRank, rankKey);
@@ -168,7 +182,7 @@ export function buildPreviewRows(
 ): RosterPreviewRow[] {
   return statsOrder.map((stat): RosterPreviewRow => ({
     stat,
-    values: ROSTER.map((unit) => {
+    values: ROSTER_PREVIEW_META.map((unit) => {
       const preview = previews[unit.id];
       return {
         id: unit.id,
@@ -181,13 +195,14 @@ export function buildPreviewRows(
   }));
 }
 
-export const ROSTER_TP_ALLOCATIONS = Object.fromEntries(
-  ROSTER.map((unit) => {
-    const base = CLASS_BASE[unit.class as keyof typeof CLASS_BASE];
-    return [unit.id, deriveTpFromMods(base, unit.mods)];
-  })
-) as Readonly<Record<string, Record<string, number>>>;
+export const ROSTER_TP_ALLOCATIONS: Readonly<Record<string, Record<string, number>>> = Object.freeze(
+  ROSTER.reduce<Record<string, Record<string, number>>>((acc, unit) => {
+    const base = getClassBase(unit.class);
+    acc[unit.id] = deriveTpFromMods(base, unit.mods);
+    return acc;
+  }, {})
+);
 
 export const ROSTER_PREVIEWS = buildRosterPreviews(ROSTER_TP_ALLOCATIONS);
 export const ROSTER_PREVIEW_ROWS = buildPreviewRows(ROSTER_PREVIEWS);
-export const STAT_KEYS = [...STAT_ORDER];
+export const STAT_KEYS = Object.freeze([...STAT_ORDER]);

@@ -1,5 +1,3 @@
-//home (termux)/arclune_lane_7x3/src/data/mode.ts
-
 import { getLotterySplit, getPityConfig, getShopTaxRate } from './economy.ts';
 
 import type {
@@ -356,21 +354,27 @@ interface ListModesOptions {
 }
 
 function hasMenuSection(mode: ModeConfig, sectionId: string): boolean {
-  const sections = Array.isArray(mode.menuSections) ? mode.menuSections as ReadonlyArray<string> : [];
-  return sections.some(section => section === sectionId);
+  return Array.isArray(mode.menuSections) && mode.menuSections.includes(sectionId);
+}
+
+function toIncludedStatusSet(includeStatuses?: ReadonlyArray<ModeStatus>): ReadonlySet<ModeStatus> | null {
+  if (!Array.isArray(includeStatuses) || includeStatuses.length === 0) return null;
+  return new Set(includeStatuses);
+}
+
+function shouldIncludeMode(mode: ModeConfig, includeSet: ReadonlySet<ModeStatus> | null): boolean {
+  if (!includeSet) return true;
+  return includeSet.has(mode.status);
+}
+
+function listModesForSectionWithSet(sectionId: string, includeSet: ReadonlySet<ModeStatus> | null): ModeConfig[] {
+  return MODES.filter(mode => {
+    return hasMenuSection(mode, sectionId) && shouldIncludeMode(mode, includeSet);
+  });
 }
 
 function listModesForSection(sectionId: string, options: ListModesOptions = {}): ModeConfig[]{
-  const { includeStatuses } = options;
-  return MODES.filter(mode => {
-    if (!hasMenuSection(mode, sectionId)){
-      return false;
-    }
-    if (Array.isArray(includeStatuses) && includeStatuses.length > 0){
-      return includeStatuses.includes(mode.status);
-    }
-    return true;
-  });
+  return listModesForSectionWithSet(sectionId, toIncludedStatusSet(options.includeStatuses));
 }
 
 type MenuSectionEntryDefinition = {
@@ -381,17 +385,13 @@ type MenuSectionEntryDefinition = {
 };
 
 function getMenuSections(options: ListModesOptions = {}){
-  const { includeStatuses } = options;
-  const includeSet = Array.isArray(includeStatuses) && includeStatuses.length > 0
-    ? new Set(includeStatuses)
-    : null;
+  const includeSet = toIncludedStatusSet(options.includeStatuses);
 
   const filterChildModeIds = (childIds: ReadonlyArray<string> = []) => {
     return childIds.filter(childId => {
       const mode = MODE_INDEX[childId];
       if (!mode) return false;
-      if (includeSet && !includeSet.has(mode.status)) return false;
-      return true;
+      return shouldIncludeMode(mode, includeSet);
     });
   };
   return MENU_SECTION_DEFINITIONS.map(section => {
@@ -409,7 +409,7 @@ function getMenuSections(options: ListModesOptions = {}){
       });
     });
 
-    const standaloneModes = listModesForSection(section.id, { includeStatuses })
+    const standaloneModes = listModesForSectionWithSet(section.id, includeSet)
       .filter(mode => !mode.parentId);
 
     standaloneModes.forEach(mode => {

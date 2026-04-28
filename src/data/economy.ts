@@ -1,5 +1,3 @@
-//home (termux)/arclune_lane_7x3/src/data/economy.ts
-
 import { z } from 'zod';
 
 import { HAS_INTL_NUMBER_FORMAT, createNumberFormatter } from '../utils/format.ts';
@@ -45,8 +43,9 @@ const PityEntrySchema = z.object({
   softGuarantees: z.array(PityRuleSchema)
 });
 
-const PityTierSchema = z.enum(['SSR', 'UR', 'PRIME']);
-type PityTier = z.infer<typeof PityTierSchema>;
+const PITY_TIERS = ['SSR', 'UR', 'PRIME'] as const;
+type PityTier = typeof PITY_TIERS[number];
+const PityTierSchema = z.enum([...PITY_TIERS] as [PityTier, ...PityTier[]]);
 
 const PityConfigSchema = z.object({
   SSR: PityEntrySchema,
@@ -93,10 +92,9 @@ for (const [tier, entry] of pityEntries){
   }
 }
 
-const currencyIdMap = {} as Record<CurrencyId, CurrencyId>;
-for (const id of currencyIdValues){
-  currencyIdMap[id] = id;
-}
+const currencyIdMap = Object.fromEntries(
+  currencyIdValues.map((id) => [id, id])
+) as Record<CurrencyId, CurrencyId>;
 
 export const CURRENCY_ORDER: ReadonlyArray<CurrencyId> = Object.freeze([...currencyIdValues]);
 
@@ -108,11 +106,18 @@ const CURRENCY_IDS = Object.freeze({
 const CURRENCIES: ReadonlyArray<CurrencyDefinition> = Object.freeze(
   economyConfig.currencies.map((currency) => Object.freeze({ ...currency }))
 );
+const SORTED_CURRENCIES_BY_RATIO = Object.freeze(
+  [...CURRENCIES].sort((a, b) => a.ratioToBase - b.ratioToBase)
+);
 
-const CURRENCY_INDEX: Readonly<Record<string, CurrencyDefinition>> = CURRENCIES.reduce<Record<string, CurrencyDefinition>>((acc, currency) => {
-  acc[currency.id] = currency;
-  return acc;
-}, {});
+function indexBy<T>(items: ReadonlyArray<T>, getKey: (item: T) => string): Readonly<Record<string, T>> {
+  return items.reduce<Record<string, T>>((acc, item) => {
+    acc[getKey(item)] = item;
+    return acc;
+  }, {});
+}
+
+const CURRENCY_INDEX: Readonly<Record<string, CurrencyDefinition>> = indexBy(CURRENCIES, (currency) => currency.id);
 
 function getCurrency(currencyId: string): CurrencyDefinition | null {
   return CURRENCY_INDEX[currencyId] ?? null;
@@ -142,7 +147,7 @@ if (HAS_INTL_NUMBER_FORMAT){
       maximumFractionDigits: 1
     });
     HAS_COMPACT_FORMAT = true;
-  } catch (error) {
+  } catch {
     FORMATTER_COMPACT = FORMATTER_STANDARD;
   }
 }
@@ -171,9 +176,8 @@ function formatBalance(value: number, currencyId: string, options: FormatBalance
   let suffix = currency.suffix;
 
   if (autoScale){
-    const ordered = [...CURRENCIES].sort((a, b) => a.ratioToBase - b.ratioToBase);
-    for (let i = ordered.length - 1; i >= 0; i -= 1){
-      const candidate = ordered[i];
+    for (let i = SORTED_CURRENCIES_BY_RATIO.length - 1; i >= 0; i -= 1){
+      const candidate = SORTED_CURRENCIES_BY_RATIO[i];
       if (!candidate) continue;
       const inCandidate = convertCurrency(value, currency.id, candidate.id);
       if (Math.abs(inCandidate) >= 1){
@@ -251,9 +255,8 @@ const PITY_CONFIG: Readonly<Record<PityTier, PityConfiguration>> = Object.freeze
     ])
   ) as Record<PityTier, PityConfiguration>
 );
-
 function isPityTier(tier: string): tier is PityTier {
-  return tier in PITY_CONFIG;
+  return PITY_TIERS.includes(tier as PityTier);
 }
 
 function getPityConfig(tier: string): PityConfiguration | null {
@@ -264,17 +267,14 @@ function getPityConfig(tier: string): PityConfiguration | null {
 }
 
 function listPityTiers(): string[] {
-  return Object.keys(PITY_CONFIG);
+  return [...PITY_TIERS];
 }
 
 const SHOP_TAX_BRACKETS: ReadonlyArray<ShopTaxBracket> = Object.freeze(
   economyConfig.shopTaxBrackets.map((bracket) => Object.freeze({ ...bracket }))
 );
 
-const SHOP_TAX_INDEX: Readonly<Record<string, ShopTaxBracket>> = SHOP_TAX_BRACKETS.reduce<Record<string, ShopTaxBracket>>((acc, bracket) => {
-  acc[bracket.rank] = bracket;
-  return acc;
-}, {});
+const SHOP_TAX_INDEX: Readonly<Record<string, ShopTaxBracket>> = indexBy(SHOP_TAX_BRACKETS, (bracket) => bracket.rank);
 
 function getShopTaxBracket(rank: string): ShopTaxBracket | null {
   return SHOP_TAX_INDEX[rank] ?? null;

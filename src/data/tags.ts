@@ -18,6 +18,15 @@ export interface TagDefinition {
 export type TagAliasVersion = 'v1';
 
 export const CURRENT_TAG_ALIAS_VERSION: TagAliasVersion = 'v1';
+const TAG_DOMAINS: ReadonlyArray<TagDomain> = Object.freeze([
+  'timing',
+  'targeting',
+  'delivery',
+  'effect',
+  'resource',
+  'rule',
+  'kit',
+]);
 
 const TAG_DEFINITIONS = [
   { id: 'instant', label: 'Lập tức', domain: 'timing', aliases: ['instant-cast', 'instantCast', 'lap_tuc'] },
@@ -74,7 +83,7 @@ const normalizeKey = (value: string): string => value.trim().toLowerCase();
 const TAG_BY_ID = new Map<string, TagDefinition>();
 for (const definition of TAG_DEFINITIONS){
   TAG_BY_ID.set(normalizeKey(definition.id), definition);
-  const aliases = 'aliases' in definition && Array.isArray(definition.aliases) ? definition.aliases : [];
+  const aliases = 'aliases' in definition ? (definition.aliases ?? []) : [];
   for (const alias of aliases){
     TAG_BY_ID.set(normalizeKey(alias), definition);
   }
@@ -126,24 +135,21 @@ for (const [version, aliases] of Object.entries(tagAliasesByVersion)){
 
 export const GAME_TAGS = Object.freeze(TAG_DEFINITIONS);
 
-export const TAG_IDS = Object.freeze(
-  Array.from(new Set(TAG_DEFINITIONS.map((definition) => definition.id)))
-);
+export const TAG_IDS = Object.freeze(TAG_DEFINITIONS.map((definition) => definition.id));
 
 export const TAG_IDS_BY_DOMAIN = Object.freeze(
-  TAG_DEFINITIONS.reduce<Record<TagDomain, ReadonlyArray<string>>>((acc, definition) => {
-    const current = acc[definition.domain] ?? [];
-    acc[definition.domain] = Object.freeze([...current, definition.id]);
-    return acc;
-  }, {
-    timing: [],
-    targeting: [],
-    delivery: [],
-    effect: [],
-    resource: [],
-    rule: [],
-    kit: [],
-  })
+  (() => {
+    const byDomain = {} as Record<TagDomain, string[]>;
+    for (const domain of TAG_DOMAINS){
+      byDomain[domain] = [];
+    }
+    for (const definition of TAG_DEFINITIONS){
+      byDomain[definition.domain].push(definition.id);
+    }
+    return Object.fromEntries(
+      TAG_DOMAINS.map((domain) => [domain, Object.freeze(byDomain[domain])])
+    ) as Record<TagDomain, ReadonlyArray<string>>;
+  })()
 );
 
 export const INSTANT_TAG_IDS = Object.freeze(['instant']);
@@ -202,11 +208,11 @@ export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined):
   const unknown = new Set<string>();
   for (const rawTag of tags){
     if (typeof rawTag !== 'string') continue;
-    const normalizedRaw = normalizeKey(rawTag);
-    if (!normalizedRaw) continue;
-    const normalized = normalizeTagId(rawTag);
-    if (!normalized || !TAG_BY_ID.has(normalizedRaw) && !TAG_BY_ID.has(normalized)){
-      unknown.add(rawTag.trim());
+    const trimmed = rawTag.trim();
+    if (!trimmed) continue;
+    const normalized = normalizeTagId(trimmed);
+    if (!normalized || !TAG_BY_ID.has(normalized)){
+      unknown.add(trimmed);
     }
   }
   return [...unknown];
@@ -214,5 +220,13 @@ export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined):
 
 export function hasAnyTag(haystack: ReadonlyArray<string>, needles: ReadonlyArray<string>): boolean{
   const normalizedHaystack = new Set(normalizeTagList(haystack));
-  return needles.some((needle) => normalizedHaystack.has(needle));
+  const normalizedNeedles = new Set<string>();
+  for (const needle of needles){
+    const normalizedNeedle = normalizeTagId(needle);
+    if (normalizedNeedle) normalizedNeedles.add(normalizedNeedle);
+  }
+  for (const normalizedNeedle of normalizedNeedles){
+    if (normalizedHaystack.has(normalizedNeedle)) return true;
+  }
+  return false;
 }
