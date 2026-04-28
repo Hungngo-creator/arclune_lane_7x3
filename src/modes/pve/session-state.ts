@@ -175,6 +175,8 @@ interface ResolveEnemyUnitsOptions {
   fallbackDeck?: ReadonlyArray<unknown> | null;
   unitProgressById?: ReadonlyMap<string, RuntimeUnitProgress> | null;
   collectionState?: CreateSessionOptions['collectionState'] | null;
+  modeKey?: string | null;
+  stageId?: string | null;
 }
 interface ResolvePlayerDeckOptions {
   preferredDeck: SessionState['unitsAll'];
@@ -302,7 +304,24 @@ export function resolveEnemyUnits(options: ResolveEnemyUnitsOptions): SessionSta
   return buildAICreepDeckFromLineup({
     lineup: lineupDeck,
     progressById,
+    creepIds: resolveCampaignStageCreepIds(options.modeKey, options.stageId, lineupDeck.length),
   });
+}
+
+function isCampaignJadeForestStage11(modeKey: string | null | undefined, stageId: string | null | undefined): boolean {
+  return modeKey === 'campaign' && stageId === '1-1';
+}
+
+function resolveCampaignStageCreepIds(
+  modeKey: string | null | undefined,
+  stageId: string | null | undefined,
+  lineupSize: number,
+): ReadonlyArray<string> | null {
+  if (!isCampaignJadeForestStage11(modeKey, stageId)) return null;
+  if (lineupSize <= 4) return Array.from({ length: 4 }, () => 'creep_3');
+  if (lineupSize <= 7) return Array.from({ length: 3 }, () => 'creep_2');
+  if (lineupSize <= 10) return Array.from({ length: 3 }, () => 'creep_1');
+  return Array.from({ length: 3 }, () => 'creep_1');
 }
 
 function resolvePlayerDeck(options: ResolvePlayerDeckOptions): {
@@ -624,6 +643,9 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
   const normalized = normalizeConfig(options);
   const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
   const modeKey = typeof normalized.modeKey === 'string' ? normalized.modeKey : null;
+  const stageId = typeof (normalized as { stageId?: unknown }).stageId === 'string'
+    ? String((normalized as { stageId?: unknown }).stageId)
+    : null;
   const sceneCfg = getSceneConfig(CFG);
   const sceneTheme = normalized.sceneTheme
     ?? sceneCfg?.CURRENT_THEME
@@ -656,6 +678,8 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
     fallbackDeck: DEFAULT_FALLBACK_DECK,
     unitProgressById,
     collectionState: normalized.collectionState ?? null,
+    modeKey,
+    stageId,
   });
 
   const requestedTurnMode = normalized.turnMode

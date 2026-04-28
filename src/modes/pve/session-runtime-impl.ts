@@ -2288,10 +2288,10 @@ function init(): boolean {
     if (!t.iid) t.iid = nextIid();
     if (t.id === 'leaderA' || t.id === 'leaderB'){
       Object.assign(t, {
-        hpMax: 1600,
-        hp: 1600,
-        arm: 0.12,
-        res: 0.12,
+        hpMax: 2600,
+        hp: 2600,
+        arm: 0.52,
+        res: 0.52,
         atk: 40,
         wil: 30,
         aeMax: 0,
@@ -2692,13 +2692,12 @@ function getShieldRatio(unit: UnitToken): number {
 }
 
 const CO_TRUONG_PHONG_ID = 'co_truong_phong';
-const CO_TRUONG_PHONG_MAX_SWORD_DOTS = 8;
 
-function readCoTruongPhongSwordDotCount(token: UnitToken): number {
+function readCoTruongPhongFlyingSwordCount(token: UnitToken): number {
   if (token.id !== CO_TRUONG_PHONG_ID) return 0;
   const swords = Math.floor(toFiniteOrZero((token as UnitToken & { _coTruongPhongFlyingSwords?: unknown })._coTruongPhongFlyingSwords));
   if (!Number.isFinite(swords) || swords <= 0) return 0;
-  return Math.min(CO_TRUONG_PHONG_MAX_SWORD_DOTS, swords);
+  return swords;
 }
 
 const {
@@ -2762,7 +2761,7 @@ function drawHPBars(): void {
 
     const hpRatio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
     const shieldRatio = getShieldRatio(t);
-    const swordDotCount = readCoTruongPhongSwordDotCount(t);
+    const swordCount = readCoTruongPhongFlyingSwordCount(t);
 
     const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.86)';
     const fillColor = art?.hpBar?.fill || '#48d267';
@@ -2816,24 +2815,20 @@ function drawHPBars(): void {
       drawCtx.restore();
     }
 
-    if (swordDotCount > 0) {
-      const drawableWidth = Math.max(8, barWidth - 4);
-      const baseDiameter = Math.max(2, Math.floor(Math.max(barHeight, 5) * 0.8));
-      const maxDiameterByWidth = Math.max(2, Math.floor((drawableWidth - ((swordDotCount - 1) * 1)) / swordDotCount));
-      const dotDiameter = Math.max(2, Math.min(baseDiameter, maxDiameterByWidth));
-      const dotRadius = dotDiameter / 2;
-      const dotGap = Math.max(1, Math.floor(dotDiameter * 0.6));
-      const dotsWidth = (swordDotCount * dotDiameter) + ((swordDotCount - 1) * dotGap);
-      const dotsStartX = hpX + barWidth - dotsWidth - 2;
-      const dotsY = hpY + (barHeight / 2);
+    if (swordCount > 0) {
+      const swordText = `${swordCount}`;
+      const swordFontPx = Math.max(5, Math.floor(barHeight * 0.7));
+      const swordGap = Math.max(3, Math.floor(barHeight * 0.35));
+      const swordCenterY = hpY + (barHeight / 2);
       drawCtx.save();
-      drawCtx.fillStyle = '#32d56b';
-      for (let i = 0; i < swordDotCount; i += 1) {
-        const dotX = dotsStartX + (i * (dotDiameter + dotGap)) + dotRadius;
-        drawCtx.beginPath();
-        drawCtx.arc(dotX, dotsY, dotRadius, 0, Math.PI * 2);
-        drawCtx.fill();
-      }
+      drawCtx.font = `700 ${swordFontPx}px system-ui, sans-serif`;
+      drawCtx.textAlign = 'right';
+      drawCtx.textBaseline = 'middle';
+      drawCtx.fillStyle = '#ffd24a';
+      drawCtx.strokeStyle = 'rgba(28, 14, 0, 0.92)';
+      drawCtx.lineWidth = Math.max(1, Math.floor(swordFontPx * 0.14));
+      drawCtx.strokeText(swordText, hpX - swordGap, swordCenterY);
+      drawCtx.fillText(swordText, hpX - swordGap, swordCenterY);
       drawCtx.restore();
     }
 

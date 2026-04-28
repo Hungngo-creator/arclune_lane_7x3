@@ -15543,6 +15543,7 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
       { id: 'creep_2', powerSlot: 1 },
       { id: 'creep_3', powerSlot: 0 },
   ];
+  const CREEP_POWER_SLOT_BY_ID = new Map(CREEP_SLOT_ORDER.map((entry) => [entry.id, entry.powerSlot]));
   const RANK_PRIORITY = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];
   const RANK_PRIORITY_SCORE = new Map(RANK_PRIORITY.map((rank, index) => [rank, index + 1]));
   const EMPTY_PROGRESS_BY_ID = new Map();
@@ -15733,11 +15734,26 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
       };
   }
   function buildAICreepDeckFromLineup(params) {
+      const configuredCreepIds = Array.isArray(params.creepIds) && params.creepIds.length > 0
+          ? params.creepIds.filter((value) => typeof value === 'string' && value.trim() !== '')
+          : null;
+      const creepIds = configuredCreepIds && configuredCreepIds.length > 0
+          ? configuredCreepIds
+          : CREEP_SLOT_ORDER.map((entry) => entry.id);
       const lineup = Array.isArray(params.lineup) ? params.lineup : [];
       if (lineup.length === 0) {
-          return DEFAULT_EMPTY_CREEP_DECK.map(entry => ({ ...entry }));
+          if (!configuredCreepIds || configuredCreepIds.length <= 0) {
+              return DEFAULT_EMPTY_CREEP_DECK.map(entry => ({ ...entry }));
+          }
+          return creepIds.map((creepId) => ({
+              id: creepId,
+              name: lookupUnit(creepId)?.name ?? creepId,
+              cost: 1,
+              dynamicRankSource: 'lineup',
+              dynamicLevelSource: 'lineup',
+          }));
       }
-      const creepCount = CREEP_SLOT_ORDER.length;
+      const creepCount = creepIds.length;
       const progressById = params.progressById
           ?? (lineup.length > 0
               ? mapUnitProgressById(params.collectionState ?? null)
@@ -15747,11 +15763,11 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
       const allocatedRanks = allocateRanksForCreeps(lineupSampling, creepCount);
       const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
       const allocatedCosts = allocateCostsForCreeps(lineupSampling.costs, creepCount);
-      return CREEP_SLOT_ORDER.map((creep) => {
-          const creepId = creep.id;
-          const profile = allocatedProgress[creep.powerSlot] ?? {};
-          const rank = allocatedRanks[creep.powerSlot] ?? null;
-          const cost = allocatedCosts[creep.powerSlot] ?? 1;
+      return creepIds.map((creepId) => {
+          const powerSlot = CREEP_POWER_SLOT_BY_ID.get(creepId) ?? 0;
+          const profile = allocatedProgress[powerSlot] ?? {};
+          const rank = allocatedRanks[powerSlot] ?? null;
+          const cost = allocatedCosts[powerSlot] ?? 1;
           return toCreepDeckEntry({
               creepId,
               profile,
@@ -19544,10 +19560,10 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               t.iid = nextIid();
           if (t.id === 'leaderA' || t.id === 'leaderB') {
               Object.assign(t, {
-                  hpMax: 1600,
-                  hp: 1600,
-                  arm: 0.12,
-                  res: 0.12,
+                  hpMax: 2600,
+                  hp: 2600,
+                  arm: 0.52,
+                  res: 0.52,
                   atk: 40,
                   wil: 30,
                   aeMax: 0,
@@ -19919,14 +19935,13 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       return Math.max(0, Math.min(1, shieldAmount / hpMax));
   }
   const CO_TRUONG_PHONG_ID = 'co_truong_phong';
-  const CO_TRUONG_PHONG_MAX_SWORD_DOTS = 8;
-  function readCoTruongPhongSwordDotCount(token) {
+  function readCoTruongPhongFlyingSwordCount(token) {
       if (token.id !== CO_TRUONG_PHONG_ID)
           return 0;
       const swords = Math.floor(toFiniteOrZero(token._coTruongPhongFlyingSwords));
       if (!Number.isFinite(swords) || swords <= 0)
           return 0;
-      return Math.min(CO_TRUONG_PHONG_MAX_SWORD_DOTS, swords);
+      return swords;
   }
   const { resolveStatusIcons: resolveStatusIconsForToken, } = createStatusIconResolver({
       fallbackIconPath: DEFAULT_STATUS_ICON_PATH,
@@ -19983,7 +19998,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           const statusStartX = Math.round(hpX + (barWidth - statusRowWidth) / 2);
           const hpRatio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
           const shieldRatio = getShieldRatio(t);
-          const swordDotCount = readCoTruongPhongSwordDotCount(t);
+          const swordCount = readCoTruongPhongFlyingSwordCount(t);
           const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.86)';
           const fillColor = art?.hpBar?.fill || '#48d267';
           const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.62)';
@@ -20031,24 +20046,20 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               drawCtx.fill();
               drawCtx.restore();
           }
-          if (swordDotCount > 0) {
-              const drawableWidth = Math.max(8, barWidth - 4);
-              const baseDiameter = Math.max(2, Math.floor(Math.max(barHeight, 5) * 0.8));
-              const maxDiameterByWidth = Math.max(2, Math.floor((drawableWidth - ((swordDotCount - 1) * 1)) / swordDotCount));
-              const dotDiameter = Math.max(2, Math.min(baseDiameter, maxDiameterByWidth));
-              const dotRadius = dotDiameter / 2;
-              const dotGap = Math.max(1, Math.floor(dotDiameter * 0.6));
-              const dotsWidth = (swordDotCount * dotDiameter) + ((swordDotCount - 1) * dotGap);
-              const dotsStartX = hpX + barWidth - dotsWidth - 2;
-              const dotsY = hpY + (barHeight / 2);
+          if (swordCount > 0) {
+              const swordText = `${swordCount}`;
+              const swordFontPx = Math.max(5, Math.floor(barHeight * 0.7));
+              const swordGap = Math.max(3, Math.floor(barHeight * 0.35));
+              const swordCenterY = hpY + (barHeight / 2);
               drawCtx.save();
-              drawCtx.fillStyle = '#32d56b';
-              for (let i = 0; i < swordDotCount; i += 1) {
-                  const dotX = dotsStartX + (i * (dotDiameter + dotGap)) + dotRadius;
-                  drawCtx.beginPath();
-                  drawCtx.arc(dotX, dotsY, dotRadius, 0, Math.PI * 2);
-                  drawCtx.fill();
-              }
+              drawCtx.font = `700 ${swordFontPx}px system-ui, sans-serif`;
+              drawCtx.textAlign = 'right';
+              drawCtx.textBaseline = 'middle';
+              drawCtx.fillStyle = '#ffd24a';
+              drawCtx.strokeStyle = 'rgba(28, 14, 0, 0.92)';
+              drawCtx.lineWidth = Math.max(1, Math.floor(swordFontPx * 0.14));
+              drawCtx.strokeText(swordText, hpX - swordGap, swordCenterY);
+              drawCtx.fillText(swordText, hpX - swordGap, swordCenterY);
               drawCtx.restore();
           }
           if (statusIcons.length > 0) {
@@ -20840,7 +20851,22 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       return buildAICreepDeckFromLineup({
           lineup: lineupDeck,
           progressById,
+          creepIds: resolveCampaignStageCreepIds(options.modeKey, options.stageId, lineupDeck.length),
       });
+  }
+  function isCampaignJadeForestStage11(modeKey, stageId) {
+      return modeKey === 'campaign' && stageId === '1-1';
+  }
+  function resolveCampaignStageCreepIds(modeKey, stageId, lineupSize) {
+      if (!isCampaignJadeForestStage11(modeKey, stageId))
+          return null;
+      if (lineupSize <= 4)
+          return Array.from({ length: 4 }, () => 'creep_3');
+      if (lineupSize <= 7)
+          return Array.from({ length: 3 }, () => 'creep_2');
+      if (lineupSize <= 10)
+          return Array.from({ length: 3 }, () => 'creep_1');
+      return Array.from({ length: 3 }, () => 'creep_1');
   }
   function resolvePlayerDeck(options) {
       const { preferredDeck, fallbackSingleDeck, defaultRoster, unitProgressById } = options;
@@ -21099,6 +21125,9 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
       const normalized = normalizeConfig(options);
       const unitProgressById = mapUnitProgressById(normalized.collectionState ?? null);
       const modeKey = typeof normalized.modeKey === 'string' ? normalized.modeKey : null;
+      const stageId = typeof normalized.stageId === 'string'
+          ? String(normalized.stageId)
+          : null;
       const sceneCfg = getSceneConfig(CFG);
       const sceneTheme = normalized.sceneTheme
           ?? sceneCfg?.CURRENT_THEME
@@ -21124,6 +21153,8 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
           fallbackDeck: DEFAULT_FALLBACK_DECK,
           unitProgressById,
           collectionState: normalized.collectionState ?? null,
+          modeKey,
+          stageId,
       });
       const requestedTurnMode = normalized.turnMode
           ?? normalized.turn?.mode

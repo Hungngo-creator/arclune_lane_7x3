@@ -34,6 +34,9 @@ const CREEP_SLOT_ORDER = [
   { id: 'creep_2', powerSlot: 1 },
   { id: 'creep_3', powerSlot: 0 },
 ] as const;
+const CREEP_POWER_SLOT_BY_ID = new Map<string, number>(
+  CREEP_SLOT_ORDER.map((entry) => [entry.id, entry.powerSlot]),
+);
 const RANK_PRIORITY = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'] as const;
 const RANK_PRIORITY_SCORE = new Map<string, number>(
   RANK_PRIORITY.map((rank, index) => [rank, index + 1]),
@@ -250,12 +253,28 @@ export function buildAICreepDeckFromLineup(params: {
   lineup: ReadonlyArray<PveDeckEntry>;
   collectionState?: CollectionStateInput | null;
   progressById?: ReadonlyMap<string, RuntimeUnitProgress> | null;
+  creepIds?: ReadonlyArray<string> | null;
 }): PveDeckEntry[] {
+  const configuredCreepIds = Array.isArray(params.creepIds) && params.creepIds.length > 0
+    ? params.creepIds.filter((value): value is string => typeof value === 'string' && value.trim() !== '')
+    : null;
+  const creepIds = configuredCreepIds && configuredCreepIds.length > 0
+    ? configuredCreepIds
+    : CREEP_SLOT_ORDER.map((entry) => entry.id);
   const lineup = Array.isArray(params.lineup) ? params.lineup : [];
   if (lineup.length === 0) {
-    return DEFAULT_EMPTY_CREEP_DECK.map(entry => ({ ...entry }));
+    if (!configuredCreepIds || configuredCreepIds.length <= 0) {
+      return DEFAULT_EMPTY_CREEP_DECK.map(entry => ({ ...entry }));
+    }
+    return creepIds.map((creepId) => ({
+      id: creepId,
+      name: lookupUnit(creepId)?.name ?? creepId,
+      cost: 1,
+      dynamicRankSource: 'lineup',
+      dynamicLevelSource: 'lineup',
+    } satisfies PveDeckEntry));
   }
-  const creepCount = CREEP_SLOT_ORDER.length;
+  const creepCount = creepIds.length;
   const progressById = params.progressById
     ?? (lineup.length > 0
       ? mapUnitProgressById(params.collectionState ?? null)
@@ -266,11 +285,11 @@ export function buildAICreepDeckFromLineup(params: {
   const allocatedProgress = allocateProgressForCreeps(lineupSampling.progressProfiles, creepCount);
   const allocatedCosts = allocateCostsForCreeps(lineupSampling.costs, creepCount);
 
-  return CREEP_SLOT_ORDER.map((creep) => {
-    const creepId = creep.id;
-    const profile = allocatedProgress[creep.powerSlot] ?? {};
-    const rank = allocatedRanks[creep.powerSlot] ?? null;
-    const cost = allocatedCosts[creep.powerSlot] ?? 1;
+  return creepIds.map((creepId) => {
+    const powerSlot = CREEP_POWER_SLOT_BY_ID.get(creepId) ?? 0;
+    const profile = allocatedProgress[powerSlot] ?? {};
+    const rank = allocatedRanks[powerSlot] ?? null;
+    const cost = allocatedCosts[powerSlot] ?? 1;
     return toCreepDeckEntry({
       creepId,
       profile,
