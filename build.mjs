@@ -28,6 +28,13 @@ const IMPORT_FROM_REGEX = /import\s+(?!type\b)[\s\S]*?\s+from\s*['\"](.+?)['\"]/
 const EXPORT_FROM_REGEX = /export\s+(?:\*|{[\s\S]*?})\s+from\s*['\"](.+?)['\"]/g;
 const IMPORT_SIDE_EFFECT_REGEX = /import\s*['\"](.+?)['\"]/g;
 const DYNAMIC_IMPORT_REGEX = /import\(\s*['\"](.+?)['\"]\s*\)/g;
+const NORMALIZED_MODULE_ID_CACHE = new Map();
+function cacheNormalizedModuleId(rawId, normalizedId, normalizedSource){
+  NORMALIZED_MODULE_ID_CACHE.set(rawId, normalizedId);
+  if (typeof normalizedSource === 'string'){
+    NORMALIZED_MODULE_ID_CACHE.set(normalizedSource, normalizedId);
+  }
+}
 
 async function copyDirectoryRecursive(fromDir, toDir){
   const entries = await fs.readdir(fromDir, { withFileTypes: true });
@@ -64,15 +71,29 @@ function normalizeModuleId(id){
     return id;
   }
   const normalizedSlashes = id.replace(/\\/g, '/');
+  const cached = NORMALIZED_MODULE_ID_CACHE.get(id);
+  if (typeof cached === 'string'){
+    return cached;
+  }
+  const normalizedCached = NORMALIZED_MODULE_ID_CACHE.get(normalizedSlashes);
+  if (typeof normalizedCached === 'string'){
+    cacheNormalizedModuleId(id, normalizedCached, normalizedSlashes);
+    return normalizedCached;
+  }
+  let normalizedResult = normalizedSlashes;
   if (path.isAbsolute(id)){
     const rel = path.relative(SRC_DIR, id);
     if (rel && !rel.startsWith('..') && !path.isAbsolute(rel)){
-      return `./${rel.split(path.sep).join('/')}`;
+      normalizedResult = `./${rel.split(path.sep).join('/')}`;
+      cacheNormalizedModuleId(id, normalizedResult, normalizedSlashes);
+      return normalizedResult;
     }
-    return normalizedSlashes;
+    cacheNormalizedModuleId(id, normalizedResult, normalizedSlashes);
+    return normalizedResult;
   }
   if (!normalizedSlashes.startsWith('.')){
-    return normalizedSlashes;
+    cacheNormalizedModuleId(id, normalizedResult, normalizedSlashes);
+    return normalizedResult;
   }
 
   const trimmed = normalizedSlashes.startsWith('./') ? normalizedSlashes.slice(2) : normalizedSlashes;
@@ -83,12 +104,14 @@ function normalizeModuleId(id){
     if (resolved){
       const rel = path.relative(SRC_DIR, resolved);
       if (rel && !rel.startsWith('..') && !path.isAbsolute(rel)){
-        return `./${rel.split(path.sep).join('/')}`;
+        normalizedResult = `./${rel.split(path.sep).join('/')}`;
+        cacheNormalizedModuleId(id, normalizedResult, normalizedSlashes);
+        return normalizedResult;
       }
     }
   }
-
-  return normalizedSlashes;
+  cacheNormalizedModuleId(id, normalizedResult, normalizedSlashes);
+  return normalizedResult;
 }
 
 const LEGACY_MODULE_ID_ALIAS_ENTRIES = [

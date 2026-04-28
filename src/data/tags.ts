@@ -198,6 +198,19 @@ function collectNormalizedTagSet(
   return unique;
 }
 
+function collectNormalizedNeedleSet(
+  needles: ReadonlyArray<string> | null | undefined,
+  version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
+): Set<string> {
+  const normalizedNeedles = new Set<string>();
+  if (!Array.isArray(needles)) return normalizedNeedles;
+  for (const needle of needles){
+    const normalized = normalizeTagId(needle, version);
+    if (normalized) normalizedNeedles.add(normalized);
+  }
+  return normalizedNeedles;
+}
+
 export function resolveTagVersionAliases(
   tags: ReadonlyArray<string> | null | undefined,
   version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
@@ -219,7 +232,8 @@ export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined):
     if (typeof rawTag !== 'string') continue;
     const trimmed = rawTag.trim();
     if (!trimmed) continue;
-    if (!getTagDefinition(trimmed)){
+    const normalized = normalizeTagId(trimmed);
+    if (!normalized || !TAG_BY_ID.has(normalized)){
       unknown.add(trimmed);
     }
   }
@@ -231,9 +245,8 @@ export function hasAnyTag(haystack: ReadonlyArray<string>, needles: ReadonlyArra
     return false;
   }
   const normalizedHaystack = collectNormalizedTagSet(haystack);
-  for (const needle of needles){
-    const normalizedNeedle = normalizeTagId(needle);
-    if (!normalizedNeedle) continue;
+  const normalizedNeedles = collectNormalizedNeedleSet(needles);
+  for (const normalizedNeedle of normalizedNeedles){
     if (normalizedHaystack.has(normalizedNeedle)) return true;
   }
   return false;

@@ -124,19 +124,18 @@ export function deriveTpFromMods(
   mods: RosterUnitDefinition['mods'] = {}
 ): Record<string, number> {
   if (!mods) return {};
-  const tp: Record<string, number> = {};
+  const rawTp: Record<string, number> = {};
   for (const [stat, modValue] of Object.entries(mods) as Array<[string, number | null | undefined]>) {
     if (!hasTpDelta(stat)) continue;
     const baseValue = base[stat];
     if (typeof baseValue !== 'number') continue;
     const delta = TP_DELTA[stat] ?? 1;
     const raw = (baseValue * (modValue ?? 0)) / delta;
-    const rounded = roundTpValue(raw);
-    if (rounded !== 0) {
-      tp[stat] = rounded;
+    if (raw !== 0) {
+      rawTp[stat] = raw;
     }
   }
-  return tp;
+  return sanitizeTpAllocation(rawTp);
 }
 
 function totalTp(tpAlloc: Record<string, number> = {}) {
@@ -145,17 +144,28 @@ function totalTp(tpAlloc: Record<string, number> = {}) {
   );
 }
 
+function resolveUnitTpAllocation(
+  unit: RosterUnitDefinition,
+  providedAllocations?: Record<string, Record<string, number>>,
+): Record<string, number> {
+  const derivedTp = providedAllocations?.[unit.id];
+  if (derivedTp){
+    return sanitizeTpAllocation(derivedTp);
+  }
+  const base = getClassBase(unit.class);
+  return deriveTpFromMods(base, unit.mods);
+}
+
 export function buildRosterPreviews(
   tpAllocations: Record<string, Record<string, number>> | undefined = undefined
 ): Record<string, RosterPreview> {
   const result: Record<string, RosterPreview> = {};
   for (const unit of ROSTER as ReadonlyArray<RosterUnitDefinition>) {
     const base = getClassBase(unit.class);
-    const derivedTp = tpAllocations?.[unit.id] ?? deriveTpFromMods(base, unit.mods);
-    const cleanTp = sanitizeTpAllocation(derivedTp);
-    const preRank = applyTpDelta(base, cleanTp);
+    const cleanTp = resolveUnitTpAllocation(unit, tpAllocations);
     const rankKey = unit.rank as keyof typeof RANK_MULT;
     const multiplier = getRankMultiplier(rankKey);
+    const preRank = applyTpToBase(base, cleanTp);
     const final = applyRankMultiplier(preRank, rankKey);
     result[unit.id] = {
       id: unit.id,
@@ -198,8 +208,7 @@ export function buildPreviewRows(
 
 export const ROSTER_TP_ALLOCATIONS: Readonly<Record<string, Record<string, number>>> = Object.freeze(
   ROSTER.reduce<Record<string, Record<string, number>>>((acc, unit) => {
-    const base = getClassBase(unit.class);
-    acc[unit.id] = deriveTpFromMods(base, unit.mods);
+    acc[unit.id] = resolveUnitTpAllocation(unit);
     return acc;
   }, {})
 );

@@ -9285,6 +9285,18 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       'vanishRiskPenalty',
       'consistencyPenalty',
   ];
+  function calculateRuleDelta(rule, matchedTags, matchedKeywords) {
+      const scaledByTags = typeof rule.perTag === 'number' ? matchedTags * rule.perTag : 0;
+      const scaledByKeywords = typeof rule.perKeyword === 'number' ? matchedKeywords * rule.perKeyword : 0;
+      const baseKeywordDelta = matchedKeywords > 0 ? (rule.delta ?? 0) : 0;
+      const totalDelta = scaledByTags + scaledByKeywords + baseKeywordDelta;
+      if (totalDelta <= 0)
+          return 0;
+      if (typeof rule.cap === 'number') {
+          return Math.min(totalDelta, rule.cap);
+      }
+      return totalDelta;
+  }
   const RANK_BUDGET_BASE = Object.freeze({
       N: { tagComplexity: 0, battlefieldInfluence: 1, economyPressure: 0, scalingCeiling: 0, tacticalFlexibility: 1 },
       R: { tagComplexity: 1, battlefieldInfluence: 1, economyPressure: 0, scalingCeiling: 1, tacticalFlexibility: 1 },
@@ -9427,32 +9439,27 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       return (base ?? 0) + (delta ?? 0);
   }
   const COST_TAG_SCORE_RULES = Object.freeze([
-      { metric: 'tagComplexity', perTag: 1, cap: 4, tagIds: ['global-rule', 'absolute-attack', 'absolute-shield', 'divine-nature', 'unique-global'] },
-      { metric: 'tagComplexity', delta: 2, keywords: ['pháp tắc'] },
-      { metric: 'battlefieldInfluence', perTag: 2, cap: 5, tagIds: ['aoe', 'random-aoe', 'field', 'line', 'control', 'taunt', 'silence', 'poison'] },
-      { metric: 'battlefieldInfluence', delta: 1, tagIds: ['global-rule'], keywords: ['quy tắc', 'rule'] },
-      { metric: 'battlefieldInfluence', delta: 1, keywords: ['toàn sân', 'global'] },
-      { metric: 'economyPressure', delta: 1, perTag: 1, cap: 3, tagIds: ['aether-cost', 'mark', 'summon'], keywords: ['cost', 'aether', 'nộ', 'energy', 'resource'] },
-      { metric: 'scalingCeiling', delta: 1, perTag: 1, cap: 4, tagIds: ['stance', 'mark', 'chain', 'revive', 'execute', 'pierce'], keywords: ['vĩnh viễn', 'stack', 'tiến hóa', 'evolve', 'evolution'] },
-      { metric: 'tacticalFlexibility', perTag: 1, cap: 4, tagIds: ['support', 'self-buff', 'heal', 'team-heal', 'shield', 'revive', 'summon'] },
-      { metric: 'tacticalFlexibility', delta: 1, requiresAll: ['support', 'heal'], excludesAny: ['summon'] },
-      { metric: 'tacticalFlexibility', delta: 1, keywords: ['buff', 'debuff', 'hồi'] },
-      { metric: 'setupPenalty', delta: 1, perTag: 1, cap: 3, tagIds: ['summon', 'sleep', 'mark'], keywords: ['setup', 'triệu hồi', 'sleep'] },
-      { metric: 'selfRiskPenalty', delta: 2, keywords: ['friendly fire', 'không phân địch ta', 'toàn bộ sinh vật', 'tự tổn thương', 'self-debuff', 'self debuff'] },
-      { metric: 'vanishRiskPenalty', delta: 2, keywords: ['biến mất', 'removed', 'vanish', 'out trận'] },
-      { metric: 'consistencyPenalty', perTag: 1, cap: 3, tagIds: ['random-target', 'random-aoe'], keywords: ['ngẫu nhiên', 'random', 'coin flip', 'coin-flip'] },
-      { metric: 'battlefieldInfluence', perTag: 1, cap: 2, tagIds: ['burst', 'execute'] },
+      { id: 'complex-rule-core', label: 'Rule core tags', metric: 'tagComplexity', perTag: 1, cap: 4, tagIds: ['global-rule', 'absolute-attack', 'absolute-shield', 'divine-nature', 'unique-global'] },
+      { id: 'complex-rule-text', label: 'Rule-centric keywords', metric: 'tagComplexity', delta: 2, keywords: ['pháp tắc'] },
+      { id: 'zone-control', label: 'AoE and control pressure', metric: 'battlefieldInfluence', perTag: 2, cap: 5, tagIds: ['aoe', 'random-aoe', 'field', 'line', 'control', 'taunt', 'silence', 'poison'] },
+      { id: 'global-rule-influence', label: 'Global rule text', metric: 'battlefieldInfluence', delta: 1, tagIds: ['global-rule'], keywords: ['quy tắc', 'rule'] },
+      { id: 'global-influence-text', label: 'Global-scope text', metric: 'battlefieldInfluence', delta: 1, keywords: ['toàn sân', 'global'] },
+      { id: 'economy-resource-load', label: 'Resource pressure', metric: 'economyPressure', delta: 1, perTag: 1, cap: 3, tagIds: ['aether-cost', 'mark', 'summon'], keywords: ['cost', 'aether', 'nộ', 'energy', 'resource'] },
+      { id: 'scaling-growth', label: 'Scaling and growth tags', metric: 'scalingCeiling', delta: 1, perTag: 1, cap: 4, tagIds: ['stance', 'mark', 'chain', 'revive', 'execute', 'pierce'], keywords: ['vĩnh viễn', 'stack', 'tiến hóa', 'evolve', 'evolution'] },
+      { id: 'utility-kit', label: 'Flexible utility kit', metric: 'tacticalFlexibility', perTag: 1, cap: 4, tagIds: ['support', 'self-buff', 'heal', 'team-heal', 'shield', 'revive', 'summon'] },
+      { id: 'support-heal-pair', label: 'Support + heal combo', metric: 'tacticalFlexibility', delta: 1, requiresAll: ['support', 'heal'], excludesAny: ['summon'] },
+      { id: 'buff-debuff-keywords', label: 'Buff/debuff text coverage', metric: 'tacticalFlexibility', delta: 1, perKeyword: 1, cap: 3, keywords: ['buff', 'debuff', 'hồi'] },
+      { id: 'setup-load', label: 'Setup burden', metric: 'setupPenalty', delta: 1, perTag: 1, cap: 3, tagIds: ['summon', 'sleep', 'mark'], keywords: ['setup', 'triệu hồi', 'sleep'] },
+      { id: 'self-risk', label: 'Self/friendly risk text', metric: 'selfRiskPenalty', delta: 1, perKeyword: 1, cap: 3, keywords: ['friendly fire', 'không phân địch ta', 'toàn bộ sinh vật', 'tự tổn thương', 'self-debuff', 'self debuff'] },
+      { id: 'vanish-risk', label: 'Vanish/removed risk text', metric: 'vanishRiskPenalty', delta: 1, perKeyword: 1, cap: 3, keywords: ['biến mất', 'removed', 'vanish', 'out trận'] },
+      { id: 'rng-consistency', label: 'Randomness penalty', metric: 'consistencyPenalty', perTag: 1, cap: 3, tagIds: ['random-target', 'random-aoe'], keywords: ['ngẫu nhiên', 'random', 'coin flip', 'coin-flip'] },
+      { id: 'burst-finisher-pressure', label: 'Burst finisher pressure', metric: 'battlefieldInfluence', perTag: 1, cap: 2, tagIds: ['burst', 'execute'] },
+      { id: 'line-burst-ceiling', label: 'Line burst scaling', metric: 'scalingCeiling', delta: 1, requiresAll: ['line', 'burst'] },
+      { id: 'defensive-economy', label: 'Sustain economy tax', metric: 'economyPressure', delta: 1, requiresAll: ['shield', 'team-heal'] },
+      { id: 'blink-flex', label: 'Blink tactical mobility', metric: 'tacticalFlexibility', delta: 1, tagIds: ['blink'] },
   ]);
-  const COST_TAG_SYNERGY_RULES = Object.freeze([
-      { requiresAll: ['summon', 'support'], metric: 'tacticalFlexibility', delta: 1 },
-      { requiresAll: ['aoe', 'control'], metric: 'battlefieldInfluence', delta: 1 },
-      { requiresAll: ['revive', 'shield'], metric: 'scalingCeiling', delta: 1 },
-      { requiresAll: ['random-aoe', 'execute'], metric: 'consistencyPenalty', delta: 1 },
-      { requiresAll: ['global-rule', 'aether-cost'], metric: 'economyPressure', delta: 1 },
-      { requiresAll: ['burst', 'execute'], metric: 'scalingCeiling', delta: 1 },
-      { requiresAll: ['heal', 'shield'], metric: 'tacticalFlexibility', delta: 1 },
-      { requiresAll: ['random-target', 'global-rule'], metric: 'consistencyPenalty', delta: 1 },
-  ]);
+  const COST_TAG_SYNERGY_RULES = Object.freeze({ id: 'summon-support-flex', label: 'Summon support flexibility', requiresAll: ['summon', 'support'], metric: 'tacticalFlexibility', delta: 1 }, { id: 'aoe-control-pressure', label: 'AoE control pressure', requiresAll: ['aoe', 'control'], metric: 'battlefieldInfluence', delta: 1 }, { id: 'revive-shield-scale', label: 'Revive shield scaling', requiresAll: ['revive', 'shield'], metric: 'scalingCeiling', delta: 1 }, { id: 'random-aoe-execute-risk', label: 'Random AoE execute volatility', requiresAll: ['random-aoe', 'execute'], metric: 'consistencyPenalty', delta: 1 }, { id: 'global-aether-tax', label: 'Global aether economy tax', requiresAll: ['global-rule', 'aether-cost'], metric: 'economyPressure', delta: 1 }, { id: 'burst-execute-scale', label: 'Burst execute scaling', requiresAll: ['burst', 'execute'], metric: 'scalingCeiling', delta: 1 }, { id: 'heal-shield-utility', label: 'Heal shield utility', requiresAll: ['heal', 'shield'], metric: 'tacticalFlexibility', delta: 1 }, { id: 'random-rule-inconsistency', label: 'Random rule inconsistency', requiresAll: ['random-target', 'global-rule'], metric: 'consistencyPenalty', delta: 1 });
+  ;
   function createTagCostContext(tags) {
       const normalizedTextTags = tags
           .map((tag) => String(tag).trim().toLowerCase())
@@ -9471,19 +9478,25 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
           }
           return count;
       };
-      const hasKeyword = (keywords) => {
+      const countMatchedKeywords = (keywords) => {
           if (!Array.isArray(keywords) || keywords.length === 0)
-              return false;
-          return keywords.some((keyword) => {
+              return 0;
+          let count = 0;
+          for (const keyword of keywords) {
               const cached = keywordCache.get(keyword);
-              if (typeof cached === 'boolean')
-                  return cached;
+              if (typeof cached === 'boolean') {
+                  if (cached)
+                      count += 1;
+                  continue;
+              }
               const matched = normalizedTagText.includes(keyword);
               keywordCache.set(keyword, matched);
-              return matched;
-          });
+              if (matched)
+                  count += 1;
+          }
+          return count;
       };
-      return { hasTag, countMatchedTags, hasKeyword, totalTags: normalizedTagSet.size };
+      return { hasTag, countMatchedTags, countMatchedKeywords, totalTags: normalizedTagSet.size };
   }
   function isRuleApplicable(rule, tagContext) {
       if (rule.requiresAll && !rule.requiresAll.every((tagId) => tagContext.hasTag(tagId))) {
@@ -9577,6 +9590,9 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       };
   }
   function estimateCostFromTags(tags) {
+      return evaluateCostBudget(deriveBudgetFromTagsDetailed(tags).input);
+  }
+  function deriveBudgetFromTagsDetailed(tags) {
       const tagContext = createTagCostContext(tags);
       const input = {
           tagComplexity: 0,
@@ -9588,40 +9604,62 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
           selfRiskPenalty: 0,
           vanishRiskPenalty: 0,
           consistencyPenalty: 0,
-          hasDivineNature: tagContext.hasTag('divine-nature') || tagContext.hasKeyword(['thần tính', 'divine']),
+          hasDivineNature: tagContext.hasTag('divine-nature') || tagContext.countMatchedKeywords(['thần tính', 'divine']) > 0,
       };
+      const matches = [];
       const addScore = (key, delta) => {
           const current = typeof input[key] === 'number' ? input[key] : 0;
           input[key] = current + delta;
+      };
+      const addMatch = (ruleId, label, metric, delta, matchedTags, matchedKeywords) => {
+          if (delta <= 0)
+              return;
+          matches.push({ ruleId, label, metric, delta, matchedTags, matchedKeywords });
       };
       for (const rule of COST_TAG_SCORE_RULES) {
           if (!isRuleApplicable(rule, tagContext))
               continue;
           const matchedTags = tagContext.countMatchedTags(rule.tagIds);
-          const matchedByKeyword = tagContext.hasKeyword(rule.keywords);
-          const scaledByTags = typeof rule.perTag === 'number'
-              ? matchedTags * rule.perTag
-              : 0;
-          const baseDelta = scaledByTags + (matchedByKeyword ? (rule.delta ?? 0) : 0);
-          if (baseDelta <= 0)
-              continue;
-          const cappedDelta = typeof rule.cap === 'number'
-              ? Math.min(baseDelta, rule.cap)
-              : baseDelta;
-          addScore(rule.metric, cappedDelta);
+          const matchedKeywords = tagContext.countMatchedKeywords(rule.keywords);
+          const delta = calculateRuleDelta(rule, matchedTags, matchedKeywords);
+          addScore(rule.metric, delta);
+          addMatch(rule.id, rule.label, rule.metric, delta, matchedTags, matchedKeywords);
       }
       for (const rule of COST_TAG_SYNERGY_RULES) {
           if (!rule.requiresAll.every((tagId) => tagContext.hasTag(tagId)))
               continue;
           addScore(rule.metric, rule.delta);
+          addMatch(`synergy:${rule.id}`, rule.label, rule.metric, rule.delta, rule.requiresAll.length, 0);
+      }
+      if (input.hasDivineNature) {
+          const divineSustainTags = tagContext.countMatchedTags(['heal', 'team-heal', 'shield', 'revive', 'support']);
+          if (divineSustainTags > 0) {
+              input.divineSelfSustainBonus = Math.min(divineSustainTags, SCORE_RANGES.divineSelfSustainBonus[1]);
+              addMatch('divine-self-sustain', 'Divine sustain bonus', 'tacticalFlexibility', input.divineSelfSustainBonus, divineSustainTags, 0);
+          }
       }
       if (tagContext.totalTags >= 6) {
           addScore('tagComplexity', 1);
+          addMatch('complexity-size-6', 'Tag pool size >= 6', 'tagComplexity', 1);
       }
       if (tagContext.totalTags >= 9) {
           addScore('tagComplexity', 1);
+          addMatch('complexity-size-9', 'Tag pool size >= 9', 'tagComplexity', 1);
       }
-      return evaluateCostBudget(input);
+      return { input, matches };
+  }
+  function deriveBudgetFromProfileDetailed(profile) {
+      const rankRoleInput = deriveBudgetFromRankRole(profile.rank, profile.role);
+      const tagDetail = deriveBudgetFromTagsDetailed(profile.tags ?? []);
+      const input = mergeBudgetInputs(rankRoleInput, tagDetail.input, profile.overrides ?? null);
+      const result = evaluateCostBudget(input);
+      return {
+          input,
+          rankRoleInput,
+          tagInput: tagDetail.input,
+          matches: tagDetail.matches,
+          result,
+      };
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'COST_MIN')) exports.COST_MIN = COST_MIN;
@@ -9634,6 +9672,8 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'deriveBudgetFromRankRole')) exports.deriveBudgetFromRankRole = deriveBudgetFromRankRole;
   if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateCostBudget')) exports.evaluateCostBudget = evaluateCostBudget;
   if (!Object.prototype.hasOwnProperty.call(exports, 'estimateCostFromTags')) exports.estimateCostFromTags = estimateCostFromTags;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'deriveBudgetFromTagsDetailed')) exports.deriveBudgetFromTagsDetailed = deriveBudgetFromTagsDetailed;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'deriveBudgetFromProfileDetailed')) exports.deriveBudgetFromProfileDetailed = deriveBudgetFromProfileDetailed;
 };
 __modules['./data/economy.config.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/data/economy.config.ts
@@ -9903,7 +9943,6 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
       softGuarantees: z.array(PityRuleSchema)
   });
   const PITY_TIERS = ['SSR', 'UR', 'PRIME'];
-  const PityTierSchema = z.enum([...PITY_TIERS]);
   const PityConfigSchema = z.object({
       SSR: PityEntrySchema,
       UR: PityEntrySchema,
@@ -9978,6 +10017,24 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
           FORMATTER_COMPACT = FORMATTER_STANDARD;
       }
   }
+  const FORMATTER_BY_PRECISION = new Map();
+  function getFormatterByPrecision(precision, compact) {
+      const formatterCacheKey = `${precision}:${compact ? 'compact' : 'standard'}`;
+      const cachedFormatter = FORMATTER_BY_PRECISION.get(formatterCacheKey);
+      if (cachedFormatter) {
+          return cachedFormatter;
+      }
+      const formatterOptions = {
+          maximumFractionDigits: precision,
+          minimumFractionDigits: precision
+      };
+      if (compact && HAS_INTL_NUMBER_FORMAT) {
+          formatterOptions.notation = 'compact';
+      }
+      const formatter = createNumberFormatter('vi-VN', formatterOptions);
+      FORMATTER_BY_PRECISION.set(formatterCacheKey, formatter);
+      return formatter;
+  }
   function formatBalance(value, currencyId, options = {}) {
       const currency = getCurrency(currencyId);
       if (!currency) {
@@ -10002,14 +10059,7 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
       const shouldUseCompact = notation === 'compact' && HAS_COMPACT_FORMAT;
       let formatter = shouldUseCompact ? FORMATTER_COMPACT : FORMATTER_STANDARD;
       if (typeof precision === 'number') {
-          const formatterOptions = {
-              maximumFractionDigits: precision,
-              minimumFractionDigits: precision
-          };
-          if (shouldUseCompact && HAS_INTL_NUMBER_FORMAT) {
-              formatterOptions.notation = 'compact';
-          }
-          formatter = createNumberFormatter('vi-VN', formatterOptions);
+          formatter = getFormatterByPrecision(precision, shouldUseCompact);
       }
       const formatted = formatter.format(amount);
       return includeSuffix ? `${formatted} ${suffix}` : formatted;
@@ -10655,7 +10705,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   function deriveTpFromMods(base, mods = {}) {
       if (!mods)
           return {};
-      const tp = {};
+      const rawTp = {};
       for (const [stat, modValue] of Object.entries(mods)) {
           if (!hasTpDelta(stat))
               continue;
@@ -10664,25 +10714,31 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
               continue;
           const delta = TP_DELTA[stat] ?? 1;
           const raw = (baseValue * (modValue ?? 0)) / delta;
-          const rounded = roundTpValue(raw);
-          if (rounded !== 0) {
-              tp[stat] = rounded;
+          if (raw !== 0) {
+              rawTp[stat] = raw;
           }
       }
-      return tp;
+      return sanitizeTpAllocation(rawTp);
   }
   function totalTp(tpAlloc = {}) {
       return roundTpValue(Object.values(tpAlloc).reduce((sum, value) => sum + value, 0));
+  }
+  function resolveUnitTpAllocation(unit, providedAllocations) {
+      const derivedTp = providedAllocations?.[unit.id];
+      if (derivedTp) {
+          return sanitizeTpAllocation(derivedTp);
+      }
+      const base = getClassBase(unit.class);
+      return deriveTpFromMods(base, unit.mods);
   }
   function buildRosterPreviews(tpAllocations = undefined) {
       const result = {};
       for (const unit of ROSTER) {
           const base = getClassBase(unit.class);
-          const derivedTp = tpAllocations?.[unit.id] ?? deriveTpFromMods(base, unit.mods);
-          const cleanTp = sanitizeTpAllocation(derivedTp);
-          const preRank = applyTpDelta(base, cleanTp);
+          const cleanTp = resolveUnitTpAllocation(unit, tpAllocations);
           const rankKey = unit.rank;
           const multiplier = getRankMultiplier(rankKey);
+          const preRank = applyTpToBase(base, cleanTp);
           const final = applyRankMultiplier(preRank, rankKey);
           result[unit.id] = {
               id: unit.id,
@@ -10719,8 +10775,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
       }));
   }
   const ROSTER_TP_ALLOCATIONS = Object.freeze(ROSTER.reduce((acc, unit) => {
-      const base = getClassBase(unit.class);
-      acc[unit.id] = deriveTpFromMods(base, unit.mods);
+      acc[unit.id] = resolveUnitTpAllocation(unit);
       return acc;
   }, {}));
   const ROSTER_PREVIEWS = buildRosterPreviews(ROSTER_TP_ALLOCATIONS);
@@ -11184,6 +11239,17 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
       }
       return unique;
   }
+  function collectNormalizedNeedleSet(needles, version = CURRENT_TAG_ALIAS_VERSION) {
+      const normalizedNeedles = new Set();
+      if (!Array.isArray(needles))
+          return normalizedNeedles;
+      for (const needle of needles) {
+          const normalized = normalizeTagId(needle, version);
+          if (normalized)
+              normalizedNeedles.add(normalized);
+      }
+      return normalizedNeedles;
+  }
   function resolveTagVersionAliases(tags, version = CURRENT_TAG_ALIAS_VERSION) {
       if (!Array.isArray(tags))
           return [];
@@ -11205,7 +11271,8 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
           const trimmed = rawTag.trim();
           if (!trimmed)
               continue;
-          if (!getTagDefinition(trimmed)) {
+          const normalized = normalizeTagId(trimmed);
+          if (!normalized || !TAG_BY_ID.has(normalized)) {
               unknown.add(trimmed);
           }
       }
@@ -11216,10 +11283,8 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
           return false;
       }
       const normalizedHaystack = collectNormalizedTagSet(haystack);
-      for (const needle of needles) {
-          const normalizedNeedle = normalizeTagId(needle);
-          if (!normalizedNeedle)
-              continue;
+      const normalizedNeedles = collectNormalizedNeedleSet(needles);
+      for (const normalizedNeedle of normalizedNeedles) {
           if (normalizedHaystack.has(normalizedNeedle))
               return true;
       }

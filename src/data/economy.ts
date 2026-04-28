@@ -45,7 +45,6 @@ const PityEntrySchema = z.object({
 
 const PITY_TIERS = ['SSR', 'UR', 'PRIME'] as const;
 type PityTier = typeof PITY_TIERS[number];
-const PityTierSchema = z.enum([...PITY_TIERS] as [PityTier, ...PityTier[]]);
 
 const PityConfigSchema = z.object({
   SSR: PityEntrySchema,
@@ -151,6 +150,25 @@ if (HAS_INTL_NUMBER_FORMAT){
     FORMATTER_COMPACT = FORMATTER_STANDARD;
   }
 }
+const FORMATTER_BY_PRECISION = new Map<string, ReturnType<typeof createNumberFormatter>>();
+
+function getFormatterByPrecision(precision: number, compact: boolean){
+  const formatterCacheKey = `${precision}:${compact ? 'compact' : 'standard'}`;
+  const cachedFormatter = FORMATTER_BY_PRECISION.get(formatterCacheKey);
+  if (cachedFormatter){
+    return cachedFormatter;
+  }
+  const formatterOptions: Intl.NumberFormatOptions = {
+    maximumFractionDigits: precision,
+    minimumFractionDigits: precision
+  };
+  if (compact && HAS_INTL_NUMBER_FORMAT){
+    formatterOptions.notation = 'compact';
+  }
+  const formatter = createNumberFormatter('vi-VN', formatterOptions);
+  FORMATTER_BY_PRECISION.set(formatterCacheKey, formatter);
+  return formatter;
+}
 
 export interface FormatBalanceOptions {
   notation?: 'standard' | 'compact';
@@ -192,14 +210,7 @@ function formatBalance(value: number, currencyId: string, options: FormatBalance
 
   let formatter = shouldUseCompact ? FORMATTER_COMPACT : FORMATTER_STANDARD;
   if (typeof precision === 'number'){
-    const formatterOptions: Intl.NumberFormatOptions = {
-      maximumFractionDigits: precision,
-      minimumFractionDigits: precision
-    };
-    if (shouldUseCompact && HAS_INTL_NUMBER_FORMAT){
-      formatterOptions.notation = 'compact';
-    }
-    formatter = createNumberFormatter('vi-VN', formatterOptions);
+    formatter = getFormatterByPrecision(precision, shouldUseCompact);
   }
 
   const formatted = formatter.format(amount);
