@@ -8,7 +8,7 @@ import { nextRngValue } from '../../utils/rng.ts';
 import type { SessionState } from '@shared-types/combat';
 import type { RngState } from '@shared-types/rng';
 import type { UnitToken } from '@shared-types/units';
-import type { UnitRuntimeHook } from './types.ts';
+import type { RuntimeSkillContext, UnitRuntimeHook } from './types.ts';
 
 const CO_TRUONG_PHONG_ID = 'co_truong_phong';
 const BASE_SWORD_GAIN_PER_TURN = 3;
@@ -62,9 +62,10 @@ function drainRageOnSuccessfulHit(unit: CoTruongPhongCarrier, target: UnitToken,
   reduceTargetRage(target, SKILL3_RAGE_DRAIN_PER_HIT);
 }
 
-function selectRandomEnemies(rng: RngState | null | undefined, enemyPool: UnitToken[], count: number): UnitToken[] {
-  if (enemyPool.length <= 1 || count <= 1) return enemyPool.length > 0 ? [enemyPool[0]] : [];
-  const available = [...enemyPool];
+function pickDistinctRandomEnemies(rng: RngState | null | undefined, enemyPool: UnitToken[], count: number): UnitToken[] {
+  if (enemyPool.length <= 0 || count <= 0) return [];
+  if (enemyPool.length === 1) return [enemyPool[0]];
+  const available = enemyPool.slice();
   const picked: UnitToken[] = [];
   const maxPick = Math.min(count, available.length);
   for (let i = 0; i < maxPick; i += 1) {
@@ -76,6 +77,15 @@ function selectRandomEnemies(rng: RngState | null | undefined, enemyPool: UnitTo
   return picked;
 }
 
+function pickSkill1Targets(rng: RngState | null | undefined, enemyPool: UnitToken[]): UnitToken[] {
+  if (enemyPool.length <= 0) return [];
+  if (enemyPool.length >= SKILL1_SWORD_COST) {
+    return pickDistinctRandomEnemies(rng, enemyPool, SKILL1_SWORD_COST);
+  }
+  const fallback = enemyPool[0];
+  return Array.from({ length: SKILL1_SWORD_COST }, () => fallback);
+}
+
 function enemyLeader(unit: CoTruongPhongCarrier, allTokens: UnitToken[]): UnitToken | null {
   const foe = unit.side === 'ally' ? 'enemy' : 'ally';
   const leader = allTokens.find((token) => token?.alive && token.side === foe && token.cy === 3);
@@ -85,7 +95,7 @@ function enemyLeader(unit: CoTruongPhongCarrier, allTokens: UnitToken[]): UnitTo
 function castSkill1Runtime(game: SessionState, caster: CoTruongPhongCarrier): number {
   const enemies = game.tokens.filter((token) => token?.alive && token.side !== caster.side);
   if (enemies.length <= 0) return 0;
-  const targets = selectRandomEnemies(game.rng, enemies, 2);
+  const targets = pickSkill1Targets(game.rng, enemies);
   if (targets.length <= 0) return 0;
   const base = Math.max(1, Math.floor(readAtkWilPower(caster) * SKILL1_DAMAGE_RATIO));
   let successHits = 0;
@@ -104,36 +114,68 @@ function castSkill2Runtime(game: SessionState, caster: CoTruongPhongCarrier): nu
   let successHits = 0;
   for (let i = 0; i < SKILL2_HITS; i += 1) {
     const result = dealAbilityDamage(game, caster, leader, { base, attackType: 'skill', skill: null });
-    drainRageOnSuccessfulHit(caster, leader, result.dealt);
     if (result.dealt > 0) {
       successHits += 1;
       healUnit(caster, Math.max(1, Math.floor(result.dealt * SKILL2_HEAL_RATIO)));
     }
   }
+  if (caster._coTruongPhongLawActive && successHits >= SKILL2_HITS) {
+    reduceTargetRage(leader, SKILL3_RAGE_DRAIN_PER_HIT * SKILL2_HITS);
+  }
   return successHits;
+}
+
+function tryCastSwordSkill(
+  game: SessionState,
+  caster: CoTruongPhongCarrier,
+  skillKey: 'skill1' | 'skill2',
+  skill: RuntimeSkillContext['skill'],
+  tags: RuntimeSkillContext['tags'],
+  appliedTags: RuntimeSkillContext['appliedTags'],
+  swordCost: number,
+  aeCost: number,
+  cast: (runtime: SessionState, unit: CoTruongPhongCarrier) => number,
+) {
+  const swordCount = getSwordCount(caster);
+  if (swordCount < swordCost) return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
+  if (!spendSkillAether(caster, aeCost)) return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
+  setSwordCount(caster, swordCount - swordCost);
+  const hitCount = cast(game, caster);
+  return buildSkillResult(hitCount > 0, skillKey, skill, tags, appliedTags, hitCount, hitCount > 0 ? undefined : 'blocked');
 }
 
 export const coTruongPhongRuntimeHook: UnitRuntimeHook = {
   onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
     if (caster.id !== CO_TRUONG_PHONG_ID) return null;
     const coTruongPhong = caster as CoTruongPhongCarrier;
-    const swordCount = getSwordCount(coTruongPhong);
     if (skillKey === 'skill3') {
       return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
     }
     if (skillKey === 'skill1') {
-      if (swordCount < SKILL1_SWORD_COST) return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-      if (!spendSkillAether(coTruongPhong, SKILL1_AE_COST)) return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
-      setSwordCount(coTruongPhong, swordCount - SKILL1_SWORD_COST);
-      const hitCount = castSkill1Runtime(game, coTruongPhong);
-      return buildSkillResult(hitCount > 0, skillKey, skill, tags, appliedTags, hitCount, hitCount > 0 ? undefined : 'blocked');
+      return tryCastSwordSkill(
+        game,
+        coTruongPhong,
+        skillKey,
+        skill,
+        tags,
+        appliedTags,
+        SKILL1_SWORD_COST,
+        SKILL1_AE_COST,
+        castSkill1Runtime,
+      );
     }
     if (skillKey === 'skill2') {
-      if (swordCount < SKILL2_SWORD_COST) return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-      if (!spendSkillAether(coTruongPhong, SKILL2_AE_COST)) return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
-      setSwordCount(coTruongPhong, swordCount - SKILL2_SWORD_COST);
-      const hitCount = castSkill2Runtime(game, coTruongPhong);
-      return buildSkillResult(hitCount > 0, skillKey, skill, tags, appliedTags, hitCount, hitCount > 0 ? undefined : 'blocked');
+      return tryCastSwordSkill(
+        game,
+        coTruongPhong,
+        skillKey,
+        skill,
+        tags,
+        appliedTags,
+        SKILL2_SWORD_COST,
+        SKILL2_AE_COST,
+        castSkill2Runtime,
+      );
     }
     return null;
   },

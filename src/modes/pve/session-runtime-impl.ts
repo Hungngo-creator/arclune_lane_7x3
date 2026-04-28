@@ -2691,6 +2691,16 @@ function getShieldRatio(unit: UnitToken): number {
   return Math.max(0, Math.min(1, shieldAmount / hpMax));
 }
 
+const CO_TRUONG_PHONG_ID = 'co_truong_phong';
+const CO_TRUONG_PHONG_MAX_SWORD_DOTS = 8;
+
+function readCoTruongPhongSwordDotCount(token: UnitToken): number {
+  if (token.id !== CO_TRUONG_PHONG_ID) return 0;
+  const swords = Math.floor(toFiniteOrZero((token as UnitToken & { _coTruongPhongFlyingSwords?: unknown })._coTruongPhongFlyingSwords));
+  if (!Number.isFinite(swords) || swords <= 0) return 0;
+  return Math.min(CO_TRUONG_PHONG_MAX_SWORD_DOTS, swords);
+}
+
 const {
   resolveStatusIcons: resolveStatusIconsForToken,
 } = createStatusIconResolver<StatusIconEntry>({
@@ -2752,6 +2762,7 @@ function drawHPBars(): void {
 
     const hpRatio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
     const shieldRatio = getShieldRatio(t);
+    const swordDotCount = readCoTruongPhongSwordDotCount(t);
 
     const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.86)';
     const fillColor = art?.hpBar?.fill || '#48d267';
@@ -2802,6 +2813,27 @@ function drawHPBars(): void {
       roundedRectPath(drawCtx, hpX + inset, hpY + inset, dimWidth, innerHeight, innerRadius);
       drawCtx.fillStyle = 'rgba(190, 210, 205, 0.32)';
       drawCtx.fill();
+      drawCtx.restore();
+    }
+
+    if (swordDotCount > 0) {
+      const drawableWidth = Math.max(8, barWidth - 4);
+      const baseDiameter = Math.max(2, Math.floor(Math.max(barHeight, 5) * 0.8));
+      const maxDiameterByWidth = Math.max(2, Math.floor((drawableWidth - ((swordDotCount - 1) * 1)) / swordDotCount));
+      const dotDiameter = Math.max(2, Math.min(baseDiameter, maxDiameterByWidth));
+      const dotRadius = dotDiameter / 2;
+      const dotGap = Math.max(1, Math.floor(dotDiameter * 0.6));
+      const dotsWidth = (swordDotCount * dotDiameter) + ((swordDotCount - 1) * dotGap);
+      const dotsStartX = hpX + barWidth - dotsWidth - 2;
+      const dotsY = hpY + (barHeight / 2);
+      drawCtx.save();
+      drawCtx.fillStyle = '#32d56b';
+      for (let i = 0; i < swordDotCount; i += 1) {
+        const dotX = dotsStartX + (i * (dotDiameter + dotGap)) + dotRadius;
+        drawCtx.beginPath();
+        drawCtx.arc(dotX, dotsY, dotRadius, 0, Math.PI * 2);
+        drawCtx.fill();
+      }
       drawCtx.restore();
     }
 

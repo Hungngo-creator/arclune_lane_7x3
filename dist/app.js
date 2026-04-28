@@ -6504,10 +6504,12 @@ __modules['./combat/runtime-hooks/co-truong-phong.ts'] = (exports, module, __req
           return;
       reduceTargetRage(target, SKILL3_RAGE_DRAIN_PER_HIT);
   }
-  function selectRandomEnemies(rng, enemyPool, count) {
-      if (enemyPool.length <= 1 || count <= 1)
-          return enemyPool.length > 0 ? [enemyPool[0]] : [];
-      const available = [...enemyPool];
+  function pickDistinctRandomEnemies(rng, enemyPool, count) {
+      if (enemyPool.length <= 0 || count <= 0)
+          return [];
+      if (enemyPool.length === 1)
+          return [enemyPool[0]];
+      const available = enemyPool.slice();
       const picked = [];
       const maxPick = Math.min(count, available.length);
       for (let i = 0; i < maxPick; i += 1) {
@@ -6519,6 +6521,15 @@ __modules['./combat/runtime-hooks/co-truong-phong.ts'] = (exports, module, __req
       }
       return picked;
   }
+  function pickSkill1Targets(rng, enemyPool) {
+      if (enemyPool.length <= 0)
+          return [];
+      if (enemyPool.length >= SKILL1_SWORD_COST) {
+          return pickDistinctRandomEnemies(rng, enemyPool, SKILL1_SWORD_COST);
+      }
+      const fallback = enemyPool[0];
+      return Array.from({ length: SKILL1_SWORD_COST }, () => fallback);
+  }
   function enemyLeader(unit, allTokens) {
       const foe = unit.side === 'ally' ? 'enemy' : 'ally';
       const leader = allTokens.find((token) => token?.alive && token.side === foe && token.cy === 3);
@@ -6528,7 +6539,7 @@ __modules['./combat/runtime-hooks/co-truong-phong.ts'] = (exports, module, __req
       const enemies = game.tokens.filter((token) => token?.alive && token.side !== caster.side);
       if (enemies.length <= 0)
           return 0;
-      const targets = selectRandomEnemies(game.rng, enemies, 2);
+      const targets = pickSkill1Targets(game.rng, enemies);
       if (targets.length <= 0)
           return 0;
       const base = Math.max(1, Math.floor(readAtkWilPower(caster) * SKILL1_DAMAGE_RATIO));
@@ -6549,40 +6560,39 @@ __modules['./combat/runtime-hooks/co-truong-phong.ts'] = (exports, module, __req
       let successHits = 0;
       for (let i = 0; i < SKILL2_HITS; i += 1) {
           const result = dealAbilityDamage(game, caster, leader, { base, attackType: 'skill', skill: null });
-          drainRageOnSuccessfulHit(caster, leader, result.dealt);
           if (result.dealt > 0) {
               successHits += 1;
               healUnit(caster, Math.max(1, Math.floor(result.dealt * SKILL2_HEAL_RATIO)));
           }
       }
+      if (caster._coTruongPhongLawActive && successHits >= SKILL2_HITS) {
+          reduceTargetRage(leader, SKILL3_RAGE_DRAIN_PER_HIT * SKILL2_HITS);
+      }
       return successHits;
+  }
+  function tryCastSwordSkill(game, caster, skillKey, skill, tags, appliedTags, swordCost, aeCost, cast) {
+      const swordCount = getSwordCount(caster);
+      if (swordCount < swordCost)
+          return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
+      if (!spendSkillAether(caster, aeCost))
+          return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
+      setSwordCount(caster, swordCount - swordCost);
+      const hitCount = cast(game, caster);
+      return buildSkillResult(hitCount > 0, skillKey, skill, tags, appliedTags, hitCount, hitCount > 0 ? undefined : 'blocked');
   }
   const coTruongPhongRuntimeHook = {
       onActiveSkill({ game, caster, skillKey, skill, tags, appliedTags }) {
           if (caster.id !== CO_TRUONG_PHONG_ID)
               return null;
           const coTruongPhong = caster;
-          const swordCount = getSwordCount(coTruongPhong);
           if (skillKey === 'skill3') {
               return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
           }
           if (skillKey === 'skill1') {
-              if (swordCount < SKILL1_SWORD_COST)
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-              if (!spendSkillAether(coTruongPhong, SKILL1_AE_COST))
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
-              setSwordCount(coTruongPhong, swordCount - SKILL1_SWORD_COST);
-              const hitCount = castSkill1Runtime(game, coTruongPhong);
-              return buildSkillResult(hitCount > 0, skillKey, skill, tags, appliedTags, hitCount, hitCount > 0 ? undefined : 'blocked');
+              return tryCastSwordSkill(game, coTruongPhong, skillKey, skill, tags, appliedTags, SKILL1_SWORD_COST, SKILL1_AE_COST, castSkill1Runtime);
           }
           if (skillKey === 'skill2') {
-              if (swordCount < SKILL2_SWORD_COST)
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-              if (!spendSkillAether(coTruongPhong, SKILL2_AE_COST))
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
-              setSwordCount(coTruongPhong, swordCount - SKILL2_SWORD_COST);
-              const hitCount = castSkill2Runtime(game, coTruongPhong);
-              return buildSkillResult(hitCount > 0, skillKey, skill, tags, appliedTags, hitCount, hitCount > 0 ? undefined : 'blocked');
+              return tryCastSwordSkill(game, coTruongPhong, skillKey, skill, tags, appliedTags, SKILL2_SWORD_COST, SKILL2_AE_COST, castSkill2Runtime);
           }
           return null;
       },
@@ -19908,6 +19918,16 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const hpMax = Math.max(1, toFiniteOrZero(unit.hpMax));
       return Math.max(0, Math.min(1, shieldAmount / hpMax));
   }
+  const CO_TRUONG_PHONG_ID = 'co_truong_phong';
+  const CO_TRUONG_PHONG_MAX_SWORD_DOTS = 8;
+  function readCoTruongPhongSwordDotCount(token) {
+      if (token.id !== CO_TRUONG_PHONG_ID)
+          return 0;
+      const swords = Math.floor(toFiniteOrZero(token._coTruongPhongFlyingSwords));
+      if (!Number.isFinite(swords) || swords <= 0)
+          return 0;
+      return Math.min(CO_TRUONG_PHONG_MAX_SWORD_DOTS, swords);
+  }
   const { resolveStatusIcons: resolveStatusIconsForToken, } = createStatusIconResolver({
       fallbackIconPath: DEFAULT_STATUS_ICON_PATH,
       getCacheEntry: (nextIconId) => statusIconCache.get(nextIconId),
@@ -19963,6 +19983,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           const statusStartX = Math.round(hpX + (barWidth - statusRowWidth) / 2);
           const hpRatio = Math.max(0, Math.min(1, (t.hp || 0) / (t.hpMax || 1)));
           const shieldRatio = getShieldRatio(t);
+          const swordDotCount = readCoTruongPhongSwordDotCount(t);
           const bgColor = art?.hpBar?.bg || 'rgba(9,14,21,0.86)';
           const fillColor = art?.hpBar?.fill || '#48d267';
           const borderColor = art?.hpBar?.border || 'rgba(0,0,0,0.62)';
@@ -20008,6 +20029,26 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               roundedRectPath(drawCtx, hpX + inset, hpY + inset, dimWidth, innerHeight, innerRadius);
               drawCtx.fillStyle = 'rgba(190, 210, 205, 0.32)';
               drawCtx.fill();
+              drawCtx.restore();
+          }
+          if (swordDotCount > 0) {
+              const drawableWidth = Math.max(8, barWidth - 4);
+              const baseDiameter = Math.max(2, Math.floor(Math.max(barHeight, 5) * 0.8));
+              const maxDiameterByWidth = Math.max(2, Math.floor((drawableWidth - ((swordDotCount - 1) * 1)) / swordDotCount));
+              const dotDiameter = Math.max(2, Math.min(baseDiameter, maxDiameterByWidth));
+              const dotRadius = dotDiameter / 2;
+              const dotGap = Math.max(1, Math.floor(dotDiameter * 0.6));
+              const dotsWidth = (swordDotCount * dotDiameter) + ((swordDotCount - 1) * dotGap);
+              const dotsStartX = hpX + barWidth - dotsWidth - 2;
+              const dotsY = hpY + (barHeight / 2);
+              drawCtx.save();
+              drawCtx.fillStyle = '#32d56b';
+              for (let i = 0; i < swordDotCount; i += 1) {
+                  const dotX = dotsStartX + (i * (dotDiameter + dotGap)) + dotRadius;
+                  drawCtx.beginPath();
+                  drawCtx.arc(dotX, dotsY, dotRadius, 0, Math.PI * 2);
+                  drawCtx.fill();
+              }
               drawCtx.restore();
           }
           if (statusIcons.length > 0) {
