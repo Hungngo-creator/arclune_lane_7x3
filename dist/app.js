@@ -907,9 +907,12 @@ __modules['./ai.ts'] = (exports, module, __require) => {
       Game.ai.lastDecision = decision;
       Game.ai.lastThinkMs = now;
   }
-  function getUnitClassName(Game, unit) {
-      const className = Game.meta?.get(unit.id)?.class;
-      return typeof className === 'string' ? className : '';
+  function resolveHpRatio(unit) {
+      if (!unit)
+          return 0;
+      const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
+      const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
+      return hp / hpMax;
   }
   function findLowestHpUnit(units) {
       let best = null;
@@ -917,9 +920,7 @@ __modules['./ai.ts'] = (exports, module, __require) => {
       for (const token of units) {
           if (!token || !token.alive)
               continue;
-          const hp = Number.isFinite(token.hp) ? Number(token.hp) : 0;
-          const hpMax = Math.max(1, Number.isFinite(token.hpMax) ? Number(token.hpMax) : 1);
-          const ratio = hp / hpMax;
+          const ratio = resolveHpRatio(token);
           if (ratio < bestRatio) {
               bestRatio = ratio;
               best = token;
@@ -928,11 +929,7 @@ __modules['./ai.ts'] = (exports, module, __require) => {
       return best;
   }
   function resolveHpPercent(unit) {
-      if (!unit)
-          return 0;
-      const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
-      const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
-      return (hp / hpMax) * 100;
+      return resolveHpRatio(unit) * 100;
   }
   function evaluateGambitCondition(condition, Game, unit, slot, allies, enemies) {
       const threshold = Number.isFinite(slot.threshold) ? Number(slot.threshold) : 0;
@@ -23768,11 +23765,19 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   const resolveTacticalAiProfile = __dep3.resolveTacticalAiProfile;
   const STYLE_ID = 'chess-strategy-rpg-match-style';
   const CARDINAL_DIRS = Object.freeze([{ dx: 1, dy: 0 }, { dx: -1, dy: 0 }, { dx: 0, dy: 1 }, { dx: 0, dy: -1 }]);
+  const DIAGONAL_DIRS = Object.freeze([{ dx: 1, dy: 1 }, { dx: 1, dy: -1 }, { dx: -1, dy: 1 }, { dx: -1, dy: -1 }]);
+  const KNIGHT_JUMPS = Object.freeze([
+      { dx: 1, dy: 2 }, { dx: 2, dy: 1 }, { dx: -1, dy: 2 }, { dx: -2, dy: 1 },
+      { dx: 1, dy: -2 }, { dx: 2, dy: -1 }, { dx: -1, dy: -2 }, { dx: -2, dy: -1 },
+  ]);
+  const CHESS_MOVE_CAP = 7;
+  const PLAYER_HP_LOSS_COLOR = 'rgba(255, 196, 118, 0.9)';
+  const ENEMY_HP_LOSS_COLOR = 'rgba(136, 211, 255, 0.9)';
   const CSS = /* css */ `
     .app--chess-strategy-rpg-match{min-height:100dvh;padding:16px;box-sizing:border-box;}
     .chess-rpg-match{max-width:1320px;margin:0 auto;min-height:calc(100dvh - 32px);border-radius:20px;border:1px solid rgba(126,208,255,.3);background:linear-gradient(170deg,rgba(8,18,31,.98),rgba(14,35,57,.92));padding:18px;color:#e7f3ff;display:grid;gap:14px;}
-    .chess-rpg-match__top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-    .chess-rpg-match__back{border:1px solid rgba(143,198,255,.5);background:rgba(8,19,31,.85);color:#e6f2ff;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;padding:0;cursor:pointer;font-size:18px;line-height:1;}
+    .chess-rpg-match__cell--player{background:linear-gradient(to top,var(--unit-hp-base, rgba(26,117,90,.74)) var(--unit-hp-pct, 100%), var(--unit-hp-loss, rgba(255,196,118,.9)) var(--unit-hp-pct, 100%));border-color:rgba(130,255,219,.6);font-weight:700;color:#95ffd9;}
+    .chess-rpg-match__cell--enemy{background:linear-gradient(to top,var(--unit-hp-base, rgba(126,42,72,.68)) var(--unit-hp-pct, 100%), var(--unit-hp-loss, rgba(136,211,255,.9)) var(--unit-hp-pct, 100%));border-color:rgba(255,149,196,.56);font-weight:700;color:#ffc3dd;}
     .chess-rpg-match__meta{font-size:13px;color:#8ec4df;}
     .chess-rpg-match__field{position:relative;overflow:auto;border:1px solid rgba(121,187,228,.32);border-radius:14px;background:radial-gradient(circle at 35% 20%, rgba(43,106,146,.26), rgba(5,13,23,.95));padding:12px;min-height:78dvh;display:grid;align-content:start;justify-content:start;}
     .chess-rpg-match__board{display:grid;gap:2px;align-self:start;justify-self:start;background:rgba(8,20,29,.82);padding:8px;border-radius:12px;border:1px solid rgba(131,213,255,.2);}
@@ -23827,50 +23832,53 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           zocImmune: Boolean(profile.zocImmune),
       };
   }
-  function hasEnemyZoc(unit, x, y, all) {
-      if (unit.zocImmune)
-          return false;
-      for (const other of all) {
-          if (other.hp <= 0 || other.team === unit.team)
-              continue;
-          if (Math.abs(other.x - x) + Math.abs(other.y - y) === 1)
-              return true;
-      }
-      return false;
+  function resolveChessMovementKind(classId) {
+      const normalized = classId.trim().toLowerCase();
+      if (normalized === 'assassin')
+          return 'knight';
+      if (normalized === 'mage' || normalized === 'support' || normalized === 'summoner')
+          return 'bishop';
+      if (normalized === 'npc' || normalized === 'summon')
+          return 'none';
+      return 'rook';
   }
-  function findShortestPaths(unit, playable, occupied, all) {
+  function findShortestPaths(unit, playable, occupied) {
       const startKey = keyOf(unit.x, unit.y);
-      const queue = [{ x: unit.x, y: unit.y, cost: 0, path: [startKey] }];
-      const best = new Map([[startKey, 0]]);
-      const paths = new Map([[startKey, [startKey]]]);
-      while (queue.length > 0) {
-          const node = queue.shift();
-          if (!node)
-              continue;
-          for (const dir of CARDINAL_DIRS) {
-              const nx = node.x + dir.dx;
-              const ny = node.y + dir.dy;
+      const paths = new Map();
+      const stepCap = Math.max(0, Math.min(CHESS_MOVE_CAP, unit.moveRange));
+      if (stepCap <= 0)
+          return paths;
+      const movementKind = resolveChessMovementKind(unit.classId);
+      if (movementKind === 'none')
+          return paths;
+      if (movementKind === 'knight') {
+          for (const jump of KNIGHT_JUMPS) {
+              const nx = unit.x + jump.dx;
+              const ny = unit.y + jump.dy;
               const key = keyOf(nx, ny);
               if (!playable.has(key) || occupied.has(key))
                   continue;
-              let cost = 1;
-              if (hasEnemyZoc(unit, node.x, node.y, all) && !hasEnemyZoc(unit, nx, ny, all))
-                  cost += 1;
-              if (hasEnemyZoc(unit, nx, ny, all))
-                  cost = unit.moveRange + 1;
-              const nextCost = node.cost + cost;
-              if (nextCost > unit.moveRange)
-                  continue;
-              const currentBest = best.get(key);
-              if (currentBest != null && currentBest <= nextCost)
-                  continue;
-              best.set(key, nextCost);
-              const nextPath = [...node.path, key];
-              paths.set(key, nextPath);
-              queue.push({ x: nx, y: ny, cost: nextCost, path: nextPath });
+              paths.set(key, [startKey, key]);
+          }
+          return paths;
+      }
+      const dirs = movementKind === 'rook' ? CARDINAL_DIRS : DIAGONAL_DIRS;
+      for (const dir of dirs) {
+          for (let step = 1; step <= stepCap; step += 1) {
+              const nx = unit.x + dir.dx * step;
+              const ny = unit.y + dir.dy * step;
+              const key = keyOf(nx, ny);
+              if (!playable.has(key))
+                  break;
+              if (occupied.has(key))
+                  break;
+              const path = [startKey];
+              for (let i = 1; i <= step; i += 1) {
+                  path.push(keyOf(unit.x + dir.dx * i, unit.y + dir.dy * i));
+              }
+              paths.set(key, path);
           }
       }
-      paths.delete(startKey);
       return paths;
   }
   function expectedIncomingDamageAt(candidateX, candidateY, actor, enemies) {
@@ -23884,6 +23892,24 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           }
       }
       return incoming;
+  }
+  function distanceBetween(a, b) {
+      return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+  }
+  function resolveHpRatio(unit) {
+      return Math.max(0, Math.min(1, unit.hp / Math.max(1, unit.maxHp)));
+  }
+  function resolveHpFillPercent(unit) {
+      return Number((resolveHpRatio(unit) * 100).toFixed(2));
+  }
+  function profileBias(profile) {
+      if (profile === 'Aggressive') {
+          return { pressure: 1.4, safety: 0.75, finisher: 1.25, conserve: 0.8 };
+      }
+      if (profile === 'Defensive') {
+          return { pressure: 0.9, safety: 1.35, finisher: 1.05, conserve: 1.2 };
+      }
+      return { pressure: 1.1, safety: 1, finisher: 1.1, conserve: 1 };
   }
   function pickAdjacentSpawnTile(origin, playable, occupied) {
       for (const dir of CARDINAL_DIRS) {
@@ -23939,24 +23965,51 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
       };
   }
   function chooseBestCombatAction(params) {
-      const { actor, enemies, teamAe, aiProfile, canUse } = params;
+      const { actor, enemies, teamAe, aiProfile, canUse, objectiveHints } = params;
+      const bias = profileBias(aiProfile);
       const evaluateBaseScore = (action, target) => {
-          const distance = Math.abs(actor.x - target.x) + Math.abs(actor.y - target.y);
+          const distance = distanceBetween(actor, target);
           const actionRange = action === 'basicAttack' ? actor.basicRange : action === 'castSkill' ? 2 : 3;
           if (distance > actionRange)
               return Number.NEGATIVE_INFINITY;
-          const projectedDamage = action === 'castUlt'
+          const rawProjectedDamage = action === 'castUlt'
               ? Math.max(1, Math.floor(actor.atk - target.arm)) + 12
               : action === 'castSkill'
                   ? Math.max(1, Math.floor(actor.atk - target.arm)) + 5
                   : Math.max(1, Math.floor(actor.atk - target.arm));
-          const lethalBonus = projectedDamage >= target.hp ? 10 : 0;
-          const pressureBias = aiProfile === 'Aggressive' ? 1.35 : aiProfile === 'Defensive' ? 0.9 : 1.1;
-          const defensivePenalty = aiProfile === 'Defensive'
-              ? expectedIncomingDamageAt(actor.x, actor.y, actor, enemies) * 0.5
+          const effectiveDamage = Math.min(target.hp, rawProjectedDamage);
+          const overkillPenalty = Math.max(0, rawProjectedDamage - target.hp) * 0.15;
+          const incoming = expectedIncomingDamageAt(actor.x, actor.y, actor, enemies);
+          const defensivePenalty = incoming * 0.12 * bias.safety;
+          const resourcePenalty = action === 'castSkill'
+              ? Math.max(0, actor.skillCost - teamAe) * 0.25 * bias.conserve
+              : action === 'castUlt'
+                  ? Math.max(0, actor.maxRage - actor.rage) * 0.02 * bias.conserve
+                  : 0;
+          const lethalBonus = rawProjectedDamage >= target.hp ? 12 * bias.finisher : 0;
+          const actionPriority = action === 'castUlt' ? 2.2 : action === 'castSkill' ? 0.8 : 0;
+          const hpRatio = resolveHpRatio(target);
+          const finisherBonus = (1 - hpRatio) * 4 * bias.finisher;
+          const rescueThreatBonus = objectiveHints?.mode === 'rescue'
+              && objectiveHints.rescueUnit
+              && distanceBetween(target, objectiveHints.rescueUnit) <= target.basicRange
+              ? 5.5
               : 0;
-          const resourcePenalty = action === 'castSkill' ? Math.max(0, 6 - teamAe) * 0.15 : 0;
-          return pressureBias * projectedDamage + lethalBonus - distance * 0.3 - defensivePenalty - resourcePenalty;
+          const bossFocusBonus = objectiveHints?.mode === 'boss'
+              && objectiveHints.bossUnitId
+              && target.id === objectiveHints.bossUnitId
+              ? 5
+              : 0;
+          return (bias.pressure * effectiveDamage
+              + lethalBonus
+              + finisherBonus
+              + rescueThreatBonus
+              + bossFocusBonus
+              + actionPriority
+              - distance * 0.35
+              - defensivePenalty
+              - resourcePenalty
+              - overkillPenalty);
       };
       const bestOfAction = (action) => {
           let best = { action, target: null, score: Number.NEGATIVE_INFINITY };
@@ -24410,6 +24463,27 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               selectedUnitId = newActive?.id ?? null;
               unitTurnStartedAtMs = Date.now();
           };
+          const resolveBossUnitId = () => {
+              if (matchState.objectiveMode !== 'boss')
+                  return null;
+              const boss = aliveByTeam.enemy.find((unit) => unit.slotIndex === 0 && unit.hp > 0);
+              return boss?.id ?? null;
+          };
+          const executeActionChoice = (team, choice) => {
+              if (choice.action === 'castUlt' && choice.target) {
+                  executeCommand({ type: 'castUlt', team, payload: { targetX: choice.target.x, targetY: choice.target.y } });
+                  return;
+              }
+              if (choice.action === 'castSkill' && choice.target) {
+                  executeCommand({ type: 'castSkill', team, payload: { targetX: choice.target.x, targetY: choice.target.y } });
+                  return;
+              }
+              if (choice.action === 'basicAttack' && choice.target) {
+                  executeCommand({ type: 'basicAttack', team, payload: { targetX: choice.target.x, targetY: choice.target.y } });
+                  return;
+              }
+              executeCommand({ type: 'skipAction', team });
+          };
           const consumeTurnBudgetOrFallback = () => {
               const now = Date.now();
               const spentMs = Math.max(0, now - unitTurnStartedAtMs);
@@ -24427,6 +24501,11 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   enemies,
                   teamAe: matchState.resources[active.team].ae,
                   aiProfile: active.team === 'enemy' ? aiProfile : 'Defensive',
+                  objectiveHints: {
+                      mode: matchState.objectiveMode,
+                      rescueUnit: rescueNpc,
+                      bossUnitId: resolveBossUnitId(),
+                  },
                   canUse: (command, options) => canUseCommand(matchState, command, options),
               });
               const fallback = chooseFallbackAction(matchState, {
@@ -24437,7 +24516,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   executeCommand({ type: 'basicAttack', team: active.team, payload: { targetX: choice.target.x, targetY: choice.target.y } });
               }
               else {
-                  executeCommand({ type: 'skipAction', team: active.team });
+                  executeActionChoice(active.team, { action: 'skipAction', target: null, score: 0 });
               }
               executeCommand({ type: 'endTurn', team: active.team });
               return true;
@@ -24468,9 +24547,15 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                           : 'chess-rpg-match__cell chess-rpg-match__cell--void';
                       const unit = allUnits().find((entry) => entry.x === x && entry.y === y);
                       if (unit) {
+                          const hpFill = resolveHpFillPercent(unit);
+                          const hpBaseColor = unit.team === 'player' ? 'rgba(26,117,90,.74)' : 'rgba(126,42,72,.68)';
+                          const hpLossColor = unit.team === 'player' ? PLAYER_HP_LOSS_COLOR : ENEMY_HP_LOSS_COLOR;
                           cell.className = unit.team === 'player'
                               ? 'chess-rpg-match__cell chess-rpg-match__cell--player'
                               : 'chess-rpg-match__cell chess-rpg-match__cell--enemy';
+                          cell.style.setProperty('--unit-hp-pct', `${hpFill}%`);
+                          cell.style.setProperty('--unit-hp-base', hpBaseColor);
+                          cell.style.setProperty('--unit-hp-loss', hpLossColor);
                           cell.textContent = unit.label;
                           if (unit.id === selectedUnitId) {
                               cell.classList.add('chess-rpg-match__cell--selected');
@@ -24623,7 +24708,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   return;
               const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
               occupied.delete(keyOf(active.x, active.y));
-              reachableById.set(active.id, findShortestPaths(active, board.playable, occupied, allUnits()));
+              reachableById.set(active.id, findShortestPaths(active, board.playable, occupied));
           };
           const processEnemyTurn = () => {
               const active = resolveActiveUnit();
@@ -24643,15 +24728,32 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               const moves = Array.from(reachableById.get(active.id)?.entries() ?? []);
               const enemies = aliveByTeam.player.filter((unit) => unit.hp > 0);
               if (moves.length > 0 && enemies.length > 0) {
+                  const rescueUnit = rescueNpc;
                   let bestMove = null;
                   for (const [key, path] of moves) {
                       const parsed = parseKey(key);
                       if (!parsed)
                           continue;
                       const nearest = enemies.reduce((min, enemy) => Math.min(min, Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y)), Number.POSITIVE_INFINITY);
-                      const defensiveBias = aiProfile === 'Defensive' ? active.hp / Math.max(1, active.maxHp) : 0;
-                      const aggressiveBias = aiProfile === 'Aggressive' ? 1.3 : aiProfile === 'Neutral' ? 1 : 0.7;
-                      const score = aggressiveBias * (10 - nearest) + defensiveBias * 2 - path.length * 0.05;
+                      const incoming = expectedIncomingDamageAt(parsed.x, parsed.y, active, enemies);
+                      const inAttackRange = enemies.some((enemy) => Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y) <= active.basicRange);
+                      const inSkillRange = enemies.some((enemy) => Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y) <= 2);
+                      const stance = profileBias(aiProfile);
+                      const ownHpRatio = resolveHpRatio(active);
+                      const objectiveBonus = matchState.objectiveMode === 'rescue'
+                          ? enemies.some((enemy) => {
+                              return rescueUnit ? distanceBetween(enemy, rescueUnit) <= enemy.basicRange : false;
+                          }) && inAttackRange
+                              ? 2.5
+                              : 0
+                          : matchState.objectiveMode === 'boss' && active.slotIndex === 0 && inSkillRange
+                              ? 1.5
+                              : 0;
+                      const score = (stance.pressure * (9 - nearest)
+                          + (inAttackRange ? 2.6 : inSkillRange ? 1.2 : 0)
+                          + objectiveBonus
+                          - stance.safety * incoming * (0.08 + (1 - ownHpRatio) * 0.12)
+                          - path.length * 0.06);
                       if (!bestMove || score > bestMove.score) {
                           bestMove = { key, score, steps: Math.max(1, path.length - 1) };
                       }
@@ -24670,6 +24772,10 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   enemies: aliveByTeam.player.filter((unit) => unit.hp > 0),
                   teamAe: matchState.resources.enemy.ae,
                   aiProfile,
+                  objectiveHints: {
+                      mode: matchState.objectiveMode,
+                      rescueUnit: rescueNpc,
+                  },
                   canUse: (command, options) => canUseCommand(matchState, command, options),
               });
               if (timerStep.timeout) {
@@ -24681,20 +24787,11 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
                   }
                   else {
-                      executeCommand({ type: 'skipAction', team: 'enemy' });
+                      executeActionChoice('enemy', { action: 'skipAction', target: null, score: 0 });
                   }
               }
-              else if (actionChoice.action === 'castUlt' && actionChoice.target) {
-                  executeCommand({ type: 'castUlt', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
-              }
-              else if (actionChoice.action === 'castSkill' && actionChoice.target) {
-                  executeCommand({ type: 'castSkill', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
-              }
-              else if (actionChoice.action === 'basicAttack' && actionChoice.target) {
-                  executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
-              }
               else {
-                  executeCommand({ type: 'skipAction', team: 'enemy' });
+                  executeActionChoice('enemy', actionChoice);
               }
               executeCommand({ type: 'endTurn', team: 'enemy' });
               prepareReachable();

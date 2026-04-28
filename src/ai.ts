@@ -719,9 +719,11 @@ export interface GambitEvaluation {
   reason: string;
 }
 
-function getUnitClassName(Game: SessionState, unit: UnitToken): string {
-  const className = Game.meta?.get(unit.id)?.class;
-  return typeof className === 'string' ? className : '';
+function resolveHpRatio(unit: UnitToken | null | undefined): number {
+  if (!unit) return 0;
+  const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
+  const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
+  return hp / hpMax;
 }
 
 function findLowestHpUnit(units: ReadonlyArray<UnitToken>): UnitToken | null {
@@ -729,9 +731,7 @@ function findLowestHpUnit(units: ReadonlyArray<UnitToken>): UnitToken | null {
   let bestRatio = Number.POSITIVE_INFINITY;
   for (const token of units) {
     if (!token || !token.alive) continue;
-    const hp = Number.isFinite(token.hp) ? Number(token.hp) : 0;
-    const hpMax = Math.max(1, Number.isFinite(token.hpMax) ? Number(token.hpMax) : 1);
-    const ratio = hp / hpMax;
+    const ratio = resolveHpRatio(token);
     if (ratio < bestRatio) {
       bestRatio = ratio;
       best = token;
@@ -741,10 +741,7 @@ function findLowestHpUnit(units: ReadonlyArray<UnitToken>): UnitToken | null {
 }
 
 function resolveHpPercent(unit: UnitToken | null | undefined): number {
-  if (!unit) return 0;
-  const hp = Number.isFinite(unit.hp) ? Number(unit.hp) : 0;
-  const hpMax = Math.max(1, Number.isFinite(unit.hpMax) ? Number(unit.hpMax) : 1);
-  return (hp / hpMax) * 100;
+  return resolveHpRatio(unit) * 100;
 }
 
 function evaluateGambitCondition(
