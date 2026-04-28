@@ -7,12 +7,14 @@ import { verifyAetherBundle } from './tools/verify-aether-bundle.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BUILD_SCRIPT_VERSION = '2026-04-28';
 let esbuild;
+const pickModuleDefault = (imported) => imported?.default ?? imported;
+async function tryImportModule(moduleId){
+  return pickModuleDefault(await import(moduleId));
+}
 try {
-  const imported = await import('esbuild');
-  esbuild = imported?.default ?? imported;
+  esbuild = await tryImportModule('esbuild');
 } catch (err) {
-  const fallback = await import('./tools/esbuild-stub/index.js');
-  esbuild = fallback?.default ?? fallback;
+  esbuild = await tryImportModule('./tools/esbuild-stub/index.js');
   console.warn('Sử dụng esbuild fallback từ tools/esbuild-stub do không thể tải gói esbuild chuẩn:', err?.message || err);
 }
 const SRC_DIR = path.join(__dirname, 'src');

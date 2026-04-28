@@ -11,6 +11,7 @@ const flipSide = (side: TurnSideKey): TurnSideKey => (side === 'ALLY' ? 'ENEMY' 
 const DEFAULT_LAST_POS: Readonly<Record<TurnSideKey, number>> = createZeroBySide();
 const DEFAULT_WRAP_COUNT: Readonly<Record<TurnSideKey, number>> = createZeroBySide();
 const SLOT_CAP = 9;
+const clampInt = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, Math.floor(value)));
 type SlotMapBySide = Record<TurnSideKey, Map<number, UnitToken>>;
 type SequentialOrderIndexCache = {
   orderRef: Array<{ side?: string; slot?: number }>;
@@ -32,7 +33,7 @@ function normalizeSide(side: Side | TurnSideKey | string): TurnSideKey {
 function resolveSlotCount(turn: InterleavedTurnState | null | undefined): number {
   const raw = Number.isFinite(turn?.slotCount) ? turn?.slotCount ?? null : null;
   if (Number.isFinite(raw) && (raw ?? 0) > 0){
-    return Math.max(1, Math.min(SLOT_CAP, Math.floor(raw ?? SLOT_CAP)));
+    return clampInt(raw ?? SLOT_CAP, 1, SLOT_CAP);
   }
   return SLOT_CAP;
 }
@@ -110,7 +111,8 @@ export function getSequentialOrderIndex(
   if (!order) return -1;
 
   const normalizedSide = toLowerSpawnSide(side);
-  const key = `${normalizedSide}:${slot}`;
+  const normalizedSlot = clampInt(Number.isFinite(slot) ? slot : 0, 0, SLOT_CAP);
+  const key = `${normalizedSide}:${normalizedSlot}`;
 
   const cache = turn.orderIndexCache;
   const needsRebuild = !cache
@@ -156,7 +158,7 @@ export function predictSpawnCycleByTurnOrder(
   if (idx < 0) return cycle + 1;
 
   const cursorRaw = Number.isFinite(maybeSequential.cursor) ? Number(maybeSequential.cursor) : 0;
-  const cursor = Math.max(0, Math.min(order.length - 1, cursorRaw));
+  const cursor = clampInt(cursorRaw, 0, order.length - 1);
   return idx >= cursor ? cycle : cycle + 1;
 }
 
@@ -171,7 +173,7 @@ export function findNextOccupiedPos(
   const sideLower = SIDE_TO_LOWER[sideKey];
 
   const slotCount = resolveSlotCount(turn);
-  const start = Number.isFinite(startPos) ? Math.max(0, Math.min(slotCount, Math.floor(startPos))) : 0;
+  const start = Number.isFinite(startPos) ? clampInt(startPos, 0, slotCount) : 0;
   const unitsBySlot = slotMaps?.[sideKey] ?? buildSlotMaps(state.tokens)[sideKey];
   const cycle = Number.isFinite(turn?.cycle) ? turn!.cycle : 0;
 
@@ -223,7 +225,7 @@ export function nextTurnInterleaved(
   const sideKey = normalizeSide(turn.nextSide);
   const sideLower = SIDE_TO_LOWER[sideKey];
   const startPosRaw = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
-  const startPos = Math.max(0, Math.min(slotCount, Math.floor(startPosRaw)));
+  const startPos = clampInt(startPosRaw, 0, slotCount);
   const picked = findNextOccupiedPos(state, sideKey, startPos, buildSlotMaps(state.tokens));
   if (!picked) return null;
 

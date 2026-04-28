@@ -102,9 +102,7 @@ const CURRENCY_IDS = Object.freeze({
   THNT: currencyIdMap.ThNT
 });
 
-const CURRENCIES: ReadonlyArray<CurrencyDefinition> = Object.freeze(
-  economyConfig.currencies.map((currency) => Object.freeze({ ...currency }))
-);
+const CURRENCIES: ReadonlyArray<CurrencyDefinition> = freezeCloneList(economyConfig.currencies);
 const SORTED_CURRENCIES_BY_RATIO = Object.freeze(
   [...CURRENCIES].sort((a, b) => a.ratioToBase - b.ratioToBase)
 );
@@ -115,14 +113,21 @@ function indexBy<T>(items: ReadonlyArray<T>, getKey: (item: T) => string): Reado
     return acc;
   }, {});
 }
+function freezeCloneList<T extends object>(items: ReadonlyArray<T>): ReadonlyArray<T> {
+  return Object.freeze(items.map((item) => Object.freeze({ ...item } as T)));
+}
 function normalizeNonNegativeInt(value: unknown): number {
   return Math.max(0, Math.floor(Number(value ?? 0)));
 }
 
 const CURRENCY_INDEX: Readonly<Record<string, CurrencyDefinition>> = indexBy(CURRENCIES, (currency) => currency.id);
+const normalizeCurrencyId = (currencyId: string): string => String(currencyId ?? '').trim();
 
 function getCurrency(currencyId: string): CurrencyDefinition | null {
-  return CURRENCY_INDEX[currencyId] ?? null;
+  const normalizedCurrencyId = normalizeCurrencyId(currencyId);
+  if (!normalizedCurrencyId) return null;
+  const canonicalCurrencyId = CURRENCY_IDS[normalizedCurrencyId as keyof typeof CURRENCY_IDS] ?? normalizedCurrencyId;
+  return CURRENCY_INDEX[canonicalCurrencyId] ?? null;
 }
 
 function listCurrencies(): CurrencyDefinition[] {
@@ -265,7 +270,9 @@ const PITY_CONFIG: Readonly<Record<PityTier, PityConfiguration>> = Object.freeze
       {
         tier: config.tier,
         hardPity: config.hardPity,
-        softGuarantees: config.softGuarantees.map((rule): PityConfiguration['softGuarantees'][number] => ({ ...rule }))
+        softGuarantees: freezeCloneList(
+          config.softGuarantees as Array<PityConfiguration['softGuarantees'][number]>
+        )
       }
     ])
   ) as Record<PityTier, PityConfiguration>
@@ -281,8 +288,7 @@ function listPityTiers(): string[] {
   return PITY_TIERS.slice();
 }
 
-const SHOP_TAX_BRACKETS: ReadonlyArray<ShopTaxBracket> = Object.freeze(
-  economyConfig.shopTaxBrackets.map((bracket) => Object.freeze({ ...bracket }))
+const SHOP_TAX_BRACKETS: ReadonlyArray<ShopTaxBracket> = freezeCloneList(economyConfig.shopTaxBrackets);
 );
 
 const SHOP_TAX_INDEX: Readonly<Record<string, ShopTaxBracket>> = indexBy(SHOP_TAX_BRACKETS, (bracket) => bracket.rank);

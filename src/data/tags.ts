@@ -79,13 +79,14 @@ const TAG_DEFINITIONS = [
 ] as const satisfies ReadonlyArray<TagDefinition>;
 
 const normalizeKey = (value: string): string => value.trim().toLowerCase();
+const getDefinitionAliases = (definition: TagDefinition): ReadonlyArray<string> => definition.aliases ?? [];
 
 const TAG_BY_ID = new Map<string, TagDefinition>();
 const KNOWN_TAG_IDS = new Set<string>();
 for (const definition of TAG_DEFINITIONS){
   KNOWN_TAG_IDS.add(definition.id);
   TAG_BY_ID.set(normalizeKey(definition.id), definition);
-  for (const alias of definition.aliases ?? []){
+  for (const alias of getDefinitionAliases(definition)){
     TAG_BY_ID.set(normalizeKey(alias), definition);
   }
 }
@@ -205,7 +206,9 @@ export function resolveTagVersionAliases(
   version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
 ): string[] {
   if (!Array.isArray(tags)) return [];
-  return tags.map((tag) => resolveVersionAlias(tag, version));
+  return tags
+    .map((tag) => (typeof tag === 'string' ? resolveVersionAlias(tag, version) : ''))
+    .filter(Boolean);
 }
 
 export function getTagDefinition(tag: string | null | undefined): TagDefinition | null {
@@ -235,8 +238,11 @@ export function hasAnyTag(haystack: ReadonlyArray<string>, needles: ReadonlyArra
   }
   const normalizedHaystack = collectNormalizedTagSet(haystack);
   const normalizedNeedles = collectNormalizedTagSet(needles);
-  for (const normalizedNeedle of normalizedNeedles) {
-    if (normalizedHaystack.has(normalizedNeedle)) return true;
+  const [smallerSet, largerSet] = normalizedHaystack.size <= normalizedNeedles.size
+    ? [normalizedHaystack, normalizedNeedles]
+    : [normalizedNeedles, normalizedHaystack];
+  for (const value of smallerSet) {
+    if (largerSet.has(value)) return true;
   }
   return false;
 }

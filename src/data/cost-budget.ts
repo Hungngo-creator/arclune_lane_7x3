@@ -1,4 +1,4 @@
-import { normalizeTagList } from './tags.ts';
+import { normalizeTagId, normalizeTagList } from './tags.ts';
 
 export const COST_MIN = 7;
 export const COST_MAX = 22;
@@ -117,6 +117,12 @@ const SCORE_METRIC_KEYS = [
 ] as const;
 type ScoreKey = typeof SCORE_METRIC_KEYS[number];
 type ScoreMetrics = Pick<CostBudgetBreakdown, ScoreKey>;
+const RISK_METRICS = new Set<ScoreKey>([
+  'setupPenalty',
+  'selfRiskPenalty',
+  'vanishRiskPenalty',
+  'consistencyPenalty',
+]);
 interface CostTagScoreRule {
   id: string;
   label: string;
@@ -146,6 +152,9 @@ interface CostTagContext {
   normalizedTags: ReadonlyArray<string>;
 }
 const normalizeKeywordTerm = (value: string): string => value.trim().toLowerCase().replace(/\s+/g, ' ');
+const TAGS_DIVINE_SUSTAIN = Object.freeze(['heal', 'team-heal', 'shield', 'revive', 'support']);
+const TAGS_RANDOMNESS = Object.freeze(['random-target', 'random-aoe']);
+const TAGS_SETUP = Object.freeze(['sleep', 'summon', 'mark']);
 
 export interface CostTagRuleMatch {
   ruleId: string;
@@ -162,6 +171,11 @@ export interface CostTagBudgetInsights {
   keywordHitCount: number;
   ruleMatchCount: number;
   synergyMatchCount: number;
+  metricTotals: Readonly<Partial<Record<ScoreKey, number>>>;
+  positiveMatchCount: number;
+  riskMatchCount: number;
+  dominantMetric: ScoreKey | null;
+  volatilityLevel: 'low' | 'medium' | 'high';
   riskSignals: ReadonlyArray<string>;
 }
 
@@ -416,6 +430,14 @@ const COST_TAG_SCORE_RULES: ReadonlyArray<CostTagScoreRule> = Object.freeze([
   { id: 'absolute-battle-tax', label: 'Absolute rule battlefield tax', metric: 'battlefieldInfluence', perTag: 1, cap: 2, tagIds: ['absolute-attack', 'absolute-shield'] },
   { id: 'field-line-pressure', label: 'Field + line pressure', metric: 'battlefieldInfluence', delta: 1, requiresAll: ['field', 'line'] },
   { id: 'revive-support-flex', label: 'Revive support flexibility', metric: 'tacticalFlexibility', delta: 1, requiresAll: ['revive', 'support'] },
+  { id: 'execute-pierce-pressure', label: 'Execute + pierce pressure', metric: 'battlefieldInfluence', delta: 1, requiresAll: ['execute', 'pierce'] },
+  { id: 'global-shield-tax', label: 'Global shield economy pressure', metric: 'economyPressure', delta: 1, requiresAll: ['global-rule', 'shield'] },
+  { id: 'chain-random-volatility', label: 'Chain random volatility', metric: 'consistencyPenalty', delta: 1, requiresAll: ['chain', 'random-target'] },
+  { id: 'blink-execute-setup', label: 'Blink execute setup pressure', metric: 'setupPenalty', delta: 1, requiresAll: ['blink', 'execute'] },
+  { id: 'summon-mark-scale', label: 'Summon mark scaling', metric: 'scalingCeiling', delta: 1, requiresAll: ['summon', 'mark'] },
+  { id: 'team-heal-shield-flex', label: 'Team-heal shield flexibility', metric: 'tacticalFlexibility', delta: 1, requiresAll: ['team-heal', 'shield'] },
+  { id: 'poison-control-pressure', label: 'Poison control pressure', metric: 'battlefieldInfluence', delta: 1, requiresAll: ['poison', 'control'] },
+  { id: 'sleep-random-tax', label: 'Sleep random consistency tax', metric: 'consistencyPenalty', delta: 1, requiresAll: ['sleep', 'random-target'] },
 ]);
 
 const COST_TAG_SYNERGY_RULES: ReadonlyArray<CostTagSynergyRule> = Object.freeze([
@@ -433,6 +455,11 @@ const COST_TAG_SYNERGY_RULES: ReadonlyArray<CostTagSynergyRule> = Object.freeze(
   { id: 'pierce-burst-ceiling', label: 'Pierce burst ceiling', requiresAll: ['pierce', 'burst'], metric: 'scalingCeiling', delta: 1 },
   { id: 'support-revive-economy', label: 'Support revive economy pressure', requiresAll: ['support', 'revive'], metric: 'economyPressure', delta: 1 },
   { id: 'shield-control-frontline', label: 'Shield control frontline pressure', requiresAll: ['shield', 'control'], metric: 'battlefieldInfluence', delta: 1 },
+  { id: 'summon-mark-economy', label: 'Summon mark economy pressure', requiresAll: ['summon', 'mark'], metric: 'economyPressure', delta: 1 },
+  { id: 'blink-burst-ceiling', label: 'Blink burst scaling', requiresAll: ['blink', 'burst'], metric: 'scalingCeiling', delta: 1 },
+  { id: 'line-control-setup', label: 'Line control setup tax', requiresAll: ['line', 'control'], metric: 'setupPenalty', delta: 1 },
+  { id: 'heal-revive-economy', label: 'Heal revive economy pressure', requiresAll: ['heal', 'revive'], metric: 'economyPressure', delta: 1 },
+  { id: 'poison-random-volatility', label: 'Poison random volatility', requiresAll: ['poison', 'random-target'], metric: 'consistencyPenalty', delta: 1 },
 ]);
 
 function createTagCostContext(tags: readonly string[]): CostTagContext {
@@ -442,6 +469,19 @@ function createTagCostContext(tags: readonly string[]): CostTagContext {
   const normalizedTagSet = new Set(normalizedTextTags);
   const normalizedTagText = normalizedTextTags.join(' || ');
   const keywordCache = new Map<string, boolean>();
+  const normalizedNeedleCache = new Map<string, string | null>();
+  const normalizeNeedle = (needle: string): string | null => {
+    const normalizedRaw = normalizeKeywordTerm(needle);
+    const cached = normalizedNeedleCache.get(normalizedRaw);
+    if (typeof cached !== 'undefined') {
+      return cached;
+    }
+    const normalizedTagId = normalizeTagId(normalizedRaw);
+    const normalized = normalizeKeywordTerm(normalizedTagId ?? normalizedRaw);
+    const value = normalized || null;
+    normalizedNeedleCache.set(normalizedRaw, value);
+    return value;
+  };
   const hasKeywordImpl = (keyword: string): boolean => {
     const normalizedKeyword = normalizeKeywordTerm(keyword);
     if (!normalizedKeyword) return false;
@@ -449,7 +489,10 @@ function createTagCostContext(tags: readonly string[]): CostTagContext {
     return normalizedTagText.includes(normalizedKeyword);
   };
 
-  const hasTag = (...needles: string[]): boolean => normalizeTagList(needles).some((needle) => normalizedTagSet.has(needle));
+  const hasTag = (...needles: string[]): boolean => needles.some((needle) => {
+    const normalized = normalizeNeedle(needle);
+    return Boolean(normalized && normalizedTagSet.has(normalized));
+  });
   const hasKeyword = (...keywords: string[]): boolean => keywords.some((keyword) => {
     const normalizedKeyword = normalizeKeywordTerm(keyword);
     const cached = keywordCache.get(normalizedKeyword);
@@ -462,8 +505,9 @@ function createTagCostContext(tags: readonly string[]): CostTagContext {
   });
   const countMatchedTags = (tagIds: ReadonlyArray<string> | undefined): number => {
     if (!Array.isArray(tagIds) || tagIds.length === 0) return 0;
+    const uniqueNeedles = new Set<string>(tagIds);
     let count = 0;
-    for (const tagId of tagIds){
+    for (const tagId of uniqueNeedles){
       if (hasTag(tagId)) count += 1;
     }
     return count;
@@ -503,6 +547,20 @@ function isRuleApplicable(rule: CostTagScoreRule, tagContext: CostTagContext): b
     return false;
   }
   return true;
+}
+
+function isSynergyApplicable(rule: CostTagSynergyRule, tagContext: CostTagContext): boolean {
+  return rule.requiresAll.every((tagId) => tagContext.hasTag(tagId));
+}
+
+function applyScoreRule(
+  rule: CostTagScoreRule,
+  tagContext: CostTagContext,
+): { delta: number; matchedTags: number; matchedKeywords: number } {
+  const matchedTags = tagContext.countMatchedTags(rule.tagIds);
+  const matchedKeywords = tagContext.countMatchedKeywords(rule.keywords);
+  const delta = calculateRuleDelta(rule, matchedTags, matchedKeywords);
+  return { delta, matchedTags, matchedKeywords };
 }
 
 export function mergeBudgetInputs(...inputs: Array<CostBudgetInput | null | undefined>): CostBudgetInput {
@@ -602,6 +660,15 @@ export function estimateCostFromTags(tags: readonly string[]): CostBudgetResult 
   return evaluateCostBudget(deriveBudgetFromTagsDetailed(tags).input);
 }
 
+function resolveVolatilityLevel(
+  riskSignals: ReadonlyArray<string>,
+  riskMatchCount: number,
+): 'low' | 'medium' | 'high' {
+  if (riskMatchCount >= 5 || riskSignals.length >= 3) return 'high';
+  if (riskMatchCount >= 3 || riskSignals.length >= 2) return 'medium';
+  return 'low';
+}
+
 function buildRiskSignals(tagContext: CostTagContext): string[] {
   const riskSignals: string[] = [];
   if (tagContext.hasTag('random-target', 'random-aoe') || tagContext.hasKeyword('random', 'ngẫu nhiên', 'coin flip')) {
@@ -650,50 +717,116 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
     if (delta <= 0) return;
     matches.push({ ruleId, label, metric, delta, matchedTags, matchedKeywords });
   };
-  if (tagContext.hasTag('global-rule') && tagContext.hasKeyword('global', 'toàn sân', 'quy tắc')){
-    addScore('tagComplexity', 1);
-    addMatch('rule-text-alignment', 'Global rule text alignment', 'tagComplexity', 1);
-  }
-  if (tagContext.totalTags >= 10){
-    addScore('consistencyPenalty', 1);
-    addMatch('high-tag-overload', 'High tag overload consistency tax', 'consistencyPenalty', 1, tagContext.totalTags, 0);
-  }
+  const applyConditionalMatch = (
+    condition: boolean,
+    ruleId: string,
+    label: string,
+    metric: ScoreKey,
+    delta: number,
+    matchedTags = 0,
+    matchedKeywords = 0,
+  ): void => {
+    if (!condition) return;
+    addScore(metric, delta);
+    addMatch(ruleId, label, metric, delta, matchedTags, matchedKeywords);
+  };
+
+  applyConditionalMatch(
+    tagContext.hasTag('global-rule') && tagContext.hasKeyword('global', 'toàn sân', 'quy tắc'),
+    'rule-text-alignment',
+    'Global rule text alignment',
+    'tagComplexity',
+    1,
+  );
+  applyConditionalMatch(
+    tagContext.totalTags >= 10,
+    'high-tag-overload',
+    'High tag overload consistency tax',
+    'consistencyPenalty',
+    1,
+    tagContext.totalTags,
+  );
 
   for (const rule of COST_TAG_SCORE_RULES){
     if (!isRuleApplicable(rule, tagContext)) continue;
-    const matchedTags = tagContext.countMatchedTags(rule.tagIds);
-    const matchedKeywords = tagContext.countMatchedKeywords(rule.keywords);
-    const delta = calculateRuleDelta(rule, matchedTags, matchedKeywords);
+    const { delta, matchedTags, matchedKeywords } = applyScoreRule(rule, tagContext);
     addScore(rule.metric, delta);
     addMatch(rule.id, rule.label, rule.metric, delta, matchedTags, matchedKeywords);
   }
 
   let synergyMatchCount = 0;
   for (const rule of COST_TAG_SYNERGY_RULES){
-    if (!rule.requiresAll.every((tagId) => tagContext.hasTag(tagId))) continue;
+    if (!isSynergyApplicable(rule, tagContext)) continue;
     synergyMatchCount += 1;
     addScore(rule.metric, rule.delta);
     addMatch(`synergy:${rule.id}`, rule.label, rule.metric, rule.delta, rule.requiresAll.length, 0);
   }
 
   if (input.hasDivineNature){
-    const divineSustainTags = tagContext.countMatchedTags(['heal', 'team-heal', 'shield', 'revive', 'support']);
+    const divineSustainTags = tagContext.countMatchedTags(TAGS_DIVINE_SUSTAIN);
     if (divineSustainTags > 0){
       input.divineSelfSustainBonus = Math.min(divineSustainTags, SCORE_RANGES.divineSelfSustainBonus[1]);
       addMatch('divine-self-sustain', 'Divine sustain bonus', 'tacticalFlexibility', input.divineSelfSustainBonus, divineSustainTags, 0);
     }
   }
 
-  if (tagContext.totalTags >= 6){
-    addScore('tagComplexity', 1);
-    addMatch('complexity-size-6', 'Tag pool size >= 6', 'tagComplexity', 1);
-  }
-  if (tagContext.totalTags >= 9){
-    addScore('tagComplexity', 1);
-    addMatch('complexity-size-9', 'Tag pool size >= 9', 'tagComplexity', 1);
-  }
+  applyConditionalMatch(tagContext.totalTags >= 6, 'complexity-size-6', 'Tag pool size >= 6', 'tagComplexity', 1);
+  applyConditionalMatch(tagContext.totalTags >= 9, 'complexity-size-9', 'Tag pool size >= 9', 'tagComplexity', 1);
+  applyConditionalMatch(tagContext.totalTags >= 12, 'high-tag-overload-12', 'Tag pool size >= 12', 'consistencyPenalty', 1, tagContext.totalTags);
+  applyConditionalMatch(
+    tagContext.hasTag('summon', 'revive') && tagContext.hasTag(...TAGS_RANDOMNESS),
+    'spawn-rng-setup-tax',
+    'Spawn + RNG setup tax',
+    'setupPenalty',
+    1,
+    3,
+  );
+  applyConditionalMatch(
+    tagContext.hasTag('global-rule', 'absolute-attack', 'absolute-shield'),
+    'rule-absolute-economy-tax',
+    'Rule + absolute economy tax',
+    'economyPressure',
+    1,
+    2,
+  );
+  applyConditionalMatch(
+    tagContext.hasTag(...TAGS_SETUP) && tagContext.hasTag('support', 'shield', 'team-heal'),
+    'setup-support-flex',
+    'Setup + support flexibility',
+    'tacticalFlexibility',
+    1,
+    2,
+  );
+  applyConditionalMatch(
+    tagContext.hasTag('burst', 'execute', 'pierce'),
+    'burst-execute-pierce-ceiling',
+    'Burst execute pierce scaling',
+    'scalingCeiling',
+    1,
+    3,
+  );
 
   const keywordHitCount = matches.reduce((sum, match) => sum + (match.matchedKeywords ?? 0), 0);
+  const metricTotals: Partial<Record<ScoreKey, number>> = {};
+  for (const match of matches) {
+    metricTotals[match.metric] = (metricTotals[match.metric] ?? 0) + match.delta;
+  }
+  let dominantMetric: ScoreKey | null = null;
+  let dominantMetricScore = -1;
+  for (const key of SCORE_METRIC_KEYS) {
+    const score = metricTotals[key] ?? 0;
+    if (score > dominantMetricScore) {
+      dominantMetric = key;
+      dominantMetricScore = score;
+    }
+  }
+  let riskMatchCount = 0;
+  for (const match of matches) {
+    if (RISK_METRICS.has(match.metric)) {
+      riskMatchCount += 1;
+    }
+  }
+  const riskSignals = buildRiskSignals(tagContext);
   return {
     input,
     matches,
@@ -703,7 +836,12 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
       keywordHitCount,
       ruleMatchCount: matches.length - synergyMatchCount,
       synergyMatchCount,
-      riskSignals: buildRiskSignals(tagContext),
+      metricTotals,
+      positiveMatchCount: matches.length - riskMatchCount,
+      riskMatchCount,
+      dominantMetric,
+      volatilityLevel: resolveVolatilityLevel(riskSignals, riskMatchCount),
+      riskSignals,
     },
   };
 }

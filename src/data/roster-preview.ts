@@ -111,14 +111,25 @@ export function applyRankMultiplier(preRank: CatalogStatBlock, rank: keyof typeo
   });
 }
 
+function computePreviewStats(
+  base: CatalogStatBlock,
+  rank: keyof typeof RANK_MULT,
+  tpAlloc: Record<string, number | null | undefined>,
+): { preRank: CatalogStatBlock; final: CatalogStatBlock } {
+  const preRank = applyTpToBase(base, tpAlloc);
+  return {
+    preRank,
+    final: applyRankMultiplier(preRank, rank),
+  };
+}
+
 export function computeFinalStats(
   className: keyof typeof CLASS_BASE,
   rank: keyof typeof RANK_MULT,
   tpAlloc: Record<string, number | null | undefined> = {}
 ): CatalogStatBlock {
   const base = getClassBase(className);
-  const preRank = applyTpToBase(base, tpAlloc);
-  return applyRankMultiplier(preRank, rank);
+  return computePreviewStats(base, rank, tpAlloc).final;
 }
 
 export function deriveTpFromMods(
@@ -148,13 +159,13 @@ function totalTp(tpAlloc: Record<string, number> = {}) {
 
 function resolveUnitTpAllocation(
   unit: RosterUnitDefinition,
+  base: CatalogStatBlock,
   providedAllocations?: Record<string, Record<string, number>>,
 ): Record<string, number> {
   const derivedTp = providedAllocations?.[unit.id];
   if (derivedTp){
     return sanitizeTpAllocation(derivedTp);
   }
-  const base = getClassBase(unit.class);
   return deriveTpFromMods(base, unit.mods);
 }
 function resolvePreviewForUnit(
@@ -162,10 +173,9 @@ function resolvePreviewForUnit(
   tpAllocations?: Record<string, Record<string, number>>,
 ): RosterPreview {
   const base = getClassBase(unit.class);
-  const cleanTp = resolveUnitTpAllocation(unit, tpAllocations);
+  const cleanTp = resolveUnitTpAllocation(unit, base, tpAllocations);
   const rankKey = unit.rank as keyof typeof RANK_MULT;
-  const preRank = applyTpToBase(base, cleanTp);
-  const final = applyRankMultiplier(preRank, rankKey);
+  const { preRank, final } = computePreviewStats(base, rankKey, cleanTp);
   return {
     id: unit.id,
     name: unit.name,
@@ -215,7 +225,7 @@ export function buildPreviewRows(
 
 export const ROSTER_TP_ALLOCATIONS: Readonly<Record<string, Record<string, number>>> = Object.freeze(
   ROSTER.reduce<Record<string, Record<string, number>>>((acc, unit) => {
-    acc[unit.id] = resolveUnitTpAllocation(unit);
+    acc[unit.id] = resolveUnitTpAllocation(unit, getClassBase(unit.class));
     return acc;
   }, {})
 );
