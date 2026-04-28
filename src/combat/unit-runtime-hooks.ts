@@ -8,6 +8,7 @@ import type {
   RuntimeOnBasicAttackContext,
   RuntimeOnUnitReviveContext,
   RuntimeSkillContext,
+  RuntimeUltContext,
   UnitRuntimeHook,
 } from './runtime-hooks/types.ts';
 
@@ -49,6 +50,10 @@ export function runRuntimeDamageResolved(target: UnitToken | null | undefined): 
 
 export function runRuntimeActiveSkill(ctx: RuntimeSkillContext): PerformActiveSkillResult | null {
   return getUnitRuntimeHook(ctx.caster.id)?.onActiveSkill?.(ctx) ?? null;
+}
+
+export function runRuntimeUlt(ctx: RuntimeUltContext): boolean {
+  return getUnitRuntimeHook(ctx.caster.id)?.onUlt?.(ctx) === true;
 }
 
 export function runRuntimeUnitDeath(ctx: RuntimeOnUnitDeathContext): void {

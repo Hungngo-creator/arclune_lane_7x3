@@ -1688,6 +1688,78 @@ export const ROSTER = [
     }
   },
   {
+    id: 'co_truong_phong', name: 'Cổ Trường Phong', class: 'Warrior', rank: 'UR', base_element: 'metal',
+    mods: { ATK: 0.13, WIL: 0.13, ARM: 0.05, RES: 0.05 },
+    elementTag: 'metal',
+    kit: {
+      onSpawn: createOnSpawn(),
+      basic: asUnknownRecord({
+        name: 'Đánh Thường',
+        tags: ['single-target'],
+      }),
+      skills: asUnknownRecordArray([
+        {
+          key: 'skill1',
+          name: 'Pháp Tắc – Phi Kiếm',
+          tags: ['active', 'rule', 'random-target', 'non-heal-hp-change'],
+          cost: { aether: 20 },
+          consumeSword: 2,
+          damageMultiplier: 1.5,
+          notes: 'Phóng 2 phi kiếm công kích ngẫu nhiên 2 mục tiêu, mỗi mục tiêu chịu 150% sát thương đánh thường (không tính là đánh thường). Runtime riêng xử lý kho phi kiếm và trừ nộ theo Quy Tắc khi Skill 3 hoạt động.'
+        },
+        {
+          key: 'skill2',
+          name: 'Pháp Tắc – Gia Tốc Kiếm',
+          tags: ['active', 'rule', 'single-target', 'non-heal-hp-change', 'heal'],
+          cost: { aether: 35 },
+          consumeSword: 3,
+          hits: 3,
+          damageMultiplier: 1,
+          healFromDamageRatio: 0.55,
+          target: 'enemy_leader',
+          notes: 'Gia tốc 3 thanh phi kiếm đánh Leader địch; mỗi kiếm gây 1 đòn đánh thường và hồi máu 55% sát thương thực tế của chính hit đó.'
+        },
+        {
+          key: 'skill3',
+          name: 'Quy Tắc – Kiếm Luật',
+          tags: ['passive', 'rule'],
+          cost: { aether: 8 },
+          notes: 'Luôn tự động kích hoạt, trừ 8 Aether mỗi lượt để duy trì. Khi đang hoạt động, mỗi lần Cổ Trường Phong gây sát thương thành công sẽ trừ 8 nộ mục tiêu.'
+        }
+      ]),
+      ult: asUnknownRecord({
+        name: 'Vô Chiêu – Kiếm Tụ',
+        tags: ['active', 'rule'],
+        notes: 'Tiêu nộ để kích hoạt tức thì: ưu tiên liên tục cast Skill 2 miễn còn đủ 3 phi kiếm/lần; nếu còn dư >=2 phi kiếm thì cast thêm Skill 1. Các lần cast từ Ultimate không tốn Aether.'
+      }),
+      talent: asUnknownRecord({
+        name: 'Quy Tắc',
+        tags: ['passive', 'rule'],
+        notes: 'Mỗi lượt nhận 3 phi kiếm. Mỗi lần tự kết liễu một mục tiêu, số phi kiếm nhận mỗi lượt tăng +1 (tối đa 5 cộng dồn).'
+      }),
+      technique: null,
+      passives: asUnknownRecordArray([
+        {
+          id: 'co_truong_phong_rule_engine',
+          name: 'Quy Tắc',
+          when: 'onTurnStart/onKill',
+          effect: 'manageFlyingSwordsAndLawUpkeep',
+          params: {
+            baseSwordPerTurn: 3,
+            swordPerKillStack: 1,
+            maxKillStacks: 5,
+            lawAetherUpkeep: 8,
+            rageDrainPerSuccessfulHit: 8,
+          },
+        },
+      ]),
+      traits: asUnknownRecordArray([
+        { id: 'law-domain', text: 'Bộ kỹ năng thuộc miền Pháp Tắc/Quy Tắc theo thiết kế.' },
+        { id: 'ultimate-chain-cast', text: 'Ultimate thi triển chuỗi Skill 2/Skill 1 theo lượng phi kiếm hiện có, không tiêu hao Aether cho các lượt cast trong chuỗi.' },
+      ]),
+    }
+  },
+  {
     id: 'ly_thanh_thu', name: 'Lý Thanh Thu', class: 'Warrior', rank: 'UR', base_element: 'law',
     mods: { ATK: 0.12, WIL: 0.12, ARM: 0.06, RES: 0.06 },
     kit: {

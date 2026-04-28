@@ -501,7 +501,7 @@ về cơ bản thi đây là 1 char toàn đánh thường trừ skill 3 ra, ult
 ssr, mage element tag:light
 nội tại: +3,5% wil/res và 1,5% max hp (không hồi hp) của hiện tại/ mỗi turn hiện diện trên sân. reset về từ đầu khi chết hoặc về deck, rời sân.
 
-skill 1: mỗi khi đánh thường giảm 10% res/arm của kẻ địch trong 1 turn, skill này luôn kích hoạt cho đến khi không đủ aether, 3 aether/turn bất kể đánh thường bao nhiêu lần/turn.
+skill 1: mỗi khi đánh thường giảm 10% res/arm của kẻ địch trong 1 turn, skill này luôn kích hoạt cho đến khi không đủ aether, 3 aether/turn bất kể đánh thường bao nhiêu lần/turn. Pháp Tắc.
 
 skill 2: mỗi khi dính 1 debuff không có tag axiom/pháp/quy tắc thì tự động xoá 1 stack debuff đó (không thể xoá mark), -8 ae/lần kích hoạt, tối đa kích hoạt 3 lần/turn. skill bị động, đáp ứng đủ điều kiện thì kích hoạt + trừ ae, không cần tốn turn riêng để kích hoạt skill này.
 
@@ -515,9 +515,9 @@ Nội Tại: khi gây sát thương lên leader không phải leader đồng min
 
 Skill 1: Bỏ qua taunt (taunt này cần không có tag pháp/quy tắc/axiom), tấn công gây sát thương lên leader địch = 2 đòn đánh thường trong 1 lần tấn công, không tính là đánh thường, 25 ae.
 
-skill 2: cường hoá 3 lần gây sát thương kế tiếp, sau khi kích hoạt skill này 3 lần gây sát thương tiếp theo tăng 20% sát thương gây ra sau khi đã trừ res/arm/buff/debuff hoặc cơ chế khác nếu có, tức là tính sát thương xong hết rồi mới + 20%, 20 ae.
+skill 2: cường hoá 3 lần gây sát thương kế tiếp (skill/ult/đánh thường đều tính là 1 lần gây sát thương, follow up attack không tính), sau khi kích hoạt skill này 3 lần gây sát thương tiếp theo tăng 20% sát thương gây ra sau khi đã trừ res/arm/buff/debuff hoặc cơ chế khác nếu có, tức là tính sát thương xong hết rồi mới + 20%, 20 ae.
 
-skill 3: bị động, tự kích hoạt khi đủ điều kiện. Khi hp thấp hơn hoặc = 30%, tự cắn đan dược (vfx thôi), mỗi turn sau khi kích hoạt skill này hồi hp , = 5% hp max trong 3 turn, sau đó cd 1 turn, 30 ae/lần kích hoạt, mỗi trận kích hoạt tối đa 3 lần.
+skill 3: bị động, tự kích hoạt khi đủ điều kiện. Khi hp thấp hơn hoặc = 30%, tự cắn đan dược (vfx thôi), mỗi turn sau khi kích hoạt skill này hồi hp , = 5% hp max trong 3 turn, sau đó cd 1 turn, 25 ae/lần kích hoạt, mỗi trận kích hoạt tối đa 3 lần.
 
 ultimate: cast 2 lần skill 1 nhưng không tốn ae.
 
@@ -529,9 +529,9 @@ skill 1: phi 2 phi kiếm tấn công ngẫu nhiên 2 mục tiêu, gây sát th�
 
 skill 2: gia tốc 3 thanh phi kiếm, tấn công leader kẻ thù, mỗi thanh phi kiếm gây sát thương = 1 đòn đánh thường, hồi hp 3 lần, mỗi lần 55% = sát thương của 1 phi kiếm gây ra lên leader địch, vì gây sát thương 3 lần riêng biệt nên sát thương gây ra cũng khác nhau và heal nhận cũng khác nhau. 35 ae và 3 phi kiếm. - 24 rage lên leader địch nếu 3 lần gây sát thương đều thành công (nếu skill 3 kích hoạt). Pháp Tắc.
 
-skill 3: luôn kích hoạt cho đến khi bể aether đồng minh không đủ để thanh toán cost skill này, skill bị động không cần tốn turn riêng để bật. Mỗi lần gây sát thương lên kẻ địch sẽ - 8 rage của họ, cost/turn bất kể số lần gây sát thương lên kẻ địch/turn là 8 ae.
+skill 3: luôn kích hoạt cho đến khi bể aether đồng minh không đủ để thanh toán cost skill này, skill bị động không cần tốn turn riêng để bật. Mỗi lần gây sát thương lên kẻ địch sẽ - 8 rage của họ, - cost ae/turn bất kể số lần gây sát thương lên kẻ địch/turn là ae. Ví dụ dễ hiểu là skill 1 và 2 của dương hạ.
 
-ultimate: cast skill 3 miễn còn đủ 3 phi kiếm/lần cho đến khi không đủ phi kiếm thì nếu còn phi kiếm sẽ cast skill 2. skill cast từ ultimate sẽ không tốn ae. Ví dụ char này có 4 phi kiếm thì sau khi dùng ultimate sẽ cast 1 lần skill 3, nếu có 5 phi kiếm thì sau khi dùng ultimate sẽ cast skill 3 sau đó là skill 2 hoặc có thể cast cùng lúc skill 2 và 3 nếu code cho phép, nếu có 6 hoặc 7 phi kiếm thì sẽ cast 2 lần skill 3. nếu có 8 phi kiếm thì cast skill 3 2 lần rồi cast skill 2, thực ra ultimate char này chả có vfx gì, player chỉ thấy char này mất nộ do ultimate rồi cast skill theo mô tả ultimate theo lượng phi kiếm hiện có thôi, kiểu thấy char này đến turn thì mất nộ do bị trừ khi kích hoạt ultimate, kiểu đến turn là cast skill luôn không có khựng gì cả. Đương nhiên nộ vẫn phải trừ, các char khác nếu có ultimate là cast skill cũng thế, mất nộ là cast skill theo mô tả của ultimate luôn.
+ultimate: cast skill 2 miễn còn đủ 3 phi kiếm/lần cho đến khi không đủ phi kiếm thì nếu còn phi kiếm sẽ cast skill 1. skill cast từ ultimate sẽ không tốn ae. Ví dụ char này có 4 phi kiếm thì sau khi dùng ultimate sẽ cast 1 lần skill 2, nếu có 5 phi kiếm thì sau khi dùng ultimate sẽ cast skill 2 sau đó là skill 1 hoặc có thể cast cùng lúc skill 1 và 2 nếu code cho phép, nếu có 6 hoặc 7 phi kiếm thì sẽ cast 2 lần skill 2. nếu có 8 phi kiếm thì cast skill 2 2 lần rồi cast skill 1, thực ra ultimate char này chả có vfx gì, player chỉ thấy char này mất nộ do ultimate rồi cast skill theo mô tả ultimate theo lượng phi kiếm hiện có thôi, kiểu thấy char này đến turn thì mất nộ do bị trừ khi kích hoạt ultimate, kiểu đến turn là cast skill luôn không có khựng gì cả. Đương nhiên nộ vẫn phải trừ, các char khác nếu có ultimate là cast skill cũng thế, mất nộ là cast skill theo mô tả của ultimate luôn.
 
 45)
 mô tả: một thiền sư chuyên tu thổ hệ công pháp.

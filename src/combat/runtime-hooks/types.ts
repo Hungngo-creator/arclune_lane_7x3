@@ -39,8 +39,14 @@ export interface RuntimeOnUnitReviveContext {
   unit: UnitToken;
 }
 
+export interface RuntimeUltContext {
+  game: SessionState;
+  caster: UnitToken;
+}
+
 export interface UnitRuntimeHook {
   onActiveSkill?: (ctx: RuntimeSkillContext) => PerformActiveSkillResult | null;
+  onUlt?: (ctx: RuntimeUltContext) => boolean;
   onTurnStart?: (ctx: RuntimeTurnContext) => void;
   onActionEnd?: (ctx: RuntimeTurnContext) => void;
   onTurnEnd?: (ctx: RuntimeTurnContext) => void;

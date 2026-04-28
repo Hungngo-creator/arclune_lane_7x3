@@ -1,4 +1,5 @@
 import { dealAbilityDamage } from '../../combat.ts';
+import { basicAttack } from '../../combat.ts';
 import { globalAetherPool } from '../../aether.ts';
 import { Statuses } from '../../statuses.ts';
 import { setFury } from '../../utils/fury.ts';
@@ -72,6 +73,14 @@ function refreshSkill2Toggle(unit: DuongHaCarrier): void {
 }
 
 export const duongHaRuntimeHook: UnitRuntimeHook = {
+  onUlt({ game, caster }) {
+    if (caster.id !== DUONG_HA_ID) return false;
+    for (let i = 0; i < 3; i += 1) {
+      if (!caster.alive) break;
+      basicAttack(game, caster);
+    }
+    return true;
+  },
   onActiveSkill({ caster, skillKey, skill, tags, appliedTags }) {
     if (caster.id !== DUONG_HA_ID) return null;
     if (skillKey === 'skill1' || skillKey === 'skill2') {
