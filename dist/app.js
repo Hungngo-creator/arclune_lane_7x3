@@ -8586,12 +8586,12 @@ __modules['./config.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'CHIBI')) exports.CHIBI = CHIBI;
 };
 __modules['./config/package-lock.json'] = (exports, module, __require) => {
-  const data = JSON.parse('{"name":"arclune_lane_7x3","version":"1.0.0","lockfileVersion":3,"requires":true,"packages":{"":{"name":"arclune_lane_7x3","version":"1.0.0","license":"ISC","dependencies":{"zod":"file:tools/zod-stub"},"devDependencies":{"esbuild":"file:tools/esbuild-stub","tsx":"file:tools/tsx-stub"}},"node_modules/esbuild":{"resolved":"tools/esbuild-stub","link":true},"node_modules/zod":{"resolved":"tools/zod-stub","link":true},"node_modules/tsx":{"resolved":"tools/tsx-stub","link":true},"tools/esbuild-stub":{"name":"esbuild","version":"0.0.0-stub","dev":true},"tools/zod-stub":{"name":"zod","version":"0.0.0-stub"},"tools/tsx-stub":{"name":"tsx","version":"4.7.1","dev":true,"bin":{"tsx":"bin.js"}}}}');
+  const data = {"name":"arclune_lane_7x3","version":"1.0.0","lockfileVersion":3,"requires":true,"packages":{"":{"name":"arclune_lane_7x3","version":"1.0.0","license":"ISC","dependencies":{"zod":"file:tools/zod-stub"},"devDependencies":{"esbuild":"file:tools/esbuild-stub","tsx":"file:tools/tsx-stub"}},"node_modules/esbuild":{"resolved":"tools/esbuild-stub","link":true},"node_modules/zod":{"resolved":"tools/zod-stub","link":true},"node_modules/tsx":{"resolved":"tools/tsx-stub","link":true},"tools/esbuild-stub":{"name":"esbuild","version":"0.0.0-stub","dev":true},"tools/zod-stub":{"name":"zod","version":"0.0.0-stub"},"tools/tsx-stub":{"name":"tsx","version":"4.7.1","dev":true,"bin":{"tsx":"bin.js"}}}};
   module.exports = data;
   module.exports.default = data;
 };
 __modules['./config/package.json'] = (exports, module, __require) => {
-  const data = JSON.parse('{"name":"arclune_lane_7x3","version":"1.0.0","description":"","scripts":{"build":"npm run build:prod","build:dev":"node ../../tools/generate-loithienanh-svg.mjs && node ../../build.mjs --mode=development","build:prod":"node ../../tools/generate-loithienanh-svg.mjs && node ../../build.mjs --mode=production","dev":"APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx watch $APP_ENTRY","start":"NODE_ENV=${NODE_ENV:-production} APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx $APP_ENTRY","test":"jest --runInBand","typecheck":"tsc --noEmit"},"keywords":[],"author":"","license":"ISC","type":"commonjs","dependencies":{"zod":"file:tools/zod-stub"},"devDependencies":{"@types/jest":"^29.5.12","esbuild":"file:tools/esbuild-stub","jest":"^29.7.0","ts-jest":"^29.2.5","ts-node":"^10.9.2","tsx":"file:tools/tsx-stub","typescript":"^5.4.0"}}');
+  const data = {"name":"arclune_lane_7x3","version":"1.0.0","description":"","scripts":{"build":"npm run build:prod","build:dev":"node ../../tools/generate-loithienanh-svg.mjs && node ../../build.mjs --mode=development","build:prod":"node ../../tools/generate-loithienanh-svg.mjs && node ../../build.mjs --mode=production","dev":"APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx watch $APP_ENTRY","start":"NODE_ENV=${NODE_ENV:-production} APP_ENTRY=${APP_ENTRY:-src/main.ts} tsx $APP_ENTRY","test":"jest --runInBand","typecheck":"tsc --noEmit"},"keywords":[],"author":"","license":"ISC","type":"commonjs","dependencies":{"zod":"file:tools/zod-stub"},"devDependencies":{"@types/jest":"^29.5.12","esbuild":"file:tools/esbuild-stub","jest":"^29.7.0","ts-jest":"^29.2.5","ts-node":"^10.9.2","tsx":"file:tools/tsx-stub","typescript":"^5.4.0"}};
   module.exports = data;
   module.exports.default = data;
 };
@@ -9272,6 +9272,17 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       consistencyPenalty: [0, 3],
       divineSelfSustainBonus: [0, 2],
   };
+  const SCORE_METRIC_KEYS = [
+      'tagComplexity',
+      'battlefieldInfluence',
+      'economyPressure',
+      'scalingCeiling',
+      'tacticalFlexibility',
+      'setupPenalty',
+      'selfRiskPenalty',
+      'vanishRiskPenalty',
+      'consistencyPenalty',
+  ];
   const RANK_BUDGET_BASE = Object.freeze({
       N: { tagComplexity: 0, battlefieldInfluence: 1, economyPressure: 0, scalingCeiling: 0, tacticalFlexibility: 1 },
       R: { tagComplexity: 1, battlefieldInfluence: 1, economyPressure: 0, scalingCeiling: 1, tacticalFlexibility: 1 },
@@ -9306,29 +9317,24 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
   function normalizeRankKey(rank) {
       return String(rank ?? '').trim().toUpperCase();
   }
-  function clampCost(cost) {
-      return clamp(cost, COST_MIN, COST_MAX);
+  function resolveRankAnchorByKey(rankKey) {
+      return RANK_COST_ANCHOR[rankKey] ?? 12;
   }
-  function resolveRankAnchor(rank) {
-      const key = normalizeRankKey(rank);
-      return RANK_COST_ANCHOR[key] ?? 12;
-  }
-  function resolveRankMultiplier(rank) {
-      const key = normalizeRankKey(rank);
-      return RANK_MULTIPLIER[key] ?? 0.95;
+  function resolveRankMultiplierByKey(rankKey) {
+      return RANK_MULTIPLIER[rankKey] ?? 0.95;
   }
   /**
    * V2 Summon Cost logic for manual balancing:
    * Cost = CostNeo(rank) + Σ(điểm cộng) - Σ(điểm trừ)
-   * Sau đó clamp vào [8..22].
+   * Sau đó clamp vào [7..22] (hoặc trần mở rộng với PRIME đặc biệt).
    *
    * Rank multiplier giữ vai trò hệ số tham chiếu khi so với hệ cũ,
    * không nhân trực tiếp vào cost neo để tránh làm loãng lợi thế kinh tế của bậc thấp.
    */
   function evaluateSummonCost(input) {
       const rank = normalizeRankKey(input.rank);
-      const anchorCost = resolveRankAnchor(rank);
-      const multiplier = resolveRankMultiplier(rank);
+      const anchorCost = resolveRankAnchorByKey(rank);
+      const multiplier = resolveRankMultiplierByKey(rank);
       const powerPoint = (input.hasRuleTag ? 1 : 0)
           + (input.hasLawTag ? 1 : 0)
           + (input.hasAbsoluteTag ? 0.5 : 0)
@@ -9337,7 +9343,9 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       const riskPoint = (input.hasDivineNature ? 1 : 0)
           + (input.hasSelfHarmRisk ? 1 : 0)
           + (input.longSetup ? 1 : 0)
-          + (input.hasVanishRisk ? 1 : 0);
+          + (input.hasVanishRisk ? 1 : 0)
+          + (input.hasFriendlyFireRisk ? 1 : 0)
+          + (input.hasRemovedRisk ? 1 : 0);
       const powerScore = powerPoint * 1.5;
       const riskScore = riskPoint * 3;
       const primeDivineAdjustment = rank === 'PRIME' && input.hasDivineNature ? 1 : 0;
@@ -9431,15 +9439,9 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
           if (typeof input.rankMultiplier === 'number' && Number.isFinite(input.rankMultiplier)) {
               merged.rankMultiplier = input.rankMultiplier;
           }
-          merged.tagComplexity = addMetric(merged.tagComplexity, input.tagComplexity);
-          merged.battlefieldInfluence = addMetric(merged.battlefieldInfluence, input.battlefieldInfluence);
-          merged.economyPressure = addMetric(merged.economyPressure, input.economyPressure);
-          merged.scalingCeiling = addMetric(merged.scalingCeiling, input.scalingCeiling);
-          merged.tacticalFlexibility = addMetric(merged.tacticalFlexibility, input.tacticalFlexibility);
-          merged.setupPenalty = addMetric(merged.setupPenalty, input.setupPenalty);
-          merged.selfRiskPenalty = addMetric(merged.selfRiskPenalty, input.selfRiskPenalty);
-          merged.vanishRiskPenalty = addMetric(merged.vanishRiskPenalty, input.vanishRiskPenalty);
-          merged.consistencyPenalty = addMetric(merged.consistencyPenalty, input.consistencyPenalty);
+          for (const key of SCORE_METRIC_KEYS) {
+              merged[key] = addMetric(merged[key], input[key]);
+          }
           if (input.hasDivineNature) {
               merged.hasDivineNature = true;
           }
@@ -9452,8 +9454,8 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       const roleKey = String(role ?? '').trim().toLowerCase();
       return mergeBudgetInputs({
           rank: rankKey,
-          rankAnchorCost: resolveRankAnchor(rankKey),
-          rankMultiplier: resolveRankMultiplier(rankKey),
+          rankAnchorCost: resolveRankAnchorByKey(rankKey),
+          rankMultiplier: resolveRankMultiplierByKey(rankKey),
       }, { battlefieldInfluence: 1, tacticalFlexibility: 1 }, RANK_BUDGET_BASE[rankKey], ROLE_BUDGET_MOD[roleKey], rankKey === 'PRIME' ? { hasDivineNature: true } : null);
   }
   /**
@@ -9461,7 +9463,7 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
    * - PowerScore = tổng nhóm điểm cộng.
    * - RiskScore = tổng nhóm điểm trừ.
    * - NetScore = PowerScore - RiskScore.
-   * - Cost = clamp(8, 22, round(14 + NetScore * 0.4)).
+   * - Cost = clamp theo rank-range và biên toàn cục [7..22] (có ngoại lệ PRIME trần mở rộng).
    */
   function evaluateCostBudget(input) {
       const breakdown = normalizeBreakdown(input);
@@ -9506,8 +9508,10 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
   }
   function estimateCostFromTags(tags) {
       const normalizedTags = tags.map((tag) => String(tag).trim().toLowerCase());
-      const has = (...needles) => needles.some((needle) => normalizedTags.includes(needle));
-      const containsAny = (...needles) => needles.some((needle) => normalizedTags.some((tag) => tag.includes(needle)));
+      const normalizedTagSet = new Set(normalizedTags);
+      const has = (...needles) => needles.some((needle) => normalizedTagSet.has(needle));
+      const normalizedTagText = normalizedTags.join(' || ');
+      const containsAny = (...needles) => needles.some((needle) => normalizedTagText.includes(needle));
       const input = {
           tagComplexity: 0,
           battlefieldInfluence: 1,
@@ -9520,41 +9524,45 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
           consistencyPenalty: 0,
           hasDivineNature: containsAny('thần tính', 'divine'),
       };
+      const addScore = (key, delta) => {
+          const current = typeof input[key] === 'number' ? input[key] : 0;
+          input[key] = current + delta;
+      };
       if (has('quy-tac') || containsAny('quy tắc')) {
-          input.tagComplexity = (input.tagComplexity ?? 0) + 3;
-          input.battlefieldInfluence = (input.battlefieldInfluence ?? 0) + 2;
+          addScore('tagComplexity', 3);
+          addScore('battlefieldInfluence', 2);
       }
       if (has('phap-tac') || containsAny('pháp tắc')) {
-          input.tagComplexity = (input.tagComplexity ?? 0) + 2;
-          input.battlefieldInfluence = (input.battlefieldInfluence ?? 0) + 1;
+          addScore('tagComplexity', 2);
+          addScore('battlefieldInfluence', 1);
       }
       if (has('tuyet-doi') || containsAny('tuyệt đối', 'absolute')) {
-          input.tagComplexity = (input.tagComplexity ?? 0) + 1;
+          addScore('tagComplexity', 1);
       }
       if (containsAny('aoe', 'toàn sân', 'global')) {
-          input.battlefieldInfluence = (input.battlefieldInfluence ?? 0) + 2;
+          addScore('battlefieldInfluence', 2);
       }
       if (containsAny('buff', 'debuff', 'heal', 'shield', 'hồi')) {
-          input.tacticalFlexibility = (input.tacticalFlexibility ?? 0) + 1;
+          addScore('tacticalFlexibility', 1);
       }
       if (containsAny('summon', 'triệu hồi')) {
-          input.tacticalFlexibility = (input.tacticalFlexibility ?? 0) + 1;
-          input.setupPenalty = (input.setupPenalty ?? 0) + 1;
+          addScore('tacticalFlexibility', 1);
+          addScore('setupPenalty', 1);
       }
       if (containsAny('cost', 'aether', 'nộ', 'energy', 'resource')) {
-          input.economyPressure = (input.economyPressure ?? 0) + 1;
+          addScore('economyPressure', 1);
       }
       if (containsAny('vĩnh viễn', 'stack', 'tiến hóa', 'evolve', 'evolution')) {
-          input.scalingCeiling = (input.scalingCeiling ?? 0) + 2;
+          addScore('scalingCeiling', 2);
       }
       if (containsAny('friendly fire', 'không phân địch ta', 'toàn bộ sinh vật', 'tự tổn thương', 'self-debuff', 'self debuff')) {
-          input.selfRiskPenalty = (input.selfRiskPenalty ?? 0) + 2;
+          addScore('selfRiskPenalty', 2);
       }
       if (containsAny('biến mất', 'removed', 'vanish', 'out trận')) {
-          input.vanishRiskPenalty = (input.vanishRiskPenalty ?? 0) + 2;
+          addScore('vanishRiskPenalty', 2);
       }
       if (containsAny('ngẫu nhiên', 'random')) {
-          input.consistencyPenalty = (input.consistencyPenalty ?? 0) + 1;
+          addScore('consistencyPenalty', 1);
       }
       return evaluateCostBudget(input);
   }
@@ -9803,7 +9811,6 @@ __modules['./data/economy.config.ts'] = (exports, module, __require) => {
   module.exports.default = exports.default;
 };
 __modules['./data/economy.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/data/economy.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
   const __dep1 = __require('./utils/format.ts');
@@ -9838,7 +9845,8 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
       hardPity: z.number(),
       softGuarantees: z.array(PityRuleSchema)
   });
-  const PityTierSchema = z.enum(['SSR', 'UR', 'PRIME']);
+  const PITY_TIERS = ['SSR', 'UR', 'PRIME'];
+  const PityTierSchema = z.enum([...PITY_TIERS]);
   const PityConfigSchema = z.object({
       SSR: PityEntrySchema,
       UR: PityEntrySchema,
@@ -9869,20 +9877,21 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
           throw new Error(`Cấu hình pity cho tier "${tier}" không khớp giá trị nội tại (${entry.tier}).`);
       }
   }
-  const currencyIdMap = {};
-  for (const id of currencyIdValues) {
-      currencyIdMap[id] = id;
-  }
+  const currencyIdMap = Object.fromEntries(currencyIdValues.map((id) => [id, id]));
   const CURRENCY_ORDER = Object.freeze([...currencyIdValues]);
   const CURRENCY_IDS = Object.freeze({
       ...currencyIdMap,
       THNT: currencyIdMap.ThNT
   });
   const CURRENCIES = Object.freeze(economyConfig.currencies.map((currency) => Object.freeze({ ...currency })));
-  const CURRENCY_INDEX = CURRENCIES.reduce((acc, currency) => {
-      acc[currency.id] = currency;
-      return acc;
-  }, {});
+  const SORTED_CURRENCIES_BY_RATIO = Object.freeze([...CURRENCIES].sort((a, b) => a.ratioToBase - b.ratioToBase));
+  function indexBy(items, getKey) {
+      return items.reduce((acc, item) => {
+          acc[getKey(item)] = item;
+          return acc;
+      }, {});
+  }
+  const CURRENCY_INDEX = indexBy(CURRENCIES, (currency) => currency.id);
   function getCurrency(currencyId) {
       return CURRENCY_INDEX[currencyId] ?? null;
   }
@@ -9908,7 +9917,7 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
           });
           HAS_COMPACT_FORMAT = true;
       }
-      catch (error) {
+      catch {
           FORMATTER_COMPACT = FORMATTER_STANDARD;
       }
   }
@@ -9921,9 +9930,8 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
       let amount = value;
       let suffix = currency.suffix;
       if (autoScale) {
-          const ordered = [...CURRENCIES].sort((a, b) => a.ratioToBase - b.ratioToBase);
-          for (let i = ordered.length - 1; i >= 0; i -= 1) {
-              const candidate = ordered[i];
+          for (let i = SORTED_CURRENCIES_BY_RATIO.length - 1; i >= 0; i -= 1) {
+              const candidate = SORTED_CURRENCIES_BY_RATIO[i];
               if (!candidate)
                   continue;
               const inCandidate = convertCurrency(value, currency.id, candidate.id);
@@ -9980,7 +9988,7 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
       }
   ])));
   function isPityTier(tier) {
-      return tier in PITY_CONFIG;
+      return PITY_TIERS.includes(tier);
   }
   function getPityConfig(tier) {
       if (isPityTier(tier)) {
@@ -9989,13 +9997,10 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
       return null;
   }
   function listPityTiers() {
-      return Object.keys(PITY_CONFIG);
+      return [...PITY_TIERS];
   }
   const SHOP_TAX_BRACKETS = Object.freeze(economyConfig.shopTaxBrackets.map((bracket) => Object.freeze({ ...bracket })));
-  const SHOP_TAX_INDEX = SHOP_TAX_BRACKETS.reduce((acc, bracket) => {
-      acc[bracket.rank] = bracket;
-      return acc;
-  }, {});
+  const SHOP_TAX_INDEX = indexBy(SHOP_TAX_BRACKETS, (bracket) => bracket.rank);
   function getShopTaxBracket(rank) {
       return SHOP_TAX_INDEX[rank] ?? null;
   }
@@ -10053,7 +10058,6 @@ __modules['./data/load-config.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'loadConfig')) exports.loadConfig = loadConfig;
 };
 __modules['./data/modes.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/data/mode.ts
   const __dep0 = __require('./data/economy.ts');
   const getLotterySplit = __dep0.getLotterySplit;
   const getPityConfig = __dep0.getPityConfig;
@@ -10390,34 +10394,34 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
       return acc;
   }, {});
   function hasMenuSection(mode, sectionId) {
-      const sections = Array.isArray(mode.menuSections) ? mode.menuSections : [];
-      return sections.some(section => section === sectionId);
+      return Array.isArray(mode.menuSections) && mode.menuSections.includes(sectionId);
   }
-  function listModesForSection(sectionId, options = {}) {
-      const { includeStatuses } = options;
-      return MODES.filter(mode => {
-          if (!hasMenuSection(mode, sectionId)) {
-              return false;
-          }
-          if (Array.isArray(includeStatuses) && includeStatuses.length > 0) {
-              return includeStatuses.includes(mode.status);
-          }
+  function toIncludedStatusSet(includeStatuses) {
+      if (!Array.isArray(includeStatuses) || includeStatuses.length === 0)
+          return null;
+      return new Set(includeStatuses);
+  }
+  function shouldIncludeMode(mode, includeSet) {
+      if (!includeSet)
           return true;
+      return includeSet.has(mode.status);
+  }
+  function listModesForSectionWithSet(sectionId, includeSet) {
+      return MODES.filter(mode => {
+          return hasMenuSection(mode, sectionId) && shouldIncludeMode(mode, includeSet);
       });
   }
+  function listModesForSection(sectionId, options = {}) {
+      return listModesForSectionWithSet(sectionId, toIncludedStatusSet(options.includeStatuses));
+  }
   function getMenuSections(options = {}) {
-      const { includeStatuses } = options;
-      const includeSet = Array.isArray(includeStatuses) && includeStatuses.length > 0
-          ? new Set(includeStatuses)
-          : null;
+      const includeSet = toIncludedStatusSet(options.includeStatuses);
       const filterChildModeIds = (childIds = []) => {
           return childIds.filter(childId => {
               const mode = MODE_INDEX[childId];
               if (!mode)
                   return false;
-              if (includeSet && !includeSet.has(mode.status))
-                  return false;
-              return true;
+              return shouldIncludeMode(mode, includeSet);
           });
       };
       return MENU_SECTION_DEFINITIONS.map(section => {
@@ -10435,7 +10439,7 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
                   childModeIds
               });
           });
-          const standaloneModes = listModesForSection(section.id, { includeStatuses })
+          const standaloneModes = listModesForSectionWithSet(section.id, includeSet)
               .filter(mode => !mode.parentId);
           standaloneModes.forEach(mode => {
               entries.push({
@@ -10505,7 +10509,6 @@ __modules['./data/roster-preview.config.ts'] = (exports, module, __require) => {
   module.exports.default = exports.default;
 };
 __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/data/roster-preview.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
   const __dep1 = __require('./catalog.ts');
@@ -10532,12 +10535,16 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   const PRECISION = Object.freeze({
       ...rosterPreviewConfig.precision
   });
+  const ROSTER_PREVIEW_META = Object.freeze(ROSTER.map((unit) => ({ id: unit.id, name: unit.name })));
   function roundStat(stat, value) {
       const precision = PRECISION[stat] ?? 1;
       return Math.round(value * precision) / precision;
   }
   function roundTpValue(value) {
       return Math.round(value * 1e6) / 1e6;
+  }
+  function getClassBase(className) {
+      return assertDefined(CLASS_BASE[className], `Unknown class "${className ?? ''}"`);
   }
   function sanitizeTpAllocation(tpAlloc = {}) {
       const clean = {};
@@ -10551,38 +10558,39 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
       }
       return clean;
   }
-  function applyTpToBase(base, tpAlloc = {}) {
-      const cleanTp = sanitizeTpAllocation(tpAlloc);
-      const out = { ...base };
-      for (const [stat, baseValue] of Object.entries(base)) {
-          const delta = TP_DELTA[stat];
-          if (delta) {
-              const tp = cleanTp[stat] ?? 0;
-              out[stat] = (baseValue ?? 0) + delta * tp;
-          }
-          else {
-              out[stat] = baseValue;
-          }
+  function mapStatBlock(stats, transform) {
+      const out = { ...stats };
+      for (const [stat, value] of Object.entries(stats)) {
+          out[stat] = transform(stat, value ?? 0);
       }
       return out;
+  }
+  function applyTpDelta(base, cleanTp) {
+      return mapStatBlock(base, (stat, baseValue) => {
+          const delta = TP_DELTA[stat];
+          if (delta) {
+              return baseValue + delta * (cleanTp[stat] ?? 0);
+          }
+          return baseValue;
+      });
+  }
+  function applyTpToBase(base, tpAlloc = {}) {
+      return applyTpDelta(base, sanitizeTpAllocation(tpAlloc));
   }
   function getRankMultiplier(rank) {
       return assertDefined(RANK_MULT[rank], `Missing rank multiplier for "${rank}"`);
   }
   function applyRankMultiplier(preRank, rank) {
       const multiplier = getRankMultiplier(rank);
-      const out = { ...preRank };
-      for (const [stat, value] of Object.entries(preRank)) {
+      return mapStatBlock(preRank, (stat, value) => {
           if (stat === 'SPD') {
-              out[stat] = roundStat(stat, value ?? 0);
-              continue;
+              return roundStat(stat, value);
           }
-          out[stat] = roundStat(stat, (value ?? 0) * multiplier);
-      }
-      return out;
+          return roundStat(stat, value * multiplier);
+      });
   }
   function computeFinalStats(className, rank, tpAlloc = {}) {
-      const base = assertDefined(CLASS_BASE[className], `Unknown class "${className}"`);
+      const base = getClassBase(className);
       const preRank = applyTpToBase(base, tpAlloc);
       return applyRankMultiplier(preRank, rank);
   }
@@ -10611,12 +10619,10 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   function buildRosterPreviews(tpAllocations = undefined) {
       const result = {};
       for (const unit of ROSTER) {
-          const base = CLASS_BASE[unit.class];
-          if (!base)
-              continue;
+          const base = getClassBase(unit.class);
           const derivedTp = tpAllocations?.[unit.id] ?? deriveTpFromMods(base, unit.mods);
           const cleanTp = sanitizeTpAllocation(derivedTp);
-          const preRank = applyTpToBase(base, cleanTp);
+          const preRank = applyTpDelta(base, cleanTp);
           const rankKey = unit.rank;
           const multiplier = getRankMultiplier(rankKey);
           const final = applyRankMultiplier(preRank, rankKey);
@@ -10642,7 +10648,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   function buildPreviewRows(previews, statsOrder = STAT_ORDER) {
       return statsOrder.map((stat) => ({
           stat,
-          values: ROSTER.map((unit) => {
+          values: ROSTER_PREVIEW_META.map((unit) => {
               const preview = previews[unit.id];
               return {
                   id: unit.id,
@@ -10654,13 +10660,14 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
           })
       }));
   }
-  const ROSTER_TP_ALLOCATIONS = Object.fromEntries(ROSTER.map((unit) => {
-      const base = CLASS_BASE[unit.class];
-      return [unit.id, deriveTpFromMods(base, unit.mods)];
-  }));
+  const ROSTER_TP_ALLOCATIONS = Object.freeze(ROSTER.reduce((acc, unit) => {
+      const base = getClassBase(unit.class);
+      acc[unit.id] = deriveTpFromMods(base, unit.mods);
+      return acc;
+  }, {}));
   const ROSTER_PREVIEWS = buildRosterPreviews(ROSTER_TP_ALLOCATIONS);
   const ROSTER_PREVIEW_ROWS = buildPreviewRows(ROSTER_PREVIEWS);
-  const STAT_KEYS = [...STAT_ORDER];
+  const STAT_KEYS = Object.freeze([...STAT_ORDER]);
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'TP_DELTA')) exports.TP_DELTA = TP_DELTA;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER_TP_ALLOCATIONS')) exports.ROSTER_TP_ALLOCATIONS = ROSTER_TP_ALLOCATIONS;
@@ -10709,7 +10716,6 @@ __modules['./data/skills.config.ts'] = (exports, module, __require) => {
   module.exports.default = exports.default;
 };
 __modules['./data/skills.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/data/skills.ts
   const __dep0 = __require('./../tools/zod-stub/index.js');
   const z = __dep0.z;
   const __dep1 = __require('./catalog.ts');
@@ -10759,22 +10765,32 @@ __modules['./data/skills.ts'] = (exports, module, __require) => {
           return [notes];
       return undefined;
   }
-  function normalizeSection(section) {
+  function toStringArray(value) {
+      if (!Array.isArray(value))
+          return [];
+      return value.filter((item) => typeof item === 'string');
+  }
+  function cloneCost(cost) {
+      if (!isUnknownRecord(cost))
+          return undefined;
+      return { ...cost };
+  }
+  function normalizeSection(section, fallbackType = 'active') {
       if (!section)
           return null;
       if (typeof section === 'string') {
-          return normalizeSkillEntry({ name: '', description: section, type: 'active' });
+          return normalizeSkillEntry({ name: '', description: section, type: fallbackType }, fallbackType);
       }
-      return normalizeSkillEntry(section);
+      return normalizeSkillEntry(section, fallbackType);
   }
-  function normalizeSkillEntry(entry) {
+  function normalizeSkillEntry(entry, fallbackType = 'active') {
       if (!entry)
           return null;
+      const type = entry.type ?? fallbackType;
       const normalized = { ...entry };
-      normalized.tags = ensureDomainTags(entry.tags ?? [], fallbackKitTag(entry.type ?? null));
-      if (entry.cost && typeof entry.cost === 'object') {
-          normalized.cost = { ...entry.cost };
-      }
+      normalized.type = type;
+      normalized.tags = ensureDomainTags(entry.tags ?? [], fallbackKitTag(type));
+      normalized.cost = cloneCost(entry.cost);
       normalized.notes = normalizeNotes(entry.notes);
       return normalized;
   }
@@ -10789,21 +10805,19 @@ __modules['./data/skills.ts'] = (exports, module, __require) => {
       const description = typeof value.description === 'string'
           ? value.description
           : (typeof value.notes === 'string' ? value.notes : '');
-      const tags = Array.isArray(value.tags) ? value.tags.filter((tag) => typeof tag === 'string') : [];
+      const tags = toStringArray(value.tags);
       const section = {
           ...value,
           name,
           type,
           description,
-          tags: ensureDomainTags(tags, fallbackKitTag(type))
+          tags
       };
-      if (isUnknownRecord(value.cost)) {
-          section.cost = { ...value.cost };
-      }
+      section.cost = cloneCost(value.cost);
       section.notes = Array.isArray(value.notes)
-          ? value.notes.filter((note) => typeof note === 'string')
-          : normalizeNotes(typeof value.notes === 'string' ? value.notes : undefined);
-      return section;
+          ? toStringArray(value.notes)
+          : normalizeNotes(value.notes);
+      return normalizeSkillEntry(section, fallbackType);
   }
   function buildBaseSkillSetsFromRoster() {
       return ROSTER.reduce((acc, unit) => {
@@ -10822,7 +10836,6 @@ __modules['./data/skills.ts'] = (exports, module, __require) => {
               technique: toSkillSection(kitRecord.technique, 'technique'),
               notes: []
           };
-          deepFreeze(normalized);
           acc[unitId] = normalized;
           return acc;
       }, {});
@@ -10837,6 +10850,7 @@ __modules['./data/skills.ts'] = (exports, module, __require) => {
           return [];
       return listUnknownTags(skill.tags);
   }
+  const SKILL_SECTION_KEYS = ['basic', 'skill', 'ult', 'talent', 'technique'];
   const SKILL_KEYS = ['basic', 'skill', 'skills', 'ult', 'talent', 'technique', 'notes'];
   const skillSets = rawSkillSets.reduce((acc, entry) => {
       const current = acc[entry.unitId] ?? {
@@ -10857,25 +10871,18 @@ __modules['./data/skills.ts'] = (exports, module, __require) => {
           : (('skills' in entry) ? (skills[0] ?? null) : (current.skill ?? skills[0] ?? null));
       const normalized = {
           unitId: entry.unitId,
-          basic: ('basic' in entry) ? normalizeSection(entry.basic) : current.basic,
+          basic: ('basic' in entry) ? normalizeSection(entry.basic, 'basic') : current.basic,
           skill,
           skills,
-          ult: ('ult' in entry) ? normalizeSection(entry.ult) : current.ult,
-          talent: ('talent' in entry) ? normalizeSection(entry.talent) : current.talent,
-          technique: ('technique' in entry) ? normalizeSection(entry.technique) : current.technique,
+          ult: ('ult' in entry) ? normalizeSection(entry.ult, 'ultimate') : current.ult,
+          talent: ('talent' in entry) ? normalizeSection(entry.talent, 'talent') : current.talent,
+          technique: ('technique' in entry) ? normalizeSection(entry.technique, 'technique') : current.technique,
           notes: ('notes' in entry)
-              ? (Array.isArray(entry.notes) ? [...entry.notes] : (entry.notes ? [entry.notes] : []))
+              ? (normalizeNotes(entry.notes) ?? [])
               : current.notes
       };
-      deepFreeze(normalized);
-      const unknownTags = [
-          ...collectUnknownSkillTags(normalized.basic),
-          ...collectUnknownSkillTags(normalized.skill),
-          ...collectUnknownSkillTags(normalized.ult),
-          ...collectUnknownSkillTags(normalized.talent),
-          ...collectUnknownSkillTags(normalized.technique),
-          ...normalized.skills.flatMap(collectUnknownSkillTags),
-      ];
+      const unknownTags = SKILL_SECTION_KEYS.flatMap((key) => collectUnknownSkillTags(normalized[key]))
+          .concat(normalized.skills.flatMap(collectUnknownSkillTags));
       if (unknownTags.length) {
           const uniqueUnknown = Array.from(new Set(unknownTags));
           console.warn(`[skills] Unknown tag(s) for ${entry.unitId}: ${uniqueUnknown.join(', ')}`);
@@ -10936,14 +10943,11 @@ __modules['./data/skills.ts'] = (exports, module, __require) => {
           }
       };
       for (const entry of Object.values(skillSets)) {
-          if (entry.basic)
-              pushIssue(entry.unitId, 'basic', entry.basic.tags ?? []);
-          if (entry.skill)
-              pushIssue(entry.unitId, 'skill', entry.skill.tags ?? []);
-          if (entry.ult)
-              pushIssue(entry.unitId, 'ult', entry.ult.tags ?? []);
-          if (entry.talent)
-              pushIssue(entry.unitId, 'talent', entry.talent.tags ?? []);
+          for (const key of SKILL_SECTION_KEYS) {
+              const section = entry[key];
+              if (section)
+                  pushIssue(entry.unitId, key, section.tags ?? []);
+          }
           if (Array.isArray(entry.skills)) {
               entry.skills.forEach((skill, index) => pushIssue(entry.unitId, `skills[${index}]`, skill.tags ?? []));
           }
@@ -10968,6 +10972,15 @@ __modules['./data/skills.ts'] = (exports, module, __require) => {
 };
 __modules['./data/tags.ts'] = (exports, module, __require) => {
   const CURRENT_TAG_ALIAS_VERSION = 'v1';
+  const TAG_DOMAINS = Object.freeze([
+      'timing',
+      'targeting',
+      'delivery',
+      'effect',
+      'resource',
+      'rule',
+      'kit',
+  ]);
   const TAG_DEFINITIONS = [
       { id: 'instant', label: 'Lập tức', domain: 'timing', aliases: ['instant-cast', 'instantCast', 'lap_tuc'] },
       { id: 'passive', label: 'Nội tại', domain: 'kit', aliases: ['noi_tai', 'passive-trigger', 'tu_dong', 'tự_động', 'noi tai', 'nội tại', 'tu dong', 'tự động'] },
@@ -11021,7 +11034,7 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
   const TAG_BY_ID = new Map();
   for (const definition of TAG_DEFINITIONS) {
       TAG_BY_ID.set(normalizeKey(definition.id), definition);
-      const aliases = 'aliases' in definition && Array.isArray(definition.aliases) ? definition.aliases : [];
+      const aliases = 'aliases' in definition ? (definition.aliases ?? []) : [];
       for (const alias of aliases) {
           TAG_BY_ID.set(normalizeKey(alias), definition);
       }
@@ -11069,20 +11082,17 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
       }
   }
   const GAME_TAGS = Object.freeze(TAG_DEFINITIONS);
-  const TAG_IDS = Object.freeze(Array.from(new Set(TAG_DEFINITIONS.map((definition) => definition.id))));
-  const TAG_IDS_BY_DOMAIN = Object.freeze(TAG_DEFINITIONS.reduce((acc, definition) => {
-      const current = acc[definition.domain] ?? [];
-      acc[definition.domain] = Object.freeze([...current, definition.id]);
-      return acc;
-  }, {
-      timing: [],
-      targeting: [],
-      delivery: [],
-      effect: [],
-      resource: [],
-      rule: [],
-      kit: [],
-  }));
+  const TAG_IDS = Object.freeze(TAG_DEFINITIONS.map((definition) => definition.id));
+  const TAG_IDS_BY_DOMAIN = Object.freeze((() => {
+      const byDomain = {};
+      for (const domain of TAG_DOMAINS) {
+          byDomain[domain] = [];
+      }
+      for (const definition of TAG_DEFINITIONS) {
+          byDomain[definition.domain].push(definition.id);
+      }
+      return Object.fromEntries(TAG_DOMAINS.map((domain) => [domain, Object.freeze(byDomain[domain])]));
+  })());
   const INSTANT_TAG_IDS = Object.freeze(['instant']);
   const DEFENSIVE_TAG_IDS = Object.freeze(['defense', 'shield', 'support']);
   const ABSOLUTE_ATTACK_TAG_IDS = Object.freeze(['absolute-attack']);
@@ -11129,19 +11139,29 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
       for (const rawTag of tags) {
           if (typeof rawTag !== 'string')
               continue;
-          const normalizedRaw = normalizeKey(rawTag);
-          if (!normalizedRaw)
+          const trimmed = rawTag.trim();
+          if (!trimmed)
               continue;
-          const normalized = normalizeTagId(rawTag);
-          if (!normalized || !TAG_BY_ID.has(normalizedRaw) && !TAG_BY_ID.has(normalized)) {
-              unknown.add(rawTag.trim());
+          const normalized = normalizeTagId(trimmed);
+          if (!normalized || !TAG_BY_ID.has(normalized)) {
+              unknown.add(trimmed);
           }
       }
       return [...unknown];
   }
   function hasAnyTag(haystack, needles) {
       const normalizedHaystack = new Set(normalizeTagList(haystack));
-      return needles.some((needle) => normalizedHaystack.has(needle));
+      const normalizedNeedles = new Set();
+      for (const needle of needles) {
+          const normalizedNeedle = normalizeTagId(needle);
+          if (normalizedNeedle)
+              normalizedNeedles.add(normalizedNeedle);
+      }
+      for (const normalizedNeedle of normalizedNeedles) {
+          if (normalizedHaystack.has(normalizedNeedle))
+              return true;
+      }
+      return false;
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENT_TAG_ALIAS_VERSION')) exports.CURRENT_TAG_ALIAS_VERSION = CURRENT_TAG_ALIAS_VERSION;
@@ -11163,7 +11183,7 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasAnyTag')) exports.hasAnyTag = hasAnyTag;
 };
 __modules['./data/vfx_anchors/loithienanh.json'] = (exports, module, __require) => {
-  const data = JSON.parse('{"unitId":"loithienanh","bodyAnchors":{"root":{"x":0.5,"y":0.5},"head":{"x":0.5,"y":0.86},"chest":{"x":0.5,"y":0.68},"pelvis":{"x":0.5,"y":0.44},"right_fist":{"x":0.66,"y":0.58},"left_fist":{"x":0.34,"y":0.58},"right_elbow":{"x":0.63,"y":0.66},"left_elbow":{"x":0.37,"y":0.66},"right_foot":{"x":0.6,"y":0.1},"left_foot":{"x":0.4,"y":0.1},"back_core":{"x":0.5,"y":0.64}},"vfxBindings":{"basic_combo":{"description":"Đòn đấm thường hai hit, ưu tiên tay phải sau đó tay trái.","anchors":[{"id":"right_fist","timing":"hit1","radius":0.12},{"id":"left_fist","timing":"hit2","radius":0.11}]},"loi_anh_tam_kich":{"description":"Skill1 tung ba cú đấm lôi, tái sử dụng anchor tay phải cho tia hồ quang và tay trái khi chuyển mục tiêu.","anchors":[{"id":"right_fist","timing":"arc_spawn","radius":0.14},{"id":"left_fist","timing":"follow_through","radius":0.12}]},"ngu_loi_phe_than":{"description":"Skill2 đốt máu phát lôi cầu quanh thân, xuất phát từ ngực lan ra 5 hướng.","anchors":[{"id":"chest","timing":"charge","radius":0.18},{"id":"right_fist","timing":"launch_major","radius":0.14},{"id":"left_fist","timing":"launch_minor","radius":0.13}]},"loi_the_bach_chien":{"description":"Skill3 dựng lớp bảo hộ bằng trường điện quấn quanh thân.","anchors":[{"id":"chest","timing":"shield_core","radius":0.22},{"id":"back_core","timing":"shield_back","radius":0.24}]},"huyet_hon_loi_quyet":{"description":"Tuyệt kỹ bùng nổ lôi huyết: hút năng lượng ở ngực, nổ ra trước bụng và chân.","anchors":[{"id":"chest","timing":"charge_up","radius":0.2},{"id":"root","timing":"burst_core","radius":0.26},{"id":"right_foot","timing":"ground_crack","radius":0.15},{"id":"left_foot","timing":"ground_crack","radius":0.15}]}},"ambientEffects":{"lightning_scars":{"description":"Hoa văn lôi văn chạy trên tay và ngực, phát sáng nhịp tim.","anchors":[{"id":"right_elbow","timing":"pulse","radius":0.1},{"id":"left_elbow","timing":"pulse","radius":0.1},{"id":"chest","timing":"pulse","radius":0.12}]},"thermal_noise":{"description":"Nhiễu nhiệt nhẹ trên toàn thân khi đứng yên.","anchors":[{"id":"chest","timing":"idle","radius":0.3}]},"storm_backdrop":{"description":"Hiệu ứng hậu cảnh vòng ấn lôi huyết và mây dông trong các cảnh ult.","anchors":[{"id":"back_core","timing":"ult_only","radius":0.35}]}}}');
+  const data = {"unitId":"loithienanh","bodyAnchors":{"root":{"x":0.5,"y":0.5},"head":{"x":0.5,"y":0.86},"chest":{"x":0.5,"y":0.68},"pelvis":{"x":0.5,"y":0.44},"right_fist":{"x":0.66,"y":0.58},"left_fist":{"x":0.34,"y":0.58},"right_elbow":{"x":0.63,"y":0.66},"left_elbow":{"x":0.37,"y":0.66},"right_foot":{"x":0.6,"y":0.1},"left_foot":{"x":0.4,"y":0.1},"back_core":{"x":0.5,"y":0.64}},"vfxBindings":{"basic_combo":{"description":"Đòn đấm thường hai hit, ưu tiên tay phải sau đó tay trái.","anchors":[{"id":"right_fist","timing":"hit1","radius":0.12},{"id":"left_fist","timing":"hit2","radius":0.11}]},"loi_anh_tam_kich":{"description":"Skill1 tung ba cú đấm lôi, tái sử dụng anchor tay phải cho tia hồ quang và tay trái khi chuyển mục tiêu.","anchors":[{"id":"right_fist","timing":"arc_spawn","radius":0.14},{"id":"left_fist","timing":"follow_through","radius":0.12}]},"ngu_loi_phe_than":{"description":"Skill2 đốt máu phát lôi cầu quanh thân, xuất phát từ ngực lan ra 5 hướng.","anchors":[{"id":"chest","timing":"charge","radius":0.18},{"id":"right_fist","timing":"launch_major","radius":0.14},{"id":"left_fist","timing":"launch_minor","radius":0.13}]},"loi_the_bach_chien":{"description":"Skill3 dựng lớp bảo hộ bằng trường điện quấn quanh thân.","anchors":[{"id":"chest","timing":"shield_core","radius":0.22},{"id":"back_core","timing":"shield_back","radius":0.24}]},"huyet_hon_loi_quyet":{"description":"Tuyệt kỹ bùng nổ lôi huyết: hút năng lượng ở ngực, nổ ra trước bụng và chân.","anchors":[{"id":"chest","timing":"charge_up","radius":0.2},{"id":"root","timing":"burst_core","radius":0.26},{"id":"right_foot","timing":"ground_crack","radius":0.15},{"id":"left_foot","timing":"ground_crack","radius":0.15}]}},"ambientEffects":{"lightning_scars":{"description":"Hoa văn lôi văn chạy trên tay và ngực, phát sáng nhịp tim.","anchors":[{"id":"right_elbow","timing":"pulse","radius":0.1},{"id":"left_elbow","timing":"pulse","radius":0.1},{"id":"chest","timing":"pulse","radius":0.12}]},"thermal_noise":{"description":"Nhiễu nhiệt nhẹ trên toàn thân khi đứng yên.","anchors":[{"id":"chest","timing":"idle","radius":0.3}]},"storm_backdrop":{"description":"Hiệu ứng hậu cảnh vòng ấn lôi huyết và mây dông trong các cảnh ult.","anchors":[{"id":"back_core","timing":"ult_only","radius":0.35}]}}};
   module.exports = data;
   module.exports.default = data;
 };

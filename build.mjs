@@ -828,7 +828,7 @@ async function build(){
       continue;
     }
     const sourceCode = await transformIfScript(raw, ext);
-    const transformed = transformModule(sourceCode, 
+    const transformed = transformModule(sourceCode, id);
     pushModule(id, transformed);
   }
 
