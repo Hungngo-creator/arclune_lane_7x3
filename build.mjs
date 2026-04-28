@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { verifyAetherBundle } from './tools/verify-aether-bundle.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const BUILD_SCRIPT_VERSION = '2026-04-28';
 let esbuild;
 try {
   const imported = await import('esbuild');
@@ -785,6 +786,7 @@ function logTopBundleSizes(metafile, limit = 5){
 }
 
 async function build(){
+  console.log(`[build.mjs ${BUILD_SCRIPT_VERSION}] Bắt đầu build với Node ${process.version}`);
   const files = await listSourceFiles();
   syncLegacyModuleAliases(files);
   const reachableModuleIds = pruneUnreachableModules
