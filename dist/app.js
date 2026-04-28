@@ -9503,9 +9503,7 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       { id: 'shield-control-frontline', label: 'Shield control frontline pressure', requiresAll: ['shield', 'control'], metric: 'battlefieldInfluence', delta: 1 },
   ]);
   function createTagCostContext(tags) {
-      const normalizedTextTags = normalizeTagList(tags
-          .map((tag) => String(tag).trim().toLowerCase())
-          .filter(Boolean))
+      const normalizedTextTags = normalizeTagList(tags)
           .map((tag) => normalizeKeywordTerm(tag))
           .filter(Boolean);
       const normalizedTagSet = new Set(normalizedTextTags);
@@ -9521,12 +9519,13 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
       };
       const hasTag = (...needles) => normalizeTagList(needles).some((needle) => normalizedTagSet.has(needle));
       const hasKeyword = (...keywords) => keywords.some((keyword) => {
-          const cached = keywordCache.get(keyword);
+          const normalizedKeyword = normalizeKeywordTerm(keyword);
+          const cached = keywordCache.get(normalizedKeyword);
           if (typeof cached === 'boolean') {
               return cached;
           }
-          const matched = hasKeywordImpl(keyword);
-          keywordCache.set(keyword, matched);
+          const matched = hasKeywordImpl(normalizedKeyword);
+          keywordCache.set(normalizedKeyword, matched);
           return matched;
       });
       const countMatchedTags = (tagIds) => {
@@ -9544,20 +9543,28 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
               return 0;
           let count = 0;
           for (const keyword of keywords) {
-              const cached = keywordCache.get(keyword);
+              const normalizedKeyword = normalizeKeywordTerm(keyword);
+              const cached = keywordCache.get(normalizedKeyword);
               if (typeof cached === 'boolean') {
                   if (cached)
                       count += 1;
                   continue;
               }
-              const matched = hasKeywordImpl(keyword);
-              keywordCache.set(keyword, matched);
+              const matched = hasKeywordImpl(normalizedKeyword);
+              keywordCache.set(normalizedKeyword, matched);
               if (matched)
                   count += 1;
           }
           return count;
       };
-      return { hasTag, hasKeyword, countMatchedTags, countMatchedKeywords, totalTags: normalizedTagSet.size };
+      return {
+          hasTag,
+          hasKeyword,
+          countMatchedTags,
+          countMatchedKeywords,
+          totalTags: normalizedTagSet.size,
+          normalizedTags: [...normalizedTagSet],
+      };
   }
   function isRuleApplicable(rule, tagContext) {
       if (rule.requiresAll && !rule.requiresAll.every((tagId) => tagContext.hasTag(tagId))) {
@@ -9653,6 +9660,22 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
   function estimateCostFromTags(tags) {
       return evaluateCostBudget(deriveBudgetFromTagsDetailed(tags).input);
   }
+  function buildRiskSignals(tagContext) {
+      const riskSignals = [];
+      if (tagContext.hasTag('random-target', 'random-aoe') || tagContext.hasKeyword('random', 'ngẫu nhiên', 'coin flip')) {
+          riskSignals.push('volatility');
+      }
+      if (tagContext.hasTag('sleep', 'summon', 'mark') || tagContext.hasKeyword('setup', 'triệu hồi', 'sleep')) {
+          riskSignals.push('setup-heavy');
+      }
+      if (tagContext.hasKeyword('friendly fire', 'tự tổn thương', 'không phân địch ta')) {
+          riskSignals.push('friendly-risk');
+      }
+      if (tagContext.hasKeyword('vanish', 'removed', 'biến mất')) {
+          riskSignals.push('vanish-risk');
+      }
+      return riskSignals;
+  }
   function deriveBudgetFromTagsDetailed(tags) {
       const tagContext = createTagCostContext(tags);
       const input = {
@@ -9694,9 +9717,11 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
           addScore(rule.metric, delta);
           addMatch(rule.id, rule.label, rule.metric, delta, matchedTags, matchedKeywords);
       }
+      let synergyMatchCount = 0;
       for (const rule of COST_TAG_SYNERGY_RULES) {
           if (!rule.requiresAll.every((tagId) => tagContext.hasTag(tagId)))
               continue;
+          synergyMatchCount += 1;
           addScore(rule.metric, rule.delta);
           addMatch(`synergy:${rule.id}`, rule.label, rule.metric, rule.delta, rule.requiresAll.length, 0);
       }
@@ -9715,7 +9740,19 @@ __modules['./data/cost-budget.ts'] = (exports, module, __require) => {
           addScore('tagComplexity', 1);
           addMatch('complexity-size-9', 'Tag pool size >= 9', 'tagComplexity', 1);
       }
-      return { input, matches };
+      const keywordHitCount = matches.reduce((sum, match) => sum + (match.matchedKeywords ?? 0), 0);
+      return {
+          input,
+          matches,
+          insights: {
+              normalizedTags: tagContext.normalizedTags,
+              uniqueTagCount: tagContext.totalTags,
+              keywordHitCount,
+              ruleMatchCount: matches.length - synergyMatchCount,
+              synergyMatchCount,
+              riskSignals: buildRiskSignals(tagContext),
+          },
+      };
   }
   function deriveBudgetFromProfileDetailed(profile) {
       const rankRoleInput = deriveBudgetFromRankRole(profile.rank, profile.role);
@@ -10056,9 +10093,6 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
           return acc;
       }, {});
   }
-  function cloneReadonlyArray(items) {
-      return [...items];
-  }
   function normalizeNonNegativeInt(value) {
       return Math.max(0, Math.floor(Number(value ?? 0)));
   }
@@ -10067,7 +10101,7 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
       return CURRENCY_INDEX[currencyId] ?? null;
   }
   function listCurrencies() {
-      return cloneReadonlyArray(CURRENCIES);
+      return CURRENCIES.slice();
   }
   function convertCurrency(value, fromId, toId) {
       const from = assertDefined(getCurrency(fromId), `Invalid currency conversion from ${fromId} to ${toId}`);
@@ -10159,7 +10193,7 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
   function listCultivationRealmsEconomy() {
       return Object.values(CULTIVATION_REALM_ECONOMY).map((entry) => ({
           ...entry,
-          subRealmCosts: cloneReadonlyArray(entry.subRealmCosts)
+          subRealmCosts: entry.subRealmCosts.slice()
       }));
   }
   const PITY_CONFIG = Object.freeze(Object.fromEntries(pityEntries.map(([tier, config]) => [
@@ -10176,7 +10210,7 @@ __modules['./data/economy.ts'] = (exports, module, __require) => {
           : null;
   }
   function listPityTiers() {
-      return cloneReadonlyArray(PITY_TIERS);
+      return PITY_TIERS.slice();
   }
   const SHOP_TAX_BRACKETS = Object.freeze(economyConfig.shopTaxBrackets.map((bracket) => Object.freeze({ ...bracket })));
   const SHOP_TAX_INDEX = indexBy(SHOP_TAX_BRACKETS, (bracket) => bracket.rank);
@@ -10720,8 +10754,9 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
       const precision = PRECISION[stat] ?? 1;
       return Math.round(value * precision) / precision;
   }
+  const TP_ROUND_FACTOR = 1e6;
   function roundTpValue(value) {
-      return Math.round(value * 1e6) / 1e6;
+      return Math.round(value * TP_ROUND_FACTOR) / TP_ROUND_FACTOR;
   }
   function getClassBase(className) {
       return assertDefined(CLASS_BASE[className], `Unknown class "${className ?? ''}"`);
@@ -10808,6 +10843,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
       const cleanTp = resolveUnitTpAllocation(unit, tpAllocations);
       const rankKey = unit.rank;
       const preRank = applyTpToBase(base, cleanTp);
+      const final = applyRankMultiplier(preRank, rankKey);
       return {
           id: unit.id,
           name: unit.name,
@@ -10817,7 +10853,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
           tp: cleanTp,
           totalTP: totalTp(cleanTp),
           preRank,
-          final: applyRankMultiplier(preRank, rankKey),
+          final,
       };
   }
   function buildRosterPreviews(tpAllocations = undefined) {
@@ -11218,14 +11254,15 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
   ];
   const normalizeKey = (value) => value.trim().toLowerCase();
   const TAG_BY_ID = new Map();
+  const KNOWN_TAG_IDS = new Set();
   for (const definition of TAG_DEFINITIONS) {
+      KNOWN_TAG_IDS.add(definition.id);
       TAG_BY_ID.set(normalizeKey(definition.id), definition);
-      const aliases = 'aliases' in definition ? definition.aliases : undefined;
-      for (const alias of aliases ?? []) {
+      for (const alias of definition.aliases ?? []) {
           TAG_BY_ID.set(normalizeKey(alias), definition);
       }
   }
-  const isKnownTagId = (tagId) => TAG_BY_ID.has(normalizeKey(tagId));
+  const isKnownTagId = (tagId) => KNOWN_TAG_IDS.has(tagId);
   const tagAliasesByVersion = Object.freeze({
       v1: Object.freeze({
           cone: 'multi-target',
@@ -11299,9 +11336,6 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
           return null;
       return TAG_BY_ID.get(normalized)?.id ?? normalized;
   }
-  function normalizeTagList(tags, version = CURRENT_TAG_ALIAS_VERSION) {
-      return [...collectNormalizedTagSet(tags, version)];
-  }
   function collectNormalizedTagSet(tags, version = CURRENT_TAG_ALIAS_VERSION) {
       const unique = new Set();
       if (!Array.isArray(tags))
@@ -11312,6 +11346,9 @@ __modules['./data/tags.ts'] = (exports, module, __require) => {
               unique.add(normalized);
       }
       return unique;
+  }
+  function normalizeTagList(tags, version = CURRENT_TAG_ALIAS_VERSION) {
+      return [...collectNormalizedTagSet(tags, version)];
   }
   function resolveTagVersionAliases(tags, version = CURRENT_TAG_ALIAS_VERSION) {
       if (!Array.isArray(tags))
@@ -36613,7 +36650,6 @@ __modules['./screens/ui-gacha/logic/types.ts'] = (exports, module, __require) =>
   if (!Object.prototype.hasOwnProperty.call(exports, 'RARITY_ORDER')) exports.RARITY_ORDER = RARITY_ORDER;
 };
 __modules['./shared-types/units.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/shared-types/units.ts
   const __reexport0 = __require('./types/units.ts');
   for (const key of Object.keys(__reexport0)) {
     if (key === 'default') continue;
@@ -38248,13 +38284,13 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'stepTurn')) exports.stepTurn = stepTurn;
 };
 __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
-  //home (termux)/arclune_lane_7x3/src/turns/interleaved.ts
   const __dep0 = __require('./engine.ts');
   const slotIndex = __dep0.slotIndex;
   const SIDE_TO_LOWER = { ALLY: 'ally', ENEMY: 'enemy' };
   const LOWER_TO_UPPER = { ally: 'ALLY', enemy: 'ENEMY' };
   const TURN_SIDES = ['ALLY', 'ENEMY'];
   const createZeroBySide = () => ({ ALLY: 0, ENEMY: 0 });
+  const flipSide = (side) => (side === 'ALLY' ? 'ENEMY' : 'ALLY');
   const DEFAULT_LAST_POS = createZeroBySide();
   const DEFAULT_WRAP_COUNT = createZeroBySide();
   const SLOT_CAP = 9;
@@ -38435,7 +38471,7 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
       if (!picked)
           return null;
       turn.lastPos[sideKey] = picked.pos;
-      turn.nextSide = sideKey === 'ALLY' ? 'ENEMY' : 'ALLY';
+      turn.nextSide = flipSide(sideKey);
       if (picked.wrapped) {
           turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
       }

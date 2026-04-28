@@ -143,6 +143,7 @@ interface CostTagContext {
   countMatchedTags: (tagIds: ReadonlyArray<string> | undefined) => number;
   countMatchedKeywords: (keywords: ReadonlyArray<string> | undefined) => number;
   totalTags: number;
+  normalizedTags: ReadonlyArray<string>;
 }
 const normalizeKeywordTerm = (value: string): string => value.trim().toLowerCase().replace(/\s+/g, ' ');
 
@@ -155,9 +156,19 @@ export interface CostTagRuleMatch {
   matchedKeywords?: number;
 }
 
+export interface CostTagBudgetInsights {
+  normalizedTags: ReadonlyArray<string>;
+  uniqueTagCount: number;
+  keywordHitCount: number;
+  ruleMatchCount: number;
+  synergyMatchCount: number;
+  riskSignals: ReadonlyArray<string>;
+}
+
 export interface CostTagBudgetDetail {
   input: CostBudgetInput;
   matches: ReadonlyArray<CostTagRuleMatch>;
+  insights: CostTagBudgetInsights;
 }
 
 export interface CostBudgetProfileInput {
@@ -425,11 +436,7 @@ const COST_TAG_SYNERGY_RULES: ReadonlyArray<CostTagSynergyRule> = Object.freeze(
 ]);
 
 function createTagCostContext(tags: readonly string[]): CostTagContext {
-  const normalizedTextTags = normalizeTagList(
-    tags
-      .map((tag) => String(tag).trim().toLowerCase())
-      .filter(Boolean)
-  )
+  const normalizedTextTags = normalizeTagList(tags)
     .map((tag) => normalizeKeywordTerm(tag))
     .filter(Boolean);
   const normalizedTagSet = new Set(normalizedTextTags);
@@ -444,12 +451,13 @@ function createTagCostContext(tags: readonly string[]): CostTagContext {
 
   const hasTag = (...needles: string[]): boolean => normalizeTagList(needles).some((needle) => normalizedTagSet.has(needle));
   const hasKeyword = (...keywords: string[]): boolean => keywords.some((keyword) => {
-    const cached = keywordCache.get(keyword);
+    const normalizedKeyword = normalizeKeywordTerm(keyword);
+    const cached = keywordCache.get(normalizedKeyword);
     if (typeof cached === 'boolean'){
       return cached;
     }
-    const matched = hasKeywordImpl(keyword);
-    keywordCache.set(keyword, matched);
+    const matched = hasKeywordImpl(normalizedKeyword);
+    keywordCache.set(normalizedKeyword, matched);
     return matched;
   });
   const countMatchedTags = (tagIds: ReadonlyArray<string> | undefined): number => {
@@ -464,19 +472,27 @@ function createTagCostContext(tags: readonly string[]): CostTagContext {
     if (!Array.isArray(keywords) || keywords.length === 0) return 0;
     let count = 0;
     for (const keyword of keywords){
-      const cached = keywordCache.get(keyword);
+      const normalizedKeyword = normalizeKeywordTerm(keyword);
+      const cached = keywordCache.get(normalizedKeyword);
       if (typeof cached === 'boolean'){
         if (cached) count += 1;
         continue;
       }
-      const matched = hasKeywordImpl(keyword);
-      keywordCache.set(keyword, matched);
+      const matched = hasKeywordImpl(normalizedKeyword);
+      keywordCache.set(normalizedKeyword, matched);
       if (matched) count += 1;
     }
     return count;
   };
 
-  return { hasTag, hasKeyword, countMatchedTags, countMatchedKeywords, totalTags: normalizedTagSet.size };
+  return {
+    hasTag,
+    hasKeyword,
+    countMatchedTags,
+    countMatchedKeywords,
+    totalTags: normalizedTagSet.size,
+    normalizedTags: [...normalizedTagSet],
+  };
 }
 
 function isRuleApplicable(rule: CostTagScoreRule, tagContext: CostTagContext): boolean {
@@ -586,6 +602,23 @@ export function estimateCostFromTags(tags: readonly string[]): CostBudgetResult 
   return evaluateCostBudget(deriveBudgetFromTagsDetailed(tags).input);
 }
 
+function buildRiskSignals(tagContext: CostTagContext): string[] {
+  const riskSignals: string[] = [];
+  if (tagContext.hasTag('random-target', 'random-aoe') || tagContext.hasKeyword('random', 'ngẫu nhiên', 'coin flip')) {
+    riskSignals.push('volatility');
+  }
+  if (tagContext.hasTag('sleep', 'summon', 'mark') || tagContext.hasKeyword('setup', 'triệu hồi', 'sleep')) {
+    riskSignals.push('setup-heavy');
+  }
+  if (tagContext.hasKeyword('friendly fire', 'tự tổn thương', 'không phân địch ta')) {
+    riskSignals.push('friendly-risk');
+  }
+  if (tagContext.hasKeyword('vanish', 'removed', 'biến mất')) {
+    riskSignals.push('vanish-risk');
+  }
+  return riskSignals;
+}
+
 export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBudgetDetail {
   const tagContext = createTagCostContext(tags);
   const input: CostBudgetInput = {
@@ -635,8 +668,10 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
     addMatch(rule.id, rule.label, rule.metric, delta, matchedTags, matchedKeywords);
   }
 
+  let synergyMatchCount = 0;
   for (const rule of COST_TAG_SYNERGY_RULES){
     if (!rule.requiresAll.every((tagId) => tagContext.hasTag(tagId))) continue;
+    synergyMatchCount += 1;
     addScore(rule.metric, rule.delta);
     addMatch(`synergy:${rule.id}`, rule.label, rule.metric, rule.delta, rule.requiresAll.length, 0);
   }
@@ -658,7 +693,19 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
     addMatch('complexity-size-9', 'Tag pool size >= 9', 'tagComplexity', 1);
   }
 
-  return { input, matches };
+  const keywordHitCount = matches.reduce((sum, match) => sum + (match.matchedKeywords ?? 0), 0);
+  return {
+    input,
+    matches,
+    insights: {
+      normalizedTags: tagContext.normalizedTags,
+      uniqueTagCount: tagContext.totalTags,
+      keywordHitCount,
+      ruleMatchCount: matches.length - synergyMatchCount,
+      synergyMatchCount,
+      riskSignals: buildRiskSignals(tagContext),
+    },
+  };
 }
 
 export function deriveBudgetFromProfileDetailed(profile: CostBudgetProfileInput): CostBudgetProfileDetail {

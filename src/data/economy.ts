@@ -115,9 +115,6 @@ function indexBy<T>(items: ReadonlyArray<T>, getKey: (item: T) => string): Reado
     return acc;
   }, {});
 }
-function cloneReadonlyArray<T>(items: ReadonlyArray<T>): T[] {
-  return [...items];
-}
 function normalizeNonNegativeInt(value: unknown): number {
   return Math.max(0, Math.floor(Number(value ?? 0)));
 }
@@ -129,7 +126,7 @@ function getCurrency(currencyId: string): CurrencyDefinition | null {
 }
 
 function listCurrencies(): CurrencyDefinition[] {
-  return cloneReadonlyArray(CURRENCIES);
+  return CURRENCIES.slice();
 }
 
 function convertCurrency(value: number, fromId: string, toId: string): number {
@@ -257,7 +254,7 @@ function getCultivationRealmEconomy(realm: number): CultivationRealmEconomy | nu
 function listCultivationRealmsEconomy(): CultivationRealmEconomy[] {
   return Object.values(CULTIVATION_REALM_ECONOMY).map((entry) => ({
     ...entry,
-    subRealmCosts: cloneReadonlyArray(entry.subRealmCosts)
+    subRealmCosts: entry.subRealmCosts.slice()
   }));
 }
 
@@ -281,7 +278,7 @@ function getPityConfig(tier: string): PityConfiguration | null {
 }
 
 function listPityTiers(): string[] {
-  return cloneReadonlyArray(PITY_TIERS);
+  return PITY_TIERS.slice();
 }
 
 const SHOP_TAX_BRACKETS: ReadonlyArray<ShopTaxBracket> = Object.freeze(

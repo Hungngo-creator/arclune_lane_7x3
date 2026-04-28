@@ -1,4 +1,3 @@
-//home (termux)/arclune_lane_7x3/src/turns/interleaved.ts
 import { slotIndex } from '../engine.ts';
 import type { SessionState } from '@shared-types/combat';
 import type { Side, UnitToken } from '@shared-types/units';
@@ -8,6 +7,7 @@ const SIDE_TO_LOWER: Record<TurnSideKey, Side> = { ALLY: 'ally', ENEMY: 'enemy' 
 const LOWER_TO_UPPER: Record<Side, TurnSideKey> = { ally: 'ALLY', enemy: 'ENEMY' };
 const TURN_SIDES: ReadonlyArray<TurnSideKey> = ['ALLY', 'ENEMY'];
 const createZeroBySide = (): Record<TurnSideKey, number> => ({ ALLY: 0, ENEMY: 0 });
+const flipSide = (side: TurnSideKey): TurnSideKey => (side === 'ALLY' ? 'ENEMY' : 'ALLY');
 const DEFAULT_LAST_POS: Readonly<Record<TurnSideKey, number>> = createZeroBySide();
 const DEFAULT_WRAP_COUNT: Readonly<Record<TurnSideKey, number>> = createZeroBySide();
 const SLOT_CAP = 9;
@@ -228,7 +228,7 @@ export function nextTurnInterleaved(
   if (!picked) return null;
 
   turn.lastPos[sideKey] = picked.pos;
-  turn.nextSide = sideKey === 'ALLY' ? 'ENEMY' : 'ALLY';
+  turn.nextSide = flipSide(sideKey);
 
   if (picked.wrapped){
     turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;

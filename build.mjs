@@ -207,11 +207,17 @@ const toKnownMode = (value) => {
   const normalized = value.toLowerCase();
   return KNOWN_MODES.has(normalized) ? normalized : undefined;
 };
-const cliMode = toKnownMode(argMode);
-if (cliMode) {
-  process.env.NODE_ENV = cliMode;
+
+function resolveBuildMode(cliModeRaw, envModeRaw){
+  const cliMode = toKnownMode(cliModeRaw);
+  if (cliMode) {
+    process.env.NODE_ENV = cliMode;
+    return cliMode;
+  }
+  return toKnownMode(envModeRaw) ?? 'development';
 }
-const MODE = cliMode ?? toKnownMode(process.env.NODE_ENV) ?? 'development';
+
+const MODE = resolveBuildMode(argMode, process.env.NODE_ENV);
 const ESBUILD_BASE_OPTIONS = {
   platform: 'browser',
   format: 'esm',

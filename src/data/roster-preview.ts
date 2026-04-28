@@ -41,8 +41,10 @@ function roundStat(stat: string, value: number) {
   return Math.round(value * precision) / precision;
 }
 
+const TP_ROUND_FACTOR = 1e6;
+
 function roundTpValue(value: number) {
-  return Math.round(value * 1e6) / 1e6;
+  return Math.round(value * TP_ROUND_FACTOR) / TP_ROUND_FACTOR;
 }
 
 function getClassBase(className: string | null | undefined): CatalogStatBlock {
@@ -163,6 +165,7 @@ function resolvePreviewForUnit(
   const cleanTp = resolveUnitTpAllocation(unit, tpAllocations);
   const rankKey = unit.rank as keyof typeof RANK_MULT;
   const preRank = applyTpToBase(base, cleanTp);
+  const final = applyRankMultiplier(preRank, rankKey);
   return {
     id: unit.id,
     name: unit.name,
@@ -172,7 +175,7 @@ function resolvePreviewForUnit(
     tp: cleanTp,
     totalTP: totalTp(cleanTp),
     preRank,
-    final: applyRankMultiplier(preRank, rankKey),
+    final,
   };
 }
 

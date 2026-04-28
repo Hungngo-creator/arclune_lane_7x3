@@ -81,14 +81,15 @@ const TAG_DEFINITIONS = [
 const normalizeKey = (value: string): string => value.trim().toLowerCase();
 
 const TAG_BY_ID = new Map<string, TagDefinition>();
+const KNOWN_TAG_IDS = new Set<string>();
 for (const definition of TAG_DEFINITIONS){
+  KNOWN_TAG_IDS.add(definition.id);
   TAG_BY_ID.set(normalizeKey(definition.id), definition);
-  const aliases = 'aliases' in definition ? definition.aliases : undefined;
-  for (const alias of aliases ?? []){
+  for (const alias of definition.aliases ?? []){
     TAG_BY_ID.set(normalizeKey(alias), definition);
   }
 }
-const isKnownTagId = (tagId: string): boolean => TAG_BY_ID.has(normalizeKey(tagId));
+const isKnownTagId = (tagId: string): boolean => KNOWN_TAG_IDS.has(tagId);
 
 export const tagAliasesByVersion: Readonly<Record<TagAliasVersion, Readonly<Record<string, string>>>> = Object.freeze({
   v1: Object.freeze({
@@ -128,9 +129,9 @@ export const tagAliasesByVersion: Readonly<Record<TagAliasVersion, Readonly<Reco
 });
 
 const TAG_ALIAS_BY_VERSION = new Map<TagAliasVersion, ReadonlyMap<string, string>>();
-for (const [version, aliases] of Object.entries(tagAliasesByVersion) as Array<[TagAliasVersion, Record<string, string>]>){
+for (const [version, aliases] of Object.entries(tagAliasesByVersion) as Array<[TagAliasVersion, Record<string, string>]>) {
   const aliasByKey = new Map<string, string>();
-  for (const [from, to] of Object.entries(aliases)){
+  for (const [from, to] of Object.entries(aliases)) {
     aliasByKey.set(normalizeKey(from), to);
   }
   TAG_ALIAS_BY_VERSION.set(version, aliasByKey);
@@ -143,10 +144,10 @@ export const TAG_IDS = Object.freeze(TAG_DEFINITIONS.map((definition) => definit
 export const TAG_IDS_BY_DOMAIN = Object.freeze(
   (() => {
     const byDomain = {} as Record<TagDomain, string[]>;
-    for (const domain of TAG_DOMAINS){
+    for (const domain of TAG_DOMAINS) {
       byDomain[domain] = [];
     }
-    for (const definition of TAG_DEFINITIONS){
+    for (const definition of TAG_DEFINITIONS) {
       byDomain[definition.domain].push(definition.id);
     }
     return Object.fromEntries(
@@ -172,18 +173,11 @@ function resolveVersionAlias(
 export function normalizeTagId(
   tag: string | null | undefined,
   version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
-): string | null{
+): string | null {
   if (typeof tag !== 'string') return null;
   const normalized = normalizeKey(resolveVersionAlias(tag, version));
   if (!normalized) return null;
   return TAG_BY_ID.get(normalized)?.id ?? normalized;
-}
-
-export function normalizeTagList(
-  tags: ReadonlyArray<string> | null | undefined,
-  version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
-): string[]{
-  return [...collectNormalizedTagSet(tags, version)];
 }
 
 function collectNormalizedTagSet(
@@ -192,11 +186,18 @@ function collectNormalizedTagSet(
 ): Set<string> {
   const unique = new Set<string>();
   if (!Array.isArray(tags)) return unique;
-  for (const tag of tags){
+  for (const tag of tags) {
     const normalized = normalizeTagId(tag, version);
     if (normalized) unique.add(normalized);
   }
   return unique;
+}
+
+export function normalizeTagList(
+  tags: ReadonlyArray<string> | null | undefined,
+  version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
+): string[] {
+  return [...collectNormalizedTagSet(tags, version)];
 }
 
 export function resolveTagVersionAliases(
@@ -213,28 +214,28 @@ export function getTagDefinition(tag: string | null | undefined): TagDefinition 
   return TAG_BY_ID.get(normalizeKey(normalized)) ?? null;
 }
 
-export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined): string[]{
+export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined): string[] {
   if (!Array.isArray(tags)) return [];
   const unknown = new Set<string>();
-  for (const rawTag of tags){
+  for (const rawTag of tags) {
     if (typeof rawTag !== 'string') continue;
     const trimmed = rawTag.trim();
     if (!trimmed) continue;
     const normalized = normalizeTagId(trimmed);
-    if (!normalized || !isKnownTagId(normalized)){
+    if (!normalized || !isKnownTagId(normalized)) {
       unknown.add(trimmed);
     }
   }
   return [...unknown];
 }
 
-export function hasAnyTag(haystack: ReadonlyArray<string>, needles: ReadonlyArray<string>): boolean{
-  if (!Array.isArray(haystack) || !Array.isArray(needles) || haystack.length === 0 || needles.length === 0){
+export function hasAnyTag(haystack: ReadonlyArray<string>, needles: ReadonlyArray<string>): boolean {
+  if (!Array.isArray(haystack) || !Array.isArray(needles) || haystack.length === 0 || needles.length === 0) {
     return false;
   }
   const normalizedHaystack = collectNormalizedTagSet(haystack);
   const normalizedNeedles = collectNormalizedTagSet(needles);
-  for (const normalizedNeedle of normalizedNeedles){
+  for (const normalizedNeedle of normalizedNeedles) {
     if (normalizedHaystack.has(normalizedNeedle)) return true;
   }
   return false;
