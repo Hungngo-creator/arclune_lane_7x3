@@ -194,6 +194,8 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['./combat/unit-runtime-hooks.js', './combat/unit-runtime-hooks.ts'],
   ['./combat/runtime-hooks/nguyen-le.js', './combat/runtime-hooks/nguyen-le.ts'],
   ['./combat/runtime-hooks/duong-ha.js', './combat/runtime-hooks/duong-ha.ts'],
+  ['./combat/runtime-hooks/duong-ha', './combat/runtime-hooks/duong-ha.ts'],
+  ['@combat/runtime-hooks/duong-ha', './combat/runtime-hooks/duong-ha.ts'],
   ['@combat/runtime-hooks/duong-ha.ts', './combat/runtime-hooks/duong-ha.ts'],
   ['@combat/runtime-hooks/duong-ha.js', './combat/runtime-hooks/duong-ha.ts'],
   ['./combat/runtime-hooks/registry.js', './combat/runtime-hooks/registry.ts'],

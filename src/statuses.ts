@@ -458,7 +458,16 @@ export const Statuses: StatusService = {
       else if (!frenzy && status.id === 'frenzy') frenzy = status;
       else if (!weak && status.id === 'weaken') weak = status;
       else if (!fear && status.id === 'fear') fear = status;
-      else if (!pierce && status.id === 'pierce') pierce = status;
+      else if (
+        !pierce
+        && (
+          status.id === 'pierce'
+          || status.id === 'duong_ha_skill2_pierce'
+          || status.tag === 'penetration'
+        )
+      ) {
+        pierce = status;
+      }
       if (fatigue && exalt && frenzy && weak && fear && pierce) break;
     }
     const targetStatuses = ensureStatusList(target);

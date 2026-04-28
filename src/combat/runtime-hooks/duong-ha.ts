@@ -124,6 +124,7 @@ export const duongHaRuntimeHook: UnitRuntimeHook = {
     }
     for (const token of game.tokens) {
       if (!token?.alive || token.id !== DUONG_HA_ID) continue;
+      if (token.side === deadUnit.side) continue;
       addPassiveStack(token as DuongHaCarrier);
     }
   },
