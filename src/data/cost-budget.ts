@@ -139,10 +139,12 @@ interface CostTagSynergyRule {
 }
 interface CostTagContext {
   hasTag: (...needles: string[]) => boolean;
+  hasKeyword: (...keywords: string[]) => boolean;
   countMatchedTags: (tagIds: ReadonlyArray<string> | undefined) => number;
   countMatchedKeywords: (keywords: ReadonlyArray<string> | undefined) => number;
   totalTags: number;
 }
+const normalizeKeywordTerm = (value: string): string => value.trim().toLowerCase().replace(/\s+/g, ' ');
 
 export interface CostTagRuleMatch {
   ruleId: string;
@@ -180,7 +182,10 @@ function calculateRuleDelta(
 ): number {
   const scaledByTags = typeof rule.perTag === 'number' ? matchedTags * rule.perTag : 0;
   const scaledByKeywords = typeof rule.perKeyword === 'number' ? matchedKeywords * rule.perKeyword : 0;
-  const baseKeywordDelta = matchedKeywords > 0 ? (rule.delta ?? 0) : 0;
+  const hasMatchedKeyword = matchedKeywords > 0;
+  const hasMatchedTag = matchedTags > 0;
+  const hasRuleSignal = hasMatchedTag || hasMatchedKeyword;
+  const baseKeywordDelta = hasRuleSignal ? (rule.delta ?? 0) : 0;
   const totalDelta = scaledByTags + scaledByKeywords + baseKeywordDelta;
   if (totalDelta <= 0) return 0;
   if (typeof rule.cap === 'number'){
@@ -207,6 +212,17 @@ const ROLE_BUDGET_MOD: Readonly<Record<string, CostBudgetInput>> = Object.freeze
   summoner: { tacticalFlexibility: 2, setupPenalty: 2, vanishRiskPenalty: 1 },
   ranger: { consistencyPenalty: 1, scalingCeiling: 1 },
 });
+const ROLE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
+  tank: 'tanker',
+  guardian: 'tanker',
+  fighter: 'warrior',
+  dps: 'warrior',
+  killer: 'assassin',
+  caster: 'mage',
+  healer: 'support',
+  buffer: 'support',
+  marksman: 'ranger',
+});
 
 const RANK_IDEAL_COST_RANGE: Readonly<Record<string, readonly [number, number]>> = Object.freeze({
   N: [7, 9],
@@ -226,6 +242,10 @@ function clamp(value: number, min: number, max: number): number {
 
 function normalizeRankKey(rank: string | null | undefined): string {
   return String(rank ?? '').trim().toUpperCase();
+}
+function normalizeRoleKey(role: string | null | undefined): string {
+  const normalized = String(role ?? '').trim().toLowerCase();
+  return ROLE_ALIASES[normalized] ?? normalized;
 }
 
 function resolveRankAnchorByKey(rankKey: string): number {
@@ -376,8 +396,18 @@ const COST_TAG_SCORE_RULES: ReadonlyArray<CostTagScoreRule> = Object.freeze([
   { id: 'line-burst-ceiling', label: 'Line burst scaling', metric: 'scalingCeiling', delta: 1, requiresAll: ['line', 'burst'] },
   { id: 'defensive-economy', label: 'Sustain economy tax', metric: 'economyPressure', delta: 1, requiresAll: ['shield', 'team-heal'] },
   { id: 'blink-flex', label: 'Blink tactical mobility', metric: 'tacticalFlexibility', delta: 1, tagIds: ['blink'] },
-  ]);
-const COST_TAG_SYNERGY_RULES: ReadonlyArray<CostTagSynergyRule> = Object.freeze(
+  { id: 'revive-economy-tax', label: 'Revive economy tax', metric: 'economyPressure', delta: 1, tagIds: ['revive'] },
+  { id: 'resource-burst-risk', label: 'Burst resource strain', metric: 'setupPenalty', delta: 1, requiresAll: ['burst', 'aether-cost'] },
+  { id: 'summon-wide-pressure', label: 'Summon + AoE influence', metric: 'battlefieldInfluence', delta: 1, requiresAll: ['summon', 'aoe'] },
+  { id: 'rule-stability-tax', label: 'Rule + random consistency tax', metric: 'consistencyPenalty', delta: 1, requiresAll: ['global-rule', 'random-target'] },
+  { id: 'control-setup-tax', label: 'Control setup tax', metric: 'setupPenalty', delta: 1, requiresAll: ['sleep', 'control'] },
+  { id: 'mark-economy-pressure', label: 'Mark chain economy pressure', metric: 'economyPressure', perTag: 1, cap: 2, tagIds: ['mark', 'chain'] },
+  { id: 'absolute-battle-tax', label: 'Absolute rule battlefield tax', metric: 'battlefieldInfluence', perTag: 1, cap: 2, tagIds: ['absolute-attack', 'absolute-shield'] },
+  { id: 'field-line-pressure', label: 'Field + line pressure', metric: 'battlefieldInfluence', delta: 1, requiresAll: ['field', 'line'] },
+  { id: 'revive-support-flex', label: 'Revive support flexibility', metric: 'tacticalFlexibility', delta: 1, requiresAll: ['revive', 'support'] },
+]);
+
+const COST_TAG_SYNERGY_RULES: ReadonlyArray<CostTagSynergyRule> = Object.freeze([
   { id: 'summon-support-flex', label: 'Summon support flexibility', requiresAll: ['summon', 'support'], metric: 'tacticalFlexibility', delta: 1 },
   { id: 'aoe-control-pressure', label: 'AoE control pressure', requiresAll: ['aoe', 'control'], metric: 'battlefieldInfluence', delta: 1 },
   { id: 'revive-shield-scale', label: 'Revive shield scaling', requiresAll: ['revive', 'shield'], metric: 'scalingCeiling', delta: 1 },
@@ -386,17 +416,42 @@ const COST_TAG_SYNERGY_RULES: ReadonlyArray<CostTagSynergyRule> = Object.freeze(
   { id: 'burst-execute-scale', label: 'Burst execute scaling', requiresAll: ['burst', 'execute'], metric: 'scalingCeiling', delta: 1 },
   { id: 'heal-shield-utility', label: 'Heal shield utility', requiresAll: ['heal', 'shield'], metric: 'tacticalFlexibility', delta: 1 },
   { id: 'random-rule-inconsistency', label: 'Random rule inconsistency', requiresAll: ['random-target', 'global-rule'], metric: 'consistencyPenalty', delta: 1 },
+  { id: 'mark-chain-scale', label: 'Mark chain scaling', requiresAll: ['mark', 'chain'], metric: 'scalingCeiling', delta: 1 },
+  { id: 'taunt-shield-flex', label: 'Taunt shield frontline', requiresAll: ['taunt', 'shield'], metric: 'tacticalFlexibility', delta: 1 },
+  { id: 'sleep-execute-setup', label: 'Sleep execute setup tax', requiresAll: ['sleep', 'execute'], metric: 'setupPenalty', delta: 1 },
+  { id: 'pierce-burst-ceiling', label: 'Pierce burst ceiling', requiresAll: ['pierce', 'burst'], metric: 'scalingCeiling', delta: 1 },
+  { id: 'support-revive-economy', label: 'Support revive economy pressure', requiresAll: ['support', 'revive'], metric: 'economyPressure', delta: 1 },
+  { id: 'shield-control-frontline', label: 'Shield control frontline pressure', requiresAll: ['shield', 'control'], metric: 'battlefieldInfluence', delta: 1 },
 ]);
 
 function createTagCostContext(tags: readonly string[]): CostTagContext {
-  const normalizedTextTags = tags
-    .map((tag) => String(tag).trim().toLowerCase())
+  const normalizedTextTags = normalizeTagList(
+    tags
+      .map((tag) => String(tag).trim().toLowerCase())
+      .filter(Boolean)
+  )
+    .map((tag) => normalizeKeywordTerm(tag))
     .filter(Boolean);
-  const normalizedTagSet = new Set(normalizeTagList(normalizedTextTags));
+  const normalizedTagSet = new Set(normalizedTextTags);
   const normalizedTagText = normalizedTextTags.join(' || ');
   const keywordCache = new Map<string, boolean>();
+  const hasKeywordImpl = (keyword: string): boolean => {
+    const normalizedKeyword = normalizeKeywordTerm(keyword);
+    if (!normalizedKeyword) return false;
+    if (normalizedTagSet.has(normalizedKeyword)) return true;
+    return normalizedTagText.includes(normalizedKeyword);
+  };
 
-  const hasTag = (...needles: string[]): boolean => needles.some((needle) => normalizedTagSet.has(needle));
+  const hasTag = (...needles: string[]): boolean => normalizeTagList(needles).some((needle) => normalizedTagSet.has(needle));
+  const hasKeyword = (...keywords: string[]): boolean => keywords.some((keyword) => {
+    const cached = keywordCache.get(keyword);
+    if (typeof cached === 'boolean'){
+      return cached;
+    }
+    const matched = hasKeywordImpl(keyword);
+    keywordCache.set(keyword, matched);
+    return matched;
+  });
   const countMatchedTags = (tagIds: ReadonlyArray<string> | undefined): number => {
     if (!Array.isArray(tagIds) || tagIds.length === 0) return 0;
     let count = 0;
@@ -414,14 +469,14 @@ function createTagCostContext(tags: readonly string[]): CostTagContext {
         if (cached) count += 1;
         continue;
       }
-      const matched = normalizedTagText.includes(keyword);
+      const matched = hasKeywordImpl(keyword);
       keywordCache.set(keyword, matched);
       if (matched) count += 1;
     }
     return count;
   };
 
-  return { hasTag, countMatchedTags, countMatchedKeywords, totalTags: normalizedTagSet.size };
+  return { hasTag, hasKeyword, countMatchedTags, countMatchedKeywords, totalTags: normalizedTagSet.size };
 }
 
 function isRuleApplicable(rule: CostTagScoreRule, tagContext: CostTagContext): boolean {
@@ -462,7 +517,7 @@ export function mergeBudgetInputs(...inputs: Array<CostBudgetInput | null | unde
 
 export function deriveBudgetFromRankRole(rank?: string | null, role?: string | null): CostBudgetInput {
   const rankKey = normalizeRankKey(rank);
-  const roleKey = String(role ?? '').trim().toLowerCase();
+  const roleKey = normalizeRoleKey(role);
   return mergeBudgetInputs(
     {
       rank: rankKey,
@@ -472,6 +527,7 @@ export function deriveBudgetFromRankRole(rank?: string | null, role?: string | n
     { battlefieldInfluence: 1, tacticalFlexibility: 1 },
     RANK_BUDGET_BASE[rankKey],
     ROLE_BUDGET_MOD[roleKey],
+    rankKey === 'UR' ? { economyPressure: 1 } : null,
     rankKey === 'PRIME' ? { hasDivineNature: true } : null,
   );
 }
@@ -549,6 +605,7 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
     const current = typeof input[key] === 'number' ? (input[key] as number) : 0;
     input[key] = current + delta;
   };
+
   const addMatch = (
     ruleId: string,
     label: string,
@@ -560,6 +617,14 @@ export function deriveBudgetFromTagsDetailed(tags: readonly string[]): CostTagBu
     if (delta <= 0) return;
     matches.push({ ruleId, label, metric, delta, matchedTags, matchedKeywords });
   };
+  if (tagContext.hasTag('global-rule') && tagContext.hasKeyword('global', 'toàn sân', 'quy tắc')){
+    addScore('tagComplexity', 1);
+    addMatch('rule-text-alignment', 'Global rule text alignment', 'tagComplexity', 1);
+  }
+  if (tagContext.totalTags >= 10){
+    addScore('consistencyPenalty', 1);
+    addMatch('high-tag-overload', 'High tag overload consistency tax', 'consistencyPenalty', 1, tagContext.totalTags, 0);
+  }
 
   for (const rule of COST_TAG_SCORE_RULES){
     if (!isRuleApplicable(rule, tagContext)) continue;

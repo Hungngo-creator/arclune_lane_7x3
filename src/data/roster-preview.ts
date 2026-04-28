@@ -155,29 +155,33 @@ function resolveUnitTpAllocation(
   const base = getClassBase(unit.class);
   return deriveTpFromMods(base, unit.mods);
 }
+function resolvePreviewForUnit(
+  unit: RosterUnitDefinition,
+  tpAllocations?: Record<string, Record<string, number>>,
+): RosterPreview {
+  const base = getClassBase(unit.class);
+  const cleanTp = resolveUnitTpAllocation(unit, tpAllocations);
+  const rankKey = unit.rank as keyof typeof RANK_MULT;
+  const preRank = applyTpToBase(base, cleanTp);
+  return {
+    id: unit.id,
+    name: unit.name,
+    class: unit.class,
+    rank: unit.rank,
+    rankMultiplier: getRankMultiplier(rankKey),
+    tp: cleanTp,
+    totalTP: totalTp(cleanTp),
+    preRank,
+    final: applyRankMultiplier(preRank, rankKey),
+  };
+}
 
 export function buildRosterPreviews(
   tpAllocations: Record<string, Record<string, number>> | undefined = undefined
 ): Record<string, RosterPreview> {
   const result: Record<string, RosterPreview> = {};
   for (const unit of ROSTER as ReadonlyArray<RosterUnitDefinition>) {
-    const base = getClassBase(unit.class);
-    const cleanTp = resolveUnitTpAllocation(unit, tpAllocations);
-    const rankKey = unit.rank as keyof typeof RANK_MULT;
-    const multiplier = getRankMultiplier(rankKey);
-    const preRank = applyTpToBase(base, cleanTp);
-    const final = applyRankMultiplier(preRank, rankKey);
-    result[unit.id] = {
-      id: unit.id,
-      name: unit.name,
-      class: unit.class,
-      rank: unit.rank,
-      rankMultiplier: multiplier,
-      tp: cleanTp,
-      totalTP: totalTp(cleanTp),
-      preRank,
-      final
-    };
+    result[unit.id] = resolvePreviewForUnit(unit, tpAllocations);
   }
   return result;
 }

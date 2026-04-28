@@ -88,6 +88,7 @@ for (const definition of TAG_DEFINITIONS){
     TAG_BY_ID.set(normalizeKey(alias), definition);
   }
 }
+const isKnownTagId = (tagId: string): boolean => TAG_BY_ID.has(normalizeKey(tagId));
 
 export const tagAliasesByVersion: Readonly<Record<TagAliasVersion, Readonly<Record<string, string>>>> = Object.freeze({
   v1: Object.freeze({
@@ -198,19 +199,6 @@ function collectNormalizedTagSet(
   return unique;
 }
 
-function collectNormalizedNeedleSet(
-  needles: ReadonlyArray<string> | null | undefined,
-  version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
-): Set<string> {
-  const normalizedNeedles = new Set<string>();
-  if (!Array.isArray(needles)) return normalizedNeedles;
-  for (const needle of needles){
-    const normalized = normalizeTagId(needle, version);
-    if (normalized) normalizedNeedles.add(normalized);
-  }
-  return normalizedNeedles;
-}
-
 export function resolveTagVersionAliases(
   tags: ReadonlyArray<string> | null | undefined,
   version: TagAliasVersion = CURRENT_TAG_ALIAS_VERSION,
@@ -222,7 +210,7 @@ export function resolveTagVersionAliases(
 export function getTagDefinition(tag: string | null | undefined): TagDefinition | null {
   const normalized = normalizeTagId(tag);
   if (!normalized) return null;
-  return TAG_BY_ID.get(normalized) ?? null;
+  return TAG_BY_ID.get(normalizeKey(normalized)) ?? null;
 }
 
 export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined): string[]{
@@ -233,7 +221,7 @@ export function listUnknownTags(tags: ReadonlyArray<string> | null | undefined):
     const trimmed = rawTag.trim();
     if (!trimmed) continue;
     const normalized = normalizeTagId(trimmed);
-    if (!normalized || !TAG_BY_ID.has(normalized)){
+    if (!normalized || !isKnownTagId(normalized)){
       unknown.add(trimmed);
     }
   }
@@ -245,7 +233,7 @@ export function hasAnyTag(haystack: ReadonlyArray<string>, needles: ReadonlyArra
     return false;
   }
   const normalizedHaystack = collectNormalizedTagSet(haystack);
-  const normalizedNeedles = collectNormalizedNeedleSet(needles);
+  const normalizedNeedles = collectNormalizedTagSet(needles);
   for (const normalizedNeedle of normalizedNeedles){
     if (normalizedHaystack.has(normalizedNeedle)) return true;
   }

@@ -207,11 +207,11 @@ const toKnownMode = (value) => {
   const normalized = value.toLowerCase();
   return KNOWN_MODES.has(normalized) ? normalized : undefined;
 };
-const normalizedMode = toKnownMode(argMode);
-if (normalizedMode) {
-  process.env.NODE_ENV = normalizedMode;
+const cliMode = toKnownMode(argMode);
+if (cliMode) {
+  process.env.NODE_ENV = cliMode;
 }
-const MODE = normalizedMode ?? toKnownMode(process.env.NODE_ENV) ?? 'development';
+const MODE = cliMode ?? toKnownMode(process.env.NODE_ENV) ?? 'development';
 const ESBUILD_BASE_OPTIONS = {
   platform: 'browser',
   format: 'esm',
@@ -332,31 +332,39 @@ function registerLegacyModuleAlias(fromId, toId, { override = true } = {}){
   LEGACY_MODULE_ID_ALIASES.set(normalizedFrom, normalizedTo);
 }
 
+function statIfExists(candidatePath){
+  if (!candidatePath) return null;
+  try {
+    return fsSync.statSync(candidatePath);
+  } catch {
+    return null;
+  }
+}
+
 function resolveWithExtensions(basePath){
   if (!basePath) return null;
-  if (fsSync.existsSync(basePath)){
-    const stat = fsSync.statSync(basePath);
-    if (stat.isFile()){
-      return basePath;
-    }
-    if (stat.isDirectory()){
-      for (const ext of SOURCE_EXTENSIONS){
-        const indexCandidate = path.join(basePath, `index${ext}`);
-        if (fsSync.existsSync(indexCandidate) && fsSync.statSync(indexCandidate).isFile()){
-          return indexCandidate;
-        }
+  const readIfFile = (candidatePath) => (statIfExists(candidatePath)?.isFile() ? candidatePath : null);
+  const baseFile = readIfFile(basePath);
+  if (baseFile){
+    return baseFile;
+  }
+  if (statIfExists(basePath)?.isDirectory()){
+    for (const ext of SOURCE_EXTENSIONS){
+      const indexCandidate = readIfFile(path.join(basePath, `index${ext}`));
+      if (indexCandidate){
+        return indexCandidate;
       }
     }
   }
   if (!path.extname(basePath)){
     for (const ext of SOURCE_EXTENSIONS){
-      const candidate = `${basePath}${ext}`;
-      if (fsSync.existsSync(candidate) && fsSync.statSync(candidate).isFile()){
+      const candidate = readIfFile(`${basePath}${ext}`);
+      if (candidate){
         return candidate;
       }
     }
   }
-  return fsSync.existsSync(basePath) ? basePath : null;
+  return null;
 }
 
 function toModuleId(filePath){

@@ -1,13 +1,15 @@
 //home (termux)/arclune_lane_7x3/src/turns/interleaved.ts
 import { slotIndex } from '../engine.ts';
 import type { SessionState } from '@shared-types/combat';
-import type { QueuedSummonRequest, Side, UnitToken } from '@shared-types/units';
+import type { Side, UnitToken } from '@shared-types/units';
 import type { InterleavedState, InterleavedTurnState, TurnSideKey } from '@shared-types/turn-order';
 
 const SIDE_TO_LOWER: Record<TurnSideKey, Side> = { ALLY: 'ally', ENEMY: 'enemy' };
 const LOWER_TO_UPPER: Record<Side, TurnSideKey> = { ally: 'ALLY', enemy: 'ENEMY' };
-const DEFAULT_LAST_POS: Record<TurnSideKey, number> = { ALLY: 0, ENEMY: 0 };
-const DEFAULT_WRAP_COUNT: Record<TurnSideKey, number> = { ALLY: 0, ENEMY: 0 };
+const TURN_SIDES: ReadonlyArray<TurnSideKey> = ['ALLY', 'ENEMY'];
+const createZeroBySide = (): Record<TurnSideKey, number> => ({ ALLY: 0, ENEMY: 0 });
+const DEFAULT_LAST_POS: Readonly<Record<TurnSideKey, number>> = createZeroBySide();
+const DEFAULT_WRAP_COUNT: Readonly<Record<TurnSideKey, number>> = createZeroBySide();
 const SLOT_CAP = 9;
 type SlotMapBySide = Record<TurnSideKey, Map<number, UnitToken>>;
 type SequentialOrderIndexCache = {
@@ -35,19 +37,24 @@ function resolveSlotCount(turn: InterleavedTurnState | null | undefined): number
   return SLOT_CAP;
 }
 
+function sanitizeSideCounter(
+  current: Record<TurnSideKey, number> | null | undefined,
+  fallback: Readonly<Record<TurnSideKey, number>>,
+): Record<TurnSideKey, number> {
+  const normalized = { ...fallback };
+  if (!current || typeof current !== 'object'){
+    return normalized;
+  }
+  for (const sideKey of TURN_SIDES){
+    const value = current[sideKey];
+    normalized[sideKey] = Number.isFinite(value) ? value : 0;
+  }
+  return normalized;
+}
+
 function ensureTurnState(turn: InterleavedTurnState): void {
-  if (!turn.lastPos || typeof turn.lastPos !== 'object'){
-    turn.lastPos = { ...DEFAULT_LAST_POS };
-  } else {
-    turn.lastPos.ALLY = Number.isFinite(turn.lastPos.ALLY) ? turn.lastPos.ALLY : 0;
-    turn.lastPos.ENEMY = Number.isFinite(turn.lastPos.ENEMY) ? turn.lastPos.ENEMY : 0;
-  }
-  if (!turn.wrapCount || typeof turn.wrapCount !== 'object'){
-    turn.wrapCount = { ...DEFAULT_WRAP_COUNT };
-  } else {
-    turn.wrapCount.ALLY = Number.isFinite(turn.wrapCount.ALLY) ? turn.wrapCount.ALLY : 0;
-    turn.wrapCount.ENEMY = Number.isFinite(turn.wrapCount.ENEMY) ? turn.wrapCount.ENEMY : 0;
-  }
+  turn.lastPos = sanitizeSideCounter(turn.lastPos, DEFAULT_LAST_POS);
+  turn.wrapCount = sanitizeSideCounter(turn.wrapCount, DEFAULT_WRAP_COUNT);
   if (!Number.isFinite(turn.turnCount)){
     turn.turnCount = 0;
   }
@@ -162,7 +169,6 @@ export function findNextOccupiedPos(
   const turn = (state.turn as InterleavedTurnState | null) ?? null;
   const sideKey = normalizeSide(side);
   const sideLower = SIDE_TO_LOWER[sideKey];
-  if (!sideLower) return null;
 
   const slotCount = resolveSlotCount(turn);
   const start = Number.isFinite(startPos) ? Math.max(0, Math.min(slotCount, Math.floor(startPos))) : 0;

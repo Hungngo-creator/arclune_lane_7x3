@@ -115,6 +115,12 @@ function indexBy<T>(items: ReadonlyArray<T>, getKey: (item: T) => string): Reado
     return acc;
   }, {});
 }
+function cloneReadonlyArray<T>(items: ReadonlyArray<T>): T[] {
+  return [...items];
+}
+function normalizeNonNegativeInt(value: unknown): number {
+  return Math.max(0, Math.floor(Number(value ?? 0)));
+}
 
 const CURRENCY_INDEX: Readonly<Record<string, CurrencyDefinition>> = indexBy(CURRENCIES, (currency) => currency.id);
 
@@ -123,7 +129,7 @@ function getCurrency(currencyId: string): CurrencyDefinition | null {
 }
 
 function listCurrencies(): CurrencyDefinition[] {
-  return [...CURRENCIES];
+  return cloneReadonlyArray(CURRENCIES);
 }
 
 function convertCurrency(value: number, fromId: string, toId: string): number {
@@ -194,10 +200,11 @@ function formatBalance(value: number, currencyId: string, options: FormatBalance
   let suffix = currency.suffix;
 
   if (autoScale){
+    const baseRatio = currency.ratioToBase;
     for (let i = SORTED_CURRENCIES_BY_RATIO.length - 1; i >= 0; i -= 1){
       const candidate = SORTED_CURRENCIES_BY_RATIO[i];
       if (!candidate) continue;
-      const inCandidate = convertCurrency(value, currency.id, candidate.id);
+      const inCandidate = (value * baseRatio) / candidate.ratioToBase;
       if (Math.abs(inCandidate) >= 1){
         amount = inCandidate;
         suffix = candidate.suffix;
@@ -250,7 +257,7 @@ function getCultivationRealmEconomy(realm: number): CultivationRealmEconomy | nu
 function listCultivationRealmsEconomy(): CultivationRealmEconomy[] {
   return Object.values(CULTIVATION_REALM_ECONOMY).map((entry) => ({
     ...entry,
-    subRealmCosts: [...entry.subRealmCosts]
+    subRealmCosts: cloneReadonlyArray(entry.subRealmCosts)
   }));
 }
 
@@ -266,19 +273,15 @@ const PITY_CONFIG: Readonly<Record<PityTier, PityConfiguration>> = Object.freeze
     ])
   ) as Record<PityTier, PityConfiguration>
 );
-function isPityTier(tier: string): tier is PityTier {
-  return PITY_TIERS.includes(tier as PityTier);
-}
 
 function getPityConfig(tier: string): PityConfiguration | null {
-  if (isPityTier(tier)){
-    return PITY_CONFIG[tier] ?? null;
-  }
-  return null;
+  return Object.prototype.hasOwnProperty.call(PITY_CONFIG, tier)
+    ? (PITY_CONFIG[tier as PityTier] ?? null)
+    : null;
 }
 
 function listPityTiers(): string[] {
-  return [...PITY_TIERS];
+  return cloneReadonlyArray(PITY_TIERS);
 }
 
 const SHOP_TAX_BRACKETS: ReadonlyArray<ShopTaxBracket> = Object.freeze(
@@ -300,7 +303,7 @@ const INITIAL_WALLET: Readonly<Partial<Record<CurrencyId, number>>> = Object.fre
   Object.fromEntries(
     CURRENCY_ORDER.map((currencyId) => [
       currencyId,
-      Math.max(0, Math.floor(Number(economyConfig.initialWallet?.[currencyId] ?? 0))),
+      normalizeNonNegativeInt(economyConfig.initialWallet?.[currencyId]),
     ])
   ) as Partial<Record<CurrencyId, number>>
 );
