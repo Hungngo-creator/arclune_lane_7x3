@@ -126,6 +126,18 @@ describe('resolveUnitCost and roster auto-cost', () => {
     }
   });
 
+  test('Dương Hạ dùng auto-cost từ cost budget theo rank/role', () => {
+    const duongHa = UNITS.find((unit) => unit.id === 'duong_ha');
+    expect(duongHa).toBeTruthy();
+    const expected = resolveUnitCost({
+      id: 'duong_ha',
+      name: 'Dương Hạ',
+      rank: 'SSR',
+      role: 'Ranger',
+    });
+    expect(duongHa?.cost).toBe(expected);
+  });
+
   test('Doãn Minh (SR Support) không vượt xa khung SR mặc định', () => {
     const doanMinh = UNITS.find((unit) => unit.id === 'doanminh');
     expect(doanMinh).toBeTruthy();

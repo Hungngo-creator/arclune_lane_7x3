@@ -73,6 +73,9 @@ function refreshSkill2Toggle(unit: DuongHaCarrier): void {
 export const duongHaRuntimeHook: UnitRuntimeHook = {
   onActiveSkill({ caster, skillKey, skill, tags, appliedTags }) {
     if (caster.id !== DUONG_HA_ID) return null;
+    if (skillKey === 'skill1' || skillKey === 'skill2') {
+      return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
+    }
     if (skillKey !== 'skill3') return null;
     Statuses.add(caster, { id: 'duong_ha_skill3_atk', kind: 'buff', tag: 'stat', attr: 'atk', mode: 'percent', amount: SKILL3_RATIO, dur: SKILL3_DURATION, tick: 'turn', sourceUnitId: caster.id });
     Statuses.add(caster, { id: 'duong_ha_skill3_wil', kind: 'buff', tag: 'stat', attr: 'wil', mode: 'percent', amount: SKILL3_RATIO, dur: SKILL3_DURATION, tick: 'turn', sourceUnitId: caster.id });
@@ -85,6 +88,18 @@ export const duongHaRuntimeHook: UnitRuntimeHook = {
     if (!duongHa || !duongHa.alive || duongHa.id !== DUONG_HA_ID) return;
     duongHa.ae = Math.max(0, Math.floor(toFiniteNumber(duongHa.ae, 0) - SKILL1_TURN_DRAIN));
     refreshSkill2Toggle(duongHa);
+    Statuses.remove(duongHa, 'duong_ha_skill2_pierce');
+    if (duongHa._duongHaSkill2ActiveThisTurn) {
+      Statuses.add(duongHa, {
+        id: 'duong_ha_skill2_pierce',
+        kind: 'buff',
+        tag: 'penetration',
+        power: SKILL2_PIERCE_RATIO,
+        dur: 1,
+        tick: 'turn',
+        sourceUnitId: duongHa.id,
+      });
+    }
   },
   onBasicAttackResolved({ game, attacker, target, dealt }) {
     const duongHa = attacker as DuongHaCarrier;
@@ -118,5 +133,6 @@ export const duongHaRuntimeHook: UnitRuntimeHook = {
     resetDuongHaPassive(duongHa);
     duongHa._duongHaSkill2NextActive = true;
     duongHa._duongHaSkill2ActiveThisTurn = false;
+    Statuses.remove(duongHa, 'duong_ha_skill2_pierce');
   },
 };
