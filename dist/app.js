@@ -23802,6 +23802,25 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
       const index = Math.floor(Math.random() * CHESS_ROLE_POOL.length);
       return CHESS_ROLE_POOL[index] ?? 'rook';
   }
+  function buildTeamChessRoles(unitCount) {
+      if (unitCount <= 0)
+          return [];
+      const roles = [];
+      for (let index = 0; index < unitCount; index += 1) {
+          if (index < CHESS_ROLE_POOL.length) {
+              roles.push(CHESS_ROLE_POOL[index] ?? 'rook');
+              continue;
+          }
+          roles.push(pickRandomChessRole());
+      }
+      for (let index = roles.length - 1; index > 0; index -= 1) {
+          const randomIndex = Math.floor(Math.random() * (index + 1));
+          const current = roles[index] ?? 'rook';
+          roles[index] = roles[randomIndex] ?? current;
+          roles[randomIndex] = current;
+      }
+      return roles;
+  }
   const CLASS_PROFILE = {
       tanker: { move: 3, basicRange: 1 },
       warrior: { move: 3, basicRange: 1 },
@@ -24125,8 +24144,11 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               `${coreEnd - 2},${coreEnd}`,
               `${coreEnd - 3},${coreEnd}`,
           ];
-          const playerStates = playerUnits
-              .slice(0, playerSlots.length)
+          const playerLineup = playerUnits.slice(0, playerSlots.length);
+          const enemyLineup = enemyUnits.slice(0, enemySlots.length);
+          const playerChessRoles = buildTeamChessRoles(playerLineup.length);
+          const enemyChessRoles = buildTeamChessRoles(enemyLineup.length);
+          const playerStates = playerLineup
               .map((unit, index) => {
               const parsed = parseKey(playerSlots[index] ?? '');
               const classProfile = resolveClassProfile(unit.classId);
@@ -24150,13 +24172,12 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       zocImmune: classProfile.zocImmune,
                       slotIndex: index,
                       isSummon: false,
-                      chessRole: pickRandomChessRole(),
+                      chessRole: playerChessRoles[index] ?? pickRandomChessRole(),
                   }
                   : null;
           })
               .filter((item) => item !== null);
-          const enemyStates = enemyUnits
-              .slice(0, enemySlots.length)
+          const enemyStates = enemyLineup
               .map((unit, index) => {
               const parsed = parseKey(enemySlots[index] ?? '');
               const classProfile = resolveClassProfile(unit.classId);
@@ -24180,7 +24201,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       zocImmune: classProfile.zocImmune,
                       slotIndex: index,
                       isSummon: false,
-                      chessRole: pickRandomChessRole(),
+                      chessRole: enemyChessRoles[index] ?? pickRandomChessRole(),
                   }
                   : null;
           })
@@ -24636,7 +24657,12 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                                   if (target.isObjectiveNpc)
                                       return;
                                   if (target.team !== actingUnit.team) {
+                                      const canAttackTarget = canUseCommand(matchState, 'basicAttack') && canBasicAttackTile(actingUnit, x, y);
+                                      if (!canAttackTarget)
+                                          return;
                                       executeCommand({ type: 'basicAttack', team: 'player', payload: { targetX: x, targetY: y } });
+                                      if (!canUseCommand(matchState, 'endTurn'))
+                                          return;
                                       executeCommand({ type: 'endTurn', team: 'player' });
                                       finalizePlayerProgress();
                                   }
