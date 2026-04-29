@@ -23797,6 +23797,11 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
     .chess-rpg-match__action-btn:disabled{opacity:.45;cursor:not-allowed;}
     .chess-rpg-match__result{padding:10px 12px;border-radius:10px;border:1px solid rgba(247,192,124,.6);background:rgba(76,38,19,.4);font-size:13px;color:#ffe4ca;}
   `;
+  const CHESS_ROLE_POOL = Object.freeze(['rook', 'bishop', 'knight']);
+  function pickRandomChessRole() {
+      const index = Math.floor(Math.random() * CHESS_ROLE_POOL.length);
+      return CHESS_ROLE_POOL[index] ?? 'rook';
+  }
   const CLASS_PROFILE = {
       tanker: { move: 3, basicRange: 1 },
       warrior: { move: 3, basicRange: 1 },
@@ -23842,13 +23847,18 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           return 'none';
       return 'rook';
   }
+  function resolveUnitMovementKind(unit) {
+      if (unit.chessRole)
+          return unit.chessRole;
+      return resolveChessMovementKind(unit.classId);
+  }
   function findShortestPaths(unit, playable, occupied) {
       const startKey = keyOf(unit.x, unit.y);
       const paths = new Map();
       const stepCap = Math.max(0, Math.min(CHESS_MOVE_CAP, unit.moveRange));
       if (stepCap <= 0)
           return paths;
-      const movementKind = resolveChessMovementKind(unit.classId);
+      const movementKind = resolveUnitMovementKind(unit);
       if (movementKind === 'none')
           return paths;
       if (movementKind === 'knight') {
@@ -23883,7 +23893,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
   }
   function resolveBasicAttackTiles(unit) {
       const tiles = new Set();
-      const movementKind = resolveChessMovementKind(unit.classId);
+      const movementKind = resolveUnitMovementKind(unit);
       if (movementKind === 'knight') {
           for (const jump of KNIGHT_JUMPS) {
               const lx = unit.x + jump.dx;
@@ -23972,6 +23982,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           zocImmune: true,
           slotIndex: -1,
           isSummon: true,
+          chessRole: context.caster.chessRole ?? 'bishop',
       };
       const rosterBefore = context.teamSummons.map((entry) => ({
           id: entry.id,
@@ -24139,6 +24150,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       zocImmune: classProfile.zocImmune,
                       slotIndex: index,
                       isSummon: false,
+                      chessRole: pickRandomChessRole(),
                   }
                   : null;
           })
@@ -24168,6 +24180,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       zocImmune: classProfile.zocImmune,
                       slotIndex: index,
                       isSummon: false,
+                      chessRole: pickRandomChessRole(),
                   }
                   : null;
           })
@@ -24666,7 +24679,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       const rescueBarrierInfo = matchState.objectiveMode === 'rescue'
                           ? ` | Barrier NPC ${rescueBarrierCharges > 0 ? 'sẵn sàng' : 'đã vỡ'}`
                           : '';
-                      status.textContent = `Class ${active.classId} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Summon ${teamSummonCount}/${SUMMON_CAP_PER_TEAM} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
+                      status.textContent = `Class ${active.classId} | Piece ${resolveUnitMovementKind(active)} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Summon ${teamSummonCount}/${SUMMON_CAP_PER_TEAM} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
                       piecesHost.appendChild(status);
                   }
               }

@@ -93,6 +93,7 @@ interface UnitState {
   zocImmune: boolean;
   slotIndex: number;
   isSummon: boolean;
+  chessRole?: ChessMovementKind;
   isObjectiveNpc?: boolean;
 }
 
@@ -133,6 +134,13 @@ interface TacticalBias {
 }
 
 type ChessMovementKind = 'rook' | 'bishop' | 'knight' | 'none';
+const CHESS_ROLE_POOL: readonly ChessMovementKind[] = Object.freeze(['rook', 'bishop', 'knight']);
+
+
+function pickRandomChessRole(): ChessMovementKind {
+  const index = Math.floor(Math.random() * CHESS_ROLE_POOL.length);
+  return CHESS_ROLE_POOL[index] ?? 'rook';
+}
 
 const CLASS_PROFILE: Record<string, { move: number; basicRange: number; zocImmune?: boolean }> = {
   tanker: { move: 3, basicRange: 1 },
@@ -180,12 +188,17 @@ function resolveChessMovementKind(classId: string): ChessMovementKind {
   return 'rook';
 }
 
+function resolveUnitMovementKind(unit: UnitState): ChessMovementKind {
+  if (unit.chessRole) return unit.chessRole;
+  return resolveChessMovementKind(unit.classId);
+}
+
 function findShortestPaths(unit: UnitState, playable: Set<string>, occupied: Set<string>): Map<string, string[]> {
   const startKey = keyOf(unit.x, unit.y);
   const paths = new Map<string, string[]>();
   const stepCap = Math.max(0, Math.min(CHESS_MOVE_CAP, unit.moveRange));
   if (stepCap <= 0) return paths;
-  const movementKind = resolveChessMovementKind(unit.classId);
+  const movementKind = resolveUnitMovementKind(unit);
   if (movementKind === 'none') return paths;
 
   if (movementKind === 'knight') {
@@ -219,7 +232,7 @@ function findShortestPaths(unit: UnitState, playable: Set<string>, occupied: Set
 
 function resolveBasicAttackTiles(unit: UnitState): Set<string> {
   const tiles = new Set<string>();
-  const movementKind = resolveChessMovementKind(unit.classId);
+  const movementKind = resolveUnitMovementKind(unit);
   if (movementKind === 'knight') {
     for (const jump of KNIGHT_JUMPS) {
       const lx = unit.x + jump.dx;
@@ -323,6 +336,7 @@ export function resolveSummonerSkillSpawn(context: SummonSpawnContext): {
     zocImmune: true,
     slotIndex: -1,
     isSummon: true,
+    chessRole: context.caster.chessRole ?? 'bishop',
   };
   const rosterBefore: SummonPresence[] = context.teamSummons.map((entry) => ({
     id: entry.id,
@@ -509,6 +523,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               zocImmune: classProfile.zocImmune,
               slotIndex: index,
               isSummon: false,
+              chessRole: pickRandomChessRole(),
             }
           : null;
       })
@@ -538,6 +553,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               zocImmune: classProfile.zocImmune,
               slotIndex: index,
               isSummon: false,
+              chessRole: pickRandomChessRole(),
             }
           : null;
       })
@@ -1026,7 +1042,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           const rescueBarrierInfo = matchState.objectiveMode === 'rescue'
             ? ` | Barrier NPC ${rescueBarrierCharges > 0 ? 'sẵn sàng' : 'đã vỡ'}`
             : '';
-          status.textContent = `Class ${active.classId} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Summon ${teamSummonCount}/${SUMMON_CAP_PER_TEAM} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
+          status.textContent = `Class ${active.classId} | Piece ${resolveUnitMovementKind(active)} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Summon ${teamSummonCount}/${SUMMON_CAP_PER_TEAM} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
           piecesHost.appendChild(status);
         }
       }
