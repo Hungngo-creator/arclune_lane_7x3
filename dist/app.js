@@ -23788,6 +23788,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
     .chess-rpg-match__cell--enemy{background:rgba(126,42,72,.68);border-color:rgba(255,149,196,.56);font-weight:700;color:#ffc3dd;}
     .chess-rpg-match__cell--selected{outline:2px solid rgba(255,229,142,.96);outline-offset:-2px;}
     .chess-rpg-match__cell--move{background:rgba(50,170,83,.72);border-color:rgba(150,255,176,.94);color:#e8fff0;cursor:pointer;}
+    .chess-rpg-match__cell--attack-zone{background:rgba(197,117,37,.44);border-color:rgba(255,192,113,.72);}
+    .chess-rpg-match__cell--attack-target{background:radial-gradient(circle at center, rgba(255,241,168,.85), rgba(190,74,58,.72));border-color:rgba(255,234,157,.98);box-shadow:0 0 12px rgba(255,220,120,.75);cursor:pointer;}
     .chess-rpg-match__turn{margin:0;font-size:13px;color:#bce2ff;}
     .chess-rpg-match__pieces{display:flex;flex-wrap:wrap;gap:6px;}
     .chess-rpg-match__piece{font-size:12px;border:1px solid rgba(161,216,255,.4);border-radius:999px;padding:2px 8px;background:rgba(31,74,107,.5);color:#e6f3ff;}
@@ -24240,6 +24242,8 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
           let unitTurnStartedAtMs = Date.now();
           let selectedUnitId = playerStates[0]?.id ?? null;
           const reachableById = new Map();
+          const attackTilesById = new Map();
+          const attackableEnemyTilesById = new Map();
           const aliveByTeam = {
               player: playerStates,
               enemy: enemyStates,
@@ -24633,6 +24637,14 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       if (canMoveTo) {
                           cell.classList.add('chess-rpg-match__cell--move');
                       }
+                      const canAttackTile = currentUnit ? attackTilesById.get(currentUnit.id)?.has(key) : false;
+                      if (canAttackTile && !canMoveTo) {
+                          cell.classList.add('chess-rpg-match__cell--attack-zone');
+                      }
+                      const isAttackableEnemyTile = currentUnit ? attackableEnemyTilesById.get(currentUnit.id)?.has(key) : false;
+                      if (isAttackableEnemyTile) {
+                          cell.classList.add('chess-rpg-match__cell--attack-target');
+                      }
                       if (board.playable.has(key)) {
                           cell.addEventListener('click', () => {
                               const actingUnit = resolveActiveUnit();
@@ -24675,7 +24687,9 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                               actingUnit.x = x;
                               actingUnit.y = y;
                               executeCommand({ type: 'move', team: 'player', payload: { tileSteps } });
-                              refreshBoardUi();
+                              prepareReachable();
+                              renderHUD();
+                              renderBoard();
                           });
                       }
                       boardHost.appendChild(cell);
@@ -24683,214 +24697,228 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               }
           };
           const renderHUD = () => {
-              const active = resolveActiveUnit();
-              if (turnHost instanceof HTMLElement) {
-                  const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : matchState.objectiveMode === 'rescue' ? 'Objective: Bảo vệ mục tiêu giải cứu' : 'Objective: Hạ boss';
-                  const missionAlert = hasRescueLethalThreat() ? ' | 🚨 Cảnh báo: NPC có nguy cơ bị kết liễu lượt kế.' : '';
-                  turnHost.textContent = active
-                      ? active.team === 'player'
-                          ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel}${missionAlert} · Move:${matchState.turn.hasMoved ? 'xong' : 'chưa'} · Action:${matchState.turn.hasActed ? 'xong' : 'chưa'} · Timer:${Math.ceil(matchState.unitTimer.remainingMs / 1000)}s + Bank ${Math.ceil(matchState.resources.player.bankTimeMs / 1000)}s.`
-                          : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
-                      : 'Không có nhân vật khả dụng.';
-              }
-              if (piecesHost instanceof HTMLElement) {
-                  piecesHost.innerHTML = '';
-                  if (active) {
-                      const teamResource = matchState.resources[active.team];
-                      const status = document.createElement('span');
-                      const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
-                      const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
-                      const teamSummonCount = summonsByTeam[active.team].filter((unit) => unit.hp > 0).length;
-                      status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
-                      const rescueBarrierInfo = matchState.objectiveMode === 'rescue'
-                          ? ` | Barrier NPC ${rescueBarrierCharges > 0 ? 'sẵn sàng' : 'đã vỡ'}`
-                          : '';
-                      status.textContent = `Class ${active.classId} | Piece ${resolveUnitMovementKind(active)} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Summon ${teamSummonCount}/${SUMMON_CAP_PER_TEAM} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
-                      piecesHost.appendChild(status);
-                  }
-              }
-              if (resultHost instanceof HTMLElement) {
-                  if (matchState.result.status === 'ongoing') {
-                      resultHost.hidden = true;
-                  }
-                  else {
-                      resultHost.hidden = false;
-                      if (matchState.result.status === 'win') {
-                          resultHost.textContent = matchState.result.reason?.startsWith('turn-cap-tiebreak')
-                              ? 'Thắng trận (tie-break khi hết turn cap).'
-                              : 'Thắng trận (hoàn thành objective).';
-                      }
-                      else if (matchState.result.status === 'lose') {
-                          resultHost.textContent = matchState.result.reason === 'turn-cap-tiebreak:unit-points' || matchState.result.reason === 'turn-cap-tiebreak:hp-pct'
-                              ? 'Thua trận (tie-break khi hết turn cap).'
-                              : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
-                      }
-                      else {
-                          resultHost.textContent = 'Hòa trận (tie-break không phân thắng bại).';
-                      }
-                  }
-              }
-              if (actionsHost instanceof HTMLElement) {
-                  actionsHost.innerHTML = '';
-                  const activePlayer = active && active.team === 'player' ? active : null;
-                  const buildActionButton = (label, onClick, disabled) => {
-                      const button = document.createElement('button');
-                      button.type = 'button';
-                      button.className = 'chess-rpg-match__action-btn';
-                      button.textContent = label;
-                      button.disabled = disabled;
-                      button.addEventListener('click', onClick);
-                      actionsHost.appendChild(button);
-                  };
-                  buildActionButton('Dùng Skill', () => {
-                      if (!activePlayer)
-                          return;
-                      executeCommand({ type: 'castSkill', team: 'player' });
-                      executeCommand({ type: 'endTurn', team: 'player' });
-                      finalizePlayerProgress();
-                  }, !activePlayer || !canUseCommand(matchState, 'castSkill', { skillCost: activePlayer.skillCost }) || matchState.result.status !== 'ongoing');
-                  buildActionButton('Dùng Ultimate', () => {
-                      if (!activePlayer)
-                          return;
-                      executeCommand({ type: 'castUlt', team: 'player' });
-                      executeCommand({ type: 'endTurn', team: 'player' });
-                      finalizePlayerProgress();
-                  }, !activePlayer || !canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: activePlayer.rage, ultCost: activePlayer.maxRage }) || matchState.result.status !== 'ongoing');
-                  buildActionButton('Bỏ qua hành động', () => {
-                      if (!activePlayer)
-                          return;
-                      executeCommand({ type: 'skipAction', team: 'player' });
-                      executeCommand({ type: 'endTurn', team: 'player' });
-                      finalizePlayerProgress();
-                  }, !activePlayer || !canUseCommand(matchState, 'skipAction') || matchState.result.status !== 'ongoing');
-                  buildActionButton('Kết thúc lượt', () => {
-                      if (!activePlayer)
-                          return;
-                      executeCommand({ type: 'endTurn', team: 'player' });
-                      finalizePlayerProgress();
-                  }, !activePlayer || !canUseCommand(matchState, 'endTurn') || matchState.result.status !== 'ongoing');
-              }
-          };
-          const prepareReachable = () => {
-              reachableById.clear();
+              attackTilesById.clear();
+              attackableEnemyTilesById.clear();
               const active = resolveActiveUnit();
               if (!active)
                   return;
-              if (!canUseCommand(matchState, 'move'))
-                  return;
-              const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
-              occupied.delete(keyOf(active.x, active.y));
-              reachableById.set(active.id, findShortestPaths(active, board.playable, occupied));
+              const attackTiles = resolveBasicAttackTiles(active);
+              attackTilesById.set(active.id, attackTiles);
+              const attackableEnemies = new Set();
+              for (const enemy of allUnits()) {
+                  if (enemy.team === active.team || enemy.isObjectiveNpc)
+                      continue;
+                  const enemyKey = keyOf(enemy.x, enemy.y);
+                  if (attackTiles.has(enemyKey))
+                      attackableEnemies.add(enemyKey);
+              }
+              attackableEnemyTilesById.set(active.id, attackableEnemies);
+              const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : matchState.objectiveMode === 'rescue' ? 'Objective: Bảo vệ mục tiêu giải cứu' : 'Objective: Hạ boss';
+              const missionAlert = hasRescueLethalThreat() ? ' | 🚨 Cảnh báo: NPC có nguy cơ bị kết liễu lượt kế.' : '';
+              turnHost.textContent = active
+                  ? active.team === 'player'
+                      ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel}${missionAlert} · Move:${matchState.turn.hasMoved ? 'xong' : 'chưa'} · Action:${matchState.turn.hasActed ? 'xong' : 'chưa'} · Timer:${Math.ceil(matchState.unitTimer.remainingMs / 1000)}s + Bank ${Math.ceil(matchState.resources.player.bankTimeMs / 1000)}s.`
+                      : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
+                  : 'Không có nhân vật khả dụng.';
           };
-          const processEnemyTurn = () => {
-              const active = resolveActiveUnit();
-              if (!active || active.team !== 'enemy')
-                  return;
-              if (matchState.result.status !== 'ongoing')
-                  return;
-              if (consumeTurnBudgetOrFallback()) {
-                  prepareReachable();
-                  renderHUD();
-                  renderBoard();
-                  if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
-                      window.setTimeout(processEnemyTurn, 240);
-                  }
-                  return;
+          if (piecesHost instanceof HTMLElement) {
+              piecesHost.innerHTML = '';
+              if (active) {
+                  const teamResource = matchState.resources[active.team];
+                  const status = document.createElement('span');
+                  const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
+                  const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
+                  const teamSummonCount = summonsByTeam[active.team].filter((unit) => unit.hp > 0).length;
+                  status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
+                  const rescueBarrierInfo = matchState.objectiveMode === 'rescue'
+                      ? ` | Barrier NPC ${rescueBarrierCharges > 0 ? 'sẵn sàng' : 'đã vỡ'}`
+                      : '';
+                  status.textContent = `Class ${active.classId} | Piece ${resolveUnitMovementKind(active)} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Summon ${teamSummonCount}/${SUMMON_CAP_PER_TEAM} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
+                  piecesHost.appendChild(status);
               }
-              const moves = Array.from(reachableById.get(active.id)?.entries() ?? []);
-              const enemies = aliveByTeam.player.filter((unit) => unit.hp > 0);
-              if (moves.length > 0 && enemies.length > 0) {
-                  const rescueUnit = rescueNpc;
-                  let bestMove = null;
-                  for (const [key, path] of moves) {
-                      const parsed = parseKey(key);
-                      if (!parsed)
-                          continue;
-                      const nearest = enemies.reduce((min, enemy) => Math.min(min, Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y)), Number.POSITIVE_INFINITY);
-                      const incoming = expectedIncomingDamageAt(parsed.x, parsed.y, active, enemies);
-                      const inAttackRange = enemies.some((enemy) => Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y) <= active.basicRange);
-                      const inSkillRange = enemies.some((enemy) => Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y) <= 2);
-                      const stance = profileBias(aiProfile);
-                      const ownHpRatio = resolveHpRatio(active);
-                      const objectiveBonus = matchState.objectiveMode === 'rescue'
-                          ? enemies.some((enemy) => {
-                              return rescueUnit ? distanceBetween(enemy, rescueUnit) <= enemy.basicRange : false;
-                          }) && inAttackRange
-                              ? 2.5
-                              : 0
-                          : matchState.objectiveMode === 'boss' && active.slotIndex === 0 && inSkillRange
-                              ? 1.5
-                              : 0;
-                      const score = (stance.pressure * (9 - nearest)
-                          + (inAttackRange ? 2.6 : inSkillRange ? 1.2 : 0)
-                          + objectiveBonus
-                          - stance.safety * incoming * (0.08 + (1 - ownHpRatio) * 0.12)
-                          - path.length * 0.06);
-                      if (!bestMove || score > bestMove.score) {
-                          bestMove = { key, score, steps: Math.max(1, path.length - 1) };
-                      }
-                  }
-                  const parsed = bestMove ? parseKey(bestMove.key) : null;
-                  if (parsed && bestMove) {
-                      active.x = parsed.x;
-                      active.y = parsed.y;
-                      executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps: bestMove.steps } });
-                  }
-              }
-              const timerStep = consumeDecisionTime(matchState, 7_600);
-              matchState = timerStep.state;
-              const actionChoice = chooseBestCombatAction({
-                  actor: active,
-                  enemies: aliveByTeam.player.filter((unit) => unit.hp > 0),
-                  teamAe: matchState.resources.enemy.ae,
-                  aiProfile,
-                  objectiveHints: {
-                      mode: matchState.objectiveMode,
-                      rescueUnit: rescueNpc,
-                  },
-                  canUse: (command, options) => canUseCommand(matchState, command, options),
-              });
-              if (timerStep.timeout) {
-                  const fallback = chooseFallbackAction(matchState, {
-                      hasSafeBasicTarget: actionChoice.action === 'basicAttack' && Boolean(actionChoice.target),
-                      lethalRisk: actionChoice.action === 'skipAction' ? 1 : 0,
-                  });
-                  if (fallback.type === 'basicAttack' && actionChoice.target) {
-                      executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
-                  }
-                  else {
-                      executeActionChoice('enemy', { action: 'skipAction', target: null, score: 0 });
-                  }
+          }
+          if (resultHost instanceof HTMLElement) {
+              if (matchState.result.status === 'ongoing') {
+                  resultHost.hidden = true;
               }
               else {
-                  executeActionChoice('enemy', actionChoice);
+                  resultHost.hidden = false;
+                  if (matchState.result.status === 'win') {
+                      resultHost.textContent = matchState.result.reason?.startsWith('turn-cap-tiebreak')
+                          ? 'Thắng trận (tie-break khi hết turn cap).'
+                          : 'Thắng trận (hoàn thành objective).';
+                  }
+                  else if (matchState.result.status === 'lose') {
+                      resultHost.textContent = matchState.result.reason === 'turn-cap-tiebreak:unit-points' || matchState.result.reason === 'turn-cap-tiebreak:hp-pct'
+                          ? 'Thua trận (tie-break khi hết turn cap).'
+                          : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
+                  }
+                  else {
+                      resultHost.textContent = 'Hòa trận (tie-break không phân thắng bại).';
+                  }
               }
-              executeCommand({ type: 'endTurn', team: 'enemy' });
+          }
+          if (actionsHost instanceof HTMLElement) {
+              actionsHost.innerHTML = '';
+              const activePlayer = active && active.team === 'player' ? active : null;
+              const buildActionButton = (label, onClick, disabled) => {
+                  const button = document.createElement('button');
+                  button.type = 'button';
+                  button.className = 'chess-rpg-match__action-btn';
+                  button.textContent = label;
+                  button.disabled = disabled;
+                  button.addEventListener('click', onClick);
+                  actionsHost.appendChild(button);
+              };
+              buildActionButton('Dùng Skill', () => {
+                  if (!activePlayer)
+                      return;
+                  executeCommand({ type: 'castSkill', team: 'player' });
+                  executeCommand({ type: 'endTurn', team: 'player' });
+                  finalizePlayerProgress();
+              }, !activePlayer || !canUseCommand(matchState, 'castSkill', { skillCost: activePlayer.skillCost }) || matchState.result.status !== 'ongoing');
+              buildActionButton('Dùng Ultimate', () => {
+                  if (!activePlayer)
+                      return;
+                  executeCommand({ type: 'castUlt', team: 'player' });
+                  executeCommand({ type: 'endTurn', team: 'player' });
+                  finalizePlayerProgress();
+              }, !activePlayer || !canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: activePlayer.rage, ultCost: activePlayer.maxRage }) || matchState.result.status !== 'ongoing');
+              buildActionButton('Bỏ qua hành động', () => {
+                  if (!activePlayer)
+                      return;
+                  executeCommand({ type: 'skipAction', team: 'player' });
+                  executeCommand({ type: 'endTurn', team: 'player' });
+                  finalizePlayerProgress();
+              }, !activePlayer || !canUseCommand(matchState, 'skipAction') || matchState.result.status !== 'ongoing');
+              buildActionButton('Kết thúc lượt', () => {
+                  if (!activePlayer)
+                      return;
+                  executeCommand({ type: 'endTurn', team: 'player' });
+                  finalizePlayerProgress();
+              }, !activePlayer || !canUseCommand(matchState, 'endTurn') || matchState.result.status !== 'ongoing');
+          }
+      }
+      ;
+      const prepareReachable = () => {
+          reachableById.clear();
+          const active = resolveActiveUnit();
+          if (!active)
+              return;
+          if (!canUseCommand(matchState, 'move'))
+              return;
+          const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
+          occupied.delete(keyOf(active.x, active.y));
+          reachableById.set(active.id, findShortestPaths(active, board.playable, occupied));
+      };
+      const processEnemyTurn = () => {
+          const active = resolveActiveUnit();
+          if (!active || active.team !== 'enemy')
+              return;
+          if (matchState.result.status !== 'ongoing')
+              return;
+          if (consumeTurnBudgetOrFallback()) {
               prepareReachable();
               renderHUD();
               renderBoard();
               if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
                   window.setTimeout(processEnemyTurn, 240);
               }
-          };
-          normalizeActiveSlot();
-          syncMatchResult('onTurnStart');
+              return;
+          }
+          const moves = Array.from(reachableById.get(active.id)?.entries() ?? []);
+          const enemies = aliveByTeam.player.filter((unit) => unit.hp > 0);
+          if (moves.length > 0 && enemies.length > 0) {
+              const rescueUnit = rescueNpc;
+              let bestMove = null;
+              for (const [key, path] of moves) {
+                  const parsed = parseKey(key);
+                  if (!parsed)
+                      continue;
+                  const nearest = enemies.reduce((min, enemy) => Math.min(min, Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y)), Number.POSITIVE_INFINITY);
+                  const incoming = expectedIncomingDamageAt(parsed.x, parsed.y, active, enemies);
+                  const inAttackRange = enemies.some((enemy) => Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y) <= active.basicRange);
+                  const inSkillRange = enemies.some((enemy) => Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y) <= 2);
+                  const stance = profileBias(aiProfile);
+                  const ownHpRatio = resolveHpRatio(active);
+                  const objectiveBonus = matchState.objectiveMode === 'rescue'
+                      ? enemies.some((enemy) => {
+                          return rescueUnit ? distanceBetween(enemy, rescueUnit) <= enemy.basicRange : false;
+                      }) && inAttackRange
+                          ? 2.5
+                          : 0
+                      : matchState.objectiveMode === 'boss' && active.slotIndex === 0 && inSkillRange
+                          ? 1.5
+                          : 0;
+                  const score = (stance.pressure * (9 - nearest)
+                      + (inAttackRange ? 2.6 : inSkillRange ? 1.2 : 0)
+                      + objectiveBonus
+                      - stance.safety * incoming * (0.08 + (1 - ownHpRatio) * 0.12)
+                      - path.length * 0.06);
+                  if (!bestMove || score > bestMove.score) {
+                      bestMove = { key, score, steps: Math.max(1, path.length - 1) };
+                  }
+              }
+              const parsed = bestMove ? parseKey(bestMove.key) : null;
+              if (parsed && bestMove) {
+                  active.x = parsed.x;
+                  active.y = parsed.y;
+                  executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps: bestMove.steps } });
+              }
+          }
+          const timerStep = consumeDecisionTime(matchState, 7_600);
+          matchState = timerStep.state;
+          const actionChoice = chooseBestCombatAction({
+              actor: active,
+              enemies: aliveByTeam.player.filter((unit) => unit.hp > 0),
+              teamAe: matchState.resources.enemy.ae,
+              aiProfile,
+              objectiveHints: {
+                  mode: matchState.objectiveMode,
+                  rescueUnit: rescueNpc,
+              },
+              canUse: (command, options) => canUseCommand(matchState, command, options),
+          });
+          if (timerStep.timeout) {
+              const fallback = chooseFallbackAction(matchState, {
+                  hasSafeBasicTarget: actionChoice.action === 'basicAttack' && Boolean(actionChoice.target),
+                  lethalRisk: actionChoice.action === 'skipAction' ? 1 : 0,
+              });
+              if (fallback.type === 'basicAttack' && actionChoice.target) {
+                  executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
+              }
+              else {
+                  executeActionChoice('enemy', { action: 'skipAction', target: null, score: 0 });
+              }
+          }
+          else {
+              executeActionChoice('enemy', actionChoice);
+          }
+          executeCommand({ type: 'endTurn', team: 'enemy' });
           prepareReachable();
           renderHUD();
           renderBoard();
-          if (matchState.activeTeam === 'enemy') {
+          if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
               window.setTimeout(processEnemyTurn, 240);
           }
-      }
-      const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
-      backButton?.addEventListener('click', onBack);
-      return {
-          destroy() {
-              backButton?.removeEventListener('click', onBack);
-              mount.destroy();
-          },
       };
+      normalizeActiveSlot();
+      syncMatchResult('onTurnStart');
+      prepareReachable();
+      renderHUD();
+      renderBoard();
+      if (matchState.activeTeam === 'enemy') {
+          window.setTimeout(processEnemyTurn, 240);
+      }
   }
+  const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
+  backButton?.addEventListener('click', onBack);
+  return {
+      destroy() {
+          backButton?.removeEventListener('click', onBack);
+          mount.destroy();
+      },
+  };
   const render = renderScreen;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;

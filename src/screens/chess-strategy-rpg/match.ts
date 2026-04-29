@@ -58,6 +58,8 @@ const CSS = /* css */ `
   .chess-rpg-match__cell--enemy{background:rgba(126,42,72,.68);border-color:rgba(255,149,196,.56);font-weight:700;color:#ffc3dd;}
   .chess-rpg-match__cell--selected{outline:2px solid rgba(255,229,142,.96);outline-offset:-2px;}
   .chess-rpg-match__cell--move{background:rgba(50,170,83,.72);border-color:rgba(150,255,176,.94);color:#e8fff0;cursor:pointer;}
+  .chess-rpg-match__cell--attack-zone{background:rgba(197,117,37,.44);border-color:rgba(255,192,113,.72);}
+  .chess-rpg-match__cell--attack-target{background:radial-gradient(circle at center, rgba(255,241,168,.85), rgba(190,74,58,.72));border-color:rgba(255,234,157,.98);box-shadow:0 0 12px rgba(255,220,120,.75);cursor:pointer;}
   .chess-rpg-match__turn{margin:0;font-size:13px;color:#bce2ff;}
   .chess-rpg-match__pieces{display:flex;flex-wrap:wrap;gap:6px;}
   .chess-rpg-match__piece{font-size:12px;border:1px solid rgba(161,216,255,.4);border-radius:999px;padding:2px 8px;background:rgba(31,74,107,.5);color:#e6f3ff;}
@@ -614,6 +616,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     let unitTurnStartedAtMs = Date.now();
     let selectedUnitId = playerStates[0]?.id ?? null;
     const reachableById = new Map<string, Map<string, string[]>>();
+    const attackTilesById = new Map<string, Set<string>>();
+    const attackableEnemyTilesById = new Map<string, Set<string>>();
     const aliveByTeam = {
       player: playerStates,
       enemy: enemyStates,
@@ -1000,6 +1004,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
           if (canMoveTo) {
             cell.classList.add('chess-rpg-match__cell--move');
           }
+          const canAttackTile = currentUnit ? attackTilesById.get(currentUnit.id)?.has(key) : false;
+          if (canAttackTile && !canMoveTo) {
+            cell.classList.add('chess-rpg-match__cell--attack-zone');
+          }
+          const isAttackableEnemyTile = currentUnit ? attackableEnemyTilesById.get(currentUnit.id)?.has(key) : false;
+          if (isAttackableEnemyTile) {
+            cell.classList.add('chess-rpg-match__cell--attack-target');
+          }
 
           if (board.playable.has(key)) {
             cell.addEventListener('click', () => {
@@ -1036,7 +1048,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
               actingUnit.x = x;
               actingUnit.y = y;
               executeCommand({ type: 'move', team: 'player', payload: { tileSteps } });
-              refreshBoardUi();
+              prepareReachable();
+              renderHUD();
+              renderBoard();
             });
           }
           boardHost.appendChild(cell);
@@ -1045,8 +1059,21 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     };
 
    const renderHUD = (): void => {
+      attackTilesById.clear();
+      attackableEnemyTilesById.clear();
       const active = resolveActiveUnit();
-      if (turnHost instanceof HTMLElement) {
+      if (!active) return;
+
+      const attackTiles = resolveBasicAttackTiles(active);
+      attackTilesById.set(active.id, attackTiles);
+      const attackableEnemies = new Set<string>();
+      for (const enemy of allUnits()) {
+        if (enemy.team === active.team || enemy.isObjectiveNpc) continue;
+        const enemyKey = keyOf(enemy.x, enemy.y);
+        if (attackTiles.has(enemyKey)) attackableEnemies.add(enemyKey);
+      }
+      attackableEnemyTilesById.set(active.id, attackableEnemies);
+
         const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : matchState.objectiveMode === 'rescue' ? 'Objective: Bảo vệ mục tiêu giải cứu' : 'Objective: Hạ boss';
         const missionAlert = hasRescueLethalThreat() ? ' | 🚨 Cảnh báo: NPC có nguy cơ bị kết liễu lượt kế.' : '';
         turnHost.textContent = active
