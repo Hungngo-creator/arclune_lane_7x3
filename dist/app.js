@@ -24912,10 +24912,14 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
       }
   }
   const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
-  backButton?.addEventListener('click', onBack);
+  if (backButton instanceof HTMLButtonElement) {
+      backButton.addEventListener('click', onBack);
+  }
   return {
       destroy() {
-          backButton?.removeEventListener('click', onBack);
+          if (backButton instanceof HTMLButtonElement) {
+              backButton.removeEventListener('click', onBack);
+          }
           mount.destroy();
       },
   };
