@@ -217,6 +217,36 @@ function findShortestPaths(unit: UnitState, playable: Set<string>, occupied: Set
   return paths;
 }
 
+function resolveBasicAttackTiles(unit: UnitState): Set<string> {
+  const tiles = new Set<string>();
+  const movementKind = resolveChessMovementKind(unit.classId);
+  if (movementKind === 'knight') {
+    for (const jump of KNIGHT_JUMPS) {
+      const lx = unit.x + jump.dx;
+      const ly = unit.y + jump.dy;
+      tiles.add(keyOf(lx, ly));
+      for (const dir of CARDINAL_DIRS) {
+        tiles.add(keyOf(lx + dir.dx, ly + dir.dy));
+      }
+    }
+    return tiles;
+  }
+
+  tiles.add(keyOf(unit.x, unit.y));
+  for (const dir of CARDINAL_DIRS) {
+    tiles.add(keyOf(unit.x + dir.dx, unit.y + dir.dy));
+    tiles.add(keyOf(unit.x + dir.dx * 2, unit.y + dir.dy * 2));
+  }
+  for (const dir of DIAGONAL_DIRS) {
+    tiles.add(keyOf(unit.x + dir.dx, unit.y + dir.dy));
+  }
+  return tiles;
+}
+
+function canBasicAttackTile(unit: UnitState, targetX: number, targetY: number): boolean {
+  return resolveBasicAttackTiles(unit).has(keyOf(targetX, targetY));
+}
+
 function expectedIncomingDamageAt(
   candidateX: number,
   candidateY: number,
@@ -647,13 +677,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       return 3;
     };
     const resolveDefaultTarget = (actor: UnitState, action: 'basicAttack' | 'castSkill' | 'castUlt'): UnitState | null => {
-      const range = resolveActionRange(actor, action);
       const enemies = allUnits().filter((unit) => unit.team !== actor.team);
       let picked: UnitState | null = null;
       let bestDistance = Number.POSITIVE_INFINITY;
       for (const enemy of enemies) {
         const d = distance(actor, enemy);
-        if (d > range) continue;
+        const canHit = action === 'basicAttack'
+          ? canBasicAttackTile(actor, enemy.x, enemy.y)
+          : d <= resolveActionRange(actor, action);
+        if (!canHit) continue;
         if (d < bestDistance) {
           picked = enemy;
           bestDistance = d;
@@ -715,7 +747,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
         const target = explicitTarget ?? resolveDefaultTarget(active, actionType);
         const actionRange = resolveActionRange(active, actionType);
         const hasValidTarget = Boolean(target);
-        const inRange = target ? distance(active, target) <= actionRange : false;
+        const inRange = target
+          ? actionType === 'basicAttack'
+            ? canBasicAttackTile(active, target.x, target.y)
+            : distance(active, target) <= actionRange
+          : false;
         if (actionType === 'castSkill' && !canUseCommand(matchState, actionType, { skillCost: active.skillCost })) return;
         if (actionType === 'castUlt' && !canUseCommand(matchState, actionType, { manualUlt: true, rage: active.rage, ultCost: active.maxRage })) return;
         if (actionType === 'basicAttack' && !canUseCommand(matchState, actionType)) return;

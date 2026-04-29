@@ -23881,6 +23881,33 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
       }
       return paths;
   }
+  function resolveBasicAttackTiles(unit) {
+      const tiles = new Set();
+      const movementKind = resolveChessMovementKind(unit.classId);
+      if (movementKind === 'knight') {
+          for (const jump of KNIGHT_JUMPS) {
+              const lx = unit.x + jump.dx;
+              const ly = unit.y + jump.dy;
+              tiles.add(keyOf(lx, ly));
+              for (const dir of CARDINAL_DIRS) {
+                  tiles.add(keyOf(lx + dir.dx, ly + dir.dy));
+              }
+          }
+          return tiles;
+      }
+      tiles.add(keyOf(unit.x, unit.y));
+      for (const dir of CARDINAL_DIRS) {
+          tiles.add(keyOf(unit.x + dir.dx, unit.y + dir.dy));
+          tiles.add(keyOf(unit.x + dir.dx * 2, unit.y + dir.dy * 2));
+      }
+      for (const dir of DIAGONAL_DIRS) {
+          tiles.add(keyOf(unit.x + dir.dx, unit.y + dir.dy));
+      }
+      return tiles;
+  }
+  function canBasicAttackTile(unit, targetX, targetY) {
+      return resolveBasicAttackTiles(unit).has(keyOf(targetX, targetY));
+  }
   function expectedIncomingDamageAt(candidateX, candidateY, actor, enemies) {
       let incoming = 0;
       for (const enemy of enemies) {
@@ -24284,13 +24311,15 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
               return 3;
           };
           const resolveDefaultTarget = (actor, action) => {
-              const range = resolveActionRange(actor, action);
               const enemies = allUnits().filter((unit) => unit.team !== actor.team);
               let picked = null;
               let bestDistance = Number.POSITIVE_INFINITY;
               for (const enemy of enemies) {
                   const d = distance(actor, enemy);
-                  if (d > range)
+                  const canHit = action === 'basicAttack'
+                      ? canBasicAttackTile(actor, enemy.x, enemy.y)
+                      : d <= resolveActionRange(actor, action);
+                  if (!canHit)
                       continue;
                   if (d < bestDistance) {
                       picked = enemy;
@@ -24354,7 +24383,11 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                   const target = explicitTarget ?? resolveDefaultTarget(active, actionType);
                   const actionRange = resolveActionRange(active, actionType);
                   const hasValidTarget = Boolean(target);
-                  const inRange = target ? distance(active, target) <= actionRange : false;
+                  const inRange = target
+                      ? actionType === 'basicAttack'
+                          ? canBasicAttackTile(active, target.x, target.y)
+                          : distance(active, target) <= actionRange
+                      : false;
                   if (actionType === 'castSkill' && !canUseCommand(matchState, actionType, { skillCost: active.skillCost }))
                       return;
                   if (actionType === 'castUlt' && !canUseCommand(matchState, actionType, { manualUlt: true, rage: active.rage, ultCost: active.maxRage }))
