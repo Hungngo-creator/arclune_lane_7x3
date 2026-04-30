@@ -890,6 +890,16 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       if (!spawnResult.spawned){
         return;
       }
+      if (spawnResult.actor && spawnResult.actor.alive){
+        selection = {
+          ...selection,
+          spawnOnly: false,
+          queued: false,
+          unit: spawnResult.actor,
+          unitId: spawnResult.actor.id ?? null,
+        };
+        break;
+      }
       selection = nextTurnInterleaved(Game, interleavedTurn);
       if (!selection) return;
     }

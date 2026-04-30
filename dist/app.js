@@ -39267,6 +39267,16 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               if (!spawnResult.spawned) {
                   return;
               }
+              if (spawnResult.actor && spawnResult.actor.alive) {
+                  selection = {
+                      ...selection,
+                      spawnOnly: false,
+                      queued: false,
+                      unit: spawnResult.actor,
+                      unitId: spawnResult.actor.id ?? null,
+                  };
+                  break;
+              }
               selection = nextTurnInterleaved(Game, interleavedTurn);
               if (!selection)
                   return;
