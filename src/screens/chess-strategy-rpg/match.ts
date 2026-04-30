@@ -492,7 +492,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   `;
 
   const boardHost = section.querySelector('[data-role="board"]');
-  const backButton = section.querySelector('.chess-rpg-match__back');
+  const backTrigger = section.querySelector('.chess-rpg-match__back');
   const turnHost = section.querySelector('[data-role="turn"]');
   const piecesHost = section.querySelector('[data-role="pieces"]');
   const actionsHost = section.querySelector('[data-role="actions"]');
@@ -1280,14 +1280,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   }
 
   const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
-  if (backButton instanceof HTMLButtonElement) {
-    backButton.addEventListener('click', onBack);
+  if (backTrigger instanceof HTMLButtonElement) {
+    backTrigger.addEventListener('click', onBack);
   }
 
   return {
     destroy() {
-      if (backButton instanceof HTMLButtonElement) {
-        backButton.removeEventListener('click', onBack);
+      if (backTrigger instanceof HTMLButtonElement) {
+        backTrigger.removeEventListener('click', onBack);
       }
       mount.destroy();
     },

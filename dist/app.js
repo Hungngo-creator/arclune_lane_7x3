@@ -24120,7 +24120,7 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
       </div>
     `;
       const boardHost = section.querySelector('[data-role="board"]');
-      const backButton = section.querySelector('.chess-rpg-match__back');
+      const backTrigger = section.querySelector('.chess-rpg-match__back');
       const turnHost = section.querySelector('[data-role="turn"]');
       const piecesHost = section.querySelector('[data-role="pieces"]');
       const actionsHost = section.querySelector('[data-role="actions"]');
@@ -24912,13 +24912,13 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
       }
   }
   const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
-  if (backButton instanceof HTMLButtonElement) {
-      backButton.addEventListener('click', onBack);
+  if (backTrigger instanceof HTMLButtonElement) {
+      backTrigger.addEventListener('click', onBack);
   }
   return {
       destroy() {
-          if (backButton instanceof HTMLButtonElement) {
-              backButton.removeEventListener('click', onBack);
+          if (backTrigger instanceof HTMLButtonElement) {
+              backTrigger.removeEventListener('click', onBack);
           }
           mount.destroy();
       },
@@ -35507,17 +35507,18 @@ __modules['./screens/sect/index.ts'] = (exports, module, __require) => {
   const patchPlayerProfile = __dep1.patchPlayerProfile;
   const STYLE_ID = 'sect-screen-style-v1';
   const DEFAULT_SECT_NAME = 'Tông Môn Vô Danh';
-  const SECT_OPTIONS = ['Thiên Cơ Lâu', 'Tu Luyện Phòng', 'Bách Khí Các', 'Luyện Đan Các', 'Dược Các'];
+  const SECT_OPTIONS = ['Thiên Cơ Lâu', 'Tu Luyện Phòng', 'Bách Khí Các', 'Luyện Đan Các', 'Dược Các', 'Bảo Khố'];
   const CSS = /* css */ `
     .app--sect{padding:32px 16px 64px;}
     .sect-screen{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:24px;min-height:70vh;}
     .sect-screen__top{display:flex;justify-content:center;align-items:center;min-height:48px;}
     .sect-screen__title{margin:0;font-size:34px;letter-spacing:.08em;text-transform:uppercase;color:#e6f2ff;text-align:center;}
-    .sect-screen__layout{display:grid;grid-template-columns:220px 1fr 1fr;gap:24px;align-items:flex-start;min-height:520px;}
+    .sect-screen__layout{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:flex-start;min-height:520px;}
     .sect-screen__left{display:flex;flex-direction:column;gap:10px;}
-    .sect-screen__hub-button{height:64px;padding:10px 12px;border-radius:12px;border:1px solid transparent;background:rgba(12,20,28,.72);color:#e6f2ff;display:flex;align-items:center;justify-content:center;letter-spacing:.04em;cursor:default;font-size:14px;}
-    .sect-screen__center,.sect-screen__right{border:1px dashed rgba(125,211,252,.14);border-radius:18px;min-height:500px;background:rgba(8,14,22,.15);}
-    .sect-screen__back{align-self:flex-start;padding:10px 18px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(16,26,36,.78);color:#aee4ff;letter-spacing:.08em;text-transform:uppercase;font-size:12px;cursor:pointer;}
+    .sect-screen__hub-button{height:64px;padding:10px 12px;border-radius:12px;border:1px solid transparent;background:rgba(12,20,28,.72);color:#e6f2ff;display:flex;align-items:center;justify-content:center;text-align:center;letter-spacing:.04em;cursor:default;font-size:14px;}
+    .sect-screen__hub-button--compact{width:75%;justify-self:start;}
+    .sect-screen__center{border:1px dashed rgba(125,211,252,.14);border-radius:18px;min-height:500px;background:rgba(8,14,22,.15);}
+    .sect-screen__back{align-self:flex-start;width:38px;height:38px;border-radius:999px;border:1px solid rgba(125,211,252,.32);background:rgba(16,26,36,.78);color:#aee4ff;display:grid;place-items:center;font-size:16px;line-height:1;cursor:pointer;padding:0;}
     .sect-screen__naming-overlay{position:fixed;inset:0;background:rgba(5,10,18,.72);display:flex;align-items:center;justify-content:center;padding:20px;z-index:70;}
     .sect-screen__naming-hub{width:min(520px,100%);border:1px solid rgba(125,211,252,.35);border-radius:18px;background:linear-gradient(160deg,rgba(11,20,30,.96),rgba(6,12,20,.96));padding:22px;display:flex;flex-direction:column;gap:12px;box-shadow:0 24px 54px rgba(0,0,0,.45);}
     .sect-screen__naming-title{margin:0;font-size:22px;letter-spacing:.05em;text-align:center;}
@@ -35547,7 +35548,7 @@ __modules['./screens/sect/index.ts'] = (exports, module, __require) => {
       const backButton = document.createElement('button');
       backButton.type = 'button';
       backButton.className = 'sect-screen__back';
-      backButton.textContent = '← Trở về menu chính';
+      backButton.textContent = '←';
       const onBack = () => {
           if (shell && typeof shell.enterScreen === 'function') {
               shell.enterScreen('main-menu');
@@ -35566,10 +35567,14 @@ __modules['./screens/sect/index.ts'] = (exports, module, __require) => {
       layout.className = 'sect-screen__layout';
       const left = document.createElement('aside');
       left.className = 'sect-screen__left';
+      const compactStartIndex = SECT_OPTIONS.indexOf('Thiên Cơ Lâu');
       SECT_OPTIONS.forEach((label, index) => {
           const option = document.createElement('button');
           option.type = 'button';
           option.className = 'sect-screen__hub-button';
+          if (compactStartIndex >= 0 && index >= compactStartIndex) {
+              option.classList.add('sect-screen__hub-button--compact');
+          }
           option.textContent = label;
           option.dataset.sectIndex = String(index);
           left.appendChild(option);
@@ -35586,9 +35591,7 @@ __modules['./screens/sect/index.ts'] = (exports, module, __require) => {
       left.addEventListener('click', onSelectOption);
       const center = document.createElement('section');
       center.className = 'sect-screen__center';
-      const right = document.createElement('section');
-      right.className = 'sect-screen__right';
-      layout.append(left, center, right);
+      layout.append(left, center);
       container.appendChild(layout);
       const existingName = sanitizeSectName(profile.sectName);
       const shouldOpenNamingHub = !profile.sectName || !String(profile.sectName).trim();
