@@ -1,10 +1,15 @@
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
+import { getCultivationCost } from '../../cultivation.ts';
 import { loadPlayerProfile, patchPlayerProfile } from '../../utils/player-profile.ts';
 import type { MainMenuShell } from '../main-menu/types.ts';
 
 const STYLE_ID = 'sect-screen-style-v1';
 const DEFAULT_SECT_NAME = 'Tông Môn Vô Danh';
 const SECT_OPTIONS = ['Thiên Cơ Lâu', 'Tu Luyện Phòng', 'Bách Khí Các', 'Luyện Đan Các', 'Dược Các', 'Bảo Khố'] as const;
+const CULTIVATION_OPTION_INDEX = SECT_OPTIONS.indexOf('Tu Luyện Phòng');
+const OFFLINE_CULTIVATION_MAX_MINUTES = 12 * 60;
+const BASE_SUBREALM_MINUTES = 120;
+const EXTRA_SUBREALM_MINUTES_PER_REALM = 30;
 
 const CSS = /* css */ `
   .app--sect{padding:32px 16px 64px;}
@@ -23,6 +28,10 @@ const CSS = /* css */ `
   .sect-screen__naming-input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(125,211,252,.38);background:rgba(10,18,28,.82);color:#e6f2ff;font-size:16px;}
   .sect-screen__naming-actions{display:flex;justify-content:flex-end;}
   .sect-screen__naming-save{padding:10px 18px;border-radius:12px;border:1px solid rgba(125,211,252,.45);background:rgba(19,34,50,.9);color:#e6f2ff;font-size:13px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+  .sect-screen__cultivation{padding:24px;display:flex;flex-direction:column;gap:12px;color:#d8ecff;}
+  .sect-screen__cultivation-title{margin:0;font-size:24px;letter-spacing:.04em;}
+  .sect-screen__cultivation-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .sect-screen__cultivation-btn{padding:10px 14px;border-radius:10px;border:1px solid rgba(125,211,252,.35);background:rgba(18,30,44,.88);color:#e6f2ff;cursor:pointer;}
 `;
 
 interface RenderContext {
@@ -43,6 +52,10 @@ function saveSectName(name: string): string {
   const nextName = sanitizeSectName(name);
   patchPlayerProfile({ sectName: nextName });
   return nextName;
+}
+
+function resolveSubRealmMinutes(realm: number): number {
+  return BASE_SUBREALM_MINUTES + Math.max(0, realm - 1) * EXTRA_SUBREALM_MINUTES_PER_REALM;
 }
 
 export function renderScreen(context: RenderContext): { destroy: () => void } {
@@ -99,14 +112,114 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     if (!button) return;
     if (button.dataset.sectIndex === '0') {
       shell?.enterScreen?.('sect-tactical-ai');
+      return;
+    }
+    const optionIndex = Number(button.dataset.sectIndex ?? -1);
+    cultivationPanel.hidden = optionIndex !== CULTIVATION_OPTION_INDEX;
+    if (optionIndex === CULTIVATION_OPTION_INDEX) {
+      renderCultivationPanel();
     }
   };
   left.addEventListener('click', onSelectOption);
 
   const center = document.createElement('section');
   center.className = 'sect-screen__center';
+  const cultivationPanel = document.createElement('div');
+  cultivationPanel.className = 'sect-screen__cultivation';
+  cultivationPanel.hidden = true;
+  cultivationPanel.innerHTML = `
+    <h2 class="sect-screen__cultivation-title">Tu Luyện Phòng</h2>
+    <p data-cultivation-status></p>
+    <p data-cultivation-earned></p>
+    <div class="sect-screen__cultivation-actions">
+      <button type="button" class="sect-screen__cultivation-btn" data-cultivation-start>Bắt đầu treo máy</button>
+      <button type="button" class="sect-screen__cultivation-btn" data-cultivation-claim>Nhận tu vi</button>
+    </div>
+  `;
+  center.appendChild(cultivationPanel);
   layout.append(left, center);
   container.appendChild(layout);
+  const cultivationStatus = cultivationPanel.querySelector<HTMLElement>('[data-cultivation-status]');
+  const cultivationEarned = cultivationPanel.querySelector<HTMLElement>('[data-cultivation-earned]');
+  const cultivationStartButton = cultivationPanel.querySelector<HTMLButtonElement>('[data-cultivation-start]');
+  const cultivationClaimButton = cultivationPanel.querySelector<HTMLButtonElement>('[data-cultivation-claim]');
+  let cultivationTimer = 0;
+
+  const readCultivationState = () => {
+    const latestProfile = loadPlayerProfile();
+    const startedAtMs = Number(latestProfile.sectCultivation?.startedAtMs ?? 0);
+    const totalMinutes = Number(latestProfile.sectCultivation?.totalMinutes ?? 0);
+    return {
+      startedAtMs: Number.isFinite(startedAtMs) && startedAtMs > 0 ? startedAtMs : 0,
+      totalMinutes: Number.isFinite(totalMinutes) && totalMinutes > 0 ? Math.floor(totalMinutes) : 0,
+      cultivationByUnit: latestProfile.cultivationByUnit ?? {},
+    };
+  };
+
+  const renderCultivationPanel = () => {
+    if (!cultivationStatus || !cultivationEarned) return;
+    const state = readCultivationState();
+    if (!state.startedAtMs) {
+      cultivationStatus.textContent = 'Chưa bắt đầu treo máy.';
+      cultivationEarned.textContent = `Tổng phút tu luyện đã nhận: ${state.totalMinutes}`;
+      if (cultivationClaimButton) cultivationClaimButton.disabled = true;
+      return;
+    }
+    const elapsedMinutes = Math.floor(Math.max(0, Date.now() - state.startedAtMs) / 60000);
+    const pendingMinutes = Math.min(OFFLINE_CULTIVATION_MAX_MINUTES, elapsedMinutes);
+    const unitCount = Object.keys(state.cultivationByUnit).length;
+    cultivationStatus.textContent = `Đã treo máy: ${elapsedMinutes} phút (giới hạn nhận ${OFFLINE_CULTIVATION_MAX_MINUTES} phút/lần).`;
+    cultivationEarned.textContent = `Phút treo máy chờ nhận: ${pendingMinutes}. Nhân vật đang theo dõi: ${unitCount}. Tổng phút đã nhận: ${state.totalMinutes}.`;
+    if (cultivationClaimButton) cultivationClaimButton.disabled = pendingMinutes <= 0;
+  };
+
+  const onStartCultivation = () => {
+    const now = Date.now();
+    patchPlayerProfile({ sectCultivation: { startedAtMs: now, lastClaimedAtMs: now } });
+    renderCultivationPanel();
+  };
+
+  const onClaimCultivation = () => {
+    const state = readCultivationState();
+    if (!state.startedAtMs) return;
+    const now = Date.now();
+    const elapsedMinutes = Math.floor(Math.max(0, now - state.startedAtMs) / 60000);
+    const claimedMinutes = Math.min(OFFLINE_CULTIVATION_MAX_MINUTES, elapsedMinutes);
+    const nextCultivationByUnit = { ...state.cultivationByUnit };
+    for (const [unitId, progress] of Object.entries(state.cultivationByUnit)) {
+      if (!unitId || !progress) continue;
+      const realm = Math.max(1, Math.floor(Number(progress.realm ?? 1)));
+      const subRealm = Math.max(0, Math.floor(Number(progress.subRealm ?? 0)));
+      const minutePerSubRealm = resolveSubRealmMinutes(realm);
+      if (minutePerSubRealm <= 0) continue;
+      const gainedSubRealm = Math.floor(claimedMinutes / minutePerSubRealm);
+      if (gainedSubRealm <= 0) continue;
+      let nextSubRealm = subRealm;
+      let remainingGain = gainedSubRealm;
+      while (remainingGain > 0) {
+        const nextCost = getCultivationCost(realm, nextSubRealm);
+        if (!nextCost || nextCost.isBreakthrough) break;
+        nextSubRealm = nextCost.nextSubRealm;
+        remainingGain -= 1;
+      }
+      if (nextSubRealm > subRealm) {
+        nextCultivationByUnit[unitId] = { realm, subRealm: nextSubRealm };
+      }
+    }
+    patchPlayerProfile({
+      sectCultivation: {
+        startedAtMs: now,
+        lastClaimedAtMs: now,
+        totalMinutes: state.totalMinutes + claimedMinutes,
+      },
+      cultivationByUnit: nextCultivationByUnit,
+    });
+    renderCultivationPanel();
+  };
+
+  cultivationStartButton?.addEventListener('click', onStartCultivation);
+  cultivationClaimButton?.addEventListener('click', onClaimCultivation);
+  cultivationTimer = window.setInterval(renderCultivationPanel, 1000);
 
   const existingName = sanitizeSectName(profile.sectName);
   const shouldOpenNamingHub = !profile.sectName || !String(profile.sectName).trim();
@@ -163,6 +276,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     destroy() {
       backButton.removeEventListener('click', onBack);
       left.removeEventListener('click', onSelectOption);
+      cultivationStartButton?.removeEventListener('click', onStartCultivation);
+      cultivationClaimButton?.removeEventListener('click', onClaimCultivation);
+      window.clearInterval(cultivationTimer);
       closeOverlay();
       mount.destroy();
     }

@@ -20,6 +20,11 @@ export interface SavedPlayerProfile {
     activeTab?: string;
     artsHubAutoOpen?: boolean;
   };
+  sectCultivation?: {
+    startedAtMs?: number;
+    lastClaimedAtMs?: number;
+    totalMinutes?: number;
+  };
 }
 
 const STORAGE_KEY = 'arclune.playerProfile.v1';
@@ -79,6 +84,10 @@ export function patchPlayerProfile(patch: SavedPlayerProfile): SavedPlayerProfil
     collectionUi: {
       ...(current.collectionUi ?? {}),
       ...(patch.collectionUi ?? {}),
+    },
+    sectCultivation: {
+      ...(current.sectCultivation ?? {}),
+      ...(patch.sectCultivation ?? {}),
     },
   };
   savePlayerProfile(merged);

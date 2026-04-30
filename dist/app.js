@@ -24713,216 +24713,217 @@ __modules['./screens/chess-strategy-rpg/match.ts'] = (exports, module, __require
                       attackableEnemies.add(enemyKey);
               }
               attackableEnemyTilesById.set(active.id, attackableEnemies);
-              const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : matchState.objectiveMode === 'rescue' ? 'Objective: Bảo vệ mục tiêu giải cứu' : 'Objective: Hạ boss';
-              const missionAlert = hasRescueLethalThreat() ? ' | 🚨 Cảnh báo: NPC có nguy cơ bị kết liễu lượt kế.' : '';
-              turnHost.textContent = active
-                  ? active.team === 'player'
-                      ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel}${missionAlert} · Move:${matchState.turn.hasMoved ? 'xong' : 'chưa'} · Action:${matchState.turn.hasActed ? 'xong' : 'chưa'} · Timer:${Math.ceil(matchState.unitTimer.remainingMs / 1000)}s + Bank ${Math.ceil(matchState.resources.player.bankTimeMs / 1000)}s.`
-                      : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
-                  : 'Không có nhân vật khả dụng.';
-          };
-          if (piecesHost instanceof HTMLElement) {
-              piecesHost.innerHTML = '';
-              if (active) {
-                  const teamResource = matchState.resources[active.team];
-                  const status = document.createElement('span');
-                  const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
-                  const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
-                  const teamSummonCount = summonsByTeam[active.team].filter((unit) => unit.hp > 0).length;
-                  status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
-                  const rescueBarrierInfo = matchState.objectiveMode === 'rescue'
-                      ? ` | Barrier NPC ${rescueBarrierCharges > 0 ? 'sẵn sàng' : 'đã vỡ'}`
-                      : '';
-                  status.textContent = `Class ${active.classId} | Piece ${resolveUnitMovementKind(active)} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Summon ${teamSummonCount}/${SUMMON_CAP_PER_TEAM} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
-                  piecesHost.appendChild(status);
+              if (turnHost instanceof HTMLElement) {
+                  const objectiveLabel = matchState.objectiveMode === 'elimination' ? 'Objective: Diệt sạch địch' : matchState.objectiveMode === 'rescue' ? 'Objective: Bảo vệ mục tiêu giải cứu' : 'Objective: Hạ boss';
+                  const missionAlert = hasRescueLethalThreat() ? ' | 🚨 Cảnh báo: NPC có nguy cơ bị kết liễu lượt kế.' : '';
+                  turnHost.textContent = active
+                      ? active.team === 'player'
+                          ? `Pha Player · lượt ${matchState.turnCountPlayer}/${PLAYER_TURN_CAP} · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) · ${objectiveLabel}${missionAlert} · Move:${matchState.turn.hasMoved ? 'xong' : 'chưa'} · Action:${matchState.turn.hasActed ? 'xong' : 'chưa'} · Timer:${Math.ceil(matchState.unitTimer.remainingMs / 1000)}s + Bank ${Math.ceil(matchState.resources.player.bankTimeMs / 1000)}s.`
+                          : `Pha AI · ${active.label} (slot ${matchState.activeIndexInLineup + 1}/${lineupSize}) đang xử lý tự động.`
+                      : 'Không có nhân vật khả dụng.';
               }
-          }
-          if (resultHost instanceof HTMLElement) {
-              if (matchState.result.status === 'ongoing') {
-                  resultHost.hidden = true;
-              }
-              else {
-                  resultHost.hidden = false;
-                  if (matchState.result.status === 'win') {
-                      resultHost.textContent = matchState.result.reason?.startsWith('turn-cap-tiebreak')
-                          ? 'Thắng trận (tie-break khi hết turn cap).'
-                          : 'Thắng trận (hoàn thành objective).';
+              if (piecesHost instanceof HTMLElement) {
+                  piecesHost.innerHTML = '';
+                  if (active) {
+                      const teamResource = matchState.resources[active.team];
+                      const status = document.createElement('span');
+                      const canSkill = canUseCommand(matchState, 'castSkill', { skillCost: active.skillCost, ae: teamResource.ae });
+                      const canUlt = canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: active.rage, ultCost: active.maxRage });
+                      const teamSummonCount = summonsByTeam[active.team].filter((unit) => unit.hp > 0).length;
+                      status.className = 'chess-rpg-match__piece chess-rpg-match__piece--active';
+                      const rescueBarrierInfo = matchState.objectiveMode === 'rescue'
+                          ? ` | Barrier NPC ${rescueBarrierCharges > 0 ? 'sẵn sàng' : 'đã vỡ'}`
+                          : '';
+                      status.textContent = `Class ${active.classId} | Piece ${resolveUnitMovementKind(active)} | Tầm đánh cơ bản ${active.basicRange} | AE ${teamResource.ae.toFixed(1)} | Rage ${active.rage}/${active.maxRage} | Summon ${teamSummonCount}/${SUMMON_CAP_PER_TEAM} | Skill ${canSkill ? 'mở' : 'khóa'} | Ult ${canUlt ? 'mở tay' : 'khóa'} | AI ${aiProfile}${rescueBarrierInfo}`;
+                      piecesHost.appendChild(status);
                   }
-                  else if (matchState.result.status === 'lose') {
-                      resultHost.textContent = matchState.result.reason === 'turn-cap-tiebreak:unit-points' || matchState.result.reason === 'turn-cap-tiebreak:hp-pct'
-                          ? 'Thua trận (tie-break khi hết turn cap).'
-                          : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
+              }
+              if (resultHost instanceof HTMLElement) {
+                  if (matchState.result.status === 'ongoing') {
+                      resultHost.hidden = true;
                   }
                   else {
-                      resultHost.textContent = 'Hòa trận (tie-break không phân thắng bại).';
+                      resultHost.hidden = false;
+                      if (matchState.result.status === 'win') {
+                          resultHost.textContent = matchState.result.reason?.startsWith('turn-cap-tiebreak')
+                              ? 'Thắng trận (tie-break khi hết turn cap).'
+                              : 'Thắng trận (hoàn thành objective).';
+                      }
+                      else if (matchState.result.status === 'lose') {
+                          resultHost.textContent = matchState.result.reason === 'turn-cap-tiebreak:unit-points' || matchState.result.reason === 'turn-cap-tiebreak:hp-pct'
+                              ? 'Thua trận (tie-break khi hết turn cap).'
+                              : `Thua trận (${matchState.result.reason === 'turn-cap' ? 'hết turn cap 9 lượt Player' : 'bị tiêu diệt'}).`;
+                      }
+                      else {
+                          resultHost.textContent = 'Hòa trận (tie-break không phân thắng bại).';
+                      }
                   }
               }
-          }
-          if (actionsHost instanceof HTMLElement) {
-              actionsHost.innerHTML = '';
-              const activePlayer = active && active.team === 'player' ? active : null;
-              const buildActionButton = (label, onClick, disabled) => {
-                  const button = document.createElement('button');
-                  button.type = 'button';
-                  button.className = 'chess-rpg-match__action-btn';
-                  button.textContent = label;
-                  button.disabled = disabled;
-                  button.addEventListener('click', onClick);
-                  actionsHost.appendChild(button);
-              };
-              buildActionButton('Dùng Skill', () => {
-                  if (!activePlayer)
-                      return;
-                  executeCommand({ type: 'castSkill', team: 'player' });
-                  executeCommand({ type: 'endTurn', team: 'player' });
-                  finalizePlayerProgress();
-              }, !activePlayer || !canUseCommand(matchState, 'castSkill', { skillCost: activePlayer.skillCost }) || matchState.result.status !== 'ongoing');
-              buildActionButton('Dùng Ultimate', () => {
-                  if (!activePlayer)
-                      return;
-                  executeCommand({ type: 'castUlt', team: 'player' });
-                  executeCommand({ type: 'endTurn', team: 'player' });
-                  finalizePlayerProgress();
-              }, !activePlayer || !canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: activePlayer.rage, ultCost: activePlayer.maxRage }) || matchState.result.status !== 'ongoing');
-              buildActionButton('Bỏ qua hành động', () => {
-                  if (!activePlayer)
-                      return;
-                  executeCommand({ type: 'skipAction', team: 'player' });
-                  executeCommand({ type: 'endTurn', team: 'player' });
-                  finalizePlayerProgress();
-              }, !activePlayer || !canUseCommand(matchState, 'skipAction') || matchState.result.status !== 'ongoing');
-              buildActionButton('Kết thúc lượt', () => {
-                  if (!activePlayer)
-                      return;
-                  executeCommand({ type: 'endTurn', team: 'player' });
-                  finalizePlayerProgress();
-              }, !activePlayer || !canUseCommand(matchState, 'endTurn') || matchState.result.status !== 'ongoing');
-          }
-      }
-      ;
-      const prepareReachable = () => {
-          reachableById.clear();
-          const active = resolveActiveUnit();
-          if (!active)
-              return;
-          if (!canUseCommand(matchState, 'move'))
-              return;
-          const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
-          occupied.delete(keyOf(active.x, active.y));
-          reachableById.set(active.id, findShortestPaths(active, board.playable, occupied));
-      };
-      const processEnemyTurn = () => {
-          const active = resolveActiveUnit();
-          if (!active || active.team !== 'enemy')
-              return;
-          if (matchState.result.status !== 'ongoing')
-              return;
-          if (consumeTurnBudgetOrFallback()) {
+              if (actionsHost instanceof HTMLElement) {
+                  actionsHost.innerHTML = '';
+                  const activePlayer = active && active.team === 'player' ? active : null;
+                  const buildActionButton = (label, onClick, disabled) => {
+                      const button = document.createElement('button');
+                      button.type = 'button';
+                      button.className = 'chess-rpg-match__action-btn';
+                      button.textContent = label;
+                      button.disabled = disabled;
+                      button.addEventListener('click', onClick);
+                      actionsHost.appendChild(button);
+                  };
+                  buildActionButton('Dùng Skill', () => {
+                      if (!activePlayer)
+                          return;
+                      executeCommand({ type: 'castSkill', team: 'player' });
+                      executeCommand({ type: 'endTurn', team: 'player' });
+                      finalizePlayerProgress();
+                  }, !activePlayer || !canUseCommand(matchState, 'castSkill', { skillCost: activePlayer.skillCost }) || matchState.result.status !== 'ongoing');
+                  buildActionButton('Dùng Ultimate', () => {
+                      if (!activePlayer)
+                          return;
+                      executeCommand({ type: 'castUlt', team: 'player' });
+                      executeCommand({ type: 'endTurn', team: 'player' });
+                      finalizePlayerProgress();
+                  }, !activePlayer || !canUseCommand(matchState, 'castUlt', { manualUlt: true, rage: activePlayer.rage, ultCost: activePlayer.maxRage }) || matchState.result.status !== 'ongoing');
+                  buildActionButton('Bỏ qua hành động', () => {
+                      if (!activePlayer)
+                          return;
+                      executeCommand({ type: 'skipAction', team: 'player' });
+                      executeCommand({ type: 'endTurn', team: 'player' });
+                      finalizePlayerProgress();
+                  }, !activePlayer || !canUseCommand(matchState, 'skipAction') || matchState.result.status !== 'ongoing');
+                  buildActionButton('Kết thúc lượt', () => {
+                      if (!activePlayer)
+                          return;
+                      executeCommand({ type: 'endTurn', team: 'player' });
+                      finalizePlayerProgress();
+                  }, !activePlayer || !canUseCommand(matchState, 'endTurn') || matchState.result.status !== 'ongoing');
+              }
+          };
+          const prepareReachable = () => {
+              reachableById.clear();
+              const active = resolveActiveUnit();
+              if (!active)
+                  return;
+              if (!canUseCommand(matchState, 'move'))
+                  return;
+              const occupied = new Set(allUnits().map((unit) => keyOf(unit.x, unit.y)));
+              occupied.delete(keyOf(active.x, active.y));
+              reachableById.set(active.id, findShortestPaths(active, board.playable, occupied));
+          };
+          const processEnemyTurn = () => {
+              const active = resolveActiveUnit();
+              if (!active || active.team !== 'enemy')
+                  return;
+              if (matchState.result.status !== 'ongoing')
+                  return;
+              if (consumeTurnBudgetOrFallback()) {
+                  prepareReachable();
+                  renderHUD();
+                  renderBoard();
+                  if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
+                      window.setTimeout(processEnemyTurn, 240);
+                  }
+                  return;
+              }
+              const moves = Array.from(reachableById.get(active.id)?.entries() ?? []);
+              const enemies = aliveByTeam.player.filter((unit) => unit.hp > 0);
+              if (moves.length > 0 && enemies.length > 0) {
+                  const rescueUnit = rescueNpc;
+                  let bestMove = null;
+                  for (const [key, path] of moves) {
+                      const parsed = parseKey(key);
+                      if (!parsed)
+                          continue;
+                      const nearest = enemies.reduce((min, enemy) => Math.min(min, Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y)), Number.POSITIVE_INFINITY);
+                      const incoming = expectedIncomingDamageAt(parsed.x, parsed.y, active, enemies);
+                      const inAttackRange = enemies.some((enemy) => Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y) <= active.basicRange);
+                      const inSkillRange = enemies.some((enemy) => Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y) <= 2);
+                      const stance = profileBias(aiProfile);
+                      const ownHpRatio = resolveHpRatio(active);
+                      const objectiveBonus = matchState.objectiveMode === 'rescue'
+                          ? enemies.some((enemy) => {
+                              return rescueUnit ? distanceBetween(enemy, rescueUnit) <= enemy.basicRange : false;
+                          }) && inAttackRange
+                              ? 2.5
+                              : 0
+                          : matchState.objectiveMode === 'boss' && active.slotIndex === 0 && inSkillRange
+                              ? 1.5
+                              : 0;
+                      const score = (stance.pressure * (9 - nearest)
+                          + (inAttackRange ? 2.6 : inSkillRange ? 1.2 : 0)
+                          + objectiveBonus
+                          - stance.safety * incoming * (0.08 + (1 - ownHpRatio) * 0.12)
+                          - path.length * 0.06);
+                      if (!bestMove || score > bestMove.score) {
+                          bestMove = { key, score, steps: Math.max(1, path.length - 1) };
+                      }
+                  }
+                  const parsed = bestMove ? parseKey(bestMove.key) : null;
+                  if (parsed && bestMove) {
+                      active.x = parsed.x;
+                      active.y = parsed.y;
+                      executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps: bestMove.steps } });
+                  }
+              }
+              const timerStep = consumeDecisionTime(matchState, 7_600);
+              matchState = timerStep.state;
+              const actionChoice = chooseBestCombatAction({
+                  actor: active,
+                  enemies: aliveByTeam.player.filter((unit) => unit.hp > 0),
+                  teamAe: matchState.resources.enemy.ae,
+                  aiProfile,
+                  objectiveHints: {
+                      mode: matchState.objectiveMode,
+                      rescueUnit: rescueNpc,
+                  },
+                  canUse: (command, options) => canUseCommand(matchState, command, options),
+              });
+              if (timerStep.timeout) {
+                  const fallback = chooseFallbackAction(matchState, {
+                      hasSafeBasicTarget: actionChoice.action === 'basicAttack' && Boolean(actionChoice.target),
+                      lethalRisk: actionChoice.action === 'skipAction' ? 1 : 0,
+                  });
+                  if (fallback.type === 'basicAttack' && actionChoice.target) {
+                      executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
+                  }
+                  else {
+                      executeActionChoice('enemy', { action: 'skipAction', target: null, score: 0 });
+                  }
+              }
+              else {
+                  executeActionChoice('enemy', actionChoice);
+              }
+              executeCommand({ type: 'endTurn', team: 'enemy' });
               prepareReachable();
               renderHUD();
               renderBoard();
               if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
                   window.setTimeout(processEnemyTurn, 240);
               }
-              return;
-          }
-          const moves = Array.from(reachableById.get(active.id)?.entries() ?? []);
-          const enemies = aliveByTeam.player.filter((unit) => unit.hp > 0);
-          if (moves.length > 0 && enemies.length > 0) {
-              const rescueUnit = rescueNpc;
-              let bestMove = null;
-              for (const [key, path] of moves) {
-                  const parsed = parseKey(key);
-                  if (!parsed)
-                      continue;
-                  const nearest = enemies.reduce((min, enemy) => Math.min(min, Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y)), Number.POSITIVE_INFINITY);
-                  const incoming = expectedIncomingDamageAt(parsed.x, parsed.y, active, enemies);
-                  const inAttackRange = enemies.some((enemy) => Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y) <= active.basicRange);
-                  const inSkillRange = enemies.some((enemy) => Math.abs(enemy.x - parsed.x) + Math.abs(enemy.y - parsed.y) <= 2);
-                  const stance = profileBias(aiProfile);
-                  const ownHpRatio = resolveHpRatio(active);
-                  const objectiveBonus = matchState.objectiveMode === 'rescue'
-                      ? enemies.some((enemy) => {
-                          return rescueUnit ? distanceBetween(enemy, rescueUnit) <= enemy.basicRange : false;
-                      }) && inAttackRange
-                          ? 2.5
-                          : 0
-                      : matchState.objectiveMode === 'boss' && active.slotIndex === 0 && inSkillRange
-                          ? 1.5
-                          : 0;
-                  const score = (stance.pressure * (9 - nearest)
-                      + (inAttackRange ? 2.6 : inSkillRange ? 1.2 : 0)
-                      + objectiveBonus
-                      - stance.safety * incoming * (0.08 + (1 - ownHpRatio) * 0.12)
-                      - path.length * 0.06);
-                  if (!bestMove || score > bestMove.score) {
-                      bestMove = { key, score, steps: Math.max(1, path.length - 1) };
-                  }
-              }
-              const parsed = bestMove ? parseKey(bestMove.key) : null;
-              if (parsed && bestMove) {
-                  active.x = parsed.x;
-                  active.y = parsed.y;
-                  executeCommand({ type: 'move', team: 'enemy', payload: { tileSteps: bestMove.steps } });
-              }
-          }
-          const timerStep = consumeDecisionTime(matchState, 7_600);
-          matchState = timerStep.state;
-          const actionChoice = chooseBestCombatAction({
-              actor: active,
-              enemies: aliveByTeam.player.filter((unit) => unit.hp > 0),
-              teamAe: matchState.resources.enemy.ae,
-              aiProfile,
-              objectiveHints: {
-                  mode: matchState.objectiveMode,
-                  rescueUnit: rescueNpc,
-              },
-              canUse: (command, options) => canUseCommand(matchState, command, options),
-          });
-          if (timerStep.timeout) {
-              const fallback = chooseFallbackAction(matchState, {
-                  hasSafeBasicTarget: actionChoice.action === 'basicAttack' && Boolean(actionChoice.target),
-                  lethalRisk: actionChoice.action === 'skipAction' ? 1 : 0,
-              });
-              if (fallback.type === 'basicAttack' && actionChoice.target) {
-                  executeCommand({ type: 'basicAttack', team: 'enemy', payload: { targetX: actionChoice.target.x, targetY: actionChoice.target.y } });
-              }
-              else {
-                  executeActionChoice('enemy', { action: 'skipAction', target: null, score: 0 });
-              }
-          }
-          else {
-              executeActionChoice('enemy', actionChoice);
-          }
-          executeCommand({ type: 'endTurn', team: 'enemy' });
+          };
+          normalizeActiveSlot();
+          syncMatchResult('onTurnStart');
           prepareReachable();
           renderHUD();
           renderBoard();
-          if (matchState.activeTeam === 'enemy' && matchState.result.status === 'ongoing') {
+          if (matchState.activeTeam === 'enemy') {
               window.setTimeout(processEnemyTurn, 240);
           }
-      };
-      normalizeActiveSlot();
-      syncMatchResult('onTurnStart');
-      prepareReachable();
-      renderHUD();
-      renderBoard();
-      if (matchState.activeTeam === 'enemy') {
-          window.setTimeout(processEnemyTurn, 240);
       }
+      const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
+      if (backTrigger instanceof HTMLButtonElement) {
+          backTrigger.addEventListener('click', onBack);
+      }
+      return {
+          destroy() {
+              if (backTrigger instanceof HTMLButtonElement) {
+                  backTrigger.removeEventListener('click', onBack);
+              }
+              mount.destroy();
+          },
+      };
   }
-  const onBack = () => shell?.enterScreen?.('chess-strategy-rpg-battle');
-  if (backTrigger instanceof HTMLButtonElement) {
-      backTrigger.addEventListener('click', onBack);
-  }
-  return {
-      destroy() {
-          if (backTrigger instanceof HTMLButtonElement) {
-              backTrigger.removeEventListener('click', onBack);
-          }
-          mount.destroy();
-      },
-  };
   const render = renderScreen;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
@@ -35502,12 +35503,18 @@ __modules['./screens/sect/index.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./ui/dom.ts');
   const ensureStyleTag = __dep0.ensureStyleTag;
   const mountSection = __dep0.mountSection;
-  const __dep1 = __require('./utils/player-profile.ts');
-  const loadPlayerProfile = __dep1.loadPlayerProfile;
-  const patchPlayerProfile = __dep1.patchPlayerProfile;
+  const __dep1 = __require('./cultivation.ts');
+  const getCultivationCost = __dep1.getCultivationCost;
+  const __dep2 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep2.loadPlayerProfile;
+  const patchPlayerProfile = __dep2.patchPlayerProfile;
   const STYLE_ID = 'sect-screen-style-v1';
   const DEFAULT_SECT_NAME = 'Tông Môn Vô Danh';
   const SECT_OPTIONS = ['Thiên Cơ Lâu', 'Tu Luyện Phòng', 'Bách Khí Các', 'Luyện Đan Các', 'Dược Các', 'Bảo Khố'];
+  const CULTIVATION_OPTION_INDEX = SECT_OPTIONS.indexOf('Tu Luyện Phòng');
+  const OFFLINE_CULTIVATION_MAX_MINUTES = 12 * 60;
+  const BASE_SUBREALM_MINUTES = 120;
+  const EXTRA_SUBREALM_MINUTES_PER_REALM = 30;
   const CSS = /* css */ `
     .app--sect{padding:32px 16px 64px;}
     .sect-screen{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:24px;min-height:70vh;}
@@ -35525,6 +35532,10 @@ __modules['./screens/sect/index.ts'] = (exports, module, __require) => {
     .sect-screen__naming-input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(125,211,252,.38);background:rgba(10,18,28,.82);color:#e6f2ff;font-size:16px;}
     .sect-screen__naming-actions{display:flex;justify-content:flex-end;}
     .sect-screen__naming-save{padding:10px 18px;border-radius:12px;border:1px solid rgba(125,211,252,.45);background:rgba(19,34,50,.9);color:#e6f2ff;font-size:13px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+    .sect-screen__cultivation{padding:24px;display:flex;flex-direction:column;gap:12px;color:#d8ecff;}
+    .sect-screen__cultivation-title{margin:0;font-size:24px;letter-spacing:.04em;}
+    .sect-screen__cultivation-actions{display:flex;gap:10px;flex-wrap:wrap;}
+    .sect-screen__cultivation-btn{padding:10px 14px;border-radius:10px;border:1px solid rgba(125,211,252,.35);background:rgba(18,30,44,.88);color:#e6f2ff;cursor:pointer;}
   `;
   function ensureStyles() {
       ensureStyleTag(STYLE_ID, { css: CSS });
@@ -35537,6 +35548,9 @@ __modules['./screens/sect/index.ts'] = (exports, module, __require) => {
       const nextName = sanitizeSectName(name);
       patchPlayerProfile({ sectName: nextName });
       return nextName;
+  }
+  function resolveSubRealmMinutes(realm) {
+      return BASE_SUBREALM_MINUTES + Math.max(0, realm - 1) * EXTRA_SUBREALM_MINUTES_PER_REALM;
   }
   function renderScreen(context) {
       const { root, shell = null } = context;
@@ -35586,13 +35600,116 @@ __modules['./screens/sect/index.ts'] = (exports, module, __require) => {
               return;
           if (button.dataset.sectIndex === '0') {
               shell?.enterScreen?.('sect-tactical-ai');
+              return;
+          }
+          const optionIndex = Number(button.dataset.sectIndex ?? -1);
+          cultivationPanel.hidden = optionIndex !== CULTIVATION_OPTION_INDEX;
+          if (optionIndex === CULTIVATION_OPTION_INDEX) {
+              renderCultivationPanel();
           }
       };
       left.addEventListener('click', onSelectOption);
       const center = document.createElement('section');
       center.className = 'sect-screen__center';
+      const cultivationPanel = document.createElement('div');
+      cultivationPanel.className = 'sect-screen__cultivation';
+      cultivationPanel.hidden = true;
+      cultivationPanel.innerHTML = `
+      <h2 class="sect-screen__cultivation-title">Tu Luyện Phòng</h2>
+      <p data-cultivation-status></p>
+      <p data-cultivation-earned></p>
+      <div class="sect-screen__cultivation-actions">
+        <button type="button" class="sect-screen__cultivation-btn" data-cultivation-start>Bắt đầu treo máy</button>
+        <button type="button" class="sect-screen__cultivation-btn" data-cultivation-claim>Nhận tu vi</button>
+      </div>
+    `;
+      center.appendChild(cultivationPanel);
       layout.append(left, center);
       container.appendChild(layout);
+      const cultivationStatus = cultivationPanel.querySelector('[data-cultivation-status]');
+      const cultivationEarned = cultivationPanel.querySelector('[data-cultivation-earned]');
+      const cultivationStartButton = cultivationPanel.querySelector('[data-cultivation-start]');
+      const cultivationClaimButton = cultivationPanel.querySelector('[data-cultivation-claim]');
+      let cultivationTimer = 0;
+      const readCultivationState = () => {
+          const latestProfile = loadPlayerProfile();
+          const startedAtMs = Number(latestProfile.sectCultivation?.startedAtMs ?? 0);
+          const totalMinutes = Number(latestProfile.sectCultivation?.totalMinutes ?? 0);
+          return {
+              startedAtMs: Number.isFinite(startedAtMs) && startedAtMs > 0 ? startedAtMs : 0,
+              totalMinutes: Number.isFinite(totalMinutes) && totalMinutes > 0 ? Math.floor(totalMinutes) : 0,
+              cultivationByUnit: latestProfile.cultivationByUnit ?? {},
+          };
+      };
+      const renderCultivationPanel = () => {
+          if (!cultivationStatus || !cultivationEarned)
+              return;
+          const state = readCultivationState();
+          if (!state.startedAtMs) {
+              cultivationStatus.textContent = 'Chưa bắt đầu treo máy.';
+              cultivationEarned.textContent = `Tổng phút tu luyện đã nhận: ${state.totalMinutes}`;
+              if (cultivationClaimButton)
+                  cultivationClaimButton.disabled = true;
+              return;
+          }
+          const elapsedMinutes = Math.floor(Math.max(0, Date.now() - state.startedAtMs) / 60000);
+          const pendingMinutes = Math.min(OFFLINE_CULTIVATION_MAX_MINUTES, elapsedMinutes);
+          const unitCount = Object.keys(state.cultivationByUnit).length;
+          cultivationStatus.textContent = `Đã treo máy: ${elapsedMinutes} phút (giới hạn nhận ${OFFLINE_CULTIVATION_MAX_MINUTES} phút/lần).`;
+          cultivationEarned.textContent = `Phút treo máy chờ nhận: ${pendingMinutes}. Nhân vật đang theo dõi: ${unitCount}. Tổng phút đã nhận: ${state.totalMinutes}.`;
+          if (cultivationClaimButton)
+              cultivationClaimButton.disabled = pendingMinutes <= 0;
+      };
+      const onStartCultivation = () => {
+          const now = Date.now();
+          patchPlayerProfile({ sectCultivation: { startedAtMs: now, lastClaimedAtMs: now } });
+          renderCultivationPanel();
+      };
+      const onClaimCultivation = () => {
+          const state = readCultivationState();
+          if (!state.startedAtMs)
+              return;
+          const now = Date.now();
+          const elapsedMinutes = Math.floor(Math.max(0, now - state.startedAtMs) / 60000);
+          const claimedMinutes = Math.min(OFFLINE_CULTIVATION_MAX_MINUTES, elapsedMinutes);
+          const nextCultivationByUnit = { ...state.cultivationByUnit };
+          for (const [unitId, progress] of Object.entries(state.cultivationByUnit)) {
+              if (!unitId || !progress)
+                  continue;
+              const realm = Math.max(1, Math.floor(Number(progress.realm ?? 1)));
+              const subRealm = Math.max(0, Math.floor(Number(progress.subRealm ?? 0)));
+              const minutePerSubRealm = resolveSubRealmMinutes(realm);
+              if (minutePerSubRealm <= 0)
+                  continue;
+              const gainedSubRealm = Math.floor(claimedMinutes / minutePerSubRealm);
+              if (gainedSubRealm <= 0)
+                  continue;
+              let nextSubRealm = subRealm;
+              let remainingGain = gainedSubRealm;
+              while (remainingGain > 0) {
+                  const nextCost = getCultivationCost(realm, nextSubRealm);
+                  if (!nextCost || nextCost.isBreakthrough)
+                      break;
+                  nextSubRealm = nextCost.nextSubRealm;
+                  remainingGain -= 1;
+              }
+              if (nextSubRealm > subRealm) {
+                  nextCultivationByUnit[unitId] = { realm, subRealm: nextSubRealm };
+              }
+          }
+          patchPlayerProfile({
+              sectCultivation: {
+                  startedAtMs: now,
+                  lastClaimedAtMs: now,
+                  totalMinutes: state.totalMinutes + claimedMinutes,
+              },
+              cultivationByUnit: nextCultivationByUnit,
+          });
+          renderCultivationPanel();
+      };
+      cultivationStartButton?.addEventListener('click', onStartCultivation);
+      cultivationClaimButton?.addEventListener('click', onClaimCultivation);
+      cultivationTimer = window.setInterval(renderCultivationPanel, 1000);
       const existingName = sanitizeSectName(profile.sectName);
       const shouldOpenNamingHub = !profile.sectName || !String(profile.sectName).trim();
       let overlay = null;
@@ -35643,6 +35760,9 @@ __modules['./screens/sect/index.ts'] = (exports, module, __require) => {
           destroy() {
               backButton.removeEventListener('click', onBack);
               left.removeEventListener('click', onSelectOption);
+              cultivationStartButton?.removeEventListener('click', onStartCultivation);
+              cultivationClaimButton?.removeEventListener('click', onClaimCultivation);
+              window.clearInterval(cultivationTimer);
               closeOverlay();
               mount.destroy();
           }
@@ -41458,6 +41578,10 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
           collectionUi: {
               ...(current.collectionUi ?? {}),
               ...(patch.collectionUi ?? {}),
+          },
+          sectCultivation: {
+              ...(current.sectCultivation ?? {}),
+              ...(patch.sectCultivation ?? {}),
           },
       };
       savePlayerProfile(merged);

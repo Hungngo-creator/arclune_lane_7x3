@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { verifyAetherBundle } from './tools/verify-aether-bundle.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BUILD_SCRIPT_VERSION = '2026-04-28';
+const BUILD_SCRIPT_VERSION = new Date().toISOString().slice(0, 10);
 let esbuild;
 const pickModuleDefault = (imported) => imported?.default ?? imported;
 async function tryImportModule(moduleId){
