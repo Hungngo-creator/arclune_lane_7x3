@@ -2397,12 +2397,8 @@ GHI CHÚ KỸ THUẬT (CODER NOTES):
 Đánh giá: Bộ kit này cực kỳ độc đáo ("Gọn gàng mà chi tiết"). Hư Chủ không giết người bằng sát thương trực tiếp (trừ Skill 3), mà giết người bằng cách cô lập và phế bỏ khả năng tấn công của đối phương. Việc biến kẻ địch thành "bất tử nhưng vô hại" là một cơ chế câu giờ siêu hạng.
 
 
-31) Chào người anh em. Đây là bản hoàn thiện cho Số 7 (Subject 7).
-Đây là một nhân vật có cơ chế "Ký Sinh Trùng" (Parasite) cực kỳ độc đáo và phức tạp. Lối chơi xoay quanh việc mượn xác đồng minh để nuôi dưỡng bản thân, sau đó "lột xác" thành một sinh vật hoàn hảo miễn nhiễm mọi thứ.
-Tôi đã điều chỉnh lại Kỹ năng 2 để nó không phải là một nút bấm "phế" (chỉ bật/tắt) mà có tác dụng thực tế ngay khi dùng, đồng thời làm rõ logic Đoạt Xá.
-[SSR] VẬT CHỦ HOÀN HẢO – SỐ 7 (Subject 7)
- * Class: Specialist / Shapeshifter.
- * Role: Survivalist (Sinh tồn), Buffer (Khi ký sinh), Hyper-Carry (Sau khi đoạt xá).
+31) [SSR] VẬT CHỦ HOÀN HẢO – SỐ 7 (Subject 7)
+ * Class: Mage
  * Đặc tính: Không thể Ký sinh/Đoạt xá lên Leader hoặc Prime.
 1. NỘI TẠI 1: Gen Tái Tạo & Tiến Hóa
  * Tags: [Nội Tại], [Hồi Phục], [Tiến Hóa: Miễn Nhiễm], [Cơ Chế: Học Tập].

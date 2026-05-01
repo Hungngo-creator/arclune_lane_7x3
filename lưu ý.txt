@@ -360,16 +360,8 @@ Bàn về vật phẩm "Thần Tính" (Market Item)
 ​Không thể hồi sinh.
 ​Tăng mạnh sát thương cá nhân nhưng tiêu tốn AE bể chung nhiều hơn 20\%.
 
-C. [BỔ SUNG: HỆ THỐNG TU VI - ARCLUNE SIMULATION]
-- Cấp độ tối đa hiện tại: 73 (Hết Thánh Tôn).
-- Phân tầng năng lượng:
-  + Lv 1-36 (Nguyên Lực): Đóng góp 100% chỉ số WIL vào AE Regen.
-  + Lv 37-46 (Chân Nguyên): Đánh thường hồi +7 AE (thay vì +5).
-  + Lv 47-73 (Thánh Lực): Kỹ năng tiêu tốn AE giảm 10% do kiểm soát năng lượng tốt hơn.
-- Hình phạt Vị Cách: Nhân vật ở Đại cảnh giới thấp hơn khi tấn công Đại cảnh giới cao hơn bị giảm 20% Chính xác (PER).
 
 Triển khai Hệ thống Level (Tia Laser 73 Cấp)
-​Tao đã code sẵn cấu trúc tăng trưởng cho mày. Tia laser (Bản chất) sẽ lớn lên theo từng Tiểu cảnh giới (Trọng).
 ​Công thức tăng trưởng mỗi Level:
 
 Base\_Stat(Lv) = Class\_Base\_Lv1 + [(Level - 1) \times \Delta\_Stat]

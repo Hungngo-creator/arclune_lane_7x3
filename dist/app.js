@@ -29813,6 +29813,15 @@ __modules['./screens/lineup/view/render.ts'] = (exports, module, __require) => {
       function persistLineupSelection() {
           const selectedLineup = getSelectedLineup();
           const selected = serializeSelectedLineup(selectedLineup);
+          const selectedLineupSelection = selectedLineup
+              ? passiveSelectionByLineup.get(selectedLineup.id) ?? null
+              : null;
+          const selectedBuffOptionIndexes = selectedLineupSelection
+              ? Array.from(selectedLineupSelection.entries())
+                  .sort((left, right) => left[0] - right[0])
+                  .map(([, optionIndex]) => optionIndex)
+                  .filter((optionIndex) => Number.isInteger(optionIndex) && optionIndex >= 0)
+              : [];
           const serializedLineupState = {};
           const serializedPassiveSelection = {};
           state.lineupState.forEach((lineup, lineupId) => {
@@ -29836,6 +29845,7 @@ __modules['./screens/lineup/view/render.ts'] = (exports, module, __require) => {
               }
           }
           patchPlayerProfile({
+              lineupActiveBuffOptionIndexes: selectedBuffOptionIndexes,
               lineupDeck: selected.unitIds,
               lineupStateById: serializedLineupState,
               lineupPassiveSelectionById: serializedPassiveSelection,
@@ -38537,12 +38547,14 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   const normalizeElementKey = __dep20.normalizeElementKey;
   const __dep21 = __require('./utils/unique-global.ts');
   const isUniqueGlobalSummonBlocked = __dep21.isUniqueGlobalSummonBlocked;
-  const __dep22 = __require('./leader-uyen.ts');
-  const clearQueuedUyenUlt = __dep22.clearQueuedUyenUlt;
-  const hasQueuedUyenUlt = __dep22.hasQueuedUyenUlt;
-  const isAnyLeaderUltReady = __dep22.isAnyLeaderUltReady;
-  const isUyenLeader = __dep22.isUyenLeader;
-  const grantUyenSummonRage = __dep22.grantUyenSummonRage;
+  const __dep22 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep22.loadPlayerProfile;
+  const __dep23 = __require('./leader-uyen.ts');
+  const clearQueuedUyenUlt = __dep23.clearQueuedUyenUlt;
+  const hasQueuedUyenUlt = __dep23.hasQueuedUyenUlt;
+  const isAnyLeaderUltReady = __dep23.isAnyLeaderUltReady;
+  const isUyenLeader = __dep23.isUyenLeader;
+  const grantUyenSummonRage = __dep23.grantUyenSummonRage;
   const toActiveUnitKey = (side, slot) => `${side}:${slot}`;
   const createActiveUnitIndex = (Game) => {
       const index = new Map();
@@ -38569,6 +38581,70 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       if (side === 'ENEMY')
           return 'enemy';
       return side;
+  };
+  const getActiveLineupBuffIndexes = () => {
+      const raw = loadPlayerProfile().lineupActiveBuffOptionIndexes;
+      if (!Array.isArray(raw) || raw.length <= 0)
+          return [];
+      return raw
+          .filter((value) => Number.isInteger(value) && value >= 0)
+          .slice(0, 6);
+  };
+  const applySelectedLineupBuffs = (unit) => {
+      const selectedBuffs = getActiveLineupBuffIndexes();
+      if (selectedBuffs.length <= 0)
+          return;
+      let hpPct = 0;
+      let atkPct = 0;
+      let wilPct = 0;
+      let armPct = 0;
+      let resPct = 0;
+      for (const buffIndex of selectedBuffs) {
+          if (buffIndex === 0)
+              atkPct += 0.12;
+          else if (buffIndex === 1)
+              wilPct += 0.1;
+          else if (buffIndex === 2)
+              atkPct += 0.08;
+          else if (buffIndex === 3)
+              armPct += 0.08;
+          else if (buffIndex === 4)
+              hpPct += 0.08;
+          else if (buffIndex === 5)
+              atkPct += 0.02;
+          else if (buffIndex === 6)
+              resPct += 0.1;
+          else if (buffIndex === 7)
+              atkPct += 0.05;
+          else if (buffIndex === 8)
+              atkPct += 0.05;
+          else if (buffIndex === 9)
+              resPct += 0.08;
+          else if (buffIndex === 10)
+              hpPct += 0.1;
+          else if (buffIndex === 11)
+              atkPct += 0.03;
+          else if (buffIndex === 12)
+              atkPct += 0.03;
+          else if (buffIndex === 13)
+              resPct += 0.02;
+          else if (buffIndex === 14)
+              atkPct += 0.01;
+      }
+      const applyStatPct = (key, pct) => {
+          if (pct <= 0)
+              return;
+          const value = Number(unit[key] ?? 0);
+          if (!Number.isFinite(value) || value <= 0)
+              return;
+          unit[key] = Math.max(1, value * (1 + pct));
+      };
+      applyStatPct('hpMax', hpPct);
+      applyStatPct('hp', hpPct);
+      applyStatPct('atk', atkPct);
+      applyStatPct('wil', wilPct);
+      applyStatPct('arm', armPct);
+      applyStatPct('res', resPct);
   };
   const asSequentialTurn = (turn) => {
       if (!turn)
@@ -38813,6 +38889,9 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       initializeFury(obj, p.unitId, initialFury, CFG);
       if (fromDeck) {
           setFury(obj, obj.furyMax);
+          if (sideLower === 'ally') {
+              applySelectedLineupBuffs(obj);
+          }
       }
       prepareUnitForPassives(obj);
       Game.tokens.push(obj);
@@ -41590,6 +41669,7 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
       }
       const resetProfile = {
           lineupDeck: [],
+          lineupActiveBuffOptionIndexes: [],
           lineupStateById: {},
           cultivationByUnit: normalizedCultivationByUnit,
           sectName: '',

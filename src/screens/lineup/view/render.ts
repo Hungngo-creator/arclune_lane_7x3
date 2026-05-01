@@ -877,6 +877,15 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   function persistLineupSelection(): void {
     const selectedLineup = getSelectedLineup();
     const selected = serializeSelectedLineup(selectedLineup);
+    const selectedLineupSelection = selectedLineup
+      ? passiveSelectionByLineup.get(selectedLineup.id) ?? null
+      : null;
+    const selectedBuffOptionIndexes = selectedLineupSelection
+      ? Array.from(selectedLineupSelection.entries())
+          .sort((left, right) => left[0] - right[0])
+          .map(([, optionIndex]) => optionIndex)
+          .filter((optionIndex): optionIndex is number => Number.isInteger(optionIndex) && optionIndex >= 0)
+      : [];
     const serializedLineupState: Record<string, SerializedLineupState> = {};
     const serializedPassiveSelection: Record<string, Record<string, number>> = {};
     state.lineupState.forEach((lineup, lineupId) => {
@@ -900,6 +909,7 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
       }
     }
     patchPlayerProfile({
+      lineupActiveBuffOptionIndexes: selectedBuffOptionIndexes,
       lineupDeck: selected.unitIds,
       lineupStateById: serializedLineupState,
       lineupPassiveSelectionById: serializedPassiveSelection,

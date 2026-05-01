@@ -1603,6 +1603,7 @@ Gia tốc khóa kỹ năng: nếu mục tiêu đã có ≥5 dấu trước khi n
 Ultimate – Hư Không Tam Hồi: thực thi liên tiếp 3 lần đánh thường.
 
 2) Ur'zaloth - Kẻ Uốn Cong Thực Tại (现实扭曲者 - Xiàn Shí Niǔ Qǔ Zhě)
+Prime, boss
 
 Nguồn gốc: Thực thể từ Thứ Nguyên Hỗn Loạn
 Lore:
@@ -1621,7 +1622,7 @@ Ultimate – Tái Viết Hiện Thực:
 - Vô Chỉ Định: bất kể là đồng minh hay kẻ thù thì mỗi đơn vị đều không thể chỉ định mục tiêu bằng đòn tấn công aoe có thiết lập tấn công ngẫu nhiên mà không phải thiết lập tấn công aoe có vị trí cố định.
 - Phong Hồi Phục: bất kể là đồng minh hay kẻ thù thì mỗi đơn vị đứng trên sân đều không thể hồi hp dưới mọi hình thức ( hp regen, kĩ năng, đánh thường, nội tại và ultimate đều không được).
 - Giới Hạn Tổn Thương 3%: Không thể gây sát thương lên mục tiêu vượt quá 3% max hp của mục tiêu, quy tắc này áp dụng toàn sân bất kể kẻ thù hay đồng minh.
-Ghi chú: các quy tắc trên không phải buff/debuff, không thể miễn dịch hay tiến hoá để né, và có độ ưu tiên cao nhất.
+Ghi chú: các quy tắc trên không phải buff/debuff, không thể miễn dịch hay tiến hoá để né, và có độ ưu tiên cao nhất trừ axiom.
 Ur'zaloth — bộ kỹ năng:
 
 Kĩ năng 1 — Bẻ Cong Trục Không

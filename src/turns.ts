@@ -34,6 +34,7 @@ import { evaluateGambitLogic } from './ai.ts';
 import { nextRngValue } from './utils/rng.ts';
 import { normalizeClassName, normalizeElementKey } from './utils/domain-normalization.ts';
 import { isUniqueGlobalSummonBlocked } from './utils/unique-global.ts';
+import { loadPlayerProfile } from './utils/player-profile.ts';
 import {
   clearQueuedUyenUlt,
   hasQueuedUyenUlt,
@@ -78,6 +79,53 @@ const toLowerSide = (side: TurnOrderSide): Side => {
   if (side === 'ALLY') return 'ally';
   if (side === 'ENEMY') return 'enemy';
   return side;
+};
+
+const getActiveLineupBuffIndexes = (): ReadonlyArray<number> => {
+  const raw = loadPlayerProfile().lineupActiveBuffOptionIndexes;
+  if (!Array.isArray(raw) || raw.length <= 0) return [];
+  return raw
+    .filter((value): value is number => Number.isInteger(value) && value >= 0)
+    .slice(0, 6);
+};
+
+const applySelectedLineupBuffs = (unit: UnitToken): void => {
+  const selectedBuffs = getActiveLineupBuffIndexes();
+  if (selectedBuffs.length <= 0) return;
+  let hpPct = 0;
+  let atkPct = 0;
+  let wilPct = 0;
+  let armPct = 0;
+  let resPct = 0;
+  for (const buffIndex of selectedBuffs){
+    if (buffIndex === 0) atkPct += 0.12;
+    else if (buffIndex === 1) wilPct += 0.1;
+    else if (buffIndex === 2) atkPct += 0.08;
+    else if (buffIndex === 3) armPct += 0.08;
+    else if (buffIndex === 4) hpPct += 0.08;
+    else if (buffIndex === 5) atkPct += 0.02;
+    else if (buffIndex === 6) resPct += 0.1;
+    else if (buffIndex === 7) atkPct += 0.05;
+    else if (buffIndex === 8) atkPct += 0.05;
+    else if (buffIndex === 9) resPct += 0.08;
+    else if (buffIndex === 10) hpPct += 0.1;
+    else if (buffIndex === 11) atkPct += 0.03;
+    else if (buffIndex === 12) atkPct += 0.03;
+    else if (buffIndex === 13) resPct += 0.02;
+    else if (buffIndex === 14) atkPct += 0.01;
+  }
+  const applyStatPct = (key: 'hpMax' | 'hp' | 'atk' | 'wil' | 'arm' | 'res', pct: number): void => {
+    if (pct <= 0) return;
+    const value = Number(unit[key] ?? 0);
+    if (!Number.isFinite(value) || value <= 0) return;
+    unit[key] = Math.max(1, value * (1 + pct)) as UnitToken[typeof key];
+  };
+  applyStatPct('hpMax', hpPct);
+  applyStatPct('hp', hpPct);
+  applyStatPct('atk', atkPct);
+  applyStatPct('wil', wilPct);
+  applyStatPct('arm', armPct);
+  applyStatPct('res', resPct);
 };
 
 const asSequentialTurn = (
@@ -367,6 +415,9 @@ export function spawnQueuedIfDue(
   initializeFury(obj, p.unitId, initialFury, CFG);
   if (fromDeck){
     setFury(obj, obj.furyMax);
+    if (sideLower === 'ally'){
+      applySelectedLineupBuffs(obj);
+    }
   }
   prepareUnitForPassives(obj);
   Game.tokens.push(obj);

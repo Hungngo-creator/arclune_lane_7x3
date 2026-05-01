@@ -1,5 +1,6 @@
 export interface SavedPlayerProfile {
   lineupDeck?: string[];
+  lineupActiveBuffOptionIndexes?: number[];
   lineupStateById?: Record<string, {
     leaderId?: string | null;
     cells?: Array<{
@@ -104,6 +105,7 @@ export function resetPlayerProfileData(): SavedPlayerProfile {
 
   const resetProfile: SavedPlayerProfile = {
     lineupDeck: [],
+    lineupActiveBuffOptionIndexes: [],
     lineupStateById: {},
     cultivationByUnit: normalizedCultivationByUnit,
     sectName: '',

@@ -17,8 +17,8 @@ Nhất Giai, Khai Nguyên:
 Nhị Giai, Trúc Cơ:
 
 #D, công pháp:
+là thứ bắt buộc phải có để nhân vật học nhằm tăng tu vi, khi 1 nhân vật không học công pháp thì không thể nâng tu vi được dù có dùng đan dược hoặc tăng tu vi qua Nguyên Tinh (VNT/HNT/Trung Phẩm nguyên tinh/ThNT/Thần Tinh) Công pháp là cách để nhân vật hấp thu khí aether, như dạ dày vậy, ăn đồ ăn không co dạ dày thì làm sao hấp thu?
 
-
-- Thánh Nhân, Thánh Hoàng, Thánh tông
+- Thánh Nhân, Thánh Hoàng, Thánh Tôn.
 1: Triều Nguyệt Vô Tâm Kinh
 Cửu Giai thượng phẩm công pháp, dù vậy Thánh Nhân nhất trọng đã có thể học, 
