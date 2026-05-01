@@ -15,3 +15,10 @@ Nhất Giai, Khai Nguyên:
 - 
 
 Nhị Giai, Trúc Cơ:
+
+#D, công pháp:
+
+
+- Thánh Nhân, Thánh Hoàng, Thánh tông
+1: Triều Nguyệt Vô Tâm Kinh
+Cửu Giai thượng phẩm công pháp, dù vậy Thánh Nhân nhất trọng đã có thể học, 
