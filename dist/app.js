@@ -41594,84 +41594,89 @@ __modules['./utils/module-resolution.ts'] = (exports, module, __require) => {
 };
 __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
   const STORAGE_KEY = 'arclune.playerProfile.v1';
+  const EMPTY_PROFILE = {};
   const isObject = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value));
+  const canUseLocalStorage = () => (typeof window !== 'undefined' && !!window.localStorage);
+  const readStoredRaw = () => {
+      if (!canUseLocalStorage())
+          return null;
+      return window.localStorage.getItem(STORAGE_KEY);
+  };
+  const writeStoredRaw = (raw) => {
+      if (!canUseLocalStorage())
+          return;
+      window.localStorage.setItem(STORAGE_KEY, raw);
+  };
+  const parseStoredProfile = (raw) => {
+      if (!raw)
+          return EMPTY_PROFILE;
+      const parsed = JSON.parse(raw);
+      return isObject(parsed) ? parsed : EMPTY_PROFILE;
+  };
+  const mergeRecord = (current, patch) => {
+      if (!current && !patch)
+          return undefined;
+      if (!current)
+          return { ...patch };
+      if (!patch)
+          return current;
+      return { ...current, ...patch };
+  };
+  const buildMergedProfile = (current, patch) => ({
+      ...current,
+      ...patch,
+      cultivationByUnit: mergeRecord(current.cultivationByUnit, patch.cultivationByUnit),
+      tpByUnit: mergeRecord(current.tpByUnit, patch.tpByUnit),
+      tpAllocByUnit: mergeRecord(current.tpAllocByUnit, patch.tpAllocByUnit),
+      equipmentByUnit: mergeRecord(current.equipmentByUnit, patch.equipmentByUnit),
+      tacticalAiByUnit: mergeRecord(current.tacticalAiByUnit, patch.tacticalAiByUnit),
+      collectionUi: mergeRecord(current.collectionUi, patch.collectionUi),
+      sectCultivation: mergeRecord(current.sectCultivation, patch.sectCultivation),
+  });
+  const normalizeCultivationByUnit = (cultivationByUnit) => {
+      const normalized = {};
+      if (!cultivationByUnit)
+          return normalized;
+      for (const unitId of Object.keys(cultivationByUnit)) {
+          if (!unitId || !unitId.trim())
+              continue;
+          normalized[unitId] = { realm: 1, subRealm: 0 };
+      }
+      return normalized;
+  };
   function loadPlayerProfile() {
-      if (typeof window === 'undefined' || !window.localStorage)
-          return {};
       try {
-          const raw = window.localStorage.getItem(STORAGE_KEY);
-          if (!raw)
-              return {};
-          const parsed = JSON.parse(raw);
-          if (!isObject(parsed))
-              return {};
-          return parsed;
+          return parseStoredProfile(readStoredRaw());
       }
       catch (error) {
           console.warn('[profile] Không thể đọc player profile.', error);
-          return {};
+          return EMPTY_PROFILE;
       }
   }
   function savePlayerProfile(next) {
-      if (typeof window === 'undefined' || !window.localStorage)
-          return;
       try {
-          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+          const nextRaw = JSON.stringify(next);
+          const currentRaw = readStoredRaw();
+          if (currentRaw === nextRaw)
+              return;
+          writeStoredRaw(nextRaw);
       }
       catch (error) {
           console.warn('[profile] Không thể lưu player profile.', error);
       }
   }
   function patchPlayerProfile(patch) {
-      const current = loadPlayerProfile();
-      const merged = {
-          ...current,
-          ...patch,
-          cultivationByUnit: {
-              ...(current.cultivationByUnit ?? {}),
-              ...(patch.cultivationByUnit ?? {}),
-          },
-          tpByUnit: {
-              ...(current.tpByUnit ?? {}),
-              ...(patch.tpByUnit ?? {}),
-          },
-          tpAllocByUnit: {
-              ...(current.tpAllocByUnit ?? {}),
-              ...(patch.tpAllocByUnit ?? {}),
-          },
-          equipmentByUnit: {
-              ...(current.equipmentByUnit ?? {}),
-              ...(patch.equipmentByUnit ?? {}),
-          },
-          tacticalAiByUnit: {
-              ...(current.tacticalAiByUnit ?? {}),
-              ...(patch.tacticalAiByUnit ?? {}),
-          },
-          collectionUi: {
-              ...(current.collectionUi ?? {}),
-              ...(patch.collectionUi ?? {}),
-          },
-          sectCultivation: {
-              ...(current.sectCultivation ?? {}),
-              ...(patch.sectCultivation ?? {}),
-          },
-      };
+      const merged = buildMergedProfile(loadPlayerProfile(), patch);
       savePlayerProfile(merged);
       return merged;
   }
   function resetPlayerProfileData() {
       const current = loadPlayerProfile();
-      const normalizedCultivationByUnit = {};
-      for (const unitId of Object.keys(current.cultivationByUnit ?? {})) {
-          if (!unitId || !unitId.trim())
-              continue;
-          normalizedCultivationByUnit[unitId] = { realm: 1, subRealm: 0 };
-      }
       const resetProfile = {
           lineupDeck: [],
           lineupActiveBuffOptionIndexes: [],
           lineupStateById: {},
-          cultivationByUnit: normalizedCultivationByUnit,
+          cultivationByUnit: normalizeCultivationByUnit(current.cultivationByUnit),
           sectName: '',
           tpByUnit: {},
           tpAllocByUnit: {},
