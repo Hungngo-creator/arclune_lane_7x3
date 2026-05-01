@@ -29,8 +29,11 @@ export interface SavedPlayerProfile {
 }
 
 const STORAGE_KEY = 'arclune.playerProfile.v1';
-
 const EMPTY_PROFILE: SavedPlayerProfile = {};
+const MAX_LINEUP_BUFF_SLOTS = 6;
+
+let cachedRawProfile: string | null | undefined;
+let cachedParsedProfile: SavedPlayerProfile | null = null;y
 
 const isObject = (value: unknown): value is Record<string, unknown> => (
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -39,6 +42,16 @@ const isObject = (value: unknown): value is Record<string, unknown> => (
 const canUseLocalStorage = (): boolean => (
   typeof window !== 'undefined' && !!window.localStorage
 );
+
+const isFiniteNumber = (value: unknown): value is number => (
+  typeof value === 'number' && Number.isFinite(value)
+);
+
+const toNonEmptyString = (value: unknown): string | null => {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
 
 const readStoredRaw = (): string | null => {
   if (!canUseLocalStorage()) return null;
@@ -50,10 +63,56 @@ const writeStoredRaw = (raw: string): void => {
   window.localStorage.setItem(STORAGE_KEY, raw);
 };
 
+const sanitizeLineupBuffIndexes = (value: unknown): number[] | undefined => {
+  if (!Array.isArray(value)) return undefined;
+  const normalized: number[] = [];
+  for (let i = 0; i < value.length && normalized.length < MAX_LINEUP_BUFF_SLOTS; i += 1) {
+    const entry = value[i];
+    if (!Number.isInteger(entry)) continue;
+    const buffIndex = Number(entry);
+    if (buffIndex < 0) continue;
+    normalized.push(buffIndex);
+  }
+  return normalized;
+};
+
+const sanitizeCultivationByUnit = (value: unknown): SavedPlayerProfile['cultivationByUnit'] => {
+  if (!isObject(value)) return undefined;
+  const normalized: NonNullable<SavedPlayerProfile['cultivationByUnit']> = {};
+  for (const [unitId, entry] of Object.entries(value)) {
+    const validId = toNonEmptyString(unitId);
+    if (!validId || !isObject(entry)) continue;
+    const realm = isFiniteNumber(entry.realm) ? Math.max(1, Math.floor(entry.realm)) : 1;
+    const subRealm = isFiniteNumber(entry.subRealm) ? Math.max(0, Math.floor(entry.subRealm)) : 0;
+    normalized[validId] = { realm, subRealm };
+  }
+  return Object.keys(normalized).length > 0 ? normalized : undefined;
+};
+
+const sanitizeSavedProfile = (rawProfile: unknown): SavedPlayerProfile => {
+  if (!isObject(rawProfile)) return EMPTY_PROFILE;
+
+  const normalized: SavedPlayerProfile = { ...rawProfile } as SavedPlayerProfile;
+  normalized.lineupDeck = Array.isArray(rawProfile.lineupDeck)
+    ? rawProfile.lineupDeck.filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+    : undefined;
+  normalized.lineupActiveBuffOptionIndexes = sanitizeLineupBuffIndexes(rawProfile.lineupActiveBuffOptionIndexes);
+  normalized.cultivationByUnit = sanitizeCultivationByUnit(rawProfile.cultivationByUnit);
+
+  const sectName = toNonEmptyString(rawProfile.sectName);
+  normalized.sectName = sectName ?? '';
+
+  return normalized;
+};
+
 const parseStoredProfile = (raw: string | null): SavedPlayerProfile => {
   if (!raw) return EMPTY_PROFILE;
-  const parsed = JSON.parse(raw) as unknown;
-  return isObject(parsed) ? (parsed as SavedPlayerProfile) : EMPTY_PROFILE;
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    return sanitizeSavedProfile(parsed);
+  } catch {
+    return EMPTY_PROFILE;
+  }
 };
 
 const mergeRecord = <T extends Record<string, unknown>>(
@@ -96,27 +155,27 @@ const normalizeCultivationByUnit = (
 };
 
 export function loadPlayerProfile(): SavedPlayerProfile {
-  try {
-    return parseStoredProfile(readStoredRaw());
-  } catch (error) {
-    console.warn('[profile] Không thể đọc player profile.', error);
-    return EMPTY_PROFILE;
-  }
+  const raw = readStoredRaw();
+  if (raw === cachedRawProfile && cachedParsedProfile) return cachedParsedProfile;
+
+  const parsed = parseStoredProfile(raw);
+  cachedRawProfile = raw;
+  cachedParsedProfile = parsed;
+  return parsed;
 }
 
 export function savePlayerProfile(next: SavedPlayerProfile): void {
-  try {
-    const nextRaw = JSON.stringify(next);
-    const currentRaw = readStoredRaw();
-    if (currentRaw === nextRaw) return;
-    writeStoredRaw(nextRaw);
-  } catch (error) {
-    console.warn('[profile] Không thể lưu player profile.', error);
-  }
+  const normalized = sanitizeSavedProfile(next);
+  const nextRaw = JSON.stringify(normalized);
+  const currentRaw = readStoredRaw();
+  if (currentRaw === nextRaw) return;
+  writeStoredRaw(nextRaw);
+  cachedRawProfile = nextRaw;
+  cachedParsedProfile = normalized;
 }
 
 export function patchPlayerProfile(patch: SavedPlayerProfile): SavedPlayerProfile {
-  const merged = buildMergedProfile(loadPlayerProfile(), patch);
+  const merged = buildMergedProfile(loadPlayerProfile(), sanitizeSavedProfile(patch));
   savePlayerProfile(merged);
   return merged;
 }

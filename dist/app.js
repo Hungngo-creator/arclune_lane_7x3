@@ -38582,69 +38582,83 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           return 'enemy';
       return side;
   };
+  const MAX_LINEUP_BUFF_SELECTION = 6;
+  const EMPTY_LINEUP_BUFFS = Object.freeze([]);
+  const BASE_LINEUP_BUFF_STATS = Object.freeze({ hpPct: 0, atkPct: 0, wilPct: 0, armPct: 0, resPct: 0 });
+  const LINEUP_BUFF_BY_INDEX = Object.freeze({
+      0: { atkPct: 0.12 },
+      1: { wilPct: 0.10 },
+      2: { atkPct: 0.08 },
+      3: { armPct: 0.08 },
+      4: { hpPct: 0.08 },
+      5: { atkPct: 0.02 },
+      6: { resPct: 0.10 },
+      7: { atkPct: 0.05 },
+      8: { atkPct: 0.05 },
+      9: { resPct: 0.08 },
+      10: { hpPct: 0.10 },
+      11: { atkPct: 0.03 },
+      12: { atkPct: 0.03 },
+      13: { resPct: 0.02 },
+      14: { atkPct: 0.01 },
+  });
   const getActiveLineupBuffIndexes = () => {
       const raw = loadPlayerProfile().lineupActiveBuffOptionIndexes;
       if (!Array.isArray(raw) || raw.length <= 0)
-          return [];
-      return raw
-          .filter((value) => Number.isInteger(value) && value >= 0)
-          .slice(0, 6);
+          return EMPTY_LINEUP_BUFFS;
+      const normalized = [];
+      for (let i = 0; i < raw.length && normalized.length < MAX_LINEUP_BUFF_SELECTION; i += 1) {
+          const entry = raw[i];
+          if (!Number.isInteger(entry))
+              continue;
+          const index = Number(entry);
+          if (index < 0 || !(index in LINEUP_BUFF_BY_INDEX))
+              continue;
+          normalized.push(index);
+      }
+      return normalized.length > 0 ? normalized : EMPTY_LINEUP_BUFFS;
   };
-  const applySelectedLineupBuffs = (unit) => {
-      const selectedBuffs = getActiveLineupBuffIndexes();
+  const resolveLineupBuffStats = (selectedBuffs) => {
       if (selectedBuffs.length <= 0)
-          return;
+          return BASE_LINEUP_BUFF_STATS;
       let hpPct = 0;
       let atkPct = 0;
       let wilPct = 0;
       let armPct = 0;
       let resPct = 0;
-      for (const buffIndex of selectedBuffs) {
-          if (buffIndex === 0)
-              atkPct += 0.12;
-          else if (buffIndex === 1)
-              wilPct += 0.1;
-          else if (buffIndex === 2)
-              atkPct += 0.08;
-          else if (buffIndex === 3)
-              armPct += 0.08;
-          else if (buffIndex === 4)
-              hpPct += 0.08;
-          else if (buffIndex === 5)
-              atkPct += 0.02;
-          else if (buffIndex === 6)
-              resPct += 0.1;
-          else if (buffIndex === 7)
-              atkPct += 0.05;
-          else if (buffIndex === 8)
-              atkPct += 0.05;
-          else if (buffIndex === 9)
-              resPct += 0.08;
-          else if (buffIndex === 10)
-              hpPct += 0.1;
-          else if (buffIndex === 11)
-              atkPct += 0.03;
-          else if (buffIndex === 12)
-              atkPct += 0.03;
-          else if (buffIndex === 13)
-              resPct += 0.02;
-          else if (buffIndex === 14)
-              atkPct += 0.01;
+      for (let i = 0; i < selectedBuffs.length; i += 1) {
+          const buff = LINEUP_BUFF_BY_INDEX[selectedBuffs[i]];
+          if (!buff)
+              continue;
+          hpPct += buff.hpPct ?? 0;
+          atkPct += buff.atkPct ?? 0;
+          wilPct += buff.wilPct ?? 0;
+          armPct += buff.armPct ?? 0;
+          resPct += buff.resPct ?? 0;
       }
-      const applyStatPct = (key, pct) => {
-          if (pct <= 0)
-              return;
-          const value = Number(unit[key] ?? 0);
-          if (!Number.isFinite(value) || value <= 0)
-              return;
-          unit[key] = Math.max(1, value * (1 + pct));
-      };
-      applyStatPct('hpMax', hpPct);
-      applyStatPct('hp', hpPct);
-      applyStatPct('atk', atkPct);
-      applyStatPct('wil', wilPct);
-      applyStatPct('arm', armPct);
-      applyStatPct('res', resPct);
+      return { hpPct, atkPct, wilPct, armPct, resPct };
+  };
+  const applyStatPct = (unit, key, pct) => {
+      if (pct <= 0)
+          return;
+      const value = Number(unit[key] ?? 0);
+      if (!Number.isFinite(value) || value <= 0)
+          return;
+      unit[key] = Math.max(1, value * (1 + pct));
+  };
+  const applySelectedLineupBuffs = (unit) => {
+      const selectedBuffs = getActiveLineupBuffIndexes();
+      if (selectedBuffs.length <= 0)
+          return;
+      const stats = resolveLineupBuffStats(selectedBuffs);
+      if (stats === BASE_LINEUP_BUFF_STATS)
+          return;
+      applyStatPct(unit, 'hpMax', stats.hpPct);
+      applyStatPct(unit, 'hp', stats.hpPct);
+      applyStatPct(unit, 'atk', stats.atkPct);
+      applyStatPct(unit, 'wil', stats.wilPct);
+      applyStatPct(unit, 'arm', stats.armPct);
+      applyStatPct(unit, 'res', stats.resPct);
   };
   const asSequentialTurn = (turn) => {
       if (!turn)
@@ -41595,8 +41609,19 @@ __modules['./utils/module-resolution.ts'] = (exports, module, __require) => {
 __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
   const STORAGE_KEY = 'arclune.playerProfile.v1';
   const EMPTY_PROFILE = {};
+  const MAX_LINEUP_BUFF_SLOTS = 6;
+  let cachedRawProfile;
+  let cachedParsedProfile = null;
+  y;
   const isObject = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value));
   const canUseLocalStorage = () => (typeof window !== 'undefined' && !!window.localStorage);
+  const isFiniteNumber = (value) => (typeof value === 'number' && Number.isFinite(value));
+  const toNonEmptyString = (value) => {
+      if (typeof value !== 'string')
+          return null;
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? trimmed : null;
+  };
   const readStoredRaw = () => {
       if (!canUseLocalStorage())
           return null;
@@ -41607,11 +41632,58 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
           return;
       window.localStorage.setItem(STORAGE_KEY, raw);
   };
+  const sanitizeLineupBuffIndexes = (value) => {
+      if (!Array.isArray(value))
+          return undefined;
+      const normalized = [];
+      for (let i = 0; i < value.length && normalized.length < MAX_LINEUP_BUFF_SLOTS; i += 1) {
+          const entry = value[i];
+          if (!Number.isInteger(entry))
+              continue;
+          const buffIndex = Number(entry);
+          if (buffIndex < 0)
+              continue;
+          normalized.push(buffIndex);
+      }
+      return normalized;
+  };
+  const sanitizeCultivationByUnit = (value) => {
+      if (!isObject(value))
+          return undefined;
+      const normalized = {};
+      for (const [unitId, entry] of Object.entries(value)) {
+          const validId = toNonEmptyString(unitId);
+          if (!validId || !isObject(entry))
+              continue;
+          const realm = isFiniteNumber(entry.realm) ? Math.max(1, Math.floor(entry.realm)) : 1;
+          const subRealm = isFiniteNumber(entry.subRealm) ? Math.max(0, Math.floor(entry.subRealm)) : 0;
+          normalized[validId] = { realm, subRealm };
+      }
+      return Object.keys(normalized).length > 0 ? normalized : undefined;
+  };
+  const sanitizeSavedProfile = (rawProfile) => {
+      if (!isObject(rawProfile))
+          return EMPTY_PROFILE;
+      const normalized = { ...rawProfile };
+      normalized.lineupDeck = Array.isArray(rawProfile.lineupDeck)
+          ? rawProfile.lineupDeck.filter((value) => typeof value === 'string' && value.trim().length > 0)
+          : undefined;
+      normalized.lineupActiveBuffOptionIndexes = sanitizeLineupBuffIndexes(rawProfile.lineupActiveBuffOptionIndexes);
+      normalized.cultivationByUnit = sanitizeCultivationByUnit(rawProfile.cultivationByUnit);
+      const sectName = toNonEmptyString(rawProfile.sectName);
+      normalized.sectName = sectName ?? '';
+      return normalized;
+  };
   const parseStoredProfile = (raw) => {
       if (!raw)
           return EMPTY_PROFILE;
-      const parsed = JSON.parse(raw);
-      return isObject(parsed) ? parsed : EMPTY_PROFILE;
+      try {
+          const parsed = JSON.parse(raw);
+          return sanitizeSavedProfile(parsed);
+      }
+      catch {
+          return EMPTY_PROFILE;
+      }
   };
   const mergeRecord = (current, patch) => {
       if (!current && !patch)
@@ -41645,28 +41717,26 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
       return normalized;
   };
   function loadPlayerProfile() {
-      try {
-          return parseStoredProfile(readStoredRaw());
-      }
-      catch (error) {
-          console.warn('[profile] Không thể đọc player profile.', error);
-          return EMPTY_PROFILE;
-      }
+      const raw = readStoredRaw();
+      if (raw === cachedRawProfile && cachedParsedProfile)
+          return cachedParsedProfile;
+      const parsed = parseStoredProfile(raw);
+      cachedRawProfile = raw;
+      cachedParsedProfile = parsed;
+      return parsed;
   }
   function savePlayerProfile(next) {
-      try {
-          const nextRaw = JSON.stringify(next);
-          const currentRaw = readStoredRaw();
-          if (currentRaw === nextRaw)
-              return;
-          writeStoredRaw(nextRaw);
-      }
-      catch (error) {
-          console.warn('[profile] Không thể lưu player profile.', error);
-      }
+      const normalized = sanitizeSavedProfile(next);
+      const nextRaw = JSON.stringify(normalized);
+      const currentRaw = readStoredRaw();
+      if (currentRaw === nextRaw)
+          return;
+      writeStoredRaw(nextRaw);
+      cachedRawProfile = nextRaw;
+      cachedParsedProfile = normalized;
   }
   function patchPlayerProfile(patch) {
-      const merged = buildMergedProfile(loadPlayerProfile(), patch);
+      const merged = buildMergedProfile(loadPlayerProfile(), sanitizeSavedProfile(patch));
       savePlayerProfile(merged);
       return merged;
   }

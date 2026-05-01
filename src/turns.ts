@@ -81,51 +81,91 @@ const toLowerSide = (side: TurnOrderSide): Side => {
   return side;
 };
 
+type LineupBuffStats = Readonly<{
+  hpPct: number;
+  atkPct: number;
+  wilPct: number;
+  armPct: number;
+  resPct: number;
+}>;
+
+const MAX_LINEUP_BUFF_SELECTION = 6;
+const EMPTY_LINEUP_BUFFS: ReadonlyArray<number> = Object.freeze([]);
+const BASE_LINEUP_BUFF_STATS: LineupBuffStats = Object.freeze({ hpPct: 0, atkPct: 0, wilPct: 0, armPct: 0, resPct: 0 });
+const LINEUP_BUFF_BY_INDEX: Readonly<Record<number, Partial<LineupBuffStats>>> = Object.freeze({
+  0: { atkPct: 0.12 },
+  1: { wilPct: 0.10 },
+  2: { atkPct: 0.08 },
+  3: { armPct: 0.08 },
+  4: { hpPct: 0.08 },
+  5: { atkPct: 0.02 },
+  6: { resPct: 0.10 },
+  7: { atkPct: 0.05 },
+  8: { atkPct: 0.05 },
+  9: { resPct: 0.08 },
+  10: { hpPct: 0.10 },
+  11: { atkPct: 0.03 },
+  12: { atkPct: 0.03 },
+  13: { resPct: 0.02 },
+  14: { atkPct: 0.01 },
+});
+
 const getActiveLineupBuffIndexes = (): ReadonlyArray<number> => {
   const raw = loadPlayerProfile().lineupActiveBuffOptionIndexes;
-  if (!Array.isArray(raw) || raw.length <= 0) return [];
-  return raw
-    .filter((value): value is number => Number.isInteger(value) && value >= 0)
-    .slice(0, 6);
+  if (!Array.isArray(raw) || raw.length <= 0) return EMPTY_LINEUP_BUFFS;
+
+  const normalized: number[] = [];
+  for (let i = 0; i < raw.length && normalized.length < MAX_LINEUP_BUFF_SELECTION; i += 1) {
+    const entry = raw[i];
+    if (!Number.isInteger(entry)) continue;
+    const index = Number(entry);
+    if (index < 0 || !(index in LINEUP_BUFF_BY_INDEX)) continue;
+    normalized.push(index);
+  }
+  return normalized.length > 0 ? normalized : EMPTY_LINEUP_BUFFS;
 };
 
-const applySelectedLineupBuffs = (unit: UnitToken): void => {
-  const selectedBuffs = getActiveLineupBuffIndexes();
-  if (selectedBuffs.length <= 0) return;
+const resolveLineupBuffStats = (selectedBuffs: ReadonlyArray<number>): LineupBuffStats => {
+  if (selectedBuffs.length <= 0) return BASE_LINEUP_BUFF_STATS;
+
   let hpPct = 0;
   let atkPct = 0;
   let wilPct = 0;
   let armPct = 0;
   let resPct = 0;
-  for (const buffIndex of selectedBuffs){
-    if (buffIndex === 0) atkPct += 0.12;
-    else if (buffIndex === 1) wilPct += 0.1;
-    else if (buffIndex === 2) atkPct += 0.08;
-    else if (buffIndex === 3) armPct += 0.08;
-    else if (buffIndex === 4) hpPct += 0.08;
-    else if (buffIndex === 5) atkPct += 0.02;
-    else if (buffIndex === 6) resPct += 0.1;
-    else if (buffIndex === 7) atkPct += 0.05;
-    else if (buffIndex === 8) atkPct += 0.05;
-    else if (buffIndex === 9) resPct += 0.08;
-    else if (buffIndex === 10) hpPct += 0.1;
-    else if (buffIndex === 11) atkPct += 0.03;
-    else if (buffIndex === 12) atkPct += 0.03;
-    else if (buffIndex === 13) resPct += 0.02;
-    else if (buffIndex === 14) atkPct += 0.01;
-  }
-  const applyStatPct = (key: 'hpMax' | 'hp' | 'atk' | 'wil' | 'arm' | 'res', pct: number): void => {
-    if (pct <= 0) return;
-    const value = Number(unit[key] ?? 0);
-    if (!Number.isFinite(value) || value <= 0) return;
-    unit[key] = Math.max(1, value * (1 + pct)) as UnitToken[typeof key];
-  };
-  applyStatPct('hpMax', hpPct);
-  applyStatPct('hp', hpPct);
-  applyStatPct('atk', atkPct);
-  applyStatPct('wil', wilPct);
-  applyStatPct('arm', armPct);
-  applyStatPct('res', resPct);
+
+  for (let i = 0; i < selectedBuffs.length; i += 1) {
+    const buff = LINEUP_BUFF_BY_INDEX[selectedBuffs[i]];
+    if (!buff) continue;
+    hpPct += buff.hpPct ?? 0;
+    atkPct += buff.atkPct ?? 0;
+    wilPct += buff.wilPct ?? 0;
+    armPct += buff.armPct ?? 0;
+    resPct += buff.resPct ?? 0;
+}
+
+  return { hpPct, atkPct, wilPct, armPct, resPct };
+};
+
+const applyStatPct = (unit: UnitToken, key: 'hpMax' | 'hp' | 'atk' | 'wil' | 'arm' | 'res', pct: number): void => {
+  if (pct <= 0) return;
+  const value = Number(unit[key] ?? 0);
+  if (!Number.isFinite(value) || value <= 0) return;
+  unit[key] = Math.max(1, value * (1 + pct)) as UnitToken[typeof key];
+};
+
+const applySelectedLineupBuffs = (unit: UnitToken): void => {
+  const selectedBuffs = getActiveLineupBuffIndexes();
+  if (selectedBuffs.length <= 0) return;
+
+  const stats = resolveLineupBuffStats(selectedBuffs);
+  if (stats === BASE_LINEUP_BUFF_STATS) return;
+  applyStatPct(unit, 'hpMax', stats.hpPct);
+  applyStatPct(unit, 'hp', stats.hpPct);
+  applyStatPct(unit, 'atk', stats.atkPct);
+  applyStatPct(unit, 'wil', stats.wilPct);
+  applyStatPct(unit, 'arm', stats.armPct);
+  applyStatPct(unit, 'res', stats.resPct);
 };
 
 const asSequentialTurn = (
