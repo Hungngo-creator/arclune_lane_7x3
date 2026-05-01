@@ -38859,12 +38859,12 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               catch (_) { }
           }
       }
-      const actor = getActiveAt(Game, sideLower, slot, activeUnitIndex);
+      const actor = getActiveAt(Game, sideLower, slot, activeUnitIndex) ?? obj;
       if (actor && activeUnitIndex) {
           activeUnitIndex.set(toActiveUnitKey(sideLower, slot), actor);
       }
-      const isLeader = actor?.id === 'leaderA' || actor?.id === 'leaderB';
-      const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
+      const isLeader = actor.id === 'leaderA' || actor.id === 'leaderB';
+      const canAutoUlt = fromDeck && !isLeader && actor.alive && typeof performUlt === 'function';
       if (canAutoUlt && !Statuses.blocks(actor, 'ult')) {
           let ultOk = false;
           try {
@@ -38878,7 +38878,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               clearFreshSummon(actor);
           }
       }
-      return { actor: actor || null, spawned: true };
+      return { actor, spawned: true };
   }
   // giảm TTL minion sau khi phe đó hoàn tất lượt của mình
   /**

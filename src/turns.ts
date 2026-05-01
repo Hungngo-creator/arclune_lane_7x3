@@ -391,12 +391,12 @@ export function spawnQueuedIfDue(
       } catch (_) {}
     }
   }
-  const actor = getActiveAt(Game, sideLower, slot, activeUnitIndex);
+  const actor = getActiveAt(Game, sideLower, slot, activeUnitIndex) ?? obj;
   if (actor && activeUnitIndex) {
     activeUnitIndex.set(toActiveUnitKey(sideLower, slot), actor);
   }
-  const isLeader = actor?.id === 'leaderA' || actor?.id === 'leaderB';
-  const canAutoUlt = fromDeck && !isLeader && actor && actor.alive && typeof performUlt === 'function';
+  const isLeader = actor.id === 'leaderA' || actor.id === 'leaderB';
+  const canAutoUlt = fromDeck && !isLeader && actor.alive && typeof performUlt === 'function';
   if (canAutoUlt && !Statuses.blocks(actor, 'ult')){
     let ultOk = false;
     try {
@@ -409,7 +409,7 @@ export function spawnQueuedIfDue(
       clearFreshSummon(actor);
     }
   }
-  return { actor: actor || null, spawned: true };
+  return { actor, spawned: true };
 }
 
 interface TickMinionTtlOptions {
