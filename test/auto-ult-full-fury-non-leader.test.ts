@@ -30,5 +30,6 @@ describe('auto-ult full fury for non-leader summon', () => {
     expect(result.spawned).toBe(true);
     expect(result.actor?.id).toBe('mong_yem');
     expect(performUlt).toHaveBeenCalledTimes(1);
+    expect(result.actor?.fury).toBe(0);
   });
 });

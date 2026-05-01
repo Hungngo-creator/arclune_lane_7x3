@@ -38875,6 +38875,10 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               console.error('[spawnQueuedIfDue.performUlt]', err);
           }
           if (ultOk) {
+              if (!isUyenLeader(actor)) {
+                  const ultCost = resolveUltCost(actor, CFG);
+                  spendFury(actor, ultCost, CFG);
+              }
               clearFreshSummon(actor);
           }
       }
