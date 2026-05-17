@@ -41612,7 +41612,6 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
   const MAX_LINEUP_BUFF_SLOTS = 6;
   let cachedRawProfile;
   let cachedParsedProfile = null;
-  y;
   const isObject = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value));
   const canUseLocalStorage = () => (typeof window !== 'undefined' && !!window.localStorage);
   const isFiniteNumber = (value) => (typeof value === 'number' && Number.isFinite(value));

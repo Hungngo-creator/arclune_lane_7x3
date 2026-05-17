@@ -45,33 +45,17 @@ Lore: Phường rèn truyền xuống.
 
 Cụm cảnh giới: Trúc Cơ→Ngưng Đan
 
-Hệ: ảnh–phong · Quỹ tích: thận→bàng quang→đốc
-
-Ấn yêu cầu: Ảnh Ấn · Cost: lưng nhẹ · SE: chóng mặt
-
-Synergy: Kiếm Thiên
-
 Lore: Bộ pháp từ trộm miếu.
 
 04) Tiểu Chu Thiên Dẫn Khí — HG–hạ/trung
 
 Cụm cảnh giới: Khai Nguyên→Trúc Cơ
 
-Hệ: aether · Quỹ tích: nhâm↔đốc
-
-Ấn yêu cầu: Dẫn Ấn · Cost: bụng ấm · SE: ngứa mạch
-
-Synergy: Luyện đan nhập môn
-
 Lore: Bia đá rêu phủ.
 
 05) Thủy Tức Tĩnh Tâm — HG–hạ/trung
 
 Cụm cảnh giới: Khai Nguyên→Trúc Cơ
-
-Hệ: thủy–tịnh · Quỹ tích: phế→thận
-
-Ấn yêu cầu: Tịnh Ấn · Cost: gáy mát · SE: lạnh lòng tạm
 
 Synergy: Âm Quốc
 

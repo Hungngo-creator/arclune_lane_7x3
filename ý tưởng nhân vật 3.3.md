@@ -387,7 +387,7 @@ sau mỗi 2 turn tự dung nhập vào không gian, hồi hp = 20% max hp. ( nó
 Kỹ năng 1: Xáo trộn vị trí của 3 kẻ thù ngẫu nhiên trên sân 1 cách ngẫu nhiên không cố định (không target leader địch), trộn vĩnh viễn cho đến khi đối phương chết, về deck hoặc bị xáo trộn lần nữa bởi kỹ năng này hoặc 1 kỹ năng không gian khác. 25 aether. Quy Tắc.
 kỹ năng 2: tạo ra 'Hư Không Màn Che' ngay 3 ô giao giới giữa 2 bên sân, (ô 1/2/3 của mỗi phe có 3 ô trống, chỉ là vfx) bất kỳ đòn aoe nào gây sát thương lên đồng minh từ kẻ thù đều giảm 60% sát thương cuối, đổi lại aoe từ đồng minh tấn công lên kẻ thù + 60% sát thương cuối cùng gây ra. tác dụng trong 4 turn, 40 aether. CD 2 turn. quy tắc.
 kỹ năng 3: gây sát thương aoe lên 4 kẻ địch ngẫu nhiên = 1 đòn đánh thường/ mỗi kẻ địch, bỏ qua 80% res của chúng, tính là đánh thường, 20 aether.
-ultimate: cast 2 lần skill 3.
+ultimate: cast 2 lần skill 3 nhưng không trừ ae.
 
 34) Hoá Thân của Thời Không Chi Chủ - Thời Gian Chi Chủ, Prime.
 mô tả: 1 nửa ý niệm của Thời Không Chi Chủ giáng lâm thế gian.
@@ -595,9 +595,32 @@ skill 3: niệm chú, hắc ám ma lực sẽ quấn lấy mọi summoner phe k�
 
 ultimate: triệu hồi 1 vùng hắc ám dưới chân mục tiêu (vfx), tấn công mục tiêu gây sát thương = 280% wil/atk, đòn đánh này bỏ qua 20% res/arm của mục tiêu, nếu mục tiêu có khiên cũng khiến khiên của họ mất 20% trước mới gây sát thương.
 
-49) Niddhoggr (Hắc Long)
-nội tại: 
+49) Niddhoggr (Hắc Long), ssr, warrior.
+nội tại: khi kẻ thù nhận 3 đòn đánh thường của Hắc Long, chúng nhận sát thương chuẩn (bỏ qua res/arm) = 3% max hp của bản thân, Sau khi nhận sát thương từ nội tại này nhận 1 debuff giảm 50% hồi phục hp nhận được từ nguồn không phải của bản thân chúng, tức khi được đồng minh của chúng hồi hp thì lượng hồi nhận được bị giảm 50%, debuff tồn tại = 1 turn của Niddhoggr, nên nếu bị dính debuff mà Niddhoggr không hành động (tấn công, sài skill,..) thì debuff sẽ còn mãi trừ khi Niddhoggr rời sân (về deck, chết, cơ chế đặc biệt nào đó,..). Pháp Tắc. nhận 3 đòn đánh thường của hắn là điều kiện kích hoạt nội tại, không phải mark/debuff nên cũng không thể xoá, không thể bị quy tắc/pháp tắc/axiom ảnh hưởng và khi 3 đòn đánh thường đã đủ thì prime có thần tính vẫn bị mất hp vì nội tại của Niddhoggr. Đương nhiên debuff giảm hồi phục của Niddhoggr thần tính vẫn miễn nhiễm.
 
+đánh thường: phun long tức, gây sát thương aoe ngẫu nhiên 3 mục tiêu, mỗi kẻ nhận 100% wil và atk.
 
-50)
+skill 1: thực thi 2 lần đánh thường, tính là 2 lần đánh thường riêng lẻ trong cùng 1 turn đó, tốc độ animation x2 để tránh tốn thời gian, 20 ae.
 
+skill 2: tiếp cận mục tiêu, cắn mục tiêu gây sát thương = 10% max hp (không phải sát thương chuẩn, có thể bị giảm bởi res/arm hoặc cơ chế/pháp tắc (nếu xung đột pháp tắc thì cần phán định)/quy tắc/axiom) của họ sau đó hồi hp cho bản thân = 50% sát thương gây ra = skill này, 30 ae. Pháp Tắc.
+
+skill 3: mỗi khi kích hoạt nội tại thành công, tăng max hp = 2% max hp của hiện tại của Niddhoggr/mỗi kẻ thù nhận sát thương từ nội tại, đơn giản là khi nội tại kích hoạt trên 1 mục tiêu thì hắn tăng max hp = 2% max ho của hiện tại, cost 4 ae/mỗi lần kích hoạt skill/mục tiêu. cứ coi skill này như nội tại nhưng tốn ae là được. Vì đánh thường aoe nên nội tại chắn chắn sẽ kích hoạt trên nhiều mục tiêu cùng lúc, lúc đó skill này tăng max hp sẽ không phân kích hoạt trước sau mà sẽ cộng dồn, ví dụ nội tại kích hoạt trên 2 enemy, - 8 ae từ phe của Niddhoggr, cùng lúc đó tăng max hp = 4% mx hp hiện tại của bản thân Niddhoggr mà không phải chia ra 2 lần tăng max hp riêng lẻ.
+
+ultimate: gào thét, phun long tức lên toàn bộ kẻ địch có mặt trên sân (tức chỉ phun lên ô có kẻ thù, không phun lên ô trống), mỗi kẻ nhận sát thương = 150% will/atk cùng áp 2 lần nội tại lên chúng.
+nếu kẻ thù đã có 1 stack nội tại của Niddhoggr từ trước thì khi dính ultimate của hắn thì nội tại sẽ kích hoạt vì đủ 3 stack, kẻ thù sẽ mất hp = 3% max hp của chúng (không giảm max hp) cùng nhận 1 debuff giảm 50% hồi phục nhận được từ nguồn ngoài, vì nội tại kích hoạt nên skill 3 cũng kích hoạt, Niddhoggr tăng max hp và phe của hắn bị trừ ae tương ứng.
+
+50) 
+Ur, tanker.
+nội tại: khi nhận sát thương, tích lũy 50% sát thương nhận vào và khi tích lũy = 30% max hp của hắn, thanh không tích lũy, chuyển 100% lượng sát thương tích lũy = 30% max hp của hắn thành hp (lượng tích lũy sát thương vượt 30% max hp sẽ bị bỏ qua mà chỉ chuyển đúng cap là 30% max hp) tương ứng cùng tạo khiên = 10% max hp của bản thân, đơn giản là bị đánh lâu lâu hồi hp cùng tạo khiên, nhận 10 sát thương thì tích luỹ 5 sát thương, ví dụ hp của hắn là 30 thì 30% là 9, vậy hắn cần tích lũy >= 9 sát thương để kích hoạt nội tại và được hồi hp = 9 cùng khiên = 10% max hp của bản thân là 3, khi nhận sát thương vượt quá tích lũy thì chỉ tính max cap tích lũy là 30% max hp, tích lũy thừa ra bị bỏ. Không giới hạn lần kích hoạt/turn hoặc /trận. Khiên không giới hạn turn tồn tại và có thể stack vô hạn, khi nhận khiên từ nguồn khác ( bị giới hạn turn tồn tại, có cap theo % max hp của kẻ tạo khiên hoặc hắn,..) thì sẽ trừ nguồn khiên khác trước rồi mới tới khiên của hắn. Quy Tắc.
+
+skill 1: nội tại bị động, khi có khiên, nhận buff reflect 100% trong 1 turn, - 3 ae/turn kích hoạt, miễn có khiên là tự có phản sát thương trong 1 turn, mất khiên thì mất phản sát thương ngay lập tức. Pháp Tắc.
+
+skill 2: gây sát thương lên kẻ địch khi đang không phải ở lượt của bản thân sẽ được hồi hp = 1% max hp hiện tại của hắn/lần, không giới hạn số lần/turn, mỗi lần kích hoạt -1 ae từ bể ae thuộc phe của hắn. Nói chung gây sát thương lên kẻ thù khi bản thân không tấn công thì được hồi hp và trừ ae. Ví dụ như debuff gây mất máu theo turn, skill 1 hoặc phản sát thương, bleed, venom này kia, điều kiện tiên quyết để kích hoạt là kẻ thù phải thực sự mất hp, có khiên/bị né không tính, điều kiện khác nữa để kích hoạt skill này là sát thương gây ra tối thiểu lên kẻ thù = 2% max hp của chúng. Nên nếu gây debuff cho boss hoặc bị boss đánh rồi Reflect chẳng hạn nhưng boss res/arm cao quá, bị mất hp chưa tới tối thiểu 2% max hp của boss thì skill này sẽ không kích hoạt và không bị trừ ae. Bị động, tự kích hoạt khi đủ điều kiện và không thể chủ động bật (tốn turn) như skill 1. Pháp tắc.
+
+skill 3: giảm hp = 25% mx hp (không giảm mx hp), tăng lượng hồi phục và khiên nhận được từ nguồn không phải của bản thân trong 3 turn tiếp theo tính từ turn sau khi kích hoạt skill này lên gấp đôi. overheal nhận gấp đôi từ skill này bị bỏ qua. Khiên nhận được sẽ tuân theo mô tả thời gian tồn tại và cap khiên thuộc nguồn của khiên đó. Ví dụ, bật skill này, hắn nhận khiên là 5, skill gấp 2 là 10, mô tả từ nguồn khiên là tồn tại tối đa 2 turn, cap = 20% max hp của mục tiêu nhận khiên tức bản thân chính hắn thì sau 2 turn khiên sẽ biến mất, nếu khiên vượt cap mô tả là vượt quá 20% max hp của hắn thì chỉ giữ đúng khiên = 20% max hp của hắn, khiên từ nguồn đó tuân theo mô tả nên sau 2 turn hoặc bị đánh nát thì sẽ mất.
+
+ultimate: gây sát thương = 180% wil + atk + 20% hp hiện có lên 1 mục tiêu, sau đó chuyển hoá toàn bộ khiên hiện có thành max hp với tỉ lệ 1 khiên = 0,5 max hp và hồi hp = lượng khiên được chuyển đổi sang hp tương ứng. ví dụ hắn đang có 80/100 (150/400) hp và 40/100 (200/400) khiên thì sau khi dùng ult hắn sẽ tăng 20 (100) max hp và cũng được hồi tương ứng 20 (100) max hp đó vậy hp của hắn sẽ là 100/120 (250/500) hp. Ngoặc () thuộc mô tả ult là ví dụ thêm.
+
+51)
+
+ultimate: nhảy lên cao, rơi vào ô 5 của kẻ thù và gây sát thương = 150% wil + atk lên kẻ đứng ở ô số 5, sau đó ô số 5 bị bể (vfx) rồi kẻ đứng ở ô 5 cùng các ô còn lại nhận sát thương = 150% wil + atk cùng 5% max hp của nhân vật này

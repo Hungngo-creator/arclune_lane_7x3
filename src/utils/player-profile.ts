@@ -33,7 +33,7 @@ const EMPTY_PROFILE: SavedPlayerProfile = {};
 const MAX_LINEUP_BUFF_SLOTS = 6;
 
 let cachedRawProfile: string | null | undefined;
-let cachedParsedProfile: SavedPlayerProfile | null = null;y
+let cachedParsedProfile: SavedPlayerProfile | null = null;
 
 const isObject = (value: unknown): value is Record<string, unknown> => (
   typeof value === 'object' && value !== null && !Array.isArray(value)

@@ -1,5 +1,8 @@
-Trang Bị/Đan Dược có tổng cộng 10 tier, là nhất đến thập giai tương ứng từ Khai Nguyên đến Bán Thần, mỗi giai sẽ chia 3 phẩm là hạ/trung/thượng, mỗi giai có 9 giai nhỏ, mỗi phẩm tương đương 3 trọng nhỏ trong 1 giai, ví dụ Nhất giai Hạ phẩm Khí Huyết Đan phạm vi sử dụng là từ Khai Nguyên 1 đến 3 trọng.
+Trang Bị/Đan Dược có tổng cộng 10 tier, là nhất đến thập giai tương ứng từ Khai Nguyên đến Bán Thần, mỗi giai sẽ chia 3 phẩm là hạ/trung/thượng, mỗi giai có 9 trọng, mỗi phẩm tương đương 3 trọng nhỏ trong 1 giai, ví dụ Nhất giai Hạ phẩm Khí Huyết Đan phạm vi sử dụng là từ Khai Nguyên 1 đến 3 trọng.
 #A. Trang Bị
+
+Hắc Động, Áo 8 giai Thượng Phẩm, yêu cầu Thánh Tôn thất trọng trở lên và ult cần là tiếp cận và gây aoe toàn sân để mặc:
+Nội Tại: tăng 5% max hp khi vào trận, tích lũy 100% sát thương nhận vào (vẫn nhận sát thương), khi tích lũy = hoặc vượt 50% max hp của người mặc thì sẽ ngừng tích lũy, khi người mặc dùng ult tiếp cận ô số 5 của kẻ thù gây aoe toàn sân thì lượng sát thương tích lũy đó sẽ phát nổ, gây sát thương chuẩn (bỏ qua res/arm của mục tiêu) = 50% max hp của người mặc lúc ult, sát thương tích lũy theo 50% mx hp và sát thương gây ra khi kích hoạt trang bị này có thể khác nhau vì sát thương tích lũy đến lúc dùng ultimate max hp của người mặc có thể bị thay đổi.
 
 -
 #B Vật Phẩm Đặc Biệt
@@ -17,8 +20,9 @@ Nhất Giai, Khai Nguyên:
 Nhị Giai, Trúc Cơ:
 
 #D, công pháp:
-là thứ bắt buộc phải có để nhân vật học nhằm tăng tu vi, khi 1 nhân vật không học công pháp thì không thể nâng tu vi được dù có dùng đan dược hoặc tăng tu vi qua Nguyên Tinh (VNT/HNT/Trung Phẩm nguyên tinh/ThNT/Thần Tinh) Công pháp là cách để nhân vật hấp thu khí aether, như dạ dày vậy, ăn đồ ăn không co dạ dày thì làm sao hấp thu?
+là thứ bắt buộc phải có để nhân vật học nhằm tăng tu vi, khi 1 nhân vật không học công pháp thì không thể nâng tu vi được dù có dùng đan dược hoặc tăng tu vi qua Nguyên Tinh (VNT/HNT/Trung Phẩm nguyên tinh/ThNT/Thần Tinh) Công pháp là cách để nhân vật hấp thu khí aether, như dạ dày vậy, ăn đồ ăn không có dạ dày thì làm sao hấp thu?. mỗi nhân vật vì tu luyện công pháp khác nhau mà lên lv cũng sẽ được thưởng TP khác nhau, hiện có thể đột phá không cần công pháp và thưởng tp cố định/ mỗi lần đột phá và cơ chế này vẫn giữ nguyên, công pháp là ràng buộc để game hay hơn cùng + thêm TP nhằm tăng sự chênh lệch giữa các đại/tiểu cảnh giới.
 
 - Thánh Nhân, Thánh Hoàng, Thánh Tôn.
 1: Triều Nguyệt Vô Tâm Kinh
-Cửu Giai thượng phẩm công pháp, dù vậy Thánh Nhân nhất trọng đã có thể học, 
+Cửu Giai thượng phẩm công pháp, dù vậy Thánh Nhân nhất trọng đã có thể học. Hiệu quả: mỗi lần đột phá 1 tiểu cảnh giới + 50 TP, đột phá đại cảnh giới + 120 TP.
+2: 
