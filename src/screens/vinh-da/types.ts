@@ -28,6 +28,8 @@ export interface Enemy {
   attackCooldown: number;
   canFly: boolean;
   side: Side;
+  mageOrbTimer?: number;
+  mageOrbs?: number;
 }
 
 export interface StructureRuntime {
@@ -35,4 +37,5 @@ export interface StructureRuntime {
   hp: number;
   armed?: boolean;
   fuse?: number;
+  dragonHitCount?: number;
 }

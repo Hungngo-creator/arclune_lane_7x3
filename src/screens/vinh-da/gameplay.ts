@@ -385,8 +385,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
   const getEnemyTemplate = (enemy: Enemy): EnemyTemplate => ENEMY_TEMPLATES[enemy.kind] ?? DEFAULT_ENEMY_TEMPLATE;
   const getEnemyPrimaryTargetX = (enemy: Enemy): number => enemy.canFly ? leaderX : CRYSTAL_X;
+  const getEnemyMoveDirection = (enemy: Enemy, targetX = getEnemyPrimaryTargetX(enemy)): number => enemy.x < targetX ? 1 : -1;
   const getStructureAhead = (enemy: Enemy, range: number): { site: BuildSite; runtime: StructureRuntime } | null => {
-    const direction = enemy.x < getEnemyPrimaryTargetX(enemy) ? 1 : -1;
+    const direction = getEnemyMoveDirection(enemy);
     let closest: { site: BuildSite; runtime: StructureRuntime; distance: number } | null = null;
     for (const structure of structures.values()){
       if (structure.type === 'wall') continue;
@@ -408,6 +409,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     return true;
   };
   const getEnemyEffectiveSpeed = (enemy: Enemy): number => {
+    if (enemy.canFly) return enemy.baseSpeed;
     for (const siteId of structureSiteIdsOfType('swamp')){
       const site = getBuildSite(siteId);
       if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS){
@@ -417,6 +419,90 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       }
     }
     return enemy.baseSpeed;
+  };
+  const moveEnemyToward = (enemy: Enemy, targetX: number, dt: number, speed = getEnemyEffectiveSpeed(enemy)): void => {
+    enemy.x += getEnemyMoveDirection(enemy, targetX) * speed * dt;
+  };
+  const attackEnemyTarget = (enemy: Enemy, template: EnemyTemplate, targetX: number, dt: number): void => {
+    if (Math.abs(enemy.x - targetX) <= template.attackRange){
+      tryEnemyAttack(enemy, template, () => { damageBase(template.damage); });
+      return;
+    }
+    moveEnemyToward(enemy, targetX, dt);
+  };
+  const updateMeleeBasicEnemy = (enemy: Enemy, template: EnemyTemplate, dt: number): void => {
+    const wall = getBlockingWall(enemy);
+    if (wall){
+      tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage); });
+      return;
+    }
+    attackEnemyTarget(enemy, template, getEnemyPrimaryTargetX(enemy), dt);
+  };
+  const updateSuicideBomberEnemy = (enemy: Enemy, template: EnemyTemplate, index: number, dt: number): void => {
+    const wall = getBlockingWall(enemy);
+    if (wall && Math.abs(enemy.x - wall.site.x) <= template.attackRange){
+      damageStructure(wall.site, wall.runtime, template.damage);
+      removeEnemyAt(index, false);
+      return;
+    }
+    if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange){
+      damageBase(template.damage);
+      removeEnemyAt(index, false);
+      return;
+    }
+    moveEnemyToward(enemy, CRYSTAL_X, dt);
+  };
+  const updateFlyingEnemy = (enemy: Enemy, template: EnemyTemplate, index: number, dt: number): void => {
+    const targetX = getEnemyPrimaryTargetX(enemy);
+    if (Math.abs(enemy.x - targetX) <= template.attackRange){
+      damageBase(template.damage);
+      removeEnemyAt(index, false);
+      return;
+    }
+    moveEnemyToward(enemy, targetX, dt, enemy.baseSpeed);
+  };
+  const updateDarkMageEnemy = (enemy: Enemy, template: EnemyTemplate, dt: number): void => {
+    const wall = getBlockingWall(enemy);
+    if (wall){
+      tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage); });
+      return;
+    }
+    if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange){
+      moveEnemyToward(enemy, CRYSTAL_X, dt);
+      return;
+    }
+    enemy.mageOrbTimer = (enemy.mageOrbTimer ?? 0) + dt;
+    while (enemy.mageOrbTimer >= 2 && (enemy.mageOrbs ?? 0) < 3){
+      enemy.mageOrbTimer -= 2;
+      enemy.mageOrbs = (enemy.mageOrbs ?? 0) + 1;
+    }
+    if ((enemy.mageOrbs ?? 0) >= 3){
+      tryEnemyAttack(enemy, template, () => {
+        damageBase(template.damage * (enemy.mageOrbs ?? 3));
+        enemy.mageOrbs = 0;
+        enemy.mageOrbTimer = 0;
+      });
+    }
+  };
+  const damageDragonStructureCounter = (site: BuildSite, runtime: StructureRuntime): boolean => {
+    const structure = structures.get(site.id);
+    if (!structure || structure.type === 'wall') return false;
+    runtime.dragonHitCount = (runtime.dragonHitCount ?? 0) + 1;
+    if (runtime.dragonHitCount < structure.level) return false;
+    deleteStructure(site.id);
+    renderBuildSite(site.id);
+    return true;
+  };
+  const updateResentfulDragonEnemy = (enemy: Enemy, template: EnemyTemplate, dt: number): void => {
+    const structureAhead = getStructureAhead(enemy, template.attackRange);
+    if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange || structureAhead){
+      tryEnemyAttack(enemy, template, () => {
+        if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) damageBase(template.damage);
+        if (structureAhead) damageDragonStructureCounter(structureAhead.site, structureAhead.runtime);
+      });
+      return;
+    }
+    moveEnemyToward(enemy, CRYSTAL_X, dt, enemy.baseSpeed);
   };
   const isUnitInLandmineTriggerRadius = (site: BuildSite): boolean => (
     Math.abs(leaderX - site.x) <= LANDMINE_TRIGGER_RADIUS
@@ -443,19 +529,27 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       if (!enemy) continue;
       enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
       const template = getEnemyTemplate(enemy);
-      const wall = getBlockingWall(enemy);
-      const structureAhead = !wall && enemy.kind === 'resentfulDragon' ? getStructureAhead(enemy, template.attackRange) : null;
-      const targetX = getEnemyPrimaryTargetX(enemy);
-      if (wall){
-        tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage); });
-      } else if (structureAhead){
-        tryEnemyAttack(enemy, template, () => { damageStructure(structureAhead.site, structureAhead.runtime, template.damage); });
-      } else if (Math.abs(enemy.x - targetX) <= template.attackRange){
-        tryEnemyAttack(enemy, template, () => { damageBase(template.damage); });
-      } else {
-        const direction = enemy.x < targetX? 1 : -1;
-        enemy.x += direction * getEnemyEffectiveSpeed(enemy) * dt;
+      switch (enemy.kind){
+        case 'suicideBomber':
+          updateSuicideBomberEnemy(enemy, template, i, dt);
+          break;
+        case 'mutantBird':
+          updateFlyingEnemy(enemy, template, i, dt);
+          break;
+        case 'darkMage':
+          updateDarkMageEnemy(enemy, template, dt);
+          break;
+        case 'resentfulDragon':
+          updateResentfulDragonEnemy(enemy, template, dt);
+          break;
+        case 'twisted':
+        case 'crawler':
+        case 'madDog':
+        case 'ironMan':
+          updateMeleeBasicEnemy(enemy, template, dt);
+          break;
       }
+      if (!enemies.includes(enemy)) continue;
       if (leaderAttackCooldown === 0 && Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE){
         leaderAttackCooldown = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
         if (damageEnemy(enemy, LEADER_BASIC_ATTACK_DAMAGE)) removeEnemyAt(i, true);
