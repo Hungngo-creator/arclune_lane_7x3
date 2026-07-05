@@ -754,18 +754,20 @@ Gợi ý nhóm tài nguyên ban đầu:
 
 ## 19. Bổ sung từ người dùng. (đều chuẩn khai nguyên 1)
 
-kẻ thù: Chim Biến Dị
+### kẻ thù: Chim Biến Dị
 mô tả, một tập hợp xác thịt không rõ của các loại chim, một chimera vặn vẹo, huyết nhục nhiễu sóng.
 chỉ số chuẩn Khai Nguyên 1: Hp 1,3, 0 res/arm, 1 atk/wil, di chuyển: 1.5/s l, phạm vi tấn công: 12.
 sau khi thấy mục tiêu, gia tốc, tiếp cận mục tiêu gây sát thương = 2.5 wil/atk sau đó tử vong. tùy theo phạm vi tấn công mà sát thương gây ra sẽ thay đổi, nếu mục tiêu cách chim biến dị chỉ dưới hoặc bằng 6 thì chỉ nhận 1,2 sát thương, nếu dưới hoặc = 9 thì nhận 2 sát thương, 12 thì 2,5, dưới 3 sẽ không gia tốc, chim biến dị sẽ bay lùi lại, giữ khoảng cách 12 và bắt đầu gia tốc. Miễn kích hoạt gia tốc chì chim biến dị sau khi gây sát thương sẽ tử vong. Trọng lượng: 0,1.
 bất kể khoảng cách gia tốc thì tốc độ bay khi gia tốc là 3.5
 
-pháp sư hắc ám: không bị ô nhiễm, là người bình thường, một tín đồ của Hắc Ám Chi Chủ, dùng aether Hắc Ám nồng hậu bao phủ cơ thể, sẽ không bị binh chủng hắc ám khác tấn công.
+### pháp sư hắc ám:
+không bị ô nhiễm, là người bình thường, một tín đồ của Hắc Ám Chi Chủ, dùng aether Hắc Ám nồng hậu bao phủ cơ thể, sẽ không bị binh chủng hắc ám khác tấn công.
 HP: 3, atk/res/arm 1, 3,5 wil
 đánh thường: ngưng tụ ma lực thành 1 quả cầu hắc ám sau lưng mỗi 2s, sau khi đạt 3 quả cầu, tấn công mục tiêu gây sát thương = 100% wil/atk/ mỗi quả cầu lên mục tiêu, sau tấn công cd 2s. Tốc độ đạn: 2
 trọng lượng: 1. Tốc độ di chuyển: 0.5
 
-pháo phòng không: một kiến trúc chuyên dụng tấn công kẻ thù trên không, tốc độ tấn công và đường đạn nhanh là đặc điểm ưu tú của nó, giá cả cũng đồng dạng ưu tú hơn kiến trúc khác.
+### pháo phòng không:
+một kiến trúc chuyên dụng tấn công kẻ thù trên không, tốc độ tấn công và đường đạn nhanh là đặc điểm ưu tú của nó, giá cả cũng đồng dạng ưu tú hơn kiến trúc khác.
 
 Tầm bắn phẳng: Tăng tiến theo cấp độ: 10.0 (Lv1) ➔ 15.0 (Lv2) ➔ 20.0/21.0 (Lv3) ➔ 23.0 (Lv4) ➔ 26.0 (Lv5). Tầm bắn giữ nguyên không đổi ở Lv6. 
 
@@ -787,7 +789,8 @@ Liên Thanh: trên cơ sở lv 4, +1 sát thương, cd - 1s, cd dài - 5s.
 
 lv 6: + 3 sát thương, cd -0,5, cd dài -5. Ở lv này pháo phòng không có thể bắn mục tiêu dưới mặt đất.
 
-Trọng lực pháo: sản phẩm điên rồ từ Cơ Giới Quốc, khống chế mục tiêu mặt đất cực tốt. Đối mục tiêu trên không không có hiệu quả.
+### Trọng lực pháo:
+sản phẩm điên rồ từ Cơ Giới Quốc, khống chế mục tiêu mặt đất cực tốt. Đối mục tiêu trên không không có hiệu quả.
 
 Bán kính hút: Quy đổi chuẩn từ mét sang hệ số: 0.5 (Lv1) ➔ 0.7 (Lv2) ➔ 0.9 (Lv3) ➔ 1.2 (Diệt Thần Lv4) / 2.0 (Thanh Tràng Lv4).
 chỉ hất tung kẻ địch trong 1s bất kể lv pháo trọng lực.
@@ -809,35 +812,23 @@ lv 6: player có thể tắt/kích hoạt trọng lực pháo.
 
 một khẩu súng không tệ, có điều coi chừng bắn xa quá trời sáng không có tiền đâu nha, bắn boss đi luôn thì húp cháo, nếu ngươi đủ giàu, nâng cái lv 6, đánh boss còn nửa mạng thì bật pháo liền xong chuyện.
 
-sau đây là nhóm kiến trúc đặt dưới đất:
+#### sau đây là nhóm kiến trúc đặt dưới đất:
 địa lôi: phát nổ sau 2s đạp trúng, không phân địch ta, gây sát thương chuẩn = 2.
 
 đầm lầy: tạo 1 bãi đầm lầy, kẻ thù có trọng lượng là 1 đạp vào giảm 50% tốc độ di chuyển, là 2 đạp vào giảm 25% tốc độ di chuyển, trọng lượng 3 trở lên không có hiệu quả.
 
 địa thứ: đạp bị cột sắt dưới đất đâm mạnh vào chân, giảm 50% tốc độ di chuyển trong 3s đồng thời gây chảy máu, gây sát thương = 3% max hp/s trong 3s đó, kích hoạt đối với kẻ có trọng lượng từ 1 đến 1,9, 2 trở lên và 0,9 trở xuống không kích hoạt.
 
-Thiết Hán: biến dị nặng nề, một thợ mỏ bị bỏ lại lúc xập mỏ, xương cốt cứng rắn, bề ngoài bao phủ bởi kim loại không rõ, từ mỏ khoáng sản kết hợp với oán niệm mà thành mạnh mẽ sản phẩm.
+### kẻ thù:
+#### Thiết Hán:
+biến dị nặng nề, một thợ mỏ bị bỏ lại lúc xập mỏ, xương cốt cứng rắn, bề ngoài bao phủ bởi kim loại không rõ, từ mỏ khoáng sản kết hợp với oán niệm mà thành mạnh mẽ sản phẩm.
 chỉ số chuẩn Khai Nguyên 1:
 Hp: 5,5, 3 res, 4 arm, atk/wil:2, tốc độ 0.3, trọng lượng: 2,8.
 nội tại: mỗi 5s hồi 1 hp (x 2 ở Khai nguyên 2 là 5s hồi 2 hp, cứ thế mà suy ra khai nguyên 3 là x3, 5s hồi 3hp)
 Đánh thường: gây sát thương= 100% wil/atk, cd 1,5s.
 
-tài nguyên:
-Vụn Nguyên Tinh, Hạ Nguyên Tinh, 1 hnt = 100 vnt. Trung Nguyên Tinh, Thượng Nguyên Tinh, 1 tnt = 100 hnt, 1 ThNT = 100 TNT, còn Thần Tinh nữa nhưng theo lore chắc khó xuất hiện, trừ phi phong ấn được lượng huyết nhục nhất định.
-Dạ Thạch: Từ khí aether hệ hắc ám ngưng kết mà thành, đa số kẻ thù đều rơi ra thứ này, base là thứ có thể chắt lọc mọi thứ thành Nguyên Tinh, các loại nguyên tinh cũng là tiền tệ chính trong game, mỗi đêm sau khi giết xong kẻ thù thì cần thu nhặt Dạ Thạch rơi trên đất, đem về base để chắt lọc năng lượng. tier vật liệu biến đổi theo tier map.
-1 Dạ Thạch = 0,9 Hạ Nguyên Tinh do qua trình chắt lọc base cần năng lượng nên lấy phần 0,1 còn lại.
-Sau đó từ dạng lỏng, ngưng tụ Nguyên Tinh thành dạng đặc lại tốn 10% của 0.9 đó mới ngưng tụ ra Hạ Nguyên Tinh, nếu để trong base không ngưng tụ thì có thể nhưng tụ ra hạng Nguyên Tinh cao cấp hơn trừ Thần Tinh. Nếu base được dời đi, phần năng lượng chưa rút ra sẽ được giữ nguyên trong base, base mỗi ngày tiêu hao 5 HNT để duy trì buff.
-Nguyên Tố Thạch: một viên đá nhiều màu, màu sắc luôn thay đổi, là ngưng kết của nguyên tố, tùy theo khí hậu/địa hình mà Nguyên Tố Thạch có nguyên tố khác nhau. tỉ lệ 1:35 HNT, có thể dùng để tạo Tháp Nguyên Tố. Không có tier cố định, tùy theo nồng độ khí aether mà có giai khác nhau.
-
-Hồng Lôi Quả: một loại quả chỉ xuất hiện trong môi trường dày đặc khí aether hệ lôi, ăn nó sẽ tăng vĩnh viễn (chỉ trong mode này) 10% max hp và tạm tăng 5% atk/wil/res trong 3 đêm (chỉ mode này). Tỉ lệ chuyển đổi: 1:55 HNT. nhất giai trung kỳ linh quả, tương đương tier 1.4 đến 1.6.
-
-Hắc Thiết: không gì ngoài cứng rắn, phàm nhân không thể khai thác vì quá cứng, Vật liệu Nhất Giai sơ kỳ, tương đương tier 1.1 đến 1.3, dùng để tạo Tháp canh cùng Nhà Lính cùng Nhà Thờ và Tường, tối đa tier 1.3. tỉ lệ chuyển đổi: 1:1 dạ thạch.
-
-Nguyện Thạch: từ tín đồ tín ngưỡng nhất ngưng tụ mà thành tín ngưỡng kết tinh, biến động theo giai vị của tín đồ, nguyên liệu bắt buộc để tạo nhà thờ, Nguyện Thạch tier nào tạo ra nhà thờ Tier đó.
-
-Base có thể tạo vật liệu nhờ khả năng chuyển đổi của nó, dù vậy vì duy trì bản thân nên sẽ luôn có thất thoát. Nhưng trong game nó chỉ là hàng nhái, dù có thể trưởng thành theo số lần tinh luyện thì nó vẫn là hàng nhái, nói chính xác là hàng phục chế. Nghĩ vậy thì đơn giản là Vua của Huyết Quốc muốn dùng cái hàng phục chế này hấp thu huyết nhục của phân thân Hắc Ám Chi Chủ sau đó lấy bản gốc hấp thu bản sao, còn main cod bị hấp thu luôn hay không thì khó nói. Dù base gốc cungc không phải vạn năng, nó không thể tạo vật phức tạp, không thể tạo thứ hỗn hợp cao trong 1 lần được, như con người, hẳn base gốc tiến thêm 1 bước sau dung hợp bản sao làm được.
-
-Oán Long: một con rồng bị ô nhiễm, lý trí không còn, chỉ còn bản năng thôn phệ, sát lục hết thảy
+#### Oán Long:
+một con rồng bị ô nhiễm, lý trí không còn, chỉ còn bản năng thôn phệ, sát lục hết thảy
 
 chỉ số Tier 1.1: hp 15: 7 res/arm 6 atk, 8 wil, tốc độ 2.5/s lúc bay, 0.8/s lúc đi.
 nội tại: hồi 3% max hp/2s, hp dưới 30% tăng 10% wil/atk. 
@@ -849,25 +840,74 @@ ultimate: gầm thét, gây sát thương và hiệu ứng như đánh thường
 
 trọng lượng: 4.
 
-Huyền Minh Trọng Thủy: một loại linh dịch nặng nề, sinh ra ở vùng trọng lực cao, có thể dùng để chế tạo Pháo Trọng Lực, tier biến đổi theo tier map. 1 đơn vị HMTT: 1 TNT. Bất kỳ sinh vật trọng lượng dưới 2 nào đi hoặc bay ngang tốc độ đều sẽ giảm 50%.
+### tài nguyên:
+Vụn Nguyên Tinh, Hạ Nguyên Tinh, 1 hnt = 100 vnt. Trung Nguyên Tinh, Thượng Nguyên Tinh, 1 tnt = 100 hnt, 1 ThNT = 100 TNT, còn Thần Tinh nữa nhưng theo lore chắc khó xuất hiện, trừ phi phong ấn được lượng huyết nhục nhất định.
+#### Dạ Thạch:
+Từ khí aether hệ hắc ám ngưng kết mà thành, đa số kẻ thù đều rơi ra thứ này, base là thứ có thể chắt lọc mọi thứ thành Nguyên Tinh, các loại nguyên tinh cũng là tiền tệ chính trong game, mỗi đêm sau khi giết xong kẻ thù thì cần thu nhặt Dạ Thạch rơi trên đất, đem về base để chắt lọc năng lượng. tier vật liệu biến đổi theo tier map.
+1 Dạ Thạch = 0,9 Hạ Nguyên Tinh do qua trình chắt lọc base cần năng lượng nên lấy phần 0,1 còn lại.
+Sau đó từ dạng lỏng, ngưng tụ Nguyên Tinh thành dạng đặc lại tốn 10% của 0.9 đó mới ngưng tụ ra Hạ Nguyên Tinh, nếu để trong base không ngưng tụ thì có thể nhưng tụ ra hạng Nguyên Tinh cao cấp hơn trừ Thần Tinh. Nếu base được dời đi, phần năng lượng chưa rút ra sẽ được giữ nguyên trong base, base mỗi ngày tiêu hao 5 HNT để duy trì buff.
+#### Nguyên Tố Thạch:
+một viên đá nhiều màu, màu sắc luôn thay đổi, là ngưng kết của nguyên tố, tùy theo khí hậu/địa hình mà Nguyên Tố Thạch có nguyên tố khác nhau. tỉ lệ 1:35 HNT, có thể dùng để tạo Tháp Nguyên Tố. Không có tier cố định, tùy theo nồng độ khí aether mà có giai khác nhau.
+
+#### Hồng Lôi Quả:
+nhất giai thượng phẩm linh quả.
+một loại quả chỉ xuất hiện trong môi trường dày đặc khí aether hệ lôi, ăn nó sẽ tăng vĩnh viễn (chỉ trong mode này) 10% max hp và tạm tăng 5% atk/wil/res trong 3 đêm (chỉ mode này). Tỉ lệ chuyển đổi: 1:55 HNT. nhất giai trung kỳ linh quả, tương đương tier 1.4 đến 1.6.
+
+#### Hắc Thiết:
+không gì ngoài cứng rắn, phàm nhân không thể khai thác vì quá cứng, Vật liệu Nhất Giai sơ kỳ, tương đương tier 1.1 đến 1.3, dùng để tạo Tháp canh cùng Nhà Lính cùng Nhà Thờ và Tường, tối đa tier 1.3. tỉ lệ chuyển đổi: 1:1 dạ thạch.
+
+#### Nguyện Thạch:
+từ tín ngưỡng của tín đồ ngưng tụ mà thành tín ngưỡng kết tinh, biến động theo giai vị của tín đồ, nguyên liệu bắt buộc để tạo nhà thờ, Nguyện Thạch tier nào tạo ra nhà thờ Tier đó.
+
+Base có thể tạo vật liệu nhờ khả năng chuyển đổi của nó, dù vậy vì duy trì bản thân nên sẽ luôn có thất thoát. Nhưng trong game nó chỉ là hàng nhái, dù có thể trưởng thành theo số lần tinh luyện thì nó vẫn là hàng nhái, nói chính xác là hàng phục chế. Nghĩ vậy thì đơn giản là Vua của Huyết Quốc muốn dùng cái hàng phục chế này hấp thu huyết nhục của phân thân Hắc Ám Chi Chủ sau đó lấy bản gốc hấp thu bản sao, còn main cod bị hấp thu luôn hay không thì khó nói. Dù base gốc cungc không phải vạn năng, nó không thể tạo vật phức tạp, không thể tạo thứ hỗn hợp cao trong 1 lần được, như con người, hẳn base gốc tiến thêm 1 bước sau dung hợp bản sao làm được.
+
+
+#### Huyền Minh Trọng Thủy:
+một loại linh dịch nặng nề, ở vùng giao giới giữa Thủy và Thổ có 5% tỉ lệ xuất hiện, tăng thêm 3%/tier (về cơ bản sẽ càng thấp vì vùng giao nhau giữ thủy và thổ rất khó xuất hiện vì mỗi map xuất hiện vùng nguyên tố là có hạn), sinh ra ở vùng trọng lực cao, có thể dùng để chế tạo Pháo Trọng Lực, tier biến đổi theo tier map. 1 đơn vị HMTT: 1 TNT. Bất kỳ sinh vật trọng lượng dưới 2 nào đi hoặc bay ngang tốc độ đều sẽ giảm 50%.
 
 Truyền Tống Trận:
 kiến trúc tu sĩ trúc cơ mới có thể tạo ra, dùng để di chuyển khoảng cách xa, cần bày trận giữa A và B. Nên theo game leader cần lên trúc cơ, phái lính đi thám thính, bày Tử trận ở chổ cần đến rồi bày mẫu trận mới tele qua được, hoặc là truyền tống trận có sẵn, sao cũng được.
 
-Vật Cưỡi: là phương tiện di chuyển của leader, có thể là vật sống hoặc cơ giới.
+## Vật Cưỡi:
+là phương tiện di chuyển của leader, có thể là vật sống hoặc cơ giới.
 
-Linh Mã: ngựa nhất giai sơ kỳ, theo ăn linh thảo mà tăng tiến tu vi, tối đa tier 1.3
+#### Linh Mã:
+ngựa nhất giai sơ kỳ, theo ăn linh thảo mà tăng tiến tu vi, tối đa tier 1.3
 hp:5, 2 res/arm, + 0,5 3 chỉ số khi lên tier.
 Thân pháp khởi điểm là 2.3 (+1 mỗi Tier), đạt tối đa 4.3 ở Tier 1.3, sau khi chạy nhanh hết tốc lực ở tier của nó trong 5s (+1/tier) thì sẽ lâm vào suy yếu, cần chạy chậm (giảm 50% tốc độ chạy) trong 7s (-1/tier) mới có thể chạy nhanh lần nữa.
 
-Huyết Mã: nhất giai Trung Kỳ, theo ăn linh thảo mà tu vi tăng từ tier 1.4 đến 1.6.
+#### Huyết Mã:
+nhất giai Trung Kỳ, theo ăn linh thảo mà tu vi tăng từ tier 1.4 đến 1.6.
 Hp: 10, 2 res/arm, +1 chỉ số khi lên tier.
 Thân pháp khởi điểm là 4.7 (+1.2 mỗi Tier), đạt tối đa 7.1 ở Tier 1.6 sau khi chạy nhanh hết tốc lực ở tier của nó trong 7s (+1/tier) thì sẽ lâm vào suy yếu, cần chạy chậm (giảm 50% tốc độ chạy) trong 7s (-1/tier) mới có thể chạy nhanh lần nữa.
 
-Quang Ảnh: nhị giai sơ kỳ, tốc độ lấy xưng.
+#### Quang Ảnh:
+nhị giai sơ kỳ, tốc độ lấy xưng.
 Thân pháp siêu tốc 11 mỗi khi tăng 1 Tier + 1.6 đến tier 2.4 ~ 2.6 tăng 1,8/tier, từ 2.7 đến 2.9 + 2 tốc độ /tier, đến tier 3.1 + 2,7 sau đó không thể tăng tier được nữa.
 Tư chất: Tam Giai, tức có thể theo player đến Tam Giai, tier 3, dẫu vậy lượng linh thảo nó cần về chất và lượng đều không thấp.
 
 kiến trúc mới:
-Ụ đá: nói kiến trúc cũng không chính xác, nó như cái module trống, nơi có thể xây kiến trúc mới lên đó, nhờ nó mà xây nhiều kiến trúc gần nhau trở nên khả thi.
+### Ụ đá:
+nói kiến trúc cũng không chính xác, nó như cái module trống, nơi có thể xây kiến trúc mới lên đó, nhờ nó mà xây nhiều kiến trúc gần nhau trở nên khả thi.
 yêu cầu: 10 oán thạch và 15 hắc thiết, ụ đá tier nào thì có thể xây kiến trúc tier đó lên, ụ đá tier thấp không thể xây kiến trúc tier cao hơn tier của ụ đá lên được.
+
+leader cần chọn đầu trận, từ 1 nhân vật bất kỳ từ collection trừ prime, trong game có các chỉ số là: hp/res/arm/atk/wil/hp regen, còn các chỉ số khác hiện chưa cần thêm vào game.
+
+### thêm nhân vật mới: thương nhân
+một gã bí ẩn, trùm kín mít, hắn luôn có thể xuất hiện trước mặt ngươi, khoảng 3 ngày sẽ xuất hiện 1 lần, khi mua sắm sẽ hiện hub hiện những gì hắn có và hắn chỉ nhận Nguyên Tinh, lúc này time sẽ bị làm chậm đi 50% để player có time mua đồ.
+
+### thêm module:
+module là địa hình, kiến trúc player không thể xây được, cung cấp tài nguyên, sự kiện, module spam ngẫu nhiên.
+1. mỏ khoáng sản: cần tốn người để đào, cung cấp hắc thiết, 35%/25%/20%/15%/5% tỉ lệ đào được 6/10/14/28/24 đơn vị hắc thiết, mỗi map xuất hiện tối thiểu 3 quặng hắc thiết.
+2. quặng Nguyên Tinh, mỗi map xuất hiện tối thiểu 1 quặng nguyên tinh, 50% tỉ lệ xuất hiện quặng thứ 2, nếu có quặng thứ 2 lại có 25% xuất hiện quặng thứ 3, nếu có quặng thứ 3 có 5% xuất hiện quặng thứ 4, không xuất hiện quặng thứ 5, với mỗi quặng xuất hiện, random lần nữa, 35% ra quặng hạ nguyên tinh (trong đó 70% là hnt, 30% còn lại là vnt), 25% ra quặng TNT (trong đó 50% là tnt, 20% là hnt, còn lại 30% là vnt), 15% ra quặng ThNT,(trong đó 35% là thượng nguyên tinh, 25% là tnt, 10% là hnt, còn lại là vnt), từ tier 1.1 tỉ lệ thu thập là 10, tức 10 viên, vậy nếu random ra 1 quặng tnt thì player khi đào sẽ được 5 viên tnt, 2 viên hnt và 3 viên vnt, tỉ lệ thu hoạch tăng 50%/tier. Nếu random ra quặng hnt thì tỉ lệ thu hoặch tăng 50%/tier, tức ở map tier 1 random ra quặng hnt thì player có tỉ lệ thu hoạch là 15 (70% hnt và 30% còn lại là vnt) Nếu random ra quặng tnt thì tỉ lệ thu hoạch tăng 20%/tier, quặng ThNT không có tỉ lệ thu hoạch tăng thêm.
+3. Linh thụ: có hình thù ngẫu nhiên, xuất hiện ở vùng có nguyên tố hợp với loại tinh thụ đó, ví dụ: ở vùng có nguyên tố lôi nhiều sẽ xuất hiện Hồng Lôi Thụ có Hồng Lôi Quả, map tier 1.7 trở lên mới có khả năng xuất hiện, 20% tỉ lệ xuất hiện ở map tier 1.7, 30% ở 1.8 và 50% ở 1.9, nếu cả 3 tier map đều không gặp thì lên tier 2.1 tỉ lệ gặp là 100% nếu có vùng nguyên tố lôi dày đặc, trên thực tế tỉ lệ xuất hiện vùng nguyên tố lôi dày đặc cũng không phải là 100% vì còn nhiều nguyên tốt khác nên tỉ lệ trên chỉ tham khảo nếu 4 map tier đề cặp đến đều xuất hiện vùng nguyên tố lôi nhiều.
+- Xích Viêm Quả: linh quả nhất giai trung kỳ, tăng vĩnh viễn 2% wil/atk. Trong Vùng Hoả nguyên tố dày đặc có thể xuất hiện, 20% tỉ lệ xuất hiện ở tier 1.4, 30% ở 1.5 và 50% ở 1.6, 100% nếu chưa ăn lần nào ở 1.7, nhưng vì vùng nguyên tố random nên chưa chắc ăn được.
+
+thật ra linh quả hiệu quả đều không quá mạnh vì chỉ tác dụng trong mode này và sẽ mất tác dụng khi leader chết. Linh quả xuất hiện đương nhiên nằm trên linh thụ tương ứng
+
+- Phong Linh Quả: + vĩnh viễn 4% atk, tỉ lệ xuất hiện như Xích viêm quả nhưng là vùng phong nguyên tố nồng đậm.
+
+4. Vùng Nguyên Tố:
+- mỗi map đều có tỉ lệ xuất hiện vùng nguyên tố vì có 10 nguyên tố là Hỏa, Mộc, Thủy, Thổ, Kim, Lôi, Huyết, Ánh Sáng, Phong và Hắc Ám. Tăng 5% diện tích map/1 tier.
+- Trong đó Hắc Ám tỉ lệ là 100% vì Vĩnh Dạ, vùng hắc ám sẽ xuất hiện ở 1 hoặc 2 bên cuối map, còn lại mỗi nguyên tố sẽ random xuất hiện với tỉ lệ 11%, mỗi map có thể tồn tại tối đa 4 (+1 ở tier 2.1 trở đi, vẫn cap 5 cho đến khi đạt tier 3.1 +1 là 6) vùng nguyên tố chưa tính đến hắc ám, tức mỗi vùng đều có 11% xuất hiện vùng nguyên tố nồng đậm, đều random 4 vùng và vùng nguyên tố đã xuất hiện rồi có thể xuất hiện lần nữa, còn 1% còn lại là vùng nguyên tố cằn cỗi.
+- Trong mỗi vùng nguyên tố xuất hiện thì tối thiểu sẽ xuất hiện 1 bãi quái tương ứng với vùng nguyên tố đó, chúng đối địch với player cũng đối địch với vĩnh dạ.
