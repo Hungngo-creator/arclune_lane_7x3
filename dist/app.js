@@ -37846,8 +37846,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const BUILD_SITES = [
       { id: 'left-rock', x: CASTLE_OUTER_LEFT - CASTLE_SIZE, kind: 'rock', allowed: ['watchtower', 'elementalTower', 'barracks'] },
       { id: 'right-rock', x: CASTLE_OUTER_RIGHT + CASTLE_SIZE, kind: 'rock', allowed: ['watchtower', 'elementalTower', 'barracks'] },
-      { id: 'left-wall-slot', x: CASTLE_OUTER_LEFT - 42, kind: 'wall-slot', allowed: ['wall'] },
-      { id: 'right-wall-slot', x: CASTLE_OUTER_RIGHT + 42, kind: 'wall-slot', allowed: ['wall'] },
+      { id: 'wall-left', x: CASTLE_OUTER_LEFT - 120, kind: 'wall-slot', allowed: ['wall'] },
+      { id: 'wall-right', x: CASTLE_OUTER_RIGHT + 120, kind: 'wall-slot', allowed: ['wall'] },
       { id: 'castle-ground', x: CRYSTAL_X, kind: 'ground', allowed: ['church', 'crystalSeal'] }
   ];
   const CSS = /* css */ `
@@ -37867,6 +37867,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__leader{position:absolute;bottom:42%;width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
     .vinh-da-game__rock{position:absolute;bottom:42%;width:96px;height:58px;margin-left:-48px;border:0;border-radius:46% 54% 38% 42%;background:linear-gradient(150deg,#7e7b8e,#383746 58%,#1f1f2a);box-shadow:inset -12px -10px 18px rgba(0,0,0,.32),0 8px 22px rgba(0,0,0,.35);cursor:pointer;z-index:2;}
     .vinh-da-game__rock::after{content:"";position:absolute;left:18px;top:12px;width:42px;height:10px;border-radius:999px;background:rgba(255,255,255,.18);transform:rotate(-12deg);}
+    .vinh-da-game__wall-slot{position:absolute;bottom:42%;width:70px;height:78px;margin-left:-35px;border:1px dashed rgba(210,200,255,.32);border-radius:10px;background:linear-gradient(180deg,rgba(121,93,255,.12),rgba(16,14,26,.28));box-shadow:0 0 18px rgba(121,93,255,.16);cursor:pointer;z-index:2;}
+    .vinh-da-game__wall-slot::after{content:"";position:absolute;left:12px;right:12px;bottom:10px;height:8px;border-radius:999px;background:rgba(210,200,255,.18);}
+    .vinh-da-game__structure--wall{border-style:solid;border-color:rgba(226,222,255,.34);background:repeating-linear-gradient(90deg,#2e2944 0 18px,#181625 18px 36px);box-shadow:0 0 22px rgba(133,105,255,.38);}
+    .vinh-da-game__structure--wall::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:84px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
     .vinh-da-game__rock.has-structure{border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,#241c46,#0d0d16);border:1px solid rgba(226,222,255,.28);box-shadow:0 0 24px rgba(133,105,255,.45);}
     .vinh-da-game__rock.has-structure::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:64px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
     .vinh-da-game__build-menu{position:absolute;bottom:calc(42% + 36px);width:170px;height:170px;margin-left:-85px;pointer-events:none;opacity:0;transform:scale(.88);transition:opacity .16s ease,transform .16s ease;z-index:4;}
@@ -37886,7 +37890,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let cameraX = 0;
       let lastTime = performance.now();
       let rafId = 0;
-      let openRockId = null;
+      let openSiteId = null;
       const keys = new Set();
       const structures = new Map();
       const section = document.createElement('section');
@@ -37902,11 +37906,11 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           <div class="vinh-da-game__castle" aria-hidden="true"></div>
           <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
           <div class="vinh-da-game__ground" aria-hidden="true"></div>
-          ${BUILD_SITES.filter(site => site.kind === 'rock').map((rock) => `<button class="vinh-da-game__rock" data-rock-id="${rock.id}" style="left:${rock.x}px" type="button" aria-label="Ụ đá xây dựng"></button><div class="vinh-da-game__build-menu" data-build-menu="${rock.id}" style="left:${rock.x}px">${BUILD_NODE_OPTIONS.map((option, index) => {
+          ${BUILD_SITES.map((site) => `<button class="${site.kind === 'wall-slot' ? 'vinh-da-game__wall-slot' : 'vinh-da-game__rock'}" data-build-site-id="${site.id}" style="left:${site.x}px" type="button" aria-label="${site.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng'}"></button><div class="vinh-da-game__build-menu" data-build-menu="${site.id}" style="left:${site.x}px">${BUILD_NODE_OPTIONS.map((option, index) => {
           const angle = -90 + index * 360 / BUILD_SLOTS;
           const x = Math.cos(angle * Math.PI / 180) * 58;
           const y = Math.sin(angle * Math.PI / 180) * 58;
-          const isAllowed = rock.allowed.includes(option.type);
+          const isAllowed = site.allowed.includes(option.type);
           return `<button class="vinh-da-game__build-node" data-structure-type="${option.type}" type="button" style="transform:translate(${x}px,${y}px)" aria-label="${option.label}"${isAllowed ? '' : ' hidden'}>+<small>${option.label}</small></button>`;
       }).join('')}</div>`).join('')}
           <div class="vinh-da-game__leader" data-role="leader" title="${leader?.name ?? leaderId ?? 'Leader'}"></div>
@@ -37918,20 +37922,24 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const buildMenus = Array.from(section.querySelectorAll('[data-build-menu]'));
       const clampLeaderX = (x) => Math.max(80, Math.min(WORLD_WIDTH - 120, x));
       const getBuildSite = (siteId) => BUILD_SITES.find(site => site.id === siteId) ?? null;
-      const nearestRock = () => BUILD_SITES.find(site => site.kind === 'rock' && Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
+      const nearestBuildSite = () => BUILD_SITES.find(site => Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
       const renderBuildSite = (siteId) => {
-          const rockButton = section.querySelector(`[data-rock-id="${siteId}"]`);
-          if (!rockButton)
+          const siteButton = section.querySelector(`[data-build-site-id="${siteId}"]`);
+          if (!siteButton)
               return;
+          const site = getBuildSite(siteId);
           const structure = structures.get(siteId);
-          rockButton.classList.toggle('has-structure', Boolean(structure));
-          rockButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
-          rockButton.setAttribute('aria-label', structure ? `${rockButton.dataset.structureLabel} cấp ${structure.level}` : 'Ụ đá xây dựng');
+          const isWall = structure?.type === 'wall';
+          siteButton.classList.toggle('has-structure', Boolean(structure));
+          siteButton.classList.toggle('vinh-da-game__structure--wall', isWall);
+          siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
+          siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng');
       };
-      const setOpenRock = (rockId) => {
-          openRockId = rockId;
+      const setOpenBuildSite = (siteId) => {
+          openSiteId = siteId;
           for (const menu of buildMenus)
-              menu.classList.toggle('is-open', menu.dataset.buildMenu === rockId);
+              menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);
+          6;
       };
       const updateCamera = () => {
           const width = viewport?.clientWidth || window.innerWidth || 1;
@@ -37940,8 +37948,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               world.style.transform = `translate3d(${-cameraX}px,0,0)`;
           if (sprite)
               sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
-          if (openRockId && !nearestRock())
-              setOpenRock(null);
+          if (openSiteId && !nearestBuildSite())
+              setOpenBuildSite(null);
       };
       const tick = (now) => {
           const dt = Math.min(0.05, (now - lastTime) / 1000);
@@ -37960,11 +37968,11 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       };
       const moveToClientX = (clientX) => {
           targetX = clampLeaderX(clientX + cameraX - 23);
-          setOpenRock(null);
+          setOpenBuildSite(null);
       };
       const onViewportPointerDown = (event) => {
           const target = event.target instanceof Element ? event.target : null;
-          if (target?.closest('.vinh-da-game__rock,.vinh-da-game__build-node,.vinh-da-game__back'))
+          if (target?.closest('[data-build-site-id],.vinh-da-game__build-node,.vinh-da-game__back'))
               return;
           moveToClientX(event.clientX);
       };
@@ -37972,25 +37980,25 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           const target = event.target instanceof Element ? event.target : null;
           const buildNode = target?.closest('.vinh-da-game__build-node');
           if (buildNode) {
-              const site = getBuildSite(openRockId);
+              const site = getBuildSite(openSiteId);
               const type = buildNode.dataset.structureType;
               if (site && type && !structures.has(site.id) && site.allowed.includes(type)) {
                   structures.set(site.id, { siteId: site.id, type, level: 1 });
                   renderBuildSite(site.id);
               }
-              setOpenRock(null);
+              setOpenBuildSite(null);
               return;
           }
-          const rockButton = target?.closest('[data-rock-id]');
-          if (!rockButton)
+          const siteButton = target?.closest('[data-build-site-id]');
+          if (!siteButton)
               return;
-          const rock = nearestRock();
-          if (!rock || rock.id !== rockButton.dataset.rockId) {
-              targetX = clampLeaderX(Number.parseFloat(rockButton.style.left) || leaderX);
-              setOpenRock(null);
+          const site = nearestBuildSite();
+          if (!site || site.id !== siteButton.dataset.buildSiteId) {
+              targetX = clampLeaderX(Number.parseFloat(siteButton.style.left) || leaderX);
+              setOpenBuildSite(null);
               return;
           }
-          setOpenRock(openRockId === rock.id ? null : rock.id);
+          setOpenBuildSite(openSiteId === site.id ? null : site.id);
       };
       const onKeyDown = (event) => { keys.add(event.key.toLowerCase()); };
       const onKeyUp = (event) => { keys.delete(event.key.toLowerCase()); };
