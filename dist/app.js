@@ -37962,8 +37962,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__rock::after{content:"";position:absolute;left:18px;top:12px;width:42px;height:10px;border-radius:999px;background:rgba(255,255,255,.18);transform:rotate(-12deg);}
     .vinh-da-game__wall-slot{position:absolute;bottom:${GROUND_PERCENT};width:70px;height:78px;margin-left:-35px;border:1px dashed rgba(210,200,255,.32);border-radius:10px;background:linear-gradient(180deg,rgba(121,93,255,.12),rgba(16,14,26,.28));box-shadow:0 0 18px rgba(121,93,255,.16);cursor:pointer;z-index:2;}
     .vinh-da-game__wall-slot::after{content:"";position:absolute;left:12px;right:12px;bottom:10px;height:8px;border-radius:999px;background:rgba(210,200,255,.18);}
-    .vinh-da-game__plot{position:absolute;bottom:${GROUND_PERCENT};width:86px;height:40px;margin-left:-43px;border:0;border-radius:999px;background:transparent;box-shadow:none;cursor:pointer;z-index:2;}
-    .vinh-da-game__plot::after{content:"";position:absolute;inset:12px 16px;border-radius:999px;background:transparent;}
+    .vinh-da-game__plot{position:absolute;bottom:${GROUND_PERCENT};width:86px;height:40px;margin-left:-43px;border:1px solid rgba(91,255,178,.58);border-radius:999px;background:rgba(91,255,178,.035);box-shadow:none;cursor:pointer;z-index:1;}
+    .vinh-da-game__plot::after{content:"";position:absolute;left:16px;right:16px;top:50%;height:1px;background:rgba(91,255,178,.72);transform:translateY(-50%);}
     .vinh-da-game__rock.has-structure,.vinh-da-game__plot.has-structure{border-radius:10px 10px 4px 4px;border:1px solid rgba(226,222,255,.28);box-shadow:0 0 24px rgba(133,105,255,.45);}
     .vinh-da-game__plot.has-structure{width:96px;height:58px;margin-left:-48px;background:rgba(8,8,16,.22);}
     .vinh-da-game__structure--watchtower{background:linear-gradient(180deg,#3a2b67,#12111f);}
@@ -38000,6 +38000,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let lastTime = performance.now();
       let rafId = 0;
       let openSiteId = null;
+      let groundPlotsVisible = false;
+      let selectedGroundPlotId = null;
       let bloodSealStone = 0;
       const keys = new Set();
       const structures = new Map();
@@ -38063,6 +38065,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const clampLeaderX = (x) => Math.max(LEADER_EDGE_PADDING_LEFT, Math.min(WORLD_WIDTH - LEADER_EDGE_PADDING_RIGHT, x));
       const getBuildSite = (siteId) => BUILD_SITES.find(site => site.id === siteId) ?? null;
       const nearestBuildSite = () => BUILD_SITES.find(site => Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
+      const isGroundClick = (event) => {
+          const bounds = viewport?.getBoundingClientRect();
+          const viewportTop = bounds?.top ?? 0;
+          const viewportHeight = bounds?.height || window.innerHeight || 1;
+          return event.clientY >= viewportTop + viewportHeight * 0.58;
+      };
       const getBuildSiteClassName = (site) => {
           if (site.kind === 'wall-slot')
               return 'vinh-da-game__wall-slot';
@@ -38143,7 +38151,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
           const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
           for (const site of BUILD_SITES) {
-              if (site.x >= minX && site.x <= maxX) {
+              const structure = structures.get(site.id);
+              const shouldRenderGroundSite = site.kind !== 'ground' || groundPlotsVisible || site.id === openSiteId || site.id === selectedGroundPlotId || Boolean(structure);
+              if (site.x >= minX && site.x <= maxX && shouldRenderGroundSite) {
                   createBuildSiteElement(site);
                   renderBuildSite(site.id);
               }
@@ -38162,10 +38172,19 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       };
       const setOpenBuildSite = (siteId) => {
           openSiteId = siteId;
+          selectedGroundPlotId = getBuildSite(siteId)?.kind === 'ground' ? siteId : null;
           if (siteId)
               renderBuildMenu(siteId);
           for (const menu of buildMenuElements.values())
               menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);
+      };
+      const setGroundPlotsVisible = (visible) => {
+          if (groundPlotsVisible === visible)
+              return;
+          groundPlotsVisible = visible;
+          if (!visible)
+              selectedGroundPlotId = null;
+          renderVisibleBuildSites();
       };
       const spawnEnemy = (side) => {
           if (enemies.length >= ENEMY_LIMIT)
@@ -38321,7 +38340,13 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           const target = event.target instanceof Element ? event.target : null;
           if (target?.closest('[data-build-site-id],.vinh-da-game__build-node,.vinh-da-game__back'))
               return;
+          if (isGroundClick(event)) {
+              moveToClientX(event.clientX);
+              setGroundPlotsVisible(true);
+              return;
+          }
           moveToClientX(event.clientX);
+          setGroundPlotsVisible(false);
       };
       const onGameClick = (event) => {
           const target = event.target instanceof Element ? event.target : null;
@@ -38348,6 +38373,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
                   }
               }
               setOpenBuildSite(null);
+              setGroundPlotsVisible(false);
               return;
           }
           const siteButton = target?.closest('[data-build-site-id]');
@@ -38357,8 +38383,13 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           if (!site || site.id !== siteButton.dataset.buildSiteId) {
               targetX = clampLeaderX(Number.parseFloat(siteButton.style.left) || leaderX);
               setOpenBuildSite(null);
+              if (getBuildSite(siteButton.dataset.buildSiteId)?.kind !== 'ground')
+                  setGroundPlotsVisible(false);
               return;
           }
+          selectedGroundPlotId = site.kind === 'ground' ? site.id : null;
+          if (site.kind !== 'ground')
+              setGroundPlotsVisible(false);
           setOpenBuildSite(openSiteId === site.id ? null : site.id);
       };
       const onViewportResize = () => { renderVisibleBuildSites(); };
