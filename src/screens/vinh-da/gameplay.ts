@@ -33,6 +33,7 @@ import { DEFAULT_ENEMY_TEMPLATE } from './enemies.ts';
 import {
   BUILD_LEVEL_COST,
   BUILD_NODE_OPTIONS,
+  GROUND_BUILD_NODE_OPTIONS,
   BUILD_SITES,
   UPGRADE_NODE_LABEL,
   getStructureLevelStat
@@ -75,6 +76,8 @@ const CSS = /* css */ `
   .vinh-da-game__structure--barracks{background:linear-gradient(180deg,#463624,#14100d);}
   .vinh-da-game__structure--church{background:linear-gradient(180deg,#efe5ff,#44305f);}
   .vinh-da-game__structure--crystalSeal{background:linear-gradient(135deg,#eaffff,#7b5cff 48%,#39e8ff);}
+  .vinh-da-game__structure--landmine{background:radial-gradient(circle at 50% 50%,#ff544d 0 18%,#2a1412 19% 54%,#100807 55% 100%);}
+  .vinh-da-game__structure--swamp{background:radial-gradient(ellipse at 50% 62%,rgba(88,151,97,.85),rgba(28,57,48,.92) 58%,rgba(9,19,18,.96));}
   .vinh-da-game__rock.has-structure::before,.vinh-da-game__plot.has-structure::before,.vinh-da-game__wall-slot.has-structure::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:64px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
   .vinh-da-game__structure--wall{border-style:solid;border-color:rgba(226,222,255,.34);background:repeating-linear-gradient(90deg,#2e2944 0 18px,#181625 18px 36px);box-shadow:0 0 22px rgba(133,105,255,.38);}
   .vinh-da-game__structure--wall::before{bottom:84px;}
@@ -147,7 +150,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const bloodSealStoneText = section.querySelector<HTMLElement>('[data-role="blood-seal-stone"]');
   const siteElements = new Map<string, HTMLElement>();
   const buildMenuElements = new Map<string, HTMLDivElement>();
-  const structureClassNames = BUILD_NODE_OPTIONS.map(option => `vinh-da-game__structure--${option.type}`);
+  const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS] as const;
+  const structureClassNames = buildNodeOptions.map(option => `vinh-da-game__structure--${option.type}`);
   let lastRenderedCameraX = Number.POSITIVE_INFINITY;
 
   const getStructureMaxHp = (structure: PlacedStructure): number => getStructureLevelStat(structure.type, structure.level).hp;
@@ -194,13 +198,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     menu.className = 'vinh-da-game__build-menu';
     menu.dataset.buildMenu = site.id;
     menu.style.left = `${site.x}px`;
-    BUILD_NODE_OPTIONS.forEach((option) => {
+    const nodeOptions = site.kind === 'ground'
+      ? GROUND_BUILD_NODE_OPTIONS
+      : BUILD_NODE_OPTIONS.filter(option => site.allowed.includes(option.type));
+    nodeOptions.forEach((option) => {
       const node = document.createElement('button');
       node.className = 'vinh-da-game__build-node';
       node.dataset.structureType = option.type;
       node.type = 'button';
       node.setAttribute('aria-label', option.label);
-      node.hidden = !site.allowed.includes(option.type);
       node.innerHTML = `+<small>${option.label}</small>`;
       menu.append(node);
     });
@@ -243,7 +249,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     siteButton.classList.remove(...structureClassNames);
     siteButton.classList.toggle('has-structure', Boolean(structure) && runtime !== null && runtime.hp > 0);
     if (structure && runtime !== null && runtime.hp > 0) siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
-    siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
+    siteButton.dataset.structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
     siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
     renderBuildMenu(siteId);
   };

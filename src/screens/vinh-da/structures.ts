@@ -9,7 +9,7 @@ import {
 } from './constants.ts';
 import type { BuildSite } from './types.ts';
 
-export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal';
+export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal' | 'landmine' | 'swamp';
 
 export interface BuildMenuOption {
   label: string;
@@ -38,9 +38,14 @@ export const BUILD_NODE_OPTIONS = [
   { label: 'Trại', type: 'barracks' }
 ] as const satisfies readonly BuildMenuOption[];
 
-export const GROUND_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church'] as const satisfies readonly StructureType[];
+export const GROUND_BUILD_NODE_OPTIONS = [
+  { label: 'Địa lôi', type: 'landmine' },
+  { label: 'Đầm lầy', type: 'swamp' }
+] as const satisfies readonly BuildMenuOption[];
+
+export const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'swamp'] as const satisfies readonly StructureType[];
 export const WALL_BUILD_SITE_ALLOWED = ['wall'] as const satisfies readonly StructureType[];
-export const CASTLE_GROUND_BUILD_SITE_ALLOWED = ['church', 'crystalSeal'] as const satisfies readonly StructureType[];
+export const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
 
 export const WALL_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
   1: { hp: 8 },
@@ -66,6 +71,14 @@ export const GROUND_STRUCTURE_STATS: Record<Exclude<StructureType, 'wall' | 'wat
     2: { hp: 1 }
   },
   crystalSeal: {
+    1: { hp: 1 },
+    2: { hp: 1 }
+    },
+  landmine: {
+    1: { hp: 1 },
+    2: { hp: 1 }
+  },
+  swamp: {
     1: { hp: 1 },
     2: { hp: 1 }
   }

@@ -37939,6 +37939,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const __dep4 = __require('./screens/vinh-da/structures.ts');
   const BUILD_LEVEL_COST = __dep4.BUILD_LEVEL_COST;
   const BUILD_NODE_OPTIONS = __dep4.BUILD_NODE_OPTIONS;
+  const GROUND_BUILD_NODE_OPTIONS = __dep4.GROUND_BUILD_NODE_OPTIONS;
   const BUILD_SITES = __dep4.BUILD_SITES;
   const UPGRADE_NODE_LABEL = __dep4.UPGRADE_NODE_LABEL;
   const getStructureLevelStat = __dep4.getStructureLevelStat;
@@ -37971,6 +37972,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__structure--barracks{background:linear-gradient(180deg,#463624,#14100d);}
     .vinh-da-game__structure--church{background:linear-gradient(180deg,#efe5ff,#44305f);}
     .vinh-da-game__structure--crystalSeal{background:linear-gradient(135deg,#eaffff,#7b5cff 48%,#39e8ff);}
+    .vinh-da-game__structure--landmine{background:radial-gradient(circle at 50% 50%,#ff544d 0 18%,#2a1412 19% 54%,#100807 55% 100%);}
+    .vinh-da-game__structure--swamp{background:radial-gradient(ellipse at 50% 62%,rgba(88,151,97,.85),rgba(28,57,48,.92) 58%,rgba(9,19,18,.96));}
     .vinh-da-game__rock.has-structure::before,.vinh-da-game__plot.has-structure::before,.vinh-da-game__wall-slot.has-structure::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:64px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
     .vinh-da-game__structure--wall{border-style:solid;border-color:rgba(226,222,255,.34);background:repeating-linear-gradient(90deg,#2e2944 0 18px,#181625 18px 36px);box-shadow:0 0 22px rgba(133,105,255,.38);}
     .vinh-da-game__structure--wall::before{bottom:84px;}
@@ -38039,7 +38042,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const bloodSealStoneText = section.querySelector('[data-role="blood-seal-stone"]');
       const siteElements = new Map();
       const buildMenuElements = new Map();
-      const structureClassNames = BUILD_NODE_OPTIONS.map(option => `vinh-da-game__structure--${option.type}`);
+      const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS];
+      const structureClassNames = buildNodeOptions.map(option => `vinh-da-game__structure--${option.type}`);
       let lastRenderedCameraX = Number.POSITIVE_INFINITY;
       const getStructureMaxHp = (structure) => getStructureLevelStat(structure.type, structure.level).hp;
       const ensureStructureRuntime = (structure) => {
@@ -38090,13 +38094,15 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           menu.className = 'vinh-da-game__build-menu';
           menu.dataset.buildMenu = site.id;
           menu.style.left = `${site.x}px`;
-          BUILD_NODE_OPTIONS.forEach((option) => {
+          const nodeOptions = site.kind === 'ground'
+              ? GROUND_BUILD_NODE_OPTIONS
+              : BUILD_NODE_OPTIONS.filter(option => site.allowed.includes(option.type));
+          nodeOptions.forEach((option) => {
               const node = document.createElement('button');
               node.className = 'vinh-da-game__build-node';
               node.dataset.structureType = option.type;
               node.type = 'button';
               node.setAttribute('aria-label', option.label);
-              node.hidden = !site.allowed.includes(option.type);
               node.innerHTML = `+<small>${option.label}</small>`;
               menu.append(node);
           });
@@ -38142,7 +38148,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           siteButton.classList.toggle('has-structure', Boolean(structure) && runtime !== null && runtime.hp > 0);
           if (structure && runtime !== null && runtime.hp > 0)
               siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
-          siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
+          siteButton.dataset.structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
           siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
           renderBuildMenu(siteId);
       };
@@ -38450,9 +38456,13 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       { label: 'Ấn', type: 'church' },
       { label: 'Trại', type: 'barracks' }
   ];
-  const GROUND_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church'];
+  const GROUND_BUILD_NODE_OPTIONS = [
+      { label: 'Địa lôi', type: 'landmine' },
+      { label: 'Đầm lầy', type: 'swamp' }
+  ];
+  const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'swamp'];
   const WALL_BUILD_SITE_ALLOWED = ['wall'];
-  const CASTLE_GROUND_BUILD_SITE_ALLOWED = ['church', 'crystalSeal'];
+  const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
   const WALL_STRUCTURE_STATS = {
       1: { hp: 8 },
       2: { hp: 16 }
@@ -38475,6 +38485,14 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           2: { hp: 1 }
       },
       crystalSeal: {
+          1: { hp: 1 },
+          2: { hp: 1 }
+      },
+      landmine: {
+          1: { hp: 1 },
+          2: { hp: 1 }
+      },
+      swamp: {
           1: { hp: 1 },
           2: { hp: 1 }
       }
@@ -38526,6 +38544,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'UPGRADE_NODE_LABEL')) exports.UPGRADE_NODE_LABEL = UPGRADE_NODE_LABEL;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_LEVEL_COST')) exports.BUILD_LEVEL_COST = BUILD_LEVEL_COST;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_NODE_OPTIONS')) exports.BUILD_NODE_OPTIONS = BUILD_NODE_OPTIONS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_BUILD_NODE_OPTIONS')) exports.GROUND_BUILD_NODE_OPTIONS = GROUND_BUILD_NODE_OPTIONS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_BUILD_SITE_ALLOWED')) exports.GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
   if (!Object.prototype.hasOwnProperty.call(exports, 'WALL_BUILD_SITE_ALLOWED')) exports.WALL_BUILD_SITE_ALLOWED = WALL_BUILD_SITE_ALLOWED;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_GROUND_BUILD_SITE_ALLOWED')) exports.CASTLE_GROUND_BUILD_SITE_ALLOWED = CASTLE_GROUND_BUILD_SITE_ALLOWED;
