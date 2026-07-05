@@ -135,14 +135,16 @@ const resolveLineupBuffStats = (selectedBuffs: ReadonlyArray<number>): LineupBuf
   let resPct = 0;
 
   for (let i = 0; i < selectedBuffs.length; i += 1) {
-    const buff = LINEUP_BUFF_BY_INDEX[selectedBuffs[i]];
+    const selectedIndex = selectedBuffs[i];
+    if (selectedIndex === undefined) continue;
+    const buff = LINEUP_BUFF_BY_INDEX[selectedIndex];
     if (!buff) continue;
     hpPct += buff.hpPct ?? 0;
     atkPct += buff.atkPct ?? 0;
     wilPct += buff.wilPct ?? 0;
     armPct += buff.armPct ?? 0;
     resPct += buff.resPct ?? 0;
-}
+  }
 
   return { hpPct, atkPct, wilPct, armPct, resPct };
 };

@@ -1,6 +1,6 @@
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import { CAMPAIGN_STAGE_DATA, resolveBossName } from '../../data/campaign-stages.ts';
-import { getMetaById } from '../../catalog.ts';
+import { ROSTER, getMetaById } from '../../catalog.ts';
 import { normalizeElementKey } from '../../utils/domain-normalization.ts';
 
 import type { MainMenuShell } from '../main-menu/types.ts';
@@ -27,6 +27,7 @@ interface WorldNode {
 interface RenderContext {
   root: HTMLElement;
   shell?: MainMenuShell | null;
+  params?: Record<string, unknown> | null;
 }
 
 const STYLE_ID = 'campaign-world-map-style';
@@ -39,32 +40,41 @@ const CSS = /* css */ `
   .campaign-world-map__title{margin:0;font-size:28px;letter-spacing:.06em;text-transform:uppercase;}
   .campaign-world-map__subtitle{margin:6px 0 0;color:#b6d8d4;font-size:13px;letter-spacing:.03em;}
   .campaign-world-map__back{border:none;width:44px;height:44px;border-radius:999px;background:rgba(239,254,250,.92);color:#1f3342;cursor:pointer;font-size:24px;line-height:1;}
+  .campaign-world-map__corner-actions{position:absolute;inset:76px 20px 20px;z-index:4;pointer-events:none;}
+  .campaign-world-map__corner-btn{position:absolute;pointer-events:auto;border:1px solid rgba(230,230,255,.38);border-radius:14px;background:rgba(0,0,0,.72);color:#f5f2ff;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+  .campaign-world-map__corner-btn--tl{top:0;left:0}.campaign-world-map__corner-btn--tr{top:0;right:0}.campaign-world-map__corner-btn--bl{bottom:0;left:0}.campaign-world-map__corner-btn--br{bottom:0;right:0}
+  .campaign-world-map--vinh-da{background:#000;border-color:rgba(160,148,255,.32);}
+  .campaign-world-map--vinh-da .campaign-world-map__bg{background:radial-gradient(circle at 50% 40%,rgba(58,45,116,.32),transparent 24%),#000;}
+  .leader-modal{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:rgba(0,0,0,.58);padding:16px;}
+  .leader-modal[hidden]{display:none}.leader-modal__panel{width:min(720px,96vw);max-height:80vh;overflow:auto;border-radius:18px;border:1px solid rgba(206,205,255,.3);background:#09101b;color:#f4f7ff;padding:16px;box-shadow:0 18px 60px rgba(0,0,0,.55)}
+  .leader-modal__head{display:flex;align-items:center;justify-content:space-between;gap:12px}.leader-modal__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}.leader-card{border:1px solid rgba(171,198,255,.22);border-radius:14px;background:rgba(18,31,52,.88);color:inherit;text-align:left;padding:12px;cursor:pointer}.leader-card--active{border-color:#f7d28a;box-shadow:0 0 0 2px rgba(247,210,138,.18)}.leader-card__name{font-weight:900}.leader-card__meta{margin-top:6px;color:#b5c5e6;font-size:12px}
   .campaign-world-map__viewport{position:relative;flex:1;min-height:360px;margin:6px 14px 16px;border-radius:16px;overflow:hidden;border:1px solid rgba(124,204,194,.3);background:#020b13;touch-action:none;cursor:grab;}
   .campaign-world-map__viewport.is-dragging{cursor:grabbing;}
-  .campaign-world-map__canvas{position:absolute;width:${WORLD_SIZE}px;height:${WORLD_SIZE}px;transform:translate3d(0,0,0);transform-origin:0 0;}
+  campaign-world-map__canvas{position:absolute;width:${WORLD_SIZE}px;height:${WORLD_SIZE}px;transform:translate3d(0,0,0);transform-origin:0 0;will-change:transform;contain:layout paint style;backface-visibility:hidden;}
   .campaign-world-map__bg{position:absolute;inset:0;background:
       radial-gradient(circle at 22% 28%, rgba(90,148,98,.24) 0 14%, transparent 38%),
       radial-gradient(circle at 66% 18%, rgba(117,120,146,.26) 0 12%, transparent 34%),
       radial-gradient(circle at 56% 66%, rgba(43,108,124,.3) 0 9%, transparent 30%),
       conic-gradient(from 220deg at 50% 55%, rgba(20,41,52,.95), rgba(18,51,58,.9), rgba(16,28,37,.95), rgba(20,41,52,.95));
-    filter:saturate(1.05);
+    background-size:100% 100%,100% 100%,100% 100%,100% 100%;
+    contain:strict;
   }
-  .campaign-world-map__terrain{position:absolute;inset:0;opacity:.45;background:
+  .campaign-world-map__terrain{position:absolute;inset:0;opacity:.36;contain:strict;background:
       repeating-linear-gradient(145deg, rgba(197,226,209,.08) 0 2px, transparent 2px 12px),
       radial-gradient(110% 70% at 48% 54%, transparent 0 46%, rgba(130,180,190,.14) 54% 58%, transparent 64%),
       linear-gradient(120deg, transparent 0 35%, rgba(103,162,182,.26) 40% 43%, transparent 52% 100%);
   }
   .campaign-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;color:#f8f8de;cursor:pointer;z-index:2;}
-  .campaign-node__badge{min-width:128px;padding:9px 12px;border-radius:13px;border:1px solid rgba(255,225,176,.6);background:rgba(44,56,74,.62);backdrop-filter:blur(5px);font-weight:800;letter-spacing:.03em;}
+  .campaign-node__badge{min-width:128px;padding:9px 12px;border-radius:13px;border:1px solid rgba(255,225,176,.6);background:rgba(44,56,74,.78);font-weight:800;letter-spacing:.03em;}
   .campaign-node__dot{width:20px;height:20px;border-radius:50%;background:#f6ddb6;border:2px solid #fff3d2;box-shadow:0 0 0 4px rgba(255,237,194,.25),0 0 16px rgba(255,219,152,.65);}
   .campaign-node--active .campaign-node__badge{border-color:#ffd9ad;background:rgba(54,72,94,.8);}
   .campaign-node--active .campaign-node__dot{box-shadow:0 0 0 6px rgba(255,237,194,.25),0 0 24px rgba(255,219,152,.8);}
-  .campaign-node--locked{opacity:.45;filter:saturate(.3);cursor:not-allowed;}
+  .campaign-node--locked{opacity:.45;cursor:not-allowed;}
   .campaign-node--locked .campaign-node__dot{background:#92a0ad;border-color:#cad5e4;box-shadow:0 0 0 2px rgba(202,213,228,.2);}
   .campaign-world-map__overlay{position:absolute;inset:0;display:flex;opacity:0;pointer-events:none;transition:opacity .26s ease;z-index:5;padding:74px 0 0;}
   .campaign-world-map--stage-detail .campaign-world-map__overlay{opacity:1;pointer-events:auto;}
-  .campaign-panel{height:100%;padding:18px 16px 16px;backdrop-filter:blur(6px);background:linear-gradient(180deg,rgba(16,36,40,.84),rgba(14,28,34,.9));border-left:1px solid rgba(145,223,205,.16);border-right:1px solid rgba(145,223,205,.16);transform:translateY(14px);transition:transform .26s ease;}
-  .campaign-world-map--stage-detail .campaign-panel{transform:translateY(0);}
+  .campaign-panel{height:100%;padding:18px 16px 16px;background:linear-gradient(180deg,rgba(16,36,40,.91),rgba(14,28,34,.94));border-left:1px solid rgba(145,223,205,.16);border-right:1px solid rgba(145,223,205,.16);transform:translateY(14px);transition:transform .26s ease;}
+   .campaign-world-map--stage-detail .campaign-panel{transform:translateY(0);}
   .campaign-panel--left{width:30%;border-left:none;}
   .campaign-panel--middle{width:40%;border:none;background:linear-gradient(180deg,rgba(6,16,22,.22),rgba(6,16,22,.55));display:flex;flex-direction:column;gap:10px;}
   .campaign-panel--right{width:30%;border-right:none;display:flex;flex-direction:column;}
@@ -178,7 +188,10 @@ function computeWorldNodes(locations: LocationGroup[]): WorldNode[] {
 }
 
 export function renderScreen(context: RenderContext): { destroy: () => void } {
-  const { root, shell = null } = context;
+  const { root, shell = null, params = null } = context;
+  const modeKey = params?.modeKey === 'vinh-da' ? 'vinh-da' : 'campaign';
+  const isVinhDa = modeKey === 'vinh-da';
+  let selectedLeaderId = typeof params?.leaderId === 'string' ? params.leaderId : ROSTER[0]?.id;
   ensureStyleTag(STYLE_ID, { css: CSS });
 
   const locations = buildLocations();
@@ -195,17 +208,18 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   let pointerRafId = 0;
 
   const container = document.createElement('section');
-  container.className = 'campaign-world-map';
+  container.className = `campaign-world-map${isVinhDa ? ' campaign-world-map--vinh-da' : ''}`;
   const mount = mountSection({ root, section: container, rootClasses: 'app--campaign-world-map' });
 
   container.innerHTML = `
     <header class="campaign-world-map__hud">
       <div>
-        <h1 class="campaign-world-map__title">Campaign · World Map</h1>
-        <p class="campaign-world-map__subtitle">Bấm node sáng để mở Stage Detail.</p>
+        <h1 class="campaign-world-map__title">${isVinhDa ? 'Vĩnh Dạ · World Map' : 'Campaign · World Map'}</h1>
+        <p class="campaign-world-map__subtitle">Bấm trực tiếp node sáng để mở danh sách Stage.</p>
       </div>
       <button class="campaign-world-map__back" type="button" aria-label="Trở về menu chính">↩</button>
     </header>
+    ${isVinhDa ? '<div class="campaign-world-map__corner-actions"><button class="campaign-world-map__corner-btn campaign-world-map__corner-btn--tl" type="button" data-role="select-leader">Chọn Tướng</button><button class="campaign-world-map__corner-btn campaign-world-map__corner-btn--tr" type="button">Thành Trì</button><button class="campaign-world-map__corner-btn campaign-world-map__corner-btn--bl" type="button">Kho</button><button class="campaign-world-map__corner-btn campaign-world-map__corner-btn--br" type="button">Nhiệm Vụ</button></div>' : ''}
     <div class="campaign-world-map__viewport" data-role="viewport">
       <div class="campaign-world-map__canvas" data-role="canvas">
         <div class="campaign-world-map__bg"></div>
@@ -220,6 +234,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       <div class="campaign-panel campaign-panel--middle" data-role="location-info"></div>
       <aside class="campaign-panel campaign-panel--right" data-role="stage-info"></aside>
     </div>
+    <div class="leader-modal" data-role="leader-modal" hidden></div>
   `;
 
   const viewport = container.querySelector('[data-role="viewport"]');
@@ -244,11 +259,17 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
     };
   }
 
+  let lastAppliedOffsetX = Number.NaN;
+  let lastAppliedOffsetY = Number.NaN;
+
   function applyCanvasTransform(): void {
     if (!(canvas instanceof HTMLElement)) return;
     const clamped = clampOffset(offsetX, offsetY);
     offsetX = clamped.x;
     offsetY = clamped.y;
+    if (offsetX === lastAppliedOffsetX && offsetY === lastAppliedOffsetY) return;
+    lastAppliedOffsetX = offsetX;
+    lastAppliedOffsetY = offsetY;
     canvas.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
   }
 
@@ -310,10 +331,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       attackButton.disabled = selectedStage.status === 'locked';
       attackButton.addEventListener('click', () => {
         if (!shell || typeof shell.enterScreen !== 'function') return;
-        shell.enterScreen('pve-session', {
-          modeKey: 'campaign',
+        shell.enterScreen(isVinhDa ? 'vinh-da-gameplay' : 'pve-session', {
+          modeKey,
           stageId: selectedStage?.id,
           bossId: selectedStage?.bossId,
+          leaderId: selectedLeaderId,
         });
       });
     }
@@ -440,8 +462,38 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
       }
       if (shell && typeof shell.enterScreen === 'function'){
         setCurrentView('menu');
-        shell.enterScreen('main-menu');
+        shell.enterScreen(isVinhDa ? 'arena-hub' : 'main-menu');
       }
+    });
+  }
+
+  const leaderButton = container.querySelector('[data-role="select-leader"]');
+  const leaderModal = container.querySelector('[data-role="leader-modal"]');
+  const renderLeaderModal = (): void => {
+    if (!(leaderModal instanceof HTMLElement)) return;
+    leaderModal.innerHTML = `
+      <div class="leader-modal__panel">
+        <div class="leader-modal__head"><h2>Chọn Tướng</h2><button type="button" data-role="close-leader">Đóng</button></div>
+        <div class="leader-modal__grid">
+          ${ROSTER.map((unit) => `<button type="button" class="leader-card${unit.id === selectedLeaderId ? ' leader-card--active' : ''}" data-leader-id="${unit.id}"><div class="leader-card__name">${unit.name}</div><div class="leader-card__meta">${unit.rank} · ${unit.class} · ${unit.base_element}</div></button>`).join('')}
+        </div>
+      </div>`;
+  };
+  if (leaderButton instanceof HTMLButtonElement && leaderModal instanceof HTMLElement){
+    leaderButton.addEventListener('click', () => {
+      renderLeaderModal();
+      leaderModal.hidden = false;
+    });
+    leaderModal.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('[data-role="close-leader"]') || target === leaderModal){
+        leaderModal.hidden = true;
+        return;
+      }
+      const card = target?.closest<HTMLButtonElement>('[data-leader-id]');
+      if (!card) return;
+      selectedLeaderId = card.dataset.leaderId || selectedLeaderId;
+      renderLeaderModal();
     });
   }
 

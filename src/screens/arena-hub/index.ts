@@ -8,7 +8,7 @@ import type { ModeConfig } from '@shared-types/config';
 
 const STYLE_ID = 'arena-hub-screen-style';
 const ARENA_HUB_ID = 'arena-hub';
-const CHILD_ORDER: ReadonlyArray<string> = ['arena', 'beast-arena', 'co-ty-phu', 'chess-strategy-rpg', 'ares', 'challenge', 'campaign'];
+const CHILD_ORDER: ReadonlyArray<string> = ['arena', 'beast-arena', 'co-ty-phu', 'chess-strategy-rpg', 'ares', 'challenge', 'campaign', 'vinh-da'];
 
 const CSS = /* css */ `
   .app--arena-hub{
@@ -19,7 +19,7 @@ const CSS = /* css */ `
     margin:0 auto;
     display:flex;
     flex-direction:column;
-    gap:32px;
+    gap:24px;
     color:inherit;
   }
   .arena-hub__header{
@@ -68,17 +68,13 @@ const CSS = /* css */ `
     line-height:1.6;
     font-size:16px;
   }
-  .arena-hub__grid{
-    display:grid;
-    gap:20px;
-  }
-  @media(min-width:720px){
-    .arena-hub__grid{
-      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    }
-  }
-  .arena-hub__card{
-    width:100%;
+  .arena-hub__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-items:stretch;}
+  .arena-hub__card{width:100%;min-height:132px;padding:14px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;overflow:hidden;}
+  .arena-hub__card .mode-card__desc{display:none;}
+  .arena-hub__card .mode-card__title{font-size:15px;line-height:1.2;white-space:normal;overflow-wrap:anywhere;}
+  .arena-hub__card .mode-card__icon{font-size:24px;}
+  .arena-hub__card .mode-card__tags{margin-top:auto;}
+  .arena-hub__card[data-mode="vinh-da"]{background:#000000;border-color:rgba(220,220,255,.32);box-shadow:inset 0 0 28px rgba(84,66,150,.28),0 12px 32px rgba(0,0,0,.45);}
   }
 `;
 

@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -10967,6 +10967,7 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
   const CHESS_STRATEGY_RPG_READY_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/ready.ts';
   const CHESS_STRATEGY_RPG_BATTLE_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/battle.ts';
   const CHESS_STRATEGY_RPG_MATCH_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/match.ts';
+  const VINH_DA_GAMEPLAY_SCREEN_MODULE_ID = '@screens/vinh-da/gameplay.ts';
   const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts';
   const MODE_TYPES = {
       PVE: '',
@@ -11016,6 +11017,39 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
               screenId: 'campaign-world-map',
               moduleId: CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID,
               defaultParams: { modeKey: 'campaign' }
+          }
+      },
+      {
+          id: 'vinh-da',
+          title: 'Vĩnh Dạ',
+          type: MODE_TYPES.PVE,
+          status: MODE_STATUS.AVAILABLE,
+          icon: '🏰',
+          shortDescription: 'World Map phòng thủ thành trì trong màn đêm vĩnh cửu, chọn Leader trước khi vào trận side-scrolling.',
+          unlockNotes: 'Mở từ Chiến Trường; dùng World Map riêng và scene Vĩnh Dạ độc lập.',
+          tags: ['PvE'],
+          menuSections: ['core-pve'],
+          parentId: 'arena-hub',
+          shell: {
+              screenId: 'campaign-world-map',
+              moduleId: CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID,
+              defaultParams: { modeKey: 'vinh-da' }
+          }
+      },
+      {
+          id: 'vinh-da-gameplay',
+          title: 'Vĩnh Dạ · Trận Chiến',
+          type: MODE_TYPES.PVE,
+          status: MODE_STATUS.AVAILABLE,
+          icon: '🏰',
+          shortDescription: 'Prototype gameplay màn hình ngang cho Vĩnh Dạ với Leader di chuyển trái/phải và camera follow.',
+          unlockNotes: 'Vào từ Stage trên World Map Vĩnh Dạ.',
+          tags: ['PvE'],
+          menuSections: [],
+          parentId: 'vinh-da',
+          shell: {
+              screenId: 'vinh-da-gameplay',
+              moduleId: VINH_DA_GAMEPLAY_SCREEN_MODULE_ID
           }
       },
       {
@@ -22676,7 +22710,7 @@ __modules['./screens/arena-hub/index.ts'] = (exports, module, __require) => {
   const MODES = __dep2.MODES;
   const STYLE_ID = 'arena-hub-screen-style';
   const ARENA_HUB_ID = 'arena-hub';
-  const CHILD_ORDER = ['arena', 'beast-arena', 'co-ty-phu', 'chess-strategy-rpg', 'ares', 'challenge', 'campaign'];
+  const CHILD_ORDER = ['arena', 'beast-arena', 'co-ty-phu', 'chess-strategy-rpg', 'ares', 'challenge', 'campaign', 'vinh-da'];
   const CSS = /* css */ `
     .app--arena-hub{
       padding:32px 16px 64px;
@@ -22686,7 +22720,7 @@ __modules['./screens/arena-hub/index.ts'] = (exports, module, __require) => {
       margin:0 auto;
       display:flex;
       flex-direction:column;
-      gap:32px;
+      gap:24px;
       color:inherit;
     }
     .arena-hub__header{
@@ -22735,17 +22769,13 @@ __modules['./screens/arena-hub/index.ts'] = (exports, module, __require) => {
       line-height:1.6;
       font-size:16px;
     }
-    .arena-hub__grid{
-      display:grid;
-      gap:20px;
-    }
-    @media(min-width:720px){
-      .arena-hub__grid{
-        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-      }
-    }
-    .arena-hub__card{
-      width:100%;
+    .arena-hub__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-items:stretch;}
+    .arena-hub__card{width:100%;min-height:132px;padding:14px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;overflow:hidden;}
+    .arena-hub__card .mode-card__desc{display:none;}
+    .arena-hub__card .mode-card__title{font-size:15px;line-height:1.2;white-space:normal;overflow-wrap:anywhere;}
+    .arena-hub__card .mode-card__icon{font-size:24px;}
+    .arena-hub__card .mode-card__tags{margin-top:auto;}
+    .arena-hub__card[data-mode="vinh-da"]{background:#000000;border-color:rgba(220,220,255,.32);box-shadow:inset 0 0 28px rgba(84,66,150,.28),0 12px 32px rgba(0,0,0,.45);}
     }
   `;
   function ensureStyles() {
@@ -22859,6 +22889,7 @@ __modules['./screens/campaign-world-map/index.ts'] = (exports, module, __require
   const CAMPAIGN_STAGE_DATA = __dep1.CAMPAIGN_STAGE_DATA;
   const resolveBossName = __dep1.resolveBossName;
   const __dep2 = __require('./catalog.ts');
+  const ROSTER = __dep2.ROSTER;
   const getMetaById = __dep2.getMetaById;
   const __dep3 = __require('./utils/domain-normalization.ts');
   const normalizeElementKey = __dep3.normalizeElementKey;
@@ -22871,32 +22902,41 @@ __modules['./screens/campaign-world-map/index.ts'] = (exports, module, __require
     .campaign-world-map__title{margin:0;font-size:28px;letter-spacing:.06em;text-transform:uppercase;}
     .campaign-world-map__subtitle{margin:6px 0 0;color:#b6d8d4;font-size:13px;letter-spacing:.03em;}
     .campaign-world-map__back{border:none;width:44px;height:44px;border-radius:999px;background:rgba(239,254,250,.92);color:#1f3342;cursor:pointer;font-size:24px;line-height:1;}
+    .campaign-world-map__corner-actions{position:absolute;inset:76px 20px 20px;z-index:4;pointer-events:none;}
+    .campaign-world-map__corner-btn{position:absolute;pointer-events:auto;border:1px solid rgba(230,230,255,.38);border-radius:14px;background:rgba(0,0,0,.72);color:#f5f2ff;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+    .campaign-world-map__corner-btn--tl{top:0;left:0}.campaign-world-map__corner-btn--tr{top:0;right:0}.campaign-world-map__corner-btn--bl{bottom:0;left:0}.campaign-world-map__corner-btn--br{bottom:0;right:0}
+    .campaign-world-map--vinh-da{background:#000;border-color:rgba(160,148,255,.32);}
+    .campaign-world-map--vinh-da .campaign-world-map__bg{background:radial-gradient(circle at 50% 40%,rgba(58,45,116,.32),transparent 24%),#000;}
+    .leader-modal{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:rgba(0,0,0,.58);padding:16px;}
+    .leader-modal[hidden]{display:none}.leader-modal__panel{width:min(720px,96vw);max-height:80vh;overflow:auto;border-radius:18px;border:1px solid rgba(206,205,255,.3);background:#09101b;color:#f4f7ff;padding:16px;box-shadow:0 18px 60px rgba(0,0,0,.55)}
+    .leader-modal__head{display:flex;align-items:center;justify-content:space-between;gap:12px}.leader-modal__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}.leader-card{border:1px solid rgba(171,198,255,.22);border-radius:14px;background:rgba(18,31,52,.88);color:inherit;text-align:left;padding:12px;cursor:pointer}.leader-card--active{border-color:#f7d28a;box-shadow:0 0 0 2px rgba(247,210,138,.18)}.leader-card__name{font-weight:900}.leader-card__meta{margin-top:6px;color:#b5c5e6;font-size:12px}
     .campaign-world-map__viewport{position:relative;flex:1;min-height:360px;margin:6px 14px 16px;border-radius:16px;overflow:hidden;border:1px solid rgba(124,204,194,.3);background:#020b13;touch-action:none;cursor:grab;}
     .campaign-world-map__viewport.is-dragging{cursor:grabbing;}
-    .campaign-world-map__canvas{position:absolute;width:${WORLD_SIZE}px;height:${WORLD_SIZE}px;transform:translate3d(0,0,0);transform-origin:0 0;}
+    campaign-world-map__canvas{position:absolute;width:${WORLD_SIZE}px;height:${WORLD_SIZE}px;transform:translate3d(0,0,0);transform-origin:0 0;will-change:transform;contain:layout paint style;backface-visibility:hidden;}
     .campaign-world-map__bg{position:absolute;inset:0;background:
         radial-gradient(circle at 22% 28%, rgba(90,148,98,.24) 0 14%, transparent 38%),
         radial-gradient(circle at 66% 18%, rgba(117,120,146,.26) 0 12%, transparent 34%),
         radial-gradient(circle at 56% 66%, rgba(43,108,124,.3) 0 9%, transparent 30%),
         conic-gradient(from 220deg at 50% 55%, rgba(20,41,52,.95), rgba(18,51,58,.9), rgba(16,28,37,.95), rgba(20,41,52,.95));
-      filter:saturate(1.05);
+      background-size:100% 100%,100% 100%,100% 100%,100% 100%;
+      contain:strict;
     }
-    .campaign-world-map__terrain{position:absolute;inset:0;opacity:.45;background:
+    .campaign-world-map__terrain{position:absolute;inset:0;opacity:.36;contain:strict;background:
         repeating-linear-gradient(145deg, rgba(197,226,209,.08) 0 2px, transparent 2px 12px),
         radial-gradient(110% 70% at 48% 54%, transparent 0 46%, rgba(130,180,190,.14) 54% 58%, transparent 64%),
         linear-gradient(120deg, transparent 0 35%, rgba(103,162,182,.26) 40% 43%, transparent 52% 100%);
     }
     .campaign-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;color:#f8f8de;cursor:pointer;z-index:2;}
-    .campaign-node__badge{min-width:128px;padding:9px 12px;border-radius:13px;border:1px solid rgba(255,225,176,.6);background:rgba(44,56,74,.62);backdrop-filter:blur(5px);font-weight:800;letter-spacing:.03em;}
+    .campaign-node__badge{min-width:128px;padding:9px 12px;border-radius:13px;border:1px solid rgba(255,225,176,.6);background:rgba(44,56,74,.78);font-weight:800;letter-spacing:.03em;}
     .campaign-node__dot{width:20px;height:20px;border-radius:50%;background:#f6ddb6;border:2px solid #fff3d2;box-shadow:0 0 0 4px rgba(255,237,194,.25),0 0 16px rgba(255,219,152,.65);}
     .campaign-node--active .campaign-node__badge{border-color:#ffd9ad;background:rgba(54,72,94,.8);}
     .campaign-node--active .campaign-node__dot{box-shadow:0 0 0 6px rgba(255,237,194,.25),0 0 24px rgba(255,219,152,.8);}
-    .campaign-node--locked{opacity:.45;filter:saturate(.3);cursor:not-allowed;}
+    .campaign-node--locked{opacity:.45;cursor:not-allowed;}
     .campaign-node--locked .campaign-node__dot{background:#92a0ad;border-color:#cad5e4;box-shadow:0 0 0 2px rgba(202,213,228,.2);}
     .campaign-world-map__overlay{position:absolute;inset:0;display:flex;opacity:0;pointer-events:none;transition:opacity .26s ease;z-index:5;padding:74px 0 0;}
     .campaign-world-map--stage-detail .campaign-world-map__overlay{opacity:1;pointer-events:auto;}
-    .campaign-panel{height:100%;padding:18px 16px 16px;backdrop-filter:blur(6px);background:linear-gradient(180deg,rgba(16,36,40,.84),rgba(14,28,34,.9));border-left:1px solid rgba(145,223,205,.16);border-right:1px solid rgba(145,223,205,.16);transform:translateY(14px);transition:transform .26s ease;}
-    .campaign-world-map--stage-detail .campaign-panel{transform:translateY(0);}
+    .campaign-panel{height:100%;padding:18px 16px 16px;background:linear-gradient(180deg,rgba(16,36,40,.91),rgba(14,28,34,.94));border-left:1px solid rgba(145,223,205,.16);border-right:1px solid rgba(145,223,205,.16);transform:translateY(14px);transition:transform .26s ease;}
+     .campaign-world-map--stage-detail .campaign-panel{transform:translateY(0);}
     .campaign-panel--left{width:30%;border-left:none;}
     .campaign-panel--middle{width:40%;border:none;background:linear-gradient(180deg,rgba(6,16,22,.22),rgba(6,16,22,.55));display:flex;flex-direction:column;gap:10px;}
     .campaign-panel--right{width:30%;border-right:none;display:flex;flex-direction:column;}
@@ -23002,7 +23042,10 @@ __modules['./screens/campaign-world-map/index.ts'] = (exports, module, __require
       });
   }
   function renderScreen(context) {
-      const { root, shell = null } = context;
+      const { root, shell = null, params = null } = context;
+      const modeKey = params?.modeKey === 'vinh-da' ? 'vinh-da' : 'campaign';
+      const isVinhDa = modeKey === 'vinh-da';
+      let selectedLeaderId = typeof params?.leaderId === 'string' ? params.leaderId : ROSTER[0]?.id;
       ensureStyleTag(STYLE_ID, { css: CSS });
       const locations = buildLocations();
       const worldNodes = computeWorldNodes(locations);
@@ -23016,16 +23059,17 @@ __modules['./screens/campaign-world-map/index.ts'] = (exports, module, __require
       let queuedPointerDeltaY = 0;
       let pointerRafId = 0;
       const container = document.createElement('section');
-      container.className = 'campaign-world-map';
+      container.className = `campaign-world-map${isVinhDa ? ' campaign-world-map--vinh-da' : ''}`;
       const mount = mountSection({ root, section: container, rootClasses: 'app--campaign-world-map' });
       container.innerHTML = `
       <header class="campaign-world-map__hud">
         <div>
-          <h1 class="campaign-world-map__title">Campaign · World Map</h1>
-          <p class="campaign-world-map__subtitle">Bấm node sáng để mở Stage Detail.</p>
+          <h1 class="campaign-world-map__title">${isVinhDa ? 'Vĩnh Dạ · World Map' : 'Campaign · World Map'}</h1>
+          <p class="campaign-world-map__subtitle">Bấm trực tiếp node sáng để mở danh sách Stage.</p>
         </div>
         <button class="campaign-world-map__back" type="button" aria-label="Trở về menu chính">↩</button>
       </header>
+      ${isVinhDa ? '<div class="campaign-world-map__corner-actions"><button class="campaign-world-map__corner-btn campaign-world-map__corner-btn--tl" type="button" data-role="select-leader">Chọn Tướng</button><button class="campaign-world-map__corner-btn campaign-world-map__corner-btn--tr" type="button">Thành Trì</button><button class="campaign-world-map__corner-btn campaign-world-map__corner-btn--bl" type="button">Kho</button><button class="campaign-world-map__corner-btn campaign-world-map__corner-btn--br" type="button">Nhiệm Vụ</button></div>' : ''}
       <div class="campaign-world-map__viewport" data-role="viewport">
         <div class="campaign-world-map__canvas" data-role="canvas">
           <div class="campaign-world-map__bg"></div>
@@ -23040,6 +23084,7 @@ __modules['./screens/campaign-world-map/index.ts'] = (exports, module, __require
         <div class="campaign-panel campaign-panel--middle" data-role="location-info"></div>
         <aside class="campaign-panel campaign-panel--right" data-role="stage-info"></aside>
       </div>
+      <div class="leader-modal" data-role="leader-modal" hidden></div>
     `;
       const viewport = container.querySelector('[data-role="viewport"]');
       const canvas = container.querySelector('[data-role="canvas"]');
@@ -23061,12 +23106,18 @@ __modules['./screens/campaign-world-map/index.ts'] = (exports, module, __require
               y: Math.max(-boundsY, Math.min(0, nextY)),
           };
       }
+      let lastAppliedOffsetX = Number.NaN;
+      let lastAppliedOffsetY = Number.NaN;
       function applyCanvasTransform() {
           if (!(canvas instanceof HTMLElement))
               return;
           const clamped = clampOffset(offsetX, offsetY);
           offsetX = clamped.x;
           offsetY = clamped.y;
+          if (offsetX === lastAppliedOffsetX && offsetY === lastAppliedOffsetY)
+              return;
+          lastAppliedOffsetX = offsetX;
+          lastAppliedOffsetY = offsetY;
           canvas.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
       }
       function centerOnNode(node) {
@@ -23127,10 +23178,11 @@ __modules['./screens/campaign-world-map/index.ts'] = (exports, module, __require
               attackButton.addEventListener('click', () => {
                   if (!shell || typeof shell.enterScreen !== 'function')
                       return;
-                  shell.enterScreen('pve-session', {
-                      modeKey: 'campaign',
+                  shell.enterScreen(isVinhDa ? 'vinh-da-gameplay' : 'pve-session', {
+                      modeKey,
                       stageId: selectedStage?.id,
                       bossId: selectedStage?.bossId,
+                      leaderId: selectedLeaderId,
                   });
               });
           }
@@ -23252,8 +23304,39 @@ __modules['./screens/campaign-world-map/index.ts'] = (exports, module, __require
               }
               if (shell && typeof shell.enterScreen === 'function') {
                   setCurrentView('menu');
-                  shell.enterScreen('main-menu');
+                  shell.enterScreen(isVinhDa ? 'arena-hub' : 'main-menu');
               }
+          });
+      }
+      const leaderButton = container.querySelector('[data-role="select-leader"]');
+      const leaderModal = container.querySelector('[data-role="leader-modal"]');
+      const renderLeaderModal = () => {
+          if (!(leaderModal instanceof HTMLElement))
+              return;
+          leaderModal.innerHTML = `
+        <div class="leader-modal__panel">
+          <div class="leader-modal__head"><h2>Chọn Tướng</h2><button type="button" data-role="close-leader">Đóng</button></div>
+          <div class="leader-modal__grid">
+            ${ROSTER.map((unit) => `<button type="button" class="leader-card${unit.id === selectedLeaderId ? ' leader-card--active' : ''}" data-leader-id="${unit.id}"><div class="leader-card__name">${unit.name}</div><div class="leader-card__meta">${unit.rank} · ${unit.class} · ${unit.base_element}</div></button>`).join('')}
+          </div>
+        </div>`;
+      };
+      if (leaderButton instanceof HTMLButtonElement && leaderModal instanceof HTMLElement) {
+          leaderButton.addEventListener('click', () => {
+              renderLeaderModal();
+              leaderModal.hidden = false;
+          });
+          leaderModal.addEventListener('click', (event) => {
+              const target = event.target;
+              if (target?.closest('[data-role="close-leader"]') || target === leaderModal) {
+                  leaderModal.hidden = true;
+                  return;
+              }
+              const card = target?.closest('[data-leader-id]');
+              if (!card)
+                  return;
+              selectedLeaderId = card.dataset.leaderId || selectedLeaderId;
+              renderLeaderModal();
           });
       }
       if (worldNodes[0]) {
@@ -37729,6 +37812,103 @@ __modules['./screens/ui-gacha/logic/types.ts'] = (exports, module, __require) =>
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
   if (!Object.prototype.hasOwnProperty.call(exports, 'RARITY_ORDER')) exports.RARITY_ORDER = RARITY_ORDER;
 };
+__modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./catalog.ts');
+  const ROSTER = __dep0.ROSTER;
+  const getMetaById = __dep0.getMetaById;
+  const __dep1 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep1.ensureStyleTag;
+  const mountSection = __dep1.mountSection;
+  const STYLE_ID = 'vinh-da-gameplay-style';
+  const WORLD_WIDTH = 3600;
+  const LEADER_SPEED = 420;
+  const CSS = /* css */ `
+    .app--vinh-da-gameplay{min-height:100dvh;background:#020204;color:#f7f2ff;overflow:hidden;}
+    .vinh-da-game{position:relative;min-height:100dvh;overflow:hidden;background:linear-gradient(#020204 0 58%,#07070b 58% 100%);}
+    .vinh-da-game__hud{position:absolute;z-index:3;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none;}
+    .vinh-da-game__panel{pointer-events:auto;border:1px solid rgba(210,200,255,.24);border-radius:14px;background:rgba(0,0,0,.58);padding:10px 12px;box-shadow:0 10px 32px rgba(0,0,0,.35);}
+    .vinh-da-game__back{border:0;border-radius:999px;background:#f3edff;color:#111020;width:42px;height:42px;font-size:22px;cursor:pointer;}
+    .vinh-da-game__viewport{position:absolute;inset:0;overflow:hidden;}
+    .vinh-da-game__world{position:absolute;left:0;top:0;width:${WORLD_WIDTH}px;height:100%;transform:translate3d(0,0,0);will-change:transform;background:radial-gradient(circle at 50% 28%,rgba(87,68,168,.34),transparent 18%),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 220px);}
+    .vinh-da-game__ground{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(#121018,#050507);border-top:1px solid rgba(210,200,255,.18);}
+    .vinh-da-game__castle{position:absolute;left:1700px;bottom:42%;width:190px;height:170px;background:linear-gradient(180deg,#202033,#0d0d16);border:2px solid rgba(226,222,255,.2);box-shadow:0 0 44px rgba(83,65,170,.3);}
+    .vinh-da-game__castle::before,.vinh-da-game__castle::after{content:"";position:absolute;bottom:0;width:54px;height:230px;background:#11111f;border:2px solid rgba(226,222,255,.18)}
+    .vinh-da-game__castle::before{left:-60px}.vinh-da-game__castle::after{right:-60px}
+    .vinh-da-game__leader{position:absolute;bottom:42%;width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;}
+    .vinh-da-game__hint{font-size:12px;color:#c7bee9;margin-top:4px;}
+  `;
+  function renderScreen(context) {
+      const { root, shell = null, params = null } = context;
+      ensureStyleTag(STYLE_ID, { css: CSS });
+      const leaderId = typeof params?.leaderId === 'string' ? params.leaderId : ROSTER[0]?.id;
+      const leader = leaderId ? getMetaById(leaderId) : null;
+      let leaderX = WORLD_WIDTH / 2;
+      let cameraX = 0;
+      let lastTime = performance.now();
+      let rafId = 0;
+      const keys = new Set();
+      const section = document.createElement('section');
+      section.className = 'vinh-da-game';
+      const mount = mountSection({ root, section, rootClasses: 'app--vinh-da-gameplay' });
+      section.innerHTML = `
+      <div class="vinh-da-game__hud">
+        <div class="vinh-da-game__panel">
+          <strong>Vĩnh Dạ · ${leader?.name ?? leaderId ?? 'Leader'}</strong>
+          <div class="vinh-da-game__hint">Di chuyển: ←/→ hoặc A/D · Stage ${params?.stageId ?? 'unknown'}</div>
+        </div>
+        <button class="vinh-da-game__back" type="button" aria-label="Về World Map">↩</button>
+      </div>
+      <div class="vinh-da-game__viewport" data-role="viewport">
+        <div class="vinh-da-game__world" data-role="world">
+          <div class="vinh-da-game__castle" aria-hidden="true"></div>
+          <div class="vinh-da-game__ground" aria-hidden="true"></div>
+          <div class="vinh-da-game__leader" data-role="leader" title="${leader?.name ?? leaderId ?? 'Leader'}"></div>
+        </div>
+      </div>`;
+      const world = section.querySelector('[data-role="world"]');
+      const sprite = section.querySelector('[data-role="leader"]');
+      const viewport = section.querySelector('[data-role="viewport"]');
+      const updateCamera = () => {
+          const width = viewport?.clientWidth || window.innerWidth || 1;
+          cameraX = Math.max(0, Math.min(WORLD_WIDTH - width, leaderX - width * 0.5));
+          if (world)
+              world.style.transform = `translate3d(${-cameraX}px,0,0)`;
+          if (sprite)
+              sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
+      };
+      const tick = (now) => {
+          const dt = Math.min(0.05, (now - lastTime) / 1000);
+          lastTime = now;
+          const left = keys.has('arrowleft') || keys.has('a');
+          const right = keys.has('arrowright') || keys.has('d');
+          leaderX += (Number(right) - Number(left)) * LEADER_SPEED * dt;
+          leaderX = Math.max(80, Math.min(WORLD_WIDTH - 120, leaderX));
+          updateCamera();
+          rafId = window.requestAnimationFrame(tick);
+      };
+      const onKeyDown = (event) => { keys.add(event.key.toLowerCase()); };
+      const onKeyUp = (event) => { keys.delete(event.key.toLowerCase()); };
+      window.addEventListener('keydown', onKeyDown);
+      window.addEventListener('keyup', onKeyUp);
+      section.querySelector('.vinh-da-game__back')?.addEventListener('click', () => {
+          shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId });
+      });
+      updateCamera();
+      rafId = window.requestAnimationFrame(tick);
+      return {
+          destroy() {
+              window.cancelAnimationFrame(rafId);
+              window.removeEventListener('keydown', onKeyDown);
+              window.removeEventListener('keyup', onKeyUp);
+              mount.destroy();
+          }
+      };
+  }
+  const render = renderScreen;
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
+};
 __modules['./shared-types/units.ts'] = (exports, module, __require) => {
   const __reexport0 = __require('./types/units.ts');
   for (const key of Object.keys(__reexport0)) {
@@ -38627,7 +38807,10 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       let armPct = 0;
       let resPct = 0;
       for (let i = 0; i < selectedBuffs.length; i += 1) {
-          const buff = LINEUP_BUFF_BY_INDEX[selectedBuffs[i]];
+          const selectedIndex = selectedBuffs[i];
+          if (selectedIndex === undefined)
+              continue;
+          const buff = LINEUP_BUFF_BY_INDEX[selectedIndex];
           if (!buff)
               continue;
           hpPct += buff.hpPct ?? 0;

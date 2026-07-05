@@ -26,6 +26,7 @@ const MONOPOLY_READY_SCREEN_MODULE_ID = '@screens/monopoly/ready.ts' as const;
 const CHESS_STRATEGY_RPG_READY_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/ready.ts' as const;
 const CHESS_STRATEGY_RPG_BATTLE_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/battle.ts' as const;
 const CHESS_STRATEGY_RPG_MATCH_SCREEN_MODULE_ID = '@screens/chess-strategy-rpg/match.ts' as const;
+const VINH_DA_GAMEPLAY_SCREEN_MODULE_ID = '@screens/vinh-da/gameplay.ts' as const;
 const SECT_SCREEN_MODULE_ID = './screens/sect/index.ts' as const;
 
 const MODE_TYPES = {
@@ -82,6 +83,39 @@ const MODES = [
       screenId: 'campaign-world-map',
       moduleId: CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID,
       defaultParams: { modeKey: 'campaign' }
+    }
+  },
+  {
+    id: 'vinh-da',
+    title: 'Vĩnh Dạ',
+    type: MODE_TYPES.PVE,
+    status: MODE_STATUS.AVAILABLE,
+    icon: '🏰',
+    shortDescription: 'World Map phòng thủ thành trì trong màn đêm vĩnh cửu, chọn Leader trước khi vào trận side-scrolling.',
+    unlockNotes: 'Mở từ Chiến Trường; dùng World Map riêng và scene Vĩnh Dạ độc lập.',
+    tags: ['PvE'],
+    menuSections: ['core-pve'],
+    parentId: 'arena-hub',
+    shell: {
+      screenId: 'campaign-world-map',
+      moduleId: CAMPAIGN_WORLD_MAP_SCREEN_MODULE_ID,
+      defaultParams: { modeKey: 'vinh-da' }
+    }
+  },
+  {
+    id: 'vinh-da-gameplay',
+    title: 'Vĩnh Dạ · Trận Chiến',
+    type: MODE_TYPES.PVE,
+    status: MODE_STATUS.AVAILABLE,
+    icon: '🏰',
+    shortDescription: 'Prototype gameplay màn hình ngang cho Vĩnh Dạ với Leader di chuyển trái/phải và camera follow.',
+    unlockNotes: 'Vào từ Stage trên World Map Vĩnh Dạ.',
+    tags: ['PvE'],
+    menuSections: [],
+    parentId: 'vinh-da',
+    shell: {
+      screenId: 'vinh-da-gameplay',
+      moduleId: VINH_DA_GAMEPLAY_SCREEN_MODULE_ID
     }
   },
   {
