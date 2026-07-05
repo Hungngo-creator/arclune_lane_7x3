@@ -66,13 +66,16 @@ const CSS = /* css */ `
   .vinh-da-game__rock::after{content:"";position:absolute;left:18px;top:12px;width:42px;height:10px;border-radius:999px;background:rgba(255,255,255,.18);transform:rotate(-12deg);}
   .vinh-da-game__wall-slot{position:absolute;bottom:${GROUND_PERCENT};width:70px;height:78px;margin-left:-35px;border:1px dashed rgba(210,200,255,.32);border-radius:10px;background:linear-gradient(180deg,rgba(121,93,255,.12),rgba(16,14,26,.28));box-shadow:0 0 18px rgba(121,93,255,.16);cursor:pointer;z-index:2;}
   .vinh-da-game__wall-slot::after{content:"";position:absolute;left:12px;right:12px;bottom:10px;height:8px;border-radius:999px;background:rgba(210,200,255,.18);}
-  .vinh-da-game__rock.has-structure{border-radius:10px 10px 4px 4px;border:1px solid rgba(226,222,255,.28);box-shadow:0 0 24px rgba(133,105,255,.45);}
+  .vinh-da-game__plot{position:absolute;bottom:${GROUND_PERCENT};width:86px;height:40px;margin-left:-43px;border:0;border-radius:999px;background:transparent;box-shadow:none;cursor:pointer;z-index:2;}
+  .vinh-da-game__plot::after{content:"";position:absolute;inset:12px 16px;border-radius:999px;background:transparent;}
+  .vinh-da-game__rock.has-structure,.vinh-da-game__plot.has-structure{border-radius:10px 10px 4px 4px;border:1px solid rgba(226,222,255,.28);box-shadow:0 0 24px rgba(133,105,255,.45);}
+  .vinh-da-game__plot.has-structure{width:96px;height:58px;margin-left:-48px;background:rgba(8,8,16,.22);}
   .vinh-da-game__structure--watchtower{background:linear-gradient(180deg,#3a2b67,#12111f);}
   .vinh-da-game__structure--elementalTower{background:linear-gradient(180deg,#1f5b73,#101621);}
   .vinh-da-game__structure--barracks{background:linear-gradient(180deg,#463624,#14100d);}
   .vinh-da-game__structure--church{background:linear-gradient(180deg,#efe5ff,#44305f);}
   .vinh-da-game__structure--crystalSeal{background:linear-gradient(135deg,#eaffff,#7b5cff 48%,#39e8ff);}
-  .vinh-da-game__rock.has-structure::before,.vinh-da-game__wall-slot.has-structure::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:64px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
+  .vinh-da-game__rock.has-structure::before,.vinh-da-game__plot.has-structure::before,.vinh-da-game__wall-slot.has-structure::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:64px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
   .vinh-da-game__structure--wall{border-style:solid;border-color:rgba(226,222,255,.34);background:repeating-linear-gradient(90deg,#2e2944 0 18px,#181625 18px 36px);box-shadow:0 0 22px rgba(133,105,255,.38);}
   .vinh-da-game__structure--wall::before{bottom:84px;}
   .vinh-da-game__build-menu{position:absolute;bottom:calc(${GROUND_PERCENT} + 36px);width:170px;height:170px;margin-left:-85px;pointer-events:none;opacity:0;transform:scale(.88);transition:opacity .16s ease,transform .16s ease;z-index:4;}
@@ -166,10 +169,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const clampLeaderX = (x: number): number => Math.max(LEADER_EDGE_PADDING_LEFT, Math.min(WORLD_WIDTH - LEADER_EDGE_PADDING_RIGHT, x));
   const getBuildSite = (siteId: string | null | undefined): BuildSite | null => BUILD_SITES.find(site => site.id === siteId) ?? null;
   const nearestBuildSite = (): BuildSite | null => BUILD_SITES.find(site => Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
+  const getBuildSiteClassName = (site: BuildSite): string => {
+    if (site.kind === 'wall-slot') return 'vinh-da-game__wall-slot';
+    if (site.kind === 'ground') return 'vinh-da-game__plot';
+    return 'vinh-da-game__rock';
+  };
   const createBuildSiteElement = (site: BuildSite): void => {
     if (!buildSitesContainer || siteElements.has(site.id)) return;
     const button = document.createElement('button');
-    button.className = site.kind === 'wall-slot' ? 'vinh-da-game__wall-slot' : 'vinh-da-game__rock';
+    button.className = getBuildSiteClassName(site);
     button.dataset.buildSiteId = site.id;
     button.style.left = `${site.x}px`;
     button.type = 'button';
@@ -228,7 +236,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     siteButton.classList.toggle('has-structure', Boolean(structure) && runtime !== null && runtime.hp > 0);
     if (structure && runtime !== null && runtime.hp > 0) siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
     siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
-    siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng');
+    siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
     renderBuildMenu(siteId);
   };
   const renderVisibleBuildSites = (): void => {
