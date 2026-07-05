@@ -37836,7 +37836,13 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const LEADER_START_X = CRYSTAL_X + 110;
   const BUILD_RANGE = 150;
   const BUILD_SLOTS = 5;
-  const BUILD_NODE_LABELS = ['Tháp', 'Tường', 'Bẫy', 'Pha lê', 'Ấn'];
+  const BUILD_NODE_OPTIONS = [
+      { label: 'Tháp', type: 'watchtower' },
+      { label: 'Tường', type: 'wall' },
+      { label: 'Bẫy', type: 'elementalTower' },
+      { label: 'Pha lê', type: 'crystalSeal' },
+      { label: 'Ấn', type: 'church' }
+  ];
   const BUILD_SITES = [
       { id: 'left-rock', x: CASTLE_OUTER_LEFT - CASTLE_SIZE, kind: 'rock', allowed: ['watchtower', 'elementalTower', 'barracks'] },
       { id: 'right-rock', x: CASTLE_OUTER_RIGHT + CASTLE_SIZE, kind: 'rock', allowed: ['watchtower', 'elementalTower', 'barracks'] },
@@ -37861,10 +37867,13 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__leader{position:absolute;bottom:42%;width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
     .vinh-da-game__rock{position:absolute;bottom:42%;width:96px;height:58px;margin-left:-48px;border:0;border-radius:46% 54% 38% 42%;background:linear-gradient(150deg,#7e7b8e,#383746 58%,#1f1f2a);box-shadow:inset -12px -10px 18px rgba(0,0,0,.32),0 8px 22px rgba(0,0,0,.35);cursor:pointer;z-index:2;}
     .vinh-da-game__rock::after{content:"";position:absolute;left:18px;top:12px;width:42px;height:10px;border-radius:999px;background:rgba(255,255,255,.18);transform:rotate(-12deg);}
+    .vinh-da-game__rock.has-structure{border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,#241c46,#0d0d16);border:1px solid rgba(226,222,255,.28);box-shadow:0 0 24px rgba(133,105,255,.45);}
+    .vinh-da-game__rock.has-structure::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:64px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
     .vinh-da-game__build-menu{position:absolute;bottom:calc(42% + 36px);width:170px;height:170px;margin-left:-85px;pointer-events:none;opacity:0;transform:scale(.88);transition:opacity .16s ease,transform .16s ease;z-index:4;}
     .vinh-da-game__build-menu.is-open{opacity:1;transform:scale(1);pointer-events:auto;}
     .vinh-da-game__build-node{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px;border-radius:999px;border:1px solid rgba(230,220,255,.42);background:rgba(8,8,16,.22);backdrop-filter:blur(2px);color:#f5f0ff;display:grid;place-items:center;font-size:24px;box-shadow:0 0 20px rgba(170,140,255,.2);}
     .vinh-da-game__build-node small{position:absolute;top:48px;font-size:9px;color:#d6ccff;text-shadow:0 1px 4px #000;white-space:nowrap;}
+    .vinh-da-game__build-node[hidden]{display:none;}
     @keyframes vinh-da-crystal-shine{0%,100%{filter:brightness(1);transform:translateX(-50%) rotate(45deg) scale(1)}50%{filter:brightness(1.45);transform:translateX(-50%) rotate(45deg) scale(1.06)}}
   `;
   function renderScreen(context) {
@@ -37893,11 +37902,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           <div class="vinh-da-game__castle" aria-hidden="true"></div>
           <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
           <div class="vinh-da-game__ground" aria-hidden="true"></div>
-          ${BUILD_SITES.filter(site => site.kind === 'rock').map((rock) => `<button class="vinh-da-game__rock" data-rock-id="${rock.id}" style="left:${rock.x}px" type="button" aria-label="Ụ đá xây dựng"></button><div class="vinh-da-game__build-menu" data-build-menu="${rock.id}" style="left:${rock.x}px">${Array.from({ length: BUILD_SLOTS }, (_, index) => {
+          ${BUILD_SITES.filter(site => site.kind === 'rock').map((rock) => `<button class="vinh-da-game__rock" data-rock-id="${rock.id}" style="left:${rock.x}px" type="button" aria-label="Ụ đá xây dựng"></button><div class="vinh-da-game__build-menu" data-build-menu="${rock.id}" style="left:${rock.x}px">${BUILD_NODE_OPTIONS.map((option, index) => {
           const angle = -90 + index * 360 / BUILD_SLOTS;
           const x = Math.cos(angle * Math.PI / 180) * 58;
           const y = Math.sin(angle * Math.PI / 180) * 58;
-          return `<button class="vinh-da-game__build-node" type="button" style="transform:translate(${x}px,${y}px)" aria-label="${BUILD_NODE_LABELS[index]}">+<small>${BUILD_NODE_LABELS[index]}</small></button>`;
+          const isAllowed = rock.allowed.includes(option.type);
+          return `<button class="vinh-da-game__build-node" data-structure-type="${option.type}" type="button" style="transform:translate(${x}px,${y}px)" aria-label="${option.label}"${isAllowed ? '' : ' hidden'}>+<small>${option.label}</small></button>`;
       }).join('')}</div>`).join('')}
           <div class="vinh-da-game__leader" data-role="leader" title="${leader?.name ?? leaderId ?? 'Leader'}"></div>
         </div>
@@ -37907,7 +37917,17 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const viewport = section.querySelector('[data-role="viewport"]');
       const buildMenus = Array.from(section.querySelectorAll('[data-build-menu]'));
       const clampLeaderX = (x) => Math.max(80, Math.min(WORLD_WIDTH - 120, x));
+      const getBuildSite = (siteId) => BUILD_SITES.find(site => site.id === siteId) ?? null;
       const nearestRock = () => BUILD_SITES.find(site => site.kind === 'rock' && Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
+      const renderBuildSite = (siteId) => {
+          const rockButton = section.querySelector(`[data-rock-id="${siteId}"]`);
+          if (!rockButton)
+              return;
+          const structure = structures.get(siteId);
+          rockButton.classList.toggle('has-structure', Boolean(structure));
+          rockButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
+          rockButton.setAttribute('aria-label', structure ? `${rockButton.dataset.structureLabel} cấp ${structure.level}` : 'Ụ đá xây dựng');
+      };
       const setOpenRock = (rockId) => {
           openRockId = rockId;
           for (const menu of buildMenus)
@@ -37948,8 +37968,20 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               return;
           moveToClientX(event.clientX);
       };
-      const onRockClick = (event) => {
-          const rockButton = (event.target instanceof Element ? event.target : null)?.closest('[data-rock-id]');
+      const onGameClick = (event) => {
+          const target = event.target instanceof Element ? event.target : null;
+          const buildNode = target?.closest('.vinh-da-game__build-node');
+          if (buildNode) {
+              const site = getBuildSite(openRockId);
+              const type = buildNode.dataset.structureType;
+              if (site && type && !structures.has(site.id) && site.allowed.includes(type)) {
+                  structures.set(site.id, { siteId: site.id, type, level: 1 });
+                  renderBuildSite(site.id);
+              }
+              setOpenRock(null);
+              return;
+          }
+          const rockButton = target?.closest('[data-rock-id]');
           if (!rockButton)
               return;
           const rock = nearestRock();
@@ -37965,7 +37997,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       window.addEventListener('keydown', onKeyDown);
       window.addEventListener('keyup', onKeyUp);
       viewport?.addEventListener('pointerdown', onViewportPointerDown);
-      section.addEventListener('click', onRockClick);
+      section.addEventListener('click', onGameClick);
       section.querySelector('.vinh-da-game__back')?.addEventListener('click', () => {
           shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId });
       });
@@ -37977,7 +38009,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               window.removeEventListener('keydown', onKeyDown);
               window.removeEventListener('keyup', onKeyUp);
               viewport?.removeEventListener('pointerdown', onViewportPointerDown);
-              section.removeEventListener('click', onRockClick);
+              section.removeEventListener('click', onGameClick);
               mount.destroy();
           }
       };
