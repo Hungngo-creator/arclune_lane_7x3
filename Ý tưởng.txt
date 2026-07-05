@@ -1,3 +1,5 @@
+cốt lõi là collection/gacha/lineup/tông môn, các nhân vật, các asset sẽ được dùng đi dùng lại trong các mode khác nhau, sẽ có nhiều meta, giá trị chơi lại cao, nói chung là đổi luật chơi đổi hình thức chơi thôi, phần thưởng thì dùng nâng nhân vật rồi có thể đem vào mode khác, pvp thì chắc monopoly, turn base 7x3, chess, còn mode như kingdom two crown like, crying sun like sẽ là pve, cá voi ở các mode pvp hoành hành thì f2p vào pve cày cho mạnh vào pvp đánh lộn vẫn được, các cá voi lo pvp sẽ không rảnh đi pve đâu, biến tướng cân bằng, nhưng nếu cá voi đi pve để mạnh nữa thì chịu, người ta bỏ tiền. còn dungeon warface 3 like cũng là pve luôn.
+
 A) ý tưởng và mong muốn
 1. Tạo skill mới dựa trên các pháp tắc đã có, có thể chọn loại đạo/pháp tắc/quy tắc để ngộ đạo và nhận được kĩ năng/ pháp tắc tương ứng để tạo kỹ năng mới.
 Kĩ năng có thể thu được từ công pháp. Áp dụng hệ thống nguyên linh + luyện đan vào game.
@@ -127,6 +129,8 @@ B) ý tưởng về các mode
 10. Chat & Xã hội: Khung chat realtime + thông báo cộng đồng.
 
 11. Đấu Thú Trường:
+
+12. Kingdoms two crown like dời sang docs/vinh-da-defense-mode-spec.md
 
 C) ý tưởng vật phẩm
 1. Loa nhỏ: thông báo 1 đoạn tin nhắn toàn sever 1 lần.
