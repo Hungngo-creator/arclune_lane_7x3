@@ -6,6 +6,7 @@ export const WORLD_CENTER_X = WORLD_WIDTH / 2;
 
 export const LEADER_SPEED = 420;
 export const LEADER_WIDTH = 46;
+export const GROUND_PLOT_WIDTH = LEADER_WIDTH * 1.8;
 export const LEADER_EDGE_PADDING_LEFT = 80;
 export const LEADER_EDGE_PADDING_RIGHT = 120;
 
@@ -19,6 +20,7 @@ export const CASTLE_TOWER_WIDTH = 54;
 export const CASTLE_OUTER_LEFT = CASTLE_LEFT - CASTLE_TOWER_OFFSET;
 export const CASTLE_OUTER_RIGHT = CASTLE_LEFT + CASTLE_WIDTH + CASTLE_TOWER_OFFSET;
 export const CRYSTAL_X = WORLD_CENTER_X;
+export const GROUND_PLOT_CENTER_X = CRYSTAL_X;
 export const LEADER_START_X = CRYSTAL_X + 110;
 
 export const BUILD_RANGE = 150;

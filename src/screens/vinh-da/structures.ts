@@ -1,10 +1,10 @@
 import {
   BUILD_SITE_CASTLE_PADDING,
   BUILD_SITE_EDGE_PADDING,
-  BUILD_SITE_SPACING,
+  GROUND_PLOT_CENTER_X,
+  GROUND_PLOT_WIDTH,
   CASTLE_OUTER_LEFT,
   CASTLE_OUTER_RIGHT,
-  CRYSTAL_X,
   WORLD_WIDTH
 } from './constants.ts';
 import type { BuildSite } from './types.ts';
@@ -71,26 +71,46 @@ export const GROUND_STRUCTURE_STATS: Record<Exclude<StructureType, 'wall' | 'wat
   }
 };
 
+const isOutsideCastleBuildPadding = (x: number): boolean => (
+  x <= CASTLE_OUTER_LEFT - BUILD_SITE_CASTLE_PADDING
+  || x >= CASTLE_OUTER_RIGHT + BUILD_SITE_CASTLE_PADDING
+);
+
 const createGroundBuildSites = (): BuildSite[] => {
   const sites: BuildSite[] = [];
-  const addSide = (side: 'left' | 'right', startX: number, endX: number): void => {
-    const direction = side === 'left' ? -1 : 1;
-    let index = 1;
-    for (let x = startX; direction < 0 ? x >= endX : x <= endX; x += direction * BUILD_SITE_SPACING){
-      sites.push({ id: `ground-${side}-${index}`, x, kind: 'ground', allowed: GROUND_BUILD_SITE_ALLOWED });
-      index += 1;
-    }
+  const minX = BUILD_SITE_EDGE_PADDING;
+  const maxX = WORLD_WIDTH - BUILD_SITE_EDGE_PADDING;
+  const addSite = (id: string, x: number, allowed: readonly StructureType[] = GROUND_BUILD_SITE_ALLOWED): void => {
+    if (x >= minX && x <= maxX) sites.push({ id, x, kind: 'ground', allowed });
   };
 
-  addSide('left', CASTLE_OUTER_LEFT - BUILD_SITE_CASTLE_PADDING, BUILD_SITE_EDGE_PADDING);
-  addSide('right', CASTLE_OUTER_RIGHT + BUILD_SITE_CASTLE_PADDING, WORLD_WIDTH - BUILD_SITE_EDGE_PADDING);
+  addSite('ground-center-0', GROUND_PLOT_CENTER_X, CASTLE_GROUND_BUILD_SITE_ALLOWED);
+
+  let leftIndex = 1;
+  let rightIndex = 1;
+  for (let offsetIndex = 1; ; offsetIndex += 1){
+    const leftX = GROUND_PLOT_CENTER_X - GROUND_PLOT_WIDTH * offsetIndex;
+    const rightX = GROUND_PLOT_CENTER_X + GROUND_PLOT_WIDTH * offsetIndex;
+    const hasLeftSite = leftX >= minX;
+    const hasRightSite = rightX <= maxX;
+    if (!hasLeftSite && !hasRightSite) break;
+
+    if (hasLeftSite && isOutsideCastleBuildPadding(leftX)){
+      addSite(`ground-left-${leftIndex}`, leftX);
+      leftIndex += 1;
+    }
+    if (hasRightSite && isOutsideCastleBuildPadding(rightX)){
+      addSite(`ground-right-${rightIndex}`, rightX);
+      rightIndex += 1;
+    }
+  }
+
   return sites;
 };
 
 export const BUILD_SITES = [
   { id: 'wall-left', x: CASTLE_OUTER_LEFT - 120, kind: 'wall-slot', allowed: WALL_BUILD_SITE_ALLOWED },
   { id: 'wall-right', x: CASTLE_OUTER_RIGHT + 120, kind: 'wall-slot', allowed: WALL_BUILD_SITE_ALLOWED },
-  { id: 'castle-ground', x: CRYSTAL_X, kind: 'ground', allowed: CASTLE_GROUND_BUILD_SITE_ALLOWED },
   ...createGroundBuildSites()
 ] as const satisfies readonly BuildSite[];
 

@@ -37820,6 +37820,7 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   const WORLD_CENTER_X = WORLD_WIDTH / 2;
   const LEADER_SPEED = 420;
   const LEADER_WIDTH = 46;
+  const GROUND_PLOT_WIDTH = LEADER_WIDTH * 1.8;
   const LEADER_EDGE_PADDING_LEFT = 80;
   const LEADER_EDGE_PADDING_RIGHT = 120;
   const GROUND_RATIO = 0.42;
@@ -37831,6 +37832,7 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   const CASTLE_OUTER_LEFT = CASTLE_LEFT - CASTLE_TOWER_OFFSET;
   const CASTLE_OUTER_RIGHT = CASTLE_LEFT + CASTLE_WIDTH + CASTLE_TOWER_OFFSET;
   const CRYSTAL_X = WORLD_CENTER_X;
+  const GROUND_PLOT_CENTER_X = CRYSTAL_X;
   const LEADER_START_X = CRYSTAL_X + 110;
   const BUILD_RANGE = 150;
   const BUILD_SITE_SPACING = 720;
@@ -37855,6 +37857,7 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'WORLD_CENTER_X')) exports.WORLD_CENTER_X = WORLD_CENTER_X;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_SPEED')) exports.LEADER_SPEED = LEADER_SPEED;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_WIDTH')) exports.LEADER_WIDTH = LEADER_WIDTH;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_PLOT_WIDTH')) exports.GROUND_PLOT_WIDTH = GROUND_PLOT_WIDTH;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_EDGE_PADDING_LEFT')) exports.LEADER_EDGE_PADDING_LEFT = LEADER_EDGE_PADDING_LEFT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_EDGE_PADDING_RIGHT')) exports.LEADER_EDGE_PADDING_RIGHT = LEADER_EDGE_PADDING_RIGHT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_RATIO')) exports.GROUND_RATIO = GROUND_RATIO;
@@ -37866,6 +37869,7 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_OUTER_LEFT')) exports.CASTLE_OUTER_LEFT = CASTLE_OUTER_LEFT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_OUTER_RIGHT')) exports.CASTLE_OUTER_RIGHT = CASTLE_OUTER_RIGHT;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CRYSTAL_X')) exports.CRYSTAL_X = CRYSTAL_X;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_PLOT_CENTER_X')) exports.GROUND_PLOT_CENTER_X = GROUND_PLOT_CENTER_X;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_START_X')) exports.LEADER_START_X = LEADER_START_X;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_RANGE')) exports.BUILD_RANGE = BUILD_RANGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITE_SPACING')) exports.BUILD_SITE_SPACING = BUILD_SITE_SPACING;
@@ -38397,10 +38401,10 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./screens/vinh-da/constants.ts');
   const BUILD_SITE_CASTLE_PADDING = __dep0.BUILD_SITE_CASTLE_PADDING;
   const BUILD_SITE_EDGE_PADDING = __dep0.BUILD_SITE_EDGE_PADDING;
-  const BUILD_SITE_SPACING = __dep0.BUILD_SITE_SPACING;
+  const GROUND_PLOT_CENTER_X = __dep0.GROUND_PLOT_CENTER_X;
+  const GROUND_PLOT_WIDTH = __dep0.GROUND_PLOT_WIDTH;
   const CASTLE_OUTER_LEFT = __dep0.CASTLE_OUTER_LEFT;
   const CASTLE_OUTER_RIGHT = __dep0.CASTLE_OUTER_RIGHT;
-  const CRYSTAL_X = __dep0.CRYSTAL_X;
   const WORLD_WIDTH = __dep0.WORLD_WIDTH;
   const UPGRADE_NODE_LABEL = 'Nâng cấp';
   const BUILD_LEVEL_COST = {
@@ -38444,24 +38448,40 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           2: { hp: 1 }
       }
   };
+  const isOutsideCastleBuildPadding = (x) => (x <= CASTLE_OUTER_LEFT - BUILD_SITE_CASTLE_PADDING
+      || x >= CASTLE_OUTER_RIGHT + BUILD_SITE_CASTLE_PADDING);
   const createGroundBuildSites = () => {
       const sites = [];
-      const addSide = (side, startX, endX) => {
-          const direction = side === 'left' ? -1 : 1;
-          let index = 1;
-          for (let x = startX; direction < 0 ? x >= endX : x <= endX; x += direction * BUILD_SITE_SPACING) {
-              sites.push({ id: `ground-${side}-${index}`, x, kind: 'ground', allowed: GROUND_BUILD_SITE_ALLOWED });
-              index += 1;
-          }
+      const minX = BUILD_SITE_EDGE_PADDING;
+      const maxX = WORLD_WIDTH - BUILD_SITE_EDGE_PADDING;
+      const addSite = (id, x, allowed = GROUND_BUILD_SITE_ALLOWED) => {
+          if (x >= minX && x <= maxX)
+              sites.push({ id, x, kind: 'ground', allowed });
       };
-      addSide('left', CASTLE_OUTER_LEFT - BUILD_SITE_CASTLE_PADDING, BUILD_SITE_EDGE_PADDING);
-      addSide('right', CASTLE_OUTER_RIGHT + BUILD_SITE_CASTLE_PADDING, WORLD_WIDTH - BUILD_SITE_EDGE_PADDING);
+      addSite('ground-center-0', GROUND_PLOT_CENTER_X, CASTLE_GROUND_BUILD_SITE_ALLOWED);
+      let leftIndex = 1;
+      let rightIndex = 1;
+      for (let offsetIndex = 1;; offsetIndex += 1) {
+          const leftX = GROUND_PLOT_CENTER_X - GROUND_PLOT_WIDTH * offsetIndex;
+          const rightX = GROUND_PLOT_CENTER_X + GROUND_PLOT_WIDTH * offsetIndex;
+          const hasLeftSite = leftX >= minX;
+          const hasRightSite = rightX <= maxX;
+          if (!hasLeftSite && !hasRightSite)
+              break;
+          if (hasLeftSite && isOutsideCastleBuildPadding(leftX)) {
+              addSite(`ground-left-${leftIndex}`, leftX);
+              leftIndex += 1;
+          }
+          if (hasRightSite && isOutsideCastleBuildPadding(rightX)) {
+              addSite(`ground-right-${rightIndex}`, rightX);
+              rightIndex += 1;
+          }
+      }
       return sites;
   };
   const BUILD_SITES = [
       { id: 'wall-left', x: CASTLE_OUTER_LEFT - 120, kind: 'wall-slot', allowed: WALL_BUILD_SITE_ALLOWED },
       { id: 'wall-right', x: CASTLE_OUTER_RIGHT + 120, kind: 'wall-slot', allowed: WALL_BUILD_SITE_ALLOWED },
-      { id: 'castle-ground', x: CRYSTAL_X, kind: 'ground', allowed: CASTLE_GROUND_BUILD_SITE_ALLOWED },
       ...createGroundBuildSites()
   ];
   const getStructureLevelStat = (type, level) => {
