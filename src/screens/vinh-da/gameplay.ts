@@ -36,24 +36,44 @@ const CASTLE_TOWER_OFFSET = 60;
 const CASTLE_TOWER_WIDTH = 54;
 const CASTLE_OUTER_LEFT = CASTLE_LEFT - CASTLE_TOWER_OFFSET;
 const CASTLE_OUTER_RIGHT = CASTLE_LEFT + CASTLE_WIDTH + CASTLE_TOWER_OFFSET;
-const CASTLE_SIZE = CASTLE_OUTER_RIGHT - CASTLE_OUTER_LEFT;
 const CRYSTAL_X = WORLD_CENTER_X;
 const LEADER_START_X = CRYSTAL_X + 110;
 const BUILD_RANGE = 150;
-const BUILD_SLOTS = 5;
+const BUILD_SITE_SPACING = 720;
+const BUILD_SITE_CASTLE_PADDING = 360;
+const BUILD_SITE_EDGE_PADDING = 160;
+const BUILD_SITE_RENDER_BUFFER = 800;
+const BUILD_SITE_RENDER_THRESHOLD = 160;
+const BUILD_SLOTS = 6;
 const BUILD_NODE_OPTIONS = [
   { label: 'Tháp', type: 'watchtower' },
   { label: 'Tường', type: 'wall' },
   { label: 'Bẫy', type: 'elementalTower' },
   { label: 'Pha lê', type: 'crystalSeal' },
-  { label: 'Ấn', type: 'church' }
+  { label: 'Ấn', type: 'church' },
+  { label: 'Trại', type: 'barracks' }
 ] as const satisfies readonly { label: string; type: StructureType }[];
+const GROUND_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church'] as const satisfies readonly StructureType[];
+const createGroundBuildSites = (): BuildSite[] => {
+  const sites: BuildSite[] = [];
+  const addSide = (side: 'left' | 'right', startX: number, endX: number): void => {
+    const direction = side === 'left' ? -1 : 1;
+    let index = 1;
+    for (let x = startX; direction < 0 ? x >= endX : x <= endX; x += direction * BUILD_SITE_SPACING){
+      sites.push({ id: `ground-${side}-${index}`, x, kind: 'ground', allowed: GROUND_BUILD_SITE_ALLOWED });
+      index += 1;
+    }
+  };
+
+  addSide('left', CASTLE_OUTER_LEFT - BUILD_SITE_CASTLE_PADDING, BUILD_SITE_EDGE_PADDING);
+  addSide('right', CASTLE_OUTER_RIGHT + BUILD_SITE_CASTLE_PADDING, WORLD_WIDTH - BUILD_SITE_EDGE_PADDING);
+  return sites;
+};
 const BUILD_SITES = [
-  { id: 'left-rock', x: CASTLE_OUTER_LEFT - CASTLE_SIZE, kind: 'rock', allowed: ['watchtower', 'elementalTower', 'barracks'] },
-  { id: 'right-rock', x: CASTLE_OUTER_RIGHT + CASTLE_SIZE, kind: 'rock', allowed: ['watchtower', 'elementalTower', 'barracks'] },
   { id: 'wall-left', x: CASTLE_OUTER_LEFT - 120, kind: 'wall-slot', allowed: ['wall'] },
   { id: 'wall-right', x: CASTLE_OUTER_RIGHT + 120, kind: 'wall-slot', allowed: ['wall'] },
-  { id: 'castle-ground', x: CRYSTAL_X, kind: 'ground', allowed: ['church', 'crystalSeal'] }
+  { id: 'castle-ground', x: CRYSTAL_X, kind: 'ground', allowed: ['church', 'crystalSeal'] },
+  ...createGroundBuildSites()
 ] as const satisfies readonly BuildSite[];
 const CSS = /* css */ `
   .app--vinh-da-gameplay{min-height:100dvh;background:#020204;color:#f7f2ff;overflow:hidden;touch-action:none;}
@@ -114,13 +134,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         <div class="vinh-da-game__castle" aria-hidden="true"></div>
         <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
         <div class="vinh-da-game__ground" aria-hidden="true"></div>
-        ${BUILD_SITES.map((site: BuildSite) => `<button class="${site.kind === 'wall-slot' ? 'vinh-da-game__wall-slot' : 'vinh-da-game__rock'}" data-build-site-id="${site.id}" style="left:${site.x}px" type="button" aria-label="${site.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng'}"></button><div class="vinh-da-game__build-menu" data-build-menu="${site.id}" style="left:${site.x}px">${BUILD_NODE_OPTIONS.map((option, index) => {
-          const angle = -90 + index * 360 / BUILD_SLOTS;
-          const x = Math.cos(angle * Math.PI / 180) * 58;
-          const y = Math.sin(angle * Math.PI / 180) * 58;
-          const isAllowed = site.allowed.includes(option.type);
-          return `<button class="vinh-da-game__build-node" data-structure-type="${option.type}" type="button" style="transform:translate(${x}px,${y}px)" aria-label="${option.label}"${isAllowed ? '' : ' hidden'}>+<small>${option.label}</small></button>`;
-        }).join('')}</div>`).join('')}
+        <div data-role="build-sites"></div>
         <div class="vinh-da-game__leader" data-role="leader" title="${leader?.name ?? leaderId ?? 'Leader'}"></div>
       </div>
     </div>`;
@@ -128,13 +142,46 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const world = section.querySelector<HTMLElement>('[data-role="world"]');
   const sprite = section.querySelector<HTMLElement>('[data-role="leader"]');
   const viewport = section.querySelector<HTMLElement>('[data-role="viewport"]');
-  const buildMenus = Array.from(section.querySelectorAll<HTMLElement>('[data-build-menu]'));
+  const buildSitesContainer = section.querySelector<HTMLElement>('[data-role="build-sites"]');
+  const buildSiteElements = new Map<string, { button: HTMLButtonElement; menu: HTMLDivElement }>();
+  let lastRenderedCameraX = Number.POSITIVE_INFINITY;
 
   const clampLeaderX = (x: number): number => Math.max(80, Math.min(WORLD_WIDTH - 120, x));
   const getBuildSite = (siteId: string | null | undefined): BuildSite | null => BUILD_SITES.find(site => site.id === siteId) ?? null;
   const nearestBuildSite = (): BuildSite | null => BUILD_SITES.find(site => Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
+  const createBuildSiteElement = (site: BuildSite): void => {
+    if (!buildSitesContainer || buildSiteElements.has(site.id)) return;
+    const button = document.createElement('button');
+    button.className = site.kind === 'wall-slot' ? 'vinh-da-game__wall-slot' : 'vinh-da-game__rock';
+    button.dataset.buildSiteId = site.id;
+    button.style.left = `${site.x}px`;
+    button.type = 'button';
+
+    const menu = document.createElement('div');
+    menu.className = 'vinh-da-game__build-menu';
+    menu.dataset.buildMenu = site.id;
+    menu.style.left = `${site.x}px`;
+    BUILD_NODE_OPTIONS.forEach((option, index) => {
+      const angle = -90 + index * 360 / BUILD_SLOTS;
+      const x = Math.cos(angle * Math.PI / 180) * 58;
+      const y = Math.sin(angle * Math.PI / 180) * 58;
+      const node = document.createElement('button');
+      node.className = 'vinh-da-game__build-node';
+      node.dataset.structureType = option.type;
+      node.type = 'button';
+      node.style.transform = `translate(${x}px,${y}px)`;
+      node.setAttribute('aria-label', option.label);
+      node.hidden = !site.allowed.includes(option.type);
+      node.innerHTML = `+<small>${option.label}</small>`;
+      menu.append(node);
+    });
+
+    buildSitesContainer.append(button, menu);
+    buildSiteElements.set(site.id, { button, menu });
+    renderBuildSite(site.id);
+  };
   const renderBuildSite = (siteId: string): void => {
-    const siteButton = section.querySelector<HTMLElement>(`[data-build-site-id="${siteId}"]`);
+    const siteButton = buildSiteElements.get(siteId)?.button;
     if (!siteButton) return;
     const site = getBuildSite(siteId);
     const structure = structures.get(siteId);
@@ -144,17 +191,37 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
     siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng');
   };
+  const renderVisibleBuildSites = (): void => {
+    const width = viewport?.clientWidth || window.innerWidth || 1;
+    const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
+    const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
+    for (const site of BUILD_SITES){
+      if (site.x >= minX && site.x <= maxX){
+        createBuildSiteElement(site);
+        renderBuildSite(site.id);
+      } else if (site.id !== openSiteId){
+        const elements = buildSiteElements.get(site.id);
+        if (elements){
+          elements.button.remove();
+          elements.menu.remove();
+          buildSiteElements.delete(site.id);
+        }
+      }
+    }
+    lastRenderedCameraX = cameraX;
+  };
   const setOpenBuildSite = (siteId: string | null): void => {
     openSiteId = siteId;
-    for (const menu of buildMenus) menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);6
+    for (const { menu } of buildSiteElements.values()) menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);
   };
 
   const updateCamera = (): void => {
     const width = viewport?.clientWidth || window.innerWidth || 1;
     cameraX = Math.max(0, Math.min(WORLD_WIDTH - width, leaderX - width * 0.5));
     if (world) world.style.transform = `translate3d(${-cameraX}px,0,0)`;
-    if (sprite) sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
     if (openSiteId && !nearestBuildSite()) setOpenBuildSite(null);
+    if (Math.abs(cameraX - lastRenderedCameraX) > BUILD_SITE_RENDER_THRESHOLD) renderVisibleBuildSites();
+    if (sprite) sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
   };
 
   const tick = (now: number): void => {
