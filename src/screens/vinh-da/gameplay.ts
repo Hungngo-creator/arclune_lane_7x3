@@ -45,6 +45,10 @@ const BUILD_SITE_EDGE_PADDING = 160;
 const BUILD_SITE_RENDER_BUFFER = 800;
 const BUILD_SITE_RENDER_THRESHOLD = 160;
 const UPGRADE_NODE_LABEL = 'Nâng cấp';
+const BUILD_LEVEL_COST = {
+  1: 0,
+  2: 1
+} as const satisfies Record<number, number>;
 const BUILD_NODE_OPTIONS = [
   { label: 'Tháp', type: 'watchtower' },
   { label: 'Tường', type: 'wall' },
@@ -131,6 +135,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let lastTime = performance.now();
   let rafId = 0;
   let openSiteId: string | null = null;
+  let bloodSealStone = 0;
   const keys = new Set<string>();
   const structures = new Map<string, PlacedStructure>();
 
@@ -139,7 +144,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const mount = mountSection({ root, section, rootClasses: 'app--vinh-da-gameplay' });
   section.innerHTML = `
     <div class="vinh-da-game__hud">
-      <div class="vinh-da-game__panel"><strong>Vĩnh Dạ · ${leader?.name ?? leaderId ?? 'Leader'}</strong></div>
+      <div class="vinh-da-game__panel">
+        <strong>Vĩnh Dạ · ${leader?.name ?? leaderId ?? 'Leader'}</strong>
+        <div>Huyết ấn thạch: <span data-role="blood-seal-stone">${bloodSealStone}</span></div>
+      </div>
       <button class="vinh-da-game__back" type="button" aria-label="Về World Map">↩</button>
     </div>
     <div class="vinh-da-game__viewport" data-role="viewport">
@@ -156,11 +164,22 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const sprite = section.querySelector<HTMLElement>('[data-role="leader"]');
   const viewport = section.querySelector<HTMLElement>('[data-role="viewport"]');
   const buildSitesContainer = section.querySelector<HTMLElement>('[data-role="build-sites"]');
+  const bloodSealStoneText = section.querySelector<HTMLElement>('[data-role="blood-seal-stone"]');
   const siteElements = new Map<string, HTMLElement>();
   const buildMenuElements = new Map<string, HTMLDivElement>();
   const structureClassNames = BUILD_NODE_OPTIONS.map(option => `vinh-da-game__structure--${option.type}`);
   let lastRenderedCameraX = Number.POSITIVE_INFINITY;
 
+  const canAfford = (cost: number): boolean => bloodSealStone >= cost;
+  const renderEconomy = (): void => {
+    if (bloodSealStoneText) bloodSealStoneText.textContent = String(bloodSealStone);
+  };
+  const spend = (cost: number): boolean => {
+    if (!canAfford(cost)) return false;
+    bloodSealStone -= cost;
+    renderEconomy();
+    return true;
+  };
   const clampLeaderX = (x: number): number => Math.max(80, Math.min(WORLD_WIDTH - 120, x));
   const getBuildSite = (siteId: string | null | undefined): BuildSite | null => BUILD_SITES.find(site => site.id === siteId) ?? null;
   const nearestBuildSite = (): BuildSite | null => BUILD_SITES.find(site => Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
@@ -209,9 +228,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     for (const node of menu.querySelectorAll<HTMLElement>('.vinh-da-game__build-node')){
       const type = node.dataset.structureType as StructureType | undefined;
       const isUpgradeNode = node.dataset.action === 'upgrade';
+      const cost = structure ? BUILD_LEVEL_COST[2] : BUILD_LEVEL_COST[1];
       node.hidden = structure
         ? !isUpgradeNode || structure.level >= 2
         : isUpgradeNode || !type || !site.allowed.includes(type);
+      if (node instanceof HTMLButtonElement) node.disabled = !node.hidden && !canAfford(cost);
     }
   };
   const renderBuildSite = (siteId: string): void => {
@@ -219,12 +240,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     if (!siteButton) return;
     const site = getBuildSite(siteId);
     const structure = structures.get(siteId);
-      .siteButton.classList.remove(...structureClassNames);
+ siteButton.classList.remove(...structureClassNames);
     siteButton.classList.toggle('has-structure', Boolean(structure));
     if (structure) siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
     siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
     siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng');
-  renderBuildMenu(siteId);
+   renderBuildMenu(siteId);
   };
   const renderVisibleBuildSites = (): void => {
     const width = viewport?.clientWidth || window.innerWidth || 1;
@@ -293,16 +314,17 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const site = getBuildSite(openSiteId);
       const structure = site ? structures.get(site.id) : null;
       if (site && buildNode.dataset.action === 'upgrade'){
-        if (structure && structure.level < 2){
+        if (structure && structure.level < 2 && spend(BUILD_LEVEL_COST[2])){
           structures.set(site.id, { ...structure, level: structure.level + 1 });
           renderBuildSite(site.id);
         }
       } else {
         const type = buildNode.dataset.structureType as StructureType | undefined;
-        if (site && type && !structure && site.allowed.includes(type)){
+        if (site && type && !structure && site.allowed.includes(type) && spend(BUILD_LEVEL_COST[1])){
           structures.set(site.id, { siteId: site.id, type, level: 1 });
           renderBuildSite(site.id);
         }
+      }
       setOpenBuildSite(null);
       return;
     }

@@ -37840,6 +37840,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const BUILD_SITE_RENDER_BUFFER = 800;
   const BUILD_SITE_RENDER_THRESHOLD = 160;
   const UPGRADE_NODE_LABEL = 'Nâng cấp';
+  const BUILD_LEVEL_COST = {
+      1: 0,
+      2: 1
+  };
   const BUILD_NODE_OPTIONS = [
       { label: 'Tháp', type: 'watchtower' },
       { label: 'Tường', type: 'wall' },
@@ -37923,6 +37927,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let lastTime = performance.now();
       let rafId = 0;
       let openSiteId = null;
+      let bloodSealStone = 0;
       const keys = new Set();
       const structures = new Map();
       const section = document.createElement('section');
@@ -37930,7 +37935,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const mount = mountSection({ root, section, rootClasses: 'app--vinh-da-gameplay' });
       section.innerHTML = `
       <div class="vinh-da-game__hud">
-        <div class="vinh-da-game__panel"><strong>Vĩnh Dạ · ${leader?.name ?? leaderId ?? 'Leader'}</strong></div>
+        <div class="vinh-da-game__panel">
+          <strong>Vĩnh Dạ · ${leader?.name ?? leaderId ?? 'Leader'}</strong>
+          <div>Huyết ấn thạch: <span data-role="blood-seal-stone">${bloodSealStone}</span></div>
+        </div>
         <button class="vinh-da-game__back" type="button" aria-label="Về World Map">↩</button>
       </div>
       <div class="vinh-da-game__viewport" data-role="viewport">
@@ -37946,10 +37954,23 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const sprite = section.querySelector('[data-role="leader"]');
       const viewport = section.querySelector('[data-role="viewport"]');
       const buildSitesContainer = section.querySelector('[data-role="build-sites"]');
+      const bloodSealStoneText = section.querySelector('[data-role="blood-seal-stone"]');
       const siteElements = new Map();
       const buildMenuElements = new Map();
       const structureClassNames = BUILD_NODE_OPTIONS.map(option => `vinh-da-game__structure--${option.type}`);
       let lastRenderedCameraX = Number.POSITIVE_INFINITY;
+      const canAfford = (cost) => bloodSealStone >= cost;
+      const renderEconomy = () => {
+          if (bloodSealStoneText)
+              bloodSealStoneText.textContent = String(bloodSealStone);
+      };
+      const spend = (cost) => {
+          if (!canAfford(cost))
+              return false;
+          bloodSealStone -= cost;
+          renderEconomy();
+          return true;
+      };
       const clampLeaderX = (x) => Math.max(80, Math.min(WORLD_WIDTH - 120, x));
       const getBuildSite = (siteId) => BUILD_SITES.find(site => site.id === siteId) ?? null;
       const nearestBuildSite = () => BUILD_SITES.find(site => Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
@@ -37998,9 +38019,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           for (const node of menu.querySelectorAll('.vinh-da-game__build-node')) {
               const type = node.dataset.structureType;
               const isUpgradeNode = node.dataset.action === 'upgrade';
+              const cost = structure ? BUILD_LEVEL_COST[2] : BUILD_LEVEL_COST[1];
               node.hidden = structure
                   ? !isUpgradeNode || structure.level >= 2
                   : isUpgradeNode || !type || !site.allowed.includes(type);
+              if (node instanceof HTMLButtonElement)
+                  node.disabled = !node.hidden && !canAfford(cost);
           }
       };
       const renderBuildSite = (siteId) => {
@@ -38009,99 +38033,98 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               return;
           const site = getBuildSite(siteId);
           const structure = structures.get(siteId);
-      };
-      siteButton.classList.remove(...structureClassNames);
-      siteButton.classList.toggle('has-structure', Boolean(structure));
-      if (structure)
-          siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
-      siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
-      siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng');
-      renderBuildMenu(siteId);
-  }
-  ;
-  const renderVisibleBuildSites = () => {
-      const width = viewport?.clientWidth || window.innerWidth || 1;
-      const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
-      const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
-      for (const site of BUILD_SITES) {
-          if (site.x >= minX && site.x <= maxX) {
-              createBuildSiteElement(site);
-              renderBuildSite(site.id);
-          }
-          else if (site.id !== openSiteId) {
-              const siteElement = siteElements.get(site.id);
-              const menuElement = buildMenuElements.get(site.id);
-              if (siteElement && menuElement) {
-                  siteElement.remove();
-                  menuElement.remove();
-                  siteElements.delete(site.id);
-                  buildMenuElements.delete(site.id);
-              }
-          }
-      }
-      lastRenderedCameraX = cameraX;
-  };
-  const setOpenBuildSite = (siteId) => {
-      openSiteId = siteId;
-      if (siteId)
+          siteButton.classList.remove(...structureClassNames);
+          siteButton.classList.toggle('has-structure', Boolean(structure));
+          if (structure)
+              siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
+          siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
+          siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng');
           renderBuildMenu(siteId);
-      for (const menu of buildMenuElements.values())
-          menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);
-  };
-  const updateCamera = () => {
-      const width = viewport?.clientWidth || window.innerWidth || 1;
-      cameraX = Math.max(0, Math.min(WORLD_WIDTH - width, leaderX - width * 0.5));
-      if (world)
-          world.style.transform = `translate3d(${-cameraX}px,0,0)`;
-      if (openSiteId && !nearestBuildSite())
-          setOpenBuildSite(null);
-      if (Math.abs(cameraX - lastRenderedCameraX) > BUILD_SITE_RENDER_THRESHOLD)
-          renderVisibleBuildSites();
-      if (sprite)
-          sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
-  };
-  const tick = (now) => {
-      const dt = Math.min(0.05, (now - lastTime) / 1000);
-      lastTime = now;
-      const left = keys.has('arrowleft') || keys.has('a');
-      const right = keys.has('arrowright') || keys.has('d');
-      const keyboardDirection = Number(right) - Number(left);
-      if (keyboardDirection !== 0)
-          targetX = leaderX;
-      leaderX += keyboardDirection !== 0
-          ? keyboardDirection * LEADER_SPEED * dt
-          : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
-      leaderX = clampLeaderX(leaderX);
-      updateCamera();
-      rafId = window.requestAnimationFrame(tick);
-  };
-  const moveToClientX = (clientX) => {
-      targetX = clampLeaderX(clientX + cameraX - 23);
-      setOpenBuildSite(null);
-  };
-  const onViewportPointerDown = (event) => {
-      const target = event.target instanceof Element ? event.target : null;
-      if (target?.closest('[data-build-site-id],.vinh-da-game__build-node,.vinh-da-game__back'))
-          return;
-      moveToClientX(event.clientX);
-  };
-  const onGameClick = (event) => {
-      const target = event.target instanceof Element ? event.target : null;
-      const buildNode = target?.closest('.vinh-da-game__build-node');
-      if (buildNode) {
-          const site = getBuildSite(openSiteId);
-          const structure = site ? structures.get(site.id) : null;
-          if (site && buildNode.dataset.action === 'upgrade') {
-              if (structure && structure.level < 2) {
-                  structures.set(site.id, { ...structure, level: structure.level + 1 });
+      };
+      const renderVisibleBuildSites = () => {
+          const width = viewport?.clientWidth || window.innerWidth || 1;
+          const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
+          const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
+          for (const site of BUILD_SITES) {
+              if (site.x >= minX && site.x <= maxX) {
+                  createBuildSiteElement(site);
                   renderBuildSite(site.id);
               }
+              else if (site.id !== openSiteId) {
+                  const siteElement = siteElements.get(site.id);
+                  const menuElement = buildMenuElements.get(site.id);
+                  if (siteElement && menuElement) {
+                      siteElement.remove();
+                      menuElement.remove();
+                      siteElements.delete(site.id);
+                      buildMenuElements.delete(site.id);
+                  }
+              }
           }
-          else {
-              const type = buildNode.dataset.structureType;
-              if (site && type && !structure && site.allowed.includes(type)) {
-                  structures.set(site.id, { siteId: site.id, type, level: 1 });
-                  renderBuildSite(site.id);
+          lastRenderedCameraX = cameraX;
+      };
+      const setOpenBuildSite = (siteId) => {
+          openSiteId = siteId;
+          if (siteId)
+              renderBuildMenu(siteId);
+          for (const menu of buildMenuElements.values())
+              menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);
+      };
+      const updateCamera = () => {
+          const width = viewport?.clientWidth || window.innerWidth || 1;
+          cameraX = Math.max(0, Math.min(WORLD_WIDTH - width, leaderX - width * 0.5));
+          if (world)
+              world.style.transform = `translate3d(${-cameraX}px,0,0)`;
+          if (openSiteId && !nearestBuildSite())
+              setOpenBuildSite(null);
+          if (Math.abs(cameraX - lastRenderedCameraX) > BUILD_SITE_RENDER_THRESHOLD)
+              renderVisibleBuildSites();
+          if (sprite)
+              sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
+      };
+      const tick = (now) => {
+          const dt = Math.min(0.05, (now - lastTime) / 1000);
+          lastTime = now;
+          const left = keys.has('arrowleft') || keys.has('a');
+          const right = keys.has('arrowright') || keys.has('d');
+          const keyboardDirection = Number(right) - Number(left);
+          if (keyboardDirection !== 0)
+              targetX = leaderX;
+          leaderX += keyboardDirection !== 0
+              ? keyboardDirection * LEADER_SPEED * dt
+              : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
+          leaderX = clampLeaderX(leaderX);
+          updateCamera();
+          rafId = window.requestAnimationFrame(tick);
+      };
+      const moveToClientX = (clientX) => {
+          targetX = clampLeaderX(clientX + cameraX - 23);
+          setOpenBuildSite(null);
+      };
+      const onViewportPointerDown = (event) => {
+          const target = event.target instanceof Element ? event.target : null;
+          if (target?.closest('[data-build-site-id],.vinh-da-game__build-node,.vinh-da-game__back'))
+              return;
+          moveToClientX(event.clientX);
+      };
+      const onGameClick = (event) => {
+          const target = event.target instanceof Element ? event.target : null;
+          const buildNode = target?.closest('.vinh-da-game__build-node');
+          if (buildNode) {
+              const site = getBuildSite(openSiteId);
+              const structure = site ? structures.get(site.id) : null;
+              if (site && buildNode.dataset.action === 'upgrade') {
+                  if (structure && structure.level < 2 && spend(BUILD_LEVEL_COST[2])) {
+                      structures.set(site.id, { ...structure, level: structure.level + 1 });
+                      renderBuildSite(site.id);
+                  }
+              }
+              else {
+                  const type = buildNode.dataset.structureType;
+                  if (site && type && !structure && site.allowed.includes(type) && spend(BUILD_LEVEL_COST[1])) {
+                      structures.set(site.id, { siteId: site.id, type, level: 1 });
+                      renderBuildSite(site.id);
+                  }
               }
               setOpenBuildSite(null);
               return;
@@ -38116,8 +38139,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               return;
           }
           setOpenBuildSite(openSiteId === site.id ? null : site.id);
-      }
-      ;
+      };
       const onViewportResize = () => { renderVisibleBuildSites(); };
       const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onViewportResize);
       const onKeyDown = (event) => { keys.add(event.key.toLowerCase()); };
@@ -38144,7 +38166,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               mount.destroy();
           }
       };
-  };
+  }
   const render = renderScreen;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
