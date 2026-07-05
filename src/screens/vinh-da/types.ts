@@ -1,8 +1,8 @@
+import type { EnemyKind } from './enemies.ts';
 import type { StructureType } from './structures.ts';
 
 export type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
 export type Side = 'left' | 'right';
-export type EnemyTemplateId = 'twisted';
 
 export interface BuildSite {
   id: string;
@@ -19,12 +19,14 @@ export interface PlacedStructure {
 
 export interface Enemy {
   id: number;
-  templateId: EnemyTemplateId;
+  kind: EnemyKind;
   x: number;
   hp: number;
   speed: number;
   baseSpeed: number;
   weight: number;
+  attackCooldown: number;
+  canFly: boolean;
   side: Side;
 }
 

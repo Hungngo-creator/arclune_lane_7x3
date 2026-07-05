@@ -14,7 +14,6 @@ import {
   DEFAULT_STRUCTURE_COOLDOWN,
   ENEMY_ATTACK_RANGE,
   ENEMY_LIMIT,
-  ENEMY_REWARD,
   ENEMY_SPAWN_INTERVAL,
   ENEMY_START_PADDING,
   ENEMY_WALL_DAMAGE_PER_SECOND,
@@ -35,7 +34,8 @@ import {
   SWAMP_RADIUS,
   WORLD_WIDTH
 } from './constants.ts';
-import { DEFAULT_ENEMY_TEMPLATE } from './enemies.ts';
+import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES } from './enemies.ts';
+import type { EnemyKind } from './enemies.ts';
 import {
   BUILD_LEVEL_COST,
   BUILD_NODE_OPTIONS,
@@ -326,16 +326,19 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     renderVisibleBuildSites();
   };
 
-  const spawnEnemy = (side: Side): void => {
+  const spawnEnemy = (side: Side, kind: EnemyKind = 'twisted'): void => {
     if (enemies.length >= ENEMY_LIMIT) return;
+    const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
     enemies.push({
       id: nextEnemyId,
       x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
-      templateId: DEFAULT_ENEMY_TEMPLATE.id,
-      hp: DEFAULT_ENEMY_TEMPLATE.hp,
-      speed: DEFAULT_ENEMY_TEMPLATE.speed,
-      baseSpeed: DEFAULT_ENEMY_TEMPLATE.speed,
-      weight: DEFAULT_ENEMY_TEMPLATE.weight,
+      kind: template.kind,
+      hp: template.hp,
+      speed: template.speed,
+      baseSpeed: template.speed,
+      weight: template.weight,
+      attackCooldown: template.attackCooldown,
+      canFly: template.canFly,
       side
     });
     nextEnemyId += 1;
@@ -346,7 +349,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     enemyElements.get(enemy.id)?.remove();
     enemyElements.delete(enemy.id);
     if (reward){
-      bloodSealStone += ENEMY_REWARD;
+      bloodSealStone += ENEMY_TEMPLATES[enemy.kind].reward;
       renderEconomy();
     }
   };

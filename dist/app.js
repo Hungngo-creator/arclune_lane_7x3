@@ -37900,13 +37900,103 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'SWAMP_RADIUS')) exports.SWAMP_RADIUS = SWAMP_RADIUS;
 };
 __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
+  6;
   const ENEMY_TEMPLATES = {
       twisted: {
-          id: 'twisted',
+          kind: 'twisted',
           label: 'Kẻ vặn vẹo',
           hp: 3,
           speed: 46,
-          weight: 1
+          weight: 1,
+          attackRange: 28,
+          attackCooldown: 1,
+          damage: 1,
+          canFly: false,
+          reward: 1
+      },
+      crawler: {
+          kind: 'crawler',
+          label: 'Kẻ bò trườn',
+          hp: 2,
+          speed: 58,
+          weight: 0.8,
+          attackRange: 20,
+          attackCooldown: 0.8,
+          damage: 1,
+          canFly: false,
+          reward: 1
+      },
+      madDog: {
+          kind: 'madDog',
+          label: 'Chó điên',
+          hp: 4,
+          speed: 72,
+          weight: 1,
+          attackRange: 18,
+          attackCooldown: 0.75,
+          damage: 1,
+          canFly: false,
+          reward: 1
+      },
+      suicideBomber: {
+          kind: 'suicideBomber',
+          label: 'Kẻ tự bạo',
+          hp: 2,
+          speed: 52,
+          weight: 1.2,
+          attackRange: 28,
+          attackCooldown: 1.6,
+          damage: 4,
+          canFly: false,
+          reward: 2
+      },
+      mutantBird: {
+          kind: 'mutantBird',
+          label: 'Chim đột biến',
+          hp: 2,
+          speed: 84,
+          weight: 0.6,
+          attackRange: 22,
+          attackCooldown: 0.9,
+          damage: 1,
+          canFly: true,
+          reward: 1
+      },
+      darkMage: {
+          kind: 'darkMage',
+          label: 'Pháp sư hắc ám',
+          hp: 5,
+          speed: 38,
+          weight: 0.9,
+          attackRange: 140,
+          attackCooldown: 2.2,
+          damage: 2,
+          canFly: false,
+          reward: 2
+      },
+      ironMan: {
+          kind: 'ironMan',
+          label: 'Người sắt',
+          hp: 12,
+          speed: 28,
+          weight: 3,
+          attackRange: 26,
+          attackCooldown: 1.4,
+          damage: 2,
+          canFly: false,
+          reward: 3
+      },
+      resentfulDragon: {
+          kind: 'resentfulDragon',
+          label: 'Rồng oán hận',
+          hp: 28,
+          speed: 34,
+          weight: 5,
+          attackRange: 180,
+          attackCooldown: 2.8,
+          damage: 5,
+          canFly: true,
+          reward: 8
       }
   };
   const DEFAULT_ENEMY_TEMPLATE = ENEMY_TEMPLATES.twisted;
@@ -37933,7 +38023,6 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const DEFAULT_STRUCTURE_COOLDOWN = __dep2.DEFAULT_STRUCTURE_COOLDOWN;
   const ENEMY_ATTACK_RANGE = __dep2.ENEMY_ATTACK_RANGE;
   const ENEMY_LIMIT = __dep2.ENEMY_LIMIT;
-  const ENEMY_REWARD = __dep2.ENEMY_REWARD;
   const ENEMY_SPAWN_INTERVAL = __dep2.ENEMY_SPAWN_INTERVAL;
   const ENEMY_START_PADDING = __dep2.ENEMY_START_PADDING;
   const ENEMY_WALL_DAMAGE_PER_SECOND = __dep2.ENEMY_WALL_DAMAGE_PER_SECOND;
@@ -37955,6 +38044,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const WORLD_WIDTH = __dep2.WORLD_WIDTH;
   const __dep3 = __require('./screens/vinh-da/enemies.ts');
   const DEFAULT_ENEMY_TEMPLATE = __dep3.DEFAULT_ENEMY_TEMPLATE;
+  const ENEMY_TEMPLATES = __dep3.ENEMY_TEMPLATES;
   const __dep4 = __require('./screens/vinh-da/structures.ts');
   const BUILD_LEVEL_COST = __dep4.BUILD_LEVEL_COST;
   const BUILD_NODE_OPTIONS = __dep4.BUILD_NODE_OPTIONS;
@@ -38244,17 +38334,20 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               selectedGroundPlotId = null;
           renderVisibleBuildSites();
       };
-      const spawnEnemy = (side) => {
+      const spawnEnemy = (side, kind = 'twisted') => {
           if (enemies.length >= ENEMY_LIMIT)
               return;
+          const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
           enemies.push({
               id: nextEnemyId,
               x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
-              templateId: DEFAULT_ENEMY_TEMPLATE.id,
-              hp: DEFAULT_ENEMY_TEMPLATE.hp,
-              speed: DEFAULT_ENEMY_TEMPLATE.speed,
-              baseSpeed: DEFAULT_ENEMY_TEMPLATE.speed,
-              weight: DEFAULT_ENEMY_TEMPLATE.weight,
+              kind: template.kind,
+              hp: template.hp,
+              speed: template.speed,
+              baseSpeed: template.speed,
+              weight: template.weight,
+              attackCooldown: template.attackCooldown,
+              canFly: template.canFly,
               side
           });
           nextEnemyId += 1;
@@ -38266,7 +38359,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           enemyElements.get(enemy.id)?.remove();
           enemyElements.delete(enemy.id);
           if (reward) {
-              bloodSealStone += ENEMY_REWARD;
+              bloodSealStone += ENEMY_TEMPLATES[enemy.kind].reward;
               renderEconomy();
           }
       };
