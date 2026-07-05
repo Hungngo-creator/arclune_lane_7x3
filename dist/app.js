@@ -37849,6 +37849,11 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   const ENEMY_WALL_DAMAGE_PER_SECOND = 1;
   const LEADER_ATTACK_RANGE = 58;
   const LEADER_DAMAGE_PER_SECOND = 2.5;
+  const LANDMINE_TRIGGER_RADIUS = GROUND_PLOT_WIDTH * 0.5;
+  const LANDMINE_BLAST_RADIUS = 72;
+  const LANDMINE_FUSE_SECONDS = 2;
+  const LANDMINE_TRUE_DAMAGE = 2;
+  const SWAMP_RADIUS = GROUND_PLOT_WIDTH * 0.5;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'STYLE_ID')) exports.STYLE_ID = STYLE_ID;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_WORLD_WIDTH')) exports.BASE_WORLD_WIDTH = BASE_WORLD_WIDTH;
@@ -37886,6 +37891,11 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_WALL_DAMAGE_PER_SECOND')) exports.ENEMY_WALL_DAMAGE_PER_SECOND = ENEMY_WALL_DAMAGE_PER_SECOND;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_ATTACK_RANGE')) exports.LEADER_ATTACK_RANGE = LEADER_ATTACK_RANGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_DAMAGE_PER_SECOND')) exports.LEADER_DAMAGE_PER_SECOND = LEADER_DAMAGE_PER_SECOND;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LANDMINE_TRIGGER_RADIUS')) exports.LANDMINE_TRIGGER_RADIUS = LANDMINE_TRIGGER_RADIUS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LANDMINE_BLAST_RADIUS')) exports.LANDMINE_BLAST_RADIUS = LANDMINE_BLAST_RADIUS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LANDMINE_FUSE_SECONDS')) exports.LANDMINE_FUSE_SECONDS = LANDMINE_FUSE_SECONDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LANDMINE_TRUE_DAMAGE')) exports.LANDMINE_TRUE_DAMAGE = LANDMINE_TRUE_DAMAGE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SWAMP_RADIUS')) exports.SWAMP_RADIUS = SWAMP_RADIUS;
 };
 __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
   const ENEMY_TEMPLATES = {
@@ -37893,7 +37903,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           id: 'twisted',
           label: 'Kẻ vặn vẹo',
           hp: 3,
-          speed: 46
+          speed: 46,
+          weight: 1
       }
   };
   const DEFAULT_ENEMY_TEMPLATE = ENEMY_TEMPLATES.twisted;
@@ -37927,12 +37938,17 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const GROUND_PERCENT = __dep2.GROUND_PERCENT;
   const LEADER_ATTACK_RANGE = __dep2.LEADER_ATTACK_RANGE;
   const LEADER_DAMAGE_PER_SECOND = __dep2.LEADER_DAMAGE_PER_SECOND;
+  const LANDMINE_BLAST_RADIUS = __dep2.LANDMINE_BLAST_RADIUS;
+  const LANDMINE_FUSE_SECONDS = __dep2.LANDMINE_FUSE_SECONDS;
+  const LANDMINE_TRIGGER_RADIUS = __dep2.LANDMINE_TRIGGER_RADIUS;
+  const LANDMINE_TRUE_DAMAGE = __dep2.LANDMINE_TRUE_DAMAGE;
   const LEADER_EDGE_PADDING_LEFT = __dep2.LEADER_EDGE_PADDING_LEFT;
   const LEADER_EDGE_PADDING_RIGHT = __dep2.LEADER_EDGE_PADDING_RIGHT;
   const LEADER_SPEED = __dep2.LEADER_SPEED;
   const LEADER_START_X = __dep2.LEADER_START_X;
   const LEADER_WIDTH = __dep2.LEADER_WIDTH;
   const STYLE_ID = __dep2.STYLE_ID;
+  const SWAMP_RADIUS = __dep2.SWAMP_RADIUS;
   const WORLD_WIDTH = __dep2.WORLD_WIDTH;
   const __dep3 = __require('./screens/vinh-da/enemies.ts');
   const DEFAULT_ENEMY_TEMPLATE = __dep3.DEFAULT_ENEMY_TEMPLATE;
@@ -38009,6 +38025,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const keys = new Set();
       const structures = new Map();
       const structureRuntimes = new Map();
+      const structureSitesByType = new Map();
       const enemies = [];
       const enemyElements = new Map();
       let nextEnemyId = 1;
@@ -38054,6 +38071,37 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           structureRuntimes.set(structure.siteId, runtime);
           return runtime;
       };
+      const trackStructureType = (structure) => {
+          let siteIds = structureSitesByType.get(structure.type);
+          if (!siteIds) {
+              siteIds = new Set();
+              structureSitesByType.set(structure.type, siteIds);
+          }
+          siteIds.add(structure.siteId);
+      };
+      const untrackStructureType = (structure) => {
+          const siteIds = structureSitesByType.get(structure.type);
+          siteIds?.delete(structure.siteId);
+          if (siteIds?.size === 0)
+              structureSitesByType.delete(structure.type);
+      };
+      const setStructure = (structure) => {
+          const previous = structures.get(structure.siteId);
+          if (previous)
+              untrackStructureType(previous);
+          structures.set(structure.siteId, structure);
+          trackStructureType(structure);
+      };
+      const deleteStructure = (siteId) => {
+          const structure = structures.get(siteId);
+          if (!structure)
+              return false;
+          untrackStructureType(structure);
+          structures.delete(siteId);
+          structureRuntimes.delete(siteId);
+          return true;
+      };
+      const structureSiteIdsOfType = (type) => structureSitesByType.get(type) ?? [];
       const canAfford = (cost) => bloodSealStone >= cost;
       const renderEconomy = () => {
           if (bloodSealStoneText)
@@ -38201,6 +38249,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               templateId: DEFAULT_ENEMY_TEMPLATE.id,
               hp: DEFAULT_ENEMY_TEMPLATE.hp,
               speed: DEFAULT_ENEMY_TEMPLATE.speed,
+              baseSpeed: DEFAULT_ENEMY_TEMPLATE.speed,
+              weight: DEFAULT_ENEMY_TEMPLATE.weight,
               side
           });
           nextEnemyId += 1;
@@ -38222,8 +38272,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           enemySpawnTimer = 0;
       };
       const getBlockingWall = (enemy) => {
-          for (const [siteId, structure] of structures) {
-              if (structure.type !== 'wall')
+          for (const siteId of structureSiteIdsOfType('wall')) {
+              const structure = structures.get(siteId);
+              if (!structure)
                   continue;
               const site = getBuildSite(siteId);
               if (!site || (enemy.side === 'left' ? site.x >= CRYSTAL_X : site.x <= CRYSTAL_X))
@@ -38237,6 +38288,30 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const damageEnemy = (enemy, amount) => {
           enemy.hp -= amount;
           return enemy.hp <= 0;
+      };
+      const getEnemyEffectiveSpeed = (enemy) => {
+          for (const siteId of structureSiteIdsOfType('swamp')) {
+              const site = getBuildSite(siteId);
+              if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS) {
+                  if (enemy.weight <= 1)
+                      return enemy.baseSpeed * 0.5;
+                  if (enemy.weight === 2)
+                      return enemy.baseSpeed * 0.75;
+                  return enemy.baseSpeed;
+              }
+          }
+          return enemy.baseSpeed;
+      };
+      const isUnitInLandmineTriggerRadius = (site) => (Math.abs(leaderX - site.x) <= LANDMINE_TRIGGER_RADIUS
+          || enemies.some(enemy => Math.abs(enemy.x - site.x) <= LANDMINE_TRIGGER_RADIUS));
+      const explodeLandmine = (site) => {
+          for (let i = enemies.length - 1; i >= 0; i -= 1) {
+              const enemy = enemies[i];
+              if (enemy && Math.abs(enemy.x - site.x) <= LANDMINE_BLAST_RADIUS && damageEnemy(enemy, LANDMINE_TRUE_DAMAGE))
+                  removeEnemyAt(i, true);
+          }
+          deleteStructure(site.id);
+          renderBuildSite(site.id);
       };
       const updateEnemies = (dt) => {
           enemySpawnTimer += dt;
@@ -38252,37 +38327,55 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               if (wall) {
                   wall.runtime.hp -= ENEMY_WALL_DAMAGE_PER_SECOND * dt;
                   if (wall.runtime.hp <= 0) {
-                      structures.delete(wall.site.id);
-                      structureRuntimes.delete(wall.site.id);
+                      deleteStructure(wall.site.id);
                       renderBuildSite(wall.site.id);
                   }
               }
               else {
                   const direction = enemy.x < CRYSTAL_X ? 1 : -1;
-                  enemy.x += direction * enemy.speed * dt;
+                  enemy.x += direction * getEnemyEffectiveSpeed(enemy) * dt;
               }
               if (Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE && damageEnemy(enemy, LEADER_DAMAGE_PER_SECOND * dt))
                   removeEnemyAt(i, true);
           }
       };
       const updateStructures = (dt) => {
-          for (const structure of structures.values()) {
-              if (structure.type !== 'watchtower' && structure.type !== 'elementalTower')
-                  continue;
-              const site = getBuildSite(structure.siteId);
-              if (!site)
+          for (const type of ['watchtower', 'elementalTower']) {
+              for (const siteId of structureSiteIdsOfType(type)) {
+                  const structure = structures.get(siteId);
+                  if (!structure)
+                      continue;
+                  const site = getBuildSite(structure.siteId);
+                  if (!site)
+                      continue;
+                  const runtime = ensureStructureRuntime(structure);
+                  runtime.cooldown = Math.max(0, runtime.cooldown - dt);
+                  if (runtime.cooldown > 0)
+                      continue;
+                  const stat = getStructureLevelStat(structure.type, structure.level);
+                  const target = enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
+                  if (!target)
+                      continue;
+                  runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+                  if (damageEnemy(target, stat.damage ?? 0))
+                      removeEnemyAt(enemies.indexOf(target), true);
+              }
+          }
+          for (const siteId of [...structureSiteIdsOfType('landmine')]) {
+              const structure = structures.get(siteId);
+              const site = getBuildSite(siteId);
+              if (!structure || !site)
                   continue;
               const runtime = ensureStructureRuntime(structure);
-              runtime.cooldown = Math.max(0, runtime.cooldown - dt);
-              if (runtime.cooldown > 0)
+              if (!runtime.armed && isUnitInLandmineTriggerRadius(site)) {
+                  runtime.armed = true;
+                  runtime.fuse = LANDMINE_FUSE_SECONDS;
+              }
+              if (!runtime.armed)
                   continue;
-              const stat = getStructureLevelStat(structure.type, structure.level);
-              const target = enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
-              if (!target)
-                  continue;
-              runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
-              if (damageEnemy(target, stat.damage ?? 0))
-                  removeEnemyAt(enemies.indexOf(target), true);
+              runtime.fuse = Math.max(0, (runtime.fuse ?? LANDMINE_FUSE_SECONDS) - dt);
+              if (runtime.fuse <= 0)
+                  explodeLandmine(site);
           }
       };
       const renderEnemies = () => {
@@ -38363,7 +38456,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               if (site && buildNode.dataset.action === 'upgrade') {
                   if (structure && structure.level < 2 && spend(BUILD_LEVEL_COST[2])) {
                       const upgraded = { ...structure, level: structure.level + 1 };
-                      structures.set(site.id, upgraded);
+                      setStructure(upgraded);
                       const runtime = ensureStructureRuntime(upgraded);
                       runtime.hp = getStructureMaxHp(upgraded);
                       renderBuildSite(site.id);
@@ -38373,7 +38466,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
                   const type = buildNode.dataset.structureType;
                   if (site && type && !structure && site.allowed.includes(type) && spend(BUILD_LEVEL_COST[1])) {
                       const placed = { siteId: site.id, type, level: 1 };
-                      structures.set(site.id, placed);
+                      setStructure(placed);
                       ensureStructureRuntime(placed);
                       renderBuildSite(site.id);
                   }

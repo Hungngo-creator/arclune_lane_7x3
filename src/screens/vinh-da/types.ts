@@ -23,10 +23,14 @@ export interface Enemy {
   x: number;
   hp: number;
   speed: number;
+  aseSpeed: number;
+  weight: number;
   side: Side;
 }
 
 export interface StructureRuntime {
   cooldown: number;
   hp: number;
+  armed?: boolean;
+  fuse?: number;
 }

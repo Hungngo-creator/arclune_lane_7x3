@@ -21,12 +21,17 @@ import {
   GROUND_PERCENT,
   LEADER_ATTACK_RANGE,
   LEADER_DAMAGE_PER_SECOND,
+  LANDMINE_BLAST_RADIUS,
+  LANDMINE_FUSE_SECONDS,
+  LANDMINE_TRIGGER_RADIUS,
+  LANDMINE_TRUE_DAMAGE,
   LEADER_EDGE_PADDING_LEFT,
   LEADER_EDGE_PADDING_RIGHT,
   LEADER_SPEED,
   LEADER_START_X,
   LEADER_WIDTH,
   STYLE_ID,
+  SWAMP_RADIUS,
   WORLD_WIDTH
 } from './constants.ts';
 import { DEFAULT_ENEMY_TEMPLATE } from './enemies.ts';
@@ -115,6 +120,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const keys = new Set<string>();
   const structures = new Map<string, PlacedStructure>();
   const structureRuntimes = new Map<string, StructureRuntime>();
+  const structureSitesByType = new Map<StructureType, Set<string>>();
   const enemies: Enemy[] = [];
   const enemyElements = new Map<number, HTMLElement>();
   let nextEnemyId = 1;
@@ -162,6 +168,35 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     structureRuntimes.set(structure.siteId, runtime);
     return runtime;
   };
+  const trackStructureType = (structure: PlacedStructure): void => {
+    let siteIds = structureSitesByType.get(structure.type);
+    if (!siteIds){
+      siteIds = new Set<string>();
+      structureSitesByType.set(structure.type, siteIds);
+    }
+    siteIds.add(structure.siteId);
+  };
+  const untrackStructureType = (structure: PlacedStructure): void => {
+    const siteIds = structureSitesByType.get(structure.type);
+    siteIds?.delete(structure.siteId);
+    if (siteIds?.size === 0) structureSitesByType.delete(structure.type);
+  };
+  const setStructure = (structure: PlacedStructure): void => {
+    const previous = structures.get(structure.siteId);
+    if (previous) untrackStructureType(previous);
+    structures.set(structure.siteId, structure);
+    trackStructureType(structure);
+  };
+  const deleteStructure = (siteId: string): boolean => {
+    const structure = structures.get(siteId);
+    if (!structure) return false;
+    untrackStructureType(structure);
+    structures.delete(siteId);
+    structureRuntimes.delete(siteId);
+    return true;
+  };
+  const structureSiteIdsOfType = (type: StructureType): Iterable<string> => structureSitesByType.get(type) ?? [];
+
   const canAfford = (cost: number): boolean => bloodSealStone >= cost;
   const renderEconomy = (): void => {
     if (bloodSealStoneText) bloodSealStoneText.textContent = String(bloodSealStone);
@@ -297,6 +332,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       templateId: DEFAULT_ENEMY_TEMPLATE.id,
       hp: DEFAULT_ENEMY_TEMPLATE.hp,
       speed: DEFAULT_ENEMY_TEMPLATE.speed,
+      baseSpeed: DEFAULT_ENEMY_TEMPLATE.speed,
+      weight: DEFAULT_ENEMY_TEMPLATE.weight,
       side
     });
     nextEnemyId += 1;
@@ -316,8 +353,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     enemySpawnTimer = 0;
   };
   const getBlockingWall = (enemy: Enemy): { site: BuildSite; runtime: StructureRuntime } | null => {
-    for (const [siteId, structure] of structures){
-      if (structure.type !== 'wall') continue;
+    for (const siteId of structureSiteIdsOfType('wall')){
+      const structure = structures.get(siteId);
+      if (!structure) continue;
       const site = getBuildSite(siteId);
       if (!site || (enemy.side === 'left' ? site.x >= CRYSTAL_X : site.x <= CRYSTAL_X)) continue;
       const runtime = ensureStructureRuntime(structure);
@@ -328,6 +366,29 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const damageEnemy = (enemy: Enemy, amount: number): boolean => {
     enemy.hp -= amount;
     return enemy.hp <= 0;
+  };
+  const getEnemyEffectiveSpeed = (enemy: Enemy): number => {
+    for (const siteId of structureSiteIdsOfType('swamp')){
+      const site = getBuildSite(siteId);
+      if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS){
+        if (enemy.weight <= 1) return enemy.baseSpeed * 0.5;
+        if (enemy.weight === 2) return enemy.baseSpeed * 0.75;
+        return enemy.baseSpeed;
+      }
+    }
+    return enemy.baseSpeed;
+  };
+  const isUnitInLandmineTriggerRadius = (site: BuildSite): boolean => (
+    Math.abs(leaderX - site.x) <= LANDMINE_TRIGGER_RADIUS
+    || enemies.some(enemy => Math.abs(enemy.x - site.x) <= LANDMINE_TRIGGER_RADIUS)
+  );
+  const explodeLandmine = (site: BuildSite): void => {
+    for (let i = enemies.length - 1; i >= 0; i -= 1){
+      const enemy = enemies[i];
+      if (enemy && Math.abs(enemy.x - site.x) <= LANDMINE_BLAST_RADIUS && damageEnemy(enemy, LANDMINE_TRUE_DAMAGE)) removeEnemyAt(i, true);
+    }
+    deleteStructure(site.id);
+    renderBuildSite(site.id);
   };
   const updateEnemies = (dt: number): void => {
     enemySpawnTimer += dt;
@@ -343,21 +404,22 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       if (wall){
         wall.runtime.hp -= ENEMY_WALL_DAMAGE_PER_SECOND * dt;
         if (wall.runtime.hp <= 0){
-          structures.delete(wall.site.id);
-          structureRuntimes.delete(wall.site.id);
+          deleteStructure(wall.site.id);
           renderBuildSite(wall.site.id);
         }
       } else {
         const direction = enemy.x < CRYSTAL_X ? 1 : -1;
-        enemy.x += direction * enemy.speed * dt;
+        enemy.x += direction * getEnemyEffectiveSpeed(enemy) * dt;
       }
       if (Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE && damageEnemy(enemy, LEADER_DAMAGE_PER_SECOND * dt)) removeEnemyAt(i, true);
     }
   };
   const updateStructures = (dt: number): void => {
-    for (const structure of structures.values()){
-      if (structure.type !== 'watchtower' && structure.type !== 'elementalTower') continue;
-      const site = getBuildSite(structure.siteId);
+    for (const type of ['watchtower', 'elementalTower'] as const){
+      for (const siteId of structureSiteIdsOfType(type)){
+        const structure = structures.get(siteId);
+        if (!structure) continue;
+        const site = getBuildSite(structure.siteId);
       if (!site) continue;
       const runtime = ensureStructureRuntime(structure);
       runtime.cooldown = Math.max(0, runtime.cooldown - dt);
@@ -367,6 +429,21 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       if (!target) continue;
       runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
       if (damageEnemy(target, stat.damage ?? 0)) removeEnemyAt(enemies.indexOf(target), true);
+        }
+    }
+
+    for (const siteId of [...structureSiteIdsOfType('landmine')]){
+      const structure = structures.get(siteId);
+      const site = getBuildSite(siteId);
+      if (!structure || !site) continue;
+      const runtime = ensureStructureRuntime(structure);
+      if (!runtime.armed && isUnitInLandmineTriggerRadius(site)){
+        runtime.armed = true;
+        runtime.fuse = LANDMINE_FUSE_SECONDS;
+      }
+      if (!runtime.armed) continue;
+      runtime.fuse = Math.max(0, (runtime.fuse ?? LANDMINE_FUSE_SECONDS) - dt);
+      if (runtime.fuse <= 0) explodeLandmine(site);
     }
   };
   const renderEnemies = (): void => {
@@ -443,7 +520,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       if (site && buildNode.dataset.action === 'upgrade'){
         if (structure && structure.level < 2 && spend(BUILD_LEVEL_COST[2])){
           const upgraded = { ...structure, level: structure.level + 1 };
-          structures.set(site.id, upgraded);
+          setStructure(upgraded);
           const runtime = ensureStructureRuntime(upgraded);
           runtime.hp = getStructureMaxHp(upgraded);
           renderBuildSite(site.id);
@@ -452,7 +529,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         const type = buildNode.dataset.structureType as StructureType | undefined;
         if (site && type && !structure && site.allowed.includes(type) && spend(BUILD_LEVEL_COST[1])){
           const placed = { siteId: site.id, type, level: 1 };
-          structures.set(site.id, placed);
+          setStructure(placed);
           ensureStructureRuntime(placed);
           renderBuildSite(site.id);
         }
