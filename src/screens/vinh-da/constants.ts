@@ -1,0 +1,40 @@
+export const STYLE_ID = 'vinh-da-gameplay-style';
+export const BASE_WORLD_WIDTH = 3600;
+export const SIDE_EXPANSION_MULTIPLIER = 3;
+export const WORLD_WIDTH = BASE_WORLD_WIDTH * (1 + SIDE_EXPANSION_MULTIPLIER * 2);
+export const WORLD_CENTER_X = WORLD_WIDTH / 2;
+
+export const LEADER_SPEED = 420;
+export const LEADER_WIDTH = 46;
+export const LEADER_EDGE_PADDING_LEFT = 80;
+export const LEADER_EDGE_PADDING_RIGHT = 120;
+
+export const GROUND_RATIO = 0.42;
+export const GROUND_PERCENT = `${GROUND_RATIO * 100}%`;
+
+export const CASTLE_WIDTH = 190;
+export const CASTLE_LEFT = WORLD_CENTER_X - CASTLE_WIDTH * 0.5;
+export const CASTLE_TOWER_OFFSET = 60;
+export const CASTLE_TOWER_WIDTH = 54;
+export const CASTLE_OUTER_LEFT = CASTLE_LEFT - CASTLE_TOWER_OFFSET;
+export const CASTLE_OUTER_RIGHT = CASTLE_LEFT + CASTLE_WIDTH + CASTLE_TOWER_OFFSET;
+export const CRYSTAL_X = WORLD_CENTER_X;
+export const LEADER_START_X = CRYSTAL_X + 110;
+
+export const BUILD_RANGE = 150;
+export const BUILD_SITE_SPACING = 720;
+export const BUILD_SITE_CASTLE_PADDING = 360;
+export const BUILD_SITE_EDGE_PADDING = 160;
+export const BUILD_SITE_RENDER_BUFFER = 800;
+export const BUILD_SITE_RENDER_THRESHOLD = 160;
+
+export const DEFAULT_STRUCTURE_COOLDOWN = 0;
+export const ENEMY_LIMIT = 30;
+export const ENEMY_REWARD = 1;
+export const ENEMY_SPAWN_INTERVAL = 1.4;
+export const ENEMY_START_PADDING = 120;
+export const ENEMY_ATTACK_RANGE = 28;
+export const ENEMY_WALL_DAMAGE_PER_SECOND = 1;
+
+export const LEADER_ATTACK_RANGE = 58;
+export const LEADER_DAMAGE_PER_SECOND = 2.5;

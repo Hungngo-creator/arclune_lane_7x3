@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -37812,19 +37812,18 @@ __modules['./screens/ui-gacha/logic/types.ts'] = (exports, module, __require) =>
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
   if (!Object.prototype.hasOwnProperty.call(exports, 'RARITY_ORDER')) exports.RARITY_ORDER = RARITY_ORDER;
 };
-__modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./catalog.ts');
-  const ROSTER = __dep0.ROSTER;
-  const getMetaById = __dep0.getMetaById;
-  const __dep1 = __require('./ui/dom.ts');
-  const ensureStyleTag = __dep1.ensureStyleTag;
-  const mountSection = __dep1.mountSection;
+__modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   const STYLE_ID = 'vinh-da-gameplay-style';
   const BASE_WORLD_WIDTH = 3600;
   const SIDE_EXPANSION_MULTIPLIER = 3;
   const WORLD_WIDTH = BASE_WORLD_WIDTH * (1 + SIDE_EXPANSION_MULTIPLIER * 2);
   const WORLD_CENTER_X = WORLD_WIDTH / 2;
   const LEADER_SPEED = 420;
+  const LEADER_WIDTH = 46;
+  const LEADER_EDGE_PADDING_LEFT = 80;
+  const LEADER_EDGE_PADDING_RIGHT = 120;
+  const GROUND_RATIO = 0.42;
+  const GROUND_PERCENT = `${GROUND_RATIO * 100}%`;
   const CASTLE_WIDTH = 190;
   const CASTLE_LEFT = WORLD_CENTER_X - CASTLE_WIDTH * 0.5;
   const CASTLE_TOWER_OFFSET = 60;
@@ -37839,54 +37838,106 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const BUILD_SITE_EDGE_PADDING = 160;
   const BUILD_SITE_RENDER_BUFFER = 800;
   const BUILD_SITE_RENDER_THRESHOLD = 160;
+  const DEFAULT_STRUCTURE_COOLDOWN = 0;
   const ENEMY_LIMIT = 30;
   const ENEMY_REWARD = 1;
   const ENEMY_SPAWN_INTERVAL = 1.4;
   const ENEMY_START_PADDING = 120;
-  const ENEMY_BASE_HP = 3;
-  const ENEMY_BASE_SPEED = 46;
   const ENEMY_ATTACK_RANGE = 28;
   const ENEMY_WALL_DAMAGE_PER_SECOND = 1;
-  const WALL_BASE_HP = 8;
-  const TOWER_RANGE = 460;
-  const TOWER_DAMAGE = 1;
-  const TOWER_COOLDOWN_SECONDS = 0.55;
   const LEADER_ATTACK_RANGE = 58;
   const LEADER_DAMAGE_PER_SECOND = 2.5;
-  const UPGRADE_NODE_LABEL = 'Nâng cấp';
-  const BUILD_LEVEL_COST = {
-      1: 0,
-      2: 1
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'STYLE_ID')) exports.STYLE_ID = STYLE_ID;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_WORLD_WIDTH')) exports.BASE_WORLD_WIDTH = BASE_WORLD_WIDTH;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SIDE_EXPANSION_MULTIPLIER')) exports.SIDE_EXPANSION_MULTIPLIER = SIDE_EXPANSION_MULTIPLIER;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'WORLD_WIDTH')) exports.WORLD_WIDTH = WORLD_WIDTH;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'WORLD_CENTER_X')) exports.WORLD_CENTER_X = WORLD_CENTER_X;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_SPEED')) exports.LEADER_SPEED = LEADER_SPEED;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_WIDTH')) exports.LEADER_WIDTH = LEADER_WIDTH;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_EDGE_PADDING_LEFT')) exports.LEADER_EDGE_PADDING_LEFT = LEADER_EDGE_PADDING_LEFT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_EDGE_PADDING_RIGHT')) exports.LEADER_EDGE_PADDING_RIGHT = LEADER_EDGE_PADDING_RIGHT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_RATIO')) exports.GROUND_RATIO = GROUND_RATIO;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_PERCENT')) exports.GROUND_PERCENT = GROUND_PERCENT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_WIDTH')) exports.CASTLE_WIDTH = CASTLE_WIDTH;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_LEFT')) exports.CASTLE_LEFT = CASTLE_LEFT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_TOWER_OFFSET')) exports.CASTLE_TOWER_OFFSET = CASTLE_TOWER_OFFSET;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_TOWER_WIDTH')) exports.CASTLE_TOWER_WIDTH = CASTLE_TOWER_WIDTH;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_OUTER_LEFT')) exports.CASTLE_OUTER_LEFT = CASTLE_OUTER_LEFT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_OUTER_RIGHT')) exports.CASTLE_OUTER_RIGHT = CASTLE_OUTER_RIGHT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CRYSTAL_X')) exports.CRYSTAL_X = CRYSTAL_X;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_START_X')) exports.LEADER_START_X = LEADER_START_X;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_RANGE')) exports.BUILD_RANGE = BUILD_RANGE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITE_SPACING')) exports.BUILD_SITE_SPACING = BUILD_SITE_SPACING;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITE_CASTLE_PADDING')) exports.BUILD_SITE_CASTLE_PADDING = BUILD_SITE_CASTLE_PADDING;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITE_EDGE_PADDING')) exports.BUILD_SITE_EDGE_PADDING = BUILD_SITE_EDGE_PADDING;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITE_RENDER_BUFFER')) exports.BUILD_SITE_RENDER_BUFFER = BUILD_SITE_RENDER_BUFFER;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITE_RENDER_THRESHOLD')) exports.BUILD_SITE_RENDER_THRESHOLD = BUILD_SITE_RENDER_THRESHOLD;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'DEFAULT_STRUCTURE_COOLDOWN')) exports.DEFAULT_STRUCTURE_COOLDOWN = DEFAULT_STRUCTURE_COOLDOWN;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_LIMIT')) exports.ENEMY_LIMIT = ENEMY_LIMIT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_REWARD')) exports.ENEMY_REWARD = ENEMY_REWARD;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_SPAWN_INTERVAL')) exports.ENEMY_SPAWN_INTERVAL = ENEMY_SPAWN_INTERVAL;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_START_PADDING')) exports.ENEMY_START_PADDING = ENEMY_START_PADDING;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_ATTACK_RANGE')) exports.ENEMY_ATTACK_RANGE = ENEMY_ATTACK_RANGE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_WALL_DAMAGE_PER_SECOND')) exports.ENEMY_WALL_DAMAGE_PER_SECOND = ENEMY_WALL_DAMAGE_PER_SECOND;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_ATTACK_RANGE')) exports.LEADER_ATTACK_RANGE = LEADER_ATTACK_RANGE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_DAMAGE_PER_SECOND')) exports.LEADER_DAMAGE_PER_SECOND = LEADER_DAMAGE_PER_SECOND;
+};
+__modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
+  const ENEMY_TEMPLATES = {
+      twisted: {
+          id: 'twisted',
+          label: 'Kẻ vặn vẹo',
+          hp: 3,
+          speed: 46
+      }
   };
-  const BUILD_NODE_OPTIONS = [
-      { label: 'Tháp', type: 'watchtower' },
-      { label: 'Tường', type: 'wall' },
-      { label: 'Bẫy', type: 'elementalTower' },
-      { label: 'Pha lê', type: 'crystalSeal' },
-      { label: 'Ấn', type: 'church' },
-      { label: 'Trại', type: 'barracks' }
-  ];
-  const GROUND_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church'];
-  const createGroundBuildSites = () => {
-      const sites = [];
-      const addSide = (side, startX, endX) => {
-          const direction = side === 'left' ? -1 : 1;
-          let index = 1;
-          for (let x = startX; direction < 0 ? x >= endX : x <= endX; x += direction * BUILD_SITE_SPACING) {
-              sites.push({ id: `ground-${side}-${index}`, x, kind: 'ground', allowed: GROUND_BUILD_SITE_ALLOWED });
-              index += 1;
-          }
-      };
-      addSide('left', CASTLE_OUTER_LEFT - BUILD_SITE_CASTLE_PADDING, BUILD_SITE_EDGE_PADDING);
-      addSide('right', CASTLE_OUTER_RIGHT + BUILD_SITE_CASTLE_PADDING, WORLD_WIDTH - BUILD_SITE_EDGE_PADDING);
-      return sites;
-  };
-  const BUILD_SITES = [
-      { id: 'wall-left', x: CASTLE_OUTER_LEFT - 120, kind: 'wall-slot', allowed: ['wall'] },
-      { id: 'wall-right', x: CASTLE_OUTER_RIGHT + 120, kind: 'wall-slot', allowed: ['wall'] },
-      { id: 'castle-ground', x: CRYSTAL_X, kind: 'ground', allowed: ['church', 'crystalSeal'] },
-      ...createGroundBuildSites()
-  ];
+  const DEFAULT_ENEMY_TEMPLATE = ENEMY_TEMPLATES.twisted;
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_TEMPLATES')) exports.ENEMY_TEMPLATES = ENEMY_TEMPLATES;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'DEFAULT_ENEMY_TEMPLATE')) exports.DEFAULT_ENEMY_TEMPLATE = DEFAULT_ENEMY_TEMPLATE;
+};
+__modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./catalog.ts');
+  const ROSTER = __dep0.ROSTER;
+  const getMetaById = __dep0.getMetaById;
+  const __dep1 = __require('./ui/dom.ts');
+  const ensureStyleTag = __dep1.ensureStyleTag;
+  const mountSection = __dep1.mountSection;
+  const __dep2 = __require('./screens/vinh-da/constants.ts');
+  const BUILD_RANGE = __dep2.BUILD_RANGE;
+  const BUILD_SITE_RENDER_BUFFER = __dep2.BUILD_SITE_RENDER_BUFFER;
+  const BUILD_SITE_RENDER_THRESHOLD = __dep2.BUILD_SITE_RENDER_THRESHOLD;
+  const CASTLE_LEFT = __dep2.CASTLE_LEFT;
+  const CASTLE_TOWER_OFFSET = __dep2.CASTLE_TOWER_OFFSET;
+  const CASTLE_TOWER_WIDTH = __dep2.CASTLE_TOWER_WIDTH;
+  const CASTLE_WIDTH = __dep2.CASTLE_WIDTH;
+  const CRYSTAL_X = __dep2.CRYSTAL_X;
+  const DEFAULT_STRUCTURE_COOLDOWN = __dep2.DEFAULT_STRUCTURE_COOLDOWN;
+  const ENEMY_ATTACK_RANGE = __dep2.ENEMY_ATTACK_RANGE;
+  const ENEMY_LIMIT = __dep2.ENEMY_LIMIT;
+  const ENEMY_REWARD = __dep2.ENEMY_REWARD;
+  const ENEMY_SPAWN_INTERVAL = __dep2.ENEMY_SPAWN_INTERVAL;
+  const ENEMY_START_PADDING = __dep2.ENEMY_START_PADDING;
+  const ENEMY_WALL_DAMAGE_PER_SECOND = __dep2.ENEMY_WALL_DAMAGE_PER_SECOND;
+  const GROUND_PERCENT = __dep2.GROUND_PERCENT;
+  const LEADER_ATTACK_RANGE = __dep2.LEADER_ATTACK_RANGE;
+  const LEADER_DAMAGE_PER_SECOND = __dep2.LEADER_DAMAGE_PER_SECOND;
+  const LEADER_EDGE_PADDING_LEFT = __dep2.LEADER_EDGE_PADDING_LEFT;
+  const LEADER_EDGE_PADDING_RIGHT = __dep2.LEADER_EDGE_PADDING_RIGHT;
+  const LEADER_SPEED = __dep2.LEADER_SPEED;
+  const LEADER_START_X = __dep2.LEADER_START_X;
+  const LEADER_WIDTH = __dep2.LEADER_WIDTH;
+  const STYLE_ID = __dep2.STYLE_ID;
+  const WORLD_WIDTH = __dep2.WORLD_WIDTH;
+  const __dep3 = __require('./screens/vinh-da/enemies.ts');
+  const DEFAULT_ENEMY_TEMPLATE = __dep3.DEFAULT_ENEMY_TEMPLATE;
+  const __dep4 = __require('./screens/vinh-da/structures.ts');
+  const BUILD_LEVEL_COST = __dep4.BUILD_LEVEL_COST;
+  const BUILD_NODE_OPTIONS = __dep4.BUILD_NODE_OPTIONS;
+  const BUILD_SITES = __dep4.BUILD_SITES;
+  const UPGRADE_NODE_LABEL = __dep4.UPGRADE_NODE_LABEL;
+  const getStructureLevelStat = __dep4.getStructureLevelStat;
   const CSS = /* css */ `
     .app--vinh-da-gameplay{min-height:100dvh;background:#020204;color:#f7f2ff;overflow:hidden;touch-action:none;}
     .vinh-da-game{position:relative;min-height:100dvh;overflow:hidden;background:linear-gradient(#020204 0 58%,#07070b 58% 100%);touch-action:none;user-select:none;}
@@ -37895,17 +37946,17 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__back{pointer-events:auto;border:0;border-radius:999px;background:#f3edff;color:#111020;width:42px;height:42px;font-size:22px;cursor:pointer;}
     .vinh-da-game__viewport{position:absolute;inset:0;overflow:hidden;cursor:pointer;}
     .vinh-da-game__world{position:absolute;left:0;top:0;width:${WORLD_WIDTH}px;height:100%;transform:translate3d(0,0,0);will-change:transform;background:radial-gradient(circle at 50% 28%,rgba(87,68,168,.34),transparent 18%),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 220px);}
-    .vinh-da-game__ground{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(#121018,#050507);border-top:1px solid rgba(210,200,255,.18);}
-    .vinh-da-game__castle{position:absolute;left:${CASTLE_LEFT}px;bottom:42%;width:${CASTLE_WIDTH}px;height:170px;background:linear-gradient(180deg,#202033,#0d0d16);border:2px solid rgba(226,222,255,.2);box-shadow:0 0 44px rgba(83,65,170,.3);}
+    .vinh-da-game__ground{position:absolute;left:0;right:0;bottom:0;height:${GROUND_PERCENT};background:linear-gradient(#121018,#050507);border-top:1px solid rgba(210,200,255,.18);}
+    .vinh-da-game__castle{position:absolute;left:${CASTLE_LEFT}px;bottom:${GROUND_PERCENT};width:${CASTLE_WIDTH}px;height:170px;background:linear-gradient(180deg,#202033,#0d0d16);border:2px solid rgba(226,222,255,.2);box-shadow:0 0 44px rgba(83,65,170,.3);}
     .vinh-da-game__castle::before,.vinh-da-game__castle::after{content:"";position:absolute;bottom:0;width:${CASTLE_TOWER_WIDTH}px;height:230px;background:#11111f;border:2px solid rgba(226,222,255,.18)}
     .vinh-da-game__castle::before{left:-${CASTLE_TOWER_OFFSET}px}.vinh-da-game__castle::after{right:-${CASTLE_TOWER_OFFSET}px}
-    .vinh-da-game__crystal{position:absolute;left:${CRYSTAL_X}px;bottom:calc(42% + 34px);width:50px;height:72px;transform:translateX(-50%) rotate(45deg);border-radius:12px;background:linear-gradient(135deg,#eaffff,#a887ff 45%,#4cf6ff);box-shadow:0 0 18px #dff,0 0 42px rgba(121,93,255,.78);animation:vinh-da-crystal-shine 1.8s ease-in-out infinite;}
+    .vinh-da-game__crystal{position:absolute;left:${CRYSTAL_X}px;bottom:calc(${GROUND_PERCENT} + 34px);width:50px;height:72px;transform:translateX(-50%) rotate(45deg);border-radius:12px;background:linear-gradient(135deg,#eaffff,#a887ff 45%,#4cf6ff);box-shadow:0 0 18px #dff,0 0 42px rgba(121,93,255,.78);animation:vinh-da-crystal-shine 1.8s ease-in-out infinite;}
     .vinh-da-game__crystal::after{content:"";position:absolute;inset:8px 20px;background:rgba(255,255,255,.72);filter:blur(2px);}
-    .vinh-da-game__leader{position:absolute;bottom:42%;width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
-    .vinh-da-game__enemy{position:absolute;bottom:42%;width:38px;height:52px;margin-left:-19px;border-radius:18px 18px 8px 8px;background:linear-gradient(180deg,#d14b5f,#381018);box-shadow:0 0 18px rgba(209,75,95,.34);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
-    .vinh-da-game__rock{position:absolute;bottom:42%;width:96px;height:58px;margin-left:-48px;border:0;border-radius:46% 54% 38% 42%;background:linear-gradient(150deg,#7e7b8e,#383746 58%,#1f1f2a);box-shadow:inset -12px -10px 18px rgba(0,0,0,.32),0 8px 22px rgba(0,0,0,.35);cursor:pointer;z-index:2;}
+    .vinh-da-game__leader{position:absolute;bottom:${GROUND_PERCENT};width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
+    .vinh-da-game__enemy{position:absolute;bottom:${GROUND_PERCENT};width:38px;height:52px;margin-left:-19px;border-radius:18px 18px 8px 8px;background:linear-gradient(180deg,#d14b5f,#381018);box-shadow:0 0 18px rgba(209,75,95,.34);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
+    .vinh-da-game__rock{position:absolute;bottom:${GROUND_PERCENT};width:96px;height:58px;margin-left:-48px;border:0;border-radius:46% 54% 38% 42%;background:linear-gradient(150deg,#7e7b8e,#383746 58%,#1f1f2a);box-shadow:inset -12px -10px 18px rgba(0,0,0,.32),0 8px 22px rgba(0,0,0,.35);cursor:pointer;z-index:2;}
     .vinh-da-game__rock::after{content:"";position:absolute;left:18px;top:12px;width:42px;height:10px;border-radius:999px;background:rgba(255,255,255,.18);transform:rotate(-12deg);}
-    .vinh-da-game__wall-slot{position:absolute;bottom:42%;width:70px;height:78px;margin-left:-35px;border:1px dashed rgba(210,200,255,.32);border-radius:10px;background:linear-gradient(180deg,rgba(121,93,255,.12),rgba(16,14,26,.28));box-shadow:0 0 18px rgba(121,93,255,.16);cursor:pointer;z-index:2;}
+    .vinh-da-game__wall-slot{position:absolute;bottom:${GROUND_PERCENT};width:70px;height:78px;margin-left:-35px;border:1px dashed rgba(210,200,255,.32);border-radius:10px;background:linear-gradient(180deg,rgba(121,93,255,.12),rgba(16,14,26,.28));box-shadow:0 0 18px rgba(121,93,255,.16);cursor:pointer;z-index:2;}
     .vinh-da-game__wall-slot::after{content:"";position:absolute;left:12px;right:12px;bottom:10px;height:8px;border-radius:999px;background:rgba(210,200,255,.18);}
     .vinh-da-game__rock.has-structure{border-radius:10px 10px 4px 4px;border:1px solid rgba(226,222,255,.28);box-shadow:0 0 24px rgba(133,105,255,.45);}
     .vinh-da-game__structure--watchtower{background:linear-gradient(180deg,#3a2b67,#12111f);}
@@ -37916,7 +37967,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__rock.has-structure::before,.vinh-da-game__wall-slot.has-structure::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:64px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
     .vinh-da-game__structure--wall{border-style:solid;border-color:rgba(226,222,255,.34);background:repeating-linear-gradient(90deg,#2e2944 0 18px,#181625 18px 36px);box-shadow:0 0 22px rgba(133,105,255,.38);}
     .vinh-da-game__structure--wall::before{bottom:84px;}
-    .vinh-da-game__build-menu{position:absolute;bottom:calc(42% + 36px);width:170px;height:170px;margin-left:-85px;pointer-events:none;opacity:0;transform:scale(.88);transition:opacity .16s ease,transform .16s ease;z-index:4;}
+    .vinh-da-game__build-menu{position:absolute;bottom:calc(${GROUND_PERCENT} + 36px);width:170px;height:170px;margin-left:-85px;pointer-events:none;opacity:0;transform:scale(.88);transition:opacity .16s ease,transform .16s ease;z-index:4;}
     .vinh-da-game__build-menu.is-open{opacity:1;transform:scale(1);pointer-events:auto;}
     .vinh-da-game__build-node{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px;border-radius:999px;border:1px solid rgba(230,220,255,.42);background:rgba(8,8,16,.22);backdrop-filter:blur(2px);color:#f5f0ff;display:grid;place-items:center;font-size:24px;box-shadow:0 0 20px rgba(170,140,255,.2);}
     .vinh-da-game__build-node small{position:absolute;top:48px;font-size:9px;color:#d6ccff;text-shadow:0 1px 4px #000;white-space:nowrap;}
@@ -37981,12 +38032,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const buildMenuElements = new Map();
       const structureClassNames = BUILD_NODE_OPTIONS.map(option => `vinh-da-game__structure--${option.type}`);
       let lastRenderedCameraX = Number.POSITIVE_INFINITY;
-      const getStructureMaxHp = (structure) => structure.type === 'wall' ? WALL_BASE_HP * structure.level : 1;
+      const getStructureMaxHp = (structure) => getStructureLevelStat(structure.type, structure.level).hp;
       const ensureStructureRuntime = (structure) => {
           const existing = structureRuntimes.get(structure.siteId);
           if (existing)
               return existing;
-          const runtime = { cooldown: 0, hp: getStructureMaxHp(structure) };
+          const runtime = { cooldown: DEFAULT_STRUCTURE_COOLDOWN, hp: getStructureMaxHp(structure) };
           structureRuntimes.set(structure.siteId, runtime);
           return runtime;
       };
@@ -38002,7 +38053,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           renderEconomy();
           return true;
       };
-      const clampLeaderX = (x) => Math.max(80, Math.min(WORLD_WIDTH - 120, x));
+      const clampLeaderX = (x) => Math.max(LEADER_EDGE_PADDING_LEFT, Math.min(WORLD_WIDTH - LEADER_EDGE_PADDING_RIGHT, x));
       const getBuildSite = (siteId) => BUILD_SITES.find(site => site.id === siteId) ?? null;
       const nearestBuildSite = () => BUILD_SITES.find(site => Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
       const createBuildSiteElement = (site) => {
@@ -38108,8 +38159,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           enemies.push({
               id: nextEnemyId,
               x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
-              hp: ENEMY_BASE_HP,
-              speed: ENEMY_BASE_SPEED,
+              templateId: DEFAULT_ENEMY_TEMPLATE.id,
+              hp: DEFAULT_ENEMY_TEMPLATE.hp,
+              speed: DEFAULT_ENEMY_TEMPLATE.speed,
               side
           });
           nextEnemyId += 1;
@@ -38185,11 +38237,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               runtime.cooldown = Math.max(0, runtime.cooldown - dt);
               if (runtime.cooldown > 0)
                   continue;
-              const target = enemies.find(enemy => Math.abs(enemy.x - site.x) <= TOWER_RANGE);
+              const stat = getStructureLevelStat(structure.type, structure.level);
+              const target = enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
               if (!target)
                   continue;
-              runtime.cooldown = TOWER_COOLDOWN_SECONDS;
-              if (damageEnemy(target, TOWER_DAMAGE * structure.level))
+              runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+              if (damageEnemy(target, stat.damage ?? 0))
                   removeEnemyAt(enemies.indexOf(target), true);
           }
       };
@@ -38247,7 +38300,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           rafId = window.requestAnimationFrame(tick);
       };
       const moveToClientX = (clientX) => {
-          targetX = clampLeaderX(clientX + cameraX - 23);
+          targetX = clampLeaderX(clientX + cameraX - LEADER_WIDTH * 0.5);
           setOpenBuildSite(null);
       };
       const onViewportPointerDown = (event) => {
@@ -38329,6 +38382,101 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
+};
+__modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./screens/vinh-da/constants.ts');
+  const BUILD_SITE_CASTLE_PADDING = __dep0.BUILD_SITE_CASTLE_PADDING;
+  const BUILD_SITE_EDGE_PADDING = __dep0.BUILD_SITE_EDGE_PADDING;
+  const BUILD_SITE_SPACING = __dep0.BUILD_SITE_SPACING;
+  const CASTLE_OUTER_LEFT = __dep0.CASTLE_OUTER_LEFT;
+  const CASTLE_OUTER_RIGHT = __dep0.CASTLE_OUTER_RIGHT;
+  const CRYSTAL_X = __dep0.CRYSTAL_X;
+  const WORLD_WIDTH = __dep0.WORLD_WIDTH;
+  const UPGRADE_NODE_LABEL = 'Nâng cấp';
+  const BUILD_LEVEL_COST = {
+      1: 0,
+      2: 1
+  };
+  const BUILD_NODE_OPTIONS = [
+      { label: 'Tháp', type: 'watchtower' },
+      { label: 'Tường', type: 'wall' },
+      { label: 'Bẫy', type: 'elementalTower' },
+      { label: 'Pha lê', type: 'crystalSeal' },
+      { label: 'Ấn', type: 'church' },
+      { label: 'Trại', type: 'barracks' }
+  ];
+  const GROUND_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church'];
+  const WALL_BUILD_SITE_ALLOWED = ['wall'];
+  const CASTLE_GROUND_BUILD_SITE_ALLOWED = ['church', 'crystalSeal'];
+  const WALL_STRUCTURE_STATS = {
+      1: { hp: 8 },
+      2: { hp: 16 }
+  };
+  const WATCHTOWER_STRUCTURE_STATS = {
+      1: { hp: 1, range: 460, damage: 1, cooldownSeconds: 0.55 },
+      2: { hp: 1, range: 460, damage: 2, cooldownSeconds: 0.55 }
+  };
+  const GROUND_STRUCTURE_STATS = {
+      elementalTower: {
+          1: { hp: 1, range: 460, damage: 1, cooldownSeconds: 0.55 },
+          2: { hp: 1, range: 460, damage: 2, cooldownSeconds: 0.55 }
+      },
+      barracks: {
+          1: { hp: 1 },
+          2: { hp: 1 }
+      },
+      church: {
+          1: { hp: 1 },
+          2: { hp: 1 }
+      },
+      crystalSeal: {
+          1: { hp: 1 },
+          2: { hp: 1 }
+      }
+  };
+  const createGroundBuildSites = () => {
+      const sites = [];
+      const addSide = (side, startX, endX) => {
+          const direction = side === 'left' ? -1 : 1;
+          let index = 1;
+          for (let x = startX; direction < 0 ? x >= endX : x <= endX; x += direction * BUILD_SITE_SPACING) {
+              sites.push({ id: `ground-${side}-${index}`, x, kind: 'ground', allowed: GROUND_BUILD_SITE_ALLOWED });
+              index += 1;
+          }
+      };
+      addSide('left', CASTLE_OUTER_LEFT - BUILD_SITE_CASTLE_PADDING, BUILD_SITE_EDGE_PADDING);
+      addSide('right', CASTLE_OUTER_RIGHT + BUILD_SITE_CASTLE_PADDING, WORLD_WIDTH - BUILD_SITE_EDGE_PADDING);
+      return sites;
+  };
+  const BUILD_SITES = [
+      { id: 'wall-left', x: CASTLE_OUTER_LEFT - 120, kind: 'wall-slot', allowed: WALL_BUILD_SITE_ALLOWED },
+      { id: 'wall-right', x: CASTLE_OUTER_RIGHT + 120, kind: 'wall-slot', allowed: WALL_BUILD_SITE_ALLOWED },
+      { id: 'castle-ground', x: CRYSTAL_X, kind: 'ground', allowed: CASTLE_GROUND_BUILD_SITE_ALLOWED },
+      ...createGroundBuildSites()
+  ];
+  const getStructureLevelStat = (type, level) => {
+      if (type === 'wall')
+          return WALL_STRUCTURE_STATS[level] ?? { hp: 1 };
+      if (type === 'watchtower')
+          return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
+      return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'UPGRADE_NODE_LABEL')) exports.UPGRADE_NODE_LABEL = UPGRADE_NODE_LABEL;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_LEVEL_COST')) exports.BUILD_LEVEL_COST = BUILD_LEVEL_COST;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_NODE_OPTIONS')) exports.BUILD_NODE_OPTIONS = BUILD_NODE_OPTIONS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_BUILD_SITE_ALLOWED')) exports.GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'WALL_BUILD_SITE_ALLOWED')) exports.WALL_BUILD_SITE_ALLOWED = WALL_BUILD_SITE_ALLOWED;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_GROUND_BUILD_SITE_ALLOWED')) exports.CASTLE_GROUND_BUILD_SITE_ALLOWED = CASTLE_GROUND_BUILD_SITE_ALLOWED;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'WALL_STRUCTURE_STATS')) exports.WALL_STRUCTURE_STATS = WALL_STRUCTURE_STATS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'WATCHTOWER_STRUCTURE_STATS')) exports.WATCHTOWER_STRUCTURE_STATS = WATCHTOWER_STRUCTURE_STATS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_STRUCTURE_STATS')) exports.GROUND_STRUCTURE_STATS = GROUND_STRUCTURE_STATS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITES')) exports.BUILD_SITES = BUILD_SITES;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getStructureLevelStat')) exports.getStructureLevelStat = getStructureLevelStat;
+};
+__modules['./screens/vinh-da/types.ts'] = (exports, module, __require) => {
+
+  //# sourceMappingURL=stdin.js.map
 };
 __modules['./shared-types/units.ts'] = (exports, module, __require) => {
   const __reexport0 = __require('./types/units.ts');

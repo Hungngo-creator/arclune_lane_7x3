@@ -2,112 +2,50 @@ import { ROSTER, getMetaById } from '../../catalog.ts';
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import type { MainMenuShell } from '../main-menu/types.ts';
 
+import {
+  BUILD_RANGE,
+  BUILD_SITE_RENDER_BUFFER,
+  BUILD_SITE_RENDER_THRESHOLD,
+  CASTLE_LEFT,
+  CASTLE_TOWER_OFFSET,
+  CASTLE_TOWER_WIDTH,
+  CASTLE_WIDTH,
+  CRYSTAL_X,
+  DEFAULT_STRUCTURE_COOLDOWN,
+  ENEMY_ATTACK_RANGE,
+  ENEMY_LIMIT,
+  ENEMY_REWARD,
+  ENEMY_SPAWN_INTERVAL,
+  ENEMY_START_PADDING,
+  ENEMY_WALL_DAMAGE_PER_SECOND,
+  GROUND_PERCENT,
+  LEADER_ATTACK_RANGE,
+  LEADER_DAMAGE_PER_SECOND,
+  LEADER_EDGE_PADDING_LEFT,
+  LEADER_EDGE_PADDING_RIGHT,
+  LEADER_SPEED,
+  LEADER_START_X,
+  LEADER_WIDTH,
+  STYLE_ID,
+  WORLD_WIDTH
+} from './constants.ts';
+import { DEFAULT_ENEMY_TEMPLATE } from './enemies.ts';
+import {
+  BUILD_LEVEL_COST,
+  BUILD_NODE_OPTIONS,
+  BUILD_SITES,
+  UPGRADE_NODE_LABEL,
+  getStructureLevelStat
+} from './structures.ts';
+import type { StructureType } from './structures.ts';
+import type { BuildSite, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
+
 interface RenderContext {
   root: HTMLElement;
   shell?: MainMenuShell | null;
   params?: Record<string, unknown> | null;
 }
 
-type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
-type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal';
-
-interface BuildSite {
-  id: string;
-  x: number;
-  kind: BuildSiteKind;
-  allowed: readonly StructureType[];
-}
-
-interface PlacedStructure {
-  siteId: string;
-  type: StructureType;
-  level: number;
-}
-
-type Side = 'left' | 'right';
-
-interface Enemy {
-  id: number;
-  x: number;
-  hp: number;
-  speed: number;
-  side: Side;
-}
-
-interface StructureRuntime {
-  cooldown: number;
-  hp: number;
-}
-
-const STYLE_ID = 'vinh-da-gameplay-style';
-const BASE_WORLD_WIDTH = 3600;
-const SIDE_EXPANSION_MULTIPLIER = 3;
-const WORLD_WIDTH = BASE_WORLD_WIDTH * (1 + SIDE_EXPANSION_MULTIPLIER * 2);
-const WORLD_CENTER_X = WORLD_WIDTH / 2;
-const LEADER_SPEED = 420;
-const CASTLE_WIDTH = 190;
-const CASTLE_LEFT = WORLD_CENTER_X - CASTLE_WIDTH * 0.5;
-const CASTLE_TOWER_OFFSET = 60;
-const CASTLE_TOWER_WIDTH = 54;
-const CASTLE_OUTER_LEFT = CASTLE_LEFT - CASTLE_TOWER_OFFSET;
-const CASTLE_OUTER_RIGHT = CASTLE_LEFT + CASTLE_WIDTH + CASTLE_TOWER_OFFSET;
-const CRYSTAL_X = WORLD_CENTER_X;
-const LEADER_START_X = CRYSTAL_X + 110;
-const BUILD_RANGE = 150;
-const BUILD_SITE_SPACING = 720;
-const BUILD_SITE_CASTLE_PADDING = 360;
-const BUILD_SITE_EDGE_PADDING = 160;
-const BUILD_SITE_RENDER_BUFFER = 800;
-const BUILD_SITE_RENDER_THRESHOLD = 160;
-const ENEMY_LIMIT = 30;
-const ENEMY_REWARD = 1;
-const ENEMY_SPAWN_INTERVAL = 1.4;
-const ENEMY_START_PADDING = 120;
-const ENEMY_BASE_HP = 3;
-const ENEMY_BASE_SPEED = 46;
-const ENEMY_ATTACK_RANGE = 28;
-const ENEMY_WALL_DAMAGE_PER_SECOND = 1;
-const WALL_BASE_HP = 8;
-const TOWER_RANGE = 460;
-const TOWER_DAMAGE = 1;
-const TOWER_COOLDOWN_SECONDS = 0.55;
-const LEADER_ATTACK_RANGE = 58;
-const LEADER_DAMAGE_PER_SECOND = 2.5;
-const UPGRADE_NODE_LABEL = 'Nâng cấp';
-const BUILD_LEVEL_COST = {
-  1: 0,
-  2: 1
-} as const satisfies Record<number, number>;
-const BUILD_NODE_OPTIONS = [
-  { label: 'Tháp', type: 'watchtower' },
-  { label: 'Tường', type: 'wall' },
-  { label: 'Bẫy', type: 'elementalTower' },
-  { label: 'Pha lê', type: 'crystalSeal' },
-  { label: 'Ấn', type: 'church' },
-  { label: 'Trại', type: 'barracks' }
-] as const satisfies readonly { label: string; type: StructureType }[];
-const GROUND_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church'] as const satisfies readonly StructureType[];
-const createGroundBuildSites = (): BuildSite[] => {
-  const sites: BuildSite[] = [];
-  const addSide = (side: 'left' | 'right', startX: number, endX: number): void => {
-    const direction = side === 'left' ? -1 : 1;
-    let index = 1;
-    for (let x = startX; direction < 0 ? x >= endX : x <= endX; x += direction * BUILD_SITE_SPACING){
-      sites.push({ id: `ground-${side}-${index}`, x, kind: 'ground', allowed: GROUND_BUILD_SITE_ALLOWED });
-      index += 1;
-    }
-  };
-
-  addSide('left', CASTLE_OUTER_LEFT - BUILD_SITE_CASTLE_PADDING, BUILD_SITE_EDGE_PADDING);
-  addSide('right', CASTLE_OUTER_RIGHT + BUILD_SITE_CASTLE_PADDING, WORLD_WIDTH - BUILD_SITE_EDGE_PADDING);
-  return sites;
-};
-const BUILD_SITES = [
-  { id: 'wall-left', x: CASTLE_OUTER_LEFT - 120, kind: 'wall-slot', allowed: ['wall'] },
-  { id: 'wall-right', x: CASTLE_OUTER_RIGHT + 120, kind: 'wall-slot', allowed: ['wall'] },
-  { id: 'castle-ground', x: CRYSTAL_X, kind: 'ground', allowed: ['church', 'crystalSeal'] },
-  ...createGroundBuildSites()
-] as const satisfies readonly BuildSite[];
 const CSS = /* css */ `
   .app--vinh-da-gameplay{min-height:100dvh;background:#020204;color:#f7f2ff;overflow:hidden;touch-action:none;}
   .vinh-da-game{position:relative;min-height:100dvh;overflow:hidden;background:linear-gradient(#020204 0 58%,#07070b 58% 100%);touch-action:none;user-select:none;}
@@ -116,17 +54,17 @@ const CSS = /* css */ `
   .vinh-da-game__back{pointer-events:auto;border:0;border-radius:999px;background:#f3edff;color:#111020;width:42px;height:42px;font-size:22px;cursor:pointer;}
   .vinh-da-game__viewport{position:absolute;inset:0;overflow:hidden;cursor:pointer;}
   .vinh-da-game__world{position:absolute;left:0;top:0;width:${WORLD_WIDTH}px;height:100%;transform:translate3d(0,0,0);will-change:transform;background:radial-gradient(circle at 50% 28%,rgba(87,68,168,.34),transparent 18%),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 220px);}
-  .vinh-da-game__ground{position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(#121018,#050507);border-top:1px solid rgba(210,200,255,.18);}
-  .vinh-da-game__castle{position:absolute;left:${CASTLE_LEFT}px;bottom:42%;width:${CASTLE_WIDTH}px;height:170px;background:linear-gradient(180deg,#202033,#0d0d16);border:2px solid rgba(226,222,255,.2);box-shadow:0 0 44px rgba(83,65,170,.3);}
+  .vinh-da-game__ground{position:absolute;left:0;right:0;bottom:0;height:${GROUND_PERCENT};background:linear-gradient(#121018,#050507);border-top:1px solid rgba(210,200,255,.18);}
+  .vinh-da-game__castle{position:absolute;left:${CASTLE_LEFT}px;bottom:${GROUND_PERCENT};width:${CASTLE_WIDTH}px;height:170px;background:linear-gradient(180deg,#202033,#0d0d16);border:2px solid rgba(226,222,255,.2);box-shadow:0 0 44px rgba(83,65,170,.3);}
   .vinh-da-game__castle::before,.vinh-da-game__castle::after{content:"";position:absolute;bottom:0;width:${CASTLE_TOWER_WIDTH}px;height:230px;background:#11111f;border:2px solid rgba(226,222,255,.18)}
   .vinh-da-game__castle::before{left:-${CASTLE_TOWER_OFFSET}px}.vinh-da-game__castle::after{right:-${CASTLE_TOWER_OFFSET}px}
-  .vinh-da-game__crystal{position:absolute;left:${CRYSTAL_X}px;bottom:calc(42% + 34px);width:50px;height:72px;transform:translateX(-50%) rotate(45deg);border-radius:12px;background:linear-gradient(135deg,#eaffff,#a887ff 45%,#4cf6ff);box-shadow:0 0 18px #dff,0 0 42px rgba(121,93,255,.78);animation:vinh-da-crystal-shine 1.8s ease-in-out infinite;}
+  .vinh-da-game__crystal{position:absolute;left:${CRYSTAL_X}px;bottom:calc(${GROUND_PERCENT} + 34px);width:50px;height:72px;transform:translateX(-50%) rotate(45deg);border-radius:12px;background:linear-gradient(135deg,#eaffff,#a887ff 45%,#4cf6ff);box-shadow:0 0 18px #dff,0 0 42px rgba(121,93,255,.78);animation:vinh-da-crystal-shine 1.8s ease-in-out infinite;}
   .vinh-da-game__crystal::after{content:"";position:absolute;inset:8px 20px;background:rgba(255,255,255,.72);filter:blur(2px);}
-  .vinh-da-game__leader{position:absolute;bottom:42%;width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
-  .vinh-da-game__enemy{position:absolute;bottom:42%;width:38px;height:52px;margin-left:-19px;border-radius:18px 18px 8px 8px;background:linear-gradient(180deg,#d14b5f,#381018);box-shadow:0 0 18px rgba(209,75,95,.34);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
-  .vinh-da-game__rock{position:absolute;bottom:42%;width:96px;height:58px;margin-left:-48px;border:0;border-radius:46% 54% 38% 42%;background:linear-gradient(150deg,#7e7b8e,#383746 58%,#1f1f2a);box-shadow:inset -12px -10px 18px rgba(0,0,0,.32),0 8px 22px rgba(0,0,0,.35);cursor:pointer;z-index:2;}
+  .vinh-da-game__leader{position:absolute;bottom:${GROUND_PERCENT};width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
+  .vinh-da-game__enemy{position:absolute;bottom:${GROUND_PERCENT};width:38px;height:52px;margin-left:-19px;border-radius:18px 18px 8px 8px;background:linear-gradient(180deg,#d14b5f,#381018);box-shadow:0 0 18px rgba(209,75,95,.34);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
+  .vinh-da-game__rock{position:absolute;bottom:${GROUND_PERCENT};width:96px;height:58px;margin-left:-48px;border:0;border-radius:46% 54% 38% 42%;background:linear-gradient(150deg,#7e7b8e,#383746 58%,#1f1f2a);box-shadow:inset -12px -10px 18px rgba(0,0,0,.32),0 8px 22px rgba(0,0,0,.35);cursor:pointer;z-index:2;}
   .vinh-da-game__rock::after{content:"";position:absolute;left:18px;top:12px;width:42px;height:10px;border-radius:999px;background:rgba(255,255,255,.18);transform:rotate(-12deg);}
-  .vinh-da-game__wall-slot{position:absolute;bottom:42%;width:70px;height:78px;margin-left:-35px;border:1px dashed rgba(210,200,255,.32);border-radius:10px;background:linear-gradient(180deg,rgba(121,93,255,.12),rgba(16,14,26,.28));box-shadow:0 0 18px rgba(121,93,255,.16);cursor:pointer;z-index:2;}
+  .vinh-da-game__wall-slot{position:absolute;bottom:${GROUND_PERCENT};width:70px;height:78px;margin-left:-35px;border:1px dashed rgba(210,200,255,.32);border-radius:10px;background:linear-gradient(180deg,rgba(121,93,255,.12),rgba(16,14,26,.28));box-shadow:0 0 18px rgba(121,93,255,.16);cursor:pointer;z-index:2;}
   .vinh-da-game__wall-slot::after{content:"";position:absolute;left:12px;right:12px;bottom:10px;height:8px;border-radius:999px;background:rgba(210,200,255,.18);}
   .vinh-da-game__rock.has-structure{border-radius:10px 10px 4px 4px;border:1px solid rgba(226,222,255,.28);box-shadow:0 0 24px rgba(133,105,255,.45);}
   .vinh-da-game__structure--watchtower{background:linear-gradient(180deg,#3a2b67,#12111f);}
@@ -137,7 +75,7 @@ const CSS = /* css */ `
   .vinh-da-game__rock.has-structure::before,.vinh-da-game__wall-slot.has-structure::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:64px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
   .vinh-da-game__structure--wall{border-style:solid;border-color:rgba(226,222,255,.34);background:repeating-linear-gradient(90deg,#2e2944 0 18px,#181625 18px 36px);box-shadow:0 0 22px rgba(133,105,255,.38);}
   .vinh-da-game__structure--wall::before{bottom:84px;}
-  .vinh-da-game__build-menu{position:absolute;bottom:calc(42% + 36px);width:170px;height:170px;margin-left:-85px;pointer-events:none;opacity:0;transform:scale(.88);transition:opacity .16s ease,transform .16s ease;z-index:4;}
+  .vinh-da-game__build-menu{position:absolute;bottom:calc(${GROUND_PERCENT} + 36px);width:170px;height:170px;margin-left:-85px;pointer-events:none;opacity:0;transform:scale(.88);transition:opacity .16s ease,transform .16s ease;z-index:4;}
   .vinh-da-game__build-menu.is-open{opacity:1;transform:scale(1);pointer-events:auto;}
   .vinh-da-game__build-node{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px;border-radius:999px;border:1px solid rgba(230,220,255,.42);background:rgba(8,8,16,.22);backdrop-filter:blur(2px);color:#f5f0ff;display:grid;place-items:center;font-size:24px;box-shadow:0 0 20px rgba(170,140,255,.2);}
   .vinh-da-game__build-node small{position:absolute;top:48px;font-size:9px;color:#d6ccff;text-shadow:0 1px 4px #000;white-space:nowrap;}
@@ -207,11 +145,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const structureClassNames = BUILD_NODE_OPTIONS.map(option => `vinh-da-game__structure--${option.type}`);
   let lastRenderedCameraX = Number.POSITIVE_INFINITY;
 
-  const getStructureMaxHp = (structure: PlacedStructure): number => structure.type === 'wall' ? WALL_BASE_HP * structure.level : 1;
+  const getStructureMaxHp = (structure: PlacedStructure): number => getStructureLevelStat(structure.type, structure.level).hp;
   const ensureStructureRuntime = (structure: PlacedStructure): StructureRuntime => {
     const existing = structureRuntimes.get(structure.siteId);
     if (existing) return existing;
-    const runtime = { cooldown: 0, hp: getStructureMaxHp(structure) };
+    const runtime = { cooldown: DEFAULT_STRUCTURE_COOLDOWN, hp: getStructureMaxHp(structure) };
     structureRuntimes.set(structure.siteId, runtime);
     return runtime;
   };
@@ -225,7 +163,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     renderEconomy();
     return true;
   };
-  const clampLeaderX = (x: number): number => Math.max(80, Math.min(WORLD_WIDTH - 120, x));
+  const clampLeaderX = (x: number): number => Math.max(LEADER_EDGE_PADDING_LEFT, Math.min(WORLD_WIDTH - LEADER_EDGE_PADDING_RIGHT, x));
   const getBuildSite = (siteId: string | null | undefined): BuildSite | null => BUILD_SITES.find(site => site.id === siteId) ?? null;
   const nearestBuildSite = (): BuildSite | null => BUILD_SITES.find(site => Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
   const createBuildSiteElement = (site: BuildSite): void => {
@@ -325,8 +263,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     enemies.push({
       id: nextEnemyId,
       x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
-      hp: ENEMY_BASE_HP,
-      speed: ENEMY_BASE_SPEED,
+      templateId: DEFAULT_ENEMY_TEMPLATE.id,
+      hp: DEFAULT_ENEMY_TEMPLATE.hp,
+      speed: DEFAULT_ENEMY_TEMPLATE.speed,
       side
     });
     nextEnemyId += 1;
@@ -392,10 +331,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const runtime = ensureStructureRuntime(structure);
       runtime.cooldown = Math.max(0, runtime.cooldown - dt);
       if (runtime.cooldown > 0) continue;
-      const target = enemies.find(enemy => Math.abs(enemy.x - site.x) <= TOWER_RANGE);
+      const stat = getStructureLevelStat(structure.type, structure.level);
+      const target = enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
       if (!target) continue;
-      runtime.cooldown = TOWER_COOLDOWN_SECONDS;
-      if (damageEnemy(target, TOWER_DAMAGE * structure.level)) removeEnemyAt(enemies.indexOf(target), true);
+      runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+      if (damageEnemy(target, stat.damage ?? 0)) removeEnemyAt(enemies.indexOf(target), true);
     }
   };
   const renderEnemies = (): void => {
@@ -449,7 +389,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
 
   const moveToClientX = (clientX: number): void => {
-    targetX = clampLeaderX(clientX + cameraX - 23);
+    targetX = clampLeaderX(clientX + cameraX - LEADER_WIDTH * 0.5);
     setOpenBuildSite(null);
   };
   const onViewportPointerDown = (event: PointerEvent): void => {
