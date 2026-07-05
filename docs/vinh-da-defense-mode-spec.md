@@ -254,6 +254,7 @@ lv 6: giữ vững hiệu ứng từ lv 5, có thể xây 1 kiến trúc trên t
 - Tầm bắn không tăng theo tu vi map.
 - Sát thương chia đều ATK và WIL: 50% ATK, 50% WIL.
 - Dùng để xử lý nhiều mục tiêu ổn định, là tháp vật lý/pháp hỗn hợp cơ bản.
+- Tốc độ tên bay: 8.0.
 
 ### 9.2. Cấp tháp canh
 
@@ -298,6 +299,7 @@ lv 6: giữ vững hiệu ứng từ lv 5, có thể xây 1 kiến trúc trên t
 - Một tháp nguyên tố chỉ có 1 element, không đổi element trong combat trừ khi sau này có cơ chế riêng.
 - Hai tháp nguyên tố không được xây quá gần nhau; mode theo tinh thần *Kingdom Two Crowns*, không phải spam tháp dày như *Dungeon Warfare*.
 - Buff/tỉ lệ phần trăm của tháp nguyên tố không tăng theo tu vi map.
+- Tốc độ đạn năng lượng: 6.0.
 - Một kẻ địch chỉ nhận tối đa 1 lần sát thương nổ từ cùng một volley.
 
 ### 10.2. Element được phép chọn
@@ -554,7 +556,7 @@ Chỉ số chuẩn Khai Nguyên 1:
 - RES/ARM/ATK/WIL: 1.
 - Không ultimate.
 - Không skill.
-- Tốc độ di chuyển: 1 m/s.
+- Tốc độ di chuyển: 0.4/s.
 
 Đánh thường:
 
@@ -579,7 +581,7 @@ Chỉ số chuẩn Khai Nguyên 1:
 - ATK/WIL: 1.
 - Không ultimate.
 - Không skill.
-- Tốc độ di chuyển: 2.5 m/s.
+- Tốc độ di chuyển: 1/s.
 
 Đánh thường:
 
@@ -608,7 +610,8 @@ Chỉ số chuẩn Khai Nguyên 1:
 
 - HP: 5.
 - RES/ARM/ATK/WIL: 2.
-- Tốc độ di chuyển: 1.5 m/s.
+- Tốc độ di chuyển: 0.55/s.
+- tốc độ đạn: 1.5/s
 
 Aura chỉ huy:
 
@@ -628,7 +631,7 @@ Mô tả:
 
 - Chó sói bị ăn mòn.
 - Sống theo bầy.
-- Tốc độ di chuyển cực cao.
+- Tốc độ di chuyển: 1.3/s
 - Cắn xé gây Ô nhiễm.
 - Có thể khiến kẻ thù chuyển hóa thành đồng minh của Vĩnh Dạ.
 - Trọng lượng: 0,3.
@@ -678,6 +681,7 @@ Mô tả:
 - Muốn hủy diệt mọi thứ.
 - Ngoại hình lở loét, dòi bọ khắp người, hơi thở hôi thối.
 - Trọng lượng: 1,5.
+- tốc độ: 0.45.
 
 Chỉ số chuẩn Khai Nguyên 1:
 
@@ -752,48 +756,54 @@ Gợi ý nhóm tài nguyên ban đầu:
 
 kẻ thù: Chim Biến Dị
 mô tả, một tập hợp xác thịt không rõ của các loại chim, một chimera vặn vẹo, huyết nhục nhiễu sóng.
-chỉ số chuẩn Khai Nguyên 1: Hp 1,3, 0 res/arm, 1 atk/wil, di chuyển: 4 mét/s l, phạm vi tấn công: 12 mét.
-sau khi thấy mục tiêu, gia tốc, tiếp cận mục tiêu gây sát thương = 2,5 wil/atk sau đó tử vong. tùy theo phạm vi tấn công mà sát thương gây ra sẽ thay đổi, nếu mục tiêu cách chim biến dị chỉ dưới hoặc bằng 6 mét thì chỉ nhận 1,2 sát thương, nếu dưới hoặc = 9 mét nhận 2 sát thương, 12 mét thì 2,5, dưới 3 mét sẽ không gia tốc, chim biến dị sẽ bay lùi lại, giữ khoảng cách 12 mét và bắt đầu gia tốc. Miễn kích hoạt gia tốc chì chim biến dị sau khi gây sát thương sẽ tử vong. Trọng lượng: 0,1.
+chỉ số chuẩn Khai Nguyên 1: Hp 1,3, 0 res/arm, 1 atk/wil, di chuyển: 1.5/s l, phạm vi tấn công: 12.
+sau khi thấy mục tiêu, gia tốc, tiếp cận mục tiêu gây sát thương = 2.5 wil/atk sau đó tử vong. tùy theo phạm vi tấn công mà sát thương gây ra sẽ thay đổi, nếu mục tiêu cách chim biến dị chỉ dưới hoặc bằng 6 thì chỉ nhận 1,2 sát thương, nếu dưới hoặc = 9 thì nhận 2 sát thương, 12 thì 2,5, dưới 3 sẽ không gia tốc, chim biến dị sẽ bay lùi lại, giữ khoảng cách 12 và bắt đầu gia tốc. Miễn kích hoạt gia tốc chì chim biến dị sau khi gây sát thương sẽ tử vong. Trọng lượng: 0,1.
+bất kể khoảng cách gia tốc thì tốc độ bay khi gia tốc là 3.5
 
 pháp sư hắc ám: không bị ô nhiễm, là người bình thường, một tín đồ của Hắc Ám Chi Chủ, dùng aether Hắc Ám nồng hậu bao phủ cơ thể, sẽ không bị binh chủng hắc ám khác tấn công.
 HP: 3, atk/res/arm 1, 3,5 wil
-đánh thường: ngưng tụ ma lực thành 1 quả cầu hắc ám sau lưng mỗi 2s, sau khi đạt 3 quả cầu, tấn công mục tiêu gây sát thương = 100% wil/atk/ mỗi quả cầu lên mục tiêu, sau tấn công cd 2s.
-trọng lượng: 1.
+đánh thường: ngưng tụ ma lực thành 1 quả cầu hắc ám sau lưng mỗi 2s, sau khi đạt 3 quả cầu, tấn công mục tiêu gây sát thương = 100% wil/atk/ mỗi quả cầu lên mục tiêu, sau tấn công cd 2s. Tốc độ đạn: 2
+trọng lượng: 1. Tốc độ di chuyển: 0.5
 
 pháo phòng không: một kiến trúc chuyên dụng tấn công kẻ thù trên không, tốc độ tấn công và đường đạn nhanh là đặc điểm ưu tú của nó, giá cả cũng đồng dạng ưu tú hơn kiến trúc khác.
 
-lv 1: gây 0,7 sát thương lên 1 mục tiêu, tốc độ đạn bay: 4 mét/s, cd 1s/phát bắn, sau 5 phát bắn cần cd 15s mới có thể bắn lần nữa (phần cd 20s không biến động theo tier). Tầm bắn 100 mét trên không.
+Tầm bắn phẳng: Tăng tiến theo cấp độ: 10.0 (Lv1) ➔ 15.0 (Lv2) ➔ 20.0/21.0 (Lv3) ➔ 23.0 (Lv4) ➔ 26.0 (Lv5). Tầm bắn giữ nguyên không đổi ở Lv6. 
 
-lv 2: gây 1,1 sát thương lên 1 mục tiêu, tốc độ đạn bay: 4,1 mét/s, cd 1,2s/phát, sau 6 phát cần cd 18s mới có thể bắn lần nữa (cd dài không biến động theo tier). tầm bắn 150 mét trên không.
+lv 1: gây 0,7 sát thương lên 1 mục tiêu, tốc độ đạn bay: 12, cd 1s/phát bắn, sau 5 phát bắn cần cd 15s mới có thể bắn lần nữa (phần cd 20s không biến động theo tier).
+
+lv 2: gây 1,1 sát thương lên 1 mục tiêu, tốc độ đạn bay: 12, cd 1,2s/phát, sau 6 phát cần cd 18s mới có thể bắn lần nữa (cd dài không biến động theo tier).
 
 lv 3: có 2 lựa chọn nâng cấp.
-Chất: gây 2,2 sát thương lên 1 mục tiêu, tốc độ đạn: 6 mét/s, cd 1,6s/phát, sau 7 phát cần cd 24s mới có thể bắn lần nữa (cd dài không biến động theo tier). Tầm bắn 200 mét trên không.
+Chất: gây 2,2 sát thương lên 1 mục tiêu, tốc độ đạn: 12, cd 1,6s/phát, sau 7 phát cần cd 24s mới có thể bắn lần nữa (cd dài không biến động theo tier).
 
-Lượng: gây 1,5 sát thương lên 1 mục tiêu, tốc độ đạn: 5 mét/s, cd 1,3s/phát, sau 5 phát cần cd 20s mới có thể bắn lần nữa (cd dài không biến động theo tier). tầm bắn 210 mét trên không.
+Lượng: gây 1,5 sát thương lên 1 mục tiêu, tốc độ đạn: 12, cd 1,3s/phát, sau 5 phát cần cd 20s mới có thể bắn lần nữa (cd dài không biến động theo tier).
 
-lv 4: trên cơ sở đã có ở lv 3, tăng 0, 3 sát thương, tốc độ đạn +0,5, cd - 0,3s, thời gian đợi cd dài giảm 5s. (cd dài không biến động theo tier). tầm bắn + 20 mét.
+lv 4: trên cơ sở đã có ở lv 3, tăng 0, 3 sát thương, cd - 0,3s, thời gian đợi cd dài giảm 5s. (cd dài không biến động theo tier).
 
 lv 5 có 2 lựa chọn nâng cấp:
-Liên Thanh: trên cơ sở lv 4, +1 sát thương, tốc độ đạn +1, cd - 1s, cd dài - 5s, tầm bắn + 30 mét.
+Liên Thanh: trên cơ sở lv 4, +1 sát thương, cd - 1s, cd dài - 5s.
 
-Đồ Long: trên cơ sở lv 4, + 3 sát thương, tốc độ đạn +0,4, cd -0,3s, cd dài -2s, tầm bắn + 10 mét.
+Đồ Long: trên cơ sở lv 4, + 3 sát thương, cd -0,3s, cd dài -2s.
 
-lv 6: + 3 sát thương, tốc độ đạn +3 mét/s, cd -0,5, cd dài -5, tầm bắn không đổi. Ở lv này pháo phòng không có thể bắn mục tiêu dưới mặt đất.
+lv 6: + 3 sát thương, cd -0,5, cd dài -5. Ở lv này pháo phòng không có thể bắn mục tiêu dưới mặt đất.
 
 Trọng lực pháo: sản phẩm điên rồ từ Cơ Giới Quốc, khống chế mục tiêu mặt đất cực tốt. Đối mục tiêu trên không không có hiệu quả.
 
-lv 1: mỗi 15s, hút mọi mục tiêu trong bán kính 5 mét bất kể địch ta, gây sát thương = 25% max hp của chúng, sau 3s, phóng chúng đi xa với tốc độ 10 mét/s, mục tiêu có trọng lượng là 1 100 mét tiếp đất, trọng lượng là 2 50 mét tiếp đất, trọng lượng là 3 không thể hút. Sau tiếp đất căn cứ trọng lượng gây sát thương, mỗi kẻ nhận 1 sát thương/1 trọng lượng, trọng lượng càng cao sát thương càng thấp.
+Bán kính hút: Quy đổi chuẩn từ mét sang hệ số: 0.5 (Lv1) ➔ 0.7 (Lv2) ➔ 0.9 (Lv3) ➔ 1.2 (Diệt Thần Lv4) / 2.0 (Thanh Tràng Lv4).
+chỉ hất tung kẻ địch trong 1s bất kể lv pháo trọng lực.
 
-lv 2: mỗi 10s, hút mọi mục tiêu trong bán kính 7 mét bất kể địch ta, gây sát thương = 30% max hp của chúng, sau 4s, phóng chúng đi xa với tốc độ 15 mét/s, mục tiêu có trọng lượng là 1 150 mét tiếp đất, trọng lượng là 2 75 mét tiếp đất, trọng lượng là 3 không thể hút. Sau tiếp đất căn cứ trọng lượng gây sát thương, mỗi kẻ nhận 1,5 sát thương/1 trọng lượng, trọng lượng càng cao sát thương càng thấp.
+lv 1: mỗi 15s, hút mọi mục tiêu trong bán kính 0.5, gây sát thương = 25% max hp của chúng, sau 3s, phóng chúng đi xa với tốc độ 10 mét/s, mục tiêu có trọng lượng là 1 15 tiếp đất, trọng lượng là 2 5 tiếp đất, trọng lượng là 3 không thể hút. Sau tiếp đất căn cứ trọng lượng gây sát thương, mỗi kẻ nhận 1 sát thương/1 trọng lượng, trọng lượng càng cao sát thương càng thấp.
 
-lv 3: mỗi 10s, hút mọi mục tiêu trong bán kính 9 mét bất kể địch ta, gây sát thương = 35% max hp của chúng, sau 5s, phóng chúng đi xa với tốc độ 20 mét/s, mục tiêu có trọng lượng là 1 200 mét tiếp đất, trọng lượng là 2 100 mét tiếp đất, trọng lượng là 3 50 mét tiếp đất, trọng lượng 4 không thể hút. Sau tiếp đất căn cứ trọng lượng gây sát thương, mỗi kẻ nhận 2 sát thương/1 trọng lượng, trọng lượng càng cao sát thương càng thấp.
+lv 2: mỗi 10s, hút mọi mục tiêu trong bán kính 0.7 bất kể địch ta, gây sát thương = 30% max hp của chúng, sau 4s, phóng chúng đi xa với tốc độ 15 mét/s, mục tiêu có trọng lượng là 1 15 tiếp đất, trọng lượng là 2 7.5 tiếp đất, trọng lượng là 3 không thể hút. Sau tiếp đất căn cứ trọng lượng gây sát thương, mỗi kẻ nhận 1,5 sát thương/1 trọng lượng, trọng lượng càng cao sát thương càng thấp.
+
+lv 3: mỗi 10s, hút mọi mục tiêu trong bán kính 0.9 bất kể địch ta, gây sát thương = 35% max hp của chúng, sau 5s, phóng chúng đi xa với tốc độ 20 mét/s, mục tiêu có trọng lượng là 1 15 tiếp đất, trọng lượng là 2 7,5 tiếp đất, trọng lượng là 3 3,5 tiếp đất, trọng lượng 4 không thể hút. Sau tiếp đất căn cứ trọng lượng gây sát thương, mỗi kẻ nhận 2 sát thương/1 trọng lượng, trọng lượng càng cao sát thương càng thấp.
 
 lv 4 có 2 lựa chọn nâng cấp:
-Diệt Thần: chỉ kích hoạt đối với kẻ có trọng lượng là 4 đến 5 trong bán kính 5 mét, khi kích hoạt hút mọi kẻ có trọng lượng từ 4 đến 5 trong bán kính 12 mét về bản thân trong 5s, trong 5s đó cũng gây sát thương = 40% mx hp của chúng sau đó bắn đi với tốc độ 25 mét/s, văng 100 mét sau đó vào cd 35s, theo mày tốc độ bay vầy có đúng chưa, tao thấy không cân bằng.
+Diệt Thần: chỉ kích hoạt đối với kẻ có trọng lượng là 4 đến 5 trong bán kính 0.5, khi kích hoạt hút mọi kẻ có trọng lượng từ 4 đến 5 trong bán kính 1.2 về bản thân trong 5s, trong 5s đó cũng gây sát thương = 40% mx hp của chúng sau đó bắn đi với tốc độ 15/s, văng 100 mét sau đó vào cd 35s, theo mày tốc độ bay vầy có đúng chưa, tao thấy không cân bằng.
 
-Thanh Tràng: khi xuất hiện kẻ có trọng lượng 1 trong bán kính 3 mét, nạp năng lượng trong 10s, sau đó hút mọi kẻ có trọng lượng từ 1 đến 3 trong bán kính 20 mét về bản thân, mỗi kẻ nhận sát thương = 35% mx hp của chúng, bắn chúng đi với tốc độ 20 mét/s, cd 25s.
+Thanh Tràng: khi xuất hiện kẻ có trọng lượng 1 trong bán kính 0.3, nạp năng lượng trong 10s, sau đó hút mọi kẻ có trọng lượng từ 1 đến 3 trong bán kính 2 về bản thân, mỗi kẻ nhận sát thương = 35% mx hp của chúng, bắn chúng đi với tốc độ 15/s, cd 25s.
 
-lv 5: trên cơ sở lv 4, tăng sát thương gây ra lên kẻ địch thêm 10% max hp, tăng tốc độ bắn thêm 10 mét/s, cd - 5s.
+lv 5: trên cơ sở lv 4, tăng sát thương gây ra lên kẻ địch thêm 10% max hp, cd - 5s.
 
 lv 6: player có thể tắt/kích hoạt trọng lực pháo.
 
@@ -808,8 +818,8 @@ sau đây là nhóm kiến trúc đặt dưới đất:
 
 Thiết Hán: biến dị nặng nề, một thợ mỏ bị bỏ lại lúc xập mỏ, xương cốt cứng rắn, bề ngoài bao phủ bởi kim loại không rõ, từ mỏ khoáng sản kết hợp với oán niệm mà thành mạnh mẽ sản phẩm.
 chỉ số chuẩn Khai Nguyên 1:
-Hp: 5,5, 3 res, 4 arm, atk/wil:2, tốc độ 2 mét/s, trọng lượng: 2,8.
-nội tại: mỗi 5s hồi 1 hp (x 2 ở Khai nguyên 2 là 5s hồi 2 hp, cứ thêd mà suy ra khai nguyên 3 là x3, 5s hồi 3hp)
+Hp: 5,5, 3 res, 4 arm, atk/wil:2, tốc độ 0.3, trọng lượng: 2,8.
+nội tại: mỗi 5s hồi 1 hp (x 2 ở Khai nguyên 2 là 5s hồi 2 hp, cứ thế mà suy ra khai nguyên 3 là x3, 5s hồi 3hp)
 Đánh thường: gây sát thương= 100% wil/atk, cd 1,5s.
 
 tài nguyên:
@@ -829,7 +839,7 @@ Base có thể tạo vật liệu nhờ khả năng chuyển đổi của nó, d
 
 Oán Long: một con rồng bị ô nhiễm, lý trí không còn, chỉ còn bản năng thôn phệ, sát lục hết thảy
 
-chỉ số Tier 1.1: hp 15: 7 res/arm 6 atk, 8 wil, tốc độ 10 mét/s lúc bay, 4 mét/s lúc đi.
+chỉ số Tier 1.1: hp 15: 7 res/arm 6 atk, 8 wil, tốc độ 2.5/s lúc bay, 0.8/s lúc đi.
 nội tại: hồi 3% max hp/2s, hp dưới 30% tăng 10% wil/atk. 
 Phá Hủy: Sau khi đánh thường nếu trước mặt 3 mét có kiến trúc không phải tường, tấn công kiến trúc đó, sau số lv tương ứng bị oán long đánh thì kiến trúc đó sẽ hư hại không thể sửa nhưng có thể xây kiến trúc khác, cd 10s. ví dụ kiến trúc lv 5 thì sau 5 cái bị đánh kiến trúc đó sẽ hư.
 đánh thường: phun long tức, gây sát thương= 100% wil/atk, long tức tấn công aoe bất kể địch ta trong 5 mét bán nguyệt trước mặt Oán Long. cd 5s
@@ -848,14 +858,14 @@ Vật Cưỡi: là phương tiện di chuyển của leader, có thể là vật
 
 Linh Mã: ngựa nhất giai sơ kỳ, theo ăn linh thảo mà tăng tiến tu vi, tối đa tier 1.3
 hp:5, 2 res/arm, + 0,5 3 chỉ số khi lên tier.
-tốc độ: +23 mét/s/tier. tối đa 69 mét/s, sau khi chạy nhanh hết tốc lực ở tier của nó trong 5s (+1/tier) thì sẽ lâm vào suy yếu, cần chạy chậm trong 7s (-1/tier) mới có thể chạy nhanh lần nữa.
+Thân pháp khởi điểm là 2.3 (+1 mỗi Tier), đạt tối đa 4.3 ở Tier 1.3, sau khi chạy nhanh hết tốc lực ở tier của nó trong 5s (+1/tier) thì sẽ lâm vào suy yếu, cần chạy chậm (giảm 50% tốc độ chạy) trong 7s (-1/tier) mới có thể chạy nhanh lần nữa.
 
 Huyết Mã: nhất giai Trung Kỳ, theo ăn linh thảo mà tu vi tăng từ tier 1.4 đến 1.6.
 Hp: 10, 2 res/arm, +1 chỉ số khi lên tier.
-tốc độ: 80 mét/s, + 25 mét/tier, tối đa 130 mét/s, sau khi chạy nhanh hết tốc lực ở tier của nó trong 7s (+1/tier) thì sẽ lâm vào suy yếu, cần chạy chậm trong 7s (-1/tier) mới có thể chạy nhanh lần nữa.
+Thân pháp khởi điểm là 4.7 (+1.2 mỗi Tier), đạt tối đa 7.1 ở Tier 1.6 sau khi chạy nhanh hết tốc lực ở tier của nó trong 7s (+1/tier) thì sẽ lâm vào suy yếu, cần chạy chậm (giảm 50% tốc độ chạy) trong 7s (-1/tier) mới có thể chạy nhanh lần nữa.
 
 Quang Ảnh: nhị giai sơ kỳ, tốc độ lấy xưng.
-tốc độ: 200 mét/s, mỗi khi tăng 1 tier + 30 mét/s.
+Thân pháp siêu tốc 11 mỗi khi tăng 1 Tier + 1.6 đến tier 2.4 ~ 2.6 tăng 1,8/tier, từ 2.7 đến 2.9 + 2 tốc độ /tier, đến tier 3.1 + 2,7 sau đó không thể tăng tier được nữa.
 Tư chất: Tam Giai, tức có thể theo player đến Tam Giai, tier 3, dẫu vậy lượng linh thảo nó cần về chất và lượng đều không thấp.
 
 kiến trúc mới:
