@@ -16,7 +16,6 @@ import {
   ENEMY_LIMIT,
   ENEMY_SPAWN_INTERVAL,
   ENEMY_START_PADDING,
-  ENEMY_WALL_DAMAGE_PER_SECOND,
   GROUND_PERCENT,
   LEADER_ATTACK_RANGE,
   LEADER_BASIC_ATTACK_COOLDOWN_SECONDS,
@@ -35,7 +34,7 @@ import {
   WORLD_WIDTH
 } from './constants.ts';
 import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES } from './enemies.ts';
-import type { EnemyKind } from './enemies.ts';
+import type { EnemyKind, EnemyTemplate } from './enemies.ts';
 import {
   BUILD_LEVEL_COST,
   BUILD_NODE_OPTIONS,
@@ -118,6 +117,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let groundPlotsVisible = false;
   let selectedGroundPlotId: string | null = null;
   let bloodSealStone = 0;
+  let baseHp = 100;
   const keys = new Set<string>();
   const structures = new Map<string, PlacedStructure>();
   const structureRuntimes = new Map<string, StructureRuntime>();
@@ -372,6 +372,41 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     enemy.hp -= amount;
     return enemy.hp <= 0;
   };
+  const damageStructure = (site: BuildSite, runtime: StructureRuntime, amount: number): boolean => {
+    runtime.hp -= amount;
+    if (runtime.hp > 0) return false;
+    deleteStructure(site.id);
+    renderBuildSite(site.id);
+    return true;
+  };
+  const damageBase = (amount: number): boolean => {
+    baseHp = Math.max(0, baseHp - amount);
+    return baseHp <= 0;
+  };
+  const getEnemyTemplate = (enemy: Enemy): EnemyTemplate => ENEMY_TEMPLATES[enemy.kind] ?? DEFAULT_ENEMY_TEMPLATE;
+  const getEnemyPrimaryTargetX = (enemy: Enemy): number => enemy.canFly ? leaderX : CRYSTAL_X;
+  const getStructureAhead = (enemy: Enemy, range: number): { site: BuildSite; runtime: StructureRuntime } | null => {
+    const direction = enemy.x < getEnemyPrimaryTargetX(enemy) ? 1 : -1;
+    let closest: { site: BuildSite; runtime: StructureRuntime; distance: number } | null = null;
+    for (const structure of structures.values()){
+      if (structure.type === 'wall') continue;
+      const site = getBuildSite(structure.siteId);
+      if (!site) continue;
+      const distance = Math.abs(enemy.x - site.x);
+      const isAhead = direction > 0 ? site.x >= enemy.x : site.x <= enemy.x;
+      if (!isAhead || distance > range) continue;
+      const runtime = ensureStructureRuntime(structure);
+      if (runtime.hp <= 0 || (closest && distance >= closest.distance)) continue;
+      closest = { site, runtime, distance };
+    }
+    return closest ? { site: closest.site, runtime: closest.runtime } : null;
+  };
+  const tryEnemyAttack = (enemy: Enemy, template: EnemyTemplate, attack: () => void): boolean => {
+    if (enemy.attackCooldown > 0) return true;
+    attack();
+    enemy.attackCooldown = template.attackCooldown;
+    return true;
+  };
   const getEnemyEffectiveSpeed = (enemy: Enemy): number => {
     for (const siteId of structureSiteIdsOfType('swamp')){
       const site = getBuildSite(siteId);
@@ -406,15 +441,19 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     for (let i = enemies.length - 1; i >= 0; i -= 1){
       const enemy = enemies[i];
       if (!enemy) continue;
+      enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
+      const template = getEnemyTemplate(enemy);
       const wall = getBlockingWall(enemy);
+      const structureAhead = !wall && enemy.kind === 'resentfulDragon' ? getStructureAhead(enemy, template.attackRange) : null;
+      const targetX = getEnemyPrimaryTargetX(enemy);
       if (wall){
-        wall.runtime.hp -= ENEMY_WALL_DAMAGE_PER_SECOND * dt;
-        if (wall.runtime.hp <= 0){
-          deleteStructure(wall.site.id);
-          renderBuildSite(wall.site.id);
-        }
+        tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage); });
+      } else if (structureAhead){
+        tryEnemyAttack(enemy, template, () => { damageStructure(structureAhead.site, structureAhead.runtime, template.damage); });
+      } else if (Math.abs(enemy.x - targetX) <= template.attackRange){
+        tryEnemyAttack(enemy, template, () => { damageBase(template.damage); });
       } else {
-        const direction = enemy.x < CRYSTAL_X ? 1 : -1;
+        const direction = enemy.x < targetX? 1 : -1;
         enemy.x += direction * getEnemyEffectiveSpeed(enemy) * dt;
       }
       if (leaderAttackCooldown === 0 && Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE){

@@ -36,7 +36,6 @@ export const ENEMY_REWARD = 1;
 export const ENEMY_SPAWN_INTERVAL = 1.4;
 export const ENEMY_START_PADDING = 120;
 export const ENEMY_ATTACK_RANGE = 28;
-export const ENEMY_WALL_DAMAGE_PER_SECOND = 1;
 
 export const LEADER_ATTACK_RANGE = 58;
 export const LEADER_BASIC_ATTACK_COOLDOWN_SECONDS = 2;

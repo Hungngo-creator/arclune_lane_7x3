@@ -6,7 +6,7 @@ export type EnemyKind =
   | 'mutantBird'
   | 'darkMage'
   | 'ironMan'
-  | 'resentfulDragon';6
+  | 'resentfulDragon';
 
 export interface EnemyTemplate {
   kind: EnemyKind;
@@ -118,6 +118,6 @@ export const ENEMY_TEMPLATES = {
     canFly: true,
     reward: 8
   }
-} as const satisfies Record<EnemyTemplateId, EnemyKind>;
+} as const satisfies Record<EnemyKind, EnemyTemplate>;
 
 export const DEFAULT_ENEMY_TEMPLATE = ENEMY_TEMPLATES.twisted;

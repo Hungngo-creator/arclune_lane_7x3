@@ -37846,7 +37846,6 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   const ENEMY_SPAWN_INTERVAL = 1.4;
   const ENEMY_START_PADDING = 120;
   const ENEMY_ATTACK_RANGE = 28;
-  const ENEMY_WALL_DAMAGE_PER_SECOND = 1;
   const LEADER_ATTACK_RANGE = 58;
   const LEADER_BASIC_ATTACK_COOLDOWN_SECONDS = 2;
   const LEADER_BASIC_ATTACK_DAMAGE = 5;
@@ -37889,7 +37888,6 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_SPAWN_INTERVAL')) exports.ENEMY_SPAWN_INTERVAL = ENEMY_SPAWN_INTERVAL;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_START_PADDING')) exports.ENEMY_START_PADDING = ENEMY_START_PADDING;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_ATTACK_RANGE')) exports.ENEMY_ATTACK_RANGE = ENEMY_ATTACK_RANGE;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_WALL_DAMAGE_PER_SECOND')) exports.ENEMY_WALL_DAMAGE_PER_SECOND = ENEMY_WALL_DAMAGE_PER_SECOND;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_ATTACK_RANGE')) exports.LEADER_ATTACK_RANGE = LEADER_ATTACK_RANGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_BASIC_ATTACK_COOLDOWN_SECONDS')) exports.LEADER_BASIC_ATTACK_COOLDOWN_SECONDS = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_BASIC_ATTACK_DAMAGE')) exports.LEADER_BASIC_ATTACK_DAMAGE = LEADER_BASIC_ATTACK_DAMAGE;
@@ -37900,7 +37898,6 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'SWAMP_RADIUS')) exports.SWAMP_RADIUS = SWAMP_RADIUS;
 };
 __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
-  6;
   const ENEMY_TEMPLATES = {
       twisted: {
           kind: 'twisted',
@@ -38025,7 +38022,6 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const ENEMY_LIMIT = __dep2.ENEMY_LIMIT;
   const ENEMY_SPAWN_INTERVAL = __dep2.ENEMY_SPAWN_INTERVAL;
   const ENEMY_START_PADDING = __dep2.ENEMY_START_PADDING;
-  const ENEMY_WALL_DAMAGE_PER_SECOND = __dep2.ENEMY_WALL_DAMAGE_PER_SECOND;
   const GROUND_PERCENT = __dep2.GROUND_PERCENT;
   const LEADER_ATTACK_RANGE = __dep2.LEADER_ATTACK_RANGE;
   const LEADER_BASIC_ATTACK_COOLDOWN_SECONDS = __dep2.LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
@@ -38115,6 +38111,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let groundPlotsVisible = false;
       let selectedGroundPlotId = null;
       let bloodSealStone = 0;
+      let baseHp = 100;
       const keys = new Set();
       const structures = new Map();
       const structureRuntimes = new Map();
@@ -38386,6 +38383,47 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           enemy.hp -= amount;
           return enemy.hp <= 0;
       };
+      const damageStructure = (site, runtime, amount) => {
+          runtime.hp -= amount;
+          if (runtime.hp > 0)
+              return false;
+          deleteStructure(site.id);
+          renderBuildSite(site.id);
+          return true;
+      };
+      const damageBase = (amount) => {
+          baseHp = Math.max(0, baseHp - amount);
+          return baseHp <= 0;
+      };
+      const getEnemyTemplate = (enemy) => ENEMY_TEMPLATES[enemy.kind] ?? DEFAULT_ENEMY_TEMPLATE;
+      const getEnemyPrimaryTargetX = (enemy) => enemy.canFly ? leaderX : CRYSTAL_X;
+      const getStructureAhead = (enemy, range) => {
+          const direction = enemy.x < getEnemyPrimaryTargetX(enemy) ? 1 : -1;
+          let closest = null;
+          for (const structure of structures.values()) {
+              if (structure.type === 'wall')
+                  continue;
+              const site = getBuildSite(structure.siteId);
+              if (!site)
+                  continue;
+              const distance = Math.abs(enemy.x - site.x);
+              const isAhead = direction > 0 ? site.x >= enemy.x : site.x <= enemy.x;
+              if (!isAhead || distance > range)
+                  continue;
+              const runtime = ensureStructureRuntime(structure);
+              if (runtime.hp <= 0 || (closest && distance >= closest.distance))
+                  continue;
+              closest = { site, runtime, distance };
+          }
+          return closest ? { site: closest.site, runtime: closest.runtime } : null;
+      };
+      const tryEnemyAttack = (enemy, template, attack) => {
+          if (enemy.attackCooldown > 0)
+              return true;
+          attack();
+          enemy.attackCooldown = template.attackCooldown;
+          return true;
+      };
       const getEnemyEffectiveSpeed = (enemy) => {
           for (const siteId of structureSiteIdsOfType('swamp')) {
               const site = getBuildSite(siteId);
@@ -38421,16 +38459,22 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const enemy = enemies[i];
               if (!enemy)
                   continue;
+              enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
+              const template = getEnemyTemplate(enemy);
               const wall = getBlockingWall(enemy);
+              const structureAhead = !wall && enemy.kind === 'resentfulDragon' ? getStructureAhead(enemy, template.attackRange) : null;
+              const targetX = getEnemyPrimaryTargetX(enemy);
               if (wall) {
-                  wall.runtime.hp -= ENEMY_WALL_DAMAGE_PER_SECOND * dt;
-                  if (wall.runtime.hp <= 0) {
-                      deleteStructure(wall.site.id);
-                      renderBuildSite(wall.site.id);
-                  }
+                  tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage); });
+              }
+              else if (structureAhead) {
+                  tryEnemyAttack(enemy, template, () => { damageStructure(structureAhead.site, structureAhead.runtime, template.damage); });
+              }
+              else if (Math.abs(enemy.x - targetX) <= template.attackRange) {
+                  tryEnemyAttack(enemy, template, () => { damageBase(template.damage); });
               }
               else {
-                  const direction = enemy.x < CRYSTAL_X ? 1 : -1;
+                  const direction = enemy.x < targetX ? 1 : -1;
                   enemy.x += direction * getEnemyEffectiveSpeed(enemy) * dt;
               }
               if (leaderAttackCooldown === 0 && Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE) {
