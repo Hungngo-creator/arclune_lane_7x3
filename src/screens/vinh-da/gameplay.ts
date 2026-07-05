@@ -8,6 +8,22 @@ interface RenderContext {
   params?: Record<string, unknown> | null;
 }
 
+type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
+type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal';
+
+interface BuildSite {
+  id: string;
+  x: number;
+  kind: BuildSiteKind;
+  allowed: readonly StructureType[];
+}
+
+interface PlacedStructure {
+  siteId: string;
+  type: StructureType;
+  level: number;
+}
+
 const STYLE_ID = 'vinh-da-gameplay-style';
 const BASE_WORLD_WIDTH = 3600;
 const SIDE_EXPANSION_MULTIPLIER = 3;
@@ -26,10 +42,13 @@ const LEADER_START_X = CRYSTAL_X + 110;
 const BUILD_RANGE = 150;
 const BUILD_SLOTS = 5;
 const BUILD_NODE_LABELS = ['Tháp', 'Tường', 'Bẫy', 'Pha lê', 'Ấn'];
-const BUILD_ROCKS = [
-  { id: 'left', x: CASTLE_OUTER_LEFT - CASTLE_SIZE },
-  { id: 'right', x: CASTLE_OUTER_RIGHT + CASTLE_SIZE }
-] as const;
+const BUILD_SITES = [
+  { id: 'left-rock', x: CASTLE_OUTER_LEFT - CASTLE_SIZE, kind: 'rock', allowed: ['watchtower', 'elementalTower', 'barracks'] },
+  { id: 'right-rock', x: CASTLE_OUTER_RIGHT + CASTLE_SIZE, kind: 'rock', allowed: ['watchtower', 'elementalTower', 'barracks'] },
+  { id: 'left-wall-slot', x: CASTLE_OUTER_LEFT - 42, kind: 'wall-slot', allowed: ['wall'] },
+  { id: 'right-wall-slot', x: CASTLE_OUTER_RIGHT + 42, kind: 'wall-slot', allowed: ['wall'] },
+  { id: 'castle-ground', x: CRYSTAL_X, kind: 'ground', allowed: ['church', 'crystalSeal'] }
+] as const satisfies readonly BuildSite[];
 const CSS = /* css */ `
   .app--vinh-da-gameplay{min-height:100dvh;background:#020204;color:#f7f2ff;overflow:hidden;touch-action:none;}
   .vinh-da-game{position:relative;min-height:100dvh;overflow:hidden;background:linear-gradient(#020204 0 58%,#07070b 58% 100%);touch-action:none;user-select:none;}
@@ -67,6 +86,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let rafId = 0;
   let openRockId: string | null = null;
   const keys = new Set<string>();
+  const structures = new Map<string, PlacedStructure>();
 
   const section = document.createElement('section');
   section.className = 'vinh-da-game';
@@ -81,7 +101,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         <div class="vinh-da-game__castle" aria-hidden="true"></div>
         <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
         <div class="vinh-da-game__ground" aria-hidden="true"></div>
-        ${BUILD_ROCKS.map((rock) => `<button class="vinh-da-game__rock" data-rock-id="${rock.id}" style="left:${rock.x}px" type="button" aria-label="Ụ đá xây dựng"></button><div class="vinh-da-game__build-menu" data-build-menu="${rock.id}" style="left:${rock.x}px">${Array.from({ length: BUILD_SLOTS }, (_, index) => {
+        ${BUILD_SITES.filter(site => site.kind === 'rock').map((rock) => `<button class="vinh-da-game__rock" data-rock-id="${rock.id}" style="left:${rock.x}px" type="button" aria-label="Ụ đá xây dựng"></button><div class="vinh-da-game__build-menu" data-build-menu="${rock.id}" style="left:${rock.x}px">${Array.from({ length: BUILD_SLOTS }, (_, index) => {
           const angle = -90 + index * 360 / BUILD_SLOTS;
           const x = Math.cos(angle * Math.PI / 180) * 58;
           const y = Math.sin(angle * Math.PI / 180) * 58;
@@ -97,7 +117,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const buildMenus = Array.from(section.querySelectorAll<HTMLElement>('[data-build-menu]'));
 
   const clampLeaderX = (x: number): number => Math.max(80, Math.min(WORLD_WIDTH - 120, x));
-  const nearestRock = (): (typeof BUILD_ROCKS)[number] | null => BUILD_ROCKS.find(rock => Math.abs(leaderX - rock.x) <= BUILD_RANGE) ?? null;
+  const nearestRock = (): BuildSite | null => BUILD_SITES.find(site => site.kind === 'rock' && Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
   const setOpenRock = (rockId: string | null): void => {
     openRockId = rockId;
     for (const menu of buildMenus) menu.classList.toggle('is-open', menu.dataset.buildMenu === rockId);

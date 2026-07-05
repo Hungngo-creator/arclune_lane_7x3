@@ -37837,9 +37837,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const BUILD_RANGE = 150;
   const BUILD_SLOTS = 5;
   const BUILD_NODE_LABELS = ['Tháp', 'Tường', 'Bẫy', 'Pha lê', 'Ấn'];
-  const BUILD_ROCKS = [
-      { id: 'left', x: CASTLE_OUTER_LEFT - CASTLE_SIZE },
-      { id: 'right', x: CASTLE_OUTER_RIGHT + CASTLE_SIZE }
+  const BUILD_SITES = [
+      { id: 'left-rock', x: CASTLE_OUTER_LEFT - CASTLE_SIZE, kind: 'rock', allowed: ['watchtower', 'elementalTower', 'barracks'] },
+      { id: 'right-rock', x: CASTLE_OUTER_RIGHT + CASTLE_SIZE, kind: 'rock', allowed: ['watchtower', 'elementalTower', 'barracks'] },
+      { id: 'left-wall-slot', x: CASTLE_OUTER_LEFT - 42, kind: 'wall-slot', allowed: ['wall'] },
+      { id: 'right-wall-slot', x: CASTLE_OUTER_RIGHT + 42, kind: 'wall-slot', allowed: ['wall'] },
+      { id: 'castle-ground', x: CRYSTAL_X, kind: 'ground', allowed: ['church', 'crystalSeal'] }
   ];
   const CSS = /* css */ `
     .app--vinh-da-gameplay{min-height:100dvh;background:#020204;color:#f7f2ff;overflow:hidden;touch-action:none;}
@@ -37876,6 +37879,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let rafId = 0;
       let openRockId = null;
       const keys = new Set();
+      const structures = new Map();
       const section = document.createElement('section');
       section.className = 'vinh-da-game';
       const mount = mountSection({ root, section, rootClasses: 'app--vinh-da-gameplay' });
@@ -37889,7 +37893,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           <div class="vinh-da-game__castle" aria-hidden="true"></div>
           <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
           <div class="vinh-da-game__ground" aria-hidden="true"></div>
-          ${BUILD_ROCKS.map((rock) => `<button class="vinh-da-game__rock" data-rock-id="${rock.id}" style="left:${rock.x}px" type="button" aria-label="Ụ đá xây dựng"></button><div class="vinh-da-game__build-menu" data-build-menu="${rock.id}" style="left:${rock.x}px">${Array.from({ length: BUILD_SLOTS }, (_, index) => {
+          ${BUILD_SITES.filter(site => site.kind === 'rock').map((rock) => `<button class="vinh-da-game__rock" data-rock-id="${rock.id}" style="left:${rock.x}px" type="button" aria-label="Ụ đá xây dựng"></button><div class="vinh-da-game__build-menu" data-build-menu="${rock.id}" style="left:${rock.x}px">${Array.from({ length: BUILD_SLOTS }, (_, index) => {
           const angle = -90 + index * 360 / BUILD_SLOTS;
           const x = Math.cos(angle * Math.PI / 180) * 58;
           const y = Math.sin(angle * Math.PI / 180) * 58;
@@ -37903,7 +37907,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const viewport = section.querySelector('[data-role="viewport"]');
       const buildMenus = Array.from(section.querySelectorAll('[data-build-menu]'));
       const clampLeaderX = (x) => Math.max(80, Math.min(WORLD_WIDTH - 120, x));
-      const nearestRock = () => BUILD_ROCKS.find(rock => Math.abs(leaderX - rock.x) <= BUILD_RANGE) ?? null;
+      const nearestRock = () => BUILD_SITES.find(site => site.kind === 'rock' && Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
       const setOpenRock = (rockId) => {
           openRockId = rockId;
           for (const menu of buildMenus)
