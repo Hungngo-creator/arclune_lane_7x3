@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô Phỏng Hệ Thống Đường Đạn Module Hóa - Turn-based Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        canvas {
+            image-rendering: corner-preserving;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 py-4 px-6 shadow-md">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-amber-400">
+                    GEMINI CANVAS: PROJECTILE SYSTEM
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">Hệ thống đường đạn Module hóa không thư viện vật lý cho Game Turn-based</p>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-700 text-xs">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                <span class="font-mono text-slate-300">Engine: Active (60 FPS)</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 sm:p-6 flex flex-col lg:flex-row gap-6 items-stretch">
+        
+        <!-- Left Column: Canvas Viewport -->
+        <div class="flex-grow flex flex-col bg-slate-950 rounded-2xl border border-slate-800 p-4 shadow-inner relative overflow-hidden">
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-sm font-semibold tracking-wider text-slate-400 uppercase">Màn hình mô phỏng (2.5D View)</span>
+                <span id="speedIndicator" class="text-xs bg-slate-800 px-2.5 py-1 rounded-md text-cyan-400 font-mono">Thời gian bay: 1.2s</span>
+            </div>
+            
+            <div class="relative flex-grow flex items-center justify-center bg-slate-900 rounded-xl overflow-hidden min-h-[350px] md:min-h-[450px]">
+                <canvas id="gameCanvas" class="w-full h-full block rounded-xl"></canvas>
+            </div>
+        </div>
+
+        <!-- Right Column: Dashboard Controls -->
+        <div class="w-full lg:w-96 flex flex-col gap-5 shrink-0">
+            
+            <!-- Bộ 1: Chọn VFX -->
+            <div class="bg-slate-800/90 rounded-2xl border border-slate-700/60 p-5 shadow-lg">
+                <h3 class="text-sm font-semibold text-slate-300 tracking-wider uppercase mb-4 flex items-center gap-2">
+                    <span class="text-amber-400">✦</span> Bộ 1: Hiệu ứng phép (VFX)
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="btnVfxFireball" onclick="selectVFX('fireball')" class="py-3 px-4 rounded-xl border-2 border-amber-500/80 bg-gradient-to-br from-amber-600/30 to-red-600/20 text-amber-200 font-medium transition duration-200 shadow-md shadow-amber-900/10 hover:border-amber-400">
+                        <div class="text-xl mb-1">🔥</div>
+                        Quả cầu lửa
+                    </button>
+                    <button id="btnVfxArcane" onclick="selectVFX('arcane_bolt')" class="py-3 px-4 rounded-xl border-2 border-transparent bg-slate-700/40 text-slate-400 font-medium transition duration-200 hover:bg-slate-700/60">
+                        <div class="text-xl mb-1">⚡</div>
+                        Cung phép
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bộ 2: Chọn Đường đạn -->
+            <div class="bg-slate-800/90 rounded-2xl border border-slate-700/60 p-5 shadow-lg">
+                <h3 class="text-sm font-semibold text-slate-300 tracking-wider uppercase mb-4 flex items-center gap-2">
+                    <span class="text-cyan-400">✦</span> Bộ 2: Quỹ đạo bay (Math)
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="btnPathLinear" onclick="selectPath('linear')" class="py-3 px-4 rounded-xl border-2 border-transparent bg-slate-700/40 text-slate-400 font-medium transition duration-200 hover:bg-slate-700/60">
+                        <div class="text-xl mb-1">📏</div>
+                        Đường Thẳng
+                    </button>
+                    <button id="btnPathArc" onclick="selectPath('arc')" class="py-3 px-4 rounded-xl border-2 border-cyan-500/80 bg-gradient-to-br from-cyan-600/30 to-blue-600/20 text-cyan-200 font-medium transition duration-200 shadow-md shadow-cyan-900/10 hover:border-cyan-400">
+                        <div class="text-xl mb-1">🏹</div>
+                        Hình Cung
+                    </button>
+                </div>
+                
+                <!-- Tinh chỉnh độ cao cho đường cầu vồng -->
+                <div id="arcConfig" class="mt-4 pt-4 border-t border-slate-700/50">
+                    <div class="flex justify-between text-xs text-slate-400 mb-1.5">
+                        <span>Độ cong cầu vồng (arcHeight):</span>
+                        <span id="arcHeightValue" class="text-cyan-400 font-mono font-bold">-150px</span>
+                    </div>
+                    <input id="rangeArcHeight" type="range" min="50" max="350" value="150" oninput="updateArcHeight(this.value)" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                </div>
+            </div>
+
+            <!-- Nút Bắn & Thao tác chính -->
+            <div class="bg-slate-800/90 rounded-2xl border border-slate-700/60 p-5 shadow-lg flex-grow flex flex-col justify-between gap-4">
+                <div>
+                    <h3 class="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-2">Thông số bay</h3>
+                    <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700/40 font-mono text-xs flex flex-col gap-2">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Tọa độ Player:</span>
+                            <span class="text-emerald-400">X: 120, Y: 280</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Tọa độ Enemy:</span>
+                            <span class="text-rose-400">X: 680, Y: 240</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Trạng thái:</span>
+                            <span id="engineStatus" class="text-slate-300">Sẵn sàng bắn</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2.5">
+                    <button id="btnFire" onclick="fireProjectile()" class="w-full py-4 px-6 rounded-xl font-bold text-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-400 hover:to-orange-400 active:scale-95 transition-all shadow-lg shadow-orange-500/20 uppercase tracking-widest">
+                        🚀 BẮN THỬ
+                    </button>
+                    <button onclick="triggerExplodeSimulation()" class="w-full py-2 px-6 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 border border-slate-700/80 bg-slate-900/30 hover:bg-slate-700/30 transition">
+                        Nổ giả lập tại vị trí địch
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Info -->
+    <footer class="bg-slate-950 py-3 text-center text-xs text-slate-500 border-t border-slate-900">
+        Thiết kế mã nguồn độc lập bởi <span class="text-slate-400">Gemini Canvas API</span> • Không phụ thuộc thư viện ngoài.
+    </footer>
+
+    <!-- Core Logic Scripts -->
+    <script>
+        // --- 1. MODULE TOÁN ĐƯỜNG ĐI (ProjectileMathModule) ---
+        // Giúp tính toán tọa độ viên đạn tại thời điểm t dựa trên tỉ lệ thời gian [0, 1]
+        const ProjectileMathModule = {
+            /**
+             * Quỹ đạo bay thẳng tắp
+             * @param {number} t - Tỉ lệ thời gian trôi qua (0 -> 1)
+             * @param {Object} start - Tọa độ bắt đầu {x, y}
+             * @param {Object} end - Tọa độ kết thúc {x, y}
+             * @returns {Object} {x, y} Tọa độ thực tại
+             */
+            linearPath: function(t, start, end) {
+                return {
+                    x: start.x + (end.x - start.x) * t,
+                    y: start.y + (end.y - start.y) * t
+                };
+            },
+
+            /**
+             * Quỹ đạo hình cung (Parabol)
+             * @param {number} t - Tỉ lệ thời gian trôi qua (0 -> 1)
+             * @param {Object} start - Tọa độ bắt đầu {x, y}
+             * @param {Object} end - Tọa độ kết thúc {x, y}
+             * @param {number} arcHeight - Độ nhô cao cực đại của đường cong (giá trị âm để bay hướng lên trên)
+             * @returns {Object} {x, y} Tọa độ thực tại
+             */
+            arcPath: function(t, start, end, arcHeight) {
+                // Điểm nội suy tuyến tính cơ sở
+                const base = this.linearPath(t, start, end);
+                
+                // Công thức parabol tạo độ cong: h(t) = 4 * H * t * (1 - t)
+                // Đạt đỉnh h = H tại thời điểm t = 0.5
+                const heightOffset = 4 * arcHeight * t * (1 - t);
+
+                return {
+                    x: base.x,
+                    y: base.y + heightOffset
+                };
+            }
+        };
+
+
+        // --- 2. MODULE QUẢN LÝ HIỆU ỨNG VFX (VFXManager) ---
+        // Chuyên trách vẽ giao diện đồ họa hạt, đuôi đạn và vụ nổ
+        class VFXManager {
+            constructor(ctx) {
+                this.ctx = ctx;
+                this.particles = []; // Lưu trữ các hạt hiệu ứng lửa / phép đang bay lơ lửng
+            }
+
+            /**
+             * Thêm một hạt hiệu ứng mới vào hệ thống hạt
+             */
+            addParticle(x, y, color, size, vx, vy, life) {
+                this.particles.push({
+                    x, y, color, size, vx, vy,
+                    maxLife: life,
+                    life: life
+                });
+            }
+
+            /**
+             * Cập nhật chuyển động của các hạt VFX
+             */
+            updateParticles() {
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life--;
+                    if (p.life <= 0) {
+                        this.particles.splice(i, 1);
+                    }
+                }
+            }
+
+            /**
+             * Vẽ toàn bộ các hạt VFX tự do (khói, bụi lửa đang tan dần)
+             */
+            drawParticles() {
+                this.ctx.save();
+                for (const p of this.particles) {
+                    const alpha = p.life / p.maxLife;
+                    this.ctx.globalAlpha = alpha;
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                this.ctx.restore();
+            }
+
+            /**
+             * Vẽ đuôi khói lửa hoặc đuôi hạt lấp lánh đằng sau đạn
+             */
+            emitTrail(vfxID, x, y) {
+                if (vfxID === 'fireball') {
+                    // Hiệu ứng tia lửa rực rỡ bắn ra phía sau
+                    const colors = ['#f59e0b', '#ef4444', '#f97316', '#fef08a'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    this.addParticle(
+                        x + (Math.random() - 0.5) * 6,
+                        y + (Math.random() - 0.5) * 6,
+                        color,
+                        Math.random() * 4 + 2,
+                        (Math.random() - 0.7) * 2 - 1, // Đẩy lùi về sau chút
+                        (Math.random() - 0.5) * 2,
+                        Math.random() * 15 + 10
+                    );
+                } else if (vfxID === 'arcane_bolt') {
+                    // Hiệu ứng bụi tinh tú xanh lục/xanh dương lấp lánh
+                    const colors = ['#06b6d4', '#3b82f6', '#a5f3fc', '#818cf8'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    this.addParticle(
+                        x + (Math.random() - 0.5) * 4,
+                        y + (Math.random() - 0.5) * 4,
+                        color,
+                        Math.random() * 3 + 1.5,
+                        (Math.random() - 0.5) * 1.5,
+                        (Math.random() - 0.5) * 1.5,
+                        Math.random() * 20 + 15
+                    );
+                }
+            }
+
+            /**
+             * Tạo vụ nổ bùng cháy khi va chạm
+             */
+            createExplosion(x, y, vfxID) {
+                const count = vfxID === 'fireball' ? 35 : 25;
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 4 + 1.5;
+                    const life = Math.random() * 25 + 15;
+                    
+                    let color, size;
+                    if (vfxID === 'fireball') {
+                        const colors = ['#f59e0b', '#ef4444', '#f97316', '#b91c1c', '#ffffff'];
+                        color = colors[Math.floor(Math.random() * colors.length)];
+                        size = Math.random() * 6 + 3;
+                    } else {
+                        const colors = ['#06b6d4', '#6366f1', '#a5f3fc', '#ffffff'];
+                        color = colors[Math.floor(Math.random() * colors.length)];
+                        size = Math.random() * 5 + 2;
+                    }
+
+                    this.addParticle(
+                        x, y, color, size,
+                        Math.cos(angle) * speed,
+                        Math.sin(angle) * speed,
+                        life
+                    );
+                }
+            }
+
+            /**
+             * RENDER CHÍNH: Vẽ quả đạn dựa theo mã hiệu ứng vfxID
+             */
+            drawProjectile(vfxID, x, y, size = 12) {
+                this.ctx.save();
+                
+                if (vfxID === 'fireball') {
+                    // Vẽ lỗi năng lượng trung tâm màu trắng sáng
+                    const grad = this.ctx.createRadialGradient(x, y, 1, x, y, size + 8);
+                    grad.addColorStop(0, '#ffffff');
+                    grad.addColorStop(0.2, '#fef08a'); // Vàng nhạt
+                    grad.addColorStop(0.5, '#f97316'); // Cam
+                    grad.addColorStop(0.8, '#ef4444'); // Đỏ
+                    grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+                    this.ctx.fillStyle = grad;
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, size + 10, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    // Nhân lõi
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, size * 0.4, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                } else if (vfxID === 'arcane_bolt') {
+                    // Tạo quầng sáng xanh dương mờ ảo đậm chất Arcane
+                    this.ctx.shadowBlur = 15;
+                    this.ctx.shadowColor = '#06b6d4';
+
+                    const grad = this.ctx.createRadialGradient(x, y, 2, x, y, size + 4);
+                    grad.addColorStop(0, '#ffffff');
+                    grad.addColorStop(0.3, '#22d3ee'); // Cyan sáng
+                    grad.addColorStop(0.7, '#4f46e5'); // Indigo huyền bí
+                    grad.addColorStop(1, 'rgba(79, 70, 229, 0)');
+
+                    this.ctx.fillStyle = grad;
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, size + 6, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    // Vành đai năng lượng nhỏ xung quanh
+                    this.ctx.strokeStyle = 'rgba(165, 243, 252, 0.8)';
+                    this.ctx.lineWidth = 1.5;
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, size * 0.8, 0, Math.PI * 2);
+                    this.ctx.stroke();
+                }
+
+                this.ctx.restore();
+            }
+        }
+
+
+        // --- 3. ĐỘNG CƠ QUẢN LÝ VÒNG ĐỜI VIÊN ĐẠN (ProjectileEngine) ---
+        // Điều khiển quá trình nạp đạn, bay nhảy, tính góc quay và kích nổ
+        class ProjectileEngine {
+            constructor(vfxManager) {
+                this.vfxManager = vfxManager;
+                this.projectiles = []; // Chứa danh sách các viên đạn đang bay thực tế
+            }
+
+            /**
+             * Kích hoạt phóng đạn mới
+             */
+            spawn(start, end, pathType, vfxID, duration = 1200, arcHeight = -150) {
+                const newProjectile = {
+                    id: Date.now() + Math.random(),
+                    start: { ...start },
+                    end: { ...end },
+                    current: { ...start },
+                    pathType: pathType, // 'linear' hoặc 'arc'
+                    vfxID: vfxID,       // 'fireball' hoặc 'arcane_bolt'
+                    duration: duration, // Thời gian bay bằng ms
+                    elapsedTime: 0,     // Thời gian đã bay
+                    arcHeight: arcHeight, // Độ cao đỉnh quỹ đạo
+                    isFinished: false
+                };
+                
+                this.projectiles.push(newProjectile);
+                return newProjectile;
+            }
+
+            /**
+             * Cập nhật vị trí tất cả viên đạn theo chu kỳ game loop (deltaTime tính bằng ms)
+             */
+            update(deltaTime) {
+                for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                    const proj = this.projectiles[i];
+                    proj.elapsedTime += deltaTime;
+
+                    // Tính tỉ lệ thời gian tiến trình (giới hạn tối đa bằng 1)
+                    let t = proj.elapsedTime / proj.duration;
+                    if (t >= 1) {
+                        t = 1;
+                        proj.isFinished = true;
+                    }
+
+                    // Gọi toán học phù hợp để lấy tọa độ tức thời
+                    if (proj.pathType === 'linear') {
+                        proj.current = ProjectileMathModule.linearPath(t, proj.start, proj.end);
+                    } else if (proj.pathType === 'arc') {
+                        proj.current = ProjectileMathModule.arcPath(t, proj.start, proj.end, proj.arcHeight);
+                    }
+
+                    // Thả đuôi khói đằng sau vị trí hiện tại
+                    this.vfxManager.emitTrail(proj.vfxID, proj.current.x, proj.current.y);
+
+                    // Xử lý khi đạn chạm đích
+                    if (proj.isFinished) {
+                        // Kích hoạt nổ tưng bừng tại đích
+                        this.vfxManager.createExplosion(proj.end.x, proj.end.y, proj.vfxID);
+                        
+                        // Kích hoạt rung lắc màn hình (screen shake) dội lại cảm giác lực mạnh mẽ
+                        triggerScreenShake();
+
+                        // Xóa đạn khỏi danh sách quản lý
+                        this.projectiles.splice(i, 1);
+                    }
+                }
+            }
+
+            /**
+             * Vẽ toàn bộ đạn đang hoạt động lên Canvas
+             */
+            draw() {
+                for (const proj of this.projectiles) {
+                this.vfxManager.drawProjectile(proj.vfxID, proj.current.x, proj.current.y);
+                }
+            }
+
+            hasActiveProjectiles() {
+                return this.projectiles.length > 0;
+            }
+        }
+
+
+        // --- 4. KHU VỰC QUẢN LÝ GIAO DIỆN VÀ ĐỒ HỌA MÔ PHỎNG ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Cấu hình vật thể (Player / Enemy)
+        const player = { x: 120, y: 280, radius: 24, color: '#10b981', label: 'Anh Hùng (Ta)' };
+        const enemy = { x: 580, y: 240, radius: 28, color: '#ef4444', label: 'Boss Thủ Lĩnh' };
+
+        // State hiện tại được chọn trên bảng điều khiển UI
+        let selectedVFX = 'fireball';
+        let selectedPath = 'arc';
+        let customArcHeight = -150; // Trục Y trong Canvas âm là bay hướng lên trời
+
+        // Thiết lập các đối tượng chính
+        const vfx = new VFXManager(ctx);
+        const engine = new ProjectileEngine(vfx);
+
+        // Hiệu ứng phụ: Shake Screen (Rung màn hình khi va chạm đạn)
+        let shakeTime = 0;
+        let shakeIntensity = 0;
+
+        function triggerScreenShake(intensity = 8, duration = 15) {
+            shakeIntensity = intensity;
+            shakeTime = duration;
+        }
+
+        // Đồng bộ kích thước Canvas linh hoạt thích ứng màn hình
+        function resizeCanvas() {
+            // Giữ tỉ lệ hiển thị chuẩn của bản demo để thiết kế đẹp nhất
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            // Cập nhật vị trí nhân vật linh hoạt theo kích thước thực tế để ko bị lệch ngoài màn hình
+            player.x = rect.width * 0.18;
+            player.y = rect.height * 0.65;
+            
+            enemy.x = rect.width * 0.82;
+            enemy.y = rect.height * 0.55;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        // Chờ DOM dựng hoàn tất trước khi thiết lập kích thước
+        setTimeout(resizeCanvas, 50);
+
+
+        // --- VẼ HÌNH ẢNH NỀN & PHÔNG CẢNH 2.5D ---
+        function drawScene() {
+            // Clear màn hình với màu tối sâu thẳm của hầm ngục
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Áp dụng bộ lọc rung màn hình nếu có va chạm xảy ra
+            if (shakeTime > 0) {
+                const dx = (Math.random() - 0.5) * shakeIntensity;
+                const dy = (Math.random() - 0.5) * shakeIntensity;
+                ctx.translate(dx, dy);
+                shakeTime--;
+            }
+          // Vẽ lưới Grid 2.5D xiên tạo chiều sâu
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.25)';
+            ctx.lineWidth = 1;
+            
+            const gridRows = 8;
+            const gridCols = 15;
+            const stepY = canvas.height / 3 / gridRows;
+
+            // Mặt đất xiên bắt đầu từ khoảng 40% màn hình đổ xuống
+            const groundStart = canvas.height * 0.35;
+            const groundEnd = canvas.height * 0.95;
+
+            // Vẽ các đường chân trời ngang xiên dần
+            for (let i = 0; i <= gridRows; i++) {
+                const ratio = i / gridRows;
+                // Nội suy phi tuyến tính để tạo cảm giác phối cảnh xa gần (perspective)
+                const y = groundStart + (groundEnd - groundStart) * Math.pow(ratio, 1.4);
+                
+                ctx.beginPath();
+                ctx.moveTo(20, y);
+                ctx.lineTo(canvas.width - 20, y);
+                ctx.stroke();
+            }
+
+            // Vẽ các đường dọc hội tụ về tiêu điểm xa tít tắp phía trên chân trời
+            const vanishPointX = canvas.width / 2;
+            const vanishPointY = groundStart - 100;
+            for (let i = 0; i <= gridCols; i++) {
+                const xOnBottom = (canvas.width / gridCols) * i;
+                ctx.beginPath();
+                ctx.moveTo(vanishPointX + (xOnBottom - vanishPointX) * 0.25, groundStart);
+                ctx.lineTo(xOnBottom, groundEnd);
+                ctx.stroke();
+            }
+
+            // Vẽ vùng sàn đấu hình Elip sáng bóng dưới chân 2 đối thủ
+            drawPlatform(player.x, player.y + 12, 45, 15, 'rgba(16, 185, 129, 0.15)');
+            drawPlatform(enemy.x, enemy.y + 12, 50, 18, 'rgba(239, 68, 68, 0.15)');
+
+            // Vẽ đường phụ quỹ đạo nét đứt nếu là đường cong, để người dùng dễ quan sát trực quan
+            drawTrajectoryGuide();
+
+            // Vẽ Player (Nhân vật xanh lục) dạng khối 3D giả lập
+            drawCharacter(player, 'rgba(16, 185, 129, 1)', 'rgba(5, 150, 105, 1)');
+
+            // Vẽ Enemy (Kẻ thù đỏ) dạng khối 3D giả lập
+            drawCharacter(enemy, 'rgba(239, 68, 68, 1)', 'rgba(185, 28, 28, 1)');
+
+            // --- CẬP NHẬT & VẼ ENGINE CHÍNH CỦA ĐẠN ---
+            vfx.updateParticles();
+            vfx.drawParticles();
+
+            engine.draw();
+
+            // Khôi phục lại phép tịnh tiến rung lắc
+            ctx.restore();
+        }
+
+        // Vẽ bệ đỡ tròn dưới chân
+        function drawPlatform(x, y, rx, ry, fillStyle) {
+            ctx.save();
+            ctx.fillStyle = fillStyle;
+            ctx.beginPath();
+            ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = fillStyle.replace('0.15', '0.4');
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Vẽ mô phỏng nhân vật dạng khối tròn có bóng đổ nâng cao 2.5D
+        function drawCharacter(char, lightColor, darkColor) {
+            ctx.save();
+            
+            // Vẽ bóng đổ đen tròn bên dưới sàn
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.beginPath();
+            ctx.ellipse(char.x, char.y + 5, char.radius * 0.9, char.radius * 0.3, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Vẽ thân hình cầu (3D sphere effect)
+            const gradient = ctx.createRadialGradient(
+                char.x - char.radius * 0.3, 
+                char.y - char.radius * 0.3, 
+                char.radius * 0.1, 
+                char.x, 
+                char.y, 
+                char.radius
+            );
+            gradient.addColorStop(0, '#ffffff');
+            gradient.addColorStop(0.3, lightColor);
+            gradient.addColorStop(1, darkColor);
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(char.x, char.y - 12, char.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Vẽ mũ sắt/vương miện tượng trưng nhỏ
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.moveTo(char.x - 8, char.y - 12 - char.radius);
+            ctx.lineTo(char.x, char.y - 22 - char.radius);
+            ctx.lineTo(char.x + 8, char.y - 12 - char.radius);
+            ctx.closePath();
+            ctx.fill();
+
+            // Nhãn tên nhân vật
+            ctx.fillStyle = '#f1f5f9';
+            ctx.font = 'bold 11px system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(char.label, char.x, char.y + 30);
+
+            ctx.restore();
+        }
+
+        // Vẽ đường viền chỉ hướng của đạn trước khi bắn (Nét đứt mờ)
+        function drawTrajectoryGuide() {
+            ctx.save();
+            ctx.strokeStyle = selectedVFX === 'fireball' ? 'rgba(245, 158, 11, 0.25)' : 'rgba(6, 182, 212, 0.25)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([5, 5]);
+
+            ctx.beginPath();
+            if (selectedPath === 'linear') {
+                ctx.moveTo(player.x, player.y - 12);
+                ctx.lineTo(enemy.x, enemy.y - 12);
+            } else {
+                const start = { x: player.x, y: player.y - 12 };
+                const end = { x: enemy.x, y: enemy.y - 12 };
+                ctx.moveTo(start.x, start.y);
+                for (let t = 0; t <= 1.05; t += 0.05) {
+                    const pt = ProjectileMathModule.arcPath(t, start, end, customArcHeight);
+                    ctx.lineTo(pt.x, pt.y);
+                }
+            }
+            ctx.stroke();
+            ctx.restore();
+                  }
+       // --- 5. ĐIỀU PHỐI VÀ GAME LOOP (60 FPS) ---
+        let lastTime = performance.now();
+
+        function gameLoop(currentTime) {
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+
+            // Cập nhật chuyển động đạn dựa trên khoảng cách thời gian chuẩn
+            engine.update(deltaTime);
+
+            // Redraw màn hình
+            drawScene();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+
+        // --- 6. HÀM GIAO TIẾP VỚI UI ĐIỀU KHIỂN ---
+        function selectVFX(type) {
+            selectedVFX = type;
+            
+            const btnFireball = document.getElementById('btnVfxFireball');
+            const btnArcane = document.getElementById('btnVfxArcane');
+
+            if (type === 'fireball') {
+                btnFireball.className = "py-3 px-4 rounded-xl border-2 border-amber-500/80 bg-gradient-to-br from-amber-600/30 to-red-600/20 text-amber-200 font-medium transition duration-200 shadow-md shadow-amber-900/10 hover:border-amber-400";
+                btnArcane.className = "py-3 px-4 rounded-xl border-2 border-transparent bg-slate-700/40 text-slate-400 font-medium transition duration-200 hover:bg-slate-700/60";
+            } else {
+                btnArcane.className = "py-3 px-4 rounded-xl border-2 border-cyan-500/80 bg-gradient-to-br from-cyan-600/30 to-blue-600/20 text-cyan-200 font-medium transition duration-200 shadow-md shadow-cyan-900/10 hover:border-cyan-400";
+                btnFireball.className = "py-3 px-4 rounded-xl border-2 border-transparent bg-slate-700/40 text-slate-400 font-medium transition duration-200 hover:bg-slate-700/60";
+            }
+        }
+
+        function selectPath(type) {
+            selectedPath = type;
+            const btnLinear = document.getElementById('btnPathLinear');
+            const btnArc = document.getElementById('btnPathArc');
+            const arcConfig = document.getElementById('arcConfig');
+
+            if (type === 'linear') {
+                btnLinear.className = "py-3 px-4 rounded-xl border-2 border-amber-500/80 bg-gradient-to-br from-amber-600/30 to-orange-600/20 text-amber-200 font-medium transition duration-200 shadow-md shadow-amber-900/10 hover:border-amber-400";
+                btnArc.className = "py-3 px-4 rounded-xl border-2 border-transparent bg-slate-700/40 text-slate-400 font-medium transition duration-200 hover:bg-slate-700/60";
+                arcConfig.style.opacity = '0.35';
+                arcConfig.style.pointerEvents = 'none';
+            } else {
+                btnArc.className = "py-3 px-4 rounded-xl border-2 border-cyan-500/80 bg-gradient-to-br from-cyan-600/30 to-blue-600/20 text-cyan-200 font-medium transition duration-200 shadow-md shadow-cyan-900/10 hover:border-cyan-400";
+                btnLinear.className = "py-3 px-4 rounded-xl border-2 border-transparent bg-slate-700/40 text-slate-400 font-medium transition duration-200 hover:bg-slate-700/60";
+                arcConfig.style.opacity = '1';
+                arcConfig.style.pointerEvents = 'auto';
+            }
+        }
+
+        function updateArcHeight(val) {
+            // Giá trị âm cho trục tọa độ Canvas để đẩy cung bay vút lên
+            customArcHeight = -parseInt(val);
+            document.getElementById('arcHeightValue').innerText = `-${val}px`;
+        }
+
+        // BẮN THỬ: Tạo đạn bay thực tế
+        function fireProjectile() {
+            const start = { x: player.x, y: player.y - 12 };
+            const end = { x: enemy.x, y: enemy.y - 12 };
+
+            // Tùy biến thời gian bay tự động dựa theo khoảng cách để duy trì tốc độ lý tưởng
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+            const distance = Math.sqrt(dx*dx + dy*dy);
+            const speed = 0.38; // px trên mỗi mili giây
+            const duration = distance / speed;
+
+            document.getElementById('speedIndicator').innerText = `Thời gian bay: ${(duration/1000).toFixed(2)}s`;
+            
+            const statusEl = document.getElementById('engineStatus');
+            statusEl.innerText = "Đang phóng đạn...";
+            statusEl.className = "text-amber-400 font-bold animate-pulse";
+
+            engine.spawn(start, end, selectedPath, selectedVFX, duration, customArcHeight);
+
+            // Trả trạng thái sẵn sàng sau khi bắn xong
+            setTimeout(() => {
+                if (!engine.hasActiveProjectiles()) {
+                    statusEl.innerText = "Sẵn sàng bắn";
+                    statusEl.className = "text-emerald-400";
+                }
+            }, duration + 100);
+        }
+
+        // Giả lập kích nổ chủ động (nhằm test tính năng tạo hạt bụi nổ)
+        function triggerExplodeSimulation() {
+            vfx.createExplosion(enemy.x, enemy.y - 12, selectedVFX);
+            triggerScreenShake(12, 20);
+        }
+
+        // Khởi tạo hoạt họa ngay khi trang tải xong
+        window.onload = function() {
+            lastTime = performance.now();
+            requestAnimationFrame(gameLoop);
+            selectPath('arc');
+            selectVFX('fireball');
+        };
+    </script>
+</body>
+</html>

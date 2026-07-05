@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Projectile Engine V4 - Ultimate Mobile-First</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            user-select: none; 
+            -webkit-user-select: none; 
+            background-color: #080c14;
+            touch-action: manipulation;
+        }
+        canvas { 
+            image-rendering: auto; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8); 
+        }
+        .btn-vfx {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-vfx.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 12px currentColor;
+        }
+        .btn-path {
+            transition: all 0.15s ease;
+        }
+        .btn-path.active {
+            box-shadow: 0 0 8px rgba(34, 211, 238, 0.3);
+        }
+        /* Custom thanh trượt slider đẹp mắt */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #1e293b;
+            border-radius: 9999px;
+            height: 6px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ec4899;
+            cursor: pointer;
+            box-shadow: 0 0 8px #ec4899;
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.3);
+        }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen flex flex-col font-sans overflow-hidden">
+
+    <!-- Header siêu mỏng gọn -->
+    <header class="bg-slate-950/90 border-b border-slate-900 py-1.5 px-3 z-10 flex justify-between items-center shrink-0">
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">
+                BURST ENGINE V4
+            </span>
+            <span class="text-[8px] bg-slate-800 text-slate-400 px-1 rounded">MOBILE-FIRST</span>
+        </div>
+        <div id="statsBox" class="text-[9px] font-mono text-cyan-400 bg-black/40 px-1.5 py-0.5 rounded border border-slate-800/60">
+            FPS: 60 | Pts: 0
+        </div>
+    </header>
+
+    <!-- Giao diện chính -->
+    <main class="flex-grow flex flex-col lg:flex-row overflow-hidden pb-[68px] lg:pb-0">
+        
+        <!-- CANVAS VIEWPORT (Tối ưu góc nhìn rộng rãi hơn) -->
+        <div class="h-[42vh] lg:h-full lg:flex-grow relative bg-slate-950 flex items-center justify-center p-1.5 border-b lg:border-b-0 lg:border-r border-slate-900 shrink-0 lg:shrink">
+            <canvas id="gameCanvas" class="w-full h-full rounded-lg bg-slate-900/40"></canvas>
+            
+            <!-- Phím tắt chạm nhanh trực tiếp lên màn hình -->
+            <div class="absolute bottom-2 left-2 text-[8px] font-mono text-slate-500 pointer-events-none bg-slate-950/80 px-1.5 py-0.5 rounded">
+                Chạm đúp vào màn hình để KHAI HỎA nhanh
+            </div>
+        </div>
+
+        <!-- BẢNG ĐIỀU KHIỂN SIÊU GỌN (COMPACT CONTROL PANEL) -->
+        <div class="flex-grow lg:w-[350px] bg-slate-900/60 flex flex-col h-full overflow-y-auto shrink lg:shrink-0 p-3 space-y-3.5">
+            
+            <!-- Bộ 1: Nguyên Tố (Chỉ hiển thị icon tối giản cỡ lớn, bỏ chữ) -->
+            <div>
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> NGUYÊN TỐ (VFX)
+                    </span>
+                    <span id="txtActiveVfx" class="text-[10px] font-bold text-pink-400 uppercase">🔥 LỬA</span>
+                </div>
+                <!-- 6 Icon xếp cực gọn gàng chỉ chiếm 1 dòng duy nhất trên mobile -->
+                <div class="grid grid-cols-6 gap-1.5" id="vfxButtons">
+                    <button onclick="setVFX('fire', '🔥 LỬA')" class="btn-vfx active bg-red-950/40 text-red-400 p-2.5 rounded-lg border border-red-500/30 text-xl flex justify-center items-center" title="Lửa">
+                        🔥
+                    </button>
+                    <button onclick="setVFX('water', '💧 NƯỚC')" class="btn-vfx bg-blue-950/40 text-blue-400 p-2.5 rounded-lg border border-transparent text-xl flex justify-center items-center" title="Nước">
+                        💧
+                    </button>
+                    <button onclick="setVFX('lightning', '⚡ SÉT ĐÁNH')" class="btn-vfx bg-yellow-950/40 text-yellow-400 p-2.5 rounded-lg border border-transparent text-xl flex justify-center items-center" title="Sét">
+                        ⚡
+                    </button>
+                    <button onclick="setVFX('wind', '🌪️ LỐC XOÁY')" class="btn-vfx bg-emerald-950/40 text-emerald-400 p-2.5 rounded-lg border border-transparent text-xl flex justify-center items-center" title="Gió">
+                        🌪️
+                    </button>
+                    <button onclick="setVFX('darkness', '🕳️ HỐ ĐEN')" class="btn-vfx bg-purple-950/40 text-purple-400 p-2.5 rounded-lg border border-transparent text-xl flex justify-center items-center" title="Hố Đen">
+                        🕳️
+                    </button>
+                    <button onclick="setVFX('earth', '🌳 RỄ CÂY')" class="btn-vfx bg-amber-950/40 text-amber-600 p-2.5 rounded-lg border border-transparent text-xl flex justify-center items-center" title="Rễ Cây">
+                        🌳
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bộ 2: Quỹ Đạo Bay (Nút bo tròn nhỏ nhắn) -->
+            <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 block">
+                    🚀 QUỸ ĐẠO (PATH)
+                </span>
+                <div class="grid grid-cols-3 gap-1 text-[10px] font-bold uppercase tracking-wider" id="pathButtons">
+                    <button onclick="setPath('linear')" class="btn-path bg-slate-850 py-1.5 rounded-md border border-slate-800 text-slate-400">Thẳng</button>
+                    <button onclick="setPath('arc')" class="btn-path active border-cyan-400 bg-cyan-950/40 py-1.5 rounded-md text-cyan-400">Cầu vồng</button>
+                    <button onclick="setPath('zigzag')" class="btn-path bg-slate-850 py-1.5 rounded-md border border-slate-800 text-slate-400">Giật sét</button>
+                    <button onclick="setPath('spiral')" class="btn-path bg-slate-850 py-1.5 rounded-md border border-slate-800 text-slate-400">Xoắn ốc</button>
+                    <button onclick="setPath('ground')" class="btn-path bg-slate-850 py-1.5 rounded-md border border-slate-800 text-slate-400 col-span-2">Dưới mặt đất</button>
+                </div>
+            </div>
+
+            <!-- Bộ 3: Cấu Hình Multi-Shot (Thiết kế thanh trượt cực kỳ tinh giản, không chiếm dụng chiều dọc) -->
+            <div class="space-y-2.5 pt-1.5 border-t border-slate-900">
+                <!-- Slider 1: Số lượng đạn -->
+                <div class="bg-black/35 p-2 rounded-lg border border-slate-900 flex items-center justify-between gap-3">
+                    <div class="shrink-0 w-24">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase block leading-none">Số lượng đạn</span>
+                        <span class="text-[8px] text-slate-500">Max 10 viên</span>
+                    </div>
+                    <input type="range" id="inpCount" min="1" max="10" value="5" class="flex-grow" oninput="updateInpText('valCount', this.value)">
+                    <span id="valCount" class="text-xs font-bold text-pink-500 font-mono w-4 text-right shrink-0">5</span>
+                </div>
+
+                <!-- Slider 2: Độ phân tán -->
+                <div class="bg-black/35 p-2 rounded-lg border border-slate-900 flex items-center justify-between gap-3">
+                    <div class="shrink-0 w-24">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase block leading-none">Phân tán (Scatter)</span>
+                        <span class="text-[8px] text-slate-500">Độ lệch tâm</span>
+                    </div>
+                    <input type="range" id="inpScatter" min="0" max="100" value="45" step="5" class="flex-grow" oninput="updateInpText('valScatter', this.value+'%')">
+                    <span id="valScatter" class="text-xs font-bold text-pink-500 font-mono w-8 text-right shrink-0">45%</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER CHỨA NÚT BẮN (Thiết kế bo sát, lách qua thanh điều hướng ảo của điện thoại) -->
+    <div class="fixed bottom-0 left-0 right-0 lg:absolute lg:bottom-0 lg:right-0 lg:w-[350px] bg-slate-950 border-t border-slate-900 p-2.5 z-30 flex gap-2 shadow-[0_-6px_25px_rgba(0,0,0,0.8)] pb-safe">
+        <button onclick="triggerUltimate()" class="flex-grow py-3 px-5 rounded-xl font-black text-sm bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-500 text-white active:scale-95 transition-transform tracking-widest uppercase shadow-[0_0_12px_rgba(236,72,153,0.4)]">
+            🚀 BẮN (ULTIMATE)
+        </button>
+        <button onclick="triggerExplodeSimulation()" class="px-3.5 rounded-xl border border-slate-800 bg-slate-900 text-lg flex items-center justify-center active:scale-95" title="Kích nổ giả lập">
+            💥
+        </button>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. MODULE TOÁN HỌC QUỸ ĐẠO (PRO_MATH)
+        // ==========================================
+        const MathModule = {
+            linear: (t, start, end) => ({
+                x: start.x + (end.x - start.x) * t,
+                y: start.y + (end.y - start.y) * t
+            }),
+            
+            arc: (t, start, end, options) => {
+                const base = MathModule.linear(t, start, end);
+                const height = options.arcHeight || -160;
+                return {
+                    x: base.x,
+                    y: base.y + 4 * height * t * (1 - t)
+                };
+            },
+
+            zigzag: (t, start, end, options) => {
+                const base = MathModule.linear(t, start, end);
+                const freq = options.freq || 8;
+                const amp = options.amp || 35;
+                const dampening = Math.sin(t * Math.PI); 
+                
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                const length = Math.sqrt(dx*dx + dy*dy);
+                const nx = -dy / length; 
+                const ny = dx / length;
+
+                const wave = Math.abs((t * freq % 1) * 2 - 1) * 2 - 1; 
+
+                return {
+                    x: base.x + nx * wave * amp * dampening,
+                    y: base.y + ny * wave * amp * dampening
+                };
+            },
+
+            spiral: (t, start, end, options) => {
+                const base = MathModule.linear(t, start, end);
+                const freq = options.freq || 4.5; 
+                const amp = options.amp || 45;
+                const phase = options.phase || 0;
+                const dampening = Math.sin(t * Math.PI);
+
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                const length = Math.sqrt(dx*dx + dy*dy);
+                const nx = -dy / length;
+                const ny = dx / length;
+
+                const wave = Math.sin(t * Math.PI * 2 * freq + phase);
+
+                return {
+                    x: base.x + nx * wave * amp * dampening,
+                    y: base.y + ny * wave * amp * dampening
+                };
+            },
+
+            ground: (t, start, end, options) => {
+                const easedT = Math.pow(t, 1.8); 
+                const base = MathModule.linear(easedT, start, end);
+                const spread = Math.sin(easedT * Math.PI * 4 + (options.phase || 0)) * (options.amp || 20);
+                
+                return {
+                    x: base.x + spread * (1 - easedT),
+                    y: base.y + (options.yOffset || 12)
+                };
+            }
+        };
+
+        // ==========================================
+        // 2. MODULE VFX HIỂN THỊ (ADVANCED)
+        // ==========================================
+        class VFXEngine {
+            constructor(ctx) {
+                this.ctx = ctx;
+                this.particles = [];
+                this.blackholes = [];
+            }
+
+            addParticle(x, y, color, size, vx, vy, life, type = 'normal') {
+                this.particles.push({ x, y, color, size, vx, vy, life, maxLife: life, type });
+            }
+
+            addBlackhole(x, y) {
+                this.blackholes.push({ x, y, life: 100, maxLife: 100, radius: 0 });
+            }
+
+            update(deltaTime) {
+                const dt = Math.min(deltaTime, 30);
+                
+                // Cập nhật hạt bụi VFX
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    let p = this.particles[i];
+                    p.x += p.vx * (dt / 16);
+                    p.y += p.vy * (dt / 16);
+                    p.life -= dt * 0.06;
+
+                    // Hố đen hút ngược hạt loại 'suck'
+                    if (p.type === 'suck' && p.targetX) {
+                        const dx = p.targetX - p.x;
+                        const dy = p.targetY - p.y;
+                        p.x += dx * 0.08;
+                        p.y += dy * 0.08;
+                    }
+
+                    if (p.type === 'water') p.vy += 0.08;
+
+                    if (p.life <= 0) this.particles.splice(i, 1);
+                }
+
+                // Cập nhật các hố đen
+                for (let i = this.blackholes.length - 1; i >= 0; i--) {
+                    let bh = this.blackholes[i];
+                    bh.life -= dt * 0.05;
+                    
+                    if (bh.life > bh.maxLife * 0.8) bh.radius += 1.5;
+                    else if (bh.life < bh.maxLife * 0.2) bh.radius -= 1.5;
+
+                    for (let p of this.particles) {
+                        const dx = bh.x - p.x;
+                        const dy = bh.y - p.y;
+                        const distSq = dx*dx + dy*dy;
+                        if (distSq < 25000) { 
+                            p.vx += (dx / distSq) * 35;
+                            p.vy += (dy / distSq) * 35;
+                        }
+                    }
+
+                    if (bh.life <= 0) this.blackholes.splice(i, 1);
+                }
+            }
+
+            draw() {
+                this.ctx.save();
+                
+                // Vẽ hạt
+                for (let p of this.particles) {
+                    const alpha = Math.max(0, p.life / p.maxLife);
+                    this.ctx.globalAlpha = alpha;
+                    
+                    if (p.type === 'wind') {
+                        this.ctx.strokeStyle = p.color;
+                        this.ctx.lineWidth = p.size;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(p.x, p.y);
+                        this.ctx.lineTo(p.x - p.vx * 1.5, p.y - p.vy * 1.5);
+                        this.ctx.stroke();
+                    } else if (p.type === 'earth') {
+                        this.ctx.fillStyle = p.color;
+                        this.ctx.fillRect(p.x - p.size, p.y - p.size, p.size*2, p.size*2);
+                    } else {
+                        this.ctx.fillStyle = p.color;
+                        this.ctx.beginPath();
+                        this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    }
+                }
+
+                // Vẽ Hố đen tại mục tiêu
+                for (let bh of this.blackholes) {
+                    if (bh.radius <= 0) continue;
+                    
+                    this.ctx.globalAlpha = 1;
+                    this.ctx.fillStyle = '#010003';
+                    this.ctx.beginPath();
+                    this.ctx.arc(bh.x, bh.y, bh.radius, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    this.ctx.strokeStyle = 'rgba(168, 85, 247, 0.75)';
+                    this.ctx.lineWidth = 2.5;
+                    this.ctx.beginPath();
+                    this.ctx.arc(bh.x, bh.y, bh.radius + 3 + Math.random()*3, 0, Math.PI * 2);
+                    this.ctx.stroke();
+                }
+
+                this.ctx.restore();
+            }
+
+            emitTrail(vfxID, x, y) {
+                switch(vfxID) {
+                    case 'fire':
+                        this.addParticle(x + (Math.random()-0.5)*6, y + (Math.random()-0.5)*6, 
+                            ['#f97316', '#ef4444', '#f59e0b'][Math.floor(Math.random()*3)], 
+                            Math.random()*3.5+1.5, (Math.random()-0.5)*0.5, (Math.random()-0.5)*0.5, 10);
+                        break;
+                    case 'water':
+                        this.addParticle(x + (Math.random()-0.5)*5, y + (Math.random()-0.5)*5, 
+                            ['#3b82f6', '#60a5fa', '#e0f2fe'][Math.floor(Math.random()*3)], 
+                            Math.random()*2.5+1, (Math.random()-0.5)*0.6, Math.random()*0.8, 12, 'water');
+                        break;
+                    case 'lightning':
+                        if (Math.random() > 0.45) {
+                            this.addParticle(x, y, '#fde047', Math.random()*1.5+1, 0, 0, 3);
+                        }
+                        break;
+                    case 'wind':
+                        this.addParticle(x + (Math.random()-0.5)*12, y + (Math.random()-0.5)*12, 
+                            '#a7f3d0', Math.random()*1.2+1, (Math.random()-0.5)*2.5, (Math.random()-0.5)*2.5, 7, 'wind');
+                        break;
+                    case 'darkness':
+                        this.addParticle(x + (Math.random()-0.5)*10, y + (Math.random()-0.5)*10, 
+                            ['#c084fc', '#581c87', '#030008'][Math.floor(Math.random()*3)], 
+                            Math.random()*4+1.5, 0, -Math.random()*0.4, 18);
+                        break;
+                    case 'earth':
+                        if (Math.random() > 0.3) {
+                            this.addParticle(x + (Math.random()-0.5)*6, y + (Math.random()-0.5)*3, 
+                                ['#78350f', '#d97706', '#14532d'][Math.floor(Math.random()*3)], 
+                                Math.random()*2.5+1.5, 0, 0, 25, 'earth');
+                        }
+                        break;
+                }
+            }
+
+            createExplosion(x, y, vfxID) {
+                if (vfxID === 'darkness') {
+                    this.addBlackhole(x, y);
+                    for(let i=0; i<20; i++) {
+                        let px = x + (Math.random()-0.5)*100;
+                        let py = y + (Math.random()-0.5)*100;
+                        this.particles.push({ 
+                            x: px, y: py, color: '#c084fc', size: 1.2, 
+                            vx: 0, vy: 0, life: 45, maxLife: 45, 
+                            type: 'suck', targetX: x, targetY: y 
+                        });
+                    }
+                    return;
+                }
+
+                if (vfxID === 'earth') {
+                    for (let i = 0; i < 12; i++) {
+                        this.addParticle(x + (Math.random()-0.5)*35, y, '#16a34a', Math.random()*5+2, 0, -Math.random()*3 - 1, 15, 'earth');
+                    }
+                    return;
+                }
+
+                const count = 25;
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 4 + 1.2;
+                    let color = '#fff';
+                    
+                    if (vfxID === 'fire') color = ['#f59e0b', '#ef4444', '#fff'][Math.floor(Math.random()*3)];
+                    if (vfxID === 'water') color = ['#3b82f6', '#93c5fd', '#fff'][Math.floor(Math.random()*3)];
+                    if (vfxID === 'lightning') color = ['#fde047', '#fef08a', '#fff'][Math.floor(Math.random()*3)];
+                    if (vfxID === 'wind') color = '#6ee7b7';
+
+                    this.addParticle(x, y, color, Math.random()*2.5+1, Math.cos(angle)*speed, Math.sin(angle)*speed, Math.random()*12+6, vfxID === 'water'?'water':'normal');
+                }
+            }
+
+            drawProjectile(vfxID, x, y, size = 10) {
+                this.ctx.save();
+                
+                if (vfxID === 'fire') {
+                    const grad = this.ctx.createRadialGradient(x, y, 0, x, y, size);
+                    grad.addColorStop(0, '#ffffff'); 
+                    grad.addColorStop(0.3, '#fbbf24'); 
+                    grad.addColorStop(1, 'rgba(220, 38, 38, 0)');
+                    this.ctx.fillStyle = grad;
+                    this.ctx.beginPath(); this.ctx.arc(x, y, size, 0, Math.PI * 2); this.ctx.fill();
+                } 
+                else if (vfxID === 'water') {
+                    this.ctx.fillStyle = 'rgba(59, 130, 246, 0.75)';
+                    this.ctx.beginPath(); this.ctx.arc(x, y, size*0.8, 0, Math.PI * 2); this.ctx.fill();
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.beginPath(); this.ctx.arc(x - size*0.2, y - size*0.2, size*0.15, 0, Math.PI * 2); this.ctx.fill();
+                }
+                else if (vfxID === 'lightning') {
+                    this.ctx.shadowBlur = 6; this.ctx.shadowColor = '#fde047';
+                    this.ctx.strokeStyle = '#ffffff'; this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x - size, y - size); this.ctx.lineTo(x, y + size); this.ctx.lineTo(x + size, y - size/2);
+                    this.ctx.stroke();
+                }
+                else if (vfxID === 'wind') {
+                    this.ctx.strokeStyle = 'rgba(16, 185, 129, 0.75)'; this.ctx.lineWidth = 1.5;
+                    this.ctx.beginPath(); this.ctx.arc(x, y, size*0.7, 0, Math.PI*2); this.ctx.stroke();
+                    this.ctx.beginPath(); this.ctx.arc(x, y, size, 0, Math.PI); this.ctx.stroke();
+                }
+                else if (vfxID === 'darkness') {
+                    this.ctx.shadowBlur = 8; this.ctx.shadowColor = '#a855f7';
+                    this.ctx.fillStyle = '#000000';
+                    this.ctx.beginPath(); this.ctx.arc(x, y, size*0.8, 0, Math.PI*2); this.ctx.fill();
+                    this.ctx.strokeStyle = '#c084fc'; this.ctx.lineWidth = 1;
+                    this.ctx.beginPath(); this.ctx.arc(x, y, size, 0, Math.PI*2); this.ctx.stroke();
+                }
+                else if (vfxID === 'earth') {
+                    this.ctx.fillStyle = '#451a03';
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, y - size); this.ctx.lineTo(x + size, y); this.ctx.lineTo(x, y + size); this.ctx.lineTo(x - size, y);
+                    this.ctx.fill();
+                }
+
+                this.ctx.restore();
+            }
+        }
+
+        // ==========================================
+        // 3. ENGINE PHÂN LOẠT ĐẠN (PRO_ENGINE)
+        // ==========================================
+        class Engine {
+            constructor(vfxManager) {
+                this.vfx = vfxManager;
+                this.projectiles = [];
+            }
+
+            spawnMulti(count, scatterPercent, start, end, pathType, vfxID) {
+                for (let i = 0; i < count; i++) {
+                    const scatterPx = 180 * (scatterPercent / 100);
+                    const modEnd = {
+                        x: end.x + (Math.random() - 0.5) * scatterPx,
+                        y: end.y + (Math.random() - 0.5) * scatterPx * 0.35
+                    };
+
+                    let speed = 0.44;
+                    if (vfxID === 'lightning') speed = 0.98; 
+                    if (vfxID === 'earth' || pathType === 'ground') speed = 0.28;
+                    
+                    const dist = Math.sqrt(Math.pow(modEnd.x - start.x, 2) + Math.pow(modEnd.y - start.y, 2));
+                    let duration = dist / speed;
+
+                    let mathOptions = {};
+                    if (pathType === 'arc') mathOptions.arcHeight = -(70 + Math.random() * 130);
+                    if (pathType === 'spiral') {
+                        mathOptions.phase = (Math.PI * 2 / count) * i;
+                        mathOptions.amp = 25 + Math.random()*12;
+                    }
+                    if (pathType === 'zigzag') {
+                        mathOptions.freq = 4.5 + Math.random() * 2.5;
+                        mathOptions.amp = (Math.random() > 0.5 ? 1 : -1) * (25 + Math.random()*15);
+                    }
+                    if (pathType === 'ground') {
+                        mathOptions.phase = Math.random() * Math.PI;
+                        mathOptions.amp = 12 + Math.random()*20;
+                        mathOptions.yOffset = 18;
+                    }
+
+                    const delay = (i / count) * (count > 1 ? 300 : 0);
+
+                    this.projectiles.push({
+                        start: { ...start },
+                        end: modEnd,
+                        current: { ...start },
+                        pathType, vfxID, duration, mathOptions,
+                        elapsedTime: -delay,
+                        active: false,
+                        isFinished: false
+                    });
+                }
+            }
+
+            update(deltaTime) {
+                const dt = Math.min(deltaTime, 30);
+                
+                for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                    const p = this.projectiles[i];
+                    p.elapsedTime += dt;
+
+                    if (p.elapsedTime < 0) continue; 
+                    
+                    if (!p.active) {
+                        p.active = true;
+                        if (p.vfxID === 'lightning' || p.vfxID === 'darkness') triggerShake(2, 4); 
+                    }
+
+                    let t = p.elapsedTime / p.duration;
+                    if (t >= 1) { t = 1; p.isFinished = true; }
+
+                    if (MathModule[p.pathType]) {
+                        p.current = MathModule[p.pathType](t, p.start, p.end, p.mathOptions);
+                    }
+
+                    this.vfx.emitTrail(p.vfxID, p.current.x, p.current.y);
+
+                    if (p.isFinished) {
+                        this.vfx.createExplosion(p.end.x, p.end.y, p.vfxID);
+                        
+                        let shakeInt = 3;
+                        if(p.vfxID === 'darkness' || p.vfxID === 'earth') shakeInt = 10;
+                        triggerShake(shakeInt, 10);
+                        
+                        this.projectiles.splice(i, 1);
+                    }
+                }
+            }
+
+            draw() {
+                for (let p of this.projectiles) {
+                    if (p.active) {
+                        let size = p.vfxID === 'lightning' ? 14 : 9;
+                        if(p.vfxID === 'darkness') size = 13;
+                        this.vfx.drawProjectile(p.vfxID, p.current.x, p.current.y, size);
+                    }
+                }
+            }
+        }
+
+
+        // ==========================================
+        // 4. THIẾT LẬP GRAPHICS & ĐIỀU KHIỂN CHUNG
+        // ==========================================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const vfx = new VFXEngine(ctx);
+        const engine = new Engine(vfx);
+
+        let state = { vfx: 'fire', path: 'arc' };
+        let shake = { time: 0, amp: 0 };
+
+        const player = { x: 0, y: 0, radius: 13, color: '#3b82f6' };
+        const enemy = { x: 0, y: 0, radius: 15, color: '#ef4444' };
+
+        function resize() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            // Tỷ lệ 2.5D phối cảnh tối ưu
+            player.x = canvas.width * 0.16; 
+            player.y = canvas.height * 0.72;
+            
+            enemy.x = canvas.width * 0.84; 
+            enemy.y = canvas.height * 0.44; 
+        }
+        
+        window.addEventListener('resize', resize);
+        setTimeout(resize, 100);
+
+        // Kích hoạt sự kiện gõ đúp chạm trực tiếp lên màn hình Canvas để xả đạn nhanh
+        let lastTap = 0;
+        canvas.addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 250 && tapLength > 0) {
+                triggerUltimate();
+                e.preventDefault();
+            }
+            lastTap = currentTime;
+        });
+
+        // Click đúp chuột trên máy tính
+        canvas.addEventListener('dblclick', function() {
+            triggerUltimate();
+        });
+
+        function triggerShake(amp, frames) {
+            shake.amp = Math.max(shake.amp, amp);
+            shake.time = frames;
+        }
+
+        function drawScene() {
+            ctx.fillStyle = '#040710';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            if (shake.time > 0) {
+                ctx.translate((Math.random()-0.5)*shake.amp, (Math.random()-0.5)*shake.amp);
+                shake.time--;
+                if(shake.time <= 0) shake.amp = 0;
+            }
+
+            // Sàn Grid 2.5D Isometric
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+            ctx.lineWidth = 1;
+            const gy = canvas.height * 0.25;
+            for(let i=0; i<8; i++) {
+                let py = gy + (canvas.height - gy) * Math.pow(i/7, 1.4);
+                ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(canvas.width, py); ctx.stroke();
+            }
+
+            // Vẽ bóng
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.beginPath(); ctx.ellipse(player.x, player.y + 8, 20, 6, 0, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(enemy.x, enemy.y + 8, 24, 7, 0, 0, Math.PI*2); ctx.fill();
+
+            // Vẽ Player
+            ctx.fillStyle = player.color;
+            ctx.beginPath(); ctx.arc(player.x, player.y - 6, player.radius, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#60a5fa'; ctx.font = 'bold 8px monospace'; ctx.textAlign='center'; ctx.fillText('PLAYER', player.x, player.y + 20);
+
+            // Vẽ Boss
+            ctx.fillStyle = enemy.color;
+            ctx.beginPath(); ctx.arc(enemy.x, enemy.y - 6, enemy.radius, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#f87171'; ctx.font = 'bold 8px monospace'; ctx.textAlign='center'; ctx.fillText('BOSS', enemy.x, enemy.y + 20);
+
+            vfx.draw(); 
+            engine.draw(); 
+
+            ctx.restore();
+        }
+
+        let lastTime = performance.now();
+        function loop(now) {
+            const dt = now - lastTime;
+            lastTime = now;
+
+            vfx.update(dt);
+            engine.update(dt);
+            drawScene();
+
+            document.getElementById('statsBox').innerText = `FPS: ${Math.round(1000/Math.max(1, dt))} | Pts: ${vfx.particles.length + engine.projectiles.length}`;
+
+            requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+
+        // --- ĐỒNG BỘ GIAO DIỆN ---
+        function setVFX(type, displayName) {
+            state.vfx = type;
+            document.getElementById('txtActiveVfx').innerText = displayName;
+            document.querySelectorAll('#vfxButtons button').forEach(b => {
+                b.classList.remove('active', 'border-white');
+                b.classList.add('border-transparent');
+            });
+            event.currentTarget.classList.add('active', 'border-white');
+            event.currentTarget.classList.remove('border-transparent');
+        }
+
+        function setPath(type) {
+            state.path = type;
+            document.querySelectorAll('#pathButtons button').forEach(b => {
+                b.classList.remove('active', 'border-cyan-400', 'bg-cyan-950/40', 'text-cyan-400');
+                b.classList.add('border-slate-800', 'text-slate-400');
+            });
+            event.currentTarget.classList.add('active', 'border-cyan-400', 'bg-cyan-950/40', 'text-cyan-400');
+            event.currentTarget.classList.remove('border-slate-800', 'text-slate-400');
+        }
+
+        function updateInpText(id, val) {
+            document.getElementById(id).innerText = val;
+        }
+
+        function triggerUltimate() {
+            const count = parseInt(document.getElementById('inpCount').value);
+            const scatter = parseInt(document.getElementById('inpScatter').value);
+            
+            const startPos = { x: player.x, y: player.y - 6 };
+            const endPos = { x: enemy.x, y: enemy.y - 6 };
+
+            engine.spawnMulti(count, scatter, startPos, endPos, state.path, state.vfx);
+        }
+
+        function triggerExplodeSimulation() {
+            vfx.createExplosion(enemy.x, enemy.y - 6, state.vfx);
+            triggerShake(8, 12);
+        }
+    </script>
+</body>
+</html>

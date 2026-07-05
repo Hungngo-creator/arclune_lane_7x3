@@ -1,0 +1,616 @@
+
+📁 file: arclune_lane_7x3/test/build.test.js
+----------------------------------------
+  [dòng 12] async function runBuild(){
+  [dòng 30] if (code === 0){
+
+📁 file: arclune_lane_7x3/test/startGame.test.js
+----------------------------------------
+  [dòng 14] export function stepTurn() {}
+  [dòng 15] export function doActionOrSkip() {}
+  [dòng 18] export function enqueueImmediate() {}
+  [dòng 19] export function processActionChain() {}
+  [dòng 22] export function refillDeckEnemy() {}
+  [dòng 23] export function aiMaybeAct() {}
+  [dòng 49] export function makeInstanceStats() { return {}; }
+  [dòng 50] export function initialRageFor() { return 0; }
+  [dòng 53] export function basicAttack() {}
+  [dòng 54] export function pickTarget() { return null; }
+  [dòng 55] export function dealAbilityDamage() {}
+  [dòng 56] export function healUnit() {}
+  [dòng 57] export function grantShield() {}
+  [dòng 58] export function applyDamage() {}
+  [dòng 61] export function basicAttack() {}
+  [dòng 62] export function pickTarget() { return null; }
+  [dòng 63] export function dealAbilityDamage() {}
+  [dòng 64] export function healUnit() {}
+  [dòng 65] export function grantShield() {}
+  [dòng 66] export function applyDamage() {}
+  [dòng 73] export function getMetaById() { return null; }
+  [dòng 74] export function isSummoner() { return false; }
+  [dòng 75] export function applyRankAndMods(meta) { return meta; }
+  [dòng 78] export function makeGrid(canvas, cols, rows) {
+  [dòng 81] export function drawGridOblique() {}
+  [dòng 82] export function drawTokensOblique() {}
+  [dòng 83] export function drawQueuedOblique() {}
+  [dòng 84] export function hitToCellOblique() { return { cx: 0, cy: 0 }; }
+  [dòng 85] export function projectCellOblique() { return { x: 0, y: 0 }; }
+  [dòng 86] export function cellOccupied() { return false; }
+  [dòng 87] export function spawnLeaders(tokens) {
+  [dòng 93] export function pickRandom() { return []; }
+  [dòng 94] export function slotIndex() { return 0; }
+  [dòng 95] export function slotToCell() { return { cx: 0, cy: 0 }; }
+  [dòng 96] export function cellReserved() { return false; }
+  [dòng 101] export function drawEnvironmentProps() {}
+  [dòng 104] export function getUnitArt() { return {}; }
+  [dòng 105] export function setUnitSkin() { return true; }
+  [dòng 109] export function initHUD(doc, root) {
+  [dòng 113] export function startSummonBar(doc, options, root) {
+  [dòng 116] export function __getInitHudCalls() {
+  [dòng 121] export function vfxAddSpawn() {}
+  [dòng 122] export function vfxAddHit() {}
+  [dòng 123] export function vfxAddMelee() {}
+  [dòng 124] export function vfxDraw() {}
+  [dòng 127] export function drawBattlefieldScene() {}
+  [dòng 132] addEventListener(type, handler) {
+  [dòng 136] removeEventListener(type, handler) {
+  [dòng 141] dispatchEvent(event) {
+  [dòng 144] for (const handler of set) {
+  [dòng 153] export function emitGameEvent() {}
+  [dòng 156] export function safeNow() { return 0; }
+  [dòng 160] function createImportReplacement(specifiers, moduleVar) {
+  [dòng 163] if (!cleaned) {
+  [dòng 167] if (cleaned.startsWith('{')) {
+  [dòng 171] if (cleaned.startsWith('*')) {
+  [dòng 178] if (!IMPORT_LOCAL_IDENTIFIER_REGEX.test(head)) {
+  [dòng 183] if (!tail) {
+  [dòng 186] if (tail.startsWith('{')) {
+  [dòng 190] if (tail.startsWith('*')) {
+  [dòng 201] function splitImportClause(clause) {
+  [dòng 203] for (let i = 0; i < clause.length; i += 1) {
+  [dòng 205] if (ch === '{') {
+  [dòng 218] function parseNamespaceImport(clause, specifiers) {
+  [dòng 220] if (!namespaceMatch) {
+  [dòng 226] function parseNamedImports(block) {
+  [dòng 228] if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
+  [dòng 241] const local = (localRaw || importedRaw).trim();
+  [dòng 246] function appendNamedImportLines(lines, namedBlock, moduleVar) {
+  [dòng 248] for (const { imported, local } of entries) {
+  [dòng 253] function resolveImport(fromId, specifier) {
+  [dòng 254] if (!specifier.startsWith('.')) {
+  [dòng 263] function transpileSource(code, filename) {
+  [dòng 277] function transformModule(code, id) {
+  [dòng 301] for (const part of parts) {
+  [dòng 305] const local = (localRaw || importedRaw).trim();
+  [dòng 306] if (!usedAliases.has(local)) {
+  [dòng 317] if (/^type\b/.test(cleanedClause)) {
+  [dòng 332] for (const part of parts) {
+  [dòng 336] const alias = (aliasRaw || localRaw).trim();
+  [dòng 337] if (!usedAliases.has(alias)) {
+  [dòng 347] if (!usedAliases.has(name)) {
+  [dòng 356] if (!usedAliases.has(name)) {
+  [dòng 374] function createCanvasContext() {
+  [dòng 377] save() {},
+  [dòng 378] restore() {},
+  [dòng 379] clearRect() {},
+  [dòng 380] setTransform() {},
+  [dòng 381] resetTransform() {},
+  [dòng 382] scale() {},
+  [dòng 383] createLinearGradient() {
+  [dòng 386] beginPath() {},
+  [dòng 387] moveTo() {},
+  [dòng 388] lineTo() {},
+  [dòng 389] closePath() {},
+  [dòng 390] fill() {},
+  [dòng 391] stroke() {},
+  [dòng 392] arc() {},
+  [dòng 393] rect() {},
+  [dòng 394] createPattern() { return null; },
+  [dòng 395] createRadialGradient() {
+  [dòng 398] measureText() {
+  [dòng 407] function createCanvasElement() {
+  [dòng 414] addEventListener(type, handler) {
+  [dòng 417] removeEventListener(type, handler) {
+  [dòng 423] getContext() {
+  [dòng 426] getBoundingClientRect() {
+  [dòng 431] get() {
+  [dòng 436] get() {
+  [dòng 443] function createDocument(boardFlag) {
+  [dòng 455] addEventListener() {},
+  [dòng 456] appendChild(node) {
+  [dòng 459] querySelector() {
+  [dòng 462] contains() {
+  [dòng 469] addEventListener(type, handler) {
+  [dòng 472] removeEventListener(type, handler) {
+  [dòng 478] dispatchEvent(event) {
+  [dòng 480] for (const handler of arr.slice()) {
+  [dòng 484] getElementById(id) {
+  [dòng 485] switch (id) {
+  [dòng 502] createElement(tag) {
+  [dòng 510] toggle() {},
+  [dòng 511] add() {},
+  [dòng 512] remove() {},
+  [dòng 513] contains() {
+  [dòng 517] addEventListener() {},
+  [dòng 518] appendChild() {},
+  [dòng 519] remove() {},
+  [dòng 520] querySelector() {
+  [dòng 523] setAttribute() {},
+  [dòng 529] appendChild() {},
+  [dòng 530] contains() {
+  [dòng 538] function createWindow() {
+  [dòng 541] addEventListener(type, handler) {
+  [dòng 544] removeEventListener(type, handler) {
+  [dòng 550] dispatchEvent(event) {
+  [dòng 552] for (const handler of arr.slice()) {
+  [dòng 561] function createSandbox(boardFlag) {
+  [dòng 566] now() {
+  [dòng 575] requestAnimationFrame(callback) {
+  [dòng 579] cancelAnimationFrame() {},
+  [dòng 580] setInterval() {
+  [dòng 583] clearInterval() {},
+  [dòng 584] setTimeout() {
+  [dòng 587] clearTimeout() {},
+  [dòng 626] function getListenerCount(target, type) {
+  [dòng 633] async function compileModuleScripts() {
+  [dòng 643] for (const [id, source] of stubModules.entries()) {
+  [dòng 656] function createRequire(moduleScripts, sandbox) {
+  [dòng 658] function __require(id) {
+  [dòng 659] if (!moduleScripts.has(id)) {
+  [dòng 663] if (!record) {
+  [dòng 671] if (!record.initialized) {
+  [dòng 692] async function loadMainModule(boardFlag) {
+  [dòng 743] querySelector(selector) {
+  [dòng 744] if (selector === '#board' && rootReady.value) {
+  [dòng 749] contains() {
+
+📁 file: arclune_lane_7x3/test/session-background.test.js
+----------------------------------------
+  [dòng 19] function cacheEntryFor(key) {
+  [dòng 45] get() {
+
+📁 file: arclune_lane_7x3/test/hud-listeners.test.js
+----------------------------------------
+  [dòng 8] function createGameEvents(){
+  [dòng 11] addEventListener(type, handler){
+  [dòng 15] removeEventListener(type, handler){
+  [dòng 24] dispatch(type, detail){
+  [dòng 27] for (const handler of [...set]){
+  [dòng 31] count(type){
+  [dòng 37] function loadUiModule(deps){
+  [dòng 94] function createDocument(){
+  [dòng 103] get(){
+  [dòng 106] set(value){
+  [dòng 113] setProperty(key, value){
+  [dòng 120] toggle(name, state){
+  [dòng 128] getElementById(id){
+  [dòng 129] switch (id){
+  [dòng 145] constructor(tagName = 'div'){
+  [dòng 155] if (typeof force === 'boolean'){
+  [dòng 156] if (force){
+  [dòng 163] if (this._classSet.has(cls)){
+  [dòng 184] for (const cls of value.split(/\s+/).filter(Boolean)){
+  [dòng 193] appendChild(node){
+  [dòng 200] removeChild(node){
+  [dòng 202] if (idx >= 0){
+  [dòng 210] addEventListener(type, handler){
+  [dòng 215] removeEventListener(type, handler){
+  [dòng 222] dispatchEvent(event){
+  [dòng 225] for (const handler of [...set]){
+  [dòng 230] contains(node){
+  [dòng 232] for (const child of this.children){
+  [dòng 234] if (typeof child.contains === 'function' && child.contains(node)){
+  [dòng 241] closest(selector){
+  [dòng 242] if (selector === 'button.card' && this.tagName === 'BUTTON' && this.classList.contains('card')){
+  [dòng 245] if (this.parentNode && typeof this.parentNode.closest === 'function'){
+  [dòng 251] querySelector(selector){
+  [dòng 252] if (selector === '.cost'){
+  [dòng 255] if (selector?.startsWith?.('#')){
+  [dòng 262] getBoundingClientRect(){
+  [dòng 269] if (typeof value === 'string'){
+  [dòng 271] if (match){
+  [dòng 286] constructor(){
+  [dòng 292] register(id, element){
+  [dòng 298] getElementById(id){
+  [dòng 302] createElement(tag){
+  [dòng 306] appendChild(node){
+  [dòng 311] function createSummonBarEnvironment(){
+  [dòng 339] addGameEventListener(type, handler){
+  [dòng 345] assertElement(value){
+  [dòng 346] if (!(value instanceof FakeElement)){
+  [dòng 396] constructor(callback){
+  [dòng 402] observe(){
+  [dòng 406] disconnect(){
+  [dòng 412] constructor(callback){
+  [dòng 418] observe(target){
+  [dòng 422] disconnect(){
+  [dòng 426] trigger(){
+  [dòng 449] for (const type of [TURN_START, TURN_END, ACTION_END]){
+  [dòng 454] for (const type of [TURN_START, TURN_END, ACTION_END]){
+  [dòng 459] for (const type of [TURN_START, TURN_END, ACTION_END]){
+  [dòng 469] for (const type of [TURN_START, TURN_END, ACTION_END]){
+  [dòng 474] for (const type of [TURN_START, TURN_END, ACTION_END]){
+
+📁 file: arclune_lane_7x3/test/pve-session-config.test.js
+----------------------------------------
+  [dòng 12] drawEnvironmentProps() {},
+  [dòng 13] getEnvironmentBackground(key) {
+  [dòng 16] __setBackgroundConfig(key, config) {
+  [dòng 19] __clearBackgroundConfigs() {
+  [dòng 26] stepTurn() {},
+  [dòng 27] doActionOrSkip() {}
+  [dòng 30] enqueueImmediate() {},
+  [dòng 31] processActionChain() {}
+  [dòng 34] refillDeckEnemy() {},
+  [dòng 35] aiMaybeAct() {}
+  [dòng 61] makeInstanceStats() { return {}; },
+  [dòng 62] initialRageFor() { return 0; }
+  [dòng 65] basicAttack() {},
+  [dòng 66] pickTarget() { return null; },
+  [dòng 67] dealAbilityDamage() {},
+  [dòng 68] healUnit() {},
+  [dòng 69] grantShield() {},
+  [dòng 70] applyDamage() {}
+  [dòng 77] getMetaById() { return null; },
+  [dòng 78] isSummoner() { return false; },
+  [dòng 79] applyRankAndMods(meta) { return meta; }
+  [dòng 82] makeGrid() {
+  [dòng 85] drawGridOblique() {},
+  [dòng 86] drawTokensOblique() {},
+  [dòng 87] drawQueuedOblique() {},
+  [dòng 88] hitToCellOblique() { return { cx: 0, cy: 0 }; },
+  [dòng 89] projectCellOblique() { return { x: 0, y: 0 }; },
+  [dòng 90] cellOccupied() { return false; },
+  [dòng 91] spawnLeaders(tokens) {
+  [dòng 97] pickRandom() { return []; },
+  [dòng 98] slotIndex() { return 0; },
+  [dòng 99] slotToCell() { return { cx: 0, cy: 0 }; },
+  [dòng 100] cellReserved() { return false; },
+  [dòng 106] getUnitArt() { return {}; },
+  [dòng 107] setUnitSkin() { return true; }
+  [dòng 110] initHUD() {
+  [dòng 113] startSummonBar() {
+  [dòng 118] vfxDraw() {},
+  [dòng 119] vfxAddSpawn() {},
+  [dòng 120] vfxAddHit() {},
+  [dòng 121] vfxAddMelee() {}
+  [dòng 124] drawBattlefieldScene() {},
+  [dòng 125] getCachedBattlefieldScene() { return null; }
+  [dòng 129] addEventListener() {},
+  [dòng 130] removeEventListener() {},
+  [dòng 131] dispatchEvent() {}
+  [dòng 137] emitGameEvent() {}
+  [dòng 140] ensureNestedModuleSupport() {}
+  [dòng 143] safeNow() { return 0; }
+  [dòng 149] function transpileSource(code, filename) {
+  [dòng 163] function splitImportClause(clause) {
+  [dòng 165] for (let i = 0; i < clause.length; i += 1) {
+  [dòng 167] if (ch === '{') {
+  [dòng 183] function parseNamedImports(block) {
+  [dòng 185] if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
+  [dòng 198] const local = (localRaw || importedRaw).trim();
+  [dòng 203] function parseNamespaceImport(clause, specifiers) {
+  [dòng 205] if (!namespaceMatch) {
+  [dòng 211] function appendNamedImportLines(lines, namedBlock, moduleVar) {
+  [dòng 213] for (const { imported, local } of entries) {
+  [dòng 218] function createImportReplacement(specifiers, moduleVar) {
+  [dòng 221] if (!cleaned) {
+  [dòng 225] if (cleaned.startsWith('{')) {
+  [dòng 229] if (cleaned.startsWith('*')) {
+  [dòng 236] if (!IMPORT_LOCAL_IDENTIFIER_REGEX.test(head)) {
+  [dòng 241] if (!tail) {
+  [dòng 244] if (tail.startsWith('{')) {
+  [dòng 248] if (tail.startsWith('*')) {
+  [dòng 256] function resolveImport(fromId, specifier) {
+  [dòng 257] if (!specifier.startsWith('.')) {
+  [dòng 266] function transformModule(code, id) {
+  [dòng 276] for (const part of parts) {
+  [dòng 280] const local = (localRaw || importedRaw).trim();
+  [dòng 281] if (!usedAliases.has(local)) {
+  [dòng 303] for (const part of parts) {
+  [dòng 307] const alias = (aliasRaw || localRaw).trim();
+  [dòng 308] if (!usedAliases.has(alias)) {
+  [dòng 318] if (!usedAliases.has(name)) {
+  [dòng 327] if (!usedAliases.has(name)) {
+  [dòng 345] function loadModule(id) {
+  [dòng 346] if (stubModules.has(id)) {
+  [dòng 349] if (moduleCache.has(id)) {
+  [dòng 362] __require(specifier) {
+  [dòng 363] if (stubModules.has(specifier)) {
+  [dòng 366] if (!specifier.startsWith('.')) {
+  [dòng 399] function clearModuleCache() {
+  [dòng 403] function loadSessionModule() {
+
+📁 file: arclune_lane_7x3/test/shell-error-handling.test.js
+----------------------------------------
+  [dòng 9] function loadShell(){
+  [dòng 55] if (callCount > 1){
+  [dòng 70] onError(error, context){
+  [dòng 95] if (firstState.screenParams) {
+  [dòng 125] if (state.screenParams) {
+
+📁 file: arclune_lane_7x3/test/pve-session-canvas.test.js
+----------------------------------------
+  [dòng 15] if (!runtimeSource.includes(warningMessage)) {
+
+📁 file: arclune_lane_7x3/test/styleMock.js
+----------------------------------------
+
+📁 file: arclune_lane_7x3/test/pve-status-icons-preview.test.js
+----------------------------------------
+
+📁 file: arclune_lane_7x3/test/helpers/pve-session-loader.js
+----------------------------------------
+  [dòng 12] drawEnvironmentProps() {},
+  [dòng 13] getEnvironmentBackground(key) {
+  [dòng 16] __setBackgroundConfig(key, config) {
+  [dòng 19] __clearBackgroundConfigs() {
+  [dòng 25] stepTurn() {},
+  [dòng 26] doActionOrSkip() {}
+  [dòng 34] basicAttack() {},
+  [dòng 35] pickTarget() { return null; },
+  [dòng 36] dealAbilityDamage() {},
+  [dòng 37] healUnit() {},
+  [dòng 38] grantShield() {},
+  [dòng 39] applyDamage() {}
+  [dòng 45] enqueueImmediate() {},
+  [dòng 46] processActionChain() {}
+  [dòng 49] refillDeckEnemy() {},
+  [dòng 50] aiMaybeAct() {}
+  [dòng 74] makeInstanceStats() { return {}; },
+  [dòng 75] initialRageFor() { return 0; }
+  [dòng 84] getMetaById() { return null; },
+  [dòng 85] isSummoner() { return false; },
+  [dòng 86] applyRankAndMods(meta) { return meta; }
+  [dòng 89] makeGrid() {
+  [dòng 92] drawGridOblique() {},
+  [dòng 93] drawTokensOblique() {},
+  [dòng 94] drawQueuedOblique() {},
+  [dòng 95] hitToCellOblique() { return { cx: 0, cy: 0 }; },
+  [dòng 96] projectCellOblique() { return { x: 0, y: 0 }; },
+  [dòng 97] cellOccupied() { return false; },
+  [dòng 98] spawnLeaders(tokens) {
+  [dòng 104] pickRandom() { return []; },
+  [dòng 105] slotIndex() { return 0; },
+  [dòng 106] slotToCell() { return { cx: 0, cy: 0 }; },
+  [dòng 107] cellReserved() { return false; },
+  [dòng 113] getUnitArt() { return {}; },
+  [dòng 114] setUnitSkin() { return true; }
+  [dòng 117] initHUD() {
+  [dòng 120] startSummonBar() {
+  [dòng 125] vfxDraw() {},
+  [dòng 126] vfxAddSpawn() {},
+  [dòng 127] vfxAddHit() {},
+  [dòng 128] vfxAddMelee() {}
+  [dòng 131] drawBattlefieldScene() {},
+  [dòng 132] getCachedBattlefieldScene() { return null; }
+  [dòng 136] addEventListener() {},
+  [dòng 137] removeEventListener() {},
+  [dòng 138] dispatchEvent() {}
+  [dòng 144] emitGameEvent() {}
+  [dòng 147] ensureNestedModuleSupport() {}
+  [dòng 150] safeNow() { return 0; }
+  [dòng 156] function getCachedModule(id) {
+  [dòng 161] function transpileSource(code, filename) {
+  [dòng 175] function splitImportClause(clause) {
+  [dòng 177] for (let i = 0; i < clause.length; i += 1) {
+  [dòng 179] if (ch === '{') {
+  [dòng 195] function parseNamedImports(block) {
+  [dòng 197] if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
+  [dòng 210] const local = (localRaw || importedRaw).trim();
+  [dòng 215] function parseNamespaceImport(clause, specifiers) {
+  [dòng 217] if (!namespaceMatch) {
+  [dòng 223] function appendNamedImportLines(lines, namedBlock, moduleVar) {
+  [dòng 225] for (const { imported, local } of entries) {
+  [dòng 230] function createImportReplacement(specifiers, moduleVar) {
+  [dòng 233] if (!cleaned) {
+  [dòng 237] if (cleaned.startsWith('{')) {
+  [dòng 241] if (cleaned.startsWith('*')) {
+  [dòng 248] if (!IMPORT_LOCAL_IDENTIFIER_REGEX.test(head)) {
+  [dòng 253] if (!tail) {
+  [dòng 256] if (tail.startsWith('{')) {
+  [dòng 260] if (tail.startsWith('*')) {
+  [dòng 268] function resolveImport(fromId, specifier) {
+  [dòng 269] if (!specifier.startsWith('.')) {
+  [dòng 278] function transformModule(code, id) {
+  [dòng 302] for (const part of parts) {
+  [dòng 306] const local = (localRaw || importedRaw).trim();
+  [dòng 307] if (!usedAliases.has(local)) {
+  [dòng 318] if (/^type\b/.test(cleanedClause)) {
+  [dòng 333] for (const part of parts) {
+  [dòng 337] const alias = (aliasRaw || localRaw).trim();
+  [dòng 338] if (!usedAliases.has(alias)) {
+  [dòng 348] if (!usedAliases.has(name)) {
+  [dòng 357] if (!usedAliases.has(name)) {
+  [dòng 375] function loadModule(id) {
+  [dòng 376] if (stubModules.has(id)) {
+  [dòng 380] if (cached) {
+  [dòng 394] __require(specifier) {
+  [dòng 395] if (stubModules.has(specifier)) {
+  [dòng 398] if (!specifier.startsWith('.')) {
+  [dòng 432] function clearModuleCache() {
+  [dòng 436] function getModuleContext(id) {
+  [dòng 441] function loadSessionModule() {
+
+📁 file: arclune_lane_7x3/tools/esbuild-stub/index.js
+----------------------------------------
+  [dòng 6] function getTypeScriptTranspiler() {
+  [dòng 7] if (!ts) {
+  [dòng 13] function initializationError() {
+  [dòng 17] function createIdentitySourceMap(code, sourcefile = '<stdin>') {
+  [dòng 27] function performTransform(code, options = {}) {
+  [dòng 28] if (typeof code !== 'string') {
+  [dòng 34] if (loader === 'ts' || loader === 'tsx') {
+  [dòng 44] if (loader === 'tsx') {
+  [dòng 56] if (err && (err.code === 'MISSING_TYPESCRIPT_RUNTIME' || err.name === 'MISSING_TYPESCRIPT_RUNTIME')) {
+  [dòng 66] const warnings = (transpileResult.diagnostics || []).map((diagnostic) => {
+  [dòng 69] if (diagnostic.file && typeof diagnostic.start === 'number') {
+  [dòng 93] if (mapText && sourcemap === 'inline') {
+  [dòng 106] if (mapText && sourcemap === 'inline') {
+  [dòng 117] async function transform(code, options = {}) {
+  [dòng 121] function transformSync(code, options = {}) {
+  [dòng 125] async function build(options = {}) {
+  [dòng 127] if (!stdin || typeof stdin.contents !== 'string') {
+  [dòng 130] if (write) {
+  [dòng 153] if (transformed.map && options.sourcemap === 'external') {
+  [dòng 165] if (metafile) {
+
+📁 file: arclune_lane_7x3/tools/tsx-stub/bin.js
+----------------------------------------
+  [dòng 15] function printHelp() {
+  [dòng 29] function printVersion() {
+  [dòng 33] function resolveEntry(raw) {
+  [dòng 35] if (!candidate) {
+  [dòng 42] if (!fs.existsSync(abs)) {
+  [dòng 50] function runNode(entry, scriptArgs, { watch }) {
+  [dòng 54] if (watch) {
+  [dòng 66] if (signal) {
+  [dòng 74] function main() {
+  [dòng 78] if (args.includes('--help') || args.includes('-h')) {
+  [dòng 82] if (args.includes('--version') || args.includes('-v')) {
+  [dòng 87] if (args.length === 0 && envEntry) {
+  [dòng 89] if (!resolved) {
+  [dòng 96] if (args.length === 0) {
+  [dòng 101] if (args[0] === 'watch') {
+  [dòng 108] if (!resolved) {
+  [dòng 122] if (!resolved) {
+
+📁 file: arclune_lane_7x3/tools/zod-stub/index.js
+----------------------------------------
+  [dòng 10] constructor(issues) {
+  [dòng 22] function formatIssueMessage(issue) {
+  [dòng 23] if (!issue) {
+  [dòng 32] function normalizeIssue(issue) {
+  [dòng 33] if (!issue || typeof issue !== 'object') {
+  [dòng 45] function createZodError(issues) {
+  [dòng 51] optional() {
+  [dòng 55] parse(value) {
+  [dòng 60] _parse() {
+  [dòng 66] constructor(inner) {
+  [dòng 71] _parse(value) {
+  [dòng 72] if (value === undefined) {
+  [dòng 80] _parse(value) {
+  [dòng 81] if (typeof value !== 'string') {
+  [dòng 89] _parse(value) {
+  [dòng 90] if (typeof value !== 'number' || Number.isNaN(value)) {
+  [dòng 98] _parse(value) {
+  [dòng 99] if (typeof value !== 'boolean') {
+  [dòng 107] constructor(expected) {
+  [dòng 112] _parse(value) {
+  [dòng 113] if (value !== this.expected) {
+  [dòng 121] constructor(values) {
+  [dòng 123] if (!Array.isArray(values) || values.length === 0) {
+  [dòng 130] _parse(value) {
+  [dòng 131] if (typeof value !== 'string' || !this.valueSet.has(value)) {
+  [dòng 139] constructor(itemSchema) {
+  [dòng 144] _parse(value) {
+  [dòng 145] if (!Array.isArray(value)) {
+  [dòng 153] constructor(options) {
+  [dòng 155] if (!Array.isArray(options) || options.length === 0) {
+  [dòng 161] _parse(value) {
+  [dòng 163] for (const option of this.options) {
+  [dòng 170] if (lastError) {
+  [dòng 178] constructor(items) {
+  [dòng 180] if (!Array.isArray(items)) {
+  [dòng 186] _parse(value) {
+  [dòng 187] if (!Array.isArray(value)) {
+  [dòng 190] if (value.length !== this.items.length) {
+  [dòng 194] for (let index = 0; index < this.items.length; index += 1) {
+  [dòng 202] constructor(valueSchema) {
+  [dòng 207] _parse(value) {
+  [dòng 208] if (!isPlainObject(value)) {
+  [dòng 212] for (const key of Object.keys(value)) {
+  [dòng 220] constructor(shape, refiners = []) {
+  [dòng 226] _parse(value) {
+  [dòng 227] if (!isPlainObject(value)) {
+  [dòng 231] for (const key of Object.keys(this.shape)) {
+  [dòng 235] if (!hasKey && !(schema instanceof ZodOptional)) {
+  [dòng 240] if (this.refiners.length > 0) {
+  [dòng 249] for (const refiner of this.refiners) {
+  [dòng 252] if (issues.length > 0) {
+  [dòng 259] merge(other) {
+  [dòng 260] if (!(other instanceof ZodObject)) {
+  [dòng 266] superRefine(refiner) {
+  [dòng 267] if (typeof refiner !== 'function') {
+  [dòng 274] function isPlainObject(value) {
+
+📁 file: arclune_lane_7x3/tools/zod-stub/superRefine.test.js
+----------------------------------------
+  [dòng 18] if (data.name !== 'hợp lệ') {
+
+📁 file: arclune_lane_7x3/tools/typescript-transpiler/index.js
+----------------------------------------
+
+📁 file: arclune_lane_7x3/tools/typescript-transpiler/runtime.js
+----------------------------------------
+
+📁 file: arclune_lane_7x3/tools/typescript-transpiler/strip-typescript.js
+----------------------------------------
+  [dòng 20] function createScanner(source) {
+  [dòng 24] function peek(offset = 0) {
+  [dòng 30] function consume(count = 1) {
+  [dòng 36] function eof() {
+  [dòng 43] function skipWhitespace(scanner) {
+  [dòng 44] while (!scanner.eof()) {
+  [dòng 46] if (ch === " " || ch === "\t" || ch === "\r" || ch === "\n") {
+  [dòng 54] function skipLineComment(scanner) {
+  [dòng 55] while (!scanner.eof()) {
+  [dòng 61] function skipBlockComment(scanner) {
+  [dòng 62] while (!scanner.eof()) {
+  [dòng 64] if (ch === "*" && scanner.peek() === "/") {
+  [dòng 71] function skipString(scanner, quote) {
+  [dòng 73] while (!scanner.eof()) {
+  [dòng 75] if (escaped) {
+  [dòng 79] if (ch === "\\") {
+  [dòng 83] if (ch === quote) {
+  [dòng 86] if (quote === "`" && ch === "$") {
+  [dòng 87] if (scanner.peek() === "{") {
+  [dòng 95] function skipTemplateExpression(scanner) {
+  [dòng 97] while (!scanner.eof() && depth > 0) {
+  [dòng 99] if (ch === "`") {
+  [dòng 103] if (ch === "\"") {
+  [dòng 107] if (ch === "'") {
+  [dòng 111] if (ch === "/") {
+  [dòng 113] if (next === "/") {
+  [dòng 117] if (next === "*") {
+  [dòng 128] function removeBlock(source, startIndex) {
+  [dòng 132] while (!scanner.eof()) {
+  [dòng 134] if (ch === "\"") {
+  [dòng 138] if (ch === "'") {
+  [dòng 142] if (ch === "`") {
+  [dòng 146] if (ch === "/") {
+  [dòng 148] if (next === "/") {
+  [dòng 152] if (next === "*") {
+  [dòng 158] if (ch === "{") {
+  [dòng 161] if (depth === 0) {
+  [dòng 170] function removeTypeBlocks(source, keyword) {
+  [dòng 175] while ((match = pattern.exec(source))) {
+  [dòng 181] if (keyword === "type" && source[scanner.index] === "=") {
+  [dòng 184] while (!scanner.eof()) {
+  [dòng 186] if (ch === "\"") {
+  [dòng 190] if (ch === "'") {
+  [dòng 194] if (ch === "`") {
+  [dòng 198] if (ch === "/") {
+  [dòng 200] if (next === "/") {
+  [dòng 204] if (next === "*") {
+  [dòng 210] if (ch === "{" || ch === "(" || ch === "[") {
+  [dòng 220] if (source[scanner.index] === "{") {
+  [dòng 224] if (maybeSemicolon === ";") {
+  [dòng 239] function stripTypeAnnotations(source) {
+  [dòng 276] function transpile(source) {
+
+📁 file: arclune_lane_7x3/tools/typescript-transpiler/vendor/typescript.js
+----------------------------------------
+  [dòng 16] if (!realTypescript) {
+  [dòng 68] const fallbackFlatten = (message) => {
+  [dòng 69] if (message == null) {
+  [dòng 72] if (Array.isArray(message)) {
+  [dòng 83] fileExists(fileName) {
+  [dòng 90] readFile(fileName) {
+  [dòng 99] function createMissingTypescriptError() {
+  [dòng 109] function fallbackTranspileModule(source, options = {}) {
+  [dòng 121] if (compilerOptions.sourceMap || compilerOptions.inlineSourceMap) {
+  [dòng 140] while (true) {
+  [dòng 142] if (fileExists(candidate)) {
+  [dòng 146] if (parent === current) {
+  [dòng 184] if (typeof effectiveHost.fileExists === "function") {

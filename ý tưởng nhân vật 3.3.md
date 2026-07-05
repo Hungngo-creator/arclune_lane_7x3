@@ -1,7 +1,12 @@
-1) [SSR] TU LA – ĐỘC CÔ HUYẾT, Class: Chiến Sĩ, thuộc element Huyết
-1. ĐÁNH THƯỜNG: Huyết Trảm, Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
+debuff và buff cũng có thể gắn tag pháp tắc, quy tắc và axiom.
+Sát thương chuẩn là bỏ qua res cùng arm của kẻ địch.
+Pháp Tắc/Quy Tắc/Axiom gọi chung là '3 tag ưu tiên'.
+nếu 1 char có cùng loại buff nhưng khác tag ưu tiên hoặc 1 cái có 1 trong 3 tag ưu tiên còn 1 cái không có thì cần chia riêng dù tác dụng là chung, ví dụ char A có 2 buff excute (kết liễu kẻ thù dưới hoặc =10% mx hp khi gây dam lên chúng) nhưng 1 buff excute là có tag pháp tắc và 1 buff lại không có và lúc đó char B có pháp tắc cấm kết liễu đồng minh của hắn (tức kẻ thù của char A) lúc này cần áp dụng quy trình phán định xung đột tag (so rank, sao, awaken, tu vi, lực chiến này kia, thứ tự không nhớ rõ) và char A thắng thì hắn vẫn có thể kết liễu đồng minh của char B vì buff excute cấp pháp tắc của hắn thắng, nếu kết liễu thành công thì buff excute sẽ biến mất vì đã được sử dụng còn buff excute còn lại vì không có tag pháp tắc hoặc tag nào khác có ưu tiên cao hơn pháp tắc nên buff này không có tác dụng cho đến khi kit cấm kết liễu của char B hết hiệu lực (char B chết, kỹ năng cooldown, hết ae để duy trì,etc...).
+
+1) TU LA – ĐỘC CÔ HUYẾT, Class: Chiến Sĩ, thuộc element Huyết
+1. ĐÁNH THƯỜNG: Huyết Trảm
 Logic: Gây sát thương = 100% (ATK + WIL) lên 1 kẻ địch. Kích hoạt 1 lần stack cho Nội tại Huyết Chiến.
-2. NỘI TẠI: Huyết Chiến Tu La, Tags: [Nội Tại], [Bản Thân], [Tuyệt Đối], [Buff/Debuff Vĩnh Viễn], [Quy Tắc: Cấm Hồi Sinh]. Logic: Cơ chế Scaling: Mỗi lần gây sát thương lên 1 mục tiêu (bất kể nguồn nào): Tăng +1% (ATK + WIL) vĩnh viễn. Giảm -0.5% (RES + ARM) vĩnh viễn. Giới hạn: Kích hoạt tối đa 1 lần/mục tiêu/turn và 9 lần/tổng cộng/turn. Không giới hạn số tầng (No Max Stack).
+2. NỘI TẠI: Tu La, Tags: [Nội Tại], [Bản Thân], [Tuyệt Đối], [Buff/Debuff Vĩnh Viễn], [Quy Tắc: Cấm Hồi Sinh]. Logic: Cơ chế Scaling: Mỗi lần gây sát thương lên 1 mục tiêu (bất kể nguồn nào): Tăng +1% (ATK + WIL) vĩnh viễn. Giảm -0.5% (RES + ARM) vĩnh viễn. Giới hạn: Kích hoạt tối đa 1 lần/mục tiêu/turn và 9 lần/tổng cộng/turn. Không giới hạn số tầng (No Max Stack).
 Cơ chế Tử Vong: Nếu nhân vật Chết và được Hồi sinh (bởi Skill 2 hoặc Quy Tắc): Tổng lượng chỉ số đã cộng từ nội tại này bị Giảm 50%.
 Cơ chế Hồi Phục: Khi Giết 1 mục tiêu: Tăng +30% HP Regen (Dựa trên chỉ số hồi phục hiện có). Cộng dồn tối đa 7 tầng.
 Quy Tắc Cấm: Nhân vật này KHÔNG THỂ được hồi sinh bởi các kỹ năng thông thường. Chỉ chấp nhận hồi sinh từ: Kỹ năng có tag [Quy Tắc] hoặc Skill 2: Niết Bàn Huyết Tế.
@@ -534,22 +539,56 @@ skill 3: luôn kích hoạt cho đến khi bể aether đồng minh không đủ
 ultimate: cast skill 2 miễn còn đủ 3 phi kiếm/lần cho đến khi không đủ phi kiếm thì nếu còn phi kiếm sẽ cast skill 1. skill cast từ ultimate sẽ không tốn ae. Ví dụ char này có 4 phi kiếm thì sau khi dùng ultimate sẽ cast 1 lần skill 2, nếu có 5 phi kiếm thì sau khi dùng ultimate sẽ cast skill 2 sau đó là skill 1 hoặc có thể cast cùng lúc skill 1 và 2 nếu code cho phép, nếu có 6 hoặc 7 phi kiếm thì sẽ cast 2 lần skill 2. nếu có 8 phi kiếm thì cast skill 2 2 lần rồi cast skill 1, thực ra ultimate char này chả có vfx gì, player chỉ thấy char này mất nộ do ultimate rồi cast skill theo mô tả ultimate theo lượng phi kiếm hiện có thôi, kiểu thấy char này đến turn thì mất nộ do bị trừ khi kích hoạt ultimate, kiểu đến turn là cast skill luôn không có khựng gì cả. Đương nhiên nộ vẫn phải trừ, các char khác nếu có ultimate là cast skill cũng thế, mất nộ là cast skill theo mô tả của ultimate luôn.
 
 45)
-mô tả: một thiền sư chuyên tu thổ hệ công pháp.
-warrior, ur, element tag: earth.
-nội tại: đánh thường sẽ follow up thêm 1 đòn đanh phụ gây sát thương = 50% đòn đánh thường chính, mỗi khi đánh thường hồi hp = 100% sát thương đòn đánh follow up gây ra, đòn đánh thường chính sẽ không có cơ chế hồi hp theo % sát thương gây ra tron nội tại này, có thể có hồi hp qua đánh thường nhưng từ buff/mark hoặc kit của char khác.
-lưu ý không nên code nội tại này để hồi hp = 50% đánh thường chính dù follow up gây sát thương = 50% đòn chính vì gây sát thương=50% đòn chính nhưng nếu thiết lập hồi của follow=50% sát thương đòn chính thay vì 100% của follow up thì sát thương gây ra của follow up và sát thương hồi sẽ có khác nhau. Pháp Tắc.
+NỘI TẠI: TÂM ĐỊA KHÔNG MINH
+Loại: Bị động (Passive)
+Cấp Tag: PHÁP TẮC
+Cơ chế kích hoạt: Ngay sau khi Đánh thường chính đánh trúng đích.
+Hiệu ứng:
+Tự động tung 1 đòn đánh phụ (Follow-up) vào cùng mục tiêu, gây sát thương = 50% Sát thương Đánh thường chính.
+Hồi HP cho bản thân = 100% lượng sát thương thực tế mà đòn Follow-up này gây ra.
+Quy tắc hệ thống: Đánh thường chính có lượng hồi phục cơ bản = 0. (Vẫn có thể nhận hồi HP từ Buff/Mark bên ngoài).
 
-Đánh thường:đấm mục tiêu gây sát thương = 100% wil/atk. (có follow up từ nội tại, nếu có kit từ char khác cấm follow up tác động đến (có tác pháp tắc trở lên) thì phán định có bị ảnh hưởng hay không theo
+ĐÁNH THƯỜNG: THỔ PHÁ QUYỀN
+Tác động: 1 mục tiêu đơn lẻ.
+Sát thương: 100% (WIL + ATK).
+Tương tác SSI: Kích hoạt Nội tại Follow-up. Nếu bị Kit của Char khác cấm Follow-up, hệ thống sẽ kích hoạt phán định Tag (Cấp Pháp Tắc).
 
-skill 1: đánh thường lên 1 mục tiêu (có follow up từ nội tại), cùng lúc đánh thường đó sẽ có 1 nham trụ mọc từ dưới đất lên đâm mục tiêu gây sát thương = 1 đánh thường của char này nhưng không có follow up, sát thương nham trụ gây ra không thể hưởng life steal, hay bỏ qua res/arm/ không bị buff/debuff ảnh hưởng lên nham trụ vì nó chỉ là 1 cục đá, 20 ae. Pháp Tắc.
+SKILL 1: LIÊM SƠN TRỤ
+Năng lượng tiêu hao: Có hành động \rightarrow Sinh 20 Mana cho bể tổng.
+Cấp Tag: PHÁP TẮC
+Cơ chế: Đánh thường 1 mục tiêu (Kích hoạt Đánh thường chính + Follow-up Nội tại). Đồng thời triệu hồi 1 Nham Trụ đâm mục tiêu đó.
+Sát thương Nham Trụ: Bằng 100% Sát thương Đánh thường chính.
+Quy tắc Nham Trụ: Kháng hoàn toàn mọi cơ chế tương tác (Không kích hoạt Follow-up, không hưởng hút máu/Life Steal, không bỏ qua phòng thủ, không bị ảnh hưởng bởi bất kỳ Buff/Debuff/Mark nào trên sân).
 
-skill 2: đứng tại chỗ, giơ mạnh nấm đấm lên cao, cùng lúc đó sẽ có 4 nham trụ đâm ngẫu nhiên 4 kẻ địch, mỗi kẻ nhận sát thương = 1 đánh thường của char này, nham trụ không tương tác với kit của mọi char, không hưởng debuff/buff/mark, cứ hiểu là nó như 1 đòn tấn công có thần tính vậy, gây sát thương cố định theo mô tả của skill 2/1 là = 1 đánh thường/mục tiêu, đương nhiên 1 cục đá không thể follow up (không thể follow up nên không thể hồi hp từ nội tại), 35 ae. Pháp tắc.
+SKILL 2: THIÊN ĐỊA CHẤN ĐỘNG
+Năng lượng tiêu hao: Có hành động \rightarrow Sinh 35 Mana cho bể tổng.
+Cấp Tag: PHÁP TẮC
+Cơ chế: Đứng tại chỗ, triệu hồi 4 Nham Trụ đâm ngẫu nhiên vào 4 kẻ địch trên bàn cờ.
+Sát thương: Mỗi Nham Trụ gây sát thương cố định = 100% Đánh thường chính.
+Quy tắc Nham Trụ: Mang thuộc tính Thần Tính (Kháng hoàn toàn mọi cơ chế tương tác của hệ thống, không kích hoạt Follow-up, không nhận Buff/Debuff/Mark, gây sát thương thuần túy theo chỉ số mô tả).
 
-skill 3: tích tụ sát thương nhận vào trong 3 turn, hiện số sát thương nhận vào ngay trên thanh hp bar, trên nữa là các icon buff/debuff(hiện đã có) trên nữa là sát thương đang tích của char này, sau 3 turn tự động - ae để kích hoạt skill này, heal bản thân = 70% sát thương đã tích tụ, nếu overheal sẽ được chuyển sang shield, cap khiên tối đa = 100% max hp, -20 ae/lần kích hoạt, mỗi trận tối đa tự kích hoạt 5 lần, khiên từ skill này chỉ mất khi nhận sát thương, nếu có khiên từ nguồn khác phải ưu tiên trừ khiên từ skill này trước. Bị Động, Quy Tắc. Vì arm/res sẽ tăng dần do ultimate dẫn đến sát thương nhận vào được tích tụ sẽ giảm nên đây là 1 loại cân bằng.
+SKILL 3: KHỔ HẠNH CHUYỂN DIÊN
+Loại: Bị động (Passive)
+Cấp Tag: QUY TẮC (Cao hơn 2 Skill trên)
+Cơ chế tích lũy: Tự động ghi lại 100% lượng sát thương nhận vào trong suốt 3 Turn của trận đấu (Hiển thị số liệu tích lũy phía trên icon Buff/Debuff của HP Bar).
+Cơ chế kích hoạt: Sau khi kết thúc Turn thứ 3, hệ thống tự động trừ 20 Mana của bể tổng để kích hoạt chiêu thức.
+Hiệu ứng:
+Hồi phục HP cho bản thân = 70% Tổng sát thương đã tích lũy.
+Nếu lượng hồi phục vượt quá Max HP (Overheal) \rightarrow Chuyển phần thừa thành Khiên (Shield). Cap Khiên tối đa = 100% Max HP của bản thân.
+Quy tắc Giới hạn: Tối đa tự kích hoạt 5 lần/trận.
+Quy tắc Ưu tiên Khiên: Khiên từ kỹ năng này không bị giới hạn thời gian (chỉ mất khi nhận sát thương). Nếu nhân vật có nhiều nguồn Khiên khác, hệ thống bắt buộc phải trừ Khiên của kỹ năng này trước.
 
-ultimate: bay lên cao, lao về phía ô số 5 của kẻ thù, ô 5 nhận sát thương chuẩn = 5% máu tối đa của char này + 150% wil/atk của char này, tăng res/arm với tỉ lệ sát thương gây ra là 1 wil/atk = 0.3 res/arm, hiệu ứng tăng res/arm này sẽ cộng trực tiếp vào chỉ số cơ bản của char này trong trận, không tính là buff/mark, reset lại khi rời sân, miễn không còn đứng trên sân là reset, (vfx, hoạt ảnh tấn công không tính).
+ULTIMATE: ĐỊA TẠNG DIỆT THẾ
+Cơ chế: Bay lên cao, lao thẳng xuống tấn công vào Ô số 5 (Vị trí trung tâm bàn cờ) của phe địch.
+Sát thương: Gây Sát thương chuẩn (True Damage) = 5% Max HP bản thân + 150% (WIL + ATK).
+Hiệu ứng Cường hóa (Permanent Buff):
+Mỗi 1 điểm Sát thương gây ra từ chiêu thức này sẽ chuyển hóa thành chỉ số Phòng thủ theo tỷ lệ: 1 \text{ dmg} = 0.3 \text{ RES} và 0.3 \text{ ARM}.
+Chỉ số này cộng trực tiếp vào Chỉ số Cơ bản của nhân vật (Không tính là hiệu ứng Buff/Mark, không thể bị xóa bởi kỹ năng xóa buff).
+Điều kiện Reset: Chỉ số cộng thêm này sẽ lập tức biến mất (Reset về ban đầu) khi nhân vật rời khỏi sân đấu.
 
-46)
+Khi Char dùng Ultimate \rightarrow Tăng mạnh RES/ARM cơ bản \rightarrow Các lượt sau Char sẽ nhận ít sát thương hơn \rightarrow Lượng sát thương tích lũy ở Skill 3 giảm đi \rightarrow Lượng Hồi máu/Khiên từ Skill 3 giảm xuống. Đây là cơ chế tự cân bằng hoàn hảo, tránh việc nhân vật trở nên bất tử lỗi.
+
+47)
 Support, ssr, element tag: mộc ( là plant nhỉ)
 nội tại: mỗi turn dù có hành động được hay không thì miễn còn sống, đứng trên sân luôn hồi hp = 50% wil/atk của bản thân/turn, tự kích hoạt mỗi turn, kích hoạt 1 lần/turn, không giới hạn lần kích hoạt/trận.
 
@@ -565,20 +604,48 @@ ultimate: xoá bỏ 1 debuff/đồng minh cho mọi đồng minh trên sân, cũ
 
 47) Hư Vô Cực
 summoner, ssr, element tag: blood.
-nội tại: mỗi turn tự triệu hồi 1 Ảnh Tử lên sân, mỗi ảnh tử có chỉ số = 50% của hư vô cực, không có aether/skill và không thể tăng ae cho team qua hành động. mỗi ảnh tử chỉ có thể đánh thường = 100% wil/atk của chúng tức = 50% của bản thể, chỉ số của ảnh tử lấy từ bản thể lúc đầu mỗi turn lúc đến turn của hắn chứ không phải biến động theo thời gian thực theo sự biến động chỉ số của bản thể nên chỉ số của mỗi ảnh tử đề sẽ khác nhau đôi chút do snap shot chỉ số của bản thể mỗi khi sinh ra, ảnh tử tồn tại tối đa 3 turn, nếu đầy sân thì ảnh tử mới sẽ thay thế ảnh tử cũ có hp thấp nhất. Hay là ảnh tử snap shot chỉ số của bản thể cố định nhỉ? như vậy khi đầy sân ảnh tử mới thay ảnh tử cũ chỉ cần hồi đầy hp của ảnh tử cũ là được rồi vì chỉ số của chúng là giống nhau, theo mày nên chọn cách nào?
-nội tại tag pháp tắc.
+NỘI TẠI: ẢNH TỬ VẠN GIỚI
+Loại: Bị động (Passive)
+Cấp Tag: PHÁP TẮC
+Cơ chế: Tự động kích hoạt ở đầu Turn hành động của Hư Vô Cực.
+Hiệu ứng:
+Triệu hồi 1 [Ảnh Tử] lên ô trống trên sân.
+Thuộc tính [Ảnh Tử]: Chỉ số thuộc tính = 50% Chỉ số cố định của Bản thể. Không có bể Mana (Aether) riêng, hành động không sinh Mana cho bể tổng. Chỉ có thể Đánh thường gây sát thương = 100% (WIL + ATK) của Ảnh Tử (tức bằng 50% của bản thể). Tồn tại tối đa 3 Turn.
+Quy tắc Đầy Sân: Nếu bàn cờ phe ta không còn ô trống, [Ảnh Tử] mới xuất hiện sẽ ghi đè vào [Ảnh Tử] có HP thấp nhất hiện tại, hồi đầy HP và reset lại thời gian tồn tại thành 3 Turn.
 
-đánh thường: gây sát thương = 100% wil và atk.
+ĐÁNH THƯỜNG: HUYẾT THỰC QUYỀN
+Tác động: 1 mục tiêu đơn lẻ.
+Sát thương: 100% (WIL + ATK).
 
-skill 1: bản thể tốn 1 turn để niệm chú, sau khi niệm chú xong các ảnh tử sẽ đồng loạt tấn công kẻ thù = 1 đánh thường của chúng, -4 ae/ mỗi ảnh tử tấn công kẻ thù từ skill này, ảnh tử đã tấn công trước từ skill này sẽ bị bỏ qua 1 turn. bản thể sau khi các ảnh tử tấn công kẻ thù sẽ được hồi hp = 3% max hp/mỗi ảnh tử tấn công kẻ thù từ skill này.
+SKILL 1: ẢNH VŨ MA TRẬN
+Năng lượng tiêu hao: Có hành động \rightarrow Tốn 1 Turn niệm chú (Bản thể đứng yên). Sau khi kết thúc niệm chú, tự động trừ Mana bể tổng dựa trên số lượng Ảnh Tử tấn công.
+Cơ chế: Ra lệnh cho toàn bộ [Ảnh Tử] trên sân đồng loạt Đánh thường vào mục tiêu.
+Giá trị Mana tiêu hao: Trừ 4 Mana của bể tổng ứng với mỗi [Ảnh Tử] tham gia tấn công.
+Hiệu ứng phụ: Hư Vô Cực được hồi HP = 3% Max HP của bản thể ứng với mỗi [Ảnh Tử] tham gia tấn công.
+Bù trừ hệ thống (Debuff): Những [Ảnh Tử] đã tham gia tấn công từ chiêu này sẽ bị đóng băng hành động (Bỏ qua Turn) ở lượt đi tuần tự tiếp theo của chúng.
 
-skill 2: liên kết hp bar của bản thân và tối đa 3 ảnh tử, khi bản thể nhận sát thương đơn (baản thể nhận aoe sẽ không chuyển được) 100% sát thương đơn đó sẽ được chia đều (tối đa là 3) lên các ảnh tử được liên kết, liên kết tồn tại mãi nhưng vì ảnh tử có giới hạn thời gian tồn tại nên liên kết sẽ tự biến mất khi các ảnh tử được liên kết biến mất và cần kích hoạt lại, 25 aether. pháp tắc.
+SKILL 2: HUYẾT NHỤC ĐỒNG BÀO
+Năng lượng tiêu hao: Tiêu tốn 25 Mana từ bể tổng khi kích hoạt.
+Cấp Tag: PHÁP TẮC
+Cơ chế: Thiết lập sợi dây liên kết HP giữa Bản thể và tối đa 3 [Ảnh Tử] hiện có trên sân.
+Hiệu ứng: Khi Bản thể nhận Sát thương đơn mục tiêu (Single-target Damage), 100% lượng sát thương đó sẽ được chia đều cho các [Ảnh Tử] đang được liên kết gánh chịu thay. (Sát thương diện rộng - AOE dội vào Bản thể sẽ không kích hoạt cơ chế chuyển dịch này).
+Thời gian duy trì: Vô hạn, cho đến khi các [Ảnh Tử] được liên kết hết thời gian tồn tại (3 turn) hoặc bị đánh chết.
 
-skill 3: hút hp của tối đa 3 ảnh tử có hp thấp nhất cho bản thân khi hp dưới 40%, nhưng có skill 2 mà hp lại thấp thì khả năng cao là ảnh tử không còn, hút hoàn toàn random và có thể hút từ ảnh tử liên kết bởi skill 2, 20 ae.
+SKILL 3: HUYẾT TẾ NGHỊCH CHUYỂN
+Năng lượng tiêu hao: Tiêu tốn 20 Mana từ bể tổng khi kích hoạt.
+Điều kiện kích hoạt: HP của Bản thể rơi xuống dưới 40%.
+Cơ chế: Hút máu của tối đa 3 [Ảnh Tử] có HP thấp nhất trên sân (Lựa chọn mục tiêu ngẫu nhiên, có thể chọn trúng các Ảnh Tử đang được liên kết bởi Skill 2).
+Hiệu ứng: Bản thể hấp thụ hoàn toàn lượng HP còn lại của các [Ảnh Tử] này để hồi phục cho bản thân. Các [Ảnh Tử] bị hút sạch HP sẽ biến mất ngay lập tức.
 
-ultimate: tiếp cận mục tiêu, gây sát thương = 200% wil/atk, các ảnh tử có trên sân cũng sẽ tấn công cùng mục tiêu bản thể đã tấn công = 1 đánh thường của chúng, sau khi tấn công các ảnh tử vẫn có thể đánh thường mà không bị bù trừ 1 turn như skill 1, hồi hp cho bản thân hư vô cực = 10% max hp của hắn. Pháp Tắc.
+ULTIMATE: VÔ CỰC THƯỢNG TÁC
+Cấp Tag: PHÁP TẮC
+Cơ chế: Bản thể tiếp cận mục tiêu, gây sát thương = 200% (WIL + ATK). Đồng thời, toàn bộ [Ảnh Tử] trên sân lập tức thực hiện 1 đòn Đánh thường phối hợp vào cùng mục tiêu đó.
+Quy tắc đặc biệt: Đòn tấn công phối hợp từ Ultimate này không làm [Ảnh Tử] bị mất lượt (Không bị dính debuff bỏ qua 1 turn như Skill 1).
+Hiệu ứng phụ: Hồi phục trực tiếp cho Hư Vô Cực = 10% Max HP của hắn.
 
-đánh thường: gây sát thương = 100% wil/atk.
+Snapshot chỉ số cố định của Hư Vô Cực lúc vừa vào trận.
+Tiết kiệm hiệu năng máy (Performance): Nếu mỗi turn đẻ 1 Ảnh Tử lại phải chụp lại chỉ số của bản thể, hệ thống sẽ phải liên tục tạo ra các "Object" nhân vật mới với các mảng chỉ số biến động khác nhau. Khi đầy sân, việc so sánh HP và thay thế sẽ rất nặng. Nếu dùng chỉ số cố định, các Ảnh Tử thực chất là cùng 1 loại "Monster/Minion Code", chỉ cần quản lý thanh HP của từng con là xong.
+Cơ chế thay thế thông minh: khi đầy sân, Ảnh Tử mới đè lên Ảnh Tử cũ có HP thấp nhất. Bản chất code chỉ cần "Hồi đầy máu và reset lại thời gian tồn tại (3 turn)" của con cũ đó là xong, không cần xóa đi tạo lại object mới.
 
 48) Dạ Hành Giả
 ssr, Assassin, element tag: dark
@@ -609,18 +676,312 @@ skill 3: mỗi khi kích hoạt nội tại thành công, tăng max hp = 2% max 
 ultimate: gào thét, phun long tức lên toàn bộ kẻ địch có mặt trên sân (tức chỉ phun lên ô có kẻ thù, không phun lên ô trống), mỗi kẻ nhận sát thương = 150% will/atk cùng áp 2 lần nội tại lên chúng.
 nếu kẻ thù đã có 1 stack nội tại của Niddhoggr từ trước thì khi dính ultimate của hắn thì nội tại sẽ kích hoạt vì đủ 3 stack, kẻ thù sẽ mất hp = 3% max hp của chúng (không giảm max hp) cùng nhận 1 debuff giảm 50% hồi phục nhận được từ nguồn ngoài, vì nội tại kích hoạt nên skill 3 cũng kích hoạt, Niddhoggr tăng max hp và phe của hắn bị trừ ae tương ứng.
 
-50) 
-Ur, tanker.
-nội tại: khi nhận sát thương, tích lũy 50% sát thương nhận vào và khi tích lũy = 30% max hp của hắn, thanh không tích lũy, chuyển 100% lượng sát thương tích lũy = 30% max hp của hắn thành hp (lượng tích lũy sát thương vượt 30% max hp sẽ bị bỏ qua mà chỉ chuyển đúng cap là 30% max hp) tương ứng cùng tạo khiên = 10% max hp của bản thân, đơn giản là bị đánh lâu lâu hồi hp cùng tạo khiên, nhận 10 sát thương thì tích luỹ 5 sát thương, ví dụ hp của hắn là 30 thì 30% là 9, vậy hắn cần tích lũy >= 9 sát thương để kích hoạt nội tại và được hồi hp = 9 cùng khiên = 10% max hp của bản thân là 3, khi nhận sát thương vượt quá tích lũy thì chỉ tính max cap tích lũy là 30% max hp, tích lũy thừa ra bị bỏ. Không giới hạn lần kích hoạt/turn hoặc /trận. Khiên không giới hạn turn tồn tại và có thể stack vô hạn, khi nhận khiên từ nguồn khác ( bị giới hạn turn tồn tại, có cap theo % max hp của kẻ tạo khiên hoặc hắn,..) thì sẽ trừ nguồn khiên khác trước rồi mới tới khiên của hắn. Quy Tắc.
+50) MẶC PHÀM
+Rank: UR
+Class: Tanker (Đỡ đòn)
+Hệ (Element): Chưa phân loại (Tùy ông chọn: Earth/Blood...)
 
-skill 1: nội tại bị động, khi có khiên, nhận buff reflect 100% trong 1 turn, - 3 ae/turn kích hoạt, miễn có khiên là tự có phản sát thương trong 1 turn, mất khiên thì mất phản sát thương ngay lập tức. Pháp Tắc.
+NỘI TẠI: BẤT DIỆT KIM THÂN
+Loại: Bị động (Passive)
+Cấp Tag: QUY TẮC
+Cơ chế: Mỗi khi nhận sát thương, hệ thống tự động cộng dồn 50% lượng sát thương thực tế nhận vào vào "Bể Tích Lũy".
+Điều kiện nổ: Khi "Bể Tích Lũy" đạt mốc \ge 30\% \text{ Max HP} của Mặc Phàm, cơ chế tự động kích hoạt Tức thời (Instant):
+Xóa toàn bộ số liệu trong Bể Tích Lũy.
+Hồi phục HP cho bản thân = Đúng 30\% \text{ Max HP} (Lượng sát thương thừa vượt quá mốc 30% này trong Bể sẽ bị xóa bỏ hoàn toàn, không bảo lưu).
+Tạo cho bản thân 1 lớp [Khiên Bất Diệt] = 10\% \text{ Max HP} của bản thân.
+Quy tắc giới hạn: Không giới hạn số lần kích hoạt trong mỗi Turn hoặc mỗi trận.
+Quy tắc [Khiên Bất Diệt]: Tồn tại vô hạn Turn, có thể cộng dồn (Stack) vô hạn. Khi Mặc Phàm nhận thêm khiên từ các nguồn khác (loại có giới hạn Turn/có Cap), hệ thống bắt buộc phải trừ các nguồn khiên khác trước, [Khiên Bất Diệt] luôn được trừ cuối cùng.
 
-skill 2: gây sát thương lên kẻ địch khi đang không phải ở lượt của bản thân sẽ được hồi hp = 1% max hp hiện tại của hắn/lần, không giới hạn số lần/turn, mỗi lần kích hoạt -1 ae từ bể ae thuộc phe của hắn. Nói chung gây sát thương lên kẻ thù khi bản thân không tấn công thì được hồi hp và trừ ae. Ví dụ như debuff gây mất máu theo turn, skill 1 hoặc phản sát thương, bleed, venom này kia, điều kiện tiên quyết để kích hoạt là kẻ thù phải thực sự mất hp, có khiên/bị né không tính, điều kiện khác nữa để kích hoạt skill này là sát thương gây ra tối thiểu lên kẻ thù = 2% max hp của chúng. Nên nếu gây debuff cho boss hoặc bị boss đánh rồi Reflect chẳng hạn nhưng boss res/arm cao quá, bị mất hp chưa tới tối thiểu 2% max hp của boss thì skill này sẽ không kích hoạt và không bị trừ ae. Bị động, tự kích hoạt khi đủ điều kiện và không thể chủ động bật (tốn turn) như skill 1. Pháp tắc.
+ĐÁNH THƯỜNG: MINH VƯƠNG ẤN
+Tác động: 1 mục tiêu đơn lẻ.
+Sát thương: 100% (WIL + ATK).
 
-skill 3: giảm hp = 25% mx hp (không giảm mx hp), tăng lượng hồi phục và khiên nhận được từ nguồn không phải của bản thân trong 3 turn tiếp theo tính từ turn sau khi kích hoạt skill này lên gấp đôi. overheal nhận gấp đôi từ skill này bị bỏ qua. Khiên nhận được sẽ tuân theo mô tả thời gian tồn tại và cap khiên thuộc nguồn của khiên đó. Ví dụ, bật skill này, hắn nhận khiên là 5, skill gấp 2 là 10, mô tả từ nguồn khiên là tồn tại tối đa 2 turn, cap = 20% max hp của mục tiêu nhận khiên tức bản thân chính hắn thì sau 2 turn khiên sẽ biến mất, nếu khiên vượt cap mô tả là vượt quá 20% max hp của hắn thì chỉ giữ đúng khiên = 20% max hp của hắn, khiên từ nguồn đó tuân theo mô tả nên sau 2 turn hoặc bị đánh nát thì sẽ mất.
+SKILL 1: MA PHÁP PHẢN VỆ
+Loại: Bị động (Passive)
+Cấp Tag: PHÁP TẮC
+Cơ chế: Tự động kiểm tra trạng thái ở đầu mỗi Turn tuần tự của Mặc Phàm. Nếu trên người hắn đang có bất kỳ loại Khiên nào (kể cả Khiên Bất Diệt hay khiên từ char khác).
+Hiệu ứng:
+Tiêu tốn 3 Mana của bể tổng.
+Nhận buff [Phản Sát Thương] 100% trong 1 Turn.
+Điều kiện tắt: Nếu Khiên trên người Mặc Phàm bị đánh vỡ hoàn toàn trước khi hết Turn, buff [Phản Sát Thương] lập tức biến mất ngay tại thời điểm đó.
 
-ultimate: gây sát thương = 180% wil + atk + 20% hp hiện có lên 1 mục tiêu, sau đó chuyển hoá toàn bộ khiên hiện có thành max hp với tỉ lệ 1 khiên = 0,5 max hp và hồi hp = lượng khiên được chuyển đổi sang hp tương ứng. ví dụ hắn đang có 80/100 (150/400) hp và 40/100 (200/400) khiên thì sau khi dùng ult hắn sẽ tăng 20 (100) max hp và cũng được hồi tương ứng 20 (100) max hp đó vậy hp của hắn sẽ là 100/120 (250/500) hp. Ngoặc () thuộc mô tả ult là ví dụ thêm.
+SKILL 2: THỰC HUYẾT TRẬN PHÁP
+Loại: Bị động (Passive) - Tự kích hoạt khi đủ điều kiện bên ngoài lượt hành động.
+Cấp Tag: PHÁP TẮC
+Cơ chế kích hoạt: Khi kẻ địch phải chịu sát thương (từ Phản sát thương, Sát thương duy trì - DOT, Bleed, Venom, v.v...) không phải do Mặc Phàm trực tiếp đánh trong lượt của hắn.
+Điều kiện kích hoạt bắt buộc (Check-gate):
+Mục tiêu phải thực sự bị trừ vào HP (Nếu đòn đánh dội vào Khiên của địch hoặc địch Né được \rightarrow Bỏ qua không kích hoạt).
+Lượng sát thương mục tiêu phải nhận từ đòn đó tối thiểu phải \ge 2\% \text{ Max HP} của chính mục tiêu đó (Nếu địch có thủ/kháng quá cao khiến damage nhận vào < 2\% \text{ Max HP} \rightarrow Bỏ qua không kích hoạt).
+Hiệu ứng:
+Trừ 1 Mana từ bể tổng của phe ta.
+Hồi phục HP cho Mặc Phàm = 1% Max HP hiện tại của hắn/lần kích hoạt.
+Quy tắc giới hạn: Không giới hạn số lần kích hoạt trong một Turn.
 
-51)
+SKILL 3: KHỔ NHỤC MA CÔNG
+Năng lượng tiêu hao: Có hành động \rightarrow Kích hoạt chủ động (Tốn Turn).
+Giá trị đánh đổi: Trực tiếp trừ thẳng 25% HP hiện tại của bản thân (Lưu ý: Không giảm chỉ số Max HP).
+Hiệu ứng: Từ Turn tiếp theo (sau Turn kích hoạt chiêu này) và kéo dài trong 3 Turn, Mặc Phàm nhận trạng thái [Cường Hóa Ngoại Lực]:
+Tăng gấp đôi (x2) lượng Hồi phục HP và lượng Khiên nhận được từ nguồn bên ngoài (từ kỹ năng/buff của đồng đội, không áp dụng cho Nội tại tự hồi/tự tạo khiên của bản thân hắn).
+Quy tắc hệ thống: Lượng Overheal (Hồi máu vượt ngưỡng) nhận từ kỹ năng này sẽ bị hủy bỏ (Không chuyển thành khiên). Các nguồn Khiên nhận được nhân đôi từ kỹ năng này vẫn phải tuân thủ nghiêm ngặt mô tả thời gian tồn tại và Cap giới hạn của chính nguồn cấp khiên đó.
 
-ultimate: nhảy lên cao, rơi vào ô 5 của kẻ thù và gây sát thương = 150% wil + atk lên kẻ đứng ở ô số 5, sau đó ô số 5 bị bể (vfx) rồi kẻ đứng ở ô 5 cùng các ô còn lại nhận sát thương = 150% wil + atk cùng 5% max hp của nhân vật này
+ULTIMATE: HOÀNG THIÊN ĐẠI PHÁ
+Cơ chế: Tấn công 1 mục tiêu đơn lẻ.
+Sát thương: Gây 180% (WIL + ATK) + 20% HP hiện có của Mặc Phàm.
+Hiệu ứng Chuyển Hóa (Instant): Sau khi gây sát thương, hệ thống quét toàn bộ lượng Khiên hiện có trên người Mặc Phàm và thực hiện chuyển đổi:
+Tăng chỉ số: Mỗi 1 điểm Khiên tiêu hao = Tăng thêm 0.5 điểm vào Max HP vĩnh viễn trong trận.
+Hồi phục: Đồng thời hồi phục ngay lập tức một lượng HP bằng đúng lượng Max HP vừa được tăng thêm.
+(Ví dụ minh họa: HP hiện tại 150/400, Khiên hiện tại là 200. Sau khi nổ Ult: Tiêu hao 200 Khiên \rightarrow Tăng thêm 100 Max HP và Hồi 100 HP. Chỉ số mới: HP 250 / Max HP 500, Khiên về 0).
+
+52)
+warrior, Ur.
+mô tả: một ma kiếm sĩ vì thanh kiếm đặc biệt của mình có thể bỏ qua phòng ngự khi gây sát thương.
+
+nội tại: Khi Hp về 0, hồi hp cho leader = 50% max hp của bản thân, hắn trở lại deck lần nữa nhưng cost giảm 3 (có thể cộng dồn với cơ chế từ kit khác), nội tại kích hoạt 1 lần/trận, Quy Tắc.
+
+đánh thường: tiếp cận mục tiêu, chém xéo gây sát thương = 100% wil/atk.
+
+skill 1: cắm kiếm xuống đất, triệu hồi 1 thiên thạch va chạm vào ô 8 của kẻ thù gây sát thương = 180% atk+wil của bản thân, 0,8s sau đó thiên thạch phát nổ, gây aoe lần nữa lên ô 5/7/8/9 của kẻ thù, mỗi kẻ nhận sát thương = 100% wil (có thể giảm bằng res) của char này cùng nhận sát thương atk = 10% hp hiện có của char này (có thể giảm = arm). cost 30 ae và hp = 5% hp max (giữ hp còn 1 khi dùng skill này lúc hp dưới 5% max hp 1 lần/trận, lần sau dùng skill này khi hp dưới 5% max hp sẽ chết, không giảm mx hp, khiên/res/arm không có tác dụng giảm sát thương trong trường hợp này). Vậy leader địch nhận sát thương tổng cộng từ skill này là 280% wil + 180% atk + sát thương atk = 10% hp hiện có của char này.
+
+skill 2: mỗi khi đánh thường - 2 ae để được hồi phục = 10% sát thương đánh thường gây ra, kích hoạt 1 lần/turn. khi không đủ ae sẽ không kích hoạt.
+
+skill 3: chém dọc ô 2/5/8 gây sát thương chuẩn = 50% hp hiện tại lên mỗi kẻ địch, hồi hp = 20% tổng sát thương gây ra, overheal bị bỏ qua, 25 ae.
+
+ultimate: nhảy lên cao, rơi vào ô 5 của kẻ thù và chém gây sát thương = 150% wil + atk lên kẻ đứng ở ô số 5, sau đó múa kiếm, ô 5 cùng các ô còn lại nhận sát thương = 150% wil + atk cùng sát thương chuẩn = 5% max hp của nhân vật này (nếu ô 5 không có kẻ thù đứng thì bỏ qua phần gây sát thương lên ô 5 và chỉ gây aoe xung quanh).
+
+52)
+ssr, mage
+nội tại: mỗi lần dùng ultimate đều tạo 1 orb laze bay sau lưng, tối đa 10 orb, tăng 5% atk/wil hiện có/mỗi orb laze, orb laze không có thanh hp, không thể nhận sát thương, pháp tắc. nhận vật này không thể follow up attack, riêng phần không thể follow up attack mang tag axiom.
+
+skill 1: khi đánh thường nếu orb gây sát thương lên mục tiêu có hp dưới hoặc = 5% max hp của chúng thì lập tức tàn sát chúng, kết liễu, đưa hp của chúng về 0 (vẫn có thể hồi sinh hoặc về deck tùy cơ chế của chúng), chỉ kích hoạt khi đánh thường, -30 ae/lần kích hoạt, kích hoạt tối đa 4 lần/trận.
+
+skill 2: khi đánh thường gây sát thương vượt 40% max hp của đối phương sẽ hồi hp cho bản thân = 40% sát thương do đòn đánh đó gây ra lên kẻ thù, -10 ae/lần kích hoạt, không cap/trận. Pháp Tắc.
+
+skill 3: khi gây sát thương vượt 15% max hp của kẻ thù (đánh thường, debuff gây sát thương theo thời gian,..) thì mỗi 1% vượt nhận 3 rage, không giới hạn lần kích hoạt/trận/turn, rage thừa sẽ bị bỏ qua. -5 ae mỗi lần kích hoạt bất kể lượng rage nhận được là bao nhiêu. vậy nếu gây sát thương= 25% max hp của mục tiêu hắn sẽ nhận 30 rage và phe đó mất 5 ae.
+gây sát thương đúng 15% max hp của mục tiêu skill này sẽ không kích hoạt.
+
+ult: cast 2 lần đánh thường, nếu 2 lần đánh thường kích hoạt skill 1/2/3 thì tiêu hao ae sẽ bị bỏ qua, không tốn ae nhưng skill vẫn kích hoạt.
+
+đánh thường: chưởng 1 chưởng, tấn công 1 mục tiêu từ xa gây sát thương = 100% wil/atk lên chúng, mỗi orb đang có cũng sẽ tấn công cùng lúc gây sát thương = 30% wil/atk của hắn/orb lên mục tiêu (vì tấn công cùng lúc nên sát thương orb gây ra có thể gộp chung khi hiện số, sát thương orb và đánh thường gây ra cần hiện số riêng tức hiện số sát thương 2 lần)
+
+53)
+support, ssr
+nội tại: khi hắn hiện diện trên sân, phe đồng minh tiêu hao AE khi dùng skill bị giảm đi 20%, char nào cast skill do dùng ultimate không tính. nội tại không áp dụng với bản thân. Pháp Tắc.
+
+skill 1: hồi hp cho đồng minh ngẫu nhiên (trừ Prime có thần tính) = 30% max hp của họ, họ nhận debuff phản hồi phục (heal nhận được từ mọi nguồn chuyển thành sát thương và bỏ qua khiên/res/arm) trong 1 turn, 20 ae.
+
+skill 2: 
+
+54)
+
+skill 1: gán debuff phản hồi phục cho toàn bộ kẻ thù có mặt trên sân (trừ Prime có thần tính) sau đó heal cho chúng = 200% wil/atk của bản thân. pháp tắc, debuff này có thể xoá hoặc miễn nhiễm nếu thắng phán định xung đột tag với char này, 25 ae. debuff tồn tại 2 turn.
+
+skill 2: 
+
+skill 3:
+
+55) 
+
+nội tại: khi hp dưới hoặc =11% max hp (từ 1 đến 11), hồi và khoá hp ở 11% mx hp, không thể tăng hay giảm trong 1 turn dù nhận sát thương kể cả sát thương chuẩn, debuff gây sát thương, pháp tắc, kích hoạt 3 lần/trận, nếu nhận sát thương vượt 11% mx hp và lượng sát thương đó đủ để hp về 0 nội tại sẽ không kích 3, nếu dính debuff tàn sát (hoặc buff tàn sát của kẻ gây sát thương) không có tag pháp/quy tắc/axiom thì nội tại này có thể kích hoạt. nếu debuff/buff xung đột với nội tại này có tag pháp tắc sẽ phán định xung đột tag, nếu có tag axiom/quy tắc nội tại này sẽ không kích hoạt.
+
+
+
+
+56)
+mô tả: một char chuyển wil thành atk, thuần atk.
+nội tại: mọi đòn đánh gây sát thương lên mục tiêu đều bỏ qua 20% res của chúng.
+chuyển 100% wil sang atk khi gây sát thương, ví dụ hắn có 5 wil và 8 atk thì sát thương đầu ra là 13 atk và không có wil. sát thương của char này vẫn có thể giảm bằng res và đa số cơ chế khác.
+
+đánh thường: bắn 1 phát laze từ xa gây sát thương = 100% wil/atk tức gây sát thương = 100% wil+atk nhưng nguồn ra là atk mà không có wil.
+
+skill 1: trước khi gây sát thương atk lên 1 mục tiêu có hp dưới hoặc = 10% mx hp của chúng, nhận 1 buff excute (kết liễu), - hp = 5% max hp của bản thân (không giảm mx hp) và 15 ae của team đồng minh mỗi lần kích hoạt, tự kích hoạt, bị động, dạng nội tại nhưng tốn cost.
+
+skill 2: kích hoạt, giảm 30% res hiện tại của mọi mục tiêu trên sân trong 2 turn, có hiệu lực ngay lập tức khi kích hoạt, turn kích hoạt của char này tính là 1 turn trong bộ đếm 2 turn đó. debuff giảm res này các char đồng minh cũng được hưởng, 35 ae, stack với nội tại cùng các debuff, cơ chế giảm res đồng cấp từ nguồn khác, đồng cấp là cấp bậc tag pháp tắc/quy tắc và axiom, nếu char khác có cơ chế giảm res như char này thì cả 2 hoặc nhiều hơn 2 cơ chế có thể stack với nhau nếu kit của đối phương không mô tả là cấm stack, dù vậy nếu kit của họ giới hạn giảm res tối đa của mục tiêu ví dụ là 25% đi thì họ vẫn giảm 25% res của kẻ thù, kit của char này vẫn giảm res bình thường nếu không bị hệ thống tag ưu tiên chặn.
+
+skill 3: triệu hồi vệ tinh bắn 1 chùm lazer toàn sân kẻ thù (vfx), gây sát thương = 180% atk + wil (nguồn ra là atk không có wil vì wil được chuyển 1:1 sang atk) của bản thân, sau đó hắn tóm lấy 1 kẻ địch (tuân theo SSI), gây sát thương chuẩn = 10% mx hp của bản thân hắn lên mục tiêu, 35 ae.
+
+ultimate: dùng skill 3 nhưng không tốn ae, +10% sát thương và hồi hp = 10% sát thương gây ra bằng dùng skill 3 bởi ultimate. Axiom: hồi phục từ ultimate này không thể tạo khiên, overheal bị bỏ qua.
+
+
+57)
+
+mô tả:
+
+đánh thường:
+
+nội tại: sau khi dùng ultimate, snapshot mọi chỉ số hiện tại và trở về deck (xoá sạch mọi trạng thái tốt lẫn xấu, debuff/buff bất kể chúng có trong 3 tag ưu tiên hay không, nói chung như mới triệu hồi lần đầu từ deck ra sân), cost giảm 1, khi ra sân nhận vĩnh viễn 50% mọi chỉ số đã snapshot, kích hoạt tối đa 5 lần, khi hp về 0 lần đầu trong trận, không chết, hồi hp = 1% mx hp, xoá mọi debuff/mark trên người kể cả từ đồng minh lẫn kẻ thù nếu chúng dưới cấp Quy Tắc, kích hoạt 1 lần/trận. Pháp Tắc.
+
+skill 1:
+
+skill 2:
+
+skill 3:
+
+ultimate:
+
+
+58)
+
+tanker, ur
+
+nội tại: hồi hp = 50% sát thương bản thân gây ra sau khi dùng ultimate và neo định chỉ số còn tồn tại. Quy Tắc.
+
+skill 1: nhận 1 turn taunt hoặc 1 turn reflect với tỉ lệ 50/50, - 20 ae và 5 rage. sau đó cũng hồi lập tức 5% hp đã mất.
+
+skill 2: khi 1 đồng minh bị tấn công và lượng sát thương sắp đến vượt ngưỡng máu tử, tức nếu nhận sát thương đó đồng minh ấy sẽ chết thì hắn sẽ đổi chỗ với đối phương nếu không bị stun, sleep và nhận sát thương sắp đến đó, chỉ có thể tự kích 3 khi không neo định, cap tối đa 3 lần/trận và mục tiêu phải là rank ssr trở lên và không phải summon của summoner thuộc đồng minh hay kẻ thù nhét summon qua sân đồng minh, cost: 30 ae, -10% hp hiện có cùng 30 rage. Đây là skill dạng nội tại tự kích hoạt khi đủ điều kiện, không thể tốn 1 turn để kích hoạt chủ động. Pháp Tắc.
+
+skill 3: hồi hp = 30% hp đã mất của hiện tại trong 2 turn, ví dụ: hắn dùng skill 3 lúc hp còn 30/100 thì ngay khi dùng skill này hắn được hồi 30% của hp đã mất là 70= 21 hp, turn sau hắn được hồi 30% của 49 hp đã mất là 14,7 làm tròn 14, hp hắn có sau 2 turn là 65/100, vậy cụm từ '30% hp đã mất của hiện tại' có biến động nhé. cost 20 ae và 10 rage, có thể dùng khi neo định chỉ số. Đương nhiên ví dụ này dựa trên điều kiện tiên quyết là trong 2 turn đó hắn không nhận bất kỳ sát thương nào, trong trận đấu lượng 30% hp đã mất của hiện tại sẽ thay đổi và không giống ví dụ này. vậy nếu hắn neo định chỉ số qua ultimate sau đó bị dính debuff phản hồi phục và player không quan sát lỡ dùng skill 3 thì ví dụ là: hp còn 40/100, hồi 30% hp đã mất là 30% của 60 = 18 nhưng vì debuff phản hồi phục nên hắn nhận 18 sát thương chuẩn, hp còn lại là 22/100, đến turn hắn hành động thì skill 2 kích hoạt lần nữa, heal nhận 30% của 78 là 23,4 làm tròn 23 nhưng vì hắn còn 22 hp nên hắn sẽ chết vì hp về 0 nếu không có cơ chế nào từ nhân vật khác hoặc leader cứu hắn.
+nếu có nhân vật nào có kit cứu hắn như ngăn đồng minh chết, hồi hp cho đồng minh (hắn trong ngữ cảnh này) nhưng có nhân vật đối phương dạng kiểu kết liễu kẻ địch dưới x% hp ví dụ 5% đi thì hắn sẽ được ngăn tử vong, hồi hp do kit của đồng minh, sau đó nếu kit của đồng minh hồi hp dưới 5% max hp của bản thân hắn thì hắn sẽ chết do bị kit của kẻ thù kết liễu. nếu kit của đồng minh cứu hắn và kit của kẻ thù muốn hắn chết thì sẽ áp dụng cơ chế phán định xung đột tag đã có để cho ra kết quả cuối cùng. Pháp Tắc.
+
+ultimate: neo định mọi chỉ số của bản thân lúc ultimate, không thể bị giảm hoặc tăng bất kỳ chỉ số nào trong 2 turn bởi kẻ thù lẫn đồng minh kể cả hồi hp (giảm chỉ số, giảm rage, ae hắn cung cấp cho bể ae chung khi hành động) (trừ bản thân hắn), Quy Tắc, debuff và buff/mark của kẻ thù lẫn đồng minh vẫn áp dụng lên bản thân nhưng nếu có thay đổi bất kỳ chỉ số nào thì đều cần phán định xung đột tag kể cả đó là đồng minh. Lúc ultimate xong sẽ neo định ngay lập tức nên lúc đó đã tính là 1 trong bộ đếm 2 turn neo định. Nếu neo định mà bị tấn công bởi kẻ có buff excute (kết liễu) thì vẫn sẽ chết nếu đạt điều kiện kết liễu.
+
+Đây chẳng phải là tanker tối thượng sao? debuff phản hồi phục là cách khắc chế hắn vì debuff vẫn áp lên người hắn, nếu hắn tự heal và vì nguồn heal không phải của người khác nên vẫn có thể heal và hắn sẽ nhận sát thương, vì sát thương từ debuff này bỏ qua res cùng arm nên chẳng khác nào sát thương chuẩn.
+
+59) Vô Lượng (Anatta), SSR, Tanker.
+mô tả: Chúng Sinh Khổ Tướng, 
+
+nội tại: khi nhận sát thương vượt 25% mx hp nhận buff reflect 35% trong 1 turn, sau đó hồi hp = 30% sát thương phản được trong lúc nhận buff phản sát thương, Pháp Tắc. ví dụ hắn có 100 hp, bị đánh còn 75 hp, lập tức nhận 1 buff phản 35% sát thương cấp Pháp Tắc trong 1 turn, lúc nhận sát thương đến lúc hắn hành động tức 1 turn bộ bộ đếm nội tại này, trong 1 turn đó sát thương bị phản bởi buff cấp pháp tắc này sau 1 turn kết thúc sẽ hồi hp cho hắn với tỉ lệ 30%. nếu hắn nhận 15 sát thương trong 1 turn đó hắn được hồi 4,5 hp sau khi 1 turn kết thúc, nội tại kích hoạt 1 lần/turn hành động của hắn. vậy về cơ bản hắn có thể kích hoạt nội tại liên tục nếu nhận sát thương hơn 25% mx hp và được hồi hp mãi nhờ nguồn ngoài.
+
+skill 1: -25 rage mỗi khi kích hoạt, tự động kích hoạt khi bị đánh vượt 18% mx hp, nhận 4 ae với mỗi 1% vượt. Pháp Tắc.
+
+skill 2: gây sát thương = 2 đánh thường lên 1 mục tiêu, 20 ae và 3 rage. không tính đánh thường.
+
+skill 3: dậm chân mạnh xuống đất gây 1 đợt sóng đất(vfx), gây sát thương dọc vào 3 ô trước mặt, mỗi kẻ đứng trong 3 ô này nhận sát thương = 1 đánh thường và bị - 10 rage, 30 ae, không tính đánh thường.
+
+đánh thường: đấm mục tiêu gây sát thương=100% wil +atk.
+
+ultimate: cast 2 lần skill 3 mà không tốn rage cùng ae, sau khi cast xong tăng 20% res cùng arm của bản thân trong 1 turn đồng thời nhận 10 rage.
+
+60) Vô Thường (Anicca), Ranger, SSR.
+Mô tả: Chúng Sinh Mệnh Tướng,
+
+nội tại: vào trận nhận 1 buff hút máu, hồi hp = 22% sát thương gây ra trong turn đó, sau đó buff sẽ tự mất trong 1 turn, sau 1 turn đó lại nhận buff hút máu lần nữa, turn sau nữa buff hút máu lại mất, turn có turn không lặp lại đến khi chết.
+
+đánh thường: bắn 1 mũi tên vào mục tiêu gây sát thương = 100% wil + atk.
+
+skill 1: bắn 3 mũi tên lên trời (vfx), rơi ngẫu nhiên lên 3 kẻ địch, mỗi kẻ nhận 1 đánh thường, tính là đánh thường nhưng không follow up attack, 20 ae.
+
+skill 2: vận sức trong 1 turn, 1 turn đó vẫn nhận sát thương, sau 1 turn bắn 1 mũi tên vào leader địch gây sát thương= 320% đánh thường, 40 ae.
+
+skill 3: tăng 30% atk và 10% wil trong 2 turn, hiệu lực turn sau lúc kích hoạt kỹ năng, kích hoạt xong cũng nhận 1 khiên = 10% mx hp, tức là sài skill này lập tức nhận khiên =10% mx hp, turn sau đến lượt char này char nay sẽ được+30% atk, 10% wil trong 2 turn. cost 25 ae 10 rage và hp = 4% mx hp.
+
+ultimate: cast skill 1 và skill 2 cùng lúc, skill 2 sẽ không cần vận sức, cả 2 skill đều cast không tốn cost, sau khi dùng ult xong không thể tăng rage qua hành động trong 1 turn và bị giảm 2,5% max hp (reset nếu chết rồi hồi sinh). tức ultimate là bắn 4 mũi tên, trong đó 3 mũi random vào 3 kẻ địch ngẫu nhiên (không thể là leader) gây sát thương = 1 đánh thường, 1 mũi tên bắn leader địch gây sát thương= 320% đánh thường, nếu đang có nội tại thì sẽ được hồi hp = (tổng sát thương của sát thương gây ra lên 3 kẻ địch (1 đánh thường/kẻ) và 320% sát thương đánh thường gây lên leader địch) * 22% hút máu từ nội tại, và buff này có thể + dồn.
+
+61) Vô Niệm (Asankha) Mage, Ur.
+mô tả: Chúng Sinh Ý Tướng
+
+nội tại: Đạo hữu, ngươi rất lo nghĩ a: khi gây sát thương, gán 1 mark 'lo nghĩ' lên mục tiêu. Lo nghĩ: khi đạt 3 mark, bản thân lâm vào suy nghĩ, chỉ có thể đánh thường trong 1 turn, atk cùng wil cũng bị giảm 25% trong 1 turn đó. tức kẻ thù dính 3 mark lo nghĩ khi hành động sẽ bị giảm 25% wil cùng atk và chỉ có thể đánh thường khi đạt 3 mark. mark biến mất khi đạt 3 trên 1 mục tiêu hoặc mark trên 1 mục tiêu tối đa 2 turn hành động của mục tiêu mà mục tiêu không nhận mark mới. Quy Tắc.
+với mỗi kẻ thù kích hoạt 'lo nghĩ' thành công, hắn được + 5% hp/wil dựa trên hp mx và wil hiện có lúc kích hoạt lo nghĩ trên kẻ thù. reset khi chết và được hồi sinh.
+
+skill 1: khi hp về 0, vẫn chết, sau 2 turn sẽ tự động hồi sinh, khi hồi sinh bằng skill này sẽ có 50% hp cùng 100% mọi chỉ số khác của lúc còn sống, ae và rage = 0, kích hoạt tự động khi chết lần đầu trong trận đấu, kích hoạt 1 lần/trận khi kích hoạt không thể được hồi sinh từ mọi kỹ năng khác từ nguồn không phải bản thân. Quy tắc.
+
+skill 2: gây aoe toàn sân = 1 đánh thường/mục tiêu, giảm 5 rage của mỗi mục tiêu trúng kỹ năng này, 30 ae.
+
+skill 3: sau kích hoạt, lần dùng kỹ năng tiếp theo sẽ được x2 mark thay vì 1 mark lên kẻ thù, 25 ae.
+
+ultimate: gây aoe cố định lên hàng 2/5/8, mỗi kẻ nhận sát thương = 2,5 đòn đánh thường, không  áp mark từ sát thương của ultimate này lên kẻ thù nhưng nếu kẻ đứng trên đường gây sát thương của ultimate đang có 1 hoặc hơn 1 mark 'lo nghĩ' thì lập tức đạt 3 mark và kích hoạt hiệu ứng của mark này lên mục tiêu. Tức kẻ đứng ở ô 2/5/8 nhận 1 lần sát thương= 250% đánh thường của char này, nếu bản thân họ có 1 hoặc hơn 1 mark lo nghĩ trên bản thân thì lập tức kích hoạt hiệu ứng của mark này đồng thời xoá mark vì mark đã được kích hoạt, dù vậy ultimate không áp mark lo nghĩ lên mục tiêu theo nội tại nên nếu có kẻ dính ultimate mà không có mark no nghĩ trên bản thân sẽ không bị dính hiệu ứng cấp quy tắc là giảm 25% atk/wil và chỉ có thể đánh thường trong 1 turn.
+
+62) Vô Tướng Chi Chủ, Prime, không class cố định.
+nội tại: một char đặc thù, chỉ có thể xuất hiện ở collection khi player sở hữu Anicca, Asankha và Anatta, khi không sỡ hữu 3 char này icon và thông tin về hắn sẽ không hiện trong collection, khi vào trận có đủ 3 char đã nhắc trên sân thì trên deck sẽ xuất hiện icon của hắn, cost của hắn là trung bình cộng của cost của Anicca, Asankha và Anatta, hắn khi được triệu hồi từ deck ra sân thì cả 3 char sẽ biến mất, chết hoàn toàn không thể hồi sinh trong trận đấu kể cả Vô Tướng Chi Chủ chết trận cũng không thể hồi sinh Anicca, Asankha và Anatta, khi ra sân hắn hưởng 30% chỉ số của Anicca và Anatta cùng 40% của Asankha, thừa hưởng chỉ số là toàn bộ, dẫu vậy chỉ số của hắn sẽ được tính theo rank multi trước rồi mới được + chỉ số từ thừa hưởng.
+khi vào trận hắn được nhận random 1 class, tức trận này là warrior, trận sau có thể là ranger hoặc support, class của hắn là random 7 class, tỉ lệ random ra 7 class là đều nhau, 100%/7 = 14,285.
+hắn trong collection không thể mặc trang bị, awaken cùng nâng sao, học công pháp.
+mỗi lần đánh thường + 1% chỉ số ngẫu nhiên trừ ae và rage của hiện tại (nếu random ra class ranger và dùng skill 1 thì tỉ lệ + từ nội tại vẫn là 1% chỉ số vì skill này là đánh thường).
+
+skill 1: chưởng ngẫu nhiên từ 2 đến 5 chưởng, tổng kẻ thù luôn nhận tổng sát thương là 500% đánh thường của hắn, tức nếu random 2 chưởng thì mỗi kẻ nhận 250% đánh thường của hắn, chưởng ra 5 chưởng thì mỗi kẻ nhận sát thương= 100% đánh thường của hắn, sát thương từ kỹ năng này không phải đánh thường, không thể follow up. cost 30 ae.
+nếu hắn là ranger, skill này là đánh thường (tính đánh thường lên mỗi kẻ nhận sát thương từ skill này, và đánh thường có thể follow up Attack), là mage skill này tăng tỉ lệ sát thương từ 500% wil/atk lên 600% wil và 500% atk, là warrior thì tăng tỉ lệ sát thương từ 500 lên 600% atk và 500% wil, tức nếu random ra 3 và hắn là warrior thì mỗi kẻ nhận 200% ATK và 500%/3 wil của hắn. nếu hắn là support l, skill này -5 ae cost. nếu hắn là assassin, hồi hp= 10% sát thương gây ra của kỹ năng này.
+
+skill 2: khi hp dưới hoặc = 15%, hồi lập tức 65% max hp, đổi lại bị mất 20% mx hp, tức hắn có hp dưới hoặc = 15%, player sẽ thấy hắn đầy cây hp nhưng max hp của hắn ở mặt hiển thị đã mỏng đi vì mất 20% max hp. Nếu hắn là summoner thì có thể kích hoạt skill này lần 2 nhưng lần 2 sẽ mất 40% mx hp (tính từ max hp kích hoạt lần 1, tức 80% của lần 1 tức 100% của lần 2 sau đó bị trừ thêm 40%) thay vì lần 1, cap kích hoạt là 1/trận, nếu random ra class summoner thì là 2, tự trừ 15 ae/lần kích hoạt, nếu không đủ ae sẽ không thể tự kích hoạt, đây là skill bị động tự kích hoạt khi đủ điều kiện.
+Ban đầu: 100% Max HP.
+Sau kích hoạt 1: Thanh Max HP mỏng đi, chỉ còn dài bằng 80% ban đầu (nhưng được hồi đầy cái thanh 80% đó nếu kích hoạt ở mức 15% mx hp).
+Sau kích hoạt 2: Thanh Max HP tiếp tục mỏng đi, chỉ còn dài bằng 48% so với ban đầu (so với lúc chưa kích hoạt skill này và được hồi đầy cái thanh 48% đó nếu kích hoạt lúc còn 15% mx hp của lần kích hoạt đầu tiên).
+
+skill 3: gây aoe toàn sân, mỗi kẻ trúng nhận sát thương= 200% atk và 200% wil của hắn, cost 40 ae. nếu random ra class support cost giảm 50%.
+
+đánh thường: chưởng 1 chưởng gây sát thương từ xa lên 1 mục tiêu = 100% wil/atk.
+nội tại đánh thường (skill 1 tính đánh thường nhưng không tính nội tại này):
+nếu random ra class summoner và đánh thường giết mục tiêu thì lập tức triệu hồi 1 creep có 50% chỉ số của kẻ đã chết bởi đòn đánh thường này, rank của creep cũng = kẻ đã chết.
+nếu random ra class support, đánh thường + 2 ae và rage cho bản thân, ae cho ae pool chung của đồng minh.
+
+ultimate: niệm chú, lập tức tăng 1 class lên bản thân, class nhận không thể trùng (chỉ số cơ bản vẫn tính là 1 class (random đầu trận), nhưng bonus từ kit sẽ được tăng theo class tương ứng)
+khi class hiện có là 7 thì dùng ultimate sẽ không tăng class nữa mà đổi sang dùng skill 1 1 lần nhưng không tốn ae.
+
+62) Mai Vô Niệm (梅无念) warrior, ur.
+Nội tại – Nghịch Cảnh: Mỗi khi Né tránh, Chặn hoặc Phản đòn thành công nhờ chỉ số AGI, nhân vật sẽ nhận tự động đánh thường lên kẻ tấn công mình, attack animation của kẻ tấn công sẽ + 1s để hắn có time phản đòn, đòn đánh từ nội tại không tính là 1 turn của hắn.
+
+skill 1: 
+
+
+ultimate: Nhất Kiếm Cách Thế: gây sát thương chuẩn = 170% wil/atk lên 1 mục tiêu, giảm max hp của đối phương= 30% hp đã mất của chúng sau khi dính ultimate này, quy tắc. ví dụ kẻ thù có 100 hp, hắn bị đánh còn 90/100 hp, dính ultimate này còn 40/100 hp, hp đã mất là 60, giảm hp mx = 30% của 60 là 18 hp, vậy hp còn lại của hắn là 40/82.
+quy tắc giảm mx hp từ ultimate này bị giảm 50% khi đánh boss.
+
+
+63)
+Ur, Tanker.
+nội tại: Vào trận luôn nhận buff phản sát thương với tỉ lệ 50%, hp regen +1000% trong trận, +1 ae vào pool khi hành động. hp regen và buff phản sát thương không thể xoá, sao chép, nội tại cấp quy tắc. nếu bị xóa bỏ do thắng phán định xung đột tag thì hiệu ứng từ nội tại sẽ chỉ biến mất trong 1 turn, turn sau đến lúc hắn hành động lại sẽ nhận hiệu ứng từ nội tại.
+
+skill 1: + 1% mọi chỉ số (dựa theo chỉ số lúc kích hoạt) mỗi khi đánh thường, - 2 ae/lần kích hoạt, kích hoạt 1 lần/turn, không cap/trận.
+
+skill 2: bay lên không, chưởng 1 chưởng cực to, toàn bộ kẻ địch trên sân nhận sát thương = 5 đánh thường của hắn/kẻ, cost: - hp = 60% mx hp cùng 20 ae, không thể tăng rage từ kỹ năng này. không thể dùng khi hp dưới 61%.
+
+skill 3: khi hp dưới hoặc =15%, giảm 20% mx hp sau đó hồi đầy cây hp, tự kích hoạt, bị động, -15 ae mỗi lần kích hoạt, kích hoạt max 2 lần/trận.
+
+ultimate: nếu hp dưới 25%:
+tăng hp = 20% hp mx lúc ultimate sau đó hồi hp = 8% mx hp.
+nếu hp trên 25% mx hp:
+cast 1 lần skill 2 nhưng cost giảm 60% tức giảm hp từ 60 xuống 24%, ae từ 10 còn 8, lưu ý skill 2 và ult đều không giảm mx hp.
+
+đánh thường: chưởng 1 chưởng ấn, chưởng ấn bay đến mục tiêu, gây sát thương= 100% wil/atk, hồi hp = 20% sát thương đánh thường gây ra.
+
+64)
+
+ultimate: tăng mx hp = 50% hp đã mất sau đó hồi hp = 10% mx hp, ví dụ: hắn có 50/100 hp, dùng ultimate thì 62,5/125 hp.
+
+65)
+
+nội tại: Bất Diệt Bá Thể
+không vào luân hồi, không thể phục sinh, chết là hết (riêng phần này thuộc tag axiom).
+
+mỗi khi ultimate sẽ nâng cấp nội tại, cấp độ của nội tại là: thức tỉnh, tiểu thành, đại thành, viên mãn.
+thức tỉnh: vào trận nhận 12% res/arm/atk/wil, hp regen +400% dựa vào chỉ số lúc được triệu hồi hoặc trong collection ( không bị bất cứ kit từ bất kỳ nhân vật, leader nào ảnh hưởng). Pháp Tắc (chỉ hiệu lực với mô tả của cấp thức tỉnh, bị xoá bỏ sau khi ult nâng cấp nội tại)
+tiểu thành: tăng 50% hiệu ứng + từ thức tỉnh, sát thương nhận vào giảm 20% trừ sát thương chuẩn.
+đại thành: giữ hiệu ứng + của tiểu thành, khi nhận sát thương vượt 15% mx hp sẽ lập tức hồi hp = 8% mx hp, không giới hạn lần kích hoạt/turn hay /trận, phần giảm 20% sát thương nhận của tiểu thành giữ nguyên. Quy Tắc (chỉ hiệu lực với mô tả của cấp đại thành, bị xoá bỏ sau khi ult nâng cấp nội tại)
+viên mãn: tăng 120% hiệu ứng + từ thức tỉnh (phần + chỉ số này không + dồn với tiểu thành và đại thành), giảm sát thương nhận vào trừ sát thương chuẩn từ 20% đến 30%. khi nhận sát thương vượt 18% mx hp sẽ lập tức hồi hp = 10% mx hp, không giới hạn lần kích hoạt/turn hay /trận, phần giảm 20% sát thương nhận của tiểu thành giữ nguyên (không cộng dồn với hiệu ứng của đại thành, đây là bản nâng cấp). khi hp về 0 sẽ tại chỗ phục sinh nhưng giảm 20% mx hp, sau đó hồi hp = 12% mx hp của hiện tại, 0 rage, vẫn giữ cấp độ của nội tại lúc chết, Axiom (chỉ hiệu lực với mô tả của cấp viên mãn, các tag mô tả của cấp nội tại thấp hơn cấp này sẽ bị xoá bỏ sau khi nâng nội tại lên cấp này).
+tức nhân vật này có tag ưu tiên nâng cấp theo cấp độ của nội tại.
+
+
+66)
+
+nội tại: Bách Độc Bá Thể
+không vào luân hồi, không thể phục sinh, chết là hết (riêng phần này thuộc tag axiom).
+
+kẻ tấn công hắn bằng đòn đánh cận chiến sẽ bị dính 1 debuff độc, gây sát thương chuẩn = 1% mx hp của chúng/turn hành động của chúng/3 turn của chúng. không cap lần kích hoạt/turn hay/trận.
+hắn tăng mx hp = 50% sát thương kẻ thù nhận từ debuff độc thuộc nội tại của bản thân, cũng đồng thời hồi hp = lượng hp đã tăng đó, lượng hp hắn nhận được tính vào hp regen.
+cả nội tại vào trận thuộc tag pháp tắc, sau lần ultimate 1, cả nội tại lên tag quy tắc, sau lần ultimate 2, cả nội tại lên tag axiom (trừ phần không vào luân hồi, không thể phục sinh vì nó tag axiom sẵn khi vào trận). debuff độc của riêng hắn cũng thuộc cấp tag khác nhau theo số lần ultimate.
+
+
+67)
+
+ultimate: Tạo 1 lớp khiên cho toàn đồng minh có mặt trên sân, mỗi đồng minh nhận khiên = 20% mx hp + 60% wil/atk của hắn, khi lớp khiên bể, nhận 1 buff giảm 50% sát thương, lượng sát thương bị giảm là có cap, cap = khiên đồng minh nhận được từ ultimate của hắn. ví dụ nhận khiên = 50(khiên)/60/100 (hp), khiên bị đánh bể, đồng minh nhận sát thương sẽ bị giảm 50%, ví dụ nhận 20 sát thương giảm còn 10, sau đó trừ vào cap khiên đã bể là 50-10=40, vậy cap tồn tại của buff giảm sát thương= 100% lượng sát thương nhận vào (đã giảm 50%) - lượng khiên đồng minh đó nhận từ ultimate này, đương nhiên khiên đã bể và buff này chỉ xuất hiện khi khiên từ hắn bể, khiên từ ultimate này có thể + dồn với khiên từ nguồn khác, không cap khiên, buff giảm 50% sát thương của ultimate này bị giới hạn tồn tại tối đa 3 turn. vậy khiên 50 bể, cap buff giảm 50% sát thương= 100% khiên nhận từ ultimate cũng tức 50, nhưng sát thương đến là 120 đi, bị giảm 50% là 60 nhưng cap buff là 50 vậy đồng minh đó nhận 70 sát thương.
+mô tả gọn: Tạo khiên cho toàn đội bằng 20% Max HP + 60% WIL/ATK. Khi khiên bị phá hủy, đồng minh nhận buff giảm 50% sát thương nhận vào trong tối đa 3 turn. Tổng lượng sát thương được giảm từ buff này không vượt quá lượng khiên ban đầu nhận được.
+
+68)
+
+nội tại: khi thanh nộ đạt 70%, tăng 50% rage nhận được.
+
+ult: cắn 1 mục tiêu, thôn phệ 10% max hp của đối phương cho bản thân, lượng hp thôn phệ được sẽ tăng max hp và hồi hp tương ứng.
+
+69)
+
+nội tại: rage nhận được từ mọi nguồn kể cả ngoài bản thân đều + 60%.
+
+ultimate: 2 tay nện đầu mục tiêu, gây sát thương= 200% wil + atk, gây debuff chảy máu, mất 3% max hp/turn trong 3 turn.
+
+70)
+
+nội tại: mỗi lần bị tấn công cận chiến, kẻ tấn công bị thiêu đốt, nhận sát thương = 3% max hp + 10% wil/atk của hắn/turn trong 2 turn, trong 2 turn này lượng hồi phục hp nhận được từ nguồn không phải của bản thân kẻ tấn công cũng bị giảm 30%.
+
+71) Viên Chúc
+
+nội tại: mỗi lần đánh giết 1 kẻ thù (không tính summon), rút 50% bản nguyên linh hồn của chúng, tạo ra Trành Quỷ. Kẻ bị Viên Chúc giết vẫn có thể hồi sinh (nếu không bị kit của bản thân kẻ đó hoặc kit từ nguồn khác ảnh hưởng), nhưng sau khi hồi sinh kẻ đó chỉ được hưởng 50% mọi chỉ số (trừ rage) vì 50% còn lại do bị viên chúc đánh cắp bản nguyên linh hồn tạo ra Trành Quỷ, nếu trành quỷ chết vì bất kỳ lý do gì, lượng bản nguyên linh hồn sẽ trả về cho kẻ bị đánh cắp, hồi phục chỉ số, nếu A có 100 hp 10 mọi chỉ số thì sau khi bị giết bởi viên chúc, viên chúc cướp 50% bản nguyên linh hồn tạo trành quỷ, A được hồi sinh với 50 hp cùng 5 mọi chỉ số khác, sau đó trành quỷ tương ứng của A bị giết, lúc đó A có 30/50 hp cùng 4 atk, 3 wil (2 chỉ số này giảm do debuff hoặc bị giảm vĩnh viễn,..m từ kit khác) cùng 5 mọi chỉ số khác thì sẽ hồi phục thành 80/100 hp, 9 atk, 8 wil cùng 10 mọi chỉ số khác, lúc này chỉ số wil/atk bị ảnh hưởng có thể sẽ hồi phục hoặc giữ nguyên hoặc tệ hơn từ kit ảnh hưởng 2 chỉ số này của A, kit của viên chúc không can thiệp.
+Trành Quỷ: thừa hưởng 50% chỉ số của kẻ Viên Chúc giết.
+
+ult: đấm mục tiêu, gây sát thương = 2 hp hp của kẻ địch + 200 l% wil/atk của Viên Chúc, sau đó sau lưng kẻ bị đấm xuất hiện âm ảnh (vfx) lao về các mục tiêu sau lưng của kẻ bị đấm (nếu có, nếu không có ai sau lưng kẻ bị đấm vì mục tiêu đứng hàng 7/8/9 thì sẽ không xuất hiện âm ảnh gây sát thương), mỗi kẻ trên đường đi thẳng của âm ảnh nhận sát thương= 100% wil/atk của Viên Chúc.
