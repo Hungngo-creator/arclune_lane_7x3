@@ -21,7 +21,7 @@ Trong mode này không có Prime.
 - Hắc Ám Chi Chủ không chết hoàn toàn, mà bị chia nhỏ và phong ấn.
 - Sau vạn năm, phong ấn suy yếu, rò rỉ ô nhiễm ra môi trường.
 - Sinh vật xung quanh bị ô nhiễm sẽ vặn vẹo, bạo ngược, căm ghét mọi sinh vật sống.
-- Nhân vật chính được vua của **Huyết Quốc** phái đi phong ấn các tàn khu huyết nhục của phân thân Hắc Ám Chi Chủ để triệt tiêu ô nhiễm.
+- Nhân vật chính được vua của Huyết Quốc phái đi phong ấn các tàn khu huyết nhục của phân thân Hắc Ám Chi Chủ để triệt tiêu ô nhiễm.
 - Có thể tồn tại âm mưu phía sau nhiệm vụ này, ví dụ Huyết Quốc muốn biến tàn khu phong ấn thành vũ khí. Phần này để mở cho lore sau.
 
 ## 3. Core loop theo phase

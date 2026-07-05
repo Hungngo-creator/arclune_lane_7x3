@@ -37839,7 +37839,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const BUILD_SITE_EDGE_PADDING = 160;
   const BUILD_SITE_RENDER_BUFFER = 800;
   const BUILD_SITE_RENDER_THRESHOLD = 160;
-  y;
+  const UPGRADE_NODE_LABEL = 'Nâng cấp';
   const BUILD_NODE_OPTIONS = [
       { label: 'Tháp', type: 'watchtower' },
       { label: 'Tường', type: 'wall' },
@@ -37907,6 +37907,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__build-node:nth-child(4){transform:translate(0,58px);}
     .vinh-da-game__build-node:nth-child(5){transform:translate(-50px,29px);}
     .vinh-da-game__build-node:nth-child(6){transform:translate(-50px,-29px);}
+    .vinh-da-game__build-menu.is-upgrade-menu{width:96px;height:96px;margin-left:-48px;}
+    .vinh-da-game__build-menu.is-upgrade-menu .vinh-da-game__build-node{transform:translate(0,0);}
     .vinh-da-game__build-node[hidden]{display:none;}
     @keyframes vinh-da-crystal-shine{0%,100%{filter:brightness(1);transform:translateX(-50%) rotate(45deg) scale(1)}50%{filter:brightness(1.45);transform:translateX(-50%) rotate(45deg) scale(1.06)}}
   `;
@@ -37973,10 +37975,33 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               node.innerHTML = `+<small>${option.label}</small>`;
               menu.append(node);
           });
+          const upgradeNode = document.createElement('button');
+          upgradeNode.className = 'vinh-da-game__build-node';
+          upgradeNode.dataset.action = 'upgrade';
+          upgradeNode.type = 'button';
+          upgradeNode.setAttribute('aria-label', UPGRADE_NODE_LABEL);
+          upgradeNode.hidden = true;
+          upgradeNode.innerHTML = `↑<small>${UPGRADE_NODE_LABEL}</small>`;
+          menu.append(upgradeNode);
           buildSitesContainer.append(button, menu);
           siteElements.set(site.id, button);
           buildMenuElements.set(site.id, menu);
           renderBuildSite(site.id);
+      };
+      const renderBuildMenu = (siteId) => {
+          const menu = buildMenuElements.get(siteId);
+          const site = getBuildSite(siteId);
+          if (!menu || !site)
+              return;
+          const structure = structures.get(siteId);
+          menu.classList.toggle('is-upgrade-menu', Boolean(structure));
+          for (const node of menu.querySelectorAll('.vinh-da-game__build-node')) {
+              const type = node.dataset.structureType;
+              const isUpgradeNode = node.dataset.action === 'upgrade';
+              node.hidden = structure
+                  ? !isUpgradeNode || structure.level >= 2
+                  : isUpgradeNode || !type || !site.allowed.includes(type);
+          }
       };
       const renderBuildSite = (siteId) => {
           const siteButton = siteElements.get(siteId);
@@ -37984,86 +38009,99 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               return;
           const site = getBuildSite(siteId);
           const structure = structures.get(siteId);
-          siteButton.classList.remove(...structureClassNames);
-          siteButton.classList.toggle('has-structure', Boolean(structure));
-          if (structure)
-              siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
-          siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
-          siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng');
       };
-      const renderVisibleBuildSites = () => {
-          const width = viewport?.clientWidth || window.innerWidth || 1;
-          const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
-          const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
-          for (const site of BUILD_SITES) {
-              if (site.x >= minX && site.x <= maxX) {
-                  createBuildSiteElement(site);
-                  renderBuildSite(site.id);
-              }
-              else if (site.id !== openSiteId) {
-                  const siteElement = siteElements.get(site.id);
-                  const menuElement = buildMenuElements.get(site.id);
-                  if (siteElement && menuElement) {
-                      siteElement.remove();
-                      menuElement.remove();
-                      siteElements.delete(site.id);
-                      buildMenuElements.delete(site.id);
-                  }
+      siteButton.classList.remove(...structureClassNames);
+      siteButton.classList.toggle('has-structure', Boolean(structure));
+      if (structure)
+          siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
+      siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
+      siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng');
+      renderBuildMenu(siteId);
+  }
+  ;
+  const renderVisibleBuildSites = () => {
+      const width = viewport?.clientWidth || window.innerWidth || 1;
+      const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
+      const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
+      for (const site of BUILD_SITES) {
+          if (site.x >= minX && site.x <= maxX) {
+              createBuildSiteElement(site);
+              renderBuildSite(site.id);
+          }
+          else if (site.id !== openSiteId) {
+              const siteElement = siteElements.get(site.id);
+              const menuElement = buildMenuElements.get(site.id);
+              if (siteElement && menuElement) {
+                  siteElement.remove();
+                  menuElement.remove();
+                  siteElements.delete(site.id);
+                  buildMenuElements.delete(site.id);
               }
           }
-          lastRenderedCameraX = cameraX;
-      };
-      const setOpenBuildSite = (siteId) => {
-          openSiteId = siteId;
-          for (const menu of buildMenuElements.values())
-              menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);
-      };
-      const updateCamera = () => {
-          const width = viewport?.clientWidth || window.innerWidth || 1;
-          cameraX = Math.max(0, Math.min(WORLD_WIDTH - width, leaderX - width * 0.5));
-          if (world)
-              world.style.transform = `translate3d(${-cameraX}px,0,0)`;
-          if (openSiteId && !nearestBuildSite())
-              setOpenBuildSite(null);
-          if (Math.abs(cameraX - lastRenderedCameraX) > BUILD_SITE_RENDER_THRESHOLD)
-              renderVisibleBuildSites();
-          if (sprite)
-              sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
-      };
-      const tick = (now) => {
-          const dt = Math.min(0.05, (now - lastTime) / 1000);
-          lastTime = now;
-          const left = keys.has('arrowleft') || keys.has('a');
-          const right = keys.has('arrowright') || keys.has('d');
-          const keyboardDirection = Number(right) - Number(left);
-          if (keyboardDirection !== 0)
-              targetX = leaderX;
-          leaderX += keyboardDirection !== 0
-              ? keyboardDirection * LEADER_SPEED * dt
-              : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
-          leaderX = clampLeaderX(leaderX);
-          updateCamera();
-          rafId = window.requestAnimationFrame(tick);
-      };
-      const moveToClientX = (clientX) => {
-          targetX = clampLeaderX(clientX + cameraX - 23);
+      }
+      lastRenderedCameraX = cameraX;
+  };
+  const setOpenBuildSite = (siteId) => {
+      openSiteId = siteId;
+      if (siteId)
+          renderBuildMenu(siteId);
+      for (const menu of buildMenuElements.values())
+          menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);
+  };
+  const updateCamera = () => {
+      const width = viewport?.clientWidth || window.innerWidth || 1;
+      cameraX = Math.max(0, Math.min(WORLD_WIDTH - width, leaderX - width * 0.5));
+      if (world)
+          world.style.transform = `translate3d(${-cameraX}px,0,0)`;
+      if (openSiteId && !nearestBuildSite())
           setOpenBuildSite(null);
-      };
-      const onViewportPointerDown = (event) => {
-          const target = event.target instanceof Element ? event.target : null;
-          if (target?.closest('[data-build-site-id],.vinh-da-game__build-node,.vinh-da-game__back'))
-              return;
-          moveToClientX(event.clientX);
-      };
-      const onGameClick = (event) => {
-          const target = event.target instanceof Element ? event.target : null;
-          const buildNode = target?.closest('.vinh-da-game__build-node');
-          if (buildNode) {
-              const site = getBuildSite(openSiteId);
+      if (Math.abs(cameraX - lastRenderedCameraX) > BUILD_SITE_RENDER_THRESHOLD)
+          renderVisibleBuildSites();
+      if (sprite)
+          sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
+  };
+  const tick = (now) => {
+      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      lastTime = now;
+      const left = keys.has('arrowleft') || keys.has('a');
+      const right = keys.has('arrowright') || keys.has('d');
+      const keyboardDirection = Number(right) - Number(left);
+      if (keyboardDirection !== 0)
+          targetX = leaderX;
+      leaderX += keyboardDirection !== 0
+          ? keyboardDirection * LEADER_SPEED * dt
+          : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
+      leaderX = clampLeaderX(leaderX);
+      updateCamera();
+      rafId = window.requestAnimationFrame(tick);
+  };
+  const moveToClientX = (clientX) => {
+      targetX = clampLeaderX(clientX + cameraX - 23);
+      setOpenBuildSite(null);
+  };
+  const onViewportPointerDown = (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('[data-build-site-id],.vinh-da-game__build-node,.vinh-da-game__back'))
+          return;
+      moveToClientX(event.clientX);
+  };
+  const onGameClick = (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const buildNode = target?.closest('.vinh-da-game__build-node');
+      if (buildNode) {
+          const site = getBuildSite(openSiteId);
+          const structure = site ? structures.get(site.id) : null;
+          if (site && buildNode.dataset.action === 'upgrade') {
+              if (structure && structure.level < 2) {
+                  structures.set(site.id, { ...structure, level: structure.level + 1 });
+                  renderBuildSite(site.id);
+              }
+          }
+          else {
               const type = buildNode.dataset.structureType;
-              if (site && type && !structures.has(site.id) && site.allowed.includes(type)) {
+              if (site && type && !structure && site.allowed.includes(type)) {
                   structures.set(site.id, { siteId: site.id, type, level: 1 });
-                  renderVisibleBuildSites();
+                  renderBuildSite(site.id);
               }
               setOpenBuildSite(null);
               return;
@@ -38078,7 +38116,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               return;
           }
           setOpenBuildSite(openSiteId === site.id ? null : site.id);
-      };
+      }
+      ;
       const onViewportResize = () => { renderVisibleBuildSites(); };
       const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onViewportResize);
       const onKeyDown = (event) => { keys.add(event.key.toLowerCase()); };
@@ -38105,7 +38144,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               mount.destroy();
           }
       };
-  }
+  };
   const render = renderScreen;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;

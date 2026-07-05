@@ -43,7 +43,8 @@ const BUILD_SITE_SPACING = 720;
 const BUILD_SITE_CASTLE_PADDING = 360;
 const BUILD_SITE_EDGE_PADDING = 160;
 const BUILD_SITE_RENDER_BUFFER = 800;
-const BUILD_SITE_RENDER_THRESHOLD = 160;y
+const BUILD_SITE_RENDER_THRESHOLD = 160;
+const UPGRADE_NODE_LABEL = 'Nâng cấp';
 const BUILD_NODE_OPTIONS = [
   { label: 'Tháp', type: 'watchtower' },
   { label: 'Tường', type: 'wall' },
@@ -112,6 +113,8 @@ const CSS = /* css */ `
   .vinh-da-game__build-node:nth-child(4){transform:translate(0,58px);}
   .vinh-da-game__build-node:nth-child(5){transform:translate(-50px,29px);}
   .vinh-da-game__build-node:nth-child(6){transform:translate(-50px,-29px);}
+  .vinh-da-game__build-menu.is-upgrade-menu{width:96px;height:96px;margin-left:-48px;}
+  .vinh-da-game__build-menu.is-upgrade-menu .vinh-da-game__build-node{transform:translate(0,0);}
   .vinh-da-game__build-node[hidden]{display:none;}
   @keyframes vinh-da-crystal-shine{0%,100%{filter:brightness(1);transform:translateX(-50%) rotate(45deg) scale(1)}50%{filter:brightness(1.45);transform:translateX(-50%) rotate(45deg) scale(1.06)}}
 `;
@@ -183,22 +186,45 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       node.innerHTML = `+<small>${option.label}</small>`;
       menu.append(node);
     });
+    const upgradeNode = document.createElement('button');
+    upgradeNode.className = 'vinh-da-game__build-node';
+    upgradeNode.dataset.action = 'upgrade';
+    upgradeNode.type = 'button';
+    upgradeNode.setAttribute('aria-label', UPGRADE_NODE_LABEL);
+    upgradeNode.hidden = true;
+    upgradeNode.innerHTML = `↑<small>${UPGRADE_NODE_LABEL}</small>`;
+    menu.append(upgradeNode);
 
     buildSitesContainer.append(button, menu);
     siteElements.set(site.id, button);
     buildMenuElements.set(site.id, menu);
     renderBuildSite(site.id);
   };
+  const renderBuildMenu = (siteId: string): void => {
+    const menu = buildMenuElements.get(siteId);
+    const site = getBuildSite(siteId);
+    if (!menu || !site) return;
+    const structure = structures.get(siteId);
+    menu.classList.toggle('is-upgrade-menu', Boolean(structure));
+    for (const node of menu.querySelectorAll<HTMLElement>('.vinh-da-game__build-node')){
+      const type = node.dataset.structureType as StructureType | undefined;
+      const isUpgradeNode = node.dataset.action === 'upgrade';
+      node.hidden = structure
+        ? !isUpgradeNode || structure.level >= 2
+        : isUpgradeNode || !type || !site.allowed.includes(type);
+    }
+  };
   const renderBuildSite = (siteId: string): void => {
     const siteButton = siteElements.get(siteId);
     if (!siteButton) return;
     const site = getBuildSite(siteId);
     const structure = structures.get(siteId);
-siteButton.classList.remove(...structureClassNames);
+      .siteButton.classList.remove(...structureClassNames);
     siteButton.classList.toggle('has-structure', Boolean(structure));
     if (structure) siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
     siteButton.dataset.structureLabel = structure ? BUILD_NODE_OPTIONS.find(option => option.type === structure.type)?.label ?? '' : '';
     siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : 'Ụ đá xây dựng');
+  renderBuildMenu(siteId);
   };
   const renderVisibleBuildSites = (): void => {
     const width = viewport?.clientWidth || window.innerWidth || 1;
@@ -223,6 +249,7 @@ siteButton.classList.remove(...structureClassNames);
   };
   const setOpenBuildSite = (siteId: string | null): void => {
     openSiteId = siteId;
+    if (siteId) renderBuildMenu(siteId);
     for (const menu of buildMenuElements.values()) menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);
   };
 
@@ -264,11 +291,18 @@ siteButton.classList.remove(...structureClassNames);
     const buildNode = target?.closest<HTMLElement>('.vinh-da-game__build-node');
     if (buildNode){
       const site = getBuildSite(openSiteId);
-      const type = buildNode.dataset.structureType as StructureType | undefined;
-      if (site && type && !structures.has(site.id) && site.allowed.includes(type)){
-        structures.set(site.id, { siteId: site.id, type, level: 1 });
-        renderVisibleBuildSites();
-      }
+      const structure = site ? structures.get(site.id) : null;
+      if (site && buildNode.dataset.action === 'upgrade'){
+        if (structure && structure.level < 2){
+          structures.set(site.id, { ...structure, level: structure.level + 1 });
+          renderBuildSite(site.id);
+        }
+      } else {
+        const type = buildNode.dataset.structureType as StructureType | undefined;
+        if (site && type && !structure && site.allowed.includes(type)){
+          structures.set(site.id, { siteId: site.id, type, level: 1 });
+          renderBuildSite(site.id);
+        }
       setOpenBuildSite(null);
       return;
     }
