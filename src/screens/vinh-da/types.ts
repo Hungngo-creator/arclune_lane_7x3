@@ -23,7 +23,7 @@ export interface Enemy {
   x: number;
   hp: number;
   speed: number;
-  aseSpeed: number;
+  baseSpeed: number;
   weight: number;
   side: Side;
 }

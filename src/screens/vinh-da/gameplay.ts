@@ -20,7 +20,8 @@ import {
   ENEMY_WALL_DAMAGE_PER_SECOND,
   GROUND_PERCENT,
   LEADER_ATTACK_RANGE,
-  LEADER_DAMAGE_PER_SECOND,
+  LEADER_BASIC_ATTACK_COOLDOWN_SECONDS,
+  LEADER_BASIC_ATTACK_DAMAGE,
   LANDMINE_BLAST_RADIUS,
   LANDMINE_FUSE_SECONDS,
   LANDMINE_TRIGGER_RADIUS,
@@ -125,6 +126,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const enemyElements = new Map<number, HTMLElement>();
   let nextEnemyId = 1;
   let enemySpawnTimer = 0;
+  let leaderAttackCooldown = 0;
 
   const section = document.createElement('section');
   section.className = 'vinh-da-game';
@@ -392,6 +394,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
   const updateEnemies = (dt: number): void => {
     enemySpawnTimer += dt;
+    leaderAttackCooldown = Math.max(0, leaderAttackCooldown - dt);
     while (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL){
       enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
       spawnEnemy(nextEnemyId % 2 === 0 ? 'left' : 'right');
@@ -411,7 +414,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         const direction = enemy.x < CRYSTAL_X ? 1 : -1;
         enemy.x += direction * getEnemyEffectiveSpeed(enemy) * dt;
       }
-      if (Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE && damageEnemy(enemy, LEADER_DAMAGE_PER_SECOND * dt)) removeEnemyAt(i, true);
+      if (leaderAttackCooldown === 0 && Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE){
+        leaderAttackCooldown = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
+        if (damageEnemy(enemy, LEADER_BASIC_ATTACK_DAMAGE)) removeEnemyAt(i, true);
+      }
     }
   };
   const updateStructures = (dt: number): void => {

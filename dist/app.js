@@ -37848,7 +37848,8 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   const ENEMY_ATTACK_RANGE = 28;
   const ENEMY_WALL_DAMAGE_PER_SECOND = 1;
   const LEADER_ATTACK_RANGE = 58;
-  const LEADER_DAMAGE_PER_SECOND = 2.5;
+  const LEADER_BASIC_ATTACK_COOLDOWN_SECONDS = 2;
+  const LEADER_BASIC_ATTACK_DAMAGE = 5;
   const LANDMINE_TRIGGER_RADIUS = GROUND_PLOT_WIDTH * 0.5;
   const LANDMINE_BLAST_RADIUS = 72;
   const LANDMINE_FUSE_SECONDS = 2;
@@ -37890,7 +37891,8 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_ATTACK_RANGE')) exports.ENEMY_ATTACK_RANGE = ENEMY_ATTACK_RANGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_WALL_DAMAGE_PER_SECOND')) exports.ENEMY_WALL_DAMAGE_PER_SECOND = ENEMY_WALL_DAMAGE_PER_SECOND;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_ATTACK_RANGE')) exports.LEADER_ATTACK_RANGE = LEADER_ATTACK_RANGE;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_DAMAGE_PER_SECOND')) exports.LEADER_DAMAGE_PER_SECOND = LEADER_DAMAGE_PER_SECOND;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_BASIC_ATTACK_COOLDOWN_SECONDS')) exports.LEADER_BASIC_ATTACK_COOLDOWN_SECONDS = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LEADER_BASIC_ATTACK_DAMAGE')) exports.LEADER_BASIC_ATTACK_DAMAGE = LEADER_BASIC_ATTACK_DAMAGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LANDMINE_TRIGGER_RADIUS')) exports.LANDMINE_TRIGGER_RADIUS = LANDMINE_TRIGGER_RADIUS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LANDMINE_BLAST_RADIUS')) exports.LANDMINE_BLAST_RADIUS = LANDMINE_BLAST_RADIUS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LANDMINE_FUSE_SECONDS')) exports.LANDMINE_FUSE_SECONDS = LANDMINE_FUSE_SECONDS;
@@ -37937,7 +37939,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const ENEMY_WALL_DAMAGE_PER_SECOND = __dep2.ENEMY_WALL_DAMAGE_PER_SECOND;
   const GROUND_PERCENT = __dep2.GROUND_PERCENT;
   const LEADER_ATTACK_RANGE = __dep2.LEADER_ATTACK_RANGE;
-  const LEADER_DAMAGE_PER_SECOND = __dep2.LEADER_DAMAGE_PER_SECOND;
+  const LEADER_BASIC_ATTACK_COOLDOWN_SECONDS = __dep2.LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
+  const LEADER_BASIC_ATTACK_DAMAGE = __dep2.LEADER_BASIC_ATTACK_DAMAGE;
   const LANDMINE_BLAST_RADIUS = __dep2.LANDMINE_BLAST_RADIUS;
   const LANDMINE_FUSE_SECONDS = __dep2.LANDMINE_FUSE_SECONDS;
   const LANDMINE_TRIGGER_RADIUS = __dep2.LANDMINE_TRIGGER_RADIUS;
@@ -38030,6 +38033,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const enemyElements = new Map();
       let nextEnemyId = 1;
       let enemySpawnTimer = 0;
+      let leaderAttackCooldown = 0;
       const section = document.createElement('section');
       section.className = 'vinh-da-game';
       const mount = mountSection({ root, section, rootClasses: 'app--vinh-da-gameplay' });
@@ -38315,6 +38319,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       };
       const updateEnemies = (dt) => {
           enemySpawnTimer += dt;
+          leaderAttackCooldown = Math.max(0, leaderAttackCooldown - dt);
           while (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL) {
               enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
               spawnEnemy(nextEnemyId % 2 === 0 ? 'left' : 'right');
@@ -38335,8 +38340,11 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
                   const direction = enemy.x < CRYSTAL_X ? 1 : -1;
                   enemy.x += direction * getEnemyEffectiveSpeed(enemy) * dt;
               }
-              if (Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE && damageEnemy(enemy, LEADER_DAMAGE_PER_SECOND * dt))
-                  removeEnemyAt(i, true);
+              if (leaderAttackCooldown === 0 && Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE) {
+                  leaderAttackCooldown = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
+                  if (damageEnemy(enemy, LEADER_BASIC_ATTACK_DAMAGE))
+                      removeEnemyAt(i, true);
+              }
           }
       };
       const updateStructures = (dt) => {
