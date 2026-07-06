@@ -37969,8 +37969,54 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
 };
 __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
   const METERS_TO_WORLD_UNITS = 100;
+  const DEFAULT_COMBAT_STATS = {
+      wil: 0,
+      arm: 0,
+      res: 0,
+      tier: 1.1,
+      rank: 1,
+      projectileSpeed: 0,
+      attackShape: 'melee',
+      aoeRadius: 0,
+      statusOnHit: null
+  };
+  const DEFAULT_BEHAVIOR_FLAGS = {
+      canFly: false,
+      hasCommanderAura: false,
+      contaminationOnHit: false,
+      bleedOnHit: false,
+      deathExplosion: false,
+      regen: false,
+      dragonDestroyStructure: false,
+      ultimate: null
+  };
+  const deriveEnemyDamage = ({ atk, wil }) => Math.max(atk, wil);
+  const defineEnemyTemplate = (template) => {
+      const combatStats = { ...DEFAULT_COMBAT_STATS, ...template };
+      const behaviorFlags = { ...DEFAULT_BEHAVIOR_FLAGS, ...template };
+      const groundSpeed = template.groundSpeed ?? template.speed;
+      const flySpeed = template.flySpeed ?? (behaviorFlags.canFly ? template.speed : 0);
+      return {
+          ...template,
+          ...combatStats,
+          ...behaviorFlags,
+          groundSpeed,
+          flySpeed,
+          speed: behaviorFlags.canFly ? flySpeed : groundSpeed,
+          damage: deriveEnemyDamage(combatStats)
+      };
+  };
+  const getEnemyTierScalingMultiplier = (tier) => {
+      if (tier === 1.2)
+          return 2;
+      if (tier === 1.3)
+          return 3;
+      return 1;
+  };
+  const scaleEnemyTierStat = (value, tier) => value * getEnemyTierScalingMultiplier(tier);
+  const reduceDamageByDefense = (raw, defense) => raw * 100 / (100 + Math.max(0, defense));
   const ENEMY_TEMPLATES = {
-      twisted: {
+      twisted: defineEnemyTemplate({
           kind: 'twisted',
           label: 'Kẻ vặn vẹo',
           hp: 3,
@@ -37978,11 +38024,10 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           weight: 1,
           attackRange: 28,
           attackCooldown: 2.5,
-          damage: 1,
-          canFly: false,
+          atk: 1,
           reward: 1
-      },
-      crawler: {
+      }),
+      crawler: defineEnemyTemplate({
           kind: 'crawler',
           label: 'Người bò sát',
           hp: 3,
@@ -37990,11 +38035,10 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           weight: 0.9,
           attackRange: 20,
           attackCooldown: 2,
-          damage: 1,
-          canFly: false,
+          atk: 1,
           reward: 1
-      },
-      madDog: {
+      }),
+      madDog: defineEnemyTemplate({
           kind: 'madDog',
           label: 'Chó điên',
           hp: 1.5,
@@ -38002,11 +38046,11 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           weight: 0.3,
           attackRange: 18,
           attackCooldown: 4,
-          damage: 1,
-          canFly: false,
+          atk: 1,
+          rank: 2,
           reward: 1
-      },
-      suicideBomber: {
+      }),
+      suicideBomber: defineEnemyTemplate({
           kind: 'suicideBomber',
           label: 'Bạo Tạc Giả',
           hp: 1,
@@ -38014,11 +38058,13 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           weight: 1.5,
           attackRange: 5 * METERS_TO_WORLD_UNITS,
           attackCooldown: 1.6,
-          damage: 4,
-          canFly: false,
+          atk: 4,
+          attackShape: 'explosion',
+          aoeRadius: 80,
+          deathExplosion: true,
           reward: 2
-      },
-      mutantBird: {
+      }),
+      mutantBird: defineEnemyTemplate({
           kind: 'mutantBird',
           label: 'Chim biến dị',
           hp: 1.3,
@@ -38026,11 +38072,12 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           weight: 0.1,
           attackRange: 12 * METERS_TO_WORLD_UNITS,
           attackCooldown: 0,
-          damage: 2.5,
+          atk: 2.5,
           canFly: true,
+          attackShape: 'flyby',
           reward: 1
-      },
-      darkMage: {
+      }),
+      darkMage: defineEnemyTemplate({
           kind: 'darkMage',
           label: 'Pháp sư hắc ám',
           hp: 3,
@@ -38038,11 +38085,15 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           weight: 1,
           attackRange: 200,
           attackCooldown: 2,
-          damage: 3.5,
-          canFly: false,
+          atk: 1,
+          wil: 3.5,
+          projectileSpeed: 160,
+          attackShape: 'projectile',
+          statusOnHit: 'contamination',
+          contaminationOnHit: true,
           reward: 2
-      },
-      ironMan: {
+      }),
+      ironMan: defineEnemyTemplate({
           kind: 'ironMan',
           label: 'Thiết Hán',
           hp: 5.5,
@@ -38050,11 +38101,12 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           weight: 2.8,
           attackRange: 26,
           attackCooldown: 1.5,
-          damage: 2,
-          canFly: false,
+          atk: 2,
+          arm: 30,
+          rank: 2,
           reward: 3
-      },
-      resentfulDragon: {
+      }),
+      resentfulDragon: defineEnemyTemplate({
           kind: 'resentfulDragon',
           label: 'Oán Long',
           hp: 15,
@@ -38062,13 +38114,25 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           weight: 4,
           attackRange: 5 * METERS_TO_WORLD_UNITS,
           attackCooldown: 5,
-          damage: 8,
+          atk: 8,
+          wil: 4,
+          arm: 20,
+          res: 20,
+          tier: 1.3,
+          rank: 3,
           canFly: true,
+          attackShape: 'line',
+          aoeRadius: 120,
+          dragonDestroyStructure: true,
+          ultimate: 'dragon-rage',
           reward: 8
-      }
+      })
   };
   const DEFAULT_ENEMY_TEMPLATE = ENEMY_TEMPLATES.twisted;
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getEnemyTierScalingMultiplier')) exports.getEnemyTierScalingMultiplier = getEnemyTierScalingMultiplier;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'scaleEnemyTierStat')) exports.scaleEnemyTierStat = scaleEnemyTierStat;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'reduceDamageByDefense')) exports.reduceDamageByDefense = reduceDamageByDefense;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ENEMY_TEMPLATES')) exports.ENEMY_TEMPLATES = ENEMY_TEMPLATES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'DEFAULT_ENEMY_TEMPLATE')) exports.DEFAULT_ENEMY_TEMPLATE = DEFAULT_ENEMY_TEMPLATE;
 };
@@ -38746,9 +38810,28 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           maxHp: template.hp,
           speed: template.speed,
           baseSpeed: template.speed,
+          groundSpeed: template.groundSpeed,
+          flySpeed: template.flySpeed,
           weight: template.weight,
           attackCooldown: template.attackCooldown,
+          atk: template.atk,
+          wil: template.wil,
+          arm: template.arm,
+          res: template.res,
+          tier: template.tier,
+          rank: template.rank,
+          projectileSpeed: template.projectileSpeed,
+          attackShape: template.attackShape,
+          aoeRadius: template.aoeRadius,
+          statusOnHit: template.statusOnHit,
           canFly: template.canFly,
+          hasCommanderAura: template.hasCommanderAura,
+          contaminationOnHit: template.contaminationOnHit,
+          bleedOnHit: template.bleedOnHit,
+          deathExplosion: template.deathExplosion,
+          regen: template.regen,
+          dragonDestroyStructure: template.dragonDestroyStructure,
+          ultimate: template.ultimate,
           side
       });
       ctx.state.nextEnemyId += 1;

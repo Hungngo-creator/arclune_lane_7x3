@@ -1,8 +1,12 @@
-import type { EnemyKind } from './enemies.ts';
+import type { EnemyKind, EnemyTier } from './enemies.ts';
 import type { ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 
 export type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
 export type Side = 'left' | 'right';
+
+export type EnemyAttackShape = 'melee' | 'projectile' | 'explosion' | 'flyby' | 'line' | 'aura';
+export type EnemyStatusOnHit = 'contamination' | 'bleed' | 'slow' | 'paralysis';
+export type EnemyUltimate = 'dragon-rage' | 'commander-aura' | 'death-burst';
 
 export interface BuildSite {
   id: string;
@@ -40,9 +44,28 @@ export interface Enemy {
   maxHp: number;
   speed: number;
   baseSpeed: number;
+  groundSpeed: number;
+  flySpeed: number;
   weight: number;
   attackCooldown: number;
+  atk: number;
+  wil: number;
+  arm: number;
+  res: number;
+  tier: EnemyTier;
+  rank: number;
+  projectileSpeed: number;
+  attackShape: EnemyAttackShape;
+  aoeRadius: number;
+  statusOnHit: EnemyStatusOnHit | null;
   canFly: boolean;
+  hasCommanderAura: boolean;
+  contaminationOnHit: boolean;
+  bleedOnHit: boolean;
+  deathExplosion: boolean;
+  regen: boolean;
+  dragonDestroyStructure: boolean;
+  ultimate: EnemyUltimate | null;
   side: Side;
   mageOrbTimer?: number;
   mageOrbs?: number;
