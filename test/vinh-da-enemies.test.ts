@@ -2,7 +2,7 @@ import { CRYSTAL_X } from '../src/screens/vinh-da/constants.ts';
 import { ENEMY_TEMPLATES } from '../src/screens/vinh-da/enemies.ts';
 import { BUILD_SITES } from '../src/screens/vinh-da/structures.ts';
 import type { StructureType } from '../src/screens/vinh-da/structures.ts';
-import { getLivingTerritoryWallBounds, getVinhDaWaveConfig, isXInLivingTerritory } from '../src/screens/vinh-da/simulation.ts';
+import { getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory } from '../src/screens/vinh-da/simulation.ts';
 import type { VinhDaSimulationContext, VinhDaSimulationState } from '../src/screens/vinh-da/simulation.ts';
 import type { BuildSite, PlacedStructure, StructureRuntime } from '../src/screens/vinh-da/types.ts';
 
@@ -35,6 +35,14 @@ describe('Vĩnh Dạ wave table', () => {
     const bossWave = getVinhDaWaveConfig(12, 1.3);
     expect(bossWave.threatBudget).toBe(40);
     expect(bossWave.enemyWeights.resentfulDragon).toBeGreaterThan(0);
+  });
+
+  it('scales threat budget by night without mutating the base wave table', () => {
+    const baseWave = getVinhDaWaveConfig(5, 1.2);
+    expect(baseWave.threatBudget).toBe(20);
+    expect(getScaledThreatBudget(baseWave.threatBudget, 1)).toBe(20);
+    expect(getScaledThreatBudget(baseWave.threatBudget, 5)).toBeCloseTo(20 * Math.pow(1.05, 4));
+    expect(getVinhDaWaveConfig(5, 1.2).threatBudget).toBe(20);
   });
 });
 

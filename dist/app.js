@@ -38208,6 +38208,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const isStructureAllowedOnBuildSite = __dep4.isStructureAllowedOnBuildSite;
   const __dep5 = __require('./screens/vinh-da/simulation.ts');
   const DAY_DURATION_SECONDS = __dep5.DAY_DURATION_SECONDS;
+  const getScaledThreatBudget = __dep5.getScaledThreatBudget;
   const getVinhDaWaveConfig = __dep5.getVinhDaWaveConfig;
   const runtimeDamageBase = __dep5.damageBase;
   const runtimeDamageStructure = __dep5.damageStructure;
@@ -38321,7 +38322,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let phaseRemainingSeconds = DAY_DURATION_SECONDS;
       let leaderAttackCooldown = 0;
       let nightIndex = 1;
-      let waveThreatBudgetRemaining = getVinhDaWaveConfig(nightIndex).threatBudget;
+      let waveThreatBudgetRemaining = getScaledThreatBudget(getVinhDaWaveConfig(nightIndex).threatBudget, nightIndex);
       const section = document.createElement('section');
       section.className = 'vinh-da-game';
       const mount = mountSection({ root, section, rootClasses: 'app--vinh-da-gameplay' });
@@ -38928,6 +38929,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       { minNightIndex: 8, mapTier: 1.2, threatBudget: 28, enemyWeights: { crawler: 3, madDog: 2, suicideBomber: 2, darkMage: 2, ironMan: 2, mutantBird: 1 } },
       { minNightIndex: 12, mapTier: 1.3, threatBudget: 40, enemyWeights: { crawler: 2, madDog: 2, suicideBomber: 2, darkMage: 3, ironMan: 3, mutantBird: 2, resentfulDragon: 0.35 } }
   ]);
+  const getScaledThreatBudget = (baseBudget, nightIndex) => (baseBudget * Math.pow(1.05, Math.max(0, nightIndex - 1)));
   const getVinhDaWaveConfig = (nightIndex, mapTier = 1.1) => {
       const targetNight = Math.max(1, Math.floor(nightIndex));
       let selected = VINH_DA_WAVE_TABLE[0];
@@ -39617,7 +39619,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           }
           else {
               ctx.state.nightIndex += 1;
-              ctx.state.waveThreatBudgetRemaining = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier).threatBudget;
+              const waveConfig = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier);
+              ctx.state.waveThreatBudgetRemaining = getScaledThreatBudget(waveConfig.threatBudget, ctx.state.nightIndex);
           }
       }
       ctx.renderDayNightTimer();
@@ -39902,6 +39905,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'RESOURCE_PICKUP_RANGE')) exports.RESOURCE_PICKUP_RANGE = RESOURCE_PICKUP_RANGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'RESOURCE_DEPOSIT_RANGE')) exports.RESOURCE_DEPOSIT_RANGE = RESOURCE_DEPOSIT_RANGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_BUFF_DAILY_UPKEEP')) exports.BASE_BUFF_DAILY_UPKEEP = BASE_BUFF_DAILY_UPKEEP;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getScaledThreatBudget')) exports.getScaledThreatBudget = getScaledThreatBudget;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getVinhDaWaveConfig')) exports.getVinhDaWaveConfig = getVinhDaWaveConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, 'spawnEnemy')) exports.spawnEnemy = spawnEnemy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'spawnWaveEnemy')) exports.spawnWaveEnemy = spawnWaveEnemy;

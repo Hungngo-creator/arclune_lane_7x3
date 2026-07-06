@@ -51,6 +51,10 @@ const VINH_DA_WAVE_TABLE: readonly VinhDaWaveConfig[] = Object.freeze([
   { minNightIndex: 12, mapTier: 1.3, threatBudget: 40, enemyWeights: { crawler: 2, madDog: 2, suicideBomber: 2, darkMage: 3, ironMan: 3, mutantBird: 2, resentfulDragon: 0.35 } }
 ]);
 
+export const getScaledThreatBudget = (baseBudget: number, nightIndex: number): number => (
+  baseBudget * Math.pow(1.05, Math.max(0, nightIndex - 1))
+);
+
 export const getVinhDaWaveConfig = (nightIndex: number, mapTier: EnemyTier = 1.1): VinhDaWaveConfig => {
   const targetNight = Math.max(1, Math.floor(nightIndex));
   let selected = VINH_DA_WAVE_TABLE[0]!;
@@ -716,9 +720,10 @@ export const updateDayNightTimer = (ctx: VinhDaSimulationContext, dt: number): v
         clearEnemiesWithoutReward(ctx);
         applyBaseBuffDailyUpkeep(ctx);
         convertContaminationToApostles(ctx);
-        } else {
+      } else {
         ctx.state.nightIndex += 1;
-        ctx.state.waveThreatBudgetRemaining = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier).threatBudget;
+        const waveConfig = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier);
+        ctx.state.waveThreatBudgetRemaining = getScaledThreatBudget(waveConfig.threatBudget, ctx.state.nightIndex);
       }
     }
     ctx.renderDayNightTimer();

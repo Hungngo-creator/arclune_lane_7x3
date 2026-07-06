@@ -37,6 +37,7 @@ import {
 import type { StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import {
   DAY_DURATION_SECONDS,
+  getScaledThreatBudget,
   getVinhDaWaveConfig,
   damageBase as runtimeDamageBase,
   damageStructure as runtimeDamageStructure,
@@ -164,7 +165,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let phaseRemainingSeconds = DAY_DURATION_SECONDS;
   let leaderAttackCooldown = 0;
   let nightIndex = 1;
-  let waveThreatBudgetRemaining = getVinhDaWaveConfig(nightIndex).threatBudget;
+  let waveThreatBudgetRemaining = getScaledThreatBudget(getVinhDaWaveConfig(nightIndex).threatBudget, nightIndex);
 
   const section = document.createElement('section');
   section.className = 'vinh-da-game';
