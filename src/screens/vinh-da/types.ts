@@ -53,6 +53,12 @@ export interface RuntimeSoldier {
   statuses?: VinhDaStatusCollection;
 }
 
+export interface DroppedResource {
+  id: number;
+  x: number;
+  amount: number;
+}
+
 export interface Enemy {
   id: number;
   kind: EnemyKind;

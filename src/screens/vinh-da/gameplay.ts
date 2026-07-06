@@ -23,11 +23,11 @@ import {
   WORLD_WIDTH
 } from './constants.ts';
 import {
-  BUILD_LEVEL_COST,
   BUILD_NODE_OPTIONS,
   GROUND_BUILD_NODE_OPTIONS,
   BUILD_SITES,
   UPGRADE_NODE_LABEL,
+  getBuildLevelCost,
   getStructureLevelStat,
   isStructureAllowedOnBuildSite,
 } from './structures.ts';
@@ -42,10 +42,11 @@ import {
   spawnWaveEnemy as runtimeSpawnWaveEnemy,
   updateDayNightTimer as runtimeUpdateDayNightTimer,
   updateEnemies as runtimeUpdateEnemies,
-  updateStructures as runtimeUpdateStructures
+  updateStructures as runtimeUpdateStructures,
+  collectDroppedResources as runtimeCollectDroppedResources,
 } from './simulation.ts';
 import type { DayNightPhase, VinhDaSimulationContext, VinhDaSimulationState } from './simulation.ts';
-import type { BuildSite, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
+import type { BuildSite, DroppedResource, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
 interface RenderContext {
   root: HTMLElement;
@@ -68,6 +69,7 @@ const CSS = /* css */ `
   .vinh-da-game__crystal{position:absolute;left:${CRYSTAL_X}px;bottom:calc(${GROUND_PERCENT} + 34px);width:50px;height:72px;transform:translateX(-50%) rotate(45deg);border-radius:12px;background:linear-gradient(135deg,#eaffff,#a887ff 45%,#4cf6ff);box-shadow:0 0 18px #dff,0 0 42px rgba(121,93,255,.78);animation:vinh-da-crystal-shine 1.8s ease-in-out infinite;}
   .vinh-da-game__crystal::after{content:"";position:absolute;inset:8px 20px;background:rgba(255,255,255,.72);filter:blur(2px);}
   .vinh-da-game__leader{position:absolute;bottom:${GROUND_PERCENT};width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
+  .vinh-da-game__drop{position:absolute;bottom:calc(${GROUND_PERCENT} + 10px);width:18px;height:18px;margin-left:-9px;border-radius:999px;background:radial-gradient(circle,#f5f7ff,#6dc8ff 48%,#352073);box-shadow:0 0 14px rgba(109,200,255,.75);z-index:2;}
   .vinh-da-game__enemy{position:absolute;bottom:${GROUND_PERCENT};width:38px;height:52px;margin-left:-19px;border-radius:18px 18px 8px 8px;background:linear-gradient(180deg,#d14b5f,#381018);box-shadow:0 0 18px rgba(209,75,95,.34);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
   .vinh-da-game__rock{position:absolute;bottom:${GROUND_PERCENT};width:96px;height:58px;margin-left:-48px;border:0;border-radius:46% 54% 38% 42%;background:linear-gradient(150deg,#7e7b8e,#383746 58%,#1f1f2a);box-shadow:inset -12px -10px 18px rgba(0,0,0,.32),0 8px 22px rgba(0,0,0,.35);cursor:pointer;z-index:2;}
   .vinh-da-game__rock::after{content:"";position:absolute;left:18px;top:12px;width:42px;height:10px;border-radius:999px;background:rgba(255,255,255,.18);transform:rotate(-12deg);}
@@ -124,14 +126,18 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let groundPlotsVisible = false;
   let selectedGroundPlotId: string | null = null;
   let bloodSealStone = 0;
+  let carriedDaThach = 0;
   let baseHp = 100;
   const keys = new Set<string>();
   const structures = new Map<string, PlacedStructure>();
   const structureRuntimes = new Map<string, StructureRuntime>();
   const structureSitesByType = new Map<StructureType, Set<string>>();
   const enemies: Enemy[] = [];
+  const droppedResources: DroppedResource[] = [];
   const enemyElements = new Map<number, HTMLElement>();
+  const droppedResourceElements = new Map<number, HTMLElement>();
   let nextEnemyId = 1;
+  let nextDroppedResourceId = 1;
   let enemySpawnTimer = 0;
   let dayNightPhase: DayNightPhase = 'night';
   let phaseRemainingSeconds = DAY_DURATION_SECONDS;
@@ -146,7 +152,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     <div class="vinh-da-game__hud">
       <div class="vinh-da-game__panel">
         <strong>Vĩnh Dạ · ${leader?.name ?? leaderId ?? 'Leader'}</strong>
-        <div>Huyết ấn thạch: <span data-role="blood-seal-stone">${bloodSealStone}</span></div>
+        <div>Dạ Thạch: <span data-role="blood-seal-stone">${bloodSealStone}</span> · Đang chở: <span data-role="carried-resource">${carriedDaThach}</span></div>
         <div>Phase: <span data-role="day-night-phase"></span></div>
         <div>Đêm: <span data-role="night-index"></span> · Budget: <span data-role="wave-threat-budget"></span></div>
         <div>Còn lại: <span data-role="phase-time-remaining"></span></div>
@@ -159,6 +165,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
         <div class="vinh-da-game__ground" aria-hidden="true"></div>
         <div data-role="build-sites"></div>
+        <div data-role="dropped-resources"></div>
         <div data-role="enemies"></div>
         <div class="vinh-da-game__leader" data-role="leader" title="${leader?.name ?? leaderId ?? 'Leader'}"></div>
       </div>
@@ -169,7 +176,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const viewport = section.querySelector<HTMLElement>('[data-role="viewport"]');
   const buildSitesContainer = section.querySelector<HTMLElement>('[data-role="build-sites"]');
   const enemiesContainer = section.querySelector<HTMLElement>('[data-role="enemies"]');
+  const droppedResourcesContainer = section.querySelector<HTMLElement>('[data-role="dropped-resources"]');
   const bloodSealStoneText = section.querySelector<HTMLElement>('[data-role="blood-seal-stone"]');
+  const carriedResourceText = section.querySelector<HTMLElement>('[data-role="carried-resource"]');
   const dayNightPhaseText = section.querySelector<HTMLElement>('[data-role="day-night-phase"]');
   const phaseTimeRemainingText = section.querySelector<HTMLElement>('[data-role="phase-time-remaining"]');
   const nightIndexText = section.querySelector<HTMLElement>('[data-role="night-index"]');
@@ -238,6 +247,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const canAfford = (cost: number): boolean => bloodSealStone >= cost;
   const renderEconomy = (): void => {
     if (bloodSealStoneText) bloodSealStoneText.textContent = String(bloodSealStone);
+    if (carriedResourceText) carriedResourceText.textContent = String(carriedDaThach);
   };
   const renderDayNightTimer = (): void => {
     if (dayNightPhaseText) dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
@@ -335,7 +345,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const action = node.dataset.action;
       const isUpgradeNode = action === 'upgrade';
       const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
-      const cost = structure ? BUILD_LEVEL_COST[nextLevel as keyof typeof BUILD_LEVEL_COST] : BUILD_LEVEL_COST[1];
+      const cost = structure ? getBuildLevelCost(structure.type, nextLevel) : type ? getBuildLevelCost(type, 1) : 1;
       const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
       const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
       const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
@@ -413,6 +423,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const simulationState: VinhDaSimulationState = {
     get bloodSealStone(){ return bloodSealStone; },
     set bloodSealStone(value: number){ bloodSealStone = value; },
+    get carriedDaThach(){ return carriedDaThach; },
+    set carriedDaThach(value: number){ carriedDaThach = value; },
+    droppedResources,
+    nextDroppedResourceId,
     get baseHp(){ return baseHp; },
     set baseHp(value: number){ baseHp = value; },
     get leaderX(){ return leaderX; },
@@ -436,6 +450,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     deleteStructure,
     structureSiteIdsOfType,
     renderEconomy,
+    renderDroppedResources,
     renderBuildSite,
     renderDayNightTimer,
     removeEnemyElement(enemyId: number): void {
@@ -451,6 +466,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     leaderAttackCooldown = simulationState.leaderAttackCooldown;
     nightIndex = simulationState.nightIndex;
     waveThreatBudgetRemaining = simulationState.waveThreatBudgetRemaining;
+    nextDroppedResourceId = simulationState.nextDroppedResourceId;
   };
   const spawnWaveEnemy = (side: Side): void => { runtimeSpawnWaveEnemy(simulationContext, side); syncSimulationState(); };
   const removeEnemyAt = (index: number, reward: boolean): void => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };
@@ -464,6 +480,28 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const updateEnemies = (dt: number): void => { runtimeUpdateEnemies(simulationContext, dt); syncSimulationState(); };
   const updateDayNightTimer = (dt: number): void => { runtimeUpdateDayNightTimer(simulationContext, dt); syncSimulationState(); };
   const updateStructures = (dt: number): void => { runtimeUpdateStructures(simulationContext, dt); syncSimulationState(); };
+  const collectDroppedResources = (): void => { runtimeCollectDroppedResources(simulationContext); syncSimulationState(); };
+
+  function renderDroppedResources(): void {
+    if (!droppedResourcesContainer) return;
+    for (const resource of droppedResources){
+      let element = droppedResourceElements.get(resource.id);
+      if (!element){
+        element = document.createElement('div');
+        element.className = 'vinh-da-game__drop';
+        element.title = `Dạ Thạch +${resource.amount}`;
+        droppedResourcesContainer.append(element);
+        droppedResourceElements.set(resource.id, element);
+      }
+      element.style.transform = `translate3d(${resource.x}px,0,0)`;
+    }
+    for (const [id, element] of droppedResourceElements){
+      if (!droppedResources.some(resource => resource.id === id)){
+        element.remove();
+        droppedResourceElements.delete(id);
+      }
+    }
+  }
 
   const renderEnemies = (): void => {
     if (!enemiesContainer) return;
@@ -514,6 +552,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     updateDayNightTimer(dt);
     updateEnemies(dt);
     updateStructures(dt);
+    collectDroppedResources();
     updateCamera();
     renderEnemies();
   };
@@ -542,13 +581,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const action = buildNode.dataset.action;
       if (site && structure && action){
         const nextLevel = structure.level + 1;
-        if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(BUILD_LEVEL_COST[nextLevel as keyof typeof BUILD_LEVEL_COST])){
+        if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(getBuildLevelCost(structure.type, nextLevel))){
           const upgraded = { ...structure, level: nextLevel };
           setStructure(upgraded);
           const runtime = ensureStructureRuntime(upgraded);
           runtime.hp = getStructureMaxHp(upgraded);
           renderBuildSite(site.id);
-          } else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(BUILD_LEVEL_COST[3])){
+          } else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(getBuildLevelCost(structure.type, 3))){
           const upgraded = { ...structure, level: 3, branchLv3: action.slice('branch-lv3-'.length) as WallBranchLv3 };
           setStructure(upgraded);
           ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
@@ -557,7 +596,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
           const runtime = ensureStructureRuntime(structure);
           runtime.gravityEnabled = !(runtime.gravityEnabled ?? true);
           renderBuildSite(site.id);
-        } else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(BUILD_LEVEL_COST[5])){
+        } else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(getBuildLevelCost(structure.type, 5))){
           const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) as WallBranchLv5 };
           setStructure(upgraded);
           ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
@@ -565,11 +604,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         }
       } else {
         const type = buildNode.dataset.structureType as StructureType | undefined;
-        if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' }) && spend(BUILD_LEVEL_COST[1])){
+        if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' }) && spend(getBuildLevelCost(type, 1))){
           const upgraded = { ...structure, mountedStructure: type };
           setStructure(upgraded);
           renderBuildSite(site.id);
-        } else if (site && type && !structure && isStructureAllowedOnBuildSite(type, site) && spend(BUILD_LEVEL_COST[1])){
+        } else if (site && type && !structure && isStructureAllowedOnBuildSite(type, site) && spend(getBuildLevelCost(type, 1))){
           const placed = { siteId: site.id, type, level: 1 };
           setStructure(placed);
           ensureStructureRuntime(placed);

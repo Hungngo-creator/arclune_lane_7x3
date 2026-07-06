@@ -28,9 +28,12 @@ import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES } from './enemies.ts';
 import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
 import { BASE_STRUCTURE_STATS, getStructureLevelStat } from './structures.ts';
 import type { ElementalTowerElement, StructureType } from './structures.ts';
-import type { BuildSite, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
+import type { BuildSite, DroppedResource, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
 export const DAY_DURATION_SECONDS = 300;
+export const RESOURCE_PICKUP_RANGE = 54;
+export const RESOURCE_DEPOSIT_RANGE = 90;
+export const BASE_BUFF_DAILY_UPKEEP = 1;
 export type DayNightPhase = 'day' | 'night';
 
 export interface VinhDaWaveConfig {
@@ -73,6 +76,9 @@ const chooseEnemyKindForBudget = (config: VinhDaWaveConfig, budgetRemaining: num
 
 export interface VinhDaSimulationState {
   bloodSealStone: number;
+  carriedDaThach: number;
+  droppedResources: DroppedResource[];
+  nextDroppedResourceId: number;
   baseHp: number;
   baseLevel?: number;
   contamination?: number;
@@ -99,6 +105,7 @@ export interface VinhDaSimulationContext {
   deleteStructure(siteId: string): boolean;
   structureSiteIdsOfType(type: StructureType): Iterable<string>;
   renderEconomy(): void;
+  renderDroppedResources(): void;
   renderBuildSite(siteId: string): void;
   renderDayNightTimer(): void;
   removeEnemyElement(enemyId: number): void;
@@ -210,14 +217,37 @@ export const removeEnemyAt = (ctx: VinhDaSimulationContext, index: number, rewar
     ctx.removeEnemyElement(enemy.id);
   triggerDeathExplosion(ctx, enemy);
     if (reward){
-      ctx.state.bloodSealStone += ENEMY_TEMPLATES[enemy.kind].reward;
-      ctx.renderEconomy();
+      const amount = ENEMY_TEMPLATES[enemy.kind].reward;
+      if (amount > 0){
+        ctx.state.droppedResources.push({ id: ctx.state.nextDroppedResourceId, x: enemy.x, amount });
+        ctx.state.nextDroppedResourceId += 1;
+        ctx.renderDroppedResources();
+      }
     }
   };
 export const clearEnemiesWithoutReward = (ctx: VinhDaSimulationContext): void => {
     while (ctx.state.enemies.length > 0) removeEnemyAt(ctx, ctx.state.enemies.length - 1, false);
     ctx.state.enemySpawnTimer = 0;
   };
+export const collectDroppedResources = (ctx: VinhDaSimulationContext): void => {
+  let collected = 0;
+  for (let i = ctx.state.droppedResources.length - 1; i >= 0; i -= 1){
+    const resource = ctx.state.droppedResources[i];
+    if (!resource || Math.abs(resource.x - ctx.state.leaderX) > RESOURCE_PICKUP_RANGE) continue;
+    collected += resource.amount;
+    ctx.state.droppedResources.splice(i, 1);
+  }
+  if (collected > 0){
+    ctx.state.carriedDaThach += collected;
+    ctx.renderDroppedResources();
+    ctx.renderEconomy();
+  }
+  if (ctx.state.carriedDaThach > 0 && Math.abs(ctx.state.leaderX - CRYSTAL_X) <= RESOURCE_DEPOSIT_RANGE){
+    ctx.state.bloodSealStone += ctx.state.carriedDaThach;
+    ctx.state.carriedDaThach = 0;
+    ctx.renderEconomy();
+  }
+};
 export const getBlockingWall = (ctx: VinhDaSimulationContext, enemy: Enemy): { site: BuildSite; runtime: StructureRuntime } | null => {
     for (const siteId of ctx.structureSiteIdsOfType('wall')){
       const structure = ctx.state.structures.get(siteId);
@@ -631,6 +661,12 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
     }
   };
 
+const applyBaseBuffDailyUpkeep = (ctx: VinhDaSimulationContext): void => {
+  if ((ctx.state.baseLevel ?? 0) <= 0) return;
+  ctx.state.bloodSealStone = Math.max(0, ctx.state.bloodSealStone - BASE_BUFF_DAILY_UPKEEP);
+  ctx.renderEconomy();
+};
+
 const convertContaminationToApostles = (ctx: VinhDaSimulationContext): void => {
   const stacks = ctx.state.contamination ?? 0;
   const apostleCount = Math.floor(stacks / CONTAMINATION_APOSTLE_STACKS);
@@ -649,6 +685,7 @@ export const updateDayNightTimer = (ctx: VinhDaSimulationContext, dt: number): v
       ctx.state.dayNightPhase = ctx.state.dayNightPhase === 'night' ? 'day' : 'night';
       if (ctx.state.dayNightPhase === 'day'){
         clearEnemiesWithoutReward(ctx);
+        applyBaseBuffDailyUpkeep(ctx);
         convertContaminationToApostles(ctx);
         } else {
         ctx.state.nightIndex += 1;

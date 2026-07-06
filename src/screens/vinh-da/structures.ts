@@ -71,13 +71,29 @@ export interface StructureLevelStat {
 
 export const UPGRADE_NODE_LABEL = 'Nâng cấp';
 export const BUILD_LEVEL_COST = {
-  1: 0,
-  2: 1,
-  3: 2,
-  4: 3,
-  5: 4,
-  6: 5,
+  1: 2,
+  2: 3,
+  3: 5,
+  4: 8,
+  5: 12,
+  6: 18,
 } as const satisfies Record<number, number>;
+
+const STRUCTURE_COST_MULTIPLIER: Record<StructureType, number> = {
+  watchtower: 1,
+  wall: 0.8,
+  elementalTower: 1.15,
+  barracks: 1.2,
+  church: 1.1,
+  crystalSeal: 1,
+  landmine: 0.6,
+  swamp: 0.75,
+  spikeTrap: 0.75,
+  antiAirCannon: 1.25,
+  gravityCannon: 1.35,
+};
+
+export const getBuildLevelCost = (type: StructureType, level: number): number => Math.max(1, Math.ceil((BUILD_LEVEL_COST[level as keyof typeof BUILD_LEVEL_COST] ?? BUILD_LEVEL_COST[6]) * (STRUCTURE_COST_MULTIPLIER[type] ?? 1)));
 
 export const WALL_LEVELS = {
   1: { hp: 15, arm: 1, res: 1, hpRegen: 1 },
