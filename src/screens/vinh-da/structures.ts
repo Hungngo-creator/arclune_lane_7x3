@@ -11,6 +11,7 @@ import {
 import type { BuildSite, BuildSiteKind } from './types.ts';
 
 export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal' | 'landmine' | 'swamp';
+export type ElementalTowerElement = 'Hỏa' | 'Mộc' | 'Thủy' | 'Thổ' | 'Kim' | 'Lôi' | 'Huyết' | 'Ánh Sáng' | 'Phong';
 
 export interface BuildMenuOption {
   label: string;
@@ -22,6 +23,24 @@ export type WallBranchLv5 = 'biochemical' | 'curse' | 'link';
 
 export interface StructureLevelStat {
   hp: number;
+  maxTargets?: number;
+  projectileSpeed?: number;
+  element?: ElementalTowerElement;
+  healPerSecond?: number;
+  healingBonusPercent?: number;
+  shield?: number;
+  emergencyHealPercent?: number;
+  emergencyCooldownSeconds?: number;
+  buffArmPercent?: number;
+  buffResPercent?: number;
+  buffAtkPercent?: number;
+  buffWilPercent?: number;
+  prayerIntervalSeconds?: number;
+  cleanseContaminationSeconds?: number;
+  soldierCap?: number;
+  soldierRank?: number;
+  soldierSpawnSeconds?: number;
+  ultimatePermission?: boolean;
   range?: number;
   damage?: number;
   cooldownSeconds?: number;
@@ -102,28 +121,51 @@ export const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'swamp'] as const satisfie
 export const WALL_BUILD_SITE_ALLOWED = ['wall'] as const satisfies readonly StructureType[];
 export const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
 
+const METERS_TO_WORLD_UNITS = 460 / 150;
+export const metersToWorldUnits = (meters: number): number => Math.round(meters * METERS_TO_WORLD_UNITS);
+export const WATCHTOWER_RANGE_WORLD_UNITS = metersToWorldUnits(150);
+export const ELEMENTAL_TOWER_RANGE_WORLD_UNITS = metersToWorldUnits(100);
+export const LORE_HOUR_SECONDS = 60;
+export const CONTAMINATION_CLEANSE_SECONDS = 2 * LORE_HOUR_SECONDS;
+
 export const WALL_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
   1: WALL_LEVELS[1],
   2: WALL_LEVELS[2],
 };
 
 export const WATCHTOWER_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
-  1: { hp: 1, range: 460, damage: 1, cooldownSeconds: 0.55 },
-  2: { hp: 1, range: 460, damage: 2, cooldownSeconds: 0.55 }
+  1: { hp: 12, maxTargets: 1, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 2, cooldownSeconds: 1.2, projectileSpeed: 8 },
+  2: { hp: 16, maxTargets: 1, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 3, cooldownSeconds: 1.05, projectileSpeed: 8 },
+  3: { hp: 22, maxTargets: 2, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 0.95, projectileSpeed: 8 },
+  4: { hp: 30, maxTargets: 2, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 6, cooldownSeconds: 0.85, projectileSpeed: 8 },
+  5: { hp: 40, maxTargets: 3, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 8, cooldownSeconds: 0.75, projectileSpeed: 8 }
 };
 
+export const ELEMENTAL_TOWER_ELEMENTS = ['Hỏa', 'Mộc', 'Thủy', 'Thổ', 'Kim', 'Lôi', 'Huyết', 'Ánh Sáng', 'Phong'] as const satisfies readonly ElementalTowerElement[];
+export const ELEMENTAL_TOWER_STRUCTURE_STATS: Record<ElementalTowerElement, Record<number, StructureLevelStat>> = Object.fromEntries(ELEMENTAL_TOWER_ELEMENTS.map((element, index) => [element, {
+  1: { hp: 10, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 1.5 + index * 0.05, cooldownSeconds: 1.4, projectileSpeed: 6 },
+  2: { hp: 14, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 2.5 + index * 0.05, cooldownSeconds: 1.3, projectileSpeed: 6 },
+  3: { hp: 20, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 3.5 + index * 0.05, cooldownSeconds: 1.2, projectileSpeed: 6 },
+  4: { hp: 28, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 5 + index * 0.05, cooldownSeconds: 1.05, projectileSpeed: 6 },
+  5: { hp: 36, element, maxTargets: 3, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 6.5 + index * 0.05, cooldownSeconds: 0.95, projectileSpeed: 6 }
+}])) as unknown as Record<ElementalTowerElement, Record<number, StructureLevelStat>>;
+
 export const GROUND_STRUCTURE_STATS: Record<Exclude<StructureType, 'wall' | 'watchtower'>, Record<number, StructureLevelStat>> = {
-  elementalTower: {
-    1: { hp: 1, range: 460, damage: 1, cooldownSeconds: 0.55 },
-    2: { hp: 1, range: 460, damage: 2, cooldownSeconds: 0.55 }
-  },
+  elementalTower: ELEMENTAL_TOWER_STRUCTURE_STATS['Hỏa'],
   barracks: {
-    1: { hp: 1 },
-    2: { hp: 1 }
+    1: { hp: 18, soldierCap: 1, soldierRank: 1, soldierSpawnSeconds: 10 },
+    2: { hp: 24, soldierCap: 2, soldierRank: 1, soldierSpawnSeconds: 9 },
+    3: { hp: 32, soldierCap: 2, soldierRank: 2, soldierSpawnSeconds: 8 },
+    4: { hp: 42, soldierCap: 3, soldierRank: 2, soldierSpawnSeconds: 7 },
+    5: { hp: 54, soldierCap: 4, soldierRank: 3, soldierSpawnSeconds: 6 },
+    6: { hp: 70, soldierCap: 5, soldierRank: 4, soldierSpawnSeconds: 5, ultimatePermission: true }
   },
   church: {
-    1: { hp: 1 },
-    2: { hp: 1 }
+    1: { hp: 14, buffArmPercent: 0.03, buffResPercent: 0.03, prayerIntervalSeconds: 20, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+    2: { hp: 18, buffArmPercent: 0.05, buffResPercent: 0.05, healingBonusPercent: 0.05, prayerIntervalSeconds: 18, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+    3: { hp: 24, buffArmPercent: 0.07, buffResPercent: 0.07, buffAtkPercent: 0.04, buffWilPercent: 0.04, healingBonusPercent: 0.08, prayerIntervalSeconds: 16, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+    4: { hp: 32, buffArmPercent: 0.1, buffResPercent: 0.1, buffAtkPercent: 0.06, buffWilPercent: 0.06, healingBonusPercent: 0.12, prayerIntervalSeconds: 14, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+    5: { hp: 44, buffArmPercent: 0.14, buffResPercent: 0.14, buffAtkPercent: 0.08, buffWilPercent: 0.08, healingBonusPercent: 0.16, shield: 12, prayerIntervalSeconds: 12, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS }
   },
   crystalSeal: {
     1: { hp: 1 },
@@ -239,8 +281,21 @@ export const getWallLevelStat = (level: number, branchLv3?: WallBranchLv3, branc
   };
 };
 
-export const getStructureLevelStat = (type: StructureType, level: number, branchLv3?: WallBranchLv3, branchLv5?: WallBranchLv5): StructureLevelStat => {
+export const BASE_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
+  0: { hp: 100, healPerSecond: 0 },
+  1: { hp: 120, healPerSecond: 0.15, healingBonusPercent: 0.02 },
+  2: { hp: 145, healPerSecond: 0.25, healingBonusPercent: 0.04, shield: 4 },
+  3: { hp: 175, healPerSecond: 0.4, healingBonusPercent: 0.06, shield: 8 },
+  4: { hp: 210, healPerSecond: 0.6, healingBonusPercent: 0.08, shield: 12 },
+  5: { hp: 250, healPerSecond: 0.85, healingBonusPercent: 0.1, shield: 18 },
+  6: { hp: 300, healPerSecond: 1.2, healingBonusPercent: 0.15, shield: 28, emergencyHealPercent: 0.35, emergencyCooldownSeconds: 60 }
+};
+
+export const getElementalTowerLevelStat = (level: number, element: ElementalTowerElement = 'Hỏa'): StructureLevelStat => ELEMENTAL_TOWER_STRUCTURE_STATS[element][level] ?? ELEMENTAL_TOWER_STRUCTURE_STATS[element][1] ?? { hp: 1 };
+
+export const getStructureLevelStat = (type: StructureType, level: number, branchLv3?: WallBranchLv3, branchLv5?: WallBranchLv5, element?: ElementalTowerElement): StructureLevelStat => {
   if (type === 'wall') return getWallLevelStat(level, branchLv3, branchLv5);
   if (type === 'watchtower') return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
+  if (type === 'elementalTower') return getElementalTowerLevelStat(level, element);y
   return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
 };

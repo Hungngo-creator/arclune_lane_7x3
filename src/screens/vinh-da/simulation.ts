@@ -19,8 +19,8 @@ import {
 } from './constants.ts';
 import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES } from './enemies.ts';
 import type { EnemyKind, EnemyTemplate } from './enemies.ts';
-import { getStructureLevelStat } from './structures.ts';
-import type { StructureType } from './structures.ts';
+import { BASE_STRUCTURE_STATS, getStructureLevelStat } from './structures.ts';
+import type { ElementalTowerElement, StructureType } from './structures.ts';
 import type { BuildSite, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
 export const DAY_DURATION_SECONDS = 300;
@@ -29,6 +29,8 @@ export type DayNightPhase = 'day' | 'night';
 export interface VinhDaSimulationState {
   bloodSealStone: number;
   baseHp: number;
+  baseLevel?: number;
+  contamination?: number;
   leaderX: number;
   enemies: Enemy[];
   nextEnemyId: number;
@@ -99,6 +101,71 @@ export const damageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, amount: 
     enemy.hp -= amount;
     return enemy.hp <= 0;
   };
+
+const ELEMENTAL_EFFECT_COOLDOWN_SECONDS = 4;
+const BLOOD_MAX_HP_STACK_CAP = 5;
+const getBaseStat = (ctx: VinhDaSimulationContext) => BASE_STRUCTURE_STATS[ctx.state.baseLevel ?? 0] ?? BASE_STRUCTURE_STATS[0]!;
+const getChurchHealingBonus = (ctx: VinhDaSimulationContext): number => {
+  let bonus = getBaseStat(ctx).healingBonusPercent ?? 0;
+  for (const siteId of ctx.structureSiteIdsOfType('church')){
+    const structure = ctx.state.structures.get(siteId);
+    if (!structure) continue;
+    bonus += getStructureLevelStat('church', structure.level).healingBonusPercent ?? 0;
+  }
+  return bonus;
+};
+const healBase = (ctx: VinhDaSimulationContext, amount: number): void => {
+  const stat = getBaseStat(ctx);
+  ctx.state.baseHp = Math.min(stat.hp + (stat.shield ?? 0), ctx.state.baseHp + amount * (1 + getChurchHealingBonus(ctx)));
+};
+const applyElementEffect = (ctx: VinhDaSimulationContext, enemy: Enemy, element: ElementalTowerElement, damage: number, sourceX: number): void => {
+  switch (element){
+    case 'Hỏa':
+      enemy.burnSeconds = Math.max(enemy.burnSeconds ?? 0, 3);
+      enemy.burnDps = Math.max(enemy.burnDps ?? 0, damage * 0.35);
+      break;
+    case 'Mộc':
+      healBase(ctx, Math.max(1, damage * 0.6));
+      break;
+    case 'Thủy':
+      enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, 2.5);
+      enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, 0.72);
+      break;
+    case 'Thổ':
+      enemy.attackCooldown += 0.4;
+      break;
+    case 'Kim':
+      enemy.hp -= damage * 0.25;
+      break;
+    case 'Lôi':
+      if ((enemy.paralysisCooldown ?? 0) <= 0){
+        enemy.attackCooldown += 1;
+        enemy.paralysisCooldown = ELEMENTAL_EFFECT_COOLDOWN_SECONDS;
+      }
+      break;
+    case 'Huyết': {
+      const stacks = Math.min(BLOOD_MAX_HP_STACK_CAP, (enemy.bloodMaxHpStacks ?? 0) + 1);
+      if (stacks !== (enemy.bloodMaxHpStacks ?? 0)){
+        enemy.bloodMaxHpStacks = stacks;
+        enemy.maxHp = Math.max(1, enemy.maxHp * 0.97);
+        enemy.hp = Math.min(enemy.hp, enemy.maxHp);
+      }
+      break;
+    }
+    case 'Ánh Sáng':
+      enemy.lightVulnerableSeconds = Math.max(enemy.lightVulnerableSeconds ?? 0, 4);
+      break;
+    case 'Phong':
+      if ((enemy.paralysisCooldown ?? 0) <= 0){
+        enemy.x += (enemy.x < sourceX ? -1 : 1) * 90;
+        enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, 2);
+        enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, 0.65);
+        enemy.paralysisCooldown = ELEMENTAL_EFFECT_COOLDOWN_SECONDS;
+      }
+      break;
+  }
+};
+
 export const reduceStructureDamage = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime, attacker: Enemy | null, amount: number): number => {
     if (structure.type !== 'wall') return amount;
     const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
@@ -173,16 +240,17 @@ const tryEnemyAttack = (enemy: Enemy, template: EnemyTemplate, attack: () => voi
     return true;
   };
 export const getEnemyEffectiveSpeed = (ctx: VinhDaSimulationContext, enemy: Enemy): number => {
-    if (enemy.canFly) return enemy.baseSpeed;
+    const statusMultiplier = enemy.slowSeconds && enemy.slowSeconds > 0 ? (enemy.slowMultiplier ?? 1) : 1;
+    if (enemy.canFly) return enemy.baseSpeed * statusMultiplier;
     for (const siteId of ctx.structureSiteIdsOfType('swamp')){
       const site = ctx.getBuildSite(siteId);
       if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS){
-        if (enemy.weight <= 1) return enemy.baseSpeed * 0.5;
-        if (enemy.weight === 2) return enemy.baseSpeed * 0.75;
-        return enemy.baseSpeed;
+        if (enemy.weight <= 1) return enemy.baseSpeed * 0.5 * statusMultiplier;
+        if (enemy.weight === 2) return enemy.baseSpeed * 0.75 * statusMultiplier;
+        return enemy.baseSpeed * statusMultiplier;
       }
     }
-    return enemy.baseSpeed;
+    return enemy.baseSpeed * statusMultiplier;
   };
 const moveEnemyToward = (ctx: VinhDaSimulationContext, enemy: Enemy, targetX: number, dt: number, speed = getEnemyEffectiveSpeed(ctx, enemy)): void => {
     enemy.x += getEnemyMoveDirection(ctx, enemy, targetX) * speed * dt;
@@ -293,6 +361,13 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
       const enemy = ctx.state.enemies[i];
       if (!enemy) continue;
       enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
+      enemy.paralysisCooldown = Math.max(0, (enemy.paralysisCooldown ?? 0) - dt);
+      enemy.slowSeconds = Math.max(0, (enemy.slowSeconds ?? 0) - dt);
+      enemy.lightVulnerableSeconds = Math.max(0, (enemy.lightVulnerableSeconds ?? 0) - dt);
+      if ((enemy.burnSeconds ?? 0) > 0){
+        enemy.burnSeconds = Math.max(0, (enemy.burnSeconds ?? 0) - dt);
+        if (damageEnemy(ctx, enemy, (enemy.burnDps ?? 0) * dt)){ removeEnemyAt(ctx, i, true); continue; }
+      }
       const template = getEnemyTemplate(enemy);
       switch (enemy.kind){
         case 'suicideBomber':
@@ -332,6 +407,10 @@ export const updateDayNightTimer = (ctx: VinhDaSimulationContext, dt: number): v
   };
 export const updateStructureRuntimeTimers = (ctx: VinhDaSimulationContext, runtime: StructureRuntime, dt: number): void => {
   runtime.biochemicalCooldown = Math.max(0, (runtime.biochemicalCooldown ?? 0) - dt);
+  runtime.prayerTimer = Math.max(0, (runtime.prayerTimer ?? 0) - dt);
+  runtime.contaminationCleanseTimer = Math.max(0, (runtime.contaminationCleanseTimer ?? 0) - dt);
+  runtime.soldierSpawnTimer = Math.max(0, (runtime.soldierSpawnTimer ?? 0) - dt);
+  runtime.emergencyHealCooldown = Math.max(0, (runtime.emergencyHealCooldown ?? 0) - dt);
     for (const [key, remaining] of runtime.attackerCooldowns ?? []){
       const next = Math.max(0, remaining - dt);
       if (next > 0) runtime.attackerCooldowns?.set(key, next);
@@ -394,6 +473,45 @@ export const updateBiochemicalWall = (ctx: VinhDaSimulationContext, structure: P
     }
     runtime.biochemicalCooldown = stat.biochemicalCooldownSeconds ?? 5;
   };
+
+const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
+  const stat = getBaseStat(ctx);
+  if ((stat.healPerSecond ?? 0) > 0) healBase(ctx, (stat.healPerSecond ?? 0) * dt);
+  for (const structure of ctx.state.structures.values()){
+    const runtime = ctx.ensureStructureRuntime(structure);
+    if ((runtime.emergencyHealCooldown ?? 0) > 0) continue;
+    if ((stat.emergencyHealPercent ?? 0) > 0 && ctx.state.baseHp > 0 && ctx.state.baseHp <= stat.hp * 0.2){
+      healBase(ctx, stat.hp * (stat.emergencyHealPercent ?? 0));
+      runtime.emergencyHealCooldown = stat.emergencyCooldownSeconds ?? 60;
+      break;
+    }
+  }
+};
+const updateChurch = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime): void => {
+  if (structure.type !== 'church') return;
+  const stat = getStructureLevelStat('church', structure.level);
+  if ((runtime.prayerTimer ?? 0) <= 0){
+    healBase(ctx, 1 + structure.level);
+    runtime.prayerTimer = stat.prayerIntervalSeconds ?? 20;
+  }
+  if ((runtime.contaminationCleanseTimer ?? 0) <= 0){
+    ctx.state.contamination = Math.max(0, (ctx.state.contamination ?? 0) - structure.level);
+    runtime.contaminationCleanseTimer = stat.cleanseContaminationSeconds ?? 120;
+  }
+};
+const updateBarracks = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime): void => {
+  if (structure.type !== 'barracks') return;
+  const site = ctx.getBuildSite(structure.siteId);
+  if (!site) return;
+  const stat = getStructureLevelStat('barracks', structure.level);
+  runtime.soldiers ??= [];
+  runtime.soldiers = runtime.soldiers.filter(soldier => soldier.hp > 0).slice(0, stat.soldierCap ?? 0);
+  if (runtime.soldiers.length >= (stat.soldierCap ?? 0) || (runtime.soldierSpawnTimer ?? 0) > 0) return;
+  runtime.nextSoldierId = (runtime.nextSoldierId ?? 0) + 1;
+  runtime.soldiers.push({ id: runtime.nextSoldierId, siteId: structure.siteId, rank: stat.soldierRank ?? 1, hp: 8 + (stat.soldierRank ?? 1) * 4, x: site.x, side: runtime.nextSoldierId % 2 === 0 ? 'left' : 'right', attackCooldown: 0, ultimateReady: Boolean(stat.ultimatePermission) });
+  runtime.soldierSpawnTimer = stat.soldierSpawnSeconds ?? 10;
+};
+
 export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void => {
     for (const structure of ctx.state.structures.values()){
       const runtime = ctx.ensureStructureRuntime(structure);
@@ -406,10 +524,13 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
       const runtime = ctx.ensureStructureRuntime(structure);
       updateWallLink(ctx, structure, runtime);
     }
+  updateBaseSupport(ctx, dt);
     for (const structure of ctx.state.structures.values()){
       const runtime = ctx.ensureStructureRuntime(structure);
       updateWallRegeneration(ctx, structure, runtime, dt);
       updateBiochemicalWall(ctx, structure, runtime);
+      updateChurch(ctx, structure, runtime);
+      updateBarracks(ctx, structure, runtime);
     }
     for (const type of ['watchtower', 'elementalTower'] as const){
       for (const siteId of ctx.structureSiteIdsOfType(type)){
@@ -420,11 +541,17 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
         const runtime = ctx.ensureStructureRuntime(structure);
         runtime.cooldown = Math.max(0, runtime.cooldown - dt);
         if (runtime.cooldown > 0) continue;
-        const stat = getStructureLevelStat(type, structure.type === type ? structure.level : 1);
-        const target = ctx.state.enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
-        if (!target) continue;
+        const stat = getStructureLevelStat(type, structure.type === type ? structure.level : 1, structure.branchLv3, structure.branchLv5, structure.element);
+        const targets = ctx.state.enemies
+          .filter(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0))
+          .slice(0, stat.maxTargets ?? 1);
+        if (targets.length <= 0) continue;
         runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
-        if (damageEnemy(ctx, target, stat.damage ?? 0)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+        for (const target of targets){
+          const bonus = target.lightVulnerableSeconds && target.lightVulnerableSeconds > 0 ? 1.2 : 1;
+          if (stat.element) applyElementEffect(ctx, target, stat.element, stat.damage ?? 0, site.x);
+          if (damageEnemy(ctx, target, (stat.damage ?? 0) * bonus)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+        }
       }
     }
 

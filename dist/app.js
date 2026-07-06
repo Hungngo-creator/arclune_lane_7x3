@@ -38699,6 +38699,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const DEFAULT_ENEMY_TEMPLATE = __dep1.DEFAULT_ENEMY_TEMPLATE;
   const ENEMY_TEMPLATES = __dep1.ENEMY_TEMPLATES;
   const __dep2 = __require('./screens/vinh-da/structures.ts');
+  const BASE_STRUCTURE_STATS = __dep2.BASE_STRUCTURE_STATS;
   const getStructureLevelStat = __dep2.getStructureLevelStat;
   const DAY_DURATION_SECONDS = 300;
   const spawnEnemy = (ctx, side, kind = 'twisted') => {
@@ -38752,6 +38753,70 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const damageEnemy = (ctx, enemy, amount) => {
       enemy.hp -= amount;
       return enemy.hp <= 0;
+  };
+  const ELEMENTAL_EFFECT_COOLDOWN_SECONDS = 4;
+  const BLOOD_MAX_HP_STACK_CAP = 5;
+  const getBaseStat = (ctx) => BASE_STRUCTURE_STATS[ctx.state.baseLevel ?? 0] ?? BASE_STRUCTURE_STATS[0];
+  const getChurchHealingBonus = (ctx) => {
+      let bonus = getBaseStat(ctx).healingBonusPercent ?? 0;
+      for (const siteId of ctx.structureSiteIdsOfType('church')) {
+          const structure = ctx.state.structures.get(siteId);
+          if (!structure)
+              continue;
+          bonus += getStructureLevelStat('church', structure.level).healingBonusPercent ?? 0;
+      }
+      return bonus;
+  };
+  const healBase = (ctx, amount) => {
+      const stat = getBaseStat(ctx);
+      ctx.state.baseHp = Math.min(stat.hp + (stat.shield ?? 0), ctx.state.baseHp + amount * (1 + getChurchHealingBonus(ctx)));
+  };
+  const applyElementEffect = (ctx, enemy, element, damage, sourceX) => {
+      switch (element) {
+          case 'Hỏa':
+              enemy.burnSeconds = Math.max(enemy.burnSeconds ?? 0, 3);
+              enemy.burnDps = Math.max(enemy.burnDps ?? 0, damage * 0.35);
+              break;
+          case 'Mộc':
+              healBase(ctx, Math.max(1, damage * 0.6));
+              break;
+          case 'Thủy':
+              enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, 2.5);
+              enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, 0.72);
+              break;
+          case 'Thổ':
+              enemy.attackCooldown += 0.4;
+              break;
+          case 'Kim':
+              enemy.hp -= damage * 0.25;
+              break;
+          case 'Lôi':
+              if ((enemy.paralysisCooldown ?? 0) <= 0) {
+                  enemy.attackCooldown += 1;
+                  enemy.paralysisCooldown = ELEMENTAL_EFFECT_COOLDOWN_SECONDS;
+              }
+              break;
+          case 'Huyết': {
+              const stacks = Math.min(BLOOD_MAX_HP_STACK_CAP, (enemy.bloodMaxHpStacks ?? 0) + 1);
+              if (stacks !== (enemy.bloodMaxHpStacks ?? 0)) {
+                  enemy.bloodMaxHpStacks = stacks;
+                  enemy.maxHp = Math.max(1, enemy.maxHp * 0.97);
+                  enemy.hp = Math.min(enemy.hp, enemy.maxHp);
+              }
+              break;
+          }
+          case 'Ánh Sáng':
+              enemy.lightVulnerableSeconds = Math.max(enemy.lightVulnerableSeconds ?? 0, 4);
+              break;
+          case 'Phong':
+              if ((enemy.paralysisCooldown ?? 0) <= 0) {
+                  enemy.x += (enemy.x < sourceX ? -1 : 1) * 90;
+                  enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, 2);
+                  enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, 0.65);
+                  enemy.paralysisCooldown = ELEMENTAL_EFFECT_COOLDOWN_SECONDS;
+              }
+              break;
+      }
   };
   const reduceStructureDamage = (ctx, structure, runtime, attacker, amount) => {
       if (structure.type !== 'wall')
@@ -38839,19 +38904,20 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       return true;
   };
   const getEnemyEffectiveSpeed = (ctx, enemy) => {
+      const statusMultiplier = enemy.slowSeconds && enemy.slowSeconds > 0 ? (enemy.slowMultiplier ?? 1) : 1;
       if (enemy.canFly)
-          return enemy.baseSpeed;
+          return enemy.baseSpeed * statusMultiplier;
       for (const siteId of ctx.structureSiteIdsOfType('swamp')) {
           const site = ctx.getBuildSite(siteId);
           if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS) {
               if (enemy.weight <= 1)
-                  return enemy.baseSpeed * 0.5;
+                  return enemy.baseSpeed * 0.5 * statusMultiplier;
               if (enemy.weight === 2)
-                  return enemy.baseSpeed * 0.75;
-              return enemy.baseSpeed;
+                  return enemy.baseSpeed * 0.75 * statusMultiplier;
+              return enemy.baseSpeed * statusMultiplier;
           }
       }
-      return enemy.baseSpeed;
+      return enemy.baseSpeed * statusMultiplier;
   };
   const moveEnemyToward = (ctx, enemy, targetX, dt, speed = getEnemyEffectiveSpeed(ctx, enemy)) => {
       enemy.x += getEnemyMoveDirection(ctx, enemy, targetX) * speed * dt;
@@ -38967,6 +39033,16 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           if (!enemy)
               continue;
           enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
+          enemy.paralysisCooldown = Math.max(0, (enemy.paralysisCooldown ?? 0) - dt);
+          enemy.slowSeconds = Math.max(0, (enemy.slowSeconds ?? 0) - dt);
+          enemy.lightVulnerableSeconds = Math.max(0, (enemy.lightVulnerableSeconds ?? 0) - dt);
+          if ((enemy.burnSeconds ?? 0) > 0) {
+              enemy.burnSeconds = Math.max(0, (enemy.burnSeconds ?? 0) - dt);
+              if (damageEnemy(ctx, enemy, (enemy.burnDps ?? 0) * dt)) {
+                  removeEnemyAt(ctx, i, true);
+                  continue;
+              }
+          }
           const template = getEnemyTemplate(enemy);
           switch (enemy.kind) {
               case 'suicideBomber':
@@ -39009,6 +39085,10 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const updateStructureRuntimeTimers = (ctx, runtime, dt) => {
       runtime.biochemicalCooldown = Math.max(0, (runtime.biochemicalCooldown ?? 0) - dt);
+      runtime.prayerTimer = Math.max(0, (runtime.prayerTimer ?? 0) - dt);
+      runtime.contaminationCleanseTimer = Math.max(0, (runtime.contaminationCleanseTimer ?? 0) - dt);
+      runtime.soldierSpawnTimer = Math.max(0, (runtime.soldierSpawnTimer ?? 0) - dt);
+      runtime.emergencyHealCooldown = Math.max(0, (runtime.emergencyHealCooldown ?? 0) - dt);
       for (const [key, remaining] of runtime.attackerCooldowns ?? []) {
           const next = Math.max(0, remaining - dt);
           if (next > 0)
@@ -39086,6 +39166,49 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       runtime.biochemicalCooldown = stat.biochemicalCooldownSeconds ?? 5;
   };
+  const updateBaseSupport = (ctx, dt) => {
+      const stat = getBaseStat(ctx);
+      if ((stat.healPerSecond ?? 0) > 0)
+          healBase(ctx, (stat.healPerSecond ?? 0) * dt);
+      for (const structure of ctx.state.structures.values()) {
+          const runtime = ctx.ensureStructureRuntime(structure);
+          if ((runtime.emergencyHealCooldown ?? 0) > 0)
+              continue;
+          if ((stat.emergencyHealPercent ?? 0) > 0 && ctx.state.baseHp > 0 && ctx.state.baseHp <= stat.hp * 0.2) {
+              healBase(ctx, stat.hp * (stat.emergencyHealPercent ?? 0));
+              runtime.emergencyHealCooldown = stat.emergencyCooldownSeconds ?? 60;
+              break;
+          }
+      }
+  };
+  const updateChurch = (ctx, structure, runtime) => {
+      if (structure.type !== 'church')
+          return;
+      const stat = getStructureLevelStat('church', structure.level);
+      if ((runtime.prayerTimer ?? 0) <= 0) {
+          healBase(ctx, 1 + structure.level);
+          runtime.prayerTimer = stat.prayerIntervalSeconds ?? 20;
+      }
+      if ((runtime.contaminationCleanseTimer ?? 0) <= 0) {
+          ctx.state.contamination = Math.max(0, (ctx.state.contamination ?? 0) - structure.level);
+          runtime.contaminationCleanseTimer = stat.cleanseContaminationSeconds ?? 120;
+      }
+  };
+  const updateBarracks = (ctx, structure, runtime) => {
+      if (structure.type !== 'barracks')
+          return;
+      const site = ctx.getBuildSite(structure.siteId);
+      if (!site)
+          return;
+      const stat = getStructureLevelStat('barracks', structure.level);
+      runtime.soldiers ??= [];
+      runtime.soldiers = runtime.soldiers.filter(soldier => soldier.hp > 0).slice(0, stat.soldierCap ?? 0);
+      if (runtime.soldiers.length >= (stat.soldierCap ?? 0) || (runtime.soldierSpawnTimer ?? 0) > 0)
+          return;
+      runtime.nextSoldierId = (runtime.nextSoldierId ?? 0) + 1;
+      runtime.soldiers.push({ id: runtime.nextSoldierId, siteId: structure.siteId, rank: stat.soldierRank ?? 1, hp: 8 + (stat.soldierRank ?? 1) * 4, x: site.x, side: runtime.nextSoldierId % 2 === 0 ? 'left' : 'right', attackCooldown: 0, ultimateReady: Boolean(stat.ultimatePermission) });
+      runtime.soldierSpawnTimer = stat.soldierSpawnSeconds ?? 10;
+  };
   const updateStructures = (ctx, dt) => {
       for (const structure of ctx.state.structures.values()) {
           const runtime = ctx.ensureStructureRuntime(structure);
@@ -39098,10 +39221,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           const runtime = ctx.ensureStructureRuntime(structure);
           updateWallLink(ctx, structure, runtime);
       }
+      updateBaseSupport(ctx, dt);
       for (const structure of ctx.state.structures.values()) {
           const runtime = ctx.ensureStructureRuntime(structure);
           updateWallRegeneration(ctx, structure, runtime, dt);
           updateBiochemicalWall(ctx, structure, runtime);
+          updateChurch(ctx, structure, runtime);
+          updateBarracks(ctx, structure, runtime);
       }
       for (const type of ['watchtower', 'elementalTower']) {
           for (const siteId of ctx.structureSiteIdsOfType(type)) {
@@ -39115,13 +39241,20 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               runtime.cooldown = Math.max(0, runtime.cooldown - dt);
               if (runtime.cooldown > 0)
                   continue;
-              const stat = getStructureLevelStat(type, structure.type === type ? structure.level : 1);
-              const target = ctx.state.enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
-              if (!target)
+              const stat = getStructureLevelStat(type, structure.type === type ? structure.level : 1, structure.branchLv3, structure.branchLv5, structure.element);
+              const targets = ctx.state.enemies
+                  .filter(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0))
+                  .slice(0, stat.maxTargets ?? 1);
+              if (targets.length <= 0)
                   continue;
               runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
-              if (damageEnemy(ctx, target, stat.damage ?? 0))
-                  removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+              for (const target of targets) {
+                  const bonus = target.lightVulnerableSeconds && target.lightVulnerableSeconds > 0 ? 1.2 : 1;
+                  if (stat.element)
+                      applyElementEffect(ctx, target, stat.element, stat.damage ?? 0, site.x);
+                  if (damageEnemy(ctx, target, (stat.damage ?? 0) * bonus))
+                      removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+              }
           }
       }
       for (const siteId of [...ctx.structureSiteIdsOfType('landmine')]) {
@@ -39232,26 +39365,47 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'swamp'];
   const WALL_BUILD_SITE_ALLOWED = ['wall'];
   const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
+  const METERS_TO_WORLD_UNITS = 460 / 150;
+  const metersToWorldUnits = (meters) => Math.round(meters * METERS_TO_WORLD_UNITS);
+  const WATCHTOWER_RANGE_WORLD_UNITS = metersToWorldUnits(150);
+  const ELEMENTAL_TOWER_RANGE_WORLD_UNITS = metersToWorldUnits(100);
+  const LORE_HOUR_SECONDS = 60;
+  const CONTAMINATION_CLEANSE_SECONDS = 2 * LORE_HOUR_SECONDS;
   const WALL_STRUCTURE_STATS = {
       1: WALL_LEVELS[1],
       2: WALL_LEVELS[2],
   };
   const WATCHTOWER_STRUCTURE_STATS = {
-      1: { hp: 1, range: 460, damage: 1, cooldownSeconds: 0.55 },
-      2: { hp: 1, range: 460, damage: 2, cooldownSeconds: 0.55 }
+      1: { hp: 12, maxTargets: 1, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 2, cooldownSeconds: 1.2, projectileSpeed: 8 },
+      2: { hp: 16, maxTargets: 1, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 3, cooldownSeconds: 1.05, projectileSpeed: 8 },
+      3: { hp: 22, maxTargets: 2, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 0.95, projectileSpeed: 8 },
+      4: { hp: 30, maxTargets: 2, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 6, cooldownSeconds: 0.85, projectileSpeed: 8 },
+      5: { hp: 40, maxTargets: 3, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 8, cooldownSeconds: 0.75, projectileSpeed: 8 }
   };
+  const ELEMENTAL_TOWER_ELEMENTS = ['Hỏa', 'Mộc', 'Thủy', 'Thổ', 'Kim', 'Lôi', 'Huyết', 'Ánh Sáng', 'Phong'];
+  const ELEMENTAL_TOWER_STRUCTURE_STATS = Object.fromEntries(ELEMENTAL_TOWER_ELEMENTS.map((element, index) => [element, {
+          1: { hp: 10, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 1.5 + index * 0.05, cooldownSeconds: 1.4, projectileSpeed: 6 },
+          2: { hp: 14, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 2.5 + index * 0.05, cooldownSeconds: 1.3, projectileSpeed: 6 },
+          3: { hp: 20, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 3.5 + index * 0.05, cooldownSeconds: 1.2, projectileSpeed: 6 },
+          4: { hp: 28, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 5 + index * 0.05, cooldownSeconds: 1.05, projectileSpeed: 6 },
+          5: { hp: 36, element, maxTargets: 3, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 6.5 + index * 0.05, cooldownSeconds: 0.95, projectileSpeed: 6 }
+      }]));
   const GROUND_STRUCTURE_STATS = {
-      elementalTower: {
-          1: { hp: 1, range: 460, damage: 1, cooldownSeconds: 0.55 },
-          2: { hp: 1, range: 460, damage: 2, cooldownSeconds: 0.55 }
-      },
+      elementalTower: ELEMENTAL_TOWER_STRUCTURE_STATS['Hỏa'],
       barracks: {
-          1: { hp: 1 },
-          2: { hp: 1 }
+          1: { hp: 18, soldierCap: 1, soldierRank: 1, soldierSpawnSeconds: 10 },
+          2: { hp: 24, soldierCap: 2, soldierRank: 1, soldierSpawnSeconds: 9 },
+          3: { hp: 32, soldierCap: 2, soldierRank: 2, soldierSpawnSeconds: 8 },
+          4: { hp: 42, soldierCap: 3, soldierRank: 2, soldierSpawnSeconds: 7 },
+          5: { hp: 54, soldierCap: 4, soldierRank: 3, soldierSpawnSeconds: 6 },
+          6: { hp: 70, soldierCap: 5, soldierRank: 4, soldierSpawnSeconds: 5, ultimatePermission: true }
       },
       church: {
-          1: { hp: 1 },
-          2: { hp: 1 }
+          1: { hp: 14, buffArmPercent: 0.03, buffResPercent: 0.03, prayerIntervalSeconds: 20, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+          2: { hp: 18, buffArmPercent: 0.05, buffResPercent: 0.05, healingBonusPercent: 0.05, prayerIntervalSeconds: 18, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+          3: { hp: 24, buffArmPercent: 0.07, buffResPercent: 0.07, buffAtkPercent: 0.04, buffWilPercent: 0.04, healingBonusPercent: 0.08, prayerIntervalSeconds: 16, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+          4: { hp: 32, buffArmPercent: 0.1, buffResPercent: 0.1, buffAtkPercent: 0.06, buffWilPercent: 0.06, healingBonusPercent: 0.12, prayerIntervalSeconds: 14, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+          5: { hp: 44, buffArmPercent: 0.14, buffResPercent: 0.14, buffAtkPercent: 0.08, buffWilPercent: 0.08, healingBonusPercent: 0.16, shield: 12, prayerIntervalSeconds: 12, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS }
       },
       crystalSeal: {
           1: { hp: 1 },
@@ -39356,11 +39510,24 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           hpRegen: (lv4.hpRegen ?? 0) + lv5Config.hpRegenBonus
       };
   };
-  const getStructureLevelStat = (type, level, branchLv3, branchLv5) => {
+  const BASE_STRUCTURE_STATS = {
+      0: { hp: 100, healPerSecond: 0 },
+      1: { hp: 120, healPerSecond: 0.15, healingBonusPercent: 0.02 },
+      2: { hp: 145, healPerSecond: 0.25, healingBonusPercent: 0.04, shield: 4 },
+      3: { hp: 175, healPerSecond: 0.4, healingBonusPercent: 0.06, shield: 8 },
+      4: { hp: 210, healPerSecond: 0.6, healingBonusPercent: 0.08, shield: 12 },
+      5: { hp: 250, healPerSecond: 0.85, healingBonusPercent: 0.1, shield: 18 },
+      6: { hp: 300, healPerSecond: 1.2, healingBonusPercent: 0.15, shield: 28, emergencyHealPercent: 0.35, emergencyCooldownSeconds: 60 }
+  };
+  const getElementalTowerLevelStat = (level, element = 'Hỏa') => ELEMENTAL_TOWER_STRUCTURE_STATS[element][level] ?? ELEMENTAL_TOWER_STRUCTURE_STATS[element][1] ?? { hp: 1 };
+  const getStructureLevelStat = (type, level, branchLv3, branchLv5, element) => {
       if (type === 'wall')
           return getWallLevelStat(level, branchLv3, branchLv5);
       if (type === 'watchtower')
           return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
+      if (type === 'elementalTower')
+          return getElementalTowerLevelStat(level, element);
+      y;
       return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
   };
   //# sourceMappingURL=stdin.js.map
@@ -39375,13 +39542,22 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_BUILD_SITE_ALLOWED')) exports.GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
   if (!Object.prototype.hasOwnProperty.call(exports, 'WALL_BUILD_SITE_ALLOWED')) exports.WALL_BUILD_SITE_ALLOWED = WALL_BUILD_SITE_ALLOWED;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_GROUND_BUILD_SITE_ALLOWED')) exports.CASTLE_GROUND_BUILD_SITE_ALLOWED = CASTLE_GROUND_BUILD_SITE_ALLOWED;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'metersToWorldUnits')) exports.metersToWorldUnits = metersToWorldUnits;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'WATCHTOWER_RANGE_WORLD_UNITS')) exports.WATCHTOWER_RANGE_WORLD_UNITS = WATCHTOWER_RANGE_WORLD_UNITS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ELEMENTAL_TOWER_RANGE_WORLD_UNITS')) exports.ELEMENTAL_TOWER_RANGE_WORLD_UNITS = ELEMENTAL_TOWER_RANGE_WORLD_UNITS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'LORE_HOUR_SECONDS')) exports.LORE_HOUR_SECONDS = LORE_HOUR_SECONDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CONTAMINATION_CLEANSE_SECONDS')) exports.CONTAMINATION_CLEANSE_SECONDS = CONTAMINATION_CLEANSE_SECONDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'WALL_STRUCTURE_STATS')) exports.WALL_STRUCTURE_STATS = WALL_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'WATCHTOWER_STRUCTURE_STATS')) exports.WATCHTOWER_STRUCTURE_STATS = WATCHTOWER_STRUCTURE_STATS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ELEMENTAL_TOWER_ELEMENTS')) exports.ELEMENTAL_TOWER_ELEMENTS = ELEMENTAL_TOWER_ELEMENTS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ELEMENTAL_TOWER_STRUCTURE_STATS')) exports.ELEMENTAL_TOWER_STRUCTURE_STATS = ELEMENTAL_TOWER_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_STRUCTURE_STATS')) exports.GROUND_STRUCTURE_STATS = GROUND_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createGroundBuildSites')) exports.createGroundBuildSites = createGroundBuildSites;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createRockBuildSites')) exports.createRockBuildSites = createRockBuildSites;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITES')) exports.BUILD_SITES = BUILD_SITES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getWallLevelStat')) exports.getWallLevelStat = getWallLevelStat;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_STRUCTURE_STATS')) exports.BASE_STRUCTURE_STATS = BASE_STRUCTURE_STATS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getElementalTowerLevelStat')) exports.getElementalTowerLevelStat = getElementalTowerLevelStat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getStructureLevelStat')) exports.getStructureLevelStat = getStructureLevelStat;
 };
 __modules['./screens/vinh-da/types.ts'] = (exports, module, __require) => {

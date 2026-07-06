@@ -1,5 +1,5 @@
 import type { EnemyKind } from './enemies.ts';
-import type { StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
+import type { ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 
 export type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
 export type Side = 'left' | 'right';
@@ -18,6 +18,18 @@ export interface PlacedStructure {
   branchLv3?: WallBranchLv3;
   branchLv5?: WallBranchLv5;
   mountedStructure?: StructureType | null;
+  element?: ElementalTowerElement;
+}
+
+export interface RuntimeSoldier {
+  id: number;
+  siteId: string;
+  rank: number;
+  hp: number;
+  x: number;
+  side: Side;
+  attackCooldown: number;
+  ultimateReady?: boolean;
 }
 
 export interface Enemy {
@@ -34,6 +46,13 @@ export interface Enemy {
   side: Side;
   mageOrbTimer?: number;
   mageOrbs?: number;
+  burnSeconds?: number;
+  burnDps?: number;
+  slowSeconds?: number;
+  slowMultiplier?: number;
+  paralysisCooldown?: number;
+  bloodMaxHpStacks?: number;
+  lightVulnerableSeconds?: number;
 }
 
 export interface StructureRuntime {
@@ -47,4 +66,10 @@ export interface StructureRuntime {
   fuse?: number;
   dragonHitCount?: number;
   attackerCooldowns?: Map<string, number>;
+  prayerTimer?: number;
+  contaminationCleanseTimer?: number;
+  soldierSpawnTimer?: number;
+  soldiers?: RuntimeSoldier[];
+  nextSoldierId?: number;
+  emergencyHealCooldown?: number;
 }
