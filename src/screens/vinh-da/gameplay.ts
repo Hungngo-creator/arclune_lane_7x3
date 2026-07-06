@@ -48,6 +48,9 @@ import {
 import type { StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import type { BuildSite, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
+const DAY_DURATION_SECONDS = 300;
+type DayNightPhase = 'day' | 'night';
+
 interface RenderContext {
   root: HTMLElement;
   shell?: MainMenuShell | null;
@@ -131,6 +134,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const enemyElements = new Map<number, HTMLElement>();
   let nextEnemyId = 1;
   let enemySpawnTimer = 0;
+  let dayNightPhase: DayNightPhase = 'night';
+  let phaseRemainingSeconds = DAY_DURATION_SECONDS;
   let leaderAttackCooldown = 0;
 
   const section = document.createElement('section');
@@ -141,6 +146,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       <div class="vinh-da-game__panel">
         <strong>Vĩnh Dạ · ${leader?.name ?? leaderId ?? 'Leader'}</strong>
         <div>Huyết ấn thạch: <span data-role="blood-seal-stone">${bloodSealStone}</span></div>
+        <div>Phase: <span data-role="day-night-phase"></span></div>
+        <div>Còn lại: <span data-role="phase-time-remaining"></span></div>
       </div>
       <button class="vinh-da-game__back" type="button" aria-label="Về World Map">↩</button>
     </div>
@@ -161,6 +168,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const buildSitesContainer = section.querySelector<HTMLElement>('[data-role="build-sites"]');
   const enemiesContainer = section.querySelector<HTMLElement>('[data-role="enemies"]');
   const bloodSealStoneText = section.querySelector<HTMLElement>('[data-role="blood-seal-stone"]');
+  const dayNightPhaseText = section.querySelector<HTMLElement>('[data-role="day-night-phase"]');
+  const phaseTimeRemainingText = section.querySelector<HTMLElement>('[data-role="phase-time-remaining"]');
   const siteElements = new Map<string, HTMLElement>();
   const buildMenuElements = new Map<string, HTMLDivElement>();
   const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS] as const;
@@ -209,6 +218,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const canAfford = (cost: number): boolean => bloodSealStone >= cost;
   const renderEconomy = (): void => {
     if (bloodSealStoneText) bloodSealStoneText.textContent = String(bloodSealStone);
+  };
+  const renderDayNightTimer = (): void => {
+    if (dayNightPhaseText) dayNightPhaseText.textContent = dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
+    if (phaseTimeRemainingText){
+      const totalSeconds = Math.max(0, Math.ceil(phaseRemainingSeconds));
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      phaseTimeRemainingText.textContent = `${minutes}:${String(seconds).padStart(2, '0')}`;
+    }
   };
   const spend = (cost: number): boolean => {
     if (!canAfford(cost)) return false;
@@ -365,7 +383,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
 
   const spawnEnemy = (side: Side, kind: EnemyKind = 'twisted'): void => {
-    if (enemies.length >= ENEMY_LIMIT) return;
+    if (dayNightPhase !== 'night' || enemies.length >= ENEMY_LIMIT) return;
     const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
     enemies.push({
       id: nextEnemyId,
@@ -590,9 +608,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     renderBuildSite(site.id);
   };
   const updateEnemies = (dt: number): void => {
-    enemySpawnTimer += dt;
+    if (dayNightPhase === 'night') enemySpawnTimer += dt;
+    else enemySpawnTimer = 0;
     leaderAttackCooldown = Math.max(0, leaderAttackCooldown - dt);
-    while (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL){
+    while (dayNightPhase === 'night' && enemySpawnTimer >= ENEMY_SPAWN_INTERVAL){
       enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
       spawnEnemy(nextEnemyId % 2 === 0 ? 'left' : 'right');
     }
@@ -628,6 +647,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         if (damageEnemy(enemy, LEADER_BASIC_ATTACK_DAMAGE)) removeEnemyAt(i, true);
       }
     }
+  };
+  const updateDayNightTimer = (dt: number): void => {
+    phaseRemainingSeconds -= dt;
+    while (phaseRemainingSeconds <= 0){
+      phaseRemainingSeconds += DAY_DURATION_SECONDS;
+      dayNightPhase = dayNightPhase === 'night' ? 'day' : 'night';
+      if (dayNightPhase === 'day') clearEnemiesWithoutReward();
+    }
+    renderDayNightTimer();
   };
   const updateStructureRuntimeTimers = (runtime: StructureRuntime, dt: number): void => {
     for (const [key, remaining] of runtime.attackerCooldowns ?? []){
@@ -725,6 +753,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       ? keyboardDirection * LEADER_SPEED * dt
       : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
     leaderX = clampLeaderX(leaderX);
+    updateDayNightTimer(dt);
     updateEnemies(dt);
     updateStructures(dt);
     updateCamera();
@@ -816,6 +845,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId });
   });
   updateCamera();
+  renderDayNightTimer();
   spawnEnemy('left');
   spawnEnemy('right');
   renderEnemies();
