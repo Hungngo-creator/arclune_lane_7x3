@@ -39195,15 +39195,22 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       });
       ctx.state.nextEnemyId += 1;
   };
+  const isValidEnemyPortal = (portal) => ((portal.side === 'left' || portal.side === 'right') && Number.isFinite(portal.x));
+  const chooseEnemyPortal = (ctx, side) => {
+      const validPortals = ctx.state.enemyPortals.filter(isValidEnemyPortal);
+      const portals = side ? validPortals.filter(portal => portal.side === side) : validPortals;
+      return portals.length > 0 ? portals[Math.floor(Math.random() * portals.length)] : null;
+  };
+  const getFallbackSpawnSide = (ctx, side) => side ?? (ctx.state.nextEnemyId % 2 === 0 ? 'left' : 'right');
   const spawnWaveEnemy = (ctx, side) => {
       const config = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier);
       const kind = chooseEnemyKindForBudget(config, ctx.state.waveThreatBudgetRemaining);
       if (!kind)
           return false;
       const previousNextEnemyId = ctx.state.nextEnemyId;
-      const sidePortals = ctx.state.enemyPortals.filter(portal => portal.side === side);
-      const portal = sidePortals.length > 0 ? sidePortals[Math.floor(Math.random() * sidePortals.length)] : null;
-      spawnEnemy(ctx, side, kind, portal?.x);
+      const portal = chooseEnemyPortal(ctx, side);
+      const spawnSide = portal?.side ?? getFallbackSpawnSide(ctx, side);
+      spawnEnemy(ctx, spawnSide, kind, portal?.x);
       if (ctx.state.nextEnemyId === previousNextEnemyId)
           return false;
       ctx.state.waveThreatBudgetRemaining = Math.max(0, ctx.state.waveThreatBudgetRemaining - ENEMY_TEMPLATES[kind].weight);
@@ -39875,7 +39882,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       ctx.state.leaderAttackCooldown = Math.max(0, ctx.state.leaderAttackCooldown - dt);
       while (ctx.state.dayNightPhase === 'night' && ctx.state.enemySpawnTimer >= ENEMY_SPAWN_INTERVAL) {
           ctx.state.enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
-          if (!spawnWaveEnemy(ctx, ctx.state.nextEnemyId % 2 === 0 ? 'left' : 'right'))
+          if (!spawnWaveEnemy(ctx))
               break;
       }
       for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1) {

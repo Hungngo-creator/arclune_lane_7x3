@@ -169,14 +169,26 @@ export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: Enemy
     ctx.state.nextEnemyId += 1;
   };
 
-export const spawnWaveEnemy = (ctx: VinhDaSimulationContext, side: Side): boolean => {
+const isValidEnemyPortal = (portal: EnemyPortal): portal is EnemyPortal & { side: Side; x: number } => (
+  (portal.side === 'left' || portal.side === 'right') && Number.isFinite(portal.x)
+);
+
+const chooseEnemyPortal = (ctx: VinhDaSimulationContext, side?: Side): (EnemyPortal & { side: Side; x: number }) | null => {
+  const validPortals = ctx.state.enemyPortals.filter(isValidEnemyPortal);
+  const portals = side ? validPortals.filter(portal => portal.side === side) : validPortals;
+  return portals.length > 0 ? portals[Math.floor(Math.random() * portals.length)]! : null;
+};
+
+const getFallbackSpawnSide = (ctx: VinhDaSimulationContext, side?: Side): Side => side ?? (ctx.state.nextEnemyId % 2 === 0 ? 'left' : 'right');
+
+export const spawnWaveEnemy = (ctx: VinhDaSimulationContext, side?: Side): boolean => {
   const config = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier);
   const kind = chooseEnemyKindForBudget(config, ctx.state.waveThreatBudgetRemaining);
   if (!kind) return false;
   const previousNextEnemyId = ctx.state.nextEnemyId;
-  const sidePortals = ctx.state.enemyPortals.filter(portal => portal.side === side);
-  const portal = sidePortals.length > 0 ? sidePortals[Math.floor(Math.random() * sidePortals.length)] : null;
-  spawnEnemy(ctx, side, kind, portal?.x);
+  const portal = chooseEnemyPortal(ctx, side);
+  const spawnSide = portal?.side ?? getFallbackSpawnSide(ctx, side);
+  spawnEnemy(ctx, spawnSide, kind, portal?.x);
   if (ctx.state.nextEnemyId === previousNextEnemyId) return false;
   ctx.state.waveThreatBudgetRemaining = Math.max(0, ctx.state.waveThreatBudgetRemaining - ENEMY_TEMPLATES[kind].weight);
   return true;
@@ -797,7 +809,7 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
     ctx.state.leaderAttackCooldown = Math.max(0, ctx.state.leaderAttackCooldown - dt);
     while (ctx.state.dayNightPhase === 'night' && ctx.state.enemySpawnTimer >= ENEMY_SPAWN_INTERVAL){
       ctx.state.enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
-      if (!spawnWaveEnemy(ctx, ctx.state.nextEnemyId % 2 === 0 ? 'left' : 'right')) break;
+      if (!spawnWaveEnemy(ctx)) break;
     }
 
     for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1){

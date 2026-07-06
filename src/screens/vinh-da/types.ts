@@ -71,8 +71,8 @@ export interface DroppedResource {
 
 export interface EnemyPortal {
   id: string;
-  side: Side;
-  x: number;
+  side?: Side;
+  x?: number;
 }
 
 export interface Enemy {

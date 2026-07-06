@@ -1,10 +1,10 @@
-import { CRYSTAL_X } from '../src/screens/vinh-da/constants.ts';
+import { CRYSTAL_X, ENEMY_SPAWN_INTERVAL, ENEMY_START_PADDING, WORLD_WIDTH } from '../src/screens/vinh-da/constants.ts';
 import { ENEMY_TEMPLATES } from '../src/screens/vinh-da/enemies.ts';
 import { BASE_STRUCTURE_STATS, BUILD_SITES, getBaseLevelStat } from '../src/screens/vinh-da/structures.ts';
 import type { StructureType } from '../src/screens/vinh-da/structures.ts';
-import { getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory, updateStructures } from '../src/screens/vinh-da/simulation.ts';
+import { getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory, spawnWaveEnemy, updateEnemies, updateStructures } from '../src/screens/vinh-da/simulation.ts';
 import type { VinhDaSimulationContext, VinhDaSimulationState } from '../src/screens/vinh-da/simulation.ts';
-import type { BuildSite, PlacedStructure, StructureRuntime } from '../src/screens/vinh-da/types.ts';
+import type { BuildSite, EnemyPortal, PlacedStructure, StructureRuntime } from '../src/screens/vinh-da/types.ts';
 
 const buildSitesById = new Map<string, BuildSite>(BUILD_SITES.map(site => [site.id, site]));
 
@@ -152,5 +152,77 @@ describe('Vĩnh Dạ base branch and leader safeguards', () => {
     expect(ctx.state.leaderShield).toBe(20);
     expect(ctx.state.leaderHp).toBe(30);
     expect(ctx.state.baseHp).toBe(64);
+  });
+});
+
+  describe('Vĩnh Dạ enemy portal spawning', () => {
+  const expectOneOrTwoPortalsPerSide = (portals: EnemyPortal[]): void => {
+    for (const side of ['left', 'right'] as const){
+      const count = portals.filter(portal => portal.side === side).length;
+      expect(count).toBeGreaterThanOrEqual(1);
+      expect(count).toBeLessThanOrEqual(2);
+    }
+  };
+
+  it('keeps generated portal layouts to one or two portals on each side', () => {
+    const portals: EnemyPortal[] = [
+      { id: 'left-portal-1', side: 'left', x: 120 },
+      { id: 'left-portal-2', side: 'left', x: 180 },
+      { id: 'right-portal-1', side: 'right', x: 920 },
+    ];
+
+    expectOneOrTwoPortalsPerSide(portals);
+  });
+
+  it('spawns a wave enemy from a portal on the requested side and spends weight budget', () => {
+    const ctx = createContext([], new Map());
+    Object.assign(ctx.state, {
+      dayNightPhase: 'night',
+      waveThreatBudgetRemaining: ENEMY_TEMPLATES.madDog.weight,
+      enemyPortals: [
+        { id: 'left-portal-1', side: 'left', x: 140 },
+        { id: 'right-portal-1', side: 'right', x: 910 },
+      ] satisfies EnemyPortal[],
+    });
+
+    expect(spawnWaveEnemy(ctx, 'right')).toBe(true);
+
+    expect(ctx.state.enemies).toHaveLength(1);
+    expect(ctx.state.enemies[0]).toMatchObject({ side: 'right', x: 910, kind: 'madDog' });
+    expect(ctx.state.waveThreatBudgetRemaining).toBeCloseTo(0);
+  });
+
+  it('lets updateEnemies choose a valid portal instead of alternating sides', () => {
+    const ctx = createContext([], new Map());
+    Object.assign(ctx.state, {
+      dayNightPhase: 'night',
+      nextEnemyId: 2,
+      enemySpawnTimer: ENEMY_SPAWN_INTERVAL,
+      waveThreatBudgetRemaining: ENEMY_TEMPLATES.madDog.weight,
+      enemyPortals: [{ id: 'right-portal-1', side: 'right', x: 930 }] satisfies EnemyPortal[],
+    });
+
+    updateEnemies(ctx, 0);
+
+    expect(ctx.state.enemies).toHaveLength(1);
+    expect(ctx.state.enemies[0]).toMatchObject({ side: 'right', x: 930, kind: 'madDog' });
+    expect(ctx.state.waveThreatBudgetRemaining).toBeCloseTo(0);
+  });
+
+  it('falls back to map-edge spawning when no valid portal is available', () => {
+    const ctx = createContext([], new Map());
+    Object.assign(ctx.state, {
+      dayNightPhase: 'night',
+      nextEnemyId: 2,
+      waveThreatBudgetRemaining: ENEMY_TEMPLATES.madDog.weight,
+      enemyPortals: [{ id: 'broken-portal' }] satisfies EnemyPortal[],
+    });
+
+    expect(spawnWaveEnemy(ctx)).toBe(true);
+
+    expect(ctx.state.enemies).toHaveLength(1);
+    expect(ctx.state.enemies[0]).toMatchObject({ side: 'left', x: ENEMY_START_PADDING, kind: 'madDog' });
+    expect(ctx.state.enemies[0]?.x).not.toBe(WORLD_WIDTH - ENEMY_START_PADDING);
+    expect(ctx.state.waveThreatBudgetRemaining).toBeCloseTo(0);
   });
 });
