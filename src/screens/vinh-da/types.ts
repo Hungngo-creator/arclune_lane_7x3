@@ -6,6 +6,22 @@ export type Side = 'left' | 'right';
 
 export type EnemyAttackShape = 'melee' | 'projectile' | 'explosion' | 'flyby' | 'line' | 'aura';
 export type EnemyStatusOnHit = 'contamination' | 'bleed' | 'slow' | 'paralysis';
+
+export interface VinhDaTimedStack {
+  remainingSeconds: number;
+}
+
+export interface VinhDaStatusCollection {
+  bleedStacks?: VinhDaTimedStack[];
+  contaminationStacks?: number;
+  paralysisSeconds?: number;
+  paralysisSourceCooldowns?: Record<string, number>;
+  slowSeconds?: number;
+  slowMultiplier?: number;
+  knockbackSourceCooldowns?: Record<string, number>;
+  burnSeconds?: number;
+  burnDps?: number;
+}
 export type EnemyUltimate = 'dragon-rage' | 'commander-aura' | 'death-burst';
 
 export interface BuildSite {
@@ -34,6 +50,7 @@ export interface RuntimeSoldier {
   side: Side;
   attackCooldown: number;
   ultimateReady?: boolean;
+  statuses?: VinhDaStatusCollection;
 }
 
 export interface Enemy {
@@ -73,6 +90,7 @@ export interface Enemy {
   regenTimer?: number;
   dragonDestroyCooldown?: number;
   dragonUltimateCooldown?: number;
+  statuses?: VinhDaStatusCollection;
   burnSeconds?: number;
   burnDps?: number;
   slowSeconds?: number;
@@ -97,6 +115,7 @@ export interface StructureRuntime {
   attackerCooldowns?: Map<string, number>;
   prayerTimer?: number;
   contaminationCleanseTimer?: number;
+  statuses?: VinhDaStatusCollection;
   soldierSpawnTimer?: number;
   soldiers?: RuntimeSoldier[];
   nextSoldierId?: number;

@@ -38024,6 +38024,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           attackRange: 28,
           attackCooldown: 2.5,
           atk: 1,
+          statusOnHit: 'bleed',
+          bleedOnHit: true,
           reward: 1
       }),
       crawler: defineEnemyTemplate({
@@ -38035,6 +38037,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           attackRange: 20,
           attackCooldown: 2,
           atk: 1,
+          statusOnHit: 'bleed',
+          bleedOnHit: true,
           reward: 1
       }),
       madDog: defineEnemyTemplate({
@@ -38115,6 +38119,22 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           regen: true,
           rank: 2,
           reward: 3
+      }),
+      apostle: defineEnemyTemplate({
+          kind: 'apostle',
+          label: 'Sứ Đồ',
+          hp: 6,
+          speed: 0.35 * METERS_TO_WORLD_UNITS,
+          weight: 2,
+          attackRange: 30,
+          attackCooldown: 2.2,
+          atk: 2,
+          wil: 2,
+          arm: 2,
+          res: 2,
+          statusOnHit: 'contamination',
+          contaminationOnHit: true,
+          reward: 0
       }),
       resentfulDragon: defineEnemyTemplate({
           kind: 'resentfulDragon',
@@ -38791,8 +38811,6 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const LANDMINE_FUSE_SECONDS = __dep0.LANDMINE_FUSE_SECONDS;
   const LANDMINE_TRIGGER_RADIUS = __dep0.LANDMINE_TRIGGER_RADIUS;
   const LANDMINE_TRUE_DAMAGE = __dep0.LANDMINE_TRUE_DAMAGE;
-  const SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND = __dep0.SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND;
-  const SPIKE_TRAP_BLEED_SECONDS = __dep0.SPIKE_TRAP_BLEED_SECONDS;
   const SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE = __dep0.SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE;
   const SPIKE_TRAP_MIN_WEIGHT = __dep0.SPIKE_TRAP_MIN_WEIGHT;
   const SPIKE_TRAP_RADIUS = __dep0.SPIKE_TRAP_RADIUS;
@@ -38848,10 +38866,53 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       });
       ctx.state.nextEnemyId += 1;
   };
+  const BLEED_SECONDS = 3;
+  const BLEED_MAX_HP_DPS_PERCENT = 0.03;
+  const BLEED_STACK_CAP = 5;
+  const LIGHTNING_PARALYSIS_SECONDS = 0.75;
+  const LIGHTNING_PARALYSIS_COOLDOWN_SECONDS = 4;
+  const WIND_SLOW_SECONDS = 2;
+  const WIND_SLOW_MULTIPLIER = 0.9;
+  const WIND_KNOCKBACK_COOLDOWN_SECONDS = 3;
+  const WIND_KNOCKBACK_DISTANCE = 60;
+  const CONTAMINATION_APOSTLE_STACKS = 5;
+  const ensureStatuses = (target) => (target.statuses ??= {});
+  const addBleedStack = (target) => {
+      const statuses = ensureStatuses(target);
+      const stacks = statuses.bleedStacks ??= [];
+      if (stacks.length >= BLEED_STACK_CAP)
+          return;
+      stacks.push({ remainingSeconds: BLEED_SECONDS });
+  };
+  const tickStatusCooldowns = (cooldowns, dt) => {
+      if (!cooldowns)
+          return;
+      for (const key of Object.keys(cooldowns)) {
+          const next = Math.max(0, cooldowns[key] - dt);
+          if (next > 0)
+              cooldowns[key] = next;
+          else
+              delete cooldowns[key];
+      }
+  };
   const applyContaminationHit = (ctx, enemy) => {
       if (!enemy.contaminationOnHit)
           return;
       ctx.state.contamination = (ctx.state.contamination ?? 0) + 1;
+      const statuses = ctx.state.baseStatuses ??= {};
+      statuses.contaminationStacks = (statuses.contaminationStacks ?? 0) + 1;
+  };
+  const applyBleedHit = (target, enemy) => {
+      if (enemy.bleedOnHit)
+          addBleedStack(target);
+  };
+  const applyBaseBleedHit = (ctx, enemy) => {
+      if (!enemy.bleedOnHit)
+          return;
+      const statuses = ctx.state.baseStatuses ??= {};
+      const stacks = statuses.bleedStacks ??= [];
+      if (stacks.length < BLEED_STACK_CAP)
+          stacks.push({ remainingSeconds: BLEED_SECONDS });
   };
   const triggerDeathExplosion = (ctx, enemy) => {
       if (!enemy.deathExplosion)
@@ -38902,7 +38963,6 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       enemy.hp -= amount;
       return enemy.hp <= 0;
   };
-  const ELEMENTAL_EFFECT_COOLDOWN_SECONDS = 4;
   const BLOOD_MAX_HP_STACK_CAP = 5;
   const getBaseStat = (ctx) => BASE_STRUCTURE_STATS[ctx.state.baseLevel ?? 0] ?? BASE_STRUCTURE_STATS[0];
   const getChurchHealingBonus = (ctx) => {
@@ -38922,15 +38982,19 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const applyElementEffect = (ctx, enemy, element, damage, sourceX) => {
       switch (element) {
           case 'Hỏa':
-              enemy.burnSeconds = Math.max(enemy.burnSeconds ?? 0, 3);
-              enemy.burnDps = Math.max(enemy.burnDps ?? 0, damage * 0.35);
+              {
+                  const statuses = ensureStatuses(enemy);
+                  statuses.burnSeconds = Math.max(statuses.burnSeconds ?? 0, 3);
+                  statuses.burnDps = Math.max(statuses.burnDps ?? 0, damage * 0.35);
+              }
               break;
           case 'Mộc':
               healBase(ctx, Math.max(1, damage * 0.6));
               break;
           case 'Thủy':
-              enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, 2.5);
-              enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, 0.72);
+              const statuses = ensureStatuses(enemy);
+              statuses.slowSeconds = Math.max(statuses.slowSeconds ?? 0, 2.5);
+              statuses.slowMultiplier = Math.min(statuses.slowMultiplier ?? 1, 0.72);
               break;
           case 'Thổ':
               enemy.attackCooldown += 0.4;
@@ -38939,9 +39003,14 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               enemy.hp -= damage * 0.25;
               break;
           case 'Lôi':
-              if ((enemy.paralysisCooldown ?? 0) <= 0) {
-                  enemy.attackCooldown += 1;
-                  enemy.paralysisCooldown = ELEMENTAL_EFFECT_COOLDOWN_SECONDS;
+              {
+                  const statuses = ensureStatuses(enemy);
+                  const key = 'elementalTower:Lôi';
+                  const cooldowns = statuses.paralysisSourceCooldowns ??= {};
+                  if ((cooldowns[key] ?? 0) <= 0) {
+                      statuses.paralysisSeconds = Math.max(statuses.paralysisSeconds ?? 0, LIGHTNING_PARALYSIS_SECONDS);
+                      cooldowns[key] = LIGHTNING_PARALYSIS_COOLDOWN_SECONDS;
+                  }
               }
               break;
           case 'Huyết': {
@@ -38957,11 +39026,20 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               enemy.lightVulnerableSeconds = Math.max(enemy.lightVulnerableSeconds ?? 0, 4);
               break;
           case 'Phong':
-              if ((enemy.paralysisCooldown ?? 0) <= 0) {
-                  enemy.x += (enemy.x < sourceX ? -1 : 1) * 90;
-                  enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, 2);
-                  enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, 0.65);
-                  enemy.paralysisCooldown = ELEMENTAL_EFFECT_COOLDOWN_SECONDS;
+              {
+                  const statuses = ensureStatuses(enemy);
+                  const key = 'elementalTower:Phong';
+                  if ((statuses.slowSeconds ?? 0) > 0) {
+                      const cooldowns = statuses.knockbackSourceCooldowns ??= {};
+                      if ((cooldowns[key] ?? 0) <= 0) {
+                          enemy.x += (enemy.x < sourceX ? -1 : 1) * WIND_KNOCKBACK_DISTANCE;
+                          cooldowns[key] = WIND_KNOCKBACK_COOLDOWN_SECONDS;
+                      }
+                  }
+                  else {
+                      statuses.slowSeconds = WIND_SLOW_SECONDS;
+                      statuses.slowMultiplier = WIND_SLOW_MULTIPLIER;
+                  }
               }
               break;
       }
@@ -39052,7 +39130,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       return true;
   };
   const getEnemyEffectiveSpeed = (ctx, enemy) => {
-      const statusMultiplier = enemy.slowSeconds && enemy.slowSeconds > 0 ? (enemy.slowMultiplier ?? 1) : 1;
+      const statusMultiplier = enemy.statuses?.slowSeconds && enemy.statuses.slowSeconds > 0 ? (enemy.statuses.slowMultiplier ?? 1) : 1;
       if (enemy.canFly)
           return enemy.baseSpeed * statusMultiplier;
       for (const siteId of ctx.structureSiteIdsOfType('swamp')) {
@@ -39072,7 +39150,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const attackEnemyTarget = (ctx, enemy, template, targetX, dt) => {
       if (Math.abs(enemy.x - targetX) <= template.attackRange) {
-          tryEnemyAttack(enemy, template, () => { damageBase(ctx, template.damage); });
+          tryEnemyAttack(enemy, template, () => { applyBaseBleedHit(ctx, enemy); damageBase(ctx, template.damage); });
           return;
       }
       moveEnemyToward(ctx, enemy, targetX, dt);
@@ -39080,7 +39158,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const updateMeleeBasicEnemy = (ctx, enemy, template, dt) => {
       const wall = getBlockingWall(ctx, enemy);
       if (wall) {
-          tryEnemyAttack(enemy, template, () => { damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy); });
+          tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy); });
           return;
       }
       attackEnemyTarget(ctx, enemy, template, getEnemyPrimaryTargetX(ctx, enemy), dt);
@@ -39090,6 +39168,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if (wall) {
           tryEnemyAttack(enemy, template, () => {
               applyContaminationHit(ctx, enemy);
+              applyBleedHit(wall.runtime, enemy);
               damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy);
           });
           return;
@@ -39097,6 +39176,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) {
           tryEnemyAttack(enemy, template, () => {
               applyContaminationHit(ctx, enemy);
+              applyBaseBleedHit(ctx, enemy);
               damageBase(ctx, template.damage);
           });
           return;
@@ -39122,7 +39202,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const updateDarkMageEnemy = (ctx, enemy, template, dt) => {
       const wall = getBlockingWall(ctx, enemy);
       if (wall) {
-          tryEnemyAttack(enemy, template, () => { damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy); });
+          tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy); });
           return;
       }
       if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange) {
@@ -39206,6 +39286,52 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       ctx.deleteStructure(site.id);
       ctx.renderBuildSite(site.id);
   };
+  const tickStatusCollection = (statuses, dt) => {
+      if (!statuses)
+          return 0;
+      tickStatusCooldowns(statuses.paralysisSourceCooldowns, dt);
+      tickStatusCooldowns(statuses.knockbackSourceCooldowns, dt);
+      statuses.paralysisSeconds = Math.max(0, (statuses.paralysisSeconds ?? 0) - dt);
+      statuses.slowSeconds = Math.max(0, (statuses.slowSeconds ?? 0) - dt);
+      statuses.burnSeconds = Math.max(0, (statuses.burnSeconds ?? 0) - dt);
+      if (statuses.slowSeconds <= 0)
+          statuses.slowMultiplier = undefined;
+      if (statuses.burnSeconds <= 0)
+          statuses.burnDps = undefined;
+      let bleedStacks = statuses.bleedStacks ?? [];
+      let activeBleedStacks = 0;
+      for (const stack of bleedStacks) {
+          if (stack.remainingSeconds > 0)
+              activeBleedStacks += 1;
+          stack.remainingSeconds = Math.max(0, stack.remainingSeconds - dt);
+      }
+      bleedStacks = bleedStacks.filter(stack => stack.remainingSeconds > 0);
+      if (bleedStacks.length > 0)
+          statuses.bleedStacks = bleedStacks;
+      else
+          statuses.bleedStacks = undefined;
+      return activeBleedStacks;
+  };
+  const tickEnemyStatuses = (ctx, enemy, dt) => {
+      const activeBurnDps = (enemy.statuses?.burnSeconds ?? 0) > 0 ? (enemy.statuses?.burnDps ?? 0) : 0;
+      const bleedStacks = tickStatusCollection(enemy.statuses, dt);
+      const bleedDamage = enemy.maxHp * BLEED_MAX_HP_DPS_PERCENT * bleedStacks * dt;
+      return damageEnemy(ctx, enemy, activeBurnDps * dt + bleedDamage);
+  };
+  const tickBaseStatuses = (ctx, dt) => {
+      const bleedStacks = tickStatusCollection(ctx.state.baseStatuses, dt);
+      if (bleedStacks <= 0)
+          return;
+      damageBase(ctx, getBaseStat(ctx).hp * BLEED_MAX_HP_DPS_PERCENT * bleedStacks * dt);
+  };
+  const tickStructureStatuses = (ctx, structure, runtime, dt) => {
+      const bleedStacks = tickStatusCollection(runtime.statuses, dt);
+      if (bleedStacks <= 0 || runtime.hp <= 0)
+          return;
+      const site = ctx.getBuildSite(structure.siteId);
+      if (site)
+          damageStructure(ctx, site, runtime, ctx.getStructureMaxHp(structure) * BLEED_MAX_HP_DPS_PERCENT * bleedStacks * dt);
+  };
   const updateEnemies = (ctx, dt) => {
       if (ctx.state.dayNightPhase === 'night')
           ctx.state.enemySpawnTimer += dt;
@@ -39222,15 +39348,11 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               continue;
           enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
           enemy.paralysisCooldown = Math.max(0, (enemy.paralysisCooldown ?? 0) - dt);
-          enemy.slowSeconds = Math.max(0, (enemy.slowSeconds ?? 0) - dt);
-          enemy.lightVulnerableSeconds = Math.max(0, (enemy.lightVulnerableSeconds ?? 0) - dt);
-          if ((enemy.burnSeconds ?? 0) > 0) {
-              enemy.burnSeconds = Math.max(0, (enemy.burnSeconds ?? 0) - dt);
-              if (damageEnemy(ctx, enemy, (enemy.burnDps ?? 0) * dt)) {
-                  removeEnemyAt(ctx, i, true);
-                  continue;
-              }
+          if (tickEnemyStatuses(ctx, enemy, dt)) {
+              removeEnemyAt(ctx, i, true);
+              continue;
           }
+          enemy.lightVulnerableSeconds = Math.max(0, (enemy.lightVulnerableSeconds ?? 0) - dt);
           if (enemy.regen) {
               enemy.regenTimer = (enemy.regenTimer ?? 0) + dt;
               const interval = enemy.kind === 'resentfulDragon' ? 2 : 5;
@@ -39240,14 +39362,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
                   enemy.hp = Math.min(enemy.maxHp, enemy.hp + amount);
               }
           }
-          y;
-          if ((enemy.bleedSeconds ?? 0) > 0) {
-              enemy.bleedSeconds = Math.max(0, (enemy.bleedSeconds ?? 0) - dt);
-              if (damageEnemy(ctx, enemy, enemy.maxHp * (enemy.bleedMaxHpDpsPercent ?? 0) * dt)) {
-                  removeEnemyAt(ctx, i, true);
-                  continue;
-              }
-          }
+          if ((enemy.statuses?.paralysisSeconds ?? 0) > 0)
+              continue;
           const template = getEnemyTemplate(enemy);
           switch (enemy.kind) {
               case 'suicideBomber':
@@ -39266,6 +39382,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               case 'crawler':
               case 'madDog':
               case 'ironMan':
+              case 'apostle':
                   updateMeleeBasicEnemy(ctx, enemy, template, dt);
                   break;
           }
@@ -39278,13 +39395,27 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           }
       }
   };
+  const convertContaminationToApostles = (ctx) => {
+      const stacks = ctx.state.contamination ?? 0;
+      const apostleCount = Math.floor(stacks / CONTAMINATION_APOSTLE_STACKS);
+      if (apostleCount <= 0)
+          return;
+      ctx.state.contamination = stacks % CONTAMINATION_APOSTLE_STACKS;
+      if (ctx.state.baseStatuses)
+          ctx.state.baseStatuses.contaminationStacks = ctx.state.contamination;
+      for (let i = 0; i < apostleCount; i += 1) {
+          spawnEnemy(ctx, (ctx.state.nextEnemyId + i) % 2 === 0 ? 'left' : 'right', 'apostle');
+      }
+  };
   const updateDayNightTimer = (ctx, dt) => {
       ctx.state.phaseRemainingSeconds -= dt;
       while (ctx.state.phaseRemainingSeconds <= 0) {
           ctx.state.phaseRemainingSeconds += DAY_DURATION_SECONDS;
           ctx.state.dayNightPhase = ctx.state.dayNightPhase === 'night' ? 'day' : 'night';
-          if (ctx.state.dayNightPhase === 'day')
+          if (ctx.state.dayNightPhase === 'day') {
               clearEnemiesWithoutReward(ctx);
+              convertContaminationToApostles(ctx);
+          }
       }
       ctx.renderDayNightTimer();
   };
@@ -39376,10 +39507,10 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       for (const enemy of ctx.state.enemies) {
           if (enemy.canFly || !canTriggerSpikeTrap(enemy) || Math.abs(enemy.x - site.x) > SPIKE_TRAP_RADIUS)
               continue;
-          enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, SPIKE_TRAP_SLOW_SECONDS);
-          enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, SPIKE_TRAP_SLOW_MULTIPLIER);
-          enemy.bleedSeconds = Math.max(enemy.bleedSeconds ?? 0, SPIKE_TRAP_BLEED_SECONDS);
-          enemy.bleedMaxHpDpsPercent = Math.max(enemy.bleedMaxHpDpsPercent ?? 0, SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND);
+          const statuses = ensureStatuses(enemy);
+          statuses.slowSeconds = Math.max(statuses.slowSeconds ?? 0, SPIKE_TRAP_SLOW_SECONDS);
+          statuses.slowMultiplier = Math.min(statuses.slowMultiplier ?? 1, SPIKE_TRAP_SLOW_MULTIPLIER);
+          addBleedStack(enemy);
       }
   };
   const updateAntiAirCannon = (ctx, structure, site, runtime, dt) => {
@@ -39417,8 +39548,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           if (enemy.weight > (stat.maxAffectedWeight ?? 0) || Math.abs(enemy.x - center) > (stat.pullRadius ?? 0))
               continue;
           enemy.x += (center - enemy.x) * Math.min(1, (stat.pullStrength ?? 0) / Math.max(1, Math.abs(center - enemy.x)) * dt);
-          enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, 1);
-          enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, 0.65);
+          const statuses = ensureStatuses(enemy);
+          statuses.slowSeconds = Math.max(statuses.slowSeconds ?? 0, 1);
+          statuses.slowMultiplier = Math.min(statuses.slowMultiplier ?? 1, 0.65);
       }
       runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
   };
@@ -39447,6 +39579,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       if ((runtime.contaminationCleanseTimer ?? 0) <= 0) {
           ctx.state.contamination = Math.max(0, (ctx.state.contamination ?? 0) - structure.level);
+          if (ctx.state.baseStatuses)
+              ctx.state.baseStatuses.contaminationStacks = ctx.state.contamination;
           runtime.contaminationCleanseTimer = stat.cleanseContaminationSeconds ?? 120;
       }
   };
@@ -39477,9 +39611,11 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           const runtime = ctx.ensureStructureRuntime(structure);
           updateWallLink(ctx, structure, runtime);
       }
+      tickBaseStatuses(ctx, dt);
       updateBaseSupport(ctx, dt);
       for (const structure of ctx.state.structures.values()) {
           const runtime = ctx.ensureStructureRuntime(structure);
+          tickStructureStatuses(ctx, structure, runtime, dt);
           updateWallRegeneration(ctx, structure, runtime, dt);
           updateBiochemicalWall(ctx, structure, runtime);
           updateChurch(ctx, structure, runtime);

@@ -8,7 +8,8 @@ export type EnemyKind =
   | 'mutantBird'
   | 'darkMage'
   | 'ironMan'
-  | 'resentfulDragon';
+  | 'resentfulDragon'
+  | 'apostle';
 
 export type EnemyTier = 1.1 | 1.2 | 1.3;
 
@@ -124,6 +125,8 @@ export const ENEMY_TEMPLATES = {
     attackRange: 28,
     attackCooldown: 2.5,
     atk: 1,
+    statusOnHit: 'bleed',
+    bleedOnHit: true,
     reward: 1
   }),
   crawler: defineEnemyTemplate({
@@ -135,6 +138,8 @@ export const ENEMY_TEMPLATES = {
     attackRange: 20,
     attackCooldown: 2,
     atk: 1,
+    statusOnHit: 'bleed',
+    bleedOnHit: true,
     reward: 1
   }),
   madDog: defineEnemyTemplate({
@@ -215,6 +220,22 @@ export const ENEMY_TEMPLATES = {
     regen: true,
     rank: 2,
     reward: 3
+  }),
+  apostle: defineEnemyTemplate({
+    kind: 'apostle',
+    label: 'Sứ Đồ',
+    hp: 6,
+    speed: 0.35 * METERS_TO_WORLD_UNITS,
+    weight: 2,
+    attackRange: 30,
+    attackCooldown: 2.2,
+    atk: 2,
+    wil: 2,
+    arm: 2,
+    res: 2,
+    statusOnHit: 'contamination',
+    contaminationOnHit: true,
+    reward: 0
   }),
   resentfulDragon: defineEnemyTemplate({
     kind: 'resentfulDragon',
