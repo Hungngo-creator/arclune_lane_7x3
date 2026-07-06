@@ -39118,6 +39118,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const RESOURCE_PICKUP_RANGE = 54;
   const RESOURCE_DEPOSIT_RANGE = 90;
   const BASE_BUFF_DAILY_UPKEEP = 1;
+  const STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND = 0.08;
+  const BASE_HEALING_CAP_WINDOW_SECONDS = 1;
   const VINH_DA_WAVE_TABLE = Object.freeze([
       { minNightIndex: 1, mapTier: 1.1, threatBudget: 8, enemyWeights: { twisted: 5, crawler: 3, madDog: 1 } },
       { minNightIndex: 3, mapTier: 1.1, threatBudget: 13, enemyWeights: { twisted: 4, crawler: 4, madDog: 2 } },
@@ -39418,10 +39420,32 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       return bonus;
   };
-  const healBase = (ctx, amount) => {
+  const getBaseMaxHp = (ctx) => {
       const stat = getBaseStat(ctx);
-      const maxHp = stat.hp + (stat.shield ?? 0) + (ctx.state.baseStatuses?.elementalBloodMaxHpBonus ?? 0);
-      ctx.state.baseHp = Math.min(maxHp, ctx.state.baseHp + amount * (1 + getChurchHealingBonus(ctx)));
+      return stat.hp + (stat.shield ?? 0) + (ctx.state.baseStatuses?.elementalBloodMaxHpBonus ?? 0);
+  };
+  const resetBaseHealingCapWindow = (ctx) => {
+      ctx.state.baseHealingCapWindowRemaining = BASE_HEALING_CAP_WINDOW_SECONDS;
+      ctx.state.baseHealingCapUsed = 0;
+  };
+  const tickBaseHealingCapWindow = (ctx, dt) => {
+      const remaining = (ctx.state.baseHealingCapWindowRemaining ?? 0) - dt;
+      if (remaining > 0) {
+          ctx.state.baseHealingCapWindowRemaining = remaining;
+          return;
+      }
+      resetBaseHealingCapWindow(ctx);
+  };
+  const healBase = (ctx, amount) => {
+      const maxHp = getBaseMaxHp(ctx);
+      const requestedHeal = amount * (1 + getChurchHealingBonus(ctx));
+      const cap = maxHp * STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND;
+      const remainingCap = Math.max(0, cap - (ctx.state.baseHealingCapUsed ?? 0));
+      const appliedHeal = Math.min(requestedHeal, remainingCap, Math.max(0, maxHp - ctx.state.baseHp));
+      if (appliedHeal <= 0)
+          return;
+      ctx.state.baseHealingCapUsed = (ctx.state.baseHealingCapUsed ?? 0) + appliedHeal;
+      ctx.state.baseHp += appliedHeal;
   };
   const applyElementAllyBuffInRange = (ctx, sourceX, range, apply) => {
       if (Math.abs(CRYSTAL_X - sourceX) <= range) {
@@ -40147,6 +40171,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           const runtime = ctx.ensureStructureRuntime(structure);
           updateWallLink(ctx, structure, runtime);
       }
+      tickBaseHealingCapWindow(ctx, dt);
       tickBaseStatuses(ctx, dt);
       updateBaseSupport(ctx, dt);
       for (const structure of ctx.state.structures.values()) {
@@ -40230,6 +40255,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'RESOURCE_PICKUP_RANGE')) exports.RESOURCE_PICKUP_RANGE = RESOURCE_PICKUP_RANGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'RESOURCE_DEPOSIT_RANGE')) exports.RESOURCE_DEPOSIT_RANGE = RESOURCE_DEPOSIT_RANGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_BUFF_DAILY_UPKEEP')) exports.BASE_BUFF_DAILY_UPKEEP = BASE_BUFF_DAILY_UPKEEP;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND')) exports.STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND = STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getScaledThreatBudget')) exports.getScaledThreatBudget = getScaledThreatBudget;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getVinhDaWaveConfig')) exports.getVinhDaWaveConfig = getVinhDaWaveConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, 'spawnEnemy')) exports.spawnEnemy = spawnEnemy;

@@ -34,6 +34,8 @@ export const DAY_DURATION_SECONDS = 300;
 export const RESOURCE_PICKUP_RANGE = 54;
 export const RESOURCE_DEPOSIT_RANGE = 90;
 export const BASE_BUFF_DAILY_UPKEEP = 1;
+export const STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND = 0.08;
+const BASE_HEALING_CAP_WINDOW_SECONDS = 1;
 export type DayNightPhase = 'day' | 'night';
 
 export interface VinhDaWaveConfig {
@@ -93,6 +95,8 @@ export interface VinhDaSimulationState {
   leaderShield?: number;
   leaderShieldNightIndex?: number;
   leaderEmergencyCooldownUntilNight?: number;
+  baseHealingCapWindowRemaining?: number;
+  baseHealingCapUsed?: number;
   leaderX: number;
   enemies: Enemy[];
   enemyPortals: EnemyPortal[];
@@ -367,10 +371,31 @@ const getChurchHealingBonus = (ctx: VinhDaSimulationContext, bounds = getLivingT
   }
   return bonus;
 };
-const healBase = (ctx: VinhDaSimulationContext, amount: number): void => {
+const getBaseMaxHp = (ctx: VinhDaSimulationContext): number => {
   const stat = getBaseStat(ctx);
-  const maxHp = stat.hp + (stat.shield ?? 0) + (ctx.state.baseStatuses?.elementalBloodMaxHpBonus ?? 0);
-  ctx.state.baseHp = Math.min(maxHp, ctx.state.baseHp + amount * (1 + getChurchHealingBonus(ctx)));
+  return stat.hp + (stat.shield ?? 0) + (ctx.state.baseStatuses?.elementalBloodMaxHpBonus ?? 0);
+};
+const resetBaseHealingCapWindow = (ctx: VinhDaSimulationContext): void => {
+  ctx.state.baseHealingCapWindowRemaining = BASE_HEALING_CAP_WINDOW_SECONDS;
+  ctx.state.baseHealingCapUsed = 0;
+};
+const tickBaseHealingCapWindow = (ctx: VinhDaSimulationContext, dt: number): void => {
+  const remaining = (ctx.state.baseHealingCapWindowRemaining ?? 0) - dt;
+  if (remaining > 0){
+    ctx.state.baseHealingCapWindowRemaining = remaining;
+    return;
+  }
+  resetBaseHealingCapWindow(ctx);
+};
+const healBase = (ctx: VinhDaSimulationContext, amount: number): void => {
+  const maxHp = getBaseMaxHp(ctx);
+  const requestedHeal = amount * (1 + getChurchHealingBonus(ctx));
+  const cap = maxHp * STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND;
+  const remainingCap = Math.max(0, cap - (ctx.state.baseHealingCapUsed ?? 0));
+  const appliedHeal = Math.min(requestedHeal, remainingCap, Math.max(0, maxHp - ctx.state.baseHp));
+  if (appliedHeal <= 0) return;
+  ctx.state.baseHealingCapUsed = (ctx.state.baseHealingCapUsed ?? 0) + appliedHeal;
+  ctx.state.baseHp += appliedHeal;
 };
 const applyElementAllyBuffInRange = (ctx: VinhDaSimulationContext, sourceX: number, range: number, apply: (statuses: import('./types.ts').VinhDaStatusCollection) => void): void => {
   if (Math.abs(CRYSTAL_X - sourceX) <= range){
@@ -1029,6 +1054,7 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
       const runtime = ctx.ensureStructureRuntime(structure);
       updateWallLink(ctx, structure, runtime);
     }
+  tickBaseHealingCapWindow(ctx, dt);
   tickBaseStatuses(ctx, dt);
   updateBaseSupport(ctx, dt);
     for (const structure of ctx.state.structures.values()){
