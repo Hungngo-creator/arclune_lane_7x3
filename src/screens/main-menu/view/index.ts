@@ -6,6 +6,7 @@ import { ensureStyles, createHeader, createModesSection } from './layout.ts';
 import { resetPlayerProfileData } from '../../../utils/player-profile.ts';
 import { resetSharedCurrencyWallet } from '../../../utils/currency.ts';
 import { getFrameRateCap, setFrameRateCap, type FrameRateCap } from '../../../utils/frame-rate.ts';
+import { isAudioEnabled, setAudioEnabled } from '../../../utils/audio-settings.ts';
 
 function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar): void {
   const toolbar = document.createElement('div');
@@ -84,6 +85,22 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
   graphicsActions.appendChild(fpsOptions);
   content.appendChild(graphicsActions);
 
+  const audioActions = document.createElement('div');
+  audioActions.className = 'main-menu-settings-fps';
+  audioActions.style.display = 'none';
+
+  const audioLabel = document.createElement('p');
+  audioLabel.className = 'main-menu-settings-fps__label';
+  audioLabel.textContent = 'Âm thanh';
+  audioActions.appendChild(audioLabel);
+
+  const audioToggle = document.createElement('button');
+  audioToggle.type = 'button';
+  audioToggle.className = 'main-menu-settings-fps__btn';
+  audioToggle.dataset.audioToggle = 'true';
+  audioActions.appendChild(audioToggle);
+  content.appendChild(audioActions);
+
   const accountActions = document.createElement('div');
   accountActions.style.display = 'none';
   const resetBtn = document.createElement('button');
@@ -117,6 +134,7 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
 
   let activeTab = 'chung';
   let activeFrameRateCap = getFrameRateCap();
+  let audioEnabled = isAudioEnabled();
 
   const renderFrameRateButtons = () => {
     fpsButtons.forEach((btn, fps) => {
@@ -125,12 +143,19 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
       btn.setAttribute('aria-pressed', String(isActive));
     });
   };
+  const renderAudioToggle = () => {
+    audioToggle.textContent = audioEnabled ? 'Bật âm' : 'Tắt âm';
+    audioToggle.classList.toggle('is-active', audioEnabled);
+    audioToggle.setAttribute('aria-pressed', String(audioEnabled));
+  };
   const renderTab = () => {
 
     navButtons.forEach((btn, tabId) => btn.classList.toggle('is-active', tabId === activeTab));
     graphicsActions.style.display = activeTab === 'đồ hoạ' ? '' : 'none';
+    audioActions.style.display = activeTab === 'âm thanh' ? '' : 'none';
     accountActions.style.display = activeTab === 'tài khoản' ? '' : 'none';
     renderFrameRateButtons();
+    renderAudioToggle();
     confirmWrap.classList.remove('is-open');
     if (activeTab === 'chung'){
       title.textContent = 'Cài đặt chung';
@@ -144,7 +169,7 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
     }
     if (activeTab === 'âm thanh'){
       title.textContent = 'Cài đặt âm thanh';
-      description.textContent = 'Các cấu hình âm thanh sẽ được bổ sung sau.';
+      description.textContent = 'Bật/tắt âm thanh hiệu ứng và môi trường trong các chế độ chơi.';
       return;
     }
     title.textContent = 'Cài đặt tài khoản';
@@ -182,6 +207,12 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
     renderFrameRateButtons();
   };
 
+  const onAudioToggleClick = () => {
+    audioEnabled = !audioEnabled;
+    setAudioEnabled(audioEnabled);
+    renderAudioToggle();
+  };
+
   const onResetClick = () => confirmWrap.classList.add('is-open');
   const onResetCancel = () => confirmWrap.classList.remove('is-open');
   const onResetConfirm = () => {
@@ -195,6 +226,7 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
   closeBtn.addEventListener('click', closeHub);
   nav.addEventListener('click', onTabClick);
   fpsOptions.addEventListener('click', onFrameRateClick);
+  audioToggle.addEventListener('click', onAudioToggleClick);
   resetBtn.addEventListener('click', onResetClick);
   confirmNo.addEventListener('click', onResetCancel);
   confirmYes.addEventListener('click', onResetConfirm);
@@ -202,6 +234,7 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
   addCleanup(() => closeBtn.removeEventListener('click', closeHub));
   addCleanup(() => nav.removeEventListener('click', onTabClick));
   addCleanup(() => fpsOptions.removeEventListener('click', onFrameRateClick));
+  addCleanup(() => audioToggle.removeEventListener('click', onAudioToggleClick));
   addCleanup(() => resetBtn.removeEventListener('click', onResetClick));
   addCleanup(() => confirmNo.removeEventListener('click', onResetCancel));
   addCleanup(() => confirmYes.removeEventListener('click', onResetConfirm));

@@ -2,6 +2,7 @@ import { ROSTER, getMetaById } from '../../catalog.ts';
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import type { MainMenuShell } from '../main-menu/types.ts';
 import { getFrameRateCap } from '../../utils/frame-rate.ts';
+import { isAudioEnabled } from '../../utils/audio-settings.ts';
 
 import {
   BUILD_RANGE,
@@ -58,6 +59,82 @@ interface RenderContext {
   root: HTMLElement;
   shell?: MainMenuShell | null;
   params?: Record<string, unknown> | null;
+}
+
+const STORM_LOOP_SRC: string | null = null;
+
+type BrowserAudioContext = AudioContext & { createGain(): GainNode };
+
+function createAudioContext(): BrowserAudioContext | null {
+  const AudioContextCtor = window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  return AudioContextCtor ? new AudioContextCtor() as BrowserAudioContext : null;
+}
+
+function createVinhDaAudioController(): { unlock: () => void; syncWeather: (weather: WeatherType) => void; playThunder: () => void; destroy: () => void } {
+  let unlocked = false;
+  let context: BrowserAudioContext | null = null;
+  let stormLoop: HTMLAudioElement | null = null;
+
+  const ensureContext = (): BrowserAudioContext | null => {
+    if (!context) context = createAudioContext();
+    return context;
+  };
+  const canPlay = (): boolean => unlocked && isAudioEnabled();
+  const ensureStormLoop = (): HTMLAudioElement | null => {
+    if (!STORM_LOOP_SRC) return null;
+    if (!stormLoop){
+      stormLoop = new Audio(STORM_LOOP_SRC);
+      stormLoop.loop = true;
+      stormLoop.volume = 0.28;
+    }
+    return stormLoop;
+  };
+  const stopStormLoop = (): void => {
+    if (!stormLoop) return;
+    stormLoop.pause();
+    stormLoop.currentTime = 0;
+  };
+
+  return {
+    unlock(){
+      if (unlocked) return;
+      unlocked = true;
+      void ensureContext()?.resume();
+    },
+    syncWeather(nextWeather: WeatherType){
+      const loop = ensureStormLoop();
+      if (!loop) return;
+      if (nextWeather === 'storm' && canPlay()){
+        void loop.play();
+      } else {
+        loop.pause();
+      }
+    },
+    playThunder(){
+      if (!canPlay()) return;
+      const audio = ensureContext();
+      if (!audio) return;
+      void audio.resume();
+      const now = audio.currentTime;
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.setValueAtTime(72, now);
+      oscillator.frequency.exponentialRampToValueAtTime(28, now + 0.22);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.22, now + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+      oscillator.start(now);
+      oscillator.stop(now + 0.34);
+    },
+    destroy(){
+      stopStormLoop();
+      void context?.close();
+      context = null;
+    },
+  };
 }
 
 const randomInRange = (min: number, max: number): number => min + Math.random() * Math.max(0, max - min);
@@ -178,6 +255,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let leaderAttackCooldown = 0;
   let nightIndex = 1;
   let waveThreatBudgetRemaining = getScaledThreatBudget(getVinhDaWaveConfig(nightIndex).threatBudget, nightIndex);
+  const audio = createVinhDaAudioController();
 
   const section = document.createElement('section');
   section.className = 'vinh-da-game';
@@ -301,14 +379,19 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     weatherLayer.classList.toggle('is-storm', weather === 'storm');
     weatherLayer.classList.toggle('is-lightning', lightningFlashTimer > 0);
   };
+  const triggerLightningFlash = (duration: number): void => {
+    lightningFlashTimer = duration;
+    if (weather === 'storm') audio.playThunder();
+  };
   const updateWeather = (dt: number, previousPhase: DayNightPhase): void => {
     if (previousPhase !== dayNightPhase){
       weather = chooseWeather();
-      lightningFlashTimer = weather === 'storm' ? 0.12 : 0;
+      if (weather === 'storm') triggerLightningFlash(0.12);
     } else if (weather === 'storm' && lightningFlashTimer <= 0 && Math.random() < dt * 0.18){
-      lightningFlashTimer = 0.08;
+      triggerLightningFlash(0.08);
     }
     if (lightningFlashTimer > 0) lightningFlashTimer = Math.max(0, lightningFlashTimer - dt);
+    audio.syncWeather(weather);
     renderWeather();
   };
   const renderDayNightTimer = (): void => {
@@ -711,12 +794,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
   const onViewportResize = (): void => { renderVisibleBuildSites(); };
   const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onViewportResize);
-  const onKeyDown = (event: KeyboardEvent): void => { keys.add(event.key.toLowerCase()); };
+  const unlockAudio = (): void => { audio.unlock(); audio.syncWeather(weather); };
+  const onKeyDown = (event: KeyboardEvent): void => { unlockAudio(); keys.add(event.key.toLowerCase()); };
   const onKeyUp = (event: KeyboardEvent): void => { keys.delete(event.key.toLowerCase()); };
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
   if (viewport) resizeObserver?.observe(viewport);
+  viewport?.addEventListener('pointerdown', unlockAudio);
   viewport?.addEventListener('pointerdown', onViewportPointerDown);
+  section.addEventListener('click', unlockAudio);
   section.addEventListener('click', onGameClick);
   section.querySelector('.vinh-da-game__back')?.addEventListener('click', () => {
     shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId });
@@ -725,6 +811,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   updateCamera();
   renderDayNightTimer();
   renderWeather();
+  audio.syncWeather(weather);
   renderEnemyPortals();
   spawnWaveEnemy('left');
   spawnWaveEnemy('right');
@@ -739,7 +826,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       resizeObserver?.disconnect();
       clearEnemiesWithoutReward();
       viewport?.removeEventListener('pointerdown', onViewportPointerDown);
+      viewport?.removeEventListener('pointerdown', unlockAudio);
+      section.removeEventListener('click', unlockAudio);
       section.removeEventListener('click', onGameClick);
+      audio.destroy();
       mount.destroy();
     }
   };

@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -32248,6 +32248,9 @@ __modules['./screens/main-menu/view/index.ts'] = (exports, module, __require) =>
   const __dep5 = __require('./utils/frame-rate.ts');
   const getFrameRateCap = __dep5.getFrameRateCap;
   const setFrameRateCap = __dep5.setFrameRateCap;
+  const __dep6 = __require('./utils/audio-settings.ts');
+  const isAudioEnabled = __dep6.isAudioEnabled;
+  const setAudioEnabled = __dep6.setAudioEnabled;
   function createSettingsHub(container, addCleanup) {
       const toolbar = document.createElement('div');
       toolbar.className = 'main-menu-v2__toolbar';
@@ -32314,6 +32317,19 @@ __modules['./screens/main-menu/view/index.ts'] = (exports, module, __require) =>
       });
       graphicsActions.appendChild(fpsOptions);
       content.appendChild(graphicsActions);
+      const audioActions = document.createElement('div');
+      audioActions.className = 'main-menu-settings-fps';
+      audioActions.style.display = 'none';
+      const audioLabel = document.createElement('p');
+      audioLabel.className = 'main-menu-settings-fps__label';
+      audioLabel.textContent = 'Âm thanh';
+      audioActions.appendChild(audioLabel);
+      const audioToggle = document.createElement('button');
+      audioToggle.type = 'button';
+      audioToggle.className = 'main-menu-settings-fps__btn';
+      audioToggle.dataset.audioToggle = 'true';
+      audioActions.appendChild(audioToggle);
+      content.appendChild(audioActions);
       const accountActions = document.createElement('div');
       accountActions.style.display = 'none';
       const resetBtn = document.createElement('button');
@@ -32344,6 +32360,7 @@ __modules['./screens/main-menu/view/index.ts'] = (exports, module, __require) =>
       container.appendChild(overlay);
       let activeTab = 'chung';
       let activeFrameRateCap = getFrameRateCap();
+      let audioEnabled = isAudioEnabled();
       const renderFrameRateButtons = () => {
           fpsButtons.forEach((btn, fps) => {
               const isActive = fps === activeFrameRateCap;
@@ -32351,11 +32368,18 @@ __modules['./screens/main-menu/view/index.ts'] = (exports, module, __require) =>
               btn.setAttribute('aria-pressed', String(isActive));
           });
       };
+      const renderAudioToggle = () => {
+          audioToggle.textContent = audioEnabled ? 'Bật âm' : 'Tắt âm';
+          audioToggle.classList.toggle('is-active', audioEnabled);
+          audioToggle.setAttribute('aria-pressed', String(audioEnabled));
+      };
       const renderTab = () => {
           navButtons.forEach((btn, tabId) => btn.classList.toggle('is-active', tabId === activeTab));
           graphicsActions.style.display = activeTab === 'đồ hoạ' ? '' : 'none';
+          audioActions.style.display = activeTab === 'âm thanh' ? '' : 'none';
           accountActions.style.display = activeTab === 'tài khoản' ? '' : 'none';
           renderFrameRateButtons();
+          renderAudioToggle();
           confirmWrap.classList.remove('is-open');
           if (activeTab === 'chung') {
               title.textContent = 'Cài đặt chung';
@@ -32369,7 +32393,7 @@ __modules['./screens/main-menu/view/index.ts'] = (exports, module, __require) =>
           }
           if (activeTab === 'âm thanh') {
               title.textContent = 'Cài đặt âm thanh';
-              description.textContent = 'Các cấu hình âm thanh sẽ được bổ sung sau.';
+              description.textContent = 'Bật/tắt âm thanh hiệu ứng và môi trường trong các chế độ chơi.';
               return;
           }
           title.textContent = 'Cài đặt tài khoản';
@@ -32406,6 +32430,11 @@ __modules['./screens/main-menu/view/index.ts'] = (exports, module, __require) =>
           setFrameRateCap(nextCap);
           renderFrameRateButtons();
       };
+      const onAudioToggleClick = () => {
+          audioEnabled = !audioEnabled;
+          setAudioEnabled(audioEnabled);
+          renderAudioToggle();
+      };
       const onResetClick = () => confirmWrap.classList.add('is-open');
       const onResetCancel = () => confirmWrap.classList.remove('is-open');
       const onResetConfirm = () => {
@@ -32418,6 +32447,7 @@ __modules['./screens/main-menu/view/index.ts'] = (exports, module, __require) =>
       closeBtn.addEventListener('click', closeHub);
       nav.addEventListener('click', onTabClick);
       fpsOptions.addEventListener('click', onFrameRateClick);
+      audioToggle.addEventListener('click', onAudioToggleClick);
       resetBtn.addEventListener('click', onResetClick);
       confirmNo.addEventListener('click', onResetCancel);
       confirmYes.addEventListener('click', onResetConfirm);
@@ -32425,6 +32455,7 @@ __modules['./screens/main-menu/view/index.ts'] = (exports, module, __require) =>
       addCleanup(() => closeBtn.removeEventListener('click', closeHub));
       addCleanup(() => nav.removeEventListener('click', onTabClick));
       addCleanup(() => fpsOptions.removeEventListener('click', onFrameRateClick));
+      addCleanup(() => audioToggle.removeEventListener('click', onAudioToggleClick));
       addCleanup(() => resetBtn.removeEventListener('click', onResetClick));
       addCleanup(() => confirmNo.removeEventListener('click', onResetCancel));
       addCleanup(() => confirmYes.removeEventListener('click', onResetConfirm));
@@ -38182,48 +38213,127 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const mountSection = __dep1.mountSection;
   const __dep2 = __require('./utils/frame-rate.ts');
   const getFrameRateCap = __dep2.getFrameRateCap;
-  const __dep3 = __require('./screens/vinh-da/constants.ts');
-  const BUILD_RANGE = __dep3.BUILD_RANGE;
-  const BUILD_SITE_RENDER_BUFFER = __dep3.BUILD_SITE_RENDER_BUFFER;
-  const BUILD_SITE_RENDER_THRESHOLD = __dep3.BUILD_SITE_RENDER_THRESHOLD;
-  const BUILD_SITE_EDGE_PADDING = __dep3.BUILD_SITE_EDGE_PADDING;
-  const CASTLE_LEFT = __dep3.CASTLE_LEFT;
-  const CASTLE_OUTER_LEFT = __dep3.CASTLE_OUTER_LEFT;
-  const CASTLE_OUTER_RIGHT = __dep3.CASTLE_OUTER_RIGHT;
-  const CASTLE_TOWER_OFFSET = __dep3.CASTLE_TOWER_OFFSET;
-  const CASTLE_TOWER_WIDTH = __dep3.CASTLE_TOWER_WIDTH;
-  const CASTLE_WIDTH = __dep3.CASTLE_WIDTH;
-  const CRYSTAL_X = __dep3.CRYSTAL_X;
-  const DEFAULT_STRUCTURE_COOLDOWN = __dep3.DEFAULT_STRUCTURE_COOLDOWN;
-  const GROUND_PERCENT = __dep3.GROUND_PERCENT;
-  const LEADER_EDGE_PADDING_LEFT = __dep3.LEADER_EDGE_PADDING_LEFT;
-  const LEADER_EDGE_PADDING_RIGHT = __dep3.LEADER_EDGE_PADDING_RIGHT;
-  const LEADER_SPEED = __dep3.LEADER_SPEED;
-  const LEADER_START_X = __dep3.LEADER_START_X;
-  const LEADER_WIDTH = __dep3.LEADER_WIDTH;
-  const STYLE_ID = __dep3.STYLE_ID;
-  const WORLD_WIDTH = __dep3.WORLD_WIDTH;
-  const __dep4 = __require('./screens/vinh-da/structures.ts');
-  const BUILD_NODE_OPTIONS = __dep4.BUILD_NODE_OPTIONS;
-  const GROUND_BUILD_NODE_OPTIONS = __dep4.GROUND_BUILD_NODE_OPTIONS;
-  const BUILD_SITES = __dep4.BUILD_SITES;
-  const UPGRADE_NODE_LABEL = __dep4.UPGRADE_NODE_LABEL;
-  const getBuildLevelCost = __dep4.getBuildLevelCost;
-  const getStructureLevelStat = __dep4.getStructureLevelStat;
-  const isStructureAllowedOnBuildSite = __dep4.isStructureAllowedOnBuildSite;
-  const __dep5 = __require('./screens/vinh-da/simulation.ts');
-  const DAY_DURATION_SECONDS = __dep5.DAY_DURATION_SECONDS;
-  const getScaledThreatBudget = __dep5.getScaledThreatBudget;
-  const getVinhDaWaveConfig = __dep5.getVinhDaWaveConfig;
-  const runtimeDamageBase = __dep5.damageBase;
-  const runtimeDamageStructure = __dep5.damageStructure;
-  const runtimeClearEnemiesWithoutReward = __dep5.clearEnemiesWithoutReward;
-  const runtimeRemoveEnemyAt = __dep5.removeEnemyAt;
-  const runtimeSpawnWaveEnemy = __dep5.spawnWaveEnemy;
-  const runtimeUpdateDayNightTimer = __dep5.updateDayNightTimer;
-  const runtimeUpdateEnemies = __dep5.updateEnemies;
-  const runtimeUpdateStructures = __dep5.updateStructures;
-  const runtimeCollectDroppedResources = __dep5.collectDroppedResources;
+  const __dep3 = __require('./utils/audio-settings.ts');
+  const isAudioEnabled = __dep3.isAudioEnabled;
+  const __dep4 = __require('./screens/vinh-da/constants.ts');
+  const BUILD_RANGE = __dep4.BUILD_RANGE;
+  const BUILD_SITE_RENDER_BUFFER = __dep4.BUILD_SITE_RENDER_BUFFER;
+  const BUILD_SITE_RENDER_THRESHOLD = __dep4.BUILD_SITE_RENDER_THRESHOLD;
+  const BUILD_SITE_EDGE_PADDING = __dep4.BUILD_SITE_EDGE_PADDING;
+  const CASTLE_LEFT = __dep4.CASTLE_LEFT;
+  const CASTLE_OUTER_LEFT = __dep4.CASTLE_OUTER_LEFT;
+  const CASTLE_OUTER_RIGHT = __dep4.CASTLE_OUTER_RIGHT;
+  const CASTLE_TOWER_OFFSET = __dep4.CASTLE_TOWER_OFFSET;
+  const CASTLE_TOWER_WIDTH = __dep4.CASTLE_TOWER_WIDTH;
+  const CASTLE_WIDTH = __dep4.CASTLE_WIDTH;
+  const CRYSTAL_X = __dep4.CRYSTAL_X;
+  const DEFAULT_STRUCTURE_COOLDOWN = __dep4.DEFAULT_STRUCTURE_COOLDOWN;
+  const GROUND_PERCENT = __dep4.GROUND_PERCENT;
+  const LEADER_EDGE_PADDING_LEFT = __dep4.LEADER_EDGE_PADDING_LEFT;
+  const LEADER_EDGE_PADDING_RIGHT = __dep4.LEADER_EDGE_PADDING_RIGHT;
+  const LEADER_SPEED = __dep4.LEADER_SPEED;
+  const LEADER_START_X = __dep4.LEADER_START_X;
+  const LEADER_WIDTH = __dep4.LEADER_WIDTH;
+  const STYLE_ID = __dep4.STYLE_ID;
+  const WORLD_WIDTH = __dep4.WORLD_WIDTH;
+  const __dep5 = __require('./screens/vinh-da/structures.ts');
+  const BUILD_NODE_OPTIONS = __dep5.BUILD_NODE_OPTIONS;
+  const GROUND_BUILD_NODE_OPTIONS = __dep5.GROUND_BUILD_NODE_OPTIONS;
+  const BUILD_SITES = __dep5.BUILD_SITES;
+  const UPGRADE_NODE_LABEL = __dep5.UPGRADE_NODE_LABEL;
+  const getBuildLevelCost = __dep5.getBuildLevelCost;
+  const getStructureLevelStat = __dep5.getStructureLevelStat;
+  const isStructureAllowedOnBuildSite = __dep5.isStructureAllowedOnBuildSite;
+  const __dep6 = __require('./screens/vinh-da/simulation.ts');
+  const DAY_DURATION_SECONDS = __dep6.DAY_DURATION_SECONDS;
+  const getScaledThreatBudget = __dep6.getScaledThreatBudget;
+  const getVinhDaWaveConfig = __dep6.getVinhDaWaveConfig;
+  const runtimeDamageBase = __dep6.damageBase;
+  const runtimeDamageStructure = __dep6.damageStructure;
+  const runtimeClearEnemiesWithoutReward = __dep6.clearEnemiesWithoutReward;
+  const runtimeRemoveEnemyAt = __dep6.removeEnemyAt;
+  const runtimeSpawnWaveEnemy = __dep6.spawnWaveEnemy;
+  const runtimeUpdateDayNightTimer = __dep6.updateDayNightTimer;
+  const runtimeUpdateEnemies = __dep6.updateEnemies;
+  const runtimeUpdateStructures = __dep6.updateStructures;
+  const runtimeCollectDroppedResources = __dep6.collectDroppedResources;
+  const STORM_LOOP_SRC = null;
+  function createAudioContext() {
+      const AudioContextCtor = window.AudioContext ?? window.webkitAudioContext;
+      return AudioContextCtor ? new AudioContextCtor() : null;
+  }
+  function createVinhDaAudioController() {
+      let unlocked = false;
+      let context = null;
+      let stormLoop = null;
+      const ensureContext = () => {
+          if (!context)
+              context = createAudioContext();
+          return context;
+      };
+      const canPlay = () => unlocked && isAudioEnabled();
+      const ensureStormLoop = () => {
+          if (!STORM_LOOP_SRC)
+              return null;
+          if (!stormLoop) {
+              stormLoop = new Audio(STORM_LOOP_SRC);
+              stormLoop.loop = true;
+              stormLoop.volume = 0.28;
+          }
+          return stormLoop;
+      };
+      const stopStormLoop = () => {
+          if (!stormLoop)
+              return;
+          stormLoop.pause();
+          stormLoop.currentTime = 0;
+      };
+      return {
+          unlock() {
+              if (unlocked)
+                  return;
+              unlocked = true;
+              void ensureContext()?.resume();
+          },
+          syncWeather(nextWeather) {
+              const loop = ensureStormLoop();
+              if (!loop)
+                  return;
+              if (nextWeather === 'storm' && canPlay()) {
+                  void loop.play();
+              }
+              else {
+                  loop.pause();
+              }
+          },
+          playThunder() {
+              if (!canPlay())
+                  return;
+              const audio = ensureContext();
+              if (!audio)
+                  return;
+              void audio.resume();
+              const now = audio.currentTime;
+              const oscillator = audio.createOscillator();
+              const gain = audio.createGain();
+              oscillator.type = 'sawtooth';
+              oscillator.frequency.setValueAtTime(72, now);
+              oscillator.frequency.exponentialRampToValueAtTime(28, now + 0.22);
+              gain.gain.setValueAtTime(0.0001, now);
+              gain.gain.exponentialRampToValueAtTime(0.22, now + 0.018);
+              gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+              oscillator.connect(gain);
+              gain.connect(audio.destination);
+              oscillator.start(now);
+              oscillator.stop(now + 0.34);
+          },
+          destroy() {
+              stopStormLoop();
+              void context?.close();
+              context = null;
+          },
+      };
+  }
   const randomInRange = (min, max) => min + Math.random() * Math.max(0, max - min);
   const createEnemyPortals = () => {
       const portals = [];
@@ -38338,6 +38448,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let leaderAttackCooldown = 0;
       let nightIndex = 1;
       let waveThreatBudgetRemaining = getScaledThreatBudget(getVinhDaWaveConfig(nightIndex).threatBudget, nightIndex);
+      const audio = createVinhDaAudioController();
       const section = document.createElement('section');
       section.className = 'vinh-da-game';
       const mount = mountSection({ root, section, rootClasses: 'app--vinh-da-gameplay' });
@@ -38465,16 +38576,23 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           weatherLayer.classList.toggle('is-storm', weather === 'storm');
           weatherLayer.classList.toggle('is-lightning', lightningFlashTimer > 0);
       };
+      const triggerLightningFlash = (duration) => {
+          lightningFlashTimer = duration;
+          if (weather === 'storm')
+              audio.playThunder();
+      };
       const updateWeather = (dt, previousPhase) => {
           if (previousPhase !== dayNightPhase) {
               weather = chooseWeather();
-              lightningFlashTimer = weather === 'storm' ? 0.12 : 0;
+              if (weather === 'storm')
+                  triggerLightningFlash(0.12);
           }
           else if (weather === 'storm' && lightningFlashTimer <= 0 && Math.random() < dt * 0.18) {
-              lightningFlashTimer = 0.08;
+              triggerLightningFlash(0.08);
           }
           if (lightningFlashTimer > 0)
               lightningFlashTimer = Math.max(0, lightningFlashTimer - dt);
+          audio.syncWeather(weather);
           renderWeather();
       };
       const renderDayNightTimer = () => {
@@ -38898,13 +39016,16 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       };
       const onViewportResize = () => { renderVisibleBuildSites(); };
       const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onViewportResize);
-      const onKeyDown = (event) => { keys.add(event.key.toLowerCase()); };
+      const unlockAudio = () => { audio.unlock(); audio.syncWeather(weather); };
+      const onKeyDown = (event) => { unlockAudio(); keys.add(event.key.toLowerCase()); };
       const onKeyUp = (event) => { keys.delete(event.key.toLowerCase()); };
       window.addEventListener('keydown', onKeyDown);
       window.addEventListener('keyup', onKeyUp);
       if (viewport)
           resizeObserver?.observe(viewport);
+      viewport?.addEventListener('pointerdown', unlockAudio);
       viewport?.addEventListener('pointerdown', onViewportPointerDown);
+      section.addEventListener('click', unlockAudio);
       section.addEventListener('click', onGameClick);
       section.querySelector('.vinh-da-game__back')?.addEventListener('click', () => {
           shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId });
@@ -38913,6 +39034,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       updateCamera();
       renderDayNightTimer();
       renderWeather();
+      audio.syncWeather(weather);
       renderEnemyPortals();
       spawnWaveEnemy('left');
       spawnWaveEnemy('right');
@@ -38926,7 +39048,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               resizeObserver?.disconnect();
               clearEnemiesWithoutReward();
               viewport?.removeEventListener('pointerdown', onViewportPointerDown);
+              viewport?.removeEventListener('pointerdown', unlockAudio);
+              section.removeEventListener('click', unlockAudio);
               section.removeEventListener('click', onGameClick);
+              audio.destroy();
               mount.destroy();
           }
       };
@@ -42934,6 +43059,29 @@ __modules['./utils/assert.ts'] = (exports, module, __require) => {
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'assertDefined')) exports.assertDefined = assertDefined;
+};
+__modules['./utils/audio-settings.ts'] = (exports, module, __require) => {
+  const AUDIO_ENABLED_STORAGE_KEY = 'arclune.audio.enabled';
+  function isAudioEnabled() {
+      try {
+          return localStorage.getItem(AUDIO_ENABLED_STORAGE_KEY) !== 'false';
+      }
+      catch {
+          return true;
+      }
+  }
+  function setAudioEnabled(enabled) {
+      try {
+          localStorage.setItem(AUDIO_ENABLED_STORAGE_KEY, String(enabled));
+      }
+      catch {
+          // Ignore storage failures; callers still use the in-memory value they just set.
+      }
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'AUDIO_ENABLED_STORAGE_KEY')) exports.AUDIO_ENABLED_STORAGE_KEY = AUDIO_ENABLED_STORAGE_KEY;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isAudioEnabled')) exports.isAudioEnabled = isAudioEnabled;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'setAudioEnabled')) exports.setAudioEnabled = setAudioEnabled;
 };
 __modules['./utils/currency.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./data/economy.ts');
