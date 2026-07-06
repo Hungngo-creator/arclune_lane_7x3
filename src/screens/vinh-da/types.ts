@@ -2,6 +2,7 @@ import type { EnemyKind, EnemyTier } from './enemies.ts';
 import type { ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 
 export type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
+export type ElementalRegionKind = 'fire' | 'wood' | 'water' | 'earth' | 'metal' | 'thunder' | 'blood' | 'light' | 'wind' | 'dark';
 export type Side = 'left' | 'right';
 
 export type EnemyAttackShape = 'melee' | 'projectile' | 'explosion' | 'flyby' | 'line' | 'aura';
@@ -32,6 +33,13 @@ export interface VinhDaStatusCollection {
 }
 
 export type EnemyUltimate = 'dragon-rage' | 'commander-aura' | 'death-burst';
+
+export interface ElementalRegion {
+  id: string;
+  kind: ElementalRegionKind;
+  startX: number;
+  endX: number;
+}
 
 export interface BuildSite {
   id: string;

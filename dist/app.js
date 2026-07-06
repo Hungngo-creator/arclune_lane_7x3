@@ -38291,6 +38291,78 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const runtimeCollectDroppedResources = __dep6.collectDroppedResources;
   const getLivingTerritoryWallBounds = __dep6.getLivingTerritoryWallBounds;
   const isXInLivingTerritory = __dep6.isXInLivingTerritory;
+  const NON_DARK_ELEMENTAL_REGION_KINDS = ['fire', 'wood', 'water', 'earth', 'metal', 'thunder', 'blood', 'light', 'wind'];
+  const ELEMENTAL_REGION_ROLL_PERCENT = 11;
+  const ELEMENTAL_REGION_BARREN_PERCENT = 1;
+  const ELEMENTAL_REGION_TIER_MIN = 1.1;
+  const ELEMENTAL_REGION_TIER_MAX = 1.9;
+  const ELEMENTAL_REGION_TIER_STEP = 0.1;
+  const ELEMENTAL_REGION_TIER_AREA_GROWTH = 0.05;
+  const ELEMENTAL_REGION_MAX_NON_DARK_TIER_1 = 4;
+  const ELEMENTAL_REGION_BASE_WIDTH_RATIO = 0.08;
+  const ELEMENTAL_REGION_DARK_EDGE_RATIO = 0.07;
+  const ELEMENTAL_REGION_RENDER_BUFFER = BUILD_SITE_RENDER_BUFFER;
+  const ELEMENTAL_REGION_PARTICLES_PER_1000_MIN = 4;
+  const ELEMENTAL_REGION_PARTICLES_PER_1000_MAX = 8;
+  const ELEMENTAL_REGION_PARTICLE_WIDTH_UNIT = 1000;
+  const createElementalRegionRandom = () => {
+      let seed = Math.floor(Math.random() * 0x7fffffff) || 1;
+      return () => {
+          seed = (seed * 48271) % 0x7fffffff;
+          return seed / 0x7fffffff;
+      };
+  };
+  const getVinhDaMapTier = (params) => {
+      const explicitTier = typeof params?.tier === 'number' ? params.tier : Number.NaN;
+      if (Number.isFinite(explicitTier))
+          return Math.max(ELEMENTAL_REGION_TIER_MIN, Math.min(ELEMENTAL_REGION_TIER_MAX, explicitTier));
+      const stageId = typeof params?.stageId === 'string' ? params.stageId : '';
+      const stageMatch = /^(\d+)-(\d+)$/.exec(stageId);
+      const stageIndex = stageMatch ? Number.parseInt(stageMatch[2] ?? '1', 10) : 1;
+      return Math.max(ELEMENTAL_REGION_TIER_MIN, Math.min(ELEMENTAL_REGION_TIER_MAX, 1 + stageIndex * ELEMENTAL_REGION_TIER_STEP));
+  };
+  const rollElementalRegionKind = (random) => {
+      const roll = random() * 100;
+      if (roll >= NON_DARK_ELEMENTAL_REGION_KINDS.length * ELEMENTAL_REGION_ROLL_PERCENT)
+          return null;
+      if (roll >= 100 - ELEMENTAL_REGION_BARREN_PERCENT)
+          return null;
+      return NON_DARK_ELEMENTAL_REGION_KINDS[Math.floor(roll / ELEMENTAL_REGION_ROLL_PERCENT)] ?? null;
+  };
+  const createElementalRegions = (mapTier, random) => {
+      const tierStep = Math.max(0, Math.round((mapTier - ELEMENTAL_REGION_TIER_MIN) / ELEMENTAL_REGION_TIER_STEP));
+      const regionWidth = WORLD_WIDTH * ELEMENTAL_REGION_BASE_WIDTH_RATIO * (1 + tierStep * ELEMENTAL_REGION_TIER_AREA_GROWTH);
+      const darkEdgeWidth = WORLD_WIDTH * ELEMENTAL_REGION_DARK_EDGE_RATIO * (1 + tierStep * ELEMENTAL_REGION_TIER_AREA_GROWTH);
+      const spawnDarkOnBothEdges = random() >= 0.5;
+      const regions = [
+          { id: 'element-region-dark-left', kind: 'dark', startX: 0, endX: darkEdgeWidth },
+          ...(spawnDarkOnBothEdges ? [{ id: 'element-region-dark-right', kind: 'dark', startX: WORLD_WIDTH - darkEdgeWidth, endX: WORLD_WIDTH }] : [])
+      ];
+      const safeStartX = darkEdgeWidth;
+      const safeEndX = WORLD_WIDTH - (spawnDarkOnBothEdges ? darkEdgeWidth : 0);
+      const slotWidth = Math.max(1, (safeEndX - safeStartX) / ELEMENTAL_REGION_MAX_NON_DARK_TIER_1);
+      for (let index = 0; index < ELEMENTAL_REGION_MAX_NON_DARK_TIER_1; index += 1) {
+          const kind = rollElementalRegionKind(random);
+          if (!kind)
+              continue;
+          const slotStart = safeStartX + slotWidth * index;
+          const minStart = slotStart;
+          const maxStart = Math.max(minStart, slotStart + slotWidth - regionWidth);
+          const startX = minStart + random() * (maxStart - minStart);
+          regions.push({
+              id: `element-region-${index + 1}-${kind}`,
+              kind,
+              startX,
+              endX: Math.min(safeEndX, startX + regionWidth)
+          });
+      }
+      return regions.sort((left, right) => left.startX - right.startX);
+  };
+  const getElementalRegionParticleCount = (region) => {
+      const width = Math.max(0, region.endX - region.startX);
+      const particleRate = ELEMENTAL_REGION_PARTICLES_PER_1000_MIN + (region.id.length % (ELEMENTAL_REGION_PARTICLES_PER_1000_MAX - ELEMENTAL_REGION_PARTICLES_PER_1000_MIN + 1));
+      return Math.max(1, Math.round(width / ELEMENTAL_REGION_PARTICLE_WIDTH_UNIT * particleRate));
+  };
   const STORM_LOOP_SRC = null;
   function createAudioContext() {
       const AudioContextCtor = window.AudioContext ?? window.webkitAudioContext;
@@ -38438,6 +38510,31 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__celestial{position:absolute;z-index:1;top:9%;left:calc(50% - 42px);width:84px;height:84px;border-radius:999px;pointer-events:none;transition:background .32s ease,box-shadow .32s ease,filter .32s ease;animation:vinh-da-celestial-pulse 2.4s ease-in-out infinite;}
     .vinh-da-game.is-day .vinh-da-game__celestial{background:radial-gradient(circle at 38% 34%,#fff7b5 0 18%,#ffd34d 38%,#f59f1f 68%,rgba(245,159,31,.18) 72%,transparent 100%);box-shadow:0 0 26px rgba(255,211,77,.82),0 0 72px rgba(245,159,31,.38);}
     .vinh-da-game.is-night .vinh-da-game__celestial{background:radial-gradient(circle at 34% 30%,#f7fbff 0 20%,#c9e6ff 42%,#6f8fb7 67%,rgba(111,143,183,.14) 72%,transparent 100%);box-shadow:0 0 18px rgba(201,230,255,.72),0 0 54px rgba(111,143,183,.34);}
+
+    .vinh-da-game__elemental-regions{position:absolute;left:0;right:0;top:0;bottom:0;z-index:1;pointer-events:none;overflow:hidden;}
+    .vinh-da-game__element-region{position:absolute;bottom:0;height:${GROUND_PERCENT};overflow:hidden;}
+    .vinh-da-game__element-region::before{content:"";position:absolute;inset:0;opacity:.36;}
+    .vinh-da-game__element-region--fire::before{background:linear-gradient(180deg,rgba(255,84,71,.02),rgba(255,69,54,.18));}
+    .vinh-da-game__element-region--wood::before{background:linear-gradient(180deg,rgba(225,255,235,.035),rgba(96,217,124,.17));}
+    .vinh-da-game__element-region--water::before{background:linear-gradient(180deg,rgba(90,197,255,.025),rgba(42,137,213,.16));}
+    .vinh-da-game__element-region--earth::before{background:linear-gradient(180deg,rgba(170,123,73,.02),rgba(151,103,57,.17));}
+    .vinh-da-game__element-region--metal::before{background:linear-gradient(180deg,rgba(250,253,255,.05),rgba(154,166,184,.24));box-shadow:inset 0 0 22px rgba(255,255,255,.08);}
+    .vinh-da-game__element-region--thunder::before{background:linear-gradient(180deg,rgba(235,242,255,.025),rgba(210,220,238,.18));}
+    .vinh-da-game__element-region--blood::before{background:linear-gradient(180deg,rgba(92,0,8,.035),rgba(112,7,18,.26) 72%,rgba(0,0,0,.08));}
+    .vinh-da-game__element-region--light::before{background:linear-gradient(180deg,rgba(255,245,184,.025),rgba(255,232,128,.16));}
+    .vinh-da-game__element-region--wind::before{background:linear-gradient(180deg,rgba(137,223,255,.025),rgba(91,195,238,.17));}
+    .vinh-da-game__element-region--dark::before{background:linear-gradient(180deg,rgba(5,5,12,.04),rgba(0,0,0,.24));}
+    .vinh-da-game__element-region-particle{position:absolute;bottom:8%;width:5px;height:5px;border-radius:999px;opacity:0;animation:vinh-da-element-particle 3.8s ease-in-out infinite;will-change:transform,opacity;}
+    .vinh-da-game__element-region--fire .vinh-da-game__element-region-particle{background:rgba(255,112,82,.7);box-shadow:0 0 10px rgba(255,76,56,.45);}
+    .vinh-da-game__element-region--wood .vinh-da-game__element-region-particle{background:rgba(205,255,218,.72);box-shadow:0 0 11px rgba(89,234,123,.5);}
+    .vinh-da-game__element-region--water .vinh-da-game__element-region-particle{background:rgba(122,211,255,.72);box-shadow:0 0 10px rgba(65,168,255,.46);}
+    .vinh-da-game__element-region--earth .vinh-da-game__element-region-particle{background:rgba(182,133,84,.62);box-shadow:0 0 8px rgba(142,92,51,.38);}
+    .vinh-da-game__element-region--metal .vinh-da-game__element-region-particle{background:rgba(244,248,255,.82);box-shadow:0 0 12px rgba(190,200,218,.72),0 0 2px rgba(255,255,255,.95);}
+    .vinh-da-game__element-region--thunder .vinh-da-game__element-region-particle{background:rgba(232,238,248,.78);box-shadow:0 0 10px rgba(220,230,255,.58);}
+    .vinh-da-game__element-region--blood .vinh-da-game__element-region-particle{width:7px;height:7px;background:rgba(164,10,29,.82);box-shadow:0 0 13px rgba(155,0,26,.72),0 0 22px rgba(38,0,8,.62);}
+    .vinh-da-game__element-region--light .vinh-da-game__element-region-particle{background:rgba(255,242,179,.72);box-shadow:0 0 10px rgba(255,226,120,.5);}
+    .vinh-da-game__element-region--wind .vinh-da-game__element-region-particle{background:rgba(133,222,255,.74);box-shadow:0 0 11px rgba(78,190,242,.54);}
+    .vinh-da-game__element-region--dark .vinh-da-game__element-region-particle{background:rgba(22,20,31,.76);box-shadow:0 0 9px rgba(0,0,0,.58);}
     .vinh-da-game__weather-layer{position:absolute;inset:0;z-index:3;pointer-events:none;background:transparent;}
     .vinh-da-game.is-night .vinh-da-game__weather-layer::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(1,2,8,.42),rgba(1,2,8,.58));}
     .vinh-da-game__weather-layer::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .08s linear;background:rgba(232,242,255,.86);}
@@ -38499,6 +38596,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__build-node[hidden]{display:none;}
     @keyframes vinh-da-crystal-shine{0%,100%{filter:brightness(1);transform:translateX(-50%) rotate(45deg) scale(1)}50%{filter:brightness(1.45);transform:translateX(-50%) rotate(45deg) scale(1.06)}}
     @keyframes vinh-da-celestial-pulse{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.28);transform:scale(1.08)}}
+    @keyframes vinh-da-element-particle{0%{opacity:0;transform:translate3d(0,8px,0) scale(.65)}28%{opacity:.5}70%{opacity:.22}100%{opacity:0;transform:translate3d(0,-42px,0) scale(1.28)}}
   `;
   function renderScreen(context) {
       const { root, shell = null, params = null } = context;
@@ -38570,6 +38668,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           <div class="vinh-da-game__castle" aria-hidden="true"></div>
           <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
           <div class="vinh-da-game__ground" aria-hidden="true"></div>
+          <div class="vinh-da-game__elemental-regions" data-role="elemental-regions" aria-hidden="true"></div>
           <div data-role="build-sites"></div>
           <div data-role="enemy-portals"></div>
           <div data-role="dropped-resources"></div>
@@ -38582,6 +38681,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const viewport = section.querySelector('[data-role="viewport"]');
       const weatherLayer = section.querySelector('[data-role="weather-layer"]');
       const buildSitesContainer = section.querySelector('[data-role="build-sites"]');
+      const elementalRegionsContainer = section.querySelector('[data-role="elemental-regions"]');
       const enemiesContainer = section.querySelector('[data-role="enemies"]');
       const enemyPortalsContainer = section.querySelector('[data-role="enemy-portals"]');
       const droppedResourcesContainer = section.querySelector('[data-role="dropped-resources"]');
@@ -38593,6 +38693,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const nightIndexText = section.querySelector('[data-role="night-index"]');
       const waveThreatBudgetText = section.querySelector('[data-role="wave-threat-budget"]');
       const statusPanel = section.querySelector('[data-role="status-panel"]');
+      const elementalRegions = createElementalRegions(getVinhDaMapTier(params), createElementalRegionRandom());
+      const elementalRegionsById = new Map(elementalRegions.map(region => [region.id, region]));
+      const elementalRegionElements = new Map();
       const siteElements = new Map();
       const buildMenuElements = new Map();
       const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS];
@@ -38933,6 +39036,45 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           siteButton.setAttribute('aria-label', structure ? siteButton.title : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
           renderBuildMenu(siteId);
       };
+      const createElementalRegionElement = (region) => {
+          if (!elementalRegionsContainer || elementalRegionElements.has(region.id))
+              return;
+          const element = document.createElement('div');
+          element.className = `vinh-da-game__element-region vinh-da-game__element-region--${region.kind}`;
+          element.dataset.elementalRegionId = region.id;
+          element.style.left = `${region.startX}px`;
+          element.style.width = `${Math.max(0, region.endX - region.startX)}px`;
+          const particleCount = getElementalRegionParticleCount(region);
+          for (let index = 0; index < particleCount; index += 1) {
+              const particle = document.createElement('span');
+              particle.className = 'vinh-da-game__element-region-particle';
+              particle.style.left = `${((index * 73 + region.startX) % 100)}%`;
+              particle.style.animationDelay = `${-((index * 0.37) % 3.8)}s`;
+              particle.style.animationDuration = `${3.2 + ((index + region.id.length) % 4) * 0.45}s`;
+              element.append(particle);
+          }
+          elementalRegionsContainer.append(element);
+          elementalRegionElements.set(region.id, element);
+      };
+      const renderVisibleElementalRegions = () => {
+          const width = viewport?.clientWidth || window.innerWidth || 1;
+          const minX = cameraX - ELEMENTAL_REGION_RENDER_BUFFER;
+          const maxX = cameraX + width + ELEMENTAL_REGION_RENDER_BUFFER;
+          for (const [regionId, regionElement] of elementalRegionElements) {
+              const region = elementalRegionsById.get(regionId);
+              if (!region || region.endX < minX || region.startX > maxX) {
+                  regionElement.remove();
+                  elementalRegionElements.delete(regionId);
+              }
+          }
+          for (const region of elementalRegions) {
+              if (region.endX < minX)
+                  continue;
+              if (region.startX > maxX)
+                  break;
+              createElementalRegionElement(region);
+          }
+      };
       const renderVisibleBuildSites = () => {
           const width = viewport?.clientWidth || window.innerWidth || 1;
           const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
@@ -38976,6 +39118,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           if (!visible)
               selectedGroundPlotId = null;
           renderVisibleBuildSites();
+          renderVisibleElementalRegions();
       };
       const simulationState = {
           get bloodSealStone() { return bloodSealStone; },
@@ -39127,8 +39270,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               world.style.transform = `translate3d(${-cameraX}px,0,0)`;
           if (openSiteId && !nearestBuildSite())
               setOpenBuildSite(null);
-          if (Math.abs(cameraX - lastRenderedCameraX) > BUILD_SITE_RENDER_THRESHOLD)
+          if (Math.abs(cameraX - lastRenderedCameraX) > BUILD_SITE_RENDER_THRESHOLD) {
               renderVisibleBuildSites();
+              renderVisibleElementalRegions();
+          }
           if (sprite)
               sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
       };
@@ -39257,7 +39402,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               setGroundPlotsVisible(false);
           setOpenBuildSite(openSiteId === site.id ? null : site.id);
       };
-      const onViewportResize = () => { renderVisibleBuildSites(); };
+      const onViewportResize = () => { renderVisibleBuildSites(); renderVisibleElementalRegions(); };
       const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onViewportResize);
       const unlockAudio = () => { audio.unlock(); audio.syncWeather(weather); };
       const onKeyDown = (event) => { unlockAudio(); keys.add(event.key.toLowerCase()); };
