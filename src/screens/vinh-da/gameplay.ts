@@ -1,6 +1,7 @@
 import { ROSTER, getMetaById } from '../../catalog.ts';
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import type { MainMenuShell } from '../main-menu/types.ts';
+import { getFrameRateCap } from '../../utils/frame-rate.ts';
 
 import {
   BUILD_RANGE,
@@ -109,10 +110,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
 
   const leaderId = typeof params?.leaderId === 'string' ? params.leaderId : ROSTER[0]?.id;
   const leader = leaderId ? getMetaById(leaderId) : null;
+  const frameCap = getFrameRateCap();
+  const minFrameMs = 1000 / frameCap;
   let leaderX = LEADER_START_X;
   let targetX = leaderX;
   let cameraX = 0;
   let lastTime = performance.now();
+  let lastFrameTime = performance.now();
   let rafId = 0;
   let openSiteId: string | null = null;
   let groundPlotsVisible = false;
@@ -708,8 +712,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
 
   const tick = (now: number): void => {
+    rafId = window.requestAnimationFrame(tick);
+    if (now - lastFrameTime < minFrameMs) return;
     const dt = Math.min(0.05, (now - lastTime) / 1000);
     lastTime = now;
+    lastFrameTime = now;
     const left = keys.has('arrowleft') || keys.has('a');
     const right = keys.has('arrowright') || keys.has('d');
     const keyboardDirection = Number(right) - Number(left);
@@ -722,7 +729,6 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     updateStructures(dt);
     updateCamera();
     renderEnemies();
-    rafId = window.requestAnimationFrame(tick);
   };
 
   const moveToClientX = (clientX: number): void => {
