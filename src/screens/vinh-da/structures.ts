@@ -239,6 +239,8 @@ const isOutsideCastleBuildPadding = (x: number): boolean => (
   || x >= CASTLE_OUTER_RIGHT + BUILD_SITE_CASTLE_PADDING
 );
 
+const isRockBuildSiteIndexVisible = (index: number): boolean => index <= 2 || (index - 2) % 6 === 0;
+
 export const createGroundBuildSites = (): BuildSite[] => {
   const sites: BuildSite[] = [];
   const minX = BUILD_SITE_EDGE_PADDING;
@@ -286,11 +288,15 @@ export const createRockBuildSites = (): BuildSite[] => {
     if (!hasLeftSite && !hasRightSite) break;
 
     if (hasLeftSite && isOutsideCastleBuildPadding(leftX)){
-      sites.push({ id: `rock-left-${leftIndex}`, x: leftX, kind: 'rock', allowed: ROCK_BUILD_SITE_ALLOWED });
+      if (isRockBuildSiteIndexVisible(leftIndex)){
+        sites.push({ id: `rock-left-${leftIndex}`, x: leftX, kind: 'rock', allowed: ROCK_BUILD_SITE_ALLOWED });
+      }
       leftIndex += 1;
     }
     if (hasRightSite && isOutsideCastleBuildPadding(rightX)){
-      sites.push({ id: `rock-right-${rightIndex}`, x: rightX, kind: 'rock', allowed: ROCK_BUILD_SITE_ALLOWED });
+      if (isRockBuildSiteIndexVisible(rightIndex)){
+        sites.push({ id: `rock-right-${rightIndex}`, x: rightX, kind: 'rock', allowed: ROCK_BUILD_SITE_ALLOWED });
+      }
       rightIndex += 1;
     }
   }
