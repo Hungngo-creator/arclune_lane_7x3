@@ -308,10 +308,12 @@ export const getBlockingWall = (ctx: VinhDaSimulationContext, enemy: Enemy): { s
     }
     return null;
   };
-export const damageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, amount: number, atkRatio = 0.5): boolean => {
+export const damageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, amount: number, atkRatio = 0.5, ignoreDefenseBelow = 0): boolean => {
     const safeAtkRatio = Math.max(0, Math.min(1, atkRatio));
-    const atkPart = reduceDamageByDefense(amount * safeAtkRatio, enemy.arm);
-    const wilPart = reduceDamageByDefense(amount * (1 - safeAtkRatio), enemy.res);
+    const effectiveArm = enemy.arm <= ignoreDefenseBelow ? 0 : enemy.arm;
+    const effectiveRes = enemy.res <= ignoreDefenseBelow ? 0 : enemy.res;
+    const atkPart = reduceDamageByDefense(amount * safeAtkRatio, effectiveArm);
+    const wilPart = reduceDamageByDefense(amount * (1 - safeAtkRatio), effectiveRes);
     enemy.hp -= atkPart + wilPart;
     return enemy.hp <= 0;
   };
@@ -990,8 +992,16 @@ const updateAntiAirCannon = (ctx: VinhDaSimulationContext, structure: PlacedStru
   if (!target) return;
   runtime.burstShotsRemaining = Math.max(0, (runtime.burstShotsRemaining ?? 1) - 1);
   runtime.cooldown = (runtime.burstShotsRemaining ?? 0) > 0 ? (stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN) : (stat.reloadSeconds ?? stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN);
-  if (damageEnemy(ctx, target, stat.damage ?? 0)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+  hitStructureTarget(ctx, target, stat.damage ?? 0);
 };
+const getStructureTargetsInRange = (ctx: VinhDaSimulationContext, site: BuildSite, stat: { range?: number; maxTargets?: number }): Enemy[] => ctx.state.enemies
+  .filter(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0))
+  .slice(0, stat.maxTargets ?? 1);
+
+const hitStructureTarget = (ctx: VinhDaSimulationContext, target: Enemy, damage: number, atkRatio = 0.5, ignoreDefenseBelow = 0): void => {
+  if (damageEnemy(ctx, target, damage, atkRatio, ignoreDefenseBelow)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+};
+
 const updateGravityCannon = (ctx: VinhDaSimulationContext, structure: PlacedStructure, site: BuildSite, runtime: StructureRuntime, dt: number): void => {
   if (structure.type !== 'gravityCannon') return;
   const stat = getStructureLevelStat('gravityCannon', structure.level);
@@ -1087,7 +1097,7 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
       updateAntiAirCannon(ctx, structure, site, runtime, dt);
       updateGravityCannon(ctx, structure, site, runtime, dt);
     }
-    for (const type of ['watchtower', 'elementalTower'] as const){
+    for (const type of ['watchtower', 'elementalTower', 'executionBlade'] as const){
       for (const siteId of ctx.structureSiteIdsOfType(type)){
         const structure = ctx.state.structures.get(siteId);
         if (!structure || (structure.type !== type && structure.mountedStructure !== type)) continue;
@@ -1097,9 +1107,7 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
         runtime.cooldown = Math.max(0, runtime.cooldown - dt);
         if (runtime.cooldown > 0) continue;
         const stat = getStructureLevelStat(type, structure.type === type ? structure.level : structure.mountedLevel ?? 1, structure.branchLv3, structure.branchLv5, structure.element);
-        const targets = ctx.state.enemies
-          .filter(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0))
-          .slice(0, stat.maxTargets ?? 1);
+        const targets = getStructureTargetsInRange(ctx, site, stat);
         if (targets.length <= 0) continue;
         runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
         const explosionHitIds = new Set(targets.map(target => target.id));
@@ -1108,7 +1116,7 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
           const bonus = stat.element === 'Ánh Sáng' ? 1.1 : target.lightVulnerableSeconds && target.lightVulnerableSeconds > 0 ? 1.2 : 1;
           if (stat.element) applyElementEffect(ctx, target, stat.element, baseDamage, site.x, stat.range ?? 0);
           const damageAtkRatio = type === 'elementalTower' ? 0.2 : 0.5;
-          if (damageEnemy(ctx, target, baseDamage * bonus, damageAtkRatio)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+          hitStructureTarget(ctx, target, baseDamage * bonus, damageAtkRatio, stat.ignoreDefenseBelow ?? 0);
           if (type === 'elementalTower' && structure.level >= 4){
             const splashDamage = stat.splashDamage ?? (structure.level >= 5 ? 2.5 : 1);
             const splashLimit = stat.splashMaxTargets ?? (structure.level >= 5 ? 5 : 3);
@@ -1118,7 +1126,7 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
               .slice(0, splashLimit);
             for (const splashTarget of splashTargets){
               explosionHitIds.add(splashTarget.id);
-              if (damageEnemy(ctx, splashTarget, splashDamage * bonus, damageAtkRatio)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(splashTarget), true);
+              hitStructureTarget(ctx, splashTarget, splashDamage * bonus, damageAtkRatio, stat.ignoreDefenseBelow ?? 0);
             }
           }
         }

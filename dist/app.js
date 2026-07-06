@@ -38296,6 +38296,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let unlocked = false;
       let context = null;
       let stormLoop = null;
+      let rainNoise = null;
       const ensureContext = () => {
           if (!context)
               context = createAudioContext();
@@ -38318,6 +38319,43 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           stormLoop.pause();
           stormLoop.currentTime = 0;
       };
+      const stopRainNoise = () => {
+          if (!rainNoise)
+              return;
+          rainNoise.source.stop();
+          rainNoise.source.disconnect();
+          rainNoise.gain.disconnect();
+          rainNoise = null;
+      };
+      const syncProceduralRain = (nextWeather) => {
+          const volume = nextWeather === 'storm' ? 0.16 : nextWeather === 'heavyRain' ? 0.1 : nextWeather === 'rain' ? 0.055 : nextWeather === 'drizzle' ? 0.025 : 0;
+          if (!canPlay() || volume <= 0) {
+              stopRainNoise();
+              return;
+          }
+          const audio = ensureContext();
+          if (!audio)
+              return;
+          void audio.resume();
+          if (!rainNoise) {
+              const buffer = audio.createBuffer(1, audio.sampleRate * 2, audio.sampleRate);
+              const data = buffer.getChannelData(0);
+              for (let index = 0; index < data.length; index += 1)
+                  data[index] = Math.random() * 2 - 1;
+              const source = audio.createBufferSource();
+              const gain = audio.createGain();
+              source.buffer = buffer;
+              source.loop = true;
+              gain.gain.value = volume;
+              source.connect(gain);
+              gain.connect(audio.destination);
+              source.start();
+              rainNoise = { source, gain };
+          }
+          else {
+              rainNoise.gain.gain.setTargetAtTime(volume, audio.currentTime, 0.08);
+          }
+      };
       return {
           unlock() {
               if (unlocked)
@@ -38327,6 +38365,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           },
           syncWeather(nextWeather) {
               const loop = ensureStormLoop();
+              syncProceduralRain(nextWeather);
               if (!loop)
                   return;
               if (nextWeather === 'storm' && canPlay()) {
@@ -38359,6 +38398,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           },
           destroy() {
               stopStormLoop();
+              stopRainNoise();
               void context?.close();
               context = null;
           },
@@ -38390,8 +38430,13 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__weather-layer{position:absolute;inset:0;z-index:3;pointer-events:none;background:transparent;}
     .vinh-da-game.is-night .vinh-da-game__weather-layer::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(1,2,8,.42),rgba(1,2,8,.58));}
     .vinh-da-game__weather-layer::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .08s linear;background:rgba(232,242,255,.86);}
-    .vinh-da-game__weather-layer.is-rain,.vinh-da-game__weather-layer.is-storm{background:repeating-linear-gradient(105deg,rgba(196,224,255,.38) 0 2px,transparent 2px 14px);}
-    .vinh-da-game__weather-layer.is-storm{background:linear-gradient(rgba(4,6,17,.28),rgba(4,6,17,.44)),repeating-linear-gradient(105deg,rgba(215,234,255,.48) 0 2px,transparent 2px 11px);}
+    .vinh-da-game__weather-layer.is-cloudy{box-shadow:inset 0 0 180px rgba(85,92,115,.22);}
+    .vinh-da-game__weather-layer.is-drizzle{background:repeating-linear-gradient(105deg,rgba(196,224,255,.18) 0 1px,transparent 1px 18px);}
+    .vinh-da-game__weather-layer.is-rain{background:linear-gradient(rgba(20,28,48,.12),rgba(20,28,48,.18)),repeating-linear-gradient(105deg,rgba(196,224,255,.38) 0 2px,transparent 2px 14px);}
+    .vinh-da-game__weather-layer.is-heavy-rain{background:linear-gradient(rgba(4,6,17,.22),rgba(4,6,17,.32)),repeating-linear-gradient(105deg,rgba(215,234,255,.48) 0 2px,transparent 2px 10px);}
+    .vinh-da-game__weather-layer.is-storm{background:linear-gradient(rgba(4,6,17,.34),rgba(4,6,17,.52)),repeating-linear-gradient(105deg,rgba(225,240,255,.58) 0 2px,transparent 2px 8px);}
+    .vinh-da-game__weather-layer.is-fog{background:linear-gradient(0deg,rgba(220,230,240,.22),rgba(220,230,240,.04) 55%,transparent);backdrop-filter:blur(1px);}
+    .vinh-da-game__weather-layer.is-blood-moon{background:radial-gradient(circle at 50% 20%,rgba(170,20,34,.36),transparent 22%),linear-gradient(rgba(50,0,8,.16),rgba(50,0,8,.3));}
     .vinh-da-game__weather-layer.is-lightning::after{opacity:.72;}
     .vinh-da-game__ground{position:absolute;left:0;right:0;bottom:0;height:${GROUND_PERCENT};background:linear-gradient(#121018,#050507);border-top:1px solid rgba(210,200,255,.18);}
     .vinh-da-game__castle{position:absolute;left:${CASTLE_LEFT}px;bottom:${GROUND_PERCENT};width:${CASTLE_WIDTH}px;height:170px;background:linear-gradient(180deg,#202033,#0d0d16);border:2px solid rgba(226,222,255,.2);box-shadow:0 0 44px rgba(83,65,170,.3);}
@@ -38482,6 +38527,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let phaseRemainingSeconds = DAY_DURATION_SECONDS;
       let weather = 'clear';
       let lightningFlashTimer = 0;
+      let weatherPhase = dayNightPhase;
       let leaderAttackCooldown = 0;
       let nightIndex = 1;
       let waveThreatBudgetRemaining = getScaledThreatBudget(getVinhDaWaveConfig(nightIndex).threatBudget, nightIndex);
@@ -38610,10 +38656,18 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       };
       const chooseWeather = () => {
           const roll = Math.random();
-          if (roll < 0.18)
+          if (dayNightPhase === 'night' && roll < 0.08)
+              return 'bloodMoon';
+          if (roll < 0.12)
+              return 'fog';
+          if (roll < 0.24)
               return 'storm';
-          if (roll < 0.52)
+          if (roll < 0.42)
+              return 'heavyRain';
+          if (roll < 0.62)
               return 'rain';
+          if (roll < 0.74)
+              return 'drizzle';
           return 'clear';
       };
       const renderWeather = () => {
@@ -38621,8 +38675,13 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           section.classList.toggle('is-night', dayNightPhase === 'night');
           if (!weatherLayer)
               return;
+          weatherLayer.classList.toggle('is-cloudy', weather !== 'clear');
+          weatherLayer.classList.toggle('is-drizzle', weather === 'drizzle');
           weatherLayer.classList.toggle('is-rain', weather === 'rain');
+          weatherLayer.classList.toggle('is-heavy-rain', weather === 'heavyRain');
           weatherLayer.classList.toggle('is-storm', weather === 'storm');
+          weatherLayer.classList.toggle('is-fog', weather === 'fog');
+          weatherLayer.classList.toggle('is-blood-moon', weather === 'bloodMoon');
           weatherLayer.classList.toggle('is-lightning', lightningFlashTimer > 0);
       };
       const triggerLightningFlash = (duration) => {
@@ -38630,8 +38689,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           if (weather === 'storm')
               audio.playThunder();
       };
-      const updateWeather = (dt, previousPhase) => {
-          if (previousPhase !== dayNightPhase) {
+      const updateWeatherScheduler = (dt) => {
+          if (weatherPhase !== dayNightPhase) {
+              weatherPhase = dayNightPhase;
               weather = chooseWeather();
               if (weather === 'storm')
                   triggerLightningFlash(0.12);
@@ -38642,7 +38702,6 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           if (lightningFlashTimer > 0)
               lightningFlashTimer = Math.max(0, lightningFlashTimer - dt);
           audio.syncWeather(weather);
-          renderWeather();
       };
       const renderDayNightTimer = () => {
           if (dayNightPhaseText)
@@ -38992,9 +39051,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               ? keyboardDirection * LEADER_SPEED * dt
               : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
           leaderX = clampLeaderX(leaderX);
-          const previousPhase = dayNightPhase;
           updateDayNightTimer(dt);
-          updateWeather(dt, previousPhase);
+          updateWeatherScheduler(dt);
+          renderWeather();
           updateEnemies(dt);
           updateStructures(dt);
           collectDroppedResources();
@@ -39402,10 +39461,12 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       return null;
   };
-  const damageEnemy = (ctx, enemy, amount, atkRatio = 0.5) => {
+  const damageEnemy = (ctx, enemy, amount, atkRatio = 0.5, ignoreDefenseBelow = 0) => {
       const safeAtkRatio = Math.max(0, Math.min(1, atkRatio));
-      const atkPart = reduceDamageByDefense(amount * safeAtkRatio, enemy.arm);
-      const wilPart = reduceDamageByDefense(amount * (1 - safeAtkRatio), enemy.res);
+      const effectiveArm = enemy.arm <= ignoreDefenseBelow ? 0 : enemy.arm;
+      const effectiveRes = enemy.res <= ignoreDefenseBelow ? 0 : enemy.res;
+      const atkPart = reduceDamageByDefense(amount * safeAtkRatio, effectiveArm);
+      const wilPart = reduceDamageByDefense(amount * (1 - safeAtkRatio), effectiveRes);
       enemy.hp -= atkPart + wilPart;
       return enemy.hp <= 0;
   };
@@ -40142,7 +40203,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           return;
       runtime.burstShotsRemaining = Math.max(0, (runtime.burstShotsRemaining ?? 1) - 1);
       runtime.cooldown = (runtime.burstShotsRemaining ?? 0) > 0 ? (stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN) : (stat.reloadSeconds ?? stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN);
-      if (damageEnemy(ctx, target, stat.damage ?? 0))
+      hitStructureTarget(ctx, target, stat.damage ?? 0);
+  };
+  const getStructureTargetsInRange = (ctx, site, stat) => ctx.state.enemies
+      .filter(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0))
+      .slice(0, stat.maxTargets ?? 1);
+  const hitStructureTarget = (ctx, target, damage, atkRatio = 0.5, ignoreDefenseBelow = 0) => {
+      if (damageEnemy(ctx, target, damage, atkRatio, ignoreDefenseBelow))
           removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
   };
   const updateGravityCannon = (ctx, structure, site, runtime, dt) => {
@@ -40255,7 +40322,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           updateAntiAirCannon(ctx, structure, site, runtime, dt);
           updateGravityCannon(ctx, structure, site, runtime, dt);
       }
-      for (const type of ['watchtower', 'elementalTower']) {
+      for (const type of ['watchtower', 'elementalTower', 'executionBlade']) {
           for (const siteId of ctx.structureSiteIdsOfType(type)) {
               const structure = ctx.state.structures.get(siteId);
               if (!structure || (structure.type !== type && structure.mountedStructure !== type))
@@ -40268,9 +40335,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               if (runtime.cooldown > 0)
                   continue;
               const stat = getStructureLevelStat(type, structure.type === type ? structure.level : structure.mountedLevel ?? 1, structure.branchLv3, structure.branchLv5, structure.element);
-              const targets = ctx.state.enemies
-                  .filter(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0))
-                  .slice(0, stat.maxTargets ?? 1);
+              const targets = getStructureTargetsInRange(ctx, site, stat);
               if (targets.length <= 0)
                   continue;
               runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
@@ -40281,8 +40346,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
                   if (stat.element)
                       applyElementEffect(ctx, target, stat.element, baseDamage, site.x, stat.range ?? 0);
                   const damageAtkRatio = type === 'elementalTower' ? 0.2 : 0.5;
-                  if (damageEnemy(ctx, target, baseDamage * bonus, damageAtkRatio))
-                      removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+                  hitStructureTarget(ctx, target, baseDamage * bonus, damageAtkRatio, stat.ignoreDefenseBelow ?? 0);
                   if (type === 'elementalTower' && structure.level >= 4) {
                       const splashDamage = stat.splashDamage ?? (structure.level >= 5 ? 2.5 : 1);
                       const splashLimit = stat.splashMaxTargets ?? (structure.level >= 5 ? 5 : 3);
@@ -40292,8 +40356,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
                           .slice(0, splashLimit);
                       for (const splashTarget of splashTargets) {
                           explosionHitIds.add(splashTarget.id);
-                          if (damageEnemy(ctx, splashTarget, splashDamage * bonus, damageAtkRatio))
-                              removeEnemyAt(ctx, ctx.state.enemies.indexOf(splashTarget), true);
+                          hitStructureTarget(ctx, splashTarget, splashDamage * bonus, damageAtkRatio, stat.ignoreDefenseBelow ?? 0);
                       }
                   }
               }
@@ -40387,6 +40450,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       spikeTrap: 0.75,
       antiAirCannon: 1.25,
       gravityCannon: 1.35,
+      executionBlade: 1.4,
   };
   const getBuildLevelCost = (type, level) => Math.max(1, Math.ceil((BUILD_LEVEL_COST[level] ?? BUILD_LEVEL_COST[6]) * (STRUCTURE_COST_MULTIPLIER[type] ?? 1)));
   const WALL_LEVELS = {
@@ -40409,6 +40473,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       { label: 'Tháp', type: 'watchtower' },
       { label: 'Tường', type: 'wall' },
       { label: 'Tháp Nguyên Tố', type: 'elementalTower' },
+      { label: 'Đao Phủ', type: 'executionBlade' },
       { label: 'Pha lê', type: 'crystalSeal' },
       { label: 'Ấn', type: 'church' },
       { label: 'Trại', type: 'barracks' }
@@ -40432,6 +40497,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       swamp: ['ground'],
       antiAirCannon: ['ground'],
       gravityCannon: ['ground'],
+      executionBlade: ['rock'],
   };
   const isStructureAllowedOnBuildSite = (type, site) => STRUCTURE_SURFACES[type].includes(site.kind);
   const STRUCTURE_TYPES = Object.keys(STRUCTURE_SURFACES);
@@ -40456,6 +40522,14 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       4: { hp: 30, maxTargets: 3, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 1, projectileSpeed: 8 },
       5: { hp: 40, maxTargets: 4, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 5, projectileSpeed: 8 }
   };
+  const EXECUTION_BLADE_STRUCTURE_STATS = {
+      1: { hp: 12, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 3, cooldownSeconds: 6, projectileSpeed: 1, ignoreDefenseBelow: 1 },
+      2: { hp: 16, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 6.5, projectileSpeed: 2, ignoreDefenseBelow: 1 },
+      3: { hp: 22, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 6.5, projectileSpeed: 2, ignoreDefenseBelow: 1, element: 'Hỏa' },
+      4: { hp: 30, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 6, cooldownSeconds: 6.25, projectileSpeed: 2.5, ignoreDefenseBelow: 1, element: 'Hỏa' },
+      5: { hp: 40, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 8, cooldownSeconds: 6, projectileSpeed: 3, ignoreDefenseBelow: 1, element: 'Hỏa' },
+      6: { hp: 52, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 10, cooldownSeconds: 5.5, projectileSpeed: 3.5, ignoreDefenseBelow: 1, element: 'Hỏa' }
+  };
   const ELEMENTAL_TOWER_ELEMENTS = ['Hỏa', 'Mộc', 'Thủy', 'Thổ', 'Kim', 'Lôi', 'Huyết', 'Ánh Sáng', 'Phong'];
   const ELEMENTAL_TOWER_STRUCTURE_STATS = Object.fromEntries(ELEMENTAL_TOWER_ELEMENTS.map((element) => [element, {
           1: { hp: 10, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 2, cooldownSeconds: 2, projectileSpeed: 6 },
@@ -40466,6 +40540,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       }]));
   const GROUND_STRUCTURE_STATS = {
       elementalTower: ELEMENTAL_TOWER_STRUCTURE_STATS['Hỏa'],
+      executionBlade: EXECUTION_BLADE_STRUCTURE_STATS,
       barracks: {
           1: { hp: 18, soldierCap: 1, soldierRank: 1, soldierSpawnSeconds: 10 },
           2: { hp: 24, soldierCap: 2, soldierRank: 1, soldierSpawnSeconds: 9 },
@@ -40686,6 +40761,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
       if (type === 'elementalTower')
           return getElementalTowerLevelStat(level, element);
+      if (type === 'executionBlade')
+          return EXECUTION_BLADE_STRUCTURE_STATS[level] ?? EXECUTION_BLADE_STRUCTURE_STATS[1] ?? { hp: 1 };
       return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
   };
   //# sourceMappingURL=stdin.js.map
@@ -40708,6 +40785,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'CONTAMINATION_CLEANSE_SECONDS')) exports.CONTAMINATION_CLEANSE_SECONDS = CONTAMINATION_CLEANSE_SECONDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'WALL_STRUCTURE_STATS')) exports.WALL_STRUCTURE_STATS = WALL_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'WATCHTOWER_STRUCTURE_STATS')) exports.WATCHTOWER_STRUCTURE_STATS = WATCHTOWER_STRUCTURE_STATS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'EXECUTION_BLADE_STRUCTURE_STATS')) exports.EXECUTION_BLADE_STRUCTURE_STATS = EXECUTION_BLADE_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ELEMENTAL_TOWER_ELEMENTS')) exports.ELEMENTAL_TOWER_ELEMENTS = ELEMENTAL_TOWER_ELEMENTS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ELEMENTAL_TOWER_STRUCTURE_STATS')) exports.ELEMENTAL_TOWER_STRUCTURE_STATS = ELEMENTAL_TOWER_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_STRUCTURE_STATS')) exports.GROUND_STRUCTURE_STATS = GROUND_STRUCTURE_STATS;

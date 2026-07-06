@@ -1,6 +1,6 @@
 import { CRYSTAL_X, ENEMY_SPAWN_INTERVAL, ENEMY_START_PADDING, WORLD_WIDTH } from '../src/screens/vinh-da/constants.ts';
 import { ENEMY_TEMPLATES } from '../src/screens/vinh-da/enemies.ts';
-import { BASE_STRUCTURE_STATS, BUILD_SITES, getBaseLevelStat } from '../src/screens/vinh-da/structures.ts';
+import { BASE_STRUCTURE_STATS, BUILD_SITES, getBaseLevelStat, getStructureLevelStat } from '../src/screens/vinh-da/structures.ts';
 import type { StructureType } from '../src/screens/vinh-da/structures.ts';
 import { damageEnemy, getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory, removeEnemyAt, spawnEnemy, spawnWaveEnemy, updateDayNightTimer, updateEnemies, updateStructures } from '../src/screens/vinh-da/simulation.ts';
 import type { VinhDaSimulationContext, VinhDaSimulationState } from '../src/screens/vinh-da/simulation.ts';
@@ -304,6 +304,59 @@ describe('Vĩnh Dạ living territory wall bounds', () => {
     runtimes.get('wall-left')!.hp = 0;
     expect(getLivingTerritoryWallBounds(ctx)).toBeNull();
     expect(isXInLivingTerritory(ctx, CRYSTAL_X)).toBe(false);
+  });
+});
+
+describe('Vĩnh Dạ Đao Phủ structure', () => {
+  const placeExecutionBlade = (level: number): VinhDaSimulationContext => {
+    const siteId = 'rock-left-1';
+    const runtimes = new Map<string, StructureRuntime>([[siteId, { cooldown: 0, hp: 12 }]]);
+    const ctx = createContext([{ siteId, type: 'executionBlade', level, branchLv3: level >= 3 ? 'spike' : undefined }], runtimes);
+    Object.assign(ctx.state, { dayNightPhase: 'night' });
+    return ctx;
+  };
+
+  it('lv1 hits at most five targets and treats ARM/RES <= 1 as ignored defense', () => {
+    const ctx = placeExecutionBlade(1);
+    const x = buildSitesById.get('rock-left-1')!.x;
+    for (let index = 0; index < 6; index += 1) spawnEnemy(ctx, 'left', 'twisted', x + index, true);
+    ctx.state.enemies.forEach(enemy => { enemy.hp = 10; enemy.maxHp = 10; enemy.arm = 1; enemy.res = 1; });
+
+    updateStructures(ctx, 0);
+
+    const damaged = ctx.state.enemies.filter(enemy => enemy.hp === 7);
+    expect(damaged).toHaveLength(5);
+    expect(ctx.state.enemies.filter(enemy => enemy.hp === 10)).toHaveLength(1);
+  });
+
+  it('lv2 uses increased damage and longer cooldown from the spec', () => {
+    const ctx = placeExecutionBlade(2);
+    const x = buildSitesById.get('rock-left-1')!.x;
+    spawnEnemy(ctx, 'left', 'ironMan', x, true);
+    const enemy = ctx.state.enemies[0]!;
+    enemy.hp = 10;
+    enemy.maxHp = 10;
+    enemy.arm = 1;
+    enemy.res = 2;
+
+    updateStructures(ctx, 0);
+
+    expect(enemy.hp).toBeCloseTo(5.049, 3);
+    expect(ctx.ensureStructureRuntime(ctx.state.structures.get('rock-left-1')!).cooldown).toBeCloseTo(6.5);
+  });
+
+  it('lv3 marks the Nguyên Tố Hóa branch with an element while preserving blade targeting', () => {
+    const ctx = placeExecutionBlade(3);
+    const x = buildSitesById.get('rock-left-1')!.x;
+    spawnEnemy(ctx, 'left', 'twisted', x, true);
+    ctx.state.enemies[0]!.hp = 20;
+    ctx.state.enemies[0]!.maxHp = 20;
+
+    updateStructures(ctx, 0);
+
+    expect(getStructureLevelStat('executionBlade', 3).element).toBe('Hỏa');
+    expect(ctx.state.enemies[0]!.statuses?.burnSeconds).toBeGreaterThan(0);
+    expect(ctx.state.enemies[0]!.hp).toBeLessThan(ctx.state.enemies[0]!.maxHp);
   });
 });
 

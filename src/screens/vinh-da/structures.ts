@@ -10,7 +10,7 @@ import {
 } from './constants.ts';
 import type { BuildSite, BuildSiteKind } from './types.ts';
 
-export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal' | 'landmine' | 'swamp' | 'spikeTrap' | 'antiAirCannon' | 'gravityCannon';
+export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal' | 'landmine' | 'swamp' | 'spikeTrap' | 'antiAirCannon' | 'gravityCannon' | 'executionBlade';
 export type ElementalTowerElement = 'Hỏa' | 'Mộc' | 'Thủy' | 'Thổ' | 'Kim' | 'Lôi' | 'Huyết' | 'Ánh Sáng' | 'Phong';
 
 export interface BuildMenuOption {
@@ -73,6 +73,7 @@ export interface StructureLevelStat {
   splashDamage?: number;
   splashMaxTargets?: number;
   splashRange?: number;
+  ignoreDefenseBelow?: number;
 }
 
 
@@ -98,6 +99,7 @@ const STRUCTURE_COST_MULTIPLIER: Record<StructureType, number> = {
   spikeTrap: 0.75,
   antiAirCannon: 1.25,
   gravityCannon: 1.35,
+  executionBlade: 1.4,
 };
 
 export const getBuildLevelCost = (type: StructureType, level: number): number => Math.max(1, Math.ceil((BUILD_LEVEL_COST[level as keyof typeof BUILD_LEVEL_COST] ?? BUILD_LEVEL_COST[6]) * (STRUCTURE_COST_MULTIPLIER[type] ?? 1)));
@@ -123,6 +125,7 @@ export const BUILD_NODE_OPTIONS = [
   { label: 'Tháp', type: 'watchtower' },
   { label: 'Tường', type: 'wall' },
   { label: 'Tháp Nguyên Tố', type: 'elementalTower' },
+  { label: 'Đao Phủ', type: 'executionBlade' },
   { label: 'Pha lê', type: 'crystalSeal' },
   { label: 'Ấn', type: 'church' },
   { label: 'Trại', type: 'barracks' }
@@ -148,6 +151,7 @@ export const STRUCTURE_SURFACES: Record<StructureType, readonly BuildSiteKind[]>
   swamp: ['ground'],
   antiAirCannon: ['ground'],
   gravityCannon: ['ground'],
+  executionBlade: ['rock'],
 } as const;
 
 export const isStructureAllowedOnBuildSite = (type: StructureType, site: Pick<BuildSite, 'kind'>): boolean => STRUCTURE_SURFACES[type].includes(site.kind);
@@ -178,6 +182,15 @@ export const WATCHTOWER_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
   5: { hp: 40, maxTargets: 4, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 5, projectileSpeed: 8 }
 };
 
+export const EXECUTION_BLADE_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
+  1: { hp: 12, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 3, cooldownSeconds: 6, projectileSpeed: 1, ignoreDefenseBelow: 1 },
+  2: { hp: 16, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 6.5, projectileSpeed: 2, ignoreDefenseBelow: 1 },
+  3: { hp: 22, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 6.5, projectileSpeed: 2, ignoreDefenseBelow: 1, element: 'Hỏa' },
+  4: { hp: 30, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 6, cooldownSeconds: 6.25, projectileSpeed: 2.5, ignoreDefenseBelow: 1, element: 'Hỏa' },
+  5: { hp: 40, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 8, cooldownSeconds: 6, projectileSpeed: 3, ignoreDefenseBelow: 1, element: 'Hỏa' },
+  6: { hp: 52, maxTargets: 5, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 10, cooldownSeconds: 5.5, projectileSpeed: 3.5, ignoreDefenseBelow: 1, element: 'Hỏa' }
+};
+
 export const ELEMENTAL_TOWER_ELEMENTS = ['Hỏa', 'Mộc', 'Thủy', 'Thổ', 'Kim', 'Lôi', 'Huyết', 'Ánh Sáng', 'Phong'] as const satisfies readonly ElementalTowerElement[];
 export const ELEMENTAL_TOWER_STRUCTURE_STATS: Record<ElementalTowerElement, Record<number, StructureLevelStat>> = Object.fromEntries(ELEMENTAL_TOWER_ELEMENTS.map((element) => [element, {
   1: { hp: 10, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 2, cooldownSeconds: 2, projectileSpeed: 6 },
@@ -189,6 +202,7 @@ export const ELEMENTAL_TOWER_STRUCTURE_STATS: Record<ElementalTowerElement, Reco
 
 export const GROUND_STRUCTURE_STATS: Record<Exclude<StructureType, 'wall' | 'watchtower'>, Record<number, StructureLevelStat>> = {
   elementalTower: ELEMENTAL_TOWER_STRUCTURE_STATS['Hỏa'],
+  executionBlade: EXECUTION_BLADE_STRUCTURE_STATS,
   barracks: {
     1: { hp: 18, soldierCap: 1, soldierRank: 1, soldierSpawnSeconds: 10 },
     2: { hp: 24, soldierCap: 2, soldierRank: 1, soldierSpawnSeconds: 9 },
@@ -420,5 +434,6 @@ export const getStructureLevelStat = (type: StructureType, level: number, branch
   if (type === 'wall') return getWallLevelStat(level, branchLv3, branchLv5);
   if (type === 'watchtower') return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
   if (type === 'elementalTower') return getElementalTowerLevelStat(level, element);
+  if (type === 'executionBlade') return EXECUTION_BLADE_STRUCTURE_STATS[level] ?? EXECUTION_BLADE_STRUCTURE_STATS[1] ?? { hp: 1 };
   return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
 };

@@ -53,7 +53,7 @@ import {
 import type { DayNightPhase, VinhDaSimulationContext, VinhDaSimulationState } from './simulation.ts';
 import type { BuildSite, DroppedResource, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
-type WeatherType = 'clear' | 'rain' | 'storm';
+type WeatherType = 'clear' | 'drizzle' | 'rain' | 'heavyRain' | 'storm' | 'fog' | 'bloodMoon';
 
 interface RenderContext {
   root: HTMLElement;
@@ -74,6 +74,7 @@ function createVinhDaAudioController(): { unlock: () => void; syncWeather: (weat
   let unlocked = false;
   let context: BrowserAudioContext | null = null;
   let stormLoop: HTMLAudioElement | null = null;
+  let rainNoise: { source: AudioBufferSourceNode; gain: GainNode } | null = null;
 
   const ensureContext = (): BrowserAudioContext | null => {
     if (!context) context = createAudioContext();
@@ -94,6 +95,39 @@ function createVinhDaAudioController(): { unlock: () => void; syncWeather: (weat
     stormLoop.pause();
     stormLoop.currentTime = 0;
   };
+  const stopRainNoise = (): void => {
+    if (!rainNoise) return;
+    rainNoise.source.stop();
+    rainNoise.source.disconnect();
+    rainNoise.gain.disconnect();
+    rainNoise = null;
+  };
+  const syncProceduralRain = (nextWeather: WeatherType): void => {
+    const volume = nextWeather === 'storm' ? 0.16 : nextWeather === 'heavyRain' ? 0.1 : nextWeather === 'rain' ? 0.055 : nextWeather === 'drizzle' ? 0.025 : 0;
+    if (!canPlay() || volume <= 0){
+      stopRainNoise();
+      return;
+    }
+    const audio = ensureContext();
+    if (!audio) return;
+    void audio.resume();
+    if (!rainNoise){
+      const buffer = audio.createBuffer(1, audio.sampleRate * 2, audio.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let index = 0; index < data.length; index += 1) data[index] = Math.random() * 2 - 1;
+      const source = audio.createBufferSource();
+      const gain = audio.createGain();
+      source.buffer = buffer;
+      source.loop = true;
+      gain.gain.value = volume;
+      source.connect(gain);
+      gain.connect(audio.destination);
+      source.start();
+      rainNoise = { source, gain };
+    } else {
+      rainNoise.gain.gain.setTargetAtTime(volume, audio.currentTime, 0.08);
+    }
+  };
 
   return {
     unlock(){
@@ -103,6 +137,7 @@ function createVinhDaAudioController(): { unlock: () => void; syncWeather: (weat
     },
     syncWeather(nextWeather: WeatherType){
       const loop = ensureStormLoop();
+      syncProceduralRain(nextWeather);
       if (!loop) return;
       if (nextWeather === 'storm' && canPlay()){
         void loop.play();
@@ -131,6 +166,7 @@ function createVinhDaAudioController(): { unlock: () => void; syncWeather: (weat
     },
     destroy(){
       stopStormLoop();
+      stopRainNoise();
       void context?.close();
       context = null;
     },
@@ -165,8 +201,13 @@ const CSS = /* css */ `
   .vinh-da-game__weather-layer{position:absolute;inset:0;z-index:3;pointer-events:none;background:transparent;}
   .vinh-da-game.is-night .vinh-da-game__weather-layer::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(1,2,8,.42),rgba(1,2,8,.58));}
   .vinh-da-game__weather-layer::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .08s linear;background:rgba(232,242,255,.86);}
-  .vinh-da-game__weather-layer.is-rain,.vinh-da-game__weather-layer.is-storm{background:repeating-linear-gradient(105deg,rgba(196,224,255,.38) 0 2px,transparent 2px 14px);}
-  .vinh-da-game__weather-layer.is-storm{background:linear-gradient(rgba(4,6,17,.28),rgba(4,6,17,.44)),repeating-linear-gradient(105deg,rgba(215,234,255,.48) 0 2px,transparent 2px 11px);}
+  .vinh-da-game__weather-layer.is-cloudy{box-shadow:inset 0 0 180px rgba(85,92,115,.22);}
+  .vinh-da-game__weather-layer.is-drizzle{background:repeating-linear-gradient(105deg,rgba(196,224,255,.18) 0 1px,transparent 1px 18px);}
+  .vinh-da-game__weather-layer.is-rain{background:linear-gradient(rgba(20,28,48,.12),rgba(20,28,48,.18)),repeating-linear-gradient(105deg,rgba(196,224,255,.38) 0 2px,transparent 2px 14px);}
+  .vinh-da-game__weather-layer.is-heavy-rain{background:linear-gradient(rgba(4,6,17,.22),rgba(4,6,17,.32)),repeating-linear-gradient(105deg,rgba(215,234,255,.48) 0 2px,transparent 2px 10px);}
+  .vinh-da-game__weather-layer.is-storm{background:linear-gradient(rgba(4,6,17,.34),rgba(4,6,17,.52)),repeating-linear-gradient(105deg,rgba(225,240,255,.58) 0 2px,transparent 2px 8px);}
+  .vinh-da-game__weather-layer.is-fog{background:linear-gradient(0deg,rgba(220,230,240,.22),rgba(220,230,240,.04) 55%,transparent);backdrop-filter:blur(1px);}
+  .vinh-da-game__weather-layer.is-blood-moon{background:radial-gradient(circle at 50% 20%,rgba(170,20,34,.36),transparent 22%),linear-gradient(rgba(50,0,8,.16),rgba(50,0,8,.3));}
   .vinh-da-game__weather-layer.is-lightning::after{opacity:.72;}
   .vinh-da-game__ground{position:absolute;left:0;right:0;bottom:0;height:${GROUND_PERCENT};background:linear-gradient(#121018,#050507);border-top:1px solid rgba(210,200,255,.18);}
   .vinh-da-game__castle{position:absolute;left:${CASTLE_LEFT}px;bottom:${GROUND_PERCENT};width:${CASTLE_WIDTH}px;height:170px;background:linear-gradient(180deg,#202033,#0d0d16);border:2px solid rgba(226,222,255,.2);box-shadow:0 0 44px rgba(83,65,170,.3);}
@@ -259,6 +300,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let phaseRemainingSeconds = DAY_DURATION_SECONDS;
   let weather: WeatherType = 'clear';
   let lightningFlashTimer = 0;
+  let weatherPhase: DayNightPhase = dayNightPhase;
   let leaderAttackCooldown = 0;
   let nightIndex = 1;
   let waveThreatBudgetRemaining = getScaledThreatBudget(getVinhDaWaveConfig(nightIndex).threatBudget, nightIndex);
@@ -385,24 +427,34 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
   const chooseWeather = (): WeatherType => {
     const roll = Math.random();
-    if (roll < 0.18) return 'storm';
-    if (roll < 0.52) return 'rain';
+    if (dayNightPhase === 'night' && roll < 0.08) return 'bloodMoon';
+    if (roll < 0.12) return 'fog';
+    if (roll < 0.24) return 'storm';
+    if (roll < 0.42) return 'heavyRain';
+    if (roll < 0.62) return 'rain';
+    if (roll < 0.74) return 'drizzle';
     return 'clear';
   };
   const renderWeather = (): void => {
     section.classList.toggle('is-day', dayNightPhase === 'day');
     section.classList.toggle('is-night', dayNightPhase === 'night');
     if (!weatherLayer) return;
+    weatherLayer.classList.toggle('is-cloudy', weather !== 'clear');
+    weatherLayer.classList.toggle('is-drizzle', weather === 'drizzle');
     weatherLayer.classList.toggle('is-rain', weather === 'rain');
+    weatherLayer.classList.toggle('is-heavy-rain', weather === 'heavyRain');
     weatherLayer.classList.toggle('is-storm', weather === 'storm');
+    weatherLayer.classList.toggle('is-fog', weather === 'fog');
+    weatherLayer.classList.toggle('is-blood-moon', weather === 'bloodMoon');
     weatherLayer.classList.toggle('is-lightning', lightningFlashTimer > 0);
   };
   const triggerLightningFlash = (duration: number): void => {
     lightningFlashTimer = duration;
     if (weather === 'storm') audio.playThunder();
   };
-  const updateWeather = (dt: number, previousPhase: DayNightPhase): void => {
-    if (previousPhase !== dayNightPhase){
+  const updateWeatherScheduler = (dt: number): void => {
+    if (weatherPhase !== dayNightPhase){
+      weatherPhase = dayNightPhase;
       weather = chooseWeather();
       if (weather === 'storm') triggerLightningFlash(0.12);
     } else if (weather === 'storm' && lightningFlashTimer <= 0 && Math.random() < dt * 0.18){
@@ -410,7 +462,6 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     }
     if (lightningFlashTimer > 0) lightningFlashTimer = Math.max(0, lightningFlashTimer - dt);
     audio.syncWeather(weather);
-    renderWeather();
   };
   const renderDayNightTimer = (): void => {
     if (dayNightPhaseText) dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
@@ -745,9 +796,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       ? keyboardDirection * LEADER_SPEED * dt
       : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
     leaderX = clampLeaderX(leaderX);
-    const previousPhase = dayNightPhase;
     updateDayNightTimer(dt);
-    updateWeather(dt, previousPhase);
+    updateWeatherScheduler(dt);
+    renderWeather();
     updateEnemies(dt);
     updateStructures(dt);
     collectDroppedResources();

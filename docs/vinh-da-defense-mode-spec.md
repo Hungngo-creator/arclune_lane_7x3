@@ -549,6 +549,7 @@ Mô tả:
 - Tay chân lở loét.
 - Thỉnh thoảng nói mớ, gào thét.
 - Trọng lượng: 1.
+- Gieets
 
 Chỉ số chuẩn Khai Nguyên 1:
 
