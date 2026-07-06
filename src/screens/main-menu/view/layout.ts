@@ -91,6 +91,12 @@ export function ensureStyles(): void {
     .main-menu-settings-content{flex:1;padding:54px 20px 20px;display:flex;flex-direction:column;gap:12px;}
     .main-menu-settings-title{margin:0;font-size:22px;letter-spacing:.08em;text-transform:uppercase;}
     .main-menu-settings-desc{margin:0;color:#9cbcd9;}
+    .main-menu-settings-fps{margin-top:6px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;}
+    .main-menu-settings-fps__label{margin:0;color:#d8eeff;font-size:13px;letter-spacing:.12em;text-transform:uppercase;}
+    .main-menu-settings-fps__options{display:flex;gap:10px;flex-wrap:wrap;}
+    .main-menu-settings-fps__btn{border:1px solid rgba(125,211,252,.28);background:rgba(16,26,36,.84);color:#cde7ff;border-radius:999px;padding:9px 14px;cursor:pointer;letter-spacing:.08em;transition:border-color .18s ease,background .18s ease,box-shadow .18s ease;}
+    .main-menu-settings-fps__btn:hover{border-color:rgba(125,211,252,.5);}
+    .main-menu-settings-fps__btn.is-active{border-color:rgba(125,211,252,.72);background:rgba(18,48,70,.92);box-shadow:0 0 18px rgba(125,211,252,.16);color:#e8f7ff;}
     .main-menu-settings-danger-btn{align-self:flex-start;border:1px solid rgba(255,128,128,.45);background:rgba(52,14,18,.82);color:#ffd4d4;border-radius:10px;padding:10px 14px;cursor:pointer;}
     .main-menu-settings-confirm{margin-top:8px;border:1px solid rgba(255,128,128,.45);background:rgba(52,14,18,.55);border-radius:12px;padding:12px;display:none;flex-direction:column;gap:10px;}
     .main-menu-settings-confirm.is-open{display:flex;}

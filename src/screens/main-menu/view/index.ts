@@ -5,6 +5,7 @@ import { mountSection } from '../../../ui/dom.ts';
 import { ensureStyles, createHeader, createModesSection } from './layout.ts';
 import { resetPlayerProfileData } from '../../../utils/player-profile.ts';
 import { resetSharedCurrencyWallet } from '../../../utils/currency.ts';
+import { getFrameRateCap, setFrameRateCap, type FrameRateCap } from '../../../utils/frame-rate.ts';
 
 function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar): void {
   const toolbar = document.createElement('div');
@@ -58,6 +59,31 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
   content.appendChild(title);
   content.appendChild(description);
 
+  const graphicsActions = document.createElement('div');
+  graphicsActions.className = 'main-menu-settings-fps';
+  graphicsActions.style.display = 'none';
+
+  const fpsLabel = document.createElement('p');
+  fpsLabel.className = 'main-menu-settings-fps__label';
+  fpsLabel.textContent = 'Giới hạn FPS';
+  graphicsActions.appendChild(fpsLabel);
+
+  const fpsOptions = document.createElement('div');
+  fpsOptions.className = 'main-menu-settings-fps__options';
+  const fpsButtons = new Map<FrameRateCap, HTMLButtonElement>();
+  ([30, 60] as const).forEach((fps) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'main-menu-settings-fps__btn';
+    btn.dataset.fps = String(fps);
+    btn.textContent = `${fps} FPS`;
+    btn.setAttribute('aria-pressed', 'false');
+    fpsButtons.set(fps, btn);
+    fpsOptions.appendChild(btn);
+  });
+  graphicsActions.appendChild(fpsOptions);
+  content.appendChild(graphicsActions);
+
   const accountActions = document.createElement('div');
   accountActions.style.display = 'none';
   const resetBtn = document.createElement('button');
@@ -90,9 +116,21 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
   container.appendChild(overlay);
 
   let activeTab = 'chung';
+  let activeFrameRateCap = getFrameRateCap();
+
+  const renderFrameRateButtons = () => {
+    fpsButtons.forEach((btn, fps) => {
+      const isActive = fps === activeFrameRateCap;
+      btn.classList.toggle('is-active', isActive);
+      btn.setAttribute('aria-pressed', String(isActive));
+    });
+  };
   const renderTab = () => {
+
     navButtons.forEach((btn, tabId) => btn.classList.toggle('is-active', tabId === activeTab));
+    graphicsActions.style.display = activeTab === 'đồ hoạ' ? '' : 'none';
     accountActions.style.display = activeTab === 'tài khoản' ? '' : 'none';
+    renderFrameRateButtons();
     confirmWrap.classList.remove('is-open');
     if (activeTab === 'chung'){
       title.textContent = 'Cài đặt chung';
@@ -101,7 +139,7 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
     }
     if (activeTab === 'đồ hoạ'){
       title.textContent = 'Cài đặt đồ hoạ';
-      description.textContent = 'Các cấu hình đồ hoạ sẽ được bổ sung sau.';
+      description.textContent = 'Chọn giới hạn tốc độ khung hình để ưu tiên độ mượt hoặc tiết kiệm tài nguyên.';
       return;
     }
     if (activeTab === 'âm thanh'){
@@ -133,6 +171,17 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
     renderTab();
   };
 
+  const onFrameRateClick = (event: Event) => {
+    const target = event.target as HTMLElement | null;
+    const fpsBtn = target?.closest('.main-menu-settings-fps__btn') as HTMLButtonElement | null;
+    if (!fpsBtn) return;
+    const nextCap = Number(fpsBtn.dataset.fps) as FrameRateCap;
+    if (!fpsButtons.has(nextCap)) return;
+    activeFrameRateCap = nextCap;
+    setFrameRateCap(nextCap);
+    renderFrameRateButtons();
+  };
+
   const onResetClick = () => confirmWrap.classList.add('is-open');
   const onResetCancel = () => confirmWrap.classList.remove('is-open');
   const onResetConfirm = () => {
@@ -145,12 +194,14 @@ function createSettingsHub(container: HTMLElement, addCleanup: CleanupRegistrar)
   trigger.addEventListener('click', openHub);
   closeBtn.addEventListener('click', closeHub);
   nav.addEventListener('click', onTabClick);
+  fpsOptions.addEventListener('click', onFrameRateClick);
   resetBtn.addEventListener('click', onResetClick);
   confirmNo.addEventListener('click', onResetCancel);
   confirmYes.addEventListener('click', onResetConfirm);
   addCleanup(() => trigger.removeEventListener('click', openHub));
   addCleanup(() => closeBtn.removeEventListener('click', closeHub));
   addCleanup(() => nav.removeEventListener('click', onTabClick));
+  addCleanup(() => fpsOptions.removeEventListener('click', onFrameRateClick));
   addCleanup(() => resetBtn.removeEventListener('click', onResetClick));
   addCleanup(() => confirmNo.removeEventListener('click', onResetCancel));
   addCleanup(() => confirmYes.removeEventListener('click', onResetConfirm));
