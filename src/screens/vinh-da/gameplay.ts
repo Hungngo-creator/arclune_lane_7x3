@@ -206,6 +206,9 @@ const CSS = /* css */ `
   .vinh-da-game__back{pointer-events:auto;border:0;border-radius:999px;background:#f3edff;color:#111020;width:42px;height:42px;font-size:22px;cursor:pointer;}
   .vinh-da-game__viewport{position:absolute;inset:0;overflow:hidden;cursor:pointer;}
   .vinh-da-game__world{position:absolute;left:0;top:0;width:${WORLD_WIDTH}px;height:100%;transform:translate3d(0,0,0);will-change:transform;background:radial-gradient(circle at 50% 28%,rgba(87,68,168,.34),transparent 18%),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 220px);}
+  .vinh-da-game__celestial{position:absolute;z-index:1;top:9%;left:calc(50% - 42px);width:84px;height:84px;border-radius:999px;pointer-events:none;transition:background .32s ease,box-shadow .32s ease,filter .32s ease;animation:vinh-da-celestial-pulse 2.4s ease-in-out infinite;}
+  .vinh-da-game.is-day .vinh-da-game__celestial{background:radial-gradient(circle at 38% 34%,#fff7b5 0 18%,#ffd34d 38%,#f59f1f 68%,rgba(245,159,31,.18) 72%,transparent 100%);box-shadow:0 0 26px rgba(255,211,77,.82),0 0 72px rgba(245,159,31,.38);}
+  .vinh-da-game.is-night .vinh-da-game__celestial{background:radial-gradient(circle at 34% 30%,#f7fbff 0 20%,#c9e6ff 42%,#6f8fb7 67%,rgba(111,143,183,.14) 72%,transparent 100%);box-shadow:0 0 18px rgba(201,230,255,.72),0 0 54px rgba(111,143,183,.34);}
   .vinh-da-game__weather-layer{position:absolute;inset:0;z-index:3;pointer-events:none;background:transparent;}
   .vinh-da-game.is-night .vinh-da-game__weather-layer::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(1,2,8,.42),rgba(1,2,8,.58));}
   .vinh-da-game__weather-layer::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .08s linear;background:rgba(232,242,255,.86);}
@@ -266,6 +269,7 @@ const CSS = /* css */ `
   .vinh-da-game__build-menu.is-upgrade-menu .vinh-da-game__build-node{transform:translate(0,0);}
   .vinh-da-game__build-node[hidden]{display:none;}
   @keyframes vinh-da-crystal-shine{0%,100%{filter:brightness(1);transform:translateX(-50%) rotate(45deg) scale(1)}50%{filter:brightness(1.45);transform:translateX(-50%) rotate(45deg) scale(1.06)}}
+  @keyframes vinh-da-celestial-pulse{0%,100%{filter:brightness(1);transform:scale(1)}50%{filter:brightness(1.28);transform:scale(1.08)}}
 `;
 
 export function renderScreen(context: RenderContext): { destroy: () => void }{
@@ -335,7 +339,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     <div class="vinh-da-game__notice" data-role="notice" aria-live="polite"></div>
     <div class="vinh-da-game__viewport" data-role="viewport">
       <div class="vinh-da-game__world" data-role="world">
-      <div class="vinh-da-game__weather-layer" data-role="weather-layer" aria-hidden="true"></div>
+      <div class="vinh-da-game__celestial" aria-hidden="true"></div>
+        <div class="vinh-da-game__weather-layer" data-role="weather-layer" aria-hidden="true"></div>
         <div class="vinh-da-game__castle" aria-hidden="true"></div>
         <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
         <div class="vinh-da-game__ground" aria-hidden="true"></div>

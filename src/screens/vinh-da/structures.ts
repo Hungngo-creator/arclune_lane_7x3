@@ -128,7 +128,7 @@ export const BUILD_NODE_OPTIONS = [
   { label: 'Tháp Nguyên Tố', type: 'elementalTower' },
   { label: 'Đao Phủ', type: 'executionBlade' },
   { label: 'Pha lê', type: 'crystalSeal' },
-  { label: 'Nhà Thờ'', type: 'church' },
+  { label: 'Nhà Thờ', type: 'church' },
   { label: 'Trại', type: 'barracks' },
   { label: 'Truyền Tống Trận', type: 'teleport' }
 ] as const satisfies readonly BuildMenuOption[];
