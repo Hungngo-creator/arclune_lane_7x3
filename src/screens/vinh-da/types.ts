@@ -35,6 +35,7 @@ export interface PlacedStructure {
   siteId: string;
   type: StructureType;
   level: number;
+  mountedLevel?: number;
   branchLv3?: WallBranchLv3;
   branchLv5?: WallBranchLv5;
   mountedStructure?: StructureType | null;
@@ -57,6 +58,12 @@ export interface DroppedResource {
   id: number;
   x: number;
   amount: number;
+}
+
+export interface EnemyPortal {
+  id: string;
+  side: Side;
+  x: number;
 }
 
 export interface Enemy {

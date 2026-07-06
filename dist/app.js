@@ -38181,7 +38181,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const BUILD_RANGE = __dep3.BUILD_RANGE;
   const BUILD_SITE_RENDER_BUFFER = __dep3.BUILD_SITE_RENDER_BUFFER;
   const BUILD_SITE_RENDER_THRESHOLD = __dep3.BUILD_SITE_RENDER_THRESHOLD;
+  const BUILD_SITE_EDGE_PADDING = __dep3.BUILD_SITE_EDGE_PADDING;
   const CASTLE_LEFT = __dep3.CASTLE_LEFT;
+  const CASTLE_OUTER_LEFT = __dep3.CASTLE_OUTER_LEFT;
+  const CASTLE_OUTER_RIGHT = __dep3.CASTLE_OUTER_RIGHT;
   const CASTLE_TOWER_OFFSET = __dep3.CASTLE_TOWER_OFFSET;
   const CASTLE_TOWER_WIDTH = __dep3.CASTLE_TOWER_WIDTH;
   const CASTLE_WIDTH = __dep3.CASTLE_WIDTH;
@@ -38215,6 +38218,19 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const runtimeUpdateEnemies = __dep5.updateEnemies;
   const runtimeUpdateStructures = __dep5.updateStructures;
   const runtimeCollectDroppedResources = __dep5.collectDroppedResources;
+  const randomInRange = (min, max) => min + Math.random() * Math.max(0, max - min);
+  const createEnemyPortals = () => {
+      const portals = [];
+      const createSidePortals = (side, minX, maxX) => {
+          const count = 1 + Math.floor(Math.random() * 2);
+          for (let index = 0; index < count; index += 1) {
+              portals.push({ id: `${side}-portal-${index + 1}`, side, x: randomInRange(minX, maxX) });
+          }
+      };
+      createSidePortals('left', BUILD_SITE_EDGE_PADDING, CASTLE_OUTER_LEFT - BUILD_SITE_EDGE_PADDING);
+      createSidePortals('right', CASTLE_OUTER_RIGHT + BUILD_SITE_EDGE_PADDING, WORLD_WIDTH - BUILD_SITE_EDGE_PADDING);
+      return portals;
+  };
   const CSS = /* css */ `
     .app--vinh-da-gameplay{min-height:100dvh;background:#020204;color:#f7f2ff;overflow:hidden;touch-action:none;}
     .vinh-da-game{position:relative;min-height:100dvh;overflow:hidden;background:linear-gradient(#020204 0 58%,#07070b 58% 100%);touch-action:none;user-select:none;}
@@ -38231,6 +38247,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__crystal::after{content:"";position:absolute;inset:8px 20px;background:rgba(255,255,255,.72);filter:blur(2px);}
     .vinh-da-game__leader{position:absolute;bottom:${GROUND_PERCENT};width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
     .vinh-da-game__drop{position:absolute;bottom:calc(${GROUND_PERCENT} + 10px);width:18px;height:18px;margin-left:-9px;border-radius:999px;background:radial-gradient(circle,#f5f7ff,#6dc8ff 48%,#352073);box-shadow:0 0 14px rgba(109,200,255,.75);z-index:2;}
+    .vinh-da-game__portal{position:absolute;bottom:${GROUND_PERCENT};width:54px;height:86px;margin-left:-27px;border-radius:999px 999px 12px 12px;background:radial-gradient(ellipse at 50% 50%,rgba(222,142,255,.92),rgba(92,41,168,.72) 42%,rgba(18,8,34,.9) 68%,transparent 70%);box-shadow:0 0 28px rgba(190,94,255,.72);z-index:1;pointer-events:none;}
+    .vinh-da-game__portal::after{content:"";position:absolute;inset:13px 18px;border-radius:999px;background:rgba(8,4,18,.82);box-shadow:inset 0 0 18px rgba(238,211,255,.36);}
     .vinh-da-game__enemy{position:absolute;bottom:${GROUND_PERCENT};width:38px;height:52px;margin-left:-19px;border-radius:18px 18px 8px 8px;background:linear-gradient(180deg,#d14b5f,#381018);box-shadow:0 0 18px rgba(209,75,95,.34);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
     .vinh-da-game__rock{position:absolute;bottom:${GROUND_PERCENT};width:96px;height:58px;margin-left:-48px;border:0;border-radius:46% 54% 38% 42%;background:linear-gradient(150deg,#7e7b8e,#383746 58%,#1f1f2a);box-shadow:inset -12px -10px 18px rgba(0,0,0,.32),0 8px 22px rgba(0,0,0,.35);cursor:pointer;z-index:2;}
     .vinh-da-game__rock::after{content:"";position:absolute;left:18px;top:12px;width:42px;height:10px;border-radius:999px;background:rgba(255,255,255,.18);transform:rotate(-12deg);}
@@ -38292,6 +38310,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const structureRuntimes = new Map();
       const structureSitesByType = new Map();
       const enemies = [];
+      const enemyPortals = createEnemyPortals();
       const droppedResources = [];
       const enemyElements = new Map();
       const droppedResourceElements = new Map();
@@ -38323,6 +38342,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
           <div class="vinh-da-game__ground" aria-hidden="true"></div>
           <div data-role="build-sites"></div>
+          <div data-role="enemy-portals"></div>
           <div data-role="dropped-resources"></div>
           <div data-role="enemies"></div>
           <div class="vinh-da-game__leader" data-role="leader" title="${leader?.name ?? leaderId ?? 'Leader'}"></div>
@@ -38333,6 +38353,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const viewport = section.querySelector('[data-role="viewport"]');
       const buildSitesContainer = section.querySelector('[data-role="build-sites"]');
       const enemiesContainer = section.querySelector('[data-role="enemies"]');
+      const enemyPortalsContainer = section.querySelector('[data-role="enemy-portals"]');
       const droppedResourcesContainer = section.querySelector('[data-role="dropped-resources"]');
       const bloodSealStoneText = section.querySelector('[data-role="blood-seal-stone"]');
       const carriedResourceText = section.querySelector('[data-role="carried-resource"]');
@@ -38542,7 +38563,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           }
           const structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
           const mountedLabel = structure?.mountedStructure ? buildNodeOptions.find(option => option.type === structure.mountedStructure)?.label ?? '' : '';
-          siteButton.dataset.structureLabel = mountedLabel ? `${structureLabel} Lv${structure?.level} + ${mountedLabel}` : structureLabel;
+          siteButton.dataset.structureLabel = structure && mountedLabel ? `${structureLabel} Lv${structure.level} + ${mountedLabel} Lv${structure.mountedLevel ?? 1}` : structureLabel;
           siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
           renderBuildMenu(siteId);
       };
@@ -38602,6 +38623,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           get leaderX() { return leaderX; },
           set leaderX(value) { leaderX = value; },
           enemies,
+          enemyPortals,
           nextEnemyId,
           enemySpawnTimer,
           dayNightPhase,
@@ -38672,6 +38694,17 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               }
           }
       }
+      const renderEnemyPortals = () => {
+          if (!enemyPortalsContainer)
+              return;
+          enemyPortalsContainer.replaceChildren(...enemyPortals.map(portal => {
+              const element = document.createElement('div');
+              element.className = 'vinh-da-game__portal';
+              element.style.transform = `translate3d(${portal.x}px,0,0)`;
+              element.title = portal.side === 'left' ? 'Cổng địch trái' : 'Cổng địch phải';
+              return element;
+          }));
+      };
       const renderEnemies = () => {
           if (!enemiesContainer)
               return;
@@ -38783,7 +38816,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               else {
                   const type = buildNode.dataset.structureType;
                   if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' }) && spend(getBuildLevelCost(type, 1))) {
-                      const upgraded = { ...structure, mountedStructure: type };
+                      const upgraded = { ...structure, mountedStructure: type, mountedLevel: 1 };
                       setStructure(upgraded);
                       renderBuildSite(site.id);
                   }
@@ -38829,6 +38862,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       });
       updateCamera();
       renderDayNightTimer();
+      renderEnemyPortals();
       spawnWaveEnemy('left');
       spawnWaveEnemy('right');
       renderEnemies();
@@ -38918,7 +38952,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       return choices[choices.length - 1]?.kind ?? null;
   };
-  const spawnEnemy = (ctx, side, kind = 'twisted') => {
+  const spawnEnemy = (ctx, side, kind = 'twisted', spawnX) => {
       if (ctx.state.dayNightPhase !== 'night' || ctx.state.enemies.length >= ENEMY_LIMIT)
           return;
       const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
@@ -38928,7 +38962,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       const wil = scaleEnemyTierStat(template.wil, tier);
       ctx.state.enemies.push({
           id: ctx.state.nextEnemyId,
-          x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
+          x: spawnX ?? (side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING),
           kind: template.kind,
           hp,
           maxHp: hp,
@@ -38966,7 +39000,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if (!kind)
           return false;
       const previousNextEnemyId = ctx.state.nextEnemyId;
-      spawnEnemy(ctx, side, kind);
+      const sidePortals = ctx.state.enemyPortals.filter(portal => portal.side === side);
+      const portal = sidePortals.length > 0 ? sidePortals[Math.floor(Math.random() * sidePortals.length)] : null;
+      spawnEnemy(ctx, side, kind, portal?.x);
       if (ctx.state.nextEnemyId === previousNextEnemyId)
           return false;
       ctx.state.waveThreatBudgetRemaining = Math.max(0, ctx.state.waveThreatBudgetRemaining - ENEMY_TEMPLATES[kind].weight);
@@ -39813,7 +39849,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               runtime.cooldown = Math.max(0, runtime.cooldown - dt);
               if (runtime.cooldown > 0)
                   continue;
-              const stat = getStructureLevelStat(type, structure.type === type ? structure.level : 1, structure.branchLv3, structure.branchLv5, structure.element);
+              const stat = getStructureLevelStat(type, structure.type === type ? structure.level : structure.mountedLevel ?? 1, structure.branchLv3, structure.branchLv5, structure.element);
               const targets = ctx.state.enemies
                   .filter(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0))
                   .slice(0, stat.maxTargets ?? 1);

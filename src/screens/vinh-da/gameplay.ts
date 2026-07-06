@@ -7,7 +7,10 @@ import {
   BUILD_RANGE,
   BUILD_SITE_RENDER_BUFFER,
   BUILD_SITE_RENDER_THRESHOLD,
+  BUILD_SITE_EDGE_PADDING,
   CASTLE_LEFT,
+  CASTLE_OUTER_LEFT,
+  CASTLE_OUTER_RIGHT,
   CASTLE_TOWER_OFFSET,
   CASTLE_TOWER_WIDTH,
   CASTLE_WIDTH,
@@ -46,13 +49,28 @@ import {
   collectDroppedResources as runtimeCollectDroppedResources,
 } from './simulation.ts';
 import type { DayNightPhase, VinhDaSimulationContext, VinhDaSimulationState } from './simulation.ts';
-import type { BuildSite, DroppedResource, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
+import type { BuildSite, DroppedResource, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
 interface RenderContext {
   root: HTMLElement;
   shell?: MainMenuShell | null;
   params?: Record<string, unknown> | null;
 }
+
+const randomInRange = (min: number, max: number): number => min + Math.random() * Math.max(0, max - min);
+
+const createEnemyPortals = (): EnemyPortal[] => {
+  const portals: EnemyPortal[] = [];
+  const createSidePortals = (side: Side, minX: number, maxX: number): void => {
+    const count = 1 + Math.floor(Math.random() * 2);
+    for (let index = 0; index < count; index += 1){
+      portals.push({ id: `${side}-portal-${index + 1}`, side, x: randomInRange(minX, maxX) });
+    }
+  };
+  createSidePortals('left', BUILD_SITE_EDGE_PADDING, CASTLE_OUTER_LEFT - BUILD_SITE_EDGE_PADDING);
+  createSidePortals('right', CASTLE_OUTER_RIGHT + BUILD_SITE_EDGE_PADDING, WORLD_WIDTH - BUILD_SITE_EDGE_PADDING);
+  return portals;
+};
 
 const CSS = /* css */ `
   .app--vinh-da-gameplay{min-height:100dvh;background:#020204;color:#f7f2ff;overflow:hidden;touch-action:none;}
@@ -70,6 +88,8 @@ const CSS = /* css */ `
   .vinh-da-game__crystal::after{content:"";position:absolute;inset:8px 20px;background:rgba(255,255,255,.72);filter:blur(2px);}
   .vinh-da-game__leader{position:absolute;bottom:${GROUND_PERCENT};width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
   .vinh-da-game__drop{position:absolute;bottom:calc(${GROUND_PERCENT} + 10px);width:18px;height:18px;margin-left:-9px;border-radius:999px;background:radial-gradient(circle,#f5f7ff,#6dc8ff 48%,#352073);box-shadow:0 0 14px rgba(109,200,255,.75);z-index:2;}
+  .vinh-da-game__portal{position:absolute;bottom:${GROUND_PERCENT};width:54px;height:86px;margin-left:-27px;border-radius:999px 999px 12px 12px;background:radial-gradient(ellipse at 50% 50%,rgba(222,142,255,.92),rgba(92,41,168,.72) 42%,rgba(18,8,34,.9) 68%,transparent 70%);box-shadow:0 0 28px rgba(190,94,255,.72);z-index:1;pointer-events:none;}
+  .vinh-da-game__portal::after{content:"";position:absolute;inset:13px 18px;border-radius:999px;background:rgba(8,4,18,.82);box-shadow:inset 0 0 18px rgba(238,211,255,.36);}
   .vinh-da-game__enemy{position:absolute;bottom:${GROUND_PERCENT};width:38px;height:52px;margin-left:-19px;border-radius:18px 18px 8px 8px;background:linear-gradient(180deg,#d14b5f,#381018);box-shadow:0 0 18px rgba(209,75,95,.34);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
   .vinh-da-game__rock{position:absolute;bottom:${GROUND_PERCENT};width:96px;height:58px;margin-left:-48px;border:0;border-radius:46% 54% 38% 42%;background:linear-gradient(150deg,#7e7b8e,#383746 58%,#1f1f2a);box-shadow:inset -12px -10px 18px rgba(0,0,0,.32),0 8px 22px rgba(0,0,0,.35);cursor:pointer;z-index:2;}
   .vinh-da-game__rock::after{content:"";position:absolute;left:18px;top:12px;width:42px;height:10px;border-radius:999px;background:rgba(255,255,255,.18);transform:rotate(-12deg);}
@@ -133,6 +153,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const structureRuntimes = new Map<string, StructureRuntime>();
   const structureSitesByType = new Map<StructureType, Set<string>>();
   const enemies: Enemy[] = [];
+  const enemyPortals = createEnemyPortals();
   const droppedResources: DroppedResource[] = [];
   const enemyElements = new Map<number, HTMLElement>();
   const droppedResourceElements = new Map<number, HTMLElement>();
@@ -165,6 +186,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
         <div class="vinh-da-game__ground" aria-hidden="true"></div>
         <div data-role="build-sites"></div>
+        <div data-role="enemy-portals"></div>
         <div data-role="dropped-resources"></div>
         <div data-role="enemies"></div>
         <div class="vinh-da-game__leader" data-role="leader" title="${leader?.name ?? leaderId ?? 'Leader'}"></div>
@@ -176,6 +198,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const viewport = section.querySelector<HTMLElement>('[data-role="viewport"]');
   const buildSitesContainer = section.querySelector<HTMLElement>('[data-role="build-sites"]');
   const enemiesContainer = section.querySelector<HTMLElement>('[data-role="enemies"]');
+  const enemyPortalsContainer = section.querySelector<HTMLElement>('[data-role="enemy-portals"]');
   const droppedResourcesContainer = section.querySelector<HTMLElement>('[data-role="dropped-resources"]');
   const bloodSealStoneText = section.querySelector<HTMLElement>('[data-role="blood-seal-stone"]');
   const carriedResourceText = section.querySelector<HTMLElement>('[data-role="carried-resource"]');
@@ -376,7 +399,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     }
     const structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
     const mountedLabel = structure?.mountedStructure ? buildNodeOptions.find(option => option.type === structure.mountedStructure)?.label ?? '' : '';
-    siteButton.dataset.structureLabel = mountedLabel ? `${structureLabel} Lv${structure?.level} + ${mountedLabel}` : structureLabel;
+    siteButton.dataset.structureLabel = structure && mountedLabel ? `${structureLabel} Lv${structure.level} + ${mountedLabel} Lv${structure.mountedLevel ?? 1}` : structureLabel;
     siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
     renderBuildMenu(siteId);
   };
@@ -432,6 +455,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     get leaderX(){ return leaderX; },
     set leaderX(value: number){ leaderX = value; },
     enemies,
+    enemyPortals,
     nextEnemyId,
     enemySpawnTimer,
     dayNightPhase,
@@ -502,6 +526,17 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       }
     }
   }
+
+  const renderEnemyPortals = (): void => {
+    if (!enemyPortalsContainer) return;
+    enemyPortalsContainer.replaceChildren(...enemyPortals.map(portal => {
+      const element = document.createElement('div');
+      element.className = 'vinh-da-game__portal';
+      element.style.transform = `translate3d(${portal.x}px,0,0)`;
+      element.title = portal.side === 'left' ? 'Cổng địch trái' : 'Cổng địch phải';
+      return element;
+    }));
+  };
 
   const renderEnemies = (): void => {
     if (!enemiesContainer) return;
@@ -605,7 +640,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       } else {
         const type = buildNode.dataset.structureType as StructureType | undefined;
         if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' }) && spend(getBuildLevelCost(type, 1))){
-          const upgraded = { ...structure, mountedStructure: type };
+          const upgraded = { ...structure, mountedStructure: type, mountedLevel: 1 };
           setStructure(upgraded);
           renderBuildSite(site.id);
         } else if (site && type && !structure && isStructureAllowedOnBuildSite(type, site) && spend(getBuildLevelCost(type, 1))){
@@ -647,6 +682,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   });
   updateCamera();
   renderDayNightTimer();
+  renderEnemyPortals();
   spawnWaveEnemy('left');
   spawnWaveEnemy('right');
   renderEnemies();

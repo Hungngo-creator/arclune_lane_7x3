@@ -28,7 +28,7 @@ import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, reduceDamageByDefense, scaleEn
 import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
 import { BASE_STRUCTURE_STATS, getStructureLevelStat } from './structures.ts';
 import type { ElementalTowerElement, StructureType } from './structures.ts';
-import type { BuildSite, DroppedResource, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
+import type { BuildSite, DroppedResource, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
 export const DAY_DURATION_SECONDS = 300;
 export const RESOURCE_PICKUP_RANGE = 54;
@@ -85,6 +85,7 @@ export interface VinhDaSimulationState {
   baseStatuses?: import('./types.ts').VinhDaStatusCollection;
   leaderX: number;
   enemies: Enemy[];
+  enemyPortals: EnemyPortal[];
   nextEnemyId: number;
   enemySpawnTimer: number;
   dayNightPhase: DayNightPhase;
@@ -111,7 +112,7 @@ export interface VinhDaSimulationContext {
   removeEnemyElement(enemyId: number): void;
 }
 
-export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: EnemyKind = 'twisted'): void => {
+export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: EnemyKind = 'twisted', spawnX?: number): void => {
     if (ctx.state.dayNightPhase !== 'night' || ctx.state.enemies.length >= ENEMY_LIMIT) return;
     const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
   const tier = ctx.state.mapTier ?? template.tier;
@@ -120,7 +121,7 @@ export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: Enemy
     const wil = scaleEnemyTierStat(template.wil, tier);
     ctx.state.enemies.push({
       id: ctx.state.nextEnemyId,
-      x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
+      x: spawnX ?? (side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING),
       kind: template.kind,
       hp,
       maxHp: hp,
@@ -158,7 +159,9 @@ export const spawnWaveEnemy = (ctx: VinhDaSimulationContext, side: Side): boolea
   const kind = chooseEnemyKindForBudget(config, ctx.state.waveThreatBudgetRemaining);
   if (!kind) return false;
   const previousNextEnemyId = ctx.state.nextEnemyId;
-  spawnEnemy(ctx, side, kind);
+  const sidePortals = ctx.state.enemyPortals.filter(portal => portal.side === side);
+  const portal = sidePortals.length > 0 ? sidePortals[Math.floor(Math.random() * sidePortals.length)] : null;
+  spawnEnemy(ctx, side, kind, portal?.x);
   if (ctx.state.nextEnemyId === previousNextEnemyId) return false;
   ctx.state.waveThreatBudgetRemaining = Math.max(0, ctx.state.waveThreatBudgetRemaining - ENEMY_TEMPLATES[kind].weight);
   return true;
@@ -910,7 +913,7 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
         const runtime = ctx.ensureStructureRuntime(structure);
         runtime.cooldown = Math.max(0, runtime.cooldown - dt);
         if (runtime.cooldown > 0) continue;
-        const stat = getStructureLevelStat(type, structure.type === type ? structure.level : 1, structure.branchLv3, structure.branchLv5, structure.element);
+        const stat = getStructureLevelStat(type, structure.type === type ? structure.level : structure.mountedLevel ?? 1, structure.branchLv3, structure.branchLv5, structure.element);
         const targets = ctx.state.enemies
           .filter(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0))
           .slice(0, stat.maxTargets ?? 1);
