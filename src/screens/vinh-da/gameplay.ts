@@ -236,6 +236,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let bloodSealStone = 0;
   let carriedDaThach = 0;
   let baseHp = 20;
+  let leaderHp = 20;
+  let leaderMaxHp = 20;
+  let leaderShield = 0;
+  let leaderShieldNightIndex: number | undefined;
+  let leaderEmergencyCooldownUntilNight = 0;
   const keys = new Set<string>();
   const structures = new Map<string, PlacedStructure>();
   const structureRuntimes = new Map<string, StructureRuntime>();
@@ -574,6 +579,16 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     nextDroppedResourceId,
     get baseHp(){ return baseHp; },
     set baseHp(value: number){ baseHp = value; },
+    get leaderHp(){ return leaderHp; },
+    set leaderHp(value: number){ leaderHp = value; },
+    get leaderMaxHp(){ return leaderMaxHp; },
+    set leaderMaxHp(value: number){ leaderMaxHp = value; },
+    get leaderShield(){ return leaderShield; },
+    set leaderShield(value: number){ leaderShield = value; },
+    get leaderShieldNightIndex(){ return leaderShieldNightIndex; },
+    set leaderShieldNightIndex(value: number | undefined){ leaderShieldNightIndex = value; },
+    get leaderEmergencyCooldownUntilNight(){ return leaderEmergencyCooldownUntilNight; },
+    set leaderEmergencyCooldownUntilNight(value: number | undefined){ leaderEmergencyCooldownUntilNight = value ?? 0; },
     get leaderX(){ return leaderX; },
     set leaderX(value: number){ leaderX = value; },
     enemies,
@@ -613,6 +628,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     nightIndex = simulationState.nightIndex;
     waveThreatBudgetRemaining = simulationState.waveThreatBudgetRemaining;
     nextDroppedResourceId = simulationState.nextDroppedResourceId;
+    leaderHp = simulationState.leaderHp ?? leaderHp;
+    leaderMaxHp = simulationState.leaderMaxHp ?? leaderMaxHp;
+    leaderShield = simulationState.leaderShield ?? leaderShield;
+    leaderShieldNightIndex = simulationState.leaderShieldNightIndex;
+    leaderEmergencyCooldownUntilNight = simulationState.leaderEmergencyCooldownUntilNight ?? leaderEmergencyCooldownUntilNight;
   };
   const spawnWaveEnemy = (side: Side): void => { runtimeSpawnWaveEnemy(simulationContext, side); syncSimulationState(); };
   const removeEnemyAt = (index: number, reward: boolean): void => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };

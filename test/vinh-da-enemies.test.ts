@@ -1,10 +1,57 @@
 import { CRYSTAL_X } from '../src/screens/vinh-da/constants.ts';
 import { ENEMY_TEMPLATES } from '../src/screens/vinh-da/enemies.ts';
-import { BUILD_SITES } from '../src/screens/vinh-da/structures.ts';
+import { BASE_STRUCTURE_STATS, BUILD_SITES, getBaseLevelStat } from '../src/screens/vinh-da/structures.ts';
 import type { StructureType } from '../src/screens/vinh-da/structures.ts';
-import { getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory } from '../src/screens/vinh-da/simulation.ts';
+import { getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory, updateStructures } from '../src/screens/vinh-da/simulation.ts';
 import type { VinhDaSimulationContext, VinhDaSimulationState } from '../src/screens/vinh-da/simulation.ts';
 import type { BuildSite, PlacedStructure, StructureRuntime } from '../src/screens/vinh-da/types.ts';
+
+const buildSitesById = new Map<string, BuildSite>(BUILD_SITES.map(site => [site.id, site]));
+
+const createContext = (structures: PlacedStructure[], runtimes: Map<string, StructureRuntime>): VinhDaSimulationContext => {
+  const structuresById = new Map<string, PlacedStructure>(structures.map(structure => [structure.siteId, structure]));
+  const structureSitesByType = new Map<StructureType, Set<string>>();
+  for (const structure of structures){
+    let siteIds = structureSitesByType.get(structure.type);
+    if (!siteIds){
+      siteIds = new Set<string>();
+      structureSitesByType.set(structure.type, siteIds);
+    }
+    siteIds.add(structure.siteId);
+  }
+  const state: VinhDaSimulationState = {
+    bloodSealStone: 0,
+    carriedDaThach: 0,
+    droppedResources: [],
+    nextDroppedResourceId: 1,
+    baseHp: 10,
+    leaderX: CRYSTAL_X,
+    enemies: [],
+    enemyPortals: [],
+    nextEnemyId: 1,
+    enemySpawnTimer: 0,
+    dayNightPhase: 'day',
+    phaseRemainingSeconds: 0,
+    leaderAttackCooldown: 0,
+    structures: structuresById,
+    nightIndex: 1,
+    waveThreatBudgetRemaining: 0,
+  };
+  return {
+    state,
+    structureSitesByType,
+    getBuildSite: siteId => siteId ? buildSitesById.get(siteId) ?? null : null,
+    ensureStructureRuntime: structure => runtimes.get(structure.siteId) ?? { cooldown: 0, hp: 0 },
+    getStructureMaxHp: () => 10,
+    deleteStructure: siteId => structuresById.delete(siteId),
+    structureSiteIdsOfType: type => structureSitesByType.get(type) ?? [],
+    renderEconomy: jest.fn(),
+    renderDroppedResources: jest.fn(),
+    renderBuildSite: jest.fn(),
+    renderDayNightTimer: jest.fn(),
+    removeEnemyElement: jest.fn(),
+  };
+};
 
 describe('Vĩnh Dạ enemy Khai Nguyên 1 templates', () => {
   it('keeps core enemy stats aligned with the defense mode spec', () => {
@@ -47,51 +94,6 @@ describe('Vĩnh Dạ wave table', () => {
 });
 
 describe('Vĩnh Dạ living territory wall bounds', () => {
-  const buildSitesById = new Map<string, BuildSite>(BUILD_SITES.map(site => [site.id, site]));
-
-  const createContext = (structures: PlacedStructure[], runtimes: Map<string, StructureRuntime>): VinhDaSimulationContext => {
-    const structuresById = new Map<string, PlacedStructure>(structures.map(structure => [structure.siteId, structure]));
-    const structureSitesByType = new Map<StructureType, Set<string>>();
-    for (const structure of structures){
-      let siteIds = structureSitesByType.get(structure.type);
-      if (!siteIds){
-        siteIds = new Set<string>();
-        structureSitesByType.set(structure.type, siteIds);
-      }
-      siteIds.add(structure.siteId);
-    }
-    const state: VinhDaSimulationState = {
-      bloodSealStone: 0,
-      carriedDaThach: 0,
-      droppedResources: [],
-      nextDroppedResourceId: 1,
-      baseHp: 10,
-      leaderX: CRYSTAL_X,
-      enemies: [],
-      nextEnemyId: 1,
-      enemySpawnTimer: 0,
-      dayNightPhase: 'day',
-      phaseRemainingSeconds: 0,
-      leaderAttackCooldown: 0,
-      structures: structuresById,
-      nightIndex: 1,
-      waveThreatBudgetRemaining: 0,
-    };
-    return {
-      state,
-      structureSitesByType,
-      getBuildSite: siteId => siteId ? buildSitesById.get(siteId) ?? null : null,
-      ensureStructureRuntime: structure => runtimes.get(structure.siteId) ?? { cooldown: 0, hp: 0 },
-      getStructureMaxHp: () => 10,
-      deleteStructure: siteId => structuresById.delete(siteId),
-      structureSiteIdsOfType: type => structureSitesByType.get(type) ?? [],
-      renderEconomy: jest.fn(),
-      renderDroppedResources: jest.fn(),
-      renderBuildSite: jest.fn(),
-      renderDayNightTimer: jest.fn(),
-      removeEnemyElement: jest.fn(),
-    };
-  };
 
   test('co lãnh địa theo hai tường ngoài cùng còn sống', () => {
     const runtimes = new Map<string, StructureRuntime>([
@@ -110,5 +112,45 @@ describe('Vĩnh Dạ living territory wall bounds', () => {
     runtimes.get('wall-left')!.hp = 0;
     expect(getLivingTerritoryWallBounds(ctx)).toBeNull();
     expect(isXInLivingTerritory(ctx, CRYSTAL_X)).toBe(false);
+  });
+});
+
+describe('Vĩnh Dạ base branch and leader safeguards', () => {
+  it('keeps lv3-lv6 base stats cumulative with lv6 overrides', () => {
+    expect(BASE_STRUCTURE_STATS[3]).toMatchObject({ hp: 55, arm: 7, res: 7, healPerSecond: 4 });
+    expect(BASE_STRUCTURE_STATS[4]).toMatchObject({ hp: 65, arm: 9, res: 9, healPerSecond: 5 });
+    expect(BASE_STRUCTURE_STATS[5]).toMatchObject({ hp: 80, arm: 11, res: 11, healPerSecond: 5, leaderShieldPercent: 0.2 });
+    expect(BASE_STRUCTURE_STATS[6]).toMatchObject({ hp: 80, arm: 11, res: 11, healPerSecond: 3, emergencyHealPercent: 0.2, emergencyBaseSelfDamagePercent: 0.1, emergencyCooldownNights: 2 });
+    expect(getBaseLevelStat(3, 'attack')).toMatchObject({ hp: 50, arm: 6, res: 6, healPerSecond: 3, buffAtkPercent: 0.05, buffWilPercent: 0.05 });
+  });
+
+  it('applies lv5 leader shield once per night and lv6 emergency heal on night cooldown', () => {
+    const ctx = createContext([], new Map());
+    Object.assign(ctx.state, {
+      baseHp: 80,
+      baseLevel: 6,
+      leaderHp: 8,
+      leaderMaxHp: 100,
+      dayNightPhase: 'night',
+      nightIndex: 3,
+    });
+
+    updateStructures(ctx, 0);
+    expect(ctx.state.leaderShield).toBe(20);
+    expect(ctx.state.leaderHp).toBe(28);
+    expect(ctx.state.baseHp).toBe(72);
+    expect(ctx.state.leaderEmergencyCooldownUntilNight).toBe(5);
+
+    ctx.state.leaderShield = 0;
+    ctx.state.leaderHp = 10;
+    updateStructures(ctx, 0);
+    expect(ctx.state.leaderShield).toBe(0);
+    expect(ctx.state.leaderHp).toBe(10);
+
+    ctx.state.nightIndex = 5;
+    updateStructures(ctx, 0);
+    expect(ctx.state.leaderShield).toBe(20);
+    expect(ctx.state.leaderHp).toBe(30);
+    expect(ctx.state.baseHp).toBe(64);
   });
 });

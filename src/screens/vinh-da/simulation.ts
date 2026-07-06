@@ -26,8 +26,8 @@ import {
 } from './constants.ts';
 import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, reduceDamageByDefense, scaleEnemyTierStat } from './enemies.ts';
 import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
-import { BASE_STRUCTURE_STATS, getStructureLevelStat } from './structures.ts';
-import type { ElementalTowerElement, StructureType } from './structures.ts';
+import { BASE_STRUCTURE_STATS, getBaseLevelStat, getStructureLevelStat } from './structures.ts';
+import type { BaseBranchLv3, ElementalTowerElement, StructureType } from './structures.ts';
 import type { BuildSite, DroppedResource, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
 export const DAY_DURATION_SECONDS = 300;
@@ -85,8 +85,14 @@ export interface VinhDaSimulationState {
   nextDroppedResourceId: number;
   baseHp: number;
   baseLevel?: number;
+  baseBranchLv3?: BaseBranchLv3;
   contamination?: number;
   baseStatuses?: import('./types.ts').VinhDaStatusCollection;
+  leaderHp?: number;
+  leaderMaxHp?: number;
+  leaderShield?: number;
+  leaderShieldNightIndex?: number;
+  leaderEmergencyCooldownUntilNight?: number;
   leaderX: number;
   enemies: Enemy[];
   enemyPortals: EnemyPortal[];
@@ -291,7 +297,40 @@ export const damageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, amount: 
 
 const BLOOD_MAX_HP_STACK_CAP = 17;
 const ELEMENTAL_ALLY_BUFF_SECONDS = 3;
-const getBaseStat = (ctx: VinhDaSimulationContext) => BASE_STRUCTURE_STATS[ctx.state.baseLevel ?? 0] ?? BASE_STRUCTURE_STATS[0]!;
+const getBaseStat = (ctx: VinhDaSimulationContext) => {
+  const level = ctx.state.baseLevel ?? 0;
+  return ctx.state.baseBranchLv3 ? getBaseLevelStat(level, ctx.state.baseBranchLv3) : (BASE_STRUCTURE_STATS[level] ?? BASE_STRUCTURE_STATS[0]!);
+};
+const getLeaderMaxHp = (ctx: VinhDaSimulationContext): number => {
+  const maxHp = ctx.state.leaderMaxHp ?? getBaseStat(ctx).hp;
+  ctx.state.leaderMaxHp = maxHp;
+  return maxHp;
+};
+const getLeaderHp = (ctx: VinhDaSimulationContext): number => {
+  const hp = ctx.state.leaderHp ?? getLeaderMaxHp(ctx);
+  ctx.state.leaderHp = Math.min(getLeaderMaxHp(ctx), hp);
+  return ctx.state.leaderHp;
+};
+const healLeader = (ctx: VinhDaSimulationContext, amount: number): void => {
+  ctx.state.leaderHp = Math.min(getLeaderMaxHp(ctx), getLeaderHp(ctx) + Math.max(0, amount));
+};
+const damageLeader = (ctx: VinhDaSimulationContext, amount: number): boolean => {
+  let remaining = Math.max(0, amount);
+  const shield = ctx.state.leaderShield ?? 0;
+  if (shield > 0){
+    const absorbed = Math.min(shield, remaining);
+    ctx.state.leaderShield = shield - absorbed;
+    remaining -= absorbed;
+  }
+  if (remaining > 0) ctx.state.leaderHp = Math.max(0, getLeaderHp(ctx) - remaining);
+  return getLeaderHp(ctx) <= 0;
+};
+const applyLeaderNightShield = (ctx: VinhDaSimulationContext): void => {
+  const stat = getBaseStat(ctx);
+  if ((stat.leaderShieldPercent ?? 0) <= 0 || ctx.state.leaderShieldNightIndex === ctx.state.nightIndex) return;
+  ctx.state.leaderShield = Math.max(ctx.state.leaderShield ?? 0, getLeaderMaxHp(ctx) * (stat.leaderShieldPercent ?? 0));
+  ctx.state.leaderShieldNightIndex = ctx.state.nightIndex;
+};
 export interface TerritoryWallBounds {
   leftX: number;
   rightX: number;
@@ -559,7 +598,7 @@ export const updateFlyingEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, te
     }
     enemy.birdAccelerating = distance <= template.attackRange;
     if (distance <= template.attackRange && enemy.birdAccelerating){
-      damageBase(ctx, distance <= 6 * 100 ? 1.2 : distance <= 9 * 100 ? 2 : 2.5);
+      damageLeader(ctx, distance <= 6 * 100 ? 1.2 : distance <= 9 * 100 ? 2 : 2.5);
       removeEnemyAt(ctx, index, false);
       return;
     }
@@ -814,6 +853,7 @@ export const updateDayNightTimer = (ctx: VinhDaSimulationContext, dt: number): v
         ctx.state.nightIndex += 1;
         const waveConfig = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier);
         ctx.state.waveThreatBudgetRemaining = getScaledThreatBudget(waveConfig.threatBudget, ctx.state.nightIndex);
+        applyLeaderNightShield(ctx);
       }
     }
     ctx.renderDayNightTimer();
@@ -931,6 +971,12 @@ const updateGravityCannon = (ctx: VinhDaSimulationContext, structure: PlacedStru
 
 const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
   const stat = getBaseStat(ctx);
+  if (ctx.state.dayNightPhase === 'night') applyLeaderNightShield(ctx);
+  if ((stat.emergencyHealPercent ?? 0) > 0 && getLeaderHp(ctx) > 0 && getLeaderHp(ctx) <= getLeaderMaxHp(ctx) * 0.12 && (ctx.state.leaderEmergencyCooldownUntilNight ?? 0) <= ctx.state.nightIndex){
+    healLeader(ctx, getLeaderMaxHp(ctx) * (stat.emergencyHealPercent ?? 0));
+    ctx.state.baseHp = Math.max(0, ctx.state.baseHp - stat.hp * (stat.emergencyBaseSelfDamagePercent ?? 0));
+    ctx.state.leaderEmergencyCooldownUntilNight = ctx.state.nightIndex + (stat.emergencyCooldownNights ?? 2);
+  }
   const territoryBounds = getLivingTerritoryWallBounds(ctx);
   if (!isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds)) return;
   if ((stat.healPerSecond ?? 0) > 0) healBase(ctx, (stat.healPerSecond ?? 0) * dt);
@@ -939,7 +985,7 @@ const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
     if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds)) continue;
     const runtime = ctx.ensureStructureRuntime(structure);
     if ((runtime.emergencyHealCooldown ?? 0) > 0) continue;
-    if ((stat.emergencyHealPercent ?? 0) > 0 && ctx.state.baseHp > 0 && ctx.state.baseHp <= stat.hp * 0.2){
+    if ((stat.emergencyCooldownSeconds ?? 0) > 0 && (stat.emergencyHealPercent ?? 0) > 0 && ctx.state.baseHp > 0 && ctx.state.baseHp <= stat.hp * 0.2){
       healBase(ctx, stat.hp * (stat.emergencyHealPercent ?? 0));
       runtime.emergencyHealCooldown = stat.emergencyCooldownSeconds ?? 60;
       break;
@@ -1050,4 +1096,3 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
       if (runtime.fuse <= 0) explodeLandmine(ctx, site);
     }
   };
-  

@@ -20,6 +20,7 @@ export interface BuildMenuOption {
 
 export type WallBranchLv3 = 'spike' | 'slippery' | 'shock';
 export type WallBranchLv5 = 'biochemical' | 'curse' | 'link';
+export type BaseBranchLv3 = 'defense' | 'attack';
 
 export interface StructureLevelStat {
   hp: number;
@@ -31,6 +32,9 @@ export interface StructureLevelStat {
   shield?: number;
   emergencyHealPercent?: number;
   emergencyCooldownSeconds?: number;
+  emergencyCooldownNights?: number;
+  emergencyBaseSelfDamagePercent?: number;
+  leaderShieldPercent?: number;
   buffArmPercent?: number;
   buffResPercent?: number;
   buffAtkPercent?: number;
@@ -344,14 +348,70 @@ export const getWallLevelStat = (level: number, branchLv3?: WallBranchLv3, branc
   };
 };
 
-export const BASE_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
+export const BASE_LEVELS = {
   0: { hp: 20, arm: 2, res: 2, healPerSecond: 0 },
   1: { hp: 30, arm: 3, res: 3, healPerSecond: 1 },
   2: { hp: 40, arm: 4, res: 4, healPerSecond: 2 },
-  3: { hp: 55, arm: 7, res: 7, healPerSecond: 4 },
-  4: { hp: 65, arm: 9, res: 9, healPerSecond: 5 },
-  5: { hp: 80, arm: 11, res: 11, healPerSecond: 5, shield: 0.2 },
-  6: { hp: 80, arm: 11, res: 11, healPerSecond: 3, emergencyHealPercent: 0.2, emergencyCooldownSeconds: 600 }
+  3: {
+    defense: { hpBonus: 15, armBonus: 3, resBonus: 3, healPerSecondBonus: 2 },
+    attack: { hpBonus: 10, armBonus: 2, resBonus: 2, healPerSecondBonus: 1, buffAtkPercent: 0.05, buffWilPercent: 0.05 }
+  },
+  4: { hpBonus: 10, armBonus: 2, resBonus: 2, healPerSecondBonus: 1 },
+  5: { hpBonus: 15, armBonus: 2, resBonus: 2, leaderShieldPercent: 0.2 },
+  6: { healPerSecondOverride: 3, emergencyHealPercent: 0.2, emergencyBaseSelfDamagePercent: 0.1, emergencyCooldownNights: 2 }
+} as const;
+
+export const getBaseLevelStat = (level: number, branchLv3: BaseBranchLv3 = 'defense'): StructureLevelStat => {
+  if (level <= 0) return BASE_LEVELS[0];
+  if (level === 1) return BASE_LEVELS[1];
+  if (level === 2) return BASE_LEVELS[2];
+
+  const lv3Config = BASE_LEVELS[3][branchLv3];
+  const lv3: StructureLevelStat = {
+    ...BASE_LEVELS[2],
+    ...('buffAtkPercent' in lv3Config ? { buffAtkPercent: lv3Config.buffAtkPercent, buffWilPercent: lv3Config.buffWilPercent } : {}),
+    hp: BASE_LEVELS[2].hp + lv3Config.hpBonus,
+    arm: BASE_LEVELS[2].arm + lv3Config.armBonus,
+    res: BASE_LEVELS[2].res + lv3Config.resBonus,
+    healPerSecond: BASE_LEVELS[2].healPerSecond + lv3Config.healPerSecondBonus
+  };
+  if (level === 3) return lv3;
+
+  const lv4: StructureLevelStat = {
+    ...lv3,
+    hp: lv3.hp + BASE_LEVELS[4].hpBonus,
+    arm: (lv3.arm ?? 0) + BASE_LEVELS[4].armBonus,
+    res: (lv3.res ?? 0) + BASE_LEVELS[4].resBonus,
+    healPerSecond: (lv3.healPerSecond ?? 0) + BASE_LEVELS[4].healPerSecondBonus
+  };
+  if (level === 4) return lv4;
+
+  const lv5: StructureLevelStat = {
+    ...lv4,
+    hp: lv4.hp + BASE_LEVELS[5].hpBonus,
+    arm: (lv4.arm ?? 0) + BASE_LEVELS[5].armBonus,
+    res: (lv4.res ?? 0) + BASE_LEVELS[5].resBonus,
+    leaderShieldPercent: BASE_LEVELS[5].leaderShieldPercent
+  };
+  if (level === 5) return lv5;
+
+  return {
+    ...lv5,
+    healPerSecond: BASE_LEVELS[6].healPerSecondOverride,
+    emergencyHealPercent: BASE_LEVELS[6].emergencyHealPercent,
+    emergencyBaseSelfDamagePercent: BASE_LEVELS[6].emergencyBaseSelfDamagePercent,
+    emergencyCooldownNights: BASE_LEVELS[6].emergencyCooldownNights
+  };
+};
+
+export const BASE_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
+  0: getBaseLevelStat(0),
+  1: getBaseLevelStat(1),
+  2: getBaseLevelStat(2),
+  3: getBaseLevelStat(3),
+  4: getBaseLevelStat(4),
+  5: getBaseLevelStat(5),
+  6: getBaseLevelStat(6)
 };
 
 export const getElementalTowerLevelStat = (level: number, element: ElementalTowerElement = 'Hỏa'): StructureLevelStat => ELEMENTAL_TOWER_STRUCTURE_STATS[element][level] ?? ELEMENTAL_TOWER_STRUCTURE_STATS[element][1] ?? { hp: 1 };

@@ -38429,6 +38429,11 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let bloodSealStone = 0;
       let carriedDaThach = 0;
       let baseHp = 20;
+      let leaderHp = 20;
+      let leaderMaxHp = 20;
+      let leaderShield = 0;
+      let leaderShieldNightIndex;
+      let leaderEmergencyCooldownUntilNight = 0;
       const keys = new Set();
       const structures = new Map();
       const structureRuntimes = new Map();
@@ -38785,6 +38790,16 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           nextDroppedResourceId,
           get baseHp() { return baseHp; },
           set baseHp(value) { baseHp = value; },
+          get leaderHp() { return leaderHp; },
+          set leaderHp(value) { leaderHp = value; },
+          get leaderMaxHp() { return leaderMaxHp; },
+          set leaderMaxHp(value) { leaderMaxHp = value; },
+          get leaderShield() { return leaderShield; },
+          set leaderShield(value) { leaderShield = value; },
+          get leaderShieldNightIndex() { return leaderShieldNightIndex; },
+          set leaderShieldNightIndex(value) { leaderShieldNightIndex = value; },
+          get leaderEmergencyCooldownUntilNight() { return leaderEmergencyCooldownUntilNight; },
+          set leaderEmergencyCooldownUntilNight(value) { leaderEmergencyCooldownUntilNight = value ?? 0; },
           get leaderX() { return leaderX; },
           set leaderX(value) { leaderX = value; },
           enemies,
@@ -38824,6 +38839,11 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           nightIndex = simulationState.nightIndex;
           waveThreatBudgetRemaining = simulationState.waveThreatBudgetRemaining;
           nextDroppedResourceId = simulationState.nextDroppedResourceId;
+          leaderHp = simulationState.leaderHp ?? leaderHp;
+          leaderMaxHp = simulationState.leaderMaxHp ?? leaderMaxHp;
+          leaderShield = simulationState.leaderShield ?? leaderShield;
+          leaderShieldNightIndex = simulationState.leaderShieldNightIndex;
+          leaderEmergencyCooldownUntilNight = simulationState.leaderEmergencyCooldownUntilNight ?? leaderEmergencyCooldownUntilNight;
       };
       const spawnWaveEnemy = (side) => { runtimeSpawnWaveEnemy(simulationContext, side); syncSimulationState(); };
       const removeEnemyAt = (index, reward) => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };
@@ -39092,6 +39112,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const scaleEnemyTierStat = __dep1.scaleEnemyTierStat;
   const __dep2 = __require('./screens/vinh-da/structures.ts');
   const BASE_STRUCTURE_STATS = __dep2.BASE_STRUCTURE_STATS;
+  const getBaseLevelStat = __dep2.getBaseLevelStat;
   const getStructureLevelStat = __dep2.getStructureLevelStat;
   const DAY_DURATION_SECONDS = 300;
   const RESOURCE_PICKUP_RANGE = 54;
@@ -39322,7 +39343,42 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const BLOOD_MAX_HP_STACK_CAP = 17;
   const ELEMENTAL_ALLY_BUFF_SECONDS = 3;
-  const getBaseStat = (ctx) => BASE_STRUCTURE_STATS[ctx.state.baseLevel ?? 0] ?? BASE_STRUCTURE_STATS[0];
+  const getBaseStat = (ctx) => {
+      const level = ctx.state.baseLevel ?? 0;
+      return ctx.state.baseBranchLv3 ? getBaseLevelStat(level, ctx.state.baseBranchLv3) : (BASE_STRUCTURE_STATS[level] ?? BASE_STRUCTURE_STATS[0]);
+  };
+  const getLeaderMaxHp = (ctx) => {
+      const maxHp = ctx.state.leaderMaxHp ?? getBaseStat(ctx).hp;
+      ctx.state.leaderMaxHp = maxHp;
+      return maxHp;
+  };
+  const getLeaderHp = (ctx) => {
+      const hp = ctx.state.leaderHp ?? getLeaderMaxHp(ctx);
+      ctx.state.leaderHp = Math.min(getLeaderMaxHp(ctx), hp);
+      return ctx.state.leaderHp;
+  };
+  const healLeader = (ctx, amount) => {
+      ctx.state.leaderHp = Math.min(getLeaderMaxHp(ctx), getLeaderHp(ctx) + Math.max(0, amount));
+  };
+  const damageLeader = (ctx, amount) => {
+      let remaining = Math.max(0, amount);
+      const shield = ctx.state.leaderShield ?? 0;
+      if (shield > 0) {
+          const absorbed = Math.min(shield, remaining);
+          ctx.state.leaderShield = shield - absorbed;
+          remaining -= absorbed;
+      }
+      if (remaining > 0)
+          ctx.state.leaderHp = Math.max(0, getLeaderHp(ctx) - remaining);
+      return getLeaderHp(ctx) <= 0;
+  };
+  const applyLeaderNightShield = (ctx) => {
+      const stat = getBaseStat(ctx);
+      if ((stat.leaderShieldPercent ?? 0) <= 0 || ctx.state.leaderShieldNightIndex === ctx.state.nightIndex)
+          return;
+      ctx.state.leaderShield = Math.max(ctx.state.leaderShield ?? 0, getLeaderMaxHp(ctx) * (stat.leaderShieldPercent ?? 0));
+      ctx.state.leaderShieldNightIndex = ctx.state.nightIndex;
+  };
   const getLivingTerritoryWallBounds = (ctx) => {
       let leftX = null;
       let rightX = null;
@@ -39609,7 +39665,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       enemy.birdAccelerating = distance <= template.attackRange;
       if (distance <= template.attackRange && enemy.birdAccelerating) {
-          damageBase(ctx, distance <= 6 * 100 ? 1.2 : distance <= 9 * 100 ? 2 : 2.5);
+          damageLeader(ctx, distance <= 6 * 100 ? 1.2 : distance <= 9 * 100 ? 2 : 2.5);
           removeEnemyAt(ctx, index, false);
           return;
       }
@@ -39883,6 +39939,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               ctx.state.nightIndex += 1;
               const waveConfig = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier);
               ctx.state.waveThreatBudgetRemaining = getScaledThreatBudget(waveConfig.threatBudget, ctx.state.nightIndex);
+              applyLeaderNightShield(ctx);
           }
       }
       ctx.renderDayNightTimer();
@@ -40024,6 +40081,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const updateBaseSupport = (ctx, dt) => {
       const stat = getBaseStat(ctx);
+      if (ctx.state.dayNightPhase === 'night')
+          applyLeaderNightShield(ctx);
+      if ((stat.emergencyHealPercent ?? 0) > 0 && getLeaderHp(ctx) > 0 && getLeaderHp(ctx) <= getLeaderMaxHp(ctx) * 0.12 && (ctx.state.leaderEmergencyCooldownUntilNight ?? 0) <= ctx.state.nightIndex) {
+          healLeader(ctx, getLeaderMaxHp(ctx) * (stat.emergencyHealPercent ?? 0));
+          ctx.state.baseHp = Math.max(0, ctx.state.baseHp - stat.hp * (stat.emergencyBaseSelfDamagePercent ?? 0));
+          ctx.state.leaderEmergencyCooldownUntilNight = ctx.state.nightIndex + (stat.emergencyCooldownNights ?? 2);
+      }
       const territoryBounds = getLivingTerritoryWallBounds(ctx);
       if (!isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds))
           return;
@@ -40036,7 +40100,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           const runtime = ctx.ensureStructureRuntime(structure);
           if ((runtime.emergencyHealCooldown ?? 0) > 0)
               continue;
-          if ((stat.emergencyHealPercent ?? 0) > 0 && ctx.state.baseHp > 0 && ctx.state.baseHp <= stat.hp * 0.2) {
+          if ((stat.emergencyCooldownSeconds ?? 0) > 0 && (stat.emergencyHealPercent ?? 0) > 0 && ctx.state.baseHp > 0 && ctx.state.baseHp <= stat.hp * 0.2) {
               healBase(ctx, stat.hp * (stat.emergencyHealPercent ?? 0));
               runtime.emergencyHealCooldown = stat.emergencyCooldownSeconds ?? 60;
               break;
@@ -40457,14 +40521,70 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           hpRegen: (lv4.hpRegen ?? 0) + lv5Config.hpRegenBonus
       };
   };
-  const BASE_STRUCTURE_STATS = {
+  const BASE_LEVELS = {
       0: { hp: 20, arm: 2, res: 2, healPerSecond: 0 },
       1: { hp: 30, arm: 3, res: 3, healPerSecond: 1 },
       2: { hp: 40, arm: 4, res: 4, healPerSecond: 2 },
-      3: { hp: 55, arm: 7, res: 7, healPerSecond: 4 },
-      4: { hp: 65, arm: 9, res: 9, healPerSecond: 5 },
-      5: { hp: 80, arm: 11, res: 11, healPerSecond: 5, shield: 0.2 },
-      6: { hp: 80, arm: 11, res: 11, healPerSecond: 3, emergencyHealPercent: 0.2, emergencyCooldownSeconds: 600 }
+      3: {
+          defense: { hpBonus: 15, armBonus: 3, resBonus: 3, healPerSecondBonus: 2 },
+          attack: { hpBonus: 10, armBonus: 2, resBonus: 2, healPerSecondBonus: 1, buffAtkPercent: 0.05, buffWilPercent: 0.05 }
+      },
+      4: { hpBonus: 10, armBonus: 2, resBonus: 2, healPerSecondBonus: 1 },
+      5: { hpBonus: 15, armBonus: 2, resBonus: 2, leaderShieldPercent: 0.2 },
+      6: { healPerSecondOverride: 3, emergencyHealPercent: 0.2, emergencyBaseSelfDamagePercent: 0.1, emergencyCooldownNights: 2 }
+  };
+  const getBaseLevelStat = (level, branchLv3 = 'defense') => {
+      if (level <= 0)
+          return BASE_LEVELS[0];
+      if (level === 1)
+          return BASE_LEVELS[1];
+      if (level === 2)
+          return BASE_LEVELS[2];
+      const lv3Config = BASE_LEVELS[3][branchLv3];
+      const lv3 = {
+          ...BASE_LEVELS[2],
+          ...('buffAtkPercent' in lv3Config ? { buffAtkPercent: lv3Config.buffAtkPercent, buffWilPercent: lv3Config.buffWilPercent } : {}),
+          hp: BASE_LEVELS[2].hp + lv3Config.hpBonus,
+          arm: BASE_LEVELS[2].arm + lv3Config.armBonus,
+          res: BASE_LEVELS[2].res + lv3Config.resBonus,
+          healPerSecond: BASE_LEVELS[2].healPerSecond + lv3Config.healPerSecondBonus
+      };
+      if (level === 3)
+          return lv3;
+      const lv4 = {
+          ...lv3,
+          hp: lv3.hp + BASE_LEVELS[4].hpBonus,
+          arm: (lv3.arm ?? 0) + BASE_LEVELS[4].armBonus,
+          res: (lv3.res ?? 0) + BASE_LEVELS[4].resBonus,
+          healPerSecond: (lv3.healPerSecond ?? 0) + BASE_LEVELS[4].healPerSecondBonus
+      };
+      if (level === 4)
+          return lv4;
+      const lv5 = {
+          ...lv4,
+          hp: lv4.hp + BASE_LEVELS[5].hpBonus,
+          arm: (lv4.arm ?? 0) + BASE_LEVELS[5].armBonus,
+          res: (lv4.res ?? 0) + BASE_LEVELS[5].resBonus,
+          leaderShieldPercent: BASE_LEVELS[5].leaderShieldPercent
+      };
+      if (level === 5)
+          return lv5;
+      return {
+          ...lv5,
+          healPerSecond: BASE_LEVELS[6].healPerSecondOverride,
+          emergencyHealPercent: BASE_LEVELS[6].emergencyHealPercent,
+          emergencyBaseSelfDamagePercent: BASE_LEVELS[6].emergencyBaseSelfDamagePercent,
+          emergencyCooldownNights: BASE_LEVELS[6].emergencyCooldownNights
+      };
+  };
+  const BASE_STRUCTURE_STATS = {
+      0: getBaseLevelStat(0),
+      1: getBaseLevelStat(1),
+      2: getBaseLevelStat(2),
+      3: getBaseLevelStat(3),
+      4: getBaseLevelStat(4),
+      5: getBaseLevelStat(5),
+      6: getBaseLevelStat(6)
   };
   const getElementalTowerLevelStat = (level, element = 'Hỏa') => ELEMENTAL_TOWER_STRUCTURE_STATS[element][level] ?? ELEMENTAL_TOWER_STRUCTURE_STATS[element][1] ?? { hp: 1 };
   const getStructureLevelStat = (type, level, branchLv3, branchLv5, element) => {
@@ -40503,6 +40623,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createRockBuildSites')) exports.createRockBuildSites = createRockBuildSites;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITES')) exports.BUILD_SITES = BUILD_SITES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getWallLevelStat')) exports.getWallLevelStat = getWallLevelStat;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_LEVELS')) exports.BASE_LEVELS = BASE_LEVELS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getBaseLevelStat')) exports.getBaseLevelStat = getBaseLevelStat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_STRUCTURE_STATS')) exports.BASE_STRUCTURE_STATS = BASE_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getElementalTowerLevelStat')) exports.getElementalTowerLevelStat = getElementalTowerLevelStat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getStructureLevelStat')) exports.getStructureLevelStat = getStructureLevelStat;
