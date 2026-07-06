@@ -66,6 +66,9 @@ export interface StructureLevelStat {
   pullStrength?: number;
   maxAffectedWeight?: number;
   affectsGroundAtLv6?: boolean;
+  splashDamage?: number;
+  splashMaxTargets?: number;
+  splashRange?: number;
 }
 
 
@@ -176,8 +179,8 @@ export const ELEMENTAL_TOWER_STRUCTURE_STATS: Record<ElementalTowerElement, Reco
   1: { hp: 10, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 2, cooldownSeconds: 2, projectileSpeed: 6 },
   2: { hp: 14, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 1.8, projectileSpeed: 6 },
   3: { hp: 20, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 1.6, projectileSpeed: 6 },
-  4: { hp: 28, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 1.5, projectileSpeed: 6 },
-  5: { hp: 36, element, maxTargets: 3, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 7, cooldownSeconds: 3, projectileSpeed: 6 }
+  4: { hp: 28, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 1.5, projectileSpeed: 6, splashDamage: 1, splashMaxTargets: 3, splashRange: 60 },
+  5: { hp: 36, element, maxTargets: 3, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 7, cooldownSeconds: 3, projectileSpeed: 6, splashDamage: 2.5, splashMaxTargets: 5, splashRange: 90 }
 }])) as unknown as Record<ElementalTowerElement, Record<number, StructureLevelStat>>;
 
 export const GROUND_STRUCTURE_STATS: Record<Exclude<StructureType, 'wall' | 'watchtower'>, Record<number, StructureLevelStat>> = {

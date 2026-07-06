@@ -22,7 +22,15 @@ export interface VinhDaStatusCollection {
   knockbackSourceCooldowns?: Record<string, number>;
   burnSeconds?: number;
   burnDps?: number;
+  elementalAllyBuffSeconds?: number;
+  elementalHealingBonus?: number;
+  elementalArmBonusPercent?: number;
+  elementalResBonusPercent?: number;
+  elementalAtkBonusPercent?: number;
+  elementalWilBonusPercent?: number;
+  elementalBloodMaxHpBonus?: number;
 }
+
 export type EnemyUltimate = 'dragon-rage' | 'commander-aura' | 'death-burst';
 
 export interface BuildSite {

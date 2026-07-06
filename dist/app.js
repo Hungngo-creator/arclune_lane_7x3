@@ -39143,13 +39143,15 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       return null;
   };
-  const damageEnemy = (ctx, enemy, amount) => {
-      const atkPart = reduceDamageByDefense(amount * 0.5, enemy.arm);
-      const wilPart = reduceDamageByDefense(amount * 0.5, enemy.res);
+  const damageEnemy = (ctx, enemy, amount, atkRatio = 0.5) => {
+      const safeAtkRatio = Math.max(0, Math.min(1, atkRatio));
+      const atkPart = reduceDamageByDefense(amount * safeAtkRatio, enemy.arm);
+      const wilPart = reduceDamageByDefense(amount * (1 - safeAtkRatio), enemy.res);
       enemy.hp -= atkPart + wilPart;
       return enemy.hp <= 0;
   };
   const BLOOD_MAX_HP_STACK_CAP = 17;
+  const ELEMENTAL_ALLY_BUFF_SECONDS = 3;
   const getBaseStat = (ctx) => BASE_STRUCTURE_STATS[ctx.state.baseLevel ?? 0] ?? BASE_STRUCTURE_STATS[0];
   const getLivingTerritoryWallBounds = (ctx) => {
       let leftX = null;
@@ -39178,6 +39180,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if (!isXInLivingTerritory(ctx, CRYSTAL_X, bounds))
           return 0;
       let bonus = getBaseStat(ctx).healingBonusPercent ?? 0;
+      bonus += ctx.state.baseStatuses?.elementalHealingBonus ?? 0;
       for (const siteId of ctx.structureSiteIdsOfType('church')) {
           const structure = ctx.state.structures.get(siteId);
           if (!structure)
@@ -39191,9 +39194,26 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const healBase = (ctx, amount) => {
       const stat = getBaseStat(ctx);
-      ctx.state.baseHp = Math.min(stat.hp + (stat.shield ?? 0), ctx.state.baseHp + amount * (1 + getChurchHealingBonus(ctx)));
+      const maxHp = stat.hp + (stat.shield ?? 0) + (ctx.state.baseStatuses?.elementalBloodMaxHpBonus ?? 0);
+      ctx.state.baseHp = Math.min(maxHp, ctx.state.baseHp + amount * (1 + getChurchHealingBonus(ctx)));
   };
-  const applyElementEffect = (ctx, enemy, element, damage, sourceX) => {
+  const applyElementAllyBuffInRange = (ctx, sourceX, range, apply) => {
+      if (Math.abs(CRYSTAL_X - sourceX) <= range) {
+          const statuses = ctx.state.baseStatuses ??= {};
+          statuses.elementalAllyBuffSeconds = Math.max(statuses.elementalAllyBuffSeconds ?? 0, ELEMENTAL_ALLY_BUFF_SECONDS);
+          apply(statuses);
+      }
+      for (const structure of ctx.state.structures.values()) {
+          const site = ctx.getBuildSite(structure.siteId);
+          if (!site || Math.abs(site.x - sourceX) > range)
+              continue;
+          const runtime = ctx.ensureStructureRuntime(structure);
+          const statuses = runtime.statuses ??= {};
+          statuses.elementalAllyBuffSeconds = Math.max(statuses.elementalAllyBuffSeconds ?? 0, ELEMENTAL_ALLY_BUFF_SECONDS);
+          apply(statuses);
+      }
+  };
+  const applyElementEffect = (ctx, enemy, element, damage, sourceX, range) => {
       switch (element) {
           case 'Hỏa':
               {
@@ -39203,14 +39223,23 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               }
               break;
           case 'Mộc':
+              applyElementAllyBuffInRange(ctx, sourceX, range, () => { });
               healBase(ctx, Math.max(0.1, damage * 0.05));
-              ;
               break;
           case 'Thủy':
+              applyElementAllyBuffInRange(ctx, sourceX, range, statuses => { statuses.elementalHealingBonus = Math.max(statuses.elementalHealingBonus ?? 0, 0.12); });
               break;
           case 'Thổ':
+              applyElementAllyBuffInRange(ctx, sourceX, range, statuses => {
+                  statuses.elementalArmBonusPercent = Math.max(statuses.elementalArmBonusPercent ?? 0, 0.07);
+                  statuses.elementalResBonusPercent = Math.max(statuses.elementalResBonusPercent ?? 0, 0.07);
+              });
               break;
           case 'Kim':
+              applyElementAllyBuffInRange(ctx, sourceX, range, statuses => {
+                  statuses.elementalAtkBonusPercent = Math.max(statuses.elementalAtkBonusPercent ?? 0, 0.05);
+                  statuses.elementalWilBonusPercent = Math.max(statuses.elementalWilBonusPercent ?? 0, 0.05);
+              });
               break;
           case 'Lôi':
               {
@@ -39227,6 +39256,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               const stacks = Math.min(BLOOD_MAX_HP_STACK_CAP, (enemy.bloodMaxHpStacks ?? 0) + 1);
               if (stacks !== (enemy.bloodMaxHpStacks ?? 0)) {
                   enemy.bloodMaxHpStacks = stacks;
+                  applyElementAllyBuffInRange(ctx, sourceX, range, statuses => { statuses.elementalBloodMaxHpBonus = (statuses.elementalBloodMaxHpBonus ?? 0) + damage * 0.03; });
                   healBase(ctx, damage * 0.03);
               }
               break;
@@ -39257,7 +39287,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if (structure.type !== 'wall')
           return amount;
       const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
-      const defenseMultiplier = ((100 / (100 + Math.max(0, stat.arm ?? 0))) + (100 / (100 + Math.max(0, stat.res ?? 0)))) / 2;
+      const arm = (stat.arm ?? 0) * (1 + (runtime.statuses?.elementalArmBonusPercent ?? 0));
+      const res = (stat.res ?? 0) * (1 + (runtime.statuses?.elementalResBonusPercent ?? 0));
+      const defenseMultiplier = ((100 / (100 + Math.max(0, arm))) + (100 / (100 + Math.max(0, res)))) / 2;
       const mitigatedAmount = amount * defenseMultiplier;
       if (structure.branchLv3 !== 'slippery' || !attacker)
           return mitigatedAmount;
@@ -39543,6 +39575,14 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           statuses.slowMultiplier = undefined;
       if (statuses.burnSeconds <= 0)
           statuses.burnDps = undefined;
+      statuses.elementalAllyBuffSeconds = Math.max(0, (statuses.elementalAllyBuffSeconds ?? 0) - dt);
+      if (statuses.elementalAllyBuffSeconds <= 0) {
+          statuses.elementalHealingBonus = undefined;
+          statuses.elementalArmBonusPercent = undefined;
+          statuses.elementalResBonusPercent = undefined;
+          statuses.elementalAtkBonusPercent = undefined;
+          statuses.elementalWilBonusPercent = undefined;
+      }
       let bleedStacks = statuses.bleedStacks ?? [];
       let activeBleedStacks = 0;
       for (const stack of bleedStacks) {
@@ -39909,24 +39949,25 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               if (targets.length <= 0)
                   continue;
               runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
-              const explosionHitIds = new Set();
+              const explosionHitIds = new Set(targets.map(target => target.id));
               for (const target of targets) {
-                  const baseDamage = stat.damage ?? 0;
+                  const baseDamage = (stat.damage ?? 0) * (1 + (((runtime.statuses?.elementalAtkBonusPercent ?? 0) + (runtime.statuses?.elementalWilBonusPercent ?? 0)) / 2));
                   const bonus = stat.element === 'Ánh Sáng' ? 1.1 : target.lightVulnerableSeconds && target.lightVulnerableSeconds > 0 ? 1.2 : 1;
                   if (stat.element)
-                      applyElementEffect(ctx, target, stat.element, baseDamage, site.x);
-                  if (damageEnemy(ctx, target, baseDamage * bonus))
+                      applyElementEffect(ctx, target, stat.element, baseDamage, site.x, stat.range ?? 0);
+                  const damageAtkRatio = type === 'elementalTower' ? 0.2 : 0.5;
+                  if (damageEnemy(ctx, target, baseDamage * bonus, damageAtkRatio))
                       removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
                   if (type === 'elementalTower' && structure.level >= 4) {
-                      const splashDamage = structure.level >= 5 ? 2.5 : 1;
-                      const splashLimit = structure.level >= 5 ? 5 : 3;
-                      const splashRange = structure.level >= 5 ? 90 : 60;
+                      const splashDamage = stat.splashDamage ?? (structure.level >= 5 ? 2.5 : 1);
+                      const splashLimit = stat.splashMaxTargets ?? (structure.level >= 5 ? 5 : 3);
+                      const splashRange = stat.splashRange ?? (structure.level >= 5 ? 90 : 60);
                       const splashTargets = ctx.state.enemies
                           .filter(enemy => enemy.id !== target.id && !explosionHitIds.has(enemy.id) && Math.abs(enemy.x - target.x) <= splashRange)
                           .slice(0, splashLimit);
                       for (const splashTarget of splashTargets) {
                           explosionHitIds.add(splashTarget.id);
-                          if (damageEnemy(ctx, splashTarget, splashDamage * bonus))
+                          if (damageEnemy(ctx, splashTarget, splashDamage * bonus, damageAtkRatio))
                               removeEnemyAt(ctx, ctx.state.enemies.indexOf(splashTarget), true);
                       }
                   }
@@ -40094,8 +40135,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           1: { hp: 10, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 2, cooldownSeconds: 2, projectileSpeed: 6 },
           2: { hp: 14, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 1.8, projectileSpeed: 6 },
           3: { hp: 20, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 1.6, projectileSpeed: 6 },
-          4: { hp: 28, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 1.5, projectileSpeed: 6 },
-          5: { hp: 36, element, maxTargets: 3, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 7, cooldownSeconds: 3, projectileSpeed: 6 }
+          4: { hp: 28, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 1.5, projectileSpeed: 6, splashDamage: 1, splashMaxTargets: 3, splashRange: 60 },
+          5: { hp: 36, element, maxTargets: 3, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 7, cooldownSeconds: 3, projectileSpeed: 6, splashDamage: 2.5, splashMaxTargets: 5, splashRange: 90 }
       }]));
   const GROUND_STRUCTURE_STATS = {
       elementalTower: ELEMENTAL_TOWER_STRUCTURE_STATS['Hỏa'],
