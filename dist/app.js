@@ -38240,11 +38240,19 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const CSS = /* css */ `
     .app--vinh-da-gameplay{min-height:100dvh;background:#020204;color:#f7f2ff;overflow:hidden;touch-action:none;}
     .vinh-da-game{position:relative;min-height:100dvh;overflow:hidden;background:linear-gradient(#020204 0 58%,#07070b 58% 100%);touch-action:none;user-select:none;}
+    .vinh-da-game.is-day{background:linear-gradient(#17294a 0 58%,#0d1118 58% 100%);}
+    .vinh-da-game.is-night{background:linear-gradient(#020204 0 58%,#07070b 58% 100%);}
     .vinh-da-game__hud{position:absolute;z-index:5;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none;}
     .vinh-da-game__panel{pointer-events:auto;border:1px solid rgba(210,200,255,.2);border-radius:12px;background:rgba(0,0,0,.5);padding:8px 12px;box-shadow:0 10px 24px rgba(0,0,0,.28);font-size:16px;line-height:1.2;}
     .vinh-da-game__back{pointer-events:auto;border:0;border-radius:999px;background:#f3edff;color:#111020;width:42px;height:42px;font-size:22px;cursor:pointer;}
     .vinh-da-game__viewport{position:absolute;inset:0;overflow:hidden;cursor:pointer;}
     .vinh-da-game__world{position:absolute;left:0;top:0;width:${WORLD_WIDTH}px;height:100%;transform:translate3d(0,0,0);will-change:transform;background:radial-gradient(circle at 50% 28%,rgba(87,68,168,.34),transparent 18%),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 220px);}
+    .vinh-da-game__weather-layer{position:absolute;inset:0;z-index:3;pointer-events:none;background:transparent;}
+    .vinh-da-game.is-night .vinh-da-game__weather-layer::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(1,2,8,.42),rgba(1,2,8,.58));}
+    .vinh-da-game__weather-layer::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .08s linear;background:rgba(232,242,255,.86);}
+    .vinh-da-game__weather-layer.is-rain,.vinh-da-game__weather-layer.is-storm{background:repeating-linear-gradient(105deg,rgba(196,224,255,.38) 0 2px,transparent 2px 14px);}
+    .vinh-da-game__weather-layer.is-storm{background:linear-gradient(rgba(4,6,17,.28),rgba(4,6,17,.44)),repeating-linear-gradient(105deg,rgba(215,234,255,.48) 0 2px,transparent 2px 11px);}
+    .vinh-da-game__weather-layer.is-lightning::after{opacity:.72;}
     .vinh-da-game__ground{position:absolute;left:0;right:0;bottom:0;height:${GROUND_PERCENT};background:linear-gradient(#121018,#050507);border-top:1px solid rgba(210,200,255,.18);}
     .vinh-da-game__castle{position:absolute;left:${CASTLE_LEFT}px;bottom:${GROUND_PERCENT};width:${CASTLE_WIDTH}px;height:170px;background:linear-gradient(180deg,#202033,#0d0d16);border:2px solid rgba(226,222,255,.2);box-shadow:0 0 44px rgba(83,65,170,.3);}
     .vinh-da-game__castle::before,.vinh-da-game__castle::after{content:"";position:absolute;bottom:0;width:${CASTLE_TOWER_WIDTH}px;height:230px;background:#11111f;border:2px solid rgba(226,222,255,.18)}
@@ -38325,6 +38333,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let enemySpawnTimer = 0;
       let dayNightPhase = 'night';
       let phaseRemainingSeconds = DAY_DURATION_SECONDS;
+      let weather = 'clear';
+      let lightningFlashTimer = 0;
       let leaderAttackCooldown = 0;
       let nightIndex = 1;
       let waveThreatBudgetRemaining = getScaledThreatBudget(getVinhDaWaveConfig(nightIndex).threatBudget, nightIndex);
@@ -38344,6 +38354,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       </div>
       <div class="vinh-da-game__viewport" data-role="viewport">
         <div class="vinh-da-game__world" data-role="world">
+        <div class="vinh-da-game__weather-layer" data-role="weather-layer" aria-hidden="true"></div>
           <div class="vinh-da-game__castle" aria-hidden="true"></div>
           <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
           <div class="vinh-da-game__ground" aria-hidden="true"></div>
@@ -38357,6 +38368,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const world = section.querySelector('[data-role="world"]');
       const sprite = section.querySelector('[data-role="leader"]');
       const viewport = section.querySelector('[data-role="viewport"]');
+      const weatherLayer = section.querySelector('[data-role="weather-layer"]');
       const buildSitesContainer = section.querySelector('[data-role="build-sites"]');
       const enemiesContainer = section.querySelector('[data-role="enemies"]');
       const enemyPortalsContainer = section.querySelector('[data-role="enemy-portals"]');
@@ -38435,6 +38447,35 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               bloodSealStoneText.textContent = String(bloodSealStone);
           if (carriedResourceText)
               carriedResourceText.textContent = String(carriedDaThach);
+      };
+      const chooseWeather = () => {
+          const roll = Math.random();
+          if (roll < 0.18)
+              return 'storm';
+          if (roll < 0.52)
+              return 'rain';
+          return 'clear';
+      };
+      const renderWeather = () => {
+          section.classList.toggle('is-day', dayNightPhase === 'day');
+          section.classList.toggle('is-night', dayNightPhase === 'night');
+          if (!weatherLayer)
+              return;
+          weatherLayer.classList.toggle('is-rain', weather === 'rain');
+          weatherLayer.classList.toggle('is-storm', weather === 'storm');
+          weatherLayer.classList.toggle('is-lightning', lightningFlashTimer > 0);
+      };
+      const updateWeather = (dt, previousPhase) => {
+          if (previousPhase !== dayNightPhase) {
+              weather = chooseWeather();
+              lightningFlashTimer = weather === 'storm' ? 0.12 : 0;
+          }
+          else if (weather === 'storm' && lightningFlashTimer <= 0 && Math.random() < dt * 0.18) {
+              lightningFlashTimer = 0.08;
+          }
+          if (lightningFlashTimer > 0)
+              lightningFlashTimer = Math.max(0, lightningFlashTimer - dt);
+          renderWeather();
       };
       const renderDayNightTimer = () => {
           if (dayNightPhaseText)
@@ -38762,7 +38803,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               ? keyboardDirection * LEADER_SPEED * dt
               : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
           leaderX = clampLeaderX(leaderX);
+          const previousPhase = dayNightPhase;
           updateDayNightTimer(dt);
+          updateWeather(dt, previousPhase);
           updateEnemies(dt);
           updateStructures(dt);
           collectDroppedResources();
@@ -38866,8 +38909,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       section.querySelector('.vinh-da-game__back')?.addEventListener('click', () => {
           shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId });
       });
+      weather = chooseWeather();
       updateCamera();
       renderDayNightTimer();
+      renderWeather();
       renderEnemyPortals();
       spawnWaveEnemy('left');
       spawnWaveEnemy('right');
