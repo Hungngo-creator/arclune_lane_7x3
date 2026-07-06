@@ -176,6 +176,8 @@ const CSS = /* css */ `
   .vinh-da-game__crystal::after{content:"";position:absolute;inset:8px 20px;background:rgba(255,255,255,.72);filter:blur(2px);}
   .vinh-da-game__leader{position:absolute;bottom:${GROUND_PERCENT};width:46px;height:82px;border-radius:10px 10px 6px 6px;background:linear-gradient(180deg,#f4d78a,#7447ff);box-shadow:0 0 26px rgba(245,215,138,.55);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
   .vinh-da-game__drop{position:absolute;bottom:calc(${GROUND_PERCENT} + 10px);width:18px;height:18px;margin-left:-9px;border-radius:999px;background:radial-gradient(circle,#f5f7ff,#6dc8ff 48%,#352073);box-shadow:0 0 14px rgba(109,200,255,.75);z-index:2;}
+  .vinh-da-game__notice{position:absolute;left:50%;top:82px;transform:translateX(-50%);padding:6px 12px;border-radius:999px;background:rgba(245,247,255,.88);color:#352073;font-size:13px;font-weight:700;box-shadow:0 0 18px rgba(109,200,255,.45);opacity:0;pointer-events:none;transition:opacity .18s ease;z-index:8;}
+  .vinh-da-game__notice--visible{opacity:1;}
   .vinh-da-game__portal{position:absolute;bottom:${GROUND_PERCENT};width:54px;height:86px;margin-left:-27px;border-radius:999px 999px 12px 12px;background:radial-gradient(ellipse at 50% 50%,rgba(222,142,255,.92),rgba(92,41,168,.72) 42%,rgba(18,8,34,.9) 68%,transparent 70%);box-shadow:0 0 28px rgba(190,94,255,.72);z-index:1;pointer-events:none;}
   .vinh-da-game__portal::after{content:"";position:absolute;inset:13px 18px;border-radius:999px;background:rgba(8,4,18,.82);box-shadow:inset 0 0 18px rgba(238,211,255,.36);}
   .vinh-da-game__enemy{position:absolute;bottom:${GROUND_PERCENT};width:38px;height:52px;margin-left:-19px;border-radius:18px 18px 8px 8px;background:linear-gradient(180deg,#d14b5f,#381018);box-shadow:0 0 18px rgba(209,75,95,.34);transform:translate3d(0,0,0);will-change:transform;z-index:2;}
@@ -276,6 +278,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       </div>
       <button class="vinh-da-game__back" type="button" aria-label="Về World Map">↩</button>
     </div>
+    <div class="vinh-da-game__notice" data-role="notice" aria-live="polite"></div>
     <div class="vinh-da-game__viewport" data-role="viewport">
       <div class="vinh-da-game__world" data-role="world">
       <div class="vinh-da-game__weather-layer" data-role="weather-layer" aria-hidden="true"></div>
@@ -298,6 +301,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const enemiesContainer = section.querySelector<HTMLElement>('[data-role="enemies"]');
   const enemyPortalsContainer = section.querySelector<HTMLElement>('[data-role="enemy-portals"]');
   const droppedResourcesContainer = section.querySelector<HTMLElement>('[data-role="dropped-resources"]');
+  const noticeElement = section.querySelector<HTMLElement>('[data-role="notice"]');
   const bloodSealStoneText = section.querySelector<HTMLElement>('[data-role="blood-seal-stone"]');
   const carriedResourceText = section.querySelector<HTMLElement>('[data-role="carried-resource"]');
   const dayNightPhaseText = section.querySelector<HTMLElement>('[data-role="day-night-phase"]');
@@ -311,6 +315,15 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const buildSitesByX = [...BUILD_SITES].sort((a, b) => a.x - b.x);
   const buildSitesById = new Map(buildSitesByX.map(site => [site.id, site]));
   let lastRenderedCameraX = Number.POSITIVE_INFINITY;
+  let noticeTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  const showNotice = (message: string): void => {
+    if (!noticeElement) return;
+    noticeElement.textContent = message;
+    noticeElement.classList.add('vinh-da-game__notice--visible');
+    if (noticeTimeout) clearTimeout(noticeTimeout);
+    noticeTimeout = setTimeout(() => noticeElement.classList.remove('vinh-da-game__notice--visible'), 1600);
+  };
 
   const getStructureMaxHp = (structure: PlacedStructure): number => (
     getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp
@@ -644,7 +657,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
   const damageBase = (amount: number): boolean => { const destroyed = runtimeDamageBase(simulationContext, amount); syncSimulationState(); return destroyed; };
   const updateEnemies = (dt: number): void => { runtimeUpdateEnemies(simulationContext, dt); syncSimulationState(); };
-  const updateDayNightTimer = (dt: number): void => { runtimeUpdateDayNightTimer(simulationContext, dt); syncSimulationState(); };
+  const updateDayNightTimer = (dt: number): void => {
+    const wasNight = simulationState.dayNightPhase === 'night';
+    const enemyCountBefore = simulationState.enemies.length;
+    runtimeUpdateDayNightTimer(simulationContext, dt);
+    if (wasNight && simulationState.dayNightPhase === 'day' && enemyCountBefore > 0) showNotice('Ánh sáng thiêu đốt quái còn sót lại');
+    syncSimulationState();
+  };
   const updateStructures = (dt: number): void => { runtimeUpdateStructures(simulationContext, dt); syncSimulationState(); };
   const collectDroppedResources = (): void => { runtimeCollectDroppedResources(simulationContext); syncSimulationState(); };
 
@@ -655,7 +674,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       if (!element){
         element = document.createElement('div');
         element.className = 'vinh-da-game__drop';
-        element.title = `Dạ Thạch +${resource.amount}`;
+        element.title = `${resource.kind === 'daThach' ? 'Dạ Thạch' : 'Tài nguyên'} +${resource.amount}`;
         droppedResourcesContainer.append(element);
         droppedResourceElements.set(resource.id, element);
       }

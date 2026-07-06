@@ -2,7 +2,7 @@ import { CRYSTAL_X, ENEMY_SPAWN_INTERVAL, ENEMY_START_PADDING, WORLD_WIDTH } fro
 import { ENEMY_TEMPLATES } from '../src/screens/vinh-da/enemies.ts';
 import { BASE_STRUCTURE_STATS, BUILD_SITES, getBaseLevelStat } from '../src/screens/vinh-da/structures.ts';
 import type { StructureType } from '../src/screens/vinh-da/structures.ts';
-import { damageEnemy, getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory, spawnEnemy, spawnWaveEnemy, updateEnemies, updateStructures } from '../src/screens/vinh-da/simulation.ts';
+import { damageEnemy, getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory, removeEnemyAt, spawnEnemy, spawnWaveEnemy, updateDayNightTimer, updateEnemies, updateStructures } from '../src/screens/vinh-da/simulation.ts';
 import type { VinhDaSimulationContext, VinhDaSimulationState } from '../src/screens/vinh-da/simulation.ts';
 import type { BuildSite, EnemyPortal, PlacedStructure, StructureRuntime } from '../src/screens/vinh-da/types.ts';
 
@@ -77,6 +77,47 @@ describe('Vĩnh Dạ enemy behavior locks', () => {
     spawnEnemy(ctx, side, kind, x, true);
     ctx.state.enemies[0]!.attackCooldown = 0;
   };
+
+  it('drops typed resources when an enemy dies to player or structures during night', () => {
+    const ctx = createContext([], new Map());
+    Object.assign(ctx.state, { baseLevel: 1, dayNightPhase: 'night', nightIndex: 4, mapTier: 1.2 });
+    spawnEnemy(ctx, 'left', 'twisted', CRYSTAL_X - 50, true);
+
+    const enemy = ctx.state.enemies[0]!;
+    expect(damageEnemy(ctx, enemy, 999)).toBe(true);
+    removeEnemyAt(ctx, ctx.state.enemies.indexOf(enemy), true);
+
+    expect(ctx.state.enemies).toHaveLength(0);
+    expect(ctx.state.droppedResources).toHaveLength(1);
+    expect(ctx.state.droppedResources[0]).toMatchObject({ kind: 'daThach', amount: expect.any(Number), x: CRYSTAL_X - 50 });
+    expect(ctx.state.droppedResources[0]!.amount).toBeGreaterThan(0);
+    expect(ctx.renderDroppedResources).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears leftover night enemies at daybreak without granting rewards before upkeep and apostles', () => {
+    const ctx = createContext([], new Map());
+    Object.assign(ctx.state, {
+      baseLevel: 1,
+      bloodSealStone: 5,
+      contamination: 5,
+      dayNightPhase: 'night',
+      phaseRemainingSeconds: 1,
+      nightIndex: 2,
+    });
+    spawnEnemy(ctx, 'left', 'twisted', CRYSTAL_X - 50, true);
+    spawnEnemy(ctx, 'left', 'suicideBomber', CRYSTAL_X - 40, true);
+
+    updateDayNightTimer(ctx, 1);
+
+    expect(ctx.state.dayNightPhase).toBe('day');
+    expect(ctx.state.enemies).toHaveLength(1);
+    expect(ctx.state.enemies[0]!.kind).toBe('apostle');
+    expect(ctx.state.bloodSealStone).toBe(4);
+    expect(ctx.state.droppedResources).toHaveLength(0);
+    expect(ctx.state.nextDroppedResourceId).toBe(1);
+    expect(ctx.state.contamination).toBe(0);
+    expect(ctx.renderDroppedResources).not.toHaveBeenCalled();
+  });
 
   it('melee enemies hit a blocking wall before the base', () => {
     const wallX = buildSitesById.get('wall-left')!.x;

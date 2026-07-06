@@ -63,9 +63,12 @@ export interface RuntimeSoldier {
   statuses?: VinhDaStatusCollection;
 }
 
+export type DroppedResourceKind = 'daThach';
+
 export interface DroppedResource {
   id: number;
   x: number;
+  kind: DroppedResourceKind;
   amount: number;
 }
 

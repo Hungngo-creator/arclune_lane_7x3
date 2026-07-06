@@ -1,4 +1,4 @@
-import type { EnemyAttackShape, EnemyStatusOnHit, EnemyUltimate } from './types.ts';
+import type { DroppedResourceKind, EnemyAttackShape, EnemyStatusOnHit, EnemyUltimate } from './types.ts';
 
 export type EnemyKind =
   | 'twisted'
@@ -268,3 +268,42 @@ export const ENEMY_TEMPLATES = {
 } as const satisfies Record<EnemyKind, EnemyTemplate>;
 
 export const DEFAULT_ENEMY_TEMPLATE = ENEMY_TEMPLATES.twisted;
+export interface EnemyResourceDrop {
+  kind: DroppedResourceKind;
+  amount: number;
+}
+
+const ENEMY_KIND_DROP_MULTIPLIERS = {
+  twisted: 1,
+  crawler: 1,
+  madDog: 1,
+  suicideBomber: 1,
+  mutantBird: 1,
+  darkMage: 1,
+  ironMan: 1,
+  resentfulDragon: 1,
+  apostle: 0
+} as const satisfies Record<EnemyKind, number>;
+
+const getDropTierMultiplier = (tier: EnemyTier): number => {
+  if (tier === 1.3) return 1.5;
+  if (tier === 1.2) return 1.25;
+  return 1;
+};
+
+export const getEnemyResourceDrop = (input: {
+  kind: EnemyKind;
+  enemyTier: EnemyTier;
+  mapTier?: EnemyTier;
+  rank: number;
+  nightIndex: number;
+}): EnemyResourceDrop | null => {
+  const template = ENEMY_TEMPLATES[input.kind] ?? DEFAULT_ENEMY_TEMPLATE;
+  const baseReward = template.reward * ENEMY_KIND_DROP_MULTIPLIERS[input.kind];
+  if (baseReward <= 0) return null;
+  const mapTier = input.mapTier ?? input.enemyTier;
+  const rankMultiplier = 1 + Math.max(0, input.rank - 1) * 0.25;
+  const nightMultiplier = 1 + Math.max(0, Math.floor(input.nightIndex) - 1) * 0.03;
+  const amount = Math.max(1, Math.round(baseReward * getDropTierMultiplier(input.enemyTier) * getDropTierMultiplier(mapTier) * rankMultiplier * nightMultiplier));
+  return { kind: 'daThach', amount };
+};

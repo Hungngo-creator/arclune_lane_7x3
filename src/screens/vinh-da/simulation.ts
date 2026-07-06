@@ -24,7 +24,7 @@ import {
   SWAMP_RADIUS,
   WORLD_WIDTH
 } from './constants.ts';
-import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, reduceDamageByDefense, scaleEnemyTierStat } from './enemies.ts';
+import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, getEnemyResourceDrop, reduceDamageByDefense, scaleEnemyTierStat } from './enemies.ts';
 import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
 import { BASE_STRUCTURE_STATS, getBaseLevelStat, getStructureLevelStat } from './structures.ts';
 import type { BaseBranchLv3, ElementalTowerElement, StructureType } from './structures.ts';
@@ -260,22 +260,22 @@ const triggerDeathExplosion = (ctx: VinhDaSimulationContext, enemy: Enemy): void
       if (damageEnemy(ctx, target, damage)) removeEnemyAt(ctx, i, true);
     }
   };
-export const removeEnemyAt = (ctx: VinhDaSimulationContext, index: number, reward: boolean): void => {
+export const removeEnemyAt = (ctx: VinhDaSimulationContext, index: number, reward: boolean, triggerDeathEffects = true): void => {
     const [enemy] = ctx.state.enemies.splice(index, 1);
     if (!enemy) return;
     ctx.removeEnemyElement(enemy.id);
-  triggerDeathExplosion(ctx, enemy);
+  if (triggerDeathEffects) triggerDeathExplosion(ctx, enemy);
     if (reward){
-      const amount = ENEMY_TEMPLATES[enemy.kind].reward;
-      if (amount > 0){
-        ctx.state.droppedResources.push({ id: ctx.state.nextDroppedResourceId, x: enemy.x, amount });
+      const drop = getEnemyResourceDrop({ kind: enemy.kind, enemyTier: enemy.tier, mapTier: ctx.state.mapTier, rank: enemy.rank, nightIndex: ctx.state.nightIndex });
+      if (drop && drop.amount > 0){
+        ctx.state.droppedResources.push({ id: ctx.state.nextDroppedResourceId, x: enemy.x, ...drop });
         ctx.state.nextDroppedResourceId += 1;
         ctx.renderDroppedResources();
       }
     }
   };
 export const clearEnemiesWithoutReward = (ctx: VinhDaSimulationContext): void => {
-    while (ctx.state.enemies.length > 0) removeEnemyAt(ctx, ctx.state.enemies.length - 1, false);
+    while (ctx.state.enemies.length > 0) removeEnemyAt(ctx, ctx.state.enemies.length - 1, false, false);
     ctx.state.enemySpawnTimer = 0;
   };
 export const collectDroppedResources = (ctx: VinhDaSimulationContext): void => {
