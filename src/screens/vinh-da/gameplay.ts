@@ -13,29 +13,16 @@ import {
   CASTLE_WIDTH,
   CRYSTAL_X,
   DEFAULT_STRUCTURE_COOLDOWN,
-  ENEMY_ATTACK_RANGE,
-  ENEMY_LIMIT,
-  ENEMY_SPAWN_INTERVAL,
-  ENEMY_START_PADDING,
   GROUND_PERCENT,
-  LEADER_ATTACK_RANGE,
-  LEADER_BASIC_ATTACK_COOLDOWN_SECONDS,
-  LEADER_BASIC_ATTACK_DAMAGE,
-  LANDMINE_BLAST_RADIUS,
-  LANDMINE_FUSE_SECONDS,
-  LANDMINE_TRIGGER_RADIUS,
-  LANDMINE_TRUE_DAMAGE,
   LEADER_EDGE_PADDING_LEFT,
   LEADER_EDGE_PADDING_RIGHT,
   LEADER_SPEED,
   LEADER_START_X,
   LEADER_WIDTH,
   STYLE_ID,
-  SWAMP_RADIUS,
   WORLD_WIDTH
 } from './constants.ts';
-import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES } from './enemies.ts';
-import type { EnemyKind, EnemyTemplate } from './enemies.ts';
+import type { EnemyKind } from './enemies.ts';
 import {
   BUILD_LEVEL_COST,
   BUILD_NODE_OPTIONS,
@@ -46,10 +33,19 @@ import {
   isStructureAllowedOnBuildSite,
 } from './structures.ts';
 import type { StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
+import {
+  DAY_DURATION_SECONDS,
+  damageBase as runtimeDamageBase,
+  damageStructure as runtimeDamageStructure,
+  clearEnemiesWithoutReward as runtimeClearEnemiesWithoutReward,
+  removeEnemyAt as runtimeRemoveEnemyAt,
+  spawnEnemy as runtimeSpawnEnemy,
+  updateDayNightTimer as runtimeUpdateDayNightTimer,
+  updateEnemies as runtimeUpdateEnemies,
+  updateStructures as runtimeUpdateStructures
+} from './simulation.ts';
+import type { DayNightPhase, VinhDaSimulationContext, VinhDaSimulationState } from './simulation.ts';
 import type { BuildSite, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
-
-const DAY_DURATION_SECONDS = 300;
-type DayNightPhase = 'day' | 'night';
 
 interface RenderContext {
   root: HTMLElement;
@@ -220,9 +216,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     if (bloodSealStoneText) bloodSealStoneText.textContent = String(bloodSealStone);
   };
   const renderDayNightTimer = (): void => {
-    if (dayNightPhaseText) dayNightPhaseText.textContent = dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
+    if (dayNightPhaseText) dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
     if (phaseTimeRemainingText){
-      const totalSeconds = Math.max(0, Math.ceil(phaseRemainingSeconds));
+      const totalSeconds = Math.max(0, Math.ceil(simulationState.phaseRemainingSeconds));
       const minutes = Math.floor(totalSeconds / 60);
       const seconds = totalSeconds % 60;
       phaseTimeRemainingText.textContent = `${minutes}:${String(seconds).padStart(2, '0')}`;
@@ -382,331 +378,57 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     renderVisibleBuildSites();
   };
 
-  const spawnEnemy = (side: Side, kind: EnemyKind = 'twisted'): void => {
-    if (dayNightPhase !== 'night' || enemies.length >= ENEMY_LIMIT) return;
-    const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
-    enemies.push({
-      id: nextEnemyId,
-      x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
-      kind: template.kind,
-      hp: template.hp,
-      maxHp: template.hp,
-      speed: template.speed,
-      baseSpeed: template.speed,
-      weight: template.weight,
-      attackCooldown: template.attackCooldown,
-      canFly: template.canFly,
-      side
-    });
-    nextEnemyId += 1;
+  const simulationState: VinhDaSimulationState = {
+    get bloodSealStone(){ return bloodSealStone; },
+    set bloodSealStone(value: number){ bloodSealStone = value; },
+    get baseHp(){ return baseHp; },
+    set baseHp(value: number){ baseHp = value; },
+    get leaderX(){ return leaderX; },
+    set leaderX(value: number){ leaderX = value; },
+    enemies,
+    nextEnemyId,
+    enemySpawnTimer,
+    dayNightPhase,
+    phaseRemainingSeconds,
+    leaderAttackCooldown,
+    structures
   };
-  const removeEnemyAt = (index: number, reward: boolean): void => {
-    const [enemy] = enemies.splice(index, 1);
-    if (!enemy) return;
-    enemyElements.get(enemy.id)?.remove();
-    enemyElements.delete(enemy.id);
-    if (reward){
-      bloodSealStone += ENEMY_TEMPLATES[enemy.kind].reward;
-      renderEconomy();
+  const simulationContext: VinhDaSimulationContext = {
+    state: simulationState,
+    structureSitesByType,
+    getBuildSite,
+    ensureStructureRuntime,
+    getStructureMaxHp,
+    deleteStructure,
+    structureSiteIdsOfType,
+    renderEconomy,
+    renderBuildSite,
+    renderDayNightTimer,
+    removeEnemyElement(enemyId: number): void {
+      enemyElements.get(enemyId)?.remove();
+      enemyElements.delete(enemyId);
     }
   };
-  const clearEnemiesWithoutReward = (): void => {
-    while (enemies.length > 0) removeEnemyAt(enemies.length - 1, false);
-    enemySpawnTimer = 0;
+  const syncSimulationState = (): void => {
+    nextEnemyId = simulationState.nextEnemyId;
+    enemySpawnTimer = simulationState.enemySpawnTimer;
+    dayNightPhase = simulationState.dayNightPhase;
+    phaseRemainingSeconds = simulationState.phaseRemainingSeconds;
+    leaderAttackCooldown = simulationState.leaderAttackCooldown;
   };
-  const getBlockingWall = (enemy: Enemy): { site: BuildSite; runtime: StructureRuntime } | null => {
-    for (const siteId of structureSiteIdsOfType('wall')){
-      const structure = structures.get(siteId);
-      if (!structure) continue;
-      const site = getBuildSite(siteId);
-      if (!site || (enemy.side === 'left' ? site.x >= CRYSTAL_X : site.x <= CRYSTAL_X)) continue;
-      const runtime = ensureStructureRuntime(structure);
-      if (runtime.hp > 0 && Math.abs(enemy.x - site.x) <= ENEMY_ATTACK_RANGE) return { site, runtime };
-    }
-    return null;
-  };
-  const damageEnemy = (enemy: Enemy, amount: number): boolean => {
-    enemy.hp -= amount;
-    return enemy.hp <= 0;
-  };
-  const reduceStructureDamage = (structure: PlacedStructure, runtime: StructureRuntime, attacker: Enemy | null, amount: number): number => {
-    if (structure.type !== 'wall' || structure.branchLv3 !== 'slippery' || !attacker) return amount;
-    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
-    const cooldowns = runtime.attackerCooldowns ??= new Map<string, number>();
-    const key = `slippery:${attacker.id}`;
-    if ((cooldowns.get(key) ?? 0) > 0 || Math.random() >= (stat.slipperyChance ?? 0)) return amount;
-    cooldowns.set(key, stat.slipperyCooldownSeconds ?? 3);
-    return amount * (stat.slipperyDamageMultiplier ?? 1);
-  };
-  const triggerWallHitEffects = (structure: PlacedStructure, site: BuildSite, runtime: StructureRuntime, attacker: Enemy): void => {
-    if (structure.type !== 'wall') return;
-    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
-    const cooldowns = runtime.attackerCooldowns ??= new Map<string, number>();
-    if (structure.branchLv3 === 'spike' && stat.spikeTrueDamage && damageEnemy(attacker, stat.spikeTrueDamage)) return;
-    if (structure.branchLv3 === 'shock'){
-      const key = `shock:${attacker.id}`;
-      if ((cooldowns.get(key) ?? 0) <= 0){
-        attacker.x += (attacker.side === 'left' ? -1 : 1) * (stat.shockKnockback ?? 0);
-        cooldowns.set(key, stat.shockCooldownSeconds ?? 3);
-      }
-    }
-    if (structure.branchLv5 === 'curse'){
-      const key = `curse:${attacker.id}`;
-      if ((cooldowns.get(key) ?? 0) <= 0){
-        const loss = attacker.maxHp * (stat.curseMaxHpPercent ?? 0);
-        attacker.maxHp = Math.max(1, attacker.maxHp - loss);
-        attacker.hp = Math.min(attacker.hp, attacker.maxHp);
-        cooldowns.set(key, stat.curseCooldownSeconds ?? 3);
-      }
-    }
-  };
+  const spawnEnemy = (side: Side, kind: EnemyKind = 'twisted'): void => { runtimeSpawnEnemy(simulationContext, side, kind); syncSimulationState(); };
+  const removeEnemyAt = (index: number, reward: boolean): void => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };
+  const clearEnemiesWithoutReward = (): void => { runtimeClearEnemiesWithoutReward(simulationContext); syncSimulationState(); };
   const damageStructure = (site: BuildSite, runtime: StructureRuntime, amount: number, attacker: Enemy | null = null): boolean => {
-    const structure = structures.get(site.id);
-    const finalAmount = structure ? reduceStructureDamage(structure, runtime, attacker, amount) : amount;
-    runtime.hp -= finalAmount;
-    if (structure && attacker && runtime.hp > 0) triggerWallHitEffects(structure, site, runtime, attacker);
-    if (runtime.hp > 0) return false;
-    deleteStructure(site.id);
-    renderBuildSite(site.id);
-    return true;
+    const destroyed = runtimeDamageStructure(simulationContext, site, runtime, amount, attacker);
+    syncSimulationState();
+    return destroyed;
   };
-  const damageBase = (amount: number): boolean => {
-    baseHp = Math.max(0, baseHp - amount);
-    return baseHp <= 0;
-  };
-  const getEnemyTemplate = (enemy: Enemy): EnemyTemplate => ENEMY_TEMPLATES[enemy.kind] ?? DEFAULT_ENEMY_TEMPLATE;
-  const getEnemyPrimaryTargetX = (enemy: Enemy): number => enemy.canFly ? leaderX : CRYSTAL_X;
-  const getEnemyMoveDirection = (enemy: Enemy, targetX = getEnemyPrimaryTargetX(enemy)): number => enemy.x < targetX ? 1 : -1;
-  const getStructureAhead = (enemy: Enemy, range: number): { site: BuildSite; runtime: StructureRuntime } | null => {
-    const direction = getEnemyMoveDirection(enemy);
-    let closest: { site: BuildSite; runtime: StructureRuntime; distance: number } | null = null;
-    for (const structure of structures.values()){
-      if (structure.type === 'wall') continue;
-      const site = getBuildSite(structure.siteId);
-      if (!site) continue;
-      const distance = Math.abs(enemy.x - site.x);
-      const isAhead = direction > 0 ? site.x >= enemy.x : site.x <= enemy.x;
-      if (!isAhead || distance > range) continue;
-      const runtime = ensureStructureRuntime(structure);
-      if (runtime.hp <= 0 || (closest && distance >= closest.distance)) continue;
-      closest = { site, runtime, distance };
-    }
-    return closest ? { site: closest.site, runtime: closest.runtime } : null;
-  };
-  const tryEnemyAttack = (enemy: Enemy, template: EnemyTemplate, attack: () => void): boolean => {
-    if (enemy.attackCooldown > 0) return true;
-    attack();
-    enemy.attackCooldown = template.attackCooldown;
-    return true;
-  };
-  const getEnemyEffectiveSpeed = (enemy: Enemy): number => {
-    if (enemy.canFly) return enemy.baseSpeed;
-    for (const siteId of structureSiteIdsOfType('swamp')){
-      const site = getBuildSite(siteId);
-      if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS){
-        if (enemy.weight <= 1) return enemy.baseSpeed * 0.5;
-        if (enemy.weight === 2) return enemy.baseSpeed * 0.75;
-        return enemy.baseSpeed;
-      }
-    }
-    return enemy.baseSpeed;
-  };
-  const moveEnemyToward = (enemy: Enemy, targetX: number, dt: number, speed = getEnemyEffectiveSpeed(enemy)): void => {
-    enemy.x += getEnemyMoveDirection(enemy, targetX) * speed * dt;
-  };
-  const attackEnemyTarget = (enemy: Enemy, template: EnemyTemplate, targetX: number, dt: number): void => {
-    if (Math.abs(enemy.x - targetX) <= template.attackRange){
-      tryEnemyAttack(enemy, template, () => { damageBase(template.damage); });
-      return;
-    }
-    moveEnemyToward(enemy, targetX, dt);
-  };
-  const updateMeleeBasicEnemy = (enemy: Enemy, template: EnemyTemplate, dt: number): void => {
-    const wall = getBlockingWall(enemy);
-    if (wall){
-      tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
-      return;
-    }
-    attackEnemyTarget(enemy, template, getEnemyPrimaryTargetX(enemy), dt);
-  };
-  const updateSuicideBomberEnemy = (enemy: Enemy, template: EnemyTemplate, index: number, dt: number): void => {
-    const wall = getBlockingWall(enemy);
-    if (wall && Math.abs(enemy.x - wall.site.x) <= template.attackRange){
-      damageStructure(wall.site, wall.runtime, template.damage, enemy);
-      removeEnemyAt(index, false);
-      return;
-    }
-    if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange){
-      damageBase(template.damage);
-      removeEnemyAt(index, false);
-      return;
-    }
-    moveEnemyToward(enemy, CRYSTAL_X, dt);
-  };
-  const updateFlyingEnemy = (enemy: Enemy, template: EnemyTemplate, index: number, dt: number): void => {
-    const targetX = getEnemyPrimaryTargetX(enemy);
-    if (Math.abs(enemy.x - targetX) <= template.attackRange){
-      damageBase(template.damage);
-      removeEnemyAt(index, false);
-      return;
-    }
-    moveEnemyToward(enemy, targetX, dt, enemy.baseSpeed);
-  };
-  const updateDarkMageEnemy = (enemy: Enemy, template: EnemyTemplate, dt: number): void => {
-    const wall = getBlockingWall(enemy);
-    if (wall){
-      tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
-      return;
-    }
-    if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange){
-      moveEnemyToward(enemy, CRYSTAL_X, dt);
-      return;
-    }
-    enemy.mageOrbTimer = (enemy.mageOrbTimer ?? 0) + dt;
-    while (enemy.mageOrbTimer >= 2 && (enemy.mageOrbs ?? 0) < 3){
-      enemy.mageOrbTimer -= 2;
-      enemy.mageOrbs = (enemy.mageOrbs ?? 0) + 1;
-    }
-    if ((enemy.mageOrbs ?? 0) >= 3){
-      tryEnemyAttack(enemy, template, () => {
-        damageBase(template.damage * (enemy.mageOrbs ?? 3));
-        enemy.mageOrbs = 0;
-        enemy.mageOrbTimer = 0;
-      });
-    }
-  };
-  const damageDragonStructureCounter = (site: BuildSite, runtime: StructureRuntime): boolean => {
-    const structure = structures.get(site.id);
-    if (!structure || structure.type === 'wall') return false;
-    runtime.dragonHitCount = (runtime.dragonHitCount ?? 0) + 1;
-    if (runtime.dragonHitCount < structure.level) return false;
-    deleteStructure(site.id);
-    renderBuildSite(site.id);
-    return true;
-  };
-  const updateResentfulDragonEnemy = (enemy: Enemy, template: EnemyTemplate, dt: number): void => {
-    const structureAhead = getStructureAhead(enemy, template.attackRange);
-    if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange || structureAhead){
-      tryEnemyAttack(enemy, template, () => {
-        if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) damageBase(template.damage);
-        if (structureAhead) damageDragonStructureCounter(structureAhead.site, structureAhead.runtime);
-      });
-      return;
-    }
-    moveEnemyToward(enemy, CRYSTAL_X, dt, enemy.baseSpeed);
-  };
-  const isUnitInLandmineTriggerRadius = (site: BuildSite): boolean => (
-    Math.abs(leaderX - site.x) <= LANDMINE_TRIGGER_RADIUS
-    || enemies.some(enemy => Math.abs(enemy.x - site.x) <= LANDMINE_TRIGGER_RADIUS)
-  );
-  const explodeLandmine = (site: BuildSite): void => {
-    for (let i = enemies.length - 1; i >= 0; i -= 1){
-      const enemy = enemies[i];
-      if (enemy && Math.abs(enemy.x - site.x) <= LANDMINE_BLAST_RADIUS && damageEnemy(enemy, LANDMINE_TRUE_DAMAGE)) removeEnemyAt(i, true);
-    }
-    deleteStructure(site.id);
-    renderBuildSite(site.id);
-  };
-  const updateEnemies = (dt: number): void => {
-    if (dayNightPhase === 'night') enemySpawnTimer += dt;
-    else enemySpawnTimer = 0;
-    leaderAttackCooldown = Math.max(0, leaderAttackCooldown - dt);
-    while (dayNightPhase === 'night' && enemySpawnTimer >= ENEMY_SPAWN_INTERVAL){
-      enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
-      spawnEnemy(nextEnemyId % 2 === 0 ? 'left' : 'right');
-    }
+  const damageBase = (amount: number): boolean => { const destroyed = runtimeDamageBase(simulationContext, amount); syncSimulationState(); return destroyed; };
+  const updateEnemies = (dt: number): void => { runtimeUpdateEnemies(simulationContext, dt); syncSimulationState(); };
+  const updateDayNightTimer = (dt: number): void => { runtimeUpdateDayNightTimer(simulationContext, dt); syncSimulationState(); };
+  const updateStructures = (dt: number): void => { runtimeUpdateStructures(simulationContext, dt); syncSimulationState(); };
 
-    for (let i = enemies.length - 1; i >= 0; i -= 1){
-      const enemy = enemies[i];
-      if (!enemy) continue;
-      enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
-      const template = getEnemyTemplate(enemy);
-      switch (enemy.kind){
-        case 'suicideBomber':
-          updateSuicideBomberEnemy(enemy, template, i, dt);
-          break;
-        case 'mutantBird':
-          updateFlyingEnemy(enemy, template, i, dt);
-          break;
-        case 'darkMage':
-          updateDarkMageEnemy(enemy, template, dt);
-          break;
-        case 'resentfulDragon':
-          updateResentfulDragonEnemy(enemy, template, dt);
-          break;
-        case 'twisted':
-        case 'crawler':
-        case 'madDog':
-        case 'ironMan':
-          updateMeleeBasicEnemy(enemy, template, dt);
-          break;
-      }
-      if (!enemies.includes(enemy)) continue;
-      if (leaderAttackCooldown === 0 && Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE){
-        leaderAttackCooldown = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
-        if (damageEnemy(enemy, LEADER_BASIC_ATTACK_DAMAGE)) removeEnemyAt(i, true);
-      }
-    }
-  };
-  const updateDayNightTimer = (dt: number): void => {
-    phaseRemainingSeconds -= dt;
-    while (phaseRemainingSeconds <= 0){
-      phaseRemainingSeconds += DAY_DURATION_SECONDS;
-      dayNightPhase = dayNightPhase === 'night' ? 'day' : 'night';
-      if (dayNightPhase === 'day') clearEnemiesWithoutReward();
-    }
-    renderDayNightTimer();
-  };
-  const updateStructureRuntimeTimers = (runtime: StructureRuntime, dt: number): void => {
-    for (const [key, remaining] of runtime.attackerCooldowns ?? []){
-      const next = Math.max(0, remaining - dt);
-      if (next > 0) runtime.attackerCooldowns?.set(key, next);
-      else runtime.attackerCooldowns?.delete(key);
-    }
-  };
-  const updateWallRegeneration = (structure: PlacedStructure, runtime: StructureRuntime, dt: number): void => {
-    if (structure.type !== 'wall') return;
-    const maxHp = getStructureMaxHp(structure);
-    const regen = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0;
-    runtime.hp = Math.min(maxHp, runtime.hp + regen * dt);
-  };
-  const updateStructures = (dt: number): void => {
-    for (const structure of structures.values()){
-      const runtime = ensureStructureRuntime(structure);
-      updateStructureRuntimeTimers(runtime, dt);
-      updateWallRegeneration(structure, runtime, dt);
-    }
-    for (const type of ['watchtower', 'elementalTower'] as const){
-      for (const siteId of structureSiteIdsOfType(type)){
-        const structure = structures.get(siteId);
-        if (!structure) continue;
-        const site = getBuildSite(structure.siteId);
-      if (!site) continue;
-      const runtime = ensureStructureRuntime(structure);
-      runtime.cooldown = Math.max(0, runtime.cooldown - dt);
-      if (runtime.cooldown > 0) continue;
-      const stat = getStructureLevelStat(structure.type, structure.level);
-      const target = enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
-      if (!target) continue;
-      runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
-      if (damageEnemy(target, stat.damage ?? 0)) removeEnemyAt(enemies.indexOf(target), true);
-        }
-    }
-
-    for (const siteId of [...structureSiteIdsOfType('landmine')]){
-      const structure = structures.get(siteId);
-      const site = getBuildSite(siteId);
-      if (!structure || !site) continue;
-      const runtime = ensureStructureRuntime(structure);
-      if (!runtime.armed && isUnitInLandmineTriggerRadius(site)){
-        runtime.armed = true;
-        runtime.fuse = LANDMINE_FUSE_SECONDS;
-      }
-      if (!runtime.armed) continue;
-      runtime.fuse = Math.max(0, (runtime.fuse ?? LANDMINE_FUSE_SECONDS) - dt);
-      if (runtime.fuse <= 0) explodeLandmine(site);
-    }
-  };
   const renderEnemies = (): void => {
     if (!enemiesContainer) return;
     const width = viewport?.clientWidth || window.innerWidth || 1;

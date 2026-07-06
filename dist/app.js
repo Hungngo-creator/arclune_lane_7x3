@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -38076,38 +38076,32 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const CASTLE_WIDTH = __dep3.CASTLE_WIDTH;
   const CRYSTAL_X = __dep3.CRYSTAL_X;
   const DEFAULT_STRUCTURE_COOLDOWN = __dep3.DEFAULT_STRUCTURE_COOLDOWN;
-  const ENEMY_ATTACK_RANGE = __dep3.ENEMY_ATTACK_RANGE;
-  const ENEMY_LIMIT = __dep3.ENEMY_LIMIT;
-  const ENEMY_SPAWN_INTERVAL = __dep3.ENEMY_SPAWN_INTERVAL;
-  const ENEMY_START_PADDING = __dep3.ENEMY_START_PADDING;
   const GROUND_PERCENT = __dep3.GROUND_PERCENT;
-  const LEADER_ATTACK_RANGE = __dep3.LEADER_ATTACK_RANGE;
-  const LEADER_BASIC_ATTACK_COOLDOWN_SECONDS = __dep3.LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
-  const LEADER_BASIC_ATTACK_DAMAGE = __dep3.LEADER_BASIC_ATTACK_DAMAGE;
-  const LANDMINE_BLAST_RADIUS = __dep3.LANDMINE_BLAST_RADIUS;
-  const LANDMINE_FUSE_SECONDS = __dep3.LANDMINE_FUSE_SECONDS;
-  const LANDMINE_TRIGGER_RADIUS = __dep3.LANDMINE_TRIGGER_RADIUS;
-  const LANDMINE_TRUE_DAMAGE = __dep3.LANDMINE_TRUE_DAMAGE;
   const LEADER_EDGE_PADDING_LEFT = __dep3.LEADER_EDGE_PADDING_LEFT;
   const LEADER_EDGE_PADDING_RIGHT = __dep3.LEADER_EDGE_PADDING_RIGHT;
   const LEADER_SPEED = __dep3.LEADER_SPEED;
   const LEADER_START_X = __dep3.LEADER_START_X;
   const LEADER_WIDTH = __dep3.LEADER_WIDTH;
   const STYLE_ID = __dep3.STYLE_ID;
-  const SWAMP_RADIUS = __dep3.SWAMP_RADIUS;
   const WORLD_WIDTH = __dep3.WORLD_WIDTH;
-  const __dep4 = __require('./screens/vinh-da/enemies.ts');
-  const DEFAULT_ENEMY_TEMPLATE = __dep4.DEFAULT_ENEMY_TEMPLATE;
-  const ENEMY_TEMPLATES = __dep4.ENEMY_TEMPLATES;
-  const __dep5 = __require('./screens/vinh-da/structures.ts');
-  const BUILD_LEVEL_COST = __dep5.BUILD_LEVEL_COST;
-  const BUILD_NODE_OPTIONS = __dep5.BUILD_NODE_OPTIONS;
-  const GROUND_BUILD_NODE_OPTIONS = __dep5.GROUND_BUILD_NODE_OPTIONS;
-  const BUILD_SITES = __dep5.BUILD_SITES;
-  const UPGRADE_NODE_LABEL = __dep5.UPGRADE_NODE_LABEL;
-  const getStructureLevelStat = __dep5.getStructureLevelStat;
-  const isStructureAllowedOnBuildSite = __dep5.isStructureAllowedOnBuildSite;
-  const DAY_DURATION_SECONDS = 300;
+  const __dep4 = __require('./screens/vinh-da/structures.ts');
+  const BUILD_LEVEL_COST = __dep4.BUILD_LEVEL_COST;
+  const BUILD_NODE_OPTIONS = __dep4.BUILD_NODE_OPTIONS;
+  const GROUND_BUILD_NODE_OPTIONS = __dep4.GROUND_BUILD_NODE_OPTIONS;
+  const BUILD_SITES = __dep4.BUILD_SITES;
+  const UPGRADE_NODE_LABEL = __dep4.UPGRADE_NODE_LABEL;
+  const getStructureLevelStat = __dep4.getStructureLevelStat;
+  const isStructureAllowedOnBuildSite = __dep4.isStructureAllowedOnBuildSite;
+  const __dep5 = __require('./screens/vinh-da/simulation.ts');
+  const DAY_DURATION_SECONDS = __dep5.DAY_DURATION_SECONDS;
+  const runtimeDamageBase = __dep5.damageBase;
+  const runtimeDamageStructure = __dep5.damageStructure;
+  const runtimeClearEnemiesWithoutReward = __dep5.clearEnemiesWithoutReward;
+  const runtimeRemoveEnemyAt = __dep5.removeEnemyAt;
+  const runtimeSpawnEnemy = __dep5.spawnEnemy;
+  const runtimeUpdateDayNightTimer = __dep5.updateDayNightTimer;
+  const runtimeUpdateEnemies = __dep5.updateEnemies;
+  const runtimeUpdateStructures = __dep5.updateStructures;
   const CSS = /* css */ `
     .app--vinh-da-gameplay{min-height:100dvh;background:#020204;color:#f7f2ff;overflow:hidden;touch-action:none;}
     .vinh-da-game{position:relative;min-height:100dvh;overflow:hidden;background:linear-gradient(#020204 0 58%,#07070b 58% 100%);touch-action:none;user-select:none;}
@@ -38271,9 +38265,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       };
       const renderDayNightTimer = () => {
           if (dayNightPhaseText)
-              dayNightPhaseText.textContent = dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
+              dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
           if (phaseTimeRemainingText) {
-              const totalSeconds = Math.max(0, Math.ceil(phaseRemainingSeconds));
+              const totalSeconds = Math.max(0, Math.ceil(simulationState.phaseRemainingSeconds));
               const minutes = Math.floor(totalSeconds / 60);
               const seconds = totalSeconds % 60;
               phaseTimeRemainingText.textContent = `${minutes}:${String(seconds).padStart(2, '0')}`;
@@ -38440,369 +38434,56 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               selectedGroundPlotId = null;
           renderVisibleBuildSites();
       };
-      const spawnEnemy = (side, kind = 'twisted') => {
-          if (dayNightPhase !== 'night' || enemies.length >= ENEMY_LIMIT)
-              return;
-          const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
-          enemies.push({
-              id: nextEnemyId,
-              x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
-              kind: template.kind,
-              hp: template.hp,
-              maxHp: template.hp,
-              speed: template.speed,
-              baseSpeed: template.speed,
-              weight: template.weight,
-              attackCooldown: template.attackCooldown,
-              canFly: template.canFly,
-              side
-          });
-          nextEnemyId += 1;
+      const simulationState = {
+          get bloodSealStone() { return bloodSealStone; },
+          set bloodSealStone(value) { bloodSealStone = value; },
+          get baseHp() { return baseHp; },
+          set baseHp(value) { baseHp = value; },
+          get leaderX() { return leaderX; },
+          set leaderX(value) { leaderX = value; },
+          enemies,
+          nextEnemyId,
+          enemySpawnTimer,
+          dayNightPhase,
+          phaseRemainingSeconds,
+          leaderAttackCooldown,
+          structures
       };
-      const removeEnemyAt = (index, reward) => {
-          const [enemy] = enemies.splice(index, 1);
-          if (!enemy)
-              return;
-          enemyElements.get(enemy.id)?.remove();
-          enemyElements.delete(enemy.id);
-          if (reward) {
-              bloodSealStone += ENEMY_TEMPLATES[enemy.kind].reward;
-              renderEconomy();
+      const simulationContext = {
+          state: simulationState,
+          structureSitesByType,
+          getBuildSite,
+          ensureStructureRuntime,
+          getStructureMaxHp,
+          deleteStructure,
+          structureSiteIdsOfType,
+          renderEconomy,
+          renderBuildSite,
+          renderDayNightTimer,
+          removeEnemyElement(enemyId) {
+              enemyElements.get(enemyId)?.remove();
+              enemyElements.delete(enemyId);
           }
       };
-      const clearEnemiesWithoutReward = () => {
-          while (enemies.length > 0)
-              removeEnemyAt(enemies.length - 1, false);
-          enemySpawnTimer = 0;
+      const syncSimulationState = () => {
+          nextEnemyId = simulationState.nextEnemyId;
+          enemySpawnTimer = simulationState.enemySpawnTimer;
+          dayNightPhase = simulationState.dayNightPhase;
+          phaseRemainingSeconds = simulationState.phaseRemainingSeconds;
+          leaderAttackCooldown = simulationState.leaderAttackCooldown;
       };
-      const getBlockingWall = (enemy) => {
-          for (const siteId of structureSiteIdsOfType('wall')) {
-              const structure = structures.get(siteId);
-              if (!structure)
-                  continue;
-              const site = getBuildSite(siteId);
-              if (!site || (enemy.side === 'left' ? site.x >= CRYSTAL_X : site.x <= CRYSTAL_X))
-                  continue;
-              const runtime = ensureStructureRuntime(structure);
-              if (runtime.hp > 0 && Math.abs(enemy.x - site.x) <= ENEMY_ATTACK_RANGE)
-                  return { site, runtime };
-          }
-          return null;
-      };
-      const damageEnemy = (enemy, amount) => {
-          enemy.hp -= amount;
-          return enemy.hp <= 0;
-      };
-      const reduceStructureDamage = (structure, runtime, attacker, amount) => {
-          if (structure.type !== 'wall' || structure.branchLv3 !== 'slippery' || !attacker)
-              return amount;
-          const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
-          const cooldowns = runtime.attackerCooldowns ??= new Map();
-          const key = `slippery:${attacker.id}`;
-          if ((cooldowns.get(key) ?? 0) > 0 || Math.random() >= (stat.slipperyChance ?? 0))
-              return amount;
-          cooldowns.set(key, stat.slipperyCooldownSeconds ?? 3);
-          return amount * (stat.slipperyDamageMultiplier ?? 1);
-      };
-      const triggerWallHitEffects = (structure, site, runtime, attacker) => {
-          if (structure.type !== 'wall')
-              return;
-          const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
-          const cooldowns = runtime.attackerCooldowns ??= new Map();
-          if (structure.branchLv3 === 'spike' && stat.spikeTrueDamage && damageEnemy(attacker, stat.spikeTrueDamage))
-              return;
-          if (structure.branchLv3 === 'shock') {
-              const key = `shock:${attacker.id}`;
-              if ((cooldowns.get(key) ?? 0) <= 0) {
-                  attacker.x += (attacker.side === 'left' ? -1 : 1) * (stat.shockKnockback ?? 0);
-                  cooldowns.set(key, stat.shockCooldownSeconds ?? 3);
-              }
-          }
-          if (structure.branchLv5 === 'curse') {
-              const key = `curse:${attacker.id}`;
-              if ((cooldowns.get(key) ?? 0) <= 0) {
-                  const loss = attacker.maxHp * (stat.curseMaxHpPercent ?? 0);
-                  attacker.maxHp = Math.max(1, attacker.maxHp - loss);
-                  attacker.hp = Math.min(attacker.hp, attacker.maxHp);
-                  cooldowns.set(key, stat.curseCooldownSeconds ?? 3);
-              }
-          }
-      };
+      const spawnEnemy = (side, kind = 'twisted') => { runtimeSpawnEnemy(simulationContext, side, kind); syncSimulationState(); };
+      const removeEnemyAt = (index, reward) => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };
+      const clearEnemiesWithoutReward = () => { runtimeClearEnemiesWithoutReward(simulationContext); syncSimulationState(); };
       const damageStructure = (site, runtime, amount, attacker = null) => {
-          const structure = structures.get(site.id);
-          const finalAmount = structure ? reduceStructureDamage(structure, runtime, attacker, amount) : amount;
-          runtime.hp -= finalAmount;
-          if (structure && attacker && runtime.hp > 0)
-              triggerWallHitEffects(structure, site, runtime, attacker);
-          if (runtime.hp > 0)
-              return false;
-          deleteStructure(site.id);
-          renderBuildSite(site.id);
-          return true;
+          const destroyed = runtimeDamageStructure(simulationContext, site, runtime, amount, attacker);
+          syncSimulationState();
+          return destroyed;
       };
-      const damageBase = (amount) => {
-          baseHp = Math.max(0, baseHp - amount);
-          return baseHp <= 0;
-      };
-      const getEnemyTemplate = (enemy) => ENEMY_TEMPLATES[enemy.kind] ?? DEFAULT_ENEMY_TEMPLATE;
-      const getEnemyPrimaryTargetX = (enemy) => enemy.canFly ? leaderX : CRYSTAL_X;
-      const getEnemyMoveDirection = (enemy, targetX = getEnemyPrimaryTargetX(enemy)) => enemy.x < targetX ? 1 : -1;
-      const getStructureAhead = (enemy, range) => {
-          const direction = getEnemyMoveDirection(enemy);
-          let closest = null;
-          for (const structure of structures.values()) {
-              if (structure.type === 'wall')
-                  continue;
-              const site = getBuildSite(structure.siteId);
-              if (!site)
-                  continue;
-              const distance = Math.abs(enemy.x - site.x);
-              const isAhead = direction > 0 ? site.x >= enemy.x : site.x <= enemy.x;
-              if (!isAhead || distance > range)
-                  continue;
-              const runtime = ensureStructureRuntime(structure);
-              if (runtime.hp <= 0 || (closest && distance >= closest.distance))
-                  continue;
-              closest = { site, runtime, distance };
-          }
-          return closest ? { site: closest.site, runtime: closest.runtime } : null;
-      };
-      const tryEnemyAttack = (enemy, template, attack) => {
-          if (enemy.attackCooldown > 0)
-              return true;
-          attack();
-          enemy.attackCooldown = template.attackCooldown;
-          return true;
-      };
-      const getEnemyEffectiveSpeed = (enemy) => {
-          if (enemy.canFly)
-              return enemy.baseSpeed;
-          for (const siteId of structureSiteIdsOfType('swamp')) {
-              const site = getBuildSite(siteId);
-              if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS) {
-                  if (enemy.weight <= 1)
-                      return enemy.baseSpeed * 0.5;
-                  if (enemy.weight === 2)
-                      return enemy.baseSpeed * 0.75;
-                  return enemy.baseSpeed;
-              }
-          }
-          return enemy.baseSpeed;
-      };
-      const moveEnemyToward = (enemy, targetX, dt, speed = getEnemyEffectiveSpeed(enemy)) => {
-          enemy.x += getEnemyMoveDirection(enemy, targetX) * speed * dt;
-      };
-      const attackEnemyTarget = (enemy, template, targetX, dt) => {
-          if (Math.abs(enemy.x - targetX) <= template.attackRange) {
-              tryEnemyAttack(enemy, template, () => { damageBase(template.damage); });
-              return;
-          }
-          moveEnemyToward(enemy, targetX, dt);
-      };
-      const updateMeleeBasicEnemy = (enemy, template, dt) => {
-          const wall = getBlockingWall(enemy);
-          if (wall) {
-              tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
-              return;
-          }
-          attackEnemyTarget(enemy, template, getEnemyPrimaryTargetX(enemy), dt);
-      };
-      const updateSuicideBomberEnemy = (enemy, template, index, dt) => {
-          const wall = getBlockingWall(enemy);
-          if (wall && Math.abs(enemy.x - wall.site.x) <= template.attackRange) {
-              damageStructure(wall.site, wall.runtime, template.damage, enemy);
-              removeEnemyAt(index, false);
-              return;
-          }
-          if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) {
-              damageBase(template.damage);
-              removeEnemyAt(index, false);
-              return;
-          }
-          moveEnemyToward(enemy, CRYSTAL_X, dt);
-      };
-      const updateFlyingEnemy = (enemy, template, index, dt) => {
-          const targetX = getEnemyPrimaryTargetX(enemy);
-          if (Math.abs(enemy.x - targetX) <= template.attackRange) {
-              damageBase(template.damage);
-              removeEnemyAt(index, false);
-              return;
-          }
-          moveEnemyToward(enemy, targetX, dt, enemy.baseSpeed);
-      };
-      const updateDarkMageEnemy = (enemy, template, dt) => {
-          const wall = getBlockingWall(enemy);
-          if (wall) {
-              tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
-              return;
-          }
-          if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange) {
-              moveEnemyToward(enemy, CRYSTAL_X, dt);
-              return;
-          }
-          enemy.mageOrbTimer = (enemy.mageOrbTimer ?? 0) + dt;
-          while (enemy.mageOrbTimer >= 2 && (enemy.mageOrbs ?? 0) < 3) {
-              enemy.mageOrbTimer -= 2;
-              enemy.mageOrbs = (enemy.mageOrbs ?? 0) + 1;
-          }
-          if ((enemy.mageOrbs ?? 0) >= 3) {
-              tryEnemyAttack(enemy, template, () => {
-                  damageBase(template.damage * (enemy.mageOrbs ?? 3));
-                  enemy.mageOrbs = 0;
-                  enemy.mageOrbTimer = 0;
-              });
-          }
-      };
-      const damageDragonStructureCounter = (site, runtime) => {
-          const structure = structures.get(site.id);
-          if (!structure || structure.type === 'wall')
-              return false;
-          runtime.dragonHitCount = (runtime.dragonHitCount ?? 0) + 1;
-          if (runtime.dragonHitCount < structure.level)
-              return false;
-          deleteStructure(site.id);
-          renderBuildSite(site.id);
-          return true;
-      };
-      const updateResentfulDragonEnemy = (enemy, template, dt) => {
-          const structureAhead = getStructureAhead(enemy, template.attackRange);
-          if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange || structureAhead) {
-              tryEnemyAttack(enemy, template, () => {
-                  if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange)
-                      damageBase(template.damage);
-                  if (structureAhead)
-                      damageDragonStructureCounter(structureAhead.site, structureAhead.runtime);
-              });
-              return;
-          }
-          moveEnemyToward(enemy, CRYSTAL_X, dt, enemy.baseSpeed);
-      };
-      const isUnitInLandmineTriggerRadius = (site) => (Math.abs(leaderX - site.x) <= LANDMINE_TRIGGER_RADIUS
-          || enemies.some(enemy => Math.abs(enemy.x - site.x) <= LANDMINE_TRIGGER_RADIUS));
-      const explodeLandmine = (site) => {
-          for (let i = enemies.length - 1; i >= 0; i -= 1) {
-              const enemy = enemies[i];
-              if (enemy && Math.abs(enemy.x - site.x) <= LANDMINE_BLAST_RADIUS && damageEnemy(enemy, LANDMINE_TRUE_DAMAGE))
-                  removeEnemyAt(i, true);
-          }
-          deleteStructure(site.id);
-          renderBuildSite(site.id);
-      };
-      const updateEnemies = (dt) => {
-          if (dayNightPhase === 'night')
-              enemySpawnTimer += dt;
-          else
-              enemySpawnTimer = 0;
-          leaderAttackCooldown = Math.max(0, leaderAttackCooldown - dt);
-          while (dayNightPhase === 'night' && enemySpawnTimer >= ENEMY_SPAWN_INTERVAL) {
-              enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
-              spawnEnemy(nextEnemyId % 2 === 0 ? 'left' : 'right');
-          }
-          for (let i = enemies.length - 1; i >= 0; i -= 1) {
-              const enemy = enemies[i];
-              if (!enemy)
-                  continue;
-              enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
-              const template = getEnemyTemplate(enemy);
-              switch (enemy.kind) {
-                  case 'suicideBomber':
-                      updateSuicideBomberEnemy(enemy, template, i, dt);
-                      break;
-                  case 'mutantBird':
-                      updateFlyingEnemy(enemy, template, i, dt);
-                      break;
-                  case 'darkMage':
-                      updateDarkMageEnemy(enemy, template, dt);
-                      break;
-                  case 'resentfulDragon':
-                      updateResentfulDragonEnemy(enemy, template, dt);
-                      break;
-                  case 'twisted':
-                  case 'crawler':
-                  case 'madDog':
-                  case 'ironMan':
-                      updateMeleeBasicEnemy(enemy, template, dt);
-                      break;
-              }
-              if (!enemies.includes(enemy))
-                  continue;
-              if (leaderAttackCooldown === 0 && Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE) {
-                  leaderAttackCooldown = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
-                  if (damageEnemy(enemy, LEADER_BASIC_ATTACK_DAMAGE))
-                      removeEnemyAt(i, true);
-              }
-          }
-      };
-      const updateDayNightTimer = (dt) => {
-          phaseRemainingSeconds -= dt;
-          while (phaseRemainingSeconds <= 0) {
-              phaseRemainingSeconds += DAY_DURATION_SECONDS;
-              dayNightPhase = dayNightPhase === 'night' ? 'day' : 'night';
-              if (dayNightPhase === 'day')
-                  clearEnemiesWithoutReward();
-          }
-          renderDayNightTimer();
-      };
-      const updateStructureRuntimeTimers = (runtime, dt) => {
-          for (const [key, remaining] of runtime.attackerCooldowns ?? []) {
-              const next = Math.max(0, remaining - dt);
-              if (next > 0)
-                  runtime.attackerCooldowns?.set(key, next);
-              else
-                  runtime.attackerCooldowns?.delete(key);
-          }
-      };
-      const updateWallRegeneration = (structure, runtime, dt) => {
-          if (structure.type !== 'wall')
-              return;
-          const maxHp = getStructureMaxHp(structure);
-          const regen = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0;
-          runtime.hp = Math.min(maxHp, runtime.hp + regen * dt);
-      };
-      const updateStructures = (dt) => {
-          for (const structure of structures.values()) {
-              const runtime = ensureStructureRuntime(structure);
-              updateStructureRuntimeTimers(runtime, dt);
-              updateWallRegeneration(structure, runtime, dt);
-          }
-          for (const type of ['watchtower', 'elementalTower']) {
-              for (const siteId of structureSiteIdsOfType(type)) {
-                  const structure = structures.get(siteId);
-                  if (!structure)
-                      continue;
-                  const site = getBuildSite(structure.siteId);
-                  if (!site)
-                      continue;
-                  const runtime = ensureStructureRuntime(structure);
-                  runtime.cooldown = Math.max(0, runtime.cooldown - dt);
-                  if (runtime.cooldown > 0)
-                      continue;
-                  const stat = getStructureLevelStat(structure.type, structure.level);
-                  const target = enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
-                  if (!target)
-                      continue;
-                  runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
-                  if (damageEnemy(target, stat.damage ?? 0))
-                      removeEnemyAt(enemies.indexOf(target), true);
-              }
-          }
-          for (const siteId of [...structureSiteIdsOfType('landmine')]) {
-              const structure = structures.get(siteId);
-              const site = getBuildSite(siteId);
-              if (!structure || !site)
-                  continue;
-              const runtime = ensureStructureRuntime(structure);
-              if (!runtime.armed && isUnitInLandmineTriggerRadius(site)) {
-                  runtime.armed = true;
-                  runtime.fuse = LANDMINE_FUSE_SECONDS;
-              }
-              if (!runtime.armed)
-                  continue;
-              runtime.fuse = Math.max(0, (runtime.fuse ?? LANDMINE_FUSE_SECONDS) - dt);
-              if (runtime.fuse <= 0)
-                  explodeLandmine(site);
-          }
-      };
+      const damageBase = (amount) => { const destroyed = runtimeDamageBase(simulationContext, amount); syncSimulationState(); return destroyed; };
+      const updateEnemies = (dt) => { runtimeUpdateEnemies(simulationContext, dt); syncSimulationState(); };
+      const updateDayNightTimer = (dt) => { runtimeUpdateDayNightTimer(simulationContext, dt); syncSimulationState(); };
+      const updateStructures = (dt) => { runtimeUpdateStructures(simulationContext, dt); syncSimulationState(); };
       const renderEnemies = () => {
           if (!enemiesContainer)
               return;
@@ -38975,6 +38656,418 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
+};
+__modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./screens/vinh-da/constants.ts');
+  const CRYSTAL_X = __dep0.CRYSTAL_X;
+  const DEFAULT_STRUCTURE_COOLDOWN = __dep0.DEFAULT_STRUCTURE_COOLDOWN;
+  const ENEMY_ATTACK_RANGE = __dep0.ENEMY_ATTACK_RANGE;
+  const ENEMY_LIMIT = __dep0.ENEMY_LIMIT;
+  const ENEMY_SPAWN_INTERVAL = __dep0.ENEMY_SPAWN_INTERVAL;
+  const ENEMY_START_PADDING = __dep0.ENEMY_START_PADDING;
+  const LANDMINE_BLAST_RADIUS = __dep0.LANDMINE_BLAST_RADIUS;
+  const LANDMINE_FUSE_SECONDS = __dep0.LANDMINE_FUSE_SECONDS;
+  const LANDMINE_TRIGGER_RADIUS = __dep0.LANDMINE_TRIGGER_RADIUS;
+  const LANDMINE_TRUE_DAMAGE = __dep0.LANDMINE_TRUE_DAMAGE;
+  const LEADER_ATTACK_RANGE = __dep0.LEADER_ATTACK_RANGE;
+  const LEADER_BASIC_ATTACK_COOLDOWN_SECONDS = __dep0.LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
+  const LEADER_BASIC_ATTACK_DAMAGE = __dep0.LEADER_BASIC_ATTACK_DAMAGE;
+  const SWAMP_RADIUS = __dep0.SWAMP_RADIUS;
+  const WORLD_WIDTH = __dep0.WORLD_WIDTH;
+  const __dep1 = __require('./screens/vinh-da/enemies.ts');
+  const DEFAULT_ENEMY_TEMPLATE = __dep1.DEFAULT_ENEMY_TEMPLATE;
+  const ENEMY_TEMPLATES = __dep1.ENEMY_TEMPLATES;
+  const __dep2 = __require('./screens/vinh-da/structures.ts');
+  const getStructureLevelStat = __dep2.getStructureLevelStat;
+  const DAY_DURATION_SECONDS = 300;
+  const spawnEnemy = (ctx, side, kind = 'twisted') => {
+      if (ctx.state.dayNightPhase !== 'night' || ctx.state.enemies.length >= ENEMY_LIMIT)
+          return;
+      const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
+      ctx.state.enemies.push({
+          id: ctx.state.nextEnemyId,
+          x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
+          kind: template.kind,
+          hp: template.hp,
+          maxHp: template.hp,
+          speed: template.speed,
+          baseSpeed: template.speed,
+          weight: template.weight,
+          attackCooldown: template.attackCooldown,
+          canFly: template.canFly,
+          side
+      });
+      ctx.state.nextEnemyId += 1;
+  };
+  const removeEnemyAt = (ctx, index, reward) => {
+      const [enemy] = ctx.state.enemies.splice(index, 1);
+      if (!enemy)
+          return;
+      ctx.removeEnemyElement(enemy.id);
+      if (reward) {
+          ctx.state.bloodSealStone += ENEMY_TEMPLATES[enemy.kind].reward;
+          ctx.renderEconomy();
+      }
+  };
+  const clearEnemiesWithoutReward = (ctx) => {
+      while (ctx.state.enemies.length > 0)
+          removeEnemyAt(ctx, ctx.state.enemies.length - 1, false);
+      ctx.state.enemySpawnTimer = 0;
+  };
+  const getBlockingWall = (ctx, enemy) => {
+      for (const siteId of ctx.structureSiteIdsOfType('wall')) {
+          const structure = ctx.state.structures.get(siteId);
+          if (!structure)
+              continue;
+          const site = ctx.getBuildSite(siteId);
+          if (!site || (enemy.side === 'left' ? site.x >= CRYSTAL_X : site.x <= CRYSTAL_X))
+              continue;
+          const runtime = ctx.ensureStructureRuntime(structure);
+          if (runtime.hp > 0 && Math.abs(enemy.x - site.x) <= ENEMY_ATTACK_RANGE)
+              return { site, runtime };
+      }
+      return null;
+  };
+  const damageEnemy = (ctx, enemy, amount) => {
+      enemy.hp -= amount;
+      return enemy.hp <= 0;
+  };
+  const reduceStructureDamage = (ctx, structure, runtime, attacker, amount) => {
+      if (structure.type !== 'wall' || structure.branchLv3 !== 'slippery' || !attacker)
+          return amount;
+      const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+      const cooldowns = runtime.attackerCooldowns ??= new Map();
+      const key = `slippery:${attacker.id}`;
+      if ((cooldowns.get(key) ?? 0) > 0 || Math.random() >= (stat.slipperyChance ?? 0))
+          return amount;
+      cooldowns.set(key, stat.slipperyCooldownSeconds ?? 3);
+      return amount * (stat.slipperyDamageMultiplier ?? 1);
+  };
+  const triggerWallHitEffects = (ctx, structure, site, runtime, attacker) => {
+      if (structure.type !== 'wall')
+          return;
+      const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+      const cooldowns = runtime.attackerCooldowns ??= new Map();
+      if (structure.branchLv3 === 'spike' && stat.spikeTrueDamage && damageEnemy(ctx, attacker, stat.spikeTrueDamage))
+          return;
+      if (structure.branchLv3 === 'shock') {
+          const key = `shock:${attacker.id}`;
+          if ((cooldowns.get(key) ?? 0) <= 0) {
+              attacker.x += (attacker.side === 'left' ? -1 : 1) * (stat.shockKnockback ?? 0);
+              cooldowns.set(key, stat.shockCooldownSeconds ?? 3);
+          }
+      }
+      if (structure.branchLv5 === 'curse') {
+          const key = `curse:${attacker.id}`;
+          if ((cooldowns.get(key) ?? 0) <= 0) {
+              const loss = attacker.maxHp * (stat.curseMaxHpPercent ?? 0);
+              attacker.maxHp = Math.max(1, attacker.maxHp - loss);
+              attacker.hp = Math.min(attacker.hp, attacker.maxHp);
+              cooldowns.set(key, stat.curseCooldownSeconds ?? 3);
+          }
+      }
+  };
+  const damageStructure = (ctx, site, runtime, amount, attacker = null) => {
+      const structure = ctx.state.structures.get(site.id);
+      const finalAmount = structure ? reduceStructureDamage(ctx, structure, runtime, attacker, amount) : amount;
+      runtime.hp -= finalAmount;
+      if (structure && attacker && runtime.hp > 0)
+          triggerWallHitEffects(ctx, structure, site, runtime, attacker);
+      if (runtime.hp > 0)
+          return false;
+      ctx.deleteStructure(site.id);
+      ctx.renderBuildSite(site.id);
+      return true;
+  };
+  const damageBase = (ctx, amount) => {
+      ctx.state.baseHp = Math.max(0, ctx.state.baseHp - amount);
+      return ctx.state.baseHp <= 0;
+  };
+  const getEnemyTemplate = (enemy) => ENEMY_TEMPLATES[enemy.kind] ?? DEFAULT_ENEMY_TEMPLATE;
+  const getEnemyPrimaryTargetX = (ctx, enemy) => enemy.canFly ? ctx.state.leaderX : CRYSTAL_X;
+  const getEnemyMoveDirection = (ctx, enemy, targetX = getEnemyPrimaryTargetX(ctx, enemy)) => enemy.x < targetX ? 1 : -1;
+  const getStructureAhead = (ctx, enemy, range) => {
+      const direction = getEnemyMoveDirection(ctx, enemy);
+      let closest = null;
+      for (const structure of ctx.state.structures.values()) {
+          if (structure.type === 'wall')
+              continue;
+          const site = ctx.getBuildSite(structure.siteId);
+          if (!site)
+              continue;
+          const distance = Math.abs(enemy.x - site.x);
+          const isAhead = direction > 0 ? site.x >= enemy.x : site.x <= enemy.x;
+          if (!isAhead || distance > range)
+              continue;
+          const runtime = ctx.ensureStructureRuntime(structure);
+          if (runtime.hp <= 0 || (closest && distance >= closest.distance))
+              continue;
+          closest = { site, runtime, distance };
+      }
+      return closest ? { site: closest.site, runtime: closest.runtime } : null;
+  };
+  const tryEnemyAttack = (enemy, template, attack) => {
+      if (enemy.attackCooldown > 0)
+          return true;
+      attack();
+      enemy.attackCooldown = template.attackCooldown;
+      return true;
+  };
+  const getEnemyEffectiveSpeed = (ctx, enemy) => {
+      if (enemy.canFly)
+          return enemy.baseSpeed;
+      for (const siteId of ctx.structureSiteIdsOfType('swamp')) {
+          const site = ctx.getBuildSite(siteId);
+          if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS) {
+              if (enemy.weight <= 1)
+                  return enemy.baseSpeed * 0.5;
+              if (enemy.weight === 2)
+                  return enemy.baseSpeed * 0.75;
+              return enemy.baseSpeed;
+          }
+      }
+      return enemy.baseSpeed;
+  };
+  const moveEnemyToward = (ctx, enemy, targetX, dt, speed = getEnemyEffectiveSpeed(ctx, enemy)) => {
+      enemy.x += getEnemyMoveDirection(ctx, enemy, targetX) * speed * dt;
+  };
+  const attackEnemyTarget = (ctx, enemy, template, targetX, dt) => {
+      if (Math.abs(enemy.x - targetX) <= template.attackRange) {
+          tryEnemyAttack(enemy, template, () => { damageBase(ctx, template.damage); });
+          return;
+      }
+      moveEnemyToward(ctx, enemy, targetX, dt);
+  };
+  const updateMeleeBasicEnemy = (ctx, enemy, template, dt) => {
+      const wall = getBlockingWall(ctx, enemy);
+      if (wall) {
+          tryEnemyAttack(enemy, template, () => { damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy); });
+          return;
+      }
+      attackEnemyTarget(ctx, enemy, template, getEnemyPrimaryTargetX(ctx, enemy), dt);
+  };
+  const updateSuicideBomberEnemy = (ctx, enemy, template, index, dt) => {
+      const wall = getBlockingWall(ctx, enemy);
+      if (wall && Math.abs(enemy.x - wall.site.x) <= template.attackRange) {
+          damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy);
+          removeEnemyAt(ctx, index, false);
+          return;
+      }
+      if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) {
+          damageBase(ctx, template.damage);
+          removeEnemyAt(ctx, index, false);
+          return;
+      }
+      moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
+  };
+  const updateFlyingEnemy = (ctx, enemy, template, index, dt) => {
+      const targetX = getEnemyPrimaryTargetX(ctx, enemy);
+      if (Math.abs(enemy.x - targetX) <= template.attackRange) {
+          damageBase(ctx, template.damage);
+          removeEnemyAt(ctx, index, false);
+          return;
+      }
+      moveEnemyToward(ctx, enemy, targetX, dt, enemy.baseSpeed);
+  };
+  const updateDarkMageEnemy = (ctx, enemy, template, dt) => {
+      const wall = getBlockingWall(ctx, enemy);
+      if (wall) {
+          tryEnemyAttack(enemy, template, () => { damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy); });
+          return;
+      }
+      if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange) {
+          moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
+          return;
+      }
+      enemy.mageOrbTimer = (enemy.mageOrbTimer ?? 0) + dt;
+      while (enemy.mageOrbTimer >= 2 && (enemy.mageOrbs ?? 0) < 3) {
+          enemy.mageOrbTimer -= 2;
+          enemy.mageOrbs = (enemy.mageOrbs ?? 0) + 1;
+      }
+      if ((enemy.mageOrbs ?? 0) >= 3) {
+          tryEnemyAttack(enemy, template, () => {
+              damageBase(ctx, template.damage * (enemy.mageOrbs ?? 3));
+              enemy.mageOrbs = 0;
+              enemy.mageOrbTimer = 0;
+          });
+      }
+  };
+  const damageDragonStructureCounter = (ctx, site, runtime) => {
+      const structure = ctx.state.structures.get(site.id);
+      if (!structure || structure.type === 'wall')
+          return false;
+      runtime.dragonHitCount = (runtime.dragonHitCount ?? 0) + 1;
+      if (runtime.dragonHitCount < structure.level)
+          return false;
+      ctx.deleteStructure(site.id);
+      ctx.renderBuildSite(site.id);
+      return true;
+  };
+  const updateResentfulDragonEnemy = (ctx, enemy, template, dt) => {
+      const structureAhead = getStructureAhead(ctx, enemy, template.attackRange);
+      if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange || structureAhead) {
+          tryEnemyAttack(enemy, template, () => {
+              if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange)
+                  damageBase(ctx, template.damage);
+              if (structureAhead)
+                  damageDragonStructureCounter(ctx, structureAhead.site, structureAhead.runtime);
+          });
+          return;
+      }
+      moveEnemyToward(ctx, enemy, CRYSTAL_X, dt, enemy.baseSpeed);
+  };
+  const isUnitInLandmineTriggerRadius = (ctx, site) => (Math.abs(ctx.state.leaderX - site.x) <= LANDMINE_TRIGGER_RADIUS
+      || ctx.state.enemies.some(enemy => Math.abs(enemy.x - site.x) <= LANDMINE_TRIGGER_RADIUS));
+  const explodeLandmine = (ctx, site) => {
+      for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1) {
+          const enemy = ctx.state.enemies[i];
+          if (enemy && Math.abs(enemy.x - site.x) <= LANDMINE_BLAST_RADIUS && damageEnemy(ctx, enemy, LANDMINE_TRUE_DAMAGE))
+              removeEnemyAt(ctx, i, true);
+      }
+      ctx.deleteStructure(site.id);
+      ctx.renderBuildSite(site.id);
+  };
+  const updateEnemies = (ctx, dt) => {
+      if (ctx.state.dayNightPhase === 'night')
+          ctx.state.enemySpawnTimer += dt;
+      else
+          ctx.state.enemySpawnTimer = 0;
+      ctx.state.leaderAttackCooldown = Math.max(0, ctx.state.leaderAttackCooldown - dt);
+      while (ctx.state.dayNightPhase === 'night' && ctx.state.enemySpawnTimer >= ENEMY_SPAWN_INTERVAL) {
+          ctx.state.enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
+          spawnEnemy(ctx, ctx.state.nextEnemyId % 2 === 0 ? 'left' : 'right');
+      }
+      for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1) {
+          const enemy = ctx.state.enemies[i];
+          if (!enemy)
+              continue;
+          enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
+          const template = getEnemyTemplate(enemy);
+          switch (enemy.kind) {
+              case 'suicideBomber':
+                  updateSuicideBomberEnemy(ctx, enemy, template, i, dt);
+                  break;
+              case 'mutantBird':
+                  updateFlyingEnemy(ctx, enemy, template, i, dt);
+                  break;
+              case 'darkMage':
+                  updateDarkMageEnemy(ctx, enemy, template, dt);
+                  break;
+              case 'resentfulDragon':
+                  updateResentfulDragonEnemy(ctx, enemy, template, dt);
+                  break;
+              case 'twisted':
+              case 'crawler':
+              case 'madDog':
+              case 'ironMan':
+                  updateMeleeBasicEnemy(ctx, enemy, template, dt);
+                  break;
+          }
+          if (!ctx.state.enemies.includes(enemy))
+              continue;
+          if (ctx.state.leaderAttackCooldown === 0 && Math.abs(enemy.x - ctx.state.leaderX) <= LEADER_ATTACK_RANGE) {
+              ctx.state.leaderAttackCooldown = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
+              if (damageEnemy(ctx, enemy, LEADER_BASIC_ATTACK_DAMAGE))
+                  removeEnemyAt(ctx, i, true);
+          }
+      }
+  };
+  const updateDayNightTimer = (ctx, dt) => {
+      ctx.state.phaseRemainingSeconds -= dt;
+      while (ctx.state.phaseRemainingSeconds <= 0) {
+          ctx.state.phaseRemainingSeconds += DAY_DURATION_SECONDS;
+          ctx.state.dayNightPhase = ctx.state.dayNightPhase === 'night' ? 'day' : 'night';
+          if (ctx.state.dayNightPhase === 'day')
+              clearEnemiesWithoutReward(ctx);
+      }
+      ctx.renderDayNightTimer();
+  };
+  const updateStructureRuntimeTimers = (ctx, runtime, dt) => {
+      for (const [key, remaining] of runtime.attackerCooldowns ?? []) {
+          const next = Math.max(0, remaining - dt);
+          if (next > 0)
+              runtime.attackerCooldowns?.set(key, next);
+          else
+              runtime.attackerCooldowns?.delete(key);
+      }
+  };
+  const updateWallRegeneration = (ctx, structure, runtime, dt) => {
+      if (structure.type !== 'wall')
+          return;
+      const maxHp = ctx.getStructureMaxHp(structure);
+      const regen = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0;
+      runtime.hp = Math.min(maxHp, runtime.hp + regen * dt);
+  };
+  const updateStructures = (ctx, dt) => {
+      for (const structure of ctx.state.structures.values()) {
+          const runtime = ctx.ensureStructureRuntime(structure);
+          updateStructureRuntimeTimers(ctx, runtime, dt);
+          updateWallRegeneration(ctx, structure, runtime, dt);
+      }
+      for (const type of ['watchtower', 'elementalTower']) {
+          for (const siteId of ctx.structureSiteIdsOfType(type)) {
+              const structure = ctx.state.structures.get(siteId);
+              if (!structure)
+                  continue;
+              const site = ctx.getBuildSite(structure.siteId);
+              if (!site)
+                  continue;
+              const runtime = ctx.ensureStructureRuntime(structure);
+              runtime.cooldown = Math.max(0, runtime.cooldown - dt);
+              if (runtime.cooldown > 0)
+                  continue;
+              const stat = getStructureLevelStat(structure.type, structure.level);
+              const target = ctx.state.enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
+              if (!target)
+                  continue;
+              runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+              if (damageEnemy(ctx, target, stat.damage ?? 0))
+                  removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+          }
+      }
+      for (const siteId of [...ctx.structureSiteIdsOfType('landmine')]) {
+          const structure = ctx.state.structures.get(siteId);
+          const site = ctx.getBuildSite(siteId);
+          if (!structure || !site)
+              continue;
+          const runtime = ctx.ensureStructureRuntime(structure);
+          if (!runtime.armed && isUnitInLandmineTriggerRadius(ctx, site)) {
+              runtime.armed = true;
+              runtime.fuse = LANDMINE_FUSE_SECONDS;
+          }
+          if (!runtime.armed)
+              continue;
+          runtime.fuse = Math.max(0, (runtime.fuse ?? LANDMINE_FUSE_SECONDS) - dt);
+          if (runtime.fuse <= 0)
+              explodeLandmine(ctx, site);
+      }
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'DAY_DURATION_SECONDS')) exports.DAY_DURATION_SECONDS = DAY_DURATION_SECONDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'spawnEnemy')) exports.spawnEnemy = spawnEnemy;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'removeEnemyAt')) exports.removeEnemyAt = removeEnemyAt;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'clearEnemiesWithoutReward')) exports.clearEnemiesWithoutReward = clearEnemiesWithoutReward;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getBlockingWall')) exports.getBlockingWall = getBlockingWall;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'damageEnemy')) exports.damageEnemy = damageEnemy;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'reduceStructureDamage')) exports.reduceStructureDamage = reduceStructureDamage;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'triggerWallHitEffects')) exports.triggerWallHitEffects = triggerWallHitEffects;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'damageStructure')) exports.damageStructure = damageStructure;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'damageBase')) exports.damageBase = damageBase;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getStructureAhead')) exports.getStructureAhead = getStructureAhead;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getEnemyEffectiveSpeed')) exports.getEnemyEffectiveSpeed = getEnemyEffectiveSpeed;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'attackEnemyTarget')) exports.attackEnemyTarget = attackEnemyTarget;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateMeleeBasicEnemy')) exports.updateMeleeBasicEnemy = updateMeleeBasicEnemy;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateSuicideBomberEnemy')) exports.updateSuicideBomberEnemy = updateSuicideBomberEnemy;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateFlyingEnemy')) exports.updateFlyingEnemy = updateFlyingEnemy;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateDarkMageEnemy')) exports.updateDarkMageEnemy = updateDarkMageEnemy;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'damageDragonStructureCounter')) exports.damageDragonStructureCounter = damageDragonStructureCounter;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateResentfulDragonEnemy')) exports.updateResentfulDragonEnemy = updateResentfulDragonEnemy;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'explodeLandmine')) exports.explodeLandmine = explodeLandmine;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateEnemies')) exports.updateEnemies = updateEnemies;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateDayNightTimer')) exports.updateDayNightTimer = updateDayNightTimer;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateStructureRuntimeTimers')) exports.updateStructureRuntimeTimers = updateStructureRuntimeTimers;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateWallRegeneration')) exports.updateWallRegeneration = updateWallRegeneration;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateStructures')) exports.updateStructures = updateStructures;
 };
 __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./screens/vinh-da/constants.ts');
