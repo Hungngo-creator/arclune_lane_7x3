@@ -1,5 +1,10 @@
+import { CRYSTAL_X } from '../src/screens/vinh-da/constants.ts';
 import { ENEMY_TEMPLATES } from '../src/screens/vinh-da/enemies.ts';
-import { getVinhDaWaveConfig } from '../src/screens/vinh-da/simulation.ts';
+import { BUILD_SITES } from '../src/screens/vinh-da/structures.ts';
+import type { StructureType } from '../src/screens/vinh-da/structures.ts';
+import { getLivingTerritoryWallBounds, getVinhDaWaveConfig, isXInLivingTerritory } from '../src/screens/vinh-da/simulation.ts';
+import type { VinhDaSimulationContext, VinhDaSimulationState } from '../src/screens/vinh-da/simulation.ts';
+import type { BuildSite, PlacedStructure, StructureRuntime } from '../src/screens/vinh-da/types.ts';
 
 describe('Vĩnh Dạ enemy Khai Nguyên 1 templates', () => {
   it('keeps core enemy stats aligned with the defense mode spec', () => {
@@ -30,5 +35,72 @@ describe('Vĩnh Dạ wave table', () => {
     const bossWave = getVinhDaWaveConfig(12, 1.3);
     expect(bossWave.threatBudget).toBe(40);
     expect(bossWave.enemyWeights.resentfulDragon).toBeGreaterThan(0);
+  });
+});
+
+describe('Vĩnh Dạ living territory wall bounds', () => {
+  const buildSitesById = new Map<string, BuildSite>(BUILD_SITES.map(site => [site.id, site]));
+
+  const createContext = (structures: PlacedStructure[], runtimes: Map<string, StructureRuntime>): VinhDaSimulationContext => {
+    const structuresById = new Map<string, PlacedStructure>(structures.map(structure => [structure.siteId, structure]));
+    const structureSitesByType = new Map<StructureType, Set<string>>();
+    for (const structure of structures){
+      let siteIds = structureSitesByType.get(structure.type);
+      if (!siteIds){
+        siteIds = new Set<string>();
+        structureSitesByType.set(structure.type, siteIds);
+      }
+      siteIds.add(structure.siteId);
+    }
+    const state: VinhDaSimulationState = {
+      bloodSealStone: 0,
+      carriedDaThach: 0,
+      droppedResources: [],
+      nextDroppedResourceId: 1,
+      baseHp: 10,
+      leaderX: CRYSTAL_X,
+      enemies: [],
+      nextEnemyId: 1,
+      enemySpawnTimer: 0,
+      dayNightPhase: 'day',
+      phaseRemainingSeconds: 0,
+      leaderAttackCooldown: 0,
+      structures: structuresById,
+      nightIndex: 1,
+      waveThreatBudgetRemaining: 0,
+    };
+    return {
+      state,
+      structureSitesByType,
+      getBuildSite: siteId => siteId ? buildSitesById.get(siteId) ?? null : null,
+      ensureStructureRuntime: structure => runtimes.get(structure.siteId) ?? { cooldown: 0, hp: 0 },
+      getStructureMaxHp: () => 10,
+      deleteStructure: siteId => structuresById.delete(siteId),
+      structureSiteIdsOfType: type => structureSitesByType.get(type) ?? [],
+      renderEconomy: jest.fn(),
+      renderDroppedResources: jest.fn(),
+      renderBuildSite: jest.fn(),
+      renderDayNightTimer: jest.fn(),
+      removeEnemyElement: jest.fn(),
+    };
+  };
+
+  test('co lãnh địa theo hai tường ngoài cùng còn sống', () => {
+    const runtimes = new Map<string, StructureRuntime>([
+      ['wall-left', { cooldown: 0, hp: 8 }],
+      ['wall-right', { cooldown: 0, hp: 8 }],
+    ]);
+    const ctx = createContext([
+      { siteId: 'wall-left', type: 'wall', level: 1 },
+      { siteId: 'wall-right', type: 'wall', level: 1 },
+    ], runtimes);
+
+    const initialBounds = getLivingTerritoryWallBounds(ctx);
+    expect(initialBounds).toEqual({ leftX: buildSitesById.get('wall-left')!.x, rightX: buildSitesById.get('wall-right')!.x });
+    expect(isXInLivingTerritory(ctx, CRYSTAL_X, initialBounds)).toBe(true);
+
+    runtimes.get('wall-left')!.hp = 0;
+    expect(getLivingTerritoryWallBounds(ctx)).toBeNull();
+    expect(isXInLivingTerritory(ctx, CRYSTAL_X)).toBe(false);
   });
 });

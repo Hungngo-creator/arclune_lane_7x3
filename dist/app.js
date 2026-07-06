@@ -39097,11 +39097,39 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const BLOOD_MAX_HP_STACK_CAP = 17;
   const getBaseStat = (ctx) => BASE_STRUCTURE_STATS[ctx.state.baseLevel ?? 0] ?? BASE_STRUCTURE_STATS[0];
-  const getChurchHealingBonus = (ctx) => {
+  const getLivingTerritoryWallBounds = (ctx) => {
+      let leftX = null;
+      let rightX = null;
+      for (const siteId of ctx.structureSiteIdsOfType('wall')) {
+          const structure = ctx.state.structures.get(siteId);
+          if (!structure || structure.type !== 'wall')
+              continue;
+          const site = ctx.getBuildSite(siteId);
+          if (!site)
+              continue;
+          const runtime = ctx.ensureStructureRuntime(structure);
+          if (runtime.hp <= 0)
+              continue;
+          if (site.x < CRYSTAL_X) {
+              leftX = leftX === null ? site.x : Math.min(leftX, site.x);
+          }
+          else if (site.x > CRYSTAL_X) {
+              rightX = rightX === null ? site.x : Math.max(rightX, site.x);
+          }
+      }
+      return leftX === null || rightX === null ? null : { leftX, rightX };
+  };
+  const isXInLivingTerritory = (ctx, x, bounds = getLivingTerritoryWallBounds(ctx)) => Boolean(bounds && x >= bounds.leftX && x <= bounds.rightX);
+  const getChurchHealingBonus = (ctx, bounds = getLivingTerritoryWallBounds(ctx)) => {
+      if (!isXInLivingTerritory(ctx, CRYSTAL_X, bounds))
+          return 0;
       let bonus = getBaseStat(ctx).healingBonusPercent ?? 0;
       for (const siteId of ctx.structureSiteIdsOfType('church')) {
           const structure = ctx.state.structures.get(siteId);
           if (!structure)
+              continue;
+          const site = ctx.getBuildSite(siteId);
+          if (!site || !isXInLivingTerritory(ctx, site.x, bounds))
               continue;
           bonus += getStructureLevelStat('church', structure.level).healingBonusPercent ?? 0;
       }
@@ -39695,9 +39723,15 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const updateBaseSupport = (ctx, dt) => {
       const stat = getBaseStat(ctx);
+      const territoryBounds = getLivingTerritoryWallBounds(ctx);
+      if (!isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds))
+          return;
       if ((stat.healPerSecond ?? 0) > 0)
           healBase(ctx, (stat.healPerSecond ?? 0) * dt);
       for (const structure of ctx.state.structures.values()) {
+          const site = ctx.getBuildSite(structure.siteId);
+          if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds))
+              continue;
           const runtime = ctx.ensureStructureRuntime(structure);
           if ((runtime.emergencyHealCooldown ?? 0) > 0)
               continue;
@@ -39840,6 +39874,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectDroppedResources')) exports.collectDroppedResources = collectDroppedResources;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBlockingWall')) exports.getBlockingWall = getBlockingWall;
   if (!Object.prototype.hasOwnProperty.call(exports, 'damageEnemy')) exports.damageEnemy = damageEnemy;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getLivingTerritoryWallBounds')) exports.getLivingTerritoryWallBounds = getLivingTerritoryWallBounds;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isXInLivingTerritory')) exports.isXInLivingTerritory = isXInLivingTerritory;
   if (!Object.prototype.hasOwnProperty.call(exports, 'reduceStructureDamage')) exports.reduceStructureDamage = reduceStructureDamage;
   if (!Object.prototype.hasOwnProperty.call(exports, 'triggerWallHitEffects')) exports.triggerWallHitEffects = triggerWallHitEffects;
   if (!Object.prototype.hasOwnProperty.call(exports, 'damageStructure')) exports.damageStructure = damageStructure;

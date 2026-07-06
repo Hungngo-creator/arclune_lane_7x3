@@ -272,11 +272,37 @@ export const damageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, amount: 
 
 const BLOOD_MAX_HP_STACK_CAP = 17;
 const getBaseStat = (ctx: VinhDaSimulationContext) => BASE_STRUCTURE_STATS[ctx.state.baseLevel ?? 0] ?? BASE_STRUCTURE_STATS[0]!;
-const getChurchHealingBonus = (ctx: VinhDaSimulationContext): number => {
+export interface TerritoryWallBounds {
+  leftX: number;
+  rightX: number;
+}
+export const getLivingTerritoryWallBounds = (ctx: VinhDaSimulationContext): TerritoryWallBounds | null => {
+  let leftX: number | null = null;
+  let rightX: number | null = null;
+  for (const siteId of ctx.structureSiteIdsOfType('wall')){
+    const structure = ctx.state.structures.get(siteId);
+    if (!structure || structure.type !== 'wall') continue;
+    const site = ctx.getBuildSite(siteId);
+    if (!site) continue;
+    const runtime = ctx.ensureStructureRuntime(structure);
+    if (runtime.hp <= 0) continue;
+    if (site.x < CRYSTAL_X){
+      leftX = leftX === null ? site.x : Math.min(leftX, site.x);
+    } else if (site.x > CRYSTAL_X){
+      rightX = rightX === null ? site.x : Math.max(rightX, site.x);
+    }
+  }
+  return leftX === null || rightX === null ? null : { leftX, rightX };
+};
+export const isXInLivingTerritory = (ctx: VinhDaSimulationContext, x: number, bounds = getLivingTerritoryWallBounds(ctx)): boolean => Boolean(bounds && x >= bounds.leftX && x <= bounds.rightX);
+const getChurchHealingBonus = (ctx: VinhDaSimulationContext, bounds = getLivingTerritoryWallBounds(ctx)): number => {
+  if (!isXInLivingTerritory(ctx, CRYSTAL_X, bounds)) return 0;
   let bonus = getBaseStat(ctx).healingBonusPercent ?? 0;
   for (const siteId of ctx.structureSiteIdsOfType('church')){
     const structure = ctx.state.structures.get(siteId);
     if (!structure) continue;
+    const site = ctx.getBuildSite(siteId);
+    if (!site || !isXInLivingTerritory(ctx, site.x, bounds)) continue;
     bonus += getStructureLevelStat('church', structure.level).healingBonusPercent ?? 0;
   }
   return bonus;
@@ -807,8 +833,12 @@ const updateGravityCannon = (ctx: VinhDaSimulationContext, structure: PlacedStru
 
 const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
   const stat = getBaseStat(ctx);
+  const territoryBounds = getLivingTerritoryWallBounds(ctx);
+  if (!isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds)) return;
   if ((stat.healPerSecond ?? 0) > 0) healBase(ctx, (stat.healPerSecond ?? 0) * dt);
   for (const structure of ctx.state.structures.values()){
+    const site = ctx.getBuildSite(structure.siteId);
+    if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds)) continue;
     const runtime = ctx.ensureStructureRuntime(structure);
     if ((runtime.emergencyHealCooldown ?? 0) > 0) continue;
     if ((stat.emergencyHealPercent ?? 0) > 0 && ctx.state.baseHp > 0 && ctx.state.baseHp <= stat.hp * 0.2){
