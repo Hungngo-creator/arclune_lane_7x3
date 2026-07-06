@@ -16,18 +16,53 @@ export interface BuildMenuOption {
   type: StructureType;
 }
 
+export type WallBranchLv3 = 'spike' | 'slippery' | 'shock';
+export type WallBranchLv5 = 'biochemical' | 'curse' | 'link';
+
 export interface StructureLevelStat {
   hp: number;
   range?: number;
   damage?: number;
   cooldownSeconds?: number;
+  arm?: number;
+  res?: number;
+  hpRegen?: number;
+  spikeTrueDamage?: number;
+  slipperyChance?: number;
+  slipperyDamageMultiplier?: number;
+  slipperyCooldownSeconds?: number;
+  shockKnockback?: number;
+  shockCooldownSeconds?: number;
+  curseMaxHpPercent?: number;
+  curseCooldownSeconds?: number;
 }
 
 export const UPGRADE_NODE_LABEL = 'Nâng cấp';
 export const BUILD_LEVEL_COST = {
   1: 0,
-  2: 1
+  2: 1,
+  3: 2,
+  4: 3,
+  5: 4,
+  6: 5,
 } as const satisfies Record<number, number>;
+
+export const WALL_LEVELS = {
+  1: { hp: 15, arm: 1, res: 1, hpRegen: 1 },
+  2: { hp: 25, arm: 2, res: 2, hpRegen: 2 },
+  3: {
+    spike: { hp: 35, arm: 4, res: 4, hpRegen: 2, spikeTrueDamage: 1 },
+    slippery: { hp: 30, arm: 3, res: 3, hpRegen: 2, slipperyChance: 0.3, slipperyDamageMultiplier: 0.2, slipperyCooldownSeconds: 3 },
+    shock: { hp: 37, arm: 3, res: 3, hpRegen: 2, shockKnockback: 200, shockCooldownSeconds: 3 }
+  },
+  4: { hpBonus: 15, armBonus: 3, resBonus: 3, hpRegen: 5 },
+  5: {
+    biochemical: { hpBonus: 20, armBonus: 4, resBonus: 4, hpRegenBonus: 5 },
+    curse: { hpBonus: 20, armBonus: 3, resBonus: 3, hpRegenBonus: 3, curseMaxHpPercent: 0.03, curseCooldownSeconds: 3 },
+    link: { hpBonus: 0, armBonus: 0, resBonus: 0, hpRegenBonus: 10, linkedHpBonusPercent: 0.2, linkedRegenShare: 0.5 }
+  },
+  6: { canMountStructure: true }
+} as const;
 
 export const BUILD_NODE_OPTIONS = [
   { label: 'Tháp', type: 'watchtower' },
@@ -48,8 +83,8 @@ export const WALL_BUILD_SITE_ALLOWED = ['wall'] as const satisfies readonly Stru
 export const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
 
 export const WALL_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
-  1: { hp: 8 },
-  2: { hp: 16 }
+  1: WALL_LEVELS[1],
+  2: WALL_LEVELS[2],
 };
 
 export const WATCHTOWER_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
@@ -127,8 +162,35 @@ export const BUILD_SITES = [
   ...createGroundBuildSites()
 ] as const satisfies readonly BuildSite[];
 
-export const getStructureLevelStat = (type: StructureType, level: number): StructureLevelStat => {
-  if (type === 'wall') return WALL_STRUCTURE_STATS[level] ?? { hp: 1 };
+export const getWallLevelStat = (level: number, branchLv3?: WallBranchLv3, branchLv5?: WallBranchLv5): StructureLevelStat => {
+  if (level <= 1) return WALL_LEVELS[1];
+  if (level === 2) return WALL_LEVELS[2];
+
+  const lv3 = WALL_LEVELS[3][branchLv3 ?? 'spike'];
+  const lv4 = level >= 4
+    ? {
+        ...lv3,
+        hp: lv3.hp + WALL_LEVELS[4].hpBonus,
+        arm: (lv3.arm ?? 0) + WALL_LEVELS[4].armBonus,
+        res: (lv3.res ?? 0) + WALL_LEVELS[4].resBonus,
+        hpRegen: WALL_LEVELS[4].hpRegen
+      }
+    : lv3;
+  if (level < 5) return lv4;
+
+  const lv5Config = WALL_LEVELS[5][branchLv5 ?? 'curse'];
+  return {
+    ...lv4,
+    ...('curseMaxHpPercent' in lv5Config ? { curseMaxHpPercent: lv5Config.curseMaxHpPercent, curseCooldownSeconds: lv5Config.curseCooldownSeconds } : {}),
+    hp: lv4.hp + lv5Config.hpBonus,
+    arm: (lv4.arm ?? 0) + lv5Config.armBonus,
+    res: (lv4.res ?? 0) + lv5Config.resBonus,
+    hpRegen: (lv4.hpRegen ?? 0) + lv5Config.hpRegenBonus
+  };
+};
+
+export const getStructureLevelStat = (type: StructureType, level: number, branchLv3?: WallBranchLv3, branchLv5?: WallBranchLv5): StructureLevelStat => {
+  if (type === 'wall') return getWallLevelStat(level, branchLv3, branchLv5);
   if (type === 'watchtower') return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
   return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
 };

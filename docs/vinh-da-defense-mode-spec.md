@@ -812,6 +812,15 @@ lv 6: player có thể tắt/kích hoạt trọng lực pháo.
 
 một khẩu súng không tệ, có điều coi chừng bắn xa quá trời sáng không có tiền đâu nha, bắn boss đi luôn thì húp cháo, nếu ngươi đủ giàu, nâng cái lv 6, đánh boss còn nửa mạng thì bật pháo liền xong chuyện.
 
+### 
+
+từ khí aether tinh khiết ngưng tụ mà thành vô hệ lưỡi đao, lưỡi đao to lớn, ngưng tụ dài nhưng sát thương đồng dạng to lớn.
+
+lv 1: nhưng tụ 1 lưỡi đao có trọng lượng 0.1, ngang 2 mét rộng 0,5 mét hình bán nguyệt, bay về phía mục tiêu với tốc độ bay: 1/s, gây 3 sát thương, bỏ qua res/arm dưới 1 của mục tiêu (sát thương chuẩn lên mục tiêu có res/arm = 1, nếu mục tiêu có 1 res 2 arm thì nhận 2 sát thương chuẩn)
+cd 6s. Mỗi lưỡi đao chỉ chém trúng tối đa 5 mục tiêu, nếu tiếp xúc trên 5 mục tiêu thì gây sát thương lên 5 kẻ đứng gần đao nhất sau đó lưỡi đao năng lượng này sẽ biến mất.
+
+lv 2: trên cơ sở lv 1, +
+
 #### sau đây là nhóm kiến trúc đặt dưới đất:
 địa lôi: phát nổ sau 2s đạp trúng, không phân địch ta, gây sát thương chuẩn = 2.
 
@@ -863,7 +872,7 @@ Base có thể tạo vật liệu nhờ khả năng chuyển đổi của nó, d
 
 
 #### Huyền Minh Trọng Thủy:
-một loại linh dịch nặng nề, ở vùng giao giới giữa Thủy và Thổ có 5% tỉ lệ xuất hiện, tăng thêm 3%/tier (về cơ bản sẽ càng thấp vì vùng giao nhau giữ thủy và thổ rất khó xuất hiện vì mỗi map xuất hiện vùng nguyên tố là có hạn), sinh ra ở vùng trọng lực cao, có thể dùng để chế tạo Pháo Trọng Lực, tier biến đổi theo tier map. 1 đơn vị HMTT: 1 TNT. Bất kỳ sinh vật trọng lượng dưới 2 nào đi hoặc bay ngang tốc độ đều sẽ giảm 50%.
+một loại linh dịch nặng nề, ở vùng giao giới giữa Thủy và Thổ có 15% tỉ lệ xuất hiện, tăng thêm 5%/tier (về cơ bản sẽ càng thấp vì vùng giao nhau giữ thủy và thổ rất khó xuất hiện vì mỗi map xuất hiện vùng nguyên tố là có hạn), sinh ra ở vùng trọng lực cao, có thể dùng để chế tạo Pháo Trọng Lực, tier biến đổi theo tier map. 1 đơn vị HMTT tier 1.1 (+0.1/0.1 tier): 1 TNT. Bất kỳ sinh vật trọng lượng dưới 2 nào đi hoặc bay ngang tốc độ đều sẽ giảm 50%.
 
 Truyền Tống Trận:
 kiến trúc tu sĩ trúc cơ mới có thể tạo ra, dùng để di chuyển khoảng cách xa, cần bày trận giữa A và B. Nên theo game leader cần lên trúc cơ, phái lính đi thám thính, bày Tử trận ở chổ cần đến rồi bày mẫu trận mới tele qua được, hoặc là truyền tống trận có sẵn, sao cũng được.
@@ -911,3 +920,4 @@ thật ra linh quả hiệu quả đều không quá mạnh vì chỉ tác dụn
 - mỗi map đều có tỉ lệ xuất hiện vùng nguyên tố vì có 10 nguyên tố là Hỏa, Mộc, Thủy, Thổ, Kim, Lôi, Huyết, Ánh Sáng, Phong và Hắc Ám. Tăng 5% diện tích map/1 tier.
 - Trong đó Hắc Ám tỉ lệ là 100% vì Vĩnh Dạ, vùng hắc ám sẽ xuất hiện ở 1 hoặc 2 bên cuối map, còn lại mỗi nguyên tố sẽ random xuất hiện với tỉ lệ 11%, mỗi map có thể tồn tại tối đa 4 (+1 ở tier 2.1 trở đi, vẫn cap 5 cho đến khi đạt tier 3.1 +1 là 6) vùng nguyên tố chưa tính đến hắc ám, tức mỗi vùng đều có 11% xuất hiện vùng nguyên tố nồng đậm, đều random 4 vùng và vùng nguyên tố đã xuất hiện rồi có thể xuất hiện lần nữa, còn 1% còn lại là vùng nguyên tố cằn cỗi.
 - Trong mỗi vùng nguyên tố xuất hiện thì tối thiểu sẽ xuất hiện 1 bãi quái tương ứng với vùng nguyên tố đó, chúng đối địch với player cũng đối địch với vĩnh dạ.
+

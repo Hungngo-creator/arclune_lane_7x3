@@ -37939,10 +37939,10 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
       suicideBomber: {
           kind: 'suicideBomber',
           label: 'Bạo Tạc Giả',
+          hp: 1,
           speed: 0.45 * METERS_TO_WORLD_UNITS,
           weight: 1.5,
           attackRange: 5 * METERS_TO_WORLD_UNITS,
-          attackCooldown: 3,
           attackCooldown: 1.6,
           damage: 4,
           canFly: false,
@@ -38154,7 +38154,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS];
       const structureClassNames = buildNodeOptions.map(option => `vinh-da-game__structure--${option.type}`);
       let lastRenderedCameraX = Number.POSITIVE_INFINITY;
-      const getStructureMaxHp = (structure) => getStructureLevelStat(structure.type, structure.level).hp;
+      const getStructureMaxHp = (structure) => getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp;
       const ensureStructureRuntime = (structure) => {
           const existing = structureRuntimes.get(structure.siteId);
           if (existing)
@@ -38236,7 +38236,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           menu.style.left = `${site.x}px`;
           const nodeOptions = site.kind === 'ground'
               ? GROUND_BUILD_NODE_OPTIONS
-              : BUILD_NODE_OPTIONS.filter(option => site.allowed.includes(option.type));
+              : BUILD_NODE_OPTIONS;
           nodeOptions.forEach((option) => {
               const node = document.createElement('button');
               node.className = 'vinh-da-game__build-node';
@@ -38254,6 +38254,22 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           upgradeNode.hidden = true;
           upgradeNode.innerHTML = `↑<small>${UPGRADE_NODE_LABEL}</small>`;
           menu.append(upgradeNode);
+          const addActionNode = (action, label) => {
+              const node = document.createElement('button');
+              node.className = 'vinh-da-game__build-node';
+              node.dataset.action = action;
+              node.type = 'button';
+              node.setAttribute('aria-label', label);
+              node.hidden = true;
+              node.innerHTML = `◆<small>${label}</small>`;
+              menu.append(node);
+          };
+          addActionNode('branch-lv3-spike', 'Gai nhọn');
+          addActionNode('branch-lv3-slippery', 'Trơn tuột');
+          addActionNode('branch-lv3-shock', 'Phản chấn');
+          addActionNode('branch-lv5-biochemical', 'Sinh hoá');
+          addActionNode('branch-lv5-curse', 'Nguyền rủa');
+          addActionNode('branch-lv5-link', 'Liên kết');
           buildSitesContainer.append(button, menu);
           siteElements.set(site.id, button);
           buildMenuElements.set(site.id, menu);
@@ -38268,11 +38284,16 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           menu.classList.toggle('is-upgrade-menu', Boolean(structure));
           for (const node of menu.querySelectorAll('.vinh-da-game__build-node')) {
               const type = node.dataset.structureType;
-              const isUpgradeNode = node.dataset.action === 'upgrade';
-              const cost = structure ? BUILD_LEVEL_COST[2] : BUILD_LEVEL_COST[1];
+              const action = node.dataset.action;
+              const isUpgradeNode = action === 'upgrade';
+              const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
+              const cost = structure ? BUILD_LEVEL_COST[nextLevel] : BUILD_LEVEL_COST[1];
+              const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
+              const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
+              const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && Boolean(type) && type !== 'wall' && site.allowed.includes('wall');
               node.hidden = structure
-                  ? !isUpgradeNode || structure.level >= 2
-                  : isUpgradeNode || !type || !site.allowed.includes(type);
+                  ? !(isLv3Branch || isLv5Branch || canMount || (isUpgradeNode && structure.level < 6 && structure.level !== 2 && structure.level !== 4))
+                  : isUpgradeNode || Boolean(action) || !type || !site.allowed.includes(type);
               if (node instanceof HTMLButtonElement)
                   node.disabled = !node.hidden && !canAfford(cost);
           }
@@ -38341,6 +38362,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
               kind: template.kind,
               hp: template.hp,
+              maxHp: template.hp,
               speed: template.speed,
               baseSpeed: template.speed,
               weight: template.weight,
@@ -38384,8 +38406,47 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           enemy.hp -= amount;
           return enemy.hp <= 0;
       };
-      const damageStructure = (site, runtime, amount) => {
-          runtime.hp -= amount;
+      const reduceStructureDamage = (structure, runtime, attacker, amount) => {
+          if (structure.type !== 'wall' || structure.branchLv3 !== 'slippery' || !attacker)
+              return amount;
+          const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+          const cooldowns = runtime.attackerCooldowns ??= new Map();
+          const key = `slippery:${attacker.id}`;
+          if ((cooldowns.get(key) ?? 0) > 0 || Math.random() >= (stat.slipperyChance ?? 0))
+              return amount;
+          cooldowns.set(key, stat.slipperyCooldownSeconds ?? 3);
+          return amount * (stat.slipperyDamageMultiplier ?? 1);
+      };
+      const triggerWallHitEffects = (structure, site, runtime, attacker) => {
+          if (structure.type !== 'wall')
+              return;
+          const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+          const cooldowns = runtime.attackerCooldowns ??= new Map();
+          if (structure.branchLv3 === 'spike' && stat.spikeTrueDamage && damageEnemy(attacker, stat.spikeTrueDamage))
+              return;
+          if (structure.branchLv3 === 'shock') {
+              const key = `shock:${attacker.id}`;
+              if ((cooldowns.get(key) ?? 0) <= 0) {
+                  attacker.x += (attacker.side === 'left' ? -1 : 1) * (stat.shockKnockback ?? 0);
+                  cooldowns.set(key, stat.shockCooldownSeconds ?? 3);
+              }
+          }
+          if (structure.branchLv5 === 'curse') {
+              const key = `curse:${attacker.id}`;
+              if ((cooldowns.get(key) ?? 0) <= 0) {
+                  const loss = attacker.maxHp * (stat.curseMaxHpPercent ?? 0);
+                  attacker.maxHp = Math.max(1, attacker.maxHp - loss);
+                  attacker.hp = Math.min(attacker.hp, attacker.maxHp);
+                  cooldowns.set(key, stat.curseCooldownSeconds ?? 3);
+              }
+          }
+      };
+      const damageStructure = (site, runtime, amount, attacker = null) => {
+          const structure = structures.get(site.id);
+          const finalAmount = structure ? reduceStructureDamage(structure, runtime, attacker, amount) : amount;
+          runtime.hp -= finalAmount;
+          if (structure && attacker && runtime.hp > 0)
+              triggerWallHitEffects(structure, site, runtime, attacker);
           if (runtime.hp > 0)
               return false;
           deleteStructure(site.id);
@@ -38454,7 +38515,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const updateMeleeBasicEnemy = (enemy, template, dt) => {
           const wall = getBlockingWall(enemy);
           if (wall) {
-              tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage); });
+              tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
               return;
           }
           attackEnemyTarget(enemy, template, getEnemyPrimaryTargetX(enemy), dt);
@@ -38462,7 +38523,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const updateSuicideBomberEnemy = (enemy, template, index, dt) => {
           const wall = getBlockingWall(enemy);
           if (wall && Math.abs(enemy.x - wall.site.x) <= template.attackRange) {
-              damageStructure(wall.site, wall.runtime, template.damage);
+              damageStructure(wall.site, wall.runtime, template.damage, enemy);
               removeEnemyAt(index, false);
               return;
           }
@@ -38485,7 +38546,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const updateDarkMageEnemy = (enemy, template, dt) => {
           const wall = getBlockingWall(enemy);
           if (wall) {
-              tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage); });
+              tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
               return;
           }
           if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange) {
@@ -38582,7 +38643,28 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               }
           }
       };
+      const updateStructureRuntimeTimers = (runtime, dt) => {
+          for (const [key, remaining] of runtime.attackerCooldowns ?? []) {
+              const next = Math.max(0, remaining - dt);
+              if (next > 0)
+                  runtime.attackerCooldowns?.set(key, next);
+              else
+                  runtime.attackerCooldowns?.delete(key);
+          }
+      };
+      const updateWallRegeneration = (structure, runtime, dt) => {
+          if (structure.type !== 'wall')
+              return;
+          const maxHp = getStructureMaxHp(structure);
+          const regen = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0;
+          runtime.hp = Math.min(maxHp, runtime.hp + regen * dt);
+      };
       const updateStructures = (dt) => {
+          for (const structure of structures.values()) {
+              const runtime = ensureStructureRuntime(structure);
+              updateStructureRuntimeTimers(runtime, dt);
+              updateWallRegeneration(structure, runtime, dt);
+          }
           for (const type of ['watchtower', 'elementalTower']) {
               for (const siteId of structureSiteIdsOfType(type)) {
                   const structure = structures.get(siteId);
@@ -38696,18 +38778,37 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           if (buildNode) {
               const site = getBuildSite(openSiteId);
               const structure = site ? structures.get(site.id) : null;
-              if (site && buildNode.dataset.action === 'upgrade') {
-                  if (structure && structure.level < 2 && spend(BUILD_LEVEL_COST[2])) {
-                      const upgraded = { ...structure, level: structure.level + 1 };
+              const action = buildNode.dataset.action;
+              if (site && structure && action) {
+                  const nextLevel = structure.level + 1;
+                  if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(BUILD_LEVEL_COST[nextLevel])) {
+                      const upgraded = { ...structure, level: nextLevel };
                       setStructure(upgraded);
                       const runtime = ensureStructureRuntime(upgraded);
                       runtime.hp = getStructureMaxHp(upgraded);
                       renderBuildSite(site.id);
                   }
+                  else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(BUILD_LEVEL_COST[3])) {
+                      const upgraded = { ...structure, level: 3, branchLv3: action.slice('branch-lv3-'.length) };
+                      setStructure(upgraded);
+                      ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+                      renderBuildSite(site.id);
+                  }
+                  else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(BUILD_LEVEL_COST[5])) {
+                      const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) };
+                      setStructure(upgraded);
+                      ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+                      renderBuildSite(site.id);
+                  }
               }
               else {
                   const type = buildNode.dataset.structureType;
-                  if (site && type && !structure && site.allowed.includes(type) && spend(BUILD_LEVEL_COST[1])) {
+                  if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && spend(BUILD_LEVEL_COST[1])) {
+                      const upgraded = { ...structure, mountedStructure: type };
+                      setStructure(upgraded);
+                      renderBuildSite(site.id);
+                  }
+                  else if (site && type && !structure && site.allowed.includes(type) && spend(BUILD_LEVEL_COST[1])) {
                       const placed = { siteId: site.id, type, level: 1 };
                       setStructure(placed);
                       ensureStructureRuntime(placed);
@@ -38782,7 +38883,27 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   const UPGRADE_NODE_LABEL = 'Nâng cấp';
   const BUILD_LEVEL_COST = {
       1: 0,
-      2: 1
+      2: 1,
+      3: 2,
+      4: 3,
+      5: 4,
+      6: 5,
+  };
+  const WALL_LEVELS = {
+      1: { hp: 15, arm: 1, res: 1, hpRegen: 1 },
+      2: { hp: 25, arm: 2, res: 2, hpRegen: 2 },
+      3: {
+          spike: { hp: 35, arm: 4, res: 4, hpRegen: 2, spikeTrueDamage: 1 },
+          slippery: { hp: 30, arm: 3, res: 3, hpRegen: 2, slipperyChance: 0.3, slipperyDamageMultiplier: 0.2, slipperyCooldownSeconds: 3 },
+          shock: { hp: 37, arm: 3, res: 3, hpRegen: 2, shockKnockback: 200, shockCooldownSeconds: 3 }
+      },
+      4: { hpBonus: 15, armBonus: 3, resBonus: 3, hpRegen: 5 },
+      5: {
+          biochemical: { hpBonus: 20, armBonus: 4, resBonus: 4, hpRegenBonus: 5 },
+          curse: { hpBonus: 20, armBonus: 3, resBonus: 3, hpRegenBonus: 3, curseMaxHpPercent: 0.03, curseCooldownSeconds: 3 },
+          link: { hpBonus: 0, armBonus: 0, resBonus: 0, hpRegenBonus: 10, linkedHpBonusPercent: 0.2, linkedRegenShare: 0.5 }
+      },
+      6: { canMountStructure: true }
   };
   const BUILD_NODE_OPTIONS = [
       { label: 'Tháp', type: 'watchtower' },
@@ -38800,8 +38921,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   const WALL_BUILD_SITE_ALLOWED = ['wall'];
   const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
   const WALL_STRUCTURE_STATS = {
-      1: { hp: 8 },
-      2: { hp: 16 }
+      1: WALL_LEVELS[1],
+      2: WALL_LEVELS[2],
   };
   const WATCHTOWER_STRUCTURE_STATS = {
       1: { hp: 1, range: 460, damage: 1, cooldownSeconds: 0.55 },
@@ -38869,9 +38990,36 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       { id: 'wall-right', x: CASTLE_OUTER_RIGHT + 120, kind: 'wall-slot', allowed: WALL_BUILD_SITE_ALLOWED },
       ...createGroundBuildSites()
   ];
-  const getStructureLevelStat = (type, level) => {
+  const getWallLevelStat = (level, branchLv3, branchLv5) => {
+      if (level <= 1)
+          return WALL_LEVELS[1];
+      if (level === 2)
+          return WALL_LEVELS[2];
+      const lv3 = WALL_LEVELS[3][branchLv3 ?? 'spike'];
+      const lv4 = level >= 4
+          ? {
+              ...lv3,
+              hp: lv3.hp + WALL_LEVELS[4].hpBonus,
+              arm: (lv3.arm ?? 0) + WALL_LEVELS[4].armBonus,
+              res: (lv3.res ?? 0) + WALL_LEVELS[4].resBonus,
+              hpRegen: WALL_LEVELS[4].hpRegen
+          }
+          : lv3;
+      if (level < 5)
+          return lv4;
+      const lv5Config = WALL_LEVELS[5][branchLv5 ?? 'curse'];
+      return {
+          ...lv4,
+          ...('curseMaxHpPercent' in lv5Config ? { curseMaxHpPercent: lv5Config.curseMaxHpPercent, curseCooldownSeconds: lv5Config.curseCooldownSeconds } : {}),
+          hp: lv4.hp + lv5Config.hpBonus,
+          arm: (lv4.arm ?? 0) + lv5Config.armBonus,
+          res: (lv4.res ?? 0) + lv5Config.resBonus,
+          hpRegen: (lv4.hpRegen ?? 0) + lv5Config.hpRegenBonus
+      };
+  };
+  const getStructureLevelStat = (type, level, branchLv3, branchLv5) => {
       if (type === 'wall')
-          return WALL_STRUCTURE_STATS[level] ?? { hp: 1 };
+          return getWallLevelStat(level, branchLv3, branchLv5);
       if (type === 'watchtower')
           return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
       return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
@@ -38879,6 +39027,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'UPGRADE_NODE_LABEL')) exports.UPGRADE_NODE_LABEL = UPGRADE_NODE_LABEL;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_LEVEL_COST')) exports.BUILD_LEVEL_COST = BUILD_LEVEL_COST;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'WALL_LEVELS')) exports.WALL_LEVELS = WALL_LEVELS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_NODE_OPTIONS')) exports.BUILD_NODE_OPTIONS = BUILD_NODE_OPTIONS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_BUILD_NODE_OPTIONS')) exports.GROUND_BUILD_NODE_OPTIONS = GROUND_BUILD_NODE_OPTIONS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_BUILD_SITE_ALLOWED')) exports.GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
@@ -38888,6 +39037,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'WATCHTOWER_STRUCTURE_STATS')) exports.WATCHTOWER_STRUCTURE_STATS = WATCHTOWER_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_STRUCTURE_STATS')) exports.GROUND_STRUCTURE_STATS = GROUND_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITES')) exports.BUILD_SITES = BUILD_SITES;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getWallLevelStat')) exports.getWallLevelStat = getWallLevelStat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getStructureLevelStat')) exports.getStructureLevelStat = getStructureLevelStat;
 };
 __modules['./screens/vinh-da/types.ts'] = (exports, module, __require) => {

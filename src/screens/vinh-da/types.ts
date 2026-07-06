@@ -1,5 +1,5 @@
 import type { EnemyKind } from './enemies.ts';
-import type { StructureType } from './structures.ts';
+import type { StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 
 export type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
 export type Side = 'left' | 'right';
@@ -15,6 +15,9 @@ export interface PlacedStructure {
   siteId: string;
   type: StructureType;
   level: number;
+  branchLv3?: WallBranchLv3;
+  branchLv5?: WallBranchLv5;
+  mountedStructure?: StructureType | null;
 }
 
 export interface Enemy {
@@ -22,6 +25,7 @@ export interface Enemy {
   kind: EnemyKind;
   x: number;
   hp: number;
+  maxHp: number;
   speed: number;
   baseSpeed: number;
   weight: number;
@@ -38,4 +42,5 @@ export interface StructureRuntime {
   armed?: boolean;
   fuse?: number;
   dragonHitCount?: number;
+  attackerCooldowns?: Map<string, number>;
 }

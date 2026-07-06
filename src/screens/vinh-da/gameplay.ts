@@ -43,7 +43,7 @@ import {
   UPGRADE_NODE_LABEL,
   getStructureLevelStat
 } from './structures.ts';
-import type { StructureType } from './structures.ts';
+import type { StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import type { BuildSite, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
 interface RenderContext {
@@ -162,7 +162,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const structureClassNames = buildNodeOptions.map(option => `vinh-da-game__structure--${option.type}`);
   let lastRenderedCameraX = Number.POSITIVE_INFINITY;
 
-  const getStructureMaxHp = (structure: PlacedStructure): number => getStructureLevelStat(structure.type, structure.level).hp;
+  const getStructureMaxHp = (structure: PlacedStructure): number => getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp;
   const ensureStructureRuntime = (structure: PlacedStructure): StructureRuntime => {
     const existing = structureRuntimes.get(structure.siteId);
     if (existing) return existing;
@@ -237,7 +237,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     menu.style.left = `${site.x}px`;
     const nodeOptions = site.kind === 'ground'
       ? GROUND_BUILD_NODE_OPTIONS
-      : BUILD_NODE_OPTIONS.filter(option => site.allowed.includes(option.type));
+      : BUILD_NODE_OPTIONS;
     nodeOptions.forEach((option) => {
       const node = document.createElement('button');
       node.className = 'vinh-da-game__build-node';
@@ -256,6 +256,23 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     upgradeNode.innerHTML = `↑<small>${UPGRADE_NODE_LABEL}</small>`;
     menu.append(upgradeNode);
 
+    const addActionNode = (action: string, label: string): void => {
+      const node = document.createElement('button');
+      node.className = 'vinh-da-game__build-node';
+      node.dataset.action = action;
+      node.type = 'button';
+      node.setAttribute('aria-label', label);
+      node.hidden = true;
+      node.innerHTML = `◆<small>${label}</small>`;
+      menu.append(node);
+    };
+    addActionNode('branch-lv3-spike', 'Gai nhọn');
+    addActionNode('branch-lv3-slippery', 'Trơn tuột');
+    addActionNode('branch-lv3-shock', 'Phản chấn');
+    addActionNode('branch-lv5-biochemical', 'Sinh hoá');
+    addActionNode('branch-lv5-curse', 'Nguyền rủa');
+    addActionNode('branch-lv5-link', 'Liên kết');
+
     buildSitesContainer.append(button, menu);
     siteElements.set(site.id, button);
     buildMenuElements.set(site.id, menu);
@@ -269,11 +286,16 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     menu.classList.toggle('is-upgrade-menu', Boolean(structure));
     for (const node of menu.querySelectorAll<HTMLElement>('.vinh-da-game__build-node')){
       const type = node.dataset.structureType as StructureType | undefined;
-      const isUpgradeNode = node.dataset.action === 'upgrade';
-      const cost = structure ? BUILD_LEVEL_COST[2] : BUILD_LEVEL_COST[1];
+      const action = node.dataset.action;
+      const isUpgradeNode = action === 'upgrade';
+      const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
+      const cost = structure ? BUILD_LEVEL_COST[nextLevel as keyof typeof BUILD_LEVEL_COST] : BUILD_LEVEL_COST[1];
+      const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
+      const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
+      const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && Boolean(type) && type !== 'wall' && site.allowed.includes('wall');
       node.hidden = structure
-        ? !isUpgradeNode || structure.level >= 2
-        : isUpgradeNode || !type || !site.allowed.includes(type);
+        ? !(isLv3Branch || isLv5Branch || canMount || (isUpgradeNode && structure.level < 6 && structure.level !== 2 && structure.level !== 4))
+        : isUpgradeNode || Boolean(action) || !type || !site.allowed.includes(type);
       if (node instanceof HTMLButtonElement) node.disabled = !node.hidden && !canAfford(cost);
     }
   };
@@ -334,6 +356,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
       kind: template.kind,
       hp: template.hp,
+      maxHp: template.hp,
       speed: template.speed,
       baseSpeed: template.speed,
       weight: template.weight,
@@ -372,8 +395,42 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     enemy.hp -= amount;
     return enemy.hp <= 0;
   };
-  const damageStructure = (site: BuildSite, runtime: StructureRuntime, amount: number): boolean => {
-    runtime.hp -= amount;
+  const reduceStructureDamage = (structure: PlacedStructure, runtime: StructureRuntime, attacker: Enemy | null, amount: number): number => {
+    if (structure.type !== 'wall' || structure.branchLv3 !== 'slippery' || !attacker) return amount;
+    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+    const cooldowns = runtime.attackerCooldowns ??= new Map<string, number>();
+    const key = `slippery:${attacker.id}`;
+    if ((cooldowns.get(key) ?? 0) > 0 || Math.random() >= (stat.slipperyChance ?? 0)) return amount;
+    cooldowns.set(key, stat.slipperyCooldownSeconds ?? 3);
+    return amount * (stat.slipperyDamageMultiplier ?? 1);
+  };
+  const triggerWallHitEffects = (structure: PlacedStructure, site: BuildSite, runtime: StructureRuntime, attacker: Enemy): void => {
+    if (structure.type !== 'wall') return;
+    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+    const cooldowns = runtime.attackerCooldowns ??= new Map<string, number>();
+    if (structure.branchLv3 === 'spike' && stat.spikeTrueDamage && damageEnemy(attacker, stat.spikeTrueDamage)) return;
+    if (structure.branchLv3 === 'shock'){
+      const key = `shock:${attacker.id}`;
+      if ((cooldowns.get(key) ?? 0) <= 0){
+        attacker.x += (attacker.side === 'left' ? -1 : 1) * (stat.shockKnockback ?? 0);
+        cooldowns.set(key, stat.shockCooldownSeconds ?? 3);
+      }
+    }
+    if (structure.branchLv5 === 'curse'){
+      const key = `curse:${attacker.id}`;
+      if ((cooldowns.get(key) ?? 0) <= 0){
+        const loss = attacker.maxHp * (stat.curseMaxHpPercent ?? 0);
+        attacker.maxHp = Math.max(1, attacker.maxHp - loss);
+        attacker.hp = Math.min(attacker.hp, attacker.maxHp);
+        cooldowns.set(key, stat.curseCooldownSeconds ?? 3);
+      }
+    }
+  };
+  const damageStructure = (site: BuildSite, runtime: StructureRuntime, amount: number, attacker: Enemy | null = null): boolean => {
+    const structure = structures.get(site.id);
+    const finalAmount = structure ? reduceStructureDamage(structure, runtime, attacker, amount) : amount;
+    runtime.hp -= finalAmount;
+    if (structure && attacker && runtime.hp > 0) triggerWallHitEffects(structure, site, runtime, attacker);
     if (runtime.hp > 0) return false;
     deleteStructure(site.id);
     renderBuildSite(site.id);
@@ -433,7 +490,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const updateMeleeBasicEnemy = (enemy: Enemy, template: EnemyTemplate, dt: number): void => {
     const wall = getBlockingWall(enemy);
     if (wall){
-      tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage); });
+      tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
       return;
     }
     attackEnemyTarget(enemy, template, getEnemyPrimaryTargetX(enemy), dt);
@@ -441,7 +498,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const updateSuicideBomberEnemy = (enemy: Enemy, template: EnemyTemplate, index: number, dt: number): void => {
     const wall = getBlockingWall(enemy);
     if (wall && Math.abs(enemy.x - wall.site.x) <= template.attackRange){
-      damageStructure(wall.site, wall.runtime, template.damage);
+      damageStructure(wall.site, wall.runtime, template.damage, enemy);
       removeEnemyAt(index, false);
       return;
     }
@@ -464,7 +521,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const updateDarkMageEnemy = (enemy: Enemy, template: EnemyTemplate, dt: number): void => {
     const wall = getBlockingWall(enemy);
     if (wall){
-      tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage); });
+      tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
       return;
     }
     if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange){
@@ -556,7 +613,25 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       }
     }
   };
+  const updateStructureRuntimeTimers = (runtime: StructureRuntime, dt: number): void => {
+    for (const [key, remaining] of runtime.attackerCooldowns ?? []){
+      const next = Math.max(0, remaining - dt);
+      if (next > 0) runtime.attackerCooldowns?.set(key, next);
+      else runtime.attackerCooldowns?.delete(key);
+    }
+  };
+  const updateWallRegeneration = (structure: PlacedStructure, runtime: StructureRuntime, dt: number): void => {
+    if (structure.type !== 'wall') return;
+    const maxHp = getStructureMaxHp(structure);
+    const regen = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0;
+    runtime.hp = Math.min(maxHp, runtime.hp + regen * dt);
+  };
   const updateStructures = (dt: number): void => {
+    for (const structure of structures.values()){
+      const runtime = ensureStructureRuntime(structure);
+      updateStructureRuntimeTimers(runtime, dt);
+      updateWallRegeneration(structure, runtime, dt);
+    }
     for (const type of ['watchtower', 'elementalTower'] as const){
       for (const siteId of structureSiteIdsOfType(type)){
         const structure = structures.get(siteId);
@@ -659,17 +734,33 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     if (buildNode){
       const site = getBuildSite(openSiteId);
       const structure = site ? structures.get(site.id) : null;
-      if (site && buildNode.dataset.action === 'upgrade'){
-        if (structure && structure.level < 2 && spend(BUILD_LEVEL_COST[2])){
-          const upgraded = { ...structure, level: structure.level + 1 };
+      const action = buildNode.dataset.action;
+      if (site && structure && action){
+        const nextLevel = structure.level + 1;
+        if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(BUILD_LEVEL_COST[nextLevel as keyof typeof BUILD_LEVEL_COST])){
+          const upgraded = { ...structure, level: nextLevel };
           setStructure(upgraded);
           const runtime = ensureStructureRuntime(upgraded);
           runtime.hp = getStructureMaxHp(upgraded);
           renderBuildSite(site.id);
+          } else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(BUILD_LEVEL_COST[3])){
+          const upgraded = { ...structure, level: 3, branchLv3: action.slice('branch-lv3-'.length) as WallBranchLv3 };
+          setStructure(upgraded);
+          ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+          renderBuildSite(site.id);
+        } else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(BUILD_LEVEL_COST[5])){
+          const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) as WallBranchLv5 };
+          setStructure(upgraded);
+          ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+          renderBuildSite(site.id);
         }
       } else {
         const type = buildNode.dataset.structureType as StructureType | undefined;
-        if (site && type && !structure && site.allowed.includes(type) && spend(BUILD_LEVEL_COST[1])){
+        if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && spend(BUILD_LEVEL_COST[1])){
+          const upgraded = { ...structure, mountedStructure: type };
+          setStructure(upgraded);
+          renderBuildSite(site.id);
+        } else if (site && type && !structure && site.allowed.includes(type) && spend(BUILD_LEVEL_COST[1])){
           const placed = { siteId: site.id, type, level: 1 };
           setStructure(placed);
           ensureStructureRuntime(placed);

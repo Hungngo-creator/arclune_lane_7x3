@@ -63,10 +63,10 @@ export const ENEMY_TEMPLATES = {
   suicideBomber: {
     kind: 'suicideBomber',
     label: 'Bạo Tạc Giả',
+    hp: 1,
     speed: 0.45 * METERS_TO_WORLD_UNITS,
     weight: 1.5,
     attackRange: 5 * METERS_TO_WORLD_UNITS,
-    attackCooldown: 3,
     attackCooldown: 1.6,
     damage: 4,
     canFly: false,
