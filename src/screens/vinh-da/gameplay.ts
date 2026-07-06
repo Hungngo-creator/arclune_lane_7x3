@@ -41,7 +41,8 @@ import {
   GROUND_BUILD_NODE_OPTIONS,
   BUILD_SITES,
   UPGRADE_NODE_LABEL,
-  getStructureLevelStat
+  getStructureLevelStat,
+  isStructureAllowedOnBuildSite,
 } from './structures.ts';
 import type { StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import type { BuildSite, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
@@ -235,8 +236,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     menu.className = 'vinh-da-game__build-menu';
     menu.dataset.buildMenu = site.id;
     menu.style.left = `${site.x}px`;
-    const nodeOptions = site.kind === 'ground'
-      ? GROUND_BUILD_NODE_OPTIONS
+    const nodeOptions = buildNodeOptions.filter(option => isStructureAllowedOnBuildSite(option.type, site));
       : BUILD_NODE_OPTIONS;
     nodeOptions.forEach((option) => {
       const node = document.createElement('button');
@@ -292,9 +292,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const cost = structure ? BUILD_LEVEL_COST[nextLevel as keyof typeof BUILD_LEVEL_COST] : BUILD_LEVEL_COST[1];
       const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
       const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
-      const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && Boolean(type) && type !== 'wall' && site.allowed.includes('wall');
+      const canBuildOnSurface = type ? isStructureAllowedOnBuildSite(type, site) : false;
+      const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && Boolean(type) && type !== 'wall' && canBuildOnSurface;
       node.hidden = structure
-        ? !(isLv3Branch || isLv5Branch || canMount || (isUpgradeNode && structure.level < 6 && structure.level !== 2 && structure.level !== 4))
+        ? isUpgradeNode || Boolean(action) || !type || !canBuildOnSurface;
         : isUpgradeNode || Boolean(action) || !type || !site.allowed.includes(type);
       if (node instanceof HTMLButtonElement) node.disabled = !node.hidden && !canAfford(cost);
     }
@@ -756,11 +757,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         }
       } else {
         const type = buildNode.dataset.structureType as StructureType | undefined;
-        if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && spend(BUILD_LEVEL_COST[1])){
+        if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, site) && spend(BUILD_LEVEL_COST[1])){
           const upgraded = { ...structure, mountedStructure: type };
           setStructure(upgraded);
           renderBuildSite(site.id);
-        } else if (site && type && !structure && site.allowed.includes(type) && spend(BUILD_LEVEL_COST[1])){
+        } else if (site && type && !structure && isStructureAllowedOnBuildSite(type, site) && spend(BUILD_LEVEL_COST[1])){
           const placed = { siteId: site.id, type, level: 1 };
           setStructure(placed);
           ensureStructureRuntime(placed);

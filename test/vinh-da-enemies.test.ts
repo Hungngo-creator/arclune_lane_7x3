@@ -5,7 +5,7 @@ describe('Vĩnh Dạ enemy Khai Nguyên 1 templates', () => {
     expect(ENEMY_TEMPLATES.twisted).toMatchObject({ hp: 3, speed: 40, weight: 1, damage: 1, attackCooldown: 2.5, canFly: false });
     expect(ENEMY_TEMPLATES.crawler).toMatchObject({ hp: 3, speed: 100, weight: 0.9, damage: 1, attackCooldown: 2, canFly: false });
     expect(ENEMY_TEMPLATES.madDog).toMatchObject({ hp: 1.5, speed: 130, weight: 0.3, damage: 1, attackCooldown: 4, canFly: false });
-    expect(ENEMY_TEMPLATES.suicideBomber).toMatchObject({ hp: 2, speed: 45, weight: 1.5, damage: 4, attackCooldown: 3, canFly: false });
+    expect(ENEMY_TEMPLATES.suicideBomber).toMatchObject({ hp: 1, speed: 45, weight: 1.5, damage: 4, attackCooldown: 1.6, canFly: false });
   });
 
   it('covers supplemental flying, caster, tank, and Oán Long specs', () => {

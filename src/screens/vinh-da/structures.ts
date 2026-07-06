@@ -7,7 +7,7 @@ import {
   CASTLE_OUTER_RIGHT,
   WORLD_WIDTH
 } from './constants.ts';
-import type { BuildSite } from './types.ts';
+import type { BuildSite, BuildSiteKind } from './types.ts';
 
 export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal' | 'landmine' | 'swamp';
 
@@ -77,6 +77,19 @@ export const GROUND_BUILD_NODE_OPTIONS = [
   { label: 'Địa lôi', type: 'landmine' },
   { label: 'Đầm lầy', type: 'swamp' }
 ] as const satisfies readonly BuildMenuOption[];
+
+export const STRUCTURE_SURFACES: Record<StructureType, readonly BuildSiteKind[]> = {
+  watchtower: ['rock', 'wall-slot'],
+  wall: ['wall-slot'],
+  elementalTower: ['rock', 'wall-slot'],
+  barracks: ['rock', 'wall-slot'],
+  church: ['rock', 'wall-slot'],
+  crystalSeal: ['rock', 'wall-slot'],
+  landmine: ['ground'],
+  swamp: ['ground']
+} as const;
+
+export const isStructureAllowedOnBuildSite = (type: StructureType, site: Pick<BuildSite, 'kind'>): boolean => STRUCTURE_SURFACES[type].includes(site.kind);
 
 export const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'swamp'] as const satisfies readonly StructureType[];
 export const WALL_BUILD_SITE_ALLOWED = ['wall'] as const satisfies readonly StructureType[];
