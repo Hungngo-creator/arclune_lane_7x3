@@ -36,6 +36,11 @@ export interface StructureLevelStat {
   shockCooldownSeconds?: number;
   curseMaxHpPercent?: number;
   curseCooldownSeconds?: number;
+  biochemicalCooldownSeconds?: number;
+  biochemicalRange?: number;
+  biochemicalMaxTargets?: number;
+  linkedHpBonusPercent?: number;
+  linkedRegenShare?: number;
 }
 
 export const UPGRADE_NODE_LABEL = 'Nâng cấp';
@@ -58,7 +63,7 @@ export const WALL_LEVELS = {
   },
   4: { hpBonus: 15, armBonus: 3, resBonus: 3, hpRegen: 5 },
   5: {
-    biochemical: { hpBonus: 20, armBonus: 4, resBonus: 4, hpRegenBonus: 5 },
+    biochemical: { hpBonus: 20, armBonus: 4, resBonus: 4, hpRegenBonus: 5, biochemicalCooldownSeconds: 5, biochemicalRange: 460, biochemicalMaxTargets: 3 },
     curse: { hpBonus: 20, armBonus: 3, resBonus: 3, hpRegenBonus: 3, curseMaxHpPercent: 0.03, curseCooldownSeconds: 3 },
     link: { hpBonus: 0, armBonus: 0, resBonus: 0, hpRegenBonus: 10, linkedHpBonusPercent: 0.2, linkedRegenShare: 0.5 }
   },
@@ -225,6 +230,8 @@ export const getWallLevelStat = (level: number, branchLv3?: WallBranchLv3, branc
   return {
     ...lv4,
     ...('curseMaxHpPercent' in lv5Config ? { curseMaxHpPercent: lv5Config.curseMaxHpPercent, curseCooldownSeconds: lv5Config.curseCooldownSeconds } : {}),
+    ...('biochemicalCooldownSeconds' in lv5Config ? { biochemicalCooldownSeconds: lv5Config.biochemicalCooldownSeconds, biochemicalRange: lv5Config.biochemicalRange, biochemicalMaxTargets: lv5Config.biochemicalMaxTargets } : {}),
+    ...('linkedHpBonusPercent' in lv5Config ? { linkedHpBonusPercent: lv5Config.linkedHpBonusPercent, linkedRegenShare: lv5Config.linkedRegenShare } : {}),
     hp: lv4.hp + lv5Config.hpBonus,
     arm: (lv4.arm ?? 0) + lv5Config.armBonus,
     res: (lv4.res ?? 0) + lv5Config.resBonus,

@@ -174,7 +174,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const buildSitesById = new Map(buildSitesByX.map(site => [site.id, site]));
   let lastRenderedCameraX = Number.POSITIVE_INFINITY;
 
-  const getStructureMaxHp = (structure: PlacedStructure): number => getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp;
+  const getStructureMaxHp = (structure: PlacedStructure): number => (
+    getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp
+    + (structureRuntimes.get(structure.siteId)?.linkedMaxHpBonus ?? 0)
+  );
   const ensureStructureRuntime = (structure: PlacedStructure): StructureRuntime => {
     const existing = structureRuntimes.get(structure.siteId);
     if (existing) return existing;

@@ -812,14 +812,17 @@ lv 6: player có thể tắt/kích hoạt trọng lực pháo.
 
 một khẩu súng không tệ, có điều coi chừng bắn xa quá trời sáng không có tiền đâu nha, bắn boss đi luôn thì húp cháo, nếu ngươi đủ giàu, nâng cái lv 6, đánh boss còn nửa mạng thì bật pháo liền xong chuyện.
 
-### 
+### Đao Phủ
 
 từ khí aether tinh khiết ngưng tụ mà thành vô hệ lưỡi đao, lưỡi đao to lớn, ngưng tụ dài nhưng sát thương đồng dạng to lớn.
 
 lv 1: nhưng tụ 1 lưỡi đao có trọng lượng 0.1, ngang 2 mét rộng 0,5 mét hình bán nguyệt, bay về phía mục tiêu với tốc độ bay: 1/s, gây 3 sát thương, bỏ qua res/arm dưới 1 của mục tiêu (sát thương chuẩn lên mục tiêu có res/arm = 1, nếu mục tiêu có 1 res 2 arm thì nhận 2 sát thương chuẩn)
 cd 6s. Mỗi lưỡi đao chỉ chém trúng tối đa 5 mục tiêu, nếu tiếp xúc trên 5 mục tiêu thì gây sát thương lên 5 kẻ đứng gần đao nhất sau đó lưỡi đao năng lượng này sẽ biến mất.
 
-lv 2: trên cơ sở lv 1, +
+lv 2: trên cơ sở lv 1, + 1/s tốc độ bay, + 2 sát thương, cd + 0,5s.
+
+lv 3 có 2 lựa chọn:
+Nguyên Tố Hoá: khi chọn nâng cấp này sẽ tiêu hao 1 loại Nguyên Tố Thạch cùng tier với kiến trúc này 1 cách ngẫu nhiên
 
 #### sau đây là nhóm kiến trúc đặt dưới đất:
 địa lôi: phát nổ sau 2s đạp trúng, không phân địch ta, gây sát thương chuẩn = 2.
@@ -851,12 +854,16 @@ trọng lượng: 4.
 
 ### tài nguyên:
 Vụn Nguyên Tinh, Hạ Nguyên Tinh, 1 hnt = 100 vnt. Trung Nguyên Tinh, Thượng Nguyên Tinh, 1 tnt = 100 hnt, 1 ThNT = 100 TNT, còn Thần Tinh nữa nhưng theo lore chắc khó xuất hiện, trừ phi phong ấn được lượng huyết nhục nhất định.
+#### Niệm Thạch:
+Từ ý thức, tinh hồn ngưng luyện mà thành, chi phí chế tạo không thấp, khó xuất hiện trong tự nhiên.
+Nguyên liệu cần thiết để chế tạo kiến trúc Đao Phủ, không có tier cố định.
+
 #### Dạ Thạch:
 Từ khí aether hệ hắc ám ngưng kết mà thành, đa số kẻ thù đều rơi ra thứ này, base là thứ có thể chắt lọc mọi thứ thành Nguyên Tinh, các loại nguyên tinh cũng là tiền tệ chính trong game, mỗi đêm sau khi giết xong kẻ thù thì cần thu nhặt Dạ Thạch rơi trên đất, đem về base để chắt lọc năng lượng. tier vật liệu biến đổi theo tier map.
 1 Dạ Thạch = 0,9 Hạ Nguyên Tinh do qua trình chắt lọc base cần năng lượng nên lấy phần 0,1 còn lại.
 Sau đó từ dạng lỏng, ngưng tụ Nguyên Tinh thành dạng đặc lại tốn 10% của 0.9 đó mới ngưng tụ ra Hạ Nguyên Tinh, nếu để trong base không ngưng tụ thì có thể nhưng tụ ra hạng Nguyên Tinh cao cấp hơn trừ Thần Tinh. Nếu base được dời đi, phần năng lượng chưa rút ra sẽ được giữ nguyên trong base, base mỗi ngày tiêu hao 5 HNT để duy trì buff.
 #### Nguyên Tố Thạch:
-một viên đá nhiều màu, màu sắc luôn thay đổi, là ngưng kết của nguyên tố, tùy theo khí hậu/địa hình mà Nguyên Tố Thạch có nguyên tố khác nhau. tỉ lệ 1:35 HNT, có thể dùng để tạo Tháp Nguyên Tố. Không có tier cố định, tùy theo nồng độ khí aether mà có giai khác nhau.
+một viên đá nhiều màu, màu sắc luôn thay đổi, là ngưng kết của nguyên tố, tùy theo khí hậu/địa hình mà Nguyên Tố Thạch có nguyên tố khác nhau. tỉ lệ 1:35 HNT (x2/tier, tức nguyên tố thạch tier 1.2 1 viên:70 HNT), có thể dùng để tạo Tháp Nguyên Tố. Không có tier cố định, tùy theo nồng độ khí aether mà có giai khác nhau.
 
 #### Hồng Lôi Quả:
 nhất giai thượng phẩm linh quả.

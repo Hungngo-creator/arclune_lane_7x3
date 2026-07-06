@@ -39,6 +39,10 @@ export interface Enemy {
 export interface StructureRuntime {
   cooldown: number;
   hp: number;
+  biochemicalCooldown?: number;
+  linkedWallSiteId?: string | null;
+  linkedMaxHpBonus?: number;
+  linkedRegenBonus?: number;
   armed?: boolean;
   fuse?: number;
   dragonHitCount?: number;

@@ -38218,7 +38218,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const buildSitesByX = [...BUILD_SITES].sort((a, b) => a.x - b.x);
       const buildSitesById = new Map(buildSitesByX.map(site => [site.id, site]));
       let lastRenderedCameraX = Number.POSITIVE_INFINITY;
-      const getStructureMaxHp = (structure) => getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp;
+      const getStructureMaxHp = (structure) => (getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp
+          + (structureRuntimes.get(structure.siteId)?.linkedMaxHpBonus ?? 0));
       const ensureStructureRuntime = (structure) => {
           const existing = structureRuntimes.get(structure.siteId);
           if (existing)
@@ -38677,6 +38678,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
 };
 __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./screens/vinh-da/constants.ts');
+  const CASTLE_OUTER_LEFT = __dep0.CASTLE_OUTER_LEFT;
+  const CASTLE_OUTER_RIGHT = __dep0.CASTLE_OUTER_RIGHT;
   const CRYSTAL_X = __dep0.CRYSTAL_X;
   const DEFAULT_STRUCTURE_COOLDOWN = __dep0.DEFAULT_STRUCTURE_COOLDOWN;
   const ENEMY_ATTACK_RANGE = __dep0.ENEMY_ATTACK_RANGE;
@@ -38751,15 +38754,19 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       return enemy.hp <= 0;
   };
   const reduceStructureDamage = (ctx, structure, runtime, attacker, amount) => {
-      if (structure.type !== 'wall' || structure.branchLv3 !== 'slippery' || !attacker)
+      if (structure.type !== 'wall')
           return amount;
       const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+      const defenseMultiplier = ((100 / (100 + Math.max(0, stat.arm ?? 0))) + (100 / (100 + Math.max(0, stat.res ?? 0)))) / 2;
+      const mitigatedAmount = amount * defenseMultiplier;
+      if (structure.branchLv3 !== 'slippery' || !attacker)
+          return mitigatedAmount;
       const cooldowns = runtime.attackerCooldowns ??= new Map();
       const key = `slippery:${attacker.id}`;
       if ((cooldowns.get(key) ?? 0) > 0 || Math.random() >= (stat.slipperyChance ?? 0))
-          return amount;
+          return mitigatedAmount;
       cooldowns.set(key, stat.slipperyCooldownSeconds ?? 3);
-      return amount * (stat.slipperyDamageMultiplier ?? 1);
+      return mitigatedAmount * (stat.slipperyDamageMultiplier ?? 1);
   };
   const triggerWallHitEffects = (ctx, structure, site, runtime, attacker) => {
       if (structure.type !== 'wall')
@@ -39001,6 +39008,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       ctx.renderDayNightTimer();
   };
   const updateStructureRuntimeTimers = (ctx, runtime, dt) => {
+      runtime.biochemicalCooldown = Math.max(0, (runtime.biochemicalCooldown ?? 0) - dt);
       for (const [key, remaining] of runtime.attackerCooldowns ?? []) {
           const next = Math.max(0, remaining - dt);
           if (next > 0)
@@ -39009,18 +39017,91 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               runtime.attackerCooldowns?.delete(key);
       }
   };
+  const getWallSide = (site) => {
+      if (site.x <= CASTLE_OUTER_LEFT)
+          return 'left';
+      if (site.x >= CASTLE_OUTER_RIGHT)
+          return 'right';
+      return null;
+  };
+  const findLinkedWall = (ctx, source, sourceSite) => {
+      const sourceSide = getWallSide(sourceSite);
+      if (!sourceSide)
+          return null;
+      let closest = null;
+      for (const siteId of ctx.structureSiteIdsOfType('wall')) {
+          if (siteId === source.siteId)
+              continue;
+          const candidate = ctx.state.structures.get(siteId);
+          const candidateSite = ctx.getBuildSite(siteId);
+          if (!candidate || !candidateSite || getWallSide(candidateSite) === sourceSide)
+              continue;
+          const distance = Math.abs(candidateSite.x - sourceSite.x);
+          if (!closest || distance < closest.distance)
+              closest = { structure: candidate, distance };
+      }
+      return closest?.structure ?? null;
+  };
+  const updateWallLink = (ctx, structure, runtime) => {
+      if (structure.type !== 'wall' || structure.level < 5 || structure.branchLv5 !== 'link')
+          return;
+      const site = ctx.getBuildSite(structure.siteId);
+      if (!site)
+          return;
+      const linked = findLinkedWall(ctx, structure, site);
+      if (!linked)
+          return;
+      const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+      const sourceMaxHp = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp;
+      const linkedRuntime = ctx.ensureStructureRuntime(linked);
+      runtime.linkedWallSiteId = linked.siteId;
+      linkedRuntime.linkedMaxHpBonus = (linkedRuntime.linkedMaxHpBonus ?? 0) + sourceMaxHp * (stat.linkedHpBonusPercent ?? 0);
+      linkedRuntime.linkedRegenBonus = (linkedRuntime.linkedRegenBonus ?? 0) + (stat.hpRegen ?? 0) * (stat.linkedRegenShare ?? 0);
+  };
   const updateWallRegeneration = (ctx, structure, runtime, dt) => {
       if (structure.type !== 'wall')
           return;
       const maxHp = ctx.getStructureMaxHp(structure);
-      const regen = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0;
+      const regen = (getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0) + (runtime.linkedRegenBonus ?? 0);
       runtime.hp = Math.min(maxHp, runtime.hp + regen * dt);
+  };
+  const updateBiochemicalWall = (ctx, structure, runtime) => {
+      if (structure.type !== 'wall' || structure.level < 5 || structure.branchLv5 !== 'biochemical' || (runtime.biochemicalCooldown ?? 0) > 0)
+          return;
+      const site = ctx.getBuildSite(structure.siteId);
+      if (!site)
+          return;
+      const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+      const candidates = ctx.state.enemies
+          .map((enemy, index) => ({ enemy, index, sort: Math.random() }))
+          .filter(item => Math.abs(item.enemy.x - site.x) <= (stat.biochemicalRange ?? 0))
+          .sort((a, b) => a.sort - b.sort)
+          .slice(0, stat.biochemicalMaxTargets ?? 3)
+          .sort((a, b) => b.index - a.index);
+      if (candidates.length <= 0)
+          return;
+      for (const { enemy, index } of candidates) {
+          runtime.hp = Math.min(ctx.getStructureMaxHp(structure), runtime.hp + Math.max(0, enemy.hp));
+          removeEnemyAt(ctx, index, false);
+      }
+      runtime.biochemicalCooldown = stat.biochemicalCooldownSeconds ?? 5;
   };
   const updateStructures = (ctx, dt) => {
       for (const structure of ctx.state.structures.values()) {
           const runtime = ctx.ensureStructureRuntime(structure);
           updateStructureRuntimeTimers(ctx, runtime, dt);
+          runtime.linkedWallSiteId = null;
+          runtime.linkedMaxHpBonus = 0;
+          runtime.linkedRegenBonus = 0;
+      }
+      for (const structure of ctx.state.structures.values()) {
+          const runtime = ctx.ensureStructureRuntime(structure);
+          updateWallLink(ctx, structure, runtime);
+      }
+      for (const structure of ctx.state.structures.values()) {
+          const runtime = ctx.ensureStructureRuntime(structure);
           updateWallRegeneration(ctx, structure, runtime, dt);
+          updateBiochemicalWall(ctx, structure, runtime);
       }
       for (const type of ['watchtower', 'elementalTower']) {
           for (const siteId of ctx.structureSiteIdsOfType(type)) {
@@ -39084,7 +39165,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateEnemies')) exports.updateEnemies = updateEnemies;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateDayNightTimer')) exports.updateDayNightTimer = updateDayNightTimer;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateStructureRuntimeTimers')) exports.updateStructureRuntimeTimers = updateStructureRuntimeTimers;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateWallLink')) exports.updateWallLink = updateWallLink;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateWallRegeneration')) exports.updateWallRegeneration = updateWallRegeneration;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateBiochemicalWall')) exports.updateBiochemicalWall = updateBiochemicalWall;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateStructures')) exports.updateStructures = updateStructures;
 };
 __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
@@ -39116,7 +39199,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       },
       4: { hpBonus: 15, armBonus: 3, resBonus: 3, hpRegen: 5 },
       5: {
-          biochemical: { hpBonus: 20, armBonus: 4, resBonus: 4, hpRegenBonus: 5 },
+          biochemical: { hpBonus: 20, armBonus: 4, resBonus: 4, hpRegenBonus: 5, biochemicalCooldownSeconds: 5, biochemicalRange: 460, biochemicalMaxTargets: 3 },
           curse: { hpBonus: 20, armBonus: 3, resBonus: 3, hpRegenBonus: 3, curseMaxHpPercent: 0.03, curseCooldownSeconds: 3 },
           link: { hpBonus: 0, armBonus: 0, resBonus: 0, hpRegenBonus: 10, linkedHpBonusPercent: 0.2, linkedRegenShare: 0.5 }
       },
@@ -39265,6 +39348,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       return {
           ...lv4,
           ...('curseMaxHpPercent' in lv5Config ? { curseMaxHpPercent: lv5Config.curseMaxHpPercent, curseCooldownSeconds: lv5Config.curseCooldownSeconds } : {}),
+          ...('biochemicalCooldownSeconds' in lv5Config ? { biochemicalCooldownSeconds: lv5Config.biochemicalCooldownSeconds, biochemicalRange: lv5Config.biochemicalRange, biochemicalMaxTargets: lv5Config.biochemicalMaxTargets } : {}),
+          ...('linkedHpBonusPercent' in lv5Config ? { linkedHpBonusPercent: lv5Config.linkedHpBonusPercent, linkedRegenShare: lv5Config.linkedRegenShare } : {}),
           hp: lv4.hp + lv5Config.hpBonus,
           arm: (lv4.arm ?? 0) + lv5Config.armBonus,
           res: (lv4.res ?? 0) + lv5Config.resBonus,

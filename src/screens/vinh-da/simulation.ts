@@ -1,4 +1,6 @@
 import {
+  CASTLE_OUTER_LEFT,
+  CASTLE_OUTER_RIGHT,
   CRYSTAL_X,
   DEFAULT_STRUCTURE_COOLDOWN,
   ENEMY_ATTACK_RANGE,
@@ -98,13 +100,16 @@ export const damageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, amount: 
     return enemy.hp <= 0;
   };
 export const reduceStructureDamage = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime, attacker: Enemy | null, amount: number): number => {
-    if (structure.type !== 'wall' || structure.branchLv3 !== 'slippery' || !attacker) return amount;
+    if (structure.type !== 'wall') return amount;
     const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+    const defenseMultiplier = ((100 / (100 + Math.max(0, stat.arm ?? 0))) + (100 / (100 + Math.max(0, stat.res ?? 0)))) / 2;
+    const mitigatedAmount = amount * defenseMultiplier;
+    if (structure.branchLv3 !== 'slippery' || !attacker) return mitigatedAmount;
     const cooldowns = runtime.attackerCooldowns ??= new Map<string, number>();
     const key = `slippery:${attacker.id}`;
-    if ((cooldowns.get(key) ?? 0) > 0 || Math.random() >= (stat.slipperyChance ?? 0)) return amount;
+    if ((cooldowns.get(key) ?? 0) > 0 || Math.random() >= (stat.slipperyChance ?? 0)) return mitigatedAmount;
     cooldowns.set(key, stat.slipperyCooldownSeconds ?? 3);
-    return amount * (stat.slipperyDamageMultiplier ?? 1);
+    return mitigatedAmount * (stat.slipperyDamageMultiplier ?? 1);
   };
 export const triggerWallHitEffects = (ctx: VinhDaSimulationContext, structure: PlacedStructure, site: BuildSite, runtime: StructureRuntime, attacker: Enemy): void => {
     if (structure.type !== 'wall') return;
@@ -326,23 +331,85 @@ export const updateDayNightTimer = (ctx: VinhDaSimulationContext, dt: number): v
     ctx.renderDayNightTimer();
   };
 export const updateStructureRuntimeTimers = (ctx: VinhDaSimulationContext, runtime: StructureRuntime, dt: number): void => {
+  runtime.biochemicalCooldown = Math.max(0, (runtime.biochemicalCooldown ?? 0) - dt);
     for (const [key, remaining] of runtime.attackerCooldowns ?? []){
       const next = Math.max(0, remaining - dt);
       if (next > 0) runtime.attackerCooldowns?.set(key, next);
       else runtime.attackerCooldowns?.delete(key);
     }
   };
+const getWallSide = (site: BuildSite): Side | null => {
+    if (site.x <= CASTLE_OUTER_LEFT) return 'left';
+    if (site.x >= CASTLE_OUTER_RIGHT) return 'right';
+    return null;
+  };
+const findLinkedWall = (ctx: VinhDaSimulationContext, source: PlacedStructure, sourceSite: BuildSite): PlacedStructure | null => {
+    const sourceSide = getWallSide(sourceSite);
+    if (!sourceSide) return null;
+    let closest: { structure: PlacedStructure; distance: number } | null = null;
+    for (const siteId of ctx.structureSiteIdsOfType('wall')){
+      if (siteId === source.siteId) continue;
+      const candidate = ctx.state.structures.get(siteId);
+      const candidateSite = ctx.getBuildSite(siteId);
+      if (!candidate || !candidateSite || getWallSide(candidateSite) === sourceSide) continue;
+      const distance = Math.abs(candidateSite.x - sourceSite.x);
+      if (!closest || distance < closest.distance) closest = { structure: candidate, distance };
+    }
+    return closest?.structure ?? null;
+  };
+export const updateWallLink = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime): void => {
+    if (structure.type !== 'wall' || structure.level < 5 || structure.branchLv5 !== 'link') return;
+    const site = ctx.getBuildSite(structure.siteId);
+    if (!site) return;
+    const linked = findLinkedWall(ctx, structure, site);
+    if (!linked) return;
+    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+    const sourceMaxHp = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp;
+    const linkedRuntime = ctx.ensureStructureRuntime(linked);
+    runtime.linkedWallSiteId = linked.siteId;
+    linkedRuntime.linkedMaxHpBonus = (linkedRuntime.linkedMaxHpBonus ?? 0) + sourceMaxHp * (stat.linkedHpBonusPercent ?? 0);
+    linkedRuntime.linkedRegenBonus = (linkedRuntime.linkedRegenBonus ?? 0) + (stat.hpRegen ?? 0) * (stat.linkedRegenShare ?? 0);
+};
 export const updateWallRegeneration = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime, dt: number): void => {
     if (structure.type !== 'wall') return;
     const maxHp = ctx.getStructureMaxHp(structure);
-    const regen = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0;
+    const regen = (getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0) + (runtime.linkedRegenBonus ?? 0);
     runtime.hp = Math.min(maxHp, runtime.hp + regen * dt);
+  };
+export const updateBiochemicalWall = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime): void => {
+    if (structure.type !== 'wall' || structure.level < 5 || structure.branchLv5 !== 'biochemical' || (runtime.biochemicalCooldown ?? 0) > 0) return;
+    const site = ctx.getBuildSite(structure.siteId);
+    if (!site) return;
+    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+    const candidates = ctx.state.enemies
+      .map((enemy, index) => ({ enemy, index, sort: Math.random() }))
+      .filter(item => Math.abs(item.enemy.x - site.x) <= (stat.biochemicalRange ?? 0))
+      .sort((a, b) => a.sort - b.sort)
+      .slice(0, stat.biochemicalMaxTargets ?? 3)
+      .sort((a, b) => b.index - a.index);
+    if (candidates.length <= 0) return;
+    for (const { enemy, index } of candidates){
+      runtime.hp = Math.min(ctx.getStructureMaxHp(structure), runtime.hp + Math.max(0, enemy.hp));
+      removeEnemyAt(ctx, index, false);
+    }
+    runtime.biochemicalCooldown = stat.biochemicalCooldownSeconds ?? 5;
   };
 export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void => {
     for (const structure of ctx.state.structures.values()){
       const runtime = ctx.ensureStructureRuntime(structure);
       updateStructureRuntimeTimers(ctx, runtime, dt);
+      runtime.linkedWallSiteId = null;
+      runtime.linkedMaxHpBonus = 0;
+      runtime.linkedRegenBonus = 0;
+    }
+    for (const structure of ctx.state.structures.values()){
+      const runtime = ctx.ensureStructureRuntime(structure);
+      updateWallLink(ctx, structure, runtime);
+    }
+    for (const structure of ctx.state.structures.values()){
+      const runtime = ctx.ensureStructureRuntime(structure);
       updateWallRegeneration(ctx, structure, runtime, dt);
+      updateBiochemicalWall(ctx, structure, runtime);
     }
     for (const type of ['watchtower', 'elementalTower'] as const){
       for (const siteId of ctx.structureSiteIdsOfType(type)){
