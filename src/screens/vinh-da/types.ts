@@ -53,6 +53,8 @@ export interface Enemy {
   paralysisCooldown?: number;
   bloodMaxHpStacks?: number;
   lightVulnerableSeconds?: number;
+  bleedSeconds?: number;
+  bleedMaxHpDpsPercent?: number;
 }
 
 export interface StructureRuntime {
@@ -72,4 +74,6 @@ export interface StructureRuntime {
   soldiers?: RuntimeSoldier[];
   nextSoldierId?: number;
   emergencyHealCooldown?: number;
+  burstShotsRemaining?: number;
+  gravityEnabled?: boolean;
 }

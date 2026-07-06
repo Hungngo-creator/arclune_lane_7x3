@@ -83,6 +83,9 @@ const CSS = /* css */ `
   .vinh-da-game__structure--church{background:linear-gradient(180deg,#efe5ff,#44305f);}
   .vinh-da-game__structure--crystalSeal{background:linear-gradient(135deg,#eaffff,#7b5cff 48%,#39e8ff);}
   .vinh-da-game__structure--landmine{background:radial-gradient(circle at 50% 50%,#ff544d 0 18%,#2a1412 19% 54%,#100807 55% 100%);}
+  .vinh-da-game__structure--spikeTrap{background:repeating-linear-gradient(120deg,#1a1518 0 11px,#6f7183 11px 14px,#1a1518 14px 24px);}
+  .vinh-da-game__structure--antiAirCannon{background:linear-gradient(180deg,#2f394b,#121821 46%,#0b0d11);}
+  .vinh-da-game__structure--gravityCannon{background:radial-gradient(circle at 50% 38%,#b78cff,#37246f 42%,#0d0b16 72%);}
   .vinh-da-game__structure--swamp{background:radial-gradient(ellipse at 50% 62%,rgba(88,151,97,.85),rgba(28,57,48,.92) 58%,rgba(9,19,18,.96));}
   .vinh-da-game__rock.has-structure::before,.vinh-da-game__plot.has-structure::before,.vinh-da-game__wall-slot.has-structure::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:64px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
   .vinh-da-game__structure--wall{border-style:solid;border-color:rgba(226,222,255,.34);background:repeating-linear-gradient(90deg,#2e2944 0 18px,#181625 18px 36px);box-shadow:0 0 22px rgba(133,105,255,.38);}
@@ -307,6 +310,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     addActionNode('branch-lv5-biochemical', 'Sinh hoá');
     addActionNode('branch-lv5-curse', 'Nguyền rủa');
     addActionNode('branch-lv5-link', 'Liên kết');
+    addActionNode('toggle-gravity', 'Bật/tắt hút');
 
     buildSitesContainer.append(button, menu);
     siteElements.set(site.id, button);
@@ -328,12 +332,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
       const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
       const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
+      const canToggleGravity = structure?.type === 'gravityCannon' && structure.level >= 6 && action === 'toggle-gravity';
       node.hidden = structure
         ? (
             isUpgradeNode
               ? structure.level >= 6 || structure.level === 2 || structure.level === 4
               : action
-                ? !(isLv3Branch || isLv5Branch)
+                ? !(isLv3Branch || isLv5Branch || canToggleGravity)
                 : !canMount
           )
         : isUpgradeNode || Boolean(action) || !type || !site.allowed.includes(type);
@@ -536,6 +541,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
           const upgraded = { ...structure, level: 3, branchLv3: action.slice('branch-lv3-'.length) as WallBranchLv3 };
           setStructure(upgraded);
           ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+          renderBuildSite(site.id);
+          } else if (structure.type === 'gravityCannon' && structure.level >= 6 && action === 'toggle-gravity'){
+          const runtime = ensureStructureRuntime(structure);
+          runtime.gravityEnabled = !(runtime.gravityEnabled ?? true);
           renderBuildSite(site.id);
         } else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(BUILD_LEVEL_COST[5])){
           const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) as WallBranchLv5 };

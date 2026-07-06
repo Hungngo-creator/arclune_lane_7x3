@@ -37909,6 +37909,14 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   const LANDMINE_FUSE_SECONDS = 2;
   const LANDMINE_TRUE_DAMAGE = 2;
   const SWAMP_RADIUS = GROUND_PLOT_WIDTH * 0.5;
+  const SPIKE_TRAP_RADIUS = GROUND_PLOT_WIDTH * 0.5;
+  const SPIKE_TRAP_MIN_WEIGHT = 1;
+  const SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE = 1.9;
+  const SPIKE_TRAP_SLOW_SECONDS = 3;
+  const SPIKE_TRAP_SLOW_MULTIPLIER = 0.5;
+  const SPIKE_TRAP_BLEED_SECONDS = 3;
+  const SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND = 0.03;
+  h;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'STYLE_ID')) exports.STYLE_ID = STYLE_ID;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_WORLD_WIDTH')) exports.BASE_WORLD_WIDTH = BASE_WORLD_WIDTH;
@@ -37951,6 +37959,13 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'LANDMINE_FUSE_SECONDS')) exports.LANDMINE_FUSE_SECONDS = LANDMINE_FUSE_SECONDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'LANDMINE_TRUE_DAMAGE')) exports.LANDMINE_TRUE_DAMAGE = LANDMINE_TRUE_DAMAGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'SWAMP_RADIUS')) exports.SWAMP_RADIUS = SWAMP_RADIUS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SPIKE_TRAP_RADIUS')) exports.SPIKE_TRAP_RADIUS = SPIKE_TRAP_RADIUS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SPIKE_TRAP_MIN_WEIGHT')) exports.SPIKE_TRAP_MIN_WEIGHT = SPIKE_TRAP_MIN_WEIGHT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE')) exports.SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE = SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SPIKE_TRAP_SLOW_SECONDS')) exports.SPIKE_TRAP_SLOW_SECONDS = SPIKE_TRAP_SLOW_SECONDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SPIKE_TRAP_SLOW_MULTIPLIER')) exports.SPIKE_TRAP_SLOW_MULTIPLIER = SPIKE_TRAP_SLOW_MULTIPLIER;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SPIKE_TRAP_BLEED_SECONDS')) exports.SPIKE_TRAP_BLEED_SECONDS = SPIKE_TRAP_BLEED_SECONDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND')) exports.SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND = SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND;
 };
 __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
   const METERS_TO_WORLD_UNITS = 100;
@@ -38132,6 +38147,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__structure--church{background:linear-gradient(180deg,#efe5ff,#44305f);}
     .vinh-da-game__structure--crystalSeal{background:linear-gradient(135deg,#eaffff,#7b5cff 48%,#39e8ff);}
     .vinh-da-game__structure--landmine{background:radial-gradient(circle at 50% 50%,#ff544d 0 18%,#2a1412 19% 54%,#100807 55% 100%);}
+    .vinh-da-game__structure--spikeTrap{background:repeating-linear-gradient(120deg,#1a1518 0 11px,#6f7183 11px 14px,#1a1518 14px 24px);}
+    .vinh-da-game__structure--antiAirCannon{background:linear-gradient(180deg,#2f394b,#121821 46%,#0b0d11);}
+    .vinh-da-game__structure--gravityCannon{background:radial-gradient(circle at 50% 38%,#b78cff,#37246f 42%,#0d0b16 72%);}
     .vinh-da-game__structure--swamp{background:radial-gradient(ellipse at 50% 62%,rgba(88,151,97,.85),rgba(28,57,48,.92) 58%,rgba(9,19,18,.96));}
     .vinh-da-game__rock.has-structure::before,.vinh-da-game__plot.has-structure::before,.vinh-da-game__wall-slot.has-structure::before{content:attr(data-structure-label);position:absolute;left:50%;bottom:64px;transform:translateX(-50%);font-size:11px;color:#eee6ff;text-shadow:0 1px 5px #000;white-space:nowrap;}
     .vinh-da-game__structure--wall{border-style:solid;border-color:rgba(226,222,255,.34);background:repeating-linear-gradient(90deg,#2e2944 0 18px,#181625 18px 36px);box-shadow:0 0 22px rgba(133,105,255,.38);}
@@ -38357,6 +38375,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           addActionNode('branch-lv5-biochemical', 'Sinh hoá');
           addActionNode('branch-lv5-curse', 'Nguyền rủa');
           addActionNode('branch-lv5-link', 'Liên kết');
+          addActionNode('toggle-gravity', 'Bật/tắt hút');
           buildSitesContainer.append(button, menu);
           siteElements.set(site.id, button);
           buildMenuElements.set(site.id, menu);
@@ -38378,11 +38397,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
               const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
               const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
+              const canToggleGravity = structure?.type === 'gravityCannon' && structure.level >= 6 && action === 'toggle-gravity';
               node.hidden = structure
                   ? (isUpgradeNode
                       ? structure.level >= 6 || structure.level === 2 || structure.level === 4
                       : action
-                          ? !(isLv3Branch || isLv5Branch)
+                          ? !(isLv3Branch || isLv5Branch || canToggleGravity)
                           : !canMount)
                   : isUpgradeNode || Boolean(action) || !type || !site.allowed.includes(type);
               if (node instanceof HTMLButtonElement)
@@ -38598,6 +38618,11 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
                       ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
                       renderBuildSite(site.id);
                   }
+                  else if (structure.type === 'gravityCannon' && structure.level >= 6 && action === 'toggle-gravity') {
+                      const runtime = ensureStructureRuntime(structure);
+                      runtime.gravityEnabled = !(runtime.gravityEnabled ?? true);
+                      renderBuildSite(site.id);
+                  }
                   else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(BUILD_LEVEL_COST[5])) {
                       const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) };
                       setStructure(upgraded);
@@ -38690,6 +38715,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const LANDMINE_FUSE_SECONDS = __dep0.LANDMINE_FUSE_SECONDS;
   const LANDMINE_TRIGGER_RADIUS = __dep0.LANDMINE_TRIGGER_RADIUS;
   const LANDMINE_TRUE_DAMAGE = __dep0.LANDMINE_TRUE_DAMAGE;
+  const SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND = __dep0.SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND;
+  const SPIKE_TRAP_BLEED_SECONDS = __dep0.SPIKE_TRAP_BLEED_SECONDS;
+  const SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE = __dep0.SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE;
+  const SPIKE_TRAP_MIN_WEIGHT = __dep0.SPIKE_TRAP_MIN_WEIGHT;
+  const SPIKE_TRAP_RADIUS = __dep0.SPIKE_TRAP_RADIUS;
+  const SPIKE_TRAP_SLOW_MULTIPLIER = __dep0.SPIKE_TRAP_SLOW_MULTIPLIER;
+  const SPIKE_TRAP_SLOW_SECONDS = __dep0.SPIKE_TRAP_SLOW_SECONDS;
   const LEADER_ATTACK_RANGE = __dep0.LEADER_ATTACK_RANGE;
   const LEADER_BASIC_ATTACK_COOLDOWN_SECONDS = __dep0.LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
   const LEADER_BASIC_ATTACK_DAMAGE = __dep0.LEADER_BASIC_ATTACK_DAMAGE;
@@ -38910,9 +38942,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       for (const siteId of ctx.structureSiteIdsOfType('swamp')) {
           const site = ctx.getBuildSite(siteId);
           if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS) {
-              if (enemy.weight <= 1)
+              if (enemy.weight >= 1 && enemy.weight < 2)
                   return enemy.baseSpeed * 0.5 * statusMultiplier;
-              if (enemy.weight === 2)
+              if (enemy.weight >= 2 && enemy.weight < 3)
                   return enemy.baseSpeed * 0.75 * statusMultiplier;
               return enemy.baseSpeed * statusMultiplier;
           }
@@ -39043,6 +39075,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
                   continue;
               }
           }
+          if ((enemy.bleedSeconds ?? 0) > 0) {
+              enemy.bleedSeconds = Math.max(0, (enemy.bleedSeconds ?? 0) - dt);
+              if (damageEnemy(ctx, enemy, enemy.maxHp * (enemy.bleedMaxHpDpsPercent ?? 0) * dt)) {
+                  removeEnemyAt(ctx, i, true);
+                  continue;
+              }
+          }
           const template = getEnemyTemplate(enemy);
           switch (enemy.kind) {
               case 'suicideBomber':
@@ -39166,6 +39205,57 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       runtime.biochemicalCooldown = stat.biochemicalCooldownSeconds ?? 5;
   };
+  const canTriggerSpikeTrap = (enemy) => enemy.weight >= SPIKE_TRAP_MIN_WEIGHT && enemy.weight < SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE;
+  const updateSpikeTrap = (ctx, site) => {
+      for (const enemy of ctx.state.enemies) {
+          if (enemy.canFly || !canTriggerSpikeTrap(enemy) || Math.abs(enemy.x - site.x) > SPIKE_TRAP_RADIUS)
+              continue;
+          enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, SPIKE_TRAP_SLOW_SECONDS);
+          enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, SPIKE_TRAP_SLOW_MULTIPLIER);
+          enemy.bleedSeconds = Math.max(enemy.bleedSeconds ?? 0, SPIKE_TRAP_BLEED_SECONDS);
+          enemy.bleedMaxHpDpsPercent = Math.max(enemy.bleedMaxHpDpsPercent ?? 0, SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND);
+      }
+  };
+  const updateAntiAirCannon = (ctx, structure, site, runtime, dt) => {
+      if (structure.type !== 'antiAirCannon')
+          return;
+      const stat = getStructureLevelStat('antiAirCannon', structure.level);
+      runtime.cooldown = Math.max(0, runtime.cooldown - dt);
+      if ((runtime.burstShotsRemaining ?? 0) <= 0 && runtime.cooldown <= 0)
+          runtime.burstShotsRemaining = stat.burstShotCount ?? 1;
+      if (runtime.cooldown > 0 || (runtime.burstShotsRemaining ?? 0) <= 0)
+          return;
+      const target = ctx.state.enemies.find(enemy => (structure.level >= 6 || enemy.canFly) && Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
+      if (!target)
+          return;
+      runtime.burstShotsRemaining = Math.max(0, (runtime.burstShotsRemaining ?? 1) - 1);
+      runtime.cooldown = (runtime.burstShotsRemaining ?? 0) > 0 ? (stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN) : (stat.reloadSeconds ?? stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN);
+      if (damageEnemy(ctx, target, stat.damage ?? 0))
+          removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+  };
+  const updateGravityCannon = (ctx, structure, site, runtime, dt) => {
+      if (structure.type !== 'gravityCannon')
+          return;
+      const stat = getStructureLevelStat('gravityCannon', structure.level);
+      runtime.cooldown = Math.max(0, runtime.cooldown - dt);
+      if (structure.level >= 6 && runtime.gravityEnabled === undefined)
+          runtime.gravityEnabled = true;
+      if (structure.level >= 6 && runtime.gravityEnabled === false)
+          return;
+      if (runtime.cooldown > 0)
+          return;
+      const center = ctx.state.enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0) && enemy.weight <= (stat.maxAffectedWeight ?? 0))?.x;
+      if (center === undefined)
+          return;
+      for (const enemy of ctx.state.enemies) {
+          if (enemy.weight > (stat.maxAffectedWeight ?? 0) || Math.abs(enemy.x - center) > (stat.pullRadius ?? 0))
+              continue;
+          enemy.x += (center - enemy.x) * Math.min(1, (stat.pullStrength ?? 0) / Math.max(1, Math.abs(center - enemy.x)) * dt);
+          enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, 1);
+          enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, 0.65);
+      }
+      runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+  };
   const updateBaseSupport = (ctx, dt) => {
       const stat = getBaseStat(ctx);
       if ((stat.healPerSecond ?? 0) > 0)
@@ -39228,6 +39318,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           updateBiochemicalWall(ctx, structure, runtime);
           updateChurch(ctx, structure, runtime);
           updateBarracks(ctx, structure, runtime);
+          const site = ctx.getBuildSite(structure.siteId);
+          if (!site)
+              continue;
+          if (structure.type === 'spikeTrap')
+              updateSpikeTrap(ctx, site);
+          updateAntiAirCannon(ctx, structure, site, runtime, dt);
+          updateGravityCannon(ctx, structure, site, runtime, dt);
       }
       for (const type of ['watchtower', 'elementalTower']) {
           for (const siteId of ctx.structureSiteIdsOfType(type)) {
@@ -39348,7 +39445,10 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   ];
   const GROUND_BUILD_NODE_OPTIONS = [
       { label: 'Địa lôi', type: 'landmine' },
-      { label: 'Đầm lầy', type: 'swamp' }
+      { label: 'Địa thứ', type: 'spikeTrap' },
+      { label: 'Đầm lầy', type: 'swamp' },
+      { label: 'Pháo phòng không', type: 'antiAirCannon' },
+      { label: 'Pháo trọng lực', type: 'gravityCannon' },
   ];
   const STRUCTURE_SURFACES = {
       watchtower: ['rock'],
@@ -39358,11 +39458,14 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       church: ['rock'],
       crystalSeal: ['rock'],
       landmine: ['ground'],
-      swamp: ['ground']
+      spikeTrap: ['ground'],
+      swamp: ['ground'],
+      antiAirCannon: ['ground'],
+      gravityCannon: ['ground'],
   };
   const isStructureAllowedOnBuildSite = (type, site) => STRUCTURE_SURFACES[type].includes(site.kind);
   const ROCK_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church', 'crystalSeal'];
-  const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'swamp'];
+  const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'spikeTrap', 'swamp', 'antiAirCannon', 'gravityCannon'];
   const WALL_BUILD_SITE_ALLOWED = ['wall'];
   const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
   const METERS_TO_WORLD_UNITS = 460 / 150;
@@ -39415,9 +39518,28 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           1: { hp: 1 },
           2: { hp: 1 }
       },
+      spikeTrap: {
+          1: { hp: 1 }
+      },
       swamp: {
           1: { hp: 1 },
           2: { hp: 1 }
+      },
+      antiAirCannon: {
+          1: { hp: 8, range: metersToWorldUnits(130), damage: 2, cooldownSeconds: 0.18, reloadSeconds: 2.6, burstShotCount: 3, maxTargets: 1, projectileSpeed: 10 },
+          2: { hp: 12, range: metersToWorldUnits(140), damage: 3, cooldownSeconds: 0.16, reloadSeconds: 2.5, burstShotCount: 3, maxTargets: 1, projectileSpeed: 10 },
+          3: { hp: 16, range: metersToWorldUnits(150), damage: 4, cooldownSeconds: 0.14, reloadSeconds: 2.4, burstShotCount: 4, maxTargets: 1, projectileSpeed: 11 },
+          4: { hp: 22, range: metersToWorldUnits(160), damage: 5, cooldownSeconds: 0.12, reloadSeconds: 2.3, burstShotCount: 4, maxTargets: 1, projectileSpeed: 11 },
+          5: { hp: 30, range: metersToWorldUnits(170), damage: 7, cooldownSeconds: 0.1, reloadSeconds: 2.2, burstShotCount: 5, maxTargets: 1, projectileSpeed: 12 },
+          6: { hp: 40, range: metersToWorldUnits(180), damage: 9, cooldownSeconds: 0.09, reloadSeconds: 2, burstShotCount: 6, maxTargets: 1, projectileSpeed: 12, affectsGroundAtLv6: true }
+      },
+      gravityCannon: {
+          1: { hp: 10, range: metersToWorldUnits(115), pullRadius: metersToWorldUnits(55), pullStrength: 70, cooldownSeconds: 4.5, maxAffectedWeight: 1 },
+          2: { hp: 14, range: metersToWorldUnits(125), pullRadius: metersToWorldUnits(60), pullStrength: 85, cooldownSeconds: 4.2, maxAffectedWeight: 1.5 },
+          3: { hp: 20, range: metersToWorldUnits(135), pullRadius: metersToWorldUnits(65), pullStrength: 100, cooldownSeconds: 3.9, maxAffectedWeight: 2 },
+          4: { hp: 28, range: metersToWorldUnits(145), pullRadius: metersToWorldUnits(70), pullStrength: 115, cooldownSeconds: 3.6, maxAffectedWeight: 2.5 },
+          5: { hp: 36, range: metersToWorldUnits(155), pullRadius: metersToWorldUnits(75), pullStrength: 130, cooldownSeconds: 3.3, maxAffectedWeight: 3 },
+          6: { hp: 48, range: metersToWorldUnits(165), pullRadius: metersToWorldUnits(85), pullStrength: 155, cooldownSeconds: 3, maxAffectedWeight: Number.POSITIVE_INFINITY }
       }
   };
   const isOutsideCastleBuildPadding = (x) => (x <= CASTLE_OUTER_LEFT - BUILD_SITE_CASTLE_PADDING
@@ -39527,7 +39649,6 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
       if (type === 'elementalTower')
           return getElementalTowerLevelStat(level, element);
-      y;
       return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
   };
   //# sourceMappingURL=stdin.js.map

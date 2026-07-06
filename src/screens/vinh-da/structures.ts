@@ -10,7 +10,7 @@ import {
 } from './constants.ts';
 import type { BuildSite, BuildSiteKind } from './types.ts';
 
-export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal' | 'landmine' | 'swamp';
+export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal' | 'landmine' | 'swamp' | 'spikeTrap' | 'antiAirCannon' | 'gravityCannon';
 export type ElementalTowerElement = 'Hỏa' | 'Mộc' | 'Thủy' | 'Thổ' | 'Kim' | 'Lôi' | 'Huyết' | 'Ánh Sáng' | 'Phong';
 
 export interface BuildMenuOption {
@@ -60,7 +60,14 @@ export interface StructureLevelStat {
   biochemicalMaxTargets?: number;
   linkedHpBonusPercent?: number;
   linkedRegenShare?: number;
+  burstShotCount?: number;
+  reloadSeconds?: number;
+  pullRadius?: number;
+  pullStrength?: number;
+  maxAffectedWeight?: number;
+  affectsGroundAtLv6?: boolean;
 }
+
 
 export const UPGRADE_NODE_LABEL = 'Nâng cấp';
 export const BUILD_LEVEL_COST = {
@@ -100,7 +107,10 @@ export const BUILD_NODE_OPTIONS = [
 
 export const GROUND_BUILD_NODE_OPTIONS = [
   { label: 'Địa lôi', type: 'landmine' },
-  { label: 'Đầm lầy', type: 'swamp' }
+  { label: 'Địa thứ', type: 'spikeTrap' },
+  { label: 'Đầm lầy', type: 'swamp' },
+  { label: 'Pháo phòng không', type: 'antiAirCannon' },
+  { label: 'Pháo trọng lực', type: 'gravityCannon' },
 ] as const satisfies readonly BuildMenuOption[];
 
 export const STRUCTURE_SURFACES: Record<StructureType, readonly BuildSiteKind[]> = {
@@ -111,13 +121,16 @@ export const STRUCTURE_SURFACES: Record<StructureType, readonly BuildSiteKind[]>
   church: ['rock'],
   crystalSeal: ['rock'],
   landmine: ['ground'],
-  swamp: ['ground']
+  spikeTrap: ['ground'],
+  swamp: ['ground'],
+  antiAirCannon: ['ground'],
+  gravityCannon: ['ground'],
 } as const;
 
 export const isStructureAllowedOnBuildSite = (type: StructureType, site: Pick<BuildSite, 'kind'>): boolean => STRUCTURE_SURFACES[type].includes(site.kind);
 
 export const ROCK_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church', 'crystalSeal'] as const satisfies readonly StructureType[];
-export const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'swamp'] as const satisfies readonly StructureType[];
+export const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'spikeTrap', 'swamp', 'antiAirCannon', 'gravityCannon'] as const satisfies readonly StructureType[];
 export const WALL_BUILD_SITE_ALLOWED = ['wall'] as const satisfies readonly StructureType[];
 export const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
 
@@ -175,9 +188,28 @@ export const GROUND_STRUCTURE_STATS: Record<Exclude<StructureType, 'wall' | 'wat
     1: { hp: 1 },
     2: { hp: 1 }
   },
+  spikeTrap: {
+    1: { hp: 1 }
+  },
   swamp: {
     1: { hp: 1 },
     2: { hp: 1 }
+    },
+  antiAirCannon: {
+    1: { hp: 8, range: metersToWorldUnits(130), damage: 2, cooldownSeconds: 0.18, reloadSeconds: 2.6, burstShotCount: 3, maxTargets: 1, projectileSpeed: 10 },
+    2: { hp: 12, range: metersToWorldUnits(140), damage: 3, cooldownSeconds: 0.16, reloadSeconds: 2.5, burstShotCount: 3, maxTargets: 1, projectileSpeed: 10 },
+    3: { hp: 16, range: metersToWorldUnits(150), damage: 4, cooldownSeconds: 0.14, reloadSeconds: 2.4, burstShotCount: 4, maxTargets: 1, projectileSpeed: 11 },
+    4: { hp: 22, range: metersToWorldUnits(160), damage: 5, cooldownSeconds: 0.12, reloadSeconds: 2.3, burstShotCount: 4, maxTargets: 1, projectileSpeed: 11 },
+    5: { hp: 30, range: metersToWorldUnits(170), damage: 7, cooldownSeconds: 0.1, reloadSeconds: 2.2, burstShotCount: 5, maxTargets: 1, projectileSpeed: 12 },
+    6: { hp: 40, range: metersToWorldUnits(180), damage: 9, cooldownSeconds: 0.09, reloadSeconds: 2, burstShotCount: 6, maxTargets: 1, projectileSpeed: 12, affectsGroundAtLv6: true }
+  },
+  gravityCannon: {
+    1: { hp: 10, range: metersToWorldUnits(115), pullRadius: metersToWorldUnits(55), pullStrength: 70, cooldownSeconds: 4.5, maxAffectedWeight: 1 },
+    2: { hp: 14, range: metersToWorldUnits(125), pullRadius: metersToWorldUnits(60), pullStrength: 85, cooldownSeconds: 4.2, maxAffectedWeight: 1.5 },
+    3: { hp: 20, range: metersToWorldUnits(135), pullRadius: metersToWorldUnits(65), pullStrength: 100, cooldownSeconds: 3.9, maxAffectedWeight: 2 },
+    4: { hp: 28, range: metersToWorldUnits(145), pullRadius: metersToWorldUnits(70), pullStrength: 115, cooldownSeconds: 3.6, maxAffectedWeight: 2.5 },
+    5: { hp: 36, range: metersToWorldUnits(155), pullRadius: metersToWorldUnits(75), pullStrength: 130, cooldownSeconds: 3.3, maxAffectedWeight: 3 },
+    6: { hp: 48, range: metersToWorldUnits(165), pullRadius: metersToWorldUnits(85), pullStrength: 155, cooldownSeconds: 3, maxAffectedWeight: Number.POSITIVE_INFINITY }
   }
 };
 
@@ -296,6 +328,6 @@ export const getElementalTowerLevelStat = (level: number, element: ElementalTowe
 export const getStructureLevelStat = (type: StructureType, level: number, branchLv3?: WallBranchLv3, branchLv5?: WallBranchLv5, element?: ElementalTowerElement): StructureLevelStat => {
   if (type === 'wall') return getWallLevelStat(level, branchLv3, branchLv5);
   if (type === 'watchtower') return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
-  if (type === 'elementalTower') return getElementalTowerLevelStat(level, element);y
+  if (type === 'elementalTower') return getElementalTowerLevelStat(level, element);
   return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
 };

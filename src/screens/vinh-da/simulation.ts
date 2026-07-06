@@ -11,6 +11,13 @@ import {
   LANDMINE_FUSE_SECONDS,
   LANDMINE_TRIGGER_RADIUS,
   LANDMINE_TRUE_DAMAGE,
+  SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND,
+  SPIKE_TRAP_BLEED_SECONDS,
+  SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE,
+  SPIKE_TRAP_MIN_WEIGHT,
+  SPIKE_TRAP_RADIUS,
+  SPIKE_TRAP_SLOW_MULTIPLIER,
+  SPIKE_TRAP_SLOW_SECONDS,
   LEADER_ATTACK_RANGE,
   LEADER_BASIC_ATTACK_COOLDOWN_SECONDS,
   LEADER_BASIC_ATTACK_DAMAGE,
@@ -245,8 +252,8 @@ export const getEnemyEffectiveSpeed = (ctx: VinhDaSimulationContext, enemy: Enem
     for (const siteId of ctx.structureSiteIdsOfType('swamp')){
       const site = ctx.getBuildSite(siteId);
       if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS){
-        if (enemy.weight <= 1) return enemy.baseSpeed * 0.5 * statusMultiplier;
-        if (enemy.weight === 2) return enemy.baseSpeed * 0.75 * statusMultiplier;
+        if (enemy.weight >= 1 && enemy.weight < 2) return enemy.baseSpeed * 0.5 * statusMultiplier;
+        if (enemy.weight >= 2 && enemy.weight < 3) return enemy.baseSpeed * 0.75 * statusMultiplier;
         return enemy.baseSpeed * statusMultiplier;
       }
     }
@@ -368,6 +375,10 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
         enemy.burnSeconds = Math.max(0, (enemy.burnSeconds ?? 0) - dt);
         if (damageEnemy(ctx, enemy, (enemy.burnDps ?? 0) * dt)){ removeEnemyAt(ctx, i, true); continue; }
       }
+      if ((enemy.bleedSeconds ?? 0) > 0){
+        enemy.bleedSeconds = Math.max(0, (enemy.bleedSeconds ?? 0) - dt);
+        if (damageEnemy(ctx, enemy, enemy.maxHp * (enemy.bleedMaxHpDpsPercent ?? 0) * dt)){ removeEnemyAt(ctx, i, true); continue; }
+      }
       const template = getEnemyTemplate(enemy);
       switch (enemy.kind){
         case 'suicideBomber':
@@ -474,6 +485,47 @@ export const updateBiochemicalWall = (ctx: VinhDaSimulationContext, structure: P
     runtime.biochemicalCooldown = stat.biochemicalCooldownSeconds ?? 5;
   };
 
+
+const canTriggerSpikeTrap = (enemy: Enemy): boolean => enemy.weight >= SPIKE_TRAP_MIN_WEIGHT && enemy.weight < SPIKE_TRAP_MAX_WEIGHT_EXCLUSIVE;
+const updateSpikeTrap = (ctx: VinhDaSimulationContext, site: BuildSite): void => {
+  for (const enemy of ctx.state.enemies){
+    if (enemy.canFly || !canTriggerSpikeTrap(enemy) || Math.abs(enemy.x - site.x) > SPIKE_TRAP_RADIUS) continue;
+    enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, SPIKE_TRAP_SLOW_SECONDS);
+    enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, SPIKE_TRAP_SLOW_MULTIPLIER);
+    enemy.bleedSeconds = Math.max(enemy.bleedSeconds ?? 0, SPIKE_TRAP_BLEED_SECONDS);
+    enemy.bleedMaxHpDpsPercent = Math.max(enemy.bleedMaxHpDpsPercent ?? 0, SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND);
+  }
+};
+const updateAntiAirCannon = (ctx: VinhDaSimulationContext, structure: PlacedStructure, site: BuildSite, runtime: StructureRuntime, dt: number): void => {
+  if (structure.type !== 'antiAirCannon') return;
+  const stat = getStructureLevelStat('antiAirCannon', structure.level);
+  runtime.cooldown = Math.max(0, runtime.cooldown - dt);
+  if ((runtime.burstShotsRemaining ?? 0) <= 0 && runtime.cooldown <= 0) runtime.burstShotsRemaining = stat.burstShotCount ?? 1;
+  if (runtime.cooldown > 0 || (runtime.burstShotsRemaining ?? 0) <= 0) return;
+  const target = ctx.state.enemies.find(enemy => (structure.level >= 6 || enemy.canFly) && Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
+  if (!target) return;
+  runtime.burstShotsRemaining = Math.max(0, (runtime.burstShotsRemaining ?? 1) - 1);
+  runtime.cooldown = (runtime.burstShotsRemaining ?? 0) > 0 ? (stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN) : (stat.reloadSeconds ?? stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN);
+  if (damageEnemy(ctx, target, stat.damage ?? 0)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+};
+const updateGravityCannon = (ctx: VinhDaSimulationContext, structure: PlacedStructure, site: BuildSite, runtime: StructureRuntime, dt: number): void => {
+  if (structure.type !== 'gravityCannon') return;
+  const stat = getStructureLevelStat('gravityCannon', structure.level);
+  runtime.cooldown = Math.max(0, runtime.cooldown - dt);
+  if (structure.level >= 6 && runtime.gravityEnabled === undefined) runtime.gravityEnabled = true;
+  if (structure.level >= 6 && runtime.gravityEnabled === false) return;
+  if (runtime.cooldown > 0) return;
+  const center = ctx.state.enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0) && enemy.weight <= (stat.maxAffectedWeight ?? 0))?.x;
+  if (center === undefined) return;
+  for (const enemy of ctx.state.enemies){
+    if (enemy.weight > (stat.maxAffectedWeight ?? 0) || Math.abs(enemy.x - center) > (stat.pullRadius ?? 0)) continue;
+    enemy.x += (center - enemy.x) * Math.min(1, (stat.pullStrength ?? 0) / Math.max(1, Math.abs(center - enemy.x)) * dt);
+    enemy.slowSeconds = Math.max(enemy.slowSeconds ?? 0, 1);
+    enemy.slowMultiplier = Math.min(enemy.slowMultiplier ?? 1, 0.65);
+  }
+  runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+};
+
 const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
   const stat = getBaseStat(ctx);
   if ((stat.healPerSecond ?? 0) > 0) healBase(ctx, (stat.healPerSecond ?? 0) * dt);
@@ -531,6 +583,11 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
       updateBiochemicalWall(ctx, structure, runtime);
       updateChurch(ctx, structure, runtime);
       updateBarracks(ctx, structure, runtime);
+      const site = ctx.getBuildSite(structure.siteId);
+      if (!site) continue;
+      if (structure.type === 'spikeTrap') updateSpikeTrap(ctx, site);
+      updateAntiAirCannon(ctx, structure, site, runtime, dt);
+      updateGravityCannon(ctx, structure, site, runtime, dt);
     }
     for (const type of ['watchtower', 'elementalTower'] as const){
       for (const siteId of ctx.structureSiteIdsOfType(type)){
