@@ -152,6 +152,8 @@ export const ENEMY_TEMPLATES = {
     attackCooldown: 4,
     atk: 1,
     rank: 2,
+    statusOnHit: 'contamination',
+    contaminationOnHit: true,
     reward: 1
   }),
   suicideBomber: defineEnemyTemplate({
@@ -224,11 +226,14 @@ export const ENEMY_TEMPLATES = {
   apostle: defineEnemyTemplate({
     kind: 'apostle',
     label: 'Sứ Đồ',
-    hp: 6,
-    speed: 0.35 * METERS_TO_WORLD_UNITS,
-    weight: 2,
-    attackRange: 30,
-    attackCooldown: 2.2,
+    hp: 5,
+    speed: 0.55 * METERS_TO_WORLD_UNITS,
+    weight: 1,
+    attackRange: 150,
+    attackCooldown: 3,
+    projectileSpeed: 1.5 * METERS_TO_WORLD_UNITS,
+    attackShape: 'projectile',
+    hasCommanderAura: true,
     atk: 2,
     wil: 2,
     arm: 2,

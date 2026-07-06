@@ -38051,6 +38051,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           attackCooldown: 4,
           atk: 1,
           rank: 2,
+          statusOnHit: 'contamination',
+          contaminationOnHit: true,
           reward: 1
       }),
       suicideBomber: defineEnemyTemplate({
@@ -38123,11 +38125,14 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
       apostle: defineEnemyTemplate({
           kind: 'apostle',
           label: 'Sứ Đồ',
-          hp: 6,
-          speed: 0.35 * METERS_TO_WORLD_UNITS,
-          weight: 2,
-          attackRange: 30,
-          attackCooldown: 2.2,
+          hp: 5,
+          speed: 0.55 * METERS_TO_WORLD_UNITS,
+          weight: 1,
+          attackRange: 150,
+          attackCooldown: 3,
+          projectileSpeed: 1.5 * METERS_TO_WORLD_UNITS,
+          attackShape: 'projectile',
+          hasCommanderAura: true,
           atk: 2,
           wil: 2,
           arm: 2,
@@ -38954,8 +38959,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       return choices[choices.length - 1]?.kind ?? null;
   };
-  const spawnEnemy = (ctx, side, kind = 'twisted', spawnX) => {
-      if (ctx.state.dayNightPhase !== 'night' || ctx.state.enemies.length >= ENEMY_LIMIT)
+  const spawnEnemy = (ctx, side, kind = 'twisted', spawnX, allowOutsideNight = false) => {
+      if ((!allowOutsideNight && ctx.state.dayNightPhase !== 'night') || ctx.state.enemies.length >= ENEMY_LIMIT)
           return;
       const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
       const tier = ctx.state.mapTier ?? template.tier;
@@ -38992,7 +38997,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           regen: template.regen,
           dragonDestroyStructure: template.dragonDestroyStructure,
           ultimate: template.ultimate,
-          side
+          side,
+          apostleState: template.kind === 'apostle' ? 'ambush' : undefined
       });
       ctx.state.nextEnemyId += 1;
   };
@@ -39020,6 +39026,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const WIND_KNOCKBACK_COOLDOWN_SECONDS = 3;
   const WIND_KNOCKBACK_DISTANCE = 60;
   const CONTAMINATION_APOSTLE_STACKS = 5;
+  const APOSTLE_COMMAND_AURA_RADIUS = 15 * 100;
+  const APOSTLE_COMMAND_AURA_MULTIPLIER = 1.05;
   const ensureStatuses = (target) => (target.statuses ??= {});
   const addBleedStack = (target) => {
       const statuses = ensureStatuses(target);
@@ -39039,12 +39047,20 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               delete cooldowns[key];
       }
   };
+  const getBaseContaminationStacks = (ctx) => ctx.state.baseStatuses?.contaminationStacks ?? ctx.state.contamination ?? 0;
+  const setBaseContaminationStacks = (ctx, stacks) => {
+      const nextStacks = Math.max(0, Math.floor(stacks));
+      const statuses = ctx.state.baseStatuses ??= {};
+      statuses.contaminationStacks = nextStacks;
+      ctx.state.contamination = nextStacks;
+  };
+  const addBaseContaminationStack = (ctx) => {
+      setBaseContaminationStacks(ctx, getBaseContaminationStacks(ctx) + 1);
+  };
   const applyContaminationHit = (ctx, enemy) => {
       if (!enemy.contaminationOnHit)
           return;
-      ctx.state.contamination = (ctx.state.contamination ?? 0) + 1;
-      const statuses = ctx.state.baseStatuses ??= {};
-      statuses.contaminationStacks = (statuses.contaminationStacks ?? 0) + 1;
+      addBaseContaminationStack(ctx);
   };
   const applyBleedHit = (target, enemy) => {
       if (enemy.bleedOnHit)
@@ -39341,9 +39357,14 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const moveEnemyToward = (ctx, enemy, targetX, dt, speed = getEnemyEffectiveSpeed(ctx, enemy)) => {
       enemy.x += getEnemyMoveDirection(ctx, enemy, targetX) * speed * dt;
   };
+  const getEnemyDamageWithApostleAura = (ctx, enemy, template) => {
+      if (enemy.kind === 'apostle')
+          return template.damage;
+      return template.damage * (ctx.state.enemies.some(source => source.kind === 'apostle' && source.id !== enemy.id && Math.abs(source.x - enemy.x) <= APOSTLE_COMMAND_AURA_RADIUS) ? APOSTLE_COMMAND_AURA_MULTIPLIER : 1);
+  };
   const attackEnemyTarget = (ctx, enemy, template, targetX, dt) => {
       if (Math.abs(enemy.x - targetX) <= template.attackRange) {
-          tryEnemyAttack(enemy, template, () => { applyBaseBleedHit(ctx, enemy); damageBase(ctx, template.damage); });
+          tryEnemyAttack(enemy, template, () => { applyContaminationHit(ctx, enemy); applyBaseBleedHit(ctx, enemy); damageBase(ctx, getEnemyDamageWithApostleAura(ctx, enemy, template)); });
           return;
       }
       moveEnemyToward(ctx, enemy, targetX, dt);
@@ -39351,7 +39372,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const updateMeleeBasicEnemy = (ctx, enemy, template, dt) => {
       const wall = getBlockingWall(ctx, enemy);
       if (wall) {
-          tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy); });
+          tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy); });
           return;
       }
       attackEnemyTarget(ctx, enemy, template, getEnemyPrimaryTargetX(ctx, enemy), dt);
@@ -39362,7 +39383,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           tryEnemyAttack(enemy, template, () => {
               applyContaminationHit(ctx, enemy);
               applyBleedHit(wall.runtime, enemy);
-              damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy);
+              damageStructure(ctx, wall.site, wall.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy);
           });
           return;
       }
@@ -39370,7 +39391,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           tryEnemyAttack(enemy, template, () => {
               applyContaminationHit(ctx, enemy);
               applyBaseBleedHit(ctx, enemy);
-              damageBase(ctx, template.damage);
+              damageBase(ctx, getEnemyDamageWithApostleAura(ctx, enemy, template));
           });
           return;
       }
@@ -39395,7 +39416,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const updateDarkMageEnemy = (ctx, enemy, template, dt) => {
       const wall = getBlockingWall(ctx, enemy);
       if (wall) {
-          tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy); });
+          tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy); });
           return;
       }
       if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange) {
@@ -39451,6 +39472,37 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           damageDragonStructureCounter(ctx, structureAhead.site, structureAhead.runtime);
           enemy.dragonDestroyCooldown = 10;
       }
+  };
+  const updateApostleEnemy = (ctx, enemy, template, dt) => {
+      enemy.apostleState = 'ambush';
+      const wall = getBlockingWall(ctx, enemy);
+      if (wall) {
+          enemy.apostleState = 'assaultStructure';
+          tryEnemyAttack(enemy, template, () => {
+              applyBleedHit(wall.runtime, enemy);
+              damageStructure(ctx, wall.site, wall.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy);
+          });
+          return;
+      }
+      const structure = getStructureAhead(ctx, enemy, template.attackRange);
+      if (structure) {
+          enemy.apostleState = 'assaultStructure';
+          tryEnemyAttack(enemy, template, () => {
+              const statuses = ensureStatuses(structure.runtime);
+              statuses.contaminationStacks = (statuses.contaminationStacks ?? 0) + 1;
+              damageStructure(ctx, structure.site, structure.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy);
+          });
+          return;
+      }
+      enemy.apostleState = 'assaultBase';
+      if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) {
+          tryEnemyAttack(enemy, template, () => {
+              applyContaminationHit(ctx, enemy);
+              damageBase(ctx, getEnemyDamageWithApostleAura(ctx, enemy, template));
+          });
+          return;
+      }
+      moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
   };
   const updateResentfulDragonEnemy = (ctx, enemy, template, dt) => {
       const inBreathRange = Math.abs(enemy.x - CRYSTAL_X) <= template.aoeRadius || Boolean(getStructureAhead(ctx, enemy, template.aoeRadius));
@@ -39576,8 +39628,10 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               case 'crawler':
               case 'madDog':
               case 'ironMan':
-              case 'apostle':
                   updateMeleeBasicEnemy(ctx, enemy, template, dt);
+                  break;
+              case 'apostle':
+                  updateApostleEnemy(ctx, enemy, template, dt);
                   break;
           }
           if (!ctx.state.enemies.includes(enemy))
@@ -39596,15 +39650,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       ctx.renderEconomy();
   };
   const convertContaminationToApostles = (ctx) => {
-      const stacks = ctx.state.contamination ?? 0;
+      const stacks = getBaseContaminationStacks(ctx);
       const apostleCount = Math.floor(stacks / CONTAMINATION_APOSTLE_STACKS);
       if (apostleCount <= 0)
           return;
-      ctx.state.contamination = stacks % CONTAMINATION_APOSTLE_STACKS;
-      if (ctx.state.baseStatuses)
-          ctx.state.baseStatuses.contaminationStacks = ctx.state.contamination;
+      setBaseContaminationStacks(ctx, stacks % CONTAMINATION_APOSTLE_STACKS);
       for (let i = 0; i < apostleCount; i += 1) {
-          spawnEnemy(ctx, (ctx.state.nextEnemyId + i) % 2 === 0 ? 'left' : 'right', 'apostle');
+          spawnEnemy(ctx, (ctx.state.nextEnemyId + i) % 2 === 0 ? 'left' : 'right', 'apostle', undefined, true);
       }
   };
   const updateDayNightTimer = (ctx, dt) => {
@@ -39790,9 +39842,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           runtime.prayerTimer = stat.prayerIntervalSeconds ?? 20;
       }
       if ((runtime.contaminationCleanseTimer ?? 0) <= 0) {
-          ctx.state.contamination = Math.max(0, (ctx.state.contamination ?? 0) - structure.level);
-          if (ctx.state.baseStatuses)
-              ctx.state.baseStatuses.contaminationStacks = ctx.state.contamination;
+          setBaseContaminationStacks(ctx, getBaseContaminationStacks(ctx) - structure.level);
           runtime.contaminationCleanseTimer = stat.cleanseContaminationSeconds ?? 120;
       }
   };
@@ -39928,6 +39978,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateFlyingEnemy')) exports.updateFlyingEnemy = updateFlyingEnemy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateDarkMageEnemy')) exports.updateDarkMageEnemy = updateDarkMageEnemy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'damageDragonStructureCounter')) exports.damageDragonStructureCounter = damageDragonStructureCounter;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'updateApostleEnemy')) exports.updateApostleEnemy = updateApostleEnemy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateResentfulDragonEnemy')) exports.updateResentfulDragonEnemy = updateResentfulDragonEnemy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'explodeLandmine')) exports.explodeLandmine = explodeLandmine;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateEnemies')) exports.updateEnemies = updateEnemies;

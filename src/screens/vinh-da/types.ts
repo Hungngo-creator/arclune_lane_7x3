@@ -6,6 +6,7 @@ export type Side = 'left' | 'right';
 
 export type EnemyAttackShape = 'melee' | 'projectile' | 'explosion' | 'flyby' | 'line' | 'aura';
 export type EnemyStatusOnHit = 'contamination' | 'bleed' | 'slow' | 'paralysis';
+export type ApostleState = 'ambush' | 'assaultBase' | 'assaultStructure';
 
 export interface VinhDaTimedStack {
   remainingSeconds: number;
@@ -97,6 +98,7 @@ export interface Enemy {
   dragonDestroyStructure: boolean;
   ultimate: EnemyUltimate | null;
   side: Side;
+  apostleState?: ApostleState;
   mageOrbTimer?: number;
   mageOrbs?: number;
   birdAccelerating?: boolean;

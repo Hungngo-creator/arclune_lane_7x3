@@ -116,8 +116,8 @@ export interface VinhDaSimulationContext {
   removeEnemyElement(enemyId: number): void;
 }
 
-export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: EnemyKind = 'twisted', spawnX?: number): void => {
-    if (ctx.state.dayNightPhase !== 'night' || ctx.state.enemies.length >= ENEMY_LIMIT) return;
+export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: EnemyKind = 'twisted', spawnX?: number, allowOutsideNight = false): void => {
+    if ((!allowOutsideNight && ctx.state.dayNightPhase !== 'night') || ctx.state.enemies.length >= ENEMY_LIMIT) return;
     const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
   const tier = ctx.state.mapTier ?? template.tier;
     const hp = scaleEnemyTierStat(template.hp, tier);
@@ -153,7 +153,8 @@ export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: Enemy
       regen: template.regen,
       dragonDestroyStructure: template.dragonDestroyStructure,
       ultimate: template.ultimate,
-      side
+      side,
+      apostleState: template.kind === 'apostle' ? 'ambush' : undefined
     });
     ctx.state.nextEnemyId += 1;
   };
@@ -180,6 +181,8 @@ const WIND_SLOW_MULTIPLIER = 0.9;
 const WIND_KNOCKBACK_COOLDOWN_SECONDS = 3;
 const WIND_KNOCKBACK_DISTANCE = 60;
 const CONTAMINATION_APOSTLE_STACKS = 5;
+const APOSTLE_COMMAND_AURA_RADIUS = 15 * 100;
+const APOSTLE_COMMAND_AURA_MULTIPLIER = 1.05;
 
 const ensureStatuses = <T extends { statuses?: import('./types.ts').VinhDaStatusCollection }>(target: T): import('./types.ts').VinhDaStatusCollection => (target.statuses ??= {});
 const addBleedStack = (target: { statuses?: import('./types.ts').VinhDaStatusCollection }): void => {
@@ -196,11 +199,19 @@ const tickStatusCooldowns = (cooldowns: Record<string, number> | undefined, dt: 
     else delete cooldowns[key];
   }
 };
+const getBaseContaminationStacks = (ctx: VinhDaSimulationContext): number => ctx.state.baseStatuses?.contaminationStacks ?? ctx.state.contamination ?? 0;
+const setBaseContaminationStacks = (ctx: VinhDaSimulationContext, stacks: number): void => {
+  const nextStacks = Math.max(0, Math.floor(stacks));
+  const statuses = ctx.state.baseStatuses ??= {};
+  statuses.contaminationStacks = nextStacks;
+  ctx.state.contamination = nextStacks;
+};
+const addBaseContaminationStack = (ctx: VinhDaSimulationContext): void => {
+  setBaseContaminationStacks(ctx, getBaseContaminationStacks(ctx) + 1);
+};
 const applyContaminationHit = (ctx: VinhDaSimulationContext, enemy: Enemy): void => {
     if (!enemy.contaminationOnHit) return;
-    ctx.state.contamination = (ctx.state.contamination ?? 0) + 1;
-  const statuses = ctx.state.baseStatuses ??= {};
-    statuses.contaminationStacks = (statuses.contaminationStacks ?? 0) + 1;
+    addBaseContaminationStack(ctx);
   };
 const applyBleedHit = (target: { statuses?: import('./types.ts').VinhDaStatusCollection }, enemy: Enemy): void => {
   if (enemy.bleedOnHit) addBleedStack(target);
@@ -466,9 +477,14 @@ export const getEnemyEffectiveSpeed = (ctx: VinhDaSimulationContext, enemy: Enem
 const moveEnemyToward = (ctx: VinhDaSimulationContext, enemy: Enemy, targetX: number, dt: number, speed = getEnemyEffectiveSpeed(ctx, enemy)): void => {
     enemy.x += getEnemyMoveDirection(ctx, enemy, targetX) * speed * dt;
   };
+const getEnemyDamageWithApostleAura = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate): number => {
+  if (enemy.kind === 'apostle') return template.damage;
+  return template.damage * (ctx.state.enemies.some(source => source.kind === 'apostle' && source.id !== enemy.id && Math.abs(source.x - enemy.x) <= APOSTLE_COMMAND_AURA_RADIUS) ? APOSTLE_COMMAND_AURA_MULTIPLIER : 1);
+};
+
 export const attackEnemyTarget = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, targetX: number, dt: number): void => {
     if (Math.abs(enemy.x - targetX) <= template.attackRange){
-      tryEnemyAttack(enemy, template, () => { applyBaseBleedHit(ctx, enemy); damageBase(ctx, template.damage); });
+      tryEnemyAttack(enemy, template, () => { applyContaminationHit(ctx, enemy); applyBaseBleedHit(ctx, enemy); damageBase(ctx, getEnemyDamageWithApostleAura(ctx, enemy, template)); });
       return;
     }
     moveEnemyToward(ctx, enemy, targetX, dt);
@@ -476,7 +492,7 @@ export const attackEnemyTarget = (ctx: VinhDaSimulationContext, enemy: Enemy, te
 export const updateMeleeBasicEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, dt: number): void => {
     const wall = getBlockingWall(ctx, enemy);
     if (wall){
-      tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy); });
+      tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy); });
       return;
     }
     attackEnemyTarget(ctx, enemy, template, getEnemyPrimaryTargetX(ctx, enemy), dt);
@@ -487,7 +503,7 @@ export const updateSuicideBomberEnemy = (ctx: VinhDaSimulationContext, enemy: En
       tryEnemyAttack(enemy, template, () => {
         applyContaminationHit(ctx, enemy);
         applyBleedHit(wall.runtime, enemy);
-        damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy);
+        damageStructure(ctx, wall.site, wall.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy);
       });
       return;
     }
@@ -495,7 +511,7 @@ export const updateSuicideBomberEnemy = (ctx: VinhDaSimulationContext, enemy: En
       tryEnemyAttack(enemy, template, () => {
         applyContaminationHit(ctx, enemy);
         applyBaseBleedHit(ctx, enemy);
-        damageBase(ctx, template.damage);
+        damageBase(ctx, getEnemyDamageWithApostleAura(ctx, enemy, template));
       });
       return;
     }
@@ -520,7 +536,7 @@ export const updateFlyingEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, te
 export const updateDarkMageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, dt: number): void => {
     const wall = getBlockingWall(ctx, enemy);
     if (wall){
-      tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy); });
+      tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy); });
       return;
     }
     if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange){
@@ -571,6 +587,39 @@ const applyDragonBreath = (ctx: VinhDaSimulationContext, enemy: Enemy, damage: n
       enemy.dragonDestroyCooldown = 10;
     }
   };
+
+export const updateApostleEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, dt: number): void => {
+    enemy.apostleState = 'ambush';
+    const wall = getBlockingWall(ctx, enemy);
+    if (wall){
+      enemy.apostleState = 'assaultStructure';
+      tryEnemyAttack(enemy, template, () => {
+        applyBleedHit(wall.runtime, enemy);
+        damageStructure(ctx, wall.site, wall.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy);
+      });
+      return;
+    }
+    const structure = getStructureAhead(ctx, enemy, template.attackRange);
+    if (structure){
+      enemy.apostleState = 'assaultStructure';
+      tryEnemyAttack(enemy, template, () => {
+        const statuses = ensureStatuses(structure.runtime);
+        statuses.contaminationStacks = (statuses.contaminationStacks ?? 0) + 1;
+        damageStructure(ctx, structure.site, structure.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy);
+      });
+      return;
+    }
+    enemy.apostleState = 'assaultBase';
+    if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange){
+      tryEnemyAttack(enemy, template, () => {
+        applyContaminationHit(ctx, enemy);
+        damageBase(ctx, getEnemyDamageWithApostleAura(ctx, enemy, template));
+      });
+      return;
+    }
+    moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
+  };
+
 export const updateResentfulDragonEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, dt: number): void => {
     const inBreathRange = Math.abs(enemy.x - CRYSTAL_X) <= template.aoeRadius || Boolean(getStructureAhead(ctx, enemy, template.aoeRadius));
     enemy.dragonUltimateCooldown = Math.max(0, (enemy.dragonUltimateCooldown ?? 20) - dt);
@@ -682,8 +731,10 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
         case 'crawler':
         case 'madDog':
         case 'ironMan':
-        case 'apostle':
           updateMeleeBasicEnemy(ctx, enemy, template, dt);
+          break;
+          case 'apostle':
+          updateApostleEnemy(ctx, enemy, template, dt);
           break;
       }
       if (!ctx.state.enemies.includes(enemy)) continue;
@@ -701,13 +752,12 @@ const applyBaseBuffDailyUpkeep = (ctx: VinhDaSimulationContext): void => {
 };
 
 const convertContaminationToApostles = (ctx: VinhDaSimulationContext): void => {
-  const stacks = ctx.state.contamination ?? 0;
+  const stacks = getBaseContaminationStacks(ctx);
   const apostleCount = Math.floor(stacks / CONTAMINATION_APOSTLE_STACKS);
   if (apostleCount <= 0) return;
-  ctx.state.contamination = stacks % CONTAMINATION_APOSTLE_STACKS;
-  if (ctx.state.baseStatuses) ctx.state.baseStatuses.contaminationStacks = ctx.state.contamination;
+  setBaseContaminationStacks(ctx, stacks % CONTAMINATION_APOSTLE_STACKS);
   for (let i = 0; i < apostleCount; i += 1){
-    spawnEnemy(ctx, (ctx.state.nextEnemyId + i) % 2 === 0 ? 'left' : 'right', 'apostle');
+    spawnEnemy(ctx, (ctx.state.nextEnemyId + i) % 2 === 0 ? 'left' : 'right', 'apostle', undefined, true);
   }
 };
 
@@ -864,8 +914,7 @@ const updateChurch = (ctx: VinhDaSimulationContext, structure: PlacedStructure, 
     runtime.prayerTimer = stat.prayerIntervalSeconds ?? 20;
   }
   if ((runtime.contaminationCleanseTimer ?? 0) <= 0){
-    ctx.state.contamination = Math.max(0, (ctx.state.contamination ?? 0) - structure.level);
-    if (ctx.state.baseStatuses) ctx.state.baseStatuses.contaminationStacks = ctx.state.contamination;
+    setBaseContaminationStacks(ctx, getBaseContaminationStacks(ctx) - structure.level);
     runtime.contaminationCleanseTimer = stat.cleanseContaminationSeconds ?? 120;
   }
 };
