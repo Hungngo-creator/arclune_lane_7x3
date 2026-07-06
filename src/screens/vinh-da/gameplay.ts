@@ -76,7 +76,7 @@ const CSS = /* css */ `
   .vinh-da-game__plot{position:absolute;bottom:${GROUND_PERCENT};width:86px;height:40px;margin-left:-43px;border:1px solid rgba(91,255,178,.58);border-radius:999px;background:rgba(91,255,178,.035);box-shadow:none;cursor:pointer;z-index:1;}
   .vinh-da-game__plot::after{content:"";position:absolute;left:16px;right:16px;top:50%;height:1px;background:rgba(91,255,178,.72);transform:translateY(-50%);}
   .vinh-da-game__rock.has-structure,.vinh-da-game__plot.has-structure{border-radius:10px 10px 4px 4px;border:1px solid rgba(226,222,255,.28);box-shadow:0 0 24px rgba(133,105,255,.45);}
-  .vinh-da-game__plot.has-structure{width:96px;height:58px;margin-left:-48px;background:rgba(8,8,16,.22);}
+  .vinh-da-game__plot.has-structure{width:96px;height:58px;margin-left:-48px;border-color:rgba(91,255,178,.72);outline:1px solid rgba(91,255,178,.32);background:rgba(8,8,16,.22);box-shadow:none;}
   .vinh-da-game__structure--watchtower{background:linear-gradient(180deg,#3a2b67,#12111f);}
   .vinh-da-game__structure--elementalTower{background:linear-gradient(180deg,#1f5b73,#101621);}
   .vinh-da-game__structure--barracks{background:linear-gradient(180deg,#463624,#14100d);}
@@ -161,6 +161,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const buildMenuElements = new Map<string, HTMLDivElement>();
   const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS] as const;
   const structureClassNames = buildNodeOptions.map(option => `vinh-da-game__structure--${option.type}`);
+  const buildSitesByX = [...BUILD_SITES].sort((a, b) => a.x - b.x);
+  const buildSitesById = new Map(buildSitesByX.map(site => [site.id, site]));
   let lastRenderedCameraX = Number.POSITIVE_INFINITY;
 
   const getStructureMaxHp = (structure: PlacedStructure): number => getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp;
@@ -211,7 +213,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     return true;
   };
   const clampLeaderX = (x: number): number => Math.max(LEADER_EDGE_PADDING_LEFT, Math.min(WORLD_WIDTH - LEADER_EDGE_PADDING_RIGHT, x));
-  const getBuildSite = (siteId: string | null | undefined): BuildSite | null => BUILD_SITES.find(site => site.id === siteId) ?? null;
+  const getBuildSite = (siteId: string | null | undefined): BuildSite | null => siteId ? buildSitesById.get(siteId) ?? null : null;
   const nearestBuildSite = (): BuildSite | null => BUILD_SITES.find(site => Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
   const isGroundClick = (event: PointerEvent): boolean => {
     const bounds = viewport?.getBoundingClientRect();
@@ -237,7 +239,6 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     menu.dataset.buildMenu = site.id;
     menu.style.left = `${site.x}px`;
     const nodeOptions = buildNodeOptions.filter(option => isStructureAllowedOnBuildSite(option.type, site));
-      : BUILD_NODE_OPTIONS;
     nodeOptions.forEach((option) => {
       const node = document.createElement('button');
       node.className = 'vinh-da-game__build-node';
@@ -295,7 +296,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const canBuildOnSurface = type ? isStructureAllowedOnBuildSite(type, site) : false;
       const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && Boolean(type) && type !== 'wall' && canBuildOnSurface;
       node.hidden = structure
-        ? isUpgradeNode || Boolean(action) || !type || !canBuildOnSurface;
+        ? (
+            isUpgradeNode
+              ? structure.level >= 6 || structure.level === 2 || structure.level === 4
+              : action
+                ? !(isLv3Branch || isLv5Branch)
+                : !canMount
+          )
         : isUpgradeNode || Boolean(action) || !type || !site.allowed.includes(type);
       if (node instanceof HTMLButtonElement) node.disabled = !node.hidden && !canAfford(cost);
     }
@@ -317,22 +324,26 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     const width = viewport?.clientWidth || window.innerWidth || 1;
     const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
     const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
-    for (const site of BUILD_SITES){
-      const structure = structures.get(site.id);
-      const shouldRenderGroundSite = site.kind !== 'ground' || groundPlotsVisible || site.id === openSiteId || site.id === selectedGroundPlotId || Boolean(structure);
-      if (site.x >= minX && site.x <= maxX && shouldRenderGroundSite){
-        createBuildSiteElement(site);
-        renderBuildSite(site.id);
-      } else if (site.id !== openSiteId){
-        const siteElement = siteElements.get(site.id);
+
+    for (const [siteId, siteElement] of siteElements){
+      const site = getBuildSite(siteId);
+      const structure = structures.get(siteId);
+      const shouldKeepGroundSite = site?.kind !== 'ground' || groundPlotsVisible || Boolean(structure);
+      if (site && site.id !== openSiteId && (site.x < minX || site.x > maxX || !shouldKeepGroundSite)){
         const menuElement = buildMenuElements.get(site.id);
-        if (siteElement && menuElement){
-          siteElement.remove();
-          menuElement.remove();
-          siteElements.delete(site.id);
-          buildMenuElements.delete(site.id);
-        }
+        siteElement.remove();
+        menuElement?.remove();
+        siteElements.delete(site.id);
+        buildMenuElements.delete(site.id);
       }
+    }
+
+    for (const site of buildSitesByX){
+      if (site.x < minX) continue;
+      if (site.x > maxX) break;
+      const structure = structures.get(site.id);
+      const shouldRenderGroundSite = site.kind !== 'ground' || groundPlotsVisible || Boolean(structure);
+      if (shouldRenderGroundSite) createBuildSiteElement(site);
     }
     lastRenderedCameraX = cameraX;
   };

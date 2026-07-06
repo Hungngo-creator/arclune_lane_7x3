@@ -38073,7 +38073,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
     .vinh-da-game__plot{position:absolute;bottom:${GROUND_PERCENT};width:86px;height:40px;margin-left:-43px;border:1px solid rgba(91,255,178,.58);border-radius:999px;background:rgba(91,255,178,.035);box-shadow:none;cursor:pointer;z-index:1;}
     .vinh-da-game__plot::after{content:"";position:absolute;left:16px;right:16px;top:50%;height:1px;background:rgba(91,255,178,.72);transform:translateY(-50%);}
     .vinh-da-game__rock.has-structure,.vinh-da-game__plot.has-structure{border-radius:10px 10px 4px 4px;border:1px solid rgba(226,222,255,.28);box-shadow:0 0 24px rgba(133,105,255,.45);}
-    .vinh-da-game__plot.has-structure{width:96px;height:58px;margin-left:-48px;background:rgba(8,8,16,.22);}
+    .vinh-da-game__plot.has-structure{width:96px;height:58px;margin-left:-48px;border-color:rgba(91,255,178,.72);outline:1px solid rgba(91,255,178,.32);background:rgba(8,8,16,.22);box-shadow:none;}
     .vinh-da-game__structure--watchtower{background:linear-gradient(180deg,#3a2b67,#12111f);}
     .vinh-da-game__structure--elementalTower{background:linear-gradient(180deg,#1f5b73,#101621);}
     .vinh-da-game__structure--barracks{background:linear-gradient(180deg,#463624,#14100d);}
@@ -38154,6 +38154,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const buildMenuElements = new Map();
       const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS];
       const structureClassNames = buildNodeOptions.map(option => `vinh-da-game__structure--${option.type}`);
+      const buildSitesByX = [...BUILD_SITES].sort((a, b) => a.x - b.x);
+      const buildSitesById = new Map(buildSitesByX.map(site => [site.id, site]));
       let lastRenderedCameraX = Number.POSITIVE_INFINITY;
       const getStructureMaxHp = (structure) => getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp;
       const ensureStructureRuntime = (structure) => {
@@ -38208,7 +38210,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           return true;
       };
       const clampLeaderX = (x) => Math.max(LEADER_EDGE_PADDING_LEFT, Math.min(WORLD_WIDTH - LEADER_EDGE_PADDING_RIGHT, x));
-      const getBuildSite = (siteId) => BUILD_SITES.find(site => site.id === siteId) ?? null;
+      const getBuildSite = (siteId) => siteId ? buildSitesById.get(siteId) ?? null : null;
       const nearestBuildSite = () => BUILD_SITES.find(site => Math.abs(leaderX - site.x) <= BUILD_RANGE) ?? null;
       const isGroundClick = (event) => {
           const bounds = viewport?.getBoundingClientRect();
@@ -38236,639 +38238,644 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           menu.dataset.buildMenu = site.id;
           menu.style.left = `${site.x}px`;
           const nodeOptions = buildNodeOptions.filter(option => isStructureAllowedOnBuildSite(option.type, site));
+          nodeOptions.forEach((option) => {
+              const node = document.createElement('button');
+              node.className = 'vinh-da-game__build-node';
+              node.dataset.structureType = option.type;
+              node.type = 'button';
+              node.setAttribute('aria-label', option.label);
+              node.innerHTML = `+<small>${option.label}</small>`;
+              menu.append(node);
+          });
+          const upgradeNode = document.createElement('button');
+          upgradeNode.className = 'vinh-da-game__build-node';
+          upgradeNode.dataset.action = 'upgrade';
+          upgradeNode.type = 'button';
+          upgradeNode.setAttribute('aria-label', UPGRADE_NODE_LABEL);
+          upgradeNode.hidden = true;
+          upgradeNode.innerHTML = `↑<small>${UPGRADE_NODE_LABEL}</small>`;
+          menu.append(upgradeNode);
+          const addActionNode = (action, label) => {
+              const node = document.createElement('button');
+              node.className = 'vinh-da-game__build-node';
+              node.dataset.action = action;
+              node.type = 'button';
+              node.setAttribute('aria-label', label);
+              node.hidden = true;
+              node.innerHTML = `◆<small>${label}</small>`;
+              menu.append(node);
+          };
+          addActionNode('branch-lv3-spike', 'Gai nhọn');
+          addActionNode('branch-lv3-slippery', 'Trơn tuột');
+          addActionNode('branch-lv3-shock', 'Phản chấn');
+          addActionNode('branch-lv5-biochemical', 'Sinh hoá');
+          addActionNode('branch-lv5-curse', 'Nguyền rủa');
+          addActionNode('branch-lv5-link', 'Liên kết');
+          buildSitesContainer.append(button, menu);
+          siteElements.set(site.id, button);
+          buildMenuElements.set(site.id, menu);
+          renderBuildSite(site.id);
       };
-      BUILD_NODE_OPTIONS;
-      nodeOptions.forEach((option) => {
-          const node = document.createElement('button');
-          node.className = 'vinh-da-game__build-node';
-          node.dataset.structureType = option.type;
-          node.type = 'button';
-          node.setAttribute('aria-label', option.label);
-          node.innerHTML = `+<small>${option.label}</small>`;
-          menu.append(node);
-      });
-      const upgradeNode = document.createElement('button');
-      upgradeNode.className = 'vinh-da-game__build-node';
-      upgradeNode.dataset.action = 'upgrade';
-      upgradeNode.type = 'button';
-      upgradeNode.setAttribute('aria-label', UPGRADE_NODE_LABEL);
-      upgradeNode.hidden = true;
-      upgradeNode.innerHTML = `↑<small>${UPGRADE_NODE_LABEL}</small>`;
-      menu.append(upgradeNode);
-      const addActionNode = (action, label) => {
-          const node = document.createElement('button');
-          node.className = 'vinh-da-game__build-node';
-          node.dataset.action = action;
-          node.type = 'button';
-          node.setAttribute('aria-label', label);
-          node.hidden = true;
-          node.innerHTML = `◆<small>${label}</small>`;
-          menu.append(node);
-      };
-      addActionNode('branch-lv3-spike', 'Gai nhọn');
-      addActionNode('branch-lv3-slippery', 'Trơn tuột');
-      addActionNode('branch-lv3-shock', 'Phản chấn');
-      addActionNode('branch-lv5-biochemical', 'Sinh hoá');
-      addActionNode('branch-lv5-curse', 'Nguyền rủa');
-      addActionNode('branch-lv5-link', 'Liên kết');
-      buildSitesContainer.append(button, menu);
-      siteElements.set(site.id, button);
-      buildMenuElements.set(site.id, menu);
-      renderBuildSite(site.id);
-  }
-  ;
-  const renderBuildMenu = (siteId) => {
-      const menu = buildMenuElements.get(siteId);
-      const site = getBuildSite(siteId);
-      if (!menu || !site)
-          return;
-      const structure = structures.get(siteId);
-      menu.classList.toggle('is-upgrade-menu', Boolean(structure));
-      for (const node of menu.querySelectorAll('.vinh-da-game__build-node')) {
-          const type = node.dataset.structureType;
-          const action = node.dataset.action;
-          const isUpgradeNode = action === 'upgrade';
-          const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
-          const cost = structure ? BUILD_LEVEL_COST[nextLevel] : BUILD_LEVEL_COST[1];
-          const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
-          const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
-          const canBuildOnSurface = type ? isStructureAllowedOnBuildSite(type, site) : false;
-          const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && Boolean(type) && type !== 'wall' && canBuildOnSurface;
-          node.hidden = structure
-              ? isUpgradeNode || Boolean(action) || !type || !canBuildOnSurface : ;
-      }
-  };
-  isUpgradeNode || Boolean(action) || !type || !site.allowed.includes(type);
-  if (node instanceof HTMLButtonElement)
-      node.disabled = !node.hidden && !canAfford(cost);
-  ;
-  const renderBuildSite = (siteId) => {
-      const siteButton = siteElements.get(siteId);
-      if (!siteButton)
-          return;
-      const site = getBuildSite(siteId);
-      const structure = structures.get(siteId);
-      const runtime = structure ? ensureStructureRuntime(structure) : null;
-      siteButton.classList.remove(...structureClassNames);
-      siteButton.classList.toggle('has-structure', Boolean(structure) && runtime !== null && runtime.hp > 0);
-      if (structure && runtime !== null && runtime.hp > 0)
-          siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
-      siteButton.dataset.structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
-      siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
-      renderBuildMenu(siteId);
-  };
-  const renderVisibleBuildSites = () => {
-      const width = viewport?.clientWidth || window.innerWidth || 1;
-      const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
-      const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
-      for (const site of BUILD_SITES) {
-          const structure = structures.get(site.id);
-          const shouldRenderGroundSite = site.kind !== 'ground' || groundPlotsVisible || site.id === openSiteId || site.id === selectedGroundPlotId || Boolean(structure);
-          if (site.x >= minX && site.x <= maxX && shouldRenderGroundSite) {
-              createBuildSiteElement(site);
-              renderBuildSite(site.id);
+      const renderBuildMenu = (siteId) => {
+          const menu = buildMenuElements.get(siteId);
+          const site = getBuildSite(siteId);
+          if (!menu || !site)
+              return;
+          const structure = structures.get(siteId);
+          menu.classList.toggle('is-upgrade-menu', Boolean(structure));
+          for (const node of menu.querySelectorAll('.vinh-da-game__build-node')) {
+              const type = node.dataset.structureType;
+              const action = node.dataset.action;
+              const isUpgradeNode = action === 'upgrade';
+              const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
+              const cost = structure ? BUILD_LEVEL_COST[nextLevel] : BUILD_LEVEL_COST[1];
+              const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
+              const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
+              const canBuildOnSurface = type ? isStructureAllowedOnBuildSite(type, site) : false;
+              const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && Boolean(type) && type !== 'wall' && canBuildOnSurface;
+              node.hidden = structure
+                  ? (isUpgradeNode
+                      ? structure.level >= 6 || structure.level === 2 || structure.level === 4
+                      : action
+                          ? !(isLv3Branch || isLv5Branch)
+                          : !canMount)
+                  : isUpgradeNode || Boolean(action) || !type || !site.allowed.includes(type);
+              if (node instanceof HTMLButtonElement)
+                  node.disabled = !node.hidden && !canAfford(cost);
           }
-          else if (site.id !== openSiteId) {
-              const siteElement = siteElements.get(site.id);
-              const menuElement = buildMenuElements.get(site.id);
-              if (siteElement && menuElement) {
+      };
+      const renderBuildSite = (siteId) => {
+          const siteButton = siteElements.get(siteId);
+          if (!siteButton)
+              return;
+          const site = getBuildSite(siteId);
+          const structure = structures.get(siteId);
+          const runtime = structure ? ensureStructureRuntime(structure) : null;
+          siteButton.classList.remove(...structureClassNames);
+          siteButton.classList.toggle('has-structure', Boolean(structure) && runtime !== null && runtime.hp > 0);
+          if (structure && runtime !== null && runtime.hp > 0)
+              siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
+          siteButton.dataset.structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
+          siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
+          renderBuildMenu(siteId);
+      };
+      const renderVisibleBuildSites = () => {
+          const width = viewport?.clientWidth || window.innerWidth || 1;
+          const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
+          const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
+          for (const [siteId, siteElement] of siteElements) {
+              const site = getBuildSite(siteId);
+              const structure = structures.get(siteId);
+              const shouldKeepGroundSite = site?.kind !== 'ground' || groundPlotsVisible || Boolean(structure);
+              if (site && site.id !== openSiteId && (site.x < minX || site.x > maxX || !shouldKeepGroundSite)) {
+                  const menuElement = buildMenuElements.get(site.id);
                   siteElement.remove();
-                  menuElement.remove();
+                  menuElement?.remove();
                   siteElements.delete(site.id);
                   buildMenuElements.delete(site.id);
               }
           }
-      }
-      lastRenderedCameraX = cameraX;
-  };
-  const setOpenBuildSite = (siteId) => {
-      openSiteId = siteId;
-      selectedGroundPlotId = getBuildSite(siteId)?.kind === 'ground' ? siteId : null;
-      if (siteId)
-          renderBuildMenu(siteId);
-      for (const menu of buildMenuElements.values())
-          menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);
-  };
-  const setGroundPlotsVisible = (visible) => {
-      if (groundPlotsVisible === visible)
-          return;
-      groundPlotsVisible = visible;
-      if (!visible)
-          selectedGroundPlotId = null;
-      renderVisibleBuildSites();
-  };
-  const spawnEnemy = (side, kind = 'twisted') => {
-      if (enemies.length >= ENEMY_LIMIT)
-          return;
-      const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
-      enemies.push({
-          id: nextEnemyId,
-          x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
-          kind: template.kind,
-          hp: template.hp,
-          maxHp: template.hp,
-          speed: template.speed,
-          baseSpeed: template.speed,
-          weight: template.weight,
-          attackCooldown: template.attackCooldown,
-          canFly: template.canFly,
-          side
-      });
-      nextEnemyId += 1;
-  };
-  const removeEnemyAt = (index, reward) => {
-      const [enemy] = enemies.splice(index, 1);
-      if (!enemy)
-          return;
-      enemyElements.get(enemy.id)?.remove();
-      enemyElements.delete(enemy.id);
-      if (reward) {
-          bloodSealStone += ENEMY_TEMPLATES[enemy.kind].reward;
-          renderEconomy();
-      }
-  };
-  const clearEnemiesWithoutReward = () => {
-      while (enemies.length > 0)
-          removeEnemyAt(enemies.length - 1, false);
-      enemySpawnTimer = 0;
-  };
-  const getBlockingWall = (enemy) => {
-      for (const siteId of structureSiteIdsOfType('wall')) {
-          const structure = structures.get(siteId);
-          if (!structure)
-              continue;
-          const site = getBuildSite(siteId);
-          if (!site || (enemy.side === 'left' ? site.x >= CRYSTAL_X : site.x <= CRYSTAL_X))
-              continue;
-          const runtime = ensureStructureRuntime(structure);
-          if (runtime.hp > 0 && Math.abs(enemy.x - site.x) <= ENEMY_ATTACK_RANGE)
-              return { site, runtime };
-      }
-      return null;
-  };
-  const damageEnemy = (enemy, amount) => {
-      enemy.hp -= amount;
-      return enemy.hp <= 0;
-  };
-  const reduceStructureDamage = (structure, runtime, attacker, amount) => {
-      if (structure.type !== 'wall' || structure.branchLv3 !== 'slippery' || !attacker)
-          return amount;
-      const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
-      const cooldowns = runtime.attackerCooldowns ??= new Map();
-      const key = `slippery:${attacker.id}`;
-      if ((cooldowns.get(key) ?? 0) > 0 || Math.random() >= (stat.slipperyChance ?? 0))
-          return amount;
-      cooldowns.set(key, stat.slipperyCooldownSeconds ?? 3);
-      return amount * (stat.slipperyDamageMultiplier ?? 1);
-  };
-  const triggerWallHitEffects = (structure, site, runtime, attacker) => {
-      if (structure.type !== 'wall')
-          return;
-      const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
-      const cooldowns = runtime.attackerCooldowns ??= new Map();
-      if (structure.branchLv3 === 'spike' && stat.spikeTrueDamage && damageEnemy(attacker, stat.spikeTrueDamage))
-          return;
-      if (structure.branchLv3 === 'shock') {
-          const key = `shock:${attacker.id}`;
-          if ((cooldowns.get(key) ?? 0) <= 0) {
-              attacker.x += (attacker.side === 'left' ? -1 : 1) * (stat.shockKnockback ?? 0);
-              cooldowns.set(key, stat.shockCooldownSeconds ?? 3);
+          for (const site of buildSitesByX) {
+              if (site.x < minX)
+                  continue;
+              if (site.x > maxX)
+                  break;
+              const structure = structures.get(site.id);
+              const shouldRenderGroundSite = site.kind !== 'ground' || groundPlotsVisible || Boolean(structure);
+              if (shouldRenderGroundSite)
+                  createBuildSiteElement(site);
           }
-      }
-      if (structure.branchLv5 === 'curse') {
-          const key = `curse:${attacker.id}`;
-          if ((cooldowns.get(key) ?? 0) <= 0) {
-              const loss = attacker.maxHp * (stat.curseMaxHpPercent ?? 0);
-              attacker.maxHp = Math.max(1, attacker.maxHp - loss);
-              attacker.hp = Math.min(attacker.hp, attacker.maxHp);
-              cooldowns.set(key, stat.curseCooldownSeconds ?? 3);
-          }
-      }
-  };
-  const damageStructure = (site, runtime, amount, attacker = null) => {
-      const structure = structures.get(site.id);
-      const finalAmount = structure ? reduceStructureDamage(structure, runtime, attacker, amount) : amount;
-      runtime.hp -= finalAmount;
-      if (structure && attacker && runtime.hp > 0)
-          triggerWallHitEffects(structure, site, runtime, attacker);
-      if (runtime.hp > 0)
-          return false;
-      deleteStructure(site.id);
-      renderBuildSite(site.id);
-      return true;
-  };
-  const damageBase = (amount) => {
-      baseHp = Math.max(0, baseHp - amount);
-      return baseHp <= 0;
-  };
-  const getEnemyTemplate = (enemy) => ENEMY_TEMPLATES[enemy.kind] ?? DEFAULT_ENEMY_TEMPLATE;
-  const getEnemyPrimaryTargetX = (enemy) => enemy.canFly ? leaderX : CRYSTAL_X;
-  const getEnemyMoveDirection = (enemy, targetX = getEnemyPrimaryTargetX(enemy)) => enemy.x < targetX ? 1 : -1;
-  const getStructureAhead = (enemy, range) => {
-      const direction = getEnemyMoveDirection(enemy);
-      let closest = null;
-      for (const structure of structures.values()) {
-          if (structure.type === 'wall')
-              continue;
-          const site = getBuildSite(structure.siteId);
-          if (!site)
-              continue;
-          const distance = Math.abs(enemy.x - site.x);
-          const isAhead = direction > 0 ? site.x >= enemy.x : site.x <= enemy.x;
-          if (!isAhead || distance > range)
-              continue;
-          const runtime = ensureStructureRuntime(structure);
-          if (runtime.hp <= 0 || (closest && distance >= closest.distance))
-              continue;
-          closest = { site, runtime, distance };
-      }
-      return closest ? { site: closest.site, runtime: closest.runtime } : null;
-  };
-  const tryEnemyAttack = (enemy, template, attack) => {
-      if (enemy.attackCooldown > 0)
-          return true;
-      attack();
-      enemy.attackCooldown = template.attackCooldown;
-      return true;
-  };
-  const getEnemyEffectiveSpeed = (enemy) => {
-      if (enemy.canFly)
-          return enemy.baseSpeed;
-      for (const siteId of structureSiteIdsOfType('swamp')) {
-          const site = getBuildSite(siteId);
-          if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS) {
-              if (enemy.weight <= 1)
-                  return enemy.baseSpeed * 0.5;
-              if (enemy.weight === 2)
-                  return enemy.baseSpeed * 0.75;
-              return enemy.baseSpeed;
-          }
-      }
-      return enemy.baseSpeed;
-  };
-  const moveEnemyToward = (enemy, targetX, dt, speed = getEnemyEffectiveSpeed(enemy)) => {
-      enemy.x += getEnemyMoveDirection(enemy, targetX) * speed * dt;
-  };
-  const attackEnemyTarget = (enemy, template, targetX, dt) => {
-      if (Math.abs(enemy.x - targetX) <= template.attackRange) {
-          tryEnemyAttack(enemy, template, () => { damageBase(template.damage); });
-          return;
-      }
-      moveEnemyToward(enemy, targetX, dt);
-  };
-  const updateMeleeBasicEnemy = (enemy, template, dt) => {
-      const wall = getBlockingWall(enemy);
-      if (wall) {
-          tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
-          return;
-      }
-      attackEnemyTarget(enemy, template, getEnemyPrimaryTargetX(enemy), dt);
-  };
-  const updateSuicideBomberEnemy = (enemy, template, index, dt) => {
-      const wall = getBlockingWall(enemy);
-      if (wall && Math.abs(enemy.x - wall.site.x) <= template.attackRange) {
-          damageStructure(wall.site, wall.runtime, template.damage, enemy);
-          removeEnemyAt(index, false);
-          return;
-      }
-      if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) {
-          damageBase(template.damage);
-          removeEnemyAt(index, false);
-          return;
-      }
-      moveEnemyToward(enemy, CRYSTAL_X, dt);
-  };
-  const updateFlyingEnemy = (enemy, template, index, dt) => {
-      const targetX = getEnemyPrimaryTargetX(enemy);
-      if (Math.abs(enemy.x - targetX) <= template.attackRange) {
-          damageBase(template.damage);
-          removeEnemyAt(index, false);
-          return;
-      }
-      moveEnemyToward(enemy, targetX, dt, enemy.baseSpeed);
-  };
-  const updateDarkMageEnemy = (enemy, template, dt) => {
-      const wall = getBlockingWall(enemy);
-      if (wall) {
-          tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
-          return;
-      }
-      if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange) {
-          moveEnemyToward(enemy, CRYSTAL_X, dt);
-          return;
-      }
-      enemy.mageOrbTimer = (enemy.mageOrbTimer ?? 0) + dt;
-      while (enemy.mageOrbTimer >= 2 && (enemy.mageOrbs ?? 0) < 3) {
-          enemy.mageOrbTimer -= 2;
-          enemy.mageOrbs = (enemy.mageOrbs ?? 0) + 1;
-      }
-      if ((enemy.mageOrbs ?? 0) >= 3) {
-          tryEnemyAttack(enemy, template, () => {
-              damageBase(template.damage * (enemy.mageOrbs ?? 3));
-              enemy.mageOrbs = 0;
-              enemy.mageOrbTimer = 0;
+          lastRenderedCameraX = cameraX;
+      };
+      const setOpenBuildSite = (siteId) => {
+          openSiteId = siteId;
+          selectedGroundPlotId = getBuildSite(siteId)?.kind === 'ground' ? siteId : null;
+          if (siteId)
+              renderBuildMenu(siteId);
+          for (const menu of buildMenuElements.values())
+              menu.classList.toggle('is-open', menu.dataset.buildMenu === siteId);
+      };
+      const setGroundPlotsVisible = (visible) => {
+          if (groundPlotsVisible === visible)
+              return;
+          groundPlotsVisible = visible;
+          if (!visible)
+              selectedGroundPlotId = null;
+          renderVisibleBuildSites();
+      };
+      const spawnEnemy = (side, kind = 'twisted') => {
+          if (enemies.length >= ENEMY_LIMIT)
+              return;
+          const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
+          enemies.push({
+              id: nextEnemyId,
+              x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
+              kind: template.kind,
+              hp: template.hp,
+              maxHp: template.hp,
+              speed: template.speed,
+              baseSpeed: template.speed,
+              weight: template.weight,
+              attackCooldown: template.attackCooldown,
+              canFly: template.canFly,
+              side
           });
-      }
-  };
-  const damageDragonStructureCounter = (site, runtime) => {
-      const structure = structures.get(site.id);
-      if (!structure || structure.type === 'wall')
-          return false;
-      runtime.dragonHitCount = (runtime.dragonHitCount ?? 0) + 1;
-      if (runtime.dragonHitCount < structure.level)
-          return false;
-      deleteStructure(site.id);
-      renderBuildSite(site.id);
-      return true;
-  };
-  const updateResentfulDragonEnemy = (enemy, template, dt) => {
-      const structureAhead = getStructureAhead(enemy, template.attackRange);
-      if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange || structureAhead) {
-          tryEnemyAttack(enemy, template, () => {
-              if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange)
-                  damageBase(template.damage);
-              if (structureAhead)
-                  damageDragonStructureCounter(structureAhead.site, structureAhead.runtime);
-          });
-          return;
-      }
-      moveEnemyToward(enemy, CRYSTAL_X, dt, enemy.baseSpeed);
-  };
-  const isUnitInLandmineTriggerRadius = (site) => (Math.abs(leaderX - site.x) <= LANDMINE_TRIGGER_RADIUS
-      || enemies.some(enemy => Math.abs(enemy.x - site.x) <= LANDMINE_TRIGGER_RADIUS));
-  const explodeLandmine = (site) => {
-      for (let i = enemies.length - 1; i >= 0; i -= 1) {
-          const enemy = enemies[i];
-          if (enemy && Math.abs(enemy.x - site.x) <= LANDMINE_BLAST_RADIUS && damageEnemy(enemy, LANDMINE_TRUE_DAMAGE))
-              removeEnemyAt(i, true);
-      }
-      deleteStructure(site.id);
-      renderBuildSite(site.id);
-  };
-  const updateEnemies = (dt) => {
-      enemySpawnTimer += dt;
-      leaderAttackCooldown = Math.max(0, leaderAttackCooldown - dt);
-      while (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL) {
-          enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
-          spawnEnemy(nextEnemyId % 2 === 0 ? 'left' : 'right');
-      }
-      for (let i = enemies.length - 1; i >= 0; i -= 1) {
-          const enemy = enemies[i];
+          nextEnemyId += 1;
+      };
+      const removeEnemyAt = (index, reward) => {
+          const [enemy] = enemies.splice(index, 1);
           if (!enemy)
-              continue;
-          enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
-          const template = getEnemyTemplate(enemy);
-          switch (enemy.kind) {
-              case 'suicideBomber':
-                  updateSuicideBomberEnemy(enemy, template, i, dt);
-                  break;
-              case 'mutantBird':
-                  updateFlyingEnemy(enemy, template, i, dt);
-                  break;
-              case 'darkMage':
-                  updateDarkMageEnemy(enemy, template, dt);
-                  break;
-              case 'resentfulDragon':
-                  updateResentfulDragonEnemy(enemy, template, dt);
-                  break;
-              case 'twisted':
-              case 'crawler':
-              case 'madDog':
-              case 'ironMan':
-                  updateMeleeBasicEnemy(enemy, template, dt);
-                  break;
+              return;
+          enemyElements.get(enemy.id)?.remove();
+          enemyElements.delete(enemy.id);
+          if (reward) {
+              bloodSealStone += ENEMY_TEMPLATES[enemy.kind].reward;
+              renderEconomy();
           }
-          if (!enemies.includes(enemy))
-              continue;
-          if (leaderAttackCooldown === 0 && Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE) {
-              leaderAttackCooldown = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
-              if (damageEnemy(enemy, LEADER_BASIC_ATTACK_DAMAGE))
-                  removeEnemyAt(i, true);
-          }
-      }
-  };
-  const updateStructureRuntimeTimers = (runtime, dt) => {
-      for (const [key, remaining] of runtime.attackerCooldowns ?? []) {
-          const next = Math.max(0, remaining - dt);
-          if (next > 0)
-              runtime.attackerCooldowns?.set(key, next);
-          else
-              runtime.attackerCooldowns?.delete(key);
-      }
-  };
-  const updateWallRegeneration = (structure, runtime, dt) => {
-      if (structure.type !== 'wall')
-          return;
-      const maxHp = getStructureMaxHp(structure);
-      const regen = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0;
-      runtime.hp = Math.min(maxHp, runtime.hp + regen * dt);
-  };
-  const updateStructures = (dt) => {
-      for (const structure of structures.values()) {
-          const runtime = ensureStructureRuntime(structure);
-          updateStructureRuntimeTimers(runtime, dt);
-          updateWallRegeneration(structure, runtime, dt);
-      }
-      for (const type of ['watchtower', 'elementalTower']) {
-          for (const siteId of structureSiteIdsOfType(type)) {
+      };
+      const clearEnemiesWithoutReward = () => {
+          while (enemies.length > 0)
+              removeEnemyAt(enemies.length - 1, false);
+          enemySpawnTimer = 0;
+      };
+      const getBlockingWall = (enemy) => {
+          for (const siteId of structureSiteIdsOfType('wall')) {
               const structure = structures.get(siteId);
               if (!structure)
+                  continue;
+              const site = getBuildSite(siteId);
+              if (!site || (enemy.side === 'left' ? site.x >= CRYSTAL_X : site.x <= CRYSTAL_X))
+                  continue;
+              const runtime = ensureStructureRuntime(structure);
+              if (runtime.hp > 0 && Math.abs(enemy.x - site.x) <= ENEMY_ATTACK_RANGE)
+                  return { site, runtime };
+          }
+          return null;
+      };
+      const damageEnemy = (enemy, amount) => {
+          enemy.hp -= amount;
+          return enemy.hp <= 0;
+      };
+      const reduceStructureDamage = (structure, runtime, attacker, amount) => {
+          if (structure.type !== 'wall' || structure.branchLv3 !== 'slippery' || !attacker)
+              return amount;
+          const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+          const cooldowns = runtime.attackerCooldowns ??= new Map();
+          const key = `slippery:${attacker.id}`;
+          if ((cooldowns.get(key) ?? 0) > 0 || Math.random() >= (stat.slipperyChance ?? 0))
+              return amount;
+          cooldowns.set(key, stat.slipperyCooldownSeconds ?? 3);
+          return amount * (stat.slipperyDamageMultiplier ?? 1);
+      };
+      const triggerWallHitEffects = (structure, site, runtime, attacker) => {
+          if (structure.type !== 'wall')
+              return;
+          const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+          const cooldowns = runtime.attackerCooldowns ??= new Map();
+          if (structure.branchLv3 === 'spike' && stat.spikeTrueDamage && damageEnemy(attacker, stat.spikeTrueDamage))
+              return;
+          if (structure.branchLv3 === 'shock') {
+              const key = `shock:${attacker.id}`;
+              if ((cooldowns.get(key) ?? 0) <= 0) {
+                  attacker.x += (attacker.side === 'left' ? -1 : 1) * (stat.shockKnockback ?? 0);
+                  cooldowns.set(key, stat.shockCooldownSeconds ?? 3);
+              }
+          }
+          if (structure.branchLv5 === 'curse') {
+              const key = `curse:${attacker.id}`;
+              if ((cooldowns.get(key) ?? 0) <= 0) {
+                  const loss = attacker.maxHp * (stat.curseMaxHpPercent ?? 0);
+                  attacker.maxHp = Math.max(1, attacker.maxHp - loss);
+                  attacker.hp = Math.min(attacker.hp, attacker.maxHp);
+                  cooldowns.set(key, stat.curseCooldownSeconds ?? 3);
+              }
+          }
+      };
+      const damageStructure = (site, runtime, amount, attacker = null) => {
+          const structure = structures.get(site.id);
+          const finalAmount = structure ? reduceStructureDamage(structure, runtime, attacker, amount) : amount;
+          runtime.hp -= finalAmount;
+          if (structure && attacker && runtime.hp > 0)
+              triggerWallHitEffects(structure, site, runtime, attacker);
+          if (runtime.hp > 0)
+              return false;
+          deleteStructure(site.id);
+          renderBuildSite(site.id);
+          return true;
+      };
+      const damageBase = (amount) => {
+          baseHp = Math.max(0, baseHp - amount);
+          return baseHp <= 0;
+      };
+      const getEnemyTemplate = (enemy) => ENEMY_TEMPLATES[enemy.kind] ?? DEFAULT_ENEMY_TEMPLATE;
+      const getEnemyPrimaryTargetX = (enemy) => enemy.canFly ? leaderX : CRYSTAL_X;
+      const getEnemyMoveDirection = (enemy, targetX = getEnemyPrimaryTargetX(enemy)) => enemy.x < targetX ? 1 : -1;
+      const getStructureAhead = (enemy, range) => {
+          const direction = getEnemyMoveDirection(enemy);
+          let closest = null;
+          for (const structure of structures.values()) {
+              if (structure.type === 'wall')
                   continue;
               const site = getBuildSite(structure.siteId);
               if (!site)
                   continue;
+              const distance = Math.abs(enemy.x - site.x);
+              const isAhead = direction > 0 ? site.x >= enemy.x : site.x <= enemy.x;
+              if (!isAhead || distance > range)
+                  continue;
               const runtime = ensureStructureRuntime(structure);
-              runtime.cooldown = Math.max(0, runtime.cooldown - dt);
-              if (runtime.cooldown > 0)
+              if (runtime.hp <= 0 || (closest && distance >= closest.distance))
                   continue;
-              const stat = getStructureLevelStat(structure.type, structure.level);
-              const target = enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
-              if (!target)
+              closest = { site, runtime, distance };
+          }
+          return closest ? { site: closest.site, runtime: closest.runtime } : null;
+      };
+      const tryEnemyAttack = (enemy, template, attack) => {
+          if (enemy.attackCooldown > 0)
+              return true;
+          attack();
+          enemy.attackCooldown = template.attackCooldown;
+          return true;
+      };
+      const getEnemyEffectiveSpeed = (enemy) => {
+          if (enemy.canFly)
+              return enemy.baseSpeed;
+          for (const siteId of structureSiteIdsOfType('swamp')) {
+              const site = getBuildSite(siteId);
+              if (site && Math.abs(enemy.x - site.x) <= SWAMP_RADIUS) {
+                  if (enemy.weight <= 1)
+                      return enemy.baseSpeed * 0.5;
+                  if (enemy.weight === 2)
+                      return enemy.baseSpeed * 0.75;
+                  return enemy.baseSpeed;
+              }
+          }
+          return enemy.baseSpeed;
+      };
+      const moveEnemyToward = (enemy, targetX, dt, speed = getEnemyEffectiveSpeed(enemy)) => {
+          enemy.x += getEnemyMoveDirection(enemy, targetX) * speed * dt;
+      };
+      const attackEnemyTarget = (enemy, template, targetX, dt) => {
+          if (Math.abs(enemy.x - targetX) <= template.attackRange) {
+              tryEnemyAttack(enemy, template, () => { damageBase(template.damage); });
+              return;
+          }
+          moveEnemyToward(enemy, targetX, dt);
+      };
+      const updateMeleeBasicEnemy = (enemy, template, dt) => {
+          const wall = getBlockingWall(enemy);
+          if (wall) {
+              tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
+              return;
+          }
+          attackEnemyTarget(enemy, template, getEnemyPrimaryTargetX(enemy), dt);
+      };
+      const updateSuicideBomberEnemy = (enemy, template, index, dt) => {
+          const wall = getBlockingWall(enemy);
+          if (wall && Math.abs(enemy.x - wall.site.x) <= template.attackRange) {
+              damageStructure(wall.site, wall.runtime, template.damage, enemy);
+              removeEnemyAt(index, false);
+              return;
+          }
+          if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) {
+              damageBase(template.damage);
+              removeEnemyAt(index, false);
+              return;
+          }
+          moveEnemyToward(enemy, CRYSTAL_X, dt);
+      };
+      const updateFlyingEnemy = (enemy, template, index, dt) => {
+          const targetX = getEnemyPrimaryTargetX(enemy);
+          if (Math.abs(enemy.x - targetX) <= template.attackRange) {
+              damageBase(template.damage);
+              removeEnemyAt(index, false);
+              return;
+          }
+          moveEnemyToward(enemy, targetX, dt, enemy.baseSpeed);
+      };
+      const updateDarkMageEnemy = (enemy, template, dt) => {
+          const wall = getBlockingWall(enemy);
+          if (wall) {
+              tryEnemyAttack(enemy, template, () => { damageStructure(wall.site, wall.runtime, template.damage, enemy); });
+              return;
+          }
+          if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange) {
+              moveEnemyToward(enemy, CRYSTAL_X, dt);
+              return;
+          }
+          enemy.mageOrbTimer = (enemy.mageOrbTimer ?? 0) + dt;
+          while (enemy.mageOrbTimer >= 2 && (enemy.mageOrbs ?? 0) < 3) {
+              enemy.mageOrbTimer -= 2;
+              enemy.mageOrbs = (enemy.mageOrbs ?? 0) + 1;
+          }
+          if ((enemy.mageOrbs ?? 0) >= 3) {
+              tryEnemyAttack(enemy, template, () => {
+                  damageBase(template.damage * (enemy.mageOrbs ?? 3));
+                  enemy.mageOrbs = 0;
+                  enemy.mageOrbTimer = 0;
+              });
+          }
+      };
+      const damageDragonStructureCounter = (site, runtime) => {
+          const structure = structures.get(site.id);
+          if (!structure || structure.type === 'wall')
+              return false;
+          runtime.dragonHitCount = (runtime.dragonHitCount ?? 0) + 1;
+          if (runtime.dragonHitCount < structure.level)
+              return false;
+          deleteStructure(site.id);
+          renderBuildSite(site.id);
+          return true;
+      };
+      const updateResentfulDragonEnemy = (enemy, template, dt) => {
+          const structureAhead = getStructureAhead(enemy, template.attackRange);
+          if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange || structureAhead) {
+              tryEnemyAttack(enemy, template, () => {
+                  if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange)
+                      damageBase(template.damage);
+                  if (structureAhead)
+                      damageDragonStructureCounter(structureAhead.site, structureAhead.runtime);
+              });
+              return;
+          }
+          moveEnemyToward(enemy, CRYSTAL_X, dt, enemy.baseSpeed);
+      };
+      const isUnitInLandmineTriggerRadius = (site) => (Math.abs(leaderX - site.x) <= LANDMINE_TRIGGER_RADIUS
+          || enemies.some(enemy => Math.abs(enemy.x - site.x) <= LANDMINE_TRIGGER_RADIUS));
+      const explodeLandmine = (site) => {
+          for (let i = enemies.length - 1; i >= 0; i -= 1) {
+              const enemy = enemies[i];
+              if (enemy && Math.abs(enemy.x - site.x) <= LANDMINE_BLAST_RADIUS && damageEnemy(enemy, LANDMINE_TRUE_DAMAGE))
+                  removeEnemyAt(i, true);
+          }
+          deleteStructure(site.id);
+          renderBuildSite(site.id);
+      };
+      const updateEnemies = (dt) => {
+          enemySpawnTimer += dt;
+          leaderAttackCooldown = Math.max(0, leaderAttackCooldown - dt);
+          while (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL) {
+              enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
+              spawnEnemy(nextEnemyId % 2 === 0 ? 'left' : 'right');
+          }
+          for (let i = enemies.length - 1; i >= 0; i -= 1) {
+              const enemy = enemies[i];
+              if (!enemy)
                   continue;
-              runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
-              if (damageEnemy(target, stat.damage ?? 0))
-                  removeEnemyAt(enemies.indexOf(target), true);
+              enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
+              const template = getEnemyTemplate(enemy);
+              switch (enemy.kind) {
+                  case 'suicideBomber':
+                      updateSuicideBomberEnemy(enemy, template, i, dt);
+                      break;
+                  case 'mutantBird':
+                      updateFlyingEnemy(enemy, template, i, dt);
+                      break;
+                  case 'darkMage':
+                      updateDarkMageEnemy(enemy, template, dt);
+                      break;
+                  case 'resentfulDragon':
+                      updateResentfulDragonEnemy(enemy, template, dt);
+                      break;
+                  case 'twisted':
+                  case 'crawler':
+                  case 'madDog':
+                  case 'ironMan':
+                      updateMeleeBasicEnemy(enemy, template, dt);
+                      break;
+              }
+              if (!enemies.includes(enemy))
+                  continue;
+              if (leaderAttackCooldown === 0 && Math.abs(enemy.x - leaderX) <= LEADER_ATTACK_RANGE) {
+                  leaderAttackCooldown = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
+                  if (damageEnemy(enemy, LEADER_BASIC_ATTACK_DAMAGE))
+                      removeEnemyAt(i, true);
+              }
           }
-      }
-      for (const siteId of [...structureSiteIdsOfType('landmine')]) {
-          const structure = structures.get(siteId);
-          const site = getBuildSite(siteId);
-          if (!structure || !site)
-              continue;
-          const runtime = ensureStructureRuntime(structure);
-          if (!runtime.armed && isUnitInLandmineTriggerRadius(site)) {
-              runtime.armed = true;
-              runtime.fuse = LANDMINE_FUSE_SECONDS;
+      };
+      const updateStructureRuntimeTimers = (runtime, dt) => {
+          for (const [key, remaining] of runtime.attackerCooldowns ?? []) {
+              const next = Math.max(0, remaining - dt);
+              if (next > 0)
+                  runtime.attackerCooldowns?.set(key, next);
+              else
+                  runtime.attackerCooldowns?.delete(key);
           }
-          if (!runtime.armed)
-              continue;
-          runtime.fuse = Math.max(0, (runtime.fuse ?? LANDMINE_FUSE_SECONDS) - dt);
-          if (runtime.fuse <= 0)
-              explodeLandmine(site);
-      }
-  };
-  const renderEnemies = () => {
-      if (!enemiesContainer)
-          return;
-      const width = viewport?.clientWidth || window.innerWidth || 1;
-      const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
-      const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
-      for (const enemy of enemies) {
-          let element = enemyElements.get(enemy.id);
-          const visible = enemy.x >= minX && enemy.x <= maxX;
-          if (!visible) {
-              element?.remove();
-              enemyElements.delete(enemy.id);
-              continue;
+      };
+      const updateWallRegeneration = (structure, runtime, dt) => {
+          if (structure.type !== 'wall')
+              return;
+          const maxHp = getStructureMaxHp(structure);
+          const regen = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0;
+          runtime.hp = Math.min(maxHp, runtime.hp + regen * dt);
+      };
+      const updateStructures = (dt) => {
+          for (const structure of structures.values()) {
+              const runtime = ensureStructureRuntime(structure);
+              updateStructureRuntimeTimers(runtime, dt);
+              updateWallRegeneration(structure, runtime, dt);
           }
-          if (!element) {
-              element = document.createElement('div');
-              element.className = 'vinh-da-game__enemy';
-              enemiesContainer.append(element);
-              enemyElements.set(enemy.id, element);
+          for (const type of ['watchtower', 'elementalTower']) {
+              for (const siteId of structureSiteIdsOfType(type)) {
+                  const structure = structures.get(siteId);
+                  if (!structure)
+                      continue;
+                  const site = getBuildSite(structure.siteId);
+                  if (!site)
+                      continue;
+                  const runtime = ensureStructureRuntime(structure);
+                  runtime.cooldown = Math.max(0, runtime.cooldown - dt);
+                  if (runtime.cooldown > 0)
+                      continue;
+                  const stat = getStructureLevelStat(structure.type, structure.level);
+                  const target = enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
+                  if (!target)
+                      continue;
+                  runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+                  if (damageEnemy(target, stat.damage ?? 0))
+                      removeEnemyAt(enemies.indexOf(target), true);
+              }
           }
-          element.style.transform = `translate3d(${enemy.x}px,0,0)`;
-      }
-  };
-  const updateCamera = () => {
-      const width = viewport?.clientWidth || window.innerWidth || 1;
-      cameraX = Math.max(0, Math.min(WORLD_WIDTH - width, leaderX - width * 0.5));
-      if (world)
-          world.style.transform = `translate3d(${-cameraX}px,0,0)`;
-      if (openSiteId && !nearestBuildSite())
+          for (const siteId of [...structureSiteIdsOfType('landmine')]) {
+              const structure = structures.get(siteId);
+              const site = getBuildSite(siteId);
+              if (!structure || !site)
+                  continue;
+              const runtime = ensureStructureRuntime(structure);
+              if (!runtime.armed && isUnitInLandmineTriggerRadius(site)) {
+                  runtime.armed = true;
+                  runtime.fuse = LANDMINE_FUSE_SECONDS;
+              }
+              if (!runtime.armed)
+                  continue;
+              runtime.fuse = Math.max(0, (runtime.fuse ?? LANDMINE_FUSE_SECONDS) - dt);
+              if (runtime.fuse <= 0)
+                  explodeLandmine(site);
+          }
+      };
+      const renderEnemies = () => {
+          if (!enemiesContainer)
+              return;
+          const width = viewport?.clientWidth || window.innerWidth || 1;
+          const minX = cameraX - BUILD_SITE_RENDER_BUFFER;
+          const maxX = cameraX + width + BUILD_SITE_RENDER_BUFFER;
+          for (const enemy of enemies) {
+              let element = enemyElements.get(enemy.id);
+              const visible = enemy.x >= minX && enemy.x <= maxX;
+              if (!visible) {
+                  element?.remove();
+                  enemyElements.delete(enemy.id);
+                  continue;
+              }
+              if (!element) {
+                  element = document.createElement('div');
+                  element.className = 'vinh-da-game__enemy';
+                  enemiesContainer.append(element);
+                  enemyElements.set(enemy.id, element);
+              }
+              element.style.transform = `translate3d(${enemy.x}px,0,0)`;
+          }
+      };
+      const updateCamera = () => {
+          const width = viewport?.clientWidth || window.innerWidth || 1;
+          cameraX = Math.max(0, Math.min(WORLD_WIDTH - width, leaderX - width * 0.5));
+          if (world)
+              world.style.transform = `translate3d(${-cameraX}px,0,0)`;
+          if (openSiteId && !nearestBuildSite())
+              setOpenBuildSite(null);
+          if (Math.abs(cameraX - lastRenderedCameraX) > BUILD_SITE_RENDER_THRESHOLD)
+              renderVisibleBuildSites();
+          if (sprite)
+              sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
+      };
+      const tick = (now) => {
+          const dt = Math.min(0.05, (now - lastTime) / 1000);
+          lastTime = now;
+          const left = keys.has('arrowleft') || keys.has('a');
+          const right = keys.has('arrowright') || keys.has('d');
+          const keyboardDirection = Number(right) - Number(left);
+          if (keyboardDirection !== 0)
+              targetX = leaderX;
+          leaderX += keyboardDirection !== 0
+              ? keyboardDirection * LEADER_SPEED * dt
+              : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
+          leaderX = clampLeaderX(leaderX);
+          updateEnemies(dt);
+          updateStructures(dt);
+          updateCamera();
+          renderEnemies();
+          rafId = window.requestAnimationFrame(tick);
+      };
+      const moveToClientX = (clientX) => {
+          targetX = clampLeaderX(clientX + cameraX - LEADER_WIDTH * 0.5);
           setOpenBuildSite(null);
-      if (Math.abs(cameraX - lastRenderedCameraX) > BUILD_SITE_RENDER_THRESHOLD)
-          renderVisibleBuildSites();
-      if (sprite)
-          sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
-  };
-  const tick = (now) => {
-      const dt = Math.min(0.05, (now - lastTime) / 1000);
-      lastTime = now;
-      const left = keys.has('arrowleft') || keys.has('a');
-      const right = keys.has('arrowright') || keys.has('d');
-      const keyboardDirection = Number(right) - Number(left);
-      if (keyboardDirection !== 0)
-          targetX = leaderX;
-      leaderX += keyboardDirection !== 0
-          ? keyboardDirection * LEADER_SPEED * dt
-          : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
-      leaderX = clampLeaderX(leaderX);
-      updateEnemies(dt);
-      updateStructures(dt);
+      };
+      const onViewportPointerDown = (event) => {
+          const target = event.target instanceof Element ? event.target : null;
+          if (target?.closest('[data-build-site-id],.vinh-da-game__build-node,.vinh-da-game__back'))
+              return;
+          if (isGroundClick(event)) {
+              moveToClientX(event.clientX);
+              setGroundPlotsVisible(true);
+              return;
+          }
+          moveToClientX(event.clientX);
+          setGroundPlotsVisible(false);
+      };
+      const onGameClick = (event) => {
+          const target = event.target instanceof Element ? event.target : null;
+          const buildNode = target?.closest('.vinh-da-game__build-node');
+          if (buildNode) {
+              const site = getBuildSite(openSiteId);
+              const structure = site ? structures.get(site.id) : null;
+              const action = buildNode.dataset.action;
+              if (site && structure && action) {
+                  const nextLevel = structure.level + 1;
+                  if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(BUILD_LEVEL_COST[nextLevel])) {
+                      const upgraded = { ...structure, level: nextLevel };
+                      setStructure(upgraded);
+                      const runtime = ensureStructureRuntime(upgraded);
+                      runtime.hp = getStructureMaxHp(upgraded);
+                      renderBuildSite(site.id);
+                  }
+                  else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(BUILD_LEVEL_COST[3])) {
+                      const upgraded = { ...structure, level: 3, branchLv3: action.slice('branch-lv3-'.length) };
+                      setStructure(upgraded);
+                      ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+                      renderBuildSite(site.id);
+                  }
+                  else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(BUILD_LEVEL_COST[5])) {
+                      const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) };
+                      setStructure(upgraded);
+                      ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+                      renderBuildSite(site.id);
+                  }
+              }
+              else {
+                  const type = buildNode.dataset.structureType;
+                  if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, site) && spend(BUILD_LEVEL_COST[1])) {
+                      const upgraded = { ...structure, mountedStructure: type };
+                      setStructure(upgraded);
+                      renderBuildSite(site.id);
+                  }
+                  else if (site && type && !structure && isStructureAllowedOnBuildSite(type, site) && spend(BUILD_LEVEL_COST[1])) {
+                      const placed = { siteId: site.id, type, level: 1 };
+                      setStructure(placed);
+                      ensureStructureRuntime(placed);
+                      renderBuildSite(site.id);
+                  }
+              }
+              setOpenBuildSite(null);
+              setGroundPlotsVisible(false);
+              return;
+          }
+          const siteButton = target?.closest('[data-build-site-id]');
+          if (!siteButton)
+              return;
+          const site = nearestBuildSite();
+          if (!site || site.id !== siteButton.dataset.buildSiteId) {
+              targetX = clampLeaderX(Number.parseFloat(siteButton.style.left) || leaderX);
+              setOpenBuildSite(null);
+              if (getBuildSite(siteButton.dataset.buildSiteId)?.kind !== 'ground')
+                  setGroundPlotsVisible(false);
+              return;
+          }
+          selectedGroundPlotId = site.kind === 'ground' ? site.id : null;
+          if (site.kind !== 'ground')
+              setGroundPlotsVisible(false);
+          setOpenBuildSite(openSiteId === site.id ? null : site.id);
+      };
+      const onViewportResize = () => { renderVisibleBuildSites(); };
+      const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onViewportResize);
+      const onKeyDown = (event) => { keys.add(event.key.toLowerCase()); };
+      const onKeyUp = (event) => { keys.delete(event.key.toLowerCase()); };
+      window.addEventListener('keydown', onKeyDown);
+      window.addEventListener('keyup', onKeyUp);
+      if (viewport)
+          resizeObserver?.observe(viewport);
+      viewport?.addEventListener('pointerdown', onViewportPointerDown);
+      section.addEventListener('click', onGameClick);
+      section.querySelector('.vinh-da-game__back')?.addEventListener('click', () => {
+          shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId });
+      });
       updateCamera();
+      spawnEnemy('left');
+      spawnEnemy('right');
       renderEnemies();
       rafId = window.requestAnimationFrame(tick);
-  };
-  const moveToClientX = (clientX) => {
-      targetX = clampLeaderX(clientX + cameraX - LEADER_WIDTH * 0.5);
-      setOpenBuildSite(null);
-  };
-  const onViewportPointerDown = (event) => {
-      const target = event.target instanceof Element ? event.target : null;
-      if (target?.closest('[data-build-site-id],.vinh-da-game__build-node,.vinh-da-game__back'))
-          return;
-      if (isGroundClick(event)) {
-          moveToClientX(event.clientX);
-          setGroundPlotsVisible(true);
-          return;
-      }
-      moveToClientX(event.clientX);
-      setGroundPlotsVisible(false);
-  };
-  const onGameClick = (event) => {
-      const target = event.target instanceof Element ? event.target : null;
-      const buildNode = target?.closest('.vinh-da-game__build-node');
-      if (buildNode) {
-          const site = getBuildSite(openSiteId);
-          const structure = site ? structures.get(site.id) : null;
-          const action = buildNode.dataset.action;
-          if (site && structure && action) {
-              const nextLevel = structure.level + 1;
-              if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(BUILD_LEVEL_COST[nextLevel])) {
-                  const upgraded = { ...structure, level: nextLevel };
-                  setStructure(upgraded);
-                  const runtime = ensureStructureRuntime(upgraded);
-                  runtime.hp = getStructureMaxHp(upgraded);
-                  renderBuildSite(site.id);
-              }
-              else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(BUILD_LEVEL_COST[3])) {
-                  const upgraded = { ...structure, level: 3, branchLv3: action.slice('branch-lv3-'.length) };
-                  setStructure(upgraded);
-                  ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
-                  renderBuildSite(site.id);
-              }
-              else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(BUILD_LEVEL_COST[5])) {
-                  const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) };
-                  setStructure(upgraded);
-                  ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
-                  renderBuildSite(site.id);
-              }
+      return {
+          destroy() {
+              window.cancelAnimationFrame(rafId);
+              window.removeEventListener('keydown', onKeyDown);
+              window.removeEventListener('keyup', onKeyUp);
+              resizeObserver?.disconnect();
+              clearEnemiesWithoutReward();
+              viewport?.removeEventListener('pointerdown', onViewportPointerDown);
+              section.removeEventListener('click', onGameClick);
+              mount.destroy();
           }
-          else {
-              const type = buildNode.dataset.structureType;
-              if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, site) && spend(BUILD_LEVEL_COST[1])) {
-                  const upgraded = { ...structure, mountedStructure: type };
-                  setStructure(upgraded);
-                  renderBuildSite(site.id);
-              }
-              else if (site && type && !structure && isStructureAllowedOnBuildSite(type, site) && spend(BUILD_LEVEL_COST[1])) {
-                  const placed = { siteId: site.id, type, level: 1 };
-                  setStructure(placed);
-                  ensureStructureRuntime(placed);
-                  renderBuildSite(site.id);
-              }
-          }
-          setOpenBuildSite(null);
-          setGroundPlotsVisible(false);
-          return;
-      }
-      const siteButton = target?.closest('[data-build-site-id]');
-      if (!siteButton)
-          return;
-      const site = nearestBuildSite();
-      if (!site || site.id !== siteButton.dataset.buildSiteId) {
-          targetX = clampLeaderX(Number.parseFloat(siteButton.style.left) || leaderX);
-          setOpenBuildSite(null);
-          if (getBuildSite(siteButton.dataset.buildSiteId)?.kind !== 'ground')
-              setGroundPlotsVisible(false);
-          return;
-      }
-      selectedGroundPlotId = site.kind === 'ground' ? site.id : null;
-      if (site.kind !== 'ground')
-          setGroundPlotsVisible(false);
-      setOpenBuildSite(openSiteId === site.id ? null : site.id);
-  };
-  const onViewportResize = () => { renderVisibleBuildSites(); };
-  const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onViewportResize);
-  const onKeyDown = (event) => { keys.add(event.key.toLowerCase()); };
-  const onKeyUp = (event) => { keys.delete(event.key.toLowerCase()); };
-  window.addEventListener('keydown', onKeyDown);
-  window.addEventListener('keyup', onKeyUp);
-  if (viewport)
-      resizeObserver?.observe(viewport);
-  viewport?.addEventListener('pointerdown', onViewportPointerDown);
-  section.addEventListener('click', onGameClick);
-  section.querySelector('.vinh-da-game__back')?.addEventListener('click', () => {
-      shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId });
-  });
-  updateCamera();
-  spawnEnemy('left');
-  spawnEnemy('right');
-  renderEnemies();
-  rafId = window.requestAnimationFrame(tick);
-  return {
-      destroy() {
-          window.cancelAnimationFrame(rafId);
-          window.removeEventListener('keydown', onKeyDown);
-          window.removeEventListener('keyup', onKeyUp);
-          resizeObserver?.disconnect();
-          clearEnemiesWithoutReward();
-          viewport?.removeEventListener('pointerdown', onViewportPointerDown);
-          section.removeEventListener('click', onGameClick);
-          mount.destroy();
-      }
-  };
+      };
+  }
   const render = renderScreen;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
