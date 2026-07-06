@@ -38234,12 +38234,26 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               structureSitesByType.set(structure.type, siteIds);
           }
           siteIds.add(structure.siteId);
+          if (structure.mountedStructure) {
+              let mountedSiteIds = structureSitesByType.get(structure.mountedStructure);
+              if (!mountedSiteIds) {
+                  mountedSiteIds = new Set();
+                  structureSitesByType.set(structure.mountedStructure, mountedSiteIds);
+              }
+              mountedSiteIds.add(structure.siteId);
+          }
       };
       const untrackStructureType = (structure) => {
           const siteIds = structureSitesByType.get(structure.type);
           siteIds?.delete(structure.siteId);
           if (siteIds?.size === 0)
               structureSitesByType.delete(structure.type);
+          if (structure.mountedStructure) {
+              const mountedSiteIds = structureSitesByType.get(structure.mountedStructure);
+              mountedSiteIds?.delete(structure.siteId);
+              if (mountedSiteIds?.size === 0)
+                  structureSitesByType.delete(structure.mountedStructure);
+          }
       };
       const setStructure = (structure) => {
           const previous = structures.get(structure.siteId);
@@ -38308,7 +38322,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           menu.className = 'vinh-da-game__build-menu';
           menu.dataset.buildMenu = site.id;
           menu.style.left = `${site.x}px`;
-          const nodeOptions = buildNodeOptions.filter(option => isStructureAllowedOnBuildSite(option.type, site));
+          const nodeOptions = buildNodeOptions.filter(option => isStructureAllowedOnBuildSite(option.type, site) || (site.kind === 'wall-slot' && isStructureAllowedOnBuildSite(option.type, { kind: 'rock' })));
           nodeOptions.forEach((option) => {
               const node = document.createElement('button');
               node.className = 'vinh-da-game__build-node';
@@ -38362,8 +38376,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const cost = structure ? BUILD_LEVEL_COST[nextLevel] : BUILD_LEVEL_COST[1];
               const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
               const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
-              const canBuildOnSurface = type ? isStructureAllowedOnBuildSite(type, site) : false;
-              const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && Boolean(type) && type !== 'wall' && canBuildOnSurface;
+              const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
               node.hidden = structure
                   ? (isUpgradeNode
                       ? structure.level >= 6 || structure.level === 2 || structure.level === 4
@@ -38384,9 +38397,14 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           const runtime = structure ? ensureStructureRuntime(structure) : null;
           siteButton.classList.remove(...structureClassNames);
           siteButton.classList.toggle('has-structure', Boolean(structure) && runtime !== null && runtime.hp > 0);
-          if (structure && runtime !== null && runtime.hp > 0)
+          if (structure && runtime !== null && runtime.hp > 0) {
               siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
-          siteButton.dataset.structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
+              if (structure.mountedStructure)
+                  siteButton.classList.add(`vinh-da-game__structure--${structure.mountedStructure}`);
+          }
+          const structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
+          const mountedLabel = structure?.mountedStructure ? buildNodeOptions.find(option => option.type === structure.mountedStructure)?.label ?? '' : '';
+          siteButton.dataset.structureLabel = mountedLabel ? `${structureLabel} Lv${structure?.level} + ${mountedLabel}` : structureLabel;
           siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
           renderBuildMenu(siteId);
       };
@@ -38588,7 +38606,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               }
               else {
                   const type = buildNode.dataset.structureType;
-                  if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, site) && spend(BUILD_LEVEL_COST[1])) {
+                  if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' }) && spend(BUILD_LEVEL_COST[1])) {
                       const upgraded = { ...structure, mountedStructure: type };
                       setStructure(upgraded);
                       renderBuildSite(site.id);
@@ -39007,7 +39025,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       for (const type of ['watchtower', 'elementalTower']) {
           for (const siteId of ctx.structureSiteIdsOfType(type)) {
               const structure = ctx.state.structures.get(siteId);
-              if (!structure)
+              if (!structure || (structure.type !== type && structure.mountedStructure !== type))
                   continue;
               const site = ctx.getBuildSite(structure.siteId);
               if (!site)
@@ -39016,7 +39034,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               runtime.cooldown = Math.max(0, runtime.cooldown - dt);
               if (runtime.cooldown > 0)
                   continue;
-              const stat = getStructureLevelStat(structure.type, structure.level);
+              const stat = getStructureLevelStat(type, structure.type === type ? structure.level : 1);
               const target = ctx.state.enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
               if (!target)
                   continue;
@@ -39073,6 +39091,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./screens/vinh-da/constants.ts');
   const BUILD_SITE_CASTLE_PADDING = __dep0.BUILD_SITE_CASTLE_PADDING;
   const BUILD_SITE_EDGE_PADDING = __dep0.BUILD_SITE_EDGE_PADDING;
+  const BUILD_SITE_SPACING = __dep0.BUILD_SITE_SPACING;
   const GROUND_PLOT_CENTER_X = __dep0.GROUND_PLOT_CENTER_X;
   const GROUND_PLOT_WIDTH = __dep0.GROUND_PLOT_WIDTH;
   const CASTLE_OUTER_LEFT = __dep0.CASTLE_OUTER_LEFT;
@@ -39116,16 +39135,17 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       { label: 'Đầm lầy', type: 'swamp' }
   ];
   const STRUCTURE_SURFACES = {
-      watchtower: ['rock', 'wall-slot'],
+      watchtower: ['rock'],
       wall: ['wall-slot'],
-      elementalTower: ['rock', 'wall-slot'],
-      barracks: ['rock', 'wall-slot'],
-      church: ['rock', 'wall-slot'],
-      crystalSeal: ['rock', 'wall-slot'],
+      elementalTower: ['rock'],
+      barracks: ['rock'],
+      church: ['rock'],
+      crystalSeal: ['rock'],
       landmine: ['ground'],
       swamp: ['ground']
   };
   const isStructureAllowedOnBuildSite = (type, site) => STRUCTURE_SURFACES[type].includes(site.kind);
+  const ROCK_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church', 'crystalSeal'];
   const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'swamp'];
   const WALL_BUILD_SITE_ALLOWED = ['wall'];
   const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
@@ -39194,9 +39214,34 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       }
       return sites;
   };
+  const createRockBuildSites = () => {
+      const sites = [];
+      const minX = BUILD_SITE_EDGE_PADDING;
+      const maxX = WORLD_WIDTH - BUILD_SITE_EDGE_PADDING;
+      let leftIndex = 1;
+      let rightIndex = 1;
+      for (let offsetIndex = 1;; offsetIndex += 1) {
+          const leftX = GROUND_PLOT_CENTER_X - BUILD_SITE_SPACING * offsetIndex;
+          const rightX = GROUND_PLOT_CENTER_X + BUILD_SITE_SPACING * offsetIndex;
+          const hasLeftSite = leftX >= minX;
+          const hasRightSite = rightX <= maxX;
+          if (!hasLeftSite && !hasRightSite)
+              break;
+          if (hasLeftSite && isOutsideCastleBuildPadding(leftX)) {
+              sites.push({ id: `rock-left-${leftIndex}`, x: leftX, kind: 'rock', allowed: ROCK_BUILD_SITE_ALLOWED });
+              leftIndex += 1;
+          }
+          if (hasRightSite && isOutsideCastleBuildPadding(rightX)) {
+              sites.push({ id: `rock-right-${rightIndex}`, x: rightX, kind: 'rock', allowed: ROCK_BUILD_SITE_ALLOWED });
+              rightIndex += 1;
+          }
+      }
+      return sites;
+  };
   const BUILD_SITES = [
       { id: 'wall-left', x: CASTLE_OUTER_LEFT - 120, kind: 'wall-slot', allowed: WALL_BUILD_SITE_ALLOWED },
       { id: 'wall-right', x: CASTLE_OUTER_RIGHT + 120, kind: 'wall-slot', allowed: WALL_BUILD_SITE_ALLOWED },
+      ...createRockBuildSites(),
       ...createGroundBuildSites()
   ];
   const getWallLevelStat = (level, branchLv3, branchLv5) => {
@@ -39241,6 +39286,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_BUILD_NODE_OPTIONS')) exports.GROUND_BUILD_NODE_OPTIONS = GROUND_BUILD_NODE_OPTIONS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'STRUCTURE_SURFACES')) exports.STRUCTURE_SURFACES = STRUCTURE_SURFACES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isStructureAllowedOnBuildSite')) exports.isStructureAllowedOnBuildSite = isStructureAllowedOnBuildSite;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ROCK_BUILD_SITE_ALLOWED')) exports.ROCK_BUILD_SITE_ALLOWED = ROCK_BUILD_SITE_ALLOWED;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_BUILD_SITE_ALLOWED')) exports.GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
   if (!Object.prototype.hasOwnProperty.call(exports, 'WALL_BUILD_SITE_ALLOWED')) exports.WALL_BUILD_SITE_ALLOWED = WALL_BUILD_SITE_ALLOWED;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CASTLE_GROUND_BUILD_SITE_ALLOWED')) exports.CASTLE_GROUND_BUILD_SITE_ALLOWED = CASTLE_GROUND_BUILD_SITE_ALLOWED;
@@ -39248,6 +39294,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'WATCHTOWER_STRUCTURE_STATS')) exports.WATCHTOWER_STRUCTURE_STATS = WATCHTOWER_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_STRUCTURE_STATS')) exports.GROUND_STRUCTURE_STATS = GROUND_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createGroundBuildSites')) exports.createGroundBuildSites = createGroundBuildSites;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createRockBuildSites')) exports.createRockBuildSites = createRockBuildSites;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITES')) exports.BUILD_SITES = BUILD_SITES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getWallLevelStat')) exports.getWallLevelStat = getWallLevelStat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getStructureLevelStat')) exports.getStructureLevelStat = getStructureLevelStat;

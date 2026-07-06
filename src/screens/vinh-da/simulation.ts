@@ -347,18 +347,18 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
     for (const type of ['watchtower', 'elementalTower'] as const){
       for (const siteId of ctx.structureSiteIdsOfType(type)){
         const structure = ctx.state.structures.get(siteId);
-        if (!structure) continue;
+        if (!structure || (structure.type !== type && structure.mountedStructure !== type)) continue;
         const site = ctx.getBuildSite(structure.siteId);
-      if (!site) continue;
-      const runtime = ctx.ensureStructureRuntime(structure);
-      runtime.cooldown = Math.max(0, runtime.cooldown - dt);
-      if (runtime.cooldown > 0) continue;
-      const stat = getStructureLevelStat(structure.type, structure.level);
-      const target = ctx.state.enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
-      if (!target) continue;
-      runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
-      if (damageEnemy(ctx, target, stat.damage ?? 0)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
-        }
+        if (!site) continue;
+        const runtime = ctx.ensureStructureRuntime(structure);
+        runtime.cooldown = Math.max(0, runtime.cooldown - dt);
+        if (runtime.cooldown > 0) continue;
+        const stat = getStructureLevelStat(type, structure.type === type ? structure.level : 1);
+        const target = ctx.state.enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
+        if (!target) continue;
+        runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+        if (damageEnemy(ctx, target, stat.damage ?? 0)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+      }
     }
 
     for (const siteId of [...ctx.structureSiteIdsOfType('landmine')]){

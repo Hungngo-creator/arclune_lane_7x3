@@ -189,11 +189,24 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       structureSitesByType.set(structure.type, siteIds);
     }
     siteIds.add(structure.siteId);
+    if (structure.mountedStructure){
+      let mountedSiteIds = structureSitesByType.get(structure.mountedStructure);
+      if (!mountedSiteIds){
+        mountedSiteIds = new Set<string>();
+        structureSitesByType.set(structure.mountedStructure, mountedSiteIds);
+      }
+      mountedSiteIds.add(structure.siteId);
+    }
   };
   const untrackStructureType = (structure: PlacedStructure): void => {
     const siteIds = structureSitesByType.get(structure.type);
     siteIds?.delete(structure.siteId);
     if (siteIds?.size === 0) structureSitesByType.delete(structure.type);
+    if (structure.mountedStructure){
+      const mountedSiteIds = structureSitesByType.get(structure.mountedStructure);
+      mountedSiteIds?.delete(structure.siteId);
+      if (mountedSiteIds?.size === 0) structureSitesByType.delete(structure.mountedStructure);
+    }
   };
   const setStructure = (structure: PlacedStructure): void => {
     const previous = structures.get(structure.siteId);
@@ -256,7 +269,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     menu.className = 'vinh-da-game__build-menu';
     menu.dataset.buildMenu = site.id;
     menu.style.left = `${site.x}px`;
-    const nodeOptions = buildNodeOptions.filter(option => isStructureAllowedOnBuildSite(option.type, site));
+    const nodeOptions = buildNodeOptions.filter(option => isStructureAllowedOnBuildSite(option.type, site) || (site.kind === 'wall-slot' && isStructureAllowedOnBuildSite(option.type, { kind: 'rock' })));
     nodeOptions.forEach((option) => {
       const node = document.createElement('button');
       node.className = 'vinh-da-game__build-node';
@@ -311,8 +324,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const cost = structure ? BUILD_LEVEL_COST[nextLevel as keyof typeof BUILD_LEVEL_COST] : BUILD_LEVEL_COST[1];
       const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
       const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
-      const canBuildOnSurface = type ? isStructureAllowedOnBuildSite(type, site) : false;
-      const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && Boolean(type) && type !== 'wall' && canBuildOnSurface;
+      const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
       node.hidden = structure
         ? (
             isUpgradeNode
@@ -333,8 +345,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     const runtime = structure ? ensureStructureRuntime(structure) : null;
     siteButton.classList.remove(...structureClassNames);
     siteButton.classList.toggle('has-structure', Boolean(structure) && runtime !== null && runtime.hp > 0);
-    if (structure && runtime !== null && runtime.hp > 0) siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
-    siteButton.dataset.structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
+    if (structure && runtime !== null && runtime.hp > 0){
+      siteButton.classList.add(`vinh-da-game__structure--${structure.type}`);
+      if (structure.mountedStructure) siteButton.classList.add(`vinh-da-game__structure--${structure.mountedStructure}`);
+    }
+    const structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
+    const mountedLabel = structure?.mountedStructure ? buildNodeOptions.find(option => option.type === structure.mountedStructure)?.label ?? '' : '';
+    siteButton.dataset.structureLabel = mountedLabel ? `${structureLabel} Lv${structure?.level} + ${mountedLabel}` : structureLabel;
     siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
     renderBuildMenu(siteId);
   };
@@ -525,7 +542,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         }
       } else {
         const type = buildNode.dataset.structureType as StructureType | undefined;
-        if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, site) && spend(BUILD_LEVEL_COST[1])){
+        if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' }) && spend(BUILD_LEVEL_COST[1])){
           const upgraded = { ...structure, mountedStructure: type };
           setStructure(upgraded);
           renderBuildSite(site.id);
