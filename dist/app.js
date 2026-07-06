@@ -39154,6 +39154,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'WALL_STRUCTURE_STATS')) exports.WALL_STRUCTURE_STATS = WALL_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'WATCHTOWER_STRUCTURE_STATS')) exports.WATCHTOWER_STRUCTURE_STATS = WATCHTOWER_STRUCTURE_STATS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'GROUND_STRUCTURE_STATS')) exports.GROUND_STRUCTURE_STATS = GROUND_STRUCTURE_STATS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createGroundBuildSites')) exports.createGroundBuildSites = createGroundBuildSites;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_SITES')) exports.BUILD_SITES = BUILD_SITES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getWallLevelStat')) exports.getWallLevelStat = getWallLevelStat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getStructureLevelStat')) exports.getStructureLevelStat = getStructureLevelStat;

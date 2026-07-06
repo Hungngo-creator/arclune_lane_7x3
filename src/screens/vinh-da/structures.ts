@@ -137,7 +137,7 @@ const isOutsideCastleBuildPadding = (x: number): boolean => (
   || x >= CASTLE_OUTER_RIGHT + BUILD_SITE_CASTLE_PADDING
 );
 
-const createGroundBuildSites = (): BuildSite[] => {
+export const createGroundBuildSites = (): BuildSite[] => {
   const sites: BuildSite[] = [];
   const minX = BUILD_SITE_EDGE_PADDING;
   const maxX = WORLD_WIDTH - BUILD_SITE_EDGE_PADDING;
