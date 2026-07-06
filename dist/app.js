@@ -38205,11 +38205,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const isStructureAllowedOnBuildSite = __dep4.isStructureAllowedOnBuildSite;
   const __dep5 = __require('./screens/vinh-da/simulation.ts');
   const DAY_DURATION_SECONDS = __dep5.DAY_DURATION_SECONDS;
+  const getVinhDaWaveConfig = __dep5.getVinhDaWaveConfig;
   const runtimeDamageBase = __dep5.damageBase;
   const runtimeDamageStructure = __dep5.damageStructure;
   const runtimeClearEnemiesWithoutReward = __dep5.clearEnemiesWithoutReward;
   const runtimeRemoveEnemyAt = __dep5.removeEnemyAt;
-  const runtimeSpawnEnemy = __dep5.spawnEnemy;
+  const runtimeSpawnWaveEnemy = __dep5.spawnWaveEnemy;
   const runtimeUpdateDayNightTimer = __dep5.updateDayNightTimer;
   const runtimeUpdateEnemies = __dep5.updateEnemies;
   const runtimeUpdateStructures = __dep5.updateStructures;
@@ -38294,6 +38295,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let dayNightPhase = 'night';
       let phaseRemainingSeconds = DAY_DURATION_SECONDS;
       let leaderAttackCooldown = 0;
+      let nightIndex = 1;
+      let waveThreatBudgetRemaining = getVinhDaWaveConfig(nightIndex).threatBudget;
       const section = document.createElement('section');
       section.className = 'vinh-da-game';
       const mount = mountSection({ root, section, rootClasses: 'app--vinh-da-gameplay' });
@@ -38303,6 +38306,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           <strong>Vĩnh Dạ · ${leader?.name ?? leaderId ?? 'Leader'}</strong>
           <div>Huyết ấn thạch: <span data-role="blood-seal-stone">${bloodSealStone}</span></div>
           <div>Phase: <span data-role="day-night-phase"></span></div>
+          <div>Đêm: <span data-role="night-index"></span> · Budget: <span data-role="wave-threat-budget"></span></div>
           <div>Còn lại: <span data-role="phase-time-remaining"></span></div>
         </div>
         <button class="vinh-da-game__back" type="button" aria-label="Về World Map">↩</button>
@@ -38325,6 +38329,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const bloodSealStoneText = section.querySelector('[data-role="blood-seal-stone"]');
       const dayNightPhaseText = section.querySelector('[data-role="day-night-phase"]');
       const phaseTimeRemainingText = section.querySelector('[data-role="phase-time-remaining"]');
+      const nightIndexText = section.querySelector('[data-role="night-index"]');
+      const waveThreatBudgetText = section.querySelector('[data-role="wave-threat-budget"]');
       const siteElements = new Map();
       const buildMenuElements = new Map();
       const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS];
@@ -38395,6 +38401,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const renderDayNightTimer = () => {
           if (dayNightPhaseText)
               dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
+          if (nightIndexText)
+              nightIndexText.textContent = String(simulationState.nightIndex);
+          if (waveThreatBudgetText)
+              waveThreatBudgetText.textContent = simulationState.dayNightPhase === 'night' ? simulationState.waveThreatBudgetRemaining.toFixed(1) : 'clear';
           if (phaseTimeRemainingText) {
               const totalSeconds = Math.max(0, Math.ceil(simulationState.phaseRemainingSeconds));
               const minutes = Math.floor(totalSeconds / 60);
@@ -38582,7 +38592,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           dayNightPhase,
           phaseRemainingSeconds,
           leaderAttackCooldown,
-          structures
+          structures,
+          nightIndex,
+          waveThreatBudgetRemaining,
       };
       const simulationContext = {
           state: simulationState,
@@ -38606,8 +38618,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           dayNightPhase = simulationState.dayNightPhase;
           phaseRemainingSeconds = simulationState.phaseRemainingSeconds;
           leaderAttackCooldown = simulationState.leaderAttackCooldown;
+          nightIndex = simulationState.nightIndex;
+          waveThreatBudgetRemaining = simulationState.waveThreatBudgetRemaining;
       };
-      const spawnEnemy = (side, kind = 'twisted') => { runtimeSpawnEnemy(simulationContext, side, kind); syncSimulationState(); };
+      const spawnWaveEnemy = (side) => { runtimeSpawnWaveEnemy(simulationContext, side); syncSimulationState(); };
       const removeEnemyAt = (index, reward) => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };
       const clearEnemiesWithoutReward = () => { runtimeClearEnemiesWithoutReward(simulationContext); syncSimulationState(); };
       const damageStructure = (site, runtime, amount, attacker = null) => {
@@ -38775,8 +38789,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       });
       updateCamera();
       renderDayNightTimer();
-      spawnEnemy('left');
-      spawnEnemy('right');
+      spawnWaveEnemy('left');
+      spawnWaveEnemy('right');
       renderEnemies();
       rafId = window.requestAnimationFrame(tick);
       return {
@@ -38828,6 +38842,37 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const BASE_STRUCTURE_STATS = __dep2.BASE_STRUCTURE_STATS;
   const getStructureLevelStat = __dep2.getStructureLevelStat;
   const DAY_DURATION_SECONDS = 300;
+  const VINH_DA_WAVE_TABLE = Object.freeze([
+      { minNightIndex: 1, mapTier: 1.1, threatBudget: 8, enemyWeights: { twisted: 5, crawler: 3, madDog: 1 } },
+      { minNightIndex: 3, mapTier: 1.1, threatBudget: 13, enemyWeights: { twisted: 4, crawler: 4, madDog: 2 } },
+      { minNightIndex: 5, mapTier: 1.2, threatBudget: 20, enemyWeights: { twisted: 3, crawler: 3, madDog: 2, suicideBomber: 2, darkMage: 1, ironMan: 1 } },
+      { minNightIndex: 8, mapTier: 1.2, threatBudget: 28, enemyWeights: { crawler: 3, madDog: 2, suicideBomber: 2, darkMage: 2, ironMan: 2, mutantBird: 1 } },
+      { minNightIndex: 12, mapTier: 1.3, threatBudget: 40, enemyWeights: { crawler: 2, madDog: 2, suicideBomber: 2, darkMage: 3, ironMan: 3, mutantBird: 2, resentfulDragon: 0.35 } }
+  ]);
+  const getVinhDaWaveConfig = (nightIndex, mapTier = 1.1) => {
+      const targetNight = Math.max(1, Math.floor(nightIndex));
+      let selected = VINH_DA_WAVE_TABLE[0];
+      for (const config of VINH_DA_WAVE_TABLE) {
+          if (config.minNightIndex <= targetNight && config.mapTier <= mapTier)
+              selected = config;
+      }
+      return selected;
+  };
+  const chooseEnemyKindForBudget = (config, budgetRemaining) => {
+      const choices = Object.entries(config.enemyWeights)
+          .map(([kind, weight]) => ({ kind: kind, rollWeight: weight ?? 0, cost: ENEMY_TEMPLATES[kind]?.weight ?? Number.POSITIVE_INFINITY }))
+          .filter(choice => choice.rollWeight > 0 && choice.cost <= budgetRemaining);
+      const totalWeight = choices.reduce((total, choice) => total + choice.rollWeight, 0);
+      if (totalWeight <= 0)
+          return null;
+      let roll = Math.random() * totalWeight;
+      for (const choice of choices) {
+          roll -= choice.rollWeight;
+          if (roll <= 0)
+              return choice.kind;
+      }
+      return choices[choices.length - 1]?.kind ?? null;
+  };
   const spawnEnemy = (ctx, side, kind = 'twisted') => {
       if (ctx.state.dayNightPhase !== 'night' || ctx.state.enemies.length >= ENEMY_LIMIT)
           return;
@@ -38865,6 +38910,18 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           side
       });
       ctx.state.nextEnemyId += 1;
+  };
+  const spawnWaveEnemy = (ctx, side) => {
+      const config = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier);
+      const kind = chooseEnemyKindForBudget(config, ctx.state.waveThreatBudgetRemaining);
+      if (!kind)
+          return false;
+      const previousNextEnemyId = ctx.state.nextEnemyId;
+      spawnEnemy(ctx, side, kind);
+      if (ctx.state.nextEnemyId === previousNextEnemyId)
+          return false;
+      ctx.state.waveThreatBudgetRemaining = Math.max(0, ctx.state.waveThreatBudgetRemaining - ENEMY_TEMPLATES[kind].weight);
+      return true;
   };
   const BLEED_SECONDS = 3;
   const BLEED_MAX_HP_DPS_PERCENT = 0.03;
@@ -39340,7 +39397,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       ctx.state.leaderAttackCooldown = Math.max(0, ctx.state.leaderAttackCooldown - dt);
       while (ctx.state.dayNightPhase === 'night' && ctx.state.enemySpawnTimer >= ENEMY_SPAWN_INTERVAL) {
           ctx.state.enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
-          spawnEnemy(ctx, ctx.state.nextEnemyId % 2 === 0 ? 'left' : 'right');
+          if (!spawnWaveEnemy(ctx, ctx.state.nextEnemyId % 2 === 0 ? 'left' : 'right'))
+              break;
       }
       for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1) {
           const enemy = ctx.state.enemies[i];
@@ -39415,6 +39473,10 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           if (ctx.state.dayNightPhase === 'day') {
               clearEnemiesWithoutReward(ctx);
               convertContaminationToApostles(ctx);
+          }
+          else {
+              ctx.state.nightIndex += 1;
+              ctx.state.waveThreatBudgetRemaining = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier).threatBudget;
           }
       }
       ctx.renderDayNightTimer();
@@ -39675,7 +39737,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'DAY_DURATION_SECONDS')) exports.DAY_DURATION_SECONDS = DAY_DURATION_SECONDS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getVinhDaWaveConfig')) exports.getVinhDaWaveConfig = getVinhDaWaveConfig;
   if (!Object.prototype.hasOwnProperty.call(exports, 'spawnEnemy')) exports.spawnEnemy = spawnEnemy;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'spawnWaveEnemy')) exports.spawnWaveEnemy = spawnWaveEnemy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'removeEnemyAt')) exports.removeEnemyAt = removeEnemyAt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearEnemiesWithoutReward')) exports.clearEnemiesWithoutReward = clearEnemiesWithoutReward;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBlockingWall')) exports.getBlockingWall = getBlockingWall;

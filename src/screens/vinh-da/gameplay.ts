@@ -22,7 +22,6 @@ import {
   STYLE_ID,
   WORLD_WIDTH
 } from './constants.ts';
-import type { EnemyKind } from './enemies.ts';
 import {
   BUILD_LEVEL_COST,
   BUILD_NODE_OPTIONS,
@@ -35,11 +34,12 @@ import {
 import type { StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import {
   DAY_DURATION_SECONDS,
+  getVinhDaWaveConfig,
   damageBase as runtimeDamageBase,
   damageStructure as runtimeDamageStructure,
   clearEnemiesWithoutReward as runtimeClearEnemiesWithoutReward,
   removeEnemyAt as runtimeRemoveEnemyAt,
-  spawnEnemy as runtimeSpawnEnemy,
+  spawnWaveEnemy as runtimeSpawnWaveEnemy,
   updateDayNightTimer as runtimeUpdateDayNightTimer,
   updateEnemies as runtimeUpdateEnemies,
   updateStructures as runtimeUpdateStructures
@@ -136,6 +136,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let dayNightPhase: DayNightPhase = 'night';
   let phaseRemainingSeconds = DAY_DURATION_SECONDS;
   let leaderAttackCooldown = 0;
+  let nightIndex = 1;
+  let waveThreatBudgetRemaining = getVinhDaWaveConfig(nightIndex).threatBudget;
 
   const section = document.createElement('section');
   section.className = 'vinh-da-game';
@@ -146,6 +148,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         <strong>Vĩnh Dạ · ${leader?.name ?? leaderId ?? 'Leader'}</strong>
         <div>Huyết ấn thạch: <span data-role="blood-seal-stone">${bloodSealStone}</span></div>
         <div>Phase: <span data-role="day-night-phase"></span></div>
+        <div>Đêm: <span data-role="night-index"></span> · Budget: <span data-role="wave-threat-budget"></span></div>
         <div>Còn lại: <span data-role="phase-time-remaining"></span></div>
       </div>
       <button class="vinh-da-game__back" type="button" aria-label="Về World Map">↩</button>
@@ -169,6 +172,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const bloodSealStoneText = section.querySelector<HTMLElement>('[data-role="blood-seal-stone"]');
   const dayNightPhaseText = section.querySelector<HTMLElement>('[data-role="day-night-phase"]');
   const phaseTimeRemainingText = section.querySelector<HTMLElement>('[data-role="phase-time-remaining"]');
+  const nightIndexText = section.querySelector<HTMLElement>('[data-role="night-index"]');
+  const waveThreatBudgetText = section.querySelector<HTMLElement>('[data-role="wave-threat-budget"]');
   const siteElements = new Map<string, HTMLElement>();
   const buildMenuElements = new Map<string, HTMLDivElement>();
   const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS] as const;
@@ -236,6 +241,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
   const renderDayNightTimer = (): void => {
     if (dayNightPhaseText) dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
+    if (nightIndexText) nightIndexText.textContent = String(simulationState.nightIndex);
+    if (waveThreatBudgetText) waveThreatBudgetText.textContent = simulationState.dayNightPhase === 'night' ? simulationState.waveThreatBudgetRemaining.toFixed(1) : 'clear';
     if (phaseTimeRemainingText){
       const totalSeconds = Math.max(0, Math.ceil(simulationState.phaseRemainingSeconds));
       const minutes = Math.floor(totalSeconds / 60);
@@ -416,7 +423,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     dayNightPhase,
     phaseRemainingSeconds,
     leaderAttackCooldown,
-    structures
+    structures,
+    nightIndex,
+    waveThreatBudgetRemaining,
   };
   const simulationContext: VinhDaSimulationContext = {
     state: simulationState,
@@ -440,8 +449,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     dayNightPhase = simulationState.dayNightPhase;
     phaseRemainingSeconds = simulationState.phaseRemainingSeconds;
     leaderAttackCooldown = simulationState.leaderAttackCooldown;
+    nightIndex = simulationState.nightIndex;
+    waveThreatBudgetRemaining = simulationState.waveThreatBudgetRemaining;
   };
-  const spawnEnemy = (side: Side, kind: EnemyKind = 'twisted'): void => { runtimeSpawnEnemy(simulationContext, side, kind); syncSimulationState(); };
+  const spawnWaveEnemy = (side: Side): void => { runtimeSpawnWaveEnemy(simulationContext, side); syncSimulationState(); };
   const removeEnemyAt = (index: number, reward: boolean): void => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };
   const clearEnemiesWithoutReward = (): void => { runtimeClearEnemiesWithoutReward(simulationContext); syncSimulationState(); };
   const damageStructure = (site: BuildSite, runtime: StructureRuntime, amount: number, attacker: Enemy | null = null): boolean => {
@@ -597,8 +608,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   });
   updateCamera();
   renderDayNightTimer();
-  spawnEnemy('left');
-  spawnEnemy('right');
+  spawnWaveEnemy('left');
+  spawnWaveEnemy('right');
   renderEnemies();
   rafId = window.requestAnimationFrame(tick);
 

@@ -25,13 +25,51 @@ import {
   WORLD_WIDTH
 } from './constants.ts';
 import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES } from './enemies.ts';
-import type { EnemyKind, EnemyTemplate } from './enemies.ts';
+import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
 import { BASE_STRUCTURE_STATS, getStructureLevelStat } from './structures.ts';
 import type { ElementalTowerElement, StructureType } from './structures.ts';
 import type { BuildSite, Enemy, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
 export const DAY_DURATION_SECONDS = 300;
 export type DayNightPhase = 'day' | 'night';
+
+export interface VinhDaWaveConfig {
+  minNightIndex: number;
+  mapTier: EnemyTier;
+  threatBudget: number;
+  enemyWeights: Partial<Record<EnemyKind, number>>;
+}
+
+const VINH_DA_WAVE_TABLE: readonly VinhDaWaveConfig[] = Object.freeze([
+  { minNightIndex: 1, mapTier: 1.1, threatBudget: 8, enemyWeights: { twisted: 5, crawler: 3, madDog: 1 } },
+  { minNightIndex: 3, mapTier: 1.1, threatBudget: 13, enemyWeights: { twisted: 4, crawler: 4, madDog: 2 } },
+  { minNightIndex: 5, mapTier: 1.2, threatBudget: 20, enemyWeights: { twisted: 3, crawler: 3, madDog: 2, suicideBomber: 2, darkMage: 1, ironMan: 1 } },
+  { minNightIndex: 8, mapTier: 1.2, threatBudget: 28, enemyWeights: { crawler: 3, madDog: 2, suicideBomber: 2, darkMage: 2, ironMan: 2, mutantBird: 1 } },
+  { minNightIndex: 12, mapTier: 1.3, threatBudget: 40, enemyWeights: { crawler: 2, madDog: 2, suicideBomber: 2, darkMage: 3, ironMan: 3, mutantBird: 2, resentfulDragon: 0.35 } }
+]);
+
+export const getVinhDaWaveConfig = (nightIndex: number, mapTier: EnemyTier = 1.1): VinhDaWaveConfig => {
+  const targetNight = Math.max(1, Math.floor(nightIndex));
+  let selected = VINH_DA_WAVE_TABLE[0]!;
+  for (const config of VINH_DA_WAVE_TABLE){
+    if (config.minNightIndex <= targetNight && config.mapTier <= mapTier) selected = config;
+  }
+  return selected;
+};
+
+const chooseEnemyKindForBudget = (config: VinhDaWaveConfig, budgetRemaining: number): EnemyKind | null => {
+  const choices = Object.entries(config.enemyWeights)
+    .map(([kind, weight]) => ({ kind: kind as EnemyKind, rollWeight: weight ?? 0, cost: ENEMY_TEMPLATES[kind as EnemyKind]?.weight ?? Number.POSITIVE_INFINITY }))
+    .filter(choice => choice.rollWeight > 0 && choice.cost <= budgetRemaining);
+  const totalWeight = choices.reduce((total, choice) => total + choice.rollWeight, 0);
+  if (totalWeight <= 0) return null;
+  let roll = Math.random() * totalWeight;
+  for (const choice of choices){
+    roll -= choice.rollWeight;
+    if (roll <= 0) return choice.kind;
+  }
+  return choices[choices.length - 1]?.kind ?? null;
+};
 
 export interface VinhDaSimulationState {
   bloodSealStone: number;
@@ -47,6 +85,9 @@ export interface VinhDaSimulationState {
   phaseRemainingSeconds: number;
   leaderAttackCooldown: number;
   structures: Map<string, PlacedStructure>;
+  nightIndex: number;
+  mapTier?: EnemyTier;
+  waveThreatBudgetRemaining: number;
 }
 
 export interface VinhDaSimulationContext {
@@ -100,6 +141,17 @@ export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: Enemy
     });
     ctx.state.nextEnemyId += 1;
   };
+
+export const spawnWaveEnemy = (ctx: VinhDaSimulationContext, side: Side): boolean => {
+  const config = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier);
+  const kind = chooseEnemyKindForBudget(config, ctx.state.waveThreatBudgetRemaining);
+  if (!kind) return false;
+  const previousNextEnemyId = ctx.state.nextEnemyId;
+  spawnEnemy(ctx, side, kind);
+  if (ctx.state.nextEnemyId === previousNextEnemyId) return false;
+  ctx.state.waveThreatBudgetRemaining = Math.max(0, ctx.state.waveThreatBudgetRemaining - ENEMY_TEMPLATES[kind].weight);
+  return true;
+};
 const BLEED_SECONDS = 3;
 const BLEED_MAX_HP_DPS_PERCENT = 0.03;
 const BLEED_STACK_CAP = 5;
@@ -529,7 +581,7 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
     ctx.state.leaderAttackCooldown = Math.max(0, ctx.state.leaderAttackCooldown - dt);
     while (ctx.state.dayNightPhase === 'night' && ctx.state.enemySpawnTimer >= ENEMY_SPAWN_INTERVAL){
       ctx.state.enemySpawnTimer -= ENEMY_SPAWN_INTERVAL;
-      spawnEnemy(ctx, ctx.state.nextEnemyId % 2 === 0 ? 'left' : 'right');
+      if (!spawnWaveEnemy(ctx, ctx.state.nextEnemyId % 2 === 0 ? 'left' : 'right')) break;
     }
 
     for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1){
@@ -598,6 +650,9 @@ export const updateDayNightTimer = (ctx: VinhDaSimulationContext, dt: number): v
       if (ctx.state.dayNightPhase === 'day'){
         clearEnemiesWithoutReward(ctx);
         convertContaminationToApostles(ctx);
+        } else {
+        ctx.state.nightIndex += 1;
+        ctx.state.waveThreatBudgetRemaining = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier).threatBudget;
       }
     }
     ctx.renderDayNightTimer();
