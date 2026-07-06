@@ -115,7 +115,7 @@ export const WALL_LEVELS = {
 export const BUILD_NODE_OPTIONS = [
   { label: 'Tháp', type: 'watchtower' },
   { label: 'Tường', type: 'wall' },
-  { label: 'Bẫy', type: 'elementalTower' },
+  { label: 'Tháp Nguyên Tố', type: 'elementalTower' },
   { label: 'Pha lê', type: 'crystalSeal' },
   { label: 'Ấn', type: 'church' },
   { label: 'Trại', type: 'barracks' }
@@ -145,9 +145,10 @@ export const STRUCTURE_SURFACES: Record<StructureType, readonly BuildSiteKind[]>
 
 export const isStructureAllowedOnBuildSite = (type: StructureType, site: Pick<BuildSite, 'kind'>): boolean => STRUCTURE_SURFACES[type].includes(site.kind);
 
-export const ROCK_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church', 'crystalSeal'] as const satisfies readonly StructureType[];
-export const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'spikeTrap', 'swamp', 'antiAirCannon', 'gravityCannon'] as const satisfies readonly StructureType[];
-export const WALL_BUILD_SITE_ALLOWED = ['wall'] as const satisfies readonly StructureType[];
+const STRUCTURE_TYPES = Object.keys(STRUCTURE_SURFACES) as StructureType[];
+export const ROCK_BUILD_SITE_ALLOWED = STRUCTURE_TYPES.filter(type => STRUCTURE_SURFACES[type].includes('rock'));
+export const GROUND_BUILD_SITE_ALLOWED = STRUCTURE_TYPES.filter(type => STRUCTURE_SURFACES[type].includes('ground'));
+export const WALL_BUILD_SITE_ALLOWED = STRUCTURE_TYPES.filter(type => STRUCTURE_SURFACES[type].includes('wall-slot'));
 export const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
 
 const METERS_TO_WORLD_UNITS = 460 / 150;

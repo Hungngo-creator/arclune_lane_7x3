@@ -38521,7 +38521,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
                       : action
                           ? !(isLv3Branch || isLv5Branch || canToggleGravity)
                           : !canMount)
-                  : isUpgradeNode || Boolean(action) || !type || !site.allowed.includes(type);
+                  : isUpgradeNode || Boolean(action) || !type || !isStructureAllowedOnBuildSite(type, site);
               if (node instanceof HTMLButtonElement)
                   node.disabled = !node.hidden && !canAfford(cost);
           }
@@ -39914,7 +39914,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   const BUILD_NODE_OPTIONS = [
       { label: 'Tháp', type: 'watchtower' },
       { label: 'Tường', type: 'wall' },
-      { label: 'Bẫy', type: 'elementalTower' },
+      { label: 'Tháp Nguyên Tố', type: 'elementalTower' },
       { label: 'Pha lê', type: 'crystalSeal' },
       { label: 'Ấn', type: 'church' },
       { label: 'Trại', type: 'barracks' }
@@ -39940,9 +39940,10 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       gravityCannon: ['ground'],
   };
   const isStructureAllowedOnBuildSite = (type, site) => STRUCTURE_SURFACES[type].includes(site.kind);
-  const ROCK_BUILD_SITE_ALLOWED = ['watchtower', 'elementalTower', 'barracks', 'church', 'crystalSeal'];
-  const GROUND_BUILD_SITE_ALLOWED = ['landmine', 'spikeTrap', 'swamp', 'antiAirCannon', 'gravityCannon'];
-  const WALL_BUILD_SITE_ALLOWED = ['wall'];
+  const STRUCTURE_TYPES = Object.keys(STRUCTURE_SURFACES);
+  const ROCK_BUILD_SITE_ALLOWED = STRUCTURE_TYPES.filter(type => STRUCTURE_SURFACES[type].includes('rock'));
+  const GROUND_BUILD_SITE_ALLOWED = STRUCTURE_TYPES.filter(type => STRUCTURE_SURFACES[type].includes('ground'));
+  const WALL_BUILD_SITE_ALLOWED = STRUCTURE_TYPES.filter(type => STRUCTURE_SURFACES[type].includes('wall-slot'));
   const CASTLE_GROUND_BUILD_SITE_ALLOWED = GROUND_BUILD_SITE_ALLOWED;
   const METERS_TO_WORLD_UNITS = 460 / 150;
   const metersToWorldUnits = (meters) => Math.round(meters * METERS_TO_WORLD_UNITS);

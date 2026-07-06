@@ -358,7 +358,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
                 ? !(isLv3Branch || isLv5Branch || canToggleGravity)
                 : !canMount
           )
-        : isUpgradeNode || Boolean(action) || !type || !site.allowed.includes(type);
+        : isUpgradeNode || Boolean(action) || !type || !isStructureAllowedOnBuildSite(type, site);
       if (node instanceof HTMLButtonElement) node.disabled = !node.hidden && !canAfford(cost);
     }
   };
