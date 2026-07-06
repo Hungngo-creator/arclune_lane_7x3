@@ -24,7 +24,7 @@ import {
   SWAMP_RADIUS,
   WORLD_WIDTH
 } from './constants.ts';
-import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES } from './enemies.ts';
+import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, reduceDamageByDefense, scaleEnemyTierStat } from './enemies.ts';
 import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
 import { BASE_STRUCTURE_STATS, getStructureLevelStat } from './structures.ts';
 import type { ElementalTowerElement, StructureType } from './structures.ts';
@@ -114,23 +114,27 @@ export interface VinhDaSimulationContext {
 export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: EnemyKind = 'twisted'): void => {
     if (ctx.state.dayNightPhase !== 'night' || ctx.state.enemies.length >= ENEMY_LIMIT) return;
     const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
+  const tier = ctx.state.mapTier ?? template.tier;
+    const hp = scaleEnemyTierStat(template.hp, tier);
+    const atk = scaleEnemyTierStat(template.atk, tier);
+    const wil = scaleEnemyTierStat(template.wil, tier);
     ctx.state.enemies.push({
       id: ctx.state.nextEnemyId,
       x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
       kind: template.kind,
-      hp: template.hp,
-      maxHp: template.hp,
+      hp,
+      maxHp: hp,
       speed: template.speed,
       baseSpeed: template.speed,
       groundSpeed: template.groundSpeed,
       flySpeed: template.flySpeed,
       weight: template.weight,
       attackCooldown: template.attackCooldown,
-      atk: template.atk,
-      wil: template.wil,
+      atk,
+      wil,
       arm: template.arm,
       res: template.res,
-      tier: template.tier,
+      tier,
       rank: template.rank,
       projectileSpeed: template.projectileSpeed,
       attackShape: template.attackShape,
@@ -260,11 +264,13 @@ export const getBlockingWall = (ctx: VinhDaSimulationContext, enemy: Enemy): { s
     return null;
   };
 export const damageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, amount: number): boolean => {
-    enemy.hp -= amount;
+    const atkPart = reduceDamageByDefense(amount * 0.5, enemy.arm);
+    const wilPart = reduceDamageByDefense(amount * 0.5, enemy.res);
+    enemy.hp -= atkPart + wilPart;
     return enemy.hp <= 0;
   };
 
-const BLOOD_MAX_HP_STACK_CAP = 5;
+const BLOOD_MAX_HP_STACK_CAP = 17;
 const getBaseStat = (ctx: VinhDaSimulationContext) => BASE_STRUCTURE_STATS[ctx.state.baseLevel ?? 0] ?? BASE_STRUCTURE_STATS[0]!;
 const getChurchHealingBonus = (ctx: VinhDaSimulationContext): number => {
   let bonus = getBaseStat(ctx).healingBonusPercent ?? 0;
@@ -285,22 +291,17 @@ const applyElementEffect = (ctx: VinhDaSimulationContext, enemy: Enemy, element:
       {
         const statuses = ensureStatuses(enemy);
         statuses.burnSeconds = Math.max(statuses.burnSeconds ?? 0, 3);
-        statuses.burnDps = Math.max(statuses.burnDps ?? 0, damage * 0.35);
+        statuses.burnDps = Math.max(statuses.burnDps ?? 0, damage * 0.2);
       }
       break;
     case 'Mộc':
-      healBase(ctx, Math.max(1, damage * 0.6));
+      healBase(ctx, Math.max(0.1, damage * 0.05));;
       break;
     case 'Thủy':
-      const statuses = ensureStatuses(enemy);
-      statuses.slowSeconds = Math.max(statuses.slowSeconds ?? 0, 2.5);
-      statuses.slowMultiplier = Math.min(statuses.slowMultiplier ?? 1, 0.72);
       break;
     case 'Thổ':
-      enemy.attackCooldown += 0.4;
       break;
     case 'Kim':
-      enemy.hp -= damage * 0.25;
       break;
     case 'Lôi':
       {
@@ -317,8 +318,7 @@ const applyElementEffect = (ctx: VinhDaSimulationContext, enemy: Enemy, element:
       const stacks = Math.min(BLOOD_MAX_HP_STACK_CAP, (enemy.bloodMaxHpStacks ?? 0) + 1);
       if (stacks !== (enemy.bloodMaxHpStacks ?? 0)){
         enemy.bloodMaxHpStacks = stacks;
-        enemy.maxHp = Math.max(1, enemy.maxHp * 0.97);
-        enemy.hp = Math.min(enemy.hp, enemy.maxHp);
+        healBase(ctx, damage * 0.03);
       }
       break;
     }
@@ -886,10 +886,24 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
           .slice(0, stat.maxTargets ?? 1);
         if (targets.length <= 0) continue;
         runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+        const explosionHitIds = new Set<number>();
         for (const target of targets){
-          const bonus = target.lightVulnerableSeconds && target.lightVulnerableSeconds > 0 ? 1.2 : 1;
-          if (stat.element) applyElementEffect(ctx, target, stat.element, stat.damage ?? 0, site.x);
-          if (damageEnemy(ctx, target, (stat.damage ?? 0) * bonus)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+          const baseDamage = stat.damage ?? 0;
+          const bonus = stat.element === 'Ánh Sáng' ? 1.1 : target.lightVulnerableSeconds && target.lightVulnerableSeconds > 0 ? 1.2 : 1;
+          if (stat.element) applyElementEffect(ctx, target, stat.element, baseDamage, site.x);
+          if (damageEnemy(ctx, target, baseDamage * bonus)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+          if (type === 'elementalTower' && structure.level >= 4){
+            const splashDamage = structure.level >= 5 ? 2.5 : 1;
+            const splashLimit = structure.level >= 5 ? 5 : 3;
+            const splashRange = structure.level >= 5 ? 90 : 60;
+            const splashTargets = ctx.state.enemies
+              .filter(enemy => enemy.id !== target.id && !explosionHitIds.has(enemy.id) && Math.abs(enemy.x - target.x) <= splashRange)
+              .slice(0, splashLimit);
+            for (const splashTarget of splashTargets){
+              explosionHitIds.add(splashTarget.id);
+              if (damageEnemy(ctx, splashTarget, splashDamage * bonus)) removeEnemyAt(ctx, ctx.state.enemies.indexOf(splashTarget), true);
+            }
+          }
         }
       }
     }

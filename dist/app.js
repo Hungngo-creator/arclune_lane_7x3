@@ -38286,7 +38286,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let selectedGroundPlotId = null;
       let bloodSealStone = 0;
       let carriedDaThach = 0;
-      let baseHp = 100;
+      let baseHp = 20;
       const keys = new Set();
       const structures = new Map();
       const structureRuntimes = new Map();
@@ -38878,6 +38878,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const __dep1 = __require('./screens/vinh-da/enemies.ts');
   const DEFAULT_ENEMY_TEMPLATE = __dep1.DEFAULT_ENEMY_TEMPLATE;
   const ENEMY_TEMPLATES = __dep1.ENEMY_TEMPLATES;
+  const reduceDamageByDefense = __dep1.reduceDamageByDefense;
+  const scaleEnemyTierStat = __dep1.scaleEnemyTierStat;
   const __dep2 = __require('./screens/vinh-da/structures.ts');
   const BASE_STRUCTURE_STATS = __dep2.BASE_STRUCTURE_STATS;
   const getStructureLevelStat = __dep2.getStructureLevelStat;
@@ -38920,23 +38922,27 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if (ctx.state.dayNightPhase !== 'night' || ctx.state.enemies.length >= ENEMY_LIMIT)
           return;
       const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
+      const tier = ctx.state.mapTier ?? template.tier;
+      const hp = scaleEnemyTierStat(template.hp, tier);
+      const atk = scaleEnemyTierStat(template.atk, tier);
+      const wil = scaleEnemyTierStat(template.wil, tier);
       ctx.state.enemies.push({
           id: ctx.state.nextEnemyId,
           x: side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING,
           kind: template.kind,
-          hp: template.hp,
-          maxHp: template.hp,
+          hp,
+          maxHp: hp,
           speed: template.speed,
           baseSpeed: template.speed,
           groundSpeed: template.groundSpeed,
           flySpeed: template.flySpeed,
           weight: template.weight,
           attackCooldown: template.attackCooldown,
-          atk: template.atk,
-          wil: template.wil,
+          atk,
+          wil,
           arm: template.arm,
           res: template.res,
-          tier: template.tier,
+          tier,
           rank: template.rank,
           projectileSpeed: template.projectileSpeed,
           attackShape: template.attackShape,
@@ -39084,10 +39090,12 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       return null;
   };
   const damageEnemy = (ctx, enemy, amount) => {
-      enemy.hp -= amount;
+      const atkPart = reduceDamageByDefense(amount * 0.5, enemy.arm);
+      const wilPart = reduceDamageByDefense(amount * 0.5, enemy.res);
+      enemy.hp -= atkPart + wilPart;
       return enemy.hp <= 0;
   };
-  const BLOOD_MAX_HP_STACK_CAP = 5;
+  const BLOOD_MAX_HP_STACK_CAP = 17;
   const getBaseStat = (ctx) => BASE_STRUCTURE_STATS[ctx.state.baseLevel ?? 0] ?? BASE_STRUCTURE_STATS[0];
   const getChurchHealingBonus = (ctx) => {
       let bonus = getBaseStat(ctx).healingBonusPercent ?? 0;
@@ -39109,22 +39117,18 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               {
                   const statuses = ensureStatuses(enemy);
                   statuses.burnSeconds = Math.max(statuses.burnSeconds ?? 0, 3);
-                  statuses.burnDps = Math.max(statuses.burnDps ?? 0, damage * 0.35);
+                  statuses.burnDps = Math.max(statuses.burnDps ?? 0, damage * 0.2);
               }
               break;
           case 'Mộc':
-              healBase(ctx, Math.max(1, damage * 0.6));
+              healBase(ctx, Math.max(0.1, damage * 0.05));
+              ;
               break;
           case 'Thủy':
-              const statuses = ensureStatuses(enemy);
-              statuses.slowSeconds = Math.max(statuses.slowSeconds ?? 0, 2.5);
-              statuses.slowMultiplier = Math.min(statuses.slowMultiplier ?? 1, 0.72);
               break;
           case 'Thổ':
-              enemy.attackCooldown += 0.4;
               break;
           case 'Kim':
-              enemy.hp -= damage * 0.25;
               break;
           case 'Lôi':
               {
@@ -39141,8 +39145,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               const stacks = Math.min(BLOOD_MAX_HP_STACK_CAP, (enemy.bloodMaxHpStacks ?? 0) + 1);
               if (stacks !== (enemy.bloodMaxHpStacks ?? 0)) {
                   enemy.bloodMaxHpStacks = stacks;
-                  enemy.maxHp = Math.max(1, enemy.maxHp * 0.97);
-                  enemy.hp = Math.min(enemy.hp, enemy.maxHp);
+                  healBase(ctx, damage * 0.03);
               }
               break;
           }
@@ -39783,12 +39786,27 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               if (targets.length <= 0)
                   continue;
               runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+              const explosionHitIds = new Set();
               for (const target of targets) {
-                  const bonus = target.lightVulnerableSeconds && target.lightVulnerableSeconds > 0 ? 1.2 : 1;
+                  const baseDamage = stat.damage ?? 0;
+                  const bonus = stat.element === 'Ánh Sáng' ? 1.1 : target.lightVulnerableSeconds && target.lightVulnerableSeconds > 0 ? 1.2 : 1;
                   if (stat.element)
-                      applyElementEffect(ctx, target, stat.element, stat.damage ?? 0, site.x);
-                  if (damageEnemy(ctx, target, (stat.damage ?? 0) * bonus))
+                      applyElementEffect(ctx, target, stat.element, baseDamage, site.x);
+                  if (damageEnemy(ctx, target, baseDamage * bonus))
                       removeEnemyAt(ctx, ctx.state.enemies.indexOf(target), true);
+                  if (type === 'elementalTower' && structure.level >= 4) {
+                      const splashDamage = structure.level >= 5 ? 2.5 : 1;
+                      const splashLimit = structure.level >= 5 ? 5 : 3;
+                      const splashRange = structure.level >= 5 ? 90 : 60;
+                      const splashTargets = ctx.state.enemies
+                          .filter(enemy => enemy.id !== target.id && !explosionHitIds.has(enemy.id) && Math.abs(enemy.x - target.x) <= splashRange)
+                          .slice(0, splashLimit);
+                      for (const splashTarget of splashTargets) {
+                          explosionHitIds.add(splashTarget.id);
+                          if (damageEnemy(ctx, splashTarget, splashDamage * bonus))
+                              removeEnemyAt(ctx, ctx.state.enemies.indexOf(splashTarget), true);
+                      }
+                  }
               }
           }
       }
@@ -39930,26 +39948,26 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   const metersToWorldUnits = (meters) => Math.round(meters * METERS_TO_WORLD_UNITS);
   const WATCHTOWER_RANGE_WORLD_UNITS = metersToWorldUnits(150);
   const ELEMENTAL_TOWER_RANGE_WORLD_UNITS = metersToWorldUnits(100);
-  const LORE_HOUR_SECONDS = 60;
+  const LORE_HOUR_SECONDS = 10;
   const CONTAMINATION_CLEANSE_SECONDS = 2 * LORE_HOUR_SECONDS;
   const WALL_STRUCTURE_STATS = {
       1: WALL_LEVELS[1],
       2: WALL_LEVELS[2],
   };
   const WATCHTOWER_STRUCTURE_STATS = {
-      1: { hp: 12, maxTargets: 1, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 2, cooldownSeconds: 1.2, projectileSpeed: 8 },
-      2: { hp: 16, maxTargets: 1, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 3, cooldownSeconds: 1.05, projectileSpeed: 8 },
-      3: { hp: 22, maxTargets: 2, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 0.95, projectileSpeed: 8 },
-      4: { hp: 30, maxTargets: 2, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 6, cooldownSeconds: 0.85, projectileSpeed: 8 },
-      5: { hp: 40, maxTargets: 3, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 8, cooldownSeconds: 0.75, projectileSpeed: 8 }
+      1: { hp: 12, maxTargets: 1, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 2, cooldownSeconds: 1, projectileSpeed: 8 },
+      2: { hp: 16, maxTargets: 1, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 3, cooldownSeconds: 1, projectileSpeed: 8 },
+      3: { hp: 22, maxTargets: 2, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 3, cooldownSeconds: 1, projectileSpeed: 8 },
+      4: { hp: 30, maxTargets: 3, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 1, projectileSpeed: 8 },
+      5: { hp: 40, maxTargets: 4, range: WATCHTOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 5, projectileSpeed: 8 }
   };
   const ELEMENTAL_TOWER_ELEMENTS = ['Hỏa', 'Mộc', 'Thủy', 'Thổ', 'Kim', 'Lôi', 'Huyết', 'Ánh Sáng', 'Phong'];
-  const ELEMENTAL_TOWER_STRUCTURE_STATS = Object.fromEntries(ELEMENTAL_TOWER_ELEMENTS.map((element, index) => [element, {
-          1: { hp: 10, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 1.5 + index * 0.05, cooldownSeconds: 1.4, projectileSpeed: 6 },
-          2: { hp: 14, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 2.5 + index * 0.05, cooldownSeconds: 1.3, projectileSpeed: 6 },
-          3: { hp: 20, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 3.5 + index * 0.05, cooldownSeconds: 1.2, projectileSpeed: 6 },
-          4: { hp: 28, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 5 + index * 0.05, cooldownSeconds: 1.05, projectileSpeed: 6 },
-          5: { hp: 36, element, maxTargets: 3, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 6.5 + index * 0.05, cooldownSeconds: 0.95, projectileSpeed: 6 }
+  const ELEMENTAL_TOWER_STRUCTURE_STATS = Object.fromEntries(ELEMENTAL_TOWER_ELEMENTS.map((element) => [element, {
+          1: { hp: 10, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 2, cooldownSeconds: 2, projectileSpeed: 6 },
+          2: { hp: 14, element, maxTargets: 1, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 1.8, projectileSpeed: 6 },
+          3: { hp: 20, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 4, cooldownSeconds: 1.6, projectileSpeed: 6 },
+          4: { hp: 28, element, maxTargets: 2, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 5, cooldownSeconds: 1.5, projectileSpeed: 6 },
+          5: { hp: 36, element, maxTargets: 3, range: ELEMENTAL_TOWER_RANGE_WORLD_UNITS, damage: 7, cooldownSeconds: 3, projectileSpeed: 6 }
       }]));
   const GROUND_STRUCTURE_STATS = {
       elementalTower: ELEMENTAL_TOWER_STRUCTURE_STATS['Hỏa'],
@@ -39969,8 +39987,13 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           5: { hp: 44, buffArmPercent: 0.14, buffResPercent: 0.14, buffAtkPercent: 0.08, buffWilPercent: 0.08, healingBonusPercent: 0.16, shield: 12, prayerIntervalSeconds: 12, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS }
       },
       crystalSeal: {
-          1: { hp: 1 },
-          2: { hp: 1 }
+          0: { hp: 20, arm: 2, res: 2, healPerSecond: 0 },
+          1: { hp: 30, arm: 3, res: 3, healPerSecond: 1 },
+          2: { hp: 40, arm: 4, res: 4, healPerSecond: 2 },
+          3: { hp: 55, arm: 7, res: 7, healPerSecond: 4 },
+          4: { hp: 65, arm: 9, res: 9, healPerSecond: 5 },
+          5: { hp: 80, arm: 11, res: 11, healPerSecond: 5, shield: 0.2 },
+          6: { hp: 80, arm: 11, res: 11, healPerSecond: 3, emergencyHealPercent: 0.2, emergencyCooldownSeconds: 600 }
       },
       landmine: {
           1: { hp: 1 },
@@ -40091,13 +40114,13 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       };
   };
   const BASE_STRUCTURE_STATS = {
-      0: { hp: 100, healPerSecond: 0 },
-      1: { hp: 120, healPerSecond: 0.15, healingBonusPercent: 0.02 },
-      2: { hp: 145, healPerSecond: 0.25, healingBonusPercent: 0.04, shield: 4 },
-      3: { hp: 175, healPerSecond: 0.4, healingBonusPercent: 0.06, shield: 8 },
-      4: { hp: 210, healPerSecond: 0.6, healingBonusPercent: 0.08, shield: 12 },
-      5: { hp: 250, healPerSecond: 0.85, healingBonusPercent: 0.1, shield: 18 },
-      6: { hp: 300, healPerSecond: 1.2, healingBonusPercent: 0.15, shield: 28, emergencyHealPercent: 0.35, emergencyCooldownSeconds: 60 }
+      0: { hp: 20, arm: 2, res: 2, healPerSecond: 0 },
+      1: { hp: 30, arm: 3, res: 3, healPerSecond: 1 },
+      2: { hp: 40, arm: 4, res: 4, healPerSecond: 2 },
+      3: { hp: 55, arm: 7, res: 7, healPerSecond: 4 },
+      4: { hp: 65, arm: 9, res: 9, healPerSecond: 5 },
+      5: { hp: 80, arm: 11, res: 11, healPerSecond: 5, shield: 0.2 },
+      6: { hp: 80, arm: 11, res: 11, healPerSecond: 3, emergencyHealPercent: 0.2, emergencyCooldownSeconds: 600 }
   };
   const getElementalTowerLevelStat = (level, element = 'Hỏa') => ELEMENTAL_TOWER_STRUCTURE_STATS[element][level] ?? ELEMENTAL_TOWER_STRUCTURE_STATS[element][1] ?? { hp: 1 };
   const getStructureLevelStat = (type, level, branchLv3, branchLv5, element) => {
