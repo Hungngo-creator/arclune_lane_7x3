@@ -10,7 +10,7 @@ import {
 } from './constants.ts';
 import type { BuildSite, BuildSiteKind } from './types.ts';
 
-export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal' | 'landmine' | 'swamp' | 'spikeTrap' | 'antiAirCannon' | 'gravityCannon' | 'executionBlade';
+export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal' | 'landmine' | 'swamp' | 'spikeTrap' | 'antiAirCannon' | 'gravityCannon' | 'executionBlade' | 'teleport';
 export type ElementalTowerElement = 'Hỏa' | 'Mộc' | 'Thủy' | 'Thổ' | 'Kim' | 'Lôi' | 'Huyết' | 'Ánh Sáng' | 'Phong';
 
 export interface BuildMenuOption {
@@ -100,6 +100,7 @@ const STRUCTURE_COST_MULTIPLIER: Record<StructureType, number> = {
   antiAirCannon: 1.25,
   gravityCannon: 1.35,
   executionBlade: 1.4,
+  teleport: 1.6,
 };
 
 export const getBuildLevelCost = (type: StructureType, level: number): number => Math.max(1, Math.ceil((BUILD_LEVEL_COST[level as keyof typeof BUILD_LEVEL_COST] ?? BUILD_LEVEL_COST[6]) * (STRUCTURE_COST_MULTIPLIER[type] ?? 1)));
@@ -127,8 +128,9 @@ export const BUILD_NODE_OPTIONS = [
   { label: 'Tháp Nguyên Tố', type: 'elementalTower' },
   { label: 'Đao Phủ', type: 'executionBlade' },
   { label: 'Pha lê', type: 'crystalSeal' },
-  { label: 'Ấn', type: 'church' },
-  { label: 'Trại', type: 'barracks' }
+  { label: 'Nhà Thờ'', type: 'church' },
+  { label: 'Trại', type: 'barracks' },
+  { label: 'Truyền Tống Trận', type: 'teleport' }
 ] as const satisfies readonly BuildMenuOption[];
 
 export const GROUND_BUILD_NODE_OPTIONS = [
@@ -152,6 +154,7 @@ export const STRUCTURE_SURFACES: Record<StructureType, readonly BuildSiteKind[]>
   antiAirCannon: ['ground'],
   gravityCannon: ['ground'],
   executionBlade: ['rock'],
+  teleport: ['ground'],
 } as const;
 
 export const isStructureAllowedOnBuildSite = (type: StructureType, site: Pick<BuildSite, 'kind'>): boolean => STRUCTURE_SURFACES[type].includes(site.kind);
@@ -203,6 +206,14 @@ export const ELEMENTAL_TOWER_STRUCTURE_STATS: Record<ElementalTowerElement, Reco
 export const GROUND_STRUCTURE_STATS: Record<Exclude<StructureType, 'wall' | 'watchtower'>, Record<number, StructureLevelStat>> = {
   elementalTower: ELEMENTAL_TOWER_STRUCTURE_STATS['Hỏa'],
   executionBlade: EXECUTION_BLADE_STRUCTURE_STATS,
+  teleport: {
+    1: { hp: 16, cooldownSeconds: 180 },
+    2: { hp: 22, cooldownSeconds: 160 },
+    3: { hp: 30, cooldownSeconds: 140 },
+    4: { hp: 40, cooldownSeconds: 120 },
+    5: { hp: 52, cooldownSeconds: 100 },
+    6: { hp: 68, cooldownSeconds: 80 }
+  },
   barracks: {
     1: { hp: 18, soldierCap: 1, soldierRank: 1, soldierSpawnSeconds: 10 },
     2: { hp: 24, soldierCap: 2, soldierRank: 1, soldierSpawnSeconds: 9 },

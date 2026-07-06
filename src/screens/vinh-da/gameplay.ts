@@ -31,11 +31,13 @@ import {
   GROUND_BUILD_NODE_OPTIONS,
   BUILD_SITES,
   UPGRADE_NODE_LABEL,
+  ELEMENTAL_TOWER_ELEMENTS,
+  getBaseLevelStat,
   getBuildLevelCost,
   getStructureLevelStat,
   isStructureAllowedOnBuildSite,
 } from './structures.ts';
-import type { StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
+import type { ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import {
   DAY_DURATION_SECONDS,
   getScaledThreatBudget,
@@ -49,9 +51,11 @@ import {
   updateEnemies as runtimeUpdateEnemies,
   updateStructures as runtimeUpdateStructures,
   collectDroppedResources as runtimeCollectDroppedResources,
+  getLivingTerritoryWallBounds,
+  isXInLivingTerritory,
 } from './simulation.ts';
 import type { DayNightPhase, VinhDaSimulationContext, VinhDaSimulationState } from './simulation.ts';
-import type { BuildSite, DroppedResource, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
+import type { BuildSite, DroppedResource, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime, VinhDaStatusCollection } from './types.ts';
 
 type WeatherType = 'clear' | 'drizzle' | 'rain' | 'heavyRain' | 'storm' | 'fog' | 'bloodMoon';
 
@@ -195,6 +199,10 @@ const CSS = /* css */ `
   .vinh-da-game.is-night{background:linear-gradient(#020204 0 58%,#07070b 58% 100%);}
   .vinh-da-game__hud{position:absolute;z-index:5;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none;}
   .vinh-da-game__panel{pointer-events:auto;border:1px solid rgba(210,200,255,.2);border-radius:12px;background:rgba(0,0,0,.5);padding:8px 12px;box-shadow:0 10px 24px rgba(0,0,0,.28);font-size:16px;line-height:1.2;}
+  .vinh-da-game__panel--status{max-width:360px;font-size:13px;}
+  .vinh-da-game__panel--status div{margin-top:3px;}
+  .vinh-da-game__status-warn{color:#ffd166;}
+  .vinh-da-game__status-danger{color:#ff7b9c;}
   .vinh-da-game__back{pointer-events:auto;border:0;border-radius:999px;background:#f3edff;color:#111020;width:42px;height:42px;font-size:22px;cursor:pointer;}
   .vinh-da-game__viewport{position:absolute;inset:0;overflow:hidden;cursor:pointer;}
   .vinh-da-game__world{position:absolute;left:0;top:0;width:${WORLD_WIDTH}px;height:100%;transform:translate3d(0,0,0);will-change:transform;background:radial-gradient(circle at 50% 28%,rgba(87,68,168,.34),transparent 18%),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 220px);}
@@ -247,6 +255,7 @@ const CSS = /* css */ `
   .vinh-da-game__build-menu.is-open{opacity:1;transform:scale(1);pointer-events:auto;}
   .vinh-da-game__build-node{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px;border-radius:999px;border:1px solid rgba(230,220,255,.42);background:rgba(8,8,16,.22);backdrop-filter:blur(2px);color:#f5f0ff;display:grid;place-items:center;font-size:24px;box-shadow:0 0 20px rgba(170,140,255,.2);}
   .vinh-da-game__build-node small{position:absolute;top:48px;font-size:9px;color:#d6ccff;text-shadow:0 1px 4px #000;white-space:nowrap;}
+  .vinh-da-game__build-node em{position:absolute;top:61px;font-style:normal;font-size:8px;color:#f6d68a;text-shadow:0 1px 4px #000;white-space:nowrap;}
   .vinh-da-game__build-node:nth-child(1){transform:translate(0,-58px);}
   .vinh-da-game__build-node:nth-child(2){transform:translate(50px,-29px);}
   .vinh-da-game__build-node:nth-child(3){transform:translate(50px,29px);}
@@ -279,6 +288,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let bloodSealStone = 0;
   let carriedDaThach = 0;
   let baseHp = 20;
+  let baseLevel = 0;
+  const baseStatuses: VinhDaStatusCollection = {};
   let leaderHp = 20;
   let leaderMaxHp = 20;
   let leaderShield = 0;
@@ -318,6 +329,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         <div>Đêm: <span data-role="night-index"></span> · Budget: <span data-role="wave-threat-budget"></span></div>
         <div>Còn lại: <span data-role="phase-time-remaining"></span></div>
       </div>
+      <div class="vinh-da-game__panel vinh-da-game__panel--status" data-role="status-panel"></div>
       <button class="vinh-da-game__back" type="button" aria-label="Về World Map">↩</button>
     </div>
     <div class="vinh-da-game__notice" data-role="notice" aria-live="polite"></div>
@@ -350,6 +362,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const phaseTimeRemainingText = section.querySelector<HTMLElement>('[data-role="phase-time-remaining"]');
   const nightIndexText = section.querySelector<HTMLElement>('[data-role="night-index"]');
   const waveThreatBudgetText = section.querySelector<HTMLElement>('[data-role="wave-threat-budget"]');
+  const statusPanel = section.querySelector<HTMLElement>('[data-role="status-panel"]');
   const siteElements = new Map<string, HTMLElement>();
   const buildMenuElements = new Map<string, HTMLDivElement>();
   const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS] as const;
@@ -374,7 +387,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const ensureStructureRuntime = (structure: PlacedStructure): StructureRuntime => {
     const existing = structureRuntimes.get(structure.siteId);
     if (existing) return existing;
-    const runtime = { cooldown: DEFAULT_STRUCTURE_COOLDOWN, hp: getStructureMaxHp(structure) };
+    const runtime = { cooldown: structure.type === 'teleport' ? 0 : DEFAULT_STRUCTURE_COOLDOWN, hp: getStructureMaxHp(structure) };
     structureRuntimes.set(structure.siteId, runtime);
     return runtime;
   };
@@ -463,6 +476,45 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     if (lightningFlashTimer > 0) lightningFlashTimer = Math.max(0, lightningFlashTimer - dt);
     audio.syncWeather(weather);
   };
+  const formatPercent = (value: number | undefined): string => `${Math.round((value ?? 0) * 100)}%`;
+  const formatSeconds = (value: number | undefined): string => `${Math.ceil(Math.max(0, value ?? 0))}s`;
+  const describeElementEffect = (element: ElementalTowerElement | undefined): string => {
+    switch (element){
+      case 'Hỏa': return 'đốt';
+      case 'Mộc': return 'hồi/bonus heal';
+      case 'Thủy': return 'làm chậm';
+      case 'Thổ': return 'tăng ARM/RES';
+      case 'Kim': return 'tăng ATK/WIL';
+      case 'Lôi': return 'tê liệt';
+      case 'Huyết': return 'tăng max HP';
+      case 'Ánh Sáng': return 'dễ tổn thương';
+      case 'Phong': return 'slow/đẩy lùi';
+      default: return 'hiệu ứng hệ';
+    }
+  };
+  const renderStatusPanel = (): void => {
+    if (!statusPanel) return;
+    const baseStat = getBaseLevelStat(baseLevel);
+    const territoryBounds = getLivingTerritoryWallBounds(simulationContext);
+    const baseInTerritory = isXInLivingTerritory(simulationContext, CRYSTAL_X, territoryBounds);
+    const contaminationStacks = simulationState.baseStatuses?.contaminationStacks ?? simulationState.contamination ?? 0;
+    const church = [...structures.values()].find(structure => structure.type === 'church');
+    const churchRuntime = church ? ensureStructureRuntime(church) : null;
+    const barracks = [...structures.values()].find(structure => structure.type === 'barracks');
+    const barracksRuntime = barracks ? ensureStructureRuntime(barracks) : null;
+    const barracksStat = barracks ? getStructureLevelStat('barracks', barracks.level) : null;
+    const elemental = [...structures.values()].find(structure => structure.type === 'elementalTower');
+    const elementalStat = elemental ? getStructureLevelStat('elementalTower', elemental.level, undefined, undefined, elemental.element) : null;
+    const lines = [
+      `<strong>Pha lê Lv${baseLevel}</strong> HP ${Math.ceil(baseHp)}/${baseStat.hp} · Khiên leader ${Math.ceil(leaderShield)}/${Math.ceil(leaderMaxHp * (baseStat.leaderShieldPercent ?? 0))}`,
+      `<div class="${baseInTerritory ? '' : 'vinh-da-game__status-danger'}">Lãnh địa: ${baseInTerritory ? 'đang bảo hộ' : 'ngoài lãnh địa / buff khóa'} · Emergency CD: ${Math.max(0, leaderEmergencyCooldownUntilNight - nightIndex)} đêm</div>`,
+      `<div class="${contaminationStacks >= 5 ? 'vinh-da-game__status-danger' : contaminationStacks > 0 ? 'vinh-da-game__status-warn' : ''}">Ô nhiễm: ${contaminationStacks}/5 stack${contaminationStacks >= 5 ? ' · sẽ hóa Sứ Đồ' : ''}</div>`,
+    ];
+    if (elemental && elementalStat) lines.push(`<div>Tháp NT: ${elemental.element ?? 'Hỏa'} Lv${elemental.level} · cost ${getBuildLevelCost('elementalTower', elemental.level)} · range ${elementalStat.range ?? 0} · ${describeElementEffect(elemental.element ?? 'Hỏa')}</div>`);
+    if (barracks && barracksStat) lines.push(`<div>Trại: ${barracksRuntime?.soldiers?.length ?? 0}/${barracksStat.soldierCap ?? 0} lính · rank ${barracksStat.soldierRank ?? 1} · ulti ${barracksStat.ultimatePermission ? 'ready' : 'khóa'}</div>`);
+    if (church) lines.push(`<div>Ấn: prayer ${formatSeconds(churchRuntime?.prayerTimer)} · cleanse ${formatSeconds(churchRuntime?.contaminationCleanseTimer)}</div>`);
+    statusPanel.innerHTML = lines.join('');
+  };
   const renderDayNightTimer = (): void => {
     if (dayNightPhaseText) dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
     if (nightIndexText) nightIndexText.textContent = String(simulationState.nightIndex);
@@ -542,6 +594,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     addActionNode('branch-lv5-curse', 'Nguyền rủa');
     addActionNode('branch-lv5-link', 'Liên kết');
     addActionNode('toggle-gravity', 'Bật/tắt hút');
+    addActionNode('cycle-element', 'Đổi hệ');
+    addActionNode('activate-teleport', 'Rút lui');
 
     buildSitesContainer.append(button, menu);
     siteElements.set(site.id, button);
@@ -564,15 +618,30 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
       const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
       const canToggleGravity = structure?.type === 'gravityCannon' && structure.level >= 6 && action === 'toggle-gravity';
+      const canCycleElement = structure?.type === 'elementalTower' && action === 'cycle-element';
+      const canActivateTeleport = structure?.type === 'teleport' && action === 'activate-teleport' && (ensureStructureRuntime(structure).cooldown ?? 0) <= 0;
       node.hidden = structure
         ? (
             isUpgradeNode
               ? structure.level >= 6 || structure.level === 2 || structure.level === 4
               : action
-                ? !(isLv3Branch || isLv5Branch || canToggleGravity)
+                ? !(isLv3Branch || isLv5Branch || canToggleGravity || canCycleElement || canActivateTeleport)
                 : !canMount
           )
         : isUpgradeNode || Boolean(action) || !type || !isStructureAllowedOnBuildSite(type, site);
+      const titleParts = [`Cost ${cost}`];
+      if (type){
+        const stat = getStructureLevelStat(type, structure?.mountedStructure === type ? structure.mountedLevel ?? 1 : nextLevel);
+        if (stat.range) titleParts.push(`Range ${stat.range}`);
+        if (type === 'watchtower') titleParts.push('rock-site tower');
+        if (type === 'elementalTower') titleParts.push(`Element ${ELEMENTAL_TOWER_ELEMENTS[0]} · ${describeElementEffect(ELEMENTAL_TOWER_ELEMENTS[0])}`);
+        if (type === 'teleport') titleParts.push('Retreat to sealed old map');
+      }
+      if (structure?.type === 'wall') titleParts.push(`Tường lãnh địa · lv3 ${structure.branchLv3 ?? 'chưa chọn'} · lv5 ${structure.branchLv5 ?? 'chưa chọn'}`);
+      node.title = titleParts.join(' · ');
+      let detail = node.querySelector('em');
+      if (!detail){ detail = document.createElement('em'); node.append(detail); }
+      detail.textContent = type ? `C${cost}${getStructureLevelStat(type, nextLevel).range ? ` R${getStructureLevelStat(type, nextLevel).range}` : ''}` : `C${cost}`;
       if (node instanceof HTMLButtonElement) node.disabled = !node.hidden && !canAfford(cost);
     }
   };
@@ -591,7 +660,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     const structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
     const mountedLabel = structure?.mountedStructure ? buildNodeOptions.find(option => option.type === structure.mountedStructure)?.label ?? '' : '';
     siteButton.dataset.structureLabel = structure && mountedLabel ? `${structureLabel} Lv${structure.level} + ${mountedLabel} Lv${structure.mountedLevel ?? 1}` : structureLabel;
-    siteButton.setAttribute('aria-label', structure ? `${siteButton.dataset.structureLabel} cấp ${structure.level}` : site?.kind === 'wall-slot' ? 'Điểm xây tường' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
+    const stat = structure ? getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element) : null;
+    const branchText = structure?.type === 'wall' ? ` · tường lãnh địa · lv3 ${structure.branchLv3 ?? 'chưa chọn'} · lv5 ${structure.branchLv5 ?? 'chưa chọn'}` : '';
+    const elementText = structure?.type === 'elementalTower' ? ` · hệ ${structure.element ?? 'Hỏa'} · ${describeElementEffect(structure.element ?? 'Hỏa')}` : '';
+    const soldierText = structure?.type === 'barracks' ? ` · lính ${runtime?.soldiers?.length ?? 0}/${stat?.soldierCap ?? 0} rank ${stat?.soldierRank ?? 1}` : '';
+    const churchText = structure?.type === 'church' ? ` · prayer ${formatSeconds(runtime?.prayerTimer)} cleanse ${formatSeconds(runtime?.contaminationCleanseTimer)}` : '';
+    const teleportText = structure?.type === 'teleport' ? ` · rút lui CD ${formatSeconds(runtime?.cooldown)}` : '';
+    siteButton.title = structure ? `${siteButton.dataset.structureLabel} Lv${structure.level} · HP ${Math.ceil(runtime?.hp ?? 0)}/${stat?.hp ?? 0} · cost ${getBuildLevelCost(structure.type, structure.level)}${stat?.range ? ` · range ${stat.range}` : ''}${branchText}${elementText}${soldierText}${churchText}${teleportText}` : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất cho bẫy' : 'Ụ đá cho tháp/trại/ấn';
+    siteButton.setAttribute('aria-label', structure ? siteButton.title : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
     renderBuildMenu(siteId);
   };
   const renderVisibleBuildSites = (): void => {
@@ -643,6 +719,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     nextDroppedResourceId,
     get baseHp(){ return baseHp; },
     set baseHp(value: number){ baseHp = value; },
+    get baseLevel(){ return baseLevel; },
+    set baseLevel(value: number | undefined){ baseLevel = value ?? 0; },
+    baseStatuses,
     get leaderHp(){ return leaderHp; },
     set leaderHp(value: number){ leaderHp = value; },
     get leaderMaxHp(){ return leaderMaxHp; },
@@ -697,6 +776,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     leaderShield = simulationState.leaderShield ?? leaderShield;
     leaderShieldNightIndex = simulationState.leaderShieldNightIndex;
     leaderEmergencyCooldownUntilNight = simulationState.leaderEmergencyCooldownUntilNight ?? leaderEmergencyCooldownUntilNight;
+    baseLevel = simulationState.baseLevel ?? baseLevel;
   };
   const spawnWaveEnemy = (side: Side): void => { runtimeSpawnWaveEnemy(simulationContext, side); syncSimulationState(); };
   const removeEnemyAt = (index: number, reward: boolean): void => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };
@@ -804,6 +884,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     collectDroppedResources();
     updateCamera();
     renderEnemies();
+    renderStatusPanel();
   };
 
   const moveToClientX = (clientX: number): void => {
@@ -845,6 +926,19 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
           const runtime = ensureStructureRuntime(structure);
           runtime.gravityEnabled = !(runtime.gravityEnabled ?? true);
           renderBuildSite(site.id);
+          } else if (structure.type === 'elementalTower' && action === 'cycle-element'){
+          const currentIndex = ELEMENTAL_TOWER_ELEMENTS.indexOf(structure.element ?? 'Hỏa');
+          const element = ELEMENTAL_TOWER_ELEMENTS[(currentIndex + 1) % ELEMENTAL_TOWER_ELEMENTS.length] ?? 'Hỏa';
+          const upgraded = { ...structure, element };
+          setStructure(upgraded);
+          renderBuildSite(site.id);
+          showNotice(`Tháp Nguyên Tố chuyển hệ ${element}`);
+        } else if (structure.type === 'teleport' && action === 'activate-teleport' && (ensureStructureRuntime(structure).cooldown ?? 0) <= 0){
+          const runtime = ensureStructureRuntime(structure);
+          runtime.cooldown = getStructureLevelStat('teleport', structure.level).cooldownSeconds ?? 180;
+          clearEnemiesWithoutReward();
+          showNotice('Truyền tống rút lui về map cũ đã phong ấn');
+          shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId, retreatedFromVinhDa: true });
         } else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(getBuildLevelCost(structure.type, 5))){
           const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) as WallBranchLv5 };
           setStructure(upgraded);
@@ -858,7 +952,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
           setStructure(upgraded);
           renderBuildSite(site.id);
         } else if (site && type && !structure && isStructureAllowedOnBuildSite(type, site) && spend(getBuildLevelCost(type, 1))){
-          const placed = { siteId: site.id, type, level: 1 };
+          const placed = { siteId: site.id, type, level: 1, ...(type === 'elementalTower' ? { element: ELEMENTAL_TOWER_ELEMENTS[0] } : {}) };
           setStructure(placed);
           ensureStructureRuntime(placed);
           renderBuildSite(site.id);
