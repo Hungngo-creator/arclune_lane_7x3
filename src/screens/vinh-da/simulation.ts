@@ -249,6 +249,11 @@ const triggerDeathExplosion = (ctx: VinhDaSimulationContext, enemy: Enemy): void
     const radius = enemy.aoeRadius || getEnemyTemplate(enemy).aoeRadius;
     const damage = Math.max(enemy.atk, enemy.wil) * 2;
     if (Math.abs(enemy.x - CRYSTAL_X) <= radius) damageBase(ctx, damage);
+  for (const structure of ctx.state.structures.values()){
+      const site = ctx.getBuildSite(structure.siteId);
+      if (!site || Math.abs(site.x - enemy.x) > radius) continue;
+      damageStructure(ctx, site, ctx.ensureStructureRuntime(structure), damage, enemy);
+  }
     for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1){
       const target = ctx.state.enemies[i];
       if (!target || target.id === enemy.id || Math.abs(target.x - enemy.x) > radius) continue;

@@ -2,7 +2,7 @@ import { CRYSTAL_X, ENEMY_SPAWN_INTERVAL, ENEMY_START_PADDING, WORLD_WIDTH } fro
 import { ENEMY_TEMPLATES } from '../src/screens/vinh-da/enemies.ts';
 import { BASE_STRUCTURE_STATS, BUILD_SITES, getBaseLevelStat } from '../src/screens/vinh-da/structures.ts';
 import type { StructureType } from '../src/screens/vinh-da/structures.ts';
-import { getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory, spawnWaveEnemy, updateEnemies, updateStructures } from '../src/screens/vinh-da/simulation.ts';
+import { damageEnemy, getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory, spawnEnemy, spawnWaveEnemy, updateEnemies, updateStructures } from '../src/screens/vinh-da/simulation.ts';
 import type { VinhDaSimulationContext, VinhDaSimulationState } from '../src/screens/vinh-da/simulation.ts';
 import type { BuildSite, EnemyPortal, PlacedStructure, StructureRuntime } from '../src/screens/vinh-da/types.ts';
 
@@ -55,17 +55,168 @@ const createContext = (structures: PlacedStructure[], runtimes: Map<string, Stru
 
 describe('Vĩnh Dạ enemy Khai Nguyên 1 templates', () => {
   it('keeps core enemy stats aligned with the defense mode spec', () => {
-    expect(ENEMY_TEMPLATES.twisted).toMatchObject({ hp: 3, speed: 40, weight: 1, damage: 1, attackCooldown: 2.5, canFly: false });
-    expect(ENEMY_TEMPLATES.crawler).toMatchObject({ hp: 3, speed: 100, weight: 0.9, damage: 1, attackCooldown: 2, canFly: false });
-    expect(ENEMY_TEMPLATES.madDog).toMatchObject({ hp: 1.5, speed: 130, weight: 0.3, damage: 1, attackCooldown: 4, canFly: false });
-    expect(ENEMY_TEMPLATES.suicideBomber).toMatchObject({ hp: 2, speed: 45, weight: 1.5, damage: 2, attackCooldown: 3, canFly: false, deathExplosion: true, contaminationOnHit: true });
+    expect(ENEMY_TEMPLATES.twisted).toMatchObject({ hp: 3, atk: 1, wil: 0, arm: 0, res: 0, speed: 40, weight: 1, attackRange: 28, attackCooldown: 2.5, attackShape: 'melee', statusOnHit: 'bleed', reward: 1, canFly: false });
+    expect(ENEMY_TEMPLATES.crawler).toMatchObject({ hp: 3, atk: 1, wil: 0, arm: 0, res: 0, speed: 100, weight: 0.9, attackRange: 20, attackCooldown: 2, attackShape: 'melee', statusOnHit: 'bleed', reward: 1, canFly: false });
+    expect(ENEMY_TEMPLATES.madDog).toMatchObject({ hp: 1.5, atk: 1, wil: 0, arm: 0, res: 0, speed: 130, weight: 0.3, attackRange: 18, attackCooldown: 4, attackShape: 'melee', statusOnHit: 'contamination', reward: 1, canFly: false });
+    expect(ENEMY_TEMPLATES.suicideBomber).toMatchObject({ hp: 2, atk: 2, wil: 2, arm: 2, res: 2, speed: 45, weight: 1.5, attackRange: 28, attackCooldown: 3, attackShape: 'melee', statusOnHit: 'contamination', reward: 2, canFly: false, deathExplosion: true, contaminationOnHit: true });
   });
 
   it('covers supplemental flying, caster, tank, and Oán Long specs', () => {
-    expect(ENEMY_TEMPLATES.mutantBird).toMatchObject({ hp: 1.3, speed: 150, weight: 0.1, damage: 1, attackRange: 1200, canFly: true });
-    expect(ENEMY_TEMPLATES.darkMage).toMatchObject({ hp: 3, speed: 50, weight: 1, damage: 3.5, projectileSpeed: 200, attackCooldown: 2, canFly: false });
-    expect(ENEMY_TEMPLATES.ironMan).toMatchObject({ hp: 5.5, speed: 30, weight: 2.8, damage: 2, attackCooldown: 1.5, regen: true, canFly: false });
-    expect(ENEMY_TEMPLATES.resentfulDragon).toMatchObject({ hp: 15, speed: 250, groundSpeed: 80, weight: 4, damage: 8, attackCooldown: 5, regen: true, canFly: true });
+    expect(ENEMY_TEMPLATES.mutantBird).toMatchObject({ hp: 1.3, atk: 1, wil: 1, arm: 0, res: 0, speed: 150, weight: 0.1, attackRange: 1200, attackCooldown: 0, attackShape: 'flyby', statusOnHit: null, reward: 1, canFly: true });
+    expect(ENEMY_TEMPLATES.darkMage).toMatchObject({ hp: 3, atk: 1, wil: 3.5, arm: 1, res: 1, speed: 50, weight: 1, attackRange: 200, projectileSpeed: 200, attackCooldown: 2, attackShape: 'projectile', statusOnHit: 'contamination', reward: 2, canFly: false });
+    expect(ENEMY_TEMPLATES.ironMan).toMatchObject({ hp: 5.5, atk: 2, wil: 2, arm: 4, res: 3, speed: 30, weight: 2.8, attackRange: 26, attackCooldown: 1.5, attackShape: 'melee', statusOnHit: null, reward: 3, regen: true, canFly: false });
+    expect(ENEMY_TEMPLATES.apostle).toMatchObject({ hp: 5, atk: 2, wil: 2, arm: 2, res: 2, weight: 1, attackRange: 150, projectileSpeed: 150, attackCooldown: 3, attackShape: 'projectile', statusOnHit: 'contamination', reward: 0, hasCommanderAura: true });
+    expect(ENEMY_TEMPLATES.apostle.speed).toBeCloseTo(55);
+    expect(ENEMY_TEMPLATES.resentfulDragon).toMatchObject({ hp: 15, atk: 6, wil: 8, arm: 7, res: 7, speed: 250, groundSpeed: 80, weight: 4, attackRange: 500, attackCooldown: 5, attackShape: 'line', statusOnHit: null, reward: 8, regen: true, canFly: true, dragonDestroyStructure: true, ultimate: 'dragon-rage' });
+  });
+});
+
+describe('Vĩnh Dạ enemy behavior locks', () => {
+  const placeEnemy = (ctx: VinhDaSimulationContext, kind: Parameters<typeof spawnEnemy>[2], x: number, side: 'left' | 'right' = 'left'): void => {
+    Object.assign(ctx.state, { dayNightPhase: 'night', leaderAttackCooldown: 999 });
+    spawnEnemy(ctx, side, kind, x, true);
+    ctx.state.enemies[0]!.attackCooldown = 0;
+  };
+
+  it('melee enemies hit a blocking wall before the base', () => {
+    const wallX = buildSitesById.get('wall-left')!.x;
+    const runtimes = new Map<string, StructureRuntime>([['wall-left', { cooldown: 0, hp: 10 }]]);
+    const ctx = createContext([{ siteId: 'wall-left', type: 'wall', level: 1 }], runtimes);
+    placeEnemy(ctx, 'crawler', wallX - 10);
+
+    updateEnemies(ctx, 0);
+
+    expect(runtimes.get('wall-left')!.hp).toBeLessThan(10);
+    expect(ctx.state.baseHp).toBe(10);
+  });
+
+  it('flying enemies ignore walls and strike the leader according to distance bands', () => {
+    const runtimes = new Map<string, StructureRuntime>([['wall-left', { cooldown: 0, hp: 10 }]]);
+    const ctx = createContext([{ siteId: 'wall-left', type: 'wall', level: 1 }], runtimes);
+    Object.assign(ctx.state, { leaderHp: 20, leaderMaxHp: 20, leaderX: CRYSTAL_X });
+    placeEnemy(ctx, 'mutantBird', CRYSTAL_X - 800);
+
+    updateEnemies(ctx, 0);
+
+    expect(runtimes.get('wall-left')!.hp).toBe(10);
+    expect(ctx.state.leaderHp).toBe(18);
+    expect(ctx.state.enemies).toHaveLength(0);
+  });
+
+  it('Dark Mage stores three orbs over cadence before firing a projectile burst', () => {
+    const ctx = createContext([], new Map());
+    placeEnemy(ctx, 'darkMage', CRYSTAL_X - 100);
+
+    updateEnemies(ctx, 2);
+    expect(ctx.state.enemies[0]!.mageOrbs).toBe(1);
+    expect(ctx.state.baseHp).toBe(10);
+
+    updateEnemies(ctx, 4);
+    expect(ctx.state.enemies[0]!.mageOrbs).toBe(0);
+    expect(ctx.state.baseHp).toBe(0);
+  });
+
+  it('Suicide Bomber contaminates on hit and explodes across base, structures, and enemies in its radius', () => {
+    const wallX = buildSitesById.get('wall-left')!.x;
+    const runtimes = new Map<string, StructureRuntime>([['wall-left', { cooldown: 0, hp: 10 }]]);
+    const ctx = createContext([{ siteId: 'wall-left', type: 'wall', level: 1 }], runtimes);
+    placeEnemy(ctx, 'suicideBomber', wallX - 10);
+
+    updateEnemies(ctx, 0);
+    expect(ctx.state.contamination).toBe(1);
+
+    const bomber = ctx.state.enemies[0]!;
+    bomber.x = CRYSTAL_X;
+    placeEnemy(ctx, 'twisted', CRYSTAL_X + 10);
+    const nearby = ctx.state.enemies[1]!;
+    damageEnemy(ctx, bomber, 999);
+    const bomberIndex = ctx.state.enemies.indexOf(bomber);
+    expect(bomberIndex).toBeGreaterThanOrEqual(0);
+    const beforeBaseHp = ctx.state.baseHp;
+    updateEnemies(ctx, 0);
+
+    expect(ctx.state.baseHp).toBeLessThan(beforeBaseHp);
+    expect(ctx.state.enemies).not.toContain(nearby);
+  });
+
+  it('Iron Man regenerates only on its five second interval', () => {
+    const ctx = createContext([], new Map());
+    Object.assign(ctx.state, { mapTier: 1.2 });
+    placeEnemy(ctx, 'ironMan', CRYSTAL_X - 200);
+    const ironMan = ctx.state.enemies[0]!;
+    ironMan.hp = 1;
+
+    updateEnemies(ctx, 4.9);
+    expect(ironMan.hp).toBe(1);
+
+    updateEnemies(ctx, 0.1);
+    expect(ironMan.hp).toBe(3);
+  });
+
+  it('Apostle aura does not stack and apostles prefer wall, structure, then base', () => {
+    const wallX = buildSitesById.get('wall-left')!.x;
+    const runtimes = new Map<string, StructureRuntime>([
+      ['wall-left', { cooldown: 0, hp: 10 }],
+      ['ground-left-1', { cooldown: 0, hp: 10 }],
+    ]);
+    const ctx = createContext([
+      { siteId: 'wall-left', type: 'wall', level: 1 },
+      { siteId: 'ground-left-1', type: 'watchtower', level: 1 },
+    ], runtimes);
+    placeEnemy(ctx, 'apostle', wallX - 10);
+    placeEnemy(ctx, 'apostle', wallX - 12);
+    placeEnemy(ctx, 'twisted', wallX - 14);
+
+    updateEnemies(ctx, 0);
+    expect(ctx.state.enemies.find(enemy => enemy.kind === 'apostle')!.apostleState).toBe('assaultStructure');
+    expect(runtimes.get('wall-left')!.hp).toBeLessThan(10);
+
+    const wallHpAfterApostles = runtimes.get('wall-left')!.hp;
+    updateEnemies(ctx, 2.5);
+    expect(wallHpAfterApostles - runtimes.get('wall-left')!.hp).toBeCloseTo(ENEMY_TEMPLATES.twisted.damage * 1.05 * (100 / 101), 3);
+
+    ctx.state.structures.delete('wall-left');
+    (ctx.structureSitesByType.get('wall') as Set<string>).delete('wall-left');
+    ctx.state.enemies = ctx.state.enemies.filter(enemy => enemy.kind === 'apostle');
+    ctx.state.enemies[0]!.attackCooldown = 0;
+    ctx.state.enemies[0]!.x = buildSitesById.get('ground-left-1')!.x - 10;
+    updateEnemies(ctx, 0);
+    expect(ctx.state.enemies[0]!.apostleState).toBe('assaultStructure');
+    expect(runtimes.get('ground-left-1')!.statuses?.contaminationStacks).toBe(1);
+
+    ctx.state.structures.clear();
+    ctx.state.enemies[0]!.attackCooldown = 0;
+    ctx.state.enemies[0]!.x = CRYSTAL_X - ENEMY_TEMPLATES.apostle.attackRange;
+    updateEnemies(ctx, 0);
+    expect(ctx.state.enemies[0]!.apostleState).toBe('assaultBase');
+    expect(ctx.state.baseHp).toBeLessThan(10);
+  });
+
+  it('Resentful Dragon destroys structures by level count and gates ultimate by cooldown', () => {
+    const runtimes = new Map<string, StructureRuntime>([['ground-left-1', { cooldown: 0, hp: 100 }]]);
+    const ctx = createContext([{ siteId: 'ground-left-1', type: 'watchtower', level: 2 }], runtimes);
+    const structureX = buildSitesById.get('ground-left-1')!.x;
+    placeEnemy(ctx, 'resentfulDragon', structureX - 250);
+    const dragon = ctx.state.enemies[0]!;
+    dragon.dragonUltimateCooldown = 999;
+
+    updateEnemies(ctx, 0);
+    expect(runtimes.get('ground-left-1')!.dragonHitCount).toBe(1);
+    expect(ctx.state.structures.has('ground-left-1')).toBe(true);
+
+    dragon.attackCooldown = 0;
+    dragon.dragonDestroyCooldown = 0;
+    updateEnemies(ctx, 0);
+    expect(ctx.state.structures.has('ground-left-1')).toBe(false);
+
+    dragon.x = CRYSTAL_X - 100;
+    dragon.attackCooldown = 999;
+    dragon.dragonUltimateCooldown = 0;
+    ctx.state.baseHp = 100;
+    const beforeBaseHp = ctx.state.baseHp;
+    updateEnemies(ctx, 0);
+    expect(ctx.state.baseHp).toBeCloseTo(beforeBaseHp - dragon.wil * 2);
+    expect(dragon.dragonUltimateCooldown).toBe(20);
   });
 });
 
