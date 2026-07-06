@@ -37916,7 +37916,6 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   const SPIKE_TRAP_SLOW_MULTIPLIER = 0.5;
   const SPIKE_TRAP_BLEED_SECONDS = 3;
   const SPIKE_TRAP_BLEED_MAX_HP_PER_SECOND = 0.03;
-  h;
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'STYLE_ID')) exports.STYLE_ID = STYLE_ID;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_WORLD_WIDTH')) exports.BASE_WORLD_WIDTH = BASE_WORLD_WIDTH;
@@ -38053,14 +38052,19 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
       suicideBomber: defineEnemyTemplate({
           kind: 'suicideBomber',
           label: 'Bạo Tạc Giả',
-          hp: 1,
+          hp: 2,
           speed: 0.45 * METERS_TO_WORLD_UNITS,
           weight: 1.5,
-          attackRange: 5 * METERS_TO_WORLD_UNITS,
-          attackCooldown: 1.6,
-          atk: 4,
-          attackShape: 'explosion',
-          aoeRadius: 80,
+          attackRange: 28,
+          attackCooldown: 3,
+          atk: 2,
+          wil: 2,
+          arm: 2,
+          res: 2,
+          attackShape: 'melee',
+          aoeRadius: 5 * METERS_TO_WORLD_UNITS,
+          statusOnHit: 'contamination',
+          contaminationOnHit: true,
           deathExplosion: true,
           reward: 2
       }),
@@ -38072,7 +38076,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           weight: 0.1,
           attackRange: 12 * METERS_TO_WORLD_UNITS,
           attackCooldown: 0,
-          atk: 2.5,
+          atk: 1,
+          wil: 1,
           canFly: true,
           attackShape: 'flyby',
           reward: 1
@@ -38087,7 +38092,9 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           attackCooldown: 2,
           atk: 1,
           wil: 3.5,
-          projectileSpeed: 160,
+          arm: 1,
+          res: 1,
+          projectileSpeed: 2 * METERS_TO_WORLD_UNITS,
           attackShape: 'projectile',
           statusOnHit: 'contamination',
           contaminationOnHit: true,
@@ -38102,7 +38109,10 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           attackRange: 26,
           attackCooldown: 1.5,
           atk: 2,
-          arm: 30,
+          wil: 2,
+          arm: 4,
+          res: 3,
+          regen: true,
           rank: 2,
           reward: 3
       }),
@@ -38111,18 +38121,20 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           label: 'Oán Long',
           hp: 15,
           speed: 2.5 * METERS_TO_WORLD_UNITS,
+          groundSpeed: 0.8 * METERS_TO_WORLD_UNITS,
           weight: 4,
           attackRange: 5 * METERS_TO_WORLD_UNITS,
           attackCooldown: 5,
-          atk: 8,
-          wil: 4,
-          arm: 20,
-          res: 20,
+          atk: 6,
+          wil: 8,
+          arm: 7,
+          res: 7,
           tier: 1.3,
           rank: 3,
           canFly: true,
           attackShape: 'line',
-          aoeRadius: 120,
+          aoeRadius: 5 * METERS_TO_WORLD_UNITS,
+          regen: true,
           dragonDestroyStructure: true,
           ultimate: 'dragon-rage',
           reward: 8
@@ -38836,11 +38848,32 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       });
       ctx.state.nextEnemyId += 1;
   };
+  const applyContaminationHit = (ctx, enemy) => {
+      if (!enemy.contaminationOnHit)
+          return;
+      ctx.state.contamination = (ctx.state.contamination ?? 0) + 1;
+  };
+  const triggerDeathExplosion = (ctx, enemy) => {
+      if (!enemy.deathExplosion)
+          return;
+      const radius = enemy.aoeRadius || getEnemyTemplate(enemy).aoeRadius;
+      const damage = Math.max(enemy.atk, enemy.wil) * 2;
+      if (Math.abs(enemy.x - CRYSTAL_X) <= radius)
+          damageBase(ctx, damage);
+      for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1) {
+          const target = ctx.state.enemies[i];
+          if (!target || target.id === enemy.id || Math.abs(target.x - enemy.x) > radius)
+              continue;
+          if (damageEnemy(ctx, target, damage))
+              removeEnemyAt(ctx, i, true);
+      }
+  };
   const removeEnemyAt = (ctx, index, reward) => {
       const [enemy] = ctx.state.enemies.splice(index, 1);
       if (!enemy)
           return;
       ctx.removeEnemyElement(enemy.id);
+      triggerDeathExplosion(ctx, enemy);
       if (reward) {
           ctx.state.bloodSealStone += ENEMY_TEMPLATES[enemy.kind].reward;
           ctx.renderEconomy();
@@ -39052,28 +39085,39 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       attackEnemyTarget(ctx, enemy, template, getEnemyPrimaryTargetX(ctx, enemy), dt);
   };
-  const updateSuicideBomberEnemy = (ctx, enemy, template, index, dt) => {
+  const updateSuicideBomberEnemy = (ctx, enemy, template, dt) => {
       const wall = getBlockingWall(ctx, enemy);
-      if (wall && Math.abs(enemy.x - wall.site.x) <= template.attackRange) {
-          damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy);
-          removeEnemyAt(ctx, index, false);
+      if (wall) {
+          tryEnemyAttack(enemy, template, () => {
+              applyContaminationHit(ctx, enemy);
+              damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy);
+          });
           return;
       }
       if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) {
-          damageBase(ctx, template.damage);
-          removeEnemyAt(ctx, index, false);
+          tryEnemyAttack(enemy, template, () => {
+              applyContaminationHit(ctx, enemy);
+              damageBase(ctx, template.damage);
+          });
           return;
       }
       moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
   };
   const updateFlyingEnemy = (ctx, enemy, template, index, dt) => {
       const targetX = getEnemyPrimaryTargetX(ctx, enemy);
-      if (Math.abs(enemy.x - targetX) <= template.attackRange) {
-          damageBase(ctx, template.damage);
+      const distance = Math.abs(enemy.x - targetX);
+      if (distance < 3 * 100) {
+          enemy.birdAccelerating = false;
+          moveEnemyToward(ctx, enemy, enemy.x + (enemy.x < targetX ? -1 : 1) * template.attackRange, dt, enemy.flySpeed);
+          return;
+      }
+      enemy.birdAccelerating = distance <= template.attackRange;
+      if (distance <= template.attackRange && enemy.birdAccelerating) {
+          damageBase(ctx, distance <= 6 * 100 ? 1.2 : distance <= 9 * 100 ? 2 : 2.5);
           removeEnemyAt(ctx, index, false);
           return;
       }
-      moveEnemyToward(ctx, enemy, targetX, dt, enemy.baseSpeed);
+      moveEnemyToward(ctx, enemy, targetX, dt, enemy.birdAccelerating ? 3.5 * 100 : enemy.flySpeed);
   };
   const updateDarkMageEnemy = (ctx, enemy, template, dt) => {
       const wall = getBlockingWall(ctx, enemy);
@@ -39092,7 +39136,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       if ((enemy.mageOrbs ?? 0) >= 3) {
           tryEnemyAttack(enemy, template, () => {
-              damageBase(ctx, template.damage * (enemy.mageOrbs ?? 3));
+              damageBase(ctx, Math.max(enemy.atk, enemy.wil) * (enemy.mageOrbs ?? 3));
               enemy.mageOrbs = 0;
               enemy.mageOrbTimer = 0;
           });
@@ -39109,15 +39153,44 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       ctx.renderBuildSite(site.id);
       return true;
   };
+  const getDragonDamage = (enemy, multiplier = 1) => {
+      const rageMultiplier = enemy.hp <= enemy.maxHp * 0.3 ? 1.1 : 1;
+      return Math.max(enemy.atk, enemy.wil) * rageMultiplier * multiplier;
+  };
+  const applyDragonBreath = (ctx, enemy, damage, applyDestroy) => {
+      const direction = getEnemyMoveDirection(ctx, enemy, CRYSTAL_X);
+      if (direction > 0 ? CRYSTAL_X >= enemy.x : CRYSTAL_X <= enemy.x) {
+          if (Math.abs(enemy.x - CRYSTAL_X) <= enemy.aoeRadius)
+              damageBase(ctx, damage);
+      }
+      for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1) {
+          const target = ctx.state.enemies[i];
+          if (!target || target.id === enemy.id)
+              continue;
+          const ahead = direction > 0 ? target.x >= enemy.x : target.x <= enemy.x;
+          if (!ahead || Math.abs(target.x - enemy.x) > enemy.aoeRadius)
+              continue;
+          if (damageEnemy(ctx, target, damage))
+              removeEnemyAt(ctx, i, true);
+      }
+      const structureAhead = getStructureAhead(ctx, enemy, applyDestroy ? 3 * 100 : enemy.aoeRadius);
+      if (applyDestroy && structureAhead && (enemy.dragonDestroyCooldown ?? 0) <= 0) {
+          damageDragonStructureCounter(ctx, structureAhead.site, structureAhead.runtime);
+          enemy.dragonDestroyCooldown = 10;
+      }
+  };
   const updateResentfulDragonEnemy = (ctx, enemy, template, dt) => {
-      const structureAhead = getStructureAhead(ctx, enemy, template.attackRange);
-      if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange || structureAhead) {
-          tryEnemyAttack(enemy, template, () => {
-              if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange)
-                  damageBase(ctx, template.damage);
-              if (structureAhead)
-                  damageDragonStructureCounter(ctx, structureAhead.site, structureAhead.runtime);
-          });
+      const inBreathRange = Math.abs(enemy.x - CRYSTAL_X) <= template.aoeRadius || Boolean(getStructureAhead(ctx, enemy, template.aoeRadius));
+      enemy.dragonUltimateCooldown = Math.max(0, (enemy.dragonUltimateCooldown ?? 20) - dt);
+      enemy.dragonDestroyCooldown = Math.max(0, (enemy.dragonDestroyCooldown ?? 0) - dt);
+      if (inBreathRange) {
+          if ((enemy.dragonUltimateCooldown ?? 0) <= 0) {
+              applyDragonBreath(ctx, enemy, getDragonDamage(enemy, 2), true);
+              enemy.dragonUltimateCooldown = 20;
+              enemy.attackCooldown = template.attackCooldown;
+              return;
+          }
+          tryEnemyAttack(enemy, template, () => { applyDragonBreath(ctx, enemy, getDragonDamage(enemy), true); });
           return;
       }
       moveEnemyToward(ctx, enemy, CRYSTAL_X, dt, enemy.baseSpeed);
@@ -39158,6 +39231,16 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
                   continue;
               }
           }
+          if (enemy.regen) {
+              enemy.regenTimer = (enemy.regenTimer ?? 0) + dt;
+              const interval = enemy.kind === 'resentfulDragon' ? 2 : 5;
+              while (enemy.regenTimer >= interval) {
+                  enemy.regenTimer -= interval;
+                  const amount = enemy.kind === 'resentfulDragon' ? enemy.maxHp * 0.03 : enemy.tier === 1.3 ? 3 : enemy.tier === 1.2 ? 2 : 1;
+                  enemy.hp = Math.min(enemy.maxHp, enemy.hp + amount);
+              }
+          }
+          y;
           if ((enemy.bleedSeconds ?? 0) > 0) {
               enemy.bleedSeconds = Math.max(0, (enemy.bleedSeconds ?? 0) - dt);
               if (damageEnemy(ctx, enemy, enemy.maxHp * (enemy.bleedMaxHpDpsPercent ?? 0) * dt)) {
@@ -39168,7 +39251,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           const template = getEnemyTemplate(enemy);
           switch (enemy.kind) {
               case 'suicideBomber':
-                  updateSuicideBomberEnemy(ctx, enemy, template, i, dt);
+                  updateSuicideBomberEnemy(ctx, enemy, template, dt);
                   break;
               case 'mutantBird':
                   updateFlyingEnemy(ctx, enemy, template, i, dt);

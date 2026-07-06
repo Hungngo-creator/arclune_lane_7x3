@@ -99,10 +99,26 @@ export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: Enemy
     });
     ctx.state.nextEnemyId += 1;
   };
+const applyContaminationHit = (ctx: VinhDaSimulationContext, enemy: Enemy): void => {
+    if (!enemy.contaminationOnHit) return;
+    ctx.state.contamination = (ctx.state.contamination ?? 0) + 1;
+  };
+const triggerDeathExplosion = (ctx: VinhDaSimulationContext, enemy: Enemy): void => {
+    if (!enemy.deathExplosion) return;
+    const radius = enemy.aoeRadius || getEnemyTemplate(enemy).aoeRadius;
+    const damage = Math.max(enemy.atk, enemy.wil) * 2;
+    if (Math.abs(enemy.x - CRYSTAL_X) <= radius) damageBase(ctx, damage);
+    for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1){
+      const target = ctx.state.enemies[i];
+      if (!target || target.id === enemy.id || Math.abs(target.x - enemy.x) > radius) continue;
+      if (damageEnemy(ctx, target, damage)) removeEnemyAt(ctx, i, true);
+    }
+  };
 export const removeEnemyAt = (ctx: VinhDaSimulationContext, index: number, reward: boolean): void => {
     const [enemy] = ctx.state.enemies.splice(index, 1);
     if (!enemy) return;
     ctx.removeEnemyElement(enemy.id);
+  triggerDeathExplosion(ctx, enemy);
     if (reward){
       ctx.state.bloodSealStone += ENEMY_TEMPLATES[enemy.kind].reward;
       ctx.renderEconomy();
@@ -296,28 +312,39 @@ export const updateMeleeBasicEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy
     }
     attackEnemyTarget(ctx, enemy, template, getEnemyPrimaryTargetX(ctx, enemy), dt);
   };
-export const updateSuicideBomberEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, index: number, dt: number): void => {
+export const updateSuicideBomberEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, dt: number): void => {
     const wall = getBlockingWall(ctx, enemy);
-    if (wall && Math.abs(enemy.x - wall.site.x) <= template.attackRange){
-      damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy);
-      removeEnemyAt(ctx, index, false);
+    if (wall){
+      tryEnemyAttack(enemy, template, () => {
+        applyContaminationHit(ctx, enemy);
+        damageStructure(ctx, wall.site, wall.runtime, template.damage, enemy);
+      });
       return;
     }
     if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange){
-      damageBase(ctx, template.damage);
-      removeEnemyAt(ctx, index, false);
+      tryEnemyAttack(enemy, template, () => {
+        applyContaminationHit(ctx, enemy);
+        damageBase(ctx, template.damage);
+      });
       return;
     }
     moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
   };
 export const updateFlyingEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, index: number, dt: number): void => {
     const targetX = getEnemyPrimaryTargetX(ctx, enemy);
-    if (Math.abs(enemy.x - targetX) <= template.attackRange){
-      damageBase(ctx, template.damage);
+    const distance = Math.abs(enemy.x - targetX);
+    if (distance < 3 * 100){
+      enemy.birdAccelerating = false;
+      moveEnemyToward(ctx, enemy, enemy.x + (enemy.x < targetX ? -1 : 1) * template.attackRange, dt, enemy.flySpeed);
+      return;
+    }
+    enemy.birdAccelerating = distance <= template.attackRange;
+    if (distance <= template.attackRange && enemy.birdAccelerating){
+      damageBase(ctx, distance <= 6 * 100 ? 1.2 : distance <= 9 * 100 ? 2 : 2.5);
       removeEnemyAt(ctx, index, false);
       return;
     }
-    moveEnemyToward(ctx, enemy, targetX, dt, enemy.baseSpeed);
+    moveEnemyToward(ctx, enemy, targetX, dt, enemy.birdAccelerating ? 3.5 * 100 : enemy.flySpeed);
   };
 export const updateDarkMageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, dt: number): void => {
     const wall = getBlockingWall(ctx, enemy);
@@ -336,7 +363,7 @@ export const updateDarkMageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, 
     }
     if ((enemy.mageOrbs ?? 0) >= 3){
       tryEnemyAttack(enemy, template, () => {
-        damageBase(ctx, template.damage * (enemy.mageOrbs ?? 3));
+        damageBase(ctx, Math.max(enemy.atk, enemy.wil) * (enemy.mageOrbs ?? 3));
         enemy.mageOrbs = 0;
         enemy.mageOrbTimer = 0;
       });
@@ -351,13 +378,40 @@ export const damageDragonStructureCounter = (ctx: VinhDaSimulationContext, site:
     ctx.renderBuildSite(site.id);
     return true;
   };
+const getDragonDamage = (enemy: Enemy, multiplier = 1): number => {
+    const rageMultiplier = enemy.hp <= enemy.maxHp * 0.3 ? 1.1 : 1;
+    return Math.max(enemy.atk, enemy.wil) * rageMultiplier * multiplier;
+  };
+const applyDragonBreath = (ctx: VinhDaSimulationContext, enemy: Enemy, damage: number, applyDestroy: boolean): void => {
+    const direction = getEnemyMoveDirection(ctx, enemy, CRYSTAL_X);
+    if (direction > 0 ? CRYSTAL_X >= enemy.x : CRYSTAL_X <= enemy.x){
+      if (Math.abs(enemy.x - CRYSTAL_X) <= enemy.aoeRadius) damageBase(ctx, damage);
+    }
+    for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1){
+      const target = ctx.state.enemies[i];
+      if (!target || target.id === enemy.id) continue;
+      const ahead = direction > 0 ? target.x >= enemy.x : target.x <= enemy.x;
+      if (!ahead || Math.abs(target.x - enemy.x) > enemy.aoeRadius) continue;
+      if (damageEnemy(ctx, target, damage)) removeEnemyAt(ctx, i, true);
+    }
+    const structureAhead = getStructureAhead(ctx, enemy, applyDestroy ? 3 * 100 : enemy.aoeRadius);
+    if (applyDestroy && structureAhead && (enemy.dragonDestroyCooldown ?? 0) <= 0){
+      damageDragonStructureCounter(ctx, structureAhead.site, structureAhead.runtime);
+      enemy.dragonDestroyCooldown = 10;
+    }
+  };
 export const updateResentfulDragonEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, dt: number): void => {
-    const structureAhead = getStructureAhead(ctx, enemy, template.attackRange);
-    if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange || structureAhead){
-      tryEnemyAttack(enemy, template, () => {
-        if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) damageBase(ctx, template.damage);
-        if (structureAhead) damageDragonStructureCounter(ctx, structureAhead.site, structureAhead.runtime);
-      });
+    const inBreathRange = Math.abs(enemy.x - CRYSTAL_X) <= template.aoeRadius || Boolean(getStructureAhead(ctx, enemy, template.aoeRadius));
+    enemy.dragonUltimateCooldown = Math.max(0, (enemy.dragonUltimateCooldown ?? 20) - dt);
+    enemy.dragonDestroyCooldown = Math.max(0, (enemy.dragonDestroyCooldown ?? 0) - dt);
+    if (inBreathRange){
+      if ((enemy.dragonUltimateCooldown ?? 0) <= 0){
+        applyDragonBreath(ctx, enemy, getDragonDamage(enemy, 2), true);
+        enemy.dragonUltimateCooldown = 20;
+        enemy.attackCooldown = template.attackCooldown;
+        return;
+      }
+      tryEnemyAttack(enemy, template, () => { applyDragonBreath(ctx, enemy, getDragonDamage(enemy), true); });
       return;
     }
     moveEnemyToward(ctx, enemy, CRYSTAL_X, dt, enemy.baseSpeed);
@@ -394,6 +448,15 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
         enemy.burnSeconds = Math.max(0, (enemy.burnSeconds ?? 0) - dt);
         if (damageEnemy(ctx, enemy, (enemy.burnDps ?? 0) * dt)){ removeEnemyAt(ctx, i, true); continue; }
       }
+      if (enemy.regen){
+        enemy.regenTimer = (enemy.regenTimer ?? 0) + dt;
+        const interval = enemy.kind === 'resentfulDragon' ? 2 : 5;
+        while (enemy.regenTimer >= interval){
+          enemy.regenTimer -= interval;
+          const amount = enemy.kind === 'resentfulDragon' ? enemy.maxHp * 0.03 : enemy.tier === 1.3 ? 3 : enemy.tier === 1.2 ? 2 : 1;
+          enemy.hp = Math.min(enemy.maxHp, enemy.hp + amount);
+        }
+      }y
       if ((enemy.bleedSeconds ?? 0) > 0){
         enemy.bleedSeconds = Math.max(0, (enemy.bleedSeconds ?? 0) - dt);
         if (damageEnemy(ctx, enemy, enemy.maxHp * (enemy.bleedMaxHpDpsPercent ?? 0) * dt)){ removeEnemyAt(ctx, i, true); continue; }
@@ -401,7 +464,7 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
       const template = getEnemyTemplate(enemy);
       switch (enemy.kind){
         case 'suicideBomber':
-          updateSuicideBomberEnemy(ctx, enemy, template, i, dt);
+          updateSuicideBomberEnemy(ctx, enemy, template, dt);
           break;
         case 'mutantBird':
           updateFlyingEnemy(ctx, enemy, template, i, dt);

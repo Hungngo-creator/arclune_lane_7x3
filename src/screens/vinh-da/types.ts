@@ -69,6 +69,10 @@ export interface Enemy {
   side: Side;
   mageOrbTimer?: number;
   mageOrbs?: number;
+  birdAccelerating?: boolean;
+  regenTimer?: number;
+  dragonDestroyCooldown?: number;
+  dragonUltimateCooldown?: number;
   burnSeconds?: number;
   burnDps?: number;
   slowSeconds?: number;
