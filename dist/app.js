@@ -39563,7 +39563,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
       resetBaseHealingCapWindow(ctx);
   };
-  const healBase = (ctx, amount) => {
+  const healBase = (ctx, amount, bounds = getLivingTerritoryWallBounds(ctx)) => {
+      if (!isXInLivingTerritory(ctx, CRYSTAL_X, bounds))
+          return;
       const maxHp = getBaseMaxHp(ctx);
       const requestedHeal = amount * (1 + getChurchHealingBonus(ctx));
       const cap = maxHp * STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND;
@@ -39575,14 +39577,15 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       ctx.state.baseHp += appliedHeal;
   };
   const applyElementAllyBuffInRange = (ctx, sourceX, range, apply) => {
-      if (Math.abs(CRYSTAL_X - sourceX) <= range) {
+      const bounds = getLivingTerritoryWallBounds(ctx);
+      if (isXInLivingTerritory(ctx, CRYSTAL_X, bounds) && Math.abs(CRYSTAL_X - sourceX) <= range) {
           const statuses = ctx.state.baseStatuses ??= {};
           statuses.elementalAllyBuffSeconds = Math.max(statuses.elementalAllyBuffSeconds ?? 0, ELEMENTAL_ALLY_BUFF_SECONDS);
           apply(statuses);
       }
       for (const structure of ctx.state.structures.values()) {
           const site = ctx.getBuildSite(structure.siteId);
-          if (!site || Math.abs(site.x - sourceX) > range)
+          if (!site || !isXInLivingTerritory(ctx, site.x, bounds) || Math.abs(site.x - sourceX) > range)
               continue;
           const runtime = ctx.ensureStructureRuntime(structure);
           const statuses = runtime.statuses ??= {};
@@ -40238,6 +40241,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const updateBaseSupport = (ctx, dt) => {
       const stat = getBaseStat(ctx);
+      const territoryBounds = getLivingTerritoryWallBounds(ctx);
+      if (!isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds))
+          return;
       if (ctx.state.dayNightPhase === 'night')
           applyLeaderNightShield(ctx);
       if ((stat.emergencyHealPercent ?? 0) > 0 && getLeaderHp(ctx) > 0 && getLeaderHp(ctx) <= getLeaderMaxHp(ctx) * 0.12 && (ctx.state.leaderEmergencyCooldownUntilNight ?? 0) <= ctx.state.nightIndex) {
@@ -40245,11 +40251,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           ctx.state.baseHp = Math.max(0, ctx.state.baseHp - stat.hp * (stat.emergencyBaseSelfDamagePercent ?? 0));
           ctx.state.leaderEmergencyCooldownUntilNight = ctx.state.nightIndex + (stat.emergencyCooldownNights ?? 2);
       }
-      const territoryBounds = getLivingTerritoryWallBounds(ctx);
-      if (!isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds))
-          return;
       if ((stat.healPerSecond ?? 0) > 0)
-          healBase(ctx, (stat.healPerSecond ?? 0) * dt);
+          healBase(ctx, (stat.healPerSecond ?? 0) * dt, territoryBounds);
       for (const structure of ctx.state.structures.values()) {
           const site = ctx.getBuildSite(structure.siteId);
           if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds))
@@ -40258,7 +40261,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           if ((runtime.emergencyHealCooldown ?? 0) > 0)
               continue;
           if ((stat.emergencyCooldownSeconds ?? 0) > 0 && (stat.emergencyHealPercent ?? 0) > 0 && ctx.state.baseHp > 0 && ctx.state.baseHp <= stat.hp * 0.2) {
-              healBase(ctx, stat.hp * (stat.emergencyHealPercent ?? 0));
+              healBase(ctx, stat.hp * (stat.emergencyHealPercent ?? 0), territoryBounds);
               runtime.emergencyHealCooldown = stat.emergencyCooldownSeconds ?? 60;
               break;
           }
@@ -40267,9 +40270,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const updateChurch = (ctx, structure, runtime) => {
       if (structure.type !== 'church')
           return;
+      const site = ctx.getBuildSite(structure.siteId);
+      const territoryBounds = getLivingTerritoryWallBounds(ctx);
+      if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds) || !isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds))
+          return;
       const stat = getStructureLevelStat('church', structure.level);
       if ((runtime.prayerTimer ?? 0) <= 0) {
-          healBase(ctx, 1 + structure.level);
+          healBase(ctx, 1 + structure.level, territoryBounds);
           runtime.prayerTimer = stat.prayerIntervalSeconds ?? 20;
       }
       if ((runtime.contaminationCleanseTimer ?? 0) <= 0) {

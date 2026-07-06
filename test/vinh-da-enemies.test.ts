@@ -8,7 +8,8 @@ import type { BuildSite, EnemyPortal, PlacedStructure, StructureRuntime } from '
 
 const buildSitesById = new Map<string, BuildSite>(BUILD_SITES.map(site => [site.id, site]));
 
-const createContext = (structures: PlacedStructure[], runtimes: Map<string, StructureRuntime>): VinhDaSimulationContext => {
+const createContext = (structures: PlacedStructure[], runtimes: Map<string, StructureRuntime>, extraBuildSites: BuildSite[] = []): VinhDaSimulationContext => {
+  const scopedBuildSites = new Map<string, BuildSite>([...buildSitesById, ...extraBuildSites.map(site => [site.id, site] as const)]);
   const structuresById = new Map<string, PlacedStructure>(structures.map(structure => [structure.siteId, structure]));
   const structureSitesByType = new Map<StructureType, Set<string>>();
   for (const structure of structures){
@@ -40,7 +41,7 @@ const createContext = (structures: PlacedStructure[], runtimes: Map<string, Stru
   return {
     state,
     structureSitesByType,
-    getBuildSite: siteId => siteId ? buildSitesById.get(siteId) ?? null : null,
+    getBuildSite: siteId => siteId ? scopedBuildSites.get(siteId) ?? null : null,
     ensureStructureRuntime: structure => runtimes.get(structure.siteId) ?? { cooldown: 0, hp: 0 },
     getStructureMaxHp: () => 10,
     deleteStructure: siteId => structuresById.delete(siteId),
@@ -286,6 +287,76 @@ describe('Vĩnh Dạ wave table', () => {
 });
 
 describe('Vĩnh Dạ living territory wall bounds', () => {
+  test('áp elemental ally buff cho base và structure trong lãnh địa khi đủ tường trái/phải', () => {
+    const insideSite: BuildSite = { id: 'inside-tower', x: CRYSTAL_X + 20, kind: 'rock', allowed: [] };
+    const runtimes = new Map<string, StructureRuntime>([
+      ['wall-left', { cooldown: 0, hp: 8 }],
+      ['wall-right', { cooldown: 0, hp: 8 }],
+      ['inside-tower', { cooldown: 0, hp: 10 }],
+    ]);
+    const ctx = createContext([
+      { siteId: 'wall-left', type: 'wall', level: 1 },
+      { siteId: 'wall-right', type: 'wall', level: 1 },
+      { siteId: 'inside-tower', type: 'elementalTower', level: 1, element: 'Thổ' },
+    ], runtimes, [insideSite]);
+    spawnEnemy(ctx, 'left', 'twisted', insideSite.x, true);
+
+    updateStructures(ctx, 0);
+
+    expect(ctx.state.baseStatuses?.elementalAllyBuffSeconds).toBeGreaterThan(0);
+    expect(ctx.state.baseStatuses?.elementalArmBonusPercent).toBeCloseTo(0.07);
+    expect(runtimes.get('inside-tower')!.statuses?.elementalResBonusPercent).toBeCloseTo(0.07);
+  });
+
+  test('không áp elemental ally buff khi một tường biên đã vỡ', () => {
+    const insideSite: BuildSite = { id: 'inside-tower', x: CRYSTAL_X + 20, kind: 'rock', allowed: [] };
+    const runtimes = new Map<string, StructureRuntime>([
+      ['wall-left', { cooldown: 0, hp: 0 }],
+      ['wall-right', { cooldown: 0, hp: 8 }],
+      ['inside-tower', { cooldown: 0, hp: 10 }],
+    ]);
+    const ctx = createContext([
+      { siteId: 'wall-left', type: 'wall', level: 1 },
+      { siteId: 'wall-right', type: 'wall', level: 1 },
+      { siteId: 'inside-tower', type: 'elementalTower', level: 1, element: 'Thổ' },
+    ], runtimes, [insideSite]);
+    spawnEnemy(ctx, 'left', 'twisted', insideSite.x, true);
+
+    updateStructures(ctx, 0);
+
+    expect(getLivingTerritoryWallBounds(ctx)).toBeNull();
+    expect(ctx.state.baseStatuses?.elementalAllyBuffSeconds).toBeUndefined();
+    expect(runtimes.get('inside-tower')!.statuses?.elementalResBonusPercent).toBeUndefined();
+  });
+
+  test('church/base heal không áp khi base nằm ngoài lãnh địa sống', () => {
+    const churchSite: BuildSite = { id: 'inside-church', x: CRYSTAL_X + 20, kind: 'rock', allowed: [] };
+    const validRuntimes = new Map<string, StructureRuntime>([
+      ['wall-left', { cooldown: 0, hp: 8 }],
+      ['wall-right', { cooldown: 0, hp: 8 }],
+      ['inside-church', { cooldown: 0, hp: 14, prayerTimer: 0 }],
+    ]);
+    const validCtx = createContext([
+      { siteId: 'wall-left', type: 'wall', level: 1 },
+      { siteId: 'wall-right', type: 'wall', level: 1 },
+      { siteId: 'inside-church', type: 'church', level: 1 },
+    ], validRuntimes, [churchSite]);
+    validCtx.state.baseHp = 10;
+    updateStructures(validCtx, 0);
+    expect(validCtx.state.baseHp).toBeGreaterThan(10);
+
+    const invalidRuntimes = new Map<string, StructureRuntime>([
+      ['wall-right', { cooldown: 0, hp: 8 }],
+      ['inside-church', { cooldown: 0, hp: 14, prayerTimer: 0 }],
+    ]);
+    const invalidCtx = createContext([
+      { siteId: 'wall-right', type: 'wall', level: 1 },
+      { siteId: 'inside-church', type: 'church', level: 1 },
+    ], invalidRuntimes, [churchSite]);
+    Object.assign(invalidCtx.state, { baseHp: 10, baseLevel: 1 });
+    updateStructures(invalidCtx, 1);
+    expect(invalidCtx.state.baseHp).toBe(10);
+  });
 
   test('co lãnh địa theo hai tường ngoài cùng còn sống', () => {
     const runtimes = new Map<string, StructureRuntime>([
@@ -370,7 +441,13 @@ describe('Vĩnh Dạ base branch and leader safeguards', () => {
   });
 
   it('applies lv5 leader shield once per night and lv6 emergency heal on night cooldown', () => {
-    const ctx = createContext([], new Map());
+    const ctx = createContext([
+      { siteId: 'wall-left', type: 'wall', level: 1 },
+      { siteId: 'wall-right', type: 'wall', level: 1 },
+    ], new Map<string, StructureRuntime>([
+      ['wall-left', { cooldown: 0, hp: 8 }],
+      ['wall-right', { cooldown: 0, hp: 8 }],
+    ]));
     Object.assign(ctx.state, {
       baseHp: 80,
       baseLevel: 6,
