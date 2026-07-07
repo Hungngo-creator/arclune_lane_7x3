@@ -46,6 +46,8 @@ export const RESOURCE_PICKUP_RANGE = 54;
 export const RESOURCE_DEPOSIT_RANGE = 90;
 export const BASE_BUFF_DAILY_UPKEEP = 1;
 export const STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND = 0.08;
+export const TELEPORT_RETREAT_COST = 3;
+export const TELEPORT_BANKED_RESOURCE_KEEP_RATIO = 0.75;
 const BASE_HEALING_CAP_WINDOW_SECONDS = 1;
 export type DayNightPhase = 'day' | 'night';
 
@@ -121,6 +123,10 @@ export interface VinhDaSimulationState {
   mapTier?: EnemyTier;
   waveThreatBudgetRemaining: number;
   elementalRegions?: readonly ElementalRegion[];
+  teleportCooldownSeconds?: number;
+  teleportActive?: boolean;
+  teleportRetreatReason?: string | null;
+  teleportedToSealedOldMap?: boolean;
 }
 
 export interface VinhDaSimulationContext {
@@ -137,6 +143,80 @@ export interface VinhDaSimulationContext {
   renderDayNightTimer(): void;
   removeEnemyElement(enemyId: number): void;
 }
+
+export interface TeleportRetreatResult {
+  ok: boolean;
+  reason?: 'missing-teleport' | 'cooldown' | 'insufficient-resource' | 'already-active';
+  cooldownSeconds: number;
+  bloodSealStoneBefore: number;
+  bloodSealStoneAfter: number;
+  carriedDaThachBefore: number;
+  carriedDaThachAfter: number;
+  lostBloodSealStone: number;
+  transferredDaThach: number;
+}
+
+const getTeleportStructures = (ctx: VinhDaSimulationContext): PlacedStructure[] => (
+  [...ctx.structureSiteIdsOfType('teleport')]
+    .map(siteId => ctx.state.structures.get(siteId))
+    .filter((structure): structure is PlacedStructure => structure?.type === 'teleport')
+);
+
+export const getReadyTeleportStructure = (ctx: VinhDaSimulationContext): PlacedStructure | null => (
+  getTeleportStructures(ctx).find(structure => (ctx.ensureStructureRuntime(structure).cooldown ?? 0) <= 0) ?? null
+);
+
+export const canActivateTeleportRetreat = (ctx: VinhDaSimulationContext): TeleportRetreatResult => {
+  const readyTeleport = getReadyTeleportStructure(ctx);
+  const fallbackCooldown = Math.min(...getTeleportStructures(ctx).map(structure => ctx.ensureStructureRuntime(structure).cooldown).filter(Number.isFinite));
+  const cooldownSeconds = readyTeleport ? 0 : Math.max(0, Number.isFinite(fallbackCooldown) ? fallbackCooldown : ctx.state.teleportCooldownSeconds ?? 0);
+  const baseResult = {
+    cooldownSeconds,
+    bloodSealStoneBefore: ctx.state.bloodSealStone,
+    bloodSealStoneAfter: ctx.state.bloodSealStone,
+    carriedDaThachBefore: ctx.state.carriedDaThach,
+    carriedDaThachAfter: ctx.state.carriedDaThach,
+    lostBloodSealStone: 0,
+    transferredDaThach: 0
+  };
+  if (ctx.state.teleportActive) return { ok: false, reason: 'already-active', ...baseResult };
+  if (!readyTeleport && getTeleportStructures(ctx).length <= 0) return { ok: false, reason: 'missing-teleport', ...baseResult };
+  if (!readyTeleport) return { ok: false, reason: 'cooldown', ...baseResult };
+  if (ctx.state.bloodSealStone < TELEPORT_RETREAT_COST) return { ok: false, reason: 'insufficient-resource', ...baseResult };
+  return { ok: true, ...baseResult };
+};
+
+export const activateTeleportRetreat = (ctx: VinhDaSimulationContext): TeleportRetreatResult => {
+  const guard = canActivateTeleportRetreat(ctx);
+  if (!guard.ok) return guard;
+  const structure = getReadyTeleportStructure(ctx);
+  if (!structure) return { ...guard, ok: false, reason: 'missing-teleport' };
+  const runtime = ctx.ensureStructureRuntime(structure);
+  const stat = getStructureLevelStat('teleport', structure.level);
+  const bloodSealStoneBefore = ctx.state.bloodSealStone;
+  const carriedDaThachBefore = ctx.state.carriedDaThach;
+  const afterCost = Math.max(0, bloodSealStoneBefore - TELEPORT_RETREAT_COST);
+  const bloodSealStoneAfter = Math.floor(afterCost * TELEPORT_BANKED_RESOURCE_KEEP_RATIO);
+  ctx.state.bloodSealStone = bloodSealStoneAfter;
+  ctx.state.carriedDaThach = carriedDaThachBefore;
+  ctx.state.teleportActive = true;
+  ctx.state.teleportRetreatReason = 'sealed-old-map-retreat';
+  ctx.state.teleportedToSealedOldMap = true;
+  ctx.state.teleportCooldownSeconds = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+  runtime.cooldown = ctx.state.teleportCooldownSeconds;
+  ctx.renderEconomy();
+  ctx.renderBuildSite(structure.siteId);
+  return {
+    ok: true,
+    cooldownSeconds: runtime.cooldown,
+    bloodSealStoneBefore,
+    bloodSealStoneAfter,
+    carriedDaThachBefore,
+    carriedDaThachAfter: ctx.state.carriedDaThach,
+    lostBloodSealStone: bloodSealStoneBefore - bloodSealStoneAfter,
+    transferredDaThach: ctx.state.carriedDaThach
+  };
+};
 
 export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: EnemyKind = 'twisted', spawnX?: number, allowOutsideNight = false): void => {
     if ((!allowOutsideNight && ctx.state.dayNightPhase !== 'night') || ctx.state.enemies.length >= ENEMY_LIMIT) return;
@@ -1155,6 +1235,7 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
       updateBiochemicalWall(ctx, structure, runtime);
       updateChurch(ctx, structure, runtime);
       updateBarracks(ctx, structure, runtime);
+      if (structure.type === 'teleport') runtime.cooldown = Math.max(0, runtime.cooldown - dt);
       const site = ctx.getBuildSite(structure.siteId);
       if (!site) continue;
       if (structure.type === 'spikeTrap') updateSpikeTrap(ctx, site);

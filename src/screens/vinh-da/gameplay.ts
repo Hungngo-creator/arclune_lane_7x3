@@ -51,6 +51,10 @@ import {
   updateEnemies as runtimeUpdateEnemies,
   updateStructures as runtimeUpdateStructures,
   collectDroppedResources as runtimeCollectDroppedResources,
+  activateTeleportRetreat,
+  canActivateTeleportRetreat,
+  TELEPORT_RETREAT_COST,
+  TELEPORT_BANKED_RESOURCE_KEEP_RATIO,
   getLivingTerritoryWallBounds,
   isXInLivingTerritory,
 } from './simulation.ts';
@@ -556,6 +560,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     const barracksRuntime = barracks ? ensureStructureRuntime(barracks) : null;
     const barracksStat = barracks ? getStructureLevelStat('barracks', barracks.level) : null;
     const elemental = [...structures.values()].find(structure => structure.type === 'elementalTower');
+    const teleport = [...structures.values()].find(structure => structure.type === 'teleport');
+    const teleportCheck = teleport ? canActivateTeleportRetreat(simulationContext) : null;
     const elementalStat = elemental ? getStructureLevelStat('elementalTower', elemental.level, undefined, undefined, elemental.element) : null;
     const lines = [
       `<strong>Pha lê Lv${baseLevel}</strong> HP ${Math.ceil(baseHp)}/${baseStat.hp} · Khiên leader ${Math.ceil(leaderShield)}/${Math.ceil(leaderMaxHp * (baseStat.leaderShieldPercent ?? 0))}`,
@@ -565,6 +571,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     if (elemental && elementalStat) lines.push(`<div>Tháp NT: ${elemental.element ?? 'Hỏa'} Lv${elemental.level} · cost ${getBuildLevelCost('elementalTower', elemental.level)} · range ${elementalStat.range ?? 0} · ${describeElementEffect(elemental.element ?? 'Hỏa')}</div>`);
     if (barracks && barracksStat) lines.push(`<div>Trại: ${barracksRuntime?.soldiers?.length ?? 0}/${barracksStat.soldierCap ?? 0} lính · rank ${barracksStat.soldierRank ?? 1} · ulti ${barracksStat.ultimatePermission ? 'ready' : 'khóa'}</div>`);
     if (church) lines.push(`<div>Ấn: prayer ${formatSeconds(churchRuntime?.prayerTimer)} · cleanse ${formatSeconds(churchRuntime?.contaminationCleanseTimer)}</div>`);
+    if (teleport) lines.push(`<div class="${teleportCheck?.ok ? '' : 'vinh-da-game__status-warn'}">Truyền Tống: phí ${TELEPORT_RETREAT_COST} · giữ ${Math.round(TELEPORT_BANKED_RESOURCE_KEEP_RATIO * 100)}% kho · ${teleportCheck?.ok ? 'sẵn sàng rút lui' : teleportCheck?.reason === 'cooldown' ? `CD ${formatSeconds(teleportCheck.cooldownSeconds)}` : teleportCheck?.reason === 'insufficient-resource' ? 'thiếu Dạ Thạch' : 'chưa sẵn sàng'}</div>`);
     statusPanel.innerHTML = lines.join('');
   };
   const renderDayNightTimer = (): void => {
@@ -674,13 +681,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const canBuildElement = !structure && action?.startsWith('build-element-') && isStructureAllowedOnBuildSite('elementalTower', site);
       const canMountElement = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && action?.startsWith('build-element-') && isStructureAllowedOnBuildSite('elementalTower', { kind: 'rock' });
       const canCycleElement = (structure?.type === 'elementalTower' || structure?.mountedStructure === 'elementalTower') && action === 'cycle-element';
-      const canActivateTeleport = structure?.type === 'teleport' && action === 'activate-teleport' && (ensureStructureRuntime(structure).cooldown ?? 0) <= 0;
+      const teleportCheck = structure?.type === 'teleport' && action === 'activate-teleport' ? canActivateTeleportRetreat(simulationContext) : null;
+      const canShowTeleport = structure?.type === 'teleport' && action === 'activate-teleport';
       node.hidden = structure
         ? (
             isUpgradeNode
               ? structure.level >= 6 || structure.level === 2 || structure.level === 4
               : action
-                ? !(isLv3Branch || isLv5Branch || canToggleGravity || canBuildElement || canMountElement || canCycleElement || canActivateTeleport)
+                ? !(isLv3Branch || isLv5Branch || canToggleGravity || canBuildElement || canMountElement || canCycleElement || canShowTeleport)
                 : !canMount
           )
         : isUpgradeNode || (Boolean(action) && !canBuildElement) || (!action && (!type || type === 'elementalTower' || !isStructureAllowedOnBuildSite(type, site)));
@@ -692,17 +700,20 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         if (stat.range) titleParts.push(`Range ${stat.range}`);
         if (type === 'watchtower') titleParts.push('rock-site tower');
         if (type === 'elementalTower') titleParts.push('Chọn hệ bằng node hệ riêng');
-        if (type === 'teleport') titleParts.push('Retreat to sealed old map');
+        if (type === 'teleport') titleParts.push(`Rút lui về map cũ đã phong ấn · phí ${TELEPORT_RETREAT_COST} · giữ ${Math.round(TELEPORT_BANKED_RESOURCE_KEEP_RATIO * 100)}% Dạ Thạch trong kho`);
       }
       if (buildElement) titleParts.push(`Xây Tháp Nguyên Tố hệ ${buildElement} · ${describeElementEffect(buildElement)}`);
-      }
+      if (teleportCheck && !teleportCheck.ok) titleParts.push(teleportCheck.reason === 'cooldown' ? `Cooldown ${formatSeconds(teleportCheck.cooldownSeconds)}` : teleportCheck.reason === 'insufficient-resource' ? `Thiếu phí ${TELEPORT_RETREAT_COST}` : 'Không thể kích hoạt');
       if (structure?.type === 'wall') titleParts.push(`Tường lãnh địa · lv3 ${structure.branchLv3 ?? 'chưa chọn'} · lv5 ${structure.branchLv5 ?? 'chưa chọn'}`);
       node.title = titleParts.join(' · ');
       let detail = node.querySelector('em');
+      if (!detail){
+        detail = document.createElement('em');
+        node.append(detail);
+      }
       const detailStat = buildElement ? getStructureLevelStat('elementalTower', 1, undefined, undefined, buildElement) : type ? getStructureLevelStat(type, nextLevel) : null;
       detail.textContent = detailStat ? `C${effectiveCost}${detailStat.range ? ` R${detailStat.range}` : ''}` : `C${effectiveCost}`;
-      if (node instanceof HTMLButtonElement) node.disabled = !node.hidden && !canAfford(effectiveCost);
-      if (node instanceof HTMLButtonElement) node.disabled = !node.hidden && !canAfford(cost);
+      if (node instanceof HTMLButtonElement) node.disabled = !node.hidden && (teleportCheck ? !teleportCheck.ok : !canAfford(effectiveCost));
     }
   };
   const renderBuildSite = (siteId: string): void => {
@@ -720,6 +731,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       if (structure.mountedStructure) siteButton.classList.add(`vinh-da-game__structure--${structure.mountedStructure}`);
     }
     const structureLabel = structure ? buildNodeOptions.find(option => option.type === structure.type)?.label ?? '' : '';
+    const mountedLabel = structure?.mountedStructure ? buildNodeOptions.find(option => option.type === structure.mountedStructure)?.label ?? structure.mountedStructure : '';
     const elementalLabel = structure?.type === 'elementalTower' || structure?.mountedStructure === 'elementalTower' ? ` (${structure.element ?? 'Hỏa'})` : '';
     siteButton.dataset.structureLabel = structure && mountedLabel ? `${structureLabel}${elementalLabel} Lv${structure.level} + ${mountedLabel} Lv${structure.mountedLevel ?? 1}` : `${structureLabel}${elementalLabel}`;
     const stat = structure ? getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element) : null;
@@ -1037,12 +1049,17 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
           setStructure(upgraded);
           renderBuildSite(site.id);
           showNotice(`Tháp Nguyên Tố chuyển hệ ${element}`);
-        } else if (structure.type === 'teleport' && action === 'activate-teleport' && (ensureStructureRuntime(structure).cooldown ?? 0) <= 0){
-          const runtime = ensureStructureRuntime(structure);
-          runtime.cooldown = getStructureLevelStat('teleport', structure.level).cooldownSeconds ?? 180;
+        } else if (structure.type === 'teleport' && action === 'activate-teleport'){
+          const result = activateTeleportRetreat(simulationContext);
+          syncSimulationState();
+          if (!result.ok){
+            showNotice(result.reason === 'cooldown' ? `Truyền tống hồi sau ${formatSeconds(result.cooldownSeconds)}` : result.reason === 'insufficient-resource' ? `Cần ${TELEPORT_RETREAT_COST} Dạ Thạch để rút lui` : 'Không thể kích hoạt truyền tống');
+            renderBuildSite(site.id);
+            return;
+          }
           clearEnemiesWithoutReward();
-          showNotice('Truyền tống rút lui về map cũ đã phong ấn');
-          shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId, retreatedFromVinhDa: true });
+          showNotice(`Truyền tống về map cũ đã phong ấn · mất ${result.lostBloodSealStone} Dạ Thạch`);
+          shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId, retreatedFromVinhDa: true, sealedOldMap: true, bloodSealStone: result.bloodSealStoneAfter, carriedDaThach: result.carriedDaThachAfter });
         } else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(getBuildLevelCost(structure.type, 5))){
           const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) as WallBranchLv5 };
           setStructure(upgraded);
