@@ -30,6 +30,7 @@ export interface VinhDaStatusCollection {
   elementalAtkBonusPercent?: number;
   elementalWilBonusPercent?: number;
   elementalBloodMaxHpBonus?: number;
+  elementalRegionEarthBonusApplied?: boolean;
 }
 
 export type EnemyUltimate = 'dragon-rage' | 'commander-aura' | 'death-burst';

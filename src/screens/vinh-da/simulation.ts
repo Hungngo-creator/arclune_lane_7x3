@@ -7,6 +7,16 @@ import {
   ENEMY_LIMIT,
   ENEMY_SPAWN_INTERVAL,
   ENEMY_START_PADDING,
+  ELEMENTAL_REGION_DARK_CONTAMINATION_COOLDOWN_SECONDS,
+  ELEMENTAL_REGION_DARK_CONTAMINATION_SECONDS,
+  ELEMENTAL_REGION_EARTH_DEFENSE_BONUS_PERCENT,
+  ELEMENTAL_REGION_FIRE_BURN_MAX_HP_PER_SECOND,
+  ELEMENTAL_REGION_FIRE_BURN_SECONDS,
+  ELEMENTAL_REGION_LIGHT_CONTAMINATION_CLEANSE_PER_SECOND,
+  ELEMENTAL_REGION_LIGHT_VULNERABLE_SECONDS,
+  ELEMENTAL_REGION_THUNDER_PARALYSIS_CHANCE_PER_SECOND,
+  ELEMENTAL_REGION_THUNDER_PARALYSIS_COOLDOWN_SECONDS,
+  ELEMENTAL_REGION_THUNDER_PARALYSIS_SECONDS,
   LANDMINE_BLAST_RADIUS,
   LANDMINE_FUSE_SECONDS,
   LANDMINE_TRIGGER_RADIUS,
@@ -24,11 +34,12 @@ import {
   SWAMP_RADIUS,
   WORLD_WIDTH
 } from './constants.ts';
+import { getElementalRegionAtX } from './elemental-regions.ts';
 import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, getEnemyResourceDrop, reduceDamageByDefense, scaleEnemyTierStat } from './enemies.ts';
 import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
 import { BASE_STRUCTURE_STATS, getBaseLevelStat, getStructureLevelStat } from './structures.ts';
 import type { BaseBranchLv3, ElementalTowerElement, StructureType } from './structures.ts';
-import type { BuildSite, DroppedResource, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
+import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
 
 export const DAY_DURATION_SECONDS = 300;
 export const RESOURCE_PICKUP_RANGE = 54;
@@ -109,6 +120,7 @@ export interface VinhDaSimulationState {
   nightIndex: number;
   mapTier?: EnemyTier;
   waveThreatBudgetRemaining: number;
+  elementalRegions?: readonly ElementalRegion[];
 }
 
 export interface VinhDaSimulationContext {
@@ -800,6 +812,52 @@ const tickEnemyStatuses = (ctx: VinhDaSimulationContext, enemy: Enemy, dt: numbe
   const bleedDamage = enemy.maxHp * BLEED_MAX_HP_DPS_PERCENT * bleedStacks * dt;
   return damageEnemy(ctx, enemy, activeBurnDps * dt + bleedDamage);
 };
+
+export const applyElementalRegionEnemyEffect = (ctx: VinhDaSimulationContext, enemy: Enemy, dt: number): void => {
+  const region = getElementalRegionAtX(ctx.state.elementalRegions, enemy.x);
+  if (!region) return;
+  const statuses = ensureStatuses(enemy);
+  switch (region.kind){
+    case 'fire':
+      statuses.burnSeconds = Math.max(statuses.burnSeconds ?? 0, ELEMENTAL_REGION_FIRE_BURN_SECONDS);
+      statuses.burnDps = Math.max(statuses.burnDps ?? 0, enemy.maxHp * ELEMENTAL_REGION_FIRE_BURN_MAX_HP_PER_SECOND);
+      break;
+    case 'light':
+      enemy.lightVulnerableSeconds = Math.max(enemy.lightVulnerableSeconds ?? 0, ELEMENTAL_REGION_LIGHT_VULNERABLE_SECONDS);
+      if (statuses.contaminationStacks) statuses.contaminationStacks = Math.max(0, statuses.contaminationStacks - ELEMENTAL_REGION_LIGHT_CONTAMINATION_CLEANSE_PER_SECOND * dt);
+      break;
+    case 'dark': {
+      const cooldowns = statuses.paralysisSourceCooldowns ??= {};
+      if ((cooldowns['elementalRegion:dark'] ?? 0) <= 0){
+        statuses.contaminationStacks = (statuses.contaminationStacks ?? 0) + 1;
+        cooldowns['elementalRegion:dark'] = ELEMENTAL_REGION_DARK_CONTAMINATION_COOLDOWN_SECONDS;
+      }
+      statuses.slowSeconds = Math.max(statuses.slowSeconds ?? 0, ELEMENTAL_REGION_DARK_CONTAMINATION_SECONDS);
+      break;
+    }
+    case 'thunder': {
+      const cooldowns = statuses.paralysisSourceCooldowns ??= {};
+      if ((cooldowns['elementalRegion:thunder'] ?? 0) <= 0 && Math.random() < ELEMENTAL_REGION_THUNDER_PARALYSIS_CHANCE_PER_SECOND * dt){
+        statuses.paralysisSeconds = Math.max(statuses.paralysisSeconds ?? 0, ELEMENTAL_REGION_THUNDER_PARALYSIS_SECONDS);
+        cooldowns['elementalRegion:thunder'] = ELEMENTAL_REGION_THUNDER_PARALYSIS_COOLDOWN_SECONDS;
+      }
+      break;
+    }
+    case 'earth':
+      if (!statuses.elementalRegionEarthBonusApplied){
+        enemy.arm = (enemy.arm ?? 0) * (1 + ELEMENTAL_REGION_EARTH_DEFENSE_BONUS_PERCENT);
+        enemy.res = (enemy.res ?? 0) * (1 + ELEMENTAL_REGION_EARTH_DEFENSE_BONUS_PERCENT);
+        statuses.elementalRegionEarthBonusApplied = true;
+      }
+      break;
+    case 'wood':
+    case 'water':
+    case 'metal':
+    case 'blood':
+    case 'wind':
+      break;
+  }
+};
 const tickBaseStatuses = (ctx: VinhDaSimulationContext, dt: number): void => {
   const bleedStacks = tickStatusCollection(ctx.state.baseStatuses, dt);
   if (bleedStacks <= 0) return;
@@ -826,6 +884,7 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
       if (!enemy) continue;
       enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
       enemy.paralysisCooldown = Math.max(0, (enemy.paralysisCooldown ?? 0) - dt);
+      applyElementalRegionEnemyEffect(ctx, enemy, dt);
       if (tickEnemyStatuses(ctx, enemy, dt)){ removeEnemyAt(ctx, i, true); continue; }
       enemy.lightVulnerableSeconds = Math.max(0, (enemy.lightVulnerableSeconds ?? 0) - dt);
       if (enemy.regen){
