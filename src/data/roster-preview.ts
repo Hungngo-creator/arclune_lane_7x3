@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { CLASS_BASE, RANK_MULT, ROSTER } from '../catalog.ts';
+import { CLASS_BASE, RANK_MULT, ROSTER, isRankScaledStat } from '../catalog.ts';
 import { assertDefined } from '../utils/assert.ts';
 import rawRosterPreviewConfig from './roster-preview.config.ts';
 
@@ -104,10 +104,8 @@ function getRankMultiplier(rank: keyof typeof RANK_MULT) {
 export function applyRankMultiplier(preRank: CatalogStatBlock, rank: keyof typeof RANK_MULT): CatalogStatBlock {
   const multiplier = getRankMultiplier(rank);
   return mapStatBlock(preRank, (stat, value) => {
-    if (stat === 'SPD') {
-      return roundStat(stat, value);
-    }
-    return roundStat(stat, value * multiplier);
+    const rankMultiplier = isRankScaledStat(stat) ? multiplier : 1;
+    return roundStat(stat, value * rankMultiplier);
   });
 }
 

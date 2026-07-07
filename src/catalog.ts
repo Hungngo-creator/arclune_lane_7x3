@@ -1,6 +1,6 @@
 // @ts-check
 //home (termux)/arclune_lane_7x3/src/catalog.ts
-// 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
+// 1) Rank multiplier (đơn giản) — chỉ áp lên nhóm stat được scale theo rank
 import { kitSupportsSummon } from './utils/kit.ts';
 import { normalizeClassName } from './utils/domain-normalization.ts';
 
@@ -64,7 +64,25 @@ export const RANK_MULT = {
 
 export type RankName = keyof typeof RANK_MULT;
 
-// 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
+export const RANK_SCALED_STATS = [
+  'HP',
+  'ATK',
+  'WIL',
+  'ARM',
+  'RES',
+  'HPregen',
+] as const satisfies ReadonlyArray<keyof CatalogStatBlock>;
+
+const RANK_SCALED_STAT_SET: ReadonlySet<keyof CatalogStatBlock> = new Set(RANK_SCALED_STATS);
+
+export const isRankScaledStat = (stat: keyof CatalogStatBlock): boolean => (
+  RANK_SCALED_STAT_SET.has(stat)
+);
+
+// AGI/PER tạm thời không chịu rank multiplier để chờ cân bằng riêng.
+// SPD/AEmax/AEregen cũng không scale theo rank.
+
+// 2) Class base (mốc lv1 để test). Chỉ RANK_SCALED_STATS chịu rank multiplier.
 export const CLASS_BASE = {
   Mage:     { HP:740, ATK:28, WIL:31, ARM:0.08, RES:0.12, AGI:10, PER:12, SPD:1.00, AEmax:110, AEregen: 8.0, HPregen:15 },
   Tanker:   { HP:900, ATK:23, WIL:21, ARM:0.15, RES:0.12, AGI: 9, PER:10, SPD:0.95, AEmax: 65, AEregen: 4.5, HPregen:19 },
@@ -82,7 +100,7 @@ const isClassName = (value: string): value is ClassName => normalizeClassName(va
 
 type MaybeUnitId = UnitId | string | null | undefined;
 
-// 3) Helper: áp rank & mod (mods không áp vào SPD)
+// 3) Helper: áp rank & mod
 export function applyRankAndMods(
   base: CatalogStatBlock,
   rank: RankName,
@@ -94,12 +112,9 @@ export function applyRankAndMods(
   for (const key of keys){
     const baseValue = base[key] ?? 0;
     const mod = 1 + (mods?.[key] ?? 0);
-    if (key === 'SPD') { // SPD không nhân theo bậc
-      out[key] = Math.round(baseValue * mod * 100) / 100;
-      continue;
-    }
-    const precision = (key === 'ARM' || key === 'RES') ? 100 : (key === 'AEregen' ? 10 : 1);
-    out[key] = Math.round(baseValue * mod * multiplier * precision) / precision;
+    const precision = (key === 'ARM' || key === 'RES' || key === 'SPD') ? 100 : (key === 'AEregen' ? 10 : 1);
+    const rankMultiplier = isRankScaledStat(key) ? multiplier : 1;
+    out[key] = Math.round(baseValue * mod * rankMultiplier * precision) / precision;
   }
   return out;
 }

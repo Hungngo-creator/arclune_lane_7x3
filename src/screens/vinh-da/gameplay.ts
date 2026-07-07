@@ -513,7 +513,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     return 'clear';
   };
   const renderWeather = (): void => {
-    section.classList.toggle('is-day', dayNightPhase === 'day');
+    section.classList.toggle('is-day', dayNightPhase === 'day' || dayNightPhase === 'escort');
     section.classList.toggle('is-night', dayNightPhase === 'night');
     if (!weatherLayer) return;
     weatherLayer.classList.toggle('is-cloudy', weather !== 'clear');
@@ -584,7 +584,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     statusPanel.innerHTML = lines.join('');
   };
   const renderDayNightTimer = (): void => {
-    if (dayNightPhaseText) dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
+    if (dayNightPhaseText) dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : simulationState.dayNightPhase === 'escort' ? 'Hộ tống' : 'Ngày';
     if (nightIndexText) nightIndexText.textContent = String(simulationState.nightIndex);
     if (waveThreatBudgetText) waveThreatBudgetText.textContent = simulationState.dayNightPhase === 'night' ? simulationState.waveThreatBudgetRemaining.toFixed(1) : 'clear';
     if (phaseTimeRemainingText){

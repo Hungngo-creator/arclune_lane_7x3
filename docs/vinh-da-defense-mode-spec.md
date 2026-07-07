@@ -966,26 +966,936 @@ thật ra linh quả hiệu quả đều không quá mạnh vì chỉ tác dụn
 - Xuất hiện random bên trái hoặc phải base, spawn ngẫu nhiên trên map, khoảng cách xa nhất có thể spawn là cách base 150 đơn vị khoảng cách, +5% khoảng cách/mỗi tier, tier càng cao cap khoảng cách càng xa.
 - Khi bê base vào truyền tống trận, sẽ hoàn thành map đó, trở về world map của mode vĩnh dạ và nhận phần thưởng là số Nguyên Tinh lấy được trong map đó, (Vụn/Hạ/Trung/Thượng Nguyên Tinh và có thể là Thần Tinh ở tier cao) khi vào trận đấu thì sẽ bị cưỡng chế đem theo 10 HNT, coi như tiền đầu game, trừ trực tiếp từ budget, tức là nguyên tinh hiện có, thứ dùng gacha trong game, nâng lv nhân vật,... khi vào mode này sẽ bị đem đi 1 phần, nếu không win được map đó thì số Nguyên Tinh đem theo sẽ mất vĩnh viễn, nếu win map thì mọi tài nguyên base sẽ được chuyển thành Trung Nguyên Tinh theo tỉ lệ tương ứng. Player có thể dùng rune để tăng độ khó, độ khó càng cao hệ số nhân phần thưởng càng cao (tỉ lệ thu hoạch), bình thường không rune là x1, dùng rune để tăng độ khó thì kết toán có thể nhận x3, x10 phần thưởng tiêu chuẩn.
 
-6. Bệ Đá Cổ
-- một bệ đá cổ xưa, xuất hiện ngẫu nhiên trong map với tỉ lệ 20% (ở tier 1.1, + 3%/tier) ở bất kỳ vùng nào trừ vùng nguyên tố hắc ám, Tạo ngẫu nhiên 1 rune và mỗi bệ đá cổ chỉ tạo rune 1 lần, Rune có thể nâng cấp khi dung hợp với 3 rune cùng cấp, Rune không bị ràng buộc bởi tier nhưng bệ đá cổ thì có, khi xuất hiện ở tier 1.1 đến 1.3 tạo rune lv 1, 1.4 đến 1.6 tạo rune lv 2, 1.7 đến 1.9 tạo rune lv 3, 2.1 đến 2.3 tạo rune lv 4, 2.4 đến 2.6 tạo rune lv 5, 2.7 đến 2.9 tạo rune lv 6, 3.1 đến 3.3 tạo rune lv 7, 3.4 đến 3.6 tạo rune lv 8, 3.7 đến 3.9 tạo rune lv 9, rune lv cao hơn bổ sung sau, các loại rune lv1:
-- Điên cuồng: + 20% (+15%/lv) hp và atk/wil của kẻ thù. + 0,6 tỉ lệ thu hoạch, +100% tỉ lệ thu hoạch của rune khi lên cấp (tính với mốc lv1), lv 3 là + x1,5 tỉ lệ thu hoạch mà không phải x2 tỉ lệ thu hoạch
-- Hút máu: kẻ thù hồi hp = 25% (+10%/lv) sát thương gây ra kể cả đánh từ xa. logic tăng tỉ lệ thu hoạch như rune Điên Cuồng.
-- Hút máu (đồng minh): đồng minh hồi hp = 25% (+12%/lv) sát thương gây ra kể cả đánh từ xa, -0,6 tỉ lệ thu hoạch/lv. Hiệu quả giảm 25% đối với leader.
-- Phòng Thủ: kẻ thù tăng 10% (+5%/lv) hp và 15% (+4%/lv) arm/res, + 0,5 tỉ lệ thu hoạch/lv.
-- Suy Yếu (đồng minh): Đồng minh giảm 10% (+2,5%/lv) res/arm/atk/wil/hp, + 0,5 tỉ lệ thu hoạch/lv.
-- Suy Yếu (kẻ thù): kẻ thù giảm 10% (+2,6%/lv) res/arm/atk/wil/hp, - 0,5 tỉ lệ thu hoạch/lv.
-- Nhanh Nhẹn: kẻ thù tăng 0,3 (+0,1/lv) tốc độ di chuyển/s, + 0,6 tỉ lệ thu hoạch/lv.
-- Phục Sinh: khi hp về 0, kẻ thù không chết, lập tức hồi hp = 20% (+2%/lv) max hp của chúng, mỗi s hồi 2% (+1%/lv) max hp trong 5s (+1s/2lv), kích hoạt 1 lần/kẻ địch, + 0,8 tỉ lệ thu hoạch/lv, Hiệu quả giảm 50% đối với boss.
-- Nặng nề: + 0,4 (+0,3/lv) trọng lượng cho kẻ địch, + 0,6 tỉ lệ thu hoạch/lv, hiệu quả giảm 50% đối với boss.
-- Bạo Tạc: khi kẻ thù thật sự tử vong, chúng bạo tạc và gây sát thương = 100% (+15%/lv) max hp của bản thân trong bán kính tầm đánh của chúng, sát thương không phân địch ta, -0,5 tỉ lệ thu hoạch/lv, đối boss không hiệu quả.
-- Nhanh Nhẹn II (2 la mã, II là tên rune không phải lv rune, nếu lên lv 2 tên rune là 'Nhanh nhẹn II lv2'): giảm 20% (+3%/lv) cd đánh thường của mọi kẻ thù, đối boss bị giảm 50% hiệu quả, + 0,6 tỉ lệ thu hoạch/lv.
-- Phục thù: khi 5 (-1/4 lv) kẻ thù cùng loại chết, đồng loại của chúng được hồi 10% (+2/1 lv) max hp, ví dụ 5 sứ đồ chết thì mọi sứ đồ còn sống hồi 10% max hp của bản thân chúng, đối boss không hiệu quả, + 0,75 tỉ lệ thu hoạch/lv.
-- Sĩ khí: khi trên sân không có đồng minh nào có hp dưới 60%, mỗi nhân vật + 5% (+2/lv) max hp/atk/wil, - 0,35 tỉ lệ thu hoạch/lv.
-- Leader + : leader + 10% mọi chỉ số kể cả hp regen đang có, chỉ số từ rune này luôn áp dụng mỗi tối, chỉ số của leader thay đổi trước tối thì chỉ số leader nhận từ rune này cũng thay đổi theo, chỉ số từ rune này chỉ áp dụng lúc tối, buổi sáng không có hiệu quả, chỉ số từ rune này có thể vượt giới hạn chỉ số của game, -0,7 tỉ lệ thu hoạch/lv.
-- Càn Quét: đòn đánh thường của kẻ thù gây sát thương lan = 50% (+5%/lv) đòn đánh thường chính lên 3 (+1/5lv) đồng minh xung quanh, đối boss có 100% hiệu quả, + 0,8 tỉ lệ thu hoạch/lv.
-- Áp Đảo: - 10% (+2%/lv) mọi chỉ số của kẻ thù đứng trong phạm vi 5 đơn vị khoảng cách quanh leader, áp dụng với cả boss, - 0,5 tỉ lệ thu hoạch/lv.
-- Trọng Sinh: khi base bị phá hoặc hp leader về 0 và thực sự tử vong, màn hình loé sáng và mọi thứ trở lại lúc trận phòng thủ đêm đó bắt đầu, kích hoạt 1 (+1/3lv) lần/map, ví dụ: leader bị đánh chết hoặc base bị đánh bể lúc đêm thứ 3 trong map, rune này đưa leader trở lại lúc đêm thứ 3 vừa bắt đầu, lúc đó chỉ số, lính, kiến trúc trên ụ đá và dưới đất thế nào thì giữ như thế, -0,8 tỉ lệ thu hoạch/lv.
-- Hắc Khoa Kỹ: bắt đầu trận đấu với 1 (+1/3 lv) tháp canh lv 4, - 0,7 tỉ lệ thu hoạch/lv.
-- Âu Hoàng: Tăng 2% (+0,5%/lv) mọi tỉ lệ rơi đồ của mọi quái kể cả boss khi tử vong, ví dụ ở rune lv 1: trên cơ sở % tỉ lệ rơi đồ đã có + thêm 2% chứ không phải + thêm 2% của tỉ lệ rơi đồ đã có, - 0,7 tỉ lệ thu hoạch/lv.
-- Vận Rủi: tác dụng nghịch với rune Âu Hoàng, giảm 2% (+0,5%/lv) mọi tỉ lệ rơi đồ của mọi quái kể cả boss, là trừ trên tỉ lệ rơi cơ sở, +1 tỉ lệ thu hoạch/lv (tức dùng rune này ở lv 1 đã được + x1 tỉ lệ thu hoạch, nếu win mà chỉ dùng rune này sẽ được x2 phần thưởng). nếu đánh boss như Oán Long có 100% tỉ lệ rơi đồ để nhận Huyết Nhục Kết Tinh tạo ra Truyền Tống Trận thì khi dùng rune này ở lv 1 có 2% tỉ lệ không nhận được gì, sau đó còn 5% tỉ lệ nhận gấp đôi phần thưởng từ lần rơi đầu tiên của boss nhưng vì lần đầu không nhận gì nên may mắn được 5% đó kết quả cũng không nhận gì, nên map đó coi như thua, phải chơi lại vì truyền tống trận là cách duy nhất kết thúc map ở hiện tại. Để chơi được rune này player cần đủ may mắn, may mắn rune vận rủi không kích hoạt. Đương nhiên trong tương lai sẽ có nguyên liệu thay thế Huyết Nhục Kết Tinh, à hơn nữa theo lore base có thể tạo được mọi thứ nếu có đủ năng lượng nên nếu đủ tài nguyên cũng có thể tạo Huyết Nhục Kết Tinh qua base.
-- 
+## Hệ thống Rune và Bệ Đá Cổ — Bản cân bằng đề xuất
+
+1. Phân loại Rune
+
+Rune được chia thành hai nhóm:
+
+Rune Thử Thách
+
+- Làm map khó hơn.
+- Tăng Tỉ Lệ Thu Hoạch.
+- Có thể trang bị độc lập.
+- Hiệu ứng mặc định áp dụng lên toàn bộ phe Vĩnh Dạ, trừ khi mô tả ghi rõ không tác dụng hoặc giảm hiệu quả với boss.
+
+Rune Hỗ Trợ
+
+- Làm map dễ hơn hoặc cung cấp lợi thế chiến thuật.
+- Giảm Tỉ Lệ Thu Hoạch.
+- Không thể trang bị nếu chưa có ít nhất 1 Rune Thử Thách.
+- Chỉ được trang bị nếu sau khi trừ chi phí của rune, Tỉ Lệ Thu Hoạch cuối cùng vẫn từ x1 trở lên.
+
+---
+
+2. Quy tắc trang bị Rune
+
+- Mỗi map có tối đa 5 ô Rune.
+- Tối đa 2 Rune Hỗ Trợ.
+- Không thể trang bị hai Rune cùng tên.
+- Rune Hỗ Trợ phải được “trả giá” bằng phần Tỉ Lệ Thu Hoạch đã nhận từ Rune Thử Thách.
+- Nếu tháo Rune Thử Thách làm Tỉ Lệ Thu Hoạch tụt xuống dưới x1, Rune Hỗ Trợ gây ra tình trạng đó sẽ tự động bị tháo.
+- Rune có thể mang sang map khác, nhưng cấp hiệu lực tối đa của Rune bị giới hạn theo cấp Rune mà tier map đó có thể sinh ra.
+- Ví dụ: map tier 1.1–1.3 chỉ cho Rune phát huy tối đa hiệu lực lv1, dù Rune thật sự đang ở lv5.
+
+---
+
+3. Công thức Tỉ Lệ Thu Hoạch
+
+Tỉ lệ cơ sở của mọi map là:
+
+Tỉ Lệ Thu Hoạch cơ sở = x1
+
+Công thức kết toán:
+
+Tỉ Lệ Thu Hoạch cuối =
+clamp(
+    x1,
+    Giới hạn của loại map,
+    x1
+    + tổng thưởng từ Rune Thử Thách
+    - tổng chi phí từ Rune Hỗ Trợ
+)
+
+Ví dụ:
+
+Điên Cuồng lv1: +0,35
+Nhanh Nhẹn II lv1: +0,30
+Leader+ lv1: -0,25
+
+Tỉ Lệ Thu Hoạch cuối:
+x1 + 0,35 + 0,30 - 0,25 = x1,40
+
+Giới hạn Tỉ Lệ Thu Hoạch
+
+- Map thường: tối đa x3.
+- Map có boss cuối: tối đa x4.
+- Map sự kiện hoặc Thử Thách đặc biệt: tối đa x5.
+- Không dùng mức x10 trong map farm thông thường.
+
+Phạm vi áp dụng
+
+Tỉ lệ thu hoạch chỉ nhân:
+
+- Nguyên Tinh kết toán cuối map.
+- Tài nguyên có thể chuyển đổi thành Nguyên Tinh trong base.
+- Phần thưởng hoàn thành map.
+
+Tỉ lệ thu hoạch không nhân:
+
+- Vật phẩm nhiệm vụ.
+- Vật phẩm bắt buộc để mở tiến trình.
+- Huyết Nhục Kết Tinh bắt buộc.
+- Rune.
+- Vật phẩm độc bản.
+- Số lượng vật phẩm rơi trực tiếp từ từng quái.
+
+Tỉ lệ rơi đồ và Tỉ Lệ Thu Hoạch là hai hệ thống riêng.
+
+---
+
+4. Ký hiệu cân bằng Rune
+
+Trong các công thức dưới đây:
+
+L = cấp Rune, từ 1 đến 9
+N = L - 1
+
+Ví dụ:
+
+20% + 5% × N
+
+Ở lv1 là 20%.
+
+Ở lv2 là 25%.
+
+Ở lv9 là 60%.
+
+---
+
+5. Rune Thử Thách
+
+5.1. Điên Cuồng
+
+Hiệu ứng:
+
+Kẻ thù tăng:
+- Max HP: 20% + 5% × N
+- ATK/WIL: 15% + 4% × N
+
+- Boss chỉ nhận 60% phần chỉ số tăng thêm từ Rune này.
+- Không tăng tốc độ, ARM, RES hoặc cooldown.
+
+Tỉ Lệ Thu Hoạch:
+
++0,35 + 0,05 × N
+
+---
+
+5.2. Hút Máu
+
+Hiệu ứng:
+
+Kẻ thù hồi HP bằng:
+15% + 2,5% × N
+sát thương thực tế đã gây ra.
+
+Quy tắc:
+
+- Chỉ tính sát thương HP thực nhận sau ARM/RES và giảm sát thương.
+- Không tính overkill.
+- Sát thương diện rộng chỉ tạo 40% lượng hồi phục.
+- Boss chỉ nhận 50% hiệu quả.
+- Kẻ thường bị giới hạn hồi tối đa 4% max HP/s.
+- Boss bị giới hạn hồi tối đa 2% max HP/s.
+
+Tỉ Lệ Thu Hoạch:
+
++0,30 + 0,05 × N
+
+---
+
+5.3. Phòng Thủ
+
+Hiệu ứng:
+
+Kẻ thù tăng:
+- Max HP: 15% + 4% × N
+- Giảm sát thương nhận vào: 8% + 1% × N
+
+- Giảm sát thương nhận vào của Rune này tối đa 16%.
+- Boss chỉ nhận 60% hiệu quả.
+
+Tỉ Lệ Thu Hoạch:
+
++0,30 + 0,04 × N
+
+---
+
+5.4. Suy Yếu Đồng Minh
+
+Hiệu ứng:
+
+Mọi đơn vị phe player giảm:
+8% + 2% × N
+các chỉ số HP, ATK, WIL, ARM và RES.
+
+- Không giảm tốc độ di chuyển.
+- Không tăng cooldown.
+- Không ảnh hưởng lượng tài nguyên.
+- Kiến trúc không bị giảm chỉ số bởi Rune này.
+
+Tỉ Lệ Thu Hoạch:
+
++0,35 + 0,05 × N
+
+---
+
+5.5. Nhanh Nhẹn
+
+Hiệu ứng:
+
+Kẻ thù tăng tốc độ di chuyển:
+15% + 3% × N
+
+- Tối đa 39%.
+- Boss chỉ nhận 50% hiệu quả.
+- Không tăng tốc độ đạn.
+
+Tỉ Lệ Thu Hoạch:
+
++0,25 + 0,04 × N
+
+---
+
+5.6. Phục Sinh
+
+Hiệu ứng:
+
+Khi một kẻ thù lần đầu tiên về 0 HP:
+
+- Không tử vong.
+- Hồi ngay: 15% + 1,5% × N max HP.
+- Sau đó hồi 1% max HP/s trong:
+  4 + floor(N / 3) giây.
+
+Quy tắc:
+
+- Mỗi kẻ chỉ kích hoạt 1 lần trong cả đêm.
+- Boss chỉ nhận 50% lượng hồi phục.
+- Không kích hoạt khi bị tiêu diệt bởi hiệu ứng xóa sổ đặc biệt.
+- Không làm rơi đồ ở lần HP về 0 đầu tiên.
+
+Tỉ Lệ Thu Hoạch:
+
++0,40 + 0,05 × N
+
+---
+
+5.7. Nặng Nề
+
+Hiệu ứng:
+
+Kẻ thù tăng:
+- Trọng lượng vật lý: 0,4 + 0,15 × N
+- Kháng hất tung, kéo, đẩy lùi và choáng:
+  12% + 2% × N
+
+Quy tắc:
+
+- Boss chỉ nhận 50% phần trọng lượng tăng thêm.
+- Trọng lượng từ Rune này không làm thay đổi Threat Cost.
+- Trọng lượng dùng cho vật lý và tương tác kiến trúc, không dùng để tính budget sinh quái.
+
+Tỉ Lệ Thu Hoạch:
+
++0,20 + 0,03 × N
+
+---
+
+5.8. Bạo Tạc
+
+Để Rune này đúng nghĩa Rune Thử Thách, vụ nổ không gây sát thương lên phe Vĩnh Dạ.
+
+Hiệu ứng:
+
+Khi một kẻ thù thật sự tử vong:
+
+Gây sát thương hỗn hợp bằng:
+12% + 2% × N
+max HP của kẻ vừa chết.
+
+Quy tắc:
+
+- Gây sát thương lên đơn vị phe player, leader, kiến trúc và sinh vật trung lập.
+- Không gây sát thương lên phe Vĩnh Dạ.
+- Sát thương lên kiến trúc chỉ còn 50%.
+- Bán kính cơ sở 3 mét.
+- Mỗi 3 cấp Rune tăng thêm 0,25 mét bán kính.
+- Vụ nổ không kích hoạt vụ nổ của kẻ khác.
+- Boss không phát nổ.
+
+Tỉ Lệ Thu Hoạch:
+
++0,35 + 0,04 × N
+
+---
+
+5.9. Nhanh Nhẹn II
+
+Hiệu ứng:
+
+Giảm cooldown đánh thường của kẻ thù:
+15% + 2% × N
+
+- Tối đa 31%.
+- Boss chỉ nhận 50% hiệu quả.
+- Không giảm cooldown skill hoặc ultimate.
+
+Tỉ Lệ Thu Hoạch:
+
++0,30 + 0,04 × N
+
+---
+
+5.10. Phục Thù
+
+Hiệu ứng:
+
+Khi đủ số kẻ thù cùng loại thật sự tử vong:
+
+Ngưỡng kích hoạt:
+5 - floor(N / 4)
+
+Mọi kẻ cùng loại còn sống hồi:
+8% + 1% × N
+max HP.
+
+Quy tắc:
+
+- Ngưỡng tối thiểu là 3.
+- Cooldown 12 giây cho từng loại quái.
+- Mỗi loại quái kích hoạt tối đa 3 lần mỗi đêm.
+- Không tác dụng với boss.
+
+Tỉ Lệ Thu Hoạch:
+
++0,30 + 0,04 × N
+
+---
+
+5.11. Càn Quét
+
+Hiệu ứng:
+
+Đòn đánh thường đơn mục tiêu của kẻ thù gây thêm sát thương lan:
+
+Sát thương lan:
+25% + 2% × N
+sát thương của đòn chính.
+
+Số mục tiêu phụ:
+
+Lv1–4: 2 mục tiêu
+Lv5–8: 3 mục tiêu
+Lv9: 4 mục tiêu
+
+Quy tắc:
+
+- Không kích hoạt từ đòn vốn đã là AoE.
+- Không kích hoạt từ DoT, phản sát thương, vụ nổ hoặc triệu hồi.
+- Cùng một mục tiêu chỉ nhận 1 lần sát thương lan từ một đòn.
+- Đòn của boss chỉ nhận 50% hiệu quả Rune.
+
+Tỉ Lệ Thu Hoạch:
+
++0,35 + 0,05 × N
+
+---
+
+5.12. Vận Rủi
+
+Hiệu ứng:
+
+Mỗi tỉ lệ rơi đồ ngẫu nhiên bị giảm:
+2% + 0,5% × N
+điểm phần trăm.
+
+Ví dụ:
+
+Tỉ lệ gốc 5%
+Vận Rủi lv1: còn 3%
+Vận Rủi lv2: còn 2,5%
+
+Quy tắc:
+
+- Đây là trừ điểm phần trăm tuyệt đối, không phải giảm theo phần trăm tương đối.
+- Mỗi dòng tỉ lệ thành công trong cùng một pool bị trừ riêng.
+- Phần bị trừ được cộng vào tỉ lệ không rơi gì.
+- Tỉ lệ không thể thấp hơn 0%.
+- Không tác dụng lên vật phẩm nhiệm vụ.
+- Không tác dụng lên vật phẩm bắt buộc để hoàn thành map.
+- Không tác dụng lên các dòng rơi cố định 100%.
+- Không tác dụng lên Huyết Nhục Kết Tinh bắt buộc từ boss.
+
+Tỉ Lệ Thu Hoạch:
+
++0,25 + 0,05 × N
+
+---
+
+6. Rune Hỗ Trợ
+
+6.1. Hút Máu Đồng Minh
+
+Hiệu ứng:
+
+Đơn vị sống phe player hồi HP bằng:
+12% + 2% × N
+sát thương thực tế đã gây ra.
+
+Quy tắc:
+
+- Leader chỉ nhận 75% hiệu quả.
+- Sát thương AoE chỉ tạo 40% lượng hồi phục.
+- Không tính overkill.
+- Không áp dụng lên base, tường, tháp hoặc kiến trúc.
+- Hồi phục từ Rune này bị giới hạn tối đa 3% max HP/s.
+- Không tính vào healing cap của kiến trúc vì nguồn này đến từ đơn vị.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+-0,25 - 0,04 × N
+
+---
+
+6.2. Suy Yếu Kẻ Thù
+
+Hiệu ứng:
+
+Kẻ thù giảm:
+8% + 1,5% × N
+các chỉ số HP, ATK, WIL, ARM và RES.
+
+- Boss chỉ nhận 50% hiệu quả.
+- Không giảm tốc độ, cooldown hoặc trọng lượng.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+-0,30 - 0,04 × N
+
+---
+
+6.3. Sĩ Khí
+
+Điều kiện:
+
+Không có đơn vị phe player nào dưới 60% HP.
+
+Khi điều kiện được thỏa mãn:
+
+Mọi đơn vị sống phe player tăng:
+5% + 1% × N
+Max HP, ATK và WIL.
+
+Quy tắc:
+
+- Hiệu ứng mất sau 1 giây nếu có đồng minh tụt dưới 60% HP.
+- Hiệu ứng trở lại sau 3 giây liên tục thỏa điều kiện.
+- Không áp dụng lên kiến trúc.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+-0,15 - 0,025 × N
+
+---
+
+6.4. Leader+
+
+Hiệu ứng trong thời gian ban đêm:
+
+Leader tăng:
+8% + 1,5% × N
+HP, ATK, WIL, ARM, RES và HP Regen.
+
+Quy tắc:
+
+- Chỉ có hiệu lực ban đêm.
+- Tính lại theo chỉ số hiện tại của leader khi đêm bắt đầu.
+- Có thể vượt giới hạn chỉ số thông thường nếu hệ thống cho phép.
+- Không tăng tốc độ di chuyển hoặc giảm cooldown.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+-0,25 - 0,04 × N
+
+---
+
+6.5. Áp Đảo
+
+Hiệu ứng:
+
+Kẻ thù đứng trong bán kính 5 mét quanh leader bị giảm:
+
+8% + 1% × N
+HP, ATK, WIL, ARM và RES.
+
+Quy tắc:
+
+- Boss chỉ nhận 50% hiệu quả.
+- Nhiều nguồn Áp Đảo không cộng dồn.
+- Khi rời phạm vi, hiệu ứng biến mất sau 1 giây.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+-0,20 - 0,03 × N
+
+---
+
+6.6. Trọng Sinh
+
+Hiệu ứng:
+
+Khi base bị phá hoặc leader thật sự tử vong:
+
+- Trận phòng thủ quay lại đúng thời điểm đầu đêm.
+- Trạng thái ban đầu của đêm được khôi phục.
+- Tài nguyên đã tiêu trong đêm được hoàn lại theo snapshot đầu đêm.
+- Vật phẩm đã rơi trong đêm bị xóa.
+- RNG của đêm được tạo lại để tránh lặp hoàn toàn cùng một diễn biến.
+
+Số lần kích hoạt:
+
+Lv1–4: 1 lần/map
+Lv5–8: 2 lần/map
+Lv9: 3 lần/map
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+Lv1–4: -0,60
+Lv5–8: -0,75
+Lv9: -0,90
+
+---
+
+6.7. Hắc Khoa Kỹ
+
+Hiệu ứng:
+
+Bắt đầu map với 1 Tháp Canh tạm thời đặt gần base.
+
+Cấp tháp:
+
+Lv1–3: Tháp Canh lv3
+Lv4–6: Tháp Canh lv4
+Lv7–9: Tháp Canh lv5
+
+Quy tắc:
+
+- Không thể nâng cấp.
+- Không thể tháo để hoàn tài nguyên.
+- Biến mất khi rời map.
+- Cấp tháp không thể vượt giới hạn kiến trúc của tier map.
+- Nếu không có vị trí hợp lệ, game tạo một ụ đá tạm chỉ dành cho tháp này.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+Lv1–3: -0,40
+Lv4–6: -0,50
+Lv7–9: -0,60
+
+---
+
+6.8. Âu Hoàng
+
+Hiệu ứng:
+
+Mỗi tỉ lệ rơi đồ ngẫu nhiên được tăng:
+2% + 0,5% × N
+điểm phần trăm.
+
+Ví dụ:
+
+Tỉ lệ gốc 5%
+Âu Hoàng lv1: 7%
+Âu Hoàng lv2: 7,5%
+
+Quy tắc:
+
+- Đây là cộng điểm phần trăm tuyệt đối.
+- Không phải cộng phần trăm dựa trên tỉ lệ gốc.
+- Mỗi dòng tỉ lệ thành công trong cùng một pool được cộng riêng.
+- Tổng phần được cộng sẽ trừ vào tỉ lệ không rơi gì.
+- Nếu tỉ lệ không rơi gì không đủ để trừ, các dòng thành công đạt trần theo thứ tự từ tỉ lệ thấp nhất đến cao nhất.
+- Mỗi tỉ lệ tối đa 100%.
+- Các pool độc lập tiếp tục được tính độc lập.
+- Không tác dụng lên vật phẩm nhiệm vụ hoặc vật phẩm rơi cố định 100%.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+-0,30 - 0,05 × N
+
+---
+
+7. Rune mới đề xuất
+
+7.1. Rune Thử Thách — Cuồng Triều
+
+Hiệu ứng:
+
+Threat Budget mỗi đêm tăng:
+20% + 5% × N
+
+Quy tắc:
+
+- Không tăng chỉ số trực tiếp của quái.
+- Boss không tính trong phần budget tăng thêm.
+- Budget lính hộ tống boss chỉ nhận 50% hiệu quả.
+
+Tỉ Lệ Thu Hoạch:
+
++0,35 + 0,05 × N
+
+---
+
+7.2. Rune Thử Thách — Tinh Anh Hóa
+
+Hiệu ứng:
+
+5% + 1% × N
+quái thường sinh ra được nâng thành Tinh Anh.
+
+Tinh Anh nhận:
+
++50% max HP
++25% ATK/WIL
++10% tốc độ di chuyển
+
+Quy tắc:
+
+- Không biến boss thành Tinh Anh.
+- Không áp dụng lên quái vốn đã là Tinh Anh.
+- Tinh Anh dùng Threat Cost cao hơn quái gốc.
+
+Tỉ Lệ Thu Hoạch:
+
++0,40 + 0,05 × N
+
+---
+
+7.3. Rune Thử Thách — Hợp Quần
+
+Hiệu ứng:
+
+Mỗi kẻ thù nhận 1 stack Hợp Quần cho mỗi đồng minh Vĩnh Dạ trong bán kính 5 mét.
+
+Mỗi stack:
+
++2% + 0,25% × N ATK/WIL
++2% + 0,25% × N giảm sát thương nhận vào
+
+Quy tắc:
+
+- Tối đa 5 stack.
+- Boss tối đa 2 stack.
+- Stack mất sau 2 giây khi không còn đủ đồng minh gần đó.
+
+Tỉ Lệ Thu Hoạch:
+
++0,30 + 0,04 × N
+
+---
+
+7.4. Rune Thử Thách — Ô Nhiễm Sâu
+
+Hiệu ứng:
+
+Cooldown áp Ô Nhiễm từ cùng một loại nguồn giảm:
+15% + 2% × N
+
+Thời gian cầu nguyện xóa Ô Nhiễm tăng:
+10% + 2% × N
+
+Quy tắc:
+
+- Không giảm cooldown thấp hơn 3 giây.
+- Không làm thay đổi ngưỡng 5 stack chuyển hóa.
+- Boss không nhận lợi ích riêng từ Rune này nếu không có khả năng gây Ô Nhiễm.
+
+Tỉ Lệ Thu Hoạch:
+
++0,25 + 0,04 × N
+
+---
+
+7.5. Rune Hỗ Trợ — Dự Cảnh
+
+Hiệu ứng:
+
+Trước khi đêm bắt đầu, hiển thị:
+
+- Threat Budget chính xác của đêm đó.
+- Hướng xuất hiện chính.
+- Ba loại quái có Threat Cost cao nhất có thể xuất hiện.
+- Có hay không có quái bay.
+- Có hay không có đơn vị gây Ô Nhiễm.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+-0,10 - 0,01 × N
+
+---
+
+7.6. Rune Hỗ Trợ — Kiên Thành
+
+Hiệu ứng:
+
+Base và kiến trúc phe player tăng:
+- Max HP: 15% + 3% × N
+- Giảm sát thương nhận vào: 5% + 1% × N
+
+- Giảm sát thương nhận vào tối đa 13%.
+- Không tăng hồi phục.
+- Không tăng sát thương kiến trúc.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+-0,25 - 0,04 × N
+
+---
+
+7.7. Rune Hỗ Trợ — Tịnh Quang
+
+Hiệu ứng:
+
+- Hiển thị số stack Ô Nhiễm trên đơn vị phe player.
+- Thời gian cầu nguyện xóa Ô Nhiễm giảm:
+
+20% + 3% × N
+
+Quy tắc:
+
+- Không giảm tốc độ nhận stack.
+- Không tự động tịnh hóa.
+- Thời gian cầu nguyện tối thiểu còn 30% thời gian gốc.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+-0,20 - 0,03 × N
+
+---
+
+7.8. Rune Hỗ Trợ — Hậu Cần
+
+Hiệu ứng:
+
+Thời gian xây dựng, sửa chữa và cầu nguyện giảm:
+15% + 2% × N
+
+Quy tắc:
+
+- Không giảm chi phí tài nguyên.
+- Không tăng số nhân lực.
+- Không giảm cooldown chiến đấu.
+- Thời gian thực hiện tối thiểu còn 40% thời gian gốc.
+
+Chi phí Tỉ Lệ Thu Hoạch:
+
+-0,20 - 0,03 × N
+
+---
+
+8. Bệ Đá Cổ
+
+8.1. Tỉ lệ xuất hiện
+
+Tỉ lệ cơ sở:
+
+Tier 1.1: 20%
+Mỗi tier nhỏ tiếp theo: +3 điểm phần trăm
+
+Hệ thống pity:
+
+Mỗi map hoàn thành mà không nhận được Rune từ Bệ Đá Cổ:
++10 điểm phần trăm cho map kế tiếp.
+
+Quy tắc:
+
+- Tỉ lệ tối đa 100%.
+- Pity chỉ tăng khi hoàn thành map.
+- Thua hoặc rút lui không tăng pity.
+- Khi nhận Rune từ Bệ Đá Cổ, pity trở về 0.
+- Nếu map có Bệ nhưng player không tìm thấy hoặc không nhận Rune, pity vẫn tăng sau khi hoàn thành map.
+- Mỗi map có tối đa 1 Bệ Đá Cổ.
+
+Công thức:
+
+Tỉ lệ xuất hiện =
+min(
+    100%,
+    tỉ lệ theo tier + pity hiện tại
+)
+
+---
+
+8.2. Chọn Rune
+
+Khi kích hoạt Bệ Đá Cổ:
+
+- Hiển thị 3 Rune khác nhau.
+- Luôn có 2 Rune Thử Thách.
+- Luôn có 1 Rune Hỗ Trợ.
+- Player chọn đúng 1 Rune.
+- Hai Rune không chọn biến mất.
+- Không xuất hiện ba Rune cùng tên.
+- Nếu player đã sở hữu Rune đạt lv9, Rune đó không xuất hiện tiếp.
+
+---
+
+8.3. Cấp Rune do Bệ tạo ra
+
+Tier 1.1–1.3: Rune lv1
+Tier 1.4–1.6: Rune lv2
+Tier 1.7–1.9: Rune lv3
+
+Tier 2.1–2.3: Rune lv4
+Tier 2.4–2.6: Rune lv5
+Tier 2.7–2.9: Rune lv6
+
+Tier 3.1–3.3: Rune lv7
+Tier 3.4–3.6: Rune lv8
+Tier 3.7–3.9: Rune lv9
+
+---
+
+8.4. Dung hợp Rune
+
+3 Rune cùng tên và cùng cấp
+→ 1 Rune cùng tên cao hơn 1 cấp.
+
+Quy tắc:
+
+- Rune lv9 không thể dung hợp tiếp ở phiên bản hiện tại.
+- Rune đang trang bị không thể dùng làm nguyên liệu.
+- Hệ thống phải có cảnh báo xác nhận trước khi dung hợp.
+
+Đề xuất bổ sung để giảm grind:
+
+- Rune không cần có thể phân rã thành Bụi Rune.
+- 5 Bụi Rune có thể thay thế 1 trong 3 bản Rune cần cho một lần dung hợp.
+- Mỗi lần dung hợp chỉ được dùng tối đa 1 phần thay thế bằng Bụi Rune.
+
+---
+
+9. Threat Budget và trọng lượng quái
+
+Không dùng cùng một chỉ số cho hai mục đích.
+
+Mỗi quái cần có:
+
+physicsWeight
+
+Dùng cho:
+
+- Hất tung.
+- Kéo.
+- Đẩy lùi.
+- Trọng Lực Pháo.
+- Tương tác vật lý.
+
+Và:
+
+threatCost
+
+Dùng cho:
+
+- Budget mỗi đêm.
+- Tính số lượng quái sinh ra.
+- Phân phối quái thường, đặc biệt và Tinh Anh.
+
+Rune Nặng Nề chỉ thay đổi "physicsWeight", không thay đổi "threatCost".
+
+---
+
+10. Nhịp tăng Threat Budget
+
+Nếu đêm đầu có budget 10:
+
+Budget đêm N = 10 × 1,5^(N - 1)
+
+Bảng tham khảo:
+
+Đêm 1: 10
+Đêm 2: 15
+Đêm 3: 22,5
+Đêm 4: 33,75
+Đêm 5: 50,63
+Đêm 6: 75,94
+Đêm 7: 113,91
+
+Tăng 50% mỗi đêm chỉ nên dùng khi một map có khoảng 6 đêm thường và 1 đêm boss.
+
+Nếu map kéo dài hơn 7 đêm, nên đổi sang:
+
+Đêm 1–4: +50% mỗi đêm
+Đêm 5 trở đi: +30% mỗi đêm
+
+để tránh budget tăng theo cấp số nhân quá nhanh.
+
+---
+
+11. Đêm cuối và Oán Long
+
+Dùng cấu trúc kết thúc lai giữa chủ động tiến công và boss tự kéo đến.
+
+11.1. Mở quyền đánh boss
+
+- Từ ngày 5, player có thể tìm được sào huyệt hoặc lãnh địa của Oán Long.
+- Sau khi tìm thấy, player có thể chủ động dẫn leader và quân tiến công.
+- Khi chủ động tiến công, player không được hưởng toàn bộ lợi thế của tường và kiến trúc phòng thủ tại base.
+
+11.2. Boss tự xuất hiện
+
+- Nếu player chưa chủ động đánh boss, đêm 7 Oán Long tự dẫn quân tấn công.
+- Player được dùng toàn bộ phòng tuyến.
+- Đổi lại, Oán Long có quân hộ tống và trực tiếp gây áp lực lên kiến trúc.
+
+11.3. Boss Slot
+
+Oán Long không dùng "physicsWeight = 4" làm Threat Cost.
+
+Oán Long dùng một Boss Slot riêng:
+
+Boss Slot: Oán Long
+Escort Budget: budget lính hộ tống riêng
+
+- Oán Long không trừ trực tiếp 4 điểm khỏi budget.
+- Budget đêm 7 không được dùng toàn bộ rồi cộng thêm boss mà không điều chỉnh.
+- Gợi ý escort budget cơ sở bằng 50–70% budget đêm 7.
+- Rune Cuồng Triều chỉ tác động 50% lên escort budget.
+- Rune tăng chỉ số vẫn tác động lên Oán Long theo hệ số boss được ghi trong từng Rune.
+
+11.4. Phần thưởng boss
+
+- Huyết Nhục Kết Tinh bắt buộc có tỉ lệ rơi 100%.
+- Âu Hoàng và Vận Rủi không tác động lên Huyết Nhục Kết Tinh bắt buộc.
+- Các vật phẩm thưởng thêm của boss vẫn có thể bị Âu Hoàng và Vận Rủi tác động.
+- Tỉ Lệ Thu Hoạch có thể nhân phần Nguyên Tinh kết toán từ trận boss.
+- Tỉ Lệ Thu Hoạch không nhân số lượng Huyết Nhục Kết Tinh bắt buộc.
+
+---
+
+12. Điểm cần test trong prototype
+
+Các giá trị cần theo dõi khi test:
+
+- Tỉ lệ thắng theo từng tổ hợp Rune.
+- Thời gian trung bình để hoàn thành một đêm.
+- Số tài nguyên kiếm được mỗi giờ chơi.
+- Tỉ lệ Rune Hỗ Trợ được sử dụng.
+- Tổ hợp Rune nào luôn đạt cap x3 hoặc x4.
+- Rune nào gần như không ai chọn.
+- Rune nào khiến Oán Long trở nên bất tử.
+- Tần suất Bệ Đá Cổ xuất hiện thực tế sau pity.
+- Số map trung bình cần để dung hợp một Rune lên cấp tiếp theo.
+- Mức chênh lệch giữa chủ động đánh Oán Long và chờ Oán Long tấn công.

@@ -49,5 +49,6 @@ Tài liệu này là checklist QA bắt buộc trước khi tuyên bố mode Vĩ
 - [ ] Start a Vĩnh Dạ run from the current map and confirm the castle/crystal render at the legacy center position before escort is available.
 - [ ] Bank at least 10 Dạ Thạch, reach night 3 or later, clear the current night into day, and confirm escort starts or the Hộ tống action reports readiness.
 - [ ] During escort, spawn/observe ground enemies and confirm they walk toward and damage the moving crystal/base instead of the old center point.
+- [ ] During escort, confirm the existing `.vinh-da-game__celestial` remains clearly visible (escort uses the day visual class instead of dropping both day/night celestial states).
 - [ ] Build living wall pairs around the escorted crystal and confirm base/church/elemental territory buffs apply inside the moved bounds, then break one wall and confirm buffs/heal stop.
 - [ ] Let the crystal reach the first seal point and confirm enemies are cleared, contamination/bleed on the old zone are reset, and the next seal point/night is prepared.

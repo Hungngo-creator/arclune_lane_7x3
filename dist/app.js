@@ -2370,7 +2370,7 @@ __modules['./background.ts'] = (exports, module, __require) => {
 __modules['./catalog.ts'] = (exports, module, __require) => {
   // @ts-check
   //home (termux)/arclune_lane_7x3/src/catalog.ts
-  // 1) Rank multiplier (đơn giản) — áp lên TẤT CẢ stat trừ SPD
+  // 1) Rank multiplier (đơn giản) — chỉ áp lên nhóm stat được scale theo rank
   const __dep0 = __require('./utils/kit.ts');
   const kitSupportsSummon = __dep0.kitSupportsSummon;
   const __dep1 = __require('./utils/domain-normalization.ts');
@@ -2392,7 +2392,19 @@ __modules['./catalog.ts'] = (exports, module, __require) => {
       UR: 1.3,
       Prime: 1.55,
   };
-  // 2) Class base (mốc lv1 để test). SPD không chịu rank multiplier.
+  const RANK_SCALED_STATS = [
+      'HP',
+      'ATK',
+      'WIL',
+      'ARM',
+      'RES',
+      'HPregen',
+  ];
+  const RANK_SCALED_STAT_SET = new Set(RANK_SCALED_STATS);
+  const isRankScaledStat = (stat) => (RANK_SCALED_STAT_SET.has(stat));
+  // AGI/PER tạm thời không chịu rank multiplier để chờ cân bằng riêng.
+  // SPD/AEmax/AEregen cũng không scale theo rank.
+  // 2) Class base (mốc lv1 để test). Chỉ RANK_SCALED_STATS chịu rank multiplier.
   const CLASS_BASE = {
       Mage: { HP: 740, ATK: 28, WIL: 31, ARM: 0.08, RES: 0.12, AGI: 10, PER: 12, SPD: 1.00, AEmax: 110, AEregen: 8.0, HPregen: 15 },
       Tanker: { HP: 900, ATK: 23, WIL: 21, ARM: 0.15, RES: 0.12, AGI: 9, PER: 10, SPD: 0.95, AEmax: 65, AEregen: 4.5, HPregen: 19 },
@@ -2404,7 +2416,7 @@ __modules['./catalog.ts'] = (exports, module, __require) => {
   };
   const isRankName = (value) => value in RANK_MULT;
   const isClassName = (value) => normalizeClassName(value) !== null;
-  // 3) Helper: áp rank & mod (mods không áp vào SPD)
+  // 3) Helper: áp rank & mod
   function applyRankAndMods(base, rank, mods = {}) {
       const multiplier = RANK_MULT[rank] ?? 1;
       const out = { ...base };
@@ -2412,12 +2424,9 @@ __modules['./catalog.ts'] = (exports, module, __require) => {
       for (const key of keys) {
           const baseValue = base[key] ?? 0;
           const mod = 1 + (mods?.[key] ?? 0);
-          if (key === 'SPD') { // SPD không nhân theo bậc
-              out[key] = Math.round(baseValue * mod * 100) / 100;
-              continue;
-          }
-          const precision = (key === 'ARM' || key === 'RES') ? 100 : (key === 'AEregen' ? 10 : 1);
-          out[key] = Math.round(baseValue * mod * multiplier * precision) / precision;
+          const precision = (key === 'ARM' || key === 'RES' || key === 'SPD') ? 100 : (key === 'AEregen' ? 10 : 1);
+          const rankMultiplier = isRankScaledStat(key) ? multiplier : 1;
+          out[key] = Math.round(baseValue * mod * rankMultiplier * precision) / precision;
       }
       return out;
   }
@@ -4597,6 +4606,8 @@ __modules['./catalog.ts'] = (exports, module, __require) => {
   };
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_MULT')) exports.RANK_MULT = RANK_MULT;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_SCALED_STATS')) exports.RANK_SCALED_STATS = RANK_SCALED_STATS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isRankScaledStat')) exports.isRankScaledStat = isRankScaledStat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CLASS_BASE')) exports.CLASS_BASE = CLASS_BASE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ROSTER')) exports.ROSTER = ROSTER;
   if (!Object.prototype.hasOwnProperty.call(exports, 'UNIT_BASE')) exports.UNIT_BASE = UNIT_BASE;
@@ -11439,6 +11450,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   const CLASS_BASE = __dep1.CLASS_BASE;
   const RANK_MULT = __dep1.RANK_MULT;
   const ROSTER = __dep1.ROSTER;
+  const isRankScaledStat = __dep1.isRankScaledStat;
   const __dep2 = __require('./utils/assert.ts');
   const assertDefined = __dep2.assertDefined;
   const __dep3 = __require('./data/roster-preview.config.ts');
@@ -11512,10 +11524,8 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   function applyRankMultiplier(preRank, rank) {
       const multiplier = getRankMultiplier(rank);
       return mapStatBlock(preRank, (stat, value) => {
-          if (stat === 'SPD') {
-              return roundStat(stat, value);
-          }
-          return roundStat(stat, value * multiplier);
+          const rankMultiplier = isRankScaledStat(stat) ? multiplier : 1;
+          return roundStat(stat, value * rankMultiplier);
       });
   }
   function computePreviewStats(base, rank, tpAlloc) {
@@ -38865,7 +38875,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           return 'clear';
       };
       const renderWeather = () => {
-          section.classList.toggle('is-day', dayNightPhase === 'day');
+          section.classList.toggle('is-day', dayNightPhase === 'day' || dayNightPhase === 'escort');
           section.classList.toggle('is-night', dayNightPhase === 'night');
           if (!weatherLayer)
               return;
@@ -38947,7 +38957,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       };
       const renderDayNightTimer = () => {
           if (dayNightPhaseText)
-              dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : 'Ngày';
+              dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : simulationState.dayNightPhase === 'escort' ? 'Hộ tống' : 'Ngày';
           if (nightIndexText)
               nightIndexText.textContent = String(simulationState.nightIndex);
           if (waveThreatBudgetText)

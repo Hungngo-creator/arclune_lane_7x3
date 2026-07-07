@@ -3,6 +3,7 @@ import * as assert from 'node:assert/strict';
 import {
   CLASS_BASE,
   RANK_MULT,
+  RANK_SCALED_STATS,
   ROSTER,
   applyRankAndMods,
 } from '../src/catalog.ts';
@@ -12,6 +13,7 @@ import {
   ROSTER_TP_ALLOCATIONS,
   ROSTER_PREVIEWS,
   ROSTER_PREVIEW_ROWS,
+  applyRankMultiplier,
   computeFinalStats,
   deriveTpFromMods,
 } from '../src/data/roster-preview.ts';
@@ -68,6 +70,28 @@ describe('roster preview data integrity', () => {
         CLASS_BASE[meta.class as keyof typeof CLASS_BASE].SPD,
         'SPD không được thay đổi bởi rank',
       );
+    }
+  });
+
+  test('rank multiplier chỉ áp dụng cho danh sách stat được scale', () => {
+    assert.deepStrictEqual(RANK_SCALED_STATS, ['HP', 'ATK', 'WIL', 'ARM', 'RES', 'HPregen']);
+
+    const base = CLASS_BASE.Mage;
+    const rank = 'UR' as keyof typeof RANK_MULT;
+    const multiplier = RANK_MULT[rank];
+    const catalogFinal = applyRankAndMods(base, rank);
+    const previewFinal = applyRankMultiplier(base, rank);
+
+    for (const stat of ['AEmax', 'AEregen', 'SPD'] as const) {
+      assert.strictEqual(catalogFinal[stat], base[stat], `${stat} không được đổi theo rank trong catalog`);
+      assert.strictEqual(previewFinal[stat], base[stat], `${stat} không được đổi theo rank trong preview`);
+    }
+
+    for (const stat of RANK_SCALED_STATS) {
+      const precision = stat === 'ARM' || stat === 'RES' ? 100 : 1;
+      const expected = Math.round(base[stat] * multiplier * precision) / precision;
+      assert.strictEqual(catalogFinal[stat], expected, `${stat} phải đổi theo RANK_MULT trong catalog`);
+      assert.strictEqual(previewFinal[stat], expected, `${stat} phải đổi theo RANK_MULT trong preview`);
     }
   });
 
