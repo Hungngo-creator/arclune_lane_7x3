@@ -517,7 +517,7 @@ const applyElementEffect = (ctx: VinhDaSimulationContext, enemy: Enemy, element:
 
 export const reduceStructureDamage = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime, attacker: Enemy | null, amount: number): number => {
     if (structure.type !== 'wall') return amount;
-    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element);
   const arm = (stat.arm ?? 0) * (1 + (runtime.statuses?.elementalArmBonusPercent ?? 0));
     const res = (stat.res ?? 0) * (1 + (runtime.statuses?.elementalResBonusPercent ?? 0));
     const defenseMultiplier = ((100 / (100 + Math.max(0, arm))) + (100 / (100 + Math.max(0, res)))) / 2;
@@ -531,7 +531,7 @@ export const reduceStructureDamage = (ctx: VinhDaSimulationContext, structure: P
   };
 export const triggerWallHitEffects = (ctx: VinhDaSimulationContext, structure: PlacedStructure, site: BuildSite, runtime: StructureRuntime, attacker: Enemy): void => {
     if (structure.type !== 'wall') return;
-    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element);
     const cooldowns = runtime.attackerCooldowns ??= new Map<string, number>();
     if (structure.branchLv3 === 'spike' && stat.spikeTrueDamage && damageEnemy(ctx, attacker, stat.spikeTrueDamage)) return;
     if (structure.branchLv3 === 'shock'){
@@ -1000,8 +1000,8 @@ export const updateWallLink = (ctx: VinhDaSimulationContext, structure: PlacedSt
     if (!site) return;
     const linked = findLinkedWall(ctx, structure, site);
     if (!linked) return;
-    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
-    const sourceMaxHp = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hp;
+    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element);
+    const sourceMaxHp = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element).hp;
     const linkedRuntime = ctx.ensureStructureRuntime(linked);
     runtime.linkedWallSiteId = linked.siteId;
     linkedRuntime.linkedMaxHpBonus = (linkedRuntime.linkedMaxHpBonus ?? 0) + sourceMaxHp * (stat.linkedHpBonusPercent ?? 0);
@@ -1010,14 +1010,14 @@ export const updateWallLink = (ctx: VinhDaSimulationContext, structure: PlacedSt
 export const updateWallRegeneration = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime, dt: number): void => {
     if (structure.type !== 'wall') return;
     const maxHp = ctx.getStructureMaxHp(structure);
-    const regen = (getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5).hpRegen ?? 0) + (runtime.linkedRegenBonus ?? 0);
+    const regen = (getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element).hpRegen ?? 0) + (runtime.linkedRegenBonus ?? 0);
     runtime.hp = Math.min(maxHp, runtime.hp + regen * dt);
   };
 export const updateBiochemicalWall = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime): void => {
     if (structure.type !== 'wall' || structure.level < 5 || structure.branchLv5 !== 'biochemical' || (runtime.biochemicalCooldown ?? 0) > 0) return;
     const site = ctx.getBuildSite(structure.siteId);
     if (!site) return;
-    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5);
+    const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element);
     const candidates = ctx.state.enemies
       .map((enemy, index) => ({ enemy, index, sort: Math.random() }))
       .filter(item => Math.abs(item.enemy.x - site.x) <= (stat.biochemicalRange ?? 0))
