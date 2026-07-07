@@ -57,6 +57,9 @@ import {
   TELEPORT_BANKED_RESOURCE_KEEP_RATIO,
   getLivingTerritoryWallBounds,
   isXInLivingTerritory,
+  getBaseX,
+  canStartEscort,
+  startEscort,
 } from './simulation.ts';
 import type { DayNightPhase, VinhDaSimulationContext, VinhDaSimulationState } from './simulation.ts';
 import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime, VinhDaStatusCollection } from './types.ts';
@@ -339,6 +342,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let carriedDaThach = 0;
   let baseHp = 20;
   let baseLevel = 0;
+  let baseX = CRYSTAL_X;
   const baseStatuses: VinhDaStatusCollection = {};
   let leaderHp = 20;
   let leaderMaxHp = 20;
@@ -380,6 +384,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         <div>Còn lại: <span data-role="phase-time-remaining"></span></div>
       </div>
       <div class="vinh-da-game__panel vinh-da-game__panel--status" data-role="status-panel"></div>
+      <button class="vinh-da-game__build-node" data-role="escort-start" type="button" title="Mở đường hộ tống">⇢<small>Hộ tống</small></button>
       <button class="vinh-da-game__back" type="button" aria-label="Về World Map">↩</button>
     </div>
     <div class="vinh-da-game__notice" data-role="notice" aria-live="polite"></div>
@@ -387,8 +392,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       <div class="vinh-da-game__world" data-role="world">
       <div class="vinh-da-game__celestial" aria-hidden="true"></div>
         <div class="vinh-da-game__weather-layer" data-role="weather-layer" aria-hidden="true"></div>
-        <div class="vinh-da-game__castle" aria-hidden="true"></div>
-        <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
+        <div class="vinh-da-game__castle" data-role="castle" aria-hidden="true"></div>
+        <div class="vinh-da-game__crystal" data-role="crystal" aria-label="Pha lê thành trì"></div>
         <div class="vinh-da-game__ground" aria-hidden="true"></div>
         <div class="vinh-da-game__elemental-regions" data-role="elemental-regions" aria-hidden="true"></div>
         <div data-role="build-sites"></div>
@@ -400,6 +405,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     </div>`;
 
   const world = section.querySelector<HTMLElement>('[data-role="world"]');
+  const castleElement = section.querySelector<HTMLElement>('[data-role="castle"]');
+  const crystalElement = section.querySelector<HTMLElement>('[data-role="crystal"]');
+  const escortStartButton = section.querySelector<HTMLButtonElement>('[data-role="escort-start"]');
   const sprite = section.querySelector<HTMLElement>('[data-role="leader"]');
   const viewport = section.querySelector<HTMLElement>('[data-role="viewport"]');
   const weatherLayer = section.querySelector<HTMLElement>('[data-role="weather-layer"]');
@@ -552,7 +560,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     if (!statusPanel) return;
     const baseStat = getBaseLevelStat(baseLevel);
     const territoryBounds = getLivingTerritoryWallBounds(simulationContext);
-    const baseInTerritory = isXInLivingTerritory(simulationContext, CRYSTAL_X, territoryBounds);
+    const baseInTerritory = isXInLivingTerritory(simulationContext, getBaseX(simulationState), territoryBounds);
     const contaminationStacks = simulationState.baseStatuses?.contaminationStacks ?? simulationState.contamination ?? 0;
     const church = [...structures.values()].find(structure => structure.type === 'church');
     const churchRuntime = church ? ensureStructureRuntime(church) : null;
@@ -571,6 +579,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     if (elemental && elementalStat) lines.push(`<div>Tháp NT: ${elemental.element ?? 'Hỏa'} Lv${elemental.level} · cost ${getBuildLevelCost('elementalTower', elemental.level)} · range ${elementalStat.range ?? 0} · ${describeElementEffect(elemental.element ?? 'Hỏa')}</div>`);
     if (barracks && barracksStat) lines.push(`<div>Trại: ${barracksRuntime?.soldiers?.length ?? 0}/${barracksStat.soldierCap ?? 0} lính · rank ${barracksStat.soldierRank ?? 1} · ulti ${barracksStat.ultimatePermission ? 'ready' : 'khóa'}</div>`);
     if (church) lines.push(`<div>Ấn: prayer ${formatSeconds(churchRuntime?.prayerTimer)} · cleanse ${formatSeconds(churchRuntime?.contaminationCleanseTimer)}</div>`);
+    lines.push(`<div class="${canStartEscort(simulationContext) ? 'vinh-da-game__status-warn' : ''}">Hộ tống: ${simulationState.dayNightPhase === 'escort' ? `đang mở đường tới ${Math.round(getBaseX(simulationState))}` : canStartEscort(simulationContext) ? 'sẵn sàng mở đường' : 'cần Dạ Thạch/đêm/tàn khu'}</div>`);
     if (teleport) lines.push(`<div class="${teleportCheck?.ok ? '' : 'vinh-da-game__status-warn'}">Truyền Tống: phí ${TELEPORT_RETREAT_COST} · giữ ${Math.round(TELEPORT_BANKED_RESOURCE_KEEP_RATIO * 100)}% kho · ${teleportCheck?.ok ? 'sẵn sàng rút lui' : teleportCheck?.reason === 'cooldown' ? `CD ${formatSeconds(teleportCheck.cooldownSeconds)}` : teleportCheck?.reason === 'insufficient-resource' ? 'thiếu Dạ Thạch' : 'chưa sẵn sàng'}</div>`);
     statusPanel.innerHTML = lines.join('');
   };
@@ -833,6 +842,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     set baseHp(value: number){ baseHp = value; },
     get baseLevel(){ return baseLevel; },
     set baseLevel(value: number | undefined){ baseLevel = value ?? 0; },
+    get baseX(){ return baseX; },
+    set baseX(value: number | undefined){ baseX = Number.isFinite(value) ? value! : CRYSTAL_X; },
     baseStatuses,
     get leaderHp(){ return leaderHp; },
     set leaderHp(value: number){ leaderHp = value; },
@@ -880,6 +891,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     enemySpawnTimer = simulationState.enemySpawnTimer;
     dayNightPhase = simulationState.dayNightPhase;
     phaseRemainingSeconds = simulationState.phaseRemainingSeconds;
+    baseX = getBaseX(simulationState);
     leaderAttackCooldown = simulationState.leaderAttackCooldown;
     nightIndex = simulationState.nightIndex;
     waveThreatBudgetRemaining = simulationState.waveThreatBudgetRemaining;
@@ -902,6 +914,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const damageBase = (amount: number): boolean => { const destroyed = runtimeDamageBase(simulationContext, amount); syncSimulationState(); return destroyed; };
   const updateEnemies = (dt: number): void => { runtimeUpdateEnemies(simulationContext, dt); syncSimulationState(); };
   const updateDayNightTimer = (dt: number): void => {
+    if (canStartEscort(simulationContext) && simulationState.dayNightPhase === 'day' && simulationState.enemies.length === 0) startEscort(simulationContext);
     const wasNight = simulationState.dayNightPhase === 'night';
     const enemyCountBefore = simulationState.enemies.length;
     runtimeUpdateDayNightTimer(simulationContext, dt);
@@ -910,6 +923,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
   const updateStructures = (dt: number): void => { runtimeUpdateStructures(simulationContext, dt); syncSimulationState(); };
   const collectDroppedResources = (): void => { runtimeCollectDroppedResources(simulationContext); syncSimulationState(); };
+  escortStartButton?.addEventListener('click', () => {
+    if (startEscort(simulationContext)) showNotice('Bắt đầu hộ tống pha lê tới điểm phong ấn');
+    else showNotice('Chưa đủ điều kiện hộ tống');
+    syncSimulationState();
+  });
 
   function renderDroppedResources(): void {
     if (!droppedResourcesContainer) return;
@@ -975,6 +993,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       renderVisibleBuildSites();
       renderVisibleElementalRegions();
     }
+    if (castleElement) castleElement.style.left = `${getBaseX(simulationState) - CASTLE_WIDTH * 0.5}px`;
+    if (crystalElement) crystalElement.style.left = `${getBaseX(simulationState)}px`;
     if (sprite) sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
   };
 

@@ -2,7 +2,7 @@ import { CRYSTAL_X, ENEMY_SPAWN_INTERVAL, ENEMY_START_PADDING, WORLD_WIDTH } fro
 import { ENEMY_TEMPLATES } from '../src/screens/vinh-da/enemies.ts';
 import { BASE_STRUCTURE_STATS, BUILD_SITES, getBaseLevelStat, getStructureLevelStat } from '../src/screens/vinh-da/structures.ts';
 import type { StructureType } from '../src/screens/vinh-da/structures.ts';
-import { damageEnemy, getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory, removeEnemyAt, spawnEnemy, spawnWaveEnemy, updateDayNightTimer, updateEnemies, updateStructures } from '../src/screens/vinh-da/simulation.ts';
+import { ESCORT_SEAL_POINTS, ESCORT_START_NIGHT_INDEX, ESCORT_START_RESOURCE_COST, canStartEscort, damageEnemy, getBaseX, getLivingTerritoryWallBounds, getScaledThreatBudget, getVinhDaWaveConfig, isXInLivingTerritory, removeEnemyAt, spawnEnemy, spawnWaveEnemy, startEscort, updateDayNightTimer, updateEnemies, updateStructures } from '../src/screens/vinh-da/simulation.ts';
 import type { VinhDaSimulationContext, VinhDaSimulationState } from '../src/screens/vinh-da/simulation.ts';
 import type { BuildSite, EnemyPortal, PlacedStructure, StructureRuntime } from '../src/screens/vinh-da/types.ts';
 
@@ -259,6 +259,63 @@ describe('Vĩnh Dạ enemy behavior locks', () => {
     updateEnemies(ctx, 0);
     expect(ctx.state.baseHp).toBeCloseTo(beforeBaseHp - dragon.wil * 2);
     expect(dragon.dragonUltimateCooldown).toBe(20);
+  });
+});
+
+describe('Vĩnh Dạ escort relocation', () => {
+  it('keeps the base position fallback at the original crystal coordinate', () => {
+    const ctx = createContext([], new Map());
+
+    expect(getBaseX(ctx.state)).toBe(CRYSTAL_X);
+  });
+
+  it('starts escort only after resource and night gates are satisfied', () => {
+    const ctx = createContext([], new Map());
+    Object.assign(ctx.state, { bloodSealStone: ESCORT_START_RESOURCE_COST, nightIndex: ESCORT_START_NIGHT_INDEX });
+
+    expect(canStartEscort(ctx)).toBe(true);
+    expect(startEscort(ctx)).toBe(true);
+    expect(ctx.state.dayNightPhase).toBe('escort');
+    expect(ctx.state.bloodSealStone).toBe(0);
+    expect(getBaseX(ctx.state)).toBe(CRYSTAL_X);
+  });
+
+  it('retargets ground enemies to the moving base during escort', () => {
+    const ctx = createContext([], new Map());
+    Object.assign(ctx.state, { dayNightPhase: 'escort', baseX: CRYSTAL_X + 300, leaderAttackCooldown: 999 });
+    spawnEnemy(ctx, 'left', 'twisted', CRYSTAL_X + 300 - ENEMY_TEMPLATES.twisted.attackRange, true);
+    ctx.state.enemies[0]!.attackCooldown = 0;
+
+    updateEnemies(ctx, 0);
+
+    expect(ctx.state.baseHp).toBeLessThan(10);
+  });
+
+  it('moves territory bounds with the escorted base and clears the old zone after sealing', () => {
+    const leftSite: BuildSite = { id: 'escort-wall-left', x: CRYSTAL_X + 220, kind: 'wall', allowed: ['wall'] };
+    const rightSite: BuildSite = { id: 'escort-wall-right', x: CRYSTAL_X + 620, kind: 'wall', allowed: ['wall'] };
+    const runtimes = new Map<string, StructureRuntime>([
+      [leftSite.id, { cooldown: 0, hp: 8 }],
+      [rightSite.id, { cooldown: 0, hp: 8 }],
+    ]);
+    const ctx = createContext([
+      { siteId: leftSite.id, type: 'wall', level: 1 },
+      { siteId: rightSite.id, type: 'wall', level: 1 },
+    ], runtimes, [leftSite, rightSite]);
+    Object.assign(ctx.state, { dayNightPhase: 'escort', baseX: CRYSTAL_X + 400, contamination: 4, baseStatuses: { contaminationStacks: 4 } });
+    (ctx.structureSitesByType.get('wall') as Set<string>).add(leftSite.id);
+    (ctx.structureSitesByType.get('wall') as Set<string>).add(rightSite.id);
+
+    expect(isXInLivingTerritory(ctx, getBaseX(ctx.state))).toBe(true);
+    expect(isXInLivingTerritory(ctx, CRYSTAL_X)).toBe(false);
+
+    ctx.state.baseX = ESCORT_SEAL_POINTS[0] - 1;
+    updateDayNightTimer(ctx, 1);
+
+    expect(ctx.state.securedSealPoints).toContain(ESCORT_SEAL_POINTS[0]);
+    expect(ctx.state.contamination).toBe(0);
+    expect(ctx.state.baseStatuses?.contaminationStacks).toBe(0);
+    expect(ctx.state.escortSealIndex).toBe(1);
   });
 });
 

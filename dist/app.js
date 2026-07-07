@@ -38413,6 +38413,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const TELEPORT_BANKED_RESOURCE_KEEP_RATIO = __dep6.TELEPORT_BANKED_RESOURCE_KEEP_RATIO;
   const getLivingTerritoryWallBounds = __dep6.getLivingTerritoryWallBounds;
   const isXInLivingTerritory = __dep6.isXInLivingTerritory;
+  const getBaseX = __dep6.getBaseX;
+  const canStartEscort = __dep6.canStartEscort;
+  const startEscort = __dep6.startEscort;
   const __dep7 = __require('./screens/vinh-da/elemental-regions.ts');
   const createElementalRegionRandom = __dep7.createElementalRegionRandom;
   const createElementalRegions = __dep7.createElementalRegions;
@@ -38683,6 +38686,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let carriedDaThach = 0;
       let baseHp = 20;
       let baseLevel = 0;
+      let baseX = CRYSTAL_X;
       const baseStatuses = {};
       let leaderHp = 20;
       let leaderMaxHp = 20;
@@ -38723,6 +38727,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           <div>Còn lại: <span data-role="phase-time-remaining"></span></div>
         </div>
         <div class="vinh-da-game__panel vinh-da-game__panel--status" data-role="status-panel"></div>
+        <button class="vinh-da-game__build-node" data-role="escort-start" type="button" title="Mở đường hộ tống">⇢<small>Hộ tống</small></button>
         <button class="vinh-da-game__back" type="button" aria-label="Về World Map">↩</button>
       </div>
       <div class="vinh-da-game__notice" data-role="notice" aria-live="polite"></div>
@@ -38730,8 +38735,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
         <div class="vinh-da-game__world" data-role="world">
         <div class="vinh-da-game__celestial" aria-hidden="true"></div>
           <div class="vinh-da-game__weather-layer" data-role="weather-layer" aria-hidden="true"></div>
-          <div class="vinh-da-game__castle" aria-hidden="true"></div>
-          <div class="vinh-da-game__crystal" aria-label="Pha lê thành trì"></div>
+          <div class="vinh-da-game__castle" data-role="castle" aria-hidden="true"></div>
+          <div class="vinh-da-game__crystal" data-role="crystal" aria-label="Pha lê thành trì"></div>
           <div class="vinh-da-game__ground" aria-hidden="true"></div>
           <div class="vinh-da-game__elemental-regions" data-role="elemental-regions" aria-hidden="true"></div>
           <div data-role="build-sites"></div>
@@ -38742,6 +38747,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
         </div>
       </div>`;
       const world = section.querySelector('[data-role="world"]');
+      const castleElement = section.querySelector('[data-role="castle"]');
+      const crystalElement = section.querySelector('[data-role="crystal"]');
+      const escortStartButton = section.querySelector('[data-role="escort-start"]');
       const sprite = section.querySelector('[data-role="leader"]');
       const viewport = section.querySelector('[data-role="viewport"]');
       const weatherLayer = section.querySelector('[data-role="weather-layer"]');
@@ -38910,7 +38918,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               return;
           const baseStat = getBaseLevelStat(baseLevel);
           const territoryBounds = getLivingTerritoryWallBounds(simulationContext);
-          const baseInTerritory = isXInLivingTerritory(simulationContext, CRYSTAL_X, territoryBounds);
+          const baseInTerritory = isXInLivingTerritory(simulationContext, getBaseX(simulationState), territoryBounds);
           const contaminationStacks = simulationState.baseStatuses?.contaminationStacks ?? simulationState.contamination ?? 0;
           const church = [...structures.values()].find(structure => structure.type === 'church');
           const churchRuntime = church ? ensureStructureRuntime(church) : null;
@@ -38932,6 +38940,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               lines.push(`<div>Trại: ${barracksRuntime?.soldiers?.length ?? 0}/${barracksStat.soldierCap ?? 0} lính · rank ${barracksStat.soldierRank ?? 1} · ulti ${barracksStat.ultimatePermission ? 'ready' : 'khóa'}</div>`);
           if (church)
               lines.push(`<div>Ấn: prayer ${formatSeconds(churchRuntime?.prayerTimer)} · cleanse ${formatSeconds(churchRuntime?.contaminationCleanseTimer)}</div>`);
+          lines.push(`<div class="${canStartEscort(simulationContext) ? 'vinh-da-game__status-warn' : ''}">Hộ tống: ${simulationState.dayNightPhase === 'escort' ? `đang mở đường tới ${Math.round(getBaseX(simulationState))}` : canStartEscort(simulationContext) ? 'sẵn sàng mở đường' : 'cần Dạ Thạch/đêm/tàn khu'}</div>`);
           if (teleport)
               lines.push(`<div class="${teleportCheck?.ok ? '' : 'vinh-da-game__status-warn'}">Truyền Tống: phí ${TELEPORT_RETREAT_COST} · giữ ${Math.round(TELEPORT_BANKED_RESOURCE_KEEP_RATIO * 100)}% kho · ${teleportCheck?.ok ? 'sẵn sàng rút lui' : teleportCheck?.reason === 'cooldown' ? `CD ${formatSeconds(teleportCheck.cooldownSeconds)}` : teleportCheck?.reason === 'insufficient-resource' ? 'thiếu Dạ Thạch' : 'chưa sẵn sàng'}</div>`);
           statusPanel.innerHTML = lines.join('');
@@ -39216,6 +39225,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           set baseHp(value) { baseHp = value; },
           get baseLevel() { return baseLevel; },
           set baseLevel(value) { baseLevel = value ?? 0; },
+          get baseX() { return baseX; },
+          set baseX(value) { baseX = Number.isFinite(value) ? value : CRYSTAL_X; },
           baseStatuses,
           get leaderHp() { return leaderHp; },
           set leaderHp(value) { leaderHp = value; },
@@ -39263,6 +39274,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           enemySpawnTimer = simulationState.enemySpawnTimer;
           dayNightPhase = simulationState.dayNightPhase;
           phaseRemainingSeconds = simulationState.phaseRemainingSeconds;
+          baseX = getBaseX(simulationState);
           leaderAttackCooldown = simulationState.leaderAttackCooldown;
           nightIndex = simulationState.nightIndex;
           waveThreatBudgetRemaining = simulationState.waveThreatBudgetRemaining;
@@ -39285,6 +39297,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const damageBase = (amount) => { const destroyed = runtimeDamageBase(simulationContext, amount); syncSimulationState(); return destroyed; };
       const updateEnemies = (dt) => { runtimeUpdateEnemies(simulationContext, dt); syncSimulationState(); };
       const updateDayNightTimer = (dt) => {
+          if (canStartEscort(simulationContext) && simulationState.dayNightPhase === 'day' && simulationState.enemies.length === 0)
+              startEscort(simulationContext);
           const wasNight = simulationState.dayNightPhase === 'night';
           const enemyCountBefore = simulationState.enemies.length;
           runtimeUpdateDayNightTimer(simulationContext, dt);
@@ -39294,6 +39308,13 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       };
       const updateStructures = (dt) => { runtimeUpdateStructures(simulationContext, dt); syncSimulationState(); };
       const collectDroppedResources = () => { runtimeCollectDroppedResources(simulationContext); syncSimulationState(); };
+      escortStartButton?.addEventListener('click', () => {
+          if (startEscort(simulationContext))
+              showNotice('Bắt đầu hộ tống pha lê tới điểm phong ấn');
+          else
+              showNotice('Chưa đủ điều kiện hộ tống');
+          syncSimulationState();
+      });
       function renderDroppedResources() {
           if (!droppedResourcesContainer)
               return;
@@ -39360,6 +39381,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               renderVisibleBuildSites();
               renderVisibleElementalRegions();
           }
+          if (castleElement)
+              castleElement.style.left = `${getBaseX(simulationState) - CASTLE_WIDTH * 0.5}px`;
+          if (crystalElement)
+              crystalElement.style.left = `${getBaseX(simulationState)}px`;
           if (sprite)
               sprite.style.transform = `translate3d(${leaderX}px,0,0)`;
       };
@@ -39607,6 +39632,11 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND = 0.08;
   const TELEPORT_RETREAT_COST = 3;
   const TELEPORT_BANKED_RESOURCE_KEEP_RATIO = 0.75;
+  const ESCORT_START_RESOURCE_COST = 10;
+  const ESCORT_START_NIGHT_INDEX = 3;
+  const ESCORT_SEAL_POINTS = Object.freeze([CRYSTAL_X + 520, CRYSTAL_X + 1040, CRYSTAL_X + 1560]);
+  const ESCORT_SPEED = 42;
+  const ESCORT_SEAL_REACH_RANGE = 18;
   const BASE_HEALING_CAP_WINDOW_SECONDS = 1;
   const VINH_DA_WAVE_TABLE = Object.freeze([
       { minNightIndex: 1, mapTier: 1.1, threatBudget: 8, enemyWeights: { twisted: 5, crawler: 3, madDog: 1 } },
@@ -39639,6 +39669,49 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               return choice.kind;
       }
       return choices[choices.length - 1]?.kind ?? null;
+  };
+  const getBaseX = (state) => (Number.isFinite(state.baseX) ? state.baseX : CRYSTAL_X);
+  const getCurrentSealPointX = (state) => ESCORT_SEAL_POINTS[state.escortSealIndex ?? 0] ?? null;
+  const canStartEscort = (ctx) => (ctx.state.dayNightPhase !== 'escort'
+      && ctx.state.bloodSealStone >= ESCORT_START_RESOURCE_COST
+      && ctx.state.nightIndex >= ESCORT_START_NIGHT_INDEX
+      && getCurrentSealPointX(ctx.state) !== null);
+  const startEscort = (ctx) => {
+      if (!canStartEscort(ctx))
+          return false;
+      ctx.state.bloodSealStone -= ESCORT_START_RESOURCE_COST;
+      ctx.state.dayNightPhase = 'escort';
+      ctx.state.baseX = getBaseX(ctx.state);
+      ctx.renderEconomy();
+      ctx.renderDayNightTimer();
+      return true;
+  };
+  const completeEscortSealPoint = (ctx) => {
+      const targetX = getCurrentSealPointX(ctx.state);
+      if (targetX === null)
+          return;
+      ctx.state.securedSealPoints = [...(ctx.state.securedSealPoints ?? []), targetX];
+      ctx.state.baseStatuses = { ...(ctx.state.baseStatuses ?? {}), contaminationStacks: 0, bleedStacks: [] };
+      ctx.state.contamination = 0;
+      ctx.state.escortSealIndex = (ctx.state.escortSealIndex ?? 0) + 1;
+      ctx.state.dayNightPhase = getCurrentSealPointX(ctx.state) === null ? 'day' : 'night';
+      ctx.state.phaseRemainingSeconds = DAY_DURATION_SECONDS;
+      clearEnemiesWithoutReward(ctx);
+  };
+  const updateEscortMovement = (ctx, dt) => {
+      if (ctx.state.dayNightPhase !== 'escort')
+          return;
+      const targetX = getCurrentSealPointX(ctx.state);
+      if (targetX === null) {
+          ctx.state.dayNightPhase = 'day';
+          return;
+      }
+      const baseX = getBaseX(ctx.state);
+      const delta = targetX - baseX;
+      const step = Math.sign(delta) * Math.min(Math.abs(delta), ESCORT_SPEED * dt);
+      ctx.state.baseX = baseX + step;
+      if (Math.abs(targetX - getBaseX(ctx.state)) <= ESCORT_SEAL_REACH_RANGE)
+          completeEscortSealPoint(ctx);
   };
   const getTeleportStructures = (ctx) => ([...ctx.structureSiteIdsOfType('teleport')]
       .map(siteId => ctx.state.structures.get(siteId))
@@ -39827,8 +39900,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           return;
       const radius = enemy.aoeRadius || getEnemyTemplate(enemy).aoeRadius;
       const damage = Math.max(enemy.atk, enemy.wil) * 2;
-      if (Math.abs(enemy.x - CRYSTAL_X) <= radius)
+      if (Math.abs(enemy.x - getBaseX(ctx.state)) <= radius)
           damageBase(ctx, damage);
+      y;
       for (const structure of ctx.state.structures.values()) {
           const site = ctx.getBuildSite(structure.siteId);
           if (!site || Math.abs(site.x - enemy.x) > radius)
@@ -39878,7 +39952,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           ctx.renderDroppedResources();
           ctx.renderEconomy();
       }
-      if (ctx.state.carriedDaThach > 0 && Math.abs(ctx.state.leaderX - CRYSTAL_X) <= RESOURCE_DEPOSIT_RANGE) {
+      if (ctx.state.carriedDaThach > 0 && Math.abs(ctx.state.leaderX - getBaseX(ctx.state)) <= RESOURCE_DEPOSIT_RANGE) {
           ctx.state.bloodSealStone += ctx.state.carriedDaThach;
           ctx.state.carriedDaThach = 0;
           ctx.renderEconomy();
@@ -39890,7 +39964,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           if (!structure)
               continue;
           const site = ctx.getBuildSite(siteId);
-          if (!site || (enemy.side === 'left' ? site.x >= CRYSTAL_X : site.x <= CRYSTAL_X))
+          if (!site || (enemy.side === 'left' ? site.x >= getBaseX(ctx.state) : site.x <= getBaseX(ctx.state)))
               continue;
           const runtime = ctx.ensureStructureRuntime(structure);
           if (runtime.hp > 0 && Math.abs(enemy.x - site.x) <= ENEMY_ATTACK_RANGE)
@@ -39958,10 +40032,10 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           const runtime = ctx.ensureStructureRuntime(structure);
           if (runtime.hp <= 0)
               continue;
-          if (site.x < CRYSTAL_X) {
+          if (site.x < getBaseX(ctx.state)) {
               leftX = leftX === null ? site.x : Math.min(leftX, site.x);
           }
-          else if (site.x > CRYSTAL_X) {
+          else if (site.x > getBaseX(ctx.state)) {
               rightX = rightX === null ? site.x : Math.max(rightX, site.x);
           }
       }
@@ -39969,7 +40043,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const isXInLivingTerritory = (ctx, x, bounds = getLivingTerritoryWallBounds(ctx)) => Boolean(bounds && x >= bounds.leftX && x <= bounds.rightX);
   const getChurchHealingBonus = (ctx, bounds = getLivingTerritoryWallBounds(ctx)) => {
-      if (!isXInLivingTerritory(ctx, CRYSTAL_X, bounds))
+      if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds))
           return 0;
       let bonus = getBaseStat(ctx).healingBonusPercent ?? 0;
       bonus += ctx.state.baseStatuses?.elementalHealingBonus ?? 0;
@@ -40001,7 +40075,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       resetBaseHealingCapWindow(ctx);
   };
   const healBase = (ctx, amount, bounds = getLivingTerritoryWallBounds(ctx)) => {
-      if (!isXInLivingTerritory(ctx, CRYSTAL_X, bounds))
+      if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds))
           return;
       const maxHp = getBaseMaxHp(ctx);
       const requestedHeal = amount * (1 + getChurchHealingBonus(ctx));
@@ -40015,7 +40089,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const applyElementAllyBuffInRange = (ctx, sourceX, range, apply) => {
       const bounds = getLivingTerritoryWallBounds(ctx);
-      if (isXInLivingTerritory(ctx, CRYSTAL_X, bounds) && Math.abs(CRYSTAL_X - sourceX) <= range) {
+      if (isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) && Math.abs(getBaseX(ctx.state) - sourceX) <= range) {
           const statuses = ctx.state.baseStatuses ??= {};
           statuses.elementalAllyBuffSeconds = Math.max(statuses.elementalAllyBuffSeconds ?? 0, ELEMENTAL_ALLY_BUFF_SECONDS);
           apply(statuses);
@@ -40158,7 +40232,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       return ctx.state.baseHp <= 0;
   };
   const getEnemyTemplate = (enemy) => ENEMY_TEMPLATES[enemy.kind] ?? DEFAULT_ENEMY_TEMPLATE;
-  const getEnemyPrimaryTargetX = (ctx, enemy) => enemy.canFly ? ctx.state.leaderX : CRYSTAL_X;
+  const getEnemyPrimaryTargetX = (ctx, enemy) => enemy.canFly ? ctx.state.leaderX : getBaseX(ctx.state);
   const getEnemyMoveDirection = (ctx, enemy, targetX = getEnemyPrimaryTargetX(ctx, enemy)) => enemy.x < targetX ? 1 : -1;
   const getStructureAhead = (ctx, enemy, range) => {
       const direction = getEnemyMoveDirection(ctx, enemy);
@@ -40236,7 +40310,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           });
           return;
       }
-      if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) {
+      if (Math.abs(enemy.x - getBaseX(ctx.state)) <= template.attackRange) {
           tryEnemyAttack(enemy, template, () => {
               applyContaminationHit(ctx, enemy);
               applyBaseBleedHit(ctx, enemy);
@@ -40244,7 +40318,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           });
           return;
       }
-      moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
+      moveEnemyToward(ctx, enemy, getBaseX(ctx.state), dt);
   };
   const updateFlyingEnemy = (ctx, enemy, template, index, dt) => {
       const targetX = getEnemyPrimaryTargetX(ctx, enemy);
@@ -40268,8 +40342,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy); });
           return;
       }
-      if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange) {
-          moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
+      if (Math.abs(enemy.x - getBaseX(ctx.state)) > template.attackRange) {
+          moveEnemyToward(ctx, enemy, getBaseX(ctx.state), dt);
           return;
       }
       enemy.mageOrbTimer = (enemy.mageOrbTimer ?? 0) + dt;
@@ -40301,9 +40375,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       return Math.max(enemy.atk, enemy.wil) * rageMultiplier * multiplier;
   };
   const applyDragonBreath = (ctx, enemy, damage, applyDestroy) => {
-      const direction = getEnemyMoveDirection(ctx, enemy, CRYSTAL_X);
-      if (direction > 0 ? CRYSTAL_X >= enemy.x : CRYSTAL_X <= enemy.x) {
-          if (Math.abs(enemy.x - CRYSTAL_X) <= enemy.aoeRadius)
+      const direction = getEnemyMoveDirection(ctx, enemy, getBaseX(ctx.state));
+      if (direction > 0 ? getBaseX(ctx.state) >= enemy.x : getBaseX(ctx.state) <= enemy.x) {
+          if (Math.abs(enemy.x - getBaseX(ctx.state)) <= enemy.aoeRadius)
               damageBase(ctx, damage);
       }
       for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1) {
@@ -40344,17 +40418,17 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           return;
       }
       enemy.apostleState = 'assaultBase';
-      if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange) {
+      if (Math.abs(enemy.x - getBaseX(ctx.state)) <= template.attackRange) {
           tryEnemyAttack(enemy, template, () => {
               applyContaminationHit(ctx, enemy);
               damageBase(ctx, getEnemyDamageWithApostleAura(ctx, enemy, template));
           });
           return;
       }
-      moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
+      moveEnemyToward(ctx, enemy, getBaseX(ctx.state), dt);
   };
   const updateResentfulDragonEnemy = (ctx, enemy, template, dt) => {
-      const inBreathRange = Math.abs(enemy.x - CRYSTAL_X) <= template.aoeRadius || Boolean(getStructureAhead(ctx, enemy, template.aoeRadius));
+      const inBreathRange = Math.abs(enemy.x - getBaseX(ctx.state)) <= template.aoeRadius || Boolean(getStructureAhead(ctx, enemy, template.aoeRadius));
       enemy.dragonUltimateCooldown = Math.max(0, (enemy.dragonUltimateCooldown ?? 20) - dt);
       enemy.dragonDestroyCooldown = Math.max(0, (enemy.dragonDestroyCooldown ?? 0) - dt);
       if (inBreathRange) {
@@ -40367,7 +40441,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           tryEnemyAttack(enemy, template, () => { applyDragonBreath(ctx, enemy, getDragonDamage(enemy), true); });
           return;
       }
-      moveEnemyToward(ctx, enemy, CRYSTAL_X, dt, enemy.baseSpeed);
+      moveEnemyToward(ctx, enemy, getBaseX(ctx.state), dt, enemy.baseSpeed);
   };
   const isUnitInLandmineTriggerRadius = (ctx, site) => (Math.abs(ctx.state.leaderX - site.x) <= LANDMINE_TRIGGER_RADIUS
       || ctx.state.enemies.some(enemy => Math.abs(enemy.x - site.x) <= LANDMINE_TRIGGER_RADIUS));
@@ -40565,6 +40639,11 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       }
   };
   const updateDayNightTimer = (ctx, dt) => {
+      if (ctx.state.dayNightPhase === 'escort') {
+          updateEscortMovement(ctx, dt);
+          ctx.renderDayNightTimer();
+          return;
+      }
       ctx.state.phaseRemainingSeconds -= dt;
       while (ctx.state.phaseRemainingSeconds <= 0) {
           ctx.state.phaseRemainingSeconds += DAY_DURATION_SECONDS;
@@ -40727,7 +40806,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const updateBaseSupport = (ctx, dt) => {
       const stat = getBaseStat(ctx);
       const territoryBounds = getLivingTerritoryWallBounds(ctx);
-      if (!isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds))
+      if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), territoryBounds))
           return;
       if (ctx.state.dayNightPhase === 'night')
           applyLeaderNightShield(ctx);
@@ -40757,7 +40836,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           return;
       const site = ctx.getBuildSite(structure.siteId);
       const territoryBounds = getLivingTerritoryWallBounds(ctx);
-      if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds) || !isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds))
+      if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds) || !isXInLivingTerritory(ctx, getBaseX(ctx.state), territoryBounds))
           return;
       const stat = getStructureLevelStat('church', structure.level);
       if ((runtime.prayerTimer ?? 0) <= 0) {
@@ -40881,8 +40960,17 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND')) exports.STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND = STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND;
   if (!Object.prototype.hasOwnProperty.call(exports, 'TELEPORT_RETREAT_COST')) exports.TELEPORT_RETREAT_COST = TELEPORT_RETREAT_COST;
   if (!Object.prototype.hasOwnProperty.call(exports, 'TELEPORT_BANKED_RESOURCE_KEEP_RATIO')) exports.TELEPORT_BANKED_RESOURCE_KEEP_RATIO = TELEPORT_BANKED_RESOURCE_KEEP_RATIO;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ESCORT_START_RESOURCE_COST')) exports.ESCORT_START_RESOURCE_COST = ESCORT_START_RESOURCE_COST;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ESCORT_START_NIGHT_INDEX')) exports.ESCORT_START_NIGHT_INDEX = ESCORT_START_NIGHT_INDEX;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ESCORT_SEAL_POINTS')) exports.ESCORT_SEAL_POINTS = ESCORT_SEAL_POINTS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ESCORT_SPEED')) exports.ESCORT_SPEED = ESCORT_SPEED;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ESCORT_SEAL_REACH_RANGE')) exports.ESCORT_SEAL_REACH_RANGE = ESCORT_SEAL_REACH_RANGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getScaledThreatBudget')) exports.getScaledThreatBudget = getScaledThreatBudget;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getVinhDaWaveConfig')) exports.getVinhDaWaveConfig = getVinhDaWaveConfig;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getBaseX')) exports.getBaseX = getBaseX;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrentSealPointX')) exports.getCurrentSealPointX = getCurrentSealPointX;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'canStartEscort')) exports.canStartEscort = canStartEscort;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'startEscort')) exports.startEscort = startEscort;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getReadyTeleportStructure')) exports.getReadyTeleportStructure = getReadyTeleportStructure;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canActivateTeleportRetreat')) exports.canActivateTeleportRetreat = canActivateTeleportRetreat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'activateTeleportRetreat')) exports.activateTeleportRetreat = activateTeleportRetreat;

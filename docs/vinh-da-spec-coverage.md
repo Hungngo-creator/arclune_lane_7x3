@@ -42,3 +42,10 @@ Tài liệu này là checklist QA bắt buộc trước khi tuyên bố mode Vĩ
 - [ ] Chuyển pha ngày/đêm nhiều lần để weather đổi giữa clear, drizzle, rain, heavyRain, storm, fog, bloodMoon; kiểm tra CSS class tương ứng trên weather layer.
 - [ ] Ở storm, chờ hoặc force lightning; xác nhận flash sét hiển thị và thunder chỉ phát khi audio enabled/unlocked.
 - [ ] Rời màn Vĩnh Dạ về World Map; xác nhận không còn rain/noise/thunder loop, không leak audio context/source.
+## Manual QA checklist — Escort relocation
+
+- [ ] Start a Vĩnh Dạ run from the current map and confirm the castle/crystal render at the legacy center position before escort is available.
+- [ ] Bank at least 10 Dạ Thạch, reach night 3 or later, clear the current night into day, and confirm escort starts or the Hộ tống action reports readiness.
+- [ ] During escort, spawn/observe ground enemies and confirm they walk toward and damage the moving crystal/base instead of the old center point.
+- [ ] Build living wall pairs around the escorted crystal and confirm base/church/elemental territory buffs apply inside the moved bounds, then break one wall and confirm buffs/heal stop.
+- [ ] Let the crystal reach the first seal point and confirm enemies are cleared, contamination/bleed on the old zone are reset, and the next seal point/night is prepared.

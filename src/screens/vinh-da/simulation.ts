@@ -48,8 +48,13 @@ export const BASE_BUFF_DAILY_UPKEEP = 1;
 export const STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND = 0.08;
 export const TELEPORT_RETREAT_COST = 3;
 export const TELEPORT_BANKED_RESOURCE_KEEP_RATIO = 0.75;
+export const ESCORT_START_RESOURCE_COST = 10;
+export const ESCORT_START_NIGHT_INDEX = 3;
+export const ESCORT_SEAL_POINTS = Object.freeze([CRYSTAL_X + 520, CRYSTAL_X + 1040, CRYSTAL_X + 1560] as const);
+export const ESCORT_SPEED = 42;
+export const ESCORT_SEAL_REACH_RANGE = 18;
 const BASE_HEALING_CAP_WINDOW_SECONDS = 1;
-export type DayNightPhase = 'day' | 'night';
+export type DayNightPhase = 'day' | 'night' | 'escort';
 
 export interface VinhDaWaveConfig {
   minNightIndex: number;
@@ -100,6 +105,9 @@ export interface VinhDaSimulationState {
   nextDroppedResourceId: number;
   baseHp: number;
   baseLevel?: number;
+  baseX?: number;
+  escortSealIndex?: number;
+  securedSealPoints?: number[];
   baseBranchLv3?: BaseBranchLv3;
   contamination?: number;
   baseStatuses?: import('./types.ts').VinhDaStatusCollection;
@@ -128,6 +136,50 @@ export interface VinhDaSimulationState {
   teleportRetreatReason?: string | null;
   teleportedToSealedOldMap?: boolean;
 }
+
+export const getBaseX = (state: Pick<VinhDaSimulationState, 'baseX'>): number => (Number.isFinite(state.baseX) ? state.baseX! : CRYSTAL_X);
+export const getCurrentSealPointX = (state: Pick<VinhDaSimulationState, 'escortSealIndex'>): number | null => ESCORT_SEAL_POINTS[state.escortSealIndex ?? 0] ?? null;
+export const canStartEscort = (ctx: VinhDaSimulationContext): boolean => (
+  ctx.state.dayNightPhase !== 'escort'
+  && ctx.state.bloodSealStone >= ESCORT_START_RESOURCE_COST
+  && ctx.state.nightIndex >= ESCORT_START_NIGHT_INDEX
+  && getCurrentSealPointX(ctx.state) !== null
+);
+export const startEscort = (ctx: VinhDaSimulationContext): boolean => {
+  if (!canStartEscort(ctx)) return false;
+  ctx.state.bloodSealStone -= ESCORT_START_RESOURCE_COST;
+  ctx.state.dayNightPhase = 'escort';
+  ctx.state.baseX = getBaseX(ctx.state);
+  ctx.renderEconomy();
+  ctx.renderDayNightTimer();
+  return true;
+};
+
+const completeEscortSealPoint = (ctx: VinhDaSimulationContext): void => {
+  const targetX = getCurrentSealPointX(ctx.state);
+  if (targetX === null) return;
+  ctx.state.securedSealPoints = [...(ctx.state.securedSealPoints ?? []), targetX];
+  ctx.state.baseStatuses = { ...(ctx.state.baseStatuses ?? {}), contaminationStacks: 0, bleedStacks: [] };
+  ctx.state.contamination = 0;
+  ctx.state.escortSealIndex = (ctx.state.escortSealIndex ?? 0) + 1;
+  ctx.state.dayNightPhase = getCurrentSealPointX(ctx.state) === null ? 'day' : 'night';
+  ctx.state.phaseRemainingSeconds = DAY_DURATION_SECONDS;
+  clearEnemiesWithoutReward(ctx);
+};
+
+const updateEscortMovement = (ctx: VinhDaSimulationContext, dt: number): void => {
+  if (ctx.state.dayNightPhase !== 'escort') return;
+  const targetX = getCurrentSealPointX(ctx.state);
+  if (targetX === null){
+    ctx.state.dayNightPhase = 'day';
+    return;
+  }
+  const baseX = getBaseX(ctx.state);
+  const delta = targetX - baseX;
+  const step = Math.sign(delta) * Math.min(Math.abs(delta), ESCORT_SPEED * dt);
+  ctx.state.baseX = baseX + step;
+  if (Math.abs(targetX - getBaseX(ctx.state)) <= ESCORT_SEAL_REACH_RANGE) completeEscortSealPoint(ctx);
+};
 
 export interface VinhDaSimulationContext {
   state: VinhDaSimulationState;
@@ -340,7 +392,7 @@ const triggerDeathExplosion = (ctx: VinhDaSimulationContext, enemy: Enemy): void
     if (!enemy.deathExplosion) return;
     const radius = enemy.aoeRadius || getEnemyTemplate(enemy).aoeRadius;
     const damage = Math.max(enemy.atk, enemy.wil) * 2;
-    if (Math.abs(enemy.x - CRYSTAL_X) <= radius) damageBase(ctx, damage);
+    if (Math.abs(enemy.x - getBaseX(ctx.state)) <= radius) damageBase(ctx, damage);y
   for (const structure of ctx.state.structures.values()){
       const site = ctx.getBuildSite(structure.siteId);
       if (!site || Math.abs(site.x - enemy.x) > radius) continue;
@@ -383,7 +435,7 @@ export const collectDroppedResources = (ctx: VinhDaSimulationContext): void => {
     ctx.renderDroppedResources();
     ctx.renderEconomy();
   }
-  if (ctx.state.carriedDaThach > 0 && Math.abs(ctx.state.leaderX - CRYSTAL_X) <= RESOURCE_DEPOSIT_RANGE){
+  if (ctx.state.carriedDaThach > 0 && Math.abs(ctx.state.leaderX - getBaseX(ctx.state)) <= RESOURCE_DEPOSIT_RANGE){
     ctx.state.bloodSealStone += ctx.state.carriedDaThach;
     ctx.state.carriedDaThach = 0;
     ctx.renderEconomy();
@@ -394,7 +446,7 @@ export const getBlockingWall = (ctx: VinhDaSimulationContext, enemy: Enemy): { s
       const structure = ctx.state.structures.get(siteId);
       if (!structure) continue;
       const site = ctx.getBuildSite(siteId);
-      if (!site || (enemy.side === 'left' ? site.x >= CRYSTAL_X : site.x <= CRYSTAL_X)) continue;
+      if (!site || (enemy.side === 'left' ? site.x >= getBaseX(ctx.state) : site.x <= getBaseX(ctx.state))) continue;
       const runtime = ctx.ensureStructureRuntime(structure);
       if (runtime.hp > 0 && Math.abs(enemy.x - site.x) <= ENEMY_ATTACK_RANGE) return { site, runtime };
     }
@@ -460,9 +512,9 @@ export const getLivingTerritoryWallBounds = (ctx: VinhDaSimulationContext): Terr
     if (!site) continue;
     const runtime = ctx.ensureStructureRuntime(structure);
     if (runtime.hp <= 0) continue;
-    if (site.x < CRYSTAL_X){
+    if (site.x < getBaseX(ctx.state)){
       leftX = leftX === null ? site.x : Math.min(leftX, site.x);
-    } else if (site.x > CRYSTAL_X){
+    } else if (site.x > getBaseX(ctx.state)){
       rightX = rightX === null ? site.x : Math.max(rightX, site.x);
     }
   }
@@ -470,7 +522,7 @@ export const getLivingTerritoryWallBounds = (ctx: VinhDaSimulationContext): Terr
 };
 export const isXInLivingTerritory = (ctx: VinhDaSimulationContext, x: number, bounds = getLivingTerritoryWallBounds(ctx)): boolean => Boolean(bounds && x >= bounds.leftX && x <= bounds.rightX);
 const getChurchHealingBonus = (ctx: VinhDaSimulationContext, bounds = getLivingTerritoryWallBounds(ctx)): number => {
-  if (!isXInLivingTerritory(ctx, CRYSTAL_X, bounds)) return 0;
+  if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds)) return 0;
   let bonus = getBaseStat(ctx).healingBonusPercent ?? 0;
   bonus += ctx.state.baseStatuses?.elementalHealingBonus ?? 0;
   for (const siteId of ctx.structureSiteIdsOfType('church')){
@@ -499,7 +551,7 @@ const tickBaseHealingCapWindow = (ctx: VinhDaSimulationContext, dt: number): voi
   resetBaseHealingCapWindow(ctx);
 };
 const healBase = (ctx: VinhDaSimulationContext, amount: number, bounds = getLivingTerritoryWallBounds(ctx)): void => {
-  if (!isXInLivingTerritory(ctx, CRYSTAL_X, bounds)) return;
+  if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds)) return;
   const maxHp = getBaseMaxHp(ctx);
   const requestedHeal = amount * (1 + getChurchHealingBonus(ctx));
   const cap = maxHp * STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND;
@@ -511,7 +563,7 @@ const healBase = (ctx: VinhDaSimulationContext, amount: number, bounds = getLivi
 };
 const applyElementAllyBuffInRange = (ctx: VinhDaSimulationContext, sourceX: number, range: number, apply: (statuses: import('./types.ts').VinhDaStatusCollection) => void): void => {
   const bounds = getLivingTerritoryWallBounds(ctx);
-  if (isXInLivingTerritory(ctx, CRYSTAL_X, bounds) && Math.abs(CRYSTAL_X - sourceX) <= range){
+  if (isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) && Math.abs(getBaseX(ctx.state) - sourceX) <= range){
     const statuses = ctx.state.baseStatuses ??= {};
     statuses.elementalAllyBuffSeconds = Math.max(statuses.elementalAllyBuffSeconds ?? 0, ELEMENTAL_ALLY_BUFF_SECONDS);
     apply(statuses);
@@ -646,7 +698,7 @@ export const damageBase = (ctx: VinhDaSimulationContext, amount: number): boolea
     return ctx.state.baseHp <= 0;
   };
 const getEnemyTemplate = (enemy: Enemy): EnemyTemplate => ENEMY_TEMPLATES[enemy.kind] ?? DEFAULT_ENEMY_TEMPLATE;
-const getEnemyPrimaryTargetX = (ctx: VinhDaSimulationContext, enemy: Enemy): number => enemy.canFly ? ctx.state.leaderX : CRYSTAL_X;
+const getEnemyPrimaryTargetX = (ctx: VinhDaSimulationContext, enemy: Enemy): number => enemy.canFly ? ctx.state.leaderX : getBaseX(ctx.state);
 const getEnemyMoveDirection = (ctx: VinhDaSimulationContext, enemy: Enemy, targetX = getEnemyPrimaryTargetX(ctx, enemy)): number => enemy.x < targetX ? 1 : -1;
 export const getStructureAhead = (ctx: VinhDaSimulationContext, enemy: Enemy, range: number): { site: BuildSite; runtime: StructureRuntime } | null => {
     const direction = getEnemyMoveDirection(ctx, enemy);
@@ -716,7 +768,7 @@ export const updateSuicideBomberEnemy = (ctx: VinhDaSimulationContext, enemy: En
       });
       return;
     }
-    if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange){
+    if (Math.abs(enemy.x - getBaseX(ctx.state)) <= template.attackRange){
       tryEnemyAttack(enemy, template, () => {
         applyContaminationHit(ctx, enemy);
         applyBaseBleedHit(ctx, enemy);
@@ -724,7 +776,7 @@ export const updateSuicideBomberEnemy = (ctx: VinhDaSimulationContext, enemy: En
       });
       return;
     }
-    moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
+    moveEnemyToward(ctx, enemy, getBaseX(ctx.state), dt);
   };
 export const updateFlyingEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, index: number, dt: number): void => {
     const targetX = getEnemyPrimaryTargetX(ctx, enemy);
@@ -748,8 +800,8 @@ export const updateDarkMageEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, 
       tryEnemyAttack(enemy, template, () => { applyBleedHit(wall.runtime, enemy); damageStructure(ctx, wall.site, wall.runtime, getEnemyDamageWithApostleAura(ctx, enemy, template), enemy); });
       return;
     }
-    if (Math.abs(enemy.x - CRYSTAL_X) > template.attackRange){
-      moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
+    if (Math.abs(enemy.x - getBaseX(ctx.state)) > template.attackRange){
+      moveEnemyToward(ctx, enemy, getBaseX(ctx.state), dt);
       return;
     }
     enemy.mageOrbTimer = (enemy.mageOrbTimer ?? 0) + dt;
@@ -779,9 +831,9 @@ const getDragonDamage = (enemy: Enemy, multiplier = 1): number => {
     return Math.max(enemy.atk, enemy.wil) * rageMultiplier * multiplier;
   };
 const applyDragonBreath = (ctx: VinhDaSimulationContext, enemy: Enemy, damage: number, applyDestroy: boolean): void => {
-    const direction = getEnemyMoveDirection(ctx, enemy, CRYSTAL_X);
-    if (direction > 0 ? CRYSTAL_X >= enemy.x : CRYSTAL_X <= enemy.x){
-      if (Math.abs(enemy.x - CRYSTAL_X) <= enemy.aoeRadius) damageBase(ctx, damage);
+    const direction = getEnemyMoveDirection(ctx, enemy, getBaseX(ctx.state));
+    if (direction > 0 ? getBaseX(ctx.state) >= enemy.x : getBaseX(ctx.state) <= enemy.x){
+      if (Math.abs(enemy.x - getBaseX(ctx.state)) <= enemy.aoeRadius) damageBase(ctx, damage);
     }
     for (let i = ctx.state.enemies.length - 1; i >= 0; i -= 1){
       const target = ctx.state.enemies[i];
@@ -819,18 +871,18 @@ export const updateApostleEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, t
       return;
     }
     enemy.apostleState = 'assaultBase';
-    if (Math.abs(enemy.x - CRYSTAL_X) <= template.attackRange){
+    if (Math.abs(enemy.x - getBaseX(ctx.state)) <= template.attackRange){
       tryEnemyAttack(enemy, template, () => {
         applyContaminationHit(ctx, enemy);
         damageBase(ctx, getEnemyDamageWithApostleAura(ctx, enemy, template));
       });
       return;
     }
-    moveEnemyToward(ctx, enemy, CRYSTAL_X, dt);
+    moveEnemyToward(ctx, enemy, getBaseX(ctx.state), dt);
   };
 
 export const updateResentfulDragonEnemy = (ctx: VinhDaSimulationContext, enemy: Enemy, template: EnemyTemplate, dt: number): void => {
-    const inBreathRange = Math.abs(enemy.x - CRYSTAL_X) <= template.aoeRadius || Boolean(getStructureAhead(ctx, enemy, template.aoeRadius));
+    const inBreathRange = Math.abs(enemy.x - getBaseX(ctx.state)) <= template.aoeRadius || Boolean(getStructureAhead(ctx, enemy, template.aoeRadius));
     enemy.dragonUltimateCooldown = Math.max(0, (enemy.dragonUltimateCooldown ?? 20) - dt);
     enemy.dragonDestroyCooldown = Math.max(0, (enemy.dragonDestroyCooldown ?? 0) - dt);
     if (inBreathRange){
@@ -843,7 +895,7 @@ export const updateResentfulDragonEnemy = (ctx: VinhDaSimulationContext, enemy: 
       tryEnemyAttack(enemy, template, () => { applyDragonBreath(ctx, enemy, getDragonDamage(enemy), true); });
       return;
     }
-    moveEnemyToward(ctx, enemy, CRYSTAL_X, dt, enemy.baseSpeed);
+    moveEnemyToward(ctx, enemy, getBaseX(ctx.state), dt, enemy.baseSpeed);
   };
 const isUnitInLandmineTriggerRadius = (ctx: VinhDaSimulationContext, site: BuildSite): boolean => (
     Math.abs(ctx.state.leaderX - site.x) <= LANDMINE_TRIGGER_RADIUS
@@ -1026,7 +1078,12 @@ const convertContaminationToApostles = (ctx: VinhDaSimulationContext): void => {
 };
 
 export const updateDayNightTimer = (ctx: VinhDaSimulationContext, dt: number): void => {
-    ctx.state.phaseRemainingSeconds -= dt;
+    if (ctx.state.dayNightPhase === 'escort'){
+      updateEscortMovement(ctx, dt);
+      ctx.renderDayNightTimer();
+      return;
+    }
+  ctx.state.phaseRemainingSeconds -= dt;
     while (ctx.state.phaseRemainingSeconds <= 0){
       ctx.state.phaseRemainingSeconds += DAY_DURATION_SECONDS;
       ctx.state.dayNightPhase = ctx.state.dayNightPhase === 'night' ? 'day' : 'night';
@@ -1165,7 +1222,7 @@ const updateGravityCannon = (ctx: VinhDaSimulationContext, structure: PlacedStru
 const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
   const stat = getBaseStat(ctx);
   const territoryBounds = getLivingTerritoryWallBounds(ctx);
-  if (!isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds)) return;
+  if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), territoryBounds)) return;
   if (ctx.state.dayNightPhase === 'night') applyLeaderNightShield(ctx);
   if ((stat.emergencyHealPercent ?? 0) > 0 && getLeaderHp(ctx) > 0 && getLeaderHp(ctx) <= getLeaderMaxHp(ctx) * 0.12 && (ctx.state.leaderEmergencyCooldownUntilNight ?? 0) <= ctx.state.nightIndex){
     healLeader(ctx, getLeaderMaxHp(ctx) * (stat.emergencyHealPercent ?? 0));
@@ -1189,7 +1246,7 @@ const updateChurch = (ctx: VinhDaSimulationContext, structure: PlacedStructure, 
   if (structure.type !== 'church') return;
   const site = ctx.getBuildSite(structure.siteId);
   const territoryBounds = getLivingTerritoryWallBounds(ctx);
-  if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds) || !isXInLivingTerritory(ctx, CRYSTAL_X, territoryBounds)) return;
+  if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds) || !isXInLivingTerritory(ctx, getBaseX(ctx.state), territoryBounds)) return;
   const stat = getStructureLevelStat('church', structure.level);
   if ((runtime.prayerTimer ?? 0) <= 0){
     healBase(ctx, 1 + structure.level, territoryBounds);
