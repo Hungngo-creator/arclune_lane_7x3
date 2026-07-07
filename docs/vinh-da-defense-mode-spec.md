@@ -1,5 +1,8 @@
 Trong mode này không có Prime.
 để nhận được tiền nâng cấp kiến trúc cần giết kẻ thù, nếu kẻ thù không chết khi trời sáng, chúng sẽ bị ánh sáng thiêu đốt, player không nhận được gì.
+Quái nếu có rơi đồ thì mặc định rơi đồ cùng tier với bản thân của quái đó trừ phi mô tả đặc biệt.
+tỉ lệ rơi đồ không tangw theo tier nhưng rune có thể, mỗi khi lên 1 tier tỉ lệ rơi đồ vẫn như mô tả từ khi rune can thiệp, nhưng lên tier sẽ tangw tier của tài nguyên/vật phẩm nhận được.
+tỉ lệ thu hoạch: 1 map bất kể tier không dùng rune thì tỉ lệ thu hoạch là x1, tức phần thưởng cuối cùng nhân với 1, nếu dùng rune sẽ tăng độ khó của map lên, nếu win map đó thì sẽ được nhận phần thưởng tăng hoặc giảm theo rune tương ứng.
 # Vĩnh Dạ Defense Mode — Design Spec 0.1
 
 > Tài liệu này ghi lại thiết kế mode thủ thành/sinh tồn đã chốt trong cuộc thảo luận. Mục tiêu là để một agent/dev không có ký ức cuộc chat có thể đọc và hiểu đủ nhanh để triển khai prototype. Không chỉnh `dist/app.js`; khi code cần tận dụng tối đa hàm/hệ thống sẵn có, tránh overhead và tránh tạo hàm khác tên nhưng trùng logic.
@@ -549,6 +552,9 @@ Mô tả:
 - Tay chân lở loét.
 - Thỉnh thoảng nói mớ, gào thét.
 - Trọng lượng: 1.
+- khi tử vong có 40%/20% tỉ lệ rơi 1/2 Dạ Thạch cùng tier, 40% còn lại không rơi gì.
+- 10%/5% tỉ lệ rơi 1/2 Hắc Cốt, 85% còn lại không rơi gì.
+- bộ tỉ lệ Hắc Cốt và Dạ Thạch tính riêng, không gộp, tức nếu vận khi tốt thì có thể rơi cả 2 thứ cùng lúc, nếu không chỉ rơi 1 thứ hoặc không rơi gì.
 
 Chỉ số chuẩn Khai Nguyên 1:
 
@@ -573,6 +579,7 @@ Mô tả:
 - Chân biến dạng, tay có móng nhọn.
 - Bò bằng 4 chi với tốc độ cao.
 - Trọng lượng 0,9.
+- khi tử vong có 30%/15%/3% tỉ lệ rơi 1/2/3 dạ thạch cùng tier với bản thân, 52% còn lại không rơi gì.
 
 Chỉ số chuẩn Khai Nguyên 1:
 
@@ -605,6 +612,8 @@ Mô tả:
 - Bề ngoài giống kẻ vặn vẹo nhưng thông minh và xảo trá hơn.
 - Thích ẩn núp chỉ huy.
 - Trọng lượng: 1.
+- Khi tử vong 100% rơi 2 dạ thạch cùng tier bản thân, sau đó có 20% tỉ lệ rơi thêm 1 dạ thạch cùng tier với bản thân. Có 15% rơi vật phẩm "Áo choàng của Sứ Đồ": là vật phẩm cần thiết để nâng cấp Nhà thờ.
+- Bộ tỉ lệ Dạ Thạch và Áo choàng là tính riêng.
 
 Chỉ số chuẩn Khai Nguyên 1:
 
@@ -635,6 +644,7 @@ Mô tả:
 - Cắn xé gây Ô nhiễm.
 - Có thể khiến kẻ thù chuyển hóa thành đồng minh của Vĩnh Dạ.
 - Trọng lượng: 0,3.
+- 20%/5% tỉ lệ rơi 1/2 dạ thạch, 75% còn lại không rơi gì.
 
 Chỉ số chuẩn Khai Nguyên 1:
 
@@ -682,6 +692,7 @@ Mô tả:
 - Ngoại hình lở loét, dòi bọ khắp người, hơi thở hôi thối.
 - Trọng lượng: 1,5.
 - tốc độ: 0.45.
+- 10% tỉ lệ rơi 1 dạ thạch, 90% không rơi gì.
 
 Chỉ số chuẩn Khai Nguyên 1:
 
@@ -759,12 +770,18 @@ mô tả, một tập hợp xác thịt không rõ của các loại chim, một
 chỉ số chuẩn Khai Nguyên 1: Hp 1,3, 0 res/arm, 1 atk/wil, di chuyển: 1.5/s l, phạm vi tấn công: 12.
 sau khi thấy mục tiêu, gia tốc, tiếp cận mục tiêu gây sát thương = 2.5 wil/atk sau đó tử vong. tùy theo phạm vi tấn công mà sát thương gây ra sẽ thay đổi, nếu mục tiêu cách chim biến dị chỉ dưới hoặc bằng 6 thì chỉ nhận 1,2 sát thương, nếu dưới hoặc = 9 thì nhận 2 sát thương, 12 thì 2,5, dưới 3 sẽ không gia tốc, chim biến dị sẽ bay lùi lại, giữ khoảng cách 12 và bắt đầu gia tốc. Miễn kích hoạt gia tốc chì chim biến dị sau khi gây sát thương sẽ tử vong. Trọng lượng: 0,1.
 bất kể khoảng cách gia tốc thì tốc độ bay khi gia tốc là 3.5
+10% tỉ lệ rơi 1 dạ thạch, 5% rơi 1 Hắc Cốt, 85% không rơi gì. Bộ tỉ lệ Dạ thạch và hắc cốt tính riêng, hên thì rơi 1 hoặc 2 thứ, xui thì không rơi gì.
+
 
 ### pháp sư hắc ám:
 không bị ô nhiễm, là người bình thường, một tín đồ của Hắc Ám Chi Chủ, dùng aether Hắc Ám nồng hậu bao phủ cơ thể, sẽ không bị binh chủng hắc ám khác tấn công.
 HP: 3, atk/res/arm 1, 3,5 wil
 đánh thường: ngưng tụ ma lực thành 1 quả cầu hắc ám sau lưng mỗi 2s, sau khi đạt 3 quả cầu, tấn công mục tiêu gây sát thương = 100% wil/atk/ mỗi quả cầu lên mục tiêu, sau tấn công cd 2s. Tốc độ đạn: 2
 trọng lượng: 1. Tốc độ di chuyển: 0.5
+
+40%/20%/10%/5% tỉ lệ rơi 2/3/4 dạ thạch, 25% còn lại không rơi gì.
+mỗi pháp sư hắc ám có 60% tỉ lệ rơi 1 "Trượng Pháp Sư": là vật liệu cần thiết để nâng cấp Nguyên Tố Tháp. 10% tỉ lệ rơi 1 Hắc Cốt, 30% còn lại không rơi gì.
+bộ tỉ lệ của (trượng pháp sư + Hắc Cốt) và dạ thạch là tính riêng.
 
 ### pháo phòng không:
 một kiến trúc chuyên dụng tấn công kẻ thù trên không, tốc độ tấn công và đường đạn nhanh là đặc điểm ưu tú của nó, giá cả cũng đồng dạng ưu tú hơn kiến trúc khác.
@@ -831,6 +848,10 @@ Nguyên Tố Hoá: khi chọn nâng cấp này sẽ tiêu hao 1 loại Nguyên T
 
 địa thứ: đạp bị cột sắt dưới đất đâm mạnh vào chân, giảm 50% tốc độ di chuyển trong 3s đồng thời gây chảy máu, gây sát thương = 3% max hp/s trong 3s đó, kích hoạt đối với kẻ có trọng lượng từ 1 đến 1,9, 2 trở lên và 0,9 trở xuống không kích hoạt.
 
+### Chuồng Ngựa
+
+từ Linh Mộc, Hắc Cốt tạo thành kiến trúc, nơi thú cưỡi của leader ở lại, thuận tiện đổi thú cưỡi, đồng thời hồi phục hp cũng như bảo vệ thú cưỡi và trồng trọt linh thảo làm thức ăn cho chúng.
+
 ### kẻ thù:
 #### Thiết Hán:
 biến dị nặng nề, một thợ mỏ bị bỏ lại lúc xập mỏ, xương cốt cứng rắn, bề ngoài bao phủ bởi kim loại không rõ, từ mỏ khoáng sản kết hợp với oán niệm mà thành mạnh mẽ sản phẩm.
@@ -838,6 +859,9 @@ chỉ số chuẩn Khai Nguyên 1:
 Hp: 5,5, 3 res, 4 arm, atk/wil:2, tốc độ 0.3, trọng lượng: 2,8.
 nội tại: mỗi 5s hồi 1 hp (x 2 ở Khai nguyên 2 là 5s hồi 2 hp, cứ thế mà suy ra khai nguyên 3 là x3, 5s hồi 3hp)
 Đánh thường: gây sát thương= 100% wil/atk, cd 1,5s.
+
+100% tỉ lệ rơi 2 Dạ thạch và 2 Hắc Thiết + 2 Hắc Cốt.
+10% tỉ lệ nhận gấp đôi.
 
 #### Oán Long:
 một con rồng bị ô nhiễm, lý trí không còn, chỉ còn bản năng thôn phệ, sát lục hết thảy
@@ -852,6 +876,12 @@ ultimate: gầm thét, gây sát thương và hiệu ứng như đánh thường
 
 trọng lượng: 4.
 
+100% rơi 10 Dạ Thạch + 5 Hắc Cốt và 1 Huyết Nhục Kết Tinh + 5 Long Lân.
+
+Có 5% tỉ lệ rơi thêm 2 Dạ Thạch + 1 Huyết Nhục Kết Tinh.
+
+Long Lân: Tài nguyên nâng cấp kiến trúc, biến động theo tier của vật chủ.
+
 ### tài nguyên:
 Vụn Nguyên Tinh, Hạ Nguyên Tinh, 1 hnt = 100 vnt. Trung Nguyên Tinh, Thượng Nguyên Tinh, 1 tnt = 100 hnt, 1 ThNT = 100 TNT, còn Thần Tinh nữa nhưng theo lore chắc khó xuất hiện, trừ phi phong ấn được lượng huyết nhục nhất định.
 #### Niệm Thạch:
@@ -862,6 +892,10 @@ Nguyên liệu cần thiết để chế tạo kiến trúc Đao Phủ, không c
 Từ khí aether hệ hắc ám ngưng kết mà thành, đa số kẻ thù đều rơi ra thứ này, base là thứ có thể chắt lọc mọi thứ thành Nguyên Tinh, các loại nguyên tinh cũng là tiền tệ chính trong game, mỗi đêm sau khi giết xong kẻ thù thì cần thu nhặt Dạ Thạch rơi trên đất, đem về base để chắt lọc năng lượng. tier vật liệu biến đổi theo tier map.
 1 Dạ Thạch = 0,9 Hạ Nguyên Tinh do qua trình chắt lọc base cần năng lượng nên lấy phần 0,1 còn lại.
 Sau đó từ dạng lỏng, ngưng tụ Nguyên Tinh thành dạng đặc lại tốn 10% của 0.9 đó mới ngưng tụ ra Hạ Nguyên Tinh, nếu để trong base không ngưng tụ thì có thể nhưng tụ ra hạng Nguyên Tinh cao cấp hơn trừ Thần Tinh. Nếu base được dời đi, phần năng lượng chưa rút ra sẽ được giữ nguyên trong base, base mỗi ngày tiêu hao 5 HNT để duy trì buff.
+
+#### Hắc Cốt:
+Từ ô nhiễm khí aether hệ Hắc Ám mà thành đặc thù tài nguyên, dùng để chế tạo và nâng cấp kiến trúc, không có tier cố định.
+
 #### Nguyên Tố Thạch:
 một viên đá nhiều màu, màu sắc luôn thay đổi, là ngưng kết của nguyên tố, tùy theo khí hậu/địa hình mà Nguyên Tố Thạch có nguyên tố khác nhau. tỉ lệ 1:35 HNT (x2/tier, tức nguyên tố thạch tier 1.2 1 viên:70 HNT), có thể dùng để tạo Tháp Nguyên Tố. Không có tier cố định, tùy theo nồng độ khí aether mà có giai khác nhau.
 
@@ -930,4 +964,28 @@ thật ra linh quả hiệu quả đều không quá mạnh vì chỉ tác dụn
 
 5. Truyền Tống Trận:
 - Xuất hiện random bên trái hoặc phải base, spawn ngẫu nhiên trên map, khoảng cách xa nhất có thể spawn là cách base 150 đơn vị khoảng cách, +5% khoảng cách/mỗi tier, tier càng cao cap khoảng cách càng xa.
-- Khi bê base vào truyền tống trận, sẽ hoàn thành map đó, trở về world map của mode vĩnh dạ và nhận phần thưởng là số Nguyên Tinh lây được trong map đó, (Vụn/Hạ/Trung/Thượng Nguyên Tinh và có thể là Thần Tinh ở tier cao) khi vào trận đấu thì sẽ bị cưỡng chế đem theo 10 HNT, coi như tiền đầu game, trừ trực tiếp từ budget, tức là nguyên tinh hiện co thể dùng gacha trong game, nâng lv nhân vật khi vào mode này sẽ bị đem đi 1 phần, nếu không win được map đó thì số Nguyên Tinh đem theo sẽ mất vĩnh viễn, nếu win map thì mọi tài nguyên base sẽ được chuyển thành Trung Nguyên Tinh theo tỉ lệ tương ứng. Player có thể dùng rune để tăng độ khó, độ khó càng cao hệ số nhân phần thưởng càng cao, bình thường không rune là x1, dùng rune để tăng độ khó thì kết toán có thể nhận x3, x10 phần thưởng tiêu chuẩn.
+- Khi bê base vào truyền tống trận, sẽ hoàn thành map đó, trở về world map của mode vĩnh dạ và nhận phần thưởng là số Nguyên Tinh lấy được trong map đó, (Vụn/Hạ/Trung/Thượng Nguyên Tinh và có thể là Thần Tinh ở tier cao) khi vào trận đấu thì sẽ bị cưỡng chế đem theo 10 HNT, coi như tiền đầu game, trừ trực tiếp từ budget, tức là nguyên tinh hiện có, thứ dùng gacha trong game, nâng lv nhân vật,... khi vào mode này sẽ bị đem đi 1 phần, nếu không win được map đó thì số Nguyên Tinh đem theo sẽ mất vĩnh viễn, nếu win map thì mọi tài nguyên base sẽ được chuyển thành Trung Nguyên Tinh theo tỉ lệ tương ứng. Player có thể dùng rune để tăng độ khó, độ khó càng cao hệ số nhân phần thưởng càng cao (tỉ lệ thu hoạch), bình thường không rune là x1, dùng rune để tăng độ khó thì kết toán có thể nhận x3, x10 phần thưởng tiêu chuẩn.
+
+6. Bệ Đá Cổ
+- một bệ đá cổ xưa, xuất hiện ngẫu nhiên trong map với tỉ lệ 20% (ở tier 1.1, + 3%/tier) ở bất kỳ vùng nào trừ vùng nguyên tố hắc ám, Tạo ngẫu nhiên 1 rune và mỗi bệ đá cổ chỉ tạo rune 1 lần, Rune có thể nâng cấp khi dung hợp với 3 rune cùng cấp, Rune không bị ràng buộc bởi tier nhưng bệ đá cổ thì có, khi xuất hiện ở tier 1.1 đến 1.3 tạo rune lv 1, 1.4 đến 1.6 tạo rune lv 2, 1.7 đến 1.9 tạo rune lv 3, 2.1 đến 2.3 tạo rune lv 4, 2.4 đến 2.6 tạo rune lv 5, 2.7 đến 2.9 tạo rune lv 6, 3.1 đến 3.3 tạo rune lv 7, 3.4 đến 3.6 tạo rune lv 8, 3.7 đến 3.9 tạo rune lv 9, rune lv cao hơn bổ sung sau, các loại rune lv1:
+- Điên cuồng: + 20% (+15%/lv) hp và atk/wil của kẻ thù. + 0,6 tỉ lệ thu hoạch, +100% tỉ lệ thu hoạch của rune khi lên cấp (tính với mốc lv1), lv 3 là + x1,5 tỉ lệ thu hoạch mà không phải x2 tỉ lệ thu hoạch
+- Hút máu: kẻ thù hồi hp = 25% (+10%/lv) sát thương gây ra kể cả đánh từ xa. logic tăng tỉ lệ thu hoạch như rune Điên Cuồng.
+- Hút máu (đồng minh): đồng minh hồi hp = 25% (+12%/lv) sát thương gây ra kể cả đánh từ xa, -0,6 tỉ lệ thu hoạch/lv. Hiệu quả giảm 25% đối với leader.
+- Phòng Thủ: kẻ thù tăng 10% (+5%/lv) hp và 15% (+4%/lv) arm/res, + 0,5 tỉ lệ thu hoạch/lv.
+- Suy Yếu (đồng minh): Đồng minh giảm 10% (+2,5%/lv) res/arm/atk/wil/hp, + 0,5 tỉ lệ thu hoạch/lv.
+- Suy Yếu (kẻ thù): kẻ thù giảm 10% (+2,6%/lv) res/arm/atk/wil/hp, - 0,5 tỉ lệ thu hoạch/lv.
+- Nhanh Nhẹn: kẻ thù tăng 0,3 (+0,1/lv) tốc độ di chuyển/s, + 0,6 tỉ lệ thu hoạch/lv.
+- Phục Sinh: khi hp về 0, kẻ thù không chết, lập tức hồi hp = 20% (+2%/lv) max hp của chúng, mỗi s hồi 2% (+1%/lv) max hp trong 5s (+1s/2lv), kích hoạt 1 lần/kẻ địch, + 0,8 tỉ lệ thu hoạch/lv, Hiệu quả giảm 50% đối với boss.
+- Nặng nề: + 0,4 (+0,3/lv) trọng lượng cho kẻ địch, + 0,6 tỉ lệ thu hoạch/lv, hiệu quả giảm 50% đối với boss.
+- Bạo Tạc: khi kẻ thù thật sự tử vong, chúng bạo tạc và gây sát thương = 100% (+15%/lv) max hp của bản thân trong bán kính tầm đánh của chúng, sát thương không phân địch ta, -0,5 tỉ lệ thu hoạch/lv, đối boss không hiệu quả.
+- Nhanh Nhẹn II (2 la mã, II là tên rune không phải lv rune, nếu lên lv 2 tên rune là 'Nhanh nhẹn II lv2'): giảm 20% (+3%/lv) cd đánh thường của mọi kẻ thù, đối boss bị giảm 50% hiệu quả, + 0,6 tỉ lệ thu hoạch/lv.
+- Phục thù: khi 5 (-1/4 lv) kẻ thù cùng loại chết, đồng loại của chúng được hồi 10% (+2/1 lv) max hp, ví dụ 5 sứ đồ chết thì mọi sứ đồ còn sống hồi 10% max hp của bản thân chúng, đối boss không hiệu quả, + 0,75 tỉ lệ thu hoạch/lv.
+- Sĩ khí: khi trên sân không có đồng minh nào có hp dưới 60%, mỗi nhân vật + 5% (+2/lv) max hp/atk/wil, - 0,35 tỉ lệ thu hoạch/lv.
+- Leader + : leader + 10% mọi chỉ số kể cả hp regen đang có, chỉ số từ rune này luôn áp dụng mỗi tối, chỉ số của leader thay đổi trước tối thì chỉ số leader nhận từ rune này cũng thay đổi theo, chỉ số từ rune này chỉ áp dụng lúc tối, buổi sáng không có hiệu quả, chỉ số từ rune này có thể vượt giới hạn chỉ số của game, -0,7 tỉ lệ thu hoạch/lv.
+- Càn Quét: đòn đánh thường của kẻ thù gây sát thương lan = 50% (+5%/lv) đòn đánh thường chính lên 3 (+1/5lv) đồng minh xung quanh, đối boss có 100% hiệu quả, + 0,8 tỉ lệ thu hoạch/lv.
+- Áp Đảo: - 10% (+2%/lv) mọi chỉ số của kẻ thù đứng trong phạm vi 5 đơn vị khoảng cách quanh leader, áp dụng với cả boss, - 0,5 tỉ lệ thu hoạch/lv.
+- Trọng Sinh: khi base bị phá hoặc hp leader về 0 và thực sự tử vong, màn hình loé sáng và mọi thứ trở lại lúc trận phòng thủ đêm đó bắt đầu, kích hoạt 1 (+1/3lv) lần/map, ví dụ: leader bị đánh chết hoặc base bị đánh bể lúc đêm thứ 3 trong map, rune này đưa leader trở lại lúc đêm thứ 3 vừa bắt đầu, lúc đó chỉ số, lính, kiến trúc trên ụ đá và dưới đất thế nào thì giữ như thế, -0,8 tỉ lệ thu hoạch/lv.
+- Hắc Khoa Kỹ: bắt đầu trận đấu với 1 (+1/3 lv) tháp canh lv 4, - 0,7 tỉ lệ thu hoạch/lv.
+- Âu Hoàng: Tăng 2% (+0,5%/lv) mọi tỉ lệ rơi đồ của mọi quái kể cả boss khi tử vong, ví dụ ở rune lv 1: trên cơ sở % tỉ lệ rơi đồ đã có + thêm 2% chứ không phải + thêm 2% của tỉ lệ rơi đồ đã có, - 0,7 tỉ lệ thu hoạch/lv.
+- Vận Rủi: tác dụng nghịch với rune Âu Hoàng, giảm 2% (+0,5%/lv) mọi tỉ lệ rơi đồ của mọi quái kể cả boss, là trừ trên tỉ lệ rơi cơ sở, +1 tỉ lệ thu hoạch/lv (tức dùng rune này ở lv 1 đã được + x1 tỉ lệ thu hoạch, nếu win mà chỉ dùng rune này sẽ được x2 phần thưởng). nếu đánh boss như Oán Long có 100% tỉ lệ rơi đồ để nhận Huyết Nhục Kết Tinh tạo ra Truyền Tống Trận thì khi dùng rune này ở lv 1 có 2% tỉ lệ không nhận được gì, sau đó còn 5% tỉ lệ nhận gấp đôi phần thưởng từ lần rơi đầu tiên của boss nhưng vì lần đầu không nhận gì nên may mắn được 5% đó kết quả cũng không nhận gì, nên map đó coi như thua, phải chơi lại vì truyền tống trận là cách duy nhất kết thúc map ở hiện tại. Để chơi được rune này player cần đủ may mắn, may mắn rune vận rủi không kích hoạt. Đương nhiên trong tương lai sẽ có nguyên liệu thay thế Huyết Nhục Kết Tinh, à hơn nữa theo lore base có thể tạo được mọi thứ nếu có đủ năng lượng nên nếu đủ tài nguyên cũng có thể tạo Huyết Nhục Kết Tinh qua base.
+- 

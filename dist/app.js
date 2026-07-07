@@ -39902,7 +39902,6 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       const damage = Math.max(enemy.atk, enemy.wil) * 2;
       if (Math.abs(enemy.x - getBaseX(ctx.state)) <= radius)
           damageBase(ctx, damage);
-      y;
       for (const structure of ctx.state.structures.values()) {
           const site = ctx.getBuildSite(structure.siteId);
           if (!site || Math.abs(site.x - enemy.x) > radius)
