@@ -21,6 +21,7 @@ import {
 const NUMBER_FORMAT = new Intl.NumberFormat('vi-VN');
 const COMPACT_NUMBER_FORMAT = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 });
 const TIME_FORMAT = new Intl.RelativeTimeFormat('vi', { style: 'short', numeric: 'auto' });
+const HISTORY_TIME_FORMAT = new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit' });
 
 const CURRENCY_ICONS: Record<CurrencyCode, string> = {
   VNT: 'assets/dust.svg',
@@ -34,10 +35,14 @@ interface GachaUIState {
   wallet: Wallet;
   bannerId: string;
   states: BannerStateMap;
+  summonHistory: SummonHistoryEntry[];
 }
 
-interface SummonResultEntry {
+interface SummonHistoryEntry {
+  time: number;
+  bannerLabel: string;
   rarity: string;
+  name: string | null;
   featured: boolean;
   pity: string | null;
 }
@@ -386,32 +391,53 @@ function renderCosts(container: HTMLElement, banner: BannerDefinition): void {
   container.appendChild(multiEl);
 }
 
-function renderResults(container: HTMLElement, results: SummonResultEntry[]): void {
-  const fragment = document.createDocumentFragment();
-  for (const result of results) {
-    const item = document.createElement('div');
-    item.className = 'result-entry';
+function renderHistory(container: HTMLElement, history: readonly SummonHistoryEntry[]): void {
+  const content = document.createElement('div');
+  content.className = 'gacha-drawer__content';
+  content.innerHTML = '<h2>Lịch sử</h2>';
 
-   const rarity = document.createElement('span');
-    rarity.className = 'result-entry__rarity';
-    rarity.textContent = result.rarity;
+  if (history.length === 0) {
+    const empty = document.createElement('p');
+    empty.textContent = 'Chưa có lượt triệu hồi nào.';
+    content.appendChild(empty);
+    container.replaceChildren(content);
+    return;
+  }
 
-    const name = document.createElement('span');
-    name.className = 'result-entry__name';
-    name.textContent = result.featured ? 'Rate-up' : 'Thường';
+  const list = document.createElement('div');
+  list.className = 'history-list';
+  for (const entry of history) {
+    const item = document.createElement('article');
+    item.className = 'history-entry';
 
-    item.append(rarity, name);
+   const time = document.createElement('time');
+    time.className = 'history-entry__time';
+    time.dateTime = new Date(entry.time).toISOString();
+    time.textContent = HISTORY_TIME_FORMAT.
 
-    if (result.pity) {
+    const banner = document.createElement('span');
+    banner.className = 'history-entry__banner';
+    banner.textContent = entry.bannerLabel;
+
+    const rarity = document.createElement('span');
+    rarity.className = 'history-entry__rarity';
+    rarity.textContent = entry.rarity;
+
+    const name = document.createElement('strong');
+    name.className = 'history-entry__name';
+    name.textContent = entry.name ?? (entry.featured ? 'Rate-up' : 'Thường');
+
+    item.append(time, banner, rarity, name);
+    if (entry.pity) {
       const pity = document.createElement('span');
-      pity.className = 'result-entry__pity';
-      pity.textContent = result.pity;
+      pity.className = 'history-entry__pity';
+      pity.textContent = entry.pity;
       item.appendChild(pity);
     }
-
-    fragment.appendChild(item);
+    list.appendChild(item);
   }
-  container.replaceChildren(fragment);
+  content.appendChild(list);
+  container.replaceChildren(content);
 }
 
 function createToast(message: string): HTMLElement {
@@ -459,6 +485,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
             <p class="banner-desc" data-slot="hero-subtitle"></p>
           </div>
           <span class="banner-timer" data-slot="hero-timer"></span>
+          <button class="history-button" type="button" aria-label="Xem lịch sử triệu hồi">↺</button>
           <button class="rules-button" type="button" aria-label="Xem tỉ lệ và quy tắc">?</button>
           </header>
         <section class="banner-panel" aria-label="Thông tin banner">
@@ -471,7 +498,6 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
           <button type="button" data-action="summon-x1">Triệu hồi x1</button>
           <button type="button" data-action="summon-x10">Triệu hồi x10</button>
         </footer>
-        <section class="banner-panel__results" aria-label="Kết quả triệu hồi" data-slot="results"></section>
       </main>
       <aside class="currency-mini-hub" aria-label="Ví tiền tệ gacha">
         <div class="currency-bar" data-slot="currencies"></div>
@@ -482,6 +508,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
           <button type="button" role="tab" data-drawer-tab="rates">Tỉ lệ</button>
           <button type="button" role="tab" data-drawer-tab="pity">Bảo hiểm</button>
           <button type="button" role="tab" data-drawer-tab="rules">Quy tắc</button>
+          <button type="button" role="tab" data-drawer-tab="history">Lịch sử</button>
         </div>
         <div class="gacha-drawer__panel" data-slot="drawer-panel"></div>
       </aside>
@@ -494,6 +521,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     wallet: createWallet(createNormalizedWallet(getSharedCurrencyWallet())),
     bannerId: GACHA_CONFIG.banners[0]?.id ?? 'permanent',
     states: new Map(),
+    summonHistory: [],
   };
   syncSharedCurrencyWallet(state.wallet, { merge: true });
 
@@ -510,12 +538,12 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   const pitySlot = container.querySelector<HTMLElement>('[data-slot="pity"]');
   const featuredSlot = container.querySelector<HTMLElement>('[data-slot="featured"]');
   const costSlot = container.querySelector<HTMLElement>('[data-slot="cost"]');
-  const resultsSlot = container.querySelector<HTMLElement>('[data-slot="results"]');
   const rulesButton = container.querySelector<HTMLButtonElement>('.rules-button');
+  const historyButton = container.querySelector<HTMLButtonElement>('.history-button');
   const summonOne = container.querySelector<HTMLButtonElement>('[data-action="summon-x1"]');
   const summonTen = container.querySelector<HTMLButtonElement>('[data-action="summon-x10"]');
 
-  if (!currencySlot || !bannerList || !titleSlot || !subtitleSlot || !timerSlot || !artSlot || !drawerBackdrop || !drawer || !drawerPanel || drawerTabs.length === 0 || !pitySlot || !featuredSlot || !costSlot || !resultsSlot || !rulesButton || !summonOne || !summonTen) {
+  if (!currencySlot || !bannerList || !titleSlot || !subtitleSlot || !timerSlot || !artSlot || !drawerBackdrop || !drawer || !drawerPanel || drawerTabs.length === 0 || !pitySlot || !featuredSlot || !costSlot || !rulesButton || !historyButton || !summonOne || !summonTen) {
     throw new Error('Thiếu phần tử UI cần thiết.');
   }
 
@@ -597,6 +625,10 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
       drawerPanel.replaceChildren(createRulesContent());
       return;
     }
+    if (activeDrawerTab === 'history') {
+      renderHistory(drawerPanel, state.summonHistory);
+      return;
+    }
     renderRates(drawerPanel, banner);
   };
 
@@ -665,16 +697,24 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     state.wallet = payment.wallet;
     syncSharedCurrencyWallet(state.wallet);
     renderWallet();
-    const results: SummonResultEntry[] = [];
+    const historyEntries: SummonHistoryEntry[] = [];
     const rolls = count === 10 ? multiRoll(banner, state.states, 10) : [rollBanner(banner, state.states)];
+    const featuredByRarity = getSummonableFeaturedUnits(banner);
+    const now = Date.now();
     for (const roll of rolls) {
-      results.push({
+      const featuredUnit = roll.outcome.featured
+        ? featuredByRarity.find((unit) => unit.rarity === roll.outcome.rarity) ?? null
+        : null;
+      historyEntries.push({
+        time: now,
+        bannerLabel: banner.label,
         rarity: roll.outcome.rarity,
+        name: featuredUnit?.name ?? null,
         featured: roll.outcome.featured,
         pity: roll.outcome.pityTriggered === 'hard' ? 'Hard pity' : roll.outcome.pityTriggered === 'soft' ? 'Soft pity' : roll.outcome.pityTriggered === 'srFloor' ? 'SR floor' : null,
       });
     }
-    renderResults(resultsSlot, results);
+    state.summonHistory = [...historyEntries, ...state.summonHistory].slice(0, 50);
     renderPity(pitySlot, banner, state.states);
     if (drawer.classList.contains('is-open')) {
       renderDrawerPanel();
@@ -688,6 +728,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   };
 
   rulesButton.addEventListener('click', () => openDrawer('rates', rulesButton));
+  historyButton.addEventListener('click', () => openDrawer('history', historyButton));
   drawerBackdrop.addEventListener('click', closeDrawer);
   drawer.addEventListener('click', (event) => event.stopPropagation());
   drawerTabs.forEach((tab) => {

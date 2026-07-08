@@ -94,7 +94,6 @@ button {
 .banner-panel__pity,
 .banner-panel__cost,
 .banner-panel__actions,
-.banner-panel__results,
 .currency-mini-hub {
   border: 1px solid var(--border-accent);
   background: var(--bg-panel);
@@ -103,7 +102,7 @@ button {
 
 .gacha-topbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
   align-items: center;
   gap: 14px;
   padding: 14px 18px;
@@ -217,7 +216,8 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
-.rules-button {
+.rules-button,
+.history-button {
   width: 42px;
   height: 42px;
   padding: 0;
@@ -319,8 +319,7 @@ button {
 .banner-panel__featured,
 .banner-panel__pity,
 .banner-panel__cost,
-.banner-panel__actions,
-.banner-panel__results {
+.banner-panel__actions {
   border-radius: 22px;
   padding: 14px;
 }
@@ -456,32 +455,7 @@ button {
 }
 
 .banner-panel__results {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
-}
-
-.result-entry {
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba(16, 28, 42, 0.82);
-  border: 1px solid rgba(118, 212, 255, 0.18);
-  display: grid;
-  gap: 6px;
-}
-
-.result-entry__rarity {
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.result-entry__name {
-  color: var(--text-muted);
-}
-
-.result-entry__pity {
-  font-size: 12px;
-  color: var(--primary);
+  display: none;
 }
 
 .gacha-backdrop {
@@ -525,7 +499,7 @@ button {
 
 .gacha-drawer__tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
 
@@ -571,6 +545,71 @@ button {
   margin: 0;
   padding-left: 20px;
   color: var(--text-muted);
+}
+
+.history-list {
+  min-height: 0;
+  max-height: min(62vh, 560px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.history-entry {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'time banner rarity'
+    'name name pity';
+  gap: 4px 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(16, 28, 42, 0.82);
+  border: 1px solid rgba(118, 212, 255, 0.18);
+}
+
+.history-entry__time {
+  grid-area: time;
+  color: var(--primary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-entry__banner {
+  grid-area: banner;
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-entry__rarity {
+  grid-area: rarity;
+  justify-self: end;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.history-entry__name {
+  grid-area: name;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-entry__pity {
+  grid-area: pity;
+  justify-self: end;
+  color: var(--primary);
+  font-size: 12px;
 }
 
 .pity-info-list {
@@ -647,8 +686,7 @@ button {
       'topbar topbar'
       'panel panel'
       'featured pity'
-      'cost actions'
-      'results results';
+      'cost actions';
   }
 
   .gacha-topbar { grid-area: topbar; }
@@ -657,7 +695,6 @@ button {
   .banner-panel__pity { grid-area: pity; }
   .banner-panel__cost { grid-area: cost; }
   .banner-panel__actions { grid-area: actions; }
-  .banner-panel__results { grid-area: results; }
 
   .currency-mini-hub {
     grid-area: wallet;
@@ -708,7 +745,7 @@ button {
   }
 
   .gacha-topbar {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
   }
 
   .banner-timer {
@@ -750,7 +787,6 @@ button {
   .banner-panel__pity,
   .banner-panel__cost,
   .banner-panel__actions,
-  .banner-panel__results,
   .currency-mini-hub,
   .banner-sidebar {
     border-radius: 16px;
