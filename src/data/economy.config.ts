@@ -198,10 +198,10 @@ const economyConfig = {
     },
     PRIME: {
       tier: 'PRIME',
-      hardPity: 80,
+      hardPity: 120,
       softGuarantees: [
-        { tier: 'SSR', pull: 40 },
-        { tier: 'UR', pull: 60 }
+        { tier: 'UR', pull: 90 },
+        { tier: 'PRIME', pull: 91 }
       ]
     }
   },

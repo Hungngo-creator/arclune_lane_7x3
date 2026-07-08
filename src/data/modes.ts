@@ -17,7 +17,7 @@ const CURRENT_PRIME_PITY = CURRENT_PRIME_BANNER?.pity.prime ?? null;
 const CURRENT_PRIME_SUPPORT_UR_PITY = CURRENT_PRIME_BANNER?.pity.ur ?? null;
 const PRIME_BANNER_PITY_SUMMARY = CURRENT_PRIME_PITY
   ? `soft pity Prime từ lượt ${CURRENT_PRIME_PITY.soft}, hard pity Prime ở lượt ${CURRENT_PRIME_PITY.hard}`
-  : `hard pity Prime mặc định ${PRIME_PITY?.hardPity || 80} lượt`;
+  : `hard pity Prime mặc định ${PRIME_PITY?.hardPity || 120} lượt`;
 const PRIME_BANNER_SUPPORT_PITY_SUMMARY = CURRENT_PRIME_SUPPORT_UR_PITY
   ? `UR phụ trợ soft từ lượt ${CURRENT_PRIME_SUPPORT_UR_PITY.soft}, hard ở lượt ${CURRENT_PRIME_SUPPORT_UR_PITY.hard}`
   : null;

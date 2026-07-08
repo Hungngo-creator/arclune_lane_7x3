@@ -10664,10 +10664,10 @@ __modules['./data/economy.config.ts'] = (exports, module, __require) => {
           },
           PRIME: {
               tier: 'PRIME',
-              hardPity: 80,
+              hardPity: 120,
               softGuarantees: [
-                  { tier: 'SSR', pull: 40 },
-                  { tier: 'UR', pull: 60 }
+                  { tier: 'UR', pull: 90 },
+                  { tier: 'PRIME', pull: 91 }
               ]
           }
       },
@@ -10980,7 +10980,7 @@ __modules['./data/modes.ts'] = (exports, module, __require) => {
   const CURRENT_PRIME_SUPPORT_UR_PITY = CURRENT_PRIME_BANNER?.pity.ur ?? null;
   const PRIME_BANNER_PITY_SUMMARY = CURRENT_PRIME_PITY
       ? `soft pity Prime từ lượt ${CURRENT_PRIME_PITY.soft}, hard pity Prime ở lượt ${CURRENT_PRIME_PITY.hard}`
-      : `hard pity Prime mặc định ${PRIME_PITY?.hardPity || 80} lượt`;
+      : `hard pity Prime mặc định ${PRIME_PITY?.hardPity || 120} lượt`;
   const PRIME_BANNER_SUPPORT_PITY_SUMMARY = CURRENT_PRIME_SUPPORT_UR_PITY
       ? `UR phụ trợ soft từ lượt ${CURRENT_PRIME_SUPPORT_UR_PITY.soft}, hard ở lượt ${CURRENT_PRIME_SUPPORT_UR_PITY.hard}`
       : null;
