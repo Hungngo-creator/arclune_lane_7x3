@@ -114,7 +114,7 @@ function renderWalletChip(code: CurrencyCode, amount: number): HTMLElement {
   chip.type = 'button';
   chip.dataset.currency = code;
   chip.style.setProperty('--currency-icon', `url("${CURRENCY_ICONS[code]}")`);
-  chip.setAttribute('aria-label', `${CURRENCY_LABELS[code]}: ${Math.max(0, Math.trunc(amount))}`);
+  chip.setAttribute('aria-label', `${CURRENCY_LABELS[code]} (${code}): ${formatNumber(amount)}`);
   chip.innerHTML = `<span class="currency-mini-item__value">${formatCompactNumber(amount)}</span>`;
   return chip;
 }
@@ -127,7 +127,7 @@ function renderCurrencyHeader(container: HTMLElement, wallet: Wallet, onOpenTool
       const valueEl = cachedNodes.get(code);
       if (!valueEl) return;
       const nextText = formatCompactNumber(wallet[code]);
-      valueEl.closest<HTMLElement>('.currency-mini-item')?.setAttribute('aria-label', `${CURRENCY_LABELS[code]}: ${Math.max(0, Math.trunc(wallet[code]))}`);
+      valueEl.closest<HTMLElement>('.currency-mini-item')?.setAttribute('aria-label', `${CURRENCY_LABELS[code]} (${code}): ${formatNumber(wallet[code])}`);
       if (valueEl.textContent !== nextText) {
         valueEl.textContent = nextText;
       }
@@ -600,8 +600,8 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
             <p class="banner-desc" data-slot="hero-subtitle"></p>
           </div>
           <span class="banner-timer" data-slot="hero-timer"></span>
-          <button class="history-button" type="button" aria-label="Xem lịch sử triệu hồi">↺</button>
-          <button class="rules-button" type="button" aria-label="Xem tỉ lệ và quy tắc">?</button>
+          <button class="history-button" type="button" aria-label="Xem lịch sử triệu hồi" aria-expanded="false">↺</button>
+          <button class="rules-button" type="button" aria-label="Xem tỉ lệ và quy tắc" aria-expanded="false">?</button>
           </header>
         <section class="banner-panel" aria-label="Thông tin banner">
           <section class="banner-panel__art" data-slot="hero-art"></section>
@@ -671,7 +671,9 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     closeCurrencyTooltip();
     const tooltip = document.createElement('div');
     tooltip.className = 'currency-mini-tooltip';
+    tooltip.id = `currency-tooltip-${code}`;
     tooltip.setAttribute('role', 'tooltip');
+    target.setAttribute('aria-describedby', tooltip.id);
     tooltip.innerHTML = `<strong>${CURRENCY_LABELS[code]}</strong><span>${formatNumber(state.wallet[code])}</span>`;
     container.appendChild(tooltip);
     const targetRect = target.getBoundingClientRect();
@@ -689,6 +691,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     closeCurrencyTooltip = () => {
       window.clearTimeout(timeoutId);
       document.removeEventListener('pointerdown', onPointerDown, { capture: true });
+      target.removeAttribute('aria-describedby');
       tooltip.remove();
       closeCurrencyTooltip = () => {};
     };
@@ -750,11 +753,14 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   };
 
   const closeDrawer = () => {
+    const trigger = lastDrawerTrigger;
     drawer.classList.remove('is-open');
     drawer.setAttribute('aria-hidden', 'true');
     drawerBackdrop.classList.remove('is-open');
     drawerBackdrop.hidden = true;
-    lastDrawerTrigger?.focus();
+    rulesButton.setAttribute('aria-expanded', 'false');
+    historyButton.setAttribute('aria-expanded', 'false');
+    trigger?.focus();
     lastDrawerTrigger = null;
   };
 
@@ -762,6 +768,8 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     closeCurrencyTooltip();
     activeDrawerTab = tab;
     lastDrawerTrigger = trigger;
+    rulesButton.setAttribute('aria-expanded', String(trigger === rulesButton));
+    historyButton.setAttribute('aria-expanded', String(trigger === historyButton));
     drawerBackdrop.hidden = false;
     renderDrawerPanel();
     drawerBackdrop.classList.add('is-open');

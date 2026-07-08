@@ -17,6 +17,18 @@
   --rarity-ssr: #ffc866;
   --rarity-ur: #ff6a9f;
   --rarity-prime: #6cffeb;
+  --focus-ring: 0 0 0 3px rgba(5, 9, 15, 0.96), 0 0 0 6px rgba(118, 212, 255, 0.86);
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+button,
+[role='tab'] {
+  min-width: 40px;
+  min-height: 40px;
 }
 
 * {
@@ -73,10 +85,13 @@ button {
   cursor: pointer;
 }
 
-.gacha-screen-shell__back:hover,
-.gacha-screen-shell__back:focus-visible {
+.gacha-screen-shell__back:hover {
   border-color: rgba(118, 212, 255, 0.74);
   box-shadow: 0 16px 36px rgba(31, 177, 255, 0.24);
+}
+
+.gacha-screen-shell__back:focus-visible {
+  border-color: rgba(118, 212, 255, 0.9);
 }
 
 .gacha-screen-shell__back.is-fallback {
@@ -225,7 +240,10 @@ button {
 .currency-mini-item:focus-visible {
   transform: translateY(-3px);
   border-color: rgba(118, 212, 255, 0.65);
-  outline: none;
+}
+
+currency-mini-item:focus-visible {
+  box-shadow: var(--focus-ring);
 }
 
 .currency-mini-item__value {
@@ -303,7 +321,10 @@ button {
 .banner-entry:focus-visible {
   transform: translateX(6px);
   border-color: rgba(118, 212, 255, 0.6);
-  outline: none;
+}
+
+banner-entry:focus-visible {
+  box-shadow: var(--focus-ring);
 }
 
 .banner-entry.is-active {
@@ -613,7 +634,10 @@ button {
   transform: translateY(-2px);
   border-color: rgba(255, 154, 255, 0.72);
   filter: brightness(1.08);
-  outline: none;
+}
+
+.summon-button:focus-visible:not(:disabled) {
+  box-shadow: var(--focus-ring);
 }
 
 .summon-button:disabled,
@@ -673,6 +697,7 @@ button {
 }
 
 .gacha-drawer__tabs button {
+  min-height: 40px;
   padding: 10px 8px;
   border-radius: 14px;
   border: 1px solid rgba(118, 212, 255, 0.26);
@@ -684,7 +709,10 @@ button {
 .gacha-drawer__tabs button:focus-visible {
   border-color: rgba(255, 154, 255, 0.68);
   background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));
-  outline: none;
+}
+
+.gacha-drawer__tabs button:focus-visible {
+  box-shadow: var(--focus-ring);
 }
 
 .gacha-drawer__panel {
@@ -911,7 +939,10 @@ button {
 .gacha-confirm-modal__button:hover,
 .gacha-confirm-modal__button:focus-visible {
   border-color: rgba(255, 154, 255, 0.72);
-  outline: none;
+}
+
+.gacha-confirm-modal__button:focus-visible {
+  box-shadow: var(--focus-ring);
 }
 
 @media (min-width: 960px) {
