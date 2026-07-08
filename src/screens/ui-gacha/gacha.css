@@ -325,42 +325,59 @@ button {
 }
 
 .banner-panel__pity {
+  min-width: 0;
+}
+
+.pity-chip-row {
   display: flex;
-  flex-direction: column;
   gap: 10px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-bottom: 2px;
 }
 
-.pity-meter {
+.pity-chip {
+  flex: 0 0 min(150px, 48vw);
   display: grid;
-  grid-template-columns: 80px 1fr 80px;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 12px;
+  gap: 7px 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(20, 32, 48, 0.86);
+  border: 1px solid rgba(118, 212, 255, 0.18);
 }
 
-.pity-meter__label {
+.pity-chip__label {
+  min-width: 0;
   font-size: 12px;
   text-transform: uppercase;
   color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.pity-meter__bar {
+.pity-chip__value {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pity-chip__bar {
+  grid-column: 1 / -1;
   position: relative;
-  height: 8px;
+  height: 4px;
   border-radius: 999px;
   background: rgba(118, 212, 255, 0.15);
   overflow: hidden;
 }
 
-.pity-meter__progress {
+.pity-chip__progress {
   position: absolute;
   inset: 0;
   border-radius: 999px;
   background: var(--highlight);
-}
-
-.pity-meter__value {
-  font-variant-numeric: tabular-nums;
-  justify-self: end;
 }
 
 .featured__heading {
@@ -764,8 +781,8 @@ button {
     flex-direction: column;
   }
 
-.pity-meter {
-    grid-template-columns: 64px 1fr 64px;
+.pity-chip {
+    flex-basis: min(136px, 72vw);
   }
 }
 

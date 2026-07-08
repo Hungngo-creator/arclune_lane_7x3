@@ -214,11 +214,8 @@ function renderRates(container: HTMLElement, banner: BannerDefinition): void {
   container.appendChild(list);
 }
 
-function getPitySections(banner: BannerDefinition, states: BannerStateMap): PitySection[] {
-  const state = getBannerState(states, banner);
-  const sections: PitySection[] = [
-    { label: 'SR sàn', value: state.pity.sr, max: banner.pity.srFloor },
-  ];
+function getPremiumPitySections(banner: BannerDefinition, state: ReturnType<typeof getBannerState>): PitySection[] {
+  const sections: PitySection[] = [];
   if (banner.pity.ssr) {
     sections.push({ label: 'SSR', value: state.pity.ssr, max: banner.pity.ssr.hard });
   }
@@ -231,12 +228,30 @@ function getPitySections(banner: BannerDefinition, states: BannerStateMap): Pity
   return sections;
 }
 
+function getPitySections(banner: BannerDefinition, states: BannerStateMap): PitySection[] {
+  const state = getBannerState(states, banner);
+  return [
+    { label: 'SR sàn', value: state.pity.sr, max: banner.pity.srFloor },
+    ...getPremiumPitySections(banner, state),
+  ];
+}
+
+function getMainPitySections(banner: BannerDefinition, states: BannerStateMap): PitySection[] {
+  return getPremiumPitySections(banner, getBannerState(states, banner));
+}
+
 function ensurePityMeterNodes(container: HTMLElement, sections: ReadonlyArray<PitySection>): Map<string, PityMeterNodes> {
+  let row = container.querySelector<HTMLDivElement>(':scope > .pity-chip-row');
+  if (!row) {
+    row = document.createElement('div');
+    row.className = 'pity-chip-row';
+  }
+
   const existing = new Map<string, PityMeterNodes>();
-  for (const child of container.querySelectorAll<HTMLDivElement>(':scope > .pity-meter')) {
+  for (const child of row.querySelectorAll<HTMLDivElement>(':scope > .pity-chip')) {
     const label = child.dataset.pityLabel;
-    const progress = child.querySelector<HTMLDivElement>('.pity-meter__progress');
-    const value = child.querySelector<HTMLSpanElement>('.pity-meter__value');
+    const progress = child.querySelector<HTMLDivElement>('.pity-chip__progress');
+    const value = child.querySelector<HTMLSpanElement>('.pity-chip__value');
     if (!label || !progress || !value) {
       continue;
     }
@@ -253,29 +268,30 @@ function ensurePityMeterNodes(container: HTMLElement, sections: ReadonlyArray<Pi
       continue;
     }
     const item = document.createElement('div');
-    item.className = 'pity-meter';
+    item.className = 'pity-chip';
     item.dataset.pityLabel = section.label;
     const label = document.createElement('span');
-    label.className = 'pity-meter__label';
+    label.className = 'pity-chip__label';
     label.textContent = section.label;
-    const bar = document.createElement('div');
-    bar.className = 'pity-meter__bar';
-    const progress = document.createElement('div');
-    progress.className = 'pity-meter__progress';
-    bar.appendChild(progress);
     const value = document.createElement('span');
-    value.className = 'pity-meter__value';
-    item.append(label, bar, value);
+    value.className = 'pity-chip__value';
+    const bar = document.createElement('div');
+    bar.className = 'pity-chip__bar';
+    const progress = document.createElement('div');
+    progress.className = 'pity-chip__progress';
+    bar.appendChild(progress);
+    item.append(label, value, bar);
     const nodes = { root: item, progress, value };
     nextMap.set(section.label, nodes);
     fragment.appendChild(item);
   }
-  container.replaceChildren(fragment);
+  row.replaceChildren(fragment);
+  container.replaceChildren(row);
   return nextMap;
 }
 
 function renderPity(container: HTMLElement, banner: BannerDefinition, states: BannerStateMap): void {
-  const sections = getPitySections(banner, states);
+  const sections = getMainPitySections(banner, states);
   const pityNodes = ensurePityMeterNodes(container, sections);
 
   for (const entry of sections) {
@@ -410,10 +426,11 @@ function renderHistory(container: HTMLElement, history: readonly SummonHistoryEn
     const item = document.createElement('article');
     item.className = 'history-entry';
 
-   const time = document.createElement('time');
+    const time = document.createElement('time');
     time.className = 'history-entry__time';
-    time.dateTime = new Date(entry.time).toISOString();
-    time.textContent = HISTORY_TIME_FORMAT.
+    const entryDate = new Date(entry.time);
+    time.dateTime = entryDate.toISOString();
+    time.textContent = HISTORY_TIME_FORMAT.format(entryDate);
 
     const banner = document.createElement('span');
     banner.className = 'history-entry__banner';
