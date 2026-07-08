@@ -848,6 +848,14 @@ Nguyên Tố Hoá: khi chọn nâng cấp này sẽ tiêu hao 1 loại Nguyên T
 
 địa thứ: đạp bị cột sắt dưới đất đâm mạnh vào chân, giảm 50% tốc độ di chuyển trong 3s đồng thời gây chảy máu, gây sát thương = 3% max hp/s trong 3s đó, kích hoạt đối với kẻ có trọng lượng từ 1 đến 1,9, 2 trở lên và 0,9 trở xuống không kích hoạt.
 
+Hắc Động: một trọng lực nguyên, vật vô hình, không có hp, không thể bị phá hủy theo cách thông thường.
+khi đạp vào, trì hoãn trong 3s, sau 3s đó bắt đầu thôn phệ mọi thứ trong đường kính 3 đơn vị khoảng cách quanh bản thân, diệt sát mọi mục tiêu có hp dưới 5% (+1%/lv) max hp, bỏ qua hiệu quả rune Phục Sinh, nếu mục tiêu có hp trên 5% (+1%/lv) max hp của chúng, mỗi giây thôn phệ gây sát thương = 5% (+1%/lv) max hp của chúng, bất kể đồng minh/kẻ thù/nhân vật trung lập nào miễn có hp đứng trong 1 đơn vị khoảng cách ngoài đường kính 3 đơn vị khoảng cách của Hắc Động cũng bị giảm 30% (+10%/lv) tốc độ di chuyển (chỉ hoạt động khi kích hoạt thôn phệ). Đối mục tiêu phi hành miễn trong đường kính hiệu quả vẫn có tác dụng. Thời Gian thôn phệ:3s (+1s/lv), sau khi hết time thôn phệ lâm vào cd 5s.
+lv 1: Chỉ dối mục tiêu có trọng lượng 1 trở xuống có hiệu quả.
+lv 2: đối mục tiêu có trọng lượng 2 trở xuống có hiệu quả.
+lv 3 có 2 nhánh lựa chọn:
+Vĩnh Trú: Hắc động luôn kích hoạt thôn phệ, cd về 0, khi số lượng đơn vị bị hút đạt 40, bắn chúng về vị trí trước mặt chúng, nếu là vật thể đang bay, bắn chúng trên không, sau đó lâm vào cd 2s rồi lại kích hoạt hắc động.
+yêu cầu nâng cấp: 5 Hư Không Thạch và 10 Dạ Thạch đồng tier với map, 1 Huyết Nhục Kết Tinh thấp hơn map 1 tier nhỏ (tức là nếu Huyết Nhục Kết Tinh từ map trước có dư có thể đem vào map sau để nâng cấp kiến trúc này).
+
 ### Chuồng Ngựa
 
 từ Linh Mộc, Hắc Cốt tạo thành kiến trúc, nơi thú cưỡi của leader ở lại, thuận tiện đổi thú cưỡi, đồng thời hồi phục hp cũng như bảo vệ thú cưỡi và trồng trọt linh thảo làm thức ăn cho chúng.
@@ -914,6 +922,10 @@ Base có thể tạo vật liệu nhờ khả năng chuyển đổi của nó, d
 
 #### Huyền Minh Trọng Thủy:
 một loại linh dịch nặng nề, ở vùng giao giới giữa Thủy và Thổ có 15% tỉ lệ xuất hiện, tăng thêm 5%/tier (về cơ bản sẽ càng thấp vì vùng giao nhau giữ thủy và thổ rất khó xuất hiện vì mỗi map xuất hiện vùng nguyên tố là có hạn), sinh ra ở vùng trọng lực cao, có thể dùng để chế tạo Pháo Trọng Lực, tier biến đổi theo tier map. 1 đơn vị HMTT tier 1.1 (+0.1/0.1 tier): 1 TNT. Bất kỳ sinh vật trọng lượng dưới 2 nào đi hoặc bay ngang tốc độ đều sẽ giảm 50%.
+
+#### Hư Không Thạch
+có thể dẫn dắt, thao tác với hư không, sinh ra trong vùng có không gian vặn vẹo, vật liệu cần thiết để chế tạo truyền tống trận và 1 số kiến trúc. Xuất hiện ngẫu nhiên Ở Vùng Trọng Lực Cao, tỉ lệ xuất hiện lúc đầu ở vùng trọng lực cao là 1%, +1%/10 đơn vị sinh vật đi ngang.
+1 Đơn vị sinh vật: bất kỳ đơn vị nào có Hp và có thể di chuyển đều là 1 đơn vị sinh vật, (Quái thuộc phe Vĩnh Dạ, lính/leader phe player hoặc npc trung lập, Thú hoang,..)
 
 Truyền Tống Trận:
 kiến trúc tu sĩ trúc cơ mới có thể tạo ra, dùng để di chuyển khoảng cách xa, cần bày trận giữa A và B. Nên theo game leader cần lên trúc cơ, phái lính đi thám thính, bày Tử trận ở chổ cần đến rồi bày mẫu trận mới tele qua được, hoặc là truyền tống trận có sẵn, sao cũng được.

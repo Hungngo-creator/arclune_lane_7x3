@@ -17,7 +17,7 @@ import {
   computeFinalStats,
   deriveTpFromMods,
 } from '../src/data/roster-preview.ts';
-import { makeInstanceStats } from '../src/meta.ts';y
+import { makeInstanceStats } from '../src/meta.ts';
 
 const EXPECTED_TP_DELTA: Readonly<Record<string, number>> = Object.freeze({
   HP: 20,

@@ -1,6 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/config.ts
 
-import type { BannerDefinition, CurrencyCode, GachaConfig, Wallet } from './types.ts';
+import type { BannerCostConfig, BannerDefinition, CurrencyCode, GachaConfig, Wallet } from './types.ts';
 import { CURRENCY_ORDER } from './types.ts';
 
 export const DEFAULT_WALLET: Wallet = {
@@ -14,13 +14,19 @@ export const DEFAULT_WALLET: Wallet = {
 const now = Date.now();
 const day = 24 * 60 * 60 * 1000;
 
+const BANNER_COSTS = {
+  Permanent: { unit: 'HNT', x1: 250, x10: 2_500 },
+  LimitedUR: { unit: 'TNT', x1: 250, x10: 2_500 },
+  LimitedPrime: { unit: 'ThNT', x1: 4, x10: 40 },
+} satisfies Record<BannerDefinition['type'], BannerCostConfig>;
+
 const BANNERS: BannerDefinition[] = [
   {
     id: 'permanent',
     label: 'Triệu Hồi Chung',
     type: 'Permanent',
     description: 'Danh sách N / R / SR / SSR toàn bộ.',
-    cost: { unit: 'HNT', x1: 250, x10: 2_500 },
+    cost: BANNER_COSTS.Permanent,
     rates: { N: 0.6, R: 0.25, SR: 0.12, SSR: 0.03 },
     pity: {
       srFloor: 10,
@@ -37,7 +43,7 @@ const BANNERS: BannerDefinition[] = [
     label: 'Giới Hạn UR',
     type: 'LimitedUR',
     description: 'UR rate-up, pity hard bảo đảm UR featured.',
-    cost: { unit: 'TNT', x1: 250, x10: 2_500 },
+    cost: BANNER_COSTS.LimitedUR,
     rates: { N: 0.5935, R: 0.245, SR: 0.117, SSR: 0.0295, UR: 0.015, Prime: 0.0 },
     pity: {
       srFloor: 10,
@@ -55,7 +61,7 @@ const BANNERS: BannerDefinition[] = [
     label: 'Giới Hạn Prime',
     type: 'LimitedPrime',
     description: 'Prime rate-up, pity bảo đảm Prime featured.',
-    cost: { unit: 'ThNT', x1: 300, x10: 3_000 },
+    cost: BANNER_COSTS.LimitedPrime,
     rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
     pity: {
       srFloor: 10,
@@ -73,11 +79,7 @@ const BANNERS: BannerDefinition[] = [
 
 export const GACHA_CONFIG: GachaConfig = {
   currencies: ['VNT', 'HNT', 'TNT', 'ThNT', 'TT'],
-  costs: {
-    Permanent: { unit: 'HNT', x1: 250, x10: 2_500 },
-    LimitedUR: { unit: 'TNT', x1: 250, x10: 2_500 },
-    LimitedPrime: { unit: 'ThNT', x1: 300, x10: 3_000 },
-  },
+  costs: BANNER_COSTS,
   rateUpShare: 0.7,
   banners: BANNERS,
 };

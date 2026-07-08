@@ -98,6 +98,7 @@ export function scaleStatByRank(
   bonus: number = 0,
 ): number {
   return value * getRankStatMultiplier(stat, rank, bonus);
+}
 
 // AGI/PER tạm thời không chịu rank multiplier để chờ cân bằng riêng.
 // SPD/AEmax/AEregen cũng không scale theo rank.
