@@ -10498,7 +10498,7 @@ __modules['./data/economy.config.ts'] = (exports, module, __require) => {
               shortName: 'Thượng',
               suffix: 'ThNT',
               ratioToBase: 1000000,
-              description: 'Đơn vị luân chuyển giữa các tông môn, đổi thưởng cao cấp và sự kiện giới hạn.'
+              description: 'Tiền chính cho Prime banner, dùng trực tiếp cho lượt quay Prime và đổi thưởng cao cấp.'
           },
           {
               id: 'TT',
@@ -10506,7 +10506,7 @@ __modules['./data/economy.config.ts'] = (exports, module, __require) => {
               shortName: 'Thần',
               suffix: 'TT',
               ratioToBase: 100000000,
-              description: 'Đơn vị tối thượng cho các giao dịch Prime và quỹ dự trữ chiến lược.'
+              description: 'Tài nguyên tối thượng/chiến lược. Có thể đổi xuống ThNT khi người chơi xác nhận, nhưng không tự động tiêu cho roll; công dụng Nghịch Phản Tiên Thiên/Axiom là dự kiến hoặc khóa sau hệ thống upgrade.'
           }
       ],
       cultivation: {
@@ -36374,6 +36374,13 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
       ThNT: 'assets/key.svg',
       TT: 'assets/gem.svg',
   };
+  const CURRENCY_TOOLTIPS = {
+      VNT: 'Đơn vị nhỏ nhất, dùng cho tích lũy cơ bản.',
+      HNT: 'Tiền cho banner thường và giao dịch phổ thông.',
+      TNT: 'Tiền cho banner UR/cao cấp.',
+      ThNT: 'Tiền chính cho Prime banner.',
+      TT: 'Tài nguyên tối thượng/chiến lược; chỉ đổi xuống ThNT khi xác nhận, không tự động tiêu cho roll Prime.',
+  };
   const currencyValueNodeCache = new WeakMap();
   const bannerButtonNodeCache = new WeakMap();
   function formatNumber(value) {
@@ -36414,7 +36421,8 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
       chip.className = 'currency-chip';
       chip.type = 'button';
       chip.dataset.currency = code;
-      chip.title = 'Quy Tắc';
+      chip.title = CURRENCY_TOOLTIPS[code];
+      chip.setAttribute('aria-label', `${code}: ${CURRENCY_LABELS[code]}. ${CURRENCY_TOOLTIPS[code]}`);
       chip.innerHTML = `
       <span class="currency-chip__icon"><img src="${CURRENCY_ICONS[code]}" alt="${code}" /></span>
       <span class="currency-chip__info">
@@ -36636,12 +36644,14 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
       dialog.innerHTML = `
       <h2>Quy Tắc</h2>
       <p>100 đơn vị bậc thấp = 1 đơn vị bậc cao. Thuế tối đa 10% khi đổi lên, không thuế khi đổi xuống.</p>
+      <p>ThNT là tiền chính cho Prime banner; TT là tài nguyên tối thượng/chiến lược, chỉ đổi xuống ThNT khi có xác nhận và không tự động tiêu cho roll.</p>
+      <p>Công dụng TT cho Nghịch Phản Tiên Thiên/Axiom là dự kiến hoặc sẽ khóa sau hệ thống upgrade.</p>
       <p>Thuế tăng theo bậc, miễn thuế nếu đổi &lt; 100 đơn vị.</p>
       <ul>
         <li>VNT → HNT: thuế gốc 0.5%</li>
         <li>HNT → TNT: thuế gốc 1.0%</li>
         <li>TNT → ThNT: thuế gốc 1.5%</li>
-        <li>TT chỉ đổi xuống, không thuế.</li>
+        <li>TT chỉ đổi xuống khi xác nhận, không thuế; auto-convert khi roll luôn bỏ qua TT.</li>
       </ul>
     `;
       return dialog;
@@ -37321,8 +37331,8 @@ __modules['./screens/ui-gacha/logic/config.ts'] = (exports, module, __require) =
       VNT: 'Vụn',
       HNT: 'Hạ',
       TNT: 'Trung',
-      ThNT: 'Thượng',
-      TT: 'Thần Tinh',
+      ThNT: 'Thượng (Prime)',
+      TT: 'Thần Tinh chiến lược',
   };
   function createWallet(initial) {
       const wallet = {};

@@ -88,8 +88,8 @@ export const CURRENCY_LABELS: Record<CurrencyCode, string> = {
   VNT: 'Vụn',
   HNT: 'Hạ',
   TNT: 'Trung',
-  ThNT: 'Thượng',
-  TT: 'Thần Tinh',
+  ThNT: 'Thượng (Prime)',
+  TT: 'Thần Tinh chiến lược',
 };
 
 export function createWallet(initial?: Partial<Wallet>): Wallet {

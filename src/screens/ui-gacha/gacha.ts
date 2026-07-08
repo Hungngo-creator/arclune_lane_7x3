@@ -29,6 +29,14 @@ const CURRENCY_ICONS: Record<CurrencyCode, string> = {
   TT: 'assets/gem.svg',
 };
 
+const CURRENCY_TOOLTIPS: Record<CurrencyCode, string> = {
+  VNT: 'Đơn vị nhỏ nhất, dùng cho tích lũy cơ bản.',
+  HNT: 'Tiền cho banner thường và giao dịch phổ thông.',
+  TNT: 'Tiền cho banner UR/cao cấp.',
+  ThNT: 'Tiền chính cho Prime banner.',
+  TT: 'Tài nguyên tối thượng/chiến lược; chỉ đổi xuống ThNT khi xác nhận, không tự động tiêu cho roll Prime.',
+};
+
 interface GachaUIState {
   wallet: Wallet;
   bannerId: string;
@@ -98,7 +106,8 @@ function renderWalletChip(code: CurrencyCode, amount: number): HTMLElement {
   chip.className = 'currency-chip';
   chip.type = 'button';
   chip.dataset.currency = code;
-  chip.title = 'Quy Tắc';
+  chip.title = CURRENCY_TOOLTIPS[code];
+  chip.setAttribute('aria-label', `${code}: ${CURRENCY_LABELS[code]}. ${CURRENCY_TOOLTIPS[code]}`);
   chip.innerHTML = `
     <span class="currency-chip__icon"><img src="${CURRENCY_ICONS[code]}" alt="${code}" /></span>
     <span class="currency-chip__info">
@@ -341,12 +350,14 @@ function createRulesContent(): HTMLElement {
   dialog.innerHTML = `
     <h2>Quy Tắc</h2>
     <p>100 đơn vị bậc thấp = 1 đơn vị bậc cao. Thuế tối đa 10% khi đổi lên, không thuế khi đổi xuống.</p>
+    <p>ThNT là tiền chính cho Prime banner; TT là tài nguyên tối thượng/chiến lược, chỉ đổi xuống ThNT khi có xác nhận và không tự động tiêu cho roll.</p>
+    <p>Công dụng TT cho Nghịch Phản Tiên Thiên/Axiom là dự kiến hoặc sẽ khóa sau hệ thống upgrade.</p>
     <p>Thuế tăng theo bậc, miễn thuế nếu đổi &lt; 100 đơn vị.</p>
     <ul>
       <li>VNT → HNT: thuế gốc 0.5%</li>
       <li>HNT → TNT: thuế gốc 1.0%</li>
       <li>TNT → ThNT: thuế gốc 1.5%</li>
-      <li>TT chỉ đổi xuống, không thuế.</li>
+      <li>TT chỉ đổi xuống khi xác nhận, không thuế; auto-convert khi roll luôn bỏ qua TT.</li>
     </ul>
   `;
   return dialog;

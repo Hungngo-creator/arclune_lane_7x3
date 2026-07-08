@@ -32,7 +32,7 @@ const economyConfig = {
       shortName: 'Thượng',
       suffix: 'ThNT',
       ratioToBase: 1000000,
-      description: 'Đơn vị luân chuyển giữa các tông môn, đổi thưởng cao cấp và sự kiện giới hạn.'
+      description: 'Tiền chính cho Prime banner, dùng trực tiếp cho lượt quay Prime và đổi thưởng cao cấp.'
     },
     {
       id: 'TT',
@@ -40,7 +40,7 @@ const economyConfig = {
       shortName: 'Thần',
       suffix: 'TT',
       ratioToBase: 100000000,
-      description: 'Đơn vị tối thượng cho các giao dịch Prime và quỹ dự trữ chiến lược.'
+      description: 'Tài nguyên tối thượng/chiến lược. Có thể đổi xuống ThNT khi người chơi xác nhận, nhưng không tự động tiêu cho roll; công dụng Nghịch Phản Tiên Thiên/Axiom là dự kiến hoặc khóa sau hệ thống upgrade.'
     }
   ],
   cultivation: {
