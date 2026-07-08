@@ -19,6 +19,7 @@ import {
 } from './logic/types.ts';
 
 const NUMBER_FORMAT = new Intl.NumberFormat('vi-VN');
+const COMPACT_NUMBER_FORMAT = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 });
 const TIME_FORMAT = new Intl.RelativeTimeFormat('vi', { style: 'short', numeric: 'auto' });
 
 const CURRENCY_ICONS: Record<CurrencyCode, string> = {
@@ -27,14 +28,6 @@ const CURRENCY_ICONS: Record<CurrencyCode, string> = {
   TNT: 'assets/ticket.svg',
   ThNT: 'assets/key.svg',
   TT: 'assets/gem.svg',
-};
-
-const CURRENCY_TOOLTIPS: Record<CurrencyCode, string> = {
-  VNT: 'Đơn vị nhỏ nhất, dùng cho tích lũy cơ bản.',
-  HNT: 'Tiền cho banner thường và giao dịch phổ thông.',
-  TNT: 'Tiền cho banner UR/cao cấp.',
-  ThNT: 'Tiền chính cho Prime banner.',
-  TT: 'Tài nguyên tối thượng/chiến lược; chỉ đổi xuống ThNT khi xác nhận, không tự động tiêu cho roll Prime.',
 };
 
 interface GachaUIState {
@@ -66,6 +59,10 @@ const bannerButtonNodeCache = new WeakMap<HTMLElement, Map<string, HTMLButtonEle
 
 function formatNumber(value: number): string {
   return NUMBER_FORMAT.format(Math.max(0, Math.trunc(value)));
+}
+
+function formatCompactNumber(value: number): string {
+  return COMPACT_NUMBER_FORMAT.format(Math.max(0, Math.trunc(value)));
 }
 
 function formatRemainingTime(banner: BannerDefinition): string {
@@ -103,30 +100,24 @@ function formatPaymentConversionNotice(payment: { detail: { conversions: readonl
 
 function renderWalletChip(code: CurrencyCode, amount: number): HTMLElement {
   const chip = document.createElement('button');
-  chip.className = 'currency-chip';
+  chip.className = 'currency-mini-item';
   chip.type = 'button';
   chip.dataset.currency = code;
-  chip.title = CURRENCY_TOOLTIPS[code];
-  chip.setAttribute('aria-label', `${code}: ${CURRENCY_LABELS[code]}. ${CURRENCY_TOOLTIPS[code]}`);
-  chip.innerHTML = `
-    <span class="currency-chip__icon"><img src="${CURRENCY_ICONS[code]}" alt="${code}" /></span>
-    <span class="currency-chip__info">
-      <span class="currency-chip__code">${code}</span>
-      <span class="currency-chip__label">${CURRENCY_LABELS[code]}</span>
-    </span>
-    <span class="currency-chip__value">${formatNumber(amount)}</span>
-  `;
+  chip.style.setProperty('--currency-icon', `url("${CURRENCY_ICONS[code]}")`);
+  chip.setAttribute('aria-label', `${CURRENCY_LABELS[code]}: ${Math.max(0, Math.trunc(amount))}`);
+  chip.innerHTML = `<span class="currency-mini-item__value">${formatCompactNumber(amount)}</span>`;y
   return chip;
 }
 
-function renderCurrencyHeader(container: HTMLElement, wallet: Wallet, onOpenRules: () => void): void {
+function renderCurrencyHeader(container: HTMLElement, wallet: Wallet, onOpenTooltip: (code: CurrencyCode, target: HTMLElement) => void): void {
   const cachedNodes = currencyValueNodeCache.get(container) ?? new Map<CurrencyCode, HTMLElement>();
 
   if (cachedNodes.size === CURRENCY_ORDER.length) {
     CURRENCY_ORDER.forEach((code) => {
       const valueEl = cachedNodes.get(code);
       if (!valueEl) return;
-      const nextText = formatNumber(wallet[code]);
+      const nextText = formatCompactNumber(wallet[code]);
+      valueEl.closest<HTMLElement>('.currency-mini-item')?.setAttribute('aria-label', `${CURRENCY_LABELS[code]}: ${Math.max(0, Math.trunc(wallet[code]))}`);
       if (valueEl.textContent !== nextText) {
         valueEl.textContent = nextText;
       }
@@ -139,8 +130,8 @@ function renderCurrencyHeader(container: HTMLElement, wallet: Wallet, onOpenRule
   const fragment = document.createDocumentFragment();
   for (const code of CURRENCY_ORDER) {
     const chip = renderWalletChip(code, wallet[code]);
-    chip.addEventListener('click', onOpenRules);
-    const valueEl = chip.querySelector<HTMLElement>('.currency-chip__value');
+    chip.addEventListener('click', () => onOpenTooltip(code, chip));
+    const valueEl = chip.querySelector<HTMLElement>('.currency-mini-item__value');
     if (valueEl) {
       cachedNodes.set(code, valueEl);
     }
@@ -471,7 +462,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
         </footer>
         <section class="banner-panel__results" aria-label="Kết quả triệu hồi" data-slot="results"></section>
       </main>
-      <aside class="currency-hub" aria-label="Ví tiền tệ gacha">
+      <aside class="currency-mini-hub" aria-label="Ví tiền tệ gacha">
         <div class="currency-bar" data-slot="currencies"></div>
       </aside>
     </div>
@@ -506,6 +497,35 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   }
 
   let lastBannerRenderId = '';
+  let closeCurrencyTooltip: () => void = () => {};
+
+  const openCurrencyTooltip = (code: CurrencyCode, target: HTMLElement) => {
+    closeCurrencyTooltip();
+    const tooltip = document.createElement('div');
+    tooltip.className = 'currency-mini-tooltip';
+    tooltip.setAttribute('role', 'tooltip');
+    tooltip.innerHTML = `<strong>${CURRENCY_LABELS[code]}</strong><span>${formatNumber(state.wallet[code])}</span>`;
+    container.appendChild(tooltip);
+    const targetRect = target.getBoundingClientRect();
+    const rootRect = container.getBoundingClientRect();
+    tooltip.style.left = `${Math.min(rootRect.width - tooltip.offsetWidth - 8, Math.max(8, targetRect.left - rootRect.left))}px`;
+    tooltip.style.top = `${Math.max(8, targetRect.bottom - rootRect.top + 8)}px`;
+    const timeoutId = window.setTimeout(() => closeCurrencyTooltip(), 2200);
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && (target.contains(event.target) || tooltip.contains(event.target))) {
+        return;
+      }
+      closeCurrencyTooltip();
+    };
+    document.addEventListener('pointerdown', onPointerDown, { capture: true });
+    closeCurrencyTooltip = () => {
+      window.clearTimeout(timeoutId);
+      document.removeEventListener('pointerdown', onPointerDown, { capture: true });
+      tooltip.remove();
+      closeCurrencyTooltip = () => {};
+    };
+  };
+
   const renderBanner = () => {
     const banner = getBannerById(state.bannerId) ?? GACHA_CONFIG.banners[0];
     if (!banner) return;
@@ -534,12 +554,13 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   };
 
   const openRules = () => {
+    closeCurrencyTooltip();
     const rulesContent = createRulesContent();
     openModal(container, rulesContent);
   };
 
   const renderWallet = () => {
-    renderCurrencyHeader(currencySlot, state.wallet, openRules);
+    renderCurrencyHeader(currencySlot, state.wallet, openCurrencyTooltip);
   };
 
   const updateBannerList = () => {
@@ -547,6 +568,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
       if (state.bannerId === id) {
         return;
       }
+      closeCurrencyTooltip();
       state.bannerId = id;
       updateBannerList();
       renderBanner();
@@ -611,6 +633,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
         return;
       }
       destroyed = true;
+      closeCurrencyTooltip();
       unsubscribeSharedWallet();
       if (isBodyHost) {
         document.body.classList.remove('gacha-ui');

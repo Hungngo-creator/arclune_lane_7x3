@@ -95,7 +95,7 @@ button {
 .banner-panel__cost,
 .banner-panel__actions,
 .banner-panel__results,
-.currency-hub {
+.currency-mini-hub {
   border: 1px solid var(--border-accent);
   background: var(--bg-panel);
   box-shadow: 0 18px 48px rgba(5, 12, 20, 0.34);
@@ -124,12 +124,13 @@ button {
   overflow: hidden;
 }
 
-.currency-hub {
+.currency-mini-hub {
   display: none;
   border-radius: 24px;
   padding: 14px;
   min-height: 0;
   overflow-y: auto;
+  position: relative;
 }
 
 .currency-bar {
@@ -139,68 +140,81 @@ button {
   gap: 10px;
 }
 
-.currency-hub .currency-bar {
+.currency-mini-hub .currency-bar {
   flex-direction: column;
   align-items: stretch;
 }
 
-.currency-chip {
-  min-width: 122px;
-  display: flex;
+.currency-mini-item {
+  --currency-icon: none;
+  min-width: 82px;
+  min-height: 48px;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: center;
   padding: 10px 14px;
   border-radius: 16px;
   border: 1px solid transparent;
   background: var(--bg-accent);
   cursor: pointer;
+  overflow: hidden;
   transition: transform 0.16s ease, border-color 0.16s ease;
 }
 
-.currency-chip:hover,
-.currency-chip:focus-visible {
+.currency-mini-item::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  background-image: var(--currency-icon);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.14;
+  filter: drop-shadow(0 0 12px rgba(118, 212, 255, 0.24));
+}
+
+.currency-mini-item:hover,
+.currency-mini-item:focus-visible {
   transform: translateY(-3px);
   border-color: rgba(118, 212, 255, 0.65);
   outline: none;
 }
 
-.currency-chip__icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: rgba(118, 212, 255, 0.18);
+.currency-mini-item__value {
+  font-weight: 700;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+
+.currency-mini-tooltip {
+  position: absolute;
+  z-index: 20;
+  min-width: 148px;
   display: grid;
-  place-items: center;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(118, 212, 255, 0.45);
+  background: rgba(8, 14, 22, 0.96);
+  box-shadow: 0 12px 32px rgba(5, 12, 20, 0.42);
+  pointer-events: auto;
 }
 
-.currency-chip__icon img {
-  width: 18px;
-  height: 18px;
-}
-
-.currency-chip__info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+.currency-mini-tooltip strong {
   font-size: 12px;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-muted);
 }
 
-.currency-chip__code,
-.currency-chip__value {
-  font-weight: 600;
+.currency-mini-tooltip span {
+  font-weight: 700;
   color: var(--text-main);
-}
-
-.currency-chip__value {
   font-variant-numeric: tabular-nums;
-}
-
-.currency-chip__label {
-  font-size: 11px;
 }
 
 .rules-button {
@@ -526,7 +540,7 @@ button {
     grid-template-areas: 'rail main wallet';
   }
 
-  .currency-hub {
+  .currency-mini-hub {
     grid-area: wallet;
     display: block;
   }
@@ -559,7 +573,7 @@ button {
   .banner-panel__actions { grid-area: actions; }
   .banner-panel__results { grid-area: results; }
 
-  .currency-hub {
+  .currency-mini-hub {
     grid-area: wallet;
     display: block;
   }
@@ -589,7 +603,7 @@ button {
     padding: 10px;
   }
 
-  .currency-hub {
+  .currency-mini-hub {
     grid-area: wallet;
     display: block;
     overflow-x: auto;
@@ -597,7 +611,7 @@ button {
     padding: 10px;
   }
 
-  .currency-hub .currency-bar {
+  .currency-mini-hub .currency-bar {
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
@@ -651,7 +665,7 @@ button {
   .banner-panel__cost,
   .banner-panel__actions,
   .banner-panel__results,
-  .currency-hub,
+  .currency-mini-hub,
   .banner-sidebar {
     border-radius: 16px;
     padding: 10px;
