@@ -38,6 +38,51 @@ button {
   color: inherit;
 }
 
+.gacha-page,
+.gacha-app,
+.gacha-screen-shell,
+.gacha-screen-shell__mount {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.gacha-screen-shell {
+  position: relative;
+  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),
+    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);
+  color: var(--text-main);
+  overflow: hidden;
+}
+
+.gacha-screen-shell__back {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid rgba(120, 196, 255, 0.34);
+  border-radius: 999px;
+  background: rgba(12, 18, 28, 0.72);
+  box-shadow: 0 14px 32px rgba(5, 12, 20, 0.32);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+}
+
+.gacha-screen-shell__back:hover,
+.gacha-screen-shell__back:focus-visible {
+  border-color: rgba(118, 212, 255, 0.74);
+  box-shadow: 0 16px 36px rgba(31, 177, 255, 0.24);
+}
+
+.gacha-screen-shell__back.is-fallback {
+  opacity: 0.72;
+}
+
 .gacha-ui-root,
 .gacha-screen {
   width: 100%;

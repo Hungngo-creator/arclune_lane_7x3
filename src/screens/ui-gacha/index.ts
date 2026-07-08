@@ -29,10 +29,10 @@ declare global {
 const STYLE_ID = 'ui-gacha-screen-style';
 
 const GACHA_TEMPLATE = /* html */ `
-  <div class="gacha-app" data-app-root>
-    <header class="gacha-topbar" data-section="topbar">
+  <div class="gacha-app gacha-app--embedded" data-app-root>
+    <div class="gacha-screen-shell" data-section="shell">
       <button
-        class="gacha-topbar__back"
+        class="gacha-topbar__back gacha-screen-shell__back"
         type="button"
         aria-label="Trở về menu chính"
         title="Trở về menu chính"
@@ -40,91 +40,7 @@ const GACHA_TEMPLATE = /* html */ `
       >
         ← <span class="gacha-topbar__back-label">Menu chính</span>
       </button>
-      <button
-        class="banner-drawer-toggle"
-        type="button"
-        aria-label="Mở danh sách banner"
-        title="Mở danh sách banner"
-        data-action="toggle-drawer"
-      >
-        <span aria-hidden="true">☰</span>
-        <span class="banner-drawer-toggle__label">Banner</span>
-      </button>
-      <div class="currency-header" data-slot="currencies" aria-label="Tiền tệ đang có"></div>
-      <button
-        class="help-button"
-        type="button"
-        aria-haspopup="dialog"
-        aria-expanded="false"
-        aria-label="Xem tỉ lệ và bảo hiểm gacha"
-        title="Xem tỉ lệ và bảo hiểm gacha"
-        data-action="open-rates"
-      >
-        ?
-      </button>
-    </header>
-
-        <div data-gacha-content>
-      <div class="gacha-layout">
-        <aside class="banner-list" data-slot="banner-list" aria-label="Danh sách banner"></aside>
-        <main class="hero" data-slot="hero" aria-live="polite">
-          <div class="hero__background" aria-hidden="true"></div>
-          <div class="hero__content">
-            <div class="hero__header">
-              <div class="hero__title-group">
-                <div class="hero__type-chip" data-slot="hero-type"></div>
-                <h1 class="hero__title" data-slot="hero-title"></h1>
-                <p class="hero__subtitle" data-slot="hero-subtitle"></p>
-              </div>
-              <div class="hero__meta">
-                <span class="hero__rateup" data-slot="hero-rateup">Rate UP</span>
-                <span class="hero__timer" data-slot="hero-timer"></span>
-              </div>
-            </div>
-
-           <section class="pity" aria-label="Thông tin bảo hiểm">
-             <div class="pity__pills" data-slot="pity-pills"></div>
-             <div class="pity__progress">
-               <div class="pity__bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-               <span class="pity__note">Chưa có dữ liệu bảo hiểm.</span>
-             </div>
-           </section>
-
-           <section class="featured" aria-label="Đối tác nổi bật">
-             <div class="featured__list" data-slot="featured-list"></div>
-           </section>
-
-          <button class="hero__details" type="button" data-action="open-rates">Xem chi tiết tỉ lệ &amp; bảo hiểm</button>
-          </div>
-        </main>
-      </div>
-
-      <footer class="cta" data-section="cta">
-        <div class="cta__buttons">
-          <button class="cta__button" type="button" data-test="summon-x1" data-action="summon-single"></button>
-          <button class="cta__button" type="button" data-test="summon-x10" data-action="summon-multi"></button>
-        </div>
-      </footer>
-    </div>
-  </div>
-
-  <div class="modal" data-modal="rates" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Tỉ lệ &amp; bảo hiểm">
-    <div class="modal__overlay" data-action="close-modal"></div>
-    <div class="modal__dialog" role="document">
-      <header class="modal__header">
-        <h2 class="modal__title">Tỉ lệ &amp; bảo hiểm</h2>
-        <button class="modal__close" type="button" data-action="close-modal" aria-label="Đóng"></button>
-      </header>
-      <div class="modal__tabs" role="tablist">
-        <button role="tab" aria-selected="true" data-tab="rates">Tỉ lệ</button>
-        <button role="tab" aria-selected="false" data-tab="pity">Bảo hiểm</button>
-        <button role="tab" aria-selected="false" data-tab="featured">Rate-up</button>
-      </div>
-      <div class="modal__body">
-        <section class="modal__panel" data-panel="rates" role="tabpanel"></section>
-        <section class="modal__panel" data-panel="pity" role="tabpanel" hidden></section>
-        <section class="modal__panel" data-panel="featured" role="tabpanel" hidden></section>
-      </div>
+      <div class="gacha-screen-shell__mount" data-gacha-content></div>
     </div>
   </div>
 `;
@@ -313,7 +229,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void } {
   let handle: GachaHandle = null;
   const previousFlag = typeof window !== 'undefined' ? window.__ARC_GACHA_EMBED__ : undefined;
 
-const goBackButton = container.querySelector('[data-action="go-back"]');
+  const goBackButton = container.querySelector('[data-action="go-back"]');
   const hasShellNavigation = Boolean(shell && typeof shell.enterScreen === 'function');
   const handleGoBack = (event: Event) => {
     event.preventDefault();
