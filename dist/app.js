@@ -36339,7 +36339,7 @@ __modules['./screens/sect/tactical-ai.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
 };
 __modules['./screens/ui-gacha/gacha.css'] = (exports, module, __require) => {
-  const css = "/* home (termux)/arclune_lane_7x3/src/screens/ui-gacha/gacha.css */\n\n:root {\n  color-scheme: dark;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n  --bg-page: #05090f;\n  --bg-panel: rgba(12, 18, 28, 0.88);\n  --bg-accent: rgba(16, 28, 42, 0.74);\n  --border-accent: rgba(120, 196, 255, 0.28);\n  --text-main: #e9f2ff;\n  --text-muted: rgba(192, 220, 244, 0.8);\n  --primary: #76d4ff;\n  --highlight: linear-gradient(135deg, rgba(118, 212, 255, 0.45), rgba(255, 154, 255, 0.4));\n  --rarity-n: #7b869a;\n  --rarity-r: #57a8ff;\n  --rarity-sr: #a47dff;\n  --rarity-ssr: #ffc866;\n  --rarity-ur: #ff6a9f;\n  --rarity-prime: #6cffeb;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-ui {\n  margin: 0;\n  min-height: 100vh;\n  min-height: 100dvh;\n  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),\n    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);\n  color: var(--text-main);\n  overflow: hidden;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-ui-root,\n.gacha-screen {\n  width: 100%;\n  height: 100vh;\n  height: 100dvh;\n  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))\n    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));\n  overflow: hidden;\n}\n\n.gacha-body {\n  --gacha-rail-width: clamp(128px, 16vw, 176px);\n  width: min(1440px, 100%);\n  height: 100%;\n  margin: 0 auto;\n  display: grid;\n  grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr);\n  grid-template-areas: 'rail main';\n  gap: 18px;\n  min-height: 0;\n}\n\n.banner-sidebar {\n  grid-area: rail;\n  min-width: 0;\n  min-height: 0;\n  overflow-y: auto;\n  overscroll-behavior: contain;\n  background: var(--bg-panel);\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  padding: 14px;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.gacha-main {\n  grid-area: main;\n  min-width: 0;\n  min-height: 0;\n  overflow-y: auto;\n  overscroll-behavior: contain;\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-auto-rows: max-content;\n  gap: 14px;\n  padding-right: 2px;\n}\n\n.gacha-topbar,\n.banner-panel,\n.banner-panel__featured,\n.banner-panel__pity,\n.banner-panel__cost,\n.banner-panel__actions,\n.banner-panel__results,\n.currency-mini-hub {\n  border: 1px solid var(--border-accent);\n  background: var(--bg-panel);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.34);\n}\n\n.gacha-topbar {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto auto;\n  align-items: center;\n  gap: 14px;\n  padding: 14px 18px;\n  border-radius: 24px;\n}\n\n.gacha-topbar__copy {\n  min-width: 0;\n}\n\n.banner-panel {\n  border-radius: 28px;\n  padding: 16px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.45fr) minmax(210px, 0.55fr);\n  gap: 16px;\n  position: relative;\n  overflow: hidden;\n}\n\n.currency-mini-hub {\n  display: none;\n  border-radius: 24px;\n  padding: 14px;\n  min-height: 0;\n  overflow-y: auto;\n  position: relative;\n}\n\n.currency-bar {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-end;\n  gap: 10px;\n}\n\n.currency-mini-hub .currency-bar {\n  flex-direction: column;\n  align-items: stretch;\n}\n\n.currency-mini-item {\n  --currency-icon: none;\n  min-width: 82px;\n  min-height: 48px;\n  position: relative;\n  isolation: isolate;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  border: 1px solid transparent;\n  background: var(--bg-accent);\n  cursor: pointer;\n  overflow: hidden;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.currency-mini-item::before {\n  content: '';\n  position: absolute;\n  inset: 5px;\n  z-index: -1;\n  background-image: var(--currency-icon);\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: contain;\n  opacity: 0.14;\n  filter: drop-shadow(0 0 12px rgba(118, 212, 255, 0.24));\n}\n\n.currency-mini-item:hover,\n.currency-mini-item:focus-visible {\n  transform: translateY(-3px);\n  border-color: rgba(118, 212, 255, 0.65);\n  outline: none;\n}\n\n.currency-mini-item__value {\n  font-weight: 700;\n  color: var(--text-main);\n  font-variant-numeric: tabular-nums;\n  letter-spacing: 0.03em;\n}\n\n.currency-mini-tooltip {\n  position: absolute;\n  z-index: 20;\n  min-width: 148px;\n  display: grid;\n  gap: 4px;\n  padding: 10px 12px;\n  border-radius: 14px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(8, 14, 22, 0.96);\n  box-shadow: 0 12px 32px rgba(5, 12, 20, 0.42);\n  pointer-events: auto;\n}\n\n.currency-mini-tooltip strong {\n  font-size: 12px;\n  color: var(--text-muted);\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.currency-mini-tooltip span {\n  font-weight: 700;\n  color: var(--text-main);\n  font-variant-numeric: tabular-nums;\n}\n\n.rules-button {\n  padding: 10px 16px;\n  border-radius: 16px;\n  border: 1px solid rgba(118, 212, 255, 0.5);\n  background: rgba(10, 16, 24, 0.86);\n  cursor: pointer;\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  font-size: 12px;\n  white-space: nowrap;\n}\n\n.banner-entry {\n  width: 100%;\n  text-align: left;\n  padding: 14px 12px;\n  border-radius: 18px;\n  border: 1px solid transparent;\n  background: rgba(16, 26, 40, 0.88);\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  transition: transform 0.18s ease, border-color 0.18s ease;\n}\n\n.banner-entry__title {\n  font-weight: 600;\n}\n\n.banner-entry__timer {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.banner-entry:hover,\n.banner-entry:focus-visible {\n  transform: translateX(6px);\n  border-color: rgba(118, 212, 255, 0.6);\n  outline: none;\n}\n\n.banner-entry.is-active {\n  border-color: rgba(255, 154, 255, 0.65);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n}\n\n.banner-title {\n  margin: 0;\n  font-size: clamp(20px, 3vw, 30px);\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.banner-desc {\n  margin: 6px 0 0;\n  color: var(--text-muted);\n}\n\n.banner-timer {\n  font-size: 13px;\n  color: var(--primary);\n  white-space: nowrap;\n}\n\n.banner-panel__art {\n  border-radius: 22px;\n  background: rgba(10, 16, 24, 0.7);\n  overflow: hidden;\n  min-height: 260px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.banner-panel__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  filter: saturate(120%);\n}\n\n.rate-list {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 8px 16px;\n  margin: 0;\n}\n\n.rate-list dt {\n  font-weight: 600;\n}\n\n.rate-list dd {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.banner-panel__featured,\n.banner-panel__pity,\n.banner-panel__cost,\n.banner-panel__actions,\n.banner-panel__results {\n  border-radius: 22px;\n  padding: 14px;\n}\n\n.banner-panel__pity {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pity-meter {\n  display: grid;\n  grid-template-columns: 80px 1fr 80px;\n  align-items: center;\n  gap: 12px;\n}\n\n.pity-meter__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: var(--text-muted);\n}\n\n.pity-meter__bar {\n  position: relative;\n  height: 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.15);\n  overflow: hidden;\n}\n\n.pity-meter__progress {\n  position: absolute;\n  inset: 0;\n  border-radius: 999px;\n  background: var(--highlight);\n}\n\n.pity-meter__value {\n  font-variant-numeric: tabular-nums;\n  justify-self: end;\n}\n\n.featured__heading {\n  margin: 0;\n  font-size: 16px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.featured__note {\n  margin: 2px 0 12px;\n  color: var(--text-muted);\n  font-size: 12px;\n}\n\n.featured-card {\n  display: flex;\n  gap: 10px;\n  align-items: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.9);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  font-weight: 600;\n}\n\n.featured-card + .featured-card {\n  margin-top: 8px;\n}\n\n.featured-card__rarity {\n  font-size: 13px;\n  padding: 4px 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.18);\n}\n\n.featured-card__name {\n  font-size: 15px;\n}\n\n.banner-panel__cost {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 12px;\n}\n\n.cost-entry {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.86);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.cost-entry__value {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-weight: 600;\n}\n\n.cost-entry__value img {\n  width: 18px;\n  height: 18px;\n}\n\n.banner-panel__actions {\n  display: flex;\n  gap: 12px;\n}\n\n.banner-panel__actions button {\n  flex: 1;\n  padding: 14px 18px;\n  border-radius: 18px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(16, 28, 42, 0.9);\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.banner-panel__actions button:hover,\n.banner-panel__actions button:focus-visible {\n  transform: translateY(-2px);\n  border-color: rgba(255, 154, 255, 0.6);\n  outline: none;\n}\n\n.banner-panel__results {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 10px;\n}\n\n.result-entry {\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  display: grid;\n  gap: 6px;\n}\n\n.result-entry__rarity {\n  font-weight: 700;\n  text-transform: uppercase;\n}\n\n.result-entry__name {\n  color: var(--text-muted);\n}\n\n.result-entry__pity {\n  font-size: 12px;\n  color: var(--primary);\n}\n\n.modal-overlay {\n  position: fixed;\n  inset: 0;\n  backdrop-filter: blur(12px);\n  background: rgba(5, 10, 18, 0.68);\n  display: grid;\n  place-items: center;\n  z-index: 2000;\n}\n\n.modal-content {\n  width: min(420px, 92vw);\n  background: rgba(10, 16, 24, 0.92);\n  border-radius: 20px;\n  border: 1px solid rgba(118, 212, 255, 0.3);\n  padding: 24px;\n  color: var(--text-main);\n  box-shadow: 0 24px 64px rgba(5, 12, 20, 0.55);\n}\n\n.modal-content h2 {\n  margin-top: 0;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.modal-content ul {\n  margin: 12px 0 0;\n  padding-left: 20px;\n  color: var(--text-muted);\n}\n\n.gacha-toast {\n  position: fixed;\n  right: max(24px, env(safe-area-inset-right));\n  bottom: max(24px, env(safe-area-inset-bottom));\n  background: rgba(16, 28, 42, 0.92);\n  border-radius: 16px;\n  padding: 12px 18px;\n  border: 1px solid rgba(118, 212, 255, 0.35);\n  opacity: 0;\n  transform: translateY(12px);\n  transition: opacity 0.2s ease, transform 0.2s ease;\n  pointer-events: none;\n}\n\n.gacha-toast.is-visible {\n  opacity: 1;\n  transform: translateY(0);\n}\n\n@media (min-width: 960px) {\n  .gacha-body {\n    grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr) clamp(148px, 17vw, 220px);\n    grid-template-areas: 'rail main wallet';\n  }\n\n  .currency-mini-hub {\n    grid-area: wallet;\n    display: block;\n  }\n}\n\n@media (min-width: 760px) and (max-width: 959px) {\n  .gacha-body {\n    grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr);\n    grid-template-rows: minmax(0, 1fr) auto;\n    grid-template-areas:\n      'rail main'\n      'wallet main';\n  }\n\n  .gacha-main {\n    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.42fr);\n    grid-template-areas:\n      'topbar topbar'\n      'panel panel'\n      'featured pity'\n      'cost actions'\n      'results results';\n  }\n\n  .gacha-topbar { grid-area: topbar; }\n  .banner-panel { grid-area: panel; }\n  .banner-panel__featured { grid-area: featured; }\n  .banner-panel__pity { grid-area: pity; }\n  .banner-panel__cost { grid-area: cost; }\n  .banner-panel__actions { grid-area: actions; }\n  .banner-panel__results { grid-area: results; }\n\n  .currency-mini-hub {\n    grid-area: wallet;\n    display: block;\n  }\n}\n\n@media (max-width: 759px) {\n  .gacha-ui-root,\n  .gacha-screen {\n    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))\n      max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));\n  }\n\n  .gacha-body {\n    grid-template-columns: 1fr;\n    grid-template-rows: auto auto minmax(0, 1fr);\n    grid-template-areas:\n      'rail'\n      'wallet'\n      'main';\n    gap: 12px;\n  }\n\n  .banner-sidebar {\n    flex-direction: row;\n    overflow-x: auto;\n    overflow-y: hidden;\n    padding: 10px;\n  }\n\n  .currency-mini-hub {\n    grid-area: wallet;\n    display: block;\n    overflow-x: auto;\n    overflow-y: hidden;\n    padding: 10px;\n  }\n\n  .currency-mini-hub .currency-bar {\n    flex-direction: row;\n    flex-wrap: nowrap;\n    justify-content: flex-start;\n  }\n\n  .banner-entry {\n    min-width: 176px;\n  }\n\n  .gacha-topbar {\n    grid-template-columns: minmax(0, 1fr) auto;\n  }\n\n  .banner-timer {\n    grid-column: 1 / -1;\n  }\n\n.banner-panel {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-panel__art {\n    min-height: 180px;\n  }\n\n  .banner-panel__actions {\n    flex-direction: column;\n  }\n\n.pity-meter {\n    grid-template-columns: 64px 1fr 64px;\n  }\n}\n\n@media (max-height: 420px) {\n  .gacha-ui-root,\n  .gacha-screen {\n    padding-top: max(8px, env(safe-area-inset-top));\n    padding-bottom: max(8px, env(safe-area-inset-bottom));\n  }\n\n  .gacha-body,\n  .gacha-main {\n    gap: 10px;\n  }\n\n  .gacha-topbar,\n  .banner-panel,\n  .banner-panel__featured,\n  .banner-panel__pity,\n  .banner-panel__cost,\n  .banner-panel__actions,\n  .banner-panel__results,\n  .currency-mini-hub,\n  .banner-sidebar {\n    border-radius: 16px;\n    padding: 10px;\n  }\n\n  .banner-panel__art {\n    min-height: 120px;\n  }";
+  const css = "/* home (termux)/arclune_lane_7x3/src/screens/ui-gacha/gacha.css */\n\n:root {\n  color-scheme: dark;\n  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;\n  --bg-page: #05090f;\n  --bg-panel: rgba(12, 18, 28, 0.88);\n  --bg-accent: rgba(16, 28, 42, 0.74);\n  --border-accent: rgba(120, 196, 255, 0.28);\n  --text-main: #e9f2ff;\n  --text-muted: rgba(192, 220, 244, 0.8);\n  --primary: #76d4ff;\n  --highlight: linear-gradient(135deg, rgba(118, 212, 255, 0.45), rgba(255, 154, 255, 0.4));\n  --rarity-n: #7b869a;\n  --rarity-r: #57a8ff;\n  --rarity-sr: #a47dff;\n  --rarity-ssr: #ffc866;\n  --rarity-ur: #ff6a9f;\n  --rarity-prime: #6cffeb;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody.gacha-ui {\n  margin: 0;\n  min-height: 100vh;\n  min-height: 100dvh;\n  background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),\n    radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);\n  color: var(--text-main);\n  overflow: hidden;\n}\n\nbutton {\n  font-family: inherit;\n  color: inherit;\n}\n\n.gacha-ui-root,\n.gacha-screen {\n  width: 100%;\n  height: 100vh;\n  height: 100dvh;\n  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))\n    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));\n  overflow: hidden;\n}\n\n.gacha-body {\n  --gacha-rail-width: clamp(128px, 16vw, 176px);\n  width: min(1440px, 100%);\n  height: 100%;\n  margin: 0 auto;\n  display: grid;\n  grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr);\n  grid-template-areas: 'rail main';\n  gap: 18px;\n  min-height: 0;\n}\n\n.banner-sidebar {\n  grid-area: rail;\n  min-width: 0;\n  min-height: 0;\n  overflow-y: auto;\n  overscroll-behavior: contain;\n  background: var(--bg-panel);\n  border-radius: 24px;\n  border: 1px solid var(--border-accent);\n  padding: 14px;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.gacha-main {\n  grid-area: main;\n  min-width: 0;\n  min-height: 0;\n  overflow-y: auto;\n  overscroll-behavior: contain;\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-auto-rows: max-content;\n  gap: 14px;\n  padding-right: 2px;\n}\n\n.gacha-topbar,\n.banner-panel,\n.banner-panel__featured,\n.banner-panel__pity,\n.banner-panel__cost,\n.banner-panel__actions,\n.banner-panel__results,\n.currency-mini-hub {\n  border: 1px solid var(--border-accent);\n  background: var(--bg-panel);\n  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.34);\n}\n\n.gacha-topbar {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto auto;\n  align-items: center;\n  gap: 14px;\n  padding: 14px 18px;\n  border-radius: 24px;\n}\n\n.gacha-topbar__copy {\n  min-width: 0;\n}\n\n.banner-panel {\n  border-radius: 28px;\n  padding: 16px;\n  display: grid;\n  grid-template-columns: minmax(0, 1.45fr) minmax(210px, 0.55fr);\n  gap: 16px;\n  position: relative;\n  overflow: hidden;\n}\n\n.currency-mini-hub {\n  display: none;\n  border-radius: 24px;\n  padding: 14px;\n  min-height: 0;\n  overflow-y: auto;\n  position: relative;\n}\n\n.currency-bar {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: flex-end;\n  gap: 10px;\n}\n\n.currency-mini-hub .currency-bar {\n  flex-direction: column;\n  align-items: stretch;\n}\n\n.currency-mini-item {\n  --currency-icon: none;\n  min-width: 82px;\n  min-height: 48px;\n  position: relative;\n  isolation: isolate;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  border: 1px solid transparent;\n  background: var(--bg-accent);\n  cursor: pointer;\n  overflow: hidden;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.currency-mini-item::before {\n  content: '';\n  position: absolute;\n  inset: 5px;\n  z-index: -1;\n  background-image: var(--currency-icon);\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: contain;\n  opacity: 0.14;\n  filter: drop-shadow(0 0 12px rgba(118, 212, 255, 0.24));\n}\n\n.currency-mini-item:hover,\n.currency-mini-item:focus-visible {\n  transform: translateY(-3px);\n  border-color: rgba(118, 212, 255, 0.65);\n  outline: none;\n}\n\n.currency-mini-item__value {\n  font-weight: 700;\n  color: var(--text-main);\n  font-variant-numeric: tabular-nums;\n  letter-spacing: 0.03em;\n}\n\n.currency-mini-tooltip {\n  position: absolute;\n  z-index: 20;\n  min-width: 148px;\n  display: grid;\n  gap: 4px;\n  padding: 10px 12px;\n  border-radius: 14px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(8, 14, 22, 0.96);\n  box-shadow: 0 12px 32px rgba(5, 12, 20, 0.42);\n  pointer-events: auto;\n}\n\n.currency-mini-tooltip strong {\n  font-size: 12px;\n  color: var(--text-muted);\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.currency-mini-tooltip span {\n  font-weight: 700;\n  color: var(--text-main);\n  font-variant-numeric: tabular-nums;\n}\n\n.rules-button {\n  width: 42px;\n  height: 42px;\n  padding: 0;\n  border-radius: 50%;\n  border: 1px solid rgba(118, 212, 255, 0.5);\n  background: rgba(10, 16, 24, 0.86);\n  cursor: pointer;\n  font-size: 20px;\n  font-weight: 700;\n  white-space: nowrap;\n}\n\n.banner-entry {\n  width: 100%;\n  text-align: left;\n  padding: 14px 12px;\n  border-radius: 18px;\n  border: 1px solid transparent;\n  background: rgba(16, 26, 40, 0.88);\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n  transition: transform 0.18s ease, border-color 0.18s ease;\n}\n\n.banner-entry__title {\n  font-weight: 600;\n}\n\n.banner-entry__timer {\n  font-size: 12px;\n  color: var(--text-muted);\n}\n\n.banner-entry:hover,\n.banner-entry:focus-visible {\n  transform: translateX(6px);\n  border-color: rgba(118, 212, 255, 0.6);\n  outline: none;\n}\n\n.banner-entry.is-active {\n  border-color: rgba(255, 154, 255, 0.65);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n}\n\n.banner-title {\n  margin: 0;\n  font-size: clamp(20px, 3vw, 30px);\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n}\n\n.banner-desc {\n  margin: 6px 0 0;\n  color: var(--text-muted);\n}\n\n.banner-timer {\n  font-size: 13px;\n  color: var(--primary);\n  white-space: nowrap;\n}\n\n.banner-panel__art {\n  border-radius: 22px;\n  background: rgba(10, 16, 24, 0.7);\n  overflow: hidden;\n  min-height: 260px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.banner-panel__art img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n  filter: saturate(120%);\n}\n\n.rate-list {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 8px 16px;\n  margin: 0;\n}\n\n.rate-list dt {\n  font-weight: 600;\n}\n\n.rate-list dd {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.banner-panel__featured,\n.banner-panel__pity,\n.banner-panel__cost,\n.banner-panel__actions,\n.banner-panel__results {\n  border-radius: 22px;\n  padding: 14px;\n}\n\n.banner-panel__pity {\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pity-meter {\n  display: grid;\n  grid-template-columns: 80px 1fr 80px;\n  align-items: center;\n  gap: 12px;\n}\n\n.pity-meter__label {\n  font-size: 12px;\n  text-transform: uppercase;\n  color: var(--text-muted);\n}\n\n.pity-meter__bar {\n  position: relative;\n  height: 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.15);\n  overflow: hidden;\n}\n\n.pity-meter__progress {\n  position: absolute;\n  inset: 0;\n  border-radius: 999px;\n  background: var(--highlight);\n}\n\n.pity-meter__value {\n  font-variant-numeric: tabular-nums;\n  justify-self: end;\n}\n\n.featured__heading {\n  margin: 0;\n  font-size: 16px;\n  letter-spacing: 0.08em;\n  text-transform: uppercase;\n}\n\n.featured__note {\n  margin: 2px 0 12px;\n  color: var(--text-muted);\n  font-size: 12px;\n}\n\n.featured-card {\n  display: flex;\n  gap: 10px;\n  align-items: center;\n  padding: 10px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.9);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  font-weight: 600;\n}\n\n.featured-card + .featured-card {\n  margin-top: 8px;\n}\n\n.featured-card__rarity {\n  font-size: 13px;\n  padding: 4px 8px;\n  border-radius: 999px;\n  background: rgba(118, 212, 255, 0.18);\n}\n\n.featured-card__name {\n  font-size: 15px;\n}\n\n.banner-panel__cost {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n  gap: 12px;\n}\n\n.cost-entry {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(20, 32, 48, 0.86);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.cost-entry__value {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  font-weight: 600;\n}\n\n.cost-entry__value img {\n  width: 18px;\n  height: 18px;\n}\n\n.banner-panel__actions {\n  display: flex;\n  gap: 12px;\n}\n\n.banner-panel__actions button {\n  flex: 1;\n  padding: 14px 18px;\n  border-radius: 18px;\n  border: 1px solid rgba(118, 212, 255, 0.45);\n  background: rgba(16, 28, 42, 0.9);\n  text-transform: uppercase;\n  letter-spacing: 0.12em;\n  cursor: pointer;\n  transition: transform 0.16s ease, border-color 0.16s ease;\n}\n\n.banner-panel__actions button:hover,\n.banner-panel__actions button:focus-visible {\n  transform: translateY(-2px);\n  border-color: rgba(255, 154, 255, 0.6);\n  outline: none;\n}\n\n.banner-panel__results {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));\n  gap: 10px;\n}\n\n.result-entry {\n  padding: 12px 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n  display: grid;\n  gap: 6px;\n}\n\n.result-entry__rarity {\n  font-weight: 700;\n  text-transform: uppercase;\n}\n\n.result-entry__name {\n  color: var(--text-muted);\n}\n\n.result-entry__pity {\n  font-size: 12px;\n  color: var(--primary);\n}\n\n.gacha-backdrop {\n  position: fixed;\n  inset: 0;\n  z-index: 1900;\n  background: rgba(5, 10, 18, 0.42);\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity 0.18s ease;\n}\n\n.gacha-backdrop.is-open {\n  opacity: 1;\n  pointer-events: auto;\n}\n\n.gacha-drawer {\n  position: fixed;\n  top: 0;\n  right: 0;\n  z-index: 2000;\n  width: clamp(360px, 35vw, 560px);\n  max-width: 92vw;\n  height: 100vh;\n  height: 100dvh;\n  padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) 18px;\n  display: flex;\n  flex-direction: column;\n  gap: 16px;\n  background: rgba(10, 16, 24, 0.96);\n  border-left: 1px solid rgba(118, 212, 255, 0.32);\n  box-shadow: -24px 0 64px rgba(5, 12, 20, 0.55);\n  transform: translateX(100%);\n  transition: transform 0.18s ease;\n}\n\n.gacha-drawer.is-open {\n  transform: translateX(0);\n}\n\n.gacha-drawer__tabs {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 8px;\n}\n\n.gacha-drawer__tabs button {\n  padding: 10px 8px;\n  border-radius: 14px;\n  border: 1px solid rgba(118, 212, 255, 0.26);\n  background: rgba(16, 28, 42, 0.82);\n  cursor: pointer;\n}\n\n.gacha-drawer__tabs button.is-active,\n.gacha-drawer__tabs button:focus-visible {\n  border-color: rgba(255, 154, 255, 0.68);\n  background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));\n  outline: none;\n}\n\n.gacha-drawer__panel {\n  min-height: 0;\n  overflow-y: auto;\n}\n\n.gacha-drawer__content {\n  display: grid;\n  gap: 12px;\n  color: var(--text-main);\n}\n\n.gacha-drawer__content h2 {\n  margin: 0;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.gacha-drawer__content p {\n  margin: 0;\n  color: var(--text-muted);\n}\n\n.gacha-drawer__content ul,\n.pity-info-notes {\n  margin: 0;\n  padding-left: 20px;\n  color: var(--text-muted);\n}\n\n.pity-info-list {\n  display: grid;\n  grid-template-columns: minmax(90px, 0.45fr) 1fr;\n  gap: 10px 16px;\n  margin: 0;\n  padding: 14px;\n  border-radius: 16px;\n  background: rgba(16, 28, 42, 0.82);\n  border: 1px solid rgba(118, 212, 255, 0.18);\n}\n\n.pity-info-list dt {\n  color: var(--text-muted);\n}\n\n.pity-info-list dd {\n  margin: 0;\n  font-weight: 700;\n  font-variant-numeric: tabular-nums;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .gacha-backdrop,\n  .gacha-drawer {\n    transition-duration: 1ms;\n  }\n}\n\n.gacha-toast {\n  position: fixed;\n  right: max(24px, env(safe-area-inset-right));\n  bottom: max(24px, env(safe-area-inset-bottom));\n  background: rgba(16, 28, 42, 0.92);\n  border-radius: 16px;\n  padding: 12px 18px;\n  border: 1px solid rgba(118, 212, 255, 0.35);\n  opacity: 0;\n  transform: translateY(12px);\n  transition: opacity 0.2s ease, transform 0.2s ease;\n  pointer-events: none;\n}\n\n.gacha-toast.is-visible {\n  opacity: 1;\n  transform: translateY(0);\n}\n\n@media (min-width: 960px) {\n  .gacha-body {\n    grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr) clamp(148px, 17vw, 220px);\n    grid-template-areas: 'rail main wallet';\n  }\n\n  .currency-mini-hub {\n    grid-area: wallet;\n    display: block;\n  }\n}\n\n@media (min-width: 760px) and (max-width: 959px) {\n  .gacha-body {\n    grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr);\n    grid-template-rows: minmax(0, 1fr) auto;\n    grid-template-areas:\n      'rail main'\n      'wallet main';\n  }\n\n  .gacha-main {\n    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.42fr);\n    grid-template-areas:\n      'topbar topbar'\n      'panel panel'\n      'featured pity'\n      'cost actions'\n      'results results';\n  }\n\n  .gacha-topbar { grid-area: topbar; }\n  .banner-panel { grid-area: panel; }\n  .banner-panel__featured { grid-area: featured; }\n  .banner-panel__pity { grid-area: pity; }\n  .banner-panel__cost { grid-area: cost; }\n  .banner-panel__actions { grid-area: actions; }\n  .banner-panel__results { grid-area: results; }\n\n  .currency-mini-hub {\n    grid-area: wallet;\n    display: block;\n  }\n}\n\n@media (max-width: 759px) {\n  .gacha-ui-root,\n  .gacha-screen {\n    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))\n      max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));\n  }\n\n  .gacha-body {\n    grid-template-columns: 1fr;\n    grid-template-rows: auto auto minmax(0, 1fr);\n    grid-template-areas:\n      'rail'\n      'wallet'\n      'main';\n    gap: 12px;\n  }\n\n  .banner-sidebar {\n    flex-direction: row;\n    overflow-x: auto;\n    overflow-y: hidden;\n    padding: 10px;\n  }\n\n  .currency-mini-hub {\n    grid-area: wallet;\n    display: block;\n    overflow-x: auto;\n    overflow-y: hidden;\n    padding: 10px;\n  }\n\n  .currency-mini-hub .currency-bar {\n    flex-direction: row;\n    flex-wrap: nowrap;\n    justify-content: flex-start;\n  }\n\n  .banner-entry {\n    min-width: 176px;\n  }\n\n  .gacha-topbar {\n    grid-template-columns: minmax(0, 1fr) auto;\n  }\n\n  .banner-timer {\n    grid-column: 1 / -1;\n  }\n\n.banner-panel {\n    grid-template-columns: 1fr;\n  }\n\n  .banner-panel__art {\n    min-height: 180px;\n  }\n\n  .banner-panel__actions {\n    flex-direction: column;\n  }\n\n.pity-meter {\n    grid-template-columns: 64px 1fr 64px;\n  }\n}\n\n@media (max-height: 420px) {\n  .gacha-ui-root,\n  .gacha-screen {\n    padding-top: max(8px, env(safe-area-inset-top));\n    padding-bottom: max(8px, env(safe-area-inset-bottom));\n  }\n\n  .gacha-body,\n  .gacha-main {\n    gap: 10px;\n  }\n\n  .gacha-topbar,\n  .banner-panel,\n  .banner-panel__featured,\n  .banner-panel__pity,\n  .banner-panel__cost,\n  .banner-panel__actions,\n  .banner-panel__results,\n  .currency-mini-hub,\n  .banner-sidebar {\n    border-radius: 16px;\n    padding: 10px;\n  }\n\n  .banner-panel__art {\n    min-height: 120px;\n  }";
   module.exports = css;
   module.exports.default = css;
 };
@@ -36421,7 +36421,6 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
       chip.style.setProperty('--currency-icon', `url("${CURRENCY_ICONS[code]}")`);
       chip.setAttribute('aria-label', `${CURRENCY_LABELS[code]}: ${Math.max(0, Math.trunc(amount))}`);
       chip.innerHTML = `<span class="currency-mini-item__value">${formatCompactNumber(amount)}</span>`;
-      y;
       return chip;
   }
   function renderCurrencyHeader(container, wallet, onOpenTooltip) {
@@ -36611,28 +36610,9 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
           container.appendChild(card);
       }
   }
-  function createModal(content) {
-      const overlay = document.createElement('div');
-      overlay.className = 'modal-overlay';
-      overlay.appendChild(content);
-      return overlay;
-  }
-  function openModal(root, content) {
-      const modal = createModal(content);
-      root.appendChild(modal);
-      const close = () => {
-          modal.remove();
-      };
-      modal.addEventListener('click', (event) => {
-          if (event.target === modal) {
-              close();
-          }
-      });
-      return close;
-  }
   function createRulesContent() {
       const dialog = document.createElement('div');
-      dialog.className = 'modal-content';
+      dialog.className = 'gacha-drawer__content';
       dialog.innerHTML = `
       <h2>Quy Tắc</h2>
       <p>100 đơn vị bậc thấp = 1 đơn vị bậc cao. Thuế tối đa 10% khi đổi lên, không thuế khi đổi xuống.</p>
@@ -36647,6 +36627,37 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
       </ul>
     `;
       return dialog;
+  }
+  function renderPityInfo(container, banner, states) {
+      container.replaceChildren();
+      const sections = getPitySections(banner, states);
+      const active = document.createElement('div');
+      active.className = 'gacha-drawer__content';
+      active.innerHTML = '<h2>Bảo Hiểm</h2>';
+      const list = document.createElement('dl');
+      list.className = 'pity-info-list';
+      for (const section of sections) {
+          const term = document.createElement('dt');
+          term.textContent = section.label;
+          const detail = document.createElement('dd');
+          detail.textContent = section.max ? `${section.value}/${section.max}` : `${section.value}`;
+          list.append(term, detail);
+      }
+      active.appendChild(list);
+      const notes = document.createElement('ul');
+      notes.className = 'pity-info-notes';
+      notes.innerHTML = `<li>SR sàn sau ${formatNumber(banner.pity.srFloor)} lượt nếu chưa ra SR trở lên.</li>`;
+      if (banner.pity.ssr) {
+          notes.insertAdjacentHTML('beforeend', `<li>SSR soft pity từ ${formatNumber(banner.pity.ssr.soft)} lượt, hard pity ở ${formatNumber(banner.pity.ssr.hard)} lượt.</li>`);
+      }
+      if (banner.pity.ur) {
+          notes.insertAdjacentHTML('beforeend', `<li>UR soft pity từ ${formatNumber(banner.pity.ur.soft)} lượt, hard pity ở ${formatNumber(banner.pity.ur.hard)} lượt.</li>`);
+      }
+      if (banner.pity.prime) {
+          notes.insertAdjacentHTML('beforeend', `<li>Prime soft pity từ ${formatNumber(banner.pity.prime.soft)} lượt, hard pity ở ${formatNumber(banner.pity.prime.hard)} lượt.</li>`);
+      }
+      active.appendChild(notes);
+      container.appendChild(active);
   }
   function renderCosts(container, banner) {
       container.replaceChildren();
@@ -36727,11 +36738,10 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
               <p class="banner-desc" data-slot="hero-subtitle"></p>
             </div>
             <span class="banner-timer" data-slot="hero-timer"></span>
-            <button class="rules-button" type="button">Quy Tắc</button>
+            <button class="rules-button" type="button" aria-label="Xem tỉ lệ và quy tắc">?</button>
             </header>
           <section class="banner-panel" aria-label="Thông tin banner">
             <section class="banner-panel__art" data-slot="hero-art"></section>
-            <section class="banner-panel__rates" data-slot="rates"></section>
           </section>
           <section class="banner-panel__featured" aria-label="Nhân vật rate-up" data-slot="featured"></section>
           <section class="banner-panel__pity" aria-label="Pity" data-slot="pity"></section>
@@ -36744,6 +36754,15 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
         </main>
         <aside class="currency-mini-hub" aria-label="Ví tiền tệ gacha">
           <div class="currency-bar" data-slot="currencies"></div>
+        </aside>
+        <div class="gacha-backdrop" data-slot="drawer-backdrop" hidden></div>
+        <aside class="gacha-drawer" data-slot="drawer" aria-label="Tỉ lệ và quy tắc gacha" aria-hidden="true">
+          <div class="gacha-drawer__tabs" role="tablist" aria-label="Thông tin gacha">
+            <button type="button" role="tab" data-drawer-tab="rates">Tỉ lệ</button>
+            <button type="button" role="tab" data-drawer-tab="pity">Bảo hiểm</button>
+            <button type="button" role="tab" data-drawer-tab="rules">Quy tắc</button>
+          </div>
+          <div class="gacha-drawer__panel" data-slot="drawer-panel"></div>
         </aside>
       </div>
     `;
@@ -36760,7 +36779,10 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
       const subtitleSlot = container.querySelector('[data-slot="hero-subtitle"]');
       const timerSlot = container.querySelector('[data-slot="hero-timer"]');
       const artSlot = container.querySelector('[data-slot="hero-art"]');
-      const ratesSlot = container.querySelector('[data-slot="rates"]');
+      const drawerBackdrop = container.querySelector('[data-slot="drawer-backdrop"]');
+      const drawer = container.querySelector('[data-slot="drawer"]');
+      const drawerPanel = container.querySelector('[data-slot="drawer-panel"]');
+      const drawerTabs = Array.from(container.querySelectorAll('[data-drawer-tab]'));
       const pitySlot = container.querySelector('[data-slot="pity"]');
       const featuredSlot = container.querySelector('[data-slot="featured"]');
       const costSlot = container.querySelector('[data-slot="cost"]');
@@ -36768,7 +36790,7 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
       const rulesButton = container.querySelector('.rules-button');
       const summonOne = container.querySelector('[data-action="summon-x1"]');
       const summonTen = container.querySelector('[data-action="summon-x10"]');
-      if (!currencySlot || !bannerList || !titleSlot || !subtitleSlot || !timerSlot || !artSlot || !ratesSlot || !pitySlot || !featuredSlot || !costSlot || !resultsSlot || !rulesButton || !summonOne || !summonTen) {
+      if (!currencySlot || !bannerList || !titleSlot || !subtitleSlot || !timerSlot || !artSlot || !drawerBackdrop || !drawer || !drawerPanel || drawerTabs.length === 0 || !pitySlot || !featuredSlot || !costSlot || !resultsSlot || !rulesButton || !summonOne || !summonTen) {
           throw new Error('Thiếu phần tử UI cần thiết.');
       }
       let lastBannerRenderId = '';
@@ -36816,17 +36838,54 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
           }
           if (lastBannerRenderId !== banner.id) {
               artSlot.innerHTML = banner.background ? `<img src="${banner.background}" alt="${banner.label}" />` : '';
-              renderRates(ratesSlot, banner);
               renderFeatured(featuredSlot, banner);
               renderCosts(costSlot, banner);
               lastBannerRenderId = banner.id;
           }
           renderPity(pitySlot, banner, state.states);
+          if (drawer.classList.contains('is-open')) {
+              renderDrawerPanel();
+          }
       };
-      const openRules = () => {
+      let activeDrawerTab = 'rates';
+      let lastDrawerTrigger = null;
+      const renderDrawerPanel = () => {
+          const banner = getBannerById(state.bannerId) ?? GACHA_CONFIG.banners[0];
+          if (!banner)
+              return;
+          drawerTabs.forEach((tab) => {
+              const isActive = tab.dataset.drawerTab === activeDrawerTab;
+              tab.classList.toggle('is-active', isActive);
+              tab.setAttribute('aria-selected', String(isActive));
+          });
+          if (activeDrawerTab === 'pity') {
+              renderPityInfo(drawerPanel, banner, state.states);
+              return;
+          }
+          if (activeDrawerTab === 'rules') {
+              drawerPanel.replaceChildren(createRulesContent());
+              return;
+          }
+          renderRates(drawerPanel, banner);
+      };
+      const closeDrawer = () => {
+          drawer.classList.remove('is-open');
+          drawer.setAttribute('aria-hidden', 'true');
+          drawerBackdrop.classList.remove('is-open');
+          drawerBackdrop.hidden = true;
+          lastDrawerTrigger?.focus();
+          lastDrawerTrigger = null;
+      };
+      const openDrawer = (tab = 'rates', trigger = rulesButton) => {
           closeCurrencyTooltip();
-          const rulesContent = createRulesContent();
-          openModal(container, rulesContent);
+          activeDrawerTab = tab;
+          lastDrawerTrigger = trigger;
+          drawerBackdrop.hidden = false;
+          renderDrawerPanel();
+          drawerBackdrop.classList.add('is-open');
+          drawer.classList.add('is-open');
+          drawer.setAttribute('aria-hidden', 'false');
+          drawer.querySelector('[data-drawer-tab].is-active')?.focus();
       };
       const renderWallet = () => {
           renderCurrencyHeader(currencySlot, state.wallet, openCurrencyTooltip);
@@ -36840,6 +36899,9 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
               state.bannerId = id;
               updateBannerList();
               renderBanner();
+              if (drawer.classList.contains('is-open')) {
+                  renderDrawerPanel();
+              }
           });
       };
       const renderAll = () => {
@@ -36877,6 +36939,9 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
           }
           renderResults(resultsSlot, results);
           renderPity(pitySlot, banner, state.states);
+          if (drawer.classList.contains('is-open')) {
+              renderDrawerPanel();
+          }
           const paymentNotice = formatPaymentConversionNotice(payment);
           if (paymentNotice) {
               container.appendChild(createToast(paymentNotice));
@@ -36884,7 +36949,21 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
           const toast = createToast(`Đã triệu hồi ${count} lần.`);
           container.appendChild(toast);
       };
-      rulesButton.addEventListener('click', openRules);
+      rulesButton.addEventListener('click', () => openDrawer('rates', rulesButton));
+      drawerBackdrop.addEventListener('click', closeDrawer);
+      drawer.addEventListener('click', (event) => event.stopPropagation());
+      drawerTabs.forEach((tab) => {
+          tab.addEventListener('click', () => {
+              activeDrawerTab = tab.dataset.drawerTab ?? 'rates';
+              renderDrawerPanel();
+          });
+      });
+      const onDocumentKeydown = (event) => {
+          if (event.key === 'Escape' && drawer.classList.contains('is-open')) {
+              closeDrawer();
+          }
+      };
+      document.addEventListener('keydown', onDocumentKeydown);
       summonOne.addEventListener('click', () => performSummon(1));
       summonTen.addEventListener('click', () => performSummon(10));
       renderAll();
@@ -36896,6 +36975,8 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
               }
               destroyed = true;
               closeCurrencyTooltip();
+              closeDrawer();
+              document.removeEventListener('keydown', onDocumentKeydown);
               unsubscribeSharedWallet();
               if (isBodyHost) {
                   document.body.classList.remove('gacha-ui');

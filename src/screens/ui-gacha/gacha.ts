@@ -105,7 +105,7 @@ function renderWalletChip(code: CurrencyCode, amount: number): HTMLElement {
   chip.dataset.currency = code;
   chip.style.setProperty('--currency-icon', `url("${CURRENCY_ICONS[code]}")`);
   chip.setAttribute('aria-label', `${CURRENCY_LABELS[code]}: ${Math.max(0, Math.trunc(amount))}`);
-  chip.innerHTML = `<span class="currency-mini-item__value">${formatCompactNumber(amount)}</span>`;y
+  chip.innerHTML = `<span class="currency-mini-item__value">${formatCompactNumber(amount)}</span>`;
   return chip;
 }
 
@@ -226,7 +226,7 @@ function getPitySections(banner: BannerDefinition, states: BannerStateMap): Pity
   return sections;
 }
 
-  function ensurePityMeterNodes(container: HTMLElement, sections: ReadonlyArray<PitySection>): Map<string, PityMeterNodes> {
+function ensurePityMeterNodes(container: HTMLElement, sections: ReadonlyArray<PitySection>): Map<string, PityMeterNodes> {
   const existing = new Map<string, PityMeterNodes>();
   for (const child of container.querySelectorAll<HTMLDivElement>(':scope > .pity-meter')) {
     const label = child.dataset.pityLabel;
@@ -314,30 +314,9 @@ function renderFeatured(container: HTMLElement, banner: BannerDefinition): void 
   }
 }
 
-function createModal(content: HTMLElement): HTMLElement {
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.appendChild(content);
-  return overlay;
-}
-
-function openModal(root: HTMLElement, content: HTMLElement): () => void {
-  const modal = createModal(content);
-  root.appendChild(modal);
-  const close = () => {
-    modal.remove();
-  };
-  modal.addEventListener('click', (event) => {
-    if (event.target === modal) {
-      close();
-    }
-  });
-  return close;
-}
-
 function createRulesContent(): HTMLElement {
   const dialog = document.createElement('div');
-  dialog.className = 'modal-content';
+  dialog.className = 'gacha-drawer__content';
   dialog.innerHTML = `
     <h2>Quy Tắc</h2>
     <p>100 đơn vị bậc thấp = 1 đơn vị bậc cao. Thuế tối đa 10% khi đổi lên, không thuế khi đổi xuống.</p>
@@ -352,6 +331,39 @@ function createRulesContent(): HTMLElement {
     </ul>
   `;
   return dialog;
+}
+
+function renderPityInfo(container: HTMLElement, banner: BannerDefinition, states: BannerStateMap): void {
+  container.replaceChildren();
+  const sections = getPitySections(banner, states);
+  const active = document.createElement('div');
+  active.className = 'gacha-drawer__content';
+  active.innerHTML = '<h2>Bảo Hiểm</h2>';
+  const list = document.createElement('dl');
+  list.className = 'pity-info-list';
+  for (const section of sections) {
+    const term = document.createElement('dt');
+    term.textContent = section.label;
+    const detail = document.createElement('dd');
+    detail.textContent = section.max ? `${section.value}/${section.max}` : `${section.value}`;
+    list.append(term, detail);
+  }
+  active.appendChild(list);
+
+  const notes = document.createElement('ul');
+  notes.className = 'pity-info-notes';
+  notes.innerHTML = `<li>SR sàn sau ${formatNumber(banner.pity.srFloor)} lượt nếu chưa ra SR trở lên.</li>`;
+  if (banner.pity.ssr) {
+    notes.insertAdjacentHTML('beforeend', `<li>SSR soft pity từ ${formatNumber(banner.pity.ssr.soft)} lượt, hard pity ở ${formatNumber(banner.pity.ssr.hard)} lượt.</li>`);
+  }
+  if (banner.pity.ur) {
+    notes.insertAdjacentHTML('beforeend', `<li>UR soft pity từ ${formatNumber(banner.pity.ur.soft)} lượt, hard pity ở ${formatNumber(banner.pity.ur.hard)} lượt.</li>`);
+  }
+  if (banner.pity.prime) {
+    notes.insertAdjacentHTML('beforeend', `<li>Prime soft pity từ ${formatNumber(banner.pity.prime.soft)} lượt, hard pity ở ${formatNumber(banner.pity.prime.hard)} lượt.</li>`);
+  }
+  active.appendChild(notes);
+  container.appendChild(active);
 }
 
 function renderCosts(container: HTMLElement, banner: BannerDefinition): void {
@@ -447,11 +459,10 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
             <p class="banner-desc" data-slot="hero-subtitle"></p>
           </div>
           <span class="banner-timer" data-slot="hero-timer"></span>
-          <button class="rules-button" type="button">Quy Tắc</button>
+          <button class="rules-button" type="button" aria-label="Xem tỉ lệ và quy tắc">?</button>
           </header>
         <section class="banner-panel" aria-label="Thông tin banner">
           <section class="banner-panel__art" data-slot="hero-art"></section>
-          <section class="banner-panel__rates" data-slot="rates"></section>
         </section>
         <section class="banner-panel__featured" aria-label="Nhân vật rate-up" data-slot="featured"></section>
         <section class="banner-panel__pity" aria-label="Pity" data-slot="pity"></section>
@@ -464,6 +475,15 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
       </main>
       <aside class="currency-mini-hub" aria-label="Ví tiền tệ gacha">
         <div class="currency-bar" data-slot="currencies"></div>
+      </aside>
+      <div class="gacha-backdrop" data-slot="drawer-backdrop" hidden></div>
+      <aside class="gacha-drawer" data-slot="drawer" aria-label="Tỉ lệ và quy tắc gacha" aria-hidden="true">
+        <div class="gacha-drawer__tabs" role="tablist" aria-label="Thông tin gacha">
+          <button type="button" role="tab" data-drawer-tab="rates">Tỉ lệ</button>
+          <button type="button" role="tab" data-drawer-tab="pity">Bảo hiểm</button>
+          <button type="button" role="tab" data-drawer-tab="rules">Quy tắc</button>
+        </div>
+        <div class="gacha-drawer__panel" data-slot="drawer-panel"></div>
       </aside>
     </div>
   `;
@@ -483,7 +503,10 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   const subtitleSlot = container.querySelector<HTMLElement>('[data-slot="hero-subtitle"]');
   const timerSlot = container.querySelector<HTMLElement>('[data-slot="hero-timer"]');
   const artSlot = container.querySelector<HTMLElement>('[data-slot="hero-art"]');
-  const ratesSlot = container.querySelector<HTMLElement>('[data-slot="rates"]');
+  const drawerBackdrop = container.querySelector<HTMLElement>('[data-slot="drawer-backdrop"]');
+  const drawer = container.querySelector<HTMLElement>('[data-slot="drawer"]');
+  const drawerPanel = container.querySelector<HTMLElement>('[data-slot="drawer-panel"]');
+  const drawerTabs = Array.from(container.querySelectorAll<HTMLButtonElement>('[data-drawer-tab]'));
   const pitySlot = container.querySelector<HTMLElement>('[data-slot="pity"]');
   const featuredSlot = container.querySelector<HTMLElement>('[data-slot="featured"]');
   const costSlot = container.querySelector<HTMLElement>('[data-slot="cost"]');
@@ -492,7 +515,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   const summonOne = container.querySelector<HTMLButtonElement>('[data-action="summon-x1"]');
   const summonTen = container.querySelector<HTMLButtonElement>('[data-action="summon-x10"]');
 
-  if (!currencySlot || !bannerList || !titleSlot || !subtitleSlot || !timerSlot || !artSlot || !ratesSlot || !pitySlot || !featuredSlot || !costSlot || !resultsSlot || !rulesButton || !summonOne || !summonTen) {
+  if (!currencySlot || !bannerList || !titleSlot || !subtitleSlot || !timerSlot || !artSlot || !drawerBackdrop || !drawer || !drawerPanel || drawerTabs.length === 0 || !pitySlot || !featuredSlot || !costSlot || !resultsSlot || !rulesButton || !summonOne || !summonTen) {
     throw new Error('Thiếu phần tử UI cần thiết.');
   }
 
@@ -544,19 +567,58 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
 
     if (lastBannerRenderId !== banner.id) {
       artSlot.innerHTML = banner.background ? `<img src="${banner.background}" alt="${banner.label}" />` : '';
-      renderRates(ratesSlot, banner);
       renderFeatured(featuredSlot, banner);
       renderCosts(costSlot, banner);
       lastBannerRenderId = banner.id;
     }
 
     renderPity(pitySlot, banner, state.states);
+    if (drawer.classList.contains('is-open')) {
+      renderDrawerPanel();
+    }
   };
 
-  const openRules = () => {
+  let activeDrawerTab = 'rates';
+  let lastDrawerTrigger: HTMLElement | null = null;
+
+  const renderDrawerPanel = () => {
+    const banner = getBannerById(state.bannerId) ?? GACHA_CONFIG.banners[0];
+    if (!banner) return;
+    drawerTabs.forEach((tab) => {
+      const isActive = tab.dataset.drawerTab === activeDrawerTab;
+      tab.classList.toggle('is-active', isActive);
+      tab.setAttribute('aria-selected', String(isActive));
+    });
+    if (activeDrawerTab === 'pity') {
+      renderPityInfo(drawerPanel, banner, state.states);
+      return;
+    }
+    if (activeDrawerTab === 'rules') {
+      drawerPanel.replaceChildren(createRulesContent());
+      return;
+    }
+    renderRates(drawerPanel, banner);
+  };
+
+  const closeDrawer = () => {
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    drawerBackdrop.classList.remove('is-open');
+    drawerBackdrop.hidden = true;
+    lastDrawerTrigger?.focus();
+    lastDrawerTrigger = null;
+  };
+
+  const openDrawer = (tab = 'rates', trigger: HTMLElement | null = rulesButton) => {
     closeCurrencyTooltip();
-    const rulesContent = createRulesContent();
-    openModal(container, rulesContent);
+    activeDrawerTab = tab;
+    lastDrawerTrigger = trigger;
+    drawerBackdrop.hidden = false;
+    renderDrawerPanel();
+    drawerBackdrop.classList.add('is-open');
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    drawer.querySelector<HTMLButtonElement>('[data-drawer-tab].is-active')?.focus();
   };
 
   const renderWallet = () => {
@@ -572,6 +634,9 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
       state.bannerId = id;
       updateBannerList();
       renderBanner();
+      if (drawer.classList.contains('is-open')) {
+        renderDrawerPanel();
+      }
     });
   };
 
@@ -611,6 +676,9 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     }
     renderResults(resultsSlot, results);
     renderPity(pitySlot, banner, state.states);
+    if (drawer.classList.contains('is-open')) {
+      renderDrawerPanel();
+    }
     const paymentNotice = formatPaymentConversionNotice(payment);
     if (paymentNotice) {
       container.appendChild(createToast(paymentNotice));
@@ -619,7 +687,21 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     container.appendChild(toast);
   };
 
-  rulesButton.addEventListener('click', openRules);
+  rulesButton.addEventListener('click', () => openDrawer('rates', rulesButton));
+  drawerBackdrop.addEventListener('click', closeDrawer);
+  drawer.addEventListener('click', (event) => event.stopPropagation());
+  drawerTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      activeDrawerTab = tab.dataset.drawerTab ?? 'rates';
+      renderDrawerPanel();
+    });
+  });
+  const onDocumentKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && drawer.classList.contains('is-open')) {
+      closeDrawer();
+    }
+  };
+  document.addEventListener('keydown', onDocumentKeydown);
   summonOne.addEventListener('click', () => performSummon(1));
   summonTen.addEventListener('click', () => performSummon(10));
 
@@ -634,6 +716,8 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
       }
       destroyed = true;
       closeCurrencyTooltip();
+      closeDrawer();
+      document.removeEventListener('keydown', onDocumentKeydown);
       unsubscribeSharedWallet();
       if (isBodyHost) {
         document.body.classList.remove('gacha-ui');
