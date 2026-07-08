@@ -1,7 +1,7 @@
 Trong mode này không có Prime.
-để nhận được tiền nâng cấp kiến trúc cần giết kẻ thù, nếu kẻ thù không chết khi trời sáng, chúng sẽ bị ánh sáng thiêu đốt, player không nhận được gì.
+để nhận được tiền nâng cấp kiến trúc cần giết kẻ thù, nếu kẻ thù không chết khi trời sáng, chúng sẽ bị ánh sáng thiêu đốt và nhận sát thương chuẩn = 25% max hp của chúng/s, bỏ qua hiệu quả của rune phục sinh và player không nhận được gì.
 Quái nếu có rơi đồ thì mặc định rơi đồ cùng tier với bản thân của quái đó trừ phi mô tả đặc biệt.
-tỉ lệ rơi đồ không tangw theo tier nhưng rune có thể, mỗi khi lên 1 tier tỉ lệ rơi đồ vẫn như mô tả từ khi rune can thiệp, nhưng lên tier sẽ tangw tier của tài nguyên/vật phẩm nhận được.
+tỉ lệ rơi đồ không tăng theo tier nhưng rune có thể, mỗi khi lên 1 tier tỉ lệ rơi đồ vẫn như mô tả trừ khi rune can thiệp, nhưng lên tier sẽ tăng tier của tài nguyên/vật phẩm nhận được.
 tỉ lệ thu hoạch: 1 map bất kể tier không dùng rune thì tỉ lệ thu hoạch là x1, tức phần thưởng cuối cùng nhân với 1, nếu dùng rune sẽ tăng độ khó của map lên, nếu win map đó thì sẽ được nhận phần thưởng tăng hoặc giảm theo rune tương ứng.
 # Vĩnh Dạ Defense Mode — Design Spec 0.1
 
@@ -138,7 +138,6 @@ Base là quả cầu pha lê cần phòng thủ, có thể gọi là:
 
 - Huyết Tinh Phong Ấn
 - Pha Lê Huyết Ấn
-- Trấn Tâm Huyết Tinh
 
 Base có các vai trò:
 
@@ -157,6 +156,7 @@ Base có các vai trò:
 
 Tất cả chỉ số dưới đây là chuẩn Khai Nguyên 1. Khi vào map tier cao hơn thì HP/ATK/WIL/ARM/RES được scale theo tier, còn cooldown/tỉ lệ/tầm ảnh hưởng không scale nếu không nói khác.
 
+Tỉ lệ scale: mỗi khi tăng 1 tier nhỏ, tăng 100% hiệu quả buff và chỉ số của base trừ các buff tỉ lệ phần trăm, ví dụ như 4 gạch đầu dòng của mô tả lv 6 base thì chỉ có dòng hồi hp/s là được scale, 3 dòng còn lại giữ nguyên.
 #### Base lv0
 
 - 20 HP.
@@ -194,7 +194,7 @@ Lv3 ghi đè hiệu quả lv2 và yêu cầu chọn 1 trong 2 nhánh.
 - 50 HP.
 - ARM/RES: 5.
 - Hồi 3 HP/s cho lãnh đạo trong lãnh địa.
-- +2 ATK cho mọi đồng minh của lãnh địa trong phạm vi lãnh địa.
+- +2 ATK cho mọi đồng minh của lãnh địa trong phạm vi lãnh địa kể cả leader.
 
 #### Base lv4
 
@@ -202,7 +202,7 @@ Lv4 cộng thêm trên cơ sở nhánh đã chọn ở lv3, không ghi đè nhá
 
 - +10 HP.
 - +2 ARM/RES.
-- +1 HP/s cho mọi đồng minh của lãnh địa trong phạm vi lãnh địa.
+- +1 HP/s cho mọi đồng minh của lãnh địa trong phạm vi lãnh địa kể cả leader.
 
 #### Base lv5
 
@@ -210,8 +210,8 @@ Lv5 cộng thêm trên cơ sở lv4.
 
 - +15 HP.
 - +2 ARM/RES.
-- Hồi 1% HP/s cho lãnh đạo trong lãnh địa.
-- Khi Vĩnh Dạ giáng lâm, base tạo khiên cho lãnh đạo có giá trị bằng 20% max HP của lãnh đạo.
+- Hồi 1% HP/s cho lãnh đạo trong lãnh địa. (dòng này và 2 dòng trên có scale khi lên tier map)
+- Khi Vĩnh Dạ giáng lâm, base tạo khiên cho lãnh đạo có giá trị bằng 20% max HP của lãnh đạo. (dòng này và 3 dòng dưới không scale khi lên tier map)
 - Khiên chỉ tạo 1 lần mỗi đêm.
 - Khiên không cộng dồn nếu đêm kéo dài.
 - Nếu khiên bị phá, khiên không hồi lại trong cùng đêm.

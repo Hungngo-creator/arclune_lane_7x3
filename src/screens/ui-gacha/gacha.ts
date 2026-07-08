@@ -36,6 +36,11 @@ interface GachaUIState {
   bannerId: string;
   states: BannerStateMap;
   summonHistory: SummonHistoryEntry[];
+  uiSettings: GachaUISettings;
+}
+
+interface GachaUISettings {
+  confirmSummonEnabled: boolean;
 }
 
 interface SummonHistoryEntry {
@@ -486,6 +491,39 @@ function createToast(message: string): HTMLElement {
   return toast;
 }
 
+function createSummonConfirmModal(): HTMLDivElement {
+  const modal = document.createElement('div');
+  modal.className = 'gacha-confirm-modal';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'gacha-confirm-title');
+  modal.innerHTML = `
+    <div class="gacha-confirm-modal__backdrop" data-action="cancel-confirm"></div>
+    <section class="gacha-confirm-modal__dialog" role="document">
+      <h2 class="gacha-confirm-modal__title" id="gacha-confirm-title">Xác nhận triệu hồi</h2>
+      <dl class="gacha-confirm-modal__summary">
+        <div>
+          <dt>Banner</dt>
+          <dd data-slot="confirm-banner"></dd>
+        </div>
+        <div>
+          <dt>Số lần quay</dt>
+          <dd data-slot="confirm-count"></dd>
+        </div>
+        <div>
+          <dt>Cost</dt>
+          <dd data-slot="confirm-cost"></dd>
+        </div>
+      </dl>
+      <footer class="gacha-confirm-modal__actions">
+        <button type="button" class="gacha-confirm-modal__button" data-action="cancel-confirm">Hủy</button>
+        <button type="button" class="gacha-confirm-modal__button gacha-confirm-modal__button--primary" data-action="confirm-summon">Xác nhận</button>
+      </footer>
+    </section>
+  `;
+  return modal;
+}
+
 export async function mountGachaUI(scope: HTMLElement | Document | null = null) {
   const hostElement: HTMLElement | null =
     scope instanceof Document ? scope.body : scope ?? document.body;
@@ -553,6 +591,9 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     bannerId: GACHA_CONFIG.banners[0]?.id ?? 'permanent',
     states: new Map(),
     summonHistory: [],
+    uiSettings: {
+      confirmSummonEnabled: true,
+    },
   };
   syncSharedCurrencyWallet(state.wallet, { merge: true });
 
@@ -579,6 +620,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
 
   let lastBannerRenderId = '';
   let closeCurrencyTooltip: () => void = () => {};
+  let closeSummonConfirm: () => void = () => {};
 
   const openCurrencyTooltip = (code: CurrencyCode, target: HTMLElement) => {
     closeCurrencyTooltip();
@@ -761,6 +803,39 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     container.appendChild(toast);
   };
 
+  const requestSummon = (count: number) => {
+    if (!state.uiSettings.confirmSummonEnabled) {
+      performSummon(count);
+      return;
+    }
+    const banner = getBannerById(state.bannerId);
+    if (!banner) {
+      return;
+    }
+    closeCurrencyTooltip();
+    closeSummonConfirm();
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const cost = count === 10 ? banner.cost.x10 : banner.cost.x1;
+    const modal = createSummonConfirmModal();
+    modal.querySelector<HTMLElement>('[data-slot="confirm-banner"]')!.textContent = banner.label;
+    modal.querySelector<HTMLElement>('[data-slot="confirm-count"]')!.textContent = `${formatNumber(count)} lần`;
+    modal.querySelector<HTMLElement>('[data-slot="confirm-cost"]')!.textContent = `${formatNumber(cost)} ${banner.cost.unit}`;
+    const confirmButton = modal.querySelector<HTMLButtonElement>('[data-action="confirm-summon"]');
+    const cancelButtons = modal.querySelectorAll<HTMLButtonElement>('[data-action="cancel-confirm"]');
+    closeSummonConfirm = () => {
+      modal.remove();
+      closeSummonConfirm = () => {};
+      trigger?.focus();
+    };
+    confirmButton?.addEventListener('click', () => {
+      closeSummonConfirm();
+      performSummon(count);
+    });
+    cancelButtons.forEach((button) => button.addEventListener('click', closeSummonConfirm));
+    container.appendChild(modal);
+    confirmButton?.focus();
+  };
+
   rulesButton.addEventListener('click', () => openDrawer('rates', rulesButton));
   historyButton.addEventListener('click', () => openDrawer('history', historyButton));
   drawerBackdrop.addEventListener('click', closeDrawer);
@@ -772,13 +847,16 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     });
   });
   const onDocumentKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      closeSummonConfirm();
+    }
     if (event.key === 'Escape' && drawer.classList.contains('is-open')) {
       closeDrawer();
     }
   };
   document.addEventListener('keydown', onDocumentKeydown);
-  summonOne.addEventListener('click', () => performSummon(1));
-  summonTen.addEventListener('click', () => performSummon(10));
+  summonOne.addEventListener('click', () => requestSummon(1));
+  summonTen.addEventListener('click', () => requestSummon(10));
 
   renderAll();
 
@@ -791,6 +869,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
       }
       destroyed = true;
       closeCurrencyTooltip();
+      closeSummonConfirm();
       closeDrawer();
       document.removeEventListener('keydown', onDocumentKeydown);
       unsubscribeSharedWallet();

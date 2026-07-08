@@ -703,6 +703,92 @@ button {
   transform: translateY(0);
 }
 
+.gacha-confirm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2400;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.gacha-confirm-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 10, 18, 0.58);
+}
+
+.gacha-confirm-modal__dialog {
+  position: relative;
+  width: min(360px, 100%);
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(118, 212, 255, 0.34);
+  background: rgba(10, 16, 24, 0.96);
+  box-shadow: 0 24px 70px rgba(5, 12, 20, 0.62);
+}
+
+.gacha-confirm-modal__title {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gacha-confirm-modal__summary {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.gacha-confirm-modal__summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(16, 28, 42, 0.82);
+  border: 1px solid rgba(118, 212, 255, 0.16);
+}
+
+.gacha-confirm-modal__summary dt {
+  color: var(--text-muted);
+}
+
+.gacha-confirm-modal__summary dd {
+  margin: 0;
+  font-weight: 800;
+  text-align: right;
+}
+
+.gacha-confirm-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.gacha-confirm-modal__button {
+  border: 1px solid rgba(118, 212, 255, 0.28);
+  border-radius: 12px;
+  padding: 10px 14px;
+  background: rgba(16, 28, 42, 0.84);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.gacha-confirm-modal__button--primary {
+  border-color: rgba(255, 154, 255, 0.64);
+  background: linear-gradient(135deg, rgba(118, 212, 255, 0.28), rgba(255, 154, 255, 0.28));
+}
+
+.gacha-confirm-modal__button:hover,
+.gacha-confirm-modal__button:focus-visible {
+  border-color: rgba(255, 154, 255, 0.72);
+  outline: none;
+}
+
 @media (min-width: 960px) {
   .gacha-body {
     grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr) clamp(148px, 17vw, 220px);
