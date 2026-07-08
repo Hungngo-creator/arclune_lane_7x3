@@ -59,7 +59,7 @@ const BANNERS: BannerDefinition[] = [
     rates: { N: 0.586, R: 0.244, SR: 0.117, SSR: 0.03, UR: 0.015, Prime: 0.0075 },
     pity: {
       srFloor: 10,
-      prime: { soft: 130, softStep: 0.001, hard: 180, hardGuaranteeFeatured: true },
+      prime: { soft: 91, softStep: 0.001, hard: 120, hardGuaranteeFeatured: true },y
       ur: { soft: 70, softStep: 0.003, hard: 90, hardGuaranteeFeatured: true },
     },
     featured: [

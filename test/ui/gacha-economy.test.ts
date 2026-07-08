@@ -106,11 +106,11 @@ describe('Pity & bảo hiểm', () => {
     expect(result.outcome.featured).toBe(true);
   });
 
-  test('Hard pity Prime featured ở roll 180 banner Limited Prime', () => {
+  test('Hard pity Prime featured ở roll 120 banner Limited Prime', () => {
     const banner = getBannerById('limited-prime');
     expect(banner).not.toBeNull();
     const states = makeStateMap();
-    for (let i = 0; i < 179; i += 1) {
+    for (let i = 0; i < 119; i += 1) {
       rollBanner(banner!, states, { rng: stuckRng, featuredRng: stuckRng });
     }
     const result = rollBanner(banner!, states, { rng: stuckRng, featuredRng: () => 0 });
