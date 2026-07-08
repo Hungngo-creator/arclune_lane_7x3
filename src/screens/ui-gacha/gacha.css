@@ -1,4 +1,4 @@
-//home (termux)/arclune_lane_7x3/src/screens/ui-gacha/gacha.css
+/* home (termux)/arclune_lane_7x3/src/screens/ui-gacha/gacha.css */
 
 :root {
   color-scheme: dark;
@@ -26,12 +26,11 @@
 body.gacha-ui {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   background: radial-gradient(circle at top left, rgba(118, 212, 255, 0.18), transparent 45%),
     radial-gradient(circle at bottom right, rgba(255, 154, 255, 0.2), transparent 50%), var(--bg-page);
   color: var(--text-main);
-  display: flex;
-  justify-content: center;
-  padding: 32px;
+  overflow: hidden;
 }
 
 button {
@@ -39,64 +38,98 @@ button {
   color: inherit;
 }
 
-.gacha-topbar {
+.gacha-ui-root,
+.gacha-screen {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  overflow: hidden;
+}
+
+.gacha-body {
+  --gacha-rail-width: clamp(128px, 16vw, 176px);
+  width: min(1440px, 100%);
+  height: 100%;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
+  grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr);
+  grid-template-areas: 'rail main';
+  gap: 18px;
+  min-height: 0;
+}
+
+.banner-sidebar {
+  grid-area: rail;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--bg-panel);
   border-radius: 24px;
   border: 1px solid var(--border-accent);
-  background: var(--bg-panel);
-  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.45);
-}
-
-.gacha-topbar__back-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(118, 212, 255, 0.32);
-  background: rgba(12, 18, 28, 0.78);
-  color: var(--text-main);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.gacha-topbar__back-button:hover,
-.gacha-topbar__back-button:focus-visible {
-  background: rgba(18, 28, 42, 0.92);
-  border-color: rgba(118, 212, 255, 0.68);
-  transform: translateY(-1px);
-  box-shadow: 0 0 0 3px rgba(118, 212, 255, 0.24);
-  outline: none;
-}
-
-.gacha-topbar__back-button:active {
-  background: rgba(10, 18, 30, 0.95);
-  border-color: rgba(118, 212, 255, 0.8);
-  transform: translateY(0);
-  box-shadow: 0 0 0 2px rgba(118, 212, 255, 0.18);
-}
-
-.gacha-ui-root {
-  width: min(1280px, 100%);
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 10px;
 }
 
-.banner-panel__toolbar {
-  display: flex;
-  align-items: stretch;
-  justify-content: flex-end;
-  gap: 12px;
+.gacha-main {
+  grid-area: main;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: max-content;
+  gap: 14px;
+  padding-right: 2px;
+}
+
+.gacha-topbar,
+.banner-panel,
+.banner-panel__featured,
+.banner-panel__pity,
+.banner-panel__cost,
+.banner-panel__actions,
+.banner-panel__results,
+.currency-hub {
+  border: 1px solid var(--border-accent);
+  background: var(--bg-panel);
+  box-shadow: 0 18px 48px rgba(5, 12, 20, 0.34);
+}
+
+.gacha-topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 24px;
+}
+
+.gacha-topbar__copy {
+  min-width: 0;
+}
+
+.banner-panel {
+  border-radius: 28px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(210px, 0.55fr);
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.currency-hub {
+  display: none;
+  border-radius: 24px;
+  padding: 14px;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .currency-bar {
@@ -106,7 +139,13 @@ button {
   gap: 10px;
 }
 
+.currency-hub .currency-bar {
+  flex-direction: column;
+  align-items: stretch;
+}
+
 .currency-chip {
+  min-width: 122px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -127,8 +166,8 @@ button {
 }
 
 .currency-chip__icon {
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: rgba(118, 212, 255, 0.18);
   display: grid;
@@ -136,8 +175,8 @@ button {
 }
 
 .currency-chip__icon img {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
 }
 
 .currency-chip__info {
@@ -150,28 +189,14 @@ button {
   color: var(--text-muted);
 }
 
-.currency-chip__code {
+.currency-chip__code,
+.currency-chip__value {
   font-weight: 600;
   color: var(--text-main);
 }
 
 .currency-chip__value {
-  font-weight: 600;
   font-variant-numeric: tabular-nums;
-}
-
-.currency-chip {
-  min-width: 122px;
-}
-
-.currency-chip__icon {
-  width: 30px;
-  height: 30px;
-}
-
-.currency-chip__icon img {
-  width: 18px;
-  height: 18px;
 }
 
 .currency-chip__label {
@@ -187,30 +212,13 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 12px;
-}
-
-.gacha-body {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 24px;
-}
-
-.banner-sidebar {
-  background: var(--bg-panel);
-  border-radius: 24px;
-  border: 1px solid var(--border-accent);
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow-y: auto;
-  max-height: calc(100vh - 220px);
+  white-space: nowrap;
 }
 
 .banner-entry {
   width: 100%;
   text-align: left;
-  padding: 14px 16px;
+  padding: 14px 12px;
   border-radius: 18px;
   border: 1px solid transparent;
   background: rgba(16, 26, 40, 0.88);
@@ -242,26 +250,9 @@ button {
   background: linear-gradient(135deg, rgba(118, 212, 255, 0.22), rgba(255, 154, 255, 0.16));
 }
 
-.banner-panel {
-  background: var(--bg-panel);
-  border-radius: 28px;
-  border: 1px solid var(--border-accent);
-  padding: 24px;
-  display: grid;
-  gap: 18px;
-  position: relative;
-  overflow: hidden;
-}
-
-.banner-panel__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .banner-title {
   margin: 0;
-  font-size: 26px;
+  font-size: clamp(20px, 3vw, 30px);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -274,13 +265,14 @@ button {
 .banner-timer {
   font-size: 13px;
   color: var(--primary);
+  white-space: nowrap;
 }
 
 .banner-panel__art {
   border-radius: 22px;
   background: rgba(10, 16, 24, 0.7);
   overflow: hidden;
-  min-height: 180px;
+  min-height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -295,7 +287,7 @@ button {
 
 .rate-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px 16px;
   margin: 0;
 }
@@ -307,6 +299,15 @@ button {
 .rate-list dd {
   margin: 0;
   color: var(--text-muted);
+}
+
+.banner-panel__featured,
+.banner-panel__pity,
+.banner-panel__cost,
+.banner-panel__actions,
+.banner-panel__results {
+  border-radius: 22px;
+  padding: 14px;
 }
 
 .banner-panel__pity {
@@ -502,8 +503,8 @@ button {
 
 .gacha-toast {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
   background: rgba(16, 28, 42, 0.92);
   border-radius: 16px;
   padding: 12px 18px;
@@ -519,38 +520,143 @@ button {
   transform: translateY(0);
 }
 
-@media (max-width: 960px) {
+@media (min-width: 960px) {
+  .gacha-body {
+    grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr) clamp(148px, 17vw, 220px);
+    grid-template-areas: 'rail main wallet';
+  }
+
+  .currency-hub {
+    grid-area: wallet;
+    display: block;
+  }
+}
+
+@media (min-width: 760px) and (max-width: 959px) {
+  .gacha-body {
+    grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'rail main'
+      'wallet main';
+  }
+
+  .gacha-main {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.42fr);
+    grid-template-areas:
+      'topbar topbar'
+      'panel panel'
+      'featured pity'
+      'cost actions'
+      'results results';
+  }
+
+  .gacha-topbar { grid-area: topbar; }
+  .banner-panel { grid-area: panel; }
+  .banner-panel__featured { grid-area: featured; }
+  .banner-panel__pity { grid-area: pity; }
+  .banner-panel__cost { grid-area: cost; }
+  .banner-panel__actions { grid-area: actions; }
+  .banner-panel__results { grid-area: results; }
+
+  .currency-hub {
+    grid-area: wallet;
+    display: block;
+  }
+}
+
+@media (max-width: 759px) {
+  .gacha-ui-root,
+  .gacha-screen {
+    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
   .gacha-body {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'rail'
+      'wallet'
+      'main';
+    gap: 12px;
   }
 
   .banner-sidebar {
     flex-direction: row;
     overflow-x: auto;
-    max-height: none;
+    overflow-y: hidden;
+    padding: 10px;
   }
 
-  .banner-entry {
-    min-width: 220px;
-  }
-}
-
-@media (max-width: 720px) {
-  body.gacha-ui {
-    padding: 24px 16px;
+  .currency-hub {
+    grid-area: wallet;
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px;
   }
 
-.banner-panel__toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-.currency-bar {
+  .currency-hub .currency-bar {
+    flex-direction: row;
+    flex-wrap: nowrap;
     justify-content: flex-start;
   }
 
-  .currency-chip {
-    flex: 1 1 calc(50% - 8px);
-    min-width: 140px;
+  .banner-entry {
+    min-width: 176px;
+  }
+
+  .gacha-topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .banner-timer {
+    grid-column: 1 / -1;
+  }
+
+.banner-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .banner-panel__art {
+    min-height: 180px;
+  }
+
+  .banner-panel__actions {
+    flex-direction: column;
+  }
+
+.pity-meter {
+    grid-template-columns: 64px 1fr 64px;
   }
 }
+
+@media (max-height: 420px) {
+  .gacha-ui-root,
+  .gacha-screen {
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .gacha-body,
+  .gacha-main {
+    gap: 10px;
+  }
+
+  .gacha-topbar,
+  .banner-panel,
+  .banner-panel__featured,
+  .banner-panel__pity,
+  .banner-panel__cost,
+  .banner-panel__actions,
+  .banner-panel__results,
+  .currency-hub,
+  .banner-sidebar {
+    border-radius: 16px;
+    padding: 10px;
+  }
+
+  .banner-panel__art {
+    min-height: 120px;
+  }

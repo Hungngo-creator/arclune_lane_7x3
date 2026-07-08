@@ -445,33 +445,35 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   }
 
   const container = document.createElement('div');
-  container.className = 'gacha-ui-root';
+  container.className = 'gacha-ui-root gacha-screen';
   container.innerHTML = `
     <div class="gacha-body">
-      <aside class="banner-sidebar" data-slot="banner-list"></aside>
-      <main class="banner-panel">
-        <header class="banner-panel__header">
-          <div>
+      <aside class="banner-sidebar" aria-label="Danh sách banner" data-slot="banner-list"></aside>
+      <main class="gacha-main" aria-label="Gacha">
+        <header class="gacha-topbar banner-panel__header">
+          <div class="gacha-topbar__copy">
             <h1 class="banner-title" data-slot="hero-title"></h1>
             <p class="banner-desc" data-slot="hero-subtitle"></p>
           </div>
           <span class="banner-timer" data-slot="hero-timer"></span>
-        </header>
-        <section class="banner-panel__toolbar" aria-label="Ví tiền tệ gacha">
-          <div class="currency-bar" data-slot="currencies"></div>
           <button class="rules-button" type="button">Quy Tắc</button>
+          </header>
+        <section class="banner-panel" aria-label="Thông tin banner">
+          <section class="banner-panel__art" data-slot="hero-art"></section>
+          <section class="banner-panel__rates" data-slot="rates"></section>
         </section>
-        <section class="banner-panel__art" data-slot="hero-art"></section>
-        <section class="banner-panel__rates" data-slot="rates"></section>
-        <section class="banner-panel__pity" data-slot="pity"></section>
-        <section class="banner-panel__featured" data-slot="featured"></section>
-        <section class="banner-panel__cost" data-slot="cost"></section>
+        <section class="banner-panel__featured" aria-label="Nhân vật rate-up" data-slot="featured"></section>
+        <section class="banner-panel__pity" aria-label="Pity" data-slot="pity"></section>
+        <section class="banner-panel__cost" aria-label="Chi phí triệu hồi" data-slot="cost"></section>
         <footer class="banner-panel__actions">
           <button type="button" data-action="summon-x1">Triệu hồi x1</button>
           <button type="button" data-action="summon-x10">Triệu hồi x10</button>
         </footer>
-        <section class="banner-panel__results" data-slot="results"></section>
+        <section class="banner-panel__results" aria-label="Kết quả triệu hồi" data-slot="results"></section>
       </main>
+      <aside class="currency-hub" aria-label="Ví tiền tệ gacha">
+        <div class="currency-bar" data-slot="currencies"></div>
+      </aside>
     </div>
   `;
 
