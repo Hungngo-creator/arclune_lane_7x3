@@ -399,24 +399,27 @@ function renderPityInfo(container: HTMLElement, banner: BannerDefinition, states
   container.appendChild(active);
 }
 
-function renderCosts(container: HTMLElement, banner: BannerDefinition): void {
-  container.replaceChildren();
-  const single = getBannerCost(banner, 'x1');
-  const multi = getBannerCost(banner, 'x10');
-  const singleEl = document.createElement('div');
-  singleEl.className = 'cost-entry';
-  singleEl.innerHTML = `
-    <span>Triệu hồi x1</span>
-    <span class="cost-entry__value"><img src="${CURRENCY_ICONS[single.currency]}" alt="${single.currency}" />${formatNumber(single.amount)}</span>
-  `;
-  const multiEl = document.createElement('div');
-  multiEl.className = 'cost-entry';
-  multiEl.innerHTML = `
-    <span>Triệu hồi x10</span>
-    <span class="cost-entry__value"><img src="${CURRENCY_ICONS[multi.currency]}" alt="${multi.currency}" />${formatNumber(multi.amount)}</span>
-  `;
-  container.appendChild(singleEl);
-  container.appendChild(multiEl);
+function updateSummonButton(button: HTMLButtonElement, banner: BannerDefinition, type: 'x1' | 'x10', wallet: Wallet): void {
+  const cost = getBannerCost(banner, type);
+  const count = type === 'x1' ? 1 : 10;
+  const label = `TRIỆU HỒI ×${count}`;
+  const canPay = payForRoll(wallet, cost.currency, cost.amount, { allowDownFromHigher: true, allowTT: false }).ok;
+  const disabledMessage = `Không đủ ${cost.currency}.`;
+
+  button.classList.add('summon-button', `summon-button--${type}`);
+  button.disabled = !canPay;
+  button.setAttribute('aria-disabled', String(!canPay));
+  button.setAttribute('aria-label', canPay ? `${label}, tốn ${formatNumber(cost.amount)} ${cost.currency}` : `${label}, ${disabledMessage}`);
+  button.title = canPay ? '' : disabledMessage;
+  button.innerHTML = `
+    <span class="summon-button__title">${label}</span>
+    <span class="summon-button__cost"><img src="${CURRENCY_ICONS[cost.currency]}" alt="" aria-hidden="true" />${formatNumber(cost.amount)} ${cost.currency}</span>
+    `;
+  }
+
+function updateSummonButtons(summonOne: HTMLButtonElement, summonTen: HTMLButtonElement, banner: BannerDefinition, wallet: Wallet): void {
+  updateSummonButton(summonOne, banner, 'x1', wallet);
+  updateSummonButton(summonTen, banner, 'x10', wallet);
 }
 
 function renderHistory(container: HTMLElement, history: readonly SummonHistoryEntry[]): void {
@@ -522,10 +525,9 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
         </section>
         <section class="banner-panel__featured" aria-label="Nhân vật rate-up" data-slot="featured"></section>
         <section class="banner-panel__pity" aria-label="Pity" data-slot="pity"></section>
-        <section class="banner-panel__cost" aria-label="Chi phí triệu hồi" data-slot="cost"></section>
-        <footer class="banner-panel__actions">
-          <button type="button" data-action="summon-x1">Triệu hồi x1</button>
-          <button type="button" data-action="summon-x10">Triệu hồi x10</button>
+        <footer class="banner-panel__actions gacha-actions">
+          <button type="button" class="summon-button summon-button--x1" data-action="summon-x1"></button>
+          <button type="button" class="summon-button summon-button--x10" data-action="summon-x10"></button>
         </footer>
       </main>
       <aside class="currency-mini-hub" aria-label="Ví tiền tệ gacha">
@@ -566,13 +568,12 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   const drawerTabs = Array.from(container.querySelectorAll<HTMLButtonElement>('[data-drawer-tab]'));
   const pitySlot = container.querySelector<HTMLElement>('[data-slot="pity"]');
   const featuredSlot = container.querySelector<HTMLElement>('[data-slot="featured"]');
-  const costSlot = container.querySelector<HTMLElement>('[data-slot="cost"]');
   const rulesButton = container.querySelector<HTMLButtonElement>('.rules-button');
   const historyButton = container.querySelector<HTMLButtonElement>('.history-button');
   const summonOne = container.querySelector<HTMLButtonElement>('[data-action="summon-x1"]');
   const summonTen = container.querySelector<HTMLButtonElement>('[data-action="summon-x10"]');
 
-  if (!currencySlot || !bannerList || !titleSlot || !subtitleSlot || !timerSlot || !artSlot || !drawerBackdrop || !drawer || !drawerPanel || drawerTabs.length === 0 || !pitySlot || !featuredSlot || !costSlot || !rulesButton || !historyButton || !summonOne || !summonTen) {
+  if (!currencySlot || !bannerList || !titleSlot || !subtitleSlot || !timerSlot || !artSlot || !drawerBackdrop || !drawer || !drawerPanel || drawerTabs.length === 0 || !pitySlot || !featuredSlot || !rulesButton || !historyButton || !summonOne || !summonTen) {
     throw new Error('Thiếu phần tử UI cần thiết.');
   }
 
@@ -625,10 +626,10 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     if (lastBannerRenderId !== banner.id) {
       artSlot.innerHTML = banner.background ? `<img src="${banner.background}" alt="${banner.label}" />` : '';
       renderFeatured(featuredSlot, banner);
-      renderCosts(costSlot, banner);
       lastBannerRenderId = banner.id;
     }
 
+    updateSummonButtons(summonOne, summonTen, banner, state.wallet);
     renderPity(pitySlot, banner, state.states);
     if (drawer.classList.contains('is-open')) {
       renderDrawerPanel();
@@ -684,6 +685,10 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
 
   const renderWallet = () => {
     renderCurrencyHeader(currencySlot, state.wallet, openCurrencyTooltip);
+    const banner = getBannerById(state.bannerId) ?? GACHA_CONFIG.banners[0];
+    if (banner) {
+      updateSummonButtons(summonOne, summonTen, banner, state.wallet);
+    }
   };
 
   const updateBannerList = () => {

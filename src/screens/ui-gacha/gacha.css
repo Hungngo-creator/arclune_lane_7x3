@@ -92,7 +92,6 @@ button {
 .banner-panel,
 .banner-panel__featured,
 .banner-panel__pity,
-.banner-panel__cost,
 .banner-panel__actions,
 .currency-mini-hub {
   border: 1px solid var(--border-accent);
@@ -318,7 +317,6 @@ button {
 
 .banner-panel__featured,
 .banner-panel__pity,
-.banner-panel__cost,
 .banner-panel__actions {
   border-radius: 22px;
   padding: 14px;
@@ -428,56 +426,76 @@ button {
   font-size: 13px;
 }
 
-.banner-panel__cost {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+.banner-panel__actions,
+.gacha-actions {
+  display: flex;
   gap: 12px;
 }
 
-.cost-entry {
-  display: flex;
+.summon-button {
+  min-height: 46px;
+  padding: 8px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(118, 212, 255, 0.34);
+  background: rgba(16, 28, 42, 0.78);
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba(20, 32, 48, 0.86);
-  border: 1px solid rgba(118, 212, 255, 0.18);
+  justify-content: center;
+  gap: 3px;
+  transition: transform 0.16s ease, border-color 0.16s ease, filter 0.16s ease, opacity 0.16s ease;
 }
 
-.cost-entry__value {
+.summon-button--x1 {
+  flex: 1 1 42%;
+  background: rgba(16, 28, 42, 0.72);
+}
+
+.summon-button--x10 {
+  flex: 1 1 58%;
+  border-color: rgba(255, 154, 255, 0.64);
+  background: linear-gradient(135deg, rgba(118, 212, 255, 0.3), rgba(255, 154, 255, 0.28));
+  box-shadow: 0 10px 28px rgba(255, 154, 255, 0.12);
+}
+
+.summon-button__title {
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.summon-button__cost {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  font-size: 11px;
+  line-height: 1.1;
+  color: var(--text-muted);
   font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
-.cost-entry__value img {
-  width: 18px;
-  height: 18px;
+.summon-button__cost img {
+  width: 14px;
+  height: 14px;
 }
 
-.banner-panel__actions {
-  display: flex;
-  gap: 12px;
-}
-
-.banner-panel__actions button {
-  flex: 1;
-  padding: 14px 18px;
-  border-radius: 18px;
-  border: 1px solid rgba(118, 212, 255, 0.45);
-  background: rgba(16, 28, 42, 0.9);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  cursor: pointer;
-  transition: transform 0.16s ease, border-color 0.16s ease;
-}
-
-.banner-panel__actions button:hover,
-.banner-panel__actions button:focus-visible {
+.summon-button:hover:not(:disabled),
+.summon-button:focus-visible:not(:disabled) {
   transform: translateY(-2px);
-  border-color: rgba(255, 154, 255, 0.6);
+  border-color: rgba(255, 154, 255, 0.72);
+  filter: brightness(1.08);
   outline: none;
+}
+
+.summon-button:disabled,
+.summon-button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.52;
+  filter: grayscale(0.28);
 }
 
 .banner-panel__results {
@@ -712,14 +730,13 @@ button {
       'topbar topbar'
       'panel panel'
       'featured pity'
-      'cost actions';
+      'actions actions';
   }
 
   .gacha-topbar { grid-area: topbar; }
   .banner-panel { grid-area: panel; }
   .banner-panel__featured { grid-area: featured; }
   .banner-panel__pity { grid-area: pity; }
-  .banner-panel__cost { grid-area: cost; }
   .banner-panel__actions { grid-area: actions; }
 
   .currency-mini-hub {
@@ -787,7 +804,7 @@ button {
   }
 
   .banner-panel__actions {
-    flex-direction: column;
+    flex-direction: row;
   }
 
 .pity-chip {
@@ -811,7 +828,6 @@ button {
   .banner-panel,
   .banner-panel__featured,
   .banner-panel__pity,
-  .banner-panel__cost,
   .banner-panel__actions,
   .currency-mini-hub,
   .banner-sidebar {
