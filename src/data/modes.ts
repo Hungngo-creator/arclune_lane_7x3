@@ -1,4 +1,5 @@
 import { getLotterySplit, getPityConfig, getShopTaxRate } from './economy.ts';
+import { GACHA_CONFIG } from '../screens/ui-gacha/logic/config.ts';
 
 import type {
   LotterySplit,
@@ -11,6 +12,15 @@ import type {
 const SSR_PITY: PityConfiguration | null = getPityConfig('SSR');
 const UR_PITY: PityConfiguration | null = getPityConfig('UR');
 const PRIME_PITY: PityConfiguration | null = getPityConfig('PRIME');
+const CURRENT_PRIME_BANNER = GACHA_CONFIG.banners.find(({ id }) => id === 'limited-prime') ?? null;
+const CURRENT_PRIME_PITY = CURRENT_PRIME_BANNER?.pity.prime ?? null;
+const CURRENT_PRIME_SUPPORT_UR_PITY = CURRENT_PRIME_BANNER?.pity.ur ?? null;
+const PRIME_BANNER_PITY_SUMMARY = CURRENT_PRIME_PITY
+  ? `soft pity Prime từ lượt ${CURRENT_PRIME_PITY.soft}, hard pity Prime ở lượt ${CURRENT_PRIME_PITY.hard}`
+  : `hard pity Prime mặc định ${PRIME_PITY?.hardPity || 80} lượt`;
+const PRIME_BANNER_SUPPORT_PITY_SUMMARY = CURRENT_PRIME_SUPPORT_UR_PITY
+  ? `UR phụ trợ soft từ lượt ${CURRENT_PRIME_SUPPORT_UR_PITY.soft}, hard ở lượt ${CURRENT_PRIME_SUPPORT_UR_PITY.hard}`
+  : null;
 const LOTTERY_SPLIT: LotterySplit = getLotterySplit();
 const BASE_TAX_RATE = getShopTaxRate('N');
 const TOP_TAX_RATE = getShopTaxRate('PRIME');
@@ -186,8 +196,8 @@ const MODES = [
     type: MODE_TYPES.ECONOMY,
     status: MODE_STATUS.AVAILABLE,
     icon: '🎲',
-    shortDescription: `Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với bảo hiểm ${SSR_PITY?.hardPity || 60}/${UR_PITY?.hardPity || 70}/${PRIME_PITY?.hardPity || 80} lượt cho các banner SSR/UR/Prime.`,
-    unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${UR_PITY?.softGuarantees?.[0]?.pull || 50}; banner Prime lần lượt bảo hiểm SSR/UR ở ${PRIME_PITY?.softGuarantees?.map(({ pull }: PityConfiguration['softGuarantees'][number]) => pull).join('/') || '40/60'} và Prime ở ${PRIME_PITY?.hardPity || 80}.`,
+    shortDescription: `Quầy gacha phân tab Nhân Vật, Công Pháp, Vũ Khí, Sủng Thú với bảo hiểm ${SSR_PITY?.hardPity || 60}/${UR_PITY?.hardPity || 70} lượt cho meta SSR/UR; banner Prime hiện hành dùng ${PRIME_BANNER_PITY_SUMMARY}.`,
+    unlockNotes: `Banner UR bảo hiểm SSR ở lượt ${UR_PITY?.softGuarantees?.[0]?.pull || 50}; banner Prime hiện hành (${CURRENT_PRIME_BANNER?.label || 'mặc định'}) dùng runtime config limited-prime: ${PRIME_BANNER_PITY_SUMMARY}${PRIME_BANNER_SUPPORT_PITY_SUMMARY ? `; ${PRIME_BANNER_SUPPORT_PITY_SUMMARY}` : ''}.`,
     tags: ['Kinh tế nguyên tinh'],
     menuSections: ['economy'],
     shell: {
