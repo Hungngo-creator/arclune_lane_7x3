@@ -36399,6 +36399,16 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
       const amount = type === 'x1' ? banner.cost.x1 : banner.cost.x10;
       return { currency: banner.cost.unit, amount };
   }
+  function formatPaymentConversionNotice(payment) {
+      const detail = payment.detail;
+      if (!detail || detail.usedFromHigher <= 0 || detail.conversions.length === 0) {
+          return null;
+      }
+      const steps = detail.conversions
+          .map((step) => `${formatNumber(step.units)} ${step.from} → ${formatNumber(step.amount)} ${step.to}`)
+          .join(', ');
+      return `Đã dùng ${formatNumber(detail.usedFromHigher)} ${detail.currency} từ tiền tệ cao hơn: ${steps}.`;
+  }
   function renderWalletChip(code, amount) {
       const chip = document.createElement('button');
       chip.className = 'currency-chip';
@@ -36814,7 +36824,7 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
               return;
           }
           const cost = count === 10 ? banner.cost.x10 : banner.cost.x1;
-          const payment = payForRoll(state.wallet, banner.cost.unit, cost);
+          const payment = payForRoll(state.wallet, banner.cost.unit, cost, { allowDownFromHigher: true, allowTT: false });
           if (!payment.ok) {
               const toast = createToast('Không đủ tiền tệ sau khi auto-convert.');
               container.appendChild(toast);
@@ -36834,6 +36844,10 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
           }
           renderResults(resultsSlot, results);
           renderPity(pitySlot, banner, state.states);
+          const paymentNotice = formatPaymentConversionNotice(payment);
+          if (paymentNotice) {
+              container.appendChild(createToast(paymentNotice));
+          }
           const toast = createToast(`Đã triệu hồi ${count} lần.`);
           container.appendChild(toast);
       };
@@ -37570,7 +37584,7 @@ __modules['./screens/ui-gacha/logic/currency.ts'] = (exports, module, __require)
       return state[currency] >= cost ? state : null;
   }
   function payForRoll(wallet, bannerUnit, cost, options = {}) {
-      const allowTT = options.allowTT !== false;
+      const allowTT = options.allowTT === true;
       const allowDown = options.allowDownFromHigher !== false;
       const detail = [];
       const normalized = cloneWallet(wallet);

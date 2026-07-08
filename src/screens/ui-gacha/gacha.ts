@@ -82,6 +82,17 @@ function getBannerCost(banner: BannerDefinition, type: 'x1' | 'x10') {
   return { currency: banner.cost.unit, amount };
 }
 
+function formatPaymentConversionNotice(payment: { detail: { conversions: readonly { from: CurrencyCode; to: CurrencyCode; units: number; amount: number }[]; usedFromHigher: number; currency: CurrencyCode } | null }): string | null {
+  const detail = payment.detail;
+  if (!detail || detail.usedFromHigher <= 0 || detail.conversions.length === 0) {
+    return null;
+  }
+  const steps = detail.conversions
+    .map((step) => `${formatNumber(step.units)} ${step.from} → ${formatNumber(step.amount)} ${step.to}`)
+    .join(', ');
+  return `Đã dùng ${formatNumber(detail.usedFromHigher)} ${detail.currency} từ tiền tệ cao hơn: ${steps}.`;
+}
+
 function renderWalletChip(code: CurrencyCode, amount: number): HTMLElement {
   const chip = document.createElement('button');
   chip.className = 'currency-chip';
@@ -545,7 +556,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
       return;
     }
     const cost = count === 10 ? banner.cost.x10 : banner.cost.x1;
-    const payment = payForRoll(state.wallet, banner.cost.unit, cost);
+    const payment = payForRoll(state.wallet, banner.cost.unit, cost, { allowDownFromHigher: true, allowTT: false });
     if (!payment.ok) {
       const toast = createToast('Không đủ tiền tệ sau khi auto-convert.');
       container.appendChild(toast);
@@ -565,6 +576,10 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     }
     renderResults(resultsSlot, results);
     renderPity(pitySlot, banner, state.states);
+    const paymentNotice = formatPaymentConversionNotice(payment);
+    if (paymentNotice) {
+      container.appendChild(createToast(paymentNotice));
+    }
     const toast = createToast(`Đã triệu hồi ${count} lần.`);
     container.appendChild(toast);
   };

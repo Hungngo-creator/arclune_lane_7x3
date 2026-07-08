@@ -41,26 +41,23 @@ test('Quy đổi 1 TT xuống TNT theo cấp số nhân 100', () => {
     expect(result.tax).toBeLessThanOrEqual(50);
   });
 
-  test('TT tự động đổi xuống để trả phí banner Permanent', () => {
+  test('TT không tự động đổi xuống khi trả phí banner Permanent', () => {
     const wallet = createWallet({ TT: 1, VNT: 0, HNT: 0, TNT: 0, ThNT: 0 });
     const permanent = GACHA_CONFIG.banners.find((banner) => banner.type === 'Permanent');
     expect(permanent).toBeTruthy();
     const payment = payForRoll(wallet, permanent!.cost.unit, permanent!.cost.x1);
-    expect(payment.ok).toBe(true);
-    expect(payment.wallet.TT).toBe(0);
-    expect(payment.wallet.HNT).toBeGreaterThanOrEqual(0);
-    expect(payment.detail?.conversions.length).toBeGreaterThan(0);
-    const remaining = payment.wallet.HNT;
-    expect(remaining).toBeGreaterThanOrEqual(0);
+    expect(payment.ok).toBe(false);
+    expect(payment.wallet.TT).toBe(1);
+    expect(payment.detail).toBeNull();
   });
   
- test('payForRoll 10x Limited UR dùng TT quy đổi đủ', () => {
+ test('payForRoll 10x Limited UR chỉ dùng TT khi bật allowTT rõ ràng', () => {
     const wallet = createWallet({ VNT: 0, HNT: 0, TNT: 0, ThNT: 0, TT: 1 });
     const banner = GACHA_CONFIG.banners.find((item) => item.id === 'limited-ur');
     expect(banner).toBeTruthy();
     const costUnit = banner!.cost.unit;
     const costAmount = banner!.cost.x10;
-    const payment = payForRoll(wallet, costUnit, costAmount);
+    const payment = payForRoll(wallet, costUnit, costAmount, { allowTT: true });
     expect(payment.ok).toBe(true);
     expect(payment.wallet.TT).toBe(0);
     expect(payment.wallet.TNT).toBe(10_000 - costAmount);
@@ -71,6 +68,16 @@ test('Quy đổi 1 TT xuống TNT theo cấp số nhân 100', () => {
     expect(conversions.length).toBeGreaterThanOrEqual(2);
     expect(conversions[0]).toEqual(expect.objectContaining({ from: 'TT', to: 'ThNT', units: 1, amount: 100 }));
     expect(conversions[1]).toEqual(expect.objectContaining({ from: 'ThNT', to: 'TNT', units: 100, amount: 10_000 }));
+  });
+
+  test('payForRoll 10x Limited UR không tự dùng TT theo mặc định', () => {
+    const wallet = createWallet({ VNT: 0, HNT: 0, TNT: 0, ThNT: 0, TT: 1 });
+    const banner = GACHA_CONFIG.banners.find((item) => item.id === 'limited-ur');
+    expect(banner).toBeTruthy();
+    const payment = payForRoll(wallet, banner!.cost.unit, banner!.cost.x10);
+    expect(payment.ok).toBe(false);
+    expect(payment.wallet.TT).toBe(1);
+    expect(payment.detail).toBeNull();
   });
 });
 

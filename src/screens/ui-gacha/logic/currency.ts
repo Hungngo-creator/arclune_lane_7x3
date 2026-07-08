@@ -310,7 +310,7 @@ export function payForRoll(
   cost: number,
   options: PayForRollOptions = {},
 ): PaymentResult {
-  const allowTT = options.allowTT !== false;
+  const allowTT = options.allowTT === true;
   const allowDown = options.allowDownFromHigher !== false;
   const detail: AutoConvertDetail[] = [];
   const normalized = cloneWallet(wallet);
