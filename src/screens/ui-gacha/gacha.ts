@@ -352,6 +352,51 @@ function renderFeatured(container: HTMLElement, banner: BannerDefinition): void 
   container.appendChild(row);
 }
 
+function renderHeroArt(container: HTMLElement, banner: BannerDefinition): void {
+  container.replaceChildren();
+  container.classList.toggle('banner-panel__art--image', Boolean(banner.background));
+  container.classList.toggle('banner-panel__art--gradient', !banner.background);
+
+  if (banner.background) {
+    const image = document.createElement('img');
+    image.className = 'banner-panel__image';
+    image.src = banner.background;
+    image.alt = '';
+    image.setAttribute('aria-hidden', 'true');
+    container.appendChild(image);
+  }
+
+  const copy = document.createElement('div');
+  copy.className = 'banner-panel__copy';
+
+  const eyebrow = document.createElement('span');
+  eyebrow.className = 'banner-panel__eyebrow';
+  eyebrow.textContent = banner.type;
+
+  const title = document.createElement('h2');
+  title.className = 'banner-panel__label';
+  title.textContent = banner.label;
+
+  const description = document.createElement('p');
+  description.className = 'banner-panel__description';
+  description.textContent = banner.description ?? 'Triệu hồi đội hình nổi bật và tích lũy bảo hiểm theo từng banner.';
+
+  const featuredList = document.createElement('ul');
+  featuredList.className = 'banner-panel__featured-list';
+  const featuredUnits = getSummonableFeaturedUnits(banner).slice(0, 3);
+  const featuredNames = featuredUnits.length > 0
+    ? featuredUnits.map((unit) => `${unit.rarity} ${unit.name}`)
+    : ['Đội hình thường trực', 'Nhân vật rate-up sẽ cập nhật'];
+  for (const featuredName of featuredNames) {
+    const item = document.createElement('li');
+    item.textContent = featuredName;
+    featuredList.appendChild(item);
+  }
+
+  copy.append(eyebrow, title, description, featuredList);
+  container.appendChild(copy);
+}
+
 function createRulesContent(): HTMLElement {
   const dialog = document.createElement('div');
   dialog.className = 'gacha-drawer__content';
@@ -666,7 +711,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     }
 
     if (lastBannerRenderId !== banner.id) {
-      artSlot.innerHTML = banner.background ? `<img src="${banner.background}" alt="${banner.label}" />` : '';
+      renderHeroArt(artSlot, banner);
       renderFeatured(featuredSlot, banner);
       lastBannerRenderId = banner.id;
     }
