@@ -16476,7 +16476,6 @@ __modules['./modes/pve/session-events.ts'] = (exports, module, __require) => {
           const nextConfig = (typeof config === 'undefined' ? {} : config);
           configureRoot(deps.getRootElement());
           resolveTimerElement();
-          ;
           const normalizedConfig = deps.normalizeStartConfig(nextConfig);
           if (deps.isRunning())
               stopSession();

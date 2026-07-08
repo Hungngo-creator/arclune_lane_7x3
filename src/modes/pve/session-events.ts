@@ -313,7 +313,7 @@ export const createSessionEventBindings = (
   const startSession = (config?: StartConfigInput): SessionState | null => {
     const nextConfig = (typeof config === 'undefined' ? {} : config);
     configureRoot(deps.getRootElement());
-    resolveTimerElement();;
+    resolveTimerElement();
     const normalizedConfig = deps.normalizeStartConfig(nextConfig);
     if (deps.isRunning()) stopSession();
     deps.resetSessionState(normalizedConfig);
