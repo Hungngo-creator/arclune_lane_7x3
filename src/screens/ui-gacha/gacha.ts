@@ -200,6 +200,11 @@ function renderBannerList(
 
 function renderRates(container: HTMLElement, banner: BannerDefinition): void {
   container.replaceChildren();
+  const content = document.createElement('div');
+  content.className = 'gacha-drawer__content';
+  const note = document.createElement('p');
+  note.textContent = 'Rate-up: 70% tỷ lệ nếu trúng hạng tương ứng.';
+  content.appendChild(note);
   const list = document.createElement('dl');
   list.className = 'rate-list';
   const entries = Object.entries(banner.rates).sort(([, a], [, b]) => b - a);
@@ -211,7 +216,8 @@ function renderRates(container: HTMLElement, banner: BannerDefinition): void {
     list.appendChild(term);
     list.appendChild(detail);
   }
-  container.appendChild(list);
+  content.appendChild(list);
+  container.appendChild(content);
 }
 
 function getPremiumPitySections(banner: BannerDefinition, state: ReturnType<typeof getBannerState>): PitySection[] {
@@ -318,21 +324,27 @@ function renderFeatured(container: HTMLElement, banner: BannerDefinition): void 
   container.replaceChildren();
   const heading = document.createElement('h3');
   heading.className = 'featured__heading';
-  heading.textContent = 'Rate-up';
+  heading.textContent = 'RATE-UP';
   container.appendChild(heading);
-  const note = document.createElement('p');
-  note.className = 'featured__note';
-  note.textContent = '70% tỷ lệ nếu trúng hạng tương ứng.';
-  container.appendChild(note);
+
+  const row = document.createElement('div');
+  row.className = 'featured-chip-row';
   for (const unit of getSummonableFeaturedUnits(banner)) {
-    const card = document.createElement('article');
-    card.className = 'featured-card';
-    card.innerHTML = `
-      <span class="featured-card__rarity">${unit.rarity}</span>
-      <strong class="featured-card__name">${unit.name}</strong>
-    `;
-    container.appendChild(card);
+    const chip = document.createElement('article');
+    chip.className = 'featured-card';
+
+    const rarity = document.createElement('span');
+    rarity.className = 'featured-card__rarity';
+    rarity.textContent = unit.rarity;
+
+    const name = document.createElement('strong');
+    name.className = 'featured-card__name';
+    name.textContent = unit.name;
+
+    chip.append(rarity, name);
+    row.appendChild(chip);
   }
+  container.appendChild(row);
 }
 
 function createRulesContent(): HTMLElement {

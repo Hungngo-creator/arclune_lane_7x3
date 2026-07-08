@@ -387,36 +387,45 @@ button {
   text-transform: uppercase;
 }
 
-.featured__note {
-  margin: 2px 0 12px;
-  color: var(--text-muted);
-  font-size: 12px;
+.featured-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-top: 8px;
+  padding-bottom: 2px;
 }
 
 .featured-card {
-  display: flex;
-  gap: 10px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  gap: 6px;
   align-items: center;
-  padding: 10px 14px;
-  border-radius: 16px;
-  background: rgba(20, 32, 48, 0.9);
-  border: 1px solid rgba(118, 212, 255, 0.18);
+  max-width: min(220px, 72vw);
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(20, 32, 48, 0.68);
+  border: 1px solid rgba(118, 212, 255, 0.14);
   font-weight: 600;
 }
 
-.featured-card + .featured-card {
-  margin-top: 8px;
-}
-
 .featured-card__rarity {
-  font-size: 13px;
-  padding: 4px 8px;
+  flex: 0 0 auto;
+  font-size: 11px;
+  line-height: 1;
+  padding: 3px 6px;
   border-radius: 999px;
-  background: rgba(118, 212, 255, 0.18);
+  background: rgba(118, 212, 255, 0.16);
 }
 
 .featured-card__name {
-  font-size: 15px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
 }
 
 .banner-panel__cost {
