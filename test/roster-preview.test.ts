@@ -17,6 +17,7 @@ import {
   computeFinalStats,
   deriveTpFromMods,
 } from '../src/data/roster-preview.ts';
+import { makeInstanceStats } from '../src/meta.ts';y
 
 const EXPECTED_TP_DELTA: Readonly<Record<string, number>> = Object.freeze({
   HP: 20,
@@ -92,6 +93,25 @@ describe('roster preview data integrity', () => {
       const expected = Math.round(base[stat] * multiplier * precision) / precision;
       assert.strictEqual(catalogFinal[stat], expected, `${stat} phải đổi theo RANK_MULT trong catalog`);
       assert.strictEqual(previewFinal[stat], expected, `${stat} phải đổi theo RANK_MULT trong preview`);
+    }
+  });
+
+  test('preview và instance dùng cùng luật rank scaling cho AEregen/HPregen', () => {
+    const sampleIds = ['lao_khat_cai', 'chan_nga', 'lau_khac_ma_chu'] as const;
+    for (const id of sampleIds) {
+      const unit = ROSTER.find((entry) => entry.id === id);
+      if (!unit) {
+        throw new Error(`Thiếu roster entry cho ${id}`);
+      }
+      const rank = unit.rank as keyof typeof RANK_MULT;
+      const className = unit.class as keyof typeof CLASS_BASE;
+      const preview = computeFinalStats(className, rank);
+      const instance = makeInstanceStats(id, 1, 0);
+
+      assert.strictEqual(instance.aeRegen, preview.AEregen, `AEregen không được scale theo rank cho ${id}`);
+      assert.strictEqual(instance.hpRegen, preview.HPregen, `HPregen phải scale theo rank cho ${id}`);
+      assert.strictEqual(preview.AEregen, CLASS_BASE[className].AEregen, `AEregen giữ nguyên theo base cho ${id}`);
+      assert.notStrictEqual(preview.HPregen, CLASS_BASE[className].HPregen, `HPregen chịu rank multiplier cho ${id}`);
     }
   });
 

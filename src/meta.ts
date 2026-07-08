@@ -5,6 +5,7 @@ import {
   CLASS_GROWTH,
   getMetaById,
   getUnitKitById,
+  scaleStatByRank,
 } from './catalog.ts';
 import { extractOnSpawnRage, kitSupportsSummon } from './utils/kit.ts';
 import { normalizeClassName } from './utils/domain-normalization.ts';
@@ -156,25 +157,29 @@ export function makeInstanceStats(unitId: MetaId, level: number = 1, stars: numb
     HPregen: base.HPregen || 0,
   };
 
-  const rankMult = RANK_MULT[rank] + (stars * 0.05);
-  const scaleInt = (value: number): number => Math.trunc(value * rankMult);
-  const scaleFixed4 = (value: number): number => Number((value * rankMult).toFixed(4));
-  const scaledHp = scaleInt(currentBase.HP);
+  const rankBonus = stars * 0.05;
+  const scaleInt = (stat: keyof CatalogStatBlock, value: number): number => (
+    Math.trunc(scaleStatByRank(stat, value, rank, rankBonus))
+  );
+  const scaleFixed4 = (stat: keyof CatalogStatBlock, value: number): number => (
+    Number(scaleStatByRank(stat, value, rank, rankBonus).toFixed(4))
+  );
+  const scaledHp = scaleInt('HP', currentBase.HP);
 
   return {
     hpMax: scaledHp,
     hp: scaledHp,
-    atk: scaleInt(currentBase.ATK),
-    wil: scaleInt(currentBase.WIL),
-    arm: scaleFixed4(currentBase.ARM),
-    res: scaleFixed4(currentBase.RES),
+    atk: scaleInt('ATK', currentBase.ATK),
+    wil: scaleInt('WIL', currentBase.WIL),
+    arm: scaleFixed4('ARM', currentBase.ARM),
+    res: scaleFixed4('RES', currentBase.RES),
     agi: Math.trunc(base.AGI ?? 0),
     per: Math.trunc(base.PER ?? 0),
     spd: base.SPD || 1,
     aeMax: Math.trunc(base.AEmax ?? 0),
     ae: 0,
     aeRegen: base.AEregen || 0,
-    hpRegen: base.HPregen || 0,
+    hpRegen: scaleInt('HPregen', currentBase.HPregen || 0),
   } satisfies InstanceStats;
 }
 

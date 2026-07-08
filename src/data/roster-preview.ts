@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { CLASS_BASE, RANK_MULT, ROSTER, isRankScaledStat } from '../catalog.ts';
+import { CLASS_BASE, RANK_MULT, ROSTER, getRankMultiplier, scaleStatByRank } from '../catalog.ts';
 import { assertDefined } from '../utils/assert.ts';
 import rawRosterPreviewConfig from './roster-preview.config.ts';
 
@@ -94,19 +94,10 @@ export function applyTpToBase(
   return applyTpDelta(base, sanitizeTpAllocation(tpAlloc));
 }
 
-function getRankMultiplier(rank: keyof typeof RANK_MULT) {
-  return assertDefined(
-    RANK_MULT[rank],
-    `Missing rank multiplier for "${rank}"`
-  );
-}
-
 export function applyRankMultiplier(preRank: CatalogStatBlock, rank: keyof typeof RANK_MULT): CatalogStatBlock {
-  const multiplier = getRankMultiplier(rank);
-  return mapStatBlock(preRank, (stat, value) => {
-    const rankMultiplier = isRankScaledStat(stat) ? multiplier : 1;
-    return roundStat(stat, value * rankMultiplier);
-  });
+  return mapStatBlock(preRank, (stat, value) => (
+    roundStat(stat, scaleStatByRank(stat, value, rank))
+  ));
 }
 
 function computePreviewStats(

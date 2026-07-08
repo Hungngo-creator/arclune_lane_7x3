@@ -75,9 +75,29 @@ export const RANK_SCALED_STATS = [
 
 const RANK_SCALED_STAT_SET: ReadonlySet<keyof CatalogStatBlock> = new Set(RANK_SCALED_STATS);
 
-export const isRankScaledStat = (stat: keyof CatalogStatBlock): boolean => (
-  RANK_SCALED_STAT_SET.has(stat)
+export const isRankScaledStat = (stat: keyof CatalogStatBlock | string): boolean => (
+  RANK_SCALED_STAT_SET.has(stat as keyof CatalogStatBlock)
 );
+
+export function getRankMultiplier(rank: RankName, bonus: number = 0): number {
+  return (RANK_MULT[rank] ?? 1) + bonus;
+}
+
+export function getRankStatMultiplier(
+  stat: keyof CatalogStatBlock | string,
+  rank: RankName,
+  bonus: number = 0,
+): number {
+  return isRankScaledStat(stat) ? getRankMultiplier(rank, bonus) : 1;
+}
+
+export function scaleStatByRank(
+  stat: keyof CatalogStatBlock | string,
+  value: number,
+  rank: RankName,
+  bonus: number = 0,
+): number {
+  return value * getRankStatMultiplier(stat, rank, bonus);
 
 // AGI/PER tạm thời không chịu rank multiplier để chờ cân bằng riêng.
 // SPD/AEmax/AEregen cũng không scale theo rank.
@@ -106,15 +126,13 @@ export function applyRankAndMods(
   rank: RankName,
   mods: Partial<Record<keyof CatalogStatBlock, number>> = {},
 ): CatalogStatBlock {
-  const multiplier = RANK_MULT[rank] ?? 1;
   const out: CatalogStatBlock = { ...base };
   const keys = Object.keys(base) as Array<keyof CatalogStatBlock>;
   for (const key of keys){
     const baseValue = base[key] ?? 0;
     const mod = 1 + (mods?.[key] ?? 0);
     const precision = (key === 'ARM' || key === 'RES' || key === 'SPD') ? 100 : (key === 'AEregen' ? 10 : 1);
-    const rankMultiplier = isRankScaledStat(key) ? multiplier : 1;
-    out[key] = Math.round(baseValue * mod * rankMultiplier * precision) / precision;
+    out[key] = Math.round(scaleStatByRank(key, baseValue * mod, rank) * precision) / precision;
   }
   return out;
 }
