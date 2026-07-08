@@ -11542,16 +11542,25 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   function applyRankMultiplier(preRank, rank) {
       return mapStatBlock(preRank, (stat, value) => (roundStat(stat, scaleStatByRank(stat, value, rank))));
   }
-  function computePreviewStats(base, rank, tpAlloc) {
+  function applyFlatStats(rankedStats, flatStats = {}) {
+      return mapStatBlock(rankedStats, (stat, rankedValue) => {
+          const flatValue = flatStats[stat];
+          if (typeof flatValue !== 'number' || !Number.isFinite(flatValue))
+              return rankedValue;
+          return roundStat(stat, rankedValue + flatValue);
+      });
+  }
+  function computePreviewStats(base, rank, tpAlloc, equipmentFlat = {}) {
       const preRank = applyTpToBase(base, tpAlloc);
+      const ranked = applyRankMultiplier(preRank, rank);
       return {
           preRank,
-          final: applyRankMultiplier(preRank, rank),
+          final: applyFlatStats(ranked, equipmentFlat),
       };
   }
-  function computeFinalStats(className, rank, tpAlloc = {}) {
+  function computeFinalStats(className, rank, tpAlloc = {}, equipmentFlat = {}) {
       const base = getClassBase(className);
-      return computePreviewStats(base, rank, tpAlloc).final;
+      return computePreviewStats(base, rank, tpAlloc, equipmentFlat).final;
   }
   function deriveTpFromMods(base, mods = {}) {
       if (!mods)
@@ -11640,6 +11649,7 @@ __modules['./data/roster-preview.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'STAT_KEYS')) exports.STAT_KEYS = STAT_KEYS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyTpToBase')) exports.applyTpToBase = applyTpToBase;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyRankMultiplier')) exports.applyRankMultiplier = applyRankMultiplier;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyFlatStats')) exports.applyFlatStats = applyFlatStats;
   if (!Object.prototype.hasOwnProperty.call(exports, 'computeFinalStats')) exports.computeFinalStats = computeFinalStats;
   if (!Object.prototype.hasOwnProperty.call(exports, 'deriveTpFromMods')) exports.deriveTpFromMods = deriveTpFromMods;
   if (!Object.prototype.hasOwnProperty.call(exports, 'buildRosterPreviews')) exports.buildRosterPreviews = buildRosterPreviews;

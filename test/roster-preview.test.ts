@@ -96,6 +96,22 @@ describe('roster preview data integrity', () => {
     }
   });
 
+  test('equipment flat cộng sau rank nên +100 ATK giữ nguyên trên SR và Prime', () => {
+    const className = 'Warrior' as keyof typeof CLASS_BASE;
+    const equipmentFlat = { ATK: 100 };
+
+    for (const rank of ['SR', 'Prime'] as const) {
+      const withoutEquipment = computeFinalStats(className, rank);
+      const withEquipment = computeFinalStats(className, rank, {}, equipmentFlat);
+
+      assert.strictEqual(
+        withEquipment.ATK - withoutEquipment.ATK,
+        100,
+        `Equipment +100 ATK phải cộng đúng +100 sau rank cho ${rank}`,
+      );
+    }
+  });
+
   test('preview và instance dùng cùng luật rank scaling cho AEregen/HPregen', () => {
     const sampleIds = ['lao_khat_cai', 'chan_nga', 'lau_khac_ma_chu'] as const;
     for (const id of sampleIds) {

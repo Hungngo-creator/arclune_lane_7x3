@@ -100,25 +100,39 @@ export function applyRankMultiplier(preRank: CatalogStatBlock, rank: keyof typeo
   ));
 }
 
+export function applyFlatStats(
+  rankedStats: CatalogStatBlock,
+  flatStats: Record<string, number | null | undefined> = {},
+): CatalogStatBlock {
+  return mapStatBlock(rankedStats, (stat, rankedValue) => {
+    const flatValue = flatStats[stat];
+    if (typeof flatValue !== 'number' || !Number.isFinite(flatValue)) return rankedValue;
+    return roundStat(stat, rankedValue + flatValue);
+  });
+}
+
 function computePreviewStats(
   base: CatalogStatBlock,
   rank: keyof typeof RANK_MULT,
   tpAlloc: Record<string, number | null | undefined>,
+  equipmentFlat: Record<string, number | null | undefined> = {},
 ): { preRank: CatalogStatBlock; final: CatalogStatBlock } {
   const preRank = applyTpToBase(base, tpAlloc);
+  const ranked = applyRankMultiplier(preRank, rank);
   return {
     preRank,
-    final: applyRankMultiplier(preRank, rank),
+    final: applyFlatStats(ranked, equipmentFlat),
   };
 }
 
 export function computeFinalStats(
   className: keyof typeof CLASS_BASE,
   rank: keyof typeof RANK_MULT,
-  tpAlloc: Record<string, number | null | undefined> = {}
+  tpAlloc: Record<string, number | null | undefined> = {},
+  equipmentFlat: Record<string, number | null | undefined> = {},
 ): CatalogStatBlock {
   const base = getClassBase(className);
-  return computePreviewStats(base, rank, tpAlloc).final;
+  return computePreviewStats(base, rank, tpAlloc, equipmentFlat).final;
 }
 
 export function deriveTpFromMods(
