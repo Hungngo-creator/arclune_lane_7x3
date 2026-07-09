@@ -117,6 +117,8 @@ export interface CollectionProgressUnitInput extends UnknownRecord {
   selectedSkin?: string | null;
   gambit?: ReadonlyArray<GambitSlotInput> | GambitSlotsContainerInput | null;
   tacticalAi?: ReadonlyArray<GambitSlotInput> | GambitSlotsContainerInput | null;
+  equipment?: Record<string, string | null> | null;
+  equipmentByUnit?: Record<string, Record<string, string | null> | null> | null;
 }
 
 export interface GambitSlotsContainerInput extends UnknownRecord {
@@ -176,6 +178,7 @@ export interface RuntimeUnitProgress {
   inLineup?: boolean;
   skinKey?: string;
   gambit?: RuntimeGambitSlot[];
+  equipment?: Record<string, string | null>;
 }
 
 export interface CreateSessionOptions {

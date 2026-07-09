@@ -17,6 +17,22 @@ import { normalizeRarity } from '../../utils/rarity.ts';
 import { ROSTER_PREVIEWS } from '../../data/roster-preview.ts';
 import { TP_DELTA } from '../../data/roster-preview.ts';
 import { CLASS_GROWTH } from '../../catalog.ts';
+import {
+  EQUIPMENT_INVENTORY,
+  EQUIPMENT_ITEM_BY_ID,
+  EQUIPMENT_SLOT_FILTER,
+  EQUIPMENT_SLOT_LABEL,
+  EQUIPMENT_SLOT_SEQUENCE,
+  TP_ALLOCATABLE_KEYS,
+  TP_STAT_GAIN_PER_POINT,
+  normalizeUnitEquipmentState,
+  resolveEquipmentTpAllocation,
+  type EquipmentItem,
+  type EquipmentSlotKey,
+  type TpAllocMap,
+  type TpStatKey,
+  type UnitEquipmentState,
+} from '../../utils/equipment.ts';
 
 import {
   ABILITY_TYPE_LABELS,
@@ -74,80 +90,6 @@ const currencyCatalog: CurrencyCatalog = getCurrencyCatalog();
 const currencyFormatter = ensureNumberFormatter(createNumberFormatter, 'vi-VN');
 const CORE_STAT_KEYS = ['HP', 'WIL', 'ATK', 'RES', 'ARM'] as const;
 
-const TP_ALLOCATABLE_KEYS = ['HP', 'ATK', 'WIL', 'ARM', 'RES'] as const;
-type TpStatKey = (typeof TP_ALLOCATABLE_KEYS)[number];
-type TpAllocMap = Partial<Record<TpStatKey, number>>;
-
-type EquipmentSlotKey = 'head' | 'shirt' | 'weapon' | 'accessory' | 'pants' | 'ring1' | 'ring2' | 'ring3';
-
-interface EquipmentItem {
-  id: string;
-  name: string;
-  slot: EquipmentSlotKey;
-  quantity?: number;
-  tpAlloc?: Partial<Record<string, number>>;
-  setName?: string | null;
-  icon?: string | null;
-  symbol?: string | null;
-}
-
-type UnitEquipmentState = Partial<Record<EquipmentSlotKey, string | null>>;
-
-const EQUIPMENT_SLOT_SEQUENCE: ReadonlyArray<EquipmentSlotKey> = Object.freeze([
-  'head',
-  'shirt',
-  'weapon',
-  'accessory',
-  'pants',
-  'ring1',
-  'ring2',
-  'ring3',
-]);
-
-const EQUIPMENT_SLOT_LABEL: Readonly<Record<EquipmentSlotKey, string>> = Object.freeze({
-  head: 'Đầu',
-  shirt: 'Áo',
-  weapon: 'Vũ khí',
-  accessory: 'Trang sức',
-  pants: 'Quần',
-  ring1: 'Nhẫn 1',
-  ring2: 'Nhẫn 2',
-  ring3: 'Nhẫn 3',
-});
-
-const EQUIPMENT_SLOT_FILTER: Readonly<Record<EquipmentSlotKey, EquipmentSlotKey>> = Object.freeze({
-  head: 'head',
-  shirt: 'shirt',
-  weapon: 'weapon',
-  accessory: 'accessory',
-  pants: 'pants',
-  ring1: 'ring1',
-  ring2: 'ring1',
-  ring3: 'ring1',
-});
-
-const EQUIPMENT_INVENTORY: ReadonlyArray<EquipmentItem> = Object.freeze([
- { id: 'ao-luyen-khi-su-vo-danh', name: 'Áo của luyện khí sư vô danh', slot: 'shirt', tpAlloc: { ARM: 1, RES: 1, HP: 2 }, setName: 'Luyện khí sư vô danh' },
-  { id: 'quan-luyen-khi-su-vo-danh', name: 'Quần của luyện khí sư vô danh', slot: 'pants', tpAlloc: { AGI: 2, HP: 1 }, setName: 'Luyện khí sư vô danh' },
-  { id: 'kiem-cu-luyen-khi-su-vo-danh', name: 'Kiếm cũ của luyện khí sư vô danh', slot: 'weapon', tpAlloc: { ATK: 2, WIL: 1 }, setName: 'Luyện khí sư vô danh', symbol: '⚔' },
-  { id: 'mu-ke-hanh-khat', name: 'Mũ của kẻ hành khất', slot: 'head', tpAlloc: { HP: 1, HPregen: 1 }, symbol: '◉' },
-  { id: 'nhan-ke-hanh-khat', name: 'Nhẫn của kẻ hành khất', slot: 'ring1', tpAlloc: { ATK: 1, WIL: 1 }, quantity: 2, symbol: '◌' },
-]);
-
-const EQUIPMENT_ITEM_BY_ID: ReadonlyMap<string, EquipmentItem> = new Map(EQUIPMENT_INVENTORY.map((item) => [item.id, item]));
-
-
-function normalizeUnitEquipmentState(value: unknown): UnitEquipmentState {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
-  const source = value as Record<string, unknown>;
-  const normalized: UnitEquipmentState = {};
-  for (const key of EQUIPMENT_SLOT_SEQUENCE){
-    const raw = source[key];
-    normalized[key] = typeof raw === 'string' && raw.trim() ? raw : null;
-  }
-  return normalized;
-}
-
 function resolveClassGrowthByUnit(unit: CollectionEntry | null): Record<string, number> {
   const className = typeof unit?.class === 'string' ? unit.class : '';
   const growth = (CLASS_GROWTH as Record<string, Record<string, number> | undefined>)[className];
@@ -169,16 +111,6 @@ function isItemCompatibleWithSlot(item: EquipmentItem, slotKey: EquipmentSlotKey
   }
   return total;
 }
-
-  function mergeTpAllocation(target: Record<string, number>, source: Partial<Record<string, number>> | null | undefined): void {
-  if (!source) return;
-  for (const [key, rawValue] of Object.entries(source)){
-    const value = Number(rawValue);
-    if (!Number.isFinite(value) || value <= 0) continue;
-    target[key] = (target[key] ?? 0) + value;
-  }
-}
-
 
 function resolveEquippedItemUsage(equipment: UnitEquipmentState): Map<string, number> {
   const usage = new Map<string, number>();
@@ -205,35 +137,6 @@ function resolveAvailableQuantityForItem(params: {
   }
   return Math.max(0, baseQuantity - used);
 }
-
-  function resolveEquipmentTpAllocation(equipment: UnitEquipmentState): Record<string, number> {
-  const allocation: Record<string, number> = {};
-  let voDanhPieces = 0;
-  for (const slot of EQUIPMENT_SLOT_SEQUENCE){
-    const id = equipment[slot];
-    if (!id) continue;
-    const item = EQUIPMENT_ITEM_BY_ID.get(id);
-    if (!item) continue;
-    mergeTpAllocation(allocation, item.tpAlloc);
-    if (item.setName === 'Luyện khí sư vô danh'){
-      voDanhPieces += 1;
-    }
-  }
-  if (voDanhPieces >= 3){
-    mergeTpAllocation(allocation, { HP: 1, WIL: 1, ATK: 1 });
-  } else if (voDanhPieces >= 2){
-    mergeTpAllocation(allocation, { HP: 1 });
-  }
-  return allocation;
-}
-
-const TP_STAT_GAIN_PER_POINT: Readonly<Record<TpStatKey, number>> = Object.freeze({
-  HP: 20,
-  ATK: 1,
-  WIL: 1,
-  ARM: 0.5,
-  RES: 0.5,
-});
 
 const K_TP_COMBAT_POWER = 10;
 

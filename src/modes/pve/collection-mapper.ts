@@ -1,5 +1,6 @@
 import { Meta, makeInstanceStats } from '../../meta.ts';
 import { TP_DELTA } from '../../data/roster-preview.ts';
+import { applyEquipmentTpAllocationToInstanceStats, normalizeUnitEquipmentState } from '../../utils/equipment.ts';
 
 import type { InstanceStats } from '../../meta.ts';
 import type {
@@ -169,7 +170,7 @@ const applyTpAllocToInstanceStats = (
   return out ?? stats;
 };
 
-const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress | null => {
+const normalizeProgress = (entry: CollectionItemCandidate, equipmentByUnit?: Record<string, unknown> | null): RuntimeUnitProgress | null => {
   const unitId = readUnitId(entry);
   if (!unitId) return null;
 
@@ -185,6 +186,12 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
   const skinKey = readSkinKey(entry);
 
   const gambit = normalizeGambitSlots(entry.gambit ?? entry.tacticalAi);
+  const entryEquipmentByUnit = entry.equipmentByUnit && typeof entry.equipmentByUnit === 'object' && !Array.isArray(entry.equipmentByUnit)
+    ? entry.equipmentByUnit as Record<string, unknown>
+    : null;
+  const equipmentSource = entry.equipment ?? entryEquipmentByUnit?.[unitId] ?? (equipmentByUnit ? equipmentByUnit[unitId] : undefined);
+  const equipment = normalizeUnitEquipmentState(equipmentSource);
+  const hasEquipment = Object.values(equipment).some((itemId) => typeof itemId === 'string' && itemId.trim() !== '');
 
   const normalizedLevel = normalizeInteger(level, 1);
   const normalizedRealm = normalizeInteger(realm, 0);
@@ -205,6 +212,7 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
     ...(inLineup != null ? { inLineup } : {}),
     ...(skinKey ? { skinKey } : {}),
     ...(gambit ? { gambit } : {}),
+    ...(hasEquipment ? { equipment } : {}),
   };
 
   return progress;
@@ -217,7 +225,10 @@ export function mapUnitProgressById(collectionState: CollectionStateInput | null
   }
 
   const entries = getCollectionEntries(collectionState);
-  const listCacheKey = Array.isArray(entries) ? (entries as object) : null;
+  const equipmentByUnit = collectionState && typeof collectionState === 'object' && !Array.isArray(collectionState.equipmentByUnit) && collectionState.equipmentByUnit && typeof collectionState.equipmentByUnit === 'object'
+    ? collectionState.equipmentByUnit as Record<string, unknown>
+    : null;
+  const listCacheKey = Array.isArray(entries) && !equipmentByUnit ? (entries as object) : null;
   if (listCacheKey){
     const cached = PROGRESS_LIST_CACHE.get(listCacheKey);
     if (cached){
@@ -233,7 +244,7 @@ export function mapUnitProgressById(collectionState: CollectionStateInput | null
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)){
       continue;
     }
-    const normalized = normalizeProgress(entry as CollectionItemCandidate);
+    const normalized = normalizeProgress(entry as CollectionItemCandidate, equipmentByUnit);
     if (!normalized) continue;
     out.set(normalized.unitId, normalized);
   }
@@ -260,9 +271,12 @@ export function resolveRuntimeUnitStats(
   const subRealm = normalizeIntegerWithFallback(progress?.subRealm, 0, 0);
   const stars = normalizeIntegerWithFallback(progress?.stars, 0, 0);
 
-  const stats = applyTpAllocToInstanceStats(
-    meta ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId),
-    progress?.tpAlloc,
+  const stats = applyEquipmentTpAllocationToInstanceStats(
+    applyTpAllocToInstanceStats(
+      meta ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId),
+      progress?.tpAlloc,
+    ),
+    progress?.equipment,u
   );
   return {
     ...stats,

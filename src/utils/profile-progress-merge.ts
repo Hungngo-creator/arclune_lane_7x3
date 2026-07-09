@@ -6,7 +6,7 @@ type CollectionUnitPatch = Record<string, unknown> & { unitId: string };
 
 type ProfileProgressFields = Pick<
   SavedPlayerProfile,
-  'tacticalAiByUnit' | 'cultivationByUnit' | 'tpByUnit' | 'tpAllocByUnit' | 'ownedByUnit'
+  'tacticalAiByUnit' | 'cultivationByUnit' | 'tpByUnit' | 'tpAllocByUnit' | 'ownedByUnit' | 'equipmentByUnit'
 >;
 
 const isPlainRecord = (value: unknown): value is UnknownRecord => (
@@ -105,6 +105,9 @@ export function mergeProfileProgressIntoCollectionState(
       const normalizedOwned = normalizeProfileBoolean(owned);
       return normalizedOwned != null ? { unitId, owned: normalizedOwned } : null;
     }),
+...collectNormalizedUnitPatches(profile.equipmentByUnit, (unitId, equipment) => (
+      isPlainRecord(equipment) ? { unitId, equipment: { ...equipment } } : null
+    )),
   ];
 
   return mergeCollectionUnitPatches(currentCollectionState, patches);
