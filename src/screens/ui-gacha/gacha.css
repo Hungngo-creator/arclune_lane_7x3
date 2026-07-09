@@ -238,42 +238,41 @@ button {
 .currency-mini-hub {
   display: none;
   border-radius: 24px;
-  padding: 14px;
+  padding: 10px;
   min-height: 0;
-  overflow-y: auto;
+  overflow: auto;
   position: relative;
+  background:
+    linear-gradient(135deg, rgba(118, 212, 255, 0.08), rgba(255, 154, 255, 0.06)),
+    var(--bg-panel);
 }
 
 .currency-bar {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.currency-mini-hub .currency-bar {
-  flex-direction: column;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(44px, max-content));
+  justify-content: end;
+  align-items: center;
+  gap: 6px;
 }
 
 .currency-mini-item {
   --currency-icon: none;
-  min-width: 82px;
-  min-height: 48px;
+  min-width: 44px;
+  min-height: 34px;
   position: relative;
   isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 14px;
-  border-radius: 16px;
-  border: 1px solid transparent;
-  background: var(--bg-accent);
+  padding: 6px 8px;
+  border-radius: 12px;
+  border: 0;
+  background: rgba(16, 28, 42, 0.42);
   cursor: pointer;
   overflow: hidden;
   transition:
     transform 0.16s ease,
-    border-color 0.16s ease;
+    background-color 0.16s ease;
 }
 
 .currency-mini-item::before {
@@ -292,7 +291,7 @@ button {
 .currency-mini-item:hover,
 .currency-mini-item:focus-visible {
   transform: translateY(-3px);
-  border-color: rgba(118, 212, 255, 0.65);
+  background-color: rgba(118, 212, 255, 0.18);
 }
 
 .currency-mini-item:focus-visible {
@@ -1040,7 +1039,13 @@ button {
 
   .currency-mini-hub {
     grid-area: wallet;
+    align-self: start;
     display: block;
+  }
+
+  .currency-mini-hub .currency-bar {
+    grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+    justify-content: stretch;
   }
 }
 
@@ -1120,8 +1125,9 @@ button {
   }
 
   .currency-mini-hub .currency-bar {
-    flex-direction: row;
-    flex-wrap: nowrap;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    grid-template-columns: none;
     justify-content: flex-start;
   }
 
