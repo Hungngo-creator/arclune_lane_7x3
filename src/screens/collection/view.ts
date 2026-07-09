@@ -551,6 +551,9 @@ function ensureStyles(){
     .collection-stage__tuvi-realm{margin:0;color:#d6f1ff;font-size:20px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:center;}
     .collection-stage__tuvi-subrealm{display:none;}
     .collection-stage__tuvi-cost{margin:0;color:#9fc8ea;font-size:12px;letter-spacing:.05em;text-transform:uppercase;text-align:center;}
+    .collection-stage__tuvi-stats{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 8px;max-width:240px;}
+    .collection-stage__tuvi-stat{display:inline-flex;align-items:center;gap:4px;color:#9fc8ea;font-size:11px;letter-spacing:.06em;text-transform:uppercase;}
+    .collection-stage__tuvi-stat b{color:#e6f2ff;font-size:11px;letter-spacing:.03em;text-transform:none;}
     .collection-stage__tuvi-actions{display:flex;position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:3;gap:10px;}
     .collection-stage__tuvi-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(110,231,183,.6);background:linear-gradient(160deg,rgba(16,185,129,.35),rgba(5,46,22,.88));color:#dcfce7;font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .18s ease,filter .18s ease;}
     .collection-stage__tuvi-btn:hover{transform:translateY(-2px);filter:brightness(1.08);}
@@ -1099,9 +1102,14 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   tuViCost.className = 'collection-stage__tuvi-cost';
   tuViCost.textContent = 'Chi phí kế tiếp: —';
 
+  const tuViStats = document.createElement('ul');
+  tuViStats.className = 'collection-stage__tuvi-stats';
+  tuViStats.setAttribute('aria-label', 'Chỉ số hiện tại sau tu vi, TP và trang bị');
+
   tuViPanel.appendChild(tuViRealm);
   tuViPanel.appendChild(tuViSubRealm);
   tuViPanel.appendChild(tuViCost);
+  tuViPanel.appendChild(tuViStats);
 
   const tuViActions = document.createElement('div');
   tuViActions.className = 'collection-stage__tuvi-actions';
@@ -2171,6 +2179,28 @@ const resolveCurrentCultivation = () => {
 
     tuViRealm.textContent = `${realmName} (${realm})`;
     tuViSubRealm.textContent = `Tiểu cảnh giới ${subRealm}/${maxSubRealm}`;
+
+    tuViStats.replaceChildren();
+    const statPreview = resolveUnitStatPreview({
+      unitId: activeUnitId,
+      cultivation: { realm, subRealm },
+      tpAllocation: getUnitTpAlloc(activeUnitId),
+      equipment: getUnitEquipment(activeUnitId),
+    });
+    const statByKey = new Map(statPreview.stats.map((stat) => [stat.key, stat.value]));
+    for (const key of CORE_STAT_KEYS){
+      const value = statByKey.get(key);
+      if (value == null) continue;
+      const item = document.createElement('li');
+      item.className = 'collection-stage__tuvi-stat';
+      const label = document.createElement('span');
+      label.textContent = key;
+      const statValue = document.createElement('b');
+      statValue.textContent = currencyFormatter.format(value);
+      item.appendChild(label);
+      item.appendChild(statValue);
+      tuViStats.appendChild(item);
+    }
 
     const costInfo = getCultivationCost(realm, subRealm);
     if (!costInfo){

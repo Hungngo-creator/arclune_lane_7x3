@@ -27,7 +27,24 @@ describe('collection stat preview pipeline', () => {
     expect(resolveCollectionCombatPower(cultivatedPreview, 0)).toBeGreaterThan(resolveCollectionCombatPower(basePreview, 0));
   });
 
-it('keeps thien_luu Collection HP/ATK equal to PvE runtime stats after createSession', () => {
+it('keeps compact Tu Vi panel HP preview increasing across subRealm changes', () => {
+    const previousPreview = resolveUnitStatPreview({
+      unitId: 'thien_luu',
+      cultivation: { realm: 1, subRealm: 1 },
+      tpAllocation: {},
+      equipment: {},
+    });
+    const nextPreview = resolveUnitStatPreview({
+      unitId: 'thien_luu',
+      cultivation: { realm: 1, subRealm: 2 },
+      tpAllocation: {},
+      equipment: {},
+    });
+
+    expect(statValue(nextPreview, 'HP')).toBeGreaterThan(statValue(previousPreview, 'HP'));
+  });
+
+  it('keeps thien_luu Collection HP/ATK equal to PvE runtime stats after createSession', () => {
     const collectionState = {
       units: [
         {
