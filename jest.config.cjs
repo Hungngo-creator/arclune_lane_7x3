@@ -32,6 +32,7 @@ module.exports = {
     ],
   },
   moduleNameMapper: {
+    '^\\.\\./src/(.*)$': '<rootDir>/src/$1',
     ...aliasMapper,
     '^zod$': '<rootDir>/tools/zod-stub/index.js',
     '^.+\\.css$': '<rootDir>/test/styleMock.js',

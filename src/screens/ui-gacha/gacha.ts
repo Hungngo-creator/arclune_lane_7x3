@@ -7,6 +7,8 @@ import {
   subscribeSharedCurrencyWallet,
   syncSharedCurrencyWallet,
 } from '../../utils/currency.ts';
+import { loadPlayerProfile, patchPlayerProfile } from '../../utils/player-profile.ts';
+import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { payForRoll } from './logic/currency.ts';
 import { getBannerById, getSummonableFeaturedUnits, multiRoll, rollBanner } from './logic/gacha.ts';
 import { getBannerState } from './logic/pity.ts';
@@ -66,6 +68,20 @@ interface PityMeterNodes {
 
 const currencyValueNodeCache = new WeakMap<HTMLElement, Map<CurrencyCode, HTMLElement>>();
 const bannerButtonNodeCache = new WeakMap<HTMLElement, Map<string, HTMLButtonElement>>();
+
+function markOwnedUnits(unitIds: Iterable<string>): void {
+  const ownedByUnit: Record<string, boolean> = { ...(loadPlayerProfile().ownedByUnit ?? {}) };
+  let changed = false;
+  for (const unitId of unitIds) {
+    const normalizedId = normalizeUnitId(unitId);
+    if (!normalizedId || ownedByUnit[normalizedId] === true) continue;
+    ownedByUnit[normalizedId] = true;
+    changed = true;
+  }
+  if (changed) {
+    patchPlayerProfile({ ownedByUnit });
+  }
+}
 
 function formatNumber(value: number): string {
   return NUMBER_FORMAT.format(Math.max(0, Math.trunc(value)));
@@ -901,21 +917,23 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     renderWallet();
     const historyEntries: SummonHistoryEntry[] = [];
     const rolls = count === 10 ? multiRoll(banner, state.states, 10) : [rollBanner(banner, state.states)];
-    const featuredByRarity = getSummonableFeaturedUnits(banner);
     const now = Date.now();
+    const rolledUnitIds: string[] = [];
     for (const roll of rolls) {
-      const featuredUnit = roll.outcome.featured
-        ? featuredByRarity.find((unit) => unit.rarity === roll.outcome.rarity) ?? null
-        : null;
+      const rolledUnit = roll.unit ?? null;
+      if (rolledUnit?.id) {
+        rolledUnitIds.push(rolledUnit.id);
+      }
       historyEntries.push({
         time: now,
         bannerLabel: banner.label,
         rarity: roll.outcome.rarity,
-        name: featuredUnit?.name ?? null,
+        name: rolledUnit?.name ?? null,
         featured: roll.outcome.featured,
         pity: roll.outcome.pityTriggered === 'hard' ? 'Hard pity' : roll.outcome.pityTriggered === 'soft' ? 'Soft pity' : roll.outcome.pityTriggered === 'srFloor' ? 'SR floor' : null,
       });
     }
+    markOwnedUnits(rolledUnitIds);
     state.summonHistory = [...historyEntries, ...state.summonHistory].slice(0, 50);
     renderPity(pitySlot, banner, state.states);
     if (drawer.classList.contains('is-open')) {

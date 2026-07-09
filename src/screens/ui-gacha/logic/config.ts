@@ -33,8 +33,8 @@ const BANNERS: BannerDefinition[] = [
       ssr: { soft: 60, softStep: 0.005, hard: 80, hardGuaranteeFeatured: false, carryOver: true },
     },
     featured: [
-      { id: 'permanent-02', name: 'Thiên Lưu', rarity: 'SSR', portrait: 'assets/u_thien_luu.svg' },
-      { id: 'permanent-03', name: 'Mộ Dạ', rarity: 'SSR', portrait: 'assets/u_mo_da.svg' },
+      { id: 'thien_luu', name: 'Thiên Lưu', rarity: 'SSR', portrait: 'assets/u_thien_luu.svg' },
+      { id: 'mo_da', name: 'Mộ Dạ', rarity: 'SSR', portrait: 'assets/u_mo_da.svg' },
     ],
     background: 'assets/banner_standard.svg',
   },
@@ -51,7 +51,7 @@ const BANNERS: BannerDefinition[] = [
       ssr: { soft: 60, softStep: 0.005, hard: 80, hardGuaranteeFeatured: false },
     },
     featured: [
-      { id: 'limited-ssr-04', name: 'Mộng Yểm', rarity: 'SSR', portrait: 'assets/u_mong_yem.svg' },
+      { id: 'mong_yem', name: 'Mộng Yểm', rarity: 'SSR', portrait: 'assets/u_mong_yem.svg' },
     ],
     expiresAt: now + 7 * day,
     background: 'assets/banner_dragon.svg',
@@ -69,8 +69,8 @@ const BANNERS: BannerDefinition[] = [
       ur: { soft: 70, softStep: 0.003, hard: 90, hardGuaranteeFeatured: true },
     },
     featured: [
-      { id: 'limited-prime-01', name: 'Lậu Khắc Ma Chủ', rarity: 'Prime', portrait: 'assets/u_lau_khac_ma_chu.svg' },
-      { id: 'limited-prime-02', name: 'Dạ Nhạc', rarity: 'Prime', portrait: 'assets/u_chan_nga.svg' },
+      { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', rarity: 'Prime', portrait: 'assets/u_lau_khac_ma_chu.svg' },
+      { id: 'chan_nga', name: 'Dạ Nhạc', rarity: 'Prime', portrait: 'assets/u_chan_nga.svg' },
     ],
     expiresAt: now + 3 * day,
     background: 'assets/banner_void.svg',

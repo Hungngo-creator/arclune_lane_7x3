@@ -4,7 +4,7 @@ import { getSkillSet } from '../../../data/skills.ts';
 import { createNumberFormatter } from '../../../utils/format.ts';
 import { normalizeUnitId } from '../../../utils/unit-id.ts';
 import { normalizeElementKey } from '../../../utils/domain-normalization.ts';
-import { loadPlayerProfile, patchPlayerProfile } from '../../../utils/player-profile.ts';
+import { isUnitOwnedByProfile, loadPlayerProfile, patchPlayerProfile } from '../../../utils/player-profile.ts';
 import {
   createNormalizedWallet,
   getCurrencyOrder,
@@ -559,7 +559,8 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
 
   ensureStyles();
 
-  const normalizedRoster = normalizeRoster(roster ?? null);
+  const profile = loadPlayerProfile();
+  const normalizedRoster = normalizeRoster(roster ?? null).filter((unit) => isUnitOwnedByProfile(profile, normalizeUnitId(unit.id), { rank: unit.rank || null }));
   const normalizedLineups = normalizeLineups(lineups ?? null, normalizedRoster);
   const rosterLookup = new Map<string, RosterUnit>(
     normalizedRoster.map(unit => [normalizeUnitId(unit.id), unit] as const),
@@ -567,7 +568,6 @@ export function renderLineupView(options: LineupViewOptions): LineupViewHandle{
   const skillSetCache = new Map<string, ReturnType<typeof getSkillSet> | null>();
 
   const lineupState = new Map<string, LineupState>();
-  const profile = loadPlayerProfile();
   const savedLineupStateById = profile.lineupStateById ?? {};
   const savedPassiveSelectionById = profile.lineupPassiveSelectionById ?? {};
   normalizedLineups.forEach(lineup => {

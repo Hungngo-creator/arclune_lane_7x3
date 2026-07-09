@@ -31,7 +31,7 @@ import {
   ensureNumberFormatter,
 } from './helpers.ts';
 import { createFilterState, updateActiveTab, updateSelectedUnit } from './state.ts';
-import { loadPlayerProfile, patchPlayerProfile } from '../../utils/player-profile.ts';
+import { isUnitOwnedByProfile, loadPlayerProfile, patchPlayerProfile } from '../../utils/player-profile.ts';
 import type { AbilityFact } from './helpers.ts';
 import type {
   CollectionEntry,
@@ -1041,7 +1041,7 @@ export function renderCollectionView(options: CollectionViewOptions): Collection
   const rosterList = document.createElement('ul');
   rosterList.className = 'collection-roster__list';
 
-  const rosterSource = buildRosterWithCost(cloneRoster(roster));
+  const rosterSource = buildRosterWithCost(cloneRoster(roster)).filter((unit) => isUnitOwnedByProfile(savedProfile, normalizeUnitId(unit.id), { rank: typeof unit.rank === 'string' ? unit.rank : null }));
   const skillSetCache = new Map<string, ReturnType<typeof getSkillSet>>();
   const abilityDetailCache = new Map<string, AbilityDetailRecord>();
   const abilityRenderCache = new Map<string, HTMLElement[]>();

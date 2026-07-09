@@ -194,6 +194,17 @@ export function patchPlayerProfile(patch: SavedPlayerProfile): SavedPlayerProfil
   return merged;
 }
 
+export function isUnitOwnedByProfile(
+  profile: SavedPlayerProfile,
+  unitId: string | null | undefined,
+  options: { rank?: string | null } = {},
+): boolean {
+  const normalizedId = toNonEmptyString(unitId);
+  if (!normalizedId) return false;
+  if (profile.ownedByUnit?.[normalizedId] === true) return true;
+  return options.rank === 'Prime';
+}
+
 export function resetPlayerProfileData(): SavedPlayerProfile {
   const current = loadPlayerProfile();
   const resetProfile: SavedPlayerProfile = {

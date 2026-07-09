@@ -132,4 +132,5 @@ export interface RollOutcome {
 export interface RollResult {
   readonly outcome: RollOutcome;
   readonly pity: PityCounters;
+  readonly unit?: FeaturedUnit | null;
 }

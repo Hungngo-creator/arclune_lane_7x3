@@ -1,6 +1,7 @@
 import { convertCurrency, payForRoll } from '../../src/screens/ui-gacha/logic/currency.ts';
 import { createWallet, GACHA_CONFIG } from '../../src/screens/ui-gacha/logic/config.ts';
 import { getBannerById, rollBanner } from '../../src/screens/ui-gacha/logic/gacha.ts';
+import { getBannerPoolByRarity, getPermanentGachaPool } from '../../src/screens/ui-gacha/logic/pool.ts';
 import type { BannerStateMap } from '../../src/screens/ui-gacha/logic/types.ts';
 
 describe('Hệ tiền tệ', () => {
@@ -88,6 +89,26 @@ describe('Pity & bảo hiểm', () => {
 
   const stuckRng = () => 0.9999;
 
+  test('SSR featured có thể chọn cả hai unit rate-up bằng unitRng', () => {
+    const banner = getBannerById('permanent');
+    expect(banner).not.toBeNull();
+    const first = rollBanner(banner!, makeStateMap(), {
+      rng: () => 0,
+      featuredRng: () => 0,
+      unitRng: () => 0,
+    });
+    const second = rollBanner(banner!, makeStateMap(), {
+      rng: () => 0,
+      featuredRng: () => 0,
+      unitRng: () => 0.999,
+    });
+    expect(first.outcome.rarity).toBe('SSR');
+    expect(first.outcome.featured).toBe(true);
+    expect(second.outcome.rarity).toBe('SSR');
+    expect(second.outcome.featured).toBe(true);
+    expect(new Set([first.unit?.id, second.unit?.id])).toEqual(new Set(['thien_luu', 'mo_da']));
+  });
+
   test('Hard pity SSR ở roll 80 banner Permanent', () => {
     const banner = getBannerById('permanent');
     expect(banner).not.toBeNull();
@@ -124,5 +145,31 @@ describe('Pity & bảo hiểm', () => {
     expect(result.outcome.rarity).toBe('Prime');
     expect(result.outcome.pityTriggered).toBe('hard');
     expect(result.outcome.featured).toBe(true);
+  });
+});
+describe('Gacha dynamic catalog pool', () => {
+  const limitedPrime = GACHA_CONFIG.banners.find((banner) => banner.id === 'limited-prime')!;
+
+  test('permanent pool tự nhận SSR mới từ catalog fixture và loại UR/Prime', () => {
+    const fixture = [
+      { id: 'mock_ssr_new', name: 'Mock SSR', rank: 'SSR' },
+      { id: 'mock_ur_new', name: 'Mock UR', rank: 'UR' },
+      { id: 'mock_prime_new', name: 'Mock Prime', rank: 'Prime' },
+    ];
+    const pool = getPermanentGachaPool(fixture);
+    expect(pool.map((unit) => unit.id)).toContain('mock_ssr_new');
+    expect(pool.map((unit) => unit.id)).not.toContain('mock_ur_new');
+    expect(pool.map((unit) => unit.id)).not.toContain('mock_prime_new');
+  });
+
+  test('pool loại npc/pve/creep và limited fallback vẫn lấy đúng rarity hợp lệ', () => {
+    const fixture = [
+      { id: 'creep_1', name: 'Creep', rank: 'SSR' },
+      { id: 'npc_ssr', name: 'NPC', rank: 'SSR', tags: ['npc'] },
+      { id: 'pve_ssr', name: 'PvE', rank: 'SSR', notes: 'pve_only' },
+      { id: 'valid_prime', name: 'Valid Prime', rank: 'Prime' },
+    ];
+    expect(getPermanentGachaPool(fixture)).toHaveLength(0);
+    expect(getBannerPoolByRarity(limitedPrime, 'Prime', fixture).map((unit) => unit.id)).toEqual(['valid_prime']);
   });
 });

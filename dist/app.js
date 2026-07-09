@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -26466,6 +26466,7 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
   const updateActiveTab = __dep13.updateActiveTab;
   const updateSelectedUnit = __dep13.updateSelectedUnit;
   const __dep14 = __require('./utils/player-profile.ts');
+  const isUnitOwnedByProfile = __dep14.isUnitOwnedByProfile;
   const loadPlayerProfile = __dep14.loadPlayerProfile;
   const patchPlayerProfile = __dep14.patchPlayerProfile;
   const STYLE_ID = 'collection-view-style-v2';
@@ -27302,7 +27303,7 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
       rosterPanel.className = 'collection-roster';
       const rosterList = document.createElement('ul');
       rosterList.className = 'collection-roster__list';
-      const rosterSource = buildRosterWithCost(cloneRoster(roster));
+      const rosterSource = buildRosterWithCost(cloneRoster(roster)).filter((unit) => isUnitOwnedByProfile(savedProfile, normalizeUnitId(unit.id), { rank: typeof unit.rank === 'string' ? unit.rank : null }));
       const skillSetCache = new Map();
       const abilityDetailCache = new Map();
       const abilityRenderCache = new Map();
@@ -29295,6 +29296,7 @@ __modules['./screens/lineup/view/render.ts'] = (exports, module, __require) => {
   const __dep3 = __require('./utils/domain-normalization.ts');
   const normalizeElementKey = __dep3.normalizeElementKey;
   const __dep4 = __require('./utils/player-profile.ts');
+  const isUnitOwnedByProfile = __dep4.isUnitOwnedByProfile;
   const loadPlayerProfile = __dep4.loadPlayerProfile;
   const patchPlayerProfile = __dep4.patchPlayerProfile;
   const __dep5 = __require('./utils/currency.ts');
@@ -29760,12 +29762,12 @@ __modules['./screens/lineup/view/render.ts'] = (exports, module, __require) => {
           message: 'renderLineupView cần một phần tử root hợp lệ.',
       });
       ensureStyles();
-      const normalizedRoster = normalizeRoster(roster ?? null);
+      const profile = loadPlayerProfile();
+      const normalizedRoster = normalizeRoster(roster ?? null).filter((unit) => isUnitOwnedByProfile(profile, normalizeUnitId(unit.id), { rank: unit.rank || null }));
       const normalizedLineups = normalizeLineups(lineups ?? null, normalizedRoster);
       const rosterLookup = new Map(normalizedRoster.map(unit => [normalizeUnitId(unit.id), unit]));
       const skillSetCache = new Map();
       const lineupState = new Map();
-      const profile = loadPlayerProfile();
       const savedLineupStateById = profile.lineupStateById ?? {};
       const savedPassiveSelectionById = profile.lineupPassiveSelectionById ?? {};
       normalizedLineups.forEach(lineup => {
@@ -36456,17 +36458,22 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
   const getSharedCurrencyWallet = __dep1.getSharedCurrencyWallet;
   const subscribeSharedCurrencyWallet = __dep1.subscribeSharedCurrencyWallet;
   const syncSharedCurrencyWallet = __dep1.syncSharedCurrencyWallet;
-  const __dep2 = __require('./screens/ui-gacha/logic/currency.ts');
-  const payForRoll = __dep2.payForRoll;
-  const __dep3 = __require('./screens/ui-gacha/logic/gacha.ts');
-  const getBannerById = __dep3.getBannerById;
-  const getSummonableFeaturedUnits = __dep3.getSummonableFeaturedUnits;
-  const multiRoll = __dep3.multiRoll;
-  const rollBanner = __dep3.rollBanner;
-  const __dep4 = __require('./screens/ui-gacha/logic/pity.ts');
-  const getBannerState = __dep4.getBannerState;
-  const __dep5 = __require('./screens/ui-gacha/logic/types.ts');
-  const CURRENCY_ORDER = __dep5.CURRENCY_ORDER;
+  const __dep2 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep2.loadPlayerProfile;
+  const patchPlayerProfile = __dep2.patchPlayerProfile;
+  const __dep3 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep3.normalizeUnitId;
+  const __dep4 = __require('./screens/ui-gacha/logic/currency.ts');
+  const payForRoll = __dep4.payForRoll;
+  const __dep5 = __require('./screens/ui-gacha/logic/gacha.ts');
+  const getBannerById = __dep5.getBannerById;
+  const getSummonableFeaturedUnits = __dep5.getSummonableFeaturedUnits;
+  const multiRoll = __dep5.multiRoll;
+  const rollBanner = __dep5.rollBanner;
+  const __dep6 = __require('./screens/ui-gacha/logic/pity.ts');
+  const getBannerState = __dep6.getBannerState;
+  const __dep7 = __require('./screens/ui-gacha/logic/types.ts');
+  const CURRENCY_ORDER = __dep7.CURRENCY_ORDER;
   const NUMBER_FORMAT = new Intl.NumberFormat('vi-VN');
   const COMPACT_NUMBER_FORMAT = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 });
   const TIME_FORMAT = new Intl.RelativeTimeFormat('vi', { style: 'short', numeric: 'auto' });
@@ -36480,6 +36487,20 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
   };
   const currencyValueNodeCache = new WeakMap();
   const bannerButtonNodeCache = new WeakMap();
+  function markOwnedUnits(unitIds) {
+      const ownedByUnit = { ...(loadPlayerProfile().ownedByUnit ?? {}) };
+      let changed = false;
+      for (const unitId of unitIds) {
+          const normalizedId = normalizeUnitId(unitId);
+          if (!normalizedId || ownedByUnit[normalizedId] === true)
+              continue;
+          ownedByUnit[normalizedId] = true;
+          changed = true;
+      }
+      if (changed) {
+          patchPlayerProfile({ ownedByUnit });
+      }
+  }
   function formatNumber(value) {
       return NUMBER_FORMAT.format(Math.max(0, Math.trunc(value)));
   }
@@ -37233,21 +37254,23 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
           renderWallet();
           const historyEntries = [];
           const rolls = count === 10 ? multiRoll(banner, state.states, 10) : [rollBanner(banner, state.states)];
-          const featuredByRarity = getSummonableFeaturedUnits(banner);
           const now = Date.now();
+          const rolledUnitIds = [];
           for (const roll of rolls) {
-              const featuredUnit = roll.outcome.featured
-                  ? featuredByRarity.find((unit) => unit.rarity === roll.outcome.rarity) ?? null
-                  : null;
+              const rolledUnit = roll.unit ?? null;
+              if (rolledUnit?.id) {
+                  rolledUnitIds.push(rolledUnit.id);
+              }
               historyEntries.push({
                   time: now,
                   bannerLabel: banner.label,
                   rarity: roll.outcome.rarity,
-                  name: featuredUnit?.name ?? null,
+                  name: rolledUnit?.name ?? null,
                   featured: roll.outcome.featured,
                   pity: roll.outcome.pityTriggered === 'hard' ? 'Hard pity' : roll.outcome.pityTriggered === 'soft' ? 'Soft pity' : roll.outcome.pityTriggered === 'srFloor' ? 'SR floor' : null,
               });
           }
+          markOwnedUnits(rolledUnitIds);
           state.summonHistory = [...historyEntries, ...state.summonHistory].slice(0, 50);
           renderPity(pitySlot, banner, state.states);
           if (drawer.classList.contains('is-open')) {
@@ -37640,8 +37663,8 @@ __modules['./screens/ui-gacha/logic/config.ts'] = (exports, module, __require) =
               ssr: { soft: 60, softStep: 0.005, hard: 80, hardGuaranteeFeatured: false, carryOver: true },
           },
           featured: [
-              { id: 'permanent-02', name: 'Thiên Lưu', rarity: 'SSR', portrait: 'assets/u_thien_luu.svg' },
-              { id: 'permanent-03', name: 'Mộ Dạ', rarity: 'SSR', portrait: 'assets/u_mo_da.svg' },
+              { id: 'thien_luu', name: 'Thiên Lưu', rarity: 'SSR', portrait: 'assets/u_thien_luu.svg' },
+              { id: 'mo_da', name: 'Mộ Dạ', rarity: 'SSR', portrait: 'assets/u_mo_da.svg' },
           ],
           background: 'assets/banner_standard.svg',
       },
@@ -37658,7 +37681,7 @@ __modules['./screens/ui-gacha/logic/config.ts'] = (exports, module, __require) =
               ssr: { soft: 60, softStep: 0.005, hard: 80, hardGuaranteeFeatured: false },
           },
           featured: [
-              { id: 'limited-ssr-04', name: 'Mộng Yểm', rarity: 'SSR', portrait: 'assets/u_mong_yem.svg' },
+              { id: 'mong_yem', name: 'Mộng Yểm', rarity: 'SSR', portrait: 'assets/u_mong_yem.svg' },
           ],
           expiresAt: now + 7 * day,
           background: 'assets/banner_dragon.svg',
@@ -37676,8 +37699,8 @@ __modules['./screens/ui-gacha/logic/config.ts'] = (exports, module, __require) =
               ur: { soft: 70, softStep: 0.003, hard: 90, hardGuaranteeFeatured: true },
           },
           featured: [
-              { id: 'limited-prime-01', name: 'Lậu Khắc Ma Chủ', rarity: 'Prime', portrait: 'assets/u_lau_khac_ma_chu.svg' },
-              { id: 'limited-prime-02', name: 'Dạ Nhạc', rarity: 'Prime', portrait: 'assets/u_chan_nga.svg' },
+              { id: 'lau_khac_ma_chu', name: 'Lậu Khắc Ma Chủ', rarity: 'Prime', portrait: 'assets/u_lau_khac_ma_chu.svg' },
+              { id: 'chan_nga', name: 'Dạ Nhạc', rarity: 'Prime', portrait: 'assets/u_chan_nga.svg' },
           ],
           expiresAt: now + 3 * day,
           background: 'assets/banner_void.svg',
@@ -38014,8 +38037,27 @@ __modules['./screens/ui-gacha/logic/gacha.ts'] = (exports, module, __require) =>
   const __dep1 = __require('./screens/ui-gacha/logic/pity.ts');
   const applyRoll = __dep1.applyRoll;
   const getBannerState = __dep1.getBannerState;
+  const __dep2 = __require('./screens/ui-gacha/logic/pool.ts');
+  const getBannerPoolByRarity = __dep2.getBannerPoolByRarity;
+  const isGachaSummonableCatalogUnit = __dep2.isGachaSummonableCatalogUnit;
   const DEFAULT_RANDOM = () => Math.random();
-  const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve']);
+  function pickUnitFromPool(pool, rng) {
+      if (pool.length === 0) {
+          return null;
+      }
+      const normalized = Math.max(0, Math.min(0.999999, rng()));
+      return pool[Math.floor(normalized * pool.length)] ?? null;
+  }
+  function resolveRollUnit(banner, result, rng) {
+      const rarity = result.outcome.rarity;
+      const featuredPool = result.outcome.featured ? getSummonableFeaturedByRarity(banner, rarity) : [];
+      const pool = featuredPool.length > 0 ? featuredPool : getBannerPoolByRarity(banner, rarity);
+      const unit = pickUnitFromPool(pool, rng);
+      if (!unit && typeof console !== 'undefined' && typeof console.warn === 'function') {
+          console.warn(`[gacha] Empty unit pool for ${banner.id}/${rarity}; roll will not unlock a unit.`);
+      }
+      return { ...result, unit };
+  }
   const FEATURED_SUMMONABLE_CACHE = new WeakMap();
   const FEATURED_BY_RARITY_CACHE = new WeakMap();
   let bannerLookupSource = null;
@@ -38030,13 +38072,7 @@ __modules['./screens/ui-gacha/logic/gacha.ts'] = (exports, module, __require) =>
       return bannerLookupById;
   }
   function isGachaSummonableFeaturedUnit(entry) {
-      if (!entry || typeof entry !== 'object')
-          return false;
-      if (entry.isNpc === true)
-          return false;
-      if (!Array.isArray(entry.tags))
-          return true;
-      return !entry.tags.some((tag) => typeof tag === 'string' && EXCLUDED_GACHA_TAGS.has(tag.trim().toLowerCase()));
+      return isGachaSummonableCatalogUnit(entry);
   }
   function getSummonableFeaturedUnits(banner) {
       const cached = FEATURED_SUMMONABLE_CACHE.get(banner);
@@ -38076,8 +38112,10 @@ __modules['./screens/ui-gacha/logic/gacha.ts'] = (exports, module, __require) =>
   function rollBanner(banner, stateMap, options = {}) {
       const rng = options.rng ?? DEFAULT_RANDOM;
       const featuredRng = options.featuredRng ?? DEFAULT_RANDOM;
+      const unitRng = options.unitRng ?? featuredRng;
       const state = getBannerState(stateMap, banner);
-      return applyRoll(banner, state, rng, (rarity, forced) => shouldHitFeatured(banner, rarity, forced, featuredRng));
+      const result = applyRoll(banner, state, rng, (rarity, forced) => shouldHitFeatured(banner, rarity, forced, featuredRng));
+      return resolveRollUnit(banner, result, unitRng);
   }
   function multiRoll(banner, stateMap, count, options = {}) {
       const total = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
@@ -38086,11 +38124,12 @@ __modules['./screens/ui-gacha/logic/gacha.ts'] = (exports, module, __require) =>
       }
       const rng = options.rng ?? DEFAULT_RANDOM;
       const featuredRng = options.featuredRng ?? DEFAULT_RANDOM;
+      const unitRng = options.unitRng ?? featuredRng;
       const state = getBannerState(stateMap, banner);
       const chooseFeatured = (rarity, forced) => (shouldHitFeatured(banner, rarity, forced, featuredRng));
       const results = new Array(total);
       for (let i = 0; i < total; i += 1) {
-          results[i] = applyRoll(banner, state, rng, chooseFeatured);
+          results[i] = resolveRollUnit(banner, applyRoll(banner, state, rng, chooseFeatured), unitRng);
       }
       return results;
   }
@@ -38309,6 +38348,112 @@ __modules['./screens/ui-gacha/logic/pity.ts'] = (exports, module, __require) => 
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerState')) exports.getBannerState = getBannerState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollOnce')) exports.rollOnce = rollOnce;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyRoll')) exports.applyRoll = applyRoll;
+};
+__modules['./screens/ui-gacha/logic/pool.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./catalog.ts');
+  const ROSTER = __dep0.ROSTER;
+  const __dep1 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep1.normalizeUnitId;
+  const __dep2 = __require('./screens/ui-gacha/logic/types.ts');
+  const RARITY_ORDER = __dep2.RARITY_ORDER;
+  const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve', 'pve_only']);
+  const EXCLUDED_GACHA_IDS = new Set(['creep_1', 'creep_2', 'creep_3']);
+  const PERMANENT_POOL_RARITIES = new Set(['N', 'R', 'SR', 'SSR']);
+  const VALID_RARITIES = new Set(RARITY_ORDER);
+  const toStringValue = (value) => {
+      if (typeof value !== 'string')
+          return null;
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? trimmed : null;
+  };
+  function normalizeGachaRarity(value) {
+      const text = toStringValue(value);
+      if (!text)
+          return null;
+      const matched = RARITY_ORDER.find((rarity) => rarity.toLowerCase() === text.toLowerCase());
+      return matched && VALID_RARITIES.has(matched) ? matched : null;
+  }
+  const readRank = (entry) => (normalizeGachaRarity(entry.rank)
+      ?? normalizeGachaRarity(entry.rarity)
+      ?? normalizeGachaRarity(entry.tier));
+  const readTags = (entry) => {
+      if (!Array.isArray(entry.tags))
+          return [];
+      return entry.tags
+          .map((tag) => toStringValue(tag)?.toLowerCase() ?? null)
+          .filter((tag) => Boolean(tag));
+  };
+  const hasExcludedNotes = (entry) => {
+      const notes = toStringValue(entry.notes)?.toLowerCase();
+      if (!notes)
+          return false;
+      return notes.includes('pve_only') || notes.includes('npc') || notes.includes('pve');
+  };
+  function isGachaSummonableCatalogUnit(entry) {
+      if (!entry || typeof entry !== 'object' || Array.isArray(entry))
+          return false;
+      const record = entry;
+      const id = toStringValue(record.id ?? record.key);
+      if (!id || EXCLUDED_GACHA_IDS.has(normalizeUnitId(id)))
+          return false;
+      if (record.isNpc === true)
+          return false;
+      if (!readRank(record))
+          return false;
+      if (readTags(record).some((tag) => EXCLUDED_GACHA_TAGS.has(tag)))
+          return false;
+      return !hasExcludedNotes(record);
+  }
+  function toGachaPoolUnit(entry) {
+      if (!isGachaSummonableCatalogUnit(entry))
+          return null;
+      const id = toStringValue(entry.id ?? entry.key);
+      const rarity = readRank(entry);
+      if (!id || !rarity)
+          return null;
+      const normalizedId = normalizeUnitId(id);
+      return {
+          id: normalizedId,
+          name: toStringValue(entry.name ?? entry.title) ?? normalizedId,
+          rarity,
+          portrait: toStringValue(entry.portrait ?? entry.avatar ?? entry.icon),
+          isNpc: false,
+          tags: readTags(entry),
+          source: entry,
+      };
+  }
+  function createGachaPool(source = ROSTER) {
+      const pool = [];
+      const seen = new Set();
+      for (const entry of source) {
+          const unit = toGachaPoolUnit(entry);
+          if (!unit || seen.has(unit.id))
+              continue;
+          seen.add(unit.id);
+          pool.push(unit);
+      }
+      return pool;
+  }
+  function getPermanentGachaPool(source) {
+      return createGachaPool(source).filter((unit) => PERMANENT_POOL_RARITIES.has(unit.rarity));
+  }
+  function getBannerFallbackPool(banner, source) {
+      if (banner.type === 'Permanent') {
+          return getPermanentGachaPool(source);
+      }
+      return createGachaPool(source);
+  }
+  function getBannerPoolByRarity(banner, rarity, source) {
+      return getBannerFallbackPool(banner, source).filter((unit) => unit.rarity === rarity);
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeGachaRarity')) exports.normalizeGachaRarity = normalizeGachaRarity;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isGachaSummonableCatalogUnit')) exports.isGachaSummonableCatalogUnit = isGachaSummonableCatalogUnit;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'toGachaPoolUnit')) exports.toGachaPoolUnit = toGachaPoolUnit;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createGachaPool')) exports.createGachaPool = createGachaPool;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getPermanentGachaPool')) exports.getPermanentGachaPool = getPermanentGachaPool;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerFallbackPool')) exports.getBannerFallbackPool = getBannerFallbackPool;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getBannerPoolByRarity')) exports.getBannerPoolByRarity = getBannerPoolByRarity;
 };
 __modules['./screens/ui-gacha/logic/types.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/ui-gacha/logic/types.ts
@@ -45900,6 +46045,14 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
       savePlayerProfile(merged);
       return merged;
   }
+  function isUnitOwnedByProfile(profile, unitId, options = {}) {
+      const normalizedId = toNonEmptyString(unitId);
+      if (!normalizedId)
+          return false;
+      if (profile.ownedByUnit?.[normalizedId] === true)
+          return true;
+      return options.rank === 'Prime';
+  }
   function resetPlayerProfileData() {
       const current = loadPlayerProfile();
       const resetProfile = {
@@ -45921,6 +46074,7 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'loadPlayerProfile')) exports.loadPlayerProfile = loadPlayerProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'savePlayerProfile')) exports.savePlayerProfile = savePlayerProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'patchPlayerProfile')) exports.patchPlayerProfile = patchPlayerProfile;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isUnitOwnedByProfile')) exports.isUnitOwnedByProfile = isUnitOwnedByProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resetPlayerProfileData')) exports.resetPlayerProfileData = resetPlayerProfileData;
 };
 __modules['./utils/profile-progress-merge.ts'] = (exports, module, __require) => {

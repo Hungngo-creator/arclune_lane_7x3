@@ -9,10 +9,33 @@ import {
   type RollResult,
   type Rarity,
 } from './types.ts';
+import { getBannerPoolByRarity, isGachaSummonableCatalogUnit } from './pool.ts';
 
 const DEFAULT_RANDOM: RandomSource = () => Math.random();
 
-const EXCLUDED_GACHA_TAGS = new Set(['npc', 'pve']);
+function pickUnitFromPool<TUnit extends FeaturedUnit>(pool: readonly TUnit[], rng: RandomSource): TUnit | null {
+  if (pool.length === 0) {
+    return null;
+  }
+  const normalized = Math.max(0, Math.min(0.999999, rng()));
+  return pool[Math.floor(normalized * pool.length)] ?? null;
+}
+
+function resolveRollUnit(
+  banner: BannerDefinition,
+  result: RollResult,
+  rng: RandomSource,
+): RollResult {
+  const rarity = result.outcome.rarity;
+  const featuredPool = result.outcome.featured ? getSummonableFeaturedByRarity(banner, rarity) : [];
+  const pool = featuredPool.length > 0 ? featuredPool : getBannerPoolByRarity(banner, rarity);
+  const unit = pickUnitFromPool(pool, rng);
+  if (!unit && typeof console !== 'undefined' && typeof console.warn === 'function') {
+    console.warn(`[gacha] Empty unit pool for ${banner.id}/${rarity}; roll will not unlock a unit.`);
+  }
+  return { ...result, unit };
+}
+
 const FEATURED_SUMMONABLE_CACHE = new WeakMap<BannerDefinition, FeaturedUnit[]>();
 const FEATURED_BY_RARITY_CACHE = new WeakMap<BannerDefinition, Map<Rarity, FeaturedUnit[]>>();
 let bannerLookupSource: ReadonlyArray<BannerDefinition> | null = null;
@@ -29,10 +52,7 @@ function getBannerLookup(): Map<string, BannerDefinition> {
 }
 
 export function isGachaSummonableFeaturedUnit(entry: FeaturedUnit): boolean {
-  if (!entry || typeof entry !== 'object') return false;
-  if (entry.isNpc === true) return false;
-  if (!Array.isArray(entry.tags)) return true;
-  return !entry.tags.some((tag) => typeof tag === 'string' && EXCLUDED_GACHA_TAGS.has(tag.trim().toLowerCase()));
+  return isGachaSummonableCatalogUnit(entry);
 }
 
 export function getSummonableFeaturedUnits(banner: BannerDefinition): FeaturedUnit[] {
@@ -81,19 +101,21 @@ function shouldHitFeatured(
 export function rollBanner(
   banner: BannerDefinition,
   stateMap: BannerStateMap,
-  options: { rng?: RandomSource; featuredRng?: RandomSource } = {},
+  options: { rng?: RandomSource; featuredRng?: RandomSource; unitRng?: RandomSource } = {},
 ): RollResult {
   const rng = options.rng ?? DEFAULT_RANDOM;
   const featuredRng = options.featuredRng ?? DEFAULT_RANDOM;
+  const unitRng = options.unitRng ?? featuredRng;
   const state = getBannerState(stateMap, banner);
-  return applyRoll(banner, state, rng, (rarity, forced) => shouldHitFeatured(banner, rarity, forced, featuredRng));
+  const result = applyRoll(banner, state, rng, (rarity, forced) => shouldHitFeatured(banner, rarity, forced, featuredRng));
+  return resolveRollUnit(banner, result, unitRng);
 }
 
 export function multiRoll(
   banner: BannerDefinition,
   stateMap: BannerStateMap,
   count: number,
-  options: { rng?: RandomSource; featuredRng?: RandomSource } = {},
+  options: { rng?: RandomSource; featuredRng?: RandomSource; unitRng?: RandomSource } = {},
 ): RollResult[] {
   const total = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
   if (total === 0) {
@@ -102,6 +124,7 @@ export function multiRoll(
 
   const rng = options.rng ?? DEFAULT_RANDOM;
   const featuredRng = options.featuredRng ?? DEFAULT_RANDOM;
+  const unitRng = options.unitRng ?? featuredRng;
   const state = getBannerState(stateMap, banner);
   const chooseFeatured = (rarity: Rarity, forced: boolean): boolean => (
     shouldHitFeatured(banner, rarity, forced, featuredRng)
@@ -109,7 +132,7 @@ export function multiRoll(
 
   const results = new Array<RollResult>(total);
   for (let i = 0; i < total; i += 1) {
-    results[i] = applyRoll(banner, state, rng, chooseFeatured);
+    results[i] = resolveRollUnit(banner, applyRoll(banner, state, rng, chooseFeatured), unitRng);
   }
   return results;
 }
