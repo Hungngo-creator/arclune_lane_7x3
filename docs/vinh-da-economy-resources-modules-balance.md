@@ -5,6 +5,7 @@
 > Phần `# Hệ thống Rune và Bệ Đá Cổ — Bản cân bằng đề xuất` ở cuối spec gốc không bị sửa trong tài liệu này.
 >
 > Mục tiêu: tạo hệ thống tài nguyên chặt, tỉ lệ rơi rõ, chi phí xây/nâng kiến trúc rõ, quy đổi tài nguyên qua base sang Nguyên Tinh rõ, và thêm module/kẻ thù/tiền tố sinh vật để mode Vĩnh Dạ có kinh tế đủ sâu cho prototype.
+> rank multi trong mode này chỉ áp dụng lên 5 chỉ số là HP/ATK/WIL/ARM/RES.
 
 ---
 
@@ -699,6 +700,8 @@ Drop:
 
 ### 7.3. Kẻ Nghe Tiếng Gọi
 
+Nên gọi là "Vọng Giả" Hoặc "Vọng Thính Giả" sẽ hay hơn
+
 Lore:
 
 - Không phải tín đồ tự nguyện.
@@ -811,6 +814,7 @@ Nội tại — Âm Ảnh Mẫu Nghi:
 ```text
 Mỗi 8s triệu hồi 1 Kẻ Nghe Tiếng Gọi nếu còn slot summon.
 Tối đa 3 đơn vị triệu hồi sống cùng lúc.
+Đối tượng summon từ nội tại này không vào Threat Cost cungc không tăng Threat Cost của Hắc Ám Chủ Tế, vẫn nhận ảnh hưởng của rune.
 ```
 
 Skill — Dấu Ấn Vô Thức:
@@ -860,7 +864,7 @@ Cơ chế:
 Không tự đi.
 Mỗi 15s sinh ra 1 đợt 3–5 quái Vĩnh Dạ dựa theo tier map.
 Mỗi 20% HP mất đi, sinh ra 1 mini-wave.
-Nếu không bị phong ấn sau khi HP về 0 trong 30s, hồi lại 20% max HP.
+Nếu không bị phong ấn sau khi HP về 0 trong 30s, hồi lại 20% max HP (không sinh mini wave).
 ```
 
 Điều kiện kết liễu:
@@ -1000,7 +1004,7 @@ Quyền đặc biệt:
 Nhận 1 minor trait dựa theo phe:
 - Vĩnh Dạ: áp Ô Nhiễm chậm hoặc aura nhỏ.
 - Huyết Chủ: tự hồi hoặc buff đồng minh.
-- Hắc Ám: triệu hồi nhỏ hoặc tăng WIL.
+- Trung Lập: triệu hồi nhỏ hoặc tăng WIL.
 ```
 
 Drop thêm:
@@ -1008,7 +1012,7 @@ Drop thêm:
 ```text
 100%: +3 Dạ Thạch
 100%: +1 vật liệu chính của enemy
-35%: +1 Tinh Hạch Vĩnh Dạ hoặc Huyết Chủ Ấn Phiến tùy phe
+35%: +1 Tinh Hạch Vĩnh Dạ hoặc Huyết Chủ Ấn Phiến tùy phe, Phe Trung Lập không rơi gì.
 ```
 
 Spawn:
@@ -1054,7 +1058,7 @@ Drop thêm:
 
 ```text
 25%: +1 Huyết Chủ Ấn Phiến nếu thuộc phe Huyết Chủ
-25%: +1 Tinh Phách Mờ nếu thuộc phe Hắc Ám
+25%: +1 Tinh Phách Mờ nếu thuộc phe Trung Lập.
 ```
 
 Vai trò: glass cannon, tạo áp lực nhanh nhưng tự hao.
@@ -1271,6 +1275,8 @@ Reward:
 25%: 3 Oán Thạch
 10%: 1 Hư Không Thạch
 15%: không có tài nguyên, spawn 1 Bạo Tạc Giả
+5%: không tài nguyên, spawn Oán Tượng.
+Bạo Tạc Giả và Oán Tượng spawn từ module này sẽ chỉ hoạt động trong phạm vi module lúc trời sáng, tối sẽ rời đi và tấn công base.
 ```
 
 #### Huyết Chủ Tế Đàn
@@ -1417,6 +1423,7 @@ Reward:
 25%: 6 Linh Mộc
 15%: 3 Linh Thảo
 10%: spawn Người Bò Sát hoặc Chim Biến Dị
+lúc sáng 2 loại này bồi hồi trong phạm vi bị ô nhiễm để tránh bị ánh nắng thiêu chết, ban đêm rời đi tấn công base.
 ```
 
 ---
@@ -1634,6 +1641,9 @@ Quy tắc:
 - Tier 1.x chủ yếu tìm Truyền Tống Trận có sẵn.
 - Nếu rút lui khẩn cấp, tiêu hao thêm `1 HKT + 2 BPA` nếu có, nếu không thì tạo hậu quả Vĩnh Dạ truy kích.
 
+### 10.16 Trấn Hồn Đăng
+- Đọc Trấn Hồn Đăng.md, đây là kiến trúc quan trọng.
+
 ---
 
 ## 11. Mục tiêu kinh tế theo giai đoạn
@@ -1772,7 +1782,7 @@ Sinh vật trung lập / module:
 Tạo file mới nếu cần:
 
 ```text
-src/vinh-da/economy/resources.ts
+src/.../vinh-da/economy/resources.ts
 ```
 
 Nội dung:
@@ -1808,7 +1818,7 @@ export type TieredAmount = {
 ### 14.2. Module quy đổi
 
 ```text
-src/vinh-da/economy/conversion.ts
+src/.../vinh-da/economy/conversion.ts
 ```
 
 Hàm chính:
@@ -1823,7 +1833,7 @@ settleBaseEssence(liquidHnt: number, harvestRate: number): CurrencyAmount
 ### 14.3. Module drop
 
 ```text
-src/vinh-da/economy/dropTables.ts
+src/.../vinh-da/economy/dropTables.ts
 ```
 
 Hàm:
@@ -1836,7 +1846,7 @@ applyPrefixBonusDrops(enemy, drops, rng): TieredAmount[]
 ### 14.4. Module kiến trúc
 
 ```text
-src/vinh-da/buildings/buildingCosts.ts
+src/.../vinh-da/structures.ts (đã có).
 ```
 
 Dữ liệu:
@@ -1852,7 +1862,7 @@ requires?
 ### 14.5. Module tiền tố
 
 ```text
-src/vinh-da/combat/prefixes.ts
+src/.../vinh-da/combat/prefixes.ts
 ```
 
 Hàm:

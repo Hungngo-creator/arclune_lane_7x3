@@ -569,6 +569,45 @@ function createSummonConfirmModal(): HTMLDivElement {
   return modal;
 }
 
+const focusableSelector = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
+function getFocusableElements(root: HTMLElement): HTMLElement[] {
+  return Array.from(root.querySelectorAll<HTMLElement>(focusableSelector)).filter((element) => {
+    return !element.hasAttribute('disabled') && element.getAttribute('aria-hidden') !== 'true' && element.offsetParent !== null;
+  });
+}
+
+function trapFocus(root: HTMLElement, event: KeyboardEvent): void {
+  if (event.key !== 'Tab') {
+    return;
+  }
+  const focusable = getFocusableElements(root);
+  if (focusable.length === 0) {
+    event.preventDefault();
+    root.focus();
+    return;
+  }
+  const first = focusable[0]!;
+  const last = focusable[focusable.length - 1]!;
+  const active = document.activeElement;
+  if (event.shiftKey && active === first) {
+    event.preventDefault();
+    last.focus();
+    return;
+  }
+  if (!event.shiftKey && active === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
 export async function mountGachaUI(scope: HTMLElement | Document | null = null) {
   const hostElement: HTMLElement | null =
     scope instanceof Document ? scope.body : scope ?? document.body;
@@ -617,14 +656,13 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
         <div class="currency-bar" data-slot="currencies"></div>
       </aside>
       <div class="gacha-backdrop" data-slot="drawer-backdrop" hidden></div>
-      <aside class="gacha-drawer" data-slot="drawer" aria-label="Tỉ lệ và quy tắc gacha" aria-hidden="true">
+      <aside class="gacha-drawer" data-slot="drawer" role="dialog" aria-modal="true" aria-label="Tỉ lệ và quy tắc gacha" aria-hidden="true">
         <div class="gacha-drawer__tabs" role="tablist" aria-label="Thông tin gacha">
-          <button type="button" role="tab" data-drawer-tab="rates">Tỉ lệ</button>
-          <button type="button" role="tab" data-drawer-tab="pity">Bảo hiểm</button>
-          <button type="button" role="tab" data-drawer-tab="rules">Quy tắc</button>
-          <button type="button" role="tab" data-drawer-tab="history">Lịch sử</button>
+          <button type="button" id="gacha-drawer-tab-rates" role="tab" data-drawer-tab="rates" aria-controls="gacha-drawer-panel">Tỉ lệ</button>
+          <button type="button" id="gacha-drawer-tab-pity" role="tab" data-drawer-tab="pity" aria-controls="gacha-drawer-panel">Bảo hiểm</button>
+          <button type="button" id="gacha-drawer-tab-rules" role="tab" data-drawer-tab="rules" aria-controls="gacha-drawer-panel">Quy tắc</button>
         </div>
-        <div class="gacha-drawer__panel" data-slot="drawer-panel"></div>
+        <div class="gacha-drawer__panel" id="gacha-drawer-panel" data-slot="drawer-panel" role="tabpanel" tabindex="0"></div>
       </aside>
     </div>
   `;
@@ -726,16 +764,35 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     }
   };
 
-  let activeDrawerTab = 'rates';
+  let activeDrawerTab: 'rates' | 'pity' | 'rules' = 'rates';
+  let activeDrawerMode: 'info' | 'history' = 'info';
   let lastDrawerTrigger: HTMLElement | null = null;
 
   const renderDrawerPanel = () => {
     const banner = getBannerById(state.bannerId) ?? GACHA_CONFIG.banners[0];
     if (!banner) return;
+    const isHistoryMode = activeDrawerMode === 'history';
+    drawer.classList.toggle('is-history', isHistoryMode);
+    if (isHistoryMode) {
+      drawerTabs.forEach((tab) => {
+        tab.classList.remove('is-active');
+        tab.setAttribute('aria-selected', 'false');
+        tab.setAttribute('tabindex', '-1');
+      });
+      drawerPanel.removeAttribute('aria-labelledby');
+      drawerPanel.setAttribute('aria-label', 'Lịch sử triệu hồi');
+      renderHistory(drawerPanel, state.summonHistory);
+      return;
+    }
+    drawerPanel.removeAttribute('aria-label');
     drawerTabs.forEach((tab) => {
       const isActive = tab.dataset.drawerTab === activeDrawerTab;
       tab.classList.toggle('is-active', isActive);
       tab.setAttribute('aria-selected', String(isActive));
+      tab.setAttribute('tabindex', isActive ? '0' : '-1');
+      if (isActive && tab.id) {
+        drawerPanel.setAttribute('aria-labelledby', tab.id);
+      }
     });
     if (activeDrawerTab === 'pity') {
       renderPityInfo(drawerPanel, banner, state.states);
@@ -745,16 +802,12 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
       drawerPanel.replaceChildren(createRulesContent());
       return;
     }
-    if (activeDrawerTab === 'history') {
-      renderHistory(drawerPanel, state.summonHistory);
-      return;
-    }
     renderRates(drawerPanel, banner);
   };
 
   const closeDrawer = () => {
     const trigger = lastDrawerTrigger;
-    drawer.classList.remove('is-open');
+    drawer.classList.remove('is-open', 'is-history');
     drawer.setAttribute('aria-hidden', 'true');
     drawerBackdrop.classList.remove('is-open');
     drawerBackdrop.hidden = true;
@@ -764,18 +817,33 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
     lastDrawerTrigger = null;
   };
 
-  const openDrawer = (tab = 'rates', trigger: HTMLElement | null = rulesButton) => {
+  const openDrawer = (tab: 'rates' | 'pity' | 'rules' = 'rates', trigger: HTMLElement | null = rulesButton) => {
     closeCurrencyTooltip();
+    activeDrawerMode = 'info';
     activeDrawerTab = tab;
     lastDrawerTrigger = trigger;
     rulesButton.setAttribute('aria-expanded', String(trigger === rulesButton));
-    historyButton.setAttribute('aria-expanded', String(trigger === historyButton));
+    historyButton.setAttribute('aria-expanded', 'false');
     drawerBackdrop.hidden = false;
     renderDrawerPanel();
     drawerBackdrop.classList.add('is-open');
     drawer.classList.add('is-open');
     drawer.setAttribute('aria-hidden', 'false');
     drawer.querySelector<HTMLButtonElement>('[data-drawer-tab].is-active')?.focus();
+  };
+
+  const openHistoryDrawer = (trigger: HTMLElement | null = historyButton) => {
+    closeCurrencyTooltip();
+    activeDrawerMode = 'history';
+    lastDrawerTrigger = trigger;
+    rulesButton.setAttribute('aria-expanded', 'false');
+    historyButton.setAttribute('aria-expanded', String(trigger === historyButton));
+    drawerBackdrop.hidden = false;
+    renderDrawerPanel();
+    drawerBackdrop.classList.add('is-open');
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    drawerPanel.focus();
   };
 
   const renderWallet = () => {
@@ -890,16 +958,26 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
   };
 
   rulesButton.addEventListener('click', () => openDrawer('rates', rulesButton));
-  historyButton.addEventListener('click', () => openDrawer('history', historyButton));
+  historyButton.addEventListener('click', () => openHistoryDrawer(historyButton));
   drawerBackdrop.addEventListener('click', closeDrawer);
   drawer.addEventListener('click', (event) => event.stopPropagation());
   drawerTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
-      activeDrawerTab = tab.dataset.drawerTab ?? 'rates';
-      renderDrawerPanel();
+      const nextTab = tab.dataset.drawerTab;
+      if (nextTab === 'rates' || nextTab === 'pity' || nextTab === 'rules') {
+        activeDrawerMode = 'info';
+        activeDrawerTab = nextTab;
+        renderDrawerPanel();
+      }
     });
   });
   const onDocumentKeydown = (event: KeyboardEvent) => {
+    const confirmModal = container.querySelector<HTMLElement>('.gacha-confirm-modal');
+    if (confirmModal) {
+      trapFocus(confirmModal, event);
+    } else if (drawer.classList.contains('is-open')) {
+      trapFocus(drawer, event);
+    }
     if (event.key === 'Escape') {
       closeSummonConfirm();
     }
