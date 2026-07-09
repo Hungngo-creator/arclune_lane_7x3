@@ -85,11 +85,11 @@ export const GACHA_CONFIG: GachaConfig = {
 };
 
 export const CURRENCY_LABELS: Record<CurrencyCode, string> = {
-  VNT: 'Vụn',
-  HNT: 'Hạ',
-  TNT: 'Trung',
-  ThNT: 'Thượng (Prime)',
-  TT: 'Thần Tinh chiến lược',
+  VNT: 'Vụn Nguyên Tinh',
+  HNT: 'Hạ Nguyên Tinh',
+  TNT: 'Trung Nguyên Tinh',
+  ThNT: 'Thượng Nguyên Tinh',
+  TT: 'Thần Tinh',
 };
 
 export function createWallet(initial?: Partial<Wallet>): Wallet {
