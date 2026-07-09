@@ -39402,6 +39402,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let baseEnergyShortage = false;
       let baseHp = 20;
       let baseLevel = 0;
+      let baseBranchLv3;
       let baseX = CRYSTAL_X;
       const baseStatuses = {};
       let leaderHp = 20;
@@ -39509,7 +39510,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               clearTimeout(noticeTimeout);
           noticeTimeout = setTimeout(() => noticeElement.classList.remove('vinh-da-game__notice--visible'), 1600);
       };
-      const getStructureMaxHp = (structure) => (getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element).hp
+      const getStructureMaxHp = (structure) => (getStructureLevelStat(structure.type, structure.level, structure.type === 'crystalSeal' ? structure.baseBranchLv3 : structure.branchLv3, structure.branchLv5, structure.element).hp
           + (structureRuntimes.get(structure.siteId)?.linkedMaxHpBonus ?? 0));
       const ensureStructureRuntime = (structure) => {
           const existing = structureRuntimes.get(structure.siteId);
@@ -39666,7 +39667,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const renderStatusPanel = () => {
           if (!statusPanel)
               return;
-          const baseStat = getBaseLevelStat(baseLevel);
+          const baseStat = getBaseLevelStat(baseLevel, baseBranchLv3);
           const territoryBounds = getLivingTerritoryWallBounds(simulationContext);
           const baseInTerritory = isXInLivingTerritory(simulationContext, getBaseX(simulationState), territoryBounds);
           const contaminationStacks = simulationState.baseStatuses?.contaminationStacks ?? simulationState.contamination ?? 0;
@@ -39680,7 +39681,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           const teleportCheck = teleport ? canActivateTeleportRetreat(simulationContext) : null;
           const elementalStat = elemental ? getStructureLevelStat('elementalTower', elemental.level, undefined, undefined, elemental.element) : null;
           const lines = [
-              `<strong>Pha lê Lv${baseLevel}</strong> HP ${Math.ceil(baseHp)}/${baseStat.hp} · Khiên leader ${Math.ceil(leaderShield)}/${Math.ceil(leaderMaxHp * (baseStat.leaderShieldPercent ?? 0))}`,
+              `<strong>Pha lê Lv${baseLevel}${baseBranchLv3 ? ` ${baseBranchLv3}` : ''}</strong> HP ${Math.ceil(baseHp)}/${baseStat.hp} · Khiên leader ${Math.ceil(leaderShield)}/${Math.ceil(leaderMaxHp * (baseStat.leaderShieldPercent ?? 0))}`,
               `<div class="${baseInTerritory ? '' : 'vinh-da-game__status-danger'}">Lãnh địa: ${baseInTerritory ? 'đang bảo hộ' : 'ngoài lãnh địa / buff khóa'} · Emergency CD: ${Math.max(0, leaderEmergencyCooldownUntilNight - nightIndex)} đêm</div>`,
               `<div class="${contaminationStacks >= 5 ? 'vinh-da-game__status-danger' : contaminationStacks > 0 ? 'vinh-da-game__status-warn' : ''}">Ô nhiễm: ${contaminationStacks}/5 stack${contaminationStacks >= 5 ? ' · sẽ hóa Sứ Đồ' : ''}</div>`,
           ];
@@ -39799,6 +39800,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           addActionNode('branch-lv3-spike', 'Gai nhọn');
           addActionNode('branch-lv3-slippery', 'Trơn tuột');
           addActionNode('branch-lv3-shock', 'Phản chấn');
+          addActionNode('base-branch-lv3-defense', 'Base phòng thủ');
+          addActionNode('base-branch-lv3-attack', 'Base tấn công');
           addActionNode('branch-lv5-biochemical', 'Sinh hoá');
           addActionNode('branch-lv5-curse', 'Nguyền rủa');
           addActionNode('branch-lv5-link', 'Liên kết');
@@ -39824,9 +39827,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const action = node.dataset.action;
               const isUpgradeNode = action === 'upgrade';
               const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
-              const branch = action?.startsWith('branch-lv3-') ? action.slice('branch-lv3-'.length) : action?.startsWith('branch-lv5-') ? action.slice('branch-lv5-'.length) : undefined;
+              const branch = action?.startsWith('branch-lv3-') ? action.slice('branch-lv3-'.length) : action?.startsWith('base-branch-lv3-') ? action.slice('base-branch-lv3-'.length) : action?.startsWith('branch-lv5-') ? action.slice('branch-lv5-'.length) : undefined;
               const cost = structure ? getCostFor(structure.type, nextLevel, branch) : type ? getCostFor(type, 1) : [];
               const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
+              const isBaseLv3Branch = structure?.type === 'crystalSeal' && structure.level === 2 && action?.startsWith('base-branch-lv3-');
               const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
               const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
               const canToggleGravity = structure?.type === 'gravityCannon' && structure.level >= 6 && action === 'toggle-gravity';
@@ -39837,9 +39841,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const canShowTeleport = structure?.type === 'teleport' && action === 'activate-teleport';
               node.hidden = structure
                   ? (isUpgradeNode
-                      ? structure.level >= 6 || structure.level === 2 || structure.level === 4
+                      ? structure.level >= 6 || (structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal')) || (structure.level === 4 && structure.type === 'wall')
                       : action
-                          ? !(isLv3Branch || isLv5Branch || canToggleGravity || canBuildElement || canMountElement || canCycleElement || canShowTeleport)
+                          ? !(isLv3Branch || isBaseLv3Branch || isLv5Branch || canToggleGravity || canBuildElement || canMountElement || canCycleElement || canShowTeleport)
                           : !canMount)
                   : isUpgradeNode || (Boolean(action) && !canBuildElement) || (!action && (!type || type === 'elementalTower' || !isStructureAllowedOnBuildSite(type, site)));
               const buildElement = action?.startsWith('build-element-') ? action.slice('build-element-'.length) : undefined;
@@ -39896,13 +39900,13 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           const mountedLabel = structure?.mountedStructure ? buildNodeOptions.find(option => option.type === structure.mountedStructure)?.label ?? structure.mountedStructure : '';
           const elementalLabel = structure?.type === 'elementalTower' || structure?.mountedStructure === 'elementalTower' ? ` (${structure.element ?? 'Hỏa'})` : '';
           siteButton.dataset.structureLabel = structure && mountedLabel ? `${structureLabel}${elementalLabel} Lv${structure.level} + ${mountedLabel} Lv${structure.mountedLevel ?? 1}` : `${structureLabel}${elementalLabel}`;
-          const stat = structure ? getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element) : null;
-          const branchText = structure?.type === 'wall' ? ` · tường lãnh địa · lv3 ${structure.branchLv3 ?? 'chưa chọn'} · lv5 ${structure.branchLv5 ?? 'chưa chọn'}` : '';
+          const stat = structure ? getStructureLevelStat(structure.type, structure.level, structure.type === 'crystalSeal' ? structure.baseBranchLv3 : structure.branchLv3, structure.branchLv5, structure.element) : null;
+          const branchText = structure?.type === 'wall' ? ` · tường lãnh địa · lv3 ${structure.branchLv3 ?? 'chưa chọn'} · lv5 ${structure.branchLv5 ?? 'chưa chọn'}` : structure?.type === 'crystalSeal' ? ` · base lv3 ${structure.baseBranchLv3 ?? 'chưa chọn'}` : '';
           const elementText = structure?.type === 'elementalTower' || structure?.mountedStructure === 'elementalTower' ? ` · hệ ${structure.element ?? 'Hỏa'} · ${describeElementEffect(structure.element ?? 'Hỏa')}` : '';
           const soldierText = structure?.type === 'barracks' ? ` · lính ${runtime?.soldiers?.length ?? 0}/${stat?.soldierCap ?? 0} rank ${stat?.soldierRank ?? 1}` : '';
           const churchText = structure?.type === 'church' ? ` · prayer ${formatSeconds(runtime?.prayerTimer)} cleanse ${formatSeconds(runtime?.contaminationCleanseTimer)}` : '';
           const teleportText = structure?.type === 'teleport' ? ` · rút lui CD ${formatSeconds(runtime?.cooldown)}` : '';
-          siteButton.title = structure ? `${siteButton.dataset.structureLabel} Lv${structure.level} · HP ${Math.ceil(runtime?.hp ?? 0)}/${stat?.hp ?? 0} · cost ${formatCost(getCostFor(structure.type, structure.level, structure.branchLv5 ?? structure.branchLv3))}${stat?.range ? ` · range ${stat.range}` : ''}${branchText}${elementText}${soldierText}${churchText}${teleportText}` : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất cho bẫy' : 'Ụ đá cho tháp/trại/ấn';
+          siteButton.title = structure ? `${siteButton.dataset.structureLabel} Lv${structure.level} · HP ${Math.ceil(runtime?.hp ?? 0)}/${stat?.hp ?? 0} · cost ${formatCost(getCostFor(structure.type, structure.level, structure.branchLv5 ?? structure.baseBranchLv3 ?? structure.branchLv3))}${stat?.range ? ` · range ${stat.range}` : ''}${branchText}${elementText}${soldierText}${churchText}${teleportText}` : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất cho bẫy' : 'Ụ đá cho tháp/trại/Nhà Thờ';
           siteButton.setAttribute('aria-label', structure ? siteButton.title : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
           renderBuildMenu(siteId);
       };
@@ -40010,6 +40014,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           set baseHp(value) { baseHp = value; },
           get baseLevel() { return baseLevel; },
           set baseLevel(value) { baseLevel = value ?? 0; },
+          get baseBranchLv3() { return baseBranchLv3; },
+          set baseBranchLv3(value) { baseBranchLv3 = value; },
           get baseX() { return baseX; },
           set baseX(value) { baseX = Number.isFinite(value) ? value : CRYSTAL_X; },
           baseStatuses,
@@ -40034,6 +40040,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           leaderAttackCooldown,
           structures,
           nightIndex,
+          mapTier: mapTier,
           waveThreatBudgetRemaining,
           elementalRegions,
       };
@@ -40070,6 +40077,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           leaderShieldNightIndex = simulationState.leaderShieldNightIndex;
           leaderEmergencyCooldownUntilNight = simulationState.leaderEmergencyCooldownUntilNight ?? leaderEmergencyCooldownUntilNight;
           baseLevel = simulationState.baseLevel ?? baseLevel;
+          baseBranchLv3 = simulationState.baseBranchLv3 ?? baseBranchLv3;
           baseLiquidHnt = simulationState.baseLiquidHnt ?? baseLiquidHnt;
           condensedHnt = simulationState.condensedHnt ?? condensedHnt;
           bloodSealStone = condensedHnt || simulationState.bloodSealStone;
@@ -40228,7 +40236,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const action = buildNode.dataset.action;
               if (site && structure && action) {
                   const nextLevel = structure.level + 1;
-                  if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(getCostFor(structure.type, nextLevel))) {
+                  if (action === 'upgrade' && structure.level < 6 && !(structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal')) && !(structure.level === 4 && structure.type === 'wall') && spend(getCostFor(structure.type, nextLevel))) {
                       const upgraded = { ...structure, level: nextLevel };
                       setStructure(upgraded);
                       const runtime = ensureStructureRuntime(upgraded);
@@ -40237,6 +40245,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
                   }
                   else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(getCostFor(structure.type, 3, action.slice('branch-lv3-'.length)))) {
                       const upgraded = { ...structure, level: 3, branchLv3: action.slice('branch-lv3-'.length) };
+                      setStructure(upgraded);
+                      ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+                      renderBuildSite(site.id);
+                  }
+                  else if (structure.type === 'crystalSeal' && structure.level === 2 && action.startsWith('base-branch-lv3-') && spend(getCostFor(structure.type, 3, action.slice('base-branch-lv3-'.length)))) {
+                      const upgraded = { ...structure, level: 3, baseBranchLv3: action.slice('base-branch-lv3-'.length) };
                       setStructure(upgraded);
                       ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
                       renderBuildSite(site.id);
@@ -40798,7 +40812,19 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const ELEMENTAL_ALLY_BUFF_SECONDS = 3;
   const getBaseStat = (ctx) => {
       const level = ctx.state.baseLevel ?? 0;
-      return ctx.state.baseBranchLv3 ? getBaseLevelStat(level, ctx.state.baseBranchLv3) : (BASE_STRUCTURE_STATS[level] ?? BASE_STRUCTURE_STATS[0]);
+      const stat = ctx.state.baseBranchLv3 ? getBaseLevelStat(level, ctx.state.baseBranchLv3) : (BASE_STRUCTURE_STATS[level] ?? BASE_STRUCTURE_STATS[0]);
+      const tier = ctx.state.mapTier;
+      if (!tier)
+          return stat;
+      return {
+          ...stat,
+          hp: scaleEnemyTierStat(stat.hp, tier),
+          ...(stat.arm === undefined ? {} : { arm: scaleEnemyTierStat(stat.arm, tier) }),
+          ...(stat.res === undefined ? {} : { res: scaleEnemyTierStat(stat.res, tier) }),
+          ...(stat.healPerSecond === undefined ? {} : { healPerSecond: scaleEnemyTierStat(stat.healPerSecond, tier) }),
+          ...(stat.allyHealPerSecond === undefined ? {} : { allyHealPerSecond: scaleEnemyTierStat(stat.allyHealPerSecond, tier) }),
+          ...(stat.allyAtkBonus === undefined ? {} : { allyAtkBonus: scaleEnemyTierStat(stat.allyAtkBonus, tier) })
+      };
   };
   const getLeaderMaxHp = (ctx) => {
       const maxHp = ctx.state.leaderMaxHp ?? getBaseStat(ctx).hp;
@@ -40857,6 +40883,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       return leftX === null || rightX === null ? null : { leftX, rightX };
   };
   const isXInLivingTerritory = (ctx, x, bounds = getLivingTerritoryWallBounds(ctx)) => Boolean(bounds && x >= bounds.leftX && x <= bounds.rightX);
+  const getTerritoryBaseAllyAtkBonus = (ctx, x, bounds = getLivingTerritoryWallBounds(ctx)) => (isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) && isXInLivingTerritory(ctx, x, bounds) ? getBaseStat(ctx).allyAtkBonus ?? 0 : 0);
   const getChurchHealingBonus = (ctx, bounds = getLivingTerritoryWallBounds(ctx)) => {
       if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds))
           return 0;
@@ -41436,7 +41463,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               continue;
           if (ctx.state.leaderAttackCooldown === 0 && Math.abs(enemy.x - ctx.state.leaderX) <= LEADER_ATTACK_RANGE) {
               ctx.state.leaderAttackCooldown = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
-              if (damageEnemy(ctx, enemy, LEADER_BASIC_ATTACK_DAMAGE))
+              if (damageEnemy(ctx, enemy, LEADER_BASIC_ATTACK_DAMAGE + getTerritoryBaseAllyAtkBonus(ctx, ctx.state.leaderX)))
                   removeEnemyAt(ctx, i, true);
           }
       }
@@ -41497,7 +41524,6 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       runtime.prayerTimer = Math.max(0, (runtime.prayerTimer ?? 0) - dt);
       runtime.contaminationCleanseTimer = Math.max(0, (runtime.contaminationCleanseTimer ?? 0) - dt);
       runtime.soldierSpawnTimer = Math.max(0, (runtime.soldierSpawnTimer ?? 0) - dt);
-      runtime.emergencyHealCooldown = Math.max(0, (runtime.emergencyHealCooldown ?? 0) - dt);
       for (const [key, remaining] of runtime.attackerCooldowns ?? []) {
           const next = Math.max(0, remaining - dt);
           if (next > 0)
@@ -41645,21 +41671,23 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if ((stat.emergencyHealPercent ?? 0) > 0 && getLeaderHp(ctx) > 0 && getLeaderHp(ctx) <= getLeaderMaxHp(ctx) * 0.12 && (ctx.state.leaderEmergencyCooldownUntilNight ?? 0) <= ctx.state.nightIndex) {
           healLeader(ctx, getLeaderMaxHp(ctx) * (stat.emergencyHealPercent ?? 0));
           ctx.state.baseHp = Math.max(0, ctx.state.baseHp - stat.hp * (stat.emergencyBaseSelfDamagePercent ?? 0));
-          ctx.state.leaderEmergencyCooldownUntilNight = ctx.state.nightIndex + (stat.emergencyCooldownNights ?? 2);
+          ctx.state.leaderEmergencyCooldownUntilNight = ctx.state.nightIndex + (stat.emergencyCooldownNights ?? 2) + 1;
       }
-      if ((stat.healPerSecond ?? 0) > 0)
-          healBase(ctx, (stat.healPerSecond ?? 0) * dt, territoryBounds);
-      for (const structure of ctx.state.structures.values()) {
-          const site = ctx.getBuildSite(structure.siteId);
-          if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds))
-              continue;
-          const runtime = ctx.ensureStructureRuntime(structure);
-          if ((runtime.emergencyHealCooldown ?? 0) > 0)
-              continue;
-          if ((stat.emergencyCooldownSeconds ?? 0) > 0 && (stat.emergencyHealPercent ?? 0) > 0 && ctx.state.baseHp > 0 && ctx.state.baseHp <= stat.hp * 0.2) {
-              healBase(ctx, stat.hp * (stat.emergencyHealPercent ?? 0), territoryBounds);
-              runtime.emergencyHealCooldown = stat.emergencyCooldownSeconds ?? 60;
-              break;
+      const leaderFlatHeal = stat.healPerSecond ?? 0;
+      const leaderPercentHeal = getLeaderMaxHp(ctx) * (stat.leaderHealMaxHpPercentPerSecond ?? 0);
+      if (leaderFlatHeal + leaderPercentHeal > 0)
+          healLeader(ctx, (leaderFlatHeal + leaderPercentHeal) * dt);
+      const allyHeal = stat.allyHealPerSecond ?? 0;
+      if (allyHeal > 0) {
+          for (const structure of ctx.state.structures.values()) {
+              const site = ctx.getBuildSite(structure.siteId);
+              if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds))
+                  continue;
+              const runtime = ctx.ensureStructureRuntime(structure);
+              if (!runtime.soldiers)
+                  continue;
+              for (const soldier of runtime.soldiers)
+                  soldier.hp += allyHeal * dt;
           }
       }
   };
@@ -41748,7 +41776,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
               const explosionHitIds = new Set(targets.map(target => target.id));
               for (const target of targets) {
-                  const baseDamage = (stat.damage ?? 0) * (1 + (((runtime.statuses?.elementalAtkBonusPercent ?? 0) + (runtime.statuses?.elementalWilBonusPercent ?? 0)) / 2));
+                  const baseDamage = ((stat.damage ?? 0) + getTerritoryBaseAllyAtkBonus(ctx, site.x)) * (1 + (((runtime.statuses?.elementalAtkBonusPercent ?? 0) + (runtime.statuses?.elementalWilBonusPercent ?? 0)) / 2));
                   const bonus = stat.element === 'Ánh Sáng' ? 1.1 : target.lightVulnerableSeconds && target.lightVulnerableSeconds > 0 ? 1.2 : 1;
                   if (stat.element)
                       applyElementEffect(ctx, target, stat.element, baseDamage, site.x, stat.range ?? 0);
@@ -42044,10 +42072,10 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           0: { hp: 20, arm: 2, res: 2, healPerSecond: 0 },
           1: { hp: 30, arm: 3, res: 3, healPerSecond: 1 },
           2: { hp: 40, arm: 4, res: 4, healPerSecond: 2 },
-          3: { hp: 55, arm: 7, res: 7, healPerSecond: 4 },
-          4: { hp: 65, arm: 9, res: 9, healPerSecond: 5 },
-          5: { hp: 80, arm: 11, res: 11, healPerSecond: 5, shield: 0.2 },
-          6: { hp: 80, arm: 11, res: 11, healPerSecond: 3, emergencyHealPercent: 0.2, emergencyCooldownSeconds: 600 }
+          3: { hp: 55, arm: 7, res: 7, healPerSecond: 4, allyHealPerSecond: 1 },
+          4: { hp: 65, arm: 9, res: 9, healPerSecond: 4, allyHealPerSecond: 2 },
+          5: { hp: 80, arm: 11, res: 11, healPerSecond: 4, allyHealPerSecond: 2, leaderHealMaxHpPercentPerSecond: 0.01, leaderShieldPercent: 0.2 },
+          6: { hp: 80, arm: 11, res: 11, healPerSecond: 4, allyHealPerSecond: 5, leaderHealMaxHpPercentPerSecond: 0.01, leaderShieldPercent: 0.2, emergencyHealPercent: 0.2, emergencyBaseSelfDamagePercent: 0.1, emergencyCooldownNights: 2 }
       },
       landmine: {
           1: { hp: 1 },
@@ -42177,12 +42205,12 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       1: { hp: 30, arm: 3, res: 3, healPerSecond: 1 },
       2: { hp: 40, arm: 4, res: 4, healPerSecond: 2 },
       3: {
-          defense: { hpBonus: 15, armBonus: 3, resBonus: 3, healPerSecondBonus: 2 },
-          attack: { hpBonus: 10, armBonus: 2, resBonus: 2, healPerSecondBonus: 1, buffAtkPercent: 0.05, buffWilPercent: 0.05 }
+          defense: { hpBonus: 15, armBonus: 3, resBonus: 3, healPerSecondBonus: 2, allyHealPerSecond: 1 },
+          attack: { hpBonus: 10, armBonus: 1, resBonus: 1, healPerSecondBonus: 1, allyAtkBonus: 2 }
       },
-      4: { hpBonus: 10, armBonus: 2, resBonus: 2, healPerSecondBonus: 1 },
-      5: { hpBonus: 15, armBonus: 2, resBonus: 2, leaderShieldPercent: 0.2 },
-      6: { healPerSecondOverride: 3, emergencyHealPercent: 0.2, emergencyBaseSelfDamagePercent: 0.1, emergencyCooldownNights: 2 }
+      4: { hpBonus: 10, armBonus: 2, resBonus: 2, allyHealPerSecondBonus: 1 },
+      5: { hpBonus: 15, armBonus: 2, resBonus: 2, leaderHealMaxHpPercentPerSecond: 0.01, leaderShieldPercent: 0.2 },
+      6: { allyHealPerSecondBonus: 3, emergencyHealPercent: 0.2, emergencyBaseSelfDamagePercent: 0.1, emergencyCooldownNights: 2 }
   };
   const getBaseLevelStat = (level, branchLv3 = 'defense') => {
       if (level <= 0)
@@ -42194,7 +42222,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       const lv3Config = BASE_LEVELS[3][branchLv3];
       const lv3 = {
           ...BASE_LEVELS[2],
-          ...('buffAtkPercent' in lv3Config ? { buffAtkPercent: lv3Config.buffAtkPercent, buffWilPercent: lv3Config.buffWilPercent } : {}),
+          ...('allyAtkBonus' in lv3Config ? { allyAtkBonus: lv3Config.allyAtkBonus } : {}),
+          ...('allyHealPerSecond' in lv3Config ? { allyHealPerSecond: lv3Config.allyHealPerSecond } : {}),
           hp: BASE_LEVELS[2].hp + lv3Config.hpBonus,
           arm: BASE_LEVELS[2].arm + lv3Config.armBonus,
           res: BASE_LEVELS[2].res + lv3Config.resBonus,
@@ -42207,7 +42236,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           hp: lv3.hp + BASE_LEVELS[4].hpBonus,
           arm: (lv3.arm ?? 0) + BASE_LEVELS[4].armBonus,
           res: (lv3.res ?? 0) + BASE_LEVELS[4].resBonus,
-          healPerSecond: (lv3.healPerSecond ?? 0) + BASE_LEVELS[4].healPerSecondBonus
+          healPerSecond: lv3.healPerSecond,
+          allyHealPerSecond: (lv3.allyHealPerSecond ?? 0) + BASE_LEVELS[4].allyHealPerSecondBonus,
       };
       if (level === 4)
           return lv4;
@@ -42216,13 +42246,14 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           hp: lv4.hp + BASE_LEVELS[5].hpBonus,
           arm: (lv4.arm ?? 0) + BASE_LEVELS[5].armBonus,
           res: (lv4.res ?? 0) + BASE_LEVELS[5].resBonus,
+          leaderHealMaxHpPercentPerSecond: BASE_LEVELS[5].leaderHealMaxHpPercentPerSecond,
           leaderShieldPercent: BASE_LEVELS[5].leaderShieldPercent
       };
       if (level === 5)
           return lv5;
       return {
           ...lv5,
-          healPerSecond: BASE_LEVELS[6].healPerSecondOverride,
+          allyHealPerSecond: (lv5.allyHealPerSecond ?? 0) + BASE_LEVELS[6].allyHealPerSecondBonus,
           emergencyHealPercent: BASE_LEVELS[6].emergencyHealPercent,
           emergencyBaseSelfDamagePercent: BASE_LEVELS[6].emergencyBaseSelfDamagePercent,
           emergencyCooldownNights: BASE_LEVELS[6].emergencyCooldownNights
@@ -42241,6 +42272,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   const getStructureLevelStat = (type, level, branchLv3, branchLv5, element) => {
       if (type === 'wall')
           return getWallLevelStat(level, branchLv3, branchLv5);
+      if (type === 'crystalSeal')
+          return getBaseLevelStat(level, branchLv3 === 'attack' ? 'attack' : 'defense');
       if (type === 'watchtower')
           return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
       if (type === 'elementalTower')

@@ -492,10 +492,9 @@ describe('Vĩnh Dạ Đao Phủ structure', () => {
 describe('Vĩnh Dạ base branch and leader safeguards', () => {
   it('keeps lv3-lv6 base stats cumulative with lv6 overrides', () => {
     expect(BASE_STRUCTURE_STATS[3]).toMatchObject({ hp: 55, arm: 7, res: 7, healPerSecond: 4 });
-    expect(BASE_STRUCTURE_STATS[4]).toMatchObject({ hp: 65, arm: 9, res: 9, healPerSecond: 5 });
-    expect(BASE_STRUCTURE_STATS[5]).toMatchObject({ hp: 80, arm: 11, res: 11, healPerSecond: 5, leaderShieldPercent: 0.2 });
-    expect(BASE_STRUCTURE_STATS[6]).toMatchObject({ hp: 80, arm: 11, res: 11, healPerSecond: 3, emergencyHealPercent: 0.2, emergencyBaseSelfDamagePercent: 0.1, emergencyCooldownNights: 2 });
-    expect(getBaseLevelStat(3, 'attack')).toMatchObject({ hp: 50, arm: 6, res: 6, healPerSecond: 3, buffAtkPercent: 0.05, buffWilPercent: 0.05 });
+    expect(BASE_STRUCTURE_STATS[5]).toMatchObject({ hp: 80, arm: 11, res: 11, healPerSecond: 4, allyHealPerSecond: 2, leaderHealMaxHpPercentPerSecond: 0.01, leaderShieldPercent: 0.2 });
+    expect(BASE_STRUCTURE_STATS[6]).toMatchObject({ hp: 80, arm: 11, res: 11, healPerSecond: 4, allyHealPerSecond: 5, emergencyHealPercent: 0.2, emergencyBaseSelfDamagePercent: 0.1, emergencyCooldownNights: 2 });
+    expect(getBaseLevelStat(3, 'attack')).toMatchObject({ hp: 50, arm: 5, res: 5, healPerSecond: 3, allyAtkBonus: 2 });
   });
 
   it('applies lv5 leader shield once per night and lv6 emergency heal on night cooldown', () => {
@@ -519,7 +518,7 @@ describe('Vĩnh Dạ base branch and leader safeguards', () => {
     expect(ctx.state.leaderShield).toBe(20);
     expect(ctx.state.leaderHp).toBe(28);
     expect(ctx.state.baseHp).toBe(72);
-    expect(ctx.state.leaderEmergencyCooldownUntilNight).toBe(5);
+    expect(ctx.state.leaderEmergencyCooldownUntilNight).toBe(6);
 
     ctx.state.leaderShield = 0;
     ctx.state.leaderHp = 10;
@@ -531,6 +530,14 @@ describe('Vĩnh Dạ base branch and leader safeguards', () => {
     updateStructures(ctx, 0);
     expect(ctx.state.leaderShield).toBe(20);
     expect(ctx.state.leaderHp).toBe(30);
+    expect(ctx.state.leaderHp).toBe(10);
+    expect(ctx.state.baseHp).toBe(72);
+
+    ctx.state.leaderShield = 0;
+    ctx.state.leaderHp = 10;
+    ctx.state.nightIndex = 6;
+    updateStructures(ctx, 0);
+    expect(ctx.state.leaderShield).toBe(20);
     expect(ctx.state.baseHp).toBe(64);
   });
 });

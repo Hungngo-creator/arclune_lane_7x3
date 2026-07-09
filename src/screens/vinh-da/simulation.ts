@@ -492,7 +492,18 @@ const BLOOD_MAX_HP_STACK_CAP = 17;
 const ELEMENTAL_ALLY_BUFF_SECONDS = 3;
 const getBaseStat = (ctx: VinhDaSimulationContext) => {
   const level = ctx.state.baseLevel ?? 0;
-  return ctx.state.baseBranchLv3 ? getBaseLevelStat(level, ctx.state.baseBranchLv3) : (BASE_STRUCTURE_STATS[level] ?? BASE_STRUCTURE_STATS[0]!);
+  const stat = ctx.state.baseBranchLv3 ? getBaseLevelStat(level, ctx.state.baseBranchLv3) : (BASE_STRUCTURE_STATS[level] ?? BASE_STRUCTURE_STATS[0]!);
+  const tier = ctx.state.mapTier;
+  if (!tier) return stat;
+  return {
+    ...stat,
+    hp: scaleEnemyTierStat(stat.hp, tier),
+    ...(stat.arm === undefined ? {} : { arm: scaleEnemyTierStat(stat.arm, tier) }),
+    ...(stat.res === undefined ? {} : { res: scaleEnemyTierStat(stat.res, tier) }),
+    ...(stat.healPerSecond === undefined ? {} : { healPerSecond: scaleEnemyTierStat(stat.healPerSecond, tier) }),
+    ...(stat.allyHealPerSecond === undefined ? {} : { allyHealPerSecond: scaleEnemyTierStat(stat.allyHealPerSecond, tier) }),
+    ...(stat.allyAtkBonus === undefined ? {} : { allyAtkBonus: scaleEnemyTierStat(stat.allyAtkBonus, tier) })
+  };
 };
 const getLeaderMaxHp = (ctx: VinhDaSimulationContext): number => {
   const maxHp = ctx.state.leaderMaxHp ?? getBaseStat(ctx).hp;
@@ -548,6 +559,9 @@ export const getLivingTerritoryWallBounds = (ctx: VinhDaSimulationContext): Terr
   return leftX === null || rightX === null ? null : { leftX, rightX };
 };
 export const isXInLivingTerritory = (ctx: VinhDaSimulationContext, x: number, bounds = getLivingTerritoryWallBounds(ctx)): boolean => Boolean(bounds && x >= bounds.leftX && x <= bounds.rightX);
+const getTerritoryBaseAllyAtkBonus = (ctx: VinhDaSimulationContext, x: number, bounds = getLivingTerritoryWallBounds(ctx)): number => (
+  isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) && isXInLivingTerritory(ctx, x, bounds) ? getBaseStat(ctx).allyAtkBonus ?? 0 : 0
+);
 const getChurchHealingBonus = (ctx: VinhDaSimulationContext, bounds = getLivingTerritoryWallBounds(ctx)): number => {
   if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds)) return 0;
   let bonus = getBaseStat(ctx).healingBonusPercent ?? 0;
@@ -1085,7 +1099,7 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
       if (!ctx.state.enemies.includes(enemy)) continue;
       if (ctx.state.leaderAttackCooldown === 0 && Math.abs(enemy.x - ctx.state.leaderX) <= LEADER_ATTACK_RANGE){
         ctx.state.leaderAttackCooldown = LEADER_BASIC_ATTACK_COOLDOWN_SECONDS;
-        if (damageEnemy(ctx, enemy, LEADER_BASIC_ATTACK_DAMAGE)) removeEnemyAt(ctx, i, true);
+        if (damageEnemy(ctx, enemy, LEADER_BASIC_ATTACK_DAMAGE + getTerritoryBaseAllyAtkBonus(ctx, ctx.state.leaderX))) removeEnemyAt(ctx, i, true);
       }
     }
   };
@@ -1145,7 +1159,6 @@ export const updateStructureRuntimeTimers = (ctx: VinhDaSimulationContext, runti
   runtime.prayerTimer = Math.max(0, (runtime.prayerTimer ?? 0) - dt);
   runtime.contaminationCleanseTimer = Math.max(0, (runtime.contaminationCleanseTimer ?? 0) - dt);
   runtime.soldierSpawnTimer = Math.max(0, (runtime.soldierSpawnTimer ?? 0) - dt);
-  runtime.emergencyHealCooldown = Math.max(0, (runtime.emergencyHealCooldown ?? 0) - dt);
     for (const [key, remaining] of runtime.attackerCooldowns ?? []){
       const next = Math.max(0, remaining - dt);
       if (next > 0) runtime.attackerCooldowns?.set(key, next);
@@ -1268,18 +1281,19 @@ const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
   if ((stat.emergencyHealPercent ?? 0) > 0 && getLeaderHp(ctx) > 0 && getLeaderHp(ctx) <= getLeaderMaxHp(ctx) * 0.12 && (ctx.state.leaderEmergencyCooldownUntilNight ?? 0) <= ctx.state.nightIndex){
     healLeader(ctx, getLeaderMaxHp(ctx) * (stat.emergencyHealPercent ?? 0));
     ctx.state.baseHp = Math.max(0, ctx.state.baseHp - stat.hp * (stat.emergencyBaseSelfDamagePercent ?? 0));
-    ctx.state.leaderEmergencyCooldownUntilNight = ctx.state.nightIndex + (stat.emergencyCooldownNights ?? 2);
+    ctx.state.leaderEmergencyCooldownUntilNight = ctx.state.nightIndex + (stat.emergencyCooldownNights ?? 2) + 1;
   }
-  if ((stat.healPerSecond ?? 0) > 0) healBase(ctx, (stat.healPerSecond ?? 0) * dt, territoryBounds);
-  for (const structure of ctx.state.structures.values()){
-    const site = ctx.getBuildSite(structure.siteId);
-    if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds)) continue;
-    const runtime = ctx.ensureStructureRuntime(structure);
-    if ((runtime.emergencyHealCooldown ?? 0) > 0) continue;
-    if ((stat.emergencyCooldownSeconds ?? 0) > 0 && (stat.emergencyHealPercent ?? 0) > 0 && ctx.state.baseHp > 0 && ctx.state.baseHp <= stat.hp * 0.2){
-      healBase(ctx, stat.hp * (stat.emergencyHealPercent ?? 0), territoryBounds);
-      runtime.emergencyHealCooldown = stat.emergencyCooldownSeconds ?? 60;
-      break;
+  const leaderFlatHeal = stat.healPerSecond ?? 0;
+  const leaderPercentHeal = getLeaderMaxHp(ctx) * (stat.leaderHealMaxHpPercentPerSecond ?? 0);
+  if (leaderFlatHeal + leaderPercentHeal > 0) healLeader(ctx, (leaderFlatHeal + leaderPercentHeal) * dt);
+  const allyHeal = stat.allyHealPerSecond ?? 0;
+  if (allyHeal > 0){
+    for (const structure of ctx.state.structures.values()){
+      const site = ctx.getBuildSite(structure.siteId);
+      if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds)) continue;
+      const runtime = ctx.ensureStructureRuntime(structure);
+      if (!runtime.soldiers) continue;
+      for (const soldier of runtime.soldiers) soldier.hp += allyHeal * dt;
     }
   }
 };
@@ -1356,7 +1370,7 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
         runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
         const explosionHitIds = new Set(targets.map(target => target.id));
         for (const target of targets){
-          const baseDamage = (stat.damage ?? 0) * (1 + (((runtime.statuses?.elementalAtkBonusPercent ?? 0) + (runtime.statuses?.elementalWilBonusPercent ?? 0)) / 2));
+          const baseDamage = ((stat.damage ?? 0) + getTerritoryBaseAllyAtkBonus(ctx, site.x)) * (1 + (((runtime.statuses?.elementalAtkBonusPercent ?? 0) + (runtime.statuses?.elementalWilBonusPercent ?? 0)) / 2));
           const bonus = stat.element === 'Ánh Sáng' ? 1.1 : target.lightVulnerableSeconds && target.lightVulnerableSeconds > 0 ? 1.2 : 1;
           if (stat.element) applyElementEffect(ctx, target, stat.element, baseDamage, site.x, stat.range ?? 0);
           const damageAtkRatio = type === 'elementalTower' ? 0.2 : 0.5;

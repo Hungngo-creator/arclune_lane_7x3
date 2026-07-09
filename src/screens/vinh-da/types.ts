@@ -1,5 +1,5 @@
 import type { EnemyKind, EnemyTier } from './enemies.ts';
-import type { ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
+import type { BaseBranchLv3, ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import type { TieredAmount, VinhDaResourceId, VinhDaTier } from './economy/resources.ts';
 
 export type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
@@ -57,6 +57,7 @@ export interface PlacedStructure {
   mountedLevel?: number;
   branchLv3?: WallBranchLv3;
   branchLv5?: WallBranchLv5;
+  baseBranchLv3?: BaseBranchLv3;
   mountedStructure?: StructureType | null;
   element?: ElementalTowerElement;
 }

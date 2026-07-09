@@ -38,7 +38,7 @@ import {
   getStructureLevelStat,
   isStructureAllowedOnBuildSite,
 } from './structures.ts';
-import type { ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
+import type { BaseBranchLv3, ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import {
   DAY_DURATION_SECONDS,
   getScaledThreatBudget,
@@ -350,6 +350,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let baseEnergyShortage = false;
   let baseHp = 20;
   let baseLevel = 0;
+  let baseBranchLv3: BaseBranchLv3 | undefined;
   let baseX = CRYSTAL_X;
   const baseStatuses: VinhDaStatusCollection = {};
   let leaderHp = 20;
@@ -460,7 +461,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
 
   const getStructureMaxHp = (structure: PlacedStructure): number => (
-    getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element).hp
+    getStructureLevelStat(structure.type, structure.level, structure.type === 'crystalSeal' ? structure.baseBranchLv3 : structure.branchLv3, structure.branchLv5, structure.element).hp
     + (structureRuntimes.get(structure.siteId)?.linkedMaxHpBonus ?? 0)
   );
   const ensureStructureRuntime = (structure: PlacedStructure): StructureRuntime => {
@@ -596,7 +597,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
   const renderStatusPanel = (): void => {
     if (!statusPanel) return;
-    const baseStat = getBaseLevelStat(baseLevel);
+    const baseStat = getBaseLevelStat(baseLevel, baseBranchLv3);
     const territoryBounds = getLivingTerritoryWallBounds(simulationContext);
     const baseInTerritory = isXInLivingTerritory(simulationContext, getBaseX(simulationState), territoryBounds);
     const contaminationStacks = simulationState.baseStatuses?.contaminationStacks ?? simulationState.contamination ?? 0;
@@ -610,7 +611,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     const teleportCheck = teleport ? canActivateTeleportRetreat(simulationContext) : null;
     const elementalStat = elemental ? getStructureLevelStat('elementalTower', elemental.level, undefined, undefined, elemental.element) : null;
     const lines = [
-      `<strong>Pha lê Lv${baseLevel}</strong> HP ${Math.ceil(baseHp)}/${baseStat.hp} · Khiên leader ${Math.ceil(leaderShield)}/${Math.ceil(leaderMaxHp * (baseStat.leaderShieldPercent ?? 0))}`,
+      `<strong>Pha lê Lv${baseLevel}${baseBranchLv3 ? ` ${baseBranchLv3}` : ''}</strong> HP ${Math.ceil(baseHp)}/${baseStat.hp} · Khiên leader ${Math.ceil(leaderShield)}/${Math.ceil(leaderMaxHp * (baseStat.leaderShieldPercent ?? 0))}`,
       `<div class="${baseInTerritory ? '' : 'vinh-da-game__status-danger'}">Lãnh địa: ${baseInTerritory ? 'đang bảo hộ' : 'ngoài lãnh địa / buff khóa'} · Emergency CD: ${Math.max(0, leaderEmergencyCooldownUntilNight - nightIndex)} đêm</div>`,
       `<div class="${contaminationStacks >= 5 ? 'vinh-da-game__status-danger' : contaminationStacks > 0 ? 'vinh-da-game__status-warn' : ''}">Ô nhiễm: ${contaminationStacks}/5 stack${contaminationStacks >= 5 ? ' · sẽ hóa Sứ Đồ' : ''}</div>`,
     ];
@@ -717,6 +718,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     addActionNode('branch-lv3-spike', 'Gai nhọn');
     addActionNode('branch-lv3-slippery', 'Trơn tuột');
     addActionNode('branch-lv3-shock', 'Phản chấn');
+    addActionNode('base-branch-lv3-defense', 'Base phòng thủ');
+    addActionNode('base-branch-lv3-attack', 'Base tấn công');
     addActionNode('branch-lv5-biochemical', 'Sinh hoá');
     addActionNode('branch-lv5-curse', 'Nguyền rủa');
     addActionNode('branch-lv5-link', 'Liên kết');
@@ -741,9 +744,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const action = node.dataset.action;
       const isUpgradeNode = action === 'upgrade';
       const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
-      const branch = action?.startsWith('branch-lv3-') ? action.slice('branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('branch-lv5-') ? action.slice('branch-lv5-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : undefined;
+      const branch = action?.startsWith('branch-lv3-') ? action.slice('branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('base-branch-lv3-') ? action.slice('base-branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('branch-lv5-') ? action.slice('branch-lv5-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : undefined;
       const cost = structure ? getCostFor(structure.type, nextLevel, branch) : type ? getCostFor(type, 1) : [];
       const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
+      const isBaseLv3Branch = structure?.type === 'crystalSeal' && structure.level === 2 && action?.startsWith('base-branch-lv3-');
       const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
       const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
       const canToggleGravity = structure?.type === 'gravityCannon' && structure.level >= 6 && action === 'toggle-gravity';
@@ -755,9 +759,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       node.hidden = structure
         ? (
             isUpgradeNode
-              ? structure.level >= 6 || structure.level === 2 || structure.level === 4
+              ? structure.level >= 6 || (structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal')) || (structure.level === 4 && structure.type === 'wall')
               : action
-                ? !(isLv3Branch || isLv5Branch || canToggleGravity || canBuildElement || canMountElement || canCycleElement || canShowTeleport)
+                ? !(isLv3Branch || isBaseLv3Branch || isLv5Branch || canToggleGravity || canBuildElement || canMountElement || canCycleElement || canShowTeleport)
                 : !canMount
           )
         : isUpgradeNode || (Boolean(action) && !canBuildElement) || (!action && (!type || type === 'elementalTower' || !isStructureAllowedOnBuildSite(type, site)));
@@ -804,13 +808,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     const mountedLabel = structure?.mountedStructure ? buildNodeOptions.find(option => option.type === structure.mountedStructure)?.label ?? structure.mountedStructure : '';
     const elementalLabel = structure?.type === 'elementalTower' || structure?.mountedStructure === 'elementalTower' ? ` (${structure.element ?? 'Hỏa'})` : '';
     siteButton.dataset.structureLabel = structure && mountedLabel ? `${structureLabel}${elementalLabel} Lv${structure.level} + ${mountedLabel} Lv${structure.mountedLevel ?? 1}` : `${structureLabel}${elementalLabel}`;
-    const stat = structure ? getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element) : null;
-    const branchText = structure?.type === 'wall' ? ` · tường lãnh địa · lv3 ${structure.branchLv3 ?? 'chưa chọn'} · lv5 ${structure.branchLv5 ?? 'chưa chọn'}` : '';
+    const stat = structure ? getStructureLevelStat(structure.type, structure.level, structure.type === 'crystalSeal' ? structure.baseBranchLv3 : structure.branchLv3, structure.branchLv5, structure.element) : null;
+    const branchText = structure?.type === 'wall' ? ` · tường lãnh địa · lv3 ${structure.branchLv3 ?? 'chưa chọn'} · lv5 ${structure.branchLv5 ?? 'chưa chọn'}` : structure?.type === 'crystalSeal' ? ` · base lv3 ${structure.baseBranchLv3 ?? 'chưa chọn'}` : '';
     const elementText = structure?.type === 'elementalTower' || structure?.mountedStructure === 'elementalTower' ? ` · hệ ${structure.element ?? 'Hỏa'} · ${describeElementEffect(structure.element ?? 'Hỏa')}` : '';
     const soldierText = structure?.type === 'barracks' ? ` · lính ${runtime?.soldiers?.length ?? 0}/${stat?.soldierCap ?? 0} rank ${stat?.soldierRank ?? 1}` : '';
     const churchText = structure?.type === 'church' ? ` · prayer ${formatSeconds(runtime?.prayerTimer)} cleanse ${formatSeconds(runtime?.contaminationCleanseTimer)}` : '';
     const teleportText = structure?.type === 'teleport' ? ` · rút lui CD ${formatSeconds(runtime?.cooldown)}` : '';
-    siteButton.title = structure ? `${siteButton.dataset.structureLabel} Lv${structure.level} · HP ${Math.ceil(runtime?.hp ?? 0)}/${stat?.hp ?? 0} · cost ${formatCost(getCostFor(structure.type, structure.level, structure.branchLv5 ?? structure.branchLv3))}${stat?.range ? ` · range ${stat.range}` : ''}${branchText}${elementText}${soldierText}${churchText}${teleportText}` : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất cho bẫy' : 'Ụ đá cho tháp/trại/ấn';
+    siteButton.title = structure ? `${siteButton.dataset.structureLabel} Lv${structure.level} · HP ${Math.ceil(runtime?.hp ?? 0)}/${stat?.hp ?? 0} · cost ${formatCost(getCostFor(structure.type, structure.level, structure.branchLv5 ?? structure.baseBranchLv3 ?? structure.branchLv3))}${stat?.range ? ` · range ${stat.range}` : ''}${branchText}${elementText}${soldierText}${churchText}${teleportText}` : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất cho bẫy' : 'Ụ đá cho tháp/trại/Nhà Thờ';
     siteButton.setAttribute('aria-label', structure ? siteButton.title : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
     renderBuildMenu(siteId);
   };
@@ -912,6 +916,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     set baseHp(value: number){ baseHp = value; },
     get baseLevel(){ return baseLevel; },
     set baseLevel(value: number | undefined){ baseLevel = value ?? 0; },
+    get baseBranchLv3(){ return baseBranchLv3; },
+    set baseBranchLv3(value: BaseBranchLv3 | undefined){ baseBranchLv3 = value; },
     get baseX(){ return baseX; },
     set baseX(value: number | undefined){ baseX = Number.isFinite(value) ? value! : CRYSTAL_X; },
     baseStatuses,
@@ -936,6 +942,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     leaderAttackCooldown,
     structures,
     nightIndex,
+    mapTier: mapTier as VinhDaSimulationState['mapTier'],
     waveThreatBudgetRemaining,
     elementalRegions,
   };
@@ -972,6 +979,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     leaderShieldNightIndex = simulationState.leaderShieldNightIndex;
     leaderEmergencyCooldownUntilNight = simulationState.leaderEmergencyCooldownUntilNight ?? leaderEmergencyCooldownUntilNight;
     baseLevel = simulationState.baseLevel ?? baseLevel;
+    baseBranchLv3 = simulationState.baseBranchLv3 ?? baseBranchLv3;
     baseLiquidHnt = simulationState.baseLiquidHnt ?? baseLiquidHnt;
     condensedHnt = simulationState.condensedHnt ?? condensedHnt;
     bloodSealStone = condensedHnt || simulationState.bloodSealStone;
@@ -1121,7 +1129,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const action = buildNode.dataset.action;
       if (site && structure && action){
         const nextLevel = structure.level + 1;
-        if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(getCostFor(structure.type, nextLevel))){
+        if (action === 'upgrade' && structure.level < 6 && !(structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal')) && !(structure.level === 4 && structure.type === 'wall') && spend(getCostFor(structure.type, nextLevel))){
           const upgraded = { ...structure, level: nextLevel };
           setStructure(upgraded);
           const runtime = ensureStructureRuntime(upgraded);
@@ -1129,6 +1137,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
           renderBuildSite(site.id);
           } else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(getCostFor(structure.type, 3, action.slice('branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2]))){
           const upgraded = { ...structure, level: 3, branchLv3: action.slice('branch-lv3-'.length) as WallBranchLv3 };
+          setStructure(upgraded);
+          ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+          renderBuildSite(site.id);
+          } else if (structure.type === 'crystalSeal' && structure.level === 2 && action.startsWith('base-branch-lv3-') && spend(getCostFor(structure.type, 3, action.slice('base-branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2]))){
+          const upgraded = { ...structure, level: 3, baseBranchLv3: action.slice('base-branch-lv3-'.length) as BaseBranchLv3 };
           setStructure(upgraded);
           ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
           renderBuildSite(site.id);
