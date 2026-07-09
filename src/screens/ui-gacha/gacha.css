@@ -146,6 +146,28 @@ button {
   opacity: 0.72;
 }
 
+.gacha-app--embedded .gacha-screen-shell__mount {
+  padding-top: clamp(48px, 9vh, 64px);
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .gacha-app--embedded .gacha-screen-shell__back {
+    top: max(8px, env(safe-area-inset-top));
+    left: max(8px, env(safe-area-inset-left));
+    min-height: 34px;
+    padding: 6px 10px;
+  }
+
+  .gacha-app--embedded .gacha-screen-shell__mount {
+    padding-top: 0;
+  }
+
+  .gacha-app--embedded .gacha-ui-root,
+  .gacha-app--embedded .gacha-screen {
+    padding-top: max(50px, env(safe-area-inset-top));
+  }
+}
+
 .gacha-ui-root,
 .gacha-screen {
   width: 100%;
@@ -208,7 +230,7 @@ button {
 
 .gacha-topbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(140px, auto) auto auto;
   align-items: center;
   gap: 14px;
   padding: 14px 18px;
@@ -236,7 +258,7 @@ button {
 }
 
 .currency-mini-hub {
-  display: none;
+  display: block;
   border-radius: 24px;
   padding: 10px;
   min-height: 0;
@@ -1064,21 +1086,6 @@ button {
 }
 
 @media (min-width: 960px) {
-  .gacha-body {
-    grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr) clamp(
-        148px,
-        17vw,
-        220px
-      );
-    grid-template-areas: "rail main wallet";
-  }
-
-  .currency-mini-hub {
-    grid-area: wallet;
-    align-self: start;
-    display: block;
-  }
-
   .currency-mini-hub .currency-bar {
     grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
     justify-content: stretch;
@@ -1088,10 +1095,7 @@ button {
 @media (min-width: 760px) and (max-width: 959px) {
   .gacha-body {
     grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "rail main"
-      "wallet main";
+    grid-template-areas: "rail main";
   }
 
   .gacha-main {
@@ -1120,13 +1124,9 @@ button {
     grid-area: actions;
   }
 
-  .currency-mini-hub {
-    grid-area: wallet;
-    display: block;
-  }
 }
 
-@media (max-width: 759px) {
+@media (orientation: portrait) and (max-width: 759px), (max-width: 560px) {
   .gacha-ui-root,
   .gacha-screen {
     padding: max(12px, env(safe-area-inset-top))
@@ -1137,10 +1137,9 @@ button {
 
   .gacha-body {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
     grid-template-areas:
       "rail"
-      "wallet"
       "main";
     gap: 12px;
   }
@@ -1153,8 +1152,6 @@ button {
   }
 
   .currency-mini-hub {
-    grid-area: wallet;
-    display: block;
     overflow-x: auto;
     overflow-y: hidden;
     padding: 10px;
@@ -1172,7 +1169,7 @@ button {
   }
 
   .gacha-topbar {
-    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    grid-template-columns: minmax(0, 1fr) auto minmax(140px, auto) auto auto;
   }
 
   .banner-timer {
@@ -1198,7 +1195,7 @@ button {
   }
 }
 
-@media (max-height: 420px) {
+@media (orientation: landscape) and (max-height: 500px) {
   .gacha-ui-root,
   .gacha-screen {
     padding-top: max(8px, env(safe-area-inset-top));
@@ -1208,6 +1205,34 @@ button {
   .gacha-body,
   .gacha-main {
     gap: 10px;
+  }
+
+  .gacha-body {
+    grid-template-columns: var(--gacha-rail-width) minmax(0, 1fr);
+    grid-template-areas: "rail main";
+  }
+
+  .banner-sidebar {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .gacha-topbar {
+    grid-template-columns: minmax(0, 1fr) minmax(120px, auto) auto auto auto;
+  }
+
+  .currency-mini-hub {
+    max-width: min(34vw, 220px);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .currency-mini-hub .currency-bar {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    grid-template-columns: none;
+    justify-content: flex-start;
   }
 
   .gacha-topbar,

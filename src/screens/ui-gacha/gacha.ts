@@ -609,17 +609,22 @@ function trapFocus(root: HTMLElement, event: KeyboardEvent): void {
 }
 
 export async function mountGachaUI(scope: HTMLElement | Document | null = null) {
+  const rootScope = scope instanceof Document ? scope : scope ?? document;
   const hostElement: HTMLElement | null =
-    scope instanceof Document ? scope.body : scope ?? document.body;
+    rootScope instanceof Document
+      ? rootScope.querySelector<HTMLElement>('[data-gacha-content]')
+      : rootScope.matches('[data-gacha-content]')
+        ? rootScope
+        : rootScope.querySelector<HTMLElement>('[data-gacha-content]');
 
   if (!hostElement) {
-    throw new Error('Không tìm thấy vùng mount cho gacha UI.');
+    throw new Error('Không tìm thấy vùng mount [data-gacha-content] cho gacha UI.');
   }
 
-  const isBodyHost = hostElement === document.body;
+  const shouldOwnBodyClass = Boolean(hostElement.closest('body.gacha-page')) && !(window as { __ARC_GACHA_EMBED__?: boolean }).__ARC_GACHA_EMBED__;
   const preservedChildren: ChildNode[] = Array.from(hostElement.childNodes);
 
-  if (isBodyHost) {
+  if (shouldOwnBodyClass) {
     document.body.classList.add('gacha-ui');
   }
 
@@ -639,6 +644,9 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
             <p class="banner-desc" data-slot="hero-subtitle"></p>
           </div>
           <span class="banner-timer" data-slot="hero-timer"></span>
+          <div class="currency-mini-hub" aria-label="Ví tiền tệ gacha">
+            <div class="currency-bar" data-slot="currencies"></div>
+          </div>
           <button class="history-button" type="button" aria-label="Xem lịch sử triệu hồi" aria-expanded="false">↺</button>
           <button class="rules-button" type="button" aria-label="Xem tỉ lệ và quy tắc" aria-expanded="false">?</button>
           </header>
@@ -652,9 +660,6 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
           <button type="button" class="summon-button summon-button--x10" data-action="summon-x10"></button>
         </footer>
       </main>
-      <aside class="currency-mini-hub" aria-label="Ví tiền tệ gacha">
-        <div class="currency-bar" data-slot="currencies"></div>
-      </aside>
       <div class="gacha-backdrop" data-slot="drawer-backdrop" hidden></div>
       <aside class="gacha-drawer" data-slot="drawer" role="dialog" aria-modal="true" aria-label="Tỉ lệ và quy tắc gacha" aria-hidden="true">
         <div class="gacha-drawer__tabs" role="tablist" aria-label="Thông tin gacha">
@@ -1004,7 +1009,7 @@ export async function mountGachaUI(scope: HTMLElement | Document | null = null) 
       closeDrawer();
       document.removeEventListener('keydown', onDocumentKeydown);
       unsubscribeSharedWallet();
-      if (isBodyHost) {
+      if (shouldOwnBodyClass) {
         document.body.classList.remove('gacha-ui');
       }
       container.remove();
