@@ -827,7 +827,7 @@ lv 5: trên cơ sở lv 4, tăng sát thương gây ra lên kẻ địch thêm 1
 
 lv 6: player có thể tắt/kích hoạt trọng lực pháo.
 
-một khẩu súng không tệ, có điều coi chừng bắn xa quá trời sáng không có tiền đâu nha, bắn boss đi luôn thì húp cháo, nếu ngươi đủ giàu, nâng cái lv 6, đánh boss còn nửa mạng thì bật pháo liền xong chuyện.
+một khẩu súng không tệ, có điều coi chừng bắn xa quá trời sáng không có tiền đâu nha, bắn boss đi luôn thì húp cháo, nếu ngươi đủ giàu, nâng cái lv 6, đánh boss còn nửa mạng thì bật pháo liền xong chuyện, đương nhiên chi phí cũng không rẻ.
 
 ### Đao Phủ
 
