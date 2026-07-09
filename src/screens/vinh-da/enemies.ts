@@ -1,4 +1,5 @@
-import type { DroppedResourceKind, EnemyAttackShape, EnemyStatusOnHit, EnemyUltimate } from './types.ts';
+import type { EnemyAttackShape, EnemyStatusOnHit, EnemyUltimate } from './types.ts';
+import type { TieredAmount } from './economy/resources.ts';
 
 export type EnemyKind =
   | 'twisted'
@@ -268,10 +269,7 @@ export const ENEMY_TEMPLATES = {
 } as const satisfies Record<EnemyKind, EnemyTemplate>;
 
 export const DEFAULT_ENEMY_TEMPLATE = ENEMY_TEMPLATES.twisted;
-export interface EnemyResourceDrop {
-  kind: DroppedResourceKind;
-  amount: number;
-}
+export type EnemyResourceDrop = TieredAmount;
 
 const ENEMY_KIND_DROP_MULTIPLIERS = {
   twisted: 1,
@@ -305,5 +303,5 @@ export const getEnemyResourceDrop = (input: {
   const rankMultiplier = 1 + Math.max(0, input.rank - 1) * 0.25;
   const nightMultiplier = 1 + Math.max(0, Math.floor(input.nightIndex) - 1) * 0.03;
   const amount = Math.max(1, Math.round(baseReward * getDropTierMultiplier(input.enemyTier) * getDropTierMultiplier(mapTier) * rankMultiplier * nightMultiplier));
-  return { kind: 'daThach', amount };
+  return { resourceId: 'darkStone', amount, tier: mapTier };
 };

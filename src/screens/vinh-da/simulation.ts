@@ -40,11 +40,13 @@ import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
 import { BASE_STRUCTURE_STATS, getBaseLevelStat, getStructureLevelStat } from './structures.ts';
 import type { BaseBranchLv3, ElementalTowerElement, StructureType } from './structures.ts';
 import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
+import { getLiquidHntValue } from './economy/conversion.ts';
+import type { TieredAmount } from './economy/resources.ts';
 
 export const DAY_DURATION_SECONDS = 300;
 export const RESOURCE_PICKUP_RANGE = 54;
 export const RESOURCE_DEPOSIT_RANGE = 90;
-export const BASE_BUFF_DAILY_UPKEEP = 1;
+export const BASE_BUFF_DAILY_UPKEEP = 5;
 export const STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND = 0.08;
 export const TELEPORT_RETREAT_COST = 3;
 export const TELEPORT_BANKED_RESOURCE_KEEP_RATIO = 0.75;
@@ -101,6 +103,11 @@ const chooseEnemyKindForBudget = (config: VinhDaWaveConfig, budgetRemaining: num
 export interface VinhDaSimulationState {
   bloodSealStone: number;
   carriedDaThach: number;
+  carriedResources?: TieredAmount[];
+  baseStoredResources?: TieredAmount[];
+  baseLiquidHnt?: number;
+  condensedHnt?: number;
+  baseEnergyShortage?: boolean;
   droppedResources: DroppedResource[];
   nextDroppedResourceId: number;
   baseHp: number;
@@ -412,7 +419,7 @@ export const removeEnemyAt = (ctx: VinhDaSimulationContext, index: number, rewar
     if (reward){
       const drop = getEnemyResourceDrop({ kind: enemy.kind, enemyTier: enemy.tier, mapTier: ctx.state.mapTier, rank: enemy.rank, nightIndex: ctx.state.nightIndex });
       if (drop && drop.amount > 0){
-        ctx.state.droppedResources.push({ id: ctx.state.nextDroppedResourceId, x: enemy.x, ...drop });
+        ctx.state.droppedResources.push({ id: ctx.state.nextDroppedResourceId, x: enemy.x, kind: drop.resourceId, ...drop });
         ctx.state.nextDroppedResourceId += 1;
         ctx.renderDroppedResources();
       }
@@ -422,21 +429,35 @@ export const clearEnemiesWithoutReward = (ctx: VinhDaSimulationContext): void =>
     while (ctx.state.enemies.length > 0) removeEnemyAt(ctx, ctx.state.enemies.length - 1, false, false);
     ctx.state.enemySpawnTimer = 0;
   };
+const addTieredAmount = (resources: TieredAmount[], resource: TieredAmount): void => {
+  const existing = resources.find(item => item.resourceId === resource.resourceId && item.tier === resource.tier);
+  if (existing) existing.amount += resource.amount;
+  else resources.push({ resourceId: resource.resourceId, amount: resource.amount, tier: resource.tier });
+};
+
 export const collectDroppedResources = (ctx: VinhDaSimulationContext): void => {
   let collected = 0;
+  ctx.state.carriedResources ??= [];
+  ctx.state.baseStoredResources ??= [];
   for (let i = ctx.state.droppedResources.length - 1; i >= 0; i -= 1){
     const resource = ctx.state.droppedResources[i];
     if (!resource || Math.abs(resource.x - ctx.state.leaderX) > RESOURCE_PICKUP_RANGE) continue;
     collected += resource.amount;
+    addTieredAmount(ctx.state.carriedResources, resource);
+    if (resource.resourceId === 'darkStone') ctx.state.carriedDaThach += resource.amount;
     ctx.state.droppedResources.splice(i, 1);
   }
   if (collected > 0){
-    ctx.state.carriedDaThach += collected;
     ctx.renderDroppedResources();
     ctx.renderEconomy();
   }
-  if (ctx.state.carriedDaThach > 0 && Math.abs(ctx.state.leaderX - getBaseX(ctx.state)) <= RESOURCE_DEPOSIT_RANGE){
-    ctx.state.bloodSealStone += ctx.state.carriedDaThach;
+  if (ctx.state.carriedResources.length > 0 && Math.abs(ctx.state.leaderX - getBaseX(ctx.state)) <= RESOURCE_DEPOSIT_RANGE){
+    for (const resource of ctx.state.carriedResources){
+      addTieredAmount(ctx.state.baseStoredResources, resource);
+      if (ctx.state.baseEnergyShortage) continue;
+      ctx.state.baseLiquidHnt = (ctx.state.baseLiquidHnt ?? 0) + getLiquidHntValue(resource);
+    }
+    ctx.state.carriedResources.length = 0;
     ctx.state.carriedDaThach = 0;
     ctx.renderEconomy();
   }
@@ -479,6 +500,7 @@ const getLeaderHp = (ctx: VinhDaSimulationContext): number => {
   return ctx.state.leaderHp;
 };
 const healLeader = (ctx: VinhDaSimulationContext, amount: number): void => {
+  if (ctx.state.baseEnergyShortage) return;
   ctx.state.leaderHp = Math.min(getLeaderMaxHp(ctx), getLeaderHp(ctx) + Math.max(0, amount));
 };
 const damageLeader = (ctx: VinhDaSimulationContext, amount: number): boolean => {
@@ -551,6 +573,7 @@ const tickBaseHealingCapWindow = (ctx: VinhDaSimulationContext, dt: number): voi
   resetBaseHealingCapWindow(ctx);
 };
 const healBase = (ctx: VinhDaSimulationContext, amount: number, bounds = getLivingTerritoryWallBounds(ctx)): void => {
+  if (ctx.state.baseEnergyShortage) return;
   if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds)) return;
   const maxHp = getBaseMaxHp(ctx);
   const requestedHeal = amount * (1 + getChurchHealingBonus(ctx));
@@ -562,6 +585,7 @@ const healBase = (ctx: VinhDaSimulationContext, amount: number, bounds = getLivi
   ctx.state.baseHp += appliedHeal;
 };
 const applyElementAllyBuffInRange = (ctx: VinhDaSimulationContext, sourceX: number, range: number, apply: (statuses: import('./types.ts').VinhDaStatusCollection) => void): void => {
+  if (ctx.state.baseEnergyShortage) return;
   const bounds = getLivingTerritoryWallBounds(ctx);
   if (isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) && Math.abs(getBaseX(ctx.state) - sourceX) <= range){
     const statuses = ctx.state.baseStatuses ??= {};
@@ -1063,7 +1087,18 @@ export const updateEnemies = (ctx: VinhDaSimulationContext, dt: number): void =>
 
 const applyBaseBuffDailyUpkeep = (ctx: VinhDaSimulationContext): void => {
   if ((ctx.state.baseLevel ?? 0) <= 0) return;
-  ctx.state.bloodSealStone = Math.max(0, ctx.state.bloodSealStone - BASE_BUFF_DAILY_UPKEEP);
+  let remaining = BASE_BUFF_DAILY_UPKEEP;
+  const liquid = ctx.state.baseLiquidHnt ?? 0;
+  const liquidPaid = Math.min(liquid, remaining);
+  ctx.state.baseLiquidHnt = liquid - liquidPaid;
+  remaining -= liquidPaid;
+  if (remaining > 0){
+    const hardPaid = Math.min(ctx.state.condensedHnt ?? ctx.state.bloodSealStone, remaining);
+    ctx.state.condensedHnt = Math.max(0, (ctx.state.condensedHnt ?? ctx.state.bloodSealStone) - hardPaid);
+    ctx.state.bloodSealStone = ctx.state.condensedHnt;
+    remaining -= hardPaid;
+  }
+  ctx.state.baseEnergyShortage = remaining > 0;
   ctx.renderEconomy();
 };
 
@@ -1220,6 +1255,7 @@ const updateGravityCannon = (ctx: VinhDaSimulationContext, structure: PlacedStru
 };
 
 const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
+  if (ctx.state.baseEnergyShortage) return;
   const stat = getBaseStat(ctx);
   const territoryBounds = getLivingTerritoryWallBounds(ctx);
   if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), territoryBounds)) return;
@@ -1243,6 +1279,7 @@ const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
   }
 };
 const updateChurch = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime): void => {
+  if (ctx.state.baseEnergyShortage) return;
   if (structure.type !== 'church') return;
   const site = ctx.getBuildSite(structure.siteId);
   const territoryBounds = getLivingTerritoryWallBounds(ctx);

@@ -90,7 +90,7 @@ describe('Vĩnh Dạ enemy behavior locks', () => {
 
     expect(ctx.state.enemies).toHaveLength(0);
     expect(ctx.state.droppedResources).toHaveLength(1);
-    expect(ctx.state.droppedResources[0]).toMatchObject({ kind: 'daThach', amount: expect.any(Number), x: CRYSTAL_X - 50 });
+    expect(ctx.state.droppedResources[0]).toMatchObject({ kind: 'darkStone', resourceId: 'darkStone', tier: 1.2, amount: expect.any(Number), x: CRYSTAL_X - 50 });
     expect(ctx.state.droppedResources[0]!.amount).toBeGreaterThan(0);
     expect(ctx.renderDroppedResources).toHaveBeenCalledTimes(1);
   });
@@ -113,7 +113,8 @@ describe('Vĩnh Dạ enemy behavior locks', () => {
     expect(ctx.state.dayNightPhase).toBe('day');
     expect(ctx.state.enemies).toHaveLength(1);
     expect(ctx.state.enemies[0]!.kind).toBe('apostle');
-    expect(ctx.state.bloodSealStone).toBe(4);
+    expect(ctx.state.bloodSealStone).toBe(0);
+    expect(ctx.state.baseEnergyShortage).toBe(false);
     expect(ctx.state.droppedResources).toHaveLength(0);
     expect(ctx.state.nextDroppedResourceId).toBe(1);
     expect(ctx.state.contamination).toBe(0);

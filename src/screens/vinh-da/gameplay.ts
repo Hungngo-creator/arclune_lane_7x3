@@ -63,6 +63,8 @@ import {
 } from './simulation.ts';
 import type { DayNightPhase, VinhDaSimulationContext, VinhDaSimulationState } from './simulation.ts';
 import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime, VinhDaStatusCollection } from './types.ts';
+import { getResourceLabel, isTieredVinhDaResource } from './economy/resources.ts';
+import type { TieredAmount } from './economy/resources.ts';
 import {
   createElementalRegionRandom,
   createElementalRegions,
@@ -340,6 +342,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let selectedGroundPlotId: string | null = null;
   let bloodSealStone = 0;
   let carriedDaThach = 0;
+  const carriedResources: TieredAmount[] = [];
+  const baseStoredResources: TieredAmount[] = [];
+  let baseLiquidHnt = 0;
+  let condensedHnt = 0;
+  let baseEnergyShortage = false;
   let baseHp = 20;
   let baseLevel = 0;
   let baseX = CRYSTAL_X;
@@ -378,7 +385,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     <div class="vinh-da-game__hud">
       <div class="vinh-da-game__panel">
         <strong>Vĩnh Dạ · ${leader?.name ?? leaderId ?? 'Leader'}</strong>
-        <div>Dạ Thạch: <span data-role="blood-seal-stone">${bloodSealStone}</span> · Đang chở: <span data-role="carried-resource">${carriedDaThach}</span></div>
+        <div>Nguyên Tinh cứng: <span data-role="blood-seal-stone">${bloodSealStone}</span> HNT · Đang chở: <span data-role="carried-resource">${carriedDaThach}</span> Dạ Thạch</div>
+        <div>Năng lượng lỏng base: <span data-role="base-liquid-hnt">0</span> HNT · <span data-role="base-energy-status">Đủ Năng Lượng</span></div>
+        <div data-role="resource-inventory"></div>
         <div>Phase: <span data-role="day-night-phase"></span></div>
         <div>Đêm: <span data-role="night-index"></span> · Budget: <span data-role="wave-threat-budget"></span></div>
         <div>Còn lại: <span data-role="phase-time-remaining"></span></div>
@@ -419,6 +428,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const noticeElement = section.querySelector<HTMLElement>('[data-role="notice"]');
   const bloodSealStoneText = section.querySelector<HTMLElement>('[data-role="blood-seal-stone"]');
   const carriedResourceText = section.querySelector<HTMLElement>('[data-role="carried-resource"]');
+  const baseLiquidHntText = section.querySelector<HTMLElement>('[data-role="base-liquid-hnt"]');
+  const baseEnergyStatusText = section.querySelector<HTMLElement>('[data-role="base-energy-status"]');
+  const resourceInventoryText = section.querySelector<HTMLElement>('[data-role="resource-inventory"]');
   const dayNightPhaseText = section.querySelector<HTMLElement>('[data-role="day-night-phase"]');
   const phaseTimeRemainingText = section.querySelector<HTMLElement>('[data-role="phase-time-remaining"]');
   const nightIndexText = section.querySelector<HTMLElement>('[data-role="night-index"]');
@@ -498,9 +510,18 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const structureSiteIdsOfType = (type: StructureType): Iterable<string> => structureSitesByType.get(type) ?? [];
 
   const canAfford = (cost: number): boolean => bloodSealStone >= cost;
+  const formatResources = (resources: readonly TieredAmount[]): string => resources.length <= 0
+    ? 'trống'
+    : resources.map(resource => `${getResourceLabel(resource.resourceId)}${isTieredVinhDaResource(resource.resourceId) ? ` ${resource.tier ?? '?.?'}` : ''} ×${resource.amount}`).join(' · ');
   const renderEconomy = (): void => {
-    if (bloodSealStoneText) bloodSealStoneText.textContent = String(bloodSealStone);
+    if (bloodSealStoneText) bloodSealStoneText.textContent = String(Math.floor(condensedHnt || bloodSealStone));
     if (carriedResourceText) carriedResourceText.textContent = String(carriedDaThach);
+    if (baseLiquidHntText) baseLiquidHntText.textContent = baseLiquidHnt.toFixed(1);
+    if (baseEnergyStatusText){
+      baseEnergyStatusText.textContent = baseEnergyShortage ? 'Thiếu Năng Lượng' : 'Đủ Năng Lượng';
+      baseEnergyStatusText.classList.toggle('vinh-da-game__status-danger', baseEnergyShortage);
+    }
+    if (resourceInventoryText) resourceInventoryText.textContent = `Kho base: ${formatResources(baseStoredResources)} | Đang nhặt: ${formatResources(carriedResources)}`;
   };
   const chooseWeather = (): WeatherType => {
     const roll = Math.random();
@@ -836,6 +857,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     set bloodSealStone(value: number){ bloodSealStone = value; },
     get carriedDaThach(){ return carriedDaThach; },
     set carriedDaThach(value: number){ carriedDaThach = value; },
+    carriedResources,
+    baseStoredResources,
+    get baseLiquidHnt(){ return baseLiquidHnt; },
+    set baseLiquidHnt(value: number | undefined){ baseLiquidHnt = value ?? 0; },
+    get condensedHnt(){ return condensedHnt; },
+    set condensedHnt(value: number | undefined){ condensedHnt = value ?? 0; bloodSealStone = condensedHnt; },
+    get baseEnergyShortage(){ return baseEnergyShortage; },
+    set baseEnergyShortage(value: boolean | undefined){ baseEnergyShortage = Boolean(value); },
     droppedResources,
     nextDroppedResourceId,
     get baseHp(){ return baseHp; },
@@ -902,6 +931,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     leaderShieldNightIndex = simulationState.leaderShieldNightIndex;
     leaderEmergencyCooldownUntilNight = simulationState.leaderEmergencyCooldownUntilNight ?? leaderEmergencyCooldownUntilNight;
     baseLevel = simulationState.baseLevel ?? baseLevel;
+    baseLiquidHnt = simulationState.baseLiquidHnt ?? baseLiquidHnt;
+    condensedHnt = simulationState.condensedHnt ?? condensedHnt;
+    bloodSealStone = condensedHnt || simulationState.bloodSealStone;
+    baseEnergyShortage = Boolean(simulationState.baseEnergyShortage);
   };
   const spawnWaveEnemy = (side: Side): void => { runtimeSpawnWaveEnemy(simulationContext, side); syncSimulationState(); };
   const removeEnemyAt = (index: number, reward: boolean): void => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };
@@ -936,7 +969,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       if (!element){
         element = document.createElement('div');
         element.className = 'vinh-da-game__drop';
-        element.title = `${resource.kind === 'daThach' ? 'Dạ Thạch' : 'Tài nguyên'} +${resource.amount}`;
+        element.title = `${getResourceLabel(resource.resourceId)}${resource.tier ? ` ${resource.tier}` : ''} +${resource.amount}`;
         droppedResourcesContainer.append(element);
         droppedResourceElements.set(resource.id, element);
       }

@@ -1,5 +1,6 @@
 import type { EnemyKind, EnemyTier } from './enemies.ts';
 import type { ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
+import type { TieredAmount, VinhDaResourceId, VinhDaTier } from './economy/resources.ts';
 
 export type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
 export type ElementalRegionKind = 'fire' | 'wood' | 'water' | 'earth' | 'metal' | 'thunder' | 'blood' | 'light' | 'wind' | 'dark';
@@ -72,13 +73,13 @@ export interface RuntimeSoldier {
   statuses?: VinhDaStatusCollection;
 }
 
-export type DroppedResourceKind = 'daThach';
+export type DroppedResourceKind = VinhDaResourceId;
 
-export interface DroppedResource {
+export interface DroppedResource extends TieredAmount {
   id: number;
   x: number;
   kind: DroppedResourceKind;
-  amount: number;
+  tier?: EnemyTier | VinhDaTier;
 }
 
 export interface EnemyPortal {
