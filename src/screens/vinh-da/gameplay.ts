@@ -3,6 +3,7 @@ import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import type { MainMenuShell } from '../main-menu/types.ts';
 import { getFrameRateCap } from '../../utils/frame-rate.ts';
 import { isAudioEnabled } from '../../utils/audio-settings.ts';
+import { createRngState } from '../../utils/rng.ts';
 
 import {
   BUILD_RANGE,
@@ -363,6 +364,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const enemies: Enemy[] = [];
   const enemyPortals = createEnemyPortals();
   const droppedResources: DroppedResource[] = [];
+  const lootRng = createRngState(Date.now());
   const enemyElements = new Map<number, HTMLElement>();
   const droppedResourceElements = new Map<number, HTMLElement>();
   let nextEnemyId = 1;
@@ -867,6 +869,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     set baseEnergyShortage(value: boolean | undefined){ baseEnergyShortage = Boolean(value); },
     droppedResources,
     nextDroppedResourceId,
+    lootRng,
     get baseHp(){ return baseHp; },
     set baseHp(value: number){ baseHp = value; },
     get baseLevel(){ return baseLevel; },

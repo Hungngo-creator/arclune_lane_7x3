@@ -34,13 +34,16 @@ import {
   SWAMP_RADIUS,
   WORLD_WIDTH
 } from './constants.ts';
+import { nextRngValue } from '../../utils/rng.ts';
+import type { RngState } from '@shared-types/rng';
 import { getElementalRegionAtX } from './elemental-regions.ts';
-import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, getEnemyResourceDrop, reduceDamageByDefense, scaleEnemyTierStat } from './enemies.ts';
+import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, reduceDamageByDefense, scaleEnemyTierStat } from './enemies.ts';
 import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
 import { BASE_STRUCTURE_STATS, getBaseLevelStat, getStructureLevelStat } from './structures.ts';
 import type { BaseBranchLv3, ElementalTowerElement, StructureType } from './structures.ts';
 import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
 import { getLiquidHntValue } from './economy/conversion.ts';
+import { rollEnemyResourceDrops } from './economy/dropTables.ts';
 import type { TieredAmount } from './economy/resources.ts';
 
 export const DAY_DURATION_SECONDS = 300;
@@ -110,6 +113,7 @@ export interface VinhDaSimulationState {
   baseEnergyShortage?: boolean;
   droppedResources: DroppedResource[];
   nextDroppedResourceId: number;
+  lootRng?: RngState;
   baseHp: number;
   baseLevel?: number;
   baseX?: number;
@@ -416,13 +420,14 @@ export const removeEnemyAt = (ctx: VinhDaSimulationContext, index: number, rewar
     if (!enemy) return;
     ctx.removeEnemyElement(enemy.id);
   if (triggerDeathEffects) triggerDeathExplosion(ctx, enemy);
-    if (reward){
-      const drop = getEnemyResourceDrop({ kind: enemy.kind, enemyTier: enemy.tier, mapTier: ctx.state.mapTier, rank: enemy.rank, nightIndex: ctx.state.nightIndex });
-      if (drop && drop.amount > 0){
+    if (reward && ctx.state.dayNightPhase === 'night'){
+      const drops = rollEnemyResourceDrops({ kind: enemy.kind, enemyTier: enemy.tier, mapTier: ctx.state.mapTier, randomValue: () => nextRngValue(ctx.state.lootRng) });
+      for (const drop of drops){
+        if (drop.amount <= 0) continue;
         ctx.state.droppedResources.push({ id: ctx.state.nextDroppedResourceId, x: enemy.x, kind: drop.resourceId, ...drop });
         ctx.state.nextDroppedResourceId += 1;
-        ctx.renderDroppedResources();
       }
+      if (drops.length > 0) ctx.renderDroppedResources();
     }
   };
 export const clearEnemiesWithoutReward = (ctx: VinhDaSimulationContext): void => {

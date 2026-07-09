@@ -20,6 +20,8 @@ export type VinhDaResourceId =
   | 'spiritWood'
   | 'spiritHerb'
   | 'hazySoul'
+  | 'apostleCloak'
+  | 'mageStaff'
   | 'bloodLordSigil';
 
 export type TieredAmount = {
@@ -49,7 +51,9 @@ export const UNTIERED_VINH_DA_RESOURCES = Object.freeze([
   'mindStone',
   'machinePart',
   'hazySoul',
-  'sealDust'
+  'sealDust',
+  'apostleCloak',
+  'mageStaff',
 ] as const satisfies readonly VinhDaResourceId[]);
 
 export const VINH_DA_RESOURCE_LABELS = Object.freeze({
@@ -70,6 +74,8 @@ export const VINH_DA_RESOURCE_LABELS = Object.freeze({
   spiritWood: 'Linh Mộc',
   spiritHerb: 'Linh Thảo',
   hazySoul: 'Tinh Phách Mờ',
+  apostleCloak: 'Áo Choàng Sứ Đồ',
+  mageStaff: 'Trượng Pháp Sư',
   bloodLordSigil: 'Huyết Chủ Ấn Phiến'
 } as const satisfies Record<VinhDaResourceId, string>);
 
