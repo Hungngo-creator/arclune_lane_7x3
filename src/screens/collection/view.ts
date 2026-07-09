@@ -4,7 +4,7 @@ import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { getSkillSet } from '../../data/skills.ts';
 import { createNumberFormatter } from '../../utils/format.ts';
-import { upgradeCultivation, getCultivationCost, type CultivationPlayerState } from '../../cultivation.ts';
+import { upgradeCultivation, getCultivationCost, applyCultivationBonusToCatalogStats, type CultivationPlayerState } from '../../cultivation.ts';
 import { getCultivationRealmEconomy } from '../../data/economy.ts';
 import {
   createNormalizedWallet,
@@ -225,19 +225,6 @@ function resolveAvailableQuantityForItem(params: {
     mergeTpAllocation(allocation, { HP: 1 });
   }
   return allocation;
-}
-
-function resolveEquipmentTpBonus(unit: CollectionEntry | null, equipment: UnitEquipmentState): number {
-  const growth = resolveClassGrowthByUnit(unit);
-  const total = sumTpAllocation(resolveEquipmentTpAllocation(equipment));
-
-  const weighted = Object.values(growth).reduce((sum, value) => {
-    const numeric = Number(value);
-    return sum + (Number.isFinite(numeric) && numeric > 0 ? numeric : 0);
-  }, 0);
-  const normalizeFactor = Object.keys(TP_DELTA).length > 0 ? weighted / Object.keys(TP_DELTA).length : 1;
-  const factor = Number.isFinite(normalizeFactor) && normalizeFactor > 0 ? normalizeFactor : 1;
-  return total * factor;
 }
 
 const TP_STAT_GAIN_PER_POINT: Readonly<Record<TpStatKey, number>> = Object.freeze({
@@ -498,28 +485,62 @@ function resolveStatGainFromTpPoints(statKey: string, tpPoints: number): number 
   return tpPoints * gain;
 }
 
-function resolveUnitStats(unitId: string | null, tpAllocation: TpAllocMap = {}, equipmentTpAlloc: Record<string, number> = {}): Array<{ key: string; value: number }> {
-  if (!unitId) return [];
+export type CollectionStatPreview = {
+  stats: Array<{ key: string; value: number }>;
+  tpAlloc: TpAllocMap;
+  equipmentTpAlloc: Record<string, number>;
+};
+
+export function resolveUnitStatPreview(params: {
+  unitId: string | null;
+  cultivation?: { realm?: number | null; subRealm?: number | null } | null;
+  tpAllocation?: TpAllocMap;
+  equipment?: UnitEquipmentState;
+}): CollectionStatPreview {
+  const { unitId } = params;
+  const tpAlloc = normalizeTpAllocMap(params.tpAllocation ?? {});
+  const equipmentTpAlloc = resolveEquipmentTpAllocation(params.equipment ?? {});
+  if (!unitId) return { stats: [], tpAlloc, equipmentTpAlloc };
+
   const preview = ROSTER_PREVIEWS[unitId];
   const finalStats = preview?.final as Record<string, unknown> | undefined;
-  if (!finalStats) return [];
+  if (!finalStats) return { stats: [], tpAlloc, equipmentTpAlloc };
 
-  const hp = toFiniteStatValue(finalStats.HPmax ?? finalStats.HP ?? null);
+  const cultivatedStats = applyCultivationBonusToCatalogStats({
+    unitId,
+    stats: finalStats,
+    realm: params.cultivation?.realm ?? 1,
+    subRealm: params.cultivation?.subRealm ?? 0,
+  });
   const rows: Array<{ key: string; value: number }> = [];
+  const hp = toFiniteStatValue(cultivatedStats.HP ?? finalStats.HPmax ?? finalStats.HP ?? null);
   if (hp != null){
-    const manualHpBonus = resolveTpBonusForStat('HP', tpAllocation);
-    const equipmentHpBonus = resolveStatGainFromTpPoints('HP', Number(equipmentTpAlloc.HP ?? 0));
-    rows.push({ key: 'HP', value: hp + manualHpBonus + equipmentHpBonus });
+    rows.push({
+      key: 'HP',
+      value: hp + resolveTpBonusForStat('HP', tpAlloc) + resolveStatGainFromTpPoints('HP', Number(equipmentTpAlloc.HP ?? 0)),
+    });
   }
+
   for (const [key, rawValue] of Object.entries(finalStats)){
     if (key === 'HP' || key === 'HPmax') continue;
-    const value = toFiniteStatValue(rawValue);
-    if (value == null) continue;
-    const manualBonus = resolveTpBonusForStat(key, tpAllocation);
-    const equipmentBonus = resolveStatGainFromTpPoints(key, Number(equipmentTpAlloc[key] ?? 0));
-    rows.push({ key, value: value + manualBonus + equipmentBonus });
+    const baseValue = toFiniteStatValue(rawValue);
+    if (baseValue == null) continue;
+    const cultivatedValue = toFiniteStatValue(cultivatedStats[key]);
+    rows.push({
+      key,
+      value: (cultivatedValue ?? baseValue) + resolveTpBonusForStat(key, tpAlloc) + resolveStatGainFromTpPoints(key, Number(equipmentTpAlloc[key] ?? 0)),
+    });
   }
-  return rows;
+
+  return { stats: rows, tpAlloc, equipmentTpAlloc };
+}
+
+export function resolveCollectionCombatPower(preview: CollectionStatPreview, totalTp: number, catalogTpEquivalent = 0): number {
+  const normalizedTotalTp = Number.isFinite(totalTp) && totalTp > 0 ? Math.floor(totalTp) : 0;
+  const tpScore = normalizedTotalTp * K_TP_COMBAT_POWER;
+  const statTpEquivalent = preview.stats.reduce((sum, stat) => sum + toTpEquivalentFromStat(stat.key, stat.value), 0);
+  const normalizedCatalogBonus = Number.isFinite(catalogTpEquivalent) && catalogTpEquivalent > 0 ? catalogTpEquivalent : 0;
+  return Math.max(0, Math.round(tpScore + statTpEquivalent + normalizedCatalogBonus));
 }
 
 function toSafeText(value: string | number | null | undefined): string{
@@ -1313,32 +1334,30 @@ const miniStats = document.createElement('section');
     tpModal.classList.remove('is-open');
   };
 
-  const resolveCombatPower = (unitId: string | null, stats: Array<{ key: string; value: number }>, tpAlloc: TpAllocMap): number => {
+  const resolveCombatPower = (unitId: string | null, preview: CollectionStatPreview): number => {
     if (!unitId) return 0;
-    const spentTp = Object.values(tpAlloc).reduce((sum, value) => {
+    const spentTp = Object.values(preview.tpAlloc).reduce((sum, value) => {
       const numeric = Number(value ?? 0);
       if (!Number.isFinite(numeric) || numeric <= 0) return sum;
       return sum + Math.floor(numeric);
     }, 0);
     const availableTp = getUnitTp(unitId);
     const totalTp = Math.max(0, spentTp + availableTp);
-    const tpScore = totalTp * K_TP_COMBAT_POWER;
-
-    const baseStatTpEquivalent = stats.reduce((sum, stat) => sum + toTpEquivalentFromStat(stat.key, stat.value), 0);
     const unitMeta = rosterEntries.get(unitId)?.meta ?? null;
     const unitEntry = unitMeta as Record<string, unknown> | undefined;
-    const equipment = getUnitEquipment(unitId);
-    const equipmentTpEquivalent = readCombatPowerTpBonus(unitEntry ?? null) + resolveEquipmentTpBonus(unitMeta, equipment);
-
-    const combatPower = Math.round(tpScore + baseStatTpEquivalent + equipmentTpEquivalent);
-    return Math.max(0, combatPower);
+    return resolveCollectionCombatPower(preview, totalTp, readCombatPowerTpBonus(unitEntry ?? null));
   };
 
   const renderMiniStats = (unitId: string | null): void => {
     miniStatsList.replaceChildren();
-    const tpAlloc = getUnitTpAlloc(unitId);
-    const equipment = getUnitEquipment(unitId);
-    const stats = resolveUnitStats(unitId, tpAlloc, resolveEquipmentTpAllocation(equipment));
+    const unitCultivation = unitId ? savedCultivationByUnit[unitId] : null;
+    const preview = resolveUnitStatPreview({
+      unitId,
+      cultivation: unitCultivation,
+      tpAllocation: getUnitTpAlloc(unitId),
+      equipment: getUnitEquipment(unitId),
+    });
+    const stats = preview.stats;
     if (!stats.length){
       const empty = document.createElement('li');
       empty.className = 'collection-stage__mini-stats-item';
@@ -1347,7 +1366,7 @@ const miniStats = document.createElement('section');
       return;
     }
     const unitTp = getUnitTp(unitId);
-    const combatPower = resolveCombatPower(unitId, stats, tpAlloc);
+    const combatPower = resolveCombatPower(unitId, preview);
 
     const cpItem = document.createElement('li');
     cpItem.className = 'collection-stage__mini-stats-item';

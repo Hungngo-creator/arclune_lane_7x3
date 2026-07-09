@@ -9367,6 +9367,28 @@ __modules['./cultivation.ts'] = (exports, module, __require) => {
   const listCultivationRealmsEconomy = __dep0.listCultivationRealmsEconomy;
   const __dep1 = __require('./utils/currency.ts');
   const spendAetherWithPriority = __dep1.spendAetherWithPriority;
+  const CULTIVATION_CATALOG_TO_UNIT_STAT_KEY = Object.freeze({
+      HP: 'hpMax',
+      HPmax: 'hpMax',
+      ATK: 'atk',
+      WIL: 'wil',
+      ARM: 'arm',
+      RES: 'res',
+      AEmax: 'aeMax',
+      AEregen: 'aeRegen',
+  });
+  const CULTIVATION_UNIT_TO_CATALOG_STAT_KEY = Object.freeze({
+      hpMax: 'HP',
+      atk: 'ATK',
+      wil: 'WIL',
+      arm: 'ARM',
+      res: 'RES',
+      aeMax: 'AEmax',
+      aeRegen: 'AEregen',
+  });
+  function readFiniteNumber(value) {
+      return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  }
   const emptySpendResult = (wallet) => ({
       ok: false,
       wallet: { ...wallet },
@@ -9666,12 +9688,41 @@ __modules['./cultivation.ts'] = (exports, module, __require) => {
           ...(aeRegen !== undefined ? { aeRegen } : {}),
       };
   }
+  function applyCultivationBonusToCatalogStats(params) {
+      const unitInput = {
+          id: params.unitId ?? undefined,
+          realm: params.realm ?? 1,
+          subRealm: params.subRealm ?? 0,
+          hasCultivationData: params.hasCultivationData ?? true,
+      };
+      const output = {};
+      for (const [statKey, rawValue] of Object.entries(params.stats)) {
+          const value = readFiniteNumber(rawValue);
+          if (value == null)
+              continue;
+          output[statKey === 'HPmax' ? 'HP' : statKey] = value;
+          const unitKey = CULTIVATION_CATALOG_TO_UNIT_STAT_KEY[statKey];
+          if (!unitKey)
+              continue;
+          unitInput[unitKey] = value;
+          if (unitKey === 'hpMax')
+              unitInput.hp = value;
+      }
+      const cultivated = applyCultivationBonus(unitInput);
+      for (const [unitKey, statKey] of Object.entries(CULTIVATION_UNIT_TO_CATALOG_STAT_KEY)) {
+          const value = readFiniteNumber(cultivated[unitKey]);
+          if (value != null)
+              output[statKey] = value;
+      }
+      return output;
+  }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'listCultivationRealmOptions')) exports.listCultivationRealmOptions = listCultivationRealmOptions;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCultivationCost')) exports.getCultivationCost = getCultivationCost;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canBreakthrough')) exports.canBreakthrough = canBreakthrough;
   if (!Object.prototype.hasOwnProperty.call(exports, 'upgradeCultivation')) exports.upgradeCultivation = upgradeCultivation;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyCultivationBonus')) exports.applyCultivationBonus = applyCultivationBonus;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyCultivationBonusToCatalogStats')) exports.applyCultivationBonusToCatalogStats = applyCultivationBonusToCatalogStats;
 };
 __modules['./data/campaign-stages.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./catalog.ts');
@@ -26339,6 +26390,7 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
   const __dep4 = __require('./cultivation.ts');
   const upgradeCultivation = __dep4.upgradeCultivation;
   const getCultivationCost = __dep4.getCultivationCost;
+  const applyCultivationBonusToCatalogStats = __dep4.applyCultivationBonusToCatalogStats;
   const __dep5 = __require('./data/economy.ts');
   const getCultivationRealmEconomy = __dep5.getCultivationRealmEconomy;
   const __dep6 = __require('./utils/currency.ts');
@@ -26522,17 +26574,6 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
           mergeTpAllocation(allocation, { HP: 1 });
       }
       return allocation;
-  }
-  function resolveEquipmentTpBonus(unit, equipment) {
-      const growth = resolveClassGrowthByUnit(unit);
-      const total = sumTpAllocation(resolveEquipmentTpAllocation(equipment));
-      const weighted = Object.values(growth).reduce((sum, value) => {
-          const numeric = Number(value);
-          return sum + (Number.isFinite(numeric) && numeric > 0 ? numeric : 0);
-      }, 0);
-      const normalizeFactor = Object.keys(TP_DELTA).length > 0 ? weighted / Object.keys(TP_DELTA).length : 1;
-      const factor = Number.isFinite(normalizeFactor) && normalizeFactor > 0 ? normalizeFactor : 1;
-      return total * factor;
   }
   const TP_STAT_GAIN_PER_POINT = Object.freeze({
       HP: 20,
@@ -26759,31 +26800,50 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
           return tpPoints;
       return tpPoints * gain;
   }
-  function resolveUnitStats(unitId, tpAllocation = {}, equipmentTpAlloc = {}) {
+  function resolveUnitStatPreview(params) {
+      const { unitId } = params;
+      const tpAlloc = normalizeTpAllocMap(params.tpAllocation ?? {});
+      const equipmentTpAlloc = resolveEquipmentTpAllocation(params.equipment ?? {});
       if (!unitId)
-          return [];
+          return { stats: [], tpAlloc, equipmentTpAlloc };
       const preview = ROSTER_PREVIEWS[unitId];
       const finalStats = preview?.final;
       if (!finalStats)
-          return [];
-      const hp = toFiniteStatValue(finalStats.HPmax ?? finalStats.HP ?? null);
+          return { stats: [], tpAlloc, equipmentTpAlloc };
+      const cultivatedStats = applyCultivationBonusToCatalogStats({
+          unitId,
+          stats: finalStats,
+          realm: params.cultivation?.realm ?? 1,
+          subRealm: params.cultivation?.subRealm ?? 0,
+      });
       const rows = [];
+      const hp = toFiniteStatValue(cultivatedStats.HP ?? finalStats.HPmax ?? finalStats.HP ?? null);
       if (hp != null) {
-          const manualHpBonus = resolveTpBonusForStat('HP', tpAllocation);
-          const equipmentHpBonus = resolveStatGainFromTpPoints('HP', Number(equipmentTpAlloc.HP ?? 0));
-          rows.push({ key: 'HP', value: hp + manualHpBonus + equipmentHpBonus });
+          rows.push({
+              key: 'HP',
+              value: hp + resolveTpBonusForStat('HP', tpAlloc) + resolveStatGainFromTpPoints('HP', Number(equipmentTpAlloc.HP ?? 0)),
+          });
       }
       for (const [key, rawValue] of Object.entries(finalStats)) {
           if (key === 'HP' || key === 'HPmax')
               continue;
-          const value = toFiniteStatValue(rawValue);
-          if (value == null)
+          const baseValue = toFiniteStatValue(rawValue);
+          if (baseValue == null)
               continue;
-          const manualBonus = resolveTpBonusForStat(key, tpAllocation);
-          const equipmentBonus = resolveStatGainFromTpPoints(key, Number(equipmentTpAlloc[key] ?? 0));
-          rows.push({ key, value: value + manualBonus + equipmentBonus });
+          const cultivatedValue = toFiniteStatValue(cultivatedStats[key]);
+          rows.push({
+              key,
+              value: (cultivatedValue ?? baseValue) + resolveTpBonusForStat(key, tpAlloc) + resolveStatGainFromTpPoints(key, Number(equipmentTpAlloc[key] ?? 0)),
+          });
       }
-      return rows;
+      return { stats: rows, tpAlloc, equipmentTpAlloc };
+  }
+  function resolveCollectionCombatPower(preview, totalTp, catalogTpEquivalent = 0) {
+      const normalizedTotalTp = Number.isFinite(totalTp) && totalTp > 0 ? Math.floor(totalTp) : 0;
+      const tpScore = normalizedTotalTp * K_TP_COMBAT_POWER;
+      const statTpEquivalent = preview.stats.reduce((sum, stat) => sum + toTpEquivalentFromStat(stat.key, stat.value), 0);
+      const normalizedCatalogBonus = Number.isFinite(catalogTpEquivalent) && catalogTpEquivalent > 0 ? catalogTpEquivalent : 0;
+      return Math.max(0, Math.round(tpScore + statTpEquivalent + normalizedCatalogBonus));
   }
   function toSafeText(value) {
       if (value == null) {
@@ -27437,10 +27497,10 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
           pendingTpStat = null;
           tpModal.classList.remove('is-open');
       };
-      const resolveCombatPower = (unitId, stats, tpAlloc) => {
+      const resolveCombatPower = (unitId, preview) => {
           if (!unitId)
               return 0;
-          const spentTp = Object.values(tpAlloc).reduce((sum, value) => {
+          const spentTp = Object.values(preview.tpAlloc).reduce((sum, value) => {
               const numeric = Number(value ?? 0);
               if (!Number.isFinite(numeric) || numeric <= 0)
                   return sum;
@@ -27448,20 +27508,20 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
           }, 0);
           const availableTp = getUnitTp(unitId);
           const totalTp = Math.max(0, spentTp + availableTp);
-          const tpScore = totalTp * K_TP_COMBAT_POWER;
-          const baseStatTpEquivalent = stats.reduce((sum, stat) => sum + toTpEquivalentFromStat(stat.key, stat.value), 0);
           const unitMeta = rosterEntries.get(unitId)?.meta ?? null;
           const unitEntry = unitMeta;
-          const equipment = getUnitEquipment(unitId);
-          const equipmentTpEquivalent = readCombatPowerTpBonus(unitEntry ?? null) + resolveEquipmentTpBonus(unitMeta, equipment);
-          const combatPower = Math.round(tpScore + baseStatTpEquivalent + equipmentTpEquivalent);
-          return Math.max(0, combatPower);
+          return resolveCollectionCombatPower(preview, totalTp, readCombatPowerTpBonus(unitEntry ?? null));
       };
       const renderMiniStats = (unitId) => {
           miniStatsList.replaceChildren();
-          const tpAlloc = getUnitTpAlloc(unitId);
-          const equipment = getUnitEquipment(unitId);
-          const stats = resolveUnitStats(unitId, tpAlloc, resolveEquipmentTpAllocation(equipment));
+          const unitCultivation = unitId ? savedCultivationByUnit[unitId] : null;
+          const preview = resolveUnitStatPreview({
+              unitId,
+              cultivation: unitCultivation,
+              tpAllocation: getUnitTpAlloc(unitId),
+              equipment: getUnitEquipment(unitId),
+          });
+          const stats = preview.stats;
           if (!stats.length) {
               const empty = document.createElement('li');
               empty.className = 'collection-stage__mini-stats-item';
@@ -27470,7 +27530,7 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
               return;
           }
           const unitTp = getUnitTp(unitId);
-          const combatPower = resolveCombatPower(unitId, stats, tpAlloc);
+          const combatPower = resolveCombatPower(unitId, preview);
           const cpItem = document.createElement('li');
           cpItem.className = 'collection-stage__mini-stats-item';
           const cpLabel = document.createElement('span');
@@ -28487,6 +28547,8 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
       };
   }
   //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveUnitStatPreview')) exports.resolveUnitStatPreview = resolveUnitStatPreview;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveCollectionCombatPower')) exports.resolveCollectionCombatPower = resolveCollectionCombatPower;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderCollectionView')) exports.renderCollectionView = renderCollectionView;
 };
 __modules['./screens/gacha/view.ts'] = (exports, module, __require) => {

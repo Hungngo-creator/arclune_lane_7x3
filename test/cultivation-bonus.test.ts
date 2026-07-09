@@ -2,6 +2,7 @@ import * as assert from 'node:assert/strict';
 
 import {
   applyCultivationBonus,
+  applyCultivationBonusToCatalogStats,
   canBreakthrough,
   getCultivationCost,
   upgradeCultivation,
@@ -9,6 +10,23 @@ import {
 import { spendAetherWithPriority } from '../src/utils/currency.ts';
 
 describe('applyCultivationBonus', () => {
+  test('áp bonus tu vi cho stat catalog qua cùng applyCultivationBonus', () => {
+    const boosted = applyCultivationBonusToCatalogStats({
+      unitId: 'thien_luu',
+      stats: { HPmax: 1000, ATK: 200, WIL: 150, ARM: 90, RES: 80, AEmax: 300, AEregen: 20 },
+      realm: 1,
+      subRealm: 1,
+    });
+
+    assert.strictEqual(boosted.HP, 1020);
+    assert.strictEqual(boosted.ATK, 203);
+    assert.strictEqual(boosted.WIL, 152.25);
+    assert.strictEqual(boosted.ARM, 90.9);
+    assert.strictEqual(boosted.RES, 80.8);
+    assert.strictEqual(boosted.AEmax, 302.4);
+    assert.strictEqual(boosted.AEregen, 20.06);
+  });
+
   test('Khai Nguyên tăng tuyến tính và chặn tối đa ở tiểu cấp 9', () => {
     const boosted = applyCultivationBonus({
       id: 'linhgac',

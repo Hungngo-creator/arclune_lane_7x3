@@ -21,6 +21,33 @@ export interface CultivationUnitInput extends StatBlock, CultivationProgress {
   id?: string;
 }
 
+type CultivationScaledStatKey = 'hpMax' | 'hp' | 'atk' | 'wil' | 'arm' | 'res' | 'aeMax' | 'aeRegen';
+
+const CULTIVATION_CATALOG_TO_UNIT_STAT_KEY: Readonly<Record<string, CultivationScaledStatKey>> = Object.freeze({
+  HP: 'hpMax',
+  HPmax: 'hpMax',
+  ATK: 'atk',
+  WIL: 'wil',
+  ARM: 'arm',
+  RES: 'res',
+  AEmax: 'aeMax',
+  AEregen: 'aeRegen',
+});
+
+const CULTIVATION_UNIT_TO_CATALOG_STAT_KEY: Readonly<Partial<Record<CultivationScaledStatKey, string>>> = Object.freeze({
+  hpMax: 'HP',
+  atk: 'ATK',
+  wil: 'WIL',
+  arm: 'ARM',
+  res: 'RES',
+  aeMax: 'AEmax',
+  aeRegen: 'AEregen',
+});
+
+function readFiniteNumber(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
 interface CultivationStepBonus {
   hpMax: number;
   atk: number;
@@ -415,4 +442,37 @@ export function applyCultivationBonus<T extends CultivationUnitInput>(unit: T): 
     ...(aeMax !== undefined ? { aeMax } : {}),
     ...(aeRegen !== undefined ? { aeRegen } : {}),
   };
+}
+
+export function applyCultivationBonusToCatalogStats(params: {
+  unitId?: string | null;
+  stats: Readonly<Record<string, unknown>>;
+  realm?: number | null;
+  subRealm?: number | null;
+  hasCultivationData?: boolean;
+}): Record<string, number> {
+  const unitInput: CultivationUnitInput = {
+    id: params.unitId ?? undefined,
+    realm: params.realm ?? 1,
+    subRealm: params.subRealm ?? 0,
+    hasCultivationData: params.hasCultivationData ?? true,
+  };
+
+  const output: Record<string, number> = {};
+  for (const [statKey, rawValue] of Object.entries(params.stats)) {
+    const value = readFiniteNumber(rawValue);
+    if (value == null) continue;
+    output[statKey === 'HPmax' ? 'HP' : statKey] = value;
+    const unitKey = CULTIVATION_CATALOG_TO_UNIT_STAT_KEY[statKey];
+    if (!unitKey) continue;
+    unitInput[unitKey] = value;
+    if (unitKey === 'hpMax') unitInput.hp = value;
+  }
+
+  const cultivated = applyCultivationBonus(unitInput);
+  for (const [unitKey, statKey] of Object.entries(CULTIVATION_UNIT_TO_CATALOG_STAT_KEY) as Array<[CultivationScaledStatKey, string]>) {
+    const value = readFiniteNumber(cultivated[unitKey]);
+    if (value != null) output[statKey] = value;
+  }
+  return output;
 }
