@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -13213,8 +13213,8 @@ __modules['./entry.ts'] = (exports, module, __require) => {
   const resolveModuleFunction = __dep3.resolveModuleFunction;
   const __dep4 = __require('./utils/player-profile.ts');
   const loadPlayerProfile = __dep4.loadPlayerProfile;
-  const __dep5 = __require('./utils/unit-id.ts');
-  const normalizeUnitId = __dep5.normalizeUnitId;
+  const __dep5 = __require('./utils/profile-progress-merge.ts');
+  const mergeProfileProgressIntoCollectionState = __dep5.mergeProfileProgressIntoCollectionState;
   const hasMethod = (value, methodName) => (Boolean(value) && typeof value[methodName] === 'function');
   const isStoppableSession = (value) => hasMethod(value, 'stop');
   const isStartableSession = (value) => hasMethod(value, 'start');
@@ -13298,55 +13298,7 @@ __modules['./entry.ts'] = (exports, module, __require) => {
       return cloneScreenParamMap(params);
   }
   function mergeCollectionUnitsWithGambits(currentCollectionState, tacticalAiByUnit) {
-      if (!tacticalAiByUnit || typeof tacticalAiByUnit !== 'object')
-          return null;
-      const tacticalRows = Object.entries(tacticalAiByUnit)
-          .reduce((acc, [unitId, rows]) => {
-          const normalizedUnitId = normalizeUnitId(unitId);
-          if (!normalizedUnitId)
-              return acc;
-          if (Array.isArray(rows) || (rows && typeof rows === 'object')) {
-              acc.push([normalizedUnitId, rows]);
-          }
-          return acc;
-      }, []);
-      if (tacticalRows.length === 0)
-          return null;
-      const sourceState = currentCollectionState && typeof currentCollectionState === 'object' && !Array.isArray(currentCollectionState)
-          ? currentCollectionState
-          : {};
-      const sourceUnits = Array.isArray(sourceState.units) ? sourceState.units : [];
-      const mergedUnits = [...sourceUnits];
-      const unitIndexById = new Map();
-      for (let index = 0; index < mergedUnits.length; index += 1) {
-          const entry = mergedUnits[index];
-          if (!entry || typeof entry !== 'object' || Array.isArray(entry))
-              continue;
-          const rawUnitId = entry.unitId;
-          const normalizedUnitId = normalizeUnitId(typeof rawUnitId === 'string' ? rawUnitId : '');
-          if (!normalizedUnitId || unitIndexById.has(normalizedUnitId))
-              continue;
-          unitIndexById.set(normalizedUnitId, index);
-      }
-      for (const [unitId, gambit] of tacticalRows) {
-          const index = unitIndexById.get(unitId);
-          if (typeof index === 'number') {
-              const existing = mergedUnits[index];
-              const nextEntry = existing && typeof existing === 'object' && !Array.isArray(existing)
-                  ? { ...existing }
-                  : { unitId };
-              nextEntry.unitId = unitId;
-              nextEntry.gambit = gambit;
-              mergedUnits[index] = nextEntry;
-              continue;
-          }
-          unitIndexById.set(unitId, mergedUnits.length);
-          mergedUnits.push({ unitId, gambit });
-      }
-      return {
-          ...sourceState,
-          units: mergedUnits,
-      };
+      return mergeProfileProgressIntoCollectionState(currentCollectionState, { tacticalAiByUnit: tacticalAiByUnit });
   }
   const MODE_DEFINITIONS = MODES.reduce((acc, mode) => {
       const shell = mode.shell;
@@ -14283,7 +14235,7 @@ __modules['./entry.ts'] = (exports, module, __require) => {
           createSessionOptions.lineupDeck = lineupDeckEntries;
           startSessionOptions.lineupDeck = lineupDeckEntries;
       }
-      const mergedCollectionState = mergeCollectionUnitsWithGambits(createSessionOptions.collectionState, profile.tacticalAiByUnit);
+      const mergedCollectionState = mergeProfileProgressIntoCollectionState(createSessionOptions.collectionState, profile);
       if (mergedCollectionState) {
           createSessionOptions.collectionState = mergedCollectionState;
           startSessionOptions.collectionState = mergedCollectionState;
@@ -15520,6 +15472,9 @@ __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => 
       const subRealm = asFinite(entry.subRealm ?? entry.sub_realm);
       const stars = asFinite(entry.stars ?? entry.star);
       const tp = asFinite(entry.tp ?? entry.talentPoint ?? entry.talentPoints);
+      const tpAlloc = entry.tpAlloc && typeof entry.tpAlloc === 'object' && !Array.isArray(entry.tpAlloc)
+          ? { ...entry.tpAlloc }
+          : null;
       const owned = asBoolean(entry.owned ?? entry.unlocked ?? entry.isOwned);
       const awakened = asBoolean(entry.awakened ?? entry.isAwakened);
       const inLineup = asBoolean(entry.inLineup ?? entry.isInLineup);
@@ -15537,6 +15492,7 @@ __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => 
           ...(normalizedSubRealm != null ? { subRealm: normalizedSubRealm } : {}),
           ...(normalizedStars != null ? { stars: normalizedStars } : {}),
           ...(normalizedTp != null ? { tp: normalizedTp } : {}),
+          ...(tpAlloc ? { tpAlloc } : {}),
           ...(owned != null ? { owned } : {}),
           ...(awakened != null ? { awakened } : {}),
           ...(inLineup != null ? { inLineup } : {}),
@@ -45696,6 +45652,18 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
       }
       return Object.keys(normalized).length > 0 ? normalized : undefined;
   };
+  const sanitizeOwnedByUnit = (value) => {
+      if (!isObject(value))
+          return undefined;
+      const normalized = {};
+      for (const [unitId, owned] of Object.entries(value)) {
+          const validId = toNonEmptyString(unitId);
+          if (!validId || typeof owned !== 'boolean')
+              continue;
+          normalized[validId] = owned;
+      }
+      return Object.keys(normalized).length > 0 ? normalized : undefined;
+  };
   const sanitizeSavedProfile = (rawProfile) => {
       if (!isObject(rawProfile))
           return EMPTY_PROFILE;
@@ -45705,6 +45673,7 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
           : undefined;
       normalized.lineupActiveBuffOptionIndexes = sanitizeLineupBuffIndexes(rawProfile.lineupActiveBuffOptionIndexes);
       normalized.cultivationByUnit = sanitizeCultivationByUnit(rawProfile.cultivationByUnit);
+      normalized.ownedByUnit = sanitizeOwnedByUnit(rawProfile.ownedByUnit);
       const sectName = toNonEmptyString(rawProfile.sectName);
       normalized.sectName = sectName ?? '';
       return normalized;
@@ -45737,6 +45706,7 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
       tpAllocByUnit: mergeRecord(current.tpAllocByUnit, patch.tpAllocByUnit),
       equipmentByUnit: mergeRecord(current.equipmentByUnit, patch.equipmentByUnit),
       tacticalAiByUnit: mergeRecord(current.tacticalAiByUnit, patch.tacticalAiByUnit),
+      ownedByUnit: mergeRecord(current.ownedByUnit, patch.ownedByUnit),
       collectionUi: mergeRecord(current.collectionUi, patch.collectionUi),
       sectCultivation: mergeRecord(current.sectCultivation, patch.sectCultivation),
   });
@@ -45787,6 +45757,7 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
           tpAllocByUnit: {},
           equipmentByUnit: {},
           tacticalAiByUnit: {},
+          ownedByUnit: {},
       };
       savePlayerProfile(resetProfile);
       return resetProfile;
@@ -45796,6 +45767,96 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'savePlayerProfile')) exports.savePlayerProfile = savePlayerProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'patchPlayerProfile')) exports.patchPlayerProfile = patchPlayerProfile;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resetPlayerProfileData')) exports.resetPlayerProfileData = resetPlayerProfileData;
+};
+__modules['./utils/profile-progress-merge.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep0.normalizeUnitId;
+  const isPlainRecord = (value) => (Boolean(value) && typeof value === 'object' && !Array.isArray(value));
+  const normalizeProfileBoolean = (value) => {
+      if (typeof value === 'boolean')
+          return value;
+      if (typeof value === 'number')
+          return Number.isFinite(value) ? value !== 0 : null;
+      if (typeof value === 'string') {
+          const normalized = value.trim().toLowerCase();
+          if (normalized === 'true' || normalized === '1' || normalized === 'yes')
+              return true;
+          if (normalized === 'false' || normalized === '0' || normalized === 'no')
+              return false;
+      }
+      return null;
+  };
+  const collectNormalizedUnitPatches = (sourceByUnit, buildPatch) => {
+      if (!sourceByUnit || typeof sourceByUnit !== 'object' || Array.isArray(sourceByUnit))
+          return [];
+      return Object.entries(sourceByUnit).reduce((acc, [unitId, value]) => {
+          const normalizedUnitId = normalizeUnitId(unitId);
+          if (!normalizedUnitId)
+              return acc;
+          const patch = buildPatch(normalizedUnitId, value);
+          if (patch)
+              acc.push(patch);
+          return acc;
+      }, []);
+  };
+  const mergeCollectionUnitPatches = (currentCollectionState, patches) => {
+      if (patches.length === 0)
+          return null;
+      const sourceState = isPlainRecord(currentCollectionState) ? currentCollectionState : {};
+      const sourceUnits = Array.isArray(sourceState.units) ? sourceState.units : [];
+      const mergedUnits = [...sourceUnits];
+      const unitIndexById = new Map();
+      for (let index = 0; index < mergedUnits.length; index += 1) {
+          const entry = mergedUnits[index];
+          if (!isPlainRecord(entry))
+              continue;
+          const rawUnitId = entry.unitId ?? entry.id ?? entry.key;
+          const normalizedUnitId = normalizeUnitId(typeof rawUnitId === 'string' ? rawUnitId : '');
+          if (!normalizedUnitId || unitIndexById.has(normalizedUnitId))
+              continue;
+          unitIndexById.set(normalizedUnitId, index);
+      }
+      for (const patch of patches) {
+          const index = unitIndexById.get(patch.unitId);
+          if (typeof index === 'number') {
+              const existing = mergedUnits[index];
+              const nextEntry = isPlainRecord(existing) ? { ...existing } : { unitId: patch.unitId };
+              mergedUnits[index] = { ...nextEntry, ...patch };
+              continue;
+          }
+          unitIndexById.set(patch.unitId, mergedUnits.length);
+          mergedUnits.push({ ...patch });
+      }
+      return {
+          ...sourceState,
+          units: mergedUnits,
+      };
+  };
+  function mergeProfileProgressIntoCollectionState(currentCollectionState, profile) {
+      if (!profile)
+          return null;
+      const patches = [
+          ...collectNormalizedUnitPatches(profile.tacticalAiByUnit, (unitId, gambit) => (Array.isArray(gambit) || isPlainRecord(gambit) ? { unitId, gambit } : null)),
+          ...collectNormalizedUnitPatches(profile.cultivationByUnit, (unitId, progress) => {
+              if (!isPlainRecord(progress))
+                  return null;
+              const realm = typeof progress.realm === 'number' && Number.isFinite(progress.realm) ? Math.max(1, Math.floor(progress.realm)) : null;
+              const subRealm = typeof progress.subRealm === 'number' && Number.isFinite(progress.subRealm) ? Math.max(0, Math.floor(progress.subRealm)) : null;
+              return realm != null || subRealm != null
+                  ? { unitId, ...(realm != null ? { realm } : {}), ...(subRealm != null ? { subRealm } : {}) }
+                  : null;
+          }),
+          ...collectNormalizedUnitPatches(profile.tpByUnit, (unitId, tp) => (typeof tp === 'number' && Number.isFinite(tp) ? { unitId, tp: Math.max(0, Math.floor(tp)) } : null)),
+          ...collectNormalizedUnitPatches(profile.tpAllocByUnit, (unitId, tpAlloc) => (isPlainRecord(tpAlloc) ? { unitId, tpAlloc: { ...tpAlloc } } : null)),
+          ...collectNormalizedUnitPatches(profile.ownedByUnit, (unitId, owned) => {
+              const normalizedOwned = normalizeProfileBoolean(owned);
+              return normalizedOwned != null ? { unitId, owned: normalizedOwned } : null;
+          }),
+      ];
+      return mergeCollectionUnitPatches(currentCollectionState, patches);
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'mergeProfileProgressIntoCollectionState')) exports.mergeProfileProgressIntoCollectionState = mergeProfileProgressIntoCollectionState;
 };
 __modules['./utils/rarity.ts'] = (exports, module, __require) => {
   const RARITY_SEQUENCE = ['N', 'R', 'SR', 'SSR', 'UR', 'PRIME'];

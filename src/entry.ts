@@ -10,8 +10,8 @@ import type { ModeConfig, ModeGroup, ModeShellConfig } from '@shared-types/confi
 import type { UnknownRecord } from '@shared-types/common';
 import type { MenuCardMetadata, MenuSection } from './screens/main-menu/types.ts';
 import type { LineupViewHandle } from './screens/lineup/view/index.ts';
-import { loadPlayerProfile } from './utils/player-profile.ts';
-import { normalizeUnitId } from './utils/unit-id.ts';
+import { loadPlayerProfile, type SavedPlayerProfile } from './utils/player-profile.ts';
+import { mergeProfileProgressIntoCollectionState } from './utils/profile-progress-merge.ts';
 
 export interface ScreenParamMap {
   readonly [key: string]: unknown;
@@ -206,55 +206,7 @@ function mergeCollectionUnitsWithGambits(
   currentCollectionState: unknown,
   tacticalAiByUnit: unknown,
 ): UnknownRecord | null {
-  if (!tacticalAiByUnit || typeof tacticalAiByUnit !== 'object') return null;
-
-  const tacticalRows = Object.entries(tacticalAiByUnit as Record<string, unknown>)
-    .reduce<Array<[string, unknown]>>((acc, [unitId, rows]) => {
-      const normalizedUnitId = normalizeUnitId(unitId);
-      if (!normalizedUnitId) return acc;
-      if (Array.isArray(rows) || (rows && typeof rows === 'object')) {
-        acc.push([normalizedUnitId, rows]);
-      }
-      return acc;
-    }, []);
-  if (tacticalRows.length === 0) return null;
-
-  const sourceState = currentCollectionState && typeof currentCollectionState === 'object' && !Array.isArray(currentCollectionState)
-    ? (currentCollectionState as UnknownRecord)
-    : {};
-  const sourceUnits = Array.isArray(sourceState.units) ? sourceState.units : [];
-  const mergedUnits = [...sourceUnits];
-  const unitIndexById = new Map<string, number>();
-
-  for (let index = 0; index < mergedUnits.length; index += 1) {
-    const entry = mergedUnits[index];
-    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
-    const rawUnitId = (entry as Record<string, unknown>).unitId;
-    const normalizedUnitId = normalizeUnitId(typeof rawUnitId === 'string' ? rawUnitId : '');
-    if (!normalizedUnitId || unitIndexById.has(normalizedUnitId)) continue;
-    unitIndexById.set(normalizedUnitId, index);
-  }
-
-  for (const [unitId, gambit] of tacticalRows) {
-    const index = unitIndexById.get(unitId);
-    if (typeof index === 'number') {
-      const existing = mergedUnits[index];
-      const nextEntry: Record<string, unknown> = existing && typeof existing === 'object' && !Array.isArray(existing)
-        ? { ...(existing as Record<string, unknown>) }
-        : { unitId };
-      nextEntry.unitId = unitId;
-      nextEntry.gambit = gambit;
-      mergedUnits[index] = nextEntry;
-      continue;
-    }
-    unitIndexById.set(unitId, mergedUnits.length);
-    mergedUnits.push({ unitId, gambit });
-  }
-
-  return {
-    ...sourceState,
-    units: mergedUnits,
-  };
+  return mergeProfileProgressIntoCollectionState(currentCollectionState, { tacticalAiByUnit: tacticalAiByUnit as SavedPlayerProfile['tacticalAiByUnit'] });
 }
 
 const MODE_DEFINITIONS: Record<string, ModeDefinition> = (MODES as ReadonlyArray<ModeConfig>).reduce<Record<string, ModeDefinition>>((acc, mode) => {
@@ -1273,9 +1225,9 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
     createSessionOptions.lineupDeck = lineupDeckEntries;
     startSessionOptions.lineupDeck = lineupDeckEntries;
   }
-  const mergedCollectionState = mergeCollectionUnitsWithGambits(
+  const mergedCollectionState = mergeProfileProgressIntoCollectionState(
     createSessionOptions.collectionState,
-    profile.tacticalAiByUnit,
+    profile,
   );
   if (mergedCollectionState) {
     createSessionOptions.collectionState = mergedCollectionState;

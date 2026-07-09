@@ -102,6 +102,8 @@ export interface CollectionProgressUnitInput extends UnknownRecord {
   subRealm?: number | string | null;
   level?: number | string | null;
   stars?: number | string | null;
+  tp?: number | string | null;
+  tpAlloc?: Partial<Record<'HP' | 'ATK' | 'WIL' | 'ARM' | 'RES', number>> | null;
   owned?: boolean | number | string | null;
   unlocked?: boolean | number | string | null;
   awakened?: boolean | number | string | null;
@@ -164,6 +166,7 @@ export interface RuntimeUnitProgress {
   subRealm?: number;
   level?: number;
   tp?: number;
+  tpAlloc?: Partial<Record<'HP' | 'ATK' | 'WIL' | 'ARM' | 'RES', number>>;
   stars?: number;
   owned?: boolean;
   awakened?: boolean;

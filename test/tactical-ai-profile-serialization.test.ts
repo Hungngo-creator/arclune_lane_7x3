@@ -80,7 +80,20 @@ describe('tacticalAiByUnit serialization/deserialization', () => {
       { condition: 'pool_aether_above', action: 'skill3', threshold: 35, enabled: true },
     ]);
   });
-  
+
+  it('merges saved cultivation progress into collection state before PvE mapping', () => {
+    const { mergeProfileProgressIntoCollectionState } = require('../src/utils/profile-progress-merge.ts') as typeof import('../src/utils/profile-progress-merge.ts');
+    const collectionState = mergeProfileProgressIntoCollectionState(
+      { units: [{ unitId: 'thien_luu', level: 20 }] },
+      { cultivationByUnit: { thien_luu: { realm: 4, subRealm: 2 } } },
+    );
+
+    const progress = mapUnitProgressById(collectionState).get('thien_luu');
+
+    expect(progress?.realm).toBe(4);
+    expect(progress?.subRealm).toBe(2);
+  });
+
   it('reuses cached collection mapping for same collection object', () => {
     const collectionState = {
       units: [

@@ -17,6 +17,7 @@ export interface SavedPlayerProfile {
   tpAllocByUnit?: Record<string, Partial<Record<'HP' | 'ATK' | 'WIL' | 'ARM' | 'RES', number>>>;
   equipmentByUnit?: Record<string, Record<string, string | null>>;
   tacticalAiByUnit?: Record<string, unknown>;
+  ownedByUnit?: Record<string, boolean>;
   collectionUi?: {
     activeTab?: string;
     artsHubAutoOpen?: boolean;
@@ -89,6 +90,17 @@ const sanitizeCultivationByUnit = (value: unknown): SavedPlayerProfile['cultivat
   return Object.keys(normalized).length > 0 ? normalized : undefined;
 };
 
+const sanitizeOwnedByUnit = (value: unknown): SavedPlayerProfile['ownedByUnit'] => {
+  if (!isObject(value)) return undefined;
+  const normalized: NonNullable<SavedPlayerProfile['ownedByUnit']> = {};
+  for (const [unitId, owned] of Object.entries(value)) {
+    const validId = toNonEmptyString(unitId);
+    if (!validId || typeof owned !== 'boolean') continue;
+    normalized[validId] = owned;
+  }
+  return Object.keys(normalized).length > 0 ? normalized : undefined;
+};
+
 const sanitizeSavedProfile = (rawProfile: unknown): SavedPlayerProfile => {
   if (!isObject(rawProfile)) return EMPTY_PROFILE;
 
@@ -98,6 +110,7 @@ const sanitizeSavedProfile = (rawProfile: unknown): SavedPlayerProfile => {
     : undefined;
   normalized.lineupActiveBuffOptionIndexes = sanitizeLineupBuffIndexes(rawProfile.lineupActiveBuffOptionIndexes);
   normalized.cultivationByUnit = sanitizeCultivationByUnit(rawProfile.cultivationByUnit);
+  normalized.ownedByUnit = sanitizeOwnedByUnit(rawProfile.ownedByUnit);
 
   const sectName = toNonEmptyString(rawProfile.sectName);
   normalized.sectName = sectName ?? '';
@@ -136,6 +149,7 @@ const buildMergedProfile = (
   tpAllocByUnit: mergeRecord(current.tpAllocByUnit, patch.tpAllocByUnit),
   equipmentByUnit: mergeRecord(current.equipmentByUnit, patch.equipmentByUnit),
   tacticalAiByUnit: mergeRecord(current.tacticalAiByUnit, patch.tacticalAiByUnit),
+  ownedByUnit: mergeRecord(current.ownedByUnit, patch.ownedByUnit),
   collectionUi: mergeRecord(current.collectionUi, patch.collectionUi),
   sectCultivation: mergeRecord(current.sectCultivation, patch.sectCultivation),
 });
@@ -192,6 +206,7 @@ export function resetPlayerProfileData(): SavedPlayerProfile {
     tpAllocByUnit: {},
     equipmentByUnit: {},
     tacticalAiByUnit: {},
+    ownedByUnit: {},
   };
 
   savePlayerProfile(resetProfile);
