@@ -39099,7 +39099,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const UPGRADE_NODE_LABEL = __dep6.UPGRADE_NODE_LABEL;
   const ELEMENTAL_TOWER_ELEMENTS = __dep6.ELEMENTAL_TOWER_ELEMENTS;
   const getBaseLevelStat = __dep6.getBaseLevelStat;
-  const getBuildLevelCost = __dep6.getBuildLevelCost;
+  const getStructureUpgradeCost = __dep6.getStructureUpgradeCost;
   const getStructureLevelStat = __dep6.getStructureLevelStat;
   const isStructureAllowedOnBuildSite = __dep6.isStructureAllowedOnBuildSite;
   const __dep7 = __require('./screens/vinh-da/simulation.ts');
@@ -39488,7 +39488,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const nightIndexText = section.querySelector('[data-role="night-index"]');
       const waveThreatBudgetText = section.querySelector('[data-role="wave-threat-budget"]');
       const statusPanel = section.querySelector('[data-role="status-panel"]');
-      const elementalRegions = createElementalRegions(getVinhDaMapTier(params), createElementalRegionRandom());
+      const mapTier = getVinhDaMapTier(params);
+      const elementalRegions = createElementalRegions(mapTier, createElementalRegionRandom());
       const elementalRegionsById = new Map(elementalRegions.map(region => [region.id, region]));
       const elementalRegionElements = new Map();
       const siteElements = new Map();
@@ -39563,10 +39564,26 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           return true;
       };
       const structureSiteIdsOfType = (type) => structureSitesByType.get(type) ?? [];
-      const canAfford = (cost) => bloodSealStone >= cost;
+      const tierValue = (tier) => typeof tier === 'number' ? tier : Number.NEGATIVE_INFINITY;
+      const formatResourceAmount = (resource) => `${getResourceLabel(resource.resourceId)}${isTieredVinhDaResource(resource.resourceId) ? ` ${resource.tier ?? '?.?'}` : ''} ×${resource.amount}`;
+      const getStoredAmount = (resourceId, requiredTier) => baseStoredResources.reduce((total, resource) => {
+          if (resource.resourceId !== resourceId)
+              return total;
+          if (isTieredVinhDaResource(resourceId) && tierValue(resource.tier) < tierValue(requiredTier))
+              return total;
+          return total + resource.amount;
+      }, 0);
+      const canAfford = (cost) => typeof cost === 'number'
+          ? bloodSealStone >= cost
+          : cost.every(resource => getStoredAmount(resource.resourceId, resource.tier) >= resource.amount);
+      const getMissingCost = (cost) => cost
+          .map(resource => ({ ...resource, amount: Math.max(0, resource.amount - getStoredAmount(resource.resourceId, resource.tier)) }))
+          .filter(resource => resource.amount > 0);
       const formatResources = (resources) => resources.length <= 0
           ? 'trống'
-          : resources.map(resource => `${getResourceLabel(resource.resourceId)}${isTieredVinhDaResource(resource.resourceId) ? ` ${resource.tier ?? '?.?'}` : ''} ×${resource.amount}`).join(' · ');
+          : resources.map(formatResourceAmount).join(' · ');
+      const formatCost = (cost) => cost.length <= 0 ? 'Miễn phí' : cost.map(formatResourceAmount).join(' · ');
+      const getCostFor = (type, level, branch) => getStructureUpgradeCost(type, level, branch, mapTier);
       const renderEconomy = () => {
           if (bloodSealStoneText)
               bloodSealStoneText.textContent = String(Math.floor(condensedHnt || bloodSealStone));
@@ -39668,7 +39685,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               `<div class="${contaminationStacks >= 5 ? 'vinh-da-game__status-danger' : contaminationStacks > 0 ? 'vinh-da-game__status-warn' : ''}">Ô nhiễm: ${contaminationStacks}/5 stack${contaminationStacks >= 5 ? ' · sẽ hóa Sứ Đồ' : ''}</div>`,
           ];
           if (elemental && elementalStat)
-              lines.push(`<div>Tháp NT: ${elemental.element ?? 'Hỏa'} Lv${elemental.level} · cost ${getBuildLevelCost('elementalTower', elemental.level)} · range ${elementalStat.range ?? 0} · ${describeElementEffect(elemental.element ?? 'Hỏa')}</div>`);
+              lines.push(`<div>Tháp NT: ${elemental.element ?? 'Hỏa'} Lv${elemental.level} · cost ${formatCost(getCostFor('elementalTower', elemental.level))} · range ${elementalStat.range ?? 0} · ${describeElementEffect(elemental.element ?? 'Hỏa')}</div>`);
           if (barracks && barracksStat)
               lines.push(`<div>Trại: ${barracksRuntime?.soldiers?.length ?? 0}/${barracksStat.soldierCap ?? 0} lính · rank ${barracksStat.soldierRank ?? 1} · ulti ${barracksStat.ultimatePermission ? 'ready' : 'khóa'}</div>`);
           if (church)
@@ -39693,9 +39710,33 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           }
       };
       const spend = (cost) => {
+          if (typeof cost === 'number') {
+              if (!canAfford(cost))
+                  return false;
+              bloodSealStone -= cost;
+              renderEconomy();
+              return true;
+          }
           if (!canAfford(cost))
               return false;
-          bloodSealStone -= cost;
+          for (const required of cost) {
+              let remaining = required.amount;
+              const matching = baseStoredResources
+                  .filter(resource => resource.resourceId === required.resourceId && (!isTieredVinhDaResource(required.resourceId) || tierValue(resource.tier) >= tierValue(required.tier)))
+                  .sort((a, b) => tierValue(a.tier) - tierValue(b.tier));
+              for (const resource of matching) {
+                  if (remaining <= 0)
+                      break;
+                  const used = Math.min(resource.amount, remaining);
+                  resource.amount -= used;
+                  remaining -= used;
+              }
+          }
+          for (let index = baseStoredResources.length - 1; index >= 0; index -= 1) {
+              const stored = baseStoredResources[index];
+              if (stored && stored.amount <= 0)
+                  baseStoredResources.splice(index, 1);
+          }
           renderEconomy();
           return true;
       };
@@ -39783,7 +39824,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const action = node.dataset.action;
               const isUpgradeNode = action === 'upgrade';
               const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
-              const cost = structure ? getBuildLevelCost(structure.type, nextLevel) : type ? getBuildLevelCost(type, 1) : 1;
+              const branch = action?.startsWith('branch-lv3-') ? action.slice('branch-lv3-'.length) : action?.startsWith('branch-lv5-') ? action.slice('branch-lv5-'.length) : undefined;
+              const cost = structure ? getCostFor(structure.type, nextLevel, branch) : type ? getCostFor(type, 1) : [];
               const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
               const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
               const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
@@ -39801,8 +39843,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
                           : !canMount)
                   : isUpgradeNode || (Boolean(action) && !canBuildElement) || (!action && (!type || type === 'elementalTower' || !isStructureAllowedOnBuildSite(type, site)));
               const buildElement = action?.startsWith('build-element-') ? action.slice('build-element-'.length) : undefined;
-              const effectiveCost = buildElement ? getBuildLevelCost('elementalTower', 1) : cost;
-              const titleParts = [`Cost ${effectiveCost}`];
+              const effectiveCost = buildElement ? getCostFor('elementalTower', 1) : cost;
+              const missingCost = getMissingCost(effectiveCost);
+              const titleParts = [`Cost ${formatCost(effectiveCost)}`, missingCost.length > 0 ? `Thiếu ${formatCost(missingCost)}` : 'Đủ vật liệu'];
               if (type) {
                   const stat = getStructureLevelStat(type, structure?.mountedStructure === type ? structure.mountedLevel ?? 1 : nextLevel);
                   if (stat.range)
@@ -39827,7 +39870,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
                   node.append(detail);
               }
               const detailStat = buildElement ? getStructureLevelStat('elementalTower', 1, undefined, undefined, buildElement) : type ? getStructureLevelStat(type, nextLevel) : null;
-              detail.textContent = detailStat ? `C${effectiveCost}${detailStat.range ? ` R${detailStat.range}` : ''}` : `C${effectiveCost}`;
+              detail.textContent = detailStat ? `${missingCost.length > 0 ? 'Thiếu' : 'Đủ'}${detailStat.range ? ` R${detailStat.range}` : ''}` : (missingCost.length > 0 ? 'Thiếu' : 'Đủ');
               if (node instanceof HTMLButtonElement)
                   node.disabled = !node.hidden && (teleportCheck ? !teleportCheck.ok : !canAfford(effectiveCost));
           }
@@ -39859,7 +39902,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           const soldierText = structure?.type === 'barracks' ? ` · lính ${runtime?.soldiers?.length ?? 0}/${stat?.soldierCap ?? 0} rank ${stat?.soldierRank ?? 1}` : '';
           const churchText = structure?.type === 'church' ? ` · prayer ${formatSeconds(runtime?.prayerTimer)} cleanse ${formatSeconds(runtime?.contaminationCleanseTimer)}` : '';
           const teleportText = structure?.type === 'teleport' ? ` · rút lui CD ${formatSeconds(runtime?.cooldown)}` : '';
-          siteButton.title = structure ? `${siteButton.dataset.structureLabel} Lv${structure.level} · HP ${Math.ceil(runtime?.hp ?? 0)}/${stat?.hp ?? 0} · cost ${getBuildLevelCost(structure.type, structure.level)}${stat?.range ? ` · range ${stat.range}` : ''}${branchText}${elementText}${soldierText}${churchText}${teleportText}` : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất cho bẫy' : 'Ụ đá cho tháp/trại/ấn';
+          siteButton.title = structure ? `${siteButton.dataset.structureLabel} Lv${structure.level} · HP ${Math.ceil(runtime?.hp ?? 0)}/${stat?.hp ?? 0} · cost ${formatCost(getCostFor(structure.type, structure.level, structure.branchLv5 ?? structure.branchLv3))}${stat?.range ? ` · range ${stat.range}` : ''}${branchText}${elementText}${soldierText}${churchText}${teleportText}` : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất cho bẫy' : 'Ụ đá cho tháp/trại/ấn';
           siteButton.setAttribute('aria-label', structure ? siteButton.title : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
           renderBuildMenu(siteId);
       };
@@ -40185,14 +40228,14 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const action = buildNode.dataset.action;
               if (site && structure && action) {
                   const nextLevel = structure.level + 1;
-                  if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(getBuildLevelCost(structure.type, nextLevel))) {
+                  if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(getCostFor(structure.type, nextLevel))) {
                       const upgraded = { ...structure, level: nextLevel };
                       setStructure(upgraded);
                       const runtime = ensureStructureRuntime(upgraded);
                       runtime.hp = getStructureMaxHp(upgraded);
                       renderBuildSite(site.id);
                   }
-                  else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(getBuildLevelCost(structure.type, 3))) {
+                  else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(getCostFor(structure.type, 3, action.slice('branch-lv3-'.length)))) {
                       const upgraded = { ...structure, level: 3, branchLv3: action.slice('branch-lv3-'.length) };
                       setStructure(upgraded);
                       ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
@@ -40223,7 +40266,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
                       showNotice(`Truyền tống về map cũ đã phong ấn · mất ${result.lostBloodSealStone} Dạ Thạch`);
                       shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId, retreatedFromVinhDa: true, sealedOldMap: true, bloodSealStone: result.bloodSealStoneAfter, carriedDaThach: result.carriedDaThachAfter });
                   }
-                  else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(getBuildLevelCost(structure.type, 5))) {
+                  else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(getCostFor(structure.type, 5, action.slice('branch-lv5-'.length)))) {
                       const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) };
                       setStructure(upgraded);
                       ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
@@ -40233,25 +40276,25 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               else {
                   const type = buildNode.dataset.structureType;
                   const buildElement = action?.startsWith('build-element-') ? action.slice('build-element-'.length) : undefined;
-                  if (site && buildElement && !structure && isStructureAllowedOnBuildSite('elementalTower', site) && spend(getBuildLevelCost('elementalTower', 1))) {
+                  if (site && buildElement && !structure && isStructureAllowedOnBuildSite('elementalTower', site) && spend(getCostFor('elementalTower', 1))) {
                       const placed = { siteId: site.id, type: 'elementalTower', level: 1, element: buildElement };
                       setStructure(placed);
                       ensureStructureRuntime(placed);
                       renderBuildSite(site.id);
                       showNotice(`Xây Tháp Nguyên Tố hệ ${buildElement}`);
                   }
-                  else if (site && buildElement && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && spend(getBuildLevelCost('elementalTower', 1))) {
+                  else if (site && buildElement && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && spend(getCostFor('elementalTower', 1))) {
                       const upgraded = { ...structure, mountedStructure: 'elementalTower', mountedLevel: 1, element: buildElement };
                       setStructure(upgraded);
                       renderBuildSite(site.id);
                       showNotice(`Gắn Tháp Nguyên Tố hệ ${buildElement}`);
                   }
-                  else if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && type !== 'elementalTower' && isStructureAllowedOnBuildSite(type, { kind: 'rock' }) && spend(getBuildLevelCost(type, 1))) {
+                  else if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && type !== 'elementalTower' && isStructureAllowedOnBuildSite(type, { kind: 'rock' }) && spend(getCostFor(type, 1))) {
                       const upgraded = { ...structure, mountedStructure: type, mountedLevel: 1 };
                       setStructure(upgraded);
                       renderBuildSite(site.id);
                   }
-                  else if (site && type && type !== 'elementalTower' && !structure && isStructureAllowedOnBuildSite(type, site) && spend(getBuildLevelCost(type, 1))) {
+                  else if (site && type && type !== 'elementalTower' && !structure && isStructureAllowedOnBuildSite(type, site) && spend(getCostFor(type, 1))) {
                       const placed = { siteId: site.id, type, level: 1 };
                       setStructure(placed);
                       ensureStructureRuntime(placed);
@@ -41808,6 +41851,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   const CASTLE_OUTER_LEFT = __dep0.CASTLE_OUTER_LEFT;
   const CASTLE_OUTER_RIGHT = __dep0.CASTLE_OUTER_RIGHT;
   const WORLD_WIDTH = __dep0.WORLD_WIDTH;
+  const __dep1 = __require('./screens/vinh-da/economy/resources.ts');
+  const isTieredVinhDaResource = __dep1.isTieredVinhDaResource;
   const UPGRADE_NODE_LABEL = 'Nâng cấp';
   const BUILD_LEVEL_COST = {
       1: 2,
@@ -41817,22 +41862,71 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       5: 12,
       6: 18,
   };
-  const STRUCTURE_COST_MULTIPLIER = {
-      watchtower: 1,
-      wall: 0.8,
-      elementalTower: 1.15,
-      barracks: 1.2,
-      church: 1.1,
-      crystalSeal: 1,
-      landmine: 0.6,
-      swamp: 0.75,
-      spikeTrap: 0.75,
-      antiAirCannon: 1.25,
-      gravityCannon: 1.35,
-      executionBlade: 1.4,
-      teleport: 1.6,
+  const c = (resourceId, amount, tierOffset = 0) => [resourceId, amount, tierOffset];
+  const cost = (...items) => items;
+  const STRUCTURE_UPGRADE_COSTS = {
+      crystalSeal: {
+          0: cost(),
+          1: cost(c('darkStone', 4), c('blackIron', 4)),
+          2: cost(c('darkStone', 8), c('blackIron', 6), c('blackBone', 1)),
+          3: {
+              defense: cost(c('darkStone', 12), c('blackIron', 8), c('blackBone', 3), c('wishStone', 1)),
+              attack: cost(c('darkStone', 12), c('blackIron', 8), c('blackBone', 3), c('resentmentStone', 1)),
+              default: cost(c('darkStone', 12), c('blackIron', 8), c('blackBone', 3), c('wishStone', 1))
+          },
+          4: cost(c('darkStone', 16), c('blackIron', 12), c('blackBone', 4), c('sealDust', 1)),
+          5: cost(c('darkStone', 24), c('blackIron', 16), c('blackBone', 6), c('fleshCrystal', 1)),
+          6: cost(c('darkStone', 30), c('blackIron', 20), c('blackBone', 8), c('fleshCrystal', 2), c('nightCore', 1))
+      },
+      wall: {
+          1: cost(c('blackIron', 4), c('darkStone', 2)),
+          2: cost(c('blackIron', 6), c('darkStone', 3)),
+          3: {
+              spike: cost(c('blackIron', 8), c('darkStone', 4), c('blackBone', 2)),
+              slippery: cost(c('blackIron', 6), c('darkStone', 4), c('heavyWater', 1)),
+              shock: cost(c('blackIron', 8), c('darkStone', 4), c('resentmentStone', 1)),
+              default: cost(c('blackIron', 8), c('darkStone', 4), c('blackBone', 2))
+          },
+          4: cost(c('blackIron', 10), c('darkStone', 6), c('blackBone', 3)),
+          5: {
+              biochemical: cost(c('blackIron', 12), c('darkStone', 8), c('blackBone', 4), c('spiritWood', 2), c('fleshCrystal', 1)),
+              curse: cost(c('blackIron', 10), c('darkStone', 8), c('blackBone', 4), c('resentmentStone', 4)),
+              link: cost(c('blackIron', 10), c('darkStone', 8), c('blackBone', 3), c('voidStone', 1), c('sealDust', 1)),
+              default: cost(c('blackIron', 12), c('darkStone', 8), c('blackBone', 4), c('spiritWood', 2), c('fleshCrystal', 1))
+          },
+          6: cost(c('blackIron', 16), c('darkStone', 10), c('blackBone', 5), c('nightCore', 1))
+      },
+      watchtower: { 1: cost(c('blackIron', 6), c('darkStone', 3)), 2: cost(c('blackIron', 5), c('darkStone', 3)), 3: cost(c('blackIron', 8), c('darkStone', 5), c('blackBone', 1)), 4: cost(c('blackIron', 10), c('darkStone', 6), c('blackBone', 2)), 5: cost(c('blackIron', 12), c('darkStone', 8), c('blackBone', 3), c('mindStone', 1)) },
+      elementalTower: { 1: cost(c('blackIron', 5), c('darkStone', 3), c('elementStone', 1)), 2: cost(c('blackIron', 5), c('darkStone', 4), c('elementStone', 1)), 3: cost(c('blackIron', 8), c('darkStone', 5), c('elementStone', 2), c('blackBone', 1)), 4: cost(c('blackIron', 10), c('darkStone', 7), c('elementStone', 2), c('blackBone', 2), c('mageStaff', 1)), 5: cost(c('blackIron', 12), c('darkStone', 9), c('elementStone', 3), c('blackBone', 3), c('mageStaff', 2), c('mindStone', 1)) },
+      barracks: { 1: cost(c('blackIron', 8), c('spiritWood', 4), c('darkStone', 2)), 2: cost(c('blackIron', 8), c('spiritWood', 4), c('blackBone', 2)), 3: cost(c('blackIron', 12), c('spiritWood', 6), c('blackBone', 4)), 4: cost(c('blackIron', 16), c('spiritWood', 8), c('blackBone', 6), c('mindStone', 1)), 5: cost(c('blackIron', 20), c('spiritWood', 10), c('blackBone', 8), c('mindStone', 2), c('fleshCrystal', 1)), 6: cost(c('blackIron', 24), c('spiritWood', 12), c('blackBone', 10), c('mindStone', 2), c('nightCore', 1)) },
+      church: { 1: cost(c('blackIron', 4), c('darkStone', 4), c('wishStone', 1)), 2: cost(c('blackIron', 6), c('darkStone', 5), c('wishStone', 1), c('blackBone', 1)), 3: cost(c('blackIron', 8), c('darkStone', 6), c('wishStone', 2), c('apostleCloak', 1)), 4: cost(c('blackIron', 10), c('darkStone', 8), c('wishStone', 3), c('apostleCloak', 2), c('bloodLordSigil', 1)), 5: cost(c('blackIron', 12), c('darkStone', 10), c('wishStone', 4), c('apostleCloak', 3), c('bloodLordSigil', 2), c('fleshCrystal', 1)) },
+      antiAirCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('machinePart', 1)), 2: cost(c('blackIron', 8), c('darkStone', 5), c('machinePart', 1)), 3: cost(c('blackIron', 12), c('darkStone', 6), c('machinePart', 2), c('mindStone', 1)), 4: cost(c('blackIron', 12), c('darkStone', 8), c('machinePart', 2), c('blackBone', 2)), 5: cost(c('blackIron', 16), c('darkStone', 10), c('machinePart', 3), c('mindStone', 2)), 6: cost(c('blackIron', 24), c('darkStone', 12), c('machinePart', 5), c('dragonScale', 2), c('nightCore', 1)) },
+      gravityCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('heavyWater', 1), c('machinePart', 1)), 2: cost(c('blackIron', 10), c('darkStone', 6), c('heavyWater', 1), c('machinePart', 1)), 3: cost(c('blackIron', 12), c('darkStone', 8), c('heavyWater', 2), c('machinePart', 2)), 4: cost(c('blackIron', 16), c('darkStone', 10), c('heavyWater', 3), c('voidStone', 2), c('dragonScale', 1)), 5: cost(c('blackIron', 18), c('darkStone', 12), c('heavyWater', 3), c('voidStone', 2), c('nightCore', 1)), 6: cost(c('blackIron', 20), c('darkStone', 12), c('heavyWater', 4), c('voidStone', 3), c('nightCore', 2)) },
+      executionBlade: { 1: cost(c('blackIron', 6), c('darkStone', 4), c('mindStone', 1)), 2: cost(c('blackIron', 8), c('darkStone', 5), c('mindStone', 1)), 3: cost(c('blackIron', 10), c('darkStone', 6), c('mindStone', 1), c('elementStone', 1)), 4: cost(c('blackIron', 12), c('darkStone', 8), c('mindStone', 2), c('blackBone', 2)), 5: cost(c('blackIron', 16), c('darkStone', 10), c('mindStone', 3), c('voidStone', 1)), 6: cost(c('blackIron', 20), c('darkStone', 12), c('mindStone', 4), c('nightCore', 1)) },
+      landmine: { 1: cost(c('blackIron', 2), c('darkStone', 1)) },
+      swamp: { 1: cost(c('spiritWood', 2), c('heavyWater', 1)) },
+      spikeTrap: { 1: cost(c('blackIron', 3), c('resentmentStone', 1)) },
+      teleport: { 1: cost(c('voidStone', 2), c('sealDust', 4), c('darkStone', 10)), 2: cost(c('voidStone', 3), c('sealDust', 6), c('darkStone', 15), c('mindStone', 1)), 3: cost(c('voidStone', 5), c('sealDust', 10), c('darkStone', 20), c('fleshCrystal', 1)), 4: cost(c('voidStone', 3), c('sealDust', 5), c('nightCore', 1)) }
   };
-  const getBuildLevelCost = (type, level) => Math.max(1, Math.ceil((BUILD_LEVEL_COST[level] ?? BUILD_LEVEL_COST[6]) * (STRUCTURE_COST_MULTIPLIER[type] ?? 1)));
+  const normalizeMapTier = (mapTier = 1.1) => Math.round(Math.max(1.1, Number(mapTier)) * 10) / 10;
+  const resolveCostTokens = (type, level, branch) => {
+      const byLevel = STRUCTURE_UPGRADE_COSTS[type]?.[level];
+      if (!byLevel)
+          return cost(c('darkStone', BUILD_LEVEL_COST[level] ?? BUILD_LEVEL_COST[6]));
+      if (Array.isArray(byLevel))
+          return byLevel;
+      const branched = byLevel;
+      return branched[String(branch)] ?? branched.default ?? cost(c('darkStone', 1));
+  };
+  const getStructureUpgradeCost = (type, level, branch, mapTier = 1.1) => {
+      const tier = normalizeMapTier(mapTier);
+      return resolveCostTokens(type, level, branch).map(([resourceId, amount, tierOffset]) => ({
+          resourceId,
+          amount,
+          tier: isTieredVinhDaResource(resourceId) ? (tierOffset === undefined ? tier : normalizeMapTier(tier + tierOffset)) : undefined
+      }));
+  };
+  const getBuildLevelCost = (type, level) => getStructureUpgradeCost(type, level).reduce((total, item) => total + item.amount, 0);
   const WALL_LEVELS = {
       1: { hp: 15, arm: 1, res: 1, hpRegen: 1 },
       2: { hp: 25, arm: 2, res: 2, hpRegen: 2 },
@@ -42158,6 +42252,7 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'UPGRADE_NODE_LABEL')) exports.UPGRADE_NODE_LABEL = UPGRADE_NODE_LABEL;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_LEVEL_COST')) exports.BUILD_LEVEL_COST = BUILD_LEVEL_COST;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getStructureUpgradeCost')) exports.getStructureUpgradeCost = getStructureUpgradeCost;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBuildLevelCost')) exports.getBuildLevelCost = getBuildLevelCost;
   if (!Object.prototype.hasOwnProperty.call(exports, 'WALL_LEVELS')) exports.WALL_LEVELS = WALL_LEVELS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BUILD_NODE_OPTIONS')) exports.BUILD_NODE_OPTIONS = BUILD_NODE_OPTIONS;

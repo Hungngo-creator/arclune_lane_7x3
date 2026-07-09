@@ -34,7 +34,7 @@ import {
   UPGRADE_NODE_LABEL,
   ELEMENTAL_TOWER_ELEMENTS,
   getBaseLevelStat,
-  getBuildLevelCost,
+  getStructureUpgradeCost,
   getStructureLevelStat,
   isStructureAllowedOnBuildSite,
 } from './structures.ts';
@@ -65,7 +65,7 @@ import {
 import type { DayNightPhase, VinhDaSimulationContext, VinhDaSimulationState } from './simulation.ts';
 import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime, VinhDaStatusCollection } from './types.ts';
 import { getResourceLabel, isTieredVinhDaResource } from './economy/resources.ts';
-import type { TieredAmount } from './economy/resources.ts';
+import type { TieredAmount, VinhDaResourceId } from './economy/resources.ts';
 import {
   createElementalRegionRandom,
   createElementalRegions,
@@ -438,7 +438,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const nightIndexText = section.querySelector<HTMLElement>('[data-role="night-index"]');
   const waveThreatBudgetText = section.querySelector<HTMLElement>('[data-role="wave-threat-budget"]');
   const statusPanel = section.querySelector<HTMLElement>('[data-role="status-panel"]');
-  const elementalRegions = createElementalRegions(getVinhDaMapTier(params), createElementalRegionRandom());
+  const mapTier = getVinhDaMapTier(params);
+  const elementalRegions = createElementalRegions(mapTier, createElementalRegionRandom());
   const elementalRegionsById = new Map(elementalRegions.map(region => [region.id, region]));
   const elementalRegionElements = new Map<string, HTMLElement>();
   const siteElements = new Map<string, HTMLElement>();
@@ -511,10 +512,24 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   };
   const structureSiteIdsOfType = (type: StructureType): Iterable<string> => structureSitesByType.get(type) ?? [];
 
-  const canAfford = (cost: number): boolean => bloodSealStone >= cost;
+  const tierValue = (tier: TieredAmount['tier']): number => typeof tier === 'number' ? tier : Number.NEGATIVE_INFINITY;
+  const formatResourceAmount = (resource: TieredAmount): string => `${getResourceLabel(resource.resourceId)}${isTieredVinhDaResource(resource.resourceId) ? ` ${resource.tier ?? '?.?'}` : ''} ×${resource.amount}`;
+  const getStoredAmount = (resourceId: VinhDaResourceId, requiredTier?: TieredAmount['tier']): number => baseStoredResources.reduce((total, resource) => {
+    if (resource.resourceId !== resourceId) return total;
+    if (isTieredVinhDaResource(resourceId) && tierValue(resource.tier) < tierValue(requiredTier)) return total;
+    return total + resource.amount;
+  }, 0);
+  const canAfford = (cost: readonly TieredAmount[] | number): boolean => typeof cost === 'number'
+    ? bloodSealStone >= cost
+    : cost.every(resource => getStoredAmount(resource.resourceId, resource.tier) >= resource.amount);
+  const getMissingCost = (cost: readonly TieredAmount[]): TieredAmount[] => cost
+    .map(resource => ({ ...resource, amount: Math.max(0, resource.amount - getStoredAmount(resource.resourceId, resource.tier)) }))
+    .filter(resource => resource.amount > 0);
   const formatResources = (resources: readonly TieredAmount[]): string => resources.length <= 0
     ? 'trống'
-    : resources.map(resource => `${getResourceLabel(resource.resourceId)}${isTieredVinhDaResource(resource.resourceId) ? ` ${resource.tier ?? '?.?'}` : ''} ×${resource.amount}`).join(' · ');
+    : resources.map(formatResourceAmount).join(' · ');
+  const formatCost = (cost: readonly TieredAmount[]): string => cost.length <= 0 ? 'Miễn phí' : cost.map(formatResourceAmount).join(' · ');
+  const getCostFor = (type: StructureType, level: number, branch?: Parameters<typeof getStructureUpgradeCost>[2]): TieredAmount[] => getStructureUpgradeCost(type, level, branch, mapTier);
   const renderEconomy = (): void => {
     if (bloodSealStoneText) bloodSealStoneText.textContent = String(Math.floor(condensedHnt || bloodSealStone));
     if (carriedResourceText) carriedResourceText.textContent = String(carriedDaThach);
@@ -599,7 +614,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       `<div class="${baseInTerritory ? '' : 'vinh-da-game__status-danger'}">Lãnh địa: ${baseInTerritory ? 'đang bảo hộ' : 'ngoài lãnh địa / buff khóa'} · Emergency CD: ${Math.max(0, leaderEmergencyCooldownUntilNight - nightIndex)} đêm</div>`,
       `<div class="${contaminationStacks >= 5 ? 'vinh-da-game__status-danger' : contaminationStacks > 0 ? 'vinh-da-game__status-warn' : ''}">Ô nhiễm: ${contaminationStacks}/5 stack${contaminationStacks >= 5 ? ' · sẽ hóa Sứ Đồ' : ''}</div>`,
     ];
-    if (elemental && elementalStat) lines.push(`<div>Tháp NT: ${elemental.element ?? 'Hỏa'} Lv${elemental.level} · cost ${getBuildLevelCost('elementalTower', elemental.level)} · range ${elementalStat.range ?? 0} · ${describeElementEffect(elemental.element ?? 'Hỏa')}</div>`);
+    if (elemental && elementalStat) lines.push(`<div>Tháp NT: ${elemental.element ?? 'Hỏa'} Lv${elemental.level} · cost ${formatCost(getCostFor('elementalTower', elemental.level))} · range ${elementalStat.range ?? 0} · ${describeElementEffect(elemental.element ?? 'Hỏa')}</div>`);
     if (barracks && barracksStat) lines.push(`<div>Trại: ${barracksRuntime?.soldiers?.length ?? 0}/${barracksStat.soldierCap ?? 0} lính · rank ${barracksStat.soldierRank ?? 1} · ulti ${barracksStat.ultimatePermission ? 'ready' : 'khóa'}</div>`);
     if (church) lines.push(`<div>Ấn: prayer ${formatSeconds(churchRuntime?.prayerTimer)} · cleanse ${formatSeconds(churchRuntime?.contaminationCleanseTimer)}</div>`);
     lines.push(`<div class="${canStartEscort(simulationContext) ? 'vinh-da-game__status-warn' : ''}">Hộ tống: ${simulationState.dayNightPhase === 'escort' ? `đang mở đường tới ${Math.round(getBaseX(simulationState))}` : canStartEscort(simulationContext) ? 'sẵn sàng mở đường' : 'cần Dạ Thạch/đêm/tàn khu'}</div>`);
@@ -617,9 +632,30 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       phaseTimeRemainingText.textContent = `${minutes}:${String(seconds).padStart(2, '0')}`;
     }
   };
-  const spend = (cost: number): boolean => {
+  const spend = (cost: readonly TieredAmount[] | number): boolean => {
+    if (typeof cost === 'number'){
+      if (!canAfford(cost)) return false;
+      bloodSealStone -= cost;
+      renderEconomy();
+      return true;
+    }
     if (!canAfford(cost)) return false;
-    bloodSealStone -= cost;
+    for (const required of cost){
+      let remaining = required.amount;
+      const matching = baseStoredResources
+        .filter(resource => resource.resourceId === required.resourceId && (!isTieredVinhDaResource(required.resourceId) || tierValue(resource.tier) >= tierValue(required.tier)))
+        .sort((a, b) => tierValue(a.tier) - tierValue(b.tier));
+      for (const resource of matching){
+        if (remaining <= 0) break;
+        const used = Math.min(resource.amount, remaining);
+        resource.amount -= used;
+        remaining -= used;
+      }
+    }
+    for (let index = baseStoredResources.length - 1; index >= 0; index -= 1){
+      const stored = baseStoredResources[index];
+      if (stored && stored.amount <= 0) baseStoredResources.splice(index, 1);
+    }
     renderEconomy();
     return true;
   };
@@ -705,7 +741,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const action = node.dataset.action;
       const isUpgradeNode = action === 'upgrade';
       const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
-      const cost = structure ? getBuildLevelCost(structure.type, nextLevel) : type ? getBuildLevelCost(type, 1) : 1;
+      const branch = action?.startsWith('branch-lv3-') ? action.slice('branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('branch-lv5-') ? action.slice('branch-lv5-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : undefined;
+      const cost = structure ? getCostFor(structure.type, nextLevel, branch) : type ? getCostFor(type, 1) : [];
       const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
       const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
       const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
@@ -725,8 +762,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
           )
         : isUpgradeNode || (Boolean(action) && !canBuildElement) || (!action && (!type || type === 'elementalTower' || !isStructureAllowedOnBuildSite(type, site)));
       const buildElement = action?.startsWith('build-element-') ? action.slice('build-element-'.length) as ElementalTowerElement : undefined;
-      const effectiveCost = buildElement ? getBuildLevelCost('elementalTower', 1) : cost;
-      const titleParts = [`Cost ${effectiveCost}`];
+      const effectiveCost = buildElement ? getCostFor('elementalTower', 1) : cost;
+      const missingCost = getMissingCost(effectiveCost);
+      const titleParts = [`Cost ${formatCost(effectiveCost)}`, missingCost.length > 0 ? `Thiếu ${formatCost(missingCost)}` : 'Đủ vật liệu'];
       if (type){
         const stat = getStructureLevelStat(type, structure?.mountedStructure === type ? structure.mountedLevel ?? 1 : nextLevel);
         if (stat.range) titleParts.push(`Range ${stat.range}`);
@@ -744,7 +782,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         node.append(detail);
       }
       const detailStat = buildElement ? getStructureLevelStat('elementalTower', 1, undefined, undefined, buildElement) : type ? getStructureLevelStat(type, nextLevel) : null;
-      detail.textContent = detailStat ? `C${effectiveCost}${detailStat.range ? ` R${detailStat.range}` : ''}` : `C${effectiveCost}`;
+      detail.textContent = detailStat ? `${missingCost.length > 0 ? 'Thiếu' : 'Đủ'}${detailStat.range ? ` R${detailStat.range}` : ''}` : (missingCost.length > 0 ? 'Thiếu' : 'Đủ');
       if (node instanceof HTMLButtonElement) node.disabled = !node.hidden && (teleportCheck ? !teleportCheck.ok : !canAfford(effectiveCost));
     }
   };
@@ -772,7 +810,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     const soldierText = structure?.type === 'barracks' ? ` · lính ${runtime?.soldiers?.length ?? 0}/${stat?.soldierCap ?? 0} rank ${stat?.soldierRank ?? 1}` : '';
     const churchText = structure?.type === 'church' ? ` · prayer ${formatSeconds(runtime?.prayerTimer)} cleanse ${formatSeconds(runtime?.contaminationCleanseTimer)}` : '';
     const teleportText = structure?.type === 'teleport' ? ` · rút lui CD ${formatSeconds(runtime?.cooldown)}` : '';
-    siteButton.title = structure ? `${siteButton.dataset.structureLabel} Lv${structure.level} · HP ${Math.ceil(runtime?.hp ?? 0)}/${stat?.hp ?? 0} · cost ${getBuildLevelCost(structure.type, structure.level)}${stat?.range ? ` · range ${stat.range}` : ''}${branchText}${elementText}${soldierText}${churchText}${teleportText}` : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất cho bẫy' : 'Ụ đá cho tháp/trại/ấn';
+    siteButton.title = structure ? `${siteButton.dataset.structureLabel} Lv${structure.level} · HP ${Math.ceil(runtime?.hp ?? 0)}/${stat?.hp ?? 0} · cost ${formatCost(getCostFor(structure.type, structure.level, structure.branchLv5 ?? structure.branchLv3))}${stat?.range ? ` · range ${stat.range}` : ''}${branchText}${elementText}${soldierText}${churchText}${teleportText}` : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất cho bẫy' : 'Ụ đá cho tháp/trại/ấn';
     siteButton.setAttribute('aria-label', structure ? siteButton.title : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất xây dựng' : 'Ụ đá xây dựng');
     renderBuildMenu(siteId);
   };
@@ -1083,13 +1121,13 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const action = buildNode.dataset.action;
       if (site && structure && action){
         const nextLevel = structure.level + 1;
-        if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(getBuildLevelCost(structure.type, nextLevel))){
+        if (action === 'upgrade' && structure.level < 6 && structure.level !== 2 && structure.level !== 4 && spend(getCostFor(structure.type, nextLevel))){
           const upgraded = { ...structure, level: nextLevel };
           setStructure(upgraded);
           const runtime = ensureStructureRuntime(upgraded);
           runtime.hp = getStructureMaxHp(upgraded);
           renderBuildSite(site.id);
-          } else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(getBuildLevelCost(structure.type, 3))){
+          } else if (structure.type === 'wall' && structure.level === 2 && action.startsWith('branch-lv3-') && spend(getCostFor(structure.type, 3, action.slice('branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2]))){
           const upgraded = { ...structure, level: 3, branchLv3: action.slice('branch-lv3-'.length) as WallBranchLv3 };
           setStructure(upgraded);
           ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
@@ -1116,7 +1154,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
           clearEnemiesWithoutReward();
           showNotice(`Truyền tống về map cũ đã phong ấn · mất ${result.lostBloodSealStone} Dạ Thạch`);
           shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId, retreatedFromVinhDa: true, sealedOldMap: true, bloodSealStone: result.bloodSealStoneAfter, carriedDaThach: result.carriedDaThachAfter });
-        } else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(getBuildLevelCost(structure.type, 5))){
+        } else if (structure.type === 'wall' && structure.level === 4 && action.startsWith('branch-lv5-') && spend(getCostFor(structure.type, 5, action.slice('branch-lv5-'.length) as Parameters<typeof getStructureUpgradeCost>[2]))){
           const upgraded = { ...structure, level: 5, branchLv5: action.slice('branch-lv5-'.length) as WallBranchLv5 };
           setStructure(upgraded);
           ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
@@ -1125,22 +1163,22 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       } else {
         const type = buildNode.dataset.structureType as StructureType | undefined;
         const buildElement = action?.startsWith('build-element-') ? action.slice('build-element-'.length) as ElementalTowerElement : undefined;
-        if (site && buildElement && !structure && isStructureAllowedOnBuildSite('elementalTower', site) && spend(getBuildLevelCost('elementalTower', 1))){
+        if (site && buildElement && !structure && isStructureAllowedOnBuildSite('elementalTower', site) && spend(getCostFor('elementalTower', 1))){
           const placed = { siteId: site.id, type: 'elementalTower' as const, level: 1, element: buildElement };
           setStructure(placed);
           ensureStructureRuntime(placed);
           renderBuildSite(site.id);
           showNotice(`Xây Tháp Nguyên Tố hệ ${buildElement}`);
-        } else if (site && buildElement && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && spend(getBuildLevelCost('elementalTower', 1))){
+        } else if (site && buildElement && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && spend(getCostFor('elementalTower', 1))){
           const upgraded = { ...structure, mountedStructure: 'elementalTower' as const, mountedLevel: 1, element: buildElement };
           setStructure(upgraded);
           renderBuildSite(site.id);
           showNotice(`Gắn Tháp Nguyên Tố hệ ${buildElement}`);
-        } else if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && type !== 'elementalTower' && isStructureAllowedOnBuildSite(type, { kind: 'rock' }) && spend(getBuildLevelCost(type, 1))){
+        } else if (site && type && structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== 'wall' && type !== 'elementalTower' && isStructureAllowedOnBuildSite(type, { kind: 'rock' }) && spend(getCostFor(type, 1))){
           const upgraded = { ...structure, mountedStructure: type, mountedLevel: 1 };
           setStructure(upgraded);
           renderBuildSite(site.id);
-        } else if (site && type && type !== 'elementalTower' && !structure && isStructureAllowedOnBuildSite(type, site) && spend(getBuildLevelCost(type, 1))){
+        } else if (site && type && type !== 'elementalTower' && !structure && isStructureAllowedOnBuildSite(type, site) && spend(getCostFor(type, 1))){
           const placed = { siteId: site.id, type, level: 1 };
           setStructure(placed);
           ensureStructureRuntime(placed);

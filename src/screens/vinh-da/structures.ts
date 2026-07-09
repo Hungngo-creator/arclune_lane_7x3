@@ -9,6 +9,8 @@ import {
   WORLD_WIDTH
 } from './constants.ts';
 import type { BuildSite, BuildSiteKind } from './types.ts';
+import { isTieredVinhDaResource } from './economy/resources.ts';
+import type { TieredAmount, VinhDaResourceId, VinhDaTier } from './economy/resources.ts';
 
 export type StructureType = 'watchtower' | 'wall' | 'elementalTower' | 'barracks' | 'church' | 'crystalSeal' | 'landmine' | 'swamp' | 'spikeTrap' | 'antiAirCannon' | 'gravityCannon' | 'executionBlade' | 'teleport';
 export type ElementalTowerElement = 'Hỏa' | 'Mộc' | 'Thủy' | 'Thổ' | 'Kim' | 'Lôi' | 'Huyết' | 'Ánh Sáng' | 'Phong';
@@ -87,23 +89,76 @@ export const BUILD_LEVEL_COST = {
   6: 18,
 } as const satisfies Record<number, number>;
 
-const STRUCTURE_COST_MULTIPLIER: Record<StructureType, number> = {
-  watchtower: 1,
-  wall: 0.8,
-  elementalTower: 1.15,
-  barracks: 1.2,
-  church: 1.1,
-  crystalSeal: 1,
-  landmine: 0.6,
-  swamp: 0.75,
-  spikeTrap: 0.75,
-  antiAirCannon: 1.25,
-  gravityCannon: 1.35,
-  executionBlade: 1.4,
-  teleport: 1.6,
+type StructureCostBranch = WallBranchLv3 | WallBranchLv5 | BaseBranchLv3 | 'quality' | 'quantity' | 'godslayer' | 'sweeper' | 'elementalize' | 'soulSlash';
+type CostToken = readonly [resourceId: VinhDaResourceId, amount: number, tierOffset?: number];
+
+const c = (resourceId: VinhDaResourceId, amount: number, tierOffset = 0): CostToken => [resourceId, amount, tierOffset];
+const cost = (...items: CostToken[]): readonly CostToken[] => items;
+
+const STRUCTURE_UPGRADE_COSTS = {
+  crystalSeal: {
+    0: cost(),
+    1: cost(c('darkStone', 4), c('blackIron', 4)),
+    2: cost(c('darkStone', 8), c('blackIron', 6), c('blackBone', 1)),
+    3: {
+      defense: cost(c('darkStone', 12), c('blackIron', 8), c('blackBone', 3), c('wishStone', 1)),
+      attack: cost(c('darkStone', 12), c('blackIron', 8), c('blackBone', 3), c('resentmentStone', 1)),
+      default: cost(c('darkStone', 12), c('blackIron', 8), c('blackBone', 3), c('wishStone', 1))
+    },
+    4: cost(c('darkStone', 16), c('blackIron', 12), c('blackBone', 4), c('sealDust', 1)),
+    5: cost(c('darkStone', 24), c('blackIron', 16), c('blackBone', 6), c('fleshCrystal', 1)),
+    6: cost(c('darkStone', 30), c('blackIron', 20), c('blackBone', 8), c('fleshCrystal', 2), c('nightCore', 1))
+  },
+  wall: {
+    1: cost(c('blackIron', 4), c('darkStone', 2)),
+    2: cost(c('blackIron', 6), c('darkStone', 3)),
+    3: {
+      spike: cost(c('blackIron', 8), c('darkStone', 4), c('blackBone', 2)),
+      slippery: cost(c('blackIron', 6), c('darkStone', 4), c('heavyWater', 1)),
+      shock: cost(c('blackIron', 8), c('darkStone', 4), c('resentmentStone', 1)),
+      default: cost(c('blackIron', 8), c('darkStone', 4), c('blackBone', 2))
+    },
+    4: cost(c('blackIron', 10), c('darkStone', 6), c('blackBone', 3)),
+    5: {
+      biochemical: cost(c('blackIron', 12), c('darkStone', 8), c('blackBone', 4), c('spiritWood', 2), c('fleshCrystal', 1)),
+      curse: cost(c('blackIron', 10), c('darkStone', 8), c('blackBone', 4), c('resentmentStone', 4)),
+      link: cost(c('blackIron', 10), c('darkStone', 8), c('blackBone', 3), c('voidStone', 1), c('sealDust', 1)),
+      default: cost(c('blackIron', 12), c('darkStone', 8), c('blackBone', 4), c('spiritWood', 2), c('fleshCrystal', 1))
+    },
+    6: cost(c('blackIron', 16), c('darkStone', 10), c('blackBone', 5), c('nightCore', 1))
+  },
+  watchtower: { 1: cost(c('blackIron', 6), c('darkStone', 3)), 2: cost(c('blackIron', 5), c('darkStone', 3)), 3: cost(c('blackIron', 8), c('darkStone', 5), c('blackBone', 1)), 4: cost(c('blackIron', 10), c('darkStone', 6), c('blackBone', 2)), 5: cost(c('blackIron', 12), c('darkStone', 8), c('blackBone', 3), c('mindStone', 1)) },
+  elementalTower: { 1: cost(c('blackIron', 5), c('darkStone', 3), c('elementStone', 1)), 2: cost(c('blackIron', 5), c('darkStone', 4), c('elementStone', 1)), 3: cost(c('blackIron', 8), c('darkStone', 5), c('elementStone', 2), c('blackBone', 1)), 4: cost(c('blackIron', 10), c('darkStone', 7), c('elementStone', 2), c('blackBone', 2), c('mageStaff', 1)), 5: cost(c('blackIron', 12), c('darkStone', 9), c('elementStone', 3), c('blackBone', 3), c('mageStaff', 2), c('mindStone', 1)) },
+  barracks: { 1: cost(c('blackIron', 8), c('spiritWood', 4), c('darkStone', 2)), 2: cost(c('blackIron', 8), c('spiritWood', 4), c('blackBone', 2)), 3: cost(c('blackIron', 12), c('spiritWood', 6), c('blackBone', 4)), 4: cost(c('blackIron', 16), c('spiritWood', 8), c('blackBone', 6), c('mindStone', 1)), 5: cost(c('blackIron', 20), c('spiritWood', 10), c('blackBone', 8), c('mindStone', 2), c('fleshCrystal', 1)), 6: cost(c('blackIron', 24), c('spiritWood', 12), c('blackBone', 10), c('mindStone', 2), c('nightCore', 1)) },
+  church: { 1: cost(c('blackIron', 4), c('darkStone', 4), c('wishStone', 1)), 2: cost(c('blackIron', 6), c('darkStone', 5), c('wishStone', 1), c('blackBone', 1)), 3: cost(c('blackIron', 8), c('darkStone', 6), c('wishStone', 2), c('apostleCloak', 1)), 4: cost(c('blackIron', 10), c('darkStone', 8), c('wishStone', 3), c('apostleCloak', 2), c('bloodLordSigil', 1)), 5: cost(c('blackIron', 12), c('darkStone', 10), c('wishStone', 4), c('apostleCloak', 3), c('bloodLordSigil', 2), c('fleshCrystal', 1)) },
+  antiAirCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('machinePart', 1)), 2: cost(c('blackIron', 8), c('darkStone', 5), c('machinePart', 1)), 3: cost(c('blackIron', 12), c('darkStone', 6), c('machinePart', 2), c('mindStone', 1)), 4: cost(c('blackIron', 12), c('darkStone', 8), c('machinePart', 2), c('blackBone', 2)), 5: cost(c('blackIron', 16), c('darkStone', 10), c('machinePart', 3), c('mindStone', 2)), 6: cost(c('blackIron', 24), c('darkStone', 12), c('machinePart', 5), c('dragonScale', 2), c('nightCore', 1)) },
+  gravityCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('heavyWater', 1), c('machinePart', 1)), 2: cost(c('blackIron', 10), c('darkStone', 6), c('heavyWater', 1), c('machinePart', 1)), 3: cost(c('blackIron', 12), c('darkStone', 8), c('heavyWater', 2), c('machinePart', 2)), 4: cost(c('blackIron', 16), c('darkStone', 10), c('heavyWater', 3), c('voidStone', 2), c('dragonScale', 1)), 5: cost(c('blackIron', 18), c('darkStone', 12), c('heavyWater', 3), c('voidStone', 2), c('nightCore', 1)), 6: cost(c('blackIron', 20), c('darkStone', 12), c('heavyWater', 4), c('voidStone', 3), c('nightCore', 2)) },
+  executionBlade: { 1: cost(c('blackIron', 6), c('darkStone', 4), c('mindStone', 1)), 2: cost(c('blackIron', 8), c('darkStone', 5), c('mindStone', 1)), 3: cost(c('blackIron', 10), c('darkStone', 6), c('mindStone', 1), c('elementStone', 1)), 4: cost(c('blackIron', 12), c('darkStone', 8), c('mindStone', 2), c('blackBone', 2)), 5: cost(c('blackIron', 16), c('darkStone', 10), c('mindStone', 3), c('voidStone', 1)), 6: cost(c('blackIron', 20), c('darkStone', 12), c('mindStone', 4), c('nightCore', 1)) },
+  landmine: { 1: cost(c('blackIron', 2), c('darkStone', 1)) },
+  swamp: { 1: cost(c('spiritWood', 2), c('heavyWater', 1)) },
+  spikeTrap: { 1: cost(c('blackIron', 3), c('resentmentStone', 1)) },
+  teleport: { 1: cost(c('voidStone', 2), c('sealDust', 4), c('darkStone', 10)), 2: cost(c('voidStone', 3), c('sealDust', 6), c('darkStone', 15), c('mindStone', 1)), 3: cost(c('voidStone', 5), c('sealDust', 10), c('darkStone', 20), c('fleshCrystal', 1)), 4: cost(c('voidStone', 3), c('sealDust', 5), c('nightCore', 1)) }
+} as const;
+
+const normalizeMapTier = (mapTier: VinhDaTier | number = 1.1): VinhDaTier => Math.round(Math.max(1.1, Number(mapTier)) * 10) / 10 as VinhDaTier;
+const resolveCostTokens = (type: StructureType, level: number, branch?: StructureCostBranch): readonly CostToken[] => {
+  const byLevel = STRUCTURE_UPGRADE_COSTS[type]?.[level as keyof (typeof STRUCTURE_UPGRADE_COSTS)[StructureType]];
+  if (!byLevel) return cost(c('darkStone', BUILD_LEVEL_COST[level as keyof typeof BUILD_LEVEL_COST] ?? BUILD_LEVEL_COST[6]));
+  if (Array.isArray(byLevel)) return byLevel as readonly CostToken[];
+  const branched = byLevel as unknown as Record<string, readonly CostToken[]>;
+  return branched[String(branch)] ?? branched.default ?? cost(c('darkStone', 1));
 };
 
-export const getBuildLevelCost = (type: StructureType, level: number): number => Math.max(1, Math.ceil((BUILD_LEVEL_COST[level as keyof typeof BUILD_LEVEL_COST] ?? BUILD_LEVEL_COST[6]) * (STRUCTURE_COST_MULTIPLIER[type] ?? 1)));
+export const getStructureUpgradeCost = (type: StructureType, level: number, branch?: StructureCostBranch, mapTier: VinhDaTier | number = 1.1): TieredAmount[] => {
+  const tier = normalizeMapTier(mapTier);
+  return resolveCostTokens(type, level, branch).map(([resourceId, amount, tierOffset]) => ({
+    resourceId,
+    amount,
+    tier: isTieredVinhDaResource(resourceId) ? (tierOffset === undefined ? tier : normalizeMapTier(tier + tierOffset)) : undefined
+  }));
+};
+
+export const getBuildLevelCost = (type: StructureType, level: number): number => getStructureUpgradeCost(type, level).reduce((total, item) => total + item.amount, 0);
 
 export const WALL_LEVELS = {
   1: { hp: 15, arm: 1, res: 1, hpRegen: 1 },
