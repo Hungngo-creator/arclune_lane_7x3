@@ -422,6 +422,9 @@ export function spawnQueuedIfDue(
   const pRecord = p as unknown as Record<string, unknown>;
   const metaRecord = meta as Record<string, unknown> | null;
   const normalizedElement = resolveSpawnElement(pRecord, metaRecord);
+  const statOverrides = p.statOverrides && typeof p.statOverrides === 'object' && !Array.isArray(p.statOverrides)
+    ? p.statOverrides as Partial<UnitToken>
+    : null;
   const obj: UnitToken = {
     id: p.unitId,
     name: p.name ?? undefined,
@@ -431,8 +434,13 @@ export function spawnQueuedIfDue(
     side: p.side,
     alive: true,
     ...resolvedStats,
+    ...(statOverrides ?? {}),
     statuses: [],
-    baseStats,
+    baseStats: statOverrides ? {
+      atk: typeof statOverrides.atk === 'number' ? statOverrides.atk : baseStats.atk,
+      res: typeof statOverrides.res === 'number' ? statOverrides.res : baseStats.res,
+      wil: typeof statOverrides.wil === 'number' ? statOverrides.wil : baseStats.wil,
+    } : baseStats,
     class: normalizedClass,
     element: normalizedElement,
   };

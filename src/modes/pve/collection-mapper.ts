@@ -1,5 +1,5 @@
 import { Meta, makeInstanceStats } from '../../meta.ts';
-import { TP_DELTA } from '../../data/roster-preview.ts';y
+import { TP_DELTA } from '../../data/roster-preview.ts';
 
 import type { InstanceStats } from '../../meta.ts';
 import type {

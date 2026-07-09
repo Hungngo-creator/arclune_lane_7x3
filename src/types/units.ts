@@ -91,6 +91,7 @@ export interface QueuedSummonRequest {
   mutated?: boolean;
   mutationBonusPct?: number;
   mutationDebuffPool?: Array<'bleed' | 'stun' | 'poison'>;
+  statOverrides?: Partial<StatBlock>;
 }
 
 export type SummonQueue = Map<number, QueuedSummonRequest>;

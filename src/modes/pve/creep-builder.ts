@@ -1,16 +1,33 @@
 import { lookupUnit } from '../../units.ts';
-import { mapUnitProgressById } from './collection-mapper.ts';
+import { mapUnitProgressById, resolveRuntimeUnitStats } from './collection-mapper.ts';
+import { applyCultivationBonus } from '../../cultivation.ts';
 import { normalizeClassName } from '../../utils/domain-normalization.ts';
 
 import type { PveDeckEntry } from '@shared-types/combat';
 import type { CollectionStateInput, RuntimeUnitProgress } from '@shared-types/pve';
 
+type RuntimeStatProfile = {
+  hp?: number;
+  hpMax?: number;
+  atk?: number;
+  wil?: number;
+  arm?: number;
+  res?: number;
+  agi?: number;
+  per?: number;
+  aeMax?: number;
+  aeRegen?: number;
+  hpRegen?: number;
+};
+
 type ProgressProfile = {
   level?: number;
   realm?: number;
   subRealm?: number;
+  stars?: number;
   className?: string;
   tp?: number;
+  stats?: RuntimeStatProfile;
 };
 
 type LineupSampling = {
@@ -57,6 +74,34 @@ function normalizeRank(value: unknown): string | null {
   if (typeof value !== 'string' || !value.trim()) return null;
   const normalized = value.trim().toUpperCase();
   return normalized;
+}
+
+function resolveRuntimeStatProfile(
+  unitId: string,
+  progressById: ReadonlyMap<string, RuntimeUnitProgress>,
+): RuntimeStatProfile {
+  const progress = progressById.get(unitId);
+  const baseStats = resolveRuntimeUnitStats(unitId, progressById);
+  const stats = applyCultivationBonus({
+    ...baseStats,
+    id: unitId,
+    hasCultivationData: progressById.has(unitId),
+    realm: progress?.realm,
+    subRealm: progress?.subRealm,
+  });
+  return {
+    hp: stats.hp,
+    hpMax: stats.hpMax,
+    atk: stats.atk,
+    wil: stats.wil,
+    arm: stats.arm,
+    res: stats.res,
+    agi: stats.agi,
+    per: stats.per,
+    aeMax: stats.aeMax,
+    aeRegen: stats.aeRegen,
+    hpRegen: stats.hpRegen,
+  };
 }
 
 function sampleLineup(
@@ -106,8 +151,10 @@ function sampleLineup(
       level: typeof progress?.level === 'number' ? progress.level : undefined,
       realm: typeof progress?.realm === 'number' ? progress.realm : undefined,
       subRealm: typeof progress?.subRealm === 'number' ? progress.subRealm : undefined,
+      stars: typeof progress?.stars === 'number' ? progress.stars : undefined,
       className: normalizeClassName(entry.class) ?? undefined,
       tp: parsedTp,
+      stats: resolveRuntimeStatProfile(entry.id, progressById),
     });
   }
   return { rankCounts, totalRanked, progressProfiles, costs };
@@ -189,7 +236,13 @@ function progressScore(profile: ProgressProfile): number {
   const level = typeof profile.level === 'number' ? profile.level : 0;
   const realm = typeof profile.realm === 'number' ? profile.realm : 0;
   const subRealm = typeof profile.subRealm === 'number' ? profile.subRealm : 0;
-  return (realm * 10000) + (subRealm * 100) + level;
+  const stars = typeof profile.stars === 'number' ? profile.stars : 0;
+  const hpMax = typeof profile.stats?.hpMax === 'number' ? profile.stats.hpMax : 0;
+  const atk = typeof profile.stats?.atk === 'number' ? profile.stats.atk : 0;
+  const wil = typeof profile.stats?.wil === 'number' ? profile.stats.wil : 0;
+  const defenses = ((typeof profile.stats?.arm === 'number' ? profile.stats.arm : 0)
+    + (typeof profile.stats?.res === 'number' ? profile.stats.res : 0));
+  return (hpMax * 0.18) + (atk * 4) + (wil * 3) + (defenses * 500) + (realm * 10000) + (subRealm * 100) + (stars * 220) + level;
 }
 
 function allocateProgressForCreeps(profiles: ReadonlyArray<ProgressProfile>, creepCount: number): ProgressProfile[] {
@@ -232,7 +285,9 @@ function toCreepDeckEntry(params: {
   const level = clampInteger(profile.level, 1);
   const realm = clampInteger(profile.realm, 0);
   const subRealm = clampInteger(profile.subRealm, 0);
+  const stars = clampInteger(profile.stars, 0);
   const className = normalizeClassName(profile.className);
+  const statOverrides = profile.stats ? { ...profile.stats } : undefined;
 
   return {
     id: creepId,
@@ -244,6 +299,8 @@ function toCreepDeckEntry(params: {
     ...(level != null ? { level } : {}),
     ...(realm != null ? { realm } : {}),
     ...(subRealm != null ? { subRealm } : {}),
+    ...(stars != null ? { stars } : {}),
+    ...(statOverrides ? { statOverrides, ...statOverrides } : {}),
     ...(className ? { class: className } : {}),
     ...(typeof profile.tp === 'number' ? { tp: profile.tp } : {}),
   } satisfies PveDeckEntry;

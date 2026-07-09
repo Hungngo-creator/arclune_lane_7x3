@@ -482,6 +482,9 @@ export function queueEnemyAt(
     mutationDebuffPool: Array.isArray(card.mutationDebuffPool)
       ? card.mutationDebuffPool.filter((id): id is 'bleed' | 'stun' | 'poison' => id === 'bleed' || id === 'stun' || id === 'poison')
       : undefined,
+    statOverrides: card.statOverrides && typeof card.statOverrides === 'object' && !Array.isArray(card.statOverrides)
+      ? { ...(card.statOverrides as Record<string, unknown>) }
+      : undefined,
   });
 
   Game.ai.cost = Math.max(0, Game.ai.cost - cost);

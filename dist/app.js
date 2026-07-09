@@ -699,6 +699,9 @@ __modules['./ai.ts'] = (exports, module, __require) => {
           mutationDebuffPool: Array.isArray(card.mutationDebuffPool)
               ? card.mutationDebuffPool.filter((id) => id === 'bleed' || id === 'stun' || id === 'poison')
               : undefined,
+          statOverrides: card.statOverrides && typeof card.statOverrides === 'object' && !Array.isArray(card.statOverrides)
+              ? { ...card.statOverrides }
+              : undefined,
       });
       Game.ai.cost = Math.max(0, Game.ai.cost - cost);
       Game.ai.summoned += 1;
@@ -15408,7 +15411,6 @@ __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => 
   const makeInstanceStats = __dep0.makeInstanceStats;
   const __dep1 = __require('./data/roster-preview.ts');
   const TP_DELTA = __dep1.TP_DELTA;
-  y;
   const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'];
   const PROGRESS_MAP_CACHE = new WeakMap();
   const PROGRESS_LIST_CACHE = new WeakMap();
@@ -15656,8 +15658,11 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
   const lookupUnit = __dep0.lookupUnit;
   const __dep1 = __require('./modes/pve/collection-mapper.ts');
   const mapUnitProgressById = __dep1.mapUnitProgressById;
-  const __dep2 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep2.normalizeClassName;
+  const resolveRuntimeUnitStats = __dep1.resolveRuntimeUnitStats;
+  const __dep2 = __require('./cultivation.ts');
+  const applyCultivationBonus = __dep2.applyCultivationBonus;
+  const __dep3 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep3.normalizeClassName;
   const CREEP_SLOT_ORDER = [
       { id: 'creep_1', powerSlot: 2 },
       { id: 'creep_2', powerSlot: 1 },
@@ -15680,6 +15685,30 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
           return null;
       const normalized = value.trim().toUpperCase();
       return normalized;
+  }
+  function resolveRuntimeStatProfile(unitId, progressById) {
+      const progress = progressById.get(unitId);
+      const baseStats = resolveRuntimeUnitStats(unitId, progressById);
+      const stats = applyCultivationBonus({
+          ...baseStats,
+          id: unitId,
+          hasCultivationData: progressById.has(unitId),
+          realm: progress?.realm,
+          subRealm: progress?.subRealm,
+      });
+      return {
+          hp: stats.hp,
+          hpMax: stats.hpMax,
+          atk: stats.atk,
+          wil: stats.wil,
+          arm: stats.arm,
+          res: stats.res,
+          agi: stats.agi,
+          per: stats.per,
+          aeMax: stats.aeMax,
+          aeRegen: stats.aeRegen,
+          hpRegen: stats.hpRegen,
+      };
   }
   function sampleLineup(lineup, progressById, unitMetaById) {
       const rankCounts = new Map();
@@ -15723,8 +15752,10 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
               level: typeof progress?.level === 'number' ? progress.level : undefined,
               realm: typeof progress?.realm === 'number' ? progress.realm : undefined,
               subRealm: typeof progress?.subRealm === 'number' ? progress.subRealm : undefined,
+              stars: typeof progress?.stars === 'number' ? progress.stars : undefined,
               className: normalizeClassName(entry.class) ?? undefined,
               tp: parsedTp,
+              stats: resolveRuntimeStatProfile(entry.id, progressById),
           });
       }
       return { rankCounts, totalRanked, progressProfiles, costs };
@@ -15802,7 +15833,13 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
       const level = typeof profile.level === 'number' ? profile.level : 0;
       const realm = typeof profile.realm === 'number' ? profile.realm : 0;
       const subRealm = typeof profile.subRealm === 'number' ? profile.subRealm : 0;
-      return (realm * 10000) + (subRealm * 100) + level;
+      const stars = typeof profile.stars === 'number' ? profile.stars : 0;
+      const hpMax = typeof profile.stats?.hpMax === 'number' ? profile.stats.hpMax : 0;
+      const atk = typeof profile.stats?.atk === 'number' ? profile.stats.atk : 0;
+      const wil = typeof profile.stats?.wil === 'number' ? profile.stats.wil : 0;
+      const defenses = ((typeof profile.stats?.arm === 'number' ? profile.stats.arm : 0)
+          + (typeof profile.stats?.res === 'number' ? profile.stats.res : 0));
+      return (hpMax * 0.18) + (atk * 4) + (wil * 3) + (defenses * 500) + (realm * 10000) + (subRealm * 100) + (stars * 220) + level;
   }
   function allocateProgressForCreeps(profiles, creepCount) {
       if (!profiles.length)
@@ -15838,7 +15875,9 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
       const level = clampInteger(profile.level, 1);
       const realm = clampInteger(profile.realm, 0);
       const subRealm = clampInteger(profile.subRealm, 0);
+      const stars = clampInteger(profile.stars, 0);
       const className = normalizeClassName(profile.className);
+      const statOverrides = profile.stats ? { ...profile.stats } : undefined;
       return {
           id: creepId,
           name: unitName,
@@ -15849,6 +15888,8 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
           ...(level != null ? { level } : {}),
           ...(realm != null ? { realm } : {}),
           ...(subRealm != null ? { subRealm } : {}),
+          ...(stars != null ? { stars } : {}),
+          ...(statOverrides ? { statOverrides, ...statOverrides } : {}),
           ...(className ? { class: className } : {}),
           ...(typeof profile.tp === 'number' ? { tp: profile.tp } : {}),
       };
@@ -42926,6 +42967,9 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       const pRecord = p;
       const metaRecord = meta;
       const normalizedElement = resolveSpawnElement(pRecord, metaRecord);
+      const statOverrides = p.statOverrides && typeof p.statOverrides === 'object' && !Array.isArray(p.statOverrides)
+          ? p.statOverrides
+          : null;
       const obj = {
           id: p.unitId,
           name: p.name ?? undefined,
@@ -42935,8 +42979,13 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           side: p.side,
           alive: true,
           ...resolvedStats,
+          ...(statOverrides ?? {}),
           statuses: [],
-          baseStats,
+          baseStats: statOverrides ? {
+              atk: typeof statOverrides.atk === 'number' ? statOverrides.atk : baseStats.atk,
+              res: typeof statOverrides.res === 'number' ? statOverrides.res : baseStats.res,
+              wil: typeof statOverrides.wil === 'number' ? statOverrides.wil : baseStats.wil,
+          } : baseStats,
           class: normalizedClass,
           element: normalizedElement,
       };
