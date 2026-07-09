@@ -1,5 +1,5 @@
 import { loadPlayerProfile, patchPlayerProfile, savePlayerProfile } from '../src/utils/player-profile.ts';
-import { mapUnitProgressById } from '../src/modes/pve/collection-mapper.ts';
+import { mapUnitProgressById, resolveRuntimeUnitStats } from '../src/modes/pve/collection-mapper.ts';
 
 describe('tacticalAiByUnit serialization/deserialization', () => {
   const storage = new Map<string, string>();
@@ -107,4 +107,20 @@ describe('tacticalAiByUnit serialization/deserialization', () => {
     expect(second).toBe(first);
     expect(second.get('hero_legacy')?.level).toBe(40);
   });
+
+  it('maps TP allocation aliases and applies HP TP to runtime stats', () => {
+    const withoutTp = resolveRuntimeUnitStats('thien_luu', new Map());
+    const progress = mapUnitProgressById({
+      units: [
+        { unitId: 'thien_luu', tpAllocation: { HP: 3 } },
+      ],
+    });
+
+    expect(progress.get('thien_luu')?.tpAlloc).toEqual({ HP: 3 });
+
+    const withTp = resolveRuntimeUnitStats('thien_luu', progress);
+    expect(withTp.hpMax).toBe(withoutTp.hpMax + 60);
+    expect(withTp.hp).toBe(withoutTp.hp + 60);
+  });
+
 });

@@ -14,7 +14,7 @@ export interface SavedPlayerProfile {
   cultivationByUnit?: Record<string, { realm: number; subRealm: number }>;
   sectName?: string;
   tpByUnit?: Record<string, number>;
-  tpAllocByUnit?: Record<string, Partial<Record<'HP' | 'ATK' | 'WIL' | 'ARM' | 'RES', number>>>;
+  tpAllocByUnit?: Record<string, Record<string, number>>;
   equipmentByUnit?: Record<string, Record<string, string | null>>;
   tacticalAiByUnit?: Record<string, unknown>;
   ownedByUnit?: Record<string, boolean>;

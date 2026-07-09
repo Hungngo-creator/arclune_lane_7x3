@@ -15355,6 +15355,9 @@ __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => 
   const __dep0 = __require('./meta.ts');
   const Meta = __dep0.Meta;
   const makeInstanceStats = __dep0.makeInstanceStats;
+  const __dep1 = __require('./data/roster-preview.ts');
+  const TP_DELTA = __dep1.TP_DELTA;
+  y;
   const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'];
   const PROGRESS_MAP_CACHE = new WeakMap();
   const PROGRESS_LIST_CACHE = new WeakMap();
@@ -15463,6 +15466,49 @@ __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => 
       }
       return null;
   };
+  const INSTANCE_STAT_BY_TP_STAT = Object.freeze({
+      HP: 'hpMax',
+      ATK: 'atk',
+      WIL: 'wil',
+      ARM: 'arm',
+      RES: 'res',
+      AGI: 'agi',
+      PER: 'per',
+      AEmax: 'aeMax',
+      AEregen: 'aeRegen',
+      HPregen: 'hpRegen',
+  });
+  const normalizeTpAlloc = (value) => {
+      if (!value || typeof value !== 'object' || Array.isArray(value))
+          return null;
+      const normalized = {};
+      for (const [stat, rawAmount] of Object.entries(value)) {
+          const amount = asFinite(rawAmount);
+          if (amount == null || amount === 0 || typeof TP_DELTA[stat] !== 'number')
+              continue;
+          normalized[stat] = amount;
+      }
+      return Object.keys(normalized).length > 0 ? normalized : null;
+  };
+  const applyTpAllocToInstanceStats = (stats, tpAlloc) => {
+      if (!tpAlloc)
+          return stats;
+      let out = null;
+      for (const [stat, amount] of Object.entries(tpAlloc)) {
+          const delta = TP_DELTA[stat];
+          const instanceKey = INSTANCE_STAT_BY_TP_STAT[stat];
+          if (typeof delta !== 'number' || !instanceKey || !Number.isFinite(amount) || amount === 0)
+              continue;
+          if (!out)
+              out = { ...stats };
+          const bonus = delta * amount;
+          out[instanceKey] = (out[instanceKey] ?? 0) + bonus;
+          if (instanceKey === 'hpMax') {
+              out.hp = (out.hp ?? 0) + bonus;
+          }
+      }
+      return out ?? stats;
+  };
   const normalizeProgress = (entry) => {
       const unitId = readUnitId(entry);
       if (!unitId)
@@ -15472,9 +15518,7 @@ __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => 
       const subRealm = asFinite(entry.subRealm ?? entry.sub_realm);
       const stars = asFinite(entry.stars ?? entry.star);
       const tp = asFinite(entry.tp ?? entry.talentPoint ?? entry.talentPoints);
-      const tpAlloc = entry.tpAlloc && typeof entry.tpAlloc === 'object' && !Array.isArray(entry.tpAlloc)
-          ? { ...entry.tpAlloc }
-          : null;
+      const tpAlloc = normalizeTpAlloc(entry.tpAlloc ?? entry.tpAllocation ?? entry.talentAllocation ?? entry.talentAlloc);
       const owned = asBoolean(entry.owned ?? entry.unlocked ?? entry.isOwned);
       const awakened = asBoolean(entry.awakened ?? entry.isAwakened);
       const inLineup = asBoolean(entry.inLineup ?? entry.isInLineup);
@@ -15543,7 +15587,7 @@ __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => 
       const realm = normalizeIntegerWithFallback(progress?.realm, 0, 0);
       const subRealm = normalizeIntegerWithFallback(progress?.subRealm, 0, 0);
       const stars = normalizeIntegerWithFallback(progress?.stars, 0, 0);
-      const stats = meta ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId);
+      const stats = applyTpAllocToInstanceStats(meta ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId), progress?.tpAlloc);
       return {
           ...stats,
           level,

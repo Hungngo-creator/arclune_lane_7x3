@@ -1,4 +1,5 @@
 import { Meta, makeInstanceStats } from '../../meta.ts';
+import { TP_DELTA } from '../../data/roster-preview.ts';y
 
 import type { InstanceStats } from '../../meta.ts';
 import type {
@@ -124,6 +125,50 @@ const readSkinKey = (entry: CollectionItemCandidate): string | null => {
   return null;
 };
 
+const INSTANCE_STAT_BY_TP_STAT: Readonly<Record<string, keyof InstanceStats>> = Object.freeze({
+  HP: 'hpMax',
+  ATK: 'atk',
+  WIL: 'wil',
+  ARM: 'arm',
+  RES: 'res',
+  AGI: 'agi',
+  PER: 'per',
+  AEmax: 'aeMax',
+  AEregen: 'aeRegen',
+  HPregen: 'hpRegen',
+});
+
+const normalizeTpAlloc = (value: unknown): Record<string, number> | null => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const normalized: Record<string, number> = {};
+  for (const [stat, rawAmount] of Object.entries(value as Record<string, unknown>)) {
+    const amount = asFinite(rawAmount);
+    if (amount == null || amount === 0 || typeof TP_DELTA[stat] !== 'number') continue;
+    normalized[stat] = amount;
+  }
+  return Object.keys(normalized).length > 0 ? normalized : null;
+};
+
+const applyTpAllocToInstanceStats = (
+  stats: InstanceStats,
+  tpAlloc: RuntimeUnitProgress['tpAlloc'] | null | undefined,
+): InstanceStats => {
+  if (!tpAlloc) return stats;
+  let out: InstanceStats | null = null;
+  for (const [stat, amount] of Object.entries(tpAlloc)) {
+    const delta = TP_DELTA[stat];
+    const instanceKey = INSTANCE_STAT_BY_TP_STAT[stat];
+    if (typeof delta !== 'number' || !instanceKey || !Number.isFinite(amount) || amount === 0) continue;
+    if (!out) out = { ...stats };
+    const bonus = delta * amount;
+    out[instanceKey] = (out[instanceKey] ?? 0) + bonus;
+    if (instanceKey === 'hpMax') {
+      out.hp = (out.hp ?? 0) + bonus;
+    }
+  }
+  return out ?? stats;
+};
+
 const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress | null => {
   const unitId = readUnitId(entry);
   if (!unitId) return null;
@@ -133,9 +178,7 @@ const normalizeProgress = (entry: CollectionItemCandidate): RuntimeUnitProgress 
   const subRealm = asFinite(entry.subRealm ?? entry.sub_realm);
   const stars = asFinite(entry.stars ?? entry.star);
   const tp = asFinite(entry.tp ?? entry.talentPoint ?? entry.talentPoints);
-  const tpAlloc = entry.tpAlloc && typeof entry.tpAlloc === 'object' && !Array.isArray(entry.tpAlloc)
-    ? { ...(entry.tpAlloc as RuntimeUnitProgress['tpAlloc']) }
-    : null;
+  const tpAlloc = normalizeTpAlloc(entry.tpAlloc ?? entry.tpAllocation ?? entry.talentAllocation ?? entry.talentAlloc);
   const owned = asBoolean(entry.owned ?? entry.unlocked ?? entry.isOwned);
   const awakened = asBoolean(entry.awakened ?? entry.isAwakened);
   const inLineup = asBoolean(entry.inLineup ?? entry.isInLineup);
@@ -217,7 +260,10 @@ export function resolveRuntimeUnitStats(
   const subRealm = normalizeIntegerWithFallback(progress?.subRealm, 0, 0);
   const stars = normalizeIntegerWithFallback(progress?.stars, 0, 0);
 
-  const stats = meta ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId);
+  const stats = applyTpAllocToInstanceStats(
+    meta ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId),
+    progress?.tpAlloc,
+  );
   return {
     ...stats,
     level,
