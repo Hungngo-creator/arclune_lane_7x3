@@ -12,6 +12,9 @@ import type {
   LineupDefinition as LineupDefinitionInput,
   RosterEntryLite,
 } from '@shared-types/lineup';
+import { ROSTER } from '../../catalog.ts';
+import { loadPlayerProfile, isUnitOwnedByProfile } from '../../utils/player-profile.ts';
+import { normalizeUnitId } from '../../utils/unit-id.ts';
 import {
   isCurrencyEntry,
   isLineupCurrencies,
@@ -183,7 +186,13 @@ export function renderLineupScreen(options: RenderLineupScreenOptions): LineupVi
     toMergeable(defParams?.roster),
     toMergeable(normalizedParams?.roster),
   );
-  const roster = toRosterSource(mergedRosterSource);
+  const profile = loadPlayerProfile();
+  const rosterSource = toRosterSource(mergedRosterSource) ?? ROSTER;
+  const roster = rosterSource.filter((unit) => {
+    const key = (unit as RosterEntryLite).key;
+    const unitId = normalizeUnitId(unit.id ?? key ?? '');
+    return isUnitOwnedByProfile(profile, unitId, { rank: typeof unit.rank === 'string' ? unit.rank : null });
+  });
   const baseCurrencies = isLineupCurrencies(defParams?.currencies) ? defParams?.currencies ?? null : null;
   const overrideCurrencies = isLineupCurrencies(normalizedParams?.currencies) ? normalizedParams?.currencies ?? null : null;
   const mergedCurrencySource = mergeParams<LineupCurrencies>(baseCurrencies, overrideCurrencies);

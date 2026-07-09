@@ -1,3 +1,5 @@
+import { ROSTER } from '../catalog.ts';
+
 export interface SavedPlayerProfile {
   lineupDeck?: string[];
   lineupActiveBuffOptionIndexes?: number[];
@@ -18,6 +20,7 @@ export interface SavedPlayerProfile {
   equipmentByUnit?: Record<string, Record<string, string | null>>;
   tacticalAiByUnit?: Record<string, unknown>;
   ownedByUnit?: Record<string, boolean>;
+  ownedUnitIds?: string[];
   collectionUi?: {
     activeTab?: string;
     artsHubAutoOpen?: boolean;
@@ -32,6 +35,10 @@ export interface SavedPlayerProfile {
 const STORAGE_KEY = 'arclune.playerProfile.v1';
 const EMPTY_PROFILE: SavedPlayerProfile = {};
 const MAX_LINEUP_BUFF_SLOTS = 6;
+
+const DEFAULT_OWNED_UNIT_IDS = Object.freeze(
+  ROSTER.filter((unit) => unit.rank === 'Prime').map((unit) => unit.id),
+) as ReadonlyArray<string>;
 
 let cachedRawProfile: string | null | undefined;
 let cachedParsedProfile: SavedPlayerProfile | null = null;
@@ -101,8 +108,35 @@ const sanitizeOwnedByUnit = (value: unknown): SavedPlayerProfile['ownedByUnit'] 
   return Object.keys(normalized).length > 0 ? normalized : undefined;
 };
 
+const sanitizeOwnedUnitIds = (value: unknown): SavedPlayerProfile['ownedUnitIds'] => {
+  if (!Array.isArray(value)) return undefined;
+  const seen = new Set<string>();
+  for (const entry of value) {
+    const unitId = toNonEmptyString(entry);
+    if (unitId) seen.add(unitId);
+  }
+  return seen.size > 0 ? [...seen] : undefined;
+};
+
+const hasOwnedRoster = (profile: SavedPlayerProfile): boolean => (
+  Boolean(profile.ownedUnitIds?.length) || Boolean(profile.ownedByUnit && Object.keys(profile.ownedByUnit).length > 0)
+);
+
+const ensureDefaultOwnedRoster = (profile: SavedPlayerProfile): SavedPlayerProfile => {
+  if (hasOwnedRoster(profile)) return profile;
+  const ownedByUnit: Record<string, boolean> = {};
+  for (const unitId of DEFAULT_OWNED_UNIT_IDS) {
+    ownedByUnit[unitId] = true;
+  }
+  return {
+    ...profile,
+    ownedByUnit,
+    ownedUnitIds: [...DEFAULT_OWNED_UNIT_IDS],
+  };
+};
+
 const sanitizeSavedProfile = (rawProfile: unknown): SavedPlayerProfile => {
-  if (!isObject(rawProfile)) return EMPTY_PROFILE;
+  if (!isObject(rawProfile)) return ensureDefaultOwnedRoster(EMPTY_PROFILE);
 
   const normalized: SavedPlayerProfile = { ...rawProfile } as SavedPlayerProfile;
   normalized.lineupDeck = Array.isArray(rawProfile.lineupDeck)
@@ -111,20 +145,30 @@ const sanitizeSavedProfile = (rawProfile: unknown): SavedPlayerProfile => {
   normalized.lineupActiveBuffOptionIndexes = sanitizeLineupBuffIndexes(rawProfile.lineupActiveBuffOptionIndexes);
   normalized.cultivationByUnit = sanitizeCultivationByUnit(rawProfile.cultivationByUnit);
   normalized.ownedByUnit = sanitizeOwnedByUnit(rawProfile.ownedByUnit);
+  normalized.ownedUnitIds = sanitizeOwnedUnitIds(rawProfile.ownedUnitIds);
+  if (normalized.ownedUnitIds?.length) {
+    normalized.ownedByUnit = normalized.ownedByUnit ?? {};
+    for (const unitId of normalized.ownedUnitIds) normalized.ownedByUnit[unitId] = true;
+  }
+  if (normalized.ownedByUnit) {
+    normalized.ownedUnitIds = Object.entries(normalized.ownedByUnit)
+      .filter(([, owned]) => owned === true)
+      .map(([unitId]) => unitId);
+  }
 
   const sectName = toNonEmptyString(rawProfile.sectName);
   normalized.sectName = sectName ?? '';
 
-  return normalized;
+  return ensureDefaultOwnedRoster(normalized);
 };
 
 const parseStoredProfile = (raw: string | null): SavedPlayerProfile => {
-  if (!raw) return EMPTY_PROFILE;
+  if (!raw) return ensureDefaultOwnedRoster(EMPTY_PROFILE);
   try {
     const parsed = JSON.parse(raw) as unknown;
     return sanitizeSavedProfile(parsed);
   } catch {
-    return EMPTY_PROFILE;
+    return ensureDefaultOwnedRoster(EMPTY_PROFILE);
   }
 };
 
@@ -150,6 +194,7 @@ const buildMergedProfile = (
   equipmentByUnit: mergeRecord(current.equipmentByUnit, patch.equipmentByUnit),
   tacticalAiByUnit: mergeRecord(current.tacticalAiByUnit, patch.tacticalAiByUnit),
   ownedByUnit: mergeRecord(current.ownedByUnit, patch.ownedByUnit),
+  ownedUnitIds: patch.ownedUnitIds ?? current.ownedUnitIds,
   collectionUi: mergeRecord(current.collectionUi, patch.collectionUi),
   sectCultivation: mergeRecord(current.sectCultivation, patch.sectCultivation),
 });
@@ -202,7 +247,7 @@ export function isUnitOwnedByProfile(
   const normalizedId = toNonEmptyString(unitId);
   if (!normalizedId) return false;
   if (profile.ownedByUnit?.[normalizedId] === true) return true;
-  return options.rank === 'Prime';
+  return Array.isArray(profile.ownedUnitIds) && profile.ownedUnitIds.includes(normalizedId);
 }
 
 export function resetPlayerProfileData(): SavedPlayerProfile {
@@ -218,6 +263,7 @@ export function resetPlayerProfileData(): SavedPlayerProfile {
     equipmentByUnit: {},
     tacticalAiByUnit: {},
     ownedByUnit: {},
+    ownedUnitIds: [],
   };
 
   savePlayerProfile(resetProfile);

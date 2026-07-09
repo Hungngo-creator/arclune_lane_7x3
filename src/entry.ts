@@ -10,7 +10,7 @@ import type { ModeConfig, ModeGroup, ModeShellConfig } from '@shared-types/confi
 import type { UnknownRecord } from '@shared-types/common';
 import type { MenuCardMetadata, MenuSection } from './screens/main-menu/types.ts';
 import type { LineupViewHandle } from './screens/lineup/view/index.ts';
-import { loadPlayerProfile, type SavedPlayerProfile } from './utils/player-profile.ts';
+import { loadPlayerProfile, isUnitOwnedByProfile, type SavedPlayerProfile } from './utils/player-profile.ts';
 import { mergeProfileProgressIntoCollectionState } from './utils/profile-progress-merge.ts';
 
 export interface ScreenParamMap {
@@ -1218,7 +1218,10 @@ async function mountPveScreen(params: ScreenParams): Promise<void>{
   };
   const profile = loadPlayerProfile();
   const storedLineupDeck = Array.isArray(profile.lineupDeck)
-    ? profile.lineupDeck.filter((id): id is string => typeof id === 'string' && id.trim() !== '').slice(0, 10)
+    ? profile.lineupDeck
+      .filter((id): id is string => typeof id === 'string' && id.trim() !== '')
+      .filter((id) => isUnitOwnedByProfile(profile, id))
+      .slice(0, 10)
     : [];
   if (storedLineupDeck.length > 0){
     const lineupDeckEntries = storedLineupDeck.map(id => ({ id }));

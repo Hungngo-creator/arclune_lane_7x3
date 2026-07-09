@@ -13267,6 +13267,7 @@ __modules['./entry.ts'] = (exports, module, __require) => {
   const resolveModuleFunction = __dep3.resolveModuleFunction;
   const __dep4 = __require('./utils/player-profile.ts');
   const loadPlayerProfile = __dep4.loadPlayerProfile;
+  const isUnitOwnedByProfile = __dep4.isUnitOwnedByProfile;
   const __dep5 = __require('./utils/profile-progress-merge.ts');
   const mergeProfileProgressIntoCollectionState = __dep5.mergeProfileProgressIntoCollectionState;
   const hasMethod = (value, methodName) => (Boolean(value) && typeof value[methodName] === 'function');
@@ -14282,7 +14283,10 @@ __modules['./entry.ts'] = (exports, module, __require) => {
       };
       const profile = loadPlayerProfile();
       const storedLineupDeck = Array.isArray(profile.lineupDeck)
-          ? profile.lineupDeck.filter((id) => typeof id === 'string' && id.trim() !== '').slice(0, 10)
+          ? profile.lineupDeck
+              .filter((id) => typeof id === 'string' && id.trim() !== '')
+              .filter((id) => isUnitOwnedByProfile(profile, id))
+              .slice(0, 10)
           : [];
       if (storedLineupDeck.length > 0) {
           const lineupDeckEntries = storedLineupDeck.map(id => ({ id }));
@@ -28790,10 +28794,17 @@ __modules['./screens/lineup/index.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/screens/lineup/index.ts
   const __dep1 = __require('./screens/lineup/view/index.ts');
   const renderLineupView = __dep1.renderLineupView;
-  const __dep2 = __require('./types/currency.ts');
-  const isCurrencyEntry = __dep2.isCurrencyEntry;
-  const isLineupCurrencies = __dep2.isLineupCurrencies;
-  const normalizeCurrencyBalances = __dep2.normalizeCurrencyBalances;
+  const __dep2 = __require('./catalog.ts');
+  const ROSTER = __dep2.ROSTER;
+  const __dep3 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep3.loadPlayerProfile;
+  const isUnitOwnedByProfile = __dep3.isUnitOwnedByProfile;
+  const __dep4 = __require('./utils/unit-id.ts');
+  const normalizeUnitId = __dep4.normalizeUnitId;
+  const __dep5 = __require('./types/currency.ts');
+  const isCurrencyEntry = __dep5.isCurrencyEntry;
+  const isLineupCurrencies = __dep5.isLineupCurrencies;
+  const normalizeCurrencyBalances = __dep5.normalizeCurrencyBalances;
   const isUnknownRecord = (value) => (typeof value === 'object'
       && value !== null
       && !Array.isArray(value));
@@ -28903,7 +28914,13 @@ __modules['./screens/lineup/index.ts'] = (exports, module, __require) => {
       const mergedPlayerState = mergeParams(defParams?.playerState ?? null, normalizedParams?.playerState ?? null) || {};
       const lineups = resolveLineups(defParams, normalizedParams);
       const mergedRosterSource = mergeParams(toMergeable(defParams?.roster), toMergeable(normalizedParams?.roster));
-      const roster = toRosterSource(mergedRosterSource);
+      const profile = loadPlayerProfile();
+      const rosterSource = toRosterSource(mergedRosterSource) ?? ROSTER;
+      const roster = rosterSource.filter((unit) => {
+          const key = unit.key;
+          const unitId = normalizeUnitId(unit.id ?? key ?? '');
+          return isUnitOwnedByProfile(profile, unitId, { rank: typeof unit.rank === 'string' ? unit.rank : null });
+      });
       const baseCurrencies = isLineupCurrencies(defParams?.currencies) ? defParams?.currencies ?? null : null;
       const overrideCurrencies = isLineupCurrencies(normalizedParams?.currencies) ? normalizedParams?.currencies ?? null : null;
       const mergedCurrencySource = mergeParams(baseCurrencies, overrideCurrencies);
@@ -36488,17 +36505,20 @@ __modules['./screens/ui-gacha/gacha.ts'] = (exports, module, __require) => {
   const currencyValueNodeCache = new WeakMap();
   const bannerButtonNodeCache = new WeakMap();
   function markOwnedUnits(unitIds) {
-      const ownedByUnit = { ...(loadPlayerProfile().ownedByUnit ?? {}) };
+      const profile = loadPlayerProfile();
+      const ownedByUnit = { ...(profile.ownedByUnit ?? {}) };
+      const ownedUnitIds = new Set(profile.ownedUnitIds ?? Object.keys(ownedByUnit).filter((unitId) => ownedByUnit[unitId] === true));
       let changed = false;
       for (const unitId of unitIds) {
           const normalizedId = normalizeUnitId(unitId);
           if (!normalizedId || ownedByUnit[normalizedId] === true)
               continue;
           ownedByUnit[normalizedId] = true;
+          ownedUnitIds.add(normalizedId);
           changed = true;
       }
       if (changed) {
-          patchPlayerProfile({ ownedByUnit });
+          patchPlayerProfile({ ownedByUnit, ownedUnitIds: [...ownedUnitIds] });
       }
   }
   function formatNumber(value) {
@@ -45899,9 +45919,12 @@ __modules['./utils/module-resolution.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveModuleFunction')) exports.resolveModuleFunction = resolveModuleFunction;
 };
 __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./catalog.ts');
+  const ROSTER = __dep0.ROSTER;
   const STORAGE_KEY = 'arclune.playerProfile.v1';
   const EMPTY_PROFILE = {};
   const MAX_LINEUP_BUFF_SLOTS = 6;
+  const DEFAULT_OWNED_UNIT_IDS = Object.freeze(ROSTER.filter((unit) => unit.rank === 'Prime').map((unit) => unit.id));
   let cachedRawProfile;
   let cachedParsedProfile = null;
   const isObject = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value));
@@ -45964,9 +45987,34 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
       }
       return Object.keys(normalized).length > 0 ? normalized : undefined;
   };
+  const sanitizeOwnedUnitIds = (value) => {
+      if (!Array.isArray(value))
+          return undefined;
+      const seen = new Set();
+      for (const entry of value) {
+          const unitId = toNonEmptyString(entry);
+          if (unitId)
+              seen.add(unitId);
+      }
+      return seen.size > 0 ? [...seen] : undefined;
+  };
+  const hasOwnedRoster = (profile) => (Boolean(profile.ownedUnitIds?.length) || Boolean(profile.ownedByUnit && Object.keys(profile.ownedByUnit).length > 0));
+  const ensureDefaultOwnedRoster = (profile) => {
+      if (hasOwnedRoster(profile))
+          return profile;
+      const ownedByUnit = {};
+      for (const unitId of DEFAULT_OWNED_UNIT_IDS) {
+          ownedByUnit[unitId] = true;
+      }
+      return {
+          ...profile,
+          ownedByUnit,
+          ownedUnitIds: [...DEFAULT_OWNED_UNIT_IDS],
+      };
+  };
   const sanitizeSavedProfile = (rawProfile) => {
       if (!isObject(rawProfile))
-          return EMPTY_PROFILE;
+          return ensureDefaultOwnedRoster(EMPTY_PROFILE);
       const normalized = { ...rawProfile };
       normalized.lineupDeck = Array.isArray(rawProfile.lineupDeck)
           ? rawProfile.lineupDeck.filter((value) => typeof value === 'string' && value.trim().length > 0)
@@ -45974,19 +46022,30 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
       normalized.lineupActiveBuffOptionIndexes = sanitizeLineupBuffIndexes(rawProfile.lineupActiveBuffOptionIndexes);
       normalized.cultivationByUnit = sanitizeCultivationByUnit(rawProfile.cultivationByUnit);
       normalized.ownedByUnit = sanitizeOwnedByUnit(rawProfile.ownedByUnit);
+      normalized.ownedUnitIds = sanitizeOwnedUnitIds(rawProfile.ownedUnitIds);
+      if (normalized.ownedUnitIds?.length) {
+          normalized.ownedByUnit = normalized.ownedByUnit ?? {};
+          for (const unitId of normalized.ownedUnitIds)
+              normalized.ownedByUnit[unitId] = true;
+      }
+      if (normalized.ownedByUnit) {
+          normalized.ownedUnitIds = Object.entries(normalized.ownedByUnit)
+              .filter(([, owned]) => owned === true)
+              .map(([unitId]) => unitId);
+      }
       const sectName = toNonEmptyString(rawProfile.sectName);
       normalized.sectName = sectName ?? '';
-      return normalized;
+      return ensureDefaultOwnedRoster(normalized);
   };
   const parseStoredProfile = (raw) => {
       if (!raw)
-          return EMPTY_PROFILE;
+          return ensureDefaultOwnedRoster(EMPTY_PROFILE);
       try {
           const parsed = JSON.parse(raw);
           return sanitizeSavedProfile(parsed);
       }
       catch {
-          return EMPTY_PROFILE;
+          return ensureDefaultOwnedRoster(EMPTY_PROFILE);
       }
   };
   const mergeRecord = (current, patch) => {
@@ -46007,6 +46066,7 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
       equipmentByUnit: mergeRecord(current.equipmentByUnit, patch.equipmentByUnit),
       tacticalAiByUnit: mergeRecord(current.tacticalAiByUnit, patch.tacticalAiByUnit),
       ownedByUnit: mergeRecord(current.ownedByUnit, patch.ownedByUnit),
+      ownedUnitIds: patch.ownedUnitIds ?? current.ownedUnitIds,
       collectionUi: mergeRecord(current.collectionUi, patch.collectionUi),
       sectCultivation: mergeRecord(current.sectCultivation, patch.sectCultivation),
   });
@@ -46051,7 +46111,7 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
           return false;
       if (profile.ownedByUnit?.[normalizedId] === true)
           return true;
-      return options.rank === 'Prime';
+      return Array.isArray(profile.ownedUnitIds) && profile.ownedUnitIds.includes(normalizedId);
   }
   function resetPlayerProfileData() {
       const current = loadPlayerProfile();
@@ -46066,6 +46126,7 @@ __modules['./utils/player-profile.ts'] = (exports, module, __require) => {
           equipmentByUnit: {},
           tacticalAiByUnit: {},
           ownedByUnit: {},
+          ownedUnitIds: [],
       };
       savePlayerProfile(resetProfile);
       return resetProfile;

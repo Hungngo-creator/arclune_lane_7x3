@@ -70,16 +70,19 @@ const currencyValueNodeCache = new WeakMap<HTMLElement, Map<CurrencyCode, HTMLEl
 const bannerButtonNodeCache = new WeakMap<HTMLElement, Map<string, HTMLButtonElement>>();
 
 function markOwnedUnits(unitIds: Iterable<string>): void {
-  const ownedByUnit: Record<string, boolean> = { ...(loadPlayerProfile().ownedByUnit ?? {}) };
+  const profile = loadPlayerProfile();
+  const ownedByUnit: Record<string, boolean> = { ...(profile.ownedByUnit ?? {}) };
+  const ownedUnitIds = new Set(profile.ownedUnitIds ?? Object.keys(ownedByUnit).filter((unitId) => ownedByUnit[unitId] === true));
   let changed = false;
   for (const unitId of unitIds) {
     const normalizedId = normalizeUnitId(unitId);
     if (!normalizedId || ownedByUnit[normalizedId] === true) continue;
     ownedByUnit[normalizedId] = true;
+    ownedUnitIds.add(normalizedId);
     changed = true;
   }
   if (changed) {
-    patchPlayerProfile({ ownedByUnit });
+    patchPlayerProfile({ ownedByUnit, ownedUnitIds: [...ownedUnitIds] });
   }
 }
 
