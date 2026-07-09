@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -15410,13 +15410,11 @@ __modules['./modes/pve/chap-minh-runtime.ts'] = (exports, module, __require) => 
   if (!Object.prototype.hasOwnProperty.call(exports, 'performChapMinhUltRuntime')) exports.performChapMinhUltRuntime = performChapMinhUltRuntime;
 };
 __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./meta.ts');
-  const Meta = __dep0.Meta;
-  const makeInstanceStats = __dep0.makeInstanceStats;
-  const __dep1 = __require('./data/roster-preview.ts');
-  const TP_DELTA = __dep1.TP_DELTA;
+  const __dep0 = __require('./data/roster-preview.ts');
+  const TP_DELTA = __dep0.TP_DELTA;
+  const __dep1 = __require('./unit-stat-resolver.ts');
+  const resolveFinalCollectionUnitStats = __dep1.resolveFinalCollectionUnitStats;
   const __dep2 = __require('./utils/equipment.ts');
-  const applyEquipmentTpAllocationToInstanceStats = __dep2.applyEquipmentTpAllocationToInstanceStats;
   const normalizeUnitEquipmentState = __dep2.normalizeUnitEquipmentState;
   const SKIN_FIELD_KEYS = ['skinKey', 'skin', 'avatarSkin', 'selectedSkin'];
   const PROGRESS_MAP_CACHE = new WeakMap();
@@ -15516,28 +15514,6 @@ __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => 
           return null;
       return Math.max(min, Math.floor(numeric));
   };
-  const normalizeIntegerWithFallback = (value, min, fallback) => (normalizeInteger(value, min) ?? fallback);
-  const readSkinKey = (entry) => {
-      for (const key of SKIN_FIELD_KEYS) {
-          const value = entry[key];
-          if (typeof value === 'string' && value.trim() !== '') {
-              return value.trim();
-          }
-      }
-      return null;
-  };
-  const INSTANCE_STAT_BY_TP_STAT = Object.freeze({
-      HP: 'hpMax',
-      ATK: 'atk',
-      WIL: 'wil',
-      ARM: 'arm',
-      RES: 'res',
-      AGI: 'agi',
-      PER: 'per',
-      AEmax: 'aeMax',
-      AEregen: 'aeRegen',
-      HPregen: 'hpRegen',
-  });
   const normalizeTpAlloc = (value) => {
       if (!value || typeof value !== 'object' || Array.isArray(value))
           return null;
@@ -15550,24 +15526,14 @@ __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => 
       }
       return Object.keys(normalized).length > 0 ? normalized : null;
   };
-  const applyTpAllocToInstanceStats = (stats, tpAlloc) => {
-      if (!tpAlloc)
-          return stats;
-      let out = null;
-      for (const [stat, amount] of Object.entries(tpAlloc)) {
-          const delta = TP_DELTA[stat];
-          const instanceKey = INSTANCE_STAT_BY_TP_STAT[stat];
-          if (typeof delta !== 'number' || !instanceKey || !Number.isFinite(amount) || amount === 0)
-              continue;
-          if (!out)
-              out = { ...stats };
-          const bonus = delta * amount;
-          out[instanceKey] = (out[instanceKey] ?? 0) + bonus;
-          if (instanceKey === 'hpMax') {
-              out.hp = (out.hp ?? 0) + bonus;
+  const readSkinKey = (entry) => {
+      for (const key of SKIN_FIELD_KEYS) {
+          const value = entry[key];
+          if (typeof value === 'string' && value.trim() !== '') {
+              return value.trim();
           }
       }
-      return out ?? stats;
+      return null;
   };
   const normalizeProgress = (entry, equipmentByUnit) => {
       const unitId = readUnitId(entry);
@@ -15651,20 +15617,12 @@ __modules['./modes/pve/collection-mapper.ts'] = (exports, module, __require) => 
       return out;
   }
   function resolveRuntimeUnitStats(unitId, progressMap) {
-      const meta = Meta.get(unitId);
-      const progress = progressMap?.get(unitId);
-      const level = normalizeIntegerWithFallback(progress?.level, 1, 1);
-      const realm = normalizeIntegerWithFallback(progress?.realm, 0, 0);
-      const subRealm = normalizeIntegerWithFallback(progress?.subRealm, 0, 0);
-      const stars = normalizeIntegerWithFallback(progress?.stars, 0, 0);
-      const stats = applyEquipmentTpAllocationToInstanceStats(applyTpAllocToInstanceStats(meta ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId), progress?.tpAlloc), progress?.equipment, u);
-      return {
-          ...stats,
-          level,
-          realm,
-          subRealm,
-          stars,
-      };
+      const progress = progressMap?.get(unitId) ?? null;
+      return resolveFinalCollectionUnitStats({
+          unitId,
+          progress,
+          hasCultivationData: progressMap?.has(unitId) ?? false,
+      });
   }
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'mapUnitProgressById')) exports.mapUnitProgressById = mapUnitProgressById;
@@ -15676,10 +15634,8 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
   const __dep1 = __require('./modes/pve/collection-mapper.ts');
   const mapUnitProgressById = __dep1.mapUnitProgressById;
   const resolveRuntimeUnitStats = __dep1.resolveRuntimeUnitStats;
-  const __dep2 = __require('./cultivation.ts');
-  const applyCultivationBonus = __dep2.applyCultivationBonus;
-  const __dep3 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep3.normalizeClassName;
+  const __dep2 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep2.normalizeClassName;
   const CREEP_SLOT_ORDER = [
       { id: 'creep_1', powerSlot: 2 },
       { id: 'creep_2', powerSlot: 1 },
@@ -15704,15 +15660,7 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
       return normalized;
   }
   function resolveRuntimeStatProfile(unitId, progressById) {
-      const progress = progressById.get(unitId);
-      const baseStats = resolveRuntimeUnitStats(unitId, progressById);
-      const stats = applyCultivationBonus({
-          ...baseStats,
-          id: unitId,
-          hasCultivationData: progressById.has(unitId),
-          realm: progress?.realm,
-          subRealm: progress?.subRealm,
-      });
+      const stats = resolveRuntimeUnitStats(unitId, progressById);
       return {
           hp: stats.hp,
           hpMax: stats.hpMax,
@@ -26448,7 +26396,6 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
   const __dep4 = __require('./cultivation.ts');
   const upgradeCultivation = __dep4.upgradeCultivation;
   const getCultivationCost = __dep4.getCultivationCost;
-  const applyCultivationBonusToCatalogStats = __dep4.applyCultivationBonusToCatalogStats;
   const __dep5 = __require('./data/economy.ts');
   const getCultivationRealmEconomy = __dep5.getCultivationRealmEconomy;
   const __dep6 = __require('./utils/currency.ts');
@@ -26468,34 +26415,36 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
   const TP_DELTA = __dep10.TP_DELTA;
   const __dep11 = __require('./catalog.ts');
   const CLASS_GROWTH = __dep11.CLASS_GROWTH;
-  const __dep12 = __require('./utils/equipment.ts');
-  const EQUIPMENT_INVENTORY = __dep12.EQUIPMENT_INVENTORY;
-  const EQUIPMENT_ITEM_BY_ID = __dep12.EQUIPMENT_ITEM_BY_ID;
-  const EQUIPMENT_SLOT_FILTER = __dep12.EQUIPMENT_SLOT_FILTER;
-  const EQUIPMENT_SLOT_LABEL = __dep12.EQUIPMENT_SLOT_LABEL;
-  const EQUIPMENT_SLOT_SEQUENCE = __dep12.EQUIPMENT_SLOT_SEQUENCE;
-  const TP_ALLOCATABLE_KEYS = __dep12.TP_ALLOCATABLE_KEYS;
-  const TP_STAT_GAIN_PER_POINT = __dep12.TP_STAT_GAIN_PER_POINT;
-  const normalizeUnitEquipmentState = __dep12.normalizeUnitEquipmentState;
-  const resolveEquipmentTpAllocation = __dep12.resolveEquipmentTpAllocation;
-  const __dep13 = __require('./screens/collection/helpers.ts');
-  const ABILITY_TYPE_LABELS = __dep13.ABILITY_TYPE_LABELS;
-  const buildRosterWithCost = __dep13.buildRosterWithCost;
-  const cloneRoster = __dep13.cloneRoster;
-  const collectAbilityFacts = __dep13.collectAbilityFacts;
-  const describeUlt = __dep13.describeUlt;
-  const labelForAbility = __dep13.labelForAbility;
-  const resolveCurrencyBalance = __dep13.resolveCurrencyBalance;
-  const getCurrencyCatalog = __dep13.getCurrencyCatalog;
-  const ensureNumberFormatter = __dep13.ensureNumberFormatter;
-  const __dep14 = __require('./screens/collection/state.ts');
-  const createFilterState = __dep14.createFilterState;
-  const updateActiveTab = __dep14.updateActiveTab;
-  const updateSelectedUnit = __dep14.updateSelectedUnit;
-  const __dep15 = __require('./utils/player-profile.ts');
-  const isUnitOwnedByProfile = __dep15.isUnitOwnedByProfile;
-  const loadPlayerProfile = __dep15.loadPlayerProfile;
-  const patchPlayerProfile = __dep15.patchPlayerProfile;
+  const __dep12 = __require('./unit-stat-resolver.ts');
+  const resolveFinalCollectionUnitStats = __dep12.resolveFinalCollectionUnitStats;
+  const __dep13 = __require('./utils/equipment.ts');
+  const EQUIPMENT_INVENTORY = __dep13.EQUIPMENT_INVENTORY;
+  const EQUIPMENT_ITEM_BY_ID = __dep13.EQUIPMENT_ITEM_BY_ID;
+  const EQUIPMENT_SLOT_FILTER = __dep13.EQUIPMENT_SLOT_FILTER;
+  const EQUIPMENT_SLOT_LABEL = __dep13.EQUIPMENT_SLOT_LABEL;
+  const EQUIPMENT_SLOT_SEQUENCE = __dep13.EQUIPMENT_SLOT_SEQUENCE;
+  const TP_ALLOCATABLE_KEYS = __dep13.TP_ALLOCATABLE_KEYS;
+  const TP_STAT_GAIN_PER_POINT = __dep13.TP_STAT_GAIN_PER_POINT;
+  const normalizeUnitEquipmentState = __dep13.normalizeUnitEquipmentState;
+  const resolveEquipmentTpAllocation = __dep13.resolveEquipmentTpAllocation;
+  const __dep14 = __require('./screens/collection/helpers.ts');
+  const ABILITY_TYPE_LABELS = __dep14.ABILITY_TYPE_LABELS;
+  const buildRosterWithCost = __dep14.buildRosterWithCost;
+  const cloneRoster = __dep14.cloneRoster;
+  const collectAbilityFacts = __dep14.collectAbilityFacts;
+  const describeUlt = __dep14.describeUlt;
+  const labelForAbility = __dep14.labelForAbility;
+  const resolveCurrencyBalance = __dep14.resolveCurrencyBalance;
+  const getCurrencyCatalog = __dep14.getCurrencyCatalog;
+  const ensureNumberFormatter = __dep14.ensureNumberFormatter;
+  const __dep15 = __require('./screens/collection/state.ts');
+  const createFilterState = __dep15.createFilterState;
+  const updateActiveTab = __dep15.updateActiveTab;
+  const updateSelectedUnit = __dep15.updateSelectedUnit;
+  const __dep16 = __require('./utils/player-profile.ts');
+  const isUnitOwnedByProfile = __dep16.isUnitOwnedByProfile;
+  const loadPlayerProfile = __dep16.loadPlayerProfile;
+  const patchPlayerProfile = __dep16.patchPlayerProfile;
   const STYLE_ID = 'collection-view-style-v2';
   const TAB_DEFINITIONS = [
       { key: 'skills', label: 'Kĩ Năng & Thức Tỉnh', hint: 'Mở lớp phủ mô tả kỹ năng, chuỗi nâng cấp và yêu cầu nguyên liệu.', icon: 'assets/collection/skill&essence.webp' },
@@ -26782,38 +26731,52 @@ __modules['./screens/collection/view.ts'] = (exports, module, __require) => {
   function resolveUnitStatPreview(params) {
       const { unitId } = params;
       const tpAlloc = normalizeTpAllocMap(params.tpAllocation ?? {});
-      const equipmentTpAlloc = resolveEquipmentTpAllocation(params.equipment ?? {});
+      const equipment = normalizeUnitEquipmentState(params.equipment ?? {});
+      const equipmentTpAlloc = resolveEquipmentTpAllocation(equipment);
       if (!unitId)
           return { stats: [], tpAlloc, equipmentTpAlloc };
       const preview = ROSTER_PREVIEWS[unitId];
       const finalStats = preview?.final;
       if (!finalStats)
           return { stats: [], tpAlloc, equipmentTpAlloc };
-      const cultivatedStats = applyCultivationBonusToCatalogStats({
+      const resolvedStats = resolveFinalCollectionUnitStats({
           unitId,
-          stats: finalStats,
-          realm: params.cultivation?.realm ?? 1,
-          subRealm: params.cultivation?.subRealm ?? 0,
+          progress: {
+              realm: params.cultivation?.realm ?? 0,
+              subRealm: params.cultivation?.subRealm ?? 0,
+              tpAlloc,
+              equipment,
+          },
+          hasCultivationData: true,
       });
+      const statByCatalogKey = {
+          HP: resolvedStats.hpMax,
+          HPmax: resolvedStats.hpMax,
+          ATK: resolvedStats.atk,
+          WIL: resolvedStats.wil,
+          ARM: resolvedStats.arm,
+          RES: resolvedStats.res,
+          AGI: resolvedStats.agi,
+          PER: resolvedStats.per,
+          SPD: resolvedStats.spd,
+          AEmax: resolvedStats.aeMax,
+          AEregen: resolvedStats.aeRegen,
+          HPregen: resolvedStats.hpRegen,
+      };
       const rows = [];
-      const hp = toFiniteStatValue(cultivatedStats.HP ?? finalStats.HPmax ?? finalStats.HP ?? null);
+      const hp = toFiniteStatValue(statByCatalogKey.HP ?? finalStats.HPmax ?? finalStats.HP ?? null);
       if (hp != null) {
-          rows.push({
-              key: 'HP',
-              value: hp + resolveTpBonusForStat('HP', tpAlloc) + resolveStatGainFromTpPoints('HP', Number(equipmentTpAlloc.HP ?? 0)),
-          });
+          rows.push({ key: 'HP', value: hp });
       }
       for (const [key, rawValue] of Object.entries(finalStats)) {
           if (key === 'HP' || key === 'HPmax')
               continue;
-          const baseValue = toFiniteStatValue(rawValue);
-          if (baseValue == null)
+          const resolvedValue = toFiniteStatValue(statByCatalogKey[key]);
+          const fallbackValue = toFiniteStatValue(rawValue);
+          const value = resolvedValue ?? fallbackValue;
+          if (value == null)
               continue;
-          const cultivatedValue = toFiniteStatValue(cultivatedStats[key]);
-          rows.push({
-              key,
-              value: (cultivatedValue ?? baseValue) + resolveTpBonusForStat(key, tpAlloc) + resolveStatGainFromTpPoints(key, Number(equipmentTpAlloc[key] ?? 0)),
-          });
+          rows.push({ key, value });
       }
       return { stats: rows, tpAlloc, equipmentTpAlloc };
   }
@@ -42728,25 +42691,23 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   const predictSpawnCycleByTurnOrder = __dep15.predictSpawnCycleByTurnOrder;
   const __dep16 = __require('./modes/pve/collection-mapper.ts');
   const resolveRuntimeUnitStats = __dep16.resolveRuntimeUnitStats;
-  const __dep17 = __require('./cultivation.ts');
-  const applyCultivationBonus = __dep17.applyCultivationBonus;
-  const __dep18 = __require('./ai.ts');
-  const evaluateGambitLogic = __dep18.evaluateGambitLogic;
-  const __dep19 = __require('./utils/rng.ts');
-  const nextRngValue = __dep19.nextRngValue;
-  const __dep20 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep20.normalizeClassName;
-  const normalizeElementKey = __dep20.normalizeElementKey;
-  const __dep21 = __require('./utils/unique-global.ts');
-  const isUniqueGlobalSummonBlocked = __dep21.isUniqueGlobalSummonBlocked;
-  const __dep22 = __require('./utils/player-profile.ts');
-  const loadPlayerProfile = __dep22.loadPlayerProfile;
-  const __dep23 = __require('./leader-uyen.ts');
-  const clearQueuedUyenUlt = __dep23.clearQueuedUyenUlt;
-  const hasQueuedUyenUlt = __dep23.hasQueuedUyenUlt;
-  const isAnyLeaderUltReady = __dep23.isAnyLeaderUltReady;
-  const isUyenLeader = __dep23.isUyenLeader;
-  const grantUyenSummonRage = __dep23.grantUyenSummonRage;
+  const __dep17 = __require('./ai.ts');
+  const evaluateGambitLogic = __dep17.evaluateGambitLogic;
+  const __dep18 = __require('./utils/rng.ts');
+  const nextRngValue = __dep18.nextRngValue;
+  const __dep19 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep19.normalizeClassName;
+  const normalizeElementKey = __dep19.normalizeElementKey;
+  const __dep20 = __require('./utils/unique-global.ts');
+  const isUniqueGlobalSummonBlocked = __dep20.isUniqueGlobalSummonBlocked;
+  const __dep21 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep21.loadPlayerProfile;
+  const __dep22 = __require('./leader-uyen.ts');
+  const clearQueuedUyenUlt = __dep22.clearQueuedUyenUlt;
+  const hasQueuedUyenUlt = __dep22.hasQueuedUyenUlt;
+  const isAnyLeaderUltReady = __dep22.isAnyLeaderUltReady;
+  const isUyenLeader = __dep22.isUyenLeader;
+  const grantUyenSummonRage = __dep22.grantUyenSummonRage;
   const toActiveUnitKey = (side, slot) => `${side}:${slot}`;
   const createActiveUnitIndex = (Game) => {
       const index = new Map();
@@ -43044,16 +43005,8 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       const kit = meta?.kit;
       const initialFury = initialRageFor(p.unitId, { isLeader: false, revive: !!p.revive, reviveSpec: p.revived });
       const unitProgressMap = Game.runtime?.unitProgressById;
-      const progress = unitProgressMap?.get(p.unitId);
-      const baseStatsResolved = resolveRuntimeUnitStats(p.unitId, unitProgressMap);
-      const stats = applyCultivationBonus({
-          ...baseStatsResolved,
-          id: p.unitId,
-          hasCultivationData: unitProgressMap?.has(p.unitId) ?? false,
-          realm: progress?.realm,
-          subRealm: progress?.subRealm,
-      });
-      const { id: _statsId, ...resolvedStats } = stats;
+      const stats = resolveRuntimeUnitStats(p.unitId, unitProgressMap);
+      const resolvedStats = stats;
       const baseStats = {
           atk: stats.atk ?? 0,
           res: stats.res ?? 0,
@@ -44409,6 +44362,80 @@ __modules['./ui/dom.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'assertElement')) exports.assertElement = assertElement;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStyleTag')) exports.ensureStyleTag = ensureStyleTag;
   if (!Object.prototype.hasOwnProperty.call(exports, 'mountSection')) exports.mountSection = mountSection;
+};
+__modules['./unit-stat-resolver.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./meta.ts');
+  const Meta = __dep0.Meta;
+  const makeInstanceStats = __dep0.makeInstanceStats;
+  const __dep1 = __require('./data/roster-preview.ts');
+  const TP_DELTA = __dep1.TP_DELTA;
+  const __dep2 = __require('./cultivation.ts');
+  const applyCultivationBonus = __dep2.applyCultivationBonus;
+  const __dep3 = __require('./utils/equipment.ts');
+  const applyEquipmentTpAllocationToInstanceStats = __dep3.applyEquipmentTpAllocationToInstanceStats;
+  const INSTANCE_STAT_BY_TP_STAT = Object.freeze({
+      HP: 'hpMax',
+      ATK: 'atk',
+      WIL: 'wil',
+      ARM: 'arm',
+      RES: 'res',
+      AGI: 'agi',
+      PER: 'per',
+      AEmax: 'aeMax',
+      AEregen: 'aeRegen',
+      HPregen: 'hpRegen',
+  });
+  function normalizeInteger(value, min, fallback) {
+      const numeric = typeof value === 'number' && Number.isFinite(value) ? value : null;
+      if (numeric == null)
+          return fallback;
+      return Math.max(min, Math.floor(numeric));
+  }
+  function applyTpAllocToInstanceStats(stats, tpAlloc) {
+      if (!tpAlloc)
+          return stats;
+      let out = null;
+      for (const [stat, amount] of Object.entries(tpAlloc)) {
+          const delta = TP_DELTA[stat];
+          const instanceKey = INSTANCE_STAT_BY_TP_STAT[stat];
+          if (typeof delta !== 'number' || !instanceKey || !Number.isFinite(amount) || amount === 0)
+              continue;
+          if (!out)
+              out = { ...stats };
+          const bonus = delta * amount;
+          out[instanceKey] = (out[instanceKey] ?? 0) + bonus;
+          if (instanceKey === 'hpMax') {
+              out.hp = (out.hp ?? 0) + bonus;
+          }
+      }
+      return out ?? stats;
+  }
+  function resolveFinalCollectionUnitStats(params) {
+      const { unitId, progress } = params;
+      const level = normalizeInteger(progress?.level, 1, 1);
+      const realm = normalizeInteger(progress?.realm, 0, 0);
+      const subRealm = normalizeInteger(progress?.subRealm, 0, 0);
+      const stars = normalizeInteger(progress?.stars, 0, 0);
+      const baseStats = Meta.get(unitId) ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId);
+      const allocatedStats = applyEquipmentTpAllocationToInstanceStats(applyTpAllocToInstanceStats(baseStats, progress?.tpAlloc), progress?.equipment);
+      const cultivatedStats = applyCultivationBonus({
+          ...allocatedStats,
+          id: unitId,
+          hasCultivationData: params.hasCultivationData ?? !!progress,
+          realm,
+          subRealm,
+      });
+      const { id: _id, hasCultivationData: _hasCultivationData, ...stats } = cultivatedStats;
+      return {
+          ...stats,
+          level,
+          realm,
+          subRealm,
+          stars,
+      };
+  }
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveFinalCollectionUnitStats')) exports.resolveFinalCollectionUnitStats = resolveFinalCollectionUnitStats;
 };
 __modules['./units.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/units.ts

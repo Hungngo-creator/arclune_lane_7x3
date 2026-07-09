@@ -1,6 +1,6 @@
-import { Meta, makeInstanceStats } from '../../meta.ts';
 import { TP_DELTA } from '../../data/roster-preview.ts';
-import { applyEquipmentTpAllocationToInstanceStats, normalizeUnitEquipmentState } from '../../utils/equipment.ts';
+import { resolveFinalCollectionUnitStats } from '../../unit-stat-resolver.ts';
+import { normalizeUnitEquipmentState } from '../../utils/equipment.ts';
 
 import type { InstanceStats } from '../../meta.ts';
 import type {
@@ -112,33 +112,6 @@ const normalizeInteger = (value: unknown, min: number): number | null => {
   return Math.max(min, Math.floor(numeric));
 };
 
-const normalizeIntegerWithFallback = (value: unknown, min: number, fallback: number): number => (
-  normalizeInteger(value, min) ?? fallback
-);
-
-const readSkinKey = (entry: CollectionItemCandidate): string | null => {
-  for (const key of SKIN_FIELD_KEYS) {
-    const value = entry[key];
-    if (typeof value === 'string' && value.trim() !== '') {
-      return value.trim();
-    }
-  }
-  return null;
-};
-
-const INSTANCE_STAT_BY_TP_STAT: Readonly<Record<string, keyof InstanceStats>> = Object.freeze({
-  HP: 'hpMax',
-  ATK: 'atk',
-  WIL: 'wil',
-  ARM: 'arm',
-  RES: 'res',
-  AGI: 'agi',
-  PER: 'per',
-  AEmax: 'aeMax',
-  AEregen: 'aeRegen',
-  HPregen: 'hpRegen',
-});
-
 const normalizeTpAlloc = (value: unknown): Record<string, number> | null => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const normalized: Record<string, number> = {};
@@ -150,24 +123,14 @@ const normalizeTpAlloc = (value: unknown): Record<string, number> | null => {
   return Object.keys(normalized).length > 0 ? normalized : null;
 };
 
-const applyTpAllocToInstanceStats = (
-  stats: InstanceStats,
-  tpAlloc: RuntimeUnitProgress['tpAlloc'] | null | undefined,
-): InstanceStats => {
-  if (!tpAlloc) return stats;
-  let out: InstanceStats | null = null;
-  for (const [stat, amount] of Object.entries(tpAlloc)) {
-    const delta = TP_DELTA[stat];
-    const instanceKey = INSTANCE_STAT_BY_TP_STAT[stat];
-    if (typeof delta !== 'number' || !instanceKey || !Number.isFinite(amount) || amount === 0) continue;
-    if (!out) out = { ...stats };
-    const bonus = delta * amount;
-    out[instanceKey] = (out[instanceKey] ?? 0) + bonus;
-    if (instanceKey === 'hpMax') {
-      out.hp = (out.hp ?? 0) + bonus;
+const readSkinKey = (entry: CollectionItemCandidate): string | null => {
+  for (const key of SKIN_FIELD_KEYS) {
+    const value = entry[key];
+    if (typeof value === 'string' && value.trim() !== '') {
+      return value.trim();
     }
   }
-  return out ?? stats;
+  return null;
 };
 
 const normalizeProgress = (entry: CollectionItemCandidate, equipmentByUnit?: Record<string, unknown> | null): RuntimeUnitProgress | null => {
@@ -264,25 +227,10 @@ export function resolveRuntimeUnitStats(
   unitId: string,
   progressMap: ReadonlyMap<string, RuntimeUnitProgress> | null | undefined,
 ): InstanceStats & Pick<RuntimeUnitProgress, 'level' | 'realm' | 'subRealm' | 'stars'> {
-  const meta = Meta.get(unitId);
-  const progress = progressMap?.get(unitId);
-  const level = normalizeIntegerWithFallback(progress?.level, 1, 1);
-  const realm = normalizeIntegerWithFallback(progress?.realm, 0, 0);
-  const subRealm = normalizeIntegerWithFallback(progress?.subRealm, 0, 0);
-  const stars = normalizeIntegerWithFallback(progress?.stars, 0, 0);
-
-  const stats = applyEquipmentTpAllocationToInstanceStats(
-    applyTpAllocToInstanceStats(
-      meta ? makeInstanceStats(unitId, level, stars) : makeInstanceStats(unitId),
-      progress?.tpAlloc,
-    ),
-    progress?.equipment,u
-  );
-  return {
-    ...stats,
-    level,
-    realm,
-    subRealm,
-    stars,
-  };
+  const progress = progressMap?.get(unitId) ?? null;
+  return resolveFinalCollectionUnitStats({
+    unitId,
+    progress,
+    hasCultivationData: progressMap?.has(unitId) ?? false,
+  });
 }

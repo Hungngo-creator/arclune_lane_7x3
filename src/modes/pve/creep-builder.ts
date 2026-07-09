@@ -1,6 +1,5 @@
 import { lookupUnit } from '../../units.ts';
 import { mapUnitProgressById, resolveRuntimeUnitStats } from './collection-mapper.ts';
-import { applyCultivationBonus } from '../../cultivation.ts';
 import { normalizeClassName } from '../../utils/domain-normalization.ts';
 
 import type { PveDeckEntry } from '@shared-types/combat';
@@ -80,15 +79,7 @@ function resolveRuntimeStatProfile(
   unitId: string,
   progressById: ReadonlyMap<string, RuntimeUnitProgress>,
 ): RuntimeStatProfile {
-  const progress = progressById.get(unitId);
-  const baseStats = resolveRuntimeUnitStats(unitId, progressById);
-  const stats = applyCultivationBonus({
-    ...baseStats,
-    id: unitId,
-    hasCultivationData: progressById.has(unitId),
-    realm: progress?.realm,
-    subRealm: progress?.subRealm,
-  });
+  const stats = resolveRuntimeUnitStats(unitId, progressById);
   return {
     hp: stats.hp,
     hpMax: stats.hpMax,

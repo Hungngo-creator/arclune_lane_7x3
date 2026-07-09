@@ -4,7 +4,7 @@ import { getUnitArt } from '../../art.ts';
 import { normalizeUnitId } from '../../utils/unit-id.ts';
 import { getSkillSet } from '../../data/skills.ts';
 import { createNumberFormatter } from '../../utils/format.ts';
-import { upgradeCultivation, getCultivationCost, applyCultivationBonusToCatalogStats, type CultivationPlayerState } from '../../cultivation.ts';
+import { upgradeCultivation, getCultivationCost, type CultivationPlayerState } from '../../cultivation.ts';
 import { getCultivationRealmEconomy } from '../../data/economy.ts';
 import {
   createNormalizedWallet,
@@ -17,6 +17,7 @@ import { normalizeRarity } from '../../utils/rarity.ts';
 import { ROSTER_PREVIEWS } from '../../data/roster-preview.ts';
 import { TP_DELTA } from '../../data/roster-preview.ts';
 import { CLASS_GROWTH } from '../../catalog.ts';
+import { resolveFinalCollectionUnitStats } from '../../unit-stat-resolver.ts';
 import {
   EQUIPMENT_INVENTORY,
   EQUIPMENT_ITEM_BY_ID,
@@ -402,37 +403,52 @@ export function resolveUnitStatPreview(params: {
 }): CollectionStatPreview {
   const { unitId } = params;
   const tpAlloc = normalizeTpAllocMap(params.tpAllocation ?? {});
-  const equipmentTpAlloc = resolveEquipmentTpAllocation(params.equipment ?? {});
+  const equipment = normalizeUnitEquipmentState(params.equipment ?? {});
+  const equipmentTpAlloc = resolveEquipmentTpAllocation(equipment);
   if (!unitId) return { stats: [], tpAlloc, equipmentTpAlloc };
 
   const preview = ROSTER_PREVIEWS[unitId];
   const finalStats = preview?.final as Record<string, unknown> | undefined;
   if (!finalStats) return { stats: [], tpAlloc, equipmentTpAlloc };
 
-  const cultivatedStats = applyCultivationBonusToCatalogStats({
+  const resolvedStats = resolveFinalCollectionUnitStats({
     unitId,
-    stats: finalStats,
-    realm: params.cultivation?.realm ?? 1,
-    subRealm: params.cultivation?.subRealm ?? 0,
+    progress: {
+      realm: params.cultivation?.realm ?? 0,
+      subRealm: params.cultivation?.subRealm ?? 0,
+      tpAlloc,
+      equipment,
+    },
+    hasCultivationData: true,
   });
+  const statByCatalogKey: Readonly<Record<string, number | undefined>> = {
+    HP: resolvedStats.hpMax,
+    HPmax: resolvedStats.hpMax,
+    ATK: resolvedStats.atk,
+    WIL: resolvedStats.wil,
+    ARM: resolvedStats.arm,
+    RES: resolvedStats.res,
+    AGI: resolvedStats.agi,
+    PER: resolvedStats.per,
+    SPD: resolvedStats.spd,
+    AEmax: resolvedStats.aeMax,
+    AEregen: resolvedStats.aeRegen,
+    HPregen: resolvedStats.hpRegen,
+  };
+
   const rows: Array<{ key: string; value: number }> = [];
-  const hp = toFiniteStatValue(cultivatedStats.HP ?? finalStats.HPmax ?? finalStats.HP ?? null);
+  const hp = toFiniteStatValue(statByCatalogKey.HP ?? finalStats.HPmax ?? finalStats.HP ?? null);
   if (hp != null){
-    rows.push({
-      key: 'HP',
-      value: hp + resolveTpBonusForStat('HP', tpAlloc) + resolveStatGainFromTpPoints('HP', Number(equipmentTpAlloc.HP ?? 0)),
-    });
+    rows.push({ key: 'HP', value: hp });
   }
 
   for (const [key, rawValue] of Object.entries(finalStats)){
     if (key === 'HP' || key === 'HPmax') continue;
-    const baseValue = toFiniteStatValue(rawValue);
-    if (baseValue == null) continue;
-    const cultivatedValue = toFiniteStatValue(cultivatedStats[key]);
-    rows.push({
-      key,
-      value: (cultivatedValue ?? baseValue) + resolveTpBonusForStat(key, tpAlloc) + resolveStatGainFromTpPoints(key, Number(equipmentTpAlloc[key] ?? 0)),
-    });
+    const resolvedValue = toFiniteStatValue(statByCatalogKey[key]);
+    const fallbackValue = toFiniteStatValue(rawValue);
+    const value = resolvedValue ?? fallbackValue;
+    if (value == null) continue;
+    rows.push({ key, value });
   }
 
   return { stats: rows, tpAlloc, equipmentTpAlloc };

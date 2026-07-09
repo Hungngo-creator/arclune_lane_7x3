@@ -29,7 +29,6 @@ import { mergeBusyUntil, safeNow, sessionNow } from './utils/time.ts';
 import { initializeFury, startFuryTurn, spendFury, resolveUltCost, setFury, clearFreshSummon } from './utils/fury.ts';
 import { nextTurnInterleaved, getSequentialOrderIndex, predictSpawnCycleByTurnOrder } from './turns/interleaved.ts';
 import { resolveRuntimeUnitStats } from './modes/pve/collection-mapper.ts';
-import { applyCultivationBonus } from './cultivation.ts';
 import { evaluateGambitLogic } from './ai.ts';
 import { nextRngValue } from './utils/rng.ts';
 import { normalizeClassName, normalizeElementKey } from './utils/domain-normalization.ts';
@@ -401,16 +400,8 @@ export function spawnQueuedIfDue(
   const kit = meta?.kit;
   const initialFury = initialRageFor(p.unitId, { isLeader:false, revive: !!p.revive, reviveSpec: p.revived });
   const unitProgressMap = Game.runtime?.unitProgressById as ReadonlyMap<string, RuntimeUnitProgress> | undefined;
-  const progress = unitProgressMap?.get(p.unitId);
-  const baseStatsResolved = resolveRuntimeUnitStats(p.unitId, unitProgressMap);
-  const stats = applyCultivationBonus({
-    ...baseStatsResolved,
-    id: p.unitId,
-    hasCultivationData: unitProgressMap?.has(p.unitId) ?? false,
-    realm: progress?.realm,
-    subRealm: progress?.subRealm,
-  });
-  const { id: _statsId, ...resolvedStats } = stats;
+  const stats = resolveRuntimeUnitStats(p.unitId, unitProgressMap);
+  const resolvedStats = stats;
   const baseStats = {
     atk: stats.atk ?? 0,
     res: stats.res ?? 0,
