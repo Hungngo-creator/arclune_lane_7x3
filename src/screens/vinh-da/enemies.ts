@@ -9,7 +9,13 @@ export type EnemyKind =
   | 'darkMage'
   | 'ironMan'
   | 'resentfulDragon'
-  | 'apostle';
+  | 'apostle'
+  | 'bloodLordCultist'
+  | 'bloodLordPriest'
+  | 'listener'
+  | 'resentmentStatue'
+  | 'darkHighPriest'
+  | 'fleshRemnant';
 
 export type EnemyTier = 1.1 | 1.2 | 1.3;
 
@@ -50,6 +56,7 @@ export interface EnemyTemplate extends EnemyCombatStats, EnemyBehaviorFlags {
   /** Derived from ATK/WIL for legacy callers; prefer atk/wil in new combat code. */
   damage: number;
   reward: number;
+  threatCost: number;
 }
 
 const METERS_TO_WORLD_UNITS = 100;
@@ -101,7 +108,8 @@ const defineEnemyTemplate = (template: EnemyTemplateInput): EnemyTemplate => {
     groundSpeed,
     flySpeed,
     speed: behaviorFlags.canFly ? flySpeed : groundSpeed,
-    damage: deriveEnemyDamage(combatStats)
+    damage: deriveEnemyDamage(combatStats),
+    threatCost: template.threatCost ?? template.weight
   };
 };
 
@@ -127,7 +135,8 @@ export const ENEMY_TEMPLATES = {
     atk: 1,
     statusOnHit: 'bleed',
     bleedOnHit: true,
-    reward: 1
+    reward: 1,
+    threatCost: 1,
   }),
   crawler: defineEnemyTemplate({
     kind: 'crawler',
@@ -140,7 +149,8 @@ export const ENEMY_TEMPLATES = {
     atk: 1,
     statusOnHit: 'bleed',
     bleedOnHit: true,
-    reward: 1
+    reward: 1,
+    threatCost: 1,
   }),
   madDog: defineEnemyTemplate({
     kind: 'madDog',
@@ -154,7 +164,8 @@ export const ENEMY_TEMPLATES = {
     rank: 2,
     statusOnHit: 'contamination',
     contaminationOnHit: true,
-    reward: 1
+    reward: 1,
+    threatCost: 0.3,
   }),
   suicideBomber: defineEnemyTemplate({
     kind: 'suicideBomber',
@@ -173,7 +184,8 @@ export const ENEMY_TEMPLATES = {
     statusOnHit: 'contamination',
     contaminationOnHit: true,
     deathExplosion: true,
-    reward: 2
+    reward: 2,
+    threatCost: 2.5,
   }),
   mutantBird: defineEnemyTemplate({
     kind: 'mutantBird',
@@ -187,7 +199,8 @@ export const ENEMY_TEMPLATES = {
     wil: 1,
     canFly: true,
     attackShape: 'flyby',
-    reward: 1
+    reward: 1,
+    threatCost: 1.4,
   }),
   darkMage: defineEnemyTemplate({
     kind: 'darkMage',
@@ -205,7 +218,8 @@ export const ENEMY_TEMPLATES = {
     attackShape: 'projectile',
     statusOnHit: 'contamination',
     contaminationOnHit: true,
-    reward: 2
+    reward: 2,
+    threatCost: 2.7,
   }),
   ironMan: defineEnemyTemplate({
     kind: 'ironMan',
@@ -221,7 +235,8 @@ export const ENEMY_TEMPLATES = {
     res: 3,
     regen: true,
     rank: 2,
-    reward: 3
+    reward: 3,
+    threatCost: 4,
   }),
   apostle: defineEnemyTemplate({
     kind: 'apostle',
@@ -240,7 +255,8 @@ export const ENEMY_TEMPLATES = {
     res: 2,
     statusOnHit: 'contamination',
     contaminationOnHit: true,
-    reward: 0
+    reward: 0,
+    threatCost: 3.5,
   }),
   resentfulDragon: defineEnemyTemplate({
     kind: 'resentfulDragon',
@@ -263,7 +279,26 @@ export const ENEMY_TEMPLATES = {
     regen: true,
     dragonDestroyStructure: true,
     ultimate: 'dragon-rage',
-    reward: 8
+    reward: 8,
+    threatCost: 14
+  }),
+  bloodLordCultist: defineEnemyTemplate({
+    kind: 'bloodLordCultist', label: 'Tín Đồ Huyết Chủ', hp: 4, speed: 0.55 * METERS_TO_WORLD_UNITS, weight: 1, attackRange: 28, attackCooldown: 2, atk: 1.5, wil: 1.5, arm: 1, res: 1, rank: 2, statusOnHit: 'bleed', bleedOnHit: true, reward: 2, threatCost: 1.8
+  }),
+  bloodLordPriest: defineEnemyTemplate({
+    kind: 'bloodLordPriest', label: 'Tế Tư Huyết Chủ', hp: 5, speed: 0.45 * METERS_TO_WORLD_UNITS, weight: 1, attackRange: 200, attackCooldown: 3, projectileSpeed: 2 * METERS_TO_WORLD_UNITS, attackShape: 'projectile', hasCommanderAura: true, atk: 1, wil: 3, arm: 1, res: 3, rank: 3, reward: 3, threatCost: 3.6
+  }),
+  listener: defineEnemyTemplate({
+    kind: 'listener', label: 'Kẻ Nghe Tiếng Gọi', hp: 3, speed: 0.5 * METERS_TO_WORLD_UNITS, weight: 1, attackRange: 24, attackCooldown: 2.2, atk: 1, wil: 1, arm: 0.5, res: 0.5, statusOnHit: 'contamination', contaminationOnHit: true, reward: 1, threatCost: 1.2
+  }),
+  resentmentStatue: defineEnemyTemplate({
+    kind: 'resentmentStatue', label: 'Oán Tượng', hp: 9, speed: 0.25 * METERS_TO_WORLD_UNITS, weight: 3.2, attackRange: 2 * METERS_TO_WORLD_UNITS, attackCooldown: 3, atk: 3.9, wil: 3.9, arm: 5, res: 2, rank: 3, attackShape: 'aura', aoeRadius: 2 * METERS_TO_WORLD_UNITS, reward: 5, threatCost: 5.5
+  }),
+  darkHighPriest: defineEnemyTemplate({
+    kind: 'darkHighPriest', label: 'Hắc Ám Chủ Tế', hp: 12, speed: 0.45 * METERS_TO_WORLD_UNITS, weight: 1.2, attackRange: 15 * METERS_TO_WORLD_UNITS, attackCooldown: 12, projectileSpeed: 2 * METERS_TO_WORLD_UNITS, attackShape: 'projectile', atk: 2, wil: 5, arm: 2, res: 5, rank: 5, statusOnHit: 'contamination', contaminationOnHit: true, ultimate: 'commander-aura', reward: 10, threatCost: 10
+  }),
+  fleshRemnant: defineEnemyTemplate({
+    kind: 'fleshRemnant', label: 'Tàn Khu Huyết Nhục', hp: 35, speed: 0, weight: 5, attackRange: 0, attackCooldown: 15, atk: 0, wil: 0, arm: 6, res: 6, rank: 6, regen: true, ultimate: 'death-burst', reward: 20, threatCost: Number.POSITIVE_INFINITY
   })
 } as const satisfies Record<EnemyKind, EnemyTemplate>;
 

@@ -529,7 +529,6 @@ describe('Vĩnh Dạ base branch and leader safeguards', () => {
     ctx.state.nightIndex = 5;
     updateStructures(ctx, 0);
     expect(ctx.state.leaderShield).toBe(20);
-    expect(ctx.state.leaderHp).toBe(30);
     expect(ctx.state.leaderHp).toBe(10);
     expect(ctx.state.baseHp).toBe(72);
 

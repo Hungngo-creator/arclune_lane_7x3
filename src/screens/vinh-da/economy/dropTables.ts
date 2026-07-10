@@ -80,6 +80,34 @@ const ENEMY_DROP_TABLES = Object.freeze({
     [{ weight: 10, drops: [amount('darkStone', 2), amount('blackIron', 2), amount('blackBone', 2)] }, nothing(90)],
     [{ weight: 25, drops: [amount('resentmentStone', 1)] }, nothing(75)]
   ],
+
+  bloodLordCultist: [
+    [{ weight: 35, drops: [amount('wishStone', 1)] }, { weight: 10, drops: [amount('bloodLordSigil', 1)] }, nothing(55)],
+    [{ weight: 40, drops: [amount('darkStone', 1)] }, { weight: 20, drops: [amount('blackBone', 1)] }, nothing(40)]
+  ],
+  bloodLordPriest: [
+    [{ weight: 100, drops: [amount('wishStone', 1)] }],
+    [{ weight: 25, drops: [amount('bloodLordSigil', 1)] }, nothing(75)],
+    [{ weight: 20, drops: [amount('hazySoul', 1)] }, nothing(80)]
+  ],
+  listener: [
+    [{ weight: 25, drops: [amount('darkStone', 1)] }, { weight: 15, drops: [amount('hazySoul', 1)] }, nothing(60)]
+  ],
+  resentmentStatue: [
+    [{ weight: 100, drops: [amount('resentmentStone', 2)] }],
+    [{ weight: 35, drops: [amount('blackIron', 1)] }, nothing(65)],
+    [{ weight: 15, drops: [amount('voidStone', 1)] }, nothing(85)]
+  ],
+  darkHighPriest: [
+    [{ weight: 100, drops: [amount('nightCore', 1)] }],
+    [{ weight: 100, drops: [amount('hazySoul', 2)] }],
+    [{ weight: 35, drops: [amount('voidStone', 1)] }, nothing(65)],
+    [{ weight: 20, drops: [amount('fleshCrystal', 1)] }, nothing(80)]
+  ],
+  fleshRemnant: [
+    [{ weight: 100, drops: [amount('fleshCrystal', 1), amount('nightCore', 2), amount('darkStone', 5)] }],
+    [{ weight: 50, drops: [amount('voidStone', 1)] }, nothing(50)]
+  ],
   resentfulDragon: [
     [{ weight: 100, drops: [amount('darkStone', 10), amount('blackBone', 5), amount('fleshCrystal', 1), amount('dragonScale', 5)] }],
     [{ weight: 5, drops: [amount('darkStone', 2), amount('fleshCrystal', 1)] }, nothing(95)],

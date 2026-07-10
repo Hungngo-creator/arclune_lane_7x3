@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -38410,6 +38410,89 @@ __modules['./screens/ui-gacha/logic/types.ts'] = (exports, module, __require) =>
   if (!Object.prototype.hasOwnProperty.call(exports, 'CURRENCY_ORDER')) exports.CURRENCY_ORDER = CURRENCY_ORDER;
   if (!Object.prototype.hasOwnProperty.call(exports, 'RARITY_ORDER')) exports.RARITY_ORDER = RARITY_ORDER;
 };
+__modules['./screens/vinh-da/combat/prefixes.ts'] = (exports, module, __require) => {
+  const CREATURE_PREFIXES = Object.freeze({
+      elite: { label: 'Tinh Anh', hpPercent: 0.35, atkPercent: 0.2, wilPercent: 0.2, armPercent: 0.1, resPercent: 0.1, speedPercent: 0.08, controlResistPercent: 0.1, threatCostMultiplier: 1.8, minNightIndex: 2, normalNightCap: total => Math.floor(total * 0.08), role: 'normal' },
+      champion: { label: 'Quán Quân', hpPercent: 0.7, atkPercent: 0.35, wilPercent: 0.35, armPercent: 0.15, resPercent: 0.15, speedPercent: 0.12, cooldownPercent: -0.1, controlResistPercent: 0.2, threatCostMultiplier: 3, minNightIndex: 4, normalNightCap: 2, role: 'normal' },
+      hero: { label: 'Anh Hùng', hpPercent: 1.2, atkPercent: 0.6, wilPercent: 0.6, armPercent: 0.25, resPercent: 0.25, speedPercent: 0.15, cooldownPercent: -0.15, controlResistPercent: 0.35, threatCostMultiplier: 5, minNightIndex: 2, normalNightCap: 1, role: 'normal' },
+      ancient: { label: 'Cổ Lão', hpPercent: 0.9, atkPercent: 0.15, wilPercent: 0.15, armPercent: 0.3, resPercent: 0.3, speedPercent: -0.1, regenMaxHpPerSecond: 0.002, threatCostMultiplier: 2.8, role: 'special' },
+      fanatic: { label: 'Cuồng Tín', hpPercent: 0.2, atkPercent: 0.45, wilPercent: 0.45, armPercent: -0.1, resPercent: -0.1, speedPercent: 0.1, selfDamageMaxHpPerSecond: 0.004, threatCostMultiplier: 2, role: 'special' },
+      host: { label: 'Vật Chủ', hpPercent: 0.5, atkPercent: 0.1, wilPercent: 0.5, resPercent: 0.2, speedPercent: -0.05, threatCostMultiplier: 3.5, role: 'special' }
+  });
+  const add = (drops, resourceId, amount, tier) => {
+      const existing = drops.find(drop => drop.resourceId === resourceId && drop.tier === tier);
+      if (existing)
+          existing.amount += amount;
+      else
+          drops.push({ resourceId, amount, tier });
+  };
+  const applyCreaturePrefixPostRank = (stats, prefix) => {
+      if (!prefix)
+          return stats;
+      const definition = CREATURE_PREFIXES[prefix];
+      return {
+          ...stats,
+          hp: stats.hp + stats.hp * (definition.hpPercent ?? 0),
+          atk: stats.atk + stats.atk * (definition.atkPercent ?? 0),
+          wil: stats.wil + stats.wil * (definition.wilPercent ?? 0),
+          arm: stats.arm + stats.arm * (definition.armPercent ?? 0),
+          res: stats.res + stats.res * (definition.resPercent ?? 0),
+          speed: stats.speed + stats.speed * (definition.speedPercent ?? 0),
+          attackCooldown: Math.max(0, stats.attackCooldown + stats.attackCooldown * (definition.cooldownPercent ?? 0))
+      };
+  };
+  const getPrefixThreatCostMultiplier = (prefix) => prefix ? CREATURE_PREFIXES[prefix].threatCostMultiplier : 1;
+  const canApplyCreaturePrefix = (role, prefix) => !prefix || (role === 'normal' ? CREATURE_PREFIXES[prefix].role === 'normal' : role === 'miniBoss' ? CREATURE_PREFIXES[prefix].role === 'special' : false);
+  const getPrefixNightCap = (prefix, totalNormal) => {
+      const cap = CREATURE_PREFIXES[prefix].normalNightCap;
+      return typeof cap === 'function' ? cap(totalNormal) : cap ?? Number.POSITIVE_INFINITY;
+  };
+  const applyPrefixBonusDrops = (enemy, drops, randomValue) => {
+      if (!enemy.prefix)
+          return drops;
+      const tier = enemy.tier;
+      if (enemy.prefix === 'elite') {
+          add(drops, 'darkStone', 1, tier);
+          if (randomValue() < 0.2)
+              add(drops, enemy.faction === 'bloodLord' ? 'wishStone' : enemy.kind === 'resentmentStatue' ? 'resentmentStone' : 'darkStone', 1, tier);
+      }
+      if (enemy.prefix === 'champion') {
+          add(drops, 'darkStone', 2, tier);
+          if (randomValue() < 0.35)
+              add(drops, enemy.faction === 'bloodLord' ? 'wishStone' : 'resentmentStone', 1, tier);
+          if (randomValue() < 0.1)
+              add(drops, 'hazySoul', 1);
+      }
+      if (enemy.prefix === 'hero') {
+          add(drops, 'darkStone', 3, tier);
+          add(drops, enemy.faction === 'bloodLord' ? 'wishStone' : enemy.kind === 'resentmentStatue' ? 'resentmentStone' : 'darkStone', 1, tier);
+          if (randomValue() < 0.35 && enemy.faction !== 'neutral')
+              add(drops, enemy.faction === 'bloodLord' ? 'bloodLordSigil' : 'nightCore', 1, tier);
+      }
+      if (enemy.prefix === 'ancient' && randomValue() < 0.3 && enemy.faction === 'bloodLord')
+          add(drops, 'wishStone', 1, tier);
+      if (enemy.prefix === 'fanatic') {
+          if (randomValue() < 0.25 && enemy.faction === 'bloodLord')
+              add(drops, 'bloodLordSigil', 1, tier);
+          if (randomValue() < 0.25 && enemy.faction === 'neutral')
+              add(drops, 'hazySoul', 1);
+      }
+      if (enemy.prefix === 'host') {
+          if (randomValue() < 0.5)
+              add(drops, 'hazySoul', 1);
+          if (randomValue() < 0.15)
+              add(drops, 'nightCore', 1, tier);
+      }
+      return drops;
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'CREATURE_PREFIXES')) exports.CREATURE_PREFIXES = CREATURE_PREFIXES;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyCreaturePrefixPostRank')) exports.applyCreaturePrefixPostRank = applyCreaturePrefixPostRank;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getPrefixThreatCostMultiplier')) exports.getPrefixThreatCostMultiplier = getPrefixThreatCostMultiplier;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'canApplyCreaturePrefix')) exports.canApplyCreaturePrefix = canApplyCreaturePrefix;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getPrefixNightCap')) exports.getPrefixNightCap = getPrefixNightCap;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyPrefixBonusDrops')) exports.applyPrefixBonusDrops = applyPrefixBonusDrops;
+};
 __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   const STYLE_ID = 'vinh-da-gameplay-style';
   const BASE_WORLD_WIDTH = 3600;
@@ -38647,6 +38730,33 @@ __modules['./screens/vinh-da/economy/dropTables.ts'] = (exports, module, __requi
           [{ weight: 100, drops: [amount('darkStone', 2), amount('blackIron', 2), amount('blackBone', 2)] }],
           [{ weight: 10, drops: [amount('darkStone', 2), amount('blackIron', 2), amount('blackBone', 2)] }, nothing(90)],
           [{ weight: 25, drops: [amount('resentmentStone', 1)] }, nothing(75)]
+      ],
+      bloodLordCultist: [
+          [{ weight: 35, drops: [amount('wishStone', 1)] }, { weight: 10, drops: [amount('bloodLordSigil', 1)] }, nothing(55)],
+          [{ weight: 40, drops: [amount('darkStone', 1)] }, { weight: 20, drops: [amount('blackBone', 1)] }, nothing(40)]
+      ],
+      bloodLordPriest: [
+          [{ weight: 100, drops: [amount('wishStone', 1)] }],
+          [{ weight: 25, drops: [amount('bloodLordSigil', 1)] }, nothing(75)],
+          [{ weight: 20, drops: [amount('hazySoul', 1)] }, nothing(80)]
+      ],
+      listener: [
+          [{ weight: 25, drops: [amount('darkStone', 1)] }, { weight: 15, drops: [amount('hazySoul', 1)] }, nothing(60)]
+      ],
+      resentmentStatue: [
+          [{ weight: 100, drops: [amount('resentmentStone', 2)] }],
+          [{ weight: 35, drops: [amount('blackIron', 1)] }, nothing(65)],
+          [{ weight: 15, drops: [amount('voidStone', 1)] }, nothing(85)]
+      ],
+      darkHighPriest: [
+          [{ weight: 100, drops: [amount('nightCore', 1)] }],
+          [{ weight: 100, drops: [amount('hazySoul', 2)] }],
+          [{ weight: 35, drops: [amount('voidStone', 1)] }, nothing(65)],
+          [{ weight: 20, drops: [amount('fleshCrystal', 1)] }, nothing(80)]
+      ],
+      fleshRemnant: [
+          [{ weight: 100, drops: [amount('fleshCrystal', 1), amount('nightCore', 2), amount('darkStone', 5)] }],
+          [{ weight: 50, drops: [amount('voidStone', 1)] }, nothing(50)]
       ],
       resentfulDragon: [
           [{ weight: 100, drops: [amount('darkStone', 10), amount('blackBone', 5), amount('fleshCrystal', 1), amount('dragonScale', 5)] }],
@@ -38887,7 +38997,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           groundSpeed,
           flySpeed,
           speed: behaviorFlags.canFly ? flySpeed : groundSpeed,
-          damage: deriveEnemyDamage(combatStats)
+          damage: deriveEnemyDamage(combatStats),
+          threatCost: template.threatCost ?? template.weight
       };
   };
   const getEnemyTierScalingMultiplier = (tier) => {
@@ -38911,7 +39022,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           atk: 1,
           statusOnHit: 'bleed',
           bleedOnHit: true,
-          reward: 1
+          reward: 1,
+          threatCost: 1,
       }),
       crawler: defineEnemyTemplate({
           kind: 'crawler',
@@ -38924,7 +39036,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           atk: 1,
           statusOnHit: 'bleed',
           bleedOnHit: true,
-          reward: 1
+          reward: 1,
+          threatCost: 1,
       }),
       madDog: defineEnemyTemplate({
           kind: 'madDog',
@@ -38938,7 +39051,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           rank: 2,
           statusOnHit: 'contamination',
           contaminationOnHit: true,
-          reward: 1
+          reward: 1,
+          threatCost: 0.3,
       }),
       suicideBomber: defineEnemyTemplate({
           kind: 'suicideBomber',
@@ -38957,7 +39071,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           statusOnHit: 'contamination',
           contaminationOnHit: true,
           deathExplosion: true,
-          reward: 2
+          reward: 2,
+          threatCost: 2.5,
       }),
       mutantBird: defineEnemyTemplate({
           kind: 'mutantBird',
@@ -38971,7 +39086,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           wil: 1,
           canFly: true,
           attackShape: 'flyby',
-          reward: 1
+          reward: 1,
+          threatCost: 1.4,
       }),
       darkMage: defineEnemyTemplate({
           kind: 'darkMage',
@@ -38989,7 +39105,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           attackShape: 'projectile',
           statusOnHit: 'contamination',
           contaminationOnHit: true,
-          reward: 2
+          reward: 2,
+          threatCost: 2.7,
       }),
       ironMan: defineEnemyTemplate({
           kind: 'ironMan',
@@ -39005,7 +39122,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           res: 3,
           regen: true,
           rank: 2,
-          reward: 3
+          reward: 3,
+          threatCost: 4,
       }),
       apostle: defineEnemyTemplate({
           kind: 'apostle',
@@ -39024,7 +39142,8 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           res: 2,
           statusOnHit: 'contamination',
           contaminationOnHit: true,
-          reward: 0
+          reward: 0,
+          threatCost: 3.5,
       }),
       resentfulDragon: defineEnemyTemplate({
           kind: 'resentfulDragon',
@@ -39047,7 +39166,26 @@ __modules['./screens/vinh-da/enemies.ts'] = (exports, module, __require) => {
           regen: true,
           dragonDestroyStructure: true,
           ultimate: 'dragon-rage',
-          reward: 8
+          reward: 8,
+          threatCost: 14
+      }),
+      bloodLordCultist: defineEnemyTemplate({
+          kind: 'bloodLordCultist', label: 'Tín Đồ Huyết Chủ', hp: 4, speed: 0.55 * METERS_TO_WORLD_UNITS, weight: 1, attackRange: 28, attackCooldown: 2, atk: 1.5, wil: 1.5, arm: 1, res: 1, rank: 2, statusOnHit: 'bleed', bleedOnHit: true, reward: 2, threatCost: 1.8
+      }),
+      bloodLordPriest: defineEnemyTemplate({
+          kind: 'bloodLordPriest', label: 'Tế Tư Huyết Chủ', hp: 5, speed: 0.45 * METERS_TO_WORLD_UNITS, weight: 1, attackRange: 200, attackCooldown: 3, projectileSpeed: 2 * METERS_TO_WORLD_UNITS, attackShape: 'projectile', hasCommanderAura: true, atk: 1, wil: 3, arm: 1, res: 3, rank: 3, reward: 3, threatCost: 3.6
+      }),
+      listener: defineEnemyTemplate({
+          kind: 'listener', label: 'Kẻ Nghe Tiếng Gọi', hp: 3, speed: 0.5 * METERS_TO_WORLD_UNITS, weight: 1, attackRange: 24, attackCooldown: 2.2, atk: 1, wil: 1, arm: 0.5, res: 0.5, statusOnHit: 'contamination', contaminationOnHit: true, reward: 1, threatCost: 1.2
+      }),
+      resentmentStatue: defineEnemyTemplate({
+          kind: 'resentmentStatue', label: 'Oán Tượng', hp: 9, speed: 0.25 * METERS_TO_WORLD_UNITS, weight: 3.2, attackRange: 2 * METERS_TO_WORLD_UNITS, attackCooldown: 3, atk: 3.9, wil: 3.9, arm: 5, res: 2, rank: 3, attackShape: 'aura', aoeRadius: 2 * METERS_TO_WORLD_UNITS, reward: 5, threatCost: 5.5
+      }),
+      darkHighPriest: defineEnemyTemplate({
+          kind: 'darkHighPriest', label: 'Hắc Ám Chủ Tế', hp: 12, speed: 0.45 * METERS_TO_WORLD_UNITS, weight: 1.2, attackRange: 15 * METERS_TO_WORLD_UNITS, attackCooldown: 12, projectileSpeed: 2 * METERS_TO_WORLD_UNITS, attackShape: 'projectile', atk: 2, wil: 5, arm: 2, res: 5, rank: 5, statusOnHit: 'contamination', contaminationOnHit: true, ultimate: 'commander-aura', reward: 10, threatCost: 10
+      }),
+      fleshRemnant: defineEnemyTemplate({
+          kind: 'fleshRemnant', label: 'Tàn Khu Huyết Nhục', hp: 35, speed: 0, weight: 5, attackRange: 0, attackCooldown: 15, atk: 0, wil: 0, arm: 6, res: 6, rank: 6, regen: true, ultimate: 'death-burst', reward: 20, threatCost: Number.POSITIVE_INFINITY
       })
   };
   const DEFAULT_ENEMY_TEMPLATE = ENEMY_TEMPLATES.twisted;
@@ -39115,6 +39253,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const runtimeUpdateEnemies = __dep7.updateEnemies;
   const runtimeUpdateStructures = __dep7.updateStructures;
   const runtimeCollectDroppedResources = __dep7.collectDroppedResources;
+  const resolveMapModuleInteraction = __dep7.resolveMapModuleInteraction;
   const activateTeleportRetreat = __dep7.activateTeleportRetreat;
   const canActivateTeleportRetreat = __dep7.canActivateTeleportRetreat;
   const TELEPORT_RETREAT_COST = __dep7.TELEPORT_RETREAT_COST;
@@ -39124,15 +39263,17 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const getBaseX = __dep7.getBaseX;
   const canStartEscort = __dep7.canStartEscort;
   const startEscort = __dep7.startEscort;
-  const __dep8 = __require('./screens/vinh-da/economy/resources.ts');
-  const getResourceLabel = __dep8.getResourceLabel;
-  const isTieredVinhDaResource = __dep8.isTieredVinhDaResource;
-  const __dep9 = __require('./screens/vinh-da/elemental-regions.ts');
-  const createElementalRegionRandom = __dep9.createElementalRegionRandom;
-  const createElementalRegions = __dep9.createElementalRegions;
-  const getElementalRegionParticleCount = __dep9.getElementalRegionParticleCount;
-  const getVinhDaMapTier = __dep9.getVinhDaMapTier;
-  const ELEMENTAL_REGION_RENDER_BUFFER = __dep9.ELEMENTAL_REGION_RENDER_BUFFER;
+  const __dep8 = __require('./screens/vinh-da/map-modules.ts');
+  const createMapModules = __dep8.createMapModules;
+  const __dep9 = __require('./screens/vinh-da/economy/resources.ts');
+  const getResourceLabel = __dep9.getResourceLabel;
+  const isTieredVinhDaResource = __dep9.isTieredVinhDaResource;
+  const __dep10 = __require('./screens/vinh-da/elemental-regions.ts');
+  const createElementalRegionRandom = __dep10.createElementalRegionRandom;
+  const createElementalRegions = __dep10.createElementalRegions;
+  const getElementalRegionParticleCount = __dep10.getElementalRegionParticleCount;
+  const getVinhDaMapTier = __dep10.getVinhDaMapTier;
+  const ELEMENTAL_REGION_RENDER_BUFFER = __dep10.ELEMENTAL_REGION_RENDER_BUFFER;
   const STORM_LOOP_SRC = null;
   function createAudioContext() {
       const AudioContextCtor = window.AudioContext ?? window.webkitAudioContext;
@@ -39461,6 +39602,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           <div class="vinh-da-game__elemental-regions" data-role="elemental-regions" aria-hidden="true"></div>
           <div data-role="build-sites"></div>
           <div data-role="enemy-portals"></div>
+          <div data-role="map-modules"></div>
           <div data-role="dropped-resources"></div>
           <div data-role="enemies"></div>
           <div class="vinh-da-game__leader" data-role="leader" title="${leader?.name ?? leaderId ?? 'Leader'}"></div>
@@ -39477,6 +39619,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const elementalRegionsContainer = section.querySelector('[data-role="elemental-regions"]');
       const enemiesContainer = section.querySelector('[data-role="enemies"]');
       const enemyPortalsContainer = section.querySelector('[data-role="enemy-portals"]');
+      const mapModulesContainer = section.querySelector('[data-role="map-modules"]');
       const droppedResourcesContainer = section.querySelector('[data-role="dropped-resources"]');
       const noticeElement = section.querySelector('[data-role="notice"]');
       const bloodSealStoneText = section.querySelector('[data-role="blood-seal-stone"]');
@@ -39491,8 +39634,10 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const statusPanel = section.querySelector('[data-role="status-panel"]');
       const mapTier = getVinhDaMapTier(params);
       const elementalRegions = createElementalRegions(mapTier, createElementalRegionRandom());
+      const mapModules = createMapModules({ mapTier, baseX, worldWidth: WORLD_WIDTH, elementalRegions });
       const elementalRegionsById = new Map(elementalRegions.map(region => [region.id, region]));
       const elementalRegionElements = new Map();
+      const mapModuleElements = new Map();
       const siteElements = new Map();
       const buildMenuElements = new Map();
       const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS];
@@ -40043,6 +40188,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           mapTier: mapTier,
           waveThreatBudgetRemaining,
           elementalRegions,
+          mapModules,
       };
       const simulationContext = {
           state: simulationState,
@@ -40133,6 +40279,62 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               }
           }
       }
+      const formatModuleReward = (resources) => resources.length > 0 ? resources.map(formatResourceAmount).join(' · ') : 'không tài nguyên';
+      const renderMapModules = () => {
+          if (!mapModulesContainer)
+              return;
+          const visible = mapModules.filter(module => Math.abs(module.x - leaderX) <= BUILD_SITE_RENDER_BUFFER);
+          const visibleIds = new Set(visible.map(module => module.instanceId));
+          for (const module of visible) {
+              let element = mapModuleElements.get(module.instanceId);
+              if (!element) {
+                  element = document.createElement('div');
+                  element.className = 'vinh-da-game__build-node';
+                  element.dataset.moduleId = module.instanceId;
+                  mapModulesContainer.append(element);
+                  mapModuleElements.set(module.instanceId, element);
+              }
+              element.style.left = `${module.x}px`;
+              element.style.bottom = 'calc(18% + 34px)';
+              element.textContent = module.depleted ? '◇' : '◆';
+              element.title = `${module.label} · nguy ${module.dangerLevel} · ${module.tags.join(', ')}`;
+              element.hidden = Math.abs(module.x - leaderX) > BUILD_RANGE;
+              element.onclick = () => {
+                  if (module.depleted)
+                      return showNotice(`${module.label} đã cạn.`);
+                  if (dayNightPhase !== 'day' && !module.interactions.some(action => action.id === 'activateTeleport'))
+                      return showNotice('Chỉ tương tác module vào ban ngày.');
+                  const interaction = module.interactions[0];
+                  if (!interaction)
+                      return;
+                  handleMapModuleInteraction(module, interaction);
+              };
+          }
+          for (const [id, element] of mapModuleElements) {
+              if (!visibleIds.has(id)) {
+                  element.remove();
+                  mapModuleElements.delete(id);
+              }
+          }
+      };
+      const handleMapModuleInteraction = (module, interaction) => {
+          const result = resolveMapModuleInteraction(simulationContext, module.instanceId, interaction.id);
+          syncSimulationState();
+          if (!result.ok) {
+              showNotice(result.reason === 'not-day' ? 'Chỉ tương tác module vào ban ngày.' : 'Không thể tương tác module.');
+              renderMapModules();
+              return;
+          }
+          renderMapModules();
+          if (interaction.id === 'activateTeleport') {
+              clearEnemiesWithoutReward();
+              showNotice(`Truyền tống trận hoàn tất map · giữ ${result.resources.length}`);
+              shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId, completedByTeleportModule: true, bloodSealStone: simulationState.bloodSealStone, carriedDaThach: simulationState.carriedDaThach });
+              return;
+          }
+          const spawned = result.spawnedEnemies.length > 0 ? ` · sự cố: ${result.spawnedEnemies.join(', ')}` : '';
+          showNotice(`${module.label}: ${formatModuleReward(result.resources)}${spawned}${result.notice ? ` · ${result.notice}` : ''}`);
+      };
       const renderEnemyPortals = () => {
           if (!enemyPortalsContainer)
               return;
@@ -40357,6 +40559,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       renderWeather();
       audio.syncWeather(weather);
       renderEnemyPortals();
+      renderMapModules();
       spawnWaveEnemy('left');
       spawnWaveEnemy('right');
       renderEnemies();
@@ -40381,6 +40584,73 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'render')) exports.render = render;
   if (!Object.prototype.hasOwnProperty.call(exports, 'renderScreen')) exports.renderScreen = renderScreen;
+};
+__modules['./screens/vinh-da/map-modules.ts'] = (exports, module, __require) => {
+  const tiered = (resourceId, amount) => ({ resourceId, amount });
+  const untiered = (resourceId, amount) => ({ resourceId, amount });
+  const getVinhDaTierIndex = (mapTier) => Math.max(0, Math.round((mapTier - 1.1) * 10));
+  const chanceWithTier = (baseChance, tierBonus, tierIndex) => Math.max(0, Math.min(1, baseChance + (tierBonus ?? 0) * tierIndex));
+  const MAP_MODULES = Object.freeze({
+      mineralMine: { id: 'mineralMine', label: 'Mỏ Khoáng Sản', tags: ['khoáng', 'hắc thiết', 'tài nguyên'], spawnRules: { baseChance: 1, minCount: 3, maxCount: 3 }, interactions: [{ id: 'mine2h', label: 'Khai thác 2 giờ', durationHours: 2, resourcePoolId: 'iron' }], resourcePools: [{ id: 'iron', outcomes: [{ weight: 35, resources: [tiered('blackIron', 6)] }, { weight: 25, resources: [tiered('blackIron', 10)] }, { weight: 20, resources: [tiered('blackIron', 14)] }, { weight: 15, resources: [tiered('blackIron', 20)] }, { weight: 5, resources: [tiered('blackIron', 28)] }] }], dangerLevel: 1 },
+      rawCrystalOre: { id: 'rawCrystalOre', label: 'Quặng Nguyên Tinh', tags: ['nguyên tinh', 'tài nguyên'], spawnRules: { baseChance: 1, minCount: 1, maxCount: 4 }, interactions: [{ id: 'mine2h', label: 'Khai thác 2 giờ', durationHours: 2, resourcePoolId: 'crystal' }], resourcePools: [{ id: 'crystal', outcomes: [{ weight: 35, resources: [tiered('darkStone', 15)] }, { weight: 25, resources: [tiered('elementStone', 12)] }, { weight: 15, resources: [tiered('voidStone', 10)] }, { weight: 25, resources: [tiered('darkStone', 5)], spawnEnemies: ['listener'], daytimeLeashedEnemies: true }] }], dangerLevel: 1 },
+      spiritTree: { id: 'spiritTree', label: 'Linh Thụ', tags: ['linh thụ', 'mộc', 'nguyên tố'], spawnRules: { minTier: 1.4, baseChance: 0.2, tierIndexChanceBonus: 0.1, maxCount: 1, notes: 'Ưu tiên Hỏa/Lôi/Phong dày đặc theo tier.' }, interactions: [{ id: 'mine2h', label: 'Thu hái 2 giờ', durationHours: 2, resourcePoolId: 'spirit' }], resourcePools: [{ id: 'spirit', outcomes: [{ weight: 60, resources: [tiered('spiritWood', 4)] }, { weight: 30, resources: [tiered('spiritHerb', 2)] }, { weight: 10, resources: [tiered('elementStone', 1)] }] }], dangerLevel: 1 },
+      elementalZone: { id: 'elementalZone', label: 'Vùng Nguyên Tố', tags: ['nguyên tố', 'địa hình'], spawnRules: { baseChance: 1, minCount: 1, maxCount: 4, notes: 'Hắc Ám do elemental-regions.ts đảm bảo; vùng khác cap 4/5/6 theo tier.' }, interactions: [{ id: 'mine2h', label: 'Thu tinh nguyên 2 giờ', durationHours: 2, resourcePoolId: 'element' }], resourcePools: [{ id: 'element', outcomes: [{ weight: 70, resources: [tiered('elementStone', 1)] }, { weight: 20, resources: [tiered('elementStone', 2)] }, { weight: 10, resources: [tiered('heavyWater', 1)] }] }], dangerLevel: 1 },
+      teleportArray: { id: 'teleportArray', label: 'Truyền Tống Trận', tags: ['truyền tống', 'không gian', 'thoát map'], spawnRules: { baseChance: 1, minCount: 1, maxCount: 1, preference: 'nearBase' }, interactions: [{ id: 'activateTeleport', label: 'Kích hoạt truyền tống', completesMap: true, notes: 'Đưa base vào trận: hoàn thành map và kết toán tài nguyên.' }], resourcePools: [], dangerLevel: 0 },
+      resentmentPit: { id: 'resentmentPit', label: 'Oán Niệm Hố', tags: ['oán', 'hắc ám', 'nguy hiểm', 'tài nguyên'], spawnRules: { minTier: 1.3, baseChance: 0.2, tierIndexChanceBonus: 0.03, maxCount: 1, preference: 'nearDarkRegion' }, interactions: [{ id: 'mine2h', label: 'Khai thác 2 giờ', durationHours: 2, resourcePoolId: 'resentment' }], resourcePools: [{ id: 'resentment', outcomes: [{ weight: 50, resources: [tiered('resentmentStone', 2)] }, { weight: 25, resources: [tiered('resentmentStone', 3)] }, { weight: 10, resources: [tiered('voidStone', 1)] }, { weight: 15, spawnEnemies: ['suicideBomber'], daytimeLeashedEnemies: true }, { weight: 5, spawnEnemies: ['resentmentStatue'], daytimeLeashedEnemies: true }] }], dangerLevel: 4 },
+      bloodLordAltar: { id: 'bloodLordAltar', label: 'Huyết Chủ Tế Đàn', tags: ['huyết chủ', 'tín ngưỡng', 'trung lập', 'nguy hiểm'], spawnRules: { baseChance: 0.15, maxCount: 1, notes: '+5% nếu có làng/cựu doanh trại; tránh quá gần base đêm đầu.' }, interactions: [{ id: 'pray2h', label: 'Cầu nguyện 2 giờ', durationHours: 2, resourcePoolId: 'pray' }, { id: 'destroy', label: 'Phá hủy tế đàn', resourcePoolId: 'destroy' }], resourcePools: [{ id: 'pray', outcomes: [{ weight: 60, resources: [tiered('wishStone', 1)] }, { weight: 20, resources: [tiered('bloodLordSigil', 1)] }, { weight: 20, spawnEnemies: ['bloodLordPriest'], daytimeLeashedEnemies: true }] }, { id: 'destroy', outcomes: [{ weight: 80, resources: [tiered('resentmentStone', 1)] }, { weight: 20, resources: [tiered('resentmentStone', 1), tiered('bloodLordSigil', 1)] }] }], dangerLevel: 3 },
+      machineKingdomRuins: { id: 'machineKingdomRuins', label: 'Phế Tích Cơ Giới Quốc', tags: ['cơ giới', 'công nghệ', 'hiếm', 'kiến trúc'], spawnRules: { minTier: 1.4, baseChance: 0.1, tierIndexChanceBonus: 0.02, maxCount: 1 }, interactions: [{ id: 'mine2h', label: 'Trục vớt 2 giờ', durationHours: 2, resourcePoolId: 'machine' }], resourcePools: [{ id: 'machine', outcomes: [{ weight: 40, resources: [untiered('machinePart', 1)] }, { weight: 25, resources: [untiered('machinePart', 2)] }, { weight: 20, resources: [untiered('mindStone', 1)] }, { weight: 10, resources: [tiered('heavyWater', 1)] }, { weight: 5, spawnEnemies: ['ironMan'], daytimeLeashedEnemies: true }] }], dangerLevel: 3 },
+      foreignGravityField: { id: 'foreignGravityField', label: 'Dị Vực Trọng Lực', tags: ['trọng lực', 'thủy', 'thổ', 'không gian', 'hiếm'], spawnRules: { baseChance: 0.08, tierIndexChanceBonus: 0.02, maxCount: 1 }, interactions: [{ id: 'mine2h', label: 'Ổn định 2 giờ', durationHours: 2, resourcePoolId: 'gravity' }], resourcePools: [{ id: 'gravity', outcomes: [{ weight: 15, resources: [tiered('heavyWater', 1)] }, { weight: 1, resources: [tiered('voidStone', 1)] }, { weight: 84, notice: 'Trường trọng lực dao động nhưng chưa kết tinh.' }] }], dangerLevel: 2 },
+      brokenFormationPattern: { id: 'brokenFormationPattern', label: 'Trận Văn Đứt Gãy', tags: ['trận pháp', 'phong ấn', 'không gian'], spawnRules: { baseChance: 0.12, maxCount: 1, preference: 'nearTeleportOrRuins' }, interactions: [{ id: 'mine2h', label: 'Khảo sát 2 giờ', durationHours: 2, resourcePoolId: 'formation' }], resourcePools: [{ id: 'formation', outcomes: [{ weight: 50, resources: [untiered('sealDust', 1)] }, { weight: 20, resources: [untiered('sealDust', 2)] }, { weight: 10, resources: [tiered('voidStone', 1)] }, { weight: 20, notice: 'Bẫy dịch chuyển nhỏ được kích hoạt.' }] }], dangerLevel: 2 },
+      corruptedSpiritWoodForest: { id: 'corruptedSpiritWoodForest', label: 'Rừng Linh Mộc Bị Ô Nhiễm', tags: ['mộc', 'hắc ám', 'linh mộc', 'nguy hiểm'], spawnRules: { baseChance: 0.2, maxCount: 1, preference: 'nearWoodDarkOverlap' }, interactions: [{ id: 'mine2h', label: 'Khai thác 2 giờ', durationHours: 2, resourcePoolId: 'wood' }], resourcePools: [{ id: 'wood', outcomes: [{ weight: 50, resources: [tiered('spiritWood', 4)] }, { weight: 25, resources: [tiered('spiritWood', 6)] }, { weight: 15, resources: [tiered('spiritHerb', 3)] }, { weight: 10, spawnEnemies: ['crawler', 'mutantBird'], daytimeLeashedEnemies: true }] }], dangerLevel: 3 }
+  });
+  const pickCount = (module, randomValue) => {
+      if (module.id === 'rawCrystalOre')
+          return 1 + (randomValue() < 0.5 ? 1 + (randomValue() < 0.25 ? 1 + (randomValue() < 0.05 ? 1 : 0) : 0) : 0);
+      return module.spawnRules.minCount ?? (module.spawnRules.maxCount ?? 1);
+  };
+  const pickX = (module, context, randomValue) => {
+      if (module.id === 'teleportArray') {
+          const cap = 150 * (1 + getVinhDaTierIndex(context.mapTier) * 0.05);
+          return Math.max(80, Math.min(context.worldWidth - 80, context.baseX + (randomValue() < 0.5 ? -1 : 1) * (80 + randomValue() * Math.max(20, cap - 80))));
+      }
+      const dark = context.elementalRegions.find(region => region.kind === 'dark');
+      if (module.spawnRules.preference === 'nearDarkRegion' && dark)
+          return dark.startX + randomValue() * (dark.endX - dark.startX);
+      return 80 + randomValue() * Math.max(1, context.worldWidth - 160);
+  };
+  const createMapModules = (context) => {
+      const randomValue = context.randomValue ?? Math.random;
+      const tierIndex = getVinhDaTierIndex(context.mapTier);
+      const modules = [];
+      for (const module of Object.values(MAP_MODULES)) {
+          if (module.spawnRules.minTier !== undefined && context.mapTier < module.spawnRules.minTier)
+              continue;
+          const chance = chanceWithTier(module.spawnRules.baseChance, module.spawnRules.tierIndexChanceBonus, tierIndex);
+          if (chance < 1 && randomValue() >= chance)
+              continue;
+          const count = Math.min(module.spawnRules.maxCount ?? Number.POSITIVE_INFINITY, pickCount(module, randomValue));
+          for (let index = 0; index < count; index += 1)
+              modules.push({ ...module, instanceId: `${module.id}-${index + 1}`, x: pickX(module, context, randomValue) });
+      }
+      return modules.sort((a, b) => a.x - b.x);
+  };
+  const pickModuleOutcome = (pool, randomValue) => {
+      const total = pool.outcomes.reduce((sum, outcome) => sum + Math.max(0, outcome.weight), 0);
+      if (total <= 0)
+          return null;
+      let roll = Math.max(0, Math.min(0.999999, randomValue())) * total;
+      for (const outcome of pool.outcomes) {
+          roll -= Math.max(0, outcome.weight);
+          if (roll < 0)
+              return outcome;
+      }
+      return pool.outcomes[pool.outcomes.length - 1] ?? null;
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getVinhDaTierIndex')) exports.getVinhDaTierIndex = getVinhDaTierIndex;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'MAP_MODULES')) exports.MAP_MODULES = MAP_MODULES;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createMapModules')) exports.createMapModules = createMapModules;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'pickModuleOutcome')) exports.pickModuleOutcome = pickModuleOutcome;
 };
 __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./screens/vinh-da/constants.ts');
@@ -40425,14 +40695,22 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const ENEMY_TEMPLATES = __dep3.ENEMY_TEMPLATES;
   const reduceDamageByDefense = __dep3.reduceDamageByDefense;
   const scaleEnemyTierStat = __dep3.scaleEnemyTierStat;
-  const __dep4 = __require('./screens/vinh-da/structures.ts');
-  const BASE_STRUCTURE_STATS = __dep4.BASE_STRUCTURE_STATS;
-  const getBaseLevelStat = __dep4.getBaseLevelStat;
-  const getStructureLevelStat = __dep4.getStructureLevelStat;
-  const __dep5 = __require('./screens/vinh-da/economy/conversion.ts');
-  const getLiquidHntValue = __dep5.getLiquidHntValue;
-  const __dep6 = __require('./screens/vinh-da/economy/dropTables.ts');
-  const rollEnemyResourceDrops = __dep6.rollEnemyResourceDrops;
+  const __dep4 = __require('./screens/vinh-da/combat/prefixes.ts');
+  const applyCreaturePrefixPostRank = __dep4.applyCreaturePrefixPostRank;
+  const applyPrefixBonusDrops = __dep4.applyPrefixBonusDrops;
+  const canApplyCreaturePrefix = __dep4.canApplyCreaturePrefix;
+  const getPrefixNightCap = __dep4.getPrefixNightCap;
+  const getPrefixThreatCostMultiplier = __dep4.getPrefixThreatCostMultiplier;
+  const __dep5 = __require('./screens/vinh-da/structures.ts');
+  const BASE_STRUCTURE_STATS = __dep5.BASE_STRUCTURE_STATS;
+  const getBaseLevelStat = __dep5.getBaseLevelStat;
+  const getStructureLevelStat = __dep5.getStructureLevelStat;
+  const __dep6 = __require('./screens/vinh-da/map-modules.ts');
+  const pickModuleOutcome = __dep6.pickModuleOutcome;
+  const __dep7 = __require('./screens/vinh-da/economy/conversion.ts');
+  const getLiquidHntValue = __dep7.getLiquidHntValue;
+  const __dep8 = __require('./screens/vinh-da/economy/dropTables.ts');
+  const rollEnemyResourceDrops = __dep8.rollEnemyResourceDrops;
   const DAY_DURATION_SECONDS = 300;
   const RESOURCE_PICKUP_RANGE = 54;
   const RESOURCE_DEPOSIT_RANGE = 90;
@@ -40448,10 +40726,10 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const BASE_HEALING_CAP_WINDOW_SECONDS = 1;
   const VINH_DA_WAVE_TABLE = Object.freeze([
       { minNightIndex: 1, mapTier: 1.1, threatBudget: 8, enemyWeights: { twisted: 5, crawler: 3, madDog: 1 } },
-      { minNightIndex: 3, mapTier: 1.1, threatBudget: 13, enemyWeights: { twisted: 4, crawler: 4, madDog: 2 } },
-      { minNightIndex: 5, mapTier: 1.2, threatBudget: 20, enemyWeights: { twisted: 3, crawler: 3, madDog: 2, suicideBomber: 2, darkMage: 1, ironMan: 1 } },
-      { minNightIndex: 8, mapTier: 1.2, threatBudget: 28, enemyWeights: { crawler: 3, madDog: 2, suicideBomber: 2, darkMage: 2, ironMan: 2, mutantBird: 1 } },
-      { minNightIndex: 12, mapTier: 1.3, threatBudget: 40, enemyWeights: { crawler: 2, madDog: 2, suicideBomber: 2, darkMage: 3, ironMan: 3, mutantBird: 2, resentfulDragon: 0.35 } }
+      { minNightIndex: 3, mapTier: 1.1, threatBudget: 13, enemyWeights: { listener: 2, twisted: 4, crawler: 4, madDog: 2, bloodLordCultist: 1 } },
+      { minNightIndex: 5, mapTier: 1.2, threatBudget: 20, enemyWeights: { listener: 2, twisted: 3, crawler: 3, madDog: 2, bloodLordCultist: 2, suicideBomber: 2, darkMage: 1, ironMan: 1 } },
+      { minNightIndex: 8, mapTier: 1.2, threatBudget: 28, enemyWeights: { crawler: 3, madDog: 2, bloodLordCultist: 2, bloodLordPriest: 1, suicideBomber: 2, darkMage: 2, ironMan: 2, mutantBird: 1, resentmentStatue: 0.6 } },
+      { minNightIndex: 12, mapTier: 1.3, threatBudget: 40, enemyWeights: { crawler: 2, madDog: 2, bloodLordCultist: 2, bloodLordPriest: 1, listener: 2, suicideBomber: 2, darkMage: 3, ironMan: 3, mutantBird: 2, resentmentStatue: 1, darkHighPriest: 0.25, resentfulDragon: 0.35 } }
   ]);
   const getScaledThreatBudget = (baseBudget, nightIndex) => (baseBudget * Math.pow(1.05, Math.max(0, nightIndex - 1)));
   const getVinhDaWaveConfig = (nightIndex, mapTier = 1.1) => {
@@ -40465,7 +40743,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const chooseEnemyKindForBudget = (config, budgetRemaining) => {
       const choices = Object.entries(config.enemyWeights)
-          .map(([kind, weight]) => ({ kind: kind, rollWeight: weight ?? 0, cost: ENEMY_TEMPLATES[kind]?.weight ?? Number.POSITIVE_INFINITY }))
+          .map(([kind, weight]) => ({ kind: kind, rollWeight: weight ?? 0, cost: ENEMY_TEMPLATES[kind]?.threatCost ?? Number.POSITIVE_INFINITY }))
           .filter(choice => choice.rollWeight > 0 && choice.cost <= budgetRemaining);
       const totalWeight = choices.reduce((total, choice) => total + choice.rollWeight, 0);
       if (totalWeight <= 0)
@@ -40540,9 +40818,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       };
       if (ctx.state.teleportActive)
           return { ok: false, reason: 'already-active', ...baseResult };
-      if (!readyTeleport && getTeleportStructures(ctx).length <= 0)
+      if (!readyTeleport && getTeleportStructures(ctx).length <= 0 && !ctx.state.mapModules?.some(module => module.id === 'teleportArray'))
           return { ok: false, reason: 'missing-teleport', ...baseResult };
-      if (!readyTeleport)
+      if (!readyTeleport && !ctx.state.mapModules?.some(module => module.id === 'teleportArray' && !module.depleted))
           return { ok: false, reason: 'cooldown', ...baseResult };
       if (ctx.state.bloodSealStone < TELEPORT_RETREAT_COST)
           return { ok: false, reason: 'insufficient-resource', ...baseResult };
@@ -40553,10 +40831,11 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if (!guard.ok)
           return guard;
       const structure = getReadyTeleportStructure(ctx);
-      if (!structure)
+      const teleportModule = !structure ? ctx.state.mapModules?.find(module => module.id === 'teleportArray' && !module.depleted) : null;
+      if (!structure && !teleportModule)
           return { ...guard, ok: false, reason: 'missing-teleport' };
-      const runtime = ctx.ensureStructureRuntime(structure);
-      const stat = getStructureLevelStat('teleport', structure.level);
+      const runtime = structure ? ctx.ensureStructureRuntime(structure) : null;
+      const stat = structure ? getStructureLevelStat('teleport', structure.level) : null;
       const bloodSealStoneBefore = ctx.state.bloodSealStone;
       const carriedDaThachBefore = ctx.state.carriedDaThach;
       const afterCost = Math.max(0, bloodSealStoneBefore - TELEPORT_RETREAT_COST);
@@ -40566,13 +40845,17 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       ctx.state.teleportActive = true;
       ctx.state.teleportRetreatReason = 'sealed-old-map-retreat';
       ctx.state.teleportedToSealedOldMap = true;
-      ctx.state.teleportCooldownSeconds = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
-      runtime.cooldown = ctx.state.teleportCooldownSeconds;
+      ctx.state.teleportCooldownSeconds = stat?.cooldownSeconds ?? 0;
+      if (runtime)
+          runtime.cooldown = ctx.state.teleportCooldownSeconds;
+      if (teleportModule)
+          teleportModule.depleted = true;
       ctx.renderEconomy();
-      ctx.renderBuildSite(structure.siteId);
+      if (structure)
+          ctx.renderBuildSite(structure.siteId);
       return {
           ok: true,
-          cooldownSeconds: runtime.cooldown,
+          cooldownSeconds: runtime?.cooldown ?? 0,
           bloodSealStoneBefore,
           bloodSealStoneAfter,
           carriedDaThachBefore,
@@ -40581,30 +40864,71 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           transferredDaThach: ctx.state.carriedDaThach
       };
   };
-  const spawnEnemy = (ctx, side, kind = 'twisted', spawnX, allowOutsideNight = false) => {
+  const getEnemyRankMultiplier = (rank) => 1 + Math.max(0, rank - 1) * 0.1;
+  const getEnemyFaction = (kind) => kind === 'bloodLordCultist' || kind === 'bloodLordPriest' ? 'bloodLord' : kind === 'resentmentStatue' ? 'neutral' : 'eternalNight';
+  const getEnemyRole = (kind) => kind === 'fleshRemnant' ? 'boss' : kind === 'darkHighPriest' || kind === 'resentfulDragon' ? 'miniBoss' : 'normal';
+  const rollWavePrefix = (ctx, kind) => {
+      const role = getEnemyRole(kind);
+      if (role !== 'normal')
+          return null;
+      const night = ctx.state.nightIndex;
+      const spawned = ctx.state.enemies.length + 1;
+      const counts = ctx.state.enemies.reduce((record, enemy) => { if (enemy.prefix)
+          record[enemy.prefix] = (record[enemy.prefix] ?? 0) + 1; return record; }, {});
+      const candidates = [['hero', 0.01], ['champion', 0.035], ['elite', 0.08]];
+      for (const [prefix, chance] of candidates) {
+          if (!canApplyCreaturePrefix(role, prefix))
+              continue;
+          const definition = (prefix === 'elite' ? 2 : prefix === 'champion' ? 4 : 2);
+          if (night < definition)
+              continue;
+          if ((counts[prefix] ?? 0) >= getPrefixNightCap(prefix, spawned))
+              continue;
+          if (Math.random() < chance)
+              return prefix;
+      }
+      return null;
+  };
+  const spawnEnemy = (ctx, side, kind = 'twisted', spawnX, allowOutsideNight = false, prefix = null) => {
       if ((!allowOutsideNight && ctx.state.dayNightPhase !== 'night') || ctx.state.enemies.length >= ENEMY_LIMIT)
           return;
       const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
       const tier = ctx.state.mapTier ?? template.tier;
-      const hp = scaleEnemyTierStat(template.hp, tier);
-      const atk = scaleEnemyTierStat(template.atk, tier);
-      const wil = scaleEnemyTierStat(template.wil, tier);
+      const rankMultiplier = getEnemyRankMultiplier(template.rank);
+      const rankedStats = {
+          hp: scaleEnemyTierStat(template.hp, tier) * rankMultiplier,
+          atk: scaleEnemyTierStat(template.atk, tier) * rankMultiplier,
+          wil: scaleEnemyTierStat(template.wil, tier) * rankMultiplier,
+          arm: scaleEnemyTierStat(template.arm, tier) * rankMultiplier,
+          res: scaleEnemyTierStat(template.res, tier) * rankMultiplier,
+          speed: template.speed,
+          attackCooldown: template.attackCooldown
+      };
+      const role = getEnemyRole(template.kind);
+      const appliedPrefix = canApplyCreaturePrefix(role, prefix) ? prefix : null;
+      const finalStats = applyCreaturePrefixPostRank(rankedStats, appliedPrefix);
+      const hp = finalStats.hp;
+      const atk = finalStats.atk;
+      const wil = finalStats.wil;
       ctx.state.enemies.push({
           id: ctx.state.nextEnemyId,
           x: spawnX ?? (side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING),
           kind: template.kind,
           hp,
           maxHp: hp,
-          speed: template.speed,
-          baseSpeed: template.speed,
+          speed: finalStats.speed,
+          baseSpeed: finalStats.speed,
           groundSpeed: template.groundSpeed,
           flySpeed: template.flySpeed,
           weight: template.weight,
-          attackCooldown: template.attackCooldown,
+          threatCost: template.threatCost * getPrefixThreatCostMultiplier(appliedPrefix),
+          prefix: appliedPrefix,
+          faction: getEnemyFaction(template.kind),
+          attackCooldown: finalStats.attackCooldown,
           atk,
           wil,
-          arm: template.arm,
-          res: template.res,
+          arm: finalStats.arm,
+          res: finalStats.res,
           tier,
           rank: template.rank,
           projectileSpeed: template.projectileSpeed,
@@ -40639,10 +40963,12 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       const previousNextEnemyId = ctx.state.nextEnemyId;
       const portal = chooseEnemyPortal(ctx, side);
       const spawnSide = portal?.side ?? getFallbackSpawnSide(ctx, side);
-      spawnEnemy(ctx, spawnSide, kind, portal?.x);
+      const prefix = rollWavePrefix(ctx, kind);
+      spawnEnemy(ctx, spawnSide, kind, portal?.x, false, prefix);
       if (ctx.state.nextEnemyId === previousNextEnemyId)
           return false;
-      ctx.state.waveThreatBudgetRemaining = Math.max(0, ctx.state.waveThreatBudgetRemaining - ENEMY_TEMPLATES[kind].weight);
+      const spawnedEnemy = ctx.state.enemies.find(enemy => enemy.id === previousNextEnemyId);
+      ctx.state.waveThreatBudgetRemaining = Math.max(0, ctx.state.waveThreatBudgetRemaining - (spawnedEnemy?.threatCost ?? ENEMY_TEMPLATES[kind].threatCost));
       return true;
   };
   const BLEED_SECONDS = 3;
@@ -40732,7 +41058,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if (triggerDeathEffects)
           triggerDeathExplosion(ctx, enemy);
       if (reward && ctx.state.dayNightPhase === 'night') {
-          const drops = rollEnemyResourceDrops({ kind: enemy.kind, enemyTier: enemy.tier, mapTier: ctx.state.mapTier, randomValue: () => nextRngValue(ctx.state.lootRng) });
+          const drops = applyPrefixBonusDrops(enemy, rollEnemyResourceDrops({ kind: enemy.kind, enemyTier: enemy.tier, mapTier: ctx.state.mapTier, randomValue: () => nextRngValue(ctx.state.lootRng) }), () => nextRngValue(ctx.state.lootRng));
           for (const drop of drops) {
               if (drop.amount <= 0)
                   continue;
@@ -40754,6 +41080,48 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           existing.amount += resource.amount;
       else
           resources.push({ resourceId: resource.resourceId, amount: resource.amount, tier: resource.tier });
+  };
+  const resolveMapModuleInteraction = (ctx, instanceId, interactionId) => {
+      const module = ctx.state.mapModules?.find(item => item.instanceId === instanceId);
+      if (!module)
+          return { ok: false, reason: 'missing-module', resources: [], spawnedEnemies: [] };
+      if (module.depleted && interactionId !== 'activateTeleport')
+          return { ok: false, reason: 'already-depleted', resources: [], spawnedEnemies: [] };
+      if (ctx.state.dayNightPhase !== 'day' && interactionId !== 'activateTeleport')
+          return { ok: false, reason: 'not-day', resources: [], spawnedEnemies: [] };
+      const interaction = module.interactions.find(item => item.id === interactionId);
+      if (!interaction)
+          return { ok: false, reason: 'missing-interaction', resources: [], spawnedEnemies: [] };
+      if (interactionId === 'activateTeleport') {
+          module.depleted = true;
+          ctx.state.teleportActive = true;
+          ctx.state.teleportRetreatReason = 'map-module-complete';
+          ctx.state.teleportedToSealedOldMap = true;
+          ctx.renderEconomy();
+          return { ok: true, resources: [], spawnedEnemies: [], notice: 'Truyền Tống Trận hoàn thành map và kết toán tài nguyên.' };
+      }
+      const pool = module.resourcePools.find(item => item.id === interaction.resourcePoolId);
+      const outcome = pool ? pickModuleOutcome(pool, () => nextRngValue(ctx.state.lootRng)) : null;
+      const tier = ctx.state.mapTier;
+      const resources = (outcome?.resources ?? []).map(resource => ({ ...resource, tier: resource.tier ?? tier }));
+      ctx.state.baseStoredResources ??= [];
+      for (const resource of resources)
+          addTieredAmount(ctx.state.baseStoredResources, resource);
+      const spawnedEnemies = [...(interaction.spawnEnemies ?? []), ...(outcome?.spawnEnemies ?? [])];
+      for (const enemyKind of spawnedEnemies) {
+          const side = module.x < getBaseX(ctx.state) ? 'left' : 'right';
+          const beforeId = ctx.state.nextEnemyId;
+          spawnEnemy(ctx, side, enemyKind, module.x, true);
+          const enemy = ctx.state.enemies.find(item => item.id === beforeId);
+          if (enemy && outcome?.daytimeLeashedEnemies) {
+              enemy.moduleLeashX = module.x;
+              enemy.moduleLeashRadius = 120;
+              enemy.moduleLeashUntilNight = true;
+          }
+      }
+      module.depleted = true;
+      ctx.renderEconomy();
+      return { ok: true, resources, spawnedEnemies, notice: outcome?.notice };
   };
   const collectDroppedResources = (ctx) => {
       let collected = 0;
@@ -41129,6 +41497,10 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       return true;
   };
   const getEnemyEffectiveSpeed = (ctx, enemy) => {
+      if (ctx.state.dayNightPhase === 'day' && enemy.moduleLeashUntilNight)
+          return 0;
+      if (ctx.state.dayNightPhase === 'night' && enemy.moduleLeashUntilNight)
+          enemy.moduleLeashUntilNight = false;
       const statusMultiplier = enemy.statuses?.slowSeconds && enemy.statuses.slowSeconds > 0 ? (enemy.statuses.slowMultiplier ?? 1) : 1;
       if (enemy.canFly)
           return enemy.baseSpeed * statusMultiplier;
@@ -41883,6 +42255,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'spawnWaveEnemy')) exports.spawnWaveEnemy = spawnWaveEnemy;
   if (!Object.prototype.hasOwnProperty.call(exports, 'removeEnemyAt')) exports.removeEnemyAt = removeEnemyAt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearEnemiesWithoutReward')) exports.clearEnemiesWithoutReward = clearEnemiesWithoutReward;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'addTieredAmount')) exports.addTieredAmount = addTieredAmount;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveMapModuleInteraction')) exports.resolveMapModuleInteraction = resolveMapModuleInteraction;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectDroppedResources')) exports.collectDroppedResources = collectDroppedResources;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBlockingWall')) exports.getBlockingWall = getBlockingWall;
   if (!Object.prototype.hasOwnProperty.call(exports, 'damageEnemy')) exports.damageEnemy = damageEnemy;

@@ -1,4 +1,5 @@
 import type { EnemyKind, EnemyTier } from './enemies.ts';
+import type { CreaturePrefix, EnemyFaction } from './combat/prefixes.ts';
 import type { BarracksSoldierRank, BaseBranchLv3, ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import type { TieredAmount, VinhDaResourceId, VinhDaTier } from './economy/resources.ts';
 
@@ -106,6 +107,12 @@ export interface Enemy {
   groundSpeed: number;
   flySpeed: number;
   weight: number;
+  threatCost: number;
+  prefix?: CreaturePrefix | null;
+  faction?: EnemyFaction;
+  moduleLeashX?: number;
+  moduleLeashRadius?: number;
+  moduleLeashUntilNight?: boolean;
   attackCooldown: number;
   atk: number;
   wil: number;

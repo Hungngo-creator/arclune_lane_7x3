@@ -38,10 +38,14 @@ import { nextRngValue } from '../../utils/rng.ts';
 import type { RngState } from '@shared-types/rng';
 import { getElementalRegionAtX } from './elemental-regions.ts';
 import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, reduceDamageByDefense, scaleEnemyTierStat } from './enemies.ts';
+import { applyCreaturePrefixPostRank, applyPrefixBonusDrops, canApplyCreaturePrefix, getPrefixNightCap, getPrefixThreatCostMultiplier } from './combat/prefixes.ts';
+import type { CreaturePrefix, EnemyFaction, EnemyRole } from './combat/prefixes.ts';
 import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
 import { BASE_STRUCTURE_STATS, getBaseLevelStat, getStructureLevelStat } from './structures.ts';
 import type { BarracksSoldierRank, BaseBranchLv3, ElementalTowerElement, StructureType } from './structures.ts';
 import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
+import { pickModuleOutcome } from './map-modules.ts';
+import type { ModuleInteractionId, RuntimeMapModule } from './map-modules.ts';
 import { getLiquidHntValue } from './economy/conversion.ts';
 import { rollEnemyResourceDrops } from './economy/dropTables.ts';
 import type { TieredAmount } from './economy/resources.ts';
@@ -70,10 +74,10 @@ export interface VinhDaWaveConfig {
 
 const VINH_DA_WAVE_TABLE: readonly VinhDaWaveConfig[] = Object.freeze([
   { minNightIndex: 1, mapTier: 1.1, threatBudget: 8, enemyWeights: { twisted: 5, crawler: 3, madDog: 1 } },
-  { minNightIndex: 3, mapTier: 1.1, threatBudget: 13, enemyWeights: { twisted: 4, crawler: 4, madDog: 2 } },
-  { minNightIndex: 5, mapTier: 1.2, threatBudget: 20, enemyWeights: { twisted: 3, crawler: 3, madDog: 2, suicideBomber: 2, darkMage: 1, ironMan: 1 } },
-  { minNightIndex: 8, mapTier: 1.2, threatBudget: 28, enemyWeights: { crawler: 3, madDog: 2, suicideBomber: 2, darkMage: 2, ironMan: 2, mutantBird: 1 } },
-  { minNightIndex: 12, mapTier: 1.3, threatBudget: 40, enemyWeights: { crawler: 2, madDog: 2, suicideBomber: 2, darkMage: 3, ironMan: 3, mutantBird: 2, resentfulDragon: 0.35 } }
+  { minNightIndex: 3, mapTier: 1.1, threatBudget: 13, enemyWeights: { listener: 2, twisted: 4, crawler: 4, madDog: 2, bloodLordCultist: 1 } },
+  { minNightIndex: 5, mapTier: 1.2, threatBudget: 20, enemyWeights: { listener: 2, twisted: 3, crawler: 3, madDog: 2, bloodLordCultist: 2, suicideBomber: 2, darkMage: 1, ironMan: 1 } },
+  { minNightIndex: 8, mapTier: 1.2, threatBudget: 28, enemyWeights: { crawler: 3, madDog: 2, bloodLordCultist: 2, bloodLordPriest: 1, suicideBomber: 2, darkMage: 2, ironMan: 2, mutantBird: 1, resentmentStatue: 0.6 } },
+  { minNightIndex: 12, mapTier: 1.3, threatBudget: 40, enemyWeights: { crawler: 2, madDog: 2, bloodLordCultist: 2, bloodLordPriest: 1, listener: 2, suicideBomber: 2, darkMage: 3, ironMan: 3, mutantBird: 2, resentmentStatue: 1, darkHighPriest: 0.25, resentfulDragon: 0.35 } }
 ]);
 
 export const getScaledThreatBudget = (baseBudget: number, nightIndex: number): number => (
@@ -91,7 +95,7 @@ export const getVinhDaWaveConfig = (nightIndex: number, mapTier: EnemyTier = 1.1
 
 const chooseEnemyKindForBudget = (config: VinhDaWaveConfig, budgetRemaining: number): EnemyKind | null => {
   const choices = Object.entries(config.enemyWeights)
-    .map(([kind, weight]) => ({ kind: kind as EnemyKind, rollWeight: weight ?? 0, cost: ENEMY_TEMPLATES[kind as EnemyKind]?.weight ?? Number.POSITIVE_INFINITY }))
+    .map(([kind, weight]) => ({ kind: kind as EnemyKind, rollWeight: weight ?? 0, cost: ENEMY_TEMPLATES[kind as EnemyKind]?.threatCost ?? Number.POSITIVE_INFINITY }))
     .filter(choice => choice.rollWeight > 0 && choice.cost <= budgetRemaining);
   const totalWeight = choices.reduce((total, choice) => total + choice.rollWeight, 0);
   if (totalWeight <= 0) return null;
@@ -146,6 +150,7 @@ export interface VinhDaSimulationState {
   teleportActive?: boolean;
   teleportRetreatReason?: string | null;
   teleportedToSealedOldMap?: boolean;
+  mapModules?: RuntimeMapModule[];
 }
 
 export const getBaseX = (state: Pick<VinhDaSimulationState, 'baseX'>): number => (Number.isFinite(state.baseX) ? state.baseX! : CRYSTAL_X);
@@ -209,7 +214,7 @@ export interface VinhDaSimulationContext {
 
 export interface TeleportRetreatResult {
   ok: boolean;
-  reason?: 'missing-teleport' | 'cooldown' | 'insufficient-resource' | 'already-active';
+  reason?: 'missing-teleport' | 'missing-map-module' | 'cooldown' | 'insufficient-resource' | 'already-active';
   cooldownSeconds: number;
   bloodSealStoneBefore: number;
   bloodSealStoneAfter: number;
@@ -243,8 +248,8 @@ export const canActivateTeleportRetreat = (ctx: VinhDaSimulationContext): Telepo
     transferredDaThach: 0
   };
   if (ctx.state.teleportActive) return { ok: false, reason: 'already-active', ...baseResult };
-  if (!readyTeleport && getTeleportStructures(ctx).length <= 0) return { ok: false, reason: 'missing-teleport', ...baseResult };
-  if (!readyTeleport) return { ok: false, reason: 'cooldown', ...baseResult };
+  if (!readyTeleport && getTeleportStructures(ctx).length <= 0 && !ctx.state.mapModules?.some(module => module.id === 'teleportArray')) return { ok: false, reason: 'missing-teleport', ...baseResult };
+  if (!readyTeleport && !ctx.state.mapModules?.some(module => module.id === 'teleportArray' && !module.depleted)) return { ok: false, reason: 'cooldown', ...baseResult };
   if (ctx.state.bloodSealStone < TELEPORT_RETREAT_COST) return { ok: false, reason: 'insufficient-resource', ...baseResult };
   return { ok: true, ...baseResult };
 };
@@ -253,9 +258,10 @@ export const activateTeleportRetreat = (ctx: VinhDaSimulationContext): TeleportR
   const guard = canActivateTeleportRetreat(ctx);
   if (!guard.ok) return guard;
   const structure = getReadyTeleportStructure(ctx);
-  if (!structure) return { ...guard, ok: false, reason: 'missing-teleport' };
-  const runtime = ctx.ensureStructureRuntime(structure);
-  const stat = getStructureLevelStat('teleport', structure.level);
+  const teleportModule = !structure ? ctx.state.mapModules?.find(module => module.id === 'teleportArray' && !module.depleted) : null;
+  if (!structure && !teleportModule) return { ...guard, ok: false, reason: 'missing-teleport' };
+  const runtime = structure ? ctx.ensureStructureRuntime(structure) : null;
+  const stat = structure ? getStructureLevelStat('teleport', structure.level) : null;
   const bloodSealStoneBefore = ctx.state.bloodSealStone;
   const carriedDaThachBefore = ctx.state.carriedDaThach;
   const afterCost = Math.max(0, bloodSealStoneBefore - TELEPORT_RETREAT_COST);
@@ -265,13 +271,14 @@ export const activateTeleportRetreat = (ctx: VinhDaSimulationContext): TeleportR
   ctx.state.teleportActive = true;
   ctx.state.teleportRetreatReason = 'sealed-old-map-retreat';
   ctx.state.teleportedToSealedOldMap = true;
-  ctx.state.teleportCooldownSeconds = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
-  runtime.cooldown = ctx.state.teleportCooldownSeconds;
+  ctx.state.teleportCooldownSeconds = stat?.cooldownSeconds ?? 0;
+  if (runtime) runtime.cooldown = ctx.state.teleportCooldownSeconds;
+  if (teleportModule) teleportModule.depleted = true;
   ctx.renderEconomy();
-  ctx.renderBuildSite(structure.siteId);
+  if (structure) ctx.renderBuildSite(structure.siteId);
   return {
     ok: true,
-    cooldownSeconds: runtime.cooldown,
+    cooldownSeconds: runtime?.cooldown ?? 0,
     bloodSealStoneBefore,
     bloodSealStoneAfter,
     carriedDaThachBefore,
@@ -281,29 +288,65 @@ export const activateTeleportRetreat = (ctx: VinhDaSimulationContext): TeleportR
   };
 };
 
-export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: EnemyKind = 'twisted', spawnX?: number, allowOutsideNight = false): void => {
+const getEnemyRankMultiplier = (rank: number): number => 1 + Math.max(0, rank - 1) * 0.1;
+const getEnemyFaction = (kind: EnemyKind): EnemyFaction => kind === 'bloodLordCultist' || kind === 'bloodLordPriest' ? 'bloodLord' : kind === 'resentmentStatue' ? 'neutral' : 'eternalNight';
+const getEnemyRole = (kind: EnemyKind): EnemyRole => kind === 'fleshRemnant' ? 'boss' : kind === 'darkHighPriest' || kind === 'resentfulDragon' ? 'miniBoss' : 'normal';
+const rollWavePrefix = (ctx: VinhDaSimulationContext, kind: EnemyKind): CreaturePrefix | null => {
+  const role = getEnemyRole(kind);
+  if (role !== 'normal') return null;
+  const night = ctx.state.nightIndex;
+  const spawned = ctx.state.enemies.length + 1;
+  const counts = ctx.state.enemies.reduce((record, enemy) => { if (enemy.prefix) record[enemy.prefix] = (record[enemy.prefix] ?? 0) + 1; return record; }, {} as Partial<Record<CreaturePrefix, number>>);
+  const candidates: readonly [CreaturePrefix, number][] = [['hero', 0.01], ['champion', 0.035], ['elite', 0.08]];
+  for (const [prefix, chance] of candidates){
+    if (!canApplyCreaturePrefix(role, prefix)) continue;
+    const definition = (prefix === 'elite' ? 2 : prefix === 'champion' ? 4 : 2);
+    if (night < definition) continue;
+    if ((counts[prefix] ?? 0) >= getPrefixNightCap(prefix, spawned)) continue;
+    if (Math.random() < chance) return prefix;
+  }
+  return null;
+};
+
+export const spawnEnemy = (ctx: VinhDaSimulationContext, side: Side, kind: EnemyKind = 'twisted', spawnX?: number, allowOutsideNight = false, prefix: CreaturePrefix | null = null): void => {
     if ((!allowOutsideNight && ctx.state.dayNightPhase !== 'night') || ctx.state.enemies.length >= ENEMY_LIMIT) return;
     const template = ENEMY_TEMPLATES[kind] ?? DEFAULT_ENEMY_TEMPLATE;
   const tier = ctx.state.mapTier ?? template.tier;
-    const hp = scaleEnemyTierStat(template.hp, tier);
-    const atk = scaleEnemyTierStat(template.atk, tier);
-    const wil = scaleEnemyTierStat(template.wil, tier);
+    const rankMultiplier = getEnemyRankMultiplier(template.rank);
+    const rankedStats = {
+      hp: scaleEnemyTierStat(template.hp, tier) * rankMultiplier,
+      atk: scaleEnemyTierStat(template.atk, tier) * rankMultiplier,
+      wil: scaleEnemyTierStat(template.wil, tier) * rankMultiplier,
+      arm: scaleEnemyTierStat(template.arm, tier) * rankMultiplier,
+      res: scaleEnemyTierStat(template.res, tier) * rankMultiplier,
+      speed: template.speed,
+      attackCooldown: template.attackCooldown
+    };
+    const role = getEnemyRole(template.kind);
+    const appliedPrefix = canApplyCreaturePrefix(role, prefix) ? prefix : null;
+    const finalStats = applyCreaturePrefixPostRank(rankedStats, appliedPrefix);
+    const hp = finalStats.hp;
+    const atk = finalStats.atk;
+    const wil = finalStats.wil;
     ctx.state.enemies.push({
       id: ctx.state.nextEnemyId,
       x: spawnX ?? (side === 'left' ? ENEMY_START_PADDING : WORLD_WIDTH - ENEMY_START_PADDING),
       kind: template.kind,
       hp,
       maxHp: hp,
-      speed: template.speed,
-      baseSpeed: template.speed,
+      speed: finalStats.speed,
+      baseSpeed: finalStats.speed,
       groundSpeed: template.groundSpeed,
       flySpeed: template.flySpeed,
       weight: template.weight,
-      attackCooldown: template.attackCooldown,
+      threatCost: template.threatCost * getPrefixThreatCostMultiplier(appliedPrefix),
+      prefix: appliedPrefix,
+      faction: getEnemyFaction(template.kind),
+      attackCooldown: finalStats.attackCooldown,
       atk,
       wil,
-      arm: template.arm,
-      res: template.res,
+      arm: finalStats.arm,
+      res: finalStats.res,
       tier,
       rank: template.rank,
       projectileSpeed: template.projectileSpeed,
@@ -343,9 +386,11 @@ export const spawnWaveEnemy = (ctx: VinhDaSimulationContext, side?: Side): boole
   const previousNextEnemyId = ctx.state.nextEnemyId;
   const portal = chooseEnemyPortal(ctx, side);
   const spawnSide = portal?.side ?? getFallbackSpawnSide(ctx, side);
-  spawnEnemy(ctx, spawnSide, kind, portal?.x);
+  const prefix = rollWavePrefix(ctx, kind);
+  spawnEnemy(ctx, spawnSide, kind, portal?.x, false, prefix);
   if (ctx.state.nextEnemyId === previousNextEnemyId) return false;
-  ctx.state.waveThreatBudgetRemaining = Math.max(0, ctx.state.waveThreatBudgetRemaining - ENEMY_TEMPLATES[kind].weight);
+  const spawnedEnemy = ctx.state.enemies.find(enemy => enemy.id === previousNextEnemyId);
+  ctx.state.waveThreatBudgetRemaining = Math.max(0, ctx.state.waveThreatBudgetRemaining - (spawnedEnemy?.threatCost ?? ENEMY_TEMPLATES[kind].threatCost));
   return true;
 };
 const BLEED_SECONDS = 3;
@@ -421,7 +466,7 @@ export const removeEnemyAt = (ctx: VinhDaSimulationContext, index: number, rewar
     ctx.removeEnemyElement(enemy.id);
   if (triggerDeathEffects) triggerDeathExplosion(ctx, enemy);
     if (reward && ctx.state.dayNightPhase === 'night'){
-      const drops = rollEnemyResourceDrops({ kind: enemy.kind, enemyTier: enemy.tier, mapTier: ctx.state.mapTier, randomValue: () => nextRngValue(ctx.state.lootRng) });
+      const drops = applyPrefixBonusDrops(enemy, rollEnemyResourceDrops({ kind: enemy.kind, enemyTier: enemy.tier, mapTier: ctx.state.mapTier, randomValue: () => nextRngValue(ctx.state.lootRng) }), () => nextRngValue(ctx.state.lootRng));
       for (const drop of drops){
         if (drop.amount <= 0) continue;
         ctx.state.droppedResources.push({ id: ctx.state.nextDroppedResourceId, x: enemy.x, kind: drop.resourceId, ...drop });
@@ -434,10 +479,56 @@ export const clearEnemiesWithoutReward = (ctx: VinhDaSimulationContext): void =>
     while (ctx.state.enemies.length > 0) removeEnemyAt(ctx, ctx.state.enemies.length - 1, false, false);
     ctx.state.enemySpawnTimer = 0;
   };
-const addTieredAmount = (resources: TieredAmount[], resource: TieredAmount): void => {
+export const addTieredAmount = (resources: TieredAmount[], resource: TieredAmount): void => {
   const existing = resources.find(item => item.resourceId === resource.resourceId && item.tier === resource.tier);
   if (existing) existing.amount += resource.amount;
   else resources.push({ resourceId: resource.resourceId, amount: resource.amount, tier: resource.tier });
+};
+
+export interface ModuleInteractionResult {
+  ok: boolean;
+  reason?: 'missing-module' | 'already-depleted' | 'missing-interaction' | 'not-day';
+  resources: TieredAmount[];
+  spawnedEnemies: EnemyKind[];
+  notice?: string;
+}
+
+export const resolveMapModuleInteraction = (ctx: VinhDaSimulationContext, instanceId: string, interactionId: ModuleInteractionId): ModuleInteractionResult => {
+  const module = ctx.state.mapModules?.find(item => item.instanceId === instanceId);
+  if (!module) return { ok: false, reason: 'missing-module', resources: [], spawnedEnemies: [] };
+  if (module.depleted && interactionId !== 'activateTeleport') return { ok: false, reason: 'already-depleted', resources: [], spawnedEnemies: [] };
+  if (ctx.state.dayNightPhase !== 'day' && interactionId !== 'activateTeleport') return { ok: false, reason: 'not-day', resources: [], spawnedEnemies: [] };
+  const interaction = module.interactions.find(item => item.id === interactionId);
+  if (!interaction) return { ok: false, reason: 'missing-interaction', resources: [], spawnedEnemies: [] };
+  if (interactionId === 'activateTeleport') {
+    module.depleted = true;
+    ctx.state.teleportActive = true;
+    ctx.state.teleportRetreatReason = 'map-module-complete';
+    ctx.state.teleportedToSealedOldMap = true;
+    ctx.renderEconomy();
+    return { ok: true, resources: [], spawnedEnemies: [], notice: 'Truyền Tống Trận hoàn thành map và kết toán tài nguyên.' };
+  }
+  const pool = module.resourcePools.find(item => item.id === interaction.resourcePoolId);
+  const outcome = pool ? pickModuleOutcome(pool, () => nextRngValue(ctx.state.lootRng)) : null;
+  const tier = ctx.state.mapTier;
+  const resources = (outcome?.resources ?? []).map(resource => ({ ...resource, tier: resource.tier ?? tier }));
+  ctx.state.baseStoredResources ??= [];
+  for (const resource of resources) addTieredAmount(ctx.state.baseStoredResources, resource);
+  const spawnedEnemies = [...(interaction.spawnEnemies ?? []), ...(outcome?.spawnEnemies ?? [])];
+  for (const enemyKind of spawnedEnemies){
+    const side = module.x < getBaseX(ctx.state) ? 'left' : 'right';
+    const beforeId = ctx.state.nextEnemyId;
+    spawnEnemy(ctx, side, enemyKind, module.x, true);
+    const enemy = ctx.state.enemies.find(item => item.id === beforeId);
+    if (enemy && outcome?.daytimeLeashedEnemies){
+      enemy.moduleLeashX = module.x;
+      enemy.moduleLeashRadius = 120;
+      enemy.moduleLeashUntilNight = true;
+    }
+  }
+  module.depleted = true;
+  ctx.renderEconomy();
+  return { ok: true, resources, spawnedEnemies, notice: outcome?.notice };
 };
 
 export const collectDroppedResources = (ctx: VinhDaSimulationContext): void => {
@@ -786,6 +877,8 @@ const tryEnemyAttack = (enemy: Enemy, template: EnemyTemplate, attack: () => voi
     return true;
   };
 export const getEnemyEffectiveSpeed = (ctx: VinhDaSimulationContext, enemy: Enemy): number => {
+  if (ctx.state.dayNightPhase === 'day' && enemy.moduleLeashUntilNight) return 0;
+  if (ctx.state.dayNightPhase === 'night' && enemy.moduleLeashUntilNight) enemy.moduleLeashUntilNight = false;
     const statusMultiplier = enemy.statuses?.slowSeconds && enemy.statuses.slowSeconds > 0 ? (enemy.statuses.slowMultiplier ?? 1) : 1;
     if (enemy.canFly) return enemy.baseSpeed * statusMultiplier;
     for (const siteId of ctx.structureSiteIdsOfType('swamp')){

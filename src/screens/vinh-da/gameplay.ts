@@ -52,6 +52,7 @@ import {
   updateEnemies as runtimeUpdateEnemies,
   updateStructures as runtimeUpdateStructures,
   collectDroppedResources as runtimeCollectDroppedResources,
+  resolveMapModuleInteraction,
   activateTeleportRetreat,
   canActivateTeleportRetreat,
   TELEPORT_RETREAT_COST,
@@ -63,6 +64,8 @@ import {
   startEscort,
 } from './simulation.ts';
 import type { DayNightPhase, VinhDaSimulationContext, VinhDaSimulationState } from './simulation.ts';
+import { createMapModules } from './map-modules.ts';
+import type { ModuleInteraction, RuntimeMapModule } from './map-modules.ts';
 import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime, VinhDaStatusCollection } from './types.ts';
 import { getResourceLabel, isTieredVinhDaResource } from './economy/resources.ts';
 import type { TieredAmount, VinhDaResourceId } from './economy/resources.ts';
@@ -410,6 +413,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         <div class="vinh-da-game__elemental-regions" data-role="elemental-regions" aria-hidden="true"></div>
         <div data-role="build-sites"></div>
         <div data-role="enemy-portals"></div>
+        <div data-role="map-modules"></div>
         <div data-role="dropped-resources"></div>
         <div data-role="enemies"></div>
         <div class="vinh-da-game__leader" data-role="leader" title="${leader?.name ?? leaderId ?? 'Leader'}"></div>
@@ -427,6 +431,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const elementalRegionsContainer = section.querySelector<HTMLElement>('[data-role="elemental-regions"]');
   const enemiesContainer = section.querySelector<HTMLElement>('[data-role="enemies"]');
   const enemyPortalsContainer = section.querySelector<HTMLElement>('[data-role="enemy-portals"]');
+  const mapModulesContainer = section.querySelector<HTMLElement>('[data-role="map-modules"]');
   const droppedResourcesContainer = section.querySelector<HTMLElement>('[data-role="dropped-resources"]');
   const noticeElement = section.querySelector<HTMLElement>('[data-role="notice"]');
   const bloodSealStoneText = section.querySelector<HTMLElement>('[data-role="blood-seal-stone"]');
@@ -441,8 +446,10 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const statusPanel = section.querySelector<HTMLElement>('[data-role="status-panel"]');
   const mapTier = getVinhDaMapTier(params);
   const elementalRegions = createElementalRegions(mapTier, createElementalRegionRandom());
+  const mapModules = createMapModules({ mapTier, baseX, worldWidth: WORLD_WIDTH, elementalRegions });
   const elementalRegionsById = new Map(elementalRegions.map(region => [region.id, region]));
   const elementalRegionElements = new Map<string, HTMLElement>();
+  const mapModuleElements = new Map<string, HTMLElement>();
   const siteElements = new Map<string, HTMLElement>();
   const buildMenuElements = new Map<string, HTMLDivElement>();
   const buildNodeOptions = [...BUILD_NODE_OPTIONS, ...GROUND_BUILD_NODE_OPTIONS] as const;
@@ -945,6 +952,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     mapTier: mapTier as VinhDaSimulationState['mapTier'],
     waveThreatBudgetRemaining,
     elementalRegions,
+    mapModules,
   };
   const simulationContext: VinhDaSimulationContext = {
     state: simulationState,
@@ -1031,6 +1039,57 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       }
     }
   }
+
+  const formatModuleReward = (resources: readonly TieredAmount[]): string => resources.length > 0 ? resources.map(formatResourceAmount).join(' · ') : 'không tài nguyên';
+  const renderMapModules = (): void => {
+    if (!mapModulesContainer) return;
+    const visible = mapModules.filter(module => Math.abs(module.x - leaderX) <= BUILD_SITE_RENDER_BUFFER);
+    const visibleIds = new Set(visible.map(module => module.instanceId));
+    for (const module of visible){
+      let element = mapModuleElements.get(module.instanceId);
+      if (!element){
+        element = document.createElement('div');
+        element.className = 'vinh-da-game__build-node';
+        element.dataset.moduleId = module.instanceId;
+        mapModulesContainer.append(element);
+        mapModuleElements.set(module.instanceId, element);
+      }
+      element.style.left = `${module.x}px`;
+      element.style.bottom = 'calc(18% + 34px)';
+      element.textContent = module.depleted ? '◇' : '◆';
+      element.title = `${module.label} · nguy ${module.dangerLevel} · ${module.tags.join(', ')}`;
+      element.hidden = Math.abs(module.x - leaderX) > BUILD_RANGE;
+      element.onclick = () => {
+        if (module.depleted) return showNotice(`${module.label} đã cạn.`);
+        if (dayNightPhase !== 'day' && !module.interactions.some(action => action.id === 'activateTeleport')) return showNotice('Chỉ tương tác module vào ban ngày.');
+        const interaction = module.interactions[0];
+        if (!interaction) return;
+        handleMapModuleInteraction(module, interaction);
+      };
+    }
+    for (const [id, element] of mapModuleElements){
+      if (!visibleIds.has(id)){ element.remove(); mapModuleElements.delete(id); }
+    }
+  };
+
+  const handleMapModuleInteraction = (module: RuntimeMapModule, interaction: ModuleInteraction): void => {
+    const result = resolveMapModuleInteraction(simulationContext, module.instanceId, interaction.id);
+    syncSimulationState();
+    if (!result.ok){
+      showNotice(result.reason === 'not-day' ? 'Chỉ tương tác module vào ban ngày.' : 'Không thể tương tác module.');
+      renderMapModules();
+      return;
+    }
+    renderMapModules();
+    if (interaction.id === 'activateTeleport'){
+      clearEnemiesWithoutReward();
+      showNotice(`Truyền tống trận hoàn tất map · giữ ${result.resources.length}`);
+      shell?.enterScreen?.('campaign-world-map', { modeKey: 'vinh-da', leaderId, stageId: params?.stageId, completedByTeleportModule: true, bloodSealStone: simulationState.bloodSealStone, carriedDaThach: simulationState.carriedDaThach });
+      return;
+    }
+    const spawned = result.spawnedEnemies.length > 0 ? ` · sự cố: ${result.spawnedEnemies.join(', ')}` : '';
+    showNotice(`${module.label}: ${formatModuleReward(result.resources)}${spawned}${result.notice ? ` · ${result.notice}` : ''}`);
+  };
 
   const renderEnemyPortals = (): void => {
     if (!enemyPortalsContainer) return;
@@ -1237,6 +1296,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   renderWeather();
   audio.syncWeather(weather);
   renderEnemyPortals();
+  renderMapModules();
   spawnWaveEnemy('left');
   spawnWaveEnemy('right');
   renderEnemies();
