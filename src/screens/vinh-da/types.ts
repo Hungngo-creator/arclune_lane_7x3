@@ -1,5 +1,5 @@
 import type { EnemyKind, EnemyTier } from './enemies.ts';
-import type { BaseBranchLv3, ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
+import type { BarracksSoldierRank, BaseBranchLv3, ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import type { TieredAmount, VinhDaResourceId, VinhDaTier } from './economy/resources.ts';
 
 export type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
@@ -66,7 +66,13 @@ export interface RuntimeSoldier {
   id: number;
   siteId: string;
   rank: number;
+  rankName?: BarracksSoldierRank;
+  collectionRank?: BarracksSoldierRank;
+  mapCappedFromRank?: BarracksSoldierRank;
+  maxHp?: number;
   hp: number;
+  rage?: number;
+  ultimatePermission?: boolean;
   x: number;
   side: Side;
   attackCooldown: number;

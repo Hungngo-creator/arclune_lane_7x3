@@ -40,7 +40,7 @@ import { getElementalRegionAtX } from './elemental-regions.ts';
 import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, reduceDamageByDefense, scaleEnemyTierStat } from './enemies.ts';
 import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
 import { BASE_STRUCTURE_STATS, getBaseLevelStat, getStructureLevelStat } from './structures.ts';
-import type { BaseBranchLv3, ElementalTowerElement, StructureType } from './structures.ts';
+import type { BarracksSoldierRank, BaseBranchLv3, ElementalTowerElement, StructureType } from './structures.ts';
 import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
 import { getLiquidHntValue } from './economy/conversion.ts';
 import { rollEnemyResourceDrops } from './economy/dropTables.ts';
@@ -519,6 +519,8 @@ const healLeader = (ctx: VinhDaSimulationContext, amount: number): void => {
   if (ctx.state.baseEnergyShortage) return;
   ctx.state.leaderHp = Math.min(getLeaderMaxHp(ctx), getLeaderHp(ctx) + Math.max(0, amount));
 };
+const capStructureHeal = (maxHp: number, amount: number, dt = 1): number => Math.min(Math.max(0, amount), Math.max(0, maxHp) * STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND * Math.max(0, dt));
+const healLeaderFromStructure = (ctx: VinhDaSimulationContext, amount: number, dt: number): void => healLeader(ctx, capStructureHeal(getLeaderMaxHp(ctx), amount, dt));
 const damageLeader = (ctx: VinhDaSimulationContext, amount: number): boolean => {
   let remaining = Math.max(0, amount);
   const shield = ctx.state.leaderShield ?? 0;
@@ -559,8 +561,25 @@ export const getLivingTerritoryWallBounds = (ctx: VinhDaSimulationContext): Terr
   return leftX === null || rightX === null ? null : { leftX, rightX };
 };
 export const isXInLivingTerritory = (ctx: VinhDaSimulationContext, x: number, bounds = getLivingTerritoryWallBounds(ctx)): boolean => Boolean(bounds && x >= bounds.leftX && x <= bounds.rightX);
+
+const getTerritoryChurchBuff = (ctx: VinhDaSimulationContext, x: number, bounds = getLivingTerritoryWallBounds(ctx)): Pick<ReturnType<typeof getStructureLevelStat>, 'buffHpPercent' | 'buffArmPercent' | 'buffResPercent' | 'buffAtkPercent' | 'buffWilPercent'> => {
+  if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) || !isXInLivingTerritory(ctx, x, bounds)) return {};
+  const total: { buffHpPercent?: number; buffArmPercent?: number; buffResPercent?: number; buffAtkPercent?: number; buffWilPercent?: number } = {};
+  for (const siteId of ctx.structureSiteIdsOfType('church')){
+    const structure = ctx.state.structures.get(siteId);
+    const site = structure ? ctx.getBuildSite(siteId) : null;
+    if (!structure || !site || !isXInLivingTerritory(ctx, site.x, bounds)) continue;
+    const stat = getStructureLevelStat('church', structure.level);
+    total.buffHpPercent = (total.buffHpPercent ?? 0) + (stat.buffHpPercent ?? 0);
+    total.buffArmPercent = (total.buffArmPercent ?? 0) + (stat.buffArmPercent ?? 0);
+    total.buffResPercent = (total.buffResPercent ?? 0) + (stat.buffResPercent ?? 0);
+    total.buffAtkPercent = (total.buffAtkPercent ?? 0) + (stat.buffAtkPercent ?? 0);
+    total.buffWilPercent = (total.buffWilPercent ?? 0) + (stat.buffWilPercent ?? 0);
+  }
+  return total;
+};
 const getTerritoryBaseAllyAtkBonus = (ctx: VinhDaSimulationContext, x: number, bounds = getLivingTerritoryWallBounds(ctx)): number => (
-  isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) && isXInLivingTerritory(ctx, x, bounds) ? getBaseStat(ctx).allyAtkBonus ?? 0 : 0
+  isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) && isXInLivingTerritory(ctx, x, bounds) ? (getBaseStat(ctx).allyAtkBonus ?? 0) * (1 + ((getTerritoryChurchBuff(ctx, x, bounds).buffAtkPercent ?? 0) + (getTerritoryChurchBuff(ctx, x, bounds).buffWilPercent ?? 0)) / 2) : 0
 );
 const getChurchHealingBonus = (ctx: VinhDaSimulationContext, bounds = getLivingTerritoryWallBounds(ctx)): number => {
   if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds)) return 0;
@@ -577,7 +596,7 @@ const getChurchHealingBonus = (ctx: VinhDaSimulationContext, bounds = getLivingT
 };
 const getBaseMaxHp = (ctx: VinhDaSimulationContext): number => {
   const stat = getBaseStat(ctx);
-  return stat.hp + (stat.shield ?? 0) + (ctx.state.baseStatuses?.elementalBloodMaxHpBonus ?? 0);
+  return (stat.hp + (stat.shield ?? 0) + (ctx.state.baseStatuses?.elementalBloodMaxHpBonus ?? 0)) * (1 + (getTerritoryChurchBuff(ctx, getBaseX(ctx.state)).buffHpPercent ?? 0));
 };
 const resetBaseHealingCapWindow = (ctx: VinhDaSimulationContext): void => {
   ctx.state.baseHealingCapWindowRemaining = BASE_HEALING_CAP_WINDOW_SECONDS;
@@ -693,8 +712,9 @@ const applyElementEffect = (ctx: VinhDaSimulationContext, enemy: Enemy, element:
 export const reduceStructureDamage = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime, attacker: Enemy | null, amount: number): number => {
     if (structure.type !== 'wall') return amount;
     const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element);
-  const arm = (stat.arm ?? 0) * (1 + (runtime.statuses?.elementalArmBonusPercent ?? 0));
-    const res = (stat.res ?? 0) * (1 + (runtime.statuses?.elementalResBonusPercent ?? 0));
+  const churchBuff = ctx.getBuildSite(structure.siteId) ? getTerritoryChurchBuff(ctx, ctx.getBuildSite(structure.siteId)!.x) : {};
+  const arm = (stat.arm ?? 0) * (1 + (runtime.statuses?.elementalArmBonusPercent ?? 0) + (churchBuff.buffArmPercent ?? 0));
+    const res = (stat.res ?? 0) * (1 + (runtime.statuses?.elementalResBonusPercent ?? 0) + (churchBuff.buffResPercent ?? 0));
     const defenseMultiplier = ((100 / (100 + Math.max(0, arm))) + (100 / (100 + Math.max(0, res)))) / 2;
     const mitigatedAmount = amount * defenseMultiplier;
     if (structure.branchLv3 !== 'slippery' || !attacker) return mitigatedAmount;
@@ -1285,7 +1305,7 @@ const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
   }
   const leaderFlatHeal = stat.healPerSecond ?? 0;
   const leaderPercentHeal = getLeaderMaxHp(ctx) * (stat.leaderHealMaxHpPercentPerSecond ?? 0);
-  if (leaderFlatHeal + leaderPercentHeal > 0) healLeader(ctx, (leaderFlatHeal + leaderPercentHeal) * dt);
+  if (leaderFlatHeal + leaderPercentHeal > 0) healLeaderFromStructure(ctx, (leaderFlatHeal + leaderPercentHeal) * dt, dt);
   const allyHeal = stat.allyHealPerSecond ?? 0;
   if (allyHeal > 0){
     for (const structure of ctx.state.structures.values()){
@@ -1293,17 +1313,18 @@ const updateBaseSupport = (ctx: VinhDaSimulationContext, dt: number): void => {
       if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds)) continue;
       const runtime = ctx.ensureStructureRuntime(structure);
       if (!runtime.soldiers) continue;
-      for (const soldier of runtime.soldiers) soldier.hp += allyHeal * dt;
+      for (const soldier of runtime.soldiers) soldier.hp = Math.min(soldier.maxHp ?? soldier.hp, soldier.hp + capStructureHeal(soldier.maxHp ?? soldier.hp, allyHeal * dt, dt));
     }
   }
 };
-const updateChurch = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime): void => {
+const updateChurch = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime, dt: number): void => {
   if (ctx.state.baseEnergyShortage) return;
   if (structure.type !== 'church') return;
   const site = ctx.getBuildSite(structure.siteId);
   const territoryBounds = getLivingTerritoryWallBounds(ctx);
   if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds) || !isXInLivingTerritory(ctx, getBaseX(ctx.state), territoryBounds)) return;
   const stat = getStructureLevelStat('church', structure.level);
+  if ((stat.baseHealMaxHpPercentPerSecond ?? 0) > 0) healBase(ctx, getBaseMaxHp(ctx) * (stat.baseHealMaxHpPercentPerSecond ?? 0) * dt, territoryBounds);
   if ((runtime.prayerTimer ?? 0) <= 0){
     healBase(ctx, 1 + structure.level, territoryBounds);
     runtime.prayerTimer = stat.prayerIntervalSeconds ?? 20;
@@ -1313,16 +1334,35 @@ const updateChurch = (ctx: VinhDaSimulationContext, structure: PlacedStructure, 
     runtime.contaminationCleanseTimer = stat.cleanseContaminationSeconds ?? 120;
   }
 };
-const updateBarracks = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime): void => {
+const BARRACKS_RANK_POWER: Record<BarracksSoldierRank, number> = { N: 1, R: 2, SR: 3, SSR: 4, UR: 5 };
+const BARRACKS_RANKS: readonly BarracksSoldierRank[] = ['N', 'R', 'SR', 'SSR', 'UR'];
+const getMapCappedBarracksRank = (rank: BarracksSoldierRank, mapTier: number): BarracksSoldierRank => {
+  const cap: BarracksSoldierRank = mapTier >= 1.3 ? 'UR' : mapTier >= 1.2 ? 'SSR' : mapTier >= 1.1 ? 'SR' : 'R';
+  return BARRACKS_RANKS[Math.min(BARRACKS_RANK_POWER[rank], BARRACKS_RANK_POWER[cap]) - 1] ?? 'N';
+};
+const updateBarracks = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime, dt: number): void => {
   if (structure.type !== 'barracks') return;
   const site = ctx.getBuildSite(structure.siteId);
   if (!site) return;
   const stat = getStructureLevelStat('barracks', structure.level);
   runtime.soldiers ??= [];
   runtime.soldiers = runtime.soldiers.filter(soldier => soldier.hp > 0).slice(0, stat.soldierCap ?? 0);
+  for (const soldier of runtime.soldiers){
+    soldier.rage = Math.min(100, (soldier.rage ?? 0) + dt * 10);
+    if (soldier.ultimatePermission && (soldier.rage ?? 0) >= 100){
+      const target = ctx.state.enemies.find(enemy => Math.abs(enemy.x - soldier.x) <= 260);
+      if (target) hitStructureTarget(ctx, target, 4 + soldier.rank * 2, 0.5);
+      soldier.rage = 0;
+      soldier.ultimateReady = false;
+    }
+  }
   if (runtime.soldiers.length >= (stat.soldierCap ?? 0) || (runtime.soldierSpawnTimer ?? 0) > 0) return;
   runtime.nextSoldierId = (runtime.nextSoldierId ?? 0) + 1;
-  runtime.soldiers.push({ id: runtime.nextSoldierId, siteId: structure.siteId, rank: stat.soldierRank ?? 1, hp: 8 + (stat.soldierRank ?? 1) * 4, x: site.x, side: runtime.nextSoldierId % 2 === 0 ? 'left' : 'right', attackCooldown: 0, ultimateReady: Boolean(stat.ultimatePermission) });
+  const requestedRank = stat.soldierRankName ?? 'N';
+  const rankName = getMapCappedBarracksRank(requestedRank, ctx.state.mapTier ?? 1.1);
+  const rank = BARRACKS_RANK_POWER[rankName];
+  const maxHp = 8 + rank * 4;
+  runtime.soldiers.push({ id: runtime.nextSoldierId, siteId: structure.siteId, rank, rankName, collectionRank: stat.collectionRank, mapCappedFromRank: rankName === requestedRank ? undefined : requestedRank, maxHp, hp: maxHp, rage: 0, x: site.x, side: runtime.nextSoldierId % 2 === 0 ? 'left' : 'right', attackCooldown: 0, ultimatePermission: Boolean(stat.ultimatePermission), ultimateReady: false });
   runtime.soldierSpawnTimer = stat.soldierSpawnSeconds ?? 10;
 };
 
@@ -1346,8 +1386,8 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
       tickStructureStatuses(ctx, structure, runtime, dt);
       updateWallRegeneration(ctx, structure, runtime, dt);
       updateBiochemicalWall(ctx, structure, runtime);
-      updateChurch(ctx, structure, runtime);
-      updateBarracks(ctx, structure, runtime);
+      updateChurch(ctx, structure, runtime, dt);
+      updateBarracks(ctx, structure, runtime, dt);
       if (structure.type === 'teleport') runtime.cooldown = Math.max(0, runtime.cooldown - dt);
       const site = ctx.getBuildSite(structure.siteId);
       if (!site) continue;

@@ -23,6 +23,7 @@ export interface BuildMenuOption {
 export type WallBranchLv3 = 'spike' | 'slippery' | 'shock';
 export type WallBranchLv5 = 'biochemical' | 'curse' | 'link';
 export type BaseBranchLv3 = 'defense' | 'attack';
+export type BarracksSoldierRank = 'N' | 'R' | 'SR' | 'SSR' | 'UR';
 
 export interface StructureLevelStat {
   hp: number;
@@ -32,6 +33,7 @@ export interface StructureLevelStat {
   healPerSecond?: number;
   allyHealPerSecond?: number;
   leaderHealMaxHpPercentPerSecond?: number;
+  baseHealMaxHpPercentPerSecond?: number;
   allyAtkBonus?: number;
   healingBonusPercent?: number;
   shield?: number;
@@ -40,6 +42,7 @@ export interface StructureLevelStat {
   emergencyCooldownNights?: number;
   emergencyBaseSelfDamagePercent?: number;
   leaderShieldPercent?: number;
+  buffHpPercent?: number;
   buffArmPercent?: number;
   buffResPercent?: number;
   buffAtkPercent?: number;
@@ -48,6 +51,10 @@ export interface StructureLevelStat {
   cleanseContaminationSeconds?: number;
   soldierCap?: number;
   soldierRank?: number;
+  soldierRankName?: BarracksSoldierRank;
+  collectionRank?: BarracksSoldierRank;
+  requiresCollectionPick?: boolean;
+  mapTierCap?: VinhDaTier;
   soldierSpawnSeconds?: number;
   ultimatePermission?: boolean;
   range?: number;
@@ -273,19 +280,19 @@ export const GROUND_STRUCTURE_STATS: Record<Exclude<StructureType, 'wall' | 'wat
     6: { hp: 68, cooldownSeconds: 80 }
   },
   barracks: {
-    1: { hp: 18, soldierCap: 1, soldierRank: 1, soldierSpawnSeconds: 10 },
-    2: { hp: 24, soldierCap: 2, soldierRank: 1, soldierSpawnSeconds: 9 },
-    3: { hp: 32, soldierCap: 2, soldierRank: 2, soldierSpawnSeconds: 8 },
-    4: { hp: 42, soldierCap: 3, soldierRank: 2, soldierSpawnSeconds: 7 },
-    5: { hp: 54, soldierCap: 4, soldierRank: 3, soldierSpawnSeconds: 6 },
-    6: { hp: 70, soldierCap: 5, soldierRank: 4, soldierSpawnSeconds: 5, ultimatePermission: true }
+    1: { hp: 18, soldierCap: 2, soldierRank: 1, soldierRankName: 'N', soldierSpawnSeconds: 10, ultimatePermission: false },
+    2: { hp: 24, soldierCap: 2, soldierRank: 2, soldierRankName: 'R', soldierSpawnSeconds: 9, ultimatePermission: false },
+    3: { hp: 32, soldierCap: 3, soldierRank: 3, soldierRankName: 'SR', soldierSpawnSeconds: 8, ultimatePermission: true },
+    4: { hp: 42, soldierCap: 3, soldierRank: 4, soldierRankName: 'SSR', collectionRank: 'SSR', requiresCollectionPick: true, mapTierCap: 1.2, soldierSpawnSeconds: 7, ultimatePermission: true },
+    5: { hp: 54, soldierCap: 3, soldierRank: 5, soldierRankName: 'UR', collectionRank: 'UR', requiresCollectionPick: true, mapTierCap: 1.3, soldierSpawnSeconds: 6, ultimatePermission: true },
+    6: { hp: 70, soldierCap: 4, soldierRank: 5, soldierRankName: 'UR', collectionRank: 'UR', requiresCollectionPick: true, mapTierCap: 1.3, soldierSpawnSeconds: 5, ultimatePermission: true }
   },
   church: {
-    1: { hp: 14, buffArmPercent: 0.03, buffResPercent: 0.03, prayerIntervalSeconds: 20, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
-    2: { hp: 18, buffArmPercent: 0.05, buffResPercent: 0.05, healingBonusPercent: 0.05, prayerIntervalSeconds: 18, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
-    3: { hp: 24, buffArmPercent: 0.07, buffResPercent: 0.07, buffAtkPercent: 0.04, buffWilPercent: 0.04, healingBonusPercent: 0.08, prayerIntervalSeconds: 16, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
-    4: { hp: 32, buffArmPercent: 0.1, buffResPercent: 0.1, buffAtkPercent: 0.06, buffWilPercent: 0.06, healingBonusPercent: 0.12, prayerIntervalSeconds: 14, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
-    5: { hp: 44, buffArmPercent: 0.14, buffResPercent: 0.14, buffAtkPercent: 0.08, buffWilPercent: 0.08, healingBonusPercent: 0.16, shield: 12, prayerIntervalSeconds: 12, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS }
+    1: { hp: 14, buffHpPercent: 0.05, buffArmPercent: 0.05, buffResPercent: 0.05, prayerIntervalSeconds: 3 * LORE_HOUR_SECONDS, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+    2: { hp: 18, buffHpPercent: 0.075, buffArmPercent: 0.075, buffResPercent: 0.075, prayerIntervalSeconds: 4 * LORE_HOUR_SECONDS, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+    3: { hp: 24, buffHpPercent: 0.075, buffArmPercent: 0.075, buffResPercent: 0.075, buffAtkPercent: 0.05, buffWilPercent: 0.05, prayerIntervalSeconds: 6 * LORE_HOUR_SECONDS, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+    4: { hp: 32, buffHpPercent: 0.15, buffArmPercent: 0.15, buffResPercent: 0.15, buffAtkPercent: 0.1, buffWilPercent: 0.1, prayerIntervalSeconds: 10 * LORE_HOUR_SECONDS, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+    5: { hp: 44, buffHpPercent: 0.15, buffArmPercent: 0.15, buffResPercent: 0.15, buffAtkPercent: 0.1, buffWilPercent: 0.1, baseHealMaxHpPercentPerSecond: 0.02, prayerIntervalSeconds: 18 * LORE_HOUR_SECONDS, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS }
   },
   crystalSeal: {
     0: { hp: 20, arm: 2, res: 2, healPerSecond: 0 },

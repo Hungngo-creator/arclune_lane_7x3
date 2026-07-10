@@ -39688,7 +39688,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           if (elemental && elementalStat)
               lines.push(`<div>Tháp NT: ${elemental.element ?? 'Hỏa'} Lv${elemental.level} · cost ${formatCost(getCostFor('elementalTower', elemental.level))} · range ${elementalStat.range ?? 0} · ${describeElementEffect(elemental.element ?? 'Hỏa')}</div>`);
           if (barracks && barracksStat)
-              lines.push(`<div>Trại: ${barracksRuntime?.soldiers?.length ?? 0}/${barracksStat.soldierCap ?? 0} lính · rank ${barracksStat.soldierRank ?? 1} · ulti ${barracksStat.ultimatePermission ? 'ready' : 'khóa'}</div>`);
+              lines.push(`<div>Trại: ${barracksRuntime?.soldiers?.length ?? 0}/${barracksStat.soldierCap ?? 0} lính · rank ${barracksStat.soldierRankName ?? barracksStat.soldierRank ?? 1}${barracksStat.requiresCollectionPick ? ' · collection/fallback' : ''} · ulti ${barracksStat.ultimatePermission ? 'ready' : 'khóa'}</div>`);
           if (church)
               lines.push(`<div>Ấn: prayer ${formatSeconds(churchRuntime?.prayerTimer)} · cleanse ${formatSeconds(churchRuntime?.contaminationCleanseTimer)}</div>`);
           lines.push(`<div class="${canStartEscort(simulationContext) ? 'vinh-da-game__status-warn' : ''}">Hộ tống: ${simulationState.dayNightPhase === 'escort' ? `đang mở đường tới ${Math.round(getBaseX(simulationState))}` : canStartEscort(simulationContext) ? 'sẵn sàng mở đường' : 'cần Dạ Thạch/đêm/tàn khu'}</div>`);
@@ -39903,7 +39903,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           const stat = structure ? getStructureLevelStat(structure.type, structure.level, structure.type === 'crystalSeal' ? structure.baseBranchLv3 : structure.branchLv3, structure.branchLv5, structure.element) : null;
           const branchText = structure?.type === 'wall' ? ` · tường lãnh địa · lv3 ${structure.branchLv3 ?? 'chưa chọn'} · lv5 ${structure.branchLv5 ?? 'chưa chọn'}` : structure?.type === 'crystalSeal' ? ` · base lv3 ${structure.baseBranchLv3 ?? 'chưa chọn'}` : '';
           const elementText = structure?.type === 'elementalTower' || structure?.mountedStructure === 'elementalTower' ? ` · hệ ${structure.element ?? 'Hỏa'} · ${describeElementEffect(structure.element ?? 'Hỏa')}` : '';
-          const soldierText = structure?.type === 'barracks' ? ` · lính ${runtime?.soldiers?.length ?? 0}/${stat?.soldierCap ?? 0} rank ${stat?.soldierRank ?? 1}` : '';
+          const soldierText = structure?.type === 'barracks' ? ` · lính ${runtime?.soldiers?.length ?? 0}/${stat?.soldierCap ?? 0} rank ${stat?.soldierRankName ?? stat?.soldierRank ?? 1}` : '';
           const churchText = structure?.type === 'church' ? ` · prayer ${formatSeconds(runtime?.prayerTimer)} cleanse ${formatSeconds(runtime?.contaminationCleanseTimer)}` : '';
           const teleportText = structure?.type === 'teleport' ? ` · rút lui CD ${formatSeconds(runtime?.cooldown)}` : '';
           siteButton.title = structure ? `${siteButton.dataset.structureLabel} Lv${structure.level} · HP ${Math.ceil(runtime?.hp ?? 0)}/${stat?.hp ?? 0} · cost ${formatCost(getCostFor(structure.type, structure.level, structure.branchLv5 ?? structure.baseBranchLv3 ?? structure.branchLv3))}${stat?.range ? ` · range ${stat.range}` : ''}${branchText}${elementText}${soldierText}${churchText}${teleportText}` : site?.kind === 'wall-slot' ? 'Điểm xây tường lãnh địa' : site?.kind === 'ground' ? 'Điểm đất cho bẫy' : 'Ụ đá cho tháp/trại/Nhà Thờ';
@@ -40841,6 +40841,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           return;
       ctx.state.leaderHp = Math.min(getLeaderMaxHp(ctx), getLeaderHp(ctx) + Math.max(0, amount));
   };
+  const capStructureHeal = (maxHp, amount, dt = 1) => Math.min(Math.max(0, amount), Math.max(0, maxHp) * STRUCTURE_HEALING_CAP_MAX_HP_PER_SECOND * Math.max(0, dt));
+  const healLeaderFromStructure = (ctx, amount, dt) => healLeader(ctx, capStructureHeal(getLeaderMaxHp(ctx), amount, dt));
   const damageLeader = (ctx, amount) => {
       let remaining = Math.max(0, amount);
       const shield = ctx.state.leaderShield ?? 0;
@@ -40883,7 +40885,25 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       return leftX === null || rightX === null ? null : { leftX, rightX };
   };
   const isXInLivingTerritory = (ctx, x, bounds = getLivingTerritoryWallBounds(ctx)) => Boolean(bounds && x >= bounds.leftX && x <= bounds.rightX);
-  const getTerritoryBaseAllyAtkBonus = (ctx, x, bounds = getLivingTerritoryWallBounds(ctx)) => (isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) && isXInLivingTerritory(ctx, x, bounds) ? getBaseStat(ctx).allyAtkBonus ?? 0 : 0);
+  const getTerritoryChurchBuff = (ctx, x, bounds = getLivingTerritoryWallBounds(ctx)) => {
+      if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) || !isXInLivingTerritory(ctx, x, bounds))
+          return {};
+      const total = {};
+      for (const siteId of ctx.structureSiteIdsOfType('church')) {
+          const structure = ctx.state.structures.get(siteId);
+          const site = structure ? ctx.getBuildSite(siteId) : null;
+          if (!structure || !site || !isXInLivingTerritory(ctx, site.x, bounds))
+              continue;
+          const stat = getStructureLevelStat('church', structure.level);
+          total.buffHpPercent = (total.buffHpPercent ?? 0) + (stat.buffHpPercent ?? 0);
+          total.buffArmPercent = (total.buffArmPercent ?? 0) + (stat.buffArmPercent ?? 0);
+          total.buffResPercent = (total.buffResPercent ?? 0) + (stat.buffResPercent ?? 0);
+          total.buffAtkPercent = (total.buffAtkPercent ?? 0) + (stat.buffAtkPercent ?? 0);
+          total.buffWilPercent = (total.buffWilPercent ?? 0) + (stat.buffWilPercent ?? 0);
+      }
+      return total;
+  };
+  const getTerritoryBaseAllyAtkBonus = (ctx, x, bounds = getLivingTerritoryWallBounds(ctx)) => (isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds) && isXInLivingTerritory(ctx, x, bounds) ? (getBaseStat(ctx).allyAtkBonus ?? 0) * (1 + ((getTerritoryChurchBuff(ctx, x, bounds).buffAtkPercent ?? 0) + (getTerritoryChurchBuff(ctx, x, bounds).buffWilPercent ?? 0)) / 2) : 0);
   const getChurchHealingBonus = (ctx, bounds = getLivingTerritoryWallBounds(ctx)) => {
       if (!isXInLivingTerritory(ctx, getBaseX(ctx.state), bounds))
           return 0;
@@ -40902,7 +40922,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const getBaseMaxHp = (ctx) => {
       const stat = getBaseStat(ctx);
-      return stat.hp + (stat.shield ?? 0) + (ctx.state.baseStatuses?.elementalBloodMaxHpBonus ?? 0);
+      return (stat.hp + (stat.shield ?? 0) + (ctx.state.baseStatuses?.elementalBloodMaxHpBonus ?? 0)) * (1 + (getTerritoryChurchBuff(ctx, getBaseX(ctx.state)).buffHpPercent ?? 0));
   };
   const resetBaseHealingCapWindow = (ctx) => {
       ctx.state.baseHealingCapWindowRemaining = BASE_HEALING_CAP_WINDOW_SECONDS;
@@ -41024,8 +41044,9 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if (structure.type !== 'wall')
           return amount;
       const stat = getStructureLevelStat(structure.type, structure.level, structure.branchLv3, structure.branchLv5, structure.element);
-      const arm = (stat.arm ?? 0) * (1 + (runtime.statuses?.elementalArmBonusPercent ?? 0));
-      const res = (stat.res ?? 0) * (1 + (runtime.statuses?.elementalResBonusPercent ?? 0));
+      const churchBuff = ctx.getBuildSite(structure.siteId) ? getTerritoryChurchBuff(ctx, ctx.getBuildSite(structure.siteId).x) : {};
+      const arm = (stat.arm ?? 0) * (1 + (runtime.statuses?.elementalArmBonusPercent ?? 0) + (churchBuff.buffArmPercent ?? 0));
+      const res = (stat.res ?? 0) * (1 + (runtime.statuses?.elementalResBonusPercent ?? 0) + (churchBuff.buffResPercent ?? 0));
       const defenseMultiplier = ((100 / (100 + Math.max(0, arm))) + (100 / (100 + Math.max(0, res)))) / 2;
       const mitigatedAmount = amount * defenseMultiplier;
       if (structure.branchLv3 !== 'slippery' || !attacker)
@@ -41676,7 +41697,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       const leaderFlatHeal = stat.healPerSecond ?? 0;
       const leaderPercentHeal = getLeaderMaxHp(ctx) * (stat.leaderHealMaxHpPercentPerSecond ?? 0);
       if (leaderFlatHeal + leaderPercentHeal > 0)
-          healLeader(ctx, (leaderFlatHeal + leaderPercentHeal) * dt);
+          healLeaderFromStructure(ctx, (leaderFlatHeal + leaderPercentHeal) * dt, dt);
       const allyHeal = stat.allyHealPerSecond ?? 0;
       if (allyHeal > 0) {
           for (const structure of ctx.state.structures.values()) {
@@ -41687,11 +41708,11 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               if (!runtime.soldiers)
                   continue;
               for (const soldier of runtime.soldiers)
-                  soldier.hp += allyHeal * dt;
+                  soldier.hp = Math.min(soldier.maxHp ?? soldier.hp, soldier.hp + capStructureHeal(soldier.maxHp ?? soldier.hp, allyHeal * dt, dt));
           }
       }
   };
-  const updateChurch = (ctx, structure, runtime) => {
+  const updateChurch = (ctx, structure, runtime, dt) => {
       if (ctx.state.baseEnergyShortage)
           return;
       if (structure.type !== 'church')
@@ -41701,6 +41722,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       if (!site || !isXInLivingTerritory(ctx, site.x, territoryBounds) || !isXInLivingTerritory(ctx, getBaseX(ctx.state), territoryBounds))
           return;
       const stat = getStructureLevelStat('church', structure.level);
+      if ((stat.baseHealMaxHpPercentPerSecond ?? 0) > 0)
+          healBase(ctx, getBaseMaxHp(ctx) * (stat.baseHealMaxHpPercentPerSecond ?? 0) * dt, territoryBounds);
       if ((runtime.prayerTimer ?? 0) <= 0) {
           healBase(ctx, 1 + structure.level, territoryBounds);
           runtime.prayerTimer = stat.prayerIntervalSeconds ?? 20;
@@ -41710,7 +41733,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           runtime.contaminationCleanseTimer = stat.cleanseContaminationSeconds ?? 120;
       }
   };
-  const updateBarracks = (ctx, structure, runtime) => {
+  const BARRACKS_RANK_POWER = { N: 1, R: 2, SR: 3, SSR: 4, UR: 5 };
+  const BARRACKS_RANKS = ['N', 'R', 'SR', 'SSR', 'UR'];
+  const getMapCappedBarracksRank = (rank, mapTier) => {
+      const cap = mapTier >= 1.3 ? 'UR' : mapTier >= 1.2 ? 'SSR' : mapTier >= 1.1 ? 'SR' : 'R';
+      return BARRACKS_RANKS[Math.min(BARRACKS_RANK_POWER[rank], BARRACKS_RANK_POWER[cap]) - 1] ?? 'N';
+  };
+  const updateBarracks = (ctx, structure, runtime, dt) => {
       if (structure.type !== 'barracks')
           return;
       const site = ctx.getBuildSite(structure.siteId);
@@ -41719,10 +41748,24 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
       const stat = getStructureLevelStat('barracks', structure.level);
       runtime.soldiers ??= [];
       runtime.soldiers = runtime.soldiers.filter(soldier => soldier.hp > 0).slice(0, stat.soldierCap ?? 0);
+      for (const soldier of runtime.soldiers) {
+          soldier.rage = Math.min(100, (soldier.rage ?? 0) + dt * 10);
+          if (soldier.ultimatePermission && (soldier.rage ?? 0) >= 100) {
+              const target = ctx.state.enemies.find(enemy => Math.abs(enemy.x - soldier.x) <= 260);
+              if (target)
+                  hitStructureTarget(ctx, target, 4 + soldier.rank * 2, 0.5);
+              soldier.rage = 0;
+              soldier.ultimateReady = false;
+          }
+      }
       if (runtime.soldiers.length >= (stat.soldierCap ?? 0) || (runtime.soldierSpawnTimer ?? 0) > 0)
           return;
       runtime.nextSoldierId = (runtime.nextSoldierId ?? 0) + 1;
-      runtime.soldiers.push({ id: runtime.nextSoldierId, siteId: structure.siteId, rank: stat.soldierRank ?? 1, hp: 8 + (stat.soldierRank ?? 1) * 4, x: site.x, side: runtime.nextSoldierId % 2 === 0 ? 'left' : 'right', attackCooldown: 0, ultimateReady: Boolean(stat.ultimatePermission) });
+      const requestedRank = stat.soldierRankName ?? 'N';
+      const rankName = getMapCappedBarracksRank(requestedRank, ctx.state.mapTier ?? 1.1);
+      const rank = BARRACKS_RANK_POWER[rankName];
+      const maxHp = 8 + rank * 4;
+      runtime.soldiers.push({ id: runtime.nextSoldierId, siteId: structure.siteId, rank, rankName, collectionRank: stat.collectionRank, mapCappedFromRank: rankName === requestedRank ? undefined : requestedRank, maxHp, hp: maxHp, rage: 0, x: site.x, side: runtime.nextSoldierId % 2 === 0 ? 'left' : 'right', attackCooldown: 0, ultimatePermission: Boolean(stat.ultimatePermission), ultimateReady: false });
       runtime.soldierSpawnTimer = stat.soldierSpawnSeconds ?? 10;
   };
   const updateStructures = (ctx, dt) => {
@@ -41745,8 +41788,8 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           tickStructureStatuses(ctx, structure, runtime, dt);
           updateWallRegeneration(ctx, structure, runtime, dt);
           updateBiochemicalWall(ctx, structure, runtime);
-          updateChurch(ctx, structure, runtime);
-          updateBarracks(ctx, structure, runtime);
+          updateChurch(ctx, structure, runtime, dt);
+          updateBarracks(ctx, structure, runtime, dt);
           if (structure.type === 'teleport')
               runtime.cooldown = Math.max(0, runtime.cooldown - dt);
           const site = ctx.getBuildSite(structure.siteId);
@@ -42054,19 +42097,19 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           6: { hp: 68, cooldownSeconds: 80 }
       },
       barracks: {
-          1: { hp: 18, soldierCap: 1, soldierRank: 1, soldierSpawnSeconds: 10 },
-          2: { hp: 24, soldierCap: 2, soldierRank: 1, soldierSpawnSeconds: 9 },
-          3: { hp: 32, soldierCap: 2, soldierRank: 2, soldierSpawnSeconds: 8 },
-          4: { hp: 42, soldierCap: 3, soldierRank: 2, soldierSpawnSeconds: 7 },
-          5: { hp: 54, soldierCap: 4, soldierRank: 3, soldierSpawnSeconds: 6 },
-          6: { hp: 70, soldierCap: 5, soldierRank: 4, soldierSpawnSeconds: 5, ultimatePermission: true }
+          1: { hp: 18, soldierCap: 2, soldierRank: 1, soldierRankName: 'N', soldierSpawnSeconds: 10, ultimatePermission: false },
+          2: { hp: 24, soldierCap: 2, soldierRank: 2, soldierRankName: 'R', soldierSpawnSeconds: 9, ultimatePermission: false },
+          3: { hp: 32, soldierCap: 3, soldierRank: 3, soldierRankName: 'SR', soldierSpawnSeconds: 8, ultimatePermission: true },
+          4: { hp: 42, soldierCap: 3, soldierRank: 4, soldierRankName: 'SSR', collectionRank: 'SSR', requiresCollectionPick: true, mapTierCap: 1.2, soldierSpawnSeconds: 7, ultimatePermission: true },
+          5: { hp: 54, soldierCap: 3, soldierRank: 5, soldierRankName: 'UR', collectionRank: 'UR', requiresCollectionPick: true, mapTierCap: 1.3, soldierSpawnSeconds: 6, ultimatePermission: true },
+          6: { hp: 70, soldierCap: 4, soldierRank: 5, soldierRankName: 'UR', collectionRank: 'UR', requiresCollectionPick: true, mapTierCap: 1.3, soldierSpawnSeconds: 5, ultimatePermission: true }
       },
       church: {
-          1: { hp: 14, buffArmPercent: 0.03, buffResPercent: 0.03, prayerIntervalSeconds: 20, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
-          2: { hp: 18, buffArmPercent: 0.05, buffResPercent: 0.05, healingBonusPercent: 0.05, prayerIntervalSeconds: 18, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
-          3: { hp: 24, buffArmPercent: 0.07, buffResPercent: 0.07, buffAtkPercent: 0.04, buffWilPercent: 0.04, healingBonusPercent: 0.08, prayerIntervalSeconds: 16, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
-          4: { hp: 32, buffArmPercent: 0.1, buffResPercent: 0.1, buffAtkPercent: 0.06, buffWilPercent: 0.06, healingBonusPercent: 0.12, prayerIntervalSeconds: 14, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
-          5: { hp: 44, buffArmPercent: 0.14, buffResPercent: 0.14, buffAtkPercent: 0.08, buffWilPercent: 0.08, healingBonusPercent: 0.16, shield: 12, prayerIntervalSeconds: 12, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS }
+          1: { hp: 14, buffHpPercent: 0.05, buffArmPercent: 0.05, buffResPercent: 0.05, prayerIntervalSeconds: 3 * LORE_HOUR_SECONDS, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+          2: { hp: 18, buffHpPercent: 0.075, buffArmPercent: 0.075, buffResPercent: 0.075, prayerIntervalSeconds: 4 * LORE_HOUR_SECONDS, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+          3: { hp: 24, buffHpPercent: 0.075, buffArmPercent: 0.075, buffResPercent: 0.075, buffAtkPercent: 0.05, buffWilPercent: 0.05, prayerIntervalSeconds: 6 * LORE_HOUR_SECONDS, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+          4: { hp: 32, buffHpPercent: 0.15, buffArmPercent: 0.15, buffResPercent: 0.15, buffAtkPercent: 0.1, buffWilPercent: 0.1, prayerIntervalSeconds: 10 * LORE_HOUR_SECONDS, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS },
+          5: { hp: 44, buffHpPercent: 0.15, buffArmPercent: 0.15, buffResPercent: 0.15, buffAtkPercent: 0.1, buffWilPercent: 0.1, baseHealMaxHpPercentPerSecond: 0.02, prayerIntervalSeconds: 18 * LORE_HOUR_SECONDS, cleanseContaminationSeconds: CONTAMINATION_CLEANSE_SECONDS }
       },
       crystalSeal: {
           0: { hp: 20, arm: 2, res: 2, healPerSecond: 0 },
