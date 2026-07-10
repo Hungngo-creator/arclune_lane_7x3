@@ -41,12 +41,15 @@ import { DEFAULT_ENEMY_TEMPLATE, ENEMY_TEMPLATES, reduceDamageByDefense, scaleEn
 import { applyCreaturePrefixPostRank, applyPrefixBonusDrops, canApplyCreaturePrefix, getPrefixNightCap, getPrefixThreatCostMultiplier } from './combat/prefixes.ts';
 import type { CreaturePrefix, EnemyFaction, EnemyRole } from './combat/prefixes.ts';
 import type { EnemyKind, EnemyTemplate, EnemyTier } from './enemies.ts';
-import { BASE_STRUCTURE_STATS, getBaseLevelStat, getStructureLevelStat } from './structures.ts';
+import { BASE_STRUCTURE_STATS, getBaseLevelStat, getStructureLevelStat, metersToWorldUnits } from './structures.ts';
 import type { BarracksSoldierRank, BaseBranchLv3, ElementalTowerElement, StructureType } from './structures.ts';
 import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime } from './types.ts';
 import { pickModuleOutcome } from './map-modules.ts';
 import type { ModuleInteractionId, RuntimeMapModule } from './map-modules.ts';
 import { getLiquidHntValue } from './economy/conversion.ts';
+import { createVinhDaMerchantStock, rollVinhDaMerchantPresence } from './economy/merchant.ts';
+import type { VinhDaMerchantOffer } from './economy/merchant.ts';
+import { settleVinhDaMapEconomy } from './economy/settlement.ts';
 import { rollEnemyResourceDrops } from './economy/dropTables.ts';
 import type { TieredAmount } from './economy/resources.ts';
 
@@ -115,6 +118,12 @@ export interface VinhDaSimulationState {
   baseLiquidHnt?: number;
   condensedHnt?: number;
   baseEnergyShortage?: boolean;
+  harvestRate?: number;
+  merchantDayIndex?: number;
+  nextMerchantRollDay?: number;
+  merchantPresent?: boolean;
+  merchantOpen?: boolean;
+  merchantStock?: VinhDaMerchantOffer[];
   droppedResources: DroppedResource[];
   nextDroppedResourceId: number;
   lootRng?: RngState;
@@ -152,6 +161,22 @@ export interface VinhDaSimulationState {
   teleportedToSealedOldMap?: boolean;
   mapModules?: RuntimeMapModule[];
 }
+
+export const settleCompletedVinhDaMap = (ctx: VinhDaSimulationContext): ReturnType<typeof settleVinhDaMapEconomy> => {
+  const result = settleVinhDaMapEconomy({
+    liquidHntRemaining: ctx.state.baseLiquidHnt ?? 0,
+    directResources: ctx.state.carriedResources ?? [],
+    harvestRate: ctx.state.harvestRate ?? 1
+  });
+  ctx.state.condensedHnt = Math.max(0, ctx.state.condensedHnt ?? ctx.state.bloodSealStone) + result.totalCondensedHnt;
+  ctx.state.bloodSealStone = ctx.state.condensedHnt;
+  ctx.state.baseLiquidHnt = 0;
+  if (ctx.state.carriedResources) ctx.state.carriedResources.length = 0;
+  ctx.state.carriedDaThach = 0;
+  ctx.state.baseStoredResources = [...(ctx.state.baseStoredResources ?? []), ...result.keptResources];
+  ctx.renderEconomy();
+  return result;
+};
 
 export const getBaseX = (state: Pick<VinhDaSimulationState, 'baseX'>): number => (Number.isFinite(state.baseX) ? state.baseX! : CRYSTAL_X);
 export const getCurrentSealPointX = (state: Pick<VinhDaSimulationState, 'escortSealIndex'>): number | null => ESCORT_SEAL_POINTS[state.escortSealIndex ?? 0] ?? null;
@@ -505,6 +530,7 @@ export const resolveMapModuleInteraction = (ctx: VinhDaSimulationContext, instan
     ctx.state.teleportActive = true;
     ctx.state.teleportRetreatReason = 'map-module-complete';
     ctx.state.teleportedToSealedOldMap = true;
+    settleCompletedVinhDaMap(ctx);
     ctx.renderEconomy();
     return { ok: true, resources: [], spawnedEnemies: [], notice: 'Truyền Tống Trận hoàn thành map và kết toán tài nguyên.' };
   }
@@ -1244,6 +1270,17 @@ const convertContaminationToApostles = (ctx: VinhDaSimulationContext): void => {
   }
 };
 
+export const rollVinhDaMerchantForDay = (ctx: VinhDaSimulationContext): void => {
+  const dayIndex = ctx.state.merchantDayIndex ?? 0;
+  const nextRollDay = ctx.state.nextMerchantRollDay ?? 3;
+  ctx.state.merchantPresent = false;
+  ctx.state.merchantOpen = false;
+  if (dayIndex < nextRollDay) return;
+  ctx.state.nextMerchantRollDay = nextRollDay + 3;
+  ctx.state.merchantPresent = rollVinhDaMerchantPresence(ctx.state.dayNightPhase, () => nextRngValue(ctx.state.lootRng));
+  ctx.state.merchantStock = ctx.state.merchantPresent ? createVinhDaMerchantStock(ctx.state.mapTier, () => nextRngValue(ctx.state.lootRng)) : [];
+};
+
 export const updateDayNightTimer = (ctx: VinhDaSimulationContext, dt: number): void => {
     if (ctx.state.dayNightPhase === 'escort'){
       updateEscortMovement(ctx, dt);
@@ -1255,10 +1292,14 @@ export const updateDayNightTimer = (ctx: VinhDaSimulationContext, dt: number): v
       ctx.state.phaseRemainingSeconds += DAY_DURATION_SECONDS;
       ctx.state.dayNightPhase = ctx.state.dayNightPhase === 'night' ? 'day' : 'night';
       if (ctx.state.dayNightPhase === 'day'){
+        ctx.state.merchantDayIndex = (ctx.state.merchantDayIndex ?? 0) + 1;
         clearEnemiesWithoutReward(ctx);
         applyBaseBuffDailyUpkeep(ctx);
         convertContaminationToApostles(ctx);
+      rollVinhDaMerchantForDay(ctx);
       } else {
+        ctx.state.merchantPresent = false;
+        ctx.state.merchantOpen = false;
         ctx.state.nightIndex += 1;
         const waveConfig = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier);
         ctx.state.waveThreatBudgetRemaining = getScaledThreatBudget(waveConfig.threatBudget, ctx.state.nightIndex);
@@ -1348,11 +1389,11 @@ const updateSpikeTrap = (ctx: VinhDaSimulationContext, site: BuildSite): void =>
 };
 const updateAntiAirCannon = (ctx: VinhDaSimulationContext, structure: PlacedStructure, site: BuildSite, runtime: StructureRuntime, dt: number): void => {
   if (structure.type !== 'antiAirCannon') return;
-  const stat = getStructureLevelStat('antiAirCannon', structure.level);
+  const stat = getStructureLevelStat('antiAirCannon', structure.level, structure.branchLv3, structure.branchLv5);
   runtime.cooldown = Math.max(0, runtime.cooldown - dt);
   if ((runtime.burstShotsRemaining ?? 0) <= 0 && runtime.cooldown <= 0) runtime.burstShotsRemaining = stat.burstShotCount ?? 1;
   if (runtime.cooldown > 0 || (runtime.burstShotsRemaining ?? 0) <= 0) return;
-  const target = ctx.state.enemies.find(enemy => (structure.level >= 6 || enemy.canFly) && Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
+  const target = ctx.state.enemies.find(enemy => (stat.affectsGroundAtLv6 || enemy.canFly) && Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
   if (!target) return;
   runtime.burstShotsRemaining = Math.max(0, (runtime.burstShotsRemaining ?? 1) - 1);
   runtime.cooldown = (runtime.burstShotsRemaining ?? 0) > 0 ? (stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN) : (stat.reloadSeconds ?? stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN);
@@ -1368,20 +1409,39 @@ const hitStructureTarget = (ctx: VinhDaSimulationContext, target: Enemy, damage:
 
 const updateGravityCannon = (ctx: VinhDaSimulationContext, structure: PlacedStructure, site: BuildSite, runtime: StructureRuntime, dt: number): void => {
   if (structure.type !== 'gravityCannon') return;
-  const stat = getStructureLevelStat('gravityCannon', structure.level);
+  const stat = getStructureLevelStat('gravityCannon', structure.level, structure.branchLv3);
   runtime.cooldown = Math.max(0, runtime.cooldown - dt);
   if (structure.level >= 6 && runtime.gravityEnabled === undefined) runtime.gravityEnabled = true;
   if (structure.level >= 6 && runtime.gravityEnabled === false) return;
   if (runtime.cooldown > 0) return;
-  const center = ctx.state.enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0) && enemy.weight <= (stat.maxAffectedWeight ?? 0))?.x;
-  if (center === undefined) return;
-  for (const enemy of ctx.state.enemies){
-    if (enemy.weight > (stat.maxAffectedWeight ?? 0) || Math.abs(enemy.x - center) > (stat.pullRadius ?? 0)) continue;
-    enemy.x += (center - enemy.x) * Math.min(1, (stat.pullStrength ?? 0) / Math.max(1, Math.abs(center - enemy.x)) * dt);
+  const minWeight = stat.minAffectedWeight ?? 0;
+  const maxWeight = stat.maxAffectedWeight ?? 0;
+  const triggerRadius = stat.triggerRadius ?? stat.range ?? 0;
+  const center = ctx.state.enemies.find(enemy => !enemy.canFly && enemy.weight >= minWeight && enemy.weight <= maxWeight && Math.abs(enemy.x - site.x) <= triggerRadius)?.x;
+  if (center === undefined){
+    runtime.gravityChargeSeconds = 0;
+    return;
+  }
+  const needsCharge = structure.branchLv3 === 'clearField' && structure.level >= 4;
+  if (needsCharge){
+    runtime.gravityChargeSeconds = (runtime.gravityChargeSeconds ?? 0) + dt;
+    if (runtime.gravityChargeSeconds < (stat.chargeSeconds ?? 10)) return;
+  }
+  for (const enemy of [...ctx.state.enemies]){
+    if (enemy.canFly || enemy.weight < minWeight || enemy.weight > maxWeight || Math.abs(enemy.x - center) > (stat.pullRadius ?? 0)) continue;
+    const isBoss = enemy.kind === 'resentfulDragon' || enemy.kind === 'fleshRemnant' || enemy.ultimate === 'dragon-rage';
+    const effectMultiplier = isBoss ? (stat.bossEffectMultiplier ?? 1) : 1;
+    hitStructureTarget(ctx, enemy, enemy.maxHp * (stat.damageMaxHpPercent ?? 0) * effectMultiplier, 1);
+    if (enemy.hp <= 0) continue;
+    const direction = enemy.x >= site.x ? 1 : -1;
+    const launchDistance = Math.min(stat.maxLaunchDistance ?? 0, (stat.launchSpeed ?? 0) * (stat.pullDurationSeconds ?? 1));
+    const bossClamp = isBoss ? metersToWorldUnits(25) : launchDistance;
+    enemy.x += direction * Math.min(launchDistance, bossClamp) * effectMultiplier;
     const statuses = ensureStatuses(enemy);
     statuses.slowSeconds = Math.max(statuses.slowSeconds ?? 0, 1);
     statuses.slowMultiplier = Math.min(statuses.slowMultiplier ?? 1, 0.65);
   }
+  runtime.gravityChargeSeconds = 0;
   runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
 };
 
@@ -1427,12 +1487,16 @@ const updateChurch = (ctx: VinhDaSimulationContext, structure: PlacedStructure, 
     runtime.contaminationCleanseTimer = stat.cleanseContaminationSeconds ?? 120;
   }
 };
+type VinhDaCollectionRank = BarracksSoldierRank | 'Prime';
 const BARRACKS_RANK_POWER: Record<BarracksSoldierRank, number> = { N: 1, R: 2, SR: 3, SSR: 4, UR: 5 };
 const BARRACKS_RANKS: readonly BarracksSoldierRank[] = ['N', 'R', 'SR', 'SSR', 'UR'];
-const getMapCappedBarracksRank = (rank: BarracksSoldierRank, mapTier: number): BarracksSoldierRank => {
-  const cap: BarracksSoldierRank = mapTier >= 1.3 ? 'UR' : mapTier >= 1.2 ? 'SSR' : mapTier >= 1.1 ? 'SR' : 'R';
-  return BARRACKS_RANKS[Math.min(BARRACKS_RANK_POWER[rank], BARRACKS_RANK_POWER[cap]) - 1] ?? 'N';
+export const getVinhDaMapRankCap = (mapTier: number): BarracksSoldierRank => mapTier >= 1.3 ? 'UR' : mapTier >= 1.2 ? 'SSR' : mapTier >= 1.1 ? 'SR' : 'R';
+export const normalizeVinhDaCollectionRank = (rank: VinhDaCollectionRank, mapTier: number): BarracksSoldierRank => {
+  const safeRank: BarracksSoldierRank = rank === 'Prime' ? 'UR' : rank;
+  const cap = getVinhDaMapRankCap(mapTier);
+  return BARRACKS_RANKS[Math.min(BARRACKS_RANK_POWER[safeRank], BARRACKS_RANK_POWER[cap]) - 1] ?? 'N';
 };
+const getMapCappedBarracksRank = normalizeVinhDaCollectionRank;
 const updateBarracks = (ctx: VinhDaSimulationContext, structure: PlacedStructure, runtime: StructureRuntime, dt: number): void => {
   if (structure.type !== 'barracks') return;
   const site = ctx.getBuildSite(structure.siteId);
@@ -1500,7 +1564,8 @@ export const updateStructures = (ctx: VinhDaSimulationContext, dt: number): void
         const stat = getStructureLevelStat(type, structure.type === type ? structure.level : structure.mountedLevel ?? 1, structure.branchLv3, structure.branchLv5, structure.element);
         const targets = getStructureTargetsInRange(ctx, site, stat);
         if (targets.length <= 0) continue;
-        runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
+        runtime.gravityChargeSeconds = 0;
+  runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
         const explosionHitIds = new Set(targets.map(target => target.id));
         for (const target of targets){
           const baseDamage = ((stat.damage ?? 0) + getTerritoryBaseAllyAtkBonus(ctx, site.x)) * (1 + (((runtime.statuses?.elementalAtkBonusPercent ?? 0) + (runtime.statuses?.elementalWilBonusPercent ?? 0)) / 2));

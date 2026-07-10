@@ -1,6 +1,6 @@
 import type { EnemyKind, EnemyTier } from './enemies.ts';
 import type { CreaturePrefix, EnemyFaction } from './combat/prefixes.ts';
-import type { BarracksSoldierRank, BaseBranchLv3, ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
+import type { AntiAirBranchLv3, AntiAirBranchLv5, BarracksSoldierRank, BaseBranchLv3, ElementalTowerElement, GravityBranchLv4, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import type { TieredAmount, VinhDaResourceId, VinhDaTier } from './economy/resources.ts';
 
 export type BuildSiteKind = 'rock' | 'ground' | 'wall-slot';
@@ -56,8 +56,8 @@ export interface PlacedStructure {
   type: StructureType;
   level: number;
   mountedLevel?: number;
-  branchLv3?: WallBranchLv3;
-  branchLv5?: WallBranchLv5;
+  branchLv3?: WallBranchLv3 | AntiAirBranchLv3 | GravityBranchLv4;
+  branchLv5?: WallBranchLv5 | AntiAirBranchLv5;
   baseBranchLv3?: BaseBranchLv3;
   mountedStructure?: StructureType | null;
   element?: ElementalTowerElement;
@@ -172,4 +172,5 @@ export interface StructureRuntime {
   emergencyHealCooldown?: number;
   burstShotsRemaining?: number;
   gravityEnabled?: boolean;
+  gravityChargeSeconds?: number;
 }

@@ -22,6 +22,9 @@ export interface BuildMenuOption {
 
 export type WallBranchLv3 = 'spike' | 'slippery' | 'shock';
 export type WallBranchLv5 = 'biochemical' | 'curse' | 'link';
+export type AntiAirBranchLv3 = 'quality' | 'quantity';
+export type AntiAirBranchLv5 = 'rapidFire' | 'dragonSlayer';
+export type GravityBranchLv4 = 'godSlayer' | 'clearField';
 export type BaseBranchLv3 = 'defense' | 'attack';
 export type BarracksSoldierRank = 'N' | 'R' | 'SR' | 'SSR' | 'UR';
 
@@ -81,6 +84,14 @@ export interface StructureLevelStat {
   pullRadius?: number;
   pullStrength?: number;
   maxAffectedWeight?: number;
+  minAffectedWeight?: number;
+  triggerRadius?: number;
+  damageMaxHpPercent?: number;
+  pullDurationSeconds?: number;
+  chargeSeconds?: number;
+  launchSpeed?: number;
+  maxLaunchDistance?: number;
+  bossEffectMultiplier?: number;
   affectsGroundAtLv6?: boolean;
   splashDamage?: number;
   splashMaxTargets?: number;
@@ -99,7 +110,7 @@ export const BUILD_LEVEL_COST = {
   6: 18,
 } as const satisfies Record<number, number>;
 
-type StructureCostBranch = WallBranchLv3 | WallBranchLv5 | BaseBranchLv3 | 'quality' | 'quantity' | 'godslayer' | 'sweeper' | 'elementalize' | 'soulSlash';
+type StructureCostBranch = WallBranchLv3 | WallBranchLv5 | BaseBranchLv3 | AntiAirBranchLv3 | AntiAirBranchLv5 | GravityBranchLv4 | 'elementalize' | 'soulSlash';
 type CostToken = readonly [resourceId: VinhDaResourceId, amount: number, tierOffset?: number];
 
 const c = (resourceId: VinhDaResourceId, amount: number, tierOffset = 0): CostToken => [resourceId, amount, tierOffset];
@@ -141,8 +152,8 @@ const STRUCTURE_UPGRADE_COSTS = {
   elementalTower: { 1: cost(c('blackIron', 5), c('darkStone', 3), c('elementStone', 1)), 2: cost(c('blackIron', 5), c('darkStone', 4), c('elementStone', 1)), 3: cost(c('blackIron', 8), c('darkStone', 5), c('elementStone', 2), c('blackBone', 1)), 4: cost(c('blackIron', 10), c('darkStone', 7), c('elementStone', 2), c('blackBone', 2), c('mageStaff', 1)), 5: cost(c('blackIron', 12), c('darkStone', 9), c('elementStone', 3), c('blackBone', 3), c('mageStaff', 2), c('mindStone', 1)) },
   barracks: { 1: cost(c('blackIron', 8), c('spiritWood', 4), c('darkStone', 2)), 2: cost(c('blackIron', 8), c('spiritWood', 4), c('blackBone', 2)), 3: cost(c('blackIron', 12), c('spiritWood', 6), c('blackBone', 4)), 4: cost(c('blackIron', 16), c('spiritWood', 8), c('blackBone', 6), c('mindStone', 1)), 5: cost(c('blackIron', 20), c('spiritWood', 10), c('blackBone', 8), c('mindStone', 2), c('fleshCrystal', 1)), 6: cost(c('blackIron', 24), c('spiritWood', 12), c('blackBone', 10), c('mindStone', 2), c('nightCore', 1)) },
   church: { 1: cost(c('blackIron', 4), c('darkStone', 4), c('wishStone', 1)), 2: cost(c('blackIron', 6), c('darkStone', 5), c('wishStone', 1), c('blackBone', 1)), 3: cost(c('blackIron', 8), c('darkStone', 6), c('wishStone', 2), c('apostleCloak', 1)), 4: cost(c('blackIron', 10), c('darkStone', 8), c('wishStone', 3), c('apostleCloak', 2), c('bloodLordSigil', 1)), 5: cost(c('blackIron', 12), c('darkStone', 10), c('wishStone', 4), c('apostleCloak', 3), c('bloodLordSigil', 2), c('fleshCrystal', 1)) },
-  antiAirCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('machinePart', 1)), 2: cost(c('blackIron', 8), c('darkStone', 5), c('machinePart', 1)), 3: cost(c('blackIron', 12), c('darkStone', 6), c('machinePart', 2), c('mindStone', 1)), 4: cost(c('blackIron', 12), c('darkStone', 8), c('machinePart', 2), c('blackBone', 2)), 5: cost(c('blackIron', 16), c('darkStone', 10), c('machinePart', 3), c('mindStone', 2)), 6: cost(c('blackIron', 24), c('darkStone', 12), c('machinePart', 5), c('dragonScale', 2), c('nightCore', 1)) },
-  gravityCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('heavyWater', 1), c('machinePart', 1)), 2: cost(c('blackIron', 10), c('darkStone', 6), c('heavyWater', 1), c('machinePart', 1)), 3: cost(c('blackIron', 12), c('darkStone', 8), c('heavyWater', 2), c('machinePart', 2)), 4: cost(c('blackIron', 16), c('darkStone', 10), c('heavyWater', 3), c('voidStone', 2), c('dragonScale', 1)), 5: cost(c('blackIron', 18), c('darkStone', 12), c('heavyWater', 3), c('voidStone', 2), c('nightCore', 1)), 6: cost(c('blackIron', 20), c('darkStone', 12), c('heavyWater', 4), c('voidStone', 3), c('nightCore', 2)) },
+  antiAirCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('machinePart', 1)), 2: cost(c('blackIron', 8), c('darkStone', 5), c('machinePart', 1)), 3: { quality: cost(c('blackIron', 12), c('darkStone', 6), c('machinePart', 2), c('mindStone', 1)), quantity: cost(c('blackIron', 10), c('darkStone', 6), c('machinePart', 2)), default: cost(c('blackIron', 12), c('darkStone', 6), c('machinePart', 2), c('mindStone', 1)) }, 4: cost(c('blackIron', 12), c('darkStone', 8), c('machinePart', 2), c('blackBone', 2)), 5: { rapidFire: cost(c('blackIron', 16), c('darkStone', 10), c('machinePart', 3), c('mindStone', 2)), dragonSlayer: cost(c('blackIron', 18), c('darkStone', 10), c('machinePart', 4), c('dragonScale', 1)), default: cost(c('blackIron', 16), c('darkStone', 10), c('machinePart', 3), c('mindStone', 2)) }, 6: cost(c('blackIron', 24), c('darkStone', 12), c('machinePart', 5), c('dragonScale', 2), c('nightCore', 1)) },
+  gravityCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('heavyWater', 1), c('machinePart', 1)), 2: cost(c('blackIron', 10), c('darkStone', 6), c('heavyWater', 1), c('machinePart', 1)), 3: cost(c('blackIron', 12), c('darkStone', 8), c('heavyWater', 2), c('machinePart', 2)), 4: { godSlayer: cost(c('blackIron', 16), c('darkStone', 10), c('heavyWater', 3), c('voidStone', 2), c('dragonScale', 1)), clearField: cost(c('blackIron', 14), c('darkStone', 10), c('heavyWater', 2), c('voidStone', 1), c('machinePart', 2)), default: cost(c('blackIron', 16), c('darkStone', 10), c('heavyWater', 3), c('voidStone', 2), c('dragonScale', 1)) }, 5: cost(c('blackIron', 18), c('darkStone', 12), c('heavyWater', 3), c('voidStone', 2), c('nightCore', 1)), 6: cost(c('blackIron', 20), c('darkStone', 12), c('heavyWater', 4), c('voidStone', 3), c('nightCore', 2)) },
   executionBlade: { 1: cost(c('blackIron', 6), c('darkStone', 4), c('mindStone', 1)), 2: cost(c('blackIron', 8), c('darkStone', 5), c('mindStone', 1)), 3: cost(c('blackIron', 10), c('darkStone', 6), c('mindStone', 1), c('elementStone', 1)), 4: cost(c('blackIron', 12), c('darkStone', 8), c('mindStone', 2), c('blackBone', 2)), 5: cost(c('blackIron', 16), c('darkStone', 10), c('mindStone', 3), c('voidStone', 1)), 6: cost(c('blackIron', 20), c('darkStone', 12), c('mindStone', 4), c('nightCore', 1)) },
   landmine: { 1: cost(c('blackIron', 2), c('darkStone', 1)) },
   swamp: { 1: cost(c('spiritWood', 2), c('heavyWater', 1)) },
@@ -315,20 +326,13 @@ export const GROUND_STRUCTURE_STATS: Record<Exclude<StructureType, 'wall' | 'wat
     2: { hp: 1 }
     },
   antiAirCannon: {
-    1: { hp: 8, range: metersToWorldUnits(130), damage: 2, cooldownSeconds: 0.18, reloadSeconds: 2.6, burstShotCount: 3, maxTargets: 1, projectileSpeed: 10 },
-    2: { hp: 12, range: metersToWorldUnits(140), damage: 3, cooldownSeconds: 0.16, reloadSeconds: 2.5, burstShotCount: 3, maxTargets: 1, projectileSpeed: 10 },
-    3: { hp: 16, range: metersToWorldUnits(150), damage: 4, cooldownSeconds: 0.14, reloadSeconds: 2.4, burstShotCount: 4, maxTargets: 1, projectileSpeed: 11 },
-    4: { hp: 22, range: metersToWorldUnits(160), damage: 5, cooldownSeconds: 0.12, reloadSeconds: 2.3, burstShotCount: 4, maxTargets: 1, projectileSpeed: 11 },
-    5: { hp: 30, range: metersToWorldUnits(170), damage: 7, cooldownSeconds: 0.1, reloadSeconds: 2.2, burstShotCount: 5, maxTargets: 1, projectileSpeed: 12 },
-    6: { hp: 40, range: metersToWorldUnits(180), damage: 9, cooldownSeconds: 0.09, reloadSeconds: 2, burstShotCount: 6, maxTargets: 1, projectileSpeed: 12, affectsGroundAtLv6: true }
+    1: { hp: 8, range: metersToWorldUnits(10), damage: 0.7, cooldownSeconds: 1, reloadSeconds: 15, burstShotCount: 5, maxTargets: 1, projectileSpeed: 12 },
+    2: { hp: 12, range: metersToWorldUnits(15), damage: 1.1, cooldownSeconds: 1.2, reloadSeconds: 18, burstShotCount: 6, maxTargets: 1, projectileSpeed: 12 }
   },
   gravityCannon: {
-    1: { hp: 10, range: metersToWorldUnits(115), pullRadius: metersToWorldUnits(55), pullStrength: 70, cooldownSeconds: 4.5, maxAffectedWeight: 1 },
-    2: { hp: 14, range: metersToWorldUnits(125), pullRadius: metersToWorldUnits(60), pullStrength: 85, cooldownSeconds: 4.2, maxAffectedWeight: 1.5 },
-    3: { hp: 20, range: metersToWorldUnits(135), pullRadius: metersToWorldUnits(65), pullStrength: 100, cooldownSeconds: 3.9, maxAffectedWeight: 2 },
-    4: { hp: 28, range: metersToWorldUnits(145), pullRadius: metersToWorldUnits(70), pullStrength: 115, cooldownSeconds: 3.6, maxAffectedWeight: 2.5 },
-    5: { hp: 36, range: metersToWorldUnits(155), pullRadius: metersToWorldUnits(75), pullStrength: 130, cooldownSeconds: 3.3, maxAffectedWeight: 3 },
-    6: { hp: 48, range: metersToWorldUnits(165), pullRadius: metersToWorldUnits(85), pullStrength: 155, cooldownSeconds: 3, maxAffectedWeight: Number.POSITIVE_INFINITY }
+    1: { hp: 10, range: metersToWorldUnits(0.5), triggerRadius: metersToWorldUnits(0.5), pullRadius: metersToWorldUnits(0.5), damageMaxHpPercent: 0.25, pullDurationSeconds: 3, launchSpeed: metersToWorldUnits(10), cooldownSeconds: 15, minAffectedWeight: 1, maxAffectedWeight: 2, maxLaunchDistance: metersToWorldUnits(15) },
+    2: { hp: 14, range: metersToWorldUnits(0.7), triggerRadius: metersToWorldUnits(0.7), pullRadius: metersToWorldUnits(0.7), damageMaxHpPercent: 0.3, pullDurationSeconds: 4, launchSpeed: metersToWorldUnits(15), cooldownSeconds: 10, minAffectedWeight: 1, maxAffectedWeight: 2, maxLaunchDistance: metersToWorldUnits(15) },
+    3: { hp: 20, range: metersToWorldUnits(0.9), triggerRadius: metersToWorldUnits(0.9), pullRadius: metersToWorldUnits(0.9), damageMaxHpPercent: 0.35, pullDurationSeconds: 5, launchSpeed: metersToWorldUnits(20), cooldownSeconds: 10, minAffectedWeight: 1, maxAffectedWeight: 3, maxLaunchDistance: metersToWorldUnits(15) }
   }
 };
 
@@ -507,13 +511,42 @@ export const BASE_STRUCTURE_STATS: Record<number, StructureLevelStat> = {
   6: getBaseLevelStat(6)
 };
 
+const ANTI_AIR_LV3_STATS = {
+  quality: { hp: 16, range: metersToWorldUnits(20), damage: 2.2, cooldownSeconds: 1.6, reloadSeconds: 24, burstShotCount: 7, maxTargets: 1, projectileSpeed: 12 },
+  quantity: { hp: 16, range: metersToWorldUnits(21), damage: 1.5, cooldownSeconds: 1.3, reloadSeconds: 20, burstShotCount: 5, maxTargets: 1, projectileSpeed: 12 }
+} as const satisfies Record<AntiAirBranchLv3, StructureLevelStat>;
+
+export const getAntiAirCannonLevelStat = (level: number, branchLv3: AntiAirBranchLv3 = 'quality', branchLv5: AntiAirBranchLv5 = 'rapidFire'): StructureLevelStat => {
+  if (level <= 2) return GROUND_STRUCTURE_STATS.antiAirCannon[level] ?? GROUND_STRUCTURE_STATS.antiAirCannon[1] ?? { hp: 1 };
+  const lv3 = ANTI_AIR_LV3_STATS[branchLv3];
+  if (level === 3) return lv3;
+  const lv4 = { ...lv3, hp: 22, range: metersToWorldUnits(23), damage: (lv3.damage ?? 0) + 0.3, cooldownSeconds: Math.max(0, (lv3.cooldownSeconds ?? 0) - 0.3), reloadSeconds: Math.max(0, (lv3.reloadSeconds ?? 0) - 5) };
+  if (level === 4) return lv4;
+  const lv5Bonus = branchLv5 === 'dragonSlayer' ? { damage: 3, cooldown: 0.3, reload: 2 } : { damage: 1, cooldown: 1, reload: 5 };
+  const lv5 = { ...lv4, hp: 30, range: metersToWorldUnits(26), damage: (lv4.damage ?? 0) + lv5Bonus.damage, cooldownSeconds: Math.max(0, (lv4.cooldownSeconds ?? 0) - lv5Bonus.cooldown), reloadSeconds: Math.max(0, (lv4.reloadSeconds ?? 0) - lv5Bonus.reload) };
+  if (level === 5) return lv5;
+  return { ...lv5, hp: 40, damage: (lv5.damage ?? 0) + 3, cooldownSeconds: Math.max(0, (lv5.cooldownSeconds ?? 0) - 0.5), reloadSeconds: Math.max(0, (lv5.reloadSeconds ?? 0) - 5), affectsGroundAtLv6: true };
+};
+
+export const getGravityCannonLevelStat = (level: number, branchLv4: GravityBranchLv4 = 'godSlayer'): StructureLevelStat => {
+  if (level <= 3) return GROUND_STRUCTURE_STATS.gravityCannon[level] ?? GROUND_STRUCTURE_STATS.gravityCannon[1] ?? { hp: 1 };
+  const lv4 = branchLv4 === 'clearField'
+    ? { hp: 28, range: metersToWorldUnits(0.3), triggerRadius: metersToWorldUnits(0.3), pullRadius: metersToWorldUnits(2), damageMaxHpPercent: 0.35, pullDurationSeconds: 1, chargeSeconds: 10, launchSpeed: metersToWorldUnits(15), cooldownSeconds: 25, minAffectedWeight: 1, maxAffectedWeight: 3, maxLaunchDistance: metersToWorldUnits(35) }
+    : { hp: 28, range: metersToWorldUnits(0.5), triggerRadius: metersToWorldUnits(0.5), pullRadius: metersToWorldUnits(1.2), damageMaxHpPercent: 0.4, pullDurationSeconds: 5, launchSpeed: metersToWorldUnits(15), cooldownSeconds: 35, minAffectedWeight: 4, maxAffectedWeight: 5, maxLaunchDistance: metersToWorldUnits(35), bossEffectMultiplier: 0.4 };
+  if (level === 4) return lv4;
+  const lv5 = { ...lv4, hp: 36, damageMaxHpPercent: (lv4.damageMaxHpPercent ?? 0) + 0.1, cooldownSeconds: Math.max(0, (lv4.cooldownSeconds ?? 0) - 5) };
+  return level === 5 ? lv5 : { ...lv5, hp: 48 };
+};
+
 export const getElementalTowerLevelStat = (level: number, element: ElementalTowerElement = 'Hỏa'): StructureLevelStat => ELEMENTAL_TOWER_STRUCTURE_STATS[element][level] ?? ELEMENTAL_TOWER_STRUCTURE_STATS[element][1] ?? { hp: 1 };
 
-export const getStructureLevelStat = (type: StructureType, level: number, branchLv3?: WallBranchLv3 | BaseBranchLv3, branchLv5?: WallBranchLv5, element?: ElementalTowerElement): StructureLevelStat => {
-  if (type === 'wall') return getWallLevelStat(level, branchLv3 as WallBranchLv3 | undefined, branchLv5);
+export const getStructureLevelStat = (type: StructureType, level: number, branchLv3?: WallBranchLv3 | BaseBranchLv3 | AntiAirBranchLv3 | GravityBranchLv4, branchLv5?: WallBranchLv5 | AntiAirBranchLv5, element?: ElementalTowerElement): StructureLevelStat => {
+  if (type === 'wall') return getWallLevelStat(level, branchLv3 as WallBranchLv3 | undefined, branchLv5 as WallBranchLv5 | undefined);
   if (type === 'crystalSeal') return getBaseLevelStat(level, branchLv3 === 'attack' ? 'attack' : 'defense');
   if (type === 'watchtower') return WATCHTOWER_STRUCTURE_STATS[level] ?? { hp: 1 };
   if (type === 'elementalTower') return getElementalTowerLevelStat(level, element);
   if (type === 'executionBlade') return EXECUTION_BLADE_STRUCTURE_STATS[level] ?? EXECUTION_BLADE_STRUCTURE_STATS[1] ?? { hp: 1 };
+  if (type === 'antiAirCannon') return getAntiAirCannonLevelStat(level, branchLv3 === 'quantity' ? 'quantity' : 'quality', branchLv5 === 'dragonSlayer' ? 'dragonSlayer' : 'rapidFire');
+  if (type === 'gravityCannon') return getGravityCannonLevelStat(level, branchLv3 === 'clearField' ? 'clearField' : 'godSlayer');
   return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
 };

@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -38612,6 +38612,20 @@ __modules['./screens/vinh-da/constants.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ELEMENTAL_REGION_THUNDER_PARALYSIS_SECONDS')) exports.ELEMENTAL_REGION_THUNDER_PARALYSIS_SECONDS = ELEMENTAL_REGION_THUNDER_PARALYSIS_SECONDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'ELEMENTAL_REGION_THUNDER_PARALYSIS_COOLDOWN_SECONDS')) exports.ELEMENTAL_REGION_THUNDER_PARALYSIS_COOLDOWN_SECONDS = ELEMENTAL_REGION_THUNDER_PARALYSIS_COOLDOWN_SECONDS;
 };
+__modules['./screens/vinh-da/economy/balanceChecks.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./screens/vinh-da/simulation.ts');
+  const getVinhDaWaveConfig = __dep0.getVinhDaWaveConfig;
+  const checkVinhDaTier11FirstNightDrops = () => {
+      const config = getVinhDaWaveConfig(1, 1.1);
+      return {
+          id: 'tier-1.1-first-night-dark-stone',
+          ok: config.threatBudget >= 8 && config.threatBudget <= 10,
+          message: 'Tier 1.1 đêm đầu giữ budget 8–10 để mục tiêu rơi khoảng 4–8 Dạ Thạch khi giết phần lớn quái, không đủ nâng quá nhiều cấp ngay.'
+      };
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'checkVinhDaTier11FirstNightDrops')) exports.checkVinhDaTier11FirstNightDrops = checkVinhDaTier11FirstNightDrops;
+};
 __modules['./screens/vinh-da/economy/conversion.ts'] = (exports, module, __require) => {
   const TNT_TO_HNT = 100;
   const TIERED_LIQUID_HNT_BASE = Object.freeze({
@@ -38807,6 +38821,43 @@ __modules['./screens/vinh-da/economy/dropTables.ts'] = (exports, module, __requi
   //# sourceMappingURL=stdin.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'rollEnemyResourceDrops')) exports.rollEnemyResourceDrops = rollEnemyResourceDrops;
 };
+__modules['./screens/vinh-da/economy/merchant.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./screens/vinh-da/economy/conversion.ts');
+  const getTierIndex = __dep0.getTierIndex;
+  const tierIndexOf = (tier = 1.1) => getTierIndex(Math.floor(tier), Math.round((tier - Math.floor(tier)) * 10));
+  const tiered = (resourceId, amount, tier) => ({ resourceId, amount, tier });
+  const untiered = (resourceId, amount) => ({ resourceId, amount });
+  const price = (currency, amount) => ({ currency, amount });
+  const rollVinhDaMerchantPresence = (phase, randomValue) => phase === 'day' && randomValue() < 0.7;
+  const createVinhDaMerchantStock = (tier = 1.1, randomValue = Math.random) => {
+      const idx = tierIndexOf(tier);
+      const offers = [
+          { id: 'blackIron', label: '5 Hắc Thiết', stock: 2, resources: [tiered('blackIron', 5, tier)], price: price('HNT', 8 * idx) },
+          { id: 'darkStone', label: '3 Dạ Thạch', stock: 2, resources: [tiered('darkStone', 3, tier)], price: price('HNT', 4 * idx) },
+          { id: 'blackBone', label: '1 Hắc Cốt', stock: 1, resources: [untiered('blackBone', 1)], price: price('HNT', 10) },
+          { id: 'sealDust', label: '1 Bụi Phong Ấn', stock: 1, resources: [untiered('sealDust', 1)], price: price('HNT', 20) },
+          { id: 'spiritHerb', label: '1 Linh Thảo', stock: 2, resources: [tiered('spiritHerb', 1, tier)], price: price('HNT', 2 * idx) },
+          { id: 'spiritWood', label: '1 Linh Mộc', stock: 2, resources: [tiered('spiritWood', 1, tier)], price: price('HNT', 3 * idx) }
+      ];
+      const rare = [
+          { id: 'elementStone', label: '1 Nguyên Tố Thạch', stock: 1, resources: [tiered('elementStone', 1, tier)], price: price('HNT', 45 * idx), rare: true },
+          { id: 'wishStone', label: '1 Nguyện Thạch', stock: 1, resources: [tiered('wishStone', 1, tier)], price: price('HNT', 25 * idx), rare: true },
+          { id: 'mindStone', label: '1 Niệm Thạch', stock: 1, resources: [untiered('mindStone', 1)], price: price('HNT', 40), rare: true },
+          { id: 'machinePart', label: '1 Cơ Giới Linh Kiện', stock: 1, resources: [untiered('machinePart', 1)], price: price('HNT', 30), rare: true },
+          { id: 'heavyWater', label: '1 HMTT', stock: 1, resources: [tiered('heavyWater', 1, tier)], price: price('TNT', 1.5 * idx), rare: true },
+          { id: 'voidStone', label: '1 Hư Không Thạch', stock: 1, resources: [tiered('voidStone', 1, tier)], price: price('TNT', 4 * idx), rare: true }
+      ];
+      for (const offer of rare)
+          if (randomValue() < 0.45)
+              offers.push(offer);
+      return offers;
+  };
+  const getMerchantPriceInHnt = (price) => price.currency === 'ThNT' ? price.amount * 10000 : price.currency === 'TNT' ? price.amount * 100 : price.amount;
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'rollVinhDaMerchantPresence')) exports.rollVinhDaMerchantPresence = rollVinhDaMerchantPresence;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createVinhDaMerchantStock')) exports.createVinhDaMerchantStock = createVinhDaMerchantStock;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getMerchantPriceInHnt')) exports.getMerchantPriceInHnt = getMerchantPriceInHnt;
+};
 __modules['./screens/vinh-da/economy/resources.ts'] = (exports, module, __require) => {
   const TIERED_VINH_DA_RESOURCES = Object.freeze([
       'darkStone',
@@ -38862,6 +38913,45 @@ __modules['./screens/vinh-da/economy/resources.ts'] = (exports, module, __requir
   if (!Object.prototype.hasOwnProperty.call(exports, 'VINH_DA_RESOURCE_LABELS')) exports.VINH_DA_RESOURCE_LABELS = VINH_DA_RESOURCE_LABELS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isTieredVinhDaResource')) exports.isTieredVinhDaResource = isTieredVinhDaResource;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getResourceLabel')) exports.getResourceLabel = getResourceLabel;
+};
+__modules['./screens/vinh-da/economy/settlement.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./screens/vinh-da/economy/conversion.ts');
+  const getCondensedHntValue = __dep0.getCondensedHntValue;
+  const settleBaseEssence = __dep0.settleBaseEssence;
+  const VINH_DA_DEFAULT_HARVEST_RATE = 1;
+  const VINH_DA_SETTLEMENT_CONDENSE_RATE = 0.9;
+  const cloneResource = (resource) => ({ resourceId: resource.resourceId, amount: resource.amount, tier: resource.tier });
+  const isMandatoryOrProgressResource = (resource) => resource.resourceId === 'fleshCrystal';
+  const settleVinhDaMapEconomy = (params) => {
+      const harvestRate = Math.max(0, params.harvestRate ?? VINH_DA_DEFAULT_HARVEST_RATE);
+      const condensedHntFromLiquid = settleBaseEssence(params.liquidHntRemaining, harvestRate);
+      let condensedHntFromResources = 0;
+      const keptResources = [];
+      for (const resource of params.directResources ?? []) {
+          if (resource.amount <= 0)
+              continue;
+          if (isMandatoryOrProgressResource(resource)) {
+              keptResources.push(cloneResource(resource));
+              continue;
+          }
+          const value = getCondensedHntValue(resource) * harvestRate;
+          if (value > 0)
+              condensedHntFromResources += value;
+          else
+              keptResources.push(cloneResource(resource));
+      }
+      condensedHntFromResources = Math.floor(condensedHntFromResources);
+      return {
+          condensedHntFromLiquid,
+          condensedHntFromResources,
+          totalCondensedHnt: condensedHntFromLiquid + condensedHntFromResources,
+          keptResources
+      };
+  };
+  //# sourceMappingURL=stdin.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'VINH_DA_DEFAULT_HARVEST_RATE')) exports.VINH_DA_DEFAULT_HARVEST_RATE = VINH_DA_DEFAULT_HARVEST_RATE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'VINH_DA_SETTLEMENT_CONDENSE_RATE')) exports.VINH_DA_SETTLEMENT_CONDENSE_RATE = VINH_DA_SETTLEMENT_CONDENSE_RATE;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'settleVinhDaMapEconomy')) exports.settleVinhDaMapEconomy = settleVinhDaMapEconomy;
 };
 __modules['./screens/vinh-da/elemental-regions.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./screens/vinh-da/constants.ts');
@@ -39255,6 +39345,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const runtimeCollectDroppedResources = __dep7.collectDroppedResources;
   const resolveMapModuleInteraction = __dep7.resolveMapModuleInteraction;
   const activateTeleportRetreat = __dep7.activateTeleportRetreat;
+  const addTieredAmount = __dep7.addTieredAmount;
   const canActivateTeleportRetreat = __dep7.canActivateTeleportRetreat;
   const TELEPORT_RETREAT_COST = __dep7.TELEPORT_RETREAT_COST;
   const TELEPORT_BANKED_RESOURCE_KEEP_RATIO = __dep7.TELEPORT_BANKED_RESOURCE_KEEP_RATIO;
@@ -39268,12 +39359,14 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   const __dep9 = __require('./screens/vinh-da/economy/resources.ts');
   const getResourceLabel = __dep9.getResourceLabel;
   const isTieredVinhDaResource = __dep9.isTieredVinhDaResource;
-  const __dep10 = __require('./screens/vinh-da/elemental-regions.ts');
-  const createElementalRegionRandom = __dep10.createElementalRegionRandom;
-  const createElementalRegions = __dep10.createElementalRegions;
-  const getElementalRegionParticleCount = __dep10.getElementalRegionParticleCount;
-  const getVinhDaMapTier = __dep10.getVinhDaMapTier;
-  const ELEMENTAL_REGION_RENDER_BUFFER = __dep10.ELEMENTAL_REGION_RENDER_BUFFER;
+  const __dep10 = __require('./screens/vinh-da/economy/merchant.ts');
+  const getMerchantPriceInHnt = __dep10.getMerchantPriceInHnt;
+  const __dep11 = __require('./screens/vinh-da/elemental-regions.ts');
+  const createElementalRegionRandom = __dep11.createElementalRegionRandom;
+  const createElementalRegions = __dep11.createElementalRegions;
+  const getElementalRegionParticleCount = __dep11.getElementalRegionParticleCount;
+  const getVinhDaMapTier = __dep11.getVinhDaMapTier;
+  const ELEMENTAL_REGION_RENDER_BUFFER = __dep11.ELEMENTAL_REGION_RENDER_BUFFER;
   const STORM_LOOP_SRC = null;
   function createAudioContext() {
       const AudioContextCtor = window.AudioContext ?? window.webkitAudioContext;
@@ -39521,8 +39614,18 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
   function renderScreen(context) {
       const { root, shell = null, params = null } = context;
       ensureStyleTag(STYLE_ID, { css: CSS });
-      const leaderId = typeof params?.leaderId === 'string' ? params.leaderId : ROSTER[0]?.id;
-      const leader = leaderId ? getMetaById(leaderId) : null;
+      const requestedLeaderId = typeof params?.leaderId === 'string' ? params.leaderId : ROSTER[0]?.id;
+      const getVinhDaAllowedLeader = (id) => {
+          const picked = id ? getMetaById(id) : undefined;
+          if (picked?.rank === 'Prime') {
+              const fallback = ROSTER.find(unit => unit.rank !== 'Prime' && unit.rank !== undefined);
+              return { id: fallback?.id, leader: fallback ?? null, capped: true };
+          }
+          return { id, leader: picked ?? null, capped: Boolean(picked && picked.rank && !['N', 'R', 'SR', 'SSR', 'UR'].includes(String(picked.rank))) };
+      };
+      const leaderGuard = getVinhDaAllowedLeader(requestedLeaderId);
+      const leaderId = leaderGuard.id;
+      const leader = leaderGuard.leader;
       const frameCap = getFrameRateCap();
       const minFrameMs = 1000 / frameCap;
       let leaderX = LEADER_START_X;
@@ -39541,6 +39644,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       let baseLiquidHnt = 0;
       let condensedHnt = 0;
       let baseEnergyShortage = false;
+      const harvestRate = Number.isFinite(Number(params?.harvestRate)) ? Math.max(0, Number(params?.harvestRate)) : 1;
+      let merchantDayIndex = 0;
+      let nextMerchantRollDay = 3;
+      let merchantPresent = false;
+      let merchantOpen = false;
+      let merchantStock = [];
       let baseHp = 20;
       let baseLevel = 0;
       let baseBranchLv3;
@@ -39586,6 +39695,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           <div>Phase: <span data-role="day-night-phase"></span></div>
           <div>Đêm: <span data-role="night-index"></span> · Budget: <span data-role="wave-threat-budget"></span></div>
           <div>Còn lại: <span data-role="phase-time-remaining"></span></div>
+          <button class="vinh-da-game__merchant-button" data-role="merchant-toggle" type="button" hidden>Thương nhân</button>
+          <div data-role="merchant-panel" hidden></div>
         </div>
         <div class="vinh-da-game__panel vinh-da-game__panel--status" data-role="status-panel"></div>
         <button class="vinh-da-game__build-node" data-role="escort-start" type="button" title="Mở đường hộ tống">⇢<small>Hộ tống</small></button>
@@ -39632,6 +39743,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
       const nightIndexText = section.querySelector('[data-role="night-index"]');
       const waveThreatBudgetText = section.querySelector('[data-role="wave-threat-budget"]');
       const statusPanel = section.querySelector('[data-role="status-panel"]');
+      const merchantToggle = section.querySelector('[data-role="merchant-toggle"]');
+      const merchantPanel = section.querySelector('[data-role="merchant-panel"]');
       const mapTier = getVinhDaMapTier(params);
       const elementalRegions = createElementalRegions(mapTier, createElementalRegionRandom());
       const mapModules = createMapModules({ mapTier, baseX, worldWidth: WORLD_WIDTH, elementalRegions });
@@ -39655,6 +39768,8 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               clearTimeout(noticeTimeout);
           noticeTimeout = setTimeout(() => noticeElement.classList.remove('vinh-da-game__notice--visible'), 1600);
       };
+      if (leaderGuard.capped)
+          requestAnimationFrame(() => showNotice('Vĩnh Dạ không dùng Prime; đơn vị đã bị giới hạn theo tier map'));
       const getStructureMaxHp = (structure) => (getStructureLevelStat(structure.type, structure.level, structure.type === 'crystalSeal' ? structure.baseBranchLv3 : structure.branchLv3, structure.branchLv5, structure.element).hp
           + (structureRuntimes.get(structure.siteId)?.linkedMaxHpBonus ?? 0));
       const ensureStructureRuntime = (structure) => {
@@ -39848,6 +39963,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               nightIndexText.textContent = String(simulationState.nightIndex);
           if (waveThreatBudgetText)
               waveThreatBudgetText.textContent = simulationState.dayNightPhase === 'night' ? simulationState.waveThreatBudgetRemaining.toFixed(1) : 'clear';
+          renderMerchant();
           if (phaseTimeRemainingText) {
               const totalSeconds = Math.max(0, Math.ceil(simulationState.phaseRemainingSeconds));
               const minutes = Math.floor(totalSeconds / 60);
@@ -39947,6 +40063,12 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           addActionNode('branch-lv3-shock', 'Phản chấn');
           addActionNode('base-branch-lv3-defense', 'Base phòng thủ');
           addActionNode('base-branch-lv3-attack', 'Base tấn công');
+          addActionNode('anti-air-lv3-quality', 'Chất');
+          addActionNode('anti-air-lv3-quantity', 'Lượng');
+          addActionNode('anti-air-lv5-rapidFire', 'Liên Thanh');
+          addActionNode('anti-air-lv5-dragonSlayer', 'Đồ Long');
+          addActionNode('gravity-lv4-godSlayer', 'Diệt Thần');
+          addActionNode('gravity-lv4-clearField', 'Thanh Tràng');
           addActionNode('branch-lv5-biochemical', 'Sinh hoá');
           addActionNode('branch-lv5-curse', 'Nguyền rủa');
           addActionNode('branch-lv5-link', 'Liên kết');
@@ -39972,11 +40094,14 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const action = node.dataset.action;
               const isUpgradeNode = action === 'upgrade';
               const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
-              const branch = action?.startsWith('branch-lv3-') ? action.slice('branch-lv3-'.length) : action?.startsWith('base-branch-lv3-') ? action.slice('base-branch-lv3-'.length) : action?.startsWith('branch-lv5-') ? action.slice('branch-lv5-'.length) : undefined;
+              const branch = action?.startsWith('branch-lv3-') ? action.slice('branch-lv3-'.length) : action?.startsWith('base-branch-lv3-') ? action.slice('base-branch-lv3-'.length) : action?.startsWith('branch-lv5-') ? action.slice('branch-lv5-'.length) : action?.startsWith('anti-air-lv3-') ? action.slice('anti-air-lv3-'.length) : action?.startsWith('anti-air-lv5-') ? action.slice('anti-air-lv5-'.length) : action?.startsWith('gravity-lv4-') ? action.slice('gravity-lv4-'.length) : undefined;
               const cost = structure ? getCostFor(structure.type, nextLevel, branch) : type ? getCostFor(type, 1) : [];
               const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
               const isBaseLv3Branch = structure?.type === 'crystalSeal' && structure.level === 2 && action?.startsWith('base-branch-lv3-');
               const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
+              const isAntiAirLv3Branch = structure?.type === 'antiAirCannon' && structure.level === 2 && action?.startsWith('anti-air-lv3-');
+              const isAntiAirLv5Branch = structure?.type === 'antiAirCannon' && structure.level === 4 && action?.startsWith('anti-air-lv5-');
+              const isGravityLv4Branch = structure?.type === 'gravityCannon' && structure.level === 3 && action?.startsWith('gravity-lv4-');
               const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
               const canToggleGravity = structure?.type === 'gravityCannon' && structure.level >= 6 && action === 'toggle-gravity';
               const canBuildElement = !structure && action?.startsWith('build-element-') && isStructureAllowedOnBuildSite('elementalTower', site);
@@ -39986,9 +40111,9 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const canShowTeleport = structure?.type === 'teleport' && action === 'activate-teleport';
               node.hidden = structure
                   ? (isUpgradeNode
-                      ? structure.level >= 6 || (structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal')) || (structure.level === 4 && structure.type === 'wall')
+                      ? structure.level >= 6 || (structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal' || structure.type === 'antiAirCannon')) || (structure.level === 4 && (structure.type === 'wall' || structure.type === 'antiAirCannon')) || (structure.level === 3 && structure.type === 'gravityCannon')
                       : action
-                          ? !(isLv3Branch || isBaseLv3Branch || isLv5Branch || canToggleGravity || canBuildElement || canMountElement || canCycleElement || canShowTeleport)
+                          ? !(isLv3Branch || isBaseLv3Branch || isLv5Branch || isAntiAirLv3Branch || isAntiAirLv5Branch || isGravityLv4Branch || canToggleGravity || canBuildElement || canMountElement || canCycleElement || canShowTeleport)
                           : !canMount)
                   : isUpgradeNode || (Boolean(action) && !canBuildElement) || (!action && (!type || type === 'elementalTower' || !isStructureAllowedOnBuildSite(type, site)));
               const buildElement = action?.startsWith('build-element-') ? action.slice('build-element-'.length) : undefined;
@@ -40152,6 +40277,17 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           set condensedHnt(value) { condensedHnt = value ?? 0; bloodSealStone = condensedHnt; },
           get baseEnergyShortage() { return baseEnergyShortage; },
           set baseEnergyShortage(value) { baseEnergyShortage = Boolean(value); },
+          harvestRate,
+          get merchantDayIndex() { return merchantDayIndex; },
+          set merchantDayIndex(value) { merchantDayIndex = value ?? 0; },
+          get nextMerchantRollDay() { return nextMerchantRollDay; },
+          set nextMerchantRollDay(value) { nextMerchantRollDay = value ?? 3; },
+          get merchantPresent() { return merchantPresent; },
+          set merchantPresent(value) { merchantPresent = Boolean(value); },
+          get merchantOpen() { return merchantOpen; },
+          set merchantOpen(value) { merchantOpen = Boolean(value); },
+          get merchantStock() { return merchantStock; },
+          set merchantStock(value) { merchantStock = value ?? []; },
           droppedResources,
           nextDroppedResourceId,
           lootRng,
@@ -40228,6 +40364,11 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           condensedHnt = simulationState.condensedHnt ?? condensedHnt;
           bloodSealStone = condensedHnt || simulationState.bloodSealStone;
           baseEnergyShortage = Boolean(simulationState.baseEnergyShortage);
+          merchantDayIndex = simulationState.merchantDayIndex ?? merchantDayIndex;
+          nextMerchantRollDay = simulationState.nextMerchantRollDay ?? nextMerchantRollDay;
+          merchantPresent = Boolean(simulationState.merchantPresent);
+          merchantOpen = Boolean(simulationState.merchantOpen);
+          merchantStock = simulationState.merchantStock ?? merchantStock;
       };
       const spawnWaveEnemy = (side) => { runtimeSpawnWaveEnemy(simulationContext, side); syncSimulationState(); };
       const removeEnemyAt = (index, reward) => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };
@@ -40258,6 +40399,50 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               showNotice('Chưa đủ điều kiện hộ tống');
           syncSimulationState();
       });
+      merchantToggle?.addEventListener('click', () => {
+          if (!merchantPresent || dayNightPhase !== 'day') {
+              showNotice('Thương nhân chỉ giao dịch ban ngày');
+              return;
+          }
+          simulationState.merchantOpen = !simulationState.merchantOpen;
+          syncSimulationState();
+          renderMerchant();
+      });
+      merchantPanel?.addEventListener('click', (event) => {
+          const target = event.target instanceof Element ? event.target.closest('[data-merchant-offer]') : null;
+          const offerId = target?.dataset.merchantOffer;
+          if (offerId)
+              buyMerchantOffer(offerId);
+      });
+      const renderMerchant = () => {
+          if (merchantToggle) {
+              merchantToggle.hidden = !merchantPresent;
+              merchantToggle.textContent = merchantOpen ? 'Đóng thương nhân' : 'Thương nhân';
+          }
+          if (!merchantPanel)
+              return;
+          merchantPanel.hidden = !merchantOpen || !merchantPresent;
+          if (merchantPanel.hidden)
+              return;
+          merchantPanel.innerHTML = merchantStock.map(offer => `<button class="vinh-da-game__merchant-offer" data-merchant-offer="${offer.id}" ${offer.stock <= 0 ? 'disabled' : ''}>${offer.label} · ${offer.price.amount} ${offer.price.currency} · còn ${offer.stock}</button>`).join('');
+      };
+      const buyMerchantOffer = (offerId) => {
+          const offer = merchantStock.find(item => item.id === offerId);
+          if (!offer || offer.stock <= 0)
+              return;
+          const priceHnt = getMerchantPriceInHnt(offer.price);
+          if ((condensedHnt || bloodSealStone) < priceHnt) {
+              showNotice('Không đủ Nguyên Tinh cứng');
+              return;
+          }
+          condensedHnt = Math.max(0, (condensedHnt || bloodSealStone) - priceHnt);
+          bloodSealStone = condensedHnt;
+          for (const resource of offer.resources)
+              addTieredAmount(baseStoredResources, resource);
+          offer.stock -= 1;
+          renderEconomy();
+          renderMerchant();
+      };
       function renderDroppedResources() {
           if (!droppedResourcesContainer)
               return;
@@ -40392,6 +40577,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
           if (now - lastFrameTime < minFrameMs)
               return;
           const dt = Math.min(0.05, (now - lastTime) / 1000);
+          const simulationDt = merchantOpen ? dt * 0.5 : dt;
           lastTime = now;
           lastFrameTime = now;
           const left = keys.has('arrowleft') || keys.has('a');
@@ -40403,11 +40589,11 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               ? keyboardDirection * LEADER_SPEED * dt
               : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
           leaderX = clampLeaderX(leaderX);
-          updateDayNightTimer(dt);
-          updateWeatherScheduler(dt);
+          updateDayNightTimer(simulationDt);
+          updateWeatherScheduler(simulationDt);
           renderWeather();
-          updateEnemies(dt);
-          updateStructures(dt);
+          updateEnemies(simulationDt);
+          updateStructures(simulationDt);
           collectDroppedResources();
           updateCamera();
           renderEnemies();
@@ -40438,7 +40624,7 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
               const action = buildNode.dataset.action;
               if (site && structure && action) {
                   const nextLevel = structure.level + 1;
-                  if (action === 'upgrade' && structure.level < 6 && !(structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal')) && !(structure.level === 4 && structure.type === 'wall') && spend(getCostFor(structure.type, nextLevel))) {
+                  if (action === 'upgrade' && structure.level < 6 && !(structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal' || structure.type === 'antiAirCannon')) && !(structure.level === 4 && (structure.type === 'wall' || structure.type === 'antiAirCannon')) && !(structure.level === 3 && structure.type === 'gravityCannon') && spend(getCostFor(structure.type, nextLevel))) {
                       const upgraded = { ...structure, level: nextLevel };
                       setStructure(upgraded);
                       const runtime = ensureStructureRuntime(upgraded);
@@ -40453,6 +40639,24 @@ __modules['./screens/vinh-da/gameplay.ts'] = (exports, module, __require) => {
                   }
                   else if (structure.type === 'crystalSeal' && structure.level === 2 && action.startsWith('base-branch-lv3-') && spend(getCostFor(structure.type, 3, action.slice('base-branch-lv3-'.length)))) {
                       const upgraded = { ...structure, level: 3, baseBranchLv3: action.slice('base-branch-lv3-'.length) };
+                      setStructure(upgraded);
+                      ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+                      renderBuildSite(site.id);
+                  }
+                  else if (structure.type === 'antiAirCannon' && structure.level === 2 && action.startsWith('anti-air-lv3-') && spend(getCostFor(structure.type, 3, action.slice('anti-air-lv3-'.length)))) {
+                      const upgraded = { ...structure, level: 3, branchLv3: action.slice('anti-air-lv3-'.length) };
+                      setStructure(upgraded);
+                      ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+                      renderBuildSite(site.id);
+                  }
+                  else if (structure.type === 'antiAirCannon' && structure.level === 4 && action.startsWith('anti-air-lv5-') && spend(getCostFor(structure.type, 5, action.slice('anti-air-lv5-'.length)))) {
+                      const upgraded = { ...structure, level: 5, branchLv5: action.slice('anti-air-lv5-'.length) };
+                      setStructure(upgraded);
+                      ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+                      renderBuildSite(site.id);
+                  }
+                  else if (structure.type === 'gravityCannon' && structure.level === 3 && action.startsWith('gravity-lv4-') && spend(getCostFor(structure.type, 4, action.slice('gravity-lv4-'.length)))) {
+                      const upgraded = { ...structure, level: 4, branchLv3: action.slice('gravity-lv4-'.length) };
                       setStructure(upgraded);
                       ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
                       renderBuildSite(site.id);
@@ -40705,12 +40909,18 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const BASE_STRUCTURE_STATS = __dep5.BASE_STRUCTURE_STATS;
   const getBaseLevelStat = __dep5.getBaseLevelStat;
   const getStructureLevelStat = __dep5.getStructureLevelStat;
+  const metersToWorldUnits = __dep5.metersToWorldUnits;
   const __dep6 = __require('./screens/vinh-da/map-modules.ts');
   const pickModuleOutcome = __dep6.pickModuleOutcome;
   const __dep7 = __require('./screens/vinh-da/economy/conversion.ts');
   const getLiquidHntValue = __dep7.getLiquidHntValue;
-  const __dep8 = __require('./screens/vinh-da/economy/dropTables.ts');
-  const rollEnemyResourceDrops = __dep8.rollEnemyResourceDrops;
+  const __dep8 = __require('./screens/vinh-da/economy/merchant.ts');
+  const createVinhDaMerchantStock = __dep8.createVinhDaMerchantStock;
+  const rollVinhDaMerchantPresence = __dep8.rollVinhDaMerchantPresence;
+  const __dep9 = __require('./screens/vinh-da/economy/settlement.ts');
+  const settleVinhDaMapEconomy = __dep9.settleVinhDaMapEconomy;
+  const __dep10 = __require('./screens/vinh-da/economy/dropTables.ts');
+  const rollEnemyResourceDrops = __dep10.rollEnemyResourceDrops;
   const DAY_DURATION_SECONDS = 300;
   const RESOURCE_PICKUP_RANGE = 54;
   const RESOURCE_DEPOSIT_RANGE = 90;
@@ -40755,6 +40965,22 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               return choice.kind;
       }
       return choices[choices.length - 1]?.kind ?? null;
+  };
+  const settleCompletedVinhDaMap = (ctx) => {
+      const result = settleVinhDaMapEconomy({
+          liquidHntRemaining: ctx.state.baseLiquidHnt ?? 0,
+          directResources: ctx.state.carriedResources ?? [],
+          harvestRate: ctx.state.harvestRate ?? 1
+      });
+      ctx.state.condensedHnt = Math.max(0, ctx.state.condensedHnt ?? ctx.state.bloodSealStone) + result.totalCondensedHnt;
+      ctx.state.bloodSealStone = ctx.state.condensedHnt;
+      ctx.state.baseLiquidHnt = 0;
+      if (ctx.state.carriedResources)
+          ctx.state.carriedResources.length = 0;
+      ctx.state.carriedDaThach = 0;
+      ctx.state.baseStoredResources = [...(ctx.state.baseStoredResources ?? []), ...result.keptResources];
+      ctx.renderEconomy();
+      return result;
   };
   const getBaseX = (state) => (Number.isFinite(state.baseX) ? state.baseX : CRYSTAL_X);
   const getCurrentSealPointX = (state) => ESCORT_SEAL_POINTS[state.escortSealIndex ?? 0] ?? null;
@@ -41097,6 +41323,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           ctx.state.teleportActive = true;
           ctx.state.teleportRetreatReason = 'map-module-complete';
           ctx.state.teleportedToSealedOldMap = true;
+          settleCompletedVinhDaMap(ctx);
           ctx.renderEconomy();
           return { ok: true, resources: [], spawnedEnemies: [], notice: 'Truyền Tống Trận hoàn thành map và kết toán tài nguyên.' };
       }
@@ -41888,6 +42115,17 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           spawnEnemy(ctx, (ctx.state.nextEnemyId + i) % 2 === 0 ? 'left' : 'right', 'apostle', undefined, true);
       }
   };
+  const rollVinhDaMerchantForDay = (ctx) => {
+      const dayIndex = ctx.state.merchantDayIndex ?? 0;
+      const nextRollDay = ctx.state.nextMerchantRollDay ?? 3;
+      ctx.state.merchantPresent = false;
+      ctx.state.merchantOpen = false;
+      if (dayIndex < nextRollDay)
+          return;
+      ctx.state.nextMerchantRollDay = nextRollDay + 3;
+      ctx.state.merchantPresent = rollVinhDaMerchantPresence(ctx.state.dayNightPhase, () => nextRngValue(ctx.state.lootRng));
+      ctx.state.merchantStock = ctx.state.merchantPresent ? createVinhDaMerchantStock(ctx.state.mapTier, () => nextRngValue(ctx.state.lootRng)) : [];
+  };
   const updateDayNightTimer = (ctx, dt) => {
       if (ctx.state.dayNightPhase === 'escort') {
           updateEscortMovement(ctx, dt);
@@ -41899,11 +42137,15 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           ctx.state.phaseRemainingSeconds += DAY_DURATION_SECONDS;
           ctx.state.dayNightPhase = ctx.state.dayNightPhase === 'night' ? 'day' : 'night';
           if (ctx.state.dayNightPhase === 'day') {
+              ctx.state.merchantDayIndex = (ctx.state.merchantDayIndex ?? 0) + 1;
               clearEnemiesWithoutReward(ctx);
               applyBaseBuffDailyUpkeep(ctx);
               convertContaminationToApostles(ctx);
+              rollVinhDaMerchantForDay(ctx);
           }
           else {
+              ctx.state.merchantPresent = false;
+              ctx.state.merchantOpen = false;
               ctx.state.nightIndex += 1;
               const waveConfig = getVinhDaWaveConfig(ctx.state.nightIndex, ctx.state.mapTier);
               ctx.state.waveThreatBudgetRemaining = getScaledThreatBudget(waveConfig.threatBudget, ctx.state.nightIndex);
@@ -42008,13 +42250,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const updateAntiAirCannon = (ctx, structure, site, runtime, dt) => {
       if (structure.type !== 'antiAirCannon')
           return;
-      const stat = getStructureLevelStat('antiAirCannon', structure.level);
+      const stat = getStructureLevelStat('antiAirCannon', structure.level, structure.branchLv3, structure.branchLv5);
       runtime.cooldown = Math.max(0, runtime.cooldown - dt);
       if ((runtime.burstShotsRemaining ?? 0) <= 0 && runtime.cooldown <= 0)
           runtime.burstShotsRemaining = stat.burstShotCount ?? 1;
       if (runtime.cooldown > 0 || (runtime.burstShotsRemaining ?? 0) <= 0)
           return;
-      const target = ctx.state.enemies.find(enemy => (structure.level >= 6 || enemy.canFly) && Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
+      const target = ctx.state.enemies.find(enemy => (stat.affectsGroundAtLv6 || enemy.canFly) && Math.abs(enemy.x - site.x) <= (stat.range ?? 0));
       if (!target)
           return;
       runtime.burstShotsRemaining = Math.max(0, (runtime.burstShotsRemaining ?? 1) - 1);
@@ -42031,7 +42273,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   const updateGravityCannon = (ctx, structure, site, runtime, dt) => {
       if (structure.type !== 'gravityCannon')
           return;
-      const stat = getStructureLevelStat('gravityCannon', structure.level);
+      const stat = getStructureLevelStat('gravityCannon', structure.level, structure.branchLv3);
       runtime.cooldown = Math.max(0, runtime.cooldown - dt);
       if (structure.level >= 6 && runtime.gravityEnabled === undefined)
           runtime.gravityEnabled = true;
@@ -42039,17 +42281,37 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
           return;
       if (runtime.cooldown > 0)
           return;
-      const center = ctx.state.enemies.find(enemy => Math.abs(enemy.x - site.x) <= (stat.range ?? 0) && enemy.weight <= (stat.maxAffectedWeight ?? 0))?.x;
-      if (center === undefined)
+      const minWeight = stat.minAffectedWeight ?? 0;
+      const maxWeight = stat.maxAffectedWeight ?? 0;
+      const triggerRadius = stat.triggerRadius ?? stat.range ?? 0;
+      const center = ctx.state.enemies.find(enemy => !enemy.canFly && enemy.weight >= minWeight && enemy.weight <= maxWeight && Math.abs(enemy.x - site.x) <= triggerRadius)?.x;
+      if (center === undefined) {
+          runtime.gravityChargeSeconds = 0;
           return;
-      for (const enemy of ctx.state.enemies) {
-          if (enemy.weight > (stat.maxAffectedWeight ?? 0) || Math.abs(enemy.x - center) > (stat.pullRadius ?? 0))
+      }
+      const needsCharge = structure.branchLv3 === 'clearField' && structure.level >= 4;
+      if (needsCharge) {
+          runtime.gravityChargeSeconds = (runtime.gravityChargeSeconds ?? 0) + dt;
+          if (runtime.gravityChargeSeconds < (stat.chargeSeconds ?? 10))
+              return;
+      }
+      for (const enemy of [...ctx.state.enemies]) {
+          if (enemy.canFly || enemy.weight < minWeight || enemy.weight > maxWeight || Math.abs(enemy.x - center) > (stat.pullRadius ?? 0))
               continue;
-          enemy.x += (center - enemy.x) * Math.min(1, (stat.pullStrength ?? 0) / Math.max(1, Math.abs(center - enemy.x)) * dt);
+          const isBoss = enemy.kind === 'resentfulDragon' || enemy.kind === 'fleshRemnant' || enemy.ultimate === 'dragon-rage';
+          const effectMultiplier = isBoss ? (stat.bossEffectMultiplier ?? 1) : 1;
+          hitStructureTarget(ctx, enemy, enemy.maxHp * (stat.damageMaxHpPercent ?? 0) * effectMultiplier, 1);
+          if (enemy.hp <= 0)
+              continue;
+          const direction = enemy.x >= site.x ? 1 : -1;
+          const launchDistance = Math.min(stat.maxLaunchDistance ?? 0, (stat.launchSpeed ?? 0) * (stat.pullDurationSeconds ?? 1));
+          const bossClamp = isBoss ? metersToWorldUnits(25) : launchDistance;
+          enemy.x += direction * Math.min(launchDistance, bossClamp) * effectMultiplier;
           const statuses = ensureStatuses(enemy);
           statuses.slowSeconds = Math.max(statuses.slowSeconds ?? 0, 1);
           statuses.slowMultiplier = Math.min(statuses.slowMultiplier ?? 1, 0.65);
       }
+      runtime.gravityChargeSeconds = 0;
       runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
   };
   const updateBaseSupport = (ctx, dt) => {
@@ -42107,10 +42369,13 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   };
   const BARRACKS_RANK_POWER = { N: 1, R: 2, SR: 3, SSR: 4, UR: 5 };
   const BARRACKS_RANKS = ['N', 'R', 'SR', 'SSR', 'UR'];
-  const getMapCappedBarracksRank = (rank, mapTier) => {
-      const cap = mapTier >= 1.3 ? 'UR' : mapTier >= 1.2 ? 'SSR' : mapTier >= 1.1 ? 'SR' : 'R';
-      return BARRACKS_RANKS[Math.min(BARRACKS_RANK_POWER[rank], BARRACKS_RANK_POWER[cap]) - 1] ?? 'N';
+  const getVinhDaMapRankCap = (mapTier) => mapTier >= 1.3 ? 'UR' : mapTier >= 1.2 ? 'SSR' : mapTier >= 1.1 ? 'SR' : 'R';
+  const normalizeVinhDaCollectionRank = (rank, mapTier) => {
+      const safeRank = rank === 'Prime' ? 'UR' : rank;
+      const cap = getVinhDaMapRankCap(mapTier);
+      return BARRACKS_RANKS[Math.min(BARRACKS_RANK_POWER[safeRank], BARRACKS_RANK_POWER[cap]) - 1] ?? 'N';
   };
+  const getMapCappedBarracksRank = normalizeVinhDaCollectionRank;
   const updateBarracks = (ctx, structure, runtime, dt) => {
       if (structure.type !== 'barracks')
           return;
@@ -42188,6 +42453,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
               const targets = getStructureTargetsInRange(ctx, site, stat);
               if (targets.length <= 0)
                   continue;
+              runtime.gravityChargeSeconds = 0;
               runtime.cooldown = stat.cooldownSeconds ?? DEFAULT_STRUCTURE_COOLDOWN;
               const explosionHitIds = new Set(targets.map(target => target.id));
               for (const target of targets) {
@@ -42244,6 +42510,7 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'ESCORT_SEAL_REACH_RANGE')) exports.ESCORT_SEAL_REACH_RANGE = ESCORT_SEAL_REACH_RANGE;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getScaledThreatBudget')) exports.getScaledThreatBudget = getScaledThreatBudget;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getVinhDaWaveConfig')) exports.getVinhDaWaveConfig = getVinhDaWaveConfig;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'settleCompletedVinhDaMap')) exports.settleCompletedVinhDaMap = settleCompletedVinhDaMap;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBaseX')) exports.getBaseX = getBaseX;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCurrentSealPointX')) exports.getCurrentSealPointX = getCurrentSealPointX;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canStartEscort')) exports.canStartEscort = canStartEscort;
@@ -42279,11 +42546,14 @@ __modules['./screens/vinh-da/simulation.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'explodeLandmine')) exports.explodeLandmine = explodeLandmine;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyElementalRegionEnemyEffect')) exports.applyElementalRegionEnemyEffect = applyElementalRegionEnemyEffect;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateEnemies')) exports.updateEnemies = updateEnemies;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'rollVinhDaMerchantForDay')) exports.rollVinhDaMerchantForDay = rollVinhDaMerchantForDay;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateDayNightTimer')) exports.updateDayNightTimer = updateDayNightTimer;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateStructureRuntimeTimers')) exports.updateStructureRuntimeTimers = updateStructureRuntimeTimers;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateWallLink')) exports.updateWallLink = updateWallLink;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateWallRegeneration')) exports.updateWallRegeneration = updateWallRegeneration;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateBiochemicalWall')) exports.updateBiochemicalWall = updateBiochemicalWall;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getVinhDaMapRankCap')) exports.getVinhDaMapRankCap = getVinhDaMapRankCap;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeVinhDaCollectionRank')) exports.normalizeVinhDaCollectionRank = normalizeVinhDaCollectionRank;
   if (!Object.prototype.hasOwnProperty.call(exports, 'updateStructures')) exports.updateStructures = updateStructures;
 };
 __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
@@ -42345,8 +42615,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       elementalTower: { 1: cost(c('blackIron', 5), c('darkStone', 3), c('elementStone', 1)), 2: cost(c('blackIron', 5), c('darkStone', 4), c('elementStone', 1)), 3: cost(c('blackIron', 8), c('darkStone', 5), c('elementStone', 2), c('blackBone', 1)), 4: cost(c('blackIron', 10), c('darkStone', 7), c('elementStone', 2), c('blackBone', 2), c('mageStaff', 1)), 5: cost(c('blackIron', 12), c('darkStone', 9), c('elementStone', 3), c('blackBone', 3), c('mageStaff', 2), c('mindStone', 1)) },
       barracks: { 1: cost(c('blackIron', 8), c('spiritWood', 4), c('darkStone', 2)), 2: cost(c('blackIron', 8), c('spiritWood', 4), c('blackBone', 2)), 3: cost(c('blackIron', 12), c('spiritWood', 6), c('blackBone', 4)), 4: cost(c('blackIron', 16), c('spiritWood', 8), c('blackBone', 6), c('mindStone', 1)), 5: cost(c('blackIron', 20), c('spiritWood', 10), c('blackBone', 8), c('mindStone', 2), c('fleshCrystal', 1)), 6: cost(c('blackIron', 24), c('spiritWood', 12), c('blackBone', 10), c('mindStone', 2), c('nightCore', 1)) },
       church: { 1: cost(c('blackIron', 4), c('darkStone', 4), c('wishStone', 1)), 2: cost(c('blackIron', 6), c('darkStone', 5), c('wishStone', 1), c('blackBone', 1)), 3: cost(c('blackIron', 8), c('darkStone', 6), c('wishStone', 2), c('apostleCloak', 1)), 4: cost(c('blackIron', 10), c('darkStone', 8), c('wishStone', 3), c('apostleCloak', 2), c('bloodLordSigil', 1)), 5: cost(c('blackIron', 12), c('darkStone', 10), c('wishStone', 4), c('apostleCloak', 3), c('bloodLordSigil', 2), c('fleshCrystal', 1)) },
-      antiAirCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('machinePart', 1)), 2: cost(c('blackIron', 8), c('darkStone', 5), c('machinePart', 1)), 3: cost(c('blackIron', 12), c('darkStone', 6), c('machinePart', 2), c('mindStone', 1)), 4: cost(c('blackIron', 12), c('darkStone', 8), c('machinePart', 2), c('blackBone', 2)), 5: cost(c('blackIron', 16), c('darkStone', 10), c('machinePart', 3), c('mindStone', 2)), 6: cost(c('blackIron', 24), c('darkStone', 12), c('machinePart', 5), c('dragonScale', 2), c('nightCore', 1)) },
-      gravityCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('heavyWater', 1), c('machinePart', 1)), 2: cost(c('blackIron', 10), c('darkStone', 6), c('heavyWater', 1), c('machinePart', 1)), 3: cost(c('blackIron', 12), c('darkStone', 8), c('heavyWater', 2), c('machinePart', 2)), 4: cost(c('blackIron', 16), c('darkStone', 10), c('heavyWater', 3), c('voidStone', 2), c('dragonScale', 1)), 5: cost(c('blackIron', 18), c('darkStone', 12), c('heavyWater', 3), c('voidStone', 2), c('nightCore', 1)), 6: cost(c('blackIron', 20), c('darkStone', 12), c('heavyWater', 4), c('voidStone', 3), c('nightCore', 2)) },
+      antiAirCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('machinePart', 1)), 2: cost(c('blackIron', 8), c('darkStone', 5), c('machinePart', 1)), 3: { quality: cost(c('blackIron', 12), c('darkStone', 6), c('machinePart', 2), c('mindStone', 1)), quantity: cost(c('blackIron', 10), c('darkStone', 6), c('machinePart', 2)), default: cost(c('blackIron', 12), c('darkStone', 6), c('machinePart', 2), c('mindStone', 1)) }, 4: cost(c('blackIron', 12), c('darkStone', 8), c('machinePart', 2), c('blackBone', 2)), 5: { rapidFire: cost(c('blackIron', 16), c('darkStone', 10), c('machinePart', 3), c('mindStone', 2)), dragonSlayer: cost(c('blackIron', 18), c('darkStone', 10), c('machinePart', 4), c('dragonScale', 1)), default: cost(c('blackIron', 16), c('darkStone', 10), c('machinePart', 3), c('mindStone', 2)) }, 6: cost(c('blackIron', 24), c('darkStone', 12), c('machinePart', 5), c('dragonScale', 2), c('nightCore', 1)) },
+      gravityCannon: { 1: cost(c('blackIron', 8), c('darkStone', 4), c('heavyWater', 1), c('machinePart', 1)), 2: cost(c('blackIron', 10), c('darkStone', 6), c('heavyWater', 1), c('machinePart', 1)), 3: cost(c('blackIron', 12), c('darkStone', 8), c('heavyWater', 2), c('machinePart', 2)), 4: { godSlayer: cost(c('blackIron', 16), c('darkStone', 10), c('heavyWater', 3), c('voidStone', 2), c('dragonScale', 1)), clearField: cost(c('blackIron', 14), c('darkStone', 10), c('heavyWater', 2), c('voidStone', 1), c('machinePart', 2)), default: cost(c('blackIron', 16), c('darkStone', 10), c('heavyWater', 3), c('voidStone', 2), c('dragonScale', 1)) }, 5: cost(c('blackIron', 18), c('darkStone', 12), c('heavyWater', 3), c('voidStone', 2), c('nightCore', 1)), 6: cost(c('blackIron', 20), c('darkStone', 12), c('heavyWater', 4), c('voidStone', 3), c('nightCore', 2)) },
       executionBlade: { 1: cost(c('blackIron', 6), c('darkStone', 4), c('mindStone', 1)), 2: cost(c('blackIron', 8), c('darkStone', 5), c('mindStone', 1)), 3: cost(c('blackIron', 10), c('darkStone', 6), c('mindStone', 1), c('elementStone', 1)), 4: cost(c('blackIron', 12), c('darkStone', 8), c('mindStone', 2), c('blackBone', 2)), 5: cost(c('blackIron', 16), c('darkStone', 10), c('mindStone', 3), c('voidStone', 1)), 6: cost(c('blackIron', 20), c('darkStone', 12), c('mindStone', 4), c('nightCore', 1)) },
       landmine: { 1: cost(c('blackIron', 2), c('darkStone', 1)) },
       swamp: { 1: cost(c('spiritWood', 2), c('heavyWater', 1)) },
@@ -42506,20 +42776,13 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           2: { hp: 1 }
       },
       antiAirCannon: {
-          1: { hp: 8, range: metersToWorldUnits(130), damage: 2, cooldownSeconds: 0.18, reloadSeconds: 2.6, burstShotCount: 3, maxTargets: 1, projectileSpeed: 10 },
-          2: { hp: 12, range: metersToWorldUnits(140), damage: 3, cooldownSeconds: 0.16, reloadSeconds: 2.5, burstShotCount: 3, maxTargets: 1, projectileSpeed: 10 },
-          3: { hp: 16, range: metersToWorldUnits(150), damage: 4, cooldownSeconds: 0.14, reloadSeconds: 2.4, burstShotCount: 4, maxTargets: 1, projectileSpeed: 11 },
-          4: { hp: 22, range: metersToWorldUnits(160), damage: 5, cooldownSeconds: 0.12, reloadSeconds: 2.3, burstShotCount: 4, maxTargets: 1, projectileSpeed: 11 },
-          5: { hp: 30, range: metersToWorldUnits(170), damage: 7, cooldownSeconds: 0.1, reloadSeconds: 2.2, burstShotCount: 5, maxTargets: 1, projectileSpeed: 12 },
-          6: { hp: 40, range: metersToWorldUnits(180), damage: 9, cooldownSeconds: 0.09, reloadSeconds: 2, burstShotCount: 6, maxTargets: 1, projectileSpeed: 12, affectsGroundAtLv6: true }
+          1: { hp: 8, range: metersToWorldUnits(10), damage: 0.7, cooldownSeconds: 1, reloadSeconds: 15, burstShotCount: 5, maxTargets: 1, projectileSpeed: 12 },
+          2: { hp: 12, range: metersToWorldUnits(15), damage: 1.1, cooldownSeconds: 1.2, reloadSeconds: 18, burstShotCount: 6, maxTargets: 1, projectileSpeed: 12 }
       },
       gravityCannon: {
-          1: { hp: 10, range: metersToWorldUnits(115), pullRadius: metersToWorldUnits(55), pullStrength: 70, cooldownSeconds: 4.5, maxAffectedWeight: 1 },
-          2: { hp: 14, range: metersToWorldUnits(125), pullRadius: metersToWorldUnits(60), pullStrength: 85, cooldownSeconds: 4.2, maxAffectedWeight: 1.5 },
-          3: { hp: 20, range: metersToWorldUnits(135), pullRadius: metersToWorldUnits(65), pullStrength: 100, cooldownSeconds: 3.9, maxAffectedWeight: 2 },
-          4: { hp: 28, range: metersToWorldUnits(145), pullRadius: metersToWorldUnits(70), pullStrength: 115, cooldownSeconds: 3.6, maxAffectedWeight: 2.5 },
-          5: { hp: 36, range: metersToWorldUnits(155), pullRadius: metersToWorldUnits(75), pullStrength: 130, cooldownSeconds: 3.3, maxAffectedWeight: 3 },
-          6: { hp: 48, range: metersToWorldUnits(165), pullRadius: metersToWorldUnits(85), pullStrength: 155, cooldownSeconds: 3, maxAffectedWeight: Number.POSITIVE_INFINITY }
+          1: { hp: 10, range: metersToWorldUnits(0.5), triggerRadius: metersToWorldUnits(0.5), pullRadius: metersToWorldUnits(0.5), damageMaxHpPercent: 0.25, pullDurationSeconds: 3, launchSpeed: metersToWorldUnits(10), cooldownSeconds: 15, minAffectedWeight: 1, maxAffectedWeight: 2, maxLaunchDistance: metersToWorldUnits(15) },
+          2: { hp: 14, range: metersToWorldUnits(0.7), triggerRadius: metersToWorldUnits(0.7), pullRadius: metersToWorldUnits(0.7), damageMaxHpPercent: 0.3, pullDurationSeconds: 4, launchSpeed: metersToWorldUnits(15), cooldownSeconds: 10, minAffectedWeight: 1, maxAffectedWeight: 2, maxLaunchDistance: metersToWorldUnits(15) },
+          3: { hp: 20, range: metersToWorldUnits(0.9), triggerRadius: metersToWorldUnits(0.9), pullRadius: metersToWorldUnits(0.9), damageMaxHpPercent: 0.35, pullDurationSeconds: 5, launchSpeed: metersToWorldUnits(20), cooldownSeconds: 10, minAffectedWeight: 1, maxAffectedWeight: 3, maxLaunchDistance: metersToWorldUnits(15) }
       }
   };
   const isOutsideCastleBuildPadding = (x) => (x <= CASTLE_OUTER_LEFT - BUILD_SITE_CASTLE_PADDING
@@ -42685,6 +42948,36 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
       5: getBaseLevelStat(5),
       6: getBaseLevelStat(6)
   };
+  const ANTI_AIR_LV3_STATS = {
+      quality: { hp: 16, range: metersToWorldUnits(20), damage: 2.2, cooldownSeconds: 1.6, reloadSeconds: 24, burstShotCount: 7, maxTargets: 1, projectileSpeed: 12 },
+      quantity: { hp: 16, range: metersToWorldUnits(21), damage: 1.5, cooldownSeconds: 1.3, reloadSeconds: 20, burstShotCount: 5, maxTargets: 1, projectileSpeed: 12 }
+  };
+  const getAntiAirCannonLevelStat = (level, branchLv3 = 'quality', branchLv5 = 'rapidFire') => {
+      if (level <= 2)
+          return GROUND_STRUCTURE_STATS.antiAirCannon[level] ?? GROUND_STRUCTURE_STATS.antiAirCannon[1] ?? { hp: 1 };
+      const lv3 = ANTI_AIR_LV3_STATS[branchLv3];
+      if (level === 3)
+          return lv3;
+      const lv4 = { ...lv3, hp: 22, range: metersToWorldUnits(23), damage: (lv3.damage ?? 0) + 0.3, cooldownSeconds: Math.max(0, (lv3.cooldownSeconds ?? 0) - 0.3), reloadSeconds: Math.max(0, (lv3.reloadSeconds ?? 0) - 5) };
+      if (level === 4)
+          return lv4;
+      const lv5Bonus = branchLv5 === 'dragonSlayer' ? { damage: 3, cooldown: 0.3, reload: 2 } : { damage: 1, cooldown: 1, reload: 5 };
+      const lv5 = { ...lv4, hp: 30, range: metersToWorldUnits(26), damage: (lv4.damage ?? 0) + lv5Bonus.damage, cooldownSeconds: Math.max(0, (lv4.cooldownSeconds ?? 0) - lv5Bonus.cooldown), reloadSeconds: Math.max(0, (lv4.reloadSeconds ?? 0) - lv5Bonus.reload) };
+      if (level === 5)
+          return lv5;
+      return { ...lv5, hp: 40, damage: (lv5.damage ?? 0) + 3, cooldownSeconds: Math.max(0, (lv5.cooldownSeconds ?? 0) - 0.5), reloadSeconds: Math.max(0, (lv5.reloadSeconds ?? 0) - 5), affectsGroundAtLv6: true };
+  };
+  const getGravityCannonLevelStat = (level, branchLv4 = 'godSlayer') => {
+      if (level <= 3)
+          return GROUND_STRUCTURE_STATS.gravityCannon[level] ?? GROUND_STRUCTURE_STATS.gravityCannon[1] ?? { hp: 1 };
+      const lv4 = branchLv4 === 'clearField'
+          ? { hp: 28, range: metersToWorldUnits(0.3), triggerRadius: metersToWorldUnits(0.3), pullRadius: metersToWorldUnits(2), damageMaxHpPercent: 0.35, pullDurationSeconds: 1, chargeSeconds: 10, launchSpeed: metersToWorldUnits(15), cooldownSeconds: 25, minAffectedWeight: 1, maxAffectedWeight: 3, maxLaunchDistance: metersToWorldUnits(35) }
+          : { hp: 28, range: metersToWorldUnits(0.5), triggerRadius: metersToWorldUnits(0.5), pullRadius: metersToWorldUnits(1.2), damageMaxHpPercent: 0.4, pullDurationSeconds: 5, launchSpeed: metersToWorldUnits(15), cooldownSeconds: 35, minAffectedWeight: 4, maxAffectedWeight: 5, maxLaunchDistance: metersToWorldUnits(35), bossEffectMultiplier: 0.4 };
+      if (level === 4)
+          return lv4;
+      const lv5 = { ...lv4, hp: 36, damageMaxHpPercent: (lv4.damageMaxHpPercent ?? 0) + 0.1, cooldownSeconds: Math.max(0, (lv4.cooldownSeconds ?? 0) - 5) };
+      return level === 5 ? lv5 : { ...lv5, hp: 48 };
+  };
   const getElementalTowerLevelStat = (level, element = 'Hỏa') => ELEMENTAL_TOWER_STRUCTURE_STATS[element][level] ?? ELEMENTAL_TOWER_STRUCTURE_STATS[element][1] ?? { hp: 1 };
   const getStructureLevelStat = (type, level, branchLv3, branchLv5, element) => {
       if (type === 'wall')
@@ -42697,6 +42990,10 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
           return getElementalTowerLevelStat(level, element);
       if (type === 'executionBlade')
           return EXECUTION_BLADE_STRUCTURE_STATS[level] ?? EXECUTION_BLADE_STRUCTURE_STATS[1] ?? { hp: 1 };
+      if (type === 'antiAirCannon')
+          return getAntiAirCannonLevelStat(level, branchLv3 === 'quantity' ? 'quantity' : 'quality', branchLv5 === 'dragonSlayer' ? 'dragonSlayer' : 'rapidFire');
+      if (type === 'gravityCannon')
+          return getGravityCannonLevelStat(level, branchLv3 === 'clearField' ? 'clearField' : 'godSlayer');
       return GROUND_STRUCTURE_STATS[type][level] ?? { hp: 1 };
   };
   //# sourceMappingURL=stdin.js.map
@@ -42731,6 +43028,8 @@ __modules['./screens/vinh-da/structures.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_LEVELS')) exports.BASE_LEVELS = BASE_LEVELS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getBaseLevelStat')) exports.getBaseLevelStat = getBaseLevelStat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'BASE_STRUCTURE_STATS')) exports.BASE_STRUCTURE_STATS = BASE_STRUCTURE_STATS;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getAntiAirCannonLevelStat')) exports.getAntiAirCannonLevelStat = getAntiAirCannonLevelStat;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getGravityCannonLevelStat')) exports.getGravityCannonLevelStat = getGravityCannonLevelStat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getElementalTowerLevelStat')) exports.getElementalTowerLevelStat = getElementalTowerLevelStat;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getStructureLevelStat')) exports.getStructureLevelStat = getStructureLevelStat;
 };

@@ -1,4 +1,5 @@
 import { ROSTER, getMetaById } from '../../catalog.ts';
+import type { RosterEntry } from '../../catalog.ts';
 import { ensureStyleTag, mountSection } from '../../ui/dom.ts';
 import type { MainMenuShell } from '../main-menu/types.ts';
 import { getFrameRateCap } from '../../utils/frame-rate.ts';
@@ -38,7 +39,7 @@ import {
   getStructureLevelStat,
   isStructureAllowedOnBuildSite,
 } from './structures.ts';
-import type { BaseBranchLv3, ElementalTowerElement, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
+import type { AntiAirBranchLv3, AntiAirBranchLv5, BaseBranchLv3, ElementalTowerElement, GravityBranchLv4, StructureType, WallBranchLv3, WallBranchLv5 } from './structures.ts';
 import {
   DAY_DURATION_SECONDS,
   getScaledThreatBudget,
@@ -54,6 +55,7 @@ import {
   collectDroppedResources as runtimeCollectDroppedResources,
   resolveMapModuleInteraction,
   activateTeleportRetreat,
+  addTieredAmount,
   canActivateTeleportRetreat,
   TELEPORT_RETREAT_COST,
   TELEPORT_BANKED_RESOURCE_KEEP_RATIO,
@@ -69,6 +71,8 @@ import type { ModuleInteraction, RuntimeMapModule } from './map-modules.ts';
 import type { BuildSite, DroppedResource, ElementalRegion, Enemy, EnemyPortal, PlacedStructure, Side, StructureRuntime, VinhDaStatusCollection } from './types.ts';
 import { getResourceLabel, isTieredVinhDaResource } from './economy/resources.ts';
 import type { TieredAmount, VinhDaResourceId } from './economy/resources.ts';
+import { getMerchantPriceInHnt } from './economy/merchant.ts';
+import type { VinhDaMerchantOffer } from './economy/merchant.ts';
 import {
   createElementalRegionRandom,
   createElementalRegions,
@@ -331,8 +335,18 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const { root, shell = null, params = null } = context;
   ensureStyleTag(STYLE_ID, { css: CSS });
 
-  const leaderId = typeof params?.leaderId === 'string' ? params.leaderId : ROSTER[0]?.id;
-  const leader = leaderId ? getMetaById(leaderId) : null;
+  const requestedLeaderId = typeof params?.leaderId === 'string' ? params.leaderId : ROSTER[0]?.id;
+  const getVinhDaAllowedLeader = (id: string | undefined): { id: string | undefined; leader: RosterEntry | null; capped: boolean } => {
+    const picked = id ? getMetaById(id) : undefined;
+    if (picked?.rank === 'Prime'){
+      const fallback = ROSTER.find(unit => unit.rank !== 'Prime' && unit.rank !== undefined);
+      return { id: fallback?.id, leader: fallback ?? null, capped: true };
+    }
+    return { id, leader: picked ?? null, capped: Boolean(picked && picked.rank && !['N', 'R', 'SR', 'SSR', 'UR'].includes(String(picked.rank))) };
+  };
+  const leaderGuard = getVinhDaAllowedLeader(requestedLeaderId);
+  const leaderId = leaderGuard.id;
+  const leader = leaderGuard.leader;
   const frameCap = getFrameRateCap();
   const minFrameMs = 1000 / frameCap;
   let leaderX = LEADER_START_X;
@@ -351,6 +365,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   let baseLiquidHnt = 0;
   let condensedHnt = 0;
   let baseEnergyShortage = false;
+  const harvestRate = Number.isFinite(Number(params?.harvestRate)) ? Math.max(0, Number(params?.harvestRate)) : 1;
+  let merchantDayIndex = 0;
+  let nextMerchantRollDay = 3;
+  let merchantPresent = false;
+  let merchantOpen = false;
+  let merchantStock: VinhDaMerchantOffer[] = [];
   let baseHp = 20;
   let baseLevel = 0;
   let baseBranchLv3: BaseBranchLv3 | undefined;
@@ -397,6 +417,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
         <div>Phase: <span data-role="day-night-phase"></span></div>
         <div>Đêm: <span data-role="night-index"></span> · Budget: <span data-role="wave-threat-budget"></span></div>
         <div>Còn lại: <span data-role="phase-time-remaining"></span></div>
+        <button class="vinh-da-game__merchant-button" data-role="merchant-toggle" type="button" hidden>Thương nhân</button>
+        <div data-role="merchant-panel" hidden></div>
       </div>
       <div class="vinh-da-game__panel vinh-da-game__panel--status" data-role="status-panel"></div>
       <button class="vinh-da-game__build-node" data-role="escort-start" type="button" title="Mở đường hộ tống">⇢<small>Hộ tống</small></button>
@@ -444,6 +466,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
   const nightIndexText = section.querySelector<HTMLElement>('[data-role="night-index"]');
   const waveThreatBudgetText = section.querySelector<HTMLElement>('[data-role="wave-threat-budget"]');
   const statusPanel = section.querySelector<HTMLElement>('[data-role="status-panel"]');
+  const merchantToggle = section.querySelector<HTMLButtonElement>('[data-role="merchant-toggle"]');
+  const merchantPanel = section.querySelector<HTMLElement>('[data-role="merchant-panel"]');
   const mapTier = getVinhDaMapTier(params);
   const elementalRegions = createElementalRegions(mapTier, createElementalRegionRandom());
   const mapModules = createMapModules({ mapTier, baseX, worldWidth: WORLD_WIDTH, elementalRegions });
@@ -466,6 +490,8 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     if (noticeTimeout) clearTimeout(noticeTimeout);
     noticeTimeout = setTimeout(() => noticeElement.classList.remove('vinh-da-game__notice--visible'), 1600);
   };
+
+  if (leaderGuard.capped) requestAnimationFrame(() => showNotice('Vĩnh Dạ không dùng Prime; đơn vị đã bị giới hạn theo tier map'));
 
   const getStructureMaxHp = (structure: PlacedStructure): number => (
     getStructureLevelStat(structure.type, structure.level, structure.type === 'crystalSeal' ? structure.baseBranchLv3 : structure.branchLv3, structure.branchLv5, structure.element).hp
@@ -633,6 +659,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     if (dayNightPhaseText) dayNightPhaseText.textContent = simulationState.dayNightPhase === 'night' ? 'Đêm / combat' : simulationState.dayNightPhase === 'escort' ? 'Hộ tống' : 'Ngày';
     if (nightIndexText) nightIndexText.textContent = String(simulationState.nightIndex);
     if (waveThreatBudgetText) waveThreatBudgetText.textContent = simulationState.dayNightPhase === 'night' ? simulationState.waveThreatBudgetRemaining.toFixed(1) : 'clear';
+    renderMerchant();
     if (phaseTimeRemainingText){
       const totalSeconds = Math.max(0, Math.ceil(simulationState.phaseRemainingSeconds));
       const minutes = Math.floor(totalSeconds / 60);
@@ -727,6 +754,12 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     addActionNode('branch-lv3-shock', 'Phản chấn');
     addActionNode('base-branch-lv3-defense', 'Base phòng thủ');
     addActionNode('base-branch-lv3-attack', 'Base tấn công');
+    addActionNode('anti-air-lv3-quality', 'Chất');
+    addActionNode('anti-air-lv3-quantity', 'Lượng');
+    addActionNode('anti-air-lv5-rapidFire', 'Liên Thanh');
+    addActionNode('anti-air-lv5-dragonSlayer', 'Đồ Long');
+    addActionNode('gravity-lv4-godSlayer', 'Diệt Thần');
+    addActionNode('gravity-lv4-clearField', 'Thanh Tràng');
     addActionNode('branch-lv5-biochemical', 'Sinh hoá');
     addActionNode('branch-lv5-curse', 'Nguyền rủa');
     addActionNode('branch-lv5-link', 'Liên kết');
@@ -751,11 +784,14 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const action = node.dataset.action;
       const isUpgradeNode = action === 'upgrade';
       const nextLevel = structure ? Math.min(structure.level + 1, 6) : 1;
-      const branch = action?.startsWith('branch-lv3-') ? action.slice('branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('base-branch-lv3-') ? action.slice('base-branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('branch-lv5-') ? action.slice('branch-lv5-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : undefined;
+      const branch = action?.startsWith('branch-lv3-') ? action.slice('branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('base-branch-lv3-') ? action.slice('base-branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('branch-lv5-') ? action.slice('branch-lv5-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('anti-air-lv3-') ? action.slice('anti-air-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('anti-air-lv5-') ? action.slice('anti-air-lv5-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : action?.startsWith('gravity-lv4-') ? action.slice('gravity-lv4-'.length) as Parameters<typeof getStructureUpgradeCost>[2] : undefined;
       const cost = structure ? getCostFor(structure.type, nextLevel, branch) : type ? getCostFor(type, 1) : [];
       const isLv3Branch = structure?.type === 'wall' && structure.level === 2 && action?.startsWith('branch-lv3-');
       const isBaseLv3Branch = structure?.type === 'crystalSeal' && structure.level === 2 && action?.startsWith('base-branch-lv3-');
       const isLv5Branch = structure?.type === 'wall' && structure.level === 4 && action?.startsWith('branch-lv5-');
+      const isAntiAirLv3Branch = structure?.type === 'antiAirCannon' && structure.level === 2 && action?.startsWith('anti-air-lv3-');
+      const isAntiAirLv5Branch = structure?.type === 'antiAirCannon' && structure.level === 4 && action?.startsWith('anti-air-lv5-');
+      const isGravityLv4Branch = structure?.type === 'gravityCannon' && structure.level === 3 && action?.startsWith('gravity-lv4-');
       const canMount = structure?.type === 'wall' && structure.level >= 6 && !structure.mountedStructure && type !== undefined && type !== 'wall' && isStructureAllowedOnBuildSite(type, { kind: 'rock' });
       const canToggleGravity = structure?.type === 'gravityCannon' && structure.level >= 6 && action === 'toggle-gravity';
       const canBuildElement = !structure && action?.startsWith('build-element-') && isStructureAllowedOnBuildSite('elementalTower', site);
@@ -766,9 +802,9 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       node.hidden = structure
         ? (
             isUpgradeNode
-              ? structure.level >= 6 || (structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal')) || (structure.level === 4 && structure.type === 'wall')
+              ? structure.level >= 6 || (structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal' || structure.type === 'antiAirCannon')) || (structure.level === 4 && (structure.type === 'wall' || structure.type === 'antiAirCannon')) || (structure.level === 3 && structure.type === 'gravityCannon')
               : action
-                ? !(isLv3Branch || isBaseLv3Branch || isLv5Branch || canToggleGravity || canBuildElement || canMountElement || canCycleElement || canShowTeleport)
+                ? !(isLv3Branch || isBaseLv3Branch || isLv5Branch || isAntiAirLv3Branch || isAntiAirLv5Branch || isGravityLv4Branch || canToggleGravity || canBuildElement || canMountElement || canCycleElement || canShowTeleport)
                 : !canMount
           )
         : isUpgradeNode || (Boolean(action) && !canBuildElement) || (!action && (!type || type === 'elementalTower' || !isStructureAllowedOnBuildSite(type, site)));
@@ -916,6 +952,17 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     set condensedHnt(value: number | undefined){ condensedHnt = value ?? 0; bloodSealStone = condensedHnt; },
     get baseEnergyShortage(){ return baseEnergyShortage; },
     set baseEnergyShortage(value: boolean | undefined){ baseEnergyShortage = Boolean(value); },
+    harvestRate,
+    get merchantDayIndex(){ return merchantDayIndex; },
+    set merchantDayIndex(value: number | undefined){ merchantDayIndex = value ?? 0; },
+    get nextMerchantRollDay(){ return nextMerchantRollDay; },
+    set nextMerchantRollDay(value: number | undefined){ nextMerchantRollDay = value ?? 3; },
+    get merchantPresent(){ return merchantPresent; },
+    set merchantPresent(value: boolean | undefined){ merchantPresent = Boolean(value); },
+    get merchantOpen(){ return merchantOpen; },
+    set merchantOpen(value: boolean | undefined){ merchantOpen = Boolean(value); },
+    get merchantStock(){ return merchantStock; },
+    set merchantStock(value: VinhDaMerchantOffer[] | undefined){ merchantStock = value ?? []; },
     droppedResources,
     nextDroppedResourceId,
     lootRng,
@@ -992,6 +1039,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     condensedHnt = simulationState.condensedHnt ?? condensedHnt;
     bloodSealStone = condensedHnt || simulationState.bloodSealStone;
     baseEnergyShortage = Boolean(simulationState.baseEnergyShortage);
+    merchantDayIndex = simulationState.merchantDayIndex ?? merchantDayIndex;
+    nextMerchantRollDay = simulationState.nextMerchantRollDay ?? nextMerchantRollDay;
+    merchantPresent = Boolean(simulationState.merchantPresent);
+    merchantOpen = Boolean(simulationState.merchantOpen);
+    merchantStock = simulationState.merchantStock ?? merchantStock;
   };
   const spawnWaveEnemy = (side: Side): void => { runtimeSpawnWaveEnemy(simulationContext, side); syncSimulationState(); };
   const removeEnemyAt = (index: number, reward: boolean): void => { runtimeRemoveEnemyAt(simulationContext, index, reward); syncSimulationState(); };
@@ -1018,6 +1070,44 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     else showNotice('Chưa đủ điều kiện hộ tống');
     syncSimulationState();
   });
+  merchantToggle?.addEventListener('click', () => {
+    if (!merchantPresent || dayNightPhase !== 'day'){ showNotice('Thương nhân chỉ giao dịch ban ngày'); return; }
+    simulationState.merchantOpen = !simulationState.merchantOpen;
+    syncSimulationState();
+    renderMerchant();
+  });
+  merchantPanel?.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-merchant-offer]') : null;
+    const offerId = target?.dataset.merchantOffer;
+    if (offerId) buyMerchantOffer(offerId);
+  });
+
+  const renderMerchant = (): void => {
+    if (merchantToggle) {
+      merchantToggle.hidden = !merchantPresent;
+      merchantToggle.textContent = merchantOpen ? 'Đóng thương nhân' : 'Thương nhân';
+    }
+    if (!merchantPanel) return;
+    merchantPanel.hidden = !merchantOpen || !merchantPresent;
+    if (merchantPanel.hidden) return;
+    merchantPanel.innerHTML = merchantStock.map(offer => `<button class="vinh-da-game__merchant-offer" data-merchant-offer="${offer.id}" ${offer.stock <= 0 ? 'disabled' : ''}>${offer.label} · ${offer.price.amount} ${offer.price.currency} · còn ${offer.stock}</button>`).join('');
+  };
+
+  const buyMerchantOffer = (offerId: string): void => {
+    const offer = merchantStock.find(item => item.id === offerId);
+    if (!offer || offer.stock <= 0) return;
+    const priceHnt = getMerchantPriceInHnt(offer.price);
+    if ((condensedHnt || bloodSealStone) < priceHnt){
+      showNotice('Không đủ Nguyên Tinh cứng');
+      return;
+    }
+    condensedHnt = Math.max(0, (condensedHnt || bloodSealStone) - priceHnt);
+    bloodSealStone = condensedHnt;
+    for (const resource of offer.resources) addTieredAmount(baseStoredResources, resource);
+    offer.stock -= 1;
+    renderEconomy();
+    renderMerchant();
+  };
 
   function renderDroppedResources(): void {
     if (!droppedResourcesContainer) return;
@@ -1143,6 +1233,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
     rafId = window.requestAnimationFrame(tick);
     if (now - lastFrameTime < minFrameMs) return;
     const dt = Math.min(0.05, (now - lastTime) / 1000);
+    const simulationDt = merchantOpen ? dt * 0.5 : dt;
     lastTime = now;
     lastFrameTime = now;
     const left = keys.has('arrowleft') || keys.has('a');
@@ -1153,11 +1244,11 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       ? keyboardDirection * LEADER_SPEED * dt
       : Math.max(-LEADER_SPEED * dt, Math.min(LEADER_SPEED * dt, targetX - leaderX));
     leaderX = clampLeaderX(leaderX);
-    updateDayNightTimer(dt);
-    updateWeatherScheduler(dt);
+    updateDayNightTimer(simulationDt);
+    updateWeatherScheduler(simulationDt);
     renderWeather();
-    updateEnemies(dt);
-    updateStructures(dt);
+    updateEnemies(simulationDt);
+    updateStructures(simulationDt);
     collectDroppedResources();
     updateCamera();
     renderEnemies();
@@ -1188,7 +1279,7 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
       const action = buildNode.dataset.action;
       if (site && structure && action){
         const nextLevel = structure.level + 1;
-        if (action === 'upgrade' && structure.level < 6 && !(structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal')) && !(structure.level === 4 && structure.type === 'wall') && spend(getCostFor(structure.type, nextLevel))){
+        if (action === 'upgrade' && structure.level < 6 && !(structure.level === 2 && (structure.type === 'wall' || structure.type === 'crystalSeal' || structure.type === 'antiAirCannon')) && !(structure.level === 4 && (structure.type === 'wall' || structure.type === 'antiAirCannon')) && !(structure.level === 3 && structure.type === 'gravityCannon') && spend(getCostFor(structure.type, nextLevel))){
           const upgraded = { ...structure, level: nextLevel };
           setStructure(upgraded);
           const runtime = ensureStructureRuntime(upgraded);
@@ -1201,6 +1292,21 @@ export function renderScreen(context: RenderContext): { destroy: () => void }{
           renderBuildSite(site.id);
           } else if (structure.type === 'crystalSeal' && structure.level === 2 && action.startsWith('base-branch-lv3-') && spend(getCostFor(structure.type, 3, action.slice('base-branch-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2]))){
           const upgraded = { ...structure, level: 3, baseBranchLv3: action.slice('base-branch-lv3-'.length) as BaseBranchLv3 };
+          setStructure(upgraded);
+          ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+          renderBuildSite(site.id);
+          } else if (structure.type === 'antiAirCannon' && structure.level === 2 && action.startsWith('anti-air-lv3-') && spend(getCostFor(structure.type, 3, action.slice('anti-air-lv3-'.length) as Parameters<typeof getStructureUpgradeCost>[2]))){
+          const upgraded = { ...structure, level: 3, branchLv3: action.slice('anti-air-lv3-'.length) as AntiAirBranchLv3 };
+          setStructure(upgraded);
+          ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+          renderBuildSite(site.id);
+          } else if (structure.type === 'antiAirCannon' && structure.level === 4 && action.startsWith('anti-air-lv5-') && spend(getCostFor(structure.type, 5, action.slice('anti-air-lv5-'.length) as Parameters<typeof getStructureUpgradeCost>[2]))){
+          const upgraded = { ...structure, level: 5, branchLv5: action.slice('anti-air-lv5-'.length) as AntiAirBranchLv5 };
+          setStructure(upgraded);
+          ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
+          renderBuildSite(site.id);
+          } else if (structure.type === 'gravityCannon' && structure.level === 3 && action.startsWith('gravity-lv4-') && spend(getCostFor(structure.type, 4, action.slice('gravity-lv4-'.length) as Parameters<typeof getStructureUpgradeCost>[2]))){
+          const upgraded = { ...structure, level: 4, branchLv3: action.slice('gravity-lv4-'.length) as GravityBranchLv4 };
           setStructure(upgraded);
           ensureStructureRuntime(upgraded).hp = getStructureMaxHp(upgraded);
           renderBuildSite(site.id);
