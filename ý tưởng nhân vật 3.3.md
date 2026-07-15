@@ -2,6 +2,7 @@ debuff và buff cũng có thể gắn tag pháp tắc, quy tắc và axiom.
 Sát thương chuẩn là bỏ qua res cùng arm của kẻ địch.
 Pháp Tắc/Quy Tắc/Axiom gọi chung là '3 tag ưu tiên'.
 nếu 1 char có cùng loại buff nhưng khác tag ưu tiên hoặc 1 cái có 1 trong 3 tag ưu tiên còn 1 cái không có thì cần chia riêng dù tác dụng là chung, ví dụ char A có 2 buff excute (kết liễu kẻ thù dưới hoặc =10% mx hp khi gây dam lên chúng) nhưng 1 buff excute là có tag pháp tắc và 1 buff lại không có và lúc đó char B có pháp tắc cấm kết liễu đồng minh của hắn (tức kẻ thù của char A) lúc này cần áp dụng quy trình phán định xung đột tag (so rank, sao, awaken, tu vi, lực chiến này kia, thứ tự không nhớ rõ) và char A thắng thì hắn vẫn có thể kết liễu đồng minh của char B vì buff excute cấp pháp tắc của hắn thắng, nếu kết liễu thành công thì buff excute sẽ biến mất vì đã được sử dụng còn buff excute còn lại vì không có tag pháp tắc hoặc tag nào khác có ưu tiên cao hơn pháp tắc nên buff này không có tác dụng cho đến khi kit cấm kết liễu của char B hết hiệu lực (char B chết, kỹ năng cooldown, hết ae để duy trì,etc...).
+mọi chỉ số: ở đây là đang nhắc đến các chỉ số được scale bởi rank multi, chỉ số không được scale bỏ qua, khi nhắc đến mọi chỉ số mặc định là giải thích này trừ phi mô tả/ngữ cảnh nhắc đến có mô tả đặc biệt thêm hoặc bớt thêm chỉ số nào đó đã có nhưng được hoặc không được scale bởi rank multi.
 
 1) TU LA – ĐỘC CÔ HUYẾT, Class: Chiến Sĩ, thuộc element Huyết
 1. ĐÁNH THƯỜNG: Huyết Trảm
@@ -151,10 +152,10 @@ Mỗi khi nhận sát thương, hắn hấp thụ 10% lượng sát thương đ�
 Khi tấn công, hắn gây thêm Sát thương chuẩn = 5% Max HP hiện tại của bản thân.
 Tag: Nội tại, Pháp Tắc, Tiến hóa vĩnh viễn.
 Đánh thường: Dùng cánh đập mạnh. Gây sát thương = 80% ATK + 80% WIL.
-Hồi phục 4% HP tối đa cho bản thân.
+Hồi phục 2% HP tối đa cho bản thân.
 Tag: Kẻ địch, Đơn mục tiêu, Hồi phục.
 Kỹ năng 1 — Hỗn Loạn Trường (30 Aether):
-Gầm lên một tiếng, làm méo mó không gian xung quanh. Gây sát thương = 120% ATK + 120% WIL lên toàn bộ kẻ địch.
+Gầm lên một tiếng, làm méo mó không gian xung quanh. Gây sát thương = 150% ATK + 150% WIL lên toàn bộ kẻ địch.
 Kẻ địch trúng đòn bị đảo lộn chỉ số: ATK và WIL của chúng bị tráo đổi cho nhau trong 2 turn. (Khắc chế bọn lệch tủ như thuần Kiếm hoặc thuần Phép). Tag: Kẻ địch, Aoe, Debuff đặc biệt. Tương tác với nội tại.
 Ultimate — Quy Tắc: Sự Trở Về Của Hư Không (Auto-cast):
 Hỗn Độn mở ra cái miệng (vốn không tồn tại) và nuốt chửng 1 kẻ địch (Ưu tiên kẻ địch có HP hiện tại thấp nhất).
@@ -237,7 +238,7 @@ Ult: Rễ cây mọc khắp nơi. Trói chân (Root - Không thể di chuyển/�
 
 22) [SSR] Thiên Cơ Tử – Shell.ts (The Architect) Class: Summoner
 drone chỉ là cơ chế, vfx mà không có chỉ số riêng.
-Xuất thân: Nguyên là Đại Trưởng Lão của Thiên Cơ Môn, kẻ đầu tiên nhận ra cơ thể phàm trần giới hạn tốc độ tính toán của "Nguyên Anh". Hắn đã số hóa linh hồn mình, nạp vào một cỗ máy chủ lượng tử.
+Xuất thân: Nguyên là Đại Trưởng Lão của Thiên Cơ Môn, kẻ đầu tiên nhận ra cơ thể phàm trần bị giới hạn tốc độ tính toán. Hắn đã số hóa linh hồn mình, nạp vào một cỗ máy chủ lượng tử.
 Nội tại — Đa Luồng: Ép Xung (Overclocking):
 Mỗi khi Shell.ts kết thúc lượt, hắn triệu hồi 1 [Phi Kiếm Drone] (Tối đa 5 con).
 Cơ chế [Quá Tải - Overheat]: Mỗi con Drone trên sân khiến Shell.ts chịu trạng thái [Nóng Máy]: Mỗi lượt mất 2% HP tối đa cho mỗi con Drone đang có. (Có 5 con = mất 10% HP/turn).
@@ -980,8 +981,362 @@ ultimate: 2 tay nện đầu mục tiêu, gây sát thương= 200% wil + atk, g�
 nội tại: mỗi lần bị tấn công cận chiến, kẻ tấn công bị thiêu đốt, nhận sát thương = 3% max hp + 10% wil/atk của hắn/turn trong 2 turn, trong 2 turn này lượng hồi phục hp nhận được từ nguồn không phải của bản thân kẻ tấn công cũng bị giảm 30%.
 
 71) Viên Chúc
+Summoner, Ur.
 
-nội tại: mỗi lần đánh giết 1 kẻ thù (không tính summon), rút 50% bản nguyên linh hồn của chúng, tạo ra Trành Quỷ. Kẻ bị Viên Chúc giết vẫn có thể hồi sinh (nếu không bị kit của bản thân kẻ đó hoặc kit từ nguồn khác ảnh hưởng), nhưng sau khi hồi sinh kẻ đó chỉ được hưởng 50% mọi chỉ số (trừ rage) vì 50% còn lại do bị viên chúc đánh cắp bản nguyên linh hồn tạo ra Trành Quỷ, nếu trành quỷ chết vì bất kỳ lý do gì, lượng bản nguyên linh hồn sẽ trả về cho kẻ bị đánh cắp, hồi phục chỉ số, nếu A có 100 hp 10 mọi chỉ số thì sau khi bị giết bởi viên chúc, viên chúc cướp 50% bản nguyên linh hồn tạo trành quỷ, A được hồi sinh với 50 hp cùng 5 mọi chỉ số khác, sau đó trành quỷ tương ứng của A bị giết, lúc đó A có 30/50 hp cùng 4 atk, 3 wil (2 chỉ số này giảm do debuff hoặc bị giảm vĩnh viễn,..m từ kit khác) cùng 5 mọi chỉ số khác thì sẽ hồi phục thành 80/100 hp, 9 atk, 8 wil cùng 10 mọi chỉ số khác, lúc này chỉ số wil/atk bị ảnh hưởng có thể sẽ hồi phục hoặc giữ nguyên hoặc tệ hơn từ kit ảnh hưởng 2 chỉ số này của A, kit của viên chúc không can thiệp.
-Trành Quỷ: thừa hưởng 50% chỉ số của kẻ Viên Chúc giết.
+nội tại: mỗi lần đánh giết 1 kẻ thù (không tính summon), rút 50% bản nguyên linh hồn của chúng, tạo ra Trành Quỷ. Kẻ bị Viên Chúc giết vẫn có thể hồi sinh (nếu không bị kit của bản thân kẻ đó hoặc kit từ nguồn khác ảnh hưởng), nhưng sau khi hồi sinh kẻ đó chỉ được hưởng 50% mọi chỉ số (trừ rage) vì 50% còn lại do bị viên chúc đánh cắp bản nguyên linh hồn tạo ra Trành Quỷ, nếu trành quỷ chết vì bất kỳ lý do gì, lượng bản nguyên linh hồn sẽ trả về cho kẻ bị đánh cắp, hồi phục chỉ số, nếu A có 100 hp 10 mọi chỉ số thì sau khi bị giết bởi viên chúc, viên chúc cướp 50% bản nguyên linh hồn tạo trành quỷ, A được hồi sinh với 50 hp cùng 5 mọi chỉ số khác, sau đó trành quỷ tương ứng của A bị giết, lúc đó A có 30/50 hp cùng 4 atk, 3 wil (2 chỉ số này giảm do debuff hoặc bị giảm vĩnh viễn,.. từ kit khác) cùng 5 mọi chỉ số khác thì sẽ hồi phục thành 80/100 hp, 9 atk, 8 wil cùng 10 mọi chỉ số khác, lúc này chỉ số wil/atk bị ảnh hưởng có thể sẽ hồi phục hoặc giữ nguyên hoặc tệ hơn từ kit ảnh hưởng 2 chỉ số này của A, kit của viên chúc không can thiệp.
+Trành Quỷ: thừa hưởng 50% chỉ số của kẻ Viên Chúc giết, tồn tại tối đa 5 turn. cap tối đa 4 trành quỷ tồn tại cùng lúc, nếu trong mode auto đầy ô trên sân, trành quỷ có hp thấp nhất sẽ tự động tử vong (trả chỉ số) và trành quỷ mới sẽ thay thế chỗ đó.
+cả nội tại thuộc tag quy tắc.
 
-ult: đấm mục tiêu, gây sát thương = 2 hp hp của kẻ địch + 200 l% wil/atk của Viên Chúc, sau đó sau lưng kẻ bị đấm xuất hiện âm ảnh (vfx) lao về các mục tiêu sau lưng của kẻ bị đấm (nếu có, nếu không có ai sau lưng kẻ bị đấm vì mục tiêu đứng hàng 7/8/9 thì sẽ không xuất hiện âm ảnh gây sát thương), mỗi kẻ trên đường đi thẳng của âm ảnh nhận sát thương= 100% wil/atk của Viên Chúc.
+skill 1: class ae tạo khi hành động và rage nhận tăng gấp đôi trong 3 turn, trong 3 turn đó cũng nhận sát thương chuẩn = 5% max hp của bản thân, cd 1 turn của bản thân, 25 ae. Quy Tắc.
+
+skill 2: hắn cùng trành quỷ tồn tại trên sân 
+
+ult: đấm mục tiêu, gây sát thương chuẩn = 3% max hp của kẻ địch + 200% wil/atk (phần wil/atk này không có sát thương chuẩn, chỉ phần 3% max hp của kẻ địch là st chuẩn) của Viên Chúc, sau đó sau lưng kẻ bị đấm xuất hiện âm ảnh (vfx) lao về các mục tiêu sau lưng của kẻ bị đấm (nếu có, nếu không có ai sau lưng kẻ bị đấm vì mục tiêu đứng hàng 7/8/9 thì sẽ không xuất hiện âm ảnh gây sát thương), mỗi kẻ trên đường đi thẳng của âm ảnh nhận sát thương = 100% wil/atk của Viên Chúc.
+
+72) Đạo Mộng Dao
+
+Mage, Ur.
+nội tại: Tam Khí Quy Lai: khi vào trận, chia bản thể làm 3, cả 3 đều hưởng chỉ số = nhau, tuân theo logic lượt đánh của từng mode, trong vĩnh dạ sẽ tự hành động theo AI và player có thể hoán đổi bất kỳ 1 trong 3 bản thể đó, khi không điều khiển AI sẽ điều khiển. Khi 1 bản thể chết, 120% mọi chỉ số scale bởi rank multi của bản thể đó chia đều cho 2 bản thể còn lại, mỗi kẻ nhận 60% chỉ số từ bản thể đã chết, khi có thêm 1 bản thể nữa chết đi, bản thể còn sống duy nhất sẽ nhận 120% mọi chỉ số được scale rank multi của kẻ đã chết.
+vậy, 100% chỉ số (mặc định các chỉ số được scale bởi rank mult) của char này ở collection khi vào trận sẽ được chia 3, tạo ra 3 kẻ giống nhau như đúc, để dễ ví dụ, gọi tên chúng là A, B và C, C chết, A và B nhận 60% mọi chỉ số của C, sau đó A hoặc B chết thì kẻ còn sống nhận 120% mọi chỉ số kẻ chết có kể cả nhận được từ C. Trường hợp này chỉ phân biệt kẻ chết đầu tiên và thứ 2 trong 3 kẻ 
+để dễ gọi, gọi kẻ lúc chia làm 3 là Sơ Đại, 3 kẻ khi được chia ra gọi là Nhất Đại.
+
+khi nhất đại đầu tiên trong cả 3 hành động, nhất đại đó tạo ae nhưng 2 nhất đại còn lại sẽ không tạo ae, đến turn của nhất đại đầu tiên lần nữa lại tạo ae và nhâtd đại còn lại sẽ không tạo, nếu nhất đại đầu tiên bị cc cứng không hành động được thì 2 nhất đại còn lại vẫn sẽ không tạo ae.
+nếu nhất đại đầu tiên hành động chết, nhất đại còn lại ai hành động trước sẽ tạo ae, kẻ còn lại không tạo ae, cứ thế lặp lại, giới hạn này để tránh nhân vật này tạo ae quá mức.
+
+Lúc Nhất Đại chết, 2 nhất đại còn lại hưởng chỉ số hiện có lúc Nhất đại chết đang có nên bất kỳ debuff/buff/mark hay hiệu ứng nào ảnh hưởng chỉ số đều có thể ảnh hưởng đến nội tại này.
+Riêng nội tại này cấp Quy Tắc (phần chia 3 lần 1/2/3, hưởng chỉ số và hợp nhất lần 1/2 cùng không thể hồi sinh sau khi chia 3 lần 3).
+Khi hợp nhất thành Sơ đại nhưng sơ đại bị đánh hoàn toàn tử vong, và nếu có thể hồi sinh thình lại kích hoạt nội tại này lần nữa và Sơ đại lúc chia 3 lần thứ 2 cũng sẽ hưởng chỉ số từ lần hợp nhất đầu tiên nên 3 Nhất đại ở lần chia 3 thứ 2 sẽ mạnh hơn lần đầu, sau đó hợp nhất sẽ càng mạnh hơn nữa, khi Sơ đại hợp nhất lần 2 hoàn toàn tử vong, nếu được hồi sinh, cả 3 lại chia 3 và đương nhiên mạnh hơn lần chia 3 thứ 2 nhưng cả 3 không thể hợp nhất và chia chỉ số nữa, khi 1 trong 3 sơ đại ở lần chia thứ 3 chết, họ sẽ chết thật và vĩnh viễn không thêt hồi sinh trong trận đấu đó.
+Vì chia 3 nên lực chiến sẽ yếu; sao, tu vi, awaken giữ nguyên nhưng lực chiến sẽ bị chia 3, vì vậy nội tại của nhân vật cấp quy tắc này khi chia 3 rất dễ bị phán định thua trong xung đột tag, vậy nên Viên Chúc là khắc tinh của nhân vật này, khi bị đánh cắp linh hồn bản nguyên bởi Viên Chúc thì chỉ số của Nhất Đại đã chết sẽ bị chia 2, tức 100% chỉ số của nhất đại chia 2, 50% còn lại thì 2 Nhất đại còn lại mỗi kẻ hưởng 60% của 50% chỉ số còn lại của nhất đại đã chết. Đến khi Nhất đại thứ 2 chết và bị đánh cắp linh hồn bản nguyên bởi Viên chúc thì nhất đại còn lại hưởng 120% chỉ số của 50% còn lại đó, nói chung càng chia càng yếu cũng không sai, trường hợp này gần như 100% đúng vì lực chiến bị chia 3 nên 1 con nhất đại phán định xung đột tag với Viên Chúc là không thể thắng, mà hình như không có xung đột tag nữa, vì nội tại này không có kiểu "linh hồn không thể bị ảnh hưởng " hoặc "chỉ số sau khi nhất đại chết không thể bị giảm" hoặc quy tắc nào đó tương tự, nhưng tao sẽ không thêm, nên trừ phi có 1 char khác có kit bảo vệ linh hồn/chỉ số đồng minh không bị ảnh hưởng sau khi chết và kit của char đó thắng phán định xung đột tag với viên chúc còn không thì chỉ số của nhất đại bị giảm bởi Viên Chúc gần 100%.
+
+thứ tự xử lý code khi gặp viên chúc hoặc case cướp chỉ số/linh hồn bản nguyên tương tự:
+1. Nhất Đại bị Viên Chúc giết.
+2. Nội tại Viên Chúc kích hoạt trước, cướp 50% bản nguyên linh hồn.
+3. Trành Quỷ được tạo từ 50% chỉ số của Nhất Đại đã chết.
+4. Nội tại Đạo Mộng Dao đọc phần chỉ số còn lại của Nhất Đại đã chết.
+5. Hai Nhất Đại còn lại nhận 60% của phần còn lại đó.
+vậy nên nếu bị viên chúc giết thì khi đã hợp nhất thành sơ Đại, chỉ số bị cướp tạo trành quỷ vẫn không được trả về và sẽ biến mất.
+Do nội tại chụp chỉ số hiện có lúc chết, buff tạm được chuyển hóa thành lợi ích lâu dài cho Nhất Đại sống sót. Đặc biệt, buff đặt lên Nhất Đại chết thứ hai có giá trị cao hơn vì nó còn nhân cả phần chỉ số đã nhận từ cái chết đầu tiên.
+Khi code, HP trong snapshot nên được hiểu là Max HP, không phải HP hiện tại, vì Nhất Đại ở thời điểm chết có current HP bằng 0.
+
+trong mode chess hay turn base, các nhất đại được tính là 1 đơn vị độc lập và có turn riêng, tuân theo logic turn của mode, vậy nên trong 2 mode này các nhất đại chia 3 nên có thể 1 kẻ dùng 1 skill, đánh thường hoặc ultimate cũng có thể, skill và ult các nhâtd đại đều có thể dùng, khác biệt nằm ở chúng không có nội tại của sơ đại là Đạo Mộng Dao, skill khi 1 nhất đại dùng nếu có CD thì 2 nhất đại còn lại không thể dùng cho đến khi hết Cd của skill đó.
+
+skill 1: cần chủ động kích hoạt và tốn 1 turn, Nhất Đại dùng skill này nhận khiêu khích trong 2 turn, trong 2 turn đó mọi buff/hiệu ứng/mark có lợi như tăng chỉ số sẽ được giữ trên nhất đại nhận "khiêu khích", debuff/mark/hiệu ứng có hại trên người nhất đại có khiêu khích từ skill này sẽ được chuyển ngẫu nhiên sang 2 nhất đại còn lại (mỗi nhất đại chỉ nhận 1 loại debuff/mark/hiệu ứng xấu), đồng thời mỗi turn chuyển hp = 5% max hp (không giảm max hp/kẻ cho 2 nhất đại không nhận khiêu khích từ skill này, 25 aether. Sau khi hết Khiêu Khích, skill này cd 1 turn, turn thứ 2 sau khi hết Khiêu khích mới có thể dùng lại. Quy Tắc.
+
+Khiêu Khích tồn tại trong 2 vòng của phe Đạo Mộng Dao, 2 turn của nhất đại kích hoạt skill 1.
+
+Việc chuyển HP không thể khiến Nhất Đại cho HP xuống dưới 1 HP.
+Không được tính là sát thương.
+Không kích hoạt khiên, phản sát thương, hút máu hoặc hiệu ứng khi nhận damage.
+Không bị ARM/RES giảm.
+Không chịu healing modifier.
+là current HP.
+
+Skill 2 trừ 5 AE tại đầu mỗi vòng của phe Đạo Mộng Dao.
+
+Tổng chi phí duy trì tối đa:
+5 AE × 2 vòng = 10 AE.
+
+Không chuyển trạng thái độc bản như mark Sa Ấn, không chuyển mark/hiệu ứng không giảm chỉ số, mỗi lần chuyển nếu có xung đột tag cần phán định xung đột với nguồn của hiệu ứng/mark cần chuyển.
+Không chuyển Quy Tắc/Axiom nếu không thắng xung đột.
+Không chuyển hiệu ứng gắn với nguồn hoặc mục tiêu cụ thể.
+Chỉ chuyển buff/debuff chỉ số thua phán định xung đột tag.
+
+skill 2: tự kích hoạt khi một nhất đại dùng skill 1 thành công và có khiêu khích, chuyển 10% mọi chỉ số của 2 nhất đại còn lại cho nhất đại có khiêu khích từ skill 1, tự không kích hoạt khi không có nhất đại nào có khiêu khích từ skill 1, khiêu khích từ nguồn ngoài skill 1 không kích hoạt skill này, mỗi turn kích hoạt trừ 5 ae, khi ngắt kích hoạt sau khi chuyển chỉ số, hoàn lại chỉ số được chuyển, trong time chuyển chỉ số 2 nhất đại được nhận lớp khiên = 20% max hp của chúng, nếu có khiên từ nguồn khác và nguồn đó có cap thì khiên từ skill này không dính cap, tức khiên nguồn khác có cap thì vẫn đạt cap như bình thường, khiên từ skill này vẫn được cộng thêm mà không dính cap, Trong time kích hoạt khi 1 hoặc 2 nhất đại nhận sát thương hẳn phải tử vong khi skill 1 kích hoạt, chuyển 100% sát thương đó sang nhất đại nhận "khiêu khích" từ skill 1. Pháp Tắc.
+
+skill 3: mọi nhất đại hoặc sơ đại đang có mặt trên sân nếu không bị cc cứng không thể hành động đều sẽ chưởng 1 chương gây sát thương aoe cột dọc = 230% wil/atk của chúng, cột dọc có thể trùng mục tiêu, pháp tắc. 30 ae. Vậy nếu có 3 nhất đại thì 1 nhất đại dùng skill này 2 nhất đại còn lại cũng sẽ dùng skill này nhưng không tốn turn hay ae của 2 nhất đại còn lại, chỉ số của chúng khác nhau nên sát thương gây ra cũng sẽ khác nhau, sau khi dùng skill này 2 nhất đại còn lại vẫn còn turn như logic lượt bình thường.
+cd 2 turn của nhất đại đầu tiên dùng skill này.
+
+ultimate: gây aoe toàn sân = 200% wil/atk, kẻ nào nhận sát thương từ ult và mất hp tối thiểu = 20% max hp của chúng (budget tính chung với cả 3 nhất đại) nhận thêm sát thương chuẩn = 15% max hp của chúng.
+nếu có 1 nhất đại đầy rage và dùng ultimate, 2 nhất đại còn lại trừ phi bị cc cứng không thể hành động nếu không cũng cast ult và không bị bỏ qua lượt nên nếu 1 nhất đại cast ult xong và 2 nhất đại khác cũng cast ult thì lượt của nhất đại đầu tiên đã kết thúc nhưng lượt của tối đa 2 nhất đại còn lại vẫn còn (như skill 3).
+
+1. Ghi tổng lượng HP thật sự từng mục tiêu đã mất
+   từ tất cả các cast thuộc cùng Ensemble Ultimate.
+
+2. Không tính damage bị khiên hấp thụ.
+
+3. Nếu tổng HP mất >= 20% Max HP của mục tiêu:
+   gây thêm đúng 1 lần sát thương chuẩn bằng 15% Max HP.
+
+4. Mỗi mục tiêu chỉ kích hoạt bonus một lần
+   trong một Ensemble Ultimate.
+
+khi 1 nhất đại đầy rage cast ult, tối đa 2 nhất đại còn lại cũng cast ult, sau cast ult trừ nhất đại đầu cast ult và rage về 0, 2 nhất đại còn lại không mất turn nhưng rage cũng về 0.
+Nếu một Nhất Đại bị hard CC:
+Nó không cast.
+Rage của nó vẫn về 0 để tránh giữ ult dùng ngay vòng sau.
+
+Đây là phần quan trọng nhất để code không ra kết quả khác thiết kế.
+Khi Nhất Đại có Khiêu Khích chết trong lúc Skill 2 hoạt động, thứ tự nên là:
+1. Xác nhận sát thương chí tử và nguồn giết.
+
+2. Giải quyết hiệu ứng của kẻ giết kích hoạt trước nội tại Đạo Mộng Dao.
+   Ví dụ Viên Chúc cướp 50% bản nguyên.
+
+3. Chụp snapshot chỉ số còn lại của Nhất Đại đã chết:
+   Max HP, ATK, WIL, ARM, RES, HP Regen.
+
+4. Tam Khí Quy Lai dùng snapshot đó để truyền chỉ số.
+
+5. Skill 1 và Skill 2 kết thúc trên Nhất Đại đã chết.
+
+6. Chỉ số tạm thời Skill 2 đã mượn được hoàn trả cho
+   những Nhất Đại cho mượn còn sống.
+
+7. Loại Nhất Đại chết khỏi sân.
+Phải snapshot trước khi Skill 2 hoàn trả chỉ số. Nếu hoàn trả trước, lượng 10% được dồn vào Tế Thân sẽ không được nội tại ghi nhận, khiến Skill 2 mất phần lớn ý nghĩa.
+
+Khi gặp Viên Chúc:
+1. Viên Chúc giết Tế Thân.
+2. Viên Chúc cướp 50% chỉ số hiện có, bao gồm phần buff và chỉ số tạm đang được dồn.
+3. Trành Quỷ được tạo.
+4. Đạo Mộng Dao snapshot 50% còn lại.
+5. Truyền 60% hoặc 120% phần còn lại.
+6. Skill 2 hoàn trả lượng chỉ số đã mượn cho Nhất Đại còn sống.
+Cả ba chết đồng thời
+Nên xử lý:
+Không còn Nhất Đại sống để nhận chỉ số.
+Không hợp nhất.
+Sơ Đại được tính là hoàn toàn tử vong.
+Đây là counter AoE tự nhiên của nhân vật.
+Hai thân chết đồng thời, một thân sống
+Không nên cho thân chết thứ hai nhận chỉ số từ thân chết thứ nhất rồi mới truyền tiếp, vì nó đã bị đánh dấu tử vong trong cùng damage batch.
+Nên:
+Chụp snapshot của cả hai thân từ trạng thái ngay trước damage batch.
+Chọn thứ tự chết ổn định bằng action resolution order hoặc instanceId.
+Thân sống nhận:
+- 60% snapshot của kẻ chết thứ nhất.
+- 120% snapshot của kẻ chết thứ hai.
+
+Kẻ đã bị đánh dấu tử vong không nhận chỉ số trung gian.
+Điều này tránh kết quả phụ thuộc animation hoặc thứ tự duyệt array.
+Max HP thừa hưởng tăng current HP cùng lượng.
+Khi nhận thêm X Max HP từ Tam Khí Quy Lai:
+- Max HP tăng X.
+- Current HP cũng tăng X.
+Ví Dụ:
+A đang 20/40 HP.
+Nhận thêm 30 Max HP.
+
+Sau khi nhận:
+50/70 HP.
+
+73) Hoá Thân Ký Ức Chi Chủ
+
+Nội tại, Ngã Tự Bất Vong: Khi Hp về 0, 2 turn sau (mỗi khi đến turn của ô hắn chết tính 1 turn bất kể ô đó có ai đứng hay không) phục sinh với hp = 30% max hp (+15%/lần phục sinh) và 100% mọi chỉ số được rank mul scale của lần tử vong trước, phục sinh tối đa 3 lần trong trận, trong 1 turn của hắn sau phục sinh, bị mọi đơn vị kẻ thù lãng quên trong 1 turn đó, không phải và không gán mark/buff/hiệu ứng xấu lên kẻ thù, đây là hiệu ứng đặc thù áp dụng lên bản thân hắn, ở 2 lần phục sinh đầu player/npc kẻ thù vẫn có thể thấy hắn, ở lần phục sinh thứ 3 hắn biết mất khỏi tầm mắt của nhân vật trong game lần player đang chơi game trong thời gian lãng quên tác dụng, trong quãng thời gian lãng quên kích hoạt, hắn vẫn có thể tấn công nhưng vị trí hắn đứng, debuff/buff/hiệu ứng/mark/hp bar của hắn đều mất tác dụng và không hiển thị cho player kẻ thù thấy, nếu pve thì AI địch cũng sẽ bỏ qua hắn khỏi suy nghĩ, đương nhiên vì tấn công nên player chơi game biết hắn đang ở trạng thái lãng quên, AI cũng biêtd nhưng chính là không thể target mục tiêu bởi bất kỳ kit nào dù có gây sát thương hay không khi hắn ở trạng thái Lãng Quên.
+Vì chỉ số lấy từ lần phục sinh trước nên nếu bị ảnh hưởng chỉ số thì sức mạnh của hắn sẽ biến động theo.
+Nhân vật này có Thần Tính.
+toàn bộ nội tại mang tag Quy Tắc, riêng thần tính mang tag Axiom.
+Thần tính miễn nhiễm mọi kit gây hiệu ứng xấu nên không sợ Viên Chúc, mọi Prime có thần tính đều không sợ hắn.
+
+skill 1, : khi kích hoạt khiến 3 kẻ thù ngẫu nhiên quên mất 1 kỹ năng của chúng trong 1 turn, tức trong 1 turn đó không thể dùng kỹ năng bị quên, 25 ae. 1 turn đó tính từ turn hành động của chúng, nên khi bị dính skill này khi đến turn của kẻ bị dính chúng không thể dùng skill bị lãng quên, đến turn sau mới có thể dùng, quy tắc.
+khi dùng skill này xong, lâm vào cd 2 turn, mỗi khi hắn hành động cd -1 turn. Quy Tắc.
+chỉ khiến mục tiêu quên lãng ultimate, target trước, nếu mục tiêu có mội tại chống quên lãng skill thì phán định xung đột tag theo quy trình, nếu không có xung đột tag thì chắc chắn khiến mục tiêu quên lãng 1 skill, không chọn target trùng tức skill này không thể khiến 1 target quên 2 skill trong 1 lần cast skill này.
+
+skill 2, Đau Đớn Hồi Tưởng: tự kích hoạt khi 1 đồng minh gây sát thương lên 1 hoặc nhiều mục tiêu và khiến chúng mất tối thiểu 30% max hp của bản thân chúng, khiến những kẻ đó nhận thêm 1 lần sát thương (sát thương chuẩn) nữa nhưng = 50% sát thương đồng minh khiến chúng mất hp tối thiểu = 30% max hp, mỗi lần kích hoạt bất kể ảnh hưởng 1 hay nhiều mục tiêu đều tốn 30 ae, không target leader địch. Ví dụ, đồng minh gây aoe đánh 2 kẻ thù gây ra sát thương = 30% max hp của kẻ thù, skill này tự kích hoạt, trừ ae, kẻ thù đó lập tức nhận thêm 50% sát thương đồng minh gây ra lên chúng dưới dạng sát thương chuẩn. Đồng minh gây sát thương> skill này gây thêm sát thương, không ảnh hưởng đến đồng minh. Skill này chỉ tái hiện sát thương đồng minh gây ra dưới dạng sát thương chuẩn, đồng minh gây sát thương có debuff/mark hoặc bất kỳ hiệu ứng nào skill này đều sẽ không tái hiện, đây là 1 skill thuần sát thương, Pháp Tắc. Không tự kích hoạt khi thiếu ae, skill này và skill 3 không thể kích hoạt thủ công.
+
+Skill 3 — Tái Diễn Ký Ức: tự kích hoạt khi có 3 kẻ thù đánh thường liên tiếp, tức có 1 kẻ thù đánh thường, đến lượt tiếp theo của phe kẻ thù lại có thêm 1 kẻ đánh thường nữa và đến turn tiếp của kẻ thù lại có thêm 1 kẻ đánh thường nữa thì skill này sẽ tự kích hoạt. Khiến 3 kẻ đó không thể dùng skill/ultimate bất kể đầy rage mà chỉ có thể đánh thường trong 2 turn tiếp theo của cá nhân chúng, -15 ae/lần kích hoạt, không kích hoạt khi thiếu ae. Nếu trong 3 kẻ đó có kẻ chết thì cd bắt đầu đếm khi những kẻ còn sống bị ảnh hưởng bởi skill này thực thi xong 2 turn đánh thường.
+Skill 3 vào cooldown ngay sau khi kích hoạt.
+CD 2 lượt hành động của Ký Ức Chi Chủ.
+Trong thời gian CD, skill không thể ghi nhận chuỗi mới.
+
+Hiệu ứng khóa trên ba mục tiêu vẫn tồn tại độc lập
+cho đủ hai lượt cá nhân của từng mục tiêu.
+Nếu không đủ AE ở thời điểm đòn thứ ba xảy ra:
+skill không kích hoạt và chuỗi reset.
+vậy nếu cả 3 còn sống thì khi kích hoạt skill này + điều kiện kích hoạt thì 3 kẻ đó sẽ đánh thường mỗi kẻ 3 lần liên tiếp.
+
+ultimate: gây aoe toàn sân = 200% wil/atk của bản thân, tự hồi hp cho bản thân = 20% tổng sát thương ult này gây ra.
+ta không hồi phục, đau đớn khiến chúng nghĩ về ta, ký ức về ta càng thêm sâu đậm, càng nghĩ thì càng ám ảnh.
+
+Mỗi lần phục sinh lấy:
+100% Max HP
+100% ATK
+100% WIL
+100% ARM
+100% RES
+100% HP Regen
+từ trạng thái lúc tử vong trước.
+Nên hiểu rõ:
+Max HP được snapshot, không phải current HP.
+Current HP khi phục sinh được tính bằng 30% / 45% / 60% của Max HP đã snapshot.
+Buff/debuff/mark không được sao chép như một object.
+Chỉ giá trị chỉ số sau khi chúng tác động được snapshot.
+Thời hạn buff cũ không được mang sang.
+Giá trị đã snapshot trở thành bộ chỉ số nền chiến đấu mới của lần phục sinh kế tiếp
+Ví dụ:
+Max HP gốc: 100
+Được buff +50% Max HP trước khi chết
+Max HP lúc chết: 150
+
+Phục sinh lần 1:
+Max HP mới: 150
+Current HP: 45/150
+Đây là bản sắc rất mạnh: support đồng đội có thể “viết lại ký ức về bản thể” của hắn trước mỗi lần chết.
+ở trạng thái lãng quên không thể target hắn nhưng aoe cố định vị trí có thể đánh trúng hắn.
+lưu ý aoe cố định vị trí khác aoe target ngẫu nhiên, như skill 3 và ult của Đạo Mộng Dao là aoe cố định, nhưng skill 3 hắn đứng ngay hàng không có nhất đại nào cast skill 3 thì đương nhiên không dính.
+Thoại:
+1. Ta không hồi sinh. Ta chỉ nhớ lại hình dạng mình từng có.
+2. Người sống nhớ người chết. Còn ta, người chết tự nhớ lấy chính mình.
+3. Khi tất cả đều quên, ký ức của ta sẽ trở thành sự thật duy nhất.
+4. Câu thoại khi phục sinh lần ba:
+Lần này, ngay cả cái nhìn của ngươi cũng không còn nhớ nổi ta.
+5. Câu khi dùng ultimate:
+Ta quyết định điều gì đã từng xảy ra.
+6. Thoại khi dùng skill 1:
+Ngươi không bị cấm sử dụng nó. Ngươi chỉ không còn nhớ mình từng biết nó.
+và: Ngươi từng biết cách dùng nó sao?
+8. Thoại khi dùng skill 2:
+Đau đớn là thứ ký ức trung thực nhất.
+9. thoại khi dùng skill 3:
+Ba lần như một. Hãy tiếp tục đi.
+
+Buff/debuff không được mang sang dưới dạng hiệu ứng,
+nhưng hậu quả chúng gây lên chỉ số được ký ức ghi nhận
+và trở thành chỉ số nền của lần phục sinh sau.
+Nó khiến support buff hắn trước lúc chết có giá trị thật sự. Kẻ địch cũng có thể cố giảm chỉ số hắn trước khi kết liễu để “ghi lại một phiên bản yếu hơn”.
+Đây là tương tác hai chiều rất tốt.
+Không thể được chọn làm target.
+Không xuất hiện trong danh sách target ngẫu nhiên.
+AI địch bỏ qua hắn.
+AoE đã xác định vùng tác động vẫn có thể đánh trúng nếu hắn đứng trong vùng.
+Nên code tách thành hai giai đoạn:
+Target Selection:
+Lãng Quên bị loại khỏi danh sách mục tiêu.
+
+Area Resolution:
+Nếu vùng AoE đã được tạo và vị trí của hắn nằm trong vùng,
+hắn vẫn nhận sát thương/hiệu ứng.
+Ví dụ:
+Skill chọn ba mục tiêu ngẫu nhiên: không thể chọn hắn.
+AoE toàn sân: vẫn đánh trúng.
+AoE cột dọc: chỉ đánh trúng nếu hắn đứng đúng cột.
+AoE lấy một unit làm tâm: không thể lấy hắn làm tâm, nhưng nếu lấy unit khác làm tâm và hắn nằm trong bán kính thì vẫn trúng.
+Cách này vừa đúng “bị quên”, vừa không biến thành miễn nhiễm tuyệt đối.
+skill 1:
+Chọn ngẫu nhiên 3 kẻ thù khác nhau trước.
+Sau đó mỗi mục tiêu quên ngẫu nhiên 1 kỹ năng chủ động hoặc ultimate.
+Không chọn nội tại và đánh thường.
+Nên viết kỹ thuật như sau:
+Khi kích hoạt, chọn ngẫu nhiên tối đa 3 kẻ thù khác nhau.
+
+Với mỗi mục tiêu, chọn ngẫu nhiên 1 kỹ năng chủ động hoặc ultimate
+đang tồn tại trong kit của mục tiêu. Mục tiêu quên kỹ năng đó
+trong lượt hành động cá nhân kế tiếp.
+
+Trong lượt này, kỹ năng bị quên không thể được sử dụng,
+kể cả khi đã hết cooldown hoặc ultimate đã đầy rage.
+
+Sau khi mục tiêu hoàn thành lượt hành động đó,
+trạng thái Quên Lãng Kỹ Năng biến mất.
+Nếu một mục tiêu không có kỹ năng hợp lệ:
+Không tiêu hao lượt chọn vào mục tiêu đó;
+hệ thống tìm mục tiêu khác nếu còn mục tiêu hợp lệ.
+Xung đột tag
+Nên xử lý:
+1. Chọn ba mục tiêu hợp lệ.
+2. Chọn kỹ năng sẽ bị quên của từng mục tiêu.
+3. Kiểm tra mục tiêu có cơ chế chống quên lãng kỹ năng hay không.
+4. Chỉ khi có mâu thuẫn trực tiếp mới phán định tag.
+5. Nếu không có cơ chế chống lại, Quên Lãng chắc chắn thành công.
+Các skill tự kích hoạt 2 và 3 không được tính là hành động giảm cooldown Skill 1.
+skill 2
+Để tránh multi-hit kích hoạt nhiều lần, nên chốt:
+Sau khi một hành động gây sát thương của đồng minh hoàn toàn kết thúc,
+tổng hợp lượng HP thật sự từng mục tiêu đã mất từ hành động đó.
+
+Mỗi mục tiêu không phải leader địch, nếu mất tối thiểu 30% Max HP,
+sẽ trở thành mục tiêu hợp lệ của Skill 2.
+
+Nếu có ít nhất một mục tiêu hợp lệ và team có đủ 30 AE,
+Skill 2 tự kích hoạt đúng một lần cho toàn bộ hành động đó.
+Như vậy:
+Một skill 10 hit không kích hoạt 10 lần.
+Một AoE trúng năm người chỉ tốn 30 AE một lần.
+Mỗi mục tiêu nhận echo riêng theo damage thực tế nó đã chịu.
+Damage dùng để tái hiện
+Nên là:
+Actual HP damage
+Tức:
+Tính sau ARM/RES và giảm sát thương.
+Không tính phần bị khiên hấp thụ.
+Không tính overkill.
+Không tính damage lên vật thể không có HP thông thường nếu không được phép.
+Không sao chép debuff, mark, control, hút máu hoặc hiệu ứng kèm theo.
+Ví dụ:
+Mục tiêu Max HP 1.000.
+Đồng minh làm mất thật 400 HP.
+Skill 2 gây thêm 200 sát thương chuẩn.
+ví dụ:
+Đòn đầu làm mất 30% HP
+→ echo 15% Max HP
+→ tổng cộng mất 45%.
+
+Đòn đầu làm mất 50% HP
+→ echo thêm 25%
+→ tổng cộng mất 75%.
+
+Đòn đầu làm mất 66,67% HP
+→ echo thêm 33,33%
+→ về lý thuyết đủ giết mục tiêu.
+Sát thương từ Skill 2 không thể kích hoạt lại Skill 2.
+Không kích hoạt passive “khi đồng minh dùng skill”.
+Không tạo AE.
+Không tạo lượt.
+Không tính là hành động của Ký Ức Chi Chủ.
+skill 3:
+Ba lượt hành động cá nhân liên tiếp của phe địch.
+Ba unit khác nhau.
+Cả ba đều chọn đánh thường làm hành động chính.
+Ví dụ:
+A đánh thường
+B đánh thường
+C đánh thường
+→ kích hoạt.
+A đánh thường
+B đánh thường
+A đánh thường
+→ không kích hoạt vì chỉ có hai unit khác nhau.
+Không nên tính:
+Phản công.
+Đòn đánh phụ.
+Follow-up.
+Linked cast.
+Summon đánh thay.
+Đánh thường do bị cưỡng chế bởi chính Skill 3.
+Đánh thường ngoài lượt.
+Một unit có extra turn đánh nhiều lần.
+Chỉ tính:
+Hành động chính trong lượt cá nhân hợp lệ.
+Chuỗi reset nếu:
+Kẻ địch dùng skill.
+Kẻ địch dùng ultimate.
+Kẻ địch bỏ lượt do chủ động phòng thủ nếu mode có.
+Một hành động không phải đánh thường xảy ra.
+Khi kích hoạt:
+Ba unit vừa tạo chuỗi chỉ có thể chọn đánh thường
+trong hai lượt hành động cá nhân tiếp theo của từng unit.
+
+Không thể dùng skill.
+Không thể dùng ultimate.
+Không tiêu hao rage.
+Không khóa nội tại.
+Sau khi mỗi unit đã trải qua hai lượt cá nhân, khóa trên unit đó hết.
+Skill 2 và Skill 3:
+Không tiêu hao lượt.
+Không tạo AE.
+Không giảm cooldown của Skill 1.
+Không tăng rage.
+Không kích hoạt hiệu ứng “sau khi hành động”.
+Không kích hoạt hiệu ứng “khi dùng skill” nếu hệ thống không ghi rõ.
+Ultimate:
+AoE toàn sân = 200% WIL/ATK.
+Hồi HP bằng tổng 20% sát thương ultimate gây ra.
+Nên tính hồi dựa trên:
+Tổng actual HP damage gây lên mọi mục tiêu.
+Không tính:
+Damage bị khiên hấp thụ.
+Overkill.
+Damage lên vật thể không hợp lệ.
+Sát thương phản lại.
+Damage phụ từ nguồn khác.
+lượng hồi phục thừa, vượt max hp của hắn sẽ bị bỏ qua và không thể chuyển sang khiên trừ phi có kit của char khác có hiệu ứng chuyển overheal của đồng minh sang khiên và kit đó thắng được nội tại Thần Tính cấp Axiom của hắn, để khả thi đó cần là 1 prime khác có lực chiến cao hơn hắn.
