@@ -3,7 +3,7 @@
 import { getMetaById } from './catalog.ts';
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import type { DamageResult } from './statuses.ts';
-import { applyDamage, grantShield } from './combat/apply-damage.ts';
+import { applyDamage, grantShield, readShieldAmount } from './combat/apply-damage.ts';
 import { calculateFinalDamage, type DamageBreakdownMetadata } from './combat/calculate-final-damage.ts';
 import { asSessionWithVfx, vfxAddHit, vfxAddMelee, vfxAddLightningArc } from './vfx.ts';
 import { slotIndex } from './engine.ts';
@@ -23,7 +23,7 @@ import {
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
 import { runRuntimeBasicAttackResolved, runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
-import { resolveLegacyDamage } from './combat/kernel/index.ts';
+import { commitDamageBatch, createNaturalAction, resolveDamageBatch, resolveDamagePacket, resolveSourceAttribution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
 
 export { applyDamage, grantShield };
 
@@ -47,6 +47,7 @@ export interface AbilityDamageOptions {
   synergyBonus?: number;
   damageBreakdown?: Partial<DamageBreakdownMetadata>;
   skill?: unknown;
+  actionIdentity?: ActionIdentity;
   [extra: string]: unknown;
 }
 
@@ -471,17 +472,31 @@ export function dealAbilityDamage(
     synergyBonus: toFinite(opts.synergyBonus ?? opts.damageBreakdown?.synergyBonus, counterMetadata.synergyBonus),
   };
   const breakdownMultiplier = Math.max(0, 1 + bonusBreakdown.classBonus + bonusBreakdown.elementBonus + bonusBreakdown.synergyBonus);
-  const resolveComponent = (damageType: string, weight: number) => resolveLegacyDamage({
-    attacker, defender: target, damageType,
-    declaredDamage: (pre.ignoreAll || shieldWinsLaw) ? 0 : rawDamage * weight,
-    defensePercentPenetration: combinedPen,
-    outgoingModifiers: [breakdownMultiplier], incomingModifiers: [pre.inMul],
-  }).finalRoundedDamage;
+  const identity = opts.actionIdentity ?? (Game
+    ? createNaturalAction(Game, attackType)
+    : { actionId: 'detached-action-1', chainId: 'detached-chain-1', parentActionId: null, actionKind: attackType, actionSerial: 1 });
+  const controller = attacker.ownerIid != null ? Game?.tokens.find(unit => unit.iid === attacker.ownerIid) ?? null : attacker;
+  const source = resolveSourceAttribution({ immediateSource: attacker, controller: controller ?? attacker.ownerIid ?? attacker, trueSelf: controller?.trueSelfId ?? attacker.trueSelfId ?? (!attacker.isMinion ? attacker.id : null), owner: controller ?? attacker.ownerIid ?? attacker });
+  const componentSpecs = dtype === 'mixed' ? [['physical', physWeight], ['will', arcWeight]] as const : [[dtype === 'arcane' ? 'will' : dtype, 1]] as const;
+  const packets: DamagePacket[] = componentSpecs.map(([damageType, weight], index) => ({
+    packetId: `${String(identity.actionId)}:packet-${index + 1}`, packetSerial: index + 1,
+    actionId: identity.actionId, chainId: identity.chainId, source, targetIid: target.iid ?? target.id,
+    damageType: damageType as DamagePacket['damageType'], declaredDamage: (pre.ignoreAll || shieldWinsLaw) ? 0 : rawDamage * weight,
+    tags: [attackType], isDot: false, isReflect: false, isFollowup: identity.parentActionId != null,
+    isCounter: attackType === 'counter', reactionDepth: 0, pierceShield: bypassShieldByLaw,
+  }));
+  const contexts: DamageContext[] = packets.map(() => ({
+    attacker: { iid: attacker.iid ?? attacker.id, currentHp: Number(attacker.hp ?? 0), maxHp: Number(attacker.hpMax ?? 0), arm: Number(attacker.arm ?? 0), res: Number(attacker.res ?? 0) },
+    defender: { iid: target.iid ?? target.id, currentHp: Number(target.hp ?? 0), maxHp: Number(target.hpMax ?? 0), arm: Number(target.arm ?? 0), res: Number(target.res ?? 0) },
+    defensePenetration: { flat: 0, percent: combinedPen }, defenseModifiers: { flat: 0, percent: 0 },
+    outgoingModifiers: [breakdownMultiplier], incomingModifiers: [pre.inMul], genericDamageReduction: 0, reflectDamageReduction: 0, shield: { shieldBefore: 0 },
+  }));
+  const componentResolutions = packets.map((packet, index) => resolveDamagePacket(packet, contexts[index]!));
   // Legacy `mixed` is adapted to two canonical component packets, never one
   // weighted-defense packet. New callers should declare the components directly.
   const kernelTotal = dtype === 'mixed'
-    ? resolveComponent('physical', physWeight) + resolveComponent('will', arcWeight)
-    : resolveComponent(dtype, 1);
+    ? componentResolutions.reduce((sum, item) => sum + item.finalRoundedDamage, 0)
+    : componentResolutions[0]!.finalRoundedDamage;
   const finalDamage = { total: kernelTotal, breakdown: bonusBreakdown };
   const chapMinhMitigation = applyChapMinhMitigation(target, finalDamage.total, {
     isAoE: !!opts.isAoE,
@@ -492,10 +507,6 @@ export function dealAbilityDamage(
     recordChapMinhPreventedDamage(chapMinhMitigation.owner, chapMinhMitigation.prevented);
   }
 
-  const abs = bypassShieldByLaw
-    ? { remain: dmg, absorbed: 0, broke: false }
-    : (Statuses.absorbShield(target, dmg, { dtype }) as ShieldAbsorptionResult);
-  const remain = Math.max(0, Math.floor(abs.remain));
   let dealtTotal = 0;
   const attackerState = attacker as UnitToken & { _directKills?: number };
 
@@ -519,41 +530,29 @@ export function dealAbilityDamage(
     }
   }
 
-  if (remain > 0 && sharedTargets.length > 1) {
-    const weightedTargets = [] as Array<{ token: UnitToken; weight: number; capRatio: number | null }>;
+  const weightedTargets = [] as Array<{ token: UnitToken; weight: number; capRatio: number | null }>;
+  if (sharedTargets.length > 1) {
     for (const token of sharedTargets) {
       const rules = token === target ? sharedRules : getSharedHpRules(token);
       weightedTargets.push({ token, weight: Math.max(0.05, rules.weight), capRatio: rules.capRatio });
     }
-    const totalWeight = weightedTargets.reduce((acc, entry) => acc + entry.weight, 0) || 1;
-    let assigned = 0;
-    for (let i = 0; i < weightedTargets.length; i += 1) {
-      const entry = weightedTargets[i];
-      if (!entry) continue;
-      const isLast = i === weightedTargets.length - 1;
-      let payload = isLast
-        ? Math.max(0, remain - assigned)
-        : Math.max(0, Math.floor(remain * (entry.weight / totalWeight)));
-      if (entry.capRatio != null && Number.isFinite(entry.token.hpMax)) {
-        const capValue = Math.max(0, Math.floor((entry.token.hpMax ?? 0) * entry.capRatio));
-        payload = Math.min(payload, capValue);
-      }
-      assigned += payload;
-      if (payload <= 0) continue;
-      const beforeHp = Math.max(0, Math.floor(entry.token.hp ?? 0));
-      applyDamage(entry.token, payload);
-      const afterHp = Math.max(0, Math.floor(entry.token.hp ?? 0));
-      dealtTotal += Math.max(0, beforeHp - afterHp);
-      if (entry.token.hp <= 0) {
-        hookOnLethalDamage(entry.token);
-        emitOnDeathPassive(entry.token);
-      }
-    }
-  } else if (remain > 0) {
-    const beforeHp = Math.max(0, Math.floor(target.hp ?? 0));
-    applyDamage(target, remain);
-    const afterHp = Math.max(0, Math.floor(target.hp ?? 0));
-    dealtTotal += Math.max(0, beforeHp - afterHp);
+    } else {
+    weightedTargets.push({ token: target, weight: 1, capRatio: null });
+  }
+  const batchResolution = resolveDamageBatch({
+    identity, source, packets, contexts,
+    targets: weightedTargets.map((entry, index) => ({ iid: entry.token.iid ?? entry.token.id, currentHp: Math.max(0, Math.floor(entry.token.hp ?? 0)), maxHp: Math.max(0, Math.floor(entry.token.hpMax ?? 0)), arm: Number(entry.token.arm ?? 0), res: Number(entry.token.res ?? 0), trueSelfId: entry.token.trueSelfId ?? null, lifeSerial: Math.max(1, Number(entry.token.lifeSerial ?? 1)), slot: slotIndex(entry.token.side, entry.token.cx, entry.token.cy), weight: entry.weight, capRatio: entry.capRatio })),
+    shieldSnapshot: readShieldAmount(target),
+    specialMitigation: chapMinhMitigation.prevented > 0 ? { kind: 'chap-minh', prevented: chapMinhMitigation.prevented } : null,
+    batchPolicy: weightedTargets.length > 1 ? 'shared-hp' : 'single', sharedHpPolicy: weightedTargets.length > 1 ? { primaryTargetIid: target.iid ?? target.id } : null,
+  });
+  const committed = commitDamageBatch(Game, batchResolution, weightedTargets.map(entry => entry.token));
+  dealtTotal = committed.commits.reduce((sum, entry) => sum + entry.hpDamage, 0);
+  const lethalTargets = weightedTargets.map(entry => entry.token).filter(unit => unit.hp <= 0)
+    .sort((a, b) => slotIndex(a.side, a.cx, a.cy) - slotIndex(b.side, b.cx, b.cy) || String(a.iid ?? a.id).localeCompare(String(b.iid ?? b.id)));
+  for (const unit of lethalTargets) {
+    hookOnLethalDamage(unit);
+    emitOnDeathPassive(unit);
   }
   if (target.hp <= 0) {
     emitPassiveEvent(Game, target, 'onLethalDamage', { log: getPassiveLog(Game), attacker, attackType });
@@ -580,7 +579,7 @@ export function dealAbilityDamage(
 
   const damageResult: DamageResult = {
     dealt: dealtTotal,
-    absorbed: abs.absorbed,
+    absorbed: batchResolution.shieldDamage,
     dtype,
     breakdown: finalDamage.breakdown,
   };
@@ -652,7 +651,7 @@ export function dealAbilityDamage(
     rawDamage: rawDamage,
     finalDamage: dmg,
     dealtDamage: dealt,
-    absorbedDamage: abs.absorbed,
+    absorbedDamage: batchResolution.shieldDamage,
     classBonus: finalDamage.breakdown.classBonus,
     elementBonus: finalDamage.breakdown.elementBonus,
     synergyBonus: finalDamage.breakdown.synergyBonus,
@@ -669,7 +668,7 @@ export function dealAbilityDamage(
     attackerCarrier._lastDamageSummary = snapshot.summary;
   }
 
-  return { dealt, absorbed: abs.absorbed, total: dmg, breakdown: finalDamage.breakdown };
+  return { dealt, absorbed: batchResolution.shieldDamage, total: dmg, breakdown: finalDamage.breakdown };
 }
 
 export interface HealResult {

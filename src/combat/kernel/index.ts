@@ -6,4 +6,5 @@ export * from './source-attribution.ts';
 export * from './trigger-ledger.ts';
 export * from './invariants.ts';
 export * from './legacy-adapter.ts';
-
+export * from './sequence.ts';
+export * from './damage-batch.ts';

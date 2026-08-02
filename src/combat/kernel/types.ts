@@ -3,6 +3,9 @@ import type { CombatId } from './ids.ts';
 export type DamageType = 'physical' | 'will' | 'true' | 'reflected';
 export type LegacyDamageType = DamageType | 'arcane';
 export type HpMutationKind = 'damage' | 'healing' | 'hp-cost' | 'self-damage' | 'sacrifice' | 'max-hp-mutation';
+export type CurrentHpPolicy = 'preserve-absolute' | 'preserve-ratio' | 'clamp' | 'set-full' | 'set-value';
+export type MaxHpPolicy = 'unchanged' | 'add-flat' | 'add-percent' | 'set-value';
+export type MutationResetPolicy = 'on-revive' | 'on-rebirth' | 'on-leave-battle' | 'never-within-battle';
 
 export interface ActionIdentity {
   readonly actionId: CombatId;
@@ -35,6 +38,7 @@ export interface DamagePacket {
   readonly isCounter: boolean;
   readonly reactionDepth: number;
   readonly pierceShield: boolean;
+  readonly packetSerial?: number;
 }
 
 export interface CombatantSnapshot {
@@ -91,14 +95,13 @@ export interface HpMutation {
   readonly amount: number;
   readonly source: SourceAttribution;
   readonly canKill: boolean;
-  readonly currentHpPolicy: string;
-  readonly maxHpPolicy: string;
-  readonly resetPolicy: string;
+  readonly currentHpPolicy: CurrentHpPolicy;
+  readonly maxHpPolicy: MaxHpPolicy;
+  readonly resetPolicy: MutationResetPolicy;
 }
 
 export function normalizeDamageType(type: LegacyDamageType | string): DamageType {
   if (type === 'arcane') return 'will';
-  if (type === 'will' || type === 'true' || type === 'reflected') return type;
-  return 'physical';
+  if (type === 'physical' || type === 'will' || type === 'true' || type === 'reflected') return type;
+  throw new Error(`[combat-kernel] unknown damage type: ${String(type)}`);
 }
-

@@ -20,9 +20,8 @@ bypasses remain:
 5. **Active HP cost/heal:** `src/combat/perform-active-skill.ts` —
    `applyHpCostWithState`, Blood Avatar healing/cost branches, and generic HP-cost
    assignment need `HpMutation` transactions and the canonical heal gateway.
-6. **Shared HP:** `src/combat.ts` — the shared group loop inside
-   `dealAbilityDamage` sequentially calls `applyDamage`. Move to snapshot/batch
-   commit and emit reactions only after allocation.
+6. **Environment damage:** `src/modes/pve/session-runtime-impl.ts` —
+   `applyEnvironmentalDamage` remains a direct low-level commit.
 7. **Lethal/death paths:** `src/combat.ts` — `dealAbilityDamage` lethal hooks;
    `src/statuses.ts` — status lethal branches; `src/combat/chap-minh-runtime.ts` —
    `applyLinkedDamage`; `src/modes/pve/session-runtime-impl.ts` —
@@ -34,4 +33,3 @@ Also migrate legacy compatibility action ids to scheduler-owned identities,
 attach source iid when statuses are created, route passive/tag/DoT/counter procs
 through the ledger, add resource transactions, and batch AoE. Full replay,
 Luân Hồi, progression, equipment, and kit-wide rewrites remain separate work.
-

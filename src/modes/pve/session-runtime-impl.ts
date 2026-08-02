@@ -2292,6 +2292,12 @@ function init(): boolean {
   }
   for (const t of tokens){
     if (!t.iid) t.iid = nextIid();
+    if (!t.isMinion && t.hpMax != null) {
+      t.trueSelfId ??= `true-self:${t.side}:${t.iid}`;
+      t.lifeSerial ??= 1;
+    } else if (!t.isMinion && t.hpMax != null && process.env.NODE_ENV !== 'production' && !t.trueSelfId) {
+      console.warn('[combat-identity] HP-bearing non-summon is missing trueSelfId', t.id);
+    }
     if (t.id === 'leaderA' || t.id === 'leaderB'){
       Object.assign(t, {
         hpMax: 2600,

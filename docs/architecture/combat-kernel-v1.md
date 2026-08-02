@@ -1,7 +1,8 @@
-# Arclune Combat Kernel v1 — Phase A
+# Arclune Combat Kernel v1 — Phase B1
 
-Phase A establishes serializable contracts and a pure packet resolver. It does
-not replace death, resources, AoE batching, status ticks, passives, or replay.
+Phase B1 adds battle-owned action/event sequences, true-self identity, a pure
+damage batch resolver and the sole standard-damage commit gateway. Death,
+resources, status ticks, passives and replay remain later phases.
 
 ## Canonical vocabulary and calculation
 
@@ -86,4 +87,3 @@ then enters the existing Chap Minh/shield/shared-HP/death/reaction commit path.
 Basic attacks, the four standard active-skill call sites, and the standard damage
 tag branch share this gateway. `applyDamage` is a deprecated low-level legacy
 primitive; its current callers are frozen by a static test pending Phase B.
-

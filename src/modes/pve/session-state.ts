@@ -392,6 +392,7 @@ function buildBaseState(params: BuildBaseStateParams): SessionState {
     meta: metaServiceAdapter,
     rng: createRngState(params.rngSeed),
     runtime: {
+      combatSequence: { actionSerial: 0, chainSerial: 0, eventSerial: 0 },
       encounter: null,
       wave: null,
       rewardQueue: [],
