@@ -43,6 +43,16 @@ test('offline fallback preserves object values containing strict equality', () =
   assert.doesNotThrow(() => new Function('input', code));
 });
 
+test('offline fallback preserves a ternary object property containing a call', () => {
+  const source = `const request = {
+    mutationBonusPct: Number.isFinite(card.mutationBonusPct) ? Number(card.mutationBonusPct) : undefined,
+  };`;
+  const code = fallbackTypeScript.transpile(source);
+
+  assert.match(code, /mutationBonusPct:\s*Number\.isFinite\(card\.mutationBonusPct\)\s*\?\s*Number\(card\.mutationBonusPct\)\s*:\s*undefined/);
+  assert.doesNotThrow(() => new Function('card', `${code}; return request;`));
+});
+
 test('installed esbuild stub uses the current repository transpiler', async () => {
   const installedEsbuild = require('../node_modules/esbuild');
   const source = `const cards = input.map((card: Card) => ({

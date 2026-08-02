@@ -260,7 +260,9 @@ function stripTypeAnnotations(source) {
 
   code = code.replace(/(\bconst\s+[A-Za-z_$][\w$]*|\blet\s+[A-Za-z_$][\w$]*|\bvar\s+[A-Za-z_$][\w$]*)(\s*\??)\s*:\s*([^=;\n]+)/g, (full, left, optional) => `${left}${optional}`);
 
-  code = code.replace(/([\}\)\]]\s*):\s*([^=;\n\{]+)/g, "$1");
+  // Return annotations are followed by a function body or arrow. Requiring
+  // that boundary keeps ternary branches such as `call() : undefined` intact.
+  code = code.replace(/([\}\)\]]\s*):\s*([^=;\n\{]+)(?=\{|=>)/g, "$1");
 
   code = code.replace(/([,\(]\s*\.{3}[A-Za-z_$][\w$]*)\s*:\s*([^=,\)]+)(?=,|\)|=(?!=))/g, "$1");
 
@@ -271,7 +273,7 @@ function stripTypeAnnotations(source) {
   // single default-value `=`. Without this boundary, an object value such as
   // `name: typeof card.name === "string" ? card.name : undefined` was mistaken
   // for a type and emitted as the invalid JavaScript `name === ...`.
-  code = code.replace(/([,\(]\s*[A-Za-z_$][\w$]*)\??\s*:\s*([^=,\)]+)(?=,|\)|=(?!=))/g, "$1");
+  code = code.replace(/([,\(]\s*[A-Za-z_$][\w$]*)\??\s*:\s*([^?=,\)]+)(?=,|\)|=(?!=))/g, "$1");
 
   // TypeScript also permits an optional parameter without an explicit type.
   // Restrict the match to parameter delimiters so ternaries and optional

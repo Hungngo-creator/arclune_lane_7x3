@@ -21,6 +21,7 @@ try {
   esbuild = await tryImportModule('./tools/esbuild-stub/index.js');
   console.warn('Sử dụng esbuild fallback từ tools/esbuild-stub do không thể tải gói esbuild chuẩn:', err?.message || err);
 }
+const USING_ESBUILD_FALLBACK = esbuild?.__arcStub === true;
 const SRC_DIR = path.join(__dirname, 'src');
 const DIST_DIR = path.join(__dirname, 'dist');
 const ASSETS_SOURCE_DIR = path.join(__dirname, 'assets');
@@ -876,7 +877,8 @@ function logTopBundleSizes(metafile, limit = 5){
 }
 
 async function build(){
-  console.log(`[build.mjs ${BUILD_SCRIPT_VERSION}] Bắt đầu build với Node ${process.version}`);
+  const transformerLabel = USING_ESBUILD_FALLBACK ? 'offline TypeScript fallback' : 'esbuild';
+  console.log(`[build.mjs ${BUILD_SCRIPT_VERSION}] Bắt đầu build với Node ${process.version}; target Chromium 151; transformer ${transformerLabel}`);
   const files = await listSourceFiles();
   syncLegacyModuleAliases(files);
   const reachableModuleIds = pruneUnreachableModules

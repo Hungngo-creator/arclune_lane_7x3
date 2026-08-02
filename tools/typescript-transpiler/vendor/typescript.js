@@ -5,15 +5,19 @@
 const fs = require("fs");
 const path = require("path");
 
+const disableTypescriptRuntime = process.env.ARCLUNE_DISABLE_TYPESCRIPT_RUNTIME === "1";
 let realTypescript = null;
 try {
+  if (disableTypescriptRuntime) {
+    throw new Error("TypeScript runtime disabled for offline fallback verification");
+  }
     // eslint-disable-next-line @typescript-eslint/no-var-requires
   realTypescript = require("typescript");
 } catch (err) {
   realTypescript = null;
 }
 
-if (!realTypescript) {
+if (!realTypescript && !disableTypescriptRuntime) {
   try {
     const nodeBinDir = path.dirname(process.execPath);
     const globalCandidate = path.resolve(nodeBinDir, "..", "lib", "node_modules", "typescript");
