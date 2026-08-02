@@ -1352,7 +1352,7 @@ nếu có nhiều hơn 1 kẻ thù bị hất tung cùng lúc, hắn cùng lúc 
 
 skill 1: đánh dấu 1 ô bất kỳ trên sân phe địch trừ ô 8 của leader, nếu có kẻ thù đứng trên ô bị đánh dấu và chúng hành động thành công 2 turn liên tiếp, ngay sau khi chúng hành động thành công 2 turn liên tiếp của bản thân chúng, lập tức chúng sẽ bị hất tung trong 1s. Nhân vật này miễn kích hoạt được Thiện Xạ lên mục tiêu đứng vào ô bị đánh dấu thì phát thiện xạ đó sẽ không bị tính vào cap 5 của nội tại thiện xạ nhưng tăng atk vẫn nhận được và vẫn không bị tính vào cap tăng atk từ nội tại của hắn, sau khi kích hoạt thiện xạ lên mục tiêu đứng vào ô bị đánh dấu hắn +2% atk cho đến khi rời sân, nếu đã đánh dấu mà nhân vật này rời sân thì ô bị đánh dấu sẽ không bị đánh dấu ngay lập tức. cost 5 ae. không cd, tồn tại tối đa 3 ô bị đánh dấu cùng lúc, ô đánh dấu không bị giới hạn time tồn tại mà chỉ biến mất khi kích hoạt hất tung. Hất tung đối tanker có rank cao hơn bản thân hắn vô hiệu.
 
-
+skill 2: bị động kích hoạt khi đạt điều kiện, khi skill 1 kích hoạt đánh dấu và ô bị đánh dấu có kẻ địch đứng, nếu nhân vật này có hp trên hoặc = 50% max hp của bản thân, lập tức mất hp = 5% max hp, khiến time kích hoạt hất tung của skill 1 từ 2 thành 1 turn hành động của mục tiêu đứng trên ô đó. Giới hạn kích hoạt 2 lần/ turn của bản thân (tính như cap nội tại), mỗi lần kích hoạt hiệu ứng giảm time kích hoạt hất tung chỉ áp dụng lên 1 ô bị đánh dấu từ skill 1.
 
 75) 
 

@@ -53,6 +53,8 @@ export interface UnitToken extends StatBlock {
   lifeSerial?: number;
   bornSerial?: number;
   ownerIid?: number;
+  /** Spawn-time combat identity; lifecycle policy must not infer this from flags. */
+  entityKind?: 'collection-unit' | 'leader' | 'npc' | 'boss' | 'summon' | 'summoned-creep' | 'clone' | 'combat-object';
   alive: boolean;
   /** Canonical lifecycle state. `alive` remains a compatibility projection. */
   lifeState?: LifeState;

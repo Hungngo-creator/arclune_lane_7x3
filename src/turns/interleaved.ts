@@ -2,6 +2,7 @@ import { slotIndex } from '../engine.ts';
 import type { SessionState } from '@shared-types/combat';
 import type { Side, UnitToken } from '@shared-types/units';
 import type { InterleavedState, InterleavedTurnState, TurnSideKey } from '@shared-types/turn-order';
+import { isCombatAlive } from '../combat/kernel/life-cycle.ts';
 
 const SIDE_TO_LOWER: Record<TurnSideKey, Side> = { ALLY: 'ally', ENEMY: 'enemy' };
 const LOWER_TO_UPPER: Record<Side, TurnSideKey> = { ally: 'ALLY', enemy: 'ENEMY' };
@@ -95,7 +96,7 @@ function buildSlotMaps(tokens: ReadonlyArray<UnitToken> | null | undefined): Slo
   const ally = slotMaps.ALLY;
   const enemy = slotMaps.ENEMY;
   for (const unit of tokens){
-    if (!unit || !unit.alive) continue;
+    if (!unit || !isCombatAlive(unit)) continue;
     if (unit.side !== 'ally' && unit.side !== 'enemy') continue;
     const sideKey = LOWER_TO_UPPER[unit.side];
     const map = sideKey === 'ALLY' ? ally : enemy;
@@ -259,7 +260,7 @@ export function nextTurnInterleaved(
   state: SessionState,
   turn: InterleavedTurnState | null = (state.turn as InterleavedTurnState | null)
 ): InterleavedState | null {
-  if (!state || !turn) return null;
+  if (!state || !turn || ((state.runtime as { battleEnd?: { ended?: boolean } } | undefined)?.battleEnd?.ended === true)) return null;
 
   ensureTurnState(turn);
   const slotCount = resolveSlotCount(turn);
@@ -276,7 +277,7 @@ export function nextTurnInterleaved(
   // cursor wait, while a summon ahead of it can still join this side pass.
   for (let pos = startPos + 1; pos <= slotCount; pos += 1) {
     const unit = slotMaps[sideKey].get(pos) ?? null;
-    if (unit?.alive && !acted.has(naturalIdentity(unit))) {
+    if (unit && isCombatAlive(unit) && !acted.has(naturalIdentity(unit))) {
       picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit,
         unitId: unit.id ?? null, queued: false, wrapped: false, sideKey, spawnOnly: false };
       break;
@@ -294,7 +295,7 @@ export function nextTurnInterleaved(
     turn.actedNatural![sideKey] = [];
     for (let pos = 1; pos <= slotCount; pos += 1) {
       const unit = slotMaps[sideKey].get(pos) ?? null;
-      if (unit?.alive) {
+      if (unit && isCombatAlive(unit)) {
         picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit,
           unitId: unit.id ?? null, queued: false, wrapped: startPos > 0, sideKey, spawnOnly: false };
         break;

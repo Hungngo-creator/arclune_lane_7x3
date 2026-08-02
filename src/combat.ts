@@ -23,7 +23,7 @@ import {
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
 import { runRuntimeBasicAttackResolved, runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
-import { commitDamageBatch, createLinkedAction, createNaturalAction, currentActionExecution, nextActionPacket, resolveDamageBatch, resolveDamagePacket, resolveSourceAttribution, withActionExecution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
+import { commitDamageBatch, createHpZeroCandidate, createLinkedAction, createNaturalAction, currentActionExecution, nextActionPacket, registerDeathPrevention, registerDeathReactions, resolveDamageBatch, resolveDamagePacket, resolveSourceAttribution, withActionExecution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
 
 export { applyDamage, grantShield };
 
@@ -70,6 +70,31 @@ export interface BasicAttackAfterHitArgs extends Record<string, unknown> {
 }
 
 export type BasicAttackAfterHitHandler = (ctx: BasicAttackAfterHitArgs) => void;
+
+function ensureProductionDeathAdapters(game: SessionState): void {
+  const rt = (game.runtime ??= {}) as { productionDeathAdapters?: boolean };
+  if (rt.productionDeathAdapters) return;
+  rt.productionDeathAdapters = true;
+  registerDeathPrevention(game, candidate => {
+    const target = game.tokens.find(unit => (unit.iid ?? unit.id) === candidate.targetIid);
+    if (!target) return null;
+    return hookOnLethalDamage(target) ? { prevent: true, hp: Number(target.hp ?? 1), effectId: 'legacy-undying', authority: 'normal' } : null;
+  });
+  registerDeathReactions(game, record => {
+    const dead = game.tokens.find(unit => (unit.iid ?? unit.id) === record.targetIid);
+    if (!dead) return;
+    const killer = game.tokens.find(unit => unit.trueSelfId === record.source.creditTrueSelfId) ?? null;
+    emitPassiveEvent(game, dead, 'onDeath', { log: getPassiveLog(game) });
+    runRuntimeUnitDeath({ game, deadUnit: dead, killer });
+  }, record => {
+    const dead = game.tokens.find(unit => (unit.iid ?? unit.id) === record.targetIid);
+    const killer = game.tokens.find(unit => unit.trueSelfId === record.source.creditTrueSelfId);
+    if (!dead || !killer) return;
+    emitPassiveEvent(game, killer, 'onEnemyDeath', { log: getPassiveLog(game), target: dead, attackType: record.causeKind, isDirectKill: true });
+    for (const observer of game.tokens.filter(unit => unit.alive && unit.id === 'blood_avatar' && unit.side !== dead.side && unit.iid !== killer.iid))
+      emitPassiveEvent(game, observer, 'onEnemyDeath', { log: getPassiveLog(game), target: dead, attackType: record.causeKind, isDirectKill: false });
+  });
+}
 
 export interface BasicAttackContext extends Record<string, unknown> {
   target: UnitToken;
@@ -149,6 +174,7 @@ const toNonEmptyString = (value: unknown): string | null => (
 );
 
 const applyResolvedReflectDamage = (
+  game: SessionState | null,
   source: UnitToken,
   receiver: UnitToken,
   incomingDamage: number,
@@ -176,8 +202,10 @@ const applyResolvedReflectDamage = (
   applyDamage(receiver, absorbed.remain);
   const afterHp = Math.max(0, Math.floor(receiver.hp ?? 0));
   const dealt = Math.max(0, beforeHp - afterHp);
-  if (receiver.hp <= 0) {
-    hookOnLethalDamage(receiver);
+  if (game && beforeHp > 0 && receiver.hp <= 0) {
+    const execution = currentActionExecution(game);
+    const identity = execution?.identity ?? createNaturalAction(game, 'reflected');
+    createHpZeroCandidate(game, receiver, identity, resolveSourceAttribution({ immediateSource: source, trueSelf: source.trueSelfId ?? null, owner: source.ownerIid ?? source }), 'reflected', dealt);
   }
   if (dealt > 0) {
     gainFury(receiver, {
@@ -192,6 +220,7 @@ const applyResolvedReflectDamage = (
 };
 
 const resolveReflectDamage = (
+  game: SessionState | null,
   attacker: UnitToken,
   target: UnitToken,
   dealt: number,
@@ -208,8 +237,8 @@ const resolveReflectDamage = (
 
   if (fullReflectDuel || (hasEqualReflect && targetReflect > 0)) {
     const mirrored = Math.round(Math.max(0, dealt) * targetReflect);
-    const reflectedToAttacker = applyResolvedReflectDamage(target, attacker, mirrored, dtype);
-    const reflectedToTarget = applyResolvedReflectDamage(attacker, target, mirrored, dtype);
+    const reflectedToAttacker = applyResolvedReflectDamage(game, target, attacker, mirrored, dtype);
+    const reflectedToTarget = applyResolvedReflectDamage(game, attacker, target, mirrored, dtype);
     return { reflectedToAttacker, reflectedToTarget };
   }
 
@@ -219,6 +248,7 @@ const resolveReflectDamage = (
   }
 
   const reflectedToAttacker = applyResolvedReflectDamage(
+    game,
     target,
     attacker,
     Math.round(dealt * netReflectPct),
@@ -431,6 +461,7 @@ export function dealAbilityDamage(
   // not already own a cast receive a real natural action, never a detached id.
   if (Game && !currentActionExecution(Game) && !opts.actionIdentity) {
     return withActionExecution(Game, createNaturalAction(Game, String(opts.attackType ?? 'ability')), () => dealAbilityDamage(Game, attacker, target, opts));
+    if (Game) ensureProductionDeathAdapters(Game);
   }
   if (!attacker || !target || !target.alive) {
     return {
@@ -518,17 +549,6 @@ export function dealAbilityDamage(
   }
 
   let dealtTotal = 0;
-  const attackerState = attacker as UnitToken & { _directKills?: number };
-
-  const emitOnDeathPassive = (unit: UnitToken): void => {
-    if (!Game || unit.alive) return;
-    const deadAt = Number(unit.deadAt ?? 0);
-    const marker = Number((unit as UnitToken & { _passiveDeathAt?: number })._passiveDeathAt ?? Number.NaN);
-    if (Number.isFinite(marker) && marker === deadAt) return;
-    (unit as UnitToken & { _passiveDeathAt?: number })._passiveDeathAt = deadAt;
-    emitPassiveEvent(Game, unit, 'onDeath', { log: getPassiveLog(Game) });
-    runRuntimeUnitDeath({ game: Game, deadUnit: unit, killer: attacker });
-  };
   const sharedRules = getSharedHpRules(target);
   const sharedTargets = [] as UnitToken[];
   if (sharedRules.group && Game) {
@@ -558,18 +578,12 @@ export function dealAbilityDamage(
   });
   const committed = commitDamageBatch(Game, batchResolution, weightedTargets.map(entry => entry.token));
   dealtTotal = committed.commits.reduce((sum, entry) => sum + entry.hpDamage, 0);
-  const lethalTargets = weightedTargets.map(entry => entry.token).filter(unit => unit.hp <= 0)
-    .sort((a, b) => slotIndex(a.side, a.cx, a.cy) - slotIndex(b.side, b.cx, b.cy) || String(a.iid ?? a.id).localeCompare(String(b.iid ?? b.id)));
-  for (const unit of lethalTargets) {
-    hookOnLethalDamage(unit);
-    emitOnDeathPassive(unit);
+  if (Game) for (const commit of committed.commits) if (commit.reachedZero) {
+    const unit = weightedTargets.find(entry => (entry.token.iid ?? entry.token.id) === commit.targetIid)!.token;
+    createHpZeroCandidate(Game, unit, identity, source, attackType === 'reflect' ? 'reflected' : attackType === 'self-damage' ? 'self-damage' : 'damage', commit.hpDamage, 0);
   }
   if (target.hp <= 0) {
     emitPassiveEvent(Game, target, 'onLethalDamage', { log: getPassiveLog(Game), attacker, attackType });
-  }
-  if (target.hp <= 0) {
-    hookOnLethalDamage(target);
-    emitOnDeathPassive(target);
   }
   {
     const targetCarrier = target as UnitToken & {
@@ -595,7 +609,7 @@ export function dealAbilityDamage(
   };
   Statuses.afterDamage(attacker, target, damageResult);
   const dealt = Math.max(0, dealtTotal);
-  resolveReflectDamage(attacker, target, dealt, dtype);
+  resolveReflectDamage(Game, attacker, target, dealt, dtype);
 
   const sessionVfx = asSessionWithVfx(Game);
 
@@ -609,27 +623,6 @@ export function dealAbilityDamage(
   }
 
   const isKill = target.hp <= 0;
-  if (isKill) {
-    attackerState._directKills = Math.max(0, Math.floor(Number(attackerState._directKills ?? 0))) + 1;
-    emitPassiveEvent(Game, attacker, 'onEnemyDeath', { log: getPassiveLog(Game), target, attackType, isDirectKill: true });
-    const bloodAvatarObservers = Game?.tokens?.filter((token) =>
-      token.alive
-      && token.id === 'blood_avatar'
-      && token.side !== target.side
-      && token.iid !== attacker.iid
-    ) ?? [];
-    if (bloodAvatarObservers.length > 0) {
-      const observerLog = getPassiveLog(Game);
-      for (const observer of bloodAvatarObservers) {
-        emitPassiveEvent(Game, observer, 'onEnemyDeath', {
-          log: observerLog,
-          target,
-          attackType,
-          isDirectKill: false,
-        });
-      }
-    }
-  }
 
   gainFury(attacker, {
     type: attackType === 'basic' ? 'basic' : 'ability',

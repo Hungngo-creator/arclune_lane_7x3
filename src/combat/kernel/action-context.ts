@@ -2,6 +2,8 @@ import type { SessionState } from '@shared-types/combat';
 import { createTriggerLedger, type TriggerLedger } from './trigger-ledger.ts';
 import type { CombatId } from './ids.ts';
 import type { ActionIdentity } from './types.ts';
+import { resolveDeathWave } from './life-cycle.ts';
+import { evaluateBattleEnd } from './battle-end.ts';
 
 export interface ActionExecutionContext {
   readonly identity: ActionIdentity;
@@ -32,7 +34,15 @@ export function endActionExecution(game: SessionState, expected?: ActionExecutio
 
 export function withActionExecution<T>(game: SessionState, identity: ActionIdentity, execute: (context: ActionExecutionContext) => T, options: Parameters<typeof beginActionExecution>[2] = {}): T {
   const context = beginActionExecution(game, identity, options);
-  try { return execute(context); } finally { endActionExecution(game, context); }
+  let completed = false;
+  try { const result = execute(context); completed = true; return result; }
+  finally {
+    endActionExecution(game, context);
+    if (completed) {
+      const wave = resolveDeathWave(game);
+      evaluateBattleEnd(game, wave);
+    }
+  }
 }
 
 export function nextActionPacket(context: ActionExecutionContext): { packetSerial: number; packetId: string } {

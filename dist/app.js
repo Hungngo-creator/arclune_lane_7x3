@@ -4692,16 +4692,47 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   const runRuntimeUnitDeath = __dep17.runRuntimeUnitDeath;
   const __dep18 = __require('./combat/kernel/index.ts');
   const commitDamageBatch = __dep18.commitDamageBatch;
+  const createHpZeroCandidate = __dep18.createHpZeroCandidate;
   const createLinkedAction = __dep18.createLinkedAction;
   const createNaturalAction = __dep18.createNaturalAction;
   const currentActionExecution = __dep18.currentActionExecution;
   const nextActionPacket = __dep18.nextActionPacket;
+  const registerDeathPrevention = __dep18.registerDeathPrevention;
+  const registerDeathReactions = __dep18.registerDeathReactions;
   const resolveDamageBatch = __dep18.resolveDamageBatch;
   const resolveDamagePacket = __dep18.resolveDamagePacket;
   const resolveSourceAttribution = __dep18.resolveSourceAttribution;
   const withActionExecution = __dep18.withActionExecution;
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
+  function ensureProductionDeathAdapters(game) {
+      const rt = (game.runtime ??= {});
+      if (rt.productionDeathAdapters)
+          return;
+      rt.productionDeathAdapters = true;
+      registerDeathPrevention(game, candidate => {
+          const target = game.tokens.find(unit => (unit.iid ?? unit.id) === candidate.targetIid);
+          if (!target)
+              return null;
+          return hookOnLethalDamage(target) ? { prevent: true, hp: Number(target.hp ?? 1), effectId: 'legacy-undying', authority: 'normal' } : null;
+      });
+      registerDeathReactions(game, record => {
+          const dead = game.tokens.find(unit => (unit.iid ?? unit.id) === record.targetIid);
+          if (!dead)
+              return;
+          const killer = game.tokens.find(unit => unit.trueSelfId === record.source.creditTrueSelfId) ?? null;
+          emitPassiveEvent(game, dead, 'onDeath', { log: getPassiveLog(game) });
+          runRuntimeUnitDeath({ game, deadUnit: dead, killer });
+      }, record => {
+          const dead = game.tokens.find(unit => (unit.iid ?? unit.id) === record.targetIid);
+          const killer = game.tokens.find(unit => unit.trueSelfId === record.source.creditTrueSelfId);
+          if (!dead || !killer)
+              return;
+          emitPassiveEvent(game, killer, 'onEnemyDeath', { log: getPassiveLog(game), target: dead, attackType: record.causeKind, isDirectKill: true });
+          for (const observer of game.tokens.filter(unit => unit.alive && unit.id === 'blood_avatar' && unit.side !== dead.side && unit.iid !== killer.iid))
+              emitPassiveEvent(game, observer, 'onEnemyDeath', { log: getPassiveLog(game), target: dead, attackType: record.causeKind, isDirectKill: false });
+      });
+  }
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
   const RANK_PRIORITY = {
       N: 1,
@@ -4728,7 +4759,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       reflectedToTarget: 0,
   });
   const toNonEmptyString = (value) => (typeof value === 'string' && value.trim() ? value : null);
-  const applyResolvedReflectDamage = (source, receiver, incomingDamage, dtype) => {
+  const applyResolvedReflectDamage = (game, source, receiver, incomingDamage, dtype) => {
       const normalizedIncoming = Math.max(0, Math.floor(incomingDamage));
       if (normalizedIncoming <= 0)
           return 0;
@@ -4749,8 +4780,10 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       applyDamage(receiver, absorbed.remain);
       const afterHp = Math.max(0, Math.floor(receiver.hp ?? 0));
       const dealt = Math.max(0, beforeHp - afterHp);
-      if (receiver.hp <= 0) {
-          hookOnLethalDamage(receiver);
+      if (game && beforeHp > 0 && receiver.hp <= 0) {
+          const execution = currentActionExecution(game);
+          const identity = execution?.identity ?? createNaturalAction(game, 'reflected');
+          createHpZeroCandidate(game, receiver, identity, resolveSourceAttribution({ immediateSource: source, trueSelf: source.trueSelfId ?? null, owner: source.ownerIid ?? source }), 'reflected', dealt);
       }
       if (dealt > 0) {
           gainFury(receiver, {
@@ -4763,7 +4796,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       }
       return dealt;
   };
-  const resolveReflectDamage = (attacker, target, dealt, dtype) => {
+  const resolveReflectDamage = (game, attacker, target, dealt, dtype) => {
       const targetReflect = clamp01(Statuses.get(target, 'reflect')?.power ?? 0);
       if (dealt <= 0 || targetReflect <= 0) {
           return ZERO_REFLECT_RESULT;
@@ -4773,15 +4806,15 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       const fullReflectDuel = targetReflect >= 1 && attackerReflect >= 1;
       if (fullReflectDuel || (hasEqualReflect && targetReflect > 0)) {
           const mirrored = Math.round(Math.max(0, dealt) * targetReflect);
-          const reflectedToAttacker = applyResolvedReflectDamage(target, attacker, mirrored, dtype);
-          const reflectedToTarget = applyResolvedReflectDamage(attacker, target, mirrored, dtype);
+          const reflectedToAttacker = applyResolvedReflectDamage(game, target, attacker, mirrored, dtype);
+          const reflectedToTarget = applyResolvedReflectDamage(game, attacker, target, mirrored, dtype);
           return { reflectedToAttacker, reflectedToTarget };
       }
       const netReflectPct = Math.max(0, targetReflect - attackerReflect);
       if (netReflectPct <= 0) {
           return ZERO_REFLECT_RESULT;
       }
-      const reflectedToAttacker = applyResolvedReflectDamage(target, attacker, Math.round(dealt * netReflectPct), dtype);
+      const reflectedToAttacker = applyResolvedReflectDamage(game, target, attacker, Math.round(dealt * netReflectPct), dtype);
       return { reflectedToAttacker, reflectedToTarget: 0 };
   };
   const unitEventKey = (unit) => {
@@ -4968,6 +5001,8 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       // not already own a cast receive a real natural action, never a detached id.
       if (Game && !currentActionExecution(Game) && !opts.actionIdentity) {
           return withActionExecution(Game, createNaturalAction(Game, String(opts.attackType ?? 'ability')), () => dealAbilityDamage(Game, attacker, target, opts));
+          if (Game)
+              ensureProductionDeathAdapters(Game);
       }
       if (!attacker || !target || !target.alive) {
           return {
@@ -5052,18 +5087,6 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           recordChapMinhPreventedDamage(chapMinhMitigation.owner, chapMinhMitigation.prevented);
       }
       let dealtTotal = 0;
-      const attackerState = attacker;
-      const emitOnDeathPassive = (unit) => {
-          if (!Game || unit.alive)
-              return;
-          const deadAt = Number(unit.deadAt ?? 0);
-          const marker = Number(unit._passiveDeathAt ?? Number.NaN);
-          if (Number.isFinite(marker) && marker === deadAt)
-              return;
-          unit._passiveDeathAt = deadAt;
-          emitPassiveEvent(Game, unit, 'onDeath', { log: getPassiveLog(Game) });
-          runRuntimeUnitDeath({ game: Game, deadUnit: unit, killer: attacker });
-      };
       const sharedRules = getSharedHpRules(target);
       const sharedTargets = [];
       if (sharedRules.group && Game) {
@@ -5095,18 +5118,14 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       });
       const committed = commitDamageBatch(Game, batchResolution, weightedTargets.map(entry => entry.token));
       dealtTotal = committed.commits.reduce((sum, entry) => sum + entry.hpDamage, 0);
-      const lethalTargets = weightedTargets.map(entry => entry.token).filter(unit => unit.hp <= 0)
-          .sort((a, b) => slotIndex(a.side, a.cx, a.cy) - slotIndex(b.side, b.cx, b.cy) || String(a.iid ?? a.id).localeCompare(String(b.iid ?? b.id)));
-      for (const unit of lethalTargets) {
-          hookOnLethalDamage(unit);
-          emitOnDeathPassive(unit);
-      }
+      if (Game)
+          for (const commit of committed.commits)
+              if (commit.reachedZero) {
+                  const unit = weightedTargets.find(entry => (entry.token.iid ?? entry.token.id) === commit.targetIid).token;
+                  createHpZeroCandidate(Game, unit, identity, source, attackType === 'reflect' ? 'reflected' : attackType === 'self-damage' ? 'self-damage' : 'damage', commit.hpDamage, 0);
+              }
       if (target.hp <= 0) {
           emitPassiveEvent(Game, target, 'onLethalDamage', { log: getPassiveLog(Game), attacker, attackType });
-      }
-      if (target.hp <= 0) {
-          hookOnLethalDamage(target);
-          emitOnDeathPassive(target);
       }
       {
           const targetCarrier = target;
@@ -5127,7 +5146,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       };
       Statuses.afterDamage(attacker, target, damageResult);
       const dealt = Math.max(0, dealtTotal);
-      resolveReflectDamage(attacker, target, dealt, dtype);
+      resolveReflectDamage(Game, attacker, target, dealt, dtype);
       const sessionVfx = asSessionWithVfx(Game);
       if (sessionVfx != null) {
           try {
@@ -5139,25 +5158,6 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           }
       }
       const isKill = target.hp <= 0;
-      if (isKill) {
-          attackerState._directKills = Math.max(0, Math.floor(Number(attackerState._directKills ?? 0))) + 1;
-          emitPassiveEvent(Game, attacker, 'onEnemyDeath', { log: getPassiveLog(Game), target, attackType, isDirectKill: true });
-          const bloodAvatarObservers = Game?.tokens?.filter((token) => token.alive
-              && token.id === 'blood_avatar'
-              && token.side !== target.side
-              && token.iid !== attacker.iid) ?? [];
-          if (bloodAvatarObservers.length > 0) {
-              const observerLog = getPassiveLog(Game);
-              for (const observer of bloodAvatarObservers) {
-                  emitPassiveEvent(Game, observer, 'onEnemyDeath', {
-                      log: observerLog,
-                      target,
-                      attackType,
-                      isDirectKill: false,
-                  });
-              }
-          }
-      }
       gainFury(attacker, {
           type: attackType === 'basic' ? 'basic' : 'ability',
           dealt,
@@ -6009,6 +6009,10 @@ __modules['./combat/counter-matrix.ts'] = (exports, module, __require) => {
 __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/kernel/trigger-ledger.ts');
   const createTriggerLedger = __dep0.createTriggerLedger;
+  const __dep1 = __require('./combat/kernel/life-cycle.ts');
+  const resolveDeathWave = __dep1.resolveDeathWave;
+  const __dep2 = __require('./combat/kernel/battle-end.ts');
+  const evaluateBattleEnd = __dep2.evaluateBattleEnd;
   const stack = (game) => ((game.runtime ??= {}).actionExecutionStack ??= []);
   function beginActionExecution(game, identity, options = {}) {
       const context = { identity, nextPacketSerial: 1, triggerLedger: options.triggerLedger ?? createTriggerLedger(), originActionId: options.originActionId ?? null, snapshot: { ...(options.snapshot ?? {}) } };
@@ -6028,11 +6032,18 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
   }
   function withActionExecution(game, identity, execute, options = {}) {
       const context = beginActionExecution(game, identity, options);
+      let completed = false;
       try {
-          return execute(context);
+          const result = execute(context);
+          completed = true;
+          return result;
       }
       finally {
           endActionExecution(game, context);
+          if (completed) {
+              const wave = resolveDeathWave(game);
+              evaluateBattleEnd(game, wave);
+          }
       }
   }
   function nextActionPacket(context) {
@@ -6156,7 +6167,7 @@ __modules['./combat/kernel/action-transaction.ts'] = (exports, module, __require
 };
 __modules['./combat/kernel/battle-end.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/kernel/life-cycle.ts');
-  const isCombatAlive = __dep0.isCombatAlive;
+  const getLifeState = __dep0.getLifeState;
   const __dep1 = __require('./combat/kernel/sequence.ts');
   const nextEventSerial = __dep1.nextEventSerial;
   function evaluateBattleEnd(game, _wave = []) {
@@ -6165,8 +6176,8 @@ __modules['./combat/kernel/battle-end.ts'] = (exports, module, __require) => {
           return rt.battleEnd;
       const ally = game.tokens.find(unit => unit.isLeader && unit.side === 'ally');
       const enemy = game.tokens.find(unit => unit.isLeader && unit.side === 'enemy');
-      const allyDead = !!ally && !isCombatAlive(ally);
-      const enemyDead = !!enemy && !isCombatAlive(enemy);
+      const allyDead = !!ally && getLifeState(ally) === 'dead-confirmed';
+      const enemyDead = !!enemy && getLifeState(enemy) === 'dead-confirmed';
       if (!allyDead && !enemyDead)
           return { ended: false, winner: null, reason: null };
       const result = { ended: true, winner: allyDead && enemyDead ? 'draw' : allyDead ? 'enemy' : 'ally', reason: 'leader-death' };
@@ -6181,6 +6192,7 @@ __modules['./combat/kernel/combat-identity.ts'] = (exports, module, __require) =
   const OWNS_TRUE_SELF = new Set(['collection-unit', 'leader', 'npc', 'boss']);
   /** Establishes instance identity without ever treating a definition id as a true self. */
   function ensureCombatIdentity(unit, kind) {
+      unit.entityKind = kind;
       if (unit.iid == null)
           throw new Error(`[combat-identity] ${kind} requires an instance iid`);
       if (OWNS_TRUE_SELF.has(kind)) {
@@ -6747,13 +6759,17 @@ __modules['./combat/kernel/legacy-adapter.ts'] = (exports, module, __require) =>
 __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/kernel/combat-identity.ts');
   const beginRevivedLife = __dep0.beginRevivedLife;
-  const __dep1 = __require('./combat/kernel/sequence.ts');
-  const nextDeathSerial = __dep1.nextDeathSerial;
-  const nextEventSerial = __dep1.nextEventSerial;
+  const __dep1 = __require('./engine.ts');
+  const slotIndex = __dep1.slotIndex;
+  const __dep2 = __require('./combat/tag-aliases.ts');
+  const compareRuleTagPriority = __dep2.compareRuleTagPriority;
+  const __dep3 = __require('./combat/kernel/sequence.ts');
+  const nextDeathSerial = __dep3.nextDeathSerial;
+  const nextEventSerial = __dep3.nextEventSerial;
   const runtime = (game) => (game.runtime ??= {});
   const emit = (game, event) => { (runtime(game).combatEvents ??= []).push(event); };
-  const getLifeState = (unit) => unit.lifeState ?? (unit.alive && (unit.hp ?? 0) > 0 ? 'alive' : 'dead-confirmed');
-  const isCombatAlive = (unit) => getLifeState(unit) === 'alive' && unit.alive !== false && (unit.hp ?? 0) > 0;
+  const getLifeState = (unit) => unit.lifeState ?? (unit.alive && (unit.hp == null || unit.hp > 0) ? 'alive' : 'dead-confirmed');
+  const isCombatAlive = (unit) => getLifeState(unit) === 'alive' && unit.alive !== false && (unit.hp == null || unit.hp > 0);
   function markHpZero(unit) { unit.lifeState = 'hp-zero'; unit.alive = false; }
   function markDeathPrevention(unit) { unit.lifeState = 'death-prevention'; unit.alive = false; }
   function markDeathPrevented(unit, hp = 1) { unit.hp = Math.max(1, hp); unit.lifeState = 'alive'; unit.alive = true; }
@@ -6761,7 +6777,8 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   function markRemoved(unit) { unit.lifeState = 'removed'; unit.alive = false; }
   function markErased(unit) { unit.lifeState = 'erased'; unit.alive = false; }
   const lifeKey = (iid, serial) => `${String(iid)}:${serial}`;
-  const authorityRank = { normal: 0, rule: 1, law: 2, axiom: 3 };
+  const authorityTag = (authority) => authority === 'normal' || !authority ? null : authority;
+  const compareDeathAuthority = (left, right) => compareRuleTagPriority(authorityTag(left), authorityTag(right));
   function registerDeathPrevention(game, collect) {
       const state = runtime(game);
       const item = { serial: (state.deathPreventionSerial = (state.deathPreventionSerial ?? 0) + 1), collect };
@@ -6775,16 +6792,32 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
           for (const decision of found ? (Array.isArray(found) ? found : [found]) : [])
               decisions.push({ ...decision, registrationSerial: decision.registrationSerial ?? registration.serial });
       }
-      return decisions.sort((a, b) => ((authorityRank[b.authority ?? 'normal'] ?? 0) - (authorityRank[a.authority ?? 'normal'] ?? 0)) || ((b.explicitPriority ?? b.priority ?? 0) - (a.explicitPriority ?? a.priority ?? 0)) || ((a.registrationSerial ?? 0) - (b.registrationSerial ?? 0)) || a.effectId.localeCompare(b.effectId));
+      return decisions.sort((a, b) => compareDeathAuthority(b.authority, a.authority) || ((b.explicitPriority ?? b.priority ?? 0) - (a.explicitPriority ?? a.priority ?? 0)) || ((a.registrationSerial ?? 0) - (b.registrationSerial ?? 0)) || a.effectId.localeCompare(b.effectId));
   }
+  function registerDeathReactions(game, onDeath, onKill) {
+      const state = runtime(game);
+      (state.deathReactionRegistrations ??= []).push(onDeath);
+      (state.killReactionRegistrations ??= []).push(onKill);
+      return () => { state.deathReactionRegistrations = state.deathReactionRegistrations?.filter(item => item !== onDeath); state.killReactionRegistrations = state.killReactionRegistrations?.filter(item => item !== onKill); };
+  }
+  const policyFor = (kind, target) => {
+      const summon = kind === 'summon' || kind === 'summoned-creep' || kind === 'clone' || kind === 'combat-object';
+      return { countsForKill: target.countsForKill !== false, countsForKillReward: !summon && target.countsForKill !== false, countsForReincarnation: !summon, canRevive: !summon && target.revivable !== false, removalPolicy: kind === 'combat-object' ? 'remove' : 'remain' };
+  };
   function createHpZeroCandidate(game, target, identity, source, causeKind, hpDamage, overkill = 0) {
+      if (!target.trueSelfId && !target.isMinion && target.iid != null) {
+          target.trueSelfId = `true-self:${String(target.iid)}`;
+          target.lifeSerial ??= 1;
+      }
       if (!target.trueSelfId && !target.isMinion && (target.hpMax ?? 0) > 0)
           throw new Error('[combat-lifecycle] HP-bearing non-summon is missing trueSelfId');
       markHpZero(target);
+      const entityKind = target.entityKind ?? (target.isLeader ? 'leader' : target.isMinion ? 'summon' : 'collection-unit');
+      const policy = policyFor(entityKind, target);
       const candidate = { targetIid: target.iid ?? target.id, trueSelfId: target.trueSelfId ?? null, lifeSerial: target.lifeSerial ?? 1,
           actionId: identity.actionId, chainId: identity.chainId, parentActionId: identity.parentActionId, source, causeKind, committedHpDamage: hpDamage, overkill,
-          slot: target.cy * 3 + target.cx, position: { cx: target.cx, cy: target.cy }, isLeader: target.isLeader === true, isSummon: target.isMinion === true,
-          countsForReincarnation: target.isMinion !== true, eventSerial: nextEventSerial(game), entityKind: target.isLeader ? 'leader' : target.isMinion ? 'summon' : 'collection-unit', countsForKill: target.countsForKill !== false, countsForKillReward: target.countsForKill !== false, canRevive: target.revivable !== false && !target.isMinion, removalPolicy: 'remain' };
+          slot: slotIndex(target.side, target.cx, target.cy), position: { cx: target.cx, cy: target.cy }, isLeader: entityKind === 'leader', isSummon: entityKind === 'summon' || entityKind === 'summoned-creep',
+          ...policy, eventSerial: nextEventSerial(game), entityKind };
       const queue = runtime(game).hpZeroCandidates ??= [];
       const key = lifeKey(candidate.targetIid, candidate.lifeSerial);
       const opened = runtime(game).openHpZeroKeys ??= [];
@@ -6800,9 +6833,16 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       const queued = state.hpZeroCandidates ?? [];
       state.hpZeroCandidates = [];
       const confirmedKeys = state.confirmedLifeKeys ??= [];
-      const preventedKeys = state.preventedLifeKeys ??= [];
-      const candidates = [...new Map(queued.map(item => [lifeKey(item.targetIid, item.lifeSerial), item])).values()].filter(item => !confirmedKeys.includes(lifeKey(item.targetIid, item.lifeSerial)) && !preventedKeys.includes(lifeKey(item.targetIid, item.lifeSerial))).sort((a, b) => a.slot - b.slot || String(a.targetIid).localeCompare(String(b.targetIid)) || a.eventSerial - b.eventSerial);
+      const opened = state.openHpZeroKeys ??= [];
+      const close = (candidate) => { const key = lifeKey(candidate.targetIid, candidate.lifeSerial); state.openHpZeroKeys = opened.filter(item => item !== key); opened.splice(0, opened.length, ...(state.openHpZeroKeys ?? [])); };
       const tokens = new Map(game.tokens.map(unit => [unit.iid ?? unit.id, unit]));
+      const candidates = [...new Map(queued.map(item => [lifeKey(item.targetIid, item.lifeSerial), item])).values()].filter(item => {
+          const target = tokens.get(item.targetIid);
+          const valid = !confirmedKeys.includes(lifeKey(item.targetIid, item.lifeSerial)) && !!target && (target.lifeSerial ?? 1) === item.lifeSerial && Number(target.hp ?? 0) === 0 && (getLifeState(target) === 'hp-zero' || getLifeState(target) === 'death-prevention');
+          if (!valid)
+              close(item);
+          return valid;
+      }).sort((a, b) => a.slot - b.slot || String(a.targetIid).localeCompare(String(b.targetIid)) || a.eventSerial - b.eventSerial);
       for (const candidate of candidates) {
           const target = tokens.get(candidate.targetIid);
           if (target)
@@ -6820,7 +6860,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
           const decision = collected[0] ?? prevention({ candidate, decisions: collected });
           if (decision?.prevent) {
               markDeathPrevented(target, Math.min(Number(target.hpMax ?? 1), decision.hp));
-              preventedKeys.push(lifeKey(candidate.targetIid, candidate.lifeSerial));
+              close(candidate);
               emit(game, { type: 'DEATH_PREVENTED', eventSerial: nextEventSerial(game), actionId: candidate.actionId, chainId: candidate.chainId, targetIid: candidate.targetIid, trueSelfId: candidate.trueSelfId, lifeSerial: candidate.lifeSerial, decision });
           }
           else
@@ -6828,28 +6868,40 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       }
       for (const item of confirmed)
           markDeathConfirmed(item.target);
-      const records = confirmed.map(({ candidate, target }) => {
+      const records = confirmed.map(({ candidate }) => {
           const deathSerial = nextDeathSerial(game);
-          const record = { ...candidate, deathId: `death-${deathSerial}`, deathSerial, countsForKill: target.countsForKill !== false, revivable: target.revivable !== false, confirmedEventSerial: nextEventSerial(game) };
+          const record = { ...candidate, deathId: `death-${deathSerial}`, deathSerial, countsForKill: candidate.countsForKill, revivable: candidate.canRevive, confirmedEventSerial: nextEventSerial(game) };
           confirmedKeys.push(lifeKey(candidate.targetIid, candidate.lifeSerial));
-          emit(game, { type: 'DEATH_CONFIRMED', ...record, eventSerial: record.confirmedEventSerial });
-          if (record.countsForKill && record.source.creditTrueSelfId && record.source.creditTrueSelfId !== record.trueSelfId) {
-              const owner = state.trueSelfRecords ??= {};
-              (owner[String(record.source.creditTrueSelfId)] ??= { confirmedKills: 0 }).confirmedKills += 1;
-              emit(game, { type: 'KILL_CREDIT_GRANTED', eventSerial: nextEventSerial(game), deathId: record.deathId, actionId: record.actionId, chainId: record.chainId, targetIid: record.targetIid, trueSelfId: record.trueSelfId, lifeSerial: record.lifeSerial, creditTrueSelfId: record.source.creditTrueSelfId });
-          }
+          close(candidate);
           return record;
       });
       (state.deathRecords ??= []).push(...records);
       const registry = state.deathRecordById ??= {};
       records.forEach(record => { registry[record.deathId] = record; });
+      for (const record of records)
+          emit(game, { type: 'DEATH_CONFIRMED', ...record, eventSerial: record.confirmedEventSerial });
+      for (const record of records) {
+          if (record.countsForKill && record.source.creditTrueSelfId && record.source.creditTrueSelfId !== record.trueSelfId) {
+              const owner = state.trueSelfRecords ??= {};
+              (owner[String(record.source.creditTrueSelfId)] ??= { confirmedKills: 0 }).confirmedKills += 1;
+              emit(game, { type: 'KILL_CREDIT_GRANTED', eventSerial: nextEventSerial(game), deathId: record.deathId, actionId: record.actionId, chainId: record.chainId, targetIid: record.targetIid, trueSelfId: record.trueSelfId, lifeSerial: record.lifeSerial, creditTrueSelfId: record.source.creditTrueSelfId });
+          }
+      }
+      for (const record of records)
+          for (const react of state.deathReactionRegistrations ?? [])
+              react(record);
+      for (const record of records)
+          if (record.source.creditTrueSelfId && record.source.creditTrueSelfId !== record.trueSelfId)
+              for (const react of state.killReactionRegistrations ?? [])
+                  react(record);
       return records;
   }
   function commitImmediateRevive(game, target, request) {
       const death = request.death;
       const state = runtime(game);
       const canonical = state.deathRecordById?.[death.deathId];
-      if (!canonical || canonical !== death || canonical.revivable !== true || death.canRevive !== true)
+      const matches = canonical && canonical.deathId === death.deathId && canonical.targetIid === death.targetIid && canonical.trueSelfId === death.trueSelfId && canonical.lifeSerial === death.lifeSerial && canonical.confirmedEventSerial === death.confirmedEventSerial;
+      if (!matches || canonical.revivable !== true || death.canRevive !== true)
           return { committed: false, reason: 'invalid-or-non-revivable-death', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
       if (target.trueSelfId !== death.trueSelfId)
           return { committed: false, reason: 'identity-mismatch', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
@@ -6868,8 +6920,14 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       target.alive = true;
       if (request.ragePolicy === 'reset')
           target.rage = 0;
-      if (request.buffPolicy === 'purge')
-          target.statuses = target.statuses?.filter(status => status.kind !== 'debuff' || status.unpurgeable === true) ?? [];
+      if (request.buffPolicy === 'purge' || request.buffPolicy === 'purge-purgeable-debuffs')
+          target.statuses = target.statuses?.filter(status => status.kind !== 'debuff' || status.unpurgeable === true);
+      else if (request.buffPolicy === 'clear-temporary')
+          target.statuses = target.statuses?.filter(status => status.unpurgeable === true || status.permanent === true);
+      else if (request.buffPolicy === 'explicit-list') {
+          const ids = new Set(request.statusIds ?? []);
+          target.statuses = target.statuses?.filter(status => !ids.has(String(status.id)));
+      }
       consumed.push(death.deathId);
       emit(game, { type: 'REVIVE_COMMITTED', eventSerial: nextEventSerial(game), deathId: death.deathId, actionId: death.actionId, chainId: death.chainId, targetIid: death.targetIid, trueSelfId: death.trueSelfId, lifeSerial, hp: target.hp, source: request.source, authority: request.authority ?? null });
       return { committed: true, reason: null, targetIid: death.targetIid, lifeSerial };
@@ -6877,6 +6935,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=life-cycle.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getLifeState')) exports.getLifeState = getLifeState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isCombatAlive')) exports.isCombatAlive = isCombatAlive;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'compareDeathAuthority')) exports.compareDeathAuthority = compareDeathAuthority;
   if (!Object.prototype.hasOwnProperty.call(exports, 'markHpZero')) exports.markHpZero = markHpZero;
   if (!Object.prototype.hasOwnProperty.call(exports, 'markDeathPrevention')) exports.markDeathPrevention = markDeathPrevention;
   if (!Object.prototype.hasOwnProperty.call(exports, 'markDeathPrevented')) exports.markDeathPrevented = markDeathPrevented;
@@ -6885,6 +6944,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'markErased')) exports.markErased = markErased;
   if (!Object.prototype.hasOwnProperty.call(exports, 'registerDeathPrevention')) exports.registerDeathPrevention = registerDeathPrevention;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectDeathPreventionDecisions')) exports.collectDeathPreventionDecisions = collectDeathPreventionDecisions;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'registerDeathReactions')) exports.registerDeathReactions = registerDeathReactions;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHpZeroCandidate')) exports.createHpZeroCandidate = createHpZeroCandidate;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveDeathWave')) exports.resolveDeathWave = resolveDeathWave;
   if (!Object.prototype.hasOwnProperty.call(exports, 'commitImmediateRevive')) exports.commitImmediateRevive = commitImmediateRevive;
@@ -45868,6 +45928,8 @@ __modules['./turns.ts'] = (exports, module, __require) => {
 __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./engine.ts');
   const slotIndex = __dep0.slotIndex;
+  const __dep1 = __require('./combat/kernel/life-cycle.ts');
+  const isCombatAlive = __dep1.isCombatAlive;
   const SIDE_TO_LOWER = { ALLY: 'ally', ENEMY: 'enemy' };
   const LOWER_TO_UPPER = { ally: 'ALLY', enemy: 'ENEMY' };
   const TURN_SIDES = ['ALLY', 'ENEMY'];
@@ -45942,7 +46004,7 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
       const ally = slotMaps.ALLY;
       const enemy = slotMaps.ENEMY;
       for (const unit of tokens) {
-          if (!unit || !unit.alive)
+          if (!unit || !isCombatAlive(unit))
               continue;
           if (unit.side !== 'ally' && unit.side !== 'enemy')
               continue;
@@ -46077,7 +46139,7 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
       return null;
   }
   function nextTurnInterleaved(state, turn = state.turn) {
-      if (!state || !turn)
+      if (!state || !turn || (state.runtime?.battleEnd?.ended === true))
           return null;
       ensureTurnState(turn);
       const slotCount = resolveSlotCount(turn);
@@ -46094,7 +46156,7 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
       // cursor wait, while a summon ahead of it can still join this side pass.
       for (let pos = startPos + 1; pos <= slotCount; pos += 1) {
           const unit = slotMaps[sideKey].get(pos) ?? null;
-          if (unit?.alive && !acted.has(naturalIdentity(unit))) {
+          if (unit && isCombatAlive(unit) && !acted.has(naturalIdentity(unit))) {
               picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit,
                   unitId: unit.id ?? null, queued: false, wrapped: false, sideKey, spawnOnly: false };
               break;
@@ -46111,7 +46173,7 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
           turn.actedNatural[sideKey] = [];
           for (let pos = 1; pos <= slotCount; pos += 1) {
               const unit = slotMaps[sideKey].get(pos) ?? null;
-              if (unit?.alive) {
+              if (unit && isCombatAlive(unit)) {
                   picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit,
                       unitId: unit.id ?? null, queued: false, wrapped: startPos > 0, sideKey, spawnOnly: false };
                   break;

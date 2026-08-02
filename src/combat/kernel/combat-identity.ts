@@ -1,10 +1,11 @@
 import type { UnitToken } from '@shared-types/units';
 
-export type CombatIdentityKind = 'collection-unit' | 'leader' | 'npc' | 'boss' | 'summon' | 'summoned-creep' | 'combat-object';
+export type CombatIdentityKind = 'collection-unit' | 'leader' | 'npc' | 'boss' | 'summon' | 'summoned-creep' | 'clone' | 'combat-object';
 const OWNS_TRUE_SELF: ReadonlySet<CombatIdentityKind> = new Set(['collection-unit', 'leader', 'npc', 'boss']);
 
 /** Establishes instance identity without ever treating a definition id as a true self. */
 export function ensureCombatIdentity(unit: UnitToken, kind: CombatIdentityKind): UnitToken {
+  unit.entityKind = kind;
   if (unit.iid == null) throw new Error(`[combat-identity] ${kind} requires an instance iid`);
   if (OWNS_TRUE_SELF.has(kind)) {
     unit.trueSelfId ??= `true-self:${kind}:${String(unit.iid)}`;
