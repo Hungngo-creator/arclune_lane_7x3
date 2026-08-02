@@ -244,7 +244,10 @@ const MODE = resolveBuildMode(argMode, process.env.NODE_ENV);
 const ESBUILD_BASE_OPTIONS = {
   platform: 'browser',
   format: 'esm',
-  target: ['es2023'],
+  // The Android host reports Chromium 151. Target that engine directly so
+  // esbuild can make compatibility decisions from the actual runtime rather
+  // than from an approximate ECMAScript edition label.
+  target: ['chrome151'],y
   sourcemap: MODE === 'production' ? false : true,
   splitting: true,
   metafile: true,
@@ -290,12 +293,13 @@ function loaderForExtension(ext){
   return 'js';
 }
 
-async function transformIfScript(raw, ext){
+async function transformIfScript(raw, ext, sourcefile){
   if (!SCRIPT_EXTENSIONS.has(ext)){
     return raw;
   }
   const { code } = await esbuild.transform(raw, {
     loader: loaderForExtension(ext),
+    sourcefile,
     ...ESBUILD_TRANSFORM_OPTIONS,
   });
   return code;
@@ -901,8 +905,9 @@ async function build(){
       pushModule(id, moduleCode);
       continue;
     }
-    const sourceCode = await transformIfScript(raw, ext);
+    const sourceCode = await transformIfScript(raw, ext, id);
     const transformed = transformModule(sourceCode, id);
+    assertValidJavaScript(transformed, id);
     pushModule(id, transformed);
   }
 
@@ -916,9 +921,9 @@ async function build(){
     }
     const raw = await fs.readFile(stubPath, 'utf8');
     const ext = path.extname(stubPath);
-    const sourceCode = await transformIfScript(raw, ext);
+    const sourceCode = await transformIfScript(raw, ext, moduleId);
     const transformed = transformModule(sourceCode, moduleId);
-    pushModule(moduleId, transformed);
+    assertValidJavaScript(transformed, moduleId);
   }
 
   await fs.mkdir(DIST_DIR, { recursive: true });
