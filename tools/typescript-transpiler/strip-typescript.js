@@ -273,6 +273,11 @@ function stripTypeAnnotations(source) {
   // for a type and emitted as the invalid JavaScript `name === ...`.
   code = code.replace(/([,\(]\s*[A-Za-z_$][\w$]*)\??\s*:\s*([^=,\)]+)(?=,|\)|=(?!=))/g, "$1");
 
+  // TypeScript also permits an optional parameter without an explicit type.
+  // Restrict the match to parameter delimiters so ternaries and optional
+  // chaining in function bodies remain untouched.
+  code = code.replace(/([,\(]\s*[A-Za-z_$][\w$]*)\?(?=\s*[,\)=])/g, "$1");
+
   code = code.replace(/\?:/g, ":");
 
   code = code.replace(/\sas\s+const/g, " /* as const */");

@@ -247,7 +247,7 @@ const ESBUILD_BASE_OPTIONS = {
   // The Android host reports Chromium 151. Target that engine directly so
   // esbuild can make compatibility decisions from the actual runtime rather
   // than from an approximate ECMAScript edition label.
-  target: ['chrome151'],y
+  target: ['chrome151'],
   sourcemap: MODE === 'production' ? false : true,
   splitting: true,
   metafile: true,

@@ -21,6 +21,18 @@ test('offline fallback removes optional parameter markers from emitted JavaScrip
   assert.match(code, /value\?\.length/);
 });
 
+test('offline fallback removes an untyped optional parameter across multiple lines', () => {
+  const source = `function queueEnemyAt(
+    game,
+    aliveTokens?,
+  ) { return aliveTokens?.length ?? game.tokens.length; }`;
+  const code = fallbackTypeScript.transpile(source);
+
+  assert.match(code, /aliveTokens,\s*\)/);
+  assert.doesNotThrow(() => new Function(code));
+  assert.match(code, /aliveTokens\?\.length/);
+});
+
 test('offline fallback preserves object values containing strict equality', () => {
   const source = `const cards = input.map((card: Card) => ({
     name: typeof card.name === 'string' ? card.name : undefined,
