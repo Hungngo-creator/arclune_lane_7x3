@@ -4,6 +4,65 @@ import assert from 'node:assert/strict';
 import loaderModule from './helpers/pve-session-loader.js';
 import { loadTurnsHarness, loadSummonHarness } from './helpers/turns-harness.mjs';
 
+test('SSI CC skip consumes exactly one natural turn while sequential resolution contract stays unchanged', async () => {
+  const statusTicks = [];
+  const statusApi = {
+    onTurnStart(){},
+    onTurnEnd(unit){
+      unit.ccDuration -= 1;
+      statusTicks.push(unit.id);
+    },
+    canAct(unit){ return unit.ccDuration <= 0; },
+    blocks(){ return false; },
+    has(){ return false; },
+    add(){},
+  };
+  let basics = 0;
+  let skills = 0;
+  let ults = 0;
+  const harness = await loadTurnsHarness({
+    './statuses.ts': { Statuses: statusApi },
+    './combat.js': { doBasicWithFollowups(){ basics += 1; } },
+    './combat/perform-active-skill.ts': { performActiveSkill(){ skills += 1; return { ok: true }; } },
+    './leader-uyen.ts': {
+      isAnyLeaderUltReady(){ return true; }, isUyenLeader(){ return false; },
+      grantUyenSummonRage(){}, hasQueuedUyenUlt(){ return false; }, clearQueuedUyenUlt(){},
+    },
+  });
+  const { stepTurn, doActionOrSkip, deps, eventLog } = harness;
+  const ally = { id: 'cc-ally', iid: 1001, side: 'ally', alive: true, ccDuration: 2,
+    fury: 999, furyMax: 999, hp: 100, hpMax: 100, ...deps['./engine.js'].slotToCell('ally', 3) };
+  const enemy = { id: 'enemy', iid: 1002, side: 'enemy', alive: true, ccDuration: 0,
+    hp: 100, hpMax: 100, ...deps['./engine.js'].slotToCell('enemy', 4) };
+  const Game = {
+    tokens: [ally, enemy], meta: new Map(), queued: { ally: new Map(), enemy: new Map() },
+    turn: { mode: 'interleaved_by_position', nextSide: 'ALLY', lastPos: { ALLY: 0, ENEMY: 0 },
+      wrapCount: { ALLY: 0, ENEMY: 0 }, actedNatural: { ALLY: [], ENEMY: [] },
+      turnCount: 0, slotCount: 9, cycle: 0, busyUntil: 0 },
+  };
+
+  stepTurn(Game, { doActionOrSkip, performUlt(){ ults += 1; }, processActionChain(){ return null; } });
+  assert.equal(eventLog.filter((event) => event.type === 'TURN_START').length, 1);
+  assert.equal(eventLog.filter((event) => event.type === 'TURN_END').length, 1);
+  assert.deepStrictEqual(statusTicks, ['cc-ally']);
+  assert.equal(ally.ccDuration, 1);
+  assert.equal(basics, 0);
+  assert.equal(skills, 0);
+  assert.equal(ults, 0);
+  assert.equal(Game.turn.nextSide, 'ENEMY');
+  assert.equal(Game.turn.lastPos.ALLY, 3);
+  assert.equal(Game.turn.actedNatural.ALLY.length, 1);
+  assert.match(Game.turn.actedNatural.ALLY[0], /1001/);
+
+  const sequentialGame = { tokens: [ally], meta: new Map(), queued: { ally: new Map(), enemy: new Map() },
+    turn: { order: [{ side: 'ally', slot: 3 }], cursor: 0, cycle: 0, orderIndex: new Map() } };
+  ally.ccDuration = 2;
+  const legacyOutcome = doActionOrSkip(sequentialGame, ally, {
+    turnContext: { side: 'ally', slot: 3, cycle: 0, orderIndex: 0, orderLength: 1 },
+  });
+  assert.equal(legacyOutcome.consumedTurn, false);
+});
+
 test('slot 8 leader takes consecutive turns when order is mostly empty', async () => {
   const harness = await loadTurnsHarness();
   const { stepTurn, deps, eventLog } = harness;

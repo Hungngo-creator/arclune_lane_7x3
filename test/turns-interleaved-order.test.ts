@@ -172,6 +172,46 @@ describe('interleaved by position order', () => {
     const state: any = makeState([survivor], 'ALLY');
     expect(nextTurnInterleaved(state)?.unit?.iid).toBe(801);
     expect(nextTurnInterleaved(state)?.unit?.iid).toBe(801);
+    expect(state.turn.cycle).toBe(1);
+  });
+
+  test('global cycle waits for both highly asymmetric side passes', () => {
+    const state: any = makeState([
+      { id: 'a1', iid: 901, side: 'ally', alive: true, ...slotToCell('ally', 1) },
+      { id: 'e1', iid: 902, side: 'enemy', alive: true, ...slotToCell('enemy', 1) },
+      { id: 'e5', iid: 903, side: 'enemy', alive: true, ...slotToCell('enemy', 5) },
+      { id: 'e9', iid: 904, side: 'enemy', alive: true, ...slotToCell('enemy', 9) },
+    ]);
+    expect(nextTurnInterleaved(state)?.unitId).toBe('a1');
+    expect(nextTurnInterleaved(state)?.unitId).toBe('e1');
+    expect(nextTurnInterleaved(state)?.unitId).toBe('a1');
+    expect(state.turn.wrapCount.ALLY).toBe(1);
+    expect(state.turn.cycle).toBe(0);
+    expect(nextTurnInterleaved(state)?.unitId).toBe('e5');
+    expect(nextTurnInterleaved(state)?.unitId).toBe('a1');
+    expect(state.turn.cycle).toBe(0);
+    expect(nextTurnInterleaved(state)?.unitId).toBe('e9');
+    expect(nextTurnInterleaved(state)?.unitId).toBe('a1');
+    expect(nextTurnInterleaved(state)?.unitId).toBe('e1');
+    expect(state.turn.cycle).toBe(1);
+  });
+
+  test('queued summon is not due when only its side has wrapped', () => {
+    const state: any = makeState([
+      { id: 'a1', iid: 911, side: 'ally', alive: true, ...slotToCell('ally', 1) },
+      { id: 'e1', iid: 912, side: 'enemy', alive: true, ...slotToCell('enemy', 1) },
+      { id: 'e9', iid: 913, side: 'enemy', alive: true, ...slotToCell('enemy', 9) },
+    ]);
+    state.queued.ally.set(2, { unitId: 'future', spawnCycle: 1 });
+    expect(nextTurnInterleaved(state)?.unitId).toBe('a1');
+    expect(nextTurnInterleaved(state)?.unitId).toBe('e1');
+    expect(nextTurnInterleaved(state)?.unitId).toBe('a1');
+    expect(state.turn.cycle).toBe(0);
+    expect(nextTurnInterleaved(state)?.unitId).toBe('e9');
+    expect(nextTurnInterleaved(state)?.unitId).toBe('a1');
+    expect(nextTurnInterleaved(state)?.unitId).toBe('e1');
+    expect(state.turn.cycle).toBe(1);
+    expect(nextTurnInterleaved(state)).toMatchObject({ side: 'ally', pos: 2, spawnOnly: true });
   });
 
   test('alternates theo từng ô A1->B1->A2... và bỏ qua ô trống', () => {

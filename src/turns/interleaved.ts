@@ -116,6 +116,21 @@ function isQueueDue(state: SessionState, sideLower: Side, slot: number, cycle: n
   return (entry.spawnCycle ?? 0) <= cycle;
 }
 
+function sideHasCandidate(
+  state: SessionState,
+  sideKey: TurnSideKey,
+  slotMaps: SlotMapBySide,
+  slotCount: number,
+  cycle: number,
+): boolean {
+  if (slotMaps[sideKey].size > 0) return true;
+  const sideLower = SIDE_TO_LOWER[sideKey];
+  for (let pos = 1; pos <= slotCount; pos += 1) {
+    if (isQueueDue(state, sideLower, pos, cycle)) return true;
+  }
+  return false;
+}
+
 function makeWrappedFlag(start: number, pos: number): boolean {
   if (!Number.isFinite(start) || start <= 0) return false;
   return pos <= start;
@@ -284,7 +299,9 @@ export function nextTurnInterleaved(
           unitId: unit.id ?? null, queued: false, wrapped: startPos > 0, sideKey, spawnOnly: false };
         break;
       }
-      if (isQueueDue(state, sideLower, pos, turn.cycle + 1)) {
+      // A side wrapping by itself does not complete a global cycle. Future
+      // queues become eligible only after both side passes have completed.
+      if (isQueueDue(state, sideLower, pos, turn.cycle)) {
         picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit: null,
           unitId: null, queued: true, wrapped: startPos > 0, sideKey, spawnOnly: true };
         break;
@@ -296,11 +313,12 @@ export function nextTurnInterleaved(
     // opposite side actually has a live token or due queue, avoiding recursion
     // when the battlefield is empty.
     const otherSide = flipSide(sideKey);
-    const otherLower = SIDE_TO_LOWER[otherSide];
-    const otherHasCandidate = slotMaps[otherSide].size > 0
-      || Array.from({ length: slotCount }, (_, index) => index + 1)
-        .some(pos => isQueueDue(state, otherLower, pos, turn.cycle));
+    const otherHasCandidate = sideHasCandidate(state, otherSide, slotMaps, slotCount, turn.cycle);
     if (!otherHasCandidate) return null;
+    // A genuinely empty side auto-completes passes already completed by the
+    // surviving side. This prevents the canonical min(wrapCount) cycle from
+    // deadlocking without granting the surviving side an early cycle.
+    turn.wrapCount[sideKey] = Math.max(turn.wrapCount[sideKey], turn.wrapCount[otherSide]);
     turn.nextSide = otherSide;
     return nextTurnInterleaved(state, turn);
   }
@@ -311,13 +329,18 @@ export function nextTurnInterleaved(
 
   if (picked.wrapped){
     turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
+    const otherSide = flipSide(sideKey);
+    if (!sideHasCandidate(state, otherSide, slotMaps, slotCount, turn.cycle)) {
+      turn.wrapCount[otherSide] = Math.max(turn.wrapCount[otherSide], turn.wrapCount[sideKey]);
+    }
   }
 
   turn.turnCount += 1;
   const allyWrap = turn.wrapCount.ALLY ?? 0;
   const enemyWrap = turn.wrapCount.ENEMY ?? 0;
-  const maxWrap = Math.max(allyWrap, enemyWrap);
-  if (!Number.isFinite(turn.cycle) || turn.cycle < maxWrap){
+  const completedGlobalCycles = Math.min(allyWrap, enemyWrap);
+  if (!Number.isFinite(turn.cycle) || turn.cycle < completedGlobalCycles){
+    turn.cycle = completedGlobalCycles;
     turn.cycle = maxWrap;
   }
   return picked;

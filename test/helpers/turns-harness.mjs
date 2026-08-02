@@ -27,7 +27,7 @@ export async function loadTurnsHarness(overrides = {}){
   isAnyLeaderUltReady,
   isUyenLeader,
   grantUyenSummonRage,
-} from './leader-uyen.ts';", "const { isAnyLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
+} from './leader-uyen.ts';`, "const { isAnyLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
     ["import { slotToCell, slotIndex } from './engine.ts';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
     ["import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';", "const { globalAetherPool, resolveActionAetherRegen } = __deps['./aether.ts'];"],
     ["import { globalAetherPool } from './aether.ts';", "const { globalAetherPool } = __deps['./aether.ts'];"],
