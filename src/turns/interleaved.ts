@@ -338,7 +338,6 @@ export function nextTurnInterleaved(
   turn.turnCount += 1;
   const allyWrap = turn.wrapCount.ALLY ?? 0;
   const enemyWrap = turn.wrapCount.ENEMY ?? 0;
-  const completedGlobalCycles = Math.min(allyWrap, enemyWrap);
   if (!Number.isFinite(turn.cycle) || turn.cycle < completedGlobalCycles){
     turn.cycle = completedGlobalCycles;
     turn.cycle = maxWrap;
