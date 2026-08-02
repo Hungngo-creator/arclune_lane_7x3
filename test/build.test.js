@@ -49,3 +49,9 @@ test('build supports namespace re-exports in barrel modules', async () => {
   assert.match(bundled, /exports\.sessionState\s*=\s*__reexport\d+;/);
   assert.match(bundled, /exports\.sessionRuntime\s*=\s*__reexport\d+;/);
 });
+
+test('build registers external stub modules required at runtime', async () => {
+  await runBuild();
+  const bundled = await fs.readFile(DIST_FILE, 'utf8');
+  assert.match(bundled, /__modules\['\.\/\.\.\/tools\/zod-stub\/index\.js'\]\s*=/);
+});

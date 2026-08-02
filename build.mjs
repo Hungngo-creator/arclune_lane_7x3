@@ -943,6 +943,7 @@ async function build(){
     const sourceCode = await transformIfScript(raw, ext, moduleId);
     const transformed = transformModule(sourceCode, moduleId);
     assertValidJavaScript(transformed, moduleId);
+    pushModule(moduleId, transformed);
   }
 
   await fs.mkdir(DIST_DIR, { recursive: true });
