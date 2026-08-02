@@ -4,7 +4,7 @@ import * as path from 'node:path';
 test('low-level applyDamage call sites match the exact gateway/bypass inventory', () => {
   const allowed = new Map<string, number>([
     ['src/combat/apply-damage.ts', 1],
-    ['src/combat/kernel/damage-batch.ts', 1], ['src/combat.ts', 1], ['src/statuses.ts', 3],
+    ['src/combat/kernel/damage-batch.ts', 1], ['src/combat/kernel/hp-mutation.ts', 1], ['src/combat.ts', 1], ['src/statuses.ts', 3],
     ['src/combat/tag-dispatch.ts', 1], ['src/combat/chap-minh-runtime.ts', 1],
     ['src/modes/pve/session-runtime-impl.ts', 1],
   ]);

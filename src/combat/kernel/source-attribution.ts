@@ -23,7 +23,8 @@ export function resolveSourceAttribution(input: SourceAttributionInput): SourceA
   return {
     immediateSourceIid: iidOf(input.immediateSource),
     controllerIid: iidOf(input.controller),
-    creditTrueSelfId: idOf(input.trueSelf ?? input.controller ?? input.immediateSource),
+    // Credit is opt-in: controller/definition ids are not stable true-self identity.
+    creditTrueSelfId: idOf(input.trueSelf),
     ownerIid: iidOf(input.owner),
     environmentSourceId: idOf(input.environment),
   };
@@ -34,6 +35,5 @@ export function resolveLegacyStatusSource(status: { sourceIid?: CombatId; source
   if (status.sourceIid == null && status.sourceUnitId != null && process.env.NODE_ENV !== 'production') {
     console.warn(`[combat-kernel] status source ${String(status.sourceUnitId)} has no combat iid`);
   }
-  return resolveSourceAttribution({ immediateSource: status.sourceIid ?? null, trueSelf: status.sourceUnitId ?? null });
+  return resolveSourceAttribution({ immediateSource: status.sourceIid ?? null });
 }
-

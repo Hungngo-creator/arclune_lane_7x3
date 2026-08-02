@@ -8,3 +8,7 @@ export * from './invariants.ts';
 export * from './legacy-adapter.ts';
 export * from './sequence.ts';
 export * from './damage-batch.ts';
+export * from './reaction-policy.ts';
+export * from './action-context.ts';
+export * from './combat-identity.ts';
+export * from './hp-mutation.ts';

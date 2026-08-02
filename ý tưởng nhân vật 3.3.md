@@ -1339,3 +1339,16 @@ Damage lên vật thể không hợp lệ.
 Sát thương phản lại.
 Damage phụ từ nguồn khác.
 lượng hồi phục thừa, vượt max hp của hắn sẽ bị bỏ qua và không thể chuyển sang khiên trừ phi có kit của char khác có hiệu ứng chuyển overheal của đồng minh sang khiên và kit đó thắng được nội tại Thần Tính cấp Axiom của hắn, để khả thi đó cần là 1 prime khác có lực chiến cao hơn hắn.
+
+74) 
+
+nội tại - Thiện Xạ: mỗi khi có kẻ thù bị trạng thái 'hất tung', lập tức bắn 1 đánh thường lên mục tiêu, đòn đánh từ nội tại này không tính là đánh thường, không cd, không cost, cap kích hoạt 5 lần/mỗi turn của bản thân, tức sau khi hắn hành động, nội tại này có thể kích hoạt max 5 lần cho đến khi đến turn hành động tiếp theo của hắn thì cap 5 lần sẽ reset về 0.
+
+mỗi khi kích hoạt thiện xạ, tạm thời tăng 3% atk của bản thân hiện có, reset hiệu ứng buff này khi cap Thiện Xạ reset về 0. Kích hoạt tối đa 5 lần, cap 5 lần cũng reset khi cap Thiện Xạ về 0.
+
+Thiện Xạ chỉ kích hoạt khi nhân vật này không bị cc cứng và vẫn có thể đánh thường được, nếu hắn tạm thời không thể đánh thường thì nội tại Thiện Xạ sẽ không kích hoạt.
+
+
+
+
+

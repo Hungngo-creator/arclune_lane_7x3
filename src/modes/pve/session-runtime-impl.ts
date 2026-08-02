@@ -5,6 +5,7 @@ import { refillDeckEnemy, aiMaybeAct } from '../../ai';
 import { Statuses, makeStatusEffect } from '../../statuses';
 import { CFG, CAM } from '../../config';
 import { pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage, basicAttack } from '../../combat';
+import { ensureCombatIdentity } from '../../combat/kernel/index.ts';
 import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury';
 import {
   getMetaById,
@@ -2292,12 +2293,7 @@ function init(): boolean {
   }
   for (const t of tokens){
     if (!t.iid) t.iid = nextIid();
-    if (!t.isMinion && t.hpMax != null) {
-      t.trueSelfId ??= `true-self:${t.side}:${t.iid}`;
-      t.lifeSerial ??= 1;
-    } else if (!t.isMinion && t.hpMax != null && process.env.NODE_ENV !== 'production' && !t.trueSelfId) {
-      console.warn('[combat-identity] HP-bearing non-summon is missing trueSelfId', t.id);
-    }
+    ensureCombatIdentity(t, t.isMinion ? 'summon' : (t.id === 'leaderA' || t.id === 'leaderB') ? 'leader' : 'collection-unit');
     if (t.id === 'leaderA' || t.id === 'leaderB'){
       Object.assign(t, {
         hpMax: 2600,

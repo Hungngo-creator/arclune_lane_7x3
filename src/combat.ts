@@ -472,11 +472,10 @@ export function dealAbilityDamage(
     synergyBonus: toFinite(opts.synergyBonus ?? opts.damageBreakdown?.synergyBonus, counterMetadata.synergyBonus),
   };
   const breakdownMultiplier = Math.max(0, 1 + bonusBreakdown.classBonus + bonusBreakdown.elementBonus + bonusBreakdown.synergyBonus);
-  const identity = opts.actionIdentity ?? (Game
-    ? createNaturalAction(Game, attackType)
-    : { actionId: 'detached-action-1', chainId: 'detached-chain-1', parentActionId: null, actionKind: attackType, actionSerial: 1 });
+  if (!Game && !opts.actionIdentity) throw new Error('[combat-kernel] detached damage requires an explicit action identity');
+  const identity = opts.actionIdentity ?? createNaturalAction(Game!, attackType);
   const controller = attacker.ownerIid != null ? Game?.tokens.find(unit => unit.iid === attacker.ownerIid) ?? null : attacker;
-  const source = resolveSourceAttribution({ immediateSource: attacker, controller: controller ?? attacker.ownerIid ?? attacker, trueSelf: controller?.trueSelfId ?? attacker.trueSelfId ?? (!attacker.isMinion ? attacker.id : null), owner: controller ?? attacker.ownerIid ?? attacker });
+  const source = resolveSourceAttribution({ immediateSource: attacker, controller: controller ?? attacker.ownerIid ?? attacker, trueSelf: controller?.trueSelfId ?? attacker.trueSelfId ?? null, owner: controller ?? attacker.ownerIid ?? attacker });
   const componentSpecs = dtype === 'mixed' ? [['physical', physWeight], ['will', arcWeight]] as const : [[dtype === 'arcane' ? 'will' : dtype, 1]] as const;
   const packets: DamagePacket[] = componentSpecs.map(([damageType, weight], index) => ({
     packetId: `${String(identity.actionId)}:packet-${index + 1}`, packetSerial: index + 1,

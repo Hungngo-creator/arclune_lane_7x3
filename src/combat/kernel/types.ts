@@ -1,6 +1,14 @@
 import type { CombatId } from './ids.ts';
 
 export type DamageType = 'physical' | 'will' | 'true' | 'reflected';
+export type DamageOrigin = 'direct' | 'followup' | 'counter' | 'dot' | 'reflected' | 'environment' | 'self-damage';
+export type ReactionAggregation = 'packet' | 'action';
+export interface ReactionPolicy {
+  readonly canLifesteal: boolean; readonly canReflect: boolean; readonly canCounter: boolean;
+  readonly canTriggerOnDamage: boolean; readonly canTriggerOnHit: boolean;
+  readonly canGrantRage: boolean; readonly canTriggerOnKill: boolean;
+  readonly aggregation: ReactionAggregation;
+}
 export type LegacyDamageType = DamageType | 'arcane';
 export type HpMutationKind = 'damage' | 'healing' | 'hp-cost' | 'self-damage' | 'sacrifice' | 'max-hp-mutation';
 export type CurrentHpPolicy = 'preserve-absolute' | 'preserve-ratio' | 'clamp' | 'set-full' | 'set-value';
@@ -88,6 +96,20 @@ export interface DamageResolution {
   readonly overkillDamage: number;
   readonly preventedDamage: number;
   readonly finalRoundedDamage: number;
+}
+
+/** Pure mitigation output. HP and shield are deliberately absent until batch allocation. */
+export interface PacketMitigationResult {
+  readonly declaredDamage: number; readonly incomingDamage: number; readonly effectiveDefense: number;
+  readonly defenseMultiplier: number; readonly postMitigationDamage: number;
+  readonly roundedMitigatedDamage: number; readonly defensePreventedDamage: number;
+}
+
+export interface AppliedPacketResult {
+  readonly packetId: CombatId; readonly packetSerial: number; readonly targetIid: CombatId;
+  readonly mitigatedDamage: number; readonly specialPreventedDamage: number;
+  readonly shieldDamage: number; readonly postShieldDamage: number;
+  readonly effectiveHpDamage: number; readonly overkillDamage: number;
 }
 
 export interface HpMutation {
