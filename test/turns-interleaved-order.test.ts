@@ -1,4 +1,4 @@
-import { nextTurnInterleaved } from '../src/turns/interleaved.ts';
+import { nextTurnInterleaved, predictNaturalActors } from '../src/turns/interleaved.ts';
 import { slotToCell } from '../src/engine.ts';
 
 describe('interleaved by position order', () => {
@@ -83,11 +83,95 @@ describe('interleaved by position order', () => {
     expect(nextTurnInterleaved(state)?.unitId).toBe('later');
   });
 
-  test('forced action leaves both SSI cursors untouched', () => {
-    const state: any = makeState([]);
-    const before = JSON.stringify(state.turn);
-    // Forced/counter/follow-up actions do not call nextTurnInterleaved.
-    expect(JSON.stringify(state.turn)).toBe(before);
+  test('two summons with one definition id and distinct iid both act', () => {
+    const state: any = makeState([
+      { id: 'wolf', iid: 101, side: 'ally', alive: true, ...slotToCell('ally', 2) },
+      { id: 'wolf', iid: 102, side: 'ally', alive: true, ...slotToCell('ally', 4) },
+    ]);
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(101);
+    state.turn.nextSide = 'ALLY';
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(102);
+  });
+
+  test('summon in the slot just vacated by actor waits for the next pass', () => {
+    const actor = { id: 'actor', iid: 201, side: 'ally', alive: true, ...slotToCell('ally', 3) };
+    const tail = { id: 'tail', iid: 202, side: 'ally', alive: true, ...slotToCell('ally', 7) };
+    const state: any = makeState([actor, tail]);
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(201);
+    state.tokens.splice(0, 1, { id: 'summon', iid: 203, side: 'ally', alive: true, ...slotToCell('ally', 3) });
+    state.turn.nextSide = 'ALLY';
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(202);
+    state.turn.nextSide = 'ALLY';
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(203);
+  });
+
+  test.each([[1, 8], [8, 1]])('acted actor movement %i -> %i cannot act twice', (from, to) => {
+    const mover = { id: 'mover', iid: 301, side: 'ally', alive: true, ...slotToCell('ally', from) };
+    const otherSlot = from === 1 ? 4 : 9;
+    const other = { id: 'other', iid: 302, side: 'ally', alive: true, ...slotToCell('ally', otherSlot) };
+    const state: any = makeState([mover, other]);
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(301);
+    Object.assign(mover, slotToCell('ally', to));
+    state.turn.nextSide = 'ALLY';
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(302);
+  });
+
+  test('an unacted instance moved ahead of the cursor still acts', () => {
+    const first = { id: 'first', iid: 401, side: 'ally', alive: true, ...slotToCell('ally', 2) };
+    const moved = { id: 'moved', iid: 402, side: 'ally', alive: true, ...slotToCell('ally', 1) };
+    const state: any = makeState([first, moved]);
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(402);
+    Object.assign(first, slotToCell('ally', 6));
+    state.turn.nextSide = 'ALLY';
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(401);
+  });
+
+  test('revive identity controls double-turn protection', () => {
+    const original = { id: 'hero', iid: 501, side: 'ally', alive: true, ...slotToCell('ally', 1) };
+    const tail = { id: 'tail', iid: 502, side: 'ally', alive: true, ...slotToCell('ally', 5) };
+    const state: any = makeState([original, tail]);
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(501);
+    original.alive = false;
+    state.tokens.push({ ...original, alive: true, ...slotToCell('ally', 4) });
+    state.turn.nextSide = 'ALLY';
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(502);
+    state.tokens.push({ id: 'hero', iid: 503, side: 'ally', alive: true, ...slotToCell('ally', 7) });
+    state.turn.nextSide = 'ALLY';
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(503);
+  });
+
+  test('forecast is read-only and matches real scheduler', () => {
+    const state: any = makeState([
+      { id: 'a', iid: 601, side: 'ally', alive: true, ...slotToCell('ally', 1) },
+      { id: 'b', iid: 602, side: 'enemy', alive: true, ...slotToCell('enemy', 3) },
+    ]);
+    const turnBefore = structuredClone(state.turn);
+    const tokensBefore = state.tokens.map((token: any) => ({ ...token }));
+    const forecast = predictNaturalActors(state, 4).map(p => [p.side, p.pos, p.unit?.iid]);
+    expect(state.turn).toEqual(turnBefore);
+    expect(state.tokens).toEqual(tokensBefore);
+    const actual = Array.from({ length: 4 }, () => {
+      const pick = nextTurnInterleaved(state)!;
+      return [pick.side, pick.pos, pick.unit?.iid];
+    });
+    expect(actual).toEqual(forecast);
+  });
+
+  test('occupied queued slot selects occupant and leaves queue pending', () => {
+    const occupant = { id: 'occupant', iid: 701, side: 'ally', alive: true, ...slotToCell('ally', 2) };
+    const state: any = makeState([occupant]);
+    state.queued.ally.set(2, { unitId: 'queued', spawnCycle: 0 });
+    const pick = nextTurnInterleaved(state)!;
+    expect(pick.unit?.iid).toBe(701);
+    expect(pick.spawnOnly).toBe(false);
+    expect(state.queued.ally.has(2)).toBe(true);
+  });
+
+  test('side without actors does not deadlock the surviving side', () => {
+    const survivor = { id: 'survivor', iid: 801, side: 'enemy', alive: true, ...slotToCell('enemy', 4) };
+    const state: any = makeState([survivor], 'ALLY');
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(801);
+    expect(nextTurnInterleaved(state)?.unit?.iid).toBe(801);
   });
 
   test('alternates theo từng ô A1->B1->A2... và bỏ qua ô trống', () => {

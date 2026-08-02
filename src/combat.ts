@@ -834,13 +834,19 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   }
 }
 
-export function doBasicWithFollowups(Game: SessionState, unit: UnitToken, cap = 2): void {
+export function doBasicWithFollowups(
+  Game: SessionState,
+  unit: UnitToken,
+  cap = 2,
+  onFollowup?: (index: number) => void,
+): void {
   try {
     basicAttack(Game, unit);
     const followupCount = Math.max(0, cap | 0);
     for (let i = 0; i < followupCount; i += 1) {
       if (!unit || !unit.alive) break;
       basicAttack(Game, unit);
+      onFollowup?.(i);
     }
   } catch (error) {
     console.error('[doBasicWithFollowups]', error);

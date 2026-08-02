@@ -449,7 +449,12 @@ export function spawnQueuedIfDue(
     }
   }
 
-  obj.iid = typeof allocIid === 'function' ? allocIid() : obj.iid;
+  // Every combat token needs an instance identity.  Tests and headless modes
+  // do not always install the browser runtime allocator, so retain the same
+  // guarantee with a session-local maximum rather than falling back to id.
+  obj.iid = typeof allocIid === 'function'
+    ? allocIid()
+    : Game.tokens.reduce((max, token) => Math.max(max, Number(token.iid) || 0), 0) + 1;
   obj.art = getUnitArt(p.unitId);
   obj.skinKey = obj.art?.skinKey;
   obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
@@ -725,6 +730,7 @@ export function doActionOrSkip(
     orderIndex,
     orderLength,
     action: null as string | null,
+    actionKind: 'natural' as const,
     skipped: false,
     reason: null as string | null
   };
@@ -848,7 +854,7 @@ export function doActionOrSkip(
 
   if (!Statuses.canAct(unit)) {
     return completeTurn({
-      consumedTurn: true,
+      consumedTurn: Game.turn?.mode === 'interleaved_by_position',
       acted: false,
       reason: 'status',
       actionDetail: { skipped: true, reason: 'status' }
@@ -943,7 +949,15 @@ export function doActionOrSkip(
 
   const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
   try {
-    doBasicWithFollowups(Game, unit, cap);
+    doBasicWithFollowups(Game, unit, cap, (followupIndex) => {
+      finishAction({
+        action: 'basic',
+        actionKind: 'followup',
+        forcedIndex: followupIndex,
+        skipped: false,
+        reason: null,
+      });
+    });
   } catch (err) {
     console.error('[doActionOrSkip.basic]', err);
     return completeTurn({

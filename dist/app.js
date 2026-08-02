@@ -5329,7 +5329,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           }
       }
   }
-  function doBasicWithFollowups(Game, unit, cap = 2) {
+  function doBasicWithFollowups(Game, unit, cap = 2, onFollowup) {
       try {
           basicAttack(Game, unit);
           const followupCount = Math.max(0, cap | 0);
@@ -5337,6 +5337,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
               if (!unit || !unit.alive)
                   break;
               basicAttack(Game, unit);
+              onFollowup?.(i);
           }
       }
       catch (error) {
@@ -44224,7 +44225,12 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               applyMutationStatBonus(obj, mutationBonusPct);
           }
       }
-      obj.iid = typeof allocIid === 'function' ? allocIid() : obj.iid;
+      // Every combat token needs an instance identity.  Tests and headless modes
+      // do not always install the browser runtime allocator, so retain the same
+      // guarantee with a session-local maximum rather than falling back to id.
+      obj.iid = typeof allocIid === 'function'
+          ? allocIid()
+          : Game.tokens.reduce((max, token) => Math.max(max, Number(token.iid) || 0), 0) + 1;
       obj.art = getUnitArt(p.unitId);
       obj.skinKey = obj.art?.skinKey;
       obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';
@@ -44433,6 +44439,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           orderIndex,
           orderLength,
           action: null,
+          actionKind: 'natural',
           skipped: false,
           reason: null
       };
@@ -44533,7 +44540,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       emitGameEvent(ACTION_START, baseDetail);
       if (!Statuses.canAct(unit)) {
           return completeTurn({
-              consumedTurn: true,
+              consumedTurn: Game.turn?.mode === 'interleaved_by_position',
               acted: false,
               reason: 'status',
               actionDetail: { skipped: true, reason: 'status' }
@@ -44627,7 +44634,15 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       }
       const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
       try {
-          doBasicWithFollowups(Game, unit, cap);
+          doBasicWithFollowups(Game, unit, cap, (followupIndex) => {
+              finishAction({
+                  action: 'basic',
+                  actionKind: 'followup',
+                  forcedIndex: followupIndex,
+                  skipped: false,
+                  reason: null,
+              });
+          });
       }
       catch (err) {
           console.error('[doActionOrSkip.basic]', err);
@@ -44843,7 +44858,24 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
       turn.actedNatural.ALLY = Array.isArray(turn.actedNatural.ALLY) ? turn.actedNatural.ALLY : [];
       turn.actedNatural.ENEMY = Array.isArray(turn.actedNatural.ENEMY) ? turn.actedNatural.ENEMY : [];
   }
-  const naturalIdentity = (unit) => String(unit.iid ?? unit.id ?? '');
+  const anonymousCombatInstances = new WeakMap();
+  let anonymousCombatInstanceSerial = 0;
+  /**
+   * Runtime tokens are required to carry an iid.  The object-local fallback is
+   * deliberately not based on the unit definition id: it only protects old
+   * saves/test fixtures while they are being normalized by the runtime.
+   */
+  function naturalIdentity(unit) {
+      if (Number.isFinite(unit.iid))
+          return `iid:${unit.iid}`;
+      let identity = anonymousCombatInstances.get(unit);
+      if (!identity) {
+          anonymousCombatInstanceSerial += 1;
+          identity = `legacy-instance:${anonymousCombatInstanceSerial}`;
+          anonymousCombatInstances.set(unit, identity);
+      }
+      return identity;
+  }
   function buildSlotMaps(tokens) {
       if (!Array.isArray(tokens)) {
           return createEmptySlotMaps();
@@ -45023,8 +45055,20 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
               }
           }
       }
-      if (!picked)
-          return null;
+      if (!picked) {
+          // An empty side must not stall a surviving army. Only retry when the
+          // opposite side actually has a live token or due queue, avoiding recursion
+          // when the battlefield is empty.
+          const otherSide = flipSide(sideKey);
+          const otherLower = SIDE_TO_LOWER[otherSide];
+          const otherHasCandidate = slotMaps[otherSide].size > 0
+              || Array.from({ length: slotCount }, (_, index) => index + 1)
+                  .some(pos => isQueueDue(state, otherLower, pos, turn.cycle));
+          if (!otherHasCandidate)
+              return null;
+          turn.nextSide = otherSide;
+          return nextTurnInterleaved(state, turn);
+      }
       turn.lastPos[sideKey] = picked.pos;
       if (picked.unit)
           turn.actedNatural[sideKey].push(naturalIdentity(picked.unit));
@@ -45202,6 +45246,8 @@ __modules['./ui.ts'] = (exports, module, __require) => {
       const forcedRail = queryFromRoot('ssiForced') || doc.getElementById('ssiForced');
       let actionSerial = 0;
       let currentActor = '—';
+      const ssiDebugEnabled = typeof globalThis !== 'undefined'
+          && globalThis.__ARCLUNE_DEBUG_SSI__ === true;
       if (!combatReason && bottomHud) {
           const node = doc.createElement('div');
           node.id = 'combatReason';
@@ -45233,14 +45279,26 @@ __modules['./ui.ts'] = (exports, module, __require) => {
               : null;
           if (interleaved && Array.isArray(Game.tokens)) {
               const forecast = predictNaturalActors(Game, 6);
-              const labels = forecast.map((pick, index) => {
-                  const name = pick.unit?.name ?? pick.unitId ?? (pick.spawnOnly ? 'Summon' : '—');
-                  return `<span class="ssi-step ${index === 0 ? 'is-next' : ''} ${pick.side}"><b>${pick.side === 'ally' ? 'A' : 'B'}${pick.pos}</b><small>${name}</small></span>`;
-              }).join('');
               if (timeline)
-                  timeline.innerHTML = labels;
-              if (debug)
-                  debug.textContent = `#${actionSerial} actor=${currentActor} next=${forecast[0]?.unitId ?? '—'} side=${forecast[0]?.side ?? '—'} slot=${forecast[0]?.pos ?? '—'} lastPos A:${interleaved.lastPos.ALLY} E:${interleaved.lastPos.ENEMY} | ${forecast.map(p => `${p.side.charAt(0).toUpperCase()}${p.pos}`).join(' ')}`;
+                  timeline.replaceChildren(...forecast.map((pick, index) => {
+                      const name = pick.unit?.name ?? pick.unitId ?? (pick.spawnOnly ? 'Summon' : '—');
+                      const step = doc.createElement('span');
+                      step.classList.add('ssi-step', pick.side);
+                      if (index === 0)
+                          step.classList.add('is-next');
+                      const position = doc.createElement('b');
+                      position.textContent = `${pick.side === 'ally' ? 'A' : 'B'}${pick.pos}`;
+                      const label = doc.createElement('small');
+                      label.textContent = String(name);
+                      step.append(position, label);
+                      return step;
+                  }));
+              if (debug) {
+                  debug.hidden = !ssiDebugEnabled;
+                  debug.textContent = ssiDebugEnabled
+                      ? `#${actionSerial} actor=${currentActor} next=${forecast[0]?.unitId ?? '—'} side=${forecast[0]?.side ?? '—'} slot=${forecast[0]?.pos ?? '—'} lastPos A:${interleaved.lastPos.ALLY} E:${interleaved.lastPos.ENEMY} | ${forecast.map(p => `${p.side.charAt(0).toUpperCase()}${p.pos}`).join(' ')}`
+                      : '';
+              }
           }
       };
       const handleGameEvent = (event) => {
@@ -45268,10 +45326,12 @@ __modules['./ui.ts'] = (exports, module, __require) => {
                   }
               }
               const action = event.detail;
-              if (forcedRail && action.slot == null) {
-                  forcedRail.textContent = `Chen hàng: ${action.unit?.id ?? 'forced action'} · không đổi cursor SSI`;
+              if (forcedRail && action.actionKind && action.actionKind !== 'natural') {
+                  forcedRail.textContent = `Chen hàng: ${action.unit?.id ?? action.actionKind} · không đổi cursor SSI`;
               }
           }
+          if (event.type === TURN_END && forcedRail)
+              forcedRail.textContent = 'Chen hàng: —';
       };
       let cleanedUp = false;
       const disposers = [];

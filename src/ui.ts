@@ -45,6 +45,8 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
   const forcedRail = queryFromRoot<HTMLElement>('ssiForced') || doc.getElementById('ssiForced');
   let actionSerial = 0;
   let currentActor = '—';
+  const ssiDebugEnabled = typeof globalThis !== 'undefined'
+    && (globalThis as { __ARCLUNE_DEBUG_SSI__?: boolean }).__ARCLUNE_DEBUG_SSI__ === true;
 
   if (!combatReason && bottomHud) {
     const node = doc.createElement('div');
@@ -78,12 +80,24 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
       : null;
     if (interleaved && Array.isArray(Game.tokens)) {
       const forecast = predictNaturalActors(Game as SessionState, 6);
-      const labels = forecast.map((pick, index) => {
+      if (timeline) timeline.replaceChildren(...forecast.map((pick, index) => {
         const name = pick.unit?.name ?? pick.unitId ?? (pick.spawnOnly ? 'Summon' : '—');
-        return `<span class="ssi-step ${index === 0 ? 'is-next' : ''} ${pick.side}"><b>${pick.side === 'ally' ? 'A' : 'B'}${pick.pos}</b><small>${name}</small></span>`;
-      }).join('');
-      if (timeline) timeline.innerHTML = labels;
-      if (debug) debug.textContent = `#${actionSerial} actor=${currentActor} next=${forecast[0]?.unitId ?? '—'} side=${forecast[0]?.side ?? '—'} slot=${forecast[0]?.pos ?? '—'} lastPos A:${interleaved.lastPos.ALLY} E:${interleaved.lastPos.ENEMY} | ${forecast.map(p => `${p.side.charAt(0).toUpperCase()}${p.pos}`).join(' ')}`;
+        const step = doc.createElement('span');
+        step.classList.add('ssi-step', pick.side);
+        if (index === 0) step.classList.add('is-next');
+        const position = doc.createElement('b');
+        position.textContent = `${pick.side === 'ally' ? 'A' : 'B'}${pick.pos}`;
+        const label = doc.createElement('small');
+        label.textContent = String(name);
+        step.append(position, label);
+        return step;
+      }));
+      if (debug) {
+        debug.hidden = !ssiDebugEnabled;
+        debug.textContent = ssiDebugEnabled
+          ? `#${actionSerial} actor=${currentActor} next=${forecast[0]?.unitId ?? '—'} side=${forecast[0]?.side ?? '—'} slot=${forecast[0]?.pos ?? '—'} lastPos A:${interleaved.lastPos.ALLY} E:${interleaved.lastPos.ENEMY} | ${forecast.map(p => `${p.side.charAt(0).toUpperCase()}${p.pos}`).join(' ')}`
+          : '';
+      }
     }
   };
 
@@ -120,11 +134,12 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
           combatReason.title = fallback;
         }
       }
-      const action = event.detail as unknown as { orderIndex?: number | null; slot?: number | null; unit?: { id?: string } };
-      if (forcedRail && action.slot == null) {
-        forcedRail.textContent = `Chen hàng: ${action.unit?.id ?? 'forced action'} · không đổi cursor SSI`;
+      const action = event.detail as unknown as { actionKind?: string; unit?: { id?: string } };
+      if (forcedRail && action.actionKind && action.actionKind !== 'natural') {
+        forcedRail.textContent = `Chen hàng: ${action.unit?.id ?? action.actionKind} · không đổi cursor SSI`;
       }
     }
+    if (event.type === TURN_END && forcedRail) forcedRail.textContent = 'Chen hàng: —';
   };
 
   let cleanedUp = false;

@@ -24,6 +24,8 @@ export interface ActionEventDetail {
   orderIndex: number | null;
   orderLength: number | null;
   action: 'basic' | 'ult' | string | null;
+  /** Explicit rail classification; never infer forced actions from a missing slot. */
+  actionKind?: 'natural' | 'forced' | 'counter' | 'followup';
   skipped: boolean;
   reason: string | null;
   ultOk?: boolean | null;

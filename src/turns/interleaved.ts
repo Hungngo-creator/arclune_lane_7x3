@@ -68,7 +68,24 @@ function ensureTurnState(turn: InterleavedTurnState): void {
   turn.actedNatural.ENEMY = Array.isArray(turn.actedNatural.ENEMY) ? turn.actedNatural.ENEMY : [];
 }
 
-const naturalIdentity = (unit: UnitToken): string => String(unit.iid ?? unit.id ?? '');
+const anonymousCombatInstances = new WeakMap<UnitToken, string>();
+let anonymousCombatInstanceSerial = 0;
+
+/**
+ * Runtime tokens are required to carry an iid.  The object-local fallback is
+ * deliberately not based on the unit definition id: it only protects old
+ * saves/test fixtures while they are being normalized by the runtime.
+ */
+function naturalIdentity(unit: UnitToken): string {
+  if (Number.isFinite(unit.iid)) return `iid:${unit.iid}`;
+  let identity = anonymousCombatInstances.get(unit);
+  if (!identity) {
+    anonymousCombatInstanceSerial += 1;
+    identity = `legacy-instance:${anonymousCombatInstanceSerial}`;
+    anonymousCombatInstances.set(unit, identity);
+  }
+  return identity;
+}
 
 function buildSlotMaps(tokens: ReadonlyArray<UnitToken> | null | undefined): SlotMapBySide {
   if (!Array.isArray(tokens)) {
@@ -274,7 +291,19 @@ export function nextTurnInterleaved(
       }
     }
   }
-  if (!picked) return null;
+  if (!picked) {
+    // An empty side must not stall a surviving army. Only retry when the
+    // opposite side actually has a live token or due queue, avoiding recursion
+    // when the battlefield is empty.
+    const otherSide = flipSide(sideKey);
+    const otherLower = SIDE_TO_LOWER[otherSide];
+    const otherHasCandidate = slotMaps[otherSide].size > 0
+      || Array.from({ length: slotCount }, (_, index) => index + 1)
+        .some(pos => isQueueDue(state, otherLower, pos, turn.cycle));
+    if (!otherHasCandidate) return null;
+    turn.nextSide = otherSide;
+    return nextTurnInterleaved(state, turn);
+  }
 
   turn.lastPos[sideKey] = picked.pos;
   if (picked.unit) turn.actedNatural![sideKey].push(naturalIdentity(picked.unit));

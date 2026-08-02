@@ -1007,3 +1007,35 @@ test('ACTION_END mang metadata damageContext/counterBreakdown cho HUD/combat log
   assert.equal(typeof actionEnd.detail?.damageSummary, 'string');
   assert.equal(unit._lastDamageContext, null, 'metadata tạm phải được clear sau khi emit');
 });
+
+test('follow-up runtime is recorded separately and cannot advance SSI', async () => {
+  const harness = await loadTurnsHarness({
+    './combat.js': {
+      doBasicWithFollowups(_game, _unit, cap, onFollowup){
+        for (let index = 0; index < cap; index += 1) onFollowup(index);
+      }
+    }
+  });
+  const { doActionOrSkip, eventLog } = harness;
+  const unit = { id: 'actor', iid: 91, side: 'ally', alive: true, hp: 100, hpMax: 100 };
+  const turn = {
+    mode: 'interleaved_by_position', nextSide: 'ENEMY',
+    lastPos: { ALLY: 3, ENEMY: 2 }, wrapCount: { ALLY: 1, ENEMY: 1 },
+    actedNatural: { ALLY: ['iid:91'], ENEMY: [] }, cycle: 1,
+    turnCount: 2, slotCount: 9, busyUntil: 0,
+  };
+  const Game = {
+    tokens: [unit], turn, queued: { ally: new Map(), enemy: new Map() },
+    meta: new Map([[unit.id, { followupCap: 1 }]]),
+  };
+  const schedulerBefore = structuredClone(turn);
+
+  doActionOrSkip(Game, unit, {
+    performUlt(){},
+    turnContext: { side: 'ally', slot: 3, cycle: 1, orderIndex: -1, orderLength: null },
+  });
+
+  const actions = eventLog.filter(event => event.type === 'ACTION_END');
+  assert.deepStrictEqual(actions.map(event => event.detail?.actionKind), ['followup', 'natural']);
+  assert.deepStrictEqual(turn, schedulerBefore, 'follow-up không được đổi bất kỳ SSI cursor nào');
+});
