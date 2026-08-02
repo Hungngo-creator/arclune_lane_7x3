@@ -243,7 +243,7 @@ const MODE = resolveBuildMode(argMode, process.env.NODE_ENV);
 const ESBUILD_BASE_OPTIONS = {
   platform: 'browser',
   format: 'esm',
-  target: MODE === 'production' ? ['esnext'] : ['es2023'],
+  target: ['es2023'],
   sourcemap: MODE === 'production' ? false : true,
   splitting: true,
   metafile: true,

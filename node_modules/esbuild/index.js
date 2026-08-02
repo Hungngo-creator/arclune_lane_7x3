@@ -33,10 +33,10 @@ function performTransform(code, options = {}) {
 
   if (loader === 'ts' || loader === 'tsx') {
     const ts = getTypeScriptTranspiler();
-        const compilerOptions = {
+    const compilerOptions = {
       module: ts.ModuleKind.ESNext,
-      target: ts.ScriptTarget.ESNext,
-      lib: ["ESNext", "DOM"],
+      target: ts.ScriptTarget.ES2023,
+      lib: ['ESNext', 'DOM'],
       useDefineForClassFields: true,
       sourceMap: generateMap,
     };

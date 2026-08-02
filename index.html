@@ -234,16 +234,22 @@
         script.defer = true;
         script.fetchPriority = 'high';
         script.onerror = function onAppBundleError(event){
-          const message = event && typeof event === 'object' && 'message' in event
+          let message = event && typeof event === 'object' && 'message' in event
             ? String(event.message)
             : 'Không thể tải gói Arclune.';
+          if (event && typeof event === 'object' && 'lineno' in event && event.lineno){
+            message += ` (${event.filename || script.src}:${event.lineno}:${event.colno || 0})`;
+          }
           window.arcluneShowFatal && window.arcluneShowFatal(message);
         };
         document.body.appendChild(script);
       }
 
       window.addEventListener('error', function onWindowError(event){
-        const message = event && event.message ? event.message : 'Lỗi runtime không xác định.';
+        let message = event && event.message ? event.message : 'Lỗi runtime không xác định.';
+        if (event && event.lineno){
+          message += ` (${event.filename || 'script'}:${event.lineno}:${event.colno || 0})`;
+        }
         window.arcluneShowFatal && window.arcluneShowFatal(message);
       });
 
