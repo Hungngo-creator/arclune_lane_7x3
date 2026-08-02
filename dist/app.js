@@ -4648,61 +4648,59 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   const applyDamage = __dep2.applyDamage;
   const grantShield = __dep2.grantShield;
   const readShieldAmount = __dep2.readShieldAmount;
-  const __dep3 = __require('./combat/calculate-final-damage.ts');
-  const calculateFinalDamage = __dep3.calculateFinalDamage;
-  const __dep4 = __require('./vfx.ts');
-  const asSessionWithVfx = __dep4.asSessionWithVfx;
-  const vfxAddHit = __dep4.vfxAddHit;
-  const vfxAddMelee = __dep4.vfxAddMelee;
-  const vfxAddLightningArc = __dep4.vfxAddLightningArc;
-  const __dep5 = __require('./engine.ts');
-  const slotIndex = __dep5.slotIndex;
-  const __dep6 = __require('./passives.ts');
-  const emitPassiveEvent = __dep6.emitPassiveEvent;
-  const getPassiveLog = __dep6.getPassiveLog;
-  const __dep7 = __require('./config.ts');
-  const CFG = __dep7.CFG;
-  const __dep8 = __require('./utils/fury.ts');
-  const gainFury = __dep8.gainFury;
-  const startFurySkill = __dep8.startFurySkill;
-  const finishFuryHit = __dep8.finishFuryHit;
-  const __dep9 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep9.mergeBusyUntil;
-  const sessionNow = __dep9.sessionNow;
-  const __dep10 = __require('./data/tags.ts');
-  const ABSOLUTE_ATTACK_TAG_IDS = __dep10.ABSOLUTE_ATTACK_TAG_IDS;
-  const ABSOLUTE_SHIELD_TAG_IDS = __dep10.ABSOLUTE_SHIELD_TAG_IDS;
-  const __dep11 = __require('./leader-uyen.ts');
-  const applyUyenBasicExtras = __dep11.applyUyenBasicExtras;
-  const __dep12 = __require('./utils/rng.ts');
-  const nextRngValue = __dep12.nextRngValue;
-  const __dep13 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep13.normalizeClassName;
-  const __dep14 = __require('./combat/counter-matrix.ts');
-  const getCounterBonusMetadata = __dep14.getCounterBonusMetadata;
-  const __dep15 = __require('./combat/number-utils.ts');
-  const readAtkWilPower = __dep15.readAtkWilPower;
-  const __dep16 = __require('./combat/chap-minh-runtime.ts');
-  const applyChapMinhMitigation = __dep16.applyChapMinhMitigation;
-  const applyChapMinhPhaseShift = __dep16.applyChapMinhPhaseShift;
-  const recordChapMinhPreventedDamage = __dep16.recordChapMinhPreventedDamage;
-  const __dep17 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeBasicAttackResolved = __dep17.runRuntimeBasicAttackResolved;
-  const runRuntimeDamageResolved = __dep17.runRuntimeDamageResolved;
-  const runRuntimeUnitDeath = __dep17.runRuntimeUnitDeath;
-  const __dep18 = __require('./combat/kernel/index.ts');
-  const commitDamageBatch = __dep18.commitDamageBatch;
-  const createHpZeroCandidate = __dep18.createHpZeroCandidate;
-  const createLinkedAction = __dep18.createLinkedAction;
-  const createNaturalAction = __dep18.createNaturalAction;
-  const currentActionExecution = __dep18.currentActionExecution;
-  const nextActionPacket = __dep18.nextActionPacket;
-  const registerDeathPrevention = __dep18.registerDeathPrevention;
-  const registerDeathReactions = __dep18.registerDeathReactions;
-  const resolveDamageBatch = __dep18.resolveDamageBatch;
-  const resolveDamagePacket = __dep18.resolveDamagePacket;
-  const resolveSourceAttribution = __dep18.resolveSourceAttribution;
-  const withActionExecution = __dep18.withActionExecution;
+  const __dep3 = __require('./vfx.ts');
+  const asSessionWithVfx = __dep3.asSessionWithVfx;
+  const vfxAddHit = __dep3.vfxAddHit;
+  const vfxAddMelee = __dep3.vfxAddMelee;
+  const vfxAddLightningArc = __dep3.vfxAddLightningArc;
+  const __dep4 = __require('./engine.ts');
+  const slotIndex = __dep4.slotIndex;
+  const __dep5 = __require('./passives.ts');
+  const emitPassiveEvent = __dep5.emitPassiveEvent;
+  const getPassiveLog = __dep5.getPassiveLog;
+  const __dep6 = __require('./config.ts');
+  const CFG = __dep6.CFG;
+  const __dep7 = __require('./utils/fury.ts');
+  const gainFury = __dep7.gainFury;
+  const startFurySkill = __dep7.startFurySkill;
+  const finishFuryHit = __dep7.finishFuryHit;
+  const __dep8 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep8.mergeBusyUntil;
+  const sessionNow = __dep8.sessionNow;
+  const __dep9 = __require('./data/tags.ts');
+  const ABSOLUTE_ATTACK_TAG_IDS = __dep9.ABSOLUTE_ATTACK_TAG_IDS;
+  const ABSOLUTE_SHIELD_TAG_IDS = __dep9.ABSOLUTE_SHIELD_TAG_IDS;
+  const __dep10 = __require('./leader-uyen.ts');
+  const applyUyenBasicExtras = __dep10.applyUyenBasicExtras;
+  const __dep11 = __require('./utils/rng.ts');
+  const nextRngValue = __dep11.nextRngValue;
+  const __dep12 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep12.normalizeClassName;
+  const __dep13 = __require('./combat/counter-matrix.ts');
+  const getCounterBonusMetadata = __dep13.getCounterBonusMetadata;
+  const __dep14 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep14.readAtkWilPower;
+  const __dep15 = __require('./combat/chap-minh-runtime.ts');
+  const applyChapMinhMitigation = __dep15.applyChapMinhMitigation;
+  const applyChapMinhPhaseShift = __dep15.applyChapMinhPhaseShift;
+  const recordChapMinhPreventedDamage = __dep15.recordChapMinhPreventedDamage;
+  const __dep16 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeBasicAttackResolved = __dep16.runRuntimeBasicAttackResolved;
+  const runRuntimeDamageResolved = __dep16.runRuntimeDamageResolved;
+  const runRuntimeUnitDeath = __dep16.runRuntimeUnitDeath;
+  const __dep17 = __require('./combat/kernel/index.ts');
+  const commitDamageBatch = __dep17.commitDamageBatch;
+  const createHpZeroCandidate = __dep17.createHpZeroCandidate;
+  const createLinkedAction = __dep17.createLinkedAction;
+  const createNaturalAction = __dep17.createNaturalAction;
+  const currentActionExecution = __dep17.currentActionExecution;
+  const nextActionPacket = __dep17.nextActionPacket;
+  const registerDeathPrevention = __dep17.registerDeathPrevention;
+  const registerDeathReactions = __dep17.registerDeathReactions;
+  const resolveDamageBatch = __dep17.resolveDamageBatch;
+  const resolveDamagePacket = __dep17.resolveDamagePacket;
+  const resolveSourceAttribution = __dep17.resolveSourceAttribution;
+  const withActionExecution = __dep17.withActionExecution;
   exports.applyDamage = applyDamage;
   exports.grantShield = grantShield;
   function ensureProductionDeathAdapters(game) {
@@ -4714,7 +4712,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           const target = game.tokens.find(unit => (unit.iid ?? unit.id) === candidate.targetIid);
           if (!target)
               return null;
-          return hookOnLethalDamage(target) ? { prevent: true, hp: Number(target.hp ?? 1), effectId: 'legacy-undying', authority: 'normal' } : null;
+          return hookOnLethalDamage(target) ? { prevent: true, hp: 1, effectId: 'undying', authority: 'normal', charge: { consumeStatusId: 'undying' } } : null;
       });
       registerDeathReactions(game, record => {
           const dead = game.tokens.find(unit => (unit.iid ?? unit.id) === record.targetIid);
@@ -4763,38 +4761,15 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       const normalizedIncoming = Math.max(0, Math.floor(incomingDamage));
       if (normalizedIncoming <= 0)
           return 0;
-      const reflectCtx = Statuses.beforeDamage(source, receiver, {
-          dtype,
-          base: normalizedIncoming,
-          attackType: 'reflect',
-      });
-      const total = calculateFinalDamage(source, receiver, null, normalizedIncoming, {
-          ignoreAll: !!reflectCtx.ignoreAll,
-          reductionMultiplier: reflectCtx.inMul,
-          defenseMultiplier: dtype === 'arcane'
-              ? (100 / (100 + Math.max(0, receiver.res ?? 0)))
-              : (100 / (100 + Math.max(0, receiver.arm ?? 0))),
-      }).total;
-      const absorbed = Statuses.absorbShield(receiver, total, { dtype });
-      const beforeHp = Math.max(0, Math.floor(receiver.hp ?? 0));
-      applyDamage(receiver, absorbed.remain);
-      const afterHp = Math.max(0, Math.floor(receiver.hp ?? 0));
-      const dealt = Math.max(0, beforeHp - afterHp);
-      if (game && beforeHp > 0 && receiver.hp <= 0) {
-          const execution = currentActionExecution(game);
-          const identity = execution?.identity ?? createNaturalAction(game, 'reflected');
-          createHpZeroCandidate(game, receiver, identity, resolveSourceAttribution({ immediateSource: source, trueSelf: source.trueSelfId ?? null, owner: source.ownerIid ?? source }), 'reflected', dealt);
-      }
-      if (dealt > 0) {
-          gainFury(receiver, {
-              type: 'damageTaken',
-              dealt,
-              selfMaxHp: Number.isFinite(receiver?.hpMax) ? receiver.hpMax : undefined,
-              damageTaken: dealt,
-          });
-          finishFuryHit(receiver);
-      }
-      return dealt;
+      if (!game)
+          throw new Error('[combat-kernel] reflected damage requires Game');
+      const parent = currentActionExecution(game);
+      if (!parent)
+          throw new Error('[combat-kernel] reflected damage requires a parent action');
+      const linked = createLinkedAction(game, parent.identity, 'reflected-damage');
+      return withActionExecution(game, linked, () => dealAbilityDamage(game, source, receiver, {
+          base: normalizedIncoming, dtype, attackType: 'reflect', actionIdentity: linked,
+      }).dealt, { triggerLedger: parent.triggerLedger, originActionId: parent.identity.actionId });
   };
   const resolveReflectDamage = (game, attacker, target, dealt, dtype) => {
       const targetReflect = clamp01(Statuses.get(target, 'reflect')?.power ?? 0);
@@ -5001,9 +4976,9 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       // not already own a cast receive a real natural action, never a detached id.
       if (Game && !currentActionExecution(Game) && !opts.actionIdentity) {
           return withActionExecution(Game, createNaturalAction(Game, String(opts.attackType ?? 'ability')), () => dealAbilityDamage(Game, attacker, target, opts));
-          if (Game)
-              ensureProductionDeathAdapters(Game);
       }
+      if (Game)
+          ensureProductionDeathAdapters(Game);
       if (!attacker || !target || !target.alive) {
           return {
               dealt: 0,
@@ -5146,7 +5121,8 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       };
       Statuses.afterDamage(attacker, target, damageResult);
       const dealt = Math.max(0, dealtTotal);
-      resolveReflectDamage(Game, attacker, target, dealt, dtype);
+      if (attackType !== 'reflect')
+          resolveReflectDamage(Game, attacker, target, dealt, dtype);
       const sessionVfx = asSessionWithVfx(Game);
       if (sessionVfx != null) {
           try {
@@ -6013,6 +5989,9 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
   const resolveDeathWave = __dep1.resolveDeathWave;
   const __dep2 = __require('./combat/kernel/battle-end.ts');
   const evaluateBattleEnd = __dep2.evaluateBattleEnd;
+  const __dep3 = __require('./combat/kernel/sequence.ts');
+  const getCombatSequence = __dep3.getCombatSequence;
+  const nextEventSerial = __dep3.nextEventSerial;
   const stack = (game) => ((game.runtime ??= {}).actionExecutionStack ??= []);
   function beginActionExecution(game, identity, options = {}) {
       const context = { identity, nextPacketSerial: 1, triggerLedger: options.triggerLedger ?? createTriggerLedger(), originActionId: options.originActionId ?? null, snapshot: { ...(options.snapshot ?? {}) } };
@@ -6040,11 +6019,34 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
       }
       finally {
           endActionExecution(game, context);
-          if (completed) {
-              const wave = resolveDeathWave(game);
-              evaluateBattleEnd(game, wave);
-          }
+          if (completed)
+              finalizeCombatAction(game, context);
       }
+  }
+  /** The sole production action boundary. It is idempotent for an action identity. */
+  function finalizeCombatAction(game, context) {
+      const state = (game.runtime ??= {});
+      const key = String(context.identity.actionId);
+      const existing = state.finalizedActions?.[key];
+      if (existing)
+          return existing;
+      const first = getCombatSequence(game).eventSerial + 1;
+      const before = state.combatEvents?.length ?? 0;
+      const deathRecords = resolveDeathWave(game, undefined, context.identity.actionId);
+      const actionEvents = (state.combatEvents ?? []).slice(before);
+      const battleEnd = evaluateBattleEnd(game, deathRecords);
+      const actionEndSerial = nextEventSerial(game);
+      (state.combatEvents ??= []).push({ type: 'ACTION_END', eventSerial: actionEndSerial, actionId: context.identity.actionId, chainId: context.identity.chainId });
+      const result = {
+          actionId: context.identity.actionId, chainId: context.identity.chainId,
+          committedTargetAggregates: actionEvents.filter(event => event.type === 'DAMAGE_BATCH_RESOLVED').flatMap(event => Array.isArray(event.hpAllocation) ? event.hpAllocation : []),
+          deathRecords,
+          preventedDeaths: actionEvents.filter(event => event.type === 'DEATH_PREVENTED'),
+          immediateRevives: actionEvents.filter(event => event.type === 'REVIVE_COMMITTED'), battleEnd,
+          emittedEventSerialRange: { first, last: actionEndSerial },
+      };
+      (state.finalizedActions ??= {})[key] = result;
+      return result;
   }
   function nextActionPacket(context) {
       const packetSerial = context.nextPacketSerial++;
@@ -6055,6 +6057,7 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
   if (!Object.prototype.hasOwnProperty.call(exports, 'currentActionExecution')) exports.currentActionExecution = currentActionExecution;
   if (!Object.prototype.hasOwnProperty.call(exports, 'endActionExecution')) exports.endActionExecution = endActionExecution;
   if (!Object.prototype.hasOwnProperty.call(exports, 'withActionExecution')) exports.withActionExecution = withActionExecution;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'finalizeCombatAction')) exports.finalizeCombatAction = finalizeCombatAction;
   if (!Object.prototype.hasOwnProperty.call(exports, 'nextActionPacket')) exports.nextActionPacket = nextActionPacket;
 };
 __modules['./combat/kernel/action-resolution.ts'] = (exports, module, __require) => {
@@ -6828,10 +6831,11 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       }
       return candidate;
   }
-  function resolveDeathWave(game, prevention = () => null) {
+  function resolveDeathWave(game, prevention = () => null, actionId) {
       const state = runtime(game);
-      const queued = state.hpZeroCandidates ?? [];
-      state.hpZeroCandidates = [];
+      const allQueued = state.hpZeroCandidates ?? [];
+      const queued = actionId == null ? allQueued : allQueued.filter(candidate => candidate.actionId === actionId);
+      state.hpZeroCandidates = actionId == null ? [] : allQueued.filter(candidate => candidate.actionId !== actionId);
       const confirmedKeys = state.confirmedLifeKeys ??= [];
       const opened = state.openHpZeroKeys ??= [];
       const close = (candidate) => { const key = lifeKey(candidate.targetIid, candidate.lifeSerial); state.openHpZeroKeys = opened.filter(item => item !== key); opened.splice(0, opened.length, ...(state.openHpZeroKeys ?? [])); };
@@ -6860,6 +6864,9 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
           const decision = collected[0] ?? prevention({ candidate, decisions: collected });
           if (decision?.prevent) {
               markDeathPrevented(target, Math.min(Number(target.hpMax ?? 1), decision.hp));
+              const consumedStatus = decision.charge?.consumeStatusId;
+              if (typeof consumedStatus === 'string')
+                  target.statuses = target.statuses?.filter(status => status.id !== consumedStatus);
               close(candidate);
               emit(game, { type: 'DEATH_PREVENTED', eventSerial: nextEventSerial(game), actionId: candidate.actionId, chainId: candidate.chainId, targetIid: candidate.targetIid, trueSelfId: candidate.trueSelfId, lifeSerial: candidate.lifeSerial, decision });
           }
@@ -9174,7 +9181,6 @@ __modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
 };
 __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/apply-damage.ts');
-  const applyDamage = __dep0.applyDamage;
   const grantShield = __dep0.grantShield;
   const __dep1 = __require('./combat/number-utils.ts');
   const toFiniteNumber = __dep1.toFiniteNumber;
@@ -9187,23 +9193,27 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep4 = __require('./combat.ts');
   const dealAbilityDamage = __dep4.dealAbilityDamage;
   const healUnit = __dep4.healUnit;
-  const __dep5 = __require('./utils/rng.ts');
-  const nextRngValue = __dep5.nextRngValue;
-  const __dep6 = __require('./combat/status-utils.ts');
-  const ensureStatusList = __dep6.ensureStatusList;
-  const getStatusEntryById = __dep6.getStatusEntryById;
-  const __dep7 = __require('./combat/token-side-utils.ts');
-  const partitionTokensBySide = __dep7.partitionTokensBySide;
-  const sampleTokens = __dep7.sampleTokens;
-  const __dep8 = __require('./combat/tag-aliases.ts');
-  const canonicalizeCombatTagsWithRule = __dep8.canonicalizeCombatTagsWithRule;
-  const compareRuleConflictUnitPriority = __dep8.compareRuleConflictUnitPriority;
-  const compareRuleTagPriority = __dep8.compareRuleTagPriority;
-  const __dep9 = __require('./combat/board-position-utils.ts');
-  const createCrossSlotLookup = __dep9.createCrossSlotLookup;
-  const isLeaderToken = __dep9.isLeaderToken;
-  const readBoardPosition = __dep9.readBoardPosition;
-  const selectTargetsByBoardPredicate = __dep9.selectTargetsByBoardPredicate;
+  const __dep5 = __require('./combat/kernel/index.ts');
+  const createNaturalAction = __dep5.createNaturalAction;
+  const currentActionExecution = __dep5.currentActionExecution;
+  const withActionExecution = __dep5.withActionExecution;
+  const __dep6 = __require('./utils/rng.ts');
+  const nextRngValue = __dep6.nextRngValue;
+  const __dep7 = __require('./combat/status-utils.ts');
+  const ensureStatusList = __dep7.ensureStatusList;
+  const getStatusEntryById = __dep7.getStatusEntryById;
+  const __dep8 = __require('./combat/token-side-utils.ts');
+  const partitionTokensBySide = __dep8.partitionTokensBySide;
+  const sampleTokens = __dep8.sampleTokens;
+  const __dep9 = __require('./combat/tag-aliases.ts');
+  const canonicalizeCombatTagsWithRule = __dep9.canonicalizeCombatTagsWithRule;
+  const compareRuleConflictUnitPriority = __dep9.compareRuleConflictUnitPriority;
+  const compareRuleTagPriority = __dep9.compareRuleTagPriority;
+  const __dep10 = __require('./combat/board-position-utils.ts');
+  const createCrossSlotLookup = __dep10.createCrossSlotLookup;
+  const isLeaderToken = __dep10.isLeaderToken;
+  const readBoardPosition = __dep10.readBoardPosition;
+  const selectTargetsByBoardPredicate = __dep10.selectTargetsByBoardPredicate;
   const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
   const EMPTY_TAGS = [];
   const DOCTRINE_NO_HEAL_STATUS_ID = 'doctrine-no-heal';
@@ -9520,13 +9530,14 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const applyDamageLikeEffect = (ctx, result, amount) => {
       if (amount <= 0)
           return;
+      if (!ctx.game || !ctx.attacker)
+          throw new Error('[combat-kernel] damage tag requires Game, attacker, and ActionExecutionContext');
+      if (!currentActionExecution(ctx.game)) {
+          withActionExecution(ctx.game, createNaturalAction(ctx.game, 'tag-damage'), () => applyDamageLikeEffect(ctx, result, amount));
+          return;
+      }
       for (const token of result.targets) {
-          if (ctx.game && ctx.attacker) {
-              dealAbilityDamage(ctx.game, ctx.attacker, token, { base: amount, attackType: 'skill' });
-          }
-          else {
-              applyDamage(token, amount);
-          }
+          dealAbilityDamage(ctx.game, ctx.attacker, token, { base: amount, attackType: 'skill' });
       }
       if (result.targets.length > 0)
           result.sideEffects.push(`hp-change:${amount}`);
@@ -44708,12 +44719,9 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
           if (this.has(attacker, 'execute')) {
               if ((target.hp ?? 0) <= Math.ceil((target.hpMax ?? 0) * 0.1)) {
                   target.hp = 0;
-                  const revived = hookOnLethalDamage(target);
-                  if (!revived) {
-                      target.alive = false;
-                      if (!target.deadAt)
-                          target.deadAt = safeNow();
-                  }
+                  target.alive = false;
+                  if (!target.deadAt)
+                      target.deadAt = safeNow();
               }
           }
           return result;
@@ -44741,17 +44749,8 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       Statuses.remove(unit, id);
   }
   function hookOnLethalDamage(target) {
-      const status = Statuses.get(target, 'undying');
-      if (!status)
-          return false;
-      if ((target.hp ?? 0) <= 0) {
-          target.hp = 1;
-          Statuses.remove(target, 'undying');
-          target.alive = true;
-          target.deadAt = undefined;
-          return true;
-      }
-      return false;
+      // Compatibility adapter only: the lifecycle coordinator owns the commit.
+      return (target.hp ?? 0) <= 0 && Statuses.has(target, 'undying');
   }
   //# sourceMappingURL=statuses.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'Statuses')) exports.Statuses = Statuses;

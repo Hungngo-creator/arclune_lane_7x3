@@ -554,11 +554,8 @@ export const Statuses: StatusService = {
     if (this.has(attacker, 'execute')) {
       if ((target.hp ?? 0) <= Math.ceil((target.hpMax ?? 0) * 0.1)) {
         target.hp = 0;
-        const revived = hookOnLethalDamage(target);
-        if (!revived) {
-          target.alive = false;
-          if (!target.deadAt) target.deadAt = safeNow();
-        }
+        target.alive = false;
+        if (!target.deadAt) target.deadAt = safeNow();
       }
     }
 
@@ -592,14 +589,6 @@ export function clearStatus(unit: UnitToken | null | undefined, id: string): voi
 }
 
 export function hookOnLethalDamage(target: UnitToken): boolean {
-  const status = Statuses.get(target, 'undying');
-  if (!status) return false;
-  if ((target.hp ?? 0) <= 0) {
-    target.hp = 1;
-    Statuses.remove(target, 'undying');
-    target.alive = true;
-    target.deadAt = undefined;
-    return true;
-  }
-  return false;
+  // Compatibility adapter only: the lifecycle coordinator owns the commit.
+  return (target.hp ?? 0) <= 0 && Statuses.has(target, 'undying');
 }

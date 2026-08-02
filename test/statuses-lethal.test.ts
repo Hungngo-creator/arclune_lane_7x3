@@ -53,20 +53,19 @@ const addStatus = <K extends keyof typeof Statuses.make>(
     expect(unit.deadAt).toEqual(expect.any(Number));
   });
 
-  it('bleed damage triggers undying revive', () => {
+  it('bleed cannot consume undying outside the death coordinator', () => {
     const unit = createUnit({ hp: 5, hpMax: 100 });
     addStatus(unit, 'bleed', { turns: 1 });
     addStatus(unit, 'undying');
 
     Statuses.onTurnEnd(unit, { log: [] });
 
-    expect(unit.hp).toBe(1);
-    expect(unit.alive).toBe(true);
-    expect(unit.deadAt).toBeUndefined();
-    expect(Statuses.has(unit, 'undying')).toBe(false);
+    expect(unit.hp).toBe(0);
+    expect(unit.alive).toBe(false);
+    expect(Statuses.has(unit, 'undying')).toBe(true);
   });
 
-  it('reflect lethal damage respects undying revive', () => {
+  it('legacy reflect cannot consume undying outside the death coordinator', () => {
     const attacker = createUnit({ hp: 4, hpMax: 20 });
     const target = createUnit({ side: 'enemy' });
     addStatus(attacker, 'undying');
@@ -74,10 +73,9 @@ const addStatus = <K extends keyof typeof Statuses.make>(
 
     Statuses.afterDamage(attacker, target, { dealt: 4 });
 
-    expect(attacker.hp).toBe(1);
-    expect(attacker.alive).toBe(true);
-    expect(attacker.deadAt).toBeUndefined();
-    expect(Statuses.has(attacker, 'undying')).toBe(false);
+    expect(attacker.hp).toBe(0);
+    expect(attacker.alive).toBe(false);
+    expect(Statuses.has(attacker, 'undying')).toBe(true);
   });
 
   it('venom lethal damage marks targets dead', () => {
@@ -92,7 +90,7 @@ const addStatus = <K extends keyof typeof Statuses.make>(
     expect(target.deadAt).toEqual(expect.any(Number));
   });
 
-  it('venom lethal damage triggers undying revive', () => {
+  it('legacy venom cannot consume undying outside the death coordinator', () => {
     const attacker = createUnit();
     const target = createUnit({ side: 'enemy', hp: 5, hpMax: 30 });
     addStatus(attacker, 'venom', { pct: 1, turns: 1 });
@@ -100,10 +98,9 @@ const addStatus = <K extends keyof typeof Statuses.make>(
 
     Statuses.afterDamage(attacker, target, { dealt: 5 });
 
-    expect(target.hp).toBe(1);
-    expect(target.alive).toBe(true);
-    expect(target.deadAt).toBeUndefined();
-    expect(Statuses.has(target, 'undying')).toBe(false);
+    expect(target.hp).toBe(0);
+    expect(target.alive).toBe(false);
+    expect(Statuses.has(target, 'undying')).toBe(true);
   });
 
   it('execute kills targets without undying', () => {
@@ -118,7 +115,7 @@ const addStatus = <K extends keyof typeof Statuses.make>(
     expect(target.deadAt).toEqual(expect.any(Number));
   });
 
-  it('execute respects undying revive', () => {
+  it('legacy execute cannot consume undying outside the death coordinator', () => {
     const attacker = createUnit();
     const target = createUnit({ side: 'enemy', hp: 4, hpMax: 40 });
     addStatus(attacker, 'execute', { turns: 1 });
@@ -126,10 +123,9 @@ const addStatus = <K extends keyof typeof Statuses.make>(
 
     Statuses.afterDamage(attacker, target, { dealt: 1 });
 
-    expect(target.hp).toBe(1);
-    expect(target.alive).toBe(true);
-    expect(target.deadAt).toBeUndefined();
-    expect(Statuses.has(target, 'undying')).toBe(false);
+    expect(target.hp).toBe(0);
+    expect(target.alive).toBe(false);
+    expect(Statuses.has(target, 'undying')).toBe(true);
   });
 
   it('divine-nature blocks buff/debuff/mark statuses from all sources', () => {

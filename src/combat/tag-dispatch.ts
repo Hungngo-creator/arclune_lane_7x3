@@ -1,8 +1,9 @@
-import { applyDamage, grantShield } from './apply-damage.ts';
+import { grantShield } from './apply-damage.ts';
 import { toFiniteNumber, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { Statuses } from '../statuses.ts';
 import { normalizeTagList } from '../data/tags.ts';
 import { dealAbilityDamage, healUnit } from '../combat.ts';
+import { createNaturalAction, currentActionExecution, withActionExecution } from './kernel/index.ts';
 import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
@@ -451,12 +452,13 @@ const applyDamageLikeEffect = (
   amount: number,
 ): void => {
   if (amount <= 0) return;
+  if (!ctx.game || !ctx.attacker) throw new Error('[combat-kernel] damage tag requires Game, attacker, and ActionExecutionContext');
+  if (!currentActionExecution(ctx.game)) {
+    withActionExecution(ctx.game, createNaturalAction(ctx.game, 'tag-damage'), () => applyDamageLikeEffect(ctx, result, amount));
+    return;
+  }
   for (const token of result.targets) {
-    if (ctx.game && ctx.attacker) {
-      dealAbilityDamage(ctx.game, ctx.attacker, token, { base: amount, attackType: 'skill' });
-    } else {
-      applyDamage(token, amount);
-    }
+    dealAbilityDamage(ctx.game, ctx.attacker, token, { base: amount, attackType: 'skill' });
   }
   if (result.targets.length > 0) result.sideEffects.push(`hp-change:${amount}`);
 };

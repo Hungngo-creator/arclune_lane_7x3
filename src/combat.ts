@@ -78,7 +78,7 @@ function ensureProductionDeathAdapters(game: SessionState): void {
   registerDeathPrevention(game, candidate => {
     const target = game.tokens.find(unit => (unit.iid ?? unit.id) === candidate.targetIid);
     if (!target) return null;
-    return hookOnLethalDamage(target) ? { prevent: true, hp: Number(target.hp ?? 1), effectId: 'legacy-undying', authority: 'normal' } : null;
+    return hookOnLethalDamage(target) ? { prevent: true, hp: 1, effectId: 'undying', authority: 'normal', charge: { consumeStatusId: 'undying' } } : null;
   });
   registerDeathReactions(game, record => {
     const dead = game.tokens.find(unit => (unit.iid ?? unit.id) === record.targetIid);
@@ -182,41 +182,13 @@ const applyResolvedReflectDamage = (
 ): number => {
   const normalizedIncoming = Math.max(0, Math.floor(incomingDamage));
   if (normalizedIncoming <= 0) return 0;
-
-  const reflectCtx = Statuses.beforeDamage(source, receiver, {
-    dtype,
-    base: normalizedIncoming,
-    attackType: 'reflect',
-  });
-
-  const total = calculateFinalDamage(source, receiver, null, normalizedIncoming, {
-    ignoreAll: !!reflectCtx.ignoreAll,
-    reductionMultiplier: reflectCtx.inMul,
-    defenseMultiplier: dtype === 'arcane'
-      ? (100 / (100 + Math.max(0, receiver.res ?? 0)))
-      : (100 / (100 + Math.max(0, receiver.arm ?? 0))),
-  }).total;
-
-  const absorbed = Statuses.absorbShield(receiver, total, { dtype });
-  const beforeHp = Math.max(0, Math.floor(receiver.hp ?? 0));
-  applyDamage(receiver, absorbed.remain);
-  const afterHp = Math.max(0, Math.floor(receiver.hp ?? 0));
-  const dealt = Math.max(0, beforeHp - afterHp);
-  if (game && beforeHp > 0 && receiver.hp <= 0) {
-    const execution = currentActionExecution(game);
-    const identity = execution?.identity ?? createNaturalAction(game, 'reflected');
-    createHpZeroCandidate(game, receiver, identity, resolveSourceAttribution({ immediateSource: source, trueSelf: source.trueSelfId ?? null, owner: source.ownerIid ?? source }), 'reflected', dealt);
-  }
-  if (dealt > 0) {
-    gainFury(receiver, {
-      type: 'damageTaken',
-      dealt,
-      selfMaxHp: Number.isFinite(receiver?.hpMax) ? receiver.hpMax : undefined,
-      damageTaken: dealt,
-    });
-    finishFuryHit(receiver);
-  }
-  return dealt;
+  if (!game) throw new Error('[combat-kernel] reflected damage requires Game');
+  const parent = currentActionExecution(game);
+  if (!parent) throw new Error('[combat-kernel] reflected damage requires a parent action');
+  const linked = createLinkedAction(game, parent.identity, 'reflected-damage');
+  return withActionExecution(game, linked, () => dealAbilityDamage(game, source, receiver, {
+    base: normalizedIncoming, dtype, attackType: 'reflect', actionIdentity: linked,
+  }).dealt, { triggerLedger: parent.triggerLedger, originActionId: parent.identity.actionId });
 };
 
 const resolveReflectDamage = (
@@ -461,8 +433,8 @@ export function dealAbilityDamage(
   // not already own a cast receive a real natural action, never a detached id.
   if (Game && !currentActionExecution(Game) && !opts.actionIdentity) {
     return withActionExecution(Game, createNaturalAction(Game, String(opts.attackType ?? 'ability')), () => dealAbilityDamage(Game, attacker, target, opts));
-    if (Game) ensureProductionDeathAdapters(Game);
   }
+  if (Game) ensureProductionDeathAdapters(Game);
   if (!attacker || !target || !target.alive) {
     return {
       dealt: 0,
@@ -609,7 +581,7 @@ export function dealAbilityDamage(
   };
   Statuses.afterDamage(attacker, target, damageResult);
   const dealt = Math.max(0, dealtTotal);
-  resolveReflectDamage(Game, attacker, target, dealt, dtype);
+  if (attackType !== 'reflect') resolveReflectDamage(Game, attacker, target, dealt, dtype);
 
   const sessionVfx = asSessionWithVfx(Game);
 

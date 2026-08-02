@@ -73,8 +73,10 @@ export function createHpZeroCandidate(game: SessionState, target: UnitToken, ide
   return candidate;
 }
 
-export function resolveDeathWave(game: SessionState, prevention: (request: DeathPreventionRequest) => DeathPreventionDecision | null = () => null): DeathRecord[] {
-  const state = runtime(game); const queued = state.hpZeroCandidates ?? []; state.hpZeroCandidates = [];
+export function resolveDeathWave(game: SessionState, prevention: (request: DeathPreventionRequest) => DeathPreventionDecision | null = () => null, actionId?: string | number): DeathRecord[] {
+  const state = runtime(game); const allQueued = state.hpZeroCandidates ?? [];
+  const queued = actionId == null ? allQueued : allQueued.filter(candidate => candidate.actionId === actionId);
+  state.hpZeroCandidates = actionId == null ? [] : allQueued.filter(candidate => candidate.actionId !== actionId);
   const confirmedKeys = state.confirmedLifeKeys ??= []; const opened = state.openHpZeroKeys ??= [];
   const close = (candidate: HPZeroCandidate) => { const key = lifeKey(candidate.targetIid, candidate.lifeSerial); state.openHpZeroKeys = opened.filter(item => item !== key); opened.splice(0, opened.length, ...(state.openHpZeroKeys ?? [])); };
   const tokens = new Map(game.tokens.map(unit => [unit.iid ?? unit.id, unit]));
@@ -88,7 +90,12 @@ export function resolveDeathWave(game: SessionState, prevention: (request: Death
     const target = tokens.get(candidate.targetIid); if (!target || (target.lifeSerial ?? 1) !== candidate.lifeSerial) continue;
     if (Number(target.hp ?? 0) !== 0 || getLifeState(target) !== 'death-prevention') continue;
     const collected = collectDeathPreventionDecisions(game, candidate); const decision = collected[0] ?? prevention({ candidate, decisions: collected });
-    if (decision?.prevent) { markDeathPrevented(target, Math.min(Number(target.hpMax ?? 1), decision.hp)); close(candidate); emit(game, { type: 'DEATH_PREVENTED', eventSerial: nextEventSerial(game), actionId: candidate.actionId, chainId: candidate.chainId, targetIid: candidate.targetIid, trueSelfId: candidate.trueSelfId, lifeSerial: candidate.lifeSerial, decision }); }
+    if (decision?.prevent) {
+      markDeathPrevented(target, Math.min(Number(target.hpMax ?? 1), decision.hp));
+      const consumedStatus = decision.charge?.consumeStatusId;
+      if (typeof consumedStatus === 'string') target.statuses = target.statuses?.filter(status => status.id !== consumedStatus);
+      close(candidate); emit(game, { type: 'DEATH_PREVENTED', eventSerial: nextEventSerial(game), actionId: candidate.actionId, chainId: candidate.chainId, targetIid: candidate.targetIid, trueSelfId: candidate.trueSelfId, lifeSerial: candidate.lifeSerial, decision });
+    }
     else confirmed.push({ candidate, target });
   }
   for (const item of confirmed) markDeathConfirmed(item.target);
