@@ -30,6 +30,7 @@ function consumeShieldEntryAmount(entry: ReturnType<typeof getShieldEntry>, amou
   return consumed;
 }
 
+/** @deprecated Low-level legacy commit primitive. New damage must enter through the combat kernel adapter. */
 export function applyDamage(target: UnitToken, amount: number): void {
   const maxHp = toNonNegativeFloorInt(target.hpMax, 0);
   if (maxHp <= 0) return;

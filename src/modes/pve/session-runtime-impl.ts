@@ -1169,7 +1169,8 @@ function creepStatsFromInherit(
   if (atk > 0) stats.atk = atk;
   if (wil > 0) stats.wil = wil;
   if (res > 0) stats.res = res;
-  if (arm > 0) stats.arm = Math.max(0, Math.min(1, arm));
+  // Summon inheritance keeps the master's ARM rating unit.
+  if (arm > 0) stats.arm = arm;
   return stats;
 }
 

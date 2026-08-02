@@ -451,7 +451,9 @@ const recomputeFromStatuses = (unit: UnitToken | null | undefined): void => {
     let next = baseValue * (1 + pct) + add;
 
     if (attr === 'arm' || attr === 'res'){
-      unit[attr] = clamp01(next);
+      // ARM/RES are ratings. Percent-mode statuses modify the rating; they do
+      // not turn the final value into a 0..1 reduction percentage.
+      unit[attr] = Math.round(next * 100) / 100;
       continue;
     }
     if (attr === 'spd'){

@@ -175,6 +175,15 @@ describe('interleaved by position order', () => {
     expect(state.turn.cycle).toBe(1);
   });
 
+  test('both completed side passes update cycle without a ReferenceError', () => {
+    const state: any = makeState([
+      { id: 'a', iid: 821, side: 'ally', alive: true, ...slotToCell('ally', 1) },
+      { id: 'e', iid: 822, side: 'enemy', alive: true, ...slotToCell('enemy', 1) },
+    ]);
+    expect(() => Array.from({ length: 4 }, () => nextTurnInterleaved(state))).not.toThrow();
+    expect(state.turn.cycle).toBe(1);
+  });
+
   test('global cycle waits for both highly asymmetric side passes', () => {
     const state: any = makeState([
       { id: 'a1', iid: 901, side: 'ally', alive: true, ...slotToCell('ally', 1) },

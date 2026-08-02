@@ -23,6 +23,7 @@ import {
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
 import { runRuntimeBasicAttackResolved, runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
+import { resolveLegacyDamage } from './combat/kernel/index.ts';
 
 export { applyDamage, grantShield };
 
@@ -453,9 +454,6 @@ export function dealAbilityDamage(
   const splitTotal = physWeightRaw + arcWeightRaw;
   const physWeight = dtype === 'mixed' ? (splitTotal > 0 ? physWeightRaw / splitTotal : 0.5) : (dtype === 'arcane' ? 0 : 1);
   const arcWeight = dtype === 'mixed' ? (splitTotal > 0 ? arcWeightRaw / splitTotal : 0.5) : (dtype === 'arcane' ? 1 : 0);
-  const effectiveArm = Math.max(0, (target.arm ?? 0) * (1 - combinedPen));
-  const effectiveRes = Math.max(0, (target.res ?? 0) * (1 - combinedPen));
-  const defMultiplier = (physWeight * (100 / (100 + effectiveArm))) + (arcWeight * (100 / (100 + effectiveRes)));
   const sideUnits = Game?.tokens?.filter((token) => token.side === attacker.side && token.alive) ?? [];
   const counterMetadata = getCounterBonusMetadata(attacker, target, sideUnits, { skill: opts.skill });
 
@@ -472,12 +470,19 @@ export function dealAbilityDamage(
     elementBonus: toFinite(opts.elementBonus ?? opts.damageBreakdown?.elementBonus, counterMetadata.elementBonus),
     synergyBonus: toFinite(opts.synergyBonus ?? opts.damageBreakdown?.synergyBonus, counterMetadata.synergyBonus),
   };
-  const finalDamage = calculateFinalDamage(attacker, target, opts.skill, rawDamage, {
-    ignoreAll: pre.ignoreAll || shieldWinsLaw,
-    defenseMultiplier: defMultiplier,
-    reductionMultiplier: pre.inMul,
-    breakdown: bonusBreakdown,
-  });
+  const breakdownMultiplier = Math.max(0, 1 + bonusBreakdown.classBonus + bonusBreakdown.elementBonus + bonusBreakdown.synergyBonus);
+  const resolveComponent = (damageType: string, weight: number) => resolveLegacyDamage({
+    attacker, defender: target, damageType,
+    declaredDamage: (pre.ignoreAll || shieldWinsLaw) ? 0 : rawDamage * weight,
+    defensePercentPenetration: combinedPen,
+    outgoingModifiers: [breakdownMultiplier], incomingModifiers: [pre.inMul],
+  }).finalRoundedDamage;
+  // Legacy `mixed` is adapted to two canonical component packets, never one
+  // weighted-defense packet. New callers should declare the components directly.
+  const kernelTotal = dtype === 'mixed'
+    ? resolveComponent('physical', physWeight) + resolveComponent('will', arcWeight)
+    : resolveComponent(dtype, 1);
+  const finalDamage = { total: kernelTotal, breakdown: bonusBreakdown };
   const chapMinhMitigation = applyChapMinhMitigation(target, finalDamage.total, {
     isAoE: !!opts.isAoE,
     skill: opts.skill,
