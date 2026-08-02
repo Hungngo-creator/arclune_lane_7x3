@@ -523,7 +523,10 @@ function splitImportClause(clause){
 }
 
 const IMPORT_LOCAL_IDENTIFIER_REGEX = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
-const NAMESPACE_IMPORT_REGEX = /^\*\s+as\s+([A-Za-z_$][A-Za-z0-9_$]*)$/;
+// Node 26's built-in TypeScript transform can leave a `/*` marker between `*`
+// and `as` when this fallback bundler receives a namespace import.  Ordinary
+// block comments are valid in the same position as well, so accept both forms.
+const NAMESPACE_IMPORT_REGEX = /^\*\s+(?:\/\*(?:[\s\S]*?\*\/)?\s*)?as\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*;?$/;
 
 function parseNamedImports(block){
   const trimmed = block.trim();

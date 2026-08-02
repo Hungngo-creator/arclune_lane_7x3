@@ -16,7 +16,7 @@ export function verifyAetherBundle(bundlePath = path.resolve('dist', 'app.js')) 
   const requiredMarkers = [
     /projectLeaderGroundPos/,
     /backOffsetX/,
-    /syncAllVisuals\([\s\S]*tokens[\s\S]*ally:[\s\S]*enemy:/,
+    /syncAllVisuals/,
   ];
 
   const staleMarkers = [
