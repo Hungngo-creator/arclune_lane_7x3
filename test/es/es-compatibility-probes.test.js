@@ -1,6 +1,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const probes = require('../tools/es-compatibility-probes');
+const probes = require('../../tools/es-compatibility-probes');
+
+const fs = require('node:fs');
+const path = require('node:path');
 
 test('extracts the Chromium engine version actually loading the page', () => {
   assert.equal(probes.chromiumMajor('Mozilla/5.0 Chrome/132.0.6834.163 Mobile Safari/537.36'), 132);
@@ -29,3 +32,8 @@ test('runs syntax and API checks without putting modern syntax in the probe scri
   assert.equal(typeof report.apiEdition, 'string');
 });
 
+test('standalone browser checker does not depend on a separately served script', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', '..', 'check_es.html'), 'utf8');
+  assert.doesNotMatch(html, /<script\s+[^>]*src=/i);
+  assert.match(html, /ArcluneESProbes/);
+});

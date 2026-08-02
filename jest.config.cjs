@@ -12,6 +12,8 @@ module.exports = {
   modulePathIgnorePatterns: ['<rootDir>/src/config/package.json'],
   testPathIgnorePatterns: [
     '<rootDir>/test/build.test.js',
+    '<rootDir>/test/es/es-compatibility-probes.test.js',
+    '<rootDir>/test/esbuild-stub-target.test.js',
     '<rootDir>/test/hud-listeners.test.js',
     '<rootDir>/test/pve-session-canvas.test.js',
     '<rootDir>/test/pve-session-config.test.js',

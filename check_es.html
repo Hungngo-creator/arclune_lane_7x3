@@ -34,11 +34,73 @@
       <ul id="api-results"></ul>
     </section>
   </main>
-  <script src="./tools/es-compatibility-probes.js"></script>
   <script>
+    /* Bản kiểm tra phải tự chạy được khi app chỉ phục vụ các tệp ở thư mục gốc. */
+    (function (root) {
+      'use strict';
+      var syntaxTests = [
+        ['ES5', '"use strict"; return true;'],
+        ['ES2015', 'const add = (a, b = 1) => a + b; return add(1) === 2;'],
+        ['ES2016', 'return 2 ** 3 === 8;'],
+        ['ES2017', 'async function f(){ await 1; } return true;'],
+        ['ES2018', 'const {a, ...rest} = {a: 1, b: 2}; async function* g(){ yield 1; } return a === 1 && rest.b === 2;'],
+        ['ES2019', 'try { throw 1; } catch { return true; }'],
+        ['ES2020', 'const value = ({a: null})?.a ?? 7; return typeof 1n === "bigint" && value === 7;'],
+        ['ES2021', 'let value = 0; value ||= 1; return value === 1 && 1_000 === 1000;'],
+        ['ES2022', 'class A { #value = 1; static { this.ready = true; } get(){ return this.#value; } } return new A().get() === 1 && A.ready;']
+      ];
+      var apiTests = [
+        ['ES2015', function (host) { return typeof host.Promise === 'function' && typeof host.Map === 'function'; }],
+        ['ES2016', function () { return typeof Array.prototype.includes === 'function'; }],
+        ['ES2017', function (host) { return typeof host.Object.values === 'function'; }],
+        ['ES2018', function (host) { return typeof host.Promise.prototype.finally === 'function'; }],
+        ['ES2019', function () { return typeof Array.prototype.flat === 'function'; }],
+        ['ES2020', function (host) { return typeof host.Promise.allSettled === 'function'; }],
+        ['ES2021', function () { return typeof String.prototype.replaceAll === 'function'; }],
+        ['ES2022', function () { return typeof Array.prototype.at === 'function'; }],
+        ['ES2023', function () { return typeof Array.prototype.toSorted === 'function' && typeof Array.prototype.findLast === 'function'; }],
+        ['ES2024', function (host) { return typeof host.Object.groupBy === 'function' && typeof host.Promise.withResolvers === 'function'; }]
+      ];
+      function runTests(tests, evaluator) {
+        return tests.map(function (test) {
+          try { return { name: test[0], supported: evaluator(test[1]) === true }; }
+          catch (error) { return { name: test[0], supported: false }; }
+        });
+      }
+      function continuousEdition(results) {
+        var edition = 'trước ES5';
+        results.some(function (result) {
+          if (!result.supported) return true;
+          edition = result.name;
+          return false;
+        });
+        return edition;
+      }
+      function chromiumMajor(userAgent) {
+        var match = /(?:Chrome|Chromium|CriOS)\/(\d+)/.exec(userAgent || '');
+        return match ? Number(match[1]) : null;
+      }
+      root.ArcluneESProbes = {
+        run: function (host) {
+          var userAgent = host.navigator && host.navigator.userAgent || 'không có navigator.userAgent';
+          var syntax = runTests(syntaxTests, function (source) { return Function(source)() === true; });
+          var apis = runTests(apiTests, function (test) { return test(host); });
+          return {
+            userAgent: userAgent,
+            chromiumMajor: chromiumMajor(userAgent),
+            syntax: syntax,
+            apis: apis,
+            syntaxEdition: continuousEdition(syntax),
+            apiEdition: continuousEdition(apis)
+          };
+        }
+      };
+    }(window));
+
     (function () {
       'use strict';
-      var report = window.ArcluneESProbes.run(window);
+      try {
+        var report = window.ArcluneESProbes.run(window);
       var pass = '<span class="pass">HỖ TRỢ ✅</span>';
       var fail = '<span class="fail">KHÔNG HỖ TRỢ ❌</span>';
 
@@ -58,10 +120,15 @@ document.getElementById('environment').innerHTML =
       document.querySelector('#environment code').textContent = report.userAgent;
       document.getElementById('summary').innerHTML =
         '<h2>Kết luận</h2><p>Cú pháp tối thiểu liên tục: <strong>' + report.syntaxEdition +
-        '</strong></p><p>Nhóm API tối thiểu liên tục: <strong>' + report.apiEdition + '</strong></p>';
+        '</strong></p><p>Nhóm API tối thiểu liên tục: <strong>' + report.apiEdition +
+        '</strong></p><p class="note">ES2023 không có mốc cú pháp mới phù hợp để phân biệt; mức ES2023 được xác định bằng API.</p>';
       renderList('syntax-results', report.syntax);
       renderList('api-results', report.apis);
-    }());
+    } catch (error) {
+        document.getElementById('summary').innerHTML = '<h2>Không thể chạy bài kiểm tra</h2><p class="fail"></p>';
+        document.querySelector('#summary .fail').textContent = error && error.message ? error.message : String(error);
+      }
+      }());
   </script>
   </body>
 </html>

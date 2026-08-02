@@ -10,7 +10,7 @@
     ['ES2015', 'const add = (a, b = 1) => a + b; return add(1) === 2;'],
     ['ES2016', 'return 2 ** 3 === 8;'],
     ['ES2017', 'async function f(){ await 1; } return true;'],
-    ['ES2018', 'const {...rest} = {a: 1}; async function* g(){ yield 1; } return rest.a === 1;'],
+    ['ES2018', 'const {a, ...rest} = {a: 1, b: 2}; async function* g(){ yield 1; } return a === 1 && rest.b === 2;'],
     ['ES2019', 'try { throw 1; } catch { return true; }'],
     ['ES2020', 'const value = ({a: null})?.a ?? 7; return typeof 1n === "bigint" && value === 7;'],
     ['ES2021', 'let value = 0; value ||= 1; return value === 1 && 1_000 === 1000;'],
@@ -50,7 +50,7 @@
   }
 
   function chromiumMajor(userAgent) {
-    var match = /(?:Chrome|Chromium)\/(\d+)/.exec(userAgent || '');
+    var match = /(?:Chrome|Chromium|CriOS)\/(\d+)/.exec(userAgent || '');
     return match ? Number(match[1]) : null;
   }
 
@@ -73,4 +73,3 @@
 
   return { chromiumMajor: chromiumMajor, continuousEdition: continuousEdition, run: run };
 }));
-
