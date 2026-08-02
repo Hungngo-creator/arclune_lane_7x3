@@ -14,7 +14,7 @@ import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
 import { canonicalizeCombatTagsWithRule } from './tag-aliases.ts';
 import { consumeShieldByCurrentRatio, readShieldAmount } from './apply-damage.ts';
-import { createNaturalAction, currentActionExecution, withActionExecution } from './kernel/index.ts';
+import { commitHealing, commitHpMutation, createNaturalAction, currentActionExecution, executeActionTransaction, resolveHealing, resolveHpLoss, resolveSourceAttribution } from './kernel/index.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -96,6 +96,7 @@ function canApplyUniqueGlobal(game: SessionState, summonId: string): boolean {
 }
 
 function applyHpCostWithState(
+  game: SessionState,
   caster: UnitToken,
   hpMax: number,
   currentHp: number,
@@ -111,7 +112,10 @@ function applyHpCostWithState(
   const minRemain = Math.max(1, Math.floor(hpMax * minRemainRatio));
   const nextHp = currentHp - hpCost;
   if (nextHp < minRemain) return false;
-  caster.hp = Math.max(1, nextHp);
+  const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
+  const mutation = resolveHpLoss(caster, hpCost, 'hp-cost', source, false);
+  if (!mutation.succeeded) return false;
+  commitHpMutation(game, caster, mutation, currentActionExecution(game)?.identity);
   return true;
 }
 
@@ -305,7 +309,7 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
   if (!checkTurnParityCondition(game, payload)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
-  if (!applyHpCostWithState(caster, casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
+  if (!applyHpCostWithState(game, caster, casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
     return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
   }
 
@@ -345,7 +349,8 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
     }
     if (skillKey === 'skill3') {
       const heal = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.35));
-      caster.hp = Math.max(0, Math.min(caster.hpMax ?? 0, (caster.hp ?? 0) + heal));
+      const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
+      commitHealing(game, caster, resolveHealing(caster, heal, source), currentActionExecution(game)?.identity);
       Statuses.add(caster, {
         id: 'chap_minh_ult_arm_up',
         kind: 'buff',
@@ -419,7 +424,10 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
         return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'insufficient-aether');
       }
       const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
-      caster.hp = Math.max(1, toFloorInt((caster.hp ?? 0) - hpCost, 1));
+      const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
+      const mutation = resolveHpLoss(caster, hpCost, 'hp-cost', source, false);
+      if (!mutation.succeeded) return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+      commitHpMutation(game, caster, mutation, currentActionExecution(game)?.identity);
       globalAetherPool.gain(caster.side, 15);
       recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
       return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
@@ -488,7 +496,10 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
 
 export function performActiveSkill(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey): PerformActiveSkillResult {
   if (currentActionExecution(game)) return executeActiveSkill(game, caster, skillKey);
-  return withActionExecution(game, createNaturalAction(game, skillKey === 'skill3' ? 'ultimate' : 'active-skill'), () => executeActiveSkill(game, caster, skillKey));
+  const identity = createNaturalAction(game, skillKey === 'skill3' ? 'ultimate' : 'active-skill');
+  const target = pickTarget(game, caster) ?? caster;
+  const transaction = executeActionTransaction({ game, identity, actor: caster, targets: [target], resolvePayload: () => executeActiveSkill(game, caster, skillKey) });
+  return transaction.payload ?? buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, transaction.reason === 'invalid-target' ? 'blocked' : 'blocked');
 }
 
 export type { ActiveSkillKey };

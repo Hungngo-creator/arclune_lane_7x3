@@ -10,7 +10,7 @@ export interface ReactionPolicy {
   readonly aggregation: ReactionAggregation;
 }
 export type LegacyDamageType = DamageType | 'arcane';
-export type HpMutationKind = 'damage' | 'healing' | 'hp-cost' | 'self-damage' | 'sacrifice' | 'max-hp-mutation';
+export type HpMutationKind = 'damage' | 'healing' | 'hp-cost' | 'self-damage' | 'sacrifice' | 'non-damage-hp-loss' | 'execute' | 'max-hp-mutation';
 export type CurrentHpPolicy = 'preserve-absolute' | 'preserve-ratio' | 'clamp' | 'set-full' | 'set-value';
 export type MaxHpPolicy = 'unchanged' | 'add-flat' | 'add-percent' | 'set-value';
 export type MutationResetPolicy = 'on-revive' | 'on-rebirth' | 'on-leave-battle' | 'never-within-battle';

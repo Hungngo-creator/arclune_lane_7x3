@@ -1,4 +1,3 @@
-import { sessionNow } from '../utils/time.ts';
 import { toFiniteNumber, toFloorInt, toNonNegativeFloorInt, toPositiveTurns } from './number-utils.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 
@@ -41,12 +40,6 @@ export function applyDamage(target: UnitToken, amount: number): void {
   const newHp = Math.max(0, currentHp - damage);
   target.hp = newHp;
 
-  if (target.hp <= 0) {
-    if (target.alive !== false && !target.deadAt) {
-      target.deadAt = sessionNow();
-    }
-    target.alive = false;
-  }
 }
 
 export interface GrantShieldOptions {

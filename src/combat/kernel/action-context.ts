@@ -4,12 +4,14 @@ import type { CombatId } from './ids.ts';
 import type { ActionIdentity } from './types.ts';
 import { resolveDeathWave } from './life-cycle.ts';
 import { evaluateBattleEnd } from './battle-end.ts';
-import { getCombatSequence, nextEventSerial } from './sequence.ts';
+import { nextEventSerial } from './sequence.ts';
 import type { DeathRecord } from './life-cycle.ts';
 import type { BattleEndResult } from './battle-end.ts';
 
 export interface ActionExecutionContext {
   readonly identity: ActionIdentity;
+  readonly startEventSerial: number;
+  readonly startCombatEventIndex: number;
   nextPacketSerial: number;
   readonly triggerLedger: TriggerLedger;
   readonly originActionId: CombatId | null;
@@ -20,6 +22,7 @@ export interface ActionFinalizationResult {
   actionId: CombatId; chainId: CombatId; committedTargetAggregates: readonly Record<string, unknown>[];
   deathRecords: readonly DeathRecord[]; preventedDeaths: readonly Record<string, unknown>[];
   immediateRevives: readonly Record<string, unknown>[]; battleEnd: BattleEndResult;
+  healingAggregates: readonly Record<string, unknown>[]; hpMutationAggregates: readonly Record<string, unknown>[];
   emittedEventSerialRange: { first: number; last: number };
 }
 type FinalizationRuntime = ActionRuntime & { finalizedActions?: Record<string, ActionFinalizationResult>; combatEvents?: Record<string, unknown>[] };
@@ -28,8 +31,13 @@ const stack = (game: SessionState): ActionExecutionContext[] => (((game.runtime 
 export function beginActionExecution(game: SessionState, identity: ActionIdentity, options: {
   triggerLedger?: TriggerLedger; originActionId?: CombatId | null; snapshot?: Readonly<Record<string, unknown>>;
 } = {}): ActionExecutionContext {
-  const context: ActionExecutionContext = { identity, nextPacketSerial: 1, triggerLedger: options.triggerLedger ?? createTriggerLedger(), originActionId: options.originActionId ?? null, snapshot: { ...(options.snapshot ?? {}) } };
-  stack(game).push(context); return context;
+  const state = (game.runtime ??= {}) as FinalizationRuntime;
+  const startCombatEventIndex = state.combatEvents?.length ?? 0;
+  const startEventSerial = nextEventSerial(game);
+  const context: ActionExecutionContext = { identity, startEventSerial, startCombatEventIndex, nextPacketSerial: 1, triggerLedger: options.triggerLedger ?? createTriggerLedger(), originActionId: options.originActionId ?? null, snapshot: { ...(options.snapshot ?? {}) } };
+  stack(game).push(context);
+  (state.combatEvents ??= []).push({ type: 'ACTION_START', eventSerial: startEventSerial, actionId: identity.actionId, chainId: identity.chainId, parentActionId: identity.parentActionId, actionKind: identity.actionKind });
+  return context;
 }
 
 export function currentActionExecution(game: SessionState): ActionExecutionContext | null {
@@ -58,20 +66,20 @@ export function finalizeCombatAction(game: SessionState, context: ActionExecutio
   const key = String(context.identity.actionId);
   const existing = state.finalizedActions?.[key];
   if (existing) return existing;
-  const first = getCombatSequence(game).eventSerial + 1;
-  const before = state.combatEvents?.length ?? 0;
   const deathRecords = resolveDeathWave(game, undefined, context.identity.actionId);
-  const actionEvents = (state.combatEvents ?? []).slice(before);
+  const beforeEndEvents = (state.combatEvents ?? []).slice(context.startCombatEventIndex).filter(event => event.actionId === context.identity.actionId);
   const battleEnd = evaluateBattleEnd(game, deathRecords);
   const actionEndSerial = nextEventSerial(game);
   (state.combatEvents ??= []).push({ type: 'ACTION_END', eventSerial: actionEndSerial, actionId: context.identity.actionId, chainId: context.identity.chainId });
   const result: ActionFinalizationResult = {
     actionId: context.identity.actionId, chainId: context.identity.chainId,
-    committedTargetAggregates: actionEvents.filter(event => event.type === 'DAMAGE_BATCH_RESOLVED').flatMap(event => Array.isArray(event.hpAllocation) ? event.hpAllocation as Record<string, unknown>[] : []),
+    committedTargetAggregates: beforeEndEvents.filter(event => event.type === 'DAMAGE_BATCH_RESOLVED').flatMap(event => Array.isArray(event.hpAllocation) ? event.hpAllocation as Record<string, unknown>[] : []),
     deathRecords,
-    preventedDeaths: actionEvents.filter(event => event.type === 'DEATH_PREVENTED'),
-    immediateRevives: actionEvents.filter(event => event.type === 'REVIVE_COMMITTED'), battleEnd,
-    emittedEventSerialRange: { first, last: actionEndSerial },
+    preventedDeaths: beforeEndEvents.filter(event => event.type === 'DEATH_PREVENTED'),
+    immediateRevives: beforeEndEvents.filter(event => event.type === 'REVIVE_COMMITTED'),
+    healingAggregates: beforeEndEvents.filter(event => event.type === 'HEAL_RESOLVED'),
+    hpMutationAggregates: beforeEndEvents.filter(event => event.type === 'HP_MUTATION_RESOLVED'), battleEnd,
+    emittedEventSerialRange: { first: context.startEventSerial, last: actionEndSerial },
   };
   (state.finalizedActions ??= {})[key] = result;
   return result;

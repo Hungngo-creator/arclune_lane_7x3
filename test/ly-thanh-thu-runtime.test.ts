@@ -11,6 +11,9 @@ import type { UnitToken } from '@shared-types/units';
 const makeToken = (overrides: Partial<UnitToken>): UnitToken => ({
   id: 'unit',
   iid: 1,
+  trueSelfId: `true-self:${String(overrides.iid ?? 1)}`,
+  lifeSerial: 1,
+  lifeState: 'alive',
   side: 'ally',
   cx: 0,
   cy: 0,

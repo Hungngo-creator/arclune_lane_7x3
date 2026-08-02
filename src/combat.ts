@@ -23,7 +23,7 @@ import {
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
 import { runRuntimeBasicAttackResolved, runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
-import { commitDamageBatch, createHpZeroCandidate, createLinkedAction, createNaturalAction, currentActionExecution, nextActionPacket, registerDeathPrevention, registerDeathReactions, resolveDamageBatch, resolveDamagePacket, resolveSourceAttribution, withActionExecution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
+import { commitDamageBatch, commitHealing, createHpZeroCandidate, createLinkedAction, createNaturalAction, currentActionExecution, nextActionPacket, registerDeathPrevention, registerDeathReactions, resolveDamageBatch, resolveDamagePacket, resolveHealing, resolveSourceAttribution, withActionExecution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
 
 export { applyDamage, grantShield };
 
@@ -517,7 +517,7 @@ export function dealAbilityDamage(
   });
   const dmg = chapMinhMitigation.finalDamage;
   if (chapMinhMitigation.prevented > 0) {
-    recordChapMinhPreventedDamage(chapMinhMitigation.owner, chapMinhMitigation.prevented);
+ recordChapMinhPreventedDamage(chapMinhMitigation.owner, chapMinhMitigation.prevented, Game);
   }
 
   let dealtTotal = 0;
@@ -578,6 +578,8 @@ export function dealAbilityDamage(
     absorbed: batchResolution.shieldDamage,
     dtype,
     breakdown: finalDamage.breakdown,
+    game: Game,
+    attackType,
   };
   Statuses.afterDamage(attacker, target, damageResult);
   const dealt = Math.max(0, dealtTotal);
@@ -672,12 +674,10 @@ export function healUnit(target: UnitToken | null | undefined, amount: number): 
     return { healed: 0, overheal: 0 };
   }
 
-  const before = Math.max(0, Math.floor(target.hp ?? 0));
-  const healCap = Math.max(0, (target.hpMax ?? 0) - before);
-  const healed = Math.min(amt, healCap);
-  target.hp = before + healed;
-
-  return { healed, overheal: Math.max(0, amt - healed) };
+  const source = resolveSourceAttribution({ immediateSource: target, controller: target, trueSelf: target.trueSelfId ?? null, owner: target });
+  const result = resolveHealing(target, amt, source);
+  commitHealing(null, target, result);
+  return { healed: result.effectiveHeal, overheal: result.overheal };
 }
 
 function executeBasicAttack(Game: SessionState, unit: UnitToken): void {

@@ -5,7 +5,8 @@ import {
   hasAnyTag,
   normalizeTagList,
 } from '../data/tags.ts';
-import { applyDamage, grantShield } from './apply-damage.ts';
+import { grantShield } from './apply-damage.ts';
+import { commitHpMutation, createHpZeroCandidate, createNaturalAction, markDeathPrevented, resolveHpLoss, resolveMaxHpMutation, resolveSourceAttribution, withActionExecution } from './kernel/index.ts';
 import { toFiniteNumber, toFloorInt } from './number-utils.ts';
 import { bucketTokensByActualSide, forEachPartitionToken } from './token-side-utils.ts';
 import { createCrossSlotLookup, readTokenSlotAndColumn } from './board-position-utils.ts';
@@ -176,7 +177,7 @@ export function applyChapMinhMitigation(
   };
 }
 
-export function applyChapMinhBacklash(owner: UnitToken | null | undefined): void {
+export function applyChapMinhBacklash(owner: UnitToken | null | undefined, game?: SessionState | null): void {
   if (!isAliveChapMinh(owner)) return;
   const accumulated = Math.max(0, toFiniteNumber(owner._chapMinhAccumulated, 0));
   const threshold = Math.max(1, Math.floor((owner.hpMax ?? 0) * 0.7));
@@ -187,14 +188,22 @@ export function applyChapMinhBacklash(owner: UnitToken | null | undefined): void
   const res = Math.max(0, toFiniteNumber(owner.res, 0));
   const defenseMultiplier = 0.5 * (100 / (100 + arm)) + 0.5 * (100 / (100 + res));
   const finalDamage = Math.max(1, Math.floor(backlashBase * defenseMultiplier));
-  applyDamage(owner, finalDamage);
+  const source = resolveSourceAttribution({ immediateSource: owner, controller: owner, trueSelf: owner.trueSelfId ?? null, owner });
+  if (game) {
+    const identity = createNaturalAction(game, 'chap-minh-backlash');
+    withActionExecution(game, identity, () => {
+      const mutation = resolveHpLoss(owner, finalDamage, 'self-damage', source, true);
+      commitHpMutation(game, owner, mutation, identity);
+      if (mutation.hpBefore > 0 && mutation.hpAfter === 0) createHpZeroCandidate(game, owner, identity, source, 'self-damage', mutation.effectiveAmount);
+    });
+  } else commitHpMutation(null, owner, resolveHpLoss(owner, finalDamage, 'self-damage', source, true));
   owner._chapMinhAccumulated = 0;
 }
 
-export function recordChapMinhPreventedDamage(owner: UnitToken | null | undefined, prevented: number): void {
+export function recordChapMinhPreventedDamage(owner: UnitToken | null | undefined, prevented: number, game?: SessionState | null): void {
   if (!isAliveChapMinh(owner) || prevented <= 0) return;
   owner._chapMinhAccumulated = Math.max(0, toFiniteNumber(owner._chapMinhAccumulated, 0) + prevented);
-  applyChapMinhBacklash(owner);
+  applyChapMinhBacklash(owner, game);
 }
 
 export function applyChapMinhPhaseShift(unit: UnitToken | null | undefined): void {
@@ -206,10 +215,9 @@ export function applyChapMinhPhaseShift(unit: UnitToken | null | undefined): voi
 
   const lost = Math.max(1, Math.floor(hpMax * 0.5));
   const nextHpMax = Math.max(1, hpMax - lost);
-  unit.hpMax = nextHpMax;
-  unit.hp = nextHpMax;
-  unit.alive = true;
-  delete unit.deadAt;
+  const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, trueSelf: unit.trueSelfId ?? null, owner: unit });
+  commitHpMutation(null, unit, resolveMaxHpMutation(unit, nextHpMax, 'set-value', 'set-full', source));
+  markDeathPrevented(unit, nextHpMax);
   unit._chapMinhLostMaxHp = lost;
   unit._chapMinhRecoverPerTurn = Math.max(1, Math.floor(lost * 0.2));
   unit._chapMinhPhaseShiftUsed = true;

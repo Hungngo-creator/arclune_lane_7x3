@@ -3,6 +3,7 @@
 import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';
 import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.ts';
+import { isCombatAlive, markRemoved } from './combat/kernel/life-cycle.ts';
 
 import { doBasicWithFollowups } from './combat.ts';
 import { performActiveSkill } from './combat/perform-active-skill.ts';
@@ -62,7 +63,7 @@ const createActiveUnitIndex = (Game: SessionState): ActiveUnitIndex => {
   const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
   for (let i = 0; i < tokens.length; i += 1) {
     const token = tokens[i];
-    if (!token || !token.alive) continue;
+    if (!token || !isCombatAlive(token)) continue;
     if (token.side !== 'ally' && token.side !== 'enemy') continue;
     const slot = slotIndex(token.side, token.cx, token.cy);
     if (!Number.isFinite(slot)) continue;
@@ -267,7 +268,7 @@ const resolveSpawnElement = (
 );
 
 function grantActionAether(Game: SessionState, unit: UnitToken | null | undefined, acted: boolean): number {
-  if (!unit || !unit.alive || !acted) return 0;
+  if (!unit || !isCombatAlive(unit) || !acted) return 0;
   const className = normalizeClassName(Game.meta?.get(unit.id)?.class) ?? null;
   const amount = resolveActionAetherRegen(className);
   if (amount > 0){
@@ -280,7 +281,7 @@ function applyTurnRegen(
   Game: SessionState,
   unit: UnitToken | null | undefined
 ): { hpDelta: number; aeDelta: number } {
-  if (!unit || !unit.alive) return { hpDelta: 0, aeDelta: 0 };
+  if (!unit || !isCombatAlive(unit)) return { hpDelta: 0, aeDelta: 0 };
 
   let hpDelta = 0;
   if (Number.isFinite(unit.hp) || Number.isFinite(unit.hpMax) || Number.isFinite(unit.hpRegen)){
@@ -339,7 +340,7 @@ export function getActiveAt(
   const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
   for (let i = 0; i < tokens.length; i += 1){
     const token = tokens[i];
-    if (!token || !token.alive) continue;
+    if (!token || !isCombatAlive(token)) continue;
     if (token.side === normalizedSide && token.cx === cx && token.cy === cy){
       return token;
     }
@@ -474,7 +475,7 @@ export function spawnQueuedIfDue(
   let allyLeader: UnitToken | undefined;
   for (let idx = 0; idx < Game.tokens.length; idx += 1) {
     const token = Game.tokens[idx];
-    if (token?.alive && token.side === obj.side && isUyenLeader(token)) {
+    if (token && isCombatAlive(token) && token.side === obj.side && isUyenLeader(token)) {
       allyLeader = token;
       break;
     }
@@ -493,7 +494,7 @@ export function spawnQueuedIfDue(
     activeUnitIndex.set(toActiveUnitKey(sideLower, slot), actor);
   }
   const isLeader = actor.id === 'leaderA' || actor.id === 'leaderB';
-  const canAutoUlt = fromDeck && !isLeader && actor.alive && typeof performUlt === 'function';
+  const canAutoUlt = fromDeck && !isLeader && isCombatAlive(actor) && typeof performUlt === 'function';
   if (canAutoUlt && !Statuses.blocks(actor, 'ult')){
     let ultOk = false;
     try {
@@ -540,7 +541,7 @@ export function tickMinionTTL(Game: SessionState, side: Side, options: TickMinio
       token.ttlTurns = ttl - 1;
     }
     if ((token.ttlTurns ?? 0) > 0) continue;
-    token.alive = false;
+    markRemoved(token);
     Game.tokens.splice(idx, 1);
   }
 }
@@ -651,8 +652,8 @@ const resolveTurnActor = (
   fallback?: UnitToken | null | undefined,
   activeUnitIndex?: ActiveUnitIndex
 ): UnitToken | null => {
-  if (actor?.alive) return actor;
-  if (fallback?.alive) return fallback;
+  if (actor && isCombatAlive(actor)) return actor;
+  if (fallback && isCombatAlive(fallback)) return fallback;
   return getActiveAt(Game, side, slot, activeUnitIndex) ?? null;
 };
 
@@ -779,29 +780,10 @@ export function doActionOrSkip(
       applyChapMinhActionEnd(Game, unit);
       refreshChapMinhOwnership(Game);
     }
-    const wasAliveBeforeTurnEnd = !!unit?.alive;
-    const hadBleedBeforeTurnEnd = !!unit && Statuses.has(unit, 'bleed');
-    Statuses.onTurnEnd(unit, {});
+    Statuses.onTurnEnd(unit, { game: Game, log: passiveLog });
     runRuntimeTurnEnd(Game, unit);
     applyChapMinhPhaseShift(unit);
     refreshChapMinhOwnership(Game);
-    if (wasAliveBeforeTurnEnd && unit && !unit.alive && hadBleedBeforeTurnEnd) {
-      const bloodAvatarObservers = Game.tokens.filter((token) =>
-        token.alive
-        && token.id === 'blood_avatar'
-        && token.side !== unit.side
-      );
-      if (bloodAvatarObservers.length > 0) {
-        for (const observer of bloodAvatarObservers) {
-          emitPassiveEvent(Game, observer, 'onEnemyDeath', {
-            log: passiveLog,
-            target: unit,
-            attackType: 'dot',
-            isDirectKill: false,
-          });
-        }
-      }
-    }
     ensureBusyReset();
     resolution.consumedTurn = consumedTurn;
     resolution.acted = acted;
@@ -811,7 +793,7 @@ export function doActionOrSkip(
     return resolution;
   };
 
-  if (!unit || !unit.alive) {
+  if (!unit || !isCombatAlive(unit)) {
     emitGameEvent(ACTION_START, baseDetail);
     ensureBusyReset();
     resolution.consumedTurn = false;
@@ -834,7 +816,7 @@ export function doActionOrSkip(
   recoverChapMinhMaxHpPerTurn(unit);
   refreshChapMinhOwnership(Game);
   const bloodAvatarFieldOwners = Game.tokens.filter((token) =>
-    token.alive
+    isCombatAlive(token)
     && token.id === 'blood_avatar'
     && token.side !== unit.side
     && Statuses.has(token, 'blood_field_active')
@@ -979,6 +961,7 @@ export function doActionOrSkip(
 // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
 // hooks = { performUlt, processActionChain, allocIid, doActionOrSkip }
 export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
+  if ((Game.runtime as { battleEnd?: { ended?: boolean } } | undefined)?.battleEnd?.ended) return;
   const turn = Game.turn;
   if (!turn) return;
   if (Game.battle?.over) return;
@@ -1000,7 +983,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       if (!spawnResult.spawned){
         return;
       }
-      if (spawnResult.actor && spawnResult.actor.alive){
+      if (spawnResult.actor && isCombatAlive(spawnResult.actor)){
         selection = {
           ...selection,
           spawnOnly: false,
@@ -1019,7 +1002,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks, activeUnitIndex);
     const active = resolveTurnActor(Game, entry.side, entry.slot, actor, selection.unit, activeUnitIndex);
 
-    if (!active || !active.alive){
+    if (!active || !isCombatAlive(active)){
       return;
     }
 
@@ -1103,7 +1086,7 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks, activeUnitIndex);
 
     const active = resolveTurnActor(Game, entry.side, entry.slot, actor, undefined, activeUnitIndex);
-    const hasActive = !!(active && active.alive);
+    const hasActive = !!(active && isCombatAlive(active));
 
     if (!hasActive){
       advanceCursor();

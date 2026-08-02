@@ -5,6 +5,7 @@ import { getUnitArt } from './art.ts';
 import { kitSupportsSummon } from './utils/kit.ts';
 import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.ts';
 import { isUniqueGlobalSummonBlocked } from './utils/unique-global.ts';
+import { isCombatAlive } from './combat/kernel/life-cycle.ts';
 
 import type { PassiveKitDefinition, SessionState } from '@shared-types/combat';
 import type { ActionChainEntry, Side, SummonRequest, UnitToken } from '@shared-types/units';
@@ -21,7 +22,7 @@ const DEFAULT_SUMMON_UNIT: NonNullable<SummonRequest['unit']> = {
 };
 
 const tokensAlive = (Game: SessionState): UnitToken[] =>
-  Game.tokens.filter((t): t is UnitToken => t.alive);
+  Game.tokens.filter((t): t is UnitToken => isCombatAlive(t));
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value);

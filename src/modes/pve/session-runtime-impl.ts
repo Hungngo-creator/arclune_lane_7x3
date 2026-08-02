@@ -4,8 +4,8 @@ import { enqueueImmediate, processActionChain } from '../../summon';
 import { refillDeckEnemy, aiMaybeAct } from '../../ai';
 import { Statuses, makeStatusEffect } from '../../statuses';
 import { CFG, CAM } from '../../config';
-import { pickTarget, dealAbilityDamage, healUnit, grantShield, applyDamage, basicAttack } from '../../combat';
-import { ensureCombatIdentity } from '../../combat/kernel/index.ts';
+import { pickTarget, dealAbilityDamage, healUnit, grantShield, basicAttack } from '../../combat';
+import { commitHpMutation, commitImmediateRevive, currentActionExecution, ensureCombatIdentity, markRemoved, resolveHpLoss, resolveSourceAttribution } from '../../combat/kernel/index.ts';
 import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury';
 import {
   getMetaById,
@@ -1223,7 +1223,7 @@ function removeOldestMinions(masterIid: number, count: number): void {
       }
       continue;
     }
-    token.alive = false;
+    markRemoved(token);
   }
   if (write < tokens.length) tokens.length = write;
  }
@@ -1502,7 +1502,12 @@ function performUlt(unit: UnitToken): void {
   };
   const applySelfDamageAsUltCost = (amount: number): void => {
     if (!Number.isFinite(amount) || amount <= 0) return;
-    applyDamage(unit, amount);
+    const action = currentActionExecution(game);
+    if (!action) throw new Error('[combat-kernel] Ultimate self cost requires an active action');
+    const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, trueSelf: unit.trueSelfId ?? null, owner: unit });
+    const mutation = resolveHpLoss(unit, amount, 'hp-cost', source, false);
+    if (!mutation.succeeded) throw new Error('[combat-kernel] insufficient HP for Ultimate cost');
+    commitHpMutation(game, unit, mutation, action.identity);
     gainFury(unit, {
       type: 'damageTaken',
       dealt: amount,
@@ -1786,14 +1791,14 @@ function performUlt(unit: UnitToken): void {
         const ally = fallen[i];
         if (!ally) continue;
         if (ally.id !== unit.id && readTokenTags(ally).includes('divine-nature')) continue;
-        ally.alive = true;
-        ally.deadAt = 0;
-        ally.hp = 0;
-        Statuses.purge(ally);
         const revivedHp = parseFiniteNumber(u.revived?.hpPercent ?? u.revived?.hpPct) ?? 0.5;
         const hpPct = Math.max(0, Math.min(1, revivedHp));
-        const healAmt = Math.max(1, Math.round((ally.hpMax || 0) * hpPct));
-        healUnit(ally, healAmt);
+        const records = ((game.runtime as { deathRecords?: Array<{ targetIid: string | number; deathSerial: number }> }).deathRecords ?? []);
+        const death = [...records].reverse().find(record => record.targetIid === (ally.iid ?? ally.id));
+        if (!death) continue;
+        const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, trueSelf: unit.trueSelfId ?? null, owner: unit });
+        const revived = commitImmediateRevive(game, ally, { death: death as never, hpPolicy: { kind: 'ratio', value: hpPct }, ragePolicy: 'reset', buffPolicy: 'purge', positionPolicy: 'preserve', source });
+        if (!revived.committed) continue;
         setFury(ally, Math.max(0, parseFiniteNumber(u.revived?.rage) ?? 0));
         if (u.revived?.lockSkillsTurns){
           const silenceTurns = Math.max(1, Math.round(parseFiniteNumber(u.revived.lockSkillsTurns) ?? 1));
@@ -2050,14 +2055,19 @@ function checkBattleEndResult(
   if (!battle) return null;
   if (battle.over) return battle.result || null;
 
+  const normalizedContext: Record<string, unknown> = context && typeof context === 'object' ? context : {};
+  const triggerValue = normalizedContext['trigger'];
+  const trigger = typeof triggerValue === 'string' ? triggerValue : null;
+  if (trigger !== 'timeout') {
+    const canonical = (game.runtime as { battleEnd?: { ended?: boolean; winner?: 'ally' | 'enemy' | 'draw' | null; reason?: string | null } } | undefined)?.battleEnd;
+    if (!canonical?.ended || !canonical.winner) return null;
+    return finalizeBattle(game, { winner: canonical.winner, reason: canonical.reason ?? 'leader_down' }, { ...normalizedContext, canonical: true });
+  }
+
   const { leaderA, leaderB, bossAlive } = resolveBattlefieldSnapshot(game);
   const leaderAAlive = isUnitAlive(leaderA);
   const leaderBAlive = isUnitAlive(leaderB);
 
-  const normalizedContext: Record<string, unknown> =
-    context && typeof context === 'object' ? context : {};
-  const triggerValue = normalizedContext['trigger'];
-  const trigger = typeof triggerValue === 'string' ? triggerValue : null;
   const leaderAHpRatio = getHpRatio(leaderA);
   const leaderBHpRatio = getHpRatio(leaderB);
   const threshold = 0.3;

@@ -7,6 +7,7 @@ import { lookupUnit } from './units.ts';
 import { globalAetherPool } from './aether.ts';
 import { isUyenLeader, isAnyLeaderUltReady } from './leader-uyen.ts';
 import { predictSpawnCycleByTurnOrder } from './turns/interleaved.ts';
+import { isCombatAlive } from './combat/kernel/life-cycle.ts';
 
 import type { AiCard, AiCardDeck, AiDeckEntry, AiDeckPool, SessionState } from '@shared-types/combat';
 import type { RosterUnitDefinition } from '@shared-types/config';
@@ -115,7 +116,7 @@ const DEFAULT_WEIGHTS = Object.freeze({
 
 const DEFAULT_DEBUG_KEEP = 6;
 
-const tokensAlive = (Game: SessionState): ReadonlyArray<UnitToken> => Game.tokens.filter((t) => t.alive);
+const tokensAlive = (Game: SessionState): ReadonlyArray<UnitToken> => Game.tokens.filter((t) => isCombatAlive(t));
 
 const makeCellKey = (cx: number, cy: number): string => `${cx}:${cy}`;
 

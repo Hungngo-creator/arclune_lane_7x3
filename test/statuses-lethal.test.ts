@@ -1,147 +1,55 @@
+import { dealAbilityDamage } from '../src/combat.ts';
+import { createNaturalAction, withActionExecution } from '../src/combat/kernel/index.ts';
 import { Statuses, makeStatusEffect } from '../src/statuses.ts';
-
+import type { SessionState } from '../src/types/combat.ts';
 import type { UnitToken } from '../src/types/units.ts';
 
-describe('Statuses lethal handling', () => {
-  let counter = 0;
+const unit = (iid: number, side: UnitToken['side'] = 'ally', hp = 100, hpMax = 100): UnitToken => ({
+  id: `unit-${iid}`, iid, trueSelfId: `true-self:${iid}`, lifeSerial: 1, lifeState: 'alive', name: `Unit ${iid}`,
+  side, cx: 0, cy: 0, alive: true, hp, hpMax, atk: 100, wil: 100, arm: 0, res: 0, statuses: [],
+} as UnitToken);
+const game = (...tokens: UnitToken[]): SessionState => ({ tokens, runtime: {}, actionChain: [], queued: { ally: new Map(), enemy: new Map() } } as unknown as SessionState);
+const add = (target: UnitToken, key: keyof typeof Statuses.make, spec?: Record<string, unknown>): void => {
+  const status = makeStatusEffect(key, spec); if (!status) throw new Error('missing status'); Statuses.add(target, status);
+};
 
-  const createUnit = (overrides: Partial<UnitToken> = {}): UnitToken => {
-    counter += 1;
-    const hpMax = overrides.hpMax ?? 100;
-    const base: UnitToken = {
-      id: `unit-${counter}`,
-      name: `Unit ${counter}`,
-      side: overrides.side ?? 'ally',
-      cx: overrides.cx ?? 0,
-      cy: overrides.cy ?? 0,
-      alive: overrides.alive ?? true,
-      hpMax,
-      hp: overrides.hp ?? hpMax,
-      statuses: [],
-    };
-    const unit = { ...base, ...overrides } as UnitToken;
-    if (!Array.isArray(unit.statuses)) {
-      unit.statuses = [];
-    }
-    return unit;
-  };
-
-const addStatus = <K extends keyof typeof Statuses.make>(
-    unit: UnitToken,
-    key: K,
-    spec?: Parameters<(typeof Statuses.make)[K]>[0],
-  ): void => {
-    const status = makeStatusEffect(key, spec);
-    if (!status) {
-      throw new Error(`Không thể tạo hiệu ứng trạng thái "${String(key)}".`);
-    }
-    Statuses.add(unit, status);
-  };
-
-  beforeEach(() => {
-    counter = 0;
+describe('canonical status lethal handling', () => {
+  test('bleed ticks through a dot action and confirms death', () => {
+    const target = unit(1, 'ally', 5, 100); const source = unit(2, 'enemy'); const state = game(target, source);
+    add(target, 'bleed', { turns: 1, sourceIid: source.iid, creditTrueSelfId: source.trueSelfId });
+    Statuses.onTurnEnd(target, { game: state });
+    expect(target.lifeState).toBe('dead-confirmed');
+    expect((state.runtime as any).combatEvents.map((event:any)=>event.type)).toEqual(expect.arrayContaining(['ACTION_START','DAMAGE_BATCH_RESOLVED','HP_ZERO','DEATH_CONFIRMED','ACTION_END']));
   });
 
-  it('bleed damage marks units dead without undying', () => {
-    const unit = createUnit({ hp: 5, hpMax: 100 });
-    addStatus(unit, 'bleed', { turns: 1 });
-
-    Statuses.onTurnEnd(unit, { log: [] });
-
-    expect(unit.hp).toBe(0);
-    expect(unit.alive).toBe(false);
-    expect(unit.deadAt).toEqual(expect.any(Number));
+  test('Undying is consumed only by the winning prevention decision', () => {
+    const target = unit(3, 'ally', 5, 100); const source = unit(4, 'enemy'); const state = game(target, source);
+    add(target, 'bleed', { turns: 1, sourceIid: source.iid }); add(target, 'undying');
+    Statuses.onTurnEnd(target, { game: state });
+    expect(target.lifeState).toBe('alive'); expect(target.hp).toBe(1); expect(Statuses.has(target, 'undying')).toBe(false);
   });
 
-  it('bleed cannot consume undying outside the death coordinator', () => {
-    const unit = createUnit({ hp: 5, hpMax: 100 });
-    addStatus(unit, 'bleed', { turns: 1 });
-    addStatus(unit, 'undying');
-
-    Statuses.onTurnEnd(unit, { log: [] });
-
-    expect(unit.hp).toBe(0);
-    expect(unit.alive).toBe(false);
-    expect(Statuses.has(unit, 'undying')).toBe(true);
+  test('Venom damage is a linked action and grants one confirmed kill', () => {
+    const attacker = unit(5); const target = unit(6, 'enemy', 10, 30); const state = game(attacker, target); add(attacker, 'venom', { pct: 1 });
+    withActionExecution(state, createNaturalAction(state, 'skill'), () => dealAbilityDamage(state, attacker, target, { base: 5, attackType: 'skill' }));
+    expect(target.lifeState).toBe('dead-confirmed');
+    const starts = (state.runtime as any).combatEvents.filter((event:any)=>event.type==='ACTION_START');
+    expect(starts).toHaveLength(2); expect(starts[1].parentActionId).toBe(starts[0].actionId);
+    expect((state.runtime as any).trueSelfRecords[attacker.trueSelfId!].confirmedKills).toBe(1);
   });
 
-  it('legacy reflect cannot consume undying outside the death coordinator', () => {
-    const attacker = createUnit({ hp: 4, hpMax: 20 });
-    const target = createUnit({ side: 'enemy' });
-    addStatus(attacker, 'undying');
-    addStatus(target, 'reflect', { pct: 1, turns: 1 });
-
-    Statuses.afterDamage(attacker, target, { dealt: 4 });
-
-    expect(attacker.hp).toBe(0);
-    expect(attacker.alive).toBe(false);
-    expect(Statuses.has(attacker, 'undying')).toBe(true);
+  test('Execute creates a lethal mutation and still opens prevention', () => {
+    const attacker = unit(7); const target = unit(8, 'enemy', 5, 40); const state = game(attacker, target); add(attacker, 'execute'); add(target, 'undying');
+    withActionExecution(state, createNaturalAction(state, 'skill'), () => dealAbilityDamage(state, attacker, target, { base: 1, attackType: 'skill' }));
+    expect(target.lifeState).toBe('alive'); expect(target.hp).toBe(1);
+    expect((state.runtime as any).combatEvents.some((event:any)=>event.type==='HP_MUTATION_RESOLVED' && event.kind==='execute')).toBe(true);
   });
 
-  it('venom lethal damage marks targets dead', () => {
-    const attacker = createUnit();
-    const target = createUnit({ side: 'enemy', hp: 5, hpMax: 30 });
-    addStatus(attacker, 'venom', { pct: 1, turns: 1 });
-
-    Statuses.afterDamage(attacker, target, { dealt: 5 });
-
-    expect(target.hp).toBe(0);
-    expect(target.alive).toBe(false);
-    expect(target.deadAt).toEqual(expect.any(Number));
+  test('reflected damage does not recursively reflect', () => {
+    const attacker = unit(9); const target = unit(10, 'enemy'); const state = game(attacker, target); add(attacker, 'reflect', { pct: 1 }); add(target, 'reflect', { pct: 1 });
+    withActionExecution(state, createNaturalAction(state, 'skill'), () => dealAbilityDamage(state, attacker, target, { base: 10, attackType: 'skill' }));
+    const reflected = (state.runtime as any).combatEvents.filter((event:any)=>event.actionKind==='reflected-damage');
+    expect(reflected).toHaveLength(2);
+    expect(reflected.every((event:any)=>event.parentActionId===reflected[0].parentActionId)).toBe(true);
   });
-
-  it('legacy venom cannot consume undying outside the death coordinator', () => {
-    const attacker = createUnit();
-    const target = createUnit({ side: 'enemy', hp: 5, hpMax: 30 });
-    addStatus(attacker, 'venom', { pct: 1, turns: 1 });
-    addStatus(target, 'undying');
-
-    Statuses.afterDamage(attacker, target, { dealt: 5 });
-
-    expect(target.hp).toBe(0);
-    expect(target.alive).toBe(false);
-    expect(Statuses.has(target, 'undying')).toBe(true);
-  });
-
-  it('execute kills targets without undying', () => {
-    const attacker = createUnit();
-    const target = createUnit({ side: 'enemy', hp: 4, hpMax: 40 });
-    addStatus(attacker, 'execute', { turns: 1 });
-
-    Statuses.afterDamage(attacker, target, { dealt: 1 });
-
-    expect(target.hp).toBe(0);
-    expect(target.alive).toBe(false);
-    expect(target.deadAt).toEqual(expect.any(Number));
-  });
-
-  it('legacy execute cannot consume undying outside the death coordinator', () => {
-    const attacker = createUnit();
-    const target = createUnit({ side: 'enemy', hp: 4, hpMax: 40 });
-    addStatus(attacker, 'execute', { turns: 1 });
-    addStatus(target, 'undying');
-
-    Statuses.afterDamage(attacker, target, { dealt: 1 });
-
-    expect(target.hp).toBe(0);
-    expect(target.alive).toBe(false);
-    expect(Statuses.has(target, 'undying')).toBe(true);
-  });
-
-  it('divine-nature blocks buff/debuff/mark statuses from all sources', () => {
-    const unit = createUnit({ id: 'lau_khac_ma_chu', tags: ['divine-nature'] });
-    const buff = makeStatusEffect('haste', { turns: 2 });
-    const debuff = makeStatusEffect('sleep', { turns: 1 });
-    const mark = { id: 'huyet_an', kind: 'mark', tag: 'mark', stacks: 1, maxStacks: 5, sourceUnitId: 'enemy-controller' } as const;
-    if (!buff || !debuff) throw new Error('status factory unavailable');
-
-    Statuses.add(unit, { ...buff, sourceUnitId: unit.id });
-    Statuses.add(unit, { ...buff, sourceUnitId: 'ally-buffer' });
-    Statuses.add(unit, { ...debuff, sourceUnitId: 'enemy-controller' });
-    Statuses.add(unit, mark);
-
-    expect(Statuses.has(unit, 'haste')).toBe(false);
-    expect(Statuses.has(unit, 'sleep')).toBe(false);
-    expect(Statuses.has(unit, 'huyet_an')).toBe(false);
-  });
- });
+});

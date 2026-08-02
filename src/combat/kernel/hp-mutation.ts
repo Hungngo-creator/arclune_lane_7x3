@@ -5,7 +5,7 @@ import { nextEventSerial } from './sequence.ts';
 import type { ActionIdentity, CurrentHpPolicy, MaxHpPolicy, MutationResetPolicy, SourceAttribution } from './types.ts';
 
 export interface HealResult { requestedHeal: number; modifiedHeal: number; effectiveHeal: number; overheal: number; hpBefore: number; hpAfter: number; targetIid: string | number; source: SourceAttribution; blocked: boolean }
-export interface HpMutationResult { kind: 'hp-cost' | 'sacrifice' | 'non-damage-hp-loss' | 'max-hp-mutation'; requestedAmount: number; effectiveAmount: number; hpBefore: number; hpAfter: number; maxHpBefore: number; maxHpAfter: number; targetIid: string | number; source: SourceAttribution; canKill: boolean; succeeded: boolean; currentHpPolicy: CurrentHpPolicy; maxHpPolicy: MaxHpPolicy; resetPolicy: MutationResetPolicy }
+export interface HpMutationResult { kind: 'hp-cost' | 'self-damage' | 'sacrifice' | 'non-damage-hp-loss' | 'execute' | 'max-hp-mutation'; requestedAmount: number; effectiveAmount: number; hpBefore: number; hpAfter: number; maxHpBefore: number; maxHpAfter: number; targetIid: string | number; source: SourceAttribution; canKill: boolean; succeeded: boolean; currentHpPolicy: CurrentHpPolicy; maxHpPolicy: MaxHpPolicy; resetPolicy: MutationResetPolicy }
 const amount = (value: number, field: string): number => { if (!Number.isFinite(value) || value < 0) throw new Error(`[combat-kernel] ${field} must be finite and non-negative`); return value; };
 const iid = (target: UnitToken): string | number => target.iid ?? target.id;
 
@@ -23,7 +23,7 @@ export function commitHealing(game: SessionState | null, target: UnitToken, resu
   if (game) (((game.runtime ??= {}) as { combatEvents?: Record<string, unknown>[] }).combatEvents ??= []).push(event); return event;
 }
 
-export function resolveHpLoss(target: UnitToken, requestedAmount: number, kind: 'hp-cost' | 'sacrifice' | 'non-damage-hp-loss', source: SourceAttribution, canKill = false): HpMutationResult {
+export function resolveHpLoss(target: UnitToken, requestedAmount: number, kind: 'hp-cost' | 'self-damage' | 'sacrifice' | 'non-damage-hp-loss' | 'execute', source: SourceAttribution, canKill = false): HpMutationResult {
   const requested = amount(requestedAmount, 'hpMutation.amount'); const hpBefore = amount(Number(target.hp ?? 0), 'target.hp'); const maxHp = amount(Number(target.hpMax ?? 0), 'target.hpMax');
   const available = canKill ? hpBefore : Math.max(0, hpBefore - 1); const succeeded = kind !== 'hp-cost' || requested <= available;
   const effective = succeeded ? Math.min(requested, available) : 0;

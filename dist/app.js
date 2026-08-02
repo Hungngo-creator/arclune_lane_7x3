@@ -332,8 +332,10 @@ __modules['./ai.ts'] = (exports, module, __require) => {
   const globalAetherPool = __dep5.globalAetherPool;
   const __dep6 = __require('./turns/interleaved.ts');
   const predictSpawnCycleByTurnOrder = __dep6.predictSpawnCycleByTurnOrder;
-  const __dep7 = __require('./shared-types/units.ts');
-  const createSummonQueue = __dep7.createSummonQueue;
+  const __dep7 = __require('./combat/kernel/life-cycle.ts');
+  const isCombatAlive = __dep7.isCombatAlive;
+  const __dep8 = __require('./shared-types/units.ts');
+  const createSummonQueue = __dep8.createSummonQueue;
   function toMetaEntry(value) {
       if (!value || typeof value !== 'object')
           return null;
@@ -358,7 +360,7 @@ __modules['./ai.ts'] = (exports, module, __require) => {
       kitRevive: 0.04,
   });
   const DEFAULT_DEBUG_KEEP = 6;
-  const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
+  const tokensAlive = (Game) => Game.tokens.filter((t) => isCombatAlive(t));
   const makeCellKey = (cx, cy) => `${cx}:${cy}`;
   function collectReservedCellKeys(aliveTokens, queued) {
       const reserved = new Set();
@@ -4690,6 +4692,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   const runRuntimeUnitDeath = __dep16.runRuntimeUnitDeath;
   const __dep17 = __require('./combat/kernel/index.ts');
   const commitDamageBatch = __dep17.commitDamageBatch;
+  const commitHealing = __dep17.commitHealing;
   const createHpZeroCandidate = __dep17.createHpZeroCandidate;
   const createLinkedAction = __dep17.createLinkedAction;
   const createNaturalAction = __dep17.createNaturalAction;
@@ -4699,6 +4702,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   const registerDeathReactions = __dep17.registerDeathReactions;
   const resolveDamageBatch = __dep17.resolveDamageBatch;
   const resolveDamagePacket = __dep17.resolveDamagePacket;
+  const resolveHealing = __dep17.resolveHealing;
   const resolveSourceAttribution = __dep17.resolveSourceAttribution;
   const withActionExecution = __dep17.withActionExecution;
   exports.applyDamage = applyDamage;
@@ -5059,7 +5063,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       });
       const dmg = chapMinhMitigation.finalDamage;
       if (chapMinhMitigation.prevented > 0) {
-          recordChapMinhPreventedDamage(chapMinhMitigation.owner, chapMinhMitigation.prevented);
+          recordChapMinhPreventedDamage(chapMinhMitigation.owner, chapMinhMitigation.prevented, Game);
       }
       let dealtTotal = 0;
       const sharedRules = getSharedHpRules(target);
@@ -5118,6 +5122,8 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           absorbed: batchResolution.shieldDamage,
           dtype,
           breakdown: finalDamage.breakdown,
+          game: Game,
+          attackType,
       };
       Statuses.afterDamage(attacker, target, damageResult);
       const dealt = Math.max(0, dealtTotal);
@@ -5199,11 +5205,10 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       if (amt <= 0) {
           return { healed: 0, overheal: 0 };
       }
-      const before = Math.max(0, Math.floor(target.hp ?? 0));
-      const healCap = Math.max(0, (target.hpMax ?? 0) - before);
-      const healed = Math.min(amt, healCap);
-      target.hp = before + healed;
-      return { healed, overheal: Math.max(0, amt - healed) };
+      const source = resolveSourceAttribution({ immediateSource: target, controller: target, trueSelf: target.trueSelfId ?? null, owner: target });
+      const result = resolveHealing(target, amt, source);
+      commitHealing(null, target, result);
+      return { healed: result.effectiveHeal, overheal: result.overheal };
   }
   function executeBasicAttack(Game, unit) {
       const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
@@ -5364,16 +5369,14 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'doBasicWithFollowups')) exports.doBasicWithFollowups = doBasicWithFollowups;
 };
 __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./utils/time.ts');
-  const sessionNow = __dep0.sessionNow;
-  const __dep1 = __require('./combat/number-utils.ts');
-  const toFiniteNumber = __dep1.toFiniteNumber;
-  const toFloorInt = __dep1.toFloorInt;
-  const toNonNegativeFloorInt = __dep1.toNonNegativeFloorInt;
-  const toPositiveTurns = __dep1.toPositiveTurns;
-  const __dep2 = __require('./combat/status-utils.ts');
-  const ensureStatusList = __dep2.ensureStatusList;
-  const getStatusEntryById = __dep2.getStatusEntryById;
+  const __dep0 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep0.toFiniteNumber;
+  const toFloorInt = __dep0.toFloorInt;
+  const toNonNegativeFloorInt = __dep0.toNonNegativeFloorInt;
+  const toPositiveTurns = __dep0.toPositiveTurns;
+  const __dep1 = __require('./combat/status-utils.ts');
+  const ensureStatusList = __dep1.ensureStatusList;
+  const getStatusEntryById = __dep1.getStatusEntryById;
   const SHIELD_STATUS_ID = 'shield';
   function getShieldEntry(target) {
       return getStatusEntryById(target, SHIELD_STATUS_ID);
@@ -5407,12 +5410,6 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
       const currentHp = Math.max(0, Math.min(maxHp, toFloorInt(target.hp, 0)));
       const newHp = Math.max(0, currentHp - damage);
       target.hp = newHp;
-      if (target.hp <= 0) {
-          if (target.alive !== false && !target.deadAt) {
-              target.deadAt = sessionNow();
-          }
-          target.alive = false;
-      }
   }
   function grantShield(target, amount, options = {}) {
       if (!target)
@@ -5601,17 +5598,25 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
   const hasAnyTag = __dep1.hasAnyTag;
   const normalizeTagList = __dep1.normalizeTagList;
   const __dep2 = __require('./combat/apply-damage.ts');
-  const applyDamage = __dep2.applyDamage;
   const grantShield = __dep2.grantShield;
-  const __dep3 = __require('./combat/number-utils.ts');
-  const toFiniteNumber = __dep3.toFiniteNumber;
-  const toFloorInt = __dep3.toFloorInt;
-  const __dep4 = __require('./combat/token-side-utils.ts');
-  const bucketTokensByActualSide = __dep4.bucketTokensByActualSide;
-  const forEachPartitionToken = __dep4.forEachPartitionToken;
-  const __dep5 = __require('./combat/board-position-utils.ts');
-  const createCrossSlotLookup = __dep5.createCrossSlotLookup;
-  const readTokenSlotAndColumn = __dep5.readTokenSlotAndColumn;
+  const __dep3 = __require('./combat/kernel/index.ts');
+  const commitHpMutation = __dep3.commitHpMutation;
+  const createHpZeroCandidate = __dep3.createHpZeroCandidate;
+  const createNaturalAction = __dep3.createNaturalAction;
+  const markDeathPrevented = __dep3.markDeathPrevented;
+  const resolveHpLoss = __dep3.resolveHpLoss;
+  const resolveMaxHpMutation = __dep3.resolveMaxHpMutation;
+  const resolveSourceAttribution = __dep3.resolveSourceAttribution;
+  const withActionExecution = __dep3.withActionExecution;
+  const __dep4 = __require('./combat/number-utils.ts');
+  const toFiniteNumber = __dep4.toFiniteNumber;
+  const toFloorInt = __dep4.toFloorInt;
+  const __dep5 = __require('./combat/token-side-utils.ts');
+  const bucketTokensByActualSide = __dep5.bucketTokensByActualSide;
+  const forEachPartitionToken = __dep5.forEachPartitionToken;
+  const __dep6 = __require('./combat/board-position-utils.ts');
+  const createCrossSlotLookup = __dep6.createCrossSlotLookup;
+  const readTokenSlotAndColumn = __dep6.readTokenSlotAndColumn;
   const CHAP_MINH_ID = 'huyen_vu_chap_minh';
   const CHAP_MINH_LINK_REDUCTION = 0.30;
   const CHAP_MINH_AOE_COLUMN_REDUCTION = 0.35;
@@ -5752,7 +5757,7 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
           owner,
       };
   }
-  function applyChapMinhBacklash(owner) {
+  function applyChapMinhBacklash(owner, game) {
       if (!isAliveChapMinh(owner))
           return;
       const accumulated = Math.max(0, toFiniteNumber(owner._chapMinhAccumulated, 0));
@@ -5764,14 +5769,25 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
       const res = Math.max(0, toFiniteNumber(owner.res, 0));
       const defenseMultiplier = 0.5 * (100 / (100 + arm)) + 0.5 * (100 / (100 + res));
       const finalDamage = Math.max(1, Math.floor(backlashBase * defenseMultiplier));
-      applyDamage(owner, finalDamage);
+      const source = resolveSourceAttribution({ immediateSource: owner, controller: owner, trueSelf: owner.trueSelfId ?? null, owner });
+      if (game) {
+          const identity = createNaturalAction(game, 'chap-minh-backlash');
+          withActionExecution(game, identity, () => {
+              const mutation = resolveHpLoss(owner, finalDamage, 'self-damage', source, true);
+              commitHpMutation(game, owner, mutation, identity);
+              if (mutation.hpBefore > 0 && mutation.hpAfter === 0)
+                  createHpZeroCandidate(game, owner, identity, source, 'self-damage', mutation.effectiveAmount);
+          });
+      }
+      else
+          commitHpMutation(null, owner, resolveHpLoss(owner, finalDamage, 'self-damage', source, true));
       owner._chapMinhAccumulated = 0;
   }
-  function recordChapMinhPreventedDamage(owner, prevented) {
+  function recordChapMinhPreventedDamage(owner, prevented, game) {
       if (!isAliveChapMinh(owner) || prevented <= 0)
           return;
       owner._chapMinhAccumulated = Math.max(0, toFiniteNumber(owner._chapMinhAccumulated, 0) + prevented);
-      applyChapMinhBacklash(owner);
+      applyChapMinhBacklash(owner, game);
   }
   function applyChapMinhPhaseShift(unit) {
       if (!isChapMinh(unit))
@@ -5784,10 +5800,9 @@ __modules['./combat/chap-minh-runtime.ts'] = (exports, module, __require) => {
           return;
       const lost = Math.max(1, Math.floor(hpMax * 0.5));
       const nextHpMax = Math.max(1, hpMax - lost);
-      unit.hpMax = nextHpMax;
-      unit.hp = nextHpMax;
-      unit.alive = true;
-      delete unit.deadAt;
+      const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, trueSelf: unit.trueSelfId ?? null, owner: unit });
+      commitHpMutation(null, unit, resolveMaxHpMutation(unit, nextHpMax, 'set-value', 'set-full', source));
+      markDeathPrevented(unit, nextHpMax);
       unit._chapMinhLostMaxHp = lost;
       unit._chapMinhRecoverPerTurn = Math.max(1, Math.floor(lost * 0.2));
       unit._chapMinhPhaseShiftUsed = true;
@@ -5990,12 +6005,15 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
   const __dep2 = __require('./combat/kernel/battle-end.ts');
   const evaluateBattleEnd = __dep2.evaluateBattleEnd;
   const __dep3 = __require('./combat/kernel/sequence.ts');
-  const getCombatSequence = __dep3.getCombatSequence;
   const nextEventSerial = __dep3.nextEventSerial;
   const stack = (game) => ((game.runtime ??= {}).actionExecutionStack ??= []);
   function beginActionExecution(game, identity, options = {}) {
-      const context = { identity, nextPacketSerial: 1, triggerLedger: options.triggerLedger ?? createTriggerLedger(), originActionId: options.originActionId ?? null, snapshot: { ...(options.snapshot ?? {}) } };
+      const state = (game.runtime ??= {});
+      const startCombatEventIndex = state.combatEvents?.length ?? 0;
+      const startEventSerial = nextEventSerial(game);
+      const context = { identity, startEventSerial, startCombatEventIndex, nextPacketSerial: 1, triggerLedger: options.triggerLedger ?? createTriggerLedger(), originActionId: options.originActionId ?? null, snapshot: { ...(options.snapshot ?? {}) } };
       stack(game).push(context);
+      (state.combatEvents ??= []).push({ type: 'ACTION_START', eventSerial: startEventSerial, actionId: identity.actionId, chainId: identity.chainId, parentActionId: identity.parentActionId, actionKind: identity.actionKind });
       return context;
   }
   function currentActionExecution(game) {
@@ -6030,20 +6048,20 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
       const existing = state.finalizedActions?.[key];
       if (existing)
           return existing;
-      const first = getCombatSequence(game).eventSerial + 1;
-      const before = state.combatEvents?.length ?? 0;
       const deathRecords = resolveDeathWave(game, undefined, context.identity.actionId);
-      const actionEvents = (state.combatEvents ?? []).slice(before);
+      const beforeEndEvents = (state.combatEvents ?? []).slice(context.startCombatEventIndex).filter(event => event.actionId === context.identity.actionId);
       const battleEnd = evaluateBattleEnd(game, deathRecords);
       const actionEndSerial = nextEventSerial(game);
       (state.combatEvents ??= []).push({ type: 'ACTION_END', eventSerial: actionEndSerial, actionId: context.identity.actionId, chainId: context.identity.chainId });
       const result = {
           actionId: context.identity.actionId, chainId: context.identity.chainId,
-          committedTargetAggregates: actionEvents.filter(event => event.type === 'DAMAGE_BATCH_RESOLVED').flatMap(event => Array.isArray(event.hpAllocation) ? event.hpAllocation : []),
+          committedTargetAggregates: beforeEndEvents.filter(event => event.type === 'DAMAGE_BATCH_RESOLVED').flatMap(event => Array.isArray(event.hpAllocation) ? event.hpAllocation : []),
           deathRecords,
-          preventedDeaths: actionEvents.filter(event => event.type === 'DEATH_PREVENTED'),
-          immediateRevives: actionEvents.filter(event => event.type === 'REVIVE_COMMITTED'), battleEnd,
-          emittedEventSerialRange: { first, last: actionEndSerial },
+          preventedDeaths: beforeEndEvents.filter(event => event.type === 'DEATH_PREVENTED'),
+          immediateRevives: beforeEndEvents.filter(event => event.type === 'REVIVE_COMMITTED'),
+          healingAggregates: beforeEndEvents.filter(event => event.type === 'HEAL_RESOLVED'),
+          hpMutationAggregates: beforeEndEvents.filter(event => event.type === 'HP_MUTATION_RESOLVED'), battleEnd,
+          emittedEventSerialRange: { first: context.startEventSerial, last: actionEndSerial },
       };
       (state.finalizedActions ??= {})[key] = result;
       return result;
@@ -6126,6 +6144,12 @@ __modules['./combat/kernel/action-resolution.ts'] = (exports, module, __require)
 __modules['./combat/kernel/action-transaction.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/kernel/sequence.ts');
   const nextEventSerial = __dep0.nextEventSerial;
+  const __dep1 = __require('./combat/kernel/action-context.ts');
+  const beginActionExecution = __dep1.beginActionExecution;
+  const endActionExecution = __dep1.endActionExecution;
+  const finalizeCombatAction = __dep1.finalizeCombatAction;
+  const __dep2 = __require('./combat/kernel/life-cycle.ts');
+  const isCombatAlive = __dep2.isCombatAlive;
   /** The sole orchestration boundary for validation, reservation and one-time cost commit. */
   function executeActionTransaction(command) {
       let stage = 'ACTION_DECLARE';
@@ -6133,7 +6157,7 @@ __modules['./combat/kernel/action-transaction.ts'] = (exports, module, __require
       const publish = () => { events.push({ type: stage, eventSerial: nextEventSerial(command.game), actionId: command.identity.actionId, chainId: command.identity.chainId }); };
       publish();
       stage = 'ACTOR_VALIDATE';
-      if (command.actor.alive === false || (command.validateActor && !command.validateActor()))
+      if (!isCombatAlive(command.actor) || (command.validateActor && !command.validateActor()))
           return { ok: false, stage, reason: 'actor-blocked' };
       stage = 'TARGET_VALIDATE';
       if ((command.validateTargets ? !command.validateTargets() : command.targets.length === 0))
@@ -6145,9 +6169,10 @@ __modules['./combat/kernel/action-transaction.ts'] = (exports, module, __require
           return { ok: false, stage, reason: 'insufficient-cost' };
       }
       stage = 'COST_RESERVE';
+      let context = null;
       try {
           stage = 'ACTION_START';
-          publish();
+          context = beginActionExecution(command.game, command.identity);
           stage = 'COST_COMMIT';
           reservations.forEach(item => item.commit());
           stage = 'PAYLOAD_RESOLVE';
@@ -6155,13 +6180,15 @@ __modules['./combat/kernel/action-transaction.ts'] = (exports, module, __require
           stage = 'ACTION_COMMIT';
           command.commitAction?.(payload);
           publish();
+          endActionExecution(command.game, context);
+          finalizeCombatAction(command.game, context);
+          context = null;
           stage = 'ACTION_END';
-          publish();
           return { ok: true, stage, payload };
       }
       catch (error) {
-          if (stage === 'ACTION_START')
-              reservations.forEach(item => item.release());
+          if (context)
+              endActionExecution(command.game, context);
           throw error;
       }
   }
@@ -6775,7 +6802,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   const isCombatAlive = (unit) => getLifeState(unit) === 'alive' && unit.alive !== false && (unit.hp == null || unit.hp > 0);
   function markHpZero(unit) { unit.lifeState = 'hp-zero'; unit.alive = false; }
   function markDeathPrevention(unit) { unit.lifeState = 'death-prevention'; unit.alive = false; }
-  function markDeathPrevented(unit, hp = 1) { unit.hp = Math.max(1, hp); unit.lifeState = 'alive'; unit.alive = true; }
+  function markDeathPrevented(unit, hp = 1) { unit.hp = Math.max(1, hp); unit.lifeState = 'alive'; unit.alive = true; delete unit.deadAt; }
   function markDeathConfirmed(unit) { unit.lifeState = 'dead-confirmed'; unit.alive = false; }
   function markRemoved(unit) { unit.lifeState = 'removed'; unit.alive = false; }
   function markErased(unit) { unit.lifeState = 'erased'; unit.alive = false; }
@@ -6797,6 +6824,11 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       }
       return decisions.sort((a, b) => compareDeathAuthority(b.authority, a.authority) || ((b.explicitPriority ?? b.priority ?? 0) - (a.explicitPriority ?? a.priority ?? 0)) || ((a.registrationSerial ?? 0) - (b.registrationSerial ?? 0)) || a.effectId.localeCompare(b.effectId));
   }
+  function registerImmediateRevive(game, create) {
+      const state = runtime(game);
+      (state.immediateReviveRegistrations ??= []).push(create);
+      return () => { state.immediateReviveRegistrations = state.immediateReviveRegistrations?.filter(item => item !== create); };
+  }
   function registerDeathReactions(game, onDeath, onKill) {
       const state = runtime(game);
       (state.deathReactionRegistrations ??= []).push(onDeath);
@@ -6808,10 +6840,6 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       return { countsForKill: target.countsForKill !== false, countsForKillReward: !summon && target.countsForKill !== false, countsForReincarnation: !summon, canRevive: !summon && target.revivable !== false, removalPolicy: kind === 'combat-object' ? 'remove' : 'remain' };
   };
   function createHpZeroCandidate(game, target, identity, source, causeKind, hpDamage, overkill = 0) {
-      if (!target.trueSelfId && !target.isMinion && target.iid != null) {
-          target.trueSelfId = `true-self:${String(target.iid)}`;
-          target.lifeSerial ??= 1;
-      }
       if (!target.trueSelfId && !target.isMinion && (target.hpMax ?? 0) > 0)
           throw new Error('[combat-lifecycle] HP-bearing non-summon is missing trueSelfId');
       markHpZero(target);
@@ -6867,6 +6895,15 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
               const consumedStatus = decision.charge?.consumeStatusId;
               if (typeof consumedStatus === 'string')
                   target.statuses = target.statuses?.filter(status => status.id !== consumedStatus);
+              const resetMaxHpTo = decision.charge?.resetMaxHpTo;
+              if (typeof resetMaxHpTo === 'number' && Number.isFinite(resetMaxHpTo))
+                  target.hpMax = Math.max(1, Math.floor(resetMaxHpTo));
+              const consumeUnitFlag = decision.charge?.consumeUnitFlag;
+              if (typeof consumeUnitFlag === 'string')
+                  target[consumeUnitFlag] = true;
+              const resetBonusFlag = decision.charge?.resetBonusFlag;
+              if (typeof resetBonusFlag === 'string')
+                  target[resetBonusFlag] = 0;
               close(candidate);
               emit(game, { type: 'DEATH_PREVENTED', eventSerial: nextEventSerial(game), actionId: candidate.actionId, chainId: candidate.chainId, targetIid: candidate.targetIid, trueSelfId: candidate.trueSelfId, lifeSerial: candidate.lifeSerial, decision });
           }
@@ -6901,6 +6938,15 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
           if (record.source.creditTrueSelfId && record.source.creditTrueSelfId !== record.trueSelfId)
               for (const react of state.killReactionRegistrations ?? [])
                   react(record);
+      const immediateReviveQueue = [];
+      for (const record of records)
+          for (const create of state.immediateReviveRegistrations ?? []) {
+              const request = create(record);
+              if (request)
+                  immediateReviveQueue.push(request);
+          }
+      for (const entry of immediateReviveQueue)
+          commitImmediateRevive(game, entry.target, entry.request);
       return records;
   }
   function commitImmediateRevive(game, target, request) {
@@ -6951,6 +6997,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'markErased')) exports.markErased = markErased;
   if (!Object.prototype.hasOwnProperty.call(exports, 'registerDeathPrevention')) exports.registerDeathPrevention = registerDeathPrevention;
   if (!Object.prototype.hasOwnProperty.call(exports, 'collectDeathPreventionDecisions')) exports.collectDeathPreventionDecisions = collectDeathPreventionDecisions;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'registerImmediateRevive')) exports.registerImmediateRevive = registerImmediateRevive;
   if (!Object.prototype.hasOwnProperty.call(exports, 'registerDeathReactions')) exports.registerDeathReactions = registerDeathReactions;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHpZeroCandidate')) exports.createHpZeroCandidate = createHpZeroCandidate;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveDeathWave')) exports.resolveDeathWave = resolveDeathWave;
@@ -7173,9 +7220,14 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const consumeShieldByCurrentRatio = __dep15.consumeShieldByCurrentRatio;
   const readShieldAmount = __dep15.readShieldAmount;
   const __dep16 = __require('./combat/kernel/index.ts');
+  const commitHealing = __dep16.commitHealing;
+  const commitHpMutation = __dep16.commitHpMutation;
   const createNaturalAction = __dep16.createNaturalAction;
   const currentActionExecution = __dep16.currentActionExecution;
-  const withActionExecution = __dep16.withActionExecution;
+  const executeActionTransaction = __dep16.executeActionTransaction;
+  const resolveHealing = __dep16.resolveHealing;
+  const resolveHpLoss = __dep16.resolveHpLoss;
+  const resolveSourceAttribution = __dep16.resolveSourceAttribution;
   const EMPTY_TAGS = [];
   const EFFECT_APPLICATION_TAGS = new Set([
       'heal',
@@ -7227,7 +7279,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   function canApplyUniqueGlobal(game, summonId) {
       return !game.tokens.some((token) => token.alive && token.id === summonId);
   }
-  function applyHpCostWithState(caster, hpMax, currentHp, readMetaNumber) {
+  function applyHpCostWithState(game, caster, hpMax, currentHp, readMetaNumber) {
       const ratio = Math.max(0, readMetaNumber(0, 'hpCostRatio', 'hpCostPercent'));
       const flat = Math.max(0, toFloorInt(readMetaNumber(0, 'hpCostFlat', 'hpCost'), 0));
       const minRemainRatio = Math.max(0, readMetaNumber(0, 'minRemainingHpRatio', 'minHpRatio'));
@@ -7238,7 +7290,11 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       const nextHp = currentHp - hpCost;
       if (nextHp < minRemain)
           return false;
-      caster.hp = Math.max(1, nextHp);
+      const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
+      const mutation = resolveHpLoss(caster, hpCost, 'hp-cost', source, false);
+      if (!mutation.succeeded)
+          return false;
+      commitHpMutation(game, caster, mutation, currentActionExecution(game)?.identity);
       return true;
   }
   function checkHpConditionWithState(hpMax, currentHp, readMetaNumber) {
@@ -7407,7 +7463,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       if (!checkTurnParityCondition(game, payload)) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
-      if (!applyHpCostWithState(caster, casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
+      if (!applyHpCostWithState(game, caster, casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
           return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
       }
       const runtimeSkillResult = runRuntimeActiveSkill({
@@ -7446,7 +7502,8 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           }
           if (skillKey === 'skill3') {
               const heal = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.35));
-              caster.hp = Math.max(0, Math.min(caster.hpMax ?? 0, (caster.hp ?? 0) + heal));
+              const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
+              commitHealing(game, caster, resolveHealing(caster, heal, source), currentActionExecution(game)?.identity);
               Statuses.add(caster, {
                   id: 'chap_minh_ult_arm_up',
                   kind: 'buff',
@@ -7520,7 +7577,11 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
                   return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'insufficient-aether');
               }
               const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
-              caster.hp = Math.max(1, toFloorInt((caster.hp ?? 0) - hpCost, 1));
+              const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
+              const mutation = resolveHpLoss(caster, hpCost, 'hp-cost', source, false);
+              if (!mutation.succeeded)
+                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+              commitHpMutation(game, caster, mutation, currentActionExecution(game)?.identity);
               globalAetherPool.gain(caster.side, 15);
               recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
               return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
@@ -7585,7 +7646,10 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   function performActiveSkill(game, caster, skillKey) {
       if (currentActionExecution(game))
           return executeActiveSkill(game, caster, skillKey);
-      return withActionExecution(game, createNaturalAction(game, skillKey === 'skill3' ? 'ultimate' : 'active-skill'), () => executeActiveSkill(game, caster, skillKey));
+      const identity = createNaturalAction(game, skillKey === 'skill3' ? 'ultimate' : 'active-skill');
+      const target = pickTarget(game, caster) ?? caster;
+      const transaction = executeActionTransaction({ game, identity, actor: caster, targets: [target], resolvePayload: () => executeActiveSkill(game, caster, skillKey) });
+      return transaction.payload ?? buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, transaction.reason === 'invalid-target' ? 'blocked' : 'blocked');
   }
   //# sourceMappingURL=perform-active-skill.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'performActiveSkill')) exports.performActiveSkill = performActiveSkill;
@@ -18739,9 +18803,14 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const dealAbilityDamage = __dep8.dealAbilityDamage;
   const healUnit = __dep8.healUnit;
   const grantShield = __dep8.grantShield;
-  const applyDamage = __dep8.applyDamage;
   const __dep9 = __require('./combat/kernel/index.ts');
+  const commitHpMutation = __dep9.commitHpMutation;
+  const commitImmediateRevive = __dep9.commitImmediateRevive;
+  const currentActionExecution = __dep9.currentActionExecution;
   const ensureCombatIdentity = __dep9.ensureCombatIdentity;
+  const markRemoved = __dep9.markRemoved;
+  const resolveHpLoss = __dep9.resolveHpLoss;
+  const resolveSourceAttribution = __dep9.resolveSourceAttribution;
   const __dep10 = __require('./utils/fury.ts');
   const initializeFury = __dep10.initializeFury;
   const setFury = __dep10.setFury;
@@ -19763,7 +19832,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               }
               continue;
           }
-          token.alive = false;
+          markRemoved(token);
       }
       if (write < tokens.length)
           tokens.length = write;
@@ -20035,7 +20104,14 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       const applySelfDamageAsUltCost = (amount) => {
           if (!Number.isFinite(amount) || amount <= 0)
               return;
-          applyDamage(unit, amount);
+          const action = currentActionExecution(game);
+          if (!action)
+              throw new Error('[combat-kernel] Ultimate self cost requires an active action');
+          const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, trueSelf: unit.trueSelfId ?? null, owner: unit });
+          const mutation = resolveHpLoss(unit, amount, 'hp-cost', source, false);
+          if (!mutation.succeeded)
+              throw new Error('[combat-kernel] insufficient HP for Ultimate cost');
+          commitHpMutation(game, unit, mutation, action.identity);
           gainFury(unit, {
               type: 'damageTaken',
               dealt: amount,
@@ -20322,14 +20398,16 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                       continue;
                   if (ally.id !== unit.id && readTokenTags(ally).includes('divine-nature'))
                       continue;
-                  ally.alive = true;
-                  ally.deadAt = 0;
-                  ally.hp = 0;
-                  Statuses.purge(ally);
                   const revivedHp = parseFiniteNumber(u.revived?.hpPercent ?? u.revived?.hpPct) ?? 0.5;
                   const hpPct = Math.max(0, Math.min(1, revivedHp));
-                  const healAmt = Math.max(1, Math.round((ally.hpMax || 0) * hpPct));
-                  healUnit(ally, healAmt);
+                  const records = (game.runtime.deathRecords ?? []);
+                  const death = [...records].reverse().find(record => record.targetIid === (ally.iid ?? ally.id));
+                  if (!death)
+                      continue;
+                  const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, trueSelf: unit.trueSelfId ?? null, owner: unit });
+                  const revived = commitImmediateRevive(game, ally, { death: death, hpPolicy: { kind: 'ratio', value: hpPct }, ragePolicy: 'reset', buffPolicy: 'purge', positionPolicy: 'preserve', source });
+                  if (!revived.committed)
+                      continue;
                   setFury(ally, Math.max(0, parseFiniteNumber(u.revived?.rage) ?? 0));
                   if (u.revived?.lockSkillsTurns) {
                       const silenceTurns = Math.max(1, Math.round(parseFiniteNumber(u.revived.lockSkillsTurns) ?? 1));
@@ -20572,12 +20650,18 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return null;
       if (battle.over)
           return battle.result || null;
-      const { leaderA, leaderB, bossAlive } = resolveBattlefieldSnapshot(game);
-      const leaderAAlive = isUnitAlive(leaderA);
-      const leaderBAlive = isUnitAlive(leaderB);
       const normalizedContext = context && typeof context === 'object' ? context : {};
       const triggerValue = normalizedContext['trigger'];
       const trigger = typeof triggerValue === 'string' ? triggerValue : null;
+      if (trigger !== 'timeout') {
+          const canonical = game.runtime?.battleEnd;
+          if (!canonical?.ended || !canonical.winner)
+              return null;
+          return finalizeBattle(game, { winner: canonical.winner, reason: canonical.reason ?? 'leader_down' }, { ...normalizedContext, canonical: true });
+      }
+      const { leaderA, leaderB, bossAlive } = resolveBattlefieldSnapshot(game);
+      const leaderAAlive = isUnitAlive(leaderA);
+      const leaderBAlive = isUnitAlive(leaderB);
       const leaderAHpRatio = getHpRatio(leaderA);
       const leaderBHpRatio = getHpRatio(leaderB);
       const threshold = 0.3;
@@ -22796,9 +22880,19 @@ __modules['./passives.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/passives.ts — passive event dispatch & helpers
   const __dep0 = __require('./statuses.ts');
   const Statuses = __dep0.Statuses;
-  const hookOnLethalDamage = __dep0.hookOnLethalDamage;
-  const __dep1 = __require('./utils/time.ts');
-  const safeNow = __dep1.safeNow;
+  const __dep1 = __require('./combat.ts');
+  const dealAbilityDamage = __dep1.dealAbilityDamage;
+  const __dep2 = __require('./combat/kernel/index.ts');
+  const commitHealing = __dep2.commitHealing;
+  const commitHpMutation = __dep2.commitHpMutation;
+  const createLinkedAction = __dep2.createLinkedAction;
+  const currentActionExecution = __dep2.currentActionExecution;
+  const isCombatAlive = __dep2.isCombatAlive;
+  const registerDeathPrevention = __dep2.registerDeathPrevention;
+  const resolveHealing = __dep2.resolveHealing;
+  const resolveMaxHpMutation = __dep2.resolveMaxHpMutation;
+  const resolveSourceAttribution = __dep2.resolveSourceAttribution;
+  const withActionExecution = __dep2.withActionExecution;
   const clamp01 = (value) => Math.max(0, Math.min(1, value));
   const isRecord = (value) => !!value && typeof value === 'object' && !Array.isArray(value);
   const isPassiveKitDefinition = (value) => {
@@ -23190,7 +23284,9 @@ __modules['./passives.ts'] = (exports, module, __require) => {
           return;
       const mode = opts.mode || 'targetMax';
       const casterHpMax = Number.isFinite(unit.hpMax) ? unit.hpMax ?? 0 : 0;
-      const allies = (Game.tokens || []).filter(t => t && t.side === unit.side && t.alive);
+      const allies = (Game.tokens || []).filter(t => t && t.side === unit.side && isCombatAlive(t));
+      const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, trueSelf: unit.trueSelfId ?? null, owner: unit });
+      const identity = currentActionExecution(Game)?.identity;
       for (const ally of allies) {
           if (!Number.isFinite(ally.hpMax))
               continue;
@@ -23200,11 +23296,11 @@ __modules['./passives.ts'] = (exports, module, __require) => {
           const healAmount = Math.max(0, Math.round(base * pct));
           if (healAmount <= 0)
               continue;
-          ally.hp = Math.min(ally.hpMax ?? 0, (ally.hp ?? ally.hpMax ?? 0) + healAmount);
+          commitHealing(Game, ally, resolveHealing(ally, healAmount, source), identity);
       }
   };
   const EFFECTS = {
-      placeMark({ unit, passive, ctx }) {
+      placeMark({ Game, unit, passive, ctx }) {
           const runtime = (ctx ?? {});
           const id = passive?.id;
           const target = runtime.target ?? null;
@@ -23243,14 +23339,13 @@ __modules['./passives.ts'] = (exports, module, __require) => {
                   return;
               Statuses.remove(afterTarget, id);
               const amount = Math.max(1, Math.round(toNumber(unit?.wil, 0) * dmgMul));
-              afterTarget.hp = Math.max(0, (afterTarget.hp ?? 0) - amount);
-              if ((afterTarget.hp ?? 0) <= 0) {
-                  if (!hookOnLethalDamage(afterTarget)) {
-                      afterTarget.alive = false;
-                      if (!afterTarget.deadAt)
-                          afterTarget.deadAt = safeNow();
-                  }
-              }
+              if (!Game || !unit)
+                  throw new Error('[combat-kernel] mark explosion requires production game and source');
+              const parent = currentActionExecution(Game);
+              if (!parent)
+                  throw new Error('[combat-kernel] mark explosion requires an active parent action');
+              const linked = createLinkedAction(Game, parent.identity, 'mark-explosion');
+              withActionExecution(Game, linked, () => dealAbilityDamage(Game, unit, afterTarget, { base: amount, dtype: 'arcane', attackType: 'mark-explosion', skillMul: 1 }));
               if (Array.isArray(runtime.log)) {
                   runtime.log.push({ t: id, source: unit?.name, target: afterTarget?.name, dmg: amount });
               }
@@ -23412,7 +23507,7 @@ __modules['./passives.ts'] = (exports, module, __require) => {
           applyStatStacks(status, foes.length, { maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined });
           recomputeFromStatuses(unit);
       },
-      gainMaxHPPercent({ unit, passive, ctx }) {
+      gainMaxHPPercent({ Game, unit, passive, ctx }) {
           if (!unit || !passive?.id)
               return;
           const params = (passive.params ?? {});
@@ -23430,34 +23525,36 @@ __modules['./passives.ts'] = (exports, module, __require) => {
           if (addRatio <= 0)
               return;
           const gain = Math.max(1, Math.floor(hpMax * addRatio));
-          unit.hpMax = hpMax + gain;
-          unit.hp = Math.min(unit.hpMax, Math.max(0, Number(unit.hp ?? 0) + gain));
+          const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, trueSelf: unit.trueSelfId ?? null, owner: unit });
+          const mutation = resolveMaxHpMutation(unit, gain, 'add-flat', 'set-value', source, { setCurrentHp: Math.max(0, Number(unit.hp ?? 0) + gain), resetPolicy: 'never-within-battle' });
+          commitHpMutation(Game ?? null, unit, mutation, Game ? currentActionExecution(Game)?.identity : undefined);
           state._bloodFeastBonus = currentBonus + addRatio;
       },
-      surviveAtOneHP({ unit, passive }) {
-          if (!unit || !passive?.id)
+      surviveAtOneHP({ Game, unit, passive }) {
+          if (!Game || !unit || !passive?.id)
               return;
           const params = (passive.params ?? {});
           const state = unit;
           if (state._bloodCoreUsed)
               return;
           const minDirectKills = Math.max(0, Math.floor(toNumber(params.minDirectKills, 0)));
-          const directKills = Math.max(0, Math.floor(Number(state._directKills ?? 0)));
+          const canonicalKills = Number((Game.runtime?.trueSelfRecords?.[String(unit.trueSelfId)]?.confirmedKills));
+          const directKills = Math.max(0, Math.floor(Number.isFinite(canonicalKills) ? canonicalKills : Number(state._directKills ?? 0)));
           if (directKills < minDirectKills)
               return;
-          if ((unit.hp ?? 0) > 0)
+          if (state._bloodCorePreventionRegistered)
               return;
-          const baseHpMax = Math.max(1, Number(unit.hpMax ?? 1));
-          const bonusRatio = Math.max(0, Number(state._bloodFeastBonus ?? 0));
-          if (bonusRatio > 0) {
-              const reduced = Math.max(1, Math.floor(baseHpMax / (1 + bonusRatio)));
-              unit.hpMax = reduced;
-              state._bloodFeastBonus = 0;
-          }
-          unit.hp = 1;
-          unit.alive = true;
-          unit.deadAt = undefined;
-          state._bloodCoreUsed = true;
+          state._bloodCorePreventionRegistered = true;
+          registerDeathPrevention(Game, candidate => {
+              if (candidate.targetIid !== (unit.iid ?? unit.id) || state._bloodCoreUsed)
+                  return null;
+              const currentKills = Number((Game.runtime.trueSelfRecords?.[String(unit.trueSelfId)]?.confirmedKills ?? state._directKills ?? 0));
+              if (currentKills < minDirectKills)
+                  return null;
+              const bonusRatio = Math.max(0, Number(state._bloodFeastBonus ?? 0));
+              const resetMaxHpTo = bonusRatio > 0 ? Math.max(1, Math.floor(Number(unit.hpMax ?? 1) / (1 + bonusRatio))) : Number(unit.hpMax ?? 1);
+              return { prevent: true, hp: 1, effectId: passive.id, charge: { consumeUnitFlag: '_bloodCoreUsed', resetMaxHpTo, resetBonusFlag: '_bloodFeastBonus' } };
+          });
       },
   };
   /** @type {Record<string, PassiveEffectHandler>} */
@@ -44197,17 +44294,22 @@ __modules['./shared-types/units.ts'] = (exports, module, __require) => {
 };
 __modules['./statuses.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/statuses.ts
-  const __dep0 = __require('./combat/apply-damage.ts');
-  const applyDamage = __dep0.applyDamage;
-  const __dep1 = __require('./combat/calculate-final-damage.ts');
-  const calculateFinalDamage = __dep1.calculateFinalDamage;
+  const __dep0 = __require('./combat.ts');
+  const dealAbilityDamage = __dep0.dealAbilityDamage;
+  const __dep1 = __require('./combat/kernel/index.ts');
+  const commitHpMutation = __dep1.commitHpMutation;
+  const createHpZeroCandidate = __dep1.createHpZeroCandidate;
+  const createLinkedAction = __dep1.createLinkedAction;
+  const createNaturalAction = __dep1.createNaturalAction;
+  const currentActionExecution = __dep1.currentActionExecution;
+  const resolveHpLoss = __dep1.resolveHpLoss;
+  const resolveSourceAttribution = __dep1.resolveSourceAttribution;
+  const withActionExecution = __dep1.withActionExecution;
   const __dep2 = __require('./data/tags.ts');
   const normalizeTagList = __dep2.normalizeTagList;
   const __dep3 = __require('./utils/fury.ts');
   const gainFury = __dep3.gainFury;
   const finishFuryHit = __dep3.finishFuryHit;
-  const __dep4 = __require('./utils/time.ts');
-  const safeNow = __dep4.safeNow;
   const clamp01 = (value) => Math.max(0, Math.min(1, value));
   const TURN_TICK = 'turn';
   const DOT_DAMAGE_BY_STATUS = Object.freeze({
@@ -44219,47 +44321,6 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
   const ALLURE_STATUS_ID = 'allure';
   const isAxiomBlockedKind = (kind) => kind === 'buff' || kind === 'debuff' || kind === 'mark';
   const isDotStatusId = (id) => DOT_STATUS_ID_SET.has(id);
-  function resolveDefenseMultiplier(target, penetration = 0) {
-      const combinedPen = clamp01(penetration);
-      const effectiveArm = Math.max(0, (target.arm ?? 0) * (1 - combinedPen));
-      const effectiveRes = Math.max(0, (target.res ?? 0) * (1 - combinedPen));
-      const physMultiplier = 100 / (100 + effectiveArm);
-      const arcMultiplier = 100 / (100 + effectiveRes);
-      return Math.max(0, (physMultiplier + arcMultiplier) / 2);
-  }
-  function applyMitigatedHit(attacker, target, rawDamage, dtype = 'mixed') {
-      if (rawDamage <= 0 || !target.alive)
-          return 0;
-      const pre = Statuses.beforeDamage(attacker, target, {
-          attackType: 'reflect',
-          dtype,
-          base: rawDamage,
-      });
-      const final = calculateFinalDamage(attacker, target, null, Math.max(0, Math.floor(pre.base * pre.outMul)), {
-          ignoreAll: pre.ignoreAll,
-          defenseMultiplier: resolveDefenseMultiplier(target, pre.defPen),
-          reductionMultiplier: pre.inMul,
-      });
-      const total = Math.max(0, Math.floor(final.total));
-      if (total <= 0)
-          return 0;
-      const shielded = Statuses.absorbShield(target, total, { dtype });
-      const remain = Math.max(0, Math.floor(shielded.remain));
-      if (remain <= 0)
-          return 0;
-      const beforeHp = Math.max(0, Math.floor(target.hp ?? 0));
-      applyDamage(target, remain);
-      if ((target.hp ?? 0) <= 0) {
-          const revived = hookOnLethalDamage(target);
-          if (!revived) {
-              target.alive = false;
-              if (!target.deadAt)
-                  target.deadAt = safeNow();
-          }
-      }
-      const afterHp = Math.max(0, Math.floor(target.hp ?? 0));
-      return Math.max(0, beforeHp - afterHp);
-  }
   const ensureStatusList = (unit) => {
       if (!unit)
           return [];
@@ -44308,8 +44369,13 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       const id = status.id;
       const pct = DOT_DAMAGE_BY_STATUS[id];
       const lost = Math.round((unit.hpMax ?? 0) * pct);
-      applyDamage(unit, lost);
-      hookOnLethalDamage(unit);
+      const game = ctx?.game;
+      if (!game)
+          throw new Error('[combat-kernel] damaging status tick requires game context');
+      const source = game.tokens.find(token => (token.iid ?? token.id) === status.sourceIid) ?? unit;
+      const identity = createNaturalAction(game, 'dot-tick');
+      status.tickSerial = Math.max(0, Number(status.tickSerial ?? 0)) + 1;
+      withActionExecution(game, identity, () => dealAbilityDamage(game, source, unit, { base: lost, dtype: status.damageType === 'true' ? 'true' : status.damageType === 'will' ? 'arcane' : 'physical', attackType: 'dot', skillMul: 1 }), { originActionId: typeof status.originActionId === 'string' || typeof status.originActionId === 'number' ? status.originActionId : null });
       logStatusTick(ctx, id, unit, lost);
       decrementDuration(unit, status);
   }
@@ -44339,11 +44405,11 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       },
       bleed: (spec) => {
           const { turns = 2 } = (spec ?? {});
-          return createTimedStatus('bleed', 'debuff', 'dot', turns);
+          return { ...createTimedStatus('bleed', 'debuff', 'dot', turns), ...spec, turns: undefined, statusInstanceId: spec?.statusInstanceId ?? `bleed-status`, damageType: spec?.damageType ?? 'physical', snapshotPolicy: spec?.snapshotPolicy ?? 'dynamic', tickSerial: spec?.tickSerial ?? 0 };
       },
       poison: (spec) => {
           const { turns = 2 } = (spec ?? {});
-          return createTimedStatus('poison', 'debuff', 'dot', turns);
+          return { ...createTimedStatus('poison', 'debuff', 'dot', turns), ...spec, turns: undefined, statusInstanceId: spec?.statusInstanceId ?? `poison-status`, damageType: spec?.damageType ?? 'will', snapshotPolicy: spec?.snapshotPolicy ?? 'dynamic', tickSerial: spec?.tickSerial ?? 0 };
       },
       damageCut: (spec) => {
           const { pct = 0.2, turns = 1 } = (spec ?? {});
@@ -44697,10 +44763,14 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       afterDamage(attacker, target, result = {}) {
           const dealt = result.dealt ?? 0;
           const venom = this.get(attacker, 'venom');
-          if (venom && dealt > 0) {
+          if (venom && dealt > 0 && result.attackType !== 'venom') {
               const extra = Math.round(dealt * clamp01(venom.power ?? 0));
-              applyDamage(target, extra);
-              hookOnLethalDamage(target);
+              const game = result.game;
+              const parent = game ? currentActionExecution(game) : null;
+              if (!game || !parent)
+                  throw new Error('[combat-kernel] Venom requires an active production action');
+              const linked = createLinkedAction(game, parent.identity, 'venom');
+              withActionExecution(game, linked, () => dealAbilityDamage(game, attacker, target, { base: extra, dtype: result.dtype ?? 'physical', attackType: 'venom', skillMul: 1 }));
               if (extra > 0) {
                   gainFury(target, {
                       type: 'damageTaken',
@@ -44712,16 +44782,18 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
               }
           }
           const reflectPower = clamp01(this.get(target, 'reflect')?.power ?? 0);
-          const shouldApplyLegacyReflect = result.dtype == null;
-          if (shouldApplyLegacyReflect && reflectPower > 0 && dealt > 0) {
-              applyMitigatedHit(target, attacker, Math.round(dealt * reflectPower), 'mixed');
-          }
+          void reflectPower;
           if (this.has(attacker, 'execute')) {
               if ((target.hp ?? 0) <= Math.ceil((target.hpMax ?? 0) * 0.1)) {
-                  target.hp = 0;
-                  target.alive = false;
-                  if (!target.deadAt)
-                      target.deadAt = safeNow();
+                  const game = result.game;
+                  const action = game ? currentActionExecution(game) : null;
+                  if (!game || !action)
+                      throw new Error('[combat-kernel] Execute requires an active production action');
+                  const source = resolveSourceAttribution({ immediateSource: attacker, controller: attacker, trueSelf: attacker.trueSelfId ?? null, owner: attacker });
+                  const mutation = resolveHpLoss(target, Number(target.hp ?? 0), 'execute', source, true);
+                  commitHpMutation(game, target, mutation, action.identity);
+                  if (mutation.hpBefore > 0 && mutation.hpAfter === 0)
+                      createHpZeroCandidate(game, target, action.identity, source, 'execute', mutation.effectiveAmount);
               }
           }
           return result;
@@ -44776,12 +44848,14 @@ __modules['./summon.ts'] = (exports, module, __require) => {
   const applyOnSpawnEffects = __dep4.applyOnSpawnEffects;
   const __dep5 = __require('./utils/unique-global.ts');
   const isUniqueGlobalSummonBlocked = __dep5.isUniqueGlobalSummonBlocked;
+  const __dep6 = __require('./combat/kernel/life-cycle.ts');
+  const isCombatAlive = __dep6.isCombatAlive;
   const DEFAULT_SUMMON_UNIT = {
       id: 'creep',
       name: 'Creep',
       color: '#ffd27d',
   };
-  const tokensAlive = (Game) => Game.tokens.filter((t) => t.alive);
+  const tokensAlive = (Game) => Game.tokens.filter((t) => isCombatAlive(t));
   const isRecord = (value) => !!value && typeof value === 'object' && !Array.isArray(value);
   const isPassiveKit = (value) => {
       if (!isRecord(value))
@@ -44928,83 +45002,86 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   const slotIndex = __dep1.slotIndex;
   const __dep2 = __require('./statuses.ts');
   const Statuses = __dep2.Statuses;
-  const __dep3 = __require('./combat.ts');
-  const doBasicWithFollowups = __dep3.doBasicWithFollowups;
-  const __dep4 = __require('./combat/perform-active-skill.ts');
-  const performActiveSkill = __dep4.performActiveSkill;
-  const __dep5 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeActionEnd = __dep5.runRuntimeActionEnd;
-  const runRuntimeUnitRevive = __dep5.runRuntimeUnitRevive;
-  const runRuntimeTurnEnd = __dep5.runRuntimeTurnEnd;
-  const runRuntimeTurnStart = __dep5.runRuntimeTurnStart;
-  const __dep6 = __require('./combat/chap-minh-runtime.ts');
-  const applyChapMinhActionEnd = __dep6.applyChapMinhActionEnd;
-  const applyChapMinhPhaseShift = __dep6.applyChapMinhPhaseShift;
-  const recoverChapMinhMaxHpPerTurn = __dep6.recoverChapMinhMaxHpPerTurn;
-  const refreshChapMinhOwnership = __dep6.refreshChapMinhOwnership;
-  const __dep7 = __require('./config.ts');
-  const CFG = __dep7.CFG;
-  const __dep8 = __require('./meta.ts');
-  const initialRageFor = __dep8.initialRageFor;
-  const __dep9 = __require('./vfx.ts');
-  const vfxAddSpawn = __dep9.vfxAddSpawn;
-  const vfxAddBloodPulse = __dep9.vfxAddBloodPulse;
-  const asSessionWithVfx = __dep9.asSessionWithVfx;
-  const __dep10 = __require('./art.ts');
-  const getUnitArt = __dep10.getUnitArt;
-  const __dep11 = __require('./passives.ts');
-  const emitPassiveEvent = __dep11.emitPassiveEvent;
-  const applyOnSpawnEffects = __dep11.applyOnSpawnEffects;
-  const getPassiveLog = __dep11.getPassiveLog;
-  const prepareUnitForPassives = __dep11.prepareUnitForPassives;
-  const __dep12 = __require('./events.ts');
-  const emitGameEvent = __dep12.emitGameEvent;
-  const TURN_START = __dep12.TURN_START;
-  const TURN_END = __dep12.TURN_END;
-  const ACTION_START = __dep12.ACTION_START;
-  const ACTION_END = __dep12.ACTION_END;
-  const TURN_REGEN = __dep12.TURN_REGEN;
-  const __dep13 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep13.mergeBusyUntil;
-  const safeNow = __dep13.safeNow;
-  const sessionNow = __dep13.sessionNow;
-  const __dep14 = __require('./utils/fury.ts');
-  const initializeFury = __dep14.initializeFury;
-  const startFuryTurn = __dep14.startFuryTurn;
-  const spendFury = __dep14.spendFury;
-  const resolveUltCost = __dep14.resolveUltCost;
-  const setFury = __dep14.setFury;
-  const clearFreshSummon = __dep14.clearFreshSummon;
-  const __dep15 = __require('./turns/interleaved.ts');
-  const nextTurnInterleaved = __dep15.nextTurnInterleaved;
-  const getSequentialOrderIndex = __dep15.getSequentialOrderIndex;
-  const predictSpawnCycleByTurnOrder = __dep15.predictSpawnCycleByTurnOrder;
-  const __dep16 = __require('./modes/pve/collection-mapper.ts');
-  const resolveRuntimeUnitStats = __dep16.resolveRuntimeUnitStats;
-  const __dep17 = __require('./ai.ts');
-  const evaluateGambitLogic = __dep17.evaluateGambitLogic;
-  const __dep18 = __require('./utils/rng.ts');
-  const nextRngValue = __dep18.nextRngValue;
-  const __dep19 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep19.normalizeClassName;
-  const normalizeElementKey = __dep19.normalizeElementKey;
-  const __dep20 = __require('./utils/unique-global.ts');
-  const isUniqueGlobalSummonBlocked = __dep20.isUniqueGlobalSummonBlocked;
-  const __dep21 = __require('./utils/player-profile.ts');
-  const loadPlayerProfile = __dep21.loadPlayerProfile;
-  const __dep22 = __require('./leader-uyen.ts');
-  const clearQueuedUyenUlt = __dep22.clearQueuedUyenUlt;
-  const hasQueuedUyenUlt = __dep22.hasQueuedUyenUlt;
-  const isAnyLeaderUltReady = __dep22.isAnyLeaderUltReady;
-  const isUyenLeader = __dep22.isUyenLeader;
-  const grantUyenSummonRage = __dep22.grantUyenSummonRage;
+  const __dep3 = __require('./combat/kernel/life-cycle.ts');
+  const isCombatAlive = __dep3.isCombatAlive;
+  const markRemoved = __dep3.markRemoved;
+  const __dep4 = __require('./combat.ts');
+  const doBasicWithFollowups = __dep4.doBasicWithFollowups;
+  const __dep5 = __require('./combat/perform-active-skill.ts');
+  const performActiveSkill = __dep5.performActiveSkill;
+  const __dep6 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeActionEnd = __dep6.runRuntimeActionEnd;
+  const runRuntimeUnitRevive = __dep6.runRuntimeUnitRevive;
+  const runRuntimeTurnEnd = __dep6.runRuntimeTurnEnd;
+  const runRuntimeTurnStart = __dep6.runRuntimeTurnStart;
+  const __dep7 = __require('./combat/chap-minh-runtime.ts');
+  const applyChapMinhActionEnd = __dep7.applyChapMinhActionEnd;
+  const applyChapMinhPhaseShift = __dep7.applyChapMinhPhaseShift;
+  const recoverChapMinhMaxHpPerTurn = __dep7.recoverChapMinhMaxHpPerTurn;
+  const refreshChapMinhOwnership = __dep7.refreshChapMinhOwnership;
+  const __dep8 = __require('./config.ts');
+  const CFG = __dep8.CFG;
+  const __dep9 = __require('./meta.ts');
+  const initialRageFor = __dep9.initialRageFor;
+  const __dep10 = __require('./vfx.ts');
+  const vfxAddSpawn = __dep10.vfxAddSpawn;
+  const vfxAddBloodPulse = __dep10.vfxAddBloodPulse;
+  const asSessionWithVfx = __dep10.asSessionWithVfx;
+  const __dep11 = __require('./art.ts');
+  const getUnitArt = __dep11.getUnitArt;
+  const __dep12 = __require('./passives.ts');
+  const emitPassiveEvent = __dep12.emitPassiveEvent;
+  const applyOnSpawnEffects = __dep12.applyOnSpawnEffects;
+  const getPassiveLog = __dep12.getPassiveLog;
+  const prepareUnitForPassives = __dep12.prepareUnitForPassives;
+  const __dep13 = __require('./events.ts');
+  const emitGameEvent = __dep13.emitGameEvent;
+  const TURN_START = __dep13.TURN_START;
+  const TURN_END = __dep13.TURN_END;
+  const ACTION_START = __dep13.ACTION_START;
+  const ACTION_END = __dep13.ACTION_END;
+  const TURN_REGEN = __dep13.TURN_REGEN;
+  const __dep14 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep14.mergeBusyUntil;
+  const safeNow = __dep14.safeNow;
+  const sessionNow = __dep14.sessionNow;
+  const __dep15 = __require('./utils/fury.ts');
+  const initializeFury = __dep15.initializeFury;
+  const startFuryTurn = __dep15.startFuryTurn;
+  const spendFury = __dep15.spendFury;
+  const resolveUltCost = __dep15.resolveUltCost;
+  const setFury = __dep15.setFury;
+  const clearFreshSummon = __dep15.clearFreshSummon;
+  const __dep16 = __require('./turns/interleaved.ts');
+  const nextTurnInterleaved = __dep16.nextTurnInterleaved;
+  const getSequentialOrderIndex = __dep16.getSequentialOrderIndex;
+  const predictSpawnCycleByTurnOrder = __dep16.predictSpawnCycleByTurnOrder;
+  const __dep17 = __require('./modes/pve/collection-mapper.ts');
+  const resolveRuntimeUnitStats = __dep17.resolveRuntimeUnitStats;
+  const __dep18 = __require('./ai.ts');
+  const evaluateGambitLogic = __dep18.evaluateGambitLogic;
+  const __dep19 = __require('./utils/rng.ts');
+  const nextRngValue = __dep19.nextRngValue;
+  const __dep20 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep20.normalizeClassName;
+  const normalizeElementKey = __dep20.normalizeElementKey;
+  const __dep21 = __require('./utils/unique-global.ts');
+  const isUniqueGlobalSummonBlocked = __dep21.isUniqueGlobalSummonBlocked;
+  const __dep22 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep22.loadPlayerProfile;
+  const __dep23 = __require('./leader-uyen.ts');
+  const clearQueuedUyenUlt = __dep23.clearQueuedUyenUlt;
+  const hasQueuedUyenUlt = __dep23.hasQueuedUyenUlt;
+  const isAnyLeaderUltReady = __dep23.isAnyLeaderUltReady;
+  const isUyenLeader = __dep23.isUyenLeader;
+  const grantUyenSummonRage = __dep23.grantUyenSummonRage;
   const toActiveUnitKey = (side, slot) => `${side}:${slot}`;
   const createActiveUnitIndex = (Game) => {
       const index = new Map();
       const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
       for (let i = 0; i < tokens.length; i += 1) {
           const token = tokens[i];
-          if (!token || !token.alive)
+          if (!token || !isCombatAlive(token))
               continue;
           if (token.side !== 'ally' && token.side !== 'enemy')
               continue;
@@ -45179,7 +45256,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   };
   const resolveSpawnElement = (spawnEntry, meta) => (readFirstNormalizedElement(spawnEntry.element, spawnEntry.base_element, meta?.base_element, meta?.element) ?? 'neutral');
   function grantActionAether(Game, unit, acted) {
-      if (!unit || !unit.alive || !acted)
+      if (!unit || !isCombatAlive(unit) || !acted)
           return 0;
       const className = normalizeClassName(Game.meta?.get(unit.id)?.class) ?? null;
       const amount = resolveActionAetherRegen(className);
@@ -45189,7 +45266,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       return amount;
   }
   function applyTurnRegen(Game, unit) {
-      if (!unit || !unit.alive)
+      if (!unit || !isCombatAlive(unit))
           return { hpDelta: 0, aeDelta: 0 };
       let hpDelta = 0;
       if (Number.isFinite(unit.hp) || Number.isFinite(unit.hpMax) || Number.isFinite(unit.hpRegen)) {
@@ -45241,7 +45318,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       const tokens = Array.isArray(Game.tokens) ? Game.tokens : [];
       for (let i = 0; i < tokens.length; i += 1) {
           const token = tokens[i];
-          if (!token || !token.alive)
+          if (!token || !isCombatAlive(token))
               continue;
           if (token.side === normalizedSide && token.cx === cx && token.cy === cy) {
               return token;
@@ -45367,7 +45444,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       let allyLeader;
       for (let idx = 0; idx < Game.tokens.length; idx += 1) {
           const token = Game.tokens[idx];
-          if (token?.alive && token.side === obj.side && isUyenLeader(token)) {
+          if (token && isCombatAlive(token) && token.side === obj.side && isUyenLeader(token)) {
               allyLeader = token;
               break;
           }
@@ -45387,7 +45464,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           activeUnitIndex.set(toActiveUnitKey(sideLower, slot), actor);
       }
       const isLeader = actor.id === 'leaderA' || actor.id === 'leaderB';
-      const canAutoUlt = fromDeck && !isLeader && actor.alive && typeof performUlt === 'function';
+      const canAutoUlt = fromDeck && !isLeader && isCombatAlive(actor) && typeof performUlt === 'function';
       if (canAutoUlt && !Statuses.blocks(actor, 'ult')) {
           let ultOk = false;
           try {
@@ -45432,7 +45509,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           }
           if ((token.ttlTurns ?? 0) > 0)
               continue;
-          token.alive = false;
+          markRemoved(token);
           Game.tokens.splice(idx, 1);
       }
   }
@@ -45503,9 +45580,9 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       return consumedTurnFromOutcome(actionOutcome, hasActionHook);
   };
   const resolveTurnActor = (Game, side, slot, actor, fallback, activeUnitIndex) => {
-      if (actor?.alive)
+      if (actor && isCombatAlive(actor))
           return actor;
-      if (fallback?.alive)
+      if (fallback && isCombatAlive(fallback))
           return fallback;
       return getActiveAt(Game, side, slot, activeUnitIndex) ?? null;
   };
@@ -45590,27 +45667,10 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               applyChapMinhActionEnd(Game, unit);
               refreshChapMinhOwnership(Game);
           }
-          const wasAliveBeforeTurnEnd = !!unit?.alive;
-          const hadBleedBeforeTurnEnd = !!unit && Statuses.has(unit, 'bleed');
-          Statuses.onTurnEnd(unit, {});
+          Statuses.onTurnEnd(unit, { game: Game, log: passiveLog });
           runRuntimeTurnEnd(Game, unit);
           applyChapMinhPhaseShift(unit);
           refreshChapMinhOwnership(Game);
-          if (wasAliveBeforeTurnEnd && unit && !unit.alive && hadBleedBeforeTurnEnd) {
-              const bloodAvatarObservers = Game.tokens.filter((token) => token.alive
-                  && token.id === 'blood_avatar'
-                  && token.side !== unit.side);
-              if (bloodAvatarObservers.length > 0) {
-                  for (const observer of bloodAvatarObservers) {
-                      emitPassiveEvent(Game, observer, 'onEnemyDeath', {
-                          log: passiveLog,
-                          target: unit,
-                          attackType: 'dot',
-                          isDirectKill: false,
-                      });
-                  }
-              }
-          }
           ensureBusyReset();
           resolution.consumedTurn = consumedTurn;
           resolution.acted = acted;
@@ -45619,7 +45679,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           finishAction(actionDetail);
           return resolution;
       };
-      if (!unit || !unit.alive) {
+      if (!unit || !isCombatAlive(unit)) {
           emitGameEvent(ACTION_START, baseDetail);
           ensureBusyReset();
           resolution.consumedTurn = false;
@@ -45639,7 +45699,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       runRuntimeTurnStart(Game, unit);
       recoverChapMinhMaxHpPerTurn(unit);
       refreshChapMinhOwnership(Game);
-      const bloodAvatarFieldOwners = Game.tokens.filter((token) => token.alive
+      const bloodAvatarFieldOwners = Game.tokens.filter((token) => isCombatAlive(token)
           && token.id === 'blood_avatar'
           && token.side !== unit.side
           && Statuses.has(token, 'blood_field_active'));
@@ -45781,6 +45841,8 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   // Bước con trỏ lượt (sparse-cursor) đúng đặc tả
   // hooks = { performUlt, processActionChain, allocIid, doActionOrSkip }
   function stepTurn(Game, hooks) {
+      if (Game.runtime?.battleEnd?.ended)
+          return;
       const turn = Game.turn;
       if (!turn)
           return;
@@ -45803,7 +45865,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               if (!spawnResult.spawned) {
                   return;
               }
-              if (spawnResult.actor && spawnResult.actor.alive) {
+              if (spawnResult.actor && isCombatAlive(spawnResult.actor)) {
                   selection = {
                       ...selection,
                       spawnOnly: false,
@@ -45822,7 +45884,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           const entry = { side: selection.side, slot: selection.pos };
           const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks, activeUnitIndex);
           const active = resolveTurnActor(Game, entry.side, entry.slot, actor, selection.unit, activeUnitIndex);
-          if (!active || !active.alive) {
+          if (!active || !isCombatAlive(active)) {
               return;
           }
           const cycle = Number.isFinite(interleavedTurn.cycle) ? interleavedTurn.cycle : 0;
@@ -45891,7 +45953,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           };
           const { actor, spawned } = spawnQueuedIfDue(Game, entry, hooks, activeUnitIndex);
           const active = resolveTurnActor(Game, entry.side, entry.slot, actor, undefined, activeUnitIndex);
-          const hasActive = !!(active && active.alive);
+          const hasActive = !!(active && isCombatAlive(active));
           if (!hasActive) {
               advanceCursor();
               continue;

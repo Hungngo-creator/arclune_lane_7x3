@@ -1,6 +1,7 @@
 //home (termux)/arclune_lane_7x3/src/passives.ts — passive event dispatch & helpers
-import { Statuses, hookOnLethalDamage } from './statuses.ts';
-import { safeNow } from './utils/time.ts';
+import { Statuses } from './statuses.ts';
+import { dealAbilityDamage } from './combat.ts';
+import { commitHealing, commitHpMutation, createLinkedAction, currentActionExecution, isCombatAlive, registerDeathPrevention, resolveHealing, resolveMaxHpMutation, resolveSourceAttribution, withActionExecution } from './combat/kernel/index.ts';
 
 import type {
   PassiveCondition,
@@ -482,19 +483,21 @@ const healTeam = (
   if (!Number.isFinite(pct) || pct <= 0) return;
   const mode = opts.mode || 'targetMax';
   const casterHpMax = Number.isFinite(unit.hpMax) ? unit.hpMax ?? 0 : 0;
-  const allies = (Game.tokens || []).filter(t => t && t.side === unit.side && t.alive);
+  const allies = (Game.tokens || []).filter(t => t && t.side === unit.side && isCombatAlive(t));
+  const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, trueSelf: unit.trueSelfId ?? null, owner: unit });
+  const identity = currentActionExecution(Game)?.identity;
   for (const ally of allies){
     if (!Number.isFinite(ally.hpMax)) continue;
     const base = mode === 'casterMax' ? casterHpMax : (ally.hpMax ?? 0);
     if (!Number.isFinite(base) || base <= 0) continue;
     const healAmount = Math.max(0, Math.round(base * pct));
     if (healAmount <= 0) continue;
-    ally.hp = Math.min(ally.hpMax ?? 0, (ally.hp ?? ally.hpMax ?? 0) + healAmount);
+    commitHealing(Game, ally, resolveHealing(ally, healAmount, source), identity);
   }
 };
 
 const EFFECTS: Record<string, PassiveDefinition> = {
-  placeMark({ unit, passive, ctx }) {
+  placeMark({ Game, unit, passive, ctx }) {
     const runtime = (ctx ?? {}) as PassiveRuntimeContext;
     const id = passive?.id;
     const target = runtime.target ?? null;
@@ -529,13 +532,11 @@ const EFFECTS: Record<string, PassiveDefinition> = {
 
       Statuses.remove(afterTarget, id);
       const amount = Math.max(1, Math.round(toNumber(unit?.wil, 0) * dmgMul));
-      afterTarget.hp = Math.max(0, (afterTarget.hp ?? 0) - amount);
-      if ((afterTarget.hp ?? 0) <= 0){
-        if (!hookOnLethalDamage(afterTarget)){
-          afterTarget.alive = false;
-          if (!afterTarget.deadAt) afterTarget.deadAt = safeNow();
-        }
-      }
+      if (!Game || !unit) throw new Error('[combat-kernel] mark explosion requires production game and source');
+      const parent = currentActionExecution(Game);
+      if (!parent) throw new Error('[combat-kernel] mark explosion requires an active parent action');
+      const linked = createLinkedAction(Game, parent.identity, 'mark-explosion');
+      withActionExecution(Game, linked, () => dealAbilityDamage(Game, unit, afterTarget, { base: amount, dtype: 'arcane', attackType: 'mark-explosion', skillMul: 1 }));
       if (Array.isArray(runtime.log)){
         runtime.log.push({ t: id, source: unit?.name, target: afterTarget?.name, dmg: amount });
       }
@@ -689,7 +690,7 @@ const EFFECTS: Record<string, PassiveDefinition> = {
     applyStatStacks(status, foes.length, { maxStacks: typeof params.maxStacks === 'number' ? params.maxStacks : undefined });
     recomputeFromStatuses(unit);
   },
-  gainMaxHPPercent({ unit, passive, ctx }) {
+  gainMaxHPPercent({ Game, unit, passive, ctx }) {
     if (!unit || !passive?.id) return;
     const params = (passive.params ?? {}) as Record<string, unknown>;
     const amount = Math.max(0, toNumber(params.amount, 0));
@@ -705,31 +706,30 @@ const EFFECTS: Record<string, PassiveDefinition> = {
     const addRatio = Math.max(0, Math.min(amount, cap - currentBonus));
     if (addRatio <= 0) return;
     const gain = Math.max(1, Math.floor(hpMax * addRatio));
-    unit.hpMax = hpMax + gain;
-    unit.hp = Math.min(unit.hpMax, Math.max(0, Number(unit.hp ?? 0) + gain));
+    const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, trueSelf: unit.trueSelfId ?? null, owner: unit });
+    const mutation = resolveMaxHpMutation(unit, gain, 'add-flat', 'set-value', source, { setCurrentHp: Math.max(0, Number(unit.hp ?? 0) + gain), resetPolicy: 'never-within-battle' });
+    commitHpMutation(Game ?? null, unit, mutation, Game ? currentActionExecution(Game)?.identity : undefined);
     state._bloodFeastBonus = currentBonus + addRatio;
   },
-  surviveAtOneHP({ unit, passive }) {
-    if (!unit || !passive?.id) return;
+  surviveAtOneHP({ Game, unit, passive }) {
+    if (!Game || !unit || !passive?.id) return;
     const params = (passive.params ?? {}) as Record<string, unknown>;
-    const state = unit as UnitToken & { _bloodCoreUsed?: boolean; _directKills?: number; _bloodFeastBonus?: number };
+    const state = unit as UnitToken & { _bloodCoreUsed?: boolean; _directKills?: number; _bloodFeastBonus?: number; _bloodCorePreventionRegistered?: boolean };
     if (state._bloodCoreUsed) return;
     const minDirectKills = Math.max(0, Math.floor(toNumber(params.minDirectKills, 0)));
-    const directKills = Math.max(0, Math.floor(Number(state._directKills ?? 0)));
+    const canonicalKills = Number(((Game.runtime as { trueSelfRecords?: Record<string, { confirmedKills?: number }> } | undefined)?.trueSelfRecords?.[String(unit.trueSelfId)]?.confirmedKills));
+    const directKills = Math.max(0, Math.floor(Number.isFinite(canonicalKills) ? canonicalKills : Number(state._directKills ?? 0)));
     if (directKills < minDirectKills) return;
-    if ((unit.hp ?? 0) > 0) return;
-
-    const baseHpMax = Math.max(1, Number(unit.hpMax ?? 1));
-    const bonusRatio = Math.max(0, Number(state._bloodFeastBonus ?? 0));
-    if (bonusRatio > 0) {
-      const reduced = Math.max(1, Math.floor(baseHpMax / (1 + bonusRatio)));
-      unit.hpMax = reduced;
-      state._bloodFeastBonus = 0;
-    }
-    unit.hp = 1;
-    unit.alive = true;
-    unit.deadAt = undefined;
-    state._bloodCoreUsed = true;
+    if (state._bloodCorePreventionRegistered) return;
+    state._bloodCorePreventionRegistered = true;
+    registerDeathPrevention(Game, candidate => {
+      if (candidate.targetIid !== (unit.iid ?? unit.id) || state._bloodCoreUsed) return null;
+      const currentKills = Number(((Game.runtime as { trueSelfRecords?: Record<string, { confirmedKills?: number }> }).trueSelfRecords?.[String(unit.trueSelfId)]?.confirmedKills ?? state._directKills ?? 0));
+      if (currentKills < minDirectKills) return null;
+      const bonusRatio = Math.max(0, Number(state._bloodFeastBonus ?? 0));
+      const resetMaxHpTo = bonusRatio > 0 ? Math.max(1, Math.floor(Number(unit.hpMax ?? 1) / (1 + bonusRatio))) : Number(unit.hpMax ?? 1);
+      return { prevent: true, hp: 1, effectId: passive.id, charge: { consumeUnitFlag: '_bloodCoreUsed', resetMaxHpTo, resetBonusFlag: '_bloodFeastBonus' } };
+    });
   },
 };
 

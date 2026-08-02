@@ -1,12 +1,12 @@
 //home (termux)/arclune_lane_7x3/src/statuses.ts
-import { applyDamage } from './combat/apply-damage.ts';
-import { calculateFinalDamage } from './combat/calculate-final-damage.ts';
+import { dealAbilityDamage } from './combat.ts';
+import { commitHpMutation, createHpZeroCandidate, createLinkedAction, createNaturalAction, currentActionExecution, finalizeCombatAction, resolveHpLoss, resolveSourceAttribution, withActionExecution } from './combat/kernel/index.ts';
 import { normalizeTagList } from './data/tags.ts';
 import { gainFury, finishFuryHit } from './utils/fury.ts';
-import { safeNow } from './utils/time.ts';
 
 import type { DamageContext, StatusEffect, StatusRegistry } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
+import type { SessionState } from '@shared-types/combat';
 
 interface ShieldResult {
   remain: number;
@@ -23,6 +23,8 @@ export interface DamageResult {
     elementBonus?: number;
     synergyBonus?: number;
   };
+  game?: SessionState | null;
+  attackType?: string;
 }
 
 interface ResolveContext {
@@ -31,6 +33,7 @@ interface ResolveContext {
 
 interface StatusTurnContext extends Record<string, unknown> {
   log?: Array<Record<string, unknown>>;
+  game?: SessionState;
 }
 
 interface StatusService {
@@ -73,48 +76,6 @@ const isAxiomBlockedKind = (kind: StatusEffect['kind']): boolean =>
 
 const isDotStatusId = (id: string): id is keyof typeof DOT_DAMAGE_BY_STATUS =>
   DOT_STATUS_ID_SET.has(id);
-
-function resolveDefenseMultiplier(target: UnitToken, penetration = 0): number {
-  const combinedPen = clamp01(penetration);
-  const effectiveArm = Math.max(0, (target.arm ?? 0) * (1 - combinedPen));
-  const effectiveRes = Math.max(0, (target.res ?? 0) * (1 - combinedPen));
-  const physMultiplier = 100 / (100 + effectiveArm);
-  const arcMultiplier = 100 / (100 + effectiveRes);
-  return Math.max(0, (physMultiplier + arcMultiplier) / 2);
-}
-
-function applyMitigatedHit(attacker: UnitToken, target: UnitToken, rawDamage: number, dtype = 'mixed'): number {
-  if (rawDamage <= 0 || !target.alive) return 0;
-
-  const pre = Statuses.beforeDamage(attacker, target, {
-    attackType: 'reflect',
-    dtype,
-    base: rawDamage,
-  });
-  const final = calculateFinalDamage(attacker, target, null, Math.max(0, Math.floor(pre.base * pre.outMul)), {
-    ignoreAll: pre.ignoreAll,
-    defenseMultiplier: resolveDefenseMultiplier(target, pre.defPen),
-    reductionMultiplier: pre.inMul,
-  });
-  const total = Math.max(0, Math.floor(final.total));
-  if (total <= 0) return 0;
-
-  const shielded = Statuses.absorbShield(target, total, { dtype });
-  const remain = Math.max(0, Math.floor(shielded.remain));
-  if (remain <= 0) return 0;
-
-  const beforeHp = Math.max(0, Math.floor(target.hp ?? 0));
-  applyDamage(target, remain);
-  if ((target.hp ?? 0) <= 0) {
-    const revived = hookOnLethalDamage(target);
-    if (!revived) {
-      target.alive = false;
-      if (!target.deadAt) target.deadAt = safeNow();
-    }
-  }
-  const afterHp = Math.max(0, Math.floor(target.hp ?? 0));
-  return Math.max(0, beforeHp - afterHp);
-}
 
 const ensureStatusList = (unit?: UnitToken | null): StatusEffect[] => {
   if (!unit) return [];
@@ -168,8 +129,12 @@ function applyDotTick(unit: UnitToken, status: StatusEffect, ctx?: StatusTurnCon
   const id = status.id;
   const pct = DOT_DAMAGE_BY_STATUS[id];
   const lost = Math.round((unit.hpMax ?? 0) * pct);
-  applyDamage(unit, lost);
-  hookOnLethalDamage(unit);
+  const game = ctx?.game;
+  if (!game) throw new Error('[combat-kernel] damaging status tick requires game context');
+  const source = game.tokens.find(token => (token.iid ?? token.id) === status.sourceIid) ?? unit;
+  const identity = createNaturalAction(game, 'dot-tick');
+  status.tickSerial = Math.max(0, Number(status.tickSerial ?? 0)) + 1;
+  withActionExecution(game, identity, () => dealAbilityDamage(game, source, unit, { base: lost, dtype: status.damageType === 'true' ? 'true' : status.damageType === 'will' ? 'arcane' : 'physical', attackType: 'dot', skillMul: 1 }), { originActionId: typeof status.originActionId === 'string' || typeof status.originActionId === 'number' ? status.originActionId : null });
   logStatusTick(ctx, id, unit, lost);
   decrementDuration(unit, status);
 }
@@ -206,11 +171,11 @@ const statusFactories = {
   },
   bleed: (spec?: Record<string, unknown>) => {
     const { turns = 2 } = (spec ?? {}) as { turns?: number };
-    return createTimedStatus('bleed', 'debuff', 'dot', turns);
+    return { ...createTimedStatus('bleed', 'debuff', 'dot', turns), ...spec, turns: undefined, statusInstanceId: spec?.statusInstanceId ?? `bleed-status`, damageType: spec?.damageType ?? 'physical', snapshotPolicy: spec?.snapshotPolicy ?? 'dynamic', tickSerial: spec?.tickSerial ?? 0 };
   },
   poison: (spec?: Record<string, unknown>) => {
     const { turns = 2 } = (spec ?? {}) as { turns?: number };
-    return createTimedStatus('poison', 'debuff', 'dot', turns);
+    return { ...createTimedStatus('poison', 'debuff', 'dot', turns), ...spec, turns: undefined, statusInstanceId: spec?.statusInstanceId ?? `poison-status`, damageType: spec?.damageType ?? 'will', snapshotPolicy: spec?.snapshotPolicy ?? 'dynamic', tickSerial: spec?.tickSerial ?? 0 };
   },
   damageCut: (spec?: Record<string, unknown>) => {
     const { pct = 0.2, turns = 1 } = (spec ?? {}) as { pct?: number; turns?: number };
@@ -530,10 +495,13 @@ export const Statuses: StatusService = {
   afterDamage(attacker, target, result = {}) {
     const dealt = result.dealt ?? 0;
     const venom = this.get(attacker, 'venom');
-    if (venom && dealt > 0) {
+    if (venom && dealt > 0 && result.attackType !== 'venom') {
       const extra = Math.round(dealt * clamp01(venom.power ?? 0));
-      applyDamage(target, extra);
-      hookOnLethalDamage(target);
+      const game = result.game;
+      const parent = game ? currentActionExecution(game) : null;
+      if (!game || !parent) throw new Error('[combat-kernel] Venom requires an active production action');
+      const linked = createLinkedAction(game, parent.identity, 'venom');
+      withActionExecution(game, linked, () => dealAbilityDamage(game, attacker, target, { base: extra, dtype: result.dtype ?? 'physical', attackType: 'venom', skillMul: 1 }));
       if (extra > 0) {
         gainFury(target, {
           type: 'damageTaken',
@@ -546,16 +514,17 @@ export const Statuses: StatusService = {
     }
 
     const reflectPower = clamp01(this.get(target, 'reflect')?.power ?? 0);
-    const shouldApplyLegacyReflect = result.dtype == null;
-    if (shouldApplyLegacyReflect && reflectPower > 0 && dealt > 0) {
-      applyMitigatedHit(target, attacker, Math.round(dealt * reflectPower), 'mixed');
-    }
+    void reflectPower;
 
     if (this.has(attacker, 'execute')) {
       if ((target.hp ?? 0) <= Math.ceil((target.hpMax ?? 0) * 0.1)) {
-        target.hp = 0;
-        target.alive = false;
-        if (!target.deadAt) target.deadAt = safeNow();
+        const game = result.game;
+        const action = game ? currentActionExecution(game) : null;
+        if (!game || !action) throw new Error('[combat-kernel] Execute requires an active production action');
+        const source = resolveSourceAttribution({ immediateSource: attacker, controller: attacker, trueSelf: attacker.trueSelfId ?? null, owner: attacker });
+        const mutation = resolveHpLoss(target, Number(target.hp ?? 0), 'execute', source, true);
+        commitHpMutation(game, target, mutation, action.identity);
+        if (mutation.hpBefore > 0 && mutation.hpAfter === 0) createHpZeroCandidate(game, target, action.identity, source, 'execute', mutation.effectiveAmount);
       }
     }
 
