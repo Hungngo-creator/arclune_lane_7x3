@@ -5,7 +5,10 @@ let ts;
 
 function getTypeScriptTranspiler() {
   if (!ts) {
-    ts = require('typescript-transpiler');
+    // Always use the repository copy.  The stub itself is committed both under
+    // tools/ and node_modules/, while a plain package lookup can select an old
+    // node_modules/typescript-transpiler snapshot after a git pull in Termux.
+    ts = require(path.resolve(__dirname, '..', '..', 'tools', 'typescript-transpiler'));
   }
   return ts;
 }

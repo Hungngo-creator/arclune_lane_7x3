@@ -42,3 +42,14 @@ test('offline fallback preserves object values containing strict equality', () =
   assert.match(code, /name:\s*typeof card\.name === 'string'/);
   assert.doesNotThrow(() => new Function('input', code));
 });
+
+test('installed esbuild stub uses the current repository transpiler', async () => {
+  const installedEsbuild = require('../node_modules/esbuild');
+  const source = `const cards = input.map((card: Card) => ({
+    name: typeof card.name === 'string' ? card.name : undefined,
+  }));`;
+  const { code } = await installedEsbuild.transform(source, { loader: 'ts' });
+
+  assert.match(code, /name:\s*typeof card\.name === 'string'/);
+  assert.doesNotThrow(() => new Function('input', code));
+});
