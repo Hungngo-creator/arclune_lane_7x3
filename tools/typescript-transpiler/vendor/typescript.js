@@ -4,6 +4,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const { stripTypeScriptTypes } = require("node:module");
 
 const disableTypescriptRuntime = process.env.ARCLUNE_DISABLE_TYPESCRIPT_RUNTIME === "1";
 let realTypescript = null;
@@ -115,7 +116,13 @@ function fallbackTranspileModule(source, options = {}) {
   const sourceFile = options.fileName || "module.ts";
   let outputText;
   try {
-    outputText = customTranspiler.transpile(String(source));
+    outputText = typeof stripTypeScriptTypes === "function"
+      ? stripTypeScriptTypes(String(source), {
+          mode: "transform",
+          sourceMap: false,
+          sourceUrl: sourceFile,
+        })
+      : customTranspiler.transpile(String(source));
   } catch (err) {
     const error = createMissingTypescriptError();
     error.cause = err;
@@ -216,4 +223,9 @@ module.exports = {
   readConfigFile,
   parseJsonConfigFileContent,
   sys,
+  __arcTransformerKind: realTypescript
+    ? "typescript"
+    : typeof stripTypeScriptTypes === "function"
+      ? "node-parser"
+      : "legacy-regex",
 };

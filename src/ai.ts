@@ -466,6 +466,15 @@ export function queueEnemyAt(
   if (queue.has(slot)) return false;
 
   const spawnCycle = predictSpawnCycleByTurnOrder(Game, 'enemy', slot);
+  const mutationBonusPct = Number.isFinite(card.mutationBonusPct)
+    ? Number(card.mutationBonusPct)
+    : undefined;
+  const mutationDebuffPool = Array.isArray(card.mutationDebuffPool)
+    ? card.mutationDebuffPool.filter((id) => id === 'bleed' || id === 'stun' || id === 'poison')
+    : undefined;
+  const statOverrides = card.statOverrides && typeof card.statOverrides === 'object' && !Array.isArray(card.statOverrides)
+    ? { ...card.statOverrides }
+    : undefined;
 
   queue.set(slot, {
     unitId: card.id,
@@ -478,13 +487,9 @@ export function queueEnemyAt(
     color: '#ed9dad',
     class: typeof card.class === 'string' && card.class.trim() ? card.class : undefined,
     source: 'deck',
-    mutationBonusPct: Number.isFinite(card.mutationBonusPct) ? Number(card.mutationBonusPct) : undefined,
-    mutationDebuffPool: Array.isArray(card.mutationDebuffPool)
-      ? card.mutationDebuffPool.filter((id): id is 'bleed' | 'stun' | 'poison' => id === 'bleed' || id === 'stun' || id === 'poison')
-      : undefined,
-    statOverrides: card.statOverrides && typeof card.statOverrides === 'object' && !Array.isArray(card.statOverrides)
-      ? { ...(card.statOverrides as Record<string, unknown>) }
-      : undefined,
+    mutationBonusPct,
+    mutationDebuffPool,
+    statOverrides,
   });
 
   Game.ai.cost = Math.max(0, Game.ai.cost - cost);

@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
+const { spawnSync } = require('node:child_process');
 const esbuild = require('../tools/esbuild-stub');
 const fallbackTypeScript = require('../tools/typescript-transpiler/strip-typescript');
 
@@ -62,4 +63,24 @@ test('installed esbuild stub uses the current repository transpiler', async () =
 
   assert.match(code, /name:\s*typeof card\.name === 'string'/);
   assert.doesNotThrow(() => new Function('input', code));
+});
+
+test('offline runtime uses a parser-backed transform for the complete ai module', () => {
+  const script = `
+    const fs = require('node:fs');
+    const vm = require('node:vm');
+    const ts = require('./tools/typescript-transpiler');
+    const source = fs.readFileSync('./src/ai.ts', 'utf8');
+    const result = ts.transpileModule(source, { fileName: './ai.ts', compilerOptions: {} });
+    new vm.SourceTextModule(result.outputText);
+    process.stdout.write(ts.__arcTransformerKind || 'unknown');
+  `;
+  const result = spawnSync(process.execPath, ['--experimental-vm-modules', '-e', script], {
+    cwd: process.cwd(),
+    encoding: 'utf8',
+    env: { ...process.env, ARCLUNE_DISABLE_TYPESCRIPT_RUNTIME: '1' },
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout, 'node-parser');
 });

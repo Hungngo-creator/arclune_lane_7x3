@@ -877,7 +877,12 @@ function logTopBundleSizes(metafile, limit = 5){
 }
 
 async function build(){
-  const transformerLabel = USING_ESBUILD_FALLBACK ? 'offline TypeScript fallback' : 'esbuild';
+  const fallbackKind = USING_ESBUILD_FALLBACK && typeof esbuild.getFallbackTransformerKind === 'function'
+    ? esbuild.getFallbackTransformerKind()
+    : null;
+  const transformerLabel = USING_ESBUILD_FALLBACK
+    ? `offline TypeScript fallback (${fallbackKind ?? 'unknown'})`
+    : 'esbuild';
   console.log(`[build.mjs ${BUILD_SCRIPT_VERSION}] Bắt đầu build với Node ${process.version}; target Chromium 151; transformer ${transformerLabel}`);
   const files = await listSourceFiles();
   syncLegacyModuleAliases(files);

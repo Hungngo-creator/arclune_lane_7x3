@@ -20,4 +20,5 @@ module.exports = {
   readConfigFile: ts.readConfigFile,
   parseJsonConfigFileContent: ts.parseJsonConfigFileContent,
   sys: ts.sys,
+  __arcTransformerKind: ts.__arcTransformerKind,
 };
