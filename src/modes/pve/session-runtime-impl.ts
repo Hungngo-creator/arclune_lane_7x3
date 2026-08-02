@@ -2197,6 +2197,11 @@ function syncLeaderUltControls(): void {
 function init(): boolean {
   if (!Game) return false;
   if (Game._inited) return true;
+  console.info('[SSI runtime]', {
+    mode: Game.turn?.mode ?? 'missing',
+    source: 'src/modes/pve/session-runtime-impl.ts',
+    interleaved: Game.turn?.mode === 'interleaved_by_position',
+  });
   const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
   if (!doc) return false;
   const root = rootElement ?? null;

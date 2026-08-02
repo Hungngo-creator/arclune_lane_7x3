@@ -848,7 +848,7 @@ export function doActionOrSkip(
 
   if (!Statuses.canAct(unit)) {
     return completeTurn({
-      consumedTurn: false,
+      consumedTurn: true,
       acted: false,
       reason: 'status',
       actionDetail: { skipped: true, reason: 'status' }

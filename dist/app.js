@@ -14024,6 +14024,12 @@ __modules['./entry.ts'] = (exports, module, __require) => {
         </div>
       </div>
       <div class="pve-stage">
+      <section class="ssi-panel" aria-label="Natural SSI timeline">
+          <div class="ssi-panel__label">Natural SSI</div>
+          <div id="ssiTimeline" class="ssi-timeline"></div>
+          <div id="ssiForced" class="ssi-forced" aria-live="polite">Chen hàng: —</div>
+          <output id="ssiDebug" class="ssi-debug"></output>
+        </section>
         <div id="boardWrap">
           <canvas id="board"></canvas>
         </div>
@@ -19598,6 +19604,11 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           return false;
       if (Game._inited)
           return true;
+      console.info('[SSI runtime]', {
+          mode: Game.turn?.mode ?? 'missing',
+          source: 'src/modes/pve/session-runtime-impl.ts',
+          interleaved: Game.turn?.mode === 'interleaved_by_position',
+      });
       const doc = docRef ?? (typeof document !== 'undefined' ? document : null);
       if (!doc)
           return false;
@@ -21309,6 +21320,7 @@ __modules['./modes/pve/session-state.ts'] = (exports, module, __require) => {
               slotCount: slotsPerSide,
               cycle: 0,
               busyUntil: 0,
+              actedNatural: { ALLY: [], ENEMY: [] },
           }
           : createSequentialTurnSnapshot();
       const aiState = buildAiState({
@@ -44521,7 +44533,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       emitGameEvent(ACTION_START, baseDetail);
       if (!Statuses.canAct(unit)) {
           return completeTurn({
-              consumedTurn: false,
+              consumedTurn: true,
               acted: false,
               reason: 'status',
               actionDetail: { skipped: true, reason: 'status' }
@@ -44825,7 +44837,13 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
       if (!Number.isFinite(turn.turnCount)) {
           turn.turnCount = 0;
       }
+      if (!turn.actedNatural || typeof turn.actedNatural !== 'object') {
+          turn.actedNatural = { ALLY: [], ENEMY: [] };
+      }
+      turn.actedNatural.ALLY = Array.isArray(turn.actedNatural.ALLY) ? turn.actedNatural.ALLY : [];
+      turn.actedNatural.ENEMY = Array.isArray(turn.actedNatural.ENEMY) ? turn.actedNatural.ENEMY : [];
   }
+  const naturalIdentity = (unit) => String(unit.iid ?? unit.id ?? '');
   function buildSlotMaps(tokens) {
       if (!Array.isArray(tokens)) {
           return createEmptySlotMaps();
@@ -44969,10 +44987,47 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
       const sideLower = SIDE_TO_LOWER[sideKey];
       const startPosRaw = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
       const startPos = clampInt(startPosRaw, 0, slotCount);
-      const picked = findNextOccupiedPos(state, sideKey, startPos, buildSlotMaps(state.tokens));
+      const slotMaps = buildSlotMaps(state.tokens);
+      const acted = new Set(turn.actedNatural?.[sideKey] ?? []);
+      let picked = null;
+      // Finish the unvisited tail first. This is what makes a summon behind the
+      // cursor wait, while a summon ahead of it can still join this side pass.
+      for (let pos = startPos + 1; pos <= slotCount; pos += 1) {
+          const unit = slotMaps[sideKey].get(pos) ?? null;
+          if (unit?.alive && !acted.has(naturalIdentity(unit))) {
+              picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit,
+                  unitId: unit.id ?? null, queued: false, wrapped: false, sideKey, spawnOnly: false };
+              break;
+          }
+          if (!unit && isQueueDue(state, sideLower, pos, turn.cycle)) {
+              picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit: null,
+                  unitId: null, queued: true, wrapped: false, sideKey, spawnOnly: true };
+              break;
+          }
+      }
+      if (!picked) {
+          // A side pass ends only after its tail is exhausted. Moving an actor to a
+          // later slot cannot grant it another natural action in that pass.
+          turn.actedNatural[sideKey] = [];
+          for (let pos = 1; pos <= slotCount; pos += 1) {
+              const unit = slotMaps[sideKey].get(pos) ?? null;
+              if (unit?.alive) {
+                  picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit,
+                      unitId: unit.id ?? null, queued: false, wrapped: startPos > 0, sideKey, spawnOnly: false };
+                  break;
+              }
+              if (isQueueDue(state, sideLower, pos, turn.cycle + 1)) {
+                  picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit: null,
+                      unitId: null, queued: true, wrapped: startPos > 0, sideKey, spawnOnly: true };
+                  break;
+              }
+          }
+      }
       if (!picked)
           return null;
       turn.lastPos[sideKey] = picked.pos;
+      if (picked.unit)
+          turn.actedNatural[sideKey].push(naturalIdentity(picked.unit));
       turn.nextSide = flipSide(sideKey);
       if (picked.wrapped) {
           turn.wrapCount[sideKey] = (turn.wrapCount[sideKey] ?? 0) + 1;
@@ -44986,11 +45041,36 @@ __modules['./turns/interleaved.ts'] = (exports, module, __require) => {
       }
       return picked;
   }
+  /** Read-only forecast used by the SSI HUD and summon placement preview. */
+  function predictNaturalActors(state, count = 6) {
+      const source = state.turn;
+      if (!source || source.mode !== 'interleaved_by_position')
+          return [];
+      const turn = {
+          ...source,
+          lastPos: { ...source.lastPos },
+          wrapCount: { ...source.wrapCount },
+          actedNatural: {
+              ALLY: [...(source.actedNatural?.ALLY ?? [])],
+              ENEMY: [...(source.actedNatural?.ENEMY ?? [])],
+          },
+      };
+      const forecastState = { ...state, turn };
+      const result = [];
+      for (let index = 0; index < Math.max(0, Math.floor(count)); index += 1) {
+          const selection = nextTurnInterleaved(forecastState, turn);
+          if (!selection)
+              break;
+          result.push(selection);
+      }
+      return result;
+  }
   //# sourceMappingURL=interleaved.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getSequentialOrderIndex')) exports.getSequentialOrderIndex = getSequentialOrderIndex;
   if (!Object.prototype.hasOwnProperty.call(exports, 'predictSpawnCycleByTurnOrder')) exports.predictSpawnCycleByTurnOrder = predictSpawnCycleByTurnOrder;
   if (!Object.prototype.hasOwnProperty.call(exports, 'findNextOccupiedPos')) exports.findNextOccupiedPos = findNextOccupiedPos;
   if (!Object.prototype.hasOwnProperty.call(exports, 'nextTurnInterleaved')) exports.nextTurnInterleaved = nextTurnInterleaved;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'predictNaturalActors')) exports.predictNaturalActors = predictNaturalActors;
 };
 __modules['./types/art.ts'] = (exports, module, __require) => {
 
@@ -45096,6 +45176,8 @@ __modules['./ui.ts'] = (exports, module, __require) => {
   const gameEvents = __dep1.gameEvents;
   const __dep2 = __require('./ui/dom.ts');
   const assertElement = __dep2.assertElement;
+  const __dep3 = __require('./turns/interleaved.ts');
+  const predictNaturalActors = __dep3.predictNaturalActors;
   const HUD_EVENT_TYPES = [TURN_START, TURN_END, ACTION_END];
   const SUMMON_BAR_RERENDER_EVENTS = HUD_EVENT_TYPES;
   function canQuery(node) {
@@ -45115,6 +45197,11 @@ __modules['./ui.ts'] = (exports, module, __require) => {
       const costChip = queryFromRoot('costChip') || doc.getElementById('costChip');
       const bottomHud = queryFromRoot('bottomHUD') || doc.getElementById('bottomHUD');
       let combatReason = queryFromRoot('combatReason') || doc.getElementById('combatReason');
+      const timeline = queryFromRoot('ssiTimeline') || doc.getElementById('ssiTimeline');
+      const debug = queryFromRoot('ssiDebug') || doc.getElementById('ssiDebug');
+      const forcedRail = queryFromRoot('ssiForced') || doc.getElementById('ssiForced');
+      let actionSerial = 0;
+      let currentActor = '—';
       if (!combatReason && bottomHud) {
           const node = doc.createElement('div');
           node.id = 'combatReason';
@@ -45141,10 +45228,29 @@ __modules['./ui.ts'] = (exports, module, __require) => {
           if (costChip) {
               costChip.classList.toggle('full', now >= cap);
           }
+          const interleaved = Game.turn?.mode === 'interleaved_by_position'
+              ? Game.turn
+              : null;
+          if (interleaved && Array.isArray(Game.tokens)) {
+              const forecast = predictNaturalActors(Game, 6);
+              const labels = forecast.map((pick, index) => {
+                  const name = pick.unit?.name ?? pick.unitId ?? (pick.spawnOnly ? 'Summon' : '—');
+                  return `<span class="ssi-step ${index === 0 ? 'is-next' : ''} ${pick.side}"><b>${pick.side === 'ally' ? 'A' : 'B'}${pick.pos}</b><small>${name}</small></span>`;
+              }).join('');
+              if (timeline)
+                  timeline.innerHTML = labels;
+              if (debug)
+                  debug.textContent = `#${actionSerial} actor=${currentActor} next=${forecast[0]?.unitId ?? '—'} side=${forecast[0]?.side ?? '—'} slot=${forecast[0]?.pos ?? '—'} lastPos A:${interleaved.lastPos.ALLY} E:${interleaved.lastPos.ENEMY} | ${forecast.map(p => `${p.side.charAt(0).toUpperCase()}${p.pos}`).join(' ')}`;
+          }
       };
       const handleGameEvent = (event) => {
           const detail = event.detail;
           const state = detail?.game ?? null;
+          if (event.type === TURN_START) {
+              actionSerial += 1;
+              const natural = event.detail;
+              currentActor = natural.unit?.name ?? natural.unit?.id ?? '—';
+          }
           if (state)
               update(state);
           if (event.type === ACTION_END && combatReason) {
@@ -45160,6 +45266,10 @@ __modules['./ui.ts'] = (exports, module, __require) => {
                       combatReason.textContent = fallback;
                       combatReason.title = fallback;
                   }
+              }
+              const action = event.detail;
+              if (forcedRail && action.slot == null) {
+                  forcedRail.textContent = `Chen hàng: ${action.unit?.id ?? 'forced action'} · không đổi cursor SSI`;
               }
           }
       };

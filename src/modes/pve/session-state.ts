@@ -706,6 +706,7 @@ export function createSession(options: CreateSessionOptions = {}): SessionState 
       slotCount: slotsPerSide,
       cycle: 0,
       busyUntil: 0,
+      actedNatural: { ALLY: [], ENEMY: [] },
     } satisfies TurnSnapshot
     : createSequentialTurnSnapshot();
 

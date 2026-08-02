@@ -84,9 +84,11 @@
     .pve-toolbar__button{padding:10px 16px;border-radius:12px;border:1px solid rgba(125,211,252,.28);background:rgba(15,24,32,.72);color:inherit;font-weight:600;cursor:pointer;transition:background .18s ease,transform .18s ease;}
     .pve-toolbar__button:hover{transform:translateY(-1px);background:rgba(20,30,40,.9);}
 
-.app--pve #boardWrap{background:var(--panel);border-top:1px solid #0b1218;border-bottom:1px solid #0b1218;border-radius:12px;margin:0 auto;padding:24px 28px;display:flex;justify-content:center;width:100%;max-width:1200px;}
+.app--pve #boardWrap{background:var(--panel);border:1px solid #172536;border-radius:14px;margin:0 auto;padding:16px 20px;display:flex;justify-content:center;width:100%;max-width:1200px;min-height:60vh;box-shadow:0 20px 55px rgba(0,0,0,.28);}
     .app--pve canvas{display:block;width:100%;height:auto;}
     .app--pve #board{height:auto;margin:0 auto;max-width:100%;}
+    .app--pve .ssi-panel{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:8px 14px;align-items:center;padding:10px 14px;border:1px solid rgba(125,211,252,.24);border-radius:14px;background:rgba(8,17,27,.88);}
+    .ssi-panel__label{font-size:12px;font-weight:800;letter-spacing:.12em;color:#9edfff;text-transform:uppercase}.ssi-timeline{display:grid;grid-template-columns:repeat(6,minmax(72px,1fr));gap:7px}.ssi-step{display:grid;padding:6px 8px;border-radius:9px;background:#121f2d;border:1px solid #263c52;line-height:1.1}.ssi-step.ally{border-color:#28775d}.ssi-step.enemy{border-color:#884553}.ssi-step.is-next{outline:2px solid #ffe080;transform:translateY(-1px)}.ssi-step small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a9bfd3;font-size:10px;margin-top:3px}.ssi-forced{color:#e6b6ff;font-size:11px;border-left:1px solid #554064;padding-left:12px}.ssi-debug{grid-column:1/-1;color:#70889d;font:10px/1.3 monospace;white-space:normal}.ssi-step.is-current{box-shadow:0 0 16px #7dd3fc}
     .app--pve .hud-bottom{width:100%;max-width:720px;margin:0 auto;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:12px 16px;align-items:center;}
     .app--pve .leader-ult-controls{width:100%;max-width:720px;margin:0 auto;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
     .app--pve .leader-ult-controls[hidden]{display:none !important;}

@@ -61,7 +61,14 @@ function ensureTurnState(turn: InterleavedTurnState): void {
   if (!Number.isFinite(turn.turnCount)){
     turn.turnCount = 0;
   }
+  if (!turn.actedNatural || typeof turn.actedNatural !== 'object') {
+    turn.actedNatural = { ALLY: [], ENEMY: [] };
+  }
+  turn.actedNatural.ALLY = Array.isArray(turn.actedNatural.ALLY) ? turn.actedNatural.ALLY : [];
+  turn.actedNatural.ENEMY = Array.isArray(turn.actedNatural.ENEMY) ? turn.actedNatural.ENEMY : [];
 }
+
+const naturalIdentity = (unit: UnitToken): string => String(unit.iid ?? unit.id ?? '');
 
 function buildSlotMaps(tokens: ReadonlyArray<UnitToken> | null | undefined): SlotMapBySide {
   if (!Array.isArray(tokens)) {
@@ -229,10 +236,48 @@ export function nextTurnInterleaved(
   const sideLower = SIDE_TO_LOWER[sideKey];
   const startPosRaw = Number.isFinite(turn.lastPos?.[sideKey]) ? turn.lastPos[sideKey] : 0;
   const startPos = clampInt(startPosRaw, 0, slotCount);
-  const picked = findNextOccupiedPos(state, sideKey, startPos, buildSlotMaps(state.tokens));
+  const slotMaps = buildSlotMaps(state.tokens);
+  const acted = new Set(turn.actedNatural?.[sideKey] ?? []);
+  let picked: InterleavedState | null = null;
+
+  // Finish the unvisited tail first. This is what makes a summon behind the
+  // cursor wait, while a summon ahead of it can still join this side pass.
+  for (let pos = startPos + 1; pos <= slotCount; pos += 1) {
+    const unit = slotMaps[sideKey].get(pos) ?? null;
+    if (unit?.alive && !acted.has(naturalIdentity(unit))) {
+      picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit,
+        unitId: unit.id ?? null, queued: false, wrapped: false, sideKey, spawnOnly: false };
+      break;
+    }
+    if (!unit && isQueueDue(state, sideLower, pos, turn.cycle)) {
+      picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit: null,
+        unitId: null, queued: true, wrapped: false, sideKey, spawnOnly: true };
+      break;
+    }
+  }
+
+  if (!picked) {
+    // A side pass ends only after its tail is exhausted. Moving an actor to a
+    // later slot cannot grant it another natural action in that pass.
+    turn.actedNatural![sideKey] = [];
+    for (let pos = 1; pos <= slotCount; pos += 1) {
+      const unit = slotMaps[sideKey].get(pos) ?? null;
+      if (unit?.alive) {
+        picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit,
+          unitId: unit.id ?? null, queued: false, wrapped: startPos > 0, sideKey, spawnOnly: false };
+        break;
+      }
+      if (isQueueDue(state, sideLower, pos, turn.cycle + 1)) {
+        picked = { mode: 'interleaved_by_position', side: sideLower, pos, unit: null,
+          unitId: null, queued: true, wrapped: startPos > 0, sideKey, spawnOnly: true };
+        break;
+      }
+    }
+  }
   if (!picked) return null;
 
   turn.lastPos[sideKey] = picked.pos;
+  if (picked.unit) turn.actedNatural![sideKey].push(naturalIdentity(picked.unit));
   turn.nextSide = flipSide(sideKey);
 
   if (picked.wrapped){
@@ -247,4 +292,27 @@ export function nextTurnInterleaved(
     turn.cycle = maxWrap;
   }
   return picked;
+}
+
+/** Read-only forecast used by the SSI HUD and summon placement preview. */
+export function predictNaturalActors(state: SessionState, count = 6): InterleavedState[] {
+  const source = state.turn as InterleavedTurnState | null;
+  if (!source || source.mode !== 'interleaved_by_position') return [];
+  const turn: InterleavedTurnState = {
+    ...source,
+    lastPos: { ...source.lastPos },
+    wrapCount: { ...source.wrapCount },
+    actedNatural: {
+      ALLY: [...(source.actedNatural?.ALLY ?? [])],
+      ENEMY: [...(source.actedNatural?.ENEMY ?? [])],
+    },
+  };
+  const forecastState = { ...state, turn } as SessionState;
+  const result: InterleavedState[] = [];
+  for (let index = 0; index < Math.max(0, Math.floor(count)); index += 1) {
+    const selection = nextTurnInterleaved(forecastState, turn);
+    if (!selection) break;
+    result.push(selection);
+  }
+  return result;
 }

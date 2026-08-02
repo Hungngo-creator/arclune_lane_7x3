@@ -10,10 +10,13 @@ import {
 
 import type { GameEventDetail } from './events.ts';
 import { assertElement } from './ui/dom.ts';
+import { predictNaturalActors } from './turns/interleaved.ts';
+import type { SessionState } from '@shared-types/combat';
+import type { InterleavedTurnState } from '@shared-types/turn-order';
 
 import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from '@shared-types/ui';
 
-type HudGameLike = { cost?: number | null; costCap?: number | null } | null | undefined;
+type HudGameLike = ({ cost?: number | null; costCap?: number | null; turn?: SessionState['turn']; tokens?: SessionState['tokens'] }) | null | undefined;
 const HUD_EVENT_TYPES = [TURN_START, TURN_END, ACTION_END] as const;
 const SUMMON_BAR_RERENDER_EVENTS = HUD_EVENT_TYPES;
 
@@ -37,6 +40,11 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
   const costChip = queryFromRoot<HTMLElement>('costChip') || doc.getElementById('costChip');
   const bottomHud = queryFromRoot<HTMLElement>('bottomHUD') || doc.getElementById('bottomHUD');
   let combatReason = queryFromRoot<HTMLElement>('combatReason') || doc.getElementById('combatReason');
+  const timeline = queryFromRoot<HTMLElement>('ssiTimeline') || doc.getElementById('ssiTimeline');
+  const debug = queryFromRoot<HTMLElement>('ssiDebug') || doc.getElementById('ssiDebug');
+  const forcedRail = queryFromRoot<HTMLElement>('ssiForced') || doc.getElementById('ssiForced');
+  let actionSerial = 0;
+  let currentActor = '—';
 
   if (!combatReason && bottomHud) {
     const node = doc.createElement('div');
@@ -65,6 +73,18 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
     if (costChip){
       costChip.classList.toggle('full', now >= cap);
     }
+    const interleaved = Game.turn?.mode === 'interleaved_by_position'
+      ? Game.turn as InterleavedTurnState
+      : null;
+    if (interleaved && Array.isArray(Game.tokens)) {
+      const forecast = predictNaturalActors(Game as SessionState, 6);
+      const labels = forecast.map((pick, index) => {
+        const name = pick.unit?.name ?? pick.unitId ?? (pick.spawnOnly ? 'Summon' : '—');
+        return `<span class="ssi-step ${index === 0 ? 'is-next' : ''} ${pick.side}"><b>${pick.side === 'ally' ? 'A' : 'B'}${pick.pos}</b><small>${name}</small></span>`;
+      }).join('');
+      if (timeline) timeline.innerHTML = labels;
+      if (debug) debug.textContent = `#${actionSerial} actor=${currentActor} next=${forecast[0]?.unitId ?? '—'} side=${forecast[0]?.side ?? '—'} slot=${forecast[0]?.pos ?? '—'} lastPos A:${interleaved.lastPos.ALLY} E:${interleaved.lastPos.ENEMY} | ${forecast.map(p => `${p.side.charAt(0).toUpperCase()}${p.pos}`).join(' ')}`;
+    }
   };
 
   const handleGameEvent = (event: GameEventDetail<typeof TURN_START | typeof TURN_END | typeof ACTION_END>) => {
@@ -80,6 +100,11 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
       } | null;
     } | undefined;
     const state = detail?.game ?? null;
+    if (event.type === TURN_START) {
+      actionSerial += 1;
+      const natural = event.detail as unknown as { unit?: { id?: string; name?: string }; side?: string; slot?: number };
+      currentActor = natural.unit?.name ?? natural.unit?.id ?? '—';
+    }
     if (state) update(state);
 
     if (event.type === ACTION_END && combatReason) {
@@ -94,6 +119,10 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
           combatReason.textContent = fallback;
           combatReason.title = fallback;
         }
+      }
+      const action = event.detail as unknown as { orderIndex?: number | null; slot?: number | null; unit?: { id?: string } };
+      if (forcedRail && action.slot == null) {
+        forcedRail.textContent = `Chen hàng: ${action.unit?.id ?? 'forced action'} · không đổi cursor SSI`;
       }
     }
   };

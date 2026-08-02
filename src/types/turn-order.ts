@@ -32,6 +32,8 @@ export interface InterleavedTurnState {
   slotCount: number;
   cycle: number;
   busyUntil: number;
+  /** Unit identities already granted a natural action in the current pass of each side. */
+  actedNatural?: Record<TurnSideKey, string[]>;
   completed?: boolean;
   order?: undefined;
 }

@@ -934,6 +934,12 @@ function renderPveLayout(options: RenderPveLayoutOptions): HTMLElement | null{
       </div>
     </div>
     <div class="pve-stage">
+    <section class="ssi-panel" aria-label="Natural SSI timeline">
+        <div class="ssi-panel__label">Natural SSI</div>
+        <div id="ssiTimeline" class="ssi-timeline"></div>
+        <div id="ssiForced" class="ssi-forced" aria-live="polite">Chen hàng: —</div>
+        <output id="ssiDebug" class="ssi-debug"></output>
+      </section>
       <div id="boardWrap">
         <canvas id="board"></canvas>
       </div>
