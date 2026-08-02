@@ -13,6 +13,9 @@ async function tryImportModule(moduleId){
   return pickModuleDefault(await import(moduleId));
 }
 try {
+  if (process.env.ARCLUNE_FORCE_ESBUILD_FALLBACK === '1'){
+    throw new Error('fallback requested by ARCLUNE_FORCE_ESBUILD_FALLBACK');
+  }
   esbuild = await tryImportModule('esbuild');
 } catch (err) {
   esbuild = await tryImportModule('./tools/esbuild-stub/index.js');
@@ -297,11 +300,20 @@ async function transformIfScript(raw, ext, sourcefile){
   if (!SCRIPT_EXTENSIONS.has(ext)){
     return raw;
   }
-  const { code } = await esbuild.transform(raw, {
+  const { code, warnings = [] } = await esbuild.transform(raw, {
     loader: loaderForExtension(ext),
     sourcefile,
     ...ESBUILD_TRANSFORM_OPTIONS,
   });
+  const errors = warnings.filter((diagnostic) => diagnostic?.level === 'error');
+  if (errors.length){
+    const details = errors.map((diagnostic) => {
+      const location = diagnostic.location;
+      const at = location ? `${location.file || sourcefile}:${location.line || 1}:${location.column || 1}` : sourcefile;
+      return `${at}: ${diagnostic.text || 'TypeScript transform failed'}`;
+    });
+    throw new Error(`Không thể chuyển đổi TypeScript:\n${details.join('\n')}`);
+  }
   return code;
 }
 

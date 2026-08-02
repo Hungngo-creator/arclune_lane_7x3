@@ -144,7 +144,7 @@ function collectReservedCellKeys(
 
 function partitionAliveTokensBySide(
   Game: SessionState,
-  aliveTokens?: readonly UnitToken[] | null,
+  aliveTokens: readonly UnitToken[] | null = null,
 ): { alive: readonly UnitToken[]; allies: UnitToken[]; enemies: UnitToken[] } {
   const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
   const allies: UnitToken[] = [];
@@ -272,7 +272,7 @@ function getDeck(Game: SessionState): DeckState {
   return normalized;
 }
 
-function listEmptyEnemySlots(Game: SessionState, aliveTokens?: readonly UnitToken[] | null): CandidateCell[] {
+function listEmptyEnemySlots(Game: SessionState, aliveTokens: readonly UnitToken[] | null = null): CandidateCell[] {
   const alive = Array.isArray(aliveTokens) ? aliveTokens : tokensAlive(Game);
   const reserved = collectReservedCellKeys(alive, Game.queued);
   const out: CandidateCell[] = [];
@@ -324,7 +324,7 @@ function summonerFeasibility(
   meta: CandidateMeta,
   summonSpec: ResolvedSummonSpec,
   baseSlot: number,
-  aliveTokens?: readonly UnitToken[] | null,
+  aliveTokens: readonly UnitToken[] | null = null,
 ): number {
   if (!meta || meta.class !== 'Summoner') return 1;
   if (!summonSpec) return 1;
@@ -341,7 +341,7 @@ function summonerFeasibility(
 function candidateBlocked(
   Game: SessionState,
   entry: CandidateEvaluation | null | undefined,
-  aliveTokens?: readonly UnitToken[] | null,
+  aliveTokens: readonly UnitToken[] | null = null,
 ): string | null {
   if (!entry) return 'invalid';
   const alive = aliveTokens ?? tokensAlive(Game);
@@ -455,7 +455,7 @@ export function queueEnemyAt(
   slot: number,
   cx: number,
   cy: number,
-  aliveTokens?: readonly UnitToken[] | null,
+  aliveTokens: readonly UnitToken[] | null = null,
 ): boolean {
   const cost = Number.isFinite(card.cost) ? card.cost : NaN;
   if (!Number.isFinite(cost) || Game.ai.cost < cost) return false;
