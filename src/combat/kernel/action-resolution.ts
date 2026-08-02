@@ -15,7 +15,6 @@ const assert: (condition: unknown, message: string) => asserts condition = (cond
 
 /** Resolves every target from the same pre-action snapshot without mutation. */
 export function resolveAction(command: ActionResolutionCommand): ActionResolution {
-  assert(command.damageBatches.length > 0, 'action resolution requires at least one batch');
   assert(command.damageBatches.every(batch => batch.identity.actionId === command.identity.actionId), 'batch belongs to another action');
   const targets = new Map<string | number, ActionResolutionSnapshot['targetSnapshots'][number]>();
   for (const batch of command.damageBatches) for (const target of batch.targets) targets.set(target.iid, { iid: target.iid, hp: target.currentHp, hpMax: target.maxHp, lifeSerial: target.lifeSerial, shield: batch.packets[0]?.targetIid === target.iid ? batch.shieldSnapshot : 0 });
@@ -24,6 +23,7 @@ export function resolveAction(command: ActionResolutionCommand): ActionResolutio
 
 /** Prevalidates the complete action, then commits every shield/HP before publishing success or lethal candidates. */
 export function commitActionResolution(game: SessionState, resolution: ActionResolution, targets: readonly UnitToken[]): ActionCommitResult {
+  assert(new Set(resolution.snapshot.command.targetOrder).size === resolution.snapshot.command.targetOrder.length, 'targetOrder contains duplicates');
   const byIid = new Map(targets.map(target => [target.iid ?? target.id, target]));
   for (const snapshot of resolution.snapshot.targetSnapshots) { const target = byIid.get(snapshot.iid); assert(target, `target ${String(snapshot.iid)} missing`); assert(Number(target.hp ?? 0) === snapshot.hp && Number(target.hpMax ?? 0) === snapshot.hpMax && Number(target.lifeSerial ?? 1) === snapshot.lifeSerial, `stale target ${String(snapshot.iid)}`); }
   for (const batch of resolution.batches) { const primary = byIid.get(batch.packetResolutions[0]!.packet.targetIid); assert(primary && readShieldAmount(primary) === batch.shieldBefore, 'stale shield snapshot'); }

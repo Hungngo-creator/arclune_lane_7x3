@@ -23,7 +23,7 @@ import {
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
 import { runRuntimeBasicAttackResolved, runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
-import { commitDamageBatch, createLegacyDetachedAction, createLinkedAction, createNaturalAction, currentActionExecution, nextActionPacket, resolveDamageBatch, resolveDamagePacket, resolveSourceAttribution, withActionExecution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
+import { commitDamageBatch, createLinkedAction, createNaturalAction, currentActionExecution, nextActionPacket, resolveDamageBatch, resolveDamagePacket, resolveSourceAttribution, withActionExecution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
 
 export { applyDamage, grantShield };
 
@@ -427,6 +427,11 @@ export function dealAbilityDamage(
   target: UnitToken | null | undefined,
   opts: AbilityDamageOptions = {}
 ): AbilityDamageResult {
+  // Public ability damage is itself the compatibility boundary: callers that do
+  // not already own a cast receive a real natural action, never a detached id.
+  if (Game && !currentActionExecution(Game) && !opts.actionIdentity) {
+    return withActionExecution(Game, createNaturalAction(Game, String(opts.attackType ?? 'ability')), () => dealAbilityDamage(Game, attacker, target, opts));
+  }
   if (!attacker || !target || !target.alive) {
     return {
       dealt: 0,
@@ -474,7 +479,9 @@ export function dealAbilityDamage(
   const breakdownMultiplier = Math.max(0, 1 + bonusBreakdown.classBonus + bonusBreakdown.elementBonus + bonusBreakdown.synergyBonus);
   const execution = Game ? currentActionExecution(Game) : null;
   if (!Game && !opts.actionIdentity) throw new Error('[combat-kernel] detached damage requires explicit identity');
-  const identity = opts.actionIdentity ?? execution?.identity ?? createLegacyDetachedAction(Game!, attackType);
+  if (Game && !execution && !opts.actionIdentity) throw new Error('[combat-kernel] production damage requires an ActionExecutionContext');
+  const identity = opts.actionIdentity ?? execution?.identity;
+  if (!identity) throw new Error('[combat-kernel] detached damage requires explicit identity');
   const controller = attacker.ownerIid != null ? Game?.tokens.find(unit => unit.iid === attacker.ownerIid) ?? null : attacker;
   const source = resolveSourceAttribution({ immediateSource: attacker, controller: controller ?? attacker.ownerIid ?? attacker, trueSelf: controller?.trueSelfId ?? attacker.trueSelfId ?? null, owner: controller ?? attacker.ownerIid ?? attacker });
   const componentSpecs = dtype === 'mixed' ? [['physical', physWeight], ['will', arcWeight]] as const : [[dtype === 'arcane' ? 'will' : dtype, 1]] as const;
@@ -853,15 +860,18 @@ export function doBasicWithFollowups(
   onFollowup?: (index: number) => void,
 ): void {
   try {
-    basicAttack(Game, unit);
-    const parent = currentActionExecution(Game)?.identity ?? null;
+    const parent = createNaturalAction(Game, 'basic');
     const followupCount = Math.max(0, cap | 0);
-    for (let i = 0; i < followupCount; i += 1) {
-      if (!unit || !unit.alive) break;
-      if (parent) withActionExecution(Game, createLinkedAction(Game, parent, 'followup'), () => executeBasicAttack(Game, unit));
-      else basicAttack(Game, unit);
-      onFollowup?.(i);
-    }
+    withActionExecution(Game, parent, (root) => {
+      executeBasicAttack(Game, unit);
+      for (let i = 0; i < followupCount; i += 1) {
+        if (!unit || !unit.alive) break;
+        withActionExecution(Game, createLinkedAction(Game, parent, 'followup'), () => executeBasicAttack(Game, unit), {
+          triggerLedger: root.triggerLedger, originActionId: parent.actionId,
+        });
+        onFollowup?.(i);
+      }
+    });
   } catch (error) {
     console.error('[doBasicWithFollowups]', error);
   }

@@ -14,3 +14,7 @@ export * from './combat-identity.ts';
 export * from './hp-mutation.ts';
 export * from './life-cycle.ts';
 export * from './action-resolution.ts';
+export * from './action-transaction.ts';
+export * from './battle-end.ts';
+export * from './non-death-removal.ts';
+export * from './delayed-revive.ts';

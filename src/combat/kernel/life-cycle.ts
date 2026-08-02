@@ -9,16 +9,18 @@ export interface HPZeroCandidate {
   targetIid: string | number; trueSelfId: string | null; lifeSerial: number; actionId: string | number; chainId: string | number;
   parentActionId: string | number | null; source: SourceAttribution; causeKind: DeathCauseKind; committedHpDamage: number; overkill: number;
   slot: number; position: { cx: number; cy: number }; isLeader: boolean; isSummon: boolean; countsForReincarnation: boolean; eventSerial: number;
+  entityKind: 'collection-unit' | 'leader' | 'npc' | 'boss' | 'summon' | 'summoned-creep' | 'clone' | 'combat-object'; countsForKill: boolean; countsForKillReward: boolean; canRevive: boolean; removalPolicy: string;
 }
 export interface DeathRecord extends HPZeroCandidate {
   deathId: string; deathSerial: number; countsForKill: boolean; revivable: boolean; confirmedEventSerial: number;
 }
-export interface DeathPreventionDecision { prevent: boolean; hp: number; effectId: string; authority?: string; priority?: number }
+export interface DeathPreventionDecision { prevent: boolean; hp: number; effectId: string; authority?: 'normal' | 'rule' | 'law' | 'axiom'; priority?: number; explicitPriority?: number; registrationSerial?: number; charge?: Readonly<Record<string, unknown>>; source?: SourceAttribution }
 export interface DeathPreventionRequest { candidate: HPZeroCandidate; decisions: readonly DeathPreventionDecision[] }
 export interface ReviveRequest { death: DeathRecord; hpPolicy: { kind: 'flat' | 'ratio'; value: number }; ragePolicy: 'preserve' | 'reset'; aePolicy: 'preserve' | 'reset'; buffPolicy: 'preserve' | 'purge'; positionPolicy: 'preserve'; source: SourceAttribution; authority?: string; allowSummon?: boolean }
 export interface ReviveResult { committed: boolean; reason: string | null; targetIid: string | number; lifeSerial: number }
 
-type LifecycleRuntime = { combatEvents?: Record<string, unknown>[]; hpZeroCandidates?: HPZeroCandidate[]; deathRecords?: DeathRecord[]; trueSelfRecords?: Record<string, { confirmedKills: number }>; battleEnd?: { over: boolean; winner: Side | 'draw' | null } };
+type PreventionCollector = (candidate: HPZeroCandidate) => DeathPreventionDecision | readonly DeathPreventionDecision[] | null;
+type LifecycleRuntime = { combatEvents?: Record<string, unknown>[]; hpZeroCandidates?: HPZeroCandidate[]; deathRecords?: DeathRecord[]; deathRecordById?: Record<string, DeathRecord>; openHpZeroKeys?: string[]; confirmedLifeKeys?: string[]; preventedLifeKeys?: string[]; revivedDeathIds?: string[]; deathPreventionRegistrations?: Array<{ serial: number; collect: PreventionCollector }>; deathPreventionSerial?: number; trueSelfRecords?: Record<string, { confirmedKills: number }>; battleEnd?: { over: boolean; winner: Side | 'draw' | null } };
 const runtime = (game: SessionState): LifecycleRuntime => (game.runtime ??= {}) as LifecycleRuntime;
 const emit = (game: SessionState, event: Record<string, unknown>): void => { (runtime(game).combatEvents ??= []).push(event); };
 export const getLifeState = (unit: UnitToken): LifeState => unit.lifeState ?? (unit.alive && (unit.hp ?? 0) > 0 ? 'alive' : 'dead-confirmed');
@@ -29,6 +31,17 @@ export function markDeathPrevented(unit: UnitToken, hp = 1): void { unit.hp = Ma
 export function markDeathConfirmed(unit: UnitToken): void { unit.lifeState = 'dead-confirmed'; unit.alive = false; }
 export function markRemoved(unit: UnitToken): void { unit.lifeState = 'removed'; unit.alive = false; }
 export function markErased(unit: UnitToken): void { unit.lifeState = 'erased'; unit.alive = false; }
+const lifeKey = (iid: string | number, serial: number): string => `${String(iid)}:${serial}`;
+const authorityRank: Record<string, number> = { normal: 0, rule: 1, law: 2, axiom: 3 };
+export function registerDeathPrevention(game: SessionState, collect: PreventionCollector): () => void {
+  const state = runtime(game); const item = { serial: (state.deathPreventionSerial = (state.deathPreventionSerial ?? 0) + 1), collect }; (state.deathPreventionRegistrations ??= []).push(item);
+  return () => { state.deathPreventionRegistrations = state.deathPreventionRegistrations?.filter(entry => entry !== item); };
+}
+export function collectDeathPreventionDecisions(game: SessionState, candidate: HPZeroCandidate): DeathPreventionDecision[] {
+  const decisions: DeathPreventionDecision[] = [];
+  for (const registration of runtime(game).deathPreventionRegistrations ?? []) { const found = registration.collect(candidate); for (const decision of found ? (Array.isArray(found) ? found : [found]) : []) decisions.push({ ...decision, registrationSerial: decision.registrationSerial ?? registration.serial }); }
+  return decisions.sort((a, b) => ((authorityRank[b.authority ?? 'normal'] ?? 0) - (authorityRank[a.authority ?? 'normal'] ?? 0)) || ((b.explicitPriority ?? b.priority ?? 0) - (a.explicitPriority ?? a.priority ?? 0)) || ((a.registrationSerial ?? 0) - (b.registrationSerial ?? 0)) || a.effectId.localeCompare(b.effectId));
+}
 
 export function createHpZeroCandidate(game: SessionState, target: UnitToken, identity: ActionIdentity, source: SourceAttribution, causeKind: DeathCauseKind, hpDamage: number, overkill = 0): HPZeroCandidate {
   if (!target.trueSelfId && !target.isMinion && (target.hpMax ?? 0) > 0) throw new Error('[combat-lifecycle] HP-bearing non-summon is missing trueSelfId');
@@ -36,43 +49,50 @@ export function createHpZeroCandidate(game: SessionState, target: UnitToken, ide
   const candidate: HPZeroCandidate = { targetIid: target.iid ?? target.id, trueSelfId: target.trueSelfId ?? null, lifeSerial: target.lifeSerial ?? 1,
     actionId: identity.actionId, chainId: identity.chainId, parentActionId: identity.parentActionId, source, causeKind, committedHpDamage: hpDamage, overkill,
     slot: target.cy * 3 + target.cx, position: { cx: target.cx, cy: target.cy }, isLeader: target.isLeader === true, isSummon: target.isMinion === true,
-    countsForReincarnation: target.isMinion !== true, eventSerial: nextEventSerial(game) };
+    countsForReincarnation: target.isMinion !== true, eventSerial: nextEventSerial(game), entityKind: target.isLeader ? 'leader' : target.isMinion ? 'summon' : 'collection-unit', countsForKill: target.countsForKill !== false, countsForKillReward: target.countsForKill !== false, canRevive: target.revivable !== false && !target.isMinion, removalPolicy: 'remain' };
   const queue = runtime(game).hpZeroCandidates ??= [];
-  if (!queue.some(item => item.targetIid === candidate.targetIid && item.lifeSerial === candidate.lifeSerial)) queue.push(candidate);
-  emit(game, { type: 'HP_ZERO', ...candidate });
+  const key = lifeKey(candidate.targetIid, candidate.lifeSerial); const opened = runtime(game).openHpZeroKeys ??= [];
+  if (!opened.includes(key)) { opened.push(key); queue.push(candidate); emit(game, { type: 'HP_ZERO', ...candidate }); }
   return candidate;
 }
 
 export function resolveDeathWave(game: SessionState, prevention: (request: DeathPreventionRequest) => DeathPreventionDecision | null = () => null): DeathRecord[] {
   const state = runtime(game); const queued = state.hpZeroCandidates ?? []; state.hpZeroCandidates = [];
-  const candidates = [...new Map(queued.map(item => [`${item.targetIid}:${item.lifeSerial}`, item])).values()].sort((a, b) => a.slot - b.slot || String(a.targetIid).localeCompare(String(b.targetIid)) || a.eventSerial - b.eventSerial);
+  const confirmedKeys = state.confirmedLifeKeys ??= []; const preventedKeys = state.preventedLifeKeys ??= [];
+  const candidates = [...new Map(queued.map(item => [lifeKey(item.targetIid, item.lifeSerial), item])).values()].filter(item => !confirmedKeys.includes(lifeKey(item.targetIid, item.lifeSerial)) && !preventedKeys.includes(lifeKey(item.targetIid, item.lifeSerial))).sort((a, b) => a.slot - b.slot || String(a.targetIid).localeCompare(String(b.targetIid)) || a.eventSerial - b.eventSerial);
   const tokens = new Map(game.tokens.map(unit => [unit.iid ?? unit.id, unit]));
   for (const candidate of candidates) { const target = tokens.get(candidate.targetIid); if (target) markDeathPrevention(target); emit(game, { type: 'DEATH_PREVENTION_OPENED', ...candidate, eventSerial: nextEventSerial(game) }); }
   const confirmed: Array<{ candidate: HPZeroCandidate; target: UnitToken }> = [];
   for (const candidate of candidates) {
     const target = tokens.get(candidate.targetIid); if (!target || (target.lifeSerial ?? 1) !== candidate.lifeSerial) continue;
-    const decision = prevention({ candidate, decisions: [] });
-    if (decision?.prevent) { markDeathPrevented(target, decision.hp); emit(game, { type: 'DEATH_PREVENTED', eventSerial: nextEventSerial(game), actionId: candidate.actionId, chainId: candidate.chainId, targetIid: candidate.targetIid, trueSelfId: candidate.trueSelfId, lifeSerial: candidate.lifeSerial, decision }); }
+    if (Number(target.hp ?? 0) !== 0 || getLifeState(target) !== 'death-prevention') continue;
+    const collected = collectDeathPreventionDecisions(game, candidate); const decision = collected[0] ?? prevention({ candidate, decisions: collected });
+    if (decision?.prevent) { markDeathPrevented(target, Math.min(Number(target.hpMax ?? 1), decision.hp)); preventedKeys.push(lifeKey(candidate.targetIid, candidate.lifeSerial)); emit(game, { type: 'DEATH_PREVENTED', eventSerial: nextEventSerial(game), actionId: candidate.actionId, chainId: candidate.chainId, targetIid: candidate.targetIid, trueSelfId: candidate.trueSelfId, lifeSerial: candidate.lifeSerial, decision }); }
     else confirmed.push({ candidate, target });
   }
   for (const item of confirmed) markDeathConfirmed(item.target);
   const records = confirmed.map(({ candidate, target }) => {
     const deathSerial = nextDeathSerial(game); const record: DeathRecord = { ...candidate, deathId: `death-${deathSerial}`, deathSerial, countsForKill: target.countsForKill !== false, revivable: target.revivable !== false, confirmedEventSerial: nextEventSerial(game) };
+  confirmedKeys.push(lifeKey(candidate.targetIid, candidate.lifeSerial));
     emit(game, { type: 'DEATH_CONFIRMED', ...record, eventSerial: record.confirmedEventSerial });
     if (record.countsForKill && record.source.creditTrueSelfId && record.source.creditTrueSelfId !== record.trueSelfId) { const owner = state.trueSelfRecords ??= {}; (owner[String(record.source.creditTrueSelfId)] ??= { confirmedKills: 0 }).confirmedKills += 1; emit(game, { type: 'KILL_CREDIT_GRANTED', eventSerial: nextEventSerial(game), deathId: record.deathId, actionId: record.actionId, chainId: record.chainId, targetIid: record.targetIid, trueSelfId: record.trueSelfId, lifeSerial: record.lifeSerial, creditTrueSelfId: record.source.creditTrueSelfId }); }
     return record;
   });
-  (state.deathRecords ??= []).push(...records); return records;
+  (state.deathRecords ??= []).push(...records); const registry = state.deathRecordById ??= {}; records.forEach(record => { registry[record.deathId] = record; }); return records;
 }
 
 export function commitImmediateRevive(game: SessionState, target: UnitToken, request: ReviveRequest): ReviveResult {
   const death = request.death;
+  const state = runtime(game); const canonical = state.deathRecordById?.[death.deathId];
+  if (!canonical || canonical !== death || canonical.revivable !== true || death.canRevive !== true) return { committed: false, reason: 'invalid-or-non-revivable-death', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
+  if (target.trueSelfId !== death.trueSelfId) return { committed: false, reason: 'identity-mismatch', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
   if ((target.iid ?? target.id) !== death.targetIid || getLifeState(target) !== 'dead-confirmed' || (target.lifeSerial ?? 1) !== death.lifeSerial) return { committed: false, reason: 'stale-or-not-dead', targetIid: death.targetIid, lifeSerial: target.lifeSerial ?? 1 };
   if (death.isSummon && !request.allowSummon) return { committed: false, reason: 'summon-not-revivable', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
-  if ((runtime(game).combatEvents ?? []).some(event => event.type === 'REVIVE_COMMITTED' && event.deathId === death.deathId)) return { committed: false, reason: 'already-revived', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
+  const consumed = state.revivedDeathIds ??= []; if (consumed.includes(death.deathId)) return { committed: false, reason: 'already-revived', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
   const hpMax = Math.max(1, Number(target.hpMax ?? 1)); const hp = request.hpPolicy.kind === 'ratio' ? Math.floor(hpMax * request.hpPolicy.value) : Math.floor(request.hpPolicy.value);
   target.hp = Math.max(1, Math.min(hpMax, hp)); const lifeSerial = beginRevivedLife(target); target.lifeState = 'alive'; target.alive = true;
-  if (request.ragePolicy === 'reset') target.rage = 0; if (request.aePolicy === 'reset') target.ae = 0; if (request.buffPolicy === 'purge') target.statuses = [];
+  if (request.ragePolicy === 'reset') target.rage = 0; if (request.buffPolicy === 'purge') target.statuses = target.statuses?.filter(status => status.kind !== 'debuff' || status.unpurgeable === true) ?? [];
+  consumed.push(death.deathId);
   emit(game, { type: 'REVIVE_COMMITTED', eventSerial: nextEventSerial(game), deathId: death.deathId, actionId: death.actionId, chainId: death.chainId, targetIid: death.targetIid, trueSelfId: death.trueSelfId, lifeSerial, hp: target.hp, source: request.source, authority: request.authority ?? null });
   return { committed: true, reason: null, targetIid: death.targetIid, lifeSerial };
 }

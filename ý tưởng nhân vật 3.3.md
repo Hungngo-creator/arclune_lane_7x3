@@ -1350,6 +1350,10 @@ Thiện Xạ chỉ kích hoạt khi nhân vật này không bị cc cứng và v
 
 nếu có nhiều hơn 1 kẻ thù bị hất tung cùng lúc, hắn cùng lúc kích hoạt thiện xạ lên tất cả mục tiêu nhưng cap chỉ +1.
 
+skill 1: đánh dấu 1 ô bất kỳ trên sân phe địch trừ ô 8 của leader, nếu có kẻ thù đứng trên ô bị đánh dấu và chúng hành động thành công 2 turn liên tiếp, ngay sau khi chúng hành động thành công 2 turn liên tiếp của bản thân chúng, lập tức chúng sẽ bị hất tung trong 1s. Nhân vật này miễn kích hoạt được Thiện Xạ lên mục tiêu đứng vào ô bị đánh dấu thì phát thiện xạ đó sẽ không bị tính vào cap 5 của nội tại thiện xạ nhưng tăng atk vẫn nhận được và vẫn không bị tính vào cap tăng atk từ nội tại của hắn, sau khi kích hoạt thiện xạ lên mục tiêu đứng vào ô bị đánh dấu hắn +2% atk cho đến khi rời sân, nếu đã đánh dấu mà nhân vật này rời sân thì ô bị đánh dấu sẽ không bị đánh dấu ngay lập tức. cost 5 ae. không cd, tồn tại tối đa 3 ô bị đánh dấu cùng lúc, ô đánh dấu không bị giới hạn time tồn tại mà chỉ biến mất khi kích hoạt hất tung. Hất tung đối tanker có rank cao hơn bản thân hắn vô hiệu.
 
 
 
+75) 
+
+ultimate: triệu hồi 3 trụ đá ngẫu nhiên (không thể trùng, nếu không đủ 3 kẻ thù chỉ triệu hồi 2 hoặc 1 trụ đá theo trường hợp) tấn công mục tiêu từ dưới chân chúng, gây sát thương bằng 1 đánh thường của bản thân/mỗi kẻ bị trụ đá tấn công, khiến chúng bị hất tung trong 1s, sau 1s, chúng rơi xuống vị trí cũ, nhận sát thương chuẩn = 3% max hp của bản thân chúng, ultimate này đối class tanker cao hơn bản thân không thể hất tung, phần sát thương 1 đánh thường tanker địch vẫn nhận nhưng hất tung và sát thương chuẩn sẽ không nhận (nếu tanker rank cao hơn bản thân), ultimate chọn target cũng ưu tiên mục tiêu không phải class tanker.
