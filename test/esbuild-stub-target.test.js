@@ -65,7 +65,7 @@ test('installed esbuild stub uses the current repository transpiler', async () =
   assert.doesNotThrow(() => new Function('input', code));
 });
 
-test('offline runtime uses a parser-backed transform for the complete ai module', () => {
+test('offline runtime uses Node type stripping for the complete ai module', () => {
   const script = `
     const fs = require('node:fs');
     const vm = require('node:vm');
@@ -82,5 +82,5 @@ test('offline runtime uses a parser-backed transform for the complete ai module'
   });
 
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout, 'node-parser');
+  assert.equal(result.stdout, 'node-strip');
 });

@@ -188,10 +188,15 @@ async function build(options = {}) {
   return result;
 }
 
+function getFallbackTransformerKind() {
+  return getTypeScriptTranspiler().__arcTransformerKind || 'unknown';
+}
+
 module.exports = {
   transform,
   transformSync,
   build,
+  getFallbackTransformerKind,
 };
 
 module.exports.__arcStub = true;

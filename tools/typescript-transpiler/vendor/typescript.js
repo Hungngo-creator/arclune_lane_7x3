@@ -118,7 +118,7 @@ function fallbackTranspileModule(source, options = {}) {
   try {
     outputText = typeof stripTypeScriptTypes === "function"
       ? stripTypeScriptTypes(String(source), {
-          mode: "transform",
+          mode: "strip",
           sourceMap: false,
           sourceUrl: sourceFile,
         })
@@ -226,6 +226,6 @@ module.exports = {
   __arcTransformerKind: realTypescript
     ? "typescript"
     : typeof stripTypeScriptTypes === "function"
-      ? "node-parser"
+      ? "node-strip"
       : "legacy-regex",
 };
