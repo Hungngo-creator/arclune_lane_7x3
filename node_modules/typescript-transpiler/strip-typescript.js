@@ -264,7 +264,10 @@ function stripTypeAnnotations(source) {
 
   code = code.replace(/([,\(]\s*\.{3}[A-Za-z_$][\w$]*)\s*:\s*([^=,\)]+)/g, "$1");
 
-  code = code.replace(/([,\(]\s*[A-Za-z_$][\w$]*)(\??)\s*:\s*([^=,\)]+)/g, "$1$2");
+  // `?` belongs to TypeScript's optional-parameter syntax, not to the emitted
+  // JavaScript identifier. Keeping it produces invalid output such as
+  // `function example(value?) {}` when the real TypeScript runtime is absent.
+  code = code.replace(/([,\(]\s*[A-Za-z_$][\w$]*)\??\s*:\s*([^=,\)]+)/g, "$1");
 
   code = code.replace(/\?:/g, ":");
 

@@ -2,6 +2,7 @@
 import fs from 'fs/promises';
 import fsSync from 'fs';
 import path from 'path';
+import vm from 'node:vm';
 import { fileURLToPath } from 'url';
 import { verifyAetherBundle } from './tools/verify-aether-bundle.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -825,6 +826,17 @@ function formatBytes(bytes){
   return `${display} ${units[index]}`;
 }
 
+function assertValidJavaScript(code, filename){
+  try {
+    new vm.Script(code, { filename });
+  } catch (error){
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`Bundle sinh ra không phải JavaScript hợp lệ (${filename}): ${detail}`, {
+      cause: error,
+    });
+  }
+}
+
 function logTopBundleSizes(metafile, limit = 5){
   if (!metafile || !metafile.outputs){
     return;
@@ -975,6 +987,7 @@ async function build(){
   });
   const outputFile = result.outputFiles?.[0];
   const transpiled = outputFile?.text ?? '';
+  assertValidJavaScript(transpiled, 'dist/app.js');
   await fs.writeFile(path.join(DIST_DIR, 'app.js'), transpiled, 'utf8');
   if (result.metafile){
     const reportPath = path.join(DIST_DIR, 'build-report.json');
