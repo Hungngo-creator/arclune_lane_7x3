@@ -12,3 +12,5 @@ export * from './reaction-policy.ts';
 export * from './action-context.ts';
 export * from './combat-identity.ts';
 export * from './hp-mutation.ts';
+export * from './life-cycle.ts';
+export * from './action-resolution.ts';

@@ -58,4 +58,3 @@ test('typed costs and max HP policies remain non-damage transactions', () => {
   expect(resolveMaxHpMutation(target, 40, 'set-value', 'preserve-ratio', source)).toMatchObject({ maxHpAfter: 40, hpAfter: 20 });
   expect(resolveReactionPolicy('reflected')).toMatchObject({ canReflect: false, canLifesteal: false, aggregation: 'action' });
 });
-

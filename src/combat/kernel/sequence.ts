@@ -1,12 +1,14 @@
 import type { SessionState } from '@shared-types/combat';
 import type { ActionIdentity } from './types.ts';
 
-export interface CombatSequenceState { actionSerial: number; chainSerial: number; eventSerial: number }
+export interface CombatSequenceState { actionSerial: number; chainSerial: number; eventSerial: number; deathSerial: number }
 type RuntimeSequence = { combatSequence?: CombatSequenceState };
 
 export function getCombatSequence(game: SessionState): CombatSequenceState {
   const runtime = (game.runtime ??= {}) as RuntimeSequence;
-  return runtime.combatSequence ??= { actionSerial: 0, chainSerial: 0, eventSerial: 0 };
+  const sequence = runtime.combatSequence ??= { actionSerial: 0, chainSerial: 0, eventSerial: 0, deathSerial: 0 };
+  sequence.deathSerial ??= 0;
+  return sequence;
 }
 
 export function createNaturalAction(game: SessionState, actionKind = 'ability'): ActionIdentity {
@@ -22,4 +24,4 @@ export function createLinkedAction(game: SessionState, parent: ActionIdentity, a
 }
 
 export function nextEventSerial(game: SessionState): number { return ++getCombatSequence(game).eventSerial; }
-
+export function nextDeathSerial(game: SessionState): number { return ++getCombatSequence(game).deathSerial; }

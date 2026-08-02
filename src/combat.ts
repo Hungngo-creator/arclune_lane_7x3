@@ -23,7 +23,7 @@ import {
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
 import { runRuntimeBasicAttackResolved, runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
-import { commitDamageBatch, createNaturalAction, resolveDamageBatch, resolveDamagePacket, resolveSourceAttribution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
+import { commitDamageBatch, createLegacyDetachedAction, createLinkedAction, createNaturalAction, currentActionExecution, nextActionPacket, resolveDamageBatch, resolveDamagePacket, resolveSourceAttribution, withActionExecution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
 
 export { applyDamage, grantShield };
 
@@ -472,18 +472,22 @@ export function dealAbilityDamage(
     synergyBonus: toFinite(opts.synergyBonus ?? opts.damageBreakdown?.synergyBonus, counterMetadata.synergyBonus),
   };
   const breakdownMultiplier = Math.max(0, 1 + bonusBreakdown.classBonus + bonusBreakdown.elementBonus + bonusBreakdown.synergyBonus);
-  if (!Game && !opts.actionIdentity) throw new Error('[combat-kernel] detached damage requires an explicit action identity');
-  const identity = opts.actionIdentity ?? createNaturalAction(Game!, attackType);
+  const execution = Game ? currentActionExecution(Game) : null;
+  if (!Game && !opts.actionIdentity) throw new Error('[combat-kernel] detached damage requires explicit identity');
+  const identity = opts.actionIdentity ?? execution?.identity ?? createLegacyDetachedAction(Game!, attackType);
   const controller = attacker.ownerIid != null ? Game?.tokens.find(unit => unit.iid === attacker.ownerIid) ?? null : attacker;
   const source = resolveSourceAttribution({ immediateSource: attacker, controller: controller ?? attacker.ownerIid ?? attacker, trueSelf: controller?.trueSelfId ?? attacker.trueSelfId ?? null, owner: controller ?? attacker.ownerIid ?? attacker });
   const componentSpecs = dtype === 'mixed' ? [['physical', physWeight], ['will', arcWeight]] as const : [[dtype === 'arcane' ? 'will' : dtype, 1]] as const;
-  const packets: DamagePacket[] = componentSpecs.map(([damageType, weight], index) => ({
-    packetId: `${String(identity.actionId)}:packet-${index + 1}`, packetSerial: index + 1,
+  const detachedSerial = { value: 1 };
+  const packets: DamagePacket[] = componentSpecs.map(([damageType, weight]) => {
+    const packetIdentity = execution ? nextActionPacket(execution) : { packetId: `${String(identity.actionId)}:packet-${detachedSerial.value}`, packetSerial: detachedSerial.value++ };
+    return ({
+    ...packetIdentity,
     actionId: identity.actionId, chainId: identity.chainId, source, targetIid: target.iid ?? target.id,
     damageType: damageType as DamagePacket['damageType'], declaredDamage: (pre.ignoreAll || shieldWinsLaw) ? 0 : rawDamage * weight,
     tags: [attackType], isDot: false, isReflect: false, isFollowup: identity.parentActionId != null,
     isCounter: attackType === 'counter', reactionDepth: 0, pierceShield: bypassShieldByLaw,
-  }));
+  }); });
   const contexts: DamageContext[] = packets.map(() => ({
     attacker: { iid: attacker.iid ?? attacker.id, currentHp: Number(attacker.hp ?? 0), maxHp: Number(attacker.hpMax ?? 0), arm: Number(attacker.arm ?? 0), res: Number(attacker.res ?? 0) },
     defender: { iid: target.iid ?? target.id, currentHp: Number(target.hp ?? 0), maxHp: Number(target.hpMax ?? 0), arm: Number(target.arm ?? 0), res: Number(target.res ?? 0) },
@@ -704,7 +708,7 @@ export function healUnit(target: UnitToken | null | undefined, amount: number): 
   return { healed, overheal: Math.max(0, amt - healed) };
 }
 
-export function basicAttack(Game: SessionState, unit: UnitToken): void {
+function executeBasicAttack(Game: SessionState, unit: UnitToken): void {
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
   const pool = Game.tokens.filter((t): t is UnitToken => t.side === foeSide && t.alive);
   if (pool.length === 0) return;
@@ -837,6 +841,11 @@ export function basicAttack(Game: SessionState, unit: UnitToken): void {
   }
 }
 
+export function basicAttack(Game: SessionState, unit: UnitToken): void {
+  if (currentActionExecution(Game)) return executeBasicAttack(Game, unit);
+  return withActionExecution(Game, createNaturalAction(Game, 'basic'), () => executeBasicAttack(Game, unit));
+}
+
 export function doBasicWithFollowups(
   Game: SessionState,
   unit: UnitToken,
@@ -845,10 +854,12 @@ export function doBasicWithFollowups(
 ): void {
   try {
     basicAttack(Game, unit);
+    const parent = currentActionExecution(Game)?.identity ?? null;
     const followupCount = Math.max(0, cap | 0);
     for (let i = 0; i < followupCount; i += 1) {
       if (!unit || !unit.alive) break;
-      basicAttack(Game, unit);
+      if (parent) withActionExecution(Game, createLinkedAction(Game, parent, 'followup'), () => executeBasicAttack(Game, unit));
+      else basicAttack(Game, unit);
       onFollowup?.(i);
     }
   } catch (error) {

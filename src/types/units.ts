@@ -5,6 +5,7 @@ import type { UnitArt } from './art';
 export type UnitId = string;
 
 export type Side = 'ally' | 'enemy';
+export type LifeState = 'alive' | 'hp-zero' | 'death-prevention' | 'dead-confirmed' | 'removed' | 'erased';
 
 export interface StatBlock {
   hpMax?: number;
@@ -53,6 +54,8 @@ export interface UnitToken extends StatBlock {
   bornSerial?: number;
   ownerIid?: number;
   alive: boolean;
+  /** Canonical lifecycle state. `alive` remains a compatibility projection. */
+  lifeState?: LifeState;
   deadAt?: number;
   isMinion?: boolean;
   ttlTurns?: number;

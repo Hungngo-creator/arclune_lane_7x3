@@ -1348,6 +1348,7 @@ mỗi khi kích hoạt thiện xạ, tạm thời tăng 3% atk của bản thân
 
 Thiện Xạ chỉ kích hoạt khi nhân vật này không bị cc cứng và vẫn có thể đánh thường được, nếu hắn tạm thời không thể đánh thường thì nội tại Thiện Xạ sẽ không kích hoạt.
 
+nếu có nhiều hơn 1 kẻ thù bị hất tung cùng lúc, hắn cùng lúc kích hoạt thiện xạ lên tất cả mục tiêu nhưng cap chỉ +1.
 
 
 

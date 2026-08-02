@@ -14,6 +14,7 @@ import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
 import { canonicalizeCombatTagsWithRule } from './tag-aliases.ts';
 import { consumeShieldByCurrentRatio, readShieldAmount } from './apply-damage.ts';
+import { createNaturalAction, currentActionExecution, withActionExecution } from './kernel/index.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -234,7 +235,7 @@ function parseSkillTags(tags: ReadonlyArray<string>): ParsedSkillTags {
   };
 }
 
-export function performActiveSkill(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey): PerformActiveSkillResult {
+function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey): PerformActiveSkillResult {
   if (!caster.alive) {
     return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'blocked');
   }
@@ -483,6 +484,11 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
 
   recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
   return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, dispatch.targets.length);
+}
+
+export function performActiveSkill(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey): PerformActiveSkillResult {
+  if (currentActionExecution(game)) return executeActiveSkill(game, caster, skillKey);
+  return withActionExecution(game, createNaturalAction(game, skillKey === 'skill3' ? 'ultimate' : 'active-skill'), () => executeActiveSkill(game, caster, skillKey));
 }
 
 export type { ActiveSkillKey };

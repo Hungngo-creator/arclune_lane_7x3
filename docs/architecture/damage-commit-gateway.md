@@ -18,3 +18,6 @@ callbacks in slot/iid order. The gateway emits JSON-compatible
 shield/HP allocations, prevention and zero flags. Phase C will replace the
 legacy lethal boundary; B1 deliberately does not implement death confirmation.
 
+## Phase C1 integration
+
+Phase C1 adds the action-wide resolution coordinator and canonical life/death contracts described in `action-resolution-contract.md` and `life-death-lifecycle.md`. HP mutation commits are typed non-damage writes; immediate revive is policy-explicit. Remaining compatibility paths and the exact C2 boundary are recorded in `kernel-phase-c1-migration.md`.

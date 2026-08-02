@@ -1,9 +1,17 @@
 import type { UnitToken } from '@shared-types/units';
+import type { SessionState } from '@shared-types/combat';
 import { nextCompatibilityId } from './ids.ts';
 import { assertDamageInvariant } from './invariants.ts';
 import { resolveDamagePacket } from './damage-resolver.ts';
 import { resolveSourceAttribution } from './source-attribution.ts';
 import { normalizeDamageType, type DamageContext, type DamagePacket, type DamageResolution } from './types.ts';
+import { createNaturalAction } from './sequence.ts';
+import type { ActionIdentity } from './types.ts';
+
+/** Compatibility boundary for callers not yet hosted by an action executor. */
+export function createLegacyDetachedAction(game: SessionState, kind: string): ActionIdentity {
+  return createNaturalAction(game, `legacy-detached:${kind}`);
+}
 
 export interface LegacyDamageAdapterInput {
   attacker: UnitToken;
@@ -50,4 +58,3 @@ export function resolveLegacyDamage(input: LegacyDamageAdapterInput): DamageReso
   assertDamageInvariant(packet, result);
   return result;
 }
-

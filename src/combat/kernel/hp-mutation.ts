@@ -1,6 +1,6 @@
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
-import { applyDamage } from '../apply-damage.ts';
+import { markHpZero } from './life-cycle.ts';
 import { nextEventSerial } from './sequence.ts';
 import type { ActionIdentity, CurrentHpPolicy, MaxHpPolicy, MutationResetPolicy, SourceAttribution } from './types.ts';
 
@@ -44,7 +44,11 @@ export function resolveMaxHpMutation(target: UnitToken, value: number, maxHpPoli
 
 export function commitHpMutation(game: SessionState | null, target: UnitToken, result: HpMutationResult, identity?: ActionIdentity): Record<string, unknown> {
   if (iid(target) !== result.targetIid || Number(target.hp ?? 0) !== result.hpBefore || Number(target.hpMax ?? 0) !== result.maxHpBefore) throw new Error('[combat-kernel] stale HP mutation snapshot');
-  if (result.succeeded) { target.hpMax = result.maxHpAfter; if (result.hpAfter < result.hpBefore) applyDamage(target, result.hpBefore - result.hpAfter); else target.hp = result.hpAfter; }
+  if (result.succeeded) {
+    target.hpMax = result.maxHpAfter;
+    target.hp = result.hpAfter;
+    if (result.hpBefore > 0 && result.hpAfter === 0) markHpZero(target);
+  }
   const event = { type: 'HP_MUTATION_RESOLVED', state: result.succeeded ? 'committed' : 'blocked', eventSerial: game ? nextEventSerial(game) : 0, actionId: identity?.actionId ?? null, chainId: identity?.chainId ?? null, parentActionId: identity?.parentActionId ?? null, ...result };
   if (game) (((game.runtime ??= {}) as { combatEvents?: Record<string, unknown>[] }).combatEvents ??= []).push(event); return event;
 }

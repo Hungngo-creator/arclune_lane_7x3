@@ -33,3 +33,7 @@ Also migrate legacy compatibility action ids to scheduler-owned identities,
 attach source iid when statuses are created, route passive/tag/DoT/counter procs
 through the ledger, add resource transactions, and batch AoE. Full replay,
 Luân Hồi, progression, equipment, and kit-wide rewrites remain separate work.
+
+## Phase C1 integration
+
+Phase C1 adds the action-wide resolution coordinator and canonical life/death contracts described in `action-resolution-contract.md` and `life-death-lifecycle.md`. HP mutation commits are typed non-damage writes; immediate revive is policy-explicit. Remaining compatibility paths and the exact C2 boundary are recorded in `kernel-phase-c1-migration.md`.

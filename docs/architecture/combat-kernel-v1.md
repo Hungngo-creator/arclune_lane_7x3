@@ -87,3 +87,7 @@ then enters the existing Chap Minh/shield/shared-HP/death/reaction commit path.
 Basic attacks, the four standard active-skill call sites, and the standard damage
 tag branch share this gateway. `applyDamage` is a deprecated low-level legacy
 primitive; its current callers are frozen by a static test pending Phase B.
+
+## Phase C1 integration
+
+Phase C1 adds the action-wide resolution coordinator and canonical life/death contracts described in `action-resolution-contract.md` and `life-death-lifecycle.md`. HP mutation commits are typed non-damage writes; immediate revive is policy-explicit. Remaining compatibility paths and the exact C2 boundary are recorded in `kernel-phase-c1-migration.md`.
