@@ -7,7 +7,8 @@ import { isCombatAlive, markRemoved } from './combat/kernel/life-cycle.ts';
 import { createNaturalAction, ensureCombatIdentity, withActionExecution } from './combat/kernel/index.ts';
 import { emitSsiTemporalEvent } from './combat/kernel/delayed-revive.ts';
 
-import { doBasicWithFollowups } from './combat.ts';
+import { doBasicWithFollowups, healUnit } from './combat.ts';
+import { normalizeCombatHpState } from './combat/number-utils.ts';
 import { performActiveSkill } from './combat/perform-active-skill.ts';
 import {
   runRuntimeActionEnd,
@@ -193,6 +194,7 @@ const applySelectedLineupBuffs = (unit: UnitToken): void => {
   applyStatPct(unit, 'wil', stats.wilPct);
   applyStatPct(unit, 'arm', stats.armPct);
   applyStatPct(unit, 'res', stats.resPct);
+  normalizeCombatHpState(unit);
 };
 
 const asSequentialTurn = (
@@ -321,9 +323,7 @@ function applyTurnRegen(
         }
       }
     }
-    const afterHp = clampResourceAfterRegen(currentHp + regenHp, unit.hpMax);
-    hpDelta = afterHp - currentHp;
-    unit.hp = afterHp;
+    hpDelta = healUnit(Game, unit, unit, Math.max(0, regenHp)).healed;
   }
 
   let aeDelta = 0;

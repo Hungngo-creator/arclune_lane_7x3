@@ -1,6 +1,6 @@
 import {
   beginActionExecution, beginRevivedLife, commitDamageBatch, commitHealing, createLinkedAction, createNaturalAction,
-  currentActionExecution, endActionExecution, ensureCombatIdentity, nextActionPacket, resolveDamageBatch,
+  commitHpMutation, currentActionExecution, endActionExecution, ensureCombatIdentity, nextActionPacket, resolveDamageBatch,
   resolveDamagePacket, resolveHealing, resolveHpLoss, resolveMaxHpMutation, resolveReactionPolicy, resolveSourceAttribution,
 } from '../src/combat/kernel/index.ts';
 import type { SessionState } from '../src/types/combat.ts';
@@ -56,13 +56,30 @@ test('fractional shared HP, shield, and stale validation remain atomic', () => {
   expect(() => commitDamageBatch(null, result, [first, second])).toThrow(/stale hp snapshot iid=3.*actionId=a.*packetId=a:packet-1/);
   expect(first.hp).toBe(100.8); expect(first.statuses[0].amount).toBe(10);
 });
-test('fractional healing and max HP mutation use integer HP', () => {
-  const target = { id: 'u', iid: 7, alive: true, hp: 80.8, hpMax: 100.9 } as any;
+test('unchanged fractional healing snapshot commits canonical HP', () => {
+  const target = { id: 'u', iid: 7, alive: true, lifeState: 'alive', hp: 80.8, hpMax: 100.9, lifeSerial: 1 } as any;
   const heal = resolveHealing(target, 30, source);
-  expect(heal).toMatchObject({ hpBefore: 80, hpAfter: 100, effectiveHeal: 20 });
-  target.hp = 80; target.hpMax = 100; commitHealing(null, target, heal);
-  expect(target.hp).toBe(100);
+  expect(heal).toMatchObject({ rawHpBefore: 80.8, rawMaxHpBefore: 100.9, hpBefore: 80, maxHpBefore: 100, hpAfter: 100, effectiveHeal: 20, overheal: 10 });
+  commitHealing(null, target, heal); expect(target).toMatchObject({ hp: 100, hpMax: 100 });
   expect(resolveMaxHpMutation(target, 150.9, 'set-value', 'set-full', source)).toMatchObject({ maxHpAfter: 150, hpAfter: 150 });
+});
+test.each([{ hp: 80.2, hpMax: 100.9 }, { hp: 80.8, hpMax: 100.2 }])('healing rejects exact raw staleness atomically: %o', mutation => {
+  const session = game(); const target = { id: 'u', iid: 7, alive: true, lifeState: 'alive', hp: 80.8, hpMax: 100.9, lifeSerial: 1 } as any;
+  const heal = resolveHealing(target, 10, source); Object.assign(target, mutation);
+  expect(() => commitHealing(session, target, heal)).toThrow('stale healing snapshot'); expect(target).toMatchObject(mutation); expect((session.runtime as any).combatEvents).toBeUndefined();
+});
+test('healing rejects a stale lifecycle', () => {
+  const target = { id: 'u', iid: 7, alive: true, lifeState: 'alive', hp: 80.8, hpMax: 100.9, lifeSerial: 1 } as any;
+  const heal = resolveHealing(target, 10, source); target.lifeSerial = 2;
+  expect(() => commitHealing(null, target, heal)).toThrow('stale healing snapshot'); expect(target.hp).toBe(80.8);
+});
+test('HP mutation gateways accept unchanged fractions and reject raw staleness', () => {
+  const hpLossTarget = { id: 'u', iid: 8, alive: true, hp: 80.8, hpMax: 100.9, lifeSerial: 1 } as any;
+  commitHpMutation(null, hpLossTarget, resolveHpLoss(hpLossTarget, 10, 'non-damage-hp-loss', source)); expect(hpLossTarget).toMatchObject({ hp: 70, hpMax: 100 });
+  const maxTarget = { id: 'm', iid: 9, alive: true, hp: 80.8, hpMax: 100.9, lifeSerial: 1 } as any;
+  commitHpMutation(null, maxTarget, resolveMaxHpMutation(maxTarget, 20, 'add-flat', 'preserve-absolute', source)); expect(maxTarget).toMatchObject({ hp: 80, hpMax: 120 });
+  const stale = { id: 's', iid: 10, alive: true, hp: 80.8, hpMax: 100.9, lifeSerial: 1 } as any; const result = resolveHpLoss(stale, 10, 'self-damage', source); stale.hp = 80.2;
+  expect(() => commitHpMutation(null, stale, result)).toThrow('stale HP mutation snapshot'); expect(stale).toMatchObject({ hp: 80.2, hpMax: 100.9 });
 });
 test('normalized lethal damage reaches zero deterministically', () => {
   const target = { id: 'u', iid: 2, alive: true, hp: 20.9, hpMax: 20.9, lifeSerial: 1, statuses: [] } as any;

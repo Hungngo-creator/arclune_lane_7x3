@@ -4956,6 +4956,10 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       const className = normalizeClassName(meta?.class);
       const isAssassin = className === 'Assassin';
       const slotOf = (token) => slotIndex(token.side, token.cx, token.cy);
+      const forcedTaunt = pool.filter(token => token.statuses?.some((status) => status.id === 'taunt'))
+          .sort((left, right) => slotOf(left) - slotOf(right))[0];
+      if (forcedTaunt)
+          return forcedTaunt;
       const isBlockedLeader = (slot) => (slot === 8 && (occupiedSlots.has(2) || occupiedSlots.has(5)));
       if (isAssassin) {
           let nearestBackline = null;
@@ -4976,15 +4980,13 @@ __modules['./combat.ts'] = (exports, module, __require) => {
               return nearestBackline;
       }
       const attackerSlot = slotIndex(attacker.side, attacker.cx, attacker.cy);
-      const primarySlot = Math.max(1, Math.min(3, (attacker.cy | 0) + 1));
-      const legacyPriority = [primarySlot, primarySlot + 3, primarySlot + 6];
-      const slotPriority = attackerSlot === 1
+      const slotPriority = (attackerSlot === 1 || attackerSlot === 4 || attackerSlot === 7)
           ? [3, 6, 9, 2, 5, 8]
           : (attackerSlot === 3 || attackerSlot === 6 || attackerSlot === 9)
               ? [1, 4, 7, 2, 5, 8]
               : (attackerSlot === 2 || attackerSlot === 5 || attackerSlot === 8)
                   ? [2, 5, 8]
-                  : legacyPriority;
+                  : [];
       for (const slot of slotPriority) {
           if (isBlockedLeader(slot))
               continue;
@@ -4992,8 +4994,6 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           if (found)
               return found;
       }
-      if (attackerSlot === 2 || attackerSlot === 5 || attackerSlot === 8)
-          return null;
       if (nearestOverall && !isBlockedLeader(slotOf(nearestOverall))) {
           return nearestOverall;
       }
@@ -6646,25 +6646,45 @@ __modules['./combat/kernel/hp-mutation.ts'] = (exports, module, __require) => {
   const normalizeCombatHpValue = __dep0.normalizeCombatHpValue;
   const readCombatHpState = __dep0.readCombatHpState;
   const __dep1 = __require('./combat/kernel/life-cycle.ts');
+  const isCombatAlive = __dep1.isCombatAlive;
   const markHpZero = __dep1.markHpZero;
   const __dep2 = __require('./combat/kernel/sequence.ts');
   const nextEventSerial = __dep2.nextEventSerial;
   const amount = (value, field) => { if (!Number.isFinite(value) || value < 0)
       throw new Error(`[combat-kernel] ${field} must be finite and non-negative`); return value; };
   const iid = (target) => target.iid ?? target.id;
+  const snapshot = (target) => {
+      const rawHpBefore = Number(target.hp ?? 0);
+      const rawMaxHpBefore = Number(target.hpMax ?? 0);
+      if (!Number.isFinite(rawHpBefore) || !Number.isFinite(rawMaxHpBefore))
+          throw new Error('[combat-kernel] HP snapshot must be finite');
+      const { hp: hpBefore, hpMax: maxHpBefore } = readCombatHpState(target);
+      return { rawHpBefore, rawMaxHpBefore, hpBefore, maxHpBefore, targetIid: iid(target), incarnationSerial: target.incarnationSerial ?? 1, lifeSerial: target.lifeSerial ?? 1 };
+  };
+  const validateSnapshot = (target, result, label) => {
+      const current = snapshot(target);
+      if (current.targetIid !== result.targetIid || current.incarnationSerial !== result.incarnationSerial || current.lifeSerial !== result.lifeSerial
+          || current.rawHpBefore !== result.rawHpBefore || current.rawMaxHpBefore !== result.rawMaxHpBefore
+          || current.hpBefore !== result.hpBefore || current.maxHpBefore !== result.maxHpBefore)
+          throw new Error(`[combat-kernel] stale ${label} snapshot`);
+  };
   function resolveHealing(target, requestedHeal, source, modifiers = []) {
       const requested = amount(requestedHeal, 'requestedHeal');
       const modified = modifiers.reduce((value, modifier, index) => value * amount(modifier, `healModifiers[${index}]`), requested);
-      const { hp: hpBefore, hpMax: maxHp } = readCombatHpState(target);
-      const blocked = target.alive === false || hpBefore <= 0;
-      const effectiveHeal = blocked ? 0 : Math.min(Math.max(0, maxHp - hpBefore), Math.floor(modified));
-      return { requestedHeal: requested, modifiedHeal: modified, effectiveHeal, overheal: Math.max(0, Math.floor(modified) - effectiveHeal), hpBefore, hpAfter: hpBefore + effectiveHeal, targetIid: iid(target), source, blocked };
+      const state = snapshot(target);
+      const { hpBefore, maxHpBefore } = state;
+      const blocked = !isCombatAlive(target) || hpBefore <= 0;
+      const effectiveHeal = blocked ? 0 : Math.min(Math.max(0, maxHpBefore - hpBefore), Math.floor(modified));
+      return { ...state, requestedHeal: requested, modifiedHeal: modified, effectiveHeal, overheal: Math.max(0, Math.floor(modified) - effectiveHeal), hpAfter: hpBefore + effectiveHeal, source, blocked };
   }
   function commitHealing(game, target, result, identity) {
-      if (iid(target) !== result.targetIid || Number(target.hp ?? 0) !== result.hpBefore)
-          throw new Error('[combat-kernel] stale healing snapshot');
-      if (!result.blocked)
-          target.hp = normalizeCombatHpValue(result.hpAfter);
+      validateSnapshot(target, result, 'healing');
+      if (!result.blocked && !isCombatAlive(target))
+          throw new Error('[combat-kernel] stale healing eligibility snapshot');
+      if (!result.blocked) {
+          target.hpMax = result.maxHpBefore;
+          target.hp = Math.min(result.maxHpBefore, normalizeCombatHpValue(result.hpAfter));
+      }
       const event = { type: 'HEAL_RESOLVED', state: result.blocked ? 'blocked' : 'committed', eventSerial: game ? nextEventSerial(game) : 0, actionId: identity?.actionId ?? null, chainId: identity?.chainId ?? null, parentActionId: identity?.parentActionId ?? null, ...result };
       if (game)
           ((game.runtime ??= {}).combatEvents ??= []).push(event);
@@ -6672,15 +6692,17 @@ __modules['./combat/kernel/hp-mutation.ts'] = (exports, module, __require) => {
   }
   function resolveHpLoss(target, requestedAmount, kind, source, canKill = false) {
       const requested = normalizeCombatHpValue(amount(requestedAmount, 'hpMutation.amount'), 'hpMutation.amount');
-      const { hp: hpBefore, hpMax: maxHp } = readCombatHpState(target);
+      const state = snapshot(target);
+      const { hpBefore, maxHpBefore } = state;
       const available = canKill ? hpBefore : Math.max(0, hpBefore - 1);
       const succeeded = kind !== 'hp-cost' || requested <= available;
       const effective = succeeded ? Math.min(requested, available) : 0;
-      return { kind, requestedAmount: requested, effectiveAmount: effective, hpBefore, hpAfter: hpBefore - effective, maxHpBefore: maxHp, maxHpAfter: maxHp, targetIid: iid(target), source, canKill, succeeded, currentHpPolicy: 'preserve-absolute', maxHpPolicy: 'unchanged', resetPolicy: 'never-within-battle' };
+      return { ...state, kind, requestedAmount: requested, effectiveAmount: effective, hpAfter: hpBefore - effective, maxHpAfter: maxHpBefore, source, canKill, succeeded, currentHpPolicy: 'preserve-absolute', maxHpPolicy: 'unchanged', resetPolicy: 'never-within-battle' };
   }
   function resolveMaxHpMutation(target, value, maxHpPolicy, currentHpPolicy, source, options = {}) {
       const input = amount(value, 'maxHpMutation.value');
-      const { hp: hpBefore, hpMax: maxHpBefore } = readCombatHpState(target);
+      const state = snapshot(target);
+      const { hpBefore, maxHpBefore } = state;
       const maxHpAfter = normalizeCombatHpValue(maxHpPolicy === 'unchanged' ? maxHpBefore : maxHpPolicy === 'add-flat' ? maxHpBefore + input : maxHpPolicy === 'add-percent' ? maxHpBefore * (1 + input) : input, 'maxHpAfter');
       let hpAfter = hpBefore;
       if (currentHpPolicy === 'preserve-ratio')
@@ -6692,11 +6714,10 @@ __modules['./combat/kernel/hp-mutation.ts'] = (exports, module, __require) => {
       else
           hpAfter = Math.min(maxHpAfter, amount(options.setCurrentHp ?? 0, 'setCurrentHp'));
       hpAfter = Math.floor(hpAfter);
-      return { kind: 'max-hp-mutation', requestedAmount: input, effectiveAmount: maxHpAfter - maxHpBefore, hpBefore, hpAfter, maxHpBefore, maxHpAfter, targetIid: iid(target), source, canKill: false, succeeded: true, currentHpPolicy, maxHpPolicy, resetPolicy: options.resetPolicy ?? 'never-within-battle' };
+      return { ...state, kind: 'max-hp-mutation', requestedAmount: input, effectiveAmount: maxHpAfter - maxHpBefore, hpAfter, maxHpAfter, source, canKill: false, succeeded: true, currentHpPolicy, maxHpPolicy, resetPolicy: options.resetPolicy ?? 'never-within-battle' };
   }
   function commitHpMutation(game, target, result, identity) {
-      if (iid(target) !== result.targetIid || Number(target.hp ?? 0) !== result.hpBefore || Number(target.hpMax ?? 0) !== result.maxHpBefore)
-          throw new Error('[combat-kernel] stale HP mutation snapshot');
+      validateSnapshot(target, result, 'HP mutation');
       if (result.succeeded) {
           target.hpMax = result.maxHpAfter;
           target.hp = result.hpAfter;
@@ -45744,32 +45765,35 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   const emitSsiTemporalEvent = __dep5.emitSsiTemporalEvent;
   const __dep6 = __require('./combat.ts');
   const doBasicWithFollowups = __dep6.doBasicWithFollowups;
-  const __dep7 = __require('./combat/perform-active-skill.ts');
-  const performActiveSkill = __dep7.performActiveSkill;
-  const __dep8 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeActionEnd = __dep8.runRuntimeActionEnd;
-  const runRuntimeUnitRevive = __dep8.runRuntimeUnitRevive;
-  const runRuntimeTurnEnd = __dep8.runRuntimeTurnEnd;
-  const runRuntimeTurnStart = __dep8.runRuntimeTurnStart;
-  const __dep9 = __require('./combat/chap-minh-runtime.ts');
-  const applyChapMinhActionEnd = __dep9.applyChapMinhActionEnd;
-  const recoverChapMinhMaxHpPerTurn = __dep9.recoverChapMinhMaxHpPerTurn;
-  const refreshChapMinhOwnership = __dep9.refreshChapMinhOwnership;
-  const __dep10 = __require('./config.ts');
-  const CFG = __dep10.CFG;
-  const __dep11 = __require('./meta.ts');
-  const initialRageFor = __dep11.initialRageFor;
-  const __dep12 = __require('./vfx.ts');
-  const vfxAddSpawn = __dep12.vfxAddSpawn;
-  const vfxAddBloodPulse = __dep12.vfxAddBloodPulse;
-  const asSessionWithVfx = __dep12.asSessionWithVfx;
-  const __dep13 = __require('./art.ts');
-  const getUnitArt = __dep13.getUnitArt;
-  const __dep14 = __require('./passives.ts');
-  const emitPassiveEvent = __dep14.emitPassiveEvent;
-  const applyOnSpawnEffects = __dep14.applyOnSpawnEffects;
-  const getPassiveLog = __dep14.getPassiveLog;
-  const prepareUnitForPassives = __dep14.prepareUnitForPassives;
+  const healUnit = __dep6.healUnit;
+  const __dep7 = __require('./combat/number-utils.ts');
+  const normalizeCombatHpState = __dep7.normalizeCombatHpState;
+  const __dep8 = __require('./combat/perform-active-skill.ts');
+  const performActiveSkill = __dep8.performActiveSkill;
+  const __dep9 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeActionEnd = __dep9.runRuntimeActionEnd;
+  const runRuntimeUnitRevive = __dep9.runRuntimeUnitRevive;
+  const runRuntimeTurnEnd = __dep9.runRuntimeTurnEnd;
+  const runRuntimeTurnStart = __dep9.runRuntimeTurnStart;
+  const __dep10 = __require('./combat/chap-minh-runtime.ts');
+  const applyChapMinhActionEnd = __dep10.applyChapMinhActionEnd;
+  const recoverChapMinhMaxHpPerTurn = __dep10.recoverChapMinhMaxHpPerTurn;
+  const refreshChapMinhOwnership = __dep10.refreshChapMinhOwnership;
+  const __dep11 = __require('./config.ts');
+  const CFG = __dep11.CFG;
+  const __dep12 = __require('./meta.ts');
+  const initialRageFor = __dep12.initialRageFor;
+  const __dep13 = __require('./vfx.ts');
+  const vfxAddSpawn = __dep13.vfxAddSpawn;
+  const vfxAddBloodPulse = __dep13.vfxAddBloodPulse;
+  const asSessionWithVfx = __dep13.asSessionWithVfx;
+  const __dep14 = __require('./art.ts');
+  const getUnitArt = __dep14.getUnitArt;
+  const __dep15 = __require('./passives.ts');
+  const emitPassiveEvent = __dep15.emitPassiveEvent;
+  const applyOnSpawnEffects = __dep15.applyOnSpawnEffects;
+  const getPassiveLog = __dep15.getPassiveLog;
+  const prepareUnitForPassives = __dep15.prepareUnitForPassives;
   function recordCombatActionFault(Game, unit, error) {
       const fault = error instanceof Error ? error : new Error(String(error));
       const runtime = (Game.runtime ??= {});
@@ -45793,47 +45817,47 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       };
       return fault;
   }
-  const __dep15 = __require('./events.ts');
-  const emitGameEvent = __dep15.emitGameEvent;
-  const TURN_START = __dep15.TURN_START;
-  const TURN_END = __dep15.TURN_END;
-  const ACTION_START = __dep15.ACTION_START;
-  const ACTION_END = __dep15.ACTION_END;
-  const TURN_REGEN = __dep15.TURN_REGEN;
-  const __dep16 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep16.mergeBusyUntil;
-  const safeNow = __dep16.safeNow;
-  const sessionNow = __dep16.sessionNow;
-  const __dep17 = __require('./utils/fury.ts');
-  const initializeFury = __dep17.initializeFury;
-  const startFuryTurn = __dep17.startFuryTurn;
-  const spendFury = __dep17.spendFury;
-  const resolveUltCost = __dep17.resolveUltCost;
-  const setFury = __dep17.setFury;
-  const clearFreshSummon = __dep17.clearFreshSummon;
-  const __dep18 = __require('./turns/interleaved.ts');
-  const nextTurnInterleaved = __dep18.nextTurnInterleaved;
-  const getSequentialOrderIndex = __dep18.getSequentialOrderIndex;
-  const predictSpawnCycleByTurnOrder = __dep18.predictSpawnCycleByTurnOrder;
-  const __dep19 = __require('./modes/pve/collection-mapper.ts');
-  const resolveRuntimeUnitStats = __dep19.resolveRuntimeUnitStats;
-  const __dep20 = __require('./ai.ts');
-  const evaluateGambitLogic = __dep20.evaluateGambitLogic;
-  const __dep21 = __require('./utils/rng.ts');
-  const nextRngValue = __dep21.nextRngValue;
-  const __dep22 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep22.normalizeClassName;
-  const normalizeElementKey = __dep22.normalizeElementKey;
-  const __dep23 = __require('./utils/unique-global.ts');
-  const isUniqueGlobalSummonBlocked = __dep23.isUniqueGlobalSummonBlocked;
-  const __dep24 = __require('./utils/player-profile.ts');
-  const loadPlayerProfile = __dep24.loadPlayerProfile;
-  const __dep25 = __require('./leader-uyen.ts');
-  const clearQueuedUyenUlt = __dep25.clearQueuedUyenUlt;
-  const hasQueuedUyenUlt = __dep25.hasQueuedUyenUlt;
-  const isAnyLeaderUltReady = __dep25.isAnyLeaderUltReady;
-  const isUyenLeader = __dep25.isUyenLeader;
-  const grantUyenSummonRage = __dep25.grantUyenSummonRage;
+  const __dep16 = __require('./events.ts');
+  const emitGameEvent = __dep16.emitGameEvent;
+  const TURN_START = __dep16.TURN_START;
+  const TURN_END = __dep16.TURN_END;
+  const ACTION_START = __dep16.ACTION_START;
+  const ACTION_END = __dep16.ACTION_END;
+  const TURN_REGEN = __dep16.TURN_REGEN;
+  const __dep17 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep17.mergeBusyUntil;
+  const safeNow = __dep17.safeNow;
+  const sessionNow = __dep17.sessionNow;
+  const __dep18 = __require('./utils/fury.ts');
+  const initializeFury = __dep18.initializeFury;
+  const startFuryTurn = __dep18.startFuryTurn;
+  const spendFury = __dep18.spendFury;
+  const resolveUltCost = __dep18.resolveUltCost;
+  const setFury = __dep18.setFury;
+  const clearFreshSummon = __dep18.clearFreshSummon;
+  const __dep19 = __require('./turns/interleaved.ts');
+  const nextTurnInterleaved = __dep19.nextTurnInterleaved;
+  const getSequentialOrderIndex = __dep19.getSequentialOrderIndex;
+  const predictSpawnCycleByTurnOrder = __dep19.predictSpawnCycleByTurnOrder;
+  const __dep20 = __require('./modes/pve/collection-mapper.ts');
+  const resolveRuntimeUnitStats = __dep20.resolveRuntimeUnitStats;
+  const __dep21 = __require('./ai.ts');
+  const evaluateGambitLogic = __dep21.evaluateGambitLogic;
+  const __dep22 = __require('./utils/rng.ts');
+  const nextRngValue = __dep22.nextRngValue;
+  const __dep23 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep23.normalizeClassName;
+  const normalizeElementKey = __dep23.normalizeElementKey;
+  const __dep24 = __require('./utils/unique-global.ts');
+  const isUniqueGlobalSummonBlocked = __dep24.isUniqueGlobalSummonBlocked;
+  const __dep25 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep25.loadPlayerProfile;
+  const __dep26 = __require('./leader-uyen.ts');
+  const clearQueuedUyenUlt = __dep26.clearQueuedUyenUlt;
+  const hasQueuedUyenUlt = __dep26.hasQueuedUyenUlt;
+  const isAnyLeaderUltReady = __dep26.isAnyLeaderUltReady;
+  const isUyenLeader = __dep26.isUyenLeader;
+  const grantUyenSummonRage = __dep26.grantUyenSummonRage;
   const toActiveUnitKey = (side, slot) => `${side}:${slot}`;
   const createActiveUnitIndex = (Game) => {
       const index = new Map();
@@ -45942,6 +45966,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       applyStatPct(unit, 'wil', stats.wilPct);
       applyStatPct(unit, 'arm', stats.armPct);
       applyStatPct(unit, 'res', stats.resPct);
+      normalizeCombatHpState(unit);
   };
   const asSequentialTurn = (turn) => {
       if (!turn)
@@ -46042,9 +46067,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
                   }
               }
           }
-          const afterHp = clampResourceAfterRegen(currentHp + regenHp, unit.hpMax);
-          hpDelta = afterHp - currentHp;
-          unit.hp = afterHp;
+          hpDelta = healUnit(Game, unit, unit, Math.max(0, regenHp)).healed;
       }
       let aeDelta = 0;
       if (Number.isFinite(unit.ae) || Number.isFinite(unit.aeMax) || Number.isFinite(unit.aeRegen)) {

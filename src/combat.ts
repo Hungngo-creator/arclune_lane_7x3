@@ -391,6 +391,10 @@ export function pickTarget(Game: TargetableGameState, attacker: UnitToken): Unit
 
   const slotOf = (token: UnitToken): number => slotIndex(token.side, token.cx, token.cy);
 
+  const forcedTaunt = pool.filter(token => token.statuses?.some((status: { id?: string }) => status.id === 'taunt'))
+    .sort((left, right) => slotOf(left) - slotOf(right))[0];
+  if (forcedTaunt) return forcedTaunt;
+
   const isBlockedLeader = (slot: number): boolean => (
     slot === 8 && (occupiedSlots.has(2) || occupiedSlots.has(5))
   );
@@ -415,23 +419,19 @@ export function pickTarget(Game: TargetableGameState, attacker: UnitToken): Unit
   }
 
   const attackerSlot = slotIndex(attacker.side, attacker.cx, attacker.cy);
-  const primarySlot = Math.max(1, Math.min(3, (attacker.cy | 0) + 1));
-  const legacyPriority: ReadonlyArray<number> = [primarySlot, primarySlot + 3, primarySlot + 6];
-  const slotPriority: ReadonlyArray<number> = attackerSlot === 1
+  const slotPriority: ReadonlyArray<number> = (attackerSlot === 1 || attackerSlot === 4 || attackerSlot === 7)
     ? [3, 6, 9, 2, 5, 8]
     : (attackerSlot === 3 || attackerSlot === 6 || attackerSlot === 9)
       ? [1, 4, 7, 2, 5, 8]
       : (attackerSlot === 2 || attackerSlot === 5 || attackerSlot === 8)
         ? [2, 5, 8]
-        : legacyPriority;
+        : [];
 
   for (const slot of slotPriority) {
     if (isBlockedLeader(slot)) continue;
     const found = bySlot.get(slot);
     if (found) return found;
   }
-
-  if (attackerSlot === 2 || attackerSlot === 5 || attackerSlot === 8) return null;
 
   if (nearestOverall && !isBlockedLeader(slotOf(nearestOverall))) {
     return nearestOverall;
