@@ -16,7 +16,7 @@ import type { InterleavedTurnState } from '@shared-types/turn-order';
 
 import type { HudHandles, SummonBarCard, SummonBarHandles, SummonBarOptions } from '@shared-types/ui';
 
-type HudGameLike = ({ cost?: number | null; costCap?: number | null; turn?: SessionState['turn']; tokens?: SessionState['tokens'] }) | null | undefined;
+type HudGameLike = ({ cost?: number | null; costCap?: number | null; turn?: SessionState['turn']; tokens?: SessionState['tokens']; runtime?: SessionState['runtime'] }) | null | undefined;
 const HUD_EVENT_TYPES = [TURN_START, TURN_END, ACTION_END] as const;
 const SUMMON_BAR_RERENDER_EVENTS = HUD_EVENT_TYPES;
 
@@ -40,6 +40,7 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
   const costChip = queryFromRoot<HTMLElement>('costChip') || doc.getElementById('costChip');
   const bottomHud = queryFromRoot<HTMLElement>('bottomHUD') || doc.getElementById('bottomHUD');
   let combatReason = queryFromRoot<HTMLElement>('combatReason') || doc.getElementById('combatReason');
+  let actionFaultPanel: HTMLElement | null = null;
   const timeline = queryFromRoot<HTMLElement>('ssiTimeline') || doc.getElementById('ssiTimeline');
   const debug = queryFromRoot<HTMLElement>('ssiDebug') || doc.getElementById('ssiDebug');
   const forcedRail = queryFromRoot<HTMLElement>('ssiForced') || doc.getElementById('ssiForced');
@@ -74,6 +75,26 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
     }
     if (costChip){
       costChip.classList.toggle('full', now >= cap);
+    }
+    const runtime = Game.runtime as Record<string, unknown> | undefined;
+    const fault = runtime?.actionFault as Error | undefined;
+    if (fault && !actionFaultPanel && bottomHud) {
+      const context = (runtime?.errorContext ?? {}) as Record<string, unknown>;
+      const stack = typeof fault.stack === 'string' ? fault.stack.split('\n').slice(1).find(line => !line.includes('recordCombatActionFault'))?.trim() : '';
+      const panel = doc.createElement('section');
+      panel.className = 'action-fault-panel';
+      panel.setAttribute('role', 'alert');
+      const message = doc.createElement('div');
+      message.textContent = `${String(context.actorId ?? 'unknown')} · ${String(context.actionKind ?? 'natural')} · ${fault.message} · ${stack || 'source unavailable'}`;
+      const restart = doc.createElement('button');
+      restart.type = 'button'; restart.textContent = 'Restart battle';
+      restart.onclick = () => doc.defaultView?.location.reload();
+      const menu = doc.createElement('button');
+      menu.type = 'button'; menu.textContent = 'Return to menu';
+      menu.onclick = () => { if (doc.defaultView) doc.defaultView.location.hash = ''; };
+      panel.append(message, restart, menu);
+      bottomHud.appendChild(panel);
+      actionFaultPanel = panel;
     }
     const interleaved = Game.turn?.mode === 'interleaved_by_position'
       ? Game.turn as InterleavedTurnState
@@ -153,6 +174,8 @@ export function initHUD(doc: Document, root?: QueryableRoot | null): HudHandles 
         dispose();
       }
     }
+    actionFaultPanel?.remove();
+    actionFaultPanel = null;
   };
 
   if (gameEvents){

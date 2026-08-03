@@ -1360,6 +1360,39 @@ type AliveTokenIndex = {
   bySide: Map<Side, UnitToken[]>;
 };
 
+export function performDualStanceUltimate(game: SessionState, unit: UnitToken, ult: Record<string, unknown>): void {
+  const stance = (unit as UnitToken & { stance?: string }).stance;
+  if (stance !== 'light' && stance !== 'dark') {
+    throw new Error(`[ultimate] dual-stance requires light or dark stance for ${unit.id}`);
+  }
+  const sideTokens = game.tokens.filter(token => token?.alive && token.side === (stance === 'light' ? unit.side : (unit.side === 'ally' ? 'enemy' : 'ally')));
+  if (stance === 'light') {
+    const light = (ult.light ?? {}) as Record<string, unknown>;
+    sideTokens.sort((a, b) => Number(a.hp ?? 0) / Math.max(1, Number(a.hpMax ?? 1))
+      - Number(b.hp ?? 0) / Math.max(1, Number(b.hpMax ?? 1))
+      || String(a.iid ?? a.id).localeCompare(String(b.iid ?? b.id)));
+    const take = Math.max(0, Math.floor(parseFiniteNumber(light.healTargets) ?? 3));
+    const scale = (light.healScale ?? {}) as Record<string, unknown>;
+    const scaled = Math.max(0, Number(unit.atk ?? 0) * (parseFiniteNumber(scale.ATK) ?? 0)
+      + Number(unit.wil ?? 0) * (parseFiniteNumber(scale.WIL) ?? 0));
+    for (const ally of sideTokens.slice(0, take)) {
+      healUnit(game, unit, ally, Number(ally.hpMax ?? 0) * Math.max(0, parseFiniteNumber(light.healPercentMaxHP) ?? 0) + scaled);
+    }
+    return;
+  }
+  const dark = (ult.dark ?? {}) as Record<string, unknown>;
+  sideTokens.sort((a, b) => taxiDistance(unit, a) - taxiDistance(unit, b)
+    || String(a.iid ?? a.id).localeCompare(String(b.iid ?? b.id)));
+  const take = Math.max(0, Math.floor(parseFiniteNumber(dark.targets) ?? 4));
+  const multiplier = Math.max(0, parseFiniteNumber(dark.damageMultiplier) ?? 1);
+  for (const target of sideTokens.slice(0, take)) {
+    dealAbilityDamage(game, unit, target, {
+      base: Math.max(1, Math.round((Number(unit.atk ?? 0) + Number(unit.wil ?? 0)) * multiplier)),
+      dtype: 'arcane', attackType: dark.countsAsBasic === true ? 'basic' : 'skill',
+    });
+  }
+}
+
 const buildAliveTokenIndex = (tokens: ReadonlyArray<UnitToken>): AliveTokenIndex => {
   const alive: UnitToken[] = [];
   const bySide = new Map<Side, UnitToken[]>();
@@ -1534,6 +1567,66 @@ function performUlt(unit: UnitToken): void {
   };
 
   switch(u.type){
+      case 'heal': {
+      const allies = getAliveBySide(unit.side).slice().sort((a, b) =>
+        Number(a.hp ?? 0) / Math.max(1, Number(a.hpMax ?? 1)) - Number(b.hp ?? 0) / Math.max(1, Number(b.hpMax ?? 1)));
+      const scale = (u.healScale ?? {}) as Record<string, unknown>;
+      const flat = Number(unit.atk ?? 0) * (parseFiniteNumber(scale.ATK) ?? 0)
+        + Number(unit.wil ?? 0) * (parseFiniteNumber(scale.WIL) ?? 0);
+      for (const ally of allies) healUnit(game, unit, ally, Number(ally.hpMax ?? 0) * (parseFiniteNumber(u.healPercentMaxHP) ?? 0) + flat);
+      busyMs = 1000;
+      break;
+    }
+    case 'burst':
+    case 'finisher':
+    case 'executioner':
+    case 'ultimate':
+    case 'auto-cast-fury':
+    case 'weather-control': {
+      const foes = getAliveBySide(foeSide);
+      const all = u.aoe === 'allEnemies' || u.type === 'weather-control' || u.type === 'auto-cast-fury';
+      const targets = all ? foes : [pickTarget(game, unit)].filter((target): target is UnitToken => !!target);
+      const hits = u.type === 'ultimate' ? 3 : 1;
+      for (const target of targets) for (let hit = 0; hit < hits && target.alive; hit += 1) {
+        dealAbilityDamage(game, unit, target, {
+          base: Math.max(1, Math.round((Number(unit.atk ?? 0) + Number(unit.wil ?? 0)) * (parseFiniteNumber(u.damageMultiplier) ?? 1))),
+          dtype: 'arcane', attackType: u.countsAsBasic === true ? 'basic' : 'skill',
+          defPen: Math.max(parseFiniteNumber((u.pierce as Record<string, unknown> | undefined)?.ARM) ?? 0, parseFiniteNumber((u.pierce as Record<string, unknown> | undefined)?.RES) ?? 0),
+        });
+      }
+      busyMs = 1200;
+      break;
+    }
+    case 'fortify': {
+      const turns = getUltDurationTurns(u, ultTurnsFallback);
+      if (u.taunt === true) Statuses.add(unit, { id: 'taunt', kind: 'buff', tag: 'taunt', dur: turns, tick: 'turn', sourceUnitId: unit.id });
+      const stats = (u.buffStats ?? {}) as Record<string, unknown>;
+      for (const [key, value] of Object.entries(stats)) Statuses.add(unit, { id: `ult_fortify_${key.toLowerCase()}`, kind: 'buff', tag: 'stat', attr: key.toLowerCase(), mode: 'percent', amount: parseFiniteNumber(value) ?? 0, dur: turns, tick: 'turn', sourceUnitId: unit.id });
+      busyMs = 800;
+      break;
+    }
+    case 'dual-form':
+    case 'worldshift':
+    case 'time-rift':
+    case 'evolution': {
+      // These catalog payloads are stateful; retain their established state
+      // transition while routing any declared damage through packets.
+      const state = unit as UnitToken & { form?: string; ultCastCount?: number };
+      state.ultCastCount = Number(state.ultCastCount ?? 0) + 1;
+      if (u.type === 'evolution' && Array.isArray(u.sequence)) {
+        const next = u.sequence[Math.min(state.ultCastCount - 1, u.sequence.length - 1)] as Record<string, unknown> | undefined;
+        if (typeof next?.form === 'string') state.form = next.form;
+      }
+      const multiplier = parseFiniteNumber(u.damageMultiplier) ?? (u.type === 'dual-form' ? 1 : 0);
+      if (multiplier > 0) for (const target of getAliveBySide(foeSide)) dealAbilityDamage(game, unit, target, { base: Math.max(1, Math.round((Number(unit.atk ?? 0) + Number(unit.wil ?? 0)) * multiplier)), dtype: 'arcane', attackType: 'skill' });
+      busyMs = 1000;
+      break;
+    }
+    case 'dual-stance': {
+      performDualStanceUltimate(game, unit, u);
+      busyMs = 1100;
+      break;
+    }
     case 'drain': {
       const foes = getAliveBySide(foeSide);
       if (!foes.length) break;
@@ -1870,7 +1963,7 @@ function performUlt(unit: UnitToken): void {
     }
 
     default:
-      break;
+      throw new Error(`[ultimate] Unsupported Ultimate type: ${String(u.type)} (${unit.id})`);
   }
 
   extendBusy(busyMs);

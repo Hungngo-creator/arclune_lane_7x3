@@ -497,6 +497,58 @@ const healTeam = (
 };
 
 const EFFECTS: Record<string, PassiveDefinition> = {
+  grantStats({ unit, passive }) {
+    if (!unit) return;
+    const params = (passive?.params ?? {}) as Record<string, unknown>;
+    const stats = (params.stats ?? params.perAllyStats ?? params.perSummonStats) as Record<string, number> | undefined;
+    if (!stats) throw new Error(`[passives] ${passive?.id ?? 'grantStats'} requires stats`);
+    applyStatMap(unit, passive ?? null, stats, { mode: 'percent', stack: params.stackable === true || params.stack === true, maxStacks: toNumber(params.maxStacks, 1), purgeable: params.purgeable !== false });
+    recomputeFromStatuses(unit);
+  },
+  teamHeal({ Game, unit, passive }) {
+    const params = (passive?.params ?? {}) as Record<string, unknown>;
+    healTeam(Game, unit, toNumber(params.amount, 0), { mode: params.mode === 'casterMax' ? 'casterMax' : 'targetMax' });
+  },
+  applyFormRegen({ Game, unit, passive }) {
+    if (!Game || !unit) return;
+    const params = (passive?.params ?? {}) as Record<string, unknown>;
+    const forms = (params.forms ?? {}) as Record<string, unknown>;
+    const form = String((unit as UnitToken & { form?: string }).form ?? 'au_long');
+    const pct = toNumber(forms[form], 0);
+    if (pct > 0) {
+      const identity = currentActionExecution(Game)?.identity;
+      const source = resolveSourceAttribution({ immediateSource: unit, controller: unit, owner: unit });
+      commitHealing(Game, unit, resolveHealing(unit, Number(unit.hpMax ?? 0) * pct, source), identity);
+    }
+  },
+  applyDebuff({ unit, passive, ctx }) {
+    const target = ((ctx ?? {}) as PassiveRuntimeContext).target;
+    if (!unit || !target) return;
+    const params = (passive?.params ?? {}) as Record<string, unknown>;
+    const id = typeof params.id === 'string' ? params.id : passive?.id;
+    if (!id) throw new Error('[passives] applyDebuff requires id');
+    const existing = Statuses.get(target, id);
+    const max = Math.max(1, toNumber(params.maxStacksPerTarget ?? params.maxStacks, 1));
+    if (existing) existing.stacks = Math.min(max, Number(existing.stacks ?? 1) + Math.max(1, toNumber(params.stacks, 1)));
+    else Statuses.add(target, { id, kind: 'debuff', tag: id, stacks: Math.max(1, toNumber(params.stacks, 1)), sourceUnitId: unit.id });
+  },
+  swapStance({ unit, passive }) {
+    if (!unit) return;
+    const params = (passive?.params ?? {}) as Record<string, unknown>;
+    const configured = Array.isArray(params.cycle)
+      ? params.cycle.filter((entry): entry is string => typeof entry === 'string' && entry.length > 0)
+      : [];
+    const cycle = configured.length > 0 ? configured : ['light', 'dark'];
+    const state = unit as UnitToken & { stance?: string; _stanceTurnStamp?: unknown };
+    const initial = typeof params.start === 'string' && cycle.includes(params.start) ? params.start : cycle[0]!;
+    const current = typeof state.stance === 'string' && cycle.includes(state.stance) ? state.stance : initial;
+    // onSpawn owns initialisation.  The first turn-start advances exactly once;
+    // repeated dispatches in the same natural turn are idempotent.
+    const stamp = unit._furyState?.turnStamp ?? null;
+    if (state._stanceTurnStamp === stamp) return;
+    state._stanceTurnStamp = stamp;
+    state.stance = cycle[(cycle.indexOf(current) + 1) % cycle.length]!;
+  },
   placeMark({ Game, unit, passive, ctx }) {
     const runtime = (ctx ?? {}) as PassiveRuntimeContext;
     const id = passive?.id;
@@ -743,6 +795,14 @@ const EFFECTS: Record<string, PassiveDefinition> = {
 
 /** @type {Record<string, PassiveEffectHandler>} */
 const PASSIVE_ENTRIES: Record<string, PassiveDefinition | null | undefined> = {
+  swapStance: EFFECTS.swapStance,
+  grantStats: EFFECTS.grantStats,
+  stackBuff: EFFECTS.grantStats,
+  allyScaling: EFFECTS.grantStats,
+  scalePerSummon: EFFECTS.grantStats,
+  teamHeal: EFFECTS.teamHeal,
+  applyFormRegen: EFFECTS.applyFormRegen,
+  applyDebuff: EFFECTS.applyDebuff,
   placeMark: EFFECTS.placeMark,
   'gainATK%': EFFECTS.gainATKPercent,
   'gainWIL%': EFFECTS.gainWILPercent,
@@ -825,6 +885,12 @@ export function applyOnSpawnEffects(
   const config = isRecord(onSpawn) ? onSpawn : null;
   if (!config) return;
   ensureStatusContainer(unit);
+
+  const startingStance = config.startingStance;
+  if (typeof startingStance === 'string' && startingStance.length > 0){
+    const stanceUnit = unit as UnitToken & { stance?: string };
+    if (typeof stanceUnit.stance !== 'string') stanceUnit.stance = startingStance;
+  }
 
   const effects: Array<Record<string, unknown>> = [];
   if (Array.isArray(config.effects)){
