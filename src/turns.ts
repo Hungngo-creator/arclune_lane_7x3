@@ -857,7 +857,8 @@ export function doActionOrSkip(
       performUlt!(unit);
       ultOk = true;
     } catch (e){
-      console.error('[performUlt]', e);
+      ((Game.runtime ??= {}) as Record<string, unknown>).actionFault = e instanceof Error ? e : new Error(String(e));
+      throw e;
     }
     if (ultOk) {
       if (!isUyenLeader(unit)) {
@@ -917,8 +918,8 @@ export function doActionOrSkip(
         actionDetail: { action: decision.action, skillOk: cast.ok, skillTargets: cast.targetCount, skillTags: cast.appliedTags }
       });
     } catch (err) {
-      console.error('[doActionOrSkip.skill]', err);
-      continue;
+      ((Game.runtime ??= {}) as Record<string, unknown>).actionFault = err instanceof Error ? err : new Error(String(err));
+      throw err;
     }
   }
 
@@ -934,7 +935,7 @@ export function doActionOrSkip(
 
   const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
   try {
-    doBasicWithFollowups(Game, unit, cap, (followupIndex) => {
+    const basic = doBasicWithFollowups(Game, unit, cap, (followupIndex) => {
       finishAction({
         action: 'basic',
         actionKind: 'followup',
@@ -943,14 +944,12 @@ export function doActionOrSkip(
         reason: null,
       });
     });
+    if (!basic.ok || basic.committedHits < 1) {
+      return completeTurn({ consumedTurn: false, acted: false, reason: 'noTarget', actionDetail: { skipped: true, reason: 'noTarget', rootActionId: basic.rootActionId } });
+    }
   } catch (err) {
-    console.error('[doActionOrSkip.basic]', err);
-    return completeTurn({
-      consumedTurn: false,
-      acted: false,
-      reason: 'systemError',
-      actionDetail: { skipped: true, reason: 'systemError' }
-    });
+    ((Game.runtime ??= {}) as Record<string, unknown>).actionFault = err instanceof Error ? err : new Error(String(err));
+    throw err;
   }
   return completeTurn({
     consumedTurn: true,

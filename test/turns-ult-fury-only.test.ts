@@ -42,7 +42,7 @@ describe('doActionOrSkip ult fury-only', () => {
   
   it('không cast ult khi Fury thiếu dù Aether đầy', () => {
     const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(true);
-    const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => undefined);
+    const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => ({ ok: true, rootActionId: 'mock-action', attemptedHits: 1, committedHits: 1, totalHpDamage: 1, targetIids: ['mock-target'] }));
 
     let decisions = 0;
     jest.spyOn(ai, 'evaluateGambitLogic').mockImplementation(() => {

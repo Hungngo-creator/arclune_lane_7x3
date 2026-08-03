@@ -342,6 +342,7 @@ export function createSessionLoopController(deps: SessionLoopDeps): LoopControll
           deps.logError('[pve] HUD update fallback sau lỗi tick thất bại', hudErr);
         }
       }
+      if ((game?.runtime as { actionFault?: Error } | undefined)?.actionFault) return;
     }
     if (!deps.isRunning() || !clock) return;
     scheduleTickLoop();

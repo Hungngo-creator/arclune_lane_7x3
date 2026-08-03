@@ -693,16 +693,18 @@ export function healUnit(gameOrTarget: SessionState | UnitToken | null | undefin
   return { healed: result.effectiveHeal, overheal: result.overheal };
 }
 
-function executeBasicAttack(Game: SessionState, unit: UnitToken): void {
+type BasicHitResult = { targetIid: string | number; hpDamage: number };
+
+function executeBasicAttack(Game: SessionState, unit: UnitToken): BasicHitResult | null {
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
   const pool = Game.tokens.filter((t): t is UnitToken => t.side === foeSide && isCombatAlive(t));
-  if (pool.length === 0) return;
+  if (pool.length === 0) return null;
 
   startFurySkill(unit, { tag: 'basic' });
 
   const fallback = pickTarget(Game, unit);
   const resolved = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
-  if (!resolved) return;
+  if (!resolved) return null;
 
   const isLoithienanh = unit.id === 'loithienanh';
   const isChapMinh = unit.id === 'huyen_vu_chap_minh';
@@ -818,11 +820,22 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): void {
       }
     }
   }
+  return { targetIid: resolved.iid ?? resolved.id, hpDamage: dealt };
 }
 
-export function basicAttack(Game: SessionState, unit: UnitToken): void {
+export function basicAttack(Game: SessionState, unit: UnitToken): BasicHitResult | null {
   if (currentActionExecution(Game)) return executeBasicAttack(Game, unit);
   return withActionExecution(Game, createNaturalAction(Game, 'basic'), () => executeBasicAttack(Game, unit));
+}
+
+export interface BasicActionResult {
+  ok: boolean;
+  rootActionId: string | number;
+  attemptedHits: number;
+  committedHits: number;
+  totalHpDamage: number;
+  targetIids: Array<string | number>;
+  error?: Error;
 }
 
 export function doBasicWithFollowups(
@@ -830,21 +843,20 @@ export function doBasicWithFollowups(
   unit: UnitToken,
   cap = 2,
   onFollowup?: (index: number) => void,
-): void {
-  try {
-    const parent = createNaturalAction(Game, 'basic');
-    const followupCount = Math.max(0, cap | 0);
-    withActionExecution(Game, parent, (root) => {
-      executeBasicAttack(Game, unit);
-      for (let i = 0; i < followupCount; i += 1) {
-        if (!unit || !isCombatAlive(unit)) break;
-        withActionExecution(Game, createLinkedAction(Game, parent, 'followup'), () => executeBasicAttack(Game, unit), {
-          triggerLedger: root.triggerLedger, originActionId: parent.actionId,
-        });
-        onFollowup?.(i);
-      }
-    });
-  } catch (error) {
-    console.error('[doBasicWithFollowups]', error);
-  }
+): BasicActionResult {
+  const parent = createNaturalAction(Game, 'basic');
+  const result: BasicActionResult = { ok: false, rootActionId: parent.actionId, attemptedHits: 1, committedHits: 0, totalHpDamage: 0, targetIids: [] };
+  if (!Game.tokens.some(target => target.side !== unit.side && isCombatAlive(target))) return result;
+  // The cap limits triggered linked actions; it does not create follow-ups.
+  void cap;
+  void onFollowup;
+  withActionExecution(Game, parent, () => {
+    const hit = executeBasicAttack(Game, unit);
+    if (!hit) return;
+    result.committedHits = 1;
+    result.totalHpDamage = hit.hpDamage;
+    result.targetIids.push(hit.targetIid);
+    result.ok = true;
+  });
+  return result;
 }

@@ -5230,12 +5230,12 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
       const pool = Game.tokens.filter((t) => t.side === foeSide && isCombatAlive(t));
       if (pool.length === 0)
-          return;
+          return null;
       startFurySkill(unit, { tag: 'basic' });
       const fallback = pickTarget(Game, unit);
       const resolved = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
       if (!resolved)
-          return;
+          return null;
       const isLoithienanh = unit.id === 'loithienanh';
       const isChapMinh = unit.id === 'huyen_vu_chap_minh';
       const basicDamageType = isChapMinh ? 'mixed' : 'physical';
@@ -5345,6 +5345,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
               }
           }
       }
+      return { targetIid: resolved.iid ?? resolved.id, hpDamage: dealt };
   }
   function basicAttack(Game, unit) {
       if (currentActionExecution(Game))
@@ -5352,24 +5353,23 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       return withActionExecution(Game, createNaturalAction(Game, 'basic'), () => executeBasicAttack(Game, unit));
   }
   function doBasicWithFollowups(Game, unit, cap = 2, onFollowup) {
-      try {
-          const parent = createNaturalAction(Game, 'basic');
-          const followupCount = Math.max(0, cap | 0);
-          withActionExecution(Game, parent, (root) => {
-              executeBasicAttack(Game, unit);
-              for (let i = 0; i < followupCount; i += 1) {
-                  if (!unit || !isCombatAlive(unit))
-                      break;
-                  withActionExecution(Game, createLinkedAction(Game, parent, 'followup'), () => executeBasicAttack(Game, unit), {
-                      triggerLedger: root.triggerLedger, originActionId: parent.actionId,
-                  });
-                  onFollowup?.(i);
-              }
-          });
-      }
-      catch (error) {
-          console.error('[doBasicWithFollowups]', error);
-      }
+      const parent = createNaturalAction(Game, 'basic');
+      const result = { ok: false, rootActionId: parent.actionId, attemptedHits: 1, committedHits: 0, totalHpDamage: 0, targetIids: [] };
+      if (!Game.tokens.some(target => target.side !== unit.side && isCombatAlive(target)))
+          return result;
+      // The cap limits triggered linked actions; it does not create follow-ups.
+      void cap;
+      void onFollowup;
+      withActionExecution(Game, parent, () => {
+          const hit = executeBasicAttack(Game, unit);
+          if (!hit)
+              return;
+          result.committedHits = 1;
+          result.totalHpDamage = hit.hpDamage;
+          result.targetIids.push(hit.targetIid);
+          result.ok = true;
+      });
+      return result;
   }
   //# sourceMappingURL=combat.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'isBasicAttackAfterHitHandler')) exports.isBasicAttackAfterHitHandler = isBasicAttackAfterHitHandler;
@@ -18423,6 +18423,8 @@ __modules['./modes/pve/session-loop.ts'] = (exports, module, __require) => {
                       deps.logError('[pve] HUD update fallback sau lỗi tick thất bại', hudErr);
                   }
               }
+              if (game?.runtime?.actionFault)
+                  return;
           }
           if (!deps.isRunning() || !clock)
               return;
@@ -46094,7 +46096,8 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               ultOk = true;
           }
           catch (e) {
-              console.error('[performUlt]', e);
+              (Game.runtime ??= {}).actionFault = e instanceof Error ? e : new Error(String(e));
+              throw e;
           }
           if (ultOk) {
               if (!isUyenLeader(unit)) {
@@ -46153,8 +46156,8 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               });
           }
           catch (err) {
-              console.error('[doActionOrSkip.skill]', err);
-              continue;
+              (Game.runtime ??= {}).actionFault = err instanceof Error ? err : new Error(String(err));
+              throw err;
           }
       }
       const queuedLeaderUlt = isUyenLeader(unit) && hasQueuedUyenUlt(unit);
@@ -46169,7 +46172,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       }
       const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
       try {
-          doBasicWithFollowups(Game, unit, cap, (followupIndex) => {
+          const basic = doBasicWithFollowups(Game, unit, cap, (followupIndex) => {
               finishAction({
                   action: 'basic',
                   actionKind: 'followup',
@@ -46178,15 +46181,13 @@ __modules['./turns.ts'] = (exports, module, __require) => {
                   reason: null,
               });
           });
+          if (!basic.ok || basic.committedHits < 1) {
+              return completeTurn({ consumedTurn: false, acted: false, reason: 'noTarget', actionDetail: { skipped: true, reason: 'noTarget', rootActionId: basic.rootActionId } });
+          }
       }
       catch (err) {
-          console.error('[doActionOrSkip.basic]', err);
-          return completeTurn({
-              consumedTurn: false,
-              acted: false,
-              reason: 'systemError',
-              actionDetail: { skipped: true, reason: 'systemError' }
-          });
+          (Game.runtime ??= {}).actionFault = err instanceof Error ? err : new Error(String(err));
+          throw err;
       }
       return completeTurn({
           consumedTurn: true,

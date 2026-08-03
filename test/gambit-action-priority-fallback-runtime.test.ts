@@ -16,7 +16,7 @@ describe('gambit action priority + fallback runtime', () => {
       return { slotIndex: 1, action: 'basic' } as never;
     });
     jest.spyOn(globalAetherPool, 'consume').mockReturnValue(false);
-    const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => undefined as never);
+    const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => ({ ok: true, rootActionId: 'mock-action', attemptedHits: 1, committedHits: 1, totalHpDamage: 1, targetIids: ['mock-target'] }));
 
     const unit = {
       id: 'hero_fallback',

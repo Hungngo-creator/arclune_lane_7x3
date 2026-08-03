@@ -53,7 +53,7 @@ describe('resource split: ult-fury vs skill-aether', () => {
         : ({ slotIndex: -1, action: null } as never)));
     const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(true);
     const spendFurySpy = jest.spyOn(fury, 'spendFury');
-    const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => undefined as never);
+    const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => ({ ok: true, rootActionId: 'mock-action', attemptedHits: 1, committedHits: 1, totalHpDamage: 1, targetIids: ['mock-target'] }));
 
     const unit = {
       id: 'hero_skill',
@@ -89,7 +89,7 @@ describe('resource split: ult-fury vs skill-aether', () => {
 
     const currentSpy = jest.spyOn(globalAetherPool, 'current').mockReturnValue(0);
     const consumeSpy = jest.spyOn(globalAetherPool, 'consume').mockReturnValue(false);
-    const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => undefined as never);
+    const basicSpy = jest.spyOn(combat, 'doBasicWithFollowups').mockImplementation(() => ({ ok: true, rootActionId: 'mock-action', attemptedHits: 1, committedHits: 1, totalHpDamage: 1, targetIids: ['mock-target'] }));
 
     const caster = {
       id: 'unit_without_skillset',
