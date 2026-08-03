@@ -17,6 +17,9 @@ try {
     throw new Error('fallback requested by ARCLUNE_FORCE_ESBUILD_FALLBACK');
   }
   esbuild = await tryImportModule('esbuild');
+  if (esbuild?.__arcStub === true){
+    esbuild = await tryImportModule('./tools/esbuild-stub/index.js');
+  }
 } catch (err) {
   esbuild = await tryImportModule('./tools/esbuild-stub/index.js');
   console.warn('Sử dụng esbuild fallback từ tools/esbuild-stub do không thể tải gói esbuild chuẩn:', err?.message || err);
@@ -194,10 +197,6 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['./combat/number-utils.js', './combat/number-utils.ts'],
   ['./combat/tag-aliases.js', './combat/tag-aliases.ts'],
   ['./combat/status-utils.js', './combat/status-utils.ts'],
-  ['./combat/status-query.js', './combat/status-query.ts'],
-  ['./combat/status-runtime-adapter.js', './combat/status-runtime-adapter.ts'],
-  ['./statuses.js', './statuses.ts'],
-  ['@statuses', './statuses.ts'],
   ['./combat/skill-result.js', './combat/skill-result.ts'],
   ['./combat/skill-metadata-utils.js', './combat/skill-metadata-utils.ts'],
   ['./combat/token-side-utils.js', './combat/token-side-utils.ts'],
@@ -858,6 +857,31 @@ function assertValidJavaScript(code, filename){
   }
 }
 
+let typescriptScannerRuntime;
+async function assertNoBrowserNodeGlobals(code, filename){
+  typescriptScannerRuntime ??= pickModuleDefault(await import('typescript'));
+  const ts = typescriptScannerRuntime;
+  const source = ts.createSourceFile(filename, code, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+  const forbiddenNames = new Set(['process', 'Buffer', 'global', '__dirname', '__filename']);
+  const visit = (current) => {
+    if (!ts.isIdentifier(current)){
+      ts.forEachChild(current, visit);
+      return;
+    }
+    const parent = current.parent;
+    const isProperty = (ts.isPropertyAccessExpression(parent) && parent.name === current)
+      || (ts.isPropertyAssignment(parent) && parent.name === current);
+    const isNodeGlobal = forbiddenNames.has(current.text) && !isProperty;
+    const isNodeRequire = current.text === 'require' && ts.isCallExpression(parent) && parent.expression === current;
+    if (isNodeGlobal || isNodeRequire){
+      const prefix = code.slice(0, current.getStart(source));
+      const line = prefix.split('\n').length;
+      throw new Error(`[build] browser module ${filename}:${line} contains unresolved Node global ${current.text}`);
+    }
+  };
+  visit(source);
+}
+
 function logTopBundleSizes(metafile, limit = 5){
   if (!metafile || !metafile.outputs){
     return;
@@ -931,6 +955,7 @@ async function build(){
     const sourceCode = await transformIfScript(raw, ext, id);
     const transformed = transformModule(sourceCode, id);
     assertValidJavaScript(transformed, id);
+    await assertNoBrowserNodeGlobals(transformed, id);
     pushModule(id, transformed);
   }
 
@@ -947,6 +972,7 @@ async function build(){
     const sourceCode = await transformIfScript(raw, ext, moduleId);
     const transformed = transformModule(sourceCode, moduleId);
     assertValidJavaScript(transformed, moduleId);
+    await assertNoBrowserNodeGlobals(transformed, moduleId);
     pushModule(moduleId, transformed);
   }
 
@@ -954,10 +980,8 @@ async function build(){
   if (statusModules.length !== 1){
     throw new Error(`[build] expected one canonical statuses module, received ${statusModules.length}`);
   }
-  for (const alias of ['./statuses.js', '@statuses']){
-    if (applyLegacyModuleAlias(alias) !== './statuses.ts'){
-      throw new Error(`[build] status alias ${alias} does not resolve to ./statuses.ts`);
-    }
+  if (applyLegacyModuleAlias('./statuses.js') !== './statuses.ts'){
+    throw new Error('[build] automatic .js alias does not resolve to ./statuses.ts');
   }
   const statusQueryModule = modules.find(({ id }) => id === './combat/status-query.ts');
   if (!statusQueryModule || !statusQueryModule.code.includes('exports.resolveTarget = resolveTarget')){

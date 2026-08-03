@@ -2,6 +2,7 @@
 
 const path = require('path');
 let ts;
+let scannerRuntime;
 
 function getTypeScriptTranspiler() {
   if (!ts) {
@@ -17,6 +18,11 @@ function initializationError() {
   return new Error('esbuild stub initialization cycle');
 }
 
+function getTypeScriptScanner() {
+  if (!scannerRuntime) scannerRuntime = require('typescript');
+  return scannerRuntime;
+}
+
 function createIdentitySourceMap(code, sourcefile = '<stdin>') {
   return JSON.stringify({
     version: 3,
@@ -27,11 +33,59 @@ function createIdentitySourceMap(code, sourcefile = '<stdin>') {
   });
 }
 
+// esbuild's `define` option is a compile-time token substitution, not a text
+// replacement. Walk TypeScript's syntax tree so quoted text, comments, object
+// keys, and longer identifiers are never changed by the offline implementation.
+function applyDefines(code, define, sourcefile = 'stdin.js') {
+  if (!define || typeof define !== 'object' || Object.keys(define).length === 0) return code;
+  const tsRuntime = getTypeScriptScanner();
+  const scriptKind = sourcefile.endsWith('.tsx') ? tsRuntime.ScriptKind.TSX
+    : sourcefile.endsWith('.ts') ? tsRuntime.ScriptKind.TS
+      : tsRuntime.ScriptKind.JS;
+  const source = tsRuntime.createSourceFile(sourcefile, code, tsRuntime.ScriptTarget.Latest, true, scriptKind);
+  const replacements = [];
+  const propertyChain = (node, names) => {
+    let current = node;
+    for (let index = names.length - 1; index > 0; index -= 1) {
+      if (!tsRuntime.isPropertyAccessExpression(current) || current.name.text !== names[index]) return false;
+      current = current.expression;
+    }
+    return names[0] === 'import.meta'
+      ? tsRuntime.isMetaProperty(current) && current.keywordToken === tsRuntime.SyntaxKind.ImportKeyword && current.name.text === 'meta'
+      : tsRuntime.isIdentifier(current) && current.text === names[0];
+  };
+  const visit = (node) => {
+    let key;
+    if (propertyChain(node, ['process', 'env', 'NODE_ENV'])) key = 'process.env.NODE_ENV';
+    else if (propertyChain(node, ['import.meta', 'env', 'MODE'])) key = 'import.meta.env.MODE';
+    else if (tsRuntime.isIdentifier(node) && node.text === '__DEV__') {
+      const parent = node.parent;
+      const isName = (tsRuntime.isPropertyAccessExpression(parent) && parent.name === node)
+        || (tsRuntime.isPropertyAssignment(parent) && parent.name === node)
+        || (tsRuntime.isShorthandPropertyAssignment(parent) && parent.name === node)
+        || (tsRuntime.isDeclaration(parent) && parent.name === node);
+      if (!isName) key = '__DEV__';
+    }
+    if (key && Object.prototype.hasOwnProperty.call(define, key)) {
+      replacements.push({ start: node.getStart(source), end: node.end, text: String(define[key]) });
+      return;
+    }
+    tsRuntime.forEachChild(node, visit);
+  };
+  visit(source);
+  for (let index = replacements.length - 1; index >= 0; index -= 1) {
+    const replacement = replacements[index];
+    code = code.slice(0, replacement.start) + replacement.text + code.slice(replacement.end);
+  }
+  return code;
+}
+
 function performTransform(code, options = {}) {
   if (typeof code !== 'string') {
     throw new TypeError('esbuild stub transform expects code string');
   }
   const { loader, sourcemap, sourcefile } = options;
+  code = applyDefines(code, options.define, sourcefile);
   const generateMap = Boolean(sourcemap);
 
   if (loader === 'ts' || loader === 'tsx') {
@@ -138,6 +192,7 @@ async function build(options = {}) {
     loader: stdin.loader,
     sourcemap: options.sourcemap,
     sourcefile: stdin.sourcefile,
+    define: options.define,
   });
   const outputText = transformed.code;
   const outputPath = options.outfile

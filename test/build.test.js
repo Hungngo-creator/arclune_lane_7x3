@@ -55,3 +55,16 @@ test('build registers external stub modules required at runtime', async () => {
   const bundled = await fs.readFile(DIST_FILE, 'utf8');
   assert.match(bundled, /__modules\['\.\/\.\.\/tools\/zod-stub\/index\.js'\]\s*=/);
 });
+
+test('new TypeScript source files receive automatic JavaScript module aliases', async () => {
+  const sourceFile = path.join(ROOT_DIR, 'src', 'utils', 'automatic-alias-regression.ts');
+  await fs.writeFile(sourceFile, 'export const automaticAliasRegression = true;\n', 'utf8');
+  try {
+    await runBuild();
+    const bundled = await fs.readFile(DIST_FILE, 'utf8');
+    assert.match(bundled, /"\.\/utils\/automatic-alias-regression\.js":"\.\/utils\/automatic-alias-regression\.ts"/);
+    assert.match(bundled, /__modules\['\.\/utils\/automatic-alias-regression\.ts'\]/);
+  } finally {
+    await fs.rm(sourceFile, { force: true });
+  }
+});

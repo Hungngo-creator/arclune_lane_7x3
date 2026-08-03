@@ -1,16 +1,37 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { spawnSync } = require('node:child_process');
 
 const bundlePath = path.join(__dirname, '..', 'dist', 'app.js');
 
-function loadBuiltRuntime() {
-  const source = fs.readFileSync(bundlePath, 'utf8');
-  const bootstrapIndex = source.lastIndexOf('try {');
-  if (bootstrapIndex < 0) throw new Error('built bootstrap boundary not found');
+function createBrowserDocument() {
+  const element = () => ({
+    style: {}, dataset: {}, classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
+    appendChild() {}, removeChild() {}, replaceChildren() {}, addEventListener() {}, removeEventListener() {},
+    setAttribute() {}, removeAttribute() {}, querySelector() { return null; }, querySelectorAll() { return []; },
+    innerHTML: '', textContent: '',
+  });
+  const root = element();
+  return {
+    body: root,
+    head: element(),
+    documentElement: element(),
+    readyState: 'complete',
+    createElement: element,
+    createTextNode: (text) => ({ textContent: text }),
+    getElementById: () => root,
+    querySelector: () => root,
+    querySelectorAll: () => [],
+    addEventListener() {},
+    removeEventListener() {},
+  };
+}
+
+function loadBuiltRuntime(bundleSource) {
+  const source = bundleSource ?? fs.readFileSync(bundlePath, 'utf8');
   const context = {
     console,
-    process: { env: { NODE_ENV: 'development' } },
     setTimeout,
     clearTimeout,
     Map,
@@ -26,11 +47,44 @@ function loadBuiltRuntime() {
     Date,
     RegExp,
     JSON,
+  document: createBrowserDocument(),
+    location: { protocol: 'https:', href: 'https://arclune.test/', search: '', hash: '' },
+    navigator: { userAgent: 'browser-vm' },
+    Event: class Event { constructor(type) { this.type = type; } },
+    CustomEvent: class CustomEvent { constructor(type, init = {}) { this.type = type; this.detail = init.detail; } },
+    EventTarget: class EventTarget { addEventListener() {} removeEventListener() {} dispatchEvent() { return true; } },
+    Element: Object,
+    HTMLElement: Object,
+    HTMLStyleElement: Object,
+    HTMLInputElement: Object,
+    HTMLButtonElement: Object,
+    localStorage: { getItem() { return null; }, setItem() {}, removeItem() {} },
   };
+  expect('process' in context).toBe(false);
+  expect('Buffer' in context).toBe(false);
   context.globalThis = context;
+  context.window = context;
+  context.self = context;
+  context.addEventListener = () => {};
+  context.removeEventListener = () => {};
+  context.dispatchEvent = () => true;
+  context.requestAnimationFrame = (callback) => setTimeout(callback, 0);
+  context.cancelAnimationFrame = clearTimeout;
   vm.createContext(context);
-  new vm.Script(source.slice(0, bootstrapIndex), { filename: 'dist/app.js' }).runInContext(context);
+  new vm.Script(source, { filename: 'dist/app.js' }).runInContext(context);
   return context;
+}
+
+function buildFallback(mode) {
+  const result = spawnSync(process.execPath, ['build.mjs', `--mode=${mode}`], {
+    cwd: path.join(__dirname, '..'),
+    encoding: 'utf8',
+    env: { ...process.env, ARCLUNE_FORCE_ESBUILD_FALLBACK: '1' },
+  });
+  expect(result.status).toBe(0);
+  const source = fs.readFileSync(bundlePath, 'utf8');
+  expect(source).not.toMatch(/process\.env\.NODE_ENV/);
+  return source;
 }
 
 function createBattle(runtime, hp = 1000) {
@@ -51,6 +105,37 @@ function createBattle(runtime, hp = 1000) {
   return { game, ally, enemy };
 }
 
+function expectTurnAndLifecycleSmoke(runtime) {
+  const turns = runtime.__require('./turns.ts');
+  const { game, ally, enemy } = createBattle(runtime);
+  const hooks = { doActionOrSkip: turns.doActionOrSkip, processActionChain: () => null, checkBattleEnd: () => false };
+  for (let index = 0; index < 6; index += 1) {
+    turns.stepTurn(game, hooks);
+    expect(game.runtime.actionExecutionStack).toEqual([]);
+    expect(game.runtime.actionFault).toBeUndefined();
+  }
+  expect(ally.hp).toBeLessThan(1000);
+  expect(enemy.hp).toBeLessThan(1000);
+  const events = game.runtime.combatEvents;
+  expect(events.filter(event => event.type === 'ACTION_END')).toHaveLength(6);
+  expect(new Set(events.filter(event => event.type === 'ACTION_START').map(event => event.actionId)).size).toBe(6);
+
+  const combat = runtime.__require('./combat.ts');
+  const lethal = createBattle(runtime, 100);
+  lethal.ally.isLeader = true;
+  lethal.enemy.isLeader = true;
+  expect(combat.doBasicWithFollowups(lethal.game, lethal.ally, 0)).toMatchObject({ ok: true, committedHits: 1 });
+  const lethalEvents = lethal.game.runtime.combatEvents.map(event => event.type);
+  expect(lethalEvents).toEqual(expect.arrayContaining(['HP_ZERO', 'DEATH_CONFIRMED', 'ACTION_END']));
+  expect(lethal.game.runtime.actionExecutionStack).toEqual([]);
+  expect(lethal.game.runtime.battleEnd).toMatchObject({ ended: true, winner: 'ally' });
+}
+
+test.each(['development', 'production'])('forced fallback %s bundle boots and matches Turn Base runtime', (mode) => {
+  const runtime = loadBuiltRuntime(buildFallback(mode));
+  expectTurnAndLifecycleSmoke(runtime);
+});
+
 test('generated loader boots Turn Base modules and runs six real alternating actions', () => {
   const runtime = loadBuiltRuntime();
   const turns = runtime.__require('./turns.ts');
@@ -62,7 +147,6 @@ test('generated loader boots Turn Base modules and runs six real alternating act
   expect(typeof statusesModule.Statuses.resolveTarget).toBe('function');
   expect(typeof queryModule.resolveTarget).toBe('function');
   expect(runtime.__require('./statuses.js')).toBe(statusesModule);
-  expect(runtime.__require('@statuses')).toBe(statusesModule);
   expect(Object.keys(runtime.__moduleCache).filter(id => id === './statuses.ts')).toHaveLength(1);
 
   const hp = [[ally.hp, enemy.hp]];

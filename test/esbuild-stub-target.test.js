@@ -13,6 +13,37 @@ test('fallback transpiler strips TypeScript while preserving the ES2023 target',
   assert.match(code, /\?\?/);
 });
 
+test('fallback transform applies define tokens to TypeScript and JavaScript without changing text', async () => {
+  const define = {
+    'process.env.NODE_ENV': '"production"',
+    'import.meta.env.MODE': '"production"',
+    __DEV__: 'false',
+  };
+  for (const loader of ['ts', 'js']) {
+    const source = `const mode${loader === 'ts' ? ': string' : ''} = process.env.NODE_ENV;
+      const meta = import.meta.env.MODE; const enabled = __DEV__;
+      const text = "process.env.NODE_ENV import.meta.env.MODE __DEV__";
+      // process.env.NODE_ENV import.meta.env.MODE __DEV__`;
+    const { code } = await esbuild.transform(source, { loader, define });
+    assert.match(code, /mode\s*=\s*"production"/);
+    assert.match(code, /meta\s*=\s*"production"/);
+    assert.match(code, /enabled\s*=\s*false/);
+    assert.match(code, /"process\.env\.NODE_ENV import\.meta\.env\.MODE __DEV__"/);
+    assert.match(code, /\/\/ process\.env\.NODE_ENV import\.meta\.env\.MODE __DEV__/);
+  }
+});
+
+test('fallback build forwards define options through its transform path', async () => {
+  const result = await esbuild.build({
+    stdin: { contents: 'globalThis.mode = process.env.NODE_ENV; globalThis.dev = __DEV__;', loader: 'js', sourcefile: 'entry.js' },
+    write: false,
+    define: { 'process.env.NODE_ENV': '"development"', __DEV__: 'true' },
+  });
+  assert.match(result.outputFiles[0].text, /globalThis\.mode = "development"/);
+  assert.match(result.outputFiles[0].text, /globalThis\.dev = true/);
+  assert.doesNotMatch(result.outputFiles[0].text, /process\.env\.NODE_ENV/);
+});
+
 test('offline fallback removes optional parameter markers from emitted JavaScript', () => {
   const source = 'function lengthOf(value?: readonly string[] | null) { return value?.length ?? 0; }';
   const code = fallbackTypeScript.transpile(source);
