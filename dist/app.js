@@ -4686,6 +4686,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   const getCounterBonusMetadata = __dep15.getCounterBonusMetadata;
   const __dep16 = __require('./combat/number-utils.ts');
   const readAtkWilPower = __dep16.readAtkWilPower;
+  const readCombatHpState = __dep16.readCombatHpState;
   const __dep17 = __require('./combat/chap-minh-runtime.ts');
   const applyChapMinhMitigation = __dep17.applyChapMinhMitigation;
   const recordChapMinhPreventedDamage = __dep17.recordChapMinhPreventedDamage;
@@ -5107,7 +5108,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       }
       const batchResolution = resolveDamageBatch({
           identity, source, packets, contexts,
-          targets: weightedTargets.map((entry, index) => ({ iid: entry.token.iid ?? entry.token.id, currentHp: Math.max(0, Math.floor(entry.token.hp ?? 0)), maxHp: Math.max(0, Math.floor(entry.token.hpMax ?? 0)), arm: Number(entry.token.arm ?? 0), res: Number(entry.token.res ?? 0), trueSelfId: entry.token.trueSelfId ?? null, lifeSerial: Math.max(1, Number(entry.token.lifeSerial ?? 1)), slot: slotIndex(entry.token.side, entry.token.cx, entry.token.cy), weight: entry.weight, capRatio: entry.capRatio })),
+          targets: weightedTargets.map((entry, index) => { const hp = readCombatHpState(entry.token); return { iid: entry.token.iid ?? entry.token.id, currentHp: hp.hp, maxHp: hp.hpMax, rawCurrentHp: Number(entry.token.hp ?? 0), rawMaxHp: Number(entry.token.hpMax ?? 0), arm: Number(entry.token.arm ?? 0), res: Number(entry.token.res ?? 0), trueSelfId: entry.token.trueSelfId ?? null, lifeSerial: Math.max(1, Number(entry.token.lifeSerial ?? 1)), slot: slotIndex(entry.token.side, entry.token.cx, entry.token.cy), weight: entry.weight, capRatio: entry.capRatio }; }),
           shieldSnapshot: readShieldAmount(target),
           specialMitigation: chapMinhMitigation.prevented > 0 ? { kind: 'chap-minh', prevented: chapMinhMitigation.prevented } : null,
           batchPolicy: weightedTargets.length > 1 ? 'shared-hp' : 'single', sharedHpPolicy: weightedTargets.length > 1 ? { primaryTargetIid: target.iid ?? target.id } : null,
@@ -5396,8 +5397,8 @@ __modules['./combat.ts'] = (exports, module, __require) => {
 };
 __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/number-utils.ts');
+  const normalizeCombatHpState = __dep0.normalizeCombatHpState;
   const toFiniteNumber = __dep0.toFiniteNumber;
-  const toFloorInt = __dep0.toFloorInt;
   const toNonNegativeFloorInt = __dep0.toNonNegativeFloorInt;
   const toPositiveTurns = __dep0.toPositiveTurns;
   const __dep1 = __require('./combat/status-utils.ts');
@@ -5427,13 +5428,12 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   }
   /** @deprecated Low-level legacy commit primitive. New damage must enter through the combat kernel adapter. */
   function applyDamage(target, amount) {
-      const maxHp = toNonNegativeFloorInt(target.hpMax, 0);
+      const { hp: currentHp, hpMax: maxHp } = normalizeCombatHpState(target);
       if (maxHp <= 0)
           return;
       const damage = toNonNegativeFloorInt(amount, 0);
       if (damage <= 0)
           return;
-      const currentHp = Math.max(0, Math.min(maxHp, toFloorInt(target.hp, 0)));
       const newHp = Math.max(0, currentHp - damage);
       target.hp = newHp;
   }
@@ -6322,12 +6322,14 @@ __modules['./combat/kernel/damage-batch.ts'] = (exports, module, __require) => {
   const applyDamage = __dep0.applyDamage;
   const consumeShield = __dep0.consumeShield;
   const readShieldAmount = __dep0.readShieldAmount;
-  const __dep1 = __require('./combat/kernel/invariants.ts');
-  const assertDamageInvariant = __dep1.assertDamageInvariant;
-  const __dep2 = __require('./combat/kernel/damage-resolver.ts');
-  const resolveDamagePacket = __dep2.resolveDamagePacket;
-  const __dep3 = __require('./combat/kernel/sequence.ts');
-  const nextEventSerial = __dep3.nextEventSerial;
+  const __dep1 = __require('./combat/number-utils.ts');
+  const readCombatHpState = __dep1.readCombatHpState;
+  const __dep2 = __require('./combat/kernel/invariants.ts');
+  const assertDamageInvariant = __dep2.assertDamageInvariant;
+  const __dep3 = __require('./combat/kernel/damage-resolver.ts');
+  const resolveDamagePacket = __dep3.resolveDamagePacket;
+  const __dep4 = __require('./combat/kernel/sequence.ts');
+  const nextEventSerial = __dep4.nextEventSerial;
   const invariant = (condition, message) => { if (!condition)
       throw new Error(`[combat-kernel] ${message}`); };
   const finiteNonnegative = (value, field) => { invariant(Number.isFinite(value) && value >= 0, `${field} must be finite and non-negative`); return value; };
@@ -6411,8 +6413,12 @@ __modules['./combat/kernel/damage-batch.ts'] = (exports, module, __require) => {
       for (const snapshot of resolution.targetSnapshots) {
           const target = byIid.get(snapshot.iid);
           invariant(target, `allocation target ${String(snapshot.iid)} is missing`);
-          invariant(Number(target.hp ?? 0) === snapshot.currentHp, `stale hp snapshot for ${String(snapshot.iid)}`);
-          invariant(Number(target.hpMax ?? 0) === snapshot.maxHp, `stale maxHp snapshot for ${String(snapshot.iid)}`);
+          const rawHp = Number(target.hp ?? 0);
+          const rawMaxHp = Number(target.hpMax ?? 0);
+          const canonical = readCombatHpState(target);
+          const expectedRawHp = snapshot.rawCurrentHp ?? snapshot.currentHp;
+          const expectedRawMaxHp = snapshot.rawMaxHp ?? snapshot.maxHp;
+          invariant(rawHp === expectedRawHp && rawMaxHp === expectedRawMaxHp, `stale hp snapshot iid=${String(snapshot.iid)} rawHp=${rawHp} canonicalHp=${canonical.hp} snapshotHp=${snapshot.currentHp} rawMaxHp=${rawMaxHp} canonicalMaxHp=${canonical.hpMax} snapshotMaxHp=${snapshot.maxHp} actionId=${resolution.identity.actionId} chainId=${resolution.identity.chainId} packetId=${resolution.packetResolutions[0]?.packet.packetId ?? 'unknown'} actionKind=${resolution.identity.actionKind}`);
           invariant(Number(target.lifeSerial ?? 1) === snapshot.lifeSerial, `stale lifeSerial snapshot for ${String(snapshot.iid)}`);
       }
       const primaryIid = resolution.packetResolutions[0].packet.targetIid;
@@ -6602,18 +6608,20 @@ __modules['./combat/kernel/delayed-revive.ts'] = (exports, module, __require) =>
   if (!Object.prototype.hasOwnProperty.call(exports, 'consumeSsiTemporalEvent')) exports.consumeSsiTemporalEvent = consumeSsiTemporalEvent;
 };
 __modules['./combat/kernel/hp-mutation.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./combat/kernel/life-cycle.ts');
-  const markHpZero = __dep0.markHpZero;
-  const __dep1 = __require('./combat/kernel/sequence.ts');
-  const nextEventSerial = __dep1.nextEventSerial;
+  const __dep0 = __require('./combat/number-utils.ts');
+  const normalizeCombatHpValue = __dep0.normalizeCombatHpValue;
+  const readCombatHpState = __dep0.readCombatHpState;
+  const __dep1 = __require('./combat/kernel/life-cycle.ts');
+  const markHpZero = __dep1.markHpZero;
+  const __dep2 = __require('./combat/kernel/sequence.ts');
+  const nextEventSerial = __dep2.nextEventSerial;
   const amount = (value, field) => { if (!Number.isFinite(value) || value < 0)
       throw new Error(`[combat-kernel] ${field} must be finite and non-negative`); return value; };
   const iid = (target) => target.iid ?? target.id;
   function resolveHealing(target, requestedHeal, source, modifiers = []) {
       const requested = amount(requestedHeal, 'requestedHeal');
       const modified = modifiers.reduce((value, modifier, index) => value * amount(modifier, `healModifiers[${index}]`), requested);
-      const hpBefore = amount(Number(target.hp ?? 0), 'target.hp');
-      const maxHp = amount(Number(target.hpMax ?? 0), 'target.hpMax');
+      const { hp: hpBefore, hpMax: maxHp } = readCombatHpState(target);
       const blocked = target.alive === false || hpBefore <= 0;
       const effectiveHeal = blocked ? 0 : Math.min(Math.max(0, maxHp - hpBefore), Math.floor(modified));
       return { requestedHeal: requested, modifiedHeal: modified, effectiveHeal, overheal: Math.max(0, Math.floor(modified) - effectiveHeal), hpBefore, hpAfter: hpBefore + effectiveHeal, targetIid: iid(target), source, blocked };
@@ -6622,16 +6630,15 @@ __modules['./combat/kernel/hp-mutation.ts'] = (exports, module, __require) => {
       if (iid(target) !== result.targetIid || Number(target.hp ?? 0) !== result.hpBefore)
           throw new Error('[combat-kernel] stale healing snapshot');
       if (!result.blocked)
-          target.hp = result.hpAfter;
+          target.hp = normalizeCombatHpValue(result.hpAfter);
       const event = { type: 'HEAL_RESOLVED', state: result.blocked ? 'blocked' : 'committed', eventSerial: game ? nextEventSerial(game) : 0, actionId: identity?.actionId ?? null, chainId: identity?.chainId ?? null, parentActionId: identity?.parentActionId ?? null, ...result };
       if (game)
           ((game.runtime ??= {}).combatEvents ??= []).push(event);
       return event;
   }
   function resolveHpLoss(target, requestedAmount, kind, source, canKill = false) {
-      const requested = amount(requestedAmount, 'hpMutation.amount');
-      const hpBefore = amount(Number(target.hp ?? 0), 'target.hp');
-      const maxHp = amount(Number(target.hpMax ?? 0), 'target.hpMax');
+      const requested = normalizeCombatHpValue(amount(requestedAmount, 'hpMutation.amount'), 'hpMutation.amount');
+      const { hp: hpBefore, hpMax: maxHp } = readCombatHpState(target);
       const available = canKill ? hpBefore : Math.max(0, hpBefore - 1);
       const succeeded = kind !== 'hp-cost' || requested <= available;
       const effective = succeeded ? Math.min(requested, available) : 0;
@@ -6639,9 +6646,8 @@ __modules['./combat/kernel/hp-mutation.ts'] = (exports, module, __require) => {
   }
   function resolveMaxHpMutation(target, value, maxHpPolicy, currentHpPolicy, source, options = {}) {
       const input = amount(value, 'maxHpMutation.value');
-      const hpBefore = amount(Number(target.hp ?? 0), 'target.hp');
-      const maxHpBefore = amount(Number(target.hpMax ?? 0), 'target.hpMax');
-      const maxHpAfter = maxHpPolicy === 'unchanged' ? maxHpBefore : maxHpPolicy === 'add-flat' ? maxHpBefore + input : maxHpPolicy === 'add-percent' ? maxHpBefore * (1 + input) : input;
+      const { hp: hpBefore, hpMax: maxHpBefore } = readCombatHpState(target);
+      const maxHpAfter = normalizeCombatHpValue(maxHpPolicy === 'unchanged' ? maxHpBefore : maxHpPolicy === 'add-flat' ? maxHpBefore + input : maxHpPolicy === 'add-percent' ? maxHpBefore * (1 + input) : input, 'maxHpAfter');
       let hpAfter = hpBefore;
       if (currentHpPolicy === 'preserve-ratio')
           hpAfter = maxHpBefore === 0 ? 0 : maxHpAfter * hpBefore / maxHpBefore;
@@ -6916,13 +6922,16 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   const __dep5 = __require('./combat/kernel/true-self.ts');
   const ensureTrueSelfCombatRecord = __dep5.ensureTrueSelfCombatRecord;
   const lifeIdentityKey = __dep5.lifeIdentityKey;
+  const __dep6 = __require('./combat/number-utils.ts');
+  const normalizeCombatHpState = __dep6.normalizeCombatHpState;
+  const normalizeCombatHpValue = __dep6.normalizeCombatHpValue;
   const runtime = (game) => (game.runtime ??= {});
   const emit = (game, event) => { (runtime(game).combatEvents ??= []).push(event); };
   const getLifeState = (unit) => unit.lifeState ?? (unit.alive && (unit.hp == null || unit.hp > 0) ? 'alive' : 'dead-confirmed');
   const isCombatAlive = (unit) => getLifeState(unit) === 'alive' && unit.alive !== false && (unit.hp == null || unit.hp > 0);
   function markHpZero(unit) { unit.lifeState = 'hp-zero'; unit.alive = false; }
   function markDeathPrevention(unit) { unit.lifeState = 'death-prevention'; unit.alive = false; }
-  function markDeathPrevented(unit, hp = 1) { unit.hp = Math.max(1, hp); unit.lifeState = 'alive'; unit.alive = true; delete unit.deadAt; }
+  function markDeathPrevented(unit, hp = 1) { const state = normalizeCombatHpState(unit); unit.hp = Math.max(1, Math.min(state.hpMax, normalizeCombatHpValue(hp))); unit.lifeState = 'alive'; unit.alive = true; delete unit.deadAt; }
   function markDeathConfirmed(unit) { unit.lifeState = 'dead-confirmed'; unit.alive = false; }
   function markRemoved(unit) { unit.lifeState = 'removed'; unit.alive = false; }
   function markErased(unit) { unit.lifeState = 'erased'; unit.alive = false; }
@@ -7120,8 +7129,8 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       if (reason !== 'allowed')
           return { committed: false, reason, targetIid: death.targetIid, lifeSerial: target.lifeSerial ?? death.lifeSerial };
       const consumed = state.revivedDeathIds ??= [];
-      const hpMax = Math.max(1, Number(target.hpMax ?? 1));
-      const hp = request.hpPolicy.kind === 'ratio' ? Math.floor(hpMax * request.hpPolicy.value) : Math.floor(request.hpPolicy.value);
+      const hpMax = Math.max(1, normalizeCombatHpState(target).hpMax);
+      const hp = request.hpPolicy.kind === 'ratio' ? normalizeCombatHpValue(hpMax * request.hpPolicy.value) : normalizeCombatHpValue(request.hpPolicy.value);
       target.hp = Math.max(1, Math.min(hpMax, hp));
       const lifeSerial = beginRevivedLife(target);
       target.lifeState = 'alive';
@@ -7237,6 +7246,9 @@ __modules['./combat/kernel/rebirth.ts'] = (exports, module, __require) => {
   const ensureCombatIdentity = __dep2.ensureCombatIdentity;
   const __dep3 = __require('./combat/kernel/non-death-removal.ts');
   const commitNonDeathRemoval = __dep3.commitNonDeathRemoval;
+  const __dep4 = __require('./combat/number-utils.ts');
+  const normalizeCombatHpState = __dep4.normalizeCombatHpState;
+  const normalizeCombatHpValue = __dep4.normalizeCombatHpValue;
   const rt = (game) => (game.runtime ??= {});
   function registerRebirthAuthorization(game, effectId, record) {
       if (record.state !== 'entered')
@@ -7284,7 +7296,8 @@ __modules['./combat/kernel/rebirth.ts'] = (exports, module, __require) => {
           self.deathHistory.push(record.deathId);
       const newIid = nextCombatIid(game), keep = new Set(request.policies.preserveStatusIds ?? []);
       const unit = ensureCombatIdentity({ ...request.template, iid: newIid, trueSelfId: request.trueSelfId, incarnationSerial: self.incarnationSerial, lifeSerial: 1, side: request.spawn.side, cx: request.spawn.cx, cy: request.spawn.cy, lifeState: 'alive', alive: true, rage: request.policies.rage, statuses: (request.template.statuses ?? []).filter(status => keep.has(String(status.id))) }, 'collection-unit');
-      unit.hp = request.policies.hp === 'full' ? Math.max(1, Number(unit.hpMax ?? 1)) : Math.max(1, Math.min(Number(unit.hpMax ?? 1), request.policies.hp));
+      normalizeCombatHpState(unit);
+      unit.hp = request.policies.hp === 'full' ? unit.hpMax : Math.max(1, Math.min(unit.hpMax, normalizeCombatHpValue(request.policies.hp, 'rebirth.hp')));
       game.tokens.push(unit);
       record.state = 'reborn';
       const eventSerial = nextEventSerial(game);
@@ -7518,6 +7531,25 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
   function toNonNegativeFloorInt(value, fallback = 0) {
       return Math.max(0, toFloorInt(value, fallback));
   }
+  /** Canonical combat HP contract: finite, non-negative integers rounded down. */
+  function normalizeCombatHpValue(value, field = 'hp') {
+      const parsed = typeof value === 'number' ? value : Number(value);
+      if (!Number.isFinite(parsed))
+          throw new Error(`[combat-kernel] ${field} must be finite`);
+      return Math.max(0, Math.floor(parsed));
+  }
+  /** Reads HP as one state so current HP can never exceed Max HP. */
+  function readCombatHpState(unit) {
+      const hpMax = normalizeCombatHpValue(unit?.hpMax ?? 0, 'hpMax');
+      return { hp: Math.min(hpMax, normalizeCombatHpValue(unit?.hp ?? hpMax, 'hp')), hpMax };
+  }
+  /** Authoritative ingress/commit normalizer. A fractionally full unit stays full. */
+  function normalizeCombatHpState(unit) {
+      const state = readCombatHpState(unit);
+      unit.hpMax = state.hpMax;
+      unit.hp = state.hp;
+      return state;
+  }
   function toPositiveTurns(value, fallback = 1) {
       const direct = toFiniteNumber(value, NaN);
       if (!Number.isFinite(direct) || direct <= 0)
@@ -7530,8 +7562,9 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
       return Math.max(0, toFiniteNumber(unit.atk, 0) + toFiniteNumber(unit.wil, 0));
   }
   function readUnitHpState(unit) {
-      const hpMax = Math.max(1, toFloorInt(unit?.hpMax, 1));
-      const hp = Math.max(0, Math.min(hpMax, toFloorInt(unit?.hp, hpMax)));
+      const state = readCombatHpState({ hp: unit?.hp ?? 1, hpMax: unit?.hpMax ?? 1 });
+      const hpMax = Math.max(1, state.hpMax);
+      const hp = Math.min(hpMax, state.hp);
       return { hp, hpMax };
   }
   function asRecord(value) {
@@ -7545,6 +7578,9 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'toFloorInt')) exports.toFloorInt = toFloorInt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'toRoundedInt')) exports.toRoundedInt = toRoundedInt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'toNonNegativeFloorInt')) exports.toNonNegativeFloorInt = toNonNegativeFloorInt;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeCombatHpValue')) exports.normalizeCombatHpValue = normalizeCombatHpValue;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'readCombatHpState')) exports.readCombatHpState = readCombatHpState;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeCombatHpState')) exports.normalizeCombatHpState = normalizeCombatHpState;
   if (!Object.prototype.hasOwnProperty.call(exports, 'toPositiveTurns')) exports.toPositiveTurns = toPositiveTurns;
   if (!Object.prototype.hasOwnProperty.call(exports, 'readAtkWilPower')) exports.readAtkWilPower = readAtkWilPower;
   if (!Object.prototype.hasOwnProperty.call(exports, 'readUnitHpState')) exports.readUnitHpState = readUnitHpState;
@@ -11055,11 +11091,13 @@ __modules['./config/schema.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'parseGameConfig')) exports.parseGameConfig = parseGameConfig;
 };
 __modules['./cultivation.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./data/economy.ts');
-  const getCultivationRealmEconomy = __dep0.getCultivationRealmEconomy;
-  const listCultivationRealmsEconomy = __dep0.listCultivationRealmsEconomy;
-  const __dep1 = __require('./utils/currency.ts');
-  const spendAetherWithPriority = __dep1.spendAetherWithPriority;
+  const __dep0 = __require('./combat/number-utils.ts');
+  const readCombatHpState = __dep0.readCombatHpState;
+  const __dep1 = __require('./data/economy.ts');
+  const getCultivationRealmEconomy = __dep1.getCultivationRealmEconomy;
+  const listCultivationRealmsEconomy = __dep1.listCultivationRealmsEconomy;
+  const __dep2 = __require('./utils/currency.ts');
+  const spendAetherWithPriority = __dep2.spendAetherWithPriority;
   const CULTIVATION_CATALOG_TO_UNIT_STAT_KEY = Object.freeze({
       HP: 'hpMax',
       HPmax: 'hpMax',
@@ -11361,8 +11399,9 @@ __modules['./cultivation.ts'] = (exports, module, __require) => {
       if (totalBonus === ZERO_BONUS) {
           return unit;
       }
-      const hpMax = scaleStat(unit.hpMax, totalBonus.hpMax);
-      const nextHp = scaleStat(unit.hp, totalBonus.hpMax);
+      const scaledHpMax = scaleStat(unit.hpMax, totalBonus.hpMax);
+      const scaledHp = scaleStat(unit.hp, totalBonus.hpMax);
+      const hpState = scaledHpMax === undefined ? null : readCombatHpState({ hpMax: scaledHpMax, hp: scaledHp ?? scaledHpMax });
       const atk = scaleStat(unit.atk, totalBonus.atk);
       const wil = scaleStat(unit.wil, totalBonus.wil);
       const arm = scaleStat(unit.arm, totalBonus.arm);
@@ -11371,8 +11410,7 @@ __modules['./cultivation.ts'] = (exports, module, __require) => {
       const aeRegen = scaleStat(unit.aeRegen, totalBonus.aeRegen);
       return {
           ...unit,
-          ...(hpMax !== undefined ? { hpMax } : {}),
-          ...(nextHp !== undefined ? { hp: hpMax !== undefined ? Math.min(nextHp, hpMax) : nextHp } : {}),
+          ...(hpState ? { hpMax: hpState.hpMax, hp: hpState.hp } : {}),
           ...(atk !== undefined ? { atk } : {}),
           ...(wil !== undefined ? { wil } : {}),
           ...(arm !== undefined ? { arm } : {}),
@@ -17332,6 +17370,8 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
   const resolveRuntimeUnitStats = __dep1.resolveRuntimeUnitStats;
   const __dep2 = __require('./utils/domain-normalization.ts');
   const normalizeClassName = __dep2.normalizeClassName;
+  const __dep3 = __require('./combat/number-utils.ts');
+  const readCombatHpState = __dep3.readCombatHpState;
   const CREEP_SLOT_ORDER = [
       { id: 'creep_1', powerSlot: 2 },
       { id: 'creep_2', powerSlot: 1 },
@@ -17357,9 +17397,10 @@ __modules['./modes/pve/creep-builder.ts'] = (exports, module, __require) => {
   }
   function resolveRuntimeStatProfile(unitId, progressById) {
       const stats = resolveRuntimeUnitStats(unitId, progressById);
+      const hp = readCombatHpState(stats);
       return {
-          hp: stats.hp,
-          hpMax: stats.hpMax,
+          hp: hp.hp,
+          hpMax: hp.hpMax,
           atk: stats.atk,
           wil: stats.wil,
           arm: stats.arm,
@@ -45499,6 +45540,8 @@ __modules['./summon.ts'] = (exports, module, __require) => {
   const isUniqueGlobalSummonBlocked = __dep5.isUniqueGlobalSummonBlocked;
   const __dep6 = __require('./combat/kernel/life-cycle.ts');
   const isCombatAlive = __dep6.isCombatAlive;
+  const __dep7 = __require('./combat/number-utils.ts');
+  const readCombatHpState = __dep7.readCombatHpState;
   const DEFAULT_SUMMON_UNIT = {
       id: 'creep',
       name: 'Creep',
@@ -45579,6 +45622,7 @@ __modules['./summon.ts'] = (exports, module, __require) => {
           if (cellReserved(aliveTokens, Game.queued, cx, cy))
               continue;
           const extra = item.unit ?? {};
+          const hpState = readCombatHpState({ hp: extra.hp ?? extra.hpMax ?? 0, hpMax: extra.hpMax ?? 0 });
           const art = getUnitArt(extra.id ?? 'minion');
           const newToken = {
               id: (extra.id ?? 'creep'),
@@ -45592,8 +45636,8 @@ __modules['./summon.ts'] = (exports, module, __require) => {
               ownerIid: extra.ownerIid,
               bornSerial: extra.bornSerial,
               ttlTurns: extra.ttlTurns,
-              hpMax: extra.hpMax,
-              hp: extra.hp,
+              hpMax: hpState.hpMax,
+              hp: hpState.hp,
               atk: extra.atk,
               art,
               skinKey: art?.skinKey ?? null,

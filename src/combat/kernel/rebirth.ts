@@ -5,6 +5,7 @@ import type { ReincarnationRecord } from './reincarnation.ts';
 import { ensureTrueSelfCombatRecord } from './true-self.ts';
 import { ensureCombatIdentity } from './combat-identity.ts';
 import { commitNonDeathRemoval } from './non-death-removal.ts';
+import { normalizeCombatHpState, normalizeCombatHpValue } from '../number-utils.ts';
 
 export interface RebirthAuthorization { tokenId: string; effectId: string; deathId: string; trueSelfId: string; incarnationSerial: number; lifeSerial: number; consumed: boolean }
 export interface RebirthRequest { deathId: string; trueSelfId: string; authorizationTokenId: string; spawn: { side: Side; cx: number; cy: number }; template: UnitToken; policies: { hp: number | 'full'; rage: number; preserveStatusIds?: readonly string[] } }
@@ -40,7 +41,7 @@ export function commitRebirth(game:SessionState,request:RebirthRequest):RebirthR
   self.incarnationSerial=Math.max(self.incarnationSerial,record.incarnationSerial)+1; if(!self.deathHistory.includes(record.deathId))self.deathHistory.push(record.deathId);
   const newIid=nextCombatIid(game), keep=new Set(request.policies.preserveStatusIds??[]);
   const unit=ensureCombatIdentity({...request.template,iid:newIid,trueSelfId:request.trueSelfId,incarnationSerial:self.incarnationSerial,lifeSerial:1,side:request.spawn.side,cx:request.spawn.cx,cy:request.spawn.cy,lifeState:'alive',alive:true,rage:request.policies.rage,statuses:(request.template.statuses??[]).filter(status=>keep.has(String(status.id)))} as UnitToken,'collection-unit');
-  unit.hp=request.policies.hp==='full'?Math.max(1,Number(unit.hpMax??1)):Math.max(1,Math.min(Number(unit.hpMax??1),request.policies.hp)); game.tokens.push(unit); record.state='reborn';
+  normalizeCombatHpState(unit); unit.hp=request.policies.hp==='full'?unit.hpMax:Math.max(1,Math.min(unit.hpMax,normalizeCombatHpValue(request.policies.hp,'rebirth.hp'))); game.tokens.push(unit); record.state='reborn';
   const eventSerial=nextEventSerial(game); self.rebirthHistory.push({deathId:record.deathId,oldIid:record.targetIid,newIid,eventSerial,incarnationSerial:self.incarnationSerial});
   (state.combatEvents??=[]).push({type:'REBIRTH_COMMITTED',eventSerial,deathId:record.deathId,trueSelfId:request.trueSelfId,oldIid:record.targetIid,newIid,lifeSerial:1,incarnationSerial:self.incarnationSerial,authorizationTokenId:auth.tokenId});
   return{committed:true,reason:'allowed',trueSelfId:request.trueSelfId,oldIid:record.targetIid,newIid,incarnationSerial:self.incarnationSerial};

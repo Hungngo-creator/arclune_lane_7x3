@@ -1,6 +1,7 @@
 import { lookupUnit } from '../../units.ts';
 import { mapUnitProgressById, resolveRuntimeUnitStats } from './collection-mapper.ts';
 import { normalizeClassName } from '../../utils/domain-normalization.ts';
+import { readCombatHpState } from '../../combat/number-utils.ts';
 
 import type { PveDeckEntry } from '@shared-types/combat';
 import type { CollectionStateInput, RuntimeUnitProgress } from '@shared-types/pve';
@@ -80,9 +81,10 @@ function resolveRuntimeStatProfile(
   progressById: ReadonlyMap<string, RuntimeUnitProgress>,
 ): RuntimeStatProfile {
   const stats = resolveRuntimeUnitStats(unitId, progressById);
+  const hp = readCombatHpState(stats);
   return {
-    hp: stats.hp,
-    hpMax: stats.hpMax,
+    hp: hp.hp,
+    hpMax: hp.hpMax,
     atk: stats.atk,
     wil: stats.wil,
     arm: stats.arm,

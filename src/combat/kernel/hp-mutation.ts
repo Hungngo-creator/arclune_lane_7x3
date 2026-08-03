@@ -1,5 +1,6 @@
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
+import { normalizeCombatHpValue, readCombatHpState } from '../number-utils.ts';
 import { markHpZero } from './life-cycle.ts';
 import { nextEventSerial } from './sequence.ts';
 import type { ActionIdentity, CurrentHpPolicy, MaxHpPolicy, MutationResetPolicy, SourceAttribution } from './types.ts';
@@ -12,27 +13,27 @@ const iid = (target: UnitToken): string | number => target.iid ?? target.id;
 export function resolveHealing(target: UnitToken, requestedHeal: number, source: SourceAttribution, modifiers: readonly number[] = []): HealResult {
   const requested = amount(requestedHeal, 'requestedHeal');
   const modified = modifiers.reduce((value, modifier, index) => value * amount(modifier, `healModifiers[${index}]`), requested);
-  const hpBefore = amount(Number(target.hp ?? 0), 'target.hp'); const maxHp = amount(Number(target.hpMax ?? 0), 'target.hpMax');
+  const { hp: hpBefore, hpMax: maxHp } = readCombatHpState(target);
   const blocked = target.alive === false || hpBefore <= 0; const effectiveHeal = blocked ? 0 : Math.min(Math.max(0, maxHp - hpBefore), Math.floor(modified));
   return { requestedHeal: requested, modifiedHeal: modified, effectiveHeal, overheal: Math.max(0, Math.floor(modified) - effectiveHeal), hpBefore, hpAfter: hpBefore + effectiveHeal, targetIid: iid(target), source, blocked };
 }
 export function commitHealing(game: SessionState | null, target: UnitToken, result: HealResult, identity?: ActionIdentity): Record<string, unknown> {
   if (iid(target) !== result.targetIid || Number(target.hp ?? 0) !== result.hpBefore) throw new Error('[combat-kernel] stale healing snapshot');
-  if (!result.blocked) target.hp = result.hpAfter;
+  if (!result.blocked) target.hp = normalizeCombatHpValue(result.hpAfter);
   const event = { type: 'HEAL_RESOLVED', state: result.blocked ? 'blocked' : 'committed', eventSerial: game ? nextEventSerial(game) : 0, actionId: identity?.actionId ?? null, chainId: identity?.chainId ?? null, parentActionId: identity?.parentActionId ?? null, ...result };
   if (game) (((game.runtime ??= {}) as { combatEvents?: Record<string, unknown>[] }).combatEvents ??= []).push(event); return event;
 }
 
 export function resolveHpLoss(target: UnitToken, requestedAmount: number, kind: 'hp-cost' | 'self-damage' | 'sacrifice' | 'non-damage-hp-loss' | 'execute', source: SourceAttribution, canKill = false): HpMutationResult {
-  const requested = amount(requestedAmount, 'hpMutation.amount'); const hpBefore = amount(Number(target.hp ?? 0), 'target.hp'); const maxHp = amount(Number(target.hpMax ?? 0), 'target.hpMax');
+  const requested = normalizeCombatHpValue(amount(requestedAmount, 'hpMutation.amount'), 'hpMutation.amount'); const { hp: hpBefore, hpMax: maxHp } = readCombatHpState(target);
   const available = canKill ? hpBefore : Math.max(0, hpBefore - 1); const succeeded = kind !== 'hp-cost' || requested <= available;
   const effective = succeeded ? Math.min(requested, available) : 0;
   return { kind, requestedAmount: requested, effectiveAmount: effective, hpBefore, hpAfter: hpBefore - effective, maxHpBefore: maxHp, maxHpAfter: maxHp, targetIid: iid(target), source, canKill, succeeded, currentHpPolicy: 'preserve-absolute', maxHpPolicy: 'unchanged', resetPolicy: 'never-within-battle' };
 }
 
 export function resolveMaxHpMutation(target: UnitToken, value: number, maxHpPolicy: MaxHpPolicy, currentHpPolicy: CurrentHpPolicy, source: SourceAttribution, options: { setCurrentHp?: number; resetPolicy?: MutationResetPolicy } = {}): HpMutationResult {
-  const input = amount(value, 'maxHpMutation.value'); const hpBefore = amount(Number(target.hp ?? 0), 'target.hp'); const maxHpBefore = amount(Number(target.hpMax ?? 0), 'target.hpMax');
-  const maxHpAfter = maxHpPolicy === 'unchanged' ? maxHpBefore : maxHpPolicy === 'add-flat' ? maxHpBefore + input : maxHpPolicy === 'add-percent' ? maxHpBefore * (1 + input) : input;
+  const input = amount(value, 'maxHpMutation.value'); const { hp: hpBefore, hpMax: maxHpBefore } = readCombatHpState(target);
+  const maxHpAfter = normalizeCombatHpValue(maxHpPolicy === 'unchanged' ? maxHpBefore : maxHpPolicy === 'add-flat' ? maxHpBefore + input : maxHpPolicy === 'add-percent' ? maxHpBefore * (1 + input) : input, 'maxHpAfter');
   let hpAfter = hpBefore;
   if (currentHpPolicy === 'preserve-ratio') hpAfter = maxHpBefore === 0 ? 0 : maxHpAfter * hpBefore / maxHpBefore;
   else if (currentHpPolicy === 'clamp' || currentHpPolicy === 'preserve-absolute') hpAfter = Math.min(hpBefore, maxHpAfter);

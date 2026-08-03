@@ -1356,7 +1356,7 @@ skill 2: bị động kích hoạt khi đạt điều kiện, khi skill 1 kích 
 
 skill 3: mỗi khi gây sát thương lên 1 mục tiêu bằng đánh thường (nội tại cũng tính) vượt quá tối thiểu 25% max hp của mục tiêu, + 2,5% atk và wil của hiện tại/mỗi mục tiêu thoả mãn điều kiện, hiệu ứng từ skill này biến mất khi nhân vật này rời sân, kích hoạt tối đa 5 lần/turn bản thân (cap tính như cách tính cap nội tại thiện xạ), mỗi lần kích hoạt chỉ tính trên 1 mục tiêu, cost 3 ae/lần kích hoạt, follow up và các debuff DoT không thể kích hoạt skill này.
 
-ultimate: liên xạ liên tiếp 3 phát, trong đó mỗi phát là ngẫu nhiên và có thể trùng, 100% 1 viên trúng leader địch, mỗi viên gây sát thương = 170% atk và 100% wil của hắn.
+ultimate: liên xạ liên tiếp 3 phát, trong đó mỗi phát là ngẫu nhiên và có thể trùng, 100% 1 viên trúng leader địch, mỗi viên gây sát thương = 110% atk và 90% wil của hắn.
 
 75) 
 

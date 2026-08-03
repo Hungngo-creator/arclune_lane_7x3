@@ -1,12 +1,13 @@
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
 import { applyDamage, consumeShield, readShieldAmount } from '../apply-damage.ts';
+import { readCombatHpState } from '../number-utils.ts';
 import { assertDamageInvariant } from './invariants.ts';
 import { resolveDamagePacket } from './damage-resolver.ts';
 import { nextEventSerial } from './sequence.ts';
 import type { ActionIdentity, AppliedPacketResult, CombatantSnapshot, DamageContext, DamagePacket, DamageResolution, SourceAttribution } from './types.ts';
 
-export interface DamageBatchTargetSnapshot extends CombatantSnapshot { trueSelfId: string | null; lifeSerial: number; slot: number; weight: number; capRatio: number | null }
+export interface DamageBatchTargetSnapshot extends CombatantSnapshot { rawCurrentHp?: number; rawMaxHp?: number; trueSelfId: string | null; lifeSerial: number; slot: number; weight: number; capRatio: number | null }
 export interface DamageBatchCommand {
   identity: ActionIdentity; source: SourceAttribution; packets: readonly DamagePacket[]; contexts: readonly DamageContext[];
   targets: readonly DamageBatchTargetSnapshot[]; shieldSnapshot: number;
@@ -96,8 +97,10 @@ export function commitDamageBatch(game: SessionState | null, resolution: DamageB
   const byIid = new Map(targets.map(token => [token.iid ?? token.id, token]));
   for (const snapshot of resolution.targetSnapshots) {
     const target = byIid.get(snapshot.iid); invariant(target, `allocation target ${String(snapshot.iid)} is missing`);
-    invariant(Number(target.hp ?? 0) === snapshot.currentHp, `stale hp snapshot for ${String(snapshot.iid)}`);
-    invariant(Number(target.hpMax ?? 0) === snapshot.maxHp, `stale maxHp snapshot for ${String(snapshot.iid)}`);
+    const rawHp = Number(target.hp ?? 0); const rawMaxHp = Number(target.hpMax ?? 0); const canonical = readCombatHpState(target);
+    const expectedRawHp = snapshot.rawCurrentHp ?? snapshot.currentHp; const expectedRawMaxHp = snapshot.rawMaxHp ?? snapshot.maxHp;
+    invariant(rawHp === expectedRawHp && rawMaxHp === expectedRawMaxHp,
+      `stale hp snapshot iid=${String(snapshot.iid)} rawHp=${rawHp} canonicalHp=${canonical.hp} snapshotHp=${snapshot.currentHp} rawMaxHp=${rawMaxHp} canonicalMaxHp=${canonical.hpMax} snapshotMaxHp=${snapshot.maxHp} actionId=${resolution.identity.actionId} chainId=${resolution.identity.chainId} packetId=${resolution.packetResolutions[0]?.packet.packetId ?? 'unknown'} actionKind=${resolution.identity.actionKind}`);
     invariant(Number(target.lifeSerial ?? 1) === snapshot.lifeSerial, `stale lifeSerial snapshot for ${String(snapshot.iid)}`);
   }
   const primaryIid = resolution.packetResolutions[0]!.packet.targetIid;

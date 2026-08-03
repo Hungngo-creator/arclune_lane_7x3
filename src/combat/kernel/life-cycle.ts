@@ -8,6 +8,7 @@ import { nextDeathSerial, nextEventSerial } from './sequence.ts';
 import type { ActionIdentity, SourceAttribution } from './types.ts';
 import { hasEnteredReincarnation, markReincarnationEscapedByRevive, observeReincarnationDeathWave } from './reincarnation.ts';
 import { ensureTrueSelfCombatRecord, lifeIdentityKey } from './true-self.ts';
+import { normalizeCombatHpState, normalizeCombatHpValue } from '../number-utils.ts';
 
 export type DeathCauseKind = 'damage' | 'dot' | 'reflected' | 'environment' | 'self-damage' | 'sacrifice' | 'non-damage-hp-loss' | 'execute';
 export interface HPZeroCandidate {
@@ -36,7 +37,7 @@ export const getLifeState = (unit: UnitToken): LifeState => unit.lifeState ?? (u
 export const isCombatAlive = (unit: UnitToken): boolean => getLifeState(unit) === 'alive' && unit.alive !== false && (unit.hp == null || unit.hp > 0);
 export function markHpZero(unit: UnitToken): void { unit.lifeState = 'hp-zero'; unit.alive = false; }
 export function markDeathPrevention(unit: UnitToken): void { unit.lifeState = 'death-prevention'; unit.alive = false; }
-export function markDeathPrevented(unit: UnitToken, hp = 1): void { unit.hp = Math.max(1, hp); unit.lifeState = 'alive'; unit.alive = true; delete unit.deadAt; }
+export function markDeathPrevented(unit: UnitToken, hp = 1): void { const state=normalizeCombatHpState(unit); unit.hp = Math.max(1, Math.min(state.hpMax, normalizeCombatHpValue(hp))); unit.lifeState = 'alive'; unit.alive = true; delete unit.deadAt; }
 export function markDeathConfirmed(unit: UnitToken): void { unit.lifeState = 'dead-confirmed'; unit.alive = false; }
 export function markRemoved(unit: UnitToken): void { unit.lifeState = 'removed'; unit.alive = false; }
 export function markErased(unit: UnitToken): void { unit.lifeState = 'erased'; unit.alive = false; }
@@ -143,7 +144,7 @@ export function commitImmediateRevive(game: SessionState, target: UnitToken, req
   const state = runtime(game); const reason = evaluateReviveEligibility(game, death, target, request);
   if (reason !== 'allowed') return { committed: false, reason, targetIid: death.targetIid, lifeSerial: target.lifeSerial ?? death.lifeSerial };
   const consumed = state.revivedDeathIds ??= [];
-  const hpMax = Math.max(1, Number(target.hpMax ?? 1)); const hp = request.hpPolicy.kind === 'ratio' ? Math.floor(hpMax * request.hpPolicy.value) : Math.floor(request.hpPolicy.value);
+  const hpMax = Math.max(1, normalizeCombatHpState(target).hpMax); const hp = request.hpPolicy.kind === 'ratio' ? normalizeCombatHpValue(hpMax * request.hpPolicy.value) : normalizeCombatHpValue(request.hpPolicy.value);
   target.hp = Math.max(1, Math.min(hpMax, hp)); const lifeSerial = beginRevivedLife(target); target.lifeState = 'alive'; target.alive = true;
   if (request.ragePolicy === 'reset') target.rage = 0;
   if (request.buffPolicy === 'purge' || request.buffPolicy === 'purge-purgeable-debuffs') target.statuses = target.statuses?.filter(status => status.kind !== 'debuff' || status.unpurgeable === true);

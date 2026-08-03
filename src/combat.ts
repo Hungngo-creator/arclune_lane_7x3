@@ -18,7 +18,7 @@ import { applyUyenBasicExtras } from './leader-uyen.ts';
 import { nextRngValue } from './utils/rng.ts';
 import { normalizeClassName } from './utils/domain-normalization.ts';
 import { getCounterBonusMetadata } from './combat/counter-matrix.ts';
-import { readAtkWilPower } from './combat/number-utils.ts';
+import { readAtkWilPower, readCombatHpState } from './combat/number-utils.ts';
 import {
   applyChapMinhMitigation,
   recordChapMinhPreventedDamage,
@@ -555,7 +555,7 @@ export function dealAbilityDamage(
   }
   const batchResolution = resolveDamageBatch({
     identity, source, packets, contexts,
-    targets: weightedTargets.map((entry, index) => ({ iid: entry.token.iid ?? entry.token.id, currentHp: Math.max(0, Math.floor(entry.token.hp ?? 0)), maxHp: Math.max(0, Math.floor(entry.token.hpMax ?? 0)), arm: Number(entry.token.arm ?? 0), res: Number(entry.token.res ?? 0), trueSelfId: entry.token.trueSelfId ?? null, lifeSerial: Math.max(1, Number(entry.token.lifeSerial ?? 1)), slot: slotIndex(entry.token.side, entry.token.cx, entry.token.cy), weight: entry.weight, capRatio: entry.capRatio })),
+    targets: weightedTargets.map((entry, index) => { const hp = readCombatHpState(entry.token); return { iid: entry.token.iid ?? entry.token.id, currentHp: hp.hp, maxHp: hp.hpMax, rawCurrentHp: Number(entry.token.hp ?? 0), rawMaxHp: Number(entry.token.hpMax ?? 0), arm: Number(entry.token.arm ?? 0), res: Number(entry.token.res ?? 0), trueSelfId: entry.token.trueSelfId ?? null, lifeSerial: Math.max(1, Number(entry.token.lifeSerial ?? 1)), slot: slotIndex(entry.token.side, entry.token.cx, entry.token.cy), weight: entry.weight, capRatio: entry.capRatio }; }),
     shieldSnapshot: readShieldAmount(target),
     specialMitigation: chapMinhMitigation.prevented > 0 ? { kind: 'chap-minh', prevented: chapMinhMitigation.prevented } : null,
     batchPolicy: weightedTargets.length > 1 ? 'shared-hp' : 'single', sharedHpPolicy: weightedTargets.length > 1 ? { primaryTargetIid: target.iid ?? target.id } : null,

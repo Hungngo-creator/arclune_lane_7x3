@@ -1,4 +1,4 @@
-import { toFiniteNumber, toFloorInt, toNonNegativeFloorInt, toPositiveTurns } from './number-utils.ts';
+import { normalizeCombatHpState, toFiniteNumber, toNonNegativeFloorInt, toPositiveTurns } from './number-utils.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 
 import type { UnitToken } from '@shared-types/units';
@@ -31,12 +31,10 @@ function consumeShieldEntryAmount(entry: ReturnType<typeof getShieldEntry>, amou
 
 /** @deprecated Low-level legacy commit primitive. New damage must enter through the combat kernel adapter. */
 export function applyDamage(target: UnitToken, amount: number): void {
-  const maxHp = toNonNegativeFloorInt(target.hpMax, 0);
+  const { hp: currentHp, hpMax: maxHp } = normalizeCombatHpState(target);
   if (maxHp <= 0) return;
   const damage = toNonNegativeFloorInt(amount, 0);
   if (damage <= 0) return;
-
-  const currentHp = Math.max(0, Math.min(maxHp, toFloorInt(target.hp, 0)));
   const newHp = Math.max(0, currentHp - damage);
   target.hp = newHp;
 

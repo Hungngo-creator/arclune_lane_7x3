@@ -35,6 +35,42 @@ test('batch validation is atomic for stale or missing targets', () => {
   expect(() => commitDamageBatch(null, result, [target])).toThrow('stale hp'); expect(target.hp).toBe(99);
   expect(() => commitDamageBatch(null, result, [])).toThrow('missing');
 });
+test('fractional combat ingress resolves and commits a standard damage batch', () => {
+  const target = { id: 'vu_thien', iid: 2, side: 'enemy', cx: 0, cy: 0, alive: true, hp: 965.94, hpMax: 965.94, lifeSerial: 1, statuses: [] } as any;
+  const fractional = command();
+  fractional.targets[0] = { ...fractional.targets[0]!, currentHp: 965, maxHp: 965, rawCurrentHp: 965.94, rawMaxHp: 965.94 };
+  const result = resolveDamageBatch(fractional);
+  expect(() => commitDamageBatch(null, result, [target])).not.toThrow();
+  expect(target).toMatchObject({ hp: 885, hpMax: 965 });
+});
+test('fractional shared HP, shield, and stale validation remain atomic', () => {
+  const first = { id: 'a', iid: 2, alive: true, hp: 100.8, hpMax: 100.8, lifeSerial: 1, statuses: [{ id: 'shield', amount: 10 }] } as any;
+  const second = { id: 'b', iid: 3, alive: true, hp: 50.9, hpMax: 50.9, lifeSerial: 1, statuses: [] } as any;
+  const cmd: any = command([packet(1, false, 30)], 10);
+  cmd.batchPolicy = 'shared-hp'; cmd.sharedHpPolicy = { primaryTargetIid: 2 };
+  cmd.targets = [
+    { ...cmd.targets[0], currentHp: 100, maxHp: 100, rawCurrentHp: 100.8, rawMaxHp: 100.8, weight: 1 },
+    { ...cmd.targets[0], iid: 3, currentHp: 50, maxHp: 50, rawCurrentHp: 50.9, rawMaxHp: 50.9, weight: 1 },
+  ];
+  const result = resolveDamageBatch(cmd); second.hp = 49.9;
+  expect(() => commitDamageBatch(null, result, [first, second])).toThrow(/stale hp snapshot iid=3.*actionId=a.*packetId=a:packet-1/);
+  expect(first.hp).toBe(100.8); expect(first.statuses[0].amount).toBe(10);
+});
+test('fractional healing and max HP mutation use integer HP', () => {
+  const target = { id: 'u', iid: 7, alive: true, hp: 80.8, hpMax: 100.9 } as any;
+  const heal = resolveHealing(target, 30, source);
+  expect(heal).toMatchObject({ hpBefore: 80, hpAfter: 100, effectiveHeal: 20 });
+  target.hp = 80; target.hpMax = 100; commitHealing(null, target, heal);
+  expect(target.hp).toBe(100);
+  expect(resolveMaxHpMutation(target, 150.9, 'set-value', 'set-full', source)).toMatchObject({ maxHpAfter: 150, hpAfter: 150 });
+});
+test('normalized lethal damage reaches zero deterministically', () => {
+  const target = { id: 'u', iid: 2, alive: true, hp: 20.9, hpMax: 20.9, lifeSerial: 1, statuses: [] } as any;
+  const cmd: any = command([packet(1, false, 80)]);
+  cmd.targets[0] = { ...cmd.targets[0], currentHp: 20, maxHp: 20, rawCurrentHp: 20.9, rawMaxHp: 20.9 };
+  const result = resolveDamageBatch(cmd); const committed = commitDamageBatch(null, result, [target]);
+  expect(committed.commits[0]).toMatchObject({ hpAfter: 0, reachedZero: true }); expect(target.hp).toBe(0);
+});
 test('action contexts nest, restore, and allocate unique packet ids', () => {
   const session = game(); const natural = createNaturalAction(session); const outer = beginActionExecution(session, natural);
   expect(nextActionPacket(outer).packetId).toBe('action-1:packet-1'); expect(nextActionPacket(outer).packetSerial).toBe(2);

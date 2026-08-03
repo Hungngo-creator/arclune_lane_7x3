@@ -6,6 +6,7 @@ import { kitSupportsSummon } from './utils/kit.ts';
 import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.ts';
 import { isUniqueGlobalSummonBlocked } from './utils/unique-global.ts';
 import { isCombatAlive } from './combat/kernel/life-cycle.ts';
+import { readCombatHpState } from './combat/number-utils.ts';
 
 import type { PassiveKitDefinition, SessionState } from '@shared-types/combat';
 import type { ActionChainEntry, Side, SummonRequest, UnitToken } from '@shared-types/units';
@@ -109,6 +110,7 @@ export function processActionChain(
     if (cellReserved(aliveTokens, Game.queued, cx, cy)) continue;
 
     const extra = item.unit ?? {};
+    const hpState = readCombatHpState({ hp: extra.hp ?? extra.hpMax ?? 0, hpMax: extra.hpMax ?? 0 });
     const art = getUnitArt(extra.id ?? 'minion');
     const newToken: UnitToken = {
       id: (extra.id ?? 'creep') as string,
@@ -122,8 +124,8 @@ export function processActionChain(
       ownerIid: extra.ownerIid,
       bornSerial: extra.bornSerial,
       ttlTurns: extra.ttlTurns,
-      hpMax: extra.hpMax,
-      hp: extra.hp,
+      hpMax: hpState.hpMax,
+      hp: hpState.hp,
       atk: extra.atk,
       art,
       skinKey: art?.skinKey ?? null,

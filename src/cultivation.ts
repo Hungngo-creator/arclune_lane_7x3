@@ -1,4 +1,5 @@
 import type { StatBlock } from './types/units';
+import { readCombatHpState } from './combat/number-utils.ts';
 
 import {
   getCultivationRealmEconomy,
@@ -422,8 +423,9 @@ export function applyCultivationBonus<T extends CultivationUnitInput>(unit: T): 
     return unit;
   }
 
-  const hpMax = scaleStat(unit.hpMax, totalBonus.hpMax);
-  const nextHp = scaleStat(unit.hp, totalBonus.hpMax);
+  const scaledHpMax = scaleStat(unit.hpMax, totalBonus.hpMax);
+  const scaledHp = scaleStat(unit.hp, totalBonus.hpMax);
+  const hpState = scaledHpMax === undefined ? null : readCombatHpState({ hpMax: scaledHpMax, hp: scaledHp ?? scaledHpMax });
   const atk = scaleStat(unit.atk, totalBonus.atk);
   const wil = scaleStat(unit.wil, totalBonus.wil);
   const arm = scaleStat(unit.arm, totalBonus.arm);
@@ -433,8 +435,7 @@ export function applyCultivationBonus<T extends CultivationUnitInput>(unit: T): 
 
   return {
     ...unit,
-    ...(hpMax !== undefined ? { hpMax } : {}),
-    ...(nextHp !== undefined ? { hp: hpMax !== undefined ? Math.min(nextHp, hpMax) : nextHp } : {}),
+    ...(hpState ? { hpMax: hpState.hpMax, hp: hpState.hp } : {}),
     ...(atk !== undefined ? { atk } : {}),
     ...(wil !== undefined ? { wil } : {}),
     ...(arm !== undefined ? { arm } : {}),
