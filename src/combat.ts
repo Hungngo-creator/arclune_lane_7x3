@@ -776,7 +776,8 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): BasicHitResult
       Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0))
     );
 
-  const configuredHits = isLoithienanh ? Math.max(1, Math.floor(Number(getMetaById(unit.id)?.kit?.basic?.hits) || 1)) : 1;
+  // Multi-hit is catalog behavior, not character identity behavior.
+  const configuredHits = Math.max(1, Math.floor(Number(getMetaById(unit.id)?.kit?.basic?.hits) || 1));
   let dealt = 0;
   let absorbed = 0;
   for (let hitIndex = 0; hitIndex < configuredHits; hitIndex += 1) {
@@ -869,6 +870,7 @@ export function doBasicWithFollowups(
     if (!hit) return;
     result.attemptedHits = hit.hitCount;
     result.committedHits = hit.hitCount;
+    result.totalHpDamage = hit.hpDamage;
     result.targetIids.push(hit.targetIid);
     result.ok = true;
   });

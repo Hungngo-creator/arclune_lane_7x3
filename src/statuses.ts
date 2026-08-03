@@ -398,11 +398,13 @@ export const Statuses: StatusService = {
     const targetStatuses = ensureStatusList(target);
     let cut: StatusEffect | null = null;
     let stealth: StatusEffect | null = null;
+    let incomingDefense: StatusEffect | null = null;
     for (const status of targetStatuses) {
       if (!status) continue;
       if (!cut && status.id === 'dmgCut') cut = status;
       else if (!stealth && status.id === 'stealth') stealth = status;
-      if (cut && stealth) break;
+      else if (!incomingDefense && status.tag === 'defense') incomingDefense = status;
+      if (cut && stealth && incomingDefense) break;
     }
     const attackType = ctx.attackType ?? 'basic';
     const dtype = ctx.dtype ?? 'phys';
@@ -419,6 +421,7 @@ export const Statuses: StatusService = {
     if (fear) outMul *= 0.9;
 
     if (cut) inMul *= 1 - clamp01(cut.power ?? 0);
+    if (incomingDefense) inMul *= 1 - clamp01(incomingDefense.amount ?? incomingDefense.power ?? 0);
     if (stealth) {
       inMul = 0;
       ignoreAll = true;
