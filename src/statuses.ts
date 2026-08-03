@@ -1,5 +1,6 @@
 //home (termux)/arclune_lane_7x3/src/statuses.ts
-import { dealAbilityDamage } from './combat.ts';
+import { executeStatusDamage } from './combat/status-runtime-adapter.ts';
+import { resolveTarget } from './combat/status-query.ts';
 import { commitHpMutation, createHpZeroCandidate, createLinkedAction, createNaturalAction, currentActionExecution, finalizeCombatAction, resolveHpLoss, resolveSourceAttribution, withActionExecution } from './combat/kernel/index.ts';
 import { normalizeTagList } from './data/tags.ts';
 import { gainFury, finishFuryHit } from './utils/fury.ts';
@@ -68,8 +69,6 @@ const DOT_DAMAGE_BY_STATUS: Readonly<Record<'bleed' | 'poison', number>> = Objec
   poison: 0.03,
 });
 const DOT_STATUS_ID_SET = new Set<string>(Object.keys(DOT_DAMAGE_BY_STATUS));
-const TAUNT_STATUS_ID = 'taunt';
-const ALLURE_STATUS_ID = 'allure';
 
 const isAxiomBlockedKind = (kind: StatusEffect['kind']): boolean =>
   kind === 'buff' || kind === 'debuff' || kind === 'mark';
@@ -90,16 +89,6 @@ const hasDivineNatureTag = (unit: UnitToken | null | undefined): boolean => {
   if (unit.hasDivineNature === true) return true;
   const rawTags: unknown[] = Array.isArray(unit.tags) ? unit.tags : [];
   return normalizeTagList(rawTags.filter((tag): tag is string => typeof tag === 'string')).includes('divine-nature');
-};
-
-const isTokenCandidate = (value: unknown): value is UnitToken => {
-  if (!value || typeof value !== 'object') return false;
-  const candidate = value as UnitToken;
-  return (
-    typeof candidate.cx === 'number'
-    && typeof candidate.cy === 'number'
-    && typeof candidate.side === 'string'
-  );
 };
 
 function findStatus(
@@ -135,7 +124,7 @@ function applyDotTick(unit: UnitToken, status: StatusEffect, ctx?: StatusTurnCon
   const source = resolved.liveSource ?? ({ iid: resolved.attribution.immediateSourceIid ?? `status:${String(status.statusInstanceId ?? status.id)}`, trueSelfId: resolved.attribution.creditTrueSelfId, side: status.sourceSide ?? (unit.side === 'ally' ? 'enemy' : 'ally'), cx: -1, cy: -1, alive: false, lifeState: 'removed', atk: Number(status.snapshotAtk ?? 0), wil: Number(status.snapshotWil ?? 0), statuses: [] } as unknown as UnitToken);
   const identity = createNaturalAction(game, 'dot-tick');
   status.tickSerial = Math.max(0, Number(status.tickSerial ?? 0)) + 1;
-  withActionExecution(game, identity, () => dealAbilityDamage(game, source, unit, { base: lost, dtype: status.damageType === 'true' ? 'true' : status.damageType === 'will' ? 'arcane' : 'physical', attackType: 'dot', skillMul: 1, sourceAttribution: resolved.attribution }), { originActionId: typeof status.originActionId === 'string' || typeof status.originActionId === 'number' ? status.originActionId : null });
+  withActionExecution(game, identity, () => executeStatusDamage(game, source, unit, { base: lost, dtype: status.damageType === 'true' ? 'true' : status.damageType === 'will' ? 'arcane' : 'physical', attackType: 'dot', skillMul: 1, sourceAttribution: resolved.attribution }), { originActionId: typeof status.originActionId === 'string' || typeof status.originActionId === 'number' ? status.originActionId : null });
   logStatusTick(ctx, id, unit, lost);
   decrementDuration(unit, status);
 }
@@ -351,44 +340,7 @@ export const Statuses: StatusService = {
     return false;
   },
   resolveTarget(attacker, candidates, ctx = {}) {
-    const attackType = ctx.attackType ?? 'basic';
-    if (!Array.isArray(candidates) || candidates.length <= 0) return null;
-
-    let nearestTaunter: UnitToken | null = null;
-    let nearestTaunterDistance = Number.POSITIVE_INFINITY;
-    let nearestTaunterNonAllure: UnitToken | null = null;
-    let nearestTaunterNonAllureDistance = Number.POSITIVE_INFINITY;
-    let hasNonAllureCandidate = false;
-
-    for (const candidate of candidates) {
-      if (!isTokenCandidate(candidate)) continue;
-      const distance = Math.abs(candidate.cx - attacker.cx) + Math.abs(candidate.cy - attacker.cy);
-      const candidateStatuses = ensureStatusList(candidate);
-      let isAllure = false;
-      let hasTaunt = false;
-      for (const status of candidateStatuses) {
-        if (!status) continue;
-        if (!isAllure && status.id === ALLURE_STATUS_ID) isAllure = true;
-        else if (!hasTaunt && status.id === TAUNT_STATUS_ID) hasTaunt = true;
-        if (isAllure && hasTaunt) break;
-      }
-      if (!isAllure) hasNonAllureCandidate = true;
-      if (!hasTaunt) continue;
-
-      if (distance < nearestTaunterDistance) {
-        nearestTaunter = candidate;
-        nearestTaunterDistance = distance;
-      }
-      if (!isAllure && distance < nearestTaunterNonAllureDistance) {
-        nearestTaunterNonAllure = candidate;
-        nearestTaunterNonAllureDistance = distance;
-      }
-    }
-
-    if (attackType === 'basic' && hasNonAllureCandidate) {
-      return nearestTaunterNonAllure;
-    }
-    return nearestTaunter;
+    return resolveTarget(attacker, candidates, ctx);
   },
   modifyStats(unit, base) {
     const statuses = ensureStatusList(unit);
@@ -509,7 +461,7 @@ export const Statuses: StatusService = {
       const parent = game ? currentActionExecution(game) : null;
       if (!game || !parent) throw new Error('[combat-kernel] Venom requires an active production action');
       const linked = createLinkedAction(game, parent.identity, 'venom');
-      withActionExecution(game, linked, () => dealAbilityDamage(game, attacker, target, { base: extra, dtype: result.dtype ?? 'physical', attackType: 'venom', skillMul: 1 }));
+      withActionExecution(game, linked, () => executeStatusDamage(game, attacker, target, { base: extra, dtype: result.dtype ?? 'physical', attackType: 'venom', skillMul: 1 }));
       if (extra > 0) {
         gainFury(target, {
           type: 'damageTaken',

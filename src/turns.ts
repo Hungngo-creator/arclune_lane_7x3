@@ -24,6 +24,20 @@ import { initialRageFor } from './meta.ts';
 import { vfxAddSpawn, vfxAddBloodPulse, asSessionWithVfx } from './vfx.ts';
 import { getUnitArt } from './art.ts';
 import { emitPassiveEvent, applyOnSpawnEffects, getPassiveLog, prepareUnitForPassives } from './passives.ts';
+
+function recordCombatActionFault(Game: SessionState, unit: UnitToken, error: unknown): Error {
+  const fault = error instanceof Error ? error : new Error(String(error));
+  const runtime = ((Game.runtime ??= {}) as Record<string, unknown>);
+  runtime.actionFault = fault;
+  runtime.errorContext = {
+    phase: 'combat-action',
+    moduleId: './turns.ts',
+    actorIid: unit.iid ?? unit.id,
+    actionStack: Array.isArray(runtime.actionExecutionStack) ? [...runtime.actionExecutionStack] : [],
+    targetPool: Game.tokens.filter(token => token.alive && token.side !== unit.side).map(token => token.iid ?? token.id),
+  };
+  return fault;
+}
 import { emitGameEvent, TURN_START, TURN_END, ACTION_START, ACTION_END, TURN_REGEN } from './events.ts';
 import type { DamageCounterBreakdown, DamageEventContext } from './events.ts';
 import { mergeBusyUntil, safeNow, sessionNow } from './utils/time.ts';
@@ -857,7 +871,7 @@ export function doActionOrSkip(
       performUlt!(unit);
       ultOk = true;
     } catch (e){
-      ((Game.runtime ??= {}) as Record<string, unknown>).actionFault = e instanceof Error ? e : new Error(String(e));
+      recordCombatActionFault(Game, unit, e);
       throw e;
     }
     if (ultOk) {
@@ -918,7 +932,7 @@ export function doActionOrSkip(
         actionDetail: { action: decision.action, skillOk: cast.ok, skillTargets: cast.targetCount, skillTags: cast.appliedTags }
       });
     } catch (err) {
-      ((Game.runtime ??= {}) as Record<string, unknown>).actionFault = err instanceof Error ? err : new Error(String(err));
+      recordCombatActionFault(Game, unit, err);
       throw err;
     }
   }
@@ -948,7 +962,7 @@ export function doActionOrSkip(
       return completeTurn({ consumedTurn: false, acted: false, reason: 'noTarget', actionDetail: { skipped: true, reason: 'noTarget', rootActionId: basic.rootActionId } });
     }
   } catch (err) {
-    ((Game.runtime ??= {}) as Record<string, unknown>).actionFault = err instanceof Error ? err : new Error(String(err));
+    recordCombatActionFault(Game, unit, err);
     throw err;
   }
   return completeTurn({

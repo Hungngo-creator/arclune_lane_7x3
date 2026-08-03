@@ -194,6 +194,10 @@ const LEGACY_MODULE_ID_ALIAS_ENTRIES = [
   ['./combat/number-utils.js', './combat/number-utils.ts'],
   ['./combat/tag-aliases.js', './combat/tag-aliases.ts'],
   ['./combat/status-utils.js', './combat/status-utils.ts'],
+  ['./combat/status-query.js', './combat/status-query.ts'],
+  ['./combat/status-runtime-adapter.js', './combat/status-runtime-adapter.ts'],
+  ['./statuses.js', './statuses.ts'],
+  ['@statuses', './statuses.ts'],
   ['./combat/skill-result.js', './combat/skill-result.ts'],
   ['./combat/skill-metadata-utils.js', './combat/skill-metadata-utils.ts'],
   ['./combat/token-side-utils.js', './combat/token-side-utils.ts'],
@@ -944,6 +948,24 @@ async function build(){
     const transformed = transformModule(sourceCode, moduleId);
     assertValidJavaScript(transformed, moduleId);
     pushModule(moduleId, transformed);
+  }
+
+  const statusModules = modules.filter(({ id }) => id === './statuses.ts');
+  if (statusModules.length !== 1){
+    throw new Error(`[build] expected one canonical statuses module, received ${statusModules.length}`);
+  }
+  for (const alias of ['./statuses.js', '@statuses']){
+    if (applyLegacyModuleAlias(alias) !== './statuses.ts'){
+      throw new Error(`[build] status alias ${alias} does not resolve to ./statuses.ts`);
+    }
+  }
+  const statusQueryModule = modules.find(({ id }) => id === './combat/status-query.ts');
+  if (!statusQueryModule || !statusQueryModule.code.includes('exports.resolveTarget = resolveTarget')){
+    throw new Error('[build] status-query must expose resolveTarget as a named runtime function');
+  }
+  const combatModule = modules.find(({ id }) => id === './combat.ts');
+  if (!combatModule || !combatModule.code.includes("__require('./combat/status-query.ts')")){
+    throw new Error('[build] combat target resolution must use the acyclic status-query module');
   }
 
   await fs.mkdir(DIST_DIR, { recursive: true });

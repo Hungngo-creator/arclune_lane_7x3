@@ -2,6 +2,8 @@
 
 import { getMetaById } from './catalog.ts';
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
+import { resolveTarget } from './combat/status-query.ts';
+import { registerStatusDamageHandler } from './combat/status-runtime-adapter.ts';
 import type { DamageResult } from './statuses.ts';
 import { applyDamage, grantShield, readShieldAmount } from './combat/apply-damage.ts';
 import { calculateFinalDamage, type DamageBreakdownMetadata } from './combat/calculate-final-damage.ts';
@@ -25,6 +27,8 @@ import { runRuntimeBasicAttackResolved, runRuntimeDamageResolved, runRuntimeUnit
 import { commitDamageBatch, commitHealing, createHpZeroCandidate, createLinkedAction, createNaturalAction, currentActionExecution, isCombatAlive, nextActionPacket, registerDeathPrevention, registerDeathReactions, resolveDamageBatch, resolveDamagePacket, resolveHealing, resolveSourceAttribution, withActionExecution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
 
 export { applyDamage, grantShield };
+
+registerStatusDamageHandler(dealAbilityDamage);
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -703,7 +707,7 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): BasicHitResult
   startFurySkill(unit, { tag: 'basic' });
 
   const fallback = pickTarget(Game, unit);
-  const resolved = Statuses.resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
+  const resolved = resolveTarget(unit, pool, { attackType: 'basic' }) ?? fallback;
   if (!resolved) return null;
 
   const isLoithienanh = unit.id === 'loithienanh';
