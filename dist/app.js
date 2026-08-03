@@ -5245,6 +5245,19 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       const isChapMinh = unit.id === 'huyen_vu_chap_minh';
       const basicDamageType = isChapMinh ? 'mixed' : 'physical';
       const sessionVfx = asSessionWithVfx(Game);
+      const runNonAuthoritativeVfx = (label, draw) => {
+          const before = sessionVfx?.vfx?.length ?? 0;
+          try {
+              draw();
+              return true;
+          }
+          catch (error) {
+              if (sessionVfx?.vfx && sessionVfx.vfx.length > before)
+                  sessionVfx.vfx.splice(before);
+              console.error(`[vfx] ${label}`, error);
+              return false;
+          }
+      };
       const updateTurnBusy = (startedAt, busyMs) => {
           if (!Game.turn)
               return;
@@ -5256,16 +5269,13 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           if (!isLoithienanh || !sessionVfx)
               return;
           const arcStart = sessionNow();
-          try {
+          runNonAuthoritativeVfx(`loithienanh ${timing}`, () => {
               const busyMs = vfxAddLightningArc(sessionVfx, unit, resolved, {
                   bindingKey: 'basic_combo',
                   timing,
               });
               updateTurnBusy(arcStart, busyMs);
-          }
-          catch {
-              // bỏ qua lỗi VFX runtime
-          }
+          });
       };
       const passiveCtx = {
           target: resolved,
@@ -5279,13 +5289,9 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           const meleeStartMs = sessionNow();
           let meleeTriggered = false;
           if (sessionVfx != null) {
-              try {
+              meleeTriggered = runNonAuthoritativeVfx('melee', () => {
                   vfxAddMelee(sessionVfx, unit, resolved, { dur: meleeDur });
-                  meleeTriggered = true;
-              }
-              catch {
-                  // bỏ qua lỗi VFX runtime
-              }
+              });
           }
           if (meleeTriggered && Game.turn) {
               Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, meleeStartMs, meleeDur);
@@ -5296,22 +5302,24 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       const modBase = forceRawBasicDamage
           ? rawBase
           : Math.max(1, Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0)));
-      triggerLightningArc('hit1');
-      triggerLightningArc('hit2');
-      const hitResult = dealAbilityDamage(Game, unit, resolved, {
-          base: modBase,
-          dtype: basicDamageType,
-          attackType: 'basic',
-      });
-      if (sessionVfx != null) {
-          try {
-              vfxAddHit(sessionVfx, resolved);
-          }
-          catch {
-              // bỏ qua lỗi VFX runtime
-          }
+      const configuredHits = isLoithienanh ? Math.max(1, Math.floor(Number(getMetaById(unit.id)?.kit?.basic?.hits) || 1)) : 1;
+      let dealt = 0;
+      let absorbed = 0;
+      for (let hitIndex = 0; hitIndex < configuredHits; hitIndex += 1) {
+          triggerLightningArc(`hit${hitIndex + 1}`);
+          const hit = dealAbilityDamage(Game, unit, resolved, {
+              base: modBase,
+              dtype: basicDamageType,
+              attackType: 'basic',
+          });
+          dealt += hit.dealt;
+          absorbed += hit.absorbed;
       }
-      const dealt = hitResult.dealt;
+      if (sessionVfx != null) {
+          runNonAuthoritativeVfx('hit', () => {
+              vfxAddHit(sessionVfx, resolved);
+          });
+      }
       if (unit.mutated === true && isCombatAlive(resolved)) {
           const pool = Array.isArray(unit.mutationDebuffPool)
               ? unit.mutationDebuffPool.filter((id) => id === 'bleed' || id === 'stun' || id === 'poison')
@@ -5339,7 +5347,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           const afterCtx = {
               target: resolved,
               owner: unit,
-              result: { dealt, absorbed: hitResult.absorbed },
+              result: { dealt, absorbed },
           };
           for (const fn of afterHitHandlers) {
               try {
@@ -5350,7 +5358,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
               }
           }
       }
-      return { targetIid: resolved.iid ?? resolved.id, hpDamage: dealt };
+      return { targetIid: resolved.iid ?? resolved.id, hpDamage: dealt, hitCount: configuredHits };
   }
   function basicAttack(Game, unit) {
       if (currentActionExecution(Game))
@@ -5369,8 +5377,8 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           const hit = executeBasicAttack(Game, unit);
           if (!hit)
               return;
-          result.committedHits = 1;
-          result.totalHpDamage = hit.hpDamage;
+          result.attemptedHits = hit.hitCount;
+          result.committedHits = hit.hitCount;
           result.targetIids.push(hit.targetIid);
           result.ok = true;
       });
@@ -23828,9 +23836,16 @@ __modules['./passives.ts'] = (exports, module, __require) => {
           const purgeable = params.purgeable !== false;
           const applyStats = (stats) => {
               for (const [stat, amount] of Object.entries(stats)) {
+                  if (!Number.isFinite(amount))
+                      throw new Error(`[passives] ${passive.id} produced non-finite ${stat}`);
                   const attr = stat.toLowerCase();
                   const status = ensureStatBuff(unit, `${passive.id}_${attr}`, { attr, mode: 'percent', amount, purgeable });
-                  applyStatStacks(status, 1);
+                  if (!status)
+                      throw new Error(`[passives] ${passive.id} could not create ${attr} status`);
+                  // This is a mutually-exclusive stance refreshed each turn, not a
+                  // stacking buff. Reusing the status also prevents unbounded growth.
+                  status.amount = amount;
+                  status.stacks = 1;
               }
           };
           const removeStats = (stats) => {
@@ -23847,6 +23862,10 @@ __modules['./passives.ts'] = (exports, module, __require) => {
               removeStats(trueStats);
           }
           recomputeFromStatuses(unit);
+          for (const key of ['hp', 'hpMax', 'atk', 'wil', 'arm', 'res']) {
+              if (!Number.isFinite(Number(unit[key])))
+                  throw new Error(`[passives] ${passive.id} produced non-finite ${key}`);
+          }
       },
       gainRESPct({ Game, unit, passive }) {
           if (!unit)
@@ -45389,90 +45408,103 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   const __dep3 = __require('./combat/kernel/life-cycle.ts');
   const isCombatAlive = __dep3.isCombatAlive;
   const markRemoved = __dep3.markRemoved;
-  const __dep4 = __require('./combat/kernel/delayed-revive.ts');
-  const emitSsiTemporalEvent = __dep4.emitSsiTemporalEvent;
-  const __dep5 = __require('./combat.ts');
-  const doBasicWithFollowups = __dep5.doBasicWithFollowups;
-  const __dep6 = __require('./combat/perform-active-skill.ts');
-  const performActiveSkill = __dep6.performActiveSkill;
-  const __dep7 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeActionEnd = __dep7.runRuntimeActionEnd;
-  const runRuntimeUnitRevive = __dep7.runRuntimeUnitRevive;
-  const runRuntimeTurnEnd = __dep7.runRuntimeTurnEnd;
-  const runRuntimeTurnStart = __dep7.runRuntimeTurnStart;
-  const __dep8 = __require('./combat/chap-minh-runtime.ts');
-  const applyChapMinhActionEnd = __dep8.applyChapMinhActionEnd;
-  const recoverChapMinhMaxHpPerTurn = __dep8.recoverChapMinhMaxHpPerTurn;
-  const refreshChapMinhOwnership = __dep8.refreshChapMinhOwnership;
-  const __dep9 = __require('./config.ts');
-  const CFG = __dep9.CFG;
-  const __dep10 = __require('./meta.ts');
-  const initialRageFor = __dep10.initialRageFor;
-  const __dep11 = __require('./vfx.ts');
-  const vfxAddSpawn = __dep11.vfxAddSpawn;
-  const vfxAddBloodPulse = __dep11.vfxAddBloodPulse;
-  const asSessionWithVfx = __dep11.asSessionWithVfx;
-  const __dep12 = __require('./art.ts');
-  const getUnitArt = __dep12.getUnitArt;
-  const __dep13 = __require('./passives.ts');
-  const emitPassiveEvent = __dep13.emitPassiveEvent;
-  const applyOnSpawnEffects = __dep13.applyOnSpawnEffects;
-  const getPassiveLog = __dep13.getPassiveLog;
-  const prepareUnitForPassives = __dep13.prepareUnitForPassives;
+  const __dep4 = __require('./combat/kernel/index.ts');
+  const createNaturalAction = __dep4.createNaturalAction;
+  const withActionExecution = __dep4.withActionExecution;
+  const __dep5 = __require('./combat/kernel/delayed-revive.ts');
+  const emitSsiTemporalEvent = __dep5.emitSsiTemporalEvent;
+  const __dep6 = __require('./combat.ts');
+  const doBasicWithFollowups = __dep6.doBasicWithFollowups;
+  const __dep7 = __require('./combat/perform-active-skill.ts');
+  const performActiveSkill = __dep7.performActiveSkill;
+  const __dep8 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeActionEnd = __dep8.runRuntimeActionEnd;
+  const runRuntimeUnitRevive = __dep8.runRuntimeUnitRevive;
+  const runRuntimeTurnEnd = __dep8.runRuntimeTurnEnd;
+  const runRuntimeTurnStart = __dep8.runRuntimeTurnStart;
+  const __dep9 = __require('./combat/chap-minh-runtime.ts');
+  const applyChapMinhActionEnd = __dep9.applyChapMinhActionEnd;
+  const recoverChapMinhMaxHpPerTurn = __dep9.recoverChapMinhMaxHpPerTurn;
+  const refreshChapMinhOwnership = __dep9.refreshChapMinhOwnership;
+  const __dep10 = __require('./config.ts');
+  const CFG = __dep10.CFG;
+  const __dep11 = __require('./meta.ts');
+  const initialRageFor = __dep11.initialRageFor;
+  const __dep12 = __require('./vfx.ts');
+  const vfxAddSpawn = __dep12.vfxAddSpawn;
+  const vfxAddBloodPulse = __dep12.vfxAddBloodPulse;
+  const asSessionWithVfx = __dep12.asSessionWithVfx;
+  const __dep13 = __require('./art.ts');
+  const getUnitArt = __dep13.getUnitArt;
+  const __dep14 = __require('./passives.ts');
+  const emitPassiveEvent = __dep14.emitPassiveEvent;
+  const applyOnSpawnEffects = __dep14.applyOnSpawnEffects;
+  const getPassiveLog = __dep14.getPassiveLog;
+  const prepareUnitForPassives = __dep14.prepareUnitForPassives;
   function recordCombatActionFault(Game, unit, error) {
       const fault = error instanceof Error ? error : new Error(String(error));
       const runtime = (Game.runtime ??= {});
       runtime.actionFault = fault;
+      const actionStack = Array.isArray(runtime.actionExecutionStack) ? [...runtime.actionExecutionStack] : [];
+      const latestAction = [...((runtime.combatEvents ?? []))]
+          .reverse().find(event => event.type === 'ACTION_START');
       runtime.errorContext = {
+          errorName: fault.name,
+          errorMessage: fault.message,
+          errorStack: fault.stack ?? null,
           phase: 'combat-action',
           moduleId: './turns.ts',
           actorIid: unit.iid ?? unit.id,
-          actionStack: Array.isArray(runtime.actionExecutionStack) ? [...runtime.actionExecutionStack] : [],
+          actorId: unit.id,
+          actionId: latestAction?.actionId ?? null,
+          actionKind: latestAction?.actionKind ?? 'natural',
+          actionStackBeforeCleanup: actionStack,
+          actionStackAfterCleanup: actionStack,
           targetPool: Game.tokens.filter(token => token.alive && token.side !== unit.side).map(token => token.iid ?? token.id),
       };
       return fault;
   }
-  const __dep14 = __require('./events.ts');
-  const emitGameEvent = __dep14.emitGameEvent;
-  const TURN_START = __dep14.TURN_START;
-  const TURN_END = __dep14.TURN_END;
-  const ACTION_START = __dep14.ACTION_START;
-  const ACTION_END = __dep14.ACTION_END;
-  const TURN_REGEN = __dep14.TURN_REGEN;
-  const __dep15 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep15.mergeBusyUntil;
-  const safeNow = __dep15.safeNow;
-  const sessionNow = __dep15.sessionNow;
-  const __dep16 = __require('./utils/fury.ts');
-  const initializeFury = __dep16.initializeFury;
-  const startFuryTurn = __dep16.startFuryTurn;
-  const spendFury = __dep16.spendFury;
-  const resolveUltCost = __dep16.resolveUltCost;
-  const setFury = __dep16.setFury;
-  const clearFreshSummon = __dep16.clearFreshSummon;
-  const __dep17 = __require('./turns/interleaved.ts');
-  const nextTurnInterleaved = __dep17.nextTurnInterleaved;
-  const getSequentialOrderIndex = __dep17.getSequentialOrderIndex;
-  const predictSpawnCycleByTurnOrder = __dep17.predictSpawnCycleByTurnOrder;
-  const __dep18 = __require('./modes/pve/collection-mapper.ts');
-  const resolveRuntimeUnitStats = __dep18.resolveRuntimeUnitStats;
-  const __dep19 = __require('./ai.ts');
-  const evaluateGambitLogic = __dep19.evaluateGambitLogic;
-  const __dep20 = __require('./utils/rng.ts');
-  const nextRngValue = __dep20.nextRngValue;
-  const __dep21 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep21.normalizeClassName;
-  const normalizeElementKey = __dep21.normalizeElementKey;
-  const __dep22 = __require('./utils/unique-global.ts');
-  const isUniqueGlobalSummonBlocked = __dep22.isUniqueGlobalSummonBlocked;
-  const __dep23 = __require('./utils/player-profile.ts');
-  const loadPlayerProfile = __dep23.loadPlayerProfile;
-  const __dep24 = __require('./leader-uyen.ts');
-  const clearQueuedUyenUlt = __dep24.clearQueuedUyenUlt;
-  const hasQueuedUyenUlt = __dep24.hasQueuedUyenUlt;
-  const isAnyLeaderUltReady = __dep24.isAnyLeaderUltReady;
-  const isUyenLeader = __dep24.isUyenLeader;
-  const grantUyenSummonRage = __dep24.grantUyenSummonRage;
+  const __dep15 = __require('./events.ts');
+  const emitGameEvent = __dep15.emitGameEvent;
+  const TURN_START = __dep15.TURN_START;
+  const TURN_END = __dep15.TURN_END;
+  const ACTION_START = __dep15.ACTION_START;
+  const ACTION_END = __dep15.ACTION_END;
+  const TURN_REGEN = __dep15.TURN_REGEN;
+  const __dep16 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep16.mergeBusyUntil;
+  const safeNow = __dep16.safeNow;
+  const sessionNow = __dep16.sessionNow;
+  const __dep17 = __require('./utils/fury.ts');
+  const initializeFury = __dep17.initializeFury;
+  const startFuryTurn = __dep17.startFuryTurn;
+  const spendFury = __dep17.spendFury;
+  const resolveUltCost = __dep17.resolveUltCost;
+  const setFury = __dep17.setFury;
+  const clearFreshSummon = __dep17.clearFreshSummon;
+  const __dep18 = __require('./turns/interleaved.ts');
+  const nextTurnInterleaved = __dep18.nextTurnInterleaved;
+  const getSequentialOrderIndex = __dep18.getSequentialOrderIndex;
+  const predictSpawnCycleByTurnOrder = __dep18.predictSpawnCycleByTurnOrder;
+  const __dep19 = __require('./modes/pve/collection-mapper.ts');
+  const resolveRuntimeUnitStats = __dep19.resolveRuntimeUnitStats;
+  const __dep20 = __require('./ai.ts');
+  const evaluateGambitLogic = __dep20.evaluateGambitLogic;
+  const __dep21 = __require('./utils/rng.ts');
+  const nextRngValue = __dep21.nextRngValue;
+  const __dep22 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep22.normalizeClassName;
+  const normalizeElementKey = __dep22.normalizeElementKey;
+  const __dep23 = __require('./utils/unique-global.ts');
+  const isUniqueGlobalSummonBlocked = __dep23.isUniqueGlobalSummonBlocked;
+  const __dep24 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep24.loadPlayerProfile;
+  const __dep25 = __require('./leader-uyen.ts');
+  const clearQueuedUyenUlt = __dep25.clearQueuedUyenUlt;
+  const hasQueuedUyenUlt = __dep25.hasQueuedUyenUlt;
+  const isAnyLeaderUltReady = __dep25.isAnyLeaderUltReady;
+  const isUyenLeader = __dep25.isUyenLeader;
+  const grantUyenSummonRage = __dep25.grantUyenSummonRage;
   const toActiveUnitKey = (side, slot) => `${side}:${slot}`;
   const createActiveUnitIndex = (Game) => {
       const index = new Map();
@@ -46092,6 +46124,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       }
       const meta = Game.meta.get(unit.id);
       const passiveLog = getPassiveLog(Game);
+      const furyAtNaturalTurnStart = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
       emitPassiveEvent(Game, unit, 'onTurnStart', { log: passiveLog });
       const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
       startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
@@ -46133,7 +46166,13 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               return false;
           let ultOk = false;
           try {
-              performUlt(unit);
+              if (typeof performUlt !== 'function') {
+                  throw new Error('[turns] Ultimate runtime is unavailable');
+              }
+              // Ultimate payloads (including HP costs) must run inside the same
+              // canonical root action boundary as basics.  Without this boundary Lôi
+              // Thiên Ảnh's canonical HP gateway correctly rejects its self cost.
+              withActionExecution(Game, createNaturalAction(Game, 'ult'), () => performUlt(unit));
               ultOk = true;
           }
           catch (e) {
@@ -46204,7 +46243,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       const queuedLeaderUlt = isUyenLeader(unit) && hasQueuedUyenUlt(unit);
       const autoUltReady = isUyenLeader(unit)
           ? queuedLeaderUlt
-          : (unit.fury ?? 0) >= ultCost;
+          : furyAtNaturalTurnStart >= ultCost;
       if (autoUltReady && !Statuses.blocks(unit, 'ult')) {
           runUlt();
           if (queuedLeaderUlt)

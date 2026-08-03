@@ -697,7 +697,7 @@ export function healUnit(gameOrTarget: SessionState | UnitToken | null | undefin
   return { healed: result.effectiveHeal, overheal: result.overheal };
 }
 
-type BasicHitResult = { targetIid: string | number; hpDamage: number };
+type BasicHitResult = { targetIid: string | number; hpDamage: number; hitCount: number };
 
 function executeBasicAttack(Game: SessionState, unit: UnitToken): BasicHitResult | null {
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
@@ -715,6 +715,18 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): BasicHitResult
   const basicDamageType = isChapMinh ? 'mixed' : 'physical';
   const sessionVfx = asSessionWithVfx(Game);
 
+  const runNonAuthoritativeVfx = (label: string, draw: () => void): boolean => {
+    const before = sessionVfx?.vfx?.length ?? 0;
+    try {
+      draw();
+      return true;
+    } catch (error) {
+      if (sessionVfx?.vfx && sessionVfx.vfx.length > before) sessionVfx.vfx.splice(before);
+      console.error(`[vfx] ${label}`, error);
+      return false;
+    }
+  };
+
   const updateTurnBusy = (startedAt: number, busyMs: number): void => {
     if (!Game.turn) return;
     if (!Number.isFinite(startedAt) || !Number.isFinite(busyMs)) return;
@@ -724,15 +736,13 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): BasicHitResult
   const triggerLightningArc = (timing: string): void => {
     if (!isLoithienanh || !sessionVfx) return;
     const arcStart = sessionNow();
-    try {
+    runNonAuthoritativeVfx(`loithienanh ${timing}`, () => {
       const busyMs = vfxAddLightningArc(sessionVfx, unit, resolved, {
         bindingKey: 'basic_combo',
         timing,
       });
       updateTurnBusy(arcStart, busyMs);
-    } catch {
-      // bỏ qua lỗi VFX runtime
-    }
+    });
   };
 
   const passiveCtx: BasicAttackContext = {
@@ -748,12 +758,9 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): BasicHitResult
     const meleeStartMs = sessionNow();
     let meleeTriggered = false;
     if (sessionVfx != null) {
-      try {
+      meleeTriggered = runNonAuthoritativeVfx('melee', () => {
         vfxAddMelee(sessionVfx, unit, resolved, { dur: meleeDur });
-        meleeTriggered = true;
-      } catch {
-        // bỏ qua lỗi VFX runtime
-      }
+        });
     }
     if (meleeTriggered && Game.turn) {
       Game.turn.busyUntil = mergeBusyUntil(Game.turn.busyUntil, meleeStartMs, meleeDur);
@@ -769,22 +776,25 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): BasicHitResult
       Math.floor(rawBase * (passiveCtx.damage?.baseMul ?? 1) + (passiveCtx.damage?.flatAdd ?? 0))
     );
 
-  triggerLightningArc('hit1');
-  triggerLightningArc('hit2');
-  const hitResult = dealAbilityDamage(Game, unit, resolved, {
-    base: modBase,
-    dtype: basicDamageType,
-    attackType: 'basic',
-  });
+  const configuredHits = isLoithienanh ? Math.max(1, Math.floor(Number(getMetaById(unit.id)?.kit?.basic?.hits) || 1)) : 1;
+  let dealt = 0;
+  let absorbed = 0;
+  for (let hitIndex = 0; hitIndex < configuredHits; hitIndex += 1) {
+    triggerLightningArc(`hit${hitIndex + 1}`);
+    const hit = dealAbilityDamage(Game, unit, resolved, {
+      base: modBase,
+      dtype: basicDamageType,
+      attackType: 'basic',
+    });
+    dealt += hit.dealt;
+    absorbed += hit.absorbed;
+  }
 
   if (sessionVfx != null) {
-    try {
+    runNonAuthoritativeVfx('hit', () => {
       vfxAddHit(sessionVfx, resolved);
-    } catch {
-      // bỏ qua lỗi VFX runtime
-    }
+    });
   }
-  const dealt = hitResult.dealt;
   if (unit.mutated === true && isCombatAlive(resolved)) {
     const pool = Array.isArray(unit.mutationDebuffPool)
       ? unit.mutationDebuffPool.filter((id: unknown): id is 'bleed' | 'stun' | 'poison' => id === 'bleed' || id === 'stun' || id === 'poison')
@@ -814,7 +824,7 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): BasicHitResult
     const afterCtx: BasicAttackAfterHitArgs = {
       target: resolved,
       owner: unit,
-      result: { dealt, absorbed: hitResult.absorbed },
+      result: { dealt, absorbed },
     };
     for (const fn of afterHitHandlers) {
       try {
@@ -824,7 +834,7 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): BasicHitResult
       }
     }
   }
-  return { targetIid: resolved.iid ?? resolved.id, hpDamage: dealt };
+  return { targetIid: resolved.iid ?? resolved.id, hpDamage: dealt, hitCount: configuredHits };
 }
 
 export function basicAttack(Game: SessionState, unit: UnitToken): BasicHitResult | null {
@@ -857,8 +867,8 @@ export function doBasicWithFollowups(
   withActionExecution(Game, parent, () => {
     const hit = executeBasicAttack(Game, unit);
     if (!hit) return;
-    result.committedHits = 1;
-    result.totalHpDamage = hit.hpDamage;
+    result.attemptedHits = hit.hitCount;
+    result.committedHits = hit.hitCount;
     result.targetIids.push(hit.targetIid);
     result.ok = true;
   });

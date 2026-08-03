@@ -587,9 +587,14 @@ const EFFECTS: Record<string, PassiveDefinition> = {
     const purgeable = params.purgeable !== false;
     const applyStats = (stats: Record<string, number>) => {
       for (const [stat, amount] of Object.entries(stats)){
+        if (!Number.isFinite(amount)) throw new Error(`[passives] ${passive.id} produced non-finite ${stat}`);
         const attr = stat.toLowerCase();
         const status = ensureStatBuff(unit, `${passive.id}_${attr}`, { attr, mode: 'percent', amount, purgeable });
-        applyStatStacks(status, 1);
+        if (!status) throw new Error(`[passives] ${passive.id} could not create ${attr} status`);
+        // This is a mutually-exclusive stance refreshed each turn, not a
+        // stacking buff. Reusing the status also prevents unbounded growth.
+        status.amount = amount;
+        status.stacks = 1;
       }
     };
     const removeStats = (stats: Record<string, number>) => {
@@ -606,6 +611,9 @@ const EFFECTS: Record<string, PassiveDefinition> = {
       removeStats(trueStats);
     }
     recomputeFromStatuses(unit);
+    for (const key of ['hp', 'hpMax', 'atk', 'wil', 'arm', 'res'] as const) {
+      if (!Number.isFinite(Number(unit[key]))) throw new Error(`[passives] ${passive.id} produced non-finite ${key}`);
+    }
   },
 
   gainRESPct({ Game, unit, passive }) {

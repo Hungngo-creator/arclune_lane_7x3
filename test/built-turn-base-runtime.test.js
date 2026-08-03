@@ -165,6 +165,50 @@ test('generated loader boots Turn Base modules and runs six real alternating act
   expect(new Set(actionIds).size).toBe(6);
 });
 
+test('generated production bundle runs the real Lôi Thiên Ảnh catalog unit for twenty natural actions', () => {
+  const runtime = loadBuiltRuntime();
+  const turns = runtime.__require('./turns.ts');
+  const { ROSTER } = runtime.__require('./catalog.ts');
+  const { prepareUnitForPassives } = runtime.__require('./passives.ts');
+  const { createSession } = runtime.__require('./modes/pve/session-state.ts');
+  const { slotToCell } = runtime.__require('./engine.ts');
+  const game = createSession({ turnMode: 'interleaved_by_position', rngSeed: 17 });
+  const definition = ROSTER.find(unit => unit.id === 'loithienanh');
+  const ordinaryDefinition = ROSTER.find(unit => unit.id === 'mong_yem');
+  expect(definition.kit.basic.hits).toBe(2);
+  const make = (definition, side, slot) => ({
+    id: definition.id, iid: `${definition.id}:${side}:${slot}`, trueSelfId: definition.id,
+    entityKind: 'collection-unit', incarnationSerial: 1, lifeSerial: 1, lifeState: 'alive', alive: true,
+    side, ...slotToCell(side, slot), hp: 100000, hpMax: 100000, atk: 100, wil: 100,
+    arm: 0.1, res: 0.1, spd: 1, fury: 0, furyMax: definition.id === 'loithienanh' ? 120 : 100, statuses: [],
+  });
+  const ordinary = make(ordinaryDefinition, 'ally', 1);
+  const loithienanh = make(definition, 'ally', 2);
+  const enemyA = make(ordinaryDefinition, 'enemy', 1);
+  const enemyB = make(ordinaryDefinition, 'enemy', 2);
+  game.tokens = [ordinary, enemyA];
+  game.meta = new Map([[ordinary.id, ordinaryDefinition], [loithienanh.id, definition]]);
+  prepareUnitForPassives(ordinary);
+  prepareUnitForPassives(enemyA);
+  // This is the reported ordering: an ordinary roster unit acts twice before
+  // the actual second roster unit enters the live turn order.
+  const hooks = { doActionOrSkip: turns.doActionOrSkip, performUlt() {}, processActionChain: () => null, checkBattleEnd: () => false };
+  turns.stepTurn(game, hooks);
+  turns.stepTurn(game, hooks);
+  game.tokens.push(loithienanh, enemyB);
+  prepareUnitForPassives(loithienanh);
+  prepareUnitForPassives(enemyB);
+  for (let index = 0; index < 20; index += 1) {
+    turns.stepTurn(game, hooks);
+    expect(game.runtime.actionFault).toBeUndefined();
+    expect(game.runtime.actionExecutionStack).toEqual([]);
+    expect(Number.isFinite(game.turn.busyUntil)).toBe(true);
+  }
+  const packetEvents = game.runtime.combatEvents.filter(event => event.type === 'DAMAGE_BATCH_RESOLVED');
+  expect(packetEvents.length).toBeGreaterThanOrEqual(20);
+  expect(loithienanh.statuses.some(status => status.id === 'swap_res_wil_arm')).toBe(true);
+});
+
 test('built status query preserves taunt, dead exclusion, fallback and typed no-target behavior', () => {
   const runtime = loadBuiltRuntime();
   const turns = runtime.__require('./turns.ts');

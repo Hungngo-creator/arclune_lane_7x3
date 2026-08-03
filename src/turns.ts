@@ -4,6 +4,7 @@ import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';
 import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.ts';
 import { isCombatAlive, markRemoved } from './combat/kernel/life-cycle.ts';
+import { createNaturalAction, withActionExecution } from './combat/kernel/index.ts';
 import { emitSsiTemporalEvent } from './combat/kernel/delayed-revive.ts';
 
 import { doBasicWithFollowups } from './combat.ts';
@@ -29,11 +30,21 @@ function recordCombatActionFault(Game: SessionState, unit: UnitToken, error: unk
   const fault = error instanceof Error ? error : new Error(String(error));
   const runtime = ((Game.runtime ??= {}) as Record<string, unknown>);
   runtime.actionFault = fault;
+  const actionStack = Array.isArray(runtime.actionExecutionStack) ? [...runtime.actionExecutionStack] : [];
+  const latestAction = [...(((runtime.combatEvents as Array<Record<string, unknown>> | undefined) ?? []))]
+    .reverse().find(event => event.type === 'ACTION_START');
   runtime.errorContext = {
+    errorName: fault.name,
+    errorMessage: fault.message,
+    errorStack: fault.stack ?? null,
     phase: 'combat-action',
     moduleId: './turns.ts',
     actorIid: unit.iid ?? unit.id,
-    actionStack: Array.isArray(runtime.actionExecutionStack) ? [...runtime.actionExecutionStack] : [],
+    actorId: unit.id,
+    actionId: latestAction?.actionId ?? null,
+    actionKind: latestAction?.actionKind ?? 'natural',
+    actionStackBeforeCleanup: actionStack,
+    actionStackAfterCleanup: actionStack,
     targetPool: Game.tokens.filter(token => token.alive && token.side !== unit.side).map(token => token.iid ?? token.id),
   };
   return fault;
@@ -823,6 +834,7 @@ export function doActionOrSkip(
 
   const meta = Game.meta.get(unit.id);
   const passiveLog = getPassiveLog(Game);
+  const furyAtNaturalTurnStart = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
   emitPassiveEvent(Game, unit, 'onTurnStart', { log: passiveLog });
 
   const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
@@ -868,7 +880,13 @@ export function doActionOrSkip(
     if (!ready || Statuses.blocks(unit, 'ult')) return false;
     let ultOk = false;
     try {
-      performUlt!(unit);
+      if (typeof performUlt !== 'function') {
+        throw new Error('[turns] Ultimate runtime is unavailable');
+      }
+      // Ultimate payloads (including HP costs) must run inside the same
+      // canonical root action boundary as basics.  Without this boundary Lôi
+      // Thiên Ảnh's canonical HP gateway correctly rejects its self cost.
+      withActionExecution(Game, createNaturalAction(Game, 'ult'), () => performUlt(unit));
       ultOk = true;
     } catch (e){
       recordCombatActionFault(Game, unit, e);
@@ -940,7 +958,7 @@ export function doActionOrSkip(
   const queuedLeaderUlt = isUyenLeader(unit) && hasQueuedUyenUlt(unit);
   const autoUltReady = isUyenLeader(unit)
     ? queuedLeaderUlt
-    : (unit.fury ?? 0) >= ultCost;
+    : furyAtNaturalTurnStart >= ultCost;
   if (autoUltReady && !Statuses.blocks(unit, 'ult')){
     runUlt();
     if (queuedLeaderUlt) clearQueuedUyenUlt(unit);
