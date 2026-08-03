@@ -4937,6 +4937,9 @@ __modules['./combat.ts'] = (exports, module, __require) => {
               continue;
           pool.push(token);
           const slot = slotIndex(token.side, token.cx, token.cy);
+          const duplicate = bySlot.get(slot);
+          if (duplicate)
+              throw new Error(`[combat-occupancy] duplicate target occupancy side=${foeSide} slot=${slot} first=${duplicate.id}/${String(duplicate.iid)} second=${token.id}/${String(token.iid)}`);
           bySlot.set(slot, token);
           occupiedSlots.add(slot);
           const distance = distanceToAttacker(token);
@@ -4972,10 +4975,16 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           if (nearestBackline)
               return nearestBackline;
       }
-      const attackerRow = attacker.cy;
-      const targetSide = foeSide;
-      const primarySlot = Math.max(1, Math.min(3, (attackerRow | 0) + 1));
-      const slotPriority = [primarySlot, primarySlot + 3, primarySlot + 6];
+      const attackerSlot = slotIndex(attacker.side, attacker.cx, attacker.cy);
+      const primarySlot = Math.max(1, Math.min(3, (attacker.cy | 0) + 1));
+      const legacyPriority = [primarySlot, primarySlot + 3, primarySlot + 6];
+      const slotPriority = attackerSlot === 1
+          ? [3, 6, 9, 2, 5, 8]
+          : (attackerSlot === 3 || attackerSlot === 6 || attackerSlot === 9)
+              ? [1, 4, 7, 2, 5, 8]
+              : (attackerSlot === 2 || attackerSlot === 5 || attackerSlot === 8)
+                  ? [2, 5, 8]
+                  : legacyPriority;
       for (const slot of slotPriority) {
           if (isBlockedLeader(slot))
               continue;
@@ -4983,6 +4992,8 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           if (found)
               return found;
       }
+      if (attackerSlot === 2 || attackerSlot === 5 || attackerSlot === 8)
+          return null;
       if (nearestOverall && !isBlockedLeader(slotOf(nearestOverall))) {
           return nearestOverall;
       }
@@ -6150,6 +6161,8 @@ __modules['./combat/kernel/action-resolution.ts'] = (exports, module, __require)
   const createHpZeroCandidate = __dep2.createHpZeroCandidate;
   const __dep3 = __require('./combat/kernel/sequence.ts');
   const nextEventSerial = __dep3.nextEventSerial;
+  const __dep4 = __require('./combat/kernel/combat-identity.ts');
+  const assertCombatIdentity = __dep4.assertCombatIdentity;
   const assert = (condition, message) => { if (!condition)
       throw new Error(`[combat-kernel] ${message}`); };
   /** Resolves every target from the same pre-action snapshot without mutation. */
@@ -6174,6 +6187,10 @@ __modules['./combat/kernel/action-resolution.ts'] = (exports, module, __require)
           const primary = byIid.get(batch.packetResolutions[0].packet.targetIid);
           assert(primary && readShieldAmount(primary) === batch.shieldBefore, 'stale shield snapshot');
       }
+      for (const batch of resolution.batches)
+          for (const allocation of batch.hpAllocations)
+              if (allocation.reachedZero)
+                  assertCombatIdentity(byIid.get(allocation.targetIid));
       const totals = new Map();
       for (const batch of resolution.batches) {
           const primaryIid = batch.packetResolutions[0].packet.targetIid;
@@ -6312,10 +6329,27 @@ __modules['./combat/kernel/combat-identity.ts'] = (exports, module, __require) =
       if ((unit.hpMax ?? 0) > 0 && OWNS_TRUE_SELF.has(kind) && !unit.trueSelfId)
           throw new Error(`[combat-identity] HP-bearing ${kind} is missing trueSelfId`);
   }
+  /** Validates canonical spawn identity without consulting legacy flags. */
+  function assertCombatIdentity(unit) {
+      const kind = unit.entityKind;
+      if (!kind)
+          throw new Error('[combat-identity] combat token is missing entityKind');
+      if (unit.iid == null)
+          throw new Error(`[combat-identity] ${kind} requires an instance iid`);
+      assertHpBearerIdentity(unit, kind);
+      if (OWNS_TRUE_SELF.has(kind)) {
+          if (!Number.isInteger(unit.incarnationSerial) || Number(unit.incarnationSerial) < 1)
+              throw new Error(`[combat-identity] ${kind} has malformed incarnationSerial`);
+          if (!Number.isInteger(unit.lifeSerial) || Number(unit.lifeSerial) < 1)
+              throw new Error(`[combat-identity] ${kind} has malformed lifeSerial`);
+      }
+      return kind;
+  }
   //# sourceMappingURL=combat-identity.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureCombatIdentity')) exports.ensureCombatIdentity = ensureCombatIdentity;
   if (!Object.prototype.hasOwnProperty.call(exports, 'beginRevivedLife')) exports.beginRevivedLife = beginRevivedLife;
   if (!Object.prototype.hasOwnProperty.call(exports, 'assertHpBearerIdentity')) exports.assertHpBearerIdentity = assertHpBearerIdentity;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'assertCombatIdentity')) exports.assertCombatIdentity = assertCombatIdentity;
 };
 __modules['./combat/kernel/damage-batch.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/apply-damage.ts');
@@ -6908,23 +6942,25 @@ __modules['./combat/kernel/legacy-adapter.ts'] = (exports, module, __require) =>
 __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/kernel/combat-identity.ts');
   const beginRevivedLife = __dep0.beginRevivedLife;
-  const __dep1 = __require('./engine.ts');
-  const slotIndex = __dep1.slotIndex;
-  const __dep2 = __require('./combat/tag-aliases.ts');
-  const compareRuleTagPriority = __dep2.compareRuleTagPriority;
-  const __dep3 = __require('./combat/kernel/sequence.ts');
-  const nextDeathSerial = __dep3.nextDeathSerial;
-  const nextEventSerial = __dep3.nextEventSerial;
-  const __dep4 = __require('./combat/kernel/reincarnation.ts');
-  const hasEnteredReincarnation = __dep4.hasEnteredReincarnation;
-  const markReincarnationEscapedByRevive = __dep4.markReincarnationEscapedByRevive;
-  const observeReincarnationDeathWave = __dep4.observeReincarnationDeathWave;
-  const __dep5 = __require('./combat/kernel/true-self.ts');
-  const ensureTrueSelfCombatRecord = __dep5.ensureTrueSelfCombatRecord;
-  const lifeIdentityKey = __dep5.lifeIdentityKey;
-  const __dep6 = __require('./combat/number-utils.ts');
-  const normalizeCombatHpState = __dep6.normalizeCombatHpState;
-  const normalizeCombatHpValue = __dep6.normalizeCombatHpValue;
+  const __dep1 = __require('./combat/kernel/combat-identity.ts');
+  const assertCombatIdentity = __dep1.assertCombatIdentity;
+  const __dep2 = __require('./engine.ts');
+  const slotIndex = __dep2.slotIndex;
+  const __dep3 = __require('./combat/tag-aliases.ts');
+  const compareRuleTagPriority = __dep3.compareRuleTagPriority;
+  const __dep4 = __require('./combat/kernel/sequence.ts');
+  const nextDeathSerial = __dep4.nextDeathSerial;
+  const nextEventSerial = __dep4.nextEventSerial;
+  const __dep5 = __require('./combat/kernel/reincarnation.ts');
+  const hasEnteredReincarnation = __dep5.hasEnteredReincarnation;
+  const markReincarnationEscapedByRevive = __dep5.markReincarnationEscapedByRevive;
+  const observeReincarnationDeathWave = __dep5.observeReincarnationDeathWave;
+  const __dep6 = __require('./combat/kernel/true-self.ts');
+  const ensureTrueSelfCombatRecord = __dep6.ensureTrueSelfCombatRecord;
+  const lifeIdentityKey = __dep6.lifeIdentityKey;
+  const __dep7 = __require('./combat/number-utils.ts');
+  const normalizeCombatHpState = __dep7.normalizeCombatHpState;
+  const normalizeCombatHpValue = __dep7.normalizeCombatHpValue;
   const runtime = (game) => (game.runtime ??= {});
   const emit = (game, event) => { (runtime(game).combatEvents ??= []).push(event); };
   const getLifeState = (unit) => unit.lifeState ?? (unit.alive && (unit.hp == null || unit.hp > 0) ? 'alive' : 'dead-confirmed');
@@ -6971,10 +7007,8 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       return { countsForKill: target.countsForKill !== false, countsForKillReward: !summon && target.countsForKill !== false, countsForReincarnation: !summon, canRevive: !summon && target.revivable !== false, removalPolicy: kind === 'combat-object' ? 'remove' : 'remain' };
   };
   function createHpZeroCandidate(game, target, identity, source, causeKind, hpDamage, overkill = 0) {
-      if (!target.trueSelfId && !target.isMinion && (target.hpMax ?? 0) > 0)
-          throw new Error('[combat-lifecycle] HP-bearing non-summon is missing trueSelfId');
+      const entityKind = assertCombatIdentity(target);
       markHpZero(target);
-      const entityKind = target.entityKind ?? (target.isLeader ? 'leader' : target.isMinion ? 'summon' : 'collection-unit');
       const policy = policyFor(entityKind, target);
       const candidate = { targetIid: target.iid ?? target.id, trueSelfId: target.trueSelfId ?? null, incarnationSerial: target.incarnationSerial ?? 1, lifeSerial: target.lifeSerial ?? 1,
           actionId: identity.actionId, chainId: identity.chainId, parentActionId: identity.parentActionId, source, causeKind, committedHpDamage: hpDamage, overkill,
@@ -14193,7 +14227,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       });
   }
   function cellOccupied(tokens, cx, cy) {
-      return tokens.some((t) => t.cx === cx && t.cy === cy);
+      return tokens.some((t) => t.cx === cx && t.cy === cy && t.lifeState !== 'hp-zero' && t.lifeState !== 'death-prevention' && t.lifeState !== 'dead-confirmed' && t.lifeState !== 'removed' && t.lifeState !== 'erased' && t.alive !== false && (t.hp == null || t.hp > 0));
   }
   function isSummonMap(value) {
       if (!value)
@@ -45542,6 +45576,8 @@ __modules['./summon.ts'] = (exports, module, __require) => {
   const isCombatAlive = __dep6.isCombatAlive;
   const __dep7 = __require('./combat/number-utils.ts');
   const readCombatHpState = __dep7.readCombatHpState;
+  const __dep8 = __require('./combat/kernel/combat-identity.ts');
+  const ensureCombatIdentity = __dep8.ensureCombatIdentity;
   const DEFAULT_SUMMON_UNIT = {
       id: 'creep',
       name: 'Creep',
@@ -45624,7 +45660,10 @@ __modules['./summon.ts'] = (exports, module, __require) => {
           const extra = item.unit ?? {};
           const hpState = readCombatHpState({ hp: extra.hp ?? extra.hpMax ?? 0, hpMax: extra.hpMax ?? 0 });
           const art = getUnitArt(extra.id ?? 'minion');
-          const newToken = {
+          const iid = hooks.allocIid?.() ?? Game.tokens.reduce((max, token) => Math.max(max, Number(token.iid) || 0), 0) + 1;
+          const requestedKind = extra.entityKind;
+          const entityKind = requestedKind ?? (/^creep_?\d*$/i.test(String(extra.id ?? 'creep')) ? 'summoned-creep' : 'summon');
+          const newToken = ensureCombatIdentity({
               id: (extra.id ?? 'creep'),
               name: extra.name ?? 'Creep',
               color: extra.color ?? art?.palette.primary ?? '#ffd27d',
@@ -45632,7 +45671,7 @@ __modules['./summon.ts'] = (exports, module, __require) => {
               cy,
               side,
               alive: true,
-              isMinion: Boolean(extra.isMinion),
+              isMinion: true,
               ownerIid: extra.ownerIid,
               bornSerial: extra.bornSerial,
               ttlTurns: extra.ttlTurns,
@@ -45641,8 +45680,8 @@ __modules['./summon.ts'] = (exports, module, __require) => {
               atk: extra.atk,
               art,
               skinKey: art?.skinKey ?? null,
-              iid: extra.iid,
-          };
+              iid,
+          }, entityKind);
           Game.tokens.push(newToken);
           aliveTokens.push(newToken);
           try {
@@ -45662,7 +45701,6 @@ __modules['./summon.ts'] = (exports, module, __require) => {
           const onSpawnConfig = kit?.onSpawn && isRecord(kit.onSpawn) ? kit.onSpawn : null;
           prepareUnitForPassives(spawned);
           applyOnSpawnEffects(Game, spawned, onSpawnConfig ?? undefined);
-          spawned.iid = hooks.allocIid?.() ?? spawned.iid ?? 0;
           const creep = spawned.alive ? spawned : null;
           if (creep) {
               const { orderLength, cycle } = getTurnSnapshotInfo(Game.turn);
@@ -45700,6 +45738,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   const markRemoved = __dep3.markRemoved;
   const __dep4 = __require('./combat/kernel/index.ts');
   const createNaturalAction = __dep4.createNaturalAction;
+  const ensureCombatIdentity = __dep4.ensureCombatIdentity;
   const withActionExecution = __dep4.withActionExecution;
   const __dep5 = __require('./combat/kernel/delayed-revive.ts');
   const emitSsiTemporalEvent = __dep5.emitSsiTemporalEvent;
@@ -45809,9 +45848,10 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           if (!Number.isFinite(slot))
               continue;
           const key = toActiveUnitKey(token.side, slot);
-          if (!index.has(key)) {
-              index.set(key, token);
-          }
+          const existing = index.get(key);
+          if (existing)
+              throw new Error(`[combat-occupancy] duplicate authoritative occupancy side=${token.side} slot=${slot} first=${existing.id}/${String(existing.iid)} second=${token.id}/${String(token.iid)}`);
+          index.set(key, token);
       }
       return index;
   };
@@ -46079,6 +46119,8 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           return resolveCurrentActor();
       }
       queueMap?.delete(slot);
+      if (getActiveAt(Game, sideLower, slot, activeUnitIndex))
+          return resolveCurrentActor();
       const queuedTagsRaw = p.tags;
       const queuedTags = Array.isArray(queuedTagsRaw)
           ? queuedTagsRaw.filter((tag) => typeof tag === 'string')
@@ -46145,6 +46187,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       obj.iid = typeof allocIid === 'function'
           ? allocIid()
           : Game.tokens.reduce((max, token) => Math.max(max, Number(token.iid) || 0), 0) + 1;
+      ensureCombatIdentity(obj, 'collection-unit');
       obj.art = getUnitArt(p.unitId);
       obj.skinKey = obj.art?.skinKey;
       obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';

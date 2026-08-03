@@ -12,6 +12,8 @@ const makeToken = (overrides: Partial<UnitToken>): UnitToken => ({
   id: 'unit',
   iid: 1,
   trueSelfId: `true-self:${String(overrides.iid ?? 1)}`,
+  entityKind: 'collection-unit',
+  incarnationSerial: 1,
   lifeSerial: 1,
   lifeState: 'alive',
   side: 'ally',

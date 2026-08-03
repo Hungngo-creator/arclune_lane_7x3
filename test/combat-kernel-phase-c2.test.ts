@@ -4,7 +4,7 @@ import { nextTurnInterleaved } from '../src/turns/interleaved.ts';
 import type { SessionState } from '../src/types/combat.ts';
 const game = (): SessionState => ({ runtime: {}, tokens: [], battle: { over: false }, events: {} } as unknown as SessionState);
 const source = resolveSourceAttribution({ immediateSource: 'source', trueSelf: 'killer' });
-const unit = (iid: number, side: 'ally'|'enemy' = 'enemy', leader = false) => ({ id: `u${iid}`, iid, trueSelfId: `self${iid}`, lifeSerial: 1, side, cx: 0, cy: iid, hp: 0, hpMax: 100, alive: false, lifeState: 'hp-zero', isLeader: leader, statuses: [] } as any);
+const unit = (iid: number, side: 'ally'|'enemy' = 'enemy', leader = false) => ({ id: `u${iid}`, iid, trueSelfId: `self${iid}`, entityKind: leader ? 'leader' : 'collection-unit', incarnationSerial: 1, lifeSerial: 1, side, cx: 0, cy: iid, hp: 0, hpMax: 100, alive: false, lifeState: 'hp-zero', isLeader: leader, statuses: [] } as any);
 
 test('action transaction validates before committing a cost and commits once', () => {
  const g=game(), actor={alive:true} as any; let commits=0;

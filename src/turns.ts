@@ -4,7 +4,7 @@ import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';
 import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.ts';
 import { isCombatAlive, markRemoved } from './combat/kernel/life-cycle.ts';
-import { createNaturalAction, withActionExecution } from './combat/kernel/index.ts';
+import { createNaturalAction, ensureCombatIdentity, withActionExecution } from './combat/kernel/index.ts';
 import { emitSsiTemporalEvent } from './combat/kernel/delayed-revive.ts';
 
 import { doBasicWithFollowups } from './combat.ts';
@@ -93,9 +93,9 @@ const createActiveUnitIndex = (Game: SessionState): ActiveUnitIndex => {
     const slot = slotIndex(token.side, token.cx, token.cy);
     if (!Number.isFinite(slot)) continue;
     const key = toActiveUnitKey(token.side, slot);
-    if (!index.has(key)) {
-      index.set(key, token);
-    }
+    const existing = index.get(key);
+    if (existing) throw new Error(`[combat-occupancy] duplicate authoritative occupancy side=${token.side} slot=${slot} first=${existing.id}/${String(existing.iid)} second=${token.id}/${String(token.iid)}`);
+    index.set(key, token);
   }
   return index;
 };
@@ -411,6 +411,7 @@ export function spawnQueuedIfDue(
   }
 
   queueMap?.delete(slot);
+  if (getActiveAt(Game, sideLower, slot, activeUnitIndex)) return resolveCurrentActor();
 
   const queuedTagsRaw = (p as unknown as { tags?: unknown }).tags;
   const queuedTags = Array.isArray(queuedTagsRaw)
@@ -481,6 +482,7 @@ export function spawnQueuedIfDue(
   obj.iid = typeof allocIid === 'function'
     ? allocIid()
     : Game.tokens.reduce((max, token) => Math.max(max, Number(token.iid) || 0), 0) + 1;
+  ensureCombatIdentity(obj, 'collection-unit');
   obj.art = getUnitArt(p.unitId);
   obj.skinKey = obj.art?.skinKey;
   obj.color = obj.color || obj.art?.palette?.primary || '#a9f58c';

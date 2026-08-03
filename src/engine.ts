@@ -337,7 +337,7 @@ export function drawTokens(ctx: CanvasRenderingContext2D, g: GridSpec, tokens: r
 }
 
 export function cellOccupied(tokens: readonly UnitToken[], cx: number, cy: number): boolean {
-  return tokens.some((t) => t.cx === cx && t.cy === cy);
+  return tokens.some((t) => t.cx === cx && t.cy === cy && t.lifeState !== 'hp-zero' && t.lifeState !== 'death-prevention' && t.lifeState !== 'dead-confirmed' && t.lifeState !== 'removed' && t.lifeState !== 'erased' && t.alive !== false && (t.hp == null || t.hp > 0));
 }
 
 function isSummonMap(value: SummonMap): value is Map<number, QueuedSummonRequest> {

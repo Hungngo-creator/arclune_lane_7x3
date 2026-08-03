@@ -5,7 +5,7 @@ import type { SessionState } from '../src/types/combat.ts';
 import type { UnitToken } from '../src/types/units.ts';
 
 const unit = (iid: number, side: UnitToken['side'] = 'ally', hp = 100, hpMax = 100): UnitToken => ({
-  id: `unit-${iid}`, iid, trueSelfId: `true-self:${iid}`, lifeSerial: 1, lifeState: 'alive', name: `Unit ${iid}`,
+  id: `unit-${iid}`, iid, trueSelfId: `true-self:${iid}`, entityKind: 'collection-unit', incarnationSerial: 1, lifeSerial: 1, lifeState: 'alive', name: `Unit ${iid}`,
   side, cx: 0, cy: 0, alive: true, hp, hpMax, atk: 100, wil: 100, arm: 0, res: 0, statuses: [],
 } as UnitToken);
 const game = (...tokens: UnitToken[]): SessionState => ({ tokens, runtime: {}, actionChain: [], queued: { ally: new Map(), enemy: new Map() } } as unknown as SessionState);

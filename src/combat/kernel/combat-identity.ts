@@ -28,3 +28,15 @@ export function beginRevivedLife(unit: UnitToken): number {
 export function assertHpBearerIdentity(unit: UnitToken, kind: CombatIdentityKind): void {
   if ((unit.hpMax ?? 0) > 0 && OWNS_TRUE_SELF.has(kind) && !unit.trueSelfId) throw new Error(`[combat-identity] HP-bearing ${kind} is missing trueSelfId`);
 }
+/** Validates canonical spawn identity without consulting legacy flags. */
+export function assertCombatIdentity(unit: UnitToken): CombatIdentityKind {
+  const kind = unit.entityKind;
+  if (!kind) throw new Error('[combat-identity] combat token is missing entityKind');
+  if (unit.iid == null) throw new Error(`[combat-identity] ${kind} requires an instance iid`);
+  assertHpBearerIdentity(unit, kind);
+  if (OWNS_TRUE_SELF.has(kind)) {
+    if (!Number.isInteger(unit.incarnationSerial) || Number(unit.incarnationSerial) < 1) throw new Error(`[combat-identity] ${kind} has malformed incarnationSerial`);
+    if (!Number.isInteger(unit.lifeSerial) || Number(unit.lifeSerial) < 1) throw new Error(`[combat-identity] ${kind} has malformed lifeSerial`);
+  }
+  return kind;
+}

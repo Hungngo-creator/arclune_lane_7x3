@@ -4,6 +4,7 @@ import { consumeShield, readShieldAmount } from '../apply-damage.ts';
 import { resolveDamageBatch, type DamageBatchCommand, type DamageBatchResolution } from './damage-batch.ts';
 import { createHpZeroCandidate, type HPZeroCandidate } from './life-cycle.ts';
 import { nextEventSerial } from './sequence.ts';
+import { assertCombatIdentity } from './combat-identity.ts';
 import type { ActionIdentity, SourceAttribution } from './types.ts';
 
 export interface ActionResolutionCommand { identity: ActionIdentity; source: SourceAttribution; attackerSnapshot: Readonly<Record<string, unknown>>; damageBatches: readonly DamageBatchCommand[]; targetOrder: readonly (string | number)[]; reactionMetadata?: Readonly<Record<string, unknown>> }
@@ -27,6 +28,7 @@ export function commitActionResolution(game: SessionState, resolution: ActionRes
   const byIid = new Map(targets.map(target => [target.iid ?? target.id, target]));
   for (const snapshot of resolution.snapshot.targetSnapshots) { const target = byIid.get(snapshot.iid); assert(target, `target ${String(snapshot.iid)} missing`); assert(Number(target.hp ?? 0) === snapshot.hp && Number(target.hpMax ?? 0) === snapshot.hpMax && Number(target.lifeSerial ?? 1) === snapshot.lifeSerial, `stale target ${String(snapshot.iid)}`); }
   for (const batch of resolution.batches) { const primary = byIid.get(batch.packetResolutions[0]!.packet.targetIid); assert(primary && readShieldAmount(primary) === batch.shieldBefore, 'stale shield snapshot'); }
+  for (const batch of resolution.batches) for (const allocation of batch.hpAllocations) if (allocation.reachedZero) assertCombatIdentity(byIid.get(allocation.targetIid)!);
   const totals = new Map<string | number, ActionTargetAggregate>();
   for (const batch of resolution.batches) {
     const primaryIid = batch.packetResolutions[0]!.packet.targetIid; const primary = byIid.get(primaryIid)!; assert(consumeShield(primary, batch.shieldDamage) === batch.shieldDamage, 'shield commit mismatch');

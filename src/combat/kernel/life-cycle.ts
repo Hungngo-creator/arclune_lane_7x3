@@ -1,7 +1,7 @@
 import type { SessionState } from '@shared-types/combat';
 import type { LifeState, Side, UnitToken } from '../../types/units.ts';
 import { beginRevivedLife } from './combat-identity.ts';
-import type { CombatIdentityKind } from './combat-identity.ts';
+import { assertCombatIdentity, type CombatIdentityKind } from './combat-identity.ts';
 import { slotIndex } from '../../engine.ts';
 import { compareRuleTagPriority, type RuleTag } from '../tag-aliases.ts';
 import { nextDeathSerial, nextEventSerial } from './sequence.ts';
@@ -70,9 +70,9 @@ const policyFor = (kind: CombatIdentityKind, target: UnitToken) => {
 };
 
 export function createHpZeroCandidate(game: SessionState, target: UnitToken, identity: ActionIdentity, source: SourceAttribution, causeKind: DeathCauseKind, hpDamage: number, overkill = 0): HPZeroCandidate {
-  if (!target.trueSelfId && !target.isMinion && (target.hpMax ?? 0) > 0) throw new Error('[combat-lifecycle] HP-bearing non-summon is missing trueSelfId');
+  const entityKind = assertCombatIdentity(target);
   markHpZero(target);
-  const entityKind = target.entityKind ?? (target.isLeader ? 'leader' : target.isMinion ? 'summon' : 'collection-unit'); const policy = policyFor(entityKind, target);
+  const policy = policyFor(entityKind, target);
   const candidate: HPZeroCandidate = { targetIid: target.iid ?? target.id, trueSelfId: target.trueSelfId ?? null, incarnationSerial: target.incarnationSerial ?? 1, lifeSerial: target.lifeSerial ?? 1,
     actionId: identity.actionId, chainId: identity.chainId, parentActionId: identity.parentActionId, source, causeKind, committedHpDamage: hpDamage, overkill,
     slot: slotIndex(target.side, target.cx, target.cy), position: { cx: target.cx, cy: target.cy }, isLeader: entityKind === 'leader', isSummon: entityKind === 'summon' || entityKind === 'summoned-creep',

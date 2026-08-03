@@ -7,6 +7,7 @@ import { prepareUnitForPassives, applyOnSpawnEffects } from './passives.ts';
 import { isUniqueGlobalSummonBlocked } from './utils/unique-global.ts';
 import { isCombatAlive } from './combat/kernel/life-cycle.ts';
 import { readCombatHpState } from './combat/number-utils.ts';
+import { ensureCombatIdentity, type CombatIdentityKind } from './combat/kernel/combat-identity.ts';
 
 import type { PassiveKitDefinition, SessionState } from '@shared-types/combat';
 import type { ActionChainEntry, Side, SummonRequest, UnitToken } from '@shared-types/units';
@@ -112,7 +113,10 @@ export function processActionChain(
     const extra = item.unit ?? {};
     const hpState = readCombatHpState({ hp: extra.hp ?? extra.hpMax ?? 0, hpMax: extra.hpMax ?? 0 });
     const art = getUnitArt(extra.id ?? 'minion');
-    const newToken: UnitToken = {
+    const iid = hooks.allocIid?.() ?? Game.tokens.reduce((max, token) => Math.max(max, Number(token.iid) || 0), 0) + 1;
+    const requestedKind = extra.entityKind as CombatIdentityKind | undefined;
+    const entityKind: CombatIdentityKind = requestedKind ?? (/^creep_?\d*$/i.test(String(extra.id ?? 'creep')) ? 'summoned-creep' : 'summon');
+    const newToken = ensureCombatIdentity({
       id: (extra.id ?? 'creep') as string,
       name: extra.name ?? 'Creep',
       color: extra.color ?? art?.palette.primary ?? '#ffd27d',
@@ -120,7 +124,7 @@ export function processActionChain(
       cy,
       side,
       alive: true,
-      isMinion: Boolean(extra.isMinion),
+      isMinion: true,
       ownerIid: extra.ownerIid,
       bornSerial: extra.bornSerial,
       ttlTurns: extra.ttlTurns,
@@ -129,8 +133,8 @@ export function processActionChain(
       atk: extra.atk,
       art,
       skinKey: art?.skinKey ?? null,
-      iid: extra.iid,
-    };
+      iid,
+    } as UnitToken, entityKind);
     Game.tokens.push(newToken);
     aliveTokens.push(newToken);
       try {
@@ -151,7 +155,6 @@ export function processActionChain(
     const onSpawnConfig = kit?.onSpawn && isRecord(kit.onSpawn) ? kit.onSpawn : null;
     prepareUnitForPassives(spawned);
     applyOnSpawnEffects(Game, spawned, onSpawnConfig ?? undefined);
-    spawned.iid = hooks.allocIid?.() ?? spawned.iid ?? 0;
 
     const creep = spawned.alive ? spawned : null;
     if (creep){

@@ -368,6 +368,8 @@ export function pickTarget(Game: TargetableGameState, attacker: UnitToken): Unit
     if (token.side !== foeSide || !isCombatAlive(token)) continue;
     pool.push(token);
     const slot = slotIndex(token.side, token.cx, token.cy);
+    const duplicate = bySlot.get(slot);
+    if (duplicate) throw new Error(`[combat-occupancy] duplicate target occupancy side=${foeSide} slot=${slot} first=${duplicate.id}/${String(duplicate.iid)} second=${token.id}/${String(token.iid)}`);
     bySlot.set(slot, token);
     occupiedSlots.add(slot);
     const distance = distanceToAttacker(token);
@@ -412,16 +414,24 @@ export function pickTarget(Game: TargetableGameState, attacker: UnitToken): Unit
     if (nearestBackline) return nearestBackline;
   }
 
-  const attackerRow = attacker.cy;
-  const targetSide = foeSide;
-  const primarySlot = Math.max(1, Math.min(3, (attackerRow | 0) + 1));
-  const slotPriority: ReadonlyArray<number> = [primarySlot, primarySlot + 3, primarySlot + 6];
+  const attackerSlot = slotIndex(attacker.side, attacker.cx, attacker.cy);
+  const primarySlot = Math.max(1, Math.min(3, (attacker.cy | 0) + 1));
+  const legacyPriority: ReadonlyArray<number> = [primarySlot, primarySlot + 3, primarySlot + 6];
+  const slotPriority: ReadonlyArray<number> = attackerSlot === 1
+    ? [3, 6, 9, 2, 5, 8]
+    : (attackerSlot === 3 || attackerSlot === 6 || attackerSlot === 9)
+      ? [1, 4, 7, 2, 5, 8]
+      : (attackerSlot === 2 || attackerSlot === 5 || attackerSlot === 8)
+        ? [2, 5, 8]
+        : legacyPriority;
 
   for (const slot of slotPriority) {
     if (isBlockedLeader(slot)) continue;
     const found = bySlot.get(slot);
     if (found) return found;
   }
+
+  if (attackerSlot === 2 || attackerSlot === 5 || attackerSlot === 8) return null;
 
   if (nearestOverall && !isBlockedLeader(slotOf(nearestOverall))) {
     return nearestOverall;

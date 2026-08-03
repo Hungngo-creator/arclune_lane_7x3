@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
 import { basicAttack } from '../src/combat.ts';
+import { slotToCell } from '../src/engine.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
@@ -37,13 +38,12 @@ describe('basic attack scaling for ly_thanh_thu and nguyen_le', () => {
   ] as const;
 
   it.each(cases)('uses 100% ATK + 100% WIL for $id basic attack damage base', ({ id, atk, wil }) => {
-    const attacker = makeUnit({ id, side: 'ally', cx: 1, cy: 1, atk, wil, hp: 800, hpMax: 800 });
+    const attacker = makeUnit({ id, side: 'ally', ...slotToCell('ally', 5), atk, wil, hp: 800, hpMax: 800 });
     const defender = makeUnit({
       id: 'enemy',
       iid: 2,
       side: 'enemy',
-      cx: 1,
-      cy: 2,
+      ...slotToCell('enemy', 5),
       hp: 1200,
       hpMax: 1200,
       atk: 10,
