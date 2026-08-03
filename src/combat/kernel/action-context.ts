@@ -68,7 +68,8 @@ export function finalizeCombatAction(game: SessionState, context: ActionExecutio
   if (existing) return existing;
   const deathRecords = resolveDeathWave(game, undefined, context.identity.actionId);
   const beforeEndEvents = (state.combatEvents ?? []).slice(context.startCombatEventIndex).filter(event => event.actionId === context.identity.actionId);
-  const battleEnd = evaluateBattleEnd(game, deathRecords);
+  const chainQuiescent = stack(game).length === 0;
+  const battleEnd = chainQuiescent ? evaluateBattleEnd(game, deathRecords) : { ended: false, winner: null, reason: null };
   const actionEndSerial = nextEventSerial(game);
   (state.combatEvents ??= []).push({ type: 'ACTION_END', eventSerial: actionEndSerial, actionId: context.identity.actionId, chainId: context.identity.chainId });
   const result: ActionFinalizationResult = {

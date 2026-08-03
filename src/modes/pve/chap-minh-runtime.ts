@@ -14,7 +14,7 @@ export function performChapMinhUltRuntime(ctx: PveUltHookContext): boolean {
 
   const healAmount = Math.max(0, Math.round(Math.max(0, toFiniteNumber(unit.hpMax, 0)) * CHAP_MINH_ULT_HEAL_PERCENT));
   if (healAmount > 0) {
-    healUnit(unit, healAmount);
+    healUnit(game, unit, unit, healAmount);
   }
 
   Statuses.add(unit, {

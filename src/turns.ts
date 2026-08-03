@@ -4,6 +4,7 @@ import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';
 import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.ts';
 import { isCombatAlive, markRemoved } from './combat/kernel/life-cycle.ts';
+import { emitSsiTemporalEvent } from './combat/kernel/delayed-revive.ts';
 
 import { doBasicWithFollowups } from './combat.ts';
 import { performActiveSkill } from './combat/perform-active-skill.ts';
@@ -15,7 +16,6 @@ import {
 } from './combat/unit-runtime-hooks.ts';
 import {
   applyChapMinhActionEnd,
-  applyChapMinhPhaseShift,
   recoverChapMinhMaxHpPerTurn,
   refreshChapMinhOwnership,
 } from './combat/chap-minh-runtime.ts';
@@ -782,8 +782,11 @@ export function doActionOrSkip(
     }
     Statuses.onTurnEnd(unit, { game: Game, log: passiveLog });
     runRuntimeTurnEnd(Game, unit);
-    applyChapMinhPhaseShift(unit);
     refreshChapMinhOwnership(Game);
+    if (consumedTurn) {
+      const temporal = { actorSide: unit.side, actorIid: unit.iid ?? unit.id, slot: slot ?? null, cursorSnapshot: { ally: Number((Game.turn as any)?.lastPos?.ALLY ?? 0), enemy: Number((Game.turn as any)?.lastPos?.ENEMY ?? 0) }, sidePassSerial: Number((Game.runtime as any)?.ssiSidePassSerial ?? 0), globalCycleSerial: Number((Game.turn as any)?.cycle ?? 0), actionId: null };
+      emitSsiTemporalEvent(Game, { type: acted ? 'NATURAL_ACTION_COMPLETED' : 'NATURAL_ACTION_CONSUMED_BY_CC', ...temporal });
+    }
     ensureBusyReset();
     resolution.consumedTurn = consumedTurn;
     resolution.acted = acted;
@@ -1027,6 +1030,16 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
       spawned: !!spawned,
       processedChain: null as ActionChainProcessedResult | null
     };
+
+    const temporalBase = { actorSide: active.side, actorIid: active.iid ?? active.id, slot: entry.slot, cursorSnapshot: { ally: Number(interleavedTurn.lastPos.ALLY ?? 0), enemy: Number(interleavedTurn.lastPos.ENEMY ?? 0) }, sidePassSerial: Number((Game.runtime as any)?.ssiSidePassSerial ?? 0), globalCycleSerial: Number(interleavedTurn.cycle ?? 0), actionId: null };
+    emitSsiTemporalEvent(Game, { type: 'TARGET_SIDE_OPPORTUNITY', ...temporalBase, targetSide: active.side });
+    emitSsiTemporalEvent(Game, { type: 'NATURAL_ACTION_STARTED', ...temporalBase });
+    if (selection.wrapped) {
+      const runtime = (Game.runtime ??= {}) as any; runtime.ssiSidePassSerial = Number(runtime.ssiSidePassSerial ?? 0) + 1;
+      emitSsiTemporalEvent(Game, { type: 'SIDE_PASS_COMPLETED', ...temporalBase, actorSide: entry.side, sidePassSerial: runtime.ssiSidePassSerial });
+      const priorCycle = Number(runtime.lastEmittedSsiCycle ?? 0); const cycleNow = Number(interleavedTurn.cycle ?? 0);
+      if (cycleNow > priorCycle) { runtime.lastEmittedSsiCycle = cycleNow; emitSsiTemporalEvent(Game, { type: 'SSI_CYCLE_COMPLETED', ...temporalBase, actorSide: null, globalCycleSerial: cycleNow }); }
+    }
 
   const ended = runTurnAndCheckEnd(
       Game,

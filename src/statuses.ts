@@ -131,12 +131,20 @@ function applyDotTick(unit: UnitToken, status: StatusEffect, ctx?: StatusTurnCon
   const lost = Math.round((unit.hpMax ?? 0) * pct);
   const game = ctx?.game;
   if (!game) throw new Error('[combat-kernel] damaging status tick requires game context');
-  const source = game.tokens.find(token => (token.iid ?? token.id) === status.sourceIid) ?? unit;
+  const resolved = resolveStatusSourceAttribution(status, game);
+  const source = resolved.liveSource ?? ({ iid: resolved.attribution.immediateSourceIid ?? `status:${String(status.statusInstanceId ?? status.id)}`, trueSelfId: resolved.attribution.creditTrueSelfId, side: status.sourceSide ?? (unit.side === 'ally' ? 'enemy' : 'ally'), cx: -1, cy: -1, alive: false, lifeState: 'removed', atk: Number(status.snapshotAtk ?? 0), wil: Number(status.snapshotWil ?? 0), statuses: [] } as unknown as UnitToken);
   const identity = createNaturalAction(game, 'dot-tick');
   status.tickSerial = Math.max(0, Number(status.tickSerial ?? 0)) + 1;
   withActionExecution(game, identity, () => dealAbilityDamage(game, source, unit, { base: lost, dtype: status.damageType === 'true' ? 'true' : status.damageType === 'will' ? 'arcane' : 'physical', attackType: 'dot', skillMul: 1 }), { originActionId: typeof status.originActionId === 'string' || typeof status.originActionId === 'number' ? status.originActionId : null });
   logStatusTick(ctx, id, unit, lost);
   decrementDuration(unit, status);
+}
+
+export function resolveStatusSourceAttribution(status: StatusEffect, game: SessionState): { attribution: ReturnType<typeof resolveSourceAttribution>; liveSource: UnitToken | null } {
+  const sourceIid = typeof status.sourceIid === 'string' || typeof status.sourceIid === 'number' ? status.sourceIid : null;
+  const live = sourceIid == null ? null : game.tokens.find(token => (token.iid ?? token.id) === sourceIid) ?? null;
+  const dynamic = status.snapshotPolicy === 'dynamic';
+  return { attribution: resolveSourceAttribution({ immediateSource: sourceIid, controller: status.controllerIid as string | number | null, owner: status.ownerIid as string | number | null, trueSelf: status.creditTrueSelfId as string | number | null }), liveSource: dynamic ? live : null };
 }
 
 const createTimedStatus = (

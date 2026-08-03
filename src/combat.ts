@@ -19,7 +19,6 @@ import { getCounterBonusMetadata } from './combat/counter-matrix.ts';
 import { readAtkWilPower } from './combat/number-utils.ts';
 import {
   applyChapMinhMitigation,
-  applyChapMinhPhaseShift,
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
 import { runRuntimeBasicAttackResolved, runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
@@ -79,6 +78,12 @@ function ensureProductionDeathAdapters(game: SessionState): void {
     const target = game.tokens.find(unit => (unit.iid ?? unit.id) === candidate.targetIid);
     if (!target) return null;
     return hookOnLethalDamage(target) ? { prevent: true, hp: 1, effectId: 'undying', authority: 'normal', charge: { consumeStatusId: 'undying' } } : null;
+  });
+  registerDeathPrevention(game, candidate => {
+    const target = game.tokens.find(unit => (unit.iid ?? unit.id) === candidate.targetIid);
+    if (!target || target.id !== 'huyen_vu_chap_minh' || target._chapMinhPhaseShiftUsed) return null;
+    const hpMax = Math.max(1, Math.floor(Number(target.hpMax ?? 1))); const lost = Math.max(1, Math.floor(hpMax * 0.5)); const nextHpMax = Math.max(1, hpMax - lost);
+    return { prevent: true, hp: nextHpMax, effectId: 'chap-minh-phase-shift', authority: 'normal', charge: { resetMaxHpTo: nextHpMax, consumeUnitFlag: '_chapMinhPhaseShiftUsed', setFields: { _chapMinhLostMaxHp: lost, _chapMinhRecoverPerTurn: Math.max(1, Math.floor(lost * 0.2)) } } };
   });
   registerDeathReactions(game, record => {
     const dead = game.tokens.find(unit => (unit.iid ?? unit.id) === record.targetIid);
@@ -571,8 +576,6 @@ export function dealAbilityDamage(
     targetCarrier._lastDamageTakenTurn = Number((Game?.turn as { turnCount?: unknown } | null | undefined)?.turnCount ?? 0);
   }
   runRuntimeDamageResolved(target);
-  applyChapMinhPhaseShift(target);
-
   const damageResult: DamageResult = {
     dealt: dealtTotal,
     absorbed: batchResolution.shieldDamage,
@@ -653,7 +656,13 @@ export interface HealResult {
   overheal: number;
 }
 
-export function healUnit(target: UnitToken | null | undefined, amount: number): HealResult {
+export function healUnit(game: SessionState, healer: UnitToken, target: UnitToken | null | undefined, amount: number): HealResult;
+export function healUnit(target: UnitToken | null | undefined, amount: number): HealResult;
+export function healUnit(gameOrTarget: SessionState | UnitToken | null | undefined, healerOrAmount: UnitToken | number, maybeTarget?: UnitToken | null, maybeAmount?: number): HealResult {
+  const game = typeof healerOrAmount === 'number' ? null : gameOrTarget as SessionState;
+  const healer = typeof healerOrAmount === 'number' ? null : healerOrAmount;
+  const target = (typeof healerOrAmount === 'number' ? gameOrTarget : maybeTarget) as UnitToken | null | undefined;
+  const amount = typeof healerOrAmount === 'number' ? healerOrAmount : Number(maybeAmount ?? 0);
   if (!target || !Number.isFinite(target.hpMax)) {
     return { healed: 0, overheal: 0 };
   }
@@ -674,9 +683,10 @@ export function healUnit(target: UnitToken | null | undefined, amount: number): 
     return { healed: 0, overheal: 0 };
   }
 
-  const source = resolveSourceAttribution({ immediateSource: target, controller: target, trueSelf: target.trueSelfId ?? null, owner: target });
+  const sourceUnit = healer ?? target;
+  const source = resolveSourceAttribution({ immediateSource: sourceUnit, controller: sourceUnit, trueSelf: sourceUnit.trueSelfId ?? null, owner: sourceUnit });
   const result = resolveHealing(target, amt, source);
-  commitHealing(null, target, result);
+  commitHealing(game, target, result, game ? currentActionExecution(game)?.identity : undefined);
   return { healed: result.effectiveHeal, overheal: result.overheal };
 }
 

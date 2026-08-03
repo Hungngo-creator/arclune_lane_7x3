@@ -6,6 +6,7 @@ import { slotIndex } from '../../engine.ts';
 import { compareRuleTagPriority, type RuleTag } from '../tag-aliases.ts';
 import { nextDeathSerial, nextEventSerial } from './sequence.ts';
 import type { ActionIdentity, SourceAttribution } from './types.ts';
+import { hasEnteredReincarnation, markReincarnationEscapedByRevive, observeReincarnationDeathWave } from './reincarnation.ts';
 
 export type DeathCauseKind = 'damage' | 'dot' | 'reflected' | 'environment' | 'self-damage' | 'sacrifice' | 'non-damage-hp-loss' | 'execute';
 export interface HPZeroCandidate {
@@ -22,6 +23,7 @@ export interface DeathPreventionDecision { prevent: boolean; hp: number; effectI
 export interface DeathPreventionRequest { candidate: HPZeroCandidate; decisions: readonly DeathPreventionDecision[] }
 export interface ReviveRequest { death: DeathRecord; hpPolicy: { kind: 'flat' | 'ratio'; value: number }; ragePolicy: 'preserve' | 'reset'; buffPolicy: 'preserve' | 'purge' | 'preserve-all' | 'purge-purgeable-debuffs' | 'clear-temporary' | 'explicit-list'; statusIds?: readonly string[]; positionPolicy: 'preserve'; source: SourceAttribution; authority?: string; allowSummon?: boolean }
 export interface ReviveResult { committed: boolean; reason: string | null; targetIid: string | number; lifeSerial: number }
+export type ReviveEligibilityReason = 'allowed' | 'battle-ended' | 'invalid-death' | 'non-revivable' | 'stale-life' | 'already-revived' | 'summon-not-revivable' | 'removed' | 'erased' | 'fused' | 'entered-reincarnation' | 'identity-mismatch';
 
 type PreventionCollector = (candidate: HPZeroCandidate) => DeathPreventionDecision | readonly DeathPreventionDecision[] | null;
 type LifecycleRuntime = { combatEvents?: Record<string, unknown>[]; hpZeroCandidates?: HPZeroCandidate[]; deathRecords?: DeathRecord[]; deathRecordById?: Record<string, DeathRecord>; openHpZeroKeys?: string[]; confirmedLifeKeys?: string[]; revivedDeathIds?: string[]; deathPreventionRegistrations?: Array<{ serial: number; collect: PreventionCollector }>; deathPreventionSerial?: number; trueSelfRecords?: Record<string, { confirmedKills: number }>; deathReactionRegistrations?: Array<(record: DeathRecord) => void>; killReactionRegistrations?: Array<(record: DeathRecord) => void>; immediateReviveRegistrations?: Array<(record: DeathRecord) => { target: UnitToken; request: ReviveRequest } | null>; battleEnd?: { ended: boolean; winner: Side | 'draw' | null; reason: string | null } };
@@ -104,6 +106,9 @@ export function resolveDeathWave(game: SessionState, prevention: (request: Death
       if (typeof consumeUnitFlag === 'string') (target as unknown as Record<string, unknown>)[consumeUnitFlag] = true;
       const resetBonusFlag = decision.charge?.resetBonusFlag;
       if (typeof resetBonusFlag === 'string') (target as unknown as Record<string, unknown>)[resetBonusFlag] = 0;
+      const setFields = decision.charge?.setFields;
+      if (setFields && typeof setFields === 'object') Object.assign(target, setFields);
+      if (target.hp != null && target.hpMax != null) target.hp = Math.min(target.hp, target.hpMax);
       close(candidate); emit(game, { type: 'DEATH_PREVENTED', eventSerial: nextEventSerial(game), actionId: candidate.actionId, chainId: candidate.chainId, targetIid: candidate.targetIid, trueSelfId: candidate.trueSelfId, lifeSerial: candidate.lifeSerial, decision });
     }
     else confirmed.push({ candidate, target });
@@ -115,6 +120,7 @@ export function resolveDeathWave(game: SessionState, prevention: (request: Death
   });
   (state.deathRecords ??= []).push(...records); const registry = state.deathRecordById ??= {}; records.forEach(record => { registry[record.deathId] = record; });
   for (const record of records) emit(game, { type: 'DEATH_CONFIRMED', ...record, eventSerial: record.confirmedEventSerial });
+  observeReincarnationDeathWave(game, records);
   for (const record of records) {
     if (record.countsForKill && record.source.creditTrueSelfId && record.source.creditTrueSelfId !== record.trueSelfId) { const owner = state.trueSelfRecords ??= {}; (owner[String(record.source.creditTrueSelfId)] ??= { confirmedKills: 0 }).confirmedKills += 1; emit(game, { type: 'KILL_CREDIT_GRANTED', eventSerial: nextEventSerial(game), deathId: record.deathId, actionId: record.actionId, chainId: record.chainId, targetIid: record.targetIid, trueSelfId: record.trueSelfId, lifeSerial: record.lifeSerial, creditTrueSelfId: record.source.creditTrueSelfId }); }
   }
@@ -128,13 +134,9 @@ export function resolveDeathWave(game: SessionState, prevention: (request: Death
 
 export function commitImmediateRevive(game: SessionState, target: UnitToken, request: ReviveRequest): ReviveResult {
   const death = request.death;
-  const state = runtime(game); const canonical = state.deathRecordById?.[death.deathId];
-  const matches = canonical && canonical.deathId === death.deathId && canonical.targetIid === death.targetIid && canonical.trueSelfId === death.trueSelfId && canonical.lifeSerial === death.lifeSerial && canonical.confirmedEventSerial === death.confirmedEventSerial;
-  if (!matches || canonical!.revivable !== true || death.canRevive !== true) return { committed: false, reason: 'invalid-or-non-revivable-death', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
-  if (target.trueSelfId !== death.trueSelfId) return { committed: false, reason: 'identity-mismatch', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
-  if ((target.iid ?? target.id) !== death.targetIid || getLifeState(target) !== 'dead-confirmed' || (target.lifeSerial ?? 1) !== death.lifeSerial) return { committed: false, reason: 'stale-or-not-dead', targetIid: death.targetIid, lifeSerial: target.lifeSerial ?? 1 };
-  if (death.isSummon && !request.allowSummon) return { committed: false, reason: 'summon-not-revivable', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
-  const consumed = state.revivedDeathIds ??= []; if (consumed.includes(death.deathId)) return { committed: false, reason: 'already-revived', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
+  const state = runtime(game); const reason = evaluateReviveEligibility(game, death, target, request);
+  if (reason !== 'allowed') return { committed: false, reason, targetIid: death.targetIid, lifeSerial: target.lifeSerial ?? death.lifeSerial };
+  const consumed = state.revivedDeathIds ??= [];
   const hpMax = Math.max(1, Number(target.hpMax ?? 1)); const hp = request.hpPolicy.kind === 'ratio' ? Math.floor(hpMax * request.hpPolicy.value) : Math.floor(request.hpPolicy.value);
   target.hp = Math.max(1, Math.min(hpMax, hp)); const lifeSerial = beginRevivedLife(target); target.lifeState = 'alive'; target.alive = true;
   if (request.ragePolicy === 'reset') target.rage = 0;
@@ -142,6 +144,24 @@ export function commitImmediateRevive(game: SessionState, target: UnitToken, req
   else if (request.buffPolicy === 'clear-temporary') target.statuses = target.statuses?.filter(status => status.unpurgeable === true || status.permanent === true);
   else if (request.buffPolicy === 'explicit-list') { const ids = new Set(request.statusIds ?? []); target.statuses = target.statuses?.filter(status => !ids.has(String(status.id))); }
   consumed.push(death.deathId);
+  markReincarnationEscapedByRevive(game, death.deathId);
   emit(game, { type: 'REVIVE_COMMITTED', eventSerial: nextEventSerial(game), deathId: death.deathId, actionId: death.actionId, chainId: death.chainId, targetIid: death.targetIid, trueSelfId: death.trueSelfId, lifeSerial, hp: target.hp, source: request.source, authority: request.authority ?? null });
   return { committed: true, reason: null, targetIid: death.targetIid, lifeSerial };
+}
+
+/** Canonical gate used by every immediate and scheduled revive path. */
+export function evaluateReviveEligibility(game: SessionState, death: DeathRecord, target: UnitToken, request?: Pick<ReviveRequest, 'allowSummon'>): ReviveEligibilityReason {
+  const state = runtime(game); if (state.battleEnd?.ended) return 'battle-ended';
+  const canonical = state.deathRecordById?.[death.deathId];
+  if (!canonical || canonical.targetIid !== death.targetIid || canonical.trueSelfId !== death.trueSelfId || canonical.lifeSerial !== death.lifeSerial || canonical.confirmedEventSerial !== death.confirmedEventSerial) return 'invalid-death';
+  if (!canonical.revivable || !death.canRevive) return 'non-revivable';
+  if (hasEnteredReincarnation(game, death.deathId)) return 'entered-reincarnation';
+  if (target.trueSelfId !== death.trueSelfId) return 'identity-mismatch';
+  if ((target.iid ?? target.id) !== death.targetIid || (target.lifeSerial ?? 1) !== death.lifeSerial) return 'stale-life';
+  if ((state.revivedDeathIds ?? []).includes(death.deathId)) return 'already-revived';
+  const lifeState = getLifeState(target); if (lifeState === 'erased') return 'erased'; if (lifeState === 'removed') return 'removed';
+  if ((target as UnitToken & { removalKind?: string }).removalKind === 'FUSION_CONSUMED') return 'fused';
+  if (lifeState !== 'dead-confirmed') return 'already-revived';
+  if (death.isSummon && !request?.allowSummon) return 'summon-not-revivable';
+  return 'allowed';
 }

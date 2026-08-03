@@ -27,7 +27,7 @@ export function performLyThanhThuUltRuntime(ctx: PveUltHookContext): boolean {
   const overThreshold = dealtResult.dealt > Math.max(0, Math.floor(toFiniteNumber(enemyLeader.hpMax, 0) * 0.2));
   if (overThreshold) {
     const heal = Math.max(1, Math.floor(toFiniteNumber(unit.hpMax, 0) * 0.1));
-    healUnit(unit, heal);
+    healUnit(game, unit, unit, heal);
   }
 
   extendBusy(900);

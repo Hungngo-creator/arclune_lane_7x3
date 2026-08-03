@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/kernel/action-context.js":"./combat/kernel/action-context.ts","./combat/kernel/action-resolution.js":"./combat/kernel/action-resolution.ts","./combat/kernel/action-transaction.js":"./combat/kernel/action-transaction.ts","./combat/kernel/battle-end.js":"./combat/kernel/battle-end.ts","./combat/kernel/combat-identity.js":"./combat/kernel/combat-identity.ts","./combat/kernel/damage-batch.js":"./combat/kernel/damage-batch.ts","./combat/kernel/damage-resolver.js":"./combat/kernel/damage-resolver.ts","./combat/kernel/defense.js":"./combat/kernel/defense.ts","./combat/kernel/delayed-revive.js":"./combat/kernel/delayed-revive.ts","./combat/kernel/hp-mutation.js":"./combat/kernel/hp-mutation.ts","./combat/kernel/ids.js":"./combat/kernel/ids.ts","./combat/kernel/index.js":"./combat/kernel/index.ts","./combat/kernel/invariants.js":"./combat/kernel/invariants.ts","./combat/kernel/legacy-adapter.js":"./combat/kernel/legacy-adapter.ts","./combat/kernel/life-cycle.js":"./combat/kernel/life-cycle.ts","./combat/kernel/non-death-removal.js":"./combat/kernel/non-death-removal.ts","./combat/kernel/reaction-policy.js":"./combat/kernel/reaction-policy.ts","./combat/kernel/sequence.js":"./combat/kernel/sequence.ts","./combat/kernel/source-attribution.js":"./combat/kernel/source-attribution.ts","./combat/kernel/trigger-ledger.js":"./combat/kernel/trigger-ledger.ts","./combat/kernel/types.js":"./combat/kernel/types.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/kernel/action-context.js":"./combat/kernel/action-context.ts","./combat/kernel/action-resolution.js":"./combat/kernel/action-resolution.ts","./combat/kernel/action-transaction.js":"./combat/kernel/action-transaction.ts","./combat/kernel/battle-end.js":"./combat/kernel/battle-end.ts","./combat/kernel/combat-identity.js":"./combat/kernel/combat-identity.ts","./combat/kernel/damage-batch.js":"./combat/kernel/damage-batch.ts","./combat/kernel/damage-resolver.js":"./combat/kernel/damage-resolver.ts","./combat/kernel/defense.js":"./combat/kernel/defense.ts","./combat/kernel/delayed-revive.js":"./combat/kernel/delayed-revive.ts","./combat/kernel/hp-mutation.js":"./combat/kernel/hp-mutation.ts","./combat/kernel/ids.js":"./combat/kernel/ids.ts","./combat/kernel/index.js":"./combat/kernel/index.ts","./combat/kernel/invariants.js":"./combat/kernel/invariants.ts","./combat/kernel/legacy-adapter.js":"./combat/kernel/legacy-adapter.ts","./combat/kernel/life-cycle.js":"./combat/kernel/life-cycle.ts","./combat/kernel/non-death-removal.js":"./combat/kernel/non-death-removal.ts","./combat/kernel/reaction-policy.js":"./combat/kernel/reaction-policy.ts","./combat/kernel/rebirth.js":"./combat/kernel/rebirth.ts","./combat/kernel/reincarnation.js":"./combat/kernel/reincarnation.ts","./combat/kernel/sequence.js":"./combat/kernel/sequence.ts","./combat/kernel/source-attribution.js":"./combat/kernel/source-attribution.ts","./combat/kernel/trigger-ledger.js":"./combat/kernel/trigger-ledger.ts","./combat/kernel/types.js":"./combat/kernel/types.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -4684,7 +4684,6 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   const readAtkWilPower = __dep14.readAtkWilPower;
   const __dep15 = __require('./combat/chap-minh-runtime.ts');
   const applyChapMinhMitigation = __dep15.applyChapMinhMitigation;
-  const applyChapMinhPhaseShift = __dep15.applyChapMinhPhaseShift;
   const recordChapMinhPreventedDamage = __dep15.recordChapMinhPreventedDamage;
   const __dep16 = __require('./combat/unit-runtime-hooks.ts');
   const runRuntimeBasicAttackResolved = __dep16.runRuntimeBasicAttackResolved;
@@ -4717,6 +4716,15 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           if (!target)
               return null;
           return hookOnLethalDamage(target) ? { prevent: true, hp: 1, effectId: 'undying', authority: 'normal', charge: { consumeStatusId: 'undying' } } : null;
+      });
+      registerDeathPrevention(game, candidate => {
+          const target = game.tokens.find(unit => (unit.iid ?? unit.id) === candidate.targetIid);
+          if (!target || target.id !== 'huyen_vu_chap_minh' || target._chapMinhPhaseShiftUsed)
+              return null;
+          const hpMax = Math.max(1, Math.floor(Number(target.hpMax ?? 1)));
+          const lost = Math.max(1, Math.floor(hpMax * 0.5));
+          const nextHpMax = Math.max(1, hpMax - lost);
+          return { prevent: true, hp: nextHpMax, effectId: 'chap-minh-phase-shift', authority: 'normal', charge: { resetMaxHpTo: nextHpMax, consumeUnitFlag: '_chapMinhPhaseShiftUsed', setFields: { _chapMinhLostMaxHp: lost, _chapMinhRecoverPerTurn: Math.max(1, Math.floor(lost * 0.2)) } } };
       });
       registerDeathReactions(game, record => {
           const dead = game.tokens.find(unit => (unit.iid ?? unit.id) === record.targetIid);
@@ -5116,7 +5124,6 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           targetCarrier._lastDamageTakenTurn = Number(Game?.turn?.turnCount ?? 0);
       }
       runRuntimeDamageResolved(target);
-      applyChapMinhPhaseShift(target);
       const damageResult = {
           dealt: dealtTotal,
           absorbed: batchResolution.shieldDamage,
@@ -5185,7 +5192,11 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       }
       return { dealt, absorbed: batchResolution.shieldDamage, total: dmg, breakdown: finalDamage.breakdown };
   }
-  function healUnit(target, amount) {
+  function healUnit(gameOrTarget, healerOrAmount, maybeTarget, maybeAmount) {
+      const game = typeof healerOrAmount === 'number' ? null : gameOrTarget;
+      const healer = typeof healerOrAmount === 'number' ? null : healerOrAmount;
+      const target = (typeof healerOrAmount === 'number' ? gameOrTarget : maybeTarget);
+      const amount = typeof healerOrAmount === 'number' ? healerOrAmount : Number(maybeAmount ?? 0);
       if (!target || !Number.isFinite(target.hpMax)) {
           return { healed: 0, overheal: 0 };
       }
@@ -5205,9 +5216,10 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       if (amt <= 0) {
           return { healed: 0, overheal: 0 };
       }
-      const source = resolveSourceAttribution({ immediateSource: target, controller: target, trueSelf: target.trueSelfId ?? null, owner: target });
+      const sourceUnit = healer ?? target;
+      const source = resolveSourceAttribution({ immediateSource: sourceUnit, controller: sourceUnit, trueSelf: sourceUnit.trueSelfId ?? null, owner: sourceUnit });
       const result = resolveHealing(target, amt, source);
-      commitHealing(null, target, result);
+      commitHealing(game, target, result, game ? currentActionExecution(game)?.identity : undefined);
       return { healed: result.effectiveHeal, overheal: result.overheal };
   }
   function executeBasicAttack(Game, unit) {
@@ -6050,7 +6062,8 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
           return existing;
       const deathRecords = resolveDeathWave(game, undefined, context.identity.actionId);
       const beforeEndEvents = (state.combatEvents ?? []).slice(context.startCombatEventIndex).filter(event => event.actionId === context.identity.actionId);
-      const battleEnd = evaluateBattleEnd(game, deathRecords);
+      const chainQuiescent = stack(game).length === 0;
+      const battleEnd = chainQuiescent ? evaluateBattleEnd(game, deathRecords) : { ended: false, winner: null, reason: null };
       const actionEndSerial = nextEventSerial(game);
       (state.combatEvents ??= []).push({ type: 'ACTION_END', eventSerial: actionEndSerial, actionId: context.identity.actionId, chainId: context.identity.chainId });
       const result = {
@@ -6453,39 +6466,36 @@ __modules['./combat/kernel/defense.ts'] = (exports, module, __require) => {
 __modules['./combat/kernel/delayed-revive.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/kernel/life-cycle.ts');
   const commitImmediateRevive = __dep0.commitImmediateRevive;
-  const getLifeState = __dep0.getLifeState;
+  const evaluateReviveEligibility = __dep0.evaluateReviveEligibility;
   const __dep1 = __require('./combat/kernel/sequence.ts');
   const nextEventSerial = __dep1.nextEventSerial;
   const state = (game) => (game.runtime ??= {});
   function scheduleDelayedRevive(game, input) {
       const rt = state(game);
-      const insertionSerial = (rt.delayedReviveSerial = (rt.delayedReviveSerial ?? 0) + 1);
+      const insertionSerial = rt.delayedReviveSerial = (rt.delayedReviveSerial ?? 0) + 1;
       const current = rt.delayedReviveClocks?.[input.clockPolicy] ?? 0;
-      const entry = { ...input, queueId: `delayed-revive-${insertionSerial}`, scheduledAtEventSerial: nextEventSerial(game), dueValue: current + Math.max(0, Math.floor(input.delayAmount)), insertionSerial, state: 'queued' };
+      const targetSide = input.targetSide ?? game.tokens.find(unit => (unit.iid ?? unit.id) === input.targetIid)?.side;
+      if (targetSide !== 'ally' && targetSide !== 'enemy')
+          throw new Error('[delayed-revive] targetSide is required');
+      const entry = { ...input, targetSide, queueId: `delayed-revive-${insertionSerial}`, scheduledAtEventSerial: nextEventSerial(game), clockStartValue: current, dueValue: current + Math.max(0, Math.floor(input.delayAmount)), insertionSerial, state: 'queued' };
       (rt.delayedRevives ??= []).push(entry);
       return entry;
   }
   function canCommitDelayedRevive(entry, game) {
-      const rt = state(game);
-      if (rt.battleEnd?.ended)
-          return 'battle-ended';
       const death = (game.runtime.deathRecords ?? []).find(item => item.deathId === entry.deathId);
-      if (!death?.revivable)
-          return 'non-revivable';
       const target = game.tokens.find(unit => (unit.iid ?? unit.id) === entry.targetIid);
-      if (!target || target.trueSelfId !== entry.trueSelfId || (target.lifeSerial ?? 1) !== entry.deadLifeSerial)
+      if (!death || !target)
           return 'stale-life';
-      if (getLifeState(target) === 'erased')
-          return 'erased';
-      if (getLifeState(target) !== 'dead-confirmed')
-          return 'already-revived';
-      return 'allowed';
+      const reason = evaluateReviveEligibility(game, death, target, entry.revivePolicies);
+      if (reason === 'invalid-death' || reason === 'identity-mismatch' || reason === 'removed')
+          return 'stale-life';
+      if (reason === 'summon-not-revivable')
+          return 'non-revivable';
+      return reason;
   }
-  function advanceDelayedReviveClock(game, policy, amount = 1, _side) {
+  function drainDue(game) {
       const rt = state(game);
-      const clocks = rt.delayedReviveClocks ??= {};
-      clocks[policy] = (clocks[policy] ?? 0) + Math.max(0, Math.floor(amount));
-      const due = (rt.delayedRevives ?? []).filter(entry => entry.state === 'queued' && entry.clockPolicy === policy && entry.dueValue <= clocks[policy]).sort((a, b) => a.dueValue - b.dueValue || a.insertionSerial - b.insertionSerial);
+      const due = (rt.delayedRevives ?? []).filter(entry => entry.state === 'queued' && entry.dueValue <= (rt.delayedReviveClocks?.[entry.clockPolicy] ?? 0)).sort((a, b) => a.dueValue - b.dueValue || a.insertionSerial - b.insertionSerial || a.queueId.localeCompare(b.queueId));
       for (const entry of due) {
           entry.state = 'due';
           const reason = canCommitDelayedRevive(entry, game);
@@ -6498,13 +6508,42 @@ __modules['./combat/kernel/delayed-revive.ts'] = (exports, module, __require) =>
           const target = game.tokens.find(unit => (unit.iid ?? unit.id) === entry.targetIid);
           const result = commitImmediateRevive(game, target, { death, source: entry.requestSource, ...entry.revivePolicies });
           entry.state = result.committed ? 'committed' : 'blocked';
+          entry.resultReason = result.committed ? 'allowed' : canCommitDelayedRevive(entry, game);
       }
       return due;
+  }
+  /** Compatibility adapter; production advances clocks through consumeSsiTemporalEvent. */
+  function advanceDelayedReviveClock(game, policy, amount = 1) { const clocks = state(game).delayedReviveClocks ??= {}; clocks[policy] = (clocks[policy] ?? 0) + Math.max(0, Math.floor(amount)); return drainDue(game); }
+  function emitSsiTemporalEvent(game, input) { const event = { ...input, eventSerial: nextEventSerial(game) }; (state(game).combatEvents ??= []).push(event); consumeSsiTemporalEvent(game, event); return event; }
+  function consumeSsiTemporalEvent(game, event) {
+      const rt = state(game);
+      const clocks = rt.delayedReviveClocks ??= {};
+      const inc = (policy) => { clocks[policy] = (clocks[policy] ?? 0) + 1; };
+      if (event.type === 'NATURAL_ACTION_COMPLETED' || event.type === 'NATURAL_ACTION_CONSUMED_BY_CC') {
+          inc('global-natural-actions');
+          if (event.actorSide === 'ally')
+              inc('ally-natural-actions');
+          if (event.actorSide === 'enemy')
+              inc('enemy-natural-actions');
+      }
+      for (const entry of rt.delayedRevives ?? []) {
+          if (entry.state !== 'queued')
+              continue;
+          if (event.type === 'SIDE_PASS_COMPLETED' && entry.clockPolicy === 'side-pass' && event.actorSide === (entry.watchedSide ?? entry.targetSide))
+              entry.dueValue -= 1;
+          if (event.type === 'TARGET_SIDE_OPPORTUNITY' && entry.clockPolicy === 'target-side-opportunities' && event.targetSide === entry.targetSide)
+              entry.dueValue -= 1;
+      }
+      if (event.type === 'SSI_CYCLE_COMPLETED')
+          inc('global-ssi-cycle');
+      return drainDue(game);
   }
   //# sourceMappingURL=delayed-revive.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'scheduleDelayedRevive')) exports.scheduleDelayedRevive = scheduleDelayedRevive;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canCommitDelayedRevive')) exports.canCommitDelayedRevive = canCommitDelayedRevive;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceDelayedReviveClock')) exports.advanceDelayedReviveClock = advanceDelayedReviveClock;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'emitSsiTemporalEvent')) exports.emitSsiTemporalEvent = emitSsiTemporalEvent;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'consumeSsiTemporalEvent')) exports.consumeSsiTemporalEvent = consumeSsiTemporalEvent;
 };
 __modules['./combat/kernel/hp-mutation.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/kernel/life-cycle.ts');
@@ -6711,6 +6750,18 @@ __modules['./combat/kernel/index.ts'] = (exports, module, __require) => {
     if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
     exports[key] = __reexport19[key];
   }
+  const __reexport20 = __require('./combat/kernel/reincarnation.ts');
+  for (const key of Object.keys(__reexport20)) {
+    if (key === 'default') continue;
+    if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
+    exports[key] = __reexport20[key];
+  }
+  const __reexport21 = __require('./combat/kernel/rebirth.ts');
+  for (const key of Object.keys(__reexport21)) {
+    if (key === 'default') continue;
+    if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
+    exports[key] = __reexport21[key];
+  }
   //# sourceMappingURL=index.js.map
 };
 __modules['./combat/kernel/invariants.ts'] = (exports, module, __require) => {
@@ -6796,6 +6847,10 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   const __dep3 = __require('./combat/kernel/sequence.ts');
   const nextDeathSerial = __dep3.nextDeathSerial;
   const nextEventSerial = __dep3.nextEventSerial;
+  const __dep4 = __require('./combat/kernel/reincarnation.ts');
+  const hasEnteredReincarnation = __dep4.hasEnteredReincarnation;
+  const markReincarnationEscapedByRevive = __dep4.markReincarnationEscapedByRevive;
+  const observeReincarnationDeathWave = __dep4.observeReincarnationDeathWave;
   const runtime = (game) => (game.runtime ??= {});
   const emit = (game, event) => { (runtime(game).combatEvents ??= []).push(event); };
   const getLifeState = (unit) => unit.lifeState ?? (unit.alive && (unit.hp == null || unit.hp > 0) ? 'alive' : 'dead-confirmed');
@@ -6904,6 +6959,11 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
               const resetBonusFlag = decision.charge?.resetBonusFlag;
               if (typeof resetBonusFlag === 'string')
                   target[resetBonusFlag] = 0;
+              const setFields = decision.charge?.setFields;
+              if (setFields && typeof setFields === 'object')
+                  Object.assign(target, setFields);
+              if (target.hp != null && target.hpMax != null)
+                  target.hp = Math.min(target.hp, target.hpMax);
               close(candidate);
               emit(game, { type: 'DEATH_PREVENTED', eventSerial: nextEventSerial(game), actionId: candidate.actionId, chainId: candidate.chainId, targetIid: candidate.targetIid, trueSelfId: candidate.trueSelfId, lifeSerial: candidate.lifeSerial, decision });
           }
@@ -6924,6 +6984,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       records.forEach(record => { registry[record.deathId] = record; });
       for (const record of records)
           emit(game, { type: 'DEATH_CONFIRMED', ...record, eventSerial: record.confirmedEventSerial });
+      observeReincarnationDeathWave(game, records);
       for (const record of records) {
           if (record.countsForKill && record.source.creditTrueSelfId && record.source.creditTrueSelfId !== record.trueSelfId) {
               const owner = state.trueSelfRecords ??= {};
@@ -6952,19 +7013,10 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   function commitImmediateRevive(game, target, request) {
       const death = request.death;
       const state = runtime(game);
-      const canonical = state.deathRecordById?.[death.deathId];
-      const matches = canonical && canonical.deathId === death.deathId && canonical.targetIid === death.targetIid && canonical.trueSelfId === death.trueSelfId && canonical.lifeSerial === death.lifeSerial && canonical.confirmedEventSerial === death.confirmedEventSerial;
-      if (!matches || canonical.revivable !== true || death.canRevive !== true)
-          return { committed: false, reason: 'invalid-or-non-revivable-death', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
-      if (target.trueSelfId !== death.trueSelfId)
-          return { committed: false, reason: 'identity-mismatch', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
-      if ((target.iid ?? target.id) !== death.targetIid || getLifeState(target) !== 'dead-confirmed' || (target.lifeSerial ?? 1) !== death.lifeSerial)
-          return { committed: false, reason: 'stale-or-not-dead', targetIid: death.targetIid, lifeSerial: target.lifeSerial ?? 1 };
-      if (death.isSummon && !request.allowSummon)
-          return { committed: false, reason: 'summon-not-revivable', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
+      const reason = evaluateReviveEligibility(game, death, target, request);
+      if (reason !== 'allowed')
+          return { committed: false, reason, targetIid: death.targetIid, lifeSerial: target.lifeSerial ?? death.lifeSerial };
       const consumed = state.revivedDeathIds ??= [];
-      if (consumed.includes(death.deathId))
-          return { committed: false, reason: 'already-revived', targetIid: death.targetIid, lifeSerial: death.lifeSerial };
       const hpMax = Math.max(1, Number(target.hpMax ?? 1));
       const hp = request.hpPolicy.kind === 'ratio' ? Math.floor(hpMax * request.hpPolicy.value) : Math.floor(request.hpPolicy.value);
       target.hp = Math.max(1, Math.min(hpMax, hp));
@@ -6982,8 +7034,40 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
           target.statuses = target.statuses?.filter(status => !ids.has(String(status.id)));
       }
       consumed.push(death.deathId);
+      markReincarnationEscapedByRevive(game, death.deathId);
       emit(game, { type: 'REVIVE_COMMITTED', eventSerial: nextEventSerial(game), deathId: death.deathId, actionId: death.actionId, chainId: death.chainId, targetIid: death.targetIid, trueSelfId: death.trueSelfId, lifeSerial, hp: target.hp, source: request.source, authority: request.authority ?? null });
       return { committed: true, reason: null, targetIid: death.targetIid, lifeSerial };
+  }
+  /** Canonical gate used by every immediate and scheduled revive path. */
+  function evaluateReviveEligibility(game, death, target, request) {
+      const state = runtime(game);
+      if (state.battleEnd?.ended)
+          return 'battle-ended';
+      const canonical = state.deathRecordById?.[death.deathId];
+      if (!canonical || canonical.targetIid !== death.targetIid || canonical.trueSelfId !== death.trueSelfId || canonical.lifeSerial !== death.lifeSerial || canonical.confirmedEventSerial !== death.confirmedEventSerial)
+          return 'invalid-death';
+      if (!canonical.revivable || !death.canRevive)
+          return 'non-revivable';
+      if (hasEnteredReincarnation(game, death.deathId))
+          return 'entered-reincarnation';
+      if (target.trueSelfId !== death.trueSelfId)
+          return 'identity-mismatch';
+      if ((target.iid ?? target.id) !== death.targetIid || (target.lifeSerial ?? 1) !== death.lifeSerial)
+          return 'stale-life';
+      if ((state.revivedDeathIds ?? []).includes(death.deathId))
+          return 'already-revived';
+      const lifeState = getLifeState(target);
+      if (lifeState === 'erased')
+          return 'erased';
+      if (lifeState === 'removed')
+          return 'removed';
+      if (target.removalKind === 'FUSION_CONSUMED')
+          return 'fused';
+      if (lifeState !== 'dead-confirmed')
+          return 'already-revived';
+      if (death.isSummon && !request?.allowSummon)
+          return 'summon-not-revivable';
+      return 'allowed';
   }
   //# sourceMappingURL=life-cycle.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getLifeState')) exports.getLifeState = getLifeState;
@@ -7002,6 +7086,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'createHpZeroCandidate')) exports.createHpZeroCandidate = createHpZeroCandidate;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveDeathWave')) exports.resolveDeathWave = resolveDeathWave;
   if (!Object.prototype.hasOwnProperty.call(exports, 'commitImmediateRevive')) exports.commitImmediateRevive = commitImmediateRevive;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateReviveEligibility')) exports.evaluateReviveEligibility = evaluateReviveEligibility;
 };
 __modules['./combat/kernel/non-death-removal.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/kernel/sequence.ts');
@@ -7009,6 +7094,7 @@ __modules['./combat/kernel/non-death-removal.ts'] = (exports, module, __require)
   function commitNonDeathRemoval(game, target, kind, reason) {
       target.lifeState = kind === 'ERASED' ? 'erased' : 'removed';
       target.alive = false;
+      target.removalKind = kind;
       const event = { type: kind, eventSerial: nextEventSerial(game), targetIid: target.iid ?? target.id, trueSelfId: target.trueSelfId ?? null, lifeSerial: target.lifeSerial ?? null, reason };
       ((game.runtime ??= {}).combatEvents ??= []).push(event);
       return event;
@@ -7034,6 +7120,110 @@ __modules['./combat/kernel/reaction-policy.ts'] = (exports, module, __require) =
   //# sourceMappingURL=reaction-policy.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'DEFAULT_REACTION_POLICIES')) exports.DEFAULT_REACTION_POLICIES = DEFAULT_REACTION_POLICIES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveReactionPolicy')) exports.resolveReactionPolicy = resolveReactionPolicy;
+};
+__modules['./combat/kernel/rebirth.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat/kernel/sequence.ts');
+  const nextEventSerial = __dep0.nextEventSerial;
+  const rt = (game) => (game.runtime ??= {});
+  function evaluateRebirthEligibility(game, request) { const state = rt(game); if (state.battleEnd?.ended)
+      return { allowed: false, reason: 'battle-ended' }; const record = state.reincarnationByDeathId?.[request.deathId]; if (!record || record.state !== 'entered')
+      return { allowed: false, reason: 'not-entered' }; if (record.trueSelfId !== request.trueSelfId)
+      return { allowed: false, reason: 'identity-mismatch' }; if (request.authority !== 'rebirth')
+      return { allowed: false, reason: 'missing-authority' }; if (!request.effectAllowsRebirth)
+      return { allowed: false, reason: 'effect-blocked' }; if (!Number.isInteger(request.spawn.cx) || !Number.isInteger(request.spawn.cy) || request.spawn.cx < 0 || request.spawn.cy < 0)
+      return { allowed: false, reason: 'invalid-spawn' }; if (game.tokens.some(token => (token.iid ?? token.id) === request.newIid))
+      return { allowed: false, reason: 'iid-conflict' }; return { allowed: true, reason: 'allowed' }; }
+  /** Serializable consequence hook reserved for the future Axiom registry. */
+  function applyRebirthConsequences(_trueSelf, _request) { return {}; }
+  function commitRebirth(game, request) {
+      const eligibility = evaluateRebirthEligibility(game, request);
+      const state = rt(game);
+      const record = state.reincarnationByDeathId?.[request.deathId];
+      if (!eligibility.allowed || !record)
+          return { committed: false, reason: eligibility.reason, trueSelfId: request.trueSelfId, oldIid: record?.targetIid ?? null, newIid: null, incarnationSerial: state.trueSelfRecords?.[request.trueSelfId]?.incarnationSerial ?? 1 };
+      const self = (state.trueSelfRecords ??= {})[request.trueSelfId] ??= { confirmedKills: 0, incarnationSerial: 1, deathHistory: [], rebirthHistory: [] };
+      self.incarnationSerial += 1;
+      if (!self.deathHistory.includes(record.deathId))
+          self.deathHistory.push(record.deathId);
+      applyRebirthConsequences(self, request);
+      const old = game.tokens.find(token => (token.iid ?? token.id) === record.targetIid);
+      if (old)
+          old.retiredByRebirth = true;
+      const keep = new Set(request.policies.preserveStatusIds ?? []);
+      const unit = { ...request.template, iid: request.newIid, trueSelfId: request.trueSelfId, lifeSerial: 1, incarnationSerial: self.incarnationSerial, side: request.spawn.side, cx: request.spawn.cx, cy: request.spawn.cy, lifeState: 'alive', alive: true, rage: request.policies.rage, statuses: (request.template.statuses ?? []).filter(status => keep.has(String(status.id))) };
+      unit.hp = request.policies.hp === 'full' ? Math.max(1, Number(unit.hpMax ?? 1)) : Math.max(1, Math.min(Number(unit.hpMax ?? 1), request.policies.hp));
+      game.tokens.push(unit);
+      record.state = 'reborn';
+      const eventSerial = nextEventSerial(game);
+      self.rebirthHistory.push({ deathId: record.deathId, oldIid: record.targetIid, newIid: request.newIid, eventSerial });
+      (state.combatEvents ??= []).push({ type: 'REBIRTH_COMMITTED', eventSerial, deathId: record.deathId, trueSelfId: request.trueSelfId, oldIid: record.targetIid, newIid: request.newIid, lifeSerial: 1, incarnationSerial: self.incarnationSerial });
+      return { committed: true, reason: 'allowed', trueSelfId: request.trueSelfId, oldIid: record.targetIid, newIid: request.newIid, incarnationSerial: self.incarnationSerial };
+  }
+  //# sourceMappingURL=rebirth.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateRebirthEligibility')) exports.evaluateRebirthEligibility = evaluateRebirthEligibility;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyRebirthConsequences')) exports.applyRebirthConsequences = applyRebirthConsequences;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'commitRebirth')) exports.commitRebirth = commitRebirth;
+};
+__modules['./combat/kernel/reincarnation.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat/kernel/sequence.ts');
+  const nextEventSerial = __dep0.nextEventSerial;
+  const runtime = (game) => (game.runtime ??= {});
+  const reincarnationLifeKey = (trueSelfId, lifeSerial) => `${trueSelfId}:${lifeSerial}`;
+  const emit = (game, record, type, ordinal) => {
+      const eventSerial = nextEventSerial(game);
+      (runtime(game).combatEvents ??= []).push({ type, eventSerial, deathId: record.deathId, trueSelfId: record.trueSelfId, lifeSerial: record.deadLifeSerial, ordinal, actionId: record.sourceActionId, chainId: record.sourceChainId });
+      return eventSerial;
+  };
+  /** Sole observer allowed to advance death-order reincarnation state. */
+  function observeReincarnationDeathWave(game, records) {
+      const rt = runtime(game);
+      const threshold = Math.max(0, Math.floor(rt.reincarnationThresholdSubsequentDeaths ?? 4));
+      const byDeath = rt.reincarnationByDeathId ??= {};
+      const byLife = rt.reincarnationByLifeKey ??= {};
+      const history = rt.qualifyingDeathHistory ??= [];
+      for (const death of records) {
+          if (!death.countsForReincarnation || !death.trueSelfId)
+              continue;
+          const ordinal = rt.qualifyingDeathOrdinal = (rt.qualifyingDeathOrdinal ?? 0) + 1;
+          history.push({ deathId: death.deathId, ordinal, trueSelfId: death.trueSelfId, lifeSerial: death.lifeSerial });
+          const record = { reincarnationId: `reincarnation-${death.deathId}`, deathId: death.deathId, targetIid: death.targetIid, trueSelfId: death.trueSelfId, deadLifeSerial: death.lifeSerial, deathOrdinal: ordinal, thresholdOrdinal: ordinal + threshold, enteredAtDeathOrdinal: null, enteredAtEventSerial: null, sourceActionId: death.actionId, sourceChainId: death.chainId, entityKind: death.entityKind, state: 'waiting', authority: { kind: 'reincarnation', thresholdSubsequentDeaths: threshold } };
+          byDeath[death.deathId] = record;
+          byLife[reincarnationLifeKey(death.trueSelfId, death.lifeSerial)] = record;
+          emit(game, record, 'QUALIFYING_DEATH_RECORDED', ordinal);
+          emit(game, record, 'REINCARNATION_WAITING', ordinal);
+      }
+      const ordinal = rt.qualifyingDeathOrdinal ?? 0;
+      for (const record of Object.values(byDeath).sort((a, b) => a.deathOrdinal - b.deathOrdinal || a.deathId.localeCompare(b.deathId))) {
+          if (record.state !== 'waiting' || ordinal < record.thresholdOrdinal)
+              continue;
+          record.state = 'entered';
+          record.enteredAtDeathOrdinal = ordinal;
+          record.enteredAtEventSerial = emit(game, record, 'REINCARNATION_ENTERED', ordinal);
+          const key = reincarnationLifeKey(record.trueSelfId, record.deadLifeSerial);
+          const entered = rt.enteredReincarnationLifeKeys ??= [];
+          if (!entered.includes(key))
+              entered.push(key);
+          for (const entry of rt.delayedRevives ?? [])
+              if (entry.deathId === record.deathId && (entry.state === 'queued' || entry.state === 'due')) {
+                  entry.state = 'blocked';
+                  entry.resultReason = 'entered-reincarnation';
+                  emit(game, record, 'DELAYED_REVIVE_BLOCKED_BY_REINCARNATION', ordinal);
+              }
+      }
+  }
+  function hasEnteredReincarnation(game, deathId) { return runtime(game).reincarnationByDeathId?.[deathId]?.state === 'entered'; }
+  function markReincarnationEscapedByRevive(game, deathId) {
+      const record = runtime(game).reincarnationByDeathId?.[deathId];
+      if (!record || record.state !== 'waiting')
+          return;
+      record.state = 'escaped-by-revive';
+      emit(game, record, 'REINCARNATION_ESCAPED_BY_REVIVE', runtime(game).qualifyingDeathOrdinal ?? record.deathOrdinal);
+  }
+  //# sourceMappingURL=reincarnation.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'reincarnationLifeKey')) exports.reincarnationLifeKey = reincarnationLifeKey;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'observeReincarnationDeathWave')) exports.observeReincarnationDeathWave = observeReincarnationDeathWave;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'hasEnteredReincarnation')) exports.hasEnteredReincarnation = hasEnteredReincarnation;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'markReincarnationEscapedByRevive')) exports.markReincarnationEscapedByRevive = markReincarnationEscapedByRevive;
 };
 __modules['./combat/kernel/sequence.ts'] = (exports, module, __require) => {
   function getCombatSequence(game) {
@@ -7771,7 +7961,7 @@ __modules['./combat/runtime-hooks/co-truong-phong.ts'] = (exports, module, __req
           const result = dealAbilityDamage(game, caster, leader, { base, attackType: 'skill', skill: null });
           if (result.dealt > 0) {
               successHits += 1;
-              healUnit(caster, Math.max(1, Math.floor(result.dealt * SKILL2_HEAL_RATIO)));
+              healUnit(game, caster, caster, Math.max(1, Math.floor(result.dealt * SKILL2_HEAL_RATIO)));
           }
       }
       if (caster._coTruongPhongLawActive && successHits >= SKILL2_HITS) {
@@ -9611,7 +9801,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
       for (const token of tokens) {
           if (!canReceiveHealUnderDoctrine(token, game, attacker, highestRuleTag, attackerSide, attackerKitKey))
               continue;
-          const healResult = healUnit(token, amount);
+          const healResult = game && attacker ? healUnit(game, attacker, token, amount) : healUnit(token, amount);
           healed.push({ token, overheal: Math.max(0, toFiniteNumber(healResult.overheal, 0)) });
       }
       return healed;
@@ -16555,7 +16745,7 @@ __modules['./modes/pve/chap-minh-runtime.ts'] = (exports, module, __require) => 
           return false;
       const healAmount = Math.max(0, Math.round(Math.max(0, toFiniteNumber(unit.hpMax, 0)) * CHAP_MINH_ULT_HEAL_PERCENT));
       if (healAmount > 0) {
-          healUnit(unit, healAmount);
+          healUnit(game, unit, unit, healAmount);
       }
       Statuses.add(unit, {
           id: 'chap_minh_ult_arm_up',
@@ -17133,7 +17323,7 @@ __modules['./modes/pve/ly-thanh-thu-runtime.ts'] = (exports, module, __require) 
       const overThreshold = dealtResult.dealt > Math.max(0, Math.floor(toFiniteNumber(enemyLeader.hpMax, 0) * 0.2));
       if (overThreshold) {
           const heal = Math.max(1, Math.floor(toFiniteNumber(unit.hpMax, 0) * 0.1));
-          healUnit(unit, heal);
+          healUnit(game, unit, unit, heal);
       }
       extendBusy(900);
       return true;
@@ -19689,7 +19879,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               const before = Math.max(0, Math.round(parseFiniteNumber(ally.hp) ?? 0));
               if (before >= hpMax)
                   continue;
-              healUnit(ally, healAmount);
+              healUnit(Game, deadToken, ally, healAmount);
               const after = Math.max(0, Math.round(parseFiniteNumber(ally.hp) ?? 0));
               if (after > before)
                   healedTargets += 1;
@@ -19889,7 +20079,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
           spendFury(unit, cost);
           unit.furyMax = Math.max(1, Math.round((parseFiniteNumber(unit.furyMax) ?? 100) * 1.3));
           unit.rage = unit.fury;
-          healUnit(unit, Math.round((parseFiniteNumber(unit.hpMax) ?? 0) * 0.05));
+          healUnit(game, unit, unit, Math.round((parseFiniteNumber(unit.hpMax) ?? 0) * 0.05));
           state.bUses += 1;
           if (state.bUses === 3 || state.bUses === 6 || state.bUses === 10) {
               unit.hpMax = Math.max(1, Math.round((parseFiniteNumber(unit.hpMax) ?? 1) * 1.05));
@@ -20159,7 +20349,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
                   totalDrain += dealt;
               }
               if (totalDrain > 0) {
-                  const { overheal } = healUnit(unit, totalDrain);
+                  const { overheal } = healUnit(game, unit, unit, totalDrain);
                   if (overheal > 0)
                       grantShield(unit, overheal);
               }
@@ -20448,7 +20638,7 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
               for (const tgt of selected) {
                   const goal = Math.min(tgt.hpMax || 0, Math.round((tgt.hpMax || 0) * ratio));
                   if (goal > (tgt.hp || 0)) {
-                      healUnit(tgt, goal - (tgt.hp || 0));
+                      healUnit(game, unit, tgt, goal - (tgt.hp || 0));
                       addHitVfx(tgt);
                   }
               }
@@ -44372,12 +44562,19 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       const game = ctx?.game;
       if (!game)
           throw new Error('[combat-kernel] damaging status tick requires game context');
-      const source = game.tokens.find(token => (token.iid ?? token.id) === status.sourceIid) ?? unit;
+      const resolved = resolveStatusSourceAttribution(status, game);
+      const source = resolved.liveSource ?? { iid: resolved.attribution.immediateSourceIid ?? `status:${String(status.statusInstanceId ?? status.id)}`, trueSelfId: resolved.attribution.creditTrueSelfId, side: status.sourceSide ?? (unit.side === 'ally' ? 'enemy' : 'ally'), cx: -1, cy: -1, alive: false, lifeState: 'removed', atk: Number(status.snapshotAtk ?? 0), wil: Number(status.snapshotWil ?? 0), statuses: [] };
       const identity = createNaturalAction(game, 'dot-tick');
       status.tickSerial = Math.max(0, Number(status.tickSerial ?? 0)) + 1;
       withActionExecution(game, identity, () => dealAbilityDamage(game, source, unit, { base: lost, dtype: status.damageType === 'true' ? 'true' : status.damageType === 'will' ? 'arcane' : 'physical', attackType: 'dot', skillMul: 1 }), { originActionId: typeof status.originActionId === 'string' || typeof status.originActionId === 'number' ? status.originActionId : null });
       logStatusTick(ctx, id, unit, lost);
       decrementDuration(unit, status);
+  }
+  function resolveStatusSourceAttribution(status, game) {
+      const sourceIid = typeof status.sourceIid === 'string' || typeof status.sourceIid === 'number' ? status.sourceIid : null;
+      const live = sourceIid == null ? null : game.tokens.find(token => (token.iid ?? token.id) === sourceIid) ?? null;
+      const dynamic = status.snapshotPolicy === 'dynamic';
+      return { attribution: resolveSourceAttribution({ immediateSource: sourceIid, controller: status.controllerIid, owner: status.ownerIid, trueSelf: status.creditTrueSelfId }), liveSource: dynamic ? live : null };
   }
   const createTimedStatus = (id, kind, tag, turns) => ({
       id,
@@ -44826,6 +45023,7 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
   }
   //# sourceMappingURL=statuses.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'Statuses')) exports.Statuses = Statuses;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveStatusSourceAttribution')) exports.resolveStatusSourceAttribution = resolveStatusSourceAttribution;
   if (!Object.prototype.hasOwnProperty.call(exports, 'makeStatusEffect')) exports.makeStatusEffect = makeStatusEffect;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyStatus')) exports.applyStatus = applyStatus;
   if (!Object.prototype.hasOwnProperty.call(exports, 'clearStatus')) exports.clearStatus = clearStatus;
@@ -45005,76 +45203,77 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   const __dep3 = __require('./combat/kernel/life-cycle.ts');
   const isCombatAlive = __dep3.isCombatAlive;
   const markRemoved = __dep3.markRemoved;
-  const __dep4 = __require('./combat.ts');
-  const doBasicWithFollowups = __dep4.doBasicWithFollowups;
-  const __dep5 = __require('./combat/perform-active-skill.ts');
-  const performActiveSkill = __dep5.performActiveSkill;
-  const __dep6 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeActionEnd = __dep6.runRuntimeActionEnd;
-  const runRuntimeUnitRevive = __dep6.runRuntimeUnitRevive;
-  const runRuntimeTurnEnd = __dep6.runRuntimeTurnEnd;
-  const runRuntimeTurnStart = __dep6.runRuntimeTurnStart;
-  const __dep7 = __require('./combat/chap-minh-runtime.ts');
-  const applyChapMinhActionEnd = __dep7.applyChapMinhActionEnd;
-  const applyChapMinhPhaseShift = __dep7.applyChapMinhPhaseShift;
-  const recoverChapMinhMaxHpPerTurn = __dep7.recoverChapMinhMaxHpPerTurn;
-  const refreshChapMinhOwnership = __dep7.refreshChapMinhOwnership;
-  const __dep8 = __require('./config.ts');
-  const CFG = __dep8.CFG;
-  const __dep9 = __require('./meta.ts');
-  const initialRageFor = __dep9.initialRageFor;
-  const __dep10 = __require('./vfx.ts');
-  const vfxAddSpawn = __dep10.vfxAddSpawn;
-  const vfxAddBloodPulse = __dep10.vfxAddBloodPulse;
-  const asSessionWithVfx = __dep10.asSessionWithVfx;
-  const __dep11 = __require('./art.ts');
-  const getUnitArt = __dep11.getUnitArt;
-  const __dep12 = __require('./passives.ts');
-  const emitPassiveEvent = __dep12.emitPassiveEvent;
-  const applyOnSpawnEffects = __dep12.applyOnSpawnEffects;
-  const getPassiveLog = __dep12.getPassiveLog;
-  const prepareUnitForPassives = __dep12.prepareUnitForPassives;
-  const __dep13 = __require('./events.ts');
-  const emitGameEvent = __dep13.emitGameEvent;
-  const TURN_START = __dep13.TURN_START;
-  const TURN_END = __dep13.TURN_END;
-  const ACTION_START = __dep13.ACTION_START;
-  const ACTION_END = __dep13.ACTION_END;
-  const TURN_REGEN = __dep13.TURN_REGEN;
-  const __dep14 = __require('./utils/time.ts');
-  const mergeBusyUntil = __dep14.mergeBusyUntil;
-  const safeNow = __dep14.safeNow;
-  const sessionNow = __dep14.sessionNow;
-  const __dep15 = __require('./utils/fury.ts');
-  const initializeFury = __dep15.initializeFury;
-  const startFuryTurn = __dep15.startFuryTurn;
-  const spendFury = __dep15.spendFury;
-  const resolveUltCost = __dep15.resolveUltCost;
-  const setFury = __dep15.setFury;
-  const clearFreshSummon = __dep15.clearFreshSummon;
-  const __dep16 = __require('./turns/interleaved.ts');
-  const nextTurnInterleaved = __dep16.nextTurnInterleaved;
-  const getSequentialOrderIndex = __dep16.getSequentialOrderIndex;
-  const predictSpawnCycleByTurnOrder = __dep16.predictSpawnCycleByTurnOrder;
-  const __dep17 = __require('./modes/pve/collection-mapper.ts');
-  const resolveRuntimeUnitStats = __dep17.resolveRuntimeUnitStats;
-  const __dep18 = __require('./ai.ts');
-  const evaluateGambitLogic = __dep18.evaluateGambitLogic;
-  const __dep19 = __require('./utils/rng.ts');
-  const nextRngValue = __dep19.nextRngValue;
-  const __dep20 = __require('./utils/domain-normalization.ts');
-  const normalizeClassName = __dep20.normalizeClassName;
-  const normalizeElementKey = __dep20.normalizeElementKey;
-  const __dep21 = __require('./utils/unique-global.ts');
-  const isUniqueGlobalSummonBlocked = __dep21.isUniqueGlobalSummonBlocked;
-  const __dep22 = __require('./utils/player-profile.ts');
-  const loadPlayerProfile = __dep22.loadPlayerProfile;
-  const __dep23 = __require('./leader-uyen.ts');
-  const clearQueuedUyenUlt = __dep23.clearQueuedUyenUlt;
-  const hasQueuedUyenUlt = __dep23.hasQueuedUyenUlt;
-  const isAnyLeaderUltReady = __dep23.isAnyLeaderUltReady;
-  const isUyenLeader = __dep23.isUyenLeader;
-  const grantUyenSummonRage = __dep23.grantUyenSummonRage;
+  const __dep4 = __require('./combat/kernel/delayed-revive.ts');
+  const emitSsiTemporalEvent = __dep4.emitSsiTemporalEvent;
+  const __dep5 = __require('./combat.ts');
+  const doBasicWithFollowups = __dep5.doBasicWithFollowups;
+  const __dep6 = __require('./combat/perform-active-skill.ts');
+  const performActiveSkill = __dep6.performActiveSkill;
+  const __dep7 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeActionEnd = __dep7.runRuntimeActionEnd;
+  const runRuntimeUnitRevive = __dep7.runRuntimeUnitRevive;
+  const runRuntimeTurnEnd = __dep7.runRuntimeTurnEnd;
+  const runRuntimeTurnStart = __dep7.runRuntimeTurnStart;
+  const __dep8 = __require('./combat/chap-minh-runtime.ts');
+  const applyChapMinhActionEnd = __dep8.applyChapMinhActionEnd;
+  const recoverChapMinhMaxHpPerTurn = __dep8.recoverChapMinhMaxHpPerTurn;
+  const refreshChapMinhOwnership = __dep8.refreshChapMinhOwnership;
+  const __dep9 = __require('./config.ts');
+  const CFG = __dep9.CFG;
+  const __dep10 = __require('./meta.ts');
+  const initialRageFor = __dep10.initialRageFor;
+  const __dep11 = __require('./vfx.ts');
+  const vfxAddSpawn = __dep11.vfxAddSpawn;
+  const vfxAddBloodPulse = __dep11.vfxAddBloodPulse;
+  const asSessionWithVfx = __dep11.asSessionWithVfx;
+  const __dep12 = __require('./art.ts');
+  const getUnitArt = __dep12.getUnitArt;
+  const __dep13 = __require('./passives.ts');
+  const emitPassiveEvent = __dep13.emitPassiveEvent;
+  const applyOnSpawnEffects = __dep13.applyOnSpawnEffects;
+  const getPassiveLog = __dep13.getPassiveLog;
+  const prepareUnitForPassives = __dep13.prepareUnitForPassives;
+  const __dep14 = __require('./events.ts');
+  const emitGameEvent = __dep14.emitGameEvent;
+  const TURN_START = __dep14.TURN_START;
+  const TURN_END = __dep14.TURN_END;
+  const ACTION_START = __dep14.ACTION_START;
+  const ACTION_END = __dep14.ACTION_END;
+  const TURN_REGEN = __dep14.TURN_REGEN;
+  const __dep15 = __require('./utils/time.ts');
+  const mergeBusyUntil = __dep15.mergeBusyUntil;
+  const safeNow = __dep15.safeNow;
+  const sessionNow = __dep15.sessionNow;
+  const __dep16 = __require('./utils/fury.ts');
+  const initializeFury = __dep16.initializeFury;
+  const startFuryTurn = __dep16.startFuryTurn;
+  const spendFury = __dep16.spendFury;
+  const resolveUltCost = __dep16.resolveUltCost;
+  const setFury = __dep16.setFury;
+  const clearFreshSummon = __dep16.clearFreshSummon;
+  const __dep17 = __require('./turns/interleaved.ts');
+  const nextTurnInterleaved = __dep17.nextTurnInterleaved;
+  const getSequentialOrderIndex = __dep17.getSequentialOrderIndex;
+  const predictSpawnCycleByTurnOrder = __dep17.predictSpawnCycleByTurnOrder;
+  const __dep18 = __require('./modes/pve/collection-mapper.ts');
+  const resolveRuntimeUnitStats = __dep18.resolveRuntimeUnitStats;
+  const __dep19 = __require('./ai.ts');
+  const evaluateGambitLogic = __dep19.evaluateGambitLogic;
+  const __dep20 = __require('./utils/rng.ts');
+  const nextRngValue = __dep20.nextRngValue;
+  const __dep21 = __require('./utils/domain-normalization.ts');
+  const normalizeClassName = __dep21.normalizeClassName;
+  const normalizeElementKey = __dep21.normalizeElementKey;
+  const __dep22 = __require('./utils/unique-global.ts');
+  const isUniqueGlobalSummonBlocked = __dep22.isUniqueGlobalSummonBlocked;
+  const __dep23 = __require('./utils/player-profile.ts');
+  const loadPlayerProfile = __dep23.loadPlayerProfile;
+  const __dep24 = __require('./leader-uyen.ts');
+  const clearQueuedUyenUlt = __dep24.clearQueuedUyenUlt;
+  const hasQueuedUyenUlt = __dep24.hasQueuedUyenUlt;
+  const isAnyLeaderUltReady = __dep24.isAnyLeaderUltReady;
+  const isUyenLeader = __dep24.isUyenLeader;
+  const grantUyenSummonRage = __dep24.grantUyenSummonRage;
   const toActiveUnitKey = (side, slot) => `${side}:${slot}`;
   const createActiveUnitIndex = (Game) => {
       const index = new Map();
@@ -45669,8 +45868,11 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           }
           Statuses.onTurnEnd(unit, { game: Game, log: passiveLog });
           runRuntimeTurnEnd(Game, unit);
-          applyChapMinhPhaseShift(unit);
           refreshChapMinhOwnership(Game);
+          if (consumedTurn) {
+              const temporal = { actorSide: unit.side, actorIid: unit.iid ?? unit.id, slot: slot ?? null, cursorSnapshot: { ally: Number(Game.turn?.lastPos?.ALLY ?? 0), enemy: Number(Game.turn?.lastPos?.ENEMY ?? 0) }, sidePassSerial: Number(Game.runtime?.ssiSidePassSerial ?? 0), globalCycleSerial: Number(Game.turn?.cycle ?? 0), actionId: null };
+              emitSsiTemporalEvent(Game, { type: acted ? 'NATURAL_ACTION_COMPLETED' : 'NATURAL_ACTION_CONSUMED_BY_CC', ...temporal });
+          }
           ensureBusyReset();
           resolution.consumedTurn = consumedTurn;
           resolution.acted = acted;
@@ -45907,6 +46109,20 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               spawned: !!spawned,
               processedChain: null
           };
+          const temporalBase = { actorSide: active.side, actorIid: active.iid ?? active.id, slot: entry.slot, cursorSnapshot: { ally: Number(interleavedTurn.lastPos.ALLY ?? 0), enemy: Number(interleavedTurn.lastPos.ENEMY ?? 0) }, sidePassSerial: Number(Game.runtime?.ssiSidePassSerial ?? 0), globalCycleSerial: Number(interleavedTurn.cycle ?? 0), actionId: null };
+          emitSsiTemporalEvent(Game, { type: 'TARGET_SIDE_OPPORTUNITY', ...temporalBase, targetSide: active.side });
+          emitSsiTemporalEvent(Game, { type: 'NATURAL_ACTION_STARTED', ...temporalBase });
+          if (selection.wrapped) {
+              const runtime = (Game.runtime ??= {});
+              runtime.ssiSidePassSerial = Number(runtime.ssiSidePassSerial ?? 0) + 1;
+              emitSsiTemporalEvent(Game, { type: 'SIDE_PASS_COMPLETED', ...temporalBase, actorSide: entry.side, sidePassSerial: runtime.ssiSidePassSerial });
+              const priorCycle = Number(runtime.lastEmittedSsiCycle ?? 0);
+              const cycleNow = Number(interleavedTurn.cycle ?? 0);
+              if (cycleNow > priorCycle) {
+                  runtime.lastEmittedSsiCycle = cycleNow;
+                  emitSsiTemporalEvent(Game, { type: 'SSI_CYCLE_COMPLETED', ...temporalBase, actorSide: null, globalCycleSerial: cycleNow });
+              }
+          }
           const ended = runTurnAndCheckEnd(Game, hooks, entry, active, turnContext, turnDetail, 'interleaved');
           if (!ended && Game.turn) {
               const actionDelayRaw = Number(CFG?.ANIMATION?.interleavedActionDelayMs);

@@ -116,7 +116,7 @@ function castSkill2Runtime(game: SessionState, caster: CoTruongPhongCarrier): nu
     const result = dealAbilityDamage(game, caster, leader, { base, attackType: 'skill', skill: null });
     if (result.dealt > 0) {
       successHits += 1;
-      healUnit(caster, Math.max(1, Math.floor(result.dealt * SKILL2_HEAL_RATIO)));
+      healUnit(game, caster, caster, Math.max(1, Math.floor(result.dealt * SKILL2_HEAL_RATIO)));
     }
   }
   if (caster._coTruongPhongLawActive && successHits >= SKILL2_HITS) {

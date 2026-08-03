@@ -475,7 +475,7 @@ const applyHealToTokens = (
   const healed: Array<{ token: UnitToken; overheal: number }> = [];
   for (const token of tokens) {
     if (!canReceiveHealUnderDoctrine(token, game, attacker, highestRuleTag, attackerSide, attackerKitKey)) continue;
-    const healResult = healUnit(token, amount);
+    const healResult = game && attacker ? healUnit(game, attacker, token, amount) : healUnit(token, amount);
     healed.push({ token, overheal: Math.max(0, toFiniteNumber(healResult.overheal, 0)) });
   }
   return healed;

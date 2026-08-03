@@ -1089,7 +1089,7 @@ function processCreepDeathHealing(now: number): void {
       if (hpMax <= 0) continue;
       const before = Math.max(0, Math.round(parseFiniteNumber(ally.hp) ?? 0));
       if (before >= hpMax) continue;
-      healUnit(ally, healAmount);
+      healUnit(Game, deadToken, ally, healAmount);
       const after = Math.max(0, Math.round(parseFiniteNumber(ally.hp) ?? 0));
       if (after > before) healedTargets += 1;
     }
@@ -1273,7 +1273,7 @@ function performUyenLeaderUlt(game: SessionState, unit: UnitToken): boolean {
     spendFury(unit, cost);
     unit.furyMax = Math.max(1, Math.round((parseFiniteNumber(unit.furyMax) ?? 100) * 1.3));
     unit.rage = unit.fury;
-    healUnit(unit, Math.round((parseFiniteNumber(unit.hpMax) ?? 0) * 0.05));
+    healUnit(game, unit, unit, Math.round((parseFiniteNumber(unit.hpMax) ?? 0) * 0.05));
     state.bUses += 1;
     if (state.bUses === 3 || state.bUses === 6 || state.bUses === 10) {
       unit.hpMax = Math.max(1, Math.round((parseFiniteNumber(unit.hpMax) ?? 1) * 1.05));
@@ -1550,7 +1550,7 @@ function performUlt(unit: UnitToken): void {
         totalDrain += dealt;
       }
       if (totalDrain > 0){
-        const { overheal } = healUnit(unit, totalDrain);
+        const { overheal } = healUnit(game, unit, unit, totalDrain);
         if (overheal > 0) grantShield(unit, overheal);
       }
       busyMs = 1400;
@@ -1837,7 +1837,7 @@ function performUlt(unit: UnitToken): void {
       for (const tgt of selected){
         const goal = Math.min(tgt.hpMax || 0, Math.round((tgt.hpMax || 0) * ratio));
         if (goal > (tgt.hp || 0)){
-          healUnit(tgt, goal - (tgt.hp || 0));
+          healUnit(game, unit, tgt, goal - (tgt.hp || 0));
           addHitVfx(tgt);
         }
       }
