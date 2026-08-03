@@ -20,3 +20,4 @@ export * from './non-death-removal.ts';
 export * from './delayed-revive.ts';
 export * from './reincarnation.ts';
 export * from './rebirth.ts';
+export * from './true-self.ts';

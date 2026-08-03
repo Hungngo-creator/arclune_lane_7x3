@@ -35,7 +35,7 @@ describe('combat kernel packet goldens', () => {
   test('negative defense is not clamped', () => expect(resolveDefenseMultiplier(-100)).toBe(1.5));
   test('source attribution follows summon controller and true self', () => {
     expect(resolveSourceAttribution({ immediateSource: { iid: 3 }, controller: { iid: 2 }, trueSelf: { id: 'hero' }, owner: { iid: 2 } }))
-      .toEqual({ immediateSourceIid: 3, controllerIid: 2, creditTrueSelfId: 'hero', ownerIid: 2, environmentSourceId: null });
+      .toEqual({ immediateSourceIid: 3, sourceIid: 3, controllerIid: 2, creditTrueSelfId: 'hero', ownerIid: 2, environmentSourceId: null, originActionId: null, sourceSide: null });
   });
 });
 
@@ -60,4 +60,3 @@ describe('legacy adapter characterization', () => {
     expect(result.finalRoundedDamage).toBe(50);
   });
 });
-

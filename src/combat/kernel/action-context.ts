@@ -17,7 +17,7 @@ export interface ActionExecutionContext {
   readonly originActionId: CombatId | null;
   readonly snapshot: Readonly<Record<string, unknown>>;
 }
-type ActionRuntime = { actionExecutionStack?: ActionExecutionContext[] };
+type ActionRuntime = { actionExecutionStack?: ActionExecutionContext[]; actionChains?: Record<string, { rootActionId: CombatId; activeChainDepth: number; pendingDeathReactions: number; pendingKillReactions: number; pendingImmediateRevives: number; pendingHpZeroCandidates: number }> };
 export interface ActionFinalizationResult {
   actionId: CombatId; chainId: CombatId; committedTargetAggregates: readonly Record<string, unknown>[];
   deathRecords: readonly DeathRecord[]; preventedDeaths: readonly Record<string, unknown>[];
@@ -36,6 +36,9 @@ export function beginActionExecution(game: SessionState, identity: ActionIdentit
   const startEventSerial = nextEventSerial(game);
   const context: ActionExecutionContext = { identity, startEventSerial, startCombatEventIndex, nextPacketSerial: 1, triggerLedger: options.triggerLedger ?? createTriggerLedger(), originActionId: options.originActionId ?? null, snapshot: { ...(options.snapshot ?? {}) } };
   stack(game).push(context);
+  const chains = (state.actionChains ??= {}); const chainKey = String(identity.chainId);
+  const chain = chains[chainKey] ??= { rootActionId: identity.parentActionId == null ? identity.actionId : identity.chainId, activeChainDepth: 0, pendingDeathReactions: 0, pendingKillReactions: 0, pendingImmediateRevives: 0, pendingHpZeroCandidates: 0 };
+  chain.activeChainDepth += 1;
   (state.combatEvents ??= []).push({ type: 'ACTION_START', eventSerial: startEventSerial, actionId: identity.actionId, chainId: identity.chainId, parentActionId: identity.parentActionId, actionKind: identity.actionKind });
   return context;
 }
@@ -48,6 +51,8 @@ export function endActionExecution(game: SessionState, expected?: ActionExecutio
   const contexts = stack(game); const current = contexts[contexts.length - 1];
   if (!current || (expected && current !== expected)) throw new Error('[combat-kernel] action execution stack mismatch');
   contexts.pop();
+  const chain = ((game.runtime ??= {}) as ActionRuntime).actionChains?.[String(current.identity.chainId)];
+  if (chain) chain.activeChainDepth = Math.max(0, chain.activeChainDepth - 1);
 }
 
 export function withActionExecution<T>(game: SessionState, identity: ActionIdentity, execute: (context: ActionExecutionContext) => T, options: Parameters<typeof beginActionExecution>[2] = {}): T {
@@ -55,8 +60,8 @@ export function withActionExecution<T>(game: SessionState, identity: ActionIdent
   let completed = false;
   try { const result = execute(context); completed = true; return result; }
   finally {
-    endActionExecution(game, context);
     if (completed) finalizeCombatAction(game, context);
+    endActionExecution(game, context);
   }
 }
 
@@ -68,7 +73,8 @@ export function finalizeCombatAction(game: SessionState, context: ActionExecutio
   if (existing) return existing;
   const deathRecords = resolveDeathWave(game, undefined, context.identity.actionId);
   const beforeEndEvents = (state.combatEvents ?? []).slice(context.startCombatEventIndex).filter(event => event.actionId === context.identity.actionId);
-  const chainQuiescent = stack(game).length === 0;
+  const chain = state.actionChains?.[String(context.identity.chainId)];
+  const chainQuiescent = context.identity.parentActionId == null && chain?.rootActionId === context.identity.actionId && chain.activeChainDepth === 1 && chain.pendingDeathReactions === 0 && chain.pendingKillReactions === 0 && chain.pendingImmediateRevives === 0 && chain.pendingHpZeroCandidates === 0;
   const battleEnd = chainQuiescent ? evaluateBattleEnd(game, deathRecords) : { ended: false, winner: null, reason: null };
   const actionEndSerial = nextEventSerial(game);
   (state.combatEvents ??= []).push({ type: 'ACTION_END', eventSerial: actionEndSerial, actionId: context.identity.actionId, chainId: context.identity.chainId });

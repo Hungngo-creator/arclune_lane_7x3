@@ -22,7 +22,7 @@ import {
   recordChapMinhPreventedDamage,
 } from './combat/chap-minh-runtime.ts';
 import { runRuntimeBasicAttackResolved, runRuntimeDamageResolved, runRuntimeUnitDeath } from './combat/unit-runtime-hooks.ts';
-import { commitDamageBatch, commitHealing, createHpZeroCandidate, createLinkedAction, createNaturalAction, currentActionExecution, nextActionPacket, registerDeathPrevention, registerDeathReactions, resolveDamageBatch, resolveDamagePacket, resolveHealing, resolveSourceAttribution, withActionExecution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
+import { commitDamageBatch, commitHealing, createHpZeroCandidate, createLinkedAction, createNaturalAction, currentActionExecution, isCombatAlive, nextActionPacket, registerDeathPrevention, registerDeathReactions, resolveDamageBatch, resolveDamagePacket, resolveHealing, resolveSourceAttribution, withActionExecution, type ActionIdentity, type DamageContext, type DamagePacket } from './combat/kernel/index.ts';
 
 export { applyDamage, grantShield };
 
@@ -47,6 +47,7 @@ export interface AbilityDamageOptions {
   damageBreakdown?: Partial<DamageBreakdownMetadata>;
   skill?: unknown;
   actionIdentity?: ActionIdentity;
+  sourceAttribution?: import('./combat/kernel/index.ts').SourceAttribution;
   [extra: string]: unknown;
 }
 
@@ -96,8 +97,10 @@ function ensureProductionDeathAdapters(game: SessionState): void {
     const killer = game.tokens.find(unit => unit.trueSelfId === record.source.creditTrueSelfId);
     if (!dead || !killer) return;
     emitPassiveEvent(game, killer, 'onEnemyDeath', { log: getPassiveLog(game), target: dead, attackType: record.causeKind, isDirectKill: true });
-    for (const observer of game.tokens.filter(unit => unit.alive && unit.id === 'blood_avatar' && unit.side !== dead.side && unit.iid !== killer.iid))
+    for (const observer of game.tokens.filter(unit => isCombatAlive(unit) && unit.id === 'blood_avatar' && unit.side !== dead.side && unit.iid !== killer.iid))
       emitPassiveEvent(game, observer, 'onEnemyDeath', { log: getPassiveLog(game), target: dead, attackType: record.causeKind, isDirectKill: false });
+    const start=((game.runtime as {combatEvents?:Record<string,unknown>[]}).combatEvents??[]).find(event=>event.type==='ACTION_START'&&event.actionId===record.actionId);
+    if(start?.actionKind==='basic')applyUyenBasicExtras(killer,dead,{wasKill:true,turnStamp:`${game.turn?.cycle??0}:${killer.iid??0}`});
   });
 }
 
@@ -358,7 +361,7 @@ export function pickTarget(Game: TargetableGameState, attacker: UnitToken): Unit
   );
 
   for (const token of Game.tokens) {
-    if (token.side !== foeSide || !token.alive) continue;
+    if (token.side !== foeSide || !isCombatAlive(token)) continue;
     pool.push(token);
     const slot = slotIndex(token.side, token.cx, token.cy);
     bySlot.set(slot, token);
@@ -440,7 +443,7 @@ export function dealAbilityDamage(
     return withActionExecution(Game, createNaturalAction(Game, String(opts.attackType ?? 'ability')), () => dealAbilityDamage(Game, attacker, target, opts));
   }
   if (Game) ensureProductionDeathAdapters(Game);
-  if (!attacker || !target || !target.alive) {
+  if (!attacker || !target || !isCombatAlive(target)) {
     return {
       dealt: 0,
       absorbed: 0,
@@ -468,7 +471,7 @@ export function dealAbilityDamage(
   const splitTotal = physWeightRaw + arcWeightRaw;
   const physWeight = dtype === 'mixed' ? (splitTotal > 0 ? physWeightRaw / splitTotal : 0.5) : (dtype === 'arcane' ? 0 : 1);
   const arcWeight = dtype === 'mixed' ? (splitTotal > 0 ? arcWeightRaw / splitTotal : 0.5) : (dtype === 'arcane' ? 1 : 0);
-  const sideUnits = Game?.tokens?.filter((token) => token.side === attacker.side && token.alive) ?? [];
+  const sideUnits = Game?.tokens?.filter((token) => token.side === attacker.side && isCombatAlive(token)) ?? [];
   const counterMetadata = getCounterBonusMetadata(attacker, target, sideUnits, { skill: opts.skill });
 
   const atkAbsolute = hasAbsoluteLawTag(attacker, 'attack');
@@ -491,7 +494,7 @@ export function dealAbilityDamage(
   const identity = opts.actionIdentity ?? execution?.identity;
   if (!identity) throw new Error('[combat-kernel] detached damage requires explicit identity');
   const controller = attacker.ownerIid != null ? Game?.tokens.find(unit => unit.iid === attacker.ownerIid) ?? null : attacker;
-  const source = resolveSourceAttribution({ immediateSource: attacker, controller: controller ?? attacker.ownerIid ?? attacker, trueSelf: controller?.trueSelfId ?? attacker.trueSelfId ?? null, owner: controller ?? attacker.ownerIid ?? attacker });
+  const source = opts.sourceAttribution ?? resolveSourceAttribution({ immediateSource: attacker, controller: controller ?? attacker.ownerIid ?? attacker, trueSelf: controller?.trueSelfId ?? attacker.trueSelfId ?? null, owner: controller ?? attacker.ownerIid ?? attacker });
   const componentSpecs = dtype === 'mixed' ? [['physical', physWeight], ['will', arcWeight]] as const : [[dtype === 'arcane' ? 'will' : dtype, 1]] as const;
   const detachedSerial = { value: 1 };
   const packets: DamagePacket[] = componentSpecs.map(([damageType, weight]) => {
@@ -531,7 +534,7 @@ export function dealAbilityDamage(
   if (sharedRules.group && Game) {
     for (let i = 0; i < Game.tokens.length; i += 1) {
       const token = Game.tokens[i];
-      if (!token?.alive || token.side !== target.side) continue;
+      if (!token || !isCombatAlive(token) || token.side !== target.side) continue;
       const tokenGroup = getSharedHpGroup(token);
       if (tokenGroup === sharedRules.group) sharedTargets.push(token);
     }
@@ -692,7 +695,7 @@ export function healUnit(gameOrTarget: SessionState | UnitToken | null | undefin
 
 function executeBasicAttack(Game: SessionState, unit: UnitToken): void {
   const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
-  const pool = Game.tokens.filter((t): t is UnitToken => t.side === foeSide && t.alive);
+  const pool = Game.tokens.filter((t): t is UnitToken => t.side === foeSide && isCombatAlive(t));
   if (pool.length === 0) return;
 
   startFurySkill(unit, { tag: 'basic' });
@@ -776,7 +779,7 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): void {
     }
   }
   const dealt = hitResult.dealt;
-  if (unit.mutated === true && resolved.alive) {
+  if (unit.mutated === true && isCombatAlive(resolved)) {
     const pool = Array.isArray(unit.mutationDebuffPool)
       ? unit.mutationDebuffPool.filter((id: unknown): id is 'bleed' | 'stun' | 'poison' => id === 'bleed' || id === 'stun' || id === 'poison')
       : ['bleed', 'stun', 'poison'];
@@ -792,12 +795,6 @@ function executeBasicAttack(Game: SessionState, unit: UnitToken): void {
       });
     }
   }
-  const turnStamp = `${Game.turn?.cycle ?? 0}:${unit.iid ?? 0}`;
-  applyUyenBasicExtras(unit, resolved, {
-    wasKill: !resolved.alive,
-    turnStamp,
-  });
-
   runRuntimeBasicAttackResolved({
     game: Game,
     attacker: unit,
@@ -840,7 +837,7 @@ export function doBasicWithFollowups(
     withActionExecution(Game, parent, (root) => {
       executeBasicAttack(Game, unit);
       for (let i = 0; i < followupCount; i += 1) {
-        if (!unit || !unit.alive) break;
+        if (!unit || !isCombatAlive(unit)) break;
         withActionExecution(Game, createLinkedAction(Game, parent, 'followup'), () => executeBasicAttack(Game, unit), {
           triggerLedger: root.triggerLedger, originActionId: parent.actionId,
         });

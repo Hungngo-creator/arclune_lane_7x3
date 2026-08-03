@@ -25,10 +25,13 @@ export interface ActionIdentity {
 
 export interface SourceAttribution {
   readonly immediateSourceIid: CombatId | null;
+  readonly sourceIid?: CombatId | null;
   readonly controllerIid: CombatId | null;
   readonly creditTrueSelfId: CombatId | null;
   readonly ownerIid: CombatId | null;
   readonly environmentSourceId: CombatId | null;
+  readonly originActionId?: CombatId | null;
+  readonly sourceSide?: 'ally' | 'enemy' | null;
 }
 
 export interface DamagePacket {

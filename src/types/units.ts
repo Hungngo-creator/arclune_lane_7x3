@@ -49,6 +49,8 @@ export interface UnitToken extends StatBlock {
   iid?: number;
   /** Stable identity of an HP-bearing non-summon across revived lives. */
   trueSelfId?: string;
+  /** Starts at one and increments only when this true self is reborn. */
+  incarnationSerial?: number;
   /** Starts at one and increments whenever this true self begins a revived life. */
   lifeSerial?: number;
   bornSerial?: number;

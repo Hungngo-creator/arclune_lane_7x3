@@ -3,7 +3,7 @@ import { toFiniteNumber, toPositiveTurns, toRoundedInt } from './number-utils.ts
 import { Statuses } from '../statuses.ts';
 import { normalizeTagList } from '../data/tags.ts';
 import { dealAbilityDamage, healUnit } from '../combat.ts';
-import { createNaturalAction, currentActionExecution, withActionExecution } from './kernel/index.ts';
+import { createNaturalAction, currentActionExecution, queueDelayedReviveEffect, withActionExecution, type DeathRecord, type DelayedReviveEffectSpec } from './kernel/index.ts';
 import { nextRngValue } from '../utils/rng.ts';
 import { ensureStatusList, getStatusEntryById } from './status-utils.ts';
 import { partitionTokensBySide, sampleTokens } from './token-side-utils.ts';
@@ -748,6 +748,15 @@ const HANDLERS: Readonly<Record<string, TagHandler>> = Object.freeze({
     if (ctx.deferEffects) return;
     ctx.onSummon();
     result.sideEffects.push('summon');
+  },
+  'delayed-revive': (ctx, result) => {
+    if (ctx.deferEffects) return;
+    if (!ctx.game || !ctx.attacker) throw new Error('[delayed-revive] gameplay effect requires game and actor');
+    const death = ctx.payload?.deathRecord as DeathRecord | undefined;
+    const spec = ctx.payload?.delayedRevive as DelayedReviveEffectSpec | undefined;
+    if (!death || !spec) throw new Error('[delayed-revive] explicit deathRecord and delayedRevive spec are required');
+    const entry = queueDelayedReviveEffect(ctx.game, ctx.attacker, death, spec);
+    result.sideEffects.push(`delayed-revive:${entry.queueId}`);
   },
   'non-heal-hp-change': (ctx, result) => {
     if (ctx.deferEffects) return;

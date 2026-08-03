@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/kernel/action-context.js":"./combat/kernel/action-context.ts","./combat/kernel/action-resolution.js":"./combat/kernel/action-resolution.ts","./combat/kernel/action-transaction.js":"./combat/kernel/action-transaction.ts","./combat/kernel/battle-end.js":"./combat/kernel/battle-end.ts","./combat/kernel/combat-identity.js":"./combat/kernel/combat-identity.ts","./combat/kernel/damage-batch.js":"./combat/kernel/damage-batch.ts","./combat/kernel/damage-resolver.js":"./combat/kernel/damage-resolver.ts","./combat/kernel/defense.js":"./combat/kernel/defense.ts","./combat/kernel/delayed-revive.js":"./combat/kernel/delayed-revive.ts","./combat/kernel/hp-mutation.js":"./combat/kernel/hp-mutation.ts","./combat/kernel/ids.js":"./combat/kernel/ids.ts","./combat/kernel/index.js":"./combat/kernel/index.ts","./combat/kernel/invariants.js":"./combat/kernel/invariants.ts","./combat/kernel/legacy-adapter.js":"./combat/kernel/legacy-adapter.ts","./combat/kernel/life-cycle.js":"./combat/kernel/life-cycle.ts","./combat/kernel/non-death-removal.js":"./combat/kernel/non-death-removal.ts","./combat/kernel/reaction-policy.js":"./combat/kernel/reaction-policy.ts","./combat/kernel/rebirth.js":"./combat/kernel/rebirth.ts","./combat/kernel/reincarnation.js":"./combat/kernel/reincarnation.ts","./combat/kernel/sequence.js":"./combat/kernel/sequence.ts","./combat/kernel/source-attribution.js":"./combat/kernel/source-attribution.ts","./combat/kernel/trigger-ledger.js":"./combat/kernel/trigger-ledger.ts","./combat/kernel/types.js":"./combat/kernel/types.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/kernel/action-context.js":"./combat/kernel/action-context.ts","./combat/kernel/action-resolution.js":"./combat/kernel/action-resolution.ts","./combat/kernel/action-transaction.js":"./combat/kernel/action-transaction.ts","./combat/kernel/battle-end.js":"./combat/kernel/battle-end.ts","./combat/kernel/combat-identity.js":"./combat/kernel/combat-identity.ts","./combat/kernel/damage-batch.js":"./combat/kernel/damage-batch.ts","./combat/kernel/damage-resolver.js":"./combat/kernel/damage-resolver.ts","./combat/kernel/defense.js":"./combat/kernel/defense.ts","./combat/kernel/delayed-revive.js":"./combat/kernel/delayed-revive.ts","./combat/kernel/hp-mutation.js":"./combat/kernel/hp-mutation.ts","./combat/kernel/ids.js":"./combat/kernel/ids.ts","./combat/kernel/index.js":"./combat/kernel/index.ts","./combat/kernel/invariants.js":"./combat/kernel/invariants.ts","./combat/kernel/legacy-adapter.js":"./combat/kernel/legacy-adapter.ts","./combat/kernel/life-cycle.js":"./combat/kernel/life-cycle.ts","./combat/kernel/non-death-removal.js":"./combat/kernel/non-death-removal.ts","./combat/kernel/reaction-policy.js":"./combat/kernel/reaction-policy.ts","./combat/kernel/rebirth.js":"./combat/kernel/rebirth.ts","./combat/kernel/reincarnation.js":"./combat/kernel/reincarnation.ts","./combat/kernel/sequence.js":"./combat/kernel/sequence.ts","./combat/kernel/source-attribution.js":"./combat/kernel/source-attribution.ts","./combat/kernel/trigger-ledger.js":"./combat/kernel/trigger-ledger.ts","./combat/kernel/true-self.js":"./combat/kernel/true-self.ts","./combat/kernel/types.js":"./combat/kernel/types.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -4696,6 +4696,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   const createLinkedAction = __dep17.createLinkedAction;
   const createNaturalAction = __dep17.createNaturalAction;
   const currentActionExecution = __dep17.currentActionExecution;
+  const isCombatAlive = __dep17.isCombatAlive;
   const nextActionPacket = __dep17.nextActionPacket;
   const registerDeathPrevention = __dep17.registerDeathPrevention;
   const registerDeathReactions = __dep17.registerDeathReactions;
@@ -4739,8 +4740,11 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           if (!dead || !killer)
               return;
           emitPassiveEvent(game, killer, 'onEnemyDeath', { log: getPassiveLog(game), target: dead, attackType: record.causeKind, isDirectKill: true });
-          for (const observer of game.tokens.filter(unit => unit.alive && unit.id === 'blood_avatar' && unit.side !== dead.side && unit.iid !== killer.iid))
+          for (const observer of game.tokens.filter(unit => isCombatAlive(unit) && unit.id === 'blood_avatar' && unit.side !== dead.side && unit.iid !== killer.iid))
               emitPassiveEvent(game, observer, 'onEnemyDeath', { log: getPassiveLog(game), target: dead, attackType: record.causeKind, isDirectKill: false });
+          const start = (game.runtime.combatEvents ?? []).find(event => event.type === 'ACTION_START' && event.actionId === record.actionId);
+          if (start?.actionKind === 'basic')
+              applyUyenBasicExtras(killer, dead, { wasKill: true, turnStamp: `${game.turn?.cycle ?? 0}:${killer.iid ?? 0}` });
       });
   }
   const isBasicAttackAfterHitHandler = (handler) => typeof handler === 'function';
@@ -4923,7 +4927,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       let nearestOverallDistance = Number.POSITIVE_INFINITY;
       const distanceToAttacker = (token) => (Math.abs(token.cx - attacker.cx) + Math.abs(token.cy - attacker.cy));
       for (const token of Game.tokens) {
-          if (token.side !== foeSide || !token.alive)
+          if (token.side !== foeSide || !isCombatAlive(token))
               continue;
           pool.push(token);
           const slot = slotIndex(token.side, token.cx, token.cy);
@@ -4991,7 +4995,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       }
       if (Game)
           ensureProductionDeathAdapters(Game);
-      if (!attacker || !target || !target.alive) {
+      if (!attacker || !target || !isCombatAlive(target)) {
           return {
               dealt: 0,
               absorbed: 0,
@@ -5015,7 +5019,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       const splitTotal = physWeightRaw + arcWeightRaw;
       const physWeight = dtype === 'mixed' ? (splitTotal > 0 ? physWeightRaw / splitTotal : 0.5) : (dtype === 'arcane' ? 0 : 1);
       const arcWeight = dtype === 'mixed' ? (splitTotal > 0 ? arcWeightRaw / splitTotal : 0.5) : (dtype === 'arcane' ? 1 : 0);
-      const sideUnits = Game?.tokens?.filter((token) => token.side === attacker.side && token.alive) ?? [];
+      const sideUnits = Game?.tokens?.filter((token) => token.side === attacker.side && isCombatAlive(token)) ?? [];
       const counterMetadata = getCounterBonusMetadata(attacker, target, sideUnits, { skill: opts.skill });
       const atkAbsolute = hasAbsoluteLawTag(attacker, 'attack');
       const shieldAbsolute = hasAbsoluteLawTag(target, 'shield');
@@ -5039,7 +5043,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       if (!identity)
           throw new Error('[combat-kernel] detached damage requires explicit identity');
       const controller = attacker.ownerIid != null ? Game?.tokens.find(unit => unit.iid === attacker.ownerIid) ?? null : attacker;
-      const source = resolveSourceAttribution({ immediateSource: attacker, controller: controller ?? attacker.ownerIid ?? attacker, trueSelf: controller?.trueSelfId ?? attacker.trueSelfId ?? null, owner: controller ?? attacker.ownerIid ?? attacker });
+      const source = opts.sourceAttribution ?? resolveSourceAttribution({ immediateSource: attacker, controller: controller ?? attacker.ownerIid ?? attacker, trueSelf: controller?.trueSelfId ?? attacker.trueSelfId ?? null, owner: controller ?? attacker.ownerIid ?? attacker });
       const componentSpecs = dtype === 'mixed' ? [['physical', physWeight], ['will', arcWeight]] : [[dtype === 'arcane' ? 'will' : dtype, 1]];
       const detachedSerial = { value: 1 };
       const packets = componentSpecs.map(([damageType, weight]) => {
@@ -5079,7 +5083,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
       if (sharedRules.group && Game) {
           for (let i = 0; i < Game.tokens.length; i += 1) {
               const token = Game.tokens[i];
-              if (!token?.alive || token.side !== target.side)
+              if (!token || !isCombatAlive(token) || token.side !== target.side)
                   continue;
               const tokenGroup = getSharedHpGroup(token);
               if (tokenGroup === sharedRules.group)
@@ -5224,7 +5228,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
   }
   function executeBasicAttack(Game, unit) {
       const foeSide = unit.side === 'ally' ? 'enemy' : 'ally';
-      const pool = Game.tokens.filter((t) => t.side === foeSide && t.alive);
+      const pool = Game.tokens.filter((t) => t.side === foeSide && isCombatAlive(t));
       if (pool.length === 0)
           return;
       startFurySkill(unit, { tag: 'basic' });
@@ -5303,7 +5307,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           }
       }
       const dealt = hitResult.dealt;
-      if (unit.mutated === true && resolved.alive) {
+      if (unit.mutated === true && isCombatAlive(resolved)) {
           const pool = Array.isArray(unit.mutationDebuffPool)
               ? unit.mutationDebuffPool.filter((id) => id === 'bleed' || id === 'stun' || id === 'poison')
               : ['bleed', 'stun', 'poison'];
@@ -5319,11 +5323,6 @@ __modules['./combat.ts'] = (exports, module, __require) => {
               });
           }
       }
-      const turnStamp = `${Game.turn?.cycle ?? 0}:${unit.iid ?? 0}`;
-      applyUyenBasicExtras(unit, resolved, {
-          wasKill: !resolved.alive,
-          turnStamp,
-      });
       runRuntimeBasicAttackResolved({
           game: Game,
           attacker: unit,
@@ -5359,7 +5358,7 @@ __modules['./combat.ts'] = (exports, module, __require) => {
           withActionExecution(Game, parent, (root) => {
               executeBasicAttack(Game, unit);
               for (let i = 0; i < followupCount; i += 1) {
-                  if (!unit || !unit.alive)
+                  if (!unit || !isCombatAlive(unit))
                       break;
                   withActionExecution(Game, createLinkedAction(Game, parent, 'followup'), () => executeBasicAttack(Game, unit), {
                       triggerLedger: root.triggerLedger, originActionId: parent.actionId,
@@ -6025,6 +6024,10 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
       const startEventSerial = nextEventSerial(game);
       const context = { identity, startEventSerial, startCombatEventIndex, nextPacketSerial: 1, triggerLedger: options.triggerLedger ?? createTriggerLedger(), originActionId: options.originActionId ?? null, snapshot: { ...(options.snapshot ?? {}) } };
       stack(game).push(context);
+      const chains = (state.actionChains ??= {});
+      const chainKey = String(identity.chainId);
+      const chain = chains[chainKey] ??= { rootActionId: identity.parentActionId == null ? identity.actionId : identity.chainId, activeChainDepth: 0, pendingDeathReactions: 0, pendingKillReactions: 0, pendingImmediateRevives: 0, pendingHpZeroCandidates: 0 };
+      chain.activeChainDepth += 1;
       (state.combatEvents ??= []).push({ type: 'ACTION_START', eventSerial: startEventSerial, actionId: identity.actionId, chainId: identity.chainId, parentActionId: identity.parentActionId, actionKind: identity.actionKind });
       return context;
   }
@@ -6038,6 +6041,9 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
       if (!current || (expected && current !== expected))
           throw new Error('[combat-kernel] action execution stack mismatch');
       contexts.pop();
+      const chain = (game.runtime ??= {}).actionChains?.[String(current.identity.chainId)];
+      if (chain)
+          chain.activeChainDepth = Math.max(0, chain.activeChainDepth - 1);
   }
   function withActionExecution(game, identity, execute, options = {}) {
       const context = beginActionExecution(game, identity, options);
@@ -6048,9 +6054,9 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
           return result;
       }
       finally {
-          endActionExecution(game, context);
           if (completed)
               finalizeCombatAction(game, context);
+          endActionExecution(game, context);
       }
   }
   /** The sole production action boundary. It is idempotent for an action identity. */
@@ -6062,7 +6068,8 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
           return existing;
       const deathRecords = resolveDeathWave(game, undefined, context.identity.actionId);
       const beforeEndEvents = (state.combatEvents ?? []).slice(context.startCombatEventIndex).filter(event => event.actionId === context.identity.actionId);
-      const chainQuiescent = stack(game).length === 0;
+      const chain = state.actionChains?.[String(context.identity.chainId)];
+      const chainQuiescent = context.identity.parentActionId == null && chain?.rootActionId === context.identity.actionId && chain.activeChainDepth === 1 && chain.pendingDeathReactions === 0 && chain.pendingKillReactions === 0 && chain.pendingImmediateRevives === 0 && chain.pendingHpZeroCandidates === 0;
       const battleEnd = chainQuiescent ? evaluateBattleEnd(game, deathRecords) : { ended: false, winner: null, reason: null };
       const actionEndSerial = nextEventSerial(game);
       (state.combatEvents ??= []).push({ type: 'ACTION_END', eventSerial: actionEndSerial, actionId: context.identity.actionId, chainId: context.identity.chainId });
@@ -6193,8 +6200,8 @@ __modules['./combat/kernel/action-transaction.ts'] = (exports, module, __require
           stage = 'ACTION_COMMIT';
           command.commitAction?.(payload);
           publish();
-          endActionExecution(command.game, context);
           finalizeCombatAction(command.game, context);
+          endActionExecution(command.game, context);
           context = null;
           stage = 'ACTION_END';
           return { ok: true, stage, payload };
@@ -6240,6 +6247,7 @@ __modules['./combat/kernel/combat-identity.ts'] = (exports, module, __require) =
           throw new Error(`[combat-identity] ${kind} requires an instance iid`);
       if (OWNS_TRUE_SELF.has(kind)) {
           unit.trueSelfId ??= `true-self:${kind}:${String(unit.iid)}`;
+          unit.incarnationSerial ??= 1;
           unit.lifeSerial ??= 1;
       }
       else {
@@ -6470,14 +6478,23 @@ __modules['./combat/kernel/delayed-revive.ts'] = (exports, module, __require) =>
   const __dep1 = __require('./combat/kernel/sequence.ts');
   const nextEventSerial = __dep1.nextEventSerial;
   const state = (game) => (game.runtime ??= {});
+  const clockKey = (policy, side) => policy === 'side-pass' ? `${side ?? 'ally'}-side-pass` : policy === 'target-side-opportunities' ? `${side ?? 'ally'}-target-side-opportunities` : policy;
+  /** Production effect-layer adapter; low-level scheduling remains centralized below. */
+  function queueDelayedReviveEffect(game, actor, deathRecord, spec) {
+      const target = game.tokens.find(unit => (unit.iid ?? unit.id) === deathRecord.targetIid);
+      if (!target || spec.target !== 'death-target')
+          throw new Error('[delayed-revive] configured death target is unavailable');
+      return scheduleDelayedRevive(game, { deathId: deathRecord.deathId, targetIid: deathRecord.targetIid, trueSelfId: deathRecord.trueSelfId ?? '', incarnationSerial: deathRecord.incarnationSerial, deadLifeSerial: deathRecord.lifeSerial, targetSide: target.side, watchedSide: spec.watchedSide, requestSource: { immediateSourceIid: actor.iid ?? actor.id, controllerIid: actor.iid ?? actor.id, creditTrueSelfId: actor.trueSelfId ?? null, ownerIid: actor.ownerIid ?? null, environmentSourceId: null }, clockPolicy: spec.clockPolicy, delayAmount: spec.delayAmount, eligibilityPolicy: spec.authority, revivePolicies: { hpPolicy: spec.hpPolicy, ragePolicy: spec.ragePolicy, buffPolicy: spec.buffPolicy, positionPolicy: spec.positionPolicy, authority: spec.authority, allowSummon: spec.allowSummon } });
+  }
   function scheduleDelayedRevive(game, input) {
       const rt = state(game);
       const insertionSerial = rt.delayedReviveSerial = (rt.delayedReviveSerial ?? 0) + 1;
-      const current = rt.delayedReviveClocks?.[input.clockPolicy] ?? 0;
       const targetSide = input.targetSide ?? game.tokens.find(unit => (unit.iid ?? unit.id) === input.targetIid)?.side;
       if (targetSide !== 'ally' && targetSide !== 'enemy')
           throw new Error('[delayed-revive] targetSide is required');
-      const entry = { ...input, targetSide, queueId: `delayed-revive-${insertionSerial}`, scheduledAtEventSerial: nextEventSerial(game), clockStartValue: current, dueValue: current + Math.max(0, Math.floor(input.delayAmount)), insertionSerial, state: 'queued' };
+      const current = rt.delayedReviveClocks?.[clockKey(input.clockPolicy, input.watchedSide ?? targetSide)] ?? 0;
+      const incarnationSerial = input.incarnationSerial ?? game.tokens.find(unit => (unit.iid ?? unit.id) === input.targetIid)?.incarnationSerial ?? 1;
+      const entry = { ...input, incarnationSerial, targetSide, queueId: `delayed-revive-${insertionSerial}`, scheduledAtEventSerial: nextEventSerial(game), clockStartValue: current, dueValue: current + Math.max(0, Math.floor(input.delayAmount)), insertionSerial, state: 'queued' };
       (rt.delayedRevives ??= []).push(entry);
       return entry;
   }
@@ -6495,7 +6512,7 @@ __modules['./combat/kernel/delayed-revive.ts'] = (exports, module, __require) =>
   }
   function drainDue(game) {
       const rt = state(game);
-      const due = (rt.delayedRevives ?? []).filter(entry => entry.state === 'queued' && entry.dueValue <= (rt.delayedReviveClocks?.[entry.clockPolicy] ?? 0)).sort((a, b) => a.dueValue - b.dueValue || a.insertionSerial - b.insertionSerial || a.queueId.localeCompare(b.queueId));
+      const due = (rt.delayedRevives ?? []).filter(entry => entry.state === 'queued' && entry.dueValue <= (rt.delayedReviveClocks?.[clockKey(entry.clockPolicy, entry.watchedSide ?? entry.targetSide)] ?? 0)).sort((a, b) => a.dueValue - b.dueValue || a.insertionSerial - b.insertionSerial || a.queueId.localeCompare(b.queueId));
       for (const entry of due) {
           entry.state = 'due';
           const reason = canCommitDelayedRevive(entry, game);
@@ -6513,12 +6530,12 @@ __modules['./combat/kernel/delayed-revive.ts'] = (exports, module, __require) =>
       return due;
   }
   /** Compatibility adapter; production advances clocks through consumeSsiTemporalEvent. */
-  function advanceDelayedReviveClock(game, policy, amount = 1) { const clocks = state(game).delayedReviveClocks ??= {}; clocks[policy] = (clocks[policy] ?? 0) + Math.max(0, Math.floor(amount)); return drainDue(game); }
+  function advanceDelayedReviveClock(game, policy, amount = 1) { const clocks = state(game).delayedReviveClocks ??= {}; const key = clockKey(policy); clocks[key] = (clocks[key] ?? 0) + Math.max(0, Math.floor(amount)); return drainDue(game); }
   function emitSsiTemporalEvent(game, input) { const event = { ...input, eventSerial: nextEventSerial(game) }; (state(game).combatEvents ??= []).push(event); consumeSsiTemporalEvent(game, event); return event; }
   function consumeSsiTemporalEvent(game, event) {
       const rt = state(game);
       const clocks = rt.delayedReviveClocks ??= {};
-      const inc = (policy) => { clocks[policy] = (clocks[policy] ?? 0) + 1; };
+      const inc = (policy, side) => { const key = clockKey(policy, side); clocks[key] = (clocks[key] ?? 0) + 1; };
       if (event.type === 'NATURAL_ACTION_COMPLETED' || event.type === 'NATURAL_ACTION_CONSUMED_BY_CC') {
           inc('global-natural-actions');
           if (event.actorSide === 'ally')
@@ -6526,19 +6543,16 @@ __modules['./combat/kernel/delayed-revive.ts'] = (exports, module, __require) =>
           if (event.actorSide === 'enemy')
               inc('enemy-natural-actions');
       }
-      for (const entry of rt.delayedRevives ?? []) {
-          if (entry.state !== 'queued')
-              continue;
-          if (event.type === 'SIDE_PASS_COMPLETED' && entry.clockPolicy === 'side-pass' && event.actorSide === (entry.watchedSide ?? entry.targetSide))
-              entry.dueValue -= 1;
-          if (event.type === 'TARGET_SIDE_OPPORTUNITY' && entry.clockPolicy === 'target-side-opportunities' && event.targetSide === entry.targetSide)
-              entry.dueValue -= 1;
-      }
+      if (event.type === 'SIDE_PASS_COMPLETED' && event.actorSide)
+          inc('side-pass', event.actorSide);
+      if (event.type === 'TARGET_SIDE_OPPORTUNITY' && event.targetSide)
+          inc('target-side-opportunities', event.targetSide);
       if (event.type === 'SSI_CYCLE_COMPLETED')
           inc('global-ssi-cycle');
       return drainDue(game);
   }
   //# sourceMappingURL=delayed-revive.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'queueDelayedReviveEffect')) exports.queueDelayedReviveEffect = queueDelayedReviveEffect;
   if (!Object.prototype.hasOwnProperty.call(exports, 'scheduleDelayedRevive')) exports.scheduleDelayedRevive = scheduleDelayedRevive;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canCommitDelayedRevive')) exports.canCommitDelayedRevive = canCommitDelayedRevive;
   if (!Object.prototype.hasOwnProperty.call(exports, 'advanceDelayedReviveClock')) exports.advanceDelayedReviveClock = advanceDelayedReviveClock;
@@ -6762,6 +6776,12 @@ __modules['./combat/kernel/index.ts'] = (exports, module, __require) => {
     if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
     exports[key] = __reexport21[key];
   }
+  const __reexport22 = __require('./combat/kernel/true-self.ts');
+  for (const key of Object.keys(__reexport22)) {
+    if (key === 'default') continue;
+    if (Object.prototype.hasOwnProperty.call(exports, key)) continue;
+    exports[key] = __reexport22[key];
+  }
   //# sourceMappingURL=index.js.map
 };
 __modules['./combat/kernel/invariants.ts'] = (exports, module, __require) => {
@@ -6851,6 +6871,9 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   const hasEnteredReincarnation = __dep4.hasEnteredReincarnation;
   const markReincarnationEscapedByRevive = __dep4.markReincarnationEscapedByRevive;
   const observeReincarnationDeathWave = __dep4.observeReincarnationDeathWave;
+  const __dep5 = __require('./combat/kernel/true-self.ts');
+  const ensureTrueSelfCombatRecord = __dep5.ensureTrueSelfCombatRecord;
+  const lifeIdentityKey = __dep5.lifeIdentityKey;
   const runtime = (game) => (game.runtime ??= {});
   const emit = (game, event) => { (runtime(game).combatEvents ??= []).push(event); };
   const getLifeState = (unit) => unit.lifeState ?? (unit.alive && (unit.hp == null || unit.hp > 0) ? 'alive' : 'dead-confirmed');
@@ -6861,7 +6884,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   function markDeathConfirmed(unit) { unit.lifeState = 'dead-confirmed'; unit.alive = false; }
   function markRemoved(unit) { unit.lifeState = 'removed'; unit.alive = false; }
   function markErased(unit) { unit.lifeState = 'erased'; unit.alive = false; }
-  const lifeKey = (iid, serial) => `${String(iid)}:${serial}`;
+  const lifeKey = (candidate) => candidate.trueSelfId ? lifeIdentityKey(candidate.trueSelfId, candidate.incarnationSerial, candidate.lifeSerial) : `${String(candidate.targetIid)}:${candidate.incarnationSerial}:${candidate.lifeSerial}`;
   const authorityTag = (authority) => authority === 'normal' || !authority ? null : authority;
   const compareDeathAuthority = (left, right) => compareRuleTagPriority(authorityTag(left), authorityTag(right));
   function registerDeathPrevention(game, collect) {
@@ -6884,11 +6907,13 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       (state.immediateReviveRegistrations ??= []).push(create);
       return () => { state.immediateReviveRegistrations = state.immediateReviveRegistrations?.filter(item => item !== create); };
   }
-  function registerDeathReactions(game, onDeath, onKill) {
+  function registerDeathReactions(game, onDeath, onKill, priority = 0) {
       const state = runtime(game);
-      (state.deathReactionRegistrations ??= []).push(onDeath);
-      (state.killReactionRegistrations ??= []).push(onKill);
-      return () => { state.deathReactionRegistrations = state.deathReactionRegistrations?.filter(item => item !== onDeath); state.killReactionRegistrations = state.killReactionRegistrations?.filter(item => item !== onKill); };
+      const serial = state.reactionRegistrationSerial = (state.reactionRegistrationSerial ?? 0) + 1;
+      const death = { serial, priority, react: onDeath }, kill = { serial, priority, react: onKill };
+      (state.deathReactionRegistrations ??= []).push(death);
+      (state.killReactionRegistrations ??= []).push(kill);
+      return () => { state.deathReactionRegistrations = state.deathReactionRegistrations?.filter(item => item !== death); state.killReactionRegistrations = state.killReactionRegistrations?.filter(item => item !== kill); };
   }
   const policyFor = (kind, target) => {
       const summon = kind === 'summon' || kind === 'summoned-creep' || kind === 'clone' || kind === 'combat-object';
@@ -6900,17 +6925,20 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       markHpZero(target);
       const entityKind = target.entityKind ?? (target.isLeader ? 'leader' : target.isMinion ? 'summon' : 'collection-unit');
       const policy = policyFor(entityKind, target);
-      const candidate = { targetIid: target.iid ?? target.id, trueSelfId: target.trueSelfId ?? null, lifeSerial: target.lifeSerial ?? 1,
+      const candidate = { targetIid: target.iid ?? target.id, trueSelfId: target.trueSelfId ?? null, incarnationSerial: target.incarnationSerial ?? 1, lifeSerial: target.lifeSerial ?? 1,
           actionId: identity.actionId, chainId: identity.chainId, parentActionId: identity.parentActionId, source, causeKind, committedHpDamage: hpDamage, overkill,
           slot: slotIndex(target.side, target.cx, target.cy), position: { cx: target.cx, cy: target.cy }, isLeader: entityKind === 'leader', isSummon: entityKind === 'summon' || entityKind === 'summoned-creep',
           ...policy, eventSerial: nextEventSerial(game), entityKind };
       const queue = runtime(game).hpZeroCandidates ??= [];
-      const key = lifeKey(candidate.targetIid, candidate.lifeSerial);
+      const key = lifeKey(candidate);
       const opened = runtime(game).openHpZeroKeys ??= [];
       if (!opened.includes(key)) {
           opened.push(key);
           queue.push(candidate);
           emit(game, { type: 'HP_ZERO', ...candidate });
+          const chain = runtime(game).actionChains?.[String(identity.chainId)];
+          if (chain)
+              chain.pendingHpZeroCandidates += 1;
       }
       return candidate;
   }
@@ -6919,13 +6947,18 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       const allQueued = state.hpZeroCandidates ?? [];
       const queued = actionId == null ? allQueued : allQueued.filter(candidate => candidate.actionId === actionId);
       state.hpZeroCandidates = actionId == null ? [] : allQueued.filter(candidate => candidate.actionId !== actionId);
+      for (const candidate of queued) {
+          const chain = state.actionChains?.[String(candidate.chainId)];
+          if (chain)
+              chain.pendingHpZeroCandidates = Math.max(0, chain.pendingHpZeroCandidates - 1);
+      }
       const confirmedKeys = state.confirmedLifeKeys ??= [];
       const opened = state.openHpZeroKeys ??= [];
-      const close = (candidate) => { const key = lifeKey(candidate.targetIid, candidate.lifeSerial); state.openHpZeroKeys = opened.filter(item => item !== key); opened.splice(0, opened.length, ...(state.openHpZeroKeys ?? [])); };
+      const close = (candidate) => { const key = lifeKey(candidate); state.openHpZeroKeys = opened.filter(item => item !== key); opened.splice(0, opened.length, ...(state.openHpZeroKeys ?? [])); };
       const tokens = new Map(game.tokens.map(unit => [unit.iid ?? unit.id, unit]));
-      const candidates = [...new Map(queued.map(item => [lifeKey(item.targetIid, item.lifeSerial), item])).values()].filter(item => {
+      const candidates = [...new Map(queued.map(item => [lifeKey(item), item])).values()].filter(item => {
           const target = tokens.get(item.targetIid);
-          const valid = !confirmedKeys.includes(lifeKey(item.targetIid, item.lifeSerial)) && !!target && (target.lifeSerial ?? 1) === item.lifeSerial && Number(target.hp ?? 0) === 0 && (getLifeState(target) === 'hp-zero' || getLifeState(target) === 'death-prevention');
+          const valid = !confirmedKeys.includes(lifeKey(item)) && !!target && (target.incarnationSerial ?? 1) === item.incarnationSerial && (target.lifeSerial ?? 1) === item.lifeSerial && Number(target.hp ?? 0) === 0 && (getLifeState(target) === 'hp-zero' || getLifeState(target) === 'death-prevention');
           if (!valid)
               close(item);
           return valid;
@@ -6975,7 +7008,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       const records = confirmed.map(({ candidate }) => {
           const deathSerial = nextDeathSerial(game);
           const record = { ...candidate, deathId: `death-${deathSerial}`, deathSerial, countsForKill: candidate.countsForKill, revivable: candidate.canRevive, confirmedEventSerial: nextEventSerial(game) };
-          confirmedKeys.push(lifeKey(candidate.targetIid, candidate.lifeSerial));
+          confirmedKeys.push(lifeKey(candidate));
           close(candidate);
           return record;
       });
@@ -6987,18 +7020,36 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       observeReincarnationDeathWave(game, records);
       for (const record of records) {
           if (record.countsForKill && record.source.creditTrueSelfId && record.source.creditTrueSelfId !== record.trueSelfId) {
-              const owner = state.trueSelfRecords ??= {};
-              (owner[String(record.source.creditTrueSelfId)] ??= { confirmedKills: 0 }).confirmedKills += 1;
-              emit(game, { type: 'KILL_CREDIT_GRANTED', eventSerial: nextEventSerial(game), deathId: record.deathId, actionId: record.actionId, chainId: record.chainId, targetIid: record.targetIid, trueSelfId: record.trueSelfId, lifeSerial: record.lifeSerial, creditTrueSelfId: record.source.creditTrueSelfId });
+              ensureTrueSelfCombatRecord(game, String(record.source.creditTrueSelfId)).confirmedKills += 1;
+              emit(game, { type: 'KILL_CREDIT_GRANTED', eventSerial: nextEventSerial(game), deathId: record.deathId, actionId: record.actionId, chainId: record.chainId, targetIid: record.targetIid, trueSelfId: record.trueSelfId, incarnationSerial: record.incarnationSerial, lifeSerial: record.lifeSerial, creditTrueSelfId: record.source.creditTrueSelfId });
           }
       }
-      for (const record of records)
-          for (const react of state.deathReactionRegistrations ?? [])
-              react(record);
-      for (const record of records)
-          if (record.source.creditTrueSelfId && record.source.creditTrueSelfId !== record.trueSelfId)
-              for (const react of state.killReactionRegistrations ?? [])
-                  react(record);
+      const deathReactionQueue = records.flatMap(record => (state.deathReactionRegistrations ?? []).map(registration => ({ record, registration }))).sort((a, b) => b.registration.priority - a.registration.priority || a.registration.serial - b.registration.serial || a.record.deathSerial - b.record.deathSerial);
+      const killReactionQueue = records.filter(record => record.source.creditTrueSelfId && record.source.creditTrueSelfId !== record.trueSelfId).flatMap(record => (state.killReactionRegistrations ?? []).map(registration => ({ record, registration }))).sort((a, b) => b.registration.priority - a.registration.priority || a.registration.serial - b.registration.serial || a.record.deathSerial - b.record.deathSerial);
+      for (const entry of deathReactionQueue) {
+          const chain = state.actionChains?.[String(entry.record.chainId)];
+          if (chain)
+              chain.pendingDeathReactions += 1;
+          try {
+              entry.registration.react(entry.record);
+          }
+          finally {
+              if (chain)
+                  chain.pendingDeathReactions -= 1;
+          }
+      }
+      for (const entry of killReactionQueue) {
+          const chain = state.actionChains?.[String(entry.record.chainId)];
+          if (chain)
+              chain.pendingKillReactions += 1;
+          try {
+              entry.registration.react(entry.record);
+          }
+          finally {
+              if (chain)
+                  chain.pendingKillReactions -= 1;
+          }
+      }
       const immediateReviveQueue = [];
       for (const record of records)
           for (const create of state.immediateReviveRegistrations ?? []) {
@@ -7006,8 +7057,18 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
               if (request)
                   immediateReviveQueue.push(request);
           }
-      for (const entry of immediateReviveQueue)
-          commitImmediateRevive(game, entry.target, entry.request);
+      for (const entry of immediateReviveQueue) {
+          const chain = state.actionChains?.[String(entry.request.death.chainId)];
+          if (chain)
+              chain.pendingImmediateRevives += 1;
+          try {
+              commitImmediateRevive(game, entry.target, entry.request);
+          }
+          finally {
+              if (chain)
+                  chain.pendingImmediateRevives -= 1;
+          }
+      }
       return records;
   }
   function commitImmediateRevive(game, target, request) {
@@ -7035,36 +7096,39 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
       }
       consumed.push(death.deathId);
       markReincarnationEscapedByRevive(game, death.deathId);
-      emit(game, { type: 'REVIVE_COMMITTED', eventSerial: nextEventSerial(game), deathId: death.deathId, actionId: death.actionId, chainId: death.chainId, targetIid: death.targetIid, trueSelfId: death.trueSelfId, lifeSerial, hp: target.hp, source: request.source, authority: request.authority ?? null });
+      const eventSerial = nextEventSerial(game);
+      if (death.trueSelfId)
+          ensureTrueSelfCombatRecord(game, death.trueSelfId).reviveHistory.push({ deathId: death.deathId, incarnationSerial: death.incarnationSerial, fromLifeSerial: death.lifeSerial, toLifeSerial: lifeSerial, eventSerial });
+      emit(game, { type: 'REVIVE_COMMITTED', eventSerial, deathId: death.deathId, actionId: death.actionId, chainId: death.chainId, targetIid: death.targetIid, trueSelfId: death.trueSelfId, incarnationSerial: death.incarnationSerial, lifeSerial, hp: target.hp, source: request.source, authority: request.authority ?? null });
       return { committed: true, reason: null, targetIid: death.targetIid, lifeSerial };
   }
   /** Canonical gate used by every immediate and scheduled revive path. */
   function evaluateReviveEligibility(game, death, target, request) {
       const state = runtime(game);
+      const canonical = state.deathRecordById?.[death.deathId];
+      if (!canonical || canonical.targetIid !== death.targetIid || canonical.trueSelfId !== death.trueSelfId || canonical.incarnationSerial !== death.incarnationSerial || canonical.lifeSerial !== death.lifeSerial || canonical.confirmedEventSerial !== death.confirmedEventSerial)
+          return 'invalid-death';
       if (state.battleEnd?.ended)
           return 'battle-ended';
-      const canonical = state.deathRecordById?.[death.deathId];
-      if (!canonical || canonical.targetIid !== death.targetIid || canonical.trueSelfId !== death.trueSelfId || canonical.lifeSerial !== death.lifeSerial || canonical.confirmedEventSerial !== death.confirmedEventSerial)
-          return 'invalid-death';
-      if (!canonical.revivable || !death.canRevive)
-          return 'non-revivable';
       if (hasEnteredReincarnation(game, death.deathId))
           return 'entered-reincarnation';
-      if (target.trueSelfId !== death.trueSelfId)
-          return 'identity-mismatch';
-      if ((target.iid ?? target.id) !== death.targetIid || (target.lifeSerial ?? 1) !== death.lifeSerial)
-          return 'stale-life';
-      if ((state.revivedDeathIds ?? []).includes(death.deathId))
-          return 'already-revived';
+      if (target.removalKind === 'FUSION_CONSUMED')
+          return 'fused';
       const lifeState = getLifeState(target);
       if (lifeState === 'erased')
           return 'erased';
       if (lifeState === 'removed')
           return 'removed';
-      if (target.removalKind === 'FUSION_CONSUMED')
-          return 'fused';
+      if (target.trueSelfId !== death.trueSelfId)
+          return 'identity-mismatch';
+      if ((target.iid ?? target.id) !== death.targetIid || (target.incarnationSerial ?? 1) !== death.incarnationSerial || (target.lifeSerial ?? 1) !== death.lifeSerial)
+          return 'stale-life';
+      if ((state.revivedDeathIds ?? []).includes(death.deathId))
+          return 'already-revived';
       if (lifeState !== 'dead-confirmed')
           return 'already-revived';
+      if (!canonical.revivable || !death.canRevive)
+          return 'non-revivable';
       if (death.isSummon && !request?.allowSummon)
           return 'summon-not-revivable';
       return 'allowed';
@@ -7095,7 +7159,7 @@ __modules['./combat/kernel/non-death-removal.ts'] = (exports, module, __require)
       target.lifeState = kind === 'ERASED' ? 'erased' : 'removed';
       target.alive = false;
       target.removalKind = kind;
-      const event = { type: kind, eventSerial: nextEventSerial(game), targetIid: target.iid ?? target.id, trueSelfId: target.trueSelfId ?? null, lifeSerial: target.lifeSerial ?? null, reason };
+      const event = { type: kind, eventSerial: nextEventSerial(game), targetIid: target.iid ?? target.id, trueSelfId: target.trueSelfId ?? null, incarnationSerial: target.incarnationSerial ?? null, lifeSerial: target.lifeSerial ?? null, reason };
       ((game.runtime ??= {}).combatEvents ??= []).push(event);
       return event;
   }
@@ -7123,55 +7187,94 @@ __modules['./combat/kernel/reaction-policy.ts'] = (exports, module, __require) =
 };
 __modules['./combat/kernel/rebirth.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/kernel/sequence.ts');
+  const nextCombatIid = __dep0.nextCombatIid;
   const nextEventSerial = __dep0.nextEventSerial;
+  const __dep1 = __require('./combat/kernel/true-self.ts');
+  const ensureTrueSelfCombatRecord = __dep1.ensureTrueSelfCombatRecord;
+  const __dep2 = __require('./combat/kernel/combat-identity.ts');
+  const ensureCombatIdentity = __dep2.ensureCombatIdentity;
+  const __dep3 = __require('./combat/kernel/non-death-removal.ts');
+  const commitNonDeathRemoval = __dep3.commitNonDeathRemoval;
   const rt = (game) => (game.runtime ??= {});
-  function evaluateRebirthEligibility(game, request) { const state = rt(game); if (state.battleEnd?.ended)
-      return { allowed: false, reason: 'battle-ended' }; const record = state.reincarnationByDeathId?.[request.deathId]; if (!record || record.state !== 'entered')
-      return { allowed: false, reason: 'not-entered' }; if (record.trueSelfId !== request.trueSelfId)
-      return { allowed: false, reason: 'identity-mismatch' }; if (request.authority !== 'rebirth')
-      return { allowed: false, reason: 'missing-authority' }; if (!request.effectAllowsRebirth)
-      return { allowed: false, reason: 'effect-blocked' }; if (!Number.isInteger(request.spawn.cx) || !Number.isInteger(request.spawn.cy) || request.spawn.cx < 0 || request.spawn.cy < 0)
-      return { allowed: false, reason: 'invalid-spawn' }; if (game.tokens.some(token => (token.iid ?? token.id) === request.newIid))
-      return { allowed: false, reason: 'iid-conflict' }; return { allowed: true, reason: 'allowed' }; }
-  /** Serializable consequence hook reserved for the future Axiom registry. */
-  function applyRebirthConsequences(_trueSelf, _request) { return {}; }
-  function commitRebirth(game, request) {
-      const eligibility = evaluateRebirthEligibility(game, request);
+  function registerRebirthAuthorization(game, effectId, record) {
+      if (record.state !== 'entered')
+          throw new Error('[rebirth] authorization requires entered ReincarnationRecord');
       const state = rt(game);
+      const serial = state.rebirthAuthorizationSerial = (state.rebirthAuthorizationSerial ?? 0) + 1;
+      const token = { tokenId: `rebirth-auth-${serial}`, effectId, deathId: record.deathId, trueSelfId: record.trueSelfId, incarnationSerial: record.incarnationSerial, lifeSerial: record.deadLifeSerial, consumed: false };
+      (state.rebirthAuthorizations ??= {})[token.tokenId] = token;
+      return token;
+  }
+  function evaluateRebirthEligibility(game, request) {
+      const state = rt(game);
+      if (state.battleEnd?.ended)
+          return { allowed: false, reason: 'battle-ended' };
       const record = state.reincarnationByDeathId?.[request.deathId];
+      if (!record || record.state !== 'entered')
+          return { allowed: false, reason: 'not-entered' };
+      if (record.trueSelfId !== request.trueSelfId)
+          return { allowed: false, reason: 'identity-mismatch' };
+      const auth = state.rebirthAuthorizations?.[request.authorizationTokenId];
+      if (!auth || auth.consumed || auth.deathId !== record.deathId || auth.trueSelfId !== record.trueSelfId || auth.incarnationSerial !== record.incarnationSerial || auth.lifeSerial !== record.deadLifeSerial)
+          return { allowed: false, reason: 'missing-authority' };
+      const { cx, cy, side } = request.spawn;
+      if ((side !== 'ally' && side !== 'enemy') || !Number.isInteger(cx) || !Number.isInteger(cy) || cx < 0 || cx >= 3 || cy < 0 || cy >= 3)
+          return { allowed: false, reason: 'invalid-spawn' };
+      if (game.tokens.some(token => token.side === side && token.cx === cx && token.cy === cy && token.lifeState !== 'removed' && token.lifeState !== 'erased'))
+          return { allowed: false, reason: 'invalid-spawn' };
+      const queued = game.queued?.[side];
+      if (queued && [...queued.values()].some(item => item.cx === cx && item.cy === cy))
+          return { allowed: false, reason: 'invalid-spawn' };
+      return { allowed: true, reason: 'allowed' };
+  }
+  function applyRebirthConsequences() { return {}; }
+  function commitRebirth(game, request) {
+      const eligibility = evaluateRebirthEligibility(game, request), state = rt(game), record = state.reincarnationByDeathId?.[request.deathId], self = ensureTrueSelfCombatRecord(game, request.trueSelfId);
       if (!eligibility.allowed || !record)
-          return { committed: false, reason: eligibility.reason, trueSelfId: request.trueSelfId, oldIid: record?.targetIid ?? null, newIid: null, incarnationSerial: state.trueSelfRecords?.[request.trueSelfId]?.incarnationSerial ?? 1 };
-      const self = (state.trueSelfRecords ??= {})[request.trueSelfId] ??= { confirmedKills: 0, incarnationSerial: 1, deathHistory: [], rebirthHistory: [] };
-      self.incarnationSerial += 1;
-      if (!self.deathHistory.includes(record.deathId))
-          self.deathHistory.push(record.deathId);
-      applyRebirthConsequences(self, request);
+          return { committed: false, reason: eligibility.reason, trueSelfId: request.trueSelfId, oldIid: record?.targetIid ?? null, newIid: null, incarnationSerial: self.incarnationSerial };
+      const auth = state.rebirthAuthorizations[request.authorizationTokenId];
+      auth.consumed = true;
       const old = game.tokens.find(token => (token.iid ?? token.id) === record.targetIid);
       if (old)
-          old.retiredByRebirth = true;
-      const keep = new Set(request.policies.preserveStatusIds ?? []);
-      const unit = { ...request.template, iid: request.newIid, trueSelfId: request.trueSelfId, lifeSerial: 1, incarnationSerial: self.incarnationSerial, side: request.spawn.side, cx: request.spawn.cx, cy: request.spawn.cy, lifeState: 'alive', alive: true, rage: request.policies.rage, statuses: (request.template.statuses ?? []).filter(status => keep.has(String(status.id))) };
+          commitNonDeathRemoval(game, old, 'REBIRTH_RETIRED', 'rebirth');
+      self.incarnationSerial = Math.max(self.incarnationSerial, record.incarnationSerial) + 1;
+      if (!self.deathHistory.includes(record.deathId))
+          self.deathHistory.push(record.deathId);
+      const newIid = nextCombatIid(game), keep = new Set(request.policies.preserveStatusIds ?? []);
+      const unit = ensureCombatIdentity({ ...request.template, iid: newIid, trueSelfId: request.trueSelfId, incarnationSerial: self.incarnationSerial, lifeSerial: 1, side: request.spawn.side, cx: request.spawn.cx, cy: request.spawn.cy, lifeState: 'alive', alive: true, rage: request.policies.rage, statuses: (request.template.statuses ?? []).filter(status => keep.has(String(status.id))) }, 'collection-unit');
       unit.hp = request.policies.hp === 'full' ? Math.max(1, Number(unit.hpMax ?? 1)) : Math.max(1, Math.min(Number(unit.hpMax ?? 1), request.policies.hp));
       game.tokens.push(unit);
       record.state = 'reborn';
       const eventSerial = nextEventSerial(game);
-      self.rebirthHistory.push({ deathId: record.deathId, oldIid: record.targetIid, newIid: request.newIid, eventSerial });
-      (state.combatEvents ??= []).push({ type: 'REBIRTH_COMMITTED', eventSerial, deathId: record.deathId, trueSelfId: request.trueSelfId, oldIid: record.targetIid, newIid: request.newIid, lifeSerial: 1, incarnationSerial: self.incarnationSerial });
-      return { committed: true, reason: 'allowed', trueSelfId: request.trueSelfId, oldIid: record.targetIid, newIid: request.newIid, incarnationSerial: self.incarnationSerial };
+      self.rebirthHistory.push({ deathId: record.deathId, oldIid: record.targetIid, newIid, eventSerial, incarnationSerial: self.incarnationSerial });
+      (state.combatEvents ??= []).push({ type: 'REBIRTH_COMMITTED', eventSerial, deathId: record.deathId, trueSelfId: request.trueSelfId, oldIid: record.targetIid, newIid, lifeSerial: 1, incarnationSerial: self.incarnationSerial, authorizationTokenId: auth.tokenId });
+      return { committed: true, reason: 'allowed', trueSelfId: request.trueSelfId, oldIid: record.targetIid, newIid, incarnationSerial: self.incarnationSerial };
+  }
+  function commitRebirthEffect(game, deathId, effectId, spawn, template, policies) {
+      const record = rt(game).reincarnationByDeathId?.[deathId];
+      if (!record)
+          return { committed: false, reason: 'not-entered', trueSelfId: '', oldIid: null, newIid: null, incarnationSerial: 1 };
+      const authorization = registerRebirthAuthorization(game, effectId, record);
+      return commitRebirth(game, { deathId, trueSelfId: record.trueSelfId, authorizationTokenId: authorization.tokenId, spawn, template, policies });
   }
   //# sourceMappingURL=rebirth.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'registerRebirthAuthorization')) exports.registerRebirthAuthorization = registerRebirthAuthorization;
   if (!Object.prototype.hasOwnProperty.call(exports, 'evaluateRebirthEligibility')) exports.evaluateRebirthEligibility = evaluateRebirthEligibility;
   if (!Object.prototype.hasOwnProperty.call(exports, 'applyRebirthConsequences')) exports.applyRebirthConsequences = applyRebirthConsequences;
   if (!Object.prototype.hasOwnProperty.call(exports, 'commitRebirth')) exports.commitRebirth = commitRebirth;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'commitRebirthEffect')) exports.commitRebirthEffect = commitRebirthEffect;
 };
 __modules['./combat/kernel/reincarnation.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./combat/kernel/sequence.ts');
   const nextEventSerial = __dep0.nextEventSerial;
+  const __dep1 = __require('./combat/kernel/true-self.ts');
+  const ensureTrueSelfCombatRecord = __dep1.ensureTrueSelfCombatRecord;
+  const lifeIdentityKey = __dep1.lifeIdentityKey;
   const runtime = (game) => (game.runtime ??= {});
-  const reincarnationLifeKey = (trueSelfId, lifeSerial) => `${trueSelfId}:${lifeSerial}`;
+  const reincarnationLifeKey = lifeIdentityKey;
   const emit = (game, record, type, ordinal) => {
       const eventSerial = nextEventSerial(game);
-      (runtime(game).combatEvents ??= []).push({ type, eventSerial, deathId: record.deathId, trueSelfId: record.trueSelfId, lifeSerial: record.deadLifeSerial, ordinal, actionId: record.sourceActionId, chainId: record.sourceChainId });
+      (runtime(game).combatEvents ??= []).push({ type, eventSerial, deathId: record.deathId, trueSelfId: record.trueSelfId, incarnationSerial: record.incarnationSerial, lifeSerial: record.deadLifeSerial, ordinal, actionId: record.sourceActionId, chainId: record.sourceChainId });
       return eventSerial;
   };
   /** Sole observer allowed to advance death-order reincarnation state. */
@@ -7184,11 +7287,14 @@ __modules['./combat/kernel/reincarnation.ts'] = (exports, module, __require) => 
       for (const death of records) {
           if (!death.countsForReincarnation || !death.trueSelfId)
               continue;
+          if (byDeath[death.deathId] || history.some(item => item.deathId === death.deathId))
+              continue;
           const ordinal = rt.qualifyingDeathOrdinal = (rt.qualifyingDeathOrdinal ?? 0) + 1;
-          history.push({ deathId: death.deathId, ordinal, trueSelfId: death.trueSelfId, lifeSerial: death.lifeSerial });
-          const record = { reincarnationId: `reincarnation-${death.deathId}`, deathId: death.deathId, targetIid: death.targetIid, trueSelfId: death.trueSelfId, deadLifeSerial: death.lifeSerial, deathOrdinal: ordinal, thresholdOrdinal: ordinal + threshold, enteredAtDeathOrdinal: null, enteredAtEventSerial: null, sourceActionId: death.actionId, sourceChainId: death.chainId, entityKind: death.entityKind, state: 'waiting', authority: { kind: 'reincarnation', thresholdSubsequentDeaths: threshold } };
+          history.push({ deathId: death.deathId, ordinal, trueSelfId: death.trueSelfId, incarnationSerial: death.incarnationSerial, lifeSerial: death.lifeSerial });
+          const record = { reincarnationId: `reincarnation-${death.deathId}`, deathId: death.deathId, targetIid: death.targetIid, trueSelfId: death.trueSelfId, incarnationSerial: death.incarnationSerial, deadLifeSerial: death.lifeSerial, deathOrdinal: ordinal, thresholdOrdinal: ordinal + threshold, enteredAtDeathOrdinal: null, enteredAtEventSerial: null, sourceActionId: death.actionId, sourceChainId: death.chainId, entityKind: death.entityKind, state: 'waiting', authority: { kind: 'reincarnation', thresholdSubsequentDeaths: threshold } };
           byDeath[death.deathId] = record;
-          byLife[reincarnationLifeKey(death.trueSelfId, death.lifeSerial)] = record;
+          byLife[reincarnationLifeKey(death.trueSelfId, death.incarnationSerial, death.lifeSerial)] = record;
+          ensureTrueSelfCombatRecord(game, death.trueSelfId).reincarnationHistory.push({ deathId: death.deathId, incarnationSerial: death.incarnationSerial, lifeSerial: death.lifeSerial, ordinal });
           emit(game, record, 'QUALIFYING_DEATH_RECORDED', ordinal);
           emit(game, record, 'REINCARNATION_WAITING', ordinal);
       }
@@ -7199,7 +7305,7 @@ __modules['./combat/kernel/reincarnation.ts'] = (exports, module, __require) => 
           record.state = 'entered';
           record.enteredAtDeathOrdinal = ordinal;
           record.enteredAtEventSerial = emit(game, record, 'REINCARNATION_ENTERED', ordinal);
-          const key = reincarnationLifeKey(record.trueSelfId, record.deadLifeSerial);
+          const key = reincarnationLifeKey(record.trueSelfId, record.incarnationSerial, record.deadLifeSerial);
           const entered = rt.enteredReincarnationLifeKeys ??= [];
           if (!entered.includes(key))
               entered.push(key);
@@ -7244,12 +7350,18 @@ __modules['./combat/kernel/sequence.ts'] = (exports, module, __require) => {
   }
   function nextEventSerial(game) { return ++getCombatSequence(game).eventSerial; }
   function nextDeathSerial(game) { return ++getCombatSequence(game).deathSerial; }
+  function nextCombatIid(game) {
+      const sequence = getCombatSequence(game);
+      sequence.instanceSerial ??= game.tokens.reduce((max, token) => typeof token.iid === 'number' && Number.isInteger(token.iid) ? Math.max(max, token.iid) : max, 0);
+      return ++sequence.instanceSerial;
+  }
   //# sourceMappingURL=sequence.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCombatSequence')) exports.getCombatSequence = getCombatSequence;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createNaturalAction')) exports.createNaturalAction = createNaturalAction;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createLinkedAction')) exports.createLinkedAction = createLinkedAction;
   if (!Object.prototype.hasOwnProperty.call(exports, 'nextEventSerial')) exports.nextEventSerial = nextEventSerial;
   if (!Object.prototype.hasOwnProperty.call(exports, 'nextDeathSerial')) exports.nextDeathSerial = nextDeathSerial;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'nextCombatIid')) exports.nextCombatIid = nextCombatIid;
 };
 __modules['./combat/kernel/source-attribution.ts'] = (exports, module, __require) => {
   const iidOf = (value) => {
@@ -7263,13 +7375,17 @@ __modules['./combat/kernel/source-attribution.ts'] = (exports, module, __require
       return value?.id ?? value?.iid ?? null;
   };
   function resolveSourceAttribution(input) {
+      const sourceIid = iidOf(input.immediateSource);
       return {
-          immediateSourceIid: iidOf(input.immediateSource),
+          immediateSourceIid: sourceIid,
+          sourceIid,
           controllerIid: iidOf(input.controller),
           // Credit is opt-in: controller/definition ids are not stable true-self identity.
           creditTrueSelfId: idOf(input.trueSelf),
           ownerIid: iidOf(input.owner),
           environmentSourceId: idOf(input.environment),
+          originActionId: input.originActionId ?? null,
+          sourceSide: input.sourceSide ?? null,
       };
   }
   /** Old statuses stored only a definition id. Keep it readable and warn in development. */
@@ -7304,6 +7420,33 @@ __modules['./combat/kernel/trigger-ledger.ts'] = (exports, module, __require) =>
   if (!Object.prototype.hasOwnProperty.call(exports, 'createTriggerLedger')) exports.createTriggerLedger = createTriggerLedger;
   if (!Object.prototype.hasOwnProperty.call(exports, 'canTrigger')) exports.canTrigger = canTrigger;
   if (!Object.prototype.hasOwnProperty.call(exports, 'markTriggered')) exports.markTriggered = markTriggered;
+};
+__modules['./combat/kernel/true-self.ts'] = (exports, module, __require) => {
+  const positiveInteger = (value, fallback) => Number.isInteger(value) && Number(value) >= 1 ? Number(value) : fallback;
+  const nonNegativeInteger = (value) => Number.isInteger(value) && Number(value) >= 0 ? Number(value) : 0;
+  const history = (value) => Array.isArray(value) ? value.filter(item => item != null && typeof item === 'object') : [];
+  /** The only migration/initialization boundary for persistent true-self combat state. */
+  function ensureTrueSelfCombatRecord(game, trueSelfId) {
+      if (!trueSelfId)
+          throw new Error('[combat-identity] trueSelfId is required');
+      const records = ((game.runtime ??= {}).trueSelfRecords ??= {});
+      const old = records[trueSelfId] ?? {};
+      const record = {
+          trueSelfId,
+          confirmedKills: nonNegativeInteger(old.confirmedKills),
+          incarnationSerial: positiveInteger(old.incarnationSerial, 1),
+          deathHistory: Array.isArray(old.deathHistory) ? old.deathHistory.filter(item => typeof item === 'string') : [],
+          reviveHistory: history(old.reviveHistory),
+          reincarnationHistory: history(old.reincarnationHistory),
+          rebirthHistory: history(old.rebirthHistory),
+      };
+      records[trueSelfId] = record;
+      return record;
+  }
+  const lifeIdentityKey = (trueSelfId, incarnationSerial, lifeSerial) => `${trueSelfId}:${incarnationSerial}:${lifeSerial}`;
+  //# sourceMappingURL=true-self.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'lifeIdentityKey')) exports.lifeIdentityKey = lifeIdentityKey;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'ensureTrueSelfCombatRecord')) exports.ensureTrueSelfCombatRecord = ensureTrueSelfCombatRecord;
 };
 __modules['./combat/kernel/types.ts'] = (exports, module, __require) => {
   function normalizeDamageType(type) {
@@ -9450,6 +9593,7 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
   const __dep5 = __require('./combat/kernel/index.ts');
   const createNaturalAction = __dep5.createNaturalAction;
   const currentActionExecution = __dep5.currentActionExecution;
+  const queueDelayedReviveEffect = __dep5.queueDelayedReviveEffect;
   const withActionExecution = __dep5.withActionExecution;
   const __dep6 = __require('./utils/rng.ts');
   const nextRngValue = __dep6.nextRngValue;
@@ -10044,6 +10188,18 @@ __modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
               return;
           ctx.onSummon();
           result.sideEffects.push('summon');
+      },
+      'delayed-revive': (ctx, result) => {
+          if (ctx.deferEffects)
+              return;
+          if (!ctx.game || !ctx.attacker)
+              throw new Error('[delayed-revive] gameplay effect requires game and actor');
+          const death = ctx.payload?.deathRecord;
+          const spec = ctx.payload?.delayedRevive;
+          if (!death || !spec)
+              throw new Error('[delayed-revive] explicit deathRecord and delayedRevive spec are required');
+          const entry = queueDelayedReviveEffect(ctx.game, ctx.attacker, death, spec);
+          result.sideEffects.push(`delayed-revive:${entry.queueId}`);
       },
       'non-heal-hp-change': (ctx, result) => {
           if (ctx.deferEffects)
@@ -44566,7 +44722,7 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       const source = resolved.liveSource ?? { iid: resolved.attribution.immediateSourceIid ?? `status:${String(status.statusInstanceId ?? status.id)}`, trueSelfId: resolved.attribution.creditTrueSelfId, side: status.sourceSide ?? (unit.side === 'ally' ? 'enemy' : 'ally'), cx: -1, cy: -1, alive: false, lifeState: 'removed', atk: Number(status.snapshotAtk ?? 0), wil: Number(status.snapshotWil ?? 0), statuses: [] };
       const identity = createNaturalAction(game, 'dot-tick');
       status.tickSerial = Math.max(0, Number(status.tickSerial ?? 0)) + 1;
-      withActionExecution(game, identity, () => dealAbilityDamage(game, source, unit, { base: lost, dtype: status.damageType === 'true' ? 'true' : status.damageType === 'will' ? 'arcane' : 'physical', attackType: 'dot', skillMul: 1 }), { originActionId: typeof status.originActionId === 'string' || typeof status.originActionId === 'number' ? status.originActionId : null });
+      withActionExecution(game, identity, () => dealAbilityDamage(game, source, unit, { base: lost, dtype: status.damageType === 'true' ? 'true' : status.damageType === 'will' ? 'arcane' : 'physical', attackType: 'dot', skillMul: 1, sourceAttribution: resolved.attribution }), { originActionId: typeof status.originActionId === 'string' || typeof status.originActionId === 'number' ? status.originActionId : null });
       logStatusTick(ctx, id, unit, lost);
       decrementDuration(unit, status);
   }
@@ -44574,7 +44730,7 @@ __modules['./statuses.ts'] = (exports, module, __require) => {
       const sourceIid = typeof status.sourceIid === 'string' || typeof status.sourceIid === 'number' ? status.sourceIid : null;
       const live = sourceIid == null ? null : game.tokens.find(token => (token.iid ?? token.id) === sourceIid) ?? null;
       const dynamic = status.snapshotPolicy === 'dynamic';
-      return { attribution: resolveSourceAttribution({ immediateSource: sourceIid, controller: status.controllerIid, owner: status.ownerIid, trueSelf: status.creditTrueSelfId }), liveSource: dynamic ? live : null };
+      return { attribution: resolveSourceAttribution({ immediateSource: sourceIid, controller: status.controllerIid, owner: status.ownerIid, trueSelf: status.creditTrueSelfId, originActionId: status.originActionId, sourceSide: status.sourceSide === 'ally' || status.sourceSide === 'enemy' ? status.sourceSide : null }), liveSource: dynamic ? live : null };
   }
   const createTimedStatus = (id, kind, tag, turns) => ({
       id,
@@ -46110,8 +46266,6 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               processedChain: null
           };
           const temporalBase = { actorSide: active.side, actorIid: active.iid ?? active.id, slot: entry.slot, cursorSnapshot: { ally: Number(interleavedTurn.lastPos.ALLY ?? 0), enemy: Number(interleavedTurn.lastPos.ENEMY ?? 0) }, sidePassSerial: Number(Game.runtime?.ssiSidePassSerial ?? 0), globalCycleSerial: Number(interleavedTurn.cycle ?? 0), actionId: null };
-          emitSsiTemporalEvent(Game, { type: 'TARGET_SIDE_OPPORTUNITY', ...temporalBase, targetSide: active.side });
-          emitSsiTemporalEvent(Game, { type: 'NATURAL_ACTION_STARTED', ...temporalBase });
           if (selection.wrapped) {
               const runtime = (Game.runtime ??= {});
               runtime.ssiSidePassSerial = Number(runtime.ssiSidePassSerial ?? 0) + 1;
@@ -46123,6 +46277,8 @@ __modules['./turns.ts'] = (exports, module, __require) => {
                   emitSsiTemporalEvent(Game, { type: 'SSI_CYCLE_COMPLETED', ...temporalBase, actorSide: null, globalCycleSerial: cycleNow });
               }
           }
+          emitSsiTemporalEvent(Game, { type: 'TARGET_SIDE_OPPORTUNITY', ...temporalBase, targetSide: active.side });
+          emitSsiTemporalEvent(Game, { type: 'NATURAL_ACTION_STARTED', ...temporalBase });
           const ended = runTurnAndCheckEnd(Game, hooks, entry, active, turnContext, turnDetail, 'interleaved');
           if (!ended && Game.turn) {
               const actionDelayRaw = Number(CFG?.ANIMATION?.interleavedActionDelayMs);

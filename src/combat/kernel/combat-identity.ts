@@ -9,6 +9,7 @@ export function ensureCombatIdentity(unit: UnitToken, kind: CombatIdentityKind):
   if (unit.iid == null) throw new Error(`[combat-identity] ${kind} requires an instance iid`);
   if (OWNS_TRUE_SELF.has(kind)) {
     unit.trueSelfId ??= `true-self:${kind}:${String(unit.iid)}`;
+    unit.incarnationSerial ??= 1;
     unit.lifeSerial ??= 1;
   } else {
     delete unit.trueSelfId; delete unit.lifeSerial;

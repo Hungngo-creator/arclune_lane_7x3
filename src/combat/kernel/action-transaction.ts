@@ -34,7 +34,7 @@ export function executeActionTransaction<T>(command: ActionTransactionCommand<T>
     stage = 'COST_COMMIT'; reservations.forEach(item => item.commit());
     stage = 'PAYLOAD_RESOLVE'; const payload = command.resolvePayload();
     stage = 'ACTION_COMMIT'; command.commitAction?.(payload); publish();
-    endActionExecution(command.game, context); finalizeCombatAction(command.game, context); context = null;
+    finalizeCombatAction(command.game, context); endActionExecution(command.game, context); context = null;
     stage = 'ACTION_END';
     return { ok: true, stage, payload };
   } catch (error) {

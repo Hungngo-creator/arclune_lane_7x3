@@ -1032,14 +1032,14 @@ export function stepTurn(Game: SessionState, hooks: TurnHooks): void {
     };
 
     const temporalBase = { actorSide: active.side, actorIid: active.iid ?? active.id, slot: entry.slot, cursorSnapshot: { ally: Number(interleavedTurn.lastPos.ALLY ?? 0), enemy: Number(interleavedTurn.lastPos.ENEMY ?? 0) }, sidePassSerial: Number((Game.runtime as any)?.ssiSidePassSerial ?? 0), globalCycleSerial: Number(interleavedTurn.cycle ?? 0), actionId: null };
-    emitSsiTemporalEvent(Game, { type: 'TARGET_SIDE_OPPORTUNITY', ...temporalBase, targetSide: active.side });
-    emitSsiTemporalEvent(Game, { type: 'NATURAL_ACTION_STARTED', ...temporalBase });
     if (selection.wrapped) {
       const runtime = (Game.runtime ??= {}) as any; runtime.ssiSidePassSerial = Number(runtime.ssiSidePassSerial ?? 0) + 1;
       emitSsiTemporalEvent(Game, { type: 'SIDE_PASS_COMPLETED', ...temporalBase, actorSide: entry.side, sidePassSerial: runtime.ssiSidePassSerial });
       const priorCycle = Number(runtime.lastEmittedSsiCycle ?? 0); const cycleNow = Number(interleavedTurn.cycle ?? 0);
       if (cycleNow > priorCycle) { runtime.lastEmittedSsiCycle = cycleNow; emitSsiTemporalEvent(Game, { type: 'SSI_CYCLE_COMPLETED', ...temporalBase, actorSide: null, globalCycleSerial: cycleNow }); }
     }
+    emitSsiTemporalEvent(Game, { type: 'TARGET_SIDE_OPPORTUNITY', ...temporalBase, targetSide: active.side });
+    emitSsiTemporalEvent(Game, { type: 'NATURAL_ACTION_STARTED', ...temporalBase });
 
   const ended = runTurnAndCheckEnd(
       Game,

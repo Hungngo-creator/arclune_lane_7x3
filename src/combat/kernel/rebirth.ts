@@ -1,19 +1,54 @@
 import type { SessionState } from '@shared-types/combat';
 import type { Side, UnitToken } from '../../types/units.ts';
-import { nextEventSerial } from './sequence.ts';
+import { nextCombatIid, nextEventSerial } from './sequence.ts';
 import type { ReincarnationRecord } from './reincarnation.ts';
+import { ensureTrueSelfCombatRecord } from './true-self.ts';
+import { ensureCombatIdentity } from './combat-identity.ts';
+import { commitNonDeathRemoval } from './non-death-removal.ts';
 
-export interface RebirthRequest { deathId: string; trueSelfId: string; newIid: string | number; authority: 'rebirth'; effectAllowsRebirth: boolean; spawn: { side: Side; cx: number; cy: number }; template: UnitToken; policies: { hp: number | 'full'; rage: number; preserveStatusIds?: readonly string[] } }
+export interface RebirthAuthorization { tokenId: string; effectId: string; deathId: string; trueSelfId: string; incarnationSerial: number; lifeSerial: number; consumed: boolean }
+export interface RebirthRequest { deathId: string; trueSelfId: string; authorizationTokenId: string; spawn: { side: Side; cx: number; cy: number }; template: UnitToken; policies: { hp: number | 'full'; rage: number; preserveStatusIds?: readonly string[] } }
 export interface RebirthEligibility { allowed: boolean; reason: 'allowed' | 'battle-ended' | 'not-entered' | 'identity-mismatch' | 'missing-authority' | 'effect-blocked' | 'invalid-spawn' | 'iid-conflict' }
 export interface RebirthResult { committed: boolean; reason: RebirthEligibility['reason']; trueSelfId: string; oldIid: string | number | null; newIid: string | number | null; incarnationSerial: number }
-type TrueSelfRecord = { confirmedKills: number; incarnationSerial: number; deathHistory: string[]; rebirthHistory: Array<{ deathId: string; oldIid: string | number; newIid: string | number; eventSerial: number }> };
-type Runtime = { battleEnd?: { ended?: boolean }; reincarnationByDeathId?: Record<string, ReincarnationRecord>; trueSelfRecords?: Record<string, TrueSelfRecord>; combatEvents?: Record<string, unknown>[] };
+type Runtime = { battleEnd?: { ended?: boolean }; reincarnationByDeathId?: Record<string, ReincarnationRecord>; rebirthAuthorizations?: Record<string, RebirthAuthorization>; rebirthAuthorizationSerial?: number; combatEvents?: Record<string, unknown>[] };
 const rt=(game:SessionState):Runtime=>(game.runtime??={}) as Runtime;
-export function evaluateRebirthEligibility(game:SessionState,request:RebirthRequest):RebirthEligibility { const state=rt(game); if(state.battleEnd?.ended)return{allowed:false,reason:'battle-ended'}; const record=state.reincarnationByDeathId?.[request.deathId]; if(!record||record.state!=='entered')return{allowed:false,reason:'not-entered'}; if(record.trueSelfId!==request.trueSelfId)return{allowed:false,reason:'identity-mismatch'}; if(request.authority!=='rebirth')return{allowed:false,reason:'missing-authority'}; if(!request.effectAllowsRebirth)return{allowed:false,reason:'effect-blocked'}; if(!Number.isInteger(request.spawn.cx)||!Number.isInteger(request.spawn.cy)||request.spawn.cx<0||request.spawn.cy<0)return{allowed:false,reason:'invalid-spawn'}; if(game.tokens.some(token=>(token.iid??token.id)===request.newIid))return{allowed:false,reason:'iid-conflict'}; return{allowed:true,reason:'allowed'}; }
-/** Serializable consequence hook reserved for the future Axiom registry. */
-export function applyRebirthConsequences(_trueSelf:TrueSelfRecord,_request:RebirthRequest):Record<string,never>{return {};}
-export function commitRebirth(game:SessionState,request:RebirthRequest):RebirthResult { const eligibility=evaluateRebirthEligibility(game,request); const state=rt(game); const record=state.reincarnationByDeathId?.[request.deathId]; if(!eligibility.allowed||!record)return{committed:false,reason:eligibility.reason,trueSelfId:request.trueSelfId,oldIid:record?.targetIid??null,newIid:null,incarnationSerial:state.trueSelfRecords?.[request.trueSelfId]?.incarnationSerial??1};
-  const self=(state.trueSelfRecords??={})[request.trueSelfId]??={confirmedKills:0,incarnationSerial:1,deathHistory:[],rebirthHistory:[]}; self.incarnationSerial+=1; if(!self.deathHistory.includes(record.deathId))self.deathHistory.push(record.deathId); applyRebirthConsequences(self,request);
-  const old=game.tokens.find(token=>(token.iid??token.id)===record.targetIid); if(old)(old as UnitToken&{retiredByRebirth?:boolean}).retiredByRebirth=true;
-  const keep=new Set(request.policies.preserveStatusIds??[]); const unit={...request.template,iid:request.newIid,trueSelfId:request.trueSelfId,lifeSerial:1,incarnationSerial:self.incarnationSerial,side:request.spawn.side,cx:request.spawn.cx,cy:request.spawn.cy,lifeState:'alive',alive:true,rage:request.policies.rage,statuses:(request.template.statuses??[]).filter(status=>keep.has(String(status.id)))} as UnitToken; unit.hp=request.policies.hp==='full'?Math.max(1,Number(unit.hpMax??1)):Math.max(1,Math.min(Number(unit.hpMax??1),request.policies.hp)); game.tokens.push(unit); record.state='reborn'; const eventSerial=nextEventSerial(game); self.rebirthHistory.push({deathId:record.deathId,oldIid:record.targetIid,newIid:request.newIid,eventSerial}); (state.combatEvents??=[]).push({type:'REBIRTH_COMMITTED',eventSerial,deathId:record.deathId,trueSelfId:request.trueSelfId,oldIid:record.targetIid,newIid:request.newIid,lifeSerial:1,incarnationSerial:self.incarnationSerial}); return{committed:true,reason:'allowed',trueSelfId:request.trueSelfId,oldIid:record.targetIid,newIid:request.newIid,incarnationSerial:self.incarnationSerial}; }
 
+export function registerRebirthAuthorization(game: SessionState, effectId: string, record: ReincarnationRecord): RebirthAuthorization {
+  if (record.state !== 'entered') throw new Error('[rebirth] authorization requires entered ReincarnationRecord');
+  const state=rt(game); const serial=state.rebirthAuthorizationSerial=(state.rebirthAuthorizationSerial??0)+1;
+  const token={tokenId:`rebirth-auth-${serial}`,effectId,deathId:record.deathId,trueSelfId:record.trueSelfId,incarnationSerial:record.incarnationSerial,lifeSerial:record.deadLifeSerial,consumed:false};
+  (state.rebirthAuthorizations??={})[token.tokenId]=token; return token;
+}
+export function evaluateRebirthEligibility(game:SessionState,request:RebirthRequest):RebirthEligibility {
+  const state=rt(game); if(state.battleEnd?.ended)return{allowed:false,reason:'battle-ended'};
+  const record=state.reincarnationByDeathId?.[request.deathId]; if(!record||record.state!=='entered')return{allowed:false,reason:'not-entered'};
+  if(record.trueSelfId!==request.trueSelfId)return{allowed:false,reason:'identity-mismatch'};
+  const auth=state.rebirthAuthorizations?.[request.authorizationTokenId];
+  if(!auth||auth.consumed||auth.deathId!==record.deathId||auth.trueSelfId!==record.trueSelfId||auth.incarnationSerial!==record.incarnationSerial||auth.lifeSerial!==record.deadLifeSerial)return{allowed:false,reason:'missing-authority'};
+  const {cx,cy,side}=request.spawn; if((side!=='ally'&&side!=='enemy')||!Number.isInteger(cx)||!Number.isInteger(cy)||cx<0||cx>=3||cy<0||cy>=3)return{allowed:false,reason:'invalid-spawn'};
+  if(game.tokens.some(token=>token.side===side&&token.cx===cx&&token.cy===cy&&token.lifeState!=='removed'&&token.lifeState!=='erased'))return{allowed:false,reason:'invalid-spawn'};
+  const queued=(game as SessionState & {queued?:Record<string,Map<number,{cx:number;cy:number}>>}).queued?.[side];
+  if(queued&&[...queued.values()].some(item=>item.cx===cx&&item.cy===cy))return{allowed:false,reason:'invalid-spawn'};
+  return{allowed:true,reason:'allowed'};
+}
+export function applyRebirthConsequences():Record<string,never>{return {};}
+export function commitRebirth(game:SessionState,request:RebirthRequest):RebirthResult {
+  const eligibility=evaluateRebirthEligibility(game,request), state=rt(game), record=state.reincarnationByDeathId?.[request.deathId], self=ensureTrueSelfCombatRecord(game,request.trueSelfId);
+  if(!eligibility.allowed||!record)return{committed:false,reason:eligibility.reason,trueSelfId:request.trueSelfId,oldIid:record?.targetIid??null,newIid:null,incarnationSerial:self.incarnationSerial};
+  const auth=state.rebirthAuthorizations![request.authorizationTokenId]!; auth.consumed=true;
+  const old=game.tokens.find(token=>(token.iid??token.id)===record.targetIid); if(old)commitNonDeathRemoval(game,old,'REBIRTH_RETIRED','rebirth');
+  self.incarnationSerial=Math.max(self.incarnationSerial,record.incarnationSerial)+1; if(!self.deathHistory.includes(record.deathId))self.deathHistory.push(record.deathId);
+  const newIid=nextCombatIid(game), keep=new Set(request.policies.preserveStatusIds??[]);
+  const unit=ensureCombatIdentity({...request.template,iid:newIid,trueSelfId:request.trueSelfId,incarnationSerial:self.incarnationSerial,lifeSerial:1,side:request.spawn.side,cx:request.spawn.cx,cy:request.spawn.cy,lifeState:'alive',alive:true,rage:request.policies.rage,statuses:(request.template.statuses??[]).filter(status=>keep.has(String(status.id)))} as UnitToken,'collection-unit');
+  unit.hp=request.policies.hp==='full'?Math.max(1,Number(unit.hpMax??1)):Math.max(1,Math.min(Number(unit.hpMax??1),request.policies.hp)); game.tokens.push(unit); record.state='reborn';
+  const eventSerial=nextEventSerial(game); self.rebirthHistory.push({deathId:record.deathId,oldIid:record.targetIid,newIid,eventSerial,incarnationSerial:self.incarnationSerial});
+  (state.combatEvents??=[]).push({type:'REBIRTH_COMMITTED',eventSerial,deathId:record.deathId,trueSelfId:request.trueSelfId,oldIid:record.targetIid,newIid,lifeSerial:1,incarnationSerial:self.incarnationSerial,authorizationTokenId:auth.tokenId});
+  return{committed:true,reason:'allowed',trueSelfId:request.trueSelfId,oldIid:record.targetIid,newIid,incarnationSerial:self.incarnationSerial};
+}
+
+export function commitRebirthEffect(game: SessionState, deathId: string, effectId: string, spawn: RebirthRequest['spawn'], template: UnitToken, policies: RebirthRequest['policies']): RebirthResult {
+  const record=rt(game).reincarnationByDeathId?.[deathId];
+  if(!record)return{committed:false,reason:'not-entered',trueSelfId:'',oldIid:null,newIid:null,incarnationSerial:1};
+  const authorization=registerRebirthAuthorization(game,effectId,record);
+  return commitRebirth(game,{deathId,trueSelfId:record.trueSelfId,authorizationTokenId:authorization.tokenId,spawn,template,policies});
+}

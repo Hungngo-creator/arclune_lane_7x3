@@ -8,6 +8,8 @@ export interface SourceAttributionInput {
   owner?: AttributionEntity | CombatId | null;
   trueSelf?: AttributionEntity | CombatId | null;
   environment?: AttributionEntity | CombatId | null;
+  originActionId?: CombatId | null;
+  sourceSide?: 'ally' | 'enemy' | null;
 }
 
 const iidOf = (value: AttributionEntity | CombatId | null | undefined): CombatId | null => {
@@ -20,13 +22,17 @@ const idOf = (value: AttributionEntity | CombatId | null | undefined): CombatId 
 };
 
 export function resolveSourceAttribution(input: SourceAttributionInput): SourceAttribution {
+  const sourceIid=iidOf(input.immediateSource);
   return {
-    immediateSourceIid: iidOf(input.immediateSource),
+    immediateSourceIid: sourceIid,
+    sourceIid,
     controllerIid: iidOf(input.controller),
     // Credit is opt-in: controller/definition ids are not stable true-self identity.
     creditTrueSelfId: idOf(input.trueSelf),
     ownerIid: iidOf(input.owner),
     environmentSourceId: idOf(input.environment),
+    originActionId: input.originActionId ?? null,
+    sourceSide: input.sourceSide ?? null,
   };
 }
 
