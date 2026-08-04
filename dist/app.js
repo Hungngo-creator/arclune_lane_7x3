@@ -5502,6 +5502,9 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'consumeShieldByCurrentRatio')) exports.consumeShieldByCurrentRatio = consumeShieldByCurrentRatio;
 };
 __modules['./combat/axiom-runtime.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat/temporal-contract.ts');
+  const assertStableSnapshotBoundary = __dep0.assertStableSnapshotBoundary;
+  const serializeCombatSnapshot = __dep0.serializeCombatSnapshot;
   const AXIOM_IDS = Object.freeze(['reincarnation', 'heavenly-thunder', 'divine-nature', 'light-shadow-river']);
   const definitions = new Map();
   const commandHandlers = new Map();
@@ -5510,16 +5513,13 @@ __modules['./combat/axiom-runtime.ts'] = (exports, module, __require) => {
   function registerAxiomCommandHandler(type, handler) { if (commandHandlers.has(type))
       throw new Error(`[axiom] duplicate command handler ${type}`); commandHandlers.set(type, handler); }
   function listAxiomDefinitions() { return [...definitions.values()]; }
-  let receiptSerial = 0;
-  for (const type of ['record-death', 'enter-reincarnation', 'finalize-rebirth', 'depart-true-self', 'commit-rebirth', 'record-transgression', 'issue-judgment', 'route-judgment', 'request-lightning-damage', 'submit-protected-claim'])
-      registerAxiomCommandHandler(type, () => Object.freeze({ command: type, committed: true, receiptId: `axiom:${type}:${++receiptSerial}` }));
   class AxiomModuleSet {
       mode;
       stableBoundary;
       readState;
       loaded = new Set();
       active = [];
-      anchors = [];
+      temporal;
       constructor(mode, stableBoundary = () => true, readState = () => undefined) {
           this.mode = mode;
           this.stableBoundary = stableBoundary;
@@ -5528,18 +5528,23 @@ __modules['./combat/axiom-runtime.ts'] = (exports, module, __require) => {
               if (definition.activationPolicy === 'global' && definition.supportedModes.includes(mode))
                   this.load(definition.id);
       }
-      get snapshotCount() { return this.anchors.length; }
+      get snapshotCount() { return this.temporal?.anchors.length ?? 0; }
       load(id, sourceTrueSelfId) { const definition = definitions.get(id); if (!definition || !definition.supportedModes.includes(this.mode))
           throw new Error(`[axiom] unavailable module ${id} in ${this.mode}`); const key = `${id}:${sourceTrueSelfId ?? ''}`; if (this.active.some(item => `${item.definition.id}:${item.sourceTrueSelfId ?? ''}` === key))
           return; if (definition.activationPolicy === 'trait' && !sourceTrueSelfId)
           throw new Error(`[axiom] ${id}: trait activation requires a source True Self`); const submit = (command) => { if (!definition.allowedCommands.includes(command.type))
           throw new Error(`[axiom] ${id}: unauthorized command ${command.type}`); if (command.type === 'create-temporal-anchor') {
-          if (!this.stableBoundary())
+          const boundary = this.stableBoundary();
+          if (boundary === false)
               throw new Error('[axiom] temporal anchor requires a stable boundary');
+          if (boundary !== true)
+              assertStableSnapshotBoundary(boundary);
           const anchorId = command.payload.anchorId;
-          if (!anchorId || this.anchors.some(anchor => anchor.anchorId === anchorId))
-              throw new Error('[axiom] temporal anchor id must be unique');
-          this.anchors.push(Object.freeze({ anchorId, serializedState: JSON.stringify(this.readState('combat-state')) }));
+          const envelope = this.readState('combat-state');
+          if (!anchorId || !envelope?.snapshotId || this.temporal?.anchors.some(item => item.anchor.anchorId === anchorId))
+              throw new Error('[axiom] temporal anchor id must be unique and state must be a canonical snapshot');
+          const anchor = Object.freeze({ anchorId, snapshotId: envelope.snapshotId, branchId: envelope.state.branch.branchId, createdEventSerial: envelope.state.serials.event ?? 0 });
+          (this.temporal ??= { anchors: [] }).anchors.push(Object.freeze({ anchor, serializedState: serializeCombatSnapshot(envelope) }));
           return Object.freeze({ command: command.type, committed: true, receiptId: anchorId });
       } const handler = commandHandlers.get(command.type); if (!handler)
           throw new Error(`[axiom] ${id}: missing handler for ${command.type}`); return handler(command); }; const runtime = definition.createRuntime(Object.freeze({ mode: this.mode, sourceTrueSelfId, read: this.readState, submit })); this.loaded.add(id); this.active.push({ definition, runtime, sourceTrueSelfId }); }
@@ -5693,8 +5698,6 @@ __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) =
   if (!Object.prototype.hasOwnProperty.call(exports, 'calculateFinalDamage')) exports.calculateFinalDamage = calculateFinalDamage;
 };
 __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./catalog.ts');
-  const RANK_MULT = __dep0.RANK_MULT;
   const AUTHORITY_RANK = Object.freeze({ none: 0, doctrine: 1, rule: 2, axiom: 3 });
   const CANONICAL_METADATA_TAGS = Object.freeze([
       'damage:physical', 'damage:will', 'damage:true', 'damage:mixed', 'damage:dot', 'damage:self',
@@ -5713,6 +5716,20 @@ __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
       return raw;
   }
   const EFFECT_TYPES = Object.freeze(['deal-damage', 'heal', 'grant-shield', 'pay-hp-cost', 'sacrifice', 'apply-status', 'remove-status', 'dispel', 'grant-immunity', 'spend-resource', 'gain-resource', 'summon', 'create-field', 'move', 'trigger-follow-up', 'trigger-counter', 'reflect-damage', 'request-death-prevention', 'request-revive', 'queue-delayed-revive', 'enter-reincarnation', 'request-rebirth', 'set-stance', 'set-form']);
+  const authoritativeReceipts = new WeakSet();
+  function createEffectExecutionServices(commits) {
+      const services = {};
+      for (const gateway of Object.keys(commits))
+          services[gateway] = ((effect, context) => {
+              const mutation = commits[gateway](effect, context);
+              if (!Number.isSafeInteger(mutation.eventSerial) || mutation.eventSerial <= 0 || !Number.isSafeInteger(mutation.stateRevision) || mutation.stateRevision <= 0)
+                  throw new Error(`[effect-gateway] ${gateway} did not commit authoritative state`);
+              const receipt = Object.freeze({ effectType: effect.type, committed: true, eventSerial: mutation.eventSerial, stateRevision: mutation.stateRevision });
+              authoritativeReceipts.add(receipt);
+              return receipt;
+          });
+      return Object.freeze(services);
+  }
   const handlers = new Map();
   function registerEffectHandler(handler) { if (handlers.has(handler.type))
       throw new Error(`[effect-registry] duplicate handler: ${handler.type}`); handlers.set(handler.type, handler); }
@@ -5721,34 +5738,61 @@ __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
       const handler = handlers.get(effect.type);
       if (!handler)
           throw new Error(`[effect-registry] ${characterId} at ${catalogPath}: no production handler for ${effect.type}`);
-      return handler.execute(effect, context);
+      const receipt = handler.execute(effect, context);
+      if (!receipt || !authoritativeReceipts.has(receipt) || receipt.committed !== true || receipt.effectType !== effect.type || !Number.isSafeInteger(receipt.eventSerial) || receipt.eventSerial <= 0 || !Number.isSafeInteger(receipt.stateRevision) || receipt.stateRevision <= 0)
+          throw new Error(`[effect-registry] ${effect.type}: gateway did not return an authoritative receipt`);
+      return receipt;
   }
+  const targetKinds = new Set(['self', 'selected-ally', 'selected-enemy', 'leader', 'single', 'multiple', 'all', 'random', 'line', 'column', 'cross', 'explicit-iids']);
+  const targetedSides = new Set(['single', 'multiple', 'all', 'random', 'line', 'column', 'cross']);
+  const amountTypes = new Set(['deal-damage', 'reflect-damage', 'heal', 'grant-shield', 'pay-hp-cost', 'sacrifice']);
   function validateEffectSpec(effect, characterId, catalogPath) {
+      const fail = (message) => { throw new Error(`[catalog] ${characterId} at ${catalogPath}: ${message}`); };
       if (!effect || typeof effect !== 'object' || !EFFECT_TYPES.includes(effect.type))
-          throw new Error(`[catalog] ${characterId} at ${catalogPath}: unknown effect type`);
-      if (!effect.target || typeof effect.target !== 'object' || typeof effect.target.kind !== 'string')
-          throw new Error(`[catalog] ${characterId} at ${catalogPath}: malformed effect target`);
-      if (!effect.payload || typeof effect.payload !== 'object')
-          throw new Error(`[catalog] ${characterId} at ${catalogPath}: malformed effect payload`);
+          fail('unknown effect type');
+      const target = effect.target;
+      if (!target || typeof target !== 'object' || !targetKinds.has(target.kind))
+          fail('malformed effect target');
+      if (targetedSides.has(target.kind) && !['ally', 'enemy'].includes(target.side ?? ''))
+          fail('target side must be ally or enemy');
+      if ((target.kind === 'multiple' || target.kind === 'random') && (!Number.isSafeInteger(target.count) || (target.count ?? 0) <= 0))
+          fail(`${target.kind} target requires a positive count`);
+      if ((target.kind === 'line' || target.kind === 'column' || target.kind === 'cross') && !['string', 'number'].includes(typeof target.anchorIid))
+          fail(`${target.kind} target requires anchorIid`);
+      if (target.kind === 'explicit-iids' && (!Array.isArray(target.iids) || target.iids.length === 0))
+          fail('explicit-iids target requires at least one iid');
+      const payload = effect.payload;
+      if (!payload || typeof payload !== 'object')
+          fail('malformed effect payload');
+      if (amountTypes.has(effect.type) && (typeof payload.amount !== 'number' || !Number.isFinite(payload.amount) || payload.amount < 0))
+          fail('amount must be finite and non-negative');
+      if ((effect.type === 'deal-damage' || effect.type === 'reflect-damage') && !['physical', 'will', 'true'].includes(String(payload.damageType)))
+          fail('invalid damage type');
+      if (['spend-resource', 'gain-resource'].includes(effect.type) && (!['aether', 'fury'].includes(String(payload.resource)) || typeof payload.amount !== 'number' || !Number.isFinite(payload.amount) || payload.amount < 0))
+          fail('invalid resource payload');
+      if (effect.type === 'move' && (![payload.cx, payload.cy].every(Number.isSafeInteger) || Number(payload.cx) < 0 || Number(payload.cy) < 0))
+          fail('invalid board coordinates');
+      if (effect.type === 'dispel' && (!['buff', 'debuff', 'all'].includes(String(payload.polarity)) || (payload.count !== undefined && (!Number.isSafeInteger(payload.count) || Number(payload.count) <= 0))))
+          fail('invalid dispel policy');
+      for (const key of effect.type === 'summon' ? ['definitionId'] : effect.type === 'create-field' ? ['fieldId'] : ['apply-status', 'grant-immunity'].includes(effect.type) ? ['statusType'] : effect.type === 'remove-status' ? ['statusId'] : ['trigger-follow-up', 'trigger-counter'].includes(effect.type) ? ['actionKey'] : ['request-death-prevention', 'request-revive', 'enter-reincarnation', 'request-rebirth'].includes(effect.type) ? ['effectId'] : ['set-stance', 'set-form'].includes(effect.type) ? ['value'] : [])
+          if (typeof payload[key] !== 'string' || !payload[key].trim())
+              fail(`${key} must be a non-empty canonical identifier`);
+      if (effect.type === 'queue-delayed-revive' && (typeof payload.effectId !== 'string' || !['next-natural-turn', 'next-global-cycle', 'after-actions'].includes(String(payload.duePolicy))))
+          fail('invalid delayed-revive policy');
   }
   function registeredEffectHandlerCount() { return handlers.size; }
-  function assertAllEffectHandlersRegistered() {
-      const missing = EFFECT_TYPES.filter(type => !handlers.has(type));
-      if (missing.length)
-          throw new Error(`[effect-registry] missing production handlers: ${missing.join(', ')}`);
-  }
-  const gatewayHandler = (type) => ({ type, execute: (effect, context) => {
-          const receipt = context.commit(effect, context);
-          if (!receipt || receipt.committed !== true || receipt.effectType !== type || !Number.isSafeInteger(receipt.eventSerial) || receipt.eventSerial <= 0)
-              throw new Error(`[effect-registry] ${type}: gateway did not return an authoritative receipt`);
-          return receipt;
-      } });
+  function assertAllEffectHandlersRegistered() { const missing = EFFECT_TYPES.filter(type => !handlers.has(type)); if (missing.length)
+      throw new Error(`[effect-registry] missing production handlers: ${missing.join(', ')}`); }
+  const routes = {
+      'deal-damage': 'damageGateway', 'reflect-damage': 'damageGateway', 'heal': 'healingGateway', 'grant-shield': 'shieldGateway', 'pay-hp-cost': 'hpMutationGateway', 'sacrifice': 'lifecycleGateway', 'apply-status': 'statusGateway', 'remove-status': 'statusGateway', 'dispel': 'statusGateway', 'grant-immunity': 'statusGateway', 'spend-resource': 'resourceGateway', 'gain-resource': 'resourceGateway', 'summon': 'summonGateway', 'create-field': 'fieldGateway', 'move': 'movementGateway', 'trigger-follow-up': 'reactionGateway', 'trigger-counter': 'reactionGateway', 'request-death-prevention': 'lifecycleGateway', 'request-revive': 'lifecycleGateway', 'queue-delayed-revive': 'lifecycleGateway', 'enter-reincarnation': 'lifecycleGateway', 'request-rebirth': 'lifecycleGateway', 'set-stance': 'characterStateGateway', 'set-form': 'characterStateGateway'
+  };
   for (const type of EFFECT_TYPES)
-      registerEffectHandler(gatewayHandler(type));
+      registerEffectHandler({ type, execute: (effect, context) => context.services[routes[type]](effect, context) });
   function directlyConflicts(left, right) { return left.targetLifeKey === right.targetLifeKey && left.conflictDomain === right.conflictDomain && left.operation !== right.operation; }
   const compareText = (left, right) => left < right ? 1 : left > right ? -1 : 0;
+  const RANK_PRIORITY = Object.freeze({ N: 0, R: 1, SR: 2, SSR: 3, UR: 4, Prime: 5 });
   function compareAuthorityV1(left, right) {
-      for (const difference of [AUTHORITY_RANK[left.authority] - AUTHORITY_RANK[right.authority], Object.keys(RANK_MULT).indexOf(left.authoritySnapshot.rank) - Object.keys(RANK_MULT).indexOf(right.authoritySnapshot.rank), left.authoritySnapshot.cultivation - right.authoritySnapshot.cultivation, left.authoritySnapshot.combatPower - right.authoritySnapshot.combatPower, right.createdEventSerial - left.createdEventSerial])
+      for (const difference of [AUTHORITY_RANK[left.authority] - AUTHORITY_RANK[right.authority], RANK_PRIORITY[left.authoritySnapshot.rank] - RANK_PRIORITY[right.authoritySnapshot.rank], left.authoritySnapshot.cultivation - right.authoritySnapshot.cultivation, left.authoritySnapshot.combatPower - right.authoritySnapshot.combatPower, right.createdEventSerial - left.createdEventSerial])
           if (difference)
               return Math.sign(difference);
       return compareText(left.sourceTrueSelfId, right.sourceTrueSelfId) || compareText(left.effectInstanceId, right.effectInstanceId);
@@ -5759,7 +5803,9 @@ __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'AUTHORITY_RANK')) exports.AUTHORITY_RANK = AUTHORITY_RANK;
   if (!Object.prototype.hasOwnProperty.call(exports, 'CANONICAL_METADATA_TAGS')) exports.CANONICAL_METADATA_TAGS = CANONICAL_METADATA_TAGS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'EFFECT_TYPES')) exports.EFFECT_TYPES = EFFECT_TYPES;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_PRIORITY')) exports.RANK_PRIORITY = RANK_PRIORITY;
   if (!Object.prototype.hasOwnProperty.call(exports, 'requireCanonicalMetadataTag')) exports.requireCanonicalMetadataTag = requireCanonicalMetadataTag;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createEffectExecutionServices')) exports.createEffectExecutionServices = createEffectExecutionServices;
   if (!Object.prototype.hasOwnProperty.call(exports, 'registerEffectHandler')) exports.registerEffectHandler = registerEffectHandler;
   if (!Object.prototype.hasOwnProperty.call(exports, 'dispatchEffect')) exports.dispatchEffect = dispatchEffect;
   if (!Object.prototype.hasOwnProperty.call(exports, 'validateEffectSpec')) exports.validateEffectSpec = validateEffectSpec;
@@ -6027,12 +6073,7 @@ __modules['./combat/character-runtime.ts'] = (exports, module, __require) => {
       if (definition.adapter && definition.adapter.id !== definition.capabilities.customAdapter) {
           throw new Error(`[character-runtime] ${definition.characterId}: adapter and capability manifest disagree`);
       }
-      const certified = new Set(definition.behavioralCertifications.map(item => item.capability));
-      for (const [capability, state] of Object.entries(definition.capabilities)) {
-          if (capability !== 'customAdapter' && state === 'supported' && !certified.has(capability))
-              throw new Error(`[character-runtime] ${definition.characterId}: deterministic behavioral coverage missing for ${capability}`);
-      }
-      return Object.freeze({ ...definition, capabilities: Object.freeze({ ...definition.capabilities }), behavioralCertifications: Object.freeze(definition.behavioralCertifications.map(item => Object.freeze({ ...item }))) });
+      return Object.freeze({ ...definition, capabilities: Object.freeze({ ...definition.capabilities }) });
   }
   //# sourceMappingURL=character-runtime.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'assertCharacterCommandPhase')) exports.assertCharacterCommandPhase = assertCharacterCommandPhase;
@@ -8441,11 +8482,9 @@ __modules['./combat/roster-runtime-definitions.ts'] = (exports, module, __requir
           customAdapter: UNIT_RUNTIME_HOOKS[characterId] ? characterId : null,
       };
   }
-  const scenarioId = (characterId, capability) => `pve/${characterId}/${capability}`;
   const CHARACTER_RUNTIME_DEFINITIONS = new Map(ROSTER.map(entry => [entry.id, defineCharacterRuntime({
           characterId: entry.id,
           capabilities: manifest(entry),
-          behavioralCertifications: Object.entries(manifest(entry)).filter(([key, value]) => key !== 'customAdapter' && value === 'supported').map(([capability]) => ({ capability: capability, scenarioId: scenarioId(entry.id, capability) })),
       })]));
   function requireCharacterRuntimeDefinition(characterId) {
       const definition = CHARACTER_RUNTIME_DEFINITIONS.get(characterId);

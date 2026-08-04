@@ -58,8 +58,6 @@ export interface CharacterCapabilityManifest {
 }
 
 export type CharacterCapability = Exclude<keyof CharacterCapabilityManifest, 'customAdapter'>;
-export interface BehavioralCertification { readonly capability: CharacterCapability; readonly scenarioId: string }
-
 export interface CharacterRuntimeAdapter {
   readonly id: string;
   onEvent(context: CharacterEventContext): readonly CharacterCommand[];
@@ -69,7 +67,6 @@ export interface CharacterRuntimeDefinition {
   readonly characterId: string;
   readonly capabilities: CharacterCapabilityManifest;
   readonly adapter?: CharacterRuntimeAdapter;
-  readonly behavioralCertifications: readonly BehavioralCertification[];
 }
 
 const PRE_COMMIT_ALLOWED = new Set<CharacterCommandType>(['ModifyDamagePlan']);
@@ -91,9 +88,5 @@ export function defineCharacterRuntime(definition: CharacterRuntimeDefinition): 
   if (definition.adapter && definition.adapter.id !== definition.capabilities.customAdapter) {
     throw new Error(`[character-runtime] ${definition.characterId}: adapter and capability manifest disagree`);
   }
-  const certified = new Set(definition.behavioralCertifications.map(item => item.capability));
-  for (const [capability, state] of Object.entries(definition.capabilities)) {
-    if (capability !== 'customAdapter' && state === 'supported' && !certified.has(capability as CharacterCapability)) throw new Error(`[character-runtime] ${definition.characterId}: deterministic behavioral coverage missing for ${capability}`);
-  }
-  return Object.freeze({ ...definition, capabilities: Object.freeze({ ...definition.capabilities }), behavioralCertifications: Object.freeze(definition.behavioralCertifications.map(item => Object.freeze({ ...item }))) });
+  return Object.freeze({ ...definition, capabilities: Object.freeze({ ...definition.capabilities }) });
 }

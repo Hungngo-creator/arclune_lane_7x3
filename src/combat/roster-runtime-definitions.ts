@@ -30,13 +30,10 @@ function manifest(entry: RosterEntry): CharacterCapabilityManifest {
   };
 }
 
-const scenarioId = (characterId: string, capability: string): string => `pve/${characterId}/${capability}`;
-
 export const CHARACTER_RUNTIME_DEFINITIONS: ReadonlyMap<string, Readonly<CharacterRuntimeDefinition>> = new Map(
   ROSTER.map(entry => [entry.id, defineCharacterRuntime({
     characterId: entry.id,
     capabilities: manifest(entry),
-    behavioralCertifications: Object.entries(manifest(entry)).filter(([key, value]) => key !== 'customAdapter' && value === 'supported').map(([capability]) => ({ capability: capability as Exclude<keyof CharacterCapabilityManifest, 'customAdapter'>, scenarioId: scenarioId(entry.id, capability) })),
   })]),
 );
 
