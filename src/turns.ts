@@ -10,6 +10,7 @@ import { emitSsiTemporalEvent } from './combat/kernel/delayed-revive.ts';
 import { doBasicWithFollowups, healUnit } from './combat.ts';
 import { normalizeCombatHpState } from './combat/number-utils.ts';
 import { performActiveSkill } from './combat/perform-active-skill.ts';
+import { requireCharacterRuntimeDefinition } from './combat/roster-runtime-definitions.ts';
 import {
   runRuntimeActionEnd,
   runRuntimeUnitRevive,
@@ -420,6 +421,7 @@ export function spawnQueuedIfDue(
   if (isUniqueGlobalSummonBlocked(Game, { unitId: p.unitId, tags: queuedTags })) {
     return resolveCurrentActor();
   }
+  if (p.source === 'deck') requireCharacterRuntimeDefinition(p.unitId);
 
   const meta = Game.meta && typeof Game.meta.get === 'function' ? Game.meta.get(p.unitId) : null;
   const source = p.source || null;

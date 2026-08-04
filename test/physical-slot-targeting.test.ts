@@ -1,6 +1,6 @@
-import { pickTarget } from '../../src/combat.ts';
-import { slotIndex } from '../../src/engine.ts';
-import type { UnitToken } from '../../src/types/units.ts';
+import { pickTarget } from '../src/combat.ts';
+import { slotIndex } from '../src/engine.ts';
+import type { UnitToken } from '../src/types/units.ts';
 
 const raw = (id: string, side: 'ally' | 'enemy', cx: number, cy: number, iid: number): UnitToken => ({
   id, iid, side, cx, cy, alive: true, lifeState: 'alive', hp: 100, hpMax: 100, statuses: [],

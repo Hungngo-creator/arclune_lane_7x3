@@ -1342,21 +1342,214 @@ lượng hồi phục thừa, vượt max hp của hắn sẽ bị bỏ qua và 
 
 74) 
 
-nội tại - Thiện Xạ: mỗi khi có kẻ thù bị trạng thái 'hất tung', lập tức bắn 1 đánh thường lên mục tiêu, đòn đánh từ nội tại này không tính là đánh thường, không cd, không cost, cap kích hoạt 5 lần/mỗi turn của bản thân, tức sau khi hắn hành động, nội tại này có thể kích hoạt max 5 lần cho đến khi đến turn hành động tiếp theo của hắn thì cap 5 lần sẽ reset về 0.
+Silas Blackspur — Xạ Thủ Hoàng Hôn
 
-mỗi khi kích hoạt thiện xạ, tạm thời tăng 3% atk của bản thân hiện có, reset hiệu ứng buff này khi cap Thiện Xạ reset về 0. Kích hoạt tối đa 5 lần, cap 5 lần cũng reset khi cap Thiện Xạ về 0.
+Class: Ranger
+Rank: SSR
+Nội tại — Thiện Xạ
+Mỗi khi một hoặc nhiều kẻ địch bước vào trạng thái Hất Tung, nếu Silas còn trên sân, không chịu CC cứng và vẫn được phép đánh thường, hắn lập tức kích hoạt Thiện Xạ.
 
-Thiện Xạ chỉ kích hoạt khi nhân vật này không bị cc cứng và vẫn có thể đánh thường được, nếu hắn tạm thời không thể đánh thường thì nội tại Thiện Xạ sẽ không kích hoạt.
+Thiện Xạ:
+Bắn một phát vào từng mục tiêu vừa bị hất tung.
+Mỗi phát sử dụng toàn bộ công thức của đòn đánh thường.
+Đây là Follow-up Thiện Xạ, không phải Basic Attack action.
+Không có cooldown.
+Không tiêu hao AE, Rage hoặc tài nguyên khác.
+Không tạo thêm lượt tự nhiên.
+Không kích hoạt hiệu ứng yêu cầu Silas “sử dụng đánh thường”, trừ những kỹ năng trong chính kit ghi rõ ngoại lệ.
 
-nếu có nhiều hơn 1 kẻ thù bị hất tung cùng lúc, hắn cùng lúc kích hoạt thiện xạ lên tất cả mục tiêu nhưng cap chỉ +1.
+Giới hạn kích hoạt
+Silas có một cửa sổ Thiện Xạ giữa hai lượt tự nhiên của bản thân:
+Khi vào sân, cap bắt đầu từ 0.
+Sau mỗi lượt tự nhiên của Silas kết thúc, cap Thiện Xạ trở về 0.
+Trong mỗi cửa sổ, Thiện Xạ được kích hoạt tối đa 5 lần.
 
-skill 1: đánh dấu 1 ô bất kỳ trên sân phe địch trừ ô 8 của leader, nếu có kẻ thù đứng trên ô bị đánh dấu và chúng hành động thành công 2 turn liên tiếp, ngay sau khi chúng hành động thành công 2 turn liên tiếp của bản thân chúng, lập tức chúng sẽ bị hất tung trong 1s. Nhân vật này miễn kích hoạt được Thiện Xạ lên mục tiêu đứng vào ô bị đánh dấu thì phát thiện xạ đó sẽ không bị tính vào cap 5 của nội tại thiện xạ nhưng tăng atk vẫn nhận được và vẫn không bị tính vào cap tăng atk từ nội tại của hắn, sau khi kích hoạt thiện xạ lên mục tiêu đứng vào ô bị đánh dấu hắn +2% atk cho đến khi rời sân, nếu đã đánh dấu mà nhân vật này rời sân thì ô bị đánh dấu sẽ không bị đánh dấu ngay lập tức. cost 5 ae. không cd, tồn tại tối đa 3 ô bị đánh dấu cùng lúc, ô đánh dấu không bị giới hạn time tồn tại mà chỉ biến mất khi kích hoạt hất tung. Hất tung đối tanker có rank cao hơn bản thân hắn vô hiệu.
+Một lượt bị mất do CC vẫn là lượt tự nhiên đã tiêu hao và vẫn reset cửa sổ.
+Nếu nhiều kẻ địch bị hất tung trong cùng một event:
+Chỉ tính là một lần kích hoạt Thiện Xạ.
+Cap chỉ tăng 1.
+Silas bắn đồng thời vào toàn bộ mục tiêu hợp lệ.
+Tất cả phát bắn dùng chung một snapshot chỉ số.
+Kết quả trên mục tiêu trước không làm thay đổi damage của mục tiêu sau trong cùng đợt.
 
-skill 2: bị động kích hoạt khi đạt điều kiện, khi skill 1 kích hoạt đánh dấu và ô bị đánh dấu có kẻ địch vừa được triệu hồi vào ô đó (summon cũng tính nhưng chỉ khi summon đó có hp hoặc atk hoặc wil hơn hoặc bằng 60% hp/atk/wil của nhân vật này, 3 chỉ số này chỉ cần 1 chỉ số đủ điều kiện là có thể kích hoạt khi summon đứng vào ô bị đánh dấu, nếu summon đứng vào ô bị đánh dấu không thoả mãn 1 trong 3 điều kiện đó thì skill 2 sẽ không kích hoạt), nếu nhân vật này có hp trên hoặc = 50% max hp của bản thân, lập tức mất hp = 5% max hp, khiến time kích hoạt hất tung của skill 1 từ 2 thành 1 turn hành động của mục tiêu đứng trên ô đó. Giới hạn kích hoạt 2 lần/ turn của bản thân (tính như cap nội tại), mỗi lần kích hoạt hiệu ứng giảm time kích hoạt hất tung chỉ áp dụng lên 1 ô bị đánh dấu từ skill 1.
+Hiệu chỉnh đường ngắm
+Mỗi lần Thiện Xạ kích hoạt, trước khi bắn:
+Tăng tạm thời 3% ATK hiện có của Silas.
+Hiệu ứng cộng dồn theo chỉ số hiện có.
+Tối đa 5 tầng thông thường trong mỗi cửa sổ Thiện Xạ.
+Toàn bộ tầng tạm thời biến mất khi cap Thiện Xạ reset.
 
-skill 3: mỗi khi gây sát thương lên 1 mục tiêu bằng đánh thường (nội tại cũng tính) vượt quá tối thiểu 25% max hp của mục tiêu, + 2,5% atk và wil của hiện tại/mỗi mục tiêu thoả mãn điều kiện, hiệu ứng từ skill này biến mất khi nhân vật này rời sân, kích hoạt tối đa 5 lần/turn bản thân (cap tính như cách tính cap nội tại thiện xạ), mỗi lần kích hoạt chỉ tính trên 1 mục tiêu, cost 3 ae/lần kích hoạt, follow up và các debuff DoT không thể kích hoạt skill này.
 
-ultimate: liên xạ liên tiếp 3 phát, trong đó mỗi phát là ngẫu nhiên và có thể trùng, 100% 1 viên trúng leader địch, mỗi viên gây sát thương = 110% atk và 90% wil của hắn.
+Một event hất tung đồng thời chỉ cấp một tầng 3%, bất kể số mục tiêu.
+
+Điều kiện khóa
+Thiện Xạ không kích hoạt nếu tại thời điểm Hất Tung được commit, Silas:
+Đã chết hoặc rời sân.
+Đang chịu CC cứng.
+Đang bị cấm đánh thường hoặc bị tước vũ khí.
+Không thể chọn mục tiêu đó làm mục tiêu hợp lệ.
+Trigger bị bỏ lỡ không được lưu lại để bắn sau.
+Một AIRBORNE event chỉ được Thiện Xạ quan sát một lần. Refresh trạng thái khi mục tiêu vẫn đang trên không không tạo trigger mới.
+
+Skill 1 — Tọa Độ Truy Nã
+Cost: 5 AE
+Cooldown: Không có.
+Silas chọn một ô bất kỳ trên sân địch để đặt Tọa Độ Truy Nã, ngoại trừ ô số 8 của Leader địch.
+Có thể đánh dấu ô trống hoặc ô đang có kẻ địch.
+Tối đa tồn tại đồng thời 3 Tọa Độ Truy Nã.
+Không thể đặt dấu thứ tư khi đã đủ 3.
+Dấu không có giới hạn thời gian.
+Toàn bộ dấu biến mất ngay khi Silas rời sân.
+
+Bộ đếm của ô
+
+Khi một kẻ địch đứng trên ô được đánh dấu và hoàn tất thành công hai lượt tự nhiên liên tiếp của chính nó:
+Ngay sau action thứ hai được commit hoàn chỉnh, mục tiêu bị Hất Tung.
+Hất Tung kéo dài 1 giây theo animation và reaction chain.
+Sau khi chuỗi phản ứng hoàn tất, mục tiêu trở lại chính ô đó.
+Tọa Độ Truy Nã bị tiêu hao.
+
+
+Chỉ lượt tự nhiên SSI được tính:
+Follow-up không tính.
+Counter không tính.
+Forced action không tính.
+Ultimate chen hàng không tính.
+Linked cast không tính.
+Nếu mục tiêu mất lượt bởi CC, chuỗi “hai lượt liên tiếp” bị phá và bộ đếm trở về 0.
+
+Tiến độ được gắn với iid của occupant:
+Rời khỏi ô: tiến độ của unit đó mất.
+Unit khác bước vào: bắt đầu từ 0.
+Mục tiêu chết hoặc rời ô trong chính action thứ hai: dấu không hất tung, tiếp tục tồn tại trên ô.
+Đối với Tanker
+
+Nếu mục tiêu là Tanker có rank cao hơn Silas:
+Hất Tung bị vô hiệu.
+Thiện Xạ không kích hoạt từ lần đó.
+Silas không nhận bonus ATK từ phát bắn đặc biệt.
+Tọa Độ Truy Nã vẫn bị tiêu hao.
+
+Phát bắn truy nã
+Nếu Tọa Độ Truy Nã hất tung thành công mục tiêu và Silas đủ điều kiện kích hoạt Thiện Xạ:
+Phát Thiện Xạ vào mục tiêu đó không tính vào cap 5 lần.
+Tầng tăng 3% ATK từ đợt này không tính vào cap 5 tầng tạm thời.
+Sau khi phát bắn thực sự được thực hiện, Silas tăng thêm 2% ATK hiện có.
+Bonus 2% ATK tồn tại đến khi Silas rời sân.
+Bonus này không có giới hạn tổng số tầng trong trận.
+
+Nếu cùng một AIRBORNE event còn chứa mục tiêu bị hất tung từ nguồn khác:
+Phần Thiện Xạ thông thường vẫn làm cap tăng 1.
+Các phát vào mục tiêu do Tọa Độ Truy Nã hất tung không làm cap tăng thêm.
+Toàn bộ đợt vẫn chỉ có một lần tăng 3% ATK trước snapshot.
+Tầng đó được tính vào cap thông thường nếu trong đợt có ít nhất một mục tiêu hất tung từ nguồn khác.
+
+Skill 2 — Khách Lạ Vào Trấn
+Loại: Skill bị động tự kích hoạt
+Cost mỗi lần: 5% Max HP dưới dạng HP Cost
+Giới hạn: Tối đa 2 lần trong mỗi cửa sổ giữa hai lượt tự nhiên của Silas.
+Khi một enemy summon vừa được triệu hồi hoàn chỉnh vào một ô đang có Tọa Độ Truy Nã, Silas kiểm tra điều kiện.
+
+Summon đủ điều kiện nếu ít nhất một trong ba chỉ số sau đạt từ 60% chỉ số tương ứng của Silas trở lên:
+Max HP.
+ATK.
+WIL.
+Điều kiện chỉ cần đạt một chỉ số.
+Các chỉ số của Silas dùng snapshot khi vào sân, không dùng ATK/WIL đã snowball trong trận.
+Nếu summon đủ điều kiện và Silas đang có ít nhất 50% Max HP:
+Silas trả HP Cost bằng 5% Max HP.
+Thời gian kích hoạt của Tọa Độ Truy Nã trên ô đó giảm từ hai lượt tự nhiên thành một lượt tự nhiên thành công của occupant.
+Hiệu ứng chỉ áp dụng cho một ô trong mỗi lần kích hoạt.
+Không hất tung summon ngay khi nó vừa xuất hiện.
+
+HP Cost:
+Không qua khiên.
+Không reflect.
+Không lifesteal.
+Không kích hoạt hiệu ứng “khi nhận damage”.
+Không được khiến Silas chết.
+Điều kiện HP được kiểm tra lại trước từng lần trả cost.
+
+Nếu summon không đạt điều kiện 60%, Skill 2 không kích hoạt và không tiêu hao HP.
+Những summon không có Chân Ngã vẫn được tính, miễn là có stat và là combat unit thực sự.
+
+---
+
+Skill 3 — Một Phát Thành Danh
+
+Loại: Skill bị động có cost
+Cost: 3 AE cho mỗi mục tiêu kích hoạt
+Giới hạn: Tối đa 5 lần trong mỗi cửa sổ giữa hai lượt tự nhiên của Silas.
+Mỗi khi Silas gây damage hợp lệ lên một mục tiêu bằng:
+Đòn đánh thường.
+Phát Thiện Xạ.
+Nếu Actual HP Damage của đòn đó đạt ít nhất 25% Max HP của mục tiêu tại đầu action:
+Tiêu hao 3 AE của phe.
+Tăng 2,5% ATK hiện có của Silas.
+Tăng 2,5% WIL hiện có của Silas.
+Bonus tồn tại đến khi Silas rời sân.
+
+Mỗi mục tiêu hợp lệ tạo một lần kích hoạt riêng.
+
+Không tính:
+Damage vào shield.
+Overkill.
+DoT.
+Reflected damage.
+Ultimate.
+Các follow-up khác.
+
+Thiện Xạ là ngoại lệ duy nhất trong nhóm follow-up được phép kích hoạt Skill 3.
+
+Nếu một đợt Thiện Xạ đồng thời đánh nhiều mục tiêu và nhiều mục tiêu cùng đạt ngưỡng:
+
+1. Damage lên toàn bộ mục tiêu được tính từ snapshot ban đầu.
+2. Sau khi damage được commit, Skill 3 mới xử lý từng trigger.
+3. Mỗi trigger tiêu hao 3 AE và cộng một tầng.
+4. Xử lý theo thứ tự slot từ nhỏ đến lớn.
+5. Không đủ AE thì trigger tương ứng bị bỏ qua.
+
+Skill 3 không có giới hạn tổng tầng trong trận; chỉ có cap 5 lần mỗi cửa sổ.
+
+---
+
+Ultimate — Ba Tiếng Súng Hoàng Hôn
+Silas liên tiếp bắn ba viên đạn vào phe địch.
+Mỗi viên gây Mixed Damage gồm:
+Physical Damage bằng 110% ATK.
+Will Damage bằng 90% WIL.
+Hai component được phòng thủ riêng:
+Phần ATK chịu ARM.
+Phần WIL chịu RES.
+Quy tắc chọn mục tiêu
+Một trong ba viên được xác định trước là Viên Đạn Định Mệnh và chắc chắn nhắm vào Leader địch.
+Hai viên còn lại chọn ngẫu nhiên trong số kẻ địch hợp lệ còn sống.
+Hai viên ngẫu nhiên có thể trùng mục tiêu với nhau.
+Hai viên ngẫu nhiên cũng có thể tiếp tục trúng Leader.
+
+Ultimate resolve tuần tự theo từng viên.
+Nếu mục tiêu của viên chưa bắn chết trước khi viên đó được resolve, hệ thống chọn lại một mục tiêu hợp lệ theo seeded RNG.
+
+Nếu Leader nhận DEATH_CONFIRMED và trận kết thúc, các viên chưa bắn bị hủy.
+
+Ultimate:
+Không tính là đánh thường.
+Không kích hoạt Thiện Xạ.
+Không kích hoạt Một Phát Thành Danh.
+Không được hưởng các hiệu ứng chỉ áp dụng khi “sử dụng Basic Attack action”, trừ khi nguồn khác ghi rõ.
+
+Nhịp vận hành
+
+Đặt Tọa Độ Truy Nã
+→ ép đối phương phải cân nhắc có tiếp tục đứng trên ô đó hay không
+→ mục tiêu hoàn tất đủ lượt và bị hất tung
+→ Thiện Xạ bắn miễn cap
+→ Silas nhận ATK tạm thời và ATK dài hạn
+→ phát bắn đủ mạnh kích hoạt Một Phát Thành Danh
+→ ATK/WIL tiếp tục snowball
+→ Ba Tiếng Súng Hoàng Hôn dùng lượng chỉ số đã tích để uy hiếp Leader.
+
+Bộ kit này không cần buff thêm. Với tăng chỉ số theo chỉ số hiện có, Silas đã là UR tăng trưởng rất mạnh trong trận kéo dài; điểm yếu hợp lý của hắn là cần thời gian, cần AE và phụ thuộc vào việc giữ được quyền đánh thường.
 
 75) 
 

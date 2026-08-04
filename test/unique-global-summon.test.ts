@@ -30,7 +30,7 @@ describe('unique-global summon rule (campaign only)', () => {
     expect(Game.tokens).toHaveLength(1);
   });
 
-  it('allows summon outside campaign even with unique-global tag', () => {
+  it('rejects an unregistered deck character outside campaign', () => {
     const { cx, cy } = slotToCell('ally', 2);
     const Game = {
       modeKey: 'arena',
@@ -53,9 +53,8 @@ describe('unique-global summon rule (campaign only)', () => {
       source: 'deck',
     });
 
-    const result = spawnQueuedIfDue(Game as never, { side: 'ally', slot: 2 });
-    expect(result.spawned).toBe(true);
-    expect(Game.tokens).toHaveLength(2);
+    expect(() => spawnQueuedIfDue(Game as never, { side: 'ally', slot: 2 })).toThrow('missing CharacterRuntimeDefinition');
+    expect(Game.tokens).toHaveLength(1);
   });
 
   it('helper checks campaign mode and alive duplicate id', () => {

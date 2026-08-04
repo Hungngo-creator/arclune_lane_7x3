@@ -9,6 +9,7 @@ import type { ActionIdentity, SourceAttribution } from './types.ts';
 import { hasEnteredReincarnation, markReincarnationEscapedByRevive, observeReincarnationDeathWave } from './reincarnation.ts';
 import { ensureTrueSelfCombatRecord, lifeIdentityKey } from './true-self.ts';
 import { normalizeCombatHpState, normalizeCombatHpValue } from '../number-utils.ts';
+export { isCombatAlive } from '../presence.ts';
 
 export type DeathCauseKind = 'damage' | 'dot' | 'reflected' | 'environment' | 'self-damage' | 'sacrifice' | 'non-damage-hp-loss' | 'execute';
 export interface HPZeroCandidate {
@@ -34,11 +35,10 @@ type LifecycleRuntime = { combatEvents?: Record<string, unknown>[]; hpZeroCandid
 const runtime = (game: SessionState): LifecycleRuntime => (game.runtime ??= {}) as LifecycleRuntime;
 const emit = (game: SessionState, event: Record<string, unknown>): void => { (runtime(game).combatEvents ??= []).push(event); };
 export const getLifeState = (unit: UnitToken): LifeState => unit.lifeState ?? (unit.alive && (unit.hp == null || unit.hp > 0) ? 'alive' : 'dead-confirmed');
-export const isCombatAlive = (unit: UnitToken): boolean => getLifeState(unit) === 'alive' && unit.alive !== false && (unit.hp == null || unit.hp > 0);
-export function markHpZero(unit: UnitToken): void { unit.lifeState = 'hp-zero'; unit.alive = false; }
+export function markHpZero(unit: UnitToken): void { unit.hp = 0; unit.lifeState = 'hp-zero'; unit.alive = false; }
 export function markDeathPrevention(unit: UnitToken): void { unit.lifeState = 'death-prevention'; unit.alive = false; }
 export function markDeathPrevented(unit: UnitToken, hp = 1): void { const state=normalizeCombatHpState(unit); unit.hp = Math.max(1, Math.min(state.hpMax, normalizeCombatHpValue(hp))); unit.lifeState = 'alive'; unit.alive = true; delete unit.deadAt; }
-export function markDeathConfirmed(unit: UnitToken): void { unit.lifeState = 'dead-confirmed'; unit.alive = false; }
+export function markDeathConfirmed(unit: UnitToken): void { unit.hp = 0; unit.lifeState = 'dead-confirmed'; unit.alive = false; }
 export function markRemoved(unit: UnitToken): void { unit.lifeState = 'removed'; unit.alive = false; }
 export function markErased(unit: UnitToken): void { unit.lifeState = 'erased'; unit.alive = false; }
 const lifeKey = (candidate: Pick<HPZeroCandidate, 'trueSelfId' | 'incarnationSerial' | 'lifeSerial' | 'targetIid'>): string => candidate.trueSelfId ? lifeIdentityKey(candidate.trueSelfId, candidate.incarnationSerial, candidate.lifeSerial) : `${String(candidate.targetIid)}:${candidate.incarnationSerial}:${candidate.lifeSerial}`;

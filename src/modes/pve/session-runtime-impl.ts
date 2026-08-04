@@ -6,6 +6,7 @@ import { Statuses, makeStatusEffect } from '../../statuses';
 import { CFG, CAM } from '../../config';
 import { pickTarget, dealAbilityDamage, healUnit, grantShield, basicAttack } from '../../combat';
 import { commitHpMutation, commitImmediateRevive, currentActionExecution, ensureCombatIdentity, markRemoved, resolveHpLoss, resolveSourceAttribution } from '../../combat/kernel/index.ts';
+import { isCombatAlive, isLiveRenderable } from '../../combat/presence.ts';
 import { initializeFury, setFury, spendFury, resolveUltCost, gainFury, finishFuryHit } from '../../utils/fury';
 import {
   getMetaById,
@@ -2019,12 +2020,7 @@ function ensureBattleState(game: (SessionState | CombatSessionState) | null): Ba
 }
 
 function isUnitAlive(unit: UnitToken | null | undefined): boolean {
-  if (!unit) return false;
-  if (!unit.alive) return false;
-  if (Number.isFinite(unit.hp)){
-    return unit.hp > 0;
-  }
-  return true;
+  return isCombatAlive(unit);
 }
 
 function getHpRatio(unit: UnitToken | null | undefined): number {
@@ -2837,7 +2833,7 @@ function drawHPBars(): void {
   const activeAttackKeys = collectActiveAttackTokenKeys(Array.isArray(Game?.vfx) ? Game.vfx : []);
 
   for (const t of tokens){
-    if (!t.alive || !Number.isFinite(t.hpMax)) continue;
+    if (!isLiveRenderable(t) || !Number.isFinite(t.hpMax)) continue;
     const meleeKey = makeMeleeTokenKey(t);
     if (meleeKey && activeAttackKeys.has(meleeKey)) continue;
 

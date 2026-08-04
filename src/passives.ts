@@ -782,8 +782,18 @@ const EFFECTS: Record<string, PassiveDefinition> = {
     if (directKills < minDirectKills) return;
     if (state._bloodCorePreventionRegistered) return;
     state._bloodCorePreventionRegistered = true;
+    const registeredIdentity = {
+      iid: unit.iid ?? unit.id,
+      trueSelfId: unit.trueSelfId ?? null,
+      incarnationSerial: unit.incarnationSerial ?? 1,
+      lifeSerial: unit.lifeSerial ?? 1,
+    };
     registerDeathPrevention(Game, candidate => {
-      if (candidate.targetIid !== (unit.iid ?? unit.id) || state._bloodCoreUsed) return null;
+      if (candidate.targetIid !== registeredIdentity.iid
+        || candidate.trueSelfId !== registeredIdentity.trueSelfId
+        || candidate.incarnationSerial !== registeredIdentity.incarnationSerial
+        || candidate.lifeSerial !== registeredIdentity.lifeSerial
+        || state._bloodCoreUsed) return null;
       const currentKills = Number(((Game.runtime as { trueSelfRecords?: Record<string, { confirmedKills?: number }> }).trueSelfRecords?.[String(unit.trueSelfId)]?.confirmedKills ?? state._directKills ?? 0));
       if (currentKills < minDirectKills) return null;
       const bonusRatio = Math.max(0, Number(state._bloodFeastBonus ?? 0));

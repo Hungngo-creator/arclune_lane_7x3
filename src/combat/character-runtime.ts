@@ -47,6 +47,11 @@ export interface CharacterCapabilityManifest {
   readonly skill3: 'supported' | 'not-declared';
   readonly ultimate: 'supported' | 'not-declared';
   readonly passives: 'supported' | 'not-declared';
+  readonly summon: 'supported' | 'not-declared';
+  readonly healing: 'supported' | 'not-declared';
+  readonly deathPrevention: 'supported' | 'not-declared';
+  readonly revive: 'supported' | 'not-declared';
+  readonly rebirth: 'supported' | 'not-declared';
   readonly customAdapter: string | null;
   readonly directMutationViolations: 0;
 }
