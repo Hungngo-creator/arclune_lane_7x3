@@ -1,53 +1,36 @@
-export type AxiomId = 'reincarnation' | 'heavenly-thunder' | 'divine-nature' | 'light-shadow-river' | (string & {});
+export const AXIOM_IDS = Object.freeze(['reincarnation', 'heavenly-thunder', 'divine-nature', 'light-shadow-river'] as const);
+export type AxiomId = typeof AXIOM_IDS[number];
 export type ModeId = 'pve' | 'arena' | 'chess';
-export type CanonicalEventType = 'DEATH_CONFIRMED' | 'REVIVE_COMMITTED' | 'DELAYED_REVIVE_SCHEDULED' | 'DELAYED_REVIVE_RESOLVED' | 'REBIRTH_CLAIMED' | 'TRANSGRESSION_RECORDED' | 'CLAIM_CONFLICT';
-export type AxiomCommandType = 'record-death' | 'enter-reincarnation' | 'finalize-rebirth' | 'depart-true-self' | 'commit-rebirth' | 'record-transgression' | 'issue-judgment' | 'route-judgment' | 'request-lightning-damage' | 'submit-protected-claim' | 'create-temporal-anchor';
+export type CanonicalEventType = 'ACTION_FINALIZED' | 'DAMAGE_COMMITTED' | 'HEAL_COMMITTED' | 'STATUS_APPLIED' | 'STATUS_REMOVED' | 'RESOURCE_CHANGED' | 'TURN_GRANTED' | 'TURN_CONSUMED' | 'SUMMON_COMMITTED' | 'DEATH_CONFIRMED' | 'REVIVE_COMMITTED' | 'DELAYED_REVIVE_SCHEDULED' | 'DELAYED_REVIVE_RESOLVED' | 'REINCARNATION_ENTERED' | 'REBIRTH_CLAIM_WINDOW_OPENED' | 'REBIRTH_COMMITTED' | 'BATTLE_END' | 'TRANSGRESSION_RECORDED' | 'MECHANIC_CLAIM_SUBMITTED';
+export interface AxiomEventPayloadMap { ACTION_FINALIZED: { actionId: string | number }; DAMAGE_COMMITTED: { actionId: string | number }; HEAL_COMMITTED: { actionId: string | number }; STATUS_APPLIED: { targetIid: string | number }; STATUS_REMOVED: { targetIid: string | number }; RESOURCE_CHANGED: { targetIid: string | number }; TURN_GRANTED: { actorIid: string | number }; TURN_CONSUMED: { actorIid: string | number }; SUMMON_COMMITTED: { summonIid: string | number }; DEATH_CONFIRMED: { deathId: string }; REVIVE_COMMITTED: { deathId: string }; DELAYED_REVIVE_SCHEDULED: { deathId: string }; DELAYED_REVIVE_RESOLVED: { deathId: string }; REINCARNATION_ENTERED: { trueSelfId: string }; REBIRTH_CLAIM_WINDOW_OPENED: { trueSelfId: string }; REBIRTH_COMMITTED: { trueSelfId: string }; BATTLE_END: { winner: string | null }; TRANSGRESSION_RECORDED: { eventId: string }; MECHANIC_CLAIM_SUBMITTED: { claimId: string } }
+export type AxiomCommandType = keyof AxiomCommandPayloadMap;
+export interface AxiomCommandPayloadMap { 'record-death': { deathId: string }; 'enter-reincarnation': { trueSelfId: string }; 'finalize-rebirth': { trueSelfId: string }; 'depart-true-self': { trueSelfId: string }; 'commit-rebirth': { trueSelfId: string }; 'record-transgression': { eventId: string }; 'issue-judgment': { sentenceId: string }; 'route-judgment': { sentenceId: string }; 'request-lightning-damage': { sentenceId: string; targetIid: string | number }; 'submit-protected-claim': { claimId: string }; 'create-temporal-anchor': { anchorId: string } }
+export interface AxiomQueryMap { 'combat-state': unknown; 'true-self-record': unknown; 'transgression-ledger': unknown }
+export type AxiomCommand<K extends AxiomCommandType = AxiomCommandType> = { readonly type: K; readonly payload: Readonly<AxiomCommandPayloadMap[K]> };
+export interface AxiomCommandReceipt { readonly command: AxiomCommandType; readonly committed: true; readonly receiptId: string }
 export type AxiomActivationPolicy = 'global' | 'trait' | 'participant-required';
-export interface AxiomCommand { readonly type: AxiomCommandType; readonly payload: Readonly<Record<string, unknown>> }
-export interface ReadonlyAxiomContext { readonly mode: ModeId; readonly sourceTrueSelfId?: string; readonly read: (query: string) => unknown; readonly submit: (command: AxiomCommand) => unknown }
-export interface AxiomRuntime { onEvent(event: CanonicalEventType, payload: Readonly<Record<string, unknown>>): void }
+export interface ReadonlyAxiomContext { readonly mode: ModeId; readonly sourceTrueSelfId?: string; readonly read: <K extends keyof AxiomQueryMap>(query: K) => AxiomQueryMap[K]; readonly submit: <K extends AxiomCommandType>(command: AxiomCommand<K>) => AxiomCommandReceipt }
+export interface AxiomRuntime { onEvent<K extends CanonicalEventType>(event: K, payload: Readonly<AxiomEventPayloadMap[K]>): void }
 export interface AxiomDefinition { readonly id: AxiomId; readonly version: number; readonly activationPolicy: AxiomActivationPolicy; readonly supportedModes: readonly ModeId[]; readonly observedEvents: readonly CanonicalEventType[]; readonly allowedCommands: readonly AxiomCommandType[]; createRuntime(context: ReadonlyAxiomContext): AxiomRuntime }
-
 const definitions = new Map<AxiomId, AxiomDefinition>();
-const commandHandlers = new Map<AxiomCommandType, (command: AxiomCommand) => unknown>();
-export function registerAxiomDefinition(definition: AxiomDefinition): void {
-  if (definitions.has(definition.id)) throw new Error(`[axiom] duplicate definition ${definition.id}`);
-  if (!definition.version || !definition.supportedModes.length || !definition.createRuntime) throw new Error(`[axiom] incomplete definition ${definition.id}`);
-  definitions.set(definition.id, Object.freeze(definition));
-}
-export function registerAxiomCommandHandler(type: AxiomCommandType, handler: (command: AxiomCommand) => unknown): void { if (commandHandlers.has(type)) throw new Error(`[axiom] duplicate command handler ${type}`); commandHandlers.set(type, handler); }
+const commandHandlers = new Map<AxiomCommandType, (command: AxiomCommand) => AxiomCommandReceipt>();
+export function registerAxiomDefinition(definition: AxiomDefinition): void { if (!AXIOM_IDS.includes(definition.id) || definitions.has(definition.id)) throw new Error(`[axiom] duplicate or unsupported definition ${definition.id}`); definitions.set(definition.id, Object.freeze(definition)); }
+export function registerAxiomCommandHandler(type: AxiomCommandType, handler: (command: AxiomCommand) => AxiomCommandReceipt): void { if (commandHandlers.has(type)) throw new Error(`[axiom] duplicate command handler ${type}`); commandHandlers.set(type, handler); }
 export function listAxiomDefinitions(): readonly AxiomDefinition[] { return [...definitions.values()]; }
-
+let receiptSerial = 0;
+for (const type of ['record-death','enter-reincarnation','finalize-rebirth','depart-true-self','commit-rebirth','record-transgression','issue-judgment','route-judgment','request-lightning-damage','submit-protected-claim'] as const) registerAxiomCommandHandler(type, () => Object.freeze({ command: type, committed: true, receiptId: `axiom:${type}:${++receiptSerial}` }));
 export class AxiomModuleSet {
-  readonly loaded = new Set<AxiomId>();
-  readonly active: Array<{ definition: AxiomDefinition; runtime: AxiomRuntime }> = [];
-  snapshotCount = 0;
-  constructor(readonly mode: ModeId, private readonly stableBoundary: () => boolean = () => true) {}
-  load(id: AxiomId, sourceTrueSelfId?: string): void {
-    const definition = definitions.get(id);
-    if (!definition || !definition.supportedModes.includes(this.mode)) throw new Error(`[axiom] unavailable module ${id} in ${this.mode}`);
-    for (const command of definition.allowedCommands) if (!commandHandlers.has(command) && command !== 'create-temporal-anchor') throw new Error(`[axiom] ${id}: missing handler for ${command}`);
-    const submit = (command: AxiomCommand): unknown => {
-      if (!definition.allowedCommands.includes(command.type)) throw new Error(`[axiom] ${id}: unauthorized command ${command.type}`);
-      if (command.type === 'create-temporal-anchor') { if (!this.stableBoundary()) throw new Error('[axiom] temporal anchor requires a stable boundary'); this.snapshotCount++; return this.snapshotCount; }
-      return commandHandlers.get(command.type)!(command);
-    };
-    const runtime = definition.createRuntime(Object.freeze({ mode: this.mode, sourceTrueSelfId, read: () => undefined, submit }));
-    this.loaded.add(id); this.active.push({ definition, runtime });
-  }
-  publish(event: CanonicalEventType, payload: Readonly<Record<string, unknown>> = {}): void { for (const item of this.active) if (item.definition.observedEvents.includes(event)) item.runtime.onEvent(event, payload); }
+  readonly loaded = new Set<AxiomId>(); readonly active: Array<{ definition: AxiomDefinition; runtime: AxiomRuntime; sourceTrueSelfId?: string }> = []; readonly anchors: Array<{ anchorId: string; serializedState: string }> = [];
+  constructor(readonly mode: ModeId, private readonly stableBoundary: () => boolean = () => true, private readonly readState: <K extends keyof AxiomQueryMap>(query: K) => AxiomQueryMap[K] = () => undefined as never) { for (const definition of definitions.values()) if (definition.activationPolicy === 'global' && definition.supportedModes.includes(mode)) this.load(definition.id); }
+  get snapshotCount(): number { return this.anchors.length; }
+  load(id: AxiomId, sourceTrueSelfId?: string): void { const definition = definitions.get(id); if (!definition || !definition.supportedModes.includes(this.mode)) throw new Error(`[axiom] unavailable module ${id} in ${this.mode}`); const key = `${id}:${sourceTrueSelfId ?? ''}`; if (this.active.some(item => `${item.definition.id}:${item.sourceTrueSelfId ?? ''}` === key)) return; if (definition.activationPolicy === 'trait' && !sourceTrueSelfId) throw new Error(`[axiom] ${id}: trait activation requires a source True Self`); const submit = <K extends AxiomCommandType>(command: AxiomCommand<K>): AxiomCommandReceipt => { if (!definition.allowedCommands.includes(command.type)) throw new Error(`[axiom] ${id}: unauthorized command ${command.type}`); if (command.type === 'create-temporal-anchor') { if (!this.stableBoundary()) throw new Error('[axiom] temporal anchor requires a stable boundary'); const anchorId = (command.payload as unknown as AxiomCommandPayloadMap['create-temporal-anchor']).anchorId; if (!anchorId || this.anchors.some(anchor => anchor.anchorId === anchorId)) throw new Error('[axiom] temporal anchor id must be unique'); this.anchors.push(Object.freeze({ anchorId, serializedState: JSON.stringify(this.readState('combat-state')) })); return Object.freeze({ command: command.type, committed: true, receiptId: anchorId }); } const handler = commandHandlers.get(command.type); if (!handler) throw new Error(`[axiom] ${id}: missing handler for ${command.type}`); return handler(command as AxiomCommand); }; const runtime = definition.createRuntime(Object.freeze({ mode: this.mode, sourceTrueSelfId, read: this.readState, submit })); this.loaded.add(id); this.active.push({ definition, runtime, sourceTrueSelfId }); }
+  publish<K extends CanonicalEventType>(event: K, payload: Readonly<AxiomEventPayloadMap[K]>): void { for (const item of this.active) if (item.definition.observedEvents.includes(event)) item.runtime.onEvent(event, payload); }
 }
-
-export function preflightAxiomModules(set: AxiomModuleSet, possibleParticipants: unknown): void {
-  const required = new Set<AxiomId>();
-  const scan = (value: unknown): void => { if (Array.isArray(value)) { value.forEach(scan); return; } if (!value || typeof value !== 'object') return; for (const [key, child] of Object.entries(value as Record<string, unknown>)) { if (key === 'requiresAxiom' && typeof child === 'string') required.add(child as AxiomId); else scan(child); } };
-  scan(possibleParticipants); for (const id of required) if (!set.loaded.has(id)) set.load(id);
-}
-
-const emptyRuntime = (): AxiomRuntime => ({ onEvent: () => undefined });
-const builtins: readonly AxiomDefinition[] = [
-  { id: 'reincarnation', version: 1, activationPolicy: 'global', supportedModes: ['pve','arena','chess'], observedEvents: ['DEATH_CONFIRMED','REVIVE_COMMITTED','DELAYED_REVIVE_SCHEDULED','DELAYED_REVIVE_RESOLVED','REBIRTH_CLAIMED'], allowedCommands: ['record-death','enter-reincarnation','finalize-rebirth','depart-true-self','commit-rebirth'], createRuntime: emptyRuntime },
-  { id: 'heavenly-thunder', version: 1, activationPolicy: 'global', supportedModes: ['pve','arena','chess'], observedEvents: ['TRANSGRESSION_RECORDED','REVIVE_COMMITTED','CLAIM_CONFLICT'], allowedCommands: ['record-transgression','issue-judgment','route-judgment','request-lightning-damage'], createRuntime: emptyRuntime },
-  { id: 'divine-nature', version: 1, activationPolicy: 'trait', supportedModes: ['pve','arena','chess'], observedEvents: ['CLAIM_CONFLICT'], allowedCommands: ['submit-protected-claim'], createRuntime: emptyRuntime },
-];
-for (const definition of builtins) registerAxiomDefinition(definition);
+export interface AxiomParticipantManifest { readonly leaders?: readonly { requiresAxiom?: AxiomId }[]; readonly decks?: readonly { requiresAxiom?: AxiomId }[]; readonly npcRoster?: readonly { requiresAxiom?: AxiomId }[]; readonly scriptedReinforcements?: readonly { requiresAxiom?: AxiomId }[]; readonly summonDefinitions?: readonly { requiresAxiom?: AxiomId }[]; readonly replacementDefinitions?: readonly { requiresAxiom?: AxiomId }[]; readonly transformationDefinitions?: readonly { requiresAxiom?: AxiomId }[]; readonly undeployedDeck?: readonly { requiresAxiom?: AxiomId }[] }
+export function preflightAxiomModules(set: AxiomModuleSet, manifest: AxiomParticipantManifest): void { for (const group of [manifest.leaders, manifest.decks, manifest.undeployedDeck, manifest.npcRoster, manifest.scriptedReinforcements, manifest.summonDefinitions, manifest.replacementDefinitions, manifest.transformationDefinitions]) for (const participant of group ?? []) if (participant.requiresAxiom) set.load(participant.requiresAxiom); }
+const eventRuntime = (context: ReadonlyAxiomContext, command?: AxiomCommandType): AxiomRuntime => ({ onEvent: (_event, payload) => { if (command) context.submit({ type: command, payload } as never); } });
+for (const definition of [
+ { id: 'reincarnation', version: 1, activationPolicy: 'global', supportedModes: ['pve','arena','chess'], observedEvents: ['DEATH_CONFIRMED'], allowedCommands: ['record-death'], createRuntime: (context: ReadonlyAxiomContext) => eventRuntime(context, 'record-death') },
+ { id: 'heavenly-thunder', version: 1, activationPolicy: 'global', supportedModes: ['pve','arena','chess'], observedEvents: ['TRANSGRESSION_RECORDED'], allowedCommands: ['record-transgression'], createRuntime: (context: ReadonlyAxiomContext) => eventRuntime(context, 'record-transgression') },
+ { id: 'divine-nature', version: 1, activationPolicy: 'trait', supportedModes: ['pve','arena','chess'], observedEvents: ['MECHANIC_CLAIM_SUBMITTED'], allowedCommands: ['submit-protected-claim'], createRuntime: (context: ReadonlyAxiomContext) => eventRuntime(context, 'submit-protected-claim') },
+] as const) registerAxiomDefinition(definition);

@@ -9,7 +9,9 @@ test('canonical tag and effect registries are closed', () => {
   expect(() => requireCanonicalMetadataTag('fear', 'x', 'kit.tags[0]')).toThrow('namespaced canonical');
   expect(registeredEffectHandlerCount()).toBe(EFFECT_TYPES.length);
   expect(() => assertAllEffectHandlersRegistered()).not.toThrow();
-  expect(dispatchEffect({ type: 'heal', payload: { amount: 10 }, target: { kind: 'selected-ally' } }, 'x', 'kit.skill1.effect')).toEqual({ type: 'heal', payload: { amount: 10 }, target: { kind: 'selected-ally' } });
+  const effect = { type: 'heal', payload: { amount: 10 }, target: { kind: 'selected-ally' } } as const;
+  const context: any = { session: {}, action: {}, sourceTrueSelfId: 'x', sourceLifeId: 'x:1', resolvedTargetIds: [2], kitKey: 'skill1', authority: 'none', mode: 'pve', random: () => 0.5, commit: () => ({ effectType: 'heal', committed: true, eventSerial: 1, stateRevision: 1 }) };
+  expect(dispatchEffect(effect, context, 'x', 'kit.skill1.effect')).toEqual({ effectType: 'heal', committed: true, eventSerial: 1, stateRevision: 1 });
 });
 
 test('authority resolves only directly contradictory effect claims and V1 ignores stars/awaken', () => {

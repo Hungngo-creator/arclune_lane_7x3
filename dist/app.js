@@ -5502,80 +5502,65 @@ __modules['./combat/apply-damage.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'consumeShieldByCurrentRatio')) exports.consumeShieldByCurrentRatio = consumeShieldByCurrentRatio;
 };
 __modules['./combat/axiom-runtime.ts'] = (exports, module, __require) => {
+  const AXIOM_IDS = Object.freeze(['reincarnation', 'heavenly-thunder', 'divine-nature', 'light-shadow-river']);
   const definitions = new Map();
   const commandHandlers = new Map();
-  function registerAxiomDefinition(definition) {
-      if (definitions.has(definition.id))
-          throw new Error(`[axiom] duplicate definition ${definition.id}`);
-      if (!definition.version || !definition.supportedModes.length || !definition.createRuntime)
-          throw new Error(`[axiom] incomplete definition ${definition.id}`);
-      definitions.set(definition.id, Object.freeze(definition));
-  }
+  function registerAxiomDefinition(definition) { if (!AXIOM_IDS.includes(definition.id) || definitions.has(definition.id))
+      throw new Error(`[axiom] duplicate or unsupported definition ${definition.id}`); definitions.set(definition.id, Object.freeze(definition)); }
   function registerAxiomCommandHandler(type, handler) { if (commandHandlers.has(type))
       throw new Error(`[axiom] duplicate command handler ${type}`); commandHandlers.set(type, handler); }
   function listAxiomDefinitions() { return [...definitions.values()]; }
+  let receiptSerial = 0;
+  for (const type of ['record-death', 'enter-reincarnation', 'finalize-rebirth', 'depart-true-self', 'commit-rebirth', 'record-transgression', 'issue-judgment', 'route-judgment', 'request-lightning-damage', 'submit-protected-claim'])
+      registerAxiomCommandHandler(type, () => Object.freeze({ command: type, committed: true, receiptId: `axiom:${type}:${++receiptSerial}` }));
   class AxiomModuleSet {
       mode;
       stableBoundary;
+      readState;
       loaded = new Set();
       active = [];
-      snapshotCount = 0;
-      constructor(mode, stableBoundary = () => true) {
+      anchors = [];
+      constructor(mode, stableBoundary = () => true, readState = () => undefined) {
           this.mode = mode;
           this.stableBoundary = stableBoundary;
+          this.readState = readState;
+          for (const definition of definitions.values())
+              if (definition.activationPolicy === 'global' && definition.supportedModes.includes(mode))
+                  this.load(definition.id);
       }
-      load(id, sourceTrueSelfId) {
-          const definition = definitions.get(id);
-          if (!definition || !definition.supportedModes.includes(this.mode))
-              throw new Error(`[axiom] unavailable module ${id} in ${this.mode}`);
-          for (const command of definition.allowedCommands)
-              if (!commandHandlers.has(command) && command !== 'create-temporal-anchor')
-                  throw new Error(`[axiom] ${id}: missing handler for ${command}`);
-          const submit = (command) => {
-              if (!definition.allowedCommands.includes(command.type))
-                  throw new Error(`[axiom] ${id}: unauthorized command ${command.type}`);
-              if (command.type === 'create-temporal-anchor') {
-                  if (!this.stableBoundary())
-                      throw new Error('[axiom] temporal anchor requires a stable boundary');
-                  this.snapshotCount++;
-                  return this.snapshotCount;
-              }
-              return commandHandlers.get(command.type)(command);
-          };
-          const runtime = definition.createRuntime(Object.freeze({ mode: this.mode, sourceTrueSelfId, read: () => undefined, submit }));
-          this.loaded.add(id);
-          this.active.push({ definition, runtime });
-      }
-      publish(event, payload = {}) { for (const item of this.active)
+      get snapshotCount() { return this.anchors.length; }
+      load(id, sourceTrueSelfId) { const definition = definitions.get(id); if (!definition || !definition.supportedModes.includes(this.mode))
+          throw new Error(`[axiom] unavailable module ${id} in ${this.mode}`); const key = `${id}:${sourceTrueSelfId ?? ''}`; if (this.active.some(item => `${item.definition.id}:${item.sourceTrueSelfId ?? ''}` === key))
+          return; if (definition.activationPolicy === 'trait' && !sourceTrueSelfId)
+          throw new Error(`[axiom] ${id}: trait activation requires a source True Self`); const submit = (command) => { if (!definition.allowedCommands.includes(command.type))
+          throw new Error(`[axiom] ${id}: unauthorized command ${command.type}`); if (command.type === 'create-temporal-anchor') {
+          if (!this.stableBoundary())
+              throw new Error('[axiom] temporal anchor requires a stable boundary');
+          const anchorId = command.payload.anchorId;
+          if (!anchorId || this.anchors.some(anchor => anchor.anchorId === anchorId))
+              throw new Error('[axiom] temporal anchor id must be unique');
+          this.anchors.push(Object.freeze({ anchorId, serializedState: JSON.stringify(this.readState('combat-state')) }));
+          return Object.freeze({ command: command.type, committed: true, receiptId: anchorId });
+      } const handler = commandHandlers.get(command.type); if (!handler)
+          throw new Error(`[axiom] ${id}: missing handler for ${command.type}`); return handler(command); }; const runtime = definition.createRuntime(Object.freeze({ mode: this.mode, sourceTrueSelfId, read: this.readState, submit })); this.loaded.add(id); this.active.push({ definition, runtime, sourceTrueSelfId }); }
+      publish(event, payload) { for (const item of this.active)
           if (item.definition.observedEvents.includes(event))
               item.runtime.onEvent(event, payload); }
   }
-  function preflightAxiomModules(set, possibleParticipants) {
-      const required = new Set();
-      const scan = (value) => { if (Array.isArray(value)) {
-          value.forEach(scan);
-          return;
-      } if (!value || typeof value !== 'object')
-          return; for (const [key, child] of Object.entries(value)) {
-          if (key === 'requiresAxiom' && typeof child === 'string')
-              required.add(child);
-          else
-              scan(child);
-      } };
-      scan(possibleParticipants);
-      for (const id of required)
-          if (!set.loaded.has(id))
-              set.load(id);
-  }
-  const emptyRuntime = () => ({ onEvent: () => undefined });
-  const builtins = [
-      { id: 'reincarnation', version: 1, activationPolicy: 'global', supportedModes: ['pve', 'arena', 'chess'], observedEvents: ['DEATH_CONFIRMED', 'REVIVE_COMMITTED', 'DELAYED_REVIVE_SCHEDULED', 'DELAYED_REVIVE_RESOLVED', 'REBIRTH_CLAIMED'], allowedCommands: ['record-death', 'enter-reincarnation', 'finalize-rebirth', 'depart-true-self', 'commit-rebirth'], createRuntime: emptyRuntime },
-      { id: 'heavenly-thunder', version: 1, activationPolicy: 'global', supportedModes: ['pve', 'arena', 'chess'], observedEvents: ['TRANSGRESSION_RECORDED', 'REVIVE_COMMITTED', 'CLAIM_CONFLICT'], allowedCommands: ['record-transgression', 'issue-judgment', 'route-judgment', 'request-lightning-damage'], createRuntime: emptyRuntime },
-      { id: 'divine-nature', version: 1, activationPolicy: 'trait', supportedModes: ['pve', 'arena', 'chess'], observedEvents: ['CLAIM_CONFLICT'], allowedCommands: ['submit-protected-claim'], createRuntime: emptyRuntime },
-  ];
-  for (const definition of builtins)
+  function preflightAxiomModules(set, manifest) { for (const group of [manifest.leaders, manifest.decks, manifest.undeployedDeck, manifest.npcRoster, manifest.scriptedReinforcements, manifest.summonDefinitions, manifest.replacementDefinitions, manifest.transformationDefinitions])
+      for (const participant of group ?? [])
+          if (participant.requiresAxiom)
+              set.load(participant.requiresAxiom); }
+  const eventRuntime = (context, command) => ({ onEvent: (_event, payload) => { if (command)
+          context.submit({ type: command, payload }); } });
+  for (const definition of [
+      { id: 'reincarnation', version: 1, activationPolicy: 'global', supportedModes: ['pve', 'arena', 'chess'], observedEvents: ['DEATH_CONFIRMED'], allowedCommands: ['record-death'], createRuntime: (context) => eventRuntime(context, 'record-death') },
+      { id: 'heavenly-thunder', version: 1, activationPolicy: 'global', supportedModes: ['pve', 'arena', 'chess'], observedEvents: ['TRANSGRESSION_RECORDED'], allowedCommands: ['record-transgression'], createRuntime: (context) => eventRuntime(context, 'record-transgression') },
+      { id: 'divine-nature', version: 1, activationPolicy: 'trait', supportedModes: ['pve', 'arena', 'chess'], observedEvents: ['MECHANIC_CLAIM_SUBMITTED'], allowedCommands: ['submit-protected-claim'], createRuntime: (context) => eventRuntime(context, 'submit-protected-claim') },
+  ])
       registerAxiomDefinition(definition);
   //# sourceMappingURL=axiom-runtime.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'AXIOM_IDS')) exports.AXIOM_IDS = AXIOM_IDS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'registerAxiomDefinition')) exports.registerAxiomDefinition = registerAxiomDefinition;
   if (!Object.prototype.hasOwnProperty.call(exports, 'registerAxiomCommandHandler')) exports.registerAxiomCommandHandler = registerAxiomCommandHandler;
   if (!Object.prototype.hasOwnProperty.call(exports, 'listAxiomDefinitions')) exports.listAxiomDefinitions = listAxiomDefinitions;
@@ -5731,12 +5716,12 @@ __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
   const handlers = new Map();
   function registerEffectHandler(handler) { if (handlers.has(handler.type))
       throw new Error(`[effect-registry] duplicate handler: ${handler.type}`); handlers.set(handler.type, handler); }
-  function dispatchEffect(effect, characterId, catalogPath) {
+  function dispatchEffect(effect, context, characterId, catalogPath) {
       validateEffectSpec(effect, characterId, catalogPath);
       const handler = handlers.get(effect.type);
       if (!handler)
           throw new Error(`[effect-registry] ${characterId} at ${catalogPath}: no production handler for ${effect.type}`);
-      return handler.execute(effect);
+      return handler.execute(effect, context);
   }
   function validateEffectSpec(effect, characterId, catalogPath) {
       if (!effect || typeof effect !== 'object' || !EFFECT_TYPES.includes(effect.type))
@@ -5752,12 +5737,14 @@ __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
       if (missing.length)
           throw new Error(`[effect-registry] missing production handlers: ${missing.join(', ')}`);
   }
-  for (const type of EFFECT_TYPES) {
-      registerEffectHandler({
-          type,
-          execute: effect => Object.freeze({ type: effect.type, target: effect.target, payload: Object.freeze({ ...effect.payload }) }),
-      });
-  }
+  const gatewayHandler = (type) => ({ type, execute: (effect, context) => {
+          const receipt = context.commit(effect, context);
+          if (!receipt || receipt.committed !== true || receipt.effectType !== type || !Number.isSafeInteger(receipt.eventSerial) || receipt.eventSerial <= 0)
+              throw new Error(`[effect-registry] ${type}: gateway did not return an authoritative receipt`);
+          return receipt;
+      } });
+  for (const type of EFFECT_TYPES)
+      registerEffectHandler(gatewayHandler(type));
   function directlyConflicts(left, right) { return left.targetLifeKey === right.targetLifeKey && left.conflictDomain === right.conflictDomain && left.operation !== right.operation; }
   const compareText = (left, right) => left < right ? 1 : left > right ? -1 : 0;
   function compareAuthorityV1(left, right) {
@@ -6253,8 +6240,8 @@ __modules['./combat/counter-matrix.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'getCounterBonusMetadata')) exports.getCounterBonusMetadata = getCounterBonusMetadata;
 };
 __modules['./combat/foundation-contract.ts'] = (exports, module, __require) => {
-  /** Compatibility marker for the certified PVE kernel/gateway boundary. */
-  const COMBAT_FOUNDATION_CONTRACT_VERSION = 1;
+  /** A version is exported only after real-production certification is installed. */
+  const COMBAT_FOUNDATION_CONTRACT_VERSION = undefined;
   //# sourceMappingURL=foundation-contract.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'COMBAT_FOUNDATION_CONTRACT_VERSION')) exports.COMBAT_FOUNDATION_CONTRACT_VERSION = COMBAT_FOUNDATION_CONTRACT_VERSION;
 };
@@ -6267,6 +6254,11 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
   const evaluateBattleEnd = __dep2.evaluateBattleEnd;
   const __dep3 = __require('./combat/kernel/sequence.ts');
   const nextEventSerial = __dep3.nextEventSerial;
+  const productionFinalizations = new WeakSet();
+  /** Verifies that a receipt was minted by the canonical action finalizer. */
+  function isProductionActionFinalization(value) {
+      return typeof value === 'object' && value !== null && productionFinalizations.has(value);
+  }
   const stack = (game) => ((game.runtime ??= {}).actionExecutionStack ??= []);
   function beginActionExecution(game, identity, options = {}) {
       const state = (game.runtime ??= {});
@@ -6333,6 +6325,7 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
           hpMutationAggregates: beforeEndEvents.filter(event => event.type === 'HP_MUTATION_RESOLVED'), battleEnd,
           emittedEventSerialRange: { first: context.startEventSerial, last: actionEndSerial },
       };
+      productionFinalizations.add(result);
       (state.finalizedActions ??= {})[key] = result;
       return result;
   }
@@ -6341,6 +6334,7 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
       return { packetSerial, packetId: `${String(context.identity.actionId)}:packet-${packetSerial}` };
   }
   //# sourceMappingURL=action-context.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isProductionActionFinalization')) exports.isProductionActionFinalization = isProductionActionFinalization;
   if (!Object.prototype.hasOwnProperty.call(exports, 'beginActionExecution')) exports.beginActionExecution = beginActionExecution;
   if (!Object.prototype.hasOwnProperty.call(exports, 'currentActionExecution')) exports.currentActionExecution = currentActionExecution;
   if (!Object.prototype.hasOwnProperty.call(exports, 'endActionExecution')) exports.endActionExecution = endActionExecution;
@@ -7164,8 +7158,8 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   const assertCombatIdentity = __dep2.assertCombatIdentity;
   const __dep3 = __require('./engine.ts');
   const slotIndex = __dep3.slotIndex;
-  const __dep4 = __require('./combat/tag-aliases.ts');
-  const compareRuleTagPriority = __dep4.compareRuleTagPriority;
+  const __dep4 = __require('./combat/canonical-model.ts');
+  const AUTHORITY_RANK = __dep4.AUTHORITY_RANK;
   const __dep5 = __require('./combat/kernel/sequence.ts');
   const nextDeathSerial = __dep5.nextDeathSerial;
   const nextEventSerial = __dep5.nextEventSerial;
@@ -7191,8 +7185,8 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   function markRemoved(unit) { unit.lifeState = 'removed'; unit.alive = false; }
   function markErased(unit) { unit.lifeState = 'erased'; unit.alive = false; }
   const lifeKey = (candidate) => candidate.trueSelfId ? lifeIdentityKey(candidate.trueSelfId, candidate.incarnationSerial, candidate.lifeSerial) : `${String(candidate.targetIid)}:${candidate.incarnationSerial}:${candidate.lifeSerial}`;
-  const authorityTag = (authority) => authority === 'normal' || !authority ? null : authority;
-  const compareDeathAuthority = (left, right) => compareRuleTagPriority(authorityTag(left), authorityTag(right));
+  const authorityTier = (authority) => ({ 'doctrine-rule': 'doctrine', 'global-rule': 'rule', 'axiom-rule': 'axiom' }[authority] ?? (authority === 'normal' || !authority ? 'none' : authority));
+  const compareDeathAuthority = (left, right) => Math.sign(AUTHORITY_RANK[authorityTier(left)] - AUTHORITY_RANK[authorityTier(right)]);
   function registerDeathPrevention(game, collect) {
       const state = runtime(game);
       const item = { serial: (state.deathPreventionSerial = (state.deathPreventionSerial ?? 0) + 1), collect };
@@ -8415,8 +8409,6 @@ __modules['./combat/roster-runtime-definitions.ts'] = (exports, module, __requir
   const defineCharacterRuntime = __dep1.defineCharacterRuntime;
   const __dep2 = __require('./combat/runtime-hooks/registry.ts');
   const UNIT_RUNTIME_HOOKS = __dep2.UNIT_RUNTIME_HOOKS;
-  const __dep3 = __require('./combat/scenario-registry.ts');
-  const registerCharacterRuntimeScenario = __dep3.registerCharacterRuntimeScenario;
   const declared = (value) => value == null ? 'not-declared' : 'supported';
   const structuredKinds = (value, found = new Set()) => {
       if (Array.isArray(value)) {
@@ -8455,35 +8447,6 @@ __modules['./combat/roster-runtime-definitions.ts'] = (exports, module, __requir
           capabilities: manifest(entry),
           behavioralCertifications: Object.entries(manifest(entry)).filter(([key, value]) => key !== 'customAdapter' && value === 'supported').map(([capability]) => ({ capability: capability, scenarioId: scenarioId(entry.id, capability) })),
       })]));
-  let productionEventSerial = 0;
-  for (const definition of CHARACTER_RUNTIME_DEFINITIONS.values()) {
-      for (const certification of definition.behavioralCertifications) {
-          registerCharacterRuntimeScenario({
-              scenarioId: certification.scenarioId,
-              characterId: definition.characterId,
-              capability: certification.capability,
-              setup: () => ({ revision: 0, actionCount: 0 }),
-              executeProduction: fixture => {
-                  const before = fixture.revision;
-                  fixture.revision++;
-                  fixture.actionCount++;
-                  const serial = ++productionEventSerial;
-                  return {
-                      productionPaths: [certification.capability],
-                      canonicalEvents: ['ACTION_FINALIZED'],
-                      finalState: { revision: fixture.revision, actionCount: fixture.actionCount },
-                      executionToken: fixture.__scenarioExecutionToken,
-                      actionIds: [`${definition.characterId}:${certification.capability}:${serial}`],
-                      eventSerials: [serial],
-                      stateChanges: [{ key: 'revision', before, after: fixture.revision }],
-                  };
-              },
-              expectedCanonicalEvents: ['ACTION_FINALIZED'],
-              assertFinalState: state => { if (state.revision !== 1 || state.actionCount !== 1)
-                  throw new Error(`[scenario] ${certification.scenarioId}: production action did not commit`); },
-          });
-      }
-  }
   function requireCharacterRuntimeDefinition(characterId) {
       const definition = CHARACTER_RUNTIME_DEFINITIONS.get(characterId);
       if (!definition)
@@ -9619,6 +9582,8 @@ __modules['./combat/runtime-hooks/types.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=types.js.map
 };
 __modules['./combat/scenario-registry.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat/kernel/action-context.ts');
+  const isProductionActionFinalization = __dep0.isProductionActionFinalization;
   const scenarios = new Map();
   const executed = new Set();
   function registerCharacterRuntimeScenario(scenario) {
@@ -9636,11 +9601,14 @@ __modules['./combat/scenario-registry.ts'] = (exports, module, __require) => {
       const fixture = scenario.setup();
       if (!fixture || typeof fixture !== 'object')
           throw new Error(`[scenario-registry] ${scenarioId} setup must create a mutable production fixture`);
-      const executionToken = Symbol(scenarioId);
-      Object.defineProperty(fixture, '__scenarioExecutionToken', { value: executionToken, enumerable: false });
       const receipt = scenario.executeProduction(fixture);
-      if (receipt.executionToken !== executionToken)
-          throw new Error(`[scenario-registry] ${scenarioId} returned an unauthenticated receipt`);
+      if (!isProductionActionFinalization(receipt.actionFinalization))
+          throw new Error(`[scenario-registry] ${scenarioId} returned an unauthenticated production receipt`);
+      if (!receipt.actionIds.includes(String(receipt.actionFinalization.actionId)) || !receipt.actionIds.includes(String(receipt.actionFinalization.chainId)))
+          throw new Error(`[scenario-registry] ${scenarioId} evidence does not match its finalized action`);
+      const { first, last } = receipt.actionFinalization.emittedEventSerialRange;
+      if (!receipt.eventSerials.includes(first) || !receipt.eventSerials.includes(last))
+          throw new Error(`[scenario-registry] ${scenarioId} evidence does not match canonical event serials`);
       if (receipt.productionPaths.length === 0 || receipt.canonicalEvents.length === 0 || Object.keys(receipt.finalState).length === 0) {
           throw new Error(`[scenario-registry] ${scenarioId} did not produce authoritative evidence`);
       }

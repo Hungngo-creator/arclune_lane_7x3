@@ -3,7 +3,7 @@ import type { LifeState, Side, UnitToken } from '../../types/units.ts';
 import { beginRevivedLife } from './combat-identity.ts';
 import { assertCombatIdentity, type CombatIdentityKind } from './combat-identity.ts';
 import { slotIndex } from '../../engine.ts';
-import { compareRuleTagPriority, type RuleTag } from '../tag-aliases.ts';
+import { AUTHORITY_RANK, type AuthorityTier } from '../canonical-model.ts';
 import { nextDeathSerial, nextEventSerial } from './sequence.ts';
 import type { ActionIdentity, SourceAttribution } from './types.ts';
 import { finalizeRebirthClaimWindows, hasEnteredReincarnation, markReincarnationEscapedByRevive, observeReincarnationDeathWave } from './reincarnation.ts';
@@ -21,7 +21,7 @@ export interface HPZeroCandidate {
 export interface DeathRecord extends HPZeroCandidate {
   deathId: string; deathSerial: number; countsForKill: boolean; revivable: boolean; confirmedEventSerial: number;
 }
-export type DeathAuthority = 'normal' | RuleTag;
+export type DeathAuthority = 'normal' | AuthorityTier | 'doctrine-rule' | 'global-rule' | 'axiom-rule';
 export interface DeathPreventionDecision { prevent: boolean; hp: number; effectId: string; authority?: DeathAuthority; priority?: number; explicitPriority?: number; registrationSerial?: number; charge?: Readonly<Record<string, unknown>>; source?: SourceAttribution }
 export interface DeathPreventionRequest { candidate: HPZeroCandidate; decisions: readonly DeathPreventionDecision[] }
 export interface ReviveRequest { death: DeathRecord; hpPolicy: { kind: 'flat' | 'ratio'; value: number }; ragePolicy: 'preserve' | 'reset'; buffPolicy: 'preserve' | 'purge' | 'preserve-all' | 'purge-purgeable-debuffs' | 'clear-temporary' | 'explicit-list'; statusIds?: readonly string[]; positionPolicy: 'preserve'; source: SourceAttribution; authority?: string; allowSummon?: boolean }
@@ -42,8 +42,8 @@ export function markDeathConfirmed(unit: UnitToken): void { unit.hp = 0; unit.li
 export function markRemoved(unit: UnitToken): void { unit.lifeState = 'removed'; unit.alive = false; }
 export function markErased(unit: UnitToken): void { unit.lifeState = 'erased'; unit.alive = false; }
 const lifeKey = (candidate: Pick<HPZeroCandidate, 'trueSelfId' | 'incarnationSerial' | 'lifeSerial' | 'targetIid'>): string => candidate.trueSelfId ? lifeIdentityKey(candidate.trueSelfId, candidate.incarnationSerial, candidate.lifeSerial) : `${String(candidate.targetIid)}:${candidate.incarnationSerial}:${candidate.lifeSerial}`;
-const authorityTag = (authority: DeathAuthority | undefined): RuleTag | null => authority === 'normal' || !authority ? null : authority;
-export const compareDeathAuthority = (left: DeathAuthority | undefined, right: DeathAuthority | undefined): number => compareRuleTagPriority(authorityTag(left), authorityTag(right));
+const authorityTier = (authority: DeathAuthority | undefined): AuthorityTier => ({ 'doctrine-rule': 'doctrine', 'global-rule': 'rule', 'axiom-rule': 'axiom' } as const)[authority as string] ?? (authority === 'normal' || !authority ? 'none' : authority as AuthorityTier);
+export const compareDeathAuthority = (left: DeathAuthority | undefined, right: DeathAuthority | undefined): number => Math.sign(AUTHORITY_RANK[authorityTier(left)] - AUTHORITY_RANK[authorityTier(right)]);
 export function registerDeathPrevention(game: SessionState, collect: PreventionCollector): () => void {
   const state = runtime(game); const item = { serial: (state.deathPreventionSerial = (state.deathPreventionSerial ?? 0) + 1), collect }; (state.deathPreventionRegistrations ??= []).push(item);
   return () => { state.deathPreventionRegistrations = state.deathPreventionRegistrations?.filter(entry => entry !== item); };

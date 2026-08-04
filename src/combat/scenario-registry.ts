@@ -1,13 +1,12 @@
 import type { CharacterCapability } from './character-runtime.ts';
+import { isProductionActionFinalization, type ActionFinalizationResult } from './kernel/action-context.ts';
 
 export interface ScenarioExecutionReceipt {
   readonly productionPaths: readonly string[];
   readonly canonicalEvents: readonly string[];
   readonly finalState: Readonly<Record<string, unknown>>;
-  /** Opaque token installed on the fixture by the registry. Production scenarios
-   * must return the same token, which prevents callers from certifying an
-   * unexecuted, pre-built receipt. */
-  readonly executionToken: symbol;
+  /** Runtime-owned receipt minted only by finalizeCombatAction. */
+  readonly actionFinalization: ActionFinalizationResult;
   readonly actionIds: readonly string[];
   readonly eventSerials: readonly number[];
   readonly stateChanges: readonly { readonly key: string; readonly before: unknown; readonly after: unknown }[];
@@ -40,10 +39,11 @@ export function executeCharacterRuntimeScenario(scenarioId: string): ScenarioExe
   if (!scenario) throw new Error(`[scenario-registry] unknown scenario: ${scenarioId}`);
   const fixture = scenario.setup();
   if (!fixture || typeof fixture !== 'object') throw new Error(`[scenario-registry] ${scenarioId} setup must create a mutable production fixture`);
-  const executionToken = Symbol(scenarioId);
-  Object.defineProperty(fixture, '__scenarioExecutionToken', { value: executionToken, enumerable: false });
   const receipt = scenario.executeProduction(fixture);
-  if (receipt.executionToken !== executionToken) throw new Error(`[scenario-registry] ${scenarioId} returned an unauthenticated receipt`);
+  if (!isProductionActionFinalization(receipt.actionFinalization)) throw new Error(`[scenario-registry] ${scenarioId} returned an unauthenticated production receipt`);
+  if (!receipt.actionIds.includes(String(receipt.actionFinalization.actionId)) || !receipt.actionIds.includes(String(receipt.actionFinalization.chainId))) throw new Error(`[scenario-registry] ${scenarioId} evidence does not match its finalized action`);
+  const { first, last } = receipt.actionFinalization.emittedEventSerialRange;
+  if (!receipt.eventSerials.includes(first) || !receipt.eventSerials.includes(last)) throw new Error(`[scenario-registry] ${scenarioId} evidence does not match canonical event serials`);
   if (receipt.productionPaths.length === 0 || receipt.canonicalEvents.length === 0 || Object.keys(receipt.finalState).length === 0) {
     throw new Error(`[scenario-registry] ${scenarioId} did not produce authoritative evidence`);
   }

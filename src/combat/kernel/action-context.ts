@@ -25,6 +25,11 @@ export interface ActionFinalizationResult {
   healingAggregates: readonly Record<string, unknown>[]; hpMutationAggregates: readonly Record<string, unknown>[];
   emittedEventSerialRange: { first: number; last: number };
 }
+const productionFinalizations = new WeakSet<object>();
+/** Verifies that a receipt was minted by the canonical action finalizer. */
+export function isProductionActionFinalization(value: unknown): value is ActionFinalizationResult {
+  return typeof value === 'object' && value !== null && productionFinalizations.has(value);
+}
 type FinalizationRuntime = ActionRuntime & { finalizedActions?: Record<string, ActionFinalizationResult>; combatEvents?: Record<string, unknown>[] };
 const stack = (game: SessionState): ActionExecutionContext[] => (((game.runtime ??= {}) as ActionRuntime).actionExecutionStack ??= []);
 
@@ -88,6 +93,7 @@ export function finalizeCombatAction(game: SessionState, context: ActionExecutio
     hpMutationAggregates: beforeEndEvents.filter(event => event.type === 'HP_MUTATION_RESOLVED'), battleEnd,
     emittedEventSerialRange: { first: context.startEventSerial, last: actionEndSerial },
   };
+  productionFinalizations.add(result);
   (state.finalizedActions ??= {})[key] = result;
   return result;
 }

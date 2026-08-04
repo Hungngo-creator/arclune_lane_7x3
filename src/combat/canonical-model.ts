@@ -20,7 +20,9 @@ export function requireCanonicalMetadataTag(raw: string, characterId: string, ca
   return raw as CanonicalMetadataTag;
 }
 
-export type EffectType = 'deal-damage' | 'heal' | 'grant-shield' | 'pay-hp-cost' | 'sacrifice' | 'apply-status' | 'remove-status' | 'dispel' | 'grant-immunity' | 'spend-resource' | 'gain-resource' | 'summon' | 'create-field' | 'move' | 'trigger-follow-up' | 'trigger-counter' | 'reflect-damage' | 'request-death-prevention' | 'request-revive' | 'queue-delayed-revive' | 'enter-reincarnation' | 'request-rebirth' | 'set-stance' | 'set-form';
+export type ImplementedEffectType = 'deal-damage' | 'heal' | 'grant-shield' | 'pay-hp-cost' | 'sacrifice' | 'apply-status' | 'remove-status' | 'dispel' | 'grant-immunity' | 'spend-resource' | 'gain-resource' | 'summon' | 'create-field' | 'move' | 'trigger-follow-up' | 'trigger-counter' | 'reflect-damage' | 'request-death-prevention' | 'request-revive' | 'queue-delayed-revive' | 'enter-reincarnation' | 'request-rebirth' | 'set-stance' | 'set-form';
+export type ReservedFutureEffectType = never;
+export type EffectType = ImplementedEffectType;
 export const EFFECT_TYPES: readonly EffectType[] = Object.freeze(['deal-damage','heal','grant-shield','pay-hp-cost','sacrifice','apply-status','remove-status','dispel','grant-immunity','spend-resource','gain-resource','summon','create-field','move','trigger-follow-up','trigger-counter','reflect-damage','request-death-prevention','request-revive','queue-delayed-revive','enter-reincarnation','request-rebirth','set-stance','set-form']);
 export type TargetSpec =
   | { readonly kind: 'self' | 'selected-ally' | 'selected-enemy' | 'leader' }
@@ -46,15 +48,21 @@ export type EffectSpec =
   | { readonly type: 'set-stance' | 'set-form'; readonly target: TargetSpec; readonly payload: { readonly value: string } };
 /** @deprecated Use EffectSpec. */
 export type EffectDefinition = EffectSpec;
-export interface CanonicalEffectCommand { readonly type: EffectType; readonly target: TargetSpec; readonly payload: Readonly<Record<string, unknown>> }
-export interface EffectHandler<T extends EffectType = EffectType> { readonly type: T; execute(effect: Extract<EffectSpec, { type: T }>): CanonicalEffectCommand }
+export interface EffectCommitReceipt { readonly effectType: EffectType; readonly committed: true; readonly eventSerial: number; readonly stateRevision: number }
+export interface EffectExecutionContext {
+  readonly session: unknown; readonly action: unknown; readonly sourceTrueSelfId: string; readonly sourceLifeId: string;
+  readonly resolvedTargetIds: readonly (string | number)[]; readonly kitKey: string; readonly authority: AuthorityTier;
+  readonly mode: string; readonly random: () => number;
+  readonly commit: (effect: EffectSpec, context: EffectExecutionContext) => EffectCommitReceipt;
+}
+export interface EffectHandler<T extends EffectType = EffectType> { readonly type: T; execute(effect: Extract<EffectSpec, { type: T }>, context: EffectExecutionContext): EffectCommitReceipt }
 const handlers = new Map<EffectType, EffectHandler>();
 export function registerEffectHandler(handler: EffectHandler): void { if (handlers.has(handler.type)) throw new Error(`[effect-registry] duplicate handler: ${handler.type}`); handlers.set(handler.type, handler); }
-export function dispatchEffect(effect: EffectSpec, characterId: string, catalogPath: string): unknown {
+export function dispatchEffect(effect: EffectSpec, context: EffectExecutionContext, characterId: string, catalogPath: string): EffectCommitReceipt {
   validateEffectSpec(effect, characterId, catalogPath);
   const handler = handlers.get(effect.type);
   if (!handler) throw new Error(`[effect-registry] ${characterId} at ${catalogPath}: no production handler for ${effect.type}`);
-  return handler.execute(effect as never);
+  return handler.execute(effect as never, context);
 }
 export function validateEffectSpec(effect: EffectSpec, characterId: string, catalogPath: string): void {
   if (!effect || typeof effect !== 'object' || !EFFECT_TYPES.includes(effect.type)) throw new Error(`[catalog] ${characterId} at ${catalogPath}: unknown effect type`);
@@ -67,12 +75,12 @@ export function assertAllEffectHandlersRegistered(): void {
   if (missing.length) throw new Error(`[effect-registry] missing production handlers: ${missing.join(', ')}`);
 }
 
-for (const type of EFFECT_TYPES) {
-  registerEffectHandler({
-    type,
-    execute: effect => Object.freeze({ type: effect.type, target: effect.target, payload: Object.freeze({ ...effect.payload }) }),
-  });
-}
+const gatewayHandler = <T extends EffectType>(type: T): EffectHandler<T> => ({ type, execute: (effect, context) => {
+  const receipt = context.commit(effect, context);
+  if (!receipt || receipt.committed !== true || receipt.effectType !== type || !Number.isSafeInteger(receipt.eventSerial) || receipt.eventSerial <= 0) throw new Error(`[effect-registry] ${type}: gateway did not return an authoritative receipt`);
+  return receipt;
+} });
+for (const type of EFFECT_TYPES) registerEffectHandler(gatewayHandler(type));
 
 export interface AuthoritySnapshot { readonly rank: RankName; readonly cultivation: number; readonly combatPower: number; readonly stars?: number; readonly awaken?: number }
 export interface MechanicClaim { readonly claimId: string; readonly effectInstanceId: string; readonly sourceTrueSelfId: string; readonly sourceIid: string | number; readonly targetLifeKey: string; readonly kitKey: string; readonly effectType: EffectType; readonly conflictDomain: string; readonly operation: string; readonly authority: AuthorityTier; readonly authoritySnapshot: AuthoritySnapshot; readonly createdEventSerial: number }
