@@ -1156,7 +1156,7 @@ export function slotIndex(side: SlotSpecifier, cx: number, cy: number): number {
   }
   const enemyStart = enemyStartColumn();
   const colIndex = cx - enemyStart;
-  return colIndex * SIDE_ROW_COUNT + (cy + 1);
+  return colIndex * SIDE_ROW_COUNT + (SIDE_ROW_COUNT - cy);
 }
 
 export function slotToCell(side: SlotSpecifier, slot: number): CellCoords {
@@ -1170,7 +1170,7 @@ export function slotToCell(side: SlotSpecifier, slot: number): CellCoords {
   }
   const enemyStart = enemyStartColumn();
   const cx = enemyStart + colIndex;
-  const cy = rowIndex;
+  const cy = SIDE_ROW_COUNT - 1 - rowIndex;
   return { cx, cy };
 }
 

@@ -834,18 +834,51 @@ export function doActionOrSkip(
     return resolution;
   }
 
+  const selectedIid = unit.iid ?? unit.id;
+  const selectedLifeSerial = unit.lifeSerial ?? 1;
+  let actionStartEmitted = false;
+  const isSelectedActorEligible = (): boolean => {
+    if (!isCombatAlive(unit) || (unit.lifeSerial ?? 1) !== selectedLifeSerial) return false;
+    const occupant = Game.tokens.find((token) => token.side === side && slotIndex(token.side, token.cx, token.cy) === slot && isCombatAlive(token));
+    return occupant === unit && (unit.iid ?? unit.id) === selectedIid;
+  };
+  const stopInvalidActor = (): ActionResolution | null => {
+    if (isSelectedActorEligible()) return null;
+    if (!actionStartEmitted) {
+      emitGameEvent(ACTION_START, baseDetail);
+      actionStartEmitted = true;
+    }
+    ensureBusyReset();
+    resolution.consumedTurn = false;
+    resolution.acted = false;
+    resolution.skipped = true;
+    resolution.reason = 'missingUnit';
+    finishAction({ skipped: true, reason: 'missingUnit' });
+    return resolution;
+  };
+
   const meta = Game.meta.get(unit.id);
   const passiveLog = getPassiveLog(Game);
   const furyAtNaturalTurnStart = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
   emitPassiveEvent(Game, unit, 'onTurnStart', { log: passiveLog });
+  const invalidAfterPassive = stopInvalidActor();
+  if (invalidAfterPassive) return invalidAfterPassive;
 
   const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
   startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
   applyTurnRegen(Game, unit);
-  Statuses.onTurnStart(unit, {});
+  const invalidAfterRegen = stopInvalidActor();
+  if (invalidAfterRegen) return invalidAfterRegen;
+  Statuses.onTurnStart(unit, { game: Game });
+  const invalidAfterStatuses = stopInvalidActor();
+  if (invalidAfterStatuses) return invalidAfterStatuses;
   runRuntimeTurnStart(Game, unit);
+  const invalidAfterRuntime = stopInvalidActor();
+  if (invalidAfterRuntime) return invalidAfterRuntime;
   recoverChapMinhMaxHpPerTurn(unit);
   refreshChapMinhOwnership(Game);
+  const invalidAfterFieldSetup = stopInvalidActor();
+  if (invalidAfterFieldSetup) return invalidAfterFieldSetup;
   const bloodAvatarFieldOwners = Game.tokens.filter((token) =>
     isCombatAlive(token)
     && token.id === 'blood_avatar'
@@ -864,6 +897,10 @@ export function doActionOrSkip(
     }
   }
   emitGameEvent(ACTION_START, baseDetail);
+  actionStartEmitted = true;
+
+  const invalidBeforeSelection = stopInvalidActor();
+  if (invalidBeforeSelection) return invalidBeforeSelection;
 
   if (!Statuses.canAct(unit)) {
     return completeTurn({
@@ -876,6 +913,7 @@ export function doActionOrSkip(
 
   const ultCost = resolveUltCost(unit, CFG);
   const runUlt = (): boolean => {
+    if (!isSelectedActorEligible()) return false;
     const ready = isUyenLeader(unit)
       ? isAnyLeaderUltReady(unit)
       : (unit.fury ?? 0) >= ultCost;
@@ -940,6 +978,7 @@ export function doActionOrSkip(
     }
 
     try {
+      if (!isSelectedActorEligible()) return completeTurn({ consumedTurn: false, acted: false, reason: 'missingUnit', actionDetail: { skipped: true, reason: 'missingUnit' } });
       const cast = performActiveSkill(Game, unit, decision.action);
       if (!cast.ok) {
         continue;
@@ -969,6 +1008,8 @@ export function doActionOrSkip(
 
   const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
   try {
+    const invalidBeforeBasic = stopInvalidActor();
+    if (invalidBeforeBasic) return invalidBeforeBasic;
     const basic = doBasicWithFollowups(Game, unit, cap, (followupIndex) => {
       finishAction({
         action: 'basic',

@@ -111,6 +111,13 @@ export function processActionChain(
     if (cellReserved(aliveTokens, Game.queued, cx, cy)) continue;
 
     const extra = item.unit ?? {};
+    const missingStats = ['hpMax', 'hp'].filter((field) => {
+      const value = extra[field as keyof typeof extra];
+      return typeof value !== 'number' || !Number.isFinite(value) || value <= 0;
+    });
+    if (missingStats.length) {
+      throw new Error(`[summon-contract] owner=${String(extra.ownerIid ?? 'unknown')} side=${side} slot=${item.slot} summon=${String(extra.id ?? 'creep')} invalid=${missingStats.join(',')}`);
+    }
     const hpState = readCombatHpState({ hp: extra.hp ?? extra.hpMax ?? 0, hpMax: extra.hpMax ?? 0 });
     const art = getUnitArt(extra.id ?? 'minion');
     const iid = hooks.allocIid?.() ?? Game.tokens.reduce((max, token) => Math.max(max, Number(token.iid) || 0), 0) + 1;
@@ -124,6 +131,7 @@ export function processActionChain(
       cy,
       side,
       alive: true,
+      lifeState: 'alive',
       isMinion: true,
       ownerIid: extra.ownerIid,
       bornSerial: extra.bornSerial,
@@ -131,6 +139,9 @@ export function processActionChain(
       hpMax: hpState.hpMax,
       hp: hpState.hp,
       atk: extra.atk,
+      wil: extra.wil,
+      res: extra.res,
+      arm: extra.arm,
       art,
       skinKey: art?.skinKey ?? null,
       iid,
@@ -156,7 +167,7 @@ export function processActionChain(
     prepareUnitForPassives(spawned);
     applyOnSpawnEffects(Game, spawned, onSpawnConfig ?? undefined);
 
-    const creep = spawned.alive ? spawned : null;
+    const creep = isCombatAlive(spawned) ? spawned : null;
     if (creep){
       const { orderLength, cycle } = getTurnSnapshotInfo(Game.turn);
       const turnContext: TurnContext = {

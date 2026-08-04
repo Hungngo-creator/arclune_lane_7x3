@@ -14986,7 +14986,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       }
       const enemyStart = enemyStartColumn();
       const colIndex = cx - enemyStart;
-      return colIndex * SIDE_ROW_COUNT + (cy + 1);
+      return colIndex * SIDE_ROW_COUNT + (SIDE_ROW_COUNT - cy);
   }
   function slotToCell(side, slot) {
       const s = Math.max(1, Math.min(SIDE_SLOT_COUNT, slot | 0));
@@ -14999,7 +14999,7 @@ __modules['./engine.ts'] = (exports, module, __require) => {
       }
       const enemyStart = enemyStartColumn();
       const cx = enemyStart + colIndex;
-      const cy = rowIndex;
+      const cy = SIDE_ROW_COUNT - 1 - rowIndex;
       return { cx, cy };
   }
   function zoneCode(side, cx, cy, { numeric = false } = {}) {
@@ -45679,6 +45679,13 @@ __modules['./summon.ts'] = (exports, module, __require) => {
           if (cellReserved(aliveTokens, Game.queued, cx, cy))
               continue;
           const extra = item.unit ?? {};
+          const missingStats = ['hpMax', 'hp'].filter((field) => {
+              const value = extra[field];
+              return typeof value !== 'number' || !Number.isFinite(value) || value <= 0;
+          });
+          if (missingStats.length) {
+              throw new Error(`[summon-contract] owner=${String(extra.ownerIid ?? 'unknown')} side=${side} slot=${item.slot} summon=${String(extra.id ?? 'creep')} invalid=${missingStats.join(',')}`);
+          }
           const hpState = readCombatHpState({ hp: extra.hp ?? extra.hpMax ?? 0, hpMax: extra.hpMax ?? 0 });
           const art = getUnitArt(extra.id ?? 'minion');
           const iid = hooks.allocIid?.() ?? Game.tokens.reduce((max, token) => Math.max(max, Number(token.iid) || 0), 0) + 1;
@@ -45692,6 +45699,7 @@ __modules['./summon.ts'] = (exports, module, __require) => {
               cy,
               side,
               alive: true,
+              lifeState: 'alive',
               isMinion: true,
               ownerIid: extra.ownerIid,
               bornSerial: extra.bornSerial,
@@ -45699,6 +45707,9 @@ __modules['./summon.ts'] = (exports, module, __require) => {
               hpMax: hpState.hpMax,
               hp: hpState.hp,
               atk: extra.atk,
+              wil: extra.wil,
+              res: extra.res,
+              arm: extra.arm,
               art,
               skinKey: art?.skinKey ?? null,
               iid,
@@ -45722,7 +45733,7 @@ __modules['./summon.ts'] = (exports, module, __require) => {
           const onSpawnConfig = kit?.onSpawn && isRecord(kit.onSpawn) ? kit.onSpawn : null;
           prepareUnitForPassives(spawned);
           applyOnSpawnEffects(Game, spawned, onSpawnConfig ?? undefined);
-          const creep = spawned.alive ? spawned : null;
+          const creep = isCombatAlive(spawned) ? spawned : null;
           if (creep) {
               const { orderLength, cycle } = getTurnSnapshotInfo(Game.turn);
               const turnContext = {
@@ -46478,17 +46489,56 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           finishAction({ skipped: true, reason: 'missingUnit' });
           return resolution;
       }
+      const selectedIid = unit.iid ?? unit.id;
+      const selectedLifeSerial = unit.lifeSerial ?? 1;
+      let actionStartEmitted = false;
+      const isSelectedActorEligible = () => {
+          if (!isCombatAlive(unit) || (unit.lifeSerial ?? 1) !== selectedLifeSerial)
+              return false;
+          const occupant = Game.tokens.find((token) => token.side === side && slotIndex(token.side, token.cx, token.cy) === slot && isCombatAlive(token));
+          return occupant === unit && (unit.iid ?? unit.id) === selectedIid;
+      };
+      const stopInvalidActor = () => {
+          if (isSelectedActorEligible())
+              return null;
+          if (!actionStartEmitted) {
+              emitGameEvent(ACTION_START, baseDetail);
+              actionStartEmitted = true;
+          }
+          ensureBusyReset();
+          resolution.consumedTurn = false;
+          resolution.acted = false;
+          resolution.skipped = true;
+          resolution.reason = 'missingUnit';
+          finishAction({ skipped: true, reason: 'missingUnit' });
+          return resolution;
+      };
       const meta = Game.meta.get(unit.id);
       const passiveLog = getPassiveLog(Game);
       const furyAtNaturalTurnStart = Number.isFinite(unit.fury) ? Number(unit.fury) : 0;
       emitPassiveEvent(Game, unit, 'onTurnStart', { log: passiveLog });
+      const invalidAfterPassive = stopInvalidActor();
+      if (invalidAfterPassive)
+          return invalidAfterPassive;
       const turnStamp = `${side ?? ''}:${slot ?? ''}:${cycle ?? 0}`;
       startFuryTurn(unit, { turnStamp, startAmount: CFG?.fury?.turn?.startGain, grantStart: true });
       applyTurnRegen(Game, unit);
-      Statuses.onTurnStart(unit, {});
+      const invalidAfterRegen = stopInvalidActor();
+      if (invalidAfterRegen)
+          return invalidAfterRegen;
+      Statuses.onTurnStart(unit, { game: Game });
+      const invalidAfterStatuses = stopInvalidActor();
+      if (invalidAfterStatuses)
+          return invalidAfterStatuses;
       runRuntimeTurnStart(Game, unit);
+      const invalidAfterRuntime = stopInvalidActor();
+      if (invalidAfterRuntime)
+          return invalidAfterRuntime;
       recoverChapMinhMaxHpPerTurn(unit);
       refreshChapMinhOwnership(Game);
+      const invalidAfterFieldSetup = stopInvalidActor();
+      if (invalidAfterFieldSetup)
+          return invalidAfterFieldSetup;
       const bloodAvatarFieldOwners = Game.tokens.filter((token) => isCombatAlive(token)
           && token.id === 'blood_avatar'
           && token.side !== unit.side
@@ -46505,6 +46555,10 @@ __modules['./turns.ts'] = (exports, module, __require) => {
           }
       }
       emitGameEvent(ACTION_START, baseDetail);
+      actionStartEmitted = true;
+      const invalidBeforeSelection = stopInvalidActor();
+      if (invalidBeforeSelection)
+          return invalidBeforeSelection;
       if (!Statuses.canAct(unit)) {
           return completeTurn({
               consumedTurn: Game.turn?.mode === 'interleaved_by_position',
@@ -46515,6 +46569,8 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       }
       const ultCost = resolveUltCost(unit, CFG);
       const runUlt = () => {
+          if (!isSelectedActorEligible())
+              return false;
           const ready = isUyenLeader(unit)
               ? isAnyLeaderUltReady(unit)
               : (unit.fury ?? 0) >= ultCost;
@@ -46579,6 +46635,8 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               continue;
           }
           try {
+              if (!isSelectedActorEligible())
+                  return completeTurn({ consumedTurn: false, acted: false, reason: 'missingUnit', actionDetail: { skipped: true, reason: 'missingUnit' } });
               const cast = performActiveSkill(Game, unit, decision.action);
               if (!cast.ok) {
                   continue;
@@ -46608,6 +46666,9 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       }
       const cap = typeof meta?.followupCap === 'number' ? (meta.followupCap | 0) : (CFG.FOLLOWUP_CAP_DEFAULT | 0);
       try {
+          const invalidBeforeBasic = stopInvalidActor();
+          if (invalidBeforeBasic)
+              return invalidBeforeBasic;
           const basic = doBasicWithFollowups(Game, unit, cap, (followupIndex) => {
               finishAction({
                   action: 'basic',

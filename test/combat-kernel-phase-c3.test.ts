@@ -1,9 +1,10 @@
 import { commitImmediateRevive, commitRebirthEffect, createHpZeroCandidate, createNaturalAction, emitSsiTemporalEvent, resolveDeathWave, resolveSourceAttribution, scheduleDelayedRevive } from '../src/combat/kernel/index.ts';
 import type { SessionState } from '../src/types/combat.ts';
 import { dispatchGameplayTags } from '../src/combat/tag-dispatch.ts';
+import { slotToCell } from '../src/engine.ts';
 const game=():SessionState=>({runtime:{},tokens:[],battle:{over:false},events:{}} as unknown as SessionState);
 const source=resolveSourceAttribution({immediateSource:'killer-iid',trueSelf:'killer-self'});
-const unit=(iid:number,kind='collection-unit')=>({id:`u${iid}`,iid,trueSelfId:`self${iid}`,incarnationSerial:1,lifeSerial:1,side:'enemy',cx:0,cy:iid,hp:0,hpMax:100,alive:false,lifeState:'hp-zero',entityKind:kind,statuses:[]} as any);
+const unit=(iid:number,kind='collection-unit')=>({id:`u${iid}`,iid,trueSelfId:`self${iid}`,incarnationSerial:1,lifeSerial:1,side:'enemy',...slotToCell('enemy',iid),hp:0,hpMax:100,alive:false,lifeState:'hp-zero',entityKind:kind,statuses:[]} as any);
 const kill=(g:SessionState,targets:any[])=>{const action=createNaturalAction(g); for(const target of targets)createHpZeroCandidate(g,target,action,source,'damage',100); return resolveDeathWave(g);};
 
 test('five deterministic qualifying deaths enter only the first life into reincarnation',()=>{const g=game(),units=[1,2,3,4,5].map(iid=>unit(iid));g.tokens=units;const deaths=kill(g,units);expect(deaths.map(d=>d.targetIid)).toEqual([1,2,3,4,5]);const records=(g.runtime as any).reincarnationByDeathId;expect(records[deaths[0]!.deathId].state).toBe('entered');expect(records[deaths[1]!.deathId].state).toBe('waiting');expect((g.runtime as any).qualifyingDeathOrdinal).toBe(5);});

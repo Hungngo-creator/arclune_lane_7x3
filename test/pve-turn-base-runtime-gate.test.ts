@@ -3,6 +3,7 @@ import { slotToCell } from '../src/engine';
 import { doActionOrSkip, stepTurn } from '../src/turns';
 import { doBasicWithFollowups } from '../src/combat';
 import * as combat from '../src/combat';
+import { Statuses } from '../src/statuses';
 import type { UnitToken } from '../src/types/units';
 
 function unit(id: string, side: 'ally' | 'enemy', slot: number): UnitToken {
@@ -65,6 +66,22 @@ describe('production Turn Base runtime recovery gate', () => {
     expect(((game.runtime as any).combatEvents ?? []).some((event: any) => event.type === 'NATURAL_ACTION_COMPLETED')).toBe(false);
   });
 
+  test('lethal real turn-start status invalidates the selected life before any payload', () => {
+    const { game, ally } = battle();
+    ally.hp = 1;
+    ally.fury = 100;
+    const performUlt = jest.fn();
+    const basic = jest.spyOn(combat, 'doBasicWithFollowups');
+    jest.spyOn(Statuses, 'onTurnStart').mockImplementationOnce((actor) => {
+      actor.hp = 0; actor.alive = false; actor.lifeState = 'hp-zero';
+    });
+    const resolution = doActionOrSkip(game, ally, { performUlt });
+    expect(resolution).toMatchObject({ acted: false, consumedTurn: false, skipped: true, reason: 'missingUnit' });
+    expect(ally.hp).toBe(0);
+    expect(performUlt).not.toHaveBeenCalled();
+    expect(basic).not.toHaveBeenCalled();
+  });
+
   test('technical basic failure is visible, pauses runtime, and emits no successful completion', () => {
     const { game, ally } = battle();
     const fault = new Error('kernel boundary failed');
@@ -77,4 +94,3 @@ describe('production Turn Base runtime recovery gate', () => {
     expect(events.some(event => event.type === 'ACTION_END')).toBe(false);
   });
 });
-
