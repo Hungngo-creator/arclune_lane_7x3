@@ -5657,6 +5657,11 @@ __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
       return handler.execute(effect);
   }
   function registeredEffectHandlerCount() { return handlers.size; }
+  function assertAllEffectHandlersRegistered() {
+      const missing = EFFECT_TYPES.filter(type => !handlers.has(type));
+      if (missing.length)
+          throw new Error(`[effect-registry] missing production handlers: ${missing.join(', ')}`);
+  }
   function directlyConflicts(left, right) { return left.targetLifeKey === right.targetLifeKey && left.conflictDomain === right.conflictDomain && left.operation !== right.operation; }
   const compareText = (left, right) => left < right ? 1 : left > right ? -1 : 0;
   function compareAuthorityV1(left, right) {
@@ -5675,6 +5680,7 @@ __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'registerEffectHandler')) exports.registerEffectHandler = registerEffectHandler;
   if (!Object.prototype.hasOwnProperty.call(exports, 'dispatchEffect')) exports.dispatchEffect = dispatchEffect;
   if (!Object.prototype.hasOwnProperty.call(exports, 'registeredEffectHandlerCount')) exports.registeredEffectHandlerCount = registeredEffectHandlerCount;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'assertAllEffectHandlersRegistered')) exports.assertAllEffectHandlersRegistered = assertAllEffectHandlersRegistered;
   if (!Object.prototype.hasOwnProperty.call(exports, 'directlyConflicts')) exports.directlyConflicts = directlyConflicts;
   if (!Object.prototype.hasOwnProperty.call(exports, 'compareAuthorityV1')) exports.compareAuthorityV1 = compareAuthorityV1;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveDirectConflictV1')) exports.resolveDirectConflictV1 = resolveDirectConflictV1;
@@ -7067,6 +7073,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   const nextDeathSerial = __dep5.nextDeathSerial;
   const nextEventSerial = __dep5.nextEventSerial;
   const __dep6 = __require('./combat/kernel/reincarnation.ts');
+  const finalizeRebirthClaimWindows = __dep6.finalizeRebirthClaimWindows;
   const hasEnteredReincarnation = __dep6.hasEnteredReincarnation;
   const markReincarnationEscapedByRevive = __dep6.markReincarnationEscapedByRevive;
   const observeReincarnationDeathWave = __dep6.observeReincarnationDeathWave;
@@ -7269,6 +7276,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
                   chain.pendingImmediateRevives -= 1;
           }
       }
+      finalizeRebirthClaimWindows(game);
       return records;
   }
   function commitImmediateRevive(game, target, request) {
@@ -7400,8 +7408,12 @@ __modules['./combat/kernel/rebirth.ts'] = (exports, module, __require) => {
   const normalizeCombatHpValue = __dep4.normalizeCombatHpValue;
   const rt = (game) => (game.runtime ??= {});
   function registerRebirthAuthorization(game, effectId, record) {
-      if (record.state !== 'entered')
-          throw new Error('[rebirth] authorization requires entered ReincarnationRecord');
+      if (record.state === 'departed-from-battle')
+          throw new Error('[rebirth] departed-from-battle');
+      const openWinner = record.state === 'entered' && record.winningClaim?.effectId === effectId;
+      const reservation = record.state === 'rebirth-reserved' && record.reservation?.effectId === effectId && !record.reservation.consumed;
+      if (!openWinner && !reservation)
+          throw new Error('[rebirth] authorization requires a winning open claim or unconsumed reservation');
       const state = rt(game);
       const serial = state.rebirthAuthorizationSerial = (state.rebirthAuthorizationSerial ?? 0) + 1;
       const token = { tokenId: `rebirth-auth-${serial}`, effectId, deathId: record.deathId, trueSelfId: record.trueSelfId, incarnationSerial: record.incarnationSerial, lifeSerial: record.deadLifeSerial, consumed: false };
@@ -7413,7 +7425,9 @@ __modules['./combat/kernel/rebirth.ts'] = (exports, module, __require) => {
       if (state.battleEnd?.ended)
           return { allowed: false, reason: 'battle-ended' };
       const record = state.reincarnationByDeathId?.[request.deathId];
-      if (!record || record.state !== 'entered')
+      if (record?.state === 'departed-from-battle')
+          return { allowed: false, reason: 'departed-from-battle' };
+      if (!record || (record.state !== 'entered' && record.state !== 'rebirth-reserved'))
           return { allowed: false, reason: 'not-entered' };
       if (record.trueSelfId !== request.trueSelfId)
           return { allowed: false, reason: 'identity-mismatch' };
@@ -7437,6 +7451,8 @@ __modules['./combat/kernel/rebirth.ts'] = (exports, module, __require) => {
           return { committed: false, reason: eligibility.reason, trueSelfId: request.trueSelfId, oldIid: record?.targetIid ?? null, newIid: null, incarnationSerial: self.incarnationSerial };
       const auth = state.rebirthAuthorizations[request.authorizationTokenId];
       auth.consumed = true;
+      if (record.reservation)
+          record.reservation.consumed = true;
       const old = game.tokens.find(token => (token.iid ?? token.id) === record.targetIid);
       if (old)
           commitNonDeathRemoval(game, old, 'REBIRTH_RETIRED', 'rebirth');
@@ -7474,6 +7490,10 @@ __modules['./combat/kernel/reincarnation.ts'] = (exports, module, __require) => 
   const __dep1 = __require('./combat/kernel/true-self.ts');
   const ensureTrueSelfCombatRecord = __dep1.ensureTrueSelfCombatRecord;
   const lifeIdentityKey = __dep1.lifeIdentityKey;
+  const __dep2 = __require('./combat/kernel/non-death-removal.ts');
+  const commitNonDeathRemoval = __dep2.commitNonDeathRemoval;
+  const __dep3 = __require('./combat/canonical-model.ts');
+  const resolveDirectConflictV1 = __dep3.resolveDirectConflictV1;
   const runtime = (game) => (game.runtime ??= {});
   const reincarnationLifeKey = lifeIdentityKey;
   const emit = (game, record, type, ordinal) => {
@@ -7509,6 +7529,8 @@ __modules['./combat/kernel/reincarnation.ts'] = (exports, module, __require) => 
           record.state = 'entered';
           record.enteredAtDeathOrdinal = ordinal;
           record.enteredAtEventSerial = emit(game, record, 'REINCARNATION_ENTERED', ordinal);
+          record.state = 'rebirth-claim-open';
+          emit(game, record, 'REBIRTH_CLAIM_WINDOW_OPENED', ordinal);
           const key = reincarnationLifeKey(record.trueSelfId, record.incarnationSerial, record.deadLifeSerial);
           const entered = rt.enteredReincarnationLifeKeys ??= [];
           if (!entered.includes(key))
@@ -7521,7 +7543,10 @@ __modules['./combat/kernel/reincarnation.ts'] = (exports, module, __require) => 
               }
       }
   }
-  function hasEnteredReincarnation(game, deathId) { return runtime(game).reincarnationByDeathId?.[deathId]?.state === 'entered'; }
+  function hasEnteredReincarnation(game, deathId) {
+      const state = runtime(game).reincarnationByDeathId?.[deathId]?.state;
+      return state === 'entered' || state === 'rebirth-claim-open' || state === 'rebirth-reserved' || state === 'reborn' || state === 'departed-from-battle';
+  }
   function markReincarnationEscapedByRevive(game, deathId) {
       const record = runtime(game).reincarnationByDeathId?.[deathId];
       if (!record || record.state !== 'waiting')
@@ -7529,11 +7554,57 @@ __modules['./combat/kernel/reincarnation.ts'] = (exports, module, __require) => 
       record.state = 'escaped-by-revive';
       emit(game, record, 'REINCARNATION_ESCAPED_BY_REVIVE', runtime(game).qualifyingDeathOrdinal ?? record.deathOrdinal);
   }
+  function submitRebirthClaim(game, claim) {
+      const record = runtime(game).reincarnationByDeathId?.[claim.deathId];
+      if (!record || record.state === 'departed-from-battle')
+          throw new Error('[rebirth] departed-from-battle');
+      if (record.state !== 'rebirth-claim-open')
+          throw new Error('[rebirth] claim-window-closed');
+      if (claim.trueSelfId !== record.trueSelfId || claim.incarnationSerial !== record.incarnationSerial || claim.deadLifeSerial !== record.deadLifeSerial)
+          throw new Error('[rebirth] identity-mismatch');
+      if (claim.policy === 'reserved' && !claim.duePolicy)
+          throw new Error('[rebirth] reserved claim requires an explicit duePolicy');
+      (record.claims ??= []).push(claim);
+  }
+  function finalizeRebirthClaimWindows(game) {
+      const state = runtime(game);
+      for (const record of Object.values(state.reincarnationByDeathId ?? {})) {
+          if (record.state !== 'rebirth-claim-open')
+              continue;
+          let winner = record.claims?.[0];
+          for (const candidate of record.claims?.slice(1) ?? []) {
+              if (!winner)
+                  winner = candidate;
+              else
+                  winner = resolveDirectConflictV1(winner.authorityClaim, candidate.authorityClaim) === candidate.authorityClaim ? candidate : winner;
+          }
+          if (winner) {
+              record.winningClaim = winner;
+              if (winner.policy === 'reserved') {
+                  record.reservation = { reservationId: `rebirth-reservation-${record.deathId}-${winner.effectId}`, effectId: winner.effectId, deathId: record.deathId, trueSelfId: record.trueSelfId, incarnationSerial: record.incarnationSerial, deadLifeSerial: record.deadLifeSerial, duePolicy: winner.duePolicy, destination: winner.destination, consumed: false, canceledReason: null };
+                  record.state = 'rebirth-reserved';
+                  emit(game, record, 'REBIRTH_RESERVED', state.qualifyingDeathOrdinal ?? record.deathOrdinal);
+              }
+              else
+                  record.state = 'entered';
+              continue;
+          }
+          record.state = 'departed-from-battle';
+          const token = game.tokens.find(unit => (unit.iid ?? unit.id) === record.targetIid);
+          if (token) {
+              commitNonDeathRemoval(game, token, 'REMOVED', 'reincarnation-departed-from-battle');
+              game.tokens = game.tokens.filter(unit => unit !== token);
+          }
+          emit(game, record, 'REINCARNATION_DEPARTED_FROM_BATTLE', state.qualifyingDeathOrdinal ?? record.deathOrdinal);
+      }
+  }
   //# sourceMappingURL=reincarnation.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'reincarnationLifeKey')) exports.reincarnationLifeKey = reincarnationLifeKey;
   if (!Object.prototype.hasOwnProperty.call(exports, 'observeReincarnationDeathWave')) exports.observeReincarnationDeathWave = observeReincarnationDeathWave;
   if (!Object.prototype.hasOwnProperty.call(exports, 'hasEnteredReincarnation')) exports.hasEnteredReincarnation = hasEnteredReincarnation;
   if (!Object.prototype.hasOwnProperty.call(exports, 'markReincarnationEscapedByRevive')) exports.markReincarnationEscapedByRevive = markReincarnationEscapedByRevive;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'submitRebirthClaim')) exports.submitRebirthClaim = submitRebirthClaim;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'finalizeRebirthClaimWindows')) exports.finalizeRebirthClaimWindows = finalizeRebirthClaimWindows;
 };
 __modules['./combat/kernel/sequence.ts'] = (exports, module, __require) => {
   function getCombatSequence(game) {
@@ -9433,7 +9504,17 @@ __modules['./combat/scenario-registry.ts'] = (exports, module, __require) => {
       const scenario = scenarios.get(scenarioId);
       if (!scenario)
           throw new Error(`[scenario-registry] unknown scenario: ${scenarioId}`);
-      const receipt = scenario.executeProduction(scenario.setup());
+      const fixture = scenario.setup();
+      if (!fixture || typeof fixture !== 'object')
+          throw new Error(`[scenario-registry] ${scenarioId} setup must create a mutable production fixture`);
+      const executionToken = Symbol(scenarioId);
+      Object.defineProperty(fixture, '__scenarioExecutionToken', { value: executionToken, enumerable: false });
+      const receipt = scenario.executeProduction(fixture);
+      if (receipt.executionToken !== undefined && receipt.executionToken !== executionToken)
+          throw new Error(`[scenario-registry] ${scenarioId} returned an unauthenticated receipt`);
+      if (receipt.productionPaths.length === 0 || receipt.canonicalEvents.length === 0 || Object.keys(receipt.finalState).length === 0) {
+          throw new Error(`[scenario-registry] ${scenarioId} did not produce authoritative evidence`);
+      }
       if (!receipt.productionPaths.includes(scenario.capability))
           throw new Error(`[scenario-registry] ${scenarioId} did not exercise production path ${scenario.capability}`);
       for (const event of scenario.expectedCanonicalEvents) {

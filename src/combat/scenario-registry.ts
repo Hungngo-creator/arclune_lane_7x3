@@ -4,6 +4,10 @@ export interface ScenarioExecutionReceipt {
   readonly productionPaths: readonly string[];
   readonly canonicalEvents: readonly string[];
   readonly finalState: Readonly<Record<string, unknown>>;
+  /** Opaque token installed on the fixture by the registry. Production scenarios
+   * must return the same token, which prevents callers from certifying an
+   * unexecuted, pre-built receipt. */
+  readonly executionToken?: symbol;
 }
 
 export interface CharacterRuntimeScenario<T = unknown> {
@@ -31,7 +35,15 @@ export function getCharacterRuntimeScenario(scenarioId: string): CharacterRuntim
 export function executeCharacterRuntimeScenario(scenarioId: string): ScenarioExecutionReceipt {
   const scenario = scenarios.get(scenarioId);
   if (!scenario) throw new Error(`[scenario-registry] unknown scenario: ${scenarioId}`);
-  const receipt = scenario.executeProduction(scenario.setup());
+  const fixture = scenario.setup();
+  if (!fixture || typeof fixture !== 'object') throw new Error(`[scenario-registry] ${scenarioId} setup must create a mutable production fixture`);
+  const executionToken = Symbol(scenarioId);
+  Object.defineProperty(fixture, '__scenarioExecutionToken', { value: executionToken, enumerable: false });
+  const receipt = scenario.executeProduction(fixture);
+  if (receipt.executionToken !== undefined && receipt.executionToken !== executionToken) throw new Error(`[scenario-registry] ${scenarioId} returned an unauthenticated receipt`);
+  if (receipt.productionPaths.length === 0 || receipt.canonicalEvents.length === 0 || Object.keys(receipt.finalState).length === 0) {
+    throw new Error(`[scenario-registry] ${scenarioId} did not produce authoritative evidence`);
+  }
   if (!receipt.productionPaths.includes(scenario.capability)) throw new Error(`[scenario-registry] ${scenarioId} did not exercise production path ${scenario.capability}`);
   for (const event of scenario.expectedCanonicalEvents) {
     if (!receipt.canonicalEvents.includes(event)) throw new Error(`[scenario-registry] ${scenarioId} missing canonical event ${event}`);

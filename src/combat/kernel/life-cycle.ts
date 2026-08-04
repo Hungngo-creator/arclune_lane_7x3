@@ -6,7 +6,7 @@ import { slotIndex } from '../../engine.ts';
 import { compareRuleTagPriority, type RuleTag } from '../tag-aliases.ts';
 import { nextDeathSerial, nextEventSerial } from './sequence.ts';
 import type { ActionIdentity, SourceAttribution } from './types.ts';
-import { hasEnteredReincarnation, markReincarnationEscapedByRevive, observeReincarnationDeathWave } from './reincarnation.ts';
+import { finalizeRebirthClaimWindows, hasEnteredReincarnation, markReincarnationEscapedByRevive, observeReincarnationDeathWave } from './reincarnation.ts';
 import { ensureTrueSelfCombatRecord, lifeIdentityKey } from './true-self.ts';
 import { normalizeCombatHpState, normalizeCombatHpValue } from '../number-utils.ts';
 export { isCombatAlive } from '../presence.ts';
@@ -136,6 +136,7 @@ export function resolveDeathWave(game: SessionState, prevention: (request: Death
   const immediateReviveQueue: Array<{ target: UnitToken; request: ReviveRequest }> = [];
   for (const record of records) for (const create of state.immediateReviveRegistrations ?? []) { const request = create(record); if (request) immediateReviveQueue.push(request); }
   for (const entry of immediateReviveQueue) {const chain=state.actionChains?.[String(entry.request.death.chainId)];if(chain)chain.pendingImmediateRevives+=1;try{commitImmediateRevive(game, entry.target, entry.request);}finally{if(chain)chain.pendingImmediateRevives-=1;}}
+  finalizeRebirthClaimWindows(game);
   return records;
 }
 

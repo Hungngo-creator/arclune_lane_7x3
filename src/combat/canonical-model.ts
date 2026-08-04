@@ -22,16 +22,43 @@ export function requireCanonicalMetadataTag(raw: string, characterId: string, ca
 
 export type EffectType = 'deal-damage' | 'heal' | 'grant-shield' | 'pay-hp-cost' | 'sacrifice' | 'apply-status' | 'remove-status' | 'dispel' | 'grant-immunity' | 'spend-resource' | 'gain-resource' | 'summon' | 'create-field' | 'move' | 'trigger-follow-up' | 'trigger-counter' | 'reflect-damage' | 'request-death-prevention' | 'request-revive' | 'queue-delayed-revive' | 'enter-reincarnation' | 'request-rebirth' | 'set-stance' | 'set-form';
 export const EFFECT_TYPES: readonly EffectType[] = Object.freeze(['deal-damage','heal','grant-shield','pay-hp-cost','sacrifice','apply-status','remove-status','dispel','grant-immunity','spend-resource','gain-resource','summon','create-field','move','trigger-follow-up','trigger-counter','reflect-damage','request-death-prevention','request-revive','queue-delayed-revive','enter-reincarnation','request-rebirth','set-stance','set-form']);
-export interface EffectDefinition { readonly type: EffectType; readonly payload: Readonly<Record<string, unknown>>; readonly target: CanonicalMetadataTag }
-export interface EffectHandler { readonly type: EffectType; execute(effect: EffectDefinition): unknown }
+export type TargetSpec =
+  | { readonly kind: 'self' | 'selected-ally' | 'selected-enemy' | 'leader' }
+  | { readonly kind: 'single' | 'multiple' | 'all' | 'random'; readonly side: 'ally' | 'enemy'; readonly count?: number }
+  | { readonly kind: 'line' | 'column' | 'cross'; readonly side: 'ally' | 'enemy'; readonly anchorIid: string | number }
+  | { readonly kind: 'explicit-iids'; readonly iids: readonly (string | number)[] };
+type AmountPayload = { readonly amount: number };
+type StatusPayload = { readonly statusType: string; readonly duration?: number; readonly value?: number };
+type ResourcePayload = { readonly resource: 'aether' | 'fury'; readonly amount: number };
+export type EffectSpec =
+  | { readonly type: 'deal-damage' | 'reflect-damage'; readonly target: TargetSpec; readonly payload: AmountPayload & { readonly damageType: 'physical' | 'will' | 'true' } }
+  | { readonly type: 'heal' | 'grant-shield' | 'pay-hp-cost' | 'sacrifice'; readonly target: TargetSpec; readonly payload: AmountPayload }
+  | { readonly type: 'apply-status' | 'grant-immunity'; readonly target: TargetSpec; readonly payload: StatusPayload }
+  | { readonly type: 'remove-status'; readonly target: TargetSpec; readonly payload: { readonly statusId: string } }
+  | { readonly type: 'dispel'; readonly target: TargetSpec; readonly payload: { readonly polarity: 'buff' | 'debuff' | 'all'; readonly count?: number } }
+  | { readonly type: 'spend-resource' | 'gain-resource'; readonly target: TargetSpec; readonly payload: ResourcePayload }
+  | { readonly type: 'summon'; readonly target: TargetSpec; readonly payload: { readonly definitionId: string; readonly subtype?: 'clone' | 'unit' } }
+  | { readonly type: 'create-field'; readonly target: TargetSpec; readonly payload: { readonly fieldId: string; readonly duration?: number } }
+  | { readonly type: 'move'; readonly target: TargetSpec; readonly payload: { readonly cx: number; readonly cy: number } }
+  | { readonly type: 'trigger-follow-up' | 'trigger-counter'; readonly target: TargetSpec; readonly payload: { readonly actionKey: string } }
+  | { readonly type: 'request-death-prevention' | 'request-revive' | 'enter-reincarnation' | 'request-rebirth'; readonly target: TargetSpec; readonly payload: { readonly effectId: string } }
+  | { readonly type: 'queue-delayed-revive'; readonly target: TargetSpec; readonly payload: { readonly effectId: string; readonly duePolicy: string } }
+  | { readonly type: 'set-stance' | 'set-form'; readonly target: TargetSpec; readonly payload: { readonly value: string } };
+/** @deprecated Use EffectSpec. */
+export type EffectDefinition = EffectSpec;
+export interface EffectHandler<T extends EffectType = EffectType> { readonly type: T; execute(effect: Extract<EffectSpec, { type: T }>): unknown }
 const handlers = new Map<EffectType, EffectHandler>();
 export function registerEffectHandler(handler: EffectHandler): void { if (handlers.has(handler.type)) throw new Error(`[effect-registry] duplicate handler: ${handler.type}`); handlers.set(handler.type, handler); }
-export function dispatchEffect(effect: EffectDefinition, characterId: string, catalogPath: string): unknown {
+export function dispatchEffect(effect: EffectSpec, characterId: string, catalogPath: string): unknown {
   const handler = handlers.get(effect.type);
   if (!handler) throw new Error(`[effect-registry] ${characterId} at ${catalogPath}: no production handler for ${effect.type}`);
-  return handler.execute(effect);
+  return handler.execute(effect as never);
 }
 export function registeredEffectHandlerCount(): number { return handlers.size; }
+export function assertAllEffectHandlersRegistered(): void {
+  const missing = EFFECT_TYPES.filter(type => !handlers.has(type));
+  if (missing.length) throw new Error(`[effect-registry] missing production handlers: ${missing.join(', ')}`);
+}
 
 export interface AuthoritySnapshot { readonly rank: RankName; readonly cultivation: number; readonly combatPower: number; readonly stars?: number; readonly awaken?: number }
 export interface MechanicClaim { readonly claimId: string; readonly effectInstanceId: string; readonly sourceTrueSelfId: string; readonly sourceIid: string | number; readonly targetLifeKey: string; readonly kitKey: string; readonly effectType: EffectType; readonly conflictDomain: string; readonly operation: string; readonly authority: AuthorityTier; readonly authoritySnapshot: AuthoritySnapshot; readonly createdEventSerial: number }

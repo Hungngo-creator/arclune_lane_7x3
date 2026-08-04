@@ -9,20 +9,24 @@ import { normalizeCombatHpState, normalizeCombatHpValue } from '../number-utils.
 
 export interface RebirthAuthorization { tokenId: string; effectId: string; deathId: string; trueSelfId: string; incarnationSerial: number; lifeSerial: number; consumed: boolean }
 export interface RebirthRequest { deathId: string; trueSelfId: string; authorizationTokenId: string; spawn: { side: Side; cx: number; cy: number }; template: UnitToken; policies: { hp: number | 'full'; rage: number; preserveStatusIds?: readonly string[] } }
-export interface RebirthEligibility { allowed: boolean; reason: 'allowed' | 'battle-ended' | 'not-entered' | 'identity-mismatch' | 'missing-authority' | 'effect-blocked' | 'invalid-spawn' | 'iid-conflict' }
+export interface RebirthEligibility { allowed: boolean; reason: 'allowed' | 'battle-ended' | 'not-entered' | 'departed-from-battle' | 'identity-mismatch' | 'missing-authority' | 'effect-blocked' | 'invalid-spawn' | 'iid-conflict' }
 export interface RebirthResult { committed: boolean; reason: RebirthEligibility['reason']; trueSelfId: string; oldIid: string | number | null; newIid: string | number | null; incarnationSerial: number }
 type Runtime = { battleEnd?: { ended?: boolean }; reincarnationByDeathId?: Record<string, ReincarnationRecord>; rebirthAuthorizations?: Record<string, RebirthAuthorization>; rebirthAuthorizationSerial?: number; combatEvents?: Record<string, unknown>[] };
 const rt=(game:SessionState):Runtime=>(game.runtime??={}) as Runtime;
 
 export function registerRebirthAuthorization(game: SessionState, effectId: string, record: ReincarnationRecord): RebirthAuthorization {
-  if (record.state !== 'entered') throw new Error('[rebirth] authorization requires entered ReincarnationRecord');
+  if (record.state === 'departed-from-battle') throw new Error('[rebirth] departed-from-battle');
+  const openWinner = record.state === 'entered' && record.winningClaim?.effectId === effectId;
+  const reservation = record.state === 'rebirth-reserved' && record.reservation?.effectId === effectId && !record.reservation.consumed;
+  if (!openWinner && !reservation) throw new Error('[rebirth] authorization requires a winning open claim or unconsumed reservation');
   const state=rt(game); const serial=state.rebirthAuthorizationSerial=(state.rebirthAuthorizationSerial??0)+1;
   const token={tokenId:`rebirth-auth-${serial}`,effectId,deathId:record.deathId,trueSelfId:record.trueSelfId,incarnationSerial:record.incarnationSerial,lifeSerial:record.deadLifeSerial,consumed:false};
   (state.rebirthAuthorizations??={})[token.tokenId]=token; return token;
 }
 export function evaluateRebirthEligibility(game:SessionState,request:RebirthRequest):RebirthEligibility {
   const state=rt(game); if(state.battleEnd?.ended)return{allowed:false,reason:'battle-ended'};
-  const record=state.reincarnationByDeathId?.[request.deathId]; if(!record||record.state!=='entered')return{allowed:false,reason:'not-entered'};
+  const record=state.reincarnationByDeathId?.[request.deathId]; if(record?.state==='departed-from-battle')return{allowed:false,reason:'departed-from-battle'};
+  if(!record||(record.state!=='entered'&&record.state!=='rebirth-reserved'))return{allowed:false,reason:'not-entered'};
   if(record.trueSelfId!==request.trueSelfId)return{allowed:false,reason:'identity-mismatch'};
   const auth=state.rebirthAuthorizations?.[request.authorizationTokenId];
   if(!auth||auth.consumed||auth.deathId!==record.deathId||auth.trueSelfId!==record.trueSelfId||auth.incarnationSerial!==record.incarnationSerial||auth.lifeSerial!==record.deadLifeSerial)return{allowed:false,reason:'missing-authority'};
@@ -37,6 +41,7 @@ export function commitRebirth(game:SessionState,request:RebirthRequest):RebirthR
   const eligibility=evaluateRebirthEligibility(game,request), state=rt(game), record=state.reincarnationByDeathId?.[request.deathId], self=ensureTrueSelfCombatRecord(game,request.trueSelfId);
   if(!eligibility.allowed||!record)return{committed:false,reason:eligibility.reason,trueSelfId:request.trueSelfId,oldIid:record?.targetIid??null,newIid:null,incarnationSerial:self.incarnationSerial};
   const auth=state.rebirthAuthorizations![request.authorizationTokenId]!; auth.consumed=true;
+  if (record.reservation) record.reservation.consumed = true;
   const old=game.tokens.find(token=>(token.iid??token.id)===record.targetIid); if(old)commitNonDeathRemoval(game,old,'REBIRTH_RETIRED','rebirth');
   self.incarnationSerial=Math.max(self.incarnationSerial,record.incarnationSerial)+1; if(!self.deathHistory.includes(record.deathId))self.deathHistory.push(record.deathId);
   const newIid=nextCombatIid(game), keep=new Set(request.policies.preserveStatusIds??[]);
