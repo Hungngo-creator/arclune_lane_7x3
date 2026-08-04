@@ -5,10 +5,39 @@ import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
+export function assertVmModuleIntegrity(code, filename){
+  const staticImport = /(^|\n)\s*import\s+(?!\()|(^|\n)\s*export\s+(?:\{|\*|default)/m;
+  const commonJsRequire = /\brequire\s*\(/;
+  if (staticImport.test(code)) throw new Error(`${filename}: untransformed static module syntax`);
+  if (commonJsRequire.test(code)) {
+    const dependencies = [...code.matchAll(/\brequire\s*\(\s*["']([^"']+)["']\s*\)/g)].map(match => match[1]);
+    throw new Error(`${filename}: unexpected CommonJS require remains in VM code (${dependencies.join(', ')})`);
+  }
+}
+
+function bindVmDependencies(code){
+  return code.replace(/\brequire\s*\(\s*(["'][^"']+["'])\s*\)/g, '__loadDependency($1)');
+}
+
+async function loadCombatPresence(here){
+  const presencePath = path.resolve(here, '../../src/combat/presence.ts');
+  const source = await fs.readFile(presencePath, 'utf8');
+  const output = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+    fileName: 'presence.ts'
+  }).outputText.replace(/\brequire\s*\([^)]*\);?/g, '');
+  const context = { module: { exports: {} }, exports: {} };
+  context.exports = context.module.exports;
+  vm.createContext(context);
+  new vm.Script(output, { filename: 'combat/presence.js' }).runInContext(context);
+  return context.module.exports;
+}
+
 export async function loadTurnsHarness(overrides = {}){
   const here = path.dirname(fileURLToPath(import.meta.url));
   const filePath = path.resolve(here, '../../src/turns.ts');
   let code = await fs.readFile(filePath, 'utf8');
+  const combatPresence = await loadCombatPresence(here);
 
   const replacements = new Map([
     ["import { initialRageFor } from './meta.ts';", "const { initialRageFor } = __deps['./meta.ts'];"],
@@ -32,6 +61,7 @@ export async function loadTurnsHarness(overrides = {}){
     ["import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';", "const { globalAetherPool, resolveActionAetherRegen } = __deps['./aether.ts'];"],
     ["import { globalAetherPool } from './aether.ts';", "const { globalAetherPool } = __deps['./aether.ts'];"],
     ["import { Statuses } from './statuses.ts';", "const { Statuses } = __deps['./statuses.ts'];"],
+    ["import { isCombatAlive, markRemoved } from './combat/kernel/life-cycle.ts';", "const { isCombatAlive, markRemoved } = __deps['./combat/kernel/life-cycle.ts'];"],
     ["import { Statuses } from './statuses.js';", "const { Statuses } = __deps['./statuses.ts'];"],
     ["import { doBasicWithFollowups } from './combat.ts';", "const { doBasicWithFollowups } = __deps['./combat.js'];"],
     ["import { performActiveSkill } from './combat/perform-active-skill.ts';", "const { performActiveSkill } = __deps['./combat/perform-active-skill.ts'];"],
@@ -73,11 +103,30 @@ export async function loadTurnsHarness(overrides = {}){
     },
     fileName: 'turns.ts'
   });
-  code = transpiledMain.outputText;
+  code = bindVmDependencies(transpiledMain.outputText);
   code += '\nmodule.exports = { stepTurn, spawnQueuedIfDue, tickMinionTTL, getActiveAt, predictSpawnCycle, doActionOrSkip };\n';
+  assertVmModuleIntegrity(code, 'turns.ts');
 
   const eventLog = [];
   const defaultDeps = {
+    './combat/kernel/life-cycle.ts': {
+      isCombatAlive: combatPresence.isCombatAlive,
+      markRemoved(unit){ unit.lifeState = 'removed'; unit.alive = false; }
+    },
+    './combat/kernel/index.ts': {
+      createNaturalAction(game, actor){ return { actionId: `harness-${actor.iid ?? actor.id}`, chainId: `harness-${actor.iid ?? actor.id}`, parentActionId: null }; },
+      ensureCombatIdentity(unit){ return unit; },
+      withActionExecution(_game, _context, action){ return action(); }
+    },
+    './combat/kernel/delayed-revive.ts': { emitSsiTemporalEvent(){ } },
+    './combat/number-utils.ts': { normalizeCombatHpState(unit){ return { hp: Number(unit.hp ?? 0), hpMax: Number(unit.hpMax ?? unit.hp ?? 1) }; } },
+    './combat/roster-runtime-definitions.ts': { requireCharacterRuntimeDefinition(){ return {}; } },
+    './combat/unit-runtime-hooks.ts': { runRuntimeActionEnd(){}, runRuntimeUnitRevive(){}, runRuntimeTurnEnd(){}, runRuntimeTurnStart(){} },
+    './combat/chap-minh-runtime.ts': { applyChapMinhActionEnd(){}, recoverChapMinhMaxHpPerTurn(){}, refreshChapMinhOwnership(){} },
+    './utils/rng.ts': { nextRngValue(){ return 0.5; } },
+    './utils/domain-normalization.ts': { normalizeClassName(value){ return value; }, normalizeElementKey(value){ return value; } },
+    './utils/unique-global.ts': { isUniqueGlobalSummonBlocked(){ return false; } },
+    './utils/player-profile.ts': { loadPlayerProfile(){ return {}; } },
     './engine.js': {
       slotToCell(side, slot){
         const index = Math.max(0, (slot|0) - 1);
@@ -100,7 +149,8 @@ export async function loadTurnsHarness(overrides = {}){
       }
     },
     './combat.js': {
-      doBasicWithFollowups(){ }
+      doBasicWithFollowups(){ },
+      healUnit(){ return 0; }
     },
     './combat/perform-active-skill.ts': {
       performActiveSkill(){ return { ok: false, appliedTags: [], targetCount: 0 }; }
@@ -200,6 +250,8 @@ export async function loadTurnsHarness(overrides = {}){
   deps['../ai.ts'] = deps['../ai.ts'] || deps['./ai.ts'];
   deps['../leader-uyen.ts'] = deps['../leader-uyen.ts'] || deps['./leader-uyen.ts'];
   deps['../combat/perform-active-skill.ts'] = deps['../combat/perform-active-skill.ts'] || deps['./combat/perform-active-skill.ts'];
+  deps['../combat/kernel/life-cycle.ts'] = deps['../combat/kernel/life-cycle.ts'] || deps['./combat/kernel/life-cycle.ts'];
+  deps['./combat.ts'] = deps['./combat.ts'] || deps['./combat.js'];
 
   const interleavedKey = './turns/interleaved.js';
   const interleavedAltKey = '../turns/interleaved.js';
@@ -209,6 +261,7 @@ export async function loadTurnsHarness(overrides = {}){
     let interleavedCode = await fs.readFile(interleavedPath, 'utf8');
     const interleavedReplacements = new Map([
       ["import { slotIndex } from '../engine.ts';", "const { slotIndex } = __deps['../engine.js'];"],
+      ["import { isCombatAlive } from '../combat/kernel/life-cycle.ts';", "const { isCombatAlive } = __deps['../combat/kernel/life-cycle.ts'];"],
       ["import { Statuses } from '../statuses.ts';", "const { Statuses } = __deps['../statuses.ts'];"],
       ["import { Statuses } from '../statuses.js';", "const { Statuses } = __deps['../statuses.ts'];"],
       ["import { slotIndex } from '../engine.js';", "const { slotIndex } = __deps['../engine.js'];"]
@@ -226,12 +279,17 @@ export async function loadTurnsHarness(overrides = {}){
       },
       fileName: 'turns/interleaved.ts'
     });
-    interleavedCode = transpiledInterleaved.outputText;
+    interleavedCode = bindVmDependencies(transpiledInterleaved.outputText);
     interleavedCode += '\nmodule.exports = { findNextOccupiedPos, nextTurnInterleaved };\n';
+    assertVmModuleIntegrity(interleavedCode, 'turns/interleaved.ts');
     const interleavedContext = {
       module: { exports: {} },
       exports: {},
-      __deps: deps
+      __deps: deps,
+      __loadDependency(specifier){
+        if (!Object.hasOwn(deps, specifier)) throw new Error(`turns/interleaved.ts: undeclared VM dependency ${specifier}`);
+        return deps[specifier];
+      }
     };
     vm.createContext(interleavedContext);
     const interleavedScript = new vm.Script(interleavedCode, { filename: 'turns/interleaved.js' });
@@ -246,11 +304,16 @@ export async function loadTurnsHarness(overrides = {}){
   }
   deps[interleavedKey] = interleavedModule;
   deps[interleavedAltKey] = interleavedModule;
+  deps['./turns/interleaved.ts'] = interleavedModule;
   const context = {
     module: { exports: {} },
     exports: {},
     __deps: deps,
-    nextTurnInterleaved: interleavedModule.nextTurnInterleaved
+    nextTurnInterleaved: interleavedModule.nextTurnInterleaved,
+    __loadDependency(specifier){
+      if (!Object.hasOwn(deps, specifier)) throw new Error(`turns.ts: undeclared VM dependency ${specifier}`);
+      return deps[specifier];
+    }
   };
   vm.createContext(context);
   const script = new vm.Script(code, { filename: 'turns.ts' });
