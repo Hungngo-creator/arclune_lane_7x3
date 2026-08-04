@@ -1,5 +1,6 @@
 import { dealAbilityDamage, pickTarget } from '../combat.ts';
 import { skillSets } from '../data/skills.ts';
+import { requireExecutableCharacterDefinition } from './executable-character-definition.ts';
 import { enqueueImmediate } from '../summon.ts';
 import { cellReserved, slotToCell } from '../engine.ts';
 import { globalAetherPool } from '../aether.ts';
@@ -21,18 +22,6 @@ import type { UnitToken } from '@shared-types/units';
 
 type ActiveSkillKey = 'skill1' | 'skill2' | 'skill3';
 const EMPTY_TAGS: string[] = [];
-const EFFECT_APPLICATION_TAGS = new Set([
-  'heal',
-  'team-heal',
-  'shield',
-  'silence',
-  'sleep',
-  'mark',
-  'control',
-  'taunt',
-  'non-heal-hp-change',
-]);
-const DAMAGE_TARGET_TAG = 'non-heal-hp-change';
 const MONG_YEM_ID = 'mong_yem';
 const MONG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
   markId: 'me_hoac',
@@ -72,13 +61,6 @@ export interface PerformActiveSkillResult {
   reason?: 'missing-skill' | 'insufficient-aether' | 'blocked';
 }
 
-interface ParsedSkillTags {
-  effectTags: string[];
-  hasAetherCostTag: boolean;
-  hasSummonTag: boolean;
-  hasUniqueGlobalTag: boolean;
-  hasDamageTag: boolean;
-}
 type SkillUsageStore = Record<string, number>;
 type RuntimeSkillUsageStore = Record<string, SkillUsageStore>;
 
@@ -202,42 +184,6 @@ function resolveDirectDamageMultiplier(skill: SkillSection): number | null {
   return parsed;
 }
 
-function parseSkillTags(tags: ReadonlyArray<string>): ParsedSkillTags {
-  const effectTags: string[] = [];
-  let hasAetherCostTag = false;
-  let hasSummonTag = false;
-  let hasUniqueGlobalTag = false;
-  let hasDamageTag = false;
-  for (const tag of tags) {
-    switch (tag) {
-      case 'aether-cost':
-        hasAetherCostTag = true;
-        break;
-      case 'summon':
-        hasSummonTag = true;
-        break;
-      case 'unique-global':
-        hasUniqueGlobalTag = true;
-        break;
-      case DAMAGE_TARGET_TAG:
-        hasDamageTag = true;
-        break;
-      default:
-        break;
-    }
-    if (EFFECT_APPLICATION_TAGS.has(tag)) {
-      effectTags.push(tag);
-    }
-  }
-  return {
-    effectTags,
-    hasAetherCostTag,
-    hasSummonTag,
-    hasUniqueGlobalTag,
-    hasDamageTag,
-  };
-}
-
 function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey): PerformActiveSkillResult {
   if (!caster.alive) {
     return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'blocked');
@@ -248,23 +194,24 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
     return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
   }
 
-  const tags = Array.isArray(skill.tags) ? skill.tags.filter((tag: unknown): tag is string => typeof tag === 'string') : [];
-  const {
-    effectTags,
-    hasAetherCostTag,
-    hasSummonTag,
-    hasUniqueGlobalTag,
-    hasDamageTag,
-  } = parseSkillTags(tags);
+  const definition = requireExecutableCharacterDefinition(caster.id).skills.find(action => action.actionId.endsWith(`:${skillKey}`));
+  if (!definition) return buildSkillResult(false, skillKey, skill, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
+  const tags = [...definition.metadataTags];
+  const effectTags = definition.effects.map(effect => effect.type);
+  const hasSummonTag = definition.effects.some(effect => effect.type === 'summon');
+  const hasUniqueGlobalTag = definition.conditions.some(condition => condition.type === 'unique-summon');
+  const hasDamageTag = definition.effects.some(effect => effect.type === 'deal-damage');
   const skillMeta = createSkillMetadataContext(skill);
   const payload = resolveSkillPayload(skill);
   const dispatchPayload = { ...(payload ?? {}), skillKey };
   const maxSkillUses = readSkillUseCap(payload);
+  const runtimeSkillResult = runRuntimeActiveSkill({ game, caster, skillKey, skill, tags, appliedTags: [] });
+  if (runtimeSkillResult) return runtimeSkillResult;
   if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
     return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
   }
   const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
-  const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;
+  const usesTagAetherCost = skillCost > 0;
   if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
       return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'insufficient-aether');
   }
@@ -290,18 +237,6 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
     return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
   }
 
-  const runtimeSkillResult = runRuntimeActiveSkill({
-    game,
-    caster,
-    skillKey,
-    skill,
-    tags,
-    appliedTags,
-  });
-  if (runtimeSkillResult) {
-    if (runtimeSkillResult.ok) recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-    return runtimeSkillResult;
-  }
   const casterPower = readAtkWilPower(caster);
 
   if (caster.id === CHAP_MINH_ID) {

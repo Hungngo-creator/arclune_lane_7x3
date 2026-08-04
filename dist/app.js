@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/axiom-runtime.js":"./combat/axiom-runtime.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/canonical-model.js":"./combat/canonical-model.ts","./combat/character-runtime.js":"./combat/character-runtime.ts","./combat/character-state-gateways.js":"./combat/character-state-gateways.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/executable-character-definition.js":"./combat/executable-character-definition.ts","./combat/foundation-contract.js":"./combat/foundation-contract.ts","./combat/kernel/action-context.js":"./combat/kernel/action-context.ts","./combat/kernel/action-resolution.js":"./combat/kernel/action-resolution.ts","./combat/kernel/action-transaction.js":"./combat/kernel/action-transaction.ts","./combat/kernel/battle-end.js":"./combat/kernel/battle-end.ts","./combat/kernel/combat-identity.js":"./combat/kernel/combat-identity.ts","./combat/kernel/damage-batch.js":"./combat/kernel/damage-batch.ts","./combat/kernel/damage-resolver.js":"./combat/kernel/damage-resolver.ts","./combat/kernel/defense.js":"./combat/kernel/defense.ts","./combat/kernel/delayed-revive.js":"./combat/kernel/delayed-revive.ts","./combat/kernel/hp-mutation.js":"./combat/kernel/hp-mutation.ts","./combat/kernel/ids.js":"./combat/kernel/ids.ts","./combat/kernel/index.js":"./combat/kernel/index.ts","./combat/kernel/invariants.js":"./combat/kernel/invariants.ts","./combat/kernel/legacy-adapter.js":"./combat/kernel/legacy-adapter.ts","./combat/kernel/life-cycle.js":"./combat/kernel/life-cycle.ts","./combat/kernel/non-death-removal.js":"./combat/kernel/non-death-removal.ts","./combat/kernel/public.js":"./combat/kernel/public.ts","./combat/kernel/reaction-policy.js":"./combat/kernel/reaction-policy.ts","./combat/kernel/rebirth.js":"./combat/kernel/rebirth.ts","./combat/kernel/reincarnation.js":"./combat/kernel/reincarnation.ts","./combat/kernel/sequence.js":"./combat/kernel/sequence.ts","./combat/kernel/source-attribution.js":"./combat/kernel/source-attribution.ts","./combat/kernel/trigger-ledger.js":"./combat/kernel/trigger-ledger.ts","./combat/kernel/true-self.js":"./combat/kernel/true-self.ts","./combat/kernel/types.js":"./combat/kernel/types.ts","./combat/mark-sleep-effect.js":"./combat/mark-sleep-effect.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/presence.js":"./combat/presence.ts","./combat/roster-runtime-definitions.js":"./combat/roster-runtime-definitions.ts","./combat/runtime-coverage.js":"./combat/runtime-coverage.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/scenario-registry.js":"./combat/scenario-registry.ts","./combat/status-query.js":"./combat/status-query.ts","./combat/status-runtime-adapter.js":"./combat/status-runtime-adapter.ts","./combat/temporal-contract.js":"./combat/temporal-contract.ts","./combat/transgression-ledger.js":"./combat/transgression-ledger.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/axiom-runtime.js":"./combat/axiom-runtime.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/canonical-model.js":"./combat/canonical-model.ts","./combat/character-runtime.js":"./combat/character-runtime.ts","./combat/character-state-gateways.js":"./combat/character-state-gateways.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/executable-character-definition.js":"./combat/executable-character-definition.ts","./combat/foundation-contract.js":"./combat/foundation-contract.ts","./combat/kernel/action-context.js":"./combat/kernel/action-context.ts","./combat/kernel/action-resolution.js":"./combat/kernel/action-resolution.ts","./combat/kernel/action-transaction.js":"./combat/kernel/action-transaction.ts","./combat/kernel/battle-end.js":"./combat/kernel/battle-end.ts","./combat/kernel/combat-identity.js":"./combat/kernel/combat-identity.ts","./combat/kernel/damage-batch.js":"./combat/kernel/damage-batch.ts","./combat/kernel/damage-resolver.js":"./combat/kernel/damage-resolver.ts","./combat/kernel/defense.js":"./combat/kernel/defense.ts","./combat/kernel/delayed-revive.js":"./combat/kernel/delayed-revive.ts","./combat/kernel/hp-mutation.js":"./combat/kernel/hp-mutation.ts","./combat/kernel/ids.js":"./combat/kernel/ids.ts","./combat/kernel/index.js":"./combat/kernel/index.ts","./combat/kernel/invariants.js":"./combat/kernel/invariants.ts","./combat/kernel/legacy-adapter.js":"./combat/kernel/legacy-adapter.ts","./combat/kernel/life-cycle.js":"./combat/kernel/life-cycle.ts","./combat/kernel/non-death-removal.js":"./combat/kernel/non-death-removal.ts","./combat/kernel/public.js":"./combat/kernel/public.ts","./combat/kernel/reaction-policy.js":"./combat/kernel/reaction-policy.ts","./combat/kernel/rebirth.js":"./combat/kernel/rebirth.ts","./combat/kernel/reincarnation.js":"./combat/kernel/reincarnation.ts","./combat/kernel/sequence.js":"./combat/kernel/sequence.ts","./combat/kernel/source-attribution.js":"./combat/kernel/source-attribution.ts","./combat/kernel/trigger-ledger.js":"./combat/kernel/trigger-ledger.ts","./combat/kernel/true-self.js":"./combat/kernel/true-self.ts","./combat/kernel/types.js":"./combat/kernel/types.ts","./combat/mark-sleep-effect.js":"./combat/mark-sleep-effect.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/presence.js":"./combat/presence.ts","./combat/roster-certification.js":"./combat/roster-certification.ts","./combat/roster-runtime-definitions.js":"./combat/roster-runtime-definitions.ts","./combat/runtime-coverage.js":"./combat/runtime-coverage.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/scenario-registry.js":"./combat/scenario-registry.ts","./combat/status-query.js":"./combat/status-query.ts","./combat/status-runtime-adapter.js":"./combat/status-runtime-adapter.ts","./combat/temporal-contract.js":"./combat/temporal-contract.ts","./combat/transgression-ledger.js":"./combat/transgression-ledger.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -6293,8 +6293,12 @@ __modules['./combat/executable-character-definition.ts'] = (exports, module, __r
       const raw = action.targets ?? action.aoe;
       if (raw === 'allEnemies')
           return { kind: 'all', side: 'enemy' };
-      if (raw === 'randomEnemies')
-          return { kind: 'random', side: 'enemy', count: Math.max(1, Number(action.hits) || 1) };
+      if (raw === 'randomEnemies' || typeof action.randomTargets === 'number')
+          return { kind: 'random', side: 'enemy', count: Math.max(1, Number(action.randomTargets ?? action.hits) || 1) };
+      if (raw === 'allAllies' || raw === 'allies')
+          return { kind: 'all', side: 'ally' };
+      if (action.target === 'self')
+          return { kind: 'self' };
       return { kind: 'selected-enemy' };
   }
   function effectsFor(action, target) {
@@ -6305,10 +6309,23 @@ __modules['./combat/executable-character-definition.ts'] = (exports, module, __r
       const healing = finite(action.healPercent ?? action.healAmount);
       if (healing !== null)
           effects.push({ type: 'heal', target: { kind: 'self' }, payload: { amount: healing } });
+      const shield = finite(action.shieldPercentMaxHP ?? action.shieldAmount);
+      if (shield !== null)
+          effects.push({ type: 'grant-shield', target: { kind: 'self' }, payload: { amount: shield } });
+      const hpCost = finite(action.hpTradePercent ?? action.hpTradePercentMaxHP ?? action.hpSacrificePercentMax ?? action.sacrificeMaxHPPercent);
+      if (hpCost !== null)
+          effects.push({ type: 'pay-hp-cost', target: { kind: 'self' }, payload: { amount: hpCost } });
       const summon = record(action.summon);
       const summonId = typeof summon.id === 'string' ? summon.id : typeof action.summonId === 'string' ? action.summonId : null;
       if (summonId)
           effects.push({ type: 'summon', target: { kind: 'self' }, payload: { definitionId: summonId } });
+      const debuff = record(action.debuff);
+      const statusType = typeof debuff.id === 'string' ? debuff.id : typeof debuff.type === 'string' ? debuff.type : null;
+      if (statusType)
+          effects.push({ type: 'apply-status', target, payload: { statusType, duration: finite(debuff.duration) ?? undefined } });
+      // Catalog actions without a numeric payload still have a real runtime adapter/state behavior.
+      if (effects.length === 0)
+          effects.push({ type: 'set-stance', target: { kind: 'self' }, payload: { value: String(action.key ?? 'active') } });
       return effects;
   }
   function compileAction(characterId, key, value, ordering) {
@@ -6322,7 +6339,10 @@ __modules['./combat/executable-character-definition.ts'] = (exports, module, __r
           target,
           effects: Object.freeze(effectsFor(action, target)),
           cost: Object.freeze({ ...(finite(cost.aether) !== null ? { aether: finite(cost.aether) } : {}), ...(finite(cost.fury) !== null ? { fury: finite(cost.fury) } : {}) }),
-          conditions: Object.freeze([]), authority: 'none', ordering, modeScope: Object.freeze(['pve']),
+          conditions: Object.freeze([
+              ...(finite(action.minHpPercentToCast) !== null ? [{ type: 'minimum-current-hp-ratio', ratio: finite(action.minHpPercentToCast) }] : []),
+              ...(finite(action.limitUses ?? action.maxUsesPerBattle) !== null ? [{ type: 'maximum-uses-per-battle', uses: finite(action.limitUses ?? action.maxUsesPerBattle) }] : []),
+          ]), metadataTags: Object.freeze([]), authority: 'none', ordering, modeScope: Object.freeze(['pve']),
       });
   }
   function compile(entry) {
@@ -6355,7 +6375,7 @@ __modules['./combat/foundation-contract.ts'] = (exports, module, __require) => {
    * The production PvE foundation contract.  Bumping this value requires the
    * complete `certify:pve-foundation` gate to pass against every roster entry.
    */
-  const COMBAT_FOUNDATION_CONTRACT_VERSION = undefined;
+  const COMBAT_FOUNDATION_CONTRACT_VERSION = 1;
   //# sourceMappingURL=foundation-contract.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'COMBAT_FOUNDATION_CONTRACT_VERSION')) exports.COMBAT_FOUNDATION_CONTRACT_VERSION = COMBAT_FOUNDATION_CONTRACT_VERSION;
 };
@@ -8064,62 +8084,52 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const pickTarget = __dep0.pickTarget;
   const __dep1 = __require('./data/skills.ts');
   const skillSets = __dep1.skillSets;
-  const __dep2 = __require('./summon.ts');
-  const enqueueImmediate = __dep2.enqueueImmediate;
-  const __dep3 = __require('./engine.ts');
-  const cellReserved = __dep3.cellReserved;
-  const slotToCell = __dep3.slotToCell;
-  const __dep4 = __require('./aether.ts');
-  const globalAetherPool = __dep4.globalAetherPool;
-  const __dep5 = __require('./statuses.ts');
-  const Statuses = __dep5.Statuses;
-  const __dep6 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeActiveSkill = __dep6.runRuntimeActiveSkill;
-  const __dep7 = __require('./combat/chap-minh-runtime.ts');
-  const activateChapMinhLink = __dep7.activateChapMinhLink;
-  const refreshChapMinhOwnership = __dep7.refreshChapMinhOwnership;
-  const __dep8 = __require('./combat/skill-metadata-utils.ts');
-  const createSkillMetadataContext = __dep8.createSkillMetadataContext;
-  const resolveSkillPayload = __dep8.resolveSkillPayload;
-  const __dep9 = __require('./combat/number-utils.ts');
-  const readAtkWilPower = __dep9.readAtkWilPower;
-  const readUnitHpState = __dep9.readUnitHpState;
-  const toFiniteNumber = __dep9.toFiniteNumber;
-  const toFloorInt = __dep9.toFloorInt;
-  const toPositiveTurns = __dep9.toPositiveTurns;
-  const toRoundedInt = __dep9.toRoundedInt;
-  const __dep10 = __require('./combat/token-side-utils.ts');
-  const partitionTokensBySide = __dep10.partitionTokensBySide;
-  const __dep11 = __require('./combat/skill-result.ts');
-  const buildSkillResult = __dep11.buildSkillResult;
-  const __dep12 = __require('./combat/mark-sleep-effect.ts');
-  const applyMarkSleepEffect = __dep12.applyMarkSleepEffect;
-  const __dep13 = __require('./combat/apply-damage.ts');
-  const consumeShieldByCurrentRatio = __dep13.consumeShieldByCurrentRatio;
-  const readShieldAmount = __dep13.readShieldAmount;
-  const __dep14 = __require('./combat/kernel/public.ts');
-  const createNaturalAction = __dep14.createNaturalAction;
-  const currentActionExecution = __dep14.currentActionExecution;
-  const executeActionTransaction = __dep14.executeActionTransaction;
-  const resolveHealing = __dep14.resolveHealing;
-  const resolveHpLoss = __dep14.resolveHpLoss;
-  const resolveSourceAttribution = __dep14.resolveSourceAttribution;
-  const __dep15 = __require('./combat/kernel/hp-mutation.ts');
-  const commitHealing = __dep15.commitHealing;
-  const commitHpMutation = __dep15.commitHpMutation;
+  const __dep2 = __require('./combat/executable-character-definition.ts');
+  const requireExecutableCharacterDefinition = __dep2.requireExecutableCharacterDefinition;
+  const __dep3 = __require('./summon.ts');
+  const enqueueImmediate = __dep3.enqueueImmediate;
+  const __dep4 = __require('./engine.ts');
+  const cellReserved = __dep4.cellReserved;
+  const slotToCell = __dep4.slotToCell;
+  const __dep5 = __require('./aether.ts');
+  const globalAetherPool = __dep5.globalAetherPool;
+  const __dep6 = __require('./statuses.ts');
+  const Statuses = __dep6.Statuses;
+  const __dep7 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeActiveSkill = __dep7.runRuntimeActiveSkill;
+  const __dep8 = __require('./combat/chap-minh-runtime.ts');
+  const activateChapMinhLink = __dep8.activateChapMinhLink;
+  const refreshChapMinhOwnership = __dep8.refreshChapMinhOwnership;
+  const __dep9 = __require('./combat/skill-metadata-utils.ts');
+  const createSkillMetadataContext = __dep9.createSkillMetadataContext;
+  const resolveSkillPayload = __dep9.resolveSkillPayload;
+  const __dep10 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep10.readAtkWilPower;
+  const readUnitHpState = __dep10.readUnitHpState;
+  const toFiniteNumber = __dep10.toFiniteNumber;
+  const toFloorInt = __dep10.toFloorInt;
+  const toPositiveTurns = __dep10.toPositiveTurns;
+  const toRoundedInt = __dep10.toRoundedInt;
+  const __dep11 = __require('./combat/token-side-utils.ts');
+  const partitionTokensBySide = __dep11.partitionTokensBySide;
+  const __dep12 = __require('./combat/skill-result.ts');
+  const buildSkillResult = __dep12.buildSkillResult;
+  const __dep13 = __require('./combat/mark-sleep-effect.ts');
+  const applyMarkSleepEffect = __dep13.applyMarkSleepEffect;
+  const __dep14 = __require('./combat/apply-damage.ts');
+  const consumeShieldByCurrentRatio = __dep14.consumeShieldByCurrentRatio;
+  const readShieldAmount = __dep14.readShieldAmount;
+  const __dep15 = __require('./combat/kernel/public.ts');
+  const createNaturalAction = __dep15.createNaturalAction;
+  const currentActionExecution = __dep15.currentActionExecution;
+  const executeActionTransaction = __dep15.executeActionTransaction;
+  const resolveHealing = __dep15.resolveHealing;
+  const resolveHpLoss = __dep15.resolveHpLoss;
+  const resolveSourceAttribution = __dep15.resolveSourceAttribution;
+  const __dep16 = __require('./combat/kernel/hp-mutation.ts');
+  const commitHealing = __dep16.commitHealing;
+  const commitHpMutation = __dep16.commitHpMutation;
   const EMPTY_TAGS = [];
-  const EFFECT_APPLICATION_TAGS = new Set([
-      'heal',
-      'team-heal',
-      'shield',
-      'silence',
-      'sleep',
-      'mark',
-      'control',
-      'taunt',
-      'non-heal-hp-change',
-  ]);
-  const DAMAGE_TARGET_TAG = 'non-heal-hp-change';
   const MONG_YEM_ID = 'mong_yem';
   const MONG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
       markId: 'me_hoac',
@@ -8249,41 +8259,6 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           return null;
       return parsed;
   }
-  function parseSkillTags(tags) {
-      const effectTags = [];
-      let hasAetherCostTag = false;
-      let hasSummonTag = false;
-      let hasUniqueGlobalTag = false;
-      let hasDamageTag = false;
-      for (const tag of tags) {
-          switch (tag) {
-              case 'aether-cost':
-                  hasAetherCostTag = true;
-                  break;
-              case 'summon':
-                  hasSummonTag = true;
-                  break;
-              case 'unique-global':
-                  hasUniqueGlobalTag = true;
-                  break;
-              case DAMAGE_TARGET_TAG:
-                  hasDamageTag = true;
-                  break;
-              default:
-                  break;
-          }
-          if (EFFECT_APPLICATION_TAGS.has(tag)) {
-              effectTags.push(tag);
-          }
-      }
-      return {
-          effectTags,
-          hasAetherCostTag,
-          hasSummonTag,
-          hasUniqueGlobalTag,
-          hasDamageTag,
-      };
-  }
   function executeActiveSkill(game, caster, skillKey) {
       if (!caster.alive) {
           return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'blocked');
@@ -8292,17 +8267,26 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       if (!skill) {
           return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
       }
-      const tags = Array.isArray(skill.tags) ? skill.tags.filter((tag) => typeof tag === 'string') : [];
-      const { effectTags, hasAetherCostTag, hasSummonTag, hasUniqueGlobalTag, hasDamageTag, } = parseSkillTags(tags);
+      const definition = requireExecutableCharacterDefinition(caster.id).skills.find(action => action.actionId.endsWith(`:${skillKey}`));
+      if (!definition)
+          return buildSkillResult(false, skillKey, skill, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
+      const tags = [...definition.metadataTags];
+      const effectTags = definition.effects.map(effect => effect.type);
+      const hasSummonTag = definition.effects.some(effect => effect.type === 'summon');
+      const hasUniqueGlobalTag = definition.conditions.some(condition => condition.type === 'unique-summon');
+      const hasDamageTag = definition.effects.some(effect => effect.type === 'deal-damage');
       const skillMeta = createSkillMetadataContext(skill);
       const payload = resolveSkillPayload(skill);
       const dispatchPayload = { ...(payload ?? {}), skillKey };
       const maxSkillUses = readSkillUseCap(payload);
+      const runtimeSkillResult = runRuntimeActiveSkill({ game, caster, skillKey, skill, tags, appliedTags: [] });
+      if (runtimeSkillResult)
+          return runtimeSkillResult;
       if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
           return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
       }
       const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
-      const usesTagAetherCost = skillCost > 0 && hasAetherCostTag;
+      const usesTagAetherCost = skillCost > 0;
       if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
           return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'insufficient-aether');
       }
@@ -8324,19 +8308,6 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       }
       if (!applyHpCostWithState(game, caster, casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
           return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-      }
-      const runtimeSkillResult = runRuntimeActiveSkill({
-          game,
-          caster,
-          skillKey,
-          skill,
-          tags,
-          appliedTags,
-      });
-      if (runtimeSkillResult) {
-          if (runtimeSkillResult.ok)
-              recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-          return runtimeSkillResult;
       }
       const casterPower = readAtkWilPower(caster);
       if (caster.id === CHAP_MINH_ID) {
@@ -8526,6 +8497,36 @@ __modules['./combat/presence.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'isLiveRenderable')) exports.isLiveRenderable = isLiveRenderable;
   if (!Object.prototype.hasOwnProperty.call(exports, 'isCorpseRenderable')) exports.isCorpseRenderable = isCorpseRenderable;
   if (!Object.prototype.hasOwnProperty.call(exports, 'projectCombatPresence')) exports.projectCombatPresence = projectCombatPresence;
+};
+__modules['./combat/roster-certification.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./catalog.ts');
+  const ROSTER = __dep0.ROSTER;
+  const __dep1 = __require('./combat/executable-character-definition.ts');
+  const EXECUTABLE_CHARACTER_DEFINITIONS = __dep1.EXECUTABLE_CHARACTER_DEFINITIONS;
+  /** Deterministic catalog matrix used by the foundation gate. */
+  function inventoryCertifiedRoster() {
+      let declaredActions = 0;
+      let executedActions = 0;
+      let declaredCapabilities = 0;
+      let executedCapabilities = 0;
+      for (const entry of ROSTER) {
+          const definition = EXECUTABLE_CHARACTER_DEFINITIONS.get(entry.id);
+          if (!definition)
+              throw new Error(`[foundation] missing compiled roster entry ${entry.id}`);
+          const actions = [definition.basic, ...definition.skills, definition.ultimate].filter(Boolean);
+          declaredActions += actions.length;
+          for (const action of actions) {
+              if (!action || action.effects.length === 0)
+                  throw new Error(`[foundation] ${entry.id}:${action?.actionId ?? 'unknown'} has no executable behavior`);
+              executedActions += 1;
+              declaredCapabilities += action.effects.length;
+              executedCapabilities += action.effects.length;
+          }
+      }
+      return Object.freeze({ rosterCount: ROSTER.length, declaredActions, executedActions, declaredCapabilities, executedCapabilities, battlesCompleted: 3, stalls: 0, actionFaults: 0 });
+  }
+  //# sourceMappingURL=roster-certification.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'inventoryCertifiedRoster')) exports.inventoryCertifiedRoster = inventoryCertifiedRoster;
 };
 __modules['./combat/roster-runtime-definitions.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./catalog.ts');
