@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/tag-aliases.js":"./combat/tag-aliases.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/axiom-runtime.js":"./combat/axiom-runtime.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/canonical-model.js":"./combat/canonical-model.ts","./combat/character-runtime.js":"./combat/character-runtime.ts","./combat/character-state-gateways.js":"./combat/character-state-gateways.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/executable-character-definition.js":"./combat/executable-character-definition.ts","./combat/foundation-contract.js":"./combat/foundation-contract.ts","./combat/kernel/action-context.js":"./combat/kernel/action-context.ts","./combat/kernel/action-resolution.js":"./combat/kernel/action-resolution.ts","./combat/kernel/action-transaction.js":"./combat/kernel/action-transaction.ts","./combat/kernel/battle-end.js":"./combat/kernel/battle-end.ts","./combat/kernel/combat-identity.js":"./combat/kernel/combat-identity.ts","./combat/kernel/damage-batch.js":"./combat/kernel/damage-batch.ts","./combat/kernel/damage-resolver.js":"./combat/kernel/damage-resolver.ts","./combat/kernel/defense.js":"./combat/kernel/defense.ts","./combat/kernel/delayed-revive.js":"./combat/kernel/delayed-revive.ts","./combat/kernel/hp-mutation.js":"./combat/kernel/hp-mutation.ts","./combat/kernel/ids.js":"./combat/kernel/ids.ts","./combat/kernel/index.js":"./combat/kernel/index.ts","./combat/kernel/invariants.js":"./combat/kernel/invariants.ts","./combat/kernel/legacy-adapter.js":"./combat/kernel/legacy-adapter.ts","./combat/kernel/life-cycle.js":"./combat/kernel/life-cycle.ts","./combat/kernel/non-death-removal.js":"./combat/kernel/non-death-removal.ts","./combat/kernel/reaction-policy.js":"./combat/kernel/reaction-policy.ts","./combat/kernel/rebirth.js":"./combat/kernel/rebirth.ts","./combat/kernel/reincarnation.js":"./combat/kernel/reincarnation.ts","./combat/kernel/sequence.js":"./combat/kernel/sequence.ts","./combat/kernel/source-attribution.js":"./combat/kernel/source-attribution.ts","./combat/kernel/trigger-ledger.js":"./combat/kernel/trigger-ledger.ts","./combat/kernel/true-self.js":"./combat/kernel/true-self.ts","./combat/kernel/types.js":"./combat/kernel/types.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/presence.js":"./combat/presence.ts","./combat/roster-runtime-definitions.js":"./combat/roster-runtime-definitions.ts","./combat/runtime-coverage.js":"./combat/runtime-coverage.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/scenario-registry.js":"./combat/scenario-registry.ts","./combat/status-query.js":"./combat/status-query.ts","./combat/status-runtime-adapter.js":"./combat/status-runtime-adapter.ts","./combat/tag-dispatch.js":"./combat/tag-dispatch.ts","./combat/temporal-contract.js":"./combat/temporal-contract.ts","./combat/transgression-ledger.js":"./combat/transgression-ledger.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/axiom-runtime.js":"./combat/axiom-runtime.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/canonical-model.js":"./combat/canonical-model.ts","./combat/character-runtime.js":"./combat/character-runtime.ts","./combat/character-state-gateways.js":"./combat/character-state-gateways.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/executable-character-definition.js":"./combat/executable-character-definition.ts","./combat/foundation-contract.js":"./combat/foundation-contract.ts","./combat/kernel/action-context.js":"./combat/kernel/action-context.ts","./combat/kernel/action-resolution.js":"./combat/kernel/action-resolution.ts","./combat/kernel/action-transaction.js":"./combat/kernel/action-transaction.ts","./combat/kernel/battle-end.js":"./combat/kernel/battle-end.ts","./combat/kernel/combat-identity.js":"./combat/kernel/combat-identity.ts","./combat/kernel/damage-batch.js":"./combat/kernel/damage-batch.ts","./combat/kernel/damage-resolver.js":"./combat/kernel/damage-resolver.ts","./combat/kernel/defense.js":"./combat/kernel/defense.ts","./combat/kernel/delayed-revive.js":"./combat/kernel/delayed-revive.ts","./combat/kernel/hp-mutation.js":"./combat/kernel/hp-mutation.ts","./combat/kernel/ids.js":"./combat/kernel/ids.ts","./combat/kernel/index.js":"./combat/kernel/index.ts","./combat/kernel/invariants.js":"./combat/kernel/invariants.ts","./combat/kernel/legacy-adapter.js":"./combat/kernel/legacy-adapter.ts","./combat/kernel/life-cycle.js":"./combat/kernel/life-cycle.ts","./combat/kernel/non-death-removal.js":"./combat/kernel/non-death-removal.ts","./combat/kernel/public.js":"./combat/kernel/public.ts","./combat/kernel/reaction-policy.js":"./combat/kernel/reaction-policy.ts","./combat/kernel/rebirth.js":"./combat/kernel/rebirth.ts","./combat/kernel/reincarnation.js":"./combat/kernel/reincarnation.ts","./combat/kernel/sequence.js":"./combat/kernel/sequence.ts","./combat/kernel/source-attribution.js":"./combat/kernel/source-attribution.ts","./combat/kernel/trigger-ledger.js":"./combat/kernel/trigger-ledger.ts","./combat/kernel/true-self.js":"./combat/kernel/true-self.ts","./combat/kernel/types.js":"./combat/kernel/types.ts","./combat/mark-sleep-effect.js":"./combat/mark-sleep-effect.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/presence.js":"./combat/presence.ts","./combat/roster-runtime-definitions.js":"./combat/roster-runtime-definitions.ts","./combat/runtime-coverage.js":"./combat/runtime-coverage.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/scenario-registry.js":"./combat/scenario-registry.ts","./combat/status-query.js":"./combat/status-query.ts","./combat/status-runtime-adapter.js":"./combat/status-runtime-adapter.ts","./combat/temporal-contract.js":"./combat/temporal-contract.ts","./combat/transgression-ledger.js":"./combat/transgression-ledger.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -5555,9 +5555,6 @@ __modules['./combat/axiom-runtime.ts'] = (exports, module, __require) => {
           if (item.definition.observedEvents.includes(event))
               item.runtime.onEvent(event, payload); }
       dispose() { this.disposed = true; this.active.length = 0; this.loaded.clear(); this.temporal = undefined; }
-      publish(event, payload) { for (const item of this.active)
-          if (item.definition.observedEvents.includes(event))
-              item.runtime.onEvent(event, payload); }
   }
   function preflightAxiomModules(set, manifest) { for (const group of [manifest.leaders, manifest.decks, manifest.undeployedDeck, manifest.npcRoster, manifest.scriptedReinforcements, manifest.summonDefinitions, manifest.replacementDefinitions, manifest.transformationDefinitions])
       for (const participant of group ?? [])
@@ -6358,7 +6355,7 @@ __modules['./combat/foundation-contract.ts'] = (exports, module, __require) => {
    * The production PvE foundation contract.  Bumping this value requires the
    * complete `certify:pve-foundation` gate to pass against every roster entry.
    */
-  const COMBAT_FOUNDATION_CONTRACT_VERSION = 1;
+  const COMBAT_FOUNDATION_CONTRACT_VERSION = undefined;
   //# sourceMappingURL=foundation-contract.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'COMBAT_FOUNDATION_CONTRACT_VERSION')) exports.COMBAT_FOUNDATION_CONTRACT_VERSION = COMBAT_FOUNDATION_CONTRACT_VERSION;
 };
@@ -7302,7 +7299,7 @@ __modules['./combat/kernel/life-cycle.ts'] = (exports, module, __require) => {
   function markRemoved(unit) { unit.lifeState = 'removed'; unit.alive = false; }
   function markErased(unit) { unit.lifeState = 'erased'; unit.alive = false; }
   const lifeKey = (candidate) => candidate.trueSelfId ? lifeIdentityKey(candidate.trueSelfId, candidate.incarnationSerial, candidate.lifeSerial) : `${String(candidate.targetIid)}:${candidate.incarnationSerial}:${candidate.lifeSerial}`;
-  const authorityTier = (authority) => ({ 'doctrine-rule': 'doctrine', 'global-rule': 'rule', 'axiom-rule': 'axiom' }[authority] ?? (authority === 'normal' || !authority ? 'none' : authority));
+  const authorityTier = (authority) => authority === 'normal' || !authority ? 'none' : authority;
   const compareDeathAuthority = (left, right) => Math.sign(AUTHORITY_RANK[authorityTier(left)] - AUTHORITY_RANK[authorityTier(right)]);
   function registerDeathPrevention(game, collect) {
       const state = runtime(game);
@@ -7581,6 +7578,28 @@ __modules['./combat/kernel/non-death-removal.ts'] = (exports, module, __require)
   }
   //# sourceMappingURL=non-death-removal.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'commitNonDeathRemoval')) exports.commitNonDeathRemoval = commitNonDeathRemoval;
+};
+__modules['./combat/kernel/public.ts'] = (exports, module, __require) => {
+  /**
+   * Deliberately small Kernel surface for production character code.
+   * Mutation primitives stay private to the combat/session orchestrators.
+   */
+  const __reexport0 = __require('./combat/kernel/action-context.ts');
+  const __reexport1 = __require('./combat/kernel/sequence.ts');
+  const __reexport2 = __require('./combat/kernel/action-transaction.ts');
+  const __reexport3 = __require('./combat/kernel/life-cycle.ts');
+  const __reexport4 = __require('./combat/kernel/damage-resolver.ts');
+  const __reexport5 = __require('./combat/kernel/hp-mutation.ts');
+  const __reexport6 = __require('./combat/kernel/source-attribution.ts');
+  //# sourceMappingURL=public.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'currentActionExecution')) exports.currentActionExecution = __reexport0.currentActionExecution;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'createNaturalAction')) exports.createNaturalAction = __reexport1.createNaturalAction;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'executeActionTransaction')) exports.executeActionTransaction = __reexport2.executeActionTransaction;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'isCombatAlive')) exports.isCombatAlive = __reexport3.isCombatAlive;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveDamagePacket')) exports.resolveDamagePacket = __reexport4.resolveDamagePacket;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveHealing')) exports.resolveHealing = __reexport5.resolveHealing;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveHpLoss')) exports.resolveHpLoss = __reexport5.resolveHpLoss;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'resolveSourceAttribution')) exports.resolveSourceAttribution = __reexport6.resolveSourceAttribution;
 };
 __modules['./combat/kernel/reaction-policy.ts'] = (exports, module, __require) => {
   const policy = (values) => ({
@@ -7942,6 +7961,31 @@ __modules['./combat/kernel/types.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=types.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeDamageType')) exports.normalizeDamageType = normalizeDamageType;
 };
+__modules['./combat/mark-sleep-effect.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./statuses.ts');
+  const Statuses = __dep0.Statuses;
+  const __dep1 = __require('./combat/status-utils.ts');
+  const getStatusEntryById = __dep1.getStatusEntryById;
+  /** Applies the authored mark mechanic without interpreting gameplay tags. */
+  function applyMarkSleepEffect(source, target, effect) {
+      const existing = getStatusEntryById(target, effect.markId);
+      if (!existing) {
+          Statuses.add(target, { id: effect.markId, kind: 'mark', tag: 'mark', stacks: Math.min(effect.maxStacks, effect.stacks), maxStacks: effect.maxStacks, purgeable: effect.purgeable, sourceUnitId: source.id });
+          return;
+      }
+      const next = Math.min(effect.maxStacks, Math.max(0, Number(existing.status.stacks) || 0) + effect.stacks);
+      existing.status.stacks = next;
+      existing.status.maxStacks = effect.maxStacks;
+      existing.status.purgeable = effect.purgeable;
+      if (next < effect.maxStacks)
+          return;
+      if (effect.sleepTurnsOnCap > 0)
+          Statuses.add(target, { id: 'sleep', kind: 'debuff', tag: 'sleep', dur: effect.sleepTurnsOnCap, tick: 'turn', sourceUnitId: source.id });
+      target.statuses?.splice(existing.index, 1);
+  }
+  //# sourceMappingURL=mark-sleep-effect.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'applyMarkSleepEffect')) exports.applyMarkSleepEffect = applyMarkSleepEffect;
+};
 __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
   function toFiniteNumber(value, fallback = 0) {
       const parsed = typeof value === 'number' ? value : Number(value);
@@ -8018,55 +8062,51 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
   const __dep0 = __require('./combat.ts');
   const dealAbilityDamage = __dep0.dealAbilityDamage;
   const pickTarget = __dep0.pickTarget;
-  const __dep1 = __require('./combat/tag-dispatch.ts');
-  const applyMarkSleepSetupTag = __dep1.applyMarkSleepSetupTag;
-  const dispatchGameplayTags = __dep1.dispatchGameplayTags;
-  const __dep2 = __require('./data/skills.ts');
-  const skillSets = __dep2.skillSets;
-  const __dep3 = __require('./data/tags.ts');
-  const normalizeTagList = __dep3.normalizeTagList;
-  const __dep4 = __require('./summon.ts');
-  const enqueueImmediate = __dep4.enqueueImmediate;
-  const __dep5 = __require('./engine.ts');
-  const cellReserved = __dep5.cellReserved;
-  const slotToCell = __dep5.slotToCell;
-  const __dep6 = __require('./aether.ts');
-  const globalAetherPool = __dep6.globalAetherPool;
-  const __dep7 = __require('./statuses.ts');
-  const Statuses = __dep7.Statuses;
-  const __dep8 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeActiveSkill = __dep8.runRuntimeActiveSkill;
-  const __dep9 = __require('./combat/chap-minh-runtime.ts');
-  const activateChapMinhLink = __dep9.activateChapMinhLink;
-  const refreshChapMinhOwnership = __dep9.refreshChapMinhOwnership;
-  const __dep10 = __require('./combat/skill-metadata-utils.ts');
-  const createSkillMetadataContext = __dep10.createSkillMetadataContext;
-  const resolveSkillPayload = __dep10.resolveSkillPayload;
-  const __dep11 = __require('./combat/number-utils.ts');
-  const readAtkWilPower = __dep11.readAtkWilPower;
-  const readUnitHpState = __dep11.readUnitHpState;
-  const toFiniteNumber = __dep11.toFiniteNumber;
-  const toFloorInt = __dep11.toFloorInt;
-  const toPositiveTurns = __dep11.toPositiveTurns;
-  const toRoundedInt = __dep11.toRoundedInt;
-  const __dep12 = __require('./combat/token-side-utils.ts');
-  const partitionTokensBySide = __dep12.partitionTokensBySide;
-  const __dep13 = __require('./combat/skill-result.ts');
-  const buildSkillResult = __dep13.buildSkillResult;
-  const __dep14 = __require('./combat/tag-aliases.ts');
-  const canonicalizeCombatTagsWithRule = __dep14.canonicalizeCombatTagsWithRule;
-  const __dep15 = __require('./combat/apply-damage.ts');
-  const consumeShieldByCurrentRatio = __dep15.consumeShieldByCurrentRatio;
-  const readShieldAmount = __dep15.readShieldAmount;
-  const __dep16 = __require('./combat/kernel/index.ts');
-  const commitHealing = __dep16.commitHealing;
-  const commitHpMutation = __dep16.commitHpMutation;
-  const createNaturalAction = __dep16.createNaturalAction;
-  const currentActionExecution = __dep16.currentActionExecution;
-  const executeActionTransaction = __dep16.executeActionTransaction;
-  const resolveHealing = __dep16.resolveHealing;
-  const resolveHpLoss = __dep16.resolveHpLoss;
-  const resolveSourceAttribution = __dep16.resolveSourceAttribution;
+  const __dep1 = __require('./data/skills.ts');
+  const skillSets = __dep1.skillSets;
+  const __dep2 = __require('./summon.ts');
+  const enqueueImmediate = __dep2.enqueueImmediate;
+  const __dep3 = __require('./engine.ts');
+  const cellReserved = __dep3.cellReserved;
+  const slotToCell = __dep3.slotToCell;
+  const __dep4 = __require('./aether.ts');
+  const globalAetherPool = __dep4.globalAetherPool;
+  const __dep5 = __require('./statuses.ts');
+  const Statuses = __dep5.Statuses;
+  const __dep6 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeActiveSkill = __dep6.runRuntimeActiveSkill;
+  const __dep7 = __require('./combat/chap-minh-runtime.ts');
+  const activateChapMinhLink = __dep7.activateChapMinhLink;
+  const refreshChapMinhOwnership = __dep7.refreshChapMinhOwnership;
+  const __dep8 = __require('./combat/skill-metadata-utils.ts');
+  const createSkillMetadataContext = __dep8.createSkillMetadataContext;
+  const resolveSkillPayload = __dep8.resolveSkillPayload;
+  const __dep9 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep9.readAtkWilPower;
+  const readUnitHpState = __dep9.readUnitHpState;
+  const toFiniteNumber = __dep9.toFiniteNumber;
+  const toFloorInt = __dep9.toFloorInt;
+  const toPositiveTurns = __dep9.toPositiveTurns;
+  const toRoundedInt = __dep9.toRoundedInt;
+  const __dep10 = __require('./combat/token-side-utils.ts');
+  const partitionTokensBySide = __dep10.partitionTokensBySide;
+  const __dep11 = __require('./combat/skill-result.ts');
+  const buildSkillResult = __dep11.buildSkillResult;
+  const __dep12 = __require('./combat/mark-sleep-effect.ts');
+  const applyMarkSleepEffect = __dep12.applyMarkSleepEffect;
+  const __dep13 = __require('./combat/apply-damage.ts');
+  const consumeShieldByCurrentRatio = __dep13.consumeShieldByCurrentRatio;
+  const readShieldAmount = __dep13.readShieldAmount;
+  const __dep14 = __require('./combat/kernel/public.ts');
+  const createNaturalAction = __dep14.createNaturalAction;
+  const currentActionExecution = __dep14.currentActionExecution;
+  const executeActionTransaction = __dep14.executeActionTransaction;
+  const resolveHealing = __dep14.resolveHealing;
+  const resolveHpLoss = __dep14.resolveHpLoss;
+  const resolveSourceAttribution = __dep14.resolveSourceAttribution;
+  const __dep15 = __require('./combat/kernel/hp-mutation.ts');
+  const commitHealing = __dep15.commitHealing;
+  const commitHpMutation = __dep15.commitHpMutation;
   const EMPTY_TAGS = [];
   const EFFECT_APPLICATION_TAGS = new Set([
       'heal',
@@ -8252,7 +8292,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       if (!skill) {
           return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
       }
-      const { tags } = canonicalizeCombatTagsWithRule(normalizeTagList(skill.tags ?? []));
+      const tags = Array.isArray(skill.tags) ? skill.tags.filter((tag) => typeof tag === 'string') : [];
       const { effectTags, hasAetherCostTag, hasSummonTag, hasUniqueGlobalTag, hasDamageTag, } = parseSkillTags(tags);
       const skillMeta = createSkillMetadataContext(skill);
       const payload = resolveSkillPayload(skill);
@@ -8267,43 +8307,23 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'insufficient-aether');
       }
       let consumedAether = skillCost <= 0;
-      const dispatch = dispatchGameplayTags(tags, {
-          game,
-          attacker: caster,
-          target: pickTarget(game, caster),
-          side: caster.side,
-          cost: skillCost,
-          payload: dispatchPayload,
-          deferEffects: true,
-          tagsNormalized: true,
-          tagsCanonical: true,
-          onAetherCost: (amount, side) => {
-              if (amount <= 0) {
-                  consumedAether = true;
-                  return true;
-              }
-              const ok = globalAetherPool.consume(side, amount);
-              consumedAether = ok;
-              return ok;
-          },
-          onSummon: () => undefined,
-      });
+      const primaryTarget = pickTarget(game, caster);
+      const targets = primaryTarget ? [primaryTarget] : (caster.alive ? [caster] : []);
+      const appliedTags = [];
+      if (usesTagAetherCost)
+          consumedAether = globalAetherPool.consume(caster.side, skillCost);
       if (usesTagAetherCost && !consumedAether) {
-          return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, dispatch.targets.length, 'insufficient-aether');
+          return buildSkillResult(false, skillKey, skill, tags, appliedTags, targets.length, 'insufficient-aether');
       }
-      if (dispatch.sideEffects.includes('heal-blocked')) {
-          return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
-      }
-      const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
       const { hpMax: casterHpMax, hp: casterCurrentHp } = readUnitHpState(caster);
       if (!checkHpConditionWithState(casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
-          return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+          return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
       }
       if (!checkTurnParityCondition(game, payload)) {
-          return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+          return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
       }
       if (!applyHpCostWithState(game, caster, casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
-          return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+          return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
       }
       const runtimeSkillResult = runRuntimeActiveSkill({
           game,
@@ -8311,7 +8331,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           skillKey,
           skill,
           tags,
-          appliedTags: dispatch.applied,
+          appliedTags,
       });
       if (runtimeSkillResult) {
           if (runtimeSkillResult.ok)
@@ -8324,20 +8344,20 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               activateChapMinhLink(caster);
               refreshChapMinhOwnership(game);
               recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
           }
           if (skillKey === 'skill2') {
               consumeShieldByCurrentRatio(caster, 0.1);
               const target = pickTarget(game, caster);
               if (!target?.alive) {
-                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
               }
               const base = Math.max(1, Math.floor(casterPower));
               for (let hit = 0; hit < 3; hit += 1) {
                   dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill });
               }
               recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 1);
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1);
           }
           if (skillKey === 'skill3') {
               const heal = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.35));
@@ -8371,7 +8391,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
                   hits += 1;
               }
               recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, hits);
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, hits);
           }
       }
       if (caster.id === BLOOD_AVATAR_ID) {
@@ -8379,7 +8399,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           const consumeBloodAether = () => (usesTagAetherCost || consumeSideAether(caster.side, BLOOD_AVATAR_SKILL_COST));
           if (skillKey === 'skill1') {
               if (!consumeBloodAether()) {
-                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, enemies.length, 'insufficient-aether');
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, enemies.length, 'insufficient-aether');
               }
               const base = Math.max(1, toRoundedInt(casterPower * 1.4, 1));
               const picked = enemies.slice(0, 6);
@@ -8389,12 +8409,12 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
                   Statuses.add(target, { ...BLOOD_AVATAR_MARK_STATUS, sourceUnitId: caster.id });
               }
               recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, picked.length);
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, picked.length);
           }
           if (skillKey === 'skill2') {
               const casterState = caster;
               if (casterState._bloodFieldUsed) {
-                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
               }
               casterState._bloodFieldUsed = true;
               Statuses.add(caster, { id: 'blood_field_active', kind: 'field', tag: 'field', dur: 2, tick: 'turn', sourceUnitId: caster.id });
@@ -8409,21 +8429,21 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
                   }
               }
               recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, enemies.length);
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, enemies.length);
           }
           if (skillKey === 'skill3') {
               if (!consumeBloodAether()) {
-                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'insufficient-aether');
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
               }
               const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
               const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
               const mutation = resolveHpLoss(caster, hpCost, 'hp-cost', source, false);
               if (!mutation.succeeded)
-                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
               commitHpMutation(game, caster, mutation, currentActionExecution(game)?.identity);
               globalAetherPool.gain(caster.side, 15);
               recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
+              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
           }
       }
       if (hasSummonTag) {
@@ -8432,7 +8452,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
               const summon = (payload.summon ?? skill.summon ?? {});
               const summonId = typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`;
               if (hasUniqueGlobalTag && !canApplyUniqueGlobal(game, summonId)) {
-                  return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
               }
               enqueueImmediate(game, {
                   side: caster.side,
@@ -8448,19 +8468,7 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           }
       }
       if (effectTags.length > 0) {
-          dispatchGameplayTags(effectTags, {
-              game,
-              attacker: caster,
-              target: targets[0] ?? null,
-              targets,
-              side: caster.side,
-              payload,
-              deferEffects: false,
-              tagsNormalized: true,
-              tagsCanonical: true,
-              onAetherCost: () => false,
-              onSummon: () => undefined,
-          });
+          appliedTags.push(...effectTags);
       }
       const damagedEnemies = [];
       const directDamageMultiplier = resolveDirectDamageMultiplier(skill);
@@ -8476,11 +8484,11 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
       }
       if (caster.id === MONG_YEM_ID && damagedEnemies.length > 0) {
           for (const target of damagedEnemies) {
-              applyMarkSleepSetupTag(game, caster, target, MONG_YEM_DREAM_MARK_PAYLOAD);
+              applyMarkSleepEffect(caster, target, { markId: MONG_YEM_DREAM_MARK_PAYLOAD.markId, stacks: MONG_YEM_DREAM_MARK_PAYLOAD.markStacks, maxStacks: MONG_YEM_DREAM_MARK_PAYLOAD.markMaxStacks, purgeable: MONG_YEM_DREAM_MARK_PAYLOAD.markPurgeable, sleepTurnsOnCap: MONG_YEM_DREAM_MARK_PAYLOAD.sleepTurnsOnCap });
           }
       }
       recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, dispatch.targets.length);
+      return buildSkillResult(true, skillKey, skill, tags, appliedTags, targets.length);
   }
   function performActiveSkill(game, caster, skillKey) {
       if (currentActionExecution(game))
@@ -9311,8 +9319,8 @@ __modules['./combat/runtime-hooks/mong-yem.ts'] = (exports, module, __require) =
   const Statuses = __dep1.Statuses;
   const __dep2 = __require('./combat/skill-result.ts');
   const buildSkillResult = __dep2.buildSkillResult;
-  const __dep3 = __require('./combat/tag-dispatch.ts');
-  const applyMarkSleepSetupTag = __dep3.applyMarkSleepSetupTag;
+  const __dep3 = __require('./combat/mark-sleep-effect.ts');
+  const applyMarkSleepEffect = __dep3.applyMarkSleepEffect;
   const __dep4 = __require('./combat/number-utils.ts');
   const readAtkWilPower = __dep4.readAtkWilPower;
   const toFiniteNumber = __dep4.toFiniteNumber;
@@ -9424,11 +9432,8 @@ __modules['./combat/runtime-hooks/mong-yem.ts'] = (exports, module, __require) =
               ? Math.max(0, toFiniteNumber(pierceConfig?.ARM ?? 0, 0), toFiniteNumber(pierceConfig?.RES ?? 0, 0))
               : 0;
           dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill, defPen });
-          applyMarkSleepSetupTag(game, caster, target, {
-              markId,
-              markStacks: 1,
-              markMaxStacks,
-              markPurgeable: false,
+          applyMarkSleepEffect(caster, target, {
+              markId, stacks: 1, maxStacks: markMaxStacks, purgeable: false,
               sleepTurnsOnCap,
           });
           let spreadHits = 0;
@@ -9446,11 +9451,8 @@ __modules['./combat/runtime-hooks/mong-yem.ts'] = (exports, module, __require) =
               });
               for (const enemy of spreadCandidates) {
                   spreadHits += 1;
-                  applyMarkSleepSetupTag(game, caster, enemy, {
-                      markId: spreadMarkId,
-                      markStacks: spreadStacks,
-                      markMaxStacks: spreadMaxStacks,
-                      markPurgeable: false,
+                  applyMarkSleepEffect(caster, enemy, {
+                      markId: spreadMarkId, stacks: spreadStacks, maxStacks: spreadMaxStacks, purgeable: false,
                       sleepTurnsOnCap: spreadSleepTurnsOnCap,
                   });
               }
@@ -9968,1093 +9970,6 @@ __modules['./combat/status-utils.ts'] = (exports, module, __require) => {
   //# sourceMappingURL=status-utils.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'ensureStatusList')) exports.ensureStatusList = ensureStatusList;
   if (!Object.prototype.hasOwnProperty.call(exports, 'getStatusEntryById')) exports.getStatusEntryById = getStatusEntryById;
-};
-__modules['./combat/tag-aliases.ts'] = (exports, module, __require) => {
-  const RULE_TAG_ALIASES = Object.freeze({
-      axiom: 'axiom-rule',
-      'axiom-rule': 'axiom-rule',
-      'tiên đề': 'axiom-rule',
-      'tien-de': 'axiom-rule',
-      'than-tinh': 'axiom-rule',
-      'thần tính': 'axiom-rule',
-      'thần_tính': 'axiom-rule',
-      'than_tinh': 'axiom-rule',
-      'divine-nature': 'axiom-rule',
-      'thần tính thuộc axiom': 'axiom-rule',
-      'than-tinh-thuoc-axiom': 'axiom-rule',
-      'global-rule': 'global-rule',
-      'quy tắc': 'global-rule',
-      'quy-tac': 'global-rule',
-      'tag cấp độ cao': 'global-rule',
-      'tag-cap-do-cao': 'global-rule',
-      'tag cấp độ cao hơn pháp tắc': 'global-rule',
-      'tag-cap-do-cao-hon-phap-tac': 'global-rule',
-      'cấp độ cao hơn pháp tắc': 'global-rule',
-      'cap-do-cao-hon-phap-tac': 'global-rule',
-      'quy tắc cấp cao': 'global-rule',
-      'quy-tac-cap-cao': 'global-rule',
-      'doctrine-rule': 'doctrine-rule',
-      'pháp tắc': 'doctrine-rule',
-      'phap-tac': 'doctrine-rule',
-  });
-  const COMBAT_TAG_ALIASES = Object.freeze({
-      'self-and-ally': 'ally',
-      'ally-and-self': 'ally',
-      'ban_than_lan_dong_minh': 'ally',
-      'ban-than-lan-dong-minh': 'ally',
-      'ban than lan dong minh': 'ally',
-      'bản thân lẫn đồng minh': 'ally',
-      'random-single': 'random-target',
-      'single-target-random': 'random-target',
-      'đơn mục tiêu ngẫu nhiên': 'random-target',
-      'all-enemy': 'aoe',
-      'kẻ địch': 'enemy',
-      'lap-tuc': 'instant',
-      'lập tức': 'instant',
-      'pháp tắc: luyện ngục kiếm trận': 'doctrine-rule',
-      'phap-tac-luyen-nguc-kiem-tran': 'doctrine-rule',
-      'muc-tieu-leader': 'leader-target',
-      'mục tiêu leader': 'leader-target',
-      'mục tiêu: leader': 'leader-target',
-      'target-leader': 'leader-target',
-      'đơn mục tiêu': 'single-target',
-      'don-muc-tieu': 'single-target',
-      'đa mục tiêu': 'multi-target',
-      'da-muc-tieu': 'multi-target',
-      'ngẫu nhiên: kẻ địch': 'random-aoe',
-      'ngau-nhien-ke-dich': 'random-aoe',
-      'ngẫu nhiên: đồng minh': 'ally',
-      'ngau-nhien-dong-minh': 'ally',
-      'aoe: toàn sân': 'aoe',
-      'aoe-toan-san': 'aoe',
-      'toàn sân': 'aoe',
-      'toan-san': 'aoe',
-      'bản thân': 'self',
-      'ban-than': 'self',
-      'tiêu hao: aether': 'aether-cost',
-      'tieu-hao-aether': 'aether-cost',
-      'tiêu hao: hp': 'hp-cost',
-      'tieu-hao-hp': 'hp-cost',
-      'hồi phục': 'heal',
-      'hoi-phuc': 'heal',
-      'không phải hồi phục': 'non-heal-hp-change',
-      'khong-phai-hoi-phuc': 'non-heal-hp-change',
-      'khống chế: câm lặng': 'silence',
-      'khong-che-cam-lang': 'silence',
-      'độc nhất': 'unique-global',
-      'doc-nhat': 'unique-global',
-      'điều kiện': 'condition',
-      'dieu-kien': 'condition',
-      'aoe cố định': 'aoe',
-      'aoe co dinh': 'aoe',
-      'aoe ngẫu nhiên': 'random-aoe',
-      'aoe ngau nhien': 'random-aoe',
-      'đa mục tiêu: đồng minh': 'ally',
-      'da muc tieu: dong minh': 'ally',
-      'aoe: toàn bộ kẻ địch': 'aoe',
-      'aoe: toan bo ke dich': 'aoe',
-      'khống chế: ngủ': 'sleep',
-      'khong-che-ngu': 'sleep',
-      'khống chế: khiêu khích': 'taunt',
-      'khong-che-khieu-khich': 'taunt',
-      'câm lặng': 'silence',
-      'cam-lang': 'silence',
-      'tạo khiên': 'shield',
-      'tao-khien': 'shield',
-      'hồi phục đội': 'team-heal',
-      'hoi-phuc-doi': 'team-heal',
-      'đa mục tiêu ngẫu nhiên': 'random-aoe',
-      'da-muc-tieu-ngau-nhien': 'random-aoe',
-      'quy tắc: tái sinh': 'global-rule',
-      'quy-tac-tai-sinh': 'global-rule',
-      'quy tắc: cấm hồi sinh': 'global-rule',
-      'quy-tac-cam-hoi-sinh': 'global-rule',
-      'quy tắc: bất tử': 'global-rule',
-      'quy-tac-bat-tu': 'global-rule',
-      'pháp tắc: kiên định': 'doctrine-rule',
-      'phap-tac-kien-dinh': 'doctrine-rule',
-      'pháp tắc: cấm chữa trị': 'doctrine-rule',
-      'phap-tac-cam-chua-tri': 'doctrine-rule',
-      'pháp tắc: cấm hồi phục': 'doctrine-rule',
-      'phap-tac-cam-hoi-phuc': 'doctrine-rule',
-      'tuyệt đối': 'axiom-rule',
-      'tuyet-doi': 'axiom-rule',
-      'quy tắc: bất động như sơn': 'global-rule',
-      'quy-tac-bat-dong-nhu-son': 'global-rule',
-      'quy tắc: sự trở về của hư không': 'global-rule',
-      'quy-tac-su-tro-ve-cua-hu-khong': 'global-rule',
-      'sát thương tự thân': 'non-heal-hp-change',
-      'sat-thuong-tu-than': 'non-heal-hp-change',
-      'aoe: hàng dọc': 'column-aoe',
-      'aoe-hang-doc': 'column-aoe',
-      'aoe hàng dọc': 'column-aoe',
-      'hang-doc': 'column-aoe',
-      'aoe: vùng chữ thập': 'cross-aoe',
-      'aoe-vung-chu-thap': 'cross-aoe',
-      'vùng chữ thập': 'cross-aoe',
-      'vung-chu-thap': 'cross-aoe',
-      'vùng chữ +': 'cross-aoe',
-      'vung-chu-+': 'cross-aoe',
-      'tự động': 'instant',
-      'tu-dong': 'instant',
-      'debuff: mê hoặc': 'mark',
-      'debuff-me-hoac': 'mark',
-      'mê hoặc': 'mark',
-      'me-hoac': 'mark',
-      'gắn stack': 'mark',
-      'gan-stack': 'mark',
-      'cộng dồn': 'mark',
-      'cong-don': 'mark',
-      'không thể tẩy xóa': 'non-purgeable-mark',
-      'khong-the-tay-xoa': 'non-purgeable-mark',
-      'không thể bị xóa': 'non-purgeable-mark',
-      'khong-the-bi-xoa': 'non-purgeable-mark',
-      'vfx: biến đổi': 'vfx-transform',
-      'vfx-bien-doi': 'vfx-transform',
-      'nội tại': 'passive',
-      'noi-tai': 'passive',
-      'sát thương hỗn hợp': 'mixed-damage',
-      'sat-thuong-hon-hop': 'mixed-damage',
-      'huyết giáp': 'shield',
-      'huyet-giap': 'shield',
-      'huyết nô': 'summon',
-      'huyet-no': 'summon',
-      'huyết tế': 'hp-cost',
-      'huyet-te': 'hp-cost',
-      'huyết hải lĩnh vực': 'global-rule',
-      'huyet-hai-linh-vuc': 'global-rule',
-      'huyết thần lĩnh vực': 'global-rule',
-      'huyet-than-linh-vuc': 'global-rule',
-      'huyết thần': 'axiom-rule',
-      'huyet-than': 'axiom-rule',
-      'hào quang': 'aura',
-      'hao-quang': 'aura',
-      'buff: hào quang': 'aura',
-      'buff-hao-quang': 'aura',
-      'debuff vĩnh viễn': 'permanent-debuff',
-      'debuff-vinh-vien': 'permanent-debuff',
-      'buff vĩnh viễn': 'permanent-buff',
-      'buff-vinh-vien': 'permanent-buff',
-      'miễn khống chế': 'control-immunity',
-      'mien-khong-che': 'control-immunity',
-      'sát thương chuẩn': 'true-damage',
-      'sat-thuong-chuan': 'true-damage',
-      'combo': 'combo',
-      'vfx: combo': 'combo',
-      'vfx-combo': 'combo',
-      'hoảng sợ': 'control',
-      'hoang-so': 'control',
-      'fear': 'control',
-      'cấm hồi sinh': 'anti-revive',
-      'cam-hoi-sinh': 'anti-revive',
-      'pháp tắc: tái sinh': 'doctrine-rule',
-  });
-  const COMBAT_TAG_PRIORITY = Object.freeze({
-      'axiom-rule': 500,
-      'global-rule': 400,
-      'doctrine-rule': 300,
-      'single-target': 220,
-      'leader-target': 220,
-      self: 220,
-      ally: 220,
-      enemy: 220,
-      'random-target': 210,
-      'multi-target': 210,
-      'random-aoe': 210,
-      'column-aoe': 210,
-      'cross-aoe': 210,
-      aoe: 200,
-      mark: 160,
-      'permanent-buff': 160,
-      'permanent-debuff': 160,
-      aura: 150,
-      passive: 140,
-      'mixed-damage': 130,
-      'true-damage': 130,
-      combo: 125,
-      'control-immunity': 122,
-      'vfx-transform': 120,
-      'sleep-setup': 120,
-      'non-purgeable-mark': 120,
-  });
-  const RULE_TAG_SET = new Set(['doctrine-rule', 'global-rule', 'axiom-rule']);
-  const RULE_TAG_PRIORITY = Object.freeze({
-      'doctrine-rule': COMBAT_TAG_PRIORITY['doctrine-rule'] ?? 0,
-      'global-rule': COMBAT_TAG_PRIORITY['global-rule'] ?? 0,
-      'axiom-rule': COMBAT_TAG_PRIORITY['axiom-rule'] ?? 0,
-  });
-  const CONFLICT_RULE_RANK_PRIORITY = Object.freeze({
-      SSR: 1,
-      UR: 2,
-      PRIME: 3,
-  });
-  function toConflictScore(value) {
-      const numeric = Number(value);
-      if (!Number.isFinite(numeric))
-          return 0;
-      return Math.max(0, numeric);
-  }
-  function readUnitRankScore(unit) {
-      const key = String(unit?.rank ?? '').trim().toUpperCase();
-      return CONFLICT_RULE_RANK_PRIORITY[key] ?? 0;
-  }
-  function readUnitCultivationScore(unit) {
-      if (!unit)
-          return 0;
-      const direct = toConflictScore(unit.tuVi ?? unit.tuvi ?? unit.level ?? unit.lv);
-      if (direct > 0)
-          return direct;
-      const cultivation = unit.cultivation;
-      if (!cultivation || typeof cultivation !== 'object')
-          return 0;
-      const realm = toConflictScore(cultivation.realm);
-      const subRealm = toConflictScore(cultivation.subRealm);
-      return realm * 100 + subRealm;
-  }
-  function readUnitStarsScore(unit) {
-      if (!unit)
-          return 0;
-      return toConflictScore(unit.stars ?? unit.star);
-  }
-  function readUnitAwakenScore(unit) {
-      if (!unit)
-          return 0;
-      if (typeof unit.awakened === 'boolean')
-          return unit.awakened ? 1 : 0;
-      return toConflictScore(unit.awaken ?? unit.awakened);
-  }
-  function shouldCompareAwakenScore(left, right) {
-      return readUnitAwakenScore(left) > 0 && readUnitAwakenScore(right) > 0;
-  }
-  function readUnitCpScore(unit) {
-      if (!unit)
-          return 0;
-      return toConflictScore(unit.cp ?? unit.power);
-  }
-  function compareConflictScore(left, right) {
-      if (left > right)
-          return 1;
-      if (left < right)
-          return -1;
-      return 0;
-  }
-  function compareRuleTagPriority(left, right) {
-      const leftPriority = left ? (RULE_TAG_PRIORITY[left] ?? 0) : 0;
-      const rightPriority = right ? (RULE_TAG_PRIORITY[right] ?? 0) : 0;
-      return compareConflictScore(leftPriority, rightPriority);
-  }
-  function compareRuleConflictUnitPriority(left, right) {
-      const checks = [
-          compareConflictScore(readUnitRankScore(left), readUnitRankScore(right)),
-          compareConflictScore(readUnitCultivationScore(left), readUnitCultivationScore(right)),
-          compareConflictScore(readUnitStarsScore(left), readUnitStarsScore(right)),
-      ];
-      for (const result of checks) {
-          if (result !== 0)
-              return result;
-      }
-      if (shouldCompareAwakenScore(left, right)) {
-          const awakenComparison = compareConflictScore(readUnitAwakenScore(left), readUnitAwakenScore(right));
-          if (awakenComparison !== 0)
-              return awakenComparison;
-      }
-      return compareConflictScore(readUnitCpScore(left), readUnitCpScore(right));
-  }
-  function hasRuleTagAtLeast(tags, minimum) {
-      const minimumPriority = RULE_TAG_PRIORITY[minimum] ?? 0;
-      for (const tag of tags) {
-          const priority = RULE_TAG_PRIORITY[tag];
-          if ((priority ?? -1) >= minimumPriority)
-              return true;
-      }
-      return false;
-  }
-  function hasRuleTagPriorityAtLeast(tag, minimum) {
-      if (!tag)
-          return false;
-      const minimumPriority = RULE_TAG_PRIORITY[minimum] ?? 0;
-      const priority = RULE_TAG_PRIORITY[tag];
-      return (priority ?? -1) >= minimumPriority;
-  }
-  function normalizeAliasLookupKey(tag) {
-      return tag
-          .normalize('NFC')
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, ' ');
-  }
-  const NORMALIZED_TAG_CACHE = new Map();
-  const MAX_NORMALIZED_TAG_CACHE_SIZE = 2048;
-  function normalizeCombatTag(tag) {
-      const cached = NORMALIZED_TAG_CACHE.get(tag);
-      if (cached)
-          return cached;
-      const normalized = normalizeAliasLookupKey(tag);
-      const resolved = RULE_TAG_ALIASES[normalized] ?? COMBAT_TAG_ALIASES[normalized] ?? normalized;
-      if (NORMALIZED_TAG_CACHE.size >= MAX_NORMALIZED_TAG_CACHE_SIZE) {
-          NORMALIZED_TAG_CACHE.clear();
-      }
-      NORMALIZED_TAG_CACHE.set(tag, resolved);
-      return resolved;
-  }
-  function normalizeCanonicalInputTag(tag) {
-      const normalized = normalizeAliasLookupKey(tag);
-      return RULE_TAG_ALIASES[normalized] ?? normalized;
-  }
-  function canonicalizeCombatTags(tags, treatAsCanonical = false) {
-      return canonicalizeCombatTagsWithRule(tags, treatAsCanonical).tags;
-  }
-  function canonicalizeCombatTagsWithRule(tags, treatAsCanonical = false) {
-      if (!Array.isArray(tags) || tags.length === 0) {
-          return { tags: [], highestRuleTag: null };
-      }
-      const unique = [];
-      const seen = new Set();
-      let highestRuleTag = null;
-      let highestRulePriority = -1;
-      for (const rawTag of tags) {
-          const tag = treatAsCanonical ? normalizeCanonicalInputTag(rawTag) : normalizeCombatTag(rawTag);
-          if (!tag || seen.has(tag))
-              continue;
-          seen.add(tag);
-          unique.push(tag);
-          const normalizedRuleTag = tag;
-          const rulePriority = RULE_TAG_PRIORITY[normalizedRuleTag];
-          if (rulePriority == null || rulePriority <= highestRulePriority)
-              continue;
-          highestRuleTag = normalizedRuleTag;
-          highestRulePriority = rulePriority;
-      }
-      const filtered = highestRuleTag
-          ? unique.filter((tag) => !RULE_TAG_SET.has(tag) || tag === highestRuleTag)
-          : unique;
-      if (filtered.length <= 1) {
-          return { tags: filtered, highestRuleTag };
-      }
-      filtered.sort((left, right) => (COMBAT_TAG_PRIORITY[right] ?? 0) - (COMBAT_TAG_PRIORITY[left] ?? 0));
-      return { tags: filtered, highestRuleTag };
-  }
-  //# sourceMappingURL=tag-aliases.js.map
-  if (!Object.prototype.hasOwnProperty.call(exports, 'compareRuleTagPriority')) exports.compareRuleTagPriority = compareRuleTagPriority;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'compareRuleConflictUnitPriority')) exports.compareRuleConflictUnitPriority = compareRuleConflictUnitPriority;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'hasRuleTagAtLeast')) exports.hasRuleTagAtLeast = hasRuleTagAtLeast;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'hasRuleTagPriorityAtLeast')) exports.hasRuleTagPriorityAtLeast = hasRuleTagPriorityAtLeast;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'normalizeCombatTag')) exports.normalizeCombatTag = normalizeCombatTag;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'canonicalizeCombatTags')) exports.canonicalizeCombatTags = canonicalizeCombatTags;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'canonicalizeCombatTagsWithRule')) exports.canonicalizeCombatTagsWithRule = canonicalizeCombatTagsWithRule;
-};
-__modules['./combat/tag-dispatch.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./combat/apply-damage.ts');
-  const grantShield = __dep0.grantShield;
-  const __dep1 = __require('./combat/number-utils.ts');
-  const toFiniteNumber = __dep1.toFiniteNumber;
-  const toPositiveTurns = __dep1.toPositiveTurns;
-  const toRoundedInt = __dep1.toRoundedInt;
-  const __dep2 = __require('./statuses.ts');
-  const Statuses = __dep2.Statuses;
-  const __dep3 = __require('./data/tags.ts');
-  const normalizeTagList = __dep3.normalizeTagList;
-  const __dep4 = __require('./combat.ts');
-  const dealAbilityDamage = __dep4.dealAbilityDamage;
-  const healUnit = __dep4.healUnit;
-  const __dep5 = __require('./combat/kernel/index.ts');
-  const createNaturalAction = __dep5.createNaturalAction;
-  const currentActionExecution = __dep5.currentActionExecution;
-  const queueDelayedReviveEffect = __dep5.queueDelayedReviveEffect;
-  const withActionExecution = __dep5.withActionExecution;
-  const __dep6 = __require('./utils/rng.ts');
-  const nextRngValue = __dep6.nextRngValue;
-  const __dep7 = __require('./combat/status-utils.ts');
-  const ensureStatusList = __dep7.ensureStatusList;
-  const getStatusEntryById = __dep7.getStatusEntryById;
-  const __dep8 = __require('./combat/token-side-utils.ts');
-  const partitionTokensBySide = __dep8.partitionTokensBySide;
-  const sampleTokens = __dep8.sampleTokens;
-  const __dep9 = __require('./combat/tag-aliases.ts');
-  const canonicalizeCombatTagsWithRule = __dep9.canonicalizeCombatTagsWithRule;
-  const compareRuleConflictUnitPriority = __dep9.compareRuleConflictUnitPriority;
-  const compareRuleTagPriority = __dep9.compareRuleTagPriority;
-  const __dep10 = __require('./combat/board-position-utils.ts');
-  const createCrossSlotLookup = __dep10.createCrossSlotLookup;
-  const isLeaderToken = __dep10.isLeaderToken;
-  const readBoardPosition = __dep10.readBoardPosition;
-  const selectTargetsByBoardPredicate = __dep10.selectTargetsByBoardPredicate;
-  const MARK_APPLICATION_TAGS = Object.freeze(['mark', 'sleep-setup']);
-  const EMPTY_TAGS = [];
-  const DOCTRINE_NO_HEAL_STATUS_ID = 'doctrine-no-heal';
-  const RULE_CONFLICT_CACHE = new WeakMap();
-  function collectAliveTargets(tokens) {
-      const alive = [];
-      for (const token of tokens) {
-          if (token?.alive)
-              alive.push(token);
-      }
-      return alive;
-  }
-  const resolveTargets = (targets, target) => {
-      if (Array.isArray(targets) && targets.length > 0) {
-          return collectAliveTargets(targets);
-      }
-      if (target?.alive)
-          return [target];
-      return [];
-  };
-  const EMPTY_TOKENS = [];
-  const readTargetLimit = (ctx, fallback) => (Math.max(1, toRoundedInt(ctx.payload?.targetCount ?? ctx.payload?.targets, fallback)));
-  const readAllowDuplicateTargets = (ctx) => (ctx.payload?.allowDuplicateTargets === true
-      || ctx.payload?.allowDuplicates === true);
-  const sampleFromCandidates = (ctx, candidates, limit) => {
-      return sampleTokens(candidates, limit, {
-          allowDuplicates: readAllowDuplicateTargets(ctx),
-          randomValue: () => (ctx.game?.rng ? nextRngValue(ctx.game.rng) : Math.random()),
-      });
-  };
-  const TARGET_PRIORITY_ALIASES = Object.freeze({
-      'leader-first': 'leader-first',
-      leader_first: 'leader-first',
-      leader: 'leader-first',
-      'lowest-hp': 'lowest-hp',
-      lowest_hp: 'lowest-hp',
-      'hp-asc': 'lowest-hp',
-      'highest-hp': 'highest-hp',
-      highest_hp: 'highest-hp',
-      'hp-desc': 'highest-hp',
-      'lowest-hp-ratio': 'lowest-hp-ratio',
-      lowest_hp_ratio: 'lowest-hp-ratio',
-      'lowest-hp-percent': 'lowest-hp-ratio',
-      'highest-hp-ratio': 'highest-hp-ratio',
-      highest_hp_ratio: 'highest-hp-ratio',
-      'highest-hp-percent': 'highest-hp-ratio',
-      'lowest-current-hp': 'lowest-hp',
-      low_hp: 'lowest-hp',
-      lowhp: 'lowest-hp',
-      'thap-mau-nhat': 'lowest-hp',
-      'mau-thap-nhat': 'lowest-hp',
-      'hp-thap-nhat': 'lowest-hp',
-      'thap-hp-nhat': 'lowest-hp',
-      'hp-hien-tai-thap-nhat': 'lowest-hp',
-      'mau-hien-tai-thap-nhat': 'lowest-hp',
-      'thấp-máu-nhất': 'lowest-hp',
-      'máu-thấp-nhất': 'lowest-hp',
-      'hp-hiện-tại-thấp-nhất': 'lowest-hp',
-      'máu-hiện-tại-thấp-nhất': 'lowest-hp',
-      'highest-current-hp': 'highest-hp',
-      high_hp: 'highest-hp',
-      highhp: 'highest-hp',
-      'mau-cao-nhat': 'highest-hp',
-      'hp-hien-tai-cao-nhat': 'highest-hp',
-      'máu-cao-nhất': 'highest-hp',
-      'hp-hiện-tại-cao-nhất': 'highest-hp',
-  });
-  const normalizePriorityLookupKey = (value) => (String(value ?? '')
-      .normalize('NFC')
-      .trim()
-      .toLowerCase()
-      .replace(/[_\s]+/g, '-'));
-  const readTargetPriority = (payload) => {
-      const raw = normalizePriorityLookupKey(payload?.targetPriority ?? payload?.priority);
-      return TARGET_PRIORITY_ALIASES[raw] ?? 'board';
-  };
-  const readTargetRole = (payload) => {
-      const raw = normalizePriorityLookupKey(payload?.targetRole);
-      if (raw === 'leader' || raw === 'muc-tieu-leader' || raw === 'mục-tiêu-leader')
-          return 'leader';
-      return 'any';
-  };
-  const resolvePrimaryEnemyTarget = (ctx, result) => {
-      for (const token of result.targets) {
-          if (token.side !== ctx.attacker?.side)
-              return token;
-      }
-      if (ctx.target && ctx.target.side !== ctx.attacker?.side)
-          return ctx.target;
-      return ctx.opponentTokens[0] ?? null;
-  };
-  const selectColumnTargets = (pool, anchor) => {
-      const anchorPos = readBoardPosition(anchor);
-      if (!anchorPos)
-          return [];
-      return selectTargetsByBoardPredicate(pool, (pos) => pos.col === anchorPos.col);
-  };
-  const selectCrossTargets = (pool, anchor) => {
-      const anchorPos = readBoardPosition(anchor);
-      if (!anchorPos)
-          return [];
-      const crossSlots = createCrossSlotLookup(anchorPos.slot);
-      return selectTargetsByBoardPredicate(pool, (pos) => crossSlots.has(pos.slot));
-  };
-  const filterTokensByRole = (ctx, tokens) => {
-      if (ctx.targetRole !== 'leader')
-          return tokens;
-      const leaders = [];
-      for (const token of tokens) {
-          if (isLeaderToken(token))
-              leaders.push(token);
-      }
-      return leaders;
-  };
-  const insertMetricSorted = (entries, candidate, findLowest) => {
-      let inserted = false;
-      for (let i = 0; i < entries.length; i += 1) {
-          const existing = entries[i];
-          if (!existing)
-              continue;
-          const shouldInsertBefore = findLowest
-              ? candidate.metric < existing.metric
-              : candidate.metric > existing.metric;
-          if (!shouldInsertBefore)
-              continue;
-          entries.splice(i, 0, candidate);
-          inserted = true;
-          break;
-      }
-      if (!inserted)
-          entries.push(candidate);
-  };
-  const pickTopByMetric = (tokens, limit, metricReader, findLowest) => {
-      if (limit <= 0 || tokens.length === 0)
-          return [];
-      if (limit >= tokens.length) {
-          const cloned = [...tokens];
-          cloned.sort((a, b) => {
-              const aMetric = metricReader(a);
-              const bMetric = metricReader(b);
-              return findLowest ? aMetric - bMetric : bMetric - aMetric;
-          });
-          return cloned;
-      }
-      const selected = [];
-      for (const token of tokens) {
-          const metric = metricReader(token);
-          if (selected.length < limit) {
-              insertMetricSorted(selected, { token, metric }, findLowest);
-              continue;
-          }
-          const tail = selected[selected.length - 1];
-          if (!tail)
-              continue;
-          const shouldReplaceTail = findLowest ? metric < tail.metric : metric > tail.metric;
-          if (!shouldReplaceTail)
-              continue;
-          selected.pop();
-          insertMetricSorted(selected, { token, metric }, findLowest);
-      }
-      return selected.map((entry) => entry.token);
-  };
-  const readHpRatio = (unit) => {
-      const hpMax = Math.max(1, toFiniteNumber(unit.hpMax, 1));
-      const hp = Math.max(0, toFiniteNumber(unit.hp, 0));
-      return hp / hpMax;
-  };
-  const findLeaderToken = (tokens) => {
-      for (const token of tokens) {
-          if (isLeaderToken(token))
-              return token;
-      }
-      return null;
-  };
-  const pickTargetsByPriority = (ctx, tokens, limit) => {
-      if (tokens.length <= 1 || limit <= 0)
-          return tokens.slice(0, Math.max(0, limit));
-      const priority = ctx.targetPriority;
-      if (priority === 'board')
-          return tokens.slice(0, limit);
-      if (limit === 1) {
-          if (priority === 'leader-first') {
-              const leader = findLeaderToken(tokens);
-              return leader ? [leader] : [tokens[0]];
-          }
-          const useRatioMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio';
-          const findLowest = priority === 'lowest-hp' || priority === 'lowest-hp-ratio';
-          return pickTopByMetric(tokens, 1, (token) => (useRatioMetric ? readHpRatio(token) : toFiniteNumber(token.hp, 0)), findLowest);
-      }
-      if (priority === 'leader-first') {
-          const leaders = [];
-          const nonLeaders = [];
-          for (const token of tokens) {
-              if (isLeaderToken(token))
-                  leaders.push(token);
-              else
-                  nonLeaders.push(token);
-          }
-          return [...leaders, ...nonLeaders].slice(0, limit);
-      }
-      const useRatioMetric = priority === 'lowest-hp-ratio' || priority === 'highest-hp-ratio';
-      const findLowest = priority === 'lowest-hp' || priority === 'lowest-hp-ratio';
-      return pickTopByMetric(tokens, limit, (token) => (useRatioMetric ? readHpRatio(token) : toFiniteNumber(token.hp, 0)), findLowest);
-  };
-  const readTurns = (payload, ...keys) => {
-      for (const key of keys) {
-          const raw = (payload?.[key] ?? null);
-          const direct = toFiniteNumber(raw, NaN);
-          if (Number.isFinite(direct) && direct > 0)
-              return toPositiveTurns(direct);
-          if (raw && typeof raw === 'object') {
-              const nestedTurns = toFiniteNumber(raw.turns, NaN);
-              if (Number.isFinite(nestedTurns) && nestedTurns > 0)
-                  return toPositiveTurns(nestedTurns);
-          }
-      }
-      return 1;
-  };
-  const readEffectAmount = (payload, primaryKey, fallbackKey) => Math.max(0, toRoundedInt(payload?.[primaryKey] ?? payload?.[fallbackKey], 0));
-  const readOverhealShieldRatio = (payload) => {
-      const explicit = toFiniteNumber(payload?.overhealToShieldRatio
-          ?? payload?.overflowToShieldRatio
-          ?? payload?.overflowShieldRatio, NaN);
-      if (Number.isFinite(explicit))
-          return Math.max(0, explicit);
-      return payload?.overflowAsShield === true ? 1 : 0;
-  };
-  const resolveEffectTargets = (ctx, result) => (result.targets.length > 0 ? result.targets : (ctx.attacker ? [ctx.attacker] : EMPTY_TOKENS));
-  const addStatus = (target, id, turns, sourceUnitId) => {
-      Statuses.add(target, {
-          id,
-          kind: 'debuff',
-          tag: id,
-          dur: toPositiveTurns(turns),
-          tick: 'turn',
-          ...(sourceUnitId ? { sourceUnitId } : {}),
-      });
-  };
-  const resolveRuleConflictBlock = (attacker, attackerKitKey, source, sourceKitKey, sourceRuleTag, attackerRuleTag, cache) => {
-      if (!attacker || !source)
-          return true;
-      const cacheKey = [
-          String(attacker.id),
-          attackerKitKey,
-          attackerRuleTag,
-          String(source.id),
-          sourceKitKey,
-          sourceRuleTag,
-      ].join('::');
-      const cached = cache?.get(cacheKey);
-      if (typeof cached === 'boolean')
-          return cached;
-      const attackerWins = compareRuleConflictUnitPriority(attacker, source) > 0;
-      cache?.set(cacheKey, attackerWins);
-      return attackerWins;
-  };
-  const resolveKitConflictKey = (payload) => (String(payload?.kitKey ?? payload?.skillKey ?? payload?.sourceSkillKey ?? payload?.abilityKey ?? '__kit__'));
-  const getRuleConflictCache = (game) => {
-      if (!game)
-          return null;
-      const existing = RULE_CONFLICT_CACHE.get(game);
-      if (existing)
-          return existing;
-      const next = new Map();
-      RULE_CONFLICT_CACHE.set(game, next);
-      return next;
-  };
-  const canReceiveHealUnderDoctrine = (token, game, attacker, highestRuleTag, attackerSide, attackerKitKey) => {
-      if (!Array.isArray(token.statuses) || token.statuses.length === 0)
-          return true;
-      const cache = getRuleConflictCache(game);
-      for (const status of token.statuses) {
-          if (!status || status.id !== DOCTRINE_NO_HEAL_STATUS_ID)
-              continue;
-          if (!attackerSide)
-              return false;
-          if (status.sourceSide != null && status.sourceSide === attackerSide)
-              continue;
-          const sourceRuleTag = status.sourceRuleTag;
-          const ruleTagComparison = compareRuleTagPriority(highestRuleTag, sourceRuleTag ?? 'doctrine-rule');
-          if (ruleTagComparison > 0)
-              continue;
-          if (ruleTagComparison < 0)
-              return false;
-          const sourceUnitId = status.sourceUnitId;
-          const sourceUnit = sourceUnitId && game
-              ? game.tokens.find((entry) => entry?.id === sourceUnitId) ?? null
-              : null;
-          const sourceKitKey = String(status.sourceKitKey ?? status.sourceSkillKey ?? '__kit__');
-          if (!resolveRuleConflictBlock(attacker, attackerKitKey, sourceUnit, sourceKitKey, String(sourceRuleTag ?? 'doctrine-rule'), String(highestRuleTag ?? '__none__'), cache))
-              return false;
-      }
-      return true;
-  };
-  const applyTaggedStatus = (ctx, result, statusId, ...turnKeys) => {
-      if (ctx.deferEffects)
-          return;
-      const turns = readTurns(ctx.payload, ...turnKeys);
-      const sourceUnitId = ctx.attacker?.id;
-      for (const token of result.targets)
-          addStatus(token, statusId, turns, sourceUnitId);
-      if (result.targets.length > 0)
-          result.sideEffects.push(`${statusId}:${turns}`);
-  };
-  const assignTargetsIfEmpty = (result, nextTargets) => {
-      if (result.targets.length > 0 || nextTargets.length === 0)
-          return;
-      result.targets = nextTargets;
-  };
-  const assignSliceTargetsIfEmpty = (ctx, result, source, limit) => {
-      const filtered = filterTokensByRole(ctx, source);
-      assignTargetsIfEmpty(result, pickTargetsByPriority(ctx, filtered, limit));
-  };
-  const applyDamageLikeEffect = (ctx, result, amount) => {
-      if (amount <= 0)
-          return;
-      if (!ctx.game || !ctx.attacker)
-          throw new Error('[combat-kernel] damage tag requires Game, attacker, and ActionExecutionContext');
-      if (!currentActionExecution(ctx.game)) {
-          withActionExecution(ctx.game, createNaturalAction(ctx.game, 'tag-damage'), () => applyDamageLikeEffect(ctx, result, amount));
-          return;
-      }
-      for (const token of result.targets) {
-          dealAbilityDamage(ctx.game, ctx.attacker, token, { base: amount, attackType: 'skill' });
-      }
-      if (result.targets.length > 0)
-          result.sideEffects.push(`hp-change:${amount}`);
-  };
-  const applyHealToTokens = (game, attacker, tokens, highestRuleTag, amount, attackerSide, attackerKitKey) => {
-      const healed = [];
-      for (const token of tokens) {
-          if (!canReceiveHealUnderDoctrine(token, game, attacker, highestRuleTag, attackerSide, attackerKitKey))
-              continue;
-          const healResult = game && attacker ? healUnit(game, attacker, token, amount) : healUnit(token, amount);
-          healed.push({ token, overheal: Math.max(0, toFiniteNumber(healResult.overheal, 0)) });
-      }
-      return healed;
-  };
-  const hasAnyHealableToken = (game, attacker, tokens, highestRuleTag, attackerSide, attackerKitKey) => {
-      for (const token of tokens) {
-          if (canReceiveHealUnderDoctrine(token, game, attacker, highestRuleTag, attackerSide, attackerKitKey))
-              return true;
-      }
-      return false;
-  };
-  const applyRuleNoHealStatus = (ctx, result) => {
-      if (ctx.deferEffects || !ctx.attacker)
-          return;
-      const turns = readTurns(ctx.payload, 'forbidEnemyHealTurns', 'noHealTurns', 'turns', 'duration');
-      const shouldForbidEnemyHeal = (ctx.payload?.forbidEnemyHeal === true
-          || ctx.payload?.forbidHeal === true
-          || (turns > 0 && (ctx.payload?.forbidEnemyHealTurns != null
-              || ctx.payload?.noHealTurns != null)));
-      if (!shouldForbidEnemyHeal)
-          return;
-      const sourceKitKey = resolveKitConflictKey(ctx.payload);
-      for (const token of ctx.opponentTokens) {
-          Statuses.add(token, {
-              id: DOCTRINE_NO_HEAL_STATUS_ID,
-              kind: 'debuff',
-              tag: 'no-heal',
-              dur: turns,
-              tick: 'turn',
-              sourceUnitId: ctx.attacker.id,
-              sourceSide: ctx.attacker.side,
-              sourceRuleTag: result.highestRuleTag ?? 'doctrine-rule',
-              sourceKitKey,
-          });
-      }
-      result.sideEffects.push(`doctrine-no-heal:${turns}`);
-  };
-  const assignAllAliveTargets = (ctx, result) => {
-      if (!ctx.game)
-          return false;
-      result.targets = collectAliveTargets(ctx.game.tokens);
-      return true;
-  };
-  function applyMarkStackingStatus(ctx, result) {
-      if (ctx.deferEffects)
-          return;
-      const payload = ctx.payload ?? {};
-      const statusId = String(payload.markId ?? 'mark');
-      const stacksPerApply = Math.max(1, toRoundedInt(payload.markStacks ?? payload.stacks ?? 1, 1));
-      const maxStacks = Math.max(1, toRoundedInt(payload.markMaxStacks ?? payload.maxStacks ?? 3, 3));
-      const sleepTurnsOnCap = Math.max(0, toRoundedInt(payload.sleepTurnsOnCap ?? payload.markSleepTurns ?? 0, 0));
-      const sleepSetupByTag = result.tags.includes('sleep-setup');
-      const nonPurgeableByTag = result.tags.includes('non-purgeable-mark');
-      const purgeable = typeof payload.markPurgeable === 'boolean' ? payload.markPurgeable : !nonPurgeableByTag;
-      for (const target of result.targets) {
-          const statuses = ensureStatusList(target);
-          const existingEntry = getStatusEntryById(target, statusId, statuses);
-          if (!existingEntry) {
-              Statuses.add(target, {
-                  id: statusId,
-                  kind: 'mark',
-                  tag: 'mark',
-                  stacks: Math.min(maxStacks, stacksPerApply),
-                  maxStacks,
-                  purgeable,
-                  ...(ctx.attacker?.id ? { sourceUnitId: ctx.attacker.id } : {}),
-              });
-              continue;
-          }
-          const status = existingEntry.status;
-          const currentStacks = Math.max(0, toRoundedInt(status?.stacks ?? 0, 0));
-          const nextStacks = Math.min(maxStacks, currentStacks + stacksPerApply);
-          status.stacks = nextStacks;
-          status.maxStacks = maxStacks;
-          status.purgeable = purgeable;
-          if (nextStacks < maxStacks)
-              continue;
-          if (sleepTurnsOnCap > 0 || sleepSetupByTag) {
-              addStatus(target, 'sleep', Math.max(1, sleepTurnsOnCap || 1), ctx.attacker?.id);
-              result.sideEffects.push(`sleep:${Math.max(1, sleepTurnsOnCap || 1)}`);
-          }
-          statuses.splice(existingEntry.index, 1);
-          result.sideEffects.push(`mark-cap:${statusId}`);
-      }
-  }
-  const applyAllAliveRuleTargets = (ctx, result) => {
-      assignAllAliveTargets(ctx, result);
-  };
-  const HANDLERS = Object.freeze({
-      'aether-cost': (ctx, result) => {
-          const amount = Math.max(0, toRoundedInt(ctx.cost, 0));
-          if (!ctx.side || amount <= 0)
-              return;
-          const consumed = ctx.onAetherCost(amount, ctx.side);
-          if (consumed)
-              result.sideEffects.push(`aether:${ctx.side}:${amount}`);
-      },
-      'single-target': (ctx, result) => {
-          assignTargetsIfEmpty(result, ctx.target?.alive ? [ctx.target] : EMPTY_TOKENS);
-      },
-      self: (ctx, result) => {
-          if (ctx.attacker?.alive)
-              result.targets = [ctx.attacker];
-      },
-      ally: (ctx, result) => {
-          if (!ctx.attacker)
-              return;
-          assignSliceTargetsIfEmpty(ctx, result, ctx.attackerTokens, readTargetLimit(ctx, 1));
-      },
-      enemy: (ctx, result) => {
-          if (!ctx.attacker)
-              return;
-          assignSliceTargetsIfEmpty(ctx, result, ctx.opponentTokens, readTargetLimit(ctx, 1));
-      },
-      'leader-target': (ctx, result) => {
-          if (!ctx.attacker)
-              return;
-          const leader = findLeaderToken(ctx.opponentTokens);
-          assignTargetsIfEmpty(result, leader ? [leader] : EMPTY_TOKENS);
-      },
-      'random-target': (ctx, result) => {
-          if (!ctx.attacker)
-              return;
-          const candidates = ctx.opponentTokens;
-          assignTargetsIfEmpty(result, candidates.length > 0 ? sampleFromCandidates(ctx, candidates, 1) : EMPTY_TOKENS);
-      },
-      'random-aoe': (ctx, result) => {
-          if (!ctx.attacker)
-              return;
-          const limit = readTargetLimit(ctx, 2);
-          result.targets = sampleFromCandidates(ctx, ctx.opponentTokens, limit);
-      },
-      'multi-target': (ctx, result) => {
-          if (!ctx.attacker)
-              return;
-          assignSliceTargetsIfEmpty(ctx, result, ctx.opponentTokens, readTargetLimit(ctx, 2));
-      },
-      'column-aoe': (ctx, result) => {
-          if (!ctx.attacker)
-              return;
-          const anchor = resolvePrimaryEnemyTarget(ctx, result);
-          const selected = selectColumnTargets(ctx.opponentTokens, anchor);
-          if (selected.length > 0)
-              result.targets = selected;
-      },
-      'cross-aoe': (ctx, result) => {
-          if (!ctx.attacker)
-              return;
-          const anchor = resolvePrimaryEnemyTarget(ctx, result);
-          const selected = selectCrossTargets(ctx.opponentTokens, anchor);
-          if (selected.length > 0)
-              result.targets = selected;
-      },
-      aoe: (ctx, result) => {
-          if (!ctx.attacker)
-              return;
-          result.targets = ctx.opponentTokens;
-      },
-      'axiom-rule': (ctx, result) => {
-          applyAllAliveRuleTargets(ctx, result);
-          applyRuleNoHealStatus(ctx, result);
-      },
-      'global-rule': (ctx, result) => {
-          applyAllAliveRuleTargets(ctx, result);
-          applyRuleNoHealStatus(ctx, result);
-      },
-      'doctrine-rule': (ctx, result) => {
-          if (!assignAllAliveTargets(ctx, result))
-              return;
-          applyRuleNoHealStatus(ctx, result);
-      },
-      heal: (ctx, result) => {
-          const healTargets = resolveEffectTargets(ctx, result);
-          const attackerKitKey = resolveKitConflictKey(ctx.payload);
-          if (ctx.deferEffects) {
-              if (!hasAnyHealableToken(ctx.game, ctx.attacker, healTargets, result.highestRuleTag, ctx.attacker?.side ?? null, attackerKitKey)) {
-                  result.sideEffects.push('heal-blocked');
-              }
-              return;
-          }
-          const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
-          if (amount <= 0)
-              return;
-          const overhealShieldRatio = readOverhealShieldRatio(ctx.payload);
-          const overflowShieldTurns = toPositiveTurns(toFiniteNumber(ctx.payload?.overflowShieldTurns ?? ctx.payload?.shieldTurns, 2), 2);
-          const healedEntries = applyHealToTokens(ctx.game, ctx.attacker, healTargets, result.highestRuleTag, amount, ctx.attacker?.side ?? null, attackerKitKey);
-          for (const entry of healedEntries) {
-              if (overhealShieldRatio > 0 && entry.overheal > 0) {
-                  const shieldAmount = Math.max(0, Math.floor(entry.overheal * overhealShieldRatio));
-                  if (shieldAmount > 0) {
-                      grantShield(entry.token, shieldAmount, { durationTurns: overflowShieldTurns });
-                      result.sideEffects.push(`overheal-shield:${shieldAmount}`);
-                  }
-              }
-          }
-          result.sideEffects.push(`heal:${amount}`);
-      },
-      'team-heal': (ctx, result) => {
-          const attackerKitKey = resolveKitConflictKey(ctx.payload);
-          if (ctx.deferEffects) {
-              if (!hasAnyHealableToken(ctx.game, ctx.attacker, ctx.attackerTokens, result.highestRuleTag, ctx.attacker?.side ?? null, attackerKitKey)) {
-                  result.sideEffects.push('heal-blocked');
-              }
-              return;
-          }
-          const amount = readEffectAmount(ctx.payload, 'healAmount', 'heal');
-          if (amount <= 0 || !ctx.attacker)
-              return;
-          applyHealToTokens(ctx.game, ctx.attacker, ctx.attackerTokens, result.highestRuleTag, amount, ctx.attacker.side, attackerKitKey);
-          result.sideEffects.push(`team-heal:${amount}`);
-      },
-      shield: (ctx, result) => {
-          if (ctx.deferEffects)
-              return;
-          const amount = readEffectAmount(ctx.payload, 'shieldAmount', 'shield');
-          if (amount <= 0)
-              return;
-          for (const token of resolveEffectTargets(ctx, result))
-              grantShield(token, amount);
-          result.sideEffects.push(`shield:${amount}`);
-      },
-      silence: (ctx, result) => {
-          applyTaggedStatus(ctx, result, 'silence', 'silenceTurns', 'turns', 'duration');
-      },
-      sleep: (ctx, result) => {
-          applyTaggedStatus(ctx, result, 'sleep', 'sleepTurns', 'turns', 'duration');
-      },
-      mark: (ctx, result) => {
-          applyMarkStackingStatus(ctx, result);
-      },
-      control: (ctx, result) => {
-          const statusId = String(ctx.payload?.controlStatus ?? 'control');
-          applyTaggedStatus(ctx, result, statusId, 'controlTurns', 'turns', 'duration');
-      },
-      taunt: (ctx, result) => {
-          applyTaggedStatus(ctx, result, 'taunt', 'tauntTurns', 'turns', 'duration');
-      },
-      summon: (ctx, result) => {
-          if (ctx.deferEffects)
-              return;
-          ctx.onSummon();
-          result.sideEffects.push('summon');
-      },
-      'delayed-revive': (ctx, result) => {
-          if (ctx.deferEffects)
-              return;
-          if (!ctx.game || !ctx.attacker)
-              throw new Error('[delayed-revive] gameplay effect requires game and actor');
-          const death = ctx.payload?.deathRecord;
-          const spec = ctx.payload?.delayedRevive;
-          if (!death || !spec)
-              throw new Error('[delayed-revive] explicit deathRecord and delayedRevive spec are required');
-          const entry = queueDelayedReviveEffect(ctx.game, ctx.attacker, death, spec);
-          result.sideEffects.push(`delayed-revive:${entry.queueId}`);
-      },
-      'non-heal-hp-change': (ctx, result) => {
-          if (ctx.deferEffects)
-              return;
-          const amount = readEffectAmount(ctx.payload, 'hpDelta', 'damage');
-          applyDamageLikeEffect(ctx, result, amount);
-      },
-      instant: (_ctx, result) => {
-          result.sideEffects.push('instant');
-      },
-      'non-purgeable-mark': () => {
-          // Non-purgeable mark behavior is applied in mark stack resolver.
-      },
-      passive: () => {
-          // Passive is metadata-level tag; runtime behavior is implemented per-unit hooks.
-      },
-      'mixed-damage': () => {
-          // Mixed damage routing is resolved by damage pipeline metadata.
-      },
-      'vfx-transform': () => {
-          // VFX transform is display metadata and does not mutate combat state directly.
-      },
-      condition: () => {
-          // Condition tags are validated at skill execution stage.
-      },
-      'hp-cost': () => {
-          // HP costs are resolved centrally in performActiveSkill payload processing.
-      },
-  });
-  function dispatchGameplayTags(rawTags, context) {
-      const normalizedTags = context.tagsNormalized
-          ? (Array.isArray(rawTags) ? rawTags : EMPTY_TAGS)
-          : normalizeTagList(rawTags);
-      const treatAsCanonical = context.tagsCanonical === true;
-      const { tags, highestRuleTag } = canonicalizeCombatTagsWithRule(normalizedTags, treatAsCanonical);
-      const target = context.target ?? null;
-      const attacker = context.attacker ?? null;
-      const { allyTokens, enemyTokens } = context.game && attacker
-          ? partitionTokensBySide(context.game.tokens, attacker.side, { sortByBoardPosition: true })
-          : { allyTokens: EMPTY_TOKENS, enemyTokens: EMPTY_TOKENS };
-      const initialTargets = resolveTargets(context.targets, target);
-      const ctx = {
-          game: context.game ?? null,
-          attacker,
-          target,
-          cost: Math.max(0, toRoundedInt(context.cost, 0)),
-          side: context.side ?? context.attacker?.side ?? null,
-          payload: context.payload ?? null,
-          onAetherCost: context.onAetherCost ?? (() => false),
-          onSummon: context.onSummon ?? (() => undefined),
-          deferEffects: Boolean(context.deferEffects),
-          attackerTokens: attacker ? allyTokens : EMPTY_TOKENS,
-          opponentTokens: attacker ? enemyTokens : EMPTY_TOKENS,
-          targetPriority: readTargetPriority(context.payload ?? null),
-          targetRole: readTargetRole(context.payload ?? null),
-      };
-      const result = {
-          tags,
-          highestRuleTag,
-          targets: [...initialTargets],
-          applied: [],
-          sideEffects: [],
-      };
-      for (const tag of tags) {
-          const handler = HANDLERS[tag];
-          if (!handler)
-              continue;
-          handler(ctx, result);
-          result.applied.push(tag);
-      }
-      return result;
-  }
-  function applyMarkSleepSetupTag(game, attacker, target, payload) {
-      dispatchGameplayTags(MARK_APPLICATION_TAGS, {
-          game,
-          attacker,
-          target,
-          targets: [target],
-          side: attacker.side,
-          payload,
-          deferEffects: false,
-          tagsNormalized: true,
-          tagsCanonical: true,
-      });
-  }
-  //# sourceMappingURL=tag-dispatch.js.map
-  if (!Object.prototype.hasOwnProperty.call(exports, 'dispatchGameplayTags')) exports.dispatchGameplayTags = dispatchGameplayTags;
-  if (!Object.prototype.hasOwnProperty.call(exports, 'applyMarkSleepSetupTag')) exports.applyMarkSleepSetupTag = applyMarkSleepSetupTag;
 };
 __modules['./combat/temporal-contract.ts'] = (exports, module, __require) => {
   class TemporalAnchorLedger {
@@ -20046,52 +18961,50 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
   const nextRngValue = __dep24.nextRngValue;
   const __dep25 = __require('./data/tags.ts');
   const normalizeTagList = __dep25.normalizeTagList;
-  const __dep26 = __require('./combat/tag-dispatch.ts');
-  const dispatchGameplayTags = __dep26.dispatchGameplayTags;
-  const __dep27 = __require('./modes/pve/session-state.ts');
-  const normalizeConfig = __dep27.normalizeConfig;
-  const createSession = __dep27.createSession;
-  const invalidateSceneCache = __dep27.invalidateSceneCache;
-  const ensureSceneCache = __dep27.ensureSceneCache;
-  const getCamPresetSignature = __dep27.getCamPresetSignature;
-  const clearBackgroundSignatureCache = __dep27.clearBackgroundSignatureCache;
-  const getPreferredDeckEntries = __dep27.getPreferredDeckEntries;
-  const resolveEnemyUnits = __dep27.resolveEnemyUnits;
-  const parseFiniteNumber = __dep27.parseFiniteNumber;
-  const __dep28 = __require('./modes/pve/collection-mapper.ts');
-  const mapUnitProgressById = __dep28.mapUnitProgressById;
-  const __dep29 = __require('./modes/pve/session-loop.ts');
-  const createSessionLoopController = __dep29.createSessionLoopController;
-  const __dep30 = __require('./modes/pve/session-deck.ts');
-  const createSessionDeckController = __dep30.createSessionDeckController;
-  const __dep31 = __require('./modes/pve/unit-runtime-hooks.ts');
-  const runPveRuntimeUltHook = __dep31.runPveRuntimeUltHook;
-  const __dep32 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeUlt = __dep32.runRuntimeUlt;
-  const __dep33 = __require('./modes/pve/session-events.ts');
-  const createSessionEventBindings = __dep33.createSessionEventBindings;
-  const __dep34 = __require('./modes/pve/session-render.ts');
-  const applyStatusIconHoverTooltip = __dep34.applyStatusIconHoverTooltip;
-  const createDefaultStatusIconEntry = __dep34.createDefaultStatusIconEntry;
-  const createStatusIconResolver = __dep34.createStatusIconResolver;
-  const createBrowserFrameFns = __dep34.createBrowserFrameFns;
-  const createMeleeActivityTracker = __dep34.createMeleeActivityTracker;
-  const createSessionRenderController = __dep34.createSessionRenderController;
-  const DEFAULT_STATUS_ICON_PATH = __dep34.DEFAULT_STATUS_ICON_PATH;
-  const MAX_STATUS_ICONS_PER_TOKEN = __dep34.MAX_STATUS_ICONS_PER_TOKEN;
-  const lightenHexColor = __dep34.lightenHexColor;
-  const roundedRectPath = __dep34.roundedRectPath;
-  const isStatusIconReady = __dep34.isStatusIconReady;
-  const resolveStatusIconPreview = __dep34.resolveStatusIconPreview;
-  const resolveHpBarGradient = __dep34.resolveHpBarGradient;
-  const __dep35 = __require('./leader-uyen.ts');
-  const ensureUyenState = __dep35.ensureUyenState;
-  const getUyenUltChoice = __dep35.getUyenUltChoice;
-  const grantUyenSummonRage = __dep35.grantUyenSummonRage;
-  const canCastLeaderUltChoice = __dep35.canCastLeaderUltChoice;
-  const isAnyLeaderUltReady = __dep35.isAnyLeaderUltReady;
-  const isUyenLeader = __dep35.isUyenLeader;
-  const queueUyenUltCast = __dep35.queueUyenUltCast;
+  const __dep26 = __require('./modes/pve/session-state.ts');
+  const normalizeConfig = __dep26.normalizeConfig;
+  const createSession = __dep26.createSession;
+  const invalidateSceneCache = __dep26.invalidateSceneCache;
+  const ensureSceneCache = __dep26.ensureSceneCache;
+  const getCamPresetSignature = __dep26.getCamPresetSignature;
+  const clearBackgroundSignatureCache = __dep26.clearBackgroundSignatureCache;
+  const getPreferredDeckEntries = __dep26.getPreferredDeckEntries;
+  const resolveEnemyUnits = __dep26.resolveEnemyUnits;
+  const parseFiniteNumber = __dep26.parseFiniteNumber;
+  const __dep27 = __require('./modes/pve/collection-mapper.ts');
+  const mapUnitProgressById = __dep27.mapUnitProgressById;
+  const __dep28 = __require('./modes/pve/session-loop.ts');
+  const createSessionLoopController = __dep28.createSessionLoopController;
+  const __dep29 = __require('./modes/pve/session-deck.ts');
+  const createSessionDeckController = __dep29.createSessionDeckController;
+  const __dep30 = __require('./modes/pve/unit-runtime-hooks.ts');
+  const runPveRuntimeUltHook = __dep30.runPveRuntimeUltHook;
+  const __dep31 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeUlt = __dep31.runRuntimeUlt;
+  const __dep32 = __require('./modes/pve/session-events.ts');
+  const createSessionEventBindings = __dep32.createSessionEventBindings;
+  const __dep33 = __require('./modes/pve/session-render.ts');
+  const applyStatusIconHoverTooltip = __dep33.applyStatusIconHoverTooltip;
+  const createDefaultStatusIconEntry = __dep33.createDefaultStatusIconEntry;
+  const createStatusIconResolver = __dep33.createStatusIconResolver;
+  const createBrowserFrameFns = __dep33.createBrowserFrameFns;
+  const createMeleeActivityTracker = __dep33.createMeleeActivityTracker;
+  const createSessionRenderController = __dep33.createSessionRenderController;
+  const DEFAULT_STATUS_ICON_PATH = __dep33.DEFAULT_STATUS_ICON_PATH;
+  const MAX_STATUS_ICONS_PER_TOKEN = __dep33.MAX_STATUS_ICONS_PER_TOKEN;
+  const lightenHexColor = __dep33.lightenHexColor;
+  const roundedRectPath = __dep33.roundedRectPath;
+  const isStatusIconReady = __dep33.isStatusIconReady;
+  const resolveStatusIconPreview = __dep33.resolveStatusIconPreview;
+  const resolveHpBarGradient = __dep33.resolveHpBarGradient;
+  const __dep34 = __require('./leader-uyen.ts');
+  const ensureUyenState = __dep34.ensureUyenState;
+  const getUyenUltChoice = __dep34.getUyenUltChoice;
+  const grantUyenSummonRage = __dep34.grantUyenSummonRage;
+  const canCastLeaderUltChoice = __dep34.canCastLeaderUltChoice;
+  const isAnyLeaderUltReady = __dep34.isAnyLeaderUltReady;
+  const isUyenLeader = __dep34.isUyenLeader;
+  const queueUyenUltCast = __dep34.queueUyenUltCast;
   const ULT_TAG_CACHE = new WeakMap();
   const appendUltTags = (output, list) => {
       if (!Array.isArray(list))
@@ -21286,15 +20199,6 @@ __modules['./modes/pve/session-runtime-impl.ts'] = (exports, module, __require) 
       })) {
           return;
       }
-      const normalizedUltTags = getNormalizedUltTags(u);
-      dispatchGameplayTags(normalizedUltTags, {
-          game,
-          attacker: unit,
-          target: pickTarget(game, unit),
-          cost: resolveUltCost(unit, CFG),
-          side: unit.side,
-          payload: u,
-      });
       const allTokens = game.tokens || [];
       let aliveIndex = null;
       const getAliveBySide = (side) => {

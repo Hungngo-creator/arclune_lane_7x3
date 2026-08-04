@@ -2,12 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
 
-const candidates = ['src/combat/runtime-hooks', 'src/combat/unit-runtime-hooks.ts', 'src/modes/pve'];
+const candidates = ['src/combat/runtime-hooks', 'src/combat/unit-runtime-hooks.ts', 'src/combat/perform-active-skill.ts', 'src/modes/pve'];
 const files = candidates.flatMap(candidate => {
   const absolute = path.resolve(candidate);
   if (!fs.existsSync(absolute)) return [];
   if (fs.statSync(absolute).isFile()) return [absolute];
-  return fs.readdirSync(absolute).filter(name => /runtime.*\.ts$/.test(name) && !/^session-runtime/.test(name)).map(name => path.join(absolute, name));
+  return fs.readdirSync(absolute).filter(name => /runtime.*\.ts$/.test(name)).map(name => path.join(absolute, name));
 });
 const authoritative = new Set(['hp', 'hpMax', 'atk', 'wil', 'arm', 'res', 'agi', 'spd', 'aether', 'Aether', 'fury', 'Fury', 'rage', 'Rage', 'alive', 'lifeState', 'turnCursor', 'actedNatural', 'occupancy']);
 const arrayMutators = new Set(['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse']);
@@ -21,6 +21,10 @@ const propertyName = node => {
 const line = (source, node) => source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1;
 
 for (const file of files) {
+  const relativeFile = path.relative('.', file);
+  const responsibility = relativeFile.includes('combat/runtime-hooks/') || /(?:^|\/)unit-runtime-hooks\.ts$/.test(relativeFile) || relativeFile.endsWith('combat/perform-active-skill.ts')
+    ? 'character-runtime'
+    : 'session-orchestrator';
   const source = ts.createSourceFile(file, fs.readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
   const aliases = new Map();
   const visit = node => {
@@ -33,20 +37,20 @@ for (const file of files) {
     if (ts.isBinaryExpression(node) && ts.isAssignmentOperator(node.operatorToken.kind)) {
       const key = propertyName(node.left);
       const alias = ts.isIdentifier(node.left) ? aliases.get(node.left.text) : null;
-      if ((key && authoritative.has(key)) || alias) violations.push(`${path.relative('.', file)}:${line(source, node)} direct mutation of ${key ?? alias}`);
+      if (responsibility === 'character-runtime' && ((key && authoritative.has(key)) || alias)) violations.push(`${relativeFile}:${line(source, node)} direct mutation of ${key ?? alias}`);
     }
     if ((ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) && [ts.SyntaxKind.PlusPlusToken, ts.SyntaxKind.MinusMinusToken].includes(node.operator)) {
       const key = propertyName(node.operand);
-      if (key && authoritative.has(key)) violations.push(`${path.relative('.', file)}:${line(source, node)} direct mutation of ${key}`);
+      if (responsibility === 'character-runtime' && key && authoritative.has(key)) violations.push(`${relativeFile}:${line(source, node)} direct mutation of ${key}`);
     }
     if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
       const receiver = node.expression.expression.getText(source);
       if (node.expression.name.text === 'assign' && receiver === 'Object') {
         for (const arg of node.arguments.slice(1)) if (ts.isObjectLiteralExpression(arg)) for (const prop of arg.properties) {
-          if (ts.isPropertyAssignment(prop) && authoritative.has(prop.name.getText(source).replace(/['"]/g, ''))) violations.push(`${path.relative('.', file)}:${line(source, prop)} Object.assign authoritative mutation`);
+          if (responsibility === 'character-runtime' && ts.isPropertyAssignment(prop) && authoritative.has(prop.name.getText(source).replace(/['"]/g, ''))) violations.push(`${relativeFile}:${line(source, prop)} Object.assign authoritative mutation`);
         }
       }
-      if (arrayMutators.has(node.expression.name.text) && /(?:^|\.)tokens$/.test(receiver)) violations.push(`${path.relative('.', file)}:${line(source, node)} direct Game.tokens array mutation`);
+      if (responsibility === 'character-runtime' && arrayMutators.has(node.expression.name.text) && /(?:^|\.)tokens$/.test(receiver)) violations.push(`${relativeFile}:${line(source, node)} direct Game.tokens array mutation`);
     }
     ts.forEachChild(node, visit);
   };

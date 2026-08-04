@@ -54,7 +54,6 @@ import { getSummonSpec, resolveSummonSlots } from '../../utils/kit';
 import { isUniqueGlobalSummonBlocked } from '../../utils/unique-global.ts';
 import { nextRngValue } from '../../utils/rng.ts';
 import { normalizeTagList } from '../../data/tags.ts';
-import { dispatchGameplayTags } from '../../combat/tag-dispatch.ts';
 import {
   normalizeConfig,
   createSession,
@@ -1516,15 +1515,6 @@ function performUlt(unit: UnitToken): void {
   })) {
     return;
   }
-  const normalizedUltTags = getNormalizedUltTags(u);
-  dispatchGameplayTags(normalizedUltTags, {
-    game,
-    attacker: unit,
-    target: pickTarget(game, unit),
-    cost: resolveUltCost(unit, CFG),
-    side: unit.side,
-    payload: u,
-  });
   
   const allTokens = game.tokens || [];
   let aliveIndex: AliveTokenIndex | null = null;

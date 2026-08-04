@@ -1,7 +1,7 @@
 import { dealAbilityDamage, pickTarget } from '../../combat.ts';
 import { Statuses } from '../../statuses.ts';
 import { buildSkillResult } from '../skill-result.ts';
-import { applyMarkSleepSetupTag } from '../tag-dispatch.ts';
+import { applyMarkSleepEffect } from '../mark-sleep-effect.ts';
 import { readAtkWilPower, toFiniteNumber, toPositiveTurns, toRoundedInt } from '../number-utils.ts';
 import { createSkillMetadataReader } from '../skill-metadata-utils.ts';
 import { getStatusEntryById } from '../status-utils.ts';
@@ -125,11 +125,8 @@ export const mongYemRuntimeHook: UnitRuntimeHook = {
 
     dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill, defPen });
 
-    applyMarkSleepSetupTag(game, caster, target, {
-      markId,
-      markStacks: 1,
-      markMaxStacks,
-      markPurgeable: false,
+    applyMarkSleepEffect(caster, target, {
+      markId, stacks: 1, maxStacks: markMaxStacks, purgeable: false,
       sleepTurnsOnCap,
     });
 
@@ -148,11 +145,8 @@ export const mongYemRuntimeHook: UnitRuntimeHook = {
       });
       for (const enemy of spreadCandidates) {
         spreadHits += 1;
-        applyMarkSleepSetupTag(game, caster, enemy, {
-          markId: spreadMarkId,
-          markStacks: spreadStacks,
-          markMaxStacks: spreadMaxStacks,
-          markPurgeable: false,
+        applyMarkSleepEffect(caster, enemy, {
+          markId: spreadMarkId, stacks: spreadStacks, maxStacks: spreadMaxStacks, purgeable: false,
           sleepTurnsOnCap: spreadSleepTurnsOnCap,
         });
       }

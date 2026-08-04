@@ -1,7 +1,5 @@
 import { dealAbilityDamage, pickTarget } from '../combat.ts';
-import { applyMarkSleepSetupTag, dispatchGameplayTags } from './tag-dispatch.ts';
 import { skillSets } from '../data/skills.ts';
-import { normalizeTagList } from '../data/tags.ts';
 import { enqueueImmediate } from '../summon.ts';
 import { cellReserved, slotToCell } from '../engine.ts';
 import { globalAetherPool } from '../aether.ts';
@@ -12,9 +10,10 @@ import { createSkillMetadataContext, resolveSkillPayload } from './skill-metadat
 import { readAtkWilPower, readUnitHpState, toFiniteNumber, toFloorInt, toPositiveTurns, toRoundedInt } from './number-utils.ts';
 import { partitionTokensBySide } from './token-side-utils.ts';
 import { buildSkillResult } from './skill-result.ts';
-import { canonicalizeCombatTagsWithRule } from './tag-aliases.ts';
+import { applyMarkSleepEffect } from './mark-sleep-effect.ts';
 import { consumeShieldByCurrentRatio, readShieldAmount } from './apply-damage.ts';
-import { commitHealing, commitHpMutation, createNaturalAction, currentActionExecution, executeActionTransaction, resolveHealing, resolveHpLoss, resolveSourceAttribution } from './kernel/index.ts';
+import { createNaturalAction, currentActionExecution, executeActionTransaction, resolveHealing, resolveHpLoss, resolveSourceAttribution } from './kernel/public.ts';
+import { commitHealing, commitHpMutation } from './kernel/hp-mutation.ts';
 
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
@@ -249,7 +248,7 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
     return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
   }
 
-  const { tags } = canonicalizeCombatTagsWithRule(normalizeTagList(skill.tags ?? []));
+  const tags = Array.isArray(skill.tags) ? skill.tags.filter((tag: unknown): tag is string => typeof tag === 'string') : [];
   const {
     effectTags,
     hasAetherCostTag,
@@ -272,45 +271,23 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
 
   let consumedAether = skillCost <= 0;
 
-  const dispatch = dispatchGameplayTags(tags, {
-    game,
-    attacker: caster,
-    target: pickTarget(game, caster),
-    side: caster.side,
-    cost: skillCost,
-    payload: dispatchPayload,
-    deferEffects: true,
-    tagsNormalized: true,
-    tagsCanonical: true,
-    onAetherCost: (amount, side) => {
-      if (amount <= 0) {
-        consumedAether = true;
-        return true;
-      }
-      const ok = globalAetherPool.consume(side, amount);
-      consumedAether = ok;
-      return ok;
-    },
-    onSummon: () => undefined,
-  });
+  const primaryTarget = pickTarget(game, caster);
+  const targets = primaryTarget ? [primaryTarget] : (caster.alive ? [caster] : []);
+  const appliedTags: string[] = [];
+  if (usesTagAetherCost) consumedAether = globalAetherPool.consume(caster.side, skillCost);
 
   if (usesTagAetherCost && !consumedAether) {
-    return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, dispatch.targets.length, 'insufficient-aether');
+    return buildSkillResult(false, skillKey, skill, tags, appliedTags, targets.length, 'insufficient-aether');
   }
-  if (dispatch.sideEffects.includes('heal-blocked')) {
-    return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
-  }
-
-  const targets = dispatch.targets.length > 0 ? dispatch.targets : (caster.alive ? [caster] : []);
   const { hpMax: casterHpMax, hp: casterCurrentHp } = readUnitHpState(caster);
   if (!checkHpConditionWithState(casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
-    return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+    return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
   }
   if (!checkTurnParityCondition(game, payload)) {
-    return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+    return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
   }
   if (!applyHpCostWithState(game, caster, casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
-    return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+    return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
   }
 
   const runtimeSkillResult = runRuntimeActiveSkill({
@@ -319,7 +296,7 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
     skillKey,
     skill,
     tags,
-    appliedTags: dispatch.applied,
+    appliedTags,
   });
   if (runtimeSkillResult) {
     if (runtimeSkillResult.ok) recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
@@ -332,20 +309,20 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
       activateChapMinhLink(caster);
       refreshChapMinhOwnership(game);
       recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
+      return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
     }
     if (skillKey === 'skill2') {
       consumeShieldByCurrentRatio(caster, 0.1);
       const target = pickTarget(game, caster);
       if (!target?.alive) {
-        return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+        return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
       }
       const base = Math.max(1, Math.floor(casterPower));
       for (let hit = 0; hit < 3; hit += 1) {
         dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill });
       }
       recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 1);
+      return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1);
     }
     if (skillKey === 'skill3') {
       const heal = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.35));
@@ -378,7 +355,7 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
         hits += 1;
       }
       recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, hits);
+      return buildSkillResult(true, skillKey, skill, tags, appliedTags, hits);
     }
   }
 
@@ -389,7 +366,7 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
     );
     if (skillKey === 'skill1') {
       if (!consumeBloodAether()) {
-        return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, enemies.length, 'insufficient-aether');
+        return buildSkillResult(false, skillKey, skill, tags, appliedTags, enemies.length, 'insufficient-aether');
       }
       const base = Math.max(1, toRoundedInt(casterPower * 1.4, 1));
       const picked = enemies.slice(0, 6);
@@ -399,12 +376,12 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
         Statuses.add(target, { ...BLOOD_AVATAR_MARK_STATUS, sourceUnitId: caster.id });
       }
       recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, picked.length);
+      return buildSkillResult(true, skillKey, skill, tags, appliedTags, picked.length);
     }
     if (skillKey === 'skill2') {
       const casterState = caster as BloodAvatarState;
       if (casterState._bloodFieldUsed) {
-        return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+        return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
       }
       casterState._bloodFieldUsed = true;
       Statuses.add(caster, { id: 'blood_field_active', kind: 'field', tag: 'field', dur: 2, tick: 'turn', sourceUnitId: caster.id });
@@ -417,20 +394,20 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
         }
       }
       recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, enemies.length);
+      return buildSkillResult(true, skillKey, skill, tags, appliedTags, enemies.length);
     }
     if (skillKey === 'skill3') {
       if (!consumeBloodAether()) {
-        return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'insufficient-aether');
+        return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
       }
       const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
       const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
       const mutation = resolveHpLoss(caster, hpCost, 'hp-cost', source, false);
-      if (!mutation.succeeded) return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+      if (!mutation.succeeded) return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
       commitHpMutation(game, caster, mutation, currentActionExecution(game)?.identity);
       globalAetherPool.gain(caster.side, 15);
       recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-      return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, 0);
+      return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
     }
   }
 
@@ -440,7 +417,7 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
       const summon = (payload.summon ?? skill.summon ?? {}) as Record<string, unknown>;
       const summonId = typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`;
       if (hasUniqueGlobalTag && !canApplyUniqueGlobal(game, summonId)) {
-        return buildSkillResult(false, skillKey, skill, tags, dispatch.applied, 0, 'blocked');
+        return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
       }
       enqueueImmediate(game, {
         side: caster.side,
@@ -457,19 +434,7 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
   }
 
   if (effectTags.length > 0) {
-    dispatchGameplayTags(effectTags, {
-      game,
-      attacker: caster,
-      target: targets[0] ?? null,
-      targets,
-      side: caster.side,
-      payload,
-      deferEffects: false,
-      tagsNormalized: true,
-      tagsCanonical: true,
-      onAetherCost: () => false,
-      onSummon: () => undefined,
-    });
+    appliedTags.push(...effectTags);
   }
 
   const damagedEnemies: UnitToken[] = [];
@@ -486,12 +451,12 @@ function executeActiveSkill(game: SessionState, caster: UnitToken, skillKey: Act
 
   if (caster.id === MONG_YEM_ID && damagedEnemies.length > 0) {
     for (const target of damagedEnemies) {
-      applyMarkSleepSetupTag(game, caster, target, MONG_YEM_DREAM_MARK_PAYLOAD);
+      applyMarkSleepEffect(caster, target, { markId: MONG_YEM_DREAM_MARK_PAYLOAD.markId, stacks: MONG_YEM_DREAM_MARK_PAYLOAD.markStacks, maxStacks: MONG_YEM_DREAM_MARK_PAYLOAD.markMaxStacks, purgeable: MONG_YEM_DREAM_MARK_PAYLOAD.markPurgeable, sleepTurnsOnCap: MONG_YEM_DREAM_MARK_PAYLOAD.sleepTurnsOnCap });
     }
   }
 
   recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-  return buildSkillResult(true, skillKey, skill, tags, dispatch.applied, dispatch.targets.length);
+  return buildSkillResult(true, skillKey, skill, tags, appliedTags, targets.length);
 }
 
 export function performActiveSkill(game: SessionState, caster: UnitToken, skillKey: ActiveSkillKey): PerformActiveSkillResult {
