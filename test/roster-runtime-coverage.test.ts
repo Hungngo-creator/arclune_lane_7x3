@@ -14,7 +14,7 @@ test('every current roster entry has one complete runtime capability manifest', 
     const definition = CHARACTER_RUNTIME_DEFINITIONS.get(entry.id)!;
     expect(definition.characterId).toBe(entry.id);
     expect(Object.keys(definition.capabilities).sort()).toEqual([
-      'basic', 'customAdapter', 'deathPrevention', 'directMutationViolations', 'healing', 'passives', 'rebirth', 'revive', 'skill1', 'skill2', 'skill3', 'summon', 'ultimate',
+      'basic', 'customAdapter', 'deathPrevention', 'delayedRevive', 'healing', 'passives', 'rebirth', 'reincarnation', 'revive', 'skill1', 'skill2', 'skill3', 'summon', 'ultimate',
     ]);
   }
 });

@@ -21,7 +21,7 @@ export async function loadTurnsHarness(overrides = {}){
     ["import { evaluateGambitLogic } from './ai.ts';", "const { evaluateGambitLogic } = __deps['./ai.ts'];"],
     ["import { isLeaderUltReady, isUyenLeader, grantUyenSummonRage } from './leader-uyen.ts';", "const { isAnyLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
     ["import {\n  clearQueuedUyenUlt,\n  hasQueuedUyenUlt,\n  isLeaderUltReady,\n  isUyenLeader,\n  grantUyenSummonRage,\n} from './leader-uyen.ts';", "const { isAnyLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
-    ["import {
+    [`import {
   clearQueuedUyenUlt,
   hasQueuedUyenUlt,
   isAnyLeaderUltReady,

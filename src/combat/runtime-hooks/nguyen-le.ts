@@ -7,6 +7,8 @@ import { readAtkWilPower, toFiniteNumber } from '../number-utils.ts';
 import { findAliveUnitAtSlot } from '../board-position-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
+import { commitRuntimeHpValue, commitRuntimeStat } from '../character-state-gateways.ts';
+
 import type { UnitToken } from '@shared-types/units';
 import type { UnitRuntimeHook } from './types.ts';
 
@@ -60,10 +62,10 @@ function resetKillPassive(unit: NguyenLeCarrier): void {
   const atkBonus = Math.max(0, toFiniteNumber(unit._nguyenLeAtkBonus, 0));
   const wilBonus = Math.max(0, toFiniteNumber(unit._nguyenLeWilBonus, 0));
   if (atkBonus > 0) {
-    unit.atk = Math.max(0, Math.floor(toFiniteNumber(unit.atk, 0) - atkBonus));
+    commitRuntimeStat(unit, 'atk', Math.max(0, Math.floor(toFiniteNumber(unit.atk, 0) - atkBonus)));
   }
   if (wilBonus > 0) {
-    unit.wil = Math.max(0, Math.floor(toFiniteNumber(unit.wil, 0) - wilBonus));
+    commitRuntimeStat(unit, 'wil', Math.max(0, Math.floor(toFiniteNumber(unit.wil, 0) - wilBonus)));
   }
   unit._nguyenLeKillStacks = 0;
   unit._nguyenLeAtkBonus = 0;
@@ -165,7 +167,7 @@ export const nguyenLeRuntimeHook: UnitRuntimeHook = {
     if (!globalAetherPool.consume(unit.side, 10)) return;
 
     const heal = Math.max(1, Math.floor(readAtkWilPower(unit) * 0.5));
-    unit.hp = Math.min(hpMax, Math.max(0, toFiniteNumber(unit.hp, 0)) + heal);
+    commitRuntimeHpValue(null, unit, Math.min(hpMax, Math.max(0, toFiniteNumber(unit.hp, 0)) + heal));
     unit._nguyenLeSkill1LastDamageSerial = serial;
     unit._nguyenLeSkill1LastDamageTurn = turnStamp;
   },
@@ -177,8 +179,8 @@ export const nguyenLeRuntimeHook: UnitRuntimeHook = {
       const wilNow = Math.max(0, toFiniteNumber(unit.wil, 0));
       const atkGain = Math.max(0, Math.floor(atkNow * 0.05));
       const wilGain = Math.max(0, Math.floor(wilNow * 0.05));
-      unit.atk = Math.max(0, Math.floor(atkNow + atkGain));
-      unit.wil = Math.max(0, Math.floor(wilNow + wilGain));
+      commitRuntimeStat(unit, 'atk', Math.max(0, Math.floor(atkNow + atkGain)));
+      commitRuntimeStat(unit, 'wil', Math.max(0, Math.floor(wilNow + wilGain)));
       unit._nguyenLeKillStacks = stacks + 1;
       unit._nguyenLeAtkBonus = Math.max(0, toFiniteNumber(unit._nguyenLeAtkBonus, 0) + atkGain);
       unit._nguyenLeWilBonus = Math.max(0, toFiniteNumber(unit._nguyenLeWilBonus, 0) + wilGain);

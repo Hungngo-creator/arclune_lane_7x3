@@ -51,10 +51,14 @@ export interface CharacterCapabilityManifest {
   readonly healing: 'supported' | 'not-declared';
   readonly deathPrevention: 'supported' | 'not-declared';
   readonly revive: 'supported' | 'not-declared';
+  readonly delayedRevive: 'supported' | 'not-declared';
+  readonly reincarnation: 'supported' | 'not-declared';
   readonly rebirth: 'supported' | 'not-declared';
   readonly customAdapter: string | null;
-  readonly directMutationViolations: 0;
 }
+
+export type CharacterCapability = Exclude<keyof CharacterCapabilityManifest, 'customAdapter'>;
+export interface BehavioralCertification { readonly capability: CharacterCapability; readonly scenarioId: string }
 
 export interface CharacterRuntimeAdapter {
   readonly id: string;
@@ -65,7 +69,7 @@ export interface CharacterRuntimeDefinition {
   readonly characterId: string;
   readonly capabilities: CharacterCapabilityManifest;
   readonly adapter?: CharacterRuntimeAdapter;
-  readonly deterministicTests: readonly string[];
+  readonly behavioralCertifications: readonly BehavioralCertification[];
 }
 
 const PRE_COMMIT_ALLOWED = new Set<CharacterCommandType>(['ModifyDamagePlan']);
@@ -87,6 +91,9 @@ export function defineCharacterRuntime(definition: CharacterRuntimeDefinition): 
   if (definition.adapter && definition.adapter.id !== definition.capabilities.customAdapter) {
     throw new Error(`[character-runtime] ${definition.characterId}: adapter and capability manifest disagree`);
   }
-  if (definition.deterministicTests.length === 0) throw new Error(`[character-runtime] ${definition.characterId}: deterministic tests are required`);
-  return Object.freeze({ ...definition, capabilities: Object.freeze({ ...definition.capabilities }), deterministicTests: Object.freeze([...definition.deterministicTests]) });
+  const certified = new Set(definition.behavioralCertifications.map(item => item.capability));
+  for (const [capability, state] of Object.entries(definition.capabilities)) {
+    if (capability !== 'customAdapter' && state === 'supported' && !certified.has(capability as CharacterCapability)) throw new Error(`[character-runtime] ${definition.characterId}: deterministic behavioral coverage missing for ${capability}`);
+  }
+  return Object.freeze({ ...definition, capabilities: Object.freeze({ ...definition.capabilities }), behavioralCertifications: Object.freeze(definition.behavioralCertifications.map(item => Object.freeze({ ...item }))) });
 }

@@ -34,6 +34,6 @@ test('character commands reject authoritative mutation before primary commit', (
 });
 
 test('new character authoring requires deterministic coverage and adapter agreement', () => {
-  const capabilities = { basic: 'supported', skill1: 'not-declared', skill2: 'not-declared', skill3: 'not-declared', ultimate: 'not-declared', passives: 'not-declared', summon: 'not-declared', healing: 'not-declared', deathPrevention: 'not-declared', revive: 'not-declared', rebirth: 'not-declared', customAdapter: null, directMutationViolations: 0 } as const;
-  expect(() => defineCharacterRuntime({ characterId: 'new_unit', capabilities, deterministicTests: [] })).toThrow('deterministic tests are required');
+  const capabilities = { basic: 'supported', skill1: 'not-declared', skill2: 'not-declared', skill3: 'not-declared', ultimate: 'not-declared', passives: 'not-declared', summon: 'not-declared', healing: 'not-declared', deathPrevention: 'not-declared', revive: 'not-declared', delayedRevive: 'not-declared', reincarnation: 'not-declared', rebirth: 'not-declared', customAdapter: null } as const;
+  expect(() => defineCharacterRuntime({ characterId: 'new_unit', capabilities, behavioralCertifications: [] })).toThrow('deterministic behavioral coverage missing for basic');
 });

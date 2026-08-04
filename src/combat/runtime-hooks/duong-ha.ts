@@ -5,6 +5,7 @@ import { Statuses } from '../../statuses.ts';
 import { setFury } from '../../utils/fury.ts';
 import { buildSkillResult } from '../skill-result.ts';
 import { readAtkWilPower, toFiniteNumber } from '../number-utils.ts';
+import { commitRuntimeMaxHp, commitRuntimeStats } from '../character-state-gateways.ts';
 
 import type { UnitToken } from '@shared-types/units';
 import type { UnitRuntimeHook } from './types.ts';
@@ -33,11 +34,9 @@ function resetDuongHaPassive(unit: DuongHaCarrier): void {
   const atkBonus = Math.max(0, toFiniteNumber(unit._duongHaPassiveAtkBonus, 0));
   const wilBonus = Math.max(0, toFiniteNumber(unit._duongHaPassiveWilBonus, 0));
   const hpBonus = Math.max(0, toFiniteNumber(unit._duongHaPassiveHpBonus, 0));
-  if (atkBonus > 0) unit.atk = Math.max(0, Math.floor(toFiniteNumber(unit.atk, 0) - atkBonus));
-  if (wilBonus > 0) unit.wil = Math.max(0, Math.floor(toFiniteNumber(unit.wil, 0) - wilBonus));
+  commitRuntimeStats(unit, { atk: Math.max(0, Math.floor(toFiniteNumber(unit.atk, 0) - atkBonus)), wil: Math.max(0, Math.floor(toFiniteNumber(unit.wil, 0) - wilBonus)) });
   if (hpBonus > 0) {
-    unit.hpMax = Math.max(1, Math.floor(toFiniteNumber(unit.hpMax, 1) - hpBonus));
-    unit.hp = Math.min(Math.max(0, toFiniteNumber(unit.hp, 0)), Math.max(1, toFiniteNumber(unit.hpMax, 1)));
+    commitRuntimeMaxHp(null, unit, hpBonus, 'lose');
   }
   unit._duongHaPassiveStacks = 0;
   unit._duongHaPassiveAtkBonus = 0;
@@ -52,10 +51,8 @@ function addPassiveStack(unit: DuongHaCarrier): void {
   const atkGain = Math.max(1, Math.floor(atkNow * PASSIVE_SCALE_RATIO));
   const wilGain = Math.max(1, Math.floor(wilNow * PASSIVE_SCALE_RATIO));
   const hpGain = Math.max(1, Math.floor(hpMaxNow * PASSIVE_SCALE_RATIO));
-  unit.atk = atkNow + atkGain;
-  unit.wil = wilNow + wilGain;
-  unit.hpMax = hpMaxNow + hpGain;
-  unit.hp = Math.min(unit.hpMax, Math.max(0, toFiniteNumber(unit.hp, 0)) + hpGain);
+  commitRuntimeStats(unit, { atk: atkNow + atkGain, wil: wilNow + wilGain });
+  commitRuntimeMaxHp(null, unit, hpGain, 'gain');
   unit._duongHaPassiveStacks = Math.max(0, Math.floor(toFiniteNumber(unit._duongHaPassiveStacks, 0))) + 1;
   unit._duongHaPassiveAtkBonus = Math.max(0, toFiniteNumber(unit._duongHaPassiveAtkBonus, 0) + atkGain);
   unit._duongHaPassiveWilBonus = Math.max(0, toFiniteNumber(unit._duongHaPassiveWilBonus, 0) + wilGain);

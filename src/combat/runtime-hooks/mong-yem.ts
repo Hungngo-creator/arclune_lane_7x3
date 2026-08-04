@@ -7,6 +7,7 @@ import { createSkillMetadataReader } from '../skill-metadata-utils.ts';
 import { getStatusEntryById } from '../status-utils.ts';
 import { nextRngValue } from '../../utils/rng.ts';
 import { partitionTokensBySide, sampleTokens } from '../token-side-utils.ts';
+import { commitRuntimeStats } from '../character-state-gateways.ts';
 
 import type { UnitToken } from '@shared-types/units';
 import type { UnitRuntimeHook } from './types.ts';
@@ -35,8 +36,7 @@ function clearMongYemSelfSleep(unit: MongYemStateCarrier): void {
 function applyMongYemSelfSleepGrowth(unit: MongYemStateCarrier): void {
   const atk = Math.max(0, toFiniteNumber(unit.atk, 0));
   const wil = Math.max(0, toFiniteNumber(unit.wil, 0));
-  unit.atk = Math.max(0, Math.floor(atk * (1 + MONG_YEM_SELF_SLEEP_GROWTH_RATIO)));
-  unit.wil = Math.max(0, Math.floor(wil * (1 + MONG_YEM_SELF_SLEEP_GROWTH_RATIO)));
+  commitRuntimeStats(unit, { atk: Math.max(0, Math.floor(atk * (1 + MONG_YEM_SELF_SLEEP_GROWTH_RATIO))), wil: Math.max(0, Math.floor(wil * (1 + MONG_YEM_SELF_SLEEP_GROWTH_RATIO))) });
 }
 
 function maybeWakeMongYem(unit: MongYemStateCarrier): void {

@@ -6,6 +6,8 @@ import { readAtkWilPower, toFiniteNumber, toRoundedInt } from '../number-utils.t
 import { findAliveUnitAtSlot, isLeaderToken } from '../board-position-utils.ts';
 
 import type { SessionState } from '@shared-types/combat';
+import { commitRuntimeHpValue, commitRuntimeStat } from '../character-state-gateways.ts';
+
 import type { UnitToken } from '@shared-types/units';
 import type { UnitRuntimeHook } from './types.ts';
 
@@ -105,8 +107,8 @@ function addPassiveStack(game: SessionState, unit: LyThanhThuCarrier): void {
   const wilGain = Math.max(0, Math.floor(wilNow * PASSIVE_GAIN_RATIO));
   if (atkGain <= 0 && wilGain <= 0) return;
 
-  unit.atk = Math.max(0, Math.floor(atkNow + atkGain));
-  unit.wil = Math.max(0, Math.floor(wilNow + wilGain));
+  commitRuntimeStat(unit, 'atk', Math.max(0, Math.floor(atkNow + atkGain)));
+  commitRuntimeStat(unit, 'wil', Math.max(0, Math.floor(wilNow + wilGain)));
   unit._lyThanhThuPassiveAtkBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveAtkBonus, 0) + atkGain);
   unit._lyThanhThuPassiveWilBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveWilBonus, 0) + wilGain);
   unit._lyThanhThuPassiveStacks = stacks + 1;
@@ -114,10 +116,10 @@ function addPassiveStack(game: SessionState, unit: LyThanhThuCarrier): void {
 
   if ((unit._lyThanhThuPassiveStacks % PASSIVE_HEAL_EVERY_STACKS) === 0) {
     const heal = Math.max(1, Math.floor(Math.max(0, toFiniteNumber(unit.hpMax, 0)) * PASSIVE_HEAL_RATIO));
-    unit.hp = Math.min(
+    commitRuntimeHpValue(game, unit, Math.min(
       Math.max(0, toFiniteNumber(unit.hpMax, 0)),
       Math.max(0, toFiniteNumber(unit.hp, 0)) + heal,
-    );
+    ));
   }
 }
 
@@ -126,18 +128,18 @@ function transferPassiveStatsToLeader(game: SessionState, unit: LyThanhThuCarrie
   if (!leader || leader.iid === unit.iid) return;
   const atkBonus = Math.max(0, Math.floor(toFiniteNumber(unit._lyThanhThuPassiveAtkBonus, 0) * PASSIVE_TRANSFER_RATIO));
   const wilBonus = Math.max(0, Math.floor(toFiniteNumber(unit._lyThanhThuPassiveWilBonus, 0) * PASSIVE_TRANSFER_RATIO));
-  if (atkBonus > 0) leader.atk = Math.max(0, Math.floor(toFiniteNumber(leader.atk, 0) + atkBonus));
-  if (wilBonus > 0) leader.wil = Math.max(0, Math.floor(toFiniteNumber(leader.wil, 0) + wilBonus));
+  if (atkBonus > 0) commitRuntimeStat(leader, 'atk', Math.max(0, Math.floor(toFiniteNumber(leader.atk, 0) + atkBonus)));
+  if (wilBonus > 0) commitRuntimeStat(leader, 'wil', Math.max(0, Math.floor(toFiniteNumber(leader.wil, 0) + wilBonus)));
 }
 
 function resetPassive(unit: LyThanhThuCarrier): void {
   const atkBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveAtkBonus, 0));
   const wilBonus = Math.max(0, toFiniteNumber(unit._lyThanhThuPassiveWilBonus, 0));
   if (atkBonus > 0) {
-    unit.atk = Math.max(0, Math.floor(toFiniteNumber(unit.atk, 0) - atkBonus));
+    commitRuntimeStat(unit, 'atk', Math.max(0, Math.floor(toFiniteNumber(unit.atk, 0) - atkBonus)));
   }
   if (wilBonus > 0) {
-    unit.wil = Math.max(0, Math.floor(toFiniteNumber(unit.wil, 0) - wilBonus));
+    commitRuntimeStat(unit, 'wil', Math.max(0, Math.floor(toFiniteNumber(unit.wil, 0) - wilBonus)));
   }
   unit._lyThanhThuPassiveStacks = 0;
   unit._lyThanhThuPassiveTurnStamp = undefined;
@@ -179,8 +181,8 @@ function triggerSkill3Defense(game: SessionState, caster: LyThanhThuCarrier): vo
   const armBonus = armNow * SKILL3_RES_ARM_RATIO;
   const resBonus = resNow * SKILL3_RES_ARM_RATIO;
 
-  caster.arm = Math.max(0, armNow + armBonus);
-  caster.res = Math.max(0, resNow + resBonus);
+  commitRuntimeStat(caster, 'arm', Math.max(0, armNow + armBonus));
+  commitRuntimeStat(caster, 'res', Math.max(0, resNow + resBonus));
   stacks.push({ armBonus, resBonus, expiresAtTurn });
   caster._lyThanhThuDefenseStacks = stacks;
 }
@@ -195,8 +197,8 @@ function expireDefenseStacks(game: SessionState, unit: LyThanhThuCarrier): void 
       remain.push(stack);
       continue;
     }
-    unit.arm = Math.max(0, toFiniteNumber(unit.arm, 0) - Math.max(0, stack.armBonus));
-    unit.res = Math.max(0, toFiniteNumber(unit.res, 0) - Math.max(0, stack.resBonus));
+    commitRuntimeStat(unit, 'arm', Math.max(0, toFiniteNumber(unit.arm, 0) - Math.max(0, stack.armBonus)));
+    commitRuntimeStat(unit, 'res', Math.max(0, toFiniteNumber(unit.res, 0) - Math.max(0, stack.resBonus)));
   }
   unit._lyThanhThuDefenseStacks = remain;
 }
@@ -232,8 +234,8 @@ function clearDefenseStacks(unit: LyThanhThuCarrier): void {
     return;
   }
   for (const stack of stacks) {
-    unit.arm = Math.max(0, toFiniteNumber(unit.arm, 0) - Math.max(0, toFiniteNumber(stack.armBonus, 0)));
-    unit.res = Math.max(0, toFiniteNumber(unit.res, 0) - Math.max(0, toFiniteNumber(stack.resBonus, 0)));
+    commitRuntimeStat(unit, 'arm', Math.max(0, toFiniteNumber(unit.arm, 0) - Math.max(0, toFiniteNumber(stack.armBonus, 0))));
+    commitRuntimeStat(unit, 'res', Math.max(0, toFiniteNumber(unit.res, 0) - Math.max(0, toFiniteNumber(stack.resBonus, 0))));
   }
   unit._lyThanhThuDefenseStacks = [];
 }
