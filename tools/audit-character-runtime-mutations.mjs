@@ -2,9 +2,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import ts from 'typescript';
 
-const root = path.resolve('src/combat/runtime-hooks');
-const files = fs.readdirSync(root).filter(name => name.endsWith('.ts')).map(name => path.join(root, name));
-const authoritative = new Set(['hp', 'hpMax', 'atk', 'wil', 'arm', 'res', 'agi', 'spd', 'fury', 'rage', 'alive', 'lifeState']);
+const candidates = ['src/combat/runtime-hooks', 'src/combat/unit-runtime-hooks.ts', 'src/modes/pve'];
+const files = candidates.flatMap(candidate => {
+  const absolute = path.resolve(candidate);
+  if (!fs.existsSync(absolute)) return [];
+  if (fs.statSync(absolute).isFile()) return [absolute];
+  return fs.readdirSync(absolute).filter(name => /runtime.*\.ts$/.test(name) && !/^session-runtime/.test(name)).map(name => path.join(absolute, name));
+});
+const authoritative = new Set(['hp', 'hpMax', 'atk', 'wil', 'arm', 'res', 'agi', 'spd', 'aether', 'Aether', 'fury', 'Fury', 'rage', 'Rage', 'alive', 'lifeState', 'turnCursor', 'actedNatural', 'occupancy']);
 const arrayMutators = new Set(['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse']);
 const violations = [];
 
