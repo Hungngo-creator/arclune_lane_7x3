@@ -28,6 +28,7 @@ import { stableStringify } from '../../utils/format.ts';
 import { normalizeClassName, normalizeElementKey, normalizeElementList } from '../../utils/domain-normalization.ts';
 import { mapUnitProgressById } from './collection-mapper.ts';
 import { buildAICreepDeckFromLineup } from './creep-builder.ts';
+import { AxiomModuleSet, preflightAxiomModules, type AxiomParticipantManifest } from '../../combat/axiom-runtime.ts';
 
 type SceneConfigWithExtras = (SceneConfig & { CURRENT_BACKGROUND?: string | null | undefined }) | null;
 
@@ -359,6 +360,12 @@ interface BuildBaseStateParams {
 }
 
 function buildBaseState(params: BuildBaseStateParams): SessionState {
+  const axiomSession = new AxiomModuleSet('pve');
+  preflightAxiomModules(axiomSession, {
+    decks: params.allyUnits as AxiomParticipantManifest['decks'],
+    undeployedDeck: params.lockedPlayerDeck as AxiomParticipantManifest['undeployedDeck'],
+    npcRoster: params.ai.unitsAll as AxiomParticipantManifest['npcRoster'],
+  });
   return {
     modeKey: params.modeKey,
     grid: null,
@@ -397,6 +404,7 @@ function buildBaseState(params: BuildBaseStateParams): SessionState {
       wave: null,
       rewardQueue: [],
       unitProgressById: params.unitProgressById,
+      axiomSession,
     },
   };
 }
