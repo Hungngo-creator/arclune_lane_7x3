@@ -1,6 +1,6 @@
 import { executeCharacterRuntimeScenario, assertScenarioCertification, registerCharacterRuntimeScenario, resetScenarioExecutions } from '../src/combat/scenario-registry';
 
-const scenario = { scenarioId: 'registry:test:basic', characterId: 'registry_test', capability: 'basic' as const, setup: () => ({ hp: 10 }), executeProduction: () => ({ productionPaths: ['basic'], canonicalEvents: ['ACTION_FINALIZED'], finalState: { hp: 9 } }), expectedCanonicalEvents: ['ACTION_FINALIZED'], assertFinalState: (state: Readonly<Record<string, unknown>>) => { if (state.hp !== 9) throw new Error('bad final state'); } };
+const scenario = { scenarioId: 'registry:test:basic', characterId: 'registry_test', capability: 'basic' as const, setup: () => ({ hp: 10 }), executeProduction: (fixture: { hp: number; __scenarioExecutionToken?: symbol }) => { const before = fixture.hp; fixture.hp--; return { productionPaths: ['basic'], canonicalEvents: ['ACTION_FINALIZED'], finalState: { hp: fixture.hp }, executionToken: fixture.__scenarioExecutionToken!, actionIds: ['registry:test:action:1'], eventSerials: [1], stateChanges: [{ key: 'hp', before, after: fixture.hp }] }; }, expectedCanonicalEvents: ['ACTION_FINALIZED'], assertFinalState: (state: Readonly<Record<string, unknown>>) => { if (state.hp !== 9) throw new Error('bad final state'); } };
 
 beforeEach(() => resetScenarioExecutions());
 beforeAll(() => registerCharacterRuntimeScenario(scenario));

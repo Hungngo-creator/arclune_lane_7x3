@@ -7,7 +7,10 @@ export interface ScenarioExecutionReceipt {
   /** Opaque token installed on the fixture by the registry. Production scenarios
    * must return the same token, which prevents callers from certifying an
    * unexecuted, pre-built receipt. */
-  readonly executionToken?: symbol;
+  readonly executionToken: symbol;
+  readonly actionIds: readonly string[];
+  readonly eventSerials: readonly number[];
+  readonly stateChanges: readonly { readonly key: string; readonly before: unknown; readonly after: unknown }[];
 }
 
 export interface CharacterRuntimeScenario<T = unknown> {
@@ -40,11 +43,14 @@ export function executeCharacterRuntimeScenario(scenarioId: string): ScenarioExe
   const executionToken = Symbol(scenarioId);
   Object.defineProperty(fixture, '__scenarioExecutionToken', { value: executionToken, enumerable: false });
   const receipt = scenario.executeProduction(fixture);
-  if (receipt.executionToken !== undefined && receipt.executionToken !== executionToken) throw new Error(`[scenario-registry] ${scenarioId} returned an unauthenticated receipt`);
+  if (receipt.executionToken !== executionToken) throw new Error(`[scenario-registry] ${scenarioId} returned an unauthenticated receipt`);
   if (receipt.productionPaths.length === 0 || receipt.canonicalEvents.length === 0 || Object.keys(receipt.finalState).length === 0) {
     throw new Error(`[scenario-registry] ${scenarioId} did not produce authoritative evidence`);
   }
   if (!receipt.productionPaths.includes(scenario.capability)) throw new Error(`[scenario-registry] ${scenarioId} did not exercise production path ${scenario.capability}`);
+  if (receipt.actionIds.length === 0 || receipt.eventSerials.length === 0 || receipt.stateChanges.length === 0) throw new Error(`[scenario-registry] ${scenarioId} returned synthetic evidence`);
+  if (receipt.eventSerials.some((serial, index) => !Number.isSafeInteger(serial) || serial <= 0 || (index > 0 && serial <= receipt.eventSerials[index - 1]!))) throw new Error(`[scenario-registry] ${scenarioId} returned invalid event serials`);
+  if (!receipt.stateChanges.some(change => change.before !== change.after)) throw new Error(`[scenario-registry] ${scenarioId} produced no meaningful authoritative state change`);
   for (const event of scenario.expectedCanonicalEvents) {
     if (!receipt.canonicalEvents.includes(event)) throw new Error(`[scenario-registry] ${scenarioId} missing canonical event ${event}`);
   }

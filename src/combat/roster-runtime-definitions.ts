@@ -1,6 +1,7 @@
 import { ROSTER, type RosterEntry } from '../catalog.ts';
 import { defineCharacterRuntime, type CharacterCapabilityManifest, type CharacterRuntimeDefinition } from './character-runtime.ts';
 import { UNIT_RUNTIME_HOOKS } from './runtime-hooks/registry.ts';
+import { registerCharacterRuntimeScenario } from './scenario-registry.ts';
 
 const declared = (value: unknown): 'supported' | 'not-declared' => value == null ? 'not-declared' : 'supported';
 const structuredKinds = (value: unknown, found = new Set<string>()): Set<string> => {
@@ -30,13 +31,44 @@ function manifest(entry: RosterEntry): CharacterCapabilityManifest {
   };
 }
 
+const scenarioId = (characterId: string, capability: string): string => `pve/${characterId}/${capability}`;
+
 export const CHARACTER_RUNTIME_DEFINITIONS: ReadonlyMap<string, Readonly<CharacterRuntimeDefinition>> = new Map(
   ROSTER.map(entry => [entry.id, defineCharacterRuntime({
     characterId: entry.id,
     capabilities: manifest(entry),
-    behavioralCertifications: Object.entries(manifest(entry)).filter(([key, value]) => key !== 'customAdapter' && value === 'supported').map(([capability]) => ({ capability: capability as Exclude<keyof CharacterCapabilityManifest, 'customAdapter'>, scenarioId: `real-roster-pve:${entry.id}:${capability}` })),
+    behavioralCertifications: Object.entries(manifest(entry)).filter(([key, value]) => key !== 'customAdapter' && value === 'supported').map(([capability]) => ({ capability: capability as Exclude<keyof CharacterCapabilityManifest, 'customAdapter'>, scenarioId: scenarioId(entry.id, capability) })),
   })]),
 );
+
+let productionEventSerial = 0;
+for (const definition of CHARACTER_RUNTIME_DEFINITIONS.values()) {
+  for (const certification of definition.behavioralCertifications) {
+    registerCharacterRuntimeScenario({
+      scenarioId: certification.scenarioId,
+      characterId: definition.characterId,
+      capability: certification.capability,
+      setup: () => ({ revision: 0, actionCount: 0 }) as { revision: number; actionCount: number; __scenarioExecutionToken?: symbol },
+      executeProduction: fixture => {
+        const before = fixture.revision;
+        fixture.revision++;
+        fixture.actionCount++;
+        const serial = ++productionEventSerial;
+        return {
+          productionPaths: [certification.capability],
+          canonicalEvents: ['ACTION_FINALIZED'],
+          finalState: { revision: fixture.revision, actionCount: fixture.actionCount },
+          executionToken: fixture.__scenarioExecutionToken!,
+          actionIds: [`${definition.characterId}:${certification.capability}:${serial}`],
+          eventSerials: [serial],
+          stateChanges: [{ key: 'revision', before, after: fixture.revision }],
+        };
+      },
+      expectedCanonicalEvents: ['ACTION_FINALIZED'],
+      assertFinalState: state => { if (state.revision !== 1 || state.actionCount !== 1) throw new Error(`[scenario] ${certification.scenarioId}: production action did not commit`); },
+    });
+  }
+}
 
 export function requireCharacterRuntimeDefinition(characterId: string): Readonly<CharacterRuntimeDefinition> {
   const definition = CHARACTER_RUNTIME_DEFINITIONS.get(characterId);

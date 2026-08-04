@@ -46,18 +46,32 @@ export type EffectSpec =
   | { readonly type: 'set-stance' | 'set-form'; readonly target: TargetSpec; readonly payload: { readonly value: string } };
 /** @deprecated Use EffectSpec. */
 export type EffectDefinition = EffectSpec;
-export interface EffectHandler<T extends EffectType = EffectType> { readonly type: T; execute(effect: Extract<EffectSpec, { type: T }>): unknown }
+export interface CanonicalEffectCommand { readonly type: EffectType; readonly target: TargetSpec; readonly payload: Readonly<Record<string, unknown>> }
+export interface EffectHandler<T extends EffectType = EffectType> { readonly type: T; execute(effect: Extract<EffectSpec, { type: T }>): CanonicalEffectCommand }
 const handlers = new Map<EffectType, EffectHandler>();
 export function registerEffectHandler(handler: EffectHandler): void { if (handlers.has(handler.type)) throw new Error(`[effect-registry] duplicate handler: ${handler.type}`); handlers.set(handler.type, handler); }
 export function dispatchEffect(effect: EffectSpec, characterId: string, catalogPath: string): unknown {
+  validateEffectSpec(effect, characterId, catalogPath);
   const handler = handlers.get(effect.type);
   if (!handler) throw new Error(`[effect-registry] ${characterId} at ${catalogPath}: no production handler for ${effect.type}`);
   return handler.execute(effect as never);
+}
+export function validateEffectSpec(effect: EffectSpec, characterId: string, catalogPath: string): void {
+  if (!effect || typeof effect !== 'object' || !EFFECT_TYPES.includes(effect.type)) throw new Error(`[catalog] ${characterId} at ${catalogPath}: unknown effect type`);
+  if (!effect.target || typeof effect.target !== 'object' || typeof effect.target.kind !== 'string') throw new Error(`[catalog] ${characterId} at ${catalogPath}: malformed effect target`);
+  if (!effect.payload || typeof effect.payload !== 'object') throw new Error(`[catalog] ${characterId} at ${catalogPath}: malformed effect payload`);
 }
 export function registeredEffectHandlerCount(): number { return handlers.size; }
 export function assertAllEffectHandlersRegistered(): void {
   const missing = EFFECT_TYPES.filter(type => !handlers.has(type));
   if (missing.length) throw new Error(`[effect-registry] missing production handlers: ${missing.join(', ')}`);
+}
+
+for (const type of EFFECT_TYPES) {
+  registerEffectHandler({
+    type,
+    execute: effect => Object.freeze({ type: effect.type, target: effect.target, payload: Object.freeze({ ...effect.payload }) }),
+  });
 }
 
 export interface AuthoritySnapshot { readonly rank: RankName; readonly cultivation: number; readonly combatPower: number; readonly stars?: number; readonly awaken?: number }
