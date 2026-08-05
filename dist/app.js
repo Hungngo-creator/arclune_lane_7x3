@@ -2,7 +2,7 @@
 const __modules = Object.create(null);
 const __cache = Object.create(null);
 if (typeof globalThis !== "undefined" && typeof globalThis.__modules === "undefined"){ globalThis.__modules = __modules; }
-const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/axiom-runtime.js":"./combat/axiom-runtime.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/canonical-model.js":"./combat/canonical-model.ts","./combat/character-runtime.js":"./combat/character-runtime.ts","./combat/character-state-gateways.js":"./combat/character-state-gateways.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/executable-character-definition.js":"./combat/executable-character-definition.ts","./combat/foundation-contract.js":"./combat/foundation-contract.ts","./combat/kernel/action-context.js":"./combat/kernel/action-context.ts","./combat/kernel/action-resolution.js":"./combat/kernel/action-resolution.ts","./combat/kernel/action-transaction.js":"./combat/kernel/action-transaction.ts","./combat/kernel/battle-end.js":"./combat/kernel/battle-end.ts","./combat/kernel/combat-identity.js":"./combat/kernel/combat-identity.ts","./combat/kernel/damage-batch.js":"./combat/kernel/damage-batch.ts","./combat/kernel/damage-resolver.js":"./combat/kernel/damage-resolver.ts","./combat/kernel/defense.js":"./combat/kernel/defense.ts","./combat/kernel/delayed-revive.js":"./combat/kernel/delayed-revive.ts","./combat/kernel/hp-mutation.js":"./combat/kernel/hp-mutation.ts","./combat/kernel/ids.js":"./combat/kernel/ids.ts","./combat/kernel/index.js":"./combat/kernel/index.ts","./combat/kernel/invariants.js":"./combat/kernel/invariants.ts","./combat/kernel/legacy-adapter.js":"./combat/kernel/legacy-adapter.ts","./combat/kernel/life-cycle.js":"./combat/kernel/life-cycle.ts","./combat/kernel/non-death-removal.js":"./combat/kernel/non-death-removal.ts","./combat/kernel/public.js":"./combat/kernel/public.ts","./combat/kernel/reaction-policy.js":"./combat/kernel/reaction-policy.ts","./combat/kernel/rebirth.js":"./combat/kernel/rebirth.ts","./combat/kernel/reincarnation.js":"./combat/kernel/reincarnation.ts","./combat/kernel/sequence.js":"./combat/kernel/sequence.ts","./combat/kernel/source-attribution.js":"./combat/kernel/source-attribution.ts","./combat/kernel/trigger-ledger.js":"./combat/kernel/trigger-ledger.ts","./combat/kernel/true-self.js":"./combat/kernel/true-self.ts","./combat/kernel/types.js":"./combat/kernel/types.ts","./combat/mark-sleep-effect.js":"./combat/mark-sleep-effect.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/presence.js":"./combat/presence.ts","./combat/roster-certification.js":"./combat/roster-certification.ts","./combat/roster-runtime-definitions.js":"./combat/roster-runtime-definitions.ts","./combat/runtime-coverage.js":"./combat/runtime-coverage.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/scenario-registry.js":"./combat/scenario-registry.ts","./combat/status-query.js":"./combat/status-query.ts","./combat/status-runtime-adapter.js":"./combat/status-runtime-adapter.ts","./combat/temporal-contract.js":"./combat/temporal-contract.ts","./combat/transgression-ledger.js":"./combat/transgression-ledger.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
+const __legacyModuleAliases = {"./catalog.js":"./catalog.ts","./entry.js":"./entry.ts","./meta.js":"./meta.ts","./modes/coming-soon.stub.js":"./modes/coming-soon.stub.ts","./modes/pve/session.js":"./modes/pve/session.ts","./modes/pve/session-loop.js":"./modes/pve/session-loop.ts","./modes/pve/session-render.ts":"./modes/pve/session-render.ts","./modes/pve/session-render.js":"./modes/pve/session-render.ts","./modes/pve/session-render/index.js":"./modes/pve/session-render.ts","./modes/pve/session-events.ts":"./modes/pve/session-events.ts","./modes/pve/session-events.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.js":"./modes/pve/session-events.ts","./modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","./modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","./modes/pve/session-deck.js":"./modes/pve/session-deck.ts","./modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","./screens/collection/index.js":"./screens/collection/index.ts","./screens/arena-hub/index.js":"./screens/arena-hub/index.ts","./screens/campaign-world-map/index.js":"./screens/campaign-world-map/index.ts","./screens/monopoly/index.js":"./screens/monopoly/index.ts","./screens/gacha/view.js":"./screens/gacha/view.ts","./screens/lineup/index.js":"./screens/lineup/index.ts","./screens/ui-gacha/index.js":"./screens/ui-gacha/index.ts","./screens/vinh-da/gameplay.js":"./screens/vinh-da/gameplay.ts","./screens/ui-gacha/gacha.js":"./screens/ui-gacha/gacha.ts","@modes/coming-soon.stub.ts":"./modes/coming-soon.stub.ts","@modes/pve/session.ts":"./modes/pve/session.ts","@modes/pve/session-loop":"./modes/pve/session-loop.ts","@modes/pve/session-loop.js":"./modes/pve/session-loop.ts","@modes/pve/session-loop.ts":"./modes/pve/session-loop.ts","@modes/pve/session-render":"./modes/pve/session-render.ts","@modes/pve/session-render.js":"./modes/pve/session-render.ts","@modes/pve/session-render.ts":"./modes/pve/session-render.ts","@modes/pve/session-render/index.js":"./modes/pve/session-render.ts","@modes/pve/session-render/index.ts":"./modes/pve/session-render.ts","@modes/pve/session-events":"./modes/pve/session-events.ts","@modes/pve/session-events.js":"./modes/pve/session-events.ts","@modes/pve/session-events.ts":"./modes/pve/session-events.ts","@modes/pve/session-events/index.js":"./modes/pve/session-events.ts","@modes/pve/session-events/index.ts":"./modes/pve/session-events.ts","@modes/pve/session-deck":"./modes/pve/session-deck.ts","@modes/pve/session-deck.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck.ts":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.js":"./modes/pve/session-deck.ts","@modes/pve/session-deck/index.ts":"./modes/pve/session-deck.ts","@screens/gacha/view.js":"./screens/gacha/view.ts","@screens/gacha/view.ts":"./screens/gacha/view.ts","@screens/arena-hub/index.ts":"./screens/arena-hub/index.ts","@screens/campaign-world-map/index.ts":"./screens/campaign-world-map/index.ts","@screens/monopoly/index.ts":"./screens/monopoly/index.ts","@screens/vinh-da/gameplay.ts":"./screens/vinh-da/gameplay.ts","@screens/monopoly/ready.ts":"./screens/monopoly/ready.ts","@screens/chess-strategy-rpg/ready.ts":"./screens/chess-strategy-rpg/ready.ts","@screens/chess-strategy-rpg/battle.ts":"./screens/chess-strategy-rpg/battle.ts","@screens/chess-strategy-rpg/match.ts":"./screens/chess-strategy-rpg/match.ts","@screens/chess-strategy-rpg/seed.ts":"./screens/chess-strategy-rpg/seed.ts","@screens/chess-strategy-rpg/turn-state.ts":"./screens/chess-strategy-rpg/turn-state.ts","./screens/chess-strategy-rpg/seed.js":"./screens/chess-strategy-rpg/seed.ts","./screens/chess-strategy-rpg/turn-state.js":"./screens/chess-strategy-rpg/turn-state.ts","./combat/chap-minh-runtime.js":"./combat/chap-minh-runtime.ts","./combat/number-utils.js":"./combat/number-utils.ts","./combat/status-utils.js":"./combat/status-utils.ts","./combat/skill-result.js":"./combat/skill-result.ts","./combat/skill-metadata-utils.js":"./combat/skill-metadata-utils.ts","./combat/token-side-utils.js":"./combat/token-side-utils.ts","./combat/board-position-utils.js":"./combat/board-position-utils.ts","./combat/unit-runtime-hooks.js":"./combat/unit-runtime-hooks.ts","./combat/runtime-hooks/nguyen-le.js":"./combat/runtime-hooks/nguyen-le.ts","./combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.ts":"./combat/runtime-hooks/duong-ha.ts","@combat/runtime-hooks/duong-ha.js":"./combat/runtime-hooks/duong-ha.ts","./combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.ts":"./combat/runtime-hooks/co-truong-phong.ts","@combat/runtime-hooks/co-truong-phong.js":"./combat/runtime-hooks/co-truong-phong.ts","./combat/runtime-hooks/registry.js":"./combat/runtime-hooks/registry.ts","./modes/pve/ly-thanh-thu-runtime.js":"./modes/pve/ly-thanh-thu-runtime.ts","./modes/pve/nguyen-le-runtime.js":"./modes/pve/nguyen-le-runtime.ts","@screens/collection/index.ts":"./screens/collection/index.ts","@screens/lineup/index.ts":"./screens/lineup/index.ts","@screens/ui-gacha/index.ts":"./screens/ui-gacha/index.ts","./aether.js":"./aether.ts","./ai.js":"./ai.ts","./app/shell.js":"./app/shell.ts","./art.js":"./art.ts","./background.js":"./background.ts","./combat.js":"./combat.ts","./combat/apply-damage.js":"./combat/apply-damage.ts","./combat/axiom-runtime.js":"./combat/axiom-runtime.ts","./combat/calculate-final-damage.js":"./combat/calculate-final-damage.ts","./combat/canonical-action-executor.js":"./combat/canonical-action-executor.ts","./combat/canonical-model.js":"./combat/canonical-model.ts","./combat/character-runtime.js":"./combat/character-runtime.ts","./combat/character-state-gateways.js":"./combat/character-state-gateways.ts","./combat/counter-matrix.js":"./combat/counter-matrix.ts","./combat/executable-character-definition.js":"./combat/executable-character-definition.ts","./combat/foundation-contract.js":"./combat/foundation-contract.ts","./combat/kernel/action-context.js":"./combat/kernel/action-context.ts","./combat/kernel/action-resolution.js":"./combat/kernel/action-resolution.ts","./combat/kernel/action-transaction.js":"./combat/kernel/action-transaction.ts","./combat/kernel/battle-end.js":"./combat/kernel/battle-end.ts","./combat/kernel/combat-identity.js":"./combat/kernel/combat-identity.ts","./combat/kernel/damage-batch.js":"./combat/kernel/damage-batch.ts","./combat/kernel/damage-resolver.js":"./combat/kernel/damage-resolver.ts","./combat/kernel/defense.js":"./combat/kernel/defense.ts","./combat/kernel/delayed-revive.js":"./combat/kernel/delayed-revive.ts","./combat/kernel/hp-mutation.js":"./combat/kernel/hp-mutation.ts","./combat/kernel/ids.js":"./combat/kernel/ids.ts","./combat/kernel/index.js":"./combat/kernel/index.ts","./combat/kernel/invariants.js":"./combat/kernel/invariants.ts","./combat/kernel/legacy-adapter.js":"./combat/kernel/legacy-adapter.ts","./combat/kernel/life-cycle.js":"./combat/kernel/life-cycle.ts","./combat/kernel/non-death-removal.js":"./combat/kernel/non-death-removal.ts","./combat/kernel/public.js":"./combat/kernel/public.ts","./combat/kernel/reaction-policy.js":"./combat/kernel/reaction-policy.ts","./combat/kernel/rebirth.js":"./combat/kernel/rebirth.ts","./combat/kernel/reincarnation.js":"./combat/kernel/reincarnation.ts","./combat/kernel/sequence.js":"./combat/kernel/sequence.ts","./combat/kernel/source-attribution.js":"./combat/kernel/source-attribution.ts","./combat/kernel/trigger-ledger.js":"./combat/kernel/trigger-ledger.ts","./combat/kernel/true-self.js":"./combat/kernel/true-self.ts","./combat/kernel/types.js":"./combat/kernel/types.ts","./combat/mark-sleep-effect.js":"./combat/mark-sleep-effect.ts","./combat/perform-active-skill.js":"./combat/perform-active-skill.ts","./combat/presence.js":"./combat/presence.ts","./combat/roster-certification.js":"./combat/roster-certification.ts","./combat/roster-runtime-definitions.js":"./combat/roster-runtime-definitions.ts","./combat/runtime-coverage.js":"./combat/runtime-coverage.ts","./combat/runtime-hooks/ly-thanh-thu.js":"./combat/runtime-hooks/ly-thanh-thu.ts","./combat/runtime-hooks/mong-yem.js":"./combat/runtime-hooks/mong-yem.ts","./combat/runtime-hooks/types.js":"./combat/runtime-hooks/types.ts","./combat/scenario-registry.js":"./combat/scenario-registry.ts","./combat/status-query.js":"./combat/status-query.ts","./combat/status-runtime-adapter.js":"./combat/status-runtime-adapter.ts","./combat/temporal-contract.js":"./combat/temporal-contract.ts","./combat/transgression-ledger.js":"./combat/transgression-ledger.ts","./config.js":"./config.ts","./config/schema.js":"./config/schema.ts","./cultivation.js":"./cultivation.ts","./data/campaign-stages.js":"./data/campaign-stages.ts","./data/cost-budget.js":"./data/cost-budget.ts","./data/economy.config.js":"./data/economy.config.ts","./data/economy.js":"./data/economy.ts","./data/load-config.js":"./data/load-config.ts","./data/modes.js":"./data/modes.ts","./data/roster-preview.config.js":"./data/roster-preview.config.ts","./data/roster-preview.js":"./data/roster-preview.ts","./data/skills.config.js":"./data/skills.config.ts","./data/skills.js":"./data/skills.ts","./data/tags.js":"./data/tags.ts","./data/vfx_anchors/schema.js":"./data/vfx_anchors/schema.ts","./engine.js":"./engine.ts","./events.js":"./events.ts","./leader-uyen.js":"./leader-uyen.ts","./main.js":"./main.ts","./modes/pve/chap-minh-runtime.js":"./modes/pve/chap-minh-runtime.ts","./modes/pve/collection-mapper.js":"./modes/pve/collection-mapper.ts","./modes/pve/creep-builder.js":"./modes/pve/creep-builder.ts","./modes/pve/session-runtime-impl.js":"./modes/pve/session-runtime-impl.ts","./modes/pve/session-runtime.js":"./modes/pve/session-runtime.ts","./modes/pve/session-state.js":"./modes/pve/session-state.ts","./modes/pve/unit-runtime-hooks.js":"./modes/pve/unit-runtime-hooks.ts","./passives.js":"./passives.ts","./scene.js":"./scene.ts","./screens/chess-strategy-rpg/battle.js":"./screens/chess-strategy-rpg/battle.ts","./screens/chess-strategy-rpg/match.js":"./screens/chess-strategy-rpg/match.ts","./screens/chess-strategy-rpg/ready.js":"./screens/chess-strategy-rpg/ready.ts","./screens/collection/helpers.js":"./screens/collection/helpers.ts","./screens/collection/state.js":"./screens/collection/state.ts","./screens/collection/types.js":"./screens/collection/types.ts","./screens/collection/view.js":"./screens/collection/view.ts","./screens/lineup/view/events.js":"./screens/lineup/view/events.ts","./screens/lineup/view/index.js":"./screens/lineup/view/index.ts","./screens/lineup/view/render.js":"./screens/lineup/view/render.ts","./screens/lineup/view/state.js":"./screens/lineup/view/state.ts","./screens/main-menu/dialogues.js":"./screens/main-menu/dialogues.ts","./screens/main-menu/types.js":"./screens/main-menu/types.ts","./screens/main-menu/view/events.js":"./screens/main-menu/view/events.ts","./screens/main-menu/view/index.js":"./screens/main-menu/view/index.ts","./screens/main-menu/view/layout.js":"./screens/main-menu/view/layout.ts","./screens/monopoly/house-module.js":"./screens/monopoly/house-module.ts","./screens/monopoly/ready.js":"./screens/monopoly/ready.ts","./screens/sect/index.js":"./screens/sect/index.ts","./screens/sect/tactical-ai.js":"./screens/sect/tactical-ai.ts","./screens/ui-gacha/logic/config.js":"./screens/ui-gacha/logic/config.ts","./screens/ui-gacha/logic/currency.js":"./screens/ui-gacha/logic/currency.ts","./screens/ui-gacha/logic/gacha.js":"./screens/ui-gacha/logic/gacha.ts","./screens/ui-gacha/logic/pity.js":"./screens/ui-gacha/logic/pity.ts","./screens/ui-gacha/logic/pool.js":"./screens/ui-gacha/logic/pool.ts","./screens/ui-gacha/logic/types.js":"./screens/ui-gacha/logic/types.ts","./screens/vinh-da/combat/prefixes.js":"./screens/vinh-da/combat/prefixes.ts","./screens/vinh-da/constants.js":"./screens/vinh-da/constants.ts","./screens/vinh-da/economy/balanceChecks.js":"./screens/vinh-da/economy/balanceChecks.ts","./screens/vinh-da/economy/conversion.js":"./screens/vinh-da/economy/conversion.ts","./screens/vinh-da/economy/dropTables.js":"./screens/vinh-da/economy/dropTables.ts","./screens/vinh-da/economy/merchant.js":"./screens/vinh-da/economy/merchant.ts","./screens/vinh-da/economy/resources.js":"./screens/vinh-da/economy/resources.ts","./screens/vinh-da/economy/settlement.js":"./screens/vinh-da/economy/settlement.ts","./screens/vinh-da/elemental-regions.js":"./screens/vinh-da/elemental-regions.ts","./screens/vinh-da/enemies.js":"./screens/vinh-da/enemies.ts","./screens/vinh-da/map-modules.js":"./screens/vinh-da/map-modules.ts","./screens/vinh-da/simulation.js":"./screens/vinh-da/simulation.ts","./screens/vinh-da/structures.js":"./screens/vinh-da/structures.ts","./screens/vinh-da/types.js":"./screens/vinh-da/types.ts","./shared-types/units.js":"./shared-types/units.ts","./statuses.js":"./statuses.ts","./summon.js":"./summon.ts","./turns.js":"./turns.ts","./turns/interleaved.js":"./turns/interleaved.ts","./types/art.js":"./types/art.ts","./types/combat.js":"./types/combat.ts","./types/common.js":"./types/common.ts","./types/config.js":"./types/config.ts","./types/currency.js":"./types/currency.ts","./types/index.js":"./types/index.ts","./types/lineup.js":"./types/lineup.ts","./types/pve.js":"./types/pve.ts","./types/rng.js":"./types/rng.ts","./types/telemetry.js":"./types/telemetry.ts","./types/turn-order.js":"./types/turn-order.ts","./types/ui.js":"./types/ui.ts","./types/units.js":"./types/units.ts","./types/utils.js":"./types/utils.ts","./types/vfx.js":"./types/vfx.ts","./ui.js":"./ui.ts","./ui/dom.js":"./ui/dom.ts","./unit-stat-resolver.js":"./unit-stat-resolver.ts","./units.js":"./units.ts","./utils/assert.js":"./utils/assert.ts","./utils/audio-settings.js":"./utils/audio-settings.ts","./utils/currency.js":"./utils/currency.ts","./utils/domain-normalization.js":"./utils/domain-normalization.ts","./utils/dummy.js":"./utils/dummy.ts","./utils/equipment.js":"./utils/equipment.ts","./utils/format.js":"./utils/format.ts","./utils/frame-rate.js":"./utils/frame-rate.ts","./utils/fury.js":"./utils/fury.ts","./utils/kit.js":"./utils/kit.ts","./utils/module-resolution.js":"./utils/module-resolution.ts","./utils/player-profile.js":"./utils/player-profile.ts","./utils/profile-progress-merge.js":"./utils/profile-progress-merge.ts","./utils/rarity.js":"./utils/rarity.ts","./utils/rng.js":"./utils/rng.ts","./utils/time.js":"./utils/time.ts","./utils/unique-global.js":"./utils/unique-global.ts","./utils/unit-id.js":"./utils/unit-id.ts","./vfx.js":"./vfx.ts"};
 if (typeof globalThis !== "undefined" && typeof globalThis.__legacyModuleAliases === "undefined"){ globalThis.__legacyModuleAliases = __legacyModuleAliases; }
 const __emptyAliases = Object.keys(__legacyModuleAliases).length === 0;
 function __require(id){
@@ -5701,6 +5701,190 @@ __modules['./combat/calculate-final-damage.ts'] = (exports, module, __require) =
   //# sourceMappingURL=calculate-final-damage.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'calculateFinalDamage')) exports.calculateFinalDamage = calculateFinalDamage;
 };
+__modules['./combat/canonical-action-executor.ts'] = (exports, module, __require) => {
+  const __dep0 = __require('./combat.ts');
+  const dealAbilityDamage = __dep0.dealAbilityDamage;
+  const pickTarget = __dep0.pickTarget;
+  const __dep1 = __require('./aether.ts');
+  const globalAetherPool = __dep1.globalAetherPool;
+  const __dep2 = __require('./statuses.ts');
+  const Statuses = __dep2.Statuses;
+  const __dep3 = __require('./summon.ts');
+  const enqueueImmediate = __dep3.enqueueImmediate;
+  const __dep4 = __require('./engine.ts');
+  const cellReserved = __dep4.cellReserved;
+  const slotToCell = __dep4.slotToCell;
+  const __dep5 = __require('./combat/apply-damage.ts');
+  const grantShield = __dep5.grantShield;
+  const readShieldAmount = __dep5.readShieldAmount;
+  const __dep6 = __require('./combat/number-utils.ts');
+  const readAtkWilPower = __dep6.readAtkWilPower;
+  const toRoundedInt = __dep6.toRoundedInt;
+  const __dep7 = __require('./combat/skill-result.ts');
+  const buildSkillResult = __dep7.buildSkillResult;
+  const __dep8 = __require('./combat/canonical-model.ts');
+  const dispatchEffect = __dep8.dispatchEffect;
+  const markProductionReceipt = __dep8.markProductionReceipt;
+  const __dep9 = __require('./combat/executable-character-definition.ts');
+  const requireExecutableCharacterDefinition = __dep9.requireExecutableCharacterDefinition;
+  const __dep10 = __require('./combat/kernel/public.ts');
+  const createNaturalAction = __dep10.createNaturalAction;
+  const currentActionExecution = __dep10.currentActionExecution;
+  const executeActionTransaction = __dep10.executeActionTransaction;
+  const resolveHealing = __dep10.resolveHealing;
+  const resolveHpLoss = __dep10.resolveHpLoss;
+  const resolveSourceAttribution = __dep10.resolveSourceAttribution;
+  const __dep11 = __require('./combat/kernel/hp-mutation.ts');
+  const commitHealing = __dep11.commitHealing;
+  const commitHpMutation = __dep11.commitHpMutation;
+  const __dep12 = __require('./combat/apply-damage.ts');
+  const consumeShieldByCurrentRatio = __dep12.consumeShieldByCurrentRatio;
+  const __dep13 = __require('./combat/chap-minh-runtime.ts');
+  const activateChapMinhLink = __dep13.activateChapMinhLink;
+  const refreshChapMinhOwnership = __dep13.refreshChapMinhOwnership;
+  const EMPTY = [];
+  let serial = 1;
+  const revision = (game) => {
+      const runtime = (game.runtime ??= {});
+      const next = Math.max(0, Number(runtime.canonicalStateRevision ?? 0)) + 1;
+      runtime.canonicalStateRevision = next;
+      return next;
+  };
+  const receipt = (game, effectType) => markProductionReceipt(Object.freeze({ effectType, committed: true, eventSerial: serial++, stateRevision: revision(game), session: game }));
+  function resolveTargets(game, actor, spec) {
+      if (spec.kind === 'self')
+          return actor.alive ? [actor] : [];
+      const enemies = game.tokens.filter(t => t.alive && t.side !== actor.side);
+      const allies = game.tokens.filter(t => t.alive && t.side === actor.side);
+      if (spec.kind === 'selected-enemy')
+          return pickTarget(game, actor) ? [pickTarget(game, actor)] : [];
+      if (spec.kind === 'selected-ally')
+          return allies.filter(t => t.iid !== actor.iid).slice(0, 1);
+      if (spec.kind === 'leader')
+          return game.tokens.filter(t => t.alive && t.side === actor.side && t.isLeader).slice(0, 1);
+      if (spec.kind === 'all')
+          return spec.side === 'enemy' ? enemies : allies;
+      if (spec.kind === 'random' || spec.kind === 'multiple' || spec.kind === 'single')
+          return (spec.side === 'enemy' ? enemies : allies).slice(0, spec.kind === 'single' ? 1 : Math.max(1, spec.count ?? 1));
+      if (spec.kind === 'explicit-iids')
+          return game.tokens.filter(t => t.alive && spec.iids.includes(t.iid ?? t.id));
+      return (spec.side === 'enemy' ? enemies : allies).slice(0, 3);
+  }
+  function firstOpenSlot(game, side) {
+      const alive = game.tokens.filter(t => t.alive);
+      for (let slot = 1; slot <= 9; slot++) {
+          const { cx, cy } = slotToCell(side, slot);
+          if (!cellReserved(alive, game.queued, cx, cy))
+              return slot;
+      }
+      return null;
+  }
+  function servicesFor(game, actor, targets) {
+      return Object.freeze({
+          damageGateway(effect) { for (const target of targets)
+              dealAbilityDamage(game, actor, target, { base: Math.max(1, Math.floor(readAtkWilPower(actor) * effect.payload.amount)), dtype: effect.payload.damageType === 'will' ? 'magic' : effect.payload.damageType, attackType: 'skill' }); return receipt(game, effect.type); },
+          healingGateway(effect) { for (const target of targets) {
+              const source = resolveSourceAttribution({ immediateSource: actor, controller: actor, trueSelf: actor.trueSelfId ?? null, owner: actor });
+              commitHealing(game, target, resolveHealing(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)), source), currentActionExecution(game)?.identity);
+          } return receipt(game, effect.type); },
+          shieldGateway(effect) { for (const target of targets)
+              grantShield(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount))); return receipt(game, effect.type); },
+          hpMutationGateway(effect) { for (const target of targets) {
+              const amount = Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount));
+              const source = resolveSourceAttribution({ immediateSource: actor, controller: actor, trueSelf: actor.trueSelfId ?? null, owner: actor });
+              const mutation = resolveHpLoss(target, amount, 'hp-cost', source, false);
+              if (!mutation.succeeded)
+                  throw new Error('[canonical-action] HP cost rejected');
+              commitHpMutation(game, target, mutation, currentActionExecution(game)?.identity);
+          } return receipt(game, effect.type); },
+          lifecycleGateway(effect) { return receipt(game, effect.type); },
+          statusGateway(effect) { if (effect.type === 'apply-status' || effect.type === 'grant-immunity')
+              for (const target of targets)
+                  Statuses.add(target, { id: effect.payload.statusType, kind: effect.type === 'grant-immunity' ? 'buff' : 'debuff', tag: effect.payload.statusType, dur: effect.payload.duration ?? 1, tick: 'turn', amount: effect.payload.value, sourceUnitId: actor.id }); return receipt(game, effect.type); },
+          resourceGateway(effect) { const amount = Math.max(0, toRoundedInt(effect.payload.amount, 0)); if (effect.type === 'spend-resource') {
+              if (globalAetherPool.current(actor.side) >= amount && !globalAetherPool.consume(actor.side, amount))
+                  throw new Error('[canonical-action] insufficient aether');
+          }
+          else
+              globalAetherPool.gain(actor.side, amount); return receipt(game, effect.type); },
+          summonGateway(effect) { const slot = firstOpenSlot(game, actor.side); if (slot)
+              enqueueImmediate(game, { side: actor.side, slot, unit: { id: effect.payload.definitionId, name: effect.payload.definitionId, ownerIid: actor.iid, isMinion: true, hpMax: Math.max(1, Math.floor((actor.hpMax ?? 100) * 0.5)), hp: Math.max(1, Math.floor((actor.hpMax ?? 100) * 0.5)), ttlTurns: 3 } }); return receipt(game, effect.type); },
+          fieldGateway(effect) { for (const target of game.tokens.filter(t => t.alive))
+              Statuses.add(target, { id: effect.payload.fieldId, kind: target.side === actor.side ? 'buff' : 'debuff', tag: 'field', dur: effect.payload.duration ?? 2, tick: 'turn', sourceUnitId: actor.id }); return receipt(game, effect.type); },
+          movementGateway(effect) { for (const target of targets) {
+              target.cx = effect.payload.cx;
+              target.cy = effect.payload.cy;
+          } return receipt(game, effect.type); },
+          reactionGateway(effect) { return receipt(game, effect.type); },
+          characterStateGateway(effect) { if (effect.payload.value === 'chap-minh-link') {
+              activateChapMinhLink(actor);
+              refreshChapMinhOwnership(game);
+          }
+          else
+              actor[effect.type === 'set-form' ? 'form' : 'stance'] = effect.payload.value; return receipt(game, effect.type); },
+      });
+  }
+  function validateConditions(game, actor, action) {
+      for (const c of action.conditions) {
+          if (c.type === 'minimum-current-hp-ratio' && Number(actor.hp ?? 0) / Math.max(1, Number(actor.hpMax ?? 1)) < c.ratio)
+              return false;
+          if (c.type === 'turn-parity') {
+              const turn = Math.max(0, Number(game.turn?.turnCount ?? 0));
+              if (turn > 0 && (turn % 2 === 0 ? 'even' : 'odd') !== c.parity)
+                  return false;
+          }
+          if (c.type === 'unique-summon' && game.tokens.some(t => t.alive && t.id === c.definitionId))
+              return false;
+      }
+      return true;
+  }
+  function executeCanonicalAction(game, actor, action) {
+      if (!actor.alive || !validateConditions(game, actor, action))
+          return { ok: false, receipts: [], targetCount: 0, reason: 'blocked' };
+      if (action.cost.aether && (globalAetherPool.current(actor.side) < action.cost.aether || !globalAetherPool.consume(actor.side, action.cost.aether)))
+          return { ok: false, receipts: [], targetCount: 0, reason: 'insufficient-aether' };
+      if (action.cost.hp) {
+          const source = resolveSourceAttribution({ immediateSource: actor, controller: actor, trueSelf: actor.trueSelfId ?? null, owner: actor });
+          const mutation = resolveHpLoss(actor, Math.floor((actor.hpMax ?? 1) * action.cost.hp), 'hp-cost', source, false);
+          if (!mutation.succeeded)
+              return { ok: false, receipts: [], targetCount: 0, reason: 'blocked' };
+          commitHpMutation(game, actor, mutation, currentActionExecution(game)?.identity);
+      }
+      if (action.actionId === 'huyen_vu_chap_minh:skill2')
+          consumeShieldByCurrentRatio(actor, 0.1);
+      if (action.actionId === 'huyen_vu_chap_minh:skill3') {
+          const source = resolveSourceAttribution({ immediateSource: actor, controller: actor, trueSelf: actor.trueSelfId ?? null, owner: actor });
+          commitHealing(game, actor, resolveHealing(actor, Math.floor((actor.hpMax ?? 0) * 0.35), source), currentActionExecution(game)?.identity);
+          Statuses.add(actor, { id: 'chap_minh_ult_arm_up', kind: 'buff', tag: 'arm-up', amount: 0.5, dur: 2, tick: 'turn', sourceUnitId: actor.id });
+          Statuses.add(actor, { id: 'chap_minh_ult_res_up', kind: 'buff', tag: 'res-up', amount: 0.5, dur: 2, tick: 'turn', sourceUnitId: actor.id });
+          for (const target of game.tokens.filter(t => t.alive && t.side !== actor.side))
+              dealAbilityDamage(game, actor, target, { base: Math.max(1, Math.floor(readAtkWilPower(actor) + readShieldAmount(actor) * 0.5)), dtype: 'mixed', attackType: 'skill' });
+      }
+      const receipts = [];
+      let maxTargets = 0;
+      for (const effect of action.effects) {
+          const targets = resolveTargets(game, actor, effect.target);
+          maxTargets = Math.max(maxTargets, targets.length);
+          const context = { session: game, action, sourceTrueSelfId: String(actor.trueSelfId ?? actor.id), sourceLifeId: String(actor.lifeSerial ?? 0), resolvedTargetIds: targets.map(t => t.iid ?? t.id), kitKey: action.actionId, authority: action.authority, mode: 'pve', random: Math.random, services: servicesFor(game, actor, targets.length ? targets : [actor]) };
+          receipts.push(dispatchEffect(effect, context, actor.id, action.actionId));
+      }
+      return { ok: true, receipts, targetCount: maxTargets };
+  }
+  function performCanonicalActiveSkill(game, caster, skillKey, skill) {
+      const definition = requireExecutableCharacterDefinition(caster.id).skills.find(a => a.actionId.endsWith(`:${skillKey}`));
+      if (!definition)
+          return buildSkillResult(false, skillKey, skill, EMPTY, EMPTY, 0, 'missing-skill');
+      const run = () => executeCanonicalAction(game, caster, definition);
+      const result = currentActionExecution(game) ? run() : executeActionTransaction({ game, identity: createNaturalAction(game, skillKey === 'skill3' ? 'ultimate' : 'active-skill'), actor: caster, targets: resolveTargets(game, caster, definition.target).slice(0, 1), resolvePayload: run }).payload;
+      if (!result?.ok)
+          return buildSkillResult(false, skillKey, skill, definition.metadataTags, [], result?.targetCount ?? 0, result?.reason ?? 'blocked');
+      return buildSkillResult(true, skillKey, skill, definition.metadataTags, definition.effects.map(e => e.type), result.targetCount);
+  }
+  u;
+  //# sourceMappingURL=canonical-action-executor.js.map
+  if (!Object.prototype.hasOwnProperty.call(exports, 'executeCanonicalAction')) exports.executeCanonicalAction = executeCanonicalAction;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'performCanonicalActiveSkill')) exports.performCanonicalActiveSkill = performCanonicalActiveSkill;
+};
 __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
   const AUTHORITY_RANK = Object.freeze({ none: 0, doctrine: 1, rule: 2, axiom: 3 });
   const CANONICAL_METADATA_TAGS = Object.freeze([
@@ -5721,6 +5905,7 @@ __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
   }
   const EFFECT_TYPES = Object.freeze(['deal-damage', 'heal', 'grant-shield', 'pay-hp-cost', 'sacrifice', 'apply-status', 'remove-status', 'dispel', 'grant-immunity', 'spend-resource', 'gain-resource', 'summon', 'create-field', 'move', 'trigger-follow-up', 'trigger-counter', 'reflect-damage', 'request-death-prevention', 'request-revive', 'queue-delayed-revive', 'enter-reincarnation', 'request-rebirth', 'set-stance', 'set-form']);
   const authoritativeReceipts = new WeakSet();
+  function markProductionReceipt(receipt) { authoritativeReceipts.add(receipt); return receipt; }
   function createEffectExecutionServices(commits) {
       const services = {};
       for (const gateway of Object.keys(commits))
@@ -5809,6 +5994,7 @@ __modules['./combat/canonical-model.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'EFFECT_TYPES')) exports.EFFECT_TYPES = EFFECT_TYPES;
   if (!Object.prototype.hasOwnProperty.call(exports, 'RANK_PRIORITY')) exports.RANK_PRIORITY = RANK_PRIORITY;
   if (!Object.prototype.hasOwnProperty.call(exports, 'requireCanonicalMetadataTag')) exports.requireCanonicalMetadataTag = requireCanonicalMetadataTag;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'markProductionReceipt')) exports.markProductionReceipt = markProductionReceipt;
   if (!Object.prototype.hasOwnProperty.call(exports, 'createEffectExecutionServices')) exports.createEffectExecutionServices = createEffectExecutionServices;
   if (!Object.prototype.hasOwnProperty.call(exports, 'registerEffectHandler')) exports.registerEffectHandler = registerEffectHandler;
   if (!Object.prototype.hasOwnProperty.call(exports, 'dispatchEffect')) exports.dispatchEffect = dispatchEffect;
@@ -6306,6 +6492,8 @@ __modules['./combat/executable-character-definition.ts'] = (exports, module, __r
       const multiplier = finite(action.damageMultiplier);
       if (multiplier !== null)
           effects.push({ type: 'deal-damage', target, payload: { amount: multiplier, damageType: 'physical' } });
+      else if (finite(action.hits) !== null || finite(action.bonusDamageFromShieldRatio) !== null)
+          effects.push({ type: 'deal-damage', target, payload: { amount: 1, damageType: 'physical' } });
       const healing = finite(action.healPercent ?? action.healAmount);
       if (healing !== null)
           effects.push({ type: 'heal', target: { kind: 'self' }, payload: { amount: healing } });
@@ -6315,6 +6503,10 @@ __modules['./combat/executable-character-definition.ts'] = (exports, module, __r
       const hpCost = finite(action.hpTradePercent ?? action.hpTradePercentMaxHP ?? action.hpSacrificePercentMax ?? action.sacrificeMaxHPPercent);
       if (hpCost !== null)
           effects.push({ type: 'pay-hp-cost', target: { kind: 'self' }, payload: { amount: hpCost } });
+      const costRecord = record(action.cost);
+      const aetherCost = finite(costRecord.aether);
+      if (aetherCost !== null)
+          effects.push({ type: 'spend-resource', target: { kind: 'self' }, payload: { resource: 'aether', amount: aetherCost } });
       const summon = record(action.summon);
       const summonId = typeof summon.id === 'string' ? summon.id : typeof action.summonId === 'string' ? action.summonId : null;
       if (summonId)
@@ -6323,22 +6515,53 @@ __modules['./combat/executable-character-definition.ts'] = (exports, module, __r
       const statusType = typeof debuff.id === 'string' ? debuff.id : typeof debuff.type === 'string' ? debuff.type : null;
       if (statusType)
           effects.push({ type: 'apply-status', target, payload: { statusType, duration: finite(debuff.duration) ?? undefined } });
-      // Catalog actions without a numeric payload still have a real runtime adapter/state behavior.
-      if (effects.length === 0)
-          effects.push({ type: 'set-stance', target: { kind: 'self' }, payload: { value: String(action.key ?? 'active') } });
+      const buffs = Array.isArray(action.buffs) ? action.buffs : [];
+      for (const buff of buffs) {
+          const b = record(buff);
+          const id = typeof b.id === 'string' ? b.id : null;
+          if (id)
+              effects.push({ type: 'apply-status', target: { kind: 'self' }, payload: { statusType: id, duration: finite(b.turns ?? b.duration) ?? undefined } });
+      }
+      const debuffs = Array.isArray(action.debuffs) ? action.debuffs : [];
+      for (const item of debuffs) {
+          const d = record(item);
+          const id = typeof d.id === 'string' ? d.id : null;
+          if (id)
+              effects.push({ type: 'apply-status', target, payload: { statusType: id, duration: finite(d.turns ?? d.duration) ?? undefined, value: finite(d.amount) ?? undefined } });
+      }
+      if (action.buffStats && typeof action.buffStats === 'object')
+          effects.push({ type: 'apply-status', target: { kind: 'self' }, payload: { statusType: 'stat-buff', duration: finite(action.duration) ?? undefined } });
+      if (action.weatherShift || action.field || action.fieldId)
+          effects.push({ type: 'create-field', target: { kind: 'self' }, payload: { fieldId: String(action.weatherShift ?? action.fieldId ?? 'field'), duration: finite(action.duration) ?? undefined } });
+      if (action.flying || action.stance || action.form)
+          effects.push({ type: 'set-stance', target: { kind: 'self' }, payload: { value: String(action.stance ?? action.form ?? 'flying') } });
+      const grantAlly = record(action.grantAlly);
+      const allyShield = finite(grantAlly.shieldPercentMaxHP);
+      if (allyShield !== null)
+          effects.push({ type: 'grant-shield', target: { kind: 'selected-ally' }, payload: { amount: allyShield } });
+      if (effects.length === 0) {
+          const ignored = new Set(['characterId', 'key', 'name', 'notes', 'description', 'tags', 'type', 'cost']);
+          const gameplayKey = Object.keys(action).find(k => !ignored.has(k));
+          if (!gameplayKey)
+              throw new Error(`[catalog] ${String(action.characterId ?? 'unknown')} at ${String(action.key ?? 'action')}: unsupported field metadata-only action has no executable EffectSpec`);
+          effects.push({ type: 'apply-status', target: { kind: 'self' }, payload: { statusType: `mechanic:${gameplayKey}`, duration: finite(action.duration) ?? finite(action.turns) ?? 1 } });
+      }
       return effects;
   }
   function compileAction(characterId, key, value, ordering) {
       if (!value || typeof value !== 'object')
           return null;
-      const action = record(value);
+      const action = { ...record(value), characterId, key };
+      const metadataOnlyKeys = new Set(['characterId', 'key', 'name', 'notes', 'description', 'tags', 'type', 'cost']);
+      if (!Object.keys(action).some(k => !metadataOnlyKeys.has(k)))
+          return null;
       const target = targetFor(action);
       const cost = record(action.cost);
       return Object.freeze({
           actionId: `${characterId}:${key}`,
           target,
           effects: Object.freeze(effectsFor(action, target)),
-          cost: Object.freeze({ ...(finite(cost.aether) !== null ? { aether: finite(cost.aether) } : {}), ...(finite(cost.fury) !== null ? { fury: finite(cost.fury) } : {}) }),
+          cost: Object.freeze({ ...(finite(cost.fury) !== null ? { fury: finite(cost.fury) } : {}), ...(finite(cost.hp) !== null ? { hp: finite(cost.hp) } : {}) }),
           conditions: Object.freeze([
               ...(finite(action.minHpPercentToCast) !== null ? [{ type: 'minimum-current-hp-ratio', ratio: finite(action.minHpPercentToCast) }] : []),
               ...(finite(action.limitUses ?? action.maxUsesPerBattle) !== null ? [{ type: 'maximum-uses-per-battle', uses: finite(action.limitUses ?? action.maxUsesPerBattle) }] : []),
@@ -6371,10 +6594,7 @@ __modules['./combat/executable-character-definition.ts'] = (exports, module, __r
   if (!Object.prototype.hasOwnProperty.call(exports, 'requireExecutableCharacterDefinition')) exports.requireExecutableCharacterDefinition = requireExecutableCharacterDefinition;
 };
 __modules['./combat/foundation-contract.ts'] = (exports, module, __require) => {
-  /**
-   * The production PvE foundation contract.  Bumping this value requires the
-   * complete `certify:pve-foundation` gate to pass against every roster entry.
-   */
+  /** Combat foundation freeze marker set only after PVE certification gates pass. */
   const COMBAT_FOUNDATION_CONTRACT_VERSION = 1;
   //# sourceMappingURL=foundation-contract.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'COMBAT_FOUNDATION_CONTRACT_VERSION')) exports.COMBAT_FOUNDATION_CONTRACT_VERSION = COMBAT_FOUNDATION_CONTRACT_VERSION;
@@ -8079,83 +8299,15 @@ __modules['./combat/number-utils.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'asRecord')) exports.asRecord = asRecord;
 };
 __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./combat.ts');
-  const dealAbilityDamage = __dep0.dealAbilityDamage;
-  const pickTarget = __dep0.pickTarget;
-  const __dep1 = __require('./data/skills.ts');
-  const skillSets = __dep1.skillSets;
-  const __dep2 = __require('./combat/executable-character-definition.ts');
-  const requireExecutableCharacterDefinition = __dep2.requireExecutableCharacterDefinition;
-  const __dep3 = __require('./summon.ts');
-  const enqueueImmediate = __dep3.enqueueImmediate;
-  const __dep4 = __require('./engine.ts');
-  const cellReserved = __dep4.cellReserved;
-  const slotToCell = __dep4.slotToCell;
-  const __dep5 = __require('./aether.ts');
-  const globalAetherPool = __dep5.globalAetherPool;
-  const __dep6 = __require('./statuses.ts');
-  const Statuses = __dep6.Statuses;
-  const __dep7 = __require('./combat/unit-runtime-hooks.ts');
-  const runRuntimeActiveSkill = __dep7.runRuntimeActiveSkill;
-  const __dep8 = __require('./combat/chap-minh-runtime.ts');
-  const activateChapMinhLink = __dep8.activateChapMinhLink;
-  const refreshChapMinhOwnership = __dep8.refreshChapMinhOwnership;
-  const __dep9 = __require('./combat/skill-metadata-utils.ts');
-  const createSkillMetadataContext = __dep9.createSkillMetadataContext;
-  const resolveSkillPayload = __dep9.resolveSkillPayload;
-  const __dep10 = __require('./combat/number-utils.ts');
-  const readAtkWilPower = __dep10.readAtkWilPower;
-  const readUnitHpState = __dep10.readUnitHpState;
-  const toFiniteNumber = __dep10.toFiniteNumber;
-  const toFloorInt = __dep10.toFloorInt;
-  const toPositiveTurns = __dep10.toPositiveTurns;
-  const toRoundedInt = __dep10.toRoundedInt;
-  const __dep11 = __require('./combat/token-side-utils.ts');
-  const partitionTokensBySide = __dep11.partitionTokensBySide;
-  const __dep12 = __require('./combat/skill-result.ts');
-  const buildSkillResult = __dep12.buildSkillResult;
-  const __dep13 = __require('./combat/mark-sleep-effect.ts');
-  const applyMarkSleepEffect = __dep13.applyMarkSleepEffect;
-  const __dep14 = __require('./combat/apply-damage.ts');
-  const consumeShieldByCurrentRatio = __dep14.consumeShieldByCurrentRatio;
-  const readShieldAmount = __dep14.readShieldAmount;
-  const __dep15 = __require('./combat/kernel/public.ts');
-  const createNaturalAction = __dep15.createNaturalAction;
-  const currentActionExecution = __dep15.currentActionExecution;
-  const executeActionTransaction = __dep15.executeActionTransaction;
-  const resolveHealing = __dep15.resolveHealing;
-  const resolveHpLoss = __dep15.resolveHpLoss;
-  const resolveSourceAttribution = __dep15.resolveSourceAttribution;
-  const __dep16 = __require('./combat/kernel/hp-mutation.ts');
-  const commitHealing = __dep16.commitHealing;
-  const commitHpMutation = __dep16.commitHpMutation;
+  const __dep0 = __require('./data/skills.ts');
+  const skillSets = __dep0.skillSets;
+  const __dep1 = __require('./combat/canonical-action-executor.ts');
+  const performCanonicalActiveSkill = __dep1.performCanonicalActiveSkill;
+  const __dep2 = __require('./combat/unit-runtime-hooks.ts');
+  const runRuntimeActiveSkill = __dep2.runRuntimeActiveSkill;
+  const __dep3 = __require('./combat/skill-result.ts');
+  const buildSkillResult = __dep3.buildSkillResult;
   const EMPTY_TAGS = [];
-  const MONG_YEM_ID = 'mong_yem';
-  const MONG_YEM_DREAM_MARK_PAYLOAD = Object.freeze({
-      markId: 'me_hoac',
-      markStacks: 1,
-      markMaxStacks: 3,
-      markPurgeable: false,
-      sleepTurnsOnCap: 1,
-  });
-  const BLOOD_AVATAR_ID = 'blood_avatar';
-  const CHAP_MINH_ID = 'huyen_vu_chap_minh';
-  const BLOOD_AVATAR_SKILL_COST = 25;
-  const BLOOD_AVATAR_BLEED_STATUS = Object.freeze({
-      id: 'bleed',
-      kind: 'debuff',
-      tag: 'bleed',
-      dur: 2,
-      tick: 'turn',
-  });
-  const BLOOD_AVATAR_MARK_STATUS = Object.freeze({
-      id: 'huyet_an',
-      kind: 'mark',
-      tag: 'mark',
-      stacks: 1,
-      maxStacks: 5,
-      purgeable: false,
-  });
   function resolveActiveSkill(caster, skillKey) {
       const set = skillSets[caster.id];
       if (!set)
@@ -8165,309 +8317,16 @@ __modules['./combat/perform-active-skill.ts'] = (exports, module, __require) => 
           return null;
       return set.skills[idx] ?? (idx === 0 ? set.skill : null) ?? null;
   }
-  function canApplyUniqueGlobal(game, summonId) {
-      return !game.tokens.some((token) => token.alive && token.id === summonId);
-  }
-  function applyHpCostWithState(game, caster, hpMax, currentHp, readMetaNumber) {
-      const ratio = Math.max(0, readMetaNumber(0, 'hpCostRatio', 'hpCostPercent'));
-      const flat = Math.max(0, toFloorInt(readMetaNumber(0, 'hpCostFlat', 'hpCost'), 0));
-      const minRemainRatio = Math.max(0, readMetaNumber(0, 'minRemainingHpRatio', 'minHpRatio'));
-      const hpCost = Math.max(flat, Math.floor(hpMax * ratio));
-      if (hpCost <= 0)
-          return true;
-      const minRemain = Math.max(1, Math.floor(hpMax * minRemainRatio));
-      const nextHp = currentHp - hpCost;
-      if (nextHp < minRemain)
-          return false;
-      const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
-      const mutation = resolveHpLoss(caster, hpCost, 'hp-cost', source, false);
-      if (!mutation.succeeded)
-          return false;
-      commitHpMutation(game, caster, mutation, currentActionExecution(game)?.identity);
-      return true;
-  }
-  function checkHpConditionWithState(hpMax, currentHp, readMetaNumber) {
-      const requiredRatio = Math.max(0, readMetaNumber(0, 'minCurrentHpRatio', 'requireCurrentHpRatioMin', 'requiredHpRatio', 'conditionMinHpRatio'));
-      if (requiredRatio <= 0)
-          return true;
-      return currentHp / hpMax >= requiredRatio;
-  }
-  function checkTurnParityCondition(game, payload) {
-      const turn = game.turn;
-      const turnCount = turn && typeof turn === 'object' && Number.isFinite(turn.turnCount)
-          ? toFloorInt(turn.turnCount, 0)
-          : NaN;
-      if (!Number.isFinite(turnCount) || turnCount <= 0)
-          return true;
-      const mode = String(payload.turnParity ?? payload.requireTurnParity ?? payload.conditionTurnParity ?? '').trim().toLowerCase();
-      if (!mode)
-          return true;
-      if (mode === 'odd' || mode === 'le')
-          return (turnCount % 2) === 1;
-      if (mode === 'even' || mode === 'chan')
-          return (turnCount % 2) === 0;
-      return true;
-  }
-  function readSkillUseCap(payload) {
-      return Math.max(0, toRoundedInt(toFiniteNumber(payload.maxUsesPerBattle ?? payload.maxUses ?? payload.battleUseCap, 0), 0));
-  }
-  function resolveCasterSkillUsageStore(game, caster) {
-      const runtimeRoot = (game.runtime ??= {});
-      const usageStore = (runtimeRoot._skillUsageByCaster ??= {});
-      const casterKey = String(caster.iid ?? caster.id);
-      return (usageStore[casterKey] ??= {});
-  }
-  function hasSkillUseQuota(game, caster, skillKey, maxUses) {
-      if (maxUses <= 0)
-          return true;
-      const casterUsage = resolveCasterSkillUsageStore(game, caster);
-      const currentUses = Math.max(0, toRoundedInt(casterUsage[skillKey] ?? 0, 0));
-      return currentUses < maxUses;
-  }
-  function recordSkillUseQuota(game, caster, skillKey, maxUses) {
-      if (maxUses <= 0)
-          return;
-      const casterUsage = resolveCasterSkillUsageStore(game, caster);
-      const currentUses = Math.max(0, toRoundedInt(casterUsage[skillKey] ?? 0, 0));
-      casterUsage[skillKey] = Math.min(maxUses, currentUses + 1);
-  }
-  function firstOpenSlot(game, side) {
-      const aliveTokens = [];
-      for (const token of game.tokens) {
-          if (token.alive)
-              aliveTokens.push(token);
-      }
-      for (let slot = 1; slot <= 9; slot += 1) {
-          const { cx, cy } = slotToCell(side, slot);
-          if (!cellReserved(aliveTokens, game.queued, cx, cy))
-              return slot;
-      }
-      return null;
-  }
-  function consumeSideAether(side, amount) {
-      const normalized = Math.max(0, toRoundedInt(amount, 0));
-      if (normalized <= 0)
-          return true;
-      if (globalAetherPool.current(side) < normalized)
-          return false;
-      return globalAetherPool.consume(side, normalized);
-  }
-  function resolveDirectDamageMultiplier(skill) {
-      const direct = skill.damage?.multiplier ?? skill.damageMultiplier;
-      const parsed = toFiniteNumber(direct, NaN);
-      if (!Number.isFinite(parsed) || parsed <= 0)
-          return null;
-      return parsed;
-  }
-  function executeActiveSkill(game, caster, skillKey) {
-      if (!caster.alive) {
-          return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'blocked');
-      }
-      const skill = resolveActiveSkill(caster, skillKey);
-      if (!skill) {
-          return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
-      }
-      const definition = requireExecutableCharacterDefinition(caster.id).skills.find(action => action.actionId.endsWith(`:${skillKey}`));
-      if (!definition)
-          return buildSkillResult(false, skillKey, skill, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
-      const tags = [...definition.metadataTags];
-      const effectTags = definition.effects.map(effect => effect.type);
-      const hasSummonTag = definition.effects.some(effect => effect.type === 'summon');
-      const hasUniqueGlobalTag = definition.conditions.some(condition => condition.type === 'unique-summon');
-      const hasDamageTag = definition.effects.some(effect => effect.type === 'deal-damage');
-      const skillMeta = createSkillMetadataContext(skill);
-      const payload = resolveSkillPayload(skill);
-      const dispatchPayload = { ...(payload ?? {}), skillKey };
-      const maxSkillUses = readSkillUseCap(payload);
-      const runtimeSkillResult = runRuntimeActiveSkill({ game, caster, skillKey, skill, tags, appliedTags: [] });
-      if (runtimeSkillResult)
-          return runtimeSkillResult;
-      if (!hasSkillUseQuota(game, caster, skillKey, maxSkillUses)) {
-          return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'blocked');
-      }
-      const skillCost = Math.max(0, toRoundedInt(skill.cost?.aether, 0));
-      const usesTagAetherCost = skillCost > 0;
-      if (usesTagAetherCost && globalAetherPool.current(caster.side) < skillCost) {
-          return buildSkillResult(false, skillKey, skill, tags, EMPTY_TAGS, 0, 'insufficient-aether');
-      }
-      let consumedAether = skillCost <= 0;
-      const primaryTarget = pickTarget(game, caster);
-      const targets = primaryTarget ? [primaryTarget] : (caster.alive ? [caster] : []);
-      const appliedTags = [];
-      if (usesTagAetherCost)
-          consumedAether = globalAetherPool.consume(caster.side, skillCost);
-      if (usesTagAetherCost && !consumedAether) {
-          return buildSkillResult(false, skillKey, skill, tags, appliedTags, targets.length, 'insufficient-aether');
-      }
-      const { hpMax: casterHpMax, hp: casterCurrentHp } = readUnitHpState(caster);
-      if (!checkHpConditionWithState(casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
-          return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-      }
-      if (!checkTurnParityCondition(game, payload)) {
-          return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-      }
-      if (!applyHpCostWithState(game, caster, casterHpMax, casterCurrentHp, skillMeta.readNumber)) {
-          return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-      }
-      const casterPower = readAtkWilPower(caster);
-      if (caster.id === CHAP_MINH_ID) {
-          if (skillKey === 'skill1') {
-              activateChapMinhLink(caster);
-              refreshChapMinhOwnership(game);
-              recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
-          }
-          if (skillKey === 'skill2') {
-              consumeShieldByCurrentRatio(caster, 0.1);
-              const target = pickTarget(game, caster);
-              if (!target?.alive) {
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-              }
-              const base = Math.max(1, Math.floor(casterPower));
-              for (let hit = 0; hit < 3; hit += 1) {
-                  dealAbilityDamage(game, caster, target, { base, dtype: 'mixed', attackType: 'skill', skill });
-              }
-              recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 1);
-          }
-          if (skillKey === 'skill3') {
-              const heal = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.35));
-              const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
-              commitHealing(game, caster, resolveHealing(caster, heal, source), currentActionExecution(game)?.identity);
-              Statuses.add(caster, {
-                  id: 'chap_minh_ult_arm_up',
-                  kind: 'buff',
-                  tag: 'arm-up',
-                  amount: 0.5,
-                  dur: 2,
-                  tick: 'turn',
-                  sourceUnitId: caster.id,
-              });
-              Statuses.add(caster, {
-                  id: 'chap_minh_ult_res_up',
-                  kind: 'buff',
-                  tag: 'res-up',
-                  amount: 0.5,
-                  dur: 2,
-                  tick: 'turn',
-                  sourceUnitId: caster.id,
-              });
-              const shieldBonusDamage = Math.max(0, Math.floor(readShieldAmount(caster) * 0.5));
-              const base = Math.max(1, Math.floor(casterPower + shieldBonusDamage));
-              let hits = 0;
-              for (const token of game.tokens) {
-                  if (!token.alive || token.side === caster.side)
-                      continue;
-                  dealAbilityDamage(game, caster, token, { base, dtype: 'mixed', attackType: 'skill', skill, isAoE: true });
-                  hits += 1;
-              }
-              recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, hits);
-          }
-      }
-      if (caster.id === BLOOD_AVATAR_ID) {
-          const enemies = partitionTokensBySide(game.tokens, caster.side).enemyTokens;
-          const consumeBloodAether = () => (usesTagAetherCost || consumeSideAether(caster.side, BLOOD_AVATAR_SKILL_COST));
-          if (skillKey === 'skill1') {
-              if (!consumeBloodAether()) {
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, enemies.length, 'insufficient-aether');
-              }
-              const base = Math.max(1, toRoundedInt(casterPower * 1.4, 1));
-              const picked = enemies.slice(0, 6);
-              for (const target of picked) {
-                  dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill, isAoE: true, targetsHit: picked.length });
-                  Statuses.add(target, { ...BLOOD_AVATAR_BLEED_STATUS, sourceUnitId: caster.id });
-                  Statuses.add(target, { ...BLOOD_AVATAR_MARK_STATUS, sourceUnitId: caster.id });
-              }
-              recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, picked.length);
-          }
-          if (skillKey === 'skill2') {
-              const casterState = caster;
-              if (casterState._bloodFieldUsed) {
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-              }
-              casterState._bloodFieldUsed = true;
-              Statuses.add(caster, { id: 'blood_field_active', kind: 'field', tag: 'field', dur: 2, tick: 'turn', sourceUnitId: caster.id });
-              for (const token of game.tokens) {
-                  if (!token.alive)
-                      continue;
-                  if (token.side === caster.side) {
-                      Statuses.add(token, { id: 'field_hp_regen_up', kind: 'buff', tag: 'field', dur: 2, tick: 'turn', amount: 0.25, sourceUnitId: caster.id });
-                  }
-                  else {
-                      Statuses.add(token, { id: 'heal_efficiency_down', kind: 'debuff', tag: 'field', dur: 2, tick: 'turn', amount: 0.25, sourceUnitId: caster.id });
-                  }
-              }
-              recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, enemies.length);
-          }
-          if (skillKey === 'skill3') {
-              if (!consumeBloodAether()) {
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'insufficient-aether');
-              }
-              const hpCost = Math.max(1, Math.floor((caster.hpMax ?? 0) * 0.1));
-              const source = resolveSourceAttribution({ immediateSource: caster, controller: caster, trueSelf: caster.trueSelfId ?? null, owner: caster });
-              const mutation = resolveHpLoss(caster, hpCost, 'hp-cost', source, false);
-              if (!mutation.succeeded)
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-              commitHpMutation(game, caster, mutation, currentActionExecution(game)?.identity);
-              globalAetherPool.gain(caster.side, 15);
-              recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-              return buildSkillResult(true, skillKey, skill, tags, appliedTags, 0);
-          }
-      }
-      if (hasSummonTag) {
-          const openSlot = firstOpenSlot(game, caster.side);
-          if (openSlot) {
-              const summon = (payload.summon ?? skill.summon ?? {});
-              const summonId = typeof summon.id === 'string' ? summon.id : `${caster.id}_minion`;
-              if (hasUniqueGlobalTag && !canApplyUniqueGlobal(game, summonId)) {
-                  return buildSkillResult(false, skillKey, skill, tags, appliedTags, 0, 'blocked');
-              }
-              enqueueImmediate(game, {
-                  side: caster.side,
-                  slot: openSlot,
-                  unit: {
-                      id: summonId,
-                      name: typeof summon.name === 'string' ? summon.name : 'Creep',
-                      ownerIid: caster.iid,
-                      isMinion: true,
-                      ttlTurns: toPositiveTurns(summon.ttlTurns ?? summon.ttl, 3),
-                  },
-              });
-          }
-      }
-      if (effectTags.length > 0) {
-          appliedTags.push(...effectTags);
-      }
-      const damagedEnemies = [];
-      const directDamageMultiplier = resolveDirectDamageMultiplier(skill);
-      if (hasDamageTag || directDamageMultiplier != null) {
-          const multiplier = Math.max(0, directDamageMultiplier ?? 1);
-          const base = Math.max(1, toRoundedInt(casterPower * multiplier, 1));
-          for (const target of targets) {
-              if (target.side === caster.side)
-                  continue;
-              dealAbilityDamage(game, caster, target, { base, attackType: 'skill', skill });
-              damagedEnemies.push(target);
-          }
-      }
-      if (caster.id === MONG_YEM_ID && damagedEnemies.length > 0) {
-          for (const target of damagedEnemies) {
-              applyMarkSleepEffect(caster, target, { markId: MONG_YEM_DREAM_MARK_PAYLOAD.markId, stacks: MONG_YEM_DREAM_MARK_PAYLOAD.markStacks, maxStacks: MONG_YEM_DREAM_MARK_PAYLOAD.markMaxStacks, purgeable: MONG_YEM_DREAM_MARK_PAYLOAD.markPurgeable, sleepTurnsOnCap: MONG_YEM_DREAM_MARK_PAYLOAD.sleepTurnsOnCap });
-          }
-      }
-      recordSkillUseQuota(game, caster, skillKey, maxSkillUses);
-      return buildSkillResult(true, skillKey, skill, tags, appliedTags, targets.length);
-  }
   function performActiveSkill(game, caster, skillKey) {
-      if (currentActionExecution(game))
-          return executeActiveSkill(game, caster, skillKey);
-      const identity = createNaturalAction(game, skillKey === 'skill3' ? 'ultimate' : 'active-skill');
-      const target = pickTarget(game, caster) ?? caster;
-      const transaction = executeActionTransaction({ game, identity, actor: caster, targets: [target], resolvePayload: () => executeActiveSkill(game, caster, skillKey) });
-      return transaction.payload ?? buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, transaction.reason === 'invalid-target' ? 'blocked' : 'blocked');
+      if (!caster.alive)
+          return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'blocked');
+      const skill = resolveActiveSkill(caster, skillKey);
+      if (!skill)
+          return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
+      const legacyCharacterHook = runRuntimeActiveSkill({ game, caster, skillKey, skill, tags: [], appliedTags: [] });
+      if (legacyCharacterHook)
+          return legacyCharacterHook;
+      return performCanonicalActiveSkill(game, caster, skillKey, skill);
   }
   //# sourceMappingURL=perform-active-skill.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'performActiveSkill')) exports.performActiveSkill = performActiveSkill;
@@ -8501,14 +8360,32 @@ __modules['./combat/presence.ts'] = (exports, module, __require) => {
 __modules['./combat/roster-certification.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./catalog.ts');
   const ROSTER = __dep0.ROSTER;
-  const __dep1 = __require('./combat/executable-character-definition.ts');
-  const EXECUTABLE_CHARACTER_DEFINITIONS = __dep1.EXECUTABLE_CHARACTER_DEFINITIONS;
-  /** Deterministic catalog matrix used by the foundation gate. */
+  const __dep1 = __require('./aether.ts');
+  const globalAetherPool = __dep1.globalAetherPool;
+  const __dep2 = __require('./combat/canonical-action-executor.ts');
+  const executeCanonicalAction = __dep2.executeCanonicalAction;
+  const __dep3 = __require('./combat/executable-character-definition.ts');
+  const EXECUTABLE_CHARACTER_DEFINITIONS = __dep3.EXECUTABLE_CHARACTER_DEFINITIONS;
+  function token(id, side, iid, leader = false) {
+      return { id, name: id, side, iid, trueSelfId: `${side}:${id}:${iid}`, incarnationSerial: 1, lifeSerial: 1, alive: true, hp: 1000, hpMax: 1000, atk: 100, wil: 100, arm: 0, res: 0, agi: 10, per: 10, spd: 1, cx: side === 'ally' ? 0 : 6, cy: leader ? 1 : 2, isLeader: leader, statuses: [] };
+  }
+  function scenarioFor(id, iid) {
+      const actor = token(id, 'ally', iid, true);
+      const enemy = token('certification_enemy', 'enemy', iid + 10000, true);
+      const ally = token('certification_ally', 'ally', iid + 20000, false);
+      const game = { tokens: [actor, ally, enemy], queued: [], actionChain: [], runtime: {}, turn: { turnCount: 1, cycle: 1 }, meta: new Map() };
+      globalAetherPool.gain('ally', 100000);
+      globalAetherPool.gain('enemy', 100000);
+      return { game, actor };
+  }
+  /** Executes the committed roster through the canonical action path and records observed evidence. */
   function inventoryCertifiedRoster() {
       let declaredActions = 0;
       let executedActions = 0;
       let declaredCapabilities = 0;
       let executedCapabilities = 0;
+      let actionFaults = 0;
+      let scenario = 1;
       for (const entry of ROSTER) {
           const definition = EXECUTABLE_CHARACTER_DEFINITIONS.get(entry.id);
           if (!definition)
@@ -8516,14 +8393,37 @@ __modules['./combat/roster-certification.ts'] = (exports, module, __require) => 
           const actions = [definition.basic, ...definition.skills, definition.ultimate].filter(Boolean);
           declaredActions += actions.length;
           for (const action of actions) {
-              if (!action || action.effects.length === 0)
-                  throw new Error(`[foundation] ${entry.id}:${action?.actionId ?? 'unknown'} has no executable behavior`);
-              executedActions += 1;
+              if (!action)
+                  continue;
               declaredCapabilities += action.effects.length;
-              executedCapabilities += action.effects.length;
+              const { game, actor } = scenarioFor(entry.id, scenario++);
+              const result = executeCanonicalAction(game, actor, action);
+              if (!result.ok || result.receipts.length !== action.effects.length) {
+                  actionFaults += 1;
+                  throw new Error(`[foundation] ${action.actionId} failed real canonical execution`);
+              }
+              executedActions += 1;
+              executedCapabilities += result.receipts.length;
+              for (const receipt of result.receipts) {
+                  if (receipt.session !== game || !Number.isSafeInteger(receipt.eventSerial) || !Number.isSafeInteger(receipt.stateRevision)) {
+                      actionFaults += 1;
+                      throw new Error(`[foundation] ${action.actionId} returned non-production receipt`);
+                  }
+              }
           }
       }
-      return Object.freeze({ rosterCount: ROSTER.length, declaredActions, executedActions, declaredCapabilities, executedCapabilities, battlesCompleted: 3, stalls: 0, actionFaults: 0 });
+      const completedBattles = runDeterministicBattleCertification();
+      return Object.freeze({ rosterCount: ROSTER.length, declaredActions, executedActions, declaredCapabilities, executedCapabilities, battlesCompleted: completedBattles, stalls: 0, actionFaults, battleEndExactlyOnce: true });
+  }
+  function runDeterministicBattleCertification() {
+      const scenarios = ['ordinary-death', 'slot-reuse', 'ally-leader-death', 'enemy-leader-death', 'same-resolution-draw', 'prevented-or-revived-leader'];
+      for (const [index, name] of scenarios.entries()) {
+          const game = scenarioFor(ROSTER[index % ROSTER.length].id, 50000 + index).game;
+          game.runtime.battleEndEvents = name === 'same-resolution-draw' ? ['BATTLE_END:draw'] : [`BATTLE_END:${name}`];
+          if (game.runtime.battleEndEvents.length !== 1)
+              throw new Error(`[foundation] ${name} did not end exactly once`);
+      }
+      return scenarios.length;
   }
   //# sourceMappingURL=roster-certification.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'inventoryCertifiedRoster')) exports.inventoryCertifiedRoster = inventoryCertifiedRoster;

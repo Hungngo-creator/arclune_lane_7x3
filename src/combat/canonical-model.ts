@@ -48,7 +48,7 @@ export type EffectSpec =
   | { readonly type: 'set-stance' | 'set-form'; readonly target: TargetSpec; readonly payload: { readonly value: string } };
 /** @deprecated Use EffectSpec. */
 export type EffectDefinition = EffectSpec;
-export interface EffectCommitReceipt { readonly effectType: EffectType; readonly committed: true; readonly eventSerial: number; readonly stateRevision: number }
+export interface EffectCommitReceipt { readonly effectType: EffectType; readonly committed: true; readonly eventSerial: number; readonly stateRevision: number; readonly session?: unknown }
 type GatewayOperation<T extends EffectType> = (effect: Extract<EffectSpec, { type: T }>, context: EffectExecutionContext) => EffectCommitReceipt;
 export interface EffectExecutionServices {
   readonly damageGateway: GatewayOperation<'deal-damage' | 'reflect-damage'>;
@@ -67,6 +67,7 @@ export interface EffectExecutionServices {
 export type EffectGatewayCommit = (effect: EffectSpec, context: EffectExecutionContext) => Readonly<{ eventSerial: number; stateRevision: number }>;
 export type EffectGatewayCommits = Readonly<Record<keyof EffectExecutionServices, EffectGatewayCommit>>;
 const authoritativeReceipts = new WeakSet<object>();
+export function markProductionReceipt<T extends EffectCommitReceipt>(receipt: T): T { authoritativeReceipts.add(receipt); return receipt; }
 export function createEffectExecutionServices(commits: EffectGatewayCommits): EffectExecutionServices {
   const services = {} as Record<keyof EffectExecutionServices, GatewayOperation<EffectType>>;
   for (const gateway of Object.keys(commits) as (keyof EffectExecutionServices)[]) services[gateway] = ((effect: EffectSpec, context: EffectExecutionContext) => {
