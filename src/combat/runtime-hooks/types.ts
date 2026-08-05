@@ -1,7 +1,7 @@
 import type { SessionState } from '@shared-types/combat';
 import type { SkillSection } from '@shared-types/config';
 import type { UnitToken } from '@shared-types/units';
-import type { ActiveSkillKey, PerformActiveSkillResult } from '../perform-active-skill.ts';
+import type { ActiveSkillKey } from '../perform-active-skill.ts';
 
 export interface RuntimeSkillContext {
   game: SessionState;
@@ -45,7 +45,7 @@ export interface RuntimeUltContext {
 }
 
 export interface UnitRuntimeHook {
-  onActiveSkill?: (ctx: RuntimeSkillContext) => PerformActiveSkillResult | null;
+  onActiveSkill?: (ctx: RuntimeSkillContext) => void;
   onUlt?: (ctx: RuntimeUltContext) => boolean;
   onTurnStart?: (ctx: RuntimeTurnContext) => void;
   onActionEnd?: (ctx: RuntimeTurnContext) => void;

@@ -1,6 +1,5 @@
 import { skillSets } from '../data/skills.ts';
 import { performCanonicalActiveSkill } from './canonical-action-executor.ts';
-import { runRuntimeActiveSkill } from './unit-runtime-hooks.ts';
 import { buildSkillResult } from './skill-result.ts';
 
 import type { SessionState } from '@shared-types/combat';
@@ -32,8 +31,6 @@ export function performActiveSkill(game: SessionState, caster: UnitToken, skillK
   if (!caster.alive) return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'blocked');
   const skill = resolveActiveSkill(caster, skillKey);
   if (!skill) return buildSkillResult(false, skillKey, null, EMPTY_TAGS, EMPTY_TAGS, 0, 'missing-skill');
-  const legacyCharacterHook = runRuntimeActiveSkill({ game, caster, skillKey, skill, tags: [], appliedTags: [] });
-  if (legacyCharacterHook) return legacyCharacterHook as PerformActiveSkillResult;
   return performCanonicalActiveSkill(game, caster, skillKey, skill) as PerformActiveSkillResult;
 }
 

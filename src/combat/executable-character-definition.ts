@@ -46,8 +46,8 @@ function effectsFor(action: Record<string, unknown>, target: TargetSpec): Effect
   const effects: EffectSpec[] = [];
   const multiplier = finite(action.damageMultiplier);
   if (multiplier !== null) effects.push({ type: 'deal-damage', target, payload: { amount: multiplier, damageType: 'physical' } });
-  else if (finite(action.hits) !== null || finite(action.bonusDamageFromShieldRatio) !== null) effects.push({ type: 'deal-damage', target, payload: { amount: 1, damageType: 'physical' } });
-  const healing = finite(action.healPercent ?? action.healAmount);
+  else if (finite(action.hits) !== null || finite(action.bonusDamageFromShieldRatio) !== null) effects.push({ type: 'deal-damage', target: action.bonusDamageFromShieldRatio !== undefined ? { kind: 'all', side: 'enemy' } : target, payload: { amount: finite(action.hits) ?? 1, damageType: 'physical', shieldRatio: finite(action.bonusDamageFromShieldRatio) ?? undefined } as never });
+  const healing = finite(action.healPercent ?? action.healPercentMaxHP ?? action.healAmount);
   if (healing !== null) effects.push({ type: 'heal', target: { kind: 'self' }, payload: { amount: healing } });
   const shield = finite(action.shieldPercentMaxHP ?? action.shieldAmount);
   if (shield !== null) effects.push({ type: 'grant-shield', target: { kind: 'self' }, payload: { amount: shield } });
@@ -56,6 +56,8 @@ function effectsFor(action: Record<string, unknown>, target: TargetSpec): Effect
   const costRecord = record(action.cost);
   const aetherCost = finite(costRecord.aether);
   if (aetherCost !== null) effects.push({ type: 'spend-resource', target: { kind: 'self' }, payload: { resource: 'aether', amount: aetherCost } });
+  const shieldCostRatio = finite(action.shieldCostRatioCurrent);
+  if (shieldCostRatio !== null) effects.push({ type: 'apply-status', target: { kind: 'self' }, payload: { statusType: 'shield:consume-current-ratio', value: shieldCostRatio } });
   const summon = record(action.summon);
   const summonId = typeof summon.id === 'string' ? summon.id : typeof action.summonId === 'string' ? action.summonId : null;
   if (summonId) effects.push({ type: 'summon', target: { kind: 'self' }, payload: { definitionId: summonId } });
@@ -66,7 +68,10 @@ function effectsFor(action: Record<string, unknown>, target: TargetSpec): Effect
   for (const buff of buffs) { const b = record(buff); const id = typeof b.id === 'string' ? b.id : null; if (id) effects.push({ type: 'apply-status', target: { kind: 'self' }, payload: { statusType: id, duration: finite(b.turns ?? b.duration) ?? undefined } }); }
   const debuffs = Array.isArray(action.debuffs) ? action.debuffs : [];
   for (const item of debuffs) { const d = record(item); const id = typeof d.id === 'string' ? d.id : null; if (id) effects.push({ type: 'apply-status', target, payload: { statusType: id, duration: finite(d.turns ?? d.duration) ?? undefined, value: finite(d.amount) ?? undefined } }); }
-  if (action.buffStats && typeof action.buffStats === 'object') effects.push({ type: 'apply-status', target: { kind: 'self' }, payload: { statusType: 'stat-buff', duration: finite(action.duration) ?? undefined } });
+  if (action.buffStats && typeof action.buffStats === 'object') {
+    const stats = record(action.buffStats);
+    for (const [stat, raw] of Object.entries(stats)) effects.push({ type: 'apply-status', target: { kind: 'self' }, payload: { statusType: `buff:${stat.toLowerCase()}`, duration: finite(action.duration) ?? undefined, value: finite(raw) ?? undefined } });
+  }
   if (action.weatherShift || action.field || action.fieldId) effects.push({ type: 'create-field', target: { kind: 'self' }, payload: { fieldId: String(action.weatherShift ?? action.fieldId ?? 'field'), duration: finite(action.duration) ?? undefined } });
   if (action.flying || action.stance || action.form) effects.push({ type: 'set-stance', target: { kind: 'self' }, payload: { value: String(action.stance ?? action.form ?? 'flying') } });
   const grantAlly = record(action.grantAlly);

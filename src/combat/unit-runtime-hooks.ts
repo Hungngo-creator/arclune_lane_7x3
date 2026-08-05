@@ -2,7 +2,6 @@ import { getUnitRuntimeHook, UNIT_RUNTIME_HOOKS } from './runtime-hooks/registry
 
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
-import type { PerformActiveSkillResult } from './perform-active-skill.ts';
 import type {
   RuntimeOnUnitDeathContext,
   RuntimeOnBasicAttackContext,
@@ -48,8 +47,8 @@ export function runRuntimeDamageResolved(target: UnitToken | null | undefined): 
   getUnitRuntimeHook(target.id)?.onDamageResolved?.({ target });
 }
 
-export function runRuntimeActiveSkill(ctx: RuntimeSkillContext): PerformActiveSkillResult | null {
-  return getUnitRuntimeHook(ctx.caster.id)?.onActiveSkill?.(ctx) ?? null;
+export function runRuntimeActiveSkill(ctx: RuntimeSkillContext): void {
+  getUnitRuntimeHook(ctx.caster.id)?.onActiveSkill?.(ctx);
 }
 
 export function runRuntimeUlt(ctx: RuntimeUltContext): boolean {
