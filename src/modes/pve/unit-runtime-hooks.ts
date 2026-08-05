@@ -13,7 +13,7 @@ export interface PveUltHookContext {
 }
 
 interface PveUnitRuntimeHook {
-  onUlt?: (ctx: PveUltHookContext) => boolean;
+  onUlt?: (ctx: PveUltHookContext) => void;
 }
 
 const PVE_UNIT_RUNTIME_HOOKS: Readonly<Record<string, PveUnitRuntimeHook>> = Object.freeze({
@@ -28,8 +28,6 @@ const PVE_UNIT_RUNTIME_HOOKS: Readonly<Record<string, PveUnitRuntimeHook>> = Obj
   },
 });
 
-export function runPveRuntimeUltHook(ctx: PveUltHookContext): boolean {
-  const hook = PVE_UNIT_RUNTIME_HOOKS[ctx.unit.id];
-  if (!hook?.onUlt) return false;
-  return hook.onUlt(ctx);
+export function runPveRuntimeUltHook(ctx: PveUltHookContext): void {
+  PVE_UNIT_RUNTIME_HOOKS[ctx.unit.id]?.onUlt?.(ctx);
 }

@@ -46,7 +46,10 @@ function effectsFor(action: Record<string, unknown>, target: TargetSpec): Effect
   const effects: EffectSpec[] = [];
   const multiplier = finite(action.damageMultiplier);
   if (multiplier !== null) effects.push({ type: 'deal-damage', target, payload: { amount: multiplier, damageType: 'physical' } });
-  else if (finite(action.hits) !== null || finite(action.bonusDamageFromShieldRatio) !== null) effects.push({ type: 'deal-damage', target: action.bonusDamageFromShieldRatio !== undefined ? { kind: 'all', side: 'enemy' } : target, payload: { amount: finite(action.hits) ?? 1, damageType: 'physical', shieldRatio: finite(action.bonusDamageFromShieldRatio) ?? undefined } as never });
+  else if (finite(action.hits) !== null || finite(action.bonusDamageFromShieldRatio) !== null) {
+    const hitCount = Math.max(1, Math.floor(finite(action.hits) ?? 1));
+    for (let hit = 0; hit < hitCount; hit += 1) effects.push({ type: 'deal-damage', target: action.bonusDamageFromShieldRatio !== undefined ? { kind: 'all', side: 'enemy' } : target, payload: { amount: 1, damageType: 'physical', shieldRatio: finite(action.bonusDamageFromShieldRatio) ?? undefined } as never });
+  }
   const healing = finite(action.healPercent ?? action.healPercentMaxHP ?? action.healAmount);
   if (healing !== null) effects.push({ type: 'heal', target: { kind: 'self' }, payload: { amount: healing } });
   const shield = finite(action.shieldPercentMaxHP ?? action.shieldAmount);

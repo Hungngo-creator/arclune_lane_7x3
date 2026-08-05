@@ -1,4 +1,4 @@
-import { inventoryCertifiedRoster } from '../../src/combat/roster-certification';
+import { inventoryCertifiedRoster } from '../src/combat/roster-certification';
 
 test('current roster action and capability matrix is complete', () => {
   const report = inventoryCertifiedRoster();

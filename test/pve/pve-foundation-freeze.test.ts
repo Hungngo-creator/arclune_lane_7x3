@@ -3,7 +3,7 @@ import { COMBAT_FOUNDATION_CONTRACT_VERSION } from '../../src/combat/foundation-
 import { EXECUTABLE_CHARACTER_DEFINITIONS } from '../../src/combat/executable-character-definition.ts';
 
 test('the required foundation gate discovers and compiles every real roster entry', () => {
-  expect(COMBAT_FOUNDATION_CONTRACT_VERSION).toBe(1);
+  expect(COMBAT_FOUNDATION_CONTRACT_VERSION).toBe(0);
   expect(EXECUTABLE_CHARACTER_DEFINITIONS.size).toBe(ROSTER.length);
   let declaredActions = 0;
   for (const entry of ROSTER) {

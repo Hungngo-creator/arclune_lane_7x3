@@ -1,2 +1,2 @@
-/** Combat foundation freeze marker set only after PVE certification gates pass. */
-export const COMBAT_FOUNDATION_CONTRACT_VERSION = 1 as const;
+// Uncertified while canonical action/effect migration is in progress.
+export const COMBAT_FOUNDATION_CONTRACT_VERSION = 0 as const;

@@ -1,7 +1,7 @@
-import { pickTarget } from '../combat.ts';
 import { buildSkillResult } from './skill-result.ts';
 import { dispatchEffect, validateEffectSpec, type EffectCommitReceipt, type EffectExecutionContext, type EffectSpec, type TargetSpec } from './canonical-model.ts';
 import { requireExecutableCharacterDefinition, type ExecutableActionDefinition } from './executable-character-definition.ts';
+import { getSessionRandom } from './session-rng.ts';
 import { createCanonicalEffectServices, validateCanonicalEffectPreparation, reserveCanonicalActionCosts } from './canonical-effect-gateways.ts';
 import { createNaturalAction, currentActionExecution, executeActionTransaction } from './kernel/public.ts';
 import type { SessionState } from '@shared-types/combat';
@@ -15,13 +15,40 @@ function resolveTargets(game: SessionState, actor: UnitToken, spec: TargetSpec):
   if (spec.kind === 'self') return actor.alive ? [actor] : [];
   const enemies = game.tokens.filter(t => t.alive && t.side !== actor.side);
   const allies = game.tokens.filter(t => t.alive && t.side === actor.side);
-  if (spec.kind === 'selected-enemy') { const target = pickTarget(game, actor); return target ? [target] : []; }
+  if (spec.kind === 'selected-enemy') return enemies.slice(0, 1);
   if (spec.kind === 'selected-ally') return allies.filter(t => t.iid !== actor.iid).slice(0, 1);
   if (spec.kind === 'leader') return game.tokens.filter(t => t.alive && t.side === actor.side && t.isLeader).slice(0, 1);
   if (spec.kind === 'all') return spec.side === 'enemy' ? enemies : allies;
   if (spec.kind === 'random' || spec.kind === 'multiple' || spec.kind === 'single') return (spec.side === 'enemy' ? enemies : allies).slice(0, spec.kind === 'single' ? 1 : Math.max(1, spec.count ?? 1));
   if (spec.kind === 'explicit-iids') return game.tokens.filter(t => t.alive && spec.iids.includes(t.iid ?? t.id));
   return ((spec as { side?: 'ally' | 'enemy' }).side === 'enemy' ? enemies : allies).slice(0, 3);
+}
+
+function actionUsageKey(actor: UnitToken, action: ExecutableActionDefinition): string {
+  return `${actor.iid ?? actor.id}:${action.actionId}`;
+}
+
+function actionUsageMap(game: SessionState): Map<string, number> {
+  const runtime = (game.runtime ??= {}) as { canonicalActionUses?: Map<string, number> };
+  if (!(runtime.canonicalActionUses instanceof Map)) runtime.canonicalActionUses = new Map();
+  return runtime.canonicalActionUses;
+}
+
+function validateActionUsageLimit(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition): boolean {
+  const limit = action.conditions.find(condition => condition.type === 'maximum-uses-per-battle');
+  return !limit || (actionUsageMap(game).get(actionUsageKey(actor, action)) ?? 0) < limit.uses;
+}
+
+function recordActionUse(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition): void {
+  const key = actionUsageKey(actor, action);
+  const uses = actionUsageMap(game);
+  uses.set(key, (uses.get(key) ?? 0) + 1);
+}
+
+function actionByKey(compiled: ReturnType<typeof requireExecutableCharacterDefinition>, actionKey: CanonicalActionKey): ExecutableActionDefinition | null {
+  if (actionKey === 'basic') return compiled.basic;
+  if (actionKey === 'ultimate' || actionKey === 'skill3') return compiled.ultimate;
+  return compiled.skills.find(action => action.actionId.split(':').pop() === actionKey) ?? null;
 }
 
 function validateConditions(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition): boolean {
@@ -37,13 +64,13 @@ function prepareEffects(game: SessionState, actor: UnitToken, action: Executable
   const prepared = action.effects.map(effect => {
     validateEffectSpec(effect, actor.id, action.actionId);
     const targets = resolveTargets(game, actor, effect.target);
-    return { effect, targets: targets.length ? targets : [actor] };
+    return { effect, targets };
   });
   return prepared.every(item => validateCanonicalEffectPreparation(game, actor, item.effect, item.targets)) ? prepared : null;
 }
 
 export function executeCanonicalAction(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition): { ok: boolean; receipts: readonly EffectCommitReceipt[]; targetCount: number; reason?: 'blocked' | 'insufficient-aether' } {
-  if (!actor.alive || !validateConditions(game, actor, action)) return { ok: false, receipts: [], targetCount: 0, reason: 'blocked' };
+  if (!actor.alive || !validateConditions(game, actor, action) || !validateActionUsageLimit(game, actor, action)) return { ok: false, receipts: [], targetCount: 0, reason: 'blocked' };
 const prepared = prepareEffects(game, actor, action);
   if (!prepared) return { ok: false, receipts: [], targetCount: 0, reason: 'blocked' };
   const costReservations = reserveCanonicalActionCosts(game, actor, action);
@@ -53,9 +80,10 @@ const prepared = prepareEffects(game, actor, action);
   const run = () => {
     for (const item of prepared) {
       maxTargets = Math.max(maxTargets, item.targets.length);
-      const context: EffectExecutionContext = { session: game, action, sourceTrueSelfId: String(actor.trueSelfId ?? actor.id), sourceLifeId: String(actor.lifeSerial ?? 0), resolvedTargetIds: item.targets.map(t => t.iid ?? t.id), kitKey: action.actionId, authority: action.authority, mode: 'pve', random: Math.random, services: createCanonicalEffectServices(game, actor, item.targets) };
+      const context: EffectExecutionContext = { session: game, action, sourceTrueSelfId: String(actor.trueSelfId ?? actor.id), sourceLifeId: String(actor.lifeSerial ?? 0), resolvedTargetIds: item.targets.map(t => t.iid ?? t.id), kitKey: action.actionId, authority: action.authority, mode: 'pve', random: getSessionRandom(game), services: createCanonicalEffectServices(game, actor, item.targets) };
       receipts.push(dispatchEffect(item.effect, context, actor.id, action.actionId));
     }
+    recordActionUse(game, actor, action);
     return { ok: true, receipts, targetCount: maxTargets };
   };
   if (currentActionExecution(game)) { costReservations.forEach(item => item.commit()); return run(); }
@@ -64,7 +92,7 @@ const prepared = prepareEffects(game, actor, action);
 
 export function performCanonicalActiveSkill(game: SessionState, caster: UnitToken, skillKey: 'skill1' | 'skill2' | 'skill3', skill: SkillSection | null) {
   const compiled = requireExecutableCharacterDefinition(caster.id);
-  const definition = skillKey === 'skill3' ? compiled.ultimate : compiled.skills.find(a => a.actionId.endsWith(`:${skillKey}`));
+  const definition = actionByKey(compiled, skillKey);
   if (!definition) return buildSkillResult(false, skillKey, skill, EMPTY, EMPTY, 0, 'missing-skill');
   const result = executeCanonicalAction(game, caster, definition);
   if (!result?.ok) return buildSkillResult(false, skillKey, skill, definition.metadataTags as string[], [], result?.targetCount ?? 0, result?.reason ?? 'blocked');

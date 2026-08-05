@@ -51,8 +51,8 @@ export function runRuntimeActiveSkill(ctx: RuntimeSkillContext): void {
   getUnitRuntimeHook(ctx.caster.id)?.onActiveSkill?.(ctx);
 }
 
-export function runRuntimeUlt(ctx: RuntimeUltContext): boolean {
-  return getUnitRuntimeHook(ctx.caster.id)?.onUlt?.(ctx) === true;
+export function runRuntimeUlt(ctx: RuntimeUltContext): void {
+  getUnitRuntimeHook(ctx.caster.id)?.onUlt?.(ctx);
 }
 
 export function runRuntimeUnitDeath(ctx: RuntimeOnUnitDeathContext): void {

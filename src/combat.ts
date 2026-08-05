@@ -1,5 +1,7 @@
 //home (termux)/arclune_lane_7x3/src/combat.ts
 
+import { executeCanonicalAction } from './combat/canonical-action-executor.ts';
+import { EXECUTABLE_CHARACTER_DEFINITIONS, requireExecutableCharacterDefinition, type ExecutableActionDefinition } from './combat/executable-character-definition.ts';
 import { getMetaById } from './catalog.ts';
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
 import { resolveTarget } from './combat/status-query.ts';
@@ -872,17 +874,24 @@ export function doBasicWithFollowups(
   const parent = createNaturalAction(Game, 'basic');
   const result: BasicActionResult = { ok: false, rootActionId: parent.actionId, attemptedHits: 1, committedHits: 0, totalHpDamage: 0, targetIids: [] };
   if (!Game.tokens.some(target => target.side !== unit.side && isCombatAlive(target))) return result;
-  // The cap limits triggered linked actions; it does not create follow-ups.
+  // Compatibility façade only: canonical executor owns target resolution, damage, receipts and finalization.
   void cap;
   void onFollowup;
+  const definition = (EXECUTABLE_CHARACTER_DEFINITIONS.get(unit.id)?.basic ?? { actionId: `${unit.id}:basic`, target: { kind: 'selected-enemy' }, effects: [{ type: 'deal-damage', target: { kind: 'selected-enemy' }, payload: { amount: 1, damageType: 'physical' } }], cost: {}, conditions: [], metadataTags: [], authority: 'none', ordering: 0, modeScope: ['pve'] } as ExecutableActionDefinition);
+  const before = new Map(Game.tokens.map(target => [target.iid ?? target.id, Number(target.hp ?? 0)]));
   withActionExecution(Game, parent, () => {
-    const hit = executeBasicAttack(Game, unit);
-    if (!hit) return;
-    result.attemptedHits = hit.hitCount;
-    result.committedHits = hit.hitCount;
-    result.totalHpDamage = hit.hpDamage;
-    result.targetIids.push(hit.targetIid);
-    result.ok = true;
+    const executed = executeCanonicalAction(Game, unit, definition);
+    if (!executed.ok) return;
+    result.attemptedHits = executed.receipts.filter(receipt => receipt.effectType === 'deal-damage' || receipt.effectType === 'reflect-damage').length || Math.max(1, executed.targetCount);
+    result.committedHits = executed.receipts.filter(receipt => receipt.effectType === 'deal-damage' || receipt.effectType === 'reflect-damage').length || executed.receipts.length;
+    for (const target of Game.tokens) {
+      const key = target.iid ?? target.id;
+      const delta = (before.get(key) ?? Number(target.hp ?? 0)) - Number(target.hp ?? 0);
+      if (target.side !== unit.side && delta > 0) {
+        result.totalHpDamage += delta;
+        result.targetIids.push(key);
+      }
+    }
   });
   return result;
 }

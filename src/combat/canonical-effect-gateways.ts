@@ -1,11 +1,12 @@
 import { globalAetherPool } from '../aether.ts';
-import { dealAbilityDamage } from '../combat.ts';
 import { cellReserved, slotToCell } from '../engine.ts';
 import { Statuses } from '../statuses.ts';
 import { enqueueImmediate } from '../summon.ts';
 import { consumeShieldByCurrentRatio, grantShield, readShieldAmount } from './apply-damage.ts';
 import { createEffectExecutionServices, type EffectExecutionServices, type EffectSpec } from './canonical-model.ts';
 import { currentActionExecution, resolveHealing, resolveHpLoss, resolveSourceAttribution, type ActionExecutionContext } from './kernel/public.ts';
+import { commitDamageBatch, resolveDamageBatch } from './kernel/damage-batch.ts';
+import { createHpZeroCandidate } from './kernel/life-cycle.ts';
 import { commitHealing, commitHpMutation } from './kernel/hp-mutation.ts';
 import { readAtkWilPower, toRoundedInt } from './number-utils.ts';
 import type { ActionCostReservation } from './kernel/action-transaction.ts';
@@ -21,6 +22,12 @@ const eventState = (game: SessionState): { eventSerial: number; stateRevision: n
 
 const identity = (game: SessionState): ActionExecutionContext['identity'] | undefined => currentActionExecution(game)?.identity;
 const sourceFor = (actor: UnitToken) => resolveSourceAttribution({ immediateSource: actor, controller: actor, trueSelf: actor.trueSelfId ?? null, owner: actor });
+
+function nextCanonicalPacketSerial(game: SessionState): number {
+  const runtime = (game.runtime ??= {}) as { canonicalPacketSerial?: number };
+  runtime.canonicalPacketSerial = Math.max(0, Number(runtime.canonicalPacketSerial ?? 0)) + 1;
+  return runtime.canonicalPacketSerial;
+}
 
 function firstOpenSlot(game: SessionState, side: UnitToken['side']): number | null {
   const alive = game.tokens.filter(t => t.alive);
@@ -45,7 +52,20 @@ export function reserveCanonicalActionCosts(game: SessionState, actor: UnitToken
 
 export function createCanonicalEffectServices(game: SessionState, actor: UnitToken, targets: readonly UnitToken[]): EffectExecutionServices {
   return createEffectExecutionServices({
-    damageGateway(effect: any) { for (const target of targets) dealAbilityDamage(game, actor, target, { base: Math.max(1, Math.floor(readAtkWilPower(actor) * effect.payload.amount + readShieldAmount(actor) * Number(effect.payload.shieldRatio ?? 0))), dtype: effect.payload.damageType === 'will' ? 'magic' : effect.payload.damageType, attackType: 'skill' }); return eventState(game); },
+    damageGateway(effect: any) {
+      const actionIdentity = identity(game);
+      if (!actionIdentity) throw new Error('[canonical-effect] damage requires an active action identity');
+      const source = sourceFor(actor);
+      for (const target of targets) {
+        const amount = Math.max(1, Math.floor(readAtkWilPower(actor) * effect.payload.amount + readShieldAmount(actor) * Number(effect.payload.shieldRatio ?? 0)));
+        const attacker = { iid: actor.iid ?? actor.id, currentHp: Number(actor.hp ?? 0), maxHp: Number(actor.hpMax ?? 1), arm: Number(actor.arm ?? 0), res: Number(actor.res ?? 0) };
+        const defender = { iid: target.iid ?? target.id, currentHp: Number(target.hp ?? 0), maxHp: Number(target.hpMax ?? 1), arm: Number(target.arm ?? 0), res: Number(target.res ?? 0) };
+        const resolution = resolveDamageBatch({ identity: actionIdentity, source, packets: [{ packetId: `${String(actionIdentity.actionId)}:${String(target.iid ?? target.id)}:${effect.type}:${nextCanonicalPacketSerial(game)}`, actionId: actionIdentity.actionId, chainId: actionIdentity.chainId, source, targetIid: target.iid ?? target.id, damageType: effect.type === 'reflect-damage' ? 'reflected' : effect.payload.damageType, declaredDamage: amount, tags: [], isDot: false, isReflect: effect.type === 'reflect-damage', isFollowup: false, isCounter: false, reactionDepth: 0, pierceShield: effect.payload.damageType === 'true', packetSerial: 1 }], contexts: [{ attacker, defender, defensePenetration: { flat: 0, percent: 0 }, defenseModifiers: { flat: 0, percent: 0 }, outgoingModifiers: [1], incomingModifiers: [1], genericDamageReduction: 0, reflectDamageReduction: 0, shield: { shieldBefore: readShieldAmount(target) } }], targets: [{ ...defender, rawCurrentHp: Number(target.hp ?? 0), rawMaxHp: Number(target.hpMax ?? 1), trueSelfId: target.trueSelfId ?? null, lifeSerial: Number(target.lifeSerial ?? 1), slot: 0, weight: 1, capRatio: null }], shieldSnapshot: readShieldAmount(target), specialMitigation: null, batchPolicy: 'single', sharedHpPolicy: null });
+        const committed = commitDamageBatch(game, resolution, [target]);
+        for (const item of committed.commits) if (item.reachedZero) createHpZeroCandidate(game, target, actionIdentity, source, effect.type === 'reflect-damage' ? 'reflected' : 'damage', item.hpDamage, 0);
+      }
+      return eventState(game);
+    },
     healingGateway(effect: any) { for (const target of targets) commitHealing(game, target, resolveHealing(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)), sourceFor(actor)), identity(game)); return eventState(game); },
     shieldGateway(effect: any) { for (const target of targets) grantShield(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount))); return eventState(game); },
     hpMutationGateway(effect: any) { for (const target of targets) { const mutation = resolveHpLoss(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)), 'hp-cost', sourceFor(actor), false); if (!mutation.succeeded) throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, target, mutation, identity(game)); } return eventState(game); },
