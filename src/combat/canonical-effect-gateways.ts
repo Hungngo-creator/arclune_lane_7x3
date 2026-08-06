@@ -1,4 +1,4 @@
-import { globalAetherPool } from '../aether.ts';
+import { getSessionAether } from '../aether.ts';
 import { cellReserved, slotToCell } from '../engine.ts';
 import { Statuses } from '../statuses.ts';
 import { enqueueImmediate } from '../summon.ts';
@@ -11,13 +11,15 @@ import type { ActionCostReservation } from './kernel/action-transaction.ts';
 import type { ExecutableActionDefinition } from './executable-character-definition.ts';
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
-import { furyValue, setFury, spendFury } from '../utils/fury.ts';
+import { furyValue, spendFury } from '../utils/fury.ts';
 
 type CanonicalDamageOwner = (game: SessionState, actor: UnitToken, target: UnitToken, options: { base: number; dtype: string; attackType: string; actionIdentity: NonNullable<ReturnType<typeof identity>> }) => unknown;
-const damageOwnerRegistry = globalThis as typeof globalThis & { __arcluneCanonicalDamageOwner?: CanonicalDamageOwner };
+// `var` is intentional: combat.ts registers through an import cycle while this module is
+// evaluating. Module-private storage avoids both a TDZ and the former globalThis escape.
+var canonicalDamageOwner: CanonicalDamageOwner | undefined;
 export function registerCanonicalDamageOwner(owner: CanonicalDamageOwner): void {
-  if (damageOwnerRegistry.__arcluneCanonicalDamageOwner && damageOwnerRegistry.__arcluneCanonicalDamageOwner !== owner) throw new Error('[canonical-effect] duplicate damage owner');
-  damageOwnerRegistry.__arcluneCanonicalDamageOwner = owner;
+  if (canonicalDamageOwner && canonicalDamageOwner !== owner) throw new Error('[canonical-effect] duplicate damage owner');
+  canonicalDamageOwner = owner;
 }
 
 const committedMutationState = (game: SessionState): { eventSerial: number; stateRevision: number } => {
@@ -45,7 +47,7 @@ function firstOpenSlot(game: SessionState, side: UnitToken['side']): number | nu
 
 export function validateCanonicalEffectPreparation(game: SessionState, actor: UnitToken, effect: EffectSpec, targets: readonly UnitToken[]): boolean {
   if (!targets.length || targets.some(target => !target.alive)) return false;
-  if (effect.type === 'spend-resource') return effect.payload.resource !== 'aether' || globalAetherPool.current(actor.side) >= Math.max(0, toRoundedInt(effect.payload.amount, 0));
+  if (effect.type === 'spend-resource') return effect.payload.resource !== 'aether' || getSessionAether(game).current(actor.side) >= Math.max(0, toRoundedInt(effect.payload.amount, 0));
   if (effect.type === 'pay-hp-cost') return targets.every(target => Number(target.hp ?? 0) > Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)));
   if (effect.type === 'summon') return firstOpenSlot(game, actor.side) !== null;
   return true;
@@ -53,9 +55,9 @@ export function validateCanonicalEffectPreparation(game: SessionState, actor: Un
 
 export function reserveCanonicalActionCosts(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition): readonly ActionCostReservation[] {
   const reservations: ActionCostReservation[] = [];
-  if (action.cost.aether) reservations.push({ id: `${action.actionId}:aether`, validate: () => globalAetherPool.current(actor.side) >= (action.cost.aether ?? 0), commit: () => { if (!globalAetherPool.consume(actor.side, action.cost.aether ?? 0)) throw new Error('[canonical-action] insufficient aether'); }, rollback: () => globalAetherPool.gain(actor.side, action.cost.aether ?? 0), release: () => {} });
-  if (action.cost.fury) reservations.push({ id: `${action.actionId}:fury`, validate: () => furyValue(actor) >= (action.cost.fury ?? 0), commit: () => { if (spendFury(actor, action.cost.fury ?? 0) !== action.cost.fury) throw new Error('[canonical-action] insufficient fury'); }, rollback: () => { setFury(actor, furyValue(actor) + (action.cost.fury ?? 0)); }, release: () => {} });
-  if (action.cost.hp) reservations.push({ id: `${action.actionId}:hp`, validate: () => Number(actor.hp ?? 0) > Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), commit: () => { const mutation = resolveHpLoss(actor, Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), 'hp-cost', sourceFor(actor), false); if (!mutation.succeeded) throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, actor, mutation, identity(game)); }, rollback: () => { actor.hp = Math.min(Number(actor.hpMax ?? 1), Number(actor.hp ?? 0) + Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0))); }, release: () => {} });
+  if (action.cost.aether) reservations.push({ id: `${action.actionId}:aether`, validate: () => getSessionAether(game).current(actor.side) >= (action.cost.aether ?? 0), commit: () => { if (!getSessionAether(game).consume(actor.side, action.cost.aether ?? 0)) throw new Error('[canonical-action] insufficient aether'); }, rollback: () => { throw new Error('[canonical-action] committed AE cannot be rolled back independently'); }, release: () => {} });
+  if (action.cost.fury) reservations.push({ id: `${action.actionId}:fury`, validate: () => furyValue(actor) >= (action.cost.fury ?? 0), commit: () => { if (spendFury(actor, action.cost.fury ?? 0) !== action.cost.fury) throw new Error('[canonical-action] insufficient fury'); }, rollback: () => { throw new Error('[canonical-action] committed Fury cannot be rolled back independently'); }, release: () => {} });
+  if (action.cost.hp) reservations.push({ id: `${action.actionId}:hp`, validate: () => Number(actor.hp ?? 0) > Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), commit: () => { const mutation = resolveHpLoss(actor, Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), 'hp-cost', sourceFor(actor), false); if (!mutation.succeeded) throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, actor, mutation, identity(game)); }, rollback: () => { throw new Error('[canonical-action] committed HP cannot be rolled back independently'); }, release: () => {} });
   return reservations;
 }
 
@@ -64,8 +66,8 @@ export function createCanonicalEffectServices(game: SessionState, actor: UnitTok
     damageGateway(effect: EffectSpec & { type: 'deal-damage' | 'reflect-damage' }) {
       const actionIdentity = identity(game);
       if (!actionIdentity) throw new Error('[canonical-effect] damage requires an active action identity');
-      if (!damageOwnerRegistry.__arcluneCanonicalDamageOwner) throw new Error('[canonical-effect] production damage owner is not registered');
-      for (const target of targets) damageOwnerRegistry.__arcluneCanonicalDamageOwner(game, actor, target, {
+      if (!canonicalDamageOwner) throw new Error('[canonical-effect] production damage owner is not registered');
+      for (const target of targets) canonicalDamageOwner(game, actor, target, {
         base: Math.max(1, Math.floor(readAtkWilPower(actor) * effect.payload.amount + readShieldAmount(actor) * Number(effect.payload.shieldRatio ?? 0))),
         dtype: effect.payload.damageType === 'will' ? 'arcane' : effect.payload.damageType,
         attackType: effect.type === 'reflect-damage' ? 'reflect' : 'skill',
@@ -78,7 +80,7 @@ export function createCanonicalEffectServices(game: SessionState, actor: UnitTok
     hpMutationGateway(effect: EffectSpec & { type: 'pay-hp-cost' }) { for (const target of targets) { const mutation = resolveHpLoss(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)), 'hp-cost', sourceFor(actor), false); if (!mutation.succeeded) throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, target, mutation, identity(game)); } return committedMutationState(game); },
     lifecycleGateway() { throw new Error('[canonical-effect] lifecycle effect requires a production lifecycle coordinator route'); },
     statusGateway(effect: EffectSpec & { type: 'apply-status' | 'remove-status' | 'dispel' | 'grant-immunity' }) { if (effect.type === 'apply-status' || effect.type === 'grant-immunity') for (const target of targets) { if (effect.payload.statusType === 'shield:consume-current-ratio') { consumeShieldByCurrentRatio(target, Number(effect.payload.value ?? 0)); continue; } const statusId = effect.payload.statusType.startsWith('buff:') ? `chap_minh_ult_${effect.payload.statusType.slice(5)}_up` : effect.payload.statusType; Statuses.add(target, { id: statusId, kind: effect.type === 'grant-immunity' || effect.payload.statusType.startsWith('buff:') ? 'buff' : 'debuff', tag: effect.payload.statusType, dur: effect.payload.duration ?? 1, tick: 'turn', amount: effect.payload.value, sourceUnitId: actor.id }); } else throw new Error(`[canonical-effect] ${effect.type} requires a production status removal/dispel route`); return committedMutationState(game); },
-    resourceGateway(effect: EffectSpec & { type: 'spend-resource' | 'gain-resource' }) { const amount = Math.max(0, toRoundedInt(effect.payload.amount, 0)); if (effect.payload.resource !== 'aether') throw new Error('[canonical-effect] fury route requires personal resource gateway'); if (effect.type === 'spend-resource') { if (!globalAetherPool.consume(actor.side, amount)) throw new Error('[canonical-action] insufficient aether'); } else globalAetherPool.gain(actor.side, amount); return committedMutationState(game); },
+    resourceGateway(effect: EffectSpec & { type: 'spend-resource' | 'gain-resource' }) { const amount = Math.max(0, toRoundedInt(effect.payload.amount, 0)); if (effect.payload.resource !== 'aether') throw new Error('[canonical-effect] fury route requires personal resource gateway'); const ledger = getSessionAether(game); if (effect.type === 'spend-resource') { if (!ledger.consume(actor.side, amount)) throw new Error('[canonical-action] insufficient aether'); } else ledger.gain(actor.side, amount); return committedMutationState(game); },
     summonGateway(effect: EffectSpec & { type: 'summon' }) { const slot = firstOpenSlot(game, actor.side); if (!slot) throw new Error('[canonical-effect] no summon slot available'); enqueueImmediate(game, { side: actor.side, slot, unit: { id: effect.payload.definitionId, name: effect.payload.definitionId, ownerIid: actor.iid, isMinion: true, hpMax: Math.max(1, Math.floor((actor.hpMax ?? 100) * 0.5)), hp: Math.max(1, Math.floor((actor.hpMax ?? 100) * 0.5)), ttlTurns: 3 } }); return committedMutationState(game); },
     fieldGateway(effect: EffectSpec & { type: 'create-field' }) { ((game.runtime ??= {}) as { fields?: unknown[] }).fields ??= []; ((game.runtime as { fields: unknown[] }).fields).push({ fieldId: effect.payload.fieldId, sourceIid: actor.iid ?? actor.id, duration: effect.payload.duration ?? 2 }); return committedMutationState(game); },
     movementGateway(effect: EffectSpec & { type: 'move' }) { for (const target of targets) { target.cx = effect.payload.cx; target.cy = effect.payload.cy; } return committedMutationState(game); },

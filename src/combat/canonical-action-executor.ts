@@ -4,6 +4,7 @@ import { requireExecutableCharacterDefinition, type ExecutableActionDefinition }
 import { getSessionRandom } from './session-rng.ts';
 import { createCanonicalEffectServices, validateCanonicalEffectPreparation, reserveCanonicalActionCosts } from './canonical-effect-gateways.ts';
 import { createNaturalAction, currentActionExecution, executeActionTransaction, isCombatAlive } from './kernel/public.ts';
+import { getSessionAether } from '../aether.ts';
 import { slotIndex } from '../engine.ts';
 import { pickCombatTarget } from './target-resolver.ts';
 import type { SessionState } from '@shared-types/combat';
@@ -46,8 +47,17 @@ export function createTargetPlan(game: SessionState, actor: UnitToken, actionTar
     if (spec.kind === 'column') return candidates.filter(token => token.cx === anchor.cx);
     return candidates.filter(token => token.cx === anchor.cx || token.cy === anchor.cy);
   };
-  const actionTargets: readonly UnitToken[] = Object.freeze([...resolve(actionTarget)]);
-  return Object.freeze({ actionTargetIds: Object.freeze(actionTargets.map(token => token.iid ?? token.id)), resolve });
+  const cache = new Map<string, readonly UnitToken[]>();
+  const preparedResolve = (spec: TargetSpec): readonly UnitToken[] => {
+    const key = JSON.stringify(spec);
+    const existing = cache.get(key);
+    if (existing) return existing;
+    const targets = Object.freeze([...resolve(spec)]);
+    cache.set(key, targets);
+    return targets;
+  };
+  const actionTargets = preparedResolve(actionTarget);
+  return Object.freeze({ actionTargetIds: Object.freeze(actionTargets.map(token => token.iid ?? token.id)), resolve: preparedResolve });
 }
 
 function actionUsageKey(actor: UnitToken, action: ExecutableActionDefinition): string {
@@ -82,6 +92,29 @@ function validateConditions(game: SessionState, actor: UnitToken, action: Execut
   return true;
 }
 
+export interface ActionAvailabilityEntry {
+  readonly actionKey: CanonicalActionKey; readonly executableActionId: string | null;
+  readonly costs: Readonly<{ aether?: number; fury?: number; hp?: number }>;
+  readonly affordable: boolean; readonly legal: boolean; readonly blockedReason: 'missing-action' | 'dead-actor' | 'condition-blocked' | 'use-limit' | 'insufficient-cost' | 'no-legal-target' | null;
+  readonly hasLegalTarget: boolean; readonly metadataTags: readonly string[]; readonly effectTypes: readonly string[];
+  readonly actionClass: 'natural' | 'fury-ultimate' | 'linked-only';
+}
+
+/** Pure availability projection: no RNG, events, identities, reservations or mutation. */
+export function listActionAvailability(game: SessionState, actor: UnitToken): readonly ActionAvailabilityEntry[] {
+  const compiled = requireExecutableCharacterDefinition(actor.id);
+  const ledger = getSessionAether(game);
+  const livingEnemies = game.tokens.some(token => token.alive && token.side !== actor.side);
+  return (['basic','skill1','skill2','skill3','ultimate'] as const).map(actionKey => {
+    const action = actionByKey(compiled, actionKey);
+    if (!action) return Object.freeze({ actionKey, executableActionId: null, costs: {}, affordable: false, legal: false, blockedReason: 'missing-action' as const, hasLegalTarget: false, metadataTags: [], effectTypes: [], actionClass: 'natural' as const });
+    const affordable = ledger.current(actor.side) >= (action.cost.aether ?? 0) && Number(actor.fury ?? 0) >= (action.cost.fury ?? 0) && Number(actor.hp ?? 0) > Math.floor(Number(actor.hpMax ?? 1) * (action.cost.hp ?? 0));
+    const hasLegalTarget = action.target.kind === 'self' ? actor.alive : livingEnemies || !('side' in action.target) || action.target.side === 'ally';
+    const blockedReason = !actor.alive ? 'dead-actor' : !validateConditions(game, actor, action) ? 'condition-blocked' : !validateActionUsageLimit(game, actor, action) ? 'use-limit' : !affordable ? 'insufficient-cost' : !hasLegalTarget ? 'no-legal-target' : null;
+    return Object.freeze({ actionKey, executableActionId: action.actionId, costs: action.cost, affordable, legal: blockedReason === null, blockedReason, hasLegalTarget, metadataTags: action.metadataTags, effectTypes: action.effects.map(effect => effect.type), actionClass: actionKey === 'ultimate' && action.cost.fury ? 'fury-ultimate' as const : 'natural' as const });
+  });
+}
+
 function prepareEffects(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition, plan: TargetPlan): { readonly effect: EffectSpec; readonly targets: readonly UnitToken[] }[] | null {
   const prepared = action.effects.map(effect => {
     validateEffectSpec(effect, actor.id, action.actionId);
@@ -100,6 +133,11 @@ if (currentActionExecution(game)) throw new Error('[canonical-action] nested cas
   const costReservations = reserveCanonicalActionCosts(game, actor, action);
   if (!costReservations.every(item => item.validate())) { costReservations.forEach(item => item.release()); return { ok: false, receipts: [], targetCount: 0, reason: 'insufficient-cost' }; }
   const receipts: EffectCommitReceipt[] = [];
+  const actorLifeSerial = actor.lifeSerial;
+  const preparedTargets = prepared.flatMap(item => item.targets);
+  const preparedStateIsCurrent = (): boolean => actor.lifeSerial === actorLifeSerial
+    && game.tokens.includes(actor)
+    && preparedTargets.every(target => game.tokens.includes(target) && target.alive);
   let maxTargets = 0;
   const run = () => {
     for (const item of prepared) {
@@ -111,7 +149,7 @@ if (currentActionExecution(game)) throw new Error('[canonical-action] nested cas
     return { ok: true, receipts, targetCount: maxTargets };
   };
   const identity = createNaturalAction(game, action.actionId === `${actor.id}:ultimate` ? 'ultimate' : action.actionId === `${actor.id}:basic` ? 'basic' : 'active-skill');
-  const transaction = executeActionTransaction({ game, identity, actor, targets: targetPlan.resolve(action.target).slice(0, 1), validateActor: () => actor.alive && validateConditions(game, actor, action), validateTargets: () => prepared.length > 0, reserveCosts: () => costReservations, resolvePayload: run });
+  const transaction = executeActionTransaction({ game, identity, actor, targets: targetPlan.resolve(action.target).slice(0, 1), validateActor: () => actor.alive && actor.lifeSerial === actorLifeSerial && game.tokens.includes(actor) && validateConditions(game, actor, action), validateTargets: () => prepared.length > 0 && preparedStateIsCurrent(), reserveCosts: () => costReservations, resolvePayload: run });
   return transaction.payload ? { ...transaction.payload, actionId: identity.actionId, finalization: transaction.finalization } : { ok: false, receipts: [], targetCount: 0, reason: transaction.reason === 'insufficient-cost' ? 'insufficient-cost' : 'blocked' };
 }
 

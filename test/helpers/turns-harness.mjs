@@ -59,6 +59,7 @@ export async function loadTurnsHarness(overrides = {}){
 } from './leader-uyen.ts';`, "const { isAnyLeaderUltReady, isUyenLeader, grantUyenSummonRage, hasQueuedUyenUlt, clearQueuedUyenUlt } = __deps['./leader-uyen.ts'];"],
     ["import { slotToCell, slotIndex } from './engine.ts';", "const { slotToCell, slotIndex } = __deps['./engine.js'];"],
     ["import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';", "const { globalAetherPool, resolveActionAetherRegen } = __deps['./aether.ts'];"],
+    ["import { getSessionAether, resolveActionAetherRegen } from './aether.ts';", "const { getSessionAether, resolveActionAetherRegen } = __deps['./aether.ts'];"],
     ["import { globalAetherPool } from './aether.ts';", "const { globalAetherPool } = __deps['./aether.ts'];"],
     ["import { Statuses } from './statuses.ts';", "const { Statuses } = __deps['./statuses.ts'];"],
     ["import { isCombatAlive, markRemoved } from './combat/kernel/life-cycle.ts';", "const { isCombatAlive, markRemoved } = __deps['./combat/kernel/life-cycle.ts'];"],
@@ -162,6 +163,7 @@ export async function loadTurnsHarness(overrides = {}){
         current(){ return 0; },
       },
       resolveActionAetherRegen(){ return 5; },
+      getSessionAether(){ return { gain(){}, consume(){ return true; }, current(){ return 0; }, maximum(){ return 0; }, reconcile(){} }; },
     },
     './ai.ts': {
       evaluateGambitLogic(){ return { action: null, slotIndex: -1, reason: 'noMatch' }; }

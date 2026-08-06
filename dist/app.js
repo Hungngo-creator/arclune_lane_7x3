@@ -268,6 +268,35 @@ __modules['./aether.ts'] = (exports, module, __require) => {
       return AE_ACTION_REGEN_BY_CLASS[className]
           ?? AE_ACTION_REGEN_BY_CLASS.Warrior;
   }
+  const sessionLedgers = new WeakMap();
+  /** Authoritative AE belongs to a combat session and never touches the DOM. */
+  function getSessionAether(game) {
+      const owner = game;
+      const existing = sessionLedgers.get(owner);
+      if (existing)
+          return existing;
+      const values = {
+          ally: { current: 0, max: 0 }, enemy: { current: 0, max: 0 },
+      };
+      const calculateMax = (units, side) => Math.floor(units.reduce((sum, unit) => sum + (unit.alive && unit.side === side ? Math.max(0, Number(unit.aeMax ?? 0)) : 0), 0));
+      for (const side of ['ally', 'enemy']) {
+          values[side].max = calculateMax(game.tokens, side);
+          values[side].current = Math.floor(values[side].max / 2);
+      }
+      const ledger = Object.freeze({
+          current: (side) => values[side].current,
+          maximum: (side) => values[side].max,
+          gain(side, amount) { const state = values[side]; state.current = clamp(state.current + Math.max(0, amount), 0, state.max); return state.current; },
+          consume(side, amount) { const cost = Math.max(0, amount); if (values[side].current < cost)
+              return false; values[side].current -= cost; return true; },
+          reconcile(units) { for (const side of ['ally', 'enemy']) {
+              values[side].max = calculateMax(units, side);
+              values[side].current = clamp(values[side].current, 0, values[side].max);
+          } },
+      });
+      sessionLedgers.set(owner, ledger);
+      return ledger;
+  }
   const globalAetherPool = {
       init: (units) => {
           allyAetherPool.destroyUI();
@@ -310,6 +339,7 @@ __modules['./aether.ts'] = (exports, module, __require) => {
   if (!Object.prototype.hasOwnProperty.call(exports, 'AE_ACTION_REGEN_BY_CLASS')) exports.AE_ACTION_REGEN_BY_CLASS = AE_ACTION_REGEN_BY_CLASS;
   if (!Object.prototype.hasOwnProperty.call(exports, 'globalAetherPool')) exports.globalAetherPool = globalAetherPool;
   if (!Object.prototype.hasOwnProperty.call(exports, 'resolveActionAetherRegen')) exports.resolveActionAetherRegen = resolveActionAetherRegen;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'getSessionAether')) exports.getSessionAether = getSessionAether;
   if (!Object.prototype.hasOwnProperty.call(exports, 'SharedAetherPool')) exports.SharedAetherPool = SharedAetherPool;
 };
 __modules['./ai.ts'] = (exports, module, __require) => {
@@ -5660,10 +5690,12 @@ __modules['./combat/canonical-action-executor.ts'] = (exports, module, __require
   const currentActionExecution = __dep5.currentActionExecution;
   const executeActionTransaction = __dep5.executeActionTransaction;
   const isCombatAlive = __dep5.isCombatAlive;
-  const __dep6 = __require('./engine.ts');
-  const slotIndex = __dep6.slotIndex;
-  const __dep7 = __require('./combat/target-resolver.ts');
-  const pickCombatTarget = __dep7.pickCombatTarget;
+  const __dep6 = __require('./aether.ts');
+  const getSessionAether = __dep6.getSessionAether;
+  const __dep7 = __require('./engine.ts');
+  const slotIndex = __dep7.slotIndex;
+  const __dep8 = __require('./combat/target-resolver.ts');
+  const pickCombatTarget = __dep8.pickCombatTarget;
   const EMPTY = [];
   /** Builds the immutable target plan once, before any action cost is committed. */
   function createTargetPlan(game, actor, actionTarget) {
@@ -5707,8 +5739,18 @@ __modules['./combat/canonical-action-executor.ts'] = (exports, module, __require
               return candidates.filter(token => token.cx === anchor.cx);
           return candidates.filter(token => token.cx === anchor.cx || token.cy === anchor.cy);
       };
-      const actionTargets = Object.freeze([...resolve(actionTarget)]);
-      return Object.freeze({ actionTargetIds: Object.freeze(actionTargets.map(token => token.iid ?? token.id)), resolve });
+      const cache = new Map();
+      const preparedResolve = (spec) => {
+          const key = JSON.stringify(spec);
+          const existing = cache.get(key);
+          if (existing)
+              return existing;
+          const targets = Object.freeze([...resolve(spec)]);
+          cache.set(key, targets);
+          return targets;
+      };
+      const actionTargets = preparedResolve(actionTarget);
+      return Object.freeze({ actionTargetIds: Object.freeze(actionTargets.map(token => token.iid ?? token.id)), resolve: preparedResolve });
   }
   function actionUsageKey(actor, action) {
       return `${actor.iid ?? actor.id}:${action.actionId}`;
@@ -5742,6 +5784,21 @@ __modules['./combat/canonical-action-executor.ts'] = (exports, module, __require
       }
       return true;
   }
+  /** Pure availability projection: no RNG, events, identities, reservations or mutation. */
+  function listActionAvailability(game, actor) {
+      const compiled = requireExecutableCharacterDefinition(actor.id);
+      const ledger = getSessionAether(game);
+      const livingEnemies = game.tokens.some(token => token.alive && token.side !== actor.side);
+      return ['basic', 'skill1', 'skill2', 'skill3', 'ultimate'].map(actionKey => {
+          const action = actionByKey(compiled, actionKey);
+          if (!action)
+              return Object.freeze({ actionKey, executableActionId: null, costs: {}, affordable: false, legal: false, blockedReason: 'missing-action', hasLegalTarget: false, metadataTags: [], effectTypes: [], actionClass: 'natural' });
+          const affordable = ledger.current(actor.side) >= (action.cost.aether ?? 0) && Number(actor.fury ?? 0) >= (action.cost.fury ?? 0) && Number(actor.hp ?? 0) > Math.floor(Number(actor.hpMax ?? 1) * (action.cost.hp ?? 0));
+          const hasLegalTarget = action.target.kind === 'self' ? actor.alive : livingEnemies || !('side' in action.target) || action.target.side === 'ally';
+          const blockedReason = !actor.alive ? 'dead-actor' : !validateConditions(game, actor, action) ? 'condition-blocked' : !validateActionUsageLimit(game, actor, action) ? 'use-limit' : !affordable ? 'insufficient-cost' : !hasLegalTarget ? 'no-legal-target' : null;
+          return Object.freeze({ actionKey, executableActionId: action.actionId, costs: action.cost, affordable, legal: blockedReason === null, blockedReason, hasLegalTarget, metadataTags: action.metadataTags, effectTypes: action.effects.map(effect => effect.type), actionClass: actionKey === 'ultimate' && action.cost.fury ? 'fury-ultimate' : 'natural' });
+      });
+  }
   function prepareEffects(game, actor, action, plan) {
       const prepared = action.effects.map(effect => {
           validateEffectSpec(effect, actor.id, action.actionId);
@@ -5765,6 +5822,11 @@ __modules['./combat/canonical-action-executor.ts'] = (exports, module, __require
           return { ok: false, receipts: [], targetCount: 0, reason: 'insufficient-cost' };
       }
       const receipts = [];
+      const actorLifeSerial = actor.lifeSerial;
+      const preparedTargets = prepared.flatMap(item => item.targets);
+      const preparedStateIsCurrent = () => actor.lifeSerial === actorLifeSerial
+          && game.tokens.includes(actor)
+          && preparedTargets.every(target => game.tokens.includes(target) && target.alive);
       let maxTargets = 0;
       const run = () => {
           for (const item of prepared) {
@@ -5776,7 +5838,7 @@ __modules['./combat/canonical-action-executor.ts'] = (exports, module, __require
           return { ok: true, receipts, targetCount: maxTargets };
       };
       const identity = createNaturalAction(game, action.actionId === `${actor.id}:ultimate` ? 'ultimate' : action.actionId === `${actor.id}:basic` ? 'basic' : 'active-skill');
-      const transaction = executeActionTransaction({ game, identity, actor, targets: targetPlan.resolve(action.target).slice(0, 1), validateActor: () => actor.alive && validateConditions(game, actor, action), validateTargets: () => prepared.length > 0, reserveCosts: () => costReservations, resolvePayload: run });
+      const transaction = executeActionTransaction({ game, identity, actor, targets: targetPlan.resolve(action.target).slice(0, 1), validateActor: () => actor.alive && actor.lifeSerial === actorLifeSerial && game.tokens.includes(actor) && validateConditions(game, actor, action), validateTargets: () => prepared.length > 0 && preparedStateIsCurrent(), reserveCosts: () => costReservations, resolvePayload: run });
       return transaction.payload ? { ...transaction.payload, actionId: identity.actionId, finalization: transaction.finalization } : { ok: false, receipts: [], targetCount: 0, reason: transaction.reason === 'insufficient-cost' ? 'insufficient-cost' : 'blocked' };
   }
   function performCanonicalActiveSkill(game, caster, skillKey, skill) {
@@ -5791,12 +5853,13 @@ __modules['./combat/canonical-action-executor.ts'] = (exports, module, __require
   }
   //# sourceMappingURL=canonical-action-executor.js.map
   if (!Object.prototype.hasOwnProperty.call(exports, 'createTargetPlan')) exports.createTargetPlan = createTargetPlan;
+  if (!Object.prototype.hasOwnProperty.call(exports, 'listActionAvailability')) exports.listActionAvailability = listActionAvailability;
   if (!Object.prototype.hasOwnProperty.call(exports, 'executeCanonicalAction')) exports.executeCanonicalAction = executeCanonicalAction;
   if (!Object.prototype.hasOwnProperty.call(exports, 'performCanonicalActiveSkill')) exports.performCanonicalActiveSkill = performCanonicalActiveSkill;
 };
 __modules['./combat/canonical-effect-gateways.ts'] = (exports, module, __require) => {
   const __dep0 = __require('./aether.ts');
-  const globalAetherPool = __dep0.globalAetherPool;
+  const getSessionAether = __dep0.getSessionAether;
   const __dep1 = __require('./engine.ts');
   const cellReserved = __dep1.cellReserved;
   const slotToCell = __dep1.slotToCell;
@@ -5823,13 +5886,14 @@ __modules['./combat/canonical-effect-gateways.ts'] = (exports, module, __require
   const toRoundedInt = __dep8.toRoundedInt;
   const __dep9 = __require('./utils/fury.ts');
   const furyValue = __dep9.furyValue;
-  const setFury = __dep9.setFury;
   const spendFury = __dep9.spendFury;
-  const damageOwnerRegistry = globalThis;
+  // `var` is intentional: combat.ts registers through an import cycle while this module is
+  // evaluating. Module-private storage avoids both a TDZ and the former globalThis escape.
+  var canonicalDamageOwner;
   function registerCanonicalDamageOwner(owner) {
-      if (damageOwnerRegistry.__arcluneCanonicalDamageOwner && damageOwnerRegistry.__arcluneCanonicalDamageOwner !== owner)
+      if (canonicalDamageOwner && canonicalDamageOwner !== owner)
           throw new Error('[canonical-effect] duplicate damage owner');
-      damageOwnerRegistry.__arcluneCanonicalDamageOwner = owner;
+      canonicalDamageOwner = owner;
   }
   const committedMutationState = (game) => {
       const eventSerial = Number(((game.runtime ?? {}).combatSequence ?? {}).eventSerial ?? 0);
@@ -5859,7 +5923,7 @@ __modules['./combat/canonical-effect-gateways.ts'] = (exports, module, __require
       if (!targets.length || targets.some(target => !target.alive))
           return false;
       if (effect.type === 'spend-resource')
-          return effect.payload.resource !== 'aether' || globalAetherPool.current(actor.side) >= Math.max(0, toRoundedInt(effect.payload.amount, 0));
+          return effect.payload.resource !== 'aether' || getSessionAether(game).current(actor.side) >= Math.max(0, toRoundedInt(effect.payload.amount, 0));
       if (effect.type === 'pay-hp-cost')
           return targets.every(target => Number(target.hp ?? 0) > Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)));
       if (effect.type === 'summon')
@@ -5869,14 +5933,14 @@ __modules['./combat/canonical-effect-gateways.ts'] = (exports, module, __require
   function reserveCanonicalActionCosts(game, actor, action) {
       const reservations = [];
       if (action.cost.aether)
-          reservations.push({ id: `${action.actionId}:aether`, validate: () => globalAetherPool.current(actor.side) >= (action.cost.aether ?? 0), commit: () => { if (!globalAetherPool.consume(actor.side, action.cost.aether ?? 0))
-                  throw new Error('[canonical-action] insufficient aether'); }, rollback: () => globalAetherPool.gain(actor.side, action.cost.aether ?? 0), release: () => { } });
+          reservations.push({ id: `${action.actionId}:aether`, validate: () => getSessionAether(game).current(actor.side) >= (action.cost.aether ?? 0), commit: () => { if (!getSessionAether(game).consume(actor.side, action.cost.aether ?? 0))
+                  throw new Error('[canonical-action] insufficient aether'); }, rollback: () => { throw new Error('[canonical-action] committed AE cannot be rolled back independently'); }, release: () => { } });
       if (action.cost.fury)
           reservations.push({ id: `${action.actionId}:fury`, validate: () => furyValue(actor) >= (action.cost.fury ?? 0), commit: () => { if (spendFury(actor, action.cost.fury ?? 0) !== action.cost.fury)
-                  throw new Error('[canonical-action] insufficient fury'); }, rollback: () => { setFury(actor, furyValue(actor) + (action.cost.fury ?? 0)); }, release: () => { } });
+                  throw new Error('[canonical-action] insufficient fury'); }, rollback: () => { throw new Error('[canonical-action] committed Fury cannot be rolled back independently'); }, release: () => { } });
       if (action.cost.hp)
           reservations.push({ id: `${action.actionId}:hp`, validate: () => Number(actor.hp ?? 0) > Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), commit: () => { const mutation = resolveHpLoss(actor, Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), 'hp-cost', sourceFor(actor), false); if (!mutation.succeeded)
-                  throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, actor, mutation, identity(game)); }, rollback: () => { actor.hp = Math.min(Number(actor.hpMax ?? 1), Number(actor.hp ?? 0) + Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0))); }, release: () => { } });
+                  throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, actor, mutation, identity(game)); }, rollback: () => { throw new Error('[canonical-action] committed HP cannot be rolled back independently'); }, release: () => { } });
       return reservations;
   }
   function createCanonicalEffectServices(game, actor, targets) {
@@ -5885,10 +5949,10 @@ __modules['./combat/canonical-effect-gateways.ts'] = (exports, module, __require
               const actionIdentity = identity(game);
               if (!actionIdentity)
                   throw new Error('[canonical-effect] damage requires an active action identity');
-              if (!damageOwnerRegistry.__arcluneCanonicalDamageOwner)
+              if (!canonicalDamageOwner)
                   throw new Error('[canonical-effect] production damage owner is not registered');
               for (const target of targets)
-                  damageOwnerRegistry.__arcluneCanonicalDamageOwner(game, actor, target, {
+                  canonicalDamageOwner(game, actor, target, {
                       base: Math.max(1, Math.floor(readAtkWilPower(actor) * effect.payload.amount + readShieldAmount(actor) * Number(effect.payload.shieldRatio ?? 0))),
                       dtype: effect.payload.damageType === 'will' ? 'arcane' : effect.payload.damageType,
                       attackType: effect.type === 'reflect-damage' ? 'reflect' : 'skill',
@@ -5919,12 +5983,12 @@ __modules['./combat/canonical-effect-gateways.ts'] = (exports, module, __require
           else
               throw new Error(`[canonical-effect] ${effect.type} requires a production status removal/dispel route`); return committedMutationState(game); },
           resourceGateway(effect) { const amount = Math.max(0, toRoundedInt(effect.payload.amount, 0)); if (effect.payload.resource !== 'aether')
-              throw new Error('[canonical-effect] fury route requires personal resource gateway'); if (effect.type === 'spend-resource') {
-              if (!globalAetherPool.consume(actor.side, amount))
+              throw new Error('[canonical-effect] fury route requires personal resource gateway'); const ledger = getSessionAether(game); if (effect.type === 'spend-resource') {
+              if (!ledger.consume(actor.side, amount))
                   throw new Error('[canonical-action] insufficient aether');
           }
           else
-              globalAetherPool.gain(actor.side, amount); return committedMutationState(game); },
+              ledger.gain(actor.side, amount); return committedMutationState(game); },
           summonGateway(effect) { const slot = firstOpenSlot(game, actor.side); if (!slot)
               throw new Error('[canonical-effect] no summon slot available'); enqueueImmediate(game, { side: actor.side, slot, unit: { id: effect.payload.definitionId, name: effect.payload.definitionId, ownerIid: actor.iid, isMinion: true, hpMax: Math.max(1, Math.floor((actor.hpMax ?? 100) * 0.5)), hp: Math.max(1, Math.floor((actor.hpMax ?? 100) * 0.5)), ttlTurns: 3 } }); return committedMutationState(game); },
           fieldGateway(effect) { (game.runtime ??= {}).fields ??= []; (game.runtime.fields).push({ fieldId: effect.payload.fieldId, sourceIid: actor.iid ?? actor.id, duration: effect.payload.duration ?? 2 }); return committedMutationState(game); },
@@ -6800,15 +6864,12 @@ __modules['./combat/kernel/action-transaction.ts'] = (exports, module, __require
       }
       stage = 'COST_RESERVE';
       let context = null;
-      const committed = [];
       try {
           stage = 'ACTION_START';
           context = beginActionExecution(command.game, command.identity);
           stage = 'COST_COMMIT';
-          for (const reservation of reservations) {
+          for (const reservation of reservations)
               reservation.commit();
-              committed.push(reservation);
-          }
           stage = 'PAYLOAD_RESOLVE';
           const payload = command.resolvePayload();
           stage = 'ACTION_COMMIT';
@@ -6823,8 +6884,8 @@ __modules['./combat/kernel/action-transaction.ts'] = (exports, module, __require
       catch (error) {
           if (context)
               endActionExecution(command.game, context);
-          for (const reservation of committed.reverse())
-              reservation.rollback();
+          // Programming faults fail closed. Costs remain committed because payload owners may
+          // already have committed authoritative state; resource-only rollback is not atomic.
           reservations.forEach(item => item.release());
           throw error;
       }
@@ -44667,7 +44728,7 @@ __modules['./summon.ts'] = (exports, module, __require) => {
 __modules['./turns.ts'] = (exports, module, __require) => {
   //home (termux)/arclune_lane_7x3/src/turn.ts
   const __dep0 = __require('./aether.ts');
-  const globalAetherPool = __dep0.globalAetherPool;
+  const getSessionAether = __dep0.getSessionAether;
   const resolveActionAetherRegen = __dep0.resolveActionAetherRegen;
   const __dep1 = __require('./engine.ts');
   const slotToCell = __dep1.slotToCell;
@@ -44678,9 +44739,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
   const isCombatAlive = __dep3.isCombatAlive;
   const markRemoved = __dep3.markRemoved;
   const __dep4 = __require('./combat/kernel/index.ts');
-  const createNaturalAction = __dep4.createNaturalAction;
   const ensureCombatIdentity = __dep4.ensureCombatIdentity;
-  const withActionExecution = __dep4.withActionExecution;
   const __dep5 = __require('./combat/kernel/delayed-revive.ts');
   const emitSsiTemporalEvent = __dep5.emitSsiTemporalEvent;
   const __dep6 = __require('./combat.ts');
@@ -44968,7 +45027,7 @@ __modules['./turns.ts'] = (exports, module, __require) => {
       const className = normalizeClassName(Game.meta?.get(unit.id)?.class) ?? null;
       const amount = resolveActionAetherRegen(className);
       if (amount > 0) {
-          globalAetherPool.gain(unit.side, amount);
+          getSessionAether(Game).gain(unit.side, amount);
       }
       return amount;
   }
@@ -45494,10 +45553,9 @@ __modules['./turns.ts'] = (exports, module, __require) => {
               if (typeof performUlt !== 'function') {
                   throw new Error('[turns] Ultimate runtime is unavailable');
               }
-              // Ultimate payloads (including HP costs) must run inside the same
-              // canonical root action boundary as basics.  Without this boundary Lôi
-              // Thiên Ảnh's canonical HP gateway correctly rejects its self cost.
-              withActionExecution(Game, createNaturalAction(Game, 'ult'), () => performUlt(unit));
+              // The production Ultimate callback enters the canonical transaction itself;
+              // turns.ts must not manufacture a competing root identity around it.
+              performUlt(unit);
               ultOk = true;
           }
           catch (e) {

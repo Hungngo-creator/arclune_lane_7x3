@@ -1,6 +1,7 @@
 //home (termux)/arclune_lane_7x3/src/aether.ts
 
-import type { UnitToken, Side } from './types/units'; // Import type chuẩn
+import type { UnitToken, Side } from './types/units';
+import type { SessionState } from './types/combat';
 
 type AetherViewport = 'mobile' | 'desktop';
 
@@ -301,6 +302,40 @@ export function resolveActionAetherRegen(className: string | null | undefined): 
   if (!className) return AE_ACTION_REGEN_BY_CLASS.Warrior;
   return AE_ACTION_REGEN_BY_CLASS[className as keyof typeof AE_ACTION_REGEN_BY_CLASS]
     ?? AE_ACTION_REGEN_BY_CLASS.Warrior;
+}
+
+export interface SessionAetherLedger {
+  current(side: Side): number;
+  maximum(side: Side): number;
+  gain(side: Side, amount: number): number;
+  consume(side: Side, amount: number): boolean;
+  reconcile(units: readonly UnitToken[]): void;
+}
+
+const sessionLedgers = new WeakMap<object, SessionAetherLedger>();
+
+/** Authoritative AE belongs to a combat session and never touches the DOM. */
+export function getSessionAether(game: SessionState): SessionAetherLedger {
+  const owner = game as object;
+  const existing = sessionLedgers.get(owner);
+  if (existing) return existing;
+  const values: Record<Side, { current: number; max: number }> = {
+    ally: { current: 0, max: 0 }, enemy: { current: 0, max: 0 },
+  };
+  const calculateMax = (units: readonly UnitToken[], side: Side): number => Math.floor(units.reduce((sum, unit) => sum + (unit.alive && unit.side === side ? Math.max(0, Number(unit.aeMax ?? 0)) : 0), 0));
+  for (const side of ['ally', 'enemy'] as const) {
+    values[side].max = calculateMax(game.tokens, side);
+    values[side].current = Math.floor(values[side].max / 2);
+  }
+  const ledger: SessionAetherLedger = Object.freeze({
+    current: (side: Side) => values[side].current,
+    maximum: (side: Side) => values[side].max,
+    gain(side: Side, amount: number) { const state = values[side]; state.current = clamp(state.current + Math.max(0, amount), 0, state.max); return state.current; },
+    consume(side: Side, amount: number) { const cost = Math.max(0, amount); if (values[side].current < cost) return false; values[side].current -= cost; return true; },
+    reconcile(units: readonly UnitToken[]) { for (const side of ['ally', 'enemy'] as const) { values[side].max = calculateMax(units, side); values[side].current = clamp(values[side].current, 0, values[side].max); } },
+  });
+  sessionLedgers.set(owner, ledger);
+  return ledger;
 }
 
 export const globalAetherPool = {

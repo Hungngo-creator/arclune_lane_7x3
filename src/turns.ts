@@ -1,10 +1,10 @@
 //home (termux)/arclune_lane_7x3/src/turn.ts
 
-import { globalAetherPool, resolveActionAetherRegen } from './aether.ts';
+import { getSessionAether, resolveActionAetherRegen } from './aether.ts';
 import { slotToCell, slotIndex } from './engine.ts';
 import { Statuses } from './statuses.ts';
 import { isCombatAlive, markRemoved } from './combat/kernel/life-cycle.ts';
-import { createNaturalAction, ensureCombatIdentity, withActionExecution } from './combat/kernel/index.ts';
+import { ensureCombatIdentity } from './combat/kernel/index.ts';
 import { emitSsiTemporalEvent } from './combat/kernel/delayed-revive.ts';
 
 import { doBasicWithFollowups, healUnit } from './combat.ts';
@@ -300,7 +300,7 @@ function grantActionAether(Game: SessionState, unit: UnitToken | null | undefine
   const className = normalizeClassName(Game.meta?.get(unit.id)?.class) ?? null;
   const amount = resolveActionAetherRegen(className);
   if (amount > 0){
-    globalAetherPool.gain(unit.side, amount);
+    getSessionAether(Game).gain(unit.side, amount);
   }
   return amount;
 }
@@ -925,10 +925,9 @@ export function doActionOrSkip(
       if (typeof performUlt !== 'function') {
         throw new Error('[turns] Ultimate runtime is unavailable');
       }
-      // Ultimate payloads (including HP costs) must run inside the same
-      // canonical root action boundary as basics.  Without this boundary Lôi
-      // Thiên Ảnh's canonical HP gateway correctly rejects its self cost.
-      withActionExecution(Game, createNaturalAction(Game, 'ult'), () => performUlt(unit));
+      // The production Ultimate callback enters the canonical transaction itself;
+      // turns.ts must not manufacture a competing root identity around it.
+      performUlt(unit);
       ultOk = true;
     } catch (e){
       recordCombatActionFault(Game, unit, e);

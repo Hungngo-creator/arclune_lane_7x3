@@ -29,11 +29,10 @@ export function executeActionTransaction<T>(command: ActionTransactionCommand<T>
   if (!reservations.every(item => item.validate())) { reservations.forEach(item => item.release()); return { ok: false, stage, reason: 'insufficient-cost' }; }
   stage = 'COST_RESERVE';
   let context: ReturnType<typeof beginActionExecution> | null = null;
-  const committed: ActionCostReservation[] = [];
   try {
     stage = 'ACTION_START'; context = beginActionExecution(command.game, command.identity);
     stage = 'COST_COMMIT';
-    for (const reservation of reservations) { reservation.commit(); committed.push(reservation); }
+    for (const reservation of reservations) reservation.commit();
     stage = 'PAYLOAD_RESOLVE'; const payload = command.resolvePayload();
     stage = 'ACTION_COMMIT'; command.commitAction?.(payload); publish();
     const finalization = finalizeCombatAction(command.game, context); endActionExecution(command.game, context); context = null;
@@ -41,7 +40,8 @@ export function executeActionTransaction<T>(command: ActionTransactionCommand<T>
     return { ok: true, stage, payload, finalization };
   } catch (error) {
     if (context) endActionExecution(command.game, context);
-    for (const reservation of committed.reverse()) reservation.rollback();
+    // Programming faults fail closed. Costs remain committed because payload owners may
+    // already have committed authoritative state; resource-only rollback is not atomic.
     reservations.forEach(item => item.release());
     throw error;
   }
