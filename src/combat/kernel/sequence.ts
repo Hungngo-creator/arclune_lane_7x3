@@ -1,8 +1,7 @@
 import type { SessionState } from '@shared-types/combat';
 import type { ActionIdentity } from './types.ts';
 
-export interface CombatSequenceState { actionSerial: number; chainSerial: number; eventSerial: number; deathSerial: number; instanceSerial?: number }
-type RuntimeSequence = { combatSequence?: CombatSequenceState };
+export interface CombatSequenceState { actionSerial: number; chainSerial: number; eventSerial: number; deathSerial: number; stateRevision?: number; instanceSerial?: number }
 
 export function getCombatSequence(game: SessionState): CombatSequenceState {
   const runtime = (game.runtime ??= {}) as RuntimeSequence;
@@ -25,6 +24,11 @@ export function createLinkedAction(game: SessionState, parent: ActionIdentity, a
 
 export function nextEventSerial(game: SessionState): number { return ++getCombatSequence(game).eventSerial; }
 export function nextDeathSerial(game: SessionState): number { return ++getCombatSequence(game).deathSerial; }
+export function nextStateRevision(game: SessionState): number {
+  const sequence = getCombatSequence(game);
+  sequence.stateRevision = (sequence.stateRevision ?? 0) + 1;
+  return sequence.stateRevision;
+}
 export function nextCombatIid(game: SessionState): number {
   const sequence = getCombatSequence(game);
   sequence.instanceSerial ??= game.tokens.reduce((max, token) => typeof token.iid === 'number' && Number.isInteger(token.iid) ? Math.max(max, token.iid) : max, 0);

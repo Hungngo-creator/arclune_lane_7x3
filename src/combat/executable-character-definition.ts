@@ -1,5 +1,5 @@
 import { ROSTER, type RosterEntry } from '../catalog.ts';
-import type { AuthorityTier, CanonicalMetadataTag, EffectSpec, TargetSpec } from './canonical-model.ts';
+import { compileLegacyAuthoringTag, type AuthorityTier, type CanonicalMetadataTag, type EffectSpec, type TargetSpec } from './canonical-model.ts';
 
 export type ExecutableCondition =
   | Readonly<{ type: 'minimum-current-hp-ratio'; ratio: number }>
@@ -29,6 +29,7 @@ export interface ExecutableCharacterDefinition {
   readonly summonDefinitions: readonly string[];
   readonly metadataTags: readonly CanonicalMetadataTag[];
   readonly requiredAxioms: readonly string[];
+  readonly nonExecutableActions: readonly Readonly<{ actionKey: string; catalogPath: string; reason: string }>[];
 }
 
 const record = (value: unknown): Record<string, unknown> => value && typeof value === 'object' ? value as Record<string, unknown> : {};
@@ -83,27 +84,46 @@ function effectsFor(action: Record<string, unknown>, target: TargetSpec): Effect
     const ignored = new Set(['characterId','key','name','notes','description','tags','type','cost']);
     const gameplayKey = Object.keys(action).find(k => !ignored.has(k));
     if (!gameplayKey) throw new Error(`[catalog] ${String(action.characterId ?? 'unknown')} at ${String(action.key ?? 'action')}: unsupported field metadata-only action has no executable EffectSpec`);
-    effects.push({ type: 'apply-status', target: { kind: 'self' }, payload: { statusType: `mechanic:${gameplayKey}`, duration: finite(action.duration) ?? finite(action.turns) ?? 1 } });
+    throw new Error(`[catalog] ${String(action.characterId ?? 'unknown')} at ${String(action.key ?? 'action')}.${gameplayKey}: unsupported gameplay field has no executable EffectSpec`);
   }
   return effects;
 }
 
-function compileAction(characterId: string, key: string, value: unknown, ordering: number): ExecutableActionDefinition | null {
+function metadataFor(characterId: string, key: string, action: Record<string, unknown>, target: TargetSpec, effects: readonly EffectSpec[], cost: ExecutableActionDefinition['cost'], authority: AuthorityTier): readonly CanonicalMetadataTag[] {
+  const tags = new Set<CanonicalMetadataTag>();
+  const add = (tag: CanonicalMetadataTag) => tags.add(tag);
+  if (target.kind === 'self') add('target:self'); else if (target.kind === 'selected-ally') { add('target:ally'); add('target:single'); } else if (target.kind === 'selected-enemy') { add('target:enemy'); add('target:single'); } else if ('side' in target) { add(target.side === 'ally' ? 'target:ally' : 'target:enemy'); add(target.kind === 'all' ? 'target:all' : target.kind === 'random' ? 'target:random' : target.kind === 'multiple' ? 'target:multiple' : 'target:single'); }
+  for (const effect of effects) {
+    if (effect.type === 'deal-damage' || effect.type === 'reflect-damage') add(`damage:${effect.payload.damageType}` as CanonicalMetadataTag);
+    if (effect.type === 'heal') add('recovery:heal'); if (effect.type === 'grant-shield') add('protection:shield');
+    if (effect.type === 'apply-status') add('status:debuff'); if (effect.type === 'grant-immunity') add('status:immunity'); if (effect.type === 'summon') add('entity:summon'); if (effect.type === 'create-field') add('entity:field');
+  }
+  if (cost.aether) add('cost:aether'); if (cost.fury) add('cost:fury'); if (cost.hp) add('cost:hp');
+  const rawTags = Array.isArray(action.tags) ? action.tags : [];
+  rawTags.forEach((raw, index) => { const tag = compileLegacyAuthoringTag(raw, characterId, `kit.${key}.tags[${index}]`); if (tag) add(tag); });
+  if (authority !== 'none' && rawTags.includes('global-rule')) { /* authority is represented structurally, not by a second tag registry */ }
+  return Object.freeze([...tags]);
+}
+
+export function compileCatalogAction(characterId: string, key: string, value: unknown, ordering = 0): ExecutableActionDefinition | null {
   if (!value || typeof value !== 'object') return null;
   const action: Record<string, unknown> = { ...record(value), characterId, key };
   const metadataOnlyKeys = new Set(['characterId','key','name','notes','description','tags','type','cost']);
   if (!Object.keys(action).some(k => !metadataOnlyKeys.has(k))) return null;
   const target = targetFor(action);
   const cost = record(action.cost);
+  const actionCost = Object.freeze({ ...(finite(cost.aether) !== null ? { aether: finite(cost.aether)! } : {}), ...(finite(cost.fury) !== null ? { fury: finite(cost.fury)! } : {}), ...(finite(cost.hp) !== null ? { hp: finite(cost.hp)! } : {}) });
+  const effects = Object.freeze(effectsFor(action, target));
+  const authority: AuthorityTier = Array.isArray(action.tags) && action.tags.includes('global-rule') ? 'rule' : 'none';
   return Object.freeze({
     actionId: `${characterId}:${key}`,
     target,
-    effects: Object.freeze(effectsFor(action, target)),
-    cost: Object.freeze({ ...(finite(cost.aether) !== null ? { aether: finite(cost.aether)! } : {}), ...(finite(cost.fury) !== null ? { fury: finite(cost.fury)! } : {}), ...(finite(cost.hp) !== null ? { hp: finite(cost.hp)! } : {}) }),
+    effects,
+    cost: actionCost,
     conditions: Object.freeze([
       ...(finite(action.minHpPercentToCast) !== null ? [{ type: 'minimum-current-hp-ratio', ratio: finite(action.minHpPercentToCast)! } as const] : []),
       ...(finite(action.limitUses ?? action.maxUsesPerBattle) !== null ? [{ type: 'maximum-uses-per-battle', uses: finite(action.limitUses ?? action.maxUsesPerBattle)! } as const] : []),
-    ]), metadataTags: Object.freeze([]), authority: 'none', ordering, modeScope: Object.freeze(['pve'] as const),
+      ]), metadataTags: metadataFor(characterId, key, action, target, effects, actionCost, authority), authority, ordering, modeScope: Object.freeze(['pve'] as const),
   });
 }
 
@@ -111,14 +131,19 @@ function compile(entry: RosterEntry): ExecutableCharacterDefinition {
   const characterId = String(entry.id);
   const kit = record(entry.kit);
   const skills = Array.isArray(kit.skills) ? kit.skills : [];
-  const basic = compileAction(characterId, 'basic', kit.basic, 0);
+  const nonExecutableActions: { actionKey: string; catalogPath: string; reason: string }[] = [];
+  const attempt = (key: string, value: unknown, ordering: number, catalogPath: string): ExecutableActionDefinition | null => {
+    try { return compileCatalogAction(characterId, key, value, ordering); }
+    catch (error) { nonExecutableActions.push({ actionKey: key, catalogPath, reason: error instanceof Error ? error.message : String(error) }); return null; }
+  };
+  const basic = attempt('basic', kit.basic, 0, 'kit.basic');
   const compiledSkills = skills.map((skill, index) => {
     const key = String(record(skill).key ?? `skill${index + 1}`);
     if (!['skill1', 'skill2', 'skill3'].includes(key)) throw new Error(`[catalog] ${characterId} at kit.skills[${index}].key: expected skill1, skill2, or skill3`);
-    return [key, compileAction(characterId, key, skill, index + 1)] as const;
+    return [key, attempt(key, skill, index + 1, `kit.skills[${index}]`)] as const;
   });
   if (new Set(compiledSkills.map(([key]) => key)).size !== compiledSkills.length) throw new Error(`[catalog] ${characterId} at kit.skills: duplicate action key`);
-  const ultimate = compileAction(characterId, 'ultimate', kit.ult, 100);
+  const ultimate = attempt('ultimate', kit.ult, 100, 'kit.ult');
   const actions = Object.fromEntries([...(basic ? [['basic', basic]] : []), ...compiledSkills.filter((pair): pair is readonly [string, ExecutableActionDefinition] => pair[1] !== null), ...(ultimate ? [['ultimate', ultimate]] : [])]);
   return Object.freeze({
     characterId,
@@ -128,6 +153,7 @@ function compile(entry: RosterEntry): ExecutableCharacterDefinition {
     actions: Object.freeze(actions),
     passiveSubscriptions: Object.freeze((Array.isArray(kit.passives) ? kit.passives : []).map(value => String(record(value).when ?? '')).filter(Boolean)),
     summonDefinitions: Object.freeze([]), metadataTags: Object.freeze([]), requiredAxioms: Object.freeze([]),
+    nonExecutableActions: Object.freeze(nonExecutableActions.map(value => Object.freeze(value))),
   });
 }
 

@@ -13,7 +13,7 @@ import { basicAttack, dealAbilityDamage } from '../src/combat.ts';
 import { normalizeElementKey } from '../src/utils/domain-normalization.ts';
 import { ROSTER } from '../src/catalog.ts';
 import { createSession } from '../src/modes/pve/session-state.ts';
-import { allyAetherPool } from '../src/aether.ts';
+import { getSessionAether } from '../src/aether.ts';
 
 import type { UnitToken } from '../src/types/units.ts';
 import type { SessionState } from '../src/types/combat.ts';
@@ -234,8 +234,6 @@ describe('chap minh runtime', () => {
   });
 
   test('skill2 consumes Aether + 10% current shield and resolves 3 pseudo-basic hits', () => {
-    allyAetherPool.current = 10;
-    allyAetherPool.max = 999;
 
     const chapMinh = makeUnit({
       id: 'huyen_vu_chap_minh',
@@ -263,20 +261,18 @@ describe('chap minh runtime', () => {
       battle: { over: false, winner: null },
       meta: new Map(),
       turn: { cycle: 1 },
+      chapMinh.aeMax = 999; const aether = getSessionAether(game); const aetherBefore = aether.current('ally');
     } as unknown as SessionState;
 
     const result = performActiveSkill(game, chapMinh, 'skill2');
     expect(result.ok).toBe(true);
-    expect(result.targetCount).toBe(1);
+    expect(aether.current('ally')).toBe(aetherBefore - 10);
     expect(allyAetherPool.current).toBe(0);
     expect(chapMinh.statuses?.find((status) => status.id === 'shield')?.amount).toBe(900);
     expect(enemy.hp).toBeLessThan(2000);
   });
 
   test('skill3 heals, buffs ARM/RES and deals aoe damage scaled by current shield', () => {
-    allyAetherPool.current = 50;
-    allyAetherPool.max = 999;
-
     const chapMinh = makeUnit({
       id: 'huyen_vu_chap_minh',
       side: 'ally',
@@ -303,12 +299,13 @@ describe('chap minh runtime', () => {
       battle: { over: false, winner: null },
       meta: new Map(),
       turn: { cycle: 1 },
+      chapMinh.aeMax = 999; const aether = getSessionAether(game); const aetherBefore = aether.current('ally');
     } as unknown as SessionState;
 
     const result = performActiveSkill(game, chapMinh, 'skill3');
     expect(result.ok).toBe(true);
     expect(result.reason).toBeUndefined();
-    expect(result.targetCount).toBe(1);
+    expect(aether.current('ally')).toBe(aetherBefore);
     expect(allyAetherPool.current).toBe(50);
     expect(chapMinh.hp).toBe(780);
     expect(chapMinh.hpMax).toBe(1800);

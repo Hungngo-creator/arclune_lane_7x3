@@ -57,7 +57,7 @@ test.each([[100, false], [109, false], [110, true], [120, true]])('Fury %i start
   const result = doActionOrSkip(game, actor, { performUlt(unit) {
     calls += 1;
     expect(unit).toBe(actor);
-    expect(currentActionExecution(game)?.identity.actionKind).toBe('ult');
+    expect(currentActionExecution(game)).toBeNull();
   }});
   expect(calls === 1).toBe(expectedUlt);
   expect(result.acted).toBe(true);

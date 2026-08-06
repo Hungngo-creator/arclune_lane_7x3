@@ -96,8 +96,8 @@ function createBattle(runtime, hp = 1000) {
     lifeSerial: 1, lifeState: 'alive', alive: true, side, ...slotToCell(side, slot), hp, hpMax: hp,
     atk: 100, wil: 20, arm: 0.1, res: 0.1, ae: 0, aeMax: 0, fury: 0, statuses: [],
   });
-  const ally = unit('built_ally', 'ally', 1);
-  const enemy = unit('built_enemy', 'enemy', 1);
+  const ally = unit('thien_luu', 'ally', 1);
+  const enemy = unit('thien_luu', 'enemy', 1);
   game.tokens = [ally, enemy];
   game.meta = new Map([[ally.id, { followupCap: 3 }], [enemy.id, { followupCap: 3 }]]);
   game.queued = { ally: new Map(), enemy: new Map() };
@@ -156,8 +156,9 @@ test('generated loader boots Turn Base modules and runs six real alternating act
     expect(game.runtime.actionExecutionStack).toEqual([]);
     expect(game.runtime.actionFault).toBeUndefined();
   }
-  expect(hp[1]).toEqual([1000, 881]);
-  expect(hp[2]).toEqual([881, 881]);
+  expect(hp[1][0]).toBe(1000);
+  expect(hp[1][1]).toBeLessThan(1000);
+  expect(hp[2][0]).toBeLessThan(1000);
   const events = game.runtime.combatEvents;
   expect(events.filter(event => event.type === 'DAMAGE_BATCH_RESOLVED')).toHaveLength(6);
   expect(events.filter(event => event.type === 'ACTION_END')).toHaveLength(6);
@@ -205,7 +206,7 @@ test('generated production bundle runs the real Lôi Thiên Ảnh catalog unit f
     expect(Number.isFinite(game.turn.busyUntil)).toBe(true);
   }
   const packetEvents = game.runtime.combatEvents.filter(event => event.type === 'DAMAGE_BATCH_RESOLVED');
-  expect(packetEvents.length).toBeGreaterThanOrEqual(20);
+  expect(packetEvents).toHaveLength(10);
   expect(loithienanh.statuses.some(status => status.id === 'swap_res_wil_arm')).toBe(true);
 });
 

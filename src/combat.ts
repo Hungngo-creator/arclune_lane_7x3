@@ -1,7 +1,7 @@
 //home (termux)/arclune_lane_7x3/src/combat.ts
 
 import { executeCanonicalAction } from './combat/canonical-action-executor.ts';
-import { registerCanonicalDamageOwner } from './combat/canonical-effect-gateways.ts';
+import { registerCanonicalDamageOwner } from './combat/damage-owner-registry.ts';
 import { EXECUTABLE_CHARACTER_DEFINITIONS, requireExecutableCharacterDefinition, type ExecutableActionDefinition } from './combat/executable-character-definition.ts';
 import { getMetaById } from './catalog.ts';
 import { Statuses, hookOnLethalDamage } from './statuses.ts';

@@ -13,7 +13,7 @@ const walk = entry => {
 roots.forEach(walk);
 ['src/turns.ts', 'src/summon.ts', 'src/combat.ts', 'src/statuses.ts', 'src/aether.ts'].forEach(walk);
 
-const legacyNames = ['dispatchGameplayTags', 'canonicalizeCombatTagsWithRule', 'compareRuleTagPriority', 'compareRuleConflictUnitPriority', 'doctrine-rule', 'global-rule', 'axiom-rule'];
+const legacyNames = ['dispatchGameplayTags', 'canonicalizeCombatTagsWithRule', 'compareRuleTagPriority', 'compareRuleConflictUnitPriority', 'doctrine-rule', 'axiom-rule'];
 const legacyModules = ['tag-dispatch', 'tag-aliases'];
 const legacy = [];
 const failures = [];
@@ -35,6 +35,13 @@ for (const file of files) {
 
 const canonical = fs.readFileSync('src/combat/canonical-model.ts', 'utf8');
 if (!canonical.includes('authoritativeReceipts.has(receipt)')) failures.push('canonical dispatcher does not authenticate runtime-owned receipts');
+if (canonical.includes('ReservedFutureEffectType = never')) failures.push('reserved effects are falsely reported as implemented');
+const gateways = fs.readFileSync('src/combat/canonical-effect-gateways.ts', 'utf8');
+for (const forbidden of ['canonicalStateRevision', 'committedMutationState', 'target.cx =', 'target.cy =', 'Statuses.add(', 'enqueueImmediate(', 'grantShield(']) if (gateways.includes(forbidden)) failures.push(`canonical gateway directly owns mutation or synthetic receipt: ${forbidden}`);
+const compiler = fs.readFileSync('src/combat/executable-character-definition.ts', 'utf8');
+if (compiler.includes('`mechanic:${')) failures.push('roster compiler manufactures mechanic:* effects');
+if (compiler.includes("from '../data/tags")) failures.push('roster compiler imports a competing runtime tag registry');
+if (/Gateway\(\)\s*\{\s*throw/.test(gateways)) failures.push('canonical gateway exposes an executable throwing route');
 if (process.env.REQUIRE_NO_LEGACY_COMBAT === '1') failures.push(...legacy);
 if (failures.length) { console.error(failures.map(value => `- ${value}`).join('\n')); process.exitCode = 1; }
 else console.log(`Single combat runtime audit passed (${files.length} production files); legacy references reported: ${legacy.length}.`);

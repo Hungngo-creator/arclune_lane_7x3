@@ -1,5 +1,5 @@
 import { ROSTER } from '../catalog.ts';
-import { globalAetherPool } from '../aether.ts';
+import { getSessionAether } from '../aether.ts';
 import { executeCanonicalAction } from './canonical-action-executor.ts';
 import { EXECUTABLE_CHARACTER_DEFINITIONS } from './executable-character-definition.ts';
 import { evaluateBattleEnd } from './kernel/battle-end.ts';
@@ -35,11 +35,10 @@ function scenarioFor(id: string, iid: number): { game: SessionState; actor: Unit
   const actor = token(id, 'ally', iid, true);
   const enemy = token('certification_enemy', 'enemy', iid + 10000, true);
   const ally = token('certification_ally', 'ally', iid + 20000, false);
-  const game = { tokens: [actor, ally, enemy], queued: [], actionChain: [], runtime: {}, turn: { turnCount: 1, cycle: 1 }, meta: new Map() } as unknown as SessionState;
+  const game = { tokens: [actor, ally, enemy], queued: [], actionChain: [], runtime: {}, rng: { seed: iid, calls: 0 }, turn: { turnCount: 1, cycle: 1 }, meta: new Map() } as unknown as SessionState;
   ensureCertificationPresentationHost();
-  globalAetherPool.init(game.tokens);
-  globalAetherPool.gain('ally', 100000);
-  globalAetherPool.gain('enemy', 100000);
+  getSessionAether(game).gain('ally', 100000);
+  getSessionAether(game).gain('enemy', 100000);
   return { game, actor };
 }
 
