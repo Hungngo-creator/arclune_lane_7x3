@@ -16,7 +16,7 @@ export interface PerformActiveSkillResult {
   tags: string[];
   appliedTags: string[];
   targetCount: number;
-  reason?: 'missing-skill' | 'insufficient-aether' | 'blocked';
+  reason?: 'missing-skill' | 'insufficient-aether' | 'insufficient-cost' | 'blocked';
 }
 
 function resolveActiveSkill(caster: UnitToken, skillKey: ActiveSkillKey): SkillSection | null {

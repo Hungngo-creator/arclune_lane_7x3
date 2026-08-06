@@ -24,6 +24,7 @@ export interface ExecutableCharacterDefinition {
   readonly basic: ExecutableActionDefinition | null;
   readonly skills: readonly ExecutableActionDefinition[];
   readonly ultimate: ExecutableActionDefinition | null;
+  readonly actions: Readonly<Partial<Record<'basic' | 'skill1' | 'skill2' | 'skill3' | 'ultimate', ExecutableActionDefinition>>>;
   readonly passiveSubscriptions: readonly string[];
   readonly summonDefinitions: readonly string[];
   readonly metadataTags: readonly CanonicalMetadataTag[];
@@ -48,7 +49,7 @@ function effectsFor(action: Record<string, unknown>, target: TargetSpec): Effect
   if (multiplier !== null) effects.push({ type: 'deal-damage', target, payload: { amount: multiplier, damageType: 'physical' } });
   else if (finite(action.hits) !== null || finite(action.bonusDamageFromShieldRatio) !== null) {
     const hitCount = Math.max(1, Math.floor(finite(action.hits) ?? 1));
-    for (let hit = 0; hit < hitCount; hit += 1) effects.push({ type: 'deal-damage', target: action.bonusDamageFromShieldRatio !== undefined ? { kind: 'all', side: 'enemy' } : target, payload: { amount: 1, damageType: 'physical', shieldRatio: finite(action.bonusDamageFromShieldRatio) ?? undefined } as never });
+    for (let hit = 0; hit < hitCount; hit += 1) effects.push({ type: 'deal-damage', target: action.bonusDamageFromShieldRatio !== undefined ? { kind: 'all', side: 'enemy' } : target, payload: { amount: 1, damageType: 'physical', shieldRatio: finite(action.bonusDamageFromShieldRatio) ?? undefined } });
   }
   const healing = finite(action.healPercent ?? action.healPercentMaxHP ?? action.healAmount);
   if (healing !== null) effects.push({ type: 'heal', target: { kind: 'self' }, payload: { amount: healing } });
@@ -112,11 +113,21 @@ function compile(entry: RosterEntry): ExecutableCharacterDefinition {
   const characterId = String(entry.id);
   const kit = record(entry.kit);
   const skills = Array.isArray(kit.skills) ? kit.skills : [];
+  const basic = compileAction(characterId, 'basic', kit.basic, 0);
+  const compiledSkills = skills.map((skill, index) => {
+    const key = String(record(skill).key ?? `skill${index + 1}`);
+    if (!['skill1', 'skill2', 'skill3'].includes(key)) throw new Error(`[catalog] ${characterId} at kit.skills[${index}].key: expected skill1, skill2, or skill3`);
+    return [key, compileAction(characterId, key, skill, index + 1)] as const;
+  });
+  if (new Set(compiledSkills.map(([key]) => key)).size !== compiledSkills.length) throw new Error(`[catalog] ${characterId} at kit.skills: duplicate action key`);
+  const ultimate = compileAction(characterId, 'ultimate', kit.ult, 100);
+  const actions = Object.fromEntries([...(basic ? [['basic', basic]] : []), ...compiledSkills.filter((pair): pair is readonly [string, ExecutableActionDefinition] => pair[1] !== null), ...(ultimate ? [['ultimate', ultimate]] : [])]);
   return Object.freeze({
     characterId,
-    basic: compileAction(characterId, 'basic', kit.basic, 0),
-    skills: Object.freeze(skills.map((skill, index) => compileAction(characterId, String(record(skill).key ?? `skill${index + 1}`), skill, index + 1)).filter((value): value is ExecutableActionDefinition => value !== null)),
-    ultimate: compileAction(characterId, 'ultimate', kit.ult, 100),
+    basic,
+    skills: Object.freeze(compiledSkills.map(([, action]) => action).filter((value): value is ExecutableActionDefinition => value !== null)),
+    ultimate,
+    actions: Object.freeze(actions),
     passiveSubscriptions: Object.freeze((Array.isArray(kit.passives) ? kit.passives : []).map(value => String(record(value).when ?? '')).filter(Boolean)),
     summonDefinitions: Object.freeze([]), metadataTags: Object.freeze([]), requiredAxioms: Object.freeze([]),
   });

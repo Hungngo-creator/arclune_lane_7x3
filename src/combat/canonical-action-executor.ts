@@ -4,18 +4,19 @@ import { requireExecutableCharacterDefinition, type ExecutableActionDefinition }
 import { getSessionRandom } from './session-rng.ts';
 import { createCanonicalEffectServices, validateCanonicalEffectPreparation, reserveCanonicalActionCosts } from './canonical-effect-gateways.ts';
 import { createNaturalAction, currentActionExecution, executeActionTransaction } from './kernel/public.ts';
+import { pickCombatTarget } from './target-resolver.ts';
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
 import type { SkillSection } from '@shared-types/config';
 
-export type CanonicalActionKey = 'basic' | 'ultimate' | `skill${number}`;
+export type CanonicalActionKey = 'basic' | 'skill1' | 'skill2' | 'skill3' | 'ultimate';
 const EMPTY: string[] = [];
 
 function resolveTargets(game: SessionState, actor: UnitToken, spec: TargetSpec): UnitToken[] {
   if (spec.kind === 'self') return actor.alive ? [actor] : [];
   const enemies = game.tokens.filter(t => t.alive && t.side !== actor.side);
   const allies = game.tokens.filter(t => t.alive && t.side === actor.side);
-  if (spec.kind === 'selected-enemy') return enemies.slice(0, 1);
+  if (spec.kind === 'selected-enemy') { const selected = pickCombatTarget(game, actor); return selected ? [selected] : []; }
   if (spec.kind === 'selected-ally') return allies.filter(t => t.iid !== actor.iid).slice(0, 1);
   if (spec.kind === 'leader') return game.tokens.filter(t => t.alive && t.side === actor.side && t.isLeader).slice(0, 1);
   if (spec.kind === 'all') return spec.side === 'enemy' ? enemies : allies;
@@ -46,9 +47,7 @@ function recordActionUse(game: SessionState, actor: UnitToken, action: Executabl
 }
 
 function actionByKey(compiled: ReturnType<typeof requireExecutableCharacterDefinition>, actionKey: CanonicalActionKey): ExecutableActionDefinition | null {
-  if (actionKey === 'basic') return compiled.basic;
-  if (actionKey === 'ultimate' || actionKey === 'skill3') return compiled.ultimate;
-  return compiled.skills.find(action => action.actionId.split(':').pop() === actionKey) ?? null;
+  return compiled.actions[actionKey] ?? (actionKey === 'skill3' ? compiled.actions.ultimate ?? null : null);
 }
 
 function validateConditions(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition): boolean {
@@ -69,12 +68,12 @@ function prepareEffects(game: SessionState, actor: UnitToken, action: Executable
   return prepared.every(item => validateCanonicalEffectPreparation(game, actor, item.effect, item.targets)) ? prepared : null;
 }
 
-export function executeCanonicalAction(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition): { ok: boolean; receipts: readonly EffectCommitReceipt[]; targetCount: number; reason?: 'blocked' | 'insufficient-aether' } {
+export function executeCanonicalAction(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition): { ok: boolean; receipts: readonly EffectCommitReceipt[]; targetCount: number; actionId?: string | number; reason?: 'blocked' | 'insufficient-cost' } {
   if (!actor.alive || !validateConditions(game, actor, action) || !validateActionUsageLimit(game, actor, action)) return { ok: false, receipts: [], targetCount: 0, reason: 'blocked' };
 const prepared = prepareEffects(game, actor, action);
   if (!prepared) return { ok: false, receipts: [], targetCount: 0, reason: 'blocked' };
   const costReservations = reserveCanonicalActionCosts(game, actor, action);
-  if (!costReservations.every(item => item.validate())) { costReservations.forEach(item => item.release()); return { ok: false, receipts: [], targetCount: 0, reason: 'insufficient-aether' }; }
+  if (!costReservations.every(item => item.validate())) { costReservations.forEach(item => item.release()); return { ok: false, receipts: [], targetCount: 0, reason: 'insufficient-cost' }; }
   const receipts: EffectCommitReceipt[] = [];
   let maxTargets = 0;
   const run = () => {
@@ -86,8 +85,10 @@ const prepared = prepareEffects(game, actor, action);
     recordActionUse(game, actor, action);
     return { ok: true, receipts, targetCount: maxTargets };
   };
-  if (currentActionExecution(game)) { costReservations.forEach(item => item.commit()); return run(); }
-  return executeActionTransaction({ game, identity: createNaturalAction(game, action.actionId.includes(':skill3') ? 'ultimate' : 'active-skill'), actor, targets: resolveTargets(game, actor, action.target).slice(0, 1), validateActor: () => actor.alive && validateConditions(game, actor, action), validateTargets: () => prepared.length > 0, reserveCosts: () => costReservations, resolvePayload: run }).payload ?? { ok: false, receipts: [], targetCount: 0, reason: 'blocked' };
+  if (currentActionExecution(game)) { costReservations.forEach(item => item.commit()); return { ...run(), actionId: currentActionExecution(game)!.identity.actionId }; }
+  const identity = createNaturalAction(game, action.actionId === `${actor.id}:ultimate` ? 'ultimate' : action.actionId === `${actor.id}:basic` ? 'basic' : 'active-skill');
+  const transaction = executeActionTransaction({ game, identity, actor, targets: resolveTargets(game, actor, action.target).slice(0, 1), validateActor: () => actor.alive && validateConditions(game, actor, action), validateTargets: () => prepared.length > 0, reserveCosts: () => costReservations, resolvePayload: run });
+  return transaction.payload ? { ...transaction.payload, actionId: identity.actionId } : { ok: false, receipts: [], targetCount: 0, reason: transaction.reason === 'insufficient-cost' ? 'insufficient-cost' : 'blocked' };
 }
 
 export function performCanonicalActiveSkill(game: SessionState, caster: UnitToken, skillKey: 'skill1' | 'skill2' | 'skill3', skill: SkillSection | null) {

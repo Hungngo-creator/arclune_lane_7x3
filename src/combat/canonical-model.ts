@@ -33,7 +33,7 @@ type AmountPayload = { readonly amount: number };
 type StatusPayload = { readonly statusType: string; readonly duration?: number; readonly value?: number };
 type ResourcePayload = { readonly resource: 'aether' | 'fury'; readonly amount: number };
 export type EffectSpec =
-  | { readonly type: 'deal-damage' | 'reflect-damage'; readonly target: TargetSpec; readonly payload: AmountPayload & { readonly damageType: 'physical' | 'will' | 'true' } }
+  | { readonly type: 'deal-damage' | 'reflect-damage'; readonly target: TargetSpec; readonly payload: AmountPayload & { readonly damageType: 'physical' | 'will' | 'true'; readonly shieldRatio?: number; readonly pierceShield?: boolean } }
   | { readonly type: 'heal' | 'grant-shield' | 'pay-hp-cost' | 'sacrifice'; readonly target: TargetSpec; readonly payload: AmountPayload }
   | { readonly type: 'apply-status' | 'grant-immunity'; readonly target: TargetSpec; readonly payload: StatusPayload }
   | { readonly type: 'remove-status'; readonly target: TargetSpec; readonly payload: { readonly statusId: string } }
@@ -65,13 +65,14 @@ export interface EffectExecutionServices {
   readonly characterStateGateway: GatewayOperation<'set-stance' | 'set-form'>;
 }
 export type EffectGatewayCommit = (effect: EffectSpec, context: EffectExecutionContext) => Readonly<{ eventSerial: number; stateRevision: number }>;
-export type EffectGatewayCommits = Readonly<Record<keyof EffectExecutionServices, EffectGatewayCommit>>;
+export type EffectGatewayCommits = Readonly<{ [K in keyof EffectExecutionServices]: EffectExecutionServices[K] extends (effect: infer E, context: infer C) => unknown ? (effect: E, context: C) => Readonly<{ eventSerial: number; stateRevision: number }> : never }>;
 const authoritativeReceipts = new WeakSet<object>();
 function recordKernelEffectReceipt<T extends EffectCommitReceipt>(receipt: T): T { authoritativeReceipts.add(receipt); return receipt; }
 export function createEffectExecutionServices(commits: EffectGatewayCommits): EffectExecutionServices {
   const services = {} as Record<keyof EffectExecutionServices, GatewayOperation<EffectType>>;
   for (const gateway of Object.keys(commits) as (keyof EffectExecutionServices)[]) services[gateway] = ((effect: EffectSpec, context: EffectExecutionContext) => {
-    const mutation = commits[gateway](effect, context);
+    const commit = commits[gateway] as EffectGatewayCommit;
+    const mutation = commit(effect, context);
     if (!Number.isSafeInteger(mutation.eventSerial) || mutation.eventSerial <= 0 || !Number.isSafeInteger(mutation.stateRevision) || mutation.stateRevision <= 0) throw new Error(`[effect-gateway] ${gateway} did not commit authoritative state`);
     const receipt = { effectType: effect.type, committed: true as const, eventSerial: mutation.eventSerial, stateRevision: mutation.stateRevision };
     Object.defineProperty(receipt, 'session', { value: context.session, enumerable: false });

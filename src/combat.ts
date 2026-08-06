@@ -19,6 +19,7 @@ import { ABSOLUTE_ATTACK_TAG_IDS, ABSOLUTE_SHIELD_TAG_IDS } from './data/tags.ts
 import { applyUyenBasicExtras } from './leader-uyen.ts';
 import { nextRngValue } from './utils/rng.ts';
 import { normalizeClassName } from './utils/domain-normalization.ts';
+import { pickCombatTarget } from './combat/target-resolver.ts';
 import { getCounterBonusMetadata } from './combat/counter-matrix.ts';
 import { readAtkWilPower, readCombatHpState } from './combat/number-utils.ts';
 import {
@@ -355,96 +356,7 @@ const getSharedHpRules = (target: UnitToken): { group: string | null; weight: nu
 const GAME_CONFIG = CFG as Readonly<GameConfig>;
 
 export function pickTarget(Game: TargetableGameState, attacker: UnitToken): UnitToken | null {
-  const foeSide = attacker.side === 'ally' ? 'enemy' : 'ally';
-  const pool: UnitToken[] = [];
-  const bySlot = new Map<number, UnitToken>();
-  const occupiedSlots = new Set<number>();
-  let nearestOverall: UnitToken | null = null;
-  let nearestOverallDistance = Number.POSITIVE_INFINITY;
-
-  const distanceToAttacker = (token: UnitToken): number => (
-    Math.abs(token.cx - attacker.cx) + Math.abs(token.cy - attacker.cy)
-  );
-
-  for (const token of Game.tokens) {
-    if (token.side !== foeSide || !isCombatAlive(token)) continue;
-    pool.push(token);
-    const slot = slotIndex(token.side, token.cx, token.cy);
-    const duplicate = bySlot.get(slot);
-    if (duplicate) throw new Error(`[combat-occupancy] duplicate target occupancy side=${foeSide} slot=${slot} first=${duplicate.id}/${String(duplicate.iid)} second=${token.id}/${String(token.iid)}`);
-    bySlot.set(slot, token);
-    occupiedSlots.add(slot);
-    const distance = distanceToAttacker(token);
-    if (
-      !nearestOverall
-      || distance < nearestOverallDistance
-      || (distance === nearestOverallDistance && slot < slotIndex(nearestOverall.side, nearestOverall.cx, nearestOverall.cy))
-    ) {
-      nearestOverall = token;
-      nearestOverallDistance = distance;
-    }
-  }
-
-  if (pool.length === 0) return null;
-
-  const meta = getMetaById(attacker.id);
-  const className = normalizeClassName(meta?.class);
-  const isAssassin = className === 'Assassin';
-
-  const slotOf = (token: UnitToken): number => slotIndex(token.side, token.cx, token.cy);
-
-  const forcedTaunt = pool.filter(token => token.statuses?.some((status: { id?: string }) => status.id === 'taunt'))
-    .sort((left, right) => slotOf(left) - slotOf(right))[0];
-  if (forcedTaunt) return forcedTaunt;
-
-  const isBlockedLeader = (slot: number): boolean => (
-    slot === 8 && (occupiedSlots.has(2) || occupiedSlots.has(5))
-  );
-
-  if (isAssassin) {
-    let nearestBackline: UnitToken | null = null;
-    let nearestBacklineDistance = Number.POSITIVE_INFINITY;
-    for (const target of pool) {
-      const slot = slotOf(target);
-      if (slot < 7) continue;
-      const distance = distanceToAttacker(target);
-      if (
-        !nearestBackline
-        || distance < nearestBacklineDistance
-        || (distance === nearestBacklineDistance && slot < slotOf(nearestBackline))
-      ) {
-        nearestBackline = target;
-        nearestBacklineDistance = distance;
-      }
-    }
-    if (nearestBackline) return nearestBackline;
-  }
-
-  const attackerSlot = slotIndex(attacker.side, attacker.cx, attacker.cy);
-  const slotPriority: ReadonlyArray<number> = (attackerSlot === 1 || attackerSlot === 4 || attackerSlot === 7)
-    ? [3, 6, 9, 2, 5, 8]
-    : (attackerSlot === 3 || attackerSlot === 6 || attackerSlot === 9)
-      ? [1, 4, 7, 2, 5, 8]
-      : (attackerSlot === 2 || attackerSlot === 5 || attackerSlot === 8)
-        ? [2, 5, 8]
-        : [];
-
-  for (const slot of slotPriority) {
-    if (isBlockedLeader(slot)) continue;
-    const found = bySlot.get(slot);
-    if (found) return found;
-  }
-
-  if (nearestOverall && !isBlockedLeader(slotOf(nearestOverall))) {
-    return nearestOverall;
-  }
-
-  for (const target of pool) {
-    if (isBlockedLeader(slotOf(target))) continue;
-    return target;
-  }
-
-  return null;
+  return pickCombatTarget(Game, attacker);
 }
 
 export function dealAbilityDamage(
@@ -862,6 +774,10 @@ export interface BasicActionResult {
   committedHits: number;
   totalHpDamage: number;
   targetIids: Array<string | number>;
+  shieldDamage?: number;
+  linkedFollowupCount?: number;
+  killCount?: number;
+  finalizedEventSerial?: number;
   error?: Error;
 }
 
@@ -871,27 +787,25 @@ export function doBasicWithFollowups(
   cap = 2,
   onFollowup?: (index: number) => void,
 ): BasicActionResult {
-  const parent = createNaturalAction(Game, 'basic');
-  const result: BasicActionResult = { ok: false, rootActionId: parent.actionId, attemptedHits: 1, committedHits: 0, totalHpDamage: 0, targetIids: [] };
+  const result: BasicActionResult = { ok: false, rootActionId: '', attemptedHits: 0, committedHits: 0, totalHpDamage: 0, targetIids: [] };
   if (!Game.tokens.some(target => target.side !== unit.side && isCombatAlive(target))) return result;
-  // Compatibility façade only: canonical executor owns target resolution, damage, receipts and finalization.
-  void cap;
-  void onFollowup;
-  const definition = (EXECUTABLE_CHARACTER_DEFINITIONS.get(unit.id)?.basic ?? { actionId: `${unit.id}:basic`, target: { kind: 'selected-enemy' }, effects: [{ type: 'deal-damage', target: { kind: 'selected-enemy' }, payload: { amount: 1, damageType: 'physical' } }], cost: {}, conditions: [], metadataTags: [], authority: 'none', ordering: 0, modeScope: ['pve'] } as ExecutableActionDefinition);
-  const before = new Map(Game.tokens.map(target => [target.iid ?? target.id, Number(target.hp ?? 0)]));
-  withActionExecution(Game, parent, () => {
-    const executed = executeCanonicalAction(Game, unit, definition);
-    if (!executed.ok) return;
-    result.attemptedHits = executed.receipts.filter(receipt => receipt.effectType === 'deal-damage' || receipt.effectType === 'reflect-damage').length || Math.max(1, executed.targetCount);
-    result.committedHits = executed.receipts.filter(receipt => receipt.effectType === 'deal-damage' || receipt.effectType === 'reflect-damage').length || executed.receipts.length;
-    for (const target of Game.tokens) {
-      const key = target.iid ?? target.id;
-      const delta = (before.get(key) ?? Number(target.hp ?? 0)) - Number(target.hp ?? 0);
-      if (target.side !== unit.side && delta > 0) {
-        result.totalHpDamage += delta;
-        result.targetIids.push(key);
-      }
-    }
-  });
+const definition = requireExecutableCharacterDefinition(unit.id).actions.basic;
+  if (!definition) throw new Error(`[catalog] ${unit.id} at kit.basic: requested action basic has no compiled definition`);
+  const executed = executeCanonicalAction(Game, unit, definition);
+  if (!executed.ok || executed.actionId == null) return result;
+  const finalization = ((Game.runtime ?? {}) as { finalizedActions?: Record<string, import('./combat/kernel/index.ts').ActionFinalizationResult> }).finalizedActions?.[String(executed.actionId)];
+  if (!finalization) return result;
+  const damage = finalization.committedTargetAggregates;
+  result.ok = true;
+  result.rootActionId = finalization.actionId;
+  result.attemptedHits = executed.receipts.filter(receipt => receipt.effectType === 'deal-damage' || receipt.effectType === 'reflect-damage').length;
+  result.committedHits = damage.length;
+  result.totalHpDamage = damage.reduce((sum, item) => sum + Number(item.hpDamage ?? 0), 0);
+  result.shieldDamage = damage.reduce((sum, item) => sum + Number(item.shieldAbsorbed ?? 0), 0);
+  result.targetIids = damage.map(item => item.targetIid as string | number);
+  result.killCount = finalization.deathRecords.length;
+  result.finalizedEventSerial = finalization.emittedEventSerialRange.last;
+  result.linkedFollowupCount = 0;
+  void cap; void onFollowup;
   return result;
 }

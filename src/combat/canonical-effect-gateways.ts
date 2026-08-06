@@ -6,18 +6,20 @@ import { consumeShieldByCurrentRatio, grantShield, readShieldAmount } from './ap
 import { createEffectExecutionServices, type EffectExecutionServices, type EffectSpec } from './canonical-model.ts';
 import { currentActionExecution, resolveHealing, resolveHpLoss, resolveSourceAttribution, type ActionExecutionContext } from './kernel/public.ts';
 import { commitDamageBatch, resolveDamageBatch } from './kernel/damage-batch.ts';
-import { createHpZeroCandidate } from './kernel/life-cycle.ts';
 import { commitHealing, commitHpMutation } from './kernel/hp-mutation.ts';
 import { readAtkWilPower, toRoundedInt } from './number-utils.ts';
 import type { ActionCostReservation } from './kernel/action-transaction.ts';
 import type { ExecutableActionDefinition } from './executable-character-definition.ts';
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
+import { furyValue, spendFury } from '../utils/fury.ts';
 
-const eventState = (game: SessionState): { eventSerial: number; stateRevision: number } => {
+const committedMutationState = (game: SessionState): { eventSerial: number; stateRevision: number } => {
   const eventSerial = Number((((game.runtime ?? {}) as { combatSequence?: { eventSerial?: number } }).combatSequence ?? {}).eventSerial ?? 0);
   if (!Number.isSafeInteger(eventSerial) || eventSerial <= 0) throw new Error('[canonical-effect] mutation did not emit an authoritative event');
-  return { eventSerial, stateRevision: eventSerial };
+  const runtime = (game.runtime ??= {}) as { canonicalStateRevision?: number };
+  runtime.canonicalStateRevision = Math.max(0, Number(runtime.canonicalStateRevision ?? 0)) + 1;
+  return { eventSerial, stateRevision: runtime.canonicalStateRevision };
 };
 
 const identity = (game: SessionState): ActionExecutionContext['identity'] | undefined => currentActionExecution(game)?.identity;
@@ -46,13 +48,14 @@ export function validateCanonicalEffectPreparation(game: SessionState, actor: Un
 export function reserveCanonicalActionCosts(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition): readonly ActionCostReservation[] {
   const reservations: ActionCostReservation[] = [];
   if (action.cost.aether) reservations.push({ id: `${action.actionId}:aether`, validate: () => globalAetherPool.current(actor.side) >= (action.cost.aether ?? 0), commit: () => { if (!globalAetherPool.consume(actor.side, action.cost.aether ?? 0)) throw new Error('[canonical-action] insufficient aether'); }, release: () => {} });
+  if (action.cost.fury) reservations.push({ id: `${action.actionId}:fury`, validate: () => furyValue(actor) >= (action.cost.fury ?? 0), commit: () => { if (spendFury(actor, action.cost.fury ?? 0) !== action.cost.fury) throw new Error('[canonical-action] insufficient fury'); }, release: () => {} });
   if (action.cost.hp) reservations.push({ id: `${action.actionId}:hp`, validate: () => Number(actor.hp ?? 0) > Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), commit: () => { const mutation = resolveHpLoss(actor, Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), 'hp-cost', sourceFor(actor), false); if (!mutation.succeeded) throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, actor, mutation, identity(game)); }, release: () => {} });
   return reservations;
 }
 
 export function createCanonicalEffectServices(game: SessionState, actor: UnitToken, targets: readonly UnitToken[]): EffectExecutionServices {
   return createEffectExecutionServices({
-    damageGateway(effect: any) {
+    damageGateway(effect: EffectSpec & { type: 'deal-damage' | 'reflect-damage' }) {
       const actionIdentity = identity(game);
       if (!actionIdentity) throw new Error('[canonical-effect] damage requires an active action identity');
       const source = sourceFor(actor);
@@ -60,22 +63,21 @@ export function createCanonicalEffectServices(game: SessionState, actor: UnitTok
         const amount = Math.max(1, Math.floor(readAtkWilPower(actor) * effect.payload.amount + readShieldAmount(actor) * Number(effect.payload.shieldRatio ?? 0)));
         const attacker = { iid: actor.iid ?? actor.id, currentHp: Number(actor.hp ?? 0), maxHp: Number(actor.hpMax ?? 1), arm: Number(actor.arm ?? 0), res: Number(actor.res ?? 0) };
         const defender = { iid: target.iid ?? target.id, currentHp: Number(target.hp ?? 0), maxHp: Number(target.hpMax ?? 1), arm: Number(target.arm ?? 0), res: Number(target.res ?? 0) };
-        const resolution = resolveDamageBatch({ identity: actionIdentity, source, packets: [{ packetId: `${String(actionIdentity.actionId)}:${String(target.iid ?? target.id)}:${effect.type}:${nextCanonicalPacketSerial(game)}`, actionId: actionIdentity.actionId, chainId: actionIdentity.chainId, source, targetIid: target.iid ?? target.id, damageType: effect.type === 'reflect-damage' ? 'reflected' : effect.payload.damageType, declaredDamage: amount, tags: [], isDot: false, isReflect: effect.type === 'reflect-damage', isFollowup: false, isCounter: false, reactionDepth: 0, pierceShield: effect.payload.damageType === 'true', packetSerial: 1 }], contexts: [{ attacker, defender, defensePenetration: { flat: 0, percent: 0 }, defenseModifiers: { flat: 0, percent: 0 }, outgoingModifiers: [1], incomingModifiers: [1], genericDamageReduction: 0, reflectDamageReduction: 0, shield: { shieldBefore: readShieldAmount(target) } }], targets: [{ ...defender, rawCurrentHp: Number(target.hp ?? 0), rawMaxHp: Number(target.hpMax ?? 1), trueSelfId: target.trueSelfId ?? null, lifeSerial: Number(target.lifeSerial ?? 1), slot: 0, weight: 1, capRatio: null }], shieldSnapshot: readShieldAmount(target), specialMitigation: null, batchPolicy: 'single', sharedHpPolicy: null });
+        const resolution = resolveDamageBatch({ identity: actionIdentity, source, packets: [{ packetId: `${String(actionIdentity.actionId)}:${String(target.iid ?? target.id)}:${effect.type}:${nextCanonicalPacketSerial(game)}`, actionId: actionIdentity.actionId, chainId: actionIdentity.chainId, source, targetIid: target.iid ?? target.id, damageType: effect.type === 'reflect-damage' ? 'reflected' : effect.payload.damageType, declaredDamage: amount, tags: [], isDot: false, isReflect: effect.type === 'reflect-damage', isFollowup: false, isCounter: false, reactionDepth: 0, pierceShield: effect.payload.pierceShield === true, packetSerial: 1 }], contexts: [{ attacker, defender, defensePenetration: { flat: 0, percent: 0 }, defenseModifiers: { flat: 0, percent: 0 }, outgoingModifiers: [1], incomingModifiers: [1], genericDamageReduction: 0, reflectDamageReduction: 0, shield: { shieldBefore: readShieldAmount(target) } }], targets: [{ ...defender, rawCurrentHp: Number(target.hp ?? 0), rawMaxHp: Number(target.hpMax ?? 1), trueSelfId: target.trueSelfId ?? null, lifeSerial: Number(target.lifeSerial ?? 1), slot: 0, weight: 1, capRatio: null }], shieldSnapshot: readShieldAmount(target), specialMitigation: null, batchPolicy: 'single', sharedHpPolicy: null });
         const committed = commitDamageBatch(game, resolution, [target]);
-        for (const item of committed.commits) if (item.reachedZero) createHpZeroCandidate(game, target, actionIdentity, source, effect.type === 'reflect-damage' ? 'reflected' : 'damage', item.hpDamage, 0);
       }
-      return eventState(game);
+      return committedMutationState(game);
     },
-    healingGateway(effect: any) { for (const target of targets) commitHealing(game, target, resolveHealing(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)), sourceFor(actor)), identity(game)); return eventState(game); },
-    shieldGateway(effect: any) { for (const target of targets) grantShield(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount))); return eventState(game); },
-    hpMutationGateway(effect: any) { for (const target of targets) { const mutation = resolveHpLoss(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)), 'hp-cost', sourceFor(actor), false); if (!mutation.succeeded) throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, target, mutation, identity(game)); } return eventState(game); },
+    healingGateway(effect: EffectSpec & { type: 'heal' }) { for (const target of targets) commitHealing(game, target, resolveHealing(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)), sourceFor(actor)), identity(game)); return committedMutationState(game); },
+    shieldGateway(effect: EffectSpec & { type: 'grant-shield' }) { for (const target of targets) grantShield(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount))); return committedMutationState(game); },
+    hpMutationGateway(effect: EffectSpec & { type: 'pay-hp-cost' }) { for (const target of targets) { const mutation = resolveHpLoss(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)), 'hp-cost', sourceFor(actor), false); if (!mutation.succeeded) throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, target, mutation, identity(game)); } return committedMutationState(game); },
     lifecycleGateway() { throw new Error('[canonical-effect] lifecycle effect requires a production lifecycle coordinator route'); },
-    statusGateway(effect: any) { if (effect.type === 'apply-status' || effect.type === 'grant-immunity') for (const target of targets) { if (effect.payload.statusType === 'shield:consume-current-ratio') { consumeShieldByCurrentRatio(target, Number(effect.payload.value ?? 0)); continue; } const statusId = effect.payload.statusType.startsWith('buff:') ? `chap_minh_ult_${effect.payload.statusType.slice(5)}_up` : effect.payload.statusType; Statuses.add(target, { id: statusId, kind: effect.type === 'grant-immunity' || effect.payload.statusType.startsWith('buff:') ? 'buff' : 'debuff', tag: effect.payload.statusType, dur: effect.payload.duration ?? 1, tick: 'turn', amount: effect.payload.value, sourceUnitId: actor.id }); } else throw new Error(`[canonical-effect] ${effect.type} requires a production status removal/dispel route`); return eventState(game); },
-    resourceGateway(effect: any) { const amount = Math.max(0, toRoundedInt(effect.payload.amount, 0)); if (effect.payload.resource !== 'aether') throw new Error('[canonical-effect] fury route requires personal resource gateway'); if (effect.type === 'spend-resource') { if (!globalAetherPool.consume(actor.side, amount)) throw new Error('[canonical-action] insufficient aether'); } else globalAetherPool.gain(actor.side, amount); return eventState(game); },
-    summonGateway(effect: any) { const slot = firstOpenSlot(game, actor.side); if (!slot) throw new Error('[canonical-effect] no summon slot available'); enqueueImmediate(game, { side: actor.side, slot, unit: { id: effect.payload.definitionId, name: effect.payload.definitionId, ownerIid: actor.iid, isMinion: true, hpMax: Math.max(1, Math.floor((actor.hpMax ?? 100) * 0.5)), hp: Math.max(1, Math.floor((actor.hpMax ?? 100) * 0.5)), ttlTurns: 3 } }); return eventState(game); },
-    fieldGateway(effect: any) { ((game.runtime ??= {}) as { fields?: unknown[] }).fields ??= []; ((game.runtime as { fields: unknown[] }).fields).push({ fieldId: effect.payload.fieldId, sourceIid: actor.iid ?? actor.id, duration: effect.payload.duration ?? 2 }); return eventState(game); },
-    movementGateway(effect: any) { for (const target of targets) { target.cx = effect.payload.cx; target.cy = effect.payload.cy; } return eventState(game); },
+    statusGateway(effect: EffectSpec & { type: 'apply-status' | 'remove-status' | 'dispel' | 'grant-immunity' }) { if (effect.type === 'apply-status' || effect.type === 'grant-immunity') for (const target of targets) { if (effect.payload.statusType === 'shield:consume-current-ratio') { consumeShieldByCurrentRatio(target, Number(effect.payload.value ?? 0)); continue; } const statusId = effect.payload.statusType.startsWith('buff:') ? `chap_minh_ult_${effect.payload.statusType.slice(5)}_up` : effect.payload.statusType; Statuses.add(target, { id: statusId, kind: effect.type === 'grant-immunity' || effect.payload.statusType.startsWith('buff:') ? 'buff' : 'debuff', tag: effect.payload.statusType, dur: effect.payload.duration ?? 1, tick: 'turn', amount: effect.payload.value, sourceUnitId: actor.id }); } else throw new Error(`[canonical-effect] ${effect.type} requires a production status removal/dispel route`); return committedMutationState(game); },
+    resourceGateway(effect: EffectSpec & { type: 'spend-resource' | 'gain-resource' }) { const amount = Math.max(0, toRoundedInt(effect.payload.amount, 0)); if (effect.payload.resource !== 'aether') throw new Error('[canonical-effect] fury route requires personal resource gateway'); if (effect.type === 'spend-resource') { if (!globalAetherPool.consume(actor.side, amount)) throw new Error('[canonical-action] insufficient aether'); } else globalAetherPool.gain(actor.side, amount); return committedMutationState(game); },
+    summonGateway(effect: EffectSpec & { type: 'summon' }) { const slot = firstOpenSlot(game, actor.side); if (!slot) throw new Error('[canonical-effect] no summon slot available'); enqueueImmediate(game, { side: actor.side, slot, unit: { id: effect.payload.definitionId, name: effect.payload.definitionId, ownerIid: actor.iid, isMinion: true, hpMax: Math.max(1, Math.floor((actor.hpMax ?? 100) * 0.5)), hp: Math.max(1, Math.floor((actor.hpMax ?? 100) * 0.5)), ttlTurns: 3 } }); return committedMutationState(game); },
+    fieldGateway(effect: EffectSpec & { type: 'create-field' }) { ((game.runtime ??= {}) as { fields?: unknown[] }).fields ??= []; ((game.runtime as { fields: unknown[] }).fields).push({ fieldId: effect.payload.fieldId, sourceIid: actor.iid ?? actor.id, duration: effect.payload.duration ?? 2 }); return committedMutationState(game); },
+    movementGateway(effect: EffectSpec & { type: 'move' }) { for (const target of targets) { target.cx = effect.payload.cx; target.cy = effect.payload.cy; } return committedMutationState(game); },
     reactionGateway() { throw new Error('[canonical-effect] reaction effect requires action-chain coordinator route'); },
-    characterStateGateway(effect: any) { (actor as Record<string, unknown>)[effect.type === 'set-form' ? 'form' : 'stance'] = effect.payload.value; return eventState(game); },
+    characterStateGateway(effect: EffectSpec & { type: 'set-stance' | 'set-form' }) { (actor as Record<string, unknown>)[effect.type === 'set-form' ? 'form' : 'stance'] = effect.payload.value; return committedMutationState(game); },
   });
 }
