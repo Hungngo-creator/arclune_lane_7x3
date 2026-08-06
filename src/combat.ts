@@ -1,6 +1,7 @@
 //home (termux)/arclune_lane_7x3/src/combat.ts
 
 import { executeCanonicalAction } from './combat/canonical-action-executor.ts';
+import { registerCanonicalDamageOwner } from './combat/canonical-effect-gateways.ts';
 import { EXECUTABLE_CHARACTER_DEFINITIONS, requireExecutableCharacterDefinition, type ExecutableActionDefinition } from './combat/executable-character-definition.ts';
 import { getMetaById } from './catalog.ts';
 import { Statuses, hookOnLethalDamage } from './statuses.ts';
@@ -587,6 +588,8 @@ export interface HealResult {
   overheal: number;
 }
 
+registerCanonicalDamageOwner(dealAbilityDamage);
+
 export function healUnit(game: SessionState, healer: UnitToken, target: UnitToken | null | undefined, amount: number): HealResult;
 export function healUnit(target: UnitToken | null | undefined, amount: number): HealResult;
 export function healUnit(gameOrTarget: SessionState | UnitToken | null | undefined, healerOrAmount: UnitToken | number, maybeTarget?: UnitToken | null, maybeAmount?: number): HealResult {
@@ -793,7 +796,7 @@ const definition = requireExecutableCharacterDefinition(unit.id).actions.basic;
   if (!definition) throw new Error(`[catalog] ${unit.id} at kit.basic: requested action basic has no compiled definition`);
   const executed = executeCanonicalAction(Game, unit, definition);
   if (!executed.ok || executed.actionId == null) return result;
-  const finalization = ((Game.runtime ?? {}) as { finalizedActions?: Record<string, import('./combat/kernel/index.ts').ActionFinalizationResult> }).finalizedActions?.[String(executed.actionId)];
+  const finalization = executed.finalization;
   if (!finalization) return result;
   const damage = finalization.committedTargetAggregates;
   result.ok = true;

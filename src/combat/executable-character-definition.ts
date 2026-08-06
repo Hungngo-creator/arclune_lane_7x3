@@ -58,8 +58,6 @@ function effectsFor(action: Record<string, unknown>, target: TargetSpec): Effect
   const hpCost = finite(action.hpTradePercent ?? action.hpTradePercentMaxHP ?? action.hpSacrificePercentMax ?? action.sacrificeMaxHPPercent);
   if (hpCost !== null) effects.push({ type: 'pay-hp-cost', target: { kind: 'self' }, payload: { amount: hpCost } });
   const costRecord = record(action.cost);
-  const aetherCost = finite(costRecord.aether);
-  if (aetherCost !== null) effects.push({ type: 'spend-resource', target: { kind: 'self' }, payload: { resource: 'aether', amount: aetherCost } });
   const shieldCostRatio = finite(action.shieldCostRatioCurrent);
   if (shieldCostRatio !== null) effects.push({ type: 'apply-status', target: { kind: 'self' }, payload: { statusType: 'shield:consume-current-ratio', value: shieldCostRatio } });
   const summon = record(action.summon);
@@ -101,7 +99,7 @@ function compileAction(characterId: string, key: string, value: unknown, orderin
     actionId: `${characterId}:${key}`,
     target,
     effects: Object.freeze(effectsFor(action, target)),
-    cost: Object.freeze({ ...(finite(cost.fury) !== null ? { fury: finite(cost.fury)! } : {}), ...(finite(cost.hp) !== null ? { hp: finite(cost.hp)! } : {}) }),
+    cost: Object.freeze({ ...(finite(cost.aether) !== null ? { aether: finite(cost.aether)! } : {}), ...(finite(cost.fury) !== null ? { fury: finite(cost.fury)! } : {}), ...(finite(cost.hp) !== null ? { hp: finite(cost.hp)! } : {}) }),
     conditions: Object.freeze([
       ...(finite(action.minHpPercentToCast) !== null ? [{ type: 'minimum-current-hp-ratio', ratio: finite(action.minHpPercentToCast)! } as const] : []),
       ...(finite(action.limitUses ?? action.maxUsesPerBattle) !== null ? [{ type: 'maximum-uses-per-battle', uses: finite(action.limitUses ?? action.maxUsesPerBattle)! } as const] : []),

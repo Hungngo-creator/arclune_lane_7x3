@@ -5,14 +5,20 @@ import { enqueueImmediate } from '../summon.ts';
 import { consumeShieldByCurrentRatio, grantShield, readShieldAmount } from './apply-damage.ts';
 import { createEffectExecutionServices, type EffectExecutionServices, type EffectSpec } from './canonical-model.ts';
 import { currentActionExecution, resolveHealing, resolveHpLoss, resolveSourceAttribution, type ActionExecutionContext } from './kernel/public.ts';
-import { commitDamageBatch, resolveDamageBatch } from './kernel/damage-batch.ts';
 import { commitHealing, commitHpMutation } from './kernel/hp-mutation.ts';
 import { readAtkWilPower, toRoundedInt } from './number-utils.ts';
 import type { ActionCostReservation } from './kernel/action-transaction.ts';
 import type { ExecutableActionDefinition } from './executable-character-definition.ts';
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
-import { furyValue, spendFury } from '../utils/fury.ts';
+import { furyValue, setFury, spendFury } from '../utils/fury.ts';
+
+type CanonicalDamageOwner = (game: SessionState, actor: UnitToken, target: UnitToken, options: { base: number; dtype: string; attackType: string; actionIdentity: NonNullable<ReturnType<typeof identity>> }) => unknown;
+const damageOwnerRegistry = globalThis as typeof globalThis & { __arcluneCanonicalDamageOwner?: CanonicalDamageOwner };
+export function registerCanonicalDamageOwner(owner: CanonicalDamageOwner): void {
+  if (damageOwnerRegistry.__arcluneCanonicalDamageOwner && damageOwnerRegistry.__arcluneCanonicalDamageOwner !== owner) throw new Error('[canonical-effect] duplicate damage owner');
+  damageOwnerRegistry.__arcluneCanonicalDamageOwner = owner;
+}
 
 const committedMutationState = (game: SessionState): { eventSerial: number; stateRevision: number } => {
   const eventSerial = Number((((game.runtime ?? {}) as { combatSequence?: { eventSerial?: number } }).combatSequence ?? {}).eventSerial ?? 0);
@@ -47,9 +53,9 @@ export function validateCanonicalEffectPreparation(game: SessionState, actor: Un
 
 export function reserveCanonicalActionCosts(game: SessionState, actor: UnitToken, action: ExecutableActionDefinition): readonly ActionCostReservation[] {
   const reservations: ActionCostReservation[] = [];
-  if (action.cost.aether) reservations.push({ id: `${action.actionId}:aether`, validate: () => globalAetherPool.current(actor.side) >= (action.cost.aether ?? 0), commit: () => { if (!globalAetherPool.consume(actor.side, action.cost.aether ?? 0)) throw new Error('[canonical-action] insufficient aether'); }, release: () => {} });
-  if (action.cost.fury) reservations.push({ id: `${action.actionId}:fury`, validate: () => furyValue(actor) >= (action.cost.fury ?? 0), commit: () => { if (spendFury(actor, action.cost.fury ?? 0) !== action.cost.fury) throw new Error('[canonical-action] insufficient fury'); }, release: () => {} });
-  if (action.cost.hp) reservations.push({ id: `${action.actionId}:hp`, validate: () => Number(actor.hp ?? 0) > Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), commit: () => { const mutation = resolveHpLoss(actor, Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), 'hp-cost', sourceFor(actor), false); if (!mutation.succeeded) throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, actor, mutation, identity(game)); }, release: () => {} });
+  if (action.cost.aether) reservations.push({ id: `${action.actionId}:aether`, validate: () => globalAetherPool.current(actor.side) >= (action.cost.aether ?? 0), commit: () => { if (!globalAetherPool.consume(actor.side, action.cost.aether ?? 0)) throw new Error('[canonical-action] insufficient aether'); }, rollback: () => globalAetherPool.gain(actor.side, action.cost.aether ?? 0), release: () => {} });
+  if (action.cost.fury) reservations.push({ id: `${action.actionId}:fury`, validate: () => furyValue(actor) >= (action.cost.fury ?? 0), commit: () => { if (spendFury(actor, action.cost.fury ?? 0) !== action.cost.fury) throw new Error('[canonical-action] insufficient fury'); }, rollback: () => { setFury(actor, furyValue(actor) + (action.cost.fury ?? 0)); }, release: () => {} });
+  if (action.cost.hp) reservations.push({ id: `${action.actionId}:hp`, validate: () => Number(actor.hp ?? 0) > Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), commit: () => { const mutation = resolveHpLoss(actor, Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)), 'hp-cost', sourceFor(actor), false); if (!mutation.succeeded) throw new Error('[canonical-action] HP cost rejected'); commitHpMutation(game, actor, mutation, identity(game)); }, rollback: () => { actor.hp = Math.min(Number(actor.hpMax ?? 1), Number(actor.hp ?? 0) + Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0))); }, release: () => {} });
   return reservations;
 }
 
@@ -58,14 +64,13 @@ export function createCanonicalEffectServices(game: SessionState, actor: UnitTok
     damageGateway(effect: EffectSpec & { type: 'deal-damage' | 'reflect-damage' }) {
       const actionIdentity = identity(game);
       if (!actionIdentity) throw new Error('[canonical-effect] damage requires an active action identity');
-      const source = sourceFor(actor);
-      for (const target of targets) {
-        const amount = Math.max(1, Math.floor(readAtkWilPower(actor) * effect.payload.amount + readShieldAmount(actor) * Number(effect.payload.shieldRatio ?? 0)));
-        const attacker = { iid: actor.iid ?? actor.id, currentHp: Number(actor.hp ?? 0), maxHp: Number(actor.hpMax ?? 1), arm: Number(actor.arm ?? 0), res: Number(actor.res ?? 0) };
-        const defender = { iid: target.iid ?? target.id, currentHp: Number(target.hp ?? 0), maxHp: Number(target.hpMax ?? 1), arm: Number(target.arm ?? 0), res: Number(target.res ?? 0) };
-        const resolution = resolveDamageBatch({ identity: actionIdentity, source, packets: [{ packetId: `${String(actionIdentity.actionId)}:${String(target.iid ?? target.id)}:${effect.type}:${nextCanonicalPacketSerial(game)}`, actionId: actionIdentity.actionId, chainId: actionIdentity.chainId, source, targetIid: target.iid ?? target.id, damageType: effect.type === 'reflect-damage' ? 'reflected' : effect.payload.damageType, declaredDamage: amount, tags: [], isDot: false, isReflect: effect.type === 'reflect-damage', isFollowup: false, isCounter: false, reactionDepth: 0, pierceShield: effect.payload.pierceShield === true, packetSerial: 1 }], contexts: [{ attacker, defender, defensePenetration: { flat: 0, percent: 0 }, defenseModifiers: { flat: 0, percent: 0 }, outgoingModifiers: [1], incomingModifiers: [1], genericDamageReduction: 0, reflectDamageReduction: 0, shield: { shieldBefore: readShieldAmount(target) } }], targets: [{ ...defender, rawCurrentHp: Number(target.hp ?? 0), rawMaxHp: Number(target.hpMax ?? 1), trueSelfId: target.trueSelfId ?? null, lifeSerial: Number(target.lifeSerial ?? 1), slot: 0, weight: 1, capRatio: null }], shieldSnapshot: readShieldAmount(target), specialMitigation: null, batchPolicy: 'single', sharedHpPolicy: null });
-        const committed = commitDamageBatch(game, resolution, [target]);
-      }
+      if (!damageOwnerRegistry.__arcluneCanonicalDamageOwner) throw new Error('[canonical-effect] production damage owner is not registered');
+      for (const target of targets) damageOwnerRegistry.__arcluneCanonicalDamageOwner(game, actor, target, {
+        base: Math.max(1, Math.floor(readAtkWilPower(actor) * effect.payload.amount + readShieldAmount(actor) * Number(effect.payload.shieldRatio ?? 0))),
+        dtype: effect.payload.damageType === 'will' ? 'arcane' : effect.payload.damageType,
+        attackType: effect.type === 'reflect-damage' ? 'reflect' : 'skill',
+        actionIdentity,
+      });
       return committedMutationState(game);
     },
     healingGateway(effect: EffectSpec & { type: 'heal' }) { for (const target of targets) commitHealing(game, target, resolveHealing(target, Math.max(1, Math.floor((target.hpMax ?? 1) * effect.payload.amount)), sourceFor(actor)), identity(game)); return committedMutationState(game); },

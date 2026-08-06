@@ -19,7 +19,7 @@
     "check:duplicate-declarations": "node tools/check-duplicate-declarations.mjs",
     "build:dev:chess-strategy-rpg": "node tools/generate-loithienanh-svg.mjs && node build.mjs --mode=development --prune-unreachable --skip-bundle-verify",
     "check:character-runtime-mutations": "node tools/audit-character-runtime-mutations.mjs",
-    "certify:pve-foundation": "jest --runInBand --runTestsByPath test/pve/pve-foundation-freeze.test.ts test/pve/roster-action-matrix.test.ts test/roster-runtime-coverage.test.ts test/pve-turn-base-runtime-gate.test.ts test/pve-session-runtime.test.ts test/pve-session-interleaved-random-start.test.ts test/combat-kernel-phase-b1.test.ts test/combat-kernel-phase-b2.test.ts test/statuses-lethal.test.ts test/summon-construction-contract.test.ts && npm run smoke:long-battle",
+    "certify:pve-foundation": "jest --runInBand --runTestsByPath test/pve/pve-foundation-freeze.test.ts test/roster-action-matrix.test.ts test/roster-runtime-coverage.test.ts test/pve-turn-base-runtime-gate.test.ts test/pve-session-runtime.test.ts test/pve-session-interleaved-random-start.test.ts test/combat-kernel-phase-b1.test.ts test/combat-kernel-phase-b2.test.ts test/statuses-lethal.test.ts test/summon-construction-contract.test.ts && npm run smoke:long-battle",
     "audit:single-combat-runtime": "REQUIRE_NO_LEGACY_COMBAT=1 node tools/audit-single-combat-runtime.mjs"
   },
   "keywords": [],

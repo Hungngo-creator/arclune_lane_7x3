@@ -1414,15 +1414,9 @@ const buildAliveTokenIndex = (tokens: ReadonlyArray<UnitToken>): AliveTokenIndex
 // Thực thi Ult: Summoner -> Immediate Summon theo meta; class khác: trừ nộ
 function performUlt(unit: UnitToken): void {
   const game = getInitializedGame();
-  if (!game) {
-    setFury(unit, 0);
-    return;
-  }
+  if (!game) return;
   const definition = requireExecutableCharacterDefinition(unit.id).ultimate;
-  if (!definition) {
-    spendFury(unit, resolveUltCost(unit));
-    return;
-  }
+  if (!definition) throw new Error(`[catalog] ${unit.id} at kit.ultimate: missing compiled definition`);
   const result = executeCanonicalAction(game, unit, definition);
   if (result.ok) {
     extendBusy(900);
