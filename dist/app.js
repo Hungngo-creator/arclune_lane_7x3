@@ -293,6 +293,11 @@ __modules['./aether.ts'] = (exports, module, __require) => {
               values[side].max = calculateMax(units, side);
               values[side].current = clamp(values[side].current, 0, values[side].max);
           } },
+          snapshot() { return Object.freeze({ ally: Object.freeze({ ...values.ally }), enemy: Object.freeze({ ...values.enemy }) }); },
+          restore(snapshot) { for (const side of ['ally', 'enemy']) {
+              values[side].max = Math.max(0, Math.floor(Number(snapshot[side]?.max ?? 0)));
+              values[side].current = clamp(Math.floor(Number(snapshot[side]?.current ?? 0)), 0, values[side].max);
+          } },
       });
       sessionLedgers.set(owner, ledger);
       return ledger;
@@ -5902,7 +5907,7 @@ __modules['./combat/canonical-effect-gateways.ts'] = (exports, module, __require
                   && furyValue(actor) >= (action.cost.fury ?? 0)
                   && Number(actor.hp ?? 0) > Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)),
               commit: () => commitProductionEffect.commitActionCosts(game, actor, action),
-              rollback: () => { throw new Error('[canonical-action] action costs are committed atomically with the prepared action'); },
+              rollback: () => { },
               release: () => { },
           }];
   }
@@ -6657,7 +6662,7 @@ __modules['./combat/executable-character-definition.ts'] = (exports, module, __r
           if (effect.type === 'grant-shield')
               add('protection:shield');
           if (effect.type === 'apply-status')
-              add('status:debuff');
+              add(effect.payload.statusType.startsWith('buff:') ? 'status:buff' : effect.payload.statusType.includes('mark') ? 'status:mark' : 'status:debuff');
           if (effect.type === 'grant-immunity')
               add('status:immunity');
           if (effect.type === 'summon')
@@ -6688,7 +6693,7 @@ __modules['./combat/executable-character-definition.ts'] = (exports, module, __r
       const cost = record(action.cost);
       const actionCost = Object.freeze({ ...(finite(cost.aether) !== null ? { aether: finite(cost.aether) } : {}), ...(finite(cost.fury) !== null ? { fury: finite(cost.fury) } : {}), ...(finite(cost.hp) !== null ? { hp: finite(cost.hp) } : {}) });
       const effects = Object.freeze(effectsFor(action, target));
-      const authority = Array.isArray(action.tags) && action.tags.includes('global-rule') ? 'rule' : 'none';
+      const authority = Array.isArray(action.tags) && action.tags.some(tag => typeof tag === 'string' && tag.trim().toLowerCase() === 'global-rule') ? 'rule' : 'none';
       return Object.freeze({
           actionId: `${characterId}:${key}`,
           target,
@@ -6853,17 +6858,42 @@ __modules['./combat/kernel/action-context.ts'] = (exports, module, __require) =>
   if (!Object.prototype.hasOwnProperty.call(exports, 'nextActionPacket')) exports.nextActionPacket = nextActionPacket;
 };
 __modules['./combat/kernel/action-transaction.ts'] = (exports, module, __require) => {
-  const __dep0 = __require('./combat/kernel/sequence.ts');
-  const nextEventSerial = __dep0.nextEventSerial;
-  const __dep1 = __require('./combat/kernel/action-context.ts');
-  const beginActionExecution = __dep1.beginActionExecution;
-  const endActionExecution = __dep1.endActionExecution;
-  const finalizeCombatAction = __dep1.finalizeCombatAction;
-  const __dep2 = __require('./combat/kernel/life-cycle.ts');
-  const isCombatAlive = __dep2.isCombatAlive;
+  const __dep0 = __require('./aether.ts');
+  const getSessionAether = __dep0.getSessionAether;
+  const __dep1 = __require('./combat/kernel/sequence.ts');
+  const nextEventSerial = __dep1.nextEventSerial;
+  const __dep2 = __require('./combat/kernel/action-context.ts');
+  const beginActionExecution = __dep2.beginActionExecution;
+  const endActionExecution = __dep2.endActionExecution;
+  const finalizeCombatAction = __dep2.finalizeCombatAction;
+  const __dep3 = __require('./combat/kernel/life-cycle.ts');
+  const isCombatAlive = __dep3.isCombatAlive;
+  function cloneData(value) {
+      return value == null ? value : JSON.parse(JSON.stringify(value));
+  }
+  function takeRollbackSnapshot(game) {
+      return Object.freeze({
+          tokens: game.tokens.map(token => Object.freeze({ token, snapshot: cloneData(token) })),
+          queued: cloneData(game.queued),
+          runtime: cloneData(game.runtime),
+          aether: getSessionAether(game).snapshot(),
+      });
+  }
+  function restoreRollbackSnapshot(game, snapshot) {
+      for (const { token, snapshot: tokenSnapshot } of snapshot.tokens) {
+          for (const key of Object.keys(token))
+              delete token[key];
+          Object.assign(token, cloneData(tokenSnapshot));
+      }
+      game.tokens.splice(0, game.tokens.length, ...snapshot.tokens.map(item => item.token));
+      game.queued = cloneData(snapshot.queued);
+      game.runtime = cloneData(snapshot.runtime);
+      getSessionAether(game).restore(snapshot.aether);
+  }
   /** The sole orchestration boundary for validation, reservation and one-time cost commit. */
   function executeActionTransaction(command) {
       let stage = 'ACTION_DECLARE';
+      const rollbackSnapshot = takeRollbackSnapshot(command.game);
       const events = ((command.game.runtime ??= {}).combatEvents ??= []);
       const publish = () => { events.push({ type: stage, eventSerial: nextEventSerial(command.game), actionId: command.identity.actionId, chainId: command.identity.chainId }); };
       publish();
@@ -6901,9 +6931,8 @@ __modules['./combat/kernel/action-transaction.ts'] = (exports, module, __require
       catch (error) {
           if (context)
               endActionExecution(command.game, context);
-          // Programming faults fail closed. Costs remain committed because payload owners may
-          // already have committed authoritative state; resource-only rollback is not atomic.
-          reservations.forEach(item => item.release());
+          restoreRollbackSnapshot(command.game, rollbackSnapshot);
+          reservations.forEach(item => { item.rollback(); item.release(); });
           throw error;
       }
   }

@@ -34,7 +34,7 @@ export function reserveCanonicalActionCosts(game: SessionState, actor: UnitToken
       && furyValue(actor) >= (action.cost.fury ?? 0)
       && Number(actor.hp ?? 0) > Math.floor((actor.hpMax ?? 1) * (action.cost.hp ?? 0)),
     commit: () => commitProductionEffect.commitActionCosts(game, actor, action),
-    rollback: () => { throw new Error('[canonical-action] action costs are committed atomically with the prepared action'); },
+    rollback: () => {},
     release: () => {},
   }];
 }

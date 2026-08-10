@@ -2,6 +2,7 @@ import type { SessionState } from '@shared-types/combat';
 import type { ActionIdentity } from './types.ts';
 
 export interface CombatSequenceState { actionSerial: number; chainSerial: number; eventSerial: number; deathSerial: number; stateRevision?: number; instanceSerial?: number }
+type RuntimeSequence = { combatSequence?: CombatSequenceState };
 
 export function getCombatSequence(game: SessionState): CombatSequenceState {
   const runtime = (game.runtime ??= {}) as RuntimeSequence;

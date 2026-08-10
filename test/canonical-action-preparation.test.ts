@@ -57,3 +57,27 @@ test('preflight is cost-free and successful multi-effect actions charge exactly 
   expect(new Set(result.receipts.map(receipt => receipt.stateRevision)).size).toBe(2);
   expect(result.receipts.every(receipt => receipt.actionId && receipt.chainId && receipt.targetLifeIds[0] === 'actor:1:1')).toBe(true);
 });
+test('kernel transaction rolls back costs and prior effect commits when a later production owner fails', () => {
+  const actor: any = { ...unit('actor', 'ally', 0), trueSelfId: 'actor', incarnationSerial: 1, lifeSerial: 1, fury: 10, hp: 50, hpMax: 100, statuses: [] };
+  const enemy: any = { ...unit('enemy', 'enemy', 1), trueSelfId: 'enemy', incarnationSerial: 1, lifeSerial: 1, statuses: [] };
+  const game: any = { tokens: [actor, enemy], queued: [], runtime: {}, rng: { seed: 11, calls: 0 } };
+  const ledger = getSessionAether(game);
+  ledger.gain('ally', 50);
+  const before = { hp: actor.hp, fury: actor.fury, ae: ledger.current('ally'), events: JSON.stringify(game.runtime.combatEvents ?? []) };
+  const action: any = {
+    actionId: 'actor:rollback', target: { kind: 'self' }, cost: { aether: 10 }, conditions: [], metadataTags: [], authority: 'none', ordering: 0, modeScope: ['pve'],
+    effects: [
+      { type: 'heal', target: { kind: 'self' }, payload: { amount: .25 } },
+      { type: 'spend-resource', target: { kind: 'self' }, payload: { resource: 'aether', amount: before.ae } },
+    ],
+  };
+  expect(() => executeCanonicalAction(game, actor, action)).toThrow('insufficient aether');
+  expect({ hp: actor.hp, fury: actor.fury, ae: ledger.current('ally'), events: JSON.stringify(game.runtime.combatEvents ?? []) }).toEqual(before);
+});
+
+test('compiled buff metadata is derived from EffectSpec instead of legacy debuff fallback', () => {
+  const compiled = compileCatalogAction('author', 'skill1', { buffStats: { atk: .2 }, tags: ['self-buff'] })!;
+  expect(compiled.effects).toEqual([{ type: 'apply-status', target: { kind: 'self' }, payload: { statusType: 'buff:atk', value: .2 } }]);
+  expect(compiled.metadataTags).toEqual(expect.arrayContaining(['status:buff']));
+  expect(compiled.metadataTags).not.toContain('status:debuff');
+});

@@ -1,6 +1,7 @@
 import type { SessionState } from '@shared-types/combat';
 import type { UnitToken } from '@shared-types/units';
 import type { ActionIdentity } from './types.ts';
+import { getSessionAether } from '../../aether.ts';
 import { nextEventSerial } from './sequence.ts';
 import { beginActionExecution, endActionExecution, finalizeCombatAction, type ActionFinalizationResult } from './action-context.ts';
 import { isCombatAlive } from './life-cycle.ts';
@@ -14,9 +15,41 @@ export interface ActionTransactionCommand<T> {
 }
 export interface ActionTransactionResult<T> { ok: boolean; stage: ActionTransactionStage; payload?: T; finalization?: ActionFinalizationResult; reason?: 'actor-blocked' | 'invalid-target' | 'insufficient-cost' }
 
+function cloneData<T>(value: T): T {
+  return value == null ? value : JSON.parse(JSON.stringify(value)) as T;
+}
+
+interface KernelRollbackSnapshot {
+  readonly tokens: readonly { readonly token: UnitToken; readonly snapshot: Record<string, unknown> }[];
+  readonly queued: SessionState['queued'];
+  readonly runtime: SessionState['runtime'];
+  readonly aether: ReturnType<ReturnType<typeof getSessionAether>['snapshot']>;
+}
+
+function takeRollbackSnapshot(game: SessionState): KernelRollbackSnapshot {
+  return Object.freeze({
+    tokens: game.tokens.map(token => Object.freeze({ token, snapshot: cloneData(token as unknown as Record<string, unknown>) })),
+    queued: cloneData(game.queued),
+    runtime: cloneData(game.runtime),
+    aether: getSessionAether(game).snapshot(),
+  });
+}
+
+function restoreRollbackSnapshot(game: SessionState, snapshot: KernelRollbackSnapshot): void {
+  for (const { token, snapshot: tokenSnapshot } of snapshot.tokens) {
+    for (const key of Object.keys(token)) delete (token as unknown as Record<string, unknown>)[key];
+    Object.assign(token, cloneData(tokenSnapshot));
+  }
+  game.tokens.splice(0, game.tokens.length, ...snapshot.tokens.map(item => item.token));
+  game.queued = cloneData(snapshot.queued);
+  game.runtime = cloneData(snapshot.runtime);
+  getSessionAether(game).restore(snapshot.aether);
+}
+
 /** The sole orchestration boundary for validation, reservation and one-time cost commit. */
 export function executeActionTransaction<T>(command: ActionTransactionCommand<T>): ActionTransactionResult<T> {
   let stage: ActionTransactionStage = 'ACTION_DECLARE';
+  const rollbackSnapshot = takeRollbackSnapshot(command.game);
   const events = (((command.game.runtime ??= {}) as { combatEvents?: Record<string, unknown>[] }).combatEvents ??= []);
   const publish = (): void => { events.push({ type: stage, eventSerial: nextEventSerial(command.game), actionId: command.identity.actionId, chainId: command.identity.chainId }); };
   publish();
@@ -40,9 +73,8 @@ export function executeActionTransaction<T>(command: ActionTransactionCommand<T>
     return { ok: true, stage, payload, finalization };
   } catch (error) {
     if (context) endActionExecution(command.game, context);
-    // Programming faults fail closed. Costs remain committed because payload owners may
-    // already have committed authoritative state; resource-only rollback is not atomic.
-    reservations.forEach(item => item.release());
+    restoreRollbackSnapshot(command.game, rollbackSnapshot);
+    reservations.forEach(item => { item.rollback(); item.release(); });
     throw error;
   }
 }

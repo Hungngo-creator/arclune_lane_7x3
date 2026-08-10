@@ -63,8 +63,6 @@ export type EffectSpec =
   | { readonly type: 'request-death-prevention' | 'request-revive' | 'enter-reincarnation' | 'request-rebirth'; readonly target: TargetSpec; readonly payload: { readonly effectId: string } }
   | { readonly type: 'queue-delayed-revive'; readonly target: TargetSpec; readonly payload: { readonly effectId: string; readonly duePolicy: string } }
   | { readonly type: 'set-stance' | 'set-form'; readonly target: TargetSpec; readonly payload: { readonly value: string } };
-/** @deprecated Use EffectSpec. */
-export type EffectDefinition = EffectSpec;
 export interface EffectCommitReceipt { readonly effectType: ImplementedEffectType; readonly committed: true; readonly eventSerial: number; readonly stateRevision: number; readonly actionId: string | number; readonly chainId: string | number; readonly targetLifeIds: readonly string[]; readonly session?: unknown }
 type GatewayOperation<T extends EffectType> = (effect: Extract<EffectSpec, { type: T }>, context: EffectExecutionContext) => EffectCommitReceipt;
 export interface EffectExecutionServices {

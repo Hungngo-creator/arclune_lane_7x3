@@ -310,6 +310,8 @@ export interface SessionAetherLedger {
   gain(side: Side, amount: number): number;
   consume(side: Side, amount: number): boolean;
   reconcile(units: readonly UnitToken[]): void;
+  snapshot(): Readonly<Record<Side, { readonly current: number; readonly max: number }>>;
+  restore(snapshot: Readonly<Record<Side, { readonly current: number; readonly max: number }>>): void;
 }
 
 const sessionLedgers = new WeakMap<object, SessionAetherLedger>();
@@ -333,6 +335,8 @@ export function getSessionAether(game: SessionState): SessionAetherLedger {
     gain(side: Side, amount: number) { const state = values[side]; state.current = clamp(state.current + Math.max(0, amount), 0, state.max); return state.current; },
     consume(side: Side, amount: number) { const cost = Math.max(0, amount); if (values[side].current < cost) return false; values[side].current -= cost; return true; },
     reconcile(units: readonly UnitToken[]) { for (const side of ['ally', 'enemy'] as const) { values[side].max = calculateMax(units, side); values[side].current = clamp(values[side].current, 0, values[side].max); } },
+    snapshot() { return Object.freeze({ ally: Object.freeze({ ...values.ally }), enemy: Object.freeze({ ...values.enemy }) }); },
+    restore(snapshot: Readonly<Record<Side, { readonly current: number; readonly max: number }>>) { for (const side of ['ally', 'enemy'] as const) { values[side].max = Math.max(0, Math.floor(Number(snapshot[side]?.max ?? 0))); values[side].current = clamp(Math.floor(Number(snapshot[side]?.current ?? 0)), 0, values[side].max); } },
   });
   sessionLedgers.set(owner, ledger);
   return ledger;

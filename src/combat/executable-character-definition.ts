@@ -96,7 +96,7 @@ function metadataFor(characterId: string, key: string, action: Record<string, un
   for (const effect of effects) {
     if (effect.type === 'deal-damage' || effect.type === 'reflect-damage') add(`damage:${effect.payload.damageType}` as CanonicalMetadataTag);
     if (effect.type === 'heal') add('recovery:heal'); if (effect.type === 'grant-shield') add('protection:shield');
-    if (effect.type === 'apply-status') add('status:debuff'); if (effect.type === 'grant-immunity') add('status:immunity'); if (effect.type === 'summon') add('entity:summon'); if (effect.type === 'create-field') add('entity:field');
+    if (effect.type === 'apply-status') add(effect.payload.statusType.startsWith('buff:') ? 'status:buff' : effect.payload.statusType.includes('mark') ? 'status:mark' : 'status:debuff'); if (effect.type === 'grant-immunity') add('status:immunity'); if (effect.type === 'summon') add('entity:summon'); if (effect.type === 'create-field') add('entity:field');
   }
   if (cost.aether) add('cost:aether'); if (cost.fury) add('cost:fury'); if (cost.hp) add('cost:hp');
   const rawTags = Array.isArray(action.tags) ? action.tags : [];
@@ -114,7 +114,7 @@ export function compileCatalogAction(characterId: string, key: string, value: un
   const cost = record(action.cost);
   const actionCost = Object.freeze({ ...(finite(cost.aether) !== null ? { aether: finite(cost.aether)! } : {}), ...(finite(cost.fury) !== null ? { fury: finite(cost.fury)! } : {}), ...(finite(cost.hp) !== null ? { hp: finite(cost.hp)! } : {}) });
   const effects = Object.freeze(effectsFor(action, target));
-  const authority: AuthorityTier = Array.isArray(action.tags) && action.tags.includes('global-rule') ? 'rule' : 'none';
+  const authority: AuthorityTier = Array.isArray(action.tags) && action.tags.some(tag => typeof tag === 'string' && tag.trim().toLowerCase() === 'global-rule') ? 'rule' : 'none';
   return Object.freeze({
     actionId: `${characterId}:${key}`,
     target,

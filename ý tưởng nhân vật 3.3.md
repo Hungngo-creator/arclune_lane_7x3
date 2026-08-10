@@ -1555,5 +1555,50 @@ Bộ kit này không cần buff thêm. Với tăng chỉ số theo chỉ số hi
 
 ultimate: triệu hồi 3 trụ đá ngẫu nhiên (không thể trùng, nếu không đủ 3 kẻ thù chỉ triệu hồi 2 hoặc 1 trụ đá theo trường hợp) tấn công mục tiêu từ dưới chân chúng, gây sát thương bằng 1 đánh thường của bản thân/mỗi kẻ bị trụ đá tấn công, khiến chúng bị hất tung trong 1s, sau 1s, chúng rơi xuống vị trí cũ, nhận sát thương chuẩn = 3% max hp của bản thân chúng, ultimate này đối class tanker cao hơn bản thân không thể hất tung, phần sát thương 1 đánh thường tanker địch vẫn nhận nhưng hất tung và sát thương chuẩn sẽ không nhận (nếu tanker rank cao hơn bản thân), ultimate chọn target cũng ưu tiên mục tiêu không phải class tanker.
 
-76)
+76) Luân Hồi Chi Chủ
+Prime, Mage
+nội tại: khi 1 đồng minh hoặc kẻ thù vào luân hồi, tạo 1 kén, kén đó tồn tại trong 1 turn, có hp = 80% max hp của hắn, kén giảm 65% mọi sát thương nhận vào từ mọi nguồn trừ sát thương chuẩn, sau 1 turn kén sẽ nở, nở ra 1 nhân vật mới có ngoại hình bất kỳ nhân vật nào có trong collection trừ ngoại hình của những nhân vật tham gia/tồn tại ở deck trong trận đấu đó, nhân vật mới đó sẽ thuộc về phe đồng minh của luân hồi chi chủ (kén từ nội tại này cũng tồn tại trên sân thuộc phe của hắn) bất kể chân ngã của kén đó trước khi chết thuộc về phe nào, nhân vật mới sẽ có 3 giai đoạn, ngoại hình của nhân vật mới đó sẽ không thay đổi theo giai đoạn.
+Giai đoạn I, Ấu Niên: thừa hưởng 30% mọi chỉ số, nội tại, rank, đánh thường và ultimate và class thuộc chân ngã của bản thân từ đời trước trừ 3 skill.
+Giai đoạn II, Thành Niên: trên cở sở đã có ở giai đoạn 1, tăng chỉ số thừa hưởng lên 20%, có thể dùng skill 1 của đời trước.
+Giai đoạn III, Tráng Niên: trên cơ sở đã có ở giai đoạn 2, tăng chỉ số thừa hưởng lên 20%, có thể dùng skill 2 và 3 của đời trước.
+Giai đoạn IV, Lão Niên: trên cơ sở giai đoạn 3, mỗi turn giảm 20% chỉ số thừa hưởng từ đời trước cho đến khi chết, hp max = 0 cũng sẽ chết.
+khi kén nở, lập tức bước vào giai đoạn 1, nhân vật nở từ kén sẽ thuộc giai đoạn 1 trong 1 turn của bản thân, sau 1 turn đó đến turn tiếp theo bước vào Thành Niên, sau 2 turn của bản thân lại vào Tráng Niên, sau 3 turn của bản thân vào Lão Niên.
+nội tại này khiến 1 char có ngoại hình của char A nhưng lại có kit của char B, ví dụ: Silas Blackspur phe địch chết và vào luân hồi, hắn bị nội tại này ảnh hưởng, trong sân thuốc phe của nội tại này xuất hiện kén trong 1 turn, 1 turn sau kén nở ra 1 char mới với ngoại hình và hành vi của Ur Đạo Mộng Dao nhưng có rank/nội tại/đánh thường/ultimate và 30% chỉ số của đời trước là Silas, lúc dùng ultimate thì giọng silas nhưng đánh thường lại là giọng của Đạo Mộng Dao.
+còn về vấn đề vfx thì dùng của char kén đã sao chép đi, như silas cầm súng kén nở ra đạo mộng dao không có súng phải làm sao? hay là giữ animation đánh thường Đạo Mộng Dao?
+nội tại cấp quy tắc, riêng thần tính là axiom.
+Thần tính: không nhận mọi hiệu ứng/buff/debuff/mark có lợi/hại hoặc không lợi hay hại từ nguồn ngoài bản thân kể cả đồng minh.
 
+skill 1: tất cả chân ngã của kẻ thù đang đợi vào luân hồi sẽ lập tức vào luân hồi, cost: bản thân luân hồi chi chủ bị giảm 20% max hp trong 2 turn của bản thân hắn sau khi dùng skill này, sau khi 2 turn đó hết, trả lại và hồi hp = 20% max hp đã mất, sau khi kích hoạt cũng - 25 ae và 5 nộ, bất kể điều kiện cost nào chưa thoả mãn đều không thể dùng skill 1. quy tắc.
+
+skill 2: lẩn trốn vào luân hồi, rời khỏi hiện thế, biến mất khỏi trận đấu (không tính DEATH_CONFIRMED, không vào cửa sổ chờ luân hồi) sau 1 turn của leader khi kích hoạt skill này, trở lại hiện thế, vào sân ở 1 ô ngẫu nhiên còn trống trong sân phe đồng minh, nếu đầy sân, mỗi 1 turn của leader hắn sẽ thử trở lại 1 lần cho đến khi thành công trở lại sân, khi trở lại sân, hồi hp = 20% max hp của bản thân sau đó tăng 5% max hp dựa trên max hp có lúc vào sân khi dùng skill này, phần tăng 5% max hp này sẽ mất khi rời sân (vì skill này hoặc vào cửa sổ chờ luân hồi hoặc đã vào luân hồi), đương nhiên tăng max hp dựa theo max hp có lúc rời sân khi dùng skill này nên có thể dùng skill này để tăng max hp mãi, cost: 15 ae.
+
+skill 3: đứng tại chổ chưởng 1 chưởng bay ra 3 orb như đánh thường, gây sát thương ngẫu nhiên lên 3 mục tiêu, mỗi kẻ nhận 150% sát thương đánh thường của luân hồi chi chủ, đồng thời đánh dấu những kẻ đó, mark này không có hại lên kẻ thù, khi những kẻ bị đánh dấu chết mà bản thân luân hồi chi chủ có mặt trên sân, hắn được + 100% hp regen hiện có, 15 rage, cost: 20 ae.
+
+ultimate: đánh thường và cast skill 3 cùng lúc sau đó cast skill 1, cả 2 skill cast qua ultimate này sẽ không tốn ae và vẫn giữ nguyên hiệu ứng đã có của 2 skill này, khi phán định cũng là phán định tag của 2 skill này mà không phải của ultimate.
+
+trong mắt player thì hắn chưởng 1 chưởng bay ra 4 orb, 1 orb tuân theo ssi, 3 orb ngẫu nhiên mục tiêu, khi 4 orb đã gây sát thương xong hắn cũng sẽ cast skill 1.
+
+đánh thường: chưởng 1 chưởng, bắn ra 1 orb màu đỏ và đen đan xen, gâu sát thương lên 1 kẻ địch = 100% wil/atk của bản thân.
+
+nếu ultimate thì cast đánh thường và skill 3 cùng lúc nhưng vfx chỉ là 1 chưởng nhưng bay ra 4 orb.
+
+77)
+warrior, ssr.
+nội tại: khi nhận sát thương chuẩn, tăng 2% max hp hiện có của bản thân, kích hoạt 1 lần/turn của bản thân, tức hắn hành động xong > nhận sát thương chuẩn > tăng 2% max hp > nhận sát thương chuẩn lần nữa > không tăng > đến turn của bản thân hắn hành động > nhận sát thương chuẩn > tăng 2% max hp, dạng như ranger silas.
+mỗi turn hành động xong nhận sát thương chuẩn = 1% max hp đổi lại rage + 4.
+vậy mỗi turn nếu không bị đánh hắn cũng tự mất 1% hp nhưng tăng 2% max hp và +4 rage.
+nếu hắn có hp dưới hoặc = 1% hoặc mới vừa được hiệu ứng miễn tử ( khi hp về 0, không chết mà hồi 1 hp, tên gọi chính xác tao quên) thì hắn sẽ vì nội tại này mà chết.
+
+khi nhận heal từ mọi nguồn vượt max hp sẽ chuyển phần overheal sang atk và wil, tỉ lệ overheal 1% max hp:0,5% atk và wil, hiệu ứng chuyển đổi này tồn tại tối đa 1 turn của bản thân hắn và mỗi turn của bản thân hắn chỉ kích hoạt tối đa 3 lần chuyển đổi và chỉ kích hoạt khi đã thực thi xong hành động và đợi turn tiếp theo.
+ví dụ: hắn có 50 hp, 5 atk và wil, hắn hành động xong còn 50 hp nhưng đến turn kẻ thù đánh thì hắn bị đánh còn 40/50 hp, sau đó đến sp đồng minh heal 25 hp cho hắn, hắn có 50 hp và 15 hp over heal vậy hắn có 12,5 atk và wil, sau đó đến turn của hắn, hắn hành động với 50 hp, 12,5 atk và wil xong thì hiệu ứng chuyển đổi này biến mất, nếu hắn được over heal nữa thì lại kích hoạt chuyển đổi.
+
+skill 1: gây sát thương cố định vào ô 1/3/5 của kẻ địch, mỗi kẻ địch đứng trong 3 ô này nhận sát thương = 1 đánh thường của nhân vật này, nhân vật này hồi hp = 25% tổng sát thương skill này gây ra. cost: 20 ae.
+
+skill 2: gây sát thương cố định vào ô 7/8/9 của kẻ thù, mỗi kẻ nhận 170% đánh thường của nhân vật này, 20% của 170% đó sẽ được gây ra dưới dạng sát thương chuẩn, sau khi gây sát thương xong nhân vật này tăng 10% res/arm của bản thân trong 2 turn của hắn, 25 ae.
+
+skill 3: mỗi khi nhận 1 debuff có cấp độ dưới hoặc bằng Pháp Tắc, trong vòng 3 turn tiếp theo của bản thân sẽ không nhận debuff cùng loại đó nữa, tự kích hoạt mỗi khi nhận debuff dưới hoặc bằng cấp Pháp Tắc, mỗi lần kích hoạt - 3% hp và 10 ae. Skill này không kích hoạt khi gặp debuff cấp Quy tắc hay axiom. skill cấp Quy Tắc.
+
+ultimate: cast cùng lúc skill 1 và 2, không tốn ae và giữ nguyên hiệu ứng của 2 skill này, khi cast ultimate mà có xung đột tag với skill 1 và 2 thì sẽ dùng cấp tag của ultimate để phán định, Pháp Tắc.
+tức skill 1 và 2 cast không thông qua ult để cast thì sẽ không có tag tức dưới cấp Pháp tắc, nếu cast skill 1 và 2 qua ultimate mà có xung đột thì sẽ dùng cấp tag của ult để phán định.
+
+đánh thường: chém 1 kiếm gây sát thương = 100% wil/atk của bản thân lên 1 mục tiêu, mỗi lần đánh thường đều sẽ áp dụng buff cuồng bạo (tăng 10% sát thương gây ra thì phải, không nhớ rõ) lên đánh thường.
