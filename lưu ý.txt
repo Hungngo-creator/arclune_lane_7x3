@@ -460,3 +460,29 @@ SSI (Sequential Simultaneous Instant)
 Sequential (Tuần tự): Các đơn vị hành động theo thứ tự cố định từ ô số 1 đến ô số 9 (A đồng minh, B kẻ địch. 1A>1B>2A>2B>3A>3B cho đến 9A>9B rồi lại đến 1A>1B, lặp lại đến khi hp leader của 1 trong 2 phe về 0, nếu ô nào không có nhân vật đứng thì sẽ đến lượt của nhân vật khác của phe đó mới tới phe kia, ví dụ 1A> 1B lúc này tới 2A nhưng 2A không có ai nên sẽ tới 3A hay 8A chẳng hạn rồi đến 5B, 2B hoặc ô nào đó có nhân vật khác đứng của bên B, đương nhiên theo logic ô 1 > 9 lặp lại nên không có vụ đến phe B ô 3B có người đứng lại đến ô 8B đánh, kiểu thế).
 Simultaneous (Đồng thời): Mặc dù thực thi tuần tự, nhưng các hiệu ứng, sát thương và Buff/Debuff được tính toán để tạo cảm giác các đơn vị trong cùng một Lane (hàng) đang phối hợp tác chiến cùng lúc.
 Instant (Tức thời): Mọi tính toán được xử lý ngay lập tức. Khi Slot 1 đánh, kết quả máu trừ, nộ tăng được cập nhật ngay để Slot 2 có thể tương tác dựa trên trạng thái mới đó.
+
+Z. CLASS_BONUS_MAP và element tag:
+đây là tương tác sát thương/khắc chế giữa các class và element tag:
+- Assassin > Mage (+10%), phụ Support (+5%)
+- Mage > Warrior (+10%), phụ Tanker (+5%)
+- Tanker > Assassin (+10%), phụ Summoner (+5%)
+- Warrior > Tanker (+10%), phụ Ranger (+5%)
+- Ranger > Mage (+10%), phụ Support (+5%)
+- Summoner > Ranger (+10%), phụ Warrior (+5%)
+- Support > Summoner (+10%), phụ Mage (+5%)
+ELEMENT_CYCLE
+Element tag counter
+Fire > Metal (+10%)
+Metal > Wood (+10%)
+Wood > Earth (+10%)
+Earth > Lightning (+10%)
+Lightning > Blood (+10%)
+Blood > Water (+10%)
+Water > Fire (+10%)
+Light > Dark (+10%)
+Dark > Light (+10%)
+Wind: không counter trực tiếp
+Neutral: không counter trực tiếp
+Nguồn logic: ELEMENT_CYCLE là fire → metal → wood → earth → lightning → blood → water, light/dark khắc nhau hai chiều, còn wind hoặc neutral trả bonus 0. 
+
+

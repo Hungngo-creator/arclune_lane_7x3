@@ -2263,10 +2263,9 @@ Ultimate #1 → +500 → 18.000
 Ultimate #2 → +500 → 18.500
 Điều này nghĩa là nội tại +75% là nền cố định, còn Ultimate là sự trưởng thành của riêng trận đó.
 
-86)
-
-warrior
-
+86) Verdict
+warrior, ssr.
+DMG 4 / SUR 3 / CTL 1 / CMP 2 / MIC 2 / VIS 5
 nội tại: đánh thường và ultimate luân phiên 2 trạng thái:
 Chém Ngang: sát thương tăng 20% atk, hồi hp = 10% sát thương gây ra lên lẻ kẻ thù (gây lên khiên không tính, dot không tính).
 Trảm Dọc: sát thương tăng 20% wil, 10% sát thương gây ra là sát thương chuẩn.
@@ -2277,3 +2276,344 @@ Trảm Dọc: sát thương tăng 20% wil, 10% sát thương gây ra là sát th
 skill: khi gây sát thương lên mục tiêu bằng hoặc hơn 30% max hp của chúng, +3 rage, tăng vĩnh viễn 2% res/arm/hp, reset khi rời sân, tối đa 20 stack trong trận, -5 ae mỗi lần kích hoạt.
 
 ultimate: cường hoá đánh thường, chỉ số % sát thương cơ bản từ 100% lên 200%, nếu vì đánh thường của ult mà kích hoạt skill của nhân vật này thì hiệu quả skill gấp đôi, cost không giảm.
+Bình thường:
++3 Rage
++2% HP/ARM/RES
+-5 AE
+Qua Ultimate:
++6 Rage
++4% HP/ARM/RES
+-5 AE
+Chỉ đổi trạng thái sau khi một Basic Attack action hoặc Ultimate action thực sự của bản thân hoàn tất.
+Không đổi sau mọi lần gây damage.
+Lý do rất đơn giản:
+Nếu đổi sau mỗi lần gây damage, thì những thứ sau sẽ thành vấn đề:
+multihit;
+skill gây nhiều packet;
+DoT;
+follow-up;
+counter;
+phản damage;
+Ultimate có nhiều phase.
+Một Warrior “Chém Ngang → Trảm Dọc” sẽ khó đoán vì trạng thái đổi giữa chính một action.
+Trong khi nếu dùng rule:
+Basic Attack
+→ resolve toàn bộ action
+→ đổi state
+
+Ultimate
+→ resolve toàn bộ action
+→ đổi state
+thì cực kỳ sạch.
+Chém Ngang là trạng thái đầu trận.
+Lý do là Chém Ngang có heal 10%, nên trạng thái mở đầu thân thiện hơn và dễ hiểu hơn.
+Sau đó:
+Vào sân
+→ Chém Ngang
+Basic
+→ Trảm Dọc
+Basic
+→ Chém Ngang
+Ultimate trong Trảm Dọc
+→ resolve theo Trảm Dọc
+→ sau action đổi sang Chém Ngang
+Ultimate được coi là:
+Enhanced Basic Attack
+thì nó vừa:
+áp trạng thái hiện tại;
+gây damage 200%;
+sau đó đổi trạng thái.
+Tao thích cách này.
+Ví dụ đang:
+Chém Ngang
+Ultimate:
+200% theo Chém Ngang → heal → đổi sang Trảm Dọc.
+Rất trực quan.
+“+2% HP” là gì?
+Dùng Entry Snapshot
+Nếu snapshot:
+HP = 10.000
+ARM = 500
+RES = 500
+mỗi stack:
++200 Max HP
++10 ARM
++10 RES
+20 stack:
++4.000 HP
++200 ARM
++200 RES
+Như vậy:
+20 stack = +40% entry Max HP/ARM/RES
+rất dễ cân bằng.
+Actual HP Damage của một action lên mục tiêu ≥30% Max HP snapshot của mục tiêu.
+Không tính: Shield damage. Overkill. DoT. Reflect.
+Và quan trọng:
+Một action chỉ tạo tối đa một Skill trigger, kể cả có nhiều mục tiêu.
+Nếu không, một AoE Basic/Ultimate về sau sẽ có thể tạo nhiều stack.
+Có thể Ultimate tự trigger Skill rồi tạo chain?
+Ví dụ:
+Ultimate
+→ 200% Basic
+→ đạt 30%
+→ Skill x2
+→ +4% HP/ARM/RES
+→ +6 Rage
+Sau đó: Skill trigger có làm state đổi thêm một lần không? Không.
+State đã được xác định bởi Ultimate/Basic Attack action.
+Skill passive chỉ là reaction/stat mutation.
+Nếu không khóa, có thể xảy ra:
+Ultimate → Skill → state đổi → engine hiểu skill cũng là action → state đổi lần nữa.
+Không nên.
+20 stack có nên bị ảnh hưởng bởi mục tiêu?
+Đây là một câu hỏi nhỏ.
+Ví dụ:
+đánh cùng một Tanker 20 lần
+→ 20 stack. Nên, Không cần buộc phải giết nhiều mục tiêu.
+
+87) Cố Thanh Huyền
+SSR — Mage
+DMG: 4/5 SUR: 4/5 CTL: 3/5 CMP: 4/5 MIC: 4/5 VIS: 3/5
+Element = Wood
+
+nội tại: mỗi khi ultimate chuyển đổi giữa 2 dạng mộc và kim, đồng thời hồi hp = 4% max hp khi chuyển dạng qua ultimate, phần hồi hp này không cd, dù sao cũng không thể ultimate liên tục mãi được.
+
+skill 1: mộc: mỗi turn tự hồi hp cho bản thân và 1 đồng minh ngẫu nhiên = 70% wil và atk của bản thân, overheal bị bỏ qua, khi vào dạng mộc sẽ tự kích hoạt, tồn tại trong 3 turn boundary, mỗi turn boundary heal tối đa cho bản thân và đồng minh ngẫu nhiên 1 lần, -15 ae mỗi lần kích hoạt skill, tức 3 turn boundary tốn 15 ae.
+kim: gây sát thương = 210% wil và atk lên 1 mục tiêu, 10% sát thương Actual HP Damage được gây ra dưới dạng sát thương chuẩn, 20 ae.
+skill 2: mộc: niệm chú, rễ cây đâm 1 mục tiêu có % hp thấp nhất trên sân, gây sát thương = 155% wil và atk của bản thân lên mục tiêu đó, hồi hp cho leader = 10% Actual HP Damage, 20 ae.
+kim: khi hp dưới hoặc = 15% max hp, tự kích hoạt skill 1 dạng mộc mà không tốn cost, sau đó +10% wil và atk trong 1 turn boundary (giải thích như khiên của dạng kim), cost: 10 ae, cd 2 turn boundary.
+
+ultimate: mộc: xoá 2 debuff cho bản thân sau đó aoe heal cho mọi đơn vị có chân ngã và thanh hp trên sân = 23% max hp của họ + 40% wil và atk của bản thân
+kim: luôn cầm kiếm chém dọc lên hàng 2/5/8 của kẻ địch, gây sát thương aoe = 160% wil và atk lên mỗi mục tiêu, nếu mục tiêu DEATH_CONFIRMED vì ult này, lập tức nhận khiên = 10% max hp của bản thân, khiên từ ult này tồn tại trong 1 turn boundary, tức gây sát thương xong là hết 1 turn chủ động > kẻ địch DEATH_CONFIRMED > nhận khiên > đến turn chủ động tiếp thì mất khiên. khiên cũng sẽ không tự mất vì chuyển dạng từ nội tại.
+
+Vào trận mặc định Mộc hay Kim → tao chọn Mộc.
+Skill 1 Mộc cost 15 AE là trả một lần cho toàn bộ 3 Boundary, không phải 15 mỗi Boundary.
+Khi rời Mộc rồi quay lại Mộc, có thay instance cũ hay không → tao chọn thay, không stack hai vòng heal.
+Skill 2 Kim cast Skill 1 Mộc mà không đổi form.
+10% True Damage của Skill 1 Kim là một phần của 210%, không phải +10%.
+Ultimate Mộc chỉ heal đồng minh.
+Ultimate Kim shield không stack theo số kill, mỗi Ultimate chỉ tạo một Shield instance.
+Slot 2/5/8 nên ghi rõ là slot, tránh chữ “hàng”.
+Chốt rõ mọi trạng thái/skill đang chạy của Mộc có tồn tại qua lần chuyển Kim hay bị xóa; tao nghiêng về chỉ effect có duration tiếp tục tồn tại nếu không có rule nói bị hủy, nhưng Skill 1 Mộc nên có cơ chế thay instance để tránh hai vòng heal chồng.
+Ultimate bị gián đoạn/cancel/không resolve thì không chuyển trạng thái.
+Chỉ sau khi Ultimate action thực sự commit thành công mới chuyển state và hồi HP.
+Nếu không, có thể abuse những lần cast Ultimate không hoàn tất.
+
+88)
+Assassin, SSR, Neutral
+DMG 4/5 SUR 3/5 CTL 2/5 CMP 4/5 MIC 4/5 VIS 4/5.
+nội tại: Hiếp Yếu: khi tấn công một mục tiêu có element tag hoặc class yếu thế hơn thì 25% sát thương gây ra lên kẻ đó là sát thương chuẩn. Rage nhận được từ target thoả mãn hiếp yếu + 20%.
+luôn target mục tiêu thoả mãn Hiếp Yếu kể cả target hơn rank nếu không bị taunt ảnh hưởng.
+Sợ Mạnh: khi không có target nào thoả mãn hiếp yếu trên sân, sát thương gây ra giảm 20 %.
+
+skill 1: tấn công 1 mục tiêu, gây sát thương = 200% wil + 200% atk của bản thân, cost: 15 ae và 5 rage. chỉ kích hoạt khi thoả mãn cost.
+
+skill 2: khi DEATH_CONFIRMED thành công bởi sát thương từ bản thân (dot/overkill không tính) lập tức tăng max hp = 10% current hp, nếu đánh trúng mục tiêu không thoả mãn Hiếp Yếu thì bonus từ skill này sẽ reset, tối đa kích hoạt 5 lần/trận bất kể có bị reset hay không, cost: -5 ae và 10 rage, chỉ kích hoạt khi thoả mãn cost.
+Skill 2 chỉ kích hoạt nếu DEATH_CONFIRMED được sinh ra trực tiếp từ một Damage Action do Assassin thực hiện; DoT và death delayed by external effect không được tính.
+Như vậy khỏi tranh luận “overkill”.
+nếu đánh trúng mục tiêu không thoả mãn Hiếp Yếu thì bonus từ skill này sẽ reset.
+Tức là:
+Toàn bộ Max HP mutation cộng dồn của Skill 2 bị reset về 0.
+ultimate: cast 1 lần skill 1 mà không tốn cost, nếu target không thoả mãn Hiếp Yếu thì bonus từ skill 2 sẽ không reset.
+
+target có element tag hoặc class yếu thế hơn cần hiểu là:
+Assassin > Mage
+hoặc
+Assassin Element > Target Element
+Chỉ cần một trong hai đúng → Hiếp Yếu.
+Đây là cách tao khuyên dùng.
+Không cần cả hai cùng đúng.
+Ví dụ:
+Assassin / Wood
+đánh Mage / Fire
+Class:
+Assassin > Mage = +10%.
+Element:
+Water > Fire, nhưng Assassin là Wood → không.
+→ vẫn Hiếp Yếu.
+Nếu:
+Assassin / Wood
+đánh Warrior / Earth
+Class không có lợi.
+Element:
+Wood > Earth = +10%.
+→ vẫn Hiếp Yếu.
+Nếu cả hai cùng có lợi:
+Assassin / Wood → Mage / Earth
+→ Hiếp Yếu vẫn chỉ là một trạng thái, không kích hoạt hai lần.
+Không nên:
++25% True Damage + thêm 25% True Damage.
+Luôn ưu tiên mục tiêu thỏa Hiếp Yếu, kể cả mục tiêu có rank cao hơn.
+Điều này làm Assassin có một luật target riêng, khác Warrior.
+Nhưng còn thiếu tie-break.
+Ví dụ có:
+Mage A = 40% HP
+Mage B = 20% HP
+Warrior C = 10% HP
+Nếu A/B đều Hiếp Yếu nhưng C không:
+chọn B hay A?.
+1. Có Hiếp Yếu hay không
+2. %HP thấp nhất
+3. nếu bằng nhau → deterministic tie-break theo SSI slot
+Không dùng rank làm tie-break, vì mày đã chủ động nói:
+ưu tiên Hiếp Yếu kể cả target rank cao hơn.
+Khi không có target nào thoả mãn Hiếp Yếu trên sân, damage -20%.
+Tao nghĩ nên phân biệt:
+Target pool
+Có ít nhất một kẻ thù Hiếp Yếu.
+Actual target
+Có thể bị Taunt ép sang một kẻ không Hiếp Yếu.
+Ví dụ:
+Mage A: Hiếp Yếu
+Tanker B: Taunt
+Assassin bị bắt đánh Tanker B.
+Sợ Mạnh không kích hoạt, vì trên sân vẫn tồn tại mục tiêu Hiếp Yếu.
+Hiếp Yếu không được áp dụng cho B, nhưng Sợ Mạnh cũng không.
+Taunt chỉ thắng target selection, không thay đổi trạng thái chiến trường.
+
+đánh trúng” ≠ “gây damage thực tế”
+Nếu đánh vào Shield = 0 HP damage thì không reset bonus.
+Chỉ reset bonus khi Assassin thực sự gây Damage Action lên target không thoả mãn hiếp yếu.
+Nếu target né/immune/đòn hoàn toàn không gây damage:
+không reset.
+Ultimate không kích hoạt Skill 2 reset protection cho mọi thứ trong Turn, chỉ bảo vệ Skill 2 mutation hiện tại khỏi lần Skill 1 được cast qua Ultimate đó.
+Nếu không, sau Ultimate Assassin đánh Basic vào mục tiêu mạnh thì lại không reset? Cần tránh hiểu quá rộng. giới hạn:
+Chỉ lần tấn công của Skill 1 được cast trực tiếp bởi Ultimate được miễn reset.
+
+89) 
+warrior, không element tag
+DMG 4/5 SUR 4/5 CTL 2/5 CMP 3/5 MIC 3/5 VIS 5/5
+nội tại: nhân vật này không thể follow up attack, mỗi khi DEATH_CONFIRMED 1 đơn vị có chân ngã tăng và hồi 20% max hp trong 2 turn boundary, tức giết mục tiêu > xong turn > vào turn boundary > tăng hp > đến turn chủ động > vào boundary> đến turn chủ động lần nữa thì khi vừa đến turn chủ động đó, khi vừa mới bắt đầu, chưa kịp gây sát thương thì phần tăng mx hp sẽ mất, tức giảm 20% max hp, max hp bị giảm nên nếu hp đầy cũng bị giảm 20%, nếu có khiên thì bỏ qua khiên, nếu khiên có cap mà max hp giảm làm khiên vượt cap thì khiên sẽ bị giảm tương ứng để phù hợp với kit tạo ra khiên đó (nếu có cap).
+
+Tăng Max HP 20% một lần + hồi một lần, hiệu ứng kéo dài 2 Boundary.
+Ví dụ:
+Base Max HP = 10.000
+→ giết 1 mục tiêu
+→ Max HP = 12.000
+Nếu HP lúc đó là: 10.000 / 12.000
+thì lúc buff hết: Max HP 12.000 → 10.000.
+HP phải trở thành: 10.000 / 10.000
+chứ không giữ: 10.000 / 10.000
+rồi “heal lại”.
+Nếu có Shield có cap phụ thuộc Max HP:
+giảm shield về cap hợp lệ mới nếu cần.
+Nhưng chỉ shield nào có cap phụ thuộc Max HP mới chịu quy tắc này; không áp một shield-cap chung cho toàn engine.
+Nếu có:
+Shield cap = 30% Max HP = 3.600
+sau khi buff mất: Shield cap = 3.000
+Nếu shield đang là 3.600:
+phải giảm xuống 3.000. Nhưng chỉ nếu loại shield đó có cap phụ thuộc Max HP. Không tự ý áp một cap chung cho tất cả shield.
+Điểm này cần ghi trong engine contract chứ không chỉ trong character.
+Mỗi DEATH_CONFIRMED tạo một Max HP mutation instance riêng, nhưng các instance cùng loại không được chồng stat; kill mới chỉ refresh/thay thế duration hiện tại.
+Tức:
+→ giết thêm
+→ vẫn +20%
+→ duration reset thành 2 Boundary.
+
+đánh thường: đứng tại chỗ chém ra kiếm khí gây sát thương lên ô 1/2/3, nếu 3 ô này không có ai đứng thì gây sát thương lên ô 4/5/6, nếu 3 ô này không có ai lại gây sát thương lên ô 7/8/9, mỗi kẻ trúng đánh thường này nhận sát thương = 100% wil + 100% atk của nhân vật này, trong đó 50% wil và 50% atk sẽ được gây dam dưới dạng sát thương chuẩn.
+
+Nếu 1/2/3 có 1 unit
+Ví dụ:
+slot 2 = empty
+slot 3 = empty
+thì đòn đánh:
+chỉ đánh slot 1.
+Đúng.
+Nếu có 3 unit:
+cả 3 nhận damage.
+Nếu không có unit ở 1/2/3:
+kiểm tra 4/5/6.
+Đây là một AOE theo tầng ưu tiên, không phải random target.
+
+skill: hp dưới hoặc = 40% res và arm của bản thân tăng 30%, hp trên hoặc = 60% + 20% atk và 20% wil, cost: - 5 ae và hp = 1% max hp/ mỗi turn hành động thành công, tức ultimate/đánh thường. khoảng giữa 41% đến 59% sẽ không có gì. skill bị động không tốn action để kích hoạt mà sẽ tự kích hoạt khi đủ điều kiện.
+
+Sau mỗi successful Basic Attack hoặc Ultimate:
+-5 AE.
+HP Loss = 1% Max HP.
+Đây là HP Loss / Self HP Cost, không phải damage.
+mặc định HP Cost/HP Loss không thể khiến nhân vật chết; ít nhất 1 HP.
+
+ultimate: cường hoá đánh thường, tỉ lệ sát thương chuẩn từ 50% wil và 50% atk tăng lên 80% wil và atk dưới dạng sát thương chuẩn sau đó đánh thường 1 lần.
+
+100% WIL + 100% ATK, trong đó 50% WIL + 50% ATK là True.
+hiểu chính xác là:
+Normal component
+50% ATK Physical
+50% WIL Will
+True component
+50% ATK
+50% WIL
+Tổng: 100% ATK + 100% WIL
+trong đó 50% tổng damage profile là True Damage.
+ultimate:
+10% ATK Physical
+10% WIL Will
+40% ATK True
+40% WIL True
+Tổng vẫn:
+100% ATK + 100% WIL
+Điểm khác biệt hoàn toàn nằm ở:
+Tỷ lệ damage chuyển sang True Damage tăng từ 50% → 80%.
+Ultimate là một Basic Attack action được cường hóa.
+Khi đó sau action:
+-5 AE;
+-1% Max HP;
+state HP kiểm tra;
+rồi state/turn xử lý.
+Sau mỗi Basic Attack action hoặc Ultimate action thực sự hoàn tất:
+-5 AE
+HP Loss = 1% Max HP
+Hai cái này là cost của hành động đã thành công, không phải cost của state passive.
+Và vì Ultimate được định nghĩa là:
+Enhanced Basic Attack
+nên Ultimate cũng chịu đúng cost này.
+Đúng logic:
+Ultimate
+→ enhanced Basic Attack resolve
+→ damage
+→ death/reactions
+→ -5 AE
+→ HP Loss 1%
+→ reevaluate HP state
+→ action complete
+Tao chỉ muốn engine chốt đúng thứ tự này: damage/death/reaction trước, cost HP sau, vì nếu HP Loss đi trước thì nó có thể làm đổi state HP trước khi chính Ultimate hoàn tất.
+Khi Ultimate giết được mục tiêu
+Timeline sẽ là:
+Ultimate Basic Attack
+→ target DEATH_CONFIRMED
+→ nội tại +20% Max HP + heal
+→ Ultimate action kết thúc
+→ -5 AE
+→ HP Loss 1%
+→ kiểm tra lại HP state
+Nếu HP mutation từ nội tại vừa tăng Max HP rồi HP Loss mới tính 1%:
+tao thấy hợp lý.
+Ví dụ:
+kill → 12.000
+HP Loss = 1% Max HP hiện tại = 120
+không phải 100.
+Điều này cần giữ nhất quán với canon:
+“1% Max HP” luôn lấy Max HP tại thời điểm HP Loss được resolve.
+buff ultimate, Ultimate = Enhanced Basic Attack, tổng hệ số damage từ 100% → 150%.
+Và giữ nguyên tỷ lệ True Damage: 80% của damage profile là True Damage.
+Vậy: Basic
+→ 50% normal
+→ 50% True
+Ultimate
+→ 30% normal
+→ 120% True
+Tức: 30% Physical/Will, 120% True
+Tổng = 150% ATK + 150% WIL.
+Không nên hiểu:
+“150%” = 150% damage sau mitigation.
+Nó vẫn là:
+damage profile 150% ATK/WIL được tạo ở đầu action, sau đó mới qua mitigation.
+Như vậy:
+150%
+→ 30% normal
+→ 120% true
+→ mitigation trên 30%
+→ true giữ nguyên.
+Sau Ultimate vẫn:
+-5 AE
+HP Loss = 1% Max HP.
