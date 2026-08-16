@@ -1602,3 +1602,678 @@ ultimate: cast cùng lúc skill 1 và 2, không tốn ae và giữ nguyên hiệ
 tức skill 1 và 2 cast không thông qua ult để cast thì sẽ không có tag tức dưới cấp Pháp tắc, nếu cast skill 1 và 2 qua ultimate mà có xung đột thì sẽ dùng cấp tag của ult để phán định.
 
 đánh thường: chém 1 kiếm gây sát thương = 100% wil/atk của bản thân lên 1 mục tiêu, mỗi lần đánh thường đều sẽ áp dụng buff cuồng bạo (tăng 10% sát thương gây ra thì phải, không nhớ rõ) lên đánh thường.
+
+78) Tinh Không Ma Nữ
+UR, summoner.
+
+nội tại, Tàn Thần Tinh Khải: khi vào sân sẽ biến đổi leader thành Tinh Không Tàn Thần. Toàn bộ kit của leader sẽ bị thay đổi, hắn vẫn là leader như kit sẽ khác.
+Tinh Không Tàn Thần: 
+vị trí 7 và 9 cần trống, khi ra sân sẽ chiếm 2 vị trí này, mọc ra thêm 2 cánh tay, có lượt riêng tuân theo Ssi, nếu ô 7 và 9 có nhân vật đứng khi hắn ra sân, chuyển đơn vị đó sang 1 ô trống ngẫu nhiên khác, nếu sân đầy, Tinh Không Tàn Thần không ra sân cho đến khi có ô trống, mỗi cánh tay của hắn chỉ có thể đánh thường, mỗi đánh thường có chỉ số bằng đánh thường của leader (100% wil/atk).
+Ultimate, Quần Tinh Vẫn Lạc: Triệu hồi quần tinh, các ngôi sao nhỏ tấn công mỗi mục tiêu trên sân, mỗi kẻ bị ngẫu nhiên 1 đến 3 ngôi sao tấn công, mỗi ngôi sao gây sát thương = 80% wil/atk của leader + sát thương chuẩn = 2% max hp lúc bị tấn công của kẻ thù.
+ultimate B: tập hợp tinh thần chi lực, mất 5% hp hiện tại, hồi phục cho mọi đồng minh trên sân = 100% wil + atk và phần hp tương ứng với 5% hp đã mất từ skill này cho mỗi đồng minh có mặt trên sân.
+ultimate C: Tiêu hao 100% rage hiện có + 5 ae, Ngưng tụ và tạo ra đơn vị Tinh Thần Chi Tâm, thứ này có hp = 65% hp max của leader, không rank, trừ hp ra không có chỉ số gì khác, không thể tấn công, ssi bỏ qua nó, mỗi turn bị ssi bỏ qua nó hồi hp cho 2 đồng minh ngẫu nhiên = 20% max hp của leader, leader cũng nhận 10% res/arm của bản thân lúc kích hoạt hồi hp cho đồng minh, hiệu ứng tăng res/arm không thể stack, chỉ kích hoạt 1 lần cho đến khi Tinh Thần Chi Tâm tan biến sau khi bị ssi bỏ qua 3 lần cũng sẽ biến mất theo.
+
+Đánh thường của Tàn Thần: mỗi khi đến turn của bản thân thì cánh tay sẽ tát đối phương gây sát thương = 100% wil/atk của bản thân leader, leader tức thân của tàn thần đứng ô 8 sẽ không thể tấn công và bị ssi bỏ qua nhưng 2 cánh tay ở ô 7 và 9 thì có thể tấn công và tuân theo ssi, cánh tay và thân đều tăng rage khi bị đánh, thanh rage và hp của leader chỉ có 1.
+chỉ số của leader Tàn Thần = 100% chỉ số của leader lúc vào trận, tức không bị tăng hay giảm từ kit ngoài leader hoặc bản thân leader.
+mỗi khi nhân vật này cast ultimate thành công, hồi hp cho tàn thần = 10% tổng sát thương ultimate nhân vật này gây ra lên tối đa 3 mục tiêu.
+phần trên là kit của leader sau khi biến đổi cũng là nội tại của char này.
+
+Skill 1: kích hoạt sau đó turn tiếp theo kể từ turn kích hoạt skill này bản thân và leader rage nhận được từ hành động tăng 40% trong 3 turn của bản thân leader và nhân vật này, 20 ae. Hiệu ứng tăng rage từ skill 1 không stack, kích hoạt skill này khi hiệu ứng tăng rage cũ vẫn còn chỉ làm mới thời gian tồn tại của hiệu ứng, không stack với bản thân nhưng có thể cộng dồn với hiệu ứng tăng rage khác.
+
+skill 2: tự kích hoạt khi hp của leader dưới 15%, lập tức hồi hp = 25% max hp + 35% wil/atk của bản thân cho leader, tự kích hoạt khi đủ điều kiện, cost: - hp = 30% mx hp, -20 ae, chỉ tự kích hoạt khi cost và hp leader đồng minh dưới hoặc = 15% đều thoả mãn.
+cost HP của Ma Nữ là HP Cost, không phải Damage.
+
+skill 3: khi bị tấn công, khi đòn tấn công đó đã kết thúc, đánh thường lên hàng của kẻ tấn công, skill này không được tính là đánh thường, cách hoạt động như nội tại thiện xạ của Silas, không tính là 1 turn. -5 ae.
+
+đánh thường: đứng tại chỗ, orb trên đầu nàng bắn ra tia sáng mạnh mẽ gây sát thương aoe lên tối đa 3 mục tiêu (tuân theo ssi), 1/4/7, 2/5/8 hoặc 3/6/9 tùy theo vị trí đứng của bản thân và đơn vị mục tiêu.
+mỗi kẻ bị tia sáng quét trúng nhận sát thương = 100% wil/atk của nàng.
+
+Một hostile action lên Ma Nữ = tối đa một lần Skill 3.
+Nếu một action có 7 hit:
+vẫn chỉ một counter.
+Nếu cùng một action đánh Ma Nữ và tạo nhiều attacker/linked effects thì xử lý theo danh sách attacker hợp lệ, nhưng cần tránh “mỗi packet = một phản kích”.
+
+ultimate, Tinh Quang Đại Xạ: cast 1 lần đánh thường nhưng tỉ lệ sát thương từ 100% lên 280% wil/atk, sau đó kích hoạt skill 1 mà không tốn cost.
+
+Basic Attack action được cường hóa.
+Như vậy nếu sau này nàng có effect:
+“khi thực hiện Basic Attack...”
+thì Ultimate vẫn có thể tương tác đúng theo fantasy.
+
+Khi Tinh Không Ma Nữ vào sân:
+Leader biến thành Tinh Không Tàn Thần.
+Bộ kit cũ của Leader bị thay thế.
+Leader vẫn là Leader, không phải summon.
+Thân thể chính ở slot 8.
+Hai cánh tay chiếm slot 7 và 9.
+Hai cánh tay là các actor có lượt SSI riêng.
+Thân ở slot 8 không có lượt tự nhiên và bị SSI bỏ qua.
+HP và Rage của thân + hai tay dùng chung một pool.
+Chỉ số của Tàn Thần được snapshot bằng 100% chỉ số Leader tại thời điểm vào trận.
+Các mutation/buff/debuff của Leader về sau không tự thay đổi snapshot này, theo đúng mô tả của mày.
+Điểm này rất quan trọng: Tàn Thần có ba vị trí vật lý nhưng chỉ là một sinh mệnh.
+Tức Leader đổi:
+1 actor → 2 actor chiến đấu
+Đây là buff lớn hơn rất nhiều so với +stat.
+Nhưng vì hai tay chỉ Basic Attack.
+Nếu actor mới xuất hiện ở slot chưa được quét → có thể tham gia side pass hiện tại.
+Nếu slot đã đi qua → chờ pass sau.
+Điều này tránh tình trạng:
+Ma Nữ vào sân → Leader biến đổi → hai tay lập tức được chen vào → rồi SSI lại quét chúng lần nữa.
+ultimate A
+Một ngôi sao có phải một hit riêng.
+Nếu đúng:
+Enemy A: 3 stars
+Enemy B: 1 star
+Enemy C: 2 stars
+thì A/B/C có số lần chịu damage khác nhau.
+Điều đó cũng có nghĩa các effect:
+“khi nhận damage”
+counter
+shield
+lifesteal
+threshold
+on-hit
+có thể bị kích hoạt nhiều lần.
+ultimate BMỗi đồng minh nhận:
+100% ATK + 100% WIL + 5% HP đã mất của leader.
+ultimate C
+Hiện tại chưa có khái niệm:
+“một actor có slot nhưng không phải actor SSI, và mỗi lần cursor đi qua nó lại nhận một trigger.”
+Tao nghĩ nên định nghĩa cho riêng loại này một khái niệm:
+SSI Pass Contact
+Không cần biến nó thành actor.
+Mỗi khi con trỏ SSI của phe nó đi qua slot mà Tinh Thần Chi Tâm đang neo vào, nó nhận một “lần bị bỏ qua”.
+Sau 3 lần:
+FUSION/energy structure tan biến.
+Như vậy nó thực sự gắn với SSI thay vì dùng timer giả.
+bonus Tinh Thần Chi Tâm:
++10% ARM và +10% RES của Leader tại thời điểm Tinh Thần Chi Tâm được tạo.
+Snapshot một lần.
+Không stack.
+skill 1 của ma nữ
+3 Turn Boundary của từng người
+chứ không phải 3 round.
+Và reset duration khi cast lại nhưng không stack.
+
+78) 
+mage, ssr
+một char bình thường, là tiêu chuẩn, là mặt bằng chung của độ phức tạp kit nhân vật.
+
+nội tại: sau khi dùng skill bất kỳ, đánh thường tiếp theo tăng 10% wil/atk, Hiệu ứng mất sau khi Basic Attack đó được thực hiện, không stack.
+
+skill 1: đứng tại chỗ tạo 3 lôi orb Tấn công 3 mục tiêu ngẫu nhiên, gây sát thương = 130% atk/wil của bản thân lên mỗi mục tiêu, orb có thể trùng, sau đó tạo khiên cho bản thân = 25% tổng sát thương gây ra lên 3 mục tiêu đó, 25 ae.
+
+skill 2: tự buff cho bản thân, tăng 70% wil hiện có của bản thân trong 3 turn, khi kích hoạt skill này đến turn tiếp theo của bản thân tính là 1 turn trong bộ đếm 3 turn đó, sau đó lại cd 1 turn của bản thân, 25 ae.
+
+skill 3: cường hoá 3 đòn đánh thường kế tiếp của bản thân, mỗi lần đánh thường sát thương gây ra + 15%, đòn cường hoá sau khi gây sát thương xong cũng hồi hp cho bản thân = 10% tổng sát thương đòn cường hoá đó gây ra, over heal bị bỏ qua.
+
+ultimate, Mây Đen Áp Đỉnh: niệm chú, triệu hồi 1 đám mây đen (vfx), mây đen tấn công 5 mục tiêu ngẫu nhiên, mỗi kẻ nhận sát thương = 140% wil/atk hiện có của bản thân nhân vật này.
+
+đánh thường: đứng tại chỗ, chưởng 1 lôi orb tấn công 1 mục tiêu hoàn toàn ngẫu nhiên, gây sát thương = 100% wil và atk của bản thân lên mục tiêu.
+
+79) Gideon Vale
+ssr, tanker
+DMG 2 | SUR 5 | CTL 3 | CMP 2 | MIC 2 | VIS 5
+
+nội tại: mỗi khi nhận sát thương vượt 30% max hp của bản thân trong 1 lần hành động của kẻ tấn công, tăng max hp = 13% max hp hiện có, reset khi rời sân ( vào luân hồi, hp về 0, về deck).
+
+Max HP 10.000
+→ nhận 3.100 damage trong cùng action
+→ Max HP = 11.300.
+“Trong 1 lần hành động của kẻ tấn công” nên tính:
+Tổng actual HP damage từ toàn bộ damage packet của một action lên hắn.
+Không phải từng hit.
+
+skill 1: cầu nguyện Quang Chủ che chở, hồi hp = 70% wil và atk của bản thân cho bản thân và cường hoá khả năng phòng thủ, tăng 10% res và arm của bản thân trong 2 Turn Boundary, hiệu ứng tăng res/arm này không stack, kích hoạt chỉ làm mới thời gian tồn tại hiệu ứng cũ, 20 ae.
+
+Heal nên tính theo stat snapshot khi cast.
+ARM/RES buff là percentage modifier của chỉ số hiện tại.
+Recast chỉ refresh duration, không stack.
+
+skill 2: tiếp cận kẻ địch, tán mạnh khiên vào đầu kẻ địch, gây sát thương = 100% wil và atk lên kẻ địch đó, có 15% tỉ lệ gây choáng mục tiêu trong 1 turn, 25 ae.
+di chuyển tới mục tiêu chỉ là animation.
+
+skill 3: khi hp trên hoặc bằng 70% max hp, tự kích hoạt và nhận taunt trong 2 Turn Boundary, khi đạt điều kiện sẽ kích hoạt ngay lập tức khi nhân vật đã thực thi hành động xong và đang đợi đến lượt ssi tiếp theo của bản thân, cd 1 Turn Boundary, cost: 15 ae. Trong thời gian kích hoạt mỗi Turn Boundary hồi 4% max hp của bản thân cho bản thân và leader đồng minh.
+Ví dụ:
+A action
+→ Skill 3 trigger
+→ Taunt 2T
+→ cooldown = 1T
+thì Boundary tiếp theo:
+cooldown giảm về 0,
+nhưng Taunt vẫn còn 1 Boundary.
+Nếu HP vẫn ≥70% khi A action tiếp theo kết thúc:
+Skill 3 có thể lập tức trigger lại.
+
+ultimate: Cast skill 2 sau đó cast skill 3 mà không tốn cost, tức khi dùng ult char này sẽ đánh mục tiêu và nhận taunt bất kể có đủ điều kiện kích hoạt skill 3 hay không.
+sequential nội bộ:
+Ultimate
+→ Skill 2 resolve
+→ damage/stun
+→ Skill 3 resolve
+→ Taunt + heal-over-time effect
+→ Ultimate complete
+Không cần simultaneous.
+
+80) Roth Vargan
+
+warrior, ssr.
+DMG 4/5 SUR 5/5 CTL 1/5 CMP 4/5 MIC 3/5 VIS 4/5
+nội tại, Tàn Huyết: khi hp dưới hoặc = 50% max hp, nhận 1 rage trên mỗi 2% max hp đã mất, nếu % max hp đã mất không phải số chẵn, ví dụ như hp đã mất là 63% thì hắn nhận 31 rage mà không phải 31,5 rage. cd 3 turn Boundary.
+
+“Nhận 1 Rage trên mỗi 2% Max HP đã mất"
+engine hiểu theo:
+floor(percentMaxHpLost / 2)
+Ví dụ:
+HP mất 63%
+→ floor(63 / 2)
+→ 31 Rage
+Không nên lưu phần 0,5 để lần sau cộng dồn.
+Tức 63% rồi hồi lên 50%, sau đó mất lại 3% không được biến thành:
+31 + 0,5 + 1,5...
+Mỗi lần passive trigger phải tính từ HP loss hiện tại.
+Current HP / Max HP tại thời điểm passive kiểm tra.
+Ví dụ:
+Current HP = 3.700
+→ HP đã mất = 63%
+→ 31 Rage
+Nếu Max HP của hắn đã tăng qua các mechanic khác thì tỷ lệ phải tính lại.
+Điều này rất quan trọng với char này vì Skill 3 và các buff khác không trực tiếp mutate Max HP, nhưng các effect bên ngoài vẫn có thể.
+Không có chuyện:
+HP xuống ≤50 → trigger
+hồi lên >50 → passive bị “hủy” hay cooldown reset.
+chỉ nhìn HP thực tế đã mất, bất kể nguồn:
+Damage. HP Loss. HP Cost. Sacrifice.
+HP mutation Max HP giảm không làm “HP đã mất” tăng. Chỉ tính:
+Max HP - Current HP
+sau khi Max HP đã ổn định.
+Nếu Max HP giảm từ 10.000 → 8.000 mà Current HP 8.000:
+không được coi như vừa mất 20% HP để kiếm Rage.
+skill 1: chém 1 mục tiêu, gây sát thương = 180% wil/atk và áp debuff chảy máu lên mục tiêu (mất 2% hp dưới dạng sát thương chuẩn trong 2 turn hành động của mục tiêu, tức hành động xong sẽ mất hp là 1 lần), hồi hp = 25% sát thương skill này gây ra (không tính phần bị chảy máu), 20 ae. Không tính đánh thường.
+
+Hit Skill 1
+→ gây 180% Mixed Damage
+→ áp Bleed
+→ mục tiêu thực hiện natural action lần 1
+→ sau action mất 2% Max HP True Damage
+→ mục tiêu thực hiện natural action lần 2
+→ sau action mất 2% Max HP True Damage
+→ Bleed hết.
+vì đây là True Damage, nó sẽ:
+bị Shield chặn nếu không có xuyên khiên;
+không qua ARM/RES;
+actual HP damage mới được tính cho các effect liên quan.
+180% damage
+→ tính heal
+
+Bleed 2% + 2%
+→ không tính heal.
+
+skill 2: khi hp dưới hoặc =22%, 3 đòn đánh thường tiếp theo của hắn mỗi đòn đánh xong hắn được hồi hp = 20% sát thương đánh thường/mỗi đòn đánh lên mục tiêu, bất kỳ debuff/mark nào trên người hắn gây DoT lên mục tiêu qua đánh thường đều sẽ không tính vào phần hồi hp từ skill này, 15 ae. Tự kích hoạt khi đủ điều kiện.
+
+Chỉ damage trực tiếp của Basic Attack do Roth gây ra được dùng làm cơ sở hồi HP.
+Tức:
+Basic Attack
+= 500 actual damage
+Bleed triggered = 100
+Mark triggered = 50
+
+Heal = 500 × 20%
+Không phải:
+(500 + 100 + 50) × 20%
+
+Actor đang ở Turn Boundary
+→ HP hiện tại ≤22%
+→ Skill 2 tự kích hoạt
+→ trả 15 AE
+→ tạo trạng thái “3 Basic Attacks”
+→ chưa heal ngay.
+Sau đó ba Basic Attack kế tiếp mới lần lượt hồi.
+Không nên kích hoạt giữa một action đang diễn ra.
+Nếu HP xuống 22% giữa một action?
+Không trigger ngay.
+Chờ tới sau khi action đó hoàn tất, rồi kiểm tra điều kiện theo cơ chế self-trigger.
+Điều này rất hợp Turn Boundary/action completion.
+“3 đòn đánh thường tiếp theo”
+Phải là:
+3 Basic Attack action thực sự của chính Roth.
+Không tính:
+Skill 1.
+Ultimate.
+Follow-up không phải Basic Attack.
+Counter.
+Damage phản.
+Các projectile từ passive.
+Heal
+20% dựa trên actual HP damage của Basic Attack, không tính: Bleed.
+DoT từ Debuff. Mark gây damage. Reflect. Overkill. Shield damage.
+
+skill 3: gây sát thương lên mục tiêu bằng đánh thường hoặc ult vượt hoặc =30% max hp của mục tiêu sẽ lập tức tăng 10% wil và atk của bản thân lúc kích hoạt skill trong 3 turn Boundary, trong 3 turn Boundary này cost dùng skill 2 và 1 giảm 10 ae, khi 3 turn Boundary này kết thúc thì mới có thể tự kích hoạt skill 3 lần nữa, 5 ae.
+
+Một đòn Basic Attack hoặc Ultimate
+→ actual HP damage từ action đó ≥30% Max HP snapshot của mục tiêu
+→ Skill 3 trigger
+→ +10% ATK/WIL hiện có
+→ trạng thái 3 Turn Boundary
+→ Skill 1 cost -10 AE
+→ Skill 2 cost -10 AE
+→ hết 3 Boundary
+→ Skill 3 mới có thể kích hoạt lại.
+Ví dụ Basic Attack đánh nhiều target:
+Target A = 35%
+Target B = 32%
+Target C = 20%
+Skill 3 chỉ:
++1 activation
+không phải +2.
+Một action hợp lệ chỉ tạo tối đa một lần Skill 3, dù bao nhiêu mục tiêu đạt ngưỡng.
+Damage dùng để kiểm threshold
+Phải là:
+Actual HP Damage của action lên một target / Max HP của target tại đầu action.
+Không tính:
+shield damage;
+overkill;
+damage phát sinh sau action;
+Bleed tick;
+DoT;
+phản damage.
+
+ultimate: chém 1 mục tiêu, gây sát thương = 265% wil và atk, nếu mục tiêu hp về 0, rage nhận được trong 2 turn chủ động (dùng skill, đánh thường và cả ultimate, skill 2 và 3 đều là bị động nên cũng không ảnh hưởng gì vì đều là tự buff, nếu skill hoặc nội tại của hắn có kiểu tự phản kích, tấn công khi đạt điều kiện như Thiện Xạ silas thì "rage nhận được trong 2 turn chủ động" sẽ không tác dụng với nội tại thiện xạ của silas) tiếp theo tăng 30%.
+
+Ultimate gây 265% ATK + 265% WIL Mixed Damage lên 1 target.
+Nếu target DEATH_CONFIRMED vì chính Ultimate:
+Trong 2 Turn chủ động tiếp theo của Roth, Rage nhận được từ các action chủ động của hắn tăng 30%.
+Chỉ tính action tự nhiên của Roth khi hắn chủ động thực hiện:
+Basic Attack.
+Skill.
+Ultimate.
+Nhưng với Skill 2 và Skill 3 của kit này chúng là passive tự kích hoạt nên bản thân chúng không tạo Rage trực tiếp.
+Nếu sau này có:
+follow-up;
+counter;
+Thiện Xạ-like passive;
+linked attack;
+thì không hưởng +30% Rage, trừ khi effect riêng ghi rõ.
+Kill phải là:
+DEATH_CONFIRMED
+Không phải:
+HP_ZERO;
+death prevention;
+summon despawn;
+remove.
+“2 Turn chủ động” nên đóng theo Turn Boundary
+Ví dụ:
+Ultimate kill
+→ Active Rage Boost bắt đầu
+Turn tự nhiên 1 của Roth
+→ action → Rage +30%
+Turn tự nhiên 2
+→ action → Rage +30%
+→ hết
+Không tính action chain chen ngang.
+
+Nếu target có:
+100.000 Max HP
+thì 30% = 30.000 damage.
+Nếu Roth có damage không đủ, Skill 3 gần như không tồn tại.
+Ngược lại, target có:
+1.000 Max HP
+thì chỉ cần 300 actual damage.
+Skill 3 có thể bật cực dễ.
+Điều này không phải bug.
+Nó là một cách để threshold tự scale với target.
+Nhưng encounter design phải chú ý: character này sẽ có hiệu suất rất khác giữa:
+mob nhỏ; elite; Tanker; boss.
+Nếu Ultimate không giết ngay nhưng:
+Ultimate
+→ mục tiêu còn 2%
+→ Bleed tick sau
+→ target chết
+Không được kích hoạt Rage Boost từ Ultimate.
+Vì kill không xảy ra bởi chính Ultimate.
+Nếu mục tiêu bị:
+Ultimate → HP_ZERO
+→ Death Prevention
+→ sau đó sống lại
+cũng không tính là kill.
+Nếu target chết thật do chính component damage của Ultimate:
+kích hoạt.
+Đây là distinction rất quan trọng.
+
+81) 
+DMG 4/5 SUR 5/5 CTL 3/5 CMP 5/5 MIC 5/5 VIS 3/5
+summoner, ssr
+
+nội tại, Tái Hấp Thu: Khi một Tử thể đạt DEATH_CONFIRMED, Mẫu thể tăng 35% Max HP hiện tại của Tử thể đã chết.
+Vì:
+Tử thể Max HP = 40% Max HP snapshot của Mẫu thể lúc triệu hồi.
+nên:
+Mỗi Tử thể DEATH_CONFIRMED → Mẫu thể +14% Max HP hiện tại.
+Với Tử thể Max HP = 40% Max HP Mẫu thể:
+0,4 × 0,35 = 14% Max HP Mẫu thể / Tử thể chết.
+Nếu 3 Tử thể chết:
++42% Max HP.
+Nếu 6 chết trong một chuỗi death wave:
++84%.
+
++1 rage/ mỗi tử thể hp lớn hơn 0, có mặt trên sân/ mỗi turn boundary của mẫu thể, vậy mỗi turn boundary mẫu thể được + tối đa 6 rage. Tức là:
+Mỗi Tử thể có HP > 0 tại thời điểm Turn Boundary của Mẫu thể được tính 1 Rage.
+Không phải:
+Tử thể phải là ALIVE xuyên suốt toàn bộ khoảng thời gian.
+Ví dụ:
+Boundary của Mẫu thể
+→ có 5 Tử thể sống → +5 Rage
+
+Sau đó một Tử thể chết
+→ không hoàn tác +5 đã nhận.
+
+Tử thể mới tạo giữa hai Boundary
+Đây là một điểm nhỏ nhưng đáng chốt.
+Ví dụ:
+Mẫu thể vừa hành động
+→ đang chờ Boundary tiếp theo
+→ Ultimate tạo 3 Tử thể
+→ trước đó chỉ có 2 Tử thể
+→ giờ có 5
+Tại Boundary tiếp theo:
+nhận +5 Rage.
+Không được nhận ngay lúc spawn.
+
+skill 1: Mẫu thể + tất cả Tử thể hiện diện cùng thực hiện forced attack.
+Skill 1 không phải Basic Attack.
+Forced attacks sử dụng damage profile của Basic Attack nếu đó là công thức mày muốn giữ.
+Sau toàn bộ skill: +10% ATK/WIL, không stack.
+Duration 3 Turn Boundary.
+Recast chỉ refresh duration.
+Cost 20 AE.
+
+skill 2: Khi HP ≤20% Max HP.
+Liên kết các Tử thể hiện diện tại thời điểm trigger.
+Link tồn tại 2 Turn Boundary của Mẫu thể.
+Khi Mẫu thể nhận damage:
+35% Mẫu thể chịu.
+60% chia đều cho linked Tử thể dưới dạng True Damage.
+5% bị triệt tiêu.
+Link là snapshot; Tử thể mới sinh ra sau trigger không tự động nhập link.
+Cost = 5 AE + 5 Rage / mỗi linked Tử thể.
+
+skill 3: không hp về 0 nếu có tối thiểu 3 tử thể có mặt trên sân, các tử thể lập tức DEATH_CONFIRMED, mẫu thể hồi sinh ngẫu nhiên trên sân với max hp/hp = current hp của tổng các mẫu thể bị DEATH_CONFIRMED bởi skill 3, cost 20 ae, kích hoạt 1 lần/trận đấu. sau khi phục sinh bằng skill 3 hiệu ứng có lợi lẫn hại từ ngoài bản thân và bản thân (từ nội tại) đều sẽ bị xoá bỏ, khi hp về 0 sẽ tự kích hoạt skill này.
+
+đánh thường: đứng tại chỗ, độc nhãn bắn ra tia laze cực mạnh lên 1 mục tiêu, gây sát thương = 100% wil +atk, hồi hp = 15% sát thương đánh thường gây ra lên mục tiêu.
+
+ultimate: tạo ra 3 Tử thể, mỗi tử thể không có chân ngã, vào sân với 70% hp của bản thân tử thể và 30% mọi chỉ số của mẫu thể trừ max hp/40% max hp của mẫu thể, các Tử Thể chỉ có thể đánh thường, mỗi tử thể đánh thường = 100% wil/atk chúng có tức = 30% của mẫu thể. chúng là đơn vị độc lập, tuân theo ssi, không có rage/class, hành động cũng không tăng ae. mỗi tử thể rank = mẫu thể. tử thể vfx tấn công là cận chiến.
+Tử thể tồn tại tối đa 4 turn chủ động của bản thân chúng, cap là 6, nếu dùng ult và đã có tử thể, 3 tử thể có hp thấp nhất (không phải chỉ số khác ngoài hp/max hp thấp nhất) sẽ được thay thế bởi 3 tử thể mới từ ultimate.
+tử thể bị thay thế bởi ultimate không tính là DEATH_CONFIRMED và không kích hoạt Tái Hấp Thu.
+
+Max HP Tử thể = 40% Max HP Mẫu thể.
+HP lúc triệu hồi = 70% Max HP Tử thể.
+Mẫu thể 10.000 HP:
+Tử thể Max HP = 4.000
+Tử thể spawn HP = 2.800
+
+82)
+support, ssr
+SSR / Support
+
+DMG 3/5 SUR 5/5 CTL 5/5 CMP 4/5 MIC 5/5 VIS 3/5
+nội tại: mỗi turn boundary của bản thân hồi hp = 40% wil và atk của bản thân cho mọi đơn vị đồng minh có thanh hp trên sân kể cả leader, không tác dụng lên prime có Thần Tính.
+
+skill 1: khi có 1 đồng minh có chân ngã (ngoài bản thân) có hp dưới hoặc = 12% max hp của họ, lập tức hồi cho họ 100% wil và atk + 3% max hp của bản thân, cost: -2% max hp và 15 ae, tự kích hoạt khi đủ điều kiện.
+Mỗi lần một đồng minh thỏa điều kiện lần đầu, tạo một reaction; mỗi reaction chỉ có thể dùng một lần cho chính đồng minh đó cho tới khi nó thoát khỏi ngưỡng 12%.
+Nếu không, chỉ riêng hiệu ứng HP giảm nhẹ/DoT có thể liên tục gọi Skill 1.
+
+skill 2: áp debuff phản hồi phục lên 3 kẻ thù ngẫu nhiên, debuff tồn tại trên kẻ thù = 1 turn boundary của nhân vật này, trong cửa sổ đó tổng sát thương kẻ thù nhận từ debuff phản hồi phục từ skill 2 của nhân vật này thì 30% sẽ được chuyển thành hp của nhân vật này sao khi cửa sổ turn boundary kết thúc, nếu lượng sát thương từ debuff phản hồi phục của nhân vật này vượt quá 35% max hp của kẻ đó thì sau khi nhận sát thương từ phản hồi phục debuff này sẽ biến mất ngay lập tức mà không cần cửa sổ turn boundary của nhân vật này kết thúc.
+Phản hồi phục: mọi hiệu ứng hồi phục nhận được từ nguồn ngoài hp regen của bản thân sẽ được chuyển thành sát thương chuẩn, debuff này không thể giết mục tiêu, nếu vượt max hp mục tiêu thì sẽ giữ mục tiêu còn 2 hp.
+skill này không có tag pháp tắc trở lên nên debuff này chỉ là hiệu ứng thường, skill này không thể target Prime có thần tính, nếu trên sân có dưới hoặc = 3 kẻ có thần tính thì chỉ target kẻ không có thần tính. Cost: 30 ae.
+Đúng nhất là:
+Heal trực tiếp từ skill.
+Heal từ passive.
+Lifesteal.
+Healing pulse.
+Đồng minh heal.
+Global heal.
+đều bị chuyển.
+Còn:
+HP Regen của chính mục tiêu được miễn.
+Trong cửa sổ:
+Cộng dồn toàn bộ Actual HP Damage do chính debuff này gây ra.
+Kết thúc cửa sổ:
+Support hồi 30% tổng damage đó.
+Ví dụ:
+Heal 500 → 500 True Damage
+Heal 300 → 300 True Damage
+Heal 700 → 700 True Damage
+
+Total = 1.500
+Threshold 35%.
+Support cuối cửa sổ hồi = 450.
+Max HP snapshot lúc debuff được áp, vì nếu Max HP thay đổi trong cửa sổ thì luật sẽ ổn định hơn.
+5.000 damage threshold nên là cumulative damage của chính debuff, không phải tổng damage mà mục tiêu nhận từ mọi nguồn.
+Nếu ally khác đánh 20.000 damage:
+không ảnh hưởng threshold.
+câu: “nếu trên sân có ≤3 kẻ có Thần Tính thì chỉ target kẻ không có Thần Tính”
+nên hiểu đơn giản hơn:
+Target pool = tất cả enemy không có Thần Tính.
+Nếu không còn mục tiêu hợp lệ:
+Skill 2 không có mục tiêu và không cast.
+
+skill 3: đứng tại chỗ niệm chú, gây sát thương = 100% wil và atk lên 2 mục tiêu ngẫu nhiên, nếu kẻ thù DEATH_CONFIRMED bởi skill này tăng 2% max hp/mỗi kẻ, 25 ae.
+
+Nếu Skill 3 giết một target bằng overkill:
+chỉ tính actual HP damage để determine death; không lấy overkill làm gì thêm.
+Nếu 2 target cùng chết trong một action:
++4% Max HP.
+Nếu target chết vì DoT sau đó:
+không tính cho Skill 3.
+
+ultimate: tại chỗ niệm chú, heal cho mọi đơn vị đồng minh có hp trên sân trừ prime có thần tính = 180% wil và atk + 10% max hp của bản thân cho mỗi kẻ nhận heal, phần overheal bị bỏ qua.
+
+Nếu Support bị CC và mất lượt:
+lượt tự nhiên vẫn được tiêu hao;
+Boundary vẫn tiến triển theo lượt của nó;
+chỉ là nó không thực hiện action.
+Do đó CC không phải là:
+“kéo duration Boundary ra vô hạn.”
+Nó chủ yếu khiến:
+Support không được tự mình hành động, trong khi các effect gắn với Boundary vẫn có thể tiếp tục theo luật duration/cap.
+Với nội tại heal, điều này có nghĩa:
+Turn Boundary của actor vẫn tiến triển khi actor bị CC làm mất lượt theo SSI; việc mất lượt không làm trì hoãn Boundary.
+Hiệu ứng gắn trực tiếp với Turn Boundary vẫn resolve theo luật của nó, trừ khi effect có điều kiện yêu cầu actor phải hoàn tất natural action hoặc phải còn khả năng hành động.
+
+83)
+ranger, ssr
+DMG 4 / SUR 4 / CTL 2 / CMP 3 / MIC 3 / VIS 4.
+
+nội tại: mỗi đòn đánh thường đều heal cho bản thân = 10% sát thương gây ra, không tính follow up, dot.
+
+Actual HP Damage do chính Basic Attack gây ra
+Không tính:
+Shield damage.
+Overkill.
+Bleed.
+DoT.
+Reflect.
+Follow-up.
+Ví dụ:
+Basic Attack gây 500 actual HP damage
+→ heal 50.
+Nếu đánh vào shield 500 mà HP damage = 0:
+Heal = 0.
+Đúng với lifesteal contract của Arclune.
+
+skill 1: đánh thường áp debuff chảy máu lên mục tiêu, follow up không áp thêm debuff này (mất 2% hp dưới dạng sát thương chuẩn trong 2 turn hành động của mục tiêu, tức hành động xong sẽ mất hp là 1 lần, như roth), cost -1 ae/rage và -1% hp/100% max hp. debuff này đối với prime có thần tính vô hiệu.
+Basic Attack action có thêm effect Bleed.
+Ví dụ:
+Skill 1
+→ Basic Attack 500 damage
+→ heal 50
+→ apply Bleed
+Bleed 2% Max HP trong 2 natural actions của mục tiêu, giống Roth.
+Follow-up không áp Bleed lại.
+Nếu Follow-up phát sinh từ chính Skill 1 hoặc từ effect khác:
+Follow-up không refresh/stack Bleed.
+
+skill 2: khi nhận sát thương chí tử, vượt current hp, chỉ nhận 50% lượng sát thương đó, nếu sau đó còn sống, lập tức đổi vị trí sang ô trống ngẫu nhiên trên sân đồng minh, -20 ae/mỗi lần tự kích hoạt. không kích hoạt khi nhận sát thương chuẩn. Kích hoạt max 2 lần/trận.
+Ví dụ:
+Current HP = 100
+Incoming = 150
+→ nhận 75
+→ còn 25
+→ skill kích hoạt
+→ random reposition
+Nhưng:
+Current HP = 100
+Incoming = 500
+→ nhận 250
+→ vẫn chết.
+Sau toàn bộ mitigation/shield, lấy actual incoming HP damage rồi giảm còn 50%
+Skill 2 chỉ kiểm tra lethal action có ít nhất một non-True damage component gây actual HP damage.
+Nếu chuyển sang slot chưa quét:
+không được tự nhiên đi lần nữa.
+Nếu đã quét:
+vẫn chờ pass sau.
+
+skill 3: sau mỗi turn chủ động, 20% tổng sát thương vừa gây ra sẽ được chuyển thành khiên cho nhân vật này, không tính dot và follow up, - 5 ae/mỗi lần kích hoạt, mỗi turn boundary chỉ kích hoạt 1 lần, khi khiên từ skill này bể, hồi hp = 50% tổng lượng khiên đó, ví dụ vừa gây 100 sát thương> vào turn boundary> nhận khiên = 20% là 20 > khiên bị đánh bể, lập tức hồi hp = 10.
+Actual HP Damage của các action chủ động mà nhân vật thực hiện trong Turn đó.
+Không tính:
+shield damage;
+overkill;
+DoT;
+Follow-up;
+Reflect.
+Nếu trong cùng Turn sử dụng:
+→ Ultimate
+thì shield lấy tổng actual damage của cả hai, nếu hệ thống cho nhiều action chủ động trong cùng Turn.
+Nếu character mỗi natural turn chỉ được một action bình thường, thì chỉ có một nguồn.
+Damage = 100
+→ Shield = 20
+→ shield bị phá hoàn toàn
+→ heal 10.
+chỉ heal khi khiên bị phá hoàn toàn.
+nếu khiên cũ còn và nhận khiên mới, lớp khiên cũ sẽ biến mất và nhận được lượng heal nên nhận từ khiên vừa biến mất.
+
+ultimate: đánh thường 1 lần nhưng tỉ lệ sát thương từ 100% lên 300% wil và atk lên 1 mục tiêu.
+
+84)
+Assassin, ssr
+nội tại: ultimate/skill/đánh thường sẽ luôn target mục tiêu có target có % hp thấp nhất, nếu kẻ thù có taunt thì tuân theo taunt, khi hết bị taunt lại target kẻ có % hp thấp nhất.
+nhân vật này không target kẻ không có chân ngã trừ phi vô chân ngã giả có taunt.
+
+khi target hp dưới hoặc = 70%/50%/25% nhận sát thương gây ra lên kẻ địch tăng 10%/sát thương gây ra có 20% là sát thương chuẩn/hồi hp = 20% sát thương gây ra lên mục tiêu (không tính follow up/dot/chỉ tính sát thương gây ra sau khi phá khiên), 3 hiệu ứng này đều có tác dụng lên mục tiêu, nếu target có hp dưới hoặc = 25% max hp của chúng, hắn gây sát thương lên target đó tăng 10% sau đó 20% (đã tăng 10) sẽ là sát thương chuẩn, cuối cùng 20% sát thương thực sự gây ra sau khi bỏ qua khiên sẽ được hồi hp cho hắn.
+
+skill 1: mỗi khi DEATH_CONFIRMED 1 mục tiêu (dot/overkill cũng tính), hp max/atk/wil + = 5% max hp/atk/wil kẻ hắn đã giết, - 5 ae và 3% res và arm của hắn mỗi lần kích hoạt, kích hoạt xong cũng tự hồi hp = 5% max hp của bản thân (đã tăng max hp).
+
+skill 2: khi hp dưới hoặc = 60%, 3 đòn đánh thường tiếp theo kèm theo debuff chảy máu, cd 4 turn boundary, cost: 5 ae mỗi lần kích hoạt.
+
+skill 3: tiếp cận mục tiêu, gây sát thương = 300% wil và atk của bản thân, cost: 25 ae và 5 rage.
+
+ultimate: cast skill 3 mà không tốn cost, nếu skill 1 kích hoạt sau khi skill 3 từ ultimate trong 1 turn boundary thì cost = 0.
+
+85) Cổ Nhạc — Bất Động Tôn
+DMG 2/5 SUR 5/5 CTL 3/5 CMP 1/5 MIC 2/5 VIS 5/5
+tanker, ssr.
+nội tại: khi vào trận hp/res/arm/hp regen tăng 75% so với chỉ số snapshot lúc vào sân, vào luân hồi sẽ xoá hiệu quả từ nội tại này, 
+nhân vật này chỉ có 1 skill duy nhất, sát thương nhận vào tối thiểu 1% max hp.
+
+Một modifier dựa trên Entry Snapshot, không phải ×1,75 lên stat hiện tại mỗi lúc kiểm tra.
+Nếu không, bất kỳ Max HP mutation/buff nào khác có thể gây câu hỏi:
+“75% tính từ đâu?”
+Mỗi Damage Action hoàn chỉnh lên Tanker phải gây ít nhất 1% Max HP actual HP damage, nếu action đó có gây damage HP.
+Ví dụ:
+→ nâng lên 1%.
+
+Damage Action có 7 hit:
+0,1 + 0,1 + 0,1 + 0,1 + 0,1 + 0,1 + 0,1
+= 0,7%
+→ total action commit = 1%.
+Như vậy đây là floor của action, không phải floor từng hit.
+Điều này cực kỳ quan trọng với SSI/Simultaneous.
+Không áp dụng cho
+HP Cost.
+HP Loss.
+Sacrifice.
+Remove.
+Reflect damage nhận lại.
+các sự kiện không phải Damage.
+Còn True Damage thì tao nghiêng về có áp dụng, vì đây vẫn là Damage.
+Shield
+Cũng cần chốt:
+Nếu Damage Action bị Shield hấp thụ hết không được ép 1% HP damage xuyên Shield
+Tức: Damage còn lại sau Shield/mitigation mới được kiểm tra floor.
+Nếu không, cái passive “minimum 1%” sẽ biến thành shield bypass.
+
+skill: khi hp trên 30% max hp, nhận hiệu ứng taunt, cost: - 5 ae/ turn boundary. khi bị xóa hiệu ứng này nếu đủ điều kiện kích hoạt thì skill sẽ kích ngay lập tức.
+phải tránh vòng lặp
+Nếu một effect xóa Taunt → Skill tự trigger → effect lại xóa Taunt → trigger…
+thì có thể thành infinite reaction chain.
+Rule cần thêm:
+Một lần xóa hiệu ứng chỉ được kích hoạt một lần tái áp dụng; reaction mới không tự coi lần xóa vừa xảy ra là một event mới.
+Nói đơn giản hơn: cùng một resolution chain không thể tạo vô hạn Taunt refresh.
+
+ultimate: nhận buff phản 100% sát thương trong 2 turn chủ động, tức sài ultimate sau đó char này hành động 2 turn thì buff phản sát thương sẽ biến mất, sau khi biến mất tăng vĩnh viễn 5% max hp (snapshot lúc vào trận, như nội tại)
+
+Ví dụ:
+Ultimate
+↓
+Tank hành động
+↓
+vẫn phản
+↓
+kẻ khác hành động
+↓
+Tank hành động lần 2
+↓
+hết buff
+Reflected damage
+Theo contract hiện tại:
+là damage phản riêng;
+không mặc định kích phản ngược;
+không lifesteal;
+không counter.
+Đây cực kỳ quan trọng.
+Không nên để:
+→ Tank reflect
+→ Enemy reflect
+→ Tank reflect
+→ ...
+Một vòng như vậy phải bị chặn ở layer damage type.
++5% × số lần Ultimate hoàn tất
+chứ không phải compound 5% trên Max HP hiện tại.
+kiểu additive theo Entry Snapshot, bởi mày đã nói rõ:
+“5% max hp (snapshot lúc vào trận)”
+Như vậy không tạo tăng trưởng lũy thừa.
+Ví dụ:
+→ Ultimate hết: 10.500
+→ lần 2: 11.000
+→ lần 3: 11.500
+Cực dễ kiểm soát.
+
+đánh thường: gây sát thương = 100% wil và atk.
+
+Tanker có:
++75% HP từ nội tại.
+Sau đó Ultimate tăng:
++5% entry snapshot mỗi lần.
+Vậy:
+Entry snapshot = 10.000
+Passive = +75% → 17.500
+
+Ultimate #1 → +500 → 18.000
+Ultimate #2 → +500 → 18.500
+Điều này nghĩa là nội tại +75% là nền cố định, còn Ultimate là sự trưởng thành của riêng trận đó.
+
+86)
+
+warrior
+
+nội tại: đánh thường và ultimate luân phiên 2 trạng thái:
+Chém Ngang: sát thương tăng 20% atk, hồi hp = 10% sát thương gây ra lên lẻ kẻ thù (gây lên khiên không tính, dot không tính).
+Trảm Dọc: sát thương tăng 20% wil, 10% sát thương gây ra là sát thương chuẩn.
+2 trạng thái này luân phiên liên tục.
+
+đánh thường: gây sát thương = 100% wil và atk lên 1 mục tiêu
+
+skill: khi gây sát thương lên mục tiêu bằng hoặc hơn 30% max hp của chúng, +3 rage, tăng vĩnh viễn 2% res/arm/hp, reset khi rời sân, tối đa 20 stack trong trận, -5 ae mỗi lần kích hoạt.
+
+ultimate: cường hoá đánh thường, chỉ số % sát thương cơ bản từ 100% lên 200%, nếu vì đánh thường của ult mà kích hoạt skill của nhân vật này thì hiệu quả skill gấp đôi, cost không giảm.

@@ -96,6 +96,12 @@ Hệ số Hiệu suất AE (tính theo WIL):
 
 4) Ghi nhớ rule đã chốt:
 
+Warrior thắng bằng cách duy trì giao tranh.
+Ranger thắng bằng cách duy trì khoảng cách.
+Mage thắng bằng cách tạo chu kỳ phép.
+Support thắng bằng cách duy trì đội hình.
+Tanker thắng bằng cách hấp thụ áp lực.
+Assassin thắng bằng cách làm một mục tiêu cụ thể sụp đổ trước khi trận đấu kịp chuyển sang mục tiêu khác.
 Chiến trường 7×3 ngang, đồng minh trái, địch phải.
 
 Leader luôn có mặt; thua khi HP leader = 0; 4' hết giờ → so %HP leader.
