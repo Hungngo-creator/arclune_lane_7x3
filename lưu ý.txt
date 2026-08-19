@@ -110,6 +110,8 @@ Cost: +1/s, cap 30, phải triệu hồi để tiếp tục tích; không có gi
 
 Auto-đánh theo hàng, chọn skill thì thi triển, không chọn thì normal attack, tích nộ và auto dùng ult khi đầy (trừ leader vì có 3 lựa chọn).
 
+Res và arm có thể bị âm.
+
 5) Leader:
 Mặc định: luôn có trên sân, không tốn cost, có thanh Nộ riêng.
 PvE boss có thể gọi là “Leader”, nhưng không có 3 ult lựa chọn như player (chỉ có 1 ult riêng của boss).

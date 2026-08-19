@@ -4,88 +4,462 @@ Pháp Tắc/Quy Tắc/Axiom gọi chung là '3 tag ưu tiên'.
 nếu 1 char có cùng loại buff nhưng khác tag ưu tiên hoặc 1 cái có 1 trong 3 tag ưu tiên còn 1 cái không có thì cần chia riêng dù tác dụng là chung, ví dụ char A có 2 buff excute (kết liễu kẻ thù dưới hoặc =10% mx hp khi gây dam lên chúng) nhưng 1 buff excute là có tag pháp tắc và 1 buff lại không có và lúc đó char B có pháp tắc cấm kết liễu đồng minh của hắn (tức kẻ thù của char A) lúc này cần áp dụng quy trình phán định xung đột tag (so rank, sao, awaken, tu vi, lực chiến này kia, thứ tự không nhớ rõ) và char A thắng thì hắn vẫn có thể kết liễu đồng minh của char B vì buff excute cấp pháp tắc của hắn thắng, nếu kết liễu thành công thì buff excute sẽ biến mất vì đã được sử dụng còn buff excute còn lại vì không có tag pháp tắc hoặc tag nào khác có ưu tiên cao hơn pháp tắc nên buff này không có tác dụng cho đến khi kit cấm kết liễu của char B hết hiệu lực (char B chết, kỹ năng cooldown, hết ae để duy trì,etc...).
 mọi chỉ số: ở đây là đang nhắc đến các chỉ số được scale bởi rank multi, chỉ số không được scale bỏ qua, khi nhắc đến mọi chỉ số mặc định là giải thích này trừ phi mô tả/ngữ cảnh nhắc đến có mô tả đặc biệt thêm hoặc bớt thêm chỉ số nào đó đã có nhưng được hoặc không được scale bởi rank multi.
 
-1) TU LA – ĐỘC CÔ HUYẾT, Class: Chiến Sĩ, thuộc element Huyết
-1. ĐÁNH THƯỜNG: Huyết Trảm
-Logic: Gây sát thương = 100% (ATK + WIL) lên 1 kẻ địch. Kích hoạt 1 lần stack cho Nội tại Huyết Chiến.
-2. NỘI TẠI: Tu La, Tags: [Nội Tại], [Bản Thân], [Tuyệt Đối], [Buff/Debuff Vĩnh Viễn], [Quy Tắc: Cấm Hồi Sinh]. Logic: Cơ chế Scaling: Mỗi lần gây sát thương lên 1 mục tiêu (bất kể nguồn nào): Tăng +1% (ATK + WIL) vĩnh viễn. Giảm -0.5% (RES + ARM) vĩnh viễn. Giới hạn: Kích hoạt tối đa 1 lần/mục tiêu/turn và 9 lần/tổng cộng/turn. Không giới hạn số tầng (No Max Stack).
-Cơ chế Tử Vong: Nếu nhân vật Chết và được Hồi sinh (bởi Skill 2 hoặc Quy Tắc): Tổng lượng chỉ số đã cộng từ nội tại này bị Giảm 50%.
-Cơ chế Hồi Phục: Khi Giết 1 mục tiêu: Tăng +30% HP Regen (Dựa trên chỉ số hồi phục hiện có). Cộng dồn tối đa 7 tầng.
-Quy Tắc Cấm: Nhân vật này KHÔNG THỂ được hồi sinh bởi các kỹ năng thông thường. Chỉ chấp nhận hồi sinh từ: Kỹ năng có tag [Quy Tắc] hoặc Skill 2: Niết Bàn Huyết Tế.
-3. KỸ NĂNG 1: Bát Phương Diệt Tuyệt
-Tags: [Chủ Động], [AOE: Toàn Sân], [Sát Thương Hỗn Hợp], [Tiêu Hao: HP], [Tiêu Hao: Aether], [Lập Tức]. Logic: Cost: 20 Aether + 5% HP hiện tại (Không giảm Max HP). Tác dụng: Gây sát thương Cố định = 75% (ATK + WIL) lên Toàn bộ kẻ địch.
+1) TU LA – Class: Chiến Sĩ, thuộc element Huyết
+1. ĐÁNH THƯỜNG: Gây sát thương = 100% (ATK + WIL) lên 1 kẻ địch. Kích hoạt 1 lần stack cho Nội tại Huyết Chiến.
+2. NỘI TẠI: Tu La, Logic: Cơ chế Scaling: Mỗi lần gây sát thương lên 1 mục tiêu bằng Natural Action: Tăng +1% (ATK + WIL) (tính từ lúc gây sát thương , tức lúc kích hoạt nội tại) vĩnh viễn. Giảm -0.5% (RES + ARM) vĩnh viễn (như phần tăng atk và wil). Giới hạn: Kích hoạt tối đa 1 lần/mục tiêu/ Natural Action của bản thân và 9 lần/ 1 Natural Action của bản thân. Không giới hạn số tầng (No Max Stack).
+Cơ chế Tử Vong: Nếu nhân vật Chết và được Hồi sinh bởi Skill 2: Tổng lượng chỉ số đã cộng từ nội tại này bị Giảm 50%.
+Cơ chế Hồi Phục: Khi Giết 1 mục tiêu: Tăng +30% HP Regen (Dựa trên chỉ số hồi phục hiện có). Cộng dồn tối đa 7 tầng, không thể xoá các stack này nhưng kit có giảm hp regen vẫn tác dụng lên các stack này, khi tác dụng của kit đó kết thúc, bonus từ các stack sẽ phục hồi như cũ.
+Nhân vật này KHÔNG THỂ được hồi sinh từ kit ngoài Skill 2, Riêng phần này cấp quy tắc.
+4. KỸ NĂNG 1: Bát Phương Diệt Tuyệt
+Logic: Cost: -20 Aether + 5% HP hiện tại (Không giảm Max HP). Tác dụng: Gây sát thương Cố định = 85% (ATK + WIL) lên Toàn bộ kẻ địch.
 Hệ quả (Trigger): Ngay sau khi tung chiêu, với mỗi kẻ địch trúng đòn (Max 9), nhân vật lập tức nhận stack Nội tại Huyết Chiến (Tối đa +9% ATK/WIL và -4.5% RES/ARM trong 1 hành động).
-4. KỸ NĂNG 2: Niết Bàn Huyết Tế
-Tags: [Nội Tại], [Tự Động], [Bản Thân], [Quy Tắc: Tái Sinh], [Debuff Vĩnh Viễn: Không Reset], [Tiêu Hao: Aether], [Tuyệt Đối].
-Logic: Điều kiện: Kích hoạt ngay khi HP về 0. Hiệu ứng chết: Xóa toàn bộ Buff/Debuff thường. Reset các bộ đếm nội tại (trừ cái bị giảm 50%). Biến mất khỏi sàn đấu trong 3 Turn. Hiệu ứng Tái Sinh (Sau 3 Turn): Xuất hiện trở lại với 100% HP. Aether = 50% Max Aether. Nộ tích lũy (Rage) = 0.
+5. KỸ NĂNG 2: Niết Bàn.
+Logic: Điều kiện: Kích hoạt ngay khi HP về 0. Hiệu ứng chết: Xóa toàn bộ Buff/Debuff thường. Reset các bộ đếm nội tại (trừ cái bị giảm 50%). Biến mất khỏi sàn đấu trong 3 Turn boundary của leader đồng minh(. Hiệu ứng Tái Sinh (Sau 3 Turn): Xuất hiện trở lại với max hp = 95% max HP có trước khi chết, cũng có hp = 50% max hp của 95% đó. Nộ tích lũy (Rage) = 30.
 Cái giá phải trả (Cost):
-Tiêu hao 100% Aether hiện có tại thời điểm chết. Nhận Debuff: Vĩnh viễn Giảm 15% (RES + ARM). Debuff này KHÔNG RESET và cộng dồn vô hạn sau mỗi lần hồi sinh. Lưu ý: Skill này không thể bị vô hiệu hóa (Tag Tuyệt Đối).
-5. KỸ NĂNG 3: Chiến Ý Bất Diệt
-Tags: [Chủ Động], [Nội Tại: Kích hoạt], [Bản Thân], [Buff Vĩnh Viễn], [Tiêu Hao: Aether], [Tạo Khiên].
-Logic:
+Nhận Debuff: Vĩnh viễn Giảm 15% (RES + ARM). Debuff này KHÔNG RESET và cộng dồn vô hạn sau mỗi lần hồi sinh.
+6. KỸ NĂNG 3: Chiến Ý Bất Diệt
 Cost: 15 Aether (Chỉ tốn 1 lần kích hoạt duy nhất).
-Cơ chế: Sau khi kích hoạt, trạng thái này tồn tại mãi mãi cho đến khi HP về 0. Cuối mỗi Turn hành động thành công: Tự tạo 1 lớp khiên = 5% Max HP và Hồi +2 Nộ. Lưu ý: Khi nhân vật chết và hồi sinh (qua Skill 2), trạng thái này bị mất và CẦN KÍCH HOẠT LẠI.
-6. ULTIMATE: Sát Chiêu – Thiên Địa Chấn Động
-Tags: [Tự Động], [Đơn Mục Tiêu], [AOE: Toàn Sân], [Sát Thương Hỗn Hợp], [VFX: Combo].
+Cơ chế: Sau khi kích hoạt, trạng thái này tồn tại mãi mãi cho đến khi vào luân hồi. Cuối mỗi Turn hành động thành công: Tự tạo 1 lớp khiên = 5% Max HP và Hồi 2 Nộ, skill cần 1 Natural Action để kích hoạt, mỗi khi Natural Action kết thúc > vào turn boundary> kích hoạt 1 lần duy nhất > vào Natural Action > lặp lại.
+
+8. ULTIMATE: Thiên Địa Chấn Động
 Logic: Giai đoạn 1 (Đơn mục tiêu): Lao đến mục tiêu -> Hất tung -> Gây sát thương = 100% (ATK + WIL) (Tính là 1 đòn đánh thường).
 Giai đoạn 2 (AOE): Đập mục tiêu xuống đất -> Gây chấn động toàn sân.
 Mục tiêu chính nhận thêm: 100% (ATK + WIL). (Tổng nhận 200%).
 Các kẻ địch khác nhận: 100% (ATK + WIL).
-Hất tung chỉ là mô tả/vfx, không phải hiệu ứng hay debuff.
+Hất tung chỉ là mô tả/vfx, không phải hiệu ứng hay debuff, Thiện Xạ Silas không tương tác với ult này.
 Tương tác: Mỗi kẻ địch trúng đòn đều tính là 1 lần kích hoạt stack cho Nội tại Huyết Chiến.
-GHI CHÚ KỸ THUẬT (Dành cho Logic System):
-Xung đột Nội tại & Skill 1: Skill 1 là cách nhanh nhất để stack nội tại. Nếu sân có 9 địch, dùng Skill 1 xong là max stack của turn đó (9 stack). Các đòn đánh khác trong turn đó sẽ không cộng thêm stack nữa.
-Xung đột Skill 2 & Hồi sinh: Skill 2 có tag [Quy Tắc: Tái Sinh], nó ghi đè lên tag [Quy Tắc: Cấm Hồi Sinh] của Nội tại. Các skill hồi sinh thường (ví dụ của Healer Rank N) không có tag [Quy Tắc] sẽ vô dụng với nhân vật này.
-Quản lý chỉ số: Con này về late game RES và ARM sẽ âm vô cực (do nội tại giảm và skill 2 giảm). Nó sẽ cực kỳ giấy nhưng sát thương cực to (Glass Cannon đích thực).
 
-2) [UR] HUYỀN VŨ – CHẤP MINH (Zhi Ming) Class: Tanker
-1. ĐÁNH THƯỜNG: Trấn Thủy Kích, Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
-Logic: Gây sát thương = 100% (ATK + WIL) lên 1 kẻ địch.
-2. NỘI TẠI: Bắc Minh Hộ Thể, Tags: [Nội Tại], [Tự Động], [AOE: Hàng Dọc], [Tạo Khiên], [Buff: Hào Quang]. Logic:
-   * Hiệu ứng 1 (Sau khi hành động):
-     * Điều kiện: Kết thúc 1 Turn hành động thành công.
-     * Mục tiêu: Bản thân + Đồng minh cùng hàng dọc (Theo Grid 3x3: 1-4-7, 2-5-8, hoặc 3-6-9).
-     * Tác dụng: Tạo lớp khiên = 15% Max HP của Chấp Minh. (Duy trì 1 turn hoặc đến khi vỡ).
-   * Hiệu ứng 2 (Hào Quang):
-     * Điều kiện: Chấp Minh còn sống.
-     * Mục tiêu: Bản thân + Đồng minh cùng hàng dọc.
-     * Tác dụng: Giảm 35% mọi sát thương nhận vào từ nguồn [AOE] (Cả AOE Cố định & AOE Ngẫu nhiên).
-3. KỸ NĂNG 1: Liên Kết Tứ Tượng
- * Tags: [Chủ Động], [Pháp Tắc: Kiên Định], [AOE: Vùng Chữ Thập], [Buff: Liên Kết], [Cơ Chế: Tích Lũy Sát Thương], [Sát Thương Tự Thân], [Lập Tức].
- * Logic:
-   * Cost: 25 Aether.
-   * Phạm vi (Targeting): 4 ô xung quanh bản thân (Trên, Dưới, Trái, Phải). Ví dụ đứng ô 5 -> Link ô 2, 4, 6, 8.
-   * Hiệu ứng Liên Kết (Vĩnh viễn cho đến khi Chấp Minh chết):
-     * Các đồng minh tại ô liên kết được: Giảm 30% mọi sát thương nhận vào.
-Logic: Lượng giảm sát thương này BỎ QUA mọi chỉ số Xuyên Giáp (Penetration) hoặc Sát Thương Chuẩn (True Damage) thông thường của địch. Trừ khi địch dùng kỹ năng có tag [Quy Tắc], còn lại mọi sát thương đi qua liên kết này bắt buộc phải bị trừ 30%.
-     * Quy tắc cộng dồn: Nếu đồng minh vừa nằm trong vùng Nội tại (Hàng dọc) vừa được Liên kết -> Giảm tổng cộng 65% AOE Dmg (35% + 30%).
-   * Cơ chế Phản Phệ (Backlash):
-     * Hệ thống sẽ tích lũy lượng sát thương đã được giảm trừ từ 4 đồng minh này. (Ví dụ: Địch đánh 100, Đồng minh chịu 70, Tích lũy 30).
-     * Trigger: Khi Tổng Sát Thương Tích Lũy > 70% Max HP của Chấp Minh.
-     * Hậu quả: Chấp Minh nhận sát thương = 70% lượng Tích Lũy.
-     * Công thức tính dmg nhận: Dmg_Final = (Dmg_Tích_Lũy * 0.7) * (1 - 0.3) * (Hệ số giảm trừ qua ARM/RES).
-       (Lưu ý: Đoạn "nhân 1-0.3" là tao giữ nguyên theo ý mày: "sau đó giảm 30% rồi lại giảm nhờ res và arm").
-     * Sau khi gây sát thương phản phệ, thanh tích lũy reset về 0.
-4. ULTIMATE: Quy Tắc – Bất Động Như Sơn, Tags: [Tự Động], [Hồi Phục], [Buff: Cường Hóa], [AOE: Toàn Sân].
- * Logic:
-   * Tác dụng:
-     * Lập tức Hồi phục 35% Max HP cho bản thân. Cường hóa bộ giáp: Tăng 50% ARM và RES trong 2 Turn.
-     * Gây sát thương chấn động toàn sân = 100% wil/atk + 50% khiên bản thân đang có. (Chuyển hóa thủ thành công).
-PHÂN TÍCH CÂN BẰNG (Balance Check):
- * Khả năng chịu đòn:
-   * Giả sử Chấp Minh có 10.000 HP. Ngưỡng nổ là 7.000 dmg tích lũy.
-   * Khi nổ, hắn chịu: 7000 * 0.7 = 4900 -> Giảm 30% = 3430 -> Giảm tiếp qua Giáp (giả sử 50%) = 1715 Dmg.
-   * => Hắn gánh 7000 dmg cho team mà chỉ mất ~1700 HP. Cực kỳ trâu. Đây xứng đáng là Tanker Rank SSR/UR chủ lực.
- * Điểm yếu:
-   * Sợ sát thương Đơn Mục Tiêu (Single Target) dồn vào bản thân. Vì Nội tại chỉ giảm AOE, còn Skill 1 giảm dmg cho đệ chứ không giảm cho bản thân (trừ khi nổ dmg phản phệ mới được giảm).
-   * Nếu kẻ địch có skill "Bỏ qua Giáp/Xuyên thủ", cú nổ phản phệ sẽ rất đau.
+res và arm có thể bị âm nên âm càng cao sát thương nhận vào càng lớn, hiện cách res và arm hoạt động tao vẫn chưa rõ ràng vì kernel chưa khoá.
 
+2)  HUYỀN VŨ – CHẤP MINH
+# I. Hồ sơ nhân vật
 
-Đại khái là sàn đấu thế này:
-    /7/4/1/   \3\6\9\
-  /8/5/2/       \2\5\8\
-/9/6/3/           \1\4\7\
+Tên: Huyền Vũ – Chấp Minh
+Rank: UR 
+Class: Tanker.
+## Lục Cực Đồ
 
-đánh theo thứ tự 1 đến 9, ô nào không có nhân vật đứng sẽ bỏ qua, nhưng là đánh luân phiên, ô 1 bên trái đánh trước vì phía này là sân của player, bên kia là AI hoặc sân của player khác theo góc nhìn của bản thân player, tức mọi player đều thấy sân của bản thân bên trái và của kẻ thù bên phải, đầu trận sẽ random xem phe nào đánh trước, mỗi phe đều có leader là nhân vật đại diện cho player/AI đứng ở ô 8 nên nếu leader hp về 0 trận đấu sẽ kết thúc ngay lập tức. Ví dụ phe đồng minh có nhân vật đứng ô 4/6/7/8, kẻ thù có nhân vật đứng ô 2/5/8 thì nếu đầu trận random phe kẻ thù đánh trước thì thứ tự đánh là ô 2 kẻ thù >4 đồng minh >5 kẻ thù> 6 đồng minh > 8 kẻ thù > 8 đồng minh > 2 kẻ thù rồi lặp lại nếu trong quá trình này không có thay đổi về quân số như nhân vật 2 bên chết hoặc player hay AI triệu hồi thêm nhân vật vào game. 
+| Trục | Điểm |
+|---|---:|
+| DMG | 3/5 |
+| SUR | 5/5 |
+| CTL | 5/5 |
+| CMP | 4/5 |
+| MIC | 5/5 |
+| VIS | 3/5 |
+
+### DMG — 3/5
+Damage không phải identity chính.
+- Basic = 100% ATK + 100% WIL.
+- Ultimate có damage toàn sân.
+- Ultimate còn có thể scale theo Shield hiện tại.
+Nhưng phần lớn giá trị chiến đấu của Chấp Minh đến từ:
+- bảo vệ đồng minh;
+- giảm AOE damage;
+- Link;
+- Damage Accumulation;
+- Backlash.
+
+### SUR — 5/5
+Chấp Minh có nhiều lớp phòng thủ:
+- Self Shield;
+- AOE Damage Reduction cho đồng minh;
+- Link Damage Reduction;
+- ARM/RES buff từ Ultimate;
+- Backlash cho phép gánh một phần damage thay đồng minh.
+Đây là Tanker có khả năng bảo vệ đội hình rất rõ.
+
+### CTL — 5/5
+Chấp Minh kiểm soát **cách damage được phân bổ trong đội hình**.
+Không cần CC nhưng vẫn có control rất cao:
+- bảo vệ một cột;
+- Link các vị trí xung quanh;
+- chuyển damage reduction thành Backlash;
+- ép enemy phải cân nhắc AOE hay Single Target.
+
+### CMP — 4/5
+Có:
+- Self Shield;
+- AOE Aura;
+- Persistent Link;
+- Damage Accumulation;
+- Threshold;
+- Backlash;
+- Authority override;
+- Turn Boundary.
+Không chạm tới Identity/Axiom phức tạp ở mức Luân Hồi hay Giác Đấu Trường, nên chưa cần CMP 5.
+
+### MIC — 5/5
+Kit chạm sâu vào:
+- Damage Contract;
+- AOE classification;
+- True Damage;
+- Penetration;
+- Shield;
+- ARM/RES;
+- Turn Boundary;
+- Damage Accumulation;
+- Authority;
+- Position/Slot.
+Đây là character có interaction rất lớn với combat kernel.
+
+### VIS — 3/5
+
+Fantasy khá dễ hiểu:
+> "Đứng giữa đội hình, bảo vệ đồng minh, hấp thụ một phần sát thương rồi tự gánh hậu quả."
+Nhưng các chi tiết:
+- AOE reduction;
+- Link;
+- stacking reduction;
+- Backlash;
+- threshold;
+sẽ khó đọc nếu UI không biểu đạt rõ.
+
+---
+
+# II. Đánh thường
+
+## Logic
+
+Gây:
+> **100% ATK + 100% WIL**
+lên một mục tiêu.
+Damage profile:
+
+- 100% ATK → Physical Damage.
+- 100% WIL → Will Damage.
+Không có mechanic đặc biệt khác.
+---
+# III. Nội tại — Bắc Minh Hộ Thể
+
+Nội tại nên được tách thành **hai effect độc lập**.
+Không dùng Self Shield làm flag để đại diện cho Aura.
+
+---
+
+## A. Self Shield
+
+### Trigger
+
+Sau khi Chấp Minh hoàn tất **một natural action thành công**.
+
+Bao gồm:
+- Basic Attack;
+- Skill chủ động;
+- Ultimate.
+Không mặc định kích hoạt từ:
+- Follow-up;
+- Counter;
+- Forced Action;
+- Reaction.
+
+### Effect
+
+Tạo một Self Shield:
+> **15% Max HP của Chấp Minh**
+### Duration
+> **1 Turn Boundary của Chấp Minh hoặc tới khi Shield bị phá hoàn toàn.**
+### Replacement
+Self Shield mới của chính nội tại:
+> **thay thế Self Shield cũ.**
+Không cộng dồn.
+External Shield từ nguồn khác không bị Self Shield này thay thế.
+
+### Cần khóa
+
+Nếu Chấp Minh bị CC làm mất Natural Action:
+- không có natural action thành công;
+- không tạo Self Shield mới;
+- Turn Boundary của Chấp Minh vẫn tiến triển theo SSI.
+---
+
+# IV. Nội tại — Bắc Minh Hộ Thể: AOE Ward
+
+### Điều kiện
+
+Chấp Minh còn `ALIVE`.
+
+### Mục tiêu
+
+Các đồng minh **cùng cột** với Chấp Minh.
+Quy ước cột:
+- 1 / 4 / 7
+- 2 / 5 / 8
+- 3 / 6 / 9
+
+### Effect
+
+> **Giảm 35% AOE Damage nhận vào.**
+
+Bao gồm:
+- AOE cố định;
+- AOE ngẫu nhiên.
+Không áp dụng cho Single Target Damage.
+
+### Important
+
+Không dùng sự tồn tại của Shield để đại diện cho Aura.
+Nếu Self Shield bị phá:
+> AOE Ward vẫn tồn tại miễn Chấp Minh còn ALIVE.
+
+---
+
+# V. Skill 1 — Liên Kết Tứ Tượng
+
+**Cost:** 25 AE  
+**Authority:** Pháp Tắc — Kiên Định  
+**Action type:** Chủ động  
+**Target geometry:** 4 ô trực giao xung quanh Chấp Minh
+
+Ví dụ Chấp Minh ở slot 5:
+> 2, 4, 6, 8.
+Nếu ở biên/góc:
+> chỉ sử dụng các slot hợp lệ thực tế.
+Không wrap-around.
+
+---
+
+## A. Snapshot Linked Units
+
+Tại thời điểm Skill 1 resolve:
+
+- lấy các allied unit đang đứng ở các slot liên kết;
+- tạo Link Status cho từng `iid` được snapshot.
+
+### Link là theo Unit, không phải Zone
+
+Sau khi đã được Link:
+- unit di chuyển sang slot khác → vẫn giữ Link;
+- slot ban đầu trống → Link không mất;
+- summon mới xuất hiện ở slot đó → không tự động được Link.
+
+### Duration
+
+> **Vĩnh viễn cho đến khi Chấp Minh rời sân**, theo legacy intent.
+Nếu Chấp Minh rời sân:
+> toàn bộ Link do Chấp Minh tạo ra kết thúc.
+
+---
+
+# VI. Liên Kết Tứ Tượng — Damage Reduction
+
+## Effect
+
+> Linked Ally nhận **30% giảm AOE Damage**.
+
+### Chuẩn hóa
+> **30% AOE Damage Reduction**
+Lý do:
+- giữ đúng identity bảo vệ đội hình trước AOE;
+- tránh biến Chấp Minh thành generic 30% all-damage reduction;
+- giữ Single Target Damage là điểm counterplay tự nhiên.
+
+---
+
+# VII. Cộng dồn với Bắc Minh Hộ Thể
+
+Nếu một đồng minh:
+- nằm cùng cột với Chấp Minh → có 35% AOE Reduction;
+- đồng thời có Link → có thêm 30%.
+Tổng:
+
+> **65% AOE Damage Reduction.**
+Hai modifier này là cùng nhóm Generic Damage Reduction:
+> **cộng additive**, không nhân tuần tự.
+Không được biến thành:
+> `35% × 30%` reduction.
+
+---
+
+# VIII. Authority của Liên Kết
+
+Legacy mô tả Link có thể giảm:
+
+- Damage bình thường;
+- Penetration;
+- True Damage;
+và chỉ bị vượt qua bởi Quy Tắc trở lên.
+Để phù hợp hệ thống Authority hiện tại:
+> Liên Kết Tứ Tượng là **Protection Effect cấp Pháp Tắc — Kiên Định**.
+Vì vậy:
+- Armor Penetration không xuyên qua Link;
+- True Damage không tự động bỏ qua Link;
+- Generic Damage Reduction của Link vẫn áp dụng;
+- effect có Authority **Quy Tắc hoặc cao hơn** mới có quyền override.
+
+Không gọi Link là Axiom.
+
+---
+
+# IX. Phản Phệ — Backlash
+## Accumulation
+Mỗi khi một Linked Ally nhận Damage:
+> ghi lại **Actual Damage đã bị Link giảm**.
+Ví dụ:
+```text
+Incoming Damage = 100
+Link giảm = 30
+Ally thực sự nhận = 70
+Accumulated += 30
+Chỉ ghi phần damage thực sự bị Link triệt giảm.
+---
+Threshold
+Khi:
+> Accumulated > 70% Max HP của Chấp Minh
+
+Backlash được kích hoạt.
+Ví dụ:
+Threshold = 7.000
+Accumulated = 7.000
+→ chưa kích hoạt
+Accumulated = 7.001
+→ kích hoạt
+---
+X. Backlash Damage Contract
+1. Snapshot Accumulated.
+2. Tính:
+> Backlash Raw = Accumulated × 70%
+3. Backlash tạo một Physical Damage Packet riêng lên Chấp Minh.
+4. ARM/RES của Chấp Minh được áp dụng bình thường.
+5. Shield có thể chặn Backlash theo Damage Contract.
+6. Sau khi Backlash resolve:
+> Accumulated = 0.
+---
+XI. Tại sao Backlash nên là Physical Damage?
+Accumulated có thể đến từ:
+Physical Damage;
+Will Damage;
+True Damage;
+các AOE source khác nhau.
+Không thể gom chúng thành một raw packet rồi áp ARM/RES theo source gốc.
+Vì vậy:
+> Backlash được chuẩn hóa thành một Physical Damage packet đặc biệt.
+Điều này giúp engine deterministic và đơn giản.
+---
+XII. Backlash không được tạo vòng lặp
+
+Backlash là một Damage Source riêng.
+
+Mặc định:
+không được tự tích vào Backlash Accumulator;
+không được tự Reflect;
+không tự tạo Lifesteal;
+không tạo Follow-up;
+không được coi là damage của enemy.
+Nếu Backlash gây Death:
+> Death lifecycle bình thường vẫn xử lý.
+---
+XIII. Backlash và Shield
+
+Backlash là Physical Damage.
+Do đó:
+> Shield có thể chặn Backlash.
+Không được mặc định coi Backlash là True Damage.
+---
+XIV. Ultimate — Bất Động Như Sơn
+Ultimate gồm ba thành phần độc lập.
+1. Healing
+> Heal = 35% Max HP của Chấp Minh
+Đây là Healing.
+Không phải Max HP Mutation.
+---
+2. Defensive Enhancement
+> +50% ARM và +50% RES
+Duration:
+> 2 Turn Boundary của Chấp Minh.
+Không stack cùng effect cùng Identity; recast theo behavior chung của Buff Identity nếu được áp dụng.
+---
+3. Full-field Damage
+
+Gây sát thương toàn sân:
+> 100% ATK + 100% WIL + 50% Current Shield
+> 50% Current Shield được chuyển thành True Damage component.
+Khi đó:
+100% ATK → Physical;
+100% WIL → Will;
+50% Current Shield → True.
+---
+XV. Thứ tự Resolve của Ultimate
+Để tránh ambiguity:
+Ultimate cast
+→ Heal 35% Max HP
+→ apply ARM/RES +50%
+→ snapshot Current Shield
+→ tính Damage
+→ resolve Full-field Damage
+→ commit reactions/deaths
+→ action hoàn tất
+
+Nếu Current Shield được dùng để scale damage:
+> phải snapshot tại thời điểm Damage Snapshot của Ultimate.
+---
+XVI. Các điểm vẫn cần chốt
+1. Link khi target chết/revive
+Link gắn với iid
+Unit chết rồi revive cùng trueSelfId nhưng iid mới:
+> Link mất.
+Link gắn với combat instance, vì Skill 1 snapshot các đơn vị hiện diện tại thời điểm cast.
+---
+2. Unit bị remove khỏi sân nhưng chưa chết
+Cần xác định:
+> REMOVED có làm Link mất không?
+Theo hướng an toàn:
+> Chấp Minh còn ở sân → Link status vẫn tồn tại trên iid nhưng không có tác dụng ngoài sân.
+Đồng Ý.
+Khi actor trở lại:
+> Link có thể tiếp tục nếu iid/state continuity được giữ.
+Đây là điểm cần chốt riêng khi hoàn thiện Status Lifecycle.
+---
+3. External Shield có được Ultimate dùng để tăng damage?
+Có, Tổng Current Shield đang có trên Chấp Minh, bất kể nguồn.
+---
+4. Ultimate shield contribution là True Damage hay Mixed?
+> True Damage.
+---
+XVII. Cân bằng
+
+Chấp Minh có khả năng bảo vệ team cực mạnh:
+> 35% AOE Reduction từ Aura
+30% AOE Reduction từ Link
+= 65% khi overlap.
+Thêm:
+Shield;
+Backlash;
+ARM/RES Ultimate;
+Heal;
+Protection Authority.
+Do đó SUR 5 và CTL 5 là hợp lý.
+Không nên nerf trước playtest.
+Metric cần theo dõi
+Không chỉ nhìn "Chấp Minh sống bao lâu".
+Cần đo:
+> Tổng AOE damage prevented trong một trận.
+Nếu một Chấp Minh thực tế ngăn quá nhiều damage cho cả đội trong mọi matchup:
+giảm Link 30% → 25%;
+hoặc giảm Aura 35% → 30%.
+Không nên ngay lập tức phá Backlash, vì Backlash là phần identity quan trọng.
+---
+XVIII. Character Identity
+Chấp Minh không đơn thuần là:
+> "Tanker có nhiều ARM."
+Identity thực sự:
+> Bảo vệ đội hình khỏi AOE bằng Bắc Minh Hộ Thể, nối các đồng minh gần mình thành Liên Kết Tứ Tượng, rồi biến phần sát thương đã ngăn được thành món nợ mà bản thân phải gánh.
+Đây là một Tanker protector / damage sink, không phải một Tanker chỉ có HP cao.
+---
+XIX. Kết luận
+> Bắc Minh Hộ Thể → bảo vệ cột.
+> Liên Kết Tứ Tượng → mở rộng vùng bảo hộ.
+> Phản Phệ → biến damage đã giảm thành món nợ.
+> Bất Động Như Sơn → hồi phục + cường hóa phòng thủ + chuyển Shield thành sức mạnh công kích.
+Điểm quan trọng nhất cần ghi nhớ khi đưa vào kernel:
+
+> Link giảm AOE, không phải generic all-damage reduction.
+> Backlash không được giảm lại bởi chính Link.
+> Backlash là một Damage Packet riêng.
+> Self Shield và AOE Aura là hai effect độc lập.
+> Link snapshot Unit, không snapshot Slot.
+> Turn Boundary được dùng thay cho “1 turn” mơ hồ.
+> True Damage không tự động xuyên Link hoặc Shield.
 
 3) [N] Ngự Thú Sư Tập Sự – A Mộc
 Nội tại: Tăng 10% HP, +5% atk cho Sói Xám triệu hồi ra.
@@ -96,7 +470,7 @@ Ult (Auto): Hồi 50% HP cho Sói Xám và tăng cho nó 20% ATK trong 2 turn.
 
 4) [N] Nghệ Nhân Rối – Ban Cơ
 Nội tại: Khi Rối Gỗ bị phá hủy, Ban Cơ được hồi 10 Aether.
-Đánh thường: Ném gỗ vụn. Gây 80% WIL.
+Đánh thường: Ném gỗ vụn. Gây 100% WIL và 100% atk lên 1 mục tiêu.
 Kỹ năng (25 Aether): Triệu hồi 1 [Rối Gỗ] vào ô trống bất kỳ phe mình.
 Chỉ số Rối Gỗ: HP = 50% HP, 120% res/arm của Ban Cơ, ATK/wil = 0 (Chỉ dùng để chặn đòn/làm bao cát).
 Ult (Auto): Sửa chữa Rối Gỗ, hồi đầy máu cho nó. Nếu không có Rối Gỗ, triệu hồi ngay lập tức 1 con mới.
@@ -144,24 +518,480 @@ Nội tại: vào trận hp max tăng 10%.
 Kỹ năng (10 Aether): Đào Đất. Ném đất vào mắt địch, gây 100% ATK + 50% wil và giảm 10% PER của địch.
 Ult: Cơn Giận Nông Dân. Tăng 30% ATK + 20% wil trong 2 turn nhưng giảm 20% ARM (Bỏ áo ra đánh).
 
-13) [Prime] Vạn Yêu Chi Tổ – Hỗn Độn (Hundun) Class: Tanker
-Nguồn gốc: Sơn Hải Kinh. Hung thú không mặt, sáu chân bốn cánh, đại diện cho sự hỗn loạn sơ khai. Trong Arclune, hắn là kẻ tu luyện Thôn Phệ Đại Đạo đến mức ăn cả không gian để lấp đầy cái bụng không đáy.
-Nội tại — [Pháp Tắc] Hư Vô Thôn Phệ:
-Hỗn Độn không có khái niệm né tránh (AGI = 0). Hắn nhận mọi đòn đánh vào mình.
-Mỗi khi nhận sát thương, hắn hấp thụ 10% lượng sát thương đó và chuyển hóa vĩnh viễn thành Max HP (Không giới hạn). Hỗn Độn cần thời gian để thích ứng, res và arm hoạt động bình thường, vẫn có thanh HP, về 0 vẫn chết, hậu thiên thần, có thể hồi sinh, không có Thần Tính.
-Khi tấn công, hắn gây thêm Sát thương chuẩn = 5% Max HP hiện tại của bản thân.
-Tag: Nội tại, Pháp Tắc, Tiến hóa vĩnh viễn.
-Đánh thường: Dùng cánh đập mạnh. Gây sát thương = 80% ATK + 80% WIL.
-Hồi phục 2% HP tối đa cho bản thân.
-Tag: Kẻ địch, Đơn mục tiêu, Hồi phục.
-Kỹ năng 1 — Hỗn Loạn Trường (30 Aether):
-Gầm lên một tiếng, làm méo mó không gian xung quanh. Gây sát thương = 150% ATK + 150% WIL lên toàn bộ kẻ địch.
-Kẻ địch trúng đòn bị đảo lộn chỉ số: ATK và WIL của chúng bị tráo đổi cho nhau trong 2 turn. (Khắc chế bọn lệch tủ như thuần Kiếm hoặc thuần Phép). Tag: Kẻ địch, Aoe, Debuff đặc biệt. Tương tác với nội tại.
-Ultimate — Quy Tắc: Sự Trở Về Của Hư Không (Auto-cast):
-Hỗn Độn mở ra cái miệng (vốn không tồn tại) và nuốt chửng 1 kẻ địch (Ưu tiên kẻ địch có HP hiện tại thấp nhất).
-Hiệu quả: Gây sát thương = 200% (ATK + WIL, tương tác với nội tại).
-Tiến Hóa: Nếu kẻ địch chết, Hỗn Độn chiếm đoạt vĩnh viễn 20% toàn bộ chỉ số của kẻ đó cộng vào cho mình. Xác kẻ địch biến mất hoàn toàn, không thể hồi sinh.
-Tag: Kẻ địch, Đơn mục tiêu, Quy Tắc, Tiến hóa.
+13) Vạn Yêu Chi Tổ – Hỗn Độn (Hundun)
+Rank: Prime  
+Class: Tanker  
+Nguồn gốc: Sơn Hải Kinh  
+Concept: Hung thú hỗn loạn sơ khai, không mặt, sáu chân bốn cánh.
+---
+
+# I. Lục Cực Đồ
+DMG: 4/5 SUR: 5/5 CTL: 4/5 CMP: 4/5 MIC: 5/5 VIS: 3/5
+### DMG — 4/5
+Không phải damage dealer thuần, nhưng damage tăng rất mạnh nhờ:
+- Basic 100% ATK + 100% WIL.
+- Mỗi lần tấn công thêm True Damage = 2% Max HP hiện tại.
+- Skill 1 = 150% ATK + 150% WIL toàn sân.
+- Ultimate = 200% ATK + 200% WIL.
+- Có thể permanently chiếm đoạt 20% stat của mục tiêu bị Ultimate giết.
+Đặc biệt Max HP của Hỗn Độn còn liên tục tăng từ damage nhận vào, khiến True Damage 2% Max HP tăng theo.
+### SUR — 5/5
+Đây là identity cốt lõi:
+> Bị đánh → hấp thu damage → Max HP tăng → đòn đánh sau càng mạnh → tiếp tục chịu đòn.
+Không giới hạn số lần hấp thu trong trận là một scaling cực lớn.
+
+Ngoài ra:
+- AGI = 0 và không né tránh.
+- Có Max HP mutation vĩnh viễn.
+- Có thể chiếm stat từ kẻ địch chết.
+Hắn thực sự là **Tanker tăng trưởng bằng thương tổn**.
+
+### CTL — 4/5
+
+Skill 1 có:
+- toàn sân damage;
+- random 2 enemy bị đảo ATK/WIL.
+
+Ultimate:
+- target priority HP thấp nhất;
+- erase/reincarnation đặc biệt.
+Hắn không phải controller thuần, nhưng can thiệp rất mạnh vào state chiến đấu.
+### CMP — 4/5
+
+Kit không nhiều skill nhưng có:
+- Natural Action detection.
+- Multihit aggregation.
+- Turn Boundary cap.
+- Max HP mutation.
+- True Damage scaling.
+- ATK/WIL swap.
+- Target priority.
+- Permanent stat theft.
+- Quy Tắc interaction.
+- Luân Hồi shortcut.
+
+### MIC — 5/5
+
+Hỗn Độn chạm sâu vào:
+
+- Damage Contract.
+- Natural Action.
+- Turn Boundary.
+- Max HP mutation.
+- True Damage.
+- Stat mutation.
+- Authority.
+- Death lifecycle.
+- Luân Hồi.
+- Identity/Chân Ngã.
+Đây rõ ràng là một Prime có interaction kernel rất cao.
+
+### VIS — 3/5
+Fantasy rất dễ hiểu:
+
+> **Đánh càng nhiều → càng phình to → đánh càng đau → ăn luôn kẻ địch chết.**
+Nhưng các chi tiết:
+- multihit;
+- ATK/WIL swap;
+- permanent stat theft;
+- bỏ qua hàng chờ Luân Hồi;
+làm kit khó đọc hơn nhiều.
+---
+
+# II. Nội tại — Hư Vô Thôn Phệ
+## A. Không có né tránh
+> AGI = 0.
+Hỗn Độn không có mechanic né tránh.
+Mọi attack hợp lệ nhắm tới hắn đều có thể tác động lên hắn.
+
+### Chuẩn hóa
+Không cần một exception riêng cho từng skill.
+Nên hiểu:
+> **Hỗn Độn luôn được coi là mục tiêu hợp lệ của đòn đánh nhắm vào hắn; AGI không tạo khả năng miss/evade.**
+Nếu game có một mechanic khác không phải AGI mà cho miss:
+> mechanic đó cần tự xác định có bypass Hỗn Độn hay không.
+Không nên hiểu:
+> AGI = 0 → mọi source đều bắt buộc hit.
+---
+# III. Hấp Thụ Sát Thương → Max HP
+## Trigger
+> Mỗi khi Hỗn Độn nhận Damage từ **một natural action** của kẻ địch.
+Chỉ natural action mới kích hoạt.
+Không mặc định kích hoạt từ:
+- DoT.
+- Follow-up.
+- Counter.
+- Reaction.
+- Forced Action.
+- Reflect.
+
+Nếu sau này một effect được định nghĩa là natural action thì tự động hợp lệ.
+---
+## Multihit
+
+Một natural action có nhiều hit:
+```text Hit 1
+Hit 2
+Hit 3
+Hit 4
+chỉ tạo:
+> một lần Hư Vô Thôn Phệ.
+Lấy:
+> tổng Actual HP Damage mà Hỗn Độn thực nhận từ toàn bộ action đó làm cơ sở.
+Ví dụ:
+Hit 1 = 300
+Hit 2 = 500
+Hit 3 = 200
+Total Actual Damage = 1.000
+→ Max HP +50
+Không được:
+> +15 → +25 → +10.
+---
+
+IV. Cap 7 lần / Turn Boundary
+> Mỗi Turn Boundary kích hoạt tối đa 7 lần.
+Điều này nên hiểu:
+> Counter DevourTriggerCount reset về 0 tại mỗi Turn Boundary của Hỗn Độn.
+Nếu trong cùng khoảng thời gian Hỗn Độn chưa tới Boundary tiếp theo mà nhận 10 natural actions hợp lệ:
+7 actions đầu được hấp thu;
+3 actions sau không được chuyển thành Max HP.
+Không tích lũy trigger “nợ”.
+---
+
+V. Điểm cần làm rõ: Damage cơ sở là Actual HP Damage
+Phải dùng:
+> Actual HP Damage
+không dùng raw incoming damage.
+Ví dụ:
+Shield hấp thụ 400
+HP mất = 600
+→ Hư Vô Thôn Phệ = 5% × 600 = +30 Max HP
+Không phải +50.
+Lifesteal/shield/ARM/RES đã resolve xong mới lấy số.
+---
+
+VI. True Damage nhận vào có kích hoạt không?
+Theo wording:
+> “nhận sát thương từ natural action”
+và không có exception.
+Vì vậy:
+> Có.
+True Damage vẫn là Damage.
+Nhưng:
+> HP Cost / HP Loss không phải Damage → không kích hoạt.
+---
+
+VII. True Damage từ chính Hỗn Độn
+
+Mỗi khi Hỗn Độn tấn công:
+> +2% Current Max HP của chính Hỗn Độn dưới dạng True Damage.
+Đây là component riêng.
+Ví dụ:
+→ +400 True Damage
+Không qua ARM/RES.
+Nếu target có Shield:
+> Shield vẫn chặn True Damage theo Damage Contract, trừ khi attack/component có thuộc tính xuyên Shield.
+---
+
+VIII. Thứ tự khi Hỗn Độn tấn công
+Damage của Hỗn Độn nên được resolve như:
++
+2% Current Max HP → True Damage
+↓
+Damage resolution
+Không snapshot 2% Max HP từ đầu trận.
+Phải dùng:
+> Current Max HP tại thời điểm Damage Snapshot của action.
+Điều này làm Max HP mutation trực tiếp tăng damage về sau.
+---
+IX. Skill 1 — Hỗn Loạn Trường
+Cost: 30 AE
+Damage: 150% ATK + 150% WIL toàn bộ enemy.
+Đây là AOE cố định toàn battlefield.
+Random 2 target
+Sau khi gây damage:
+> chọn ngẫu nhiên 2 enemy hợp lệ để áp ATK/WIL swap.
+Nếu có ít hơn 2 enemy:
+> chọn tất cả mục tiêu hợp lệ.
+Random phải dùng seeded RNG/deterministic RNG theo hệ thống random chung.
+---
+
+X. ATK/WIL Swap
+Target:
+> ATK ↔ WIL.
+Ví dụ:
+ATK = 1.000
+WIL = 500
+sau:
+ATK = 500
+WIL = 1.000
+Duration:
+> 2 Natural Actions của chính target.
+Không phải Turn Boundary của Hỗn Độn.
+---
+
+XI. ATK/WIL Swap:
+> Chỉ tráo hai stat trong duration.
+Buff/Debuff vẫn có thể áp dụng bình thường.
+Khi một buff/debuff thay đổi ATK/WIL:
+> hệ thống dùng stat hiện tại đã bị swap theo modifier contract bình thường.
+---
+XII. Cần chốt interaction với stat mutation
+
+Trong 2 Natural Actions của target:
+> ATK/WIL đang swap.
+Nếu target nhận:
+> +20% ATK.
+Không nên tạo một logic đặc biệt.
+Nên áp theo hệ thống modifier hiện tại:
+> modifier tăng ATK → áp lên ATK stat hiện tại đang tồn tại dưới trạng thái swap.
+Kết thúc swap:
+> stat mapping trả về bình thường.
+Đây là điểm cần test kỹ trong kernel nhưng không cần thêm rule riêng trong kit.
+---
+
+XIII. Ultimate — Quy Về Hư Không
+Target:
+> Enemy có Current HP thấp nhất.
+Nếu có Taunt:
+> Taunt override target selection theo combat contract.
+Nếu muốn priority khác, phải ghi riêng.
+---
+XIV. Damage
+Ultimate gây:
+> 200% ATK + 200% WIL và áp thêm:
+> 2% Current Max HP của Hỗn Độn dưới dạng True Damage theo nội tại.
+Không tính nội tại như một “attack riêng”.
+Nó là component damage của Ultimate.
+---
+
+XV. Chiếm đoạt chỉ số
+Nếu mục tiêu bị Ultimate đưa tới:
+
+> DEATH_CONFIRMED
+thì Hỗn Độn permanent nhận:
+> 20% toàn bộ stat hợp lệ của mục tiêu, trừ AGI.
+Cần chốt “toàn bộ stat”
+Nếu literal:
+HP;
+Max HP;
+ATK;
+WIL;
+ARM;
+RES;
+Rage?
+Max Rage?
+AE?
+Speed/initiative?
+các derived stat?
+Không nên dùng chữ:
+> “toàn bộ chỉ số”
+trong kernel spec.
+chỉ chiếm: Max HP; ATK; WIL; ARM; RES.
+Và bỏ:
+AGI; Rage; Max Rage; AE; resource; cooldown; trạng thái.
+---
+
+XVI. Nguồn stat để chiếm đoạt
+Phải lấy:
+> stat snapshot của mục tiêu ngay trước DEATH_CONFIRMED.
+Ví dụ:
+Buff đang tăng Max HP → 12.000
+Target chết
+→ Hỗn Độn nhận 20% của 12.000 = 2.400 Max HP
+Không lấy Base Stat ban đầu.
+Nếu death cleanup làm mất buff trước khi stat theft resolve:
+> phải snapshot trước cleanup.
+---
+XVII. Target là Summon hay nhân vật thật?
+> Chỉ target có Chân Ngã mới tạo Stat Theft.
+---
+
+XVIII. Tỷ lệ 20% là permanent mutation
+
+Nếu Hỗn Độn giết:
+
+Max HP 10.000
+ATK 1.000
+WIL 800
+ARM 500
+RES 600
+
+thì nhận:
+
++200 ATK
++160 WIL
++100 ARM
++120 RES
+
+Mutation này tồn tại trong current life cho tới khi character rời sân/đời sống theo luật stat mutation tương ứng.
+Không phải buff duration.
+---
+
+XIX. Đưa mục tiêu thẳng vào Luân Hồi
+Legacy:
+> “kẻ địch vào Luân Hồi ngay mà không vào hàng chờ Luân Hồi.”
+Đây là mechanic cực lớn.
+
+Nếu giữ, nó không phải hiệu ứng thường.
+Để phù hợp hệ thống hiện tại:
+> Quy Tắc effect
+có quyền:
+> bỏ qua cửa sổ chờ Luân Hồi thông thường.
+Timeline:
+Ultimate
+→ target HP_ZERO
+→ Death Prevention xử lý nếu có
+→ DEATH_CONFIRMED
+→ Quy Tắc skip waiting window
+→ Chân Ngã vào Luân Hồi trực tiếp
+Không được hiểu là:
+> “Xóa Chân Ngã.”
+Mục tiêu vẫn là cùng trueSelfId.
+Nó chỉ:
+> bỏ qua waiting window và tiến thẳng vào state Luân Hồi.
+---
+
+XX. Điểm quan trọng: không dùng “vào Luân Hồi” như một Death mới
+DEATH_CONFIRMED chỉ xảy ra một lần.
+Sau đó:
+> World Axiom Luân Hồi chuyển state của Chân Ngã.
+Không:
+→ death event lần hai
+→ Luân Hồi
+---
+
+XXI. Một interaction cực mạnh với Luân Hồi Chi Chủ
+Nếu Hỗn Độn giết một character và đưa thẳng Chân Ngã vào Luân Hồi:
+> Luân Hồi Chi Chủ vẫn có thể quan sát Chân Ngã đó theo luật của Luân Hồi.
+Đây rất quan trọng:
+
+> Quy Tắc chỉ bypass waiting window, không bypass Luân Hồi.
+---
+XXII. Điểm cân bằng đáng chú ý
+Hỗn Độn có một growth loop cực mạnh:
+→ Hỗn Độn mất HP
+→ Max HP tăng
+→ 2% Max HP True Damage tăng
+→ Hỗn Độn đánh
+→ địch chết
+→ ăn 20% stat
+→ Hỗn Độn càng mạnh
+→ địch đánh càng nhiều
+→ lại tăng Max HP
+Đây là Prime snowball engine.
+Tao không xem đây là lỗi.
+Nhưng nó phải là chủ đích của rank Prime.
+---
+
+XXIII. Có nên thêm giới hạn Max HP?
+
+Không.
+
+Legacy đã nói:
+
+> không giới hạn lần kích hoạt trong trận, chỉ cap 7 trigger/Turn Boundary.
+Đây chính là điểm khác biệt của Prime.
+Nếu thêm cap toàn trận, mày phá bản sắc.
+Tao chỉ giữ:
+> 7 natural-action triggers / Turn Boundary
+để tránh multihit spam vô hạn.
+---
+
+XXIV. Điều cần sửa về “natural action multihit”
+Phải định nghĩa:
+> Một attack command của kẻ địch = một natural action.
+Ví dụ Ultimate:
+Hit 2
+Hit 3
+→ Hư Vô Thôn Phệ chỉ trigger một lần, dùng:
+> tổng Actual HP Damage từ cả 3 hit.
+Điều này đúng với simultaneous/sequential contract:
+
+Nếu multihit được định nghĩa sequential nội bộ:
+> từng hit vẫn có thể làm HP thay đổi,
+nhưng Max HP absorption của Hỗn Độn chỉ commit một lần sau khi toàn bộ natural action hoàn thành.
+Đây là cách sạch nhất.
+
+---
+
+XXV. Skill 1 có trigger Hư Vô Thôn Phệ không?
+Nếu enemy sử dụng Skill 1:
+> đó là natural action.
+→ Có.
+Nếu Skill 1 có nhiều target và nhiều hit:
+> vẫn một lần absorption cho action đó.
+---
+
+XXVI. DoT có trigger không?
+Không.
+Vì legacy ghi:
+> natural action.
+DoT tick không phải natural action.
+---
+
+XXVII. Hỗn Độn có bị AOE target như bình thường không?
+Có.
+AGI = 0 không phải:
+> “mọi attack tự động target Hỗn Độn.”
+AOE vẫn resolve theo target list của skill.
+Nó chỉ không có khả năng né tránh nếu đã bị chọn.
+
+---
+
+XXVIII. Có cần buff/nerf?
+
+Cái cần quan tâm không phải:
+> “Hắn mạnh không?”
+mà là:
+> “Growth engine có vượt khỏi khả năng của encounter trước khi đối thủ có cơ hội kết thúc hắn không?”
+
+Nếu quá mạnh, tao sẽ nerf theo thứ tự:
+1. 5% damage → Max HP absorption
+2. 20% stat theft
+3. 2% Max HP True Damage
+---
+
+XXIX. Các điểm CẦN CHỐT
+1. ATK/WIL swap không nên có hiệu ứng “không nhận buff/debuff”
+Khuyến nghị:
+> Bỏ hoàn toàn mechanic này.
+Nó biến một state modifier thành một mini-Thần Tính và tạo authority conflict không cần thiết.
+2. Stat nào được chiếm 20%?
+Khuyến nghị:
+> Max HP / ATK / WIL / ARM / RES.
+Không mặc định lấy:
+> Rage / Max Rage / AE / cooldown / resource.
+3. Stat theft có ăn stat của summon không?
+Khuyến nghị:
+> chỉ character có Chân Ngã.
+4. Stat theft snapshot ở đâu?
+> ngay trước DEATH_CONFIRMED và death cleanup.
+5. 2% Max HP True Damage có xuyên Shield không?
+Không.
+Theo Damage Contract hiện tại:
+> True bỏ ARM/RES nhưng vẫn bị Shield chặn.
+6. Hư Vô Thôn Phệ dùng Actual HP Damage
+> Có.
+Không dùng raw damage.
+XXXI. Verdict
+Vạn Yêu Chi Tổ – Hỗn Độn
+Prime / Tanker
+DMG 4/5
+SUR 5/5
+CTL 4/5
+CMP 4/5
+MIC 5/5
+VIS 3/5
+Engine Risk
+5/5
+Mechanic Profile
+Damage-to-Max-HP Conversion
+Max HP Scaling
+True Damage Scaling
+Stat Theft
+State Mutation
+Death/Luân Hồi Override
 
 14) [UR] Cửu Đỉnh: Tội Kiếm – Sát Sinh Hoàn (Sha Sheng Wan) Class: Kiếm sĩ
 Nguồn gốc: Nhánh kiếm thuật bị cấm của Kiếm Thiên – Tu La Kiếm. Lấy cảm hứng từ Ta có một thân bị động kỹ (Kiếm tu điên cuồng). Hắn dùng máu kẻ thù để mài kiếm.
@@ -397,9 +1227,9 @@ ultimate: cast 2 lần skill 3 nhưng không trừ ae.
 
 34) Hoá Thân của Thời Không Chi Chủ - Thời Gian Chi Chủ, Prime.
 mô tả: 1 nửa ý niệm của Thời Không Chi Chủ giáng lâm thế gian.
-nội tại: khi có Hư Không Chi Chủ là đồng minh trên sân + 20% mọi chỉ số cho cả bản thân và Hư Không Chi Chủ.
-Thần Tính: không nhận buff hay debuff ngoài bản thân (trừ Không Gian Chi Chủ), không thể hồi sinh.
-bất kể nhận bao nhiêu sát thương/1 lần thì hắn sẽ luôn được hồi hp = 10% max hp mỗi lần nhận sát thương, không giới hạn lần kích hoạt/turn. quy tắc.
+nội tại: khi có Hư Không Chi Chủ là đồng minh trên sân + 20% mọi chỉ số (được rank multi scale) cho cả bản thân và Hư Không Chi Chủ.
+Thần Tính: không nhận buff/mark hay debuff ngoài bản thân (trừ Không Gian Chi Chủ), không thể hồi sinh từ kit ngoài bản thân và Không Gian Chi Chủ, không vào luân hồi.
+bất kể nhận bao nhiêu sát thương/1 lần thì hắn sẽ luôn được hồi hp = 10% max hp mỗi lần nhận sát thương, không giới hạn lần kích hoạt/turn.
 kỹ năng 1: quy tắc: tạo Thời Gian Màn Che giữa 2 bên sân trong 3 turn. Thời Gian Màn Che: mọi đơn vị cận chiến từ kẻ thù khi tấn công đồng minh đều sẽ giảm 30% sát thương cuối gây ra lên đồng minh, khi kết thúc lượt tấn công cận chiến đó nhận debuff chậm chạp trong 1 turn, mỗi kẻ thù chỉ nhận 1 debuff chậm chạp từ kỹ năng này/1 turn. 25 aether. Khi có 2 Thời Gian Màn Che tồn tại, chúng không ảnh hưởng hay chiếm chỗ của nhau.
 kỹ năng 2: hồi hp cho đồng minh = 200% wil + atk của bản thân cho họ, tăng tác dụng thêm 20% đối với Hư Không Chi Chủ. 20 aether.
 kỹ năng 3: quy tắc: khiến mọi đồng minh trên sân thực thi 1 turn đánh thường, giảm animation tấn công từ 2,2s xuống 1s khi có đồng minh thực thi tấn công từ kỹ năng này. quy tắc. 30 aether.
@@ -420,10 +1250,10 @@ ultimate: gây 1 đòn aoe cố định hình chữ T lên ô 1/2/3/5/8 của k�
 36) Lý Mộng Cầm
 Support, ssr, element tag: water.
 nội tại: mỗi lần xoá thành công 1 debuff từ đồng minh và bản thân sẽ tự hồi HP = 5% wil và atk của bản thân, không thể vượt max hp và không thể tạo khiên khi overheal.
-skill 1: Mỗi 3 lần đánh thường/ sài skill hoặc ultimate thành công thì lần ultimate tiếp theo sẽ hồi cho mọi đồng minh trên sân nếu có thể (không ảnh hưởng được thần tính) = 25% wil/atk của bản thân cho mọi đồng minh trên sân nếu có thể và bản thân. Luôn kích hoạt kể cả tử vong rồi được hồi sinh, bị động, -10 ae mỗi lần kích hoạt hồi hp.
-skill 2: đánh 2 quả cầu nước vào 2 mục tiêu từ xa, gây sát thương aoe ngẫu nhiên lên 2 mục tiêu này, mỗi kẻ nhận 1 đòn đánh thường, tính là đánh thường, 15 ae.
-skill 3: khi nhận sát thương vượt 20% max hp sẽ giảm 20% sát thương phải nhận vào, ví dụ sát thương đang đến phải nhận là 100% thì char này chỉ nhận 80 thôi, không ảnh hưởng được pháp tắc hay quy tắc. đây là skill bị động, không cần tốn turn để kích hoạt mà sẽ luôn kích hoạt từ lúc char này ra sân kể cả được hồi sinh, mỗi lần kích hoạt thành công - 20 ae.
-ultimate: xoá 2 debuff (không xoá mark)ngẫu nhiên trên người đồng minh và bản thân, không ảnh hưởng được debuff/mark cấp quy/pháp tắc. sau đó +10% wil và atk của bản thân trong 1 turn và trạng thái này không tính là buff.
+skill 1: Mỗi 3 lần đánh thường/ sài skill hoặc ultimate thành công thì lần ultimate tiếp theo sẽ hồi cho mọi đồng minh trên sân (không ảnh hưởng được thần tính) = 25% wil/atk của bản thân cho mọi đồng minh trên sân và bản thân. Luôn kích hoạt kể cả tử vong rồi được hồi sinh, bị động, -10 ae mỗi lần kích hoạt hồi hp. một nội tại tốn cost tự kích hoạt khi vào sân.
+skill 2: đánh 2 quả cầu nước vào 2 mục tiêu ngẫu nhiên từ xa, gây sát thương aoe lên 2 mục tiêu này, mỗi kẻ nhận 1 đòn đánh thường, tính là đánh thường, 15 ae.
+skill 3: khi sắp nhận sát thương vượt 20% max hp sẽ giảm 25% sát thương phải nhận vào (trừ sát thương chuẩn), ví dụ sát thương đang đến phải nhận là 100% thì char này chỉ nhận 75% thôi, không ảnh hưởng được pháp tắc hay quy tắc. đây là skill bị động, không cần tốn turn để kích hoạt mà sẽ luôn kích hoạt từ lúc char này ra sân kể cả được hồi sinh, mỗi lần kích hoạt thành công - 20 ae.
+ultimate: xoá 2 debuff (không xoá mark)ngẫu nhiên trên người đồng minh và bản thân, không ảnh hưởng được debuff/mark cấp quy/pháp tắc. sau đó +10% wil và atk của bản thân trong 2 natural Action và trạng thái này không tính là buff.
 
 36)
 ssr
@@ -1557,22 +2387,23 @@ ultimate: triệu hồi 3 trụ đá ngẫu nhiên (không thể trùng, nếu k
 
 76) Luân Hồi Chi Chủ
 Prime, Mage
-nội tại: khi 1 đồng minh hoặc kẻ thù vào luân hồi, tạo 1 kén, kén đó tồn tại trong 1 turn, có hp = 80% max hp của hắn, kén giảm 65% mọi sát thương nhận vào từ mọi nguồn trừ sát thương chuẩn, sau 1 turn kén sẽ nở, nở ra 1 nhân vật mới có ngoại hình bất kỳ nhân vật nào có trong collection trừ ngoại hình của những nhân vật tham gia/tồn tại ở deck trong trận đấu đó, nhân vật mới đó sẽ thuộc về phe đồng minh của luân hồi chi chủ (kén từ nội tại này cũng tồn tại trên sân thuộc phe của hắn) bất kể chân ngã của kén đó trước khi chết thuộc về phe nào, nhân vật mới sẽ có 3 giai đoạn, ngoại hình của nhân vật mới đó sẽ không thay đổi theo giai đoạn.
-Giai đoạn I, Ấu Niên: thừa hưởng 30% mọi chỉ số, nội tại, rank, đánh thường và ultimate và class thuộc chân ngã của bản thân từ đời trước trừ 3 skill.
+nội tại: khi 1 đồng minh hoặc kẻ thù vào luân hồi, tạo 1 kén, kén đó tồn tại trong 1 turn boundary của Luân Hồi Chi Chủ, có hp = 80% max hp của hắn, kén giảm 65% mọi sát thương nhận vào từ mọi nguồn trừ sát thương chuẩn, sau 1 turn kén sẽ nở, nở ra 1 nhân vật mới có ngoại hình bất kỳ nhân vật nào có trong collection trừ ngoại hình của những nhân vật tham gia/tồn tại ở deck trong trận đấu đó, nhân vật mới đó sẽ thuộc về phe đồng minh của luân hồi chi chủ (kén từ nội tại này cũng tồn tại trên sân thuộc phe của hắn) bất kể chân ngã của kén đó trước khi chết thuộc về phe nào, nhân vật mới sẽ có 3 giai đoạn, ngoại hình của nhân vật mới đó sẽ không thay đổi theo giai đoạn.
+Giai đoạn I, Ấu Niên: thừa hưởng 30% mọi chỉ số, nội tại, rank, đánh thường và ultimate và class thuộc chân ngã của bản thân từ đời trước trừ 3 skill của họ, ở giai đoạn này họ không thể dùng skill.
 Giai đoạn II, Thành Niên: trên cở sở đã có ở giai đoạn 1, tăng chỉ số thừa hưởng lên 20%, có thể dùng skill 1 của đời trước.
 Giai đoạn III, Tráng Niên: trên cơ sở đã có ở giai đoạn 2, tăng chỉ số thừa hưởng lên 20%, có thể dùng skill 2 và 3 của đời trước.
-Giai đoạn IV, Lão Niên: trên cơ sở giai đoạn 3, mỗi turn giảm 20% chỉ số thừa hưởng từ đời trước cho đến khi chết, hp max = 0 cũng sẽ chết.
-khi kén nở, lập tức bước vào giai đoạn 1, nhân vật nở từ kén sẽ thuộc giai đoạn 1 trong 1 turn của bản thân, sau 1 turn đó đến turn tiếp theo bước vào Thành Niên, sau 2 turn của bản thân lại vào Tráng Niên, sau 3 turn của bản thân vào Lão Niên.
+Giai đoạn IV, Lão Niên: trên cơ sở giai đoạn 3, mỗi turn giảm 20% chỉ số thừa hưởng từ đời trước cho đến khi chết, hp max = 0 cũng sẽ chết, khi hp max bằng không lập tức DEATH_CONFIRMED và vào luân hồi lần 2, khác ở chỗ chân ngã vào luân hồi lần 2 sẽ không thể bị thao túng bởi Luân Hồi Chi Chủ, sẽ không tạo kén và không đầu thai lần nữa vào trận đấu, tức chân ngã đó đã biến mất hoàn toàn trong trận đấu đó, theo lore thì Luân Hồi Chi Chủ có thể bắt và cho chân ngã đầu thai vô hạn như tao thêm cơ chế này để tránh hắn tạo char mới mãi, hơn nữa chân ngã theo cơ chế này sẽ càng ngày càng yếu nếu đầu thai hơn 1 lần.
+
+khi kén nở, lập tức bước vào giai đoạn 1, nhân vật nở từ kén sẽ thuộc giai đoạn 1 trong 1 Natural Action của bản thân, sau 1 đó vào turn boundary đến turn tiếp theo bước vào Thành Niên, sau 2 natural action của bản thân và 3 turn boundary lại vào Tráng Niên, sau 3 natural Action cùng 4 turn boundary của bản thân vào Lão Niên.
 nội tại này khiến 1 char có ngoại hình của char A nhưng lại có kit của char B, ví dụ: Silas Blackspur phe địch chết và vào luân hồi, hắn bị nội tại này ảnh hưởng, trong sân thuốc phe của nội tại này xuất hiện kén trong 1 turn, 1 turn sau kén nở ra 1 char mới với ngoại hình và hành vi của Ur Đạo Mộng Dao nhưng có rank/nội tại/đánh thường/ultimate và 30% chỉ số của đời trước là Silas, lúc dùng ultimate thì giọng silas nhưng đánh thường lại là giọng của Đạo Mộng Dao.
 còn về vấn đề vfx thì dùng của char kén đã sao chép đi, như silas cầm súng kén nở ra đạo mộng dao không có súng phải làm sao? hay là giữ animation đánh thường Đạo Mộng Dao?
 nội tại cấp quy tắc, riêng thần tính là axiom.
 Thần tính: không nhận mọi hiệu ứng/buff/debuff/mark có lợi/hại hoặc không lợi hay hại từ nguồn ngoài bản thân kể cả đồng minh.
 
-skill 1: tất cả chân ngã của kẻ thù đang đợi vào luân hồi sẽ lập tức vào luân hồi, cost: bản thân luân hồi chi chủ bị giảm 20% max hp trong 2 turn của bản thân hắn sau khi dùng skill này, sau khi 2 turn đó hết, trả lại và hồi hp = 20% max hp đã mất, sau khi kích hoạt cũng - 25 ae và 5 nộ, bất kể điều kiện cost nào chưa thoả mãn đều không thể dùng skill 1. quy tắc.
+skill 1: tất cả chân ngã của kẻ thù đang đợi vào luân hồi sẽ lập tức vào luân hồi, cost: bản thân luân hồi chi chủ bị giảm 20% max hp trong 2 turn boundary và 3 natural Action của bản thân hắn sau khi dùng skill này, sau khi cửa sổ hết, trả lại và hồi hp = 20% max hp đã mất, sau khi kích hoạt cũng - 25 ae và 5 nộ, bất kể điều kiện cost nào chưa thoả mãn đều không thể dùng skill 1. quy tắc.
 
-skill 2: lẩn trốn vào luân hồi, rời khỏi hiện thế, biến mất khỏi trận đấu (không tính DEATH_CONFIRMED, không vào cửa sổ chờ luân hồi) sau 1 turn của leader khi kích hoạt skill này, trở lại hiện thế, vào sân ở 1 ô ngẫu nhiên còn trống trong sân phe đồng minh, nếu đầy sân, mỗi 1 turn của leader hắn sẽ thử trở lại 1 lần cho đến khi thành công trở lại sân, khi trở lại sân, hồi hp = 20% max hp của bản thân sau đó tăng 5% max hp dựa trên max hp có lúc vào sân khi dùng skill này, phần tăng 5% max hp này sẽ mất khi rời sân (vì skill này hoặc vào cửa sổ chờ luân hồi hoặc đã vào luân hồi), đương nhiên tăng max hp dựa theo max hp có lúc rời sân khi dùng skill này nên có thể dùng skill này để tăng max hp mãi, cost: 15 ae.
+skill 2: lẩn trốn vào luân hồi, rời khỏi hiện thế, biến mất khỏi trận đấu (không tính DEATH_CONFIRMED, không vào cửa sổ chờ luân hồi) sau 1 turn của leader khi kích hoạt skill này, trở lại hiện thế, vào sân ở 1 ô ngẫu nhiên còn trống trong sân phe đồng minh, nếu đầy sân, mỗi 1 turn boundary của leader hắn sẽ thử trở lại 1 lần cho đến khi thành công trở lại sân, khi trở lại sân, hồi hp = 20% max hp của bản thân sau đó tăng 5% max hp dựa trên max hp có lúc vào sân khi dùng skill này, phần tăng 5% max hp này sẽ mất khi rời sân (vì skill này hoặc vào cửa sổ chờ luân hồi hoặc đã vào luân hồi), đương nhiên tăng max hp dựa theo max hp có lúc rời sân khi dùng skill này nên có thể dùng skill này để tăng max hp mãi, cost: 15 ae.
 
-skill 3: đứng tại chổ chưởng 1 chưởng bay ra 3 orb như đánh thường, gây sát thương ngẫu nhiên lên 3 mục tiêu, mỗi kẻ nhận 150% sát thương đánh thường của luân hồi chi chủ, đồng thời đánh dấu những kẻ đó, mark này không có hại lên kẻ thù, khi những kẻ bị đánh dấu chết mà bản thân luân hồi chi chủ có mặt trên sân, hắn được + 100% hp regen hiện có, 15 rage, cost: 20 ae.
+skill 3: đứng tại chổ chưởng 1 chưởng bay ra 3 orb như đánh thường, gây sát thương ngẫu nhiên lên 3 mục tiêu, mỗi kẻ nhận 150% sát thương đánh thường của luân hồi chi chủ, đồng thời đánh dấu những kẻ đó, mark này không có hại lên kẻ thù, không giới hạn time tồn tại trên kẻ thù, mất khi kẻ đó rời sân, khi những kẻ bị đánh dấu DEATH_CONFIRMED mà bản thân luân hồi chi chủ có mặt trên sân, hắn được + 100% hp regen hiện có cho đến khi DEATH_CONFIRMED và + 15 rage, cost: 20 ae. sát thương từ skill này không tính là đánh thường. mark cấp quy tắc, bất kỳ hiệu ứng/kit xoá mark nào dưới cấp quy tắc đều không thể xoá mark này.
 
 ultimate: đánh thường và cast skill 3 cùng lúc sau đó cast skill 1, cả 2 skill cast qua ultimate này sẽ không tốn ae và vẫn giữ nguyên hiệu ứng đã có của 2 skill này, khi phán định cũng là phán định tag của 2 skill này mà không phải của ultimate.
 
@@ -1581,6 +2412,7 @@ trong mắt player thì hắn chưởng 1 chưởng bay ra 4 orb, 1 orb tuân th
 đánh thường: chưởng 1 chưởng, bắn ra 1 orb màu đỏ và đen đan xen, gâu sát thương lên 1 kẻ địch = 100% wil/atk của bản thân.
 
 nếu ultimate thì cast đánh thường và skill 3 cùng lúc nhưng vfx chỉ là 1 chưởng nhưng bay ra 4 orb.
+phân tích chi tiết hơn nằm ở docs/luân hồi chi chủ.md, khi người dùng yêu cầu liên quan đến nhân vật này hãy đọc tệp .md vừa nêu để có câu trả lời tốt hơn.
 
 77)
 warrior, ssr.
@@ -2145,7 +2977,7 @@ Reflect.
 Nếu trong cùng Turn sử dụng:
 → Ultimate
 thì shield lấy tổng actual damage của cả hai, nếu hệ thống cho nhiều action chủ động trong cùng Turn.
-Nếu character mỗi natural turn chỉ được một action bình thường, thì chỉ có một nguồn.
+Nếu character mỗi Natural Action chỉ được một action bình thường, thì chỉ có một nguồn.
 Damage = 100
 → Shield = 20
 → shield bị phá hoàn toàn
@@ -2510,7 +3342,7 @@ Tức:
 → vẫn +20%
 → duration reset thành 2 Boundary.
 
-đánh thường: đứng tại chỗ chém ra kiếm khí gây sát thương lên ô 1/2/3, nếu 3 ô này không có ai đứng thì gây sát thương lên ô 4/5/6, nếu 3 ô này không có ai lại gây sát thương lên ô 7/8/9, mỗi kẻ trúng đánh thường này nhận sát thương = 100% wil + 100% atk của nhân vật này, trong đó 50% wil và 50% atk sẽ được gây dam dưới dạng sát thương chuẩn.
+đánh thường: đứng tại chỗ chém ra kiếm khí gây sát thương lên ô 1/2/3, nếu 3 ô này không có ai đứng thì gây sát thương lên ô 4/5/6, nếu 3 ô này không có ai lại gây sát thương lên ô 7/8/9, mỗi kẻ trúng đánh thường này nhận sát thương = 100% wil + 100% atk của nhân vật này, trong đó 50% wil và 50% atk sẽ được gây dam dưới dạng sát thương chuẩn. Nếu chém mà chỉ gây sát thương lên 1 mục tiêu, mục tiêu nhận thêm sát thương chuẩn = 1% max hp của chúng.
 
 Nếu 1/2/3 có 1 unit
 Ví dụ:
@@ -2617,3 +3449,830 @@ Như vậy:
 Sau Ultimate vẫn:
 -5 AE
 HP Loss = 1% Max HP.
+
+90) Tẫn Nhân
+summoner, UR.
+DMG 4/5 SUR 4/5 CTL 5/5 CMP 5/5 MIC 5/5 VIS 3/5
+nội tại: mỗi turn triệu hồi 1 creep có hp = 25% của bản thân, không atk/wil/res/arm/rage/ae gain/chân ngã/class nhưng rank bằng chủ thể, khi hp về 0, creep phát nổ gây sát thương = 20% max hp + 50% atk và wil của chủ thể lên kẻ giết creep.
+mỗi creep tồn tại tối đa 3 turn chủ động của chúng, tồn tại tối đa 6 creep trên sân, đầu mỗi turn chủ động, creep sinh ra được snapshot chỉ số của Tẫn Nhân, nếu chỉ số của hắn thay đổi thì chỉ số của creep vẫn tuân theo snapshot mà không thay đổi theo tẫn nhân.
+creep chỉ có thể đánh thường, mỗi đòn đánh của chúng gây sát thương chuẩn = 1% max hp của target.
+
+skill 1: 4 creep tiếp theo được tăng tỉ lệ thừa hưởng hp từ 25 lên 50% max hp của chủ thể, 30 ae. skill chủ động, cần tốn 1 turn để kích hoạt, không stack, khi kích hoạt, 4 creep tiếp theo được tăng tỉ lệ thừa hưởng hp đã ra sân hết thì skill này mới có thể kích hoạt lần nữa.
+Ví dụ:
+→ flag = next 4 summons enhanced
+
+Spawn #1 → enhanced
+Spawn #2 → enhanced
+Spawn #3 → enhanced
+Spawn #4 → enhanced
+
+→ flag hết
+Tử Chủng chết, bị replace hay tồn tại bao lâu không ảnh hưởng đến việc đã tiêu một “lần spawn”.
+
+skill 2: khi 1 mục tiêu làm nổ 3 creep trở lên trong 1 action chủ động, tỉ lệ phát nổ tăng từ 20 lên 35% max hp + 75% wil và atk của chủ thể/mỗi creep lên kẻ thù, tự kích hoạt khi thoả mãn điều kiện và cost, không cần tốn turn chủ động, cost: 15 ae mỗi lần kích hoạt, mỗi turn boundary của bản thân chỉ kích hoạt 1 lần, không cap lần kích hoạt trong trận.
+Ví dụ enemy AoE giết:
+Creep A
+Creep B
+Creep C
+Creep D
+tất cả chết trong cùng action.
+Skill 2 trigger một lần.
+Không phải 4 lần.
+Toàn bộ Tử Chủng đã bị DEATH_CONFIRMED bởi chính action đó nhận explosion profile nâng cao.
+Ví dụ action giết 4 creep:
+cả 4 đều dùng 35% + 75%.
+Không chỉ 3 con đầu tiên.
+Damage nên resolve kiểu simultaneous
+Không được:
+→ enemy mất HP
+→ Skill 2 trigger
+→ Creep B/B/C dùng damage cao hơn
+Phải:
+Snapshot:
+A/B/C/D đều chết bởi action
+
+→ Skill 2 được xác định
+
+→ Commit toàn bộ explosion profile nâng cao
+Nếu không, explosion order có thể làm damage thay đổi giữa các creep.
+
+skill 3: đứng tại chỗ chưởng 1 chưởng gây sát thương = 200% wil và atk lên 1 mục tiêu, cost: 25 ae và 5 rage.
+
+ultimate: đánh dấu 1 mục tiêu (tuân theo char bị char này target bằng ssi), trong 3 turn chủ động tiếp theo của bản thân, sát thương bản thân (creep nổ không tính) gây lên target và sát thương target gây lên creep đều tăng 25%, trong cửa sổ 3 turn đó res và arm cũng tăng 20%, snapshot lúc ultimate, khi cửa sổ 3 turn kết thúc, tăng max hp cho bản thân bằng 25% tổng sát thương bản thân (creep không tính) gây lên target bị đánh dấu trong cửa sổ 3 turn đó
+Nếu target dùng AoE giết 5 Tử Chủng:
+25% tăng được áp lên tất cả damage mà target gây cho Tử Chủng trong cửa sổ.
+Không tăng damage target gây lên chủ thể.
+Chỉ:
+target → Tử Chủng
+và:
+chủ thể → marked target.
+Như vậy Ultimate tạo ra một đấu trường hai chiều:
+chủ thể muốn đánh target.
+target muốn tránh giết Tử Chủng để không kích explosion.
+
+Explosion
+Damage source = Chủ thể, nhưng trigger cause = Tử Chủng bị DEATH_CONFIRMED.
+Lý do:
+các hiệu ứng “do chủ thể gây damage” có thể tương tác đúng;
+nhưng không biến Tử Chủng thành một attacker thực sự có stats.
+
+91) Đường Diễm
+mage, ssr
+DMG: 4/5 SUR: 4/5 CTL: 1/5
+CMP: 2/5 MIC: 3/5 VIS: 5/5
+
+nội tại: khi gây sát thương aoe lên đơn vị địch không có chân ngã sát thương gây ra 100% sẽ là sát thương chuẩn. Mỗi 3 turn chủ động nhận khiên = 25% max hp, không thể stack với khiên của bản thân nhưng có thể nhận khiên từ kit khác, khi nhận sát thương sẽ ưu tiên tiêu hao khiên của bản thân trước, khiên không giới hạn time tồn tại, khiên mới xuất hiện sẽ thay thế khiên cũ.
+
+nàng thực tế có hai loại shield state:
+Self Shield
+Sinh từ passive.
+Không stack với self shield khác.
+Shield mới từ chính passive thay shield cũ.
+Không có thời hạn.
+Được ưu tiên tiêu hao trước.
+External Shield
+Đến từ character/skill khác.
+Có thể tồn tại đồng thời với self shield.
+Không bị self shield mới thay thế.
+Sau khi self shield hết, external shield tiếp tục nếu còn.
+Nếu đây đúng ý mày thì tao rất thích. Nó tạo một mechanic “khiên của riêng mình” khá riêng biệt.
+Mỗi 3 Natural Actions mà bản thân thực sự hoàn thành action
+chứ không phải mỗi 3 Boundary.
+Ví dụ:
+Action 1 → chưa có
+Action 2 → chưa có
+Action 3 → nhận Self Shield
+Action 4
+Action 5
+Action 6 → nhận shield mới, thay shield cũ
+Nếu bị CC làm mất lượt thì không tính là successful active turn, nếu mày dùng đúng nghĩa “turn chủ động”.
+
+ultimate: cường hoá 3 đòn đánh thường kế tiếp, tỉ lệ sát thương từ 100% lên 140% wil và atk, sát thương từ 20% giá trị khiên của bản thân lên 35% giá trị khiên của bản thân.
+
+Basic:
+100% ATK/WIL + 20% Shield hiện tại
+Ultimate:
+3 Basic Attack kế tiếp, hệ số shield tăng 20% → 35%.
+Tao đề nghị:
+Mỗi Basic Attack đọc giá trị Self Shield tại thời điểm hit của chính nó.
+Không snapshot shield một lần khi cast Ultimate.
+Ví dụ:
+Hit 1 → +350
+enemy đánh giữa các action → shield còn 400
+Hit 2 → +140
+shield hồi/đổi...
+Hit 3 → đọc lại giá trị hiện tại.
+external shield được tính vào 20%/35%.
+
+đánh thường: đứng tại chỗ niệm chú bắn 3 hoả cầu gây aoe lên 3 mục tiêu ngẫu nhiên, mỗi kẻ nhận sát thương = 100% wil và atk + 20% giá trị khiên (miễn khiên là tính, không cần phân biệt nguồn khiên) bản thân đang có lên kẻ địch.
+
+nội tại Mỗi target được kiểm tra độc lập.
+Ví dụ Basic đánh:
+Enemy A có Chân Ngã.
+Creep B không có.
+Creep C không có.
+Thì:
+B → 100% thành True
+C → 100% thành True
+Không phải toàn bộ action biến thành True Damage chỉ vì có một summon.
+Đây là rất quan trọng.
+
+92) Tần Liệt
+Ranger, ssr
+DMG: 4/5 SUR: 3/5 CTL: 3/5
+CMP: 4/5 MIC: 4/5 VIS: 4/5
+nội tại: luôn target mục tiêu có % khiên/max hp (của kẻ thù) cao nhất, nếu bị taunt thì vẫn tuân theo taunt, khi hết bị taunt lại target mục tiêu có % khiên/ max hp cao nhất, nếu target thuộc class tanker thì tăng 20% res và arm của bản thân lúc tấn công, mỗi turn chủ động chỉ kích hoạt 1 lần, không cd, ví dụ:
+hắn đánh tanker > lập tức tăng res/arm > xong hành động đó > bonus res và arm từ nội tại này sẽ biến mất ngay lập tức khi vào turn boundary> hết turn boundary và đánh target class tanker > bonus có tác dụng lần nữa.
+
+đánh thường: gây sát thương = 100% wil và atk của bản thân + 2% max hp của mục tiêu dưới dạng sát thương chuẩn (không giảm max hp của kẻ địch), rage nhận được khi đánh kẻ địch không có taunt + 4 rage.
+
+ultimate: cường hoá sát thương của 3 đánh thường kế tiếp sau ult này, tỉ lệ sát thương từ 100% lên 140% wil và atk mỗi đánh thường, 2% lên 4% max hp của mục tiêu dưới dạng sát thương chuẩn, rage nhận được từ 4 lên 6, hiệu ứng cường hoá đánh thường từ ultimate không thể stack hiệu ứng nhưng có thể stack time cường hoá tồn tại, tức nếu ultimate mới đã dùng trong khi hiệu ứng cường hoá từ ultimate cũ vẫn còn thì hiệu ứng sẽ không phải kiểu 140% + 40% wil và atk, rage từ 4 lên 8 hay sát thương chuẩn % hp mục tiêu từ 2 lên 6% nhưng nếu cường hoá chưa dùng hết, ví dụ còn 1 lần cường hoá đánh thường từ ult đã ult lần nữa thì char này còn 4 lần cường hoá đánh thường. Trên thực tế 1 char muốn đủ rage để ult thường cần 4 đến 5 Natural Action, turn boundary cũng cần 3 đến 4, nên nếu không có buff rage ngoài thì stack cường hoá khó vượt quá 3. Mỗi 3 enhanced Basic Attacks thực sự được tiêu → max rage -1, +hp = 1% max hp lúc tiêu đủ 3 enhanced Basic Attacks từ ult. +1% Max HP hiện tại tại thời điểm mutation.
+
+A. Nội tại chọn target có tỷ lệ Current Shield / Max HP cao nhất.
+Ví dụ:
+A: Shield 500 / Max HP 1.000 = 50%
+B: Shield 900 / Max HP 3.000 = 30%
+C: Shield 100 / Max HP 1.000 = 10%
+→ chọn A.
+Target không có shield: chọn char tuân theo vị trí và ssi bình thường như các char khác, khi char kẻ thù có khiên thì bắt đầu tuân theo nội tại, không khiên thì lại tuân theo ssi.
+B. Target có Max HP mutation, Dùng:
+Max HP hiện tại tại thời điểm target resolution.
+C. Tie-break
+Nếu A và B cùng tỷ lệ:
+nên dùng Current Shield tuyệt đối cao hơn làm tie-break.
+Nếu vẫn bằng:
+slot SSI thấp hơn / deterministic IID.
+Không nên random vì đây là target algorithm cốt lõi.
+Taunt thắng target selection.
+Khi Taunt hết:
+ngay lập tức quay lại target có % Shield/Max HP cao nhất.
++20% ARM/RES khi target là Tanker:
+→ +20% ARM/RES
+→ thực hiện toàn bộ attack
+→ action hoàn tất
+→ vào Turn Boundary
+→ bonus mất
+Điểm quan trọng:
+Bonus phải có hiệu lực trong lúc phản ứng/counter/reaction phát sinh từ chính action đó, nếu một reaction xảy ra trước khi action kết thúc.
+Nếu địch counter ngay sau khi nhận hit nhưng vẫn nằm trong resolve của action:
+bonus vẫn tồn tại.
+Sau khi action kết thúc thì mới mất.
+Nếu không, mechanic sẽ hơi vô nghĩa với mục đích mà mày nói là chống phản công.
+Nếu bonus đã mất khi vào Turn Boundary, Tanker vẫn có Class Bonus riêng đánh ngược lại:
+Tanker > Ranger = +10%.
+Đó là một lớp matchup khác.
+Nếu target không Taunt nhưng là Tanker
+Có +4 Rage.
+Tức: Taunt state, không phải class, là điều kiện của Rage.
+Đánh thường: 2% Max HP target là damage component riêng, không bị ARM/RES.
+Ví dụ target Max HP = 10.000:
++200 True Damage.
+Nếu target có shield:
+phần 2% Max HP True Damage vẫn bị Shield chặn theo True Damage contract hiện tại, trừ khi mày gắn xuyên khiên riêng.
+Đừng nhầm: True = bỏ ARM/RES
+với: True = bỏ Shield.
+Ultimate
+Cường hóa 3 Basic Attack kế tiếp:
+100% → 140%
+2% target Max HP → 4%
+Rage gain 4 → 6. 
+effect không stack, duration/number of remaining charges có thể cộng dồn.
+Ví dụ:
+→ 3 charges
+dùng 2
+→ còn 1
+Ultimate #2
+→ còn 1 + thêm 3
+→ 4 charges
+Tất cả 4 đều chỉ ở 140% / 4% HP / +6 Rage.
+chỉ Basic Attack action thực sự của Tần Liệt tiêu 1 charge ult.
+Không tính:
+DoT.
+Follow-up của người khác.
+Counter.
+Damage từ reaction.
+Skill khác nếu sau này có.
+Nếu character có một skill bảo “đánh thường”, thì phải ghi rõ có phải Basic Attack action hay không.
+cường hóa không stack nhưng time/charge stack.
+Nếu sau này có skill khác cũng cường hóa Basic Attack:
+cần Debuff/Enhancement Identity riêng.
+Ví dụ:
+Ultimate Enhancement A
+External Buff B
+thì A/B có được cộng:
+140% + 20%?
+Hay chỉ một cái thắng?
+Target algorithm và actor selection của SSI.
+SSI chỉ quyết định:
+Tần Liệt được quyền hành động khi nào.
+Nó không quyết định:
+ai bị Basic Attack của Tần Liệt chọn.
+Vì vậy:
+đến lượt Tần Liệt;
+nếu có enemy có shield → target theo ratio algorithm;
+không có enemy có shield → target resolver mặc định của character/game.
+Còn “SSI bình thường” chỉ nên dùng nếu game đã có default target resolution phụ thuộc slot/AI.
+không khiên thì quay về target bình thường, tức phải có một Shield Presence Gate:
+Có ít nhất 1 enemy có Current Shield > 0
+→ dùng Shield/Max HP algorithm
+
+Không có enemy có shield
+→ dùng default target resolver
+Không nên tính ratio 0% cho toàn bộ rồi tie-break bằng Shield absolute = 0, slot... vì như vậy kết quả có thể vô tình vẫn chọn một target “bằng algorithm” thay vì default AI.
+ “slot thấp hơn” nghĩa gì?
+Vì phe địch có 9 slot:
+1 trước 9.
+Đừng dùng iid nếu slot vẫn khác.
+Nếu hai target cùng ratio, cùng shield:
+chọn slot thấp hơn.
+Nếu cùng slot thì trong điều kiện một slot chỉ có một unit, không cần bước tiếp.
+iid chỉ cần làm fallback khi một hệ thống ngoài đời cho phép cùng slot/linked proxy.
+
++20% ARM/RES khi đánh Tanker:
+↓
+apply +20% ARM/RES temporary protection
+↓
+resolve entire attack action
+↓
+resolve any reaction/counter caused by that action
+↓
+action ends
+↓
+enter Turn Boundary
+↓
+remove +20%
+Nếu phản ứng xảy ra sau action commit nhưng trước khi actor boundary được mở thì vẫn tính không?
+Có, miễn reaction vẫn thuộc resolution chain của chính action đó.
+Chỉ khi action đã COMMITTED + CLOSED và chuyển sang state tiếp theo thì bonus mới biến mất.
+Rage gain 4 chỉ phụ thuộc Taunt state, không phụ thuộc class.
+Vậy:
+Tanker nhưng không Taunt
+→ +4 Rage.
+Mage nhưng có Taunt
+→ không +4.
+Đó là đúng nghĩa target state, không phải class identity.
+Taunt vừa hết ngay trước target resolution?
+→ target action resolution dùng state mới.
+Ví dụ Taunt expired trước khi target resolver chạy:
+không còn Taunt → +4 Rage.
+Không dùng state cũ.
+Ultimate enhanced attack có thay target algorithm không?
+Không.
+Ultimate chỉ:
+tạo enhancement.
+Ba Basic Attack sau đó vẫn là Basic Attack bình thường của Tần Liệt, nên target resolver vẫn chạy:
+Taunt.
+Nếu có shield target hợp lệ → Shield/Max HP ratio.
+Nếu không → default resolver.
+Không nên snapshot:
+“Ultimate target = X”
+và bắt ba Basic sau đó đánh X.
+Tần Liệt là hunter, mục tiêu phải có thể thay đổi theo battlefield.
+
+92) MẶC LUÂN — UR
+
+> Tên nhân vật không nhất thiết phải liên quan trực tiếp đến kit.  
+> Mặc Luân là một ví dụ cho character mà identity gameplay chủ yếu đến từ Ultimate — Giác Đấu Trường.
+
+**Rank:** UR  
+**Class:** chưa bắt buộc phải chốt từ riêng cơ chế Giác Đấu Trường; có thể chọn class phù hợp với tổng kit sau.  
+**Element Tag:** chưa cần gắn cố định; Effective Element có thể được quyết định bởi hệ thống build/gear/Công Pháp về sau.
+
+---
+
+# Lục Cực Đồ
+
+**DMG: 4/5**  
+**SUR: 5/5**  
+**CTL: 5/5**  
+**CMP: 5/5**  
+**MIC: 5/5**  
+**VIS: 2/5**
+
+### DMG — 4/5
+
+Skill 1 gây 200% WIL + 200% ATK + 5% Max HP của bản thân lên một mục tiêu.
+
+Basic Attack là 100% WIL + 100% ATK.
+
+Mặc Luân không phải damage carry thuần; điểm mạnh chính nằm ở việc hắn buộc hai nhân vật khác bước vào một combat instance riêng.
+
+### SUR — 5/5
+
+Skill 2 cho phép Death Prevention/Revive trực tiếp khi DEATH_CONFIRMED:
+
+- Max HP sau revive = 50% Max HP trước khi chết.
+- Max Rage sau revive = 80.
+- Có thể kích hoạt 1 lần/trận.
+
+Bản thân còn có khả năng tăng Max HP theo lượng HP còn lại của nhân vật trở về từ Giác Đấu Trường.
+
+### CTL — 5/5
+
+Giác Đấu Trường là một trong những dạng battlefield control mạnh nhất của Arclune:
+
+- Chọn một đồng minh.
+- Chọn một kẻ thù.
+- Cô lập cả hai khỏi chiến trường chính.
+- Buộc họ giải quyết một trận 1v1.
+- Kết quả có thể loại bỏ vĩnh viễn một actor khỏi chiến trường thông qua DEATH_CONFIRMED.
+
+Đây không còn là target control thông thường mà là **control cấu trúc chiến trường**.
+
+### CMP — 5/5
+
+Kit có:
+
+- Giác Đấu Trường.
+- local combat instance.
+- local Leader.
+- SSI riêng.
+- resource riêng.
+- return state.
+- summon replacement khi return.
+- death lifecycle.
+- Luân Hồi interaction.
+- revive.
+- Max HP mutation.
+- Max Rage mutation.
+- Quy Tắc cấm bản thân bị target bởi chính Giác Đấu Trường.
+
+### MIC — 5/5
+
+Mặc Luân chạm trực tiếp vào:
+
+- SSI.
+- Combat Instance.
+- Identity / Chân Ngã.
+- Death lifecycle.
+- Revive.
+- Luân Hồi.
+- AE / Rage.
+- Class Bonus.
+- Rank.
+- Element.
+- Star / Awaken / Công Pháp.
+- Summon.
+- Slot / Position.
+- Target Resolution.
+
+Đây là character có mức tương tác kernel cực cao.
+
+### VIS — 2/5
+
+Với người chơi, mechanic nhìn ngoài rất đơn giản:
+
+> Ultimate → hai nhân vật biến mất → một người trở lại.
+
+Nhưng kết quả bên trong có thể phụ thuộc vào gần như toàn bộ hệ thống chiến đấu. Vì Arena chủ động không hiển thị quá trình simulation, khả năng giải thích nguyên nhân thắng/thua cho player cũng khó hơn các character thông thường.
+
+---
+
+# Nội tại — Hấp Thu Kẻ Trở Về
+
+Mỗi khi Ultimate — Giác Đấu Trường của Mặc Luân hoàn tất thành công và có một nhân vật sống sót trở về chiến trường chính:
+
+- Max Rage của Mặc Luân +3.
+- Max HP của Mặc Luân tăng đúng bằng **Current HP của nhân vật sống sót vừa trở về**.
+
+Đây là Max HP mutation, không phải heal.
+
+Ví dụ:
+```text
+Mặc Luân Max HP = 10.000
+Đồng minh bước vào Giác Đấu Trường.
+Sau simulation:
+đồng minh thắng và trở về với 3.200 / 8.000 HP.
+→ Mặc Luân Max HP +3.200
+→ Max HP mới = 13.200
+→ Max Rage +3
+Cần chốt
+Lượng HP dùng cho mutation là Current HP tại thời điểm Arena kết thúc.
+Nếu survivor đang có shield thì shield không được cộng vào HP.
+Chỉ survivor của chính Arena vừa kết thúc mới được tính.
+Vì Arena hiện được định nghĩa kết thúc khi một bên DEATH_CONFIRMED, về nguyên tắc chỉ có một survivor trở về.
+---
+Quy Tắc — Không thể bị Giác Đấu Trường target
+Mặc Luân không thể trở thành một trong hai actor được chọn làm đối tượng của Ultimate — Giác Đấu Trường.
+Đây là phần duy nhất của cơ chế này mang authority cấp Quy Tắc.
+Mục đích:
+Tránh self-target.
+Tránh biến Ultimate của Mặc Luân thành một cuộc đấu mà bản thân hắn không thể tham gia đúng thiết kế.
+Giữ cho pool target của Giác Đấu Trường không bao gồm Mặc Luân.
+Nếu một Chân Ngã khác về sau đầu thai thành một definition/character khác thì identity mới có thể được target bình thường; việc Mặc Luân bị cấm không phải một thuộc tính của toàn bộ Chân Ngã vĩnh viễn.
+---
+Skill 1
+Gây:
+> 200% WIL + 200% ATK + 5% Max HP của bản thân lên một mục tiêu.
+Cost:
+> 30 AE
+
+Đây là damage skill trực tiếp, không có cơ chế đặc biệt khác.
+---
+Skill 2 — Revive
+Khi Mặc Luân đạt:
+> DEATH_CONFIRMED
+
+Skill 2 lập tức kích hoạt:
+Revive ngay lập tức.
+Max HP sau revive = 50% Max HP trước khi chết.
+Max Rage = 80.
+Kích hoạt tối đa 1 lần/trận.
+Cost ghi trong kit = 35 AE.
+Khi skill kích hoạt:
+
+Cửa sổ chờ Luân Hồi được điều chỉnh theo luật đã định nghĩa cho Luân Hồi.
+
+Sau khi revive thành công, Mặc Luân rời cửa sổ chờ Luân Hồi.
+
+Lần DEATH_CONFIRMED đầu tiên của Mặc Luân không dùng death animation bình thường; thay bằng animation của Skill 2.
+Điểm cần chốt
+Cần xác định rõ Skill 2 có được phép thanh toán 35 AE tại thời điểm DEATH_CONFIRMED hay không nếu AE của phe hiện tại không đủ.
+Nếu đây là Death Prevention/Revive bắt buộc thì không nên để shared AE pool có thể khiến revive thất bại ngoài ý muốn.
+---
+Đánh thường
+Gây:
+> 100% WIL + 100% ATK
+lên một mục tiêu.
+---
+Ultimate — GIÁC ĐẤU TRƯỜNG
+Mục đích
+Giác Đấu Trường là một Combat Instance cô lập.
+Nó không phải battlefield thứ hai mà player trực tiếp điều khiển.
+Nó là một bài test combat nội bộ:
+> Chọn 1 đồng minh + 1 kẻ thù → đưa hai actor vào sandbox → chạy combat kernel thật → một bên DEATH_CONFIRMED → survivor trở về.
+---
+Targeting của Giác Đấu Trường
+Chỉ có thể target unit:
+Có Chân Ngã.
+Có HP bar.
+Không target:
+creep không có Chân Ngã;
+summon không có Chân Ngã;
+NPC/entity không có HP bar;
+các entity không phải combat actor hợp lệ.
+Việc chọn cặp ưu tiên:
+> Đồng minh có Class Bonus có lợi và/hoặc có ưu thế rank theo tiêu chí của Giác Đấu Trường.
+Phần “rank thắng” cần được formalize riêng thành target-scoring rule để tránh cách hiểu mơ hồ.
+---
+Isolation
+Khi Giác Đấu Trường bắt đầu:
+Một đồng minh được chọn và một kẻ thù được chọn bị cô lập khỏi chiến trường chính.
+Hai actor không được coi là REMOVED khỏi trận.
+Chúng đang ở trạng thái tương đương ISOLATED_IN_DUEL.
+Chúng không được target bởi actor ngoài Arena.
+Các actor ngoài Arena không tác động vào hai actor này.
+Các effect ngoài Arena không đọc state trung gian của hai actor.
+
+Quan trọng:
+> Không tạo một death system riêng cho Arena.
+Arena dùng chính death lifecycle hiện tại:
+ALIVE
+→ HP_ZERO
+→ DEATH_PREVENTION
+→ DEATH_PREVENTED / DEATH_CONFIRMED
+
+Chỉ DEATH_CONFIRMED mới làm một bên thua.
+---
+Arena là combat instance độc lập
+Trong Arena:
+SSI được chạy riêng.
+Hai actor được coi là Leader cục bộ của Arena.
+Kit giữ nguyên.
+Rank giữ nguyên.
+Class giữ nguyên.
+Effective Element giữ nguyên.
+Level giữ nguyên.
+Sao giữ nguyên.
+Awaken giữ nguyên.
+Công Pháp giữ nguyên.
+Buff/Debuff giữ nguyên theo state mang vào Arena.
+Rage giữ nguyên và được xử lý bình thường.
+Cooldown giữ nguyên và được xử lý bình thường.
+Death/Revive/Luân Hồi vẫn hoạt động.
+Các Axiom/Quy Tắc hợp lệ vẫn có hiệu lực.
+Arena không phải một “phiên bản đơn giản” của combat.
+Nó chạy chính combat kernel, chỉ khác ở chỗ battlefield được cô lập thành một instance 1v1.
+---
+Thời gian của Arena
+
+Không cần giới hạn thời gian tồn tại theo Turn Boundary hoặc Turn chủ động.
+Arena kết thúc khi:
+> Một trong hai bên đạt DEATH_CONFIRMED.
+Không có kết quả hòa theo timeout.
+Không có:
+> “hết giờ → cả hai trở về”.
+Một bên phải chết thật.
+---
+Main Battle và Arena Time
+Arena không cần pause game về mặt trải nghiệm người chơi.
+Không render từng action của Arena.
+Về logic:
+> Main Battle không được commit action mới làm ảnh hưởng tới thế giới trong lúc action tạo Arena chưa hoàn tất.
+
+Nhưng về mặt thời gian hiển thị:
+> Arena simulation chạy cực nhanh, giống một bài test nội bộ.
+Player chỉ thấy:
+Mặc Luân dùng Ultimate
+→ hai nhân vật biến mất
+→ Arena simulation resolve
+→ một nhân vật chết
+→ survivor trở lại
+→ Main Battle tiếp tục
+
+Không cần:
+battlefield Arena hiển thị;
+animation;
+VFX;
+camera;
+replay;
+animation 1v1 từng turn.
+
+Arena có thể xử lý 8 action, 9 Turn Boundary hoặc nhiều hơn về mặt logic, nhưng player chỉ thấy kết quả gần như tức thời.
+---
+State của Survivor khi trở về
+
+Survivor trở về với:
+> toàn bộ combat state tại đúng thời điểm Arena kết thúc.
+Ví dụ:
+Current HP.
+Max HP.
+Rage.
+Shield.
+Buff/Debuff.
+Cooldown.
+Mark.
+Stat mutation.
+Temporary state.
+Life state.
+
+Không reset lại state chỉ vì trở về chiến trường chính.
+Nếu một actor chết:
+> actor không trở về.
+DEATH_CONFIRMED đó là cái chết thật.
+---
+Luân Hồi trong Arena
+Chết trong Arena không phải “chết giả”.
+Nếu actor DEATH_CONFIRMED:
+Death event được ghi nhận.
+Actor có thể bước vào cửa sổ chờ Luân Hồi theo luật Luân Hồi.
+
+Nếu vẫn còn trong cửa sổ chờ và có một cơ chế revive hợp lệ → có thể revive.
+Nếu đã bước vào Luân Hồi → không được revive theo cách thông thường.
+Nếu Luân Hồi Chi Chủ có cơ chế tương tác với Chân Ngã đó → cơ chế của Luân Hồi Chi Chủ vẫn có thể quan sát và xử lý Chân Ngã đó.
+Arena không có quyền ghi đè World Axiom Luân Hồi.
+---
+Vị trí trở về
+Sau khi Arena kết thúc, survivor trở về chiến trường của phe mình.
+
+Ưu tiên:
+1. Tìm một slot đồng minh trống.
+
+2. Nếu có → trở về một slot trống được chọn theo random/deterministic RNG.
+
+3. Nếu không còn slot:
+tìm summon đồng minh thỏa điều kiện thay thế;
+rank của summon ≤ rank của survivor;
+trong các summon đủ điều kiện, ưu tiên summon có Current HP / Max HP thấp nhất.
+
+4. Survivor thay thế summon đó.
+Việc thay thế summon:
+> Không phải DEATH_CONFIRMED.
+
+Không kích hoạt:
+on-death;
+on-kill;
+Luân Hồi;
+explosion;
+mark;
+stat scaling;
+damage;
+các effect của chủ nhân summon có điều kiện “summon chết”.
+Lý do:
+
+> Survivor và chủ nhân summon là đồng minh; việc survivor trở lại không phải một cái chết của summon.
+---
+Resource trong Arena
+Rage
+Rage là resource cá nhân.
+Khi actor vào Arena:
+Rage hiện tại được mang theo.
+Rage gain tiếp tục hoạt động theo kit bình thường.
+Rage cost tiếp tục hoạt động bình thường.
+Rage cuối Arena trở thành Rage của survivor khi trở về Main Battle.
+Ví dụ:
+
+Vào Arena: Rage = 50
+Trong Arena:
+→ +4
+→ -20
+→ +5
+→ ...
+Kết thúc: Rage = 61
+→ trở về Main Battle với Rage = 61
+AE
+Không nên cho Arena sử dụng trực tiếp Shared AE Pool của phe theo cách bình thường.
+Lý do:
+Arena có thể có nhiều action.
+Kit của hai actor có thời lượng không đoán trước.
+AE gain khác nhau theo class.
+Nếu rút trực tiếp global pool, một Arena có thể làm cạn tài nguyên của cả team.
+Nếu ghi nợ AE rồi trả dần, main battle sẽ bị “thuế AE” kéo dài sau Arena.
+Giải pháp đề xuất:
+Arena AE Reserve
+Khi hai actor vào Arena:
+> Mỗi phe tách một phần AE hiện tại thành Arena AE Reserve riêng cho actor của phe đó.
+Ví dụ:
+
+Phe A Global AE = 80
+→ Arena Reserve A = 30
+→ Main Global AE A còn 50
+Phe B Global AE = 65
+→ Arena Reserve B = 30
+→ Main Global AE B còn 35
+
+Trong Arena:
+Skill cost trừ từ Arena Reserve.
+Không truy cập Global AE Pool.
+AE Gain từ action có thể cộng vào Arena Reserve.
+Reserve có hard cap.
+AE vượt cap bị triệt tiêu.
+Khi Arena kết thúc, AE còn dư trong Reserve trả về Global AE Pool của phe tương ứng.
+
+Không tồn tại AE debt.
+Ví dụ:
+→ chi 20
+→ gain 5
+→ gain 7
+→ Reserve cuối = 22
+
+→ Arena kết thúc
+→ 22 AE trả về Global Pool
+
+Như vậy Arena chỉ tiêu một lượng AE có giới hạn, không thể rút cạn team chính và cũng không tạo nợ.
+---
+Thiên Cơ
+Thiên Cơ đã tồn tại như một hệ thống behavior setup trong game, nhưng chưa nối trực tiếp vào combat kernel.
+Giác Đấu Trường là một nơi rất phù hợp để Thiên Cơ điều khiển actor.
+Arena không cần AI “thông minh” hay random skill selection.
+Người chơi có thể thiết lập trước:
+Nếu HP ≤ 30% → Skill 2
+Priority 2:
+Nếu Ultimate đủ điều kiện → Ultimate
+Priority 3:
+Nếu target HP ≤ 20% → Skill 1
+Priority 4:
+Basic Attack
+Arena sau đó:
+
+> chạy character theo Thiên Cơ đã thiết lập.
+Điều này làm Giác Đấu Trường trở thành một bài test thật sự:
+> Player không trực tiếp điều khiển hai actor.
+> Player đã thiết lập cách hai actor tự vận hành.
+> Arena chỉ cho hai hệ thống đó gặp nhau và để combat kernel quyết định survivor.
+Thiên Cơ vì vậy có thể trở thành một phần chiến thuật thực sự của Giác Đấu Trường.
+---
+Arena không nên cho player “điều khiển trực tiếp”
+Không:
+> chọn skill từng turn.
+Không:
+> random skill.
+Không:
+> một AI đặc biệt riêng cho Arena.
+Mục tiêu là:
+> Character phải tự vận hành đúng theo kit và Thiên Cơ đã được thiết lập.
+
+Như vậy kết quả Arena phản ánh:
+kit;
+resource economy;
+matchup;
+build;
+Thiên Cơ;
+rank;
+class;
+element;
+sao;
+awaken;
+Công Pháp;
+RNG hợp lệ.
+
+---
+
+Arena và SSI Main
+
+Nếu actor C đang thực hiện Ultimate để tạo Arena:
+
+Main SSI:
+A → B → C
+      C Ultimate
+        └→ Arena simulation
+        └→ Survivor returns / opponent dies
+      Ultimate của C tiếp tục hoàn tất
+→ Main SSI chuyển sang actor tiếp theo
+Quan trọng:
+
+> Survivor trở về không nhận thêm một Natural Action chỉ vì vừa trở về.
+Arena là một phần của resolution của Ultimate tạo nó.
+
+Main SSI sau đó tiếp tục theo con trỏ bình thường.
+---
+Những invariant bắt buộc
+
+1. Không tạo Arena lồng Arena
+Trong Arena:
+> Không được tạo thêm một Giác Đấu Trường mới nếu hệ thống chưa có cơ chế hỗ trợ nested combat instance.
+Khuyến nghị ban đầu:
+> ArenaDepth >= 1 → Giác Đấu Trường không hợp lệ.
+
+2. Không commit state Arena nhiều lần
+Arena phải có một transaction/result:
+→ kết quả
+→ commit một lần
+→ destroy instance
+Không được vừa commit survivor vừa tiếp tục commit một lần khác.
+
+3. Main Battle không đọc state trung gian
+Main chỉ nhìn thấy:
+> state trước Arena
+hoặc:
+> state sau Arena.
+Không được nhìn thấy:
+> “survivor đang còn 1 HP trong Arena”.
+
+4. DEATH_CONFIRMED là điều kiện kết thúc
+HP = 0 chưa đủ nếu còn Death Prevention/Revive hợp lệ.
+
+5. Không coi Arena actor là REMOVED
+Actor đang ISOLATED_IN_DUEL, không phải REMOVED.
+
+Do đó:
+không trigger “khi rời sân”;
+không reset skill chỉ vì vào Arena;
+không reset các effect chỉ dựa trên leaving battlefield.
+---
+Bản chất của Giác Đấu Trường
+Đối với player, Giác Đấu Trường gần giống:
+> “Tư Mệnh chọn hai người và tung một đồng xu.”
+Nhưng thực chất không phải 50/50.
+
+Kết quả được quyết định bởi một combat simulation thật:
+Rank.
+Class.
+Effective Element.
+Level.
+Stars.
+Awaken.
+Công Pháp.
+Current HP.
+Max HP.
+Rage.
+AE Reserve.
+Shield.
+Buff/Debuff.
+Cooldown.
+Kit.
+Thiên Cơ.
+RNG.
+SSI.
+Death Prevention.
+Revive.
+Axiom/Quy Tắc hợp lệ.
+Nói cách khác:
+> Bên ngoài là tung đồng xu; bên trong là một bài kiểm tra matchup hoàn chỉnh.
+Đó là identity của Giác Đấu Trường.
+---
+Đặc điểm của cơ chế này
+Giác Đấu Trường nên cực kỳ hiếm.
+Không nên trở thành một primitive phổ biến của cả roster.
+Nó phù hợp với:
+> Signature Mechanic / System-Altering Mechanic
+của riêng Mặc Luân hoặc một số rất ít character đặc biệt.
+Nó không nên trở thành:
+> “mọi Assassin đều có một bản Giác Đấu Trường”.
+Giá trị của nó chính là:
+
+> một character có quyền tạo ra một bài test combat riêng bên trong trận đấu.
+
+Mặc Luân — đánh giá cuối
+
+UR
+
+DMG 4/5
+SUR 5/5
+CTL 5/5
+CMP 5/5
+MIC 5/5
+VIS 2/5
+
+ENGINE RISK: 5/5
+
+MECHANIC CLASS:
+
+System-Altering
+
+Mặc Luân không mạnh vì có damage cao nhất hay stat khủng nhất.
+
+Điểm mạnh của hắn là:
+
+> Hắn có quyền biến một phần trận đấu thành một bài test 1v1 độc lập, rồi đưa kết quả trở lại chiến trường chính.
+Đây cũng là lý do Giác Đấu Trường phải được xem như một capability của combat kernel, không chỉ là một skill thông thường của character.
