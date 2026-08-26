@@ -1163,18 +1163,20 @@ Ultimate — Sát Chiêu: Lực Bạt Sơn Hà (Auto-cast):
 Dồn toàn bộ sức mạnh cơ bắp cầm cột đá đập  1 mục tiêu.
 Gây sát thương = 300% (ATK + WIL) lên 1 kẻ địch. Tự gây cho bản thân trạng thái [Kiệt Sức] (Giảm 35% ATK và SPD) trong 1 turn sau khi dùng chiêu. Tag: Kẻ địch, Đơn mục tiêu, Sát thương cực đại, Tự Debuff.
 
-28)[SSR] Kim Cang – Bất Hoại (Indestructible) Tanker.
-Nguồn gốc: Phật Môn/Tiên Hiệp cổ điển. Luyện da thịt thành vàng ròng.
-Nội tại — Pháp Tắc: Phản Chấn:
-Giảm 30% mọi sát thương nhận vào.
-Mỗi khi nhận sát thương, phản lại kẻ tấn công 100% lượng sát thương thực nhận (Sau khi đã giảm trừ qua Giáp).
-Tag: Nội tại, Pháp Tắc, Phản đòn.
-Đánh thường: Đấm. Gây sát thương = 100% (ATK + WIL). Tag: Kẻ địch, Đơn mục tiêu.
+28)[SSR] Kim Cang – Bất Hoại
+Nội tại — Phản Chấn:
+Giảm 30% mọi sát thương đơn nhận vào trừ sát thương chuẩn (miễn bị target bởi hit gây damage lên 1 target là giảm, dot không giảm, chỉ sát thương từ natural Action, nội tại nổ khi đủ mark, khi giết summon của đối phương cũng không giảm, chỉ natural Action, sát thương từ nội tại không giảm, nhưng nếu nội tại hay ult cường hoá đánh thường thì có, skill đơn mục tiêu cũng giảm).
+
+Mỗi khi nhận sát thương vào khiên (miễn khiên là tính), phản lại kẻ tấn công 100% lượng sát thương thực nhận (Sau khi đã giảm trừ qua res/arm).
+
+Đánh thường: Đấm. Gây sát thương = 100% (ATK + WIL).
+
 Kỹ năng 1 — Kim Chung Tráo (20 Aether):
 Tạo khiên cho bản thân = 35% HP Tối Đa.
-Trong thời gian tồn tại khiên, sát thương phản đòn từ nội tại tăng lên gấp đôi (200%). Tag: Bản thân, Buff.
+Trong thời gian tồn tại khiên, sát thương phản đòn từ nội tại tăng lên gấp đôi (200%).
+
 Ultimate — Sát Chiêu: Phật Nộ Kim Liên (Auto-cast):
-Gồng mình phát nổ lớp giáp khí. Gây sát thương = 100% max hp/giáp đang có từ mọi nguồn/RES (Kháng Phép) của bản thân lên toàn bộ kẻ địch. (cả 3 đều 100%).
+Gồng mình phát nổ lớp giáp khí (là khiên, miễn khiên hắn có liền tính). Gây sát thương = 100% max hp/giáp đang có từ mọi nguồn/RES (Kháng Phép) của bản thân lên toàn bộ kẻ địch. (cả 3 đều 100%).
 (Đây là con Tank gây dmg dựa trên độ trâu bò của nó, càng trâu nổ càng đau). Tag: Kẻ địch, Aoe, Scaling theo chỉ số thủ.
 
 29)[SSR] Phần Tinh (Star Burner) mage
@@ -1215,15 +1217,16 @@ Ultimate — Sát Chiêu: Cương Khí Hộ Thể (Auto-cast): Không gây sát 
 Tạo một lớp khiên cho Toàn Đội. Giá trị khiên = 250% WIL + atk của Chiến Cổ, cho phép cộng dồn khiên, cap 300% max hp của mục tiêu (tính mỗi khiên từ ult của nhân vật này, khiên từ nguồn không phải ult của nhân vật này sẽ được tính riêng theo kit nguồn của khiên đó), Tag: Đồng minh, Buff Khiên.
 
 33) Hoá Thân của Thời Không Chi Chủ - Không Gian Chi Chủ, Prime. mage, không element tag.
-mô tả: Thời Không nhất thể, vì sức mạnh quá lớn nên Hắn phải tách ra làm 2 để giáng lâm Arclune - Ảnh Giới, dù chỉ là 1 sợi ý niệm của hắn bị chia làm 2 nhưng vẫn có bản chất áp đảo.
+mô tả: Thời Không nhất thể, vì sức mạnh quá lớn nên Hắn phải tách ra làm 2 để giáng lâm Arclune - Kính Giới, dù chỉ là 1 sợi ý niệm của hắn bị chia làm 2 nhưng vẫn có bản chất áp đảo.
 
-nội tại: Thần Tính: không nhận buff hay debuff/mark, mọi trạng thái có lợi lẫn hại ngoài bản thân (trừ Thời Gian Chi Chủ), không thể hồi sinh khi hp về 0 trừ hồi sinh = kit của char này hoặc Thời Gian Chi Chủ.
-sau mỗi 2 turn tự dung nhập vào không gian, hồi hp = 20% max hp. ( nói chung sau 2 turn tự hồi 20% max hp, dung nhập vào không gian chỉ là vfx). quy tắc.
+nội tại: Thần Tính: không nhận buff hay debuff/mark, mọi trạng thái có lợi lẫn hại ngoài bản thân (trừ Thời Gian Chi Chủ), không thể hồi sinh khi DEATH_CONFIRMED trừ hồi sinh = kit của char này hoặc Thời Gian Chi Chủ.
+sau mỗi 2 turn tự dung nhập vào không gian, hồi hp = 20% max hp. ( nói chung sau 2 turn tự hồi 20% max hp, dung nhập vào không gian chỉ là vfx).
 
-Kỹ năng 1: Xáo trộn vị trí của 3 kẻ thù ngẫu nhiên trên sân 1 cách ngẫu nhiên không cố định (không target leader địch), trộn vĩnh viễn cho đến khi đối phương chết, về deck hoặc bị xáo trộn lần nữa bởi kỹ năng này hoặc 1 kỹ năng không gian khác. 25 aether. Quy Tắc.
-kỹ năng 2: tạo ra 'Hư Không Màn Che' ngay 3 ô giao giới giữa 2 bên sân, (ô 1/2/3 của mỗi phe có 3 ô trống, chỉ là vfx) bất kỳ đòn aoe nào gây sát thương lên đồng minh từ kẻ thù đều giảm 60% sát thương cuối, đổi lại aoe từ đồng minh tấn công lên kẻ thù + 60% sát thương cuối cùng gây ra. tác dụng trong 4 turn, 40 aether. CD 2 turn. quy tắc.
-kỹ năng 3: gây sát thương aoe lên 4 kẻ địch ngẫu nhiên = 1 đòn đánh thường/ mỗi kẻ địch, bỏ qua 80% res của chúng, tính là đánh thường, 20 aether.
-ultimate: cast 2 lần skill 3 nhưng không trừ ae.
+Kỹ năng 1: Xáo trộn vị trí của 3 kẻ thù ngẫu nhiên trên sân 1 cách ngẫu nhiên không cố định (không target leader địch), trộn vĩnh viễn cho đến khi đối phương chết, về deck hoặc bị xáo trộn lần nữa bởi kỹ năng này hoặc 1 kỹ năng không gian khác. 25 aether.
+
+kỹ năng 2: tạo ra 'Hư Không Màn Che' ngay 3 ô giao giới giữa 2 bên sân, (ô 1/2/3 của mỗi phe có 3 ô trống, chỉ là vfx) bất kỳ đòn aoe nào gây sát thương lên đồng minh từ kẻ thù đều giảm 35% sát thương cuối, đổi lại aoe từ đồng minh tấn công lên kẻ thù + 20% sát thương cuối cùng gây ra. tác dụng trong 4 turn boundary của hắn, 35 aether. CD 2 turn. quy tắc.
+kỹ năng 3: gây sát thương aoe lên 4 kẻ địch ngẫu nhiên = 1 đòn đánh thường/ mỗi kẻ địch, bỏ qua 80% res của chúng, không tính là đánh thường, 20 aether.
+ultimate: cast 2 lần skill 3 nhưng không trừ ae. (đơn giản hơn là cast 1 lần nhưng damage gấp đôi, phần giảm res vẫn giữ nguyên)
 
 34) Hoá Thân của Thời Không Chi Chủ - Thời Gian Chi Chủ, Prime.
 mô tả: 1 nửa ý niệm của Thời Không Chi Chủ giáng lâm thế gian.
@@ -1251,7 +1254,7 @@ ultimate: gây 1 đòn aoe cố định hình chữ T lên ô 1/2/3/5/8 của k�
 Support, ssr, element tag: water.
 nội tại: mỗi lần xoá thành công 1 debuff từ đồng minh và bản thân sẽ tự hồi HP = 5% wil và atk của bản thân, không thể vượt max hp và không thể tạo khiên khi overheal.
 skill 1: Mỗi 3 lần đánh thường/ sài skill hoặc ultimate thành công thì lần ultimate tiếp theo sẽ hồi cho mọi đồng minh trên sân (không ảnh hưởng được thần tính) = 25% wil/atk của bản thân cho mọi đồng minh trên sân và bản thân. Luôn kích hoạt kể cả tử vong rồi được hồi sinh, bị động, -10 ae mỗi lần kích hoạt hồi hp. một nội tại tốn cost tự kích hoạt khi vào sân.
-skill 2: đánh 2 quả cầu nước vào 2 mục tiêu ngẫu nhiên từ xa, gây sát thương aoe lên 2 mục tiêu này, mỗi kẻ nhận 1 đòn đánh thường, tính là đánh thường, 15 ae.
+skill 2: đánh 2 quả cầu nước vào 2 mục tiêu ngẫu nhiên từ xa, mỗi kẻ nhận 1 đòn đánh thường, tính là đánh thường, 15 ae.
 skill 3: khi sắp nhận sát thương vượt 20% max hp sẽ giảm 25% sát thương phải nhận vào (trừ sát thương chuẩn), ví dụ sát thương đang đến phải nhận là 100% thì char này chỉ nhận 75% thôi, không ảnh hưởng được pháp tắc hay quy tắc. đây là skill bị động, không cần tốn turn để kích hoạt mà sẽ luôn kích hoạt từ lúc char này ra sân kể cả được hồi sinh, mỗi lần kích hoạt thành công - 20 ae.
 ultimate: xoá 2 debuff (không xoá mark)ngẫu nhiên trên người đồng minh và bản thân, không ảnh hưởng được debuff/mark cấp quy/pháp tắc. sau đó +10% wil và atk của bản thân trong 2 natural Action và trạng thái này không tính là buff.
 

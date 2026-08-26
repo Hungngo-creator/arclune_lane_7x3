@@ -87,12 +87,7 @@ Trong đó, \Delta\_Class là lượng chỉ số tăng thêm mỗi cấp dựa 
 ​Mage/Support: \Delta\_WIL cao, \Delta\_AEregen nhẹ.
 
 
-3) Class & cân bằng (cùng bậc):
-Hệ số Hiệu suất AE (tính theo WIL):
-- Support: 1.5, Summoner: 1.3
-- Mage: 1.2
-- Tanker, Warrior, Ranger: 0.55
-- Assassin: 0.22
+3) bị xoá
 
 4) Ghi nhớ rule đã chốt:
 
@@ -487,4 +482,18 @@ Wind: không counter trực tiếp
 Neutral: không counter trực tiếp
 Nguồn logic: ELEMENT_CYCLE là fire → metal → wood → earth → lightning → blood → water, light/dark khắc nhau hai chiều, còn wind hoặc neutral trả bonus 0. 
 
-
+O. Kim Chỉ Nam
+Ranger
+“Mục tiêu nào phải chết trước?”
+Mage
+“Ta muốn battlefield này trông như thế nào sau action của ta?”
+Warrior
+“Ta mạnh lên thế nào khi tiếp tục đánh?”
+Tanker
+“Ta bảo vệ ai và gánh damage thế nào?”
+Assassin
+“Ai đang yếu và làm sao kết liễu hắn?”
+Support
+“Ta biến đồng minh thành phiên bản mạnh hơn bằng cách nào?”
+Summoner
+“Ta tạo thêm bao nhiêu combat actors và dùng chúng thế nào?”
