@@ -119,12 +119,98 @@ repeat the last action / last word / last effect.
 nội tại: khi kẻ thù gây sát thương lên bản thân và bản thân gây sát thương lên kẻ thù, lặp lại 50% sát thương đó dưới dạng sát thương chuẩn, chỉ mỗi sát thương chuẩn mà không có hiệu ứng kèm theo, sát thương từ nội tại này được tính là của nhân vật này, không tính là 1 natural Action, ví dụ: hắn là A bị dính aoe của kẻ thù là B, nhận 10 sát thương và dot mỗi natural Action của A là 2% max hp trong 3 turn boundary của A thì A sẽ nhận thêm sát thương chuẩn là 5 nhưng không kèm theo hiệu ứng hay stack gì của B, coi như A tự đánh A, sát thương chuẩn này không tính dot, vì tính của A nên B không nhận lợi ích gì từ sát thương chuẩn này, khi A đánh B thì B cũng nhận sát thương chuẩn từ nội tại này.
 khi nhận Actual HP damage là đánh thường thì hắn chỉ được đánh thường trong 1 natural Action tiếp theo, nếu trong 1 turn boundary của hắn: nhận quá nhiều đánh thường/skill/ult Actual HP damage thì ở lần nhận sát thương mới nhất trong turn boundary đó là loại nào thì khi hết turn boundary và đến natural Action hắn chỉ được dùng cách thức gây sát thương đó, ví dụ trong turn boundary hắn nhận đánh thường > ult > skill > nội tại gây sát thương từ kẻ thù và đến natural Action của hắn thì hắn chỉ dược dùng skill (nội tại bỏ qua, dot các kiểu cũng bỏ qua), vẫn tuân theo ssi mà không phải chắc chắn target kẻ đánh mình, tóm lại dùng skill hay đánh thường hoặc ultimate đều có hạn chế, nếu hắn đầy nộ mà trong turn boundary ở lần nhận sát thương cuối không phải ultimate thì natural Action tiếp theo hắn vẫn không thể ult. các char khác trừ phi bị kit giới hạn không thì đến natural Action của mình mà rage vẫn đầy không bị giảm thì sẽ auto cast ult nhưng char này thì khác, kit của hắn là giới hạn.
 
+hắn không nhận khiên thuộc nguồn dưới quy tắc, chỉ nhận khiên từ kit có tag quy tắc, khiên từ nguồn ngoài và khiên từ skill 1 tính độc lập với nhau, mỗi loại cap 100% max hp, ưu tiên tiêu hao khiên từ nguồn ngoài bản thân trước.
 Nội tại nerf hơi nặng nên char này sẽ có nhiều aoe để cân bằng.
+
+khi ra sân vì chưa bị ai đánh bằng natural Action nên hắn sẽ ultimate như bình thường vì ra sân luôn đầy rage.
 
 nếu hắn nhận sát thương từ đánh thường nhưng kit kẻ thù có skill cường hoá đánh thường thì tính là hắn nhận đánh thường, nếu nhânk sát thương là ultimate cast lại skill hay đánh thường thì tính là hắn nhận sát thương từ ult và hắn có thể ultimate, nhưng nếu hắn không đầy rage thì fallback về kiểu gây sát thương kẻ địch gây lên hắn, tức ultimate cast skill gây Actual HP damage lên hắn > cast ult nếu đủ rage, không đủ thì cast skill, mà không phải kiểu B đánh A thì A phải đánh lại B, char này vẫn tuân ssi và mô tả cách gây sát thương của skill/đánh thường và ult, nếu char này mỗi phe đều có và chúng có thể đánh lẫn nhau thì vẫn không bị nội tại của đối phương ảnh hưởng, vẫn sài skill/ult/đánh thường theo nội tại của bản thân chúng.
 
 ngẫm lại thì char này rất mạnh, nếu aoe nhiều + thêm sát thương chuẩn từ nội tại nữa thì chẳng phải quá mạnh, tự hạn chế là hợp lý.
 
-skill 1: mỗi natural Action tổng 35% nội tại gây sát thương lên enemy sẽ được chuyển thành hp và khiên với tỉ lệ 1:1/35% đó, dễ hiểu là mỗi natural Action gây sát thương chuẩn từ nội tại lên target bao nhiêu thì 17,5% tổng sát thương đó sẽ được chuyển thành khiên, 17,5% cũng chuyển thành hp, overheal và khiên vượt 100% max hp bị bỏ qua, mỗi natural Action - cost là 10 ae.
-char này cần được thiết kế để ngốn ae, hắn dps cao nhưng giấy và ngốn tài nguyên, giấy thì cần team bảo vệ, ngốn tài nguyên làm đồng minh khác tần xuất sài skill thấp hơn, cũng khó bảo vệ hắn hơn.
+skill 1: mỗi natural Action tổng 45% nội tại gây sát thương lên enemy sẽ được chuyển thành hp và khiên với tỉ lệ 1:1/50% của 45% đó, dễ hiểu là mỗi natural Action gây sát thương chuẩn từ nội tại lên target bao nhiêu thì 22,5% tổng sát thương đó sẽ được chuyển thành khiên, 22,5% cũng chuyển thành hp, overheal và khiên vượt 100% max hp bị bỏ qua, mỗi natural Action - cost là 10 ae nên cần nhiều hơn 1 support trong team để duy trì skill này, nếu ae không đủ skill sẽ không kích hoạt tiếp, hp hồi và kiên từ skill này sẽ không mất, khiên không cap time tồn tại. skill dạng bị động, tự kích hoạt không cần natural Action.
 
+char này cần được thiết kế để ngốn ae, hắn dps cao nhưng giấy và ngốn tài nguyên, giấy thì cần team bảo vệ, ngốn tài nguyên làm đồng minh khác tần xuất sài skill thấp hơn, cũng khó bảo vệ hắn hơn.
+nerf mạnh tay trước mới buff mạnh tay được.
+
+skill 2: gây aoe toàn sân, mỗi kẻ nhận sát thương = 175% wil và 145% atk + 15% tổng khiên hiện có của nhân vật này, cost 30 ae.
+skill tương tác với khiên > nội tại nổ > skill 1 tạo khiên > tăng sát thương skill 2.
+hơn nữa vì còn có thể nhận khiên từ nguồn ngoài nên sát thương có thể cao hơn nữa.
+
+skill 3: khi death confrim 1 target có chân ngã = natural Action (nội tại không phải natural Action) 50% khiên hiện có từ mọi nguồn sẽ biến mất và chuyển thành max hp với tỉ lệ 1:1, phần max hp tăng thêm sẽ không tự hồi, 1 natural Action death confrim bao nhiêu target cũng không quan trọng vì skill này chỉ chuyển 1 lần/natural Action, kích hoạt tối đa 10 lần/trận, mỗi lần tự kích hoạt không cần natural Action cần -30 ae.
+
+ultimate: cast 1 lần skill 2 với 0 cost, 2 natural Action tiếp theo skill 1 sẽ được cast không tốn cost.
+
+đánh thường: đứng tại chổ niệm chú gây sát thương = 100% wil/atk lên 1 target.
+
+char này tự action vì nội tại mà không cần leader chọn hắn dùng skill/ult hay đánh thường.
+
+15) Sanguinius
+Tên rất mạnh vì bản thân nó gợi Latin sanguis = blood, rồi cái tên đó được gắn với hình tượng thiên thần, cánh, hy sinh và bi kịch của nhân vật.
+
+trong dự án này thiết lập hắn như 1 thiên sứ bị huyết tộc cấp cao cắn và thành huyết tộc là hợp lý, thiên sứ làm người ta liên tưởng đến ánh sáng nhưng huyết tộc lại sợ mặt trời, hắn bị trục xuất khỏi Thánh Vực ( thần quốc của các thiên sứ cấp thần), hắn phải lòng một vị huyết tộc xinh đẹp, nàng phản bội hắn vì bất đắc dĩ, nói chung là một cái máu chó cố sự yêu hận tình cừu, nói vậy chứ hắn dù sao cũng là thần, dù chỉ là nhỏ yếu thần, hắn sẽ không sợ mặt trời bình thường, Thái Dương Thần thì sợ.
+
+nội tại: mỗi khi trên sân có kẻ thù thuộc element light, mỗi kẻ làm hiệu ứng hồi phục của hắn lên đồng minh giảm 10%, (ở mode turn base thì cap là 9), mỗi kẻ cũng làm sát thương hắn gây lên chúng giảm 10%.
+
+khi vào sân mỗi natural Action thành công hắn tự heal hp = 4% max hp của hắn, nếu trên sân kẻ thù có nhiều hơn hoặc = 3 đơn vị có element tag là light thì phần hồi hp này tạm thời vô hiệu hoá, khôi phục khi kẻ thù có 2 kẻ thù thuộc element light trở xuống.
+
+mỗi lần ultimate xong rage max giảm 3.
+
+skill 1: rút hp = 20% max hp của bản thân (không giảm max hp), gây sát thương = 20% đó (chia đều 20% đó ra thành wil và atk) + 180% wil và 140% atk lên 1 target, sau đó phát nổ, gây sát thương lần nữa = 2% max hp của kẻ thù dưới dạng sát thương chuẩn, 25 ae.
+
+skill 2: chỉ có thể kích hoạt khi hp trên hoặc = 40% max hp, rút hp = 10% max hp của bản thân + 10% max hp của mọi đồng minh trừ leader trên sân có hp trên hoặc = 60% max hp của họ, sau đó tổng lượng hp rút được sẽ được chuyển toàn bộ cho leader đồng minh, nếu thừ sẽ được chuyển thành khiên tồn tại tối đa 2 natural Action của nhân vật này, cap time tồn tại của khiên khiên bắt đầu tính khi đến natural Action tiếp theo sau khi dùng skill này, 20 ae. skill này không làm giảm max hp.
+khiên từ skill này không thể vượt 100% max hp của leader.
+
+ultimate: rút ra hp = 25% max hp, tạo 1 chi huyết tiễn tấn công leader kẻ thù, gây sát thương = lượng hp rút ra dưới dạng sát thương chuẩn lên leader kẻ thù bất kể vị trí nhân vật này đứng ở đâu, khi huyết tiễn bắt đầu bay hắn cũng cầm quang kiếm lao về phía trước (vfx), chém dọc gây sát thương lên hàng 2/5/8, mỗi kẻ nhận 170% wil và atk của nhân vật này, trong mắt player thấy tự dưng có hắn mất hp, có huyết tiễn bay về leader địch và hắn chém dọc cùng lúc luôn.
+nếu ultimate lúc rút hp không đủ 25% thì hắn rút toàn bộ và chỉ chừa lại hp = 2% max hp của mình, toàn bộ hp rút được vẫn gây sát thương tương ứng.
+
+16) Khandira
+ranger vì lấy cảm hứng từ Shikhandi trong Mahabharata, lúc đầu tao tính chọn assassin nhưng ranger cũng được.
+
+nội tại: khi bản thân DEATH_CONFIRMED, không vào hàng chờ luân hồi, vẫn tính là bản thân rời sân nhưng vfx của bản thân tại chỗ mờ nhạt, sau 1 natural Action của bản thân, tại chỗ phục sinh với 100% max hp và chỉ số của đời trước, hp đầy = 80%/100% max hp, 50% sát thương gây ra lên kẻ DEATH_CONFIRMED bản thân thành sát thương chuẩn, sau khi nội tại này kích hoạt và hắn DEATH_CONFIRMED lần nữa, vào thẳng luân hồi và bỏ qua cửa sổ chờ luân hồi.
+khi kích hoạt nội tại sẽ vào trạng thái "Báo Thù":
+đòn đánh thường/skill/ult target kẻ DEATH_CONFIRMED bản thân, nếu DEATH_CONFIRMED kẻ đó thành công thì tuân theo ssi như bình thường.
+
+cái nội tại này làm các kit revive bình thường bất lực vì kit loại này cần revive target trong cửa sổ chờ luân hồi, tức chưa vào luân hồi, dễ hiểu là hồn còn tại thêd chưa đi đầu thai, chứ vào luân hồi thành sinh linh mới rồi sao đầu thai được.
+đó là cái giá cho tự revive, target kẻ giết mình và sát thương chuẩn, nội tại không kích hoạt thì char này vẫn chơi được, char này khá hợp để đi đánh boss, đặt nó ở ô 5 cho boss đánh, sau đó nó hồi sinh rồi đặt tanker ô 2 là bảo vệ được.
+
+skill 1: gây sát thương
+
+17) Meleora Vell
+Nguồn: Meleager.
+Đây là một trong những reference tao thích nhất.
+Trong thần thoại Hy Lạp, sinh mạng của Meleager được gắn trực tiếp với một khúc gỗ đang cháy: chừng nào nó chưa cháy hết thì ông còn sống. Mẹ ông lấy khúc gỗ ra khỏi lửa và cất đi.
+
+nội tại: vào sân sẽ có 1 khúc gỗ cũng vào sân, khúc gỗ có hp bar, mỗi natural Action của nhân vật này khúc gỗ mất 10% hp của bản thân nó, sát thương nó nhận vào tối đa là 20% max hp của bản thân khúc gỗ, khúc gỗ không có chân ngã, vfx là nó luôn cháy hừng hực, cap heal lên khúc gỗ mỗi lần nó nhận heal từ natural Action của đồng minh là 30% max hp của khúc gỗ, khúc gỗ không nhận heal ngoài natural Action của đồng minh (nhiều khi kit của kẻ thù cũng có heal nữa nên cần miêu tả rõ). nhân vật này không thể DEATH_CONFIRMED trừ phi khúc gỗ hp về 0, hắn sẽ luôn còn tối thiểu 1 hp, buff execute của kẻ thù vẫn kích hoạt như hắn sẽ fatal, không DEATH_CONFIRMED, khúc gỗ không nhận buff hay debuff, mọi debuff và buff sẽ bỏ qua nó.
+
+18) Vidara Veyl
+Nguồn: Víðarr.
+Một vị thần Bắc Âu cực ít lời nhưng có một mục tiêu duy nhất: trả thù cho Odin. Trong Ragnarök, Fenrir nuốt Odin và Víðarr xuất hiện để giết Fenrir; biểu tượng đặc biệt của ông là chiếc giày được chuẩn bị từ những mảnh da tích lũy qua thời gian.
+
+nội tại: mỗi turn boundary không nhận bất kỳ sát thương từ natural Action của kẻ thù thì rage max giảm 3, tăng hp = 3% max hp của hiện tại, đồng thời heal bằng phần tăng đó, atk và wil cũng tăng = 4% của hiện tại, rage + 5, thật ra điều kiện kích hoạt cũng rất khó nên mỗi lần kích hoạt được nên buff mạnh 1 chút, gặp mấy con aoe coi như phế cái nội tại nên kit của hắn sẽ ưu tiên mage 1 chút.
+
+hắn vẫn sẽ mạnh nhưng tròn 1 trận đấu max rage = 0 và ultimate liên tục là không thể nào.
+
+19) Ariadne Velora
+
+Nguồn: Ariadne.
+
+nội tại: khi ra sân sẽ đánh dấu vị trí nàng đứng trong 3 natural Action, bộ đếm bắt đầu đếm ở natural Action tiếp sau sau khi đánh dấu, sau 3 natural Action đó đánh dấu vị trí sẽ biến mất và đánh dấu lần nữa ở vị trí nàng đang đứng và bắt đầu di chuyển, trước natural Action tiếp theo sẽ lùi lại 1 bước sau đó mới bắt đầu natural Action, nếu không thể lùi thì sang phải hoặc trái, nếu đều không thể thì dịch chuyển đến vị trí ngẫu nhiên còn trống trên sân đồng minh, nếu đầy sân thì đứng tại chỗ và không đi đâu, nàng chỉ có thể di chuyển khi đã đánh dấu và đứng trên vị trí đã đánh dấu, mode chess/monopoly/turn base đều có ô, hiện tập trung vào turn base.
+kỳ vọng là nàng ra sân, đánh dấu ngay, trước natural Action tiếp theo thì di chuyển sau đó thực thi natural Action rồi đứng im đó vì nàng không thể đổi vị trí bằng nội tại được vì nàng không đứng trên ô đánh dấu, khi đánh dấu ở vị trí cũ mất, nàng đánh dấu ngay ở ô hiện tại và lại di chuyển ngay trước natural Action tiếp theo. có lẽ cap time tồn tại đánh dấu 3 natural Action turn là hơi dài, sẽ thay đổi sau test, nếu nàng là leader khi bị đưa vào đấu thú trường thì nàng vẫn có thể đánh dấu và di chuyển.
+
+ultimate: chuyển 1 đồng minh vào vị trí đã đánh dấu bằng nội tại, thứ tự ưu tiên là trái> phải > trước> sau, không thể target leader, nếu chỉ có thể chọn leader thì nàng sẽ không chuyển, chuyển sang gây sát thương lên 2 kẻ địch ngẫu nhiên, mỗi kẻ nhận 185% wil và atk.
+nếu nàng ra sân thì quy trình là: đánh dấu > di chuyển > dùng ultimate (vì ra sân sẽ tự đầy rage và dùng ult), quá trình này sẽ rất nhanh, nhân vật này ra sân đầu tiên sẽ phế, đầy sân cũng phế cái nội tại.
+ví dụ nàng ra sân ở ô 2, ô 5 không ai, nàng lùi sang ô 5 và ultimate, nàng chuyển vị trí của đồng minh theo thứ tự ultimate đã mô tả, nếu ra sân đầu tiên thì chỉ có nàng và leader đứng sau lưng nàng ở ô 8 nên nàng sẽ gây sát thương theo mô tả của ult, nếu lúc đó ô 4/6 đều có người thì nàng sẽ chuyển char ở ô 4 sang ô đã đánh dấu là ô 2 vì tuân theo mô tả ult.
+vấn đề là khi chuyển 1 char đồng minh sang ô đánh dấu thì đánh dấu có mất không? cap 3 natural Action quá dài, tao nghĩ giảm là hợp lý, cap vẫn là 3, nhưng khi có 1 đồng minh không phải nàng đứng trên ô đã đánh dấu (không quan trọng họ đứng đó có phải do nàng hay không) thì cap sẽ giảm 1, thực tế là nàng ultimate xong nếu không ai đứng ô đánh dấu thì đến cuối natural Action tiếp theo của nàng cap time của đánh dấu mới giảm 1, nếu có đồng minh đứng lên đánh dấu thì giảm là 2, vậy đi cho dễ hiểu.
+
+19) Orphea Bellurne
+Nguồn: Orpheus.
+Không dùng Eurydice.
+Signature
+Music can alter the dead, but only under a condition.
+Character có thể “kéo” một đồng minh đã chết về.
+
+nội tại: khi đồng minh được hồi sinh bằng kit của nhân vật này xuất hiện ở ô trước mặt hắn, hắn và đồng minh đó mỗi natural Action của bản thân đều sẽ mất vĩnh viễn (trong trận) 20% max hp, khi max hp = 0, lập tức vào luân hồi, bỏ qua cửa sổ chờ luân hồi.
+trước mặt: hắn đứng ô 1/2/3, an toàn, trước mặt là 3 ô trung lập và 9 ô của kẻ thù.
+đứng ô 4/5/6: ô 1/2/3 là trước mặt.
+ô 7/8/8 thì 1 đến 6 là trước mặt
