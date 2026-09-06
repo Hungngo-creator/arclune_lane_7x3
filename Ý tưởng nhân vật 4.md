@@ -89,3 +89,42 @@ A2: char 2 bên phe tao, B2; char 2 phe AI, B3; một char thuộc phe AI, A3: m
 A2 đánh B3 bằng natural Action, A2 bị B2 đánh lại bằng nội tại này.
 B3 đánh A3, nội tại A2 kích hoạt và đánh B3, sau đó nội tại của B2 cũng kích hoạt và đánh A2, đó là cách nội tại này hoạt động nếu có 2 char số 2 trên sân.
 mà nghĩ lại nội tại này chỉ trigger khi ally nhận sát thương từ natural Action nên ví dụ thứ 2 là sai vì nội tại char này không phải natural Action 
+
+13) Rotania
+mage
+
+nội tại: natural Action tiếp theo của natural Action đầu tiên khi vào sân, tức vào sân > natural Action (nếu từ deck ra thì đầy rage và ult, thường là thế nếu không có kit can thiệp) > natural Action tiếp thì nội tại kích hoạt > natural Action tiếp theo không kích hoạt nội tại > natural Action tiếp theo nữa lại kích hoạt nội tại, cứ thế lặp lại đến khi rời sân.
+hiệu ứng nội tại: khi gây Actual HP damage lên target, sát thương từ natural Action đó sau khi xong thì target nhận thêm sát thương chuẩn = 30% Actual z,
+a hHP damage target nhận từ nhân vật này, hiệu ứng này tính là follow up attack, dễ hiểu là target nhận Actual HP damage = 100 thì nhận thêm sát thương chuẩn là 30, vì là follow up nên tính là 1 action với đòn chính, hiệu ứng này cap kích hoạt max 9 target/mỗi lần nội tại kích hoạt.
+
+skill 1: triệu hồi 5 lỗ đen (vfx biến động theo lượng target, không hiện ở ô skill có thể target nhưng không có target), trong đó bay ra tia sét gây sát thương = 150% wil và 120% atk của bản thân lên 5 vị trí cố định là 2/4/5/6/8 của kẻ địch, đòn aoe này mỗi khi DEATH_CONFIRMED 1 target có chân ngã thì cost của skill này giảm 4 ae, cost: 30 ae.
+Nếu kích hoạt nội tại thì phần giảm cost đương nhiên tính vì sát thương chuẩn của nội tại tính là follow up trong 1 natural Action.
+
+skill 2: sau khi kích hoạt bằng 1 natural Action, không gây sát thương ngay mà tụ lực, đến natural Action tiếp theo sát thương gây ra bằng ultimate/skill hoặc đánh thường hệ số sát thương tăng 40% trong 1 natural Action, 25 ae.
+ví dụ dùng skill này, natural Action sau dùng skill 1 thì hệ số sát thương wil và atk của skill 1 tăng 40%, 210% wil và 168% atk lên mỗi target, chưa kể nếu nội tại kích hoạt thì sau đó mỗi target nhận thêm 30% Actual HP Damage của skill 1 dưới dạng sát thương chuẩn và sát thương cao như thế thì DEATH_CONFIRMED không khó, tối đa giảm được 20 ae cost skill 1, điểm cân bằng là kích hoạt skill 2 cần 1 turn, animation sẽ là vận sức, có lẽ nên nerf kiểu sau khi kích hoạt skill 2 xong thì nhận debuff hay tạm mất chỉ số nào đó?.
+
+skill 3: tự kích hoạt khi hp dưới hoặc = 15% max hp và có tối thiểu 40 rage, cost: max rage +20, rage hiện có -20.
+nhận 1 lớp khiên = 45% max hp của bản thân trong 3 natural Action, sau khi skill này kích hoạt thì sau 3 natural Action khiên sẽ biến mất, ưu tiên tiêu hao khiên từ skill này, nếu trên người có khiên thuộc nguồn ngoài bản thân và khiên đó có mô tả ưu tiên tiêu hao khiên từ chính nguồn đó thì vẫn sẽ ưu tiên tiêu hao khiên từ skill này, khi khiên mất tự hồi hp = 25% max hp. kích hoạt tối đa 2 lần trong trận đấu.
+một skill tự cứu, rage khi kích hoạt được skill này mà không tăng hay giảm từ bị đánh hoặc hành động là: 20/120, tăng rage max là nerf vì cần đầy rage để ult, max rage càng thấp ult càng nhanh.
+
+utl: cast 1 lần skill 1 nhưng không tốn cost, nếu skill 1 cast qua ult DEATH_CONFIRMED (tính luôn nội tại) target có chân ngã thì max rage giảm 3 vì skill 1 cast qua ult đã không tốn cost, sau đó heal bằng 20% tổng Actual HP damage gây ra, overheal từ ultimate này bị bỏ qua và không thể chuyển sang khiên bằng kit của đồng minh hay kẻ thù nếu có hiệu ứng chuyển overheal sang khiên, phần tổng này không tính sát thương chuẩn từ nội tại. ultimate này vẫn có thể kích hoạt nội tại.
+
+14) Echo Reverie
+
+Nguồn: Echo trong thần thoại Narcissus.
+Trong phiên bản Ovid, Echo bị tước khả năng chủ động trong lời nói và chỉ có thể lặp lại những từ cuối mà người khác nói.
+Signature:
+repeat the last action / last word / last effect.
+
+nội tại: khi kẻ thù gây sát thương lên bản thân và bản thân gây sát thương lên kẻ thù, lặp lại 50% sát thương đó dưới dạng sát thương chuẩn, chỉ mỗi sát thương chuẩn mà không có hiệu ứng kèm theo, sát thương từ nội tại này được tính là của nhân vật này, không tính là 1 natural Action, ví dụ: hắn là A bị dính aoe của kẻ thù là B, nhận 10 sát thương và dot mỗi natural Action của A là 2% max hp trong 3 turn boundary của A thì A sẽ nhận thêm sát thương chuẩn là 5 nhưng không kèm theo hiệu ứng hay stack gì của B, coi như A tự đánh A, sát thương chuẩn này không tính dot, vì tính của A nên B không nhận lợi ích gì từ sát thương chuẩn này, khi A đánh B thì B cũng nhận sát thương chuẩn từ nội tại này.
+khi nhận Actual HP damage là đánh thường thì hắn chỉ được đánh thường trong 1 natural Action tiếp theo, nếu trong 1 turn boundary của hắn: nhận quá nhiều đánh thường/skill/ult Actual HP damage thì ở lần nhận sát thương mới nhất trong turn boundary đó là loại nào thì khi hết turn boundary và đến natural Action hắn chỉ được dùng cách thức gây sát thương đó, ví dụ trong turn boundary hắn nhận đánh thường > ult > skill > nội tại gây sát thương từ kẻ thù và đến natural Action của hắn thì hắn chỉ dược dùng skill (nội tại bỏ qua, dot các kiểu cũng bỏ qua), vẫn tuân theo ssi mà không phải chắc chắn target kẻ đánh mình, tóm lại dùng skill hay đánh thường hoặc ultimate đều có hạn chế, nếu hắn đầy nộ mà trong turn boundary ở lần nhận sát thương cuối không phải ultimate thì natural Action tiếp theo hắn vẫn không thể ult. các char khác trừ phi bị kit giới hạn không thì đến natural Action của mình mà rage vẫn đầy không bị giảm thì sẽ auto cast ult nhưng char này thì khác, kit của hắn là giới hạn.
+
+Nội tại nerf hơi nặng nên char này sẽ có nhiều aoe để cân bằng.
+
+nếu hắn nhận sát thương từ đánh thường nhưng kit kẻ thù có skill cường hoá đánh thường thì tính là hắn nhận đánh thường, nếu nhânk sát thương là ultimate cast lại skill hay đánh thường thì tính là hắn nhận sát thương từ ult và hắn có thể ultimate, nhưng nếu hắn không đầy rage thì fallback về kiểu gây sát thương kẻ địch gây lên hắn, tức ultimate cast skill gây Actual HP damage lên hắn > cast ult nếu đủ rage, không đủ thì cast skill, mà không phải kiểu B đánh A thì A phải đánh lại B, char này vẫn tuân ssi và mô tả cách gây sát thương của skill/đánh thường và ult, nếu char này mỗi phe đều có và chúng có thể đánh lẫn nhau thì vẫn không bị nội tại của đối phương ảnh hưởng, vẫn sài skill/ult/đánh thường theo nội tại của bản thân chúng.
+
+ngẫm lại thì char này rất mạnh, nếu aoe nhiều + thêm sát thương chuẩn từ nội tại nữa thì chẳng phải quá mạnh, tự hạn chế là hợp lý.
+
+skill 1: mỗi natural Action tổng 35% nội tại gây sát thương lên enemy sẽ được chuyển thành hp và khiên với tỉ lệ 1:1/35% đó, dễ hiểu là mỗi natural Action gây sát thương chuẩn từ nội tại lên target bao nhiêu thì 17,5% tổng sát thương đó sẽ được chuyển thành khiên, 17,5% cũng chuyển thành hp, overheal và khiên vượt 100% max hp bị bỏ qua, mỗi natural Action - cost là 10 ae.
+char này cần được thiết kế để ngốn ae, hắn dps cao nhưng giấy và ngốn tài nguyên, giấy thì cần team bảo vệ, ngốn tài nguyên làm đồng minh khác tần xuất sài skill thấp hơn, cũng khó bảo vệ hắn hơn.
+

@@ -388,54 +388,6 @@ Quy Tắc (Rules/Absolute): "Admin lệnh". Không thể kháng, không thể n�
 Pháp Tắc (Laws):Thay đổi cách thế giới vận hành trong một phạm vi. Nó đè lên chỉ số và buff thường, nhưng bị Quy Tắc đè bẹp. (Ví dụ: Trong vùng này không ai được hồi máu -> Hồi máu thường sẽ = 0, nhưng nếu dùng Quy Tắc Hồi Sinh thì vẫn sống).
 Cơ chế thường (Normal): Sát thương, Buff, Debuff, Chỉ số cơ bản.
 
-E. Hệ thống Tag, phân loại kit và tránh xung đột logic.
-I. NHÓM 1: ĐỘ ƯU TIÊN & HỆ THỐNG (HIERARCHY TAGS)
-Đây là nhóm quan trọng nhất để xác định "Ai thắng" khi hai kỹ năng va chạm nhau.
- * [Quy Tắc] (Rule): Cấp độ cao nhất (Admin Level). Thay đổi thực tại của game (Ví dụ: Cấm hồi sinh, Thay đổi lượt, Bất tử).
-   * Logic: Đè bẹp mọi chỉ số và hiệu ứng thông thường.
- * [Pháp Tắc] (Law): Cấp độ thứ hai (System Level). Thay đổi môi trường hoặc cách tính toán chỉ số (Ví dụ: Đảo ngược hồi máu thành sát thương, Vùng cấm bay).
-   * Logic: Đè lên chỉ số, nhưng thua Quy Tắc.
- * [Tuyệt Đối] (Absolute/Sure-hit): Cấp độ thứ ba (Interaction Level). Bỏ qua các check thông thường như Né tránh (AGI), Chặn đòn (Block) hoặc Giáp (ARM).
-   * Logic: Đánh là trúng, trúng là thấm (True Damage thường nằm ở đây).
- * [Độc Nhất] (Unique): Chỉ được tồn tại 1 bản thể/hiệu ứng này trên sân. (Đã bàn ở trên).
- * [Thường] (Normal): Các kỹ năng mặc định, chịu ảnh hưởng của DEF, RES, AGI...
-II. NHÓM 2: CƠ CHẾ SO SÁNH (CLASH RESOLUTION TAGS)
-Khi 2 [Quy Tắc] va nhau (ví dụ: "Bắt buộc chết" vs "Cấm tử vong"), hệ thống sẽ nhìn vào các tag này để quyết định bên nào thắng.
- * [So Sánh: Cảnh Giới] (Check: Level): So sánh Level (Tu vi) của hai nhân vật. Bên nào cao hơn thì hiệu ứng bên đó có tác dụng.
- * [So Sánh: Tinh Cấp] (Check: Star/Awaken): So sánh số Sao (Đột phá/Thăng thiên). Dùng để phân định thắng thua giữa 2 char cùng Rank.
- * [So Sánh: Chiến Lực] (Check: CP): So sánh tổng lực chiến (Combat Power) hoặc một chỉ số cụ thể (ATK vs DEF, WIL vs WIL). "Mạnh được yếu thua".
- * [So Sánh: Phẩm Bậc] (Check: Rank): Prime > UR > SSR > SR... (Mặc định ngầm, nhưng có thể gắn tag nếu cần skill khắc chế rank thấp).
-III. NHÓM 3: PHẠM VI & MỤC TIÊU (TARGETING TAGS)
-Quy định skill đánh vào đâu và trúng ai.
- * [Đơn Mục Tiêu] (Single): Chọn 1 đối tượng cụ thể.
- * [AOE: Toàn Sân] (Global): Trúng tất cả mọi người trên sân (có thể lọc theo phe).
- * [AOE: Hàng Ngang/Dọc] (Row/Column): Theo lưới 3x3.
- * [AOE: Vùng] (Area): Trúng mục tiêu chính và các ô lân cận (Splash).
- * [Ngẫu Nhiên] (Random): Hệ thống tự chọn mục tiêu (Không thể target thủ công).
- * [Bản Thân] (Self): Chỉ tác dụng lên người thi triển.
- * [Phe Ta] (Ally) / [Phe Địch] (Enemy): Xác định luồng tác dụng.
-IV. NHÓM 4: LOẠI HIỆU ỨNG (EFFECT TYPE TAGS)
-Quy định skill làm cái gì.
- * [Sát Thương Vật Lý] (Phys Dmg): Tính theo ATK vs ARM.
- * [Sát Thương Phép] (Magic Dmg): Tính theo WIL vs RES.
- * [Sát Thương Chuẩn] (True Dmg): Bỏ qua ARM/RES.
- * [Hồi Phục] (Heal): Tăng HP.
- * [Tạo Khiên] (Shield): Tạo HP ảo.
- * [Buff]: Hiệu ứng có lợi (Tăng stat, miễn nhiễm...).
- * [Debuff]: Hiệu ứng bất lợi (Giảm stat, DOT, dấu ấn...).
- * [Khống Chế] (Control): Choáng, Ngủ, Câm lặng, Trói chân.
- * [Triệu Hồi] (Summon): Gọi đệ tử ra ô trống.
- * [Biến Hình] (Transform): Thay đổi bộ skill/chỉ số tạm thời.
- * [Địa Hình] (Terrain/Field): Tạo hiệu ứng lên ô đất (Ví dụ: Ô lửa, Ô độc).
-V. NHÓM 5: TÀI NGUYÊN & ĐIỀU KIỆN (COST & TRIGGER TAGS)
-Cái giá phải trả và thời điểm kích hoạt.
- * [Tiêu Hao: Aether] (Cost: AE): Tốn năng lượng chung.
- * [Tiêu Hao: HP] (Cost: HP): Tốn máu bản thân.
- * [Tiêu Hao: Cost] (Cost: DP): Tốn điểm triệu hồi trên thanh Cost Bar.
- * [Lập Tức] (Instant): Tác dụng ngay khi bấm nút.
- * [Nội Tại] (Passive): Luôn hoạt động hoặc tự kích hoạt khi đủ điều kiện.
- * [Tự Động] (Auto-cast): Dùng cho Ult hoặc Skill tự kích hoạt khi đầy thanh nộ/điều kiện.
- * [Hồi Chiêu] (Cooldown): Số turn phải chờ để dùng lại.
 PHÂN TÍCH XUNG ĐỘT các tag Pháp Tắc/Quy Tắc/ Axiom (CONFLICT RESOLUTION FLOW)
 Axiom là cao nhất sau đó đến Quy Tắc, đến Pháp Tắc rồi còn lại là skill/ultimate/nội tại không có 3 tag này. Nếu skill/ult/nội tại (gọi chung là kit) xung đột nhau và có cùng tag thì sẽ phán định dựa theo rank của 2 nhân vật có kit xung đột đó, nếu 2 char có rank = nhau thì so sánh tu vi của 2 char, nếu tu vi = nhau thì so sánh sao, nếu = nhau thì so sánh sao awaken, nếu = nhau nữa thì so sánh CP, sở dĩ so sánh CP cuối cùng là vì có class CP cao có class CP thấp do chi số của class đó thấp sẵn, cũng tránh tình trạng char mặc đồ xịn cp cao nhưng số sao, tu vi thấp đè char có sao, tu vi cao nhưng CP thấp vì class hoặc trang bị không đủ mạnh.
 Ví dụ: Nhân vật A có "Quy Tắc: Đánh là chết" đánh vào Nhân vật B có "Quy Tắc: Bất tử":
@@ -497,3 +449,13 @@ Support
 “Ta biến đồng minh thành phiên bản mạnh hơn bằng cách nào?”
 Summoner
 “Ta tạo thêm bao nhiêu combat actors và dùng chúng thế nào?”
+
+AE_ACTION_REGEN_BY_CLASS
+
+Class	AE / action
+Support	10
+Mage & Summoner	7
+Warrior	5
+Tanker	5
+Ranger	5
+Assassin	3

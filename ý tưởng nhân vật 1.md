@@ -210,19 +210,16 @@ A. Các char cho player gacha.
      * 2 Stack: Sương dày hơn.
      * 3 Stack: Sương che kín mặt + Icon chữ 'Z' trên đầu.
 2. ĐÁNH THƯỜNG: Mộng Phệ
- * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Gắn Stack].
  * Logic:
    * Gây sát thương = 100% (WIL + ATK) lên 1 kẻ địch.
    * Áp dụng 1 stack [Mê Hoặc].
 3. KỸ NĂNG 1: Huyễn Ảnh Che Màn
- * Tags: [Chủ Động], [Bản Thân], [Buff: Né Tránh Đặc Thù], [Tiêu Hao: Aether].
  * Logic:
    * Cost: 30 Aether.
    * Hiệu ứng: Giảm 50% Tỷ lệ bị đánh trúng (Evasion).
    * Điều kiện Né: Chỉ tác dụng với các đòn Đánh Thường đơn mục tiêu cố định. (Vẫn bị trúng Skill hoặc AOE).
    * Thời gian: Duy trì 3 Turn.
 4. KỸ NĂNG 2: Thụy Ca Tự Miên
- * Tags: [Chủ Động], [Bản Thân], [Trạng Thái: Ngủ], [Buff: Giảm Sát Thương], [Buff: Tăng Trưởng], [Tương Tác: Người Chơi].
  * Logic:
    * Cost: 30 Aether. (Kích hoạt 1 lần, tự duy trì).
    * Trạng Thái Ngủ (Self-Sleep):
@@ -233,7 +230,6 @@ A. Các char cho player gacha.
      * Tự động: Khi HP hiện tại \le 35% Max HP.
      * Thủ công: Người chơi (Player) Chạm (Tap/Click) 2 lần vào nhân vật Mộng Yểm ngay trong lượt của Địch (Enemy Turn) hoặc đầu lượt mình.
 5. KỸ NĂNG 3: Phá Mộng Tàn Ca
- * Tags: [Chủ Động], [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Sát Thương Điều Kiện], [Xuyên Giáp], [Lan Truyền Debuff].
  * Logic:
    * Cost: 25 Aether.
    * Loại đòn: Kỹ năng sát thương (Không tính là đánh thường).
@@ -403,7 +399,6 @@ GHI CHÚ CHIẾN THUẬT (Dành cho Coder & Player):
      * Cứ mỗi 2 Ma Chủng: Áp dụng 1 tầng [Sợ Hãi] và [Chảy Máu] trong 1 Turn.
    * Hậu quả: Sau khi nổ, số Ma Chủng trên địch về 0.
 7. ULTIMATE (Dạng Ma Chủ): Thiên Ma Độc Tôn
- * Tags: [Tự Động], [Đơn Mục Tiêu], [Sát Thương Chuẩn Hóa], [Không Tiêu Hao Dấu Ấn], [Buff: Bạo Kích].
  * Logic:
    * Lý do thay đổi: Khi đã thành Ma Chủ, Diệp Lâm cần giữ Ma Chủng để duy trì khả năng đánh Sát Thương Chuẩn (theo Skill 2), nên Ult này KHÔNG ĐƯỢC XÓA MARK.
    * Trigger: Đầy Nộ ở dạng Ma Chủ.
@@ -440,7 +435,6 @@ TỔNG KẾT & CÂN BẰNG:
  * Logic:
    * Gây sát thương = 100% (WIL + ATK) lên 1 kẻ địch.
 3. KỸ NĂNG 1: U Trào Tụ Lực
- * Tags: [Chủ Động], [Bản Thân], [Buff: Chỉ Số], [Cộng Dồn], [Tiêu Hao: Aether].
  * Logic:
    * Cost: 25 Aether.
    * Hiệu ứng: Tăng 15% WIL và 15% ATK.
@@ -448,7 +442,6 @@ TỔNG KẾT & CÂN BẰNG:
    * Stack: Tối đa 3 tầng (+45% Stats).
    * Cơ chế: Dùng liên tiếp sẽ cộng thêm tầng và làm mới thời gian tồn tại của tất cả các tầng.
 4. KỸ NĂNG 2: Huyết Tế Cuồng Khí
- * Tags: [Chủ Động], [Bản Thân], [Tiêu Hao: HP], [Buff: Chỉ Số], [Cộng Dồn], [Tiêu Hao: Aether].
  * Logic:
    * Cost: 15 Aether.
    * Cost Phụ: Mất 30% HP Hiện Tại (Self-Damage, giúp kích hoạt nội tại thủ).
@@ -457,13 +450,11 @@ TỔNG KẾT & CÂN BẰNG:
    * Stack: Tối đa 2 tầng (+50% Stats).
    * Tổng hợp: Nếu Mộ Dạ max stack cả Skill 1 và 2, hắn sẽ có +95% Stats (Gần gấp đôi sát thương).
 5. KỸ NĂNG 3: Mộ Vực Trảm
- * Tags: [Chủ Động], [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Tiêu Hao: Aether].
  * Logic:
    * Cost: 15 Aether.
    * Sát thương: Gây 150% Sát Thương Đánh Thường (150% WIL + 150% ATK).
    * Lưu ý: Skill này damage base thấp, nhưng vì Mộ Dạ tự buff stats cực khủng nên damage thực tế sẽ rất to.
 6. ULTIMATE: Hồn Về Mộ
- * Tags: [Tự Động], [Đơn Mục Tiêu], [Buff: Bất Khuất], [Buff: Không Thể Chỉ Định], [Xuyên Giáp], [Cơ Chế: Kết Liễu].
  * Logic:
    * Trigger: Kích hoạt khi đầy Nộ (Auto-cast).
    * Sát thương: Gây 200% Sát Thương Đánh Thường (200% WIL + 200% ATK).
@@ -527,7 +518,6 @@ GHI CHÚ CHIẾN THUẬT:
      * Trưởng Thành: Lan 50%.
      * Long Thần/Prime: Lan 60%.
 6. ULTIMATE: Tam Chuyển Long Thai (Cơ Chế Tiến Hóa)
- * Tags: [Tự Động], [Biến Hình: Trứng], [Bỏ Qua Lượt], [Nâng Cấp Chỉ Số], [AOE: Toàn Sân], [Thăng Hạng: Prime].
  * Logic:
    * Trigger: Đầy Nộ (Auto-cast).
    * Cơ chế chung (Lần 1, 2, 3):
@@ -586,7 +576,6 @@ Bộ kit này đảm bảo Ngao Bính yếu ở đầu trận (do phải hóa tr
    * Gây sát thương = 100% (WIL + ATK).
    * Gắn +1 Sa Ấn.
 3. KỸ NĂNG 1: Hắc Sa Song Chưởng
- * Tags: [Chủ Động], [Đa Mục Tiêu: Ngẫu Nhiên], [Sát Thương Hỗn Hợp], [Gắn Dấu Ấn], [Tiêu Hao: Aether].
  * Logic:
    * Cost: 25 Aether.
    * Hành động: Tung 2 chưởng vào 2 Kẻ Địch Ngẫu Nhiên.
@@ -607,7 +596,6 @@ Bộ kit này đảm bảo Ngao Bính yếu ở đầu trận (do phải hóa tr
    * Hiệu ứng: Mỗi chưởng gắn +1 Sa Ấn (Tổng 3 Sa Ấn).
    * Combo: Nếu đang bật Skill 2 -> Tổng cộng rải 6 Sa Ấn ra sân (Mỗi hit 2 ấn). Kẻ nào xui bị trúng 2-3 phát là bị Ngưng Thời ngay lập tức.
 6. ULTIMATE: Thiên Mệnh Lậu Khắc Ma Kinh
- * Tags: [Tự Động], [RNG: 50/50], [Quy Tắc: Nghịch Lưu], [Quy Tắc: Thuận Lưu], [Toàn Sân: Đồng Minh].
  * Logic:
    * Trigger: Đầy Nộ (Auto-cast).
    * Cơ chế RNG: Tỷ lệ 50% ra Nghịch Lưu hoặc Thuận Lưu.
@@ -2221,7 +2209,6 @@ OnDealDamage: Luôn trả về Damage = 1 (True Dmg) hoặc 0.
  * Role: Armor Breaker (Phá Giáp), Reflect Tank (Phản đòn), Taunter.
  * Đặc tính: Sát thương xuyên thấu cao, trừng phạt kẻ địch tấn công mình.
 1. NỘI TẠI: Hỗn Mang Tuyệt Cách
- * Tags: [Nội Tại], [Xuyên Giáp Cố Định], [Quy Tắc: Giới Hạn], [Không Thể Xóa Bỏ].
  * Logic:
    * Xuyên Phá Chủ Động: Mọi sát thương do chính bản thân Ma Long gây ra (Đánh thường, Skill 1, Ult, Follow-up) sẽ bỏ qua 50% ARM và 50% RES của mục tiêu.
    * Loại trừ: KHÔNG áp dụng cho sát thương Phản đòn (Reflect), DoT (Đốt/Độc) hoặc các nguồn sát thương gián tiếp khác.
@@ -2260,7 +2247,6 @@ OnDealDamage: Luôn trả về Damage = 1 (True Dmg) hoặc 0.
      * [Tự Suy Yếu]: Giảm 20% Sát thương gây ra của bản thân trong 3 Lượt.
      * [Cân Bằng - Buff Thêm]: Để skill này xứng đáng UR và bù lại việc giảm dmg, Ma Long nhận thêm +25% Giảm Sát Thương Nhận Vào (Damage Reduction) trong 3 lượt. (Nếu không có cái này, việc Khiêu khích mà giảm dmg bản thân là tự sát).
 6. ULTIMATE: Hạo Kiếp Hỗn Không
- * Tags: [Tự Động], [AOE: Diện Rộng], [Sát Thương Xuyên], [Ưu Tiên: Mục Tiêu Khác Nhau].
  * Logic:
    * Trigger: Đầy Nộ (Auto-cast).
    * Mục tiêu: 4 Kẻ địch ngẫu nhiên.
@@ -2526,7 +2512,6 @@ B. Char pve: Các char dùng trong pve vẫn áp dụng rank như những char d
    * Hiệu ứng: Áp dụng ngẫu nhiên 1 Debuff từ Pool 9 loại (Stun, Sleep, Bleed, Fatigue, Silence, Daze, Weaken, Fear, Venom).
    * Thời gian Debuff: 1 Lượt (cho Hard CC: Stun/Sleep/Fear) hoặc 2 Lượt (cho Soft CC/DoT).
 4. KỸ NĂNG 1: Kích Thích Tố – Bạo Tẩu (Overdrive)
- * Tags: [Chủ Động], [Buff Tự Thân], [Debuff Tự Thân: Điểm Yếu], [Tiêu Hao: Aether].
  * Logic:
    * Cost: 25 Aether.
    * Buff:

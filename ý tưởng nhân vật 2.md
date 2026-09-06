@@ -125,7 +125,6 @@ GHI CHÚ CHIẾN THUẬT:
 
 34) [SR] CÁI BANG – LÃO KHẤT CÁI, Class: Warrior. không có element tag
 1. NỘI TẠI: Tạp Dân Tụ Lực
- * Tags: [Nội Tại], [Bản Thân], [Buff Vĩnh Viễn], [Kháng Hiệu Ứng: Khiêu Khích], [Scaling: Đồng Minh].
  * Logic:
    * Kháng: Miễn nhiễm hoàn toàn với hiệu ứng [Khiêu Khích] (Taunt) từ kẻ địch. Hắn tự do chọn mục tiêu (hoặc đánh theo cơ chế mặc định).
    * Buff Chỉ Số:
@@ -775,24 +774,17 @@ CHIẾN THUẬT:
  * Combo: Skill 1 (Bạo Huyết) liên tục để stack chỉ số Lost_Max_HP và lấy buff ATK \rightarrow Khi đầy nộ, tung Ult để one-shot địch \rightarrow Dùng Skill 3 (Giáp) để trụ lại khi máu giấy.
  
 
-52) [UR] CHÚC CỬU ÂM (Zhu Jiu Yin)
- * Class: Support / Controller.
+52) [UR] CHÚC CỬU ÂM (Zhu Jiu Yin/ Zhulong Noctis) Class: Support 
 1. NỘI TẠI: Nhật Dạ Chu Thiên
- * Tags: [Nội Tại], [Bản Thân], [Cơ Chế: Thăng Giai], [Buff Vĩnh Viễn], [Reset: Rời Sân].
- * Logic:
-   * Biến số: ChuThien (Counter). Khởi đầu = 0 (Giai Đoạn I).
-   * Trigger: Cuối lượt hành động của Chúc Cửu Âm \rightarrow ChuThien +1.
-   * Thăng Giai:
-     * GĐ I: Mặc định (0-1 Chu Thiên).
-     * GĐ II: Khi ChuThien \ge 2. (Buff: +8% WIL/ATK, +6% RES, +5% SPD).
+ChuThien (Counter). Khởi đầu = 0 (Giai Đoạn I). Trigger: Cuối lượt hành động của Chúc Cửu Âm ChuThien +1.
+GĐ I: Mặc định (0-1 Chu Thiên).
+GĐ II: Khi ChuThien \ge 2. (Buff: +8% WIL/ATK, +6% RES, +5% SPD).
      * GĐ III: Khi ChuThien \ge 5 (Tức là sau 5 turn tích lũy). (Buff: +15% WIL/ATK, +10% RES, +8% SPD).
    * Cơ chế: Các chỉ số cộng thêm được áp dụng trực tiếp vào Base Stats. Reset về 0 nếu rời sân/chết.
-2. ĐÁNH THƯỜNG: Long Tức
- * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
+3. ĐÁNH THƯỜNG: Long Tức
  * Logic:
    * Gây sát thương = 100% (WIL + ATK) lên 1 kẻ địch.
 3. KỸ NĂNG 1: Thời Sa Phóng Quang
- * Tags: [Chủ Động], [Đơn Mục Tiêu], [Sát Thương Theo Giai Đoạn], [Khống Chế: Choáng Nhẹ], [Trừ Aether], [Tiêu Hao: Aether].
  * Logic:
    * Cost: 25 Aether.
    * Sát thương: 150% (GĐ I) / 160% (GĐ II) / 170% (GĐ III) đòn đánh thường.
@@ -800,7 +792,6 @@ CHIẾN THUẬT:
      * Check: Mục tiêu có đang đứng trong vùng ảnh hưởng (Mask) của Minh Đăng (bất kể phe nào sở hữu) hay không?
      * Hiệu quả: Nếu có \rightarrow Trừ Aether địch (-1/-1/-2 theo Giai đoạn) VÀ gây [Daze] (Choáng nhẹ) trong 1 Turn.
 4. KỸ NĂNG 2: Hô Hấp Chu Thiên
- * Tags: [Chủ Động], [Bản Thân], [AOE: Hàng Dọc], [Buff: Xuyên Giáp], [Hồi Phục], [Hồi Aether], [Tương Tác: Minh Đăng].
  * Logic:
    * Cost: 25 Aether. Cooldown: 1 Turn.
    * Hiệu ứng Bản thân:
@@ -813,7 +804,6 @@ CHIẾN THUẬT:
      * Check: Phe mình có đang sở hữu Minh Đăng không?
      * Result: Nếu có \rightarrow Thời lượng tồn tại của Minh Đăng +1 Turn (Max Cap = 5 Turn).
 5. KỸ NĂNG 3: Minh Đăng Trấn Giới
- * Tags: [Chủ Động], [Địa Hình: Trung Tâm], [Triệu Hồi: Địa Vật], [Aura: Buff/Debuff], [Quy Tắc: Tranh Chấp], [Hồi/Trừ Aether].
  * Logic:
    * Cost: 25 Aether. Cooldown: 2 Turn.
    * Vị trí: Giữa ô số 2 (Phe ta) và ô số 2 (Phe địch).
@@ -835,7 +825,6 @@ CHIẾN THUẬT:
        * GĐ III: -50% Heal Taken, -2 Aether.
          (Không trừ Aether xuống dưới 0).
 6. ULTIMATE: Khai–Bế Thiên Nhãn
- * Tags: [Tự Động], [AOE: Toàn Sân], [Hồi Aether], [Khống Chế: Câm Lặng], [Buff: Sát Thương], [Debuff: Sát Thương Nhận].
  * Logic:
    * Trigger: Đầy Nộ (Auto-cast).
    * Hiệu ứng Tức Thời:
@@ -856,7 +845,6 @@ GHI CHÚ KỸ THUẬT (Dành cho Coder):
 [PRIME] HÓA THÂN HUYẾT CHỦ (Blood Avatar)
  * Class: Mage
 1. NỘI TẠI: Bất Nhiễm Huyết Chủ
- * Tags: [Nội Tại], [Bản Thân], [Quy Tắc Tối Thượng: Thần Tính], [Cơ Chế: Tăng Trưởng], [Quy Tắc: Tái Sinh].
  * Logic:
    * Thần Tính (Axiom):
      * Miễn nhiễm tuyệt đối: Không thể nhận Buff (kể cả có lợi như Shield, Haste) và Debuff (kể cả Khống chế, DOT) từ bất kỳ nguồn nào.
@@ -883,13 +871,11 @@ GHI CHÚ KỸ THUẬT (Dành cho Coder):
      * Mục tiêu nhận thêm +25% Sát thương từ các nguồn: Bleed (Chảy máu) và Execute (Kết liễu).
      * Tương tác đặc biệt với Skill 2 (Bị Câm lặng).
 3. ĐÁNH THƯỜNG: Huyết Đoạt
- * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Gắn Dấu Ấn], [Sát Thương Điều Kiện].
  * Logic:
    * Gây sát thương = 100% (WIL + ATK).
    * Gắn: +1 tầng Huyết Ấn.
    * Bonus: Nếu mục tiêu đang có [Bleed] \rightarrow Sát thương tăng +10%.
 4. KỸ NĂNG 1: Huyết Triều
- * Tags: [Chủ Động], [AOE: Đường Chéo], [Sát Thương Hỗn Hợp], [Debuff: Chảy Máu], [Gắn Dấu Ấn].
  * Logic:
    * Cost: 25 Aether.
    * Phạm vi: Quét 2 đường chéo (Ô 1-4-7 và 3-6-9). Tối đa 6 mục tiêu.
@@ -898,7 +884,6 @@ GHI CHÚ KỸ THUẬT (Dành cho Coder):
      * Áp dụng [Bleed] (Chảy máu) trong 2 Turn.
      * Gắn +1 tầng Huyết Ấn.
 5. KỸ NĂNG 2: Huyết Hải Lãnh Địa
- * Tags: [Chủ Động], [Địa Hình: Trung Tâm], [Aura: Toàn Sân], [Hồi Phục/Giảm Hồi Phục], [Khống Chế: Câm Lặng], [Giới Hạn: 1 Lần/Trận].
  * Logic:
    * Cost: 0 Aether. (Chỉ dùng được 1 lần duy nhất trong cả trận đấu).
    * Vị trí: Tại ô trung tâm (Giữa ô 2 ta và ô 2 địch).
@@ -912,12 +897,10 @@ GHI CHÚ KỸ THUẬT (Dành cho Coder):
      * Effect: Bị [Silence] (Câm lặng) ngay lập tức trong 1 Turn. (Mỗi mục tiêu chỉ bị 1 lần trong suốt thời gian Lãnh Địa tồn tại).
    * Quy tắc chồng lấn: Nếu phe mình đặt lại \rightarrow Ghi đè (Reset thời gian). Nếu phe địch đặt Lãnh Địa của họ \rightarrow Hai Lãnh Địa cùng tồn tại song song.
 6. KỸ NĂNG 3: Huyết Tế
- * Tags: [Chủ Động], [Bản Thân], [Tiêu Hao: Max HP], [Hồi Năng Lượng: Toàn Đội], [Lập Tức].
  * Logic:
    * Cost: 25 Aether + 10% Max HP (True Cost - Không thể bị chặn/giảm).
    * Hiệu ứng: Hồi ngay lập tức +15 Aether cho Toàn Bộ Đồng Minh (Trừ bản thân, vì bản thân tốn 25 để cast rồi).
 7. ULTIMATE: Huyết Hải Quy Tông
- * Tags: [Tự Động], [AOE: Toàn Sân], [Sát Thương Hỗn Hợp], [Quy Tắc: Kết Liễu], [Gắn Dấu Ấn].
  * Logic:
    * Trigger: Đầy Nộ (Auto-cast).
    * Sát thương: Gây 220% Sát Thương Đánh Thường lên toàn bộ kẻ địch.
@@ -988,7 +971,6 @@ Sau khi gây sát thương, nếu mục tiêu đang có ≥4 stack, áp thêm 1 
 55) [SSR] CHIẾN PHÁP SƯ – MỄ LỆ (Mili)
  * Class: Mage
 1. NỘI TẠI: Hào Quang Nhiệt Huyết
- * Tags: [Nội Tại], [Toàn Sân: Đồng Minh], [Buff: Giảm Sát Thương], [Quy Tắc: Cấm Hồi Sinh], [Quy Tắc: Cấm Bắt Hồn], [Không Thể Tẩy Xóa].
  * Logic:
    * Hiệu ứng Xuất Hiện (On-Deploy):
      * Ngay khi Mễ Lệ được triệu hồi ra sân, toàn bộ đồng minh hiện có nhận Buff: Giảm 20% Sát thương nhận vào.
@@ -1004,7 +986,6 @@ Sau khi gây sát thương, nếu mục tiêu đang có ≥4 stack, áp thêm 1 
    * Dùng pháp trượng (vật lý) gõ vào đầu địch.
    * Gây sát thương = 100% (WIL + ATK).
 3. KỸ NĂNG 1: Chiến Thuật Rút Lui
- * Tags: [Chủ Động], [Bản Thân], [Cơ Chế: Về Deck], [Giảm Cost], [Tiêu Hao: HP], [Điều Kiện: HP].
  * Logic:
    * Cost: 0 Aether.
    * Điều kiện: HP hiện tại \ge 20% Max HP. (Nếu thấp hơn không thể dùng).
@@ -1014,7 +995,6 @@ Sau khi gây sát thương, nếu mục tiêu đang có ≥4 stack, áp thêm 1 
      * Giảm 3 Cost triệu hồi cho chính cô ta trong lần ra sân kế tiếp.
    * Giới hạn: Dùng tối đa 3 lần/trận.
 4. KỸ NĂNG 2: Trượng Liệu Pháp
- * Tags: [Chủ Động], [Đa Mục Tiêu: Đồng Minh], [Hồi Phục], [Hiệu Ứng Trễ], [Scaling: Cost], [Tiêu Hao: Aether].
  * Logic:
    * Cost: 25 Aether.
    * Mục tiêu: Bản thân + 2 Đồng minh ngẫu nhiên.
@@ -1026,7 +1006,6 @@ Sau khi gây sát thương, nếu mục tiêu đang có ≥4 stack, áp thêm 1 
      * Ví dụ: Hồi lần 1 được 1000 HP. Cost hiện tại là 15 \rightarrow Lần 2 hồi 150 HP (15% của 1000).
    * Cơ chế: Tính là 2 lần hồi phục riêng biệt (Kích hoạt các nội tại liên quan đến số lần hồi máu 2 lần).
 5. KỸ NĂNG 3: Chuyền Năng Lượng
- * Tags: [Chủ Động], [Đơn Mục Tiêu: Ngẫu Nhiên], [Hồi Aether], [Tiêu Hao: Aether (Toàn bộ)], [Cơ Chế: Tràn].
  * Logic:
    * Cost Kích Hoạt: 10 Aether (Cần tối thiểu 10 để bấm nút).
    * Hành động:
@@ -1038,7 +1017,6 @@ Sau khi gây sát thương, nếu mục tiêu đang có ≥4 stack, áp thêm 1 
      * Phần dư thừa sẽ tự động tìm 1 Đồng minh ngẫu nhiên khác để truyền tiếp.
      * Lặp lại cho đến khi hết lượng Aether cần truyền.
 6. ULTIMATE: Loạn Trượng Kích
- * Tags: [Tự Động], [Đơn Mục Tiêu], [Đa Hit], [Sát Thương Hỗn Hợp].
  * Logic:
    * Trigger: Kích hoạt khi đầy Nộ (Auto-cast).
    * Hành động: Thực hiện 3 lần Đánh thường liên tiếp vào 1 mục tiêu.
@@ -1085,11 +1063,9 @@ Nội tại: mỗi lần tấn công nhất định trúng mục tiêu dù mục
      * Cộng dồn: Cộng dồn tuyến tính với các skill giảm thương khác (Ví dụ: Skill giảm 20% + Nội tại này 5% = Giảm 25%).
      * Kháng: Không bị ảnh hưởng bởi Câm lặng, Cấm Buff hay Xóa Buff.
 2. ĐÁNH THƯỜNG: Thiết Quyền
- * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
  * Logic:
    * Gây sát thương = 100% (WIL + ATK) lên 1 kẻ địch.
 3. KỸ NĂNG 1: Tụ Khí Đan Điền
- * Tags: [Chủ Động], [Bản Thân], [Buff: Hiệu Suất Nộ], [Tiêu Hao: Aether], [Hiệu Ứng Trễ].
  * Logic:
    * Cost: 20 Aether.
    * Hiệu ứng:
@@ -1098,7 +1074,6 @@ Nội tại: mỗi lần tấn công nhất định trúng mục tiêu dù mục
    * Thời gian: Duy trì 3 Turn.
    * Mục đích: Bù đắp cho lượng Nộ bị trừ bởi Nội tại và giúp sạc Ult nhanh hơn.
 4. KỸ NĂNG 2: Bất Di Động
- * Tags: [Chủ Động], [Bản Thân], [Buff: Phòng Thủ], [Khống Chế: Khiêu Khích], [Tiêu Hao: Aether], [Lập Tức].
  * Logic:
    * Cost: 25 Aether.
    * Hiệu ứng:
@@ -1107,7 +1082,6 @@ Nội tại: mỗi lần tấn công nhất định trúng mục tiêu dù mục
    * Thời gian: Duy trì 3 Turn.
    * Thời điểm: Tác dụng ngay lập tức sau khi bấm skill.
 5. KỸ NĂNG 3: Huyết Khải Phản Hồi
- * Tags: [Chủ Động], [Bản Thân], [Buff: Hồi Phục Theo Hit], [Tiêu Hao: Aether].
  * Logic:
    * Cost: 20 Aether.
    * Cơ chế Hồi Phục (On-Hit Heal):
@@ -1119,7 +1093,6 @@ Nội tại: mỗi lần tấn công nhất định trúng mục tiêu dù mục
      * Ví dụ: Địch dùng skill đánh 3 hit \rightarrow Cương Nham hồi máu 3 lần (Tổng 10.5% Max HP).
      * Khắc chế: Cực mạnh khi đối đầu với các tướng đánh nhiều hit như Ngụy Thiên Sơ hay Mễ Lệ.
 6. ULTIMATE: Cương Nham Phá
- * Tags: [Tự Động], [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Đơn Hit: Cơ Chế].
  * Logic:
    * Trigger: Kích hoạt khi đầy Nộ (Auto-cast).
    * Sát thương: Gây sát thương cực lớn = 300% Sát Thương Đánh Thường (300% WIL + 300% ATK).
@@ -1136,7 +1109,6 @@ GHI CHÚ CHIẾN THUẬT:
  * Class: Mage.
  * Cost Tổng: 24 (Chia làm 2 thẻ, mỗi thẻ 12 Cost).
 1. NỘI TẠI: Song Hồn Đồng Điệu
- * Tags: [Nội Tại], [Cơ Chế: Tách Deck], [Cơ Chế: Đồng Bộ], [Debuff: Mất Lượt], [Quy Tắc: Chia Sẻ Tài Nguyên].
  * Logic:
    * Biến Đổi Deck (Deck Rule):
      * Khi đưa đơn vị này vào đội hình, Deck sẽ có 11 Thẻ (thay vì 10).
@@ -1152,12 +1124,10 @@ GHI CHÚ CHIẾN THUẬT:
    * Chia Sẻ Aether:
      * Nếu Skill tiêu tốn Aether, nó chỉ trừ 1 lần cho người Cast chính (Active Caster). Tuy nhiên, nếu có cơ chế trừ Aether từ kẻ địch đánh vào, cả 2 cùng chịu chung số phận.
 2. ĐÁNH THƯỜNG: Song Tinh Kích
- * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Thường].
  * Logic:
    * Solo: Gây sát thương = 100% (WIL + ATK) lên 1 kẻ địch.
    * Đồng Bộ: Nếu cả 2 cùng đánh thường vào 1 mục tiêu (hiếm khi xảy ra trừ khi có cơ chế ép đánh), sát thương là 200%.
 3. KỸ NĂNG 1: Hỏa Cầu Kép
- * Tags: [Chủ Động], [Đa Mục Tiêu], [Ngẫu Nhiên: Kẻ Địch], [Sát Thương Hỗn Hợp], [Tiêu Hao: Aether], [Đồng Bộ: Cường Hóa].
  * Logic:
    * Cost: 25 Aether.
    * Cơ chế Solo: Tạo 2 quả cầu lửa tấn công 2 mục tiêu ngẫu nhiên. Mỗi quả gây 100% Sát Thương Đánh Thường (100% WIL + 100% ATK).
@@ -1166,7 +1136,6 @@ GHI CHÚ CHIẾN THUẬT:
      * Sát thương lên mỗi mục tiêu = 200% Sát Thương Đánh Thường.
      * Người Cast phụ bị mất lượt sau đó.
 4. KỸ NĂNG 2: Địa Châm Đột Kích
- * Tags: [Chủ Động], [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Sát Thương Dồn], [Tiêu Hao: Aether], [Đồng Bộ: Cường Hóa].
  * Logic:
    * Cost: 20 Aether.
    * Cơ chế Solo: Triệu hồi gai đất đâm 1 mục tiêu. Gây 150% Sát Thương Đánh Thường.
@@ -1175,7 +1144,6 @@ GHI CHÚ CHIẾN THUẬT:
      * Tổng sát thương = 300% Sát Thương Đánh Thường.
      * Người Cast phụ bị mất lượt sau đó.
 5. KỸ NĂNG 3: Linh Lực Hộ Thân
- * Tags: [Chủ Động], [Bản Thân], [Hồi Phục], [Buff: Phòng Thủ], [Tiêu Hao: Aether], [Đồng Bộ: Lan Tỏa].
  * Logic:
    * Cost: 20 Aether.
    * Cơ chế Solo:
@@ -1187,7 +1155,6 @@ GHI CHÚ CHIẾN THUẬT:
      * \rightarrow Kết quả: Cả 2 chị em đều được hồi máu và tăng thủ.
      * Người Cast phụ bị mất lượt sau đó.
 6. ULTIMATE: Thiên Thạch Hủy Diệt
- * Tags: [Tự Động], [AOE: Toàn Sân], [AOE: Cố Định], [Sát Thương Hỗn Hợp], [Đồng Bộ: Hợp Nhất], [Reset Nộ].
  * Logic:
    * Trigger: Đầy Nộ (Auto-cast) hoặc khi người chị em còn lại vừa được triệu hồi ra sân.
    * Cơ chế Solo (Chỉ 1 người trên sân):
