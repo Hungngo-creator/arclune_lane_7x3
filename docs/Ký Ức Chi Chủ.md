@@ -1,4 +1,4 @@
-# HOÁ THÂN KÝ ỨC CHI CHỦ
+# HOÁ THÂN KÝ ỨC CHI CHỦ, Memento
 ## Prime / Mage — Chuẩn hóa Legacy Kit
 
 **Rank:** Prime. **Class:** Mage. **Element:** chưa gắn cố định; Effective Element về sau có thể do build/Công Pháp quyết định. **Axiom:** Thần Tính. **Authority chính:** Quy Tắc.

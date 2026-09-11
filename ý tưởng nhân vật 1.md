@@ -1616,12 +1616,11 @@ def onFusionEnd(owner):
 
 Chú thích: Các nhân vật thuộc bậc Prime nếu là hoá thân của thần nên có thần tính: thần tính: không thể hồi sinh, không nhận bất kỳ buff hay debuff, kĩ năng/đánh thường/nội tại/ult đều không thể cướp, xoá bỏ, lãng quên hay sao chép.
 
-22) [PRIME] HÓA THÂN: KÝ ỨC CHI CHỦ
+22) [PRIME] HÓA THÂN: KÝ ỨC CHI CHỦ, Memento
  * Class: 
  * Role: Ruleset Manipulator (Thao túng quy tắc), Skill Denier (Cấm chiêu), Self-Sustain (Tự duy trì qua Time-loop).
  * Cost: 22 (1 lần duy nhất). Flag: UNREVIVABLE.
 1. NỘI TẠI: Quy Tắc – Quên Lãng Vô Hình
- * Tags: [Nội Tại], [Quy Tắc: Quên Lãng], [Quy Tắc: Chân Ngã], [Miễn Nhiễm Tuyệt Đối].
  * Logic:
    * Quên Lãng (Forget): Khi gây sát thương, có 75% tỷ lệ áp dụng:
      * 15%: [Quên Ultimate] (Khóa Auto-cast Nộ lượt sau).
@@ -1631,17 +1630,14 @@ Chú thích: Các nhân vật thuộc bậc Prime nếu là hoá thân của th�
      * Không thể bị Cướp/Xóa/Sao chép.
    * Ký Ức Vĩnh Cửu: Mỗi khi kết thúc lượt hành động của bản thân, tự động Truy Hồi (Hồi phục) 5% Max HP. (Thay thế cho regen từ đồng đội).
 2. ĐÁNH THƯỜNG: Trích Ảnh Trảm
- * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Tầm Xa].
  * Logic: Gây sát thương 100% (WIL + ATK) lên 1 kẻ địch ngẫu nhiên. Kích hoạt Nội tại Quên Lãng.
 3. KỸ NĂNG 1: Pháp Tắc – Bản Tôn Giáng Ảnh
- * Tags: [Chủ Động], [Cường Hóa Ult], [Phạt: Max Aether].
  * Logic:
    * Cost: 0 Aether.
    * Hiệu ứng: Ult tiếp theo tăng sát thương lên 150% – 270%.
    * Cái giá: Giảm vĩnh viễn 20% Max Aether (Không hoàn lại).
    * Cơ chế: Hiệu ứng cường hóa mất sau khi tung Ult thành công.
 4. KỸ NĂNG 2: Vô Danh Chi Thân
- * Tags: [Chủ Động], [Trạng Thái: Ẩn Ảnh], [RNG], [Kích Hoạt Đánh Thường].
  * Logic:
    * Cost: 30 Aether. Cooldown: 3 Lượt.
    * Roll 50/50:
@@ -1649,7 +1645,6 @@ Chú thích: Các nhân vật thuộc bậc Prime nếu là hoá thân của th�
      * Ẩn Ảnh Quần: Miễn nhiễm đòn AOE (2 Lượt).
    * Hành động: Đánh thường 1 cái ngay lập tức.
 5. KỸ NĂNG 3: Quy Tắc – Phủ Nhận Thương Tổn (Thay cho Ô Nhiễm Ký Ức)
- * Tags: [Chủ Động], [Khiêu Khích], [Quy Tắc: Truy Hồi Ký Ức], [Hồi Phục].
  * Mô tả Lore: Hắn xóa bỏ ký ức về việc mình bị thương khỏi tâm trí của thực tại. Nếu không ai nhớ hắn bị thương, nghĩa là hắn chưa từng bị thương.
  * Logic:
    * Cost: 25 Aether. Cooldown: 4 Lượt.
@@ -1659,7 +1654,6 @@ Chú thích: Các nhân vật thuộc bậc Prime nếu là hoá thân của th�
      * Hồi phục ngay lập tức 30% Max HP. (Không cần điều kiện máu thấp, vì Prime cần chủ động).
      * Nếu đang có [Bản Tôn Giáng Ảnh] (Skill 1 active), lượng hồi phục tăng lên 50% Max HP.
 6. ULTIMATE: Vô Tự Minh Quyển
- * Tags: [Tự Động], [AOE], [Sát Thương Biến Thiên], [Trigger Passive].
  * Logic:
    * Tự động cast khi đầy Nộ.
    * Sát thương ngẫu nhiên 100% – 180% (WIL + ATK) lên mỗi kẻ địch.
@@ -1683,8 +1677,6 @@ GIẢI THÍCH SỰ THAY ĐỔI & CÂN BẰNG
  * Role: Max HP Manipulator (Thao túng giới hạn máu), Leader Buffer, Field Enchanter.
  * Cost: 22 (1 lần duy nhất). Flag: UNREVIVABLE (Không thể hồi sinh).
 1. NỘI TẠI: Quy Tắc – Mẫu Thần Bất Diệt
- * Tags: [Nội Tại], [Buff: Bất Khuất], [Quy Tắc: Chân Ngã], [Quy Tắc: Trao Hoán].
- * Logic:
    * Hộ Ấn Bất Khuất:
      * Trigger: Ngay khi vào sân.
      * Effect: Ban hiệu ứng [Bất Khuất] (Indomitable) cho Bản thân và Leader.

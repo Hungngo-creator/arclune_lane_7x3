@@ -2388,7 +2388,7 @@ Bộ kit này không cần buff thêm. Với tăng chỉ số theo chỉ số hi
 
 ultimate: triệu hồi 3 trụ đá ngẫu nhiên (không thể trùng, nếu không đủ 3 kẻ thù chỉ triệu hồi 2 hoặc 1 trụ đá theo trường hợp) tấn công mục tiêu từ dưới chân chúng, gây sát thương bằng 1 đánh thường của bản thân/mỗi kẻ bị trụ đá tấn công, khiến chúng bị hất tung trong 1s, sau 1s, chúng rơi xuống vị trí cũ, nhận sát thương chuẩn = 3% max hp của bản thân chúng, ultimate này đối class tanker cao hơn bản thân không thể hất tung, phần sát thương 1 đánh thường tanker địch vẫn nhận nhưng hất tung và sát thương chuẩn sẽ không nhận (nếu tanker rank cao hơn bản thân), ultimate chọn target cũng ưu tiên mục tiêu không phải class tanker.
 
-76) Luân Hồi Chi Chủ
+76) Hoá Thân của Luân Hồi Chi Chủ
 Prime, Mage
 nội tại: khi 1 đồng minh hoặc kẻ thù vào luân hồi, tạo 1 kén, kén đó tồn tại trong 1 turn boundary của Luân Hồi Chi Chủ, có hp = 80% max hp của hắn, kén giảm 65% mọi sát thương nhận vào từ mọi nguồn trừ sát thương chuẩn, sau 1 turn kén sẽ nở, nở ra 1 nhân vật mới có ngoại hình bất kỳ nhân vật nào có trong collection trừ ngoại hình của những nhân vật tham gia/tồn tại ở deck trong trận đấu đó, nhân vật mới đó sẽ thuộc về phe đồng minh của luân hồi chi chủ (kén từ nội tại này cũng tồn tại trên sân thuộc phe của hắn) bất kể chân ngã của kén đó trước khi chết thuộc về phe nào, nhân vật mới sẽ có 3 giai đoạn, ngoại hình của nhân vật mới đó sẽ không thay đổi theo giai đoạn.
 Giai đoạn I, Ấu Niên: thừa hưởng 30% mọi chỉ số, nội tại, rank, đánh thường và ultimate và class thuộc chân ngã của bản thân từ đời trước trừ 3 skill của họ, ở giai đoạn này họ không thể dùng skill.

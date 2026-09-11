@@ -3,7 +3,16 @@ Cố Sự Chi Thần là một char đặc thù, là bài test cho kernel và h�
 
 2) 
 
-SR,
+nội tại: mỗi lần dùng skill hay ultimate heal cho đồng minh bằng natural Action bằng kit của bản thân, giáng 1 cột sáng từ trên trời xuống mọi target nhân vật này gây sát thương bằng natural Action lên ở 1 natural Action trước lần heal đó.
+mỗi natural Action chỉ kích hoạt nội tại này 1 lần.
+sát thương từ cột sáng bằng 100% wil và atk của nhân vật này/cột, không code sát thương cột sáng = sát thương của đánh thường dù chúng có hệ số sát thương giống nhau ở mô tả.
+mỗi lần nội tại kích hoạt cap tối đa 7 cột sáng, nếu natural Action trước khi kích hoạt nội tại gây sát thương lên nhiều hơn 7 target, cột sáng random, cột sáng tính là follow up của natural Action kích nội tại, ví dụ: gây aoe toàn sân nhưng trúng 8 target, natural Action tiếp theo heal cho ally vừa gây sát thương từ nội tại lên 7 target cùng lúc.
+trên lý luận char này có thể kích hoạt nội tại mỗi natural Action nhưng hắn sẽ chỉ có 1 skill/ult gây sát thương, muốn kích hoạt nội tại ở natural Action tiếp theo cần heal cho ally bởi kit của bản thân nên nội tại không thể kích hoạt mãi.
+nội tại chỉ kích hoạt lên những kẻ char này gây Actual HP Damage, nếu có tấn công như không làm đối phương mất hp thực sự bằng natural Action thì target đó chưa hợp lệ với nội tại.
+
+
+
+
 
 3)
 phân tích kỹ hơn nằm ở docs/Chuẩn hoá và gắn tag kit/warrior_stance_execute_analysis.md
@@ -25,11 +34,10 @@ mục đích thiết kế là 1 char có sát thương không quá cao mà chỉ
 ultimate: gây aoe toàn sân (max 9 target), mỗi kẻ nhận sát thương = 185% wil và 185% atk của bản thân nhân vật này, sau khi gây sát thương xong nếu trong target có summon không có chân ngã nhưng có hp bar và hp của chúng dưới hoặc= 10% max hp của bản thân chúng, lập tức DEATH_CONFIRMED, hiệu ứng này chỉ target summon có rank bằng hoặc thấp hơn nhân vật này.
 (tránh kill vật chứa của cố sự chi thần hoặc case tương tự), tỉ lệ sát thương này cũng không phải thấp đối với summon, nhiều khi không cần kết liễu là đã chết rồi, nếu kích hoạt kết liễu summon thì 2 bên player chỉ thấy summon nhận ultimate này rồi summon DEATH_CONFIRMED, tức quá trình nhận sát thương nếu đủ điều kiện kết liễu thì kết liễu trong natural Action của nhân vật này luôn, tao muốn không có delay về mặt hiển thị.
 
-5) Đế Hoài An
+5) Đế Hoài An/ Di Huai'an
 
 không thể không ma hoá
 
-6
 
 nội tại: mỗi natural Action gồm skill/đánh thường/ultimate đều sẽ gắn 1 mark Đóng Băng lên mục tiêu, khi đạt đủ 3 mark trên target, lập tức đóng băng target, họ không thể thực thi natural Action trong 1 turn của bản thân họ, ngay khi vfx đóng băng kích hoạt, tức vừa xoá 3 mark đóng băng để kích hoạt đóng băng, 5 thanh băng kiếm từ góc nghiêng 60 độ trước mặt mục tiêu sẽ xuất hiện, đâm về phía mục tiêu, gây sát thương = 150% đánh thường của nhân vật này, số lượng băng kiếm không quan trọng, chỉ là hiển thị thôi, quan trọng là nội tại này lấy chỉ số từ đánh thường, nếu sát thương đánh thường tăng thì nội tại sẽ tăng sát thương, mark đóng băng và hiệu ứng đóng băng khi kích hoạt mark thuộc cấp pháp tắc, đâg đơn giản là một loại stun thôi. mỗi mark có time tồn tại riêng = 2 turn boundary của nhân vật này.
 
@@ -50,7 +58,9 @@ ultimate: cưỡng chế rút hp = 3% max hp của mỗi kẻ địch trên sân
 
 nội tại: mỗi khi DEATH_CONFIRMED, vào luân hồi ngay và bỏ qua cửa sổ chờ luân hồi, không vào cửa sổ chờ nên không ảnh hưởng các chân ngã trong đó,
 
-9) Hà Tích Hương
+9) Hà Tích Hương/ Bellatrix/ He Xixiang
+何惜香
+
 Nữ, warrior
 
 Nội tại, Tinh Vẫn Thần Quyền: mỗi đánh thường và skill gắn 1 mark 'Tinh Vẫn' lên target, khi đạt 3 mark trên target, tinh không xuất hiện sao băng (animation) tấn công target, gây sát thương = 150% will và atk của mark owner lên target, if target hp < 10% max hp, execute now, sau khi kích hoạt mark sẽ biến mất.
@@ -176,14 +186,14 @@ cái nội tại này làm các kit revive bình thường bất lực vì kit l
 
 skill 1: gây sát thương
 
-17) Meleora Vell
+17) Meleora
 Nguồn: Meleager.
 Đây là một trong những reference tao thích nhất.
 Trong thần thoại Hy Lạp, sinh mạng của Meleager được gắn trực tiếp với một khúc gỗ đang cháy: chừng nào nó chưa cháy hết thì ông còn sống. Mẹ ông lấy khúc gỗ ra khỏi lửa và cất đi.
 
 nội tại: vào sân sẽ có 1 khúc gỗ cũng vào sân, khúc gỗ có hp bar, mỗi natural Action của nhân vật này khúc gỗ mất 10% hp của bản thân nó, sát thương nó nhận vào tối đa là 20% max hp của bản thân khúc gỗ, khúc gỗ không có chân ngã, vfx là nó luôn cháy hừng hực, cap heal lên khúc gỗ mỗi lần nó nhận heal từ natural Action của đồng minh là 30% max hp của khúc gỗ, khúc gỗ không nhận heal ngoài natural Action của đồng minh (nhiều khi kit của kẻ thù cũng có heal nữa nên cần miêu tả rõ). nhân vật này không thể DEATH_CONFIRMED trừ phi khúc gỗ hp về 0, hắn sẽ luôn còn tối thiểu 1 hp, buff execute của kẻ thù vẫn kích hoạt như hắn sẽ fatal, không DEATH_CONFIRMED, khúc gỗ không nhận buff hay debuff, mọi debuff và buff sẽ bỏ qua nó.
 
-18) Vidara Veyl
+18) Vidara
 Nguồn: Víðarr.
 Một vị thần Bắc Âu cực ít lời nhưng có một mục tiêu duy nhất: trả thù cho Odin. Trong Ragnarök, Fenrir nuốt Odin và Víðarr xuất hiện để giết Fenrir; biểu tượng đặc biệt của ông là chiếc giày được chuẩn bị từ những mảnh da tích lũy qua thời gian.
 
@@ -192,13 +202,21 @@ nội tại: mỗi turn boundary không nhận bất kỳ sát thương từ nat
 hắn vẫn sẽ mạnh nhưng tròn 1 trận đấu max rage = 0 và ultimate liên tục là không thể nào.
 
 19) Ariadne Velora
-
-Nguồn: Ariadne.
+Raw kit, bản canon ở docs/canon kit/Ariadne_Velora_Clarified_Gameplay_Canon.md.
+bản raw kit này vẫn có giá trị, giá trị ở chênh lệch giữa raw và canon.
 
 nội tại: khi ra sân sẽ đánh dấu vị trí nàng đứng trong 3 natural Action, bộ đếm bắt đầu đếm ở natural Action tiếp sau sau khi đánh dấu, sau 3 natural Action đó đánh dấu vị trí sẽ biến mất và đánh dấu lần nữa ở vị trí nàng đang đứng và bắt đầu di chuyển, trước natural Action tiếp theo sẽ lùi lại 1 bước sau đó mới bắt đầu natural Action, nếu không thể lùi thì sang phải hoặc trái, nếu đều không thể thì dịch chuyển đến vị trí ngẫu nhiên còn trống trên sân đồng minh, nếu đầy sân thì đứng tại chỗ và không đi đâu, nàng chỉ có thể di chuyển khi đã đánh dấu và đứng trên vị trí đã đánh dấu, mode chess/monopoly/turn base đều có ô, hiện tập trung vào turn base.
 kỳ vọng là nàng ra sân, đánh dấu ngay, trước natural Action tiếp theo thì di chuyển sau đó thực thi natural Action rồi đứng im đó vì nàng không thể đổi vị trí bằng nội tại được vì nàng không đứng trên ô đánh dấu, khi đánh dấu ở vị trí cũ mất, nàng đánh dấu ngay ở ô hiện tại và lại di chuyển ngay trước natural Action tiếp theo. có lẽ cap time tồn tại đánh dấu 3 natural Action turn là hơi dài, sẽ thay đổi sau test, nếu nàng là leader khi bị đưa vào đấu thú trường thì nàng vẫn có thể đánh dấu và di chuyển.
 
-ultimate: chuyển 1 đồng minh vào vị trí đã đánh dấu bằng nội tại, thứ tự ưu tiên là trái> phải > trước> sau, không thể target leader, nếu chỉ có thể chọn leader thì nàng sẽ không chuyển, chuyển sang gây sát thương lên 2 kẻ địch ngẫu nhiên, mỗi kẻ nhận 185% wil và atk.
+skill 1: mỗi khi di chuyển vị trí (bằng nội tại hoặc kit khác, có thể là không gian chi chủ của kẻ thù), heal cho leader = 100% wil/atk + 10% max hp của bản thân, overheal nếu có sẽ được chuyển toàn bộ thành khiên cho nàng, mỗi lần tự kích hoạt không tốn natural Action sẽ -15 ae.
+
+skill 2: mỗi khi đồng minh (chỉ đồng minh, ví dụ như ultimate của nàng, bản thân nàg đổi vị trí cũng không tính, ví dụ như nội tại) đổi vị trí (nhờ bản thân nàng hoặc kit của đồng minh lẫn kẻ thù) thì nhân vật này được tăng 5% max hp tính theo lúc kích hoạt, mỗi turn boundary kích hoạt tối đa 5 lần, nếu đồng minh bị đổi vị trí hơn 1 char trong 1 lần thì vẫn chỉ tăng 5% max hp, mỗi lần tự kích hoạt -10 ae.
+
+khá hợp nếu phe địch có không gian chi chủ, hắn dùng skill sẽ thay đổi vị trí đồng minh của nàng và nàng sẽ hưởng lợi từ skill 2, đây cũng coi là khắc chế.
+
+skill 3: gây sát thương aoe ngẫu nhiên lên 3 mục tiêu kẻ thù trên sân, mỗi kẻ nhận 150% wil/atk của nàng, skill này tất trúng, nếu target có kit kiểu đổi vị trí khi dính sát thương thì vẫn trúng, 20 ae.
+
+ultimate: chuyển 1 đồng minh vào vị trí đã đánh dấu bằng nội tại, thứ tự ưu tiên là trái> phải > trước> sau, không thể target leader, nếu chỉ có thể chọn leader thì nàng sẽ không chuyển, chuyển sang gây sát thương lên 2 kẻ địch ngẫu nhiên, mỗi kẻ nhận 195% wil và atk.
 nếu nàng ra sân thì quy trình là: đánh dấu > di chuyển > dùng ultimate (vì ra sân sẽ tự đầy rage và dùng ult), quá trình này sẽ rất nhanh, nhân vật này ra sân đầu tiên sẽ phế, đầy sân cũng phế cái nội tại.
 ví dụ nàng ra sân ở ô 2, ô 5 không ai, nàng lùi sang ô 5 và ultimate, nàng chuyển vị trí của đồng minh theo thứ tự ultimate đã mô tả, nếu ra sân đầu tiên thì chỉ có nàng và leader đứng sau lưng nàng ở ô 8 nên nàng sẽ gây sát thương theo mô tả của ult, nếu lúc đó ô 4/6 đều có người thì nàng sẽ chuyển char ở ô 4 sang ô đã đánh dấu là ô 2 vì tuân theo mô tả ult.
 vấn đề là khi chuyển 1 char đồng minh sang ô đánh dấu thì đánh dấu có mất không? cap 3 natural Action quá dài, tao nghĩ giảm là hợp lý, cap vẫn là 3, nhưng khi có 1 đồng minh không phải nàng đứng trên ô đã đánh dấu (không quan trọng họ đứng đó có phải do nàng hay không) thì cap sẽ giảm 1, thực tế là nàng ultimate xong nếu không ai đứng ô đánh dấu thì đến cuối natural Action tiếp theo của nàng cap time của đánh dấu mới giảm 1, nếu có đồng minh đứng lên đánh dấu thì giảm là 2, vậy đi cho dễ hiểu.
@@ -213,4 +231,339 @@ Character có thể “kéo” một đồng minh đã chết về.
 nội tại: khi đồng minh được hồi sinh bằng kit của nhân vật này xuất hiện ở ô trước mặt hắn, hắn và đồng minh đó mỗi natural Action của bản thân đều sẽ mất vĩnh viễn (trong trận) 20% max hp, khi max hp = 0, lập tức vào luân hồi, bỏ qua cửa sổ chờ luân hồi.
 trước mặt: hắn đứng ô 1/2/3, an toàn, trước mặt là 3 ô trung lập và 9 ô của kẻ thù.
 đứng ô 4/5/6: ô 1/2/3 là trước mặt.
-ô 7/8/8 thì 1 đến 6 là trước mặt
+ô 7/8/8 thì ô 1 đến 6 là trước mặt.
+
+
+20) Tithonus
+một sinh vật tham lam tôn thờ tà thần, hắn muốn bất tử và hắn nhận được.
+hắn lên kế hoạch hiến tế cả toà thành trì, triệu hồi hắn Chủ.
+"ta muốn bất tử thưa Đấng vĩ đại!" hắn cuồng nhiệt nói.
+"như ngươi muốn, tín đồ trung thành của ta".
+
+nội tại: mỗi natural Action, max hp giảm 5%, không reset khi hồi sinh, khi max hp về 0, vào luân hồi, bỏ qua hàng chờ.
+mỗi natural Action cũng đồng thời hồi hp = 5% max hp, hp max giảm trước hồi sau.
+
+skill 1: khi hp dưới hoặc = 15% max hp, chuyển đổi thành Huyết tộc, nội tại giảm max hp biến mất, sát thương gây ra từ đánh thường và skill tăng 10%, cũng hồi hp = 35% tổng sát thương mỗi natural Action skill và đánh thường gây ra, 35 ae, kích hoạt mỗi trận 1 lần, skill này chỉ có thể kích hoạt khi đáp ứng điều kiện hp và Tithonus cần tồn tại trên sân tối thiểu 3 turn boundary của hắn, skill cần tốn 1 natural Action để kích hoạt. sau khi chuyển đổi tăng max hp = (max hp hiện có + hp hiện có)/2.
+natural Action > +1 turn boundary> natural Action > + 1 turn boundary, lặp lại cho đến khi đạt 3 turn boundary và hp hắn cần dưới hoặc = 15% max hp.
+
+"hắn lừa ta, đã vậy thì tín ngưỡng 1 cái khác thần chính là, không có vấn đề" Tithonus một mặt âm trầm nói.
+
+ultimate:
+
+21) Kairos
+
+nội tại: khi leader địch có hp dưới hoặc = 50% của hắn, Kairos chuyển target đánh thường/skill/ult sang leader địch, nếu leader địch có hp hơn hoặc = 51% thì Kairos vẫn theo ssi như bình thường.
+
+
+22) Lethe
+
+Tên của một con sông và khái niệm lãng quên trong Hades.
+
+là hoá hình của dòng sông ký ức, có quan hệ không rõ với ký ức chi chủ, có lẽ Lethe liền là ký ức chi chủ?
+
+Lethe là một phân thân, nước cờ của ký ức chi chủ, trong lore thì không ai biết cả.
+
+23) Neria
+
+hàng chờ luân hồi là nơi chuẩn bị đầu thai, các chân ngã sẽ được cho uống nước của Lethe nhằm gội rửa ký ức, Neria đã té vào sông, nàng lại không uống ngụm nào, bằng cách nào đó nàng vẫn tỉnh táo và trở lại hiện thế.
+
+24) Nerissa
+
+skill 1: nàng cast 1 skill gây damage của đồng minh, nàng lấy mô tả skill của đồng minh để gây sát thương nhưng nguồn sát thương là nàng, các skill kiểu gây sát thương có 50% là chuẩn, kèm debuff này kia thì phần sát thương chuẩn nàng hưởng nhưng debuff/buff/mark, heal cho ally/bản thân hay leader đều không hưởng, cost biến động theo mô tả của kit lấy được, cost cũng giữ nguyên, pool là động, chỉ cast skill đủ điều kiện để cast.
+
+25) Vermillion
+
+nội tại: mỗi turn boundary mất hp = 3% max hp, nhận 1 stack "hoả tước", khi dùng skill và ultimate hoả tước bị tiêu hao, mỗi stack bị tiêu hao skill/ult gây ra sát thương có 10% là sát thương chuẩn, mỗi stack tiêu hao cũng tăng vĩnh viễn (trong trận, không reset khi được revive) 3% wil và 3% atk bản thân hiện có ở lúc tiêu hao stack, không giới hạn chỉ số nhận được từ nội tại, nếu hp dưới hoặc = 15% trong turn boundary thì không nhận stack hoả tước.
+ví dụ nếu có 2 stack > sài skill 1 > gây sát thương = 120% wil/atk và 30% wil/atk là sát thương chuẩn.
+
+skill 1: chưởng ra 3 hoả cầu gây sát thương lên 3 target ngẫu nhiên, mỗi target nhận sát thương = 150% wil và 150% atk, 20 ae.
+
+skill 2: nếu Vermillion có hp hơn hoặc = 80% max hp, lượng stack nhận ở turn boundary từ nội tại tăng gấp đôi, tự kích hoạt khi đạt điều kiện, mỗi turn boundary tiêu hao 7 ae.
+
+skill 3: đứng tại chỗ triệu hồi 1 chu tước hư ảnh sau lưng (vfx), Vermillion phun lửa gây sát thương ô 1/4/7, 2/5/8 hoặc 3/6/9 tuy vị trí đứng, theo ssi, kẻ đầu tiên nhận sát thương = 160% wil/atk của Vermillion, nhận debuff "thiêu đốt" trong 2 natural Action của kẻ đó, kẻ sau lưng kẻ nhận sát thương đầu tiên nhận sát thương = 125% wil/atk của Vermillion và nhận 1 debuff thiêu đốt, kẻ cuối cùng nhận sát thương = 50% wil/atk của Vermillion, không nhận debuff thiêu đốt.
+nếu gây sát thương được 3 ô mà chỉ có 2 kẻ trúng thì kẻ đầu nhận 160%, kẻ sau nhận 125%, không có kẻ thứ 3, dễ hiểu thôi, với mỗi kẻ nhận sát thương từ skill này cost -12 ae.
+tình huống có 1 hoặc 2 kẻ thù là lời cost nhất, stack nội tại là buff cả skill trong 1 natural Action chứ không phải buff đơn lẻ trên mỗi lần gây sát thương, nên kẻ nhận sát thương đầu tiên, thứ 2 lẫn 3 đều sẽ nhận sát thương chuẩn tương ứng stack "hoả tước" tiêu hao, skill 1 cũng thế.
+debuff thiêu đốt của Vermillion: cấp pháp tắc, mỗi natural Action của kẻ dính debuff này nhận sát thương chuẩn = 3% max hp của chúng, hiệu ứng xoá debuff dưới cấp pháp tắc không thể xoá debuff này, hiệu ứng xoá cấp pháp tắc cần phán định.
+kỳ thực tao muốn game chỉ có 1 vài tag dot, độc/cháy máu/cháy hay thiêu đốt bản chất đều là dot, chỉ khác ở mặt hiển thị thôi.
+
+ultimate: cast skill 3 không tốn cost, lần này chu tước hư ảnh cũng phun lửa, sát thương của skill 3 cast bởi ultimate này hiệu ứng chuyển sát thương chuẩn của hoả tước từ nội tại tăng từ 10% lên 20%/stack, hệ số sát thương tăng từ 160%/125%/50% lên 200%/145%/60%, vậy nếu có 3 kẻ địch đều trúng, chúng nhận 200% atk/wil cùng 20% sát thương chuẩn mỗi stack hoả tước tiêu hao, tạm bỏ qua phần kẻ trúng thứ 2 và 3 cho dễ ví dụ, hệ số gây sát thương vẫn là 200% nha, không phải nhận sát thương là 200% wil và 200% atk của nhân vật này rồi nhận thêm 1 đợt sát thương chuẩn mà là mix sát thương wil/atk lẫn sát thương chuẩn, nếu tiêu hao 1 stack hoả tước khi dùng ult cast skill 3 thì kẻ đầu tiên dính nhận 160% wil + 160% atk (không sát thương chuẩn) + 40% wil và 40% atk của Vermillion dưới dạng sát thương chuẩn
+vậy hệ số sát thương là 200% nhưng 20% của 200% đó là 40% wil và atk bỏ qua res và arm thôi vì là sát thương chuẩn.
+
+26) Pygmalion
+
+nội tại: khi ra sân tạo 1 con rối, nó có rank bằng rank của nhân vật này, rage max là 100, rage = 0, mọi chỉ số được rank multi scale sẽ = 80% của nhân vật này, mọi chỉ số không được rank multi scale sẽ = 0, tu vi của con rối cũng = nhân vật này, con rối sẽ hành động theo ssi và chỉ đánh thường, ultimate cũng sẽ tiêu hao rage nhưng nó chỉ đánh thường mà không tăng bất kỳ sát thương nào.
+đánh thường của con rối: gây sát thương= 100% wil/atk của bản thân tức = 80% của Pygmalion.
+
+khi một chân ngã rời hàng chờ và vào luân hồi, chân ngã đó đầu thai vào con rối của Pygmalion, chân ngã không phân phe địch ta, con rối sẽ có kit của một nhân vật ngẫu nhiên có rank = rank của con rối trong roster, lúc đó nó hoàn toàn có kit của nhân vật đó, không thể đầu thai thành nhân vật đã có trong trận đấu (deck lẫn trên sân và chân ngã đang ở hàng chờ luân hồi), nhưng có thể đầu thai thành 1 nhân vật đã vào luân hồi trong sân nhưng không thể đầu thai thành đời trước của bản thân, tóm lại chỉ là thay đổi kit khi có chân ngã đầu thai vào, không có tăng chỉ số, ngoại hình con rối giữ nguyên, hành động khi dùng skill/ult/đánh thường/nội tại tuân theo hành động mà nhân vật nó có kit sẽ làm khi dùng skill/đánh thường/ultimate/kích hoạt nội tại nếu có, hiệu ứng và giọng nói cũng thế, chỉ có không đổi ngoại hình thôi.
+đầu thai vào con rối > ra kit random (pool có hạn chế) > thừa hưởng toàn bộ kit/voice/animation, hiệu ứng khi action, chỉ là ngoại hình không thay đổi và chỉ số theo Pygmalion, hơn nữa chỉ số của con rối đầu tiên snapshot theo Pygmalion lúc đầu trận, nêú chỉ số của Pygmalion biến động thì chỉ số của con rối cũng sẽ không thay đổi theo, con rối không bị ảnh hưởng bởi DEATH_CONFIRMED của Pygmalion bất kể con rối có được chân ngã đầu thai vào hay không.
+nếu con rối DEATH_CONFIRMED mà không có chân ngã: biến mất, Pygmalion không thể tạo con rối khác trừ phi bước vào chu kỳ sống mới qua revive, nếu con rối đã có chân ngã thì con rối biến mất, chân ngã vào hàng chờ luân hồi như bình thường và có thể đầu thai vào con rối lần nữa nếu không bị luân hồi chi chủ ảnh hưởng, Pygmalion vẫn cần bắt đầu 1 chu kỳ sống khác để tạo con rối.
+con rối nếu đã có chân ngã thì được revive nêú chân ngã của con rối đó đang ở hàng chờ.
+kit của con rối có chân ngã có thể tự revive bản thân vì con rối đã thừa hưởng toàn bộ kit nhưng con rối vẫn giữ chỉ số của con rối tức lúc snapshot lúc Pygmalion tạo ra con rối đó trừ phi kit của con rối có scale hay mô tả chỉ số sẽ không bị reset sau revive.u
+
+nếu Pygmalion chết và được revive thì hắn có thể tạo con rối lần nữa chỉ khi con rối cũ đã có chân ngã đầu thai vào, nếu hắn revive và con rối chưa được chân ngã đầu thai vào thì hắn không tạo con rối mới, sau đó nếu có chân ngã đầu thai vào con rối thì hắn sẽ tạo 1 con rối mới với mô tả như nội tại như snapshot chỉ số hiện tại của Pygmalion lúc tạo con rối.
+nếu trên sân có 2 Pygmalion thì quá trình đầu thai chân ngã thuộc phe nào sẽ đầu thai vào con rối của phe đó.
+chân ngã không thể đầu thai vào con rối khi hoá thân của luân hồi chi chủ có mặt trên sân bất kể Pygmalion và hoá thân luân hồi chi chủ có là đồng minh hay không, chỉ khi luân hồi DEATH_CONFIRMED thì chân ngã mới có thể đầu thai vào con rối của Pygmalion.
+
+Puppet trước khi có Chân Ngã vẫn có Character Definition tối thiểu riêng của Puppet.
+Nó không nên được xem là “không có kit”.
+
+hắn chỉ có thể tạo 1 con rối mỗi 1 chu kỳ sống, tức hắn vào sân > tạo rối > rối có chân ngã đầu thai vào > hắn không thể tạo con rối mới cho đến khi DEATH_CONFIRMED và được revive > hắn được revive > có thể tạo 1 con rối mới > hắn tạo rối > rối chưa có chân ngã nhưng hắn DEATH_CONFIRMED > hắn chết và revive > không thể tạo rối mới vì rối cũ chưa có ai đầu thai vào > tạo 1 con rối mới khi rối cũ đã có chân ngã vào > hắn không thể tạo rối mới trừ phi hắn chết và được revive lần nữa.
+skill 1: cửa sổ chờ luân hồi giảm 1, cost là --hp = 50% max hp và 25 ae, cửa sổ chờ luân hồi luôn phải hơn hoặc = 1, nếu cửa sổ chờ luân hồi là 1 thì không thể dùng skill này.
+một chân ngã vào luân hồi mà không có kit can thiệp như char này hay luân hồi chi chủ hay kit liên quan đến đầu thai thì chân ngã đó đã biến mất khỏi trận đấu.
+
+Phải:
+check waitingWindow > 1
+→ check cost
+→ pay
+→ waitingWindow -1
+Không:
+pay HP/AE
+→ phát hiện window =1
+→ không cast
+→ mất tài nguyên.
+
+cost làm Pygmalion chết nhanh hơn, mỗi lần chết làm con rối hắn có thể chế tạo tăng, skill này là con dao 2 lưỡi, hàng chờ giảm xuống làm hắn có thể vào luân hồi luôn mà không kịp được revive, lúc này hắn có thể bị nội tại của Pygmalion kẻ địch bắt đầu thai vào con rối của kẻ địch.
+
+ultimate: Pygmalion và mọi con rối của mình cùng nhau thực thi 1 đánh thường (tuân theo mô tả đánh thường của con rối, thường miêu tả đều là 100% wil và 100% atk của bản thân chúng tức bằng 80% của Pygmalion dù có kế thừa kit do chân ngã đầu thai vào nên cũng không quá quan trọng, nhưng nếu đánh thường thuộc kit có hiệu ứng gì thì cũng sẽ được giữ nguyên). các con rối đánh thường không tính là 1 natural Action, sát thương là con rối gây ra nhưng nguồn damage tính là Pygmalion, sát thương từ các con rối tính là follow up đánh thường của Pygmalion nên con rối không mất natural Action.
+
+Snapshot danh sách Puppet hợp lệ ngay khi Ultimate bắt đầu.
+Sau đó:
+tất cả Puppet snapshot được yêu cầu thực hiện Follow-up.
+Nếu A chết trước khi đến lượt resolve:
+A không đánh.
+Không chuyển slot/attack cho Puppet khác.
+Puppet inherited Basic Attack
+Đây là chỗ rất nguy hiểm.
+Mày nói:
+“nếu đánh thường thuộc kit có hiệu ứng gì thì cũng sẽ được giữ nguyên.”
+Ví dụ Character B có:
+Basic Attack → Bleed.
+Puppet inherit B:
+Basic Attack → Bleed.
+Khi Pygmalion Ultimate:
+Puppet → Basic Attack Follow-up.
+Vậy:
+có áp Bleed không?
+Tao nghĩ có, vì mày nói giữ nguyên behavior của Character Definition.
+Nhưng:
+Effect đó được attribution cho Puppet hay Pygmalion?
+Tao đề xuất:
+Behavior Source
+Puppet inherited kit
+Damage Attribution
+Pygmalion
+Effect Source
+Pygmalion Ultimate → Puppet Follow-up
+Đây là một hệ attribution ba tầng cực kỳ hữu ích.
+
+Nếu behavior thực sự là modify countdown:
+REINCARNATION + RESOURCE_MODIFIER hoặc một state/counter primitive.
+Không cần Tag mới kiểu:
+WAITING_WINDOW_REDUCTION.
+Đó là parameter của Reincarnation lifecycle.
+
+nếu có nhiều con rối thì cũng mạnh đó, có char có đánh thường là aoe nữa, nếu đầu game thì rất là phế luôn. Một char cực độ phức tạp.
+
+đây là kit phức tạp nhất tính đến 21h30p ngày 6 tháng 9 2026.
+
+“Một Puppet mỗi chu kỳ sống”
+State:
+PuppetQuotaAvailable
+Khi Pygmalion vào sân:
+nếu đủ điều kiện → create Puppet.
+Sau đó:
+quota consumed.
+Puppet được Chân Ngã nhập:
+quota được mở?
+không trong cùng life cycle.
+Chỉ khi:
+Pygmalion DEATH_CONFIRMED → Revive
+mới có một lifecycle mới.
+Nhưng có ngoại lệ mày đã chốt:
+nếu Puppet cũ chưa có Chân Ngã → dù Pygmalion revive cũng không spawn Puppet mới.
+Sau khi Puppet cũ nhận Chân Ngã:
+tạo Puppet mới nếu Pygmalion đang trong một life cycle mới đủ điều kiện.
+Nhưng cần một state rõ ràng
+Đừng dùng:
+hasPuppet
+một boolean.
+Cần ít nhất:
+PuppetLifecycleState:
+- NONE
+- ACTIVE_EMPTY
+- ACTIVE_INHABITED
+- DEAD_EMPTY
+- DEAD_INHABITED
+và:
+LifeCyclePuppetQuota:
+- UNUSED
+- CONSUMED
+Nếu không, Codex rất dễ làm lỗi những chuỗi như:
+Pygmalion dies
+→ revive
+→ puppet empty
+→ no new puppet
+
+puppet inhabited
+→ new lifecycle allowed
+Mỗi Life Cycle của Pygmalion tạo ra đúng 1 Puppet mới. Puppet của các Life Cycle trước tiếp tục tồn tại độc lập cho tới khi bị loại khỏi chiến trường.
+mỗi rối có chân ngã đều là 1 actor độc lập.
+
+đây là 1 char khiến tao phải tạo vô số Ur đơn giản để pool của con rối đỡ ra các char có kit phức tạp trong trận.
+
+27) Galatea
+Nguồn: tên thường dùng cho pho tượng của Pygmalion trong truyền thống hậu kỳ.
+Từ khóa:
+được tạo ra · không có quá khứ · thức tỉnh · người sáng tạo · quyền được sống · identity
+
+một kit khi hắn tử vong sẽ không vào hàng chờ, không vào luân hồi mà chân ngã tại chổ đoạt xá summon của đồng minh là ổn, hắn sẽ tương tác với Pygmalion.
+hắn có thể đoạt xá mọi summon dưới rank prime.
+
+29) Cairn
+Từ cairn: một đống đá dùng làm dấu mốc, mộ hoặc chỉ đường.
+Từ khóa:
+dấu đường · người đã chết · mộ · ký ức · đường về · những viên đá được xếp lại
+
+nội tại: mỗi 3 natural Action đan xen 2 turn boundary, đặt 1 "hòn đá" ngẫu nhiên trên sân đồng minh, hòn đá là 1 mark, khi có đồng minh có chân ngã đứng trên hòn đá đó, họ nhận mark "hòn đá" của Cairn, nói dễ hiểu là họ nhặt đá.
+summon không có chân ngã không thể nhặt đá, con rối của Pygmalion nếu có chân ngã thì nhặt được.
+ví dụ: Cairn ra sân đặt đá trước và ultimate vì đầy rage (1 natural Action) > hắn vào turn boundary, đợi natural Action (1 turn boundary) > thực thi natural Action > vào turn boundary > đến đầu natural Action tiếp theo của hắn thì hắn sẽ đặt đá trước rồi mới thực thi natural Action (nếu không bị cc, 1 natural Action), đấy là 1 chu kỳ, sau đó hắn cần vào turn boundary và đến natural Action tiếp theo nữa mới bước vào chu kỳ đặt đá, hắn cứ đặt đá như thế mãi cho đến khi rời sân.
+
+tác dụng: đồng minh nhặt đá time tối thiểu 1 turn boundary + 1 natural Action của Cairn DEATH_CONFIRMED và vào hàng chờ luân hồi (là 4 nếu không bị can thiệp), Cairn thực thi 1 natural Action xong và vào turn boundary sau khi đồng minh đó DEATH_CONFIRMED > đồng minh hồi sinh với chỉ số và class, kit như trước khi DEATH_CONFIRMED, rage là 0, hp là 50%/100% max hp của họ.
+nếu đồng minh cầm đá nhưng DEATH_CONFIRMED trước khi đạt time tối thiểu, họ sẽ không được hồi sinh bởi nội tại của Cairn, mark hòn đá sẽ biến mất, nhưng họ vẫn có thể hồi sinh bởi kit khác nếu có, có những char khi DEATH_CONFIRMED vào thẳng luân hồi mà không vào hàng chờ luôn, nếu họ nhặt đá thì DEATH_CONFIRMED họ không được revive vì nội tại này chỉ revive những kẻ trong hàng chờ, kẻ đã vào luân hồi không thể revive.
+
+30) Hotaru
+
+nội tại: khi vào trận cost của nàng trên deck giảm 5.
+
+31) Phenex
+
+nội tại: khi DEATH_CONFIRMED, không vào hàng chờ luân hồi hay luân hồi, tại chổ phục sinh với 100% chỉ số lúc vào sân, nếu có kit từ nguồn ngoài làm tăng hay giảm chỉ số của nàng thì đều không ảnh hưởng, kích hoạt 1 lần/trận đấu.
+
+32) Pasithea
+Nguồn: Hy Lạp, một trong các Charites; tên thường gắn với thư thái/thư giãn và giấc ngủ.
+Từ khóa:
+ngủ · mộng · thư giãn · trạng thái tinh thần · đẹp nhưng xa cách · thời gian ngừng lại.
+
+33) Stheno
+Nguồn: một trong ba Gorgon.
+Từ khóa:
+Gorgon · bất tử · chị cả · giận dữ · bảo vệ gia đình · quái vật bị con người nhìn nhận sai
+Điểm hay: rất nhiều người chỉ biết Medusa, nên nhân vật này có khoảng trống lớn để reinterpret
+
+
+34) Asteropae
+Nguồn gợi từ các Pleiades/stellar mythology.
+Từ khóa:
+ngôi sao · bầu trời · định hướng · chị em · trốn chạy · hóa thành sao
+Tên hơi exotic, phù hợp một nhân vật celestial.
+
+
+
+
+36) Savitri, nữ.
+
+ultimate: mất hp = 25% max hp, revive 1 đồng minh, nếu ultimate khi còn dưới 25% mx hp, fatal còn 1hp.
+
+37) Damayanti
+Nguồn Mahabharata.
+Từ khóa:
+nữ hoàng · lựa chọn người yêu · lưu lạc · tách khỏi người mình yêu · nhận dạng · đoàn tụ
+Không ép kit, lore-space rất rộng.
+
+
+
+38) Khonsu
+Thần mặt trăng trong Ai Cập cổ.
+Từ khóa:
+mặt trăng · đêm · thời gian · lang thang · chữa bệnh · chu kỳ
+Tên có cảm giác rất “boss/support deity”.
+
+
+39) Obatala
+Tên mang nghĩa gần “king of white cloth”, gắn với việc tạo ra đất và con người trong truyền thống Yoruba.
+Behind the Name
+Từ khóa:
+tạo người · đất · vải trắng · sự hoàn hảo · sáng tạo · người phán xét
+Tên này rất hợp một nhân vật creator, nhưng không đụng trực tiếp concept Galatea/Pygmalion nếu mày đi hướng “creator of society” thay vì “maker of a person”.
+
+
+40) Taotie
+
+
+
+
+41) 
+
+nội tại: char này không có chân ngã, hắn chỉ là một robot do AI điều khiển, hắn không vào luân hồi, không vào hàng chờ luân hồi, trạng thái cuối cùng của hắn là DEATH_CONFIRMED.
+hắn không thể revive từ mọi kit ngoài bản thân vì revive là kéo đồng minh từ hàng chờ luân hồi về hiện thế.
+Quy tắc: mọi kit heal ngoài bản thân kit của hắn đều không có tác dụng lên hắn trừ kit heal của char thuộc rank Prime, hắn không phải là sinh mệnh.
+
+skill 1: tự kích hoạt khi DEATH_CONFIRMED, sau 1 natural Action của hắn, một cột sáng từ trên trời giáng xuống, tàu mẹ gửi cho hắn cơ thể mới, hắn revive tại chỗ với trạng thái mới ra sân ở lần ra sân gần nhất, kích hoạt 3 lần/trận, sau khi revive bởi skill này, trong 3 natural Action và 2 turn boundary tiếp theo hắn không thể nhận rage từ action hay từ nhận sát thương, cost 15 ae.
+nếu không đủ cost, hắn sẽ đợi thêm 1 natural Action của bản thân nữa rồi revive nếu cost đủ, nếu vẫn không đủ, hắn biến mất khỏi trận đấu.
+
+mỗi vòng đời của hắn từ ra sân đến DEATH_CONFIRMED hắn đều sẽ thu thập thông tin chiến trường, gửi về tàu mẹ.
+tổng sát thương nhận trong vòng đời: sát thương chuẩn chiếm tỉ lệ Actual HP damage lên bản thân cao nhất: cơ thể tiếp theo từ skill 1 tăng 25% max hp trên cơ sở max hp đã có của lần tử vong kích hoạt skill 1 gần nhất.
+
+sát thương wil chiếm tỉ lệ Actual HP damage lên bản thân cao nhất: cơ thể tiếp theo từ skill 1 tăng 30% res trên cơ sở res đã có của lần tử vong kích hoạt skill 1 gần nhất.
+ví dụ: đời 1 có 100 res > chết, đời 2 có 130 res > chết, đời 3 có 30% của 130 res, cứ thế mà tăng, tăng arm cũng logic tương tự, ở đời 2 là kích hoạt skill 1 lần đầu.
+
+ở lần kích hoạt đầu tiên thì bonus này cũng tăng 5% giảm aoe chọn target ngẫu nhiên lẫn aoe gây damage lên ô cố định, đời tiếp theo + thêm 5%, tiếp theo +5%, skill 1 kích hoạt 3 lần nên tổng 15% nếu 3 lần kích hoạt đều dính dòng này.
+
+sát thương atk chiếm tỉ lệ Actual HP damage lên bản thân cao nhất: cơ thể tiếp theo từ skill 1 tăng 30% arm trên cơ sở arm đã có của lần tử vong kích hoạt skill 1 gần nhất.
+logic như dòng wil nhưng giảm là 5% mọi sát thương đơn, tức natural Action có target = 1.
+giảm aoe từ dòng atk và wil đều chỉ tính sát thương từ natural Action, không tính dot, không tính follow up luôn nên con rối của Pygmalion và hắn có thể bỏ qua bonus vì ult của Pygmalion là khiến con rối đánh thường nhưng nguồn sát thương của con rối tính là follow up của Pygmalion.
+
+tao muốn loại scale này cơ thể tiếp theo sẽ kế thừa.
+
+skill 2: gây sát thương đơn = 155% wil/atk lên 1 target, đồng thời cũng gây sát thương chuẩn = 1% max hp của target, tác dụng với boss không giảm, 20 ae.
+
+skill 3: tự sửa chữa, khi kích hoạt tự hồi hp cho bản thân ngay lập tức khi đủ điều kiện, skill này không cd, có thể kích hoạt khi ở natural Action lẫn turn boundary, 1 ae/1,5% max hp heal, tối đa tiêu hao 30 ae mỗi lần dùng skill này, hồi bao nhiêu hp thì trừ bấy nhiêu ae, 30 ae không phải lsf cost cứng, skill tự kích hoạt không tốn natural Action khi hp dưới 35% max hp.
+đây là một skill khá đốt ae nếu hắn cứ hp thấp mãi.
+
+ultimate: liên lạc với tàu mẹ, một tia death ray bắn từ trên trời xuống gây sát thương = 175% wil và atk của char này lên mỗi target trúng đòn, đây là aoe nhưng không tính là aoe ngẫu nhiên nên kit kiểu di chuyển vị trí khi dính sát thương aoe sẽ không có tác dụng, kit kiểu dính sát thương đơn di chuyển vị trí cũng không kích hoạt khi dính skill này vì đây là aoe cố định toàn sân, chạy đi đâi cũng dính nên không kích hoạt luôn để đỡ tốn tài nguyên, mọi target có rank dưới hoặc = rank nhân vật này nhận thêm follow up ult, sát thương = 10% max hp của char này lúc ultimate dưới dạng sát thương chuẩn.
+
+đánh thường: bắn tia laze gây sát thương = 100% wil và atk của bản thân lên 1 target, mỗi lần đánh thường đều có 20% tỉ lệ tăng tỉ lệ sát thương lên 20%, tức từ 100% lên 120% wil và 120% atk.
+
+một char có khả năng sống tốt, chỉ số tăng theo tình huống chiến trường, khả năng hồi phục mạnh, sát thương ổn và có aoe, đồng dạng hạn chế cũng không ít vì bản chất của bản thân, chưa xác định tên và giới tính, có thể hắn sẽ không có giới tính, bề ngoài là nam hay nữ có da sinh học hoặc 1 robot sắt thép là điều cần thảo luận, nó liên quan đến doanh thu, bề ngoài sắt thép mạnh mẽ sẽ được lòng bộ phận player nam, bề ngoài gợi cảm như cặp sinh đôi như atomic heart hay lucy trong reverse 1999 cũng đồng dạng được lòng player nam, nhưng player nữ có xu hướng đốt tiền cho husbando, skin có bề ngoài của 3 loại sẽ tốt hơn, ví dụ mặc định ở bề ngoài sắt thép như lockdown trong transformer, 1 skin nam có da sinh học, trông mạnh mẽ phong trần cho player nữ, 1 skin có da sinh học và vòng 1 lẫn 3 to dành cho player nam.
+quan trọng là giọng, giọng của hắn bất kể skin nào đều sẽ là máy móc, da sinh học đẹp nhưng giọng máy móc sẽ là signature của hắn, chênh lệch nghe nhìn có lẽ sẽ là cách marketing tốt.
+
+42) 
+
+nội tại: mỗi natural Action, tự heal 8% max hp đổi lại mọi heal cấp quy tắc trở xuống hắn nhận được từ đồng minh class support sẽ giảm 65%, heal cấp quy tắc không bị ảnh hưởng, 
+
+43) 
+
+Nội tại: sát thương nhận từ natural Action của kẻ thù class assassin 100% là sát thương chuẩn (không tính dot, mark hay sát thương từ nội tại của kit assassin nhưng nếu kit là nội tại cường hoá đánh thường thì vẫn tính,..), đổi lại vào trận (vào trận khác vào sân) cost trong deck giảm 5 (nếu về deck hơn 1 lần thì cost vẫn sẽ giảm 5 so với cost gốc, không cộng dồn), mỗi lần ra sân nhận khiên bằng 25% max hp tồn tại trong 3 natural Action của bản thân, khi khiên mất vì vỡ hay đến giới hạn tồn tại, heal = 5% max hp mỗi natural Action trong 3 natural Action.
+
+mỗi lần về deck bằng ultimate cost ở deck bar giảm 1.
+
+skill 1: giảm tỉ lệ chia từ ultimate từ 4 còn 2, tức cost của bản thân/4 thành /2, đổi lại cost sẽ không thể giảm được nữa và khiên khi ra sân từ nội tại cũng sẽ biến mất, vì thế nên phần heal 5% max hp cũng mất luôn, 20 ae, kích hoạt 1 lần/trận, cần natural Action để kích hoạt.
+
+skill 2: gây aoe random lên 3 target, mỗi kẻ nhận sát thương = 185% wil và atk của nàng, 15 ae.
+
+skill 3: khi hp giảm trên hoặc = 50% max hp của bản thân trong 1 natural Action gây damage lên bản thân nàng của kẻ địch, res và wil của bản thân tăng 70% trong 2 natural Action + 1 turn boundary, khi time đó kết thúc thì tự heal 10% max hp ngay ở đầu turn boundary. ví dụ: kích hoạt skill trong turn boundary hoặc natural Action của bản thân > lập tức tăng res/arm > natural Action, tính là 1 natural Action trong bộ đếm (nếu kích hoạt khi đang ở turn boundary thì khá hời vì vào natural Action mới tính vào bộ đếm) > turn boundary > natural Action > turn boundary (hết tăng res/arm ngay lúc vào, đồng thời heal 10% max hp).
+khi bộ đếm này kết thúc thì mới có thể kích hoạt skill 3 lần nữa, không cd, cost 30 ae mỗi lần tự kích hoạt, tối đa kích hoạt 2 lần/trận.
+
+ultimate: heal cho leader bằng 100% wil/atk của bản thân * (cost của bản thân/4), sau đó về lại deck ngay khi heal xong, cost từ cost bar +3. ví dụ cost của nàng khi vào trận lần đầu là 15 (đã giảm 5 từ nội tại) thì (100% wil và 100% atk)* 15/4 = 375% wil và atk của bản thân cho leader đồng minh, lần 2 thì 100% wil/atk * 14/4 =, 350%.
+over heal được chuyển toàn bộ thành khiên, cap 100% max hp của leader.
+về deck rồi ra sân lại là xoá mọi debuff/buff/mark trên người bất kể chúng thuộc cấp độ nào luôn.
+đồng thời cũng heal cho một đồng minh có chân ngã có hp thấp nhất = 30% tỉ lệ % heal mà leader nhận được, ví dụ ở lần ra sân thứ 3 và cost đã giảm 5 của nàng là 15 thì 13/4 = 325% wil/atk sẽ heal cho leader, đồng minh kia nhận heal = 325/2 % wil và atk nhưng overheal sẽ bị bỏ qua mà không phải chuyển thành khiên, nếu leader không thể nhận heal hoặc heal bị chuyển thành sát thương thì đồng minh kia vẫn nhận heal.
+sẽ có char có debuff phản hồi phục toàn sân, mọi heal nhận vào chuyển thành sát thương chuẩn.
+char này cost không thể nào là 20 nên vào trận cost chắc chắn dưới 15.
+
+44) 
+
+Nội tại: 
+
+
+ultimate: lao đến 1 target, đấm vào bụng họ (vfx) và hất tung (là hiệu ứng có thể tương tác) target đó lên không, họ nhận sát thương = 120% wil và atk của nhân vật này và nhận debuff chảy máu trong 2 turn boundary+ 1 natural Action của họ, mỗi khi bộ đếm +1, mất hp = 3% max hp dưới dạng sát thương chuẩn, mọi thứ chỉ diễn ra chớp mắt ngay khi target trên không, vừa lúc target bị hất tung char này cũng nhảy lên sau lưng target, 2 nấm đấm gộp lại và nện xuống lưng target, gây sát thương lần 2 bằng 125% wil và atk của bản thân lên họ, sau đó họ chạm đất, gây sát thương lần 3 = 105% wil và atk của bản thân cho họ.
+tức sau khi lần nhận sát thương thứ 3 kết thúc, target vào turn boundary, chảy máu và mất hp = 3% max hp > vào natural Action tiếp theo cũng thế > vào turn boundary cũng thế, đến natural Action tiếp theo thì hết chảy máu, tổng chảy máu là 9% max hp, chảy máu là sát thương chuẩn, tổng sát thương ultimate gây ra là 350% wil/atk của bản thân và 9% max hp của target.
+3 lần gây sát thương chỉ tính là 1 natural Action, dễ hiểu là target chỉ nhận sát thương 1 lần từ ultimate (cho dễ code) nhưng mặt hiển thị chia 3 giai đoạn hoặc đơn giản hơn là target trong 3 đoạn này không hiện thanh hp, sau khi animation ult này kết thúc thì hiện thanh hp, sau đó mới nhận sát thương từ chảy máu.
+vậy nên mô tả ultimate có thể rút gọn là gây sát thương = 350% wil và atk của bản thân lên 1 target, 3 giai đoạn đó chỉ là animation mà thôi.
+
+45) 
+
+
+
+
+46) 
