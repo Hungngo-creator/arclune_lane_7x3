@@ -561,9 +561,88 @@ tức sau khi lần nhận sát thương thứ 3 kết thúc, target vào turn b
 3 lần gây sát thương chỉ tính là 1 natural Action, dễ hiểu là target chỉ nhận sát thương 1 lần từ ultimate (cho dễ code) nhưng mặt hiển thị chia 3 giai đoạn hoặc đơn giản hơn là target trong 3 đoạn này không hiện thanh hp, sau khi animation ult này kết thúc thì hiện thanh hp, sau đó mới nhận sát thương từ chảy máu.
 vậy nên mô tả ultimate có thể rút gọn là gây sát thương = 350% wil và atk của bản thân lên 1 target, 3 giai đoạn đó chỉ là animation mà thôi.
 
-45) 
+45) Oisiny
+
+hình tượng nhắm đến trong đầu tao là con bạc, một người đàn ông luộm thuộm phong trần với mái tóc đen dài hơi rối, ánh mắt kiên nghị xen lẫn láu cá, dẫu vậy tao không muốn hắn là 1 char rng, thực ra con bạc cũng không chính xác, đúng hơn là vay mà thôi, vay trước trả sau.
+
+nội tại: khi nhân vật này dùng skill của bản thân, cost sẽ không được trả trước mà đến natural Action tiếp theo mới trả, tức hiệu ứng skill vẫn hoạt động như cost natural Action tiếp theo mới trừ, khi đang nợ mà đến natural Action tiếp theo không đủ cost để trả, nhận sát thương chuẩn = cost/2 trên % max hp.
+ví dụ, skill 1 nợ không trả được thì thiếu 15/2 là nhận 7,5% max hp sát thương chuẩn.
+
+khi đã nhận sát thương chuẩn từ nội tại do nợ không trả, char này đã coi là trả nợ và không cần trả hay nhận sát thương chuẩn lần nữa từ 1 khoản nợ.
+
+nhưng muốn nợ không trả rất khó, hơn nữa nợ không trả 3 lần còn bị phạt, tao đang nghĩ đến cơ chế này như 1 loại lưu phái đánh boss, tức là sum char này ra player sẽ ráng cho hắn nợ không trả, 15% max hp sát thương chuẩn nếu trúng boss thì rất mạnh, không trúng cũng có thể sum char mới để heal, nếu gặp leader có kit heal thì càng ổn.
+khi có ae thì nợ cũ sẽ được trả trước, nợ mới nhất trả sau.
+
+mỗi lần dùng ultimate max rage + 4.
+
+khi không trả nợ cost từ nội tại đạt 3 lần, một thanh kiếm sẽ tấn côn 1 target được chọn từ trước với pool là tất cả đơn vị có hp bar trên sân, không phân địch ta, kẻ trúng đòn nhận sát thương chuẩn = 15% max hp của chính họ + 100% wil và 100% atk của nhân vật này, thanh kiếm từ nội tại này không có hp bar, không phải một đơn vị hợp lệ để bất kỳ kit nào target, sát thương nó gây ra không có nguồn thực sự, nó không bị kit nào ảnh hưởng và nó không ảnh hưởng đến bất kỳ kit nào ngoài gây sát thương, một target DEATH_CONFIRMED bởi thanh kiếm này nếu không bị ràng buộc bởi kit của bản thân hay kit nào khác thì vẫn sẽ vào hàng chờ sau đó vào luân hồi, trừ phi kẻ bị DEATH_CONFIRMED bị kit nào đó ảnh hưởng kiểu không vào hàng chờ mà vào thẳng luân hồi hoặc không vào hàng chờ hay luân hồi.
+
+theo lore thì aether là năng lượng của thiên địa, thử nghĩ 1 kẻ có thể dùng trước trả sau năng lượng ở đời thực mạnh cỡ nào?.
+thanh kiếm này như một loại thiên khiển dành cho char này, nhưng axiom thiên lôi vẫn có thể tấn công hắn.
+
+khi một kẻ nợ nần bị đòi nợ ở nơi làm việc, đồng nghiệp của hắn sẽ bị tác động lây.
+rng duy nhất là thanh kiếm.
+
+skill 1: tấn công 1 target = 105% wil và 200% atk của bản thân, 15 ae.
+
+skill 2: heal cho bản thân và leader mỗi kẻ bằng 100% wil và 100% atk của bản thân, cũng heal cho 1 ally có hp thấp nhất trong sân bằng 50% wil và 50% atk của bản thân, 35 ae.
+hắn vay mượn skill này từ một khế ước không rõ, vì thế cost để dùng hơi đắt một chút.
+nếu hắn dùng skill này mà nợ không trả ở natural Action sau thì vẫn nhận sát thương chuẩn từ nội tại.
+
+skill 3: vay mượn 35% ae hiện có của team địch, đổi lại sau 3 natural Action tiếp theo của bản thân, bắt đầu tính sau khi dùng 1 natural Action để dùng skill này thì phải trả 150% lượng ae mượn được từ team địch, skill này không có cost, đến lúc trả đó là cưỡng chế rút ae, nếu không có thì nhận 150% của 35% đó chia 2 thành sát thương chuẩn từ nội tại.
+
+ví dụ: vay 100 ae đến lúc trả là 150/2 = 75% max hp của hắn dưới dạng sát thương chuẩn, dạng này coi như chết chắc.
+
+skill này dùng rất tốt khi sắp win như leader địch sắp chết hoặc sắp hết thời gian trận đấu.
+
+ultimate: tấn công 1 kẻ địch bằng nấm đấm (animation), gây sát thương = 250% atk + 150% wil của bản thân, sau đó hồi hp = 20% Actual HP damage ult gây ra, nếu DEATH_CONFIRMED target đó, xoá 1 khoản nợ ae lớn nhất của bản thân (vẫn chưa trả hay nhận sát thương chuẩn từ nội tại), nếu DEATH_CONFIRMED target mà không có khoản nợ nào thì không có gì xảy ra thêm.
+
+46) Siduri
+
+Epic of Gilgamesh, nữ chủ quán rượu/thần tính ở rìa thế giới.
+bất tử · con người · tận hưởng đời sống · người lữ hành · rìa thế giới · chấp nhận cái chết
+
+47) Anahita
+Ba Tư cổ, Yazata gắn với nước
+nước tinh khiết · vương quyền · dòng sông · chiến binh · sinh sản · thanh tẩy
+
+49) Mesopotamia
+số phận · bệnh dịch · sứ giả của cõi chết · mệnh lệnh · định số
+Đọc như tên boss/champion mà không quá nổi tiếng
+
+50) Changxi
+常羲, thần thoại Trung Hoa
+mười hai mặt trăng · chu kỳ · người mẹ · lịch · đêm · thay phiên.
+
+51) Saelis
+Tên mới, phonetics kiểu LoL/40K
+người thừa kế · một gia tộc không còn tồn tại · di sản · danh tính giả.
+hợp với vài char không tên đã có kit.
+
+52) Azhren
+Tên mới, âm Tây Á/40K
+tro · lưu đày · tín ngưỡng · thành phố cháy · người sống sót.
+như trên.
+
+53) Orryx
+Tên mới; lấy texture từ oryx nhưng biến chính tả
+sa mạc · sừng · săn đuổi · bộ tộc · sinh tồn · quý tộc chiến binh.
+
+54) Balor
+Ireland
+con mắt bị phong ấn · mở mắt = thảm họa · power phải được giải khóa · nhìn = giết.
 
 
+nội tại: luôn trong trạng thái nhắm mắt khi chưa nhận sát thương vì đã giải phóng sát thương bằng mở mắt hoặc vừa vào sân.
+nhắm mắt: tích lũy sát thương nhận vào từ natural Action của kẻ địch, khi lượng sát thương tích lũy đó đạt 50% max hp của bản thân, giải phóng sát thương đó.
+mở mắt: sát thương tạo ra luôn gây sát thương lên ô 2/5/8 của kẻ địch, toàn bộ đều là sát thương chuẩn.
+chỉ tích sát thương khi nhận Actual HP damage.
 
+hắn không cần khiên, hắn cần nhận sát thương nhưng cũng cần sống sót để giải phóng sát thương, vậy hắn cần max hp cao. như hp cao thì khoảng cách giữa mỗi lần mở mắt sẽ càng xa.
 
-46) 
+55) Mithridates
+lịch sử Pontus
+tự đầu độc · liều nhỏ → kháng độc · thứ từng gây hại trở thành khả năng chống lại chính nó · độc và giải độc cùng nguồn.
+đã có char phù hợp tên này.
+
+56) 

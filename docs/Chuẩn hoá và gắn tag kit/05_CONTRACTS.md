@@ -185,6 +185,8 @@ This registry defines:
 - `HIS-*` History / regression
 - `NAR-*` Narrative
 - `MOD-*` Mode Profile
+- `HIT-*` Hit Admission
+- `DEP-*` Deck Deployment
 
 ---
 
@@ -247,6 +249,96 @@ Failure before commit:
 > no Action effect is partially applied.
 
 A Character-specific rule may intentionally pay a cost before later failure, but that must be explicit.
+
+## ACT-003 — Natural Action Form Restriction and Ordered Fallback
+**Status:** `LOCKED`
+
+A Character/System rule may constrain the Action form used by an SSI-granted Natural Action.
+
+This Contract applies only after SSI has already granted the Actor a Natural Action opportunity.
+
+A Natural-Action form restriction:
+
+- does not create another Natural Action;
+- does not convert the resulting Action into `FORCED_ACTION`;
+- does not itself choose or override the final target;
+- is not an AI preference/heuristic;
+- may restrict or order allowed `BASIC_ATTACK`, `SKILL`, `ULTIMATE` candidates according to authored data.
+
+Conceptual flow:
+SSI grants Natural Action
+→ read applicable form restriction/policy
+→ probe authored candidate 1
+→ if invalid/unpayable, probe candidate 2
+→ ...
+→ select first legal candidate
+→ selected candidate enters ordinary Action Admission / Cost / Target / Resolution pipeline
+
+Candidate probing is read-only
+A fallback candidate probe may inspect:
+current Action restriction;
+Ability availability;
+Mode legality;
+required prerequisite state;
+cooldown;
+Rage readiness;
+AE/resource affordability;
+whether mandatory target prerequisites currently have any valid candidate.
+A candidate probe must not:
+pay or reserve Cost;
+consume/reset Rage;
+begin cooldown;
+mutate Character/System State;
+emit gameplay Events;
+create/request the candidate Action;
+consume RNG;
+lock a random target set;
+partially resolve any Effect.
+Only the candidate ultimately selected may enter normal Action execution and commit resources/state.
+Therefore:
+probe ULTIMATE
+→ unavailable
+
+probe SKILL
+→ payable
+
+select SKILL
+→ only now normal Skill Cost/Action pipeline begins
+must not become:
+try ULTIMATE
+→ consume something
+→ fail
+→ try SKILL
+Natural Action identity
+The selected candidate remains the Actor's originally granted Natural Action.
+Example:
+SSI grants Echo Natural Action
+→ kit law selects SKILL
+→ resulting Skill is still Echo's Natural Action
+It is not a Forced Action merely because Character data restricted the choice.
+Targeting remains separate
+Selecting an Action form does not automatically fix the final target.
+After form selection, the selected Ability uses its ordinary:
+Target Candidate Pool
+→ Target Selection
+→ Area Resolution
+unless another explicit rule separately overrides targeting.
+Fallback must be authored
+There is no hidden global rule:
+if preferred Action cannot be used
+→ always Basic Attack
+Fallback order must exist in normalized Character/System data.
+If every authored candidate fails:
+use the declared noCandidatePolicy.
+The Kernel must not invent an undeclared fallback.
+Example
+A legal policy may express:
+remembered ULTIMATE
+→ probe Ultimate
+→ otherwise probe remembered child SKILL
+→ otherwise probe Basic Attack
+This ordering is Character/System law.
+It is not global AI behavior.
 
 ---
 
@@ -537,14 +629,16 @@ This is not necessarily the same as:
 
 For deterministic triggering, working model:
 
-An Action becomes `ACTION_COMPLETED` after:
+An Action becomes `ACTION_COMPLETED` only after:
 
 1. its direct effect groups commit;
 2. required immediate HP_ZERO/death evaluations caused by those commits complete;
 3. child Actions designated as **blocking children** complete;
-4. Action-level result aggregation is finalized.
+4. all declared **root-linked blocking settlements** for this Action reach a terminal settlement state under `ACT-032`;
+5. Action-level result aggregation required for final completion is finalized.
 
-Queued **non-blocking reactions** then resolve from the completion event.
+Queued ordinary **non-blocking reactions** are not promoted into blocking settlements merely because they were caused by this Action.
+
 
 ### Why this proposal
 Ký Ức Skill 2 explicitly waits until an allied **Damage Action completely ends**, and a target already DEATH_CONFIRMED before its echo resolves is invalid.
@@ -557,6 +651,72 @@ before the reaction is evaluated.
 ### Not yet fully user-locked
 Whether every possible Reaction waits until Action completion is not asserted.
 Effects may subscribe to earlier events such as `DAMAGE_COMMITTED`.
+
+## ACT-032 — Root-Linked Blocking Settlement / Completion Dependency
+**Status:** `LOCKED`
+
+A Triggered/Passive settlement may explicitly declare itself a blocking completion dependency of an existing root Action.
+
+This exists for mechanics where the root Action's gameplay outcome is not semantically complete until a bounded set of linked settlements has resolved.
+
+Conceptual form:
+root Action direct/linked outcome
+→ declared blocking settlement A
+→ declared blocking settlement B
+→ root ACTION_COMPLETED
+
+Root linkage
+Every blocking settlement must identify the exact root Action lineage to which it belongs.
+Temporal coincidence is insufficient.
+A settlement occurring while an Action happens to be running does not become part of that Action merely because their wall-clock windows overlap.
+Local dependency graph
+Blocking settlements belonging to the same root Action may declare local dependencies.
+Example:
+REPEAT_SETTLEMENT
+→ DEATH_OUTCOME_STABLE
+→ SKILL_3_SETTLEMENT
+→ SKILL_1_SETTLEMENT
+→ root ACTION_COMPLETED
+Such dependency edges define ordering only inside that root Action's declared completion graph.
+They do not define global Trigger/Reaction priority.
+In particular:
+Skill 3 before Skill 1 for one Character
+does not imply:
+all Skill-3-like Triggers globally outrank all Skill-1-like Triggers
+and does not resolve TRG-005.
+Terminal settlement states
+A blocking dependency is considered settled when it reaches a terminal result such as:
+resolved successfully;
+conditions no longer qualify;
+target becomes invalid under its declared policy;
+Cost validation fails and the activation cleanly fails;
+it is explicitly cancelled by a valid Contract.
+A failed Cost does not leave the root Action permanently blocked.
+Example:
+settlement qualifies
+→ requires 30 AE
+→ insufficient AE
+→ settlement = FAILED_COST
+→ dependency closes
+→ root Action may continue toward completion
+subject to the Trigger's declared failed-Cost counter/cap policy.
+Cost and mutation
+Registering a completion dependency does not itself pay Cost or apply Effects.
+The settlement still follows:
+TRG-003 for triggered Cost;
+CST-* for Cost semantics;
+its ordinary Effect/Primitive Contracts.
+Bounded dependency rule
+Completion dependencies must form a finite acyclic graph.
+Normalizer/Validator must reject:
+cycles;
+dependency chains that can recursively recreate themselves without a declared bound;
+a dependency whose required qualifying Event can occur only after the same root Action has already emitted ACTION_COMPLETED;
+a dependency referencing an unrelated root Action without an explicit cross-root Contract.
+Non-blocking Reactions remain non-blocking
+An ordinary Reaction is not automatically upgraded into a blocking settlement.
+Only explicit normalized completion-dependency data may delay root ACTION_COMPLETED.
+This Contract therefore adds a local Action-completion mechanism without changing the unresolved global same-window Reaction priority.
 
 ---
 
@@ -655,6 +815,15 @@ Until decided, implementation-ready data involving competing same-window trigger
 or use a system Contract that defines it.
 
 Stable insertion order alone may be used for replay determinism internally, but must not be mistaken for gameplay canon.
+For multiple Events produced by the same committed transaction:
+
+> deterministic Event sequence / publication trace order is not by itself gameplay Trigger priority.
+
+`eventSeq` may preserve reproducible trace/insertion order, but it must not be used as a semantic winner rule between otherwise unrelated same-window Trigger Candidates unless a specific Contract explicitly gives that ordering gameplay meaning.
+
+Multiple semantic Events derived from one committed transaction may therefore have deterministic trace order while remaining unordered in gameplay priority.
+
+This clarification does not resolve the currently-unresolved global same-window Reaction priority.
 
 ---
 
@@ -680,6 +849,83 @@ TriggerSpec/Contract must expose:
 - `cooldownStartOnFailedCost`
 
 No silent default for mechanics where this changes outcome.
+
+## TRG-007 — Position Mutation Commit Observation
+**Status:** `LOCKED`
+
+A successful authoritative Position Mutation commit exposes:
+POSITION_MUTATION_COMMITTED
+as one semantic Event for the atomic Position Mutation group that committed.
+The authoritative Position Mutation payload is:
+entries[]
+with at minimum, per entry:
+entityRef
+oldPositionRef
+newPositionRef
+plus transaction/batch context required for deterministic trace.
+Observation timing
+POSITION_MUTATION_COMMITTED is observed only after the authoritative Position commit has completed.
+At that observation point:
+every newPositionRef in entries[] is already authoritative;
+old occupancy removed by the commit is no longer authoritative;
+new occupancy established by the commit is observable;
+Trigger evaluation may read the post-commit authoritative state;
+Trigger logic may also inspect oldPositionRef / newPositionRef from the immutable Event payload.
+A listener cannot mutate or interleave with the Position transaction that produced the Event.
+The Position transaction is already closed.
+This Contract locks:
+post-Position-commit observation timing.
+It does not lock a universal priority among multiple Trigger Candidates discovered at that observation point.
+Their scheduling/priority remains governed by existing Trigger/Reaction Contracts, including unresolved global ordering under TRG-005.
+Atomic multi-entity mutation
+If one atomic Position Mutation group commits:
+A moves
+B moves
+C moves
+COMMIT together
+then exactly:
+1 POSITION_MUTATION_COMMITTED Event
+is exposed.
+Its authoritative entries[] contains A, B and C.
+It is not automatically expanded into three semantic Events.
+A simultaneous swap follows the same principle.
+Sequential commits
+If one root Action performs:
+mutation group 1
+→ commit
+
+mutation group 2
+→ commit
+
+mutation group 3
+→ commit
+then three separate POSITION_MUTATION_COMMITTED Events are exposed.
+Root Action identity does not merge distinct committed Position Mutation groups.
+No successful mutation
+If:
+movement validation fails;
+destination resolution fails;
+operation is cancelled before commit;
+authoritative Position does not actually change;
+then no successful POSITION_MUTATION_COMMITTED Event is emitted for that attempted mutation.
+Listener cardinality
+A Trigger may inspect whether entries[] contains:
+SELF;
+any ALLY relative to an explicit anchor;
+any ENEMY relative to an explicit anchor;
+an entity entering/leaving a queried Position.
+Matching multiple entries inside one Event does not multiply the Event.
+entries[] is the authoritative semantic payload for Position Mutation results.
+If a derived/index field such as subjectRefs exists for lookup efficiency:
+subjectRefs := entries[].entityRef
+it is only a derived projection.
+It must not independently override or contradict entries[].
+This Contract defines observer/event granularity and post-commit observation timing only.
+It does not create:
+a new Position Mutation terminology type;
+a Functional Tag;
+a Primitive;
+a global Reaction priority rule.
 
 ---
 
@@ -713,6 +959,66 @@ Reflected damage can similarly block reflect-of-reflect under default.
 **Status:** `LOCKED_DEFAULT`
 
 Same Ability may not recursively request itself within the same lineage unless an explicit recurrence Contract allows it.
+
+## TRG-013 — Action Lineage vs Effect Provenance
+**Status:** `LOCKED`
+
+Action lineage and Effect provenance are separate query axes.
+
+Canonical distinction:
+Action lineage
+≠ Effect provenance
+≠ Damage Attribution
+Action-lineage query
+When a Condition asks about Action Identity, it must explicitly identify the Action relation being queried when ambiguity is possible:
+SELF
+PARENT
+ROOT
+Examples:
+immediate Action Identity = SKILL
+and:
+root Action Identity = ULTIMATE
+are different Conditions.
+The Kernel/Condition evaluator must not silently substitute one for the other.
+Shared root does not imply same Effect
+Two Damage instances may have:
+the same rootActionId;
+the same Actor;
+the same Damage Attribution;
+while still coming from different Effects.
+Example:
+Echo Skill 2 Damage
+→ Damage Attribution = Echo
+
+Echo Passive Repeat Damage
+→ Damage Attribution = Echo
+→ same root Action
+These must remain distinguishable.
+Therefore provenance-sensitive execution must preserve/query the generating Effect identity/source, such as:
+originAbilityId
+originEffectId
+effectSource
+according to the normalized representation.
+Recursion filtering
+A no-recursion rule must use the semantic provenance necessary to distinguish the generated Effect from the Effect it is listening for.
+It must not rely only on:
+current Caster;
+Damage Attribution;
+same Character;
+same rootActionId.
+Those values can legitimately be identical for both the original and generated Effect.
+Example:
+original Echo Damage
+→ qualifies for Passive Repeat
+
+Passive Repeat Damage
+→ origin Effect identifies it as Repeat-generated
+→ does not qualify for Repeat again
+Cross-Character recursion
+The same principle applies when two Characters own similar listeners.
+A generated repeat/reflect/echo Effect may remain inside the original root lineage while still carrying provenance that makes it ineligible for another repeat layer.
+This Contract does not create a second Action-lineage subsystem.
+It requires declarative Conditions to query the lineage/provenance already preserved by execution.
 
 ---
 
@@ -817,6 +1123,75 @@ That profile is:
 ### Known Ký Ức rule
 If target reaches DEATH_CONFIRMED before Skill 2 echo resolves:
 > target is invalid and receives no echo.
+
+# 12A. HIT ADMISSION CONTRACT
+
+## HIT-001 — Target Lock Is Not Hit Admission
+**Status:** `LOCKED`
+
+Target Lock and Hit Admission are separate resolution axes.
+
+Target Lock determines which previously selected:
+- Entity;
+- Position;
+- or both
+
+remain referenced.
+
+Hit Admission determines whether a currently valid referenced target is admitted through ordinary hit resolution.
+
+Therefore:
+LOCK_ENTITY_IDS
+does not by itself mean:
+GUARANTEED
+and:
+GUARANTEED
+does not by itself lock target identity.
+## HIT-002 — Hit Admission Interface
+Status: LOCKED INTERFACE
+For an effect that uses Hit Admission, the conceptual order is:
+Target Selection / Target Lock
+→ declared current-target validity / invalidation handling
+→ Hit Admission
+→ admitted effect resolution
+Current minimum policy interface supports:
+MODE_DEFAULT
+GUARANTEED
+MODE_DEFAULT delegates ordinary hit admission to the active Mode/System hit policy.
+This Contract does not define:
+Accuracy formula;
+Evasion formula;
+Dodge stat formula;
+Miss probability;
+RNG formula for ordinary hit checks.
+Those systems remain outside this Pilot patch.
+## HIT-003 — Guaranteed Hit
+Status: LOCKED
+If:
+hitAdmission.policy = GUARANTEED
+and the selected/locked target remains a legal recipient at the Hit Admission point:
+ordinary Miss/Dodge/Evasion cannot reject that hit.
+A Position change alone does not make a locked Entity ID miss when:
+target identity is locked;
+target remains otherwise valid.
+Guaranteed Hit does not override:
+target invalidation under declared invalidPolicy;
+lifecycle removal that makes target no longer a legal recipient;
+battle termination;
+Authority adjudication;
+protections/immunities whose semantic is not ordinary Miss/Dodge/Evasion.
+Authority-based special deny / avoidance
+A rule-level effect such as:
+“this hit cannot connect”;
+“this Character avoids the hit under Rule X”;
+special Dodge/Denial granted by Pháp Tắc / Quy Tắc / Axiom;
+is not ordinary Miss/Dodge/Evasion merely because its presentation resembles a dodge.
+If such a rule directly conflicts with Guaranteed Hit over the same semantic scope:
+resolve that conflict through the existing Authority Contract.
+GUARANTEED does not automatically bypass or outrank the special rule.
+This Contract introduces no Accuracy/Evasion formula.
+
+Phần này giữ `GUARANTEED` ở đúng mức **ordinary hit policy**, không biến nó thành mini-Axiom.
 
 ---
 
@@ -1091,6 +1466,48 @@ A parent Action may waive child Cost.
 
 This affects only that child execution instance, not base child Ability definition.
 
+## CST-007 — Active Skill Cost Before Activation
+**Status:** `LOCKED DEFAULT`
+
+Unless an Ability/Contract explicitly overrides Cost timing, an active `SKILL` with Cost follows:
+validate Action legality/prerequisites
+→ validate mandatory pre-cost target/resource conditions
+→ validate full Cost
+→ commit/pay Cost atomically
+→ ACTION_BEGIN / Skill activation
+→ resolve Skill
+If required Cost is not payable:
+Skill does not activate
+and:
+no Skill Effect partially resolves;
+no Action-side Skill result is committed;
+no Cost is partially paid.
+This is the default active-Skill rule.
+Ordered fallback interaction
+Candidate probing under ACT-003 does not pay Cost.
+For:
+ULTIMATE
+→ else SKILL
+→ else BASIC
+the Kernel may read whether Skill Cost is currently affordable during candidate probing, but it does not commit that Cost.
+Only after that Skill candidate is selected does CST-007 perform actual validation/payment.
+Triggered/passive settlement exception
+Do not automatically apply this active-Skill activation sequence to a Passive/Triggered settlement merely because its source Ability is named Skill.
+Auto/Reaction/Passive settlements follow:
+TRG-003
+and their explicit settlement timing.
+Child Cost override
+CST-006 may explicitly waive/override the Cost of one child execution instance.
+Example:
+root Ultimate
+→ child Skill
+→ child Cost override = 0
+does not modify the base Skill Cost definition.
+Later failure
+If Cost has committed and a later phase fails for a reason that occurs after payment:
+no automatic refund exists.
+Any refund must follow CST-005.
+
 ---
 
 # 18. RESOURCE CONTRACT
@@ -1124,6 +1541,25 @@ merely because a Natural Action would.
 Gain must be explicitly tied to that Action/effect.
 
 Ký Ức auto Skill 2/3 explicitly generate no Natural Action, AE or Rage.
+
+## CST-013 — Rage Readiness Is Not Ultimate Autocast
+**Status:** `LOCKED`
+
+For a Character with Rage:
+Current Rage >= Max Rage
+satisfies the generic Rage readiness condition for Ultimate use.
+This does not by itself guarantee that Ultimate is currently legal.
+Other admission conditions/restrictions may still block it.
+Reaching full Rage does not by itself:
+create an Action;
+create a Reaction;
+create an interrupt;
+cast Ultimate;
+consume a Natural Action;
+consume/reset Rage.
+Canonical distinction:
+FULL_RAGE ≠ AUTO_CAST_ULTIMATE.
+Exact Rage consumption/reset after an Ultimate is a separate global Rage Contract and is not defined here.
 
 ---
 
@@ -1458,7 +1894,7 @@ Its per-own-action-window cap is handled by `CLK-002`, not global Turn Boundary.
 
 ---
 
-# 26. STATE ADMISSION / IMMUNITY / AUTHORITY
+# 26. STATE / EFFECT ADMISSION / IMMUNITY / AUTHORITY
 
 ## STA-010 — State Admission
 **Status:** `LOCKED_DEFAULT`
@@ -1508,6 +1944,78 @@ SSR Warrior Skill 3 adaptation therefore compares exact Debuff Identity.
 
 They are not interchangeable.
 
+## STA-014 — Scoped Effect Admission
+**Status:** `LOCKED DEFAULT`
+
+State Admission is a specialized case of a broader scoped Effect Admission boundary.
+
+A non-State Effect such as Shield may require admission before commit when the recipient currently owns a rule that explicitly governs admission of that Effect semantic.
+
+This Contract does **not** mean every Effect in the game passes through one universal Immunity gate.
+
+### Admission applicability
+
+Before applying a non-State Effect:
+
+1. validate target presence/lifecycle eligibility;
+2. identify the incoming Effect semantic and relevant source/relation;
+3. query whether the target/system owns any admission/protection rule whose declared scope matches that Effect;
+4. if no matching admission rule exists, continue through the Effect's ordinary pipeline;
+5. if a matching admission rule exists, evaluate that rule;
+6. only an admitted Effect may proceed to its mutation/commit operation.
+
+### Scope must be explicit
+
+An admission rule must declare what it governs.
+
+Possible scope dimensions include:
+
+- Effect semantic, such as `SHIELD`;
+- source relation, such as external/ally/enemy/self;
+- Authority requirement;
+- Effect Source / provenance;
+- Character/System state;
+- other structured Schema criteria.
+
+A rule protecting against Shield must not silently become:
+- Damage immunity;
+- Heal immunity;
+- all-effect immunity.
+
+### Authority threshold is not automatically adjudication
+
+A target-local admission rule may directly contain a threshold such as:
+admit external SHIELD only if incoming Authority >= QUY TẮC
+
+Evaluation then gives:
+NORMAL   → reject
+PHÁP TẮC → reject
+QUY TẮC  → admit
+AXIOM     → admit
+This threshold evaluation is an admission predicate.
+It is not by itself an AUT-004 same-tier Authority adjudication and therefore does not invoke Rank/Tu vi/Stars/Awaken/CP comparison.
+When Authority adjudication actually occurs
+Invoke AUT-* only if two rule/effect clauses directly conflict.
+Example:
+target admission rule:
+external Shield below/at some scope is denied
+
+incoming Effect rule:
+this Shield explicitly bypasses/overrides that protection
+If those clauses directly conflict:
+resolve the conflict through the normal Authority Contract.
+Authority is not invoked merely because the incoming Effect has an Authority field.
+Rejected Effect
+If Effect Admission rejects an Effect:
+the Effect does not commit;
+no partial Shield/Heal/State/property mutation is created by that Effect;
+rejection itself does not become Damage or Resource loss;
+Cost/refund behavior remains governed by the originating Ability's own Contract.
+Damage warning
+Direct Damage is not automatically gated by generic Effect Admission.
+A protection must explicitly include Damage in its scope before this boundary can deny Damage.
+Therefore this Contract does not turn Thần Tính or ordinary scoped Immunity into global Damage immunity.
+
 ---
 
 # 27. POSITION
@@ -1544,6 +2052,111 @@ If destination is invalid/occupied and Ability has no obvious unique outcome, it
 - other deterministic policy.
 
 No hidden nearest-cell search.
+
+## POS-004 — Side-relative Direction Resolution
+**Status:** `LOCKED FOR MODES THAT SUPPORT SIDE-RELATIVE SPATIAL MAPPING`
+
+When an authored `SpatialSelectorSpec` uses:
+FRONT
+BACK
+LEFT
+RIGHT
+with:
+orientationBasis = SIDE_RELATIVE
+the active Spatial Profile resolves those directions relative to the Side obtained from the selector's declared orientation anchor.
+Canonical meaning:
+FRONT = toward opposing Side
+BACK  = toward own rear
+LEFT  = left relative to reference Side facing
+RIGHT = right relative to reference Side facing
+Opposing Sides may therefore map the same semantic direction to mirrored physical Slots/coordinates.
+Direction resolution is gameplay geometry.
+It must not depend on:
+camera orientation;
+current screen rotation;
+presentation-facing animation.
+If a requested directional destination does not exist or is invalid:
+the direction resolver returns no valid destination for that candidate.
+The caller then follows its explicit:
+next priority candidate;
+occupancy policy;
+failure policy;
+fallback composition.
+No hidden nearest-position behavior is introduced.
+
+## POS-005 — Combat-Instance-keyed Field Presence
+**Status:** `LOCKED`
+
+Field Presence is authoritative per:
+Runtime Entity
+× Combat Instance
+The Kernel must be able to answer independently:
+isActivePresent(entityRef, combatInstanceId)
+for the relevant Combat Instance.
+Presence must not be inferred solely from:
+one global/singular presentation visibility flag;
+renderer state;
+camera state;
+animation;
+current screen;
+lore identity.
+An entity leaving Main Battlefield presence while becoming active-present in an Arena child Combat Instance is represented as two instance-local presence states/transitions, not one ambiguous global boolean.
+## POS-006 — ENTER_FIELD / LEAVE_FIELD Emission
+
+Status: LOCKED
+After authoritative presence state commits:
+not active-present in X
+→ active-present in X
+emit:
+ENTER_FIELD
+for Combat Instance X.
+After:
+active-present in X
+→ not active-present in X
+emit:
+LEAVE_FIELD
+for Combat Instance X.
+A repeated write that does not change the presence truth value does not emit another presence-transition Event.
+Presence Events must preserve:
+Combat Instance ID;
+entity reference;
+transaction/cause context needed by downstream listeners.
+Listeners observe the committed presence state.
+
+## POS-007 — Presence Cause Separation
+Status: LOCKED
+ENTER_FIELD / LEAVE_FIELD describe presence transition.
+They do not erase semantic cause.
+Cause-specific events and lifecycle contracts remain distinct.
+Deck deployment
+A successful Deck deployment can produce:
+DEPLOY_FROM_DECK_COMMITTED
+ENTER_FIELD
+because the first identifies cause while the second identifies the resulting presence transition.
+The deterministic publication/event sequence between these Events may be preserved for trace purposes.
+That sequence does not by itself establish gameplay Reaction priority between unrelated listeners.
+Revive
+A legitimate Revive returning a non-present Character to active battlefield presence may produce:
+ENTER_FIELD
+but remains Revive, not Deck Deployment.
+Arena transfer
+Main → Arena participant transfer may produce:
+LEAVE_FIELD(Main)
+ENTER_FIELD(Arena)
+without DEATH_CONFIRMED.
+Arena → Main return follows the same instance-local presence principle.
+Host / Combat Definition binding
+Changing:
+True Self binding;
+Combat Definition;
+Behavior Source;
+on an entity that was already active-present and remains active-present does not emit ENTER_FIELD or LEAVE_FIELD solely because of that binding/change.
+Death
+DEATH_CONFIRMED alone does not imply LEAVE_FIELD.
+Only an actual active-presence transition emits LEAVE_FIELD.
+Return to Deck
+Leaving the field does not automatically mean returning to Deck.
+A future explicit Return-to-Deck mechanic remains a separate transition.
 
 ---
 
@@ -2495,6 +3108,100 @@ depending system.
 
 No global choice yet.
 
+# 39A. DECK DEPLOYMENT CONTRACT
+
+## DEP-001 — Deck Deployment Transaction
+**Status:** `LOCKED`
+
+`DEPLOY_FROM_DECK` is a deployment-system transaction, not an Ability Action Cost.
+
+Before commit, validate at minimum:
+1. Character has valid membership in the relevant battle Deck
+2. Character's current deployment state permits a Deck → Battlefield deployment
+3. any additional deployment eligibility conditions pass
+4. Deployment Cost is resolved for runtime use
+5. Deployment Cost Bar has sufficient value
+6. requested Battlefield placement is valid
+7. destination can be reserved for the transaction
+Important:
+Deck membership alone does not prove step 2.
+A Deck member may currently be:
+already deployed;
+dead/waiting;
+unavailable;
+otherwise deployment-ineligible;
+depending on runtime/system state.
+This Contract does not define whether a successful deployment changes long-lived Deck membership.
+If validation succeeds, one successful deployment transaction commits the required deployment state atomically, including:
+Deployment Cost Bar debit
+Character deployment-state transition
+valid destination Position / active Field Presence
+Current Rage = Max Rage
+required battlefield registration
+Only after successful transaction commit are post-commit Events exposed, including:
+DEPLOY_FROM_DECK_COMMITTED
+ENTER_FIELD
+The ENTER_FIELD observer therefore sees the already-committed deployment state, including full Rage.
+The deterministic event trace may assign the two Event records distinct eventSeq values.
+That trace order does not by itself define gameplay priority between unrelated listeners responding to those Events.
+If deployment fails before commit:
+Deployment Cost Bar is not spent;
+Character does not become active-present through that attempted deployment;
+deployment full-Rage assignment does not commit;
+no successful deployment Event is published.
+A roster Character deployed this way is not automatically SUMMON.
+No new Primitive is required.
+
+## DEP-002 — Deployment Cost Metadata
+Status: LOCKED
+Deployment Cost is read from Character deployment metadata:
+character.deployment.fromDeck.deploymentCost
+It is not an Ability CostSpec.
+During authoring/Pilot Normalization:
+TBD_BY_COST_BUDGET
+is permitted as unresolved Cost Budget output.
+Runtime deployment requiring actual payment must reject execution-ready content whose Deployment Cost is still unresolved.
+This Contract does not define the future Cost Budget formula.
+
+## DEP-003 — Full Rage on Successful Deck Deployment
+Status: LOCKED
+Only a successful:
+Deck-deployment transaction
+→ Battlefield active presence
+automatically applies:
+Current Rage = Max Rage
+through the global Deck-deployment rule.
+The following do not receive this rule merely because they may also produce ENTER_FIELD:
+ordinary Revive;
+Return from Arena;
+Return from Temporary Absence;
+Rebirth;
+other non-Deck field-entry transitions.
+Full Rage does not auto-cast Ultimate.
+
+## DEP-004 — Deployment Cost Bar Gain Profile
+Status: LOCKED INTERFACE / MODE-PROVIDED RATE
+Deployment Cost Bar gain behavior is supplied by the active Mode Profile.
+The Contract layer does not define one universal gain rate for all modes.
+For a mode that supports timed Deployment Cost gain, the active Mode Profile must define the relevant rate and time source.
+The current TURN_BASED_MAIN exact rate is defined in 07_MODE_PROFILES.md, not duplicated here.
+This Contract does not define:
+Cost Bar maximum;
+overflow behavior;
+pause behavior;
+time-scale interaction;
+background/offline accumulation.
+Those must not be inferred unless a Mode/System Contract explicitly defines them.
+## DEP-005 — SSI Eligibility After Deployment
+
+Status: LOCKED
+Successful deployment does not itself grant an immediate Natural Action.
+After the Character becomes active-present:
+if deployed into a Slot the Side's current Natural Pointer has not yet passed in the current Side Pass, it may receive its Natural Action when SSI reaches that Slot;
+if deployed into a Slot already passed in that Side Pass, it waits until the next Side Pass;
+deployment never grants a second Natural Action merely by changing battlefield occupancy.
+This rule applies to roster Character deployment and does not redefine ACT-014 Summon semantics.
+
 ---
 
 # 40. IDENTITY / DEFINITION CONTRACT
@@ -3182,6 +3889,13 @@ Normalizer must block or warn when:
 14. an Axiom/Quy Tắc/Pháp Tắc same-tier conflict lacks a valid Adjudication Owner.
 15. a PUPPET is accidentally matched by a SUMMON-only TargetSpec without explicit inclusion.
 16. ordinary Revive is authored to increment `lifeSerial` without an explicit Character-specific override.
+17. a `naturalActionFormPolicy` has an ambiguous candidate selector or attempts to mutate state/pay Cost/consume RNG during candidate probing.
+18. an Action-identity Condition can mean immediate/parent/root Action but does not declare which Action reference is being queried.
+19. a provenance-sensitive recursion/echo/reflect rule relies only on Caster, Damage Attribution, or `rootActionId` even though original and generated Effects can share those values.
+20. a root-linked blocking settlement graph contains a cycle, depends on an event available only after the same root `ACTION_COMPLETED`, or can recreate an unbounded blocking dependency.
+21. an active Skill with ordinary Cost resolves/activates effects before Cost commit without an explicit Cost-timing override.
+22. a non-State Effect protection/admission rule has no explicit semantic scope and would therefore behave as accidental all-effect immunity.
+23. an Authority threshold used as a simple Effect-admission predicate is incorrectly routed through same-tier Rank/Tu vi/Stars/Awaken/CP adjudication without a direct rule conflict.
 
 # 60. WHAT IS ACTUALLY LOCKED ENOUGH NOW
 
@@ -3212,6 +3926,12 @@ The following foundational behavior is sufficiently stable for Kernel planning:
 - Arena is a separate Combat Instance.
 - Story/Belief/Stability/Proof/Realization are separate Narrative state axes.
 - Capability query uses Tags + Schema facets + system metadata.
+- an SSI-granted Natural Action may use a declarative Action-form restriction/fallback policy without becoming a Forced Action.
+- ordered Action-form candidate probing is read-only; only the selected candidate may pay Cost or enter execution.
+- active Skill Cost commits before Skill activation by default unless an explicit Contract overrides timing.
+- Action lineage and Effect provenance are separate query axes; shared root Action does not imply same generating Effect.
+- scoped non-State Effect Admission may gate effects such as Shield without creating universal all-effect immunity.
+- root-linked blocking settlements may delay one root Action's `ACTION_COMPLETED` through a bounded local dependency DAG without defining global Reaction priority.
 
 ---
 
