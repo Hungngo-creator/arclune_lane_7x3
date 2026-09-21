@@ -34,18 +34,14 @@ mục đích thiết kế là 1 char có sát thương không quá cao mà chỉ
 ultimate: gây aoe toàn sân (max 9 target), mỗi kẻ nhận sát thương = 185% wil và 185% atk của bản thân nhân vật này, sau khi gây sát thương xong nếu trong target có summon không có chân ngã nhưng có hp bar và hp của chúng dưới hoặc= 10% max hp của bản thân chúng, lập tức DEATH_CONFIRMED, hiệu ứng này chỉ target summon có rank bằng hoặc thấp hơn nhân vật này.
 (tránh kill vật chứa của cố sự chi thần hoặc case tương tự), tỉ lệ sát thương này cũng không phải thấp đối với summon, nhiều khi không cần kết liễu là đã chết rồi, nếu kích hoạt kết liễu summon thì 2 bên player chỉ thấy summon nhận ultimate này rồi summon DEATH_CONFIRMED, tức quá trình nhận sát thương nếu đủ điều kiện kết liễu thì kết liễu trong natural Action của nhân vật này luôn, tao muốn không có delay về mặt hiển thị.
 
-5) Đế Hoài An/ Di Huai'an
-
-không thể không ma hoá
+5) Đế Hoài An
 
 
-nội tại: mỗi natural Action gồm skill/đánh thường/ultimate đều sẽ gắn 1 mark Đóng Băng lên mục tiêu, khi đạt đủ 3 mark trên target, lập tức đóng băng target, họ không thể thực thi natural Action trong 1 turn của bản thân họ, ngay khi vfx đóng băng kích hoạt, tức vừa xoá 3 mark đóng băng để kích hoạt đóng băng, 5 thanh băng kiếm từ góc nghiêng 60 độ trước mặt mục tiêu sẽ xuất hiện, đâm về phía mục tiêu, gây sát thương = 150% đánh thường của nhân vật này, số lượng băng kiếm không quan trọng, chỉ là hiển thị thôi, quan trọng là nội tại này lấy chỉ số từ đánh thường, nếu sát thương đánh thường tăng thì nội tại sẽ tăng sát thương, mark đóng băng và hiệu ứng đóng băng khi kích hoạt mark thuộc cấp pháp tắc, đâg đơn giản là một loại stun thôi. mỗi mark có time tồn tại riêng = 2 turn boundary của nhân vật này.
+nội tại: mỗi natural Action gồm skill/đánh thường/ultimate đều sẽ gắn 1 mark Đóng Băng lên mục tiêu, khi đạt đủ 3 mark trên target, lập tức đóng băng target, họ không thể thực thi natural Action trong 1 turn của bản thân họ, ngay khi vfx đóng băng kích hoạt, tức vừa xoá 3 mark đóng băng để kích hoạt đóng băng, 5 thanh băng kiếm từ góc nghiêng 60 độ trước mặt mục tiêu sẽ xuất hiện, đâm về phía mục tiêu, gây sát thương = 150% đánh thường của nhân vật này, số lượng băng kiếm không quan trọng, chỉ là hiển thị thôi, quan trọng là nội tại này lấy chỉ số từ đánh thường, nếu sát thương đánh thường tăng thì nội tại sẽ tăng sát thương, mark đóng băng và hiệu ứng đóng băng khi kích hoạt mark thuộc cấp pháp tắc, đơn giản là một loại stun thôi. mỗi mark có time tồn tại riêng = 2 turn boundary của nhân vật này.
 
-nếu target tu vi cao hơn bản thân 5 tiểu cảnh giới hoặc 1 đại cảnh giới, sát thương từ mark giảm 50%, nếu target hơn bản thân 2 đại cảnh giới, sát thương từ mark thành 1 sát thương chuẩn, căn bản vô hiệu. giới hạn này chỉ áp dụng lên target có rank hơn hoặc = bản thân nhân vật này. ví dụ, tao sẽ dùng 2 đại cảnh giới đầu game là Khai nguyên, trúc cơ đến Kết Đan, mỗi đại cảnh giới này đều có 9 tiểu cảnh giới, khai nguyên 4 gặp KN9 > giảm 50% sát thương từ mark, KN9 gặp Trúc Cơ 1 cũng thế, KN9 gặp Kết Đan 1 trở lên mark vẫn tích nếu không bị kit khác ảnh hưởng, tích xong kích nổ nhưng chỉ gây 1 sát thương chuẩn.
+mặc dù freeze natural Action rất khó chịu nhưng bản thân mark này chỉ là cấp pháp tắc, gặp thần tính thì vô dụng, hơn nữa hạn chế không ít.
 
-mặc dù free natural Action rất khó chịu nhưng bản thân mark này chỉ là cấp pháp tắc, gặp thần tính thì vô dụng, hơn nữa hạn chế không ít.
-
-đánh thường: tấn công 1 target, gây 150% wil và 150% atk.
+đánh thường: tấn công 1 target, gây 100% wil và 100% atk.
 
 skill 1: 
 
@@ -64,7 +60,7 @@ nội tại: mỗi khi DEATH_CONFIRMED, vào luân hồi ngay và bỏ qua cửa
 Nữ, warrior
 
 Nội tại, Tinh Vẫn Thần Quyền: mỗi đánh thường và skill gắn 1 mark 'Tinh Vẫn' lên target, khi đạt 3 mark trên target, tinh không xuất hiện sao băng (animation) tấn công target, gây sát thương = 150% will và atk của mark owner lên target, if target hp < 10% max hp, execute now, sau khi kích hoạt mark sẽ biến mất.
-mark cấp Pháp Tắc, kit xoá mark dưới cấp này không thể xoá mark này, nếu kit xoá lv pháp tắc thì phán định xung đột tag.
+mark cấp Pháp Tắc, kit xoá mark dưới cấp này không thể xoá mark này, nếu kit xoá lv pháp tắc thì phán định xung đột quyền hạn.
 
 đánh thường: gây sát thương = 100% wil và atk lên 1 target, nếu target không đứng hàng 7/8/9 và sau lưng có đơn vị khác, target đó bị đánh văng và đụng trúng target khác sau lưng họ, cả hai nhận thêm sát thương = 30% wil và 30% atk của nhân vật này, 2 kẻ thù đụng nhau chỉ là cơ chế, animation và không ảnh hưởng vị trí chúng đứng trên sân, target đầu bị đánh sẽ bị gắn 1 mark, nếu kích hoạt đụng nhau thì cả 2 target đó sẽ không nhận thêm mark.
 
@@ -109,6 +105,7 @@ a hHP damage target nhận từ nhân vật này, hiệu ứng này tính là fo
 
 skill 1: triệu hồi 5 lỗ đen (vfx biến động theo lượng target, không hiện ở ô skill có thể target nhưng không có target), trong đó bay ra tia sét gây sát thương = 150% wil và 120% atk của bản thân lên 5 vị trí cố định là 2/4/5/6/8 của kẻ địch, đòn aoe này mỗi khi DEATH_CONFIRMED 1 target có chân ngã thì cost của skill này giảm 4 ae, cost: 30 ae.
 Nếu kích hoạt nội tại thì phần giảm cost đương nhiên tính vì sát thương chuẩn của nội tại tính là follow up trong 1 natural Action.
+nếu target dưới 5, mỗi target chỉ nhận 1 lần sát thương từ skill này.
 
 skill 2: sau khi kích hoạt bằng 1 natural Action, không gây sát thương ngay mà tụ lực, đến natural Action tiếp theo sát thương gây ra bằng ultimate/skill hoặc đánh thường hệ số sát thương tăng 40% trong 1 natural Action, 25 ae.
 ví dụ dùng skill này, natural Action sau dùng skill 1 thì hệ số sát thương wil và atk của skill 1 tăng 40%, 210% wil và 168% atk lên mỗi target, chưa kể nếu nội tại kích hoạt thì sau đó mỗi target nhận thêm 30% Actual HP Damage của skill 1 dưới dạng sát thương chuẩn và sát thương cao như thế thì DEATH_CONFIRMED không khó, tối đa giảm được 20 ae cost skill 1, điểm cân bằng là kích hoạt skill 2 cần 1 turn, animation sẽ là vận sức, có lẽ nên nerf kiểu sau khi kích hoạt skill 2 xong thì nhận debuff hay tạm mất chỉ số nào đó?.
@@ -160,7 +157,7 @@ Tên rất mạnh vì bản thân nó gợi Latin sanguis = blood, rồi cái t�
 
 trong dự án này thiết lập hắn như 1 thiên sứ bị huyết tộc cấp cao cắn và thành huyết tộc là hợp lý, thiên sứ làm người ta liên tưởng đến ánh sáng nhưng huyết tộc lại sợ mặt trời, hắn bị trục xuất khỏi Thánh Vực ( thần quốc của các thiên sứ cấp thần), hắn phải lòng một vị huyết tộc xinh đẹp, nàng phản bội hắn vì bất đắc dĩ, nói chung là một cái máu chó cố sự yêu hận tình cừu, nói vậy chứ hắn dù sao cũng là thần, dù chỉ là nhỏ yếu thần, hắn sẽ không sợ mặt trời bình thường, Thái Dương Thần thì sợ.
 
-nội tại: mỗi khi trên sân có kẻ thù thuộc element light, mỗi kẻ làm hiệu ứng hồi phục của hắn lên đồng minh giảm 10%, (ở mode turn base thì cap là 9), mỗi kẻ cũng làm sát thương hắn gây lên chúng giảm 10%.
+nội tại: mỗi khi trên sân có kẻ thù thuộc element light có rank prime, mỗi kẻ làm hiệu ứng hồi phục của hắn lên đồng minh giảm 10%, (ở mode turn base thì cap là 9 vì phe địch ta mỗi phe chỉ có 9 ô, đây là cap tự nhiên của mode), mỗi kẻ cũng làm sát thương hắn gây lên chúng giảm 10%. (trừ sát thương chuẩn nếu char này gây sát thương chuẩn)
 
 khi vào sân mỗi natural Action thành công hắn tự heal hp = 4% max hp của hắn, nếu trên sân kẻ thù có nhiều hơn hoặc = 3 đơn vị có element tag là light thì phần hồi hp này tạm thời vô hiệu hoá, khôi phục khi kẻ thù có 2 kẻ thù thuộc element light trở xuống.
 
@@ -168,8 +165,11 @@ mỗi lần ultimate xong rage max giảm 3.
 
 skill 1: rút hp = 20% max hp của bản thân (không giảm max hp), gây sát thương = 20% đó (chia đều 20% đó ra thành wil và atk) + 180% wil và 140% atk lên 1 target, sau đó phát nổ, gây sát thương lần nữa = 2% max hp của kẻ thù dưới dạng sát thương chuẩn, 25 ae.
 
-skill 2: chỉ có thể kích hoạt khi hp trên hoặc = 40% max hp, rút hp = 10% max hp của bản thân + 10% max hp của mọi đồng minh trừ leader trên sân có hp trên hoặc = 60% max hp của họ, sau đó tổng lượng hp rút được sẽ được chuyển toàn bộ cho leader đồng minh, nếu thừ sẽ được chuyển thành khiên tồn tại tối đa 2 natural Action của nhân vật này, cap time tồn tại của khiên khiên bắt đầu tính khi đến natural Action tiếp theo sau khi dùng skill này, 20 ae. skill này không làm giảm max hp.
+skill 2: chỉ có thể kích hoạt khi hp trên hoặc = 40% max hp, rút hp = 10% max hp của bản thân + 10% max hp của mọi đồng minh trừ leader trên sân có hp trên hoặc = 60% max hp của họ, sau đó tổng lượng hp rút được sẽ được chuyển toàn bộ cho leader đồng minh, nếu thừa sẽ được chuyển thành khiên tồn tại tối đa 2 natural Action của nhân vật này, cap time tồn tại của khiên khiên bắt đầu tính khi đến natural Action tiếp theo sau khi dùng skill này, 20 ae. skill này không làm giảm max hp.
 khiên từ skill này không thể vượt 100% max hp của leader.
+việc mất hp vì đồng minh của đồng minh cùng phe với nhân vật này tính thế nào? hp cost của bản thân kẻ bị rút?.
+
+skill 3: mỗi natural Action, bản thân hắn tự heal = 8% max hp, cost = 10 ae/natural Action, đây là skill bị động, tao có thể thêm nó vào nội tại nhưng không làm thế vì cost chính là một loại nerf, nếu char này dùng skill 1 hoặc 2 thì heal từ skill 3 trước rồi mới rút máu nếu hắn có hp dưới hoặc= 30% max hp, nếu hắn có hp trên 75% thì thanh toán cost skill 1 và 2 trước mới heal từ skill 3, nếu không đủ cost thì skill này không kích hoạt, nếu hắn dưới 30% max hp và team chỉ có 20 ae và player cho hắn dùng skill 2 thì sao? là skill 3 đi trước, sau đó không đủ ae để làm cost skill 2 nên sẽ fall back về đánh thường, nhưng nếu hắn có hp trên 75% và còn 20 ae thì skill 2 được kích hoạt trước và skill 3 không kích hoạt vì không đủ ae, nhưng nếu hắn có hp từ 30% đến 75% và team chỉ có 20 ae và hắn muốn kích hoạt skill 2 thì sao?.
 
 ultimate: rút ra hp = 25% max hp, tạo 1 chi huyết tiễn tấn công leader kẻ thù, gây sát thương = lượng hp rút ra dưới dạng sát thương chuẩn lên leader kẻ thù bất kể vị trí nhân vật này đứng ở đâu, khi huyết tiễn bắt đầu bay hắn cũng cầm quang kiếm lao về phía trước (vfx), chém dọc gây sát thương lên hàng 2/5/8, mỗi kẻ nhận 170% wil và atk của nhân vật này, trong mắt player thấy tự dưng có hắn mất hp, có huyết tiễn bay về leader địch và hắn chém dọc cùng lúc luôn.
 nếu ultimate lúc rút hp không đủ 25% thì hắn rút toàn bộ và chỉ chừa lại hp = 2% max hp của mình, toàn bộ hp rút được vẫn gây sát thương tương ứng.
@@ -645,4 +645,106 @@ lịch sử Pontus
 tự đầu độc · liều nhỏ → kháng độc · thứ từng gây hại trở thành khả năng chống lại chính nó · độc và giải độc cùng nguồn.
 đã có char phù hợp tên này.
 
-56) 
+56) Renchu / Nhận Sơ
+Hoá Thân của Kiếm Chủ, Kiếm Chủ là tiên thiên thần sinh ra từ khái niệm kiếm, Prime.
+
+nội tại: mọi sát thương natural Action gây ra đều là sát thương chuẩn, heal cho bản thân = 50% lượng sát thương chuẩn gây ra bằng natural Action từ nội tại, nếu over heal, chuyển thành khiên với tỉ lệ 1% lượng sát thương over heal = 1% max hp của nhân vật  này sang 0,5% max hp khiên của nhân vật này, vậy lượng, tức nhân vật này có 100/150 max hp, gây sát thương chuẩn bằng nội tại là 70, 20 là over heal, trong đó 1% max hp của nhân vật này là 1,5, vậy 20 over heal đó mỗi 1,5 over heal thì hắn nhận 1,5/2 là 0,75 khiên.
+
+Thần tính: không nhận debuff/buff/mark từ mọi nguồn bên ngoài thuộc cấp Quy Tắc và Quy Tắc trở xuống.
+
+đánh thường: gây sát thương chuẩn = 100% wil + 100% atk lên 1 target.
+
+skill 1: đứng tại chỗ loạn trảm ra 4 đạo kiếm khí, gây sát thương chuẩn lên ô 8/2/4/6 của kẻ địch, 15 ae, mỗi kẻ nhận sát thương = 135% wil + 150% atk của nhân vật này.
+
+skill 2: chém dọc, một đạo kiếm khí khổng lồ lao về ô 2/5/8 của sân kẻ địch bất kể nhân vật này đứng ở đâu, mỗi kẻ trúng nhận sát thương chuẩn = 160% wil và 180% atk của nhân vật này, 25 ae.
+
+skill 3: rút kiếm, thu kiếm, mọi chân ngã trong hàng chờ luân hồi thuộc phe kẻ thù lập tức vào luân hồi, chân ngã phe đồng minh không bị ảnh hưởng, cần 1 natural Action, 30 ae.
+hắn chém khoảng cách giữa hàng chờ luân hồi và luân hồi của chân ngã thuộc phe kẻ thù.
+
+ultimate: cast skill 1 và 2 cùng lúc nhưng không tốn ae.
+
+
+57) .
+
+ultimate: gán debuff phản hồi phục cho 3 kẻ thù ngẫu nhiên sau đó heal cho họ hp = 150% wil + 150% atk.
+
+58) Rosenthal
+
+59) 
+
+mỗi 3 natural Action, natural Action tiếp theo được cường hoá, natu action đó gây ra bao nhiêu sát thương thì 50% của sát thương đó sẽ được gây ra dưới dạng sát thương chuẩn, đồng thời heal = 40% tổng sát thương chuẩn gây ra từ natural Action được cường hoá từ nội tại này.
+
+ví dụ: vào sân là 1 natural Action, thêm 2 natural Action nữa thì natural Action kế tiếp là được cường hoá, cường hoá xong lại reset về như lúc vào sân.
+
+nội tại này rất hợp đầu trận, nơi có ít đơn vị trên sân nên kích nội tại cần ít thời gian hơn.
+
+60) 
+
+nội tại: mọi debuff cấp pháp tắc gây giảm hp trên kẻ thù bị kéo dài thời gian thêm 1 natural Action hoặc 1 turn boundary tùy loại
+
+
+
+61) 
+
+nội tại: vào sân không có chân ngã, kit hoạt động bình thường, chân ngã đầu thai vào sẽ tăng sức mạnh, một sinh vật huyết nhục kết hợp với cơ giới nhưng không có chân ngã.
+vào trận cost trên deck giảm 2, không stack, ví dụ cost giảm còn 15 thì rời sân vào deck bao lần cũng là thế nếu không bị ảnh hưởng bởi kit khác.
+
+skill 1: target 3 kẻ thù có rage cao nhất trên sân, bắn 3 viên đạn vào chúng, mỗi kẻ nhận 1 viên với sát thương là 135% wil và 135% atk, đồng thời giảm 15 rage của chúng, cost 30 ae, nếu có chân ngã đầu thai vào thì tăng tỉ lệ sát thương từ 135% wil/atk lên 150% wil và 150% atk, 15 lên 20 rage, cost giảm 5 ae.
+
+skill 2: khi nhận sát thương vượt quá 35% max hp của bản thân từ natural Action của kẻ thù ( không tính dot nhưng tính các nội tại gây sát thương kiểu follow up hoặc cường hoá sát thương, sát thương chuẩn cũng tính), chuyển 100% lượng hp/max hp đã mất thành khiên trong 3 natural Action của bản thân, ví dụ: 100/200 hp chuyển thì còn 100 max hp nhưng khiên cũng là 100, vậy là mất max hp nhưng nhận lượng khiên tương ứng, sau 3 natural Action thì khiên biến mất nếu chưa vỡ, max hp hồi phục, nếu lúc đó còn khiên thì heal hp = lượng khiên còn lại.
+nếu còn 100 max hp/30 khiên thì khi hồi phục là 130/200 max hp, nếu không còn khiên thì 100/200 max hp.
+nhưng khiên của bản thân skill 2 mới tính nha, hiện khiên có nhiều nguồn, nhận sát thương thì bị trừ đều.
+cost 5 ae mỗi lần kích hoạt, khi bộ đếm 3 natural Action kết thúc thì vào cd 2 natural Action của bản thân, không hạn lần kích hoạt/trận.
+
+skill này không biết là tốt hay xấu nữa, nó làm giảm max hp, trong time giảm max hp thì heal nhiều cũng vô dụng trừ phi chuyển thành khiên, nếu khôi phục max hp mà có khiên từ nguồn ngoài skill này thì khiên đó vẫn sẽ giữ nguyên nếu không bị hết time.
+
+dù giảm max hp nhưng lại có lớp khiên = hp đã mất đổi lại giảm max hp = hp đã mất.
+
+có chân ngã đầu thai vào thì khi bộ đếm 3 natural Action kết thúc và skill 2 vào cd thì char này tăng 5% max hp (tính lúc skill 2 vào cd), reset khi rời sân.
+
+skill 3: target kẻ thù ở ô 8 ( không nhất định là leader vì sau này lỡ đâu có kit chuyển vị trí leader thì sao), gây sát thương = 160% wil và 160% atk lên kẻ đó. cost 25.
+chân ngã: nếu target nhận Actual HP damage từ skill 3, chúng nhận thêm sát thương chuẩn = 5% max hp lúc dùng skill 3 của nhân vật này. cost giảm 5.
+
+ultimate: cast 1 lần skill 1 nhưng 0 cost, sau đó hồi hp = 50% Actual HP Damage gây ra.
+
+
+62) 
+
+63) .
+
+64) .
+
+65) .
+
+66) .
+
+67) .
+
+68) .
+
+69) .
+
+70) .
+
+
+71) .
+
+72) .
+
+73) .
+
+74) .
+75) .
+
+76) .
+
+77) .
+
+78) .
+
+79) .
+80) .
+81) .
+
+82) .
+83) .

@@ -1404,6 +1404,46 @@ The only proposed solution is bespoke Character runtime code.
 **Forbidden Outcomes:** “2 turns = 2 seconds” or “2 attacks”.  
 **Layers Under Test:** Authoring workflow, Mode.
 
+## J-007 — Turn-based AE Regen Requires an Actually Completed Natural Action
+
+**ID:** `J-007`  
+**Status:** `MUST_PASS`  
+**Purpose:** verify `AE_ACTION_REGEN_BY_CLASS` is a Turn-based Mode rule tied to actual Natural Action completion, not SSI opportunity consumption or generic Action execution.
+
+**Initial State:** `TURN_BASED_MAIN`; Side AE pool exists; Actors of each Effective Class can perform legal Natural Actions.
+
+**Input:** parameterized cases:
+
+Support Natural Action completed
+Mage Natural Action completed
+Summoner Natural Action completed
+Warrior Natural Action completed
+Tanker Natural Action completed
+Ranger Natural Action completed
+Assassin Natural Action completed
+
+plus negative cases:
+Actor loses SSI opportunity to CC and performs no Action
+Follow-up completes
+Counter completes
+Reaction completes
+Forced Action completes
+child Action completes
+Expected Resolution:
+Support   → +10 Side AE
+Mage      → +7 Side AE
+Summoner  → +7 Side AE
+Warrior   → +5 Side AE
+Tanker    → +5 Side AE
+Ranger    → +5 Side AE
+Assassin  → +3 Side AE
+Basic / Skill / Ultimate used as the Natural Action all grant the same amount for the Actor's Effective Class.
+Every negative case grants:
++0 class AE
+The lookup samples EFFECTIVE_CLASS at the Natural Action completion point.
+Forbidden Outcomes: CC-consumed opportunity grants AE; child/follow-up/counter/reaction grants AE; native Class is used when Effective Class differs; Basic/Skill/Ultimate use different class-regen amounts; Exploration silently inherits this table.
+Layers Under Test: Mode Resource Profile, SSI, Effective Class, Resource Runtime.
+
 ---
 
 # 15. TEST GROUP K — VALIDATION / ANTI-SCRIPTING
@@ -1506,6 +1546,59 @@ The only proposed solution is bespoke Character runtime code.
 **Expected Resolution:** reject inference; remains Physical with Penetration.  
 **Forbidden Outcomes:** semantic conversion.  
 **Layers Under Test:** Tag, Damage Schema.
+
+## K-009 — Ambiguous Action-lineage Query
+
+**ID:** `K-009`  
+**Status:** `MUST_REJECT`  
+**Purpose:** prevent immediate/parent/root Action identity from being silently conflated.
+
+**Initial State:** root Action is `ULTIMATE`; child Action is `SKILL`; child Effect produces the observed Event.
+
+**Input:** authored Condition says only:
+
+ACTION_IDENTITY_IS = SKILL
+while the mechanic can semantically refer to either the immediate child or root Action and provides no explicit ACTION_REF.
+Expected Resolution: Normalizer rejects the ambiguous Condition and requires an explicit Action relation such as SELF, PARENT, or ROOT.
+Forbidden Outcomes: silently interpret as immediate Action; silently interpret as root Action; choose whichever interpretation makes the kit work.
+Layers Under Test: Schema validation, Action lineage, Condition evaluator.
+
+## K-010 — Invalid Root Completion Dependency Graph
+ID: K-010
+Status: MUST_REJECT
+Purpose: prevent completion deadlock and impossible dependency graphs.
+Initial State: normalized Ability data declares root-linked blocking settlements.
+Input: test invalid cases:
+A dependsOn B
+B dependsOn A
+and:
+A cannot settle until the same root ACTION_COMPLETED Event occurs
+while A itself blocks that ACTION_COMPLETED
+Expected Resolution: validation rejects both graphs before battle execution.
+Forbidden Outcomes: accept cyclic graph; root Action waits forever at runtime; silently drop one dependency edge; use eventSeq/list order to break the cycle.
+Layers Under Test: Ability Schema, ACT-032, Normalizer, Completion Dependency DAG.
+
+## K-011 — Ambiguous Natural-Action Form Selector
+ID: K-011
+Status: MUST_REJECT
+Purpose: ensure ordered Action-form policies remain deterministic and data-driven.
+Initial State: one naturalActionFormPolicy candidate selects SKILL through a selector rather than exact Ability reference.
+Input: selector matches two equally valid damaging Skills and declares no deterministic selection rule.
+Expected Resolution: Normalizer rejects the policy as ambiguous.
+Forbidden Outcomes: select first list item; select by dictionary iteration; use RNG without an authored RNG policy; silently prefer lower/higher Cost.
+Layers Under Test: Ability Schema, Natural Action Form Resolver, Determinism.
+
+## K-012 — Unscoped Non-State Effect Admission Rule
+ID: K-012
+Status: MUST_REJECT
+Purpose: prevent scoped Effect Admission from becoming accidental all-effect immunity.
+Initial State: Character owns an admission/protection rule.
+Input: rule says only:
+reject external Effects below QUY_TẮC
+but does not declare which Effect semantic(s) it governs.
+Expected Resolution: Normalizer rejects the rule until explicit scope is supplied, such as SHIELD.
+Forbidden Outcomes: infer Shield because current Character happens to use Shield; turn the rule into global Damage/Heal/State immunity; use presentation/lore wording as the missing scope.
+Layers Under Test: Effect Admission, Schema validation, Authority boundary.
 
 ---
 
@@ -1856,6 +1949,236 @@ These are not isolated primitives. They deliberately span multiple layers.
 **Forbidden Outcomes:** listener observes pre-commit/half-commit Position; new Mark immediately becomes 2 from same Natural Action; old Mark remains; Ariadne performs another passive movement in current Natural Action merely because new Mark appeared; this test is interpreted as defining global priority against unrelated same-window Reactions.  
 **Layers Under Test:** Position observation, Position Mark, State identity, Natural Action clock, existing primitives.
 
+## M-021 — Echo Root Ultimate / Child Skill Action Memory
+
+**ID:** `M-021`  
+**Status:** `MUST_PASS`  
+**Purpose:** prove Echo can query immediate and root Action Identity independently.
+
+**Initial State:** enemy performs root `ULTIMATE`; Ultimate invokes child `SKILL`; child Skill causes qualifying Actual HP Damage to Echo.
+
+**Input:** Echo Action-form memory observes the damaging Event.
+
+**Expected Resolution:**
+immediate Action Identity = SKILL
+root Action Identity      = ULTIMATE
+
+Echo memory:
+primary  = ULTIMATE
+fallback = SKILL
+The Event remains attributable to the correct Action lineage without changing the child Skill's own identity.
+Forbidden Outcomes: record only SKILL and lose root identity; rewrite child Skill as ULTIMATE; store both identities in one ambiguous field; infer ancestry from animation/presentation.
+Layers Under Test: Action lineage, Condition query, parent/child Action system, Echo memory.
+
+## M-022 — Same-root Effect Provenance Prevents Echo Repeat Recursion
+ID: M-022
+Status: MUST_PASS
+Purpose: prove Action lineage alone is insufficient and Effect provenance prevents one-layer repeat from recursively repeating itself.
+Initial State: Echo uses a damaging Action on enemy T; no Shield interferes; original Damage causes exactly 200 Actual HP Damage. Echo's repeat ratio = 50%.
+Input: outgoing repeat passive resolves.
+Expected Resolution:
+original Damage:
+Actual HP Damage = 200
+rootActionId = R
+Damage Attribution = Echo
+originEffectId = ORIGINAL_DAMAGE
+
+repeat Damage:
+True Damage = 100
+rootActionId = R
+Damage Attribution = Echo
+originEffectId = ECHO_REPEAT
+The repeat Damage does not generate another repeat.
+If it causes 100 Actual HP Damage, Skill 1 aggregation may identify that 100 as repeat-origin Damage while excluding the original 200.
+Forbidden Outcomes: repeat creates 50 → 25 → 12.5... chain; recursion guard relies only on rootActionId; recursion guard relies only on Damage Attribution; Skill 1 aggregates original Damage as if it were repeat Damage.
+Layers Under Test: Effect provenance, Action lineage, Actual HP Damage, recursion guard, result aggregation.
+
+## M-023 — Two Echoes Do Not Create Repeat Feedback Loop
+ID: M-023
+Status: MUST_PASS
+Purpose: prove provenance-based recursion protection remains correct across two different owners with the same kit.
+Initial State: Echo A attacks Echo B; both have sufficient HP; no Shield; direct hit causes B exactly 100 Actual HP Damage.
+Input: resolve both Characters' qualifying passive listeners.
+Expected Resolution:
+From the original direct Damage:
+Echo A outgoing repeat
+→ 50 True Damage to Echo B
+
+Echo B incoming self-repeat
+→ 50 True Damage to Echo B
+Both repeat Effects are passive-generated and terminate after that layer.
+They do not trigger:
+another outgoing repeat from A;
+another incoming repeat from B;
+each other's repeat listener.
+Forbidden Outcomes: infinite A↔B repeat chain; repeat packet from A is treated as fresh qualifying enemy direct Damage for B; B self-repeat generates another repeat because Damage Attribution = B.
+Layers Under Test: Effect provenance, cross-Character Trigger filtering, recursion guard, Damage Attribution.
+
+## M-024 — Echo Natural-Action Form Restriction Uses Read-only Ordered Fallback
+ID: M-024
+Status: MUST_PASS
+Purpose: verify explicit Character law overrides Mode default without turning the Action into Forced Action or mutating rejected candidates.
+Initial State: Echo has an SSI-granted Natural Action.
+Case A
+Memory:
+primary  = ULTIMATE
+fallback = SKILL
+then     = BASIC_ATTACK
+Current Rage is below Max Rage.
+Skill costs 30 AE.
+Side AE = 20.
+Input: resolve Echo's Natural Action form.
+Expected Resolution:
+probe ULTIMATE
+→ rejected: not Rage-ready
+
+probe SKILL
+→ rejected: unpayable
+
+probe BASIC_ATTACK
+→ legal
+→ select BASIC_ATTACK
+During both rejected probes:
+Rage unchanged;
+AE remains 20;
+cooldowns unchanged;
+RNG stream unchanged;
+no target is locked;
+no gameplay Event is emitted.
+The selected Basic is still:
+naturalActionStatus = NATURAL
+Case B
+Memory restricts Echo to:
+SKILL
+→ BASIC_ATTACK
+Echo is at full Rage and Skill is payable/legal.
+Expected Resolution: Skill is selected. Mode default full-Rage Ultimate priority does not bypass the explicit Character restriction.
+Forbidden Outcomes: rejected Skill spends AE; rejected Ultimate consumes/resets Rage; random target selection occurs while probing; Action becomes FORCED_ACTION; full Rage ignores Echo restriction.
+Layers Under Test: ACT-003, Cost, Rage, Mode Action-form priority, Determinism.
+
+## M-025 — Echo Scoped Shield Admission by Authority
+ID: M-025
+Status: MUST_PASS
+Purpose: prove non-State Effect Admission is scoped and that an Authority threshold is not automatically same-tier progression adjudication.
+Initial State: Echo owns a rule:
+external SHIELD admitted only if incoming Authority >= QUY_TẮC
+No separate direct-Damage admission rule exists.
+Input: four external Shield Effects arrive independently:
+NORMAL
+PHÁP TẮC
+QUY TẮC
+AXIOM
+then an ordinary direct Damage Effect arrives.
+Expected Resolution:
+NORMAL Shield      → REJECT
+PHÁP TẮC Shield    → REJECT
+QUY TẮC Shield     → ADMIT
+AXIOM Shield       → ADMIT
+The simple threshold check does not invoke Rank → Tu vi → Stars → Awaken → CP comparison.
+The ordinary direct Damage proceeds through the normal Damage pipeline because Echo's admission rule scopes only SHIELD.
+Forbidden Outcomes: Pháp Tắc Shield admitted; threshold comparison invokes same-tier progression adjudication without direct conflict; Shield rule blocks Damage; every incoming Effect is globally routed as immunity.
+Layers Under Test: Scoped Effect Admission, Shield Runtime, Authority threshold, Damage boundary.
+
+## M-026 — Echo Blocking Settlements Cannot Self-fund from Same Natural Action AE Regen
+ID: M-026
+Status: MUST_PASS
+Purpose: verify local root-completion dependencies settle before ACTION_COMPLETED and before class AE regeneration.
+Initial State: Echo Mage performs a Natural Action. Side AE = 35. The Action:
+produces qualifying outgoing repeat Damage P > 0;
+causes at least one qualifying True-Self DEATH_CONFIRMED;
+leaves Echo with Shield available for Skill 3;
+therefore makes both Skill 3 and Skill 1 eligible.
+Costs:
+Skill 3 = 30 AE
+Skill 1 = 10 AE
+Mage completion regen = +7 AE
+Local dependency:
+Skill 3
+→ Skill 1
+→ root ACTION_COMPLETED
+Input: resolve the Natural Action to completion.
+Expected Resolution:
+AE 35
+→ Skill 3 pays 30
+→ AE 5
+→ Skill 3 resolves
+
+→ Skill 1 becomes ready
+→ cannot pay 10
+→ Skill 1 = FAILED_COST
+→ Skill 1 dependency becomes terminal
+
+→ all blocking dependencies terminal
+→ root ACTION_COMPLETED
+
+→ Mage Mode hook grants +7 AE
+→ AE 12
+Skill 1 does not reactivate retroactively after AE becomes 12.
+Forbidden Outcomes: +7 Mage AE occurs before Skill 1 Cost check; Skill 1 self-funds from current Natural Action's regen; failed Skill 1 leaves root Action blocked forever; root Action completes before Skill 3/Skill 1 dependencies settle.
+Layers Under Test: ACT-032, Completion Tracker, triggered Cost, Mode AE regen, Natural Action completion.
+
+## M-027 — Echo Local Skill 3 → Skill 1 Ordering
+ID: M-027
+Status: MUST_PASS
+Purpose: verify Echo-specific local dependency order without defining global Reaction priority.
+Initial State: Echo Natural Action makes both Skill 3 and Skill 1 eligible; Side AE is sufficient for both; Echo currently has Shield; Skill 1 will create new Shield from P.
+Input: resolve the root completion graph.
+Expected Resolution:
+existing Shield snapshot
+→ Skill 3 converts 50% current total Shield to Max HP
+→ Current HP remains unchanged
+→ Skill 3 terminal
+
+→ Skill 1 settles
+→ Heal
+→ new Skill 1 Shield is created
+
+→ root ACTION_COMPLETED
+→ class AE regen
+The Shield newly created by Skill 1 is not retroactively consumed by Skill 3 from the same Action.
+This ordering exists only because normalized Echo dependency data declares it.
+Forbidden Outcomes: Skill 1 Shield is created first and immediately converted by Skill 3; eventSeq alone chooses order; this test is generalized into a global Skill-3-before-Skill-1 priority; root completes between the two settlements.
+Layers Under Test: local completion DAG, Shield, Max HP Mutation, Trigger ordering.
+
+## M-028 — Echo CC-lost Opportunity Preserves Actual-action Windows
+ID: M-028
+Status: MUST_PASS
+Purpose: distinguish SSI opportunity consumption from an actually performed Natural Action across memory, free-cost duration and class AE regeneration.
+Initial State: Echo has:
+Action-form memory = SKILL
+Skill-1 free-cost window = 2 actually performed Natural Actions remaining
+Input: Echo's next SSI opportunity is lost to CC and no Action is performed; later Echo receives another opportunity and actually performs a legal Skill Natural Action.
+Expected Resolution after CC-lost opportunity:
+memory remains SKILL
+free-cost window remains 2
+class AE gain = 0
+After the later actually performed Natural Action completes:
+memory used by that Action is cleared
+free-cost window 2 → 1
+Mage class AE +7 occurs after root-linked settlements and ACTION_COMPLETED
+Forbidden Outcomes: CC clears memory; CC decrements free-cost window; CC grants +7 AE; global Turn Boundary substitutes for actual-action completion.
+Layers Under Test: SSI, actor-specific Natural Action window, duration State, Action-form memory, Mode AE regen.
+
+## M-029 — Echo Skill 3 Uses Root-outcome Attribution, Not Temporal Coincidence
+ID: M-029
+Status: MUST_PASS
+Purpose: prove DEATH_CONFIRMED qualification follows root Action lineage/provenance and once-per-Natural-Action semantics.
+Initial State: during one Echo Natural Action:
+enemy A with True Self is damaged by Echo;
+Echo's repeat Effect linked to the same root Action causes A's DEATH_CONFIRMED;
+unrelated enemy B with True Self dies during the same broad time window from another source;
+optionally enemy C also receives a qualifying DEATH_CONFIRMED from another Echo-linked repeat in the same root Action.
+Input: evaluate Echo Skill 3 trigger.
+Expected Resolution:
+A qualifies
+B does not qualify
+C qualifies if present
+Because at least one qualifying death belongs to Echo's root Natural Action:
+Skill 3 activation attempts exactly once
+regardless of whether A alone or A+C qualify.
+Forbidden Outcomes: B qualifies merely because death happened before Echo Action completed; linked repeat kill A is excluded because immediate Effect is passive; one activation per dead target; attribution determined only from Damage Attribution without root/effect provenance.
+Layers Under Test: DEATH_CONFIRMED, Action lineage, Effect provenance, Trigger cap/frequency, root-outcome attribution.
+
 ---
 
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
@@ -2043,6 +2366,10 @@ When executable Kernel tests exist, at minimum create Golden Traces for:
 12. `M-011` inherit-outer Authority composite.
 13. `M-012` Story property capability source.
 14. `N-005` Puppet Behavior/Adjudication/Damage source split.
+15. `M-021` root Ultimate / child Skill Action-lineage memory.
+16. `M-022` same-root Effect provenance + one-layer repeat recursion guard.
+17. `M-024` read-only Natural-Action form fallback.
+18. `M-026` root-linked blocking settlement + failed Cost + post-completion class AE regen.
 
 ---
 
@@ -2111,6 +2438,38 @@ Future automated test harness should generate many states and assert:
 - global Turn Boundary does not reset all actor personal windows
 - CC-consumed opportunity advances appropriate personal clocks
 
+## Action lineage / Effect provenance
+- an Effect's provenance is immutable for that execution instance
+- two Effects sharing one `rootActionId` are not required to share `originEffectId`
+- Damage Attribution equality never implies Effect-provenance equality
+- a provenance-excluded repeat/reflect/echo Effect never recursively requalifies solely because Actor/root/Damage Attribution are unchanged
+
+## Natural Action form resolution
+- probing an unselected Action-form candidate never changes authoritative State
+- candidate probing never commits Cost, consumes Rage, starts cooldown, emits gameplay Events, locks RNG-selected targets, or advances RNG
+- exactly one selected candidate enters ordinary Action execution
+- explicit Character/System Action-form restriction overrides Mode default priority where their scopes overlap
+- selected form restriction never changes `naturalActionStatus = NATURAL` into `FORCED_ACTION`
+
+## Root completion dependencies
+- a normalized completion-dependency graph is acyclic
+- root `ACTION_COMPLETED` never emits while a declared blocking dependency is nonterminal
+- `FAILED_COST`, `FAILED_CONDITION`, valid cancellation and successful resolution all close a dependency according to Contract
+- a failed blocking settlement cannot deadlock its root Action
+- local dependency order does not imply global unrelated Reaction priority
+
+## Scoped Effect Admission
+- an Effect Admission rule never applies outside its declared semantic scope
+- absence of a matching admission rule yields ordinary pass-through behavior
+- a Shield-only admission rule never blocks direct Damage
+- an Authority threshold predicate does not enter progression adjudication unless a direct rule conflict actually exists
+
+## Mode resource hooks
+- Class AE regeneration occurs only after an actually performed Natural Action reaches `ACTION_COMPLETED`
+- non-Natural Actions never receive `AE_ACTION_REGEN_BY_CLASS`
+- CC-consumed opportunity without Action grants zero class AE
+- AE generated by a Natural Action cannot fund a blocking settlement that must resolve before that same Action completes
+
 ---
 
 # 23. FUZZING TARGETS
@@ -2129,6 +2488,12 @@ Damage
 × Authority
 × Follow-up/Counter
 × State duration
+× Action lineage
+× Effect provenance
+× Action-form fallback
+× scoped Effect Admission
+× root completion dependency
+× post-Natural-Action AE regeneration
 ```
 
 Look for:
@@ -2144,12 +2509,33 @@ Look for:
 - non-natural Action advancing SSI;
 - cache result surviving adjudication revision;
 - source provenance disappearing.
+- same-root Effect provenance collapsing into one identity;
+- repeat/reflect/echo recursion caused by checking only Actor/root/Damage Attribution;
+- rejected Action-form candidates spending Cost or consuming Rage;
+- candidate probing advancing RNG or locking targets;
+- explicit Character restriction being bypassed by Mode auto-Ultimate priority;
+- completion dependency cycle/deadlock;
+- failed-cost blocking settlement never reaching terminal state;
+- root `ACTION_COMPLETED` emitted before declared blocking settlements;
+- same-action class AE regen self-funding a pre-completion settlement;
+- Effect Admission leaking outside declared semantic scope;
+- Authority threshold incorrectly invoking progression comparator without direct conflict.
 
 ---
 
 # 24. TEST EXECUTION ORDER BEFORE 200+ KIT MIGRATION
 
 Recommended architecture-validation order:
+
+## Pre-Gate — Validation / Normalization
+
+Run:
+- K group.
+
+If invalid authored/normalized data is accepted:
+> stop before runtime integration testing.
+
+In particular, ambiguous Action-lineage queries, cyclic completion dependencies, nondeterministic Action-form selectors and unscoped Effect Admission must be rejected before battle execution.
 
 ## Gate 1 — Core
 Run:
@@ -2190,7 +2576,11 @@ Unresolved narrative timing tests may remain intentionally blocked.
 
 ## Gate 6 — Integration
 Run:
-- M and N groups.
+- J group according to each test's declared status;
+- M group;
+- N group.
+
+`FUTURE_MODE_PROBE` remains a probe and is not converted into a hidden default merely to make Gate 6 green.
 
 Only after integration passes:
 > begin bulk roster normalization.
@@ -2317,16 +2707,16 @@ Current suite defines:
 - 12 Pygmalion tests;
 - 4 Arena tests;
 - 7 Narrative/capability tests;
-- 6 Mode tests;
-- 8 anti-scripting/validation tests;
+- 7 Mode tests;
+- 12 anti-scripting/validation tests;
 - 6 unresolved Contract probes;
-- 20 character-derived integration tests;
+- 29 character-derived integration tests;
 - 7 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-> **141 tests / probes / meta-tests**
+155 tests / probes / meta-tests
 
 The count is not a design target.
 
@@ -2358,6 +2748,17 @@ At architecture level, the expected result is:
 - reusable side-relative spatial direction resolution;
 - Target Lock vs Hit Admission separation;
 - Guaranteed Hit bypassing ordinary Miss/Dodge/Evasion without bypassing lifecycle or Authority.
+- explicit immediate/parent/root Action-lineage queries without collapsing child identity into root identity;
+- immutable Effect provenance sufficient to distinguish same-root original Damage from generated repeat/echo Damage;
+- provenance-based one-layer repeat filtering without Character-specific runtime branches;
+- declarative Natural-Action form restriction and ordered read-only fallback;
+- Character Action-form restrictions overriding Turn-based default full-Rage Ultimate priority when applicable;
+- scoped non-State Effect Admission such as Authority-gated Shield admission without creating global Damage immunity;
+- root-linked blocking settlements delaying `ACTION_COMPLETED` through a bounded local dependency DAG;
+- failed-cost blocking settlements becoming terminal without deadlocking the root Action;
+- Echo-local Skill 3 → Skill 1 ordering without resolving global unrelated Reaction priority;
+- Turn-based `AE_ACTION_REGEN_BY_CLASS` only after actual Natural Action completion;
+- CC-lost opportunities granting no class AE and not advancing actual-action-only Echo windows.
 
 ## Should intentionally remain blocked
 - global unrelated Reaction priority;
@@ -2419,6 +2820,18 @@ A future model understands Chặng I only if it knows:
 22. Deterministic Event sequence is trace order, not hidden global Reaction priority.
 23. Target Lock and Guaranteed Hit are independent; Guaranteed Hit bypasses only ordinary Miss/Dodge/Evasion and does not bypass lifecycle or Authority.
 24. Side-relative directions resolve through the active Spatial Profile, not screen/camera orientation.
+25. Action lineage and Effect provenance are independent query axes; same root Action does not imply same generating Effect.
+26. Repeat/echo/reflect recursion guards must use sufficient provenance and must not rely only on Character identity, Damage Attribution, or `rootActionId`.
+27. An SSI-granted Natural Action may be constrained by declarative Action-form law without becoming a Forced Action.
+28. Ordered fallback candidate probing is read-only; rejected candidates cannot spend Cost, consume Rage, mutate State, consume RNG, or emit gameplay Events.
+29. Turn-based full-Rage Ultimate priority is a Mode default at the actual Natural Action, not an immediate cast event and not an override over explicit Character Action-form restrictions.
+30. Scoped Effect Admission applies only when a matching admission/protection rule exists; a Shield-only rule is not global Damage immunity.
+31. A simple incoming-Authority threshold is an admission predicate, not automatically same-tier progression adjudication.
+32. Root-linked blocking settlements may delay one root Action's `ACTION_COMPLETED`, but their local dependency DAG does not define global unrelated Reaction priority.
+33. A failed blocking settlement must reach a terminal state and cannot deadlock its root Action.
+34. `AE_ACTION_REGEN_BY_CLASS` belongs to the Turn-based Mode Profile and occurs only after an actually performed Natural Action reaches `ACTION_COMPLETED`.
+35. AE generated by a Natural Action cannot retroactively fund blocking settlements that had to resolve before that same Action completed.
+36. Actor-specific windows based on actually performed Natural Actions do not advance merely because SSI consumed a CC-lost opportunity.
 
 ---
 

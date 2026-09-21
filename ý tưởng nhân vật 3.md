@@ -292,16 +292,17 @@ Không gọi Link là Axiom.
 ---
 
 # IX. Phản Phệ — Backlash
-## Accumulation
+ Accumulation
 Mỗi khi một Linked Ally nhận Damage:
 > ghi lại **Actual Damage đã bị Link giảm**.
 Ví dụ:
-```text
+
 Incoming Damage = 100
 Link giảm = 30
 Ally thực sự nhận = 70
 Accumulated += 30
 Chỉ ghi phần damage thực sự bị Link triệt giảm.
+
 ---
 Threshold
 Khi:
@@ -314,8 +315,10 @@ Accumulated = 7.000
 → chưa kích hoạt
 Accumulated = 7.001
 → kích hoạt
+
 ---
-X. Backlash Damage Contract
+
+# X. Backlash Damage Contract
 1. Snapshot Accumulated.
 2. Tính:
 > Backlash Raw = Accumulated × 70%
@@ -324,8 +327,9 @@ X. Backlash Damage Contract
 5. Shield có thể chặn Backlash theo Damage Contract.
 6. Sau khi Backlash resolve:
 > Accumulated = 0.
+> 
 ---
-XI. Tại sao Backlash nên là Physical Damage?
+# XI. Tại sao Backlash nên là Physical Damage?
 Accumulated có thể đến từ:
 Physical Damage;
 Will Damage;
@@ -335,8 +339,9 @@ Không thể gom chúng thành một raw packet rồi áp ARM/RES theo source g�
 Vì vậy:
 > Backlash được chuẩn hóa thành một Physical Damage packet đặc biệt.
 Điều này giúp engine deterministic và đơn giản.
+
 ---
-XII. Backlash không được tạo vòng lặp
+# XII. Backlash không được tạo vòng lặp
 
 Backlash là một Damage Source riêng.
 
@@ -355,8 +360,10 @@ Backlash là Physical Damage.
 Do đó:
 > Shield có thể chặn Backlash.
 Không được mặc định coi Backlash là True Damage.
+
 ---
-XIV. Ultimate — Bất Động Như Sơn
+
+# XIV. Ultimate — Bất Động Như Sơn
 Ultimate gồm ba thành phần độc lập.
 1. Healing
 > Heal = 35% Max HP của Chấp Minh
@@ -415,8 +422,10 @@ Có, Tổng Current Shield đang có trên Chấp Minh, bất kể nguồn.
 ---
 4. Ultimate shield contribution là True Damage hay Mixed?
 > True Damage.
+
 ---
-XVII. Cân bằng
+
+# XVII. Cân bằng
 
 Chấp Minh có khả năng bảo vệ team cực mạnh:
 > 35% AOE Reduction từ Aura
@@ -439,14 +448,15 @@ giảm Link 30% → 25%;
 hoặc giảm Aura 35% → 30%.
 Không nên ngay lập tức phá Backlash, vì Backlash là phần identity quan trọng.
 ---
-XVIII. Character Identity
+
+# XVIII. Character Identity
 Chấp Minh không đơn thuần là:
 > "Tanker có nhiều ARM."
 Identity thực sự:
 > Bảo vệ đội hình khỏi AOE bằng Bắc Minh Hộ Thể, nối các đồng minh gần mình thành Liên Kết Tứ Tượng, rồi biến phần sát thương đã ngăn được thành món nợ mà bản thân phải gánh.
 Đây là một Tanker protector / damage sink, không phải một Tanker chỉ có HP cao.
 ---
-XIX. Kết luận
+# XIX. Kết luận
 > Bắc Minh Hộ Thể → bảo vệ cột.
 > Liên Kết Tứ Tượng → mở rộng vùng bảo hộ.
 > Phản Phệ → biến damage đã giảm thành món nợ.
@@ -626,11 +636,12 @@ Không mặc định kích hoạt từ:
 - Reflect.
 
 Nếu sau này một effect được định nghĩa là natural action thì tự động hợp lệ.
+
 ---
 ## Multihit
 
 Một natural action có nhiều hit:
-```text Hit 1
+
 Hit 2
 Hit 3
 Hit 4
@@ -826,6 +837,7 @@ thì nhận:
 
 Mutation này tồn tại trong current life cho tới khi character rời sân/đời sống theo luật stat mutation tương ứng.
 Không phải buff duration.
+
 ---
 
 XIX. Đưa mục tiêu thẳng vào Luân Hồi
@@ -882,6 +894,7 @@ Hỗn Độn có một growth loop cực mạnh:
 Đây là Prime snowball engine.
 Tao không xem đây là lỗi.
 Nhưng nó phải là chủ đích của rank Prime.
+
 ---
 
 XXIII. Có nên thêm giới hạn Max HP?
@@ -1228,7 +1241,7 @@ kỹ năng 2: tạo ra 'Hư Không Màn Che' ngay 3 ô giao giới giữa 2 bên
 kỹ năng 3: gây sát thương aoe lên 4 kẻ địch ngẫu nhiên = 1 đòn đánh thường/ mỗi kẻ địch, bỏ qua 80% res của chúng, không tính là đánh thường, 20 aether.
 ultimate: cast 2 lần skill 3 nhưng không trừ ae. (đơn giản hơn là cast 1 lần nhưng damage gấp đôi, phần giảm res vẫn giữ nguyên)
 
-34) Hoá Thân của Thời Không Chi Chủ - Thời Gian Chi Chủ, Prime.
+34) Hoá Thân của Thời Không Chi Chủ - Thời Gian Chi Chủ, Prime, Julius Novachrono
 mô tả: 1 nửa ý niệm của Thời Không Chi Chủ giáng lâm thế gian.
 nội tại: khi có Hư Không Chi Chủ là đồng minh trên sân + 20% mọi chỉ số (được rank multi scale) cho cả bản thân và Hư Không Chi Chủ.
 Thần Tính: không nhận buff/mark hay debuff ngoài bản thân (trừ Không Gian Chi Chủ), không thể hồi sinh từ kit ngoài bản thân và Không Gian Chi Chủ, không vào luân hồi.
@@ -1239,13 +1252,13 @@ kỹ năng 3: quy tắc: khiến mọi đồng minh trên sân thực thi 1 turn
 ultimate: quy tắc: hồi hp cho mọi đơn vị đồng minh trên sân = 30% max hp của họ, bản thân hắn được + 10% wil và atk trong 3 turn sau khi dùng ultimate, không cộng dồn.
 
 35) Nguyên Lễ
-Kiếm sĩ, UR. không element tag.
+Kiếm sĩ, UR. không element.
 nội tại: mỗi lần giết 1 mục tiêu thành công nhận miễn nhiễm với 1 debuff ngẫu nhiên từ pool: độc, choáng, ngủ, chảy máu, yếu đuối. Cũng đồng thời tăng vĩnh viễn 5% atk và wil của bản thân ở lúc giết kẻ thù ( tính luôn atk/wil bị ảnh hưởng từ buff/debuff và mọi nguồn khác) đến khi chết.
 
 đánh thường: gây sát thương=100% wil/atk.
 
 skill 1: mỗi khi nhận sát thương vượt 20% max hp, tự hồi hp cho bản thân = 50% wil /atk của bản thân, tự kích hoạt, mỗi lần kích hoạt - 10 aether từ aepool, nếu ae không đủ sẽ không kích hoạt skill này.
-skill 2: chém 1 nhát ngang gây sát thương lên hàng 1/2/3 hoặc 4/5/5 hoặc 7/8/9, ưu tiên hàng có nhiều kẻ địch đứng nhất, mỗi kẻ địch nhận sát thương = 150% đánh thường, cost - 7 ae/kẻ địch nhận sát thương ( tối đa - 21 ae).
+skill 2: chém 1 nhát ngang gây sát thương lên hàng 1/2/3, nếu không có ai đứng thì 4/5/5 hoặc 7/8/9, ưu tiên hàng có nhiều kẻ địch đứng nhất, mỗi kẻ địch nhận sát thương = 150% đánh thường, cost - 7 ae/kẻ địch nhận sát thương ( tối đa - 21 ae).
 skill 3: tăng 50% wil và atk trong 2 turn kế tiếp, 20 ae.
 
 ultimate: gây 1 đòn aoe cố định hình chữ T lên ô 1/2/3/5/8 của kẻ địch, mỗi kẻ địch đứng ở vị trí tấn công này nhận sát thương = 2 đòn đánh thường của nhân vật này, (biến động sát thương theo atk và wil của nhân vật).
@@ -1253,8 +1266,8 @@ ultimate: gây 1 đòn aoe cố định hình chữ T lên ô 1/2/3/5/8 của k�
 36) Lý Mộng Cầm
 Support, ssr, element tag: water.
 nội tại: mỗi lần xoá thành công 1 debuff từ đồng minh và bản thân sẽ tự hồi HP = 5% wil và atk của bản thân, không thể vượt max hp và không thể tạo khiên khi overheal.
-skill 1: Mỗi 3 lần đánh thường/ sài skill hoặc ultimate thành công thì lần ultimate tiếp theo sẽ hồi cho mọi đồng minh trên sân (không ảnh hưởng được thần tính) = 25% wil/atk của bản thân cho mọi đồng minh trên sân và bản thân. Luôn kích hoạt kể cả tử vong rồi được hồi sinh, bị động, -10 ae mỗi lần kích hoạt hồi hp. một nội tại tốn cost tự kích hoạt khi vào sân.
-skill 2: đánh 2 quả cầu nước vào 2 mục tiêu ngẫu nhiên từ xa, mỗi kẻ nhận 1 đòn đánh thường, tính là đánh thường, 15 ae.
+skill 1: Mỗi 3 lần đánh thường/ sài skill hoặc ultimate thành công thì lần ultimate tiếp theo sẽ hồi cho mọi đồng minh trên sân (không ảnh hưởng được thần tính) = 65% wil/atk của bản thân cho mọi đồng minh trên sân và bản thân. Luôn kích hoạt kể cả tử vong rồi được hồi sinh, bị động, -10 ae mỗi lần kích hoạt hồi hp. một nội tại tốn cost tự kích hoạt khi vào sân.
+skill 2: đánh 2 quả cầu nước vào 2 mục tiêu ngẫu nhiên từ xa, mỗi kẻ nhận 1 đòn đánh thường, tính là đánh thường, 10 ae.
 skill 3: khi sắp nhận sát thương vượt 20% max hp sẽ giảm 25% sát thương phải nhận vào (trừ sát thương chuẩn), ví dụ sát thương đang đến phải nhận là 100% thì char này chỉ nhận 75% thôi, không ảnh hưởng được pháp tắc hay quy tắc. đây là skill bị động, không cần tốn turn để kích hoạt mà sẽ luôn kích hoạt từ lúc char này ra sân kể cả được hồi sinh, mỗi lần kích hoạt thành công - 20 ae.
 ultimate: xoá 2 debuff (không xoá mark)ngẫu nhiên trên người đồng minh và bản thân, không ảnh hưởng được debuff/mark cấp quy/pháp tắc. sau đó +10% wil và atk của bản thân trong 2 natural Action và trạng thái này không tính là buff.
 
@@ -2992,7 +3005,7 @@ ultimate: đánh thường 1 lần nhưng tỉ lệ sát thương từ 100% lên
 
 84)
 Assassin, ssr
-nội tại: ultimate/skill/đánh thường sẽ luôn target mục tiêu có target có % hp thấp nhất, nếu kẻ thù có taunt thì tuân theo taunt, khi hết bị taunt lại target kẻ có % hp thấp nhất.
+nội tại: ultimate/skill/đánh thường sẽ luôn target mục tiêu có % hp thấp nhất, nếu kẻ thù có taunt thì tuân theo taunt, khi hết bị taunt lại target kẻ có % hp thấp nhất.
 nhân vật này không target kẻ không có chân ngã trừ phi vô chân ngã giả có taunt.
 
 khi target hp dưới hoặc = 70%/50%/25% nhận sát thương gây ra lên kẻ địch tăng 10%/sát thương gây ra có 20% là sát thương chuẩn/hồi hp = 20% sát thương gây ra lên mục tiêu (không tính follow up/dot/chỉ tính sát thương gây ra sau khi phá khiên), 3 hiệu ứng này đều có tác dụng lên mục tiêu, nếu target có hp dưới hoặc = 25% max hp của chúng, hắn gây sát thương lên target đó tăng 10% sau đó 20% (đã tăng 10) sẽ là sát thương chuẩn, cuối cùng 20% sát thương thực sự gây ra sau khi bỏ qua khiên sẽ được hồi hp cho hắn.

@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-09-10-E  
+**Version:** 2026-09-15-E  
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT.md`  
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -321,11 +321,14 @@ ability:
   enabledInModes: []
   action:
   triggers: []
+  actionIntentInterpositions: []
   prerequisites: []
   costs: []
+  costGroups: []
   targeting:
   snapshots: []
   effects: []
+  effectAmountModifiers: []
   resolution:
   authority:
   attribution:
@@ -338,8 +341,20 @@ ability:
 Không phải mọi field đều bắt buộc.
 
 Passive static rule có thể không có Action.
+
 Basic Attack có thể không có Trigger ngoài natural selection.
+
 Auto Skill có thể có Trigger nhưng không player-cast path.
+
+`costGroups` is optional and is used only when several CostSpecs require explicit transaction/group semantics beyond the ordinary fixed Cost list.
+
+`effectAmountModifiers` is optional and contains constrained declarative modifier rules defined by `ScopedEffectAmountModifierSpec`.
+
+`actionIntentInterpositions` is optional and contains bounded declarative `ActionIntentInterpositionSpec` rules owned by this Ability.
+
+A Passive may therefore own an Action-Intent interposition rule that applies to its owner's future Action Intents without duplicating that rule into every Basic / Skill / Ultimate definition.
+
+None of these fields authorizes custom executable code.
 
 ---
 
@@ -401,6 +416,7 @@ action:
   actionIdentity:
   behavior:
   naturalActionPolicy:
+  naturalActionFormPolicy:
   parentChildPolicy:
   childAuthorityPolicy:
   childCostPolicy:
@@ -592,6 +608,218 @@ The exact settlement is declared by the Trigger/Ability that creates it rather t
 This field does not define global Reaction priority.
 Local dependency ordering between settlements belongs to explicit dependency data and Contract validation.
 A root-linked blocking dependency must be bounded and must not depend on a future event that can occur only after the root Action has already completed.
+
+---
+
+# 6A. ACTION INTENT INTERPOSITION SPEC
+
+`ActionIntentInterpositionSpec` is a bounded declarative rule owned by an Ability, commonly a Passive, that may settle against another Action Intent before that intent completes ordinary admission/effect execution.
+
+Canonical distinction:
+
+```text
+ACTION INTENT / REQUEST
+≠
+ADMITTED ACTION
+```
+
+An Action Intent records what the player/autonomy currently requests.
+
+It does not by itself prove that the requested Ability:
+- is legal;
+- is payable;
+- has valid targets;
+- has entered ordinary Action execution;
+- has committed Cost;
+- has emitted Action Events.
+
+Conceptual form:
+
+```yaml
+actionIntentInterposition:
+  interpositionId:
+
+  intentScope:
+    actorRef:
+    naturalActionStatus:
+    actionIdentities: []
+    abilityRefs: []
+
+  branchSelectionTiming:
+
+  branches:
+    - branchId:
+      conditions: []
+      anchor:
+      settlementAbilityRef:
+      settlementFailurePolicy:
+      revalidationPolicy:
+
+      onRevalidationFailure:
+        candidates:
+          - candidateId:
+            actionIdentity:
+            abilityRef:
+            abilitySelector:
+            conditions: []
+```
+
+## Intent scope
+
+`intentScope` declares which Action Intents this rule may observe.
+
+It must be explicit enough that a Passive intended for Natural Actions does not accidentally interpose on:
+- Follow-up;
+- Counter;
+- Reaction;
+- Forced Action;
+- child Action;
+- unrelated actor Action.
+
+Example semantic scope:
+
+```yaml
+intentScope:
+  actorRef: SELF
+  naturalActionStatus: NATURAL
+  actionIdentities:
+    - BASIC_ATTACK
+    - SKILL
+    - ULTIMATE
+```
+
+`actorRef = SELF` is resolved relative to the owner of the interposition rule.
+
+## Branch selection timing
+
+Current canonical value:
+
+```text
+ACTION_INTENT_CREATED
+```
+
+Branch conditions are evaluated once for that Action Intent.
+
+After a branch is selected:
+
+> later HP/resource/state changes during the same admission sequence do not retroactively select another branch.
+
+## Allowed anchors
+
+Current allowed anchors are exactly:
+
+```text
+PRE_ADMISSION_PRE_COST
+POST_COST_PRE_EFFECT
+```
+
+No arbitrary authored timing string is permitted.
+
+### `PRE_ADMISSION_PRE_COST`
+
+Semantic flow:
+
+```text
+Action Intent exists
+→ declared settlement
+→ optional authoritative revalidation of the preserved original Intent
+→ admit original Intent or evaluate explicit fallback
+```
+
+Ordinary pre-interposition legality/payability probing must not discard the original Intent before this declared settlement has had its opportunity to resolve.
+
+### `POST_COST_PRE_EFFECT`
+
+Semantic flow:
+
+```text
+Action Intent
+→ ordinary admission
+→ required active Cost commits
+→ declared settlement
+→ admitted Ability effects continue
+```
+
+If the admitted Action has no active Cost:
+
+```text
+ordinary Cost stage completes with no payment
+→ declared settlement
+→ Ability effects
+```
+
+No fake Cost is created.
+
+## Settlement reference
+
+`settlementAbilityRef` references an authored Ability/settlement definition.
+
+Invoking it at this boundary:
+- does not create a second Natural Action;
+- does not convert it into a child Natural Action;
+- does not establish global Reaction priority;
+- does not authorize arbitrary callback execution.
+
+## Settlement failure
+
+Current minimum:
+
+```text
+CONTINUE
+FAIL_INTENT
+```
+
+`CONTINUE` means settlement failure itself does not automatically cancel the preserved Action Intent.
+
+## Revalidation
+
+Current minimum:
+
+```text
+NONE
+REVALIDATE_ORIGINAL_INTENT
+```
+
+`REVALIDATE_ORIGINAL_INTENT` re-tests the same preserved request against current authoritative state.
+
+It is not a new Action selection.
+
+## Revalidation fallback
+
+`onRevalidationFailure.candidates` reuses the candidate-entry shape and read-only probing semantics of `naturalActionFormPolicy`.
+
+Fallback candidates are evaluated in authored order.
+
+There is no global rule:
+
+```text
+failed Skill / Ultimate
+→ BASIC_ATTACK
+```
+
+Basic Attack occurs only when explicitly authored as a fallback candidate.
+
+## Relationship to `naturalActionFormPolicy`
+
+`naturalActionFormPolicy` constrains which form an SSI-granted Natural Action may use.
+
+`ActionIntentInterpositionSpec` allows an Ability-owned bounded settlement to occur against an already-created Intent at a canonical admission boundary.
+
+They are not interchangeable.
+
+## Safety boundary
+
+This object must not support:
+- arbitrary method calls;
+- custom code;
+- custom timing strings;
+- unbounded repeated interposition;
+- arbitrary jumps between pipeline stages;
+- Character-ID runtime callbacks.
+
+Recurring future behavior remains State + Trigger.
+
+Late root-completion settlement remains `rootCompletionDependency` / `actionCompletionPolicy`.
 
 ---
 
@@ -998,6 +1226,8 @@ RANK_REF
 STACK_REF
 TARGET_COUNT_REF
 PROPERTY_REF
+COST_PAYMENT_REF
+COST_GROUP_PAYMENT_REF
 ```
 
 ---
@@ -1046,14 +1276,33 @@ Canonical conceptual form:
 cost:
   costId:
   payer:
+  payerCollection:
   kind:
   amount:
   validation:
   paymentTiming:
   insufficientPolicy:
+  optionalPayerFailurePolicy:
   waiverPolicy:
   refundPolicy:
+  resultBinding:
 ```
+
+A CostSpec uses either:
+
+```text
+payer
+```
+
+or:
+
+```text
+payerCollection
+```
+
+for one payment definition.
+
+Do not silently treat a payer collection as one shared payer.
 
 ---
 
@@ -1065,6 +1314,98 @@ Can reference:
 - actor;
 - team resource pool;
 - explicit entity.
+
+---
+
+## 10.1A `payerCollection`
+
+Optional runtime-selected collection of entities where each selected member is the payer of its own Cost instance.
+
+Conceptual form:
+
+```yaml
+payerCollection:
+  query:
+    targetKind:
+    relation:
+    relationAnchor:
+    candidateSource:
+    filters: []
+    excludeRefs: []
+    selection: ALL
+
+  snapshotTiming: AFTER_REQUIRED_VALIDATION_BEFORE_REQUIRED_COMMIT
+```
+
+The query reuses the existing structured candidate/filter vocabulary.
+
+When `relation` requires a reference entity, including:
+
+```text
+ALLY
+ENEMY
+SAME_SIDE
+OPPOSING_SIDE
+```
+
+`relationAnchor` is mandatory.
+
+The Kernel must not infer “ally/enemy relative to whom”.
+
+For distributed Cost introduced by this Pilot:
+
+```text
+selection = ALL
+```
+
+is the supported collection-selection semantic.
+
+Each entity in the snapshotted collection becomes the payer of one instance of this CostSpec.
+
+Within that per-payer Cost evaluation:
+
+```text
+PAYER
+```
+
+resolves to the current collection member.
+
+This permits authored formulas such as:
+
+```text
+10% of PAYER.CurrentMaxHP
+```
+
+without converting the payment into Damage from the caster.
+
+### Snapshot requirement
+
+For distributed Cost participating in a CostGroup with required Costs:
+
+```text
+AFTER_REQUIRED_VALIDATION_BEFORE_REQUIRED_COMMIT
+```
+
+means the payer collection is frozen:
+
+```text
+after required Cost / mandatory-payer validation
+but before any required Cost payment commits
+```
+
+Payment of one entity must not silently change which other entities belonged to the already-snapshotted payer collection.
+
+The exact transaction order is Contract-defined.
+
+Schema exposes the semantic anchor.
+
+### Payer collection is not Target ownership
+
+Using structured target/query vocabulary here does not mean collection members become the Ability's damage/heal targets.
+
+They are Cost payers.
+
+Targeting and Cost-payer selection remain separate semantic roles.
 
 ---
 
@@ -1097,17 +1438,101 @@ Non-payment HP loss must not use CostSpec.
 
 ---
 
-## 10.4 Multi-cost transaction
+## 10.4 `CostGroupSpec`
 
-Ability can require:
+Several CostSpecs may participate in one declared Cost transaction/group.
+
+Conceptual form:
+
+```yaml
+costGroup:
+  costGroupId:
+  requiredCostRefs: []
+  optionalDistributedCostRefs: []
+  resultBinding:
+```
+
+### `requiredCostRefs`
+
+References CostSpecs whose successful validation/payment is required for the Ability to proceed under the applicable Cost Contract.
+
+Ordinary fixed multi-cost requirements such as:
 
 ```text
 25 AE + 5 Rage
 ```
 
-This is one CostGroup with atomic payment by default.
+remain representable as required Costs.
 
-Exact partial-payment policy belongs to Contract.
+### `optionalDistributedCostRefs`
+
+References CostSpecs that:
+
+- use `payerCollection`;
+- attempt one payment per snapshotted payer;
+- do not by themselves fail the entire Ability merely because one optional payer cannot pay.
+
+Every referenced distributed Cost must declare an explicit optional-payer failure policy.
+
+### Required vs optional does not change payer identity
+
+A payer in `optionalDistributedCostRefs` still pays its own Cost.
+
+Optional means:
+
+> that payer's failed contribution need not fail the whole CostGroup.
+
+It does not mean the caster pays on that entity's behalf.
+
+### Payer-set ordering
+
+For a CostGroup containing both required Costs and optional distributed Costs, authored data must preserve:
+
+```text
+validate required Costs / mandatory payer legality
+→ snapshot optional payer collection
+→ commit required Costs
+→ attempt optional payer Costs from the frozen collection
+```
+
+The exact authoritative transaction Contract belongs to Stage F.
+
+Schema must not encode a payer collection whose membership is first determined after required payment has already started.
+
+### `resultBinding`
+
+A CostGroup may expose a typed committed group-payment result.
+
+Exact fields and legal consumers are defined under Result Bindings.
+
+No CostGroup creates a new Primitive.
+
+---
+
+## 10.4A `optionalPayerFailurePolicy`
+
+For a CostSpec referenced through:
+
+```text
+optionalDistributedCostRefs
+```
+
+the current minimum supported policy is:
+
+```text
+CONTRIBUTION_ZERO_CONTINUE
+```
+
+Meaning:
+
+- the payer's payment attempt may fail;
+- that payer contributes zero actual paid amount;
+- failure does not by itself invalidate payments committed by other optional payers;
+- failure does not by itself fail the whole Ability.
+
+This field does not define transaction timing.
+
+Timing/atomicity belong to Cost Contract.
 
 ---
 
@@ -1117,6 +1542,56 @@ Composite Ultimate can call child Skill with:
 `childCostPolicy = WAIVE_CHILD_COST`.
 
 This must not mutate child Skill's base definition.
+
+## 10.6 Cost payment result binding
+
+A singular-payer CostSpec may expose the authoritative result of its committed payment attempt:
+
+```yaml
+cost:
+  costId: ULTIMATE_HP_COST
+  payer: SELF
+  ...
+  resultBinding: ULTIMATE_HP_PAYMENT_RESULT
+```
+
+This binding denotes one typed:
+
+```text
+COST_PAYMENT_RESULT
+```
+
+It refers to committed payment outcome, not the nominal Cost formula.
+
+If a CostSpec uses:
+
+```text
+payerCollection
+```
+
+it produces multiple per-payer payment outcomes at runtime.
+
+Such a distributed CostSpec must not expose those multiple outcomes through one ambiguous singular `COST_PAYMENT_RESULT` binding.
+
+Distributed member results are exposed through the containing declared `CostGroup` / `COST_GROUP_PAYMENT_RESULT`.
+
+A CostGroup may expose:
+
+```yaml
+costGroup:
+  ...
+  resultBinding: SKILL2_COST_GROUP_PAYMENT_RESULT
+```
+
+This distinction is required whenever:
+
+```text
+requested Cost
+≠
+actual amount successfully paid
+```
+
+---
 
 # 10A. COMMON SPATIAL SELECTOR SPEC
 
@@ -1651,6 +2126,331 @@ Shield effect can have:
 - owner.
 
 No need to encode Shield as HP.
+
+---
+
+# 18A. SCOPED EFFECT-AMOUNT MODIFIER SPEC
+
+`ScopedEffectAmountModifierSpec` is a constrained declarative rule that modifies the numeric amount of qualifying Effects.
+
+It exists for passive/system rules whose semantic is:
+
+> Effects satisfying a structured source + recipient + Effect-semantic scope receive a typed numeric amount transform at a declared resolution phase.
+
+It is not:
+- arbitrary scripting;
+- a new Functional Tag;
+- a Primitive;
+- a general callback;
+- an unrestricted formula hook.
+
+Conceptual form:
+
+```yaml
+effectAmountModifier:
+  modifierId:
+  tags: []
+
+  sourceScope:
+    attributionField:
+    equalsRef:
+
+  recipientScope:
+    relation:
+    relationAnchor:
+    filters: []
+    excludeRefs: []
+
+  valueQueries: []
+
+  effectScope:
+    effectType:
+    damageComponents: []
+
+  conditions: []
+
+  amountOperation:
+    type:
+    value:
+
+  resolutionPhase:
+```
+
+## Source scope
+
+`sourceScope.attributionField` must reference an existing AttributionSpec field.
+
+Compatible fields may include:
+
+```text
+caster
+owner
+source
+behaviorSource
+effectSource
+damageAttribution
+```
+
+`equalsRef` resolves through an existing symbolic reference.
+
+Example:
+
+```yaml
+sourceScope:
+  attributionField: damageAttribution
+  equalsRef: SELF
+```
+
+means:
+
+> only Damage whose `damageAttribution` resolves to this modifier owner's SELF can qualify.
+
+No source dimension may be inferred from prose when the distinction matters.
+
+## Recipient scope
+
+`recipientScope` reuses existing structured relation/filter vocabulary.
+
+Example:
+
+```yaml
+recipientScope:
+  relation: ALLY
+  relationAnchor: SELF
+  excludeRefs:
+    - SELF
+```
+
+or:
+
+```yaml
+recipientScope:
+  relation: ENEMY
+  relationAnchor: SELF
+  filters:
+    - <structured Rank condition>
+    - <structured Effective Element condition>
+```
+
+A relation requiring a reference entity must supply an explicit `relationAnchor`.
+
+Recipient filtering does not perform target selection.
+
+It only determines whether an already-resolving Effect recipient falls inside the modifier's scope.
+
+## Read-only value queries
+
+A modifier may require a bounded read-only collection query to calculate a scalar used by its amount formula.
+
+Conceptual form:
+
+```yaml
+valueQueries:
+  - queryId:
+    targetKind:
+    relation:
+    relationAnchor:
+    candidateSource:
+    filters: []
+    selection: ALL
+```
+
+The query reuses existing structured target/candidate/filter vocabulary.
+
+It:
+- performs no Effect;
+- performs no target selection for the resolving Ability;
+- mutates no State;
+- consumes no RNG;
+- creates no Action.
+
+Its result may be referenced through an existing typed scalar such as:
+
+```text
+TARGET_COUNT_REF(queryId)
+```
+
+Example semantic use:
+
+```text
+query active enemy Prime + Effective-Light units
+→ TARGET_COUNT_REF = N
+→ modifier factor = CLAMP(1 - 0.10 × N, 0, 1)
+```
+
+A relation requiring an anchor must declare `relationAnchor`.
+
+This facility exists to feed bounded pure formulas.
+
+It is not arbitrary authored iteration.
+
+## Effect semantic/component scope
+
+Current minimum supported Effect scopes:
+
+```text
+HEAL
+DAMAGE
+```
+
+For Damage:
+
+```text
+PHYSICAL
+WILL
+TRUE
+```
+
+may be selected explicitly.
+
+Example:
+
+```yaml
+effectScope:
+  effectType: DAMAGE
+  damageComponents:
+    - PHYSICAL
+    - WILL
+```
+
+means True Damage lies outside this modifier's scope.
+
+No negative pseudo-tag such as:
+
+```text
+NON_TRUE_DAMAGE
+```
+
+is required.
+
+## Structured conditions
+
+`conditions` uses existing `ConditionSpec`.
+
+No executable condition string is permitted.
+
+## Modifier Tags
+
+A modifier may carry existing Functional Tags when the modifier itself owns that canonical semantic.
+
+Example:
+
+```yaml
+tags:
+  - FINAL_DAMAGE_REDUCTION
+```
+
+for a modifier whose declared Damage resolution phase is `FINAL_DAMAGE_REDUCTION`.
+
+This does not create a new Tag.
+
+Tag compatibility remains subject to the canonical Tag Registry and Normalizer validation.
+
+## Typed amount operation
+
+Current minimum supported amount operation:
+
+```text
+MULTIPLY
+```
+
+Conceptual:
+
+```yaml
+amountOperation:
+  type: MULTIPLY
+  value: <ValueRef or bounded Formula>
+```
+
+`value` uses the existing pure Formula system.
+
+Examples:
+
+```text
+× 0.90
+```
+
+or:
+
+```text
+CLAMP(1 - 0.10 × TARGET_COUNT_REF(queryId), 0, 1)
+```
+
+The formula may calculate a scalar.
+
+It may not:
+- iterate entities itself;
+- mutate State;
+- emit Events;
+- invoke Abilities;
+- call engine code.
+
+A new amount-operation type requires explicit Schema review.
+
+## Resolution phase
+
+Current minimum phases introduced here:
+
+```text
+PRE_OVERHEAL
+FINAL_DAMAGE_REDUCTION
+```
+
+Phase compatibility is typed.
+
+### `PRE_OVERHEAL`
+
+Valid for HEAL amount modifiers.
+
+Modifier applies to Heal amount before Overheal is derived.
+
+It must not modify Overheal after the fact while leaving underlying Heal unchanged.
+
+### `FINAL_DAMAGE_REDUCTION`
+
+Valid for DAMAGE amount modifiers.
+
+It identifies canonical Final Damage Reduction stage.
+
+Exact Damage-pipeline ordering belongs to Damage Contract.
+
+For a modifier scoped to:
+
+```text
+PHYSICAL
+WILL
+```
+
+True Damage is unaffected because it lies outside `damageComponents`.
+
+## Multiple rules
+
+Each modifier is one bounded declarative rule.
+
+Complex Character behavior should compose several modifier specs rather than embed procedural branching into one spec.
+
+Ordering/conflict between multiple modifiers at the same resolution phase belongs to Contracts.
+
+Schema does not invent global modifier priority here.
+
+## Static Passive ownership
+
+A static Passive may own one or more:
+
+```text
+effectAmountModifiers
+```
+
+without creating a fake Action.
+
+The rule remains source-traceable to that authored Ability.
+
+This preserves:
+
+```text
+Character = data/composition
+Kernel = resolver/runtime
+```
 
 ---
 
@@ -2365,7 +3165,7 @@ No Accuracy/Evasion formula is introduced here.
 
 Result Binding is essential to composition without custom scripts.
 
-An Effect can expose a typed result handle.
+An Effect or Cost transaction can expose a typed result handle.
 
 Examples:
 
@@ -2376,6 +3176,8 @@ TARGET_SET_X
 SNAPSHOT_Y
 SPAWNED_ENTITY_Z
 STORY_PROPERTY_P
+COST_PAYMENT_Q
+COST_GROUP_PAYMENT_R
 ```
 
 Later effects can reference only legal typed outputs.
@@ -2409,6 +3211,120 @@ A later effect can reference:
 - newly spawned Summon/Object;
 - new Puppet;
 - Container.
+
+---
+
+## 35.3A Cost payment result references
+
+A committed singular Cost payment may expose:
+
+```text
+COST_PAYMENT_RESULT
+```
+
+At minimum:
+
+```text
+requestedAmount
+actualPaidAmount
+payer
+success
+```
+
+Conceptual ValueRef:
+
+```yaml
+costPaymentRef:
+  binding: ULTIMATE_HP_PAYMENT_RESULT
+  field: ACTUAL_PAID_AMOUNT
+```
+
+`requestedAmount` is the evaluated requested payment amount.
+
+`actualPaidAmount` is the authoritative amount actually committed.
+
+They are not interchangeable.
+
+Important:
+
+```text
+actualPaidAmount = 0
+```
+
+does **not** by itself imply:
+
+```text
+success = false
+```
+
+A Cost Contract may explicitly allow a successful zero payment.
+
+Example:
+
+```text
+Ultimate HP Cost with a floor
+→ payer already at the permitted floor
+→ requested/derived payable amount = 0
+→ payment may succeed
+→ success = true
+→ actualPaidAmount = 0
+```
+
+A failed optional payment instead produces:
+
+```text
+success = false
+actualPaidAmount = 0
+```
+
+unless an explicit Cost Contract defines another result.
+
+Downstream consumers requiring committed payment outcome must use `actualPaidAmount`.
+
+They must not reconstruct it from the nominal Cost expression.
+
+A direct `COST_PAYMENT_REF` must resolve to one singular payment result.
+
+---
+
+## 35.3B Cost group payment result references
+
+A declared CostGroup may expose:
+
+```text
+COST_GROUP_PAYMENT_RESULT
+```
+
+The group result owns the typed member payment results generated by that declared transaction, including per-payer outcomes produced by distributed CostSpecs.
+
+It must support an aggregate equivalent to:
+
+```text
+TOTAL_ACTUAL_PAID
+```
+
+For heterogeneous resource groups, aggregate consumers must specify the relevant Cost kind.
+
+Conceptual ValueRef:
+
+```yaml
+costGroupPaymentRef:
+  binding: SKILL2_COST_GROUP_PAYMENT_RESULT
+  field: TOTAL_ACTUAL_PAID
+  kind: HP
+```
+
+Meaning:
+
+> sum `actualPaidAmount` of all relevant HP payment results belonging to this declared CostGroup.
+
+Failed optional payers therefore contribute zero.
+
+Successful zero payments also contribute zero without being reclassified as failed.
+
+This is typed result composition.
+
+It is not a mutable variable and does not authorize arbitrary authored iteration.
 
 ---
 
@@ -2835,10 +3751,12 @@ normalizedAbility:
   schemaVersion:
   actionSpec:
   triggerGraph:
+  intentInterpositionPlan:
   costPlan:
   targetPlan:
   snapshotPlan:
   effectGraph:
+  effectModifierPlan:
   authorityPlan:
   attributionPlan:
   capabilityIndex:
@@ -2846,6 +3764,18 @@ normalizedAbility:
   contractRefs:
   validationHash:
 ```
+
+`intentInterpositionPlan` is generated from bounded authored `actionIntentInterpositions`.
+
+It preserves the owning Ability and normalized Action-Intent scope.
+
+It is not part of another Ability's `actionSpec` merely because that other Ability's Intent is being observed.
+
+`effectModifierPlan` is generated from constrained `effectAmountModifiers`.
+
+`costPlan` may carry explicit CostGroup, distributed payer-collection, and typed Cost-result binding plans.
+
+None of these plans implies a new Primitive by itself.
 
 ---
 
@@ -2913,6 +3843,12 @@ Normalizer/compiler must:
 16. Attach Contract references.
 17. Generate deterministic normalized representation.
 18. Produce diagnostics without modifying designer intent silently.
+19. Validate `ScopedEffectAmountModifierSpec` source, recipient, Effect/component, Tag and resolution-phase compatibility.
+20. Validate modifier `valueQueries`, relation anchors, query scope and every `TARGET_COUNT_REF`/query-result reference.
+21. Validate CostGroup references, distributed payer-collection shape, relation anchor, snapshot anchor and optional-payer failure policy.
+22. Validate singular `COST_PAYMENT_RESULT` vs aggregate `COST_GROUP_PAYMENT_RESULT` binding shape and consumer compatibility.
+23. Validate Action Intent interposition ownership, intent scope, canonical anchor, settlement reference, branch selection, revalidation policy and explicit fallback candidates.
+24. Reject arbitrary modifier operations, arbitrary interposition timing strings, hidden Character-specific runtime callbacks and unresolved ambiguous query anchors.
 
 ---
 
@@ -3297,6 +4233,8 @@ Action should produce a typed result summary:
 ```yaml
 actionResult:
   targets:
+  costPaymentResults:
+  costGroupPaymentResults:
   damageResults:
   healResults:
   stateChanges:
@@ -3310,6 +4248,12 @@ actionResult:
 This is runtime result, not authored Character data.
 
 Later child/effect references may access allowed portions via typed bindings.
+
+`costPaymentResults` records committed Cost-payment outcomes.
+
+`costGroupPaymentResults` records declared typed aggregation/group outcomes.
+
+Neither field replaces the Cost transaction itself.
 
 ---
 
@@ -3414,6 +4358,7 @@ SELF
 CASTER
 OWNER
 SOURCE
+PAYER
 PARENT_CASTER
 PARENT_DAMAGE_ATTRIBUTION
 TRIGGER_SOURCE
@@ -3424,6 +4369,18 @@ INHERITED_DEFINITION
 ```
 
 Normalizer resolves them to typed references.
+
+`PAYER` is valid only inside a Cost/payment context.
+
+For an ordinary singular CostSpec:
+
+> `PAYER` resolves to the CostSpec payer.
+
+For a distributed payer collection:
+
+> `PAYER` resolves to the current snapshotted collection member whose Cost instance is being evaluated.
+
+`PAYER` must not escape its Cost/payment scope and become a general mutable local variable.
 
 ---
 
@@ -3748,6 +4705,26 @@ At minimum validator must enforce:
 23. Combat Definition inheritance does not default to clone all layers.
 24. attribution overrides are explicit and traceable.
 25. mode-incompatible systems rejected.
+26. A CostSpec must not author both singular `payer` and `payerCollection` for the same payment definition.
+27. A distributed payer collection must use supported structured query semantics, explicit relation anchor when required, and a declared snapshot timing.
+28. A CostSpec referenced as an optional distributed Cost must declare an explicit optional-payer failure policy.
+29. CostGroup references must resolve to existing CostSpecs in the same legal Ability scope.
+30. A singular `COST_PAYMENT_REF` must resolve to exactly one payment result; distributed payer results must not collapse into one ambiguous singular binding.
+31. `COST_PAYMENT_REF` and `COST_GROUP_PAYMENT_REF` consumers must reference compatible typed payment results.
+32. A consumer requiring committed payment outcome must not silently substitute the nominal Cost formula.
+33. `actualPaidAmount = 0` must not be used by Schema validation as an implicit synonym for payment failure.
+34. `ScopedEffectAmountModifierSpec` must use an allowed source field, structured recipient scope, supported Effect/component scope, typed amount operation and compatible resolution phase.
+35. Every modifier value-query relation requiring an anchor must declare that anchor, and every query-derived ValueRef must resolve to a declared compatible query binding.
+36. Modifier Functional Tags must be compatible with the modifier's declared Effect scope and resolution phase.
+37. `PRE_OVERHEAL` is invalid for non-Heal Effect scope.
+38. `FINAL_DAMAGE_REDUCTION` is invalid for non-Damage Effect scope.
+39. Action Intent interposition must be owned by an authored Ability and must declare an explicit compatible `intentScope`.
+40. Action Intent interposition must use one of the canonical bounded interposition anchors.
+41. A `PRE_ADMISSION_PRE_COST` branch requiring post-settlement admission testing must explicitly declare `REVALIDATE_ORIGINAL_INTENT`.
+42. Revalidation failure must not silently fall back to Basic Attack or another form; fallback candidates must be authored explicitly.
+43. A referenced interposition settlement must not consume an additional Natural Action unless a separate explicit mechanic says so.
+44. Action Intent interposition must not be normalized as `FORCED_ACTION` merely because Character law constrains admission timing.
+45. A Passive-owned interposition rule must not be duplicated into every observed Ability merely to obtain runtime scope.
 
 ---
 

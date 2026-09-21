@@ -1,10 +1,11 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-09-10-F.1  
+**Version:** 2026-09-19-F.2  
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA.md`, `00_CANONICAL_RECOVERY_AUDIT.md`  
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
 **Revision F.1:** incorporates approved Shield pooling, Authority Adjudication, Death Cohorts, Revive/Reincarnation race, global lifeSerial default, and Pygmalion rulings.
+**Revision F.2:** incorporates Pilot Normalization #3 approved Contracts for bounded Action Intent interposition/revalidation, dynamic distributed Cost payment, typed committed Cost-payment results, scoped Effect-amount modifiers, and explicit sequential Reaction-boundary profiles. No new Functional Tag or Primitive is introduced.
 **Purpose:** turn semantic declarations into deterministic resolution rules without turning Character data into code.
 
 ---
@@ -339,6 +340,388 @@ remembered ULTIMATE
 → otherwise probe Basic Attack
 This ordering is Character/System law.
 It is not global AI behavior.
+
+---
+
+## ACT-004 — Action Intent Is Not an Admitted Action
+**Status:** `LOCKED`
+
+Canonical distinction:
+
+```text
+ACTION INTENT / REQUEST
+≠
+ADMITTED ACTION
+```
+
+`ACTION_REQUESTED` may establish an Action Intent describing what the player, autonomy policy, or other legal decision source currently requests.
+
+An Action Intent may preserve at minimum the semantic identity needed to later test the request, such as:
+
+- requesting Actor;
+- requested Action Identity;
+- requested Ability or authored selector;
+- originating Natural Action opportunity where applicable;
+- other already-authored request context.
+
+Creating or preserving an Action Intent does **not** by itself mean that the requested Action:
+
+- passed legality checks;
+- passed prerequisites;
+- has a payable Cost;
+- has valid mandatory targets;
+- has committed Cost;
+- emitted `ACTION_BEGIN`;
+- resolved any Effect;
+- became an admitted Action.
+
+No Cost or Effect may commit merely because an Intent exists.
+
+### Ordinary path
+
+If no matching `ActionIntentInterpositionSpec` requires a pre-admission interposition:
+
+```text
+Action Intent
+→ ACT-002 Action Admission
+→ applicable Cost Contract
+→ admitted Action execution
+```
+
+### Pre-admission interposition exception
+
+If authored data declares a matching:
+
+```text
+PRE_ADMISSION_PRE_COST
+```
+
+interposition:
+
+> ordinary legality / prerequisite / payability probing must not discard the preserved original Intent before that declared interposition receives its opportunity to settle.
+
+The Intent remains a request, not an admitted Action, during that settlement.
+
+After the settlement, admission may be performed or re-performed according to `ACT-005`.
+
+### Natural Action identity
+
+When the Intent belongs to one SSI-granted Natural Action opportunity:
+
+- creation of the Intent does not create another Natural Action;
+- an interposition settlement does not create another Natural Action;
+- an explicitly authored fallback selected after revalidation remains inside that same granted Natural Action opportunity unless another Contract explicitly says otherwise.
+
+This Contract does not define global Trigger/Reaction priority.
+
+---
+
+## ACT-005 — Bounded Action Intent Interposition and Revalidation
+**Status:** `LOCKED`
+
+This Contract resolves normalized `ActionIntentInterpositionSpec`.
+
+It supports exactly the canonical interposition anchors authored by Schema:
+
+```text
+PRE_ADMISSION_PRE_COST
+POST_COST_PRE_EFFECT
+```
+
+It does not authorize arbitrary Action-pipeline hooks.
+
+---
+
+### A. Intent scope, matching multiplicity, and one-time branch selection
+
+Only an interposition whose authored `intentScope` matches the current Action Intent may participate.
+
+Branch selection occurs at the authored canonical timing:
+
+```text
+ACTION_INTENT_CREATED
+```
+
+Branch conditions are evaluated once against the authoritative state at that point.
+
+For one `ActionIntentInterpositionSpec`:
+
+> current canonical semantics require at most one branch to match one Action Intent.
+
+If more than one branch matches the same Intent:
+
+> authored/normalized data is invalid unless a future explicit branch-selection policy defines that composition.
+
+The Kernel must not resolve branch ambiguity through:
+
+- authored list order;
+- Ability list order;
+- Event sequence;
+- Character ID;
+- insertion order;
+- incidental iteration order.
+
+Likewise, at one canonical interposition anchor:
+
+> current canonical semantics permit at most one applicable interposition instance for the same Action Intent unless an explicit future composition/dependency policy exists.
+
+If multiple independent interposition instances match the same Intent + anchor without such a policy:
+
+> validation must reject the ambiguity.
+
+This Pilot does not invent priority between interpositions.
+
+After one valid branch is selected:
+
+> later HP, resource, State, Cost, or settlement changes during the same admission sequence do not retroactively select another branch.
+
+The selected branch remains authoritative for that Intent.
+
+---
+
+### B. `PRE_ADMISSION_PRE_COST`
+
+Canonical flow:
+
+```text
+Action Intent exists
+→ select matching interposition branch
+→ preserve original Action Intent
+→ settle declared interposition settlement
+→ if declared, revalidate preserved original Intent
+→ if original Intent passes:
+     admit original Intent
+     → ordinary Cost / Action pipeline
+  else:
+     evaluate explicitly authored fallback candidates
+```
+
+Before the interposition settlement:
+
+- ordinary prerequisite failure must not discard the preserved Intent;
+- ordinary Cost unaffordability must not discard the preserved Intent;
+- ordinary mandatory target probing must not finalize rejection of the preserved Intent when that property is part of the later declared revalidation.
+
+The settlement may mutate authoritative state/resources according to its own Ability/Trigger/Cost Contracts.
+
+If the settlement is Passive/Triggered/Automatic:
+
+> its Cost follows `TRG-003` and its explicit settlement timing, not `CST-007` merely because its source Ability may be named a Skill.
+
+The settlement does not consume an additional Natural Action.
+
+---
+
+### C. Revalidation
+
+If:
+
+```text
+revalidationPolicy = REVALIDATE_ORIGINAL_INTENT
+```
+
+the preserved original Intent is tested against the **current authoritative state after the interposition settlement**.
+
+Revalidation checks the admission dimensions that would normally matter for that requested Action, including as applicable:
+
+- lifecycle/presence eligibility;
+- Mode legality;
+- Action-form restriction;
+- Ability prerequisites;
+- required pre-cost target legality;
+- Cost payability.
+
+Revalidation is a test of the original request.
+
+It does not itself:
+
+- pay Cost;
+- begin the Action;
+- resolve Effects;
+- choose a different Action.
+
+If revalidation succeeds:
+
+```text
+original Intent
+→ ACT-002 admission
+→ applicable Cost Contract
+→ Action execution
+```
+
+---
+
+### D. Revalidation failure and fallback
+
+If original Intent revalidation fails:
+
+> only explicitly authored fallback candidates may be evaluated.
+
+Fallback candidate probing follows the read-only semantics of `ACT-003`.
+
+There is no global rule:
+
+```text
+failed Skill / Ultimate
+→ BASIC_ATTACK
+```
+
+A Basic Attack is used only when authored data explicitly supplies Basic Attack as a fallback candidate.
+
+If a fallback is selected:
+
+- it uses the same SSI-granted Natural Action opportunity;
+- it enters its ordinary Action Admission / Cost / Target / Resolution pipeline;
+- failed original Intent Cost is not paid merely because that Intent was requested.
+
+If no authored fallback is legal:
+
+> use the declared fallback/no-candidate policy.
+
+The Kernel must not invent another fallback.
+
+---
+
+### E. Interposition settlement failure
+
+Current Schema policies are:
+
+```text
+CONTINUE
+FAIL_INTENT
+```
+
+`CONTINUE` means:
+
+> failure of the interposition settlement itself does not automatically cancel the preserved original Intent.
+
+Example:
+
+```text
+interposition settlement cannot pay its own Cost
+→ settlement produces no successful Effect
+→ preserved original Intent continues to the declared revalidation/admission step
+```
+
+`FAIL_INTENT` means the enclosing Intent/Action path stops at this interposition boundary according to authored data.
+
+No automatic refund is implied.
+
+---
+
+### F. `POST_COST_PRE_EFFECT`
+
+Canonical flow:
+
+```text
+Action Intent
+→ ordinary Action Admission
+→ complete the entire declared active Cost transaction
+→ settle declared interposition settlement
+→ original admitted Ability direct Effects may begin
+```
+
+The original Action is already admitted at this anchor.
+
+For an ordinary singular/fixed Cost Ability:
+
+```text
+complete Cost transaction
+=
+validate required Cost
+→ commit required Cost
+```
+
+For a distributed CostGroup under `CST-008`:
+
+```text
+complete Cost transaction
+=
+validate required Costs
+→ snapshot optional payer collections
+→ commit required Costs
+→ attempt every frozen optional payer Cost
+→ create all member payment results
+→ construct declared CostGroup payment result / aggregates
+```
+
+Therefore:
+
+> committing only the required subset does not mean the active Cost stage has finished when distributed optional payer work remains.
+
+Neither the `POST_COST_PRE_EFFECT` settlement nor the original Ability's first direct Effect may begin while that declared active Cost transaction is incomplete.
+
+After the full Cost transaction reaches a terminal result:
+
+```text
+complete Cost transaction
+→ declared POST_COST_PRE_EFFECT settlement
+→ first direct Ability Effect
+```
+
+If the original Ability has no active Cost:
+
+```text
+ordinary Cost stage completes with no payment
+→ declared interposition settlement
+→ direct Ability Effects
+```
+
+No fake Cost is created.
+
+`REVALIDATE_ORIGINAL_INTENT` is not a rewind mechanism for `POST_COST_PRE_EFFECT`.
+
+This anchor does not reopen ordinary admission merely because the settlement changed state.
+
+Any separate rule that can invalidate an already-admitted Action must use its own explicit Contract.
+
+---
+
+### G. Cost already committed at post-cost anchor
+
+At `POST_COST_PRE_EFFECT`, the declared active Cost transaction is already terminal.
+
+If the interposition settlement then stops the already-admitted Action before its direct Effects:
+
+> committed Cost is not automatically refunded.
+
+Refund follows `CST-005`.
+
+A failed or cancelled post-cost settlement must not retroactively rewrite already-produced:
+
+- singular Cost payment results;
+- distributed member payment results;
+- CostGroup payment results.
+
+Those committed results remain authoritative transaction history.
+
+---
+
+### H. Boundedness and priority boundary
+
+One interposition instance is bounded to its matching Action Intent and authored branch.
+
+It must not become:
+
+- an arbitrary callback;
+- arbitrary stage jumping;
+- an unbounded loop;
+- repeated self-reentry;
+- a second Natural Action;
+- a hidden `FORCED_ACTION`.
+
+Fallback caused by this interposition does not recursively re-run the same interposition instance unless a separate bounded authored rule independently matches and is legal.
+
+This Contract establishes only the local dependency:
+
+```text
+declared interposition
+→ required admission/effect boundary
+```
+
+It does not establish global priority among unrelated Reactions/Triggers.
+
+`TRG-005` remains unchanged.
 
 ---
 
@@ -1353,19 +1736,85 @@ No earlier target death in the batch buffs/changes later target calculation unle
 ---
 
 ## RES-003 — Sequential Group
-**Status:** `LOCKED`
+**Status:** `LOCKED CORE / reaction boundary REQUIRED_EXPLICIT WHEN RELEVANT`
 
 For sequential resolution:
 
 ```text
 resolve component 1
-→ commit
-→ required immediate lifecycle resolution
-→ component 2 may observe new state
+→ commit component 1
+→ required immediate lifecycle evaluation
+→ component 2 may observe new authoritative state
 → ...
 ```
 
-Whether Reactions interrupt between components is a separate Contract field.
+A later component may therefore observe state committed by an earlier component.
+
+### Mandatory lifecycle processing is not an ordinary Reaction window
+
+After a committed component, any lifecycle processing required to determine whether a later component still has a legal recipient may occur immediately.
+
+This may include, where applicable:
+
+```text
+HP_ZERO
+→ Death Prevention / required lifecycle handling
+→ target validity update
+```
+
+This required lifecycle processing does not by itself grant ordinary Counter/Reaction resolution between components.
+
+---
+
+### Explicit reaction boundary profile
+
+`resolution.reactionBoundary` determines whether ordinary Reactions may resolve between sequential components when that distinction matters.
+
+The explicit profile required by Pilot #3 is:
+
+```text
+AFTER_DIRECT_EFFECTS_COMPLETE
+```
+
+Meaning:
+
+```text
+component 1 commit
+→ mandatory immediate lifecycle evaluation
+→ if later component remains legal:
+     component 2 resolve/commit
+→ continue declared direct sequential Effects
+→ ACTION_DIRECT_EFFECTS_COMPLETE
+→ ordinary eligible Reactions may proceed/queue under existing Trigger Contracts
+```
+
+Under this profile:
+
+> ordinary Reactions do not resolve between sequential direct components.
+
+Mandatory lifecycle evaluation still occurs between components.
+
+Target invalidation continues to follow `TGT-006`.
+
+---
+
+### No new global default
+
+This Contract does **not** choose a universal intermediate-Reaction rule for all sequential/multihit Actions.
+
+If an Ability can expose a meaningful intermediate ordinary-Reaction distinction and does not declare the required profile:
+
+> authoring remains `REQUIRED_EXPLICIT`.
+
+The HARD UNRESOLVED default intermediate-Reaction question therefore remains unresolved.
+
+A Character-specific use of:
+
+```text
+reactionBoundary = AFTER_DIRECT_EFFECTS_COMPLETE
+```
+
+must not be generalized into a global Reaction priority rule.
 
 ---
 
@@ -1394,20 +1843,256 @@ Examples:
 
 ---
 
+## RES-006 — Scoped Effect-Amount Modifier Evaluation
+**Status:** `LOCKED`
+
+A normalized `ScopedEffectAmountModifierSpec` may modify only Effects that match its declared bounded scope.
+
+The Contract evaluates a modifier in the following conceptual order:
+
+```text
+resolving Effect reaches declared resolution phase
+→ evaluate source scope
+→ evaluate recipient scope
+→ evaluate Effect semantic/component scope
+→ evaluate structured conditions
+→ execute declared read-only valueQueries
+→ calculate typed amount scalar
+→ apply typed amount operation at that resolution phase
+```
+
+A modifier that fails any declared scope/condition check does not apply to that Effect/component.
+
+---
+
+### Source scope
+
+`sourceScope` is evaluated against the resolving Effect's existing authoritative Attribution context.
+
+The declared `attributionField` must be used exactly.
+
+For example:
+
+```text
+damageAttribution = SELF
+```
+
+is not interchangeable with:
+
+```text
+caster = SELF
+```
+
+or:
+
+```text
+effectSource = SELF
+```
+
+unless authored data explicitly selected that field.
+
+No Attribution dimension is inferred from Character prose.
+
+---
+
+### Recipient scope
+
+`recipientScope` evaluates the already-resolving Effect recipient.
+
+It does not perform target selection and does not create another TargetSet.
+
+A relational filter such as:
+
+```text
+ALLY
+ENEMY
+SAME_SIDE
+OPPOSING_SIDE
+```
+
+must use its explicit authored `relationAnchor`.
+
+Exclusions such as:
+
+```text
+excludeRefs:
+  - SELF
+```
+
+are applied as recipient-scope conditions.
+
+---
+
+### Effect/component scope
+
+The modifier applies only to the declared Effect semantic.
+
+Current Pilot-supported Effect semantics are:
+
+```text
+HEAL
+DAMAGE
+```
+
+For Damage, component scope is evaluated independently for:
+
+```text
+PHYSICAL
+WILL
+TRUE
+```
+
+A modifier scoped to:
+
+```text
+PHYSICAL
+WILL
+```
+
+does not apply to the True component of the same Damage Effect.
+
+---
+
+### Structured conditions and `valueQueries`
+
+Modifier conditions reuse existing structured `ConditionSpec`.
+
+`valueQueries` are bounded read-only queries.
+
+At modifier evaluation:
+
+- each query reads the authoritative gameplay state visible at that declared resolution phase;
+- candidate/filter semantics reuse existing Target/Condition contracts;
+- a relation requiring an anchor must use the authored explicit anchor;
+- the query may produce typed read results such as `TARGET_COUNT_REF`.
+
+A `valueQuery` must not:
+
+- mutate State;
+- pay Cost;
+- emit gameplay Effects;
+- create/request Actions;
+- consume RNG;
+- alter the resolving Effect's target set.
+
+If a modifier requires an earlier authored Snapshot rather than current authoritative state:
+
+> its formula must explicitly reference that Snapshot.
+
+No hidden snapshot is created by the modifier system.
+
+---
+
+### Typed amount operation
+
+The current supported amount operation is:
+
+```text
+MULTIPLY
+```
+
+The operation consumes a bounded pure ValueRef/Formula and produces a scalar.
+
+The amount formula may not perform iteration or mutation itself.
+
+Collection work belongs to declared `valueQueries`.
+
+---
+
+### Multiple matching modifiers
+
+Every modifier whose declared scope and conditions match the resolving Effect/component is applicable.
+
+Current Pilot semantics do not introduce a winner/priority relationship between matching modifier rules.
+
+Because the currently-supported operation is `MULTIPLY`:
+
+> all applicable multiplier scalars participate in the same declared amount phase.
+
+Authoring order, Event sequence, insertion order, Ability list order, and Character ID do not create gameplay priority between them.
+
+If a future non-commutative amount operation is introduced:
+
+> its ordering semantics require a separate explicit Contract before use.
+
+This Pilot does not invent that ordering.
+
+---
+
+### Resolution phase ownership
+
+A modifier applies only at its authored `resolutionPhase`.
+
+Current Pilot phases are resolved by their owning pipelines:
+
+```text
+PRE_OVERHEAL
+→ HEL-001
+
+FINAL_DAMAGE_REDUCTION
+→ DMG-005
+```
+
+A modifier may not run at an undeclared or custom string phase.
+
+---
+
+### Authority boundary
+
+Ordinary structured predicates such as:
+
+```text
+Rank = Prime
+Effective Element = Light
+```
+
+are not Authority predicates.
+
+They do not invoke Authority adjudication merely because they appear in a modifier condition/query.
+
+`AUT-*` applies only if a genuine Authority-bearing rule conflict exists independently.
+
+---
+
 # 17. COST CONTRACT
 
 ## CST-001 — Validation Before Payment
 **Status:** `LOCKED_DEFAULT`
 
-Cost payment follows:
+For an ordinary required-only Cost group:
 
 ```text
-validate all required costs
-→ if all payable
-→ commit cost group atomically
+validate all required Costs
+→ if all required Costs are payable
+→ commit required Cost group atomically
 ```
 
-No partial multi-cost payment by default.
+No partial required multi-cost payment by default.
+
+This remains the default for ordinary fixed Cost composition.
+
+---
+
+### Explicit distributed-Cost exception
+
+A declared `CostGroupSpec` containing:
+
+```text
+optionalDistributedCostRefs
+```
+
+does not treat all optional collection members as additional all-or-nothing required Costs.
+
+Instead:
+
+- `requiredCostRefs` remain required;
+- their successful commit remains required for Ability continuation;
+- distributed optional payers follow `CST-008`;
+- optional payer failure does not retroactively convert the required Cost group into a failed atomic transaction.
+
+The required Cost subset is still atomic with respect to itself unless an explicit higher Contract says otherwise.
+
+This exception does not permit partial payment of a failed required Cost.
 
 ---
 
@@ -1510,6 +2195,440 @@ Any refund must follow CST-005.
 
 ---
 
+## CST-008 — Dynamic Distributed Multi-Payer Cost
+**Status:** `LOCKED`
+
+This Contract applies to a normalized `CostGroupSpec` containing:
+
+```text
+requiredCostRefs
++
+optionalDistributedCostRefs
+```
+
+Each entity in a distributed payer collection pays **its own Cost**.
+
+A distributed HP Cost is therefore:
+
+```text
+payer loses HP as Cost
+```
+
+not:
+
+```text
+caster deals Damage to payer
+```
+
+`CST-003` continues to govern each HP Cost attempt.
+
+---
+
+### Canonical transaction order
+
+For a distributed CostGroup:
+
+```text
+1. Action admission / declared revalidation confirms the requested Ability may proceed to Cost processing
+
+2. validate all required Costs
+   + mandatory payer legality
+
+3. if required Costs are not payable:
+     fail before payment
+     do not snapshot/attempt optional payment as a committed payment phase
+     do not partially pay required Cost
+
+4. snapshot every declared optional payer collection
+   from authoritative pre-payment state
+
+5. commit the required Cost subset atomically
+
+6. for each member of each frozen optional payer collection:
+     attempt that entity's own Cost
+
+7. create authoritative member payment results
+
+8. construct declared CostGroup payment result
+   and aggregates
+```
+
+The critical invariant is:
+
+> optional payer collections are snapshotted after required validation but before any required or optional payment commits.
+
+The payer set must not first be discovered after required payment has begun.
+
+---
+
+### Snapshot freezes membership, not payment success
+
+The optional payer snapshot fixes:
+
+> which entities are members of that distributed payer collection for this Cost transaction.
+
+It does not guarantee that every snapshotted member will successfully pay.
+
+At the member's payment attempt:
+
+- use that entity as `PAYER`;
+- evaluate the authored Cost for that payer;
+- apply that payer's relevant Cost/payment rules;
+- produce that payer's own payment result.
+
+A later state change must not silently:
+
+- add a new optional payer to the frozen collection;
+- remove an already-snapshotted payer merely because collection eligibility would now differ.
+
+The member's actual payment attempt may still fail under its own applicable Cost rules.
+
+---
+
+### Optional payer failure
+
+For:
+
+```text
+optionalPayerFailurePolicy
+= CONTRIBUTION_ZERO_CONTINUE
+```
+
+a failed optional payer attempt produces:
+
+```text
+success = false
+actualPaidAmount = 0
+```
+
+for that payer.
+
+That failure:
+
+- contributes zero to payment aggregation;
+- does not by itself fail the whole Ability;
+- does not invalidate successful payments from other optional payers;
+- does not refund already-committed required Costs;
+- does not convert another entity into the failed payer.
+
+---
+
+### Successful zero payment
+
+A payer-specific Cost Contract may explicitly permit:
+
+```text
+success = true
+actualPaidAmount = 0
+```
+
+Such an outcome is a successful payment outcome with zero committed amount.
+
+It must not be rewritten as optional-payer failure merely because the numeric amount is zero.
+
+---
+
+### Required commit failure
+
+If the required Cost subset cannot commit after validation:
+
+> the distributed optional payment phase does not begin.
+
+No optional payer payment may be used to rescue an uncommitted required Cost unless another explicit Cost Contract says so.
+
+---
+
+### Per-payer ownership
+
+For a distributed HP Cost:
+
+```text
+PAYER = current frozen collection member
+```
+
+That member's HP changes through Cost semantics.
+
+Therefore the payment does not:
+
+- create Damage Attribution from the caster;
+- trigger ordinary Damage triggers;
+- use Shield;
+- Reflect;
+- Lifesteal;
+
+unless an explicit Cost Contract independently overrides those defaults.
+
+---
+
+### Active Cost-stage completion boundary
+
+For an active Ability, the distributed Cost transaction does not finish when the required subset commits.
+
+If the CostGroup contains:
+
+```text
+optionalDistributedCostRefs
+```
+
+the active Cost stage remains in progress until:
+
+```text
+required Costs committed
+→ every frozen optional payer attempt reached a terminal payment result
+→ all member payment results were recorded
+→ declared CostGroup payment result / aggregates were constructed
+```
+
+Only after this full sequence is terminal may the Action proceed to:
+
+```text
+POST_COST_PRE_EFFECT
+```
+
+or to its first direct Ability Effect when no such interposition applies.
+
+Forbidden flow:
+
+```text
+required Cost commits
+→ POST_COST_PRE_EFFECT settlement or direct Effect
+→ optional payer payments happen later
+```
+
+because it would split one declared Cost transaction across Ability execution.
+
+Canonical boundary:
+
+```text
+complete Cost transaction
+→ post-cost interposition if any
+→ direct Effects
+```
+
+This rule does not make optional payer success required for Ability continuation.
+
+An optional payer may still terminate as:
+
+```text
+success = false
+actualPaidAmount = 0
+```
+
+under `CONTRIBUTION_ZERO_CONTINUE`.
+
+What is required is that the **attempt/result is terminal**, not that every optional payer succeeds.
+
+---
+
+### Cross-payer ordering boundary
+
+This Contract freezes payer membership and per-payer ownership.
+
+It does not create a general gameplay-priority rule among optional payer entities.
+
+Authoring that intentionally makes one optional payer's payment result alter another optional payer's payment legality/amount in an order-dependent way requires an additional explicit Contract/profile.
+
+The Kernel must not use entity ID, Slot, collection insertion order, or incidental iteration order as an undeclared gameplay rule.
+
+---
+
+## CST-009 — Typed Cost-Payment Result Semantics
+**Status:** `LOCKED`
+
+Cost formulas and committed payment outcomes are distinct.
+
+Canonical distinction:
+
+```text
+requestedAmount
+≠
+actualPaidAmount
+```
+
+when the applicable Cost/payment policy allows them to differ.
+
+Downstream Effects that require the committed payment outcome must consume the authoritative Cost-payment result.
+
+They must not reconstruct that outcome from the nominal/authored Cost formula.
+
+---
+
+### Singular payment result
+
+One singular payer Cost attempt may produce one typed:
+
+```text
+COST_PAYMENT_RESULT
+```
+
+At minimum it preserves:
+
+```text
+requestedAmount
+actualPaidAmount
+payer
+success
+```
+
+`requestedAmount` is the evaluated amount requested from that payer by the Cost definition/payment profile.
+
+`actualPaidAmount` is the authoritative amount actually committed from that payer.
+
+`payer` is the entity/resource owner that paid or attempted that singular Cost.
+
+`success` is the payment outcome according to the applicable Cost Contract.
+
+---
+
+### Zero amount is not failure
+
+The following implication is invalid:
+
+```text
+actualPaidAmount = 0
+→ success = false
+```
+
+A legal Cost/payment policy may produce:
+
+```text
+success = true
+actualPaidAmount = 0
+```
+
+For example, an explicitly-authored HP Cost floor may permit the Cost interaction to succeed while no HP can legally be removed beyond that floor.
+
+Conversely, a failed optional payment may produce:
+
+```text
+success = false
+actualPaidAmount = 0
+```
+
+Consumers must inspect the typed fields they semantically require.
+
+They must not infer `success` only from amount.
+
+---
+
+### Distributed payment results remain individual
+
+If one distributed CostSpec produces payment attempts for:
+
+```text
+Payer A
+Payer B
+Payer C
+```
+
+the authoritative outcomes remain three distinct member `COST_PAYMENT_RESULT` records.
+
+They must not be collapsed into one ambiguous singular Cost result.
+
+A direct singular `COST_PAYMENT_REF` must resolve to exactly one payment result.
+
+Distributed member outcomes are owned/exposed through their declared CostGroup result.
+
+---
+
+### CostGroup result
+
+A declared `CostGroupSpec` may expose:
+
+```text
+COST_GROUP_PAYMENT_RESULT
+```
+
+The group result owns the member payment results generated by that declared transaction.
+
+For an aggregate such as:
+
+```text
+TOTAL_ACTUAL_PAID
+```
+
+the aggregate is computed from authoritative member:
+
+```text
+actualPaidAmount
+```
+
+not from requested/nominal formulas.
+
+For a heterogeneous CostGroup, the aggregate consumer must identify the Cost kind being aggregated.
+
+Example:
+
+```text
+TOTAL_ACTUAL_PAID(kind = HP)
+```
+
+sums only HP payment results belonging to that declared CostGroup.
+
+Failed optional payer:
+
+```text
+actualPaidAmount = 0
+```
+
+contributes zero.
+
+Successful zero payment:
+
+```text
+actualPaidAmount = 0
+```
+
+also contributes zero while preserving:
+
+```text
+success = true
+```
+
+in its member result.
+
+---
+
+### Downstream binding rule
+
+If downstream gameplay says:
+
+> amount equals HP actually paid
+
+the consumer must read:
+
+```text
+actualPaidAmount
+```
+
+or the corresponding typed group aggregate.
+
+It must not use:
+
+- raw percentage formula;
+- requested Cost amount;
+- payer HP difference reconstructed after unrelated mutations;
+- a guessed nominal value.
+
+This ensures Cost-result-dependent Effects remain correct when:
+
+- a Cost floor applies;
+- a partial/special payment policy applies;
+- optional payers fail;
+- a successful zero payment is permitted.
+
+---
+
+### Result lifetime and immutability
+
+Once a payment result is committed:
+
+> its recorded requested amount, actual paid amount, payer and success outcome are immutable result data for that transaction.
+
+Later Heal, Damage, Resource changes, Max HP changes, or other Effects do not retroactively rewrite the payment result.
+
+---
+
 # 18. RESOURCE CONTRACT
 
 ## CST-010 — AE Ownership
@@ -1606,22 +2725,90 @@ True Damage:
 ## DMG-005 — True Damage vs Final Damage Reduction
 **Status:** `LOCKED`
 
-Final Damage Reduction applies only to non-True damage after the relevant ARM/RES mitigation stage.
+Final Damage Reduction is a Damage amount phase for non-True components after the relevant ARM/RES mitigation stage and before Shield resolution.
 
 Canonical component flow:
 
 ```text
-Physical → ARM/Penetration → Final Damage Reduction
-Will     → RES/Penetration → Final Damage Reduction
-True     → bypass ARM/RES → bypass Final Damage Reduction
+Physical
+→ ARM/Penetration
+→ qualifying FINAL_DAMAGE_REDUCTION modifiers
+→ Shield
+
+Will
+→ RES/Penetration
+→ qualifying FINAL_DAMAGE_REDUCTION modifiers
+→ Shield
+
+True
+→ bypass ARM/RES
+→ bypass FINAL_DAMAGE_REDUCTION
+→ Shield
 ```
 
-Final Damage Reduction does **not** reduce True Damage.
+Final Damage Reduction does **not** reduce True Damage under the current canonical Damage Contract.
 
 Shield resolution occurs afterward unless a packet has explicit Shield Piercing/bypass.
 
 This preserves:
-`TRUE_DAMAGE ≠ SHIELD_PIERCING`.
+
+```text
+TRUE_DAMAGE ≠ SHIELD_PIERCING
+```
+
+---
+
+### Scoped modifier application
+
+A `ScopedEffectAmountModifierSpec` with:
+
+```text
+effectType = DAMAGE
+resolutionPhase = FINAL_DAMAGE_REDUCTION
+```
+
+is evaluated under `RES-006`.
+
+The modifier is applied independently to each resolving Damage component/recipient that matches its declared:
+
+- source scope;
+- recipient scope;
+- Damage component scope;
+- structured conditions/valueQueries.
+
+A target-local modifier on Target A does not automatically modify Damage received by Target B.
+
+A source-target scoped rule therefore remains local to the qualifying source/recipient interaction.
+
+---
+
+### True component boundary
+
+Under the current Contract, a modifier authored at:
+
+```text
+FINAL_DAMAGE_REDUCTION
+```
+
+cannot affect a `TRUE` component merely by including it in loose data.
+
+True Damage bypasses this phase.
+
+If normalized authored data attempts to make a normal `FINAL_DAMAGE_REDUCTION` modifier affect True Damage without another explicit higher Contract:
+
+> normalization must reject the contradiction.
+
+---
+
+### Multiple scoped reductions
+
+If several qualifying Stage-E amount modifiers apply at this phase:
+
+> resolve them under `RES-006`.
+
+The Contract does not establish gameplay priority between those modifier sources.
+
+Current `MULTIPLY` modifiers all participate in the phase without deriving priority from authoring/event order.
 
 ## DMG-006 — Penetration
 **Status:** `LOCKED`
@@ -1817,12 +3004,94 @@ Reflected Damage does not automatically qualify as a normal attack/action for Co
 ## HEL-001 — Heal Calculation
 **Status:** `LOCKED`
 
-Heal resolves:
+Heal resolves conceptually:
 
 ```text
-requested Heal
+requested Heal amount
+→ qualifying PRE_OVERHEAL scoped amount modifiers
+→ modified Heal amount
 → actual restorable HP up to Current Max HP
 → Overheal = remaining excess
+```
+
+If no qualifying `PRE_OVERHEAL` modifier exists:
+
+> modified Heal amount equals requested Heal amount.
+
+---
+
+### PRE_OVERHEAL semantics
+
+A `ScopedEffectAmountModifierSpec` with:
+
+```text
+effectType = HEAL
+resolutionPhase = PRE_OVERHEAL
+```
+
+is evaluated under `RES-006`.
+
+Its source/recipient/condition/value-query scope is resolved **before** Overheal is calculated.
+
+The resulting modified Heal amount becomes the Heal quantity used to determine:
+
+```text
+actual restored HP
++
+Overheal
+```
+
+Therefore:
+
+> Overheal must be derived from the already-modified Heal amount.
+
+A PRE_OVERHEAL rule must not:
+
+1. calculate Overheal from the unmodified Heal;
+2. then modify only the restored-HP portion;
+3. leave the old Overheal amount unchanged.
+
+That would violate the declared resolution phase.
+
+---
+
+### Recipient-local behavior
+
+The modifier evaluates against the actual Heal recipient.
+
+A rule scoped to:
+
+```text
+ALLY relative to SELF
+excluding SELF
+```
+
+does not modify self-Heal merely because the Heal was created by the same source.
+
+---
+
+### Value-query timing
+
+Any modifier `valueQueries` used by this phase observe the authoritative state at the PRE_OVERHEAL evaluation point unless the authored formula explicitly references a prior Snapshot.
+
+No hidden Heal-time snapshot is implied.
+
+---
+
+### Authority boundary
+
+Rank/Element predicates used to calculate or qualify a Heal modifier are ordinary structured gameplay conditions.
+
+They do not become Authority merely because a queried entity has:
+
+```text
+Rank = Prime
+```
+
+or:
+
+```text
+Effective Element = Light
 ```
 
 ---
@@ -3896,6 +5165,23 @@ Normalizer must block or warn when:
 21. an active Skill with ordinary Cost resolves/activates effects before Cost commit without an explicit Cost-timing override.
 22. a non-State Effect protection/admission rule has no explicit semantic scope and would therefore behave as accidental all-effect immunity.
 23. an Authority threshold used as a simple Effect-admission predicate is incorrectly routed through same-tier Rank/Tu vi/Stars/Awaken/CP adjudication without a direct rule conflict.
+24. a `ScopedEffectAmountModifierSpec` uses an undeclared/custom resolution phase, arbitrary executable logic, or an Effect/component scope incompatible with that phase.
+25. a modifier `valueQuery` mutates state, consumes RNG, performs Effect/Action work, or uses a relation without its required explicit anchor.
+26. a `FINAL_DAMAGE_REDUCTION` scoped modifier attempts to modify True Damage without another explicit higher Contract allowing that semantic.
+27. a distributed optional payer collection is first snapshotted after required Cost payment has already begun.
+28. a distributed payer Cost is normalized as caster Damage/HP Loss rather than that payer's own Cost.
+29. an optional distributed payer under `CONTRIBUTION_ZERO_CONTINUE` is allowed to fail the entire Ability merely because that payer cannot pay.
+30. multiple distributed payer outcomes are collapsed into one ambiguous singular `COST_PAYMENT_RESULT`.
+31. downstream gameplay requiring actual committed payment reads/reconstructs the nominal Cost formula instead of the typed committed Cost-payment result.
+32. `actualPaidAmount = 0` is treated as proof that `success = false`.
+33. a `PRE_ADMISSION_PRE_COST` interposition discards the original Action Intent through ordinary legality/payability probing before the declared settlement/revalidation occurs.
+34. Action-Intent revalidation failure silently falls back to Basic Attack or another Action form not explicitly authored in the fallback candidate data.
+35. a `POST_COST_PRE_EFFECT` interposition permits the original Ability's direct Effects to begin before the declared interposition settlement has completed/failed according to policy.
+36. an Action-Intent interposition is normalized as an additional Natural Action, arbitrary callback, arbitrary timing hook, or global Reaction priority mechanism.
+37. a sequential Action authored with `reactionBoundary = AFTER_DIRECT_EFFECTS_COMPLETE` exposes an ordinary Reaction window between its direct sequential components.
+38. more than one branch of one `ActionIntentInterpositionSpec` matches the same Action Intent at `ACTION_INTENT_CREATED` without an explicit canonical branch-selection policy.
+39. more than one independent Action-Intent interposition instance matches the same Action Intent + canonical anchor without an explicit composition/dependency policy; authoring order, Event order, Character ID, or incidental iteration order must not become hidden priority.
+40. a `POST_COST_PRE_EFFECT` execution plan or direct Ability Effect begins before the entire declared active Cost transaction is terminal, including all frozen optional distributed payer attempts and required CostGroup-result construction.
 
 # 60. WHAT IS ACTUALLY LOCKED ENOUGH NOW
 
@@ -3935,54 +5221,9 @@ The following foundational behavior is sufficiently stable for Kernel planning:
 
 ---
 
-# 
-
-These are the important remaining blockers. They must not be hidden.
-
-## Combat/ordering
-1. global same-window Trigger priority.
-2. exact intermediate Reaction boundary for sequential multihit.
-3. exact battle-terminal queued Reaction cancellation.
-
-## Damage
-4. True Damage vs Final Damage Reduction.
-5. multiple Shield instance priority.
-6. default Max-HP reference for damage threshold when Max HP mutates mid-action.
-
-## Authority
-7. same-tier Authority conflict.
-8. final Dynamic Authority sampling rule confirmation.
-
-## Revive/materialization
-9. global Revive lifeSerial default.
-10. default full-slot materialization policy.
-11. default invalid Duy Nhất materialization policy.
-
-## Luân Hồi
-12. simultaneous deaths and “4 later deaths” ordering confirmation.
-13. exact Revive-vs-threshold race confirmation.
-
-## Pygmalion
-14. inherit Class.
-15. inherit Element.
-16. inherited secondary-effect Attribution.
-17. exact inhabited Puppet Revive semantics.
-18. exact Puppet object classification (`SUMMON` or special Combat Unit).
-
-## Narrative
-19. Belief cadence after Turn Boundary terminology correction.
-20. Belief formula finality.
-21. Knowledge Propagation delay.
-22. Story-specific Counter-Proof severity defaults.
-23. Realized Property Authority default.
-
-## Exploration mode
-24. AE ownership.
-25. real-time Action cadence and remaining economy contracts.
-
 # 61. HARD UNRESOLVED LIST BEFORE FREEZE
 
-These are the important remaining blockers after revision F.1. They must not be hidden.
+These are the important remaining blockers after revision F.2. They must not be hidden.
 
 ## Combat / ordering
 1. global same-window Trigger priority across unrelated Reactions.
@@ -4007,6 +5248,10 @@ These are the important remaining blockers after revision F.1. They must not be 
 ## Exploration mode
 13. AE ownership.
 14. real-time Action cadence and remaining economy/lifecycle contracts.
+
+## Pilot #3 composition boundaries
+15. priority/composition of multiple independent Action-Intent interpositions that match the same Action Intent + canonical anchor without an explicit composition/dependency policy.
+16. order-dependent interactions among optional distributed payers without a dedicated explicit Contract/profile.
 
 ### Resolved since the older blocker list
 
@@ -4378,13 +5623,22 @@ A model understands this file only if it can preserve all of these simultaneousl
 21. Behavior Source and Damage Attribution can differ.
 22. Outer Authority may or may not pass to child Action based on policy.
 23. Higher Authority matters only on semantic conflict, not as a generic power multiplier.
-24. Same-tier Authority is still unresolved and must not be guessed.
+24. Same-tier special Authority conflict follows `AUT-004`: adjudicate by Rank → Cultivation/Tu vi → Character Stars → Awaken Count → Adjudication CP; exact total tie resolves as `NO_OVERRIDE`.
 25. One Pygmalion Puppet per Life Cycle does not limit total existing Puppets to one.
 26. Arena objects remain owned by Arena instance unless transferred.
 27. Story Belief and Stability are separate.
 28. Realized property removal removes only its own capability contribution.
 29. Determinism does not justify inventing gameplay semantics.
 30. Unknown contract decisions stay visible as unresolved instead of being silently filled.
+31. Action Intent / Request is not an admitted Action; a declared PRE_ADMISSION_PRE_COST interposition may preserve the original Intent until settlement and authoritative revalidation.
+32. Dynamic distributed optional payer collections are snapshotted from authoritative pre-payment state after required validation but before any payment commit; every payer pays its own Cost.
+33. Requested Cost amount and actual committed payment amount are distinct result semantics; `actualPaidAmount = 0` does not by itself mean payment failure.
+34. Scoped Effect-amount modifiers are bounded by source, recipient, Effect/component, structured query/condition, typed amount operation and explicit resolution phase; they do not create arbitrary modifier scripting or implicit global priority.
+35. PRE_OVERHEAL modifies Heal before Overheal derivation; FINAL_DAMAGE_REDUCTION occurs after Physical/Will mitigation and before Shield while True Damage bypasses that phase.
+36. An explicit sequential Reaction-boundary profile may defer ordinary Reactions until direct Effects complete while still allowing mandatory intermediate lifecycle evaluation; this does not define the unresolved global sequential-Reaction default.
+37. Multiple matching Action-Intent branches or interposition instances do not gain gameplay priority from authored order, Event sequence, Character ID, or incidental iteration; unresolved multiplicity is a validation error until an explicit composition policy exists.
+38. `POST_COST_PRE_EFFECT` occurs only after the entire declared active Cost transaction is terminal; committing only the required subset of a distributed CostGroup is not sufficient.
+39. Distributed optional payer failure may contribute zero without failing the Ability, but every frozen payer attempt must reach a terminal result before the CostGroup transaction is considered complete.
 
 If a future model violates one of these:
 > it should not be allowed to freeze Kernel behavior for Arclune.

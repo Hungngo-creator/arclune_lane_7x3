@@ -1,10 +1,12 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-09-10-G  
+**Version:** 2026-09-19-G.1  
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA.md`, `05_CONTRACTS.md`  
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
 **Non-goal:** implementation code, Unity class layout, networking transport, renderer, editor UI.
+
+**Revision G.1:** incorporates Pilot Normalization #3 runtime support for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost execution, immutable typed Cost-payment results, scoped Effect-amount modifier evaluation, and explicit `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary execution. No new Functional Tag or Primitive is introduced.
 
 ---
 
@@ -180,10 +182,12 @@ canonicalAbilityId
 schemaVersion
 actionSpec
 triggerGraph
+intentInterpositionPlan
 costPlan
 targetPlan
 snapshotPlan
 effectGraph
+effectModifierPlan
 authorityPlan
 attributionPlan
 capabilityIndex
@@ -192,12 +196,27 @@ contractRefs
 validationHash
 ```
 
+`intentInterpositionPlan` is generated from bounded Ability-owned `ActionIntentInterpositionSpec`.
+
+`effectModifierPlan` is generated from bounded `ScopedEffectAmountModifierSpec`.
+
+`costPlan` may contain:
+- ordinary singular/fixed Cost execution;
+- declared `CostGroupSpec`;
+- frozen runtime payer-collection plan;
+- typed Cost-payment Result Binding plan.
+
+None of these plans creates a new Primitive by itself.
+
 Kernel may reject IR if:
 - version mismatch;
 - unresolved blocker;
 - invalid Contract reference;
 - deprecated Tag;
-- invalid primitive request.
+- invalid Primitive request;
+- ambiguous interposition multiplicity that should have been rejected by normalization;
+- unsupported modifier operation or resolution phase;
+- invalid Cost-result binding shape.
 
 ---
 
@@ -476,8 +495,315 @@ targetContext
 snapshotContext
 effectGraphCursor
 generationDepth
+completionDependencyState?
 status
 ```
+
+`completionDependencyState` is materialized only when an Action actually owns declared root-linked blocking settlements.
+
+Do not allocate or infer a completion-dependency graph for every Action by default.
+
+---
+
+## 12A. NATURAL ACTION FORM RESOLVER
+
+Action Scheduler owns a generic resolver for an SSI-granted Natural Action whose allowed Action form is constrained by normalized Character/System data.
+
+The resolver consumes:
+
+```text
+actorRef
+naturalActionOpportunityRef
+normalized naturalActionFormPolicy?
+Mode Profile default Action-form policy
+current authoritative State
+```
+
+It does not contain Character-specific branches.
+
+Forbidden implementation:
+
+```text
+if characterId == ECHO_REVERIE:
+    ...
+```
+
+Required direction:
+
+```text
+normalized policy data
+→ generic resolver
+→ selected Action candidate
+```
+
+### Resolution precedence
+
+When an Actor receives an actual Natural Action opportunity:
+
+```text
+1. resolve an active explicit Character/System naturalActionFormPolicy, if one applies;
+2. otherwise use the Mode Profile's default Natural-Action form policy;
+3. create the selected ordinary Action Request;
+4. preserve naturalActionStatus = NATURAL.
+```
+
+An explicit Character/System restriction may therefore override the Mode default.
+
+Example:
+
+```text
+Mode default:
+Rage-ready legal Ultimate has automatic priority
+
+Character restriction:
+current remembered form = SKILL
+
+→ explicit restriction wins
+→ resolver does not select Ultimate merely because Rage is full
+```
+
+unless that restriction itself declares Ultimate as an eligible candidate.
+
+### Candidate probe
+
+Candidate evaluation uses a read-only Action-admission probe.
+
+Conceptual result:
+
+```text
+ProbeActionCandidate(candidate)
+→ LEGAL
+or
+→ REJECTED(reasonCode)
+```
+
+The probe may read:
+
+- Action/Ability legality;
+- Rage readiness;
+- AE/resource affordability;
+- cooldown;
+- required Mode;
+- required prerequisite State;
+- whether at least one mandatory target candidate exists.
+
+The probe must not:
+
+- mutate State;
+- commit or reserve Cost;
+- consume/reset Rage;
+- consume RNG;
+- select/lock a random target;
+- start cooldown;
+- emit gameplay Events;
+- instantiate the candidate Action.
+
+Target-existence probing must use a deterministic non-RNG eligibility query.
+
+Only after one candidate is selected does the ordinary Action pipeline begin.
+
+### No hidden fallback
+
+If normalized data declares:
+
+```text
+ULTIMATE
+→ SKILL
+→ BASIC_ATTACK
+```
+
+the resolver probes in exactly that order.
+
+It must not invent another fallback.
+
+If all candidates fail:
+> use normalized `noCandidatePolicy`.
+
+### Trace
+
+Execution Trace should record:
+
+```text
+naturalActionFormPolicyRef?
+candidateOrder
+candidateProbeResults[]
+selectedActionIdentity?
+selectedAbilityRef?
+noCandidateResult?
+```
+
+Candidate probe traces are diagnostic reads, not gameplay Events.
+
+---
+
+## 12B. ACTION INTENT RUNTIME
+
+The Action Scheduler owns a bounded runtime record for an Action Intent before that Intent becomes an admitted Action.
+
+This object is required because:
+
+```text
+ACTION INTENT / REQUEST
+≠
+ADMITTED ACTION
+```
+
+and the existing Action Instance must not collapse the two semantic states.
+
+Conceptual runtime record:
+
+```text
+ActionIntentRuntime
+  intentId
+  actorRef
+  naturalActionOpportunityRef?
+  naturalActionStatus
+  originalRequestedActionIdentity
+  originalRequestedAbilityRef?
+  originalRequestedSelector?
+  effectiveCandidateRef?
+  sourceDecisionContext
+  selectedInterpositionBranchesByAnchor
+  revalidationResult?
+  fallbackSelection?
+  status
+```
+
+Possible internal status values may include:
+
+```text
+CREATED
+INTERPOSITION_PENDING
+INTERPOSITION_SETTLING
+REVALIDATING
+READY_FOR_ADMISSION
+ADMITTED
+FALLBACK_SELECTED
+FAILED
+CANCELLED
+```
+
+These are runtime states, not Functional Tags.
+
+### Intent creation
+
+When an input decision, autonomy decision, or normalized Action-form resolver produces a request:
+
+```text
+create ActionIntentRuntime
+→ preserve original requested identity/reference
+→ resolve matching normalized interposition specs against the ORIGINAL Intent
+→ for each applicable interposition spec:
+     select at most one matching branch
+→ index every selected branch by its authored canonical anchor
+→ require at most one selected interposition branch per Intent + anchor
+→ freeze the resulting interposition selection for this Intent
+```
+
+Branch conditions are evaluated at:
+
+```text
+ACTION_INTENT_CREATED
+```
+
+as defined by Schema/Contract.
+
+The selected branch belongs to its owning interposition spec first; its authored anchor determines where that already-selected branch may later execute.
+
+Runtime must not reinterpret this as:
+
+```text
+choose one branch independently for every anchor
+```
+
+because one interposition spec may contain mutually-exclusive branches whose anchors differ.
+
+Later HP/resource/State changes do not reselect another branch for the same Intent.
+
+### Multiplicity invariant
+
+Normalized executable content is expected to satisfy:
+
+```text
+at most one matching branch per applicable interposition spec
+and
+at most one selected interposition instance per Intent + anchor
+```
+
+unless a future explicit composition policy exists.
+
+Runtime must not choose a winner using:
+
+- authored list order;
+- Event sequence;
+- Ability list order;
+- Character ID;
+- Slot;
+- insertion order;
+- incidental collection iteration order.
+
+If executable IR violates this invariant:
+
+> fail as normalized-content/runtime invariant error.
+
+Do not invent runtime priority.
+
+### Same Natural Action opportunity
+
+If the Intent originated from one SSI-granted Natural Action opportunity:
+
+- pre-admission settlement remains inside that opportunity;
+- revalidation remains inside that opportunity;
+- explicit fallback remains inside that opportunity;
+- no interposition settlement creates another Natural Action.
+
+The record preserves the original requested candidate for trace even if a fallback later becomes the effective admitted candidate.
+
+### Interposition execution
+
+The Action Scheduler dispatches the selected branch's declared `settlementAbilityRef` through the existing normalized Ability/Trigger settlement path.
+
+The settlement:
+
+- uses its own normalized Cost/Effect data;
+- follows `TRG-003` when it is Passive/Triggered/Automatic;
+- does not receive a second SSI Natural Action;
+- does not become an arbitrary engine callback;
+- returns a terminal settlement outcome that can be interpreted by the branch's `settlementFailurePolicy`.
+
+No Character ID branch is permitted.
+
+### Settlement failure policy
+
+The selected branch carries its normalized:
+
+```text
+CONTINUE
+or
+FAIL_INTENT
+```
+
+policy.
+
+Runtime must distinguish:
+
+```text
+settlement terminal success
+```
+
+from:
+
+```text
+settlement terminal failure
+```
+
+and then apply the authored failure policy.
+
+`CONTINUE` means the failed settlement itself does not cancel the enclosing Intent/Action path.
+
+`FAIL_INTENT` means the enclosing Intent/Action path terminates at that interposition boundary under existing Action failure/termination semantics.
+
+No automatic refund is implied.
 
 ---
 
@@ -501,21 +827,174 @@ These are runtime states, not Functional Tags.
 
 ---
 
-# 14. ACTION REQUEST
+# 14. ACTION REQUEST / INTENT ADMISSION
 
-`REQUEST_ACTION` does not immediately mutate combat state.
+`REQUEST_ACTION` does not immediately mutate combat state and does not immediately imply an admitted Action.
 
-It creates an Action Request.
+Canonical runtime split:
 
-Scheduler validates:
-- actor;
-- mode;
+```text
+request decision
+→ Action Intent
+→ bounded pre-admission interposition if declared
+→ admission/revalidation
+→ admitted Action Instance
+```
+
+### Ordinary path
+
+If no matching `PRE_ADMISSION_PRE_COST` selected branch applies:
+
+```text
+Action Intent
+→ ordinary read-only admission probe
+→ ACT-002 admission
+→ accepted Intent becomes Action Instance
+```
+
+The ordinary admission probe may read, as applicable:
+
+- actor lifecycle/presence;
+- Mode legality;
+- Action-form restriction;
 - parent policy;
 - recursion guard;
 - natural-action policy;
-- target/cost prerequisites if required.
+- Ability prerequisites;
+- required pre-cost target legality;
+- Cost payability.
 
-Accepted request becomes Action Instance.
+The probe does not commit Cost or Effects.
+
+### `PRE_ADMISSION_PRE_COST` path
+
+If the frozen Intent selection contains a pre-admission branch:
+
+```text
+Action Intent
+→ do not finalize ordinary admission rejection yet
+→ execute declared settlement
+→ apply settlementFailurePolicy
+→ if the path continues and revalidation is declared:
+     revalidate the SAME preserved original Intent
+```
+
+Before that settlement has received its opportunity to resolve, the Scheduler must not discard the Intent merely because an ordinary early probe currently reports:
+
+- prerequisite failure;
+- Cost unaffordability;
+- target illegality that belongs to later declared revalidation.
+
+The settlement may change authoritative state.
+
+### Pre-admission settlement terminal handling
+
+If the settlement reaches terminal success:
+
+> continue to the branch's declared revalidation/admission path.
+
+If the settlement reaches terminal failure and:
+
+```text
+settlementFailurePolicy = CONTINUE
+```
+
+then:
+
+> preserve the original Intent and continue to the branch's declared revalidation/admission path.
+
+If the settlement reaches terminal failure and:
+
+```text
+settlementFailurePolicy = FAIL_INTENT
+```
+
+then:
+
+> mark the Intent path terminal under existing failure/termination semantics and do not admit the original candidate merely because it was requested.
+
+No Cost of the unadmitted original candidate is paid.
+
+### Revalidation
+
+For:
+
+```text
+REVALIDATE_ORIGINAL_INTENT
+```
+
+the Scheduler runs the ordinary read-only admission probe again against current authoritative state.
+
+Revalidation:
+
+- does not pay Cost;
+- does not emit `ACTION_BEGIN`;
+- does not resolve an Effect;
+- does not choose another candidate.
+
+If the original Intent passes:
+
+```text
+preserved original Intent
+→ ACT-002 admission
+→ Action Instance
+```
+
+If it fails:
+
+```text
+evaluate only explicitly authored fallback candidates
+```
+
+Fallback candidate probing reuses the existing read-only candidate-probe machinery from `# 12A`.
+
+No global Basic fallback exists.
+
+### Fallback
+
+When one explicit fallback candidate is selected:
+
+- preserve the original Intent for trace;
+- set the selected fallback as the effective candidate;
+- reuse the same `naturalActionOpportunityRef`;
+- enter the fallback candidate's ordinary ACT-002 admission / Cost / target / effect path;
+- do not pay the failed original candidate's Cost.
+
+Fallback selection does **not** create a new Action Intent.
+
+Therefore it does not rerun:
+
+```text
+ACTION_INTENT_CREATED
+```
+
+interposition matching or branch selection.
+
+The frozen interposition selection remains the selection of the original Intent.
+
+An already-selected/consumed interposition is not recursively re-entered merely because the effective candidate changed.
+
+### Action Instance creation
+
+Only an admitted effective candidate becomes an Action Instance.
+
+At that point runtime creates/attaches the already-canonical Action fields such as:
+
+```text
+actionId
+rootActionId
+parentActionId?
+originAbilityId
+actorRef
+actionIdentity
+actionBehavior
+naturalActionStatus
+authorityContext
+attributionContext
+...
+```
+
+The original Intent remains separately traceable.
 
 ---
 
@@ -537,6 +1016,118 @@ Used for:
 - reflect loop prevention;
 - attribution;
 - trace.
+
+---
+
+## 15A. EXECUTION PROVENANCE QUERY VIEW
+
+Kernel preserves two separate read-only identity axes:
+
+```text
+Action lineage
+Effect provenance
+```
+
+They must not be collapsed.
+
+### Action lineage
+
+Existing Action runtime remains authoritative for:
+
+```text
+actionId
+parentActionId?
+rootActionId
+originAbilityId
+actionIdentity
+actionBehavior
+naturalActionStatus
+```
+
+A query may explicitly resolve:
+
+```text
+SELF
+PARENT
+ROOT
+```
+
+without creating another ancestry subsystem.
+
+### Effect provenance
+
+Each executing normalized Effect has an immutable execution context sufficient to distinguish its generating Effect from other Effects in the same Action lineage.
+
+Conceptual fields:
+
+```text
+effectInstanceId
+originEffectId
+originAbilityId
+actionRef
+effectSource
+authorityContext
+attributionContext
+```
+
+`effectInstanceId` identifies this runtime execution instance.
+
+`originEffectId` identifies the normalized generating Effect definition/node.
+
+`effectSource` preserves canonical Effect Source semantics.
+
+### Same root does not mean same Effect
+
+Example:
+
+```text
+root Action = Echo Skill 2
+
+Effect A:
+Skill 2 direct Damage
+
+Effect B:
+Echo passive repeat True Damage
+```
+
+Both may share:
+
+```text
+rootActionId
+Damage Attribution = Echo
+```
+
+but must have different Effect provenance.
+
+A recursion filter therefore queries provenance rather than guessing from Character identity or Damage Attribution.
+
+### Condition evaluator
+
+Condition evaluation receives read-only typed views over:
+
+```text
+ActionLineageView
+EffectProvenanceView
+```
+
+according to Schema/Contract.
+
+It must not reconstruct provenance from presentation sequence or prose.
+
+### Event/result propagation
+
+When an Event/result is produced by a specific Effect, it may carry or reference:
+
+```text
+effectRef?
+originEffectId?
+```
+
+where required for downstream declarative queries.
+
+This metadata is immutable provenance.
+
+It is not a Functional Tag and does not change Damage Attribution.
 
 ---
 
@@ -671,32 +1262,193 @@ This supports mechanics whose timer remains attached to death slot.
 
 # 23. ACTION EXECUTION PIPELINE
 
-A normal Action path:
+The Kernel distinguishes the Intent phase from admitted Action execution.
+
+Canonical high-level path:
 
 ```text
-1. request accepted
-2. admission
-3. prerequisite evaluation
-4. Cost validation
-5. Cost commit
-6. ACTION_BEGIN
-7. snapshot plan
-8. target plan
-9. effect graph execution
-10. transaction commits
-11. immediate death/lifecycle processing
-12. blocking child Actions
-13. action result aggregation
-14. ACTION_DIRECT_EFFECTS_COMPLETE
-15. ACTION_COMPLETED
-16. queue eligible completion reactions
-17. if Natural Action:
-      post-natural-action hooks
+0. Action Intent created
+1. freeze valid Action-Intent interposition branch selection
+
+2. if PRE_ADMISSION_PRE_COST branch applies:
+     execute declared settlement
+     apply settlementFailurePolicy
+     if path terminates:
+       stop before admission
+     otherwise, if declared:
+       revalidate SAME original Intent
+     if original Intent fails:
+       evaluate explicit fallback
+       preserve same Natural Action opportunity
+
+3. run ACT-002 admission for the effective Intent
+
+4. only on successful admission:
+     create / enter the admitted Action Instance
+
+5. execute the entire declared active Cost transaction
+   according to Cost Contract
+
+6. Cost stage becomes terminal only when:
+     all required Cost work is terminal
+     AND all frozen optional distributed payer attempts are terminal
+     AND all required payment results are stored
+     AND declared CostGroup result/aggregates are constructed
+
+7. ACTION_BEGIN
+
+8. if POST_COST_PRE_EFFECT branch applies:
+     execute declared settlement
+     wait for its terminal outcome
+     apply settlementFailurePolicy
+     if FAIL_INTENT terminates the already-admitted path:
+       do not begin direct Effects
+       do not automatically refund committed Cost
+       continue through existing Action failure/termination bookkeeping
+
+9. snapshot plan
+
+10. target plan
+
+11. effect graph execution
+
+12. transaction commits
+
+13. mandatory immediate death/lifecycle processing
+
+14. blocking child Actions
+
+15. finalize direct-effect stage
+
+16. ACTION_DIRECT_EFFECTS_COMPLETE
+
+17. if an explicit Reaction-boundary profile opens at
+    ACTION_DIRECT_EFFECTS_COMPLETE:
+      lift that local hold / make eligible candidates available
+      to the existing Trigger/Reaction scheduler
+      WITHOUT inventing priority against unrelated eligible work
+
+18. discover / resolve declared root-linked blocking settlements
+    according to the root Action's local completion-dependency graph
+
+19. finish mandatory lifecycle/results caused by those settlements
+
+20. finalize Action-level result aggregation required for completion
+
+21. verify all root completion dependencies are terminal
+
+22. ACTION_COMPLETED
+
+23. publish/queue ACTION_COMPLETED-dependent ordinary non-blocking work
+    according to existing Trigger/Reaction Contracts
+
+24. if Natural Action:
+      execute Mode Profile post-Natural-Action system hooks
       SSI pointer advance
       Turn Boundary
 ```
 
-Specific Action profiles can move target/cost validation within allowed Contract boundaries.
+### Admission is not duplicated Cost commit
+
+`ACT-002` admission/probing may verify prerequisite and Cost payability.
+
+The later Cost transaction is the authoritative validation/commit path.
+
+Do not add a second independent gameplay prerequisite phase between:
+
+```text
+ACT-002 admission
+and
+Cost transaction
+```
+
+unless another explicit Contract requires it.
+
+### Cost-stage terminal boundary
+
+For ordinary singular/fixed active Cost:
+
+```text
+required validation
+→ required commit
+→ typed payment result storage
+→ Cost stage terminal
+```
+
+For `CostGroupSpec` with distributed optional payers:
+
+```text
+required validation
+→ freeze optional payer collections
+→ required atomic commit
+→ every frozen optional payer attempt reaches terminal result
+→ store all member results
+→ build/store CostGroup result + aggregates
+→ Cost stage terminal
+```
+
+Therefore:
+
+> `POST_COST_PRE_EFFECT` must never run merely because the required subset has committed while optional distributed payer attempts are still unfinished.
+
+### Post-cost interposition position
+
+Under the existing active-Cost lifecycle:
+
+```text
+complete active Cost transaction
+→ ACTION_BEGIN
+→ POST_COST_PRE_EFFECT settlement if selected
+→ snapshot / target / first direct Effect
+```
+
+The post-cost settlement may change authoritative state before the original Ability's first direct Effect.
+
+It does not rewind ordinary admission.
+
+### Post-cost settlement failure
+
+If the post-cost settlement fails under:
+
+```text
+CONTINUE
+```
+
+the already-admitted original Action continues to its direct Effects.
+
+If it fails under:
+
+```text
+FAIL_INTENT
+```
+
+the already-admitted Action path stops before its direct Effects under existing failure/termination semantics.
+
+Committed Cost-payment results remain immutable.
+
+Committed Cost is not automatically refunded.
+
+Refund remains `CST-005` / explicit-policy driven.
+
+### Relationship to root-completion settlement
+
+Action Intent interposition is an early Action-lifecycle boundary.
+
+`rootCompletionDependency` is a late Action-completion boundary.
+
+Do not merge them.
+
+### Reaction priority boundary
+
+Opening a local Reaction boundary at `ACTION_DIRECT_EFFECTS_COMPLETE` means only:
+
+> the explicit sequential hold no longer blocks those candidates.
+
+It does **not** determine whether an ordinary Reaction resolves before or after an unrelated root-linked blocking settlement or another same-window candidate.
+
+That unresolved scheduling/priority question remains governed by existing Trigger/Reaction Contracts, including `TRG-005`.
+
+`eventSeq` remains trace order, not gameplay priority.
 
 ---
 
@@ -722,7 +1474,7 @@ Recurring behavior:
 
 # 25. RESULT BINDINGS
 
-Runtime Result Store supports typed bindings.
+Runtime Result Store supports typed immutable bindings.
 
 Examples:
 
@@ -732,16 +1484,154 @@ SnapshotRef
 DamageResultRef
 DamageAggregateRef
 HealResultRef
+CostPaymentResultRef
+CostGroupPaymentResultRef
 SpawnedEntityRef
 StateRef
 StoryRef
 PropertyRef
 ```
 
-A node can consume only compatible typed result.
+A node can consume only a compatible typed result.
 
 Rejected:
+
 > arbitrary mutable local variable shared across effects.
+
+---
+
+## Cost payment result
+
+One singular Cost-payment attempt may store:
+
+```text
+CostPaymentResult
+  costPaymentResultId
+  costRef
+  payerRef
+  costKind
+  requestedAmount
+  actualPaidAmount
+  success
+  costTransactionId
+```
+
+`costTransactionId` identifies the owning Cost transaction and is intentionally distinct from any generic state/batch transaction identifier.
+
+Once committed/stored, these fields are immutable transaction history.
+
+A singular:
+
+```text
+COST_PAYMENT_REF
+```
+
+must resolve to exactly one `CostPaymentResult`.
+
+It must not resolve to a collection of distributed payer outcomes.
+
+### `requestedAmount` vs `actualPaidAmount`
+
+Runtime preserves both values independently.
+
+It must not reconstruct `actualPaidAmount` from:
+
+- nominal formula;
+- payer HP/resource difference after later Effects;
+- expected percentage;
+- requested amount.
+
+The committed Cost execution result is authoritative.
+
+The following are both legal typed states when Contract permits:
+
+```text
+success = false
+actualPaidAmount = 0
+```
+
+and:
+
+```text
+success = true
+actualPaidAmount = 0
+```
+
+---
+
+## Cost group payment result
+
+A declared CostGroup may store:
+
+```text
+CostGroupPaymentResult
+  costGroupPaymentResultId
+  costGroupRef
+  costTransactionId
+  memberPaymentResultRefs[]
+  typedAggregates
+```
+
+Distributed payer outcomes remain separate member `CostPaymentResult` objects.
+
+They are not collapsed into one ambiguous synthetic singular payment.
+
+Supported typed aggregate includes:
+
+```text
+TOTAL_ACTUAL_PAID(kind)
+```
+
+computed only from member:
+
+```text
+actualPaidAmount
+```
+
+for the requested Cost kind.
+
+Example:
+
+```text
+TOTAL_ACTUAL_PAID(HP)
+= sum(actualPaidAmount of HP member payment results)
+```
+
+Failed optional payments contribute zero.
+
+Successful zero payments also contribute zero while retaining `success = true` in their member record.
+
+### Binding visibility
+
+The Cost transaction must store all required Result Bindings before the Cost stage is marked terminal.
+
+Downstream Effect DAG nodes may consume:
+
+```text
+CostPaymentResultRef.actualPaidAmount
+```
+
+or:
+
+```text
+CostGroupPaymentResultRef.TOTAL_ACTUAL_PAID(kind)
+```
+
+according to normalized type compatibility.
+
+### Immutability
+
+Later:
+
+- Heal;
+- Damage;
+- HP mutation;
+- Max HP mutation;
+- Resource mutation;
+- Shield mutation;
+- lifecycle mutation
+
+must not rewrite committed Cost-payment results.
 
 ---
 
@@ -803,6 +1693,154 @@ Character-specific Contract profile overrides only declared semantics.
 
 ---
 
+## 28A. SCOPED EFFECT-AMOUNT MODIFIER EXECUTION
+
+The existing Contract Resolver coordinates normalized `effectModifierPlan` evaluation at a declared Effect amount phase.
+
+No separate modifier subsystem/manager is required.
+
+Conceptual input:
+
+```text
+resolving Effect execution context
+recipientRef
+Damage component type?
+resolutionPhase
+authoritative state version
+normalized effectModifierPlan
+existing Attribution context
+explicit SnapshotRefs?
+```
+
+Canonical evaluation:
+
+```text
+Effect reaches declared phase
+→ enumerate normalized modifier candidates for that Effect semantic/phase
+→ source-scope test
+→ recipient-scope test
+→ Effect/component-scope test
+→ structured Condition evaluation
+→ bounded read-only valueQueries
+→ evaluate pure scalar formula
+→ collect matching MULTIPLY factors
+→ combine phase factor
+→ apply amount transform once at this phase
+```
+
+### Source scope
+
+Source matching reads the exact authored Attribution field from the existing Effect execution context.
+
+For example:
+
+```text
+damageAttribution
+```
+
+must not be substituted with:
+
+```text
+caster
+owner
+effectSource
+```
+
+unless normalized data selected that field.
+
+### Recipient scope
+
+Recipient scope evaluates the already-resolving recipient.
+
+It does not re-target the Ability.
+
+It may use existing Target/Condition relation/filter logic as a read-only predicate.
+
+Explicit relation anchors remain mandatory.
+
+### Structured `valueQueries`
+
+`valueQueries` reuse the existing read-only candidate/filter machinery.
+
+For one modifier-phase evaluation:
+
+```text
+read authoritative state at phase entry
+→ run bounded query
+→ return typed read result
+```
+
+unless the normalized formula explicitly references an earlier `SnapshotRef`.
+
+A value query must not:
+
+- mutate State;
+- pay Cost;
+- emit an Effect;
+- request/create an Action;
+- consume RNG;
+- alter the resolving Ability's TargetSet.
+
+A query result such as target count is exposed only as the typed value expected by the normalized pure formula.
+
+### MULTIPLY combination
+
+Current supported modifier operation:
+
+```text
+MULTIPLY
+```
+
+All matching multipliers participate in the same phase.
+
+Runtime must not derive winner/priority from:
+
+- modifier authoring order;
+- Ability order;
+- Event order;
+- entity order;
+- Character ID;
+- insertion order.
+
+To prevent numeric rounding from accidentally turning iteration order into gameplay semantics:
+
+> combine all matching multiplier factors into one canonical phase factor before applying the amount transform, and avoid per-modifier amount rounding that would make factor order observable.
+
+Exact global numeric representation/rounding remains governed by the project's numeric policy.
+
+### Non-commutative future operations
+
+If normalized content requests a future non-commutative amount operation without an explicit Contract:
+
+> reject as unsupported.
+
+Do not invent a modifier-priority subsystem.
+
+### Authority boundary
+
+Rank/Element predicates are ordinary structured reads.
+
+They do not invoke Authority adjudication.
+
+Authority runtime is entered only when the resolving interaction contains a genuine Authority-bearing semantic conflict under `AUT-*`.
+
+### Trace
+
+Modifier evaluation should be traceable by:
+
+```text
+modifierRef
+resolutionPhase
+scopeMatch
+queryResultRefs?
+scalar
+combinedPhaseFactor
+```
+
+These are trace/debug data, not gameplay Events.
+
+---
+
 # 29. TRANSACTION MANAGER
 
 Transaction Manager protects atomicity.
@@ -818,6 +1856,184 @@ proposedDeltas
 commitMode
 batchId?
 ```
+
+---
+
+## 29A. COST TRANSACTION RUNTIME
+
+The existing Transaction Manager owns a typed Cost transaction context for normalized Cost execution.
+
+This is not a new top-level subsystem.
+
+Conceptual runtime state:
+
+```text
+CostTransactionContext
+  costTransactionId
+  actionRef?
+  settlementRef?
+  costGroupRef?
+  stateVersionBeforePayment
+  requiredCostRefs[]
+  requiredValidationResults[]
+  optionalPayerSnapshots[]
+  requiredCommitResult?
+  memberPaymentResultRefs[]
+  costGroupPaymentResultRef?
+  status
+```
+
+One optional payer snapshot may contain:
+
+```text
+OptionalPayerSnapshot
+  distributedCostRef
+  snapshotStateVersion
+  payerRefs[]
+```
+
+Possible internal status values may include:
+
+```text
+CREATED
+REQUIRED_VALIDATED
+OPTIONAL_PAYERS_SNAPSHOTTED
+REQUIRED_COMMITTED
+OPTIONAL_ATTEMPTS_RUNNING
+RESULTS_FINALIZING
+TERMINAL_SUCCESS
+TERMINAL_REQUIRED_FAILURE
+```
+
+These are runtime transaction states, not Functional Tags.
+
+### Canonical distributed execution order
+
+For a distributed CostGroup:
+
+```text
+1. validate required Costs / mandatory payer legality
+
+2. if required validation fails:
+     terminate required failure
+     commit nothing
+
+3. snapshot every optional payer collection
+   from authoritative pre-payment state
+
+4. freeze those payerRefs
+
+5. atomically commit the required Cost subset
+
+6. for every frozen optional payer:
+     resolve PAYER = that member
+     attempt that member's own Cost
+     create one terminal COST_PAYMENT_RESULT
+
+7. wait until every frozen payer attempt is terminal
+
+8. construct COST_GROUP_PAYMENT_RESULT
+
+9. compute declared typed aggregates
+
+10. publish/store result bindings
+
+11. mark Cost stage terminal
+```
+
+The required invariant is:
+
+```text
+all optional payer membership snapshots
+happen before ANY required or optional payment commit
+```
+
+### Each payer pays its own Cost
+
+For distributed HP Cost:
+
+```text
+payerRef Current HP
+→ HP Cost commit
+```
+
+Do not route through Damage Runtime.
+
+Do not create:
+
+- caster Damage Attribution;
+- Shield absorption;
+- Reflect;
+- Lifesteal;
+- ordinary Damage triggers.
+
+Existing HP-Cost semantics remain authoritative.
+
+### Optional payer failure
+
+For:
+
+```text
+CONTRIBUTION_ZERO_CONTINUE
+```
+
+a failed optional payer attempt records:
+
+```text
+success = false
+actualPaidAmount = 0
+```
+
+and the CostGroup continues.
+
+The attempt is still terminal and must still have a member result.
+
+### Successful zero payment
+
+If the applicable Cost Contract permits a legal zero payment:
+
+```text
+success = true
+actualPaidAmount = 0
+```
+
+must remain distinguishable from failure.
+
+Runtime must never derive `success` only from the numeric amount.
+
+### No gameplay ordering from iteration
+
+The optional payer collection may require a stable technical iteration order for replay/trace.
+
+That order is implementation-only.
+
+It must not become gameplay priority.
+
+Normalized executable content is expected not to contain an order-dependent cross-payer dependency such as:
+
+```text
+payer A's result changes payer B's payment legality/amount
+```
+
+without a future explicit profile.
+
+If such unsupported dependency reaches runtime:
+
+> fail as an unsupported normalized-content invariant rather than inventing order from entity ID, Slot, list order, or iteration order.
+
+### Cost-stage terminal
+
+A distributed CostGroup is not terminal when only required Cost commits.
+
+It becomes terminal only after:
+
+```text
+all frozen optional attempts terminal
+AND all member payment results stored
+AND group result/aggregates constructed
+```
+
+Only then may `POST_COST_PRE_EFFECT` or the first direct Ability Effect proceed.
 
 ---
 
@@ -855,17 +2071,64 @@ This prevents calculation contamination.
 
 # 32. SEQUENTIAL TRANSACTION
 
-Sequential component:
+For one sequential direct component:
 
 ```text
 calculate component
-→ commit
+→ commit component
 → stateVersion++
-→ required immediate lifecycle processing
-→ next component reads new state
+→ mandatory immediate lifecycle processing
+→ validate whether later component remains legal
+→ next direct component may read new authoritative state
 ```
 
-Reaction boundary remains controlled by Action resolution profile.
+Mandatory immediate lifecycle processing is not an ordinary Reaction window.
+
+It may perform required processing such as:
+
+```text
+HP_ZERO
+→ Death Prevention / lifecycle evaluation
+→ target validity update
+```
+
+when that processing is necessary before a later direct component can legally resolve.
+
+### Explicit `AFTER_DIRECT_EFFECTS_COMPLETE` profile
+
+If normalized:
+
+```text
+resolution.reactionBoundary
+= AFTER_DIRECT_EFFECTS_COMPLETE
+```
+
+then runtime must hold ordinary eligible Reaction release across the direct sequential chain:
+
+```text
+component 1 commit
+→ mandatory lifecycle
+→ component 2 if legal
+→ mandatory lifecycle
+→ ...
+→ all declared direct components finished
+→ ACTION_DIRECT_EFFECTS_COMPLETE
+→ ordinary eligible Reactions may proceed/queue
+```
+
+Ordinary Reaction candidates may be discovered/traced as appropriate, but they must not resolve between the direct components under this profile.
+
+This does not suppress mandatory lifecycle processing.
+
+### No global default
+
+If the Ability has a meaningful intermediate-Reaction distinction but normalized content does not contain a Contract-supported explicit reaction boundary:
+
+> runtime must not guess.
+
+The unresolved global default remains a validation/content blocker where relevant.
+
+The Kernel must not silently map every sequential Action to `AFTER_DIRECT_EFFECTS_COMPLETE`.
 
 ---
 
@@ -881,6 +2144,8 @@ eventType
 combatInstanceId
 rootActionId?
 actionId?
+effectRef?
+originEffectId?
 transactionId?
 batchId?
 sourceRef?
@@ -891,6 +2156,24 @@ resultRef?
 stateVersion
 authorityContext?
 attributionContext?
+```
+
+`effectRef` / `originEffectId` are populated only when the Event semantically originates from a specific Effect and downstream provenance queries require that identity.
+
+They do not replace:
+
+```text
+sourceRef
+authorityContext
+attributionContext
+```
+
+because:
+
+```text
+Effect provenance
+≠ Source identity
+≠ Damage Attribution
 ```
 
 `subjectRefs` may exist as a derived/index projection for listener lookup.
@@ -1050,6 +2333,19 @@ Trigger Candidate stores:
 - lineage;
 - Cost state;
 - priority class.
+- rootCompletionDependency?
+- effectProvenanceContext?
+
+If a candidate declares a root completion dependency:
+
+1. resolve and validate its root Action reference;
+2. register/instantiate the corresponding Completion Tracker node;
+3. preserve the candidate's Action-lineage and Effect-provenance query context;
+4. schedule settlement only when its declared local dependencies permit it.
+
+Registration of a blocking dependency must occur before the root Action can cross its completion barrier.
+
+This does not give the candidate global Reaction priority.
 
 ---
 
@@ -1095,6 +2391,128 @@ Before `DAMAGE_ACTION_COMPLETED`:
 - aggregation is final.
 
 This allows Ký Ức Skill 2 to evaluate stable Actual HP Damage and target survival.
+
+---
+
+# 39A. ROOT ACTION COMPLETION TRACKER
+
+Root-linked blocking settlements are tracked as local state owned by the relevant Action Instance.
+
+This is not a separate global scheduler.
+
+Conceptual runtime state:
+
+```text
+CompletionDependencyState
+  rootActionId
+  nodes[]
+    dependencyId
+    triggerRef
+    status
+    dependsOn[]
+    terminalReason?
+```
+
+Possible runtime status:
+
+```text
+PENDING
+READY
+RESOLVING
+RESOLVED
+FAILED_COST
+FAILED_CONDITION
+CANCELLED
+```
+
+All statuses except:
+
+```text
+PENDING
+READY
+RESOLVING
+```
+
+are terminal for completion purposes.
+
+### Registration
+
+When Trigger Engine discovers an eligible Trigger whose normalized definition declares:
+
+```text
+rootCompletionDependency:
+  mode = BLOCK_ROOT_ACTION_COMPLETION
+```
+
+it must register/instantiate the corresponding dependency node on the referenced root Action **before** that root Action is allowed to pass the completion barrier.
+
+The runtime graph comes from normalized declarative dependency data.
+
+The Kernel must not invent dependency edges from Ability names or Event publication order.
+
+### Dependency readiness
+
+A node becomes `READY` only when all declared `dependsOn` nodes are terminal in a way permitted by its normalized policy.
+
+A node cannot execute merely because its Event has a lower `eventSeq`.
+
+### Failed activation closes the node
+
+Example:
+
+```text
+Skill 3 settlement qualifies
+→ Cost requires 30 AE
+→ AE insufficient
+→ status = FAILED_COST
+→ dependency is terminal
+```
+
+The root Action is not left permanently blocked.
+
+Whether a failed activation consumes a Trigger cap/counter remains governed by its Trigger/Cost Contract.
+
+### Completion barrier
+
+A root Action may emit `ACTION_COMPLETED` only when:
+
+```text
+direct effects are complete
+AND mandatory immediate lifecycle is complete
+AND blocking child Actions are complete
+AND all declared root-linked blocking dependencies are terminal
+AND required Action-level aggregation is final
+```
+
+### Local ordering only
+
+If normalized data declares:
+
+```text
+SKILL_3_SETTLEMENT
+→ SKILL_1_SETTLEMENT
+```
+
+that ordering exists only inside this root Action's completion graph.
+
+It does not:
+
+- alter global Reaction Queue priority;
+- solve same-window unrelated Trigger priority;
+- establish a global Ability-category priority;
+- use `eventSeq` as gameplay priority.
+
+### Boundedness
+
+The Completion Tracker must fail-fast if runtime data violates normalized guarantees, including:
+
+- unknown dependency node;
+- cycle;
+- dependency linked to the wrong root Action;
+- dependency requiring the same root Action to already be completed;
+- recursive unbounded dependency instantiation.
+
+Such failures are content/runtime invariant violations, not Character-specific fallback cases.
 
 ---
 
@@ -1220,23 +2638,50 @@ Exact implementation can use deterministic substreams/hash-based draws.
 
 # 45. DAMAGE RUNTIME
 
-Damage runtime receives DamagePacketRef.
+Damage Runtime receives a normalized Damage packet/effect context.
 
 It does not inspect Character names.
 
-Core stages:
+Each recipient/component resolves through the component-specific pipeline.
+
+Canonical core stages:
 
 ```text
 Damage Profile
-→ component formulas
-→ component mitigation
-→ Final Damage Reduction for non-True components
+→ component formula
+→ component-specific mitigation
+→ scoped FINAL_DAMAGE_REDUCTION phase for eligible non-True components
 → combine eligible post-mitigation components
 → Shield interaction
 → Current HP-bound result
 → Actual HP Damage
 → Overkill
 ```
+
+At:
+
+```text
+FINAL_DAMAGE_REDUCTION
+```
+
+Damage Runtime calls the bounded modifier execution defined in `§28A`.
+
+The call receives:
+
+```text
+effect semantic = DAMAGE
+recipientRef
+component type
+existing Attribution context
+resolutionPhase = FINAL_DAMAGE_REDUCTION
+authoritative phase state
+```
+
+Only normalized matching modifiers participate.
+
+A target-local modifier on one recipient does not alter another recipient's packet.
+
+No Character-specific Prime/Light logic is embedded in Damage Runtime.
 
 ---
 
@@ -1255,6 +2700,16 @@ raw Physical
 
 Exact ARM formula belongs tuning/math data, not architecture.
 
+At the Final Damage Reduction stage:
+
+```text
+post-ARM Physical amount
+→ §28A scoped FINAL_DAMAGE_REDUCTION multiplier evaluation
+→ final Physical amount for Shield interaction
+```
+
+The modifier query runs after ARM/Penetration mitigation and before Shield.
+
 ---
 
 # 47. WILL DAMAGE
@@ -1269,6 +2724,16 @@ raw Will
 → Shield
 → HP
 ```
+
+At the Final Damage Reduction stage:
+
+```text
+post-RES Will amount
+→ §28A scoped FINAL_DAMAGE_REDUCTION multiplier evaluation
+→ final Will amount for Shield interaction
+```
+
+The modifier query runs after RES/Penetration mitigation and before Shield.
 
 ---
 
@@ -1286,6 +2751,18 @@ raw True
 ```
 
 True Damage does not automatically gain Axiom authority.
+
+True Damage does not enter the normal:
+
+```text
+FINAL_DAMAGE_REDUCTION
+```
+
+modifier phase.
+
+Therefore the ordinary scoped modifier evaluator is not invoked for True components at that phase.
+
+True Damage still proceeds to eligible Shield unless explicit Shield Piercing/bypass exists.
 
 ---
 
@@ -1418,18 +2895,88 @@ Do not reconstruct these afterward from HP difference only.
 
 # 57. HEAL RUNTIME
 
-Heal resolver computes:
+Heal Runtime resolves one Heal instance as:
 
 ```text
 requestedHeal
-missingHP
-actualRestore = min(requestedHeal, missingHP)
-overheal = requestedHeal - actualRestore
+→ qualifying scoped PRE_OVERHEAL modifier evaluation
+→ modifiedHeal
+→ missingHP
+→ actualRestore = min(modifiedHeal, missingHP)
+→ overheal = modifiedHeal - actualRestore
+→ commit actualRestore
 ```
 
-Then commit only actualRestore to Current HP.
+If no qualifying `PRE_OVERHEAL` modifier exists:
+
+```text
+modifiedHeal = requestedHeal
+```
+
+### PRE_OVERHEAL modifier call
+
+Before computing actual restoration or Overheal, Heal Runtime calls `§28A` with:
+
+```text
+effect semantic = HEAL
+recipientRef
+existing Attribution context
+resolutionPhase = PRE_OVERHEAL
+authoritative phase state
+```
+
+The resolver evaluates:
+
+- source scope;
+- recipient scope;
+- structured conditions;
+- bounded `valueQueries`;
+- all matching `MULTIPLY` factors.
+
+The resulting phase factor modifies the Heal amount first.
+
+Only then may Heal Runtime compute:
+
+```text
+actualRestore
+overheal
+```
+
+Forbidden ordering:
+
+```text
+requestedHeal
+→ calculate Overheal
+→ reduce only restored HP
+```
+
+because Overheal must derive from the already-modified Heal amount.
+
+### Recipient-local scope
+
+A modifier scoped to:
+
+```text
+ALLY relative to SELF
+excluding SELF
+```
+
+must not modify self-Heal.
+
+### Result data
+
+Heal Result should preserve enough typed information for trace/debug such as:
+
+```text
+requestedHeal
+modifiedHeal
+actualRestore
+overheal
+```
 
 Overheal remains typed result data.
+
+It is not automatically Shield.
 
 ---
 
@@ -1556,6 +3103,117 @@ check target eligibility
 → Authority resolution if required
 → commit or reject
 ```
+
+---
+
+# 64A. SCOPED EFFECT ADMISSION GATEWAY
+
+Kernel provides a generic scoped Effect Admission boundary for non-State Effects whose target currently owns a matching admission/protection rule.
+
+This gateway is not automatically invoked as an all-effect immunity check for every Effect.
+
+Conceptual flow:
+
+```text
+incoming Effect
+→ validate target/lifecycle eligibility
+→ query matching admission rules by Effect semantic/scope
+→ no matching rule:
+     PASS_THROUGH
+→ matching rule exists:
+     evaluate admission predicate
+     → ADMIT
+     or
+     → REJECT
+→ if admitted:
+     continue ordinary Effect runtime/commit
+```
+
+### Indexed rule lookup
+
+Admission rules should be queryable/indexed by structured scope such as:
+
+```text
+effect semantic
+recipient
+source relation
+Effect Source/provenance
+Authority threshold
+Mode/System state
+```
+
+Kernel must not scan arbitrary Character prose.
+
+### Authority threshold
+
+A simple threshold rule such as:
+
+```text
+external SHIELD admitted only if
+incoming Authority >= QUY_TAC
+```
+
+is evaluated directly as an admission predicate.
+
+It does not automatically invoke same-tier Rank/Tu vi/Stars/Awaken/CP adjudication.
+
+### Direct conflict
+
+Authority Adjudication Engine is invoked only when admission exposes an actual direct rule/effect conflict that requires Authority adjudication.
+
+Therefore:
+
+```text
+incoming Authority field exists
+```
+
+alone is insufficient reason to start adjudication.
+
+### Shield integration
+
+Before Shield Runtime commits an incoming Shield Effect:
+
+```text
+if recipient has matching Shield-admission rule
+→ Effect Admission Gateway
+→ ADMIT / REJECT
+```
+
+If no matching rule exists:
+> ordinary Shield processing continues unchanged.
+
+### Damage integration
+
+Direct Damage is not sent through a universal Effect-immunity gate.
+
+Damage is subject to Effect Admission only if an explicit matching protection rule declares Damage inside its scope.
+
+This preserves:
+
+```text
+scoped Effect Admission
+≠ generic invulnerability
+```
+
+### State Admission
+
+Existing State Admission remains canonical for State application.
+
+State Runtime may share query/infrastructure with Effect Admission, but their semantic contracts remain distinct.
+
+### Result
+
+Gateway returns a typed result such as:
+
+```text
+ADMIT
+REJECT
+PASS_THROUGH
+```
+
+with machine-readable reason/trace data.
+
+Rejected Effects never reach their mutation/commit Primitive.
 
 ---
 
@@ -2445,6 +4103,8 @@ stateVersion
 rootActionId?
 actionId?
 parentActionId?
+effectRef?
+originEffectId?
 actorRef?
 primitiveId?
 contractId?
@@ -2468,7 +4128,77 @@ lifeSerial?
 waitingCount?
 storyId?
 reasonCode?
+actionFormProbeResult?
+completionDependencyId?
+completionDependencyStatus?
+effectAdmissionResult?
 ```
+
+Trace must be able to distinguish:
+
+```text
+same root Action
++ same Damage Attribution
++ different generating Effect
+```
+
+without inspecting presentation sequence.
+
+Trace should also show why:
+
+- an Action-form fallback candidate was rejected;
+- an Effect was rejected by scoped Effect Admission;
+- a blocking settlement ended in `FAILED_COST`;
+- a root Action remained waiting for completion dependencies.
+
+Pilot #3 runtime may additionally trace:
+
+```text
+actionIntentId?
+originalRequestedActionIdentity?
+effectiveActionIdentity?
+interpositionId?
+interpositionBranchId?
+interpositionAnchor?
+interpositionSettlementResult?
+interpositionFailurePolicy?
+interpositionTerminalStatus?
+actionIntentRevalidationResult?
+fallbackCandidateRef?
+costTransactionId?
+costTransactionStatus?
+costPaymentResultRefs?
+costGroupPaymentResultRef?
+optionalPayerSnapshotRef?
+effectModifierRefs?
+effectModifierPhase?
+modifierQueryResultRefs?
+combinedModifierFactor?
+reactionBoundaryProfile?
+```
+
+Trace must make it possible to distinguish:
+
+```text
+original Action Intent
+≠ effective fallback candidate
+≠ admitted Action
+```
+
+and:
+
+```text
+requested Cost amount
+≠ actual committed Cost amount
+```
+
+without reconstructing either distinction from later state.
+
+For distributed Cost, trace may use a stable technical payer iteration order for replay readability.
+
+That trace order does not create gameplay priority or payment precedence.
+
+For multiple scoped `MULTIPLY` modifiers, trace may list the participating modifier refs in a stable technical order while gameplay uses the combined phase factor rather than list-order precedence.
 
 ---
 
@@ -2490,7 +4220,44 @@ SLOT_OCCUPIED
 PUPPET_ALREADY_INHABITED
 REACTION_RECURSION_BLOCKED
 MODE_DISABLED
+ACTION_FORM_CANDIDATE_ILLEGAL
+ACTION_FORM_CANDIDATE_UNPAYABLE
+ACTION_FORM_NO_VALID_CANDIDATE
+EFFECT_ADMISSION_REJECTED
+COMPLETION_DEPENDENCY_FAILED_COST
+COMPLETION_DEPENDENCY_INVALID
+PROVENANCE_RECURSION_BLOCKED
 ```
+
+Pilot #3 runtime may additionally use machine-readable reasons such as:
+
+```text
+ACTION_INTENT_REVALIDATION_FAILED
+ACTION_INTENT_NO_AUTHORED_FALLBACK
+INTERPOSITION_SETTLEMENT_FAILED
+INTERPOSITION_FAIL_INTENT
+INTERPOSITION_MULTIPLICITY_INVALID
+COST_REQUIRED_VALIDATION_FAILED
+COST_REQUIRED_COMMIT_FAILED
+COST_OPTIONAL_PAYER_FAILED
+COST_GROUP_NOT_TERMINAL
+COST_RESULT_BINDING_INVALID
+COST_DISTRIBUTED_ORDER_DEPENDENCY_UNSUPPORTED
+EFFECT_MODIFIER_OPERATION_UNSUPPORTED
+EFFECT_MODIFIER_PHASE_INVALID
+EFFECT_MODIFIER_QUERY_INVALID
+SEQUENTIAL_REACTION_BOUNDARY_REQUIRED
+```
+
+`COST_OPTIONAL_PAYER_FAILED` is diagnostic.
+
+Under:
+
+```text
+CONTRIBUTION_ZERO_CONTINUE
+```
+
+it does not mean the enclosing Ability failed.
 
 ---
 
@@ -3094,17 +4861,72 @@ Do not infer completion from last VFX hit.
 
 # 157. INTERMEDIATE REACTION WINDOWS
 
-Sequential Action profile can declare:
+Sequential Actions use an explicit normalized Reaction-boundary profile whenever intermediate ordinary-Reaction timing is gameplay-relevant.
+
+Pilot #3 requires canonical runtime support for:
+
+```text
+AFTER_DIRECT_EFFECTS_COMPLETE
+```
+
+Runtime semantics:
+
+```text
+direct sequential component
+→ commit
+→ mandatory immediate lifecycle evaluation
+→ next legal direct component
+→ ...
+→ ACTION_DIRECT_EFFECTS_COMPLETE
+→ local sequential Reaction hold opens
+→ eligible ordinary Reaction candidates return to
+   existing Trigger/Reaction scheduling
+```
+
+Mandatory lifecycle processing between components is not an ordinary Reaction window.
+
+This profile is local to the Action that declares it.
+
+It does not:
+
+- establish global Reaction priority;
+- resolve `TRG-005`;
+- make Event order into gameplay priority;
+- force an eligible ordinary Reaction to resolve before an unrelated blocking settlement;
+- become the default for all sequential/multihit Actions.
+
+The project-wide default intermediate-Reaction policy remains unresolved / `REQUIRED_EXPLICIT` where the distinction matters.
+
+### Legacy runtime labels
+
+Earlier Kernel text mentioned:
 
 ```text
 REACTIONS_BETWEEN_COMPONENTS
-or
 QUEUE_UNTIL_ACTION_COMPLETE
 ```
 
-This remains Contract-driven.
+Those names are not silently promoted into canonical Stage-3 authoring values by this patch.
 
-Kernel supports both.
+If existing generated content/replay data uses one of those legacy labels:
+
+> migration must either prove an explicit semantic mapping to a currently Contract-supported profile or reject the legacy value for regeneration.
+
+Do not silently alias:
+
+```text
+QUEUE_UNTIL_ACTION_COMPLETE
+```
+
+to:
+
+```text
+AFTER_DIRECT_EFFECTS_COMPLETE
+```
+
+because `ACTION_COMPLETED` and `ACTION_DIRECT_EFFECTS_COMPLETE` are distinct canonical boundaries.
+
+Any additional Reaction-boundary profile requires its own explicit canonical Contract before executable runtime accepts it.
 
 ---
 
@@ -3978,6 +5800,24 @@ A correct Arclune Kernel must support all of these without contradiction:
 46. Kernel determinism never justifies inventing missing gameplay semantics.
 47. unresolved Contract branches fail visibly rather than guessing.
 48. no ordinary mechanic requires Character-specific engine code.
+
+49. Action Intent / Request remains distinct from an admitted Action at runtime.
+50. A normalized `PRE_ADMISSION_PRE_COST` interposition may settle before ordinary rejection and then revalidate the same preserved original Intent.
+51. Interposition fallback is explicit Character/System data and remains inside the same SSI-granted Natural Action opportunity unless another Contract says otherwise.
+52. `POST_COST_PRE_EFFECT` runs only after the complete active Cost transaction is terminal, including all frozen optional distributed payer attempts and group-result construction.
+53. Dynamic distributed payer membership is frozen before any payment commit; every member pays its own Cost.
+54. Distributed HP Cost is not caster Damage.
+55. `requestedAmount` and `actualPaidAmount` are distinct immutable runtime result fields, and zero actual payment does not itself imply failure.
+56. Distributed payment member results remain individually addressable through the CostGroup result and do not collapse into one ambiguous singular binding.
+57. Scoped Effect-amount modifiers are resolved only through bounded normalized source/recipient/effect/component/query/phase data.
+58. Current scoped amount operation `MULTIPLY` does not create modifier priority; all matching factors participate in one phase.
+59. `PRE_OVERHEAL` modifies Heal before actual restoration and Overheal derivation.
+60. `FINAL_DAMAGE_REDUCTION` applies after Physical/Will mitigation and before Shield; True Damage bypasses that phase.
+61. `AFTER_DIRECT_EFFECTS_COMPLETE` defers ordinary Reactions across declared direct sequential components while still permitting mandatory immediate lifecycle processing.
+62. Fallback inside one preserved Action Intent does not create a second `ACTION_INTENT_CREATED` cycle or rerun interposition branch selection.
+63. `CONTINUE` and `FAIL_INTENT` are explicit runtime outcomes of interposition settlement failure; post-cost `FAIL_INTENT` does not automatically refund already-committed Cost.
+64. Opening a local Reaction boundary does not establish priority against unrelated blocking settlements or same-window Reaction candidates.
+65. Pilot #3 requires no Character-specific runtime branch, new Functional Tag, or new Primitive.
 
 ---
 

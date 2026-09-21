@@ -337,6 +337,69 @@ pause behavior;
 time-scale interaction;
 background/offline accumulation.
 
+## 12.1 AE ACTION REGEN BY EFFECTIVE CLASS
+
+`TURN_BASED_MAIN` grants Side/team AE after a Character **actually completes one of its own Natural Actions**.
+
+Canonical table:
+
+| Effective Class | AE gained |
+|---|---:|
+| Support | 10 |
+| Mage | 7 |
+| Summoner | 7 |
+| Warrior | 5 |
+| Tanker | 5 |
+| Ranger | 5 |
+| Assassin | 3 |
+
+Lookup uses the Actor's `EFFECTIVE_CLASS` at the Natural Action completion point.
+
+The Ability form used for that Natural Action does not change this table.
+
+Therefore:
+Natural Basic Attack completed
+Natural Skill completed
+Natural Ultimate completed
+all grant the same Class-defined amount.
+Qualification
+AE regeneration requires:
+naturalActionStatus = NATURAL
+AND
+ACTION_COMPLETED actually occurred
+A consumed SSI opportunity with no performed Action does not qualify.
+Therefore:
+CC causes Actor to lose Natural Action opportunity
+→ no Action performed
+→ no class AE regen
+The following do not qualify merely because they execute successfully:
+Follow-up
+Counter
+Reaction
+Forced Action
+child Action
+other NON_NATURAL Action
+Timing
+Class AE regeneration is a Mode Profile post-Natural-Action system hook:
+root Natural Action
+→ all root-linked blocking settlements finish
+→ ACTION_COMPLETED
+→ AE_ACTION_REGEN_BY_CLASS
+→ SSI pointer advance / Turn Boundary
+Therefore AE gained from this Natural Action is not available to pay a blocking settlement belonging to that same Action before completion.
+Ownership
+The gained AE is credited to:
+the Actor's Side/team AE pool
+under the Turn-based resource ownership rule.
+System provenance
+This gain is a Mode/System resource grant.
+It is not:
+a Character Ability;
+a Functional Tag;
+a child Action;
+a Triggered Skill.
+Execution Trace should identify the gain source as the Turn-based Mode Resource Profile.
+
 ---
 
 # 13. TURN-BASED ABILITY PROFILE
@@ -358,6 +421,60 @@ Full Character kit may include:
 - complex persistent State.
 
 No requirement exists that every Character use every category.
+
+# 13A. TURN-BASED NATURAL ACTION FORM PRIORITY
+
+`FULL_RAGE` and `AUTO_CAST_ULTIMATE` remain separate semantics.
+
+Receiving or reaching full Rage does not immediately create/cast an Ultimate Action.
+
+However, when an Actor's actual Natural Action arrives, `TURN_BASED_MAIN` uses the following default Action-form priority unless an explicit Character/System Action-form restriction overrides it:
+
+if Current Rage >= Max Rage
+AND Ultimate is legal
+→ select Ultimate
+
+otherwise
+→ continue ordinary legal Action selection
+Therefore:
+DEPLOY_FROM_DECK
+→ Current Rage = Max Rage
+does not cast Ultimate at deployment time.
+Instead:
+later actual Natural Action
+→ Mode default Action-form policy sees Rage readiness
+→ legal Ultimate receives automatic priority
+Explicit restriction overrides Mode default
+A Character/System naturalActionFormPolicy may constrain that Natural Action before the Mode default is used.
+Example:
+Echo memory = SKILL
+Echo Current Rage = Max Rage
+If Echo's active restriction permits only:
+SKILL
+→ BASIC fallback
+then full Rage does not bypass the restriction.
+If memory declares:
+ULTIMATE
+→ remembered child SKILL
+→ BASIC
+the generic ordered fallback resolver evaluates that authored sequence.
+No extra Natural Action
+Automatic Ultimate priority:
+does not create another Natural Action;
+does not cast outside SSI;
+does not advance SSI twice.
+The selected Ultimate is the Actor's existing SSI-granted Natural Action.
+Legality remains authoritative
+Rage readiness alone does not override:
+Character/System Action-form restriction;
+target/prerequisite illegality;
+Mode restriction;
+cooldown/disable;
+Authority/rule prohibition.
+Canonical distinction remains:
+FULL_RAGE
+≠ unconditional Ultimate success
+≠ immediate auto-cast event
 
 ---
 
@@ -1545,6 +1662,20 @@ modeProfile
 AE in turn-based:
 > team pool.
 
+Turn-based class Action regeneration is also Mode-owned:
+
+actual Natural Action ACTION_COMPLETED
+→ lookup Actor Effective Class
+→ gain AE from TURN_BASED_MAIN table
+Other modes do not inherit this table automatically.
+In particular:
+EXPLORATION_DEFENSE
+still has unresolved AE ownership/action-economy semantics and must not silently reuse the Turn-based Class table.
+Other modes do not inherit this table automatically.
+In particular:
+EXPLORATION_DEFENSE
+still has unresolved AE ownership/action-economy semantics and must not silently reuse the Turn-based Class table.
+
 AE in Exploration:
 > unresolved.
 
@@ -1861,6 +1992,10 @@ A model understands turn-based profile if it preserves:
 16. Successful Deck deployment sets Current Rage = Max Rage but does not auto-cast Ultimate.
 17. Side-relative Slot directions resolve from declared Side orientation.
 18. Deployment obeys current SSI pointer/pass state and grants no bonus Natural Action.
+19. Actual completed Natural Actions grant Side/team AE from the Actor's Effective Class table; CC-lost opportunities and non-Natural Actions grant none.
+20. Class AE regeneration occurs only after root-linked blocking settlements and `ACTION_COMPLETED`, before SSI pointer/Turn Boundary continuation.
+21. Rage-ready legal Ultimate has default priority at the Actor's actual Natural Action unless an explicit Character/System Action-form restriction overrides that Mode default.
+22. Full Rage still does not mean an immediate Ultimate cast at the moment Rage becomes full.
 
 ---
 
