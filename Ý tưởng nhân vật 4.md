@@ -1,18 +1,25 @@
 1) Cố Sự Chi Thần
 Cố Sự Chi Thần là một char đặc thù, là bài test cho kernel và hệ thống tag, chưa thể thêm nhân vật này vào game nếu 2 thứ đó chưa hoàn thiện, đọc docs/Cố Sự Chi Thần.md để hiểu rõ về char này hơn nếu có yêu cầu liên quan đến hắn.
 
-2) 
+2) Longinus
 
-nội tại: mỗi lần dùng skill hay ultimate heal cho đồng minh bằng natural Action bằng kit của bản thân, giáng 1 cột sáng từ trên trời xuống mọi target nhân vật này gây sát thương bằng natural Action lên ở 1 natural Action trước lần heal đó.
+nội tại, Heaven Remembers the Wound: mỗi lần dùng skill hay ultimate heal cho đồng minh bằng natural Action bằng kit của bản thân, giáng 1 cột sáng từ trên trời xuống mọi target nhân vật này gây sát thương bằng natural Action lên ở 1 natural Action trước lần heal đó.
 mỗi natural Action chỉ kích hoạt nội tại này 1 lần.
 sát thương từ cột sáng bằng 100% wil và atk của nhân vật này/cột, không code sát thương cột sáng = sát thương của đánh thường dù chúng có hệ số sát thương giống nhau ở mô tả.
 mỗi lần nội tại kích hoạt cap tối đa 7 cột sáng, nếu natural Action trước khi kích hoạt nội tại gây sát thương lên nhiều hơn 7 target, cột sáng random, cột sáng tính là follow up của natural Action kích nội tại, ví dụ: gây aoe toàn sân nhưng trúng 8 target, natural Action tiếp theo heal cho ally vừa gây sát thương từ nội tại lên 7 target cùng lúc.
 trên lý luận char này có thể kích hoạt nội tại mỗi natural Action nhưng hắn sẽ chỉ có 1 skill/ult gây sát thương, muốn kích hoạt nội tại ở natural Action tiếp theo cần heal cho ally bởi kit của bản thân nên nội tại không thể kích hoạt mãi.
 nội tại chỉ kích hoạt lên những kẻ char này gây Actual HP Damage, nếu có tấn công như không làm đối phương mất hp thực sự bằng natural Action thì target đó chưa hợp lệ với nội tại.
 
+skill 1, Benediction of the Pierced: mỗi ally được heal từ char này được + cố định 10% wil và 10% atk của nhân vật này cho ally đó trong 1 turn boundary + 2 natural Action của nhân vật này, lấy chỉ số lúc char này heal cho ally đó, mỗi natural Action bất kể heal bao nhiêu ally thì chỉ tính chỉ số của char này 1 lần duy nhất, nếu snapshot là + 30 wil và 30 atk và heal cho 3 ally thì 3 ally đó + 30 wil và 30 atk, bất kể buff cho bao nhiêu ally trong 1 natural Action dùng heal thì skill này chỉ tính cost 1 lần là 15 ae, skill này không kích hoạt lên bản thân.
 
+skill 2, Fourfold Mercy: heal ngẫu nhiên từ 1 đến 4 ally có % hp/ max hp thấp nhất của bản thân họ bằng tổng % tỉ lệ là 200% wil và 200% atk của bản thân nhân vật này, ví dụ nếu heal cho 3 ally thì mỗi kẻ nhận heal = (200% wil + 200% atk) của nhân vật này chia 3, nếu heal cho 4 ally thì mỗi kẻ nhận heal = 50% wil và 50% atk của nhân vật này, bất kể heal bao nhiêu target bằng skill 2 thì cost luôn là 15, không thể target bản thân.
 
+skill 3, Gospel of Spear and Light, có 2 kiểu gây sát thương:
+Judgment from Above: đứng tại chỗ niệm chú, cột sáng giáng xuống tùy theo lượng target (cột sáng này là vfx, không liên quan đến cột sáng từ nội tại ở mặt logic), gây aoe lên 4 kẻ địch, mỗi kẻ nhận sát thương = 145% wil và 145% atk của nhân vật này, nếu không đủ 4 target thì tỉ lệ sát thương không đổi và chỉ gây sát thương lên các target hợp lệ.
+The Piercing Grace: trên tay xuất hiện 1 cây giáo ánh sáng, lao đến target, đâm họ và gây sát thương đơn = 250% wil và 250% atk lên 1 target, heal cho bản thân = 65% Actual HP damage natural Action này gây ra.
+2 kiểu đều có cost là 25 ae.
 
+ultimate, Triune Lance of Salvation: tại chỗ bay lên chân không chạm đất, ngưng tụ sau lưng 3 ngọn giáo ánh sáng, mỗi ngọn giáo sẽ tấn công target khác nhau và có thể trùng target nếu target trên sân dưới 3, 120% wil và 120% atk/mỗi ngọn giáo, 3 ngọn giáo chỉ tính là 1 natural Action, sau đó heal cho leader = 10% tổng Actual HP Damage ult gây ra.
 
 3)
 phân tích kỹ hơn nằm ở docs/Chuẩn hoá và gắn tag kit/warrior_stance_execute_analysis.md
@@ -31,7 +38,7 @@ mục đích thiết kế là 1 char có sát thương không quá cao mà chỉ
 
 4)
 
-ultimate: gây aoe toàn sân (max 9 target), mỗi kẻ nhận sát thương = 185% wil và 185% atk của bản thân nhân vật này, sau khi gây sát thương xong nếu trong target có summon không có chân ngã nhưng có hp bar và hp của chúng dưới hoặc= 10% max hp của bản thân chúng, lập tức DEATH_CONFIRMED, hiệu ứng này chỉ target summon có rank bằng hoặc thấp hơn nhân vật này.
+ultimate: gây aoe toàn sân (max 9 target), mỗi kẻ nhận sát thương = 155% wil và 155% atk của bản thân nhân vật này, sau khi gây sát thương xong nếu trong target có summon không có chân ngã nhưng có hp bar và hp của chúng dưới hoặc= 10% max hp của bản thân chúng, lập tức DEATH_CONFIRMED, hiệu ứng này chỉ target summon có rank bằng hoặc thấp hơn nhân vật này.
 (tránh kill vật chứa của cố sự chi thần hoặc case tương tự), tỉ lệ sát thương này cũng không phải thấp đối với summon, nhiều khi không cần kết liễu là đã chết rồi, nếu kích hoạt kết liễu summon thì 2 bên player chỉ thấy summon nhận ultimate này rồi summon DEATH_CONFIRMED, tức quá trình nhận sát thương nếu đủ điều kiện kết liễu thì kết liễu trong natural Action của nhân vật này luôn, tao muốn không có delay về mặt hiển thị.
 
 5) Đế Hoài An

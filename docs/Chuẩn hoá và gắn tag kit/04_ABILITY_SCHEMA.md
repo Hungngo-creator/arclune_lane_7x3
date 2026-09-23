@@ -1,9 +1,11 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-09-15-E  
+**Version:** 2026-09-23-E.1  
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT.md`  
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
+
+**Revision E.1:** incorporates Pilot Normalization #4 Schema support for scoped incoming Damage-component type transforms, battle-scoped Current Deployment Cost, explicit Return-to-Deck with transition-owned retention data, and deterministic tie policy for metric target selectors. No new Functional Tag or Primitive is introduced.
 
 ---
 
@@ -289,24 +291,134 @@ Mode khác được override.
 
 ## 3.8A `deployment`
 
-Character/deployment metadata.
+Character/deployment authoring.
 
-Conceptual form:
+Canonical conceptual form:
+
+```yaml
 deployment:
   fromDeck:
     enabled: true
-    deploymentCost: <number | TBD_BY_COST_BUDGET>
-deploymentCost is not an Ability CostSpec.
-It belongs to Deck deployment authoring and is paid from the Deployment Cost Bar according to Deployment Contract.
+
+    baseDeploymentCost:
+      value: <number | TBD_BY_COST_BUDGET>
+
+    currentDeploymentCostPolicy:
+      scope: BATTLE
+      initializeFrom: BASE_DEPLOYMENT_COST
+      floor: 1
+```
+
+Canonical distinction:
+
+```text
+BASE_DEPLOYMENT_COST
+≠
+CURRENT_DEPLOYMENT_COST
+≠
+DEPLOYMENT_COST_BAR
+≠
+Ability CostSpec
+```
+
+### `baseDeploymentCost`
+
+`BASE_DEPLOYMENT_COST` is the resolved Character deployment value produced by the Cost Budget system.
+
 During Pilot Normalization:
+
+```text
 TBD_BY_COST_BUDGET
-is an allowed authored placeholder when the Cost Budget system has not produced a numeric value yet.
-This placeholder:
-does not define a Cost Budget formula;
-does not imply current runtime deployability;
-does not make Ability normalization invalid;
-must be resolved before runtime deployment execution requires payment.
-Deck membership and current deployment state remain runtime/system concerns and are not inferred from deployment.fromDeck.enabled.
+```
+
+remains an allowed authored placeholder.
+
+The placeholder:
+- does not define the Cost Budget formula;
+- does not imply current runtime deployability;
+- does not invalidate Ability normalization;
+- must be resolved before execution-ready deployment needs numeric payment.
+
+### `CURRENT_DEPLOYMENT_COST`
+
+`CURRENT_DEPLOYMENT_COST` is authoritative battle-scoped Character deployment state.
+
+At battle initialization, before Character-specific battle-start mutations:
+
+```text
+CURRENT_DEPLOYMENT_COST
+=
+BASE_DEPLOYMENT_COST
+```
+
+subject to the declared deployment-cost policy.
+
+`CURRENT_DEPLOYMENT_COST` may then be changed only by explicit canonical Deployment-Cost mutation semantics.
+
+It:
+- is the value used by `DEPLOY_FROM_DECK` payment;
+- may be read by Ability formulas through a typed ValueRef;
+- may be snapshotted;
+- may persist through Return-to-Deck within the same battle;
+- resets from Base Deployment Cost when a new battle initializes;
+- is not the Side Deployment Cost Bar.
+
+### Floor
+
+`currentDeploymentCostPolicy.floor` defines the lower legal bound for Current Deployment Cost.
+
+Pilot #4 currently requires:
+
+```text
+floor = 1
+```
+
+This does not define the future Cost Budget formula.
+
+### Lock state
+
+Current Deployment Cost runtime state must be able to represent whether its exact current value is locked against later Deployment-Cost mutations.
+
+The default battle initialization state is conceptually:
+
+```text
+locked = false
+```
+
+until explicit authored gameplay changes it.
+
+Lock semantics belong to Deployment Contract.
+
+### Existing field migration
+
+Previous Stage-E authored field:
+
+```yaml
+deploymentCost:
+```
+
+represented what is now explicitly named:
+
+```yaml
+baseDeploymentCost:
+```
+
+Existing authored numeric / `TBD_BY_COST_BUDGET` data therefore has a mechanical one-way migration:
+
+```text
+deploymentCost
+→ baseDeploymentCost.value
+```
+
+with no intended gameplay-value change.
+
+Deck membership and current deployability remain runtime/system concerns.
+
+They are not inferred from:
+
+```text
+deployment.fromDeck.enabled
+```
 
 ---
 
@@ -329,6 +441,7 @@ ability:
   snapshots: []
   effects: []
   effectAmountModifiers: []
+  damageComponentTransforms: []
   resolution:
   authority:
   attribution:
@@ -350,9 +463,16 @@ Auto Skill có thể có Trigger nhưng không player-cast path.
 
 `effectAmountModifiers` is optional and contains constrained declarative modifier rules defined by `ScopedEffectAmountModifierSpec`.
 
+`damageComponentTransforms` is optional and contains constrained declarative `ScopedDamageComponentTransformSpec` rules.
+
 `actionIntentInterpositions` is optional and contains bounded declarative `ActionIntentInterpositionSpec` rules owned by this Ability.
 
-A Passive may therefore own an Action-Intent interposition rule that applies to its owner's future Action Intents without duplicating that rule into every Basic / Skill / Ultimate definition.
+A Passive may own:
+- an Action-Intent interposition;
+- a scoped Effect-amount modifier;
+- a scoped incoming Damage-component transform;
+
+without duplicating the same rule into every observed Basic / Skill / Ultimate definition.
 
 None of these fields authorizes custom executable code.
 
@@ -1170,12 +1290,27 @@ actionIdentityIs:
   value: ULTIMATE
 Action references may expose typed immutable/queryable fields such as:
 actionId
+actorRef
 actionIdentity
 actionBehavior
 naturalActionStatus
 originAbilityId
 parentActionRef
 rootActionRef
+
+`actorRef` identifies the Actor performing that Action.
+
+It must remain distinct from Effect Attribution dimensions such as:
+
+```text
+caster
+owner
+source
+damageAttribution
+```
+
+when a mechanic explicitly queries the Actor of the Action rather than the credited Damage source.
+
 Conditions may also compare Action references for equality when a mechanic must prove that an Event/result belongs to a particular root Action.
 Effect provenance
 Action lineage alone is not sufficient to identify every generated Effect.
@@ -1228,7 +1363,26 @@ TARGET_COUNT_REF
 PROPERTY_REF
 COST_PAYMENT_REF
 COST_GROUP_PAYMENT_REF
+BASE_DEPLOYMENT_COST_REF
+CURRENT_DEPLOYMENT_COST_REF
 ```
+
+`BASE_DEPLOYMENT_COST_REF` reads resolved Character Base Deployment Cost.
+
+`CURRENT_DEPLOYMENT_COST_REF` reads the authoritative battle-scoped Current Deployment Cost.
+
+Neither reads the Side Deployment Cost Bar.
+
+Both are pure typed reads and may participate in bounded Formula/Snapshot composition.
+
+Example:
+
+```text
+C_cast
+= SNAPSHOT(CURRENT_DEPLOYMENT_COST_REF(SELF))
+```
+
+A later Current Deployment Cost mutation does not rewrite that earlier Snapshot.
 
 ---
 
@@ -1651,9 +1805,11 @@ Canonical conceptual structure:
 targeting:
   targetKind:
   relation:
+  relationAnchor:
   candidateSource:
   filters: []
   selection:
+  tiePolicy:
   count:
   duplicatePolicy:
   invalidPolicy:
@@ -1663,9 +1819,15 @@ targeting:
   origin:
   spatialSelector:
 ```
+
 When present:
+
+```text
 targeting.spatialSelector
-uses the common SpatialSelectorSpec.
+```
+
+uses the common `SpatialSelectorSpec`.
+
 TargetSpec references/contains an instance of that reusable object; it does not define a separate Target-only spatial selector language.
 
 ---
@@ -1753,6 +1915,129 @@ FARTHEST
 FIXED_POSITION_SET
 EXPLICIT
 ```
+
+---
+
+## 11.5A `tiePolicy`
+
+`tiePolicy` resolves equality after a metric/ordered selector has identified the best metric value.
+
+It is separate from:
+- initial candidate filtering;
+- random multi-target selection;
+- duplicate policy;
+- target invalidation;
+- reroll/requery after selection.
+
+Current minimum supported tie policy required by Pilot #4:
+
+```text
+RANDOM_AMONG_TIED
+```
+
+No larger tie-breaker library is introduced by this Pilot.
+
+---
+
+### `RANDOM_AMONG_TIED`
+
+Canonical authoring meaning:
+
+```text
+1. evaluate the selector metric for every eligible candidate;
+2. identify the best metric value;
+3. build the exact tied-best candidate set;
+4. choose one candidate from that tied set using existing deterministic seeded RNG.
+```
+
+Example:
+
+```yaml
+targeting:
+  relation: ALLY
+  filters:
+    - exclude Leader
+    - exclude SELF
+    - require True Self
+    - require legal Heal recipient
+
+  selection: LOWEST_HP_PERCENT
+  tiePolicy: RANDOM_AMONG_TIED
+  count: 1
+  lockPolicy: LOCK_ENTITY_IDS
+  invalidPolicy: DROP_INVALID
+```
+
+This means:
+
+```text
+lowest CurrentHP / CurrentMaxHP
+→ random only among exact tied minima
+```
+
+not random among the whole candidate pool.
+
+---
+
+### Tie policy is selection-time only
+
+`RANDOM_AMONG_TIED` does not imply:
+- `REROLL`;
+- `REQUERY`;
+- retarget after lifecycle invalidation;
+- another RNG draw after the initial locked target is selected.
+
+Later invalid-target behavior remains governed by:
+
+```text
+invalidPolicy
+lockPolicy
+requeryPolicy / explicit later target plan
+```
+
+---
+
+### Alcestis secondary-target authoring consequence
+
+Pilot #4 latest locked Character data uses:
+
+```text
+Ultimate target-context establishment
+→ evaluate secondary target at step 2
+→ LOWEST_HP_PERCENT
+→ RANDOM_AMONG_TIED
+→ LOCK_ENTITY_IDS
+```
+
+The selected Entity is then reused by the later secondary Heal branch.
+
+No later target-selection/requery node is authored for that branch.
+
+If the locked target becomes lifecycle-invalid before secondary Heal:
+
+```text
+DROP_INVALID / local branch skip
+```
+
+applies.
+
+The tie policy is not rerun and no replacement ally is selected.
+
+---
+
+### Determinism
+
+All random tie resolution uses the existing deterministic RNG service.
+
+A tied metric selector must not use:
+- collection iteration order;
+- entity ID;
+- Slot order;
+- Event sequence;
+
+unless a future explicitly-authored tie policy defines one of those semantics.
+
+Additional tie policies require explicit future Schema/Contract review.
 
 ---
 
@@ -1943,8 +2228,10 @@ effect:
   shield:
   stat:
   resource:
+  deploymentCost:
   position:
   lifecycle:
+  returnToDeck:
   system:
   authority:
   attribution:
@@ -1970,6 +2257,7 @@ MODIFY_STATE
 REMOVE_STATE
 STAT_MODIFICATION
 RESOURCE_MODIFICATION
+DEPLOYMENT_COST_MODIFICATION
 HP_LOSS
 HP_COST
 MAX_HP_MUTATION
@@ -1977,6 +2265,7 @@ POSITION_MUTATION
 SPAWN_ENTITY
 REMOVE_ENTITY
 TEMPORARY_ABSENCE
+RETURN_TO_DECK
 REVIVE
 REINCARNATION
 COMBAT_DEFINITION_INHERITANCE
@@ -1988,7 +2277,7 @@ SNAPSHOT_OPERATION
 
 This enum is not a one-to-one mirror of Primitive IDs.
 
-Normalizer maps EffectSpec to one or multiple Primitive requests.
+Normalizer maps EffectSpec to one or multiple Primitive/system-operation requests.
 
 ---
 
@@ -2123,7 +2412,47 @@ Shield effect can have:
 - stacking;
 - priority;
 - source;
-- owner.
+- owner;
+- lifecycle retention scope.
+
+Conceptual extension:
+
+```yaml
+shield:
+  operation:
+  value:
+  duration:
+  stacking:
+  priority:
+  source:
+  owner:
+  lifecycle:
+    retentionScope:
+```
+
+`lifecycle.retentionScope` uses the same generic lifecycle-retention vocabulary defined for persistent State:
+
+```text
+FIELD_PRESENCE_SCOPED
+LIFE_SCOPED
+BATTLE_SCOPED
+```
+
+This field is orthogonal to:
+- source ledger identity;
+- Shield duration;
+- Shield break/depletion;
+- ordinary Shield removal reason.
+
+A transition-owned cleanup can therefore remove a:
+
+```text
+FIELD_PRESENCE_SCOPED
+```
+
+Shield contribution without pretending that contribution:
+- broke from Damage;
+- naturally expired.
 
 No need to encode Shield as HP.
 
@@ -2454,6 +2783,296 @@ Kernel = resolver/runtime
 
 ---
 
+# 18B. SCOPED DAMAGE-COMPONENT TRANSFORM SPEC
+
+`ScopedDamageComponentTransformSpec` is a constrained declarative rule that changes the semantic type of qualifying Damage components at an explicit Damage-pipeline phase.
+
+It exists for mechanics whose meaning is:
+
+> an already-resolving Damage component satisfies a bounded source/action/provenance/recipient scope, so its component type is transformed before later Damage stages.
+
+It is intentionally separate from:
+
+```text
+ScopedEffectAmountModifierSpec
+```
+
+because:
+
+```text
+numeric amount transform
+≠
+Damage component semantic-type transform
+```
+
+It is not:
+- arbitrary Damage scripting;
+- an amount modifier;
+- a new Functional Tag;
+- a Primitive;
+- post-mitigation relabeling;
+- implicit Penetration;
+- a general callback.
+
+Conceptual form:
+
+```yaml
+damageComponentTransform:
+  transformId:
+
+  sourceActionScope:
+    actionRef:
+    naturalActionStatus:
+    actorRelationToRecipient:
+    actorFilters: []
+
+  recipientScope:
+    relation:
+    relationAnchor:
+    filters: []
+    excludeRefs: []
+
+  effectProvenanceScope:
+    mode:
+
+  componentScope:
+    fromTypes: []
+
+  conditions: []
+
+  transformOperation:
+    type:
+    toType:
+
+  resolutionPhase:
+```
+
+---
+
+## Source Action scope
+
+`sourceActionScope` resolves against the Action context that owns/contains the qualifying incoming Damage execution.
+
+It reuses existing typed Action-reference and structured Condition/filter semantics.
+
+`actionRef` uses the existing Action-lineage reference shape.
+
+Example:
+
+```yaml
+sourceActionScope:
+  actionRef:
+    anchor: CURRENT_ACTION
+    relation: ROOT
+  naturalActionStatus: NATURAL
+  actorRelationToRecipient: ENEMY
+  actorFilters:
+    - <structured Effective-Class = ASSASSIN condition>
+```
+
+`actorFilters` apply to the Actor of the declared scoped Action.
+
+The Action Actor is not automatically interchangeable with:
+- Damage Attribution;
+- Caster;
+- Owner;
+- Effect Source.
+
+When the distinction matters, the scoped Action Actor is authoritative for this field.
+
+`naturalActionStatus = NATURAL` refers to canonical Natural-Action status, not Ability Type alone.
+
+---
+
+## Recipient scope
+
+`recipientScope` reuses existing structured relation/filter vocabulary.
+
+Example:
+
+```yaml
+recipientScope:
+  relation: SELF
+```
+
+for a target-owned Passive that transforms incoming Damage only when the Passive owner is the recipient.
+
+Recipient scope:
+- does not retarget the Damage;
+- does not create another TargetSet;
+- does not imply immunity.
+
+---
+
+## Effect-provenance scope
+
+`effectProvenanceScope` constrains which Effects belonging around the scoped Action are eligible.
+
+Current minimum mode required by Pilot #4:
+
+```text
+DIRECT_EFFECT_GRAPH_OF_SCOPED_ACTION
+```
+
+Meaning:
+
+> the resolving Damage Effect must belong to the scoped Action's own authored direct effect graph.
+
+This mode includes an ordinary Passive/stat rule that modifies or strengthens the same direct hit without creating a separate Effect/Action.
+
+It excludes Damage whose gameplay identity is a separate:
+- child Action;
+- Passive-triggered standalone Damage Effect;
+- Reaction;
+- Follow-up;
+- Counter;
+- delayed standalone Effect;
+- DoT;
+- Mark Damage;
+
+even when that Damage shares the same `rootActionId`.
+
+Canonical distinction remains:
+
+```text
+Action lineage
+≠
+Effect provenance
+≠
+Damage Attribution
+```
+
+This field consumes existing execution provenance.
+
+It does not create another Action-lineage subsystem.
+
+---
+
+## Component scope
+
+Current canonical Damage component types remain:
+
+```text
+PHYSICAL
+WILL
+TRUE
+```
+
+`componentScope.fromTypes` declares which pre-transform component types are eligible.
+
+Example:
+
+```yaml
+componentScope:
+  fromTypes:
+    - PHYSICAL
+    - WILL
+```
+
+An already-True component lies outside that example filter and remains True normally.
+
+---
+
+## Typed transform operation
+
+Current minimum operation required by Pilot #4:
+
+```text
+SET_COMPONENT_TYPE
+```
+
+Conceptual form:
+
+```yaml
+transformOperation:
+  type: SET_COMPONENT_TYPE
+  toType: TRUE
+```
+
+The target type must be one canonical Damage component type.
+
+The operation changes semantic Damage-component type.
+
+It does not merely change presentation/label text.
+
+It does not imply Shield Piercing.
+
+A transformed component subsequently follows the Contract of its resulting component type.
+
+---
+
+## Resolution phase
+
+Current Pilot #4 phase:
+
+```text
+PRE_MITIGATION
+```
+
+Meaning at Schema level:
+
+> the component-type transform occurs before the ordinary mitigation branch selected by the original Physical/Will component type.
+
+Exact Damage-pipeline ordering belongs to the Damage Contract.
+
+The Schema must not compile:
+
+```text
+SET_COMPONENT_TYPE(TRUE) @ PRE_MITIGATION
+```
+
+as:
+- 100% ARM/RES Penetration;
+- Final Damage Reduction;
+- post-mitigation relabeling.
+
+---
+
+## Multiple overlapping transforms
+
+This Schema does not create transform priority.
+
+If several component transforms can match the same component and their resulting semantics are incompatible:
+
+> Normalizer must reject the overlap unless an explicit canonical Contract/composition policy exists.
+
+Authoring order, Event order, Character ID, Effect list order and runtime iteration order do not choose a winner.
+
+---
+
+## Functional Tag boundary
+
+A target-owned incoming transform does not retroactively rewrite the source Ability's authored Functional Tags or source capability index.
+
+For example:
+
+```text
+source Ability authored Physical Damage
+→ recipient-owned rule transforms that runtime component to True
+```
+
+does not mean the source Ability definition itself permanently acquires native `TRUE_DAMAGE` capability.
+
+The authoritative runtime Damage component after transform nevertheless resolves under True-Damage semantics.
+
+---
+
+## Static Passive ownership
+
+A static Passive may own:
+
+```text
+damageComponentTransforms
+```
+
+without creating a fake Action.
+
+The rule remains source-traceable to the Passive that owns it.
+
+No Character ID check is permitted.
+
+---
+
 # 19. STATE SPEC
 
 Canonical conceptual structure:
@@ -2471,6 +3090,7 @@ state:
   immunity:
   authority:
   lifecycle:
+    retentionScope:
 ```
 
 ---
@@ -2532,6 +3152,88 @@ Can be normalized as a system/neutral state containing:
 - observer-specific presentation visibility changes.
 
 It should not be mislabeled Debuff just because enemies dislike it.
+
+---
+
+## 19.5 `lifecycle.retentionScope`
+
+Persistent State may declare its generic lifecycle/transition retention scope.
+
+Current minimum scopes required by Pilot #4:
+
+```text
+FIELD_PRESENCE_SCOPED
+LIFE_SCOPED
+BATTLE_SCOPED
+```
+
+### `FIELD_PRESENCE_SCOPED`
+
+The State exists only while its owner remains inside the relevant active field-presence cycle unless another explicit transition profile says otherwise.
+
+Typical examples may include:
+- field-only defensive window;
+- field-only recovery window;
+- field-only self modifier.
+
+### `LIFE_SCOPED`
+
+The State belongs to the current Life/lifecycle instance.
+
+Exact behavior across each lifecycle/deployment transition belongs to the transition Contract/profile.
+
+### `BATTLE_SCOPED`
+
+The State is intended to remain available across ordinary field-presence/deployment transitions within the same battle unless an explicit transition profile discards its classification/scope.
+
+Examples may include:
+- battle use counters;
+- battle-persistent form/state flags;
+- battle-persistent Deployment-Cost lock state.
+
+### Important distinction
+
+`retentionScope` is not:
+- a duration clock;
+- Buff/Debuff/Mark classification;
+- Authority Tier;
+- a Functional Tag.
+
+Therefore:
+
+```text
+classification = DEBUFF
+```
+
+and:
+
+```text
+retentionScope = BATTLE_SCOPED
+```
+
+are separate authored dimensions.
+
+A transition may still explicitly discard all Debuffs regardless their retention scope.
+
+### No Character-state-name cleanup
+
+Transition retention should normally operate on:
+- generic state classification;
+- generic retention scope;
+- explicit core-state policy;
+
+not a list of Character-specific State IDs.
+
+Pilot #4 does not introduce a normal-path field such as:
+
+```text
+removeStateIds:
+  - ALC_ESTIS_PASSIVE_SHIELD
+  - ALC_ESTIS_RECOVERY
+  - ALC_ESTIS_SKILL3_WINDOW
+```
+
+because that would turn lifecycle transition data into Character scripting.
 
 ---
 
@@ -2684,6 +3386,129 @@ Can be:
 - mode subsystem.
 
 No hardcoded “AE belongs to actor”.
+
+---
+
+# 23A. DEPLOYMENT COST MODIFICATION SPEC
+
+Character Current Deployment Cost is deployment-system state, not a Resource Pool.
+
+Therefore an Ability that changes it uses a dedicated declarative semantic object rather than `ResourceSpec`.
+
+Conceptual form:
+
+```yaml
+deploymentCost:
+  subject:
+  operation:
+  value:
+```
+
+Current minimum operations required by Pilot #4:
+
+```text
+ADD_CURRENT
+LOCK_CURRENT
+```
+
+---
+
+## `subject`
+
+Typed Character/Entity reference whose Current Deployment Cost is affected.
+
+Example:
+
+```text
+SELF
+```
+
+---
+
+## `ADD_CURRENT`
+
+Adds the authored pure numeric/Formula value to:
+
+```text
+CURRENT_DEPLOYMENT_COST
+```
+
+Example semantic intent:
+
+```text
+ADD_CURRENT -5
+```
+
+or:
+
+```text
+ADD_CURRENT -1
+```
+
+The Character's declared Current Deployment Cost floor is enforced by Deployment Contract/runtime.
+
+This operation does not change:
+
+```text
+BASE_DEPLOYMENT_COST
+```
+
+and does not add/subtract:
+
+```text
+DEPLOYMENT_COST_BAR
+```
+
+---
+
+## `LOCK_CURRENT`
+
+Locks the exact currently-authoritative:
+
+```text
+CURRENT_DEPLOYMENT_COST
+```
+
+against later ordinary Deployment-Cost mutations for the remainder of the declared lock scope.
+
+Pilot #4 lock scope is battle remainder.
+
+Conceptually:
+
+```text
+lockedDeploymentCost
+=
+CURRENT_DEPLOYMENT_COST at successful lock commit
+```
+
+followed by:
+
+```text
+CURRENT_DEPLOYMENT_COST remains that exact value
+```
+
+for the battle remainder unless a future explicit higher system rule defines another interaction.
+
+`LOCK_CURRENT` does not:
+- change Base Deployment Cost;
+- refund Deployment Cost Bar;
+- change AE;
+- change Rage.
+
+Exact mutation-vs-lock admission and commit semantics belong to Deployment Contract.
+
+---
+
+## No arbitrary Deployment-Cost script
+
+This object does not permit:
+- arbitrary callbacks;
+- arbitrary named variables;
+- loops;
+- custom mutation code;
+- Cost Budget evaluation at runtime.
+
+Additional operation kinds require explicit future Schema review.
 
 ---
 
@@ -2921,6 +3746,294 @@ Possible operation family:
 - SET_EXHAUSTED
 
 Exact execution compiles into multiple lifecycle Primitives.
+
+---
+
+# 30A. RETURN-TO-DECK SPEC
+
+`RETURN_TO_DECK` is an explicit deployment/lifecycle transition.
+
+It is not equivalent to:
+
+```text
+LEAVE_FIELD
+```
+
+alone.
+
+It is also not:
+- Death;
+- `DEATH_CONFIRMED`;
+- Revive;
+- Reincarnation;
+- Summon despawn;
+- Arena return;
+- ordinary Temporary Absence.
+
+Conceptual form:
+
+```yaml
+returnToDeck:
+  subject:
+
+  sourceDeploymentState:
+  destinationDeploymentState:
+
+  combatInstance:
+  presencePolicy:
+  deckMembershipPolicy:
+
+  retentionProfile:
+    discardStateClassifications: []
+    discardRetentionScopes: []
+    retainRetentionScopes: []
+    unmatchedStatePolicy:
+    currentHpPolicy:
+    removalCause:
+```
+
+---
+
+## Subject
+
+`subject` is the Character/runtime Entity undergoing the transition.
+
+---
+
+## Deployment-state transition
+
+Current minimum semantic destination required by Pilot #4:
+
+```text
+sourceDeploymentState = BATTLEFIELD_ACTIVE
+destinationDeploymentState = DECK_UNDEPLOYED
+```
+
+Exact runtime state naming belongs to Contract/runtime implementation.
+
+The semantic requirement is:
+
+```text
+currently active/deployed on Battlefield
+→ returned to a Deck-deployable undeployed state
+```
+
+without changing long-lived battle Deck membership.
+
+---
+
+## Presence policy
+
+Current Pilot #4 requirement:
+
+```text
+LEAVE_CURRENT_COMBAT_INSTANCE
+```
+
+Meaning the transition includes the corresponding authoritative active-presence exit from the current Combat Instance.
+
+Presence transition remains cause-distinct:
+
+```text
+LEAVE_FIELD
+```
+
+describes the presence result.
+
+```text
+RETURN_TO_DECK
+```
+
+describes the deployment/lifecycle cause and destination.
+
+Do not collapse them.
+
+---
+
+## Deck membership policy
+
+Current Pilot #4 value:
+
+```text
+RETAIN_BATTLE_DECK_MEMBERSHIP
+```
+
+Returning to Deck changes current deployment state.
+
+It does not remove the Character definition/True Self from the battle Deck roster.
+
+A later legal deployment can therefore use ordinary:
+
+```text
+DEPLOY_FROM_DECK
+```
+
+again.
+
+---
+
+## Transition-owned retention profile
+
+`retentionProfile` belongs to the Return-to-Deck transition.
+
+It is not authored as a Cleanse Ability.
+
+It defines what attached/transient state survives the transition.
+
+### `discardStateClassifications`
+
+Uses existing State classifications.
+
+Pilot #4 may author:
+
+```text
+BUFF
+DEBUFF
+MARK
+```
+
+to discard every attached State of those classifications on the subject.
+
+This is lifecycle retention behavior.
+
+It does not mean:
+- cast `DEBUFF_CLEANSE`;
+- compare Cleanse Authority against every removed State;
+- grant Axiom Authority to the returning Character.
+
+### `discardRetentionScopes`
+
+Generic state/Shield retention scopes that do not survive the transition.
+
+Pilot #4 may author:
+
+```text
+FIELD_PRESENCE_SCOPED
+```
+
+so field-transient:
+- Shield contributions;
+- Recovery windows;
+- defensive windows;
+- similar generic field-scoped state
+
+can be removed without knowing Ability/Character-specific State IDs.
+
+### `retainRetentionScopes`
+
+Generic scopes explicitly preserved.
+
+Pilot #4 requires battle-persistent Character state such as use counters and Deployment-Cost lock data to survive Return-to-Deck.
+
+It may therefore declare:
+
+```text
+BATTLE_SCOPED
+```
+
+as retained.
+
+### `unmatchedStatePolicy`
+
+Current bounded policy values:
+
+```text
+RETAIN
+REQUIRED_EXPLICIT
+```
+
+This prevents a transition implementation from silently deleting every unspecified SYSTEM_STATE.
+
+For Alcestis, the least-destructive profile is:
+
+```text
+RETAIN
+```
+
+after the explicit Buff/Debuff/Mark and Field-Presence-scoped discards are applied.
+
+### `currentHpPolicy`
+
+Current bounded value required by Pilot #4:
+
+```text
+RETAIN
+```
+
+The Return-to-Deck transition therefore does not reset self Current HP merely because deployment state changes.
+
+This field does not define Revive/respawn HP rules.
+
+### `removalCause`
+
+Transition-owned cleanup supplies an explicit lifecycle removal cause.
+
+Current semantic value:
+
+```text
+TRANSITION_CLEANUP
+```
+
+The active transition identity remains separately traceable as:
+
+```text
+RETURN_TO_DECK
+```
+
+Therefore cleanup must not be silently reclassified as:
+- Shield depletion/break;
+- natural Shield expiry;
+- natural duration expiry;
+- Cleanse.
+
+Exact Event/result semantics belong to Contract.
+
+---
+
+## No Character-specific cleanup list
+
+Normal-path `ReturnToDeckSpec` deliberately does not provide:
+
+```text
+stateIdsToRemove
+abilityStateNamesToRemove
+```
+
+for Character-specific cleanup.
+
+State/Shield objects must be authored with correct generic classification/retention scope so the transition can operate generically.
+
+A future mechanic that genuinely requires identity-specific lifecycle retention must prove that need separately.
+
+---
+
+## No HP reset / Death semantic
+
+`RETURN_TO_DECK` does not imply:
+- HP restoration;
+- HP reset;
+- Death;
+- Revive;
+- lifeSerial mutation.
+
+Those require separate explicit mechanics.
+
+---
+
+## Primitive boundary
+
+`RETURN_TO_DECK` is a semantic transition Effect family.
+
+This Schema does not require a new atomic Primitive.
+
+Normalizer/Contract/Kernel may compose the transition from existing authoritative:
+- deployment-state mutation;
+- Field Presence;
+- State removal;
+- Shield removal;
+- transaction/commit machinery.
+
+Exact execution is Stage F/G work.
 
 ---
 
@@ -3757,6 +4870,7 @@ normalizedAbility:
   snapshotPlan:
   effectGraph:
   effectModifierPlan:
+  damageTransformPlan:
   authorityPlan:
   attributionPlan:
   capabilityIndex:
@@ -3773,7 +4887,23 @@ It is not part of another Ability's `actionSpec` merely because that other Abili
 
 `effectModifierPlan` is generated from constrained `effectAmountModifiers`.
 
+`damageTransformPlan` is generated from constrained `damageComponentTransforms`.
+
+The two plans are distinct:
+
+```text
+effectModifierPlan
+= numeric amount modification
+
+damageTransformPlan
+= Damage component semantic-type transformation
+```
+
 `costPlan` may carry explicit CostGroup, distributed payer-collection, and typed Cost-result binding plans.
+
+Target tie policy is normalized into `targetPlan`.
+
+`DEPLOYMENT_COST_MODIFICATION` and `RETURN_TO_DECK` remain typed Effect semantics in the normalized Effect/deployment execution plan; they do not imply new Primitive IDs.
 
 None of these plans implies a new Primitive by itself.
 
@@ -3850,6 +4980,16 @@ Normalizer/compiler must:
 23. Validate Action Intent interposition ownership, intent scope, canonical anchor, settlement reference, branch selection, revalidation policy and explicit fallback candidates.
 24. Reject arbitrary modifier operations, arbitrary interposition timing strings, hidden Character-specific runtime callbacks and unresolved ambiguous query anchors.
 
+
+25. Validate `ScopedDamageComponentTransformSpec` source Action scope, recipient scope, direct-Effect provenance scope, component filter, typed transform operation and Damage-pipeline phase compatibility.
+26. Reject overlapping incompatible Damage-component transforms when no explicit canonical composition Contract exists.
+27. Preserve the distinction `BASE_DEPLOYMENT_COST ≠ CURRENT_DEPLOYMENT_COST ≠ DEPLOYMENT_COST_BAR` and normalize Deployment-Cost mutation/lock Effects to deployment-system semantics rather than ResourceSpec.
+28. Validate Return-to-Deck source/destination deployment state, presence policy, Deck-membership policy and transition-owned retention profile.
+29. Validate State/Shield lifecycle-retention scopes referenced by a transition profile without converting transition cleanup into Cleanse/Authority behavior.
+30. Validate metric-selector `tiePolicy` compatibility and route `RANDOM_AMONG_TIED` only through deterministic RNG over the exact tied-best set.
+31. Reject any normalization in which a metric tie is silently resolved by entity/list/Slot/Event order.
+32. Preserve target lock and invalid-target behavior independently from initial metric tie resolution; `tiePolicy` must not silently create later reroll/requery.
+
 ---
 
 # 53. NORMALIZER MUST NOT
@@ -3866,6 +5006,17 @@ Normalizer must not:
 - convert Skill profile copy into Basic Attack Identity;
 - decide Pygmalion Class/Element inheritance;
 - silently attach Tags based on lore name where semantic is ambiguous.
+
+- compile target-owned incoming Damage-component conversion as 100% Penetration, Final Damage Reduction or post-mitigation relabeling;
+- merge `ScopedDamageComponentTransformSpec` into `ScopedEffectAmountModifierSpec`;
+- treat `CURRENT_DEPLOYMENT_COST` as the Side Deployment Cost Bar;
+- pay `DEPLOY_FROM_DECK` from Base Deployment Cost after Current Deployment Cost has been initialized/mutated for battle;
+- model Return-to-Deck as generic `LEAVE_FIELD` only;
+- model Return-to-Deck retention cleanup as `DEBUFF_CLEANSE`;
+- hardcode Character-specific State IDs into the normal Return-to-Deck retention path;
+- treat lifecycle transition cleanup as Shield break/natural expiry merely because a Shield/State disappears;
+- invent a metric-selector tie winner from list/Entity/Slot/Event order;
+- reroll/requery Alcestis secondary target merely because its previously locked target later becomes invalid.
 
 If required information is absent:
 > validation error or unresolved warning.
@@ -4725,6 +5876,26 @@ At minimum validator must enforce:
 43. A referenced interposition settlement must not consume an additional Natural Action unless a separate explicit mechanic says so.
 44. Action Intent interposition must not be normalized as `FORCED_ACTION` merely because Character law constrains admission timing.
 45. A Passive-owned interposition rule must not be duplicated into every observed Ability merely to obtain runtime scope.
+
+
+46. `ScopedDamageComponentTransformSpec` must be owned by an authored Ability/System rule and use structured source Action, recipient, provenance and component scope.
+47. Pilot #4 `SET_COMPONENT_TYPE` transforms must declare a canonical target Damage component type and a compatible explicit Damage resolution phase.
+48. `PRE_MITIGATION` Damage-component transformation must not normalize as Penetration, Final Damage Reduction or post-mitigation type relabeling.
+49. A transform requiring direct root/Natural-Action Damage must use Effect-provenance scope; matching `rootActionId` alone is insufficient when child/standalone Effects are excluded.
+50. Overlapping incompatible Damage-component transforms must be rejected unless a separate canonical Contract explicitly resolves their composition.
+51. Authored source Ability Functional Tags must not be silently rewritten merely because a recipient-owned runtime transform changes an incoming component type.
+52. Character deployment authoring must distinguish `baseDeploymentCost` from battle-scoped `CURRENT_DEPLOYMENT_COST`.
+53. `CURRENT_DEPLOYMENT_COST` must not be represented as `DEPLOYMENT_COST_BAR` or ordinary Ability `CostSpec`.
+54. `DEPLOYMENT_COST_MODIFICATION` must target Current Deployment Cost and must not mutate Base Deployment Cost unless a future explicit operation says otherwise.
+55. `LOCK_CURRENT` freezes the exact Current Deployment Cost under Deployment Contract; it is not a floor-only modifier.
+56. `RETURN_TO_DECK` must declare enough transition data to distinguish destination deployment state from generic Field Presence exit.
+57. `RETURN_TO_DECK` must not normalize as Death, Revive, Temporary Absence, Arena return, Summon despawn or generic `LEAVE_FIELD` alone.
+58. Transition-owned retention cleanup must not normalize as ordinary Cleanse/DEBUFF_CLEANSE merely because Buff/Debuff/Mark State is discarded.
+59. Normal-path Return-to-Deck retention data must operate on generic State classification/retention scope rather than Character-specific State-ID removal lists.
+60. State/Shield removed by `TRANSITION_CLEANUP` must remain distinguishable from natural expiry and damage depletion/break.
+61. A metric selector using `RANDOM_AMONG_TIED` must build the exact tied-best set before consuming deterministic RNG.
+62. `tiePolicy` applies to initial metric selection only and must not silently imply target requery/reroll after selection.
+63. A locked target that later becomes invalid follows its declared invalid-target policy; the initial tie policy must not select a replacement unless an explicit requery/reroll policy exists.
 
 ---
 

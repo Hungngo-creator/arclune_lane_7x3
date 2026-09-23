@@ -1,8 +1,9 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-09-10-I  
+**Version:** 2026-09-21-I.1  
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA.md`, `05_CONTRACTS.md` F.1+, `06_KERNEL_RUNTIME.md`, `07_MODE_PROFILES.md`  
+**Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA.md`, `05_CONTRACTS.md` F.2+, `06_KERNEL_RUNTIME.md` G.1+, `07_MODE_PROFILES.md`  
+**Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
 ---
@@ -1602,6 +1603,94 @@ Layers Under Test: Effect Admission, Schema validation, Authority boundary.
 
 ---
 
+## K-013 — Ambiguous Action-Intent Interposition Multiplicity
+
+**ID:** `K-013`  
+**Status:** `MUST_REJECT`  
+**Purpose:** prove Action-Intent interposition never acquires hidden list/Event/entity-order priority.
+
+**Initial State:** normalized Character data contains Action-Intent interposition rules matching the same Natural Action Intent.
+
+**Input:** validate both invalid cases:
+
+### Case A — one interposition spec, multiple matching branches
+
+One `ActionIntentInterpositionSpec` has two branches whose conditions are simultaneously true for the same `ACTION_INTENT_CREATED`.
+
+### Case B — multiple interposition instances at one anchor
+
+Two distinct applicable interposition specs each select a branch for the same Intent and the same canonical anchor, with no explicit future composition policy.
+
+**Expected Resolution:**
+
+Normalizer rejects executable content before battle runtime.
+
+Runtime must never need to choose a winner through:
+
+- authored list order;
+- Event order;
+- Ability order;
+- Character ID;
+- Slot;
+- entity ID;
+- incidental iteration order.
+
+**Expected Trace / State:** no admitted Action; no settlement executes; validation reports ambiguous interposition multiplicity.
+
+**Forbidden Outcomes:** first branch wins; first Ability wins; lowest Character/Ability ID wins; lower `eventSeq` wins; RNG chooses; both settlements execute in an undeclared order.
+
+**Layers Under Test:** Ability Schema, Normalizer, ACT-004, ACT-005, Action Scheduler determinism.
+
+---
+
+## K-014 — Legacy Reaction Boundary Is Not Silently Aliased
+
+**ID:** `K-014`  
+**Status:** `MUST_REJECT`  
+**Purpose:** prevent legacy runtime labels from silently changing canonical sequential timing.
+
+**Initial State:** current canonical runtime supports explicit:
+
+```text
+AFTER_DIRECT_EFFECTS_COMPLETE
+```
+
+while old/generated content contains:
+
+```text
+QUEUE_UNTIL_ACTION_COMPLETE
+```
+
+and provides no explicit proven migration mapping.
+
+**Input:** load/normalize the legacy reaction-boundary value as executable content.
+
+**Expected Resolution:** reject for regeneration or require an explicit migration whose semantic equivalence is separately proven.
+
+**Expected Trace / State:** no silent normalization to `AFTER_DIRECT_EFFECTS_COMPLETE`.
+
+**Forbidden Outcomes:**
+
+```text
+QUEUE_UNTIL_ACTION_COMPLETE
+→ silently reinterpret as
+AFTER_DIRECT_EFFECTS_COMPLETE
+```
+
+because:
+
+```text
+ACTION_COMPLETED
+≠
+ACTION_DIRECT_EFFECTS_COMPLETE
+```
+
+Also forbidden: accepting the legacy label merely because both appear to “delay reactions”.
+
+**Layers Under Test:** Schema/IR compatibility, RES-003, Kernel sequential runtime, migration validation.
+
+---
+
 # 16. TEST GROUP L — UNRESOLVED CONTRACT PROBES
 
 These tests are valuable precisely because the correct output is:
@@ -1622,16 +1711,40 @@ These tests are valuable precisely because the correct output is:
 
 ---
 
-## L-002 — Sequential Multihit Reaction Boundary
+## L-002 — Sequential Multihit Default Reaction Boundary
 
 **ID:** `L-002`  
 **Status:** `PROBE_UNRESOLVED`  
-**Purpose:** expose default reaction-window gap.  
-**Initial State:** hit 1 triggers a Reaction that could alter hit 2; Ability only says “3 sequential hits” and omits reaction boundary.  
-**Input:** Action.  
-**Expected Resolution:** require profile `REACTIONS_BETWEEN_COMPONENTS` or `QUEUE_UNTIL_ACTION_COMPLETE`.  
-**Forbidden Outcomes:** silently pick one.  
-**Layers Under Test:** Resolution Contract.
+**Purpose:** preserve the unresolved global/default intermediate-Reaction question after adding one explicit local profile.
+
+**Initial State:** one sequential three-component Action has a Reaction that could alter a later component; authored resolution data omits an explicit canonical Reaction-boundary profile.
+
+**Input:** resolve/validate the Action.
+
+**Expected Resolution:** architecture reports that an explicit Contract-supported profile is required where the distinction is gameplay-relevant.
+
+The existence of:
+
+```text
+AFTER_DIRECT_EFFECTS_COMPLETE
+```
+
+does not make it the global default.
+
+Legacy names such as:
+
+```text
+REACTIONS_BETWEEN_COMPONENTS
+QUEUE_UNTIL_ACTION_COMPLETE
+```
+
+must not be silently chosen or treated as canonical fallback values.
+
+**Expected Trace / State:** no implementation/list/Event-order decision is promoted into gameplay canon.
+
+**Forbidden Outcomes:** silently use `AFTER_DIRECT_EFFECTS_COMPLETE`; silently use a legacy label; use first implementation behavior encountered; claim Pilot #3 resolved the global default.
+
+**Layers Under Test:** Resolution Contract, Normalizer, Sequential Runtime, unresolved-policy preservation.
 
 ---
 
@@ -1684,6 +1797,47 @@ These tests are valuable precisely because the correct output is:
 **Expected Resolution:** current working default samples tier at start of atomic conflict, but test remains review item until final confirmation for self-upgrading edge cases.  
 **Forbidden Outcomes:** silently resample differently per target in same simultaneous group.  
 **Layers Under Test:** Authority Contract.
+
+---
+
+## L-007 — Local Sequential Reaction Gate Does Not Define Global Priority
+
+**ID:** `L-007`  
+**Status:** `PROBE_UNRESOLVED`  
+**Purpose:** prove `AFTER_DIRECT_EFFECTS_COMPLETE` opens only a local sequential Reaction hold and does not order unrelated eligible work.
+
+**Initial State:** one root Action declares:
+
+```text
+reactionBoundary = AFTER_DIRECT_EFFECTS_COMPLETE
+```
+
+At `ACTION_DIRECT_EFFECTS_COMPLETE`:
+
+- an ordinary Reaction candidate becomes locally unheld;
+- one unrelated root-linked blocking settlement is also eligible;
+- another unrelated same-window Reaction candidate may also exist;
+- no explicit global scheduling/priority Contract orders them.
+
+**Input:** reach `ACTION_DIRECT_EFFECTS_COMPLETE`.
+
+**Expected Resolution:**
+
+```text
+local sequential hold opens
+```
+
+but the architecture does not declare which unrelated eligible item resolves first.
+
+If final gameplay outcome depends on that unresolved order:
+
+> expose the existing global priority blocker rather than choosing through trace order.
+
+**Expected Trace / State:** the local gate transition is traceable independently from any later scheduler choice.
+
+**Forbidden Outcomes:** ordinary Reaction automatically outranks root-linked blocking settlement; blocking settlement automatically outranks ordinary Reaction merely because of this profile; lower `eventSeq` wins; list order wins; profile silently resolves `TRG-005`.
+
+**Layers Under Test:** RES-003, Action pipeline, Reaction Queue, root-completion dependency, TRG-005.
 
 ---
 
@@ -2181,6 +2335,610 @@ Layers Under Test: DEATH_CONFIRMED, Action lineage, Effect provenance, Trigger c
 
 ---
 
+## M-030 — Sanguinius Skill 2 Distributed Cost Transaction
+
+**ID:** `M-030`  
+**Status:** `MUST_PASS`  
+**Purpose:** prove dynamic distributed multi-payer Cost, optional failure, actual-paid aggregation, frozen high-zone branch selection, and the complete Cost-stage terminal boundary before `POST_COST_PRE_EFFECT`.
+
+**Initial State:**
+
+Turn-based battle.
+
+Sanguinius:
+- Current Max HP = 1000;
+- Current HP = 400;
+- Side AE = 40;
+- Skill 2 is requested and otherwise legal;
+- at `ACTION_INTENT_CREATED`, HP = 40% Max HP, so the high-zone `POST_COST_PRE_EFFECT` branch is selected and frozen.
+
+Skill 2 required Costs:
+- 20 AE;
+- Sanguinius HP Cost = 100.
+
+Optional payer candidates at the authoritative pre-payment snapshot:
+- ally A: non-Leader, active, 700/1000 HP, ordinary HP Cost allowed;
+- ally B: non-Leader, active, 700/1000 HP, but a special Cost rule rejects this HP payment;
+- ally C: non-Leader, active, 590/1000 HP, therefore below the 60% candidate threshold.
+
+No active enemy satisfies the Prime + Effective-Light Heal-pressure predicate in this test.
+
+Leader is missing enough HP that the Skill-2 Heal result is observable.
+
+**Input:** activate Skill 2.
+
+**Expected Resolution:**
+
+```text
+ACTION_INTENT_CREATED at 40% HP
+→ freeze high-zone POST_COST_PRE_EFFECT branch
+
+→ validate required AE + mandatory Sanguinius HP Cost
+→ snapshot optional payer collection = {A, B}
+→ commit required Costs
+     Side AE 40 → 20
+     Sanguinius HP 400 → 300
+
+→ branch remains high-zone even though Current HP is now 30%
+→ do not reopen admission / do not switch to PRE_ADMISSION_PRE_COST
+
+→ attempt every frozen optional payer's own Cost
+   in any stable technical order
+→ record one terminal payment result per frozen payer
+→ construct COST_GROUP_PAYMENT_RESULT
+→ TOTAL_ACTUAL_PAID(HP)
+→ Cost stage terminal
+
+→ only now POST_COST_PRE_EFFECT Skill 3 may settle
+     Skill 3 pays 10 AE
+     Skill 3 Heals Sanguinius +80
+→ only after that may Skill-2 direct Heal/Shield effects begin
+```
+
+Expected member outcomes:
+
+```text
+Sanguinius actualPaidAmount = 100
+A actualPaidAmount = 100, success = true
+B actualPaidAmount = 0, success = false
+C has no payment attempt because C was not in the frozen payer set
+```
+
+Therefore:
+
+```text
+T = TOTAL_ACTUAL_PAID(HP) = 200
+```
+
+Skill-2 Leader Heal nominal base reads `T = 200`.
+
+B's failed optional payment does not fail Skill 2.
+
+Every frozen optional payer attempt reaches a terminal result before the CostGroup becomes terminal.
+
+The technical order in which A/B attempts are iterated is not gameplay priority.
+
+**Expected Trace / State:** trace shows high-zone branch frozen at Intent creation; payer snapshot before the first Cost commit; all member `COST_PAYMENT_RESULT`s exist before the group result; group result exists before post-cost interposition begins; no revalidation occurs merely because required Cost lowered Sanguinius to 30% HP.
+
+**Forbidden Outcomes:** branch switches to low-zone after self HP Cost; Skill 2 is revalidated/rejected after already-admitted Cost processing; B failure cancels Skill 2; C is added after payment begins; group total uses nominal amounts; optional payer outcomes collapse into one singular binding; Skill 3 begins while optional attempts or group aggregation remain unfinished; A/B technical iteration order changes gameplay; ally HP Cost is emitted as Damage from Sanguinius.
+
+**Layers Under Test:** Action Intent branch freeze, CostGroupSpec, payerCollection, CST-008, CST-009, Transaction Manager, Result Binding Store, ACT-005 `POST_COST_PRE_EFFECT`.
+
+---
+
+## M-031 — Sanguinius Ultimate Uses Committed HP Cost Result
+
+**ID:** `M-031`  
+**Status:** `MUST_PASS`  
+**Purpose:** prove HP-floor payment results, successful zero payment, blood-arrow use of committed `actualPaidAmount`, simultaneous arrow/slash resolution, presentation-only dash, and non-blocking failed low-zone Skill-3 settlement.
+
+**Initial State:**
+
+Sanguinius Current Max HP = 1000.
+
+For both cases:
+- Side AE = 0, so Skill 3 cannot pay its 10 AE Cost;
+- the selected low-zone Skill-3 settlement uses its canonical continue-on-failed-payment behavior;
+- Ultimate is otherwise legal and Rage-ready;
+- enemy Leader occupies turn-based position 2 and is a legal target;
+- the test does not add a Prime-Light Damage modifier or Shield edge that would obscure the Cost-result assertion.
+
+Run two deterministic cases.
+
+### Case A — floor truncates nominal payment
+
+Sanguinius Current HP = 100.
+
+At `ACTION_INTENT_CREATED`, the low-zone branch is selected.
+
+Skill 3 attempts first, cannot pay 10 AE, produces no Heal, and does not cancel the preserved Ultimate Intent.
+
+Nominal Ultimate HP Cost is 25% Max HP, but the 2% floor permits only:
+
+```text
+actualPaidAmount = 80
+```
+
+leaving Current HP = 20.
+
+### Case B — zero-payable legal Ultimate
+
+Sanguinius Current HP = 20, exactly 2% Max HP.
+
+Again, Skill 3 attempts first and fails for insufficient AE without cancelling the Ultimate Intent.
+
+Applicable Ultimate Cost policy permits:
+
+```text
+success = true
+actualPaidAmount = 0
+```
+
+**Input:** cast Ultimate in each case.
+
+**Expected Resolution:**
+
+Case A:
+
+```text
+failed Skill-3 settlement under continue policy
+→ revalidate/admit Ultimate
+→ committed Ultimate HP payment = 80
+→ blood-arrow True Damage formula reads 80
+```
+
+Case B:
+
+```text
+failed Skill-3 settlement under continue policy
+→ revalidate/admit Ultimate
+→ successful Ultimate HP payment = 0
+→ blood-arrow True Damage formula reads 0
+```
+
+The downstream arrow consumes the committed `CostPaymentResult.actualPaidAmount`.
+
+It does not reconstruct raw nominal 25% Max HP.
+
+In both cases, if the Ultimate remains otherwise legal:
+
+- the fixed-position slash still resolves;
+- arrow and slash belong to one simultaneous damage batch;
+- because Leader occupies position 2, Leader may receive both arrow and slash Effects before lifecycle processing;
+- Sanguinius' visual forward dash creates no gameplay `POSITION_MUTATION`.
+
+**Expected Trace / State:** one low-zone Action Intent; one failed Skill-3 settlement with no Heal; one singular immutable Ultimate HP `COST_PAYMENT_RESULT`; blood-arrow formula references that result; one simultaneous batch contains independently-targeted arrow/slash Effects; no Position Mutation Event exists for the VFX dash.
+
+**Forbidden Outcomes:** failed Skill 3 cancels Ultimate despite continue policy; Skill 3 somehow succeeds with Side AE 0; `actualPaidAmount=0` is treated as automatic Ultimate Cost failure; arrow deals nominal 250; later HP changes rewrite the Cost result; lifecycle is processed between arrow and slash inside the simultaneous batch; slash is removed because Leader already received arrow; VFX changes authoritative Slot/Position.
+
+**Layers Under Test:** Action Intent interposition, settlement failure continuation, HP Cost, CST-009, CostPaymentResultRef, RES-002 simultaneous batch, Position/presentation separation.
+
+---
+
+## M-032 — Sanguinius Low-zone Intent Revalidation Uses Same Natural Action
+
+**ID:** `M-032`  
+**Status:** `MUST_PASS`  
+**Purpose:** prove low-zone Action Intent survives pre-admission interposition, branch selection is frozen, failed revalidation uses authored Basic fallback, and fallback does not create a second Intent cycle.
+
+**Initial State:**
+
+Sanguinius:
+- Current Max HP = 1000;
+- Current HP = 290;
+- enough Side AE for Skill 3;
+- player requests Skill 2;
+- Skill 2 prerequisite requires HP >= 400;
+- authored revalidation fallback = `BASIC_ATTACK`.
+
+At `ACTION_INTENT_CREATED`:
+
+```text
+HP = 29% Max HP
+```
+
+therefore the low-zone branch is selected.
+
+**Input:** process the Natural Action.
+
+**Expected Resolution:**
+
+```text
+one SSI Natural Action opportunity
+→ ACTION_INTENT_CREATED for requested Skill 2
+→ low-zone PRE_ADMISSION_PRE_COST branch frozen
+→ Skill 3 pays 10 AE
+→ Skill 3 Heals +80
+→ Current HP becomes 370
+→ branch remains low-zone even though HP crossed above 30%
+→ revalidate SAME original Skill 2 Intent
+→ Skill 2 still fails >=40% prerequisite
+→ evaluate explicitly-authored fallback
+→ BASIC_ATTACK selected
+→ Basic enters ordinary admission/execution
+```
+
+Fallback:
+
+- uses the same `naturalActionOpportunityRef`;
+- does not create a second `ACTION_INTENT_CREATED`;
+- does not rerun interposition matching;
+- does not rerun the already-selected Skill 3 interposition;
+- does not pay failed Skill 2 Cost.
+
+**Expected Trace / State:** one Action Intent ID, one frozen interposition selection, one Natural Action opportunity, one Skill 3 settlement, one fallback Basic admitted as effective candidate.
+
+**Forbidden Outcomes:** Skill 2 request is rejected before Skill 3 can settle; branch switches to high-zone after Heal; Basic fallback creates a new Intent; Skill 3 runs twice; fallback grants a second Natural Action; failed Skill 2 spends AE/HP Cost; global Basic fallback is inferred without authored data.
+
+**Layers Under Test:** ActionIntentInterpositionSpec, ACT-004, ACT-005, Action Scheduler, revalidation, explicit fallback, SSI.
+
+---
+
+## M-033 — Sanguinius Actual-action Hooks, CC Loss and Insufficient Skill 3 AE
+
+**ID:** `M-033`  
+**Status:** `MUST_PASS`  
+**Purpose:** preserve actual-Natural-Action-only self Heal, CC-lost distinction, Skill-3 insufficient-AE behavior, and Warrior +5 AE timing.
+
+**Initial State:**
+
+Sanguinius:
+- Current Max HP = 1000;
+- Current HP = 500;
+- Side AE = 5;
+- enemy field initially has 0–2 Effective-Light units;
+- no other effect changes AE during the test.
+
+**Input / Case A — CC-lost opportunity:**
+
+Sanguinius reaches an SSI Natural Action opportunity but CC prevents any Basic/Skill/Ultimate Action from being performed.
+
+**Expected Resolution / Case A:**
+
+- opportunity is consumed under SSI;
+- no Skill-3 settlement caused by an Action Intent;
+- no 4% post-Natural-Action self Heal;
+- no Warrior +5 AE;
+- any Sanguinius duration explicitly based on actually performed Natural Actions does not decrement merely because this opportunity was lost.
+
+**Input / Case B — actual Basic with only 5 AE:**
+
+At the next opportunity Sanguinius actually performs Basic Attack.
+
+**Expected Resolution / Case B:**
+
+Basic has no active Skill Cost, so Skill 3 attempts before the Basic direct effect.
+
+Skill 3 attempts its 10 AE Cost and fails:
+
+```text
+success = false
+→ no Skill-3 8% Heal
+```
+
+Basic still resolves.
+
+After the Natural Action reaches `ACTION_COMPLETED`:
+
+- the 4% self-Heal may settle because only 0–2 enemy Light units exist;
+- Warrior class hook grants +5 Side AE;
+- no relative priority between unrelated same-window post-completion work is inferred beyond existing Contracts;
+- the later +5 AE does not retroactively fund the failed Skill-3 settlement.
+
+**Input / Case C — 3+ Light suppression:**
+
+Repeat an actually performed Natural Action with 3+ active enemy `Effective Element = Light` units.
+
+**Expected Resolution / Case C:**
+
+The 4% self-Heal is suppressed for that completion.
+
+Warrior +5 AE remains governed by the Mode Profile and is not suppressed merely by the Light count.
+
+**Forbidden Outcomes:** CC-lost opportunity heals 4%; CC grants +5 AE; +5 AE retroactively makes Skill 3 succeed; failed Skill 3 blocks Basic; Prime rank is incorrectly required for the 3+ Light suppression; global Turn Boundary substitutes for actual-action completion; the test invents a global priority between the 4% Heal and class AE hook.
+
+**Layers Under Test:** SSI, actual Natural Action completion, Trigger timing, Skill-3 Cost, Heal, Effective Element query, Mode AE hook.
+
+---
+
+## M-034 — Sanguinius Skill 2 Shield Cap / Refresh / Actual-action Duration
+
+**ID:** `M-034`  
+**Status:** `MUST_PASS`  
+**Purpose:** preserve the source-specific Skill-2 Shield pool semantics, especially the distinction between refresh and the existing actual-action duration clock.
+
+**Initial State:**
+
+Leader Current Max HP = 1000.
+
+Existing Sanguinius Skill-2 Shield contribution:
+- remaining Shield = 800;
+- duration = 1 future actually performed Sanguinius Natural Action.
+
+All Skill-2 casts used below are otherwise legal and affordable.
+
+**Input:**
+
+1. Sanguinius performs Skill 2 and produces positive post-modifier Overheal that converts to 500 new Shield.
+2. Sanguinius later completes one different actual Natural Action.
+3. Next SSI opportunity is lost to CC with no Action.
+4. Sanguinius later performs Skill 2 again, but this cast produces zero new Shield.
+
+**Expected Resolution:**
+
+Step 1:
+
+```text
+Shield 800 + 500
+→ cap at 1000
+→ positive new Shield occurred
+→ whole Skill-2 Shield duration refreshes to 2 future actual Natural Actions
+→ the Skill-2 cast that performed this refresh does not immediately decrement the refreshed duration
+```
+
+Step 2:
+
+```text
+one future actually performed Sanguinius Natural Action
+→ duration 2 → 1
+```
+
+Step 3:
+
+```text
+CC-lost opportunity
+→ duration remains 1
+```
+
+Step 4:
+
+```text
+zero new Shield
+→ no refresh occurs
+→ the pre-existing pool still sees this Skill-2 cast as a future actually performed Natural Action
+→ duration 1 → 0 at the qualifying completion point
+→ remaining Sanguinius Skill-2 Shield contribution expires
+```
+
+Other Shield sources are unaffected.
+
+**Expected Trace / State:** positive addition and refresh are distinguishable from the duration decrement clock; the zero-Shield cast emits no refresh and therefore cannot protect the old duration from that Action's qualifying decrement.
+
+**Forbidden Outcomes:** cap exceeds 100% Leader Current Max HP; the positive-refresh cast immediately decrements its newly refreshed duration; CC-lost opportunity decrements duration; zero new Shield refreshes duration; zero-Shield Skill-2 cast leaves the old duration unchanged merely because it was a Skill-2 cast; expiry removes unrelated Shield contributions.
+
+**Layers Under Test:** Shield source ledger, cap, Overheal conversion, DurationSpec, actual-Natural-Action clock.
+
+---
+
+## M-035 — Sanguinius PRE_OVERHEAL Modifier Excludes Self-Heal
+
+**ID:** `M-035`  
+**Status:** `MUST_PASS`  
+**Purpose:** prove the scoped ally-Heal modifier executes before Overheal and does not leak onto Sanguinius self-Heal.
+
+**Initial State:**
+
+Two active enemy units satisfy:
+
+```text
+Rank = Prime
+AND
+Effective Element = Light
+```
+
+so the Sanguinius ally-Heal multiplier is:
+
+```text
+0.80
+```
+
+Leader:
+- Current HP = 900;
+- Current Max HP = 1000.
+
+A Sanguinius-created ally Heal has requested amount:
+
+```text
+1000
+```
+
+A separate Sanguinius self-Heal has requested amount:
+
+```text
+80
+```
+
+**Input:** resolve both Heal instances.
+
+**Expected Resolution:**
+
+Leader Heal:
+
+```text
+requestedHeal = 1000
+→ PRE_OVERHEAL ×0.80
+→ modifiedHeal = 800
+→ missingHP = 100
+→ actualRestore = 100
+→ Overheal = 700
+```
+
+Only the post-modifier `Overheal = 700` is available to downstream Overheal conversion.
+
+Self-Heal:
+
+```text
+requestedHeal = 80
+→ recipient scope excludes SELF from the Prime-Light ally-Heal rule
+→ modifiedHeal = 80
+```
+
+The Prime/Light query is an ordinary structured gameplay predicate.
+
+No Authority adjudication occurs merely because Rank is Prime or Element is Light.
+
+**Expected Trace / State:** modifier trace records `PRE_OVERHEAL`, qualifying enemy count 2, multiplier 0.80 for Leader, and scope miss for SELF.
+
+**Forbidden Outcomes:** Overheal is calculated as 900 before reduction; modifier reduces only actual restored HP while preserving old Overheal; self-Heal becomes 64; Prime/Light invokes Authority; modifier retargets the Heal.
+
+**Layers Under Test:** ScopedEffectAmountModifierSpec, valueQueries, RES-006, HEL-001, Heal Result Binding.
+
+---
+
+## M-036 — Sanguinius Prime-Light Damage Reduction Is Target-local Final DR
+
+**ID:** `M-036`  
+**Status:** `MUST_PASS`  
+**Purpose:** prove source-target scoped Final Damage Reduction phase, target locality, Physical/Will ordering, True-Damage bypass, and the single downstream Shield boundary of the Damage Runtime.
+
+**Initial State:**
+
+Sanguinius produces equivalent test Damage against two enemy recipients with equal defensive stats.
+
+Target A:
+- Rank = Prime;
+- Effective Element = Light.
+
+Target B:
+- does not satisfy the full Prime+Light predicate.
+
+For both targets, before Final Damage Reduction:
+- Physical component after ARM/Penetration = 80;
+- Will component after RES/Penetration = 80.
+
+Target A also receives a True component = 100 from a Sanguinius Effect.
+
+Both targets have enough Shield to make post-FDR-before-Shield ordering observable.
+
+**Input:** resolve Damage.
+
+**Expected Resolution:**
+
+Target A component amounts before Shield:
+
+```text
+Physical:
+80 post-ARM
+→ FINAL_DAMAGE_REDUCTION ×0.90
+→ 72
+
+Will:
+80 post-RES
+→ FINAL_DAMAGE_REDUCTION ×0.90
+→ 72
+
+True:
+100
+→ bypass FINAL_DAMAGE_REDUCTION
+→ 100
+```
+
+After eligible component amounts are finalized:
+
+```text
+Physical 72
++ Will 72
++ True 100
+→ proceed through the canonical Damage packet/profile Shield interaction
+```
+
+Target B component amounts before Shield:
+
+```text
+Physical 80
+→ no Sanguinius Prime-Light modifier
+→ 80
+
+Will 80
+→ no Sanguinius Prime-Light modifier
+→ 80
+
+→ then proceed through the canonical Shield interaction
+```
+
+The modifier is target-local.
+
+The number of other Prime-Light enemies does not multiply Target A's own -10% rule.
+
+**Expected Trace / State:** modifier applies only to A's Physical/Will components at `FINAL_DAMAGE_REDUCTION`; True component bypasses that phase; Shield handling occurs only after the eligible post-mitigation/post-FDR component amounts are established.
+
+**Forbidden Outcomes:** reduction is applied before ARM/RES mitigation; reduction occurs after Shield; Shield is independently consumed once per component merely because this test lists components separately; True is reduced to 90; B is reduced because A qualifies; A receives -20% merely because two Prime-Light enemies exist; Authority adjudication is entered from Prime/Light predicates alone.
+
+**Layers Under Test:** Scoped Effect-Amount Modifier, RES-006, DMG-005, Damage Runtime component combination, Shield boundary, Authority boundary.
+
+---
+
+## M-037 — Sanguinius Skill 1 Explicit Sequential Reaction Boundary
+
+**ID:** `M-037`  
+**Status:** `MUST_PASS`  
+**Purpose:** prove `AFTER_DIRECT_EFFECTS_COMPLETE` defers ordinary Reactions but does not suppress mandatory lifecycle processing between Skill-1 direct components.
+
+**Initial State:** Sanguinius Skill 1 is normalized as a sequential direct-effect group:
+
+```text
+phase 1 Physical + Will
+→ mandatory lifecycle evaluation
+→ if target remains legal:
+     2% target Current Max HP True-Damage explosion
+```
+
+with:
+
+```text
+reactionBoundary = AFTER_DIRECT_EFFECTS_COMPLETE
+```
+
+An ordinary Reaction candidate is eligible because of phase 1.
+
+Run two deterministic cases.
+
+### Case A — target remains legal
+
+Phase 1 commits and target survives required lifecycle processing.
+
+**Expected Resolution / Case A:**
+
+```text
+phase 1 commit
+→ mandatory immediate lifecycle processing
+→ target still legal
+→ explosion resolves/commits
+→ direct Skill effects finish
+→ ACTION_DIRECT_EFFECTS_COMPLETE
+→ local sequential Reaction hold opens
+→ ordinary Reaction becomes eligible for existing Trigger/Reaction scheduling
+```
+
+The ordinary Reaction does not resolve between phase 1 and explosion.
+
+The test does not assert priority between that now-unheld Reaction and unrelated eligible blocking/same-window work.
+
+### Case B — target becomes lifecycle-invalid
+
+Phase 1 commits and mandatory lifecycle processing makes the target no longer a legal Damage recipient.
+
+**Expected Resolution / Case B:**
+
+```text
+phase 1 commit
+→ mandatory immediate lifecycle processing
+→ target invalid
+→ explosion skipped by target-invalid policy
+→ ACTION_DIRECT_EFFECTS_COMPLETE
+→ local sequential Reaction hold opens
+```
+
+Reaction deferral does not suppress or postpone the mandatory lifecycle evaluation needed to decide explosion legality.
+
+**Expected Trace / State:** lifecycle milestones occur between direct components; ordinary Reaction does not resolve before the explicit local gate opens; post-gate priority remains governed by existing Trigger/Reaction Contracts.
+
+**Forbidden Outcomes:** ordinary Reaction resolves between phase 1 and explosion; explosion resolves against a lifecycle-invalid target; mandatory `HP_ZERO`/death-prevention/lifecycle processing is deferred until after explosion; local gate opening is treated as a priority win over unrelated eligible work; this profile is written back as the global default for unrelated sequential Actions.
+
+**Layers Under Test:** RES-003, Sequential Transaction, Lifecycle Runtime, TGT-006, Reaction Queue.
+
+---
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -2279,6 +3037,174 @@ This test passes when the architecture can represent both variants without a new
 
 ---
 
+## N-008 — Distributed Cost Snapshot Is Before Any Payment Commit
+
+**ID:** `N-008`  
+**Status:** `MUST_PASS`  
+**Purpose:** attack the exact Cost transaction boundary where required payment could otherwise mutate optional payer membership.
+
+**Initial State:**
+
+A normalized generic CostGroup has:
+
+- one required HP Cost paid by entity A;
+- one optional distributed HP Cost whose payer collection is:
+  `all allied eligible entities with Current HP >= 60% Current Max HP`;
+- A and B both qualify at the pre-payment state.
+
+A:
+- Current HP = 65% Max HP;
+- required HP Cost = 10% Max HP.
+
+B:
+- Current HP = 70% Max HP.
+
+Optional per-payer HP Cost = 10% own Max HP.
+
+No cross-payer order-dependent rule exists.
+
+**Input:** execute the CostGroup.
+
+**Expected Resolution:**
+
+Before any payment commit:
+
+```text
+validate required Cost
+→ snapshot optional payer set = {A, B}
+```
+
+Then:
+
+```text
+commit A required HP Cost
+→ A falls from 65% to 55%
+```
+
+This state change does not remove A from the already-frozen optional payer set.
+
+Both frozen members still receive one optional payment attempt.
+
+Every frozen attempt produces one terminal member `COST_PAYMENT_RESULT`.
+
+The CostGroup result is built only after both terminal outcomes exist.
+
+### Metamorphic replay
+
+Execute the same frozen payer set using two different stable technical iteration orders:
+
+```text
+A then B
+```
+
+and:
+
+```text
+B then A
+```
+
+With no authored cross-payer dependency:
+
+> member outcomes, `TOTAL_ACTUAL_PAID(HP)`, final gameplay state and Ability continuation are identical.
+
+Technical iteration order may differ in trace formatting only.
+
+**Expected Trace / State:** `optionalPayerSnapshot` state version precedes the first payment commit; frozen membership is stable; no entity/Slot/list order appears as gameplay priority.
+
+**Forbidden Outcomes:** snapshot after A required payment; A disappears from optional set after falling below 60%; payer B result changes merely because A was iterated first; entity ID/Slot order becomes gameplay semantics.
+
+**Layers Under Test:** CostGroupSpec, CST-008, Transaction Manager, Snapshot boundary, deterministic trace, Cost Result aggregation.
+
+---
+
+## N-009 — Interposition Settlement Failure Policies Are Explicit
+
+**ID:** `N-009`  
+**Status:** `MUST_PASS`  
+**Purpose:** prove `CONTINUE` and `FAIL_INTENT` are real runtime semantics at both Action-Intent interposition anchors, and that post-cost failure does not invent a refund.
+
+Run four deterministic cases using otherwise-valid generic normalized data.
+
+### Case A — PRE_ADMISSION_PRE_COST + CONTINUE
+
+**Initial State:** original Action Intent is preservable; declared pre-admission settlement reaches terminal failure; original Action would pass revalidation after that failure.
+
+**Expected Resolution:**
+
+```text
+Action Intent
+→ PRE_ADMISSION_PRE_COST settlement
+→ terminal settlement failure
+→ settlementFailurePolicy = CONTINUE
+→ preserve original Intent
+→ run declared revalidation
+→ original Intent may be admitted normally
+```
+
+The failed settlement produces no successful settlement Effect.
+
+The original unadmitted Action pays no Cost until/if it is later admitted and reaches its own Cost stage.
+
+### Case B — PRE_ADMISSION_PRE_COST + FAIL_INTENT
+
+**Expected Resolution:**
+
+```text
+Action Intent
+→ pre-admission settlement terminal failure
+→ settlementFailurePolicy = FAIL_INTENT
+→ enclosing Intent path terminates
+```
+
+The original Action is not admitted.
+
+Its Cost is not paid merely because it was requested.
+
+No hidden fallback is invented.
+
+### Case C — POST_COST_PRE_EFFECT + CONTINUE
+
+**Initial State:** original Action is admitted; its complete active Cost transaction commits and all Cost Result Bindings are stored; declared post-cost settlement then reaches terminal failure.
+
+**Expected Resolution:**
+
+```text
+complete active Cost transaction
+→ ACTION_BEGIN
+→ POST_COST_PRE_EFFECT settlement failure
+→ settlementFailurePolicy = CONTINUE
+→ original direct Effects proceed
+```
+
+Committed Cost-payment results remain immutable.
+
+### Case D — POST_COST_PRE_EFFECT + FAIL_INTENT
+
+**Expected Resolution:**
+
+```text
+complete active Cost transaction
+→ ACTION_BEGIN
+→ POST_COST_PRE_EFFECT settlement failure
+→ settlementFailurePolicy = FAIL_INTENT
+→ original direct Effects do not begin
+→ existing Action failure/termination bookkeeping continues
+```
+
+Already-committed Cost is **not automatically refunded**.
+
+Committed singular/group Cost-payment results remain immutable transaction history.
+
+Any refund requires its own explicit refund Contract/policy.
+
+**Expected Trace / State:** terminal settlement outcome and failure policy are separately traceable; pre-admission failure can stop before Action admission; post-cost failure can stop direct Effects without rewriting/refunding committed Cost by implication.
+
+**Forbidden Outcomes:** all settlement failures always cancel; all settlement failures always continue; PRE `FAIL_INTENT` still admits original Action; PRE failure pays original Action Cost before admission; POST `CONTINUE` suppresses direct Effects; POST `FAIL_INTENT` automatically refunds Cost; post-cost failure rewrites `actualPaidAmount`; implementation/list order chooses failure behavior.
+
+**Layers Under Test:** ACT-005, ActionIntentRuntime, Action execution pipeline, settlementFailurePolicy, CST-005 refund boundary, Cost Result immutability.
+
+---
+
 # 19. ARCHITECTURE META-TESTS
 
 ---
@@ -2370,6 +3296,12 @@ When executable Kernel tests exist, at minimum create Golden Traces for:
 16. `M-022` same-root Effect provenance + one-layer repeat recursion guard.
 17. `M-024` read-only Natural-Action form fallback.
 18. `M-026` root-linked blocking settlement + failed Cost + post-completion class AE regen.
+19. `M-030` high-zone branch freeze + distributed Skill-2 Cost transaction: payer snapshot → required commit crossing HP to 30% → every optional terminal result → CostGroup aggregate → post-cost Skill-3 settlement without branch switch/revalidation.
+20. `M-031` failed low-zone Skill-3 settlement → Ultimate HP-floor Cost result → actual-paid blood arrow + simultaneous slash, including the successful-zero-payment case.
+21. `M-032` one preserved low-zone Action Intent → Skill-3 settlement → same-Intent revalidation → explicit Basic fallback without a second `ACTION_INTENT_CREATED`.
+22. `M-037` sequential phase-1 commit → mandatory lifecycle → explosion/skip → `ACTION_DIRECT_EFFECTS_COMPLETE` local Reaction-gate opening.
+23. `N-008` distributed payer-set freeze before any payment commit and gameplay-equivalent replay under permuted technical payer iteration.
+24. `N-009` explicit interposition settlement-failure traces for PRE/POST `CONTINUE` and `FAIL_INTENT`, including post-cost no-auto-refund behavior.
 
 ---
 
@@ -2469,6 +3401,58 @@ Future automated test harness should generate many states and assert:
 - non-Natural Actions never receive `AE_ACTION_REGEN_BY_CLASS`
 - CC-consumed opportunity without Action grants zero class AE
 - AE generated by a Natural Action cannot fund a blocking settlement that must resolve before that same Action completes
+## Distributed Cost / Cost-payment results
+- every optional payer collection snapshot used by one Cost transaction precedes every payment commit in that transaction
+- required Cost mutation never changes membership of an already-frozen optional payer collection
+- every frozen optional payer produces exactly one terminal member payment result
+- `CONTRIBUTION_ZERO_CONTINUE` optional failure never fails the whole Ability by itself
+- `actualPaidAmount = 0` does not determine `success`; both successful-zero and failed-zero outcomes remain representable
+- `COST_PAYMENT_REF` resolves to exactly one singular payment result
+- distributed member results are never collapsed into one ambiguous singular binding
+- `TOTAL_ACTUAL_PAID(kind)` equals the sum of authoritative member `actualPaidAmount` for that kind
+- later HP/Heal/Damage/MaxHP/resource mutations never rewrite committed Cost-payment results
+- permuting a purely technical optional-payer iteration order does not change member outcomes, aggregates, final gameplay state or Ability continuation when no authored order-dependent rule exists
+
+## Action Intent interposition
+- Action Intent creation alone never commits Cost or Effects
+- branch selection is frozen from `ACTION_INTENT_CREATED` and does not change after settlement mutation
+- pre-admission interposition may settle before ordinary rejection when declared
+- revalidation tests the same preserved original Intent
+- explicit fallback remains inside the same `naturalActionOpportunityRef`
+- fallback never creates a second `ACTION_INTENT_CREATED` cycle
+- fallback never reruns already-frozen interposition selection merely because the effective candidate changed
+- ambiguous matching branches/interposition instances are rejected rather than ordered by list/Event/entity/Character ID
+- `POST_COST_PRE_EFFECT` never begins until the entire active Cost transaction, including distributed optional attempts and declared CostGroup results, is terminal
+
+## Interposition settlement failure policy
+- a terminal interposition settlement failure is not self-interpreting; runtime must apply the authored `CONTINUE` or `FAIL_INTENT` policy
+- PRE `CONTINUE` preserves the original Intent and proceeds to declared revalidation/admission logic
+- PRE `FAIL_INTENT` terminates before original Action admission and cannot spend that unadmitted Action's Cost
+- POST `CONTINUE` allows the already-admitted original Action to proceed to direct Effects
+- POST `FAIL_INTENT` prevents original direct Effects from beginning after the settlement failure
+- POST `FAIL_INTENT` never implies automatic refund of already-committed Cost
+- no interposition failure may retroactively rewrite committed singular/group Cost-payment results
+
+## Scoped Effect-amount modifiers
+- a modifier never applies outside its declared source, recipient, Effect, component and resolution-phase scope
+- modifier `valueQueries` are read-only: they never mutate State, pay Cost, emit Effects, request Actions, alter TargetSets or consume RNG
+- unless an explicit earlier Snapshot is referenced, a valueQuery observes authoritative state at its declared resolution phase
+- permuting authoring/list order of matching `MULTIPLY` modifiers does not change the combined phase factor or gameplay result
+- `PRE_OVERHEAL` modifies Heal before actual restoration and Overheal derivation
+- an ally-only Heal modifier with `exclude SELF` never modifies self-Heal
+- `FINAL_DAMAGE_REDUCTION` is target-local
+- Physical Final Damage Reduction occurs after ARM/Penetration and before the shared downstream Shield boundary
+- Will Final Damage Reduction occurs after RES/Penetration and before the shared downstream Shield boundary
+- True Damage never enters ordinary `FINAL_DAMAGE_REDUCTION`
+- Rank/Element predicates alone never invoke Authority adjudication
+
+## Explicit sequential Reaction boundary
+- under `AFTER_DIRECT_EFFECTS_COMPLETE`, ordinary Reactions never resolve between declared direct sequential components
+- mandatory immediate lifecycle processing still occurs between sequential direct components when required
+- lifecycle invalidation can skip a later component even while ordinary Reactions remain locally held
+- opening the local gate at `ACTION_DIRECT_EFFECTS_COMPLETE` does not define priority against unrelated root-linked blocking settlements or same-window Reactions
+- an omitted reactionBoundary never silently inherits `AFTER_DIRECT_EFFECTS_COMPLETE`
+- legacy `QUEUE_UNTIL_ACTION_COMPLETE` is never silently aliased to `AFTER_DIRECT_EFFECTS_COMPLETE`
 
 ---
 
@@ -2494,6 +3478,12 @@ Damage
 × scoped Effect Admission
 × root completion dependency
 × post-Natural-Action AE regeneration
+× Action Intent interposition
+× interposition settlement failure policy
+× distributed CostGroup
+× typed Cost-payment Result Binding
+× scoped Effect-amount modifiers
+× explicit sequential Reaction boundary
 ```
 
 Look for:
@@ -2508,7 +3498,7 @@ Look for:
 - target reroll without policy;
 - non-natural Action advancing SSI;
 - cache result surviving adjudication revision;
-- source provenance disappearing.
+- source provenance disappearing;
 - same-root Effect provenance collapsing into one identity;
 - repeat/reflect/echo recursion caused by checking only Actor/root/Damage Attribution;
 - rejected Action-form candidates spending Cost or consuming Rage;
@@ -2519,7 +3509,33 @@ Look for:
 - root `ACTION_COMPLETED` emitted before declared blocking settlements;
 - same-action class AE regen self-funding a pre-completion settlement;
 - Effect Admission leaking outside declared semantic scope;
-- Authority threshold incorrectly invoking progression comparator without direct conflict.
+- Authority threshold incorrectly invoking progression comparator without direct conflict;
+- optional payer collection being sampled after any payment commit;
+- frozen payer membership changing because required Cost mutated authoritative state;
+- optional payer failure incorrectly failing the whole Ability;
+- successful zero payment being rewritten as failure;
+- distributed member payment results collapsing into one singular result;
+- downstream Effect reconstructing nominal Cost instead of using committed `actualPaidAmount`;
+- CostGroup becoming terminal before all frozen optional payer attempts and aggregates are terminal;
+- `POST_COST_PRE_EFFECT` running after only the required Cost subset;
+- low-zone Action Intent being discarded before its declared interposition settlement;
+- fallback creating a second Action Intent or rerunning frozen interposition selection;
+- ambiguous interposition multiplicity resolved by list/Event/entity/Character-ID order;
+- PRE settlement failure ignoring `CONTINUE`/`FAIL_INTENT`;
+- PRE `FAIL_INTENT` admitting or charging the original unadmitted Action;
+- POST `CONTINUE` incorrectly suppressing direct Effects;
+- POST `FAIL_INTENT` incorrectly allowing direct Effects or automatically refunding committed Cost;
+- post-cost settlement failure rewriting committed Cost-payment results;
+- scoped modifier `valueQuery` mutating state or consuming RNG;
+- modifier ordering changing output when only `MULTIPLY` operations are legal;
+- PRE_OVERHEAL modifier being applied after Overheal derivation;
+- target-local Final Damage Reduction leaking onto unrelated targets;
+- per-component test bookkeeping accidentally causing multiple Shield passes where the Damage Runtime defines one downstream Shield boundary;
+- True Damage entering ordinary Final Damage Reduction;
+- ordinary Reaction resolving between sequential components under `AFTER_DIRECT_EFFECTS_COMPLETE`;
+- mandatory lifecycle processing being accidentally held together with ordinary Reactions;
+- local Reaction-gate opening being interpreted as global scheduler priority;
+- legacy `QUEUE_UNTIL_ACTION_COMPLETE` being silently aliased to `AFTER_DIRECT_EFFECTS_COMPLETE`.
 
 ---
 
@@ -2708,15 +3724,15 @@ Current suite defines:
 - 4 Arena tests;
 - 7 Narrative/capability tests;
 - 7 Mode tests;
-- 12 anti-scripting/validation tests;
-- 6 unresolved Contract probes;
-- 29 character-derived integration tests;
-- 7 cross-system torture tests;
+- 14 anti-scripting/validation tests;
+- 7 unresolved Contract probes;
+- 37 character-derived integration tests;
+- 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-155 tests / probes / meta-tests
+168 tests / probes / meta-tests
 
 The count is not a design target.
 
@@ -2759,6 +3775,25 @@ At architecture level, the expected result is:
 - Echo-local Skill 3 → Skill 1 ordering without resolving global unrelated Reaction priority;
 - Turn-based `AE_ACTION_REGEN_BY_CLASS` only after actual Natural Action completion;
 - CC-lost opportunities granting no class AE and not advancing actual-action-only Echo windows.
+
+- bounded Action Intent / Request remains distinct from admitted Action and supports canonical `PRE_ADMISSION_PRE_COST` / `POST_COST_PRE_EFFECT` interposition without arbitrary callbacks;
+- low-zone preserved Intent may settle, revalidate the same request, and select only explicitly-authored fallback inside the same SSI Natural Action opportunity;
+- fallback does not create a second `ACTION_INTENT_CREATED` cycle or rerun frozen interposition selection;
+- ambiguous multiple interposition matches are rejected instead of receiving hidden list/Event/entity-order priority;
+- interposition settlement failure obeys explicit `CONTINUE` / `FAIL_INTENT`; PRE failure cannot spend an unadmitted original Action's Cost, and POST `FAIL_INTENT` does not imply automatic refund of already-committed Cost;
+- dynamic optional payer collections are frozen after required validation and before any payment commit;
+- required Cost mutation cannot retroactively change frozen payer membership;
+- optional distributed payer failure can contribute zero while the Ability continues;
+- successful zero payment remains distinct from failed zero payment;
+- singular and CostGroup payment results preserve committed `actualPaidAmount`, and downstream Effects can consume that immutable result;
+- distributed CostGroup remains nonterminal until every frozen optional payer attempt and declared aggregate is terminal;
+- scoped Effect-amount modifiers remain bounded by source/recipient/effect/component/query/phase and current `MULTIPLY` semantics are order-independent;
+- PRE_OVERHEAL modifiers execute before Overheal derivation and can exclude self by recipient scope;
+- target-local FINAL_DAMAGE_REDUCTION applies to Physical/Will after ARM/RES mitigation and before the downstream Shield boundary while True Damage bypasses the phase;
+- explicit `AFTER_DIRECT_EFFECTS_COMPLETE` can defer ordinary Reactions across one sequential direct-effect chain without suppressing mandatory lifecycle processing;
+- opening that local Reaction gate does not establish global priority against unrelated Reactions or root-linked blocking settlements;
+- legacy `QUEUE_UNTIL_ACTION_COMPLETE` is not silently equivalent to `AFTER_DIRECT_EFFECTS_COMPLETE`;
+- Sanguinius distributed Skill-2 Cost, two-zone Skill-3 ordering/revalidation/fallback, Skill-2 Shield clock, Prime-Light scoped modifiers, Skill-1 sequential profile and Ultimate actual-paid result all compose without Character-specific runtime branches.
 
 ## Should intentionally remain blocked
 - global unrelated Reaction priority;
@@ -2832,6 +3867,19 @@ A future model understands Chặng I only if it knows:
 34. `AE_ACTION_REGEN_BY_CLASS` belongs to the Turn-based Mode Profile and occurs only after an actually performed Natural Action reaches `ACTION_COMPLETED`.
 35. AE generated by a Natural Action cannot retroactively fund blocking settlements that had to resolve before that same Action completed.
 36. Actor-specific windows based on actually performed Natural Actions do not advance merely because SSI consumed a CC-lost opportunity.
+37. Action Intent / Request is testably distinct from an admitted Action; a declared pre-admission interposition may settle before the original request is revalidated.
+38. Interposition branch selection is frozen for one Intent, and ambiguous multiplicity must be rejected rather than resolved by incidental ordering.
+39. Explicit fallback after failed revalidation stays inside the same SSI Natural Action opportunity and does not create a second `ACTION_INTENT_CREATED` cycle.
+40. Optional distributed payer collections are frozen before any payment commit; later required Cost mutation cannot change their membership.
+41. Every frozen distributed payer receives one terminal payment result, and optional failure under `CONTRIBUTION_ZERO_CONTINUE` does not fail the whole Ability.
+42. `actualPaidAmount = 0` does not imply payment failure; successful-zero and failed-zero outcomes are semantically distinct.
+43. Downstream Effects that depend on Cost payment use immutable committed payment results or typed CostGroup aggregates, never reconstructed nominal Cost.
+44. `POST_COST_PRE_EFFECT` waits for the complete distributed Cost transaction, including all optional terminal results and CostGroup aggregate construction.
+45. Scoped Effect-amount modifiers are bounded read-only rules; current `MULTIPLY` factors do not acquire priority from authoring/Event/entity iteration order.
+46. PRE_OVERHEAL modifies Heal before actual restoration/Overheal, while FINAL_DAMAGE_REDUCTION modifies qualifying Physical/Will after mitigation and before the downstream Shield boundary; True bypasses that phase.
+47. `AFTER_DIRECT_EFFECTS_COMPLETE` holds ordinary Reactions across the local direct sequential chain but never suppresses mandatory immediate lifecycle processing.
+48. A local Reaction-gate opening is not a global priority rule, and legacy `QUEUE_UNTIL_ACTION_COMPLETE` must not be silently aliased to `AFTER_DIRECT_EFFECTS_COMPLETE`.
+49. Interposition settlement failure is resolved only by explicit `CONTINUE` / `FAIL_INTENT`; PRE `FAIL_INTENT` stops before admission, while POST `FAIL_INTENT` stops direct Effects without automatically refunding or rewriting committed Cost.
 
 ---
 
