@@ -1580,30 +1580,36 @@ Hồi phục: Đồng thời hồi phục ngay lập tức một lượng HP b�
 (Ví dụ minh họa: HP hiện tại 150/400, Khiên hiện tại là 200. Sau khi nổ Ult: Tiêu hao 200 Khiên \rightarrow Tăng thêm 100 Max HP và Hồi 100 HP. Chỉ số mới: HP 250 / Max HP 500, Khiên về 0).
 
 52)
-warrior, Ur.
+warrior.
 mô tả: một ma kiếm sĩ vì thanh kiếm đặc biệt của mình có thể bỏ qua phòng ngự khi gây sát thương.
 
-nội tại: Khi Hp về 0, hồi hp cho leader = 50% max hp của bản thân, hắn trở lại deck lần nữa nhưng cost giảm 3 (có thể cộng dồn với cơ chế từ kit khác), nội tại kích hoạt 1 lần/trận, Quy Tắc.
+Passive — Death Pays the Fare
+Tử Vong Trả Lộ Phí: Khi Hp về 0, hồi hp cho leader = 50% max hp của bản thân, hắn trở lại deck lần nữa nhưng cost giảm 3 (có thể cộng dồn với cơ chế từ kit khác), nội tại kích hoạt 1 lần/trận.
 
-đánh thường: tiếp cận mục tiêu, chém xéo gây sát thương = 100% wil/atk.
+Basic — Falling Scar
+Lạc Ngân: tiếp cận mục tiêu, chém xéo từ trên xuống gây sát thương = 100% wil/atk.
 
-skill 1: cắm kiếm xuống đất, triệu hồi 1 thiên thạch va chạm vào ô 8 của kẻ thù gây sát thương = 180% atk+wil của bản thân, 0,8s sau đó thiên thạch phát nổ, gây aoe lần nữa lên ô 5/7/8/9 của kẻ thù, mỗi kẻ nhận sát thương = 100% wil (có thể giảm bằng res) của char này cùng nhận sát thương atk = 10% hp hiện có của char này (có thể giảm = arm). cost 30 ae và hp = 5% hp max (giữ hp còn 1 khi dùng skill này lúc hp dưới 5% max hp 1 lần/trận, lần sau dùng skill này khi hp dưới 5% max hp sẽ chết, không giảm mx hp, khiên/res/arm không có tác dụng giảm sát thương trong trường hợp này). Vậy leader địch nhận sát thương tổng cộng từ skill này là 280% wil + 180% atk + sát thương atk = 10% hp hiện có của char này.
+Skill 1 — Starfall Invocation
+Dẫn Tinh Trụy Thế: cắm kiếm xuống đất, triệu hồi 1 thiên thạch va chạm vào ô 8 của kẻ thù gây sát thương = 180% atk+wil của bản thân, sau đó thiên thạch phát nổ, gây aoe lần nữa lên ô 5/7/8/9 của kẻ thù, mỗi kẻ nhận sát thương = 100% wil (có thể giảm bằng res) của char này cùng nhận sát thương atk = 10% hp hiện có của char này (có thể giảm = arm). cost 30 ae và hp = 5% hp max (giữ hp còn 1 khi dùng skill này lúc hp dưới 5% max hp 1 lần/trận, lần sau dùng skill này khi hp dưới 5% max hp sẽ chết, không giảm mx hp, khiên/res/arm không có tác dụng giảm sát thương trong trường hợp này). Vậy leader địch nhận sát thương tổng cộng từ skill này là 280% wil + 180% atk + sát thương atk = 10% hp hiện có của char này.
 
-skill 2: mỗi khi đánh thường - 2 ae để được hồi phục = 10% sát thương đánh thường gây ra, kích hoạt 1 lần/turn. khi không đủ ae sẽ không kích hoạt.
+Skill 2 — Blood Returned
+Huyết Hoàn: mỗi khi đánh thường - 4 ae để được hồi phục = 10% sát thương đánh thường gây ra, kích hoạt 1 lần/turn. khi không đủ ae sẽ không kích hoạt.
 
-skill 3: chém dọc ô 2/5/8 gây sát thương chuẩn = 50% hp hiện tại lên mỗi kẻ địch, hồi hp = 20% tổng sát thương gây ra, overheal bị bỏ qua, 25 ae.
+Skill 3 — Sever the Mortal Measure
+Đoạn Mệnh Xích: chém dọc ô 2/5/8 gây sát thương chuẩn = 50% hp hiện tại lên mỗi kẻ địch, hồi hp = 20% tổng sát thương gây ra, overheal bị bỏ qua, 25 ae.
 
-ultimate: nhảy lên cao, rơi vào ô 5 của kẻ thù và chém gây sát thương = 150% wil + atk lên kẻ đứng ở ô số 5, sau đó múa kiếm, ô 5 cùng các ô còn lại nhận sát thương = 150% wil + atk cùng sát thương chuẩn = 5% max hp của nhân vật này (nếu ô 5 không có kẻ thù đứng thì bỏ qua phần gây sát thương lên ô 5 và chỉ gây aoe xung quanh).
+Ultimate — Descend, Ruin, Reap
+Giáng Thế · Phá Diệt · Thu Hoạch: nhảy lên cao, rơi vào ô 5 của kẻ thù và chém gây sát thương = 150% wil + atk lên kẻ đứng ở ô số 5, sau đó múa kiếm, ô 5 cùng các ô còn lại nhận sát thương = 150% wil + atk cùng sát thương chuẩn = 5% max hp của nhân vật này (nếu ô 5 không có kẻ thù đứng thì bỏ qua phần gây sát thương lên ô 5 và chỉ gây aoe xung quanh).
 
 52)
 ssr, mage
-nội tại: mỗi lần dùng ultimate đều tạo 1 orb laze bay sau lưng, tối đa 10 orb, tăng 5% atk/wil hiện có/mỗi orb laze, orb laze không có thanh hp, không thể nhận sát thương, pháp tắc. nhận vật này không thể follow up attack, riêng phần không thể follow up attack mang tag axiom.
+nội tại: mỗi lần dùng ultimate đều tạo 1 orb laze bay sau lưng, tối đa 10 orb, tăng 5% atk/wil hiện có/mỗi orb laze, orb laze không có thanh hp, không thể nhận sát thương. nhận vật này không thể follow up attack, các orb chỉ là vfx, bản chất của nó là tăng atk/wil sau mỗi lần ult.
 
-skill 1: khi đánh thường nếu orb gây sát thương lên mục tiêu có hp dưới hoặc = 5% max hp của chúng thì lập tức tàn sát chúng, kết liễu, đưa hp của chúng về 0 (vẫn có thể hồi sinh hoặc về deck tùy cơ chế của chúng), chỉ kích hoạt khi đánh thường, -30 ae/lần kích hoạt, kích hoạt tối đa 4 lần/trận.
+skill 1: khi đánh thường nếu orb gây sát thương lên mục tiêu có hp dưới hoặc = 5% max hp của chúng thì lập tức tàn sát chúng, kết liễu và DEATH_CONFIRMED, đưa hp của chúng về 0 (vẫn có thể hồi sinh hoặc về deck tùy cơ chế của chúng), chỉ kích hoạt khi đánh thường, -30 ae/lần kích hoạt, kích hoạt tối đa 4 lần/trận.
 
-skill 2: khi đánh thường gây sát thương vượt 40% max hp của đối phương sẽ hồi hp cho bản thân = 40% sát thương do đòn đánh đó gây ra lên kẻ thù, -10 ae/lần kích hoạt, không cap/trận. Pháp Tắc.
+skill 2: khi đánh thường gây sát thương vượt 40% max hp của đối phương sẽ hồi hp cho bản thân = 40% sát thương do đòn đánh đó gây ra lên kẻ thù, -10 ae/lần kích hoạt, không cap/trận.
 
-skill 3: khi gây sát thương vượt 15% max hp của kẻ thù (đánh thường, debuff gây sát thương theo thời gian,..) thì mỗi 1% vượt nhận 3 rage, không giới hạn lần kích hoạt/trận/turn, rage thừa sẽ bị bỏ qua. -5 ae mỗi lần kích hoạt bất kể lượng rage nhận được là bao nhiêu. vậy nếu gây sát thương= 25% max hp của mục tiêu hắn sẽ nhận 30 rage và phe đó mất 5 ae.
+skill 3: khi gây sát thương vượt 15% max hp của kẻ thù bằng natural Action thì mỗi 1% vượt nhận 3 rage, không giới hạn lần kích hoạt/trận/turn, rage thừa sẽ bị bỏ qua. -5 ae mỗi lần kích hoạt bất kể lượng rage nhận được là bao nhiêu. vậy nếu gây sát thương= 25% max hp của mục tiêu hắn sẽ nhận 30 rage và phe đó mất 5 ae.
 gây sát thương đúng 15% max hp của mục tiêu skill này sẽ không kích hoạt.
 
 ult: cast 2 lần đánh thường, nếu 2 lần đánh thường kích hoạt skill 1/2/3 thì tiêu hao ae sẽ bị bỏ qua, không tốn ae nhưng skill vẫn kích hoạt.

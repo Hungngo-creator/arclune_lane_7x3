@@ -21,7 +21,7 @@ The Piercing Grace: trên tay xuất hiện 1 cây giáo ánh sáng, lao đến 
 
 ultimate, Triune Lance of Salvation: tại chỗ bay lên chân không chạm đất, ngưng tụ sau lưng 3 ngọn giáo ánh sáng, mỗi ngọn giáo sẽ tấn công target khác nhau và có thể trùng target nếu target trên sân dưới 3, 120% wil và 120% atk/mỗi ngọn giáo, 3 ngọn giáo chỉ tính là 1 natural Action, sau đó heal cho leader = 10% tổng Actual HP Damage ult gây ra.
 
-3)
+3) Niten
 phân tích kỹ hơn nằm ở docs/Chuẩn hoá và gắn tag kit/warrior_stance_execute_analysis.md
 
 nội tại: ultimate sẽ chuyển đổi trạng thái đánh thường, vào trận với đơn kiếm, đánh thường gây sát thương= 100% wil và 100% atk của bản thân lên 1 mục tiêu, khi ultimate lần đầu mỗi khi ra sân, chuyển sang dạng song kiếm, sát thương đánh thường tăng 50% và bỏ qua 10% res cùng arm của target, ultimate lần nữa sẽ chuyển về dạng đơn kiếm, cứ thế lặp lại cho đến khi rời sân, nếu vào sân lần nữa dạng bắt đầu cũng sẽ là đơn kiếm. dạng song kiếm đánh thường % cũng là 100% như đơn kiếm
@@ -80,16 +80,24 @@ nội tại: mỗi 10% hp lost/100% max hp, + 5% atk/wil/res/arm, tính trên ba
 
 ultimate: gây aoe toàn sân = 300% wil và ATK của bản thân lên toàn bộ kẻ địch, nếu kẻ địch có hp = hoặc dưới 10%, kích hoạt execute, kết liễu và tiễn vào cửa sổ chờ luân hồi.
 
-11)
-nội tại: khi vào sân cửa sổ chờ luân hồi +2, khi rời sân hiệu ứng này biến mất, nếu có 2 đơn vị này trên sân (mỗi phe 1 char) thì nội tại này sẽ kích hoạt 2 lần tức cửa sổ là 8 nếu không có kit khác can thiệp.
+11) Nephthys
+Passive — The Dead May Linger
+Người Chết Được Phép Nán Lại: khi vào sân cửa sổ chờ luân hồi +2, khi rời sân hiệu ứng này biến mất, nếu có 2 đơn vị này trên sân (mỗi phe 1 char) thì nội tại này sẽ kích hoạt 2 lần tức cửa sổ là 8 nếu không có kit khác can thiệp.
 
 nếu cửa sổ đang hơn 4 mà char này rời sân, 2 chân ngã chết lâu nhất sẽ vào luân hồi, nếu mỗi phe 1 char thì 4 chân ngã chết lâu nhất vào luân hồi.
 
-skill 1: tấn công 1 target, gây sát thương = 150% wil và 150% atk, sau khi natural Action từ skill này kết thúc, nhận khiên = 25% Actual hp damage skill này gây ra, 20 ae, khiên từ skill này không thể vượt max hp của nhân vật này, khiên tồn tại tối đa 2 natural Action của nhân vật này, lượng khiên từ skill có thể cộng dồn.
+Skill 1 — Shroud of the Departed
+Liệm Y Của Kẻ Đã Khuất: tấn công 1 target, gây sát thương = 150% wil và 150% atk, sau khi natural Action từ skill này kết thúc, nhận khiên = 25% Actual hp damage skill này gây ra, 20 ae, khiên từ skill này không thể vượt max hp của nhân vật này, khiên tồn tại tối đa 2 natural Action của nhân vật này, lượng khiên từ skill có thể cộng dồn.
+tức khiên từ skill này miễn đạt 2 natural Action là mất, cách để khiên không mất là tạo thêm khiên, lúc đó bôn đếm 2 natural Action sẽ reset.
 
-skill 2: trong mỗi turn boundary, sát thương nhận từ 1 natural Action của kẻ thù lên khiên của bản thân vượt 35% max hp của bản thân (miễn khiên trên bản thân là tính), lập tức hồi hp = 70% wil và atk của bản thân cho mình và leader đồng minh, tức cả 2 nhận heal = 70% wil và 70% atk của nhân vật này khi lượng khiên của hắn mất quá nhanh, tự kích hoạt khi đạt điều kiện và ae pool có tối thiểu 20 ae, cost 20 ae/mỗi lần kích hoạt.
+Skill 2 — When the Shroud Tears
+Khi Liệm Y Rách Vỡ: trong mỗi turn boundary, sát thương nhận từ 1 natural Action của kẻ thù lên khiên của bản thân vượt 35% max hp của bản thân (miễn khiên trên bản thân là tính), lập tức hồi hp = 70% wil và atk của bản thân cho mình và leader đồng minh, tức cả 2 nhận heal = 70% wil và 70% atk của nhân vật này khi lượng khiên của hắn mất quá nhanh, tự kích hoạt khi đạt điều kiện và ae pool có tối thiểu 15 ae, cost 15 ae/mỗi lần kích hoạt, skill bị động, không cần natural Action để kích hoạt.
 
-ultimate: revive random 1 ally từ cửa sổ chờ luân hồi, ally revive với hp = 35% max hp của họ, 5 rage, chỉ số 100% như lúc summon từ deck, nếu target có chỉ số được scale từ kit của bản thân trước khi vào cửa sổ luân hồi, chỉ số đó được reset hoặc giữ tùy mô tả kit của họ.
+Skill 3 — Three Names in Mourning
+Tam Danh Ai Điếu: tấn công ngẫu nhiên 3 kẻ thù, mỗi kẻ nhận sát thương = 125% wil và 125% atk, 25 ae.
+
+Ultimate — Not Yet Beyond the Gate
+Chưa Được Qua Cánh Cửa: revive random 1 ally từ cửa sổ chờ luân hồi, ally revive với hp = 35% max hp của họ và 5 rage, chỉ số 100% như lúc summon từ deck, nếu target có chỉ số được scale từ kit của bản thân trước khi vào cửa sổ luân hồi, chỉ số đó được reset hoặc giữ tùy mô tả kit của họ.
 
 12)
 
@@ -106,22 +114,28 @@ mà nghĩ lại nội tại này chỉ trigger khi ally nhận sát thương t�
 13) Rotania
 mage
 
-nội tại: natural Action tiếp theo của natural Action đầu tiên khi vào sân, tức vào sân > natural Action (nếu từ deck ra thì đầy rage và ult, thường là thế nếu không có kit can thiệp) > natural Action tiếp thì nội tại kích hoạt > natural Action tiếp theo không kích hoạt nội tại > natural Action tiếp theo nữa lại kích hoạt nội tại, cứ thế lặp lại đến khi rời sân.
+Nội tại — Orbital Recurrence
+Quỹ Đạo Hồi Quy: natural Action tiếp theo của natural Action đầu tiên khi vào sân, tức vào sân > natural Action (nếu từ deck ra thì đầy rage và ult, thường là thế nếu không có kit can thiệp) > natural Action tiếp thì nội tại kích hoạt > natural Action tiếp theo không kích hoạt nội tại > natural Action tiếp theo nữa lại kích hoạt nội tại, cứ thế lặp lại đến khi rời sân.
 hiệu ứng nội tại: khi gây Actual HP damage lên target, sát thương từ natural Action đó sau khi xong thì target nhận thêm sát thương chuẩn = 30% Actual z,
 a hHP damage target nhận từ nhân vật này, hiệu ứng này tính là follow up attack, dễ hiểu là target nhận Actual HP damage = 100 thì nhận thêm sát thương chuẩn là 30, vì là follow up nên tính là 1 action với đòn chính, hiệu ứng này cap kích hoạt max 9 target/mỗi lần nội tại kích hoạt.
 
-skill 1: triệu hồi 5 lỗ đen (vfx biến động theo lượng target, không hiện ở ô skill có thể target nhưng không có target), trong đó bay ra tia sét gây sát thương = 150% wil và 120% atk của bản thân lên 5 vị trí cố định là 2/4/5/6/8 của kẻ địch, đòn aoe này mỗi khi DEATH_CONFIRMED 1 target có chân ngã thì cost của skill này giảm 4 ae, cost: 30 ae.
+Skill 1 — Fivefold Singularity
+Ngũ Trùng Kỳ Điểm: triệu hồi 5 lỗ đen (vfx biến động theo lượng target, không hiện ở ô skill có thể target nhưng không có target), trong đó bay ra tia sét gây sát thương = 150% wil và 120% atk của bản thân lên 5 vị trí cố định là 2/4/5/6/8 của kẻ địch, đòn aoe này mỗi khi DEATH_CONFIRMED 1 target có chân ngã thì cost của skill này giảm 4 ae, cost: 30 ae.
 Nếu kích hoạt nội tại thì phần giảm cost đương nhiên tính vì sát thương chuẩn của nội tại tính là follow up trong 1 natural Action.
 nếu target dưới 5, mỗi target chỉ nhận 1 lần sát thương từ skill này.
 
-skill 2: sau khi kích hoạt bằng 1 natural Action, không gây sát thương ngay mà tụ lực, đến natural Action tiếp theo sát thương gây ra bằng ultimate/skill hoặc đánh thường hệ số sát thương tăng 40% trong 1 natural Action, 25 ae.
-ví dụ dùng skill này, natural Action sau dùng skill 1 thì hệ số sát thương wil và atk của skill 1 tăng 40%, 210% wil và 168% atk lên mỗi target, chưa kể nếu nội tại kích hoạt thì sau đó mỗi target nhận thêm 30% Actual HP Damage của skill 1 dưới dạng sát thương chuẩn và sát thương cao như thế thì DEATH_CONFIRMED không khó, tối đa giảm được 20 ae cost skill 1, điểm cân bằng là kích hoạt skill 2 cần 1 turn, animation sẽ là vận sức, có lẽ nên nerf kiểu sau khi kích hoạt skill 2 xong thì nhận debuff hay tạm mất chỉ số nào đó?.
+Skill 2 — Arrested Orbit
+Quỹ Đạo Đình Chuyển: sau khi kích hoạt bằng 1 natural Action, không gây sát thương ngay mà tụ lực, đến natural Action tiếp theo sát thương gây ra bằng ultimate/skill hoặc đánh thường hệ số sát thương tăng 40% trong 1 natural Action, 25 ae.
+ví dụ dùng skill này, natural Action sau dùng skill 1 thì hệ số sát thương wil và atk của skill 1 tăng 40%, 210% wil và 168% atk lên mỗi target, chưa kể nếu nội tại kích hoạt thì sau đó mỗi target nhận thêm 30% Actual HP Damage của skill 1 dưới dạng sát thương chuẩn và sát thương cao như thế thì DEATH_CONFIRMED không khó, tối đa giảm được 20 ae cost skill 1, điểm cân bằng là kích hoạt skill 2 cần 1 turn, animation sẽ là vận sức.
 
-skill 3: tự kích hoạt khi hp dưới hoặc = 15% max hp và có tối thiểu 40 rage, cost: max rage +20, rage hiện có -20.
+Skill 3 — Event Horizon Aegis
+Hộ Thuẫn Chân Trời Sự Kiện: tự kích hoạt khi hp dưới hoặc = 15% max hp và có tối thiểu 40 rage, cost: max rage +20, rage hiện có -20.
 nhận 1 lớp khiên = 45% max hp của bản thân trong 3 natural Action, sau khi skill này kích hoạt thì sau 3 natural Action khiên sẽ biến mất, ưu tiên tiêu hao khiên từ skill này, nếu trên người có khiên thuộc nguồn ngoài bản thân và khiên đó có mô tả ưu tiên tiêu hao khiên từ chính nguồn đó thì vẫn sẽ ưu tiên tiêu hao khiên từ skill này, khi khiên mất tự hồi hp = 25% max hp. kích hoạt tối đa 2 lần trong trận đấu.
 một skill tự cứu, rage khi kích hoạt được skill này mà không tăng hay giảm từ bị đánh hoặc hành động là: 20/120, tăng rage max là nerf vì cần đầy rage để ult, max rage càng thấp ult càng nhanh.
 
-utl: cast 1 lần skill 1 nhưng không tốn cost, nếu skill 1 cast qua ult DEATH_CONFIRMED (tính luôn nội tại) target có chân ngã thì max rage giảm 3 vì skill 1 cast qua ult đã không tốn cost, sau đó heal bằng 20% tổng Actual HP damage gây ra, overheal từ ultimate này bị bỏ qua và không thể chuyển sang khiên bằng kit của đồng minh hay kẻ thù nếu có hiệu ứng chuyển overheal sang khiên, phần tổng này không tính sát thương chuẩn từ nội tại. ultimate này vẫn có thể kích hoạt nội tại.
+Ultimate — Grand Orrery: Black-Star Revolution
+Đại Thiên Nghi: Vòng Quay Hắc Tinh:
+cast 1 lần skill 1 nhưng không tốn cost, nếu skill 1 cast qua ult DEATH_CONFIRMED (tính luôn nội tại) target có chân ngã thì max rage giảm 3 vì skill 1 cast qua ult đã không tốn cost, sau đó heal bằng 20% tổng Actual HP damage gây ra, overheal từ ultimate này bị bỏ qua và không thể chuyển sang khiên bằng kit của đồng minh hay kẻ thù nếu có hiệu ứng chuyển overheal sang khiên, phần tổng này không tính sát thương chuẩn từ nội tại. ultimate này vẫn có thể kích hoạt nội tại.
 
 14) Echo Reverie
 
@@ -129,8 +143,9 @@ Nguồn: Echo trong thần thoại Narcissus.
 Trong phiên bản Ovid, Echo bị tước khả năng chủ động trong lời nói và chỉ có thể lặp lại những từ cuối mà người khác nói.
 Signature:
 repeat the last action / last word / last effect.
-
-nội tại: khi kẻ thù gây sát thương lên bản thân và bản thân gây sát thương lên kẻ thù, lặp lại 50% sát thương đó dưới dạng sát thương chuẩn, chỉ mỗi sát thương chuẩn mà không có hiệu ứng kèm theo, sát thương từ nội tại này được tính là của nhân vật này, không tính là 1 natural Action, ví dụ: hắn là A bị dính aoe của kẻ thù là B, nhận 10 sát thương và dot mỗi natural Action của A là 2% max hp trong 3 turn boundary của A thì A sẽ nhận thêm sát thương chuẩn là 5 nhưng không kèm theo hiệu ứng hay stack gì của B, coi như A tự đánh A, sát thương chuẩn này không tính dot, vì tính của A nên B không nhận lợi ích gì từ sát thương chuẩn này, khi A đánh B thì B cũng nhận sát thương chuẩn từ nội tại này.
+Nữ.
+Nội tại — What You Gave, I Return
+Điều Ngươi Trao, Ta Hồi Đáp: khi kẻ thù gây sát thương lên bản thân và bản thân gây sát thương lên kẻ thù, lặp lại 50% sát thương đó dưới dạng sát thương chuẩn, chỉ mỗi sát thương chuẩn mà không có hiệu ứng kèm theo, sát thương từ nội tại này được tính là của nhân vật này, không tính là 1 natural Action, ví dụ: hắn là A bị dính aoe của kẻ thù là B, nhận 10 sát thương và dot mỗi natural Action của A là 2% max hp trong 3 turn boundary của A thì A sẽ nhận thêm sát thương chuẩn là 5 nhưng không kèm theo hiệu ứng hay stack gì của B, coi như A tự đánh A, sát thương chuẩn này không tính dot, vì tính của A nên B không nhận lợi ích gì từ sát thương chuẩn này, khi A đánh B thì B cũng nhận sát thương chuẩn từ nội tại này.
 khi nhận Actual HP damage là đánh thường thì hắn chỉ được đánh thường trong 1 natural Action tiếp theo, nếu trong 1 turn boundary của hắn: nhận quá nhiều đánh thường/skill/ult Actual HP damage thì ở lần nhận sát thương mới nhất trong turn boundary đó là loại nào thì khi hết turn boundary và đến natural Action hắn chỉ được dùng cách thức gây sát thương đó, ví dụ trong turn boundary hắn nhận đánh thường > ult > skill > nội tại gây sát thương từ kẻ thù và đến natural Action của hắn thì hắn chỉ dược dùng skill (nội tại bỏ qua, dot các kiểu cũng bỏ qua), vẫn tuân theo ssi mà không phải chắc chắn target kẻ đánh mình, tóm lại dùng skill hay đánh thường hoặc ultimate đều có hạn chế, nếu hắn đầy nộ mà trong turn boundary ở lần nhận sát thương cuối không phải ultimate thì natural Action tiếp theo hắn vẫn không thể ult. các char khác trừ phi bị kit giới hạn không thì đến natural Action của mình mà rage vẫn đầy không bị giảm thì sẽ auto cast ult nhưng char này thì khác, kit của hắn là giới hạn.
 
 hắn không nhận khiên thuộc nguồn dưới quy tắc, chỉ nhận khiên từ kit có tag quy tắc, khiên từ nguồn ngoài và khiên từ skill 1 tính độc lập với nhau, mỗi loại cap 100% max hp, ưu tiên tiêu hao khiên từ nguồn ngoài bản thân trước.
@@ -142,18 +157,24 @@ nếu hắn nhận sát thương từ đánh thường nhưng kit kẻ thù có 
 
 ngẫm lại thì char này rất mạnh, nếu aoe nhiều + thêm sát thương chuẩn từ nội tại nữa thì chẳng phải quá mạnh, tự hạn chế là hợp lý.
 
-skill 1: mỗi natural Action tổng 45% nội tại gây sát thương lên enemy sẽ được chuyển thành hp và khiên với tỉ lệ 1:1/50% của 45% đó, dễ hiểu là mỗi natural Action gây sát thương chuẩn từ nội tại lên target bao nhiêu thì 22,5% tổng sát thương đó sẽ được chuyển thành khiên, 22,5% cũng chuyển thành hp, overheal và khiên vượt 100% max hp bị bỏ qua, mỗi natural Action - cost là 10 ae nên cần nhiều hơn 1 support trong team để duy trì skill này, nếu ae không đủ skill sẽ không kích hoạt tiếp, hp hồi và kiên từ skill này sẽ không mất, khiên không cap time tồn tại. skill dạng bị động, tự kích hoạt không cần natural Action.
+Skill 1 — Solace in the Refrain
+An Ủi Trong Điệp Khúc: mỗi natural Action tổng 45% nội tại gây sát thương lên enemy sẽ được chuyển thành hp và khiên với tỉ lệ 1:1/50% của 45% đó, dễ hiểu là mỗi natural Action gây sát thương chuẩn từ nội tại lên target bao nhiêu thì 22,5% tổng sát thương đó sẽ được chuyển thành khiên, 22,5% cũng chuyển thành hp, overheal và khiên vượt 100% max hp bị bỏ qua, mỗi natural Action - cost là 10 ae nên cần nhiều hơn 1 support trong team để duy trì skill này, nếu ae không đủ skill sẽ không kích hoạt tiếp, hp hồi và kiên từ skill này sẽ không mất, khiên không cap time tồn tại. skill dạng bị động, tự kích hoạt không cần natural Action.
 
 char này cần được thiết kế để ngốn ae, hắn dps cao nhưng giấy và ngốn tài nguyên, giấy thì cần team bảo vệ, ngốn tài nguyên làm đồng minh khác tần xuất sài skill thấp hơn, cũng khó bảo vệ hắn hơn.
 nerf mạnh tay trước mới buff mạnh tay được.
 
-skill 2: gây aoe toàn sân, mỗi kẻ nhận sát thương = 175% wil và 145% atk + 15% tổng khiên hiện có của nhân vật này, cost 30 ae.
+Skill 2 — Choir of Reverberations
+Hợp Xướng Dư Âm: gây aoe toàn sân, mỗi kẻ nhận sát thương = 175% wil và 145% atk + 15% tổng khiên hiện có của nhân vật này, cost 30 ae.
 skill tương tác với khiên > nội tại nổ > skill 1 tạo khiên > tăng sát thương skill 2.
 hơn nữa vì còn có thể nhận khiên từ nguồn ngoài nên sát thương có thể cao hơn nữa.
 
-skill 3: khi death confrim 1 target có chân ngã = natural Action (nội tại không phải natural Action) 50% khiên hiện có từ mọi nguồn sẽ biến mất và chuyển thành max hp với tỉ lệ 1:1, phần max hp tăng thêm sẽ không tự hồi, 1 natural Action death confrim bao nhiêu target cũng không quan trọng vì skill này chỉ chuyển 1 lần/natural Action, kích hoạt tối đa 10 lần/trận, mỗi lần tự kích hoạt không cần natural Action cần -30 ae.
+Skill 3 — The Dead Leave an Echo
+Người Chết Để Lại Dư Âm: khi death confrim 1 target có chân ngã = natural Action (nội tại không phải natural Action) 50% khiên hiện có từ mọi nguồn sẽ biến mất và chuyển thành max hp với tỉ lệ 1:1, phần max hp tăng thêm sẽ không tự hồi, 1 natural Action death confrim bao nhiêu target cũng không quan trọng vì skill này chỉ chuyển 1 lần/natural Action, kích hoạt tối đa 10 lần/trận, mỗi lần tự kích hoạt không cần natural Action cần -30 ae.
 
-ultimate: cast 1 lần skill 2 với 0 cost, 2 natural Action tiếp theo skill 1 sẽ được cast không tốn cost.
+tên skill làm tao muốn viết lore kiểu nàng là trẻ mồ côi, chỉ còn lại echo.
+
+Ultimate — Until Only My Echo Remains
+Cho Đến Khi Chỉ Còn Dư Âm Của Ta: cast 1 lần skill 2 với 0 cost, 2 natural Action tiếp theo skill 1 sẽ được cast không tốn cost.
 
 đánh thường: đứng tại chổ niệm chú gây sát thương = 100% wil/atk lên 1 target.
 
@@ -162,23 +183,28 @@ char này tự action vì nội tại mà không cần leader chọn hắn dùng
 15) Sanguinius
 Tên rất mạnh vì bản thân nó gợi Latin sanguis = blood, rồi cái tên đó được gắn với hình tượng thiên thần, cánh, hy sinh và bi kịch của nhân vật.
 
-trong dự án này thiết lập hắn như 1 thiên sứ bị huyết tộc cấp cao cắn và thành huyết tộc là hợp lý, thiên sứ làm người ta liên tưởng đến ánh sáng nhưng huyết tộc lại sợ mặt trời, hắn bị trục xuất khỏi Thánh Vực ( thần quốc của các thiên sứ cấp thần), hắn phải lòng một vị huyết tộc xinh đẹp, nàng phản bội hắn vì bất đắc dĩ, nói chung là một cái máu chó cố sự yêu hận tình cừu, nói vậy chứ hắn dù sao cũng là thần, dù chỉ là nhỏ yếu thần, hắn sẽ không sợ mặt trời bình thường, Thái Dương Thần thì sợ.
+trong dự án này thiết lập hắn như 1 thiên sứ bị huyết tộc cấp cao cắn và thành huyết tộc là hợp lý, thiên sứ làm người ta liên tưởng đến ánh sáng nhưng huyết tộc lại sợ mặt trời, hắn bị trục xuất khỏi Thánh Vực ( thần quốc của các thiên sứ cấp thần) vì hắn phải lòng một vị huyết tộc xinh đẹp, nàng phản bội hắn vì bất đắc dĩ, nói chung là một cái máu chó cố sự yêu hận tình cừu, nói vậy chứ hắn dù sao cũng là thần, dù chỉ là nhỏ yếu thần, hắn sẽ không sợ mặt trời bình thường, Thái Dương Thần thì sợ.
 
-nội tại: mỗi khi trên sân có kẻ thù thuộc element light có rank prime, mỗi kẻ làm hiệu ứng hồi phục của hắn lên đồng minh giảm 10%, (ở mode turn base thì cap là 9 vì phe địch ta mỗi phe chỉ có 9 ô, đây là cap tự nhiên của mode), mỗi kẻ cũng làm sát thương hắn gây lên chúng giảm 10%. (trừ sát thương chuẩn nếu char này gây sát thương chuẩn)
+Passive — Exile Beneath the Crimson Halo
+Kẻ Lưu Đày Dưới Huyết Quang: mỗi khi trên sân có kẻ thù thuộc element light có rank prime, mỗi kẻ làm hiệu ứng hồi phục của hắn lên đồng minh giảm 10%, (ở mode turn base thì cap là 9 vì phe địch ta mỗi phe chỉ có 9 ô, đây là cap tự nhiên của mode), mỗi kẻ cũng làm sát thương hắn gây lên chúng giảm 10%. (trừ sát thương chuẩn nếu char này gây sát thương chuẩn)
 
 khi vào sân mỗi natural Action thành công hắn tự heal hp = 4% max hp của hắn, nếu trên sân kẻ thù có nhiều hơn hoặc = 3 đơn vị có element tag là light thì phần hồi hp này tạm thời vô hiệu hoá, khôi phục khi kẻ thù có 2 kẻ thù thuộc element light trở xuống.
 
 mỗi lần ultimate xong rage max giảm 3.
 
-skill 1: rút hp = 20% max hp của bản thân (không giảm max hp), gây sát thương = 20% đó (chia đều 20% đó ra thành wil và atk) + 180% wil và 140% atk lên 1 target, sau đó phát nổ, gây sát thương lần nữa = 2% max hp của kẻ thù dưới dạng sát thương chuẩn, 25 ae.
+Skill I — Stigmata of the Forsaken
+Thánh Ngân Kẻ Bị Ruồng Bỏ: rút hp = 20% max hp của bản thân (không giảm max hp), gây sát thương = 20% đó (chia đều 20% đó ra thành wil và atk) + 180% wil và 140% atk lên 1 target, sau đó phát nổ, gây sát thương lần nữa = 2% max hp của kẻ thù dưới dạng sát thương chuẩn, 25 ae.
 
-skill 2: chỉ có thể kích hoạt khi hp trên hoặc = 40% max hp, rút hp = 10% max hp của bản thân + 10% max hp của mọi đồng minh trừ leader trên sân có hp trên hoặc = 60% max hp của họ, sau đó tổng lượng hp rút được sẽ được chuyển toàn bộ cho leader đồng minh, nếu thừa sẽ được chuyển thành khiên tồn tại tối đa 2 natural Action của nhân vật này, cap time tồn tại của khiên khiên bắt đầu tính khi đến natural Action tiếp theo sau khi dùng skill này, 20 ae. skill này không làm giảm max hp.
+Skill II — Sanguine Communion
+Huyết Lễ Hiệp Thông: chỉ có thể kích hoạt khi hp trên hoặc = 40% max hp, rút hp = 10% max hp của bản thân + 10% max hp của mọi đồng minh trừ leader trên sân có hp trên hoặc = 60% max hp của họ, sau đó tổng lượng hp rút được sẽ được chuyển toàn bộ cho leader đồng minh, nếu thừa sẽ được chuyển thành khiên tồn tại tối đa 2 natural Action của nhân vật này, cap time tồn tại của khiên khiên bắt đầu tính khi đến natural Action tiếp theo sau khi dùng skill này, 20 ae. skill này không làm giảm max hp.
 khiên từ skill này không thể vượt 100% max hp của leader.
 việc mất hp vì đồng minh của đồng minh cùng phe với nhân vật này tính thế nào? hp cost của bản thân kẻ bị rút?.
 
-skill 3: mỗi natural Action, bản thân hắn tự heal = 8% max hp, cost = 10 ae/natural Action, đây là skill bị động, tao có thể thêm nó vào nội tại nhưng không làm thế vì cost chính là một loại nerf, nếu char này dùng skill 1 hoặc 2 thì heal từ skill 3 trước rồi mới rút máu nếu hắn có hp dưới hoặc= 30% max hp, nếu hắn có hp trên 75% thì thanh toán cost skill 1 và 2 trước mới heal từ skill 3, nếu không đủ cost thì skill này không kích hoạt, nếu hắn dưới 30% max hp và team chỉ có 20 ae và player cho hắn dùng skill 2 thì sao? là skill 3 đi trước, sau đó không đủ ae để làm cost skill 2 nên sẽ fall back về đánh thường, nhưng nếu hắn có hp trên 75% và còn 20 ae thì skill 2 được kích hoạt trước và skill 3 không kích hoạt vì không đủ ae, nhưng nếu hắn có hp từ 30% đến 75% và team chỉ có 20 ae và hắn muốn kích hoạt skill 2 thì sao?.
+Skill III — Scarlet Absolution
+Huyết Sắc Xá Tội: mỗi natural Action, bản thân hắn tự heal = 8% max hp, cost = 10 ae/natural Action, đây là skill bị động, tao có thể thêm nó vào nội tại nhưng không làm thế vì cost chính là một loại nerf, nếu char này dùng skill 1 hoặc 2 thì heal từ skill 3 trước rồi mới rút máu nếu hắn có hp dưới hoặc= 30% max hp, nếu hắn có hp trên 75% thì thanh toán cost skill 1 và 2 trước mới heal từ skill 3, nếu không đủ cost thì skill này không kích hoạt, nếu hắn dưới 30% max hp và team chỉ có 20 ae và player cho hắn dùng skill 2 thì sao? là skill 3 đi trước, sau đó không đủ ae để làm cost skill 2 nên sẽ fall back về đánh thường, nhưng nếu hắn có hp trên 75% và còn 20 ae thì skill 2 được kích hoạt trước và skill 3 không kích hoạt vì không đủ ae, nhưng nếu hắn có hp từ 30% đến 75% và team chỉ có 20 ae và hắn muốn kích hoạt skill 2 thì sao?.
 
-ultimate: rút ra hp = 25% max hp, tạo 1 chi huyết tiễn tấn công leader kẻ thù, gây sát thương = lượng hp rút ra dưới dạng sát thương chuẩn lên leader kẻ thù bất kể vị trí nhân vật này đứng ở đâu, khi huyết tiễn bắt đầu bay hắn cũng cầm quang kiếm lao về phía trước (vfx), chém dọc gây sát thương lên hàng 2/5/8, mỗi kẻ nhận 170% wil và atk của nhân vật này, trong mắt player thấy tự dưng có hắn mất hp, có huyết tiễn bay về leader địch và hắn chém dọc cùng lúc luôn.
+Ultimate — When Blood Eclipses Heaven
+Khi Máu Che Khuất Thiên Đường: rút ra hp = 25% max hp, tạo 1 chi huyết tiễn tấn công leader kẻ thù, gây sát thương = lượng hp rút ra dưới dạng sát thương chuẩn lên leader kẻ thù bất kể vị trí nhân vật này đứng ở đâu, khi huyết tiễn bắt đầu bay hắn cũng cầm quang kiếm lao về phía trước (vfx), chém dọc gây sát thương lên hàng 2/5/8, mỗi kẻ nhận 170% wil và atk của nhân vật này, trong mắt player thấy tự dưng có hắn mất hp, có huyết tiễn bay về leader địch và hắn chém dọc cùng lúc luôn.
 nếu ultimate lúc rút hp không đủ 25% thì hắn rút toàn bộ và chỉ chừa lại hp = 2% max hp của mình, toàn bộ hp rút được vẫn gây sát thương tương ứng.
 
 16) Khandira
@@ -212,21 +238,25 @@ hắn vẫn sẽ mạnh nhưng tròn 1 trận đấu max rage = 0 và ultimate l
 Raw kit, bản canon ở docs/canon kit/Ariadne_Velora_Clarified_Gameplay_Canon.md.
 bản raw kit này vẫn có giá trị, giá trị ở chênh lệch giữa raw và canon.
 
-nội tại: khi ra sân sẽ đánh dấu vị trí nàng đứng trong 3 natural Action, bộ đếm bắt đầu đếm ở natural Action tiếp sau sau khi đánh dấu, sau 3 natural Action đó đánh dấu vị trí sẽ biến mất và đánh dấu lần nữa ở vị trí nàng đang đứng và bắt đầu di chuyển, trước natural Action tiếp theo sẽ lùi lại 1 bước sau đó mới bắt đầu natural Action, nếu không thể lùi thì sang phải hoặc trái, nếu đều không thể thì dịch chuyển đến vị trí ngẫu nhiên còn trống trên sân đồng minh, nếu đầy sân thì đứng tại chỗ và không đi đâu, nàng chỉ có thể di chuyển khi đã đánh dấu và đứng trên vị trí đã đánh dấu, mode chess/monopoly/turn base đều có ô, hiện tập trung vào turn base.
+Nội tại —  The Way Left Behind
+Lối Đi Để Lại: khi ra sân sẽ đánh dấu vị trí nàng đứng trong 3 natural Action, bộ đếm bắt đầu đếm ở natural Action tiếp sau sau khi đánh dấu, sau 3 natural Action đó đánh dấu vị trí sẽ biến mất và đánh dấu lần nữa ở vị trí nàng đang đứng và bắt đầu di chuyển, trước natural Action tiếp theo sẽ lùi lại 1 bước sau đó mới bắt đầu natural Action, nếu không thể lùi thì sang phải hoặc trái, nếu đều không thể thì dịch chuyển đến vị trí ngẫu nhiên còn trống trên sân đồng minh, nếu đầy sân thì đứng tại chỗ và không đi đâu, nàng chỉ có thể di chuyển khi đã đánh dấu và đứng trên vị trí đã đánh dấu, mode chess/monopoly/turn base đều có ô, hiện tập trung vào turn base.
 kỳ vọng là nàng ra sân, đánh dấu ngay, trước natural Action tiếp theo thì di chuyển sau đó thực thi natural Action rồi đứng im đó vì nàng không thể đổi vị trí bằng nội tại được vì nàng không đứng trên ô đánh dấu, khi đánh dấu ở vị trí cũ mất, nàng đánh dấu ngay ở ô hiện tại và lại di chuyển ngay trước natural Action tiếp theo. có lẽ cap time tồn tại đánh dấu 3 natural Action turn là hơi dài, sẽ thay đổi sau test, nếu nàng là leader khi bị đưa vào đấu thú trường thì nàng vẫn có thể đánh dấu và di chuyển.
 
-skill 1: mỗi khi di chuyển vị trí (bằng nội tại hoặc kit khác, có thể là không gian chi chủ của kẻ thù), heal cho leader = 100% wil/atk + 10% max hp của bản thân, overheal nếu có sẽ được chuyển toàn bộ thành khiên cho nàng, mỗi lần tự kích hoạt không tốn natural Action sẽ -15 ae.
+Skill 1 — Grace Upon Departure, Ân Sủng Khi Rời Bước: mỗi khi di chuyển vị trí (bằng nội tại hoặc kit khác, có thể là không gian chi chủ của kẻ thù), heal cho leader = 100% wil/atk + 10% max hp của bản thân, overheal nếu có sẽ được chuyển toàn bộ thành khiên cho nàng, mỗi lần tự kích hoạt không tốn natural Action sẽ -15 ae.
 
-skill 2: mỗi khi đồng minh (chỉ đồng minh, ví dụ như ultimate của nàng, bản thân nàg đổi vị trí cũng không tính, ví dụ như nội tại) đổi vị trí (nhờ bản thân nàng hoặc kit của đồng minh lẫn kẻ thù) thì nhân vật này được tăng 5% max hp tính theo lúc kích hoạt, mỗi turn boundary kích hoạt tối đa 5 lần, nếu đồng minh bị đổi vị trí hơn 1 char trong 1 lần thì vẫn chỉ tăng 5% max hp, mỗi lần tự kích hoạt -10 ae.
+Skill 2 — Labyrinth Without Walls, Mê Cung Vô Tường: mỗi khi đồng minh (chỉ đồng minh, ví dụ như ultimate của nàng, bản thân nàg đổi vị trí cũng không tính, ví dụ như nội tại) đổi vị trí (nhờ bản thân nàng hoặc kit của đồng minh lẫn kẻ thù) thì nhân vật này được tăng 5% max hp tính theo lúc kích hoạt, mỗi turn boundary kích hoạt tối đa 5 lần, nếu đồng minh bị đổi vị trí hơn 1 char trong 1 lần thì vẫn chỉ tăng 5% max hp, mỗi lần tự kích hoạt -10 ae.
 
 khá hợp nếu phe địch có không gian chi chủ, hắn dùng skill sẽ thay đổi vị trí đồng minh của nàng và nàng sẽ hưởng lợi từ skill 2, đây cũng coi là khắc chế.
 
-skill 3: gây sát thương aoe ngẫu nhiên lên 3 mục tiêu kẻ thù trên sân, mỗi kẻ nhận 150% wil/atk của nàng, skill này tất trúng, nếu target có kit kiểu đổi vị trí khi dính sát thương thì vẫn trúng, 20 ae.
+Skill 3 — No One Escapes the Maze, Không Ai Thoát Khỏi Mê Cung: gây sát thương aoe ngẫu nhiên lên 3 mục tiêu kẻ thù trên sân, mỗi kẻ nhận 150% wil/atk của nàng, skill này tất trúng, nếu target có kit kiểu đổi vị trí khi dính sát thương thì vẫn trúng, 20 ae.
 
-ultimate: chuyển 1 đồng minh vào vị trí đã đánh dấu bằng nội tại, thứ tự ưu tiên là trái> phải > trước> sau, không thể target leader, nếu chỉ có thể chọn leader thì nàng sẽ không chuyển, chuyển sang gây sát thương lên 2 kẻ địch ngẫu nhiên, mỗi kẻ nhận 195% wil và atk.
+Ultimate — Crown of the Homeward Path, Vương Miện Quy Lộ: chuyển 1 đồng minh vào vị trí đã đánh dấu bằng nội tại, thứ tự ưu tiên là trái> phải > trước> sau, không thể target leader, nếu chỉ có thể chọn leader thì nàng sẽ không chuyển, chuyển sang gây sát thương lên 2 kẻ địch ngẫu nhiên, mỗi kẻ nhận 195% wil và atk.
 nếu nàng ra sân thì quy trình là: đánh dấu > di chuyển > dùng ultimate (vì ra sân sẽ tự đầy rage và dùng ult), quá trình này sẽ rất nhanh, nhân vật này ra sân đầu tiên sẽ phế, đầy sân cũng phế cái nội tại.
 ví dụ nàng ra sân ở ô 2, ô 5 không ai, nàng lùi sang ô 5 và ultimate, nàng chuyển vị trí của đồng minh theo thứ tự ultimate đã mô tả, nếu ra sân đầu tiên thì chỉ có nàng và leader đứng sau lưng nàng ở ô 8 nên nàng sẽ gây sát thương theo mô tả của ult, nếu lúc đó ô 4/6 đều có người thì nàng sẽ chuyển char ở ô 4 sang ô đã đánh dấu là ô 2 vì tuân theo mô tả ult.
 vấn đề là khi chuyển 1 char đồng minh sang ô đánh dấu thì đánh dấu có mất không? cap 3 natural Action quá dài, tao nghĩ giảm là hợp lý, cap vẫn là 3, nhưng khi có 1 đồng minh không phải nàng đứng trên ô đã đánh dấu (không quan trọng họ đứng đó có phải do nàng hay không) thì cap sẽ giảm 1, thực tế là nàng ultimate xong nếu không ai đứng ô đánh dấu thì đến cuối natural Action tiếp theo của nàng cap time của đánh dấu mới giảm 1, nếu có đồng minh đứng lên đánh dấu thì giảm là 2, vậy đi cho dễ hiểu.
+
+mở thêm motif vương miện của Ariadne. Trong thần thoại, Ariadne còn gắn với chiếc vương miện được đưa lên trời thành chòm Corona Borealis. Homeward Path lại rất đúng Ultimate: nàng tìm một đồng minh và đưa họ về điểm đã đánh dấu. Nếu không có ai để đưa về, quyền năng chuyển thành nhánh Damage.
+Về VFX, Ultimate có thể làm rất đẹp: một vương miện sao xuất hiện trên đầu Ariadne, Mark sáng lên như một “điểm về”, rồi một đường hình học của mê cung nối ally tới destination. Nếu movement branch thất bại, các ngôi sao trên crown tách ra và khóa hai enemy cho damage fallback.
 
 19) Orphea Bellurne
 Nguồn: Orpheus.
@@ -280,32 +310,38 @@ skill 1: nàng cast 1 skill gây damage của đồng minh, nàng lấy mô tả
 
 25) Vermillion
 
-nội tại: mỗi turn boundary mất hp = 3% max hp, nhận 1 stack "hoả tước", khi dùng skill và ultimate hoả tước bị tiêu hao, mỗi stack bị tiêu hao skill/ult gây ra sát thương có 10% là sát thương chuẩn, mỗi stack tiêu hao cũng tăng vĩnh viễn (trong trận, không reset khi được revive) 3% wil và 3% atk bản thân hiện có ở lúc tiêu hao stack, không giới hạn chỉ số nhận được từ nội tại, nếu hp dưới hoặc = 15% trong turn boundary thì không nhận stack hoả tước.
+Passive — Cinnabar Ascension
+Đan Sa Thăng Hoa: mỗi turn boundary mất hp = 3% max hp, nhận 1 stack "hoả tước", khi dùng skill và ultimate hoả tước bị tiêu hao, mỗi stack bị tiêu hao skill/ult gây ra sát thương có 10% là sát thương chuẩn, mỗi stack tiêu hao cũng tăng vĩnh viễn (trong trận, không reset khi được revive) 3% wil và 3% atk bản thân hiện có ở lúc tiêu hao stack, không giới hạn chỉ số nhận được từ nội tại, nếu hp dưới hoặc = 15% trong turn boundary thì không nhận stack hoả tước.
 ví dụ nếu có 2 stack > sài skill 1 > gây sát thương = 120% wil/atk và 30% wil/atk là sát thương chuẩn.
 
-skill 1: chưởng ra 3 hoả cầu gây sát thương lên 3 target ngẫu nhiên, mỗi target nhận sát thương = 150% wil và 150% atk, 20 ae.
+Skill 1 — Three Embers Across Heaven
+Tam Diễm Hoành Thiên: chưởng ra 3 hoả cầu gây sát thương lên 3 target ngẫu nhiên, mỗi target nhận sát thương = 150% wil và 150% atk, 20 ae.
 
-skill 2: nếu Vermillion có hp hơn hoặc = 80% max hp, lượng stack nhận ở turn boundary từ nội tại tăng gấp đôi, tự kích hoạt khi đạt điều kiện, mỗi turn boundary tiêu hao 7 ae.
+Skill 2 — The Furnace Burns Brighter
+Lò Luyện Càng Cháy Càng Rực: nếu Vermillion có hp hơn hoặc = 80% max hp, lượng stack nhận ở turn boundary từ nội tại tăng gấp đôi, tự kích hoạt khi đạt điều kiện, mỗi turn boundary tiêu hao 7 ae.
 
-skill 3: đứng tại chỗ triệu hồi 1 chu tước hư ảnh sau lưng (vfx), Vermillion phun lửa gây sát thương ô 1/4/7, 2/5/8 hoặc 3/6/9 tuy vị trí đứng, theo ssi, kẻ đầu tiên nhận sát thương = 160% wil/atk của Vermillion, nhận debuff "thiêu đốt" trong 2 natural Action của kẻ đó, kẻ sau lưng kẻ nhận sát thương đầu tiên nhận sát thương = 125% wil/atk của Vermillion và nhận 1 debuff thiêu đốt, kẻ cuối cùng nhận sát thương = 50% wil/atk của Vermillion, không nhận debuff thiêu đốt.
+Skill 3 — Edict of the Vermilion Bird
+Chu Tước Pháp Chỉ: đứng tại chỗ triệu hồi 1 chu tước hư ảnh sau lưng (vfx), Vermillion phun lửa gây sát thương ô 1/4/7, 2/5/8 hoặc 3/6/9 tuy vị trí đứng, theo ssi, kẻ đầu tiên nhận sát thương = 160% wil/atk của Vermillion, nhận debuff "thiêu đốt" trong 2 natural Action của kẻ đó, kẻ sau lưng kẻ nhận sát thương đầu tiên nhận sát thương = 125% wil/atk của Vermillion và nhận 1 debuff thiêu đốt, kẻ cuối cùng nhận sát thương = 50% wil/atk của Vermillion, không nhận debuff thiêu đốt.
 nếu gây sát thương được 3 ô mà chỉ có 2 kẻ trúng thì kẻ đầu nhận 160%, kẻ sau nhận 125%, không có kẻ thứ 3, dễ hiểu thôi, với mỗi kẻ nhận sát thương từ skill này cost -12 ae.
 tình huống có 1 hoặc 2 kẻ thù là lời cost nhất, stack nội tại là buff cả skill trong 1 natural Action chứ không phải buff đơn lẻ trên mỗi lần gây sát thương, nên kẻ nhận sát thương đầu tiên, thứ 2 lẫn 3 đều sẽ nhận sát thương chuẩn tương ứng stack "hoả tước" tiêu hao, skill 1 cũng thế.
 debuff thiêu đốt của Vermillion: cấp pháp tắc, mỗi natural Action của kẻ dính debuff này nhận sát thương chuẩn = 3% max hp của chúng, hiệu ứng xoá debuff dưới cấp pháp tắc không thể xoá debuff này, hiệu ứng xoá cấp pháp tắc cần phán định.
 kỳ thực tao muốn game chỉ có 1 vài tag dot, độc/cháy máu/cháy hay thiêu đốt bản chất đều là dot, chỉ khác ở mặt hiển thị thôi.
 
-ultimate: cast skill 3 không tốn cost, lần này chu tước hư ảnh cũng phun lửa, sát thương của skill 3 cast bởi ultimate này hiệu ứng chuyển sát thương chuẩn của hoả tước từ nội tại tăng từ 10% lên 20%/stack, hệ số sát thương tăng từ 160%/125%/50% lên 200%/145%/60%, vậy nếu có 3 kẻ địch đều trúng, chúng nhận 200% atk/wil cùng 20% sát thương chuẩn mỗi stack hoả tước tiêu hao, tạm bỏ qua phần kẻ trúng thứ 2 và 3 cho dễ ví dụ, hệ số gây sát thương vẫn là 200% nha, không phải nhận sát thương là 200% wil và 200% atk của nhân vật này rồi nhận thêm 1 đợt sát thương chuẩn mà là mix sát thương wil/atk lẫn sát thương chuẩn, nếu tiêu hao 1 stack hoả tước khi dùng ult cast skill 3 thì kẻ đầu tiên dính nhận 160% wil + 160% atk (không sát thương chuẩn) + 40% wil và 40% atk của Vermillion dưới dạng sát thương chuẩn
+Ultimate — Nine Heavens, One Scarlet Sun
+Cửu Thiên Nhất Xích Nhật: cast skill 3 không tốn cost, lần này chu tước hư ảnh cũng phun lửa, sát thương của skill 3 cast bởi ultimate này hiệu ứng chuyển sát thương chuẩn của hoả tước từ nội tại tăng từ 10% lên 20%/stack, hệ số sát thương tăng từ 160%/125%/50% lên 200%/145%/60%, vậy nếu có 3 kẻ địch đều trúng, chúng nhận 200% atk/wil cùng 20% sát thương chuẩn mỗi stack hoả tước tiêu hao, tạm bỏ qua phần kẻ trúng thứ 2 và 3 cho dễ ví dụ, hệ số gây sát thương vẫn là 200% nha, không phải nhận sát thương là 200% wil và 200% atk của nhân vật này rồi nhận thêm 1 đợt sát thương chuẩn mà là mix sát thương wil/atk lẫn sát thương chuẩn, nếu tiêu hao 1 stack hoả tước khi dùng ult cast skill 3 thì kẻ đầu tiên dính nhận 160% wil + 160% atk (không sát thương chuẩn) + 40% wil và 40% atk của Vermillion dưới dạng sát thương chuẩn
 vậy hệ số sát thương là 200% nhưng 20% của 200% đó là 40% wil và atk bỏ qua res và arm thôi vì là sát thương chuẩn.
 
 26) Pygmalion
 
-nội tại: khi ra sân tạo 1 con rối, nó có rank bằng rank của nhân vật này, rage max là 100, rage = 0, mọi chỉ số được rank multi scale sẽ = 80% của nhân vật này, mọi chỉ số không được rank multi scale sẽ = 0, tu vi của con rối cũng = nhân vật này, con rối sẽ hành động theo ssi và chỉ đánh thường, ultimate cũng sẽ tiêu hao rage nhưng nó chỉ đánh thường mà không tăng bất kỳ sát thương nào.
+Passive — A Masterpiece Awaiting a Soul
+Kiệt Tác Chờ Một Linh Hồn: khi ra sân tạo 1 con rối, nó có rank bằng rank của nhân vật này, rage max là 100, rage = 0, mọi chỉ số được rank multi scale sẽ = 80% của nhân vật này, mọi chỉ số không được rank multi scale sẽ = 0, tu vi của con rối cũng = nhân vật này, con rối sẽ hành động theo ssi và chỉ đánh thường, ultimate cũng sẽ tiêu hao rage nhưng nó chỉ đánh thường mà không tăng bất kỳ sát thương nào.
 đánh thường của con rối: gây sát thương= 100% wil/atk của bản thân tức = 80% của Pygmalion.
 
 khi một chân ngã rời hàng chờ và vào luân hồi, chân ngã đó đầu thai vào con rối của Pygmalion, chân ngã không phân phe địch ta, con rối sẽ có kit của một nhân vật ngẫu nhiên có rank = rank của con rối trong roster, lúc đó nó hoàn toàn có kit của nhân vật đó, không thể đầu thai thành nhân vật đã có trong trận đấu (deck lẫn trên sân và chân ngã đang ở hàng chờ luân hồi), nhưng có thể đầu thai thành 1 nhân vật đã vào luân hồi trong sân nhưng không thể đầu thai thành đời trước của bản thân, tóm lại chỉ là thay đổi kit khi có chân ngã đầu thai vào, không có tăng chỉ số, ngoại hình con rối giữ nguyên, hành động khi dùng skill/ult/đánh thường/nội tại tuân theo hành động mà nhân vật nó có kit sẽ làm khi dùng skill/đánh thường/ultimate/kích hoạt nội tại nếu có, hiệu ứng và giọng nói cũng thế, chỉ có không đổi ngoại hình thôi.
 đầu thai vào con rối > ra kit random (pool có hạn chế) > thừa hưởng toàn bộ kit/voice/animation, hiệu ứng khi action, chỉ là ngoại hình không thay đổi và chỉ số theo Pygmalion, hơn nữa chỉ số của con rối đầu tiên snapshot theo Pygmalion lúc đầu trận, nêú chỉ số của Pygmalion biến động thì chỉ số của con rối cũng sẽ không thay đổi theo, con rối không bị ảnh hưởng bởi DEATH_CONFIRMED của Pygmalion bất kể con rối có được chân ngã đầu thai vào hay không.
 nếu con rối DEATH_CONFIRMED mà không có chân ngã: biến mất, Pygmalion không thể tạo con rối khác trừ phi bước vào chu kỳ sống mới qua revive, nếu con rối đã có chân ngã thì con rối biến mất, chân ngã vào hàng chờ luân hồi như bình thường và có thể đầu thai vào con rối lần nữa nếu không bị luân hồi chi chủ ảnh hưởng, Pygmalion vẫn cần bắt đầu 1 chu kỳ sống khác để tạo con rối.
 con rối nếu đã có chân ngã thì được revive nêú chân ngã của con rối đó đang ở hàng chờ.
-kit của con rối có chân ngã có thể tự revive bản thân vì con rối đã thừa hưởng toàn bộ kit nhưng con rối vẫn giữ chỉ số của con rối tức lúc snapshot lúc Pygmalion tạo ra con rối đó trừ phi kit của con rối có scale hay mô tả chỉ số sẽ không bị reset sau revive.u
+kit của con rối có chân ngã có thể tự revive bản thân vì con rối đã thừa hưởng toàn bộ kit nhưng con rối vẫn giữ chỉ số của con rối tức lúc snapshot lúc Pygmalion tạo ra con rối đó trừ phi kit của con rối có scale hay mô tả chỉ số sẽ không bị reset sau revive.
 
 nếu Pygmalion chết và được revive thì hắn có thể tạo con rối lần nữa chỉ khi con rối cũ đã có chân ngã đầu thai vào, nếu hắn revive và con rối chưa được chân ngã đầu thai vào thì hắn không tạo con rối mới, sau đó nếu có chân ngã đầu thai vào con rối thì hắn sẽ tạo 1 con rối mới với mô tả như nội tại như snapshot chỉ số hiện tại của Pygmalion lúc tạo con rối.
 nếu trên sân có 2 Pygmalion thì quá trình đầu thai chân ngã thuộc phe nào sẽ đầu thai vào con rối của phe đó.
@@ -315,7 +351,7 @@ Puppet trước khi có Chân Ngã vẫn có Character Definition tối thiểu 
 Nó không nên được xem là “không có kit”.
 
 hắn chỉ có thể tạo 1 con rối mỗi 1 chu kỳ sống, tức hắn vào sân > tạo rối > rối có chân ngã đầu thai vào > hắn không thể tạo con rối mới cho đến khi DEATH_CONFIRMED và được revive > hắn được revive > có thể tạo 1 con rối mới > hắn tạo rối > rối chưa có chân ngã nhưng hắn DEATH_CONFIRMED > hắn chết và revive > không thể tạo rối mới vì rối cũ chưa có ai đầu thai vào > tạo 1 con rối mới khi rối cũ đã có chân ngã vào > hắn không thể tạo rối mới trừ phi hắn chết và được revive lần nữa.
-skill 1: cửa sổ chờ luân hồi giảm 1, cost là --hp = 50% max hp và 25 ae, cửa sổ chờ luân hồi luôn phải hơn hoặc = 1, nếu cửa sổ chờ luân hồi là 1 thì không thể dùng skill này.
+Skill 1 — Chisel Away the Afterlife, Đục Mòn Cõi Luân Hồi: cửa sổ chờ luân hồi giảm 1, cost là --hp = 50% max hp và 25 ae, cửa sổ chờ luân hồi luôn phải hơn hoặc = 1, nếu cửa sổ chờ luân hồi là 1 thì không thể dùng skill này.
 một chân ngã vào luân hồi mà không có kit can thiệp như char này hay luân hồi chi chủ hay kit liên quan đến đầu thai thì chân ngã đó đã biến mất khỏi trận đấu.
 
 Phải:
@@ -331,7 +367,10 @@ pay HP/AE
 
 cost làm Pygmalion chết nhanh hơn, mỗi lần chết làm con rối hắn có thể chế tạo tăng, skill này là con dao 2 lưỡi, hàng chờ giảm xuống làm hắn có thể vào luân hồi luôn mà không kịp được revive, lúc này hắn có thể bị nội tại của Pygmalion kẻ địch bắt đầu thai vào con rối của kẻ địch.
 
-ultimate: Pygmalion và mọi con rối của mình cùng nhau thực thi 1 đánh thường (tuân theo mô tả đánh thường của con rối, thường miêu tả đều là 100% wil và 100% atk của bản thân chúng tức bằng 80% của Pygmalion dù có kế thừa kit do chân ngã đầu thai vào nên cũng không quá quan trọng, nhưng nếu đánh thường thuộc kit có hiệu ứng gì thì cũng sẽ được giữ nguyên). các con rối đánh thường không tính là 1 natural Action, sát thương là con rối gây ra nhưng nguồn damage tính là Pygmalion, sát thương từ các con rối tính là follow up đánh thường của Pygmalion nên con rối không mất natural Action.
+Skill II — Carve the Imperfect — Khắc Gọt Kẻ Bất Toàn: cầm cây đục và búa, gõ búa, đục đẽo 1 kẻ địch và gây sát thương = 130% wil và 150% atk lên target đó, thanh toán cost là 20 ae trước khi gây sát thương, lúc thanh toán cũng tăng 15% arm (kháng vật lý) và 7% res (kháng phép) của bản thân cho đến cuối natural Action tiếp theo, ví dụ: kích hoạt skill 2 bằng 1 natural Action, lúc đó thanh toán cost và tăng res/arm ngay lúc animation tấn công của skill này bắt đầu > tấn công > hết natural Action > turn boundary > natural Action (hết tăng res/arm ngay khi natural Action này kết thúc, trước turn boundary).
+
+Ultimate — At My Gesture, Every Form Moves
+Theo Một Cử Chỉ, Vạn Hình Chuyển Động: Pygmalion và mọi con rối của mình cùng nhau thực thi 1 đánh thường (tuân theo mô tả đánh thường của con rối, thường miêu tả đều là 100% wil và 100% atk của bản thân chúng tức bằng 80% của Pygmalion dù có kế thừa kit do chân ngã đầu thai vào nên cũng không quá quan trọng, nhưng nếu đánh thường thuộc kit có hiệu ứng gì thì cũng sẽ được giữ nguyên). các con rối đánh thường không tính là 1 natural Action, sát thương là con rối gây ra nhưng nguồn damage tính là Pygmalion, sát thương từ các con rối tính là follow up đánh thường của Pygmalion nên con rối không mất natural Action.
 
 Snapshot danh sách Puppet hợp lệ ngay khi Ultimate bắt đầu.
 Sau đó:
@@ -499,13 +538,25 @@ Tên này rất hợp một nhân vật creator, nhưng không đụng trực ti
 
 
 
-41) 
+41) Lamarck
 
-nội tại: char này không có chân ngã, hắn chỉ là một robot do AI điều khiển, hắn không vào luân hồi, không vào hàng chờ luân hồi, trạng thái cuối cùng của hắn là DEATH_CONFIRMED.
+Lamarck không có cơ thể thật. Lamarck là AI. Mỗi model người chơi nhìn thấy chỉ là một thân xác đang được Lamarck vận hành.
+Default
+= heavy mechanical chassis
+
+Male biosynthetic skin
+= chassis
+
+Female biosynthetic skin
+= chassis
+
+Passive — Inheritance Without a Soul
+Di Truyền Không Linh Hồn: char này không có chân ngã, hắn chỉ là một robot do AI điều khiển, hắn không vào luân hồi, không vào hàng chờ luân hồi, trạng thái cuối cùng của hắn là DEATH_CONFIRMED.
 hắn không thể revive từ mọi kit ngoài bản thân vì revive là kéo đồng minh từ hàng chờ luân hồi về hiện thế.
 Quy tắc: mọi kit heal ngoài bản thân kit của hắn đều không có tác dụng lên hắn trừ kit heal của char thuộc rank Prime, hắn không phải là sinh mệnh.
 
-skill 1: tự kích hoạt khi DEATH_CONFIRMED, sau 1 natural Action của hắn, một cột sáng từ trên trời giáng xuống, tàu mẹ gửi cho hắn cơ thể mới, hắn revive tại chỗ với trạng thái mới ra sân ở lần ra sân gần nhất, kích hoạt 3 lần/trận, sau khi revive bởi skill này, trong 3 natural Action và 2 turn boundary tiếp theo hắn không thể nhận rage từ action hay từ nhận sát thương, cost 15 ae.
+Skill 1 — Postmortem Revision
+Hiệu Chỉnh Hậu Tử: tự kích hoạt khi DEATH_CONFIRMED, sau 1 natural Action của hắn, một cột sáng từ trên trời giáng xuống, tàu mẹ gửi cho hắn cơ thể mới, hắn revive tại chỗ với trạng thái mới ra sân ở lần ra sân gần nhất, kích hoạt 3 lần/trận, sau khi revive bởi skill này, trong 3 natural Action và 2 turn boundary tiếp theo hắn không thể nhận rage từ action hay từ nhận sát thương, cost 15 ae.
 nếu không đủ cost, hắn sẽ đợi thêm 1 natural Action của bản thân nữa rồi revive nếu cost đủ, nếu vẫn không đủ, hắn biến mất khỏi trận đấu.
 
 mỗi vòng đời của hắn từ ra sân đến DEATH_CONFIRMED hắn đều sẽ thu thập thông tin chiến trường, gửi về tàu mẹ.
@@ -522,14 +573,18 @@ giảm aoe từ dòng atk và wil đều chỉ tính sát thương từ natural 
 
 tao muốn loại scale này cơ thể tiếp theo sẽ kế thừa.
 
-skill 2: gây sát thương đơn = 155% wil/atk lên 1 target, đồng thời cũng gây sát thương chuẩn = 1% max hp của target, tác dụng với boss không giảm, 20 ae.
+Skill 2 — Invariant Breach
+Xuyên Phá Bất Biến: gây sát thương đơn = 155% wil/atk lên 1 target, đồng thời cũng gây sát thương chuẩn = 1% max hp của target, tác dụng với boss không giảm, 20 ae.
 
-skill 3: tự sửa chữa, khi kích hoạt tự hồi hp cho bản thân ngay lập tức khi đủ điều kiện, skill này không cd, có thể kích hoạt khi ở natural Action lẫn turn boundary, 1 ae/1,5% max hp heal, tối đa tiêu hao 30 ae mỗi lần dùng skill này, hồi bao nhiêu hp thì trừ bấy nhiêu ae, 30 ae không phải lsf cost cứng, skill tự kích hoạt không tốn natural Action khi hp dưới 35% max hp.
+Skill 3 — Closed-Loop Repair
+Tự Sửa Chữa Vòng Kín: tự sửa chữa, khi kích hoạt tự hồi hp cho bản thân ngay lập tức khi đủ điều kiện, skill này không cd, có thể kích hoạt khi ở natural Action lẫn turn boundary, 1 ae/1,5% max hp heal, tối đa tiêu hao 30 ae mỗi lần dùng skill này, hồi bao nhiêu hp thì trừ bấy nhiêu ae, 30 ae không phải lsf cost cứng, skill tự kích hoạt không tốn natural Action khi hp dưới 35% max hp.
 đây là một skill khá đốt ae nếu hắn cứ hp thấp mãi.
 
-ultimate: liên lạc với tàu mẹ, một tia death ray bắn từ trên trời xuống gây sát thương = 175% wil và atk của char này lên mỗi target trúng đòn, đây là aoe nhưng không tính là aoe ngẫu nhiên nên kit kiểu di chuyển vị trí khi dính sát thương aoe sẽ không có tác dụng, kit kiểu dính sát thương đơn di chuyển vị trí cũng không kích hoạt khi dính skill này vì đây là aoe cố định toàn sân, chạy đi đâi cũng dính nên không kích hoạt luôn để đỡ tốn tài nguyên, mọi target có rank dưới hoặc = rank nhân vật này nhận thêm follow up ult, sát thương = 10% max hp của char này lúc ultimate dưới dạng sát thương chuẩn.
+Ultimate — Mothership Directive: Artificial Selection
+Chỉ Lệnh Mẫu Hạm: Chọn Lọc Nhân Tạo: liên lạc với tàu mẹ, một tia death ray bắn từ trên trời xuống gây sát thương = 175% wil và atk của char này lên mỗi target trúng đòn, đây là aoe nhưng không tính là aoe ngẫu nhiên nên kit kiểu di chuyển vị trí khi dính sát thương aoe sẽ không có tác dụng, kit kiểu dính sát thương đơn di chuyển vị trí cũng không kích hoạt khi dính skill này vì đây là aoe cố định toàn sân, chạy đi đâi cũng dính nên không kích hoạt luôn để đỡ tốn tài nguyên, mọi target có rank dưới hoặc = rank nhân vật này nhận thêm follow up ult, sát thương = 10% max hp của char này lúc ultimate dưới dạng sát thương chuẩn.
 
-đánh thường: bắn tia laze gây sát thương = 100% wil và atk của bản thân lên 1 target, mỗi lần đánh thường đều có 20% tỉ lệ tăng tỉ lệ sát thương lên 20%, tức từ 100% lên 120% wil và 120% atk.
+Basic — Calibration Shot
+Xạ Kích Hiệu Chuẩn: bắn tia laze gây sát thương = 100% wil và atk của bản thân lên 1 target, mỗi lần đánh thường đều có 20% tỉ lệ tăng tỉ lệ sát thương lên 20%, tức từ 100% lên 120% wil và 120% atk.
 
 một char có khả năng sống tốt, chỉ số tăng theo tình huống chiến trường, khả năng hồi phục mạnh, sát thương ổn và có aoe, đồng dạng hạn chế cũng không ít vì bản chất của bản thân, chưa xác định tên và giới tính, có thể hắn sẽ không có giới tính, bề ngoài là nam hay nữ có da sinh học hoặc 1 robot sắt thép là điều cần thảo luận, nó liên quan đến doanh thu, bề ngoài sắt thép mạnh mẽ sẽ được lòng bộ phận player nam, bề ngoài gợi cảm như cặp sinh đôi như atomic heart hay lucy trong reverse 1999 cũng đồng dạng được lòng player nam, nhưng player nữ có xu hướng đốt tiền cho husbando, skin có bề ngoài của 3 loại sẽ tốt hơn, ví dụ mặc định ở bề ngoài sắt thép như lockdown trong transformer, 1 skin nam có da sinh học, trông mạnh mẽ phong trần cho player nữ, 1 skin có da sinh học và vòng 1 lẫn 3 to dành cho player nam.
 quan trọng là giọng, giọng của hắn bất kể skin nào đều sẽ là máy móc, da sinh học đẹp nhưng giọng máy móc sẽ là signature của hắn, chênh lệch nghe nhìn có lẽ sẽ là cách marketing tốt.
@@ -538,20 +593,25 @@ quan trọng là giọng, giọng của hắn bất kể skin nào đều sẽ l
 
 nội tại: mỗi natural Action, tự heal 8% max hp đổi lại mọi heal cấp quy tắc trở xuống hắn nhận được từ đồng minh class support sẽ giảm 65%, heal cấp quy tắc không bị ảnh hưởng, 
 
-43) 
+43) Alcestis
 
-Nội tại: sát thương nhận từ natural Action của kẻ thù class assassin 100% là sát thương chuẩn (không tính dot, mark hay sát thương từ nội tại của kit assassin nhưng nếu kit là nội tại cường hoá đánh thường thì vẫn tính,..), đổi lại vào trận (vào trận khác vào sân) cost trong deck giảm 5 (nếu về deck hơn 1 lần thì cost vẫn sẽ giảm 5 so với cost gốc, không cộng dồn), mỗi lần ra sân nhận khiên bằng 25% max hp tồn tại trong 3 natural Action của bản thân, khi khiên mất vì vỡ hay đến giới hạn tồn tại, heal = 5% max hp mỗi natural Action trong 3 natural Action.
+Passive — No Farewell Is Final
+Không Lời Từ Biệt Nào Là Cuối Cùng: sát thương nhận từ natural Action của kẻ thù class assassin 100% là sát thương chuẩn (không tính dot, mark hay sát thương từ nội tại của kit assassin nhưng nếu kit là nội tại cường hoá đánh thường thì vẫn tính,..), đổi lại vào trận (vào trận khác vào sân) cost trong deck giảm 5 (nếu về deck hơn 1 lần thì cost vẫn sẽ giảm 5 so với cost gốc, không cộng dồn), mỗi lần ra sân nhận khiên bằng 25% max hp tồn tại trong 3 natural Action của bản thân, khi khiên mất vì vỡ hay đến giới hạn tồn tại, heal = 5% max hp mỗi natural Action trong 3 natural Action.
 
 mỗi lần về deck bằng ultimate cost ở deck bar giảm 1.
 
-skill 1: giảm tỉ lệ chia từ ultimate từ 4 còn 2, tức cost của bản thân/4 thành /2, đổi lại cost sẽ không thể giảm được nữa và khiên khi ra sân từ nội tại cũng sẽ biến mất, vì thế nên phần heal 5% max hp cũng mất luôn, 20 ae, kích hoạt 1 lần/trận, cần natural Action để kích hoạt.
+Skill 1 — No More Bargains
+Không Còn Mặc Cả: giảm tỉ lệ chia từ ultimate từ 4 còn 2, tức cost của bản thân/4 thành /2, đổi lại cost sẽ không thể giảm được nữa và khiên khi ra sân từ nội tại cũng sẽ biến mất, vì thế nên phần heal 5% max hp cũng mất luôn, 20 ae, kích hoạt 1 lần/trận, cần natural Action để kích hoạt.
 
-skill 2: gây aoe random lên 3 target, mỗi kẻ nhận sát thương = 185% wil và atk của nàng, 15 ae.
+Skill 2 — Three Names for the Dead
+Ba Danh Xưng Cho Người Chết: gây aoe random lên 3 target, mỗi kẻ nhận sát thương = 155% wil và atk của nàng, 15 ae.
 
-skill 3: khi hp giảm trên hoặc = 50% max hp của bản thân trong 1 natural Action gây damage lên bản thân nàng của kẻ địch, res và wil của bản thân tăng 70% trong 2 natural Action + 1 turn boundary, khi time đó kết thúc thì tự heal 10% max hp ngay ở đầu turn boundary. ví dụ: kích hoạt skill trong turn boundary hoặc natural Action của bản thân > lập tức tăng res/arm > natural Action, tính là 1 natural Action trong bộ đếm (nếu kích hoạt khi đang ở turn boundary thì khá hời vì vào natural Action mới tính vào bộ đếm) > turn boundary > natural Action > turn boundary (hết tăng res/arm ngay lúc vào, đồng thời heal 10% max hp).
+Skill 3 — Death Must Knock Twice
+Tử Thần Phải Gõ Cửa Hai Lần: khi hp giảm trên hoặc = 50% max hp của bản thân trong 1 natural Action gây damage lên bản thân nàng của kẻ địch, res và wil của bản thân tăng 70% trong 2 natural Action + 1 turn boundary, khi time đó kết thúc thì tự heal 10% max hp ngay ở đầu turn boundary. ví dụ: kích hoạt skill trong turn boundary hoặc natural Action của bản thân > lập tức tăng res/arm > natural Action, tính là 1 natural Action trong bộ đếm (nếu kích hoạt khi đang ở turn boundary thì khá hời vì vào natural Action mới tính vào bộ đếm) > turn boundary > natural Action > turn boundary (hết tăng res/arm ngay lúc vào, đồng thời heal 10% max hp).
 khi bộ đếm này kết thúc thì mới có thể kích hoạt skill 3 lần nữa, không cd, cost 30 ae mỗi lần tự kích hoạt, tối đa kích hoạt 2 lần/trận.
 
-ultimate: heal cho leader bằng 100% wil/atk của bản thân * (cost của bản thân/4), sau đó về lại deck ngay khi heal xong, cost từ cost bar +3. ví dụ cost của nàng khi vào trận lần đầu là 15 (đã giảm 5 từ nội tại) thì (100% wil và 100% atk)* 15/4 = 375% wil và atk của bản thân cho leader đồng minh, lần 2 thì 100% wil/atk * 14/4 =, 350%.
+Ultimate — Stay. I Will Go Instead.
+Hãy Ở Lại. Ta Sẽ Đi Thay: heal cho leader bằng 100% wil/atk của bản thân * (cost của bản thân/4), sau đó về lại deck ngay khi heal xong, cost từ cost bar +3. ví dụ cost của nàng khi vào trận lần đầu là 15 (đã giảm 5 từ nội tại) thì (100% wil và 100% atk)* 15/4 = 375% wil và atk của bản thân cho leader đồng minh, lần 2 thì 100% wil/atk * 14/4 =, 350%.
 over heal được chuyển toàn bộ thành khiên, cap 100% max hp của leader.
 về deck rồi ra sân lại là xoá mọi debuff/buff/mark trên người bất kể chúng thuộc cấp độ nào luôn.
 đồng thời cũng heal cho một đồng minh có chân ngã có hp thấp nhất = 30% tỉ lệ % heal mà leader nhận được, ví dụ ở lần ra sân thứ 3 và cost đã giảm 5 của nàng là 15 thì 13/4 = 325% wil/atk sẽ heal cho leader, đồng minh kia nhận heal = 325/2 % wil và atk nhưng overheal sẽ bị bỏ qua mà không phải chuyển thành khiên, nếu leader không thể nhận heal hoặc heal bị chuyển thành sát thương thì đồng minh kia vẫn nhận heal.
@@ -570,9 +630,10 @@ vậy nên mô tả ultimate có thể rút gọn là gây sát thương = 350% 
 
 45) Oisiny
 
-hình tượng nhắm đến trong đầu tao là con bạc, một người đàn ông luộm thuộm phong trần với mái tóc đen dài hơi rối, ánh mắt kiên nghị xen lẫn láu cá, dẫu vậy tao không muốn hắn là 1 char rng, thực ra con bạc cũng không chính xác, đúng hơn là vay mà thôi, vay trước trả sau.
+một người đàn ông luộm thuộm phong trần với mái tóc đen dài hơi rối, ánh mắt kiên nghị xen lẫn láu cá, dẫu vậy tao không muốn hắn là 1 char rng, thực ra con bạc cũng không chính xác, đúng hơn là vay mà thôi, vay trước trả sau.
 
-nội tại: khi nhân vật này dùng skill của bản thân, cost sẽ không được trả trước mà đến natural Action tiếp theo mới trả, tức hiệu ứng skill vẫn hoạt động như cost natural Action tiếp theo mới trừ, khi đang nợ mà đến natural Action tiếp theo không đủ cost để trả, nhận sát thương chuẩn = cost/2 trên % max hp.
+Passive — The World Keeps the Ledger
+Thiên Địa Ghi Sổ: khi nhân vật này dùng skill của bản thân, cost sẽ không được trả trước mà đến natural Action tiếp theo mới trả, tức hiệu ứng skill vẫn hoạt động như cost natural Action tiếp theo mới trừ, khi đang nợ mà đến natural Action tiếp theo không đủ cost để trả, nhận sát thương chuẩn = cost/2 trên % max hp.
 ví dụ, skill 1 nợ không trả được thì thiếu 15/2 là nhận 7,5% max hp sát thương chuẩn.
 
 khi đã nhận sát thương chuẩn từ nội tại do nợ không trả, char này đã coi là trả nợ và không cần trả hay nhận sát thương chuẩn lần nữa từ 1 khoản nợ.
@@ -587,22 +648,30 @@ khi không trả nợ cost từ nội tại đạt 3 lần, một thanh kiếm s
 theo lore thì aether là năng lượng của thiên địa, thử nghĩ 1 kẻ có thể dùng trước trả sau năng lượng ở đời thực mạnh cỡ nào?.
 thanh kiếm này như một loại thiên khiển dành cho char này, nhưng axiom thiên lôi vẫn có thể tấn công hắn.
 
+The Collector's Blade
+Đòi Nợ Chi Kiếm
+Không phải tên ability riêng, chỉ là tên presentation/lore của hiện tượng.
+
 khi một kẻ nợ nần bị đòi nợ ở nơi làm việc, đồng nghiệp của hắn sẽ bị tác động lây.
 rng duy nhất là thanh kiếm.
 
-skill 1: tấn công 1 target = 105% wil và 200% atk của bản thân, 15 ae.
+Skill 1 — Tomorrow's Advance
+Tạm Ứng Ngày Mai: tấn công 1 target = 105% wil và 200% atk của bản thân, 15 ae.
 
-skill 2: heal cho bản thân và leader mỗi kẻ bằng 100% wil và 100% atk của bản thân, cũng heal cho 1 ally có hp thấp nhất trong sân bằng 50% wil và 50% atk của bản thân, 35 ae.
+Skill 2 — Borrowed Grace
+Ân Điển Vay Mượn: heal cho bản thân và leader mỗi kẻ bằng 110% wil và 110% atk của bản thân, cũng heal cho 1 ally có hp thấp nhất trong sân bằng 55% wil và 55% atk của bản thân, 30 ae.
 hắn vay mượn skill này từ một khế ước không rõ, vì thế cost để dùng hơi đắt một chút.
 nếu hắn dùng skill này mà nợ không trả ở natural Action sau thì vẫn nhận sát thương chuẩn từ nội tại.
 
-skill 3: vay mượn 35% ae hiện có của team địch, đổi lại sau 3 natural Action tiếp theo của bản thân, bắt đầu tính sau khi dùng 1 natural Action để dùng skill này thì phải trả 150% lượng ae mượn được từ team địch, skill này không có cost, đến lúc trả đó là cưỡng chế rút ae, nếu không có thì nhận 150% của 35% đó chia 2 thành sát thương chuẩn từ nội tại.
+Skill 3 — Hostile Credit
+Tín Dụng Cưỡng Đoạt: vay mượn 35% ae hiện có của team địch, đổi lại sau 3 natural Action tiếp theo của bản thân, bắt đầu tính sau khi dùng 1 natural Action để dùng skill này thì phải trả 150% lượng ae mượn được từ team địch, skill này không có cost, đến lúc trả đó là cưỡng chế rút ae, nếu không có thì nhận 150% của 35% đó chia 2 thành sát thương chuẩn từ nội tại.
 
 ví dụ: vay 100 ae đến lúc trả là 150/2 = 75% max hp của hắn dưới dạng sát thương chuẩn, dạng này coi như chết chắc.
 
 skill này dùng rất tốt khi sắp win như leader địch sắp chết hoặc sắp hết thời gian trận đấu.
 
-ultimate: tấn công 1 kẻ địch bằng nấm đấm (animation), gây sát thương = 250% atk + 150% wil của bản thân, sau đó hồi hp = 20% Actual HP damage ult gây ra, nếu DEATH_CONFIRMED target đó, xoá 1 khoản nợ ae lớn nhất của bản thân (vẫn chưa trả hay nhận sát thương chuẩn từ nội tại), nếu DEATH_CONFIRMED target mà không có khoản nợ nào thì không có gì xảy ra thêm.
+Ultimate — A Life Against the Ledger
+Một Mạng Gạch Sổ: tấn công 1 kẻ địch bằng nấm đấm (animation), gây sát thương = 250% atk + 150% wil của bản thân, sau đó hồi hp = 20% Actual HP damage ult gây ra, nếu DEATH_CONFIRMED target đó, xoá 1 khoản nợ ae lớn nhất của bản thân (vẫn chưa trả hay nhận sát thương chuẩn từ nội tại), nếu DEATH_CONFIRMED target mà không có khoản nợ nào thì không có gì xảy ra thêm.
 
 46) Siduri
 
@@ -654,21 +723,26 @@ tự đầu độc · liều nhỏ → kháng độc · thứ từng gây hại 
 
 56) Renchu / Nhận Sơ
 Hoá Thân của Kiếm Chủ, Kiếm Chủ là tiên thiên thần sinh ra từ khái niệm kiếm, Prime.
+class warrior.
 
-nội tại: mọi sát thương natural Action gây ra đều là sát thương chuẩn, heal cho bản thân = 50% lượng sát thương chuẩn gây ra bằng natural Action từ nội tại, nếu over heal, chuyển thành khiên với tỉ lệ 1% lượng sát thương over heal = 1% max hp của nhân vật  này sang 0,5% max hp khiên của nhân vật này, vậy lượng, tức nhân vật này có 100/150 max hp, gây sát thương chuẩn bằng nội tại là 70, 20 là over heal, trong đó 1% max hp của nhân vật này là 1,5, vậy 20 over heal đó mỗi 1,5 over heal thì hắn nhận 1,5/2 là 0,75 khiên.
+Passive — The Sword Precedes All Law
+Kiếm Tiên Ư Vạn Pháp: mọi sát thương natural Action gây ra đều là sát thương chuẩn, heal cho bản thân = 50% lượng sát thương chuẩn gây ra bằng natural Action từ nội tại, nếu over heal, chuyển thành khiên với tỉ lệ 1% lượng sát thương over heal = 1% max hp của nhân vật này sang 0,5% max hp khiên của nhân vật này, tức nhân vật này có 100/150 max hp, gây sát thương chuẩn bằng nội tại là 70, 20 là over heal, trong đó 1% max hp của nhân vật này là 1,5, vậy 20 over heal đó mỗi 1,5 over heal thì hắn nhận 1,5/2 là 0,75 khiên.
 
 Thần tính: không nhận debuff/buff/mark từ mọi nguồn bên ngoài thuộc cấp Quy Tắc và Quy Tắc trở xuống.
 
 đánh thường: gây sát thương chuẩn = 100% wil + 100% atk lên 1 target.
 
-skill 1: đứng tại chỗ loạn trảm ra 4 đạo kiếm khí, gây sát thương chuẩn lên ô 8/2/4/6 của kẻ địch, 15 ae, mỗi kẻ nhận sát thương = 135% wil + 150% atk của nhân vật này.
+Skill 1 — Four Directions, One Edge
+Tứ Phương Nhất Nhận: đứng tại chỗ loạn trảm ra 4 đạo kiếm khí, gây sát thương chuẩn lên ô 8/2/4/6 của kẻ địch, 15 ae, mỗi kẻ nhận sát thương = 135% wil + 150% atk của nhân vật này.
 
-skill 2: chém dọc, một đạo kiếm khí khổng lồ lao về ô 2/5/8 của sân kẻ địch bất kể nhân vật này đứng ở đâu, mỗi kẻ trúng nhận sát thương chuẩn = 160% wil và 180% atk của nhân vật này, 25 ae.
+Skill II — Sever Heaven
+Đoạn Thiên: chém dọc, một đạo kiếm khí khổng lồ lao về ô 2/5/8 của sân kẻ địch bất kể nhân vật này đứng ở đâu, mỗi kẻ trúng nhận sát thương chuẩn = 160% wil và 180% atk của nhân vật này, 25 ae.
 
-skill 3: rút kiếm, thu kiếm, mọi chân ngã trong hàng chờ luân hồi thuộc phe kẻ thù lập tức vào luân hồi, chân ngã phe đồng minh không bị ảnh hưởng, cần 1 natural Action, 30 ae.
+Skill 3 — No Interval Between Death and Rebirth
+Sinh Tử Vô Gian: rút kiếm, thu kiếm, mọi chân ngã trong hàng chờ luân hồi thuộc phe kẻ thù lập tức vào luân hồi, chân ngã phe đồng minh không bị ảnh hưởng, cần 1 natural Action, 30 ae.
 hắn chém khoảng cách giữa hàng chờ luân hồi và luân hồi của chân ngã thuộc phe kẻ thù.
 
-ultimate: cast skill 1 và 2 cùng lúc nhưng không tốn ae.
+One Sword Defines Heaven and Earth / Nhất Kiếm Định Thiên Địa: cast skill 1 và 2 cùng lúc nhưng không tốn ae.
 
 
 57) .
@@ -691,14 +765,17 @@ nội tại: mọi debuff cấp pháp tắc gây giảm hp trên kẻ thù bị 
 
 
 
-61) 
+61) Kenoma
 
-nội tại: vào sân không có chân ngã, kit hoạt động bình thường, chân ngã đầu thai vào sẽ tăng sức mạnh, một sinh vật huyết nhục kết hợp với cơ giới nhưng không có chân ngã.
+Passive — Life Before the Soul
+Sinh Mệnh Có Trước Linh Hồn: vào sân không có chân ngã, kit hoạt động bình thường, chân ngã đầu thai vào sẽ tăng sức mạnh, một sinh vật huyết nhục kết hợp với cơ giới nhưng không có chân ngã.
 vào trận cost trên deck giảm 2, không stack, ví dụ cost giảm còn 15 thì rời sân vào deck bao lần cũng là thế nếu không bị ảnh hưởng bởi kit khác.
 
-skill 1: target 3 kẻ thù có rage cao nhất trên sân, bắn 3 viên đạn vào chúng, mỗi kẻ nhận 1 viên với sát thương là 135% wil và 135% atk, đồng thời giảm 15 rage của chúng, cost 30 ae, nếu có chân ngã đầu thai vào thì tăng tỉ lệ sát thương từ 135% wil/atk lên 150% wil và 150% atk, 15 lên 20 rage, cost giảm 5 ae.
+Skill 1 — Three Shots Against Wrath
+Tam Đạn Trấn Nộ: target 3 kẻ thù có rage cao nhất trên sân, bắn 3 viên đạn vào chúng, mỗi kẻ nhận 1 viên với sát thương là 135% wil và 135% atk, đồng thời giảm 15 rage của chúng, cost 30 ae, nếu có chân ngã đầu thai vào thì tăng tỉ lệ sát thương từ 135% wil/atk lên 150% wil và 150% atk, 15 lên 20 rage, cost giảm 5 ae.
 
-skill 2: khi nhận sát thương vượt quá 35% max hp của bản thân từ natural Action của kẻ thù ( không tính dot nhưng tính các nội tại gây sát thương kiểu follow up hoặc cường hoá sát thương, sát thương chuẩn cũng tính), chuyển 100% lượng hp/max hp đã mất thành khiên trong 3 natural Action của bản thân, ví dụ: 100/200 hp chuyển thì còn 100 max hp nhưng khiên cũng là 100, vậy là mất max hp nhưng nhận lượng khiên tương ứng, sau 3 natural Action thì khiên biến mất nếu chưa vỡ, max hp hồi phục, nếu lúc đó còn khiên thì heal hp = lượng khiên còn lại.
+Skill 2 — Flesh Becomes Armor, Armor Becomes Flesh
+Huyết Nhục Hóa Giáp, Giáp Hoàn Huyết Nhục: khi nhận sát thương vượt quá 35% max hp của bản thân từ natural Action của kẻ thù ( không tính dot nhưng tính các nội tại gây sát thương kiểu follow up hoặc cường hoá sát thương, sát thương chuẩn cũng tính), chuyển 100% lượng hp/max hp đã mất thành khiên trong 3 natural Action của bản thân, ví dụ: 100/200 hp chuyển thì còn 100 max hp nhưng khiên cũng là 100, vậy là mất max hp nhưng nhận lượng khiên tương ứng, sau 3 natural Action thì khiên biến mất nếu chưa vỡ, max hp hồi phục, nếu lúc đó còn khiên thì heal hp = lượng khiên còn lại.
 nếu còn 100 max hp/30 khiên thì khi hồi phục là 130/200 max hp, nếu không còn khiên thì 100/200 max hp.
 nhưng khiên của bản thân skill 2 mới tính nha, hiện khiên có nhiều nguồn, nhận sát thương thì bị trừ đều.
 cost 5 ae mỗi lần kích hoạt, khi bộ đếm 3 natural Action kết thúc thì vào cd 2 natural Action của bản thân, không hạn lần kích hoạt/trận.
@@ -709,15 +786,217 @@ dù giảm max hp nhưng lại có lớp khiên = hp đã mất đổi lại gi�
 
 có chân ngã đầu thai vào thì khi bộ đếm 3 natural Action kết thúc và skill 2 vào cd thì char này tăng 5% max hp (tính lúc skill 2 vào cd), reset khi rời sân.
 
-skill 3: target kẻ thù ở ô 8 ( không nhất định là leader vì sau này lỡ đâu có kit chuyển vị trí leader thì sao), gây sát thương = 160% wil và 160% atk lên kẻ đó. cost 25.
+Skill 3 — Core-Piercing Round
+Đạn Xuyên Sinh Lõi: target kẻ thù ở ô 8 ( không nhất định là leader vì sau này lỡ đâu có kit chuyển vị trí leader thì sao), gây sát thương = 160% wil và 160% atk lên kẻ đó. cost 25.
 chân ngã: nếu target nhận Actual HP damage từ skill 3, chúng nhận thêm sát thương chuẩn = 5% max hp lúc dùng skill 3 của nhân vật này. cost giảm 5.
 
-ultimate: cast 1 lần skill 1 nhưng 0 cost, sau đó hồi hp = 50% Actual HP Damage gây ra.
+Ultimate — Reclamation Salvo
+Loạt Đạn Thu Hồi: cast 1 lần skill 1 nhưng 0 cost, sau đó hồi hp = 50% Actual HP Damage gây ra.
 
 
 62) 
 
-63) .
+nội tại: mỗi natural Action thành công, ae cho team + 4.
+
+skill 1: khi hp dưới hoặc = 12% max hp, phân giải cơ thể, chân ngã tại vị trí đó sau 2 natural Action sẽ revive với chỉ số = 100% lúc chưa phân giải kể cả max hp, và có hp = 65%/100% max hp, skill này chỉ kích hoạt 1 lần/trận, không tốn ae, thực ra cost chính là biến mất 2 turn làm tổn thất tối thiểu 8 ae.
+
+skill 2: 
+
+63) Polyhymnia
+
+Rank: SSR
+Class: Support
+Element: Wind
+Giới tính: nữ
+
+Hình tượng: một nữ nhạc sư/người chỉ huy nghi lễ. Không cầm đàn fantasy thông thường; sau lưng nàng là một hệ vòng kim loại và chuông cộng hưởng lơ lửng, giống một nhạc cụ nghi lễ khổng lồ. Vũ khí cầm tay là một thanh chỉ huy dài như kim âm thoa.
+
+Signature của nàng không phải “bard buff team”.
+
+> Polyhymnia xem Damage, Heal và Shield là ba thanh âm khác nhau. Khi đồng đội tạo đủ cả ba, nàng biến chúng thành một hợp âm hoàn chỉnh.
+
+Không RNG ở mechanic signature.
+
+---
+
+Nội tại — When Three Voices Agree
+Tam Thanh Đồng Điệu
+Khi Polyhymnia đang trên sân, nàng duy trì một Khuông Nhạc có ba thanh âm:
+I.   Harm — Sát
+II.  Mercy — Dưỡng
+III. Shelter — Hộ
+Mỗi khi một Natural Action của đồng minh hoặc bản thân hoàn tất, kiểm tra những Effect trực tiếp thuộc Natural Action đó:
+Nếu ít nhất 1 enemy nhận Actual HP Damage > 0 → ghi nhận Sát Âm.
+Nếu ít nhất 1 ally nhận Effective Heal > 0 → ghi nhận Dưỡng Âm.
+Nếu ít nhất 1 ally được cộng Shield > 0 → ghi nhận Hộ Âm.
+Một Natural Action có thể ghi nhận nhiều loại cùng lúc.
+
+Không tính:
+DoT; HoT độc lập; Follow-up; Counter; Reaction; Mark Damage; effect tự động không thuộc Natural Action.
+
+Nếu một âm đã được ghi thì ghi lại cùng loại không làm gì.
+Khi cả ba âm đều tồn tại:
+Natural Action hiện tại hoàn tất
+→ tiêu hao cả 3 âm
+→ kích hoạt Hợp Âm Hoàn Chỉnh
+
+Hợp Âm Hoàn Chỉnh:
+hồi HP cho tối đa 3 đồng minh có HP% thấp nhất, mỗi người: 50% WIL + 50% ATK của Polyhymnia;
+phe Polyhymnia nhận +8 AE.
+Nếu dưới 3 ally hợp lệ thì Heal những người còn lại.
+Hiệu ứng này:
+không phải Natural Action;
+Heal của chính nó không tạo Dưỡng Âm mới;
+không thể tự loop.
+Khi Polyhymnia rời sân, toàn bộ âm đang ghi bị xóa.
+Vì sao tao thích mechanic này
+Một team thuần DPS rất dễ tạo Sát, nhưng phải tìm Dưỡng/Hộ.
+
+Một team phòng thủ có Heal + Shield liên tục lại cần tạo Sát.
+
+Một char hybrid mạnh có thể ghi hai hoặc thậm chí ba âm trong một Natural Action.
+Polyhymnia vì vậy không bảo:
+> “hãy dùng đúng Character X.”
+Nàng bảo:
+> “hãy xây một đội có đủ ba chức năng.”
+Đó là dạng Support tao thấy rất hợp roster lớn 200+ kit.
+
+---
+
+Đánh thường — Tuning Strike
+
+Định Âm
+Polyhymnia gõ thanh chỉ huy vào một vòng cộng hưởng.
+Một sóng âm mảnh lao tới 1 enemy:
+Damage =
+100% WIL
++
+100% ATK
+Nếu gây Actual HP Damage thì Natural Action này có thể ghi Sát Âm.
+Không thêm hiệu ứng.
+
+---
+
+Skill 1 — Break the Silence
+Phá Tĩnh
+Cost: 15 AE.
+Polyhymnia gõ mạnh hai vòng cộng hưởng theo hai hướng khác nhau.
+Chọn ngẫu nhiên tối đa 2 enemy khác nhau.
+Mỗi target nhận:
+130% WIL
++
+110% ATK
+
+Không target trùng.
+Nếu chỉ còn 1 enemy thì chỉ target người đó một lần.
+Đây là Skill damage tương đối vừa; mục đích chính ngoài gây sát thương là cho Polyhymnia một cách chủ động tạo Sát Âm khi team đang thiếu nó.
+
+VFX:
+hai vòng chuông nghiêng sang hai phía
+→ không phát projectile
+→ không gian trước target rung lên
+→ impact xảy ra trực tiếp như áp suất âm
+
+---
+
+Skill 2 — Hymn for the Wounded
+Thánh Ca Thương Giả
+Cost: 20 AE.
+Target tối đa 2 đồng minh có HP% thấp nhất.
+Mỗi người Heal:
+100% WIL
++
+70% ATK
+
+Nếu chỉ có 1 target cần Heal thì không dồn lượng Heal của người thứ hai vào người đó.
+Overheal bị bỏ qua. Không tự tạo Shield.
+
+Đây là lựa chọn cố ý: tao không muốn Skill 2 tự làm luôn cả Dưỡng + Hộ rồi khiến passive quá dễ hoàn thành.
+
+Nếu Skill thực sự hồi được HP cho ít nhất một target thì Natural Action ghi Dưỡng Âm.
+VFX cũng nên rất khác healer holy-light:
+Polyhymnia không quay về phía ally
+→ nàng hạ thanh chỉ huy xuống
+→ hai tiếng chuông vang
+→ sóng gió rất mỏng quấn quanh hai người bị thương
+
+---
+
+Skill 3 — Hold the Last Note
+Trì Âm
+Cost: 20 AE.
+Tạo Shield cho:
+1. Leader đồng minh;
+2. một ally có HP% thấp nhất, không tính Leader và Polyhymnia.
+Mỗi Shield:
+8% Current Max HP của Polyhymnia
++
+50% WIL của Polyhymnia
+
+Nếu không có target thứ hai hợp lệ thì chỉ Leader nhận Shield.
+Shield tồn tại tối đa:
+
+2 Natural Action thực sự hoàn tất của Polyhymnia
+Natural Action dùng Skill 3 không tính vào hai Action đó.
+Shield của hai target là hai contribution độc lập.
+Nếu ít nhất một Shield có lượng >0 được commit thành công thì Natural Action này ghi Hộ Âm.
+Tên Hold the Last Note vì nàng không “dựng khiên” theo fantasy thông thường.
+Nàng giữ một âm thanh kéo dài:
+OOOOOOOO—
+và âm đó trở thành một màng áp suất bao lấy target.
+Khi Shield hết thời gian, tiếng ngân tắt.
+
+---
+
+Ultimate — Let Heaven Hear the Chorus
+Thiên Thính Vạn Thanh
+Polyhymnia nâng thanh chỉ huy.
+Toàn bộ những vòng cộng hưởng sau lưng tách ra, phủ thành một đại nhạc trận trên battlefield.
+Ultimate resolve thành một Natural Action với ba nhóm Effect.
+I. Đối với toàn bộ enemy
+Mỗi enemy nhận:
+115% WIL
++
+85% ATK
+Không phải True Damage.
+Không Guaranteed Hit nếu mode/system không cho.
+Nếu ít nhất một enemy thực sự mất HP → ghi Sát Âm.
+II. Đối với toàn bộ ally
+Mỗi ally Heal:
+55% WIL
++
+55% ATK
+
+Overheal bị bỏ qua.
+Nếu ít nhất một ally thực sự hồi HP → ghi Dưỡng Âm.
+
+III. Leader
+Leader nhận thêm Shield:
+15% Current Max HP của Polyhymnia
+Shield từ Ultimate cap tại:
+40% Current Max HP của Leader
+Nếu positive Shield được tạo → ghi Hộ Âm.
+Do đó trong tình huống bình thường:
+Ultimate
+→ Damage thành công
+→ Heal thực sự
+→ Shield Leader
+
+→ Sát + Dưỡng + Hộ
+→ Natural Action kết thúc
+→ Hợp Âm Hoàn Chỉnh
+→ Heal 3 ally yếu nhất thêm một lần
+→ +8 AE
+
+Nhưng nó không bảo đảm tuyệt đối.
+Ví dụ:
+toàn bộ enemy chỉ mất Shield, không mất HP
+→ không có Sát Âm
+hoặc:
+toàn team đang full HP
+→ Ultimate chỉ tạo Overheal = bỏ
+→ không có Dưỡng Âm
+Tao thích điểm này vì player nhìn thấy cùng một Ultimate nhưng trạng thái chiến trường quyết định liệu bản giao hưởng có thật sự “hoàn chỉnh” hay không.
 
 64) .
 

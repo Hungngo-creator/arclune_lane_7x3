@@ -2434,7 +2434,6 @@ shield:
 
 ```text
 FIELD_PRESENCE_SCOPED
-LIFE_SCOPED
 BATTLE_SCOPED
 ```
 
@@ -3163,7 +3162,6 @@ Current minimum scopes required by Pilot #4:
 
 ```text
 FIELD_PRESENCE_SCOPED
-LIFE_SCOPED
 BATTLE_SCOPED
 ```
 
@@ -3175,12 +3173,6 @@ Typical examples may include:
 - field-only defensive window;
 - field-only recovery window;
 - field-only self modifier.
-
-### `LIFE_SCOPED`
-
-The State belongs to the current Life/lifecycle instance.
-
-Exact behavior across each lifecycle/deployment transition belongs to the transition Contract/profile.
 
 ### `BATTLE_SCOPED`
 

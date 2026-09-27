@@ -1,11 +1,12 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-09-19-F.2  
+**Version:** 2026-09-25-F.3  
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA.md`, `00_CANONICAL_RECOVERY_AUDIT.md`  
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
 **Revision F.1:** incorporates approved Shield pooling, Authority Adjudication, Death Cohorts, Revive/Reincarnation race, global lifeSerial default, and Pygmalion rulings.
 **Revision F.2:** incorporates Pilot Normalization #3 approved Contracts for bounded Action Intent interposition/revalidation, dynamic distributed Cost payment, typed committed Cost-payment results, scoped Effect-amount modifiers, and explicit sequential Reaction-boundary profiles. No new Functional Tag or Primitive is introduced.
+**Revision F.3:** incorporates Pilot Normalization #4 Contracts for static-Passive battle initialization, scoped incoming Damage-component type transformation before mitigation, battle-scoped Current Character Deployment Cost, explicit Return-to-Deck with transition-owned retention cleanup, and deterministic metric-selector tie policy. No new Functional Tag or Primitive is introduced.
 **Purpose:** turn semantic declarations into deterministic resolution rules without turning Character data into code.
 
 ---
@@ -1405,6 +1406,94 @@ It requires declarative Conditions to query the lineage/provenance already prese
 
 ---
 
+## TRG-014 — Passive Static Registration and Battle Initialization
+**Status:** `LOCKED`
+
+`PASSIVE_STATIC` is not an Event-driven Action and does not create a Natural Action.
+
+It is the declarative activation mode for Passive rules that are continuously registered for their declared lifetime and/or for Passive-owned initialization Effects that must settle at the owning runtime participant's initialization checkpoint.
+
+### Static rule registration
+
+A static rule such as:
+- native admission/immunity rule;
+- scoped Effect modifier;
+- scoped Damage-component transform;
+
+is registered from the owning Passive without creating a fake Action.
+
+Registration itself:
+- pays no Ability Cost unless another explicit Contract says otherwise;
+- consumes no Natural Action;
+- does not advance SSI;
+- does not emit an Action merely to make the rule exist.
+
+### Battle-scoped initialization Effects
+
+When a `PASSIVE_STATIC` owns a mutation whose declared target state is battle-scoped initialization state, that mutation settles exactly once for that battle participant at battle initialization.
+
+Canonical ordering for Character Current Deployment Cost is:
+
+```text
+resolve execution-ready BASE_DEPLOYMENT_COST
+→ initialize CURRENT_DEPLOYMENT_COST from Base under DEP-002
+→ initialize Deployment-Cost lock state
+→ settle qualifying PASSIVE_STATIC battle-initialization mutations
+→ expose the resulting battle Current Deployment Cost to later deployment/payment/formula reads
+```
+
+This permits a Character to declaratively author:
+
+```text
+ADD_CURRENT -5
+```
+
+as a once-per-battle static Passive initialization mutation.
+
+It does not create a universal `-5` rule.
+
+### Exactly-once boundary
+
+A battle-scoped static initialization mutation is not rerun merely because the Character:
+- deploys from Deck;
+- returns to Deck;
+- redeploys;
+- leaves/re-enters Field Presence;
+- Revives;
+- returns from Temporary Absence;
+- transfers between Combat Instances;
+
+unless an explicit separate Contract says that transition creates a new owning battle participant/lifetime.
+
+For ordinary same-battle Return-to-Deck/redeployment:
+
+> the already-initialized battle state is reused.
+
+### Determinism / multiplicity
+
+Static initialization must not derive gameplay ordering from:
+- Ability list order;
+- Character file order;
+- Event order;
+- entity ID;
+- incidental iteration order.
+
+If several initialization mutations affect the same semantic state and their operations are order-independent under their typed Contract, they may all participate.
+
+If final outcome would depend on undeclared order:
+
+> normalization must require an explicit dependency/composition rule or reject executable content.
+
+### Failure boundary
+
+Execution-ready battle initialization must not continue with unresolved required initialization data.
+
+A failed required initialization does not silently produce a default numeric gameplay value.
+
+This Contract does not create a scripting/callback startup system.
+
+---
+
 # 12. TARGET SELECTION CONTRACT
 
 ## TGT-001 — Candidate Pool
@@ -1506,6 +1595,112 @@ That profile is:
 ### Known Ký Ức rule
 If target reaches DEATH_CONFIRMED before Skill 2 echo resolves:
 > target is invalid and receives no echo.
+
+## TGT-007 — Metric Selector Tie Policy
+**Status:** `LOCKED`
+
+A metric/ordered Target selector must not derive a gameplay winner from incidental ordering when several eligible candidates share the same best metric value.
+
+For:
+
+```text
+tiePolicy = RANDOM_AMONG_TIED
+```
+
+canonical selection is:
+
+```text
+build final eligible Candidate Pool
+→ read the declared selection metric for every candidate at the same selection checkpoint
+→ determine the best metric value
+→ build the exact tied-best subset
+→ consume deterministic seeded gameplay RNG over that tied-best subset
+→ select the declared target count
+```
+
+For:
+
+```text
+selection = LOWEST_HP_PERCENT
+tiePolicy = RANDOM_AMONG_TIED
+count = 1
+```
+
+RNG is used only among candidates tied for the minimum:
+
+```text
+CurrentHP / CurrentMaxHP
+```
+
+not among the whole Candidate Pool.
+
+### No hidden tie priority
+
+A tied winner must not be selected by:
+- authored list order;
+- entity ID;
+- Slot;
+- insertion order;
+- Event order;
+- incidental collection iteration.
+
+`eventSeq` remains trace order, not Target priority.
+
+### RNG interaction
+
+`RNG-001` and `RNG-002` apply.
+
+The exact tied-best subset is fixed before the random draw.
+
+No RNG draw may change which candidates count as tied.
+
+### Selection-time scope only
+
+`tiePolicy` controls initial selection only.
+
+It does not itself imply:
+- `REROLL`;
+- `REQUERY`;
+- replacement after later target invalidation;
+- another RNG draw after target lock.
+
+After selection:
+
+```text
+TGT-004
+TGT-006
+```
+
+remain authoritative for target lock, re-query and invalidation.
+
+Therefore authored data may use:
+
+```text
+LOWEST_HP_PERCENT
+→ RANDOM_AMONG_TIED
+→ LOCK_ENTITY_IDS
+→ later DROP_INVALID
+```
+
+to mean:
+
+```text
+select once
+lock the Entity
+if later invalid:
+  drop/skip that target
+  do not re-query
+  do not reroll
+  do not select a replacement
+```
+
+This Contract does not create a global default that every metric selector randomizes ties.
+
+If gameplay-observable tie behavior is not declared:
+
+> it remains `REQUIRED_EXPLICIT`.
+
+---
 
 # 12A. HIT ADMISSION CONTRACT
 
@@ -2816,6 +3011,146 @@ Current `MULTIPLY` modifiers all participate in the phase without deriving prior
 Penetration reduces/ignores relevant defensive stat.
 
 100% Penetration is not automatically True Damage.
+
+---
+
+## DMG-007 — Scoped Damage-Component Type Transform
+**Status:** `LOCKED`
+
+A normalized `ScopedDamageComponentTransformSpec` changes the semantic type of a qualifying resolving Damage component at its declared Damage-pipeline phase.
+
+Canonical distinction:
+
+```text
+ScopedEffectAmountModifierSpec
+= numeric amount modification
+
+ScopedDamageComponentTransformSpec
+= Damage-component semantic-type transformation
+```
+
+The two systems remain separate.
+
+### `PRE_MITIGATION`
+
+For:
+
+```text
+resolutionPhase = PRE_MITIGATION
+```
+
+the component's formula/pre-mitigation amount already exists, but the component has not yet entered the mitigation branch selected by its original Physical/Will type.
+
+Canonical flow:
+
+```text
+typed resolving component + pre-mitigation amount
+→ evaluate matching PRE_MITIGATION component transform
+→ determine resulting semantic component type
+→ enter the ordinary pipeline of that resulting type
+```
+
+Therefore:
+
+```text
+Physical
+→ SET_COMPONENT_TYPE(TRUE)
+→ True-Damage path
+→ bypass ARM/RES
+→ bypass FINAL_DAMAGE_REDUCTION
+→ Shield unless separately pierced/bypassed
+```
+
+and:
+
+```text
+Will
+→ SET_COMPONENT_TYPE(TRUE)
+→ True-Damage path
+→ bypass ARM/RES
+→ bypass FINAL_DAMAGE_REDUCTION
+→ Shield unless separately pierced/bypassed
+```
+
+Forbidden interpretation:
+
+```text
+Physical/Will
+→ first resolve ARM/RES
+→ then relabel result as True
+```
+
+The transform is not Penetration.
+
+### Scoped applicability
+
+Only the normalized typed scope may determine applicability:
+
+- scoped Action reference/lineage relation;
+- Natural-Action status;
+- Actor performing the scoped Action;
+- structured source-Actor filters such as Effective Class;
+- recipient scope;
+- Effect-provenance/direct-effect scope;
+- component-type filter;
+- structured Conditions.
+
+The Action Actor must not be silently substituted with:
+- Damage Attribution;
+- Caster;
+- Owner;
+- Effect Source.
+
+`TRG-013` remains authoritative:
+
+```text
+Action lineage
+≠
+Effect provenance
+≠
+Damage Attribution
+```
+
+Matching `rootActionId` alone is insufficient when the authored rule requires the scoped root Action's own direct Effect graph.
+
+A separate child Action / Passive-triggered standalone Damage / Reaction / Follow-up / Counter / DoT / Mark Damage does not become root-direct merely by sharing lineage.
+
+### Component-local behavior
+
+Evaluation is per resolving component and recipient.
+
+A match on one recipient does not transform sibling recipients.
+
+A filter for Physical/Will does not rewrite unrelated components.
+
+A target-owned runtime transform does not retroactively rewrite:
+- source Ability identity;
+- source Ability Functional Tags;
+- Effect provenance.
+
+The transformed runtime component nevertheless resolves under the resulting Damage-type Contract.
+
+### Multiple matching transforms
+
+No winner is chosen from:
+- authoring order;
+- Event order;
+- Character ID;
+- entity ID;
+- Effect-list order;
+- incidental runtime iteration.
+
+If all applicable transforms are semantically compatible and produce the same resulting component type, the outcome is order-independent.
+
+If applicable transforms are incompatible and no explicit future composition Contract exists:
+
+> executable content must be rejected.
+
+### Authority boundary
+
+Ordinary Rank/Class/Element/relation predicates do not invoke Authority.
+
+Authority is entered only when a real Authority-bearing semantic conflict exists under `AUT-*`.
 
 ---
 
@@ -4385,52 +4720,171 @@ No global choice yet.
 `DEPLOY_FROM_DECK` is a deployment-system transaction, not an Ability Action Cost.
 
 Before commit, validate at minimum:
-1. Character has valid membership in the relevant battle Deck
-2. Character's current deployment state permits a Deck → Battlefield deployment
-3. any additional deployment eligibility conditions pass
-4. Deployment Cost is resolved for runtime use
-5. Deployment Cost Bar has sufficient value
-6. requested Battlefield placement is valid
-7. destination can be reserved for the transaction
-Important:
-Deck membership alone does not prove step 2.
+
+1. Character has valid long-lived membership in the relevant battle Deck;
+2. Character's current deployment state permits Deck → Battlefield deployment;
+3. additional deployment eligibility conditions pass;
+4. `CURRENT_DEPLOYMENT_COST` is resolved and numerically executable;
+5. Deployment Cost Bar can pay that Current Deployment Cost;
+6. requested Battlefield placement is valid;
+7. destination can be reserved for the transaction.
+
+Canonical distinction:
+
+```text
+DECK_MEMBERSHIP
+≠
+CURRENT_DEPLOYMENT_STATE
+≠
+CURRENT_DEPLOYMENT_COST
+≠
+DEPLOYMENT_COST_BAR
+```
+
 A Deck member may currently be:
-already deployed;
-dead/waiting;
-unavailable;
-otherwise deployment-ineligible;
-depending on runtime/system state.
-This Contract does not define whether a successful deployment changes long-lived Deck membership.
-If validation succeeds, one successful deployment transaction commits the required deployment state atomically, including:
-Deployment Cost Bar debit
-Character deployment-state transition
+- deployed;
+- dead/waiting;
+- unavailable;
+- otherwise not deployable.
+
+### Transaction payment value
+
+The transaction resolves one authoritative:
+
+```text
+deploymentPaymentAmount
+=
+CURRENT_DEPLOYMENT_COST
+```
+
+from pre-commit authoritative state.
+
+Validation and debit for that transaction must use the same resolved value.
+
+Do not:
+- validate against Base Deployment Cost and pay Current Deployment Cost;
+- validate one Current value then silently re-read a different Current value inside the same atomic commit;
+- treat Current Deployment Cost as the Side Deployment Cost Bar.
+
+### Successful commit
+
+If validation succeeds, one atomic deployment transaction commits the required deployment state, including:
+
+```text
+Deployment Cost Bar debit by deploymentPaymentAmount
+current deployment-state transition to Battlefield-active/deployed
 valid destination Position / active Field Presence
 Current Rage = Max Rage
 required battlefield registration
-Only after successful transaction commit are post-commit Events exposed, including:
-DEPLOY_FROM_DECK_COMMITTED
-ENTER_FIELD
-The ENTER_FIELD observer therefore sees the already-committed deployment state, including full Rage.
-The deterministic event trace may assign the two Event records distinct eventSeq values.
-That trace order does not by itself define gameplay priority between unrelated listeners responding to those Events.
-If deployment fails before commit:
-Deployment Cost Bar is not spent;
-Character does not become active-present through that attempted deployment;
-deployment full-Rage assignment does not commit;
-no successful deployment Event is published.
-A roster Character deployed this way is not automatically SUMMON.
-No new Primitive is required.
+```
 
-## DEP-002 — Deployment Cost Metadata
-Status: LOCKED
-Deployment Cost is read from Character deployment metadata:
-character.deployment.fromDeck.deploymentCost
-It is not an Ability CostSpec.
+Successful deployment changes current deployment state.
+
+It does not remove the Character's long-lived battle Deck membership.
+
+Only after commit are post-commit deployment/presence observations exposed.
+
+The `ENTER_FIELD` observer therefore sees already-committed deployment state, including full Rage.
+
+Trace/event sequence does not create gameplay priority among unrelated listeners.
+
+### Failed deployment
+
+If validation fails before commit:
+
+- Deployment Cost Bar is unchanged;
+- deployment state does not transition through that attempt;
+- active Field Presence is unchanged by that attempt;
+- full-Rage deployment assignment does not commit;
+- no successful deployment observation is published.
+
+A roster Character deployed this way is not automatically `SUMMON`.
+
+Successful deployment does not itself grant an extra Natural Action; `DEP-005` remains authoritative.
+
+---
+
+## DEP-002 — Base and Current Character Deployment Cost
+**Status:** `LOCKED`
+
+When the distinction is gameplay-observable:
+
+```text
+BASE_DEPLOYMENT_COST
+≠
+CURRENT_DEPLOYMENT_COST
+≠
+DEPLOYMENT_COST_BAR
+```
+
+### Base Deployment Cost
+
+`BASE_DEPLOYMENT_COST` is the resolved Character baseline produced by Character metadata / Cost Budget architecture.
+
 During authoring/Pilot Normalization:
+
+```text
 TBD_BY_COST_BUDGET
-is permitted as unresolved Cost Budget output.
-Runtime deployment requiring actual payment must reject execution-ready content whose Deployment Cost is still unresolved.
+```
+
+is allowed.
+
+Execution-ready battle/deployment content that needs numeric payment must not execute with unresolved required Base/Current Deployment Cost.
+
 This Contract does not define the future Cost Budget formula.
+
+### Current Deployment Cost
+
+`CURRENT_DEPLOYMENT_COST` is authoritative battle-scoped Character deployment state.
+
+Battle initialization order:
+
+```text
+resolve BASE_DEPLOYMENT_COST
+→ CURRENT_DEPLOYMENT_COST := BASE_DEPLOYMENT_COST
+→ initialize Current-Deployment-Cost lock state as unlocked
+→ settle qualifying PASSIVE_STATIC battle-initialization mutations under TRG-014
+→ expose final initialized Current value to later deployment/formula reads
+```
+
+For Alcestis, Character data may therefore compose:
+
+```text
+PASSIVE_STATIC initialization
+→ ADD_CURRENT -5
+```
+
+and the mutation occurs exactly once per battle rather than once per redeployment.
+
+Current Deployment Cost:
+- is used by `DEPLOY_FROM_DECK`;
+- may be read by typed ValueRef;
+- may be snapshotted;
+- persists through ordinary Return-to-Deck within the same battle unless a separate explicit transition says otherwise;
+- resets from Base at a new battle initialization;
+- is not a Resource Pool.
+
+### Floor
+
+The Character's declared Current Deployment Cost floor is enforced by `DEP-006` whenever a Current-value mutation commits.
+
+Pilot #4 currently uses:
+
+```text
+floor = 1
+```
+
+The floor does not rewrite Base Deployment Cost.
+
+### Lifetime
+
+Current Deployment Cost and its lock are battle-scoped deployment-system state.
+
+They do not reset merely because Field Presence ends or the Character returns to Deck.
+
+This Contract does not claim that every unrelated lifecycle transition preserves them; those transitions use their own explicit semantics.
+
+---
 
 ## DEP-003 — Full Rage on Successful Deck Deployment
 Status: LOCKED
@@ -4470,6 +4924,414 @@ if deployed into a Slot the Side's current Natural Pointer has not yet passed in
 if deployed into a Slot already passed in that Side Pass, it waits until the next Side Pass;
 deployment never grants a second Natural Action merely by changing battlefield occupancy.
 This rule applies to roster Character deployment and does not redefine ACT-014 Summon semantics.
+
+---
+
+## DEP-006 — Current Deployment Cost Mutation and Lock
+**Status:** `LOCKED`
+
+`DeploymentCostModificationSpec` operates on:
+
+```text
+CURRENT_DEPLOYMENT_COST
+```
+
+only.
+
+It does not mutate:
+- `BASE_DEPLOYMENT_COST`;
+- `DEPLOYMENT_COST_BAR`;
+- AE;
+- Rage.
+
+### `ADD_CURRENT`
+
+When Current Deployment Cost is unlocked:
+
+```text
+candidateValue
+=
+CURRENT_DEPLOYMENT_COST + authoredValue
+```
+
+then commit:
+
+```text
+CURRENT_DEPLOYMENT_COST
+=
+max(declaredFloor, candidateValue)
+```
+
+The mutation reads the authoritative Current value at its declared resolution point.
+
+### `LOCK_CURRENT`
+
+For the current Pilot #4 operation set, `LOCK_CURRENT` freezes the exact then-authoritative Current Deployment Cost for the remainder of that battle.
+
+```text
+lockedValue
+=
+CURRENT_DEPLOYMENT_COST at lock commit
+```
+
+After successful lock:
+
+```text
+CURRENT_DEPLOYMENT_COST
+=
+lockedValue
+```
+
+for the battle remainder against ordinary `ADD_CURRENT` mutations.
+
+A new battle initialization clears that battle lock and initializes new Current state under `DEP-002`.
+
+There is no implicit unlock operation in the current Schema.
+
+### Mutation while locked
+
+An ordinary `ADD_CURRENT` that reaches this Contract while Current Deployment Cost is locked commits no Current-value change.
+
+The lock itself does not:
+- retroactively invalidate the enclosing already-admitted Action;
+- roll back already-committed Effects;
+- block unrelated Side Deployment Cost Bar gain.
+
+Character data may conditionally omit/skip a mutation when lock state is already known.
+
+No Character-ID branch is permitted.
+
+### Snapshot/read ordering
+
+A previously committed Snapshot remains immutable.
+
+Therefore:
+
+```text
+C_cast
+=
+snapshot CURRENT_DEPLOYMENT_COST
+```
+
+may be followed later by:
+
+```text
+ADD_CURRENT -1
+```
+
+without changing `C_cast`.
+
+Locking or later mutation never rewrites an earlier Snapshot.
+
+---
+
+## DEP-007 — Return-to-Deck Transaction
+**Status:** `LOCKED`
+
+`RETURN_TO_DECK` is an explicit deployment/lifecycle transition.
+
+It is not an alias for:
+- generic `LEAVE_FIELD`;
+- Death / `DEATH_CONFIRMED`;
+- `REMOVED`;
+- Summon despawn;
+- ordinary Temporary Absence;
+- Revive;
+- Reincarnation;
+- Arena transfer/return.
+
+### Required successful post-state
+
+For a valid Battlefield-active roster Character:
+
+```text
+active-present in current Combat Instance
+→ not active-present in that Combat Instance
+
+current deployment state
+→ Deck / undeployed-returned state
+
+battle Deck membership
+→ retained
+```
+
+The presence result is:
+
+```text
+LEAVE_FIELD
+```
+
+The cause/destination semantic is:
+
+```text
+RETURN_TO_DECK
+```
+
+The two are not interchangeable.
+
+### Validation
+
+Before commit, validate at minimum:
+- subject/source deployment state matches the declared transition source;
+- required current Combat-Instance presence relation;
+- destination deployment state is legal;
+- declared Deck-membership policy is satisfiable;
+- retention profile is valid for the transition.
+
+If validation fails:
+
+```text
+no Return-to-Deck state transition commits
+no transition-owned cleanup commits
+no partial presence/deployment destination commits
+```
+
+Already-committed earlier Effects in the enclosing Action are not automatically rolled back.
+
+Later Effects whose gameplay requires successful Return-to-Deck must be explicitly gated/dependent on the successful post-transition state.
+
+No hidden “assume success” fallback is created.
+
+### Atomic transition commit
+
+A successful Return-to-Deck commits one coherent authoritative post-state.
+
+The transition must not expose accidental half-states such as:
+
+```text
+old Field Presence ended
+but current deployment state still Battlefield-active
+```
+
+or:
+
+```text
+deployment state says Deck
+while old Combat-Instance active presence remains true
+```
+
+Transition-owned cleanup under `DEP-008` belongs to this same authoritative transition state.
+
+Internal service-call order is implementation detail, not gameplay priority.
+
+### Post-commit observability
+
+Observers released after the commit see the coherent post-transition state.
+
+Trace/event sequence does not by itself order unrelated Reactions/listeners.
+
+This Contract does not resolve global `TRG-005`.
+
+### Already-admitted Action continuity
+
+A successful `RETURN_TO_DECK` does not by itself cancel the already-admitted Action that caused it.
+
+That Action may continue through explicitly-authored downstream Effect nodes whose own Conditions/targets remain legal.
+
+This does not permit a new off-field Natural Action.
+
+It only preserves the existing admitted Action execution context.
+
+A later Effect whose semantics require active Field Presence must still pass its own legality/Condition rules.
+
+### No implicit extra effects
+
+`RETURN_TO_DECK` itself does not automatically:
+- Heal/reset Current HP;
+- mutate `lifeSerial`;
+- decrement Current Deployment Cost;
+- gain Deployment Cost Bar;
+- grant Rage/full Rage;
+- grant a Natural Action.
+
+Those are separate explicit mechanics.
+
+For Alcestis:
+
+```text
+successful RETURN_TO_DECK
+→ later explicit Current Deployment Cost -1 if unlocked
+→ later explicit Side Deployment Cost Bar +3
+```
+
+is authored composition, not built into Return-to-Deck globally.
+
+### Redeployment
+
+After successful Return-to-Deck, a later legal entry is a fresh:
+
+```text
+DEPLOY_FROM_DECK
+```
+
+transaction under `DEP-001`, `DEP-003`, and `DEP-005`.
+
+---
+
+## DEP-008 — Return-to-Deck Retention and Transition Cleanup
+**Status:** `LOCKED`
+
+`ReturnToDeckSpec.retentionProfile` is transition-owned lifecycle/deployment semantics.
+
+It is not an authored Cleanse Ability.
+
+### Cleanup decision snapshot
+
+The retention decision set is derived from authoritative pre-transition state before cleanup commit.
+
+For every relevant attached State/Shield contribution, evaluate the bounded profile without letting cleanup iteration mutate the classification basis for later entries.
+
+Current profile decision precedence is:
+
+```text
+1. discardStateClassifications
+2. discardRetentionScopes
+3. retainRetentionScopes
+4. unmatchedStatePolicy
+```
+
+The first matching explicit decision is authoritative.
+
+This guarantees that an authored rule:
+
+```text
+discard all DEBUFF
+```
+
+still discards a Debuff even if that Debuff also has:
+
+```text
+retentionScope = BATTLE_SCOPED
+```
+
+### Authority boundary
+
+Transition-owned retention removal is not:
+
+```text
+Cleanse Effect
+vs
+State Authority
+```
+
+competition.
+
+Ordinary Cleanse-vs-State Authority adjudication is therefore not invoked merely because a removed Buff/Debuff/Mark has an Authority-bearing source.
+
+If a future mechanic explicitly protects a State from lifecycle/deployment transition cleanup, that future semantic must define the actual conflict.
+
+Do not infer such protection from Authority Tier alone.
+
+### Retention-scope behavior
+
+Pilot #4 currently relies on:
+
+```text
+FIELD_PRESENCE_SCOPED
+BATTLE_SCOPED
+```
+
+A profile may discard:
+
+```text
+FIELD_PRESENCE_SCOPED
+```
+
+State/Shield contributions and retain:
+
+```text
+BATTLE_SCOPED
+```
+
+State.
+
+Normal transition cleanup must not require Character-specific State-ID lists when classification/retention metadata already expresses the intended lifetime.
+
+### Unmatched State
+
+`unmatchedStatePolicy` applies only after no earlier classification/scope rule decides the item.
+
+For:
+
+```text
+unmatchedStatePolicy = RETAIN
+```
+
+unspecified State is retained.
+
+This avoids silently deleting unrelated State that the transition profile never selected.
+
+### Current HP
+
+For:
+
+```text
+currentHpPolicy = RETAIN
+```
+
+Return-to-Deck does not Heal, reset, or otherwise reconcile Current HP merely because deployment state changes.
+
+### Terminal cause
+
+A State/Shield contribution removed by this profile terminates under:
+
+```text
+TRANSITION_CLEANUP
+```
+
+while the owning transition remains identifiable as:
+
+```text
+RETURN_TO_DECK
+```
+
+It must not be silently reclassified as:
+- Shield damage depletion/break;
+- natural Shield expiry;
+- natural State duration expiry;
+- Cleanse.
+
+Therefore observers requiring one of those other causes do not qualify from `TRANSITION_CLEANUP` alone.
+
+### Shield ledger
+
+When transition cleanup removes a Shield contribution:
+
+- remove only the selected contribution(s) through the source-aware Shield ledger;
+- do not fake Damage absorption;
+- do not fake natural expiry;
+- preserve the transition-cleanup cause.
+
+Unselected Shield contributions remain.
+
+### No false terminal settlement
+
+A mechanic whose trigger requires:
+
+```text
+Shield broken/depleted
+OR natural Shield expiry
+```
+
+does not trigger from transition cleanup.
+
+Likewise a State with a natural-expiry terminal Heal does not receive that Heal merely because Return-to-Deck removed the State early.
+
+### Battle-scoped deployment-system state
+
+`CURRENT_DEPLOYMENT_COST` and its lock belong to deployment-system battle state rather than the ordinary attached-State cleanup collection.
+
+Return-to-Deck preserves them unless an explicit separate deployment rule changes them.
+
+Already-committed Current Deployment Cost reductions remain committed.
+
+### Commit / determinism boundary
+
+All retention decisions belong to the Return-to-Deck transition's authoritative commit.
+
+Cleanup order among selected State/Shield entries must not create gameplay priority.
+
+If several terminal observations are emitted for traceability, their `eventSeq` values remain trace order unless another explicit Contract says otherwise.
 
 ---
 

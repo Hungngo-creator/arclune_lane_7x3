@@ -1,9 +1,11 @@
 # ARCLUNE — TERMINOLOGY vNext
 ## Canonical Combat, Runtime & System Terminology
-**Version:** 2026-09-10-B  
+**Version:** 2026-09-25-B.1  
 **Stage:** Chặng B — Terminology Reconstruction  
 **Source basis:** `terminology.md` + `00_CANONICAL_RECOVERY_AUDIT.md` + các correction hiện hành của user được Audit ghi nhận.  
 **Scope:** định nghĩa nghĩa canonical của khái niệm. File này **không** phải Tag Registry, Primitive Registry, Ability Schema, Contract hay Kernel implementation.
+
+**Revision B.1:** incorporates Pilot Normalization #4 terminology for Base vs Current Character Deployment Cost, explicit Return-to-Deck, and lifecycle/deployment State Retention Scope. No new Functional Tag or Primitive is introduced.
 
 ---
 
@@ -1741,6 +1743,69 @@ Deploy thành công không tự cấp bonus Natural Action ngoài SSI.
 
 ---
 
+## 8.1F Return to Deck
+**VI:** Trở về Deck  
+**ID:** `RETURN_TO_DECK`  
+**Status:** CANONICAL CORE / DEPLOYMENT-LIFECYCLE TRANSITION
+
+Cause-specific deployment/lifecycle transition đưa một roster Character từ một current deployment state đang active trên Battlefield trở về một current deployment state thuộc Deck.
+
+Canonical distinction:
+
+```text
+RETURN_TO_DECK
+≠
+LEAVE_FIELD
+```
+
+`LEAVE_FIELD` chỉ mô tả presence result trong một Combat Instance:
+
+```text
+active-present
+→ not active-present
+```
+
+`RETURN_TO_DECK` additionally xác định rằng cause/destination của transition thuộc Deck deployment lifecycle.
+
+Khi subject đang active-present trong Combat Instance hiện tại, một successful `RETURN_TO_DECK` làm active Field Presence trong instance đó kết thúc.
+
+Nhưng:
+
+> không phải mọi `LEAVE_FIELD` đều là `RETURN_TO_DECK`.
+
+`RETURN_TO_DECK` không tự đồng nghĩa:
+- `DEATH_CONFIRMED`;
+- `REMOVED`;
+- `DESPAWNED`;
+- `TEMPORARILY_ABSENT`;
+- Revive;
+- Reincarnation;
+- Arena transfer/return.
+
+Return-to-Deck không tự xóa long-lived battle Deck membership.
+
+Canonical distinction vẫn là:
+
+```text
+DECK_MEMBERSHIP
+≠
+CURRENT_DEPLOYMENT_STATE
+```
+
+Return-to-Deck cũng không tự định nghĩa:
+- HP reset;
+- Heal;
+- Revive;
+- `lifeSerial` mutation;
+- Natural Action grant;
+- Rage gain/full-Rage rule.
+
+Nếu Character sau đó được triển khai lại, lần vào sân đó là một `DEPLOY_FROM_DECK` transaction mới và tuân Contract của deployment transaction đó.
+
+State/Shield nào sống qua transition không được suy ra chỉ từ `LEAVE_FIELD`; retention semantics phải được khai báo bởi transition/lifecycle architecture tương ứng.
+
+---
+
 ## 8.2 Side
 **VI:** Phe  
 **ID:** `SIDE`  
@@ -2320,6 +2385,61 @@ Graph/table mô tả:
 - forbidden transitions.
 
 Dùng khi boolean không đủ an toàn.
+
+---
+
+## 11.3A State Retention Scope
+**VI:** Phạm vi tồn tại qua lifecycle/deployment transition  
+**ID:** `STATE_RETENTION_SCOPE`  
+**Status:** CANONICAL CORE / LIFECYCLE DIMENSION
+
+Semantic dimension mô tả một persistent State hoặc Shield contribution được thiết kế để tồn tại trong phạm vi lifecycle/deployment nào.
+
+State Retention Scope khác với:
+
+```text
+State classification
+Duration clock
+Authority Tier
+```
+
+Current minimum scopes proven by Pilot #4:
+
+### `FIELD_PRESENCE_SCOPED`
+
+State/Shield contribution gắn với active field-presence cycle liên quan.
+
+Nó không mặc định được giữ khi một lifecycle/deployment transition kết thúc presence cycle đó.
+
+### `BATTLE_SCOPED`
+
+State/counter thuộc phạm vi battle và có thể được giữ xuyên qua field/deployment transitions trong cùng battle khi transition semantics cho phép.
+
+Ví dụ generic có thể gồm:
+- battle use counter;
+- battle-persistent form/flag;
+- battle-persistent deployment state parameter.
+
+Canonical distinction:
+
+```text
+BUFF / DEBUFF / MARK / SYSTEM_STATE
+= State classification
+
+FIELD_PRESENCE_SCOPED / BATTLE_SCOPED
+= State Retention Scope
+```
+
+Hai dimension không thay thế nhau.
+
+Một State có thể có State classification và Retention Scope đồng thời.
+
+Transition-owned retention/removal cũng không tự là:
+- Debuff Cleanse;
+- natural duration expiry;
+- Shield damage depletion/break.
+
+Exact retention-profile shape, transition removal cause, Event exposure và execution order thuộc Schema / Contract / Kernel.
 
 ---
 
@@ -3171,20 +3291,110 @@ Canonical distinction:
 ## 16.4B Deployment Cost
 **VI:** Cost triển khai Character  
 **ID:** `DEPLOYMENT_COST`  
+**Status:** CANONICAL CORE / CHARACTER DEPLOYMENT COST FAMILY
+
+Character-side deployment-cost semantic used by Deck deployment.
+
+`DEPLOYMENT_COST` is the umbrella family.
+
+When battle mechanics can change the Character's deployment cost, distinguish:
+
+```text
+BASE_DEPLOYMENT_COST
+≠
+CURRENT_DEPLOYMENT_COST
+```
+
+Deployment Cost is not:
+- AE Cost;
+- Rage Cost;
+- an Ability `CostSpec`;
+- the Side/player `DEPLOYMENT_COST_BAR`.
+
+Canonical family distinction:
+
+```text
+Character Deployment Cost
+≠
+Side Deployment Cost Bar
+```
+
+`DEPLOYMENT_COST_BAR` is the Resource Pool used by the deployment system.
+
+`DEPLOYMENT_COST` is the Character-side amount/value family that determines how much that deployment requires.
+
+If Base and Current are guaranteed equal for a mechanic/context, prose may refer generically to Deployment Cost.
+
+If the distinction changes gameplay, authoring/Contract/runtime must use the exact Base or Current concept rather than bare `DEPLOYMENT_COST`.
+
+---
+
+## 16.4C Base Deployment Cost
+**VI:** Cost triển khai nền của Character  
+**ID:** `BASE_DEPLOYMENT_COST`  
 **Status:** CANONICAL CORE / CHARACTER DEPLOYMENT METADATA
 
-Numeric deployment value của một Character dùng trong `DEPLOY_FROM_DECK`.
+Resolved baseline deployment value of a Character before battle-scoped Deployment-Cost mutations.
 
-Deployment Cost:
-- được trả từ Deployment Cost Bar;
-- không phải AE Cost;
-- không phải Rage Cost;
-- không phải Ability `CostSpec` của Skill/Ultimate.
+Base Deployment Cost may be produced by Character metadata / Cost Budget architecture.
 
-Trong Pilot Normalization, Character chưa được Cost Budget system tính xong có thể mang authored placeholder:
+During Pilot Normalization, unresolved Cost Budget output may remain authored as:
+
+```text
 TBD_BY_COST_BUDGET
-Placeholder này không định nghĩa Cost Budget formula.
-Execution-ready battle content phải có resolved numeric Deployment Cost trước khi deployment transaction có thể thực thi payment.
+```
+
+until execution-ready content requires a numeric value.
+
+Base Deployment Cost:
+- is not the Side Deployment Cost Bar;
+- is not an Ability Cost;
+- is not automatically rewritten when battle-scoped mechanics change Current Deployment Cost.
+
+Exact Cost Budget formula is outside this Terminology definition.
+
+---
+
+## 16.4D Current Deployment Cost
+**VI:** Cost triển khai hiện tại của Character  
+**ID:** `CURRENT_DEPLOYMENT_COST`  
+**Status:** CANONICAL CORE / BATTLE-SCOPED CHARACTER DEPLOYMENT STATE
+
+Authoritative battle-scoped Character deployment-cost value used when the exact current deployment requirement is queried.
+
+Current Deployment Cost may differ from Base Deployment Cost because of explicit battle mechanics.
+
+It may be:
+- read by deployment legality/payment semantics;
+- read or snapshotted by Ability formulas;
+- modified or locked only through explicit downstream gameplay semantics.
+
+Canonical distinction:
+
+```text
+BASE_DEPLOYMENT_COST
+≠
+CURRENT_DEPLOYMENT_COST
+≠
+DEPLOYMENT_COST_BAR
+```
+
+`CURRENT_DEPLOYMENT_COST` is not a Resource Pool.
+
+It is therefore not interchangeable with:
+- Side Deployment Cost Bar;
+- AE;
+- Rage;
+- Ability `CostSpec`.
+
+This Terminology entry does not define:
+- initialization order;
+- mutation order;
+- floor algorithm;
+- lock algorithm;
+- transaction commit timing.
+
+Those belong to Schema / Contracts / Kernel.
 
 ---
 
@@ -4165,6 +4375,11 @@ Các cặp/nhóm sau **không được collapse**:
 41. `Full Rage ≠ Ultimate autocast`.
 42. `Materialization ≠ presence-transition cause identity`.
 
+43. `BASE_DEPLOYMENT_COST ≠ CURRENT_DEPLOYMENT_COST ≠ DEPLOYMENT_COST_BAR`.
+44. `RETURN_TO_DECK ≠ LEAVE_FIELD ≠ DEATH_CONFIRMED ≠ TEMPORARILY_ABSENT`.
+45. `State classification ≠ State Retention Scope ≠ Duration clock`.
+46. Transition-owned retention removal does not automatically mean `DEBUFF_CLEANSE`, natural expiry, or Shield break/depletion.
+
 ---
 
 # 28. CANONICAL RULES RECOVERED
@@ -4201,6 +4416,10 @@ Các cặp/nhóm sau **không được collapse**:
 30. Mode Profile phải cho phép mode mới bỏ SSI/Luân Hồi mà không phá semantic global.
 31. Pygmalion mỗi Life Cycle tạo một Puppet mới; Puppet cũ vẫn tồn tại tới khi chính nó bị remove.
 32. Narrative System cần capability query nhưng không được ép mọi Narrative Property thành Functional Tag.
+
+33. Khi Base-vs-Current Deployment Cost làm thay đổi gameplay, architecture phải giữ hai value này tách biệt và không dùng `DEPLOYMENT_COST_BAR` thay cho Character Deployment Cost.
+34. `RETURN_TO_DECK` là cause-specific deployment/lifecycle transition; `LEAVE_FIELD` chỉ mô tả presence result.
+35. State/Shield bị loại bỏ do lifecycle/deployment retention không tự được coi là Cleanse, natural expiry hoặc damage depletion/break.
 
 ---
 
@@ -4343,6 +4562,9 @@ Một model hiểu đúng Terminology vNext phải chấp nhận đồng thời:
 - Deck membership không tự đồng nghĩa currently deployable.
 - Deployment Cost Bar, AE và Rage là ba resource semantic khác nhau.
 - Full Rage không tự tạo hoặc cast Ultimate.
+
+- Base Deployment Cost không phải Current Deployment Cost; cả hai đều không phải Side Deployment Cost Bar.
+- Return-to-Deck không phải alias của Leave Field; transition-owned cleanup không tự là Cleanse/expiry/break.
 
 Nếu model không giữ được các distinction này:
 > chưa nên cho model đó canonicalize `TAG vNext` hoặc `PRIMITIVE.md`.

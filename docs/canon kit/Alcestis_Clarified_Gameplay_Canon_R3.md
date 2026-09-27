@@ -1,7 +1,7 @@
 # ARCLUNE — PILOT #4
 # ALCestis — CLARIFIED GAMEPLAY CANON
 
-**Revision:** Pilot #4 Clarification R2 — exact Skill-3 direct-effect checkpoint / child-action exclusion / lifecycle validity / global Turn Boundary clock
+**Revision:** Pilot #4 Clarification R3 — R2 semantics preserved; Ultimate secondary-target selection timing locked by later designer correction
 
 > **Purpose:** This file is the authoritative gameplay interpretation for Alcestis Pilot #4.
 >
@@ -10,6 +10,8 @@
 > **Scope:** gameplay meaning only. It does **not** itself patch `01–08`.
 >
 > **Architecture rule:** Character = declarative composition; Kernel = generic runtime. Do not hardcode Alcestis by Character ID.
+>
+> **R3 correction:** the previous R2 sentence leaving Ultimate secondary-target timing potentially unresolved is superseded. The target is selected + locked at target-context step 2; there is no later HP%-requery or retarget.
 
 ---
 
@@ -781,8 +783,38 @@ If multiple eligible allies tie for lowest HP%, choose randomly among the tied l
 
 If no eligible ally exists, skip this secondary branch.
 
-**Target-selection timing relative to the Leader Heal is not separately locked by the designer.**
-Normalizer must preserve the lowest-HP% semantic and surface timing only if current architecture requires an explicit choice.
+### Secondary target selection / lock timing
+
+The secondary target is selected and locked during Ultimate target-context establishment at canonical direct-effect step 2, before the Leader Heal resolves.
+
+Canonical sequence:
+
+```text
+build eligible secondary candidate pool
+→ evaluate LOWEST_HP_PERCENT
+→ if tied: RANDOM_AMONG_TIED
+→ lock selected Entity
+```
+
+The later secondary Heal consumes that already-locked target reference.
+
+Therefore:
+
+```text
+no HP%-requery after Leader Heal
+no tie reroll after initial selection
+no replacement target
+```
+
+If the locked secondary target becomes lifecycle-invalid before the secondary Heal resolves:
+
+```text
+apply ordinary locked-target invalid handling
+→ secondary branch skips/fails on that locked target
+→ NO RETARGET
+```
+
+The Leader Heal/Overheal branch does not cause the secondary target to be selected again.
 
 ---
 
@@ -1196,7 +1228,6 @@ These items are intentionally not invented:
 2. Alcestis Class.
 3. Alcestis Native Element.
 4. Final Base Deployment Cost from Cost Budget.
-5. Exact target-selection snapshot timing of the Ultimate secondary lowest-HP% ally relative to the Leader Heal, if current architecture makes that timing gameplay-observable.
-6. Any future system that converts incoming Heal into True Damage. Alcestis only locks branch independence against such an external rule; the external conversion mechanic itself belongs to the future character/system that proves it.
+5. Any future system that converts incoming Heal into True Damage. Alcestis only locks branch independence against such an external rule; the external conversion mechanic itself belongs to the future character/system that proves it.
 
 Everything else in this file is locked gameplay interpretation for Pilot #4.
