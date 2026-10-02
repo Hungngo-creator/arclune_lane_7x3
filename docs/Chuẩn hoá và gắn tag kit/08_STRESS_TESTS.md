@@ -1,6 +1,6 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-02-I.3
+**Version:** 2026-10-02-I.4
 **Status:** Working Canonical Validation Suite  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.5+, `06_KERNEL_RUNTIME.md` G.4+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
@@ -8,6 +8,7 @@
 
 **Revision I.2:** adds Pilot #5 declarative cases M-038–M-046 for committed-result checkpoints, Shield addition/family caps, explicit Slot ties and existing composition. Architecture Phase: these specify obligations; they do not report executable test results or resolve undeclared gameplay.
 **Revision I.3:** updates M-038–M-046 to current Polyhymnia gameplay; adds M-047 post-completion/source-leave/replay and M-048–M-050 Phần Tinh Cost/snapshot/final multiplier obligations. Declarative architecture validation only.
+**Revision I.4:** binds M-040 to Polyhymnia R4's locked simultaneous Damage/Heal groups and separate sequential group commits; adds permutation, sibling-state isolation and explicitly authored invalid-recipient variants using existing RES-002/003 machinery. No global AoE default or executable test result.
 
 ---
 
@@ -3008,28 +3009,30 @@ At the earlier checkpoint, the own-direct projection is immutable and readable w
 
 ---
 
-## M-040 — Polyhymnia Ultimate Sequential Commits Share One Formula Snapshot
+## M-040 — Polyhymnia Simultaneous Batches Preserve Sequential Groups and One Formula Snapshot
 
 **ID:** `M-040`
 **Status:** `MUST_PASS`
-**Purpose:** preserve Damage → Heal → Leader Shield order, the common source-stat snapshot and the later current Leader cap read.
+**Purpose:** preserve local simultaneous Damage/Heal recipient policies, Damage → Heal → Leader Shield group order, the common source-stat snapshot and the later current Leader cap read.
 
-**Initial State:** Polyhymnia has WIL 100, ATK 80 and Current Max HP 1000 at `ACTION_START`; capture those three values in one SnapshotRef. Eligible enemies have no Shield and sufficient HP to survive; allies have at least 99 missing HP; no amount modifiers alter the fixture's formulas. Leader Current HP is 100, Current Max HP starts at 1000 and 100 Shield remains from this runtime Polyhymnia's stable Ultimate Shield family. Target pools, target-invalid behavior and all required relation/read anchors are explicitly authored. This fixture explicitly uses SIMULTANEOUS recipients within each Damage/Heal group for its snapshot proof; that test-only choice does not resolve the Character's remaining within-group batch question. The locked Character declares `reactionBoundary = AFTER_DIRECT_EFFECTS_COMPLETE`. Ultimate Shields use CREATE, no timed expiry (PERMANENT), and retain source provenance across source leave. All target sets/relations are locked at target-context establishment; relation predicates use its retained SnapshotRef.
+**Initial State:** Polyhymnia has WIL 100, ATK 80 and Current Max HP 1000 at `ACTION_START`. At target-context establishment lock enemy set, ally set and Leader, then capture those source values once in a SnapshotRef. Eligible enemies have no Shield, ordinary Hit Admission succeeds, mitigation is identity and HP is sufficient to survive; allies have at least 99 missing HP; no amount modifiers alter the fixture's formulas. Leader Current HP is 100, Current Max HP starts at 1000 and 100 Shield remains from this runtime Polyhymnia's stable Ultimate Shield family. Initial notes are empty; no unrelated Reaction candidate or source leave interferes with the primary completion fixture. Target pools, explicit ordinary target-invalid profiles and required relation/read anchors are authored. Polyhymnia R4 locks SIMULTANEOUS_BATCH for each Damage/Heal group and `reactionBoundary = AFTER_DIRECT_EFFECTS_COMPLETE` across the ordered direct groups. Ultimate Shields use CREATE, no timed expiry (PERMANENT), and retain source provenance across source leave. Locked target/relation context, common source-formula SnapshotRef and each group's shared calculation-state version remain distinct.
 
-**Input:** resolve the Ultimate as three sequential direct Effect groups, using the source SnapshotRef for every formula. In the test-only snapshot-perturbation variant, an explicitly authored generic Stat mutation dependency between the Damage and Heal groups sets current Polyhymnia WIL/ATK/Max HP to 200/160/2000 and Leader Current Max HP to 500. This additional synthetic node tests SnapshotRef stability and does not become an extra Polyhymnia kit Effect.
+**Input:** resolve Damage as one simultaneous batch, then Heal as one simultaneous batch, then the single locked Leader Shield, using the source SnapshotRef for every formula. Each batch builds all target-local results against its shared group-start state, commits the whole group, then performs mandatory lifecycle/result processing. In the test-only snapshot-perturbation variant, an explicitly authored generic Stat mutation dependency between the Damage and Heal groups sets current Polyhymnia WIL/ATK/Max HP to 200/160/2000 and Leader Current Max HP to 500. This synthetic dependency tests SnapshotRef stability and does not become an extra Polyhymnia kit Effect.
 
 **Expected Resolution:**
 
 ```text
-ACTION_START source snapshot: WIL 100, ATK 80, Max HP 1000
-→ Damage: Will 115 + Physical 68; same hit/Effect
-→ Damage group commit and mandatory lifecycle handling
-→ Heal: requested 55 + 44 = 99 per eligible ally
-→ Heal group commit
+ACTION_START / target context: lock enemies → lock allies → lock Leader
+→ source snapshot: WIL 100, ATK 80, Max HP 1000
+→ shared Damage calculation state; each target: Will 115 + Physical 68, one hit/Effect
+→ whole Damage batch commit → mandatory lifecycle/result processing
+→ shared Heal calculation state; each locked legal ally: requested 55 + 44 = 99
+→ whole Heal batch commit → mandatory lifecycle/result processing
 → Leader Shield: requested 150 from source snapshot
 → read Leader Current Max HP at SHIELD_COMMIT
 → Shield group commit
 → ACTION_DIRECT_EFFECTS_COMPLETE
+→ ordinary eligible Reactions according to existing architecture
 → settle declared pre-completion work
 → ACTION_COMPLETED
 → record/check/atomically consume and create one Chord
@@ -3038,11 +3041,19 @@ ACTION_START source snapshot: WIL 100, ATK 80, Max HP 1000
 
 In the perturbation variant, Damage, Heal and Shield source formulas remain 183/99/150. Leader's current cap is `0.40 × 500 = 200`; existing family Shield is 100, so only 100 is added. The added Shield receipt records requested 150 and committed 100.
 
-**Expected Trace / State:** one Natural Action; common source SnapshotRef; sequential group commits; no extra hit/Action for the Physical/Will components; current-at-Shield-commit cap basis; notes observed only at actual completion and Chord before the next SSI Natural Action. Mandatory lifecycle processing remains between groups, while ordinary Reaction eligibility is held until ADEC.
+**Adversarial variants:**
 
-**Forbidden Outcomes:** simultaneous commit of all three groups; reading updated Polyhymnia source stats for a later formula; reading the Leader cap from Polyhymnia's source snapshot or an earlier Leader snapshot; splitting a single Damage Effect into two Natural Actions; running Chord before Natural completion; opening ordinary Reaction windows between Polyhymnia direct groups or making her local profile the universal default for unrelated Actions; collecting notes at ADEC.
+1. Permute technical target iteration, candidate-list order, incidental trace/Event order, Entity IDs and Slot assignment while retaining the same locked entities' gameplay state. Every target's admitted/calculated/committed result remains equivalent by recipient. No ordering key affects another target's eligibility, formula, relation, Damage type, Hit Admission, mitigation or Shield interaction.
+2. In a synthetic Damage fixture, enemy A supplies a modifier affecting enemy B while A is alive; the Damage batch kills A. B's calculation still includes the modifier present in the shared pre-commit state. A's resulting lifecycle cleanup runs after the whole Damage commit. In a separate synthetic Heal fixture, Polyhymnia starts below 50% HP and a generic source-owned PRE_OVERHEAL ×2 modifier qualifies only above 50%. Her own Heal crosses that threshold at commit; sibling ally Heals still use the group's below-50% start state and are not doubled. These external fixture mechanics are not new Polyhymnia Effects; permuting recipient iteration leaves every target-local result unchanged.
+3. Author DROP_INVALID / NO_REPLACEMENT explicitly for this fixture, then make a locked enemy or ally lifecycle-invalid before its group commits. Skip only that recipient; do not requery, retarget or change any other locked member. This fixture profile does not establish a new Character/global TGT-006 default.
+4. Make all locked allies full HP at the Heal group start. They stay legal, commit actualRestore = 0, discard excess and never reroll. With initial Mercy absent, that group creates no Mercy and the Ultimate does not guarantee a Chord.
+5. In a separate explicit fixture, Damage-group mandatory lifecycle processing changes an ally's HP before Heal starts. Heal's shared calculation view uses that resulting group-start HP, while source formulas and locked target relations remain unchanged. An Action-start HP snapshot must not replace the declared Heal group-start read.
 
-**Layers Under Test:** SnapshotRef, sequential Effects, component Damage profile, `TRG-015`, `SHP-005`, `SHP-006`, Action completion, authored Reaction boundary.
+**Expected Trace / State:** one Natural Action; targets locked before the common source SnapshotRef; one shared calculation-state version per simultaneous group; sequential whole-group commits; no extra hit/Action for the Physical/Will components; current-at-Shield-commit cap basis. Primary positive-result fixture records at completion and creates one Chord before the next SSI Natural Action. Ordinary eligible Reactions follow existing architecture after ADEC; mandatory lifecycle follows each completed batch and remains between groups. Invalid-recipient/full-HP variants qualify notes only from their actual committed positive results.
+
+**Forbidden Outcomes:** simultaneous commit of all three groups; sibling calculations observing an earlier recipient's delta or lifecycle handling; using Slot/entity/list/Event/iteration as undeclared recipient priority; freezing Heal missing HP at Action start instead of its own group-start state; reading updated Polyhymnia source stats for a later formula; reading the Leader cap from Polyhymnia's source snapshot or an earlier Leader snapshot; implicit replacement of invalid/full-HP recipients; splitting one mixed hit into separate Natural Actions; running Chord before Natural completion; ordinary Reaction windows inside batches or between direct groups; making this Character's policy the universal default for unrelated Actions; collecting notes at ADEC.
+
+**Layers Under Test:** ResolutionSpec COMPOSITE/SIMULTANEOUS_BATCH, SnapshotRef, `RES-002`/`RES-003`, Transaction Manager `06` §§30–32, `TGT-006`, component Damage profile, `TRG-015`, `SHP-005`/`SHP-006`, Action completion, authored Reaction boundary.
 
 ---
 
@@ -3651,7 +3662,7 @@ When executable Kernel tests exist, at minimum create Golden Traces for:
 22. `M-037` sequential phase-1 commit → mandatory lifecycle → explosion/skip → `ACTION_DIRECT_EFFECTS_COMPLETE` local Reaction-gate opening.
 23. `N-008` distributed payer-set freeze before any payment commit and gameplay-equivalent replay under permuted technical payer iteration.
 24. `N-009` explicit interposition settlement-failure traces for PRE/POST `CONTINUE` and `FAIL_INTENT`, including post-cost no-auto-refund behavior.
-25. `M-040` / `M-041` sequential common-snapshot Ultimate → direct-result seal → completion → owner-scoped record/check/consume/create → Chord without rerecording.
+25. `M-040` / `M-041` separate simultaneous Damage/Heal batches with shared group-state calculations → sequential Damage/Heal/Shield commits using one source-formula snapshot → direct-result seal → completion → owner-scoped record/check/consume/create → Chord without rerecording; no sibling contamination or hidden recipient priority.
 26. `M-043` source-family cap sum → current commit-time headroom → clipped new addition and immutable receipt without old refresh/clamp.
 27. `M-044` / `M-045` exact metric Slot cutoff and locked invalidation; retained result views and created settlement restore without replay, including terminal deduplication after receipt cleanup.
 28. `M-047` completion → atomic consume/create → required settlement → global SSI handoff, with source-leave cuts and no gameplay pending token.
