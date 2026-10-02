@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-02-G.4
+**Version:** 2026-10-02-G.5
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -12,6 +12,7 @@
 
 **Revision G.3:** adds checkpoint-scoped committed-result views, Shield addition receipts/source-family caps and explicit Slot tie resolution through existing owners. No Character-specific runtime, Functional Tag, Primitive or generic priority is introduced.
 **Revision G.4:** executes typed relation context, corrected Shield owner/zero-result law, durable replay identity, required post-completion settlement and bounded Final Damage amplification through existing owners. No Character-specific runtime, Functional Tag, Primitive or generic priority is introduced.
+**Revision G.5:** lowers bounded HP-payment profiles and immutable post-payment HP into existing Cost/State/Result transactions; handles explicit admitted-Action continuation through Cost-caused lifecycle before direct Effects. Existing defaults/distributed barriers are preserved.
 
 ---
 
@@ -1398,6 +1399,12 @@ Canonical high-level path:
      AND all required payment results are stored
      AND declared CostGroup result/aggregates are constructed
 
+6A. only on terminal Cost success, if normalized
+    costLifecyclePolicy = CONTINUE_ADMITTED_ACTION:
+      finish mandatory Cost-caused HP_ZERO/lifecycle work under CST-015
+      resume this same admitted Action; do not cancel merely because its Actor
+      returned to Deck or reached DEATH_CONFIRMED during that processing
+
 7. ACTION_BEGIN
 
 8. if POST_COST_PRE_EFFECT branch applies:
@@ -2006,6 +2013,16 @@ The existing Transaction Manager owns a typed Cost transaction context for norma
 
 This is not a new top-level subsystem.
 
+### Explicit singular HP-payment profile / commit HP binding
+
+For normalized `hpPaymentPolicy`, existing Cost validation / Transaction Manager evaluates CST-014 against one protected pre-payment view: requested amount, payer HP/MaxHP, structured case guards, floor and optional owner-keyed remaining-use counter. Cache one matched case and its proposed debit/result HP; reject no match/overlap, co-authored legacy floor, unsupported consumption context/input or ambiguous shared-payer/counter allocation. Do not choose by case/Cost iteration order. Read-only admission probes perform no debit, counter update, floor assignment or lifecycle publication.
+
+Join the selected counter decrement and HP outcome with all required Cost writes/results at their authoritative atomic commit. If any required validation/admission or protected-read check fails, commit no AE/HP/floor/counter delta. A technical resume reuses frozen input/case identity rather than rerolling/reselecting it; a new logical attempt needs new validation. State Runtime remains the allowance owner; no new service.
+
+At each successful singular HP payment commit, lower P-036's resulting HP to immutable `CostPaymentResult.currentHpAfterPayment` **before releasing resulting HP_ZERO/lifecycle work**. This includes successful zero debit. Store it with requested amount, actual paid amount, payer and success; do not capture it later from live HP. `COST_PAYMENT_REF / CURRENT_HP_AFTER_PAYMENT` resolves this HP-only field through the existing Result Store. Failed/non-HP/missing bindings fail closed, not to live HP or amount paid. Explicit floor assignment is non-Heal.
+
+Existing Action execution records retain pending Cost-caused lifecycle work and `CONTINUE_ADMITTED_ACTION` profile under §23. After the entire active Cost stage reaches terminal success, Lifecycle Runtime resolves that mandatory work; death/return keeps this admitted Action's context/bindings for downstream legal nodes, without a new request/admission or hidden cancellation. Failed required Cost never enters direct continuation. Existing independently declared cancellation and recipient legality still apply. This does not authorize a dead/off-field Actor's next Action.
+
 Conceptual runtime state:
 
 ```text
@@ -2017,6 +2034,7 @@ CostTransactionContext
   stateVersionBeforePayment
   requiredCostRefs[]
   requiredValidationResults[]
+  singularHpPolicySelections[]? # protected input/case/counter refs and proposed HP outcome
   optionalPayerSnapshots[]
   requiredCommitResult?
   memberPaymentResultRefs[]
@@ -3239,6 +3257,8 @@ validate payable
 
 Global default:
 leaves at least 1 HP.
+
+Explicit normalized `hpPaymentPolicy` is evaluated through §29A / CST-014; selected floor0 and permitted successful shortfall do not change that default for other Costs. The existing P-036 payment output supplies immutable post-payment HP before Cost-caused lifecycle; do not route through Damage/Heal Runtime. Under the declared continuation profile, §23 / CST-015 complete mandatory lifecycle before this admitted Action's direct Effects.
 
 ---
 
@@ -5345,6 +5365,7 @@ A complete save needs:
 - sealed checkpoint result views/immutable Shield addition receipts still referenced by pending observers or dependent work, and stable source-family provenance on surviving contributions;
 - processed observation / consume-create / terminal settlement identities keyed by observed Action + checkpoint + runtime trigger owner + instantiated candidate/dependency, even after receipts are freed and flags consumed, for the supported replay horizon;
 - ACT-033 required post-action obligation state and its held scheduler handoff, so recovery finishes the same finite settlement before advancing to the next Natural Action.
+- singular HP-policy input/case identity and protected counter updates, immutable post-payment HP receipts, pending Cost-caused lifecycle work and the admitted Action continuation cursor; restore must not debit, consume, process HP_ZERO or replay completed direct Effects twice.
 
 Reuse existing Trigger candidate / Transaction Manager idempotence records, not a new manager. Observation identity includes the trigger definition and original committed Event identity; stored candidate/dependency IDs remain stable on redelivery. Check terminal observation identity before allocating another candidate, including previously nonqualifying observations. Rebuilding indexes does not reset processed identities. Release receipt payloads once their consumers finish, independently from deduplication identity retention. After a terminal record's replay horizon is retired, reject delivery from before the retained horizon rather than accept it as a fresh observation. Restore cannot recreate notes, additions, consumed sets or already-terminal settlements.
 

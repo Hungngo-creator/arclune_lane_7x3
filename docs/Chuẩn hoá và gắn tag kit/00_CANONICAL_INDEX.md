@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-02-INDEX-5
+**Version:** 2026-10-02-INDEX-6
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-02-INDEX-3`
+**Version:** `2026-10-02-INDEX-6`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-02-E.3`.
+**Version:** `2026-10-02-E.4`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-02-F.5`.
+**Version:** `2026-10-02-F.6`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-02-G.4`
+**Version:** `2026-10-02-G.5`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-02-I.4`
+**Version:** `2026-10-02-I.5`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -150,9 +150,9 @@ In `docs/canon kit/`:
 - Pilot #5: `Polyhymnia_Clarified_Gameplay_Canon.md`; R4 locks Character-local simultaneous Damage/Heal batches within sequential Damage → Heal → Leader Shield groups, target-lock-before-source-snapshot and completion-only notes. Internal kit gameplay is clarified; §7 contains future external-content/profile boundaries. Existing E.3/F.5/G.4 machinery suffices; no new runtime gap. It is not a claim of execution-ready numeric data.
 
 - Pilot #6: `Phan_Tinh_Clarified_Gameplay_Canon.md` R2; complete one-Skill raw kit, mandatory actual-cast HP exchange, common-snapshot simultaneous conditional TRUE AoE and payment-gated own-direct final multiplier. Native Element/budget remain separate metadata.
-- Next selected kit: `Nerovar_Clarified_Gameplay_Canon.md` R1, **CLARIFICATION_IN_PROGRESS**. Designer-named first #52 Warrior / Death Pays the Fare from `ý tưởng nhân vật 3.md`; complete Passive/Basic/three Skills/Ultimate. HP_ZERO→Deck life state, exceptional HP payment and formula/target/snapshot/clock bindings await designer answers. No completed normalization or new generic gap is claimed. The later duplicate #52 Mage is separate content.
+- Current selected kit: `Nerovar_Clarified_Gameplay_Canon.md` R2, **PARTIALLY_NORMALIZED / CLARIFICATION_IN_PROGRESS**. First #52 Warrior / Death Pays the Fare from `ý tưởng nhân vật 3.md`; later duplicate #52 Mage remains separate. Designer locked HP_ZERO prevention, successful alive/HP1 return/use/−3 order, and Skill1 atomic AE+exceptional HP Cost/immutable post-payment HP/admitted meteor continuation. E.4/F.6/G.5 close only the proved Cost gaps through existing owners; Passive failed-return survival atomicity and remaining Damage/target/snapshot/Skill2 clock/Heal profiles still need answers. Do not claim full Character normalization or copy another kit’s answers.
 
-Earlier canon architecture-base/proposed-delta statements record their drafting context. Current architecture authority remains the latest merged 00–08: PR #5's E.3/F.5/G.4/I.3 corrections are merged, not open gaps to duplicate. PR #6 updated navigation/coverage to I.4 without changing those Schema/Contract/Kernel revisions; INDEX-5 updates the selected raw kit and clarification record only.
+Earlier canon architecture-base/proposed-delta statements record their drafting context. Current architecture authority remains the latest merged 00–08: PR #5's E.3/F.5/G.4/I.3 corrections are merged, not open gaps to duplicate. PR #6 updated navigation/coverage to I.4; PR #7 selected/named Nerovar and reconstructed its R1 canon. Current E.4/F.6/G.5/I.5 adds bounded singular HP-payment cases, atomic allowance consumption, typed immutable HP at payment commit and explicit Cost-caused lifecycle continuation. Earlier Pilot boundaries remain canonical and must not be duplicated.
 
 Pilot #5 architecture deltas: bounded checkpoint result observation, immutable Shield addition receipts, source-family addition caps, explicit Slot metric ties/top-N cutoff, typed recipient relation snapshots, required finite post-completion settlements before SSI handoff, and Turn-Based Main Leader position clarification. No new Functional Tag or Primitive. `M-038` onward adds declarative architecture coverage; Pilot #6 adds the bounded FINAL_DAMAGE_MULTIPLIER/directActionRef surface through existing modifier/Damage owners; no executable tests are implied.
 
@@ -1019,7 +1019,7 @@ Do not solve Contract ambiguity by inventing a new Tag.
 
 # 27. ARCHITECTURE IMPACT / REVIEWABLE OUTPUT
 
-For authorized repository editing, apply corrected changes directly on a reviewable branch and report every affected file/section with its reason. Preserve untouched layers explicitly as `NO CHANGE`. Commit/PR follow the user's authorized scope; do not merge automatically.
+For authorized repository editing, apply corrected changes directly on a reviewable branch and report every affected file/section with its reason. Preserve untouched layers explicitly as `NO CHANGE`. Commit/PR/merge follow the user's authorized scope. Automatic merge requires explicit user authorization, which may persist across turns.
 
 Provide exact manual patch blocks only when that is the requested deliverable. Neither workflow requires regenerating all canonical files.
 

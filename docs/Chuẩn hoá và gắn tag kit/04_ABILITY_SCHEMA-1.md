@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-02-E.3
+**Version:** 2026-10-02-E.4
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -9,6 +9,7 @@
 
 **Revision E.2:** adds checkpoint-scoped committed-result Conditions, Shield addition receipts/source-family caps and explicitly authored Slot ties through existing owners. Earlier normalized data remains unchanged; unresolved Character fields are not compiled into defaults.
 **Revision E.3:** adds required post-completion settlement, typed result relation context, Shield owner/zero-addition clarification and bounded Final Damage amplification/direct-Action scope. Pre-Pilot-5 data remains unchanged; E.2 ACTION_RESULT_ANY content must explicitly bind readContext before normalization to E.3.
+**Revision E.4:** adds bounded singular HP-payment profiles, immutable post-payment HP reads and explicit admitted-Action continuation through Cost-caused lifecycle processing. Existing exact-payment/default-floor and distributed Cost profiles remain unchanged; no new Tag/Primitive.
 
 ---
 
@@ -545,6 +546,7 @@ action:
   childCostPolicy:
   childSnapshotPolicy:
   actionCompletionPolicy:
+  costLifecyclePolicy:
 ```
 
 ---
@@ -564,6 +566,10 @@ SPECIAL
 ```
 
 Character-specific Ability ID vẫn giữ exact source.
+
+### Optional `costLifecyclePolicy`
+
+Minimum explicit profile: `CONTINUE_ADMITTED_ACTION`. After successful Cost, mandatory Cost-caused HP_ZERO/lifecycle processing finishes before direct Effects; actor death or field leave from that processing does not itself cancel this already-admitted Action. Retain its execution context and bindings. No admission replay, new Action, resurrection, payment waiver, target replacement or bypass of explicit Effect legality/cancellation is implied. `CST-015` governs timing. Absence preserves existing profiles; observable Cost-caused source invalidity requires an applicable explicit continuation/cancellation law, not a guessed default.
 
 ---
 
@@ -1510,6 +1516,7 @@ cost:
   waiverPolicy:
   refundPolicy:
   resultBinding:
+  hpPaymentPolicy:
 ```
 
 A CostSpec uses either:
@@ -1659,6 +1666,30 @@ Compiler path:
 `VALIDATE_COST → COMMIT_HP_COST`.
 
 Non-payment HP loss must not use CostSpec.
+
+## 10.3A Optional bounded `hpPaymentPolicy`
+
+For singular `kind = HP` only; current bounded support does not accept `payerCollection`:
+
+```yaml
+hpPaymentPolicy:
+  cases:
+    - hpRange: BELOW_REQUESTED | AT_OR_ABOVE_REQUESTED
+      conditions: [] # existing structured Conditions, pre-payment state only
+      minimumRemainingHp: <pure nonnegative finite ValueRef>
+      shortfallPolicy: REQUIRE_FULL | CLAMP_SUCCESS
+      consumeCounterRef: <optional existing COUNTER_REF remaining-use binding>
+```
+
+Evaluate normalized requested amount, payer HP, guard Conditions, floor and counter availability once from the transaction's authoritative pre-payment view. `hpRange` compares that HP with that same normalized requested amount. Exactly one case must match; case/list/Event order never chooses a winner. Reject uncovered/overlapping cases, unsupported guards, negative/nonfinite amounts/floors or floors above Current MaxHP. A counter binding names existing owner-keyed State/counter data, not a new allowance manager or arbitrary commit callback.
+
+The selected case explicitly owns this payment's HP payability/floor. Do not co-author the legacy scalar `lethalFloor` with `hpPaymentPolicy`; reject that conflicting source shape rather than select precedence. Other required Cost validation and ordinary failure/refund laws remain authoritative. A consuming case is supported only for a required Cost of the admitted Action, not optional-payer or unrelated settlement-counter mutation.
+
+`REQUIRE_FULL` requires full requested payment while respecting the selected floor. `CLAMP_SUCCESS` explicitly permits a smaller/zero successful payment: `paid = min(requested, max(0, hpBefore - floor))`; `hpAfter = max(floor, hpBefore - paid)`. Its declared floor assignment is not Heal; the receipt's debit is not reconstructed from later/net HP differences. This is opt-in exceptional semantics, not the ordinary required-Cost default. `CST-014` owns the atomic law.
+
+If supplied, `consumeCounterRef` consumes one available remaining-use unit only with successful required-group commit and Action admission; protect its read/write in that transaction. Failed probes, another required Cost failure or an uncommitted/aborted transaction consume nothing. Independent matching Costs may not compete for the same payer HP/counter without an explicit supported allocation law. No hidden payment order or partial required-group commit.
+
+Example composition for a once-only safeguard: BELOW_REQUESTED + allowance available → floor1/CLAMP_SUCCESS/consume allowance; BELOW_REQUESTED + exhausted → floor0/CLAMP_SUCCESS; AT_OR_ABOVE_REQUESTED → floor0/REQUIRE_FULL. Those are authored cases, not Character-ID rules. Existing unprofiled Costs, ordinary full-payment exchanges and distributed optional-payer semantics remain unchanged.
 
 ---
 
@@ -4456,6 +4487,8 @@ payer
 success
 ```
 
+A successful singular HP payment may additionally expose immutable `currentHpAfterPayment`, read through `COST_PAYMENT_REF.field = CURRENT_HP_AFTER_PAYMENT`. Capture the resulting payer HP in the actual payment commit before HP_ZERO/lifecycle side-effects; P-036 already returns this resulting HP. It is an HP-only commit result, not `actualPaidAmount`, a live HP read or the Action's ATK/WIL Snapshot. Reject reads from failed/non-HP/unavailable payments; zero paid with success may still provide this HP field. Retain it for dependent Action work/replay under CST-009.
+
 Conceptual ValueRef:
 
 ```yaml
@@ -4504,7 +4537,7 @@ actualPaidAmount = 0
 
 unless an explicit Cost Contract defines another result.
 
-Downstream consumers requiring committed payment outcome must use `actualPaidAmount`.
+Downstream consumers whose formula requires the amount actually paid must use `actualPaidAmount`; a post-payment-HP formula instead uses the typed HP result field above.
 
 They must not reconstruct it from the nominal Cost expression.
 
@@ -5025,6 +5058,8 @@ damageTransformPlan
 
 `costPlan` may carry explicit CostGroup, distributed payer-collection, and typed Cost-result binding plans.
 
+It also preserves bounded singular HP cases, protected counter consumption and the typed commit-HP result binding under CST-014/009. The existing `actionSpec` carries costLifecyclePolicy under CST-015; do not lower it as a new Trigger/Action or generic callback. P-036 remains the HP-payment operation.
+
 Target tie policy is normalized into `targetPlan`.
 
 `DEPLOYMENT_COST_MODIFICATION` and `RETURN_TO_DECK` remain typed Effect semantics in the normalized Effect/deployment execution plan; they do not imply new Primitive IDs.
@@ -5121,6 +5156,7 @@ Normalizer/compiler must:
 38. Validate postActionSettlement completed-Natural-Action/Mode/owner anchors, bounded same-opportunity DAG and terminal-before-handoff requirement; reject completion cycles and waits on held boundaries.
 39. Preserve declared Shield owner independently from recipient when lowering retention/owner clocks; reject an unresolved required owner reference.
 40. Validate FINAL_DAMAGE_MULTIPLIER Damage/component/operation compatibility, directActionRef own-graph membership and same-Action Cost/Snapshot/result binding visibility; reject implicit root/Attribution scope or raw/FDR phase substitution.
+41. Validate bounded HP case/floor/required-counter compatibility and typed resulting-HP reads; preserve explicit Cost-caused lifecycle continuation in the same admitted Action under CST-014/009/015.
 
 ---
 
@@ -6032,6 +6068,10 @@ At minimum validator must enforce:
 64. ACTION_RESULT_ANY recipient readContext must be explicit and its SnapshotRef cover every requested fact.
 65. postActionSettlement must be finite, opportunity-local and completed-Natural-Action anchored; it cannot block its own source completion or wait for held handoff/boundary.
 66. FINAL_DAMAGE_MULTIPLIER is Damage-only with finite MULTIPLY factors >= 1; directActionRef and all scoped result bindings must resolve without implicit child-root inheritance.
+67. `hpPaymentPolicy` requires singular HP Cost, supported pure pre-payment guards/floors and exactly one matching case; reject uncovered/overlapping cases, nonfinite/negative values, floors above payer Current MaxHP, co-authored legacy lethalFloor, incompatible payerCollection or unsupported shared-payer/counter allocation.
+68. A selected `consumeCounterRef` must resolve to an available owner-keyed remaining-use counter with declared lifetime for a required Cost of this admitted Action, and join its required Cost/admission commit. Optional/unrelated consumption, probes or aborted/failed transactions cannot consume it or assign the floor.
+69. `CURRENT_HP_AFTER_PAYMENT` must bind to the successful singular HP payment commit; failed, unavailable, distributed-aggregate or non-HP bindings cannot substitute live HP, nominal Cost or actualPaidAmount.
+70. `CONTINUE_ADMITTED_ACTION` preserves only the existing admitted Action after mandatory Cost-caused lifecycle. It grants no new Action, payment waiver, resurrection, target replacement or bypass of explicit Effect/cancellation legality; observable source-invalidity outcomes require an applicable explicit policy.
 
 ---
 
