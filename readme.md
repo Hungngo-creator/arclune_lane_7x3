@@ -1,4 +1,3 @@
-tao đọc và chỉnh sửa repo được - 6.1 sol
 # Arclune Lane 7x3 — README kỹ thuật (cập nhật 2026-03-26)
 
 ## 1) Tổng quan kiến trúc
