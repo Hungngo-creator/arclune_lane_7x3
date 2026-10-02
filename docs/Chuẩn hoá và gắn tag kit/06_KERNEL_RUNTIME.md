@@ -1,12 +1,14 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-09-19-G.1  
+**Version:** 2026-10-02-G.2
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA.md`, `05_CONTRACTS.md`  
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
 **Non-goal:** implementation code, Unity class layout, networking transport, renderer, editor UI.
 
 **Revision G.1:** incorporates Pilot Normalization #3 runtime support for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost execution, immutable typed Cost-payment results, scoped Effect-amount modifier evaluation, and explicit `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary execution. No new Functional Tag or Primitive is introduced.
+
+**Revision G.2:** executes the merged Pilot #4 Schema and F.3 Contracts through existing runtime owners: static-Passive initialization, pre-mitigation component-type transforms, battle-scoped Deployment Cost and lock, atomic Return-to-Deck retention cleanup, and metric-selector tie resolution. No Character-specific runtime branch, Functional Tag, Primitive, callback registry, or generic priority system is introduced.
 
 ---
 
@@ -188,6 +190,7 @@ targetPlan
 snapshotPlan
 effectGraph
 effectModifierPlan
+damageTransformPlan
 authorityPlan
 attributionPlan
 capabilityIndex
@@ -199,6 +202,8 @@ validationHash
 `intentInterpositionPlan` is generated from bounded Ability-owned `ActionIntentInterpositionSpec`.
 
 `effectModifierPlan` is generated from bounded `ScopedEffectAmountModifierSpec`.
+
+`damageTransformPlan` is generated from bounded `ScopedDamageComponentTransformSpec` and is distinct from numeric amount modification. `targetPlan` preserves the declared metric tie policy independently from target lock/invalidation. Typed `DEPLOYMENT_COST_MODIFICATION` and `RETURN_TO_DECK` nodes use the existing Effect/deployment execution plan and Contract Resolver, not new Primitive IDs.
 
 `costPlan` may contain:
 - ordinary singular/fixed Cost execution;
@@ -216,7 +221,9 @@ Kernel may reject IR if:
 - invalid Primitive request;
 - ambiguous interposition multiplicity that should have been rejected by normalization;
 - unsupported modifier operation or resolution phase;
-- invalid Cost-result binding shape.
+- invalid Cost-result binding shape;
+- unsupported Damage transform operation/phase or incompatible overlapping transforms;
+- unresolved required deployment initialization data, ambiguous static initialization order, invalid retention profile, or undeclared observable metric tie behavior.
 
 ---
 
@@ -249,7 +256,11 @@ HistoryState
 
 - battle Deck membership;
 - current deployment state / deployment availability;
-- deployment metadata/runtime references.
+- deployment metadata/runtime references;
+- battle-participant-keyed Current Deployment Cost, declared floor, and lock state under §10B;
+- static deployment-state battle-initialization completion records under §35A.
+
+The battle participant is the stable roster runtime identity within the owning battle. It is not the mutable Field Presence, destination Slot, or child Combat Instance. These records must not be duplicated as writable Resource Pools or ordinary attached State.
 
 These are separate concerns.
 
@@ -426,11 +437,11 @@ resolve battle Deck membership
 → read current deployment state
 → validate this state permits Deck → Battlefield deployment
 → validate additional deployment eligibility
-→ read resolved Deployment Cost
-→ validate Deployment Cost Bar
+→ resolve deploymentPaymentAmount from initialized CURRENT_DEPLOYMENT_COST
+→ validate Deployment Cost Bar against that amount
 → validate / reserve destination Position
 → open atomic deployment transaction
-→ debit Deployment Cost Bar
+→ debit Deployment Cost Bar by that same deploymentPaymentAmount
 → commit deployment-state transition
 → materialize / activate Character on destination Battlefield
 → SET Current Rage = Max Rage
@@ -457,6 +468,85 @@ No dedicated Character-specific deployment Primitive is required.
 TBD_BY_COST_BUDGET is authoring metadata only and is not executable as a runtime numeric cost.
 Turn-based Deployment Cost Bar gain rate is supplied by Mode Resource Profile.
 Exact Cost Bar cap/overflow/pause/time-scale behavior remains outside this Pilot patch.
+
+Under `DEP-001`, validation and debit use the same authoritative Current value. Transaction Manager protects that read through commit; a conflicting intervening mutation must not let an attempt validate one amount and pay another. Successful deployment retains battle Deck membership. Deployment consumes initialized battle state and never runs static battle initialization again.
+
+---
+
+# 10B. BATTLE-SCOPED CHARACTER DEPLOYMENT COST
+
+The existing deployment runtime owns this field family in `DeckState` under `DEP-002` / `DEP-006`, keyed by owning battle × stable battle participant:
+
+```text
+resolved Base Deployment Cost reference
+currentDeploymentCost
+floor
+locked
+lockedValue?
+```
+
+Base is resolved Character/deployment metadata, not a writable battle Resource Pool. Current and its lock are authoritative battle state.
+
+Creation follows §35A: resolve executable Base → initialize Current from Base → initialize unlocked state → settle declared static initialization mutations → expose initialized reads. Unresolved required Base/Current data blocks execution-ready initialization; `TBD_BY_COST_BUDGET` is never a numeric fallback. This runtime does not compute the future Cost Budget formula.
+
+A normalized `DeploymentCostModificationSpec` resolves its typed subject and operation at the declared Effect checkpoint:
+
+- `ADD_CURRENT`, while unlocked: evaluate the authored pure value and commit `max(floor, authoritative Current + value)`.
+- `LOCK_CURRENT`: capture the exact then-authoritative Current as `lockedValue` and freeze that value for the battle remainder.
+- `ADD_CURRENT`, while locked: record no Current-value change; preserve already-committed Effects and the enclosing admitted Action. Unrelated Side Deployment Cost Bar gain remains legal.
+
+The floor is enforced whenever a Current mutation commits; it does not rewrite Base. There is no implicit unlock operation. Undeclared order between conflicting mutations/lock operations is not supplied by runtime iteration.
+
+`BASE_DEPLOYMENT_COST_REF` and `CURRENT_DEPLOYMENT_COST_REF` are pure typed reads from their respective owners. Snapshot Runtime captures the selected authoritative value and state version at the declared checkpoint; later mutation or lock never rewrites an earlier `SnapshotRef`. Deployment payment reads Current, not an earlier formula snapshot or Base.
+
+Ordinary same-battle Return-to-Deck/redeployment reuses Current and its lock. Other lifecycle transitions follow their explicit Contracts; field exit alone never creates another initialization lifetime. Battle end retires the records; a new battle resolves Base and creates fresh unlocked state. Save/load and replay preserve Current, floor, lock/value, participant identity and initialization completion, without reapplying mutations during restoration.
+
+---
+
+# 10C. RETURN-TO-DECK TRANSACTION
+
+The existing deployment runtime coordinates `ReturnToDeckSpec` through Transaction Manager, presence/Position machinery, State Runtime and source-aware Shield Runtime under `DEP-007` / `DEP-008`.
+
+```text
+resolve typed subject and current Combat Instance
+→ validate declared source/destination deployment states
+→ validate current presence, Deck-membership policy and retention profile
+→ freeze retention decisions from authoritative pre-transition state
+→ stage presence/Position exit, deployment destination and selected cleanup
+→ commit one coherent authoritative post-state
+→ release post-commit observations with transition/cleanup causes
+```
+
+For the current bounded profile, `BATTLEFIELD_ACTIVE → DECK_UNDEPLOYED`, `LEAVE_CURRENT_COMBAT_INSTANCE` and `RETAIN_BATTLE_DECK_MEMBERSHIP` produce: no active presence/occupancy in that instance, returned deployment state, retained battle Deck membership. This is `LEAVE_FIELD` caused by `RETURN_TO_DECK`, not Death, Temporary Absence, Arena transfer or removal/erasure.
+
+No presence exit, destination-state mutation or transition-owned cleanup commits on failed validation. Earlier committed Action Effects remain committed. Downstream nodes requiring successful return must declare dependency/Conditions on the successful transition post-state; runtime never assumes success.
+
+### Retention and terminal causes
+
+State/Shield retention metadata is read from §§51/61. Freeze a decision for every relevant attached State/Shield contribution before staging removals. For each item, use the first matching decision in this Contract order:
+
+```text
+1. discardStateClassifications
+2. discardRetentionScopes
+3. retainRetentionScopes
+4. unmatchedStatePolicy
+```
+
+Classification discard therefore wins over a retained scope. A `BATTLE_SCOPED` Debuff is still removed when `DEBUFF` is explicitly discarded. `unmatchedStatePolicy = RETAIN` preserves unselected items; `REQUIRED_EXPLICIT` must be resolved before executable transition content is accepted. No Character-specific State-ID cleanup list is consulted.
+
+Removal is transition retention, not Cleanse: Authority Tier alone does not exempt selected Buff/Debuff/Mark instances. A real future protection against transition cleanup requires its own explicit conflict Contract.
+
+Stage selected State termination, modifier deregistration, duration/recovery-window retirement and selected Shield-ledger removal inside the same transaction. Retire pending clock/settlement work owned by terminated windows so it cannot execute later as natural expiry or survive redeployment; preserve unrelated work and already-consumed battle use counts. Remove only selected Shield contributions and recompute their pool totals without simulating Damage absorption.
+
+Removed entries record `TRANSITION_CLEANUP` and separately retain the owning `RETURN_TO_DECK` transaction/cause. State/Shield terminal observers see the committed post-state and those immutable causes. Cleanup does not emit break/depletion, natural expiry or Cleanse semantics, and cannot create a break/expiry-only recovery window or natural-expiry Heal. Internal cleanup iteration and `eventSeq` are not gameplay priority.
+
+`currentHpPolicy = RETAIN` preserves Current HP. Deployment Current Cost/lock are outside the attached-State collection and remain available in `DeckState`; ordinary retained battle counters/flags remain in their own stores. No HP reset, lifeSerial mutation, Cost decrement, Cost Bar gain, full Rage or Natural Action is implicit in the transition.
+
+### Commit and Action continuity
+
+No reader/listener may observe absent presence with Battlefield-active deployment, Deck destination with active old presence, or cleanup before its terminal cause exists. Transaction Manager validates the protected read/decision set and publishes only after the common commit barrier.
+
+The already-admitted Action retains its execution/provenance context after successful return. It may finish explicitly authored downstream nodes whose own legality passes, including deployment-system mutation and Side resource gain. Active-presence requirements still apply to nodes that declare them; no new off-field Natural Action is granted. Later legal redeployment uses §10A, full-Rage and SSI rules as before, with a fresh field-presence cycle and no static battle reinitialization.
 
 ---
 
@@ -1075,6 +1165,12 @@ attributionContext
 `originEffectId` identifies the normalized generating Effect definition/node.
 
 `effectSource` preserves canonical Effect Source semantics.
+
+### Direct-effect ownership query
+
+`DIRECT_EFFECT_GRAPH_OF_SCOPED_ACTION` resolves through the existing normalized Effect graph and immutable Effect context. Preserve enough owning Action/node membership to test that the resolving Effect belongs to the declared scoped Action's own direct graph. A separate child Action or standalone triggered Effect fails that test even if its `rootActionId` matches. A Passive modification of the same direct hit preserves that hit's membership.
+
+This typed query is available to transform scope checks and committed Damage-result aggregation. It does not change which child steps block Action completion. Propagate the same provenance through result/Event references so later aggregation cannot reconstruct direct ownership from attribution or temporal coincidence.
 
 ### Same root does not mean same Effect
 
@@ -2315,6 +2411,29 @@ Priority/scheduling remains governed by existing Trigger/Reaction Contracts.
 
 ---
 
+## 35A. STATIC PASSIVE REGISTRATION / BATTLE INITIALIZATION
+
+Under `TRG-014`, the existing Trigger Engine / Contract Resolver registers normalized `PASSIVE_STATIC` rules with their owning Ability/System, runtime participant and declared lifetime. Repeated index construction for the same owner, normalized rule and lifetime reuses that registration rather than multiplying candidates. Registration supplies indexed admission/modifier/transform candidates; it is not Event-driven Action execution and pays no Ability Cost, consumes no Natural Action and advances no SSI by itself.
+
+Battle-scoped initialization Effects use the owning battle participant's initialization checkpoint, including participants initially undeployed in Deck. For deployment-state initialization, the deployment runtime owns completion records in `DeckState`, keyed by battle × participant × owning normalized Ability/System and initialization Effect identity. Other static initialization Effects remain with their existing state owners; they do not become deployment state merely because they use this checkpoint. Transaction Manager commits required initialization deltas and their completion records together before deployment/payment/formula readers can access initialized state:
+
+```text
+resolve execution-ready BASE_DEPLOYMENT_COST
+→ initialize CURRENT_DEPLOYMENT_COST from Base
+→ initialize its lock as unlocked
+→ settle qualifying PASSIVE_STATIC initialization Effects exactly once
+→ record initialization complete
+→ expose final initialized state
+```
+
+A failed required initialization must not expose a partially initialized participant or guess unresolved numeric values. Retry resumes only uncommitted work and never reseeds already-created Current/lock state or repeats a mutation whose completion record committed. Reads remain gated until the required participant initialization is complete. Restoring a save restores records/state and rebuilds rule indexes without replaying initialization mutations or duplicating static registration.
+
+Deployment, return/redeployment, presence re-entry, Revive, Temporary Absence return and Combat-Instance transfer do not by themselves create another owning battle-participant lifetime or rerun battle mutations. Rule availability continues to follow its declared lifetime/scope; registration/index maintenance is distinct from initialization Effect settlement. Expired registrations are retired by the owning lifetime; a new battle creates fresh completion records.
+
+Order-independent typed initialization operations may compose. If mutation/lock ordering changes the result, require normalized explicit dependency/composition supported by Contract or reject executable content; Ability list, entity ID, Event order and iteration never supply it. This is bounded normalized initialization, not a startup callback registry.
+
+---
+
 # 36. TRIGGER CANDIDATE
 
 When an Event is published:
@@ -2529,9 +2648,19 @@ candidate source
 → semantic target filters
 → TARGET_EXCLUSION
 → candidate pool
-→ deterministic selection
+→ declared selection / metric tie resolution
 → TargetSetRef
 ```
+
+### Metric tie resolution
+
+`targetPlan.tiePolicy` is executed here under `TGT-007`, with §§43/44 RNG and §§42 / `TGT-004` / `TGT-006` lock/invalidation behavior remaining separate.
+
+For `RANDOM_AMONG_TIED`, freeze the final eligible Candidate Pool and read all metric values from the same authoritative selection checkpoint. Determine the best value and the exact tied-best subset before a draw. For `LOWEST_HP_PERCENT`, compare `CurrentHP / CurrentMaxHP` using authoritative arithmetic, never rounded UI percentages; positive-denominator ratios can be compared by exact cross-products to avoid false ties.
+
+The current count-one profile selects the sole best candidate directly, or uses deterministic seeded `TARGET_SELECTION` RNG only over the tied-best subset when several candidates tie. An empty pool follows declared no-target handling without a draw. Stable technical enumeration for replay must preserve the same set-to-draw mapping across incidental collection permutations and give each tied candidate equal eligibility; entity/list/Slot order cannot supply a preferred winner.
+
+Store the selected Entity in `TargetSetRef` at the declared target-context checkpoint. `LOCK_ENTITY_IDS` with later `DROP_INVALID` consumes that reference once: no metric re-query, tie reroll or replacement after intervening Effects. An invalid locked target follows its declared branch failure policy. A tie policy does not supply invalidation semantics or a global random-tie default; undeclared observable tie behavior remains `REQUIRED_EXPLICIT`.
 
 ---
 
@@ -2648,8 +2777,9 @@ Canonical core stages:
 
 ```text
 Damage Profile
-→ component formula
-→ component-specific mitigation
+→ component formula / pre-mitigation amount
+→ §45A PRE_MITIGATION component-type transform
+→ component-specific mitigation selected by resulting type
 → scoped FINAL_DAMAGE_REDUCTION phase for eligible non-True components
 → combine eligible post-mitigation components
 → Shield interaction
@@ -2685,9 +2815,34 @@ No Character-specific Prime/Light logic is embedded in Damage Runtime.
 
 ---
 
+## 45A. SCOPED DAMAGE-COMPONENT TYPE TRANSFORM
+
+At `PRE_MITIGATION`, Damage Runtime calls Contract Resolver with normalized `damageTransformPlan`, the resolving recipient/component and pre-mitigation amount, the authoritative phase-entry state (the shared transaction view for simultaneous groups under §31), and existing Action/provenance views (§15A). This executes `DMG-007`, separately from §28A amount modifiers.
+
+```text
+freeze incoming component type and phase-entry context
+→ enumerate registered transform candidates for this phase
+→ resolve declared source Action reference / lineage relation
+→ test its Natural-Action status, Actor relation and structured Actor filters
+→ test recipient scope, direct-Effect provenance, fromTypes and Conditions
+→ collect applicable typed SET_COMPONENT_TYPE results
+→ determine one compatible resulting type
+→ dispatch that type's ordinary Damage pipeline
+```
+
+Actor filters read the Actor performing the scoped Action, including authoritative Effective Class; they do not substitute Damage Attribution, Caster, Owner or Effect Source. Direct-graph scope uses §15A membership, never shared `rootActionId` alone. Matching is recipient/component-local and read-only; it does not retarget or produce a new Action/packet.
+
+All candidates are evaluated against the same incoming component/context, not the preceding transform's output. Compatible matching operations with the same resulting type are applied as one result. Incompatible overlapping transforms without an explicit composition Contract are rejected; unsupported content that escaped normalization fails visibly before affected Damage commits. No list/Effect/entity/Event order chooses a transform winner and no hidden transform chain is created.
+
+Without a match, preserve the incoming type. A Physical/Will component transformed to `TRUE` keeps its pre-mitigation amount and enters §48 before any ARM/RES or Final Damage Reduction. Already-True components excluded by `fromTypes` remain True. Shield eligibility/piercing, attribution and Effect provenance remain independent; source Ability identity, authored Functional Tags and capability contributions are not rewritten.
+
+Ordinary source Class/relation predicates invoke no Authority. Genuine Authority-bearing semantic conflicts use existing `AUT-*` adjudication. Trace records the scoped Action/Actor, Effect membership, matching transform refs, original/resulting component types, phase and state version without turning this evaluation into a gameplay Event.
+
+---
+
 # 46. PHYSICAL DAMAGE
 
-For Physical component:
+For a component whose resulting type after §45A is Physical:
 
 ```text
 raw Physical
@@ -2714,7 +2869,7 @@ The modifier query runs after ARM/Penetration mitigation and before Shield.
 
 # 47. WILL DAMAGE
 
-For Will component:
+For a component whose resulting type after §45A is Will:
 
 ```text
 raw Will
@@ -2739,7 +2894,7 @@ The modifier query runs after RES/Penetration mitigation and before Shield.
 
 # 48. TRUE DAMAGE
 
-For True component:
+For a component whose resulting type after §45A is True:
 
 ```text
 raw True
@@ -2803,13 +2958,14 @@ ownerRef
 originalAmount
 remainingAmount
 durationState
+retentionScope
 authorityMetadata
 specialFlags
 ```
 
 UI may show one total Standard Shield bar.
 
-Runtime preserves source provenance.
+Runtime preserves source provenance. `retentionScope` is lowered from the Shield lifecycle metadata; field-scoped contributions identify the relevant owner/Combat-Instance presence cycle. It is independent of duration and Authority. §10C uses it without creating Character-specific Shield layers.
 
 ---
 
@@ -2874,6 +3030,8 @@ Generic:
 can clear all eligible Standard contributions according to Authority.
 
 This preserves simple gameplay plus source-aware mechanics.
+
+Transition-owned removal under §10C uses the same ledger but follows `DEP-008`, not ordinary Cleanse/Authority admission. Terminal records preserve removal cause and owning transition; removing a contribution this way never impersonates §52 damage depletion or §54 natural expiry.
 
 ---
 
@@ -3046,6 +3204,7 @@ stateInstanceId
 stateDefinitionId
 stateIdentity
 classification
+retentionScope
 attachmentKind
 attachmentRef
 source
@@ -3056,6 +3215,8 @@ durationProfile
 stackData
 parameters
 ```
+
+`retentionScope` is lowered from `StateSpec.lifecycle.retentionScope`, independently of classification, duration clock and Authority. `FIELD_PRESENCE_SCOPED` identifies its owning entity/Combat-Instance presence cycle; `BATTLE_SCOPED` identifies its owning battle participant. Transition profiles decide retention under §10C; they do not classify every battle-scoped object as immune to explicit classification discard. Termination retires that instance's modifier/clock/window work while preserving immutable terminal cause and transition references for observers/replay.
 
 ---
 
@@ -4618,6 +4779,7 @@ Example:
 ```text
 HP/MaxHP → Health runtime
 Shield → Shield runtime
+Current Deployment Cost/lock and static deployment-init completion → deployment runtime / DeckState
 Position → Position runtime
 trueSelfId/lifeSerial → Identity/Lifecycle runtime
 waiting count → Reincarnation ledger
@@ -5089,7 +5251,10 @@ A complete save needs:
 - Authority cache or enough inputs to rebuild;
 - Shield ledger;
 - Story state;
-- history snapshot refs if needed.
+- history snapshot refs if needed;
+- battle deployment Current/floor/lock and static initialization completion records;
+- declared static rule ownership/lifetimes (or inputs to rebuild indexes without resettling initialization);
+- State/Shield retention metadata, terminal causes/transition refs and surviving scheduled work.
 
 Do not serialize presentation-only transient animation as authoritative.
 
@@ -5197,6 +5362,10 @@ active True Self not simultaneously waiting
 reincarnated True Self not ordinary-revive-eligible
 entity CombatInstance membership is coherent
 child lineage has no cycle
+committed Current Deployment Cost mutations respect the declared floor
+locked deployment Current == lockedValue
+RETURN_TO_DECK commit has coherent presence/occupancy/deployment and retained Deck membership
+terminated duration/recovery windows own no pending natural-expiry/recovery settlement
 ```
 
 ---
@@ -5818,6 +5987,13 @@ A correct Arclune Kernel must support all of these without contradiction:
 63. `CONTINUE` and `FAIL_INTENT` are explicit runtime outcomes of interposition settlement failure; post-cost `FAIL_INTENT` does not automatically refund already-committed Cost.
 64. Opening a local Reaction boundary does not establish priority against unrelated blocking settlements or same-window Reaction candidates.
 65. Pilot #3 requires no Character-specific runtime branch, new Functional Tag, or new Primitive.
+66. Static rule registration creates no fake Action; battle initialization mutations settle exactly once per owning participant lifetime.
+67. Current Deployment Cost/floor/lock live in deployment-owned battle state and typed reads/snapshots never alias the Side Cost Bar.
+68. Pre-mitigation component transforms use scoped Action Actor and direct-Effect provenance, then dispatch the resulting Damage type without rewriting source Tags.
+69. Return-to-Deck commits presence, deployment state and transition-selected State/Shield cleanup atomically while retaining Deck membership and the admitted Action context.
+70. Transition cleanup preserves its terminal cause and cannot trigger break/expiry-only settlements.
+71. Metric ties use the exact tied-best set and deterministic RNG before target lock; later invalidation follows explicit policy without implicit requery/reroll.
+72. Pilot #4 reuses existing owners and requires no Character-specific runtime type, Functional Tag, Primitive or generic priority system.
 
 ---
 
