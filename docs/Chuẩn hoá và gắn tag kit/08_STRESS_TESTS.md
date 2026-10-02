@@ -1,12 +1,13 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-02-I.2
+**Version:** 2026-10-02-I.3
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.4+, `06_KERNEL_RUNTIME.md` G.3+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.5+, `06_KERNEL_RUNTIME.md` G.4+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
 **Revision I.2:** adds Pilot #5 declarative cases M-038–M-046 for committed-result checkpoints, Shield addition/family caps, explicit Slot ties and existing composition. Architecture Phase: these specify obligations; they do not report executable test results or resolve undeclared gameplay.
+**Revision I.3:** updates M-038–M-046 to current Polyhymnia gameplay; adds M-047 post-completion/source-leave/replay and M-048–M-050 Phần Tinh Cost/snapshot/final multiplier obligations. Declarative architecture validation only.
 
 ---
 
@@ -2947,7 +2948,7 @@ Reaction deferral does not suppress or postpone the mandatory lifecycle evaluati
 **Status:** `MUST_PASS`
 **Purpose:** prove that the three note predicates observe committed Damage, Heal and Shield addition amounts rather than formulas, totals or recipient counts.
 
-**Initial State:** Polyhymnia is field-present with no recorded notes. The primary fixtures observe this runtime Polyhymnia's own Ultimate Natural Action: observed `actorRef` equals the Trigger owner and `originAbilityId` identifies that owner's Ultimate definition. This explicitly scoped branch observes `ACTION_DIRECT_EFFECTS_COMPLETE`; other allied/self Natural Actions use the separately authored completion branch and are not given this earlier note checkpoint. The test authors separate `ACTION_RESULT_ANY` Conditions for `DAMAGE / ACTUAL_HP_DAMAGE`, `HEAL / ACTUAL_RESTORE` and `SHIELD_ADDITION / COMMITTED_ADDED_AMOUNT`, each compared with `> 0`, `DIRECT_EFFECT_GRAPH_OF_SCOPED_ACTION`, and explicit enemy/ally relations anchored to Polyhymnia's Side. Relation affiliation is stable through the fixture; no live alive/field-presence recipient filter is authored. Any test-only failure branch explicitly continues the enclosing Action.
+**Initial State:** Polyhymnia is field-present with no recorded notes. All primary fixtures, including this owner's own Ultimate, observe ACTION_COMPLETED; ADEC availability does not authorize earlier note collection. The test authors separate `ACTION_RESULT_ANY` Conditions for `DAMAGE / ACTUAL_HP_DAMAGE`, `HEAL / ACTUAL_RESTORE` and `SHIELD_ADDITION / COMMITTED_ADDED_AMOUNT`, each compared with `> 0`, `DIRECT_EFFECT_GRAPH_OF_SCOPED_ACTION`, and explicit enemy/ally relations anchored to Polyhymnia's Side. The recipientFilter declares readContext = SNAPSHOT with a retained target-context SnapshotRef covering recipient and anchor Side/affiliation; no live alive/presence recipient filter is authored. Any test-only failure branch explicitly continues the enclosing Action.
 
 **Input:** run independent committed-receipt cases:
 
@@ -2969,7 +2970,7 @@ Reaction deferral does not suppress or postpone the mandatory lifecycle evaluati
 
 **Expected Trace / State:** trace preserves requested amounts separately from committed metrics, receipt/Effect ownership, recipient relation context and the chosen result checkpoint. Any selected `ANY` outcome is independent of receipt enumeration order.
 
-**Forbidden Outcomes:** counting Shield absorption or overkill as Actual HP Damage; counting Overheal as actual restoration; positive Shelter from a positive formula with zero addition; treating current total Shield as the addition receipt; multiplying note recording by the number of matching recipients; treating one failed/zero sibling as failure of all sibling evidence; dropping a positive receipt because its recipient later died; fabricating a Natural Action for an Actionless static receipt; generalizing the own-Ultimate ADEC note checkpoint to all allied Actions.
+**Forbidden Outcomes:** counting Shield absorption or overkill as Actual HP Damage; counting Overheal as actual restoration; positive Shelter from a positive formula with zero addition; treating current total Shield as the addition receipt; multiplying note recording by the number of matching recipients; treating one failed/zero sibling as failure of all sibling evidence; dropping a positive receipt because its recipient later died; fabricating a Natural Action for an Actionless static receipt; recording any Polyhymnia notes at ADEC instead of completion.
 
 **Layers Under Test:** `ACTION_RESULT_ANY`, typed Result Binding, `TRG-015`, `SHP-005`, existing Damage/Heal Results, Trigger Conditions.
 
@@ -2981,7 +2982,7 @@ Reaction deferral does not suppress or postpone the mandatory lifecycle evaluati
 **Status:** `MUST_PASS`
 **Purpose:** prove the earlier own-direct observation checkpoint without relabeling an unfinished Action as completed or admitting same-root child receipts.
 
-**Initial State:** synthetic Natural Action A owns direct Damage receipt D with `actualHpDamage = 10`. Child Action C shares A's `rootActionId` and Damage Attribution, but owns its own positive Heal and Shield-addition receipts. C is created by an explicitly authored `ACT-032` local completion settlement after A's direct-effects seal and blocks only A's later completion. This is not an ordinary blocking child incorrectly moved past the earlier child-drain stage. No unstated priority among unrelated work is required. The test concerns generic view availability; it does not grant every allied Action an early Polyhymnia note checkpoint.
+**Initial State:** synthetic Natural Action A owns direct Damage receipt D with `actualHpDamage = 10`. Child Action C shares A's `rootActionId` and Damage Attribution, but owns its own positive Heal and Shield-addition receipts. C is created by an explicitly authored `ACT-032` local completion settlement after A's direct-effects seal and blocks only A's later completion. This is not an ordinary blocking child incorrectly moved past the earlier child-drain stage. No unstated priority among unrelated work is required. The test concerns generic view availability, not early Polyhymnia notes. Both synthetic predicates declare recipientFilter.readContext = OBSERVATION_STATE with no additional alive/presence filters; their immutable result/provenance reads remain independent from live totals.
 
 **Input:** A reaches `ACTION_DIRECT_EFFECTS_COMPLETE`; evaluate the own-direct predicates. Finish C and then A; evaluate a separately authored own-direct Condition with `resultCheckpoint = ACTION_COMPLETED`.
 
@@ -3013,7 +3014,7 @@ At the earlier checkpoint, the own-direct projection is immutable and readable w
 **Status:** `MUST_PASS`
 **Purpose:** preserve Damage → Heal → Leader Shield order, the common source-stat snapshot and the later current Leader cap read.
 
-**Initial State:** Polyhymnia has WIL 100, ATK 80 and Current Max HP 1000 at `ACTION_START`; capture those three values in one SnapshotRef. Eligible enemies have no Shield and sufficient HP to survive; allies have at least 99 missing HP; no amount modifiers alter the fixture's formulas. Leader Current HP is 100, Current Max HP starts at 1000 and 100 Shield remains from this runtime Polyhymnia's stable Ultimate Shield family. Target pools, target-invalid behavior and all required relation/read anchors are explicitly authored. The fixture declares `reactionBoundary = AFTER_DIRECT_EFFECTS_COMPLETE` only for this test; this is not a Polyhymnia gameplay default.
+**Initial State:** Polyhymnia has WIL 100, ATK 80 and Current Max HP 1000 at `ACTION_START`; capture those three values in one SnapshotRef. Eligible enemies have no Shield and sufficient HP to survive; allies have at least 99 missing HP; no amount modifiers alter the fixture's formulas. Leader Current HP is 100, Current Max HP starts at 1000 and 100 Shield remains from this runtime Polyhymnia's stable Ultimate Shield family. Target pools, target-invalid behavior and all required relation/read anchors are explicitly authored. This fixture explicitly uses SIMULTANEOUS recipients within each Damage/Heal group for its snapshot proof; that test-only choice does not resolve the Character's remaining within-group batch question. The locked Character declares `reactionBoundary = AFTER_DIRECT_EFFECTS_COMPLETE`. Ultimate Shields use CREATE, no timed expiry (PERMANENT), and retain source provenance across source leave. All target sets/relations are locked at target-context establishment; relation predicates use its retained SnapshotRef.
 
 **Input:** resolve the Ultimate as three sequential direct Effect groups, using the source SnapshotRef for every formula. In the test-only snapshot-perturbation variant, an explicitly authored generic Stat mutation dependency between the Damage and Heal groups sets current Polyhymnia WIL/ATK/Max HP to 200/160/2000 and Leader Current Max HP to 500. This additional synthetic node tests SnapshotRef stability and does not become an extra Polyhymnia kit Effect.
 
@@ -3029,41 +3030,41 @@ ACTION_START source snapshot: WIL 100, ATK 80, Max HP 1000
 → read Leader Current Max HP at SHIELD_COMMIT
 → Shield group commit
 → ACTION_DIRECT_EFFECTS_COMPLETE
-→ record qualifying notes
-→ settle declared completion work
+→ settle declared pre-completion work
 → ACTION_COMPLETED
-→ eligible Complete Chord settlement
+→ record/check/atomically consume and create one Chord
+→ Chord resolves before next SSI Natural Action
 ```
 
 In the perturbation variant, Damage, Heal and Shield source formulas remain 183/99/150. Leader's current cap is `0.40 × 500 = 200`; existing family Shield is 100, so only 100 is added. The added Shield receipt records requested 150 and committed 100.
 
-**Expected Trace / State:** one Natural Action; common source SnapshotRef; sequential group commits; no extra hit/Action for the Physical/Will components; current-at-Shield-commit cap basis; notes observed after all three direct groups and Chord after actual completion.
+**Expected Trace / State:** one Natural Action; common source SnapshotRef; sequential group commits; no extra hit/Action for the Physical/Will components; current-at-Shield-commit cap basis; notes observed only at actual completion and Chord before the next SSI Natural Action. Mandatory lifecycle processing remains between groups, while ordinary Reaction eligibility is held until ADEC.
 
-**Forbidden Outcomes:** simultaneous commit of all three groups; reading updated Polyhymnia source stats for a later formula; reading the Leader cap from Polyhymnia's source snapshot or an earlier Leader snapshot; splitting a single Damage Effect into two Natural Actions; running Chord before Natural completion; adopting this fixture's Reaction hold as a universal or Character gameplay default.
+**Forbidden Outcomes:** simultaneous commit of all three groups; reading updated Polyhymnia source stats for a later formula; reading the Leader cap from Polyhymnia's source snapshot or an earlier Leader snapshot; splitting a single Damage Effect into two Natural Actions; running Chord before Natural completion; opening ordinary Reaction windows between Polyhymnia direct groups or making her local profile the universal default for unrelated Actions; collecting notes at ADEC.
 
 **Layers Under Test:** SnapshotRef, sequential Effects, component Damage profile, `TRG-015`, `SHP-005`, `SHP-006`, Action completion, authored Reaction boundary.
 
 ---
 
-## M-041 — Polyhymnia Note Idempotence and Consume-before-Chord Isolation
+## M-041 — Polyhymnia Completion-only Notes and Consume/Create Isolation
 
 **ID:** `M-041`
 **Status:** `MUST_PASS`
-**Purpose:** prove ordinary State composition, one activation per complete note set, post-completion settlement and independent runtime-owner dependencies.
+**Purpose:** prove one completion checkpoint, owner-isolated flags, atomic consume/create and non-recursive Chord.
 
-**Initial State:** two field-present runtime Polyhymnia owners P and Q use distinct owner-keyed note States and dependency identities. Both remain valid through the fixture. P initially has Harm and Mercy; Q initially has only Harm. An ordinary allied Natural Action A is neither owner's own Ultimate. Both owners use their completed-Action branch: record qualifying notes → check owner-local flags → atomically consume a full set → run the declared Chord settlement. Each dependency identity includes its own runtime owner and observed Action. The fixture supplies complete target pools, ties, snapshots and failure policies; unrelated P/Q settlement priority remains unasserted.
+**Initial State:** field-present runtime owners P and Q have separate note States and trigger/candidate keys. P has Harm/Mercy; Q only Harm. Qualifying allied Natural Action A owns several positive direct Shield receipts. All predicates explicitly declare ACTION_COMPLETED, own-direct provenance and covered relation SnapshotRefs. Chord has ACT-033 postActionSettlement, no Cost, a fresh settlement-start WIL/ATK snapshot, lowest-HP% count3 declared Slot ties, DISCARD and explicit ordinary invalid-target policy. Unrelated P/Q priority is not asserted.
 
-**Input:** A commits several positive own-direct Shield additions, reaches its direct-effects checkpoint, then completes. Deliver/recover the same already-processed completion observation without creating another actual Effect/Action. Then allow a later independent actual Natural Action to provide fresh Mercy evidence to Q. In a separate branch-isolation variant, P instead performs its own Ultimate; P records that Action's direct evidence at its scoped ADEC branch, while Q observes P's Ultimate through Q's ordinary completed-Action branch.
+**Input:** publish ADEC, complete A, redeliver its original completion identity; later a separate actual Action gives Q positive Heal evidence. Repeat with A = P's own Ultimate.
 
-**Expected Resolution:** in the ordinary-A fixture neither owner records A's notes at ADEC. At A's completion, Shelter is recorded once per runtime owner. P's resulting full set is consumed before P's one Chord is queued/executed; Q has Harm and Shelter, unchanged by P's consumption. Re-reading the same completion event/result does not recreate consumed notes or execute a duplicate settlement. Q may complete its own set from the later new Mercy evidence. In a separate reset fixture with only partial voices and no pending Chord, a valid P leave/re-entry clears P's voices and starts empty; Q's voices remain unchanged. This fixture makes no assertion about Shield source-leave retention or already pending Chord cancellation. In the own-Ultimate variant, P's completion branch skips only rerecording the already-handled own-Ultimate evidence, then still checks all three flags and atomically consumes them before the eligible Chord. Consumption and Chord occur after Natural completion. Q's completed observer is independent and is not misclassified as an own-Ultimate ADEC observer merely because the Ability definition/name matches P's.
+**Expected Resolution:** no flags change at ADEC in either variant. At completion P records Shelter once, atomically consumes all three and creates one Chord; Q independently records Shelter. Duplicate delivery cannot reconstruct P's consumed notes or create another settlement. Q may later complete its set from the new Action. Each created Chord uses a fresh current source snapshot, Heals up to three allies, DISCARDs excess, grants +8 owning Side AE once, remains non-Natural and supplies no Mercy to P/Q.
 
-Complete Chord uses Heal `50% WIL + 50% ATK` for up to three lowest-HP% eligible allies and grants `+8 AE` to the owning Side. It is non-Natural settlement work. Its positive Heal receipt cannot supply a new Mercy note and cannot recursively complete P or Q through this Natural-Action observer.
+Full-HP fixture: all allies remain legal targets; choose count3 using declared Slot order, actualRestore = 0, no retarget or Shield conversion. +8 AE still commits. Chord formula fixture: causing Action snapshot was WIL/ATK 100/80, current source stats at Chord start are 200/160; request 180 Heal, not 90.
 
-**Expected Trace / State:** distinct P/Q State keys and local dependency IDs; actual event/result processing identity retained for replay; notes consumed before settlement; no synthetic Natural Action or SSI advancement for Chord; independent sets remain isolated. No assertion chooses whether unrelated P or Q work wins scheduling.
+**Expected Trace / State:** ACTION_COMPLETED precedes observation/consume/create/Chord; each owner's state and execution key are separate; every created settlement closes before next Natural Action. No SSI advance for Chord.
 
-**Forbidden Outcomes:** one note per matching recipient; all three notes consumed by another runtime owner; replays recreate notes after consumption; settlement begins before consumption or before actual completion; Chord Heal counts as an allied Natural Action; two Polyhymnia copies share dependency IDs or a singleton note manager; ordinary allied Actions use the own-Ultimate ADEC branch; P rerecords its own Ultimate at completion; Q uses P's owner-local ADEC exception; tests introduce a global priority between independent Chords.
+**Forbidden Outcomes:** own-Ultimate early exception; one note per receipt; cross-owner consumption; recreate notes after replay; reuse causing Action formula snapshot; full-HP reroll; Chord generates Mercy/another Chord; implicit global order between P/Q.
 
-**Layers Under Test:** `TRG-015`, State/counters, Effect DAG dependencies, Transaction Manager idempotence, Natural Action classification, replay identity.
+**Layers Under Test:** TRG-015, ACT-033, State/counter DAG, Transaction idempotence, SnapshotRef, HEL-002, SSI.
 
 ---
 
@@ -3073,7 +3074,7 @@ Complete Chord uses Heal `50% WIL + 50% ATK` for up to three lowest-HP% eligible
 **Status:** `MUST_PASS`
 **Purpose:** prove that a later Skill-3 cast counts against an older contribution's clock while excluding only its own creating Action.
 
-**Initial State:** Polyhymnia and Leader are valid. The secondary eligible ally exists. Every Skill-3 cast successfully creates one new contribution per recipient; no Damage depletes those contributions during this fixture. The declared clock is two future actually completed Polyhymnia Natural Actions; each contribution excludes only its own creation Action. No source-leave retention or cancellation default is asserted.
+**Initial State:** Polyhymnia and Leader are valid. The secondary eligible ally exists. Every Skill-3 cast successfully creates one new contribution per recipient; no Damage depletes those contributions during this fixture. The declared clock is two future actually completed Polyhymnia Natural Actions; each contribution excludes only its own creation Action. Skill3 owner = source Polyhymnia, recipient separately bound; FIELD_PRESENCE_SCOPED retention follows source. A source-leave variant removes remaining X/Y contributions across both recipients with source-leave/lifecycle cause, without touching Ultimate/unrelated contributions or emitting break/natural expiry; re-entry does not resurrect them.
 
 **Input / Expected Resolution:**
 
@@ -3099,7 +3100,7 @@ Complete Chord uses Heal `50% WIL + 50% ATK` for up to three lowest-HP% eligible
 **Status:** `MUST_PASS`
 **Purpose:** prove aggregate active-remaining cap admission without old-contribution mutation, cast-keyed bypass or interference from other Shield sources.
 
-**Initial State:** Leader Current Max HP is 100, so the cap is 40. Runtime Polyhymnia P's Ultimate Shield family is identified by runtime EntityRef `sourceOwnerRef = P`, stable authored Ultimate `originAbilityId` and stable authored originating Shield definition `originEffectId`. Each cast has a distinct Effect instance and contribution ID, but shares that family. `shield.sourceFamilyCap` declares `capPolicy = CLIP_NEW_ADDITION`, maximum `40% Leader Current Max HP`, `readTiming = SHIELD_COMMIT`. Runtime Polyhymnia Q, P's Skill 3 and unrelated Shields have different family keys. These fixtures isolate the explicitly declared addition-only cap operation. For the input with family sum above the current maximum, supply that ledger state synthetically and explicitly omit a separate reactive cap rule; this does not decide whether/how Polyhymnia should reconcile old Shield when Leader Max HP changes.
+**Initial State:** Leader Current Max HP is 100, so the cap is 40. Runtime Polyhymnia P's Ultimate Shield family is identified by runtime EntityRef `sourceOwnerRef = P`, stable authored Ultimate `originAbilityId` and stable authored originating Shield definition `originEffectId`. Each cast has a distinct Effect instance and contribution ID, but shares that family. `shield.sourceFamilyCap` declares `capPolicy = CLIP_NEW_ADDITION`, maximum `40% Leader Current Max HP`, `readTiming = SHIELD_COMMIT`. Runtime Polyhymnia Q, P's Skill 3 and unrelated Shields have different family keys. These fixtures isolate the explicitly declared addition-only cap operation. The designer explicitly locks no retroactive old-Shield mutation on Leader MaxHP change. Contributions use CREATE/PERMANENT and survive source leave with family provenance retained.
 
 **Input / Expected Resolution:** run these independent variants:
 
@@ -3110,14 +3111,14 @@ Complete Chord uses Heal `50% WIL + 50% ATK` for up to three lowest-HP% eligible
 | Two prior P Ultimate casts remain 20 and 10 | 15 | Sum 30 first; add 10, not 15 per prior cast. |
 | P Ultimate contributions originally 30 have depleted to 20 | 15 | Add 15; cap uses remaining 20, not historical original grant. |
 | P Ultimate remaining 30; Q Ultimate remaining 35; external/Skill-3 Shield also exists | 15 for P | Add 10 for P; Q/external/Skill-3 Shield does not consume P-family headroom. |
-| Synthetic input: P Ultimate remaining 30; current Leader Max HP 50; no separate cap reaction in this fixture | 15 | Current cap 20; addition admits 0 and does not itself clamp, remove or refresh the existing 30. |
+| P Ultimate remains 30 after Leader Max HP falls from 100 to 50 | 15 | Current cap 20; addition admits 0 and does not itself clamp, remove or refresh the existing 30. |
 | P Ultimate remaining 30; Leader Max HP rises to 150 | 15 | Current cap 60; add 15. |
 
-The new receipt records operation-local requested and committed amounts. A full-cap zero outcome supplies no Shelter evidence; it does not fail the enclosing Ultimate merely because the addition is zero. Any positively admitted amount belongs to the newly authored contribution, with its independently declared lifetime/retention policy; the fixture does not invent Ultimate Shield duration.
+The new receipt records operation-local requested and committed amounts. A full-cap zero outcome supplies no Shelter evidence; it does not fail the enclosing Ultimate merely because the addition is zero. Any positively admitted amount belongs to the newly authored contribution, with its independently declared lifetime/retention policy; Ultimate's no-timed-expiry/source-retention profile is explicitly declared. At committed amount zero no contribution entry, duration/expiry/refresh work or old mutation exists; successful zero receipt has empty contribution refs.
 
 **Expected Trace / State:** stable family key, relevant active remaining sum, current cap basis, requested amount, clipped amount and independent new contribution identity. Existing contribution amounts/durations are not rewritten by admission. Standard downstream Shield absorption remains proportional within its existing eligible pool.
 
-**Forbidden Outcomes:** grouping by Character definition rather than runtime owner; grouping by dynamic cast/effect-instance ID; grouping all P Shields or all Leader Shield; applying cap to each old contribution separately; summing expired or historical grant amounts; counting Q's contribution against P; refreshing/removing prior grants; making the addition-only operation retroactively clamp old grants, or treating this fixture as a decision about the Character's separate MaxHP-change rule; positive Shelter from the discarded request; replacing Standard pooled depletion with hidden source priority.
+**Forbidden Outcomes:** grouping by Character definition rather than runtime owner; grouping by dynamic cast/effect-instance ID; grouping all P Shields or all Leader Shield; applying cap to each old contribution separately; summing expired or historical grant amounts; counting Q's contribution against P; refreshing/removing prior grants; retroactively clamping old grants on MaxHP change; deleting Ultimate grants when source leaves; creating a zero-valued contribution; positive Shelter from the discarded request; replacing Standard pooled depletion with hidden source priority.
 
 **Layers Under Test:** `shield.sourceFamilyCap`, `SHP-005`, `SHP-006`, stable Ability/Effect definitions, runtime owner identity, Shield ledger, committed receipt semantics.
 
@@ -3136,7 +3137,8 @@ The new receipt records operation-local requested and committed amounts. A full-
 1. Chord count 3: Slot 1 has 10% HP; Slot 4, Leader at Slot 8 and Slot 9 each have 20%; Polyhymnia at Slot 2 has 60%. Select Slots 1, 4 and 8. The cutoff tie excludes Slot 9, independent of candidate list/entity IDs.
 2. Skill 2 count 2: Slot 9 has 5% HP; Slots 1, 4 and 8 each have 20%. Select Slots 9 and 1. Slot order cannot override Slot 9's strictly better metric.
 3. Skill 3 secondary count 1: eligible non-Leader/non-Polyhymnia allies at Slots 4 and 9 have equal lowest HP%. Select Slot 4. Primary Leader recipient remains the separately declared Leader at Slot 8.
-4. After a selection, make one locked target invalid. This fixture explicitly declares `DROP_INVALID` without requery: skip only that recipient; do not replace it with the next Slot or the next-lowest candidate.
+4. All eligible Skill2 allies full HP: select the two earliest declared Slots, actual restoration zero, no reroll.
+5. After a selection, make one locked target invalid. This fixture explicitly declares `DROP_INVALID` without requery: skip only that recipient; do not replace it with the next Slot or the next-lowest candidate.
 
 **Expected Trace / State:** frozen eligible pool, exact HP% comparison, equality subsets, authored PositionRef order used only for tied candidates, target lock and declared invalid-target handling. Permuting input lists/entity IDs leaves the result unchanged; no RNG is consumed for this tie policy.
 
@@ -3152,13 +3154,13 @@ The new receipt records operation-local requested and committed amounts. A full-
 **Status:** `MUST_PASS`
 **Purpose:** prove immutable addition evidence, retained scoped receipt views and replay-safe observation/settlement identity.
 
-**Initial State:** valid allied Natural Action A owns a successful direct Shield creation/addition receipt with requested 15 and `committedAddedAmount = 10`. It belongs to Polyhymnia's declared ally/direct scope. The fixture explicitly authors an ACT-032 post-seal settlement that creates a blocking child Action and completely depletes that contribution before A completes. Polyhymnia stays field-present and valid. In a second fixture, all three notes will be consumed and one Chord is pending after A completes.
+**Initial State:** valid allied Natural Action A owns a successful direct Shield creation/addition receipt with requested 15 and `committedAddedAmount = 10`. It belongs to Polyhymnia's declared ally/direct scope; the predicate has readContext = SNAPSHOT with a retained target-context SnapshotRef covering recipient/anchor relation facts. The fixture explicitly authors an ACT-032 post-seal settlement that creates a blocking child Action and completely depletes that contribution before A completes. Polyhymnia stays field-present and valid. In a second fixture, all three notes will be consumed and one Chord has been created after consume/create commits at A completion, with ACT-033 holding SSI handoff.
 
 **Input:** evaluate the declared ADEC own-direct view; let later child work deplete the contribution; finalize A. Save/load at each of these supported cuts: after receipt commit but before direct-effects seal, after sealed observation but before completion, and after note consumption/Chord enqueue but before settlement. Rebuild indexes, resume pending work and redeliver any already-processed observation with its original identity.
 
-**Expected Resolution:** the addition receipt stays 10 even when live remaining Shield is 0. The own-direct view remains readable at its declared checkpoint and the completed Action view retains that immutable evidence. Polyhymnia note recording uses the observer's own-Ultimate ADEC branch or other-Natural-Action completion branch as appropriate; availability of a generic earlier view does not move the latter branch earlier. Restore does not repeat Shield creation, direct Effects, already-committed note updates or note consumption. A pending Chord preserves its own runtime-owner/observed-Action dependency identity and can settle once. Replaying a completed settlement cannot grant another Heal or `+8 AE`.
+**Expected Resolution:** the addition receipt stays 10 even when live remaining Shield is 0. The own-direct view remains readable at its declared checkpoint and the completed Action view retains that immutable evidence. Every Polyhymnia note observer records at completion only; generic ADEC view availability does not move it earlier. Restore does not repeat Shield creation, direct Effects, already-committed note updates or note consumption. An already-created Chord preserves its runtime-owner/observed-Action/candidate dependency identity and held SSI handoff; it settles once within this opportunity, without a persistent pending gameplay token. Replaying a completed settlement cannot grant another Heal or `+8 AE`.
 
-**Expected Trace / State:** receipt values/provenance, sealed-view status, Action status, contribution terminal cause, processed observation identity and pending/terminal settlement state survive serialization. Once all reference holders finish, the existing Result Store may release receipts through normal lifetime cleanup.
+**Expected Trace / State:** receipt values/provenance, sealed-view status, Action status, contribution terminal cause, processed observation identity and pending/terminal settlement state survive serialization. Once consumers finish, Result Store may release receipt payloads. Processed observation/consume-create/terminal settlement identities remain through the replay horizon. Additional cut: save/load after receipts have been freed and Chord is terminal, then redeliver the original Action observation/settlement, even if dispatch attempts to allocate a fresh candidate ID; stable original observation lookup prevents new notes, Heal or AE. A no-qualification observation before source leave/re-entry also remains processed rather than becoming newly eligible later. Retired-horizon input is rejected rather than treated as fresh.
 
 **Forbidden Outcomes:** replacing receipt 10 with live Shield 0; recreating a depleted contribution on load; recomputing historical formulas from current stats; resetting processed observation identity so consumed notes reappear; re-executing a terminal Chord; dropping receipts before their declared observer/dependency releases them; treating later Shield depletion as retroactive Effect failure.
 
@@ -3184,7 +3186,9 @@ The new receipt records operation-local requested and committed amounts. A full-
 6. A post-completion observer inserted as a blocker awaiting the same Action's completion Event, creating a dependency cycle.
 7. `EXPLICIT_SLOT_ORDER` with missing/duplicate PositionRefs, a relevant tied candidate whose position lacks an authored mapping, or a Mode lacking a compatible mapping for this authored order. No fallback order is authored; the generic policy does not impose nine Slots on every Mode.
 8. `shield.sourceFamilyCap` whose family is only a Character-name/definition label, a dynamic cast/effect-instance ID, or an unbound/missing runtime `sourceOwnerRef` or stable `originAbilityId`/`originEffectId`; or a cap lacking the required current-at-commit read policy.
-9. Competing same-family Shield grants with shared headroom and observably different contribution lifetimes/owners/results, but no explicit dependency or applicable simultaneous admission law. Choosing which grant consumes headroom would change gameplay.
+9. A recipientFilter missing required readContext, or SNAPSHOT referring to an unavailable snapshot or one lacking recipient/anchor/filter relation facts; no live fallback.
+10. postActionSettlement with cross-opportunity edges, non-Natural/uncompleted Action, missing compatible Mode, or a wait for the next Action/TURN_BOUNDARY it holds.
+11. Competing same-family Shield grants with shared headroom and observably different contribution lifetimes/owners/results, but no explicit dependency or applicable simultaneous admission law. Choosing which grant consumes headroom would change gameplay.
 
 **Expected Resolution:** Normalizer rejects the incompatible/missing declarations before affected Effects commit. A malformed IR object that escaped normalization fails visibly at the affected boundary; it does not guess amounts, Action status, cap grouping, mapping or ordering. A valid ADEC-sealed own-direct reference is accepted even while the Action remains incomplete; rejection applies to an actually unavailable view, not to all pre-completion observation.
 
@@ -3193,6 +3197,94 @@ The new receipt records operation-local requested and committed amounts. A full-
 **Forbidden Outcomes:** nominal/live reconstruction; early completion publication; hidden operation coercion; automatic origin-family inference from a dynamic instance; an implicit Slot/entity/list/Leader fallback; one Mode's mapped Slot order leaking into an unsupported Mode; changing unrelated global priority to make malformed dependencies executable.
 
 **Layers Under Test:** Schema/Normalizer, typed Result Binding, `TRG-015`, `SHP-005`, `SHP-006`, `TGT-007`, Mode mapping, dependency-cycle validation.
+
+---
+
+## M-047 — Created Chord Settles before SSI Handoff; Source Leave Does Not Reverse Creation
+
+**ID:** `M-047`
+**Status:** `MUST_PASS`
+**Purpose:** prove ACT-033's finite post-completion barrier and the before/after-creation source-leave distinction without introducing global priority or pending gameplay tokens.
+
+**Initial State:** P is field-present with Harm/Mercy and an eligible Natural Action A will supply direct positive Shield at completion. Chord declares postActionSettlement BEFORE_NEXT_NATURAL_ACTION, owner/candidate-scoped identity and complete target/snapshot/failure profile. Test-only dependency nodes explicitly force the listed source-leave cuts; no incidental event/list ordering selects them.
+
+**Input / Expected Resolution:**
+
+1. Leave before observation: source leave clears notes; Passive inactive at A completion; no Chord, no AE. Required evaluation becomes terminal.
+2. Leave after atomic consume/create but before Chord start: settlement is already created, not reversed into notes or cancelled by Passive inactivity. Current source WIL/ATK remains readable through authoritative Entity identity for Chord's own start snapshot; resolve its Heal/+8 AE once under its locked target/invalidity law, before next SSI opportunity. Ultimate Shield remains, Skill3 Shield is removed with source-leave cause.
+3. Try to advance TURN_BOUNDARY/next Natural Action while the created settlement is still in progress: Scheduler holds handoff. After terminal resolution/clean failure under explicit ordinary policy, handoff can continue; failed branches do not hang or imply automatic retry/refund.
+4. Save/load after consume/create, then redeliver completion: restore same held obligation and settlement identity, no new Chord. Save/load after terminal settlement and receipt cleanup: original replay cannot recreate it.
+
+**Expected Trace / State:** A is already completed before Chord; finite obligation belongs to A's current opportunity, terminal identity survives recovery; no additional Natural Action, private Turn Boundary, note token or invented P/Q priority.
+
+**Forbidden Outcomes:** using rootCompletionDependency to wait for its own completion; next SSI Action starts before required Chord; source leave recredits consumed notes/cancels created Chord by rechecking Passive; future-Action pending token; indefinite failed obligation; repeat AE/Heal on replay; order unrelated Reactions by eventSeq.
+
+**Layers Under Test:** 04 §7.13, ACT-033, existing Trigger/Scheduler/Transaction owners, required post-action phase, source lifetime, replay horizon.
+
+---
+
+## M-048 — Phần Tinh Mandatory Exchange Is Action-owned Cost, Including Non-Natural Casts
+
+**ID:** `M-048`
+**Status:** `MUST_PASS`
+**Purpose:** preserve atomic required payment, true Action identity, immutable payment binding and target lock.
+
+**Initial State:** Phần Tinh has HP100, sufficient Side AE and an explicitly requested locked enemy. Skill1 costs 25 AE + normalized 15 HP; ordinary CST-003 policy applies, no private floor. WIL100 is snapshotted after successful Cost. Direct WILL Damage has a payment-gated own-direct FINAL_DAMAGE_MULTIPLIER 1.40. Test mitigation/reduction are identity, no Shield. Cases for Ultimate also supply ordinary Mode readiness/Rage law rather than inventing a Rage reset.
+
+**Input / Expected Resolution:**
+
+- Valid Skill: required Costs atomically commit 25 AE / 15 HP; HP85; one WILL200 hit becomes 280 before Shield. HP Cost creates no Damage/Reflect/Lifesteal/Heal receipt. Later payer HP mutation does not change payment or multiplier.
+- Required AE invalid, or external payment constraint prevents full positive normalized HP amount: original Action fails admission/activation under ordinary timing, no partial required payment, Damage, use count or bonus. No Character rollback. An explicitly legal rounded requested HP amount0 may succeed; truncated underpayment of a positive request does not satisfy the exchange.
+- Natural/Forced/linked/non-Natural genuine Skill or Ultimate: same required exchange once per actual Action. Basic has no exchange/bonus. A child **Skill** without waiver pays its own Cost and owns its own bonus; a plain direct Effect node pays nothing extra. Explicit caller override/waiver follows its Contract and cannot silently be treated as a successful HP exchange.
+- Post-Cost locked Skill target becomes lifecycle-invalid: drop only that Damage branch, no retarget/refund or second target cycle.
+
+**Expected Trace / State:** Action-local Cost result has normalized requested/actual/status and protected transaction identity; Damage bonus reads that binding with directActionRef CURRENT_ACTION/SELF. HP Cost remains distinct from Damage.
+
+**Forbidden Outcomes:** Basic HP payment; non-Natural cast free by default; auto-cast waives Cost; underpayment grants full bonus; nominal HP formula reconstructed after commit; child shares parent payment/bonus from root equality; invalid target silently replaced.
+
+**Layers Under Test:** CostSpec/CostPaymentResultRef, CST-001/003/005–009/013, DMG-008, Action identity/provenance, Intent explicit target binding, TGT-006.
+
+---
+
+## M-049 — Phần Tinh Simultaneous Ultimate Uses Common HP Threshold and Source Snapshots
+
+**ID:** `M-049`
+**Status:** `MUST_PASS`
+**Purpose:** prove per-target conditional TRUE before mitigation, one logical mixed hit, all-target snapshot stability and TRUE bonus/Shield law.
+
+**Initial State:** admitted/paid Ultimate locks all legal enemies at one target-context checkpoint. Source ATK10/WIL20 is captured once after Cost. All three target MaxHP values are1000; A CurrentHP290 = 29%, B310 = 31%, C300 = exactly30%; captured target HP/MaxHP supplies below30 Booleans. A has Standard Shield20, sufficient actual HP and no Shield Piercing. B/C normal mitigation factors are explicitly fixed at 0.5 ARM/RES, no FDR. Bonus1.40 is locked by this Action's successful normalized HP payment. Transaction is SIMULTANEOUS with DROP_INVALID/no-requery.
+
+**Input:** resolve all targets from the common view. Repeat with permuted IDs/list/Slot/technical iteration. Test-only explicit mutation before group resolution changes current source stats and B HP to29% after snapshots; retain the declared snapshots. An independent variant makes one locked recipient lifecycle-invalid before commit.
+
+**Expected Resolution:** A's raw30 PHYSICAL +60 WILL both choose TRUE before mitigation, remain one hit, receive ×1.40 => total126 before Shield; Standard Shield absorbs20 normally. B/C retain PHYSICAL/WILL; mitigation gives15+30, ×1.40 => total63 before Shield. B does not change branch from the later HP mutation, C is not below30, source mutation does not alter any formula. Invalid locked recipient drops locally with no replacement/requery; protected transaction revalidation cannot silently refresh locked snapshots. All surviving results are independent of technical order. Mandatory lifecycle and ordinary Reactions follow existing simultaneous batch law.
+
+**Expected Trace / State:** one Ultimate Action, one source SnapshotRef, common target SnapshotRef, one below30 choice per target shared by both components, simultaneous batch result ownership, same payment-gated factor across recipients.
+
+**Forbidden Outcomes:** first component lowers HP then converts second; per-target live threshold or source resnapshot; target A affects B eligibility/formula/type; transform emulated by Penetration/post-mitigation label; TRUE loses bonus or bypasses Shield; two components become two hits/Actions; hidden list/Slot priority.
+
+**Layers Under Test:** SnapshotSpec, Condition profile branching before packet build, DMG-001/004/007/008, RES-002, TGT-006, Shield/HP commit.
+
+---
+
+## M-050 — Final Multiplier Scope Rejects Foreign Bindings and Reduction Emulation
+
+**ID:** `M-050`
+**Status:** `MUST_REJECT`
+**Purpose:** prove the new phase is bounded, own-direct and backed by available Action-local immutable inputs.
+
+**Initial State:** valid baseline Damage modifier uses FINAL_DAMAGE_MULTIPLIER/MULTIPLY1.40, explicit components including TRUE, bound directActionRef and committed Cost result. Each negative fixture changes only its listed defect.
+
+**Input:** attempt non-Damage scope; unknown phase/operation; nonfinite/negative/factor<1; unbound Action reference; child/standalone Effect with only same root/Attribution; foreign/unavailable payment binding; unfinished Action-result query used instead of executing-Effect graph membership; current HP value substituted for a declared required immutable Snapshot/result input with an incompatible binding type; normal FDR targeting TRUE or relabeled as new phase to evade bypass.
+
+**Expected Resolution:** reject malformed/unavailable bindings/semantics before affected Damage commits; no guessed direct membership, payment or factor. Child/standalone ownership mismatch is a false scope predicate for an otherwise valid modifier, so that modifier does not apply; it does not reject the legitimate child Action itself. A separately authored paid child Skill with its **own** valid rule/binding remains accepted.
+
+Positive control: two explicitly authored same-phase finite factors1.40 and1.20 combine as one factor1.68 before one amount application under RES-006, independent of modifier/list/Event order. No rules yields1. TRUE bypasses FDR while visiting its explicitly authored final amplification.
+
+**Expected Trace / State:** reason identifies Effect/phase/operation/reference/eligibility defect; scope mismatch creates no inherited bonus. No per-modifier rounding or global priority.
+
+**Forbidden Outcomes:** raw formula×1.40 accepted as equivalent final checkpoint; negative reduction multiplier affects TRUE; missing result guessed from parent/nominal Cost; child Action itself rejected merely for not matching parent's modifier; universal bonus manager/extra hit.
+
+**Layers Under Test:** 04 §18A validators, RES-006, DMG-005/008, existing Modifier/Damage/Result owners.
 
 ---
 
@@ -3559,9 +3651,12 @@ When executable Kernel tests exist, at minimum create Golden Traces for:
 22. `M-037` sequential phase-1 commit → mandatory lifecycle → explosion/skip → `ACTION_DIRECT_EFFECTS_COMPLETE` local Reaction-gate opening.
 23. `N-008` distributed payer-set freeze before any payment commit and gameplay-equivalent replay under permuted technical payer iteration.
 24. `N-009` explicit interposition settlement-failure traces for PRE/POST `CONTINUE` and `FAIL_INTENT`, including post-cost no-auto-refund behavior.
-25. `M-040` / `M-041` sequential common-snapshot Ultimate → owner-scoped direct-result observation → completion → record/check/consume/Chord without rerecording.
+25. `M-040` / `M-041` sequential common-snapshot Ultimate → direct-result seal → completion → owner-scoped record/check/consume/create → Chord without rerecording.
 26. `M-043` source-family cap sum → current commit-time headroom → clipped new addition and immutable receipt without old refresh/clamp.
-27. `M-044` / `M-045` exact metric Slot cutoff and locked invalidation; retained result views and pending settlement restore without replay.
+27. `M-044` / `M-045` exact metric Slot cutoff and locked invalidation; retained result views and created settlement restore without replay, including terminal deduplication after receipt cleanup.
+28. `M-047` completion → atomic consume/create → required settlement → global SSI handoff, with source-leave cuts and no gameplay pending token.
+29. `M-048` / `M-049` required HP exchange → immutable action-local bonus → common-snapshot simultaneous conditional TRUE Damage → ordinary Shield.
+30. `M-050` bounded Final Damage phase/direct graph and foreign-binding rejection.
 
 ---
 

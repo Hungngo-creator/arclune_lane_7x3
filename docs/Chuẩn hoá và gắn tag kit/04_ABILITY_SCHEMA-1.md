@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-02-E.2
+**Version:** 2026-10-02-E.3
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -8,6 +8,7 @@
 **Revision E.1:** incorporates Pilot Normalization #4 Schema support for scoped incoming Damage-component type transforms, battle-scoped Current Deployment Cost, explicit Return-to-Deck with transition-owned retention data, and deterministic tie policy for metric target selectors. No new Functional Tag or Primitive is introduced.
 
 **Revision E.2:** adds checkpoint-scoped committed-result Conditions, Shield addition receipts/source-family caps and explicitly authored Slot ties through existing owners. Earlier normalized data remains unchanged; unresolved Character fields are not compiled into defaults.
+**Revision E.3:** adds required post-completion settlement, typed result relation context, Shield owner/zero-addition clarification and bounded Final Damage amplification/direct-Action scope. Pre-Pilot-5 data remains unchanged; E.2 ACTION_RESULT_ANY content must explicitly bind readContext before normalization to E.3.
 
 ---
 
@@ -965,6 +966,7 @@ trigger:
   reset:
   recursionPolicy:
   rootCompletionDependency:
+  postActionSettlement:
 ```
 
 ---
@@ -1193,6 +1195,26 @@ unbounded recursive dependency creation.
 
 ---
 
+## 7.13 `postActionSettlement`
+
+Optional bounded declaration for an ACTION_COMPLETED Trigger whose finite settlement is required in the **existing post-action phase**, before the next Natural Action opportunity. It does not delay ACTION_COMPLETED or create future-Action pending gameplay state.
+
+```yaml
+postActionSettlement:
+  mode: BEFORE_NEXT_NATURAL_ACTION
+  observedActionRef: EVENT_ACTION
+  dependencyId:
+  dependsOn: []
+```
+
+The observed Action must be an actually completed Natural Action in the same Combat Instance. Dependency identity is observed Action + runtime trigger owner + instantiated candidate + local dependencyId. Local dependsOn edges refer only to this opportunity's required post-action obligations. Use the existing required post-action Scheduler/Effect DAG/Transaction owners, not a new queue/priority subsystem.
+
+Completion dispatch registers the authored obligation before SSI handoff; its eligibility check and any created settlement become terminal before that handoff. A false condition/clean failed activation closes it under existing failure law. After consume/create commits, an independently authored settlement's validity/lifetime governs later source leave; Trigger re-eligibility does not undo committed creation. Finite scheduler save state is not a pending token for a later Action.
+
+Normalizer rejects missing Action/owner/Mode anchors, non-completed/non-Natural sources, cross-opportunity edges, cycles, waits for the next Action/TURN_BOUNDARY being blocked, unbounded creation and combining this obligation with a blocker for its own completion. A Mode must expose the same Natural Action/required post-action phase or require an explicit 07 adaptation. No ordering of unrelated observers follows from this marker.
+
+---
+
 # 8. CONDITION SPEC
 
 Conditions must be declarative expressions, not arbitrary scripts.
@@ -1361,6 +1383,9 @@ actionResultAny:
   recipientFilter:
     relation:
     relationAnchor:
+    readContext:
+      mode: OBSERVATION_STATE | SNAPSHOT
+      snapshotRef: <SnapshotRef; required only for SNAPSHOT>
     filters: []
   metric:
   compare:
@@ -1380,7 +1405,7 @@ Allowed kind/metric pairs are bounded:
 
 Filter committed entries belonging to the scoped Action's own direct graph, apply the typed recipient relation/filter using its explicit anchor and existing snapshot/read policy, then compare the selected committed field. The result is one Boolean: `ANY` matching entry, or false for an empty filtered collection. Match count does not multiply Trigger activations. Historical evidence does not inherit target-selection ALIVE/presence/targetability filters: a recipient killed by the committed Damage still provides its result. Apply only the recipient filters actually authored. Separate predicates may independently inspect different result kinds for the same Action.
 
-`TRG-002` governs relation/Condition state reads; result amounts and provenance are immutable commit data, not live reconstructed values. If a mechanic requires earlier recipient relation facts, author an explicit SnapshotRef rather than infer them from current allegiance. `TRG-013` / `TRG-015` govern direct provenance and completion observation.
+`TRG-002` governs relation/Condition state reads; result amounts and provenance are immutable commit data, not live reconstructed values. `recipientFilter.readContext` is required: OBSERVATION_STATE uses TRG-002 at observation; SNAPSHOT requires an available immutable SnapshotRef captured under §13 that covers recipient, relationAnchor and every relation/filter fact read. Reject missing/uncovered/stale references; no arbitrary checkpoint string or implicit fallback to live allegiance. This typed context applies to recipient relation/filter facts only, not immutable result amounts/provenance. `TRG-013` / `TRG-015` govern direct provenance and completion observation.
 
 Normalizer rejects an unavailable/not-yet-reached Action/checkpoint anchor, wrong kind/metric pair, nominal/live amount in a committed metric, missing relation anchor, unsupported Shield operation mapping, or a dependency cycle that waits for its own completion Event. Existing logical `ALL`/`ANY`/`NOT` can combine these bounded predicates with State Conditions. No new Functional Tag or Primitive is implied.
 
@@ -2466,6 +2491,8 @@ TRANSFER
 REMOVE
 ```
 
+Shield recipient is the Effect target; existing `owner` is a separately declared runtime EntityRef. For source-presence retention/owner clocks, author owner = source (for example SELF), not the recipient by implication. FIELD_PRESENCE_SCOPED follows that declared owner's relevant presence cycle even when its contribution is attached to another recipient. BATTLE_SCOPED retention does not acquire source-leave deletion implicitly; preserve source provenance. PERMANENT only removes timed expiry and does not override a separately declared field-scoped retention/transition policy.
+
 Shield effect can have:
 - value formula;
 - duration;
@@ -2579,6 +2606,7 @@ effectAmountModifier:
   effectScope:
     effectType:
     damageComponents: []
+    directActionRef: <optional existing ActionRef anchor/relation>
 
   conditions: []
 
@@ -2736,6 +2764,8 @@ NON_TRUE_DAMAGE
 
 is required.
 
+`effectScope.directActionRef`, when authored, resolves an existing Action and requires the resolving Effect to belong to that Action's own direct graph under TRG-013. For an Action-instance-owned rule use `{anchor: CURRENT_ACTION, relation: SELF}`. Shared rootActionId or Attribution alone does not qualify a child/standalone Effect. Referenced Cost/Snapshot/results resolve in that same declared Action's existing binding namespace; reject unavailable/foreign bindings. This scope is a read-only predicate at resolution, not an ACTION_RESULT_ANY read of an unfinished Action.
+
 ## Structured conditions
 
 `conditions` uses existing `ConditionSpec`.
@@ -2807,6 +2837,7 @@ Current minimum phases introduced here:
 ```text
 PRE_OVERHEAL
 FINAL_DAMAGE_REDUCTION
+FINAL_DAMAGE_MULTIPLIER
 ```
 
 Phase compatibility is typed.
@@ -2835,6 +2866,10 @@ WILL
 ```
 
 True Damage is unaffected because it lies outside `damageComponents`.
+
+### `FINAL_DAMAGE_MULTIPLIER`
+
+Valid only for DAMAGE. Existing MULTIPLY with a finite factor >= 1 applies to explicitly selected PHYSICAL/WILL/TRUE components at DMG-008's Final Damage checkpoint before Shield. A factor below 1 is rejected at this bounded amplification phase rather than disguising reduction against TRUE. It is distinct from FINAL_DAMAGE_REDUCTION; TRUE bypasses reduction but may receive an explicitly authored final multiplier. Do not lower this phase to a raw-formula coefficient or a reduction Tag. Payment-gated rules consume their declared Action-local committed Cost result and immutable factor/Snapshot, never current payer HP or later nominal reconstruction.
 
 ## Multiple rules
 
@@ -5082,6 +5117,10 @@ Normalizer/compiler must:
 34. Preserve Shield requested versus committed creation/addition amounts and reject unsupported operation-result mappings without inventing stacking/cap semantics.
 35. Validate source-family cap owner/origin provenance, commit-time read set and explicit competing-grant order.
 36. Validate metric top-N cutoff and explicit Slot coverage without introducing entity/list priority or later reroll.
+37. Validate required ACTION_RESULT_ANY readContext and SnapshotRef coverage of recipient/anchor/filter facts; reject missing data rather than use live fallback.
+38. Validate postActionSettlement completed-Natural-Action/Mode/owner anchors, bounded same-opportunity DAG and terminal-before-handoff requirement; reject completion cycles and waits on held boundaries.
+39. Preserve declared Shield owner independently from recipient when lowering retention/owner clocks; reject an unresolved required owner reference.
+40. Validate FINAL_DAMAGE_MULTIPLIER Damage/component/operation compatibility, directActionRef own-graph membership and same-Action Cost/Snapshot/result binding visibility; reject implicit root/Attribution scope or raw/FDR phase substitution.
 
 ---
 
@@ -5990,6 +6029,9 @@ At minimum validator must enforce:
 61. A metric selector using `RANDOM_AMONG_TIED` must build the exact tied-best set before consuming deterministic RNG.
 62. `tiePolicy` applies to initial metric selection only and must not silently imply target requery/reroll after selection.
 63. A locked target that later becomes invalid follows its declared invalid-target policy; the initial tie policy must not select a replacement unless an explicit requery/reroll policy exists.
+64. ACTION_RESULT_ANY recipient readContext must be explicit and its SnapshotRef cover every requested fact.
+65. postActionSettlement must be finite, opportunity-local and completed-Natural-Action anchored; it cannot block its own source completion or wait for held handoff/boundary.
+66. FINAL_DAMAGE_MULTIPLIER is Damage-only with finite MULTIPLY factors >= 1; directActionRef and all scoped result bindings must resolve without implicit child-root inheritance.
 
 ---
 

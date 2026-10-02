@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-02-F.4
+**Version:** 2026-10-02-F.5
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -10,6 +10,7 @@
 **Purpose:** turn semantic declarations into deterministic resolution rules without turning Character data into code.
 
 **Revision F.4:** adds checkpoint-scoped committed-result observation, Shield addition receipts/source-family caps and local explicit Slot ties. Existing Pilot #4 random-tie behavior and proportional Shield pooling remain unchanged.
+**Revision F.5:** corrects typed result observation/zero-addition law; adds ACT-033 required post-completion handoff and DMG-008 bounded final amplification/direct-Action scope. No new Tag/Primitive or global priority.
 
 ---
 
@@ -1106,6 +1107,17 @@ This Contract therefore adds a local Action-completion mechanism without changin
 
 ---
 
+## ACT-033 — Required Post-completion Settlement before Natural-Action Handoff
+**Status:** `LOCKED`
+
+`trigger.postActionSettlement` declares finite required work in the existing ACT-001 post-action phase. The observed Action has already emitted ACTION_COMPLETED and must be an actual Natural Action in the same Combat Instance. Completion dispatch registers the owner/candidate-scoped obligation before scheduler handoff. Eligibility observation and any created settlement resolve to terminal status before TURN_BOUNDARY/next Natural Action opportunity can proceed.
+
+This obligation blocks **handoff**, not the already-completed Action. Existing rootCompletionDependency remains pre-completion and is not reused cyclically. A skipped condition or clean failed activation closes the obligation under existing failure semantics; no automatic refund or retry is inferred. Consume/create mutation and its execution identity use the existing transaction boundary; replay cannot create another settlement after consumption. Once created, apply its declared settlement validity/lifetime, not a second Trigger availability check that reverses creation.
+
+Keys include observed Action, runtime trigger owner, instantiated candidate and local dependencyId. Local edges are limited to required work of this same opportunity, must form a bounded DAG and cannot await a next Action or boundary being held. Terminal observation/settlement records, including clean nonqualification/failure, survive the supported replay horizon. Original committed Event + observed Action/checkpoint + trigger definition/runtime owner identifies redelivery before a new candidate is allocated; preserve the original candidate identity rather than let a fresh ID bypass idempotence. No order between unrelated observers/Reactions is added; if competing work needs observable ordering, an existing explicit law is still required. Mode support requires the same Natural Action/post-action abstraction or explicit 07 adaptation. Reject malformed/cyclic content before execution; malformed IR fails closed at this boundary without advancing into an unfinished obligation.
+
+---
+
 # 10. TRIGGER / REACTION EVENT LEVELS
 
 ## TRG-001 — Event Granularity
@@ -1518,9 +1530,9 @@ Own-direct membership is proven from Effect provenance and normalized graph owne
 
 The predicate returns one Boolean per Event regardless of matching-entry count. An empty committed collection returns false; failure/zero of one Effect does not erase successful sibling results or imply failure of the enclosing Action. Several kind-specific predicates can all be true for one scoped Action/checkpoint.
 
-Each selected checkpoint view is sealed before its Event is published and remains immutable while observers/dependent queued work reference it, even if a contribution has since depleted/expired or a recipient later becomes invalid. Current recipient relation/Condition reads use `TRG-002` unless an explicit earlier SnapshotRef is selected. Do not inherit live target-selection legality filters for historical receipts: a target killed by the qualifying Damage remains result evidence unless an authored recipient filter says otherwise. The collection is read-only: no RNG, target selection, Cost, Effect emission or mutation occurs inside a predicate.
+Each selected checkpoint view is sealed before its Event is published and remains immutable while observers/dependent queued work reference it, even if a contribution has since depleted/expired or a recipient later becomes invalid. Recipient relation/filter reads use the required typed `recipientFilter.readContext`: OBSERVATION_STATE under TRG-002, or SNAPSHOT with a retained SnapshotRef covering recipient, anchor and all requested facts. Missing/uncovered snapshot data is an error, never a live-read fallback. Do not inherit live target-selection legality filters for historical receipts: a target killed by the qualifying Damage remains result evidence unless an authored recipient filter says otherwise. The collection is read-only: no RNG, target selection, Cost, Effect emission or mutation occurs inside a predicate.
 
-An observer may compose ordinary State/counter updates and later Effects through its declared Effect DAG/atomic group. At ADEC, such a bounded update may be a declared `ACT-032` dependency registered before the completion barrier; its runtime identity includes root Action, trigger owner and instantiated candidate. A settlement waiting for `ACTION_COMPLETED` cannot be that same root's blocker. Mutually exclusive authored checkpoint branches must prevent duplicate observation where a mechanic handles one Action at ADEC instead of completion. Idempotence, retention, note consumption, owner validity, failed-Cost behavior and settlement dependencies remain authored semantics; this Contract does not create a universal reward/memory subsystem. Multiple competing state-mutating observers still require their existing dependency/priority law where order matters; neither entry iteration nor eventSeq supplies it.
+An observer may compose ordinary State/counter updates and later Effects through its declared Effect DAG/atomic group. At ADEC, such a bounded update may be a declared `ACT-032` dependency registered before the completion barrier; its runtime identity includes root Action, trigger owner and instantiated candidate. A settlement waiting for `ACTION_COMPLETED` cannot be that same root's blocker; an explicitly required post-completion settlement instead uses ACT-033 to block the next Natural-Action handoff. Mutually exclusive authored checkpoint branches must prevent duplicate observation where a mechanic handles one Action at ADEC instead of completion. Idempotence, retention, note consumption, owner validity, failed-Cost behavior and settlement dependencies remain authored semantics; this Contract does not create a universal reward/memory subsystem. Multiple competing state-mutating observers still require their existing dependency/priority law where order matters; neither entry iteration nor eventSeq supplies it.
 
 Executable content with an unavailable Action/checkpoint anchor, mismatched result metric, missing semantic anchor or unsupported operation-result mapping is rejected. A post-completion observer cannot be made a dependency waiting for the completion Event it would itself prevent.
 
@@ -2190,6 +2202,8 @@ does not apply to the True component of the same Damage Effect.
 
 ---
 
+When effectScope.directActionRef is present, test resolving Effect membership in that existing Action's own direct graph under TRG-013, independently from source Attribution. Action-local Cost/Snapshot bindings must resolve in that Action's namespace; reject foreign/unavailable references. No sealed completed-result collection is needed to test an executing Effect's known graph ownership.
+
 ### Structured conditions and `valueQueries`
 
 Modifier conditions reuse existing structured `ConditionSpec`.
@@ -2268,6 +2282,9 @@ PRE_OVERHEAL
 
 FINAL_DAMAGE_REDUCTION
 → DMG-005
+
+FINAL_DAMAGE_MULTIPLIER
+→ DMG-008
 ```
 
 A modifier may not run at an undeclared or custom string phase.
@@ -2970,16 +2987,19 @@ Canonical component flow:
 Physical
 → ARM/Penetration
 → qualifying FINAL_DAMAGE_REDUCTION modifiers
+→ explicitly authored FINAL_DAMAGE_MULTIPLIER
 → Shield
 
 Will
 → RES/Penetration
 → qualifying FINAL_DAMAGE_REDUCTION modifiers
+→ explicitly authored FINAL_DAMAGE_MULTIPLIER
 → Shield
 
 True
 → bypass ARM/RES
 → bypass FINAL_DAMAGE_REDUCTION
+→ explicitly authored FINAL_DAMAGE_MULTIPLIER (DMG-008)
 → Shield
 ```
 
@@ -3100,6 +3120,7 @@ Physical
 → True-Damage path
 → bypass ARM/RES
 → bypass FINAL_DAMAGE_REDUCTION
+→ explicitly authored FINAL_DAMAGE_MULTIPLIER (DMG-008)
 → Shield unless separately pierced/bypassed
 ```
 
@@ -3111,6 +3132,7 @@ Will
 → True-Damage path
 → bypass ARM/RES
 → bypass FINAL_DAMAGE_REDUCTION
+→ explicitly authored FINAL_DAMAGE_MULTIPLIER (DMG-008)
 → Shield unless separately pierced/bypassed
 ```
 
@@ -3196,6 +3218,19 @@ Authority is entered only when a real Authority-bearing semantic conflict exists
 
 ---
 
+## DMG-008 — Scoped Final Damage Multiplier
+**Status:** `LOCKED`
+
+A normalized amount modifier at FINAL_DAMAGE_MULTIPLIER applies existing MULTIPLY to explicitly selected Damage components after their type-specific mitigation and applicable reduction, before component combination/Shield. PHYSICAL and WILL have passed their normal ARM/RES and qualifying FINAL_DAMAGE_REDUCTION; TRUE bypasses those stages but enters this distinct explicitly authored multiplier phase. True Damage retains ordinary Shield interaction and does not become Shield Piercing.
+
+The bounded phase accepts only finite MULTIPLY factors >= 1; factors below 1 require another explicit higher law and are rejected here, preserving TRUE reduction bypass. Execute under RES-006 using one deterministic combined phase factor, with no per-rule amount rounding or inferred priority. Unsupported noncommutative operations are rejected. This phase is not ordinary generic/final Damage Reduction; reduction rules cannot affect TRUE by being relabeled as this phase. Unauthored phase has identity factor and preserves existing Damage behavior.
+
+An optional effectScope.directActionRef binds own-direct provenance under TRG-013 to the resolved existing Action. Child/standalone Damage sharing lineage or Attribution is excluded. A rule's Action-local CostPaymentResultRef/SnapshotRef must belong to that Action and be available before this phase. Successful payment eligibility/locked factors use immutable declared bindings; no HP re-read, payment, Cost waiver inference or result mutation occurs inside modifier evaluation. An Actionless rule need not fabricate an Action; it cannot resolve a required directActionRef that does not exist.
+
+No new Tag/Primitive or mutable multiplier store. Reject wrong Effect/component/phase, unavailable/foreign references and provenance ambiguity before affected Damage commit. The phase defines amount resolution, not a Character reward, global priority or additional hit.
+
+---
+
 # 20. SHIELD DAMAGE ORDER
 
 ## SHP-001 — Shield Before HP
@@ -3240,6 +3275,8 @@ C → 480
 
 If B later expires:
 > remove only B's remaining 240 contribution.
+
+The Shield recipient and declared runtime owner are distinct roles. FIELD_PRESENCE_SCOPED retention/owner clocks follow the declared owner; source-owned contributions attached to other recipients are removed by that owner's committed field-leave lifecycle cleanup, preserving its removal cause rather than break/natural expiry. BATTLE_SCOPED grants do not acquire source-leave deletion implicitly. No timed expiry alone does not override an explicit field-scoped retention/transition policy. Source identity remains valid provenance after field leave.
 
 This gives one simple gameplay Shield pool while preserving provenance for:
 - expiry;
@@ -3289,7 +3326,7 @@ Action provenance when Action-owned; Effect/transaction provenance in all cases
 stateVersion
 ```
 
-Apply the independently authored admission, stacking and cap policy first. `CREATE` records the value actually inserted as the declared contribution; `ADD_VALUE` records the positive amount actually credited by that operation. Rejection cannot report a positive committed amount; a successful cap-to-zero addition reports zero without automatically failing the enclosing Action.
+Apply the independently authored admission, stacking and cap policy first. `CREATE` records the value actually inserted as the declared contribution; `ADD_VALUE` records the positive amount actually credited by that operation. Rejection cannot report a positive committed amount; a successful cap-to-zero addition reports zero without automatically failing the enclosing Action. Its contribution refs are empty: no zero-valued contribution is created, no old contribution is mutated, and no refresh/duration/expiry work is scheduled by that zero operation.
 
 This is an operation-local receipt, not a net recipient/pool delta. Later absorption, removal, expiry or sibling Effects never rewrite it. A contribution's current `remainingAmount` cannot reconstruct how much the original Effect committed.
 
@@ -3311,7 +3348,8 @@ resolve validated source family and recipient
 → read active remaining family contributions + declared cap ValueRef at SHIELD_COMMIT
 → headroom = max(0, maximum - sum(active remaining family amount))
 → committed new amount = min(admitted requested addition, headroom)
-→ commit new contribution/addition and SHP-005 receipt atomically
+→ if new amount > 0: commit admitted ledger addition + SHP-005 receipt atomically
+→ if new amount = 0: publish successful zero SHP-005 receipt with no affected contribution refs; do not create/mutate a ledger contribution or duration/expiry work
 ```
 
 Use existing deterministic Shield arithmetic; clamp headroom and the new amount nonnegative. Contribution expiry, removal or proportional depletion changes future headroom, not earlier receipts. A lowered cap/MaxHP does not retroactively trim old contributions under `CLIP_NEW_ADDITION`; it may leave zero headroom. No refresh, merge, old removal, duration change or independent absorption layer follows from this cap.

@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-02-E.2`.
+**Version:** `2026-10-02-E.3`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-02-F.4`.
+**Version:** `2026-10-02-F.5`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-02-G.3`
+**Version:** `2026-10-02-G.4`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-02-I.2`
+**Version:** `2026-10-02-I.3`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -146,10 +146,12 @@ In `docs/canon kit/`:
 - Pilot #1: `Ariadne_Velora_Clarified_Gameplay_Canon.md`.
 - Pilot #2: `Echo_Reverie_Clarified_Gameplay_Canon.md`.
 - Pilot #3: `Sanguinius_Clarified_Gameplay_Canon.md`.
-- Pilot #4: `Alcestis_Clarified_Gameplay_Canon_R3.md`; merged F.3 / G.2 boundaries remain canonical under the additive F.4 / G.3 revisions.
-- Pilot #5: `Polyhymnia_Clarified_Gameplay_Canon.md`; locked designer corrections, partial normalization, generic-gap proofs and explicit `UNRESOLVED / NOT BLOCKING` fields live together. It is not a claim of execution-ready numeric data.
+- Pilot #4: `Alcestis_Clarified_Gameplay_Canon_R3.md`; merged F.3 / G.2 boundaries remain preserved through F.5 / G.4; Pilot #5 F.4 / G.3 is also merged at the current base.
+- Pilot #5: `Polyhymnia_Clarified_Gameplay_Canon.md`; R3 records all ten designer decisions, completion-only collectors, created-Chord handoff obligation, source-retention profiles, normalization and generic-gap proofs; only external-content/unsupported-Mode branches remain UNRESOLVED / NOT BLOCKING. It is not a claim of execution-ready numeric data.
 
-Pilot #5 architecture deltas: bounded checkpoint result observation, immutable Shield addition receipts, source-family addition caps, explicit Slot metric ties/top-N cutoff, and Turn-Based Main Leader position clarification. No new Functional Tag or Primitive. `M-038` onward adds declarative architecture coverage; no executable tests are implied.
+- Pilot #6: `Phan_Tinh_Clarified_Gameplay_Canon.md` R2; complete one-Skill raw kit, mandatory actual-cast HP exchange, common-snapshot simultaneous conditional TRUE AoE and payment-gated own-direct final multiplier. Native Element/budget remain separate metadata.
+
+Pilot #5 architecture deltas: bounded checkpoint result observation, immutable Shield addition receipts, source-family addition caps, explicit Slot metric ties/top-N cutoff, typed recipient relation snapshots, required finite post-completion settlements before SSI handoff, and Turn-Based Main Leader position clarification. No new Functional Tag or Primitive. `M-038` onward adds declarative architecture coverage; Pilot #6 adds the bounded FINAL_DAMAGE_MULTIPLIER/directActionRef surface through existing modifier/Damage owners; no executable tests are implied.
 
 ---
 

@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-02-G.3
+**Version:** 2026-10-02-G.4
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -11,6 +11,7 @@
 **Revision G.2:** executes the merged Pilot #4 Schema and F.3 Contracts through existing runtime owners: static-Passive initialization, pre-mitigation component-type transforms, battle-scoped Deployment Cost and lock, atomic Return-to-Deck retention cleanup, and metric-selector tie resolution. No Character-specific runtime branch, Functional Tag, Primitive, callback registry, or generic priority system is introduced.
 
 **Revision G.3:** adds checkpoint-scoped committed-result views, Shield addition receipts/source-family caps and explicit Slot tie resolution through existing owners. No Character-specific runtime, Functional Tag, Primitive or generic priority is introduced.
+**Revision G.4:** executes typed relation context, corrected Shield owner/zero-result law, durable replay identity, required post-completion settlement and bounded Final Damage amplification through existing owners. No Character-specific runtime, Functional Tag, Primitive or generic priority is introduced.
 
 ---
 
@@ -777,6 +778,8 @@ CANCELLED
 
 These are runtime states, not Functional Tags.
 
+For an explicitly requested target Entity already selected/locked at pre-cost target context, preserve that typed target reference in existing originalRequestedSelector/sourceDecisionContext and carry it into the admitted Action targetContext. CST-007 validates its mandatory pre-cost legality; later target-plan execution reuses the lock and applies TGT-006 invalidity rather than selecting a replacement. This does not perform RNG selection during a candidate payability probe or change timing for Actions without such an authored explicit-input profile.
+
 ### Intent creation
 
 When an input decision, autonomy decision, or normalized Action-form resolver produces a request:
@@ -1325,6 +1328,8 @@ It is not a personal actor clock.
 
 ---
 
+For normalized ACT-033 obligations, the existing Scheduler keeps required post-action work keyed by completed Natural Action + runtime trigger owner + instantiated candidate/local dependency. Completion dispatch registers/evaluates these obligations before this handoff. Eligibility false or clean failure closes the obligation; a created settlement must be terminal before TURN_BOUNDARY or the next Natural Action opportunity. This never reopens/delays the completed Action. Existing Mode semantics decide other hooks/order; this barrier creates no relative priority between unrelated work.
+
 # 21. ACTOR NATURAL ACTION WINDOW
 
 Per-actor state:
@@ -1440,8 +1445,10 @@ Canonical high-level path:
 
 22. ACTION_COMPLETED
 
-23. publish/queue ACTION_COMPLETED-dependent ordinary non-blocking work
-    according to existing Trigger/Reaction Contracts
+23. publish/queue ACTION_COMPLETED-dependent work under existing Trigger/Reaction Contracts
+    ordinary unmarked work remains non-blocking
+    register/evaluate declared ACT-033 postActionSettlement obligations
+    finish their required finite settlement work before Natural-Action handoff
 
 24. if Natural Action:
       execute Mode Profile post-Natural-Action system hooks
@@ -1552,6 +1559,8 @@ That unresolved scheduling/priority question remains governed by existing Trigge
 `eventSeq` remains trace order, not gameplay priority.
 
 ---
+
+ACT-033 extends only the required post-action stage of this pipeline: after ACTION_COMPLETED publication, register/evaluate declared postActionSettlement obligations and finish their finite work before SSI handoff that leaves this opportunity. Existing Mode hook ordering remains governed by its current Contracts/profile; this marker alone supplies no new relative priority against unrelated hooks/candidates. Ordinary unmarked completion-triggered work retains its existing nonblocking behavior. Snapshot/target planning steps do not force every stat capture before target selection: execute declared SnapshotSpec timing/dependencies, including AFTER_TARGET_SELECTION, without changing unrelated Action profiles.
 
 # 24. EFFECT GRAPH RUNTIME
 
@@ -1758,6 +1767,8 @@ No entry-order dependence, RNG, live HP/Shield delta reconstruction, payment or 
 
 Receipt lifetime is owned by the existing Action/Result Store: create immutable receipts at commit, seal each checkpoint view before publication, retain while checkpoint observers/declared dependent work hold references, then release through ordinary result lifetime cleanup. Save/load and replay preserve pending refs and immutable provenance/values; rebuilding an index does not replay committed Effects.
 
+Recipient relation/filter queries execute the required normalized readContext: OBSERVATION_STATE through existing state reads, or SNAPSHOT through the retained typed SnapshotRef covering recipient, anchor and all requested facts. Validate coverage and fail visibly rather than substitute live allegiance. Result amount/provenance stays immutable regardless of that context.
+
 Trigger Engine can use this view to update ordinary field-scoped State/counters and consume them before an authored non-Natural settlement via existing Effect DAG/Transaction Manager. It does not create a Character-specific memory service or global ordering between unrelated observers. An ADEC State update may use existing §39A bounded completion dependencies registered before the barrier. A completion-triggered settlement cannot block the completion Event it waits for. Distinct trigger-owner/candidate instances are not collapsed merely because they share an authored dependency ID. For an authored single-observation mechanic, mutually exclusive checkpoint rules prevent counting the same Action twice; no global priority between unrelated candidates is inferred.
 
 ---
@@ -1837,6 +1848,7 @@ authoritative state version
 normalized effectModifierPlan
 existing Attribution context
 explicit SnapshotRefs?
+existing scoped Action/provenance and Action-local result bindings?
 ```
 
 Canonical evaluation:
@@ -1846,7 +1858,7 @@ Effect reaches declared phase
 → enumerate normalized modifier candidates for that Effect semantic/phase
 → source-scope test
 → recipient-scope test
-→ Effect/component-scope test
+→ Effect/component-scope test, including optional directActionRef own-graph provenance
 → structured Condition evaluation
 → bounded read-only valueQueries
 → evaluate pure scalar formula
@@ -1874,6 +1886,8 @@ effectSource
 ```
 
 unless normalized data selected that field.
+
+For optional directActionRef, resolve the declared Action using existing Action context, then test own-direct Effect membership under §15A/TRG-013. Same root or Attribution alone does not pass. Resolve Cost/Snapshot/result inputs from that Action's existing Result Store; reject unavailable/foreign bindings. This evaluation needs no sealed Action-result collection or new mutable bonus State.
 
 ### Recipient scope
 
@@ -2484,6 +2498,7 @@ Trigger Candidate stores:
 - Cost state;
 - priority class.
 - rootCompletionDependency?
+- postActionSettlement?
 - effectProvenanceContext?
 
 If a candidate declares a root completion dependency:
@@ -2668,6 +2683,16 @@ Such failures are content/runtime invariant violations, not Character-specific f
 
 ---
 
+## 39B. REQUIRED POST-COMPLETION SETTLEMENT
+
+Existing Trigger Engine / Scheduler / Transaction Manager interpret `postActionSettlement` under ACT-033. At completion dispatch, register the finite opportunity-local obligation before releasing SSI handoff; evaluate its conditions and ordered Effect DAG. Reuse existing candidate/dependency storage, with keys (Combat Instance, observed Natural Action, runtime trigger owner, instantiated candidate, local dependencyId). Distinct runtime owners never share one mutable obligation.
+
+Pending evaluation → in-progress created settlement → terminal success/clean failure/cancellation under explicit policy. Conditions false close without effects. Atomic consume/create commits its settlement identity with State mutation, so replay cannot consume twice or produce a duplicate Effect graph. Before creating a candidate on redelivery, look up the stable original observation key (Combat Instance, observed Action, checkpoint, trigger definition, runtime owner, original committed Event identity) and reuse its stored candidate identity/outcome; allocating a new candidate ID must not bypass deduplication. Terminal no-qualification/clean-failure observations also retain their identity so later source re-entry cannot make an old Event newly eligible. Retain terminal identity through the replay horizon even if flags/receipt refs are gone. This state is finite work for the current opportunity, not gameplay state awaiting a future Action. Once created, the settlement's declared validity/source-lifetime policy governs source leave; do not silently rerun Trigger availability to cancel it.
+
+The existing Scheduler refuses TURN_BOUNDARY/next Natural Action opportunity until these required obligations are terminal. It does not add edges between unrelated candidates or change ordinary Reaction eligibility. Reject cycles/cross-opportunity dependencies and waits on held boundaries; clean failures must terminate rather than hang the opportunity. Existing generic Snapshot/Result/Effect services execute settlement work; no Character branch, token manager or global priority is introduced.
+
+---
+
 # 40. TARGET RESOLVER
 
 Target Resolver is a pure/read-only subsystem until an effect mutates state later.
@@ -2818,6 +2843,7 @@ Damage Profile
 → §45A PRE_MITIGATION component-type transform
 → component-specific mitigation selected by resulting type
 → scoped FINAL_DAMAGE_REDUCTION phase for eligible non-True components
+→ explicitly authored FINAL_DAMAGE_MULTIPLIER for selected components, including True
 → combine eligible post-mitigation components
 → Shield interaction
 → Current HP-bound result
@@ -2851,6 +2877,8 @@ A target-local modifier on one recipient does not alter another recipient's pack
 No Character-specific Prime/Light logic is embedded in Damage Runtime.
 
 ---
+
+At FINAL_DAMAGE_MULTIPLIER, existing Damage Runtime calls §28A under DMG-008 with component/recipient, scoped Action/Effect provenance and available Action-local Cost/Snapshot bindings. Validate finite factors >= 1, then evaluate matching MULTIPLY factors once at this phase and apply one combined factor after mitigation/applicable reduction and before Shield. TRUE reaches this phase without entering reduction. Missing rules yield factor 1. Payment-gated factors use immutable successful Cost results/locked values, not payer HP re-query or child-root inheritance. No Character-specific bonus service, callback or new hit is created.
 
 ## 45A. SCOPED DAMAGE-COMPONENT TYPE TRANSFORM
 
@@ -2886,6 +2914,7 @@ raw Physical
 → apply ARM Penetration
 → ARM mitigation
 → Final Damage Reduction
+→ explicitly authored Final Damage Multiplier (DMG-008 / §28A)
 → Shield
 → HP
 ```
@@ -2913,6 +2942,7 @@ raw Will
 → apply RES Penetration
 → RES mitigation
 → Final Damage Reduction
+→ explicitly authored Final Damage Multiplier (DMG-008 / §28A)
 → Shield
 → HP
 ```
@@ -2938,6 +2968,7 @@ raw True
 → bypass ARM
 → bypass RES
 → bypass generic/final Damage Reduction
+→ explicitly authored Final Damage Multiplier (DMG-008 / §28A)
 → Standard Shield unless Shield Piercing
 → HP
 ```
@@ -2952,7 +2983,7 @@ FINAL_DAMAGE_REDUCTION
 
 modifier phase.
 
-Therefore the ordinary scoped modifier evaluator is not invoked for True components at that phase.
+Therefore the scoped modifier evaluator is not invoked for True components at FINAL_DAMAGE_REDUCTION. It may be invoked at the distinct explicitly authored FINAL_DAMAGE_MULTIPLIER phase; no reduction semantics are imported.
 
 True Damage still proceeds to eligible Shield unless explicit Shield Piercing/bypass exists.
 
@@ -3005,7 +3036,7 @@ specialFlags
 
 UI may show one total Standard Shield bar.
 
-Runtime preserves source provenance. The ledger origin IDs reuse the existing stable `originAbilityId` / `originEffectId` from Effect context; `sourceOwnerRef` resolves the authored runtime source owner independently from the recipient/attachment owner. These fields are required for matching a source-family cap; uncapped standalone/System grants need not fabricate an Ability origin. `retentionScope` is lowered from the Shield lifecycle metadata; field-scoped contributions identify the relevant owner/Combat-Instance presence cycle. It is independent of duration and Authority. §10C uses it without creating Character-specific Shield layers.
+Runtime preserves source provenance. The ledger origin IDs reuse the existing stable `originAbilityId` / `originEffectId` from Effect context; `sourceOwnerRef` resolves the authored runtime source owner independently from the recipient and authored Shield owner. These fields are required for matching a source-family cap; uncapped standalone/System grants need not fabricate an Ability origin. `retentionScope` is lowered from the Shield lifecycle metadata; field-scoped contributions identify the explicitly declared Shield owner/Combat-Instance presence cycle, independently from the recipient. Lower existing shield.owner into ownerRef and index that owner's contributions across recipients; source-owned grants use the source owner cycle. Committed field-leave cleanup removes only selected field-scoped entries with that owner/cycle and preserves source-leave/transition cause, not break/expiry. Surviving entries retain source identity across source leave; no-timed-expiry and lifecycle retention are orthogonal and explicit transition policy remains authoritative. It is independent of duration and Authority. §10C uses it without creating Character-specific Shield layers.
 
 ### Shield addition commit receipt
 
@@ -3019,7 +3050,7 @@ Later damage/expiry/removal changes ledger state and terminal causes, not the ea
 
 ### Source-family cap at Shield commit
 
-For optional `sourceFamilyCap`, existing Shield Runtime / Transaction Manager execute `SHP-006`. Resolve the runtime source owner and stable authored origin Ability/Effect-definition family on this recipient. Read active remaining matching contributions and the declared cap ValueRef at `SHIELD_COMMIT`; include both in the protected transaction read set. Clip only the admitted new amount to nonnegative headroom, then atomically commit that addition and its receipt. An independently declared new contribution keeps its own provenance/duration; no merge/refresh is inferred.
+For optional `sourceFamilyCap`, existing Shield Runtime / Transaction Manager execute `SHP-006`. Resolve the runtime source owner and stable authored origin Ability/Effect-definition family on this recipient. Read active remaining matching contributions and the declared cap ValueRef at `SHIELD_COMMIT`; include both in the protected transaction read set. Clip only the admitted new amount to nonnegative headroom. A positive amount atomically commits the addition and receipt; zero publishes a successful receipt with empty contribution refs, no new/old ledger mutation and no duration/expiry/refresh work. Zero is not automatic Action failure. An independently declared new contribution keeps its own provenance/duration; no merge/refresh is inferred.
 
 Ledger provenance provides the query; no mutable family-pool subsystem is introduced. Source-owner identity separates identical Characters, while stable definition refs group their successive casts. Existing Effect-instance provenance remains available for each contribution. Old contributions are not clamped when a cap changes; depletion/expiry/removal only affects future reads. Competing additions need an explicit existing sequential allocation/dependency law, otherwise reject; stale reads must revalidate through existing transaction handling, never overcommit the cap. Preserve §52 proportional absorption unchanged.
 
@@ -5311,7 +5342,11 @@ A complete save needs:
 - battle deployment Current/floor/lock and static initialization completion records;
 - declared static rule ownership/lifetimes (or inputs to rebuild indexes without resettling initialization);
 - State/Shield retention metadata, terminal causes/transition refs and surviving scheduled work;
-- sealed checkpoint result views/immutable Shield addition receipts still referenced by pending observers or dependent work, and stable source-family provenance on surviving contributions.
+- sealed checkpoint result views/immutable Shield addition receipts still referenced by pending observers or dependent work, and stable source-family provenance on surviving contributions;
+- processed observation / consume-create / terminal settlement identities keyed by observed Action + checkpoint + runtime trigger owner + instantiated candidate/dependency, even after receipts are freed and flags consumed, for the supported replay horizon;
+- ACT-033 required post-action obligation state and its held scheduler handoff, so recovery finishes the same finite settlement before advancing to the next Natural Action.
+
+Reuse existing Trigger candidate / Transaction Manager idempotence records, not a new manager. Observation identity includes the trigger definition and original committed Event identity; stored candidate/dependency IDs remain stable on redelivery. Check terminal observation identity before allocating another candidate, including previously nonqualifying observations. Rebuilding indexes does not reset processed identities. Release receipt payloads once their consumers finish, independently from deduplication identity retention. After a terminal record's replay horizon is retired, reject delivery from before the retained horizon rather than accept it as a fresh observation. Restore cannot recreate notes, additions, consumed sets or already-terminal settlements.
 
 Do not serialize presentation-only transient animation as authoritative.
 
@@ -6056,6 +6091,10 @@ A correct Arclune Kernel must support all of these without contradiction:
 75. Checkpoint observers reuse State/Effect DAG composition with per-owner dependency identity; completion-only work cannot block its own completion.
 76. Source-family addition caps use protected commit-time ledger reads, clip new amounts only and preserve independent provenance/duration and proportional pooling.
 77. Explicit Slot ties rank metric equality only; top-N, position coverage, target lock and invalidation remain separate.
+78. ACT-033 obligations hold only required post-completion handoff and cannot cycle back into source completion; ordinary unmarked work stays nonblocking.
+79. Processed observation/consume-create/terminal identities survive receipt cleanup through the supported replay horizon; old retired-horizon input is rejected.
+80. Cap-to-zero emits an immutable success receipt with no ledger entry/mutation or duration/expiry work.
+81. FINAL_DAMAGE_MULTIPLIER visits explicitly scoped TRUE as well as Physical/Will, uses finite factors >= 1 and existing own-direct Action/Cost bindings, and does not weaken reduction bypass.
 
 ---
 
