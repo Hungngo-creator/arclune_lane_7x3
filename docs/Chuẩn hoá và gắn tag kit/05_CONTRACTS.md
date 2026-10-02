@@ -1,13 +1,15 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-09-25-F.3  
+**Version:** 2026-10-02-F.4
 **Status:** Working Canonical Candidate  
-**Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA.md`, `00_CANONICAL_RECOVERY_AUDIT.md`  
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
 **Revision F.1:** incorporates approved Shield pooling, Authority Adjudication, Death Cohorts, Revive/Reincarnation race, global lifeSerial default, and Pygmalion rulings.
 **Revision F.2:** incorporates Pilot Normalization #3 approved Contracts for bounded Action Intent interposition/revalidation, dynamic distributed Cost payment, typed committed Cost-payment results, scoped Effect-amount modifiers, and explicit sequential Reaction-boundary profiles. No new Functional Tag or Primitive is introduced.
 **Revision F.3:** incorporates Pilot Normalization #4 Contracts for static-Passive battle initialization, scoped incoming Damage-component type transformation before mitigation, battle-scoped Current Character Deployment Cost, explicit Return-to-Deck with transition-owned retention cleanup, and deterministic metric-selector tie policy. No new Functional Tag or Primitive is introduced.
 **Purpose:** turn semantic declarations into deterministic resolution rules without turning Character data into code.
+
+**Revision F.4:** adds checkpoint-scoped committed-result observation, Shield addition receipts/source-family caps and local explicit Slot ties. Existing Pilot #4 random-tie behavior and proportional Shield pooling remain unchanged.
 
 ---
 
@@ -1494,6 +1496,36 @@ This Contract does not create a scripting/callback startup system.
 
 ---
 
+## TRG-015 — Checkpoint-Scoped Committed-Result Observation
+**Status:** `LOCKED`
+
+A normalized `ACTION_RESULT_ANY` Condition reads the referenced Action at one declared checkpoint: `ACTION_DIRECT_EFFECTS_COMPLETE` or `ACTION_COMPLETED`. This creates no new Event or Action-result owner. Before ADEC publication, seal the own-direct committed receipt-reference projection. Later blocking settlements can extend the whole Action summary but cannot enter or rewrite that sealed projection. At completion, final aggregation is immutable. Both reads enforce the declared own-direct provenance.
+
+The read is bounded by:
+
+```text
+explicit Action reference + reached checkpoint
+→ selected result kind / committed metric
+→ DIRECT_EFFECT_GRAPH_OF_SCOPED_ACTION membership
+→ explicit recipient relation/filter and reference anchor
+→ scalar comparison
+→ ANY Boolean
+```
+
+Only committed result data qualifies. Damage reads `actualHpDamage`, Heal reads `actualRestore`, and supported Shield addition reads `committedAddedAmount` under `SHP-005`. Requested/nominal amount, Overheal, absorbed Shield damage and live remaining Shield are not substitutes for those metrics.
+
+Own-direct membership is proven from Effect provenance and normalized graph ownership under `TRG-013`; matching `rootActionId` or Damage Attribution alone is insufficient. A child Action, standalone Passive-triggered Effect, Follow-up/Counter/Reaction, DoT or independent HoT does not enter the scoped Action's own direct set merely because it shares lineage. Existing root-linked outcome aggregation remains available to mechanics that explicitly request that different scope.
+
+The predicate returns one Boolean per Event regardless of matching-entry count. An empty committed collection returns false; failure/zero of one Effect does not erase successful sibling results or imply failure of the enclosing Action. Several kind-specific predicates can all be true for one scoped Action/checkpoint.
+
+Each selected checkpoint view is sealed before its Event is published and remains immutable while observers/dependent queued work reference it, even if a contribution has since depleted/expired or a recipient later becomes invalid. Current recipient relation/Condition reads use `TRG-002` unless an explicit earlier SnapshotRef is selected. Do not inherit live target-selection legality filters for historical receipts: a target killed by the qualifying Damage remains result evidence unless an authored recipient filter says otherwise. The collection is read-only: no RNG, target selection, Cost, Effect emission or mutation occurs inside a predicate.
+
+An observer may compose ordinary State/counter updates and later Effects through its declared Effect DAG/atomic group. At ADEC, such a bounded update may be a declared `ACT-032` dependency registered before the completion barrier; its runtime identity includes root Action, trigger owner and instantiated candidate. A settlement waiting for `ACTION_COMPLETED` cannot be that same root's blocker. Mutually exclusive authored checkpoint branches must prevent duplicate observation where a mechanic handles one Action at ADEC instead of completion. Idempotence, retention, note consumption, owner validity, failed-Cost behavior and settlement dependencies remain authored semantics; this Contract does not create a universal reward/memory subsystem. Multiple competing state-mutating observers still require their existing dependency/priority law where order matters; neither entry iteration nor eventSeq supplies it.
+
+Executable content with an unavailable Action/checkpoint anchor, mismatched result metric, missing semantic anchor or unsupported operation-result mapping is rejected. A post-completion observer cannot be made a dependency waiting for the completion Event it would itself prevent.
+
+---
+
 # 12. TARGET SELECTION CONTRACT
 
 ## TGT-001 — Candidate Pool
@@ -1636,7 +1668,7 @@ not among the whole Candidate Pool.
 
 ### No hidden tie priority
 
-A tied winner must not be selected by:
+For `RANDOM_AMONG_TIED`, a tied winner must not be selected by:
 - authored list order;
 - entity ID;
 - Slot;
@@ -1693,6 +1725,16 @@ if later invalid:
   do not reroll
   do not select a replacement
 ```
+
+### Explicit Slot ties and top-N metric cutoff
+
+For positive count N, form unique eligible candidates and rank metric groups at the same selection checkpoint. Admit complete better metric groups before the cutoff group. If fewer than N candidates exist, select the eligible remainder. Only the equal-metric group that requires resolution uses its declared tie policy; worse groups cannot win via tie priority.
+
+`EXPLICIT_SLOT_ORDER` reads candidate positions from that selection checkpoint and compares them against the authored `explicitSlotOrder` of PositionRefs. It consumes no RNG. Mode validates position identities; the local authored rule defines their priority. Leader follows its occupied Slot. No entity/list/entry/SSI-cursor priority is inferred. Duplicate or unresolved order positions, uncovered tied candidates, or multiple equal-position candidates without a further explicit law are invalid content.
+
+With `RANDOM_AMONG_TIED`, select the needed distinct members only from the exact cutoff tied group using existing deterministic seeded RNG and `NO_DUPLICATES`; the count-one tied-best law above is preserved. Technical enumeration must not bias membership or imply resolution order between selected Effects. A selected target set does not itself supply sequential Effect execution priority.
+
+After selection, store the TargetSetRef under the declared lock policy. Later invalidation/requery follows `TGT-004` / `TGT-006`, never an implicit tie rerun.
 
 This Contract does not create a global default that every metric selector randomizes ties.
 
@@ -3226,6 +3268,57 @@ A packet may be:
 **Status:** `LOCKED`
 
 Damage absorbed by Shield is not Actual HP Damage.
+
+---
+
+## SHP-005 — Committed Shield Creation/Addition Result
+**Status:** `LOCKED`
+
+Existing Shield creation/addition execution may expose an immutable `ShieldAdditionResultRef` alongside its source-aware ledger mutation. Current supported operations are `CREATE` and `ADD_VALUE`; this output introduces no new Shield Primitive or absorption layer.
+
+At the same authoritative commit as the Shield mutation, preserve:
+
+```text
+operation
+recipientRef
+contributionRef(s)
+requestedAmount
+committedAddedAmount
+committed / failure outcome
+Action provenance when Action-owned; Effect/transaction provenance in all cases
+stateVersion
+```
+
+Apply the independently authored admission, stacking and cap policy first. `CREATE` records the value actually inserted as the declared contribution; `ADD_VALUE` records the positive amount actually credited by that operation. Rejection cannot report a positive committed amount; a successful cap-to-zero addition reports zero without automatically failing the enclosing Action.
+
+This is an operation-local receipt, not a net recipient/pool delta. Later absorption, removal, expiry or sibling Effects never rewrite it. A contribution's current `remainingAmount` cannot reconstruct how much the original Effect committed.
+
+Pure duration refresh does not add positive Shield amount. `SET_VALUE`, `TRANSFER`, replacement or other manipulations require their own explicit operation-result mapping if a consumer needs an addition metric; no hidden cast to `ADD_VALUE` is allowed. This Contract does not decide a Character's reapplication policy, cap scope or whether its gameplay trigger should count such other operations.
+
+Standard proportional depletion under `SHP-002`, special Shield eligibility and all terminal causes remain unchanged. Actionless static/System Shield execution remains legal; preserve its Effect/transaction receipt without fabricating an Action or inserting it into a Natural Action's direct set. Result retention uses the existing Action/Result Store until completion observers and dependent consumers are terminal; save/replay preserves the receipt and provenance, not a reconstructed later total.
+
+---
+
+## SHP-006 — Source-Family Cap on New Addition
+**Status:** `LOCKED`
+
+An optional `shield.sourceFamilyCap` bounds only a new supported creation/addition using the existing source-aware ledger on the recipient. Family identity is the explicit runtime source-owner EntityRef plus stable authored origin Ability and Shield Effect-definition refs. Successive cast instances match that family; different runtime owners do not. Admission and explicitly authored reapplication semantics remain authoritative.
+
+In the same transaction as creation/addition:
+
+```text
+resolve validated source family and recipient
+→ read active remaining family contributions + declared cap ValueRef at SHIELD_COMMIT
+→ headroom = max(0, maximum - sum(active remaining family amount))
+→ committed new amount = min(admitted requested addition, headroom)
+→ commit new contribution/addition and SHP-005 receipt atomically
+```
+
+Use existing deterministic Shield arithmetic; clamp headroom and the new amount nonnegative. Contribution expiry, removal or proportional depletion changes future headroom, not earlier receipts. A lowered cap/MaxHP does not retroactively trim old contributions under `CLIP_NEW_ADDITION`; it may leave zero headroom. No refresh, merge, old removal, duration change or independent absorption layer follows from this cap.
+
+The cap read set and ledger mutation must be transaction-consistent so two additions cannot both consume the same headroom. If several competing additions share a cap, normalized data must supply an existing explicit sequential allocation/dependency order or reject an allocation-ambiguous batch. Incidental iteration order must not decide which duration/provenance receives limited headroom. This is a local addition law, not generic priority.
+
+Uncapped Shields and `SHP-002` proportional Standard Shield depletion remain unchanged. Reject missing/ambiguous family provenance, unsupported operations, negative/nonfinite or otherwise invalid cap references and stale transaction reads rather than guessing a global or per-cast cap.
 
 ---
 
@@ -6044,6 +6137,9 @@ Normalizer must block or warn when:
 38. more than one branch of one `ActionIntentInterpositionSpec` matches the same Action Intent at `ACTION_INTENT_CREATED` without an explicit canonical branch-selection policy.
 39. more than one independent Action-Intent interposition instance matches the same Action Intent + canonical anchor without an explicit composition/dependency policy; authoring order, Event order, Character ID, or incidental iteration order must not become hidden priority.
 40. a `POST_COST_PRE_EFFECT` execution plan or direct Ability Effect begins before the entire declared active Cost transaction is terminal, including all frozen optional distributed payer attempts and required CostGroup-result construction.
+41. a committed-result predicate reads an unavailable checkpoint, incompatible metric/operation or implicit target-legality filter, or a completion-only observer blocks its own completion.
+42. a Shield source-family cap lacks consistent owner/origin matching, atomic commit reads or explicit competing-grant allocation.
+43. metric top-N Slot ties lack unique ordered position coverage or silently use entity/list/SSI priority.
 
 # 60. WHAT IS ACTUALLY LOCKED ENOUGH NOW
 

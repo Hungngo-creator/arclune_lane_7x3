@@ -1,9 +1,11 @@
 # ARCLUNE — MODE PROFILES
 ## Chặng H — Mode-Specific Runtime Profiles
-**Version:** 2026-09-10-H  
+**Version:** 2026-10-02-H.1
 **Status:** Working Canonical Candidate  
-**Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA.md`, `05_CONTRACTS.md`, `06_KERNEL_RUNTIME.md`  
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`, `06_KERNEL_RUNTIME.md`
 **Purpose:** define which runtime rules are active in each game mode without forking Character identity, Tag semantics, Primitive meanings, or Kernel foundations.
+
+**Revision H.1:** clarifies the designer-confirmed nine-position Main battlefield and Leader occupancy at Slot 8. No scheduler, clock, lifecycle or alternate-Mode policy changes.
 
 ---
 
@@ -215,9 +217,9 @@ Current battlefield concept:
 3 enemy columns
 ```
 
-Each side has approximately:
-- 9 normal combat positions;
-- Leader as its own combat unit/role.
+For `TURN_BASED_MAIN`, each Side has nine combat positions, Slot 1 through Slot 9. The standard board places Leader in Slot 8 within that set; it is not a tenth position or an additional copy appended to an ally pool. Slot numbering is Side-relative on the mirrored boards, as shown in repository `Giải thích về lượt đánh.jpg` and explicitly confirmed by the designer.
+
+Position identity belongs to the Mode Spatial Profile. A Character's declared Slot tie order is local targeting data under `TGT-007`; these position facts do not create a universal target tie policy or change SSI scheduling. This clarification does not declare Leader immobility or a new Position-mutation prohibition: selectors use the actual Position at their declared checkpoint.
 
 Exact visual presentation can evolve independently.
 
@@ -253,6 +255,7 @@ but runtime payment requires a resolved numeric value.
 # 9. TURN-BASED LEADER
 
 Leader:
+- has standard board position Slot 8 in `TURN_BASED_MAIN`;
 - has HP;
 - can participate as combat unit;
 - can act according to its profile;

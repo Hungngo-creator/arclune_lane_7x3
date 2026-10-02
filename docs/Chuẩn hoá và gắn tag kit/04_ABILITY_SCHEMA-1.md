@@ -1,11 +1,13 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-09-23-E.1  
+**Version:** 2026-10-02-E.2
 **Status:** Working Canonical Candidate  
-**Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT.md`  
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
 
 **Revision E.1:** incorporates Pilot Normalization #4 Schema support for scoped incoming Damage-component type transforms, battle-scoped Current Deployment Cost, explicit Return-to-Deck with transition-owned retention data, and deterministic tie policy for metric target selectors. No new Functional Tag or Primitive is introduced.
+
+**Revision E.2:** adds checkpoint-scoped committed-result Conditions, Shield addition receipts/source-family caps and explicitly authored Slot ties through existing owners. Earlier normalized data remains unchanged; unresolved Character fields are not compiled into defaults.
 
 ---
 
@@ -1220,6 +1222,7 @@ ACTION_IDENTITY_IS
 ACTION_BEHAVIOR_IS
 ABILITY_TYPE_IS
 DAMAGE_RESULT_COMPARE
+ACTION_RESULT_ANY
 POSITION_COMPARE
 SYSTEM_STATE_COMPARE
 ```
@@ -1338,6 +1341,48 @@ Action lineage
 ≠ Damage Attribution
 These queries expose existing execution identity/provenance.
 They do not create a second Action-lineage subsystem.
+
+---
+
+## 8.4 Checkpoint-scoped committed-result predicates
+
+`ACTION_RESULT_ANY` is a bounded Condition over existing typed Action results. It does not query current HP/Shield totals, execute an arbitrary historical loop, or create another Action-result subsystem.
+
+Conceptual form:
+
+```yaml
+actionResultAny:
+  actionRef:
+    anchor: EVENT_ACTION
+    relation: SELF
+  resultCheckpoint: ACTION_DIRECT_EFFECTS_COMPLETE | ACTION_COMPLETED
+  effectProvenanceScope: DIRECT_EFFECT_GRAPH_OF_SCOPED_ACTION
+  resultKind: DAMAGE | HEAL | SHIELD_ADDITION
+  recipientFilter:
+    relation:
+    relationAnchor:
+    filters: []
+  metric:
+  compare:
+    op: GT | GTE | LT | LTE | EQ | NEQ
+    value: <pure scalar ValueRef>
+```
+
+The Action must have reached the explicitly selected checkpoint. At `ACTION_DIRECT_EFFECTS_COMPLETE`, read a sealed own-direct committed receipt-reference projection; this does not finalize the whole Action result object before later blocking settlements. At `ACTION_COMPLETED`, read the finalized Action result object, filtered to the same declared direct provenance. An ADEC-triggered State update may use existing bounded `rootCompletionDependency`; an observer triggered only by completion cannot block that same completion.
+
+Allowed kind/metric pairs are bounded:
+
+| resultKind | metric | Authoritative committed field |
+| --- | --- | --- |
+| DAMAGE | ACTUAL_HP_DAMAGE | DamageResult.actualHpDamage |
+| HEAL | ACTUAL_RESTORE | HealResult.actualRestore |
+| SHIELD_ADDITION | COMMITTED_ADDED_AMOUNT | ShieldAdditionResult.committedAddedAmount |
+
+Filter committed entries belonging to the scoped Action's own direct graph, apply the typed recipient relation/filter using its explicit anchor and existing snapshot/read policy, then compare the selected committed field. The result is one Boolean: `ANY` matching entry, or false for an empty filtered collection. Match count does not multiply Trigger activations. Historical evidence does not inherit target-selection ALIVE/presence/targetability filters: a recipient killed by the committed Damage still provides its result. Apply only the recipient filters actually authored. Separate predicates may independently inspect different result kinds for the same Action.
+
+`TRG-002` governs relation/Condition state reads; result amounts and provenance are immutable commit data, not live reconstructed values. If a mechanic requires earlier recipient relation facts, author an explicit SnapshotRef rather than infer them from current allegiance. `TRG-013` / `TRG-015` govern direct provenance and completion observation.
+
+Normalizer rejects an unavailable/not-yet-reached Action/checkpoint anchor, wrong kind/metric pair, nominal/live amount in a committed metric, missing relation anchor, unsupported Shield operation mapping, or a dependency cycle that waits for its own completion Event. Existing logical `ALL`/`ANY`/`NOT` can combine these bounded predicates with State Conditions. No new Functional Tag or Primitive is implied.
 
 ---
 
@@ -1929,13 +1974,14 @@ It is separate from:
 - target invalidation;
 - reroll/requery after selection.
 
-Current minimum supported tie policy required by Pilot #4:
+Current bounded tie policies:
 
 ```text
 RANDOM_AMONG_TIED
+EXPLICIT_SLOT_ORDER
 ```
 
-No larger tie-breaker library is introduced by this Pilot.
+Pilot #4 keeps its count-one random-tie semantics. Pilot #5 adds an explicitly authored local Slot tie order, not global target or Reaction priority.
 
 ---
 
@@ -2037,7 +2083,21 @@ A tied metric selector must not use:
 
 unless a future explicitly-authored tie policy defines one of those semantics.
 
-Additional tie policies require explicit future Schema/Contract review.
+### `EXPLICIT_SLOT_ORDER` and metric top-N cutoff
+
+```yaml
+targeting:
+  selection: LOWEST_HP_PERCENT
+  count: <positive integer>
+  tiePolicy: EXPLICIT_SLOT_ORDER
+  explicitSlotOrder: [<PositionRef>, <PositionRef>, ...]
+```
+
+Rank unique eligible candidates by the declared metric at one selection checkpoint. Fill complete better-ranked groups first; where a tied metric group must be ordered or crosses the count cutoff, use only the explicitly declared policy. `EXPLICIT_SLOT_ORDER` compares the candidates' positions captured at that checkpoint against the authored ordered PositionRefs. Mode provides valid position identities; Character data supplies this local order. Leader is an ordinary occupant of its actual Slot, not an appended entity or hidden first priority.
+
+The order must uniquely cover candidates requiring tie resolution. Reject duplicate/unresolved PositionRefs, unmapped tied candidates or multiple tied occupants without a further declared law; do not fall back to entity/list order. HP% uses authoritative unrounded ratios. This policy consumes no RNG. `RANDOM_AMONG_TIED` may select the needed distinct members of a cutoff tied group using existing seeded RNG with `NO_DUPLICATES`; it still cannot randomize among worse metric groups. Top-N returns at most the available eligible count.
+
+Explicit Slot ordering applies only to metric equality at initial selection. Lock, invalidation and later requery remain independent. Additional tie policies require explicit future Schema/Contract review.
 
 ---
 
@@ -2423,12 +2483,16 @@ shield:
   value:
   duration:
   stacking:
+  sourceFamilyCap:
   priority:
   source:
   owner:
   lifecycle:
     retentionScope:
+  resultBinding:
 ```
+
+`resultBinding` may expose the bounded creation/addition receipt in §35.3C. It does not replace the mutable Shield StateRef/ledger.
 
 `lifecycle.retentionScope` uses the same generic lifecycle-retention vocabulary defined for persistent State:
 
@@ -2454,6 +2518,27 @@ Shield contribution without pretending that contribution:
 - naturally expired.
 
 No need to encode Shield as HP.
+
+---
+
+## 18.1 Source-family cap on new Shield addition
+
+```yaml
+shield:
+  operation: CREATE | ADD_VALUE
+  sourceFamilyCap:
+    family:
+      sourceOwnerRef: <runtime EntityRef>
+      originAbilityId: <stable authored Ability definition ref>
+      originEffectId: <stable authored Shield Effect definition ref>
+    maximum: <pure scalar ValueRef>
+    readTiming: SHIELD_COMMIT
+    capPolicy: CLIP_NEW_ADDITION
+```
+
+This optional cap sums active remaining matching ledger contributions on this recipient from exactly the declared source family. The origin IDs reuse existing Effect provenance fields; they are not parallel provenance aliases. The runtime source owner separates different instances of the same Character; authored origin refs group successive casts without merging their contributions. A cast-specific Action/Effect instance ID is not the family key. Source/owner/origin provenance must agree with the grant; missing or ambiguous family matching is rejected.
+
+At addition commit, atomically read the family sum and nonnegative finite cap ValueRef, then bound the new admitted amount to `max(0, maximum - familyRemaining)`. Do not clamp, refresh, merge or remove older contributions implicitly. New-contribution reapplication and independent duration remain authored `stacking`/duration semantics. No separate mutable cap pool or absorption priority is created. Multiple new grants competing for the same cap require an explicit existing sequential allocation order, or are rejected when allocation affects gameplay. `SHP-006` owns the transaction law.
 
 ---
 
@@ -4433,6 +4518,18 @@ It is not a mutable variable and does not authorize arbitrary authored iteration
 
 ---
 
+## 35.3C Shield addition result references
+
+A Shield `CREATE` or `ADD_VALUE` Effect may bind an immutable `ShieldAdditionResultRef` through `shield.resultBinding`. It preserves requested amount separately from `committedAddedAmount`, recipient, operation, contribution reference(s), Action/Effect provenance, state version and commit/failure outcome under `SHP-005`. Action provenance is present only for Action-owned execution; standalone static/System Effects do not acquire a fabricated Action.
+
+For `CREATE`, the metric is the value actually inserted as the declared new contribution after its authored admission/stacking/cap policy. For `ADD_VALUE`, it is the positive amount actually credited by that operation after the same policy. It is not the target's net total Shield delta across replacement/removal/other Effects, nor its remaining Shield at a later checkpoint.
+
+A pure duration refresh supplies no positive addition. A denied or fully cap-discarded request cannot supply a positive committed value. Zero amount does not itself imply Effect/Action failure.
+
+`SET_VALUE`, `TRANSFER` and other replacement/removal semantics have no implicit mapping to this bounded creation/addition metric. Where gameplay requires such a mapping, require an explicit operation-result Contract or reject the unsupported binding; do not choose how a Character's reapplication stacks or which Shield operations qualify for its Passive.
+
+---
+
 ## 35.4 No arbitrary memory variables
 
 Result bindings are typed and scoped.
@@ -4981,6 +5078,10 @@ Normalizer/compiler must:
 30. Validate metric-selector `tiePolicy` compatibility and route `RANDOM_AMONG_TIED` only through deterministic RNG over the exact tied-best set.
 31. Reject any normalization in which a metric tie is silently resolved by entity/list/Slot/Event order.
 32. Preserve target lock and invalid-target behavior independently from initial metric tie resolution; `tiePolicy` must not silently create later reroll/requery.
+33. Validate `ACTION_RESULT_ANY` Action/checkpoint anchor, direct-graph scope, recipient anchor/read policy, kind/metric compatibility and immutable committed result binding.
+34. Preserve Shield requested versus committed creation/addition amounts and reject unsupported operation-result mappings without inventing stacking/cap semantics.
+35. Validate source-family cap owner/origin provenance, commit-time read set and explicit competing-grant order.
+36. Validate metric top-N cutoff and explicit Slot coverage without introducing entity/list priority or later reroll.
 
 ---
 
@@ -5380,6 +5481,7 @@ actionResult:
   costGroupPaymentResults:
   damageResults:
   healResults:
+  shieldResults:
   stateChanges:
   resourceChanges:
   spawnedEntities:
@@ -5390,7 +5492,7 @@ actionResult:
 
 This is runtime result, not authored Character data.
 
-Later child/effect references may access allowed portions via typed bindings.
+Later child/effect references may access allowed portions via typed bindings. `shieldResults` contains the supported typed Shield creation/addition receipts; other Shield manipulations must not masquerade as positive additions. Checkpoint-scoped predicates read a sealed projection or finalized form of this existing result object with explicit provenance scope; Action lineage does not merge child receipts into root-direct membership.
 
 `costPaymentResults` records committed Cost-payment outcomes.
 
