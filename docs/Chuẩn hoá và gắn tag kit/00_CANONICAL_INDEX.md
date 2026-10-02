@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-02-INDEX-4
+**Version:** 2026-10-02-INDEX-5
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -150,9 +150,9 @@ In `docs/canon kit/`:
 - Pilot #5: `Polyhymnia_Clarified_Gameplay_Canon.md`; R4 locks Character-local simultaneous Damage/Heal batches within sequential Damage → Heal → Leader Shield groups, target-lock-before-source-snapshot and completion-only notes. Internal kit gameplay is clarified; §7 contains future external-content/profile boundaries. Existing E.3/F.5/G.4 machinery suffices; no new runtime gap. It is not a claim of execution-ready numeric data.
 
 - Pilot #6: `Phan_Tinh_Clarified_Gameplay_Canon.md` R2; complete one-Skill raw kit, mandatory actual-cast HP exchange, common-snapshot simultaneous conditional TRUE AoE and payment-gated own-direct final multiplier. Native Element/budget remain separate metadata.
-- Next selected kit: `Chien_Co_Clarified_Gameplay_Canon.md` R1, **CLARIFICATION_IN_PROGRESS**; Trụ Đạo — Chiến Cổ, SSR Support, complete Passive/Basic/one Skill/Ultimate from `ý tưởng nhân vật 3.md` #32. Raw formulas and current composition inventory are recorded; source aura validity/combination and Shield/target/snapshot decisions await designer clarification. Do not treat this as completed normalization or a proven generic gap.
+- Next selected kit: `Nerovar_Clarified_Gameplay_Canon.md` R1, **CLARIFICATION_IN_PROGRESS**. Designer-named first #52 Warrior / Death Pays the Fare from `ý tưởng nhân vật 3.md`; complete Passive/Basic/three Skills/Ultimate. HP_ZERO→Deck life state, exceptional HP payment and formula/target/snapshot/clock bindings await designer answers. No completed normalization or new generic gap is claimed. The later duplicate #52 Mage is separate content.
 
-Earlier canon architecture-base/proposed-delta statements record their drafting context. Current architecture authority remains the latest merged 00–08: PR #5's E.3/F.5/G.4/I.3 corrections are now merged, not open gaps to duplicate. This change updates navigation/coverage to I.4 without changing those Schema/Contract/Kernel revisions.
+Earlier canon architecture-base/proposed-delta statements record their drafting context. Current architecture authority remains the latest merged 00–08: PR #5's E.3/F.5/G.4/I.3 corrections are merged, not open gaps to duplicate. PR #6 updated navigation/coverage to I.4 without changing those Schema/Contract/Kernel revisions; INDEX-5 updates the selected raw kit and clarification record only.
 
 Pilot #5 architecture deltas: bounded checkpoint result observation, immutable Shield addition receipts, source-family addition caps, explicit Slot metric ties/top-N cutoff, typed recipient relation snapshots, required finite post-completion settlements before SSI handoff, and Turn-Based Main Leader position clarification. No new Functional Tag or Primitive. `M-038` onward adds declarative architecture coverage; Pilot #6 adds the bounded FINAL_DAMAGE_MULTIPLIER/directActionRef surface through existing modifier/Damage owners; no executable tests are implied.
 

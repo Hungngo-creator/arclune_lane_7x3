@@ -1220,15 +1220,6 @@ Kỹ năng 1 — Triệu Hồi: Huyết Sư (40 Aether):
 Gọi ra 1 con Huyết Sư (Rank SSR). Chỉ số Huyết Sư = 150% Chỉ số của Cuồng Sư. (Nó mạnh hơn cả chủ). Nó chỉ biết cắn thường (100% ATK) nhưng cắn rất đau vì stat to. Tag: Triệu hồi.
 Ultimate — Sát Chiêu: Sư Tử Hống (Auto-cast): Cuồng Sư và Huyết Sư cùng gầm lên. Gây sát thương âm thanh = 200% WIL (Chủ) + 200% WIL (Đệ) lên toàn bộ kẻ địch. Tổng damage thực tế lên tới 400% nếu cả 2 cùng sống. Tag: Kẻ địch, Aoe, Combo.
 
-32) [SSR] Trụ Đạo – Chiến Cổ (War Drummer) Support.
-Nội tại — Tiếng Trống Trận: Toàn bộ đồng minh trên sân được tăng vĩnh viễn 15% ATK và 15% SPD chỉ cần Chiến Cổ còn sống. Tag: Nội tại, Aura Buff.
-Đánh thường: Gõ dùi trống vào đầu địch. Gây 100% (ATK + WIL). Tag: Kẻ địch, Đơn mục tiêu.
-Kỹ năng 1 — Huyết Chiến (0 Aether - Tốn HP):
-Đánh đổi hp = 20% max HP của bản thân để Buff cho 1 đồng minh chủ lực.
-Hồi 100% nộ cho 1 đồng minh (Đầy nộ ngay lập tức) Tag: Đồng minh, Hồi năng lượng, Tự tổn thương.
-Ultimate — Sát Chiêu: Cương Khí Hộ Thể (Auto-cast): Không gây sát thương.
-Tạo một lớp khiên cho Toàn Đội. Giá trị khiên = 250% WIL + atk của Chiến Cổ, cho phép cộng dồn khiên, cap 300% max hp của mục tiêu (tính mỗi khiên từ ult của nhân vật này, khiên từ nguồn không phải ult của nhân vật này sẽ được tính riêng theo kit nguồn của khiên đó), Tag: Đồng minh, Buff Khiên.
-
 33) Hoá Thân của Thời Không Chi Chủ - Không Gian Chi Chủ, Prime. mage, không element tag.
 mô tả: Thời Không nhất thể, vì sức mạnh quá lớn nên Hắn phải tách ra làm 2 để giáng lâm Arclune - Kính Giới, dù chỉ là 1 sợi ý niệm của hắn bị chia làm 2 nhưng vẫn có bản chất áp đảo.
 
@@ -1579,7 +1570,7 @@ Tăng chỉ số: Mỗi 1 điểm Khiên tiêu hao = Tăng thêm 0.5 điểm và
 Hồi phục: Đồng thời hồi phục ngay lập tức một lượng HP bằng đúng lượng Max HP vừa được tăng thêm.
 (Ví dụ minh họa: HP hiện tại 150/400, Khiên hiện tại là 200. Sau khi nổ Ult: Tiêu hao 200 Khiên \rightarrow Tăng thêm 100 Max HP và Hồi 100 HP. Chỉ số mới: HP 250 / Max HP 500, Khiên về 0).
 
-52)
+52) Nerovar
 warrior.
 mô tả: một ma kiếm sĩ vì thanh kiếm đặc biệt của mình có thể bỏ qua phòng ngự khi gây sát thương.
 
