@@ -1,14 +1,16 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-02-I.4
+**Version:** 2026-10-02-I.5
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.5+, `06_KERNEL_RUNTIME.md` G.4+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.6+, `06_KERNEL_RUNTIME.md` G.5+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
 **Revision I.2:** adds Pilot #5 declarative cases M-038–M-046 for committed-result checkpoints, Shield addition/family caps, explicit Slot ties and existing composition. Architecture Phase: these specify obligations; they do not report executable test results or resolve undeclared gameplay.
 **Revision I.3:** updates M-038–M-046 to current Polyhymnia gameplay; adds M-047 post-completion/source-leave/replay and M-048–M-050 Phần Tinh Cost/snapshot/final multiplier obligations. Declarative architecture validation only.
 **Revision I.4:** binds M-040 to Polyhymnia R4's locked simultaneous Damage/Heal groups and separate sequential group commits; adds permutation, sibling-state isolation and explicitly authored invalid-recipient variants using existing RES-002/003 machinery. No global AoE default or executable test result.
+
+**Revision I.5:** adds M-051–M-053 for opted-in singular HP payment, atomic allowance consumption, immutable HP at payment commit, explicit Cost-caused lifecycle continuation and malformed-profile rejection. Prior fixtures and exact/distributed Cost semantics remain intact; declarative obligations only.
 
 ---
 
@@ -3299,6 +3301,85 @@ Positive control: two explicitly authored same-phase finite factors1.40 and1.20 
 
 ---
 
+## M-051 — Bounded HP Payment Uses Strict Threshold and Atomic Battle Allowance
+
+**ID:** `M-051`
+**Status:** `MUST_PASS`
+**Purpose:** prove the clarified Nerovar Skill1 Cost slice without deciding its unresolved Damage/target policy or Passive failure atomicity.
+
+**Initial State:** legal Skill Action with required Side AE30 and singular HP Cost5% Current MaxHP; MaxHP1000, so normalized requested HP50. The source-owned battle safeguard starts with one remaining use. Authored cases: below requested + available → floor1/CLAMP_SUCCESS/consume one use; below + exhausted → floor0/CLAMP_SUCCESS; at/above → floor0/REQUIRE_FULL. All reads occur once in the protected pre-payment transaction view. Passive use is a different counter.
+
+**Input / Expected Resolution:** each row is an independent fixture with sufficient AE and ordinary initial Action/payer legality.
+
+| HP before | Skill1 allowance remaining | Requested / actual paid | HP at payment commit | Allowance after commit |
+| --- | --- | --- | --- | --- |
+| 200 | 1 | 50 / 50 | 150 | 1 |
+| 50 | 1 | 50 / 50 | 0 | 1 |
+| 40 | 1 | 50 / 39 | 1 | 0 |
+| 1 | 1 | 50 / 0 | 1 | 0 |
+| 40 | 0 | 50 / 40 | 0 | 0 |
+| 1 | 0 | 50 / 1 | 0 | 0 |
+
+Every row succeeds, commits AE30 and records requestedAmount50 unchanged. HP0 rows enqueue ordinary mandatory HP_ZERO processing, not a Damage Event; equality does not use the safeguard. Zero paid with success remains a successful payment. This fixture does not choose the unresolved Passive return-failure outcome.
+
+Repeat the HP40/available case with AE29, an aborted transaction and a failed protected-read check: no AE/HP/floor/allowance commit, no HP_ZERO/direct Effects and no committed success binding. Read-only admission probes change nothing. If validation discovers a changed guard, the old frozen transaction cannot silently switch cases; a new logical attempt must revalidate before committing. A repeated probe/restore/redelivery cannot debit or consume twice.
+
+Battle-scoped allowance stays exhausted through source leave/return/redeploy; new battle initializes its own allowance. The separate Passive use is untouched by this Cost transaction. Permuting case declarations changes neither selected case nor receipts; unsupported overlapping shared HP/counter allocations are rejected, not resolved by iteration order.
+
+**Expected Trace / State:** stable Cost transaction identity, protected input/case/counter refs, proposed then atomic required commit, immutable requested/paid/result-HP fields, allowance write only on successful required Cost/admission. No Heal/Damage/Lifesteal event for payment or declared floor assignment.
+
+**Forbidden Outcomes:** equality takes floor1; AE consumed before failed HP validation; safeguard consumed during probe/failed AE; paid0 implies failure; HP0 shortfall always rejected; redeploy resets the allowance; floor exception becomes a universal full-payment waiver.
+
+**Layers Under Test:** CostSpec/CostGroup/State Conditions, 04 §10.3A/92, CST-001/003/009/014, P-036, existing Cost/State/Transaction owners, G.5 §29A/58/168. Existing M-030/031 and M-048 remain regression obligations, including Phần Tinh's independent full-payment entitlement.
+
+---
+
+## M-052 — Commit-bound HP Survives Mandatory Lifecycle and Same-Action Continuation
+
+**ID:** `M-052`
+**Status:** `MUST_PASS`
+**Purpose:** prove HP after Cost is not paid amount/live HP, and the explicit continuation retains an admitted Action through source return or confirmed death. These synthetic direct-Effect fixtures test locked Cost semantics, not Nerovar's unanswered whole-kit target/ATK/WIL/batch policy.
+
+**Initial State:** otherwise legal admitted Skill opts into CONTINUE_ADMITTED_ACTION; its required Cost stage succeeds under an explicit HP policy. A direct Physical component has amount0.10 × COST_PAYMENT_REF/CURRENT_HP_AFTER_PAYMENT and a separately declared valid locked enemy. Any other formula inputs use their own declared bindings. All tested recipient/Effect legality permits continuation; no separate cancellation law applies.
+
+**Input / Expected Resolution:**
+
+- Payment1000→500 binds H_postCost500 at the commit, so the component nominal amount is50 even if a later independent lifecycle Effect changes live source HP.
+- First-use floor1 payment binds1, so component nominal amount0.1 follows ordinary numeric policy; no test invents rounding.
+- Lethal payment binds0 **before** mandatory HP_ZERO work. In one explicitly authored successful-prevention/return fixture, life state ends alive/HP1/Deck; in a separate fixture with no available prevention, DEATH_CONFIRMED occurs. Both retain H_postCost0 and the original admitted Action, so the HP component remains0. The successful-return fixture supplies that success explicitly and does not resolve Nerovar's failed-return survival atomicity.
+
+Complete the entire required/optional Cost stage under its applicable barrier before continuation. Capture receipts at their individual commits, then finish mandatory Cost-caused lifecycle before direct Effects. No ordinary Reaction is inserted merely by this profile. Existing independently authored interposition/cancellation laws remain authoritative. Source return/death alone creates no readmission, second payment or replacement Action; a separate dead/off-field future Action still fails ordinary admission.
+
+Replay/save at after-payment-before-lifecycle and after-lifecycle-before-direct restores the same transaction/receipt, pending lifecycle identity and Action cursor. No repeated payment, floor/counter write, HP_ZERO/DEATH_CONFIRMED publication or completed direct node. The receipt lives until dependent nodes finish. A locked enemy made invalid before its branch follows that fixture's declared DROP_LOCAL/no-retarget policy; the continuation profile does not bypass recipient validity.
+
+**Expected Trace / State:** payment commit with immutable resultingHP → terminal successful Cost stage → mandatory lifecycle terminal → same ActionId/direct graph; ordinary ATK/WIL SnapshotRefs remain separate. A synthetic larger active distributed CostGroup retains CST-008/009's existing terminal barrier and frozen membership; required-subset completion alone cannot release direct work.
+
+**Forbidden Outcomes:** post-preventionHP1 overwrites committedHP0; ACTUAL_PAID_AMOUNT substituted for post-paymentHP; live read after return; source death silently cancels admitted Skill under the opted-in profile; new dead-actor cast allowed; ordinary cancellation/recipient law bypassed; failed required Cost enters continuation; incomplete distributed stage begins direct Effects; restore resolves meteor/direct nodes twice.
+
+**Layers Under Test:** 04 §6.1/35.3A/92, CST-009/015, DEP-007 reuse, existing Action/Cost/Lifecycle/Result/Transaction owners, G.5 §23/29A/168. No new SnapshotTiming, Tag, Primitive or Character-specific branch.
+
+---
+
+## M-053 — HP Profiles and Post-payment References Fail Closed
+
+**ID:** `M-053`
+**Status:** `MUST_REJECT`
+**Purpose:** reject unsupported semantics before any affected required transaction or direct Effect commits.
+
+**Initial State:** valid M-051/M-052 profiles and bindings. Each independent negative fixture changes only one listed defect.
+
+**Input:** hpPaymentPolicy on non-HP kind or payerCollection, or co-authored legacy lethalFloor; no matching case/overlapping cases selected by list order; unsupported/non-pure or post-payment case guard; nonfinite/negative requested amount or floor; floor above payer Current MaxHP; invalid/unavailable or undeclared-lifetime consumeCounterRef; optional-payer/unrelated counter consumption or consumption detached from successful required-group/admission commit; unsupported competing HP/counter writes; typed CURRENT_HP_AFTER_PAYMENT read from failed/non-HP/unavailable/singular-ambiguous or distributed aggregate binding; required immutable HP result replaced by nominal/paid/live source HP; observable Cost-caused source-invalidity content lacking any applicable declared continuation/cancellation law.
+
+**Expected Resolution:** reject malformed/unsupported normalization, or fail the protected runtime invariant before affected commit if a conflict is discovered during execution. No fallback case, hidden floor, zero success fabrication, guessed current HP, partial required commit or Character/Slot/Event priority. Absent a profile does not reject unchanged existing content governed by its already applicable laws. A valid binding with successful zero paid still passes and exposes its committed resultingHP.
+
+**Expected Trace / State:** failure names the field/scope/guard/allocation or required policy; no required debit, allowance consumption or direct continuation is emitted for failed required Cost. Wrong Effect binding fails before that Effect commits; it does not silently roll back unrelated earlier commits.
+
+**Forbidden Outcomes:** arbitrary evaluator/callback accepted as bounded data; validator invents a case or lifecycle policy; failed HP payment read becomes zero/live HP; profile changes default floor/exact-payment/distributed law; malformed continuation grants a new Action.
+
+**Layers Under Test:** 04 §10.3A/35.3A/92, CST-014/015 and CST-009 typed results, existing Normalizer/Cost/Result/Transaction owners.
+
+---
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -3668,6 +3749,7 @@ When executable Kernel tests exist, at minimum create Golden Traces for:
 28. `M-047` completion → atomic consume/create → required settlement → global SSI handoff, with source-leave cuts and no gameplay pending token.
 29. `M-048` / `M-049` required HP exchange → immutable action-local bonus → common-snapshot simultaneous conditional TRUE Damage → ordinary Shield.
 30. `M-050` bounded Final Damage phase/direct graph and foreign-binding rejection.
+31. `M-051` / `M-052` / `M-053` bounded HP cases → atomic required Cost/allowance → immutable HP at payment → mandatory lifecycle → same admitted Action continuation, with malformed inputs rejected.
 
 ---
 

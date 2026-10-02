@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-02-F.5
+**Version:** 2026-10-02-F.6
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -11,6 +11,7 @@
 
 **Revision F.4:** adds checkpoint-scoped committed-result observation, Shield addition receipts/source-family caps and local explicit Slot ties. Existing Pilot #4 random-tie behavior and proportional Shield pooling remain unchanged.
 **Revision F.5:** corrects typed result observation/zero-addition law; adds ACT-033 required post-completion handoff and DMG-008 bounded final amplification/direct-Action scope. No new Tag/Primitive or global priority.
+**Revision F.6:** adds CST-014 bounded singular HP-payment profiles and CST-015 explicit Cost-caused lifecycle continuation; extends CST-009 with immutable resulting HP at payment commit. Existing default/exact/distributed Costs and prior Pilots remain unchanged.
 
 ---
 
@@ -2373,6 +2374,8 @@ HP Cost:
 
 A Character may explicitly override lethal policy.
 
+An explicit bounded `hpPaymentPolicy` follows CST-014. Its successful shortfall/floor is a declared payment exception, not Damage/HP Loss or permission to partially commit a failed required group. Default and unrelated exact-payment exchanges remain unchanged.
+
 ---
 
 ## CST-004 — HP Loss
@@ -2880,6 +2883,51 @@ Once a payment result is committed:
 > its recorded requested amount, actual paid amount, payer and success outcome are immutable result data for that transaction.
 
 Later Heal, Damage, Resource changes, Max HP changes, or other Effects do not retroactively rewrite the payment result.
+
+### HP immediately after payment
+
+A successful singular HP payment's `currentHpAfterPayment` is the resulting authoritative HP from that payment commit, captured before any ensuing HP_ZERO/death-prevention/return/Heal side-effects. `CURRENT_HP_AFTER_PAYMENT` is valid only for that successful HP result, including successful zero debit. No field is fabricated for a failed/uncommitted or non-HP payment. Store the value with the result and retain it through all dependent Action work/replay. It is not HP paid and must not be reconstructed from live HP after lifecycle processing.
+
+---
+
+## CST-014 — Bounded Singular HP-Payment Profile
+**Status:** `LOCKED EXPLICIT PROFILE`
+
+An opted-in HP Cost freezes normalized requested amount, pre-payment HP, structured guards, selected floor and referenced allowance state once per logical transaction. Exactly one declared case matches; no list/Entity/Event order supplies a case or payer allocation. Validate ordinary payer/admission legality and every other required Cost before committing anything.
+
+The selected case owns this payment's HP payability/floor; co-authored legacy lethalFloor is rejected, not resolved by hidden precedence. Counter-consuming cases are bounded to required Costs of this admitted Action; optional-payer/unrelated settlement consumption is unsupported. Ordinary failure/refund laws still govern unsuccessful required payment.
+
+For `REQUIRE_FULL`, payment succeeds only if the complete requested debit can leave the selected minimum HP. For `CLAMP_SUCCESS`, the explicit successful-shortfall law is:
+
+```text
+actualPaidAmount = min(requestedAmount, max(0, hpBefore - selectedFloor))
+currentHpAfterPayment = max(selectedFloor, hpBefore - actualPaidAmount)
+success = true
+```
+
+Preserve requestedAmount unchanged. The declared exceptional floor assignment is non-Heal and creates no Heal/Overheal/Damage/Lifesteal result; actualPaidAmount records the debit, not a later net HP difference. Floor0 explicitly permits lethal payment. This profile does not waive initial Action/payer legality, other required Costs or an exact-payment consumer's own entitlement test.
+
+Required AE/HP payments, payment receipts and any selected one-unit `consumeCounterRef` update commit atomically with successful admission. A failed other Cost, probe, transaction validation conflict or abort commits none of them. Availability/guard reads are protected; technical retry cannot silently reselect a case inside the same frozen transaction. A fresh gameplay attempt requires a fresh validated transaction under existing admission law.
+
+The counter is existing owner-keyed State with its declared lifetime. Required battle-scoped allowances survive source leave/redeploy and are retired only with that battle. Replay resumes/reuses the same transaction/case/receipts; it cannot debit, assign a floor, consume an allowance or emit HP_ZERO twice. Ambiguous same-payer HP allocation or competing allowance consumption is rejected unless an existing explicit allocation law resolves it. No new manager, scripting or priority.
+
+---
+
+## CST-015 — Cost-caused Lifecycle before Direct Effects
+**Status:** `LOCKED EXPLICIT CONTINUATION PROFILE`
+
+Under `ActionSpec.costLifecyclePolicy = CONTINUE_ADMITTED_ACTION`:
+
+```text
+entire active Cost transaction succeeds and is terminal
+→ immutable payment outcomes already captured at their commits
+→ finish mandatory Cost-caused HP_ZERO/death evaluation/prevention
+→ resume this same admitted Action's direct Effect graph
+```
+
+Successful Return-to-Deck or DEATH_CONFIRMED during that processing does not itself cancel the admitted Action. Retain its Actor/Ability/Action/Combat-Instance context, result bindings and declared snapshots/target locks through completion. Do not re-admit, charge again, grant another Action, resurrect the Actor or refresh a commit-bound HP value from post-prevention HP. Explicit recipient/Effect legality and separately applicable cancellation remain authoritative.
+
+Mandatory lifecycle processing is not an ordinary Reaction interposition. This adds no new global same-window priority and no free opportunity for a dead/off-field Actor to request another Action. Absent this explicit profile, preserve existing laws; reject execution content whose observable Cost-caused source-invalidity outcome lacks an applicable declared policy. Distributed Cost-stage terminal/result barriers remain CST-008/009; neither direct Effects nor post-cost interposition begins while that active transaction is incomplete.
 
 ---
 
