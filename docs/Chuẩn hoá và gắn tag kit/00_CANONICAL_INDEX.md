@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-09-10-INDEX-2
+**Version:** 2026-10-02-INDEX-3
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -9,7 +9,7 @@
 
 # 0. READ THIS FIRST
 
-Đây là **file đầu tiên phải đọc trong chat mới**.
+Đọc root `AGENTS.md` trên latest actual repository state trước, rồi đọc INDEX này để định vị canonical architecture. GitHub repository là source of truth; chat memory, uploaded Project copies và draft cũ không thay thế merged files.
 
 Không được suy diễn toàn bộ Arclune chỉ từ memory/chat summary.
 
@@ -45,16 +45,14 @@ Tag không execute code.
 
 # 1. SOURCE PRECEDENCE
 
-Khi có mâu thuẫn, dùng thứ tự ưu tiên:
+Gameplay authority:
 
-1. **Newest explicit user correction.**
-2. **Newest LOCKED rule trong canonical architecture files.**
-3. **Current character kit text supplied by user.**
-4. **Older canonical project files.**
-5. **Legacy source / recovery material.**
-6. **Assistant inference/proposal.**
+1. Newest explicit designer correction.
+2. Latest non-superseded Clarified Gameplay Canon in `docs/canon kit/`.
+3. Current repository Raw Kit.
+4. Older drafts / legacy material / assistant proposals.
 
-Không được lấy một proposal cũ ghi đè user correction mới hơn.
+Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture state/semantic authority: latest actual merged canonical `00–08` in this repository; AGENTS guides the workflow, not gameplay or architecture meaning. A gameplay clarification is not proof that a generic architecture extension is needed; attempt composition and prove the exact gap first. Do not let current architecture rewrite designer gameplay, or stale exports overwrite merged architecture.
 
 ---
 
@@ -62,18 +60,18 @@ Không được lấy một proposal cũ ghi đè user correction mới hơn.
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-09-10-INDEX-2`  
-**Read:** always first.
+**Version:** `2026-10-02-INDEX-3`
+**Read:** after root `AGENTS.md`.
 
-## `00_CANONICAL_RECOVERY_AUDIT.md`
+## `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Role:** Chặng A — recovery/audit provenance.  
 **Version:** `2026-09-10-A`  
 **Read when:** cần truy nguồn legacy, audit một quyết định, hoặc xem vì sao terminology/tag cũ bị sửa.  
 **Do not treat as:** runtime spec.
 
-## `01_TERMINOLOGY_vNext.md`
+## `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`
 **Role:** Chặng B — canonical meanings and semantic distinctions.  
-**Version:** `2026-09-10-B` plus current manual patches.  
+**Version:** `2026-09-25-B.1`.
 **Read when:** gần như mọi normalization task.  
 **Important:** `TURN_BOUNDARY` hiện nghĩa là global SSI boundary giữa hai Natural Actions liên tiếp. Personal “own turn” mechanics dùng Actor Natural Action Window / Natural Action clocks.
 
@@ -89,9 +87,9 @@ Không được lấy một proposal cũ ghi đè user correction mới hơn.
 **Read when:** kit có mechanic mới có vẻ không composition được bằng operations hiện hữu.  
 **Important:** Tag ↔ Primitive là many-to-many. Không tạo một Primitive cho mỗi Character.
 
-## `04_ABILITY_SCHEMA.md`
+## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-09-10-E` plus current clock patch.  
+**Version:** `2026-10-02-E.2`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -106,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-09-10-F.1` plus current manual patch to stale checklists.  
+**Version:** `2026-10-02-F.4`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -124,20 +122,34 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-09-10-G`  
+**Version:** `2026-10-02-G.3`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
 ## `07_MODE_PROFILES.md`
 **Role:** Chặng H — mode-specific scheduler/spatial/lifecycle/resource profiles.  
-**Version:** `2026-09-10-H`  
+**Version:** `2026-10-02-H.1`
 **Read when:** mechanic khác nhau theo turn-based / Arena / Exploration-Defense.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-09-10-I`  
+**Version:** `2026-10-02-I.2`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
+
+---
+
+## 2A. Current Character canon navigation
+
+In `docs/canon kit/`:
+
+- Pilot #1: `Ariadne_Velora_Clarified_Gameplay_Canon.md`.
+- Pilot #2: `Echo_Reverie_Clarified_Gameplay_Canon.md`.
+- Pilot #3: `Sanguinius_Clarified_Gameplay_Canon.md`.
+- Pilot #4: `Alcestis_Clarified_Gameplay_Canon_R3.md`; merged F.3 / G.2 boundaries remain canonical under the additive F.4 / G.3 revisions.
+- Pilot #5: `Polyhymnia_Clarified_Gameplay_Canon.md`; locked designer corrections, partial normalization, generic-gap proofs and explicit `UNRESOLVED / NOT BLOCKING` fields live together. It is not a claim of execution-ready numeric data.
+
+Pilot #5 architecture deltas: bounded checkpoint result observation, immutable Shield addition receipts, source-family addition caps, explicit Slot metric ties/top-N cutoff, and Turn-Based Main Leader position clarification. No new Functional Tag or Primitive. `M-038` onward adds declarative architecture coverage; no executable tests are implied.
 
 ---
 
@@ -165,7 +177,7 @@ Do not silently restore old Luna-era assumptions from these files.
 
 If a legacy file conflicts with:
 - user correction;
-- `01_TERMINOLOGY_vNext.md`;
+- `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`;
 - `02_TAG_vNext.md`;
 - `05_CONTRACTS.md` F.1+;
 
@@ -854,26 +866,26 @@ Do not silently resolve these.
 
 # 21. NEW KIT WORKFLOW — DEFAULT
 
-When user sends a new kit, do **not** regenerate all architecture files.
-
-Default procedure:
+Use the root `AGENTS.md` autonomous Character normalization loop:
 
 ```text
-1. Read this INDEX.
-2. Read latest kit text.
-3. Read only architecture files relevant to this kit.
-4. Semantic parse.
-5. List ambiguities.
-6. Map to existing Terminology.
-7. Map to existing Tags.
-8. Express with Ability Schema.
-9. Derive existing Primitive composition.
-10. Apply relevant Contracts.
-11. Dry-run Kernel trace.
-12. Compare with Stress Tests.
-13. Identify architecture impact.
-14. Return manual patch list.
+Raw Kit
+→ Clarified Gameplay Canon
+→ self-audit Canon
+→ ask genuinely blocking gameplay ambiguity
+→ normalize against latest 00–08
+→ audit impact across all 00–08
+→ attempt existing composition
+→ prove generic gaps
+→ draft smallest changes
+→ self-audit and correct draft
+→ apply to affected canonical repo files
+→ inspect diff / cross-file audit
+→ update declarative 08 only when needed
+→ six-pass final self-audit
 ```
+
+Audit across 00–08 does not require modifying all nine files. Preserve nonblocking unknowns as `UNRESOLVED / NOT BLOCKING`; do not manufacture defaults or require unrelated answers before continuing architecture work. Architecture Phase uses documentation/consistency checks, not implementation builds or executable game tests.
 
 ---
 
@@ -918,13 +930,13 @@ It must first prove the existing architecture cannot represent its mechanic with
 Use this order:
 
 ### If missing meaning
-Patch `01_TERMINOLOGY_vNext.md`.
+Patch `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`.
 
 ### If genuinely new searchable semantic capability
 Audit candidate for `02_TAG_vNext.md`.
 
 ### If authored data cannot express mechanic
-Patch `04_ABILITY_SCHEMA.md`.
+Patch `04_ABILITY_SCHEMA-1.md`.
 
 ### If execution needs genuinely new reusable operation
 Audit candidate for `03_PRIMITIVE.md`.
@@ -1000,45 +1012,11 @@ Do not solve Contract ambiguity by inventing a new Tag.
 
 ---
 
-# 27. MANUAL PATCH OUTPUT FORMAT
+# 27. ARCHITECTURE IMPACT / REVIEWABLE OUTPUT
 
-User maintains canonical files manually to reduce unnecessary file regeneration and usage.
+For authorized repository editing, apply corrected changes directly on a reviewable branch and report every affected file/section with its reason. Preserve untouched layers explicitly as `NO CHANGE`. Commit/PR follow the user's authorized scope; do not merge automatically.
 
-Future responses should prefer:
-
-```text
-ARCHITECTURE IMPACT
-
-01_TERMINOLOGY_vNext.md
-- NO CHANGE
-
-02_TAG_vNext.md
-- NO CHANGE
-
-03_PRIMITIVE.md
-- NO CHANGE
-
-04_ABILITY_SCHEMA.md
-- PATCH REQUIRED
-- Insert after §X:
-  [exact markdown block]
-
-05_CONTRACTS.md
-- PATCH REQUIRED
-- Add Contract ABC-123:
-  [exact markdown block]
-
-06_KERNEL_RUNTIME.md
-- NO CHANGE
-
-07_MODE_PROFILES.md
-- NO CHANGE
-
-08_STRESS_TESTS.md
-- Add test NEW-001 because ...
-```
-
-Do not regenerate full files unless user explicitly requests.
+Provide exact manual patch blocks only when that is the requested deliverable. Neither workflow requires regenerating all canonical files.
 
 ---
 
@@ -1183,65 +1161,21 @@ Future model must not:
 
 # 36. NEW CHAT START PROCEDURE
 
-Preferred user workflow:
+Read current repository root `AGENTS.md`, then this INDEX. Locate the current Raw Kit and latest non-superseded Character canon. Load the minimum sufficient canonical source set, then audit impact across 00–08 before any change. Repository files are primary; an upload is not needed when the repository is accessible.
 
-### First upload / provide
-`00_CANONICAL_INDEX.md`
-
-Then provide the kit to analyze.
-
-If needed, the model requests only relevant canonical files.
-
-For a typical turn-based kit, usually enough:
-
-```text
-01_TERMINOLOGY_vNext.md
-02_TAG_vNext.md
-04_ABILITY_SCHEMA.md
-05_CONTRACTS.md
-kit file
-```
-
-Add:
-
-`03_PRIMITIVE.md`
-when a new executable operation may be required.
-
-`06_KERNEL_RUNTIME.md`
-when runtime state/scheduler/subsystem architecture may be affected.
-
-`07_MODE_PROFILES.md`
-when mode behavior matters.
-
-`08_STRESS_TESTS.md`
-for hard/new interaction class or architecture validation.
-
-`00_CANONICAL_RECOVERY_AUDIT.md`
-only for legacy/provenance disputes.
+Read recovery audit only for provenance disputes. Use actual canonical filenames listed in §2; shortened names in older prose describe layers and do not designate separate newer files.
 
 ---
 
 # 37. CHAT MODEL INSTRUCTION
 
-When starting a new chat, user can say:
-
-> Đọc `00_CANONICAL_INDEX.md` trước. Đây là điểm vào canonical của Arclune. Không dùng memory hoặc legacy file để ghi đè file hiện hành. Hãy xử lý kit mới theo `NEW KIT WORKFLOW`, chỉ đề xuất patch khi kiến trúc hiện tại thực sự thiếu semantic/schema/primitive/contract/runtime. Những chỗ chưa đủ dữ liệu phải để UNRESOLVED và hỏi tao, không tự chọn default.
-
-This is sufficient as the starting instruction when the index file is supplied.
+Start from latest actual repository state and root `AGENTS.md`, then INDEX. Analyze the kit under §21. Try existing composition before proposing architecture growth. Ask only gameplay choices that block dependent work; preserve other unknowns explicitly and continue authorized independent work.
 
 ---
 
 # 38. FILE MAINTENANCE POLICY
 
-User manually maintains master files.
-
-Therefore:
-
-- assistant should output exact patch blocks;
-- user copies them into local master;
-- newly edited local master becomes newest canonical source;
-- next chat should use user's newest uploaded version;
-- assistant should not assume an old generated sandbox file remains newest.
+GitHub repository is the canonical master. Edit only files with proven deltas, inspect the actual diff and retain a reviewable branch/commit. A stale local draft, chat artifact or uploaded Project snapshot never becomes canonical merely because it was generated later. Re-read merged state for the next task.
 
 ---
 
@@ -1335,7 +1269,7 @@ A future model is ready to continue Arclune only if it can answer “yes” to a
 27. Do I know Exploration has no SSI and no Luân Hồi?
 28. Do I know unresolved mechanics must remain unresolved?
 29. Do I know a new kit must first try composition before changing architecture?
-30. Do I know user wants manual patch output rather than repeated full-file regeneration?
+30. Do I know current repository workflow applies corrected edits only to proven affected files, with manual output only when requested?
 31. Do I know Field Presence is keyed by Runtime Entity × Combat Instance?
 32. Do I know `DEATH_CONFIRMED` does not automatically mean `LEAVE_FIELD`?
 33. Do I know Deck membership does not automatically mean currently deployable?

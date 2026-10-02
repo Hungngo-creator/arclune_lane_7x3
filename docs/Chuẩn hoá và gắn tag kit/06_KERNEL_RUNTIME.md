@@ -1,14 +1,16 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-02-G.2
+**Version:** 2026-10-02-G.3
 **Status:** Working Canonical Candidate  
-**Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA.md`, `05_CONTRACTS.md`  
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
 **Non-goal:** implementation code, Unity class layout, networking transport, renderer, editor UI.
 
 **Revision G.1:** incorporates Pilot Normalization #3 runtime support for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost execution, immutable typed Cost-payment results, scoped Effect-amount modifier evaluation, and explicit `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary execution. No new Functional Tag or Primitive is introduced.
 
 **Revision G.2:** executes the merged Pilot #4 Schema and F.3 Contracts through existing runtime owners: static-Passive initialization, pre-mitigation component-type transforms, battle-scoped Deployment Cost and lock, atomic Return-to-Deck retention cleanup, and metric-selector tie resolution. No Character-specific runtime branch, Functional Tag, Primitive, callback registry, or generic priority system is introduced.
+
+**Revision G.3:** adds checkpoint-scoped committed-result views, Shield addition receipts/source-family caps and explicit Slot tie resolution through existing owners. No Character-specific runtime, Functional Tag, Primitive or generic priority is introduced.
 
 ---
 
@@ -1415,6 +1417,7 @@ Canonical high-level path:
 14. blocking child Actions
 
 15. finalize direct-effect stage
+    seal own-direct committed receipt-reference projection under §25A
 
 16. ACTION_DIRECT_EFFECTS_COMPLETE
 
@@ -1430,6 +1433,8 @@ Canonical high-level path:
 19. finish mandatory lifecycle/results caused by those settlements
 
 20. finalize Action-level result aggregation required for completion
+    finalize/expose the typed committed-result view under §25A
+    before completion observers are released
 
 21. verify all root completion dependencies are terminal
 
@@ -1580,6 +1585,7 @@ SnapshotRef
 DamageResultRef
 DamageAggregateRef
 HealResultRef
+ShieldAdditionResultRef
 CostPaymentResultRef
 CostGroupPaymentResultRef
 SpawnedEntityRef
@@ -1728,6 +1734,31 @@ Later:
 - lifecycle mutation
 
 must not rewrite committed Cost-payment results.
+
+---
+
+## 25A. CHECKPOINT-SCOPED ACTION RESULT VIEW
+
+Existing Action finalization and Result Store execute `TRG-015`; no new result-aggregation manager is required. For a supported Damage/Heal/Shield commit owned by an executing Action, associate its immutable receipt with that existing ActionResult and Effect provenance. Actionless static/System Effects preserve Effect/transaction results without a fabricated Action and never enter an Action-direct view merely by temporal coincidence. At direct-stage finalization, seal the own-direct receipt-reference projection before `ACTION_DIRECT_EFFECTS_COMPLETE`. This is not an early freeze of the whole ActionResult: later blocking work can extend its summary without changing the sealed direct projection. Final aggregation exposes the finalized existing object, including `damageResults`, `healResults` and supported `shieldResults`, before `ACTION_COMPLETED`.
+
+Child Actions retain their own receipt ownership. A parent may reference child results under an explicitly broader existing outcome scope; sharing root lineage never promotes them to the parent's own direct set. §15A supplies the direct-graph membership query.
+
+At the declared checkpoint, Condition evaluation resolves `ACTION_RESULT_ANY` as:
+
+```text
+resolve reached Action checkpoint and its sealed/finalized result view
+→ enumerate selected kind's committed receipt refs
+→ test scoped direct-graph membership
+→ test recipient filter against declared read/snapshot context
+→ compare compatible immutable metric
+→ return one ANY Boolean
+```
+
+No entry-order dependence, RNG, live HP/Shield delta reconstruction, payment or mutation is permitted inside this read. Empty collections yield false. Unsupported kind/metric/operation or incomplete Action references fail validation visibly; they are not guessed as nominal amounts or live State.
+
+Receipt lifetime is owned by the existing Action/Result Store: create immutable receipts at commit, seal each checkpoint view before publication, retain while checkpoint observers/declared dependent work hold references, then release through ordinary result lifetime cleanup. Save/load and replay preserve pending refs and immutable provenance/values; rebuilding an index does not replay committed Effects.
+
+Trigger Engine can use this view to update ordinary field-scoped State/counters and consume them before an authored non-Natural settlement via existing Effect DAG/Transaction Manager. It does not create a Character-specific memory service or global ordering between unrelated observers. An ADEC State update may use existing §39A bounded completion dependencies registered before the barrier. A completion-triggered settlement cannot block the completion Event it waits for. Distinct trigger-owner/candidate instances are not collapsed merely because they share an authored dependency ID. For an authored single-observation mechanic, mutually exclusive checkpoint rules prevent counting the same Action twice; no global priority between unrelated candidates is inferred.
 
 ---
 
@@ -2526,6 +2557,8 @@ CompletionDependencyState
   rootActionId
   nodes[]
     dependencyId
+    triggerOwnerRef
+    candidateInstanceRef
     triggerRef
     status
     dependsOn[]
@@ -2565,7 +2598,7 @@ rootCompletionDependency:
 
 it must register/instantiate the corresponding dependency node on the referenced root Action **before** that root Action is allowed to pass the completion barrier.
 
-The runtime graph comes from normalized declarative dependency data.
+The runtime graph comes from normalized declarative dependency data. Runtime dependency identity includes the root Action, authored dependency ID, trigger owner and instantiated candidate; two runtime owners using the same authored ID remain distinct. ADEC observers read the already-sealed own-direct projection under §25A, not a prematurely final whole ActionResult.
 
 The Kernel must not invent dependency edges from Ability names or Event publication order.
 
@@ -2660,7 +2693,11 @@ For `RANDOM_AMONG_TIED`, freeze the final eligible Candidate Pool and read all m
 
 The current count-one profile selects the sole best candidate directly, or uses deterministic seeded `TARGET_SELECTION` RNG only over the tied-best subset when several candidates tie. An empty pool follows declared no-target handling without a draw. Stable technical enumeration for replay must preserve the same set-to-draw mapping across incidental collection permutations and give each tied candidate equal eligibility; entity/list/Slot order cannot supply a preferred winner.
 
-Store the selected Entity in `TargetSetRef` at the declared target-context checkpoint. `LOCK_ENTITY_IDS` with later `DROP_INVALID` consumes that reference once: no metric re-query, tie reroll or replacement after intervening Effects. An invalid locked target follows its declared branch failure policy. A tie policy does not supply invalidation semantics or a global random-tie default; undeclared observable tie behavior remains `REQUIRED_EXPLICIT`.
+For metric top-N, freeze unique candidates' metrics and positions at one selection checkpoint. Fill complete better metric groups first. A cutoff tied group uses only its declared policy: seeded random distinct selection for `RANDOM_AMONG_TIED`, or captured positions against authored PositionRefs for `EXPLICIT_SLOT_ORDER`. Slot priority never overrides unequal metrics and consumes no RNG. Fewer eligible candidates returns the eligible remainder; the selected set does not imply Effect execution order.
+
+For explicit Slot ties, validate position coverage and uniqueness via the existing Mode Spatial Adapter. Reject unresolved/duplicate order positions, unmapped tied entities or multiple tied entities sharing a position without a declared law. Leader is resolved through its actual position. Do not read the SSI cursor as target priority. This local authored order does not modify the scheduler or global Reaction priority.
+
+Store the selected Entity/Entity set in `TargetSetRef` at the declared target-context checkpoint. `LOCK_ENTITY_IDS` with later `DROP_INVALID` consumes that reference once: no metric re-query, tie reroll or replacement after intervening Effects. An invalid locked target follows its declared branch failure policy. A tie policy does not supply invalidation semantics or a global random-tie default; undeclared observable tie behavior remains `REQUIRED_EXPLICIT`.
 
 ---
 
@@ -2954,6 +2991,9 @@ Contribution record:
 ```text
 shieldContributionId
 sourceEffectRef
+originAbilityId?
+originEffectId?
+sourceOwnerRef?
 ownerRef
 originalAmount
 remainingAmount
@@ -2965,7 +3005,23 @@ specialFlags
 
 UI may show one total Standard Shield bar.
 
-Runtime preserves source provenance. `retentionScope` is lowered from the Shield lifecycle metadata; field-scoped contributions identify the relevant owner/Combat-Instance presence cycle. It is independent of duration and Authority. §10C uses it without creating Character-specific Shield layers.
+Runtime preserves source provenance. The ledger origin IDs reuse the existing stable `originAbilityId` / `originEffectId` from Effect context; `sourceOwnerRef` resolves the authored runtime source owner independently from the recipient/attachment owner. These fields are required for matching a source-family cap; uncapped standalone/System grants need not fabricate an Ability origin. `retentionScope` is lowered from the Shield lifecycle metadata; field-scoped contributions identify the relevant owner/Combat-Instance presence cycle. It is independent of duration and Authority. §10C uses it without creating Character-specific Shield layers.
+
+### Shield addition commit receipt
+
+Existing Shield Runtime emits the typed `ShieldAdditionResultRef` under `SHP-005` at the same transaction commit as a supported `CREATE`/`ADD_VALUE` ledger mutation. It stores recipient, operation, affected contribution refs, requested and actual credited/created amount, outcome, state version and immutable Effect/transaction provenance, plus Action provenance when Action-owned.
+
+For Action-owned execution, register the receipt in the owning Action result object; otherwise retain the standalone Effect/transaction result without fabricating an Action. Do not derive it from the later total or remaining Shield. Admission rejection and cap-discarded amount cannot become positive addition evidence. Duration-only refresh and unsupported manipulation kinds do not silently become additive receipts. The authored stacking/cap law stays authoritative; the receipt does not select it.
+
+Later damage/expiry/removal changes ledger state and terminal causes, not the earlier receipt. Preserve pooled proportional depletion and transition-cleanup behavior unchanged.
+
+---
+
+### Source-family cap at Shield commit
+
+For optional `sourceFamilyCap`, existing Shield Runtime / Transaction Manager execute `SHP-006`. Resolve the runtime source owner and stable authored origin Ability/Effect-definition family on this recipient. Read active remaining matching contributions and the declared cap ValueRef at `SHIELD_COMMIT`; include both in the protected transaction read set. Clip only the admitted new amount to nonnegative headroom, then atomically commit that addition and its receipt. An independently declared new contribution keeps its own provenance/duration; no merge/refresh is inferred.
+
+Ledger provenance provides the query; no mutable family-pool subsystem is introduced. Source-owner identity separates identical Characters, while stable definition refs group their successive casts. Existing Effect-instance provenance remains available for each contribution. Old contributions are not clamped when a cap changes; depletion/expiry/removal only affects future reads. Competing additions need an explicit existing sequential allocation/dependency law, otherwise reject; stale reads must revalidate through existing transaction handling, never overcommit the cap. Preserve §52 proportional absorption unchanged.
 
 ---
 
@@ -5254,7 +5310,8 @@ A complete save needs:
 - history snapshot refs if needed;
 - battle deployment Current/floor/lock and static initialization completion records;
 - declared static rule ownership/lifetimes (or inputs to rebuild indexes without resettling initialization);
-- State/Shield retention metadata, terminal causes/transition refs and surviving scheduled work.
+- State/Shield retention metadata, terminal causes/transition refs and surviving scheduled work;
+- sealed checkpoint result views/immutable Shield addition receipts still referenced by pending observers or dependent work, and stable source-family provenance on surviving contributions.
 
 Do not serialize presentation-only transient animation as authoritative.
 
@@ -5992,8 +6049,13 @@ A correct Arclune Kernel must support all of these without contradiction:
 68. Pre-mitigation component transforms use scoped Action Actor and direct-Effect provenance, then dispatch the resulting Damage type without rewriting source Tags.
 69. Return-to-Deck commits presence, deployment state and transition-selected State/Shield cleanup atomically while retaining Deck membership and the admitted Action context.
 70. Transition cleanup preserves its terminal cause and cannot trigger break/expiry-only settlements.
-71. Metric ties use the exact tied-best set and deterministic RNG before target lock; later invalidation follows explicit policy without implicit requery/reroll.
+71. `RANDOM_AMONG_TIED` uses the exact tied-best set and deterministic RNG before target lock; later invalidation follows explicit policy without implicit requery/reroll.
 72. Pilot #4 reuses existing owners and requires no Character-specific runtime type, Functional Tag, Primitive or generic priority system.
+73. Checkpoint result predicates read sealed own-direct projections or finalized Action results with immutable committed metrics, never live HP/Shield reconstruction.
+74. Shield creation/addition receipts preserve operation-local credited amounts after authored admission/stacking/caps without choosing Character reapplication gameplay.
+75. Checkpoint observers reuse State/Effect DAG composition with per-owner dependency identity; completion-only work cannot block its own completion.
+76. Source-family addition caps use protected commit-time ledger reads, clip new amounts only and preserve independent provenance/duration and proportional pooling.
+77. Explicit Slot ties rank metric equality only; top-N, position coverage, target lock and invalidation remain separate.
 
 ---
 
