@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-03-INDEX-8
+**Version:** 2026-10-03-INDEX-9
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-03-INDEX-8`
+**Version:** `2026-10-03-INDEX-9`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-03-E.6`.
+**Version:** `2026-10-03-E.7`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-03-F.8`.
+**Version:** `2026-10-03-F.9`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-03-G.7`
+**Version:** `2026-10-03-G.8`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-03-I.7`
+**Version:** `2026-10-03-I.8`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -153,6 +153,10 @@ In `docs/canon kit/`:
 - `Nerovar_Clarified_Gameplay_Canon.md` R4, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. First #52 Warrior. Reuses merged Cost/atomic Return, scope retention and actor-window cap; completes target-local HP Skill3, per-group requery/batches and pre-Cost source snapshot distinct from H_postCost. No internal gameplay question remains.
 - `Phanes_Clarified_Gameplay_Canon.md` R2, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Later #52 SSR Mage. Battle factor1.05^N excluding own input, simultaneous main/orb with proportional shared-recipient Shield/HP allocation, separate packet results, independent snapshots of two same-target child Basics, local S1→2→3, exact AE-only waiver and direct Execute without ordinary prevention are locked. No internal gameplay question remains.
 - `Azoth_Clarified_Gameplay_Canon.md` R1, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw #56 replaced only by latest kit/names. PHYSICAL output uses RES/packet20% Penetration, Basic-only pre-hit paid Execute retains admitted hit through source HP_ZERO, Skill2 snapshots RES delta/replace/refresh on completed-Natural clock, Ultimate calls one Skill3 child and heals20% own committed child Damage with no +10% modifier. External kits may affect Heal/Overheal/Shield. No internal gameplay question remains.
+
+- `Anicca_Clarified_Gameplay_Canon.md` R1, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw #60 replaced/named with latest thirteen designer locks and follow-up answers: actual-Natural ON/OFF cycle with dead freeze, common-snapshot distinct real Basic children in one commit, exclusive delayed Skill2 release, delayed live stat contribution, additive one-outcome Lifesteal before compound MaxHP penalty, origin-aware Rage window and failed-Revive-atomic reset. No unrelated raw kit was edited.
+
+E.7/F.9/G.8/I.8 adds only five proved opt-in extensions through existing owners: RES-009 cross-child Damage preparation/common commit, HEL-005 damage-derived coefficient ADD, CST-016 positive-grant origin/scoped admission, REV-007 MaxHP contribution removal joined to Revive, and ACT-033's explicitly opted-in completed-non-Natural observer scope before next-Natural handoff. No new Tag/Primitive/subsystem/Character branch/priority system. 01/02/03/07 remain unchanged; M-066–M-073 are declarative Architecture Phase obligations, not executable tests. Other kit mechanics use existing composition.
 
 E.6/F.8/G.7/I.7 adds only proved bounded surfaces through existing owners: DIRECT_EXECUTE, own-family stat-baseline exclusion, pre-Cost source capture, explicit shared-recipient proportional Damage allocation, mitigation-stat override, and local CostGroup scope of admitted continuation. No new Functional Tag/Primitive/Character runtime/priority system. Declarative M-056–M-065 cover these and their negative boundaries; no executable build/game tests are implied. Metadata/Cost Budget/unsupported Mode adapters remain NOT BLOCKING, not fabricated execution-ready values.
 

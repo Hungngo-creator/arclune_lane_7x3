@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-03-E.6
+**Version:** 2026-10-03-E.7
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -1206,21 +1206,22 @@ unbounded recursive dependency creation.
 
 ## 7.13 `postActionSettlement`
 
-Optional bounded declaration for an ACTION_COMPLETED Trigger whose finite settlement is required in the **existing post-action phase**, before the next Natural Action opportunity. It does not delay ACTION_COMPLETED or create future-Action pending gameplay state.
+Optional bounded declaration for an ACTION_COMPLETED Trigger whose finite settlement is required in the **existing post-action phase**, before the next Natural Action opportunity. It does not delay ACTION_COMPLETED or create a future-Action scheduling token. Its finite Effect graph may explicitly create ordinary persistent State, whose future behavior/lifetime is separately authored.
 
 ```yaml
 postActionSettlement:
   mode: BEFORE_NEXT_NATURAL_ACTION
   observedActionRef: EVENT_ACTION
+  completionSourcePolicy: NATURAL_ONLY # optional; existing default
   dependencyId:
   dependsOn: []
 ```
 
-The observed Action must be an actually completed Natural Action in the same Combat Instance. Dependency identity is observed Action + runtime trigger owner + instantiated candidate + local dependencyId. Local dependsOn edges refer only to this opportunity's required post-action obligations. Use the existing required post-action Scheduler/Effect DAG/Transaction owners, not a new queue/priority subsystem.
+The default NATURAL_ONLY requires an actually completed Natural Action in the same Combat Instance. An explicit completionSourcePolicy ALLOW_COMPLETED_NON_NATURAL also permits an actually completed non-Natural Action under ACT-033, using this Combat Instance's existing next-Natural Scheduler handoff gate. The finite observer work does not wait for a future Action or delay its completed source/parent; it merely must be terminal before any next Natural Action starts. Absent this opt-in, non-Natural observations remain rejected. Dependency identity is observed Action + runtime trigger owner + instantiated candidate + local dependencyId. Local dependsOn edges refer only to this opportunity's required post-action obligations. Use the existing required post-action Scheduler/Effect DAG/Transaction owners, not a new queue/priority subsystem.
 
 Completion dispatch registers the authored obligation before SSI handoff; its eligibility check and any created settlement become terminal before that handoff. A false condition/clean failed activation closes it under existing failure law. After consume/create commits, an independently authored settlement's validity/lifetime governs later source leave; Trigger re-eligibility does not undo committed creation. Finite scheduler save state is not a pending token for a later Action.
 
-Normalizer rejects missing Action/owner/Mode anchors, non-completed/non-Natural sources, cross-opportunity edges, cycles, waits for the next Action/TURN_BOUNDARY being blocked, unbounded creation and combining this obligation with a blocker for its own completion. A Mode must expose the same Natural Action/required post-action phase or require an explicit 07 adaptation. No ordering of unrelated observers follows from this marker.
+Normalizer rejects missing Action/owner/Mode anchors, non-completed sources/non-Natural sources without this explicit profile, cross-observation/opportunity edges, cycles, waits for the next Action/TURN_BOUNDARY being blocked, unbounded creation and combining this obligation with a blocker for its own completion. A Mode must expose the same Natural Action/required post-action phase or require an explicit 07 adaptation. No ordering of unrelated observers follows from this marker.
 
 ---
 
@@ -2530,6 +2531,22 @@ Normalizer:
 
 ---
 
+## 17.1 Optional damage-derived coefficient profile
+
+```yaml
+heal:
+  damageDerived:
+    basisResultRef: <sealed committed Actual-HP-Damage projection>
+    baseCoefficient: <pure nonnegative scalar>
+    settlementId: <authored local dependency ID>
+```
+
+This opt-in HEL-005 profile replaces this Heal's ordinary `formula`/`sourceResult` amount calculation, not its target/admission/Overheal policy. The basis declares exact Action/Effect membership and terminal checkpoint, including only explicitly selected children. Same root is insufficient. Instantiate once per observed Action + recipient + authored settlementId, through existing Trigger/completion-DAG/Result owners. Independent Heal instances are not merged by equal amounts or incidental shared roots.
+
+At the declared settlement checkpoint, §18A may add qualifying coefficients at `DAMAGE_DERIVED_HEAL_COEFFICIENT`; sum the base and additions, then multiply this one immutable Damage basis once. Conditions/values normally read settlement-phase state; an explicitly bound Snapshot preserves an earlier source decision. With total coefficient0, no damage-derived Heal is emitted; with a positive coefficient and Damage basis0, normal zero-amount Heal semantics apply. No new mutable Lifesteal pool/Tag/Primitive is implied.
+
+---
+
 # 18. SHIELD EFFECT SPEC
 
 Conceptual families:
@@ -2842,7 +2859,7 @@ Tag compatibility remains subject to the canonical Tag Registry and Normalizer v
 
 ## Typed amount operation
 
-Current minimum supported amount operation:
+Current amount-phase operation (the coefficient-only ADD profile below is separate):
 
 ```text
 MULTIPLY
@@ -2889,6 +2906,7 @@ Current minimum phases introduced here:
 PRE_OVERHEAL
 FINAL_DAMAGE_REDUCTION
 FINAL_DAMAGE_MULTIPLIER
+DAMAGE_DERIVED_HEAL_COEFFICIENT
 ```
 
 Phase compatibility is typed.
@@ -2921,6 +2939,10 @@ True Damage is unaffected because it lies outside `damageComponents`.
 ### `FINAL_DAMAGE_MULTIPLIER`
 
 Valid only for DAMAGE. Existing MULTIPLY with a finite factor >= 1 applies to explicitly selected PHYSICAL/WILL/TRUE components at DMG-008's Final Damage checkpoint before Shield. A factor below 1 is rejected at this bounded amplification phase rather than disguising reduction against TRUE. It is distinct from FINAL_DAMAGE_REDUCTION; TRUE bypasses reduction but may receive an explicitly authored final multiplier. Do not lower this phase to a raw-formula coefficient or a reduction Tag. Payment-gated rules consume their declared Action-local committed Cost result and immutable factor/Snapshot, never current payer HP or later nominal reconstruction.
+
+### `DAMAGE_DERIVED_HEAL_COEFFICIENT`
+
+Valid only for HEAL with §17.1 `damageDerived`, no Damage component scope. The only operation here is bounded **ADD** of a finite nonnegative dimensionless coefficient, not ADD to HP or arbitrary Effect amount. Existing source/recipient/Condition/value-query scopes qualify each contribution. A rule needing a particular outcome projection must bind that exact basis/observed Action, not just root ancestry. HEL-005 sums matching contributions once before requested Heal and the existing PRE_OVERHEAL phase; MULTIPLY remains the operation at the three amount phases above. No custom phase or general operation-order system is introduced.
 
 ## Multiple rules
 
@@ -3564,6 +3586,14 @@ No default silently chosen for unusual kit.
 
 ---
 
+## 22.2 Optional Revive-joined removal
+
+A contribution may declare `maxHpMutation.reviveRemoval: BEFORE_HP_RESTORE` under REV-007. Store it on that existing source-traceable mutation record; absence adds no Revive reset. It selects this contribution for staged removal inside a legal post-DEATH_CONFIRMED Revive, before a Revive formula's **CurrentMaxHP** read. Duration/owner Field-leave removal remains separately explicit.
+
+Revive validates/derives a projected contribution view, applies the record's explicit expiry reconciliation there, and atomically joins removal/restored MaxHP/Revive HP/materialization. Failed Revive leaves the records and MaxHP unchanged. No successful-Revive event may be used to undo penalties after the HP formula, and no free-standing pre-Revive cleanup Effect is generated. Explicit snapshot-MaxHP formulas/restoration profiles preserve their existing meanings; require an applicable composition law if another restoration conflicts.
+
+---
+
 # 23. RESOURCE MODIFICATION SPEC
 
 Conceptual form:
@@ -3575,6 +3605,8 @@ resource:
   operation:
   value:
   overflow:
+  grantOrigin: # optional unless origin is observable
+  grantActionRef: # existing typed ActionRef when Action provenance is observable
   resultBinding:
 ```
 
@@ -3590,6 +3622,31 @@ Can be:
 - mode subsystem.
 
 No hardcoded “AE belongs to actor”.
+
+---
+
+## 23.2 Typed gain provenance for scoped admission
+
+For a positive Resource grant whose origin is observable, declare `grantOrigin: ACTION_GENERATED | EXPLICIT_EXTERNAL | SYSTEM_NON_ACTION`. These classify the **grant's semantic cause**, independently from issuer, immediate/root Action, Effect Attribution or whether a System service executes it. An Action-class regen/outcome grant is ACTION_GENERATED even if a Mode hook issues it; an explicitly authored external grant remains EXPLICIT_EXTERNAL even if triggered during another Action. A grant genuinely independent of Actions is SYSTEM_NON_ACTION. Classification comes from validated authoring/Mode data, never a caller-selected escape from a matching prohibition. If an Action-sensitive rule applies, grantActionRef identifies the exact performed Action outcome generating/receiving the authored attribution of this gain. A child may attribute to a Natural parent only under explicit outcome law; shared root is insufficient. Preserve it in the Resource receipt. Ungrounded/foreign Action bindings are rejected, not inferred from coincident timing.
+
+Existing State-owned scoped Effect Admission under STA-014 can select `RESOURCE_MODIFICATION`, positive grant operation, `resourceKind`, exact recipient/pool and `grantOrigin`. CST-016 requires Resource Runtime/P-033 to consult that gateway before commit when such a matching rule exists. No global Resource immunity/default gate is added. Costs/drains/transfers/sets do not silently become positive grants; a transfer credit or SET increase needs an explicit compatible grant mapping if this distinction is observable. Missing/contradictory origin or unsupported operation is rejected where matching admission depends on it; legacy ungated Resource operations remain unchanged.
+
+The bounded scope is carried by the existing State `immunity` declaration, for example:
+
+```yaml
+immunity:
+  scope:
+    effectType: RESOURCE_MODIFICATION
+    resourceKind: RAGE
+    operation: POSITIVE_GRANT
+    grantOrigin: ACTION_GENERATED
+    recipientRef: <own Actor>
+    grantActionRef: <exact bound Natural Action>
+  actionBinding: CAPTURE_AT_NATURAL_ACTION_START
+  outcome: REJECT
+```
+
+This optional Resource-only actionBinding captures the matching restriction on the next **actually performed** Natural Action at start, before grant-bearing Effect/Mode work; probes/CC do not capture/consume it. Existing Action/Snapshot storage retains the normalized rule/scope and bound ActionRef until its explicitly tracked Action-linked Resource obligations are terminal. Closing the source window at ACTION_COMPLETED prevents binding another Action, but cannot erase this captured restriction from late grants of the same Action. Another Action's grant does not match merely by occurring during the window. A pending-window lifecycle removal does not undo already captured execution evidence. No new callback/protection registry or Functional Tag is needed.
 
 ---
 
@@ -4436,6 +4493,26 @@ A named SIMULTANEOUS_BATCH group with several Damage packets sharing one recipie
 
 No global multi-target/AoE default is introduced. Reject shared-recipient batches with observable per-packet results if no applicable explicit allocation law exists. Ordinary different-recipient simultaneous groups need no such field. Reject this field on non-simultaneous groups, unavailable membership/results or undeclared observable numeric allocation.
 
+## 34.2B Explicit child-Damage participation in one batch
+
+```yaml
+resolution:
+  groups:
+    - id: <local batch ID>
+      mode: SIMULTANEOUS_BATCH
+      childActionBoundary: PREPARE_CHILD_DAMAGE_THEN_COMMIT
+      childDamageParticipants:
+        - requestPath: <finite declared child-request path, possibly nested>
+          damageEffectRefs: <exact direct Damage definitions on that path>
+      snapshotPolicy: <explicit shared Snapshot bindings>
+```
+
+RES-009 extends the existing group/Action/Transaction plan: a parent owns one batch, prepares these **real** child Actions to their named Damage proposal boundary, then commits all proposals together. Paths are bounded expansions of authored RequestAction/repeat/locked-target refs, not arbitrary descendant queries or all same-root Actions. Each child's own Resolution group delegates these selected Damage nodes to that batch; it must not independently commit them. Own Damage receipts/events/Action identities remain on each child; explicit parent outcome projection references them without relabeling root-direct membership.
+
+The preparation subset is restricted to read-only admission, zero or explicitly waived authored Costs, immutable supplied target/source bindings and pure Damage preparation. Ordinary child-triggered Reactions wait for common commit/lifecycle; mutation-bearing interposition/Cost/preparation requires another applicable explicit transaction law or is rejected, never silently skipped. No arbitrary child graph can be paused at a callback. Locked invalid recipients follow their declared local skip policy; other admission/preparation failures need an applicable explicit failure profile. Missing/empty local branches become terminal, not a wait for nonexistent children. Later result-dependent work uses ordinary DAG edges after commit.
+
+Neither parent nor child waits for child ACTION_COMPLETED to release this pre-commit barrier. Only prepared/skipped participant Damage nodes release it; child completion follows common commit/results/lifecycle. Reject multiple commit owners, membership/snapshot ambiguity, cycles, participant completion prerequisites and hidden sequential commits. Other child/group policies remain unchanged.
+
 ## 34.3 No general loops
 
 A repeated effect must use bounded declarative constructs:
@@ -5121,7 +5198,7 @@ The two plans are distinct:
 
 ```text
 effectModifierPlan
-= numeric amount modification
+= typed numeric amount/coefficient modification
 
 damageTransformPlan
 = Damage component semantic-type transformation
@@ -5142,6 +5219,8 @@ Target tie policy is normalized into `targetPlan`.
 None of these plans implies a new Primitive by itself.
 
 ---
+
+The existing plans also preserve RES-009 parent-owned finite child-Damage participation, HEL-005 exact Damage basis/local coefficient settlement and typed ADD phase, CST-016 positive-grant origin/scoped State admission, and REV-007 marked MaxHP removal joined to Revive. Lower them through the existing Action/Effect/modifier/State/Transaction/result plans; postActionSettlement preserves its explicit completed-source policy under ACT-033; no new Primitive or top-level runtime subsystem. Preserve explicit family/Action/Effect/participant/contribution refs, failure policy, acyclic dependency and terminal commit identity.
 
 ## 51.1 Why IR exists
 
@@ -6192,7 +6271,7 @@ At minimum validator must enforce:
 62. `tiePolicy` applies to initial metric selection only and must not silently imply target requery/reroll after selection.
 63. A locked target that later becomes invalid follows its declared invalid-target policy; the initial tie policy must not select a replacement unless an explicit requery/reroll policy exists.
 64. ACTION_RESULT_ANY recipient readContext must be explicit and its SnapshotRef cover every requested fact.
-65. postActionSettlement must be finite, opportunity-local and completed-Natural-Action anchored; it cannot block its own source completion or wait for held handoff/boundary.
+65. postActionSettlement must be finite, completed-Action anchored and source-policy/Combat-Instance-handoff local (NATURAL_ONLY by default); it cannot block its own source completion or wait for held handoff/boundary.
 66. FINAL_DAMAGE_MULTIPLIER is Damage-only with finite MULTIPLY factors >= 1; directActionRef and all scoped result bindings must resolve without implicit child-root inheritance.
 67. `hpPaymentPolicy` requires singular HP Cost, supported pure pre-payment guards/floors and exactly one matching case; reject uncovered/overlapping cases, nonfinite/negative values, floors above payer Current MaxHP, co-authored legacy lethalFloor, incompatible payerCollection or unsupported shared-payer/counter allocation.
 68. A selected `consumeCounterRef` must resolve to an available owner-keyed remaining-use counter with declared lifetime for a required Cost of this admitted Action, and join its required Cost/admission commit. Optional/unrelated consumption, probes or aborted/failed transactions cannot consume it or assign the floor.
@@ -6205,6 +6284,11 @@ At minimum validator must enforce:
 75. Shared-recipient PROPORTIONAL allocation is opt-in SIMULTANEOUS_BATCH law: commit recipient budgets once, preserve each packet receipt, eligible-layer proportions and bounded conserved numeric totals without packet/list priority.
 76. SET_MITIGATION_STAT changes only a qualifying non-TRUE component's mitigation lookup after type transformation. No semantic type/capability rewrite, target ARM/RES mutation, double mitigation, implicit penetration stacking or Authority bypass.
 77. AFTER_ADMISSION_BEFORE_COST_COMMIT captures once after successful admission and before active Cost debit; no failed probe/Cost may activate direct Effects, and explicit continuation retains the admitted Action's immutable source capture.
+
+78. PREPARE_CHILD_DAMAGE_THEN_COMMIT requires finite explicit child-Damage membership, one commit owner, read-only zero/waived-Cost preparation, explicit target/failure/shared Snapshot policy and no wait for participant completion before commit.
+79. A damageDerived Heal requires a sealed exact committed basis and unique local settlement owner; ADD is legal only at DAMAGE_DERIVED_HEAL_COEFFICIENT with finite nonnegative coefficients and no automatic merging of independent Heals.
+80. A matching positive-grant admission scope requires validated grantOrigin/grantActionRef where observable and compatible operation mapping; it cannot be bypassed by System issuer/shared-root inference or late Resource subtraction.
+81. BEFORE_HP_RESTORE MaxHP removal must join the post-death Revive transaction/projected HP read, preserving foreign contributions/Snapshot inputs and all old state on failed Revive.
 
 ---
 

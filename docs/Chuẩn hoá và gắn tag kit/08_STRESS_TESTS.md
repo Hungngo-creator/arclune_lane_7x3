@@ -1,6 +1,6 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-03-I.7
+**Version:** 2026-10-03-I.8
 **Status:** Working Canonical Validation Suite  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.8+, `06_KERNEL_RUNTIME.md` G.7+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
@@ -13,6 +13,8 @@
 **Revision I.5:** adds M-051–M-053 for opted-in singular HP payment, atomic allowance consumption, immutable HP at payment commit, explicit Cost-caused lifecycle continuation and malformed-profile rejection. Prior fixtures and exact/distributed Cost semantics remain intact; declarative obligations only.
 
 **Revision I.6:** adds M-054/M-055 for joined survival/prevention/Return/use completion, local Heal and post-success Cost boundaries, failure/replay/cycle rejection. Prior Cost/Pilot fixtures remain unchanged; no executable game validation.
+**Revision I.8:** adds M-066–M-073 for Anicca actual-action/presence cycle, finite cross-child Damage batch, charge/release form, delayed stat clock, additive outcome Lifesteal, origin-aware Rage and atomic Revive MaxHP projection; prior fixtures remain unchanged. Documentation only.
+
 **Revision I.7:** adds M-056–M-065 for completed Nerovar/Phanes/Azoth normalization: retention/window, pre-Cost snapshots, own-baseline, child provenance, direct Execute, shared-recipient allocation, mitigation override and local Cost continuation. Prior-Pilot fixtures remain unchanged; Architecture Phase coverage only.
 
 ---
@@ -3569,6 +3571,80 @@ Save/resume at local Cost success/use/lifecycle/hit/Execute/child aggregate/Heal
 
 ---
 
+## M-066 — Field Cycle, Actual Actions and Dead Freeze
+
+**Status:** `MUST_PASS`
+**Fixture:** Anicca new deployment Presence; passive ON. First Natural Ultimate, a CC-lost opportunity, a Natural charge Action, two non-Natural child Basics, death/ordinary Revive without LEAVE_FIELD, then source Field leave/redeploy. Inject unrelated same-root Reaction/Mark/DoT receipts. Deliver a completion twice and rebuild static indices.
+
+**Expected:** deployment starts one ON State; Natural-start phase binding governs its entire declared outcome. Only actual Natural completion toggles once; CC/children/non-Natural/re-registration do not. Dead cycle is frozen; ordinary same-Presence Revive retains phase. Leave ends it; new deployment starts one fresh ON. Exact qualifying direct/declared-child outcome includes the Ultimate arrows, excludes unrelated lineage peers. No implicit immediate deployment Ultimate/extra SSI opportunity. LifeSerial remains ordinary. Cleanup/ref initialization/duplicate delivery cannot invent a second22% instance.
+
+---
+
+## M-067 — Seeded Distinct Real Children Share One Damage Commit
+
+**Status:** `MUST_PASS`
+**Fixture:** standalone Skill1 paysAE20, selects up to3 distinct current legal enemies including possible Leader, locks and captures ATK/WIL once. Ultimate locks Leader plus up to3 distinct non-Leaders; common ATK100/WIL100. Three selected non-Leaders A/B/C; A Shield50/HP100, B HP1000, C invalidates after lock; Leader HP1000. No mitigation. Permute child/request/Entity/list order and pause/save before preparation/common commit/lifecycle/completion.
+
+**Expected:** standalone source capture is after AE20/selection, shared by all real Basic children. Ultimate creates one real Skill1 child, nested non-Natural Basic per selected Entity and one immediate Skill2 child, explicitly waiving authored child Costs and charge. Root RES-009 group owns all four Damage nodes; nested groups do not commit separately. Each Basic one hit/two components totals200; Leader hit totals600. A ActualHP100/Shield50/Overkill50, B ActualHP200, C DROP_LOCAL, Leader ActualHP600: exact qualifying P900, own ON requestedHeal198. Whole group uses shared calculation state, one common commit/mandatory lifecycle; child receipts/identities remain distinct and parent projection explicitly reads them. No participant waits for its ACTION_COMPLETED to permit its own Damage commit. Root outcome can seal before later Lifesteal/MaxHP nodes without ADEC/completion cycle.
+
+Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects all; empty pool creates no phantom child arrows, terminal empty branch; missing/invalid locked Leader skips locally. No RNG redraw/retarget after invalidation. Participant Action/Effect/RNG-domain bindings are frozen before preparation; permutation cannot swap Hit Admission draws between targets. No source resnapshot between arrows, hidden recipient priority, Follow-up class/SSI/child Natural regen or ordinary Reaction window inside the batch. Resume publishes each commit/receipt/completion once, preserving the original draw/locks. Parent Cost has no guessed refund on local invalidity.
+
+---
+
+## M-068 — Pending Release Occupies the Next Performed Natural Action
+
+**Status:** `MUST_PASS`
+**Fixture:** charge admits as Natural Skill2 with AE40; change source ATK/WIL afterward, fill Rage, then CC-lost opportunity, then actual Natural opportunity. Variants: missing/lifecycle-invalid enemy Leader, source DEATH_CONFIRMED/LEAVE_FIELD before release, and Ultimate immediate child Skill2.
+
+**Expected:** pending survives CC, but dies/leaves with source. Explicit release-only form wins before Mode default full-Rage Ultimate, staying in the same SSI-granted Natural Action. Release uses current start ATK/WIL and300% each typed component, no second AE40. Missing Leader still admits the local release form and terminally consumes pending, skips Damage/no retarget; it cannot deadlock on a failed read-only target probe. Action is actually performed even with skipped Damage, so eligible cycle/duration clocks advance. Ultimate child bypasses charge/pending entirely and uses parent snapshot; it creates no additional Natural opportunity. Read-only probes pay/consume/mutate nothing; resume cannot release/pay/consume twice.
+
+---
+
+## M-069 — Delayed Live Stat Contribution and Atomic Three-Cost Admission
+
+**Status:** `MUST_PASS`
+**Fixture:** Skill3 Natural-only, MaxHP1000, HP150, AE25/Rage10. Required HP40. Variants HP149, missing AE/Rage, CC-lost next opportunity, foreign live stat change, same-source recast while pending/active, source death/leave and later Revive. An unrelated Shield/stat contribution has an explicitly retaining lifecycle profile.
+
+**Expected:** inclusive15% prerequisite admits150, rejects149 before debit; full atomic25AE/10Rage/HP40 leavesHP110 and creates immediate Shield100. Missing any required Cost debits none/creates nothing. No HP Loss/Damage/MaxHP debit. Fresh bonus absent from activation; next actual Natural start applies ATK baseline excluding own family×1.30/WIL×1.10 for its two actual completions, then expires. CC neither starts nor decrements. Foreign stat change re-evaluates baseline, not frozen flat bonus/self recursion. Recast replaces/refreshes pending-or-active family to fresh2, and creates another independent Shield; old clock work cannot decrement the new pending instance at activation completion. DEATH_CONFIRMED/LEAVE_FIELD clears these pending/active/Shield refs only, preserving unrelated contributions under their own retaining profile/cause; Revive restores no leftovers.
+
+---
+
+## M-070 — One Additive Lifesteal Settlement before Compound MaxHP Penalty
+
+**Status:** `MUST_PASS`
+**Fixture:** Natural-start passive ON; exact terminal ActualHP basis500, unrelated same-root Damage999/Shield/Overkill excluded. Other coefficient0.08 qualifies at settlement, another expired provider does not; a separately declared Snapshot provider retains its own prior binding. For the simple0.22+0.08 branch, CurrentHP950/MaxHP1000. Also OFF branch, zero basis, duplicate rule delivery, Heal-block/conversion/zero Effective Heal and repeated Ultimates.
+
+**Expected:** locked passive contributes0.22 regardless of later phase change. Foreign providers use settlement state unless explicit earlier binding; actual distinct sources add, technical re-delivery does not duplicate. C0.30 yields requestedHeal150 **once**, normal missingHP50 yields EffectiveHeal50/Overheal100 at MaxHP1000; discard or explicit external consumer. Only afterward ×0.96 yields MaxHP960 and CurrentHP clamps1000→960, no Damage/Heal from clamp. Repeated mutation factors give1000→960→921.6 before applicable numeric normalization; no BaseStat destruction or foreign contribution removal. Heal denial/conversion/EffectiveHeal0 reaches terminal and still permits penalty. OFF base0 can receive foreign coefficient; total coefficient0 produces no Lifesteal Heal. Positive coefficient/basis0 uses ordinary zero-Heal semantics. Independent SSR Warrior Heal instances and their Overheal conversions remain independent, not merged into this profile. No per-arrow/provider Heal or multiplication of coefficients.
+
+---
+
+## M-071 — Origin-aware Rage Window without Resource Undo
+
+**Status:** `MUST_PASS`
+**Fixture:** completed Natural or non-Natural root Ultimate arms suppression (explicit ACT-033 completed-source profile); CC-lost opportunity, then actual Natural Action with positive Rage grants classified ACTION_GENERATED, EXPLICIT_EXTERNAL, SYSTEM_NON_ACTION. A Mode hook issues an Action-generated grant; an Action-triggered external grant has an explicit external law. Include AE gain, Rage Cost/drain, non-Natural children, another Action's grant, completion re-delivery, next Action being another Ultimate and source death/leave.
+
+**Expected:** origin Ultimate/CC/children do not consume the new window. Completed non-Natural Ultimate also registers finite arming under the same-instance handoff gate before the next Natural start, without becoming Natural/delaying completed source or parent. Default NATURAL_ONLY observers continue rejecting non-Natural sources. Next actual Natural binds the scope; positive Action-generated Rage attributed to that bound Action is rejected before mutation with origin/Action-bearing zero-committed receipt, even from a System issuer. Explicit external/System-non-Action grants remain subject to their own ordinary law, not blocked merely by root lineage. AE/class Ranger regen and Costs/drains remain unchanged. Completion closes the old bound window once; a fresh post-completion window from a repeated Ultimate survives for the following actual Action. Death/leave clears suppression, Revive restores none. Save/resume does not add then subtract Rage, reopen consumed window or duplicate post-action arming. Capture the exact performed Natural Action prohibition at start: grants with validated ACTION_GENERATED attribution to it remain rejected after completion/window closure, including delayed Mode settlement. A different Action's ACTION_GENERATED grant arriving at the same time does not match this capture. Root equality is insufficient. Keep captured rule/Action evidence until all linked obligations/dedup are terminal; source State cleanup cannot erase old evidence or suppress future unrelated Actions. No micro-timing/Event-order exemption.
+
+---
+
+## M-072 — Revive Projection Resets Only Marked MaxHP Records Atomically
+
+**Status:** `MUST_PASS`
+**Fixture:** Anicca base MaxHP1000 has two×0.96 Ultimate penalties and an unrelated multiplicative×1.10 MaxHP contribution (all three commute in this fixture): current1013.76. It dies without leaving Field; Skill2 pending/Skill3 pending-active/Shield/Rage suppression existed. A legal Revive reads30% CurrentMaxHP. Variants failed materialization, stale contribution read, explicit death-Snapshot-MaxHP Revive formula, ordinary Field leave and save/resume at staging/commit.
+
+**Expected:** death clears authored pending/temp Skill2/Skill3/Shield/suppression; passive freezes and penalties remain until Revive/leave. Revive transaction stages only BEFORE_HP_RESTORE-marked penalty removal; projected MaxHP preserves the foreign contribution, reset itself PRESERVE_ABSOLUTE_THEN_CLAMP/no Heal.30% CurrentMaxHP reads restored1100 and assigns330, rather than304.128 from reduced1013.76. The explicit death-Snapshot variant still reads1013.76 and assigns304.128 while current capacity is restored1100. Successful transaction atomically removes records/restores MaxHP/assigns ReviveHP/materializes, preserving ordinary lifeSerial/position/waiting-race law. Failure/staleness commits none and penalties remain exactly as before; no independent reset. Explicit immutable Snapshot formula keeps that input. Successful same-Presence Revive preserves passive phase, restores no temporary buffs/Shield/suppression/pending release. Field leave removes penalties immediately, not at a later redeploy. Replay cannot apply reset/materialization twice or generate Heal/Overheal on capacity reset/ReviveHP.
+
+---
+
+## M-073 — Reject Unsupported Child, Coefficient, Grant or Revive Profiles
+
+**Status:** `MUST_REJECT`
+**Input:** unbounded/all-descendant batch paths; child double commit/foreign membership; waiting for child completion before its Damage commit; mutative preparation/foreign required Cost without explicit law; hidden sequential/priority/source resnapshot; unsealed/foreign Damage basis; multiple independent Heal producers claiming a settlement with no owner; ADD to arbitrary amount/negative-nonfinite coefficient/custom phase; treating equal numeric bases as identical; outcome consumer waiting for root completion it blocks; Resource origin/Action attribution inferred from System issuer/same root/time or caller exemption; erasing captured scope before delayed Action-linked grant; missing observable positive-grant origin/SET-transfer mapping; non-Natural post-action observation without explicit source policy/uncompleted or foreign-instance source; reset after ReviveHP calculation or independently before failing materialization; blanket reset of unmarked records/foreign Snapshot input; replay reopening terminal work.
+
+**Expected:** responsible Schema/Contract owner rejects unsupported normalized execution before affected partial mutations/receipts. Legal bounded opt-in profiles, ordinary independent child Actions/Heals/ungated Resource operations/unmarked MaxHP Revives remain accepted. Numeric/Authority/external composition gaps remain explicit, never hidden list order, invented Tag/Primitive or Character branch.
+
+---
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -3949,6 +4025,15 @@ When executable Kernel tests exist, at minimum create Golden Traces for:
 39. `M-063` semantic type transform → explicit mitigation-stat lookup/Penetration → ordinary later Damage phases; target RES snapshot contribution/replace/refresh and source-completion clock.
 40. `M-064` pre-hit Basic snapshot/gate → local required Cost/use → source lifecycle → retained hit/Execute; exact Skill3 child → sealed own-result aggregate → root Heal20%.
 41. `M-065` unsupported allocation/override/pre-Cost capture/local continuation rejected without hidden defaults or partial state.
+
+42. `M-066` deployment phase → immutable Natural-start binding → actual completion/CC/dead freeze → leave/new Presence reset.
+43. `M-067` seeded distinct locks/common capture → real child preparation/delegated owner → common Damage commit → own receipts/lifecycle → parent outcome without completion deadlock.
+44. `M-068` charge payment/pending → CC retention → explicit next-Natural form → release snapshot/terminal local skip.
+45. `M-069` full three-Cost admission → immediate Shield/fresh pending live stat family → next actual starts/two completions/recast/cleanup.
+46. `M-070` exact terminal Damage basis → one additive coefficient fold/Heal → compound MaxHP/reconcile despite failed Heal.
+47. `M-071` origin-aware admission/captured window → rejected or ordinary grant receipt → completion/renewal/lifecycle cleanup without Resource undo.
+48. `M-072` marked records → projected restored MaxHP/ReviveHP → one joined materialization commit or complete rollback.
+49. `M-073` malformed/unsupported opt-in profiles reject before affected mutation, preserving default owners/profiles.
 
 ---
 
