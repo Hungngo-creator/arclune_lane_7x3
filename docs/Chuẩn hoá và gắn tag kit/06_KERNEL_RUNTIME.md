@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-02-G.5
+**Version:** 2026-10-03-G.6
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -13,6 +13,7 @@
 **Revision G.3:** adds checkpoint-scoped committed-result views, Shield addition receipts/source-family caps and explicit Slot tie resolution through existing owners. No Character-specific runtime, Functional Tag, Primitive or generic priority is introduced.
 **Revision G.4:** executes typed relation context, corrected Shield owner/zero-result law, durable replay identity, required post-completion settlement and bounded Final Damage amplification through existing owners. No Character-specific runtime, Functional Tag, Primitive or generic priority is introduced.
 **Revision G.5:** lowers bounded HP-payment profiles and immutable post-payment HP into existing Cost/State/Result transactions; handles explicit admitted-Action continuation through Cost-caused lifecycle before direct Effects. Existing defaults/distributed barriers are preserved.
+**Revision G.6:** joins explicitly transition-completed prevention to existing Return/State/Lifecycle transactions, with staged survival, completion-owned allowance and failure/replay handling. No Character runtime or global priority.
 
 ---
 
@@ -524,6 +525,8 @@ resolve typed subject and current Combat Instance
 For the current bounded profile, `BATTLEFIELD_ACTIVE → DECK_UNDEPLOYED`, `LEAVE_CURRENT_COMBAT_INSTANCE` and `RETAIN_BATTLE_DECK_MEMBERSHIP` produce: no active presence/occupancy in that instance, returned deployment state, retained battle Deck membership. This is `LEAVE_FIELD` caused by `RETURN_TO_DECK`, not Death, Temporary Absence, Arena transfer or removal/erasure.
 
 No presence exit, destination-state mutation or transition-owned cleanup commits on failed validation. Earlier committed Action Effects remain committed. Downstream nodes requiring successful return must declare dependency/Conditions on the successful transition post-state; runtime never assumes success.
+
+When this Return operand is owned by an opted-in deathPrevention completionTransitionRef, §83 / DTH-007 supplies the enclosing transaction. Reuse these validation/retention/staging operations against that transaction's proposed surviving subject view; do not separately commit Return or release observations before survival/life/allowance completion shares the common barrier. Standalone Return follows the existing path.
 
 ### Retention and terminal causes
 
@@ -3820,6 +3823,18 @@ If prevention succeeds:
 - current loss/damage event does not repeat;
 - no confirmed death observers.
 
+### Explicit transition-completed candidate
+
+For normalized deathPrevention completionTransitionRef, existing Lifecycle Runtime holds the matching death-evaluation context and coordinates P-061 with §10C Return Runtime, State Runtime and Transaction Manager under DTH-007. Key the work by death-evaluation identity + runtime prevention owner/Ability candidate + joined transaction; no Character switch or separate manager.
+
+Resolve/protect `survivalHp`, the available `consumeCounterRef` and authoritative Return inputs/retention decisions. Validate the same-subject/current-instance Return against the proposed alive/survival state. Stage the life/HP outcome, Return deltas/results and selected counter decrement; the referenced operand executes once inside this join, not again as an ordinary independent Effect node. Reject unsupported references, cycles or an allowance discarded by the same retention decisions.
+
+Only common commit success records prevention success and releases coherent post-state observations. Transition/counter/validation failure discards all completion proposals, preserves the latest authoritative HP/use/presence/deployment/cleanup, stores a terminal failed candidate and resumes/revalidates the original evaluation. An unchanged lethal subject remains HP0/use unused; never restore frozen input values over another committed mutation. Do not emit DEATH_PREVENTED, synthesize confirmed death, retry the same candidate at unchanged HP0 or repeat the causing Damage/HP Cost. Earlier committed Leader Heal remains separate. Other candidates/ordinary death follow existing laws, without a newly invented same-window priority.
+
+Existing lifecycle/transaction records retain candidate refs, captured survival/retention/counter inputs, transaction status and terminal outcome through pending observers/replay. Save/resume before commit exposes no staged survival; after success/failure reuses the outcome without repeating use/cleanup/Events. Already-admitted Skill continuation and immutable payment HP stay governed by CST-015/009; the survival assignment cannot rewrite that earlier HP0 receipt.
+
+Publish/store the existing P-061 terminal outcome with this completion's candidate/transaction identity through the existing typed Result/DAG bindings. Only that success releases its authored success-dependent nodes; live Deck/HP state or a different return is insufficient. Retain the outcome and downstream cursor until their work is terminal and preserve terminal identity for the replay horizon, so later Cost mutation cannot be replayed twice.
+
 ---
 
 # 84. DEATH CONFIRMATION
@@ -5366,6 +5381,7 @@ A complete save needs:
 - processed observation / consume-create / terminal settlement identities keyed by observed Action + checkpoint + runtime trigger owner + instantiated candidate/dependency, even after receipts are freed and flags consumed, for the supported replay horizon;
 - ACT-033 required post-action obligation state and its held scheduler handoff, so recovery finishes the same finite settlement before advancing to the next Natural Action.
 - singular HP-policy input/case identity and protected counter updates, immutable post-payment HP receipts, pending Cost-caused lifecycle work and the admitted Action continuation cursor; restore must not debit, consume, process HP_ZERO or replay completed direct Effects twice.
+- transition-completed prevention death-evaluation/candidate/joined-transaction refs, protected survival/Return-retention/allowance inputs and terminal completion identity; restore must never expose or retain staged HP1 after failure, or replay prevention/Return/use/cleanup twice.
 
 Reuse existing Trigger candidate / Transaction Manager idempotence records, not a new manager. Observation identity includes the trigger definition and original committed Event identity; stored candidate/dependency IDs remain stable on redelivery. Check terminal observation identity before allocating another candidate, including previously nonqualifying observations. Rebuilding indexes does not reset processed identities. Release receipt payloads once their consumers finish, independently from deduplication identity retention. After a terminal record's replay horizon is retired, reject delivery from before the retained horizon rather than accept it as a fresh observation. Restore cannot recreate notes, additions, consumed sets or already-terminal settlements.
 

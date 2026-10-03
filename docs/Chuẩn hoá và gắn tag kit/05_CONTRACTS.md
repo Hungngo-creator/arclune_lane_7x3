@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-02-F.6
+**Version:** 2026-10-03-F.7
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -12,6 +12,7 @@
 **Revision F.4:** adds checkpoint-scoped committed-result observation, Shield addition receipts/source-family caps and local explicit Slot ties. Existing Pilot #4 random-tie behavior and proportional Shield pooling remain unchanged.
 **Revision F.5:** corrects typed result observation/zero-addition law; adds ACT-033 required post-completion handoff and DMG-008 bounded final amplification/direct-Action scope. No new Tag/Primitive or global priority.
 **Revision F.6:** adds CST-014 bounded singular HP-payment profiles and CST-015 explicit Cost-caused lifecycle continuation; extends CST-009 with immutable resulting HP at payment commit. Existing default/exact/distributed Costs and prior Pilots remain unchanged.
+**Revision F.7:** adds DTH-007 transition-completed prevention atomicity; repairs the distinct Summon Identity Contract to ENT-015 while preserving Puppet death/ordinary Revive at ENT-010 and every other ID. Both blocks were already present at initial tracked commit 8a9876e; neither is obsolete. No universal legacy ENT-010 alias is valid: migrated Summon references use ENT-015, Puppet references retain ENT-010.
 
 ---
 
@@ -3981,6 +3982,8 @@ If successful:
 - entity returns/remains in a non-dead life state;
 - no confirmed-death observers fire.
 
+An explicitly transition-completed profile follows DTH-007; survival/prevention success cannot commit independently before its required Return completes.
+
 ---
 
 ## DTH-004 — Single Loss Does Not Re-kill
@@ -4021,6 +4024,29 @@ Working proposal:
 > order by canonical stable battlefield resolution order only for post-batch indexing, not for damage calculation.
 
 Exact tie-break should be confirmed before freeze because Luân Hồi waiting depends on death order.
+
+---
+
+## DTH-007 — Transition-completed Death Prevention
+**Status:** `LOCKED EXPLICIT PROFILE`
+
+An opted-in deathPrevention Effect with completionTransitionRef owns one local completion transaction. Current bounded completion is an authored same-subject RETURN_TO_DECK in the current Combat Instance; the existing Return profile remains authoritative. The open HP_ZERO evaluation is held before DEATH_CONFIRMED while this candidate settles, not treated as a new ordinary Reaction window.
+
+Freeze the legal survivalHp/allowance and Return retention decisions in the protected candidate transaction. Validate Return against the proposed surviving post-state; do not publish HP1/alive early just to make deployment validation pass. Stage survival/life state, presence/Position exit, Deck/deployment state, selected State/Shield cleanup and any one-unit consumeCounterRef. Counter owner/lifetime must be explicit and its committed exhausted state must survive that transition.
+
+```text
+all completion validation succeeds
+→ one common commit of survival + prevention success + Return + selected allowance
+→ observers see the coherent alive/Deck/survival-HP post-state
+```
+
+On transition/allowance/protected validation failure: no survival assignment, DEATH_PREVENTED, use consumption, transition or transition-cleanup delta from this completion remains committed. For the unchanged HP_ZERO subject keep HP0; mark this candidate attempt terminal and resume the **same** death evaluation under existing lifecycle/other-candidate laws. A protected-state conflict preserves the latest authoritative state and revalidates that context; never restore stale HP/allowance/presence or undo another commit. Ordinary DEATH_CONFIRMED may follow when evaluation remains lethal. This attempt does not consume the battle allowance, which stays unused for a later qualifying episode in the unchanged fixture, but does not requeue this failed attempt endlessly at the unchanged HP0.
+
+Earlier independently committed Effects are not rolled back; local failed/zero Leader Heal does not become a Return prerequisite. Subsequent Current Deployment Cost modification must require successful completion and follows DEP-006 separately. A later blocked/clamped mutation does not roll back prevention/Return or restore use. No fake confirmed death/Revive, repeated lethal debit, extra Action or lifeSerial change.
+
+The existing P-061 terminal result identifies this candidate/completion instance. Success-dependent downstream work reads that outcome, not live Deck/HP state or another return's success. Retain it until dependent work is terminal; replay uses the same outcome and Effect cursor, not a second successful mutation.
+
+Reuse P-061, the existing Return/Lifecycle/State owners and Transaction Manager. Persist death-evaluation/candidate/transaction/outcome identity for replay; restore cannot expose a partial completion or consume/emit/clean up twice. No generic callback, global prevention priority or automatic cleanup profile is created. Unprofiled prevention and standalone Return semantics remain unchanged.
 
 ---
 
@@ -4812,7 +4838,7 @@ Return does not grant a bonus Natural Action merely because entity reappeared.
 
 # 38. SUMMON / NON-DEATH TERMINATION
 
-## ENT-010 — Summon Identity
+## ENT-015 — Summon Identity
 **Status:** `LOCKED_DEFAULT`
 
 Summons:

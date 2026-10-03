@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-02-I.5
+**Version:** 2026-10-03-I.6
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.6+, `06_KERNEL_RUNTIME.md` G.5+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.7+, `06_KERNEL_RUNTIME.md` G.6+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -11,6 +11,8 @@
 **Revision I.4:** binds M-040 to Polyhymnia R4's locked simultaneous Damage/Heal groups and separate sequential group commits; adds permutation, sibling-state isolation and explicitly authored invalid-recipient variants using existing RES-002/003 machinery. No global AoE default or executable test result.
 
 **Revision I.5:** adds M-051–M-053 for opted-in singular HP payment, atomic allowance consumption, immutable HP at payment commit, explicit Cost-caused lifecycle continuation and malformed-profile rejection. Prior fixtures and exact/distributed Cost semantics remain intact; declarative obligations only.
+
+**Revision I.6:** adds M-054/M-055 for joined survival/prevention/Return/use completion, local Heal and post-success Cost boundaries, failure/replay/cycle rejection. Prior Cost/Pilot fixtures remain unchanged; no executable game validation.
 
 ---
 
@@ -3380,6 +3382,54 @@ Replay/save at after-payment-before-lifecycle and after-lifecycle-before-direct 
 
 ---
 
+## M-054 — Death Prevention Survival and Return Share One Commit
+
+**ID:** `M-054`
+**Status:** `MUST_PASS`
+**Purpose:** prove Nerovar’s locked Passive success/failure atomicity through existing Lifecycle/Return/State/Transaction owners; do not decide unanswered target/Heal snapshot/retention choices from this synthetic fixture.
+
+**Initial State:** open HP_ZERO evaluation from source HP>0→0; source is battle participant/active Field member with MaxHP1000, retained Deck membership, Passive remaining-use counter1. Authored prevention has survivalHp1, local same-subject Return operand and consumeCounterRef. This explicit fixture retains BATTLE_SCOPED SYSTEM_STATE, discards FIELD_PRESENCE_SCOPED contributions, retains unselected items and current HP, with TRANSITION_CLEANUP cause; it supplies those parameters for this transaction test, not as Nerovar’s still-unanswered cleanup default. Leader Heal is a separately committed/skipped earlier branch. Current Deployment Cost6, ordinary floor1, unlocked.
+
+**Input / Expected Resolution:**
+
+- Success: validate against proposed alive/HP1 state; one common commit yields alive/HP1, Deck/undeployed, no old Field presence/occupancy, retained membership, fixture-selected cleanup and counter0. No observer sees HP1 on Field with an uncommitted destination. No DEATH_CONFIRMED, Revive, lifeSerial increment or Heal event from survival. Only after success, ADD_CURRENT−3 commits Cost3.
+- Full-HP or illegal Leader: Heal may commit actualRestore0 or fail/skip locally; otherwise legal completion still succeeds exactly as above. No replacement Leader/ally.
+- Failed Return without intervening external mutation: staged HP1/alive, presence/deployment/cleanup and counter writes do not commit. HP remains0, counter1, original presence/deployment and selected contributions unchanged by this failed completion, no−3. Candidate becomes terminal failed; same HP_ZERO evaluation resumes ordinary eligible prevention/death law, without repeating the causing loss. An independently committed earlier Leader Heal stays committed.
+- Protected-validation/allowance conflict caused by another authoritative mutation: none of this completion’s proposals commit; the other mutation remains authoritative. Revalidate the same death-evaluation context under existing law, without resetting HP/counter/presence/MaxHP to frozen prepare values or silently retrying this failed candidate. In particular, an unrelated already committed Current-Cost change or Leader Heal is not undone. A different return producing live Deck state is not success of this failed completion and cannot authorize its −3 node.
+- Successful Return with pre-existing Current Cost lock6: return/use still succeed, later−3 changes no Cost and does not rollback/refund. Clamp fixture Cost2/floor1 commits1, not a negative value; prior completion remains successful.
+
+Allow an ordinary later redeploy from the success post-state under normal legality/payment. Both battle allowances (Passive and Skill1 safeguard) retain their independent used/unused values; static initialization is not rerun. A failed candidate does not spin at unchanged HP0; if ordinary Revive later produces a genuinely new qualifying HP>0→0 episode while this Passive remains unused, that new episode is eligible under its own context.
+
+Save/restore immediately after the Leader branch, during prepared-but-uncommitted completion, after common success and after failure. Preserve death-evaluation/candidate/joined-transaction/outcome identity; no staged HP leaks, double counter/Return/cleanup, repeated prior Heal, post-success Cost mutation or duplicate prevention/death Events. With Skill1 H_postCost0 already committed, successHP1 or failure/death still leaves that receipt0 and resumes the same admitted meteor under CST-015 after mandatory lifecycle.
+
+**Expected Trace / State:** original HP_ZERO cause → local Heal receipt/status → completion prepare → one success or terminal-failure outcome → success-only Current Cost node or resumed death evaluation. Immutable transition cleanup cause is not break/expiry/Cleanse. All observers see the authoritative common post-state.
+
+**Forbidden Outcomes:** HP1 remains after failed Return; provisional alive published to satisfy Return validation; early use consumption on HP_ZERO/Heal/Trigger admission; failed Return applies−3; counter silently discarded/reset by cleanup; positive Leader Heal is required for success; post-success Cost lock cancels survival; same failed candidate retries indefinitely; abort restores stale frozen state over another commit; paymentHP0 overwritten by survivalHP1.
+
+**Layers Under Test:** 04 §77.1/92, DTH-003/007, DEP-006/007/008 reuse, P-061, existing Lifecycle/Return/State/Transaction/Result owners, G.6 §§10C/83/168; M-051/M-052 remain authoritative Cost/continuation obligations.
+
+---
+
+## M-055 — Prevention Completion References and Atomicity Fail Closed
+
+**ID:** `M-055`
+**Status:** `MUST_REJECT`
+**Purpose:** reject malformed or ambiguous joined completion without inventing a lifecycle fallback or generic callback system.
+
+**Initial State:** valid M-054 completion profile. Each negative fixture changes only the stated defect.
+
+**Input:** unavailable/non-Return/foreign-subject/foreign-instance/cross-settlement completionTransitionRef; same Return scheduled independently as well as lowered inside the join; arbitrary success callback/predicate; zero/negative/nonfinite or above-MaxHP survival value; missing/illegal/undeclared-lifetime counter; unavailable selected counter or cleanup that removes its committed use record; contradictory eager Trigger consumption of that same consume-on-completion allowance; dependency/cycle waiting on its own post-commit Event; foreign/unavailable/uncommitted P-061 outcome or live Deck/HP substituted for this completion’s success binding; split survival/Return/use commits or DEATH_PREVENTED publication before required completion.
+
+**Expected Resolution:** Normalizer rejects unsupported shape/reference/law; protected runtime validation fails before completion commit for changed state/availability. No HP1, allowance/cleanup/transition delta or success event from a failed completion. Counter unavailable means eligibility/local candidate failure under ordinary law, not a new Character-specific rollback. No universal cleanup/default priority or silent retry.
+
+**Expected Trace / State:** diagnostic names the field/scope/cycle/common-barrier violation. A valid unrelated standalone Return or another already declared prevention profile remains accepted with its existing law.
+
+**Forbidden Outcomes:** “first matching transition” chosen by list/Entity/Slot order; one return succeeds then a second emits failure; staged HP1 escapes a failure; old HP0 payment receipt mutated; arbitrary completion callback is accepted as typed composition; all future prevention is forced to Return.
+
+**Layers Under Test:** 04 §51/52/77.1/92, DTH-007, DEP-007 and existing Normalizer/Lifecycle/Return/Transaction owners.
+
+---
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -3750,6 +3800,7 @@ When executable Kernel tests exist, at minimum create Golden Traces for:
 29. `M-048` / `M-049` required HP exchange → immutable action-local bonus → common-snapshot simultaneous conditional TRUE Damage → ordinary Shield.
 30. `M-050` bounded Final Damage phase/direct graph and foreign-binding rejection.
 31. `M-051` / `M-052` / `M-053` bounded HP cases → atomic required Cost/allowance → immutable HP at payment → mandatory lifecycle → same admitted Action continuation, with malformed inputs rejected.
+32. `M-054` / `M-055` original HP_ZERO → separate Leader branch → joined survival/prevention/Return/use success or atomic failure → separate successful-return Cost mutation or resumed death evaluation.
 
 ---
 
