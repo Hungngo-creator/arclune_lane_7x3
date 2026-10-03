@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-03-F.9
+**Version:** 2026-10-03-F.10
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -14,6 +14,8 @@
 **Revision F.6:** adds CST-014 bounded singular HP-payment profiles and CST-015 explicit Cost-caused lifecycle continuation; extends CST-009 with immutable resulting HP at payment commit. Existing default/exact/distributed Costs and prior Pilots remain unchanged.
 **Revision F.7:** adds DTH-007 transition-completed prevention atomicity; repairs the distinct Summon Identity Contract to ENT-015 while preserving Puppet death/ordinary Revive at ENT-010 and every other ID. Both blocks were already present at initial tracked commit 8a9876e; neither is obsolete. No universal legacy ENT-010 alias is valid: migrated Summon references use ENT-015, Puppet references retain ENT-010.
 **Revision F.8:** adds opt-in DTH-008 direct Execute, RES-007 own-family baseline, RES-008 shared-recipient proportional Damage, SNP-006 pre-Cost capture, DMG-009 mitigation-stat override and local CostGroup scope of CST-015 continuation. Ordinary pipelines/profiles remain unchanged.
+
+**Revision F.10:** adds DMG-034 opt-in reflected scalar Damage: committed source-local received basis, ARM/RES bypass then matching Final DR/ordinary Shield, separate reflected receipt/lineage and existing source grouping. DMG-030–033 defaults and ordinary component profiles remain intact.
 
 ---
 
@@ -3606,6 +3608,35 @@ Reflected Damage does not grant ordinary Lifesteal by default.
 **Status:** `LOCKED_DEFAULT`
 
 Reflected Damage does not automatically qualify as a normal attack/action for Counter triggers unless TriggerSpec explicitly accepts reflected damage lineage.
+
+---
+
+## DMG-034 — Opt-in Reflected Scalar Packet and Source-local Basis
+**Status:** `LOCKED`
+
+04§16.5 opts into the existing REFLECTED_DAMAGE semantic. Omitted packetKind preserves ordinary component behavior. A reflected packet has one finite nonnegative requested scalar: coefficient × one sealed committed received-ActualHP projection for an explicit receiving reflector and immediate Damage Source. Its retained basis proves the reached outcome checkpoint and exact receipt/Effect membership; explicit declared children may participate, shared root/credit alone may not. DMG-010/011 exclude Shield absorption/Overkill/non-Damage removal. Ordinary and reflected committed receipts retain the built packet's immediate damageSourceRef and packetKind, independently of later live emitter state. P-043 groups `BY_DAMAGE_SOURCE` using that immutable packet Damage Source, separately from Damage Attribution/Effect Source/Action Actor. Different sources remain separate; same-source receipts aggregate without hit/list duplication.
+
+The currently supported **explicit** mitigationProfile is BYPASS_ARM_RES_THEN_FINAL_REDUCTION:
+
+```text
+coefficient × committed received ActualHP basis
+→ bypass ARM/RES and their Penetration/mitigation lookup
+→ existing matching FINAL_DAMAGE_REDUCTION, once on the scalar
+→ ordinary eligible Shield
+→ HP-bound Actual HP Damage / Overkill
+→ commit new reflected Damage result
+→ mandatory lifecycle under the authored group boundary
+```
+
+This does not make reflection TRUE, PHYSICAL or WILL and introduces no fourth ordinary component. Do not run component-type transforms/mitigation-stat overrides, copy the original packet's mitigation/secondary Effects, infer Shield Piercing/Hit Admission bypass or ordinary final amplification. Reflect remains Damage for existing applicable admission/Authority rules. Actual Authority conflicts follow AUT-*; no tier is inferred from reflection.
+
+Existing RES-006 evaluates matching reduction rules with packetKind available. An explicit ordinary component scope remains component-only. An unqualified applicable DAMAGE reduction can cover the scalar, or author a reflected packet-kind scope without component filters. TRUE still bypasses Final DR. Reflected-only incompatible component/phase scope is rejected; this profile adds no new reduction operation or generic ordering.
+
+The new packet targets the locked immediate Source from its basis. Invalid/non-damageable Source skips under explicit local policy without retargeting to an owner/credited Entity. Source-group membership and simultaneous/sequential policy belong to existing Target/Resolution data; this Contract supplies no hidden source priority, global batch default or order between unrelated Trigger candidates. Freeze source-group Effect/packet identities and any applicable RNG domains from observed outcome + runtime activation/owner + normalized origin Effect + immediate Source before technical enumeration; list/Event order cannot allocate a different gameplay draw. Semantic identity keys are not source priority.
+
+Preserve a distinct Effect/packet/result identity, reflection semantic, generating rule/State activation and causal received-result references. Actionless reflection needs no artificial Action; causal root lineage does not grant BASIC_ATTACK/Natural/Counter identity or direct membership in the triggering outcome. DMG-030–033 retain their ordinary no-reverse-reflect/no-Lifesteal/no-Counter defaults. Default reflection cannot consume an already-reflected basis; a future exception needs an explicit separate governing Contract.
+
+Commit Shield/HP and immutable DamageResult through existing P-040/041/042 and Transaction/Result owners. Retain causal basis/immediate Source/packet kind and reflected receipts while dependent aggregate/terminal work references them. A committed receipt is not lost or recomputed because its Buff/source/recipient later becomes invalid; ordinary target validity controls **new** settlement, not historical evidence. Save/load/replay reuses terminal Effect/transaction identity; no duplicate packet, accumulator credit, terminal Heal or fake Action is permitted. Reject unavailable/unsealed/wrong-source basis, negative/nonfinite coefficient, foreign/ambiguous target binding, ordinary-component co-authoring and unsupported policies before affected mutations. Other reflected profiles remain REQUIRED_EXPLICIT, not a silent global mitigation default.
 
 ---
 

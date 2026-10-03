@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-03-E.7
+**Version:** 2026-10-03-E.8
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -14,6 +14,8 @@
 **Revision E.6:** adds explicit DIRECT_EXECUTE confirmation, an own-excluding StatModifier baseline, pre-Cost source snapshots, shared-recipient proportional Damage allocation bounded mitigation-stat overrides and local CostGroup continuation through existing owners. Ordinary HP_ZERO/prevention, joined Return and other stat baselines remain unchanged; no new Tag/Primitive.
 
 ---
+
+**Revision E.8:** adds one opt-in reflected scalar packet profile under DMG-034, explicit packet-kind reduction scope and retained immediate-Damage-Source result grouping through existing owners. No fourth ordinary component type, Tag, Primitive or new lifecycle barrier.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -1371,6 +1373,7 @@ Canonical distinction:
 Action lineage
 ≠ Effect provenance
 ≠ Damage Attribution
+Damage execution/result queries also expose typed packetKind and immutable immediate damageSourceRef under §16.5/DMG-034, separately from effectSource/Damage Attribution. Non-Damage contexts do not invent these fields. Ordinary packets keep their component types; reflected kind is not an Action identity or Tag.
 These queries expose existing execution identity/provenance.
 They do not create a second Action-lineage subsystem.
 
@@ -2438,12 +2441,12 @@ damage:
 
 ## 16.1 Component type
 
-Canonical:
+Canonical ordinary component types:
 - PHYSICAL
 - WILL
 - TRUE
 
-Mixed Damage is multiple components.
+Mixed Damage is multiple components. The opt-in reflected scalar packet in §16.5 is a separate packet semantic, not a fourth ordinary component or mixed profile.
 
 No required Functional Tag:
 `MIXED_DAMAGE`.
@@ -2501,6 +2504,28 @@ Later Heal can reference:
 `ACTUAL_HP_DAMAGE(SKILL1_DAMAGE_RESULT)`.
 
 This avoids custom code.
+
+---
+
+## 16.5 Opt-in reflected scalar packet
+
+```yaml
+damage:
+  packetKind: REFLECTED_DAMAGE
+  reflected:
+    basisResultRef: <sealed committed received-ActualHP projection for one recipient/one immediate Damage Source>
+    coefficient: <pure finite nonnegative scalar>
+    mitigationProfile: BYPASS_ARM_RES_THEN_FINAL_REDUCTION
+  resultBinding: <ordinary typed DamageResult binding>
+```
+
+Under DMG-034, this form replaces ordinary `profile.components`/profile-copy/aggregation amount authoring. Omitted packetKind keeps the ordinary component path. Never co-author a reflected scalar packet with PHYSICAL/WILL/TRUE components, Penetration, component transform/mitigation-stat override or an incompatible profile. The only currently supported reflected mitigation profile bypasses ARM/RES, applies qualifying existing FINAL_DAMAGE_REDUCTION once to the scalar, then ordinary Shield/HP/Overkill. No component Tags, TRUE relabel, Shield bypass or final amplification is inferred.
+
+The retained DamageAggregateRef proves an explicit reached Damage-outcome checkpoint, exact committed receipt/Effect membership, receiving reflector and **one immediate Damage Source**. Pure coefficient multiplication is the amount; requested/Shield/Overkill/live-HP reconstruction are not substitutes. Existing target bindings identify that exact Source; invalid source follows the authored local skip/no-retarget policy, not an owner/Attribution fallback. Damage Source and attribution stay separate. A trigger may create one packet per declared source group; its target/batch/failure policy remains explicit Resolution data, not a global reflection priority.
+
+Create a new reflected Effect/packet/result with its own provenance and causal basis references. It may be Actionless; no synthetic Basic/Counter/Reaction/Natural Action is required. DMG-030–033 guard recursive reflect, ordinary Lifesteal and Counter by packet semantic/provenance. Merely inheriting root lineage cannot admit this standalone Effect into the triggering Action's direct/declared outcome. Default ordinary recursion exclusion rejects a reflected basis unless another explicit Contract permits it.
+
+Use DAMAGE only; REFLECTED_DAMAGE is existing semantic metadata, not a newly registered Tag. Normalizer lowers to P-040/041/042 plus existing P-043 result grouping and Contract inputs, with stable Effect/candidate/State-instance/basis refs. Unavailable/unsealed/wrong-source results, nonfinite/negative coefficient, unsupported reflected policy or fake component/profile mapping are rejected rather than guessed.
 
 ---
 
@@ -2833,6 +2858,8 @@ NON_TRUE_DAMAGE
 is required.
 
 `effectScope.directActionRef`, when authored, resolves an existing Action and requires the resolving Effect to belong to that Action's own direct graph under TRG-013. For an Action-instance-owned rule use `{anchor: CURRENT_ACTION, relation: SELF}`. Shared rootActionId or Attribution alone does not qualify a child/standalone Effect. Referenced Cost/Snapshot/results resolve in that same declared Action's existing binding namespace; reject unavailable/foreign bindings. This scope is a read-only predicate at resolution, not an ACTION_RESULT_ANY read of an unfinished Action.
+
+A DAMAGE scope may additionally select `damagePacketKinds` with values ORDINARY and/or REFLECTED_DAMAGE. This is semantic/query scope, not a Tag or component enum. Omission adds no packet-kind restriction; all existing explicitly authored component constraints retain their meaning. A reflected-only scope has no `damageComponents`: it selects the scalar packet at FINAL_DAMAGE_REDUCTION. PHYSICAL/WILL component-scoped reductions do not silently expand to reflection; an otherwise unqualified DAMAGE reduction may match it under its existing source/recipient/Condition law. A component filter cannot match a scalar reflected packet. Reject a reflected-only scope combined with ordinary components or an unsupported amount phase; no default TRUE reduction or reflected final multiplier is added.
 
 ## Structured conditions
 
@@ -4594,6 +4621,8 @@ Allowed metrics:
 - total resolved damage;
 - per-target result.
 
+Ordinary and reflected Damage bindings used by source-group consumers retain immutable immediate damageSourceRef and packetKind (ORDINARY by default); DMG-034 additionally retains exact causal basis refs with ordinary ActualHP/Shield/Overkill metrics. A grouped basis/receipt remains immutable through dependent terminal readers; later source death/removal does not rewrite its committed evidence. Source validity is checked for the new reflected recipient, not retroactively for historical incoming results.
+
 ---
 
 ## 35.2 Target result references
@@ -5222,6 +5251,8 @@ None of these plans implies a new Primitive by itself.
 
 The existing plans also preserve RES-009 parent-owned finite child-Damage participation, HEL-005 exact Damage basis/local coefficient settlement and typed ADD phase, CST-016 positive-grant origin/scoped State admission, and REV-007 marked MaxHP removal joined to Revive. Lower them through the existing Action/Effect/modifier/State/Transaction/result plans; postActionSettlement preserves its explicit completed-source policy under ACT-033; no new Primitive or top-level runtime subsystem. Preserve explicit family/Action/Effect/participant/contribution refs, failure policy, acyclic dependency and terminal commit identity.
 
+The existing effectGraph/primitiveRequests also preserve the opt-in reflected scalar profile, exact sealed source-group basis, packet-kind reduction applicability and distinct Effect/result identity under DMG-034. Existing target/resolution plans preserve its authored lock/invalid/batch policy. No reflected Action or new runtime plan/Primitive is synthesized.
+
 ## 51.1 Why IR exists
 
 IR isolates Character content from:
@@ -5745,6 +5776,7 @@ Damage aggregation must support:
 BY_ACTION
 BY_TARGET
 BY_DAMAGE_ATTRIBUTION
+BY_DAMAGE_SOURCE
 BY_COMPONENT
 BY_EFFECT
 BY_CHILD_ACTION
@@ -5755,6 +5787,8 @@ Required for:
 - Ultimate self-heal;
 - threshold logic;
 - damage statistics.
+
+`BY_DAMAGE_SOURCE` groups the immutable immediate Damage Source on the committed packet/result, not credited Damage Attribution, Effect Source, Actor or root. P-043 already accepts declared grouping/filter criteria; this makes the existing canonical Source axis explicit for DMG-034. Combine only the declared result collection/outcome/recipient filters. Equal credited sources cannot collapse distinct immediate sources, and repeated Effects from one immediate source do not create extra source groups. Source grouping grants no target ordering or storage subsystem.
 
 ---
 
@@ -6289,6 +6323,9 @@ At minimum validator must enforce:
 79. A damageDerived Heal requires a sealed exact committed basis and unique local settlement owner; ADD is legal only at DAMAGE_DERIVED_HEAL_COEFFICIENT with finite nonnegative coefficients and no automatic merging of independent Heals.
 80. A matching positive-grant admission scope requires validated grantOrigin/grantActionRef where observable and compatible operation mapping; it cannot be bypassed by System issuer/shared-root inference or late Resource subtraction.
 81. BEFORE_HP_RESTORE MaxHP removal must join the post-death Revive transaction/projected HP read, preserving foreign contributions/Snapshot inputs and all old state on failed Revive.
+
+82. REFLECTED_DAMAGE requires DMG-034 scalar authoring, a reached sealed committed received-ActualHP/source-group basis and a supported explicit mitigation profile; it cannot impersonate ordinary component Damage, inherit the triggering outcome membership or infer target/Authority/Shield bypass.
+83. Reflected-only amount scope selects packet kind without ordinary component filters and only a supported reflected phase. Preserve ordinary component-scoped reduction semantics; unsupported reflected transform/amplification/profile mappings are rejected.
 
 ---
 

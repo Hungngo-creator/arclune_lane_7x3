@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-03-I.8
+**Version:** 2026-10-03-I.9
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.8+, `06_KERNEL_RUNTIME.md` G.7+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.10+, `06_KERNEL_RUNTIME.md` G.9+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -14,6 +14,7 @@
 
 **Revision I.6:** adds M-054/M-055 for joined survival/prevention/Return/use completion, local Heal and post-success Cost boundaries, failure/replay/cycle rejection. Prior Cost/Pilot fixtures remain unchanged; no executable game validation.
 **Revision I.8:** adds M-066–M-073 for Anicca actual-action/presence cycle, finite cross-child Damage batch, charge/release form, delayed stat clock, additive outcome Lifesteal, origin-aware Rage and atomic Revive MaxHP projection; prior fixtures remain unchanged. Documentation only.
+**Revision I.9:** adds M-074–M-081 for Anatta received-Natural snapshots/thresholds, opt-in scalar reflection/source grouping, terminal result/cause clocks, continuous paid AE settlement, one-hit Skills and existing mixed Damage/Rage group/one enhanced child. Preserve all prior cases; Architecture Phase documentation only.
 
 **Revision I.7:** adds M-056–M-065 for completed Nerovar/Phanes/Azoth normalization: retention/window, pre-Cost snapshots, own-baseline, child provenance, direct Execute, shared-recipient allocation, mitigation override and local Cost continuation. Prior-Pilot fixtures remain unchanged; Architecture Phase coverage only.
 
@@ -3642,6 +3643,78 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 **Input:** unbounded/all-descendant batch paths; child double commit/foreign membership; waiting for child completion before its Damage commit; mutative preparation/foreign required Cost without explicit law; hidden sequential/priority/source resnapshot; unsealed/foreign Damage basis; multiple independent Heal producers claiming a settlement with no owner; ADD to arbitrary amount/negative-nonfinite coefficient/custom phase; treating equal numeric bases as identical; outcome consumer waiting for root completion it blocks; Resource origin/Action attribution inferred from System issuer/same root/time or caller exemption; erasing captured scope before delayed Action-linked grant; missing observable positive-grant origin/SET-transfer mapping; non-Natural post-action observation without explicit source policy/uncompleted or foreign-instance source; reset after ReviveHP calculation or independently before failing materialization; blanket reset of unmarked records/foreign Snapshot input; replay reopening terminal work.
 
 **Expected:** responsible Schema/Contract owner rejects unsupported normalized execution before affected partial mutations/receipts. Legal bounded opt-in profiles, ordinary independent child Actions/Heals/ungated Resource operations/unmarked MaxHP Revives remain accepted. Numeric/Authority/external composition gaps remain explicit, never hidden list order, invented Tag/Primitive or Character branch.
+
+---
+
+## M-074 — Incoming Natural Outcome, Start MaxHP and Non-retroactive Reflect
+
+**Status:** `MUST_PASS`
+**Fixture:** READY Anatta MaxHP1000 captured at enemy Natural start; legal direct multihit/explicit child receipts to Anatta, plus unrelated same-root DoT/Mark/Reaction/Counter/reflected/Passive Damage999, Shield absorption and Overkill. MaxHP later changes to2000. Consider qualifying ActualHP D180 /185 /250 /260, completed non-Natural source, duplicate child/root observation and death/leave after receipt.
+
+**Expected:** one immutable received outcome per observed enemy Natural Action/receiver; denominator stays1000, never trigger-time2000 or nominal Damage. Direct declared children aggregate, unrelated same-root receipts do not. D180 cannot trigger S1; D250 cannot grant Reflect, although S1 may pay/gain21AE. D260 can grant ACTIVE_REFLECT only **after incoming Natural completion**/mandatory lifecycle and current owner validity, before next handoff via ACT-033. The triggering Action reflects nothing retroactively. Non-Natural/child completion cannot duplicate the root package/activation. Missing/invalid owner skips activation; historical Damage evidence remains immutable. Active/cooldown events neither stack nor refresh. Capture/delivery/replay cannot create another snapshot or activation for that same observation.
+
+---
+
+## M-075 — Reflected Scalar Reduction and Separate Damage Identity
+
+**Status:** `MUST_PASS`
+**Fixture:** sealed received-ActualHP basis200, coefficient0.35, valid locked immediate Source; target has very high ARM/RES, applicable unqualified or reflected-kind Final DR20%, ordinary Shield10 and HP100. Also an explicitly PHYSICAL/WILL-only reduction, blocked Damage admission, zero basis, invalid source, same-root attribution and reflected/normal-counter/Lifesteal observers.
+
+**Expected:** requested reflected70; bypass ARM/RES, matching Final DR yields56, Shield absorbs10, committed reflected ActualHP46/Overkill0/HP54. A component-only reduction does not gain reflected scope. Packet/result kind remains REFLECTED_DAMAGE, with distinct Effect/receipt and causal received refs; it has no PHYSICAL/WILL/TRUE component, Penetration or inferred Shield bypass. Ordinary applicable admission/Authority remains; rejection/invalid source commits no reflected HP/Shield and cannot retarget to credited owner. Zero received basis adds no positive accumulated ActualHP. No reverse reflection/automatic Lifesteal/Counter or synthetic Action/SSI/class regen. Parent/root credit equality cannot add this standalone Effect to the original Natural outcome. Re-delivery uses the original terminal transaction/result, not another packet or credit.
+
+---
+
+## M-076 — Immediate-source Grouping and Simultaneous Reflected Batch
+
+**Status:** `MUST_PASS`
+**Fixture:** ACTIVE_REFLECT Anatta receives from one declared enemy Natural outcome: Source A receipts60+80 and Source B receipt120, both credited to the same Damage Attribution C. C is a different Entity. A/B are valid damageable sources. A has Final DR20%/Shield9.2/HP40; B has Final DR50%/Shield0/HP5. Source-linked lifecycle can mutate another source's defenses after the group. Permute Effects/sources/Slots/list/Event trace order; include B invalid at reflected-group admission.
+
+**Expected:** source groups remain A140/B120, not C260 or three separate hits. Reflected requests49/42 calculate under one shared reflected-batch phase state, respectively FinalDR39.2/21. Commit A ActualHP30 and B ActualHP5/Overkill16 in one SIMULTANEOUS batch; accumulator35, terminal Heal basis7. B's death/lifecycle runs **after whole reflected commit** and cannot change A's Shield/mitigation/HP result. No technical-source priority or per-source Reaction. Invalid B drops only B packet without replacement or changing A. C is never targeted just because credit matches. Preserve exact receipt/source/activation membership; Shield/Overkill and unrelated Damage credited to Anatta do not augment35.
+
+---
+
+## M-077 — Reflect Termination, Heal-before-Cooldown and Life/Presence Reset
+
+**Status:** `MUST_PASS`
+**Fixture:** fresh active instance with accumulated committed reflection35. Two actually performed Anatta Natural Actions, CC-lost opportunity and non-Natural/Forced/child Actions interleaved. Variants early eligible dispel, death/leave cleanup, Heal blocked/converted/full HP, committed reflection awaiting its finite bookkeeping at removal, repeated removal/expiry, stale expiry after cleanup/reinitialization and same-Presence ordinary Revive preserving lifeSerial.
+
+**Expected:** CC/non-Natural do not decrement. Second actual completion terminates Active → exactly one requestedHeal7, ordinary Heal/Overheal DISCARD → terminal attempt → fresh Cooldown2. That same completion cannot decrement new cooldown; next actual completion leaves1, next leavesREADY. Positive/zero/blocked/converted Heal all close the terminal branch; if conversion/lifecycle invalidates owner, cleanup cannot be undone by a late cooldown callback. Early alive/present removal settles committed credit so far, including receipts committed before removal whose accounting dispatch comes later; finite receipt dependencies finish before basis read, without counting twice or waiting for future Actions. Death/leave cause grants no Heal, clears credit/active/cooldown and cannot masquerade as dispel/natural expiry. New valid life/Presence beginsREADY; old activation/clock/result work cannot resurrect credit or cooldown on the new instance, even with unchanged lifeSerial. Unrelated retaining States/Shields follow their own profiles; no blanket purge.
+
+---
+
+## M-078 — Continuous Excess AE and Independent Required Rage Cost
+
+**Status:** `MUST_PASS`
+**Fixture:** immutable incoming qualifying received ratio18% /18.5% /25% /26%, Anatta Rage19 or20+, existing Mode Side AE pool. Both S1 and READY-Passive qualify at26%. Include no ActualHP despite nominal/Shield Damage, repeated event delivery, completed non-Natural source and capped AE.
+
+**Expected:** strict18% does not activate. At18.5%, required Rage20 succeeds then requestedAE1.5 before ordinary numeric policy;25% gives21;26% gives24. Insufficient Rage spends/gains nothing. AE cap/overflow may reduce committed gain but does not change the already successful required Rage payment into partial payment/refund. S1 is one automatic settlement per observed enemy Natural outcome, no new Action/extra class regen/SSI. S1 and Passive use the same start-MaxHP/ActualHP package independently: Rage19 can prevent S1 while completion still grants Reflect at26%; successful S1 does not alter the historical Passive threshold. No implicit Rage↔AE conversion, integer percentage truncation or global Event/list priority. Invalid owner skips its local settlement; re-delivery cannot repay/regain.
+
+---
+
+## M-079 — Non-Basic Coefficients and Atomic Active Skill Cost
+
+**Status:** `MUST_PASS`
+**Fixture:** Basic and Skill2 against a legal single locked enemy; source ATK100/WIL50, defenses0/Shield0 and enough target HP. Skill2 required SideAE20/ownRage5, missing-AE/missing-Rage variants; locked target invalid after committed Cost, source stat mutation after capture and Basic-only observer.
+
+**Expected:** Basic one hit PHYSICAL100+WILL50, not two hits. Skill2 full atomic Cost commits only when both payable; one hit PHYSICAL200+WILL100 with SKILL identity, not two Basics/no Basic-only trigger. Skill2 captures source stats after successful active Cost/before Damage; later mutation does not re-formula it. Missing required resource pays neither/creates no Damage. Locked invalid target DROP_LOCAL/NO_RETARGET/no refund after committed Cost. No cận-thân VFX Position mutation or invented range priority. Ordinary root Natural/Mode Resource rules apply only to actual performed Actions, never a fabricated settlement.
+
+---
+
+## M-080 — Column Damage/Rage Group and One Enhanced Ultimate Child
+
+**Status:** `MUST_PASS`
+**Fixture:** source Slot4, enemy current occupants at1/4/7; other enemies/Leader outside that line. Source ATK100/WIL50, zero defenses/Shield for simple arithmetic. At Slot1 HP80/Rage7; surviving other recipients have sufficient HP/Rage. Include empty/invalid locked occupant, movement after lock, reflected source lifecycle and both mirrored Sides. Ultimate uses the exact same Skill3 child with explicit zero child AE; root readiness/payment already follows its supplied ordinary profile.
+
+**Expected:** line is1/4/7 on either Side, not hidden Slot target order; source Slots2/5/8 and3/6/9 map their own corresponding lines. One common capture, ordinary Skill3 one simultaneous100/100% Damage hit per recipient; Slot1 ActualHP80/Overkill70 and Rage7→0. P-042/P-033 submit both Effects to **one existing outer direct-group transaction**; mandatory HP_ZERO/death/prevention sees the complete Damage/Rage post-state, never an independently finished Damage-only group or second retargeted drain. No ordinary Reaction between them. Shield/zero ActualHP does not remove a legal recipient's drain. Invalid/empty drops locally; no replacement after movement/death. Explicit admission/failure policy cannot partially commit the transaction. Ultimate makes exactly one real non-Natural SKILL child with same group/Rage−10, enhanced one200/200% hit (300 simple total), no normal100/100% hit first and no AE30/additional child Rage. No child SSI/Natural class regen. After child terminal, parent ownRage+10 plus liveARM/RES×1.20 excluding own family; ordinary root Rage payment is not waived. Root AFTER_DIRECT_EFFECTS_COMPLETE holds ordinary Reactions from the child until parent Rage+10/stat buff have committed; mandatory child lifecycle remains, with no global priority or child-event suppression. Buff starts immediately but origin Ultimate/CC/non-Natural children do not consume fresh1; next actual Natural completion expires. Source-family recast refreshes without1.20², old expiry cannot consume fresh instance and foreign baseline changes re-evaluate. Golden bell/stomp create no Shield/movement/DR; prior Pilot group/lifecycle semantics remain intact.
+
+---
+
+## M-081 — Reject Unsupported Reflected Profile or Ambiguous Source Outcome
+
+**Status:** `MUST_REJECT`
+**Input:** reflected scalar with PHYSICAL/WILL/TRUE components/profile-copy/Penetration/transform/mitigation override; unsealed/nominal/Shield/Overkill/live reconstruction basis; missing receiving/outcome/source identity or wrong credited-source target; default reflect-of-reflect; nonfinite/negative coefficient; unsupported mitigation/final-amplification phase; reflected-only modifier with ordinary component filters; missing observable multi-source batch policy; grouping by attribution/root instead of immediate Source; invented Action/Tag/Authority; result-dependent bookkeeping cycle or stale activation work mutating a newer instance.
+
+**Expected:** responsible Schema/Contract owner rejects before affected HP/Shield/State/Resource mutations. Explicit DMG-034 scalar/reduction/simultaneous source grouping and existing ordinary component profiles remain accepted. Missing future external profile/numeric adaptation stays explicit, not hidden priority or global reflection mitigation/batch default. P-040–045 remain the executable operations; no Character branch, fourth ordinary component or callback system is introduced.
 
 ---
 

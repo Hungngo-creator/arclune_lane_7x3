@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-03-G.8
+**Version:** 2026-10-03-G.9
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -15,6 +15,8 @@
 **Revision G.5:** lowers bounded HP-payment profiles and immutable post-payment HP into existing Cost/State/Result transactions; handles explicit admitted-Action continuation through Cost-caused lifecycle before direct Effects. Existing defaults/distributed barriers are preserved.
 **Revision G.6:** joins explicitly transition-completed prevention to existing Return/State/Lifecycle transactions, with staged survival, completion-owned allowance and failure/replay handling. No Character runtime or global priority.
 **Revision G.7:** lowers direct Execute, own-excluding stat baselines, pre-Cost capture, shared-recipient allocation, mitigation-stat override and local Cost continuation through existing owners; ordinary defaults/profiles remain unchanged.
+
+**Revision G.9:** executes DMG-034 through existing Damage/Contract/Result/Transaction owners, with packet-kind reduction scope and immutable immediate-source/basis references. No Character service, fourth component pipeline, new Primitive or priority/lifecycle-barrier system.
 
 ---
 
@@ -1176,6 +1178,8 @@ attributionContext
 
 `effectSource` preserves canonical Effect Source semantics.
 
+Ordinary and reflected Damage contexts preserve packetKind (ORDINARY by default) and immutable immediate damageSourceRef from the built packet through the existing packet/result/Event provenance view; DMG-034/source-group consumers require that retained axis. They are not substitutes for effectSource or Damage Attribution. Non-Damage contexts leave them absent; causal root equality cannot turn reflected Damage into own-direct outcome membership.
+
 ### Direct-effect ownership query
 
 `DIRECT_EFFECT_GRAPH_OF_SCOPED_ACTION` resolves through the existing normalized Effect graph and immutable Effect context. Preserve enough owning Action/node membership to test that the resolving Effect belongs to the declared scoped Action's own direct graph. A separate child Action or standalone triggered Effect fails that test even if its `rootActionId` matches. A Passive modification of the same direct hit preserves that hit's membership.
@@ -1860,6 +1864,7 @@ Conceptual input:
 resolving Effect execution context
 recipientRef
 Damage component type?
+Damage packet kind?
 resolutionPhase
 authoritative state version
 normalized effectModifierPlan
@@ -1883,6 +1888,8 @@ Effect reaches declared phase
 → existing amount phases: combine MULTIPLY factors and apply once
 → HEL-005 coefficient phase: canonical ADD fold before one requested-Heal calculation
 ```
+
+For DMG-034 reflected scalar Damage at FINAL_DAMAGE_REDUCTION, pass packetKind REFLECTED_DAMAGE without an ordinary component type. Existing source/recipient/Condition/value-query/multiplicative law remains; a component filter cannot match that scalar and reflected-only incompatible phase data is rejected. Omitted packet-kind filter adds no restriction; existing explicit component scopes stay intact. No synthetic TRUE component or new modifier service.
 
 ### Source scope
 
@@ -2962,6 +2969,16 @@ After §45A, existing Damage Runtime invokes Contract Resolver with normalized d
 
 Keep semantic type and source capability/provenance unchanged. One selected stat is used once; conflicting overrides or unsupported Penetration composition fail before affected Damage commit, not by iteration priority. Optional penetration on a matching rule is scoped packet input, not a target-stat write. Existing STATIC registration/retention ownership (§35A/TRG-014) and rule-origin refs apply; no new manager, middleware or Character name branch. Trace selection and phase version for replay; normal reduction/Final Multiplier/Shield stages continue unchanged.
 
+## 45C. OPT-IN REFLECTED SCALAR DAMAGE
+
+Existing Damage Runtime executes DMG-034 when normalized packetKind is REFLECTED_DAMAGE; ordinary component execution is unchanged. Resolve the retained sealed DamageAggregateRef through existing Result Store/P-043, enforcing exact received recipient/outcome/Effect membership and one immutable immediate Damage Source. Multiply its committed ActualHP basis by the pure coefficient. Do not reconstruct it from current HP/Shield or group by attribution.
+
+For BYPASS_ARM_RES_THEN_FINAL_REDUCTION, skip ordinary component assembly, §45A/45B transforms, ARM/RES/Penetration and ordinary component amplification. Call §28A at FINAL_DAMAGE_REDUCTION with this scalar/packet kind, its own source/recipient/Effect context and authoritative group phase state. Then use existing Shield/HP/Overkill calculation and P-042 commit/lifecycle under the declared Resolution policy. Scalar reflection is neither TRUE nor an attack/Action request; its default Shield policy is ordinary eligible absorption, not inherited piercing.
+
+Keep a new Effect/packet/receipt identity and causal incoming basis references. Existing Trigger/Condition provenance exposes packetKind and immutable Damage Source for DMG-030–033 recursion/qualification and source grouping; an Actionless reflected Effect remains outside the original Action's direct graph. Causal root linkage cannot add it to an explicitly declared Natural outcome. Source target revalidation uses its supplied lock/skip policy; no owner/Attribution fallback or source/list priority. Reflection batch policy remains authored data, not a global default. Bind source-group Effect/packet/RNG identity to observed outcome + activation/owner + normalized origin + immediate Source before technical iteration under DMG-034; identity lookup does not create gameplay source priority.
+
+Existing Effect cursor/Transaction/Result lifetimes retain the basis and committed reflected receipt through dependent accumulator/terminal reads. Receipt credit is keyed by activation/Effect/result identity and is not discarded because live Buff lookup later fails. Re-delivery/replay returns the existing terminal result rather than creating another Damage or credit. Unsupported kind/profile/component/phase/basis data fails normalization (malformed IR fails closed), without partial HP/Shield/counter mutation. No Character branch or reflection manager.
+
 # 46. PHYSICAL DAMAGE
 
 For a component whose resulting type after §45A is Physical, the default path is below. An explicit §45B/DMG-009 override substitutes the selected stat and its Penetration/mitigation once, preserving Physical semantics and later stages:
@@ -3192,6 +3209,8 @@ overkill
 ```
 
 Do not reconstruct these afterward from HP difference only.
+
+Every ordinary or reflected Damage receipt consumed by BY_DAMAGE_SOURCE retains the built packet's immutable immediate damageSourceRef and packetKind (ORDINARY by default); never reconstruct either from Attribution/Actor/live emitter state. For DMG-034 additionally retain exact causal sealed basis/Effect/State-activation refs beside the ordinary amount metrics. Existing Result Store/P-043 performs BY_DAMAGE_SOURCE grouping of the explicit projection; it cannot substitute Damage Attribution or Actor/root identity. A reflected result keeps its own Shield/ActualHP/Overkill breakdown and lineage. Hold results while existing dependent aggregate/terminal observers retain refs, including committed evidence from a subsequently removed State; index rebuild/replay does not credit it twice or recalculate it from live totals.
 
 ---
 
