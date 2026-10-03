@@ -1024,7 +1024,27 @@ Tao thích điểm này vì player nhìn thấy cùng một Ultimate nhưng tr�
 
 76) .
 
-77) .
+77) Savitar
+
+Lấy cảm hứng từ Savitar trong series The Flash của DC. Rank, Class, Native Element và Base Deployment Cost chưa chốt; không suy ra chúng từ nguồn cảm hứng.
+
+Passive — Lôi Ảnh Hoán Vị
+Mỗi Field Presence bắt đầu với một charge né. Sau mỗi Natural Action thực sự hoàn tất của Savitar, charge trở lại AVAILABLE; CC-lost opportunity không refresh. Khi enemy Natural Action dùng fixed positional AoE không chọn random và Slot hiện tại nằm trong vùng đó, trước Damage Savitar chọn ngẫu nhiên seeded một Slot đồng minh thực sự trống, hợp lệ rồi di chuyển. Slot có occupant hoặc reservation/lifecycle claim không trống. Không có destination hoặc move fail thì không consume charge, không có tàn ảnh. Successful move consume charge; có thể chạy vào Slot khác vẫn thuộc chính AoE đó và vẫn nhận Damage. Nhiều dodger dùng seeded one-to-one assignment, không ưu tiên Slot/ID/list/Event. Snapshot ATK/WIL và hostile Natural-Action actor tại move commit; sau AoE batch + mandatory lifecycle, tàn ảnh VFX gây một counter hit PHYSICAL100% ATK + WILL100% WIL lên actor đã khóa. Counter đã tạo vẫn resolve nếu Savitar bị AoE giết; hostile actor invalid thì DROP_LOCAL / NO_RETARGET. Tàn ảnh không chiếm Slot, không phải Basic/Natural Action.
+
+Basic — Tốc Kích Trọng Quyền
+Chọn một occupied legal enemy Slot, lock tọa độ; VFX chạy tới không đổi Position bản thân. Tại Damage commit đọc occupant hiện tại của Slot đó: empty thì MISS, Entity hợp lệ mới thay vào thì nhận hit, không đuổi Entity cũ hoặc retarget Slot. Một hit gồm PHYSICAL100% ATK + WILL100% WIL. Basic không kích hoạt Passive dodge vì không phải AoE.
+
+Skill 1 — Lôi Trụ Quán Trường
+Dùng một Natural Action, Cost20 AE. Sau Cost snapshot column hiện tại và ATK/WIL một lần; chạy quanh chiến trường chỉ là VFX. Own Slot1/4/7 → enemy1/4/7; 2/5/8 → 2/5/8; 3/6/9 → 3/6/9. Lock ba Slot, cho declared pre-Damage dodge/movement resolve rồi đọc current occupants; một simultaneous fixed-AoE batch, mỗi legal occupant nhận PHYSICAL155% ATK + WILL155% WIL. Empty thì không target; không retarget.
+
+Skill 2 — Dị Tuyến Quy Lai
+Auto, tối đa một successful activation/battle, Cost15 AE. Tại stable committed HP-mutation/lifecycle checkpoint, nếu alive + active-present + HP<15% CurrentMaxHP và chưa dùng/chưa temporal absence thì attempt. Thiếu AE không activate/consume; AE-only change không tự retry. Successful activation giữ Field Presence và Slot ownership/reservation, chỉ từ chối Damage admission do enemy Natural Actions; không phải LEAVE_FIELD, TEMPORARILY_ABSENT hay invulnerability toàn bộ. Existing DoT/Mark/environmental/non-targeting effects theo luật riêng. Khi enemy fixed positional AoE bao gồm Slot reserved: read-only counterfactual cùng packets/snapshots/defensive state/Shield tính Actual HP Damage đáng ra nhận rồi cộng accumulator; không sửa HP/Shield thật hoặc phát Damage/listeners. Mỗi batch đọc authoritative state riêng, không có shadow HP/Shield timeline. Passive dodge không chạy khi temporal absence; charge giữ nguyên. Đầu next SSI-granted Natural Action opportunity trở lại cùng Slot, kể cả opportunity sau đó bị CC; Heal25% CurrentMaxHP +30% accumulator, Overheal DISCARD. Death/leave trước return hủy pending, xóa accumulator, không Heal.
+
+Skill 3 — Tốc Giới Quá Tải
+Dùng một Natural Action, Cost25 AE. Activation Action không hưởng buff. Bắt đầu next actually-performed Natural Action, kéo dài đúng ba actual Natural Actions; CC/non-Natural không đốt clock. Basic100→130% ATK/WIL; Skill1 155→185% ATK/WIL, cộng30 percentage points, không ×1.30. Skill1 AE20→15, không negative Cost. Qualifying direct Basic/Skill1 outcome Heal10% aggregate committed Actual HP Damage; Shield/overkill/Counter/Reaction/DoT/unrelated Damage không tính, Overheal DISCARD. Không stack, không cast khi active, không buff own activation; hết ba Action → cooldown một actual Natural Action. Death/leave xóa pending/active/cooldown. Tăng tốc chỉ là theme/VFX, không có SPD hay SSI-order modifier.
+
+Ultimate — Tốc Thần · Thiên Lôi Quán Giới
+Root ULTIMATE gọi đúng một Skill1 child thật, giữ SKILL identity/non-Natural, AE override0; không miễn ordinary readiness/root Ultimate Cost. Common Ultimate ATK/WIL snapshot cho mọi child target, cùng fixed-column/pre-Damage occupancy/simultaneous semantics. +15 coefficient points: 170% ATK/WIL, hoặc200% nếu Skill3 active. Heal10% exact child committed Actual HP Damage; Skill3 thêm10 điểm Lifesteal →20% trên cùng basis, cộng với source khác theo Contract riêng. Heal sau toàn child Damage batch terminal, Overheal DISCARD; không tạo Cost âm/refund từ modifier -5 AE.
 
 78) .
 
