@@ -1717,3 +1717,57 @@ one typed field
 instead of a new subsystem.
 
 The doctrine succeeds only if Codex can reject its own earlier solution when current evidence proves it wrong.
+
+---
+
+# 39. NEW-CHAT BOOTSTRAP AND DURABLE WORK CONTINUITY
+
+This operational addendum complements the preceding rules. It records workflow and standing user authorization, not a roster snapshot, gameplay default, or change of Project Phase. Immediate user scope and the authority rules in sections 2–4 still govern.
+
+## 39.1 Find and verify the actual repository
+
+Repository: `Hungngo-creator/arclune_lane_7x3` on GitHub.
+
+An empty local workspace or an unavailable repository/environment selector does not prove GitHub is inaccessible. Inspect available repository connectors as well as local Git access before reporting an access blocker. Use an available authorized route; do not assume a new chat has the same tools or credentials as an old one.
+
+At task start, verify the canonical branch/ref, actual current commit, working-tree changes, and any relevant open PR. Read this root `AGENTS.md` first. Never use a screenshot or a previous chat's claim that a merge succeeded as verification.
+
+Navigation anchors, subject to verification in the current tree:
+
+- Raw kits: root `ý tưởng nhân vật 1.md`, `ý tưởng nhân vật 2.md`, `ý tưởng nhân vật 3.md`, and `Ý tưởng nhân vật 4.md`.
+- Character Canons: `docs/canon kit/`.
+- Architecture: `docs/Chuẩn hoá và gắn tag kit/`; start from `00_CANONICAL_INDEX.md` to resolve the active `00–08` filenames.
+
+Preserve actual case, accents, spaces, and indexed filenames. Do not rename an indexed file merely because its suffix resembles a duplicate. Do not preload every Character Canon; load only what the task, composition proof, or regression obligations require.
+
+## 39.2 Recover the task, not a presumed next Character
+
+A new chat is not itself authorization to select a Character or resume an arbitrary old PR. An explanation-only request does not authorize starting another Character. Autonomous selection follows section 25 only within an authorized continuation task.
+
+When selecting a raw kit, require a Passive, at least one Skill, and an Ultimate. One, two, or three Skills can all constitute a complete kit; judge coherence rather than imposing a fixed Skill count. Missing metadata is not automatically blocking: identify whether the current task actually depends on it.
+
+Raw item numbers may collide. Identify an entry by file, Character name when available, and distinctive kit text, not its number alone. If those anchors cannot establish which kit the user means, ask. When the user explicitly supplies a replacement raw description or names, update that identified entry as requested before deriving its Canon; preserve unrelated entries.
+
+## 39.3 Make approved decisions recoverable without chat memory
+
+During authorized Character work, incorporate explicit designer answers and later corrections into the relevant Clarified Gameplay Canon. Preserve their scope, formulas, checkpoints, failure semantics, and which older wording they supersede. An approval such as "all other proposed answers are approved" must be resolved into concrete semantics from an actually available proposal; never reconstruct missing answers from memory.
+
+Before asking a gameplay question, check the active Canon and relevant current sources for an existing lock. If incompatible interpretations affect gameplay and the sources cannot prove a choice, ask about the genuinely blocked decision. Record unrelated ambiguity as `UNRESOLVED / NOT BLOCKING` and continue independent work. Distinguish future external-content or Mode boundaries from missing internal kit decisions; mark a boundary non-blocking only when the current task does not depend on it.
+
+Do not use this `AGENTS.md` to store Character mechanics, current Pilot versions, per-kit patch conclusions, or a fixed implementation folder layout. For each proposed Kernel change, make the proof explicit:
+
+```text
+current Schema input
+→ governing Contract
+→ current runtime owner
+→ exact insufficiency
+→ smallest runtime extension
+```
+
+## 39.4 Standing authorization and verified delivery
+
+The user has authorized Codex to commit completed, in-scope repository patches, create a reviewable PR, and merge them autonomously after the required audits and phase-appropriate checks, without another user approval request. This is the authorization required by section 29; it applies when the task authorizes repository editing. It does not widen an audit-only, discussion-only, normalization-only, or explicitly restricted task, and later user instructions can narrow or revoke it.
+
+Before merging, inspect the actual PR diff, verify its head commit and changed-file scope, and recheck the target branch. If the target moved, reconcile and audit the resulting delta before merging. Do not merge unrelated PRs, overwrite unrelated work, force-push, or bypass repository protection under this authorization. If access or repository requirements prevent delivery, report the concrete blocker rather than claiming completion.
+
+After merging, verify the PR is merged and the resulting canonical branch contains the intended content. Report the PR/commit, changed files or sections, checks, and genuine unresolved items. If work must pause, keep a concise recoverable status in the task report or existing PR: verified base, proposed changes, checks completed, and exact blocked questions. Do not create a competing canonical handoff file or require a new chat to read the entire old conversation.
