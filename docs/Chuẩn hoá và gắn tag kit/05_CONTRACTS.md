@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-03-F.10
+**Version:** 2026-10-03-F.11
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -18,6 +18,8 @@
 **Revision F.10:** adds DMG-034 opt-in reflected scalar Damage: committed source-local received basis, ARM/RES bypass then matching Final DR/ordinary Shield, separate reflected receipt/lineage and existing source grouping. DMG-030–033 defaults and ordinary component profiles remain intact.
 
 ---
+
+**Revision F.11:** adds TGT-008 Position-binding/default precision, POS-008/009 bounded relocation/deferred-counter/truly-empty law, DMG-035 isolated Damage projection, TRG-016 stable-health mandatory settlement and ACT-034 opportunity-start dependency. All prior IDs/profiles remain intact; no new Tag/Primitive or global priority.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -1125,6 +1127,17 @@ Keys include observed Action, runtime trigger owner, instantiated candidate and 
 
 ---
 
+## ACT-034 — Required Owner-opportunity-start Settlement before Control
+**Status:** `LOCKED FOR EXPLICIT OPPORTUNITY-START PROFILES`
+
+After SSI/Mode grants an owner's Natural Action opportunity, register and finish its declared finite opportunityStartSettlement before ordinary CC, selection or Action admission for that same grant. A retained State's first later grant is anchored by owner + Combat Instance + opportunity serial greater than its creation serial; it cannot consume a still-open creation opportunity. Existing grants/actor-window reset bookkeeping are preserved; this profile neither creates a grant nor advances SSI twice.
+
+A CC-lost opportunity still runs the required start settlement, then follows ACT-012 with no actual Natural Action or completion. Completion-based refresh/durations/class gain remain unchanged. State termination at a retained reserved coordinate is not POS-010/011 materialization when Field Presence/occupancy never left. Heal, if authored, follows ordinary HEL-* rules and is terminal before control continues. Death/leave/State retirement cancels work according to its lifetime, never applying it to a new owner instance.
+
+Keys include owner/instance, observed grant, retained State and dependency. Conditions/clean failure close finite work; no waits on the held grant's future Action, cyclic edges, fake Actions or cross-instance dependencies. Multiple observable competing settlements require explicit composition, not queue priority. Save/resume completes this same grant/settlement once. Other Modes must supply the same opportunity abstraction or explicit 07 adaptation; do not convert it to seconds.
+
+---
+
 # 10. TRIGGER / REACTION EVENT LEVELS
 
 ## TRG-001 — Event Granularity
@@ -1546,6 +1559,19 @@ Executable content with an unavailable Action/checkpoint anchor, mismatched resu
 
 ---
 
+## TRG-016 — Mandatory Stable Health-mutation Observation
+**Status:** `LOCKED FOR EXPLICIT STABLE-HEALTH PROFILES`
+
+An actual committed CurrentHP or CurrentMaxHP change records a health observation for that transaction/recipient, including effective MaxHP changes from committed stat/State/position-dependent contributions and their ordinary reconciliation. Joined HP/MaxHP changes in one commit produce one observation, not two payments. A simultaneous/mixed group commits completely before observation; never interpose between its packets/recipients or contaminate sibling calculations. Preserve mutation/result identity and semantic kind; no-op/staged/rolled-back writes or AE-only mutations do not qualify. Damage/Heal/HP Cost/HP Loss/MaxHP/lifecycle writes remain distinct operations.
+
+Mandatory lifecycle, joined prevention/Return/Revive commits and required health reconciliation must reach a stable state before evaluation. Do not insert this observation inside their atomic transaction or before HP_ZERO handling. Then evaluate the opted-in finite Conditions/Cost/cap/State settlement before the next direct group or Action/SSI continuation, even while ordinary Reactions are held. This barrier is mandatory work, not an ordinary Reaction window. It can make the next group's recipient admission different without re-querying an Entity lock or altering earlier committed results.
+
+Use the same stable observation for candidate facts; no Slot/Entity/list/Event order selects a shared-resource winner. Unrelated commuting work may retain its existing law; observable competing resource/admission/mutation interactions require explicit composition or fail normalization. No new global priority is supplied. Required settlements close on nonqualification/clean Cost failure. A later actual health mutation may produce another observation; AE gain alone or polling cannot retry a failed one. Resulting health mutations produce their own bounded obligations only after their own stable lifecycle boundary; reject cycles/unbounded cascades rather than scan to a fixpoint.
+
+Observation/candidate identity includes Combat Instance, original commit/recipient, trigger definition/runtime owner and local dependency. Retain terminal nonqualification/failure/success through replay; resume cannot spend/use/create again. State mutations/queued work carry current life/presence/instance validity and cannot revive a retired State. Existing ordinary triggers keep their authored timing.
+
+---
+
 # 12. TARGET SELECTION CONTRACT
 
 ## TGT-001 — Candidate Pool
@@ -1761,6 +1787,17 @@ This Contract does not create a global default that every metric selector random
 If gameplay-observable tie behavior is not declared:
 
 > it remains `REQUIRED_EXPLICIT`.
+
+---
+
+## TGT-008 — Position-bound Attack and Current Occupant
+**Status:** `LOCKED_DEFAULT FOR NEW OTHERWISE-UNDECLARED ATTACK BINDING; EXPLICIT PROFILES PRESERVED`
+
+The project attack-reference default is Position/Slot. Normalization must resolve it into explicit Position locks/current-occupant timing before execution. It does not overwrite an explicit designer Entity/Both lock, migrate previous approved Canons, or change non-attack Self/Leader/State references. Entity following requires explicit identity binding; it is separate from Guaranteed Hit.
+
+For CURRENT_LEGAL_OCCUPANT / POST_POSITIONAL_INTERPOSITION_PRE_DAMAGE, select/retain coordinates first, finish any applicable POS-008 relocation, then resolve current legal occupants immediately before Damage calculation. Freeze those recipients and the shared state through the group's commit. Empty coordinates yield the authored MISS/OMIT outcome; legal replacement occupants may receive the hit. Do not chase originals, reselect coordinates or re-query occupancy between packet calculations. Resolved invalid recipients follow TGT-006 locally, without replacement. Earlier source snapshots remain immutable.
+
+TGT-010/011 still govern geometry and batch membership. A declared Entity-bound area retains its explicit semantics; this default does not force all geometry profiles to add a relocation phase. Missing movement-sensitive binding/checkpoint remains a normalization error, not a hidden Kernel default.
 
 ---
 
@@ -3640,6 +3677,19 @@ Commit Shield/HP and immutable DamageResult through existing P-040/041/042 and T
 
 ---
 
+## DMG-035 — Read-only Single-recipient Fixed-area Damage Projection
+**Status:** `LOCKED FOR EXPLICIT PROJECTABLE INPUTS`
+
+An active State's opted-in query observes a retained enemy Natural fixed-positional Damage batch whose locked area contains its reserved Position. At POST_POSITIONAL_INTERPOSITION_PRE_DAMAGE, retain the batch's actual authored packet/formula/source/threshold bindings and authoritative defensive State/Shield/HP view. Resolve how much HP this one recipient would lose if only the named State-owned admission clauses were ignored. Other admission/Hit/Authority/mitigation/reduction/Shield/allocation laws stay applicable. No speculative movement, hypothetical downstream lifecycle or damage-listener execution.
+
+Reuse RES-001 calculation/P-040/P-041 with an isolated proposed-delta view. Multiple packet demands share one hypothetical Shield/HP budget under their applicable RES-002/008 policy; no per-packet double spend. Seal a distinct DamageProjectionResultRef(projectedActualHpDamage, batch/recipient/state/rule refs, phase version/input bindings). It is not a committed DamageResult or Actual HP Damage gameplay credit, and cannot enter P-043, Lifesteal, Reflect, HP_ZERO, ordinary listeners or action results.
+
+Calculation consumes no real HP/Shield, emits no Damage, pays no resource and advances no gameplay RNG. Retained applicable draw facts or a declared pure keyed probe may be used; missing/unprojectable inputs require an explicit supported profile, not a guessed average or new ordinary draw. At observed batch terminal, an authored State transaction can credit the estimate once if that same State remains valid; a named-exclusion local no-recipient outcome may still be terminal. Abort/retired-State work receives no credit. A later batch independently reads then-current real state; never carry a shadow HP/Shield timeline forward.
+
+Use batch + query/State instance + recipient + phase identity for calculation/credit deduplication. Keep the retained view/result until dependent credit is terminal; retain terminal identity across replay without replaying a committed counter update. Pure calculation and later State credit are separate boundaries. No new Damage type/Tag/Primitive or Character projection branch.
+
+---
+
 # 24. HEAL / OVERHEAL
 
 ## HEL-001 — Heal Calculation
@@ -4080,6 +4130,26 @@ Only an actual active-presence transition emits LEAVE_FIELD.
 Return to Deck
 Leaving the field does not automatically mean returning to Deck.
 A future explicit Return-to-Deck mechanic remains a separate transition.
+
+---
+
+## POS-008 — Bounded Pre-Damage Relocation and Deferred Counter
+**Status:** `LOCKED FOR EXPLICIT FIXED-POSITIONAL PROFILES`
+
+The bounded phase is locked geometry → qualifying relocation group → current occupants → Damage calculation/commit. Only explicit fixed/non-random positional Damage and declared incoming Action/outcome scope may open it. Single-target, random selection, independent periodic/reaction/counter Effects do not qualify through shared lineage. Check charged State/owner position against the fixed area at phase entry; retain that area after movement. Destination inside the same area is legal if the authored predicate permits it and may still receive the original Damage. Relocation is not Hit-Admission immunity or guaranteed evade.
+
+For SEEDED_ONE_TO_ONE_COMMON_DESTINATIONS, freeze eligible actor/rule instances and the common POS-009 destination set in one phase view. Seeded selection chooses actors if capacity is insufficient and seeded distinct assignment maps selected actors to unique destinations, with equal eligible participation and permutation-invariant set-to-draw mapping. Never use Slot/Entity/list/Event order as a winner. Planned source departures do not add destinations to this frozen set. Unequal destination-legality graphs or competing rules for one actor require an explicit supported composition; no greedy/list fallback.
+
+Validate and commit assigned moves with success-only own-State/counter updates, declared post-move source snapshots/hostile Actor bindings and deferred obligation creation as one coherent transaction. No assignment/failure publishes any success mutation or counter; unassigned actors retain allowances. Ordinary relocation failure then follows its explicit PositionMutationSpec failurePolicy, such as no movement and continue original Damage; unsupported content is a separate fail-closed error. Never expose a moved actor with unconsumed allowance or missing obligation. Publish the existing single POSITION_MUTATION_COMMITTED collection after commit under TRG-007. Preserve prior Position Mark observer eligibility and already-required immediate State bookkeeping; that Event creates no global Reaction priority.
+
+An opted-in frozen-Damage deferred counter releases at its observed root's ADEC, after that root's declared attacker Heal/remaining direct work and mandatory lifecycle. Source death after creation cannot revoke RETAIN_CREATED_SETTLEMENT; invalid locked hostile Actor drops locally without another target. Seal all eligible obligations of the explicit batchProfileRef/observed root/checkpoint into one finite SIMULTANEOUS counter batch, PROPORTIONAL under RES-008 when recipient demands overlap. Freeze recipient defence/calculation state at counter-batch entry. Keep separate source/Effect/receipt provenance; these counters are not the hostile root's direct outcome or Natural Actions. Do not run ordinary Counter between the source Damage and its authored Heal. Other Reactions obtain no priority from this local group.
+
+Keys are incoming group/root/checkpoint + rule/owner/State instance + movement commit + batch profile. Movement redelivery/resume cannot spend again or create another obligation; counter redelivery cannot recommit Damage. Keep frozen bindings through source cleanup until settlement terminal, then retire payloads under existing replay horizons. Observed-root cancellation before release or battle termination still requires its existing explicit terminal/queue policy; this profile does not resolve the global ordinary queue cutoff. Normalizer rejects arbitrary callbacks, recursion/fixpoint movement, mutation-bearing counter preparation, missing allowance/failure/lifetime/allocation law or incompatible observable interpositions. Malformed IR fails before affected Damage, never by quietly skipping the declared phase.
+
+## POS-009 — Truly-empty Position Predicate
+**Status:** `LOCKED FOR EXPLICIT TRULY_EMPTY READS`
+
+A Mode-legal destination is TRULY_EMPTY only when one authoritative view has no active occupant and no valid deployment reservation, death-waiting/pending-Revive reservation, absent/present owner, temporary reserved occupancy or other lifecycle/presence claim. A renderer disappearing, 0 HP or a temporarily damage-ineligible occupant does not release a claim. Read existing Position/Lifecycle/Deployment/Materialization owners; create no duplicate occupancy store. A Mark alone is not a claim. Own current coordinate is excluded where the relocation author excludes it. Claim creation/removal follows its existing owner transaction, not this predicate.
 
 ---
 

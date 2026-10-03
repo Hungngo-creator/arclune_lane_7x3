@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-03-E.8
+**Version:** 2026-10-03-E.9
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -16,6 +16,8 @@
 ---
 
 **Revision E.8:** adds one opt-in reflected scalar packet profile under DMG-034, explicit packet-kind reduction scope and retained immediate-Damage-Source result grouping through existing owners. No fourth ordinary component type, Tag, Primitive or new lifecycle barrier.
+
+**Revision E.9:** preserves explicit target locks while making the new-content Slot default concrete; adds bounded pre-Damage positional relocation/deferred-counter batching, distinct read-only fixed-area Damage projection, mandatory stable HP/MaxHP and owner-opportunity-start profiles through existing plans. No new Tag, Primitive or callback/priority system.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -1227,6 +1229,41 @@ Normalizer rejects missing Action/owner/Mode anchors, non-completed sources/non-
 
 ---
 
+## 7.14 Required stable-health settlement
+
+Optional `trigger.stableHealthSettlement` observes HEALTH_MUTATION_STABLE under TRG-016:
+
+```yaml
+event: HEALTH_MUTATION_STABLE
+stableHealthSettlement:
+  mutationFields: [CURRENT_HP, CURRENT_MAX_HP]
+  mode: MANDATORY_BEFORE_NEXT_DIRECT_GROUP
+  subjectRef: EVENT_SUBJECT
+  dependencyId: <local finite settlement ID>
+  dependsOn: []
+```
+
+Conditions read stable post-lifecycle health/presence and ordinary owner State; Effects use existing Cost/cap/State/DAG laws. This profile is finite mandatory work before the next direct group, not an ordinary Reaction or a new Action. Actual health mutations may come from Damage, Heal, Cost/Loss, MaxHP/reconciliation or lifecycle; their semantic kinds stay distinct. No-op writes and AE-only changes do not qualify. No polling/failed-payment retry token. Dependencies are limited to this observation, cannot await a future direct group/Action, and do not order competing unrelated candidates. Observable shared-budget or non-commuting interactions require an explicit composition law.
+
+## 7.15 Required owner-opportunity-start settlement
+
+Optional `trigger.opportunityStartSettlement` observes an actual owner Natural Action opportunity grant under ACT-034:
+
+```yaml
+event: NATURAL_ACTION_OPPORTUNITY_GRANTED
+opportunityStartSettlement:
+  mode: BEFORE_CONTROL_AND_ACTION_SELECTION
+  ownerRef: <Entity/State owner>
+  stateInstanceRef: <retained State instance>
+  createdAtOpportunitySerial: <immutable creation binding>
+  dependencyId: <local finite settlement ID>
+  dependsOn: []
+```
+
+The first later owner grant may terminate State and resolve an ordinary Heal before the same opportunity's CC/selection/admission. It creates no Action/opportunity and does not turn a CC-lost opportunity into an actually performed/completed Action. Use the existing scheduler's grant identity and retain cleanup/source-validity policies. Reject foreign/stale owner/State refs, waits on the held opportunity's future Action, cycles or unsupported Mode clocks. Existing actual-action clocks/postActionSettlement remain unchanged.
+
+---
+
 # 8. CONDITION SPEC
 
 Conditions must be declarative expressions, not arbitrary scripts.
@@ -1448,6 +1485,7 @@ COST_PAYMENT_REF
 COST_GROUP_PAYMENT_REF
 BASE_DEPLOYMENT_COST_REF
 CURRENT_DEPLOYMENT_COST_REF
+DAMAGE_PROJECTION_REF
 ```
 
 `BASE_DEPLOYMENT_COST_REF` reads resolved Character Base Deployment Cost.
@@ -2230,6 +2268,26 @@ Defines whether later components re-run Target Selection.
 
 ---
 
+## 11.11 Position-bound attacks and occupant reads
+
+For new attack content without an explicitly approved binding, the designer's project default is Position/Slot binding under TGT-008. Normalize it into an explicit POSITION / LOCK_POSITIONS profile; executable IR never guesses a missing binding. Existing explicit Entity/Both profiles and previously approved Character locks remain unchanged. Non-attack Entity, Self, Leader, State and other references are not migrated by this default.
+
+An opted-in Position attack can declare:
+
+```yaml
+positionRecipientRead:
+  mode: CURRENT_LEGAL_OCCUPANT
+  checkpoint: POST_POSITIONAL_INTERPOSITION_PRE_DAMAGE
+  emptyPolicy: MISS | OMIT_RECIPIENT
+requeryPolicy: DO_NOT_RESELECT_POSITIONS
+```
+
+At this checkpoint, read current legal occupants of the retained coordinates, then freeze recipient identities and the shared calculation state through commit. This occupancy read is not another Slot selection or retarget: an original Entity moving away is not chased; a legal replacement at that coordinate may receive the hit. Apply the authored invalidPolicy to an invalid resolved recipient, without another coordinate/occupant query inside the same batch. Source Snapshot bindings remain independent. Entity binding does not itself grant Guaranteed Hit; HIT-* still applies. This profile requires retained Position routing; a simultaneous Entity/Both lock needs an explicit compatible Contract, never silently ignored identity fields.
+
+The same policy composes with AreaSpec positionSet/occupancyRule. Explicit Entity-bound areas retain their declared checkpoint. Do not silently convert every prior AoE to a post-movement query or use renderer state for occupancy.
+
+---
+
 # 12. AREA SPEC
 
 Canonical conceptual structure:
@@ -2526,6 +2584,28 @@ The retained DamageAggregateRef proves an explicit reached Damage-outcome checkp
 Create a new reflected Effect/packet/result with its own provenance and causal basis references. It may be Actionless; no synthetic Basic/Counter/Reaction/Natural Action is required. DMG-030–033 guard recursive reflect, ordinary Lifesteal and Counter by packet semantic/provenance. Merely inheriting root lineage cannot admit this standalone Effect into the triggering Action's direct/declared outcome. Default ordinary recursion exclusion rejects a reflected basis unless another explicit Contract permits it.
 
 Use DAMAGE only; REFLECTED_DAMAGE is existing semantic metadata, not a newly registered Tag. Normalizer lowers to P-040/041/042 plus existing P-043 result grouping and Contract inputs, with stable Effect/candidate/State-instance/basis refs. Unavailable/unsealed/wrong-source results, nonfinite/negative coefficient, unsupported reflected policy or fake component/profile mapping are rejected rather than guessed.
+
+---
+
+## 16.6 Read-only incoming fixed-area Damage projection
+
+An active State may declare bounded `state.damageProjectionQueries[]` under DMG-035. This is a query over an incoming batch, not a Damage Effect or a committed-result predicate:
+
+```yaml
+damageProjectionQueries:
+  - inputBatchRef: OBSERVED_FIXED_POSITIONAL_DAMAGE_BATCH
+    subjectRef: STATE_OWNER
+    reservedPositionRef: <retained owner Position>
+    incomingActionScope: <enemy Natural direct/declared outcome>
+    checkpoint: POST_POSITIONAL_INTERPOSITION_PRE_DAMAGE
+    ignoredAdmissionRuleRefs: <exact rule instances owned by this State>
+    resultBinding: <DamageProjectionResultRef>
+    creditStateCounterRef: <existing owner counter>
+```
+
+Only a locked area containing this reserved coordinate qualifies; random/direct targeting does not. Retain original Damage definitions, formula/source/threshold Snapshot bindings and this checkpoint's authoritative defensive/Shield/HP view. Bypass only the named scoped recipient-admission clauses; refs must resolve to DAMAGE-admission clauses of that same active State/subject/Combat Instance. They cannot disable lifecycle or arbitrary foreign rules. Other admission/Hit/mitigation laws still apply. Multiple packets share one hypothetical recipient budget under the original explicit allocation policy. No persistent hypothetical timeline exists between batches.
+
+`DAMAGE_PROJECTION_REF` reads only this typed result's `projectedActualHpDamage`; it cannot satisfy ACTUAL_HP_DAMAGE_REF, P-043 committed Damage queries or ordinary Damage listeners. The existing State counter can receive this estimate once when that observed batch is terminal (including a local no-admitted-recipient outcome caused by the named exclusion), not if the batch aborts or the owning State has retired. Counter update is an ordinary State transaction; calculation itself makes no mutation/Event/Cost or gameplay RNG advance. Unsupported missing recipient/formula/snapshot/Hit/numeric/projection inputs fail closed. Reuse retained draw facts or an explicitly supported pure keyed probe; never invent expected Damage for a non-projectable random profile.
 
 ---
 
@@ -3884,6 +3964,39 @@ explicit priority/failure/fallback composition determines the next behavior.
 No hidden spatial fallback is implied by SpatialSelectorSpec.
 
 Mục đích của 04-D là tránh việc Targeting sở hữu riêng spatial language; Target và Position Mutation cùng reuse một common object.
+
+---
+
+## 26.1 Bounded fixed-area pre-Damage relocation
+
+Optional `trigger.positionalDamageInterposition` is a typed phase profile, not a general hook. It observes only an explicitly fixed, non-random positional Damage area at its retained geometry boundary, before recipient Damage calculation. Declare incoming Action reference/Natural-status and direct-or-declared-outcome scope, owner-position/State Conditions, PositionMutationSpec reference, and these bounded operands:
+
+```yaml
+positionalDamageInterposition:
+  incomingActionRef: <explicit Action/ROOT reference>
+  outcomeScope: DIRECT_AND_DECLARED_CHILD_DAMAGE
+  areaClass: FIXED_POSITIONAL_NON_RANDOM
+  positionMutationRef: <RANDOM_REPOSITION definition>
+  assignmentPolicy: SEEDED_ONE_TO_ONE_COMMON_DESTINATIONS
+  successStateEffectRefs: <finite own-State/counter updates>
+  successSnapshotRefs: <source fields and hostile Actor binding>
+  deferredCounter:
+    effectRefs: <finite snapshot-bound Damage nodes>
+    release: OBSERVED_ROOT_DIRECT_EFFECTS_COMPLETE
+    batchProfileRef: <explicit common counter-batch profile>
+    mode: SIMULTANEOUS_BATCH
+    sharedRecipientDamageAllocation: PROPORTIONAL
+    sourceValidity: RETAIN_CREATED_SETTLEMENT
+    invalidPolicy: DROP_INVALID
+```
+
+The referenced destination predicate may be `TRULY_EMPTY`: no occupant or valid deployment/lifecycle/Revive/absence/presence claim and Mode-legal occupancy under POS-009. Marks alone do not claim occupancy. Freeze candidates and common destinations before seeded assignment. Different destination-legality graphs require an explicit supported matching policy; do not silently run a greedy resolver.
+
+POS-008 limits successStateEffectRefs to finite owner State/counter mutations and creation of the declared deferred counter obligation. No arbitrary Damage/Cost/Action/recursive interposition runs inside relocation. Position, success-only allowance, source Snapshot/hostile Actor bindings and obligation creation have one coherent commit. Source/rule/State instances are identity keys, never priority. No assignment or failed mutation means no success changes/counter; no automatic reroll.
+
+The deferred counter is an independently sourced COUNTER settlement, not another Natural Action or the observed root's direct Damage. Its already-created data survives source invalidity only when this explicit sourceValidity profile says so. Retain it until its target-invalid/local-failure or Damage settlement is terminal; neither a live Passive lookup nor field-scoped cleanup can revoke its committed creation. At the named root checkpoint, POS-008 seals this profile's finite obligation set into one ordinary eligible counter batch. Existing Resolution/RES-008 machinery supplies shared-recipient allocation; unrelated Reactions remain outside that set and obtain no priority from it. Costs/other mutation-bearing counter preparation require another explicit law and are not supported by this pure frozen-Damage profile.
+
+Normalizer rejects non-fixed/random scopes, absent geometry/Actor/result anchors, unbounded success graphs, incompatible duplicate interpositions, hidden matching/fallback, missing counter snapshot/invalid/batch/allocation law, or a dependency waiting for its own held release. No new Tag or Primitive.
 
 ---
 
@@ -5253,6 +5366,8 @@ The existing plans also preserve RES-009 parent-owned finite child-Damage partic
 
 The existing effectGraph/primitiveRequests also preserve the opt-in reflected scalar profile, exact sealed source-group basis, packet-kind reduction applicability and distinct Effect/result identity under DMG-034. Existing target/resolution plans preserve its authored lock/invalid/batch policy. No reflected Action or new runtime plan/Primitive is synthesized.
 
+Existing targetPlan/triggerGraph/effectGraph/snapshot/result plans also retain TGT-008 explicit coordinate/occupant timing, POS-008/009 bounded phase/assignment/success/deferred-counter refs, DMG-035 isolated projection result/query bindings, TRG-016 mandatory health observations and ACT-034 finite grant-start dependencies. Keep their typed query/State/Action/commit/phase identities; do not synthesize a Character runtime, new top-level subsystem or general hook. Prior explicit locks/profiles remain unchanged.
+
 ## 51.1 Why IR exists
 
 IR isolates Character content from:
@@ -6328,6 +6443,8 @@ At minimum validator must enforce:
 83. Reflected-only amount scope selects packet kind without ordinary component filters and only a supported reflected phase. Preserve ordinary component-scoped reduction semantics; unsupported reflected transform/amplification/profile mappings are rejected.
 
 ---
+
+Additional E.9 invariants: explicit movement-sensitive Position/Entity binding; no renderer-based emptiness or hidden coordinate re-selection; bounded fixed-area interposition and supported matching; atomic success-only allowance/obligation; declared counter release/batch/retention/allocation; projection result cannot satisfy committed-result queries; complete isolated input/budget/credit identity; stable-health fields and finite pre-continuation dependency; owner/grant/State-instance anchor before control. Reject cycles, unavailable snapshots/Mode adapters and undeclared observable competing interactions.
 
 # 93. SCHEMA NON-GOALS
 
