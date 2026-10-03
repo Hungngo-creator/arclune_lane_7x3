@@ -1592,18 +1592,23 @@ Skill 3 — Sever the Mortal Measure
 Ultimate — Descend, Ruin, Reap
 Giáng Thế · Phá Diệt · Thu Hoạch: nhảy lên cao, rơi vào ô 5 của kẻ thù và chém gây sát thương = 150% wil + atk lên kẻ đứng ở ô số 5, sau đó múa kiếm, ô 5 cùng các ô còn lại nhận sát thương = 150% wil + atk cùng sát thương chuẩn = 5% max hp của nhân vật này (nếu ô 5 không có kẻ thù đứng thì bỏ qua phần gây sát thương lên ô 5 và chỉ gây aoe xung quanh).
 
-52)
+52) Phanes
 ssr, mage
-nội tại: mỗi lần dùng ultimate đều tạo 1 orb laze bay sau lưng, tối đa 10 orb, tăng 5% atk/wil hiện có/mỗi orb laze, orb laze không có thanh hp, không thể nhận sát thương. nhận vật này không thể follow up attack, các orb chỉ là vfx, bản chất của nó là tăng atk/wil sau mỗi lần ult.
+Passive — Constellation of One / Nhất Thể Tinh Trận
+mỗi lần dùng ultimate đều tạo 1 orb laze bay sau lưng, tối đa 10 orb, tăng 5% atk/wil hiện có/mỗi orb laze, orb laze không có thanh hp, không thể nhận sát thương. nhận vật này không thể follow up attack, các orb chỉ là vfx, bản chất của nó là tăng atk/wil sau mỗi lần ult.
 
-skill 1: khi đánh thường nếu orb gây sát thương lên mục tiêu có hp dưới hoặc = 5% max hp của chúng thì lập tức tàn sát chúng, kết liễu và DEATH_CONFIRMED, đưa hp của chúng về 0 (vẫn có thể hồi sinh hoặc về deck tùy cơ chế của chúng), chỉ kích hoạt khi đánh thường, -30 ae/lần kích hoạt, kích hoạt tối đa 4 lần/trận.
+Skill 1 — Terminal Ray / Chung Mệnh Quang
+khi đánh thường nếu orb gây sát thương lên mục tiêu có hp dưới hoặc = 5% max hp của chúng thì lập tức tàn sát chúng, kết liễu và DEATH_CONFIRMED, đưa hp của chúng về 0 (vẫn có thể hồi sinh hoặc về deck tùy cơ chế của chúng), chỉ kích hoạt khi đánh thường, -30 ae/lần kích hoạt, kích hoạt tối đa 4 lần/trận.
 
-skill 2: khi đánh thường gây sát thương vượt 40% max hp của đối phương sẽ hồi hp cho bản thân = 40% sát thương do đòn đánh đó gây ra lên kẻ thù, -10 ae/lần kích hoạt, không cap/trận.
+Skill 2 — Radiant Reflux / Hồi Quang Phản Lưu
+khi đánh thường gây sát thương vượt 40% max hp của đối phương sẽ hồi hp cho bản thân = 40% sát thương do đòn đánh đó gây ra lên kẻ thù, -10 ae/lần kích hoạt, không cap/trận.
 
-skill 3: khi gây sát thương vượt 15% max hp của kẻ thù bằng natural Action thì mỗi 1% vượt nhận 3 rage, không giới hạn lần kích hoạt/trận/turn, rage thừa sẽ bị bỏ qua. -5 ae mỗi lần kích hoạt bất kể lượng rage nhận được là bao nhiêu. vậy nếu gây sát thương= 25% max hp của mục tiêu hắn sẽ nhận 30 rage và phe đó mất 5 ae.
+Skill 3 — Threshold Ascension / Việt Giới Thăng Hoa
+khi gây sát thương vượt 15% max hp của kẻ thù bằng natural Action thì mỗi 1% vượt nhận 3 rage, không giới hạn lần kích hoạt/trận/turn, rage thừa sẽ bị bỏ qua. -5 ae mỗi lần kích hoạt bất kể lượng rage nhận được là bao nhiêu. vậy nếu gây sát thương= 25% max hp của mục tiêu hắn sẽ nhận 30 rage và phe đó mất 5 ae.
 gây sát thương đúng 15% max hp của mục tiêu skill này sẽ không kích hoạt.
 
-ult: cast 2 lần đánh thường, nếu 2 lần đánh thường kích hoạt skill 1/2/3 thì tiêu hao ae sẽ bị bỏ qua, không tốn ae nhưng skill vẫn kích hoạt.
+Ultimate — Twin Zenith / Song Cực Thiên Quang
+cast 2 lần đánh thường, nếu 2 lần đánh thường kích hoạt skill 1/2/3 thì tiêu hao ae sẽ bị bỏ qua, không tốn ae nhưng skill vẫn kích hoạt.
 
 đánh thường: chưởng 1 chưởng, tấn công 1 mục tiêu từ xa gây sát thương = 100% wil/atk lên chúng, mỗi orb đang có cũng sẽ tấn công cùng lúc gây sát thương = 30% wil/atk của hắn/orb lên mục tiêu (vì tấn công cùng lúc nên sát thương orb gây ra có thể gộp chung khi hiện số, sát thương orb và đánh thường gây ra cần hiện số riêng tức hiện số sát thương 2 lần)
 

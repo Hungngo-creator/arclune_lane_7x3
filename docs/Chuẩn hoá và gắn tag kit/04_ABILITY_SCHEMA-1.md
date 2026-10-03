@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-02-E.4
+**Version:** 2026-10-03-E.5
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -10,6 +10,7 @@
 **Revision E.2:** adds checkpoint-scoped committed-result Conditions, Shield addition receipts/source-family caps and explicitly authored Slot ties through existing owners. Earlier normalized data remains unchanged; unresolved Character fields are not compiled into defaults.
 **Revision E.3:** adds required post-completion settlement, typed result relation context, Shield owner/zero-addition clarification and bounded Final Damage amplification/direct-Action scope. Pre-Pilot-5 data remains unchanged; E.2 ACTION_RESULT_ANY content must explicitly bind readContext before normalization to E.3.
 **Revision E.4:** adds bounded singular HP-payment profiles, immutable post-payment HP reads and explicit admitted-Action continuation through Cost-caused lifecycle processing. Existing exact-payment/default-floor and distributed Cost profiles remain unchanged; no new Tag/Primitive.
+**Revision E.5:** adds a bounded Death Prevention completion profile joining a same-subject Return-to-Deck, survival assignment and selected allowance at one commit. Existing prevention/return/default Cost semantics remain unchanged; no new Tag/Primitive.
 
 ---
 
@@ -2347,6 +2348,7 @@ effect:
   deploymentCost:
   position:
   lifecycle:
+  deathPrevention:
   returnToDeck:
   system:
   authority:
@@ -2384,6 +2386,7 @@ TEMPORARY_ABSENCE
 RETURN_TO_DECK
 REVIVE
 REINCARNATION
+SYSTEM_LIFECYCLE
 COMBAT_DEFINITION_INHERITANCE
 REQUEST_ACTION
 ARENA_INTERACTION
@@ -2392,6 +2395,8 @@ SNAPSHOT_OPERATION
 ```
 
 This enum is not a one-to-one mirror of Primitive IDs.
+
+SYSTEM_LIFECYCLE is the already-used §77 Death Prevention family; only its explicitly defined canonical profiles normalize. It is not an arbitrary lifecycle operation/callback escape hatch.
 
 Normalizer maps EffectSpec to one or multiple Primitive/system-operation requests.
 
@@ -5060,6 +5065,8 @@ damageTransformPlan
 
 It also preserves bounded singular HP cases, protected counter consumption and the typed commit-HP result binding under CST-014/009. The existing `actionSpec` carries costLifecyclePolicy under CST-015; do not lower it as a new Trigger/Action or generic callback. P-036 remains the HP-payment operation.
 
+An opted-in deathPrevention completion profile lowers to one joined lifecycle/Return transaction under DTH-007, using P-061 and existing deployment/State/Transaction owners. Its referenced Return operand is not also executed as a standalone Effect node.
+
 Target tie policy is normalized into `targetPlan`.
 
 `DEPLOYMENT_COST_MODIFICATION` and `RETURN_TO_DECK` remain typed Effect semantics in the normalized Effect/deployment execution plan; they do not imply new Primitive IDs.
@@ -5157,6 +5164,7 @@ Normalizer/compiler must:
 39. Preserve declared Shield owner independently from recipient when lowering retention/owner clocks; reject an unresolved required owner reference.
 40. Validate FINAL_DAMAGE_MULTIPLIER Damage/component/operation compatibility, directActionRef own-graph membership and same-Action Cost/Snapshot/result binding visibility; reject implicit root/Attribution scope or raw/FDR phase substitution.
 41. Validate bounded HP case/floor/required-counter compatibility and typed resulting-HP reads; preserve explicit Cost-caused lifecycle continuation in the same admitted Action under CST-014/009/015.
+42. Validate deathPrevention survival/subject/completion/counter references and their common transaction under DTH-007; reject duplicate standalone execution, unavailable/cleanup-discarded counter, foreign transition or completion cycle.
 
 ---
 
@@ -5755,6 +5763,30 @@ effect:
 
 Exact lifecycle operation belongs to Contract/Normalizer.
 
+## 77.1 Optional transition-completed Death Prevention
+
+An HP_ZERO prevention Effect may declare this bounded profile:
+
+```yaml
+deathPrevention:
+  survivalHp: <pure finite positive ValueRef>
+  completionTransitionRef: <local authored ReturnToDeckSpec reference>
+  consumeCounterRef: <optional existing owner-keyed remaining-use COUNTER_REF>
+  resultBinding: <optional existing typed P-061 terminal-result binding>
+```
+
+Current supported completion is RETURN_TO_DECK of the **same death-evaluating subject** and current Combat Instance. Resolve the reference within this authored prevention settlement; lower its Return operand once into the prevention completion transaction, rather than executing an independent Return node and checking success afterward. No arbitrary completion predicate, callback, foreign Action or cross-settlement transition.
+
+Capture survivalHp from the declared prevention checkpoint under ordinary numeric law; it must be legal positive HP <= subject Current MaxHP at commit. Stage alive/survival HP, the explicit Return profile's presence/deployment/Deck/retention deltas, and one available selected allowance unit at the same protected commit barrier. Return's currentHpPolicy RETAIN applies to this proposed survival value; Return itself still supplies no restoration or survival default.
+
+Under DTH-007, successful completion commits all those deltas and prevention success together. A failed transition/protected validation/counter requirement commits none of those completion deltas, adds no survival/use delta and resumes the same death evaluation. With the unchanged HP_ZERO subject this means HP0 and unused allowance; a protected-state conflict never restores stale HP/counter/presence over another authoritative commit. Earlier committed Effects such as a separate Leader Heal are not part of this join; later result-gated Effects remain separate. Do not emit DEATH_PREVENTED before completion or rerun the same failed candidate indefinitely.
+
+The selected counter must have a declared owner/lifetime and remain represented in the post-transition state; do not silently discard/reset it through retention cleanup. No new allowance manager or global prevention priority is introduced. Other prevention profiles and standalone Return authoring are unchanged.
+
+This is mandatory P-061 death-evaluation work, not a delayed ordinary Reaction. When this counter owns consume-on-completion semantics, do not also consume that same allowance via Trigger admission/activation; reject contradictory eager consumption. Existing Trigger Conditions can check availability without changing it.
+
+Reuse P-061's prevented/not-prevented terminal outcome in existing typed result/DAG bindings. A success-dependent later Effect binds to **this completion instance's** terminal success, not merely to live Deck/HP state that another transition could produce. Keep that outcome available through dependent work/replay; do not reconstruct success from post-state or replay successful downstream Effects twice.
+
 ---
 
 # 78. MATERIALIZATION SCHEMA
@@ -6072,6 +6104,8 @@ At minimum validator must enforce:
 68. A selected `consumeCounterRef` must resolve to an available owner-keyed remaining-use counter with declared lifetime for a required Cost of this admitted Action, and join its required Cost/admission commit. Optional/unrelated consumption, probes or aborted/failed transactions cannot consume it or assign the floor.
 69. `CURRENT_HP_AFTER_PAYMENT` must bind to the successful singular HP payment commit; failed, unavailable, distributed-aggregate or non-HP bindings cannot substitute live HP, nominal Cost or actualPaidAmount.
 70. `CONTINUE_ADMITTED_ACTION` preserves only the existing admitted Action after mandatory Cost-caused lifecycle. It grants no new Action, payment waiver, resurrection, target replacement or bypass of explicit Effect/cancellation legality; observable source-invalidity outcomes require an applicable explicit policy.
+71. Transition-completed deathPrevention requires an open matching HP_ZERO context, legal survivalHp and same-subject/current-instance local Return operand. Reject foreign/unavailable/independently executing references, duplicate lowering or a completion/dependency cycle.
+72. A prevention consumeCounterRef must resolve with explicit owner/lifetime, be available and retained after completion, and join survival/Return/prevention success at one barrier; reject contradictory eager consumption of that allowance. Failed completion commits no floor/use/cleanup/transition and cannot silently retry the same failed candidate.
 
 ---
 
