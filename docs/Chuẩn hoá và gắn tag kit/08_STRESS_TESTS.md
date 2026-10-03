@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-03-I.9
+**Version:** 2026-10-03-I.10
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.10+, `06_KERNEL_RUNTIME.md` G.9+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.11+, `06_KERNEL_RUNTIME.md` G.10+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -19,6 +19,8 @@
 **Revision I.7:** adds M-056–M-065 for completed Nerovar/Phanes/Azoth normalization: retention/window, pre-Cost snapshots, own-baseline, child provenance, direct Execute, shared-recipient allocation, mitigation override and local Cost continuation. Prior-Pilot fixtures remain unchanged; Architecture Phase coverage only.
 
 ---
+
+**Revision I.10:** adds M-082–M-093 for explicit Slot/occupant binding, bounded seeded relocation/claims/deferred-counter allocation, stable health and opportunity barriers, isolated fixed-area projections, enhancement/child composition, rejection and external unresolved boundaries. Prior cases remain unchanged; Architecture Phase declarative coverage only.
 
 # 0. WHAT THIS FILE IS
 
@@ -3718,6 +3720,114 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 
 ---
 
+## M-082 — Explicit Position Binding, Replacement and Preserved Entity Locks
+
+**Status:** `MUST_PASS`
+**Fixture:** new default-binding attack selects occupied enemy Slot5/X; common Basic-start ATK100/WIL50 capture. X moves away; variant Y legally occupies5, empty5, invalid Y, and source stats change after capture. Separately execute an older explicit LOCK_ENTITY_IDS profile and ordinary non-attack Self/Leader targeting.
+
+**Expected:** new normalization emits explicit POSITION/LOCK_POSITIONS/current-occupant checkpoint. Y receives one PHYSICAL100+WILL50 hit; empty5 is MISS/no Damage, invalid resolved Y drops locally. Never chase X, select another Slot or recapture source formula. Occupancy is read after any otherwise-qualifying movement, then frozen through commit. Savitar Basic itself does not open fixed-AoE dodge. Existing approved Entity/Both locks and non-attack refs remain unchanged; Entity binding does not grant HIT-003 or bypass lifecycle/Authority. Undefined movement-sensitive executable binding fails validation, not a Kernel fallback.
+
+---
+
+## M-083 — Fixed-area Relocation Does Not Guarantee Evade
+
+**Status:** `MUST_PASS`
+**Fixture:** charged Savitar at5; fixed hostile enemy-Natural column2/5/8, only legal truly-empty destination8. Also full-field fixed area, no destination, failed move, used charge, actual Natural completion/CC-lost opportunity, random multi-target and single-target variants.
+
+**Expected:** committed5→8 consumes one charge/creates one counter obligation but original locked column still hits current occupant at8. Full-field movement also may succeed without evading. No destination/failed movement leaves Position/allowance/obligation unchanged; no reroll or counter. One successful activation until actual own completion refreshes; CC/non-Natural do not refresh. Random/single/independent periodic/Reaction/Counter/Follow-up are outside this explicit fixed-area scope even if root lineage matches. VFX alone moves nobody. Redeploy starts a fresh AVAILABLE presence charge; old observation cannot spend it.
+
+---
+
+## M-084 — Claimed Slots, Seeded Matching and Atomic Movement
+
+**Status:** `MUST_PASS`
+**Fixture:** two eligible charged defenders, one truly-empty destination; other visually empty cells have deployment, death-waiting/Revive, absence or temporal-owner claims. Permute candidate/Slot/list/Event enumeration and save during assignment/staging/after commit. Variant two destinations, group abort and a destination carrying Ariadne's Mark at Remaining1.
+
+**Expected:** frozen union of valid claims excludes every reserved cell. Seeded selection/one-to-one assignment grants one actor the scarce cell and exactly one move/charge/counter; unassigned actor retains charge. With enough cells each destination is unique. Planned source departures are not added to the original candidate set. Same seed/identities gives the same assignment across technical permutations/resume, without preferred low Slot/ID. Abort commits no partial movement/allowance/obligation. One existing POSITION_MUTATION_COMMITTED entries[] Event describes the group. A Position Mark alone permits occupancy; its successful eligible ally entry still immediately decrements Remaining and preserves zero-expiry/recreation at Ariadne's current Position. Standing there repeats nothing; no global observer priority is invented.
+
+---
+
+## M-085 — Root Heal before Simultaneous Retained Afterimage Counters
+
+**Status:** `MUST_PASS`
+**Fixture:** two successfully created frozen counters, one source then killed by the triggering AoE. Hostile root Actor has HP50/Shield20 and resolves its authored Heal30 before ADEC. Counter post-mitigation demands100 and300 share that Actor; no other mitigation. Include invalid hostile Actor, stat changes after movement capture, replay and unrelated same-checkpoint Reaction.
+
+**Expected:** root Damage → mandatory lifecycle/health work → Heal gives HP80 → remaining direct nodes/ADEC → one eligible counter batch. Never counter at HP50 before Heal. Surviving and dead source obligations retain move-commit ATK/WIL/hostile Natural Actor; target invalid closes locally/no retarget. Under RES-008, Shield shares5/15, HP-bound demand95/285, ActualHP shares20/60; total Shield20 and ActualHP80, separate receipts/Overkill and one recipient net commit. No first counter consumes all HP/Shield. Counter output is not the hostile Natural direct outcome, Basic or Natural Action; no automatic Reflect recursion/Lifesteal/SSI/class gain. Other Reactions gain no priority; save/redelivery cannot create/commit again.
+
+---
+
+## M-086 — Mandatory CurrentHP/CurrentMaxHP Checkpoint and Cost Retry
+
+**Status:** `MUST_PASS`
+**Fixture:** root holds ordinary Reactions; Damage group1 changes Savitar to HP140/MaxHP1000, unused Skill2/AE15. Follow with group2. Variants exactly150, HP140/MaxHP900 then MaxHP-only1000 (including committed stat/State/position-dependent contribution recomputation), AE14 at first observation followed by AE gain then genuine HP or MaxHP mutation, joined HP+MaxHP commit, simultaneous main/orb packets, rolled-back/no-op health writes, HP Cost/Loss/Heal and HP_ZERO.
+
+**Expected:** stable mandatory lifecycle first; alive/present140/1000 triggers AE15/use/State coherently before group2, which cannot admit protected enemy-Natural Damage. No ordinary Reaction window.150/1000 does not qualify; a MaxHP-only900→1000 may qualify. AE-only gain never retries; later genuine health commit may. Joined fields generate one observation/payment; no-op/abort produces none. A complete simultaneous main/orb group commits both results before any health observer: Skill2 cannot reject the orb midway, and Phanes' RES-008 allocation remains unchanged. Preserve Cost/Loss/Heal versus Damage identity. HP_ZERO/prevention/Return/Revive handling completes before checking stable validity; do not activate an ordinary low-HP State before death evaluation or expose staged HP1. Failed AE uses nothing/closes that observation; replay cannot pay/consume/create twice or create a persistent retry token.
+
+---
+
+## M-087 — Temporal Admission with Present Reserved Occupancy
+
+**Status:** `MUST_PASS`
+**Fixture:** active temporal State at reserved5; enemy Natural Entity hit, fixed-area hit and random targeting; ally Heal/Buff, independent existing DoT/Mark/environmental damage, attempted ally deployment and charged dodge. Include death/leave from a non-protected source.
+
+**Expected:** enemy-Natural outcome Damage recipient admission rejects Savitar with no actual HP/Shield Damage. Entity/area binding does not bypass this scoped gate. State retains alive/present/Slot claim and emits no LEAVE_FIELD/ENTER_FIELD/DEATH/Deck transition; another actor cannot deploy there. Non-Damage/independent effects use their own ordinary laws, not global immunity. Passive dodge does not trigger/consume charge. Fixed geometry still includes reserved5; random/single targeting adds no projection credit. Death/leave clears return/estimate, no return Heal; spent battle use survives ordinary Revive/redeploy. External Authority conflicts still need actual Authority-bearing clauses.
+
+---
+
+## M-088 — Isolated Projected Damage, Shared Budget and Independent Batches
+
+**Status:** `MUST_PASS`
+**Fixture:** temporally protected HP100/MaxHP1000/Shield50; fixed incoming post-mitigation amount80, then another identical batch. Variant real non-protected Shield consumption20 between batches. Shared-packet variant HP60/Shield40 with two post-mitigation demands60/60 and explicit PROPORTIONAL. Include another admission rule, keyed Hit inputs, duplicate observation, local no-recipient terminal batch, abort and State retirement.
+
+**Expected:** each original batch projects Shield50/HP30 while real HP/Shield stay100/50; total avoided60 → return requested250+18=268. If real Shield became30, second projectsHP50; avoided80 →274. No shadow timeline. Shared-packet variant spends hypothetical Shield40 once and projects totalHP60, ActualHP shares30/30, not120 or two independent full budgets; real values unchanged. Bypass only named own admission clauses, preserving all other pipeline rules. Counterfactual uses pinned pre-Damage phase inputs, not changed post-commit defences. Seal distinct DamageProjectionResultRef, never P-043/actual Damage credit/listeners/Reflect/Lifesteal/HP_ZERO. No gameplay RNG advance; supported retained/pure probe only. Local terminal exclusion may credit once, abort/retired State cannot; redelivery/resume cannot double-add or recompute against newer state.
+
+---
+
+## M-089 — Opportunity Return before CC without Completion
+
+**Status:** `MUST_PASS`
+**Fixture:** retained temporal State with avoided60 at reserved5, return MaxHP1000; next own SSI grant is subsequently lost to CC. Passive charge used and Skill3 pending/active clock also exist. Variants actual Action, death/leave/State retirement before grant, Heal-block/zero Effective Heal and save at grant/Heal boundary.
+
+**Expected:** first later owner opportunity grant → end temporal admission protection at same owned Slot → requested Heal268 under ordinary Overheal/modifiers → only then CC/Action handling. CC branch has no actual Action/completion, so no dodge-charge refresh, Skill3 start/decrement/class regen or extra SSI grant. Return does not materialize into another cell or emit Field re-entry. Clean blocked/zero Heal still makes return terminal. Death/leave cancels it, no Heal of a fresh presence; once-battle use remains consumed. Creation opportunity cannot discharge newly created State; recovery completes the same grant once without duplicate Heal/SSI advance.
+
+---
+
+## M-090 — Delayed Enhancement, Three Actions and Fresh Cooldown
+
+**Status:** `MUST_PASS`
+**Fixture:** Natural Skill3 paysAE25; CC-lost grant, rejected pending Skill3 recast/candidate probes, then three actual Natural Actions including Basic/Skill1/Ultimate; non-Natural work between them. Source leaves/dies in pending/active/cooldown variants; old completion re-delivered after refresh/new State.
+
+**Expected:** activation unenhanced; next actual start activates and next three own actual completions consume3. CC/rejected probes do not start/consume; non-Natural consumes none. Pending Skill3 recast is rejected because the buff would be active for that prospective Action; no mutation from the probe. Natural Skill1 payability may use its declared pending-for-this-Action15AE branch, then actual start promotes State; unsuccessful admission leaves pending intact. Basic coefficients130/130, Skill1 185/185 and Cost15; no ×1.30 conversion or SPD/SSI mutation. Cannot stack/cast active/buff own activation. Enhanced qualifying direct result basis100 yields requestedHeal10; Shield/overkill/counter/Reaction/DoT/unrelated same-root result999 excluded. Third completion creates fresh one-action cooldown without decrementing it; fourth actual completion ends it. Death/leave retires pending/active/cooldown; old callbacks cannot affect new instances.
+
+---
+
+## M-091 — Fixed-column Skill and Exact Ultimate Child/Snapshot/Heal
+
+**Status:** `MUST_PASS`
+**Fixture:** own4 maps enemy1/4/7 on either Side; AE20 standalone Skill1 or ordinary admitted root Ultimate. Source ATK100/WIL50, zero defence/Shield, targets sufficientHP; a pre-Damage defender move changes occupancy after capture. Active-Skill3 and absent-Skill3 branches, empty Slot, invalid resolved occupant and unrelated same-root Damage.
+
+**Expected:** standalone Cost then current column/common ATK/WIL capture; fixed coordinates permit declared defender interposition and read post-move occupants, one simultaneous155/155% group or185/185% enhanced. VFX never moves attacker. Ultimate root Cost then one common source capture before exactly one real non-Natural SKILL1 child/positional work; coefficients170/170% (255 per simple recipient) or200/200% (300). AE child0 stays0, no negative refund from−5 and no waived root readiness/Rage payment. Frozen source formulas survive later movement; no per-target recapture/extra Basic/Natural/SSI/class gain. Three simple recipients give exact child ActualHP765 → inherent Heal76.5, or enhanced900 → additive20% Heal180, before ordinary numeric/Overheal policy. Root Heal/direct completion precedes enemy counters; counter/unrelated same-root receipts never join the basis. Empty/invalid positional branches drop without selecting another coordinate.
+
+---
+
+## M-092 — Reject Unbounded Positional, Projection or Mandatory Profiles
+
+**Status:** `MUST_REJECT`
+**Input:** renderer-empty reservations; hidden Entity chase/coordinate reselection/default overwriting prior locks; random/single scope passed as fixed area; greedy/Slot-ID matching or unproved unequal legality graphs; partial move/use/counter commit; unbounded success callbacks/recursive phases; missing counter Snapshot/Actor/retention/release/allocation; mutative counter preparation; fake committed projection/P-043 credit, missing source/threshold/defence input, multiple hypothetical full Shield budgets, real mutation/RNG draw or persistent shadow timeline; AE-only/poll retries; stable-health callback before lifecycle/inside joined transaction; cycles/future-Action waits; stale State/grant refs or fake Action to return; missing supported Mode/projection/composition law.
+
+**Expected:** responsible Schema/Contract owner rejects before affected partial mutations, movement, health credit or scheduling continuation. Supported bounded profiles and existing explicit Entity binding/ordinary State/Cost/Action/Shield workflows stay accepted. No new Character branch, Tag/Primitive, arbitrary middleware or unrelated priority makes rejected content executable.
+
+---
+
+## M-093 — Keep External Migration and Shared-budget Ordering Explicit
+
+**Status:** `PROBE_UNRESOLVED`
+**Input:** request to change previous approved Entity locks without replacement designer checkpoints; several independent low-HP mandatory settlements compete for insufficient sharedAE; external unequal matching topology/non-projectable Hit/numeric rules; unrelated counter and other Reaction whose order changes gameplay; observed-root cancellation or battle termination before ordinary counter release.
+
+**Expected:** do not infer migrated locks, seeded resource winner, greedy matching, average projected Damage or global Counter priority. Current Savitar internal locks normalize independently; existing explicit kit profiles remain authoritative. Content depending on these external observable choices requires explicit supported semantics or stays rejected. This probe does not reopen Savitar's locked proportional counter batch, mandatory HP/MaxHP timing or return-before-CC law.
+
+---
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -4531,13 +4641,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 37 character-derived integration tests;
+- 93 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-168 tests / probes / meta-tests
+224 tests / probes / meta-tests (219 A–N cases plus 5 META cases)
 
 The count is not a design target.
 
