@@ -1711,17 +1711,23 @@ ultimate: cast 2 lần skill 3 mà không tốn rage cùng ae, sau khi cast xong
 60) Vô Thường (Anicca), Ranger, SSR.
 Mô tả: Chúng Sinh Mệnh Tướng,
 
-nội tại: vào trận nhận 1 buff hút máu, hồi hp = 22% sát thương gây ra trong turn đó, sau đó buff sẽ tự mất trong 1 turn, sau 1 turn đó lại nhận buff hút máu lần nữa, turn sau nữa buff hút máu lại mất, turn có turn không lặp lại đến khi chết.
+Passive — Sinh Diệt Nhị Tướng / Two Marks of Arising and Passing
+vào trận nhận 1 buff hút máu hồi hp = 22% sát thương gây ra trong 1 natural Action tiếp theo, tức là vào trận nhận hút máu, dùng ultimate vì đầy rage khi ra sân từ deck sau đó mất hút máu, sau đó buff sẽ tự mất trong 1 natural action, sau 1 natural Action đó lại nhận buff hút máu lần nữa, natural Action sau nữa buff hút máu lại mất, có và không lặp lại đến khi rời sân.
 
-đánh thường: bắn 1 mũi tên vào mục tiêu gây sát thương = 100% wil + atk.
+Basic — Nhất Tiễn Vô Thường / Arrow of Impermanence
+bắn 1 mũi tên vào mục tiêu gây sát thương = 100% wil + atk.
 
-skill 1: bắn 3 mũi tên lên trời (vfx), rơi ngẫu nhiên lên 3 kẻ địch, mỗi kẻ nhận 1 đánh thường, tính là đánh thường nhưng không follow up attack, 20 ae.
+Skill 1 — Tam Tiễn Lạc Mệnh / Three Arrows of Fallen Fate
+bắn 3 mũi tên lên trời (vfx), rơi ngẫu nhiên lên 3 kẻ địch, mỗi kẻ nhận 1 đánh thường, tính là đánh thường nhưng không follow up attack, 20 ae.
 
-skill 2: vận sức trong 1 turn, 1 turn đó vẫn nhận sát thương, sau 1 turn bắn 1 mũi tên vào leader địch gây sát thương= 320% đánh thường, 40 ae.
+Skill 2 — Nhất Niệm Định Mệnh / Fate in a Single Thought
+vận sức trong 1 natural Action, 1 natural Action đó vẫn nhận sát thương, sau 1 turn bắn 1 mũi tên vào leader địch gây sát thương = 300% đánh thường (đánh thường là 100% wil và 100% atk nên 300% là 300% wil + 300% atk), 40 ae.
 
-skill 3: tăng 30% atk và 10% wil trong 2 turn, hiệu lực turn sau lúc kích hoạt kỹ năng, kích hoạt xong cũng nhận 1 khiên = 10% mx hp, tức là sài skill này lập tức nhận khiên =10% mx hp, turn sau đến lượt char này char nay sẽ được+30% atk, 10% wil trong 2 turn. cost 25 ae 10 rage và hp = 4% mx hp.
+Skill 3 — Thịnh Suy Chuyển Tướng / Wax and Wane
+tăng 30% atk và 10% wil trong 2 natural action, hiệu lực ở natural Action sau lúc kích hoạt kỹ năng, kích hoạt xong cũng nhận 1 khiên = 10% mx hp, tức là sài skill này lập tức nhận khiên =10% mx hp, natural Action sau đến lượt char này char nay sẽ được +30% atk, 10% wil trong 2 natural action. cost 25 ae 10 rage và hp = 4% mx hp, không giảm max hp, chỉ có thể dùng natural Action để kích hoạt skill này khi hp trên hoặc = 15% max hp, thấp hơn không thể dùng.
 
-ultimate: cast skill 1 và skill 2 cùng lúc, skill 2 sẽ không cần vận sức, cả 2 skill đều cast không tốn cost, sau khi dùng ult xong không thể tăng rage qua hành động trong 1 turn và bị giảm 2,5% max hp (reset nếu chết rồi hồi sinh). tức ultimate là bắn 4 mũi tên, trong đó 3 mũi random vào 3 kẻ địch ngẫu nhiên (không thể là leader) gây sát thương = 1 đánh thường, 1 mũi tên bắn leader địch gây sát thương= 320% đánh thường, nếu đang có nội tại thì sẽ được hồi hp = (tổng sát thương của sát thương gây ra lên 3 kẻ địch (1 đánh thường/kẻ) và 320% sát thương đánh thường gây lên leader địch) * 22% hút máu từ nội tại, và buff này có thể + dồn.
+Ultimate — Tứ Tướng Vô Thường · Sinh Trụ Dị Diệt / Arising, Abiding, Changing, Ceasing
+cast skill 1 và skill 2 cùng lúc, skill 2 sẽ không cần vận sức, cả 2 skill đều cast không tốn cost, sau khi dùng ult xong không thể tăng rage qua hành động trong 1 natural Action và bị giảm 4% max hp (reset nếu chết rồi hồi sinh hoặc rời sân). tức ultimate là bắn 4 mũi tên, trong đó 3 mũi random vào 3 kẻ địch ngẫu nhiên (không thể là leader) gây sát thương = 1 đánh thường, 1 mũi tên bắn leader địch gây sát thương = 300% đánh thường, nếu đang có nội tại thì sẽ được hồi hp = (tổng sát thương của sát thương gây ra lên 3 kẻ địch (1 đánh thường/kẻ) và 300% sát thương đánh thường gây lên leader địch) * 22% hút máu từ nội tại, và buff này có thể + dồn.
 
 61) Vô Niệm (Asankha) Mage, Ur.
 mô tả: Chúng Sinh Ý Tướng
