@@ -1694,19 +1694,26 @@ ultimate: neo định mọi chỉ số của bản thân lúc ultimate, không t
 Đây chẳng phải là tanker tối thượng sao? debuff phản hồi phục là cách khắc chế hắn vì debuff vẫn áp lên người hắn, nếu hắn tự heal và vì nguồn heal không phải của người khác nên vẫn có thể heal và hắn sẽ nhận sát thương, vì sát thương từ debuff này bỏ qua res cùng arm nên chẳng khác nào sát thương chuẩn.
 
 59) Vô Lượng (Anatta), SSR, Tanker.
-mô tả: Chúng Sinh Khổ Tướng, 
+Mô tả: Chúng Sinh Khổ Tướng.
 
-nội tại: khi nhận sát thương vượt 25% mx hp nhận buff reflect 35% trong 1 turn, sau đó hồi hp = 30% sát thương phản được trong lúc nhận buff phản sát thương, Pháp Tắc. ví dụ hắn có 100 hp, bị đánh còn 75 hp, lập tức nhận 1 buff phản 35% sát thương cấp Pháp Tắc trong 1 turn, lúc nhận sát thương đến lúc hắn hành động tức 1 turn bộ bộ đếm nội tại này, trong 1 turn đó sát thương bị phản bởi buff cấp pháp tắc này sau 1 turn kết thúc sẽ hồi hp cho hắn với tỉ lệ 30%. nếu hắn nhận 15 sát thương trong 1 turn đó hắn được hồi 4,5 hp sau khi 1 turn kết thúc, nội tại kích hoạt 1 lần/turn hành động của hắn. vậy về cơ bản hắn có thể kích hoạt nội tại liên tục nếu nhận sát thương hơn 25% mx hp và được hồi hp mãi nhờ nguồn ngoài.
+Passive — Khổ Tướng Hồi Chấn
+khi nhận sát thương vượt 25% mx hp nhận buff reflect 35% trong 2 natural action, tức là bị đánh thì nhận buff này, sau 2 natural action thì buff mất rồi hồi hp = 20% sát thương phản được trong lúc nhận buff phản sát thương, khi kích hoạt hồi hp khi buff phản sát thương mất thì nội tại cho buff phản sát thương cũng vào cd là 2 natural Action của char này, reflect 35% nghĩa là phản 35% sát thương nhận từ natural Action lên kẻ gây sát thương bằng na.
 
-skill 1: -25 rage mỗi khi kích hoạt, tự động kích hoạt khi bị đánh vượt 18% mx hp, nhận 4 ae với mỗi 1% vượt. Pháp Tắc.
+Basic — Vô Ngã Nhất Quyền
+đấm mục tiêu gây sát thương = 100% wil + atk.
 
-skill 2: gây sát thương = 2 đánh thường lên 1 mục tiêu, 20 ae và 3 rage. không tính đánh thường.
+Skill 1 — Kim Chung Nạp Khổ
+-20 rage mỗi khi kích hoạt, tự động kích hoạt khi bị đánh vượt 18% mx hp trong 1 natural action, nhận 3 ae với mỗi 1% vượt. tức là để hoà vốn là 21 ae cần nhận sát thương từ 1 natural Action không tính dot = 25% max hp của bản thân.
+animation khi kích hoạt: kim chung hư ảnh hiển hiện bao bọc bản thể.
 
-skill 3: dậm chân mạnh xuống đất gây 1 đợt sóng đất(vfx), gây sát thương dọc vào 3 ô trước mặt, mỗi kẻ đứng trong 3 ô này nhận sát thương = 1 đánh thường và bị - 10 rage, 30 ae, không tính đánh thường.
+Skill 2 — Song Trọng Phá Chướng
+cận thân target gây sát thương = 2 đánh thường lên 1 mục tiêu, 20 ae và 5 rage. không tính đánh thường.
 
-đánh thường: đấm mục tiêu gây sát thương=100% wil +atk.
+Skill 3 — Tam Giới Địa Chấn
+đứng tại chỗ dậm chân mạnh xuống đất gây 1 đợt sóng đất (vfx), gây sát thương dọc vào 3 ô trước mặt (1/4/7, 2/5/8, 3/6/9 tùy vị trí đứng), mỗi kẻ đứng trong 3 ô này nhận sát thương = 1 đánh thường và bị -10 rage, 30 ae, không tính đánh thường.
 
-ultimate: cast 2 lần skill 3 mà không tốn rage cùng ae, sau khi cast xong tăng 20% res cùng arm của bản thân trong 1 turn đồng thời nhận 10 rage.
+Ultimate — Vô Lượng Kim Cương · Chấn Khổ Tam Giới
+cast 1 lần skill 3 mà không tốn rage cùng ae nhưng hệ số sát thương từ 100% đánh thường lên 200% đánh thường/target tức 200% wil và 200% atk, sau khi cast xong tăng 20% res cùng arm của bản thân trong 1 turn đồng thời nhận 10 rage.
 
 60) Vô Thường (Anicca), Ranger, SSR.
 Mô tả: Chúng Sinh Mệnh Tướng,
