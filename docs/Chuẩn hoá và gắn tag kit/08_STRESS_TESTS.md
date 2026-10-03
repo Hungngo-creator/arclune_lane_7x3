@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-03-I.6
+**Version:** 2026-10-03-I.7
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.7+, `06_KERNEL_RUNTIME.md` G.6+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.8+, `06_KERNEL_RUNTIME.md` G.7+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -13,6 +13,7 @@
 **Revision I.5:** adds M-051–M-053 for opted-in singular HP payment, atomic allowance consumption, immutable HP at payment commit, explicit Cost-caused lifecycle continuation and malformed-profile rejection. Prior fixtures and exact/distributed Cost semantics remain intact; declarative obligations only.
 
 **Revision I.6:** adds M-054/M-055 for joined survival/prevention/Return/use completion, local Heal and post-success Cost boundaries, failure/replay/cycle rejection. Prior Cost/Pilot fixtures remain unchanged; no executable game validation.
+**Revision I.7:** adds M-056–M-065 for completed Nerovar/Phanes/Azoth normalization: retention/window, pre-Cost snapshots, own-baseline, child provenance, direct Execute, shared-recipient allocation, mitigation override and local Cost continuation. Prior-Pilot fixtures remain unchanged; Architecture Phase coverage only.
 
 ---
 
@@ -3430,6 +3431,144 @@ Save/restore immediately after the Leader branch, during prepared-but-uncommitte
 
 ---
 
+## M-056 — Nerovar Return Retains Battle State and Uses One Actor Window
+
+**Status:** `MUST_PASS`
+**Purpose:** validate locked R4 retention/clock through existing DEP-008/CLK-002 and State/Shield/Trigger owners; complement complete R4 Damage/payment/snapshot bindings in M-061.
+
+**Fixture:** successful M-054 completion with Nerovar's explicit empty classification-discard list, discard FIELD_PRESENCE_SCOPED, retain BATTLE_SCOPED, unmatched RETAIN and CurrentHP RETAIN. Source owns both battle allowances, battle Current Deployment Cost, a BATTLE_SCOPED Buff/Debuff/Mark/Shield and FIELD_PRESENCE_SCOPED State/Shield. Skill2 cap is keyed to source actor-window, with a declared successful-use record already present in that window.
+
+**Expected:** Return preserves HP1/cost/battle allowances and battle-scoped contributions regardless of Buff/Debuff/Mark classification; only field-scoped items governed by this profile terminate with transition/source-leave cause. No Alcestis purge, Cleanse/expiry/break or redeploy reinitialization. An external explicit retention law follows its existing conflict law rather than being invented from Authority Tier.
+
+Natural, non-Natural, Forced and child Basics share the same current actor-window cap. Extra Basics and other actors' global TURN_BOUNDARY events cannot reset it. Nerovar's next Natural Action **opportunity start** resets the window, including a CC-lost opportunity; an actually completed Action is not required for this reset. No opportunity while dead means no reset. Save/replay preserves source/window/use identity; old child/result delivery cannot consume a newly reset window as if it were new evidence.
+
+**Forbidden:** purge all Debuffs/Marks/Shields; classification overrides an empty purge list; global-boundary reset; separate forced/child caps; completion-only reset; redeploy restores battle uses.
+
+---
+
+## M-057 — Phanes Locked Counter, Child Lineage and Local Settlement Composition
+
+**Status:** `MUST_PASS`
+**Purpose:** exercise locked multiplier/activation/lifetime, child/root distinction, immutable packages and explicit local dependencies through existing State/Stat/Action/Cost/Result owners. This isolated fixture provides already-committed packet results; M-062 separately verifies shared-recipient allocation and per-child threshold snapshots from the now-locked answers.
+
+**Fixture:** source orb countN is battle-scoped and capped10; external resolved ATK/WIL input excludes the source orb modifier family. Successful Ultimate activation precedes two sequential non-Natural Basic children with one parent-locked target. Each child supplies a sealed Basic own-direct Actual-HP-Damage package with explicit provenance/denominator bindings, independent of later lifecycle mutations. Local Skill1→Skill2→Skill3 dependencies have CONTINUE on clean local failure; parent reactionBoundary AFTER_DIRECT_EFFECTS_COMPLETE and blocking-child/settlement policies are explicit.
+
+**Expected:** N0 gives factor1; N1 gives1.05; N10 gives1.05^10, not1.50. RES-007 excludes every instance/stack of the matching runtime source/origin stat family, resolves other declared contributions and applies this family's product once. Activation adds one capped orb before child1 once, never on a failed activation or replay; at10 no eleventh orb. No recursive own-output input/base-stat mutation or orb Actor/SSI opportunity. Counter/modifier survive ordinary field-leave/Deck/death under their battle retention. Own multiplication does not compound again merely because another Snapshot is taken.
+
+Children preserve BASIC_ATTACK identity, own results and non-Natural status. A Natural root Ultimate permits only its explicitly authored child-Damage scope for Skill3; it does not grant children SSI/resource gains or include an unrelated Reaction/DoT sharing root/Attribution. A non-Natural root does not qualify from the Ultimate name alone. No ordinary Reaction between children; mandatory lifecycle and declared local Skill settlements still finish at their own authored boundaries.
+
+Immutable D=25% of the package's denominator requests30 Rage; D=25.5% requests31.5 before ordinary numeric normalization; D=15% does not activate. Full Rage discards excess but does not remove an otherwise payable AE5 charge. Skill2 requested Heal uses0.40×the captured Basic Actual HP Damage, unaffected by later Execute/recovery. Failed AE in one settlement closes that dependency and later Skills remain eligible; numbered Skill names alone do not establish global priority.
+
+Exact Ultimate children waive only their authored Skill1/2/3 AE30/10/5. Conditions/caps/use remain; foreign HP/AE Costs and unrelated descendants are not silently waived. Replay cannot consume uses, grant Rage/Heal or add an orb twice. Opponent recovery cannot rewrite the captured package.
+
+**Forbidden:** additive orb factor; recursive stat input; child becomes Natural; same-root means root-direct; all descendant Costs waived; failed Skill1 blocks Skill2/3; live HP replaces sealed Damage result; visual display count dictates gameplay hit priority.
+
+---
+
+## M-058 — Explicit Execute Confirms Death without Ordinary Prevention
+
+**Status:** `MUST_PASS`
+**Purpose:** validate DTH-008 independently of the fully locked Character-specific qualification/packet fixtures.
+
+**Fixture:** authored DIRECT_EXECUTE request to a locked legal current-instance alive recipient, ordinary HP_ZERO prevention available, explicitly completed upstream activation payment/use and no conflicting Authority-bearing clause. Threshold qualification is supplied as an explicit fixture input. Existing immutable Damage receipts are retained. Another fixture recipient has a valid post-DEATH_CONFIRMED recovery rule.
+
+**Expected:** successful request commits HP0 and confirmed-dead outcome together using P-060's explicit-lethal-condition context and P-062. No ordinary HP_ZERO/prevention dispatch, provisional HP0/alive observation or Nerovar HP_ZERO prevention intercept. Canonical death/kill/world observers receive the same committed confirmation with normal attribution/lifeSerial/instance/batch identity; no invented lifeSerial increment or extra kill.
+
+Post-confirmation Revive/death-triggered Return may run under their explicit law. Recovery does not refund prior AE/use or erase confirmation. Execute supplies no Actual HP Damage, so existing Heal/Rage packages exclude its HP assignment. Real Authority-bearing anti-death conflicts still use existing admission/AUT; this profile grants no automatic bypass or Rank-derived win.
+
+Protected subject invalidation/conflict before commit adds no Execute delta and preserves any other authoritative commit. Ordinary lethal Damage/Cost/HP Loss with the same recipient still opens its normal prevention pipeline. Save at prepare/commit/observer/recovery boundaries preserves policy/context/terminal identity; no second confirmation, repeated upstream payment/use or forced recovery.
+
+After all confirmation observers finish and receipt payloads are released, ordinary Revive leaves lifeSerial unchanged. Redeliver the original successful or terminal-failed Execute request: check its stable original Effect/candidate identity before allocating another death context; no new death/payment/use. Keep that identity through the replay horizon and reject too-old redelivery.
+
+**Forbidden:** secretly call P-061; emit fake fatal Damage; bypass every anti-death Authority; replace a locked target; undo payment after recovery; apply direct profile globally to every Execute label or every HP0.
+
+---
+
+## M-059 — Direct Confirmation Rejects Ambiguous or Foreign Lifecycle Work
+
+**Status:** `MUST_REJECT`
+**Fixture/input:** missing/unsupported confirmationPolicy; unlocked/foreign-instance/foreign-result subject; callback confirmation; implicit profile selected from Ability/Character name; simultaneous ordinary-prevention and DIRECT_EXECUTE routing; HP0 and confirmation published at separate barriers; synthetic Damage receipt from Execute; ignored actual Authority conflict; dependency waiting on its own confirmation; duplicate/stale request confirming an already-dead subject.
+
+**Expected:** malformed authoring is rejected; runtime stale/invalid/blocked request fails locally with no Execute HP/confirmation delta. Earlier payment/use follows its own committed law, with no fabricated refund. Valid ordinary lethal/prevention or separately authored post-death recovery remains accepted. No global priority, new Tag/Primitive or Character callback is required.
+
+---
+
+## M-060 — Own-Excluding Stat Baseline Rejects Recursive or Ambiguous Contributions
+
+**Status:** `MUST_REJECT`
+**Fixture/input:** EXCLUDE_THIS_SOURCE_FAMILY with unavailable/ambiguous runtime source/origin Ability/origin Stat Effect refs; self-referential final-stat input; cross-family feedback cycle; unsupported noncommutative baseline/stack composition without a Contract; undeclared/unbounded/illegal count binding; mixed runtime owners treated as one family; Snapshot capture applies the modifier again; base mutation substituted for a persistent contribution.
+
+**Expected:** Normalizer/State-stat validation fails closed on the offending refs/dependency/law. Existing ordinary stat baselines and explicitly legal contribution profiles remain accepted. No hidden source/list/Event ordering, POW Primitive, orb Actor or repeated compounding is introduced. Failed reads/validation do not mutate stats/counts or existing independent contributions.
+
+---
+
+## M-061 — Nerovar Complete Formula, Checkpoint and Paid-Heal Composition
+
+**Status:** `MUST_PASS`
+**Fixture:** full Nerovar R4 authoring, costLifecyclePolicy CONTINUE_ADMITTED_ACTION and explicit SNP-006 source snapshot. Two branches make Skill1 HP payment lethal: unused Passive succeeds Return, versus prevention unavailable/fails. Use identical pre-Cost ATK/WIL/MaxHP and resulting paymentHP0. Change source stats/field-scoped modifiers during mandatory lifecycle. Provide before/after group occupants and legal/invalid recipient variants.
+
+**Expected:** both casts use the same pre-Cost source capture and immutable H_postCost0; explosion HP component0 regardless of later survivalHP1. Costs/use/Return follow M-051–M-055, never duplicate those transactions. Basic has100% PHYSICAL ATK+100% WILL WIL in one hit. Meteor queries Slot8 at its start,180% each; after mandatory lifecycle explosion re-queries Slots5/7/8/9 and simultaneously deals WILL100%WIL+PHYSICAL10%H_postCost. Changed occupants follow the later query; invalid after lock drops locally/no replacement. Ultimate re-queries Slot5 for150% each, then current enemy group for150% each+TRUE5% captured source MaxHP. Its later group is simultaneous, not iteration-driven.
+
+Skill3 common pre-group recipient HP snapshot at Slots2/5/8 yields TRUE50% **each target's** HP, simultaneous; Heal20% own committed Skill3 ActualHP sum excludes Shield/Overkill/foreign Damage. Skill2 consumes AE4/window cap after completed Basic Damage/mandatory lifecycle, heals10% whole own-direct Basic ActualHP sum; successful full-HP Heal0 still uses cap, missingAE consumes none. Natural/non-Natural/Forced/child Basics share M-056's window. Passive snapshots requested50% source MaxHP at its admission and locks current-instance allied Leader at settlement start; missing/invalid/full-HP Leader cannot block Return or cause retarget.
+
+Failed required Cost neither activates the cast nor exposes its pre-Cost snapshot to direct Effects. Probe/replay/redeploy never capture twice, reset battle allowances or debit again. Permute recipients/technical iteration: per-provenance results unchanged, no ordinary Reaction between sequential direct groups; mandatory lifecycle always runs.
+
+**Forbidden:** source stats after Cost; live HP after prevention as H_postCost; all Action targets locked at once; source HP as Skill3 target formula; global-turn Skill2 cap; Heal reconstructed from nominal Damage; equality uses strict-below safeguard; stale Slot recipient fallback.
+
+---
+
+## M-062 — Phanes Proportional Main/Orb Results and Independent Child Snapshots
+
+**Status:** `MUST_PASS`
+**Fixture:** Basic's main/orb PHYSICAL+WILL components independently produce post-mitigation demands main60/orb40 on one target with Standard Shield20 (source contributions12/8) and HP40. Group explicitly opts into RES-008. Technical packet/component ordering is permuted. Variants use type-restricted Shield, Shield Piercing, zero demand, abundant HP and ordinary numeric precision. Ultimate locks one target but child-start stat/count/target-MaxHP inputs differ legitimately between children.
+
+**Expected:** incoming Shield absorption main12/orb8; Shield **source ledger** separately consumes12/8. Remaining HP demands48/32 yield ActualHP main24/orb16, netHP40 removed and Overkill24/16; retain two immutable receipts. HP_ZERO/lifecycle runs only after batch commit. S1 never Execute-rewrites them. An eligible type-specific layer allocates among only eligible remaining components; piercing/ineligible demand bypasses that layer. T=0 no division. Numeric allocation obeys project precision/conservation and has no packet/list tie priority. Unsupported numeric allocation must fail visibly rather than manufacture a gameplay order.
+
+N0 creates only main packet/no phantom orb result; N>0 produces main100%ATK+100%WIL and aggregate orbN×30%each. At each Basic start capture ATK/WIL/N/targetMaxHP once for both packets. Child1 and child2 capture independently despite the shared locked Entity. Basic2 invalid lock drops locally/no retarget. Their S2/S3 denominator uses each child's captured MaxHP, while S1 after whole batch/mandatory lifecycle reads live currentHP/currentMaxHP and requires positive **committed orb ActualHP**, active legal target. Shield-only orb result cannot qualify. Damage-killed/invalid target cannot consume S1 AE/use; revalidation/payment/waiver precedes cap consumption/request.
+
+Supply surviving recipient fixtures D/M exactly15%/40% and strictly above; strict S3/S2 gates apply, S1 inclusive5% applies at its checkpoint. S1→2→3 uses only each immutable main+orb package, excluding Execute/remnant root-linked foreign Damage. Same-root Reaction does not qualify for Natural-root child inclusion; exact children waive only AE30/10/5, preserve usecap4 and full-Rage AE5 rule. Local failed AE closes one branch only. No ordinary Reaction between child1/child2; mandatory lifecycle remains. Replay after ledger/result release cannot spend Shield/HP/cap/Heal/Rage twice.
+
+**Forbidden:** independent packet budget double-spend; main-first/orb-first; SHP-002 mistaken for packet allocation; one Ultimate snapshot for both Basics; threshold denominator re-read; execute added to ActualHP package; hidden rounding/list priority.
+
+---
+
+## M-063 — Azoth Physical RES Override and Snapshot Debuff Lifetime
+
+**Status:** `MUST_PASS`
+**Fixture:** Azoth Basic ATK8/WIL5; chosen target resolved ARM900/RES100. Explicit DMG-009 source-owned PHYSICAL→RES rule with20% RES packet Penetration. Rank-filtered Skill2 includes current legal enemies under/equal source Rank, then recast on same source/target and another source contribution under an explicitly compatible stat composition. Variants transform a component to TRUE before mitigation, and remove source Field Presence after attaching Skill2.
+
+**Expected:** one PHYSICAL Basic amount13; selected mitigation input RES80, no ARM900 lookup or target.RES mutation. Semantic Physical queries remain true. Skill3 laser formula1.50ATK+1.30WIL produces one PHYSICAL packet, not two components/double WIL; TRUE group uses normal TRUE bypass/Shield. If DMG-007 changes a qualifying component to TRUE first, DMG-009/Penetration does not mitigate it. Unqualified other-owner Physical keeps ARM default, ordinary WILL keeps RES, TRUE remains unchanged. Real conflicting Authority clauses adjudicate under AUT; Rank alone does not win.
+
+Skill2 snapshots target CurrentRES at activation, attaches delta−.30×that snapshot once. Subsequent RES changes do not re-evaluate it. Same-source recast reads new **CurrentRES including active contributions**, replaces old delta and refreshes2-completed-Natural duration; other sources keep distinct contributions/caps. Target stat Debuff benefits allies whose pipeline uses RES, while Passive packet penetration never changes ally inputs. Cast Natural completion decrements1; next actual completion expires. CC opportunity does not decrement; non-Natural cast counts only future Natural completions. Source leave does not clear debuff/clock identity; target lifecycle/cleanse remains governed by ordinary declared law. No real-time conversion or actor-window/global-boundary clock. Permute independent source contributions under their declared compatible law: same resolved stat, no list winner.
+
+**Forbidden:** relabel Physical as Will to get RES; ARM then RES double mitigation; stat RES20% Debuff from Passive; live ×.70 Skill2; same-source stack; foreign cap applied globally; source-leave expiry; cast opportunity lost to CC counted as actual completion.
+
+---
+
+## M-064 — Azoth Basic-Only Local Cost Continuation and Exact Ultimate Child Heal
+
+**Status:** `MUST_PASS`
+**Fixture:** Basic locked True-Self target currentHP<=10%Max, available cap2; source currentHP exactly5%Max, AE15 available. Basic source snapshot precedes S1 required local CostGroup and uses same admittedActionRef/CONTINUE_ADMITTED_ACTION. Variants: source HP insufficient/AE insufficient, no True Self, target invalid after payment, source confirmed death versus successful prevention/Return, real Authority Execute denial. Ultimate calls exactly one actual Skill3 child with its authored AE35 waiver, snapshots source after child Cost/waiver; supplies own committed laserActualHP30+TRUEActualHP10 and foreign same-root Damage999.
+
+**Expected:** inclusive pre-hit gate qualifies **Basic only**; laser/TRUE/Ultimate Skill3 does not consume S1 Cost/use. AE15+HP5%Max full transaction succeeds to sourceHP0, consumes one battle use, then mandatory ordinary source HP_ZERO lifecycle. Retained same Basic/Execute context continues with pre-Cost formula snapshot whether source died or returned to Deck, no new Action. Original hit Damage/lifecycle precedes attached direct Execute on still legal locked recipient. Missing full AE/HP skips S1 with no debit/use but original Basic continues. Invalid target after paid admission drops Basic/Execute locally/no retarget/refund; blocked Execute likewise preserves committed Cost/use. No persistent buff or extra Action.
+
+Child Skill3 uses one ATK/WIL/MaxHP capture after its cost override, locks simultaneous current enemy laser set, commits/lifecycle, then selects one **current** legal enemy normally and locks for TRUE10%captured sourceMaxHP. Empty pool skips TRUE. Invalid lock drops locally/no retarget. Exact child's immutable own-direct aggregate40 requests Ultimate Heal**8 (20%)**, not4/extra+10%Damage; unrelated999/Shield/Overkill excluded. Root waits for child terminal Damage package before Heal; ordinary Reactions held across laser→TRUE→Heal, mandatory lifecycle retained. Overheal discarded without self conversion; an explicitly valid external converter may consume it under its own law, no invented Axiom block.
+
+Save/resume at local Cost success/use/lifecycle/hit/Execute/child aggregate/Heal boundaries retains the same admitted context and terminal identities; no re-admission/debit/use/request/Heal replay. Basic and Skill3's different source capture timings remain explicit. Battle use does not reset on redeploy.
+
+**Forbidden:** post-hit S1 activation/payment; S1 applies to AoE; partial floor1 HP payment; S1 Cost mandatory for every Basic; source death cancels admitted hit/request; snapshot Basic after S1 Cost; inline Skill3 copy; blanket child foreign Cost waiver; Heal10%/+10%Damage restored.
+
+---
+
+## M-065 — Reject Unproved Allocation, Mitigator or Continuation Defaults
+
+**Status:** `MUST_REJECT`
+**Fixture/input:** observable shared-recipient simultaneous receipts without allocation law; PROPORTIONAL on sequential group; unavailable/foreign packet membership; separate full Shield/HP budgets per packet; list-order rounding; incompatible mitigation overrides without applicable composition/AUT law; unsupported defensive stat/custom formula; TRUE ARM/RES mitigation; passive stat mutation masquerading as packet penetration; undefined multiple-Penetration composition; probe-time pre-Cost capture; unavailable source fields; snapshot consumers after failed Cost; foreign/cyclic local admittedActionRef; local Cost branch lacking failure policy or conflicting continuation scope; continuation creating a new dead-actor Action/retarget/free cast.
+
+**Expected:** reject malformed/unsupported executable content at the responsible Schema/Contract boundary, with no partial affected state/result commit. Valid default different-recipient simultaneous Damage, default mitigation, ordinary active Cost and unrelated admitted graphs remain accepted. Missing numeric precision law remains explicit and cannot become packet priority. No Character callback, new Primitive/Tag, global AoE default or generic priority is required.
+
+---
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -3801,6 +3940,15 @@ When executable Kernel tests exist, at minimum create Golden Traces for:
 30. `M-050` bounded Final Damage phase/direct graph and foreign-binding rejection.
 31. `M-051` / `M-052` / `M-053` bounded HP cases → atomic required Cost/allowance → immutable HP at payment → mandatory lifecycle → same admitted Action continuation, with malformed inputs rejected.
 32. `M-054` / `M-055` original HP_ZERO → separate Leader branch → joined survival/prevention/Return/use success or atomic failure → separate successful-return Cost mutation or resumed death evaluation.
+33. `M-056` actor-window opportunity reset/shared Basic cap and scope-based Return retention without classification purge.
+34. `M-057` battle orb counter → own-excluding multiplicative stats → non-Natural child packages/local settlements with exact AE-only waiver.
+35. `M-058` / `M-059` explicit lethal request → joined HP0/confirmation without ordinary prevention → canonical observers/recovery, with malformed/foreign work rejected.
+36. `M-057` / `M-060` family-excluding stat input → bounded multiplicative stack once → immutable Snapshot, rejecting recursive/ambiguous baseline composition.
+37. `M-061` admitted source capture → Cost commit/H_postCost → mandatory lifecycle → per-group requery/locked batch → own-result Heal/window use.
+38. `M-062` independent component calculation → eligible-layer incoming-demand allocation and independent Shield source depletion → one recipient budget commit → separate sealed receipts/child snapshots.
+39. `M-063` semantic type transform → explicit mitigation-stat lookup/Penetration → ordinary later Damage phases; target RES snapshot contribution/replace/refresh and source-completion clock.
+40. `M-064` pre-hit Basic snapshot/gate → local required Cost/use → source lifecycle → retained hit/Execute; exact Skill3 child → sealed own-result aggregate → root Heal20%.
+41. `M-065` unsupported allocation/override/pre-Cost capture/local continuation rejected without hidden defaults or partial state.
 
 ---
 

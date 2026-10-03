@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-03-G.6
+**Version:** 2026-10-03-G.7
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -14,6 +14,7 @@
 **Revision G.4:** executes typed relation context, corrected Shield owner/zero-result law, durable replay identity, required post-completion settlement and bounded Final Damage amplification through existing owners. No Character-specific runtime, Functional Tag, Primitive or generic priority is introduced.
 **Revision G.5:** lowers bounded HP-payment profiles and immutable post-payment HP into existing Cost/State/Result transactions; handles explicit admitted-Action continuation through Cost-caused lifecycle before direct Effects. Existing defaults/distributed barriers are preserved.
 **Revision G.6:** joins explicitly transition-completed prevention to existing Return/State/Lifecycle transactions, with staged survival, completion-owned allowance and failure/replay handling. No Character runtime or global priority.
+**Revision G.7:** lowers direct Execute, own-excluding stat baselines, pre-Cost capture, shared-recipient allocation, mitigation-stat override and local Cost continuation through existing owners; ordinary defaults/profiles remain unchanged.
 
 ---
 
@@ -1393,6 +1394,10 @@ Canonical high-level path:
 4. only on successful admission:
      create / enter the admitted Action Instance
 
+4A. only if normalized Snapshot timing opts into SNP-006:
+      capture declared source fields once for this admitted Action
+      before any active Cost debit; no probe-time capture/mutation
+
 5. execute the entire declared active Cost transaction
    according to Cost Contract
 
@@ -1570,7 +1575,7 @@ That unresolved scheduling/priority question remains governed by existing Trigge
 
 ---
 
-ACT-033 extends only the required post-action stage of this pipeline: after ACTION_COMPLETED publication, register/evaluate declared postActionSettlement obligations and finish their finite work before SSI handoff that leaves this opportunity. Existing Mode hook ordering remains governed by its current Contracts/profile; this marker alone supplies no new relative priority against unrelated hooks/candidates. Ordinary unmarked completion-triggered work retains its existing nonblocking behavior. Snapshot/target planning steps do not force every stat capture before target selection: execute declared SnapshotSpec timing/dependencies, including AFTER_TARGET_SELECTION, without changing unrelated Action profiles.
+ACT-033 extends only the required post-action stage of this pipeline: after ACTION_COMPLETED publication, register/evaluate declared postActionSettlement obligations and finish their finite work before SSI handoff that leaves this opportunity. Existing Mode hook ordering remains governed by its current Contracts/profile; this marker alone supplies no new relative priority against unrelated hooks/candidates. Ordinary unmarked completion-triggered work retains its existing nonblocking behavior. SNP-006 captures belong only to successfully admitted executions and remain keyed/immutable across CST-015 continuation; failed Cost produces no direct consumer, and replay never re-captures from newer source state. Snapshot/target planning steps do not force every stat capture before target selection: execute declared SnapshotSpec timing/dependencies, including AFTER_TARGET_SELECTION, without changing unrelated Action profiles.
 
 # 24. EFFECT GRAPH RUNTIME
 
@@ -1584,6 +1589,8 @@ Runtime tracks:
 - transaction scope.
 
 No unbounded loops.
+
+For a normalized local CostGroup continuation under CST-015, Cost Runtime executes the entire group's existing transaction/result barrier inside this DAG. On success finish its declared success-side cap/use dependency before dispatching mandatory source HP_ZERO/lifecycle, retain the same enclosing admitted Action context/snapshots/locked targets and resume the already-admitted dependent hit/request. Failed local Cost closes only the authored branch under its failure policy; do not debit partially, consume use or create a new Action. No source-death cancellation is inferred for the opted-in admitted graph, no refund/re-admission occurs, and normal target/Effect invalidity remains authoritative.
 
 Recurring behavior:
 - emits/observes Events;
@@ -2231,6 +2238,12 @@ This prevents calculation contamination.
 
 ---
 
+### Shared-recipient allocation under RES-008
+
+If a normalized simultaneous group opts into sharedRecipientDamageAllocation PROPORTIONAL, the existing Transaction Manager groups incoming packet/component demands by locked recipient, using the same shared phase state. Damage Runtime calculates each independent pre-Shield demand; existing Shield Runtime allocates each eligible layer's consumed budget across eligible demands proportionally and separately depletes source contributions under §52/SHP-002. Remaining HP-bound demand shares one recipient HP budget proportionally under RES-008. No independently proposed packet may spend that budget twice.
+
+Commit one recipient net Shield/HP delta within the batch, retain separate immutable DamageResultRef receipts for all participating packets, then publish mandatory lifecycle/ordinary downstream work at the existing boundaries. Validate numeric conservation and permutation invariance before commit; reject unsupported allocation rather than round by list order. Batch/recipient/packet identities, shared state version and proposed shares belong to this existing transaction; pending save/load preserves them, successful commit seals receipts once, abort discards proposals and replay reuses terminal commit/results.
+
 # 32. SEQUENTIAL TRANSACTION
 
 For one sequential direct component:
@@ -2479,7 +2492,7 @@ Priority/scheduling remains governed by existing Trigger/Reaction Contracts.
 
 ## 35A. STATIC PASSIVE REGISTRATION / BATTLE INITIALIZATION
 
-Under `TRG-014`, the existing Trigger Engine / Contract Resolver registers normalized `PASSIVE_STATIC` rules with their owning Ability/System, runtime participant and declared lifetime. Repeated index construction for the same owner, normalized rule and lifetime reuses that registration rather than multiplying candidates. Registration supplies indexed admission/modifier/transform candidates; it is not Event-driven Action execution and pays no Ability Cost, consumes no Natural Action and advances no SSI by itself.
+Under `TRG-014`, the existing Trigger Engine / Contract Resolver registers normalized `PASSIVE_STATIC` rules with their owning Ability/System, runtime participant and declared lifetime. Repeated index construction for the same owner, normalized rule and lifetime reuses that registration rather than multiplying candidates. Registration supplies indexed admission/modifier/transform/mitigation-override candidates; it is not Event-driven Action execution and pays no Ability Cost, consumes no Natural Action and advances no SSI by itself.
 
 Battle-scoped initialization Effects use the owning battle participant's initialization checkpoint, including participants initially undeployed in Deck. For deployment-state initialization, the deployment runtime owns completion records in `DeckState`, keyed by battle × participant × owning normalized Ability/System and initialization Effect identity. Other static initialization Effects remain with their existing state owners; they do not become deployment state merely because they use this checkpoint. Transaction Manager commits required initialization deltas and their completion records together before deployment/payment/formula readers can access initialized state:
 
@@ -2862,7 +2875,8 @@ Canonical core stages:
 Damage Profile
 → component formula / pre-mitigation amount
 → §45A PRE_MITIGATION component-type transform
-→ component-specific mitigation selected by resulting type
+→ §45B explicit mitigation-stat selection, otherwise default from resulting type
+→ selected-stat Penetration and mitigation
 → scoped FINAL_DAMAGE_REDUCTION phase for eligible non-True components
 → explicitly authored FINAL_DAMAGE_MULTIPLIER for selected components, including True
 → combine eligible post-mitigation components
@@ -2926,9 +2940,15 @@ Ordinary source Class/relation predicates invoke no Authority. Genuine Authority
 
 ---
 
+## 45B. SCOPED MITIGATION-STAT OVERRIDE
+
+After §45A, existing Damage Runtime invokes Contract Resolver with normalized damageMitigationPlan, resulting semantic component type and the same authoritative Action/Actor/recipient/provenance/phase view under DMG-009. TRUE bypasses selection and ARM/RES penetration entirely. For PHYSICAL/WILL, collect compatible bounded SET_MITIGATION_STAT candidates, resolve one legal ARM/RES selection or retain the default, then pass that stat's resolved contribution value and compatible declared Penetration inputs into the existing mitigation calculation.
+
+Keep semantic type and source capability/provenance unchanged. One selected stat is used once; conflicting overrides or unsupported Penetration composition fail before affected Damage commit, not by iteration priority. Optional penetration on a matching rule is scoped packet input, not a target-stat write. Existing STATIC registration/retention ownership (§35A/TRG-014) and rule-origin refs apply; no new manager, middleware or Character name branch. Trace selection and phase version for replay; normal reduction/Final Multiplier/Shield stages continue unchanged.
+
 # 46. PHYSICAL DAMAGE
 
-For a component whose resulting type after §45A is Physical:
+For a component whose resulting type after §45A is Physical, the default path is below. An explicit §45B/DMG-009 override substitutes the selected stat and its Penetration/mitigation once, preserving Physical semantics and later stages:
 
 ```text
 raw Physical
@@ -2956,7 +2976,7 @@ The modifier query runs after ARM/Penetration mitigation and before Shield.
 
 # 47. WILL DAMAGE
 
-For a component whose resulting type after §45A is Will:
+For a component whose resulting type after §45A is Will, the default path is below. An explicit §45B/DMG-009 override substitutes the selected stat and its Penetration/mitigation once, preserving Will semantics and later stages:
 
 ```text
 raw Will
@@ -3327,6 +3347,10 @@ parameters
 ```
 
 `retentionScope` is lowered from `StateSpec.lifecycle.retentionScope`, independently of classification, duration clock and Authority. `FIELD_PRESENCE_SCOPED` identifies its owning entity/Combat-Instance presence cycle; `BATTLE_SCOPED` identifies its owning battle participant. Transition profiles decide retention under §10C; they do not classify every battle-scoped object as immune to explicit classification discard. Termination retires that instance's modifier/clock/window work while preserving immutable terminal cause and transition references for observers/replay.
+
+For a State/stat contribution selecting baseline EXCLUDE_THIS_SOURCE_FAMILY, derive its family from existing source-owner/origin Ability/origin Stat Effect refs and evaluate RES-007 through the existing P-030/stat contribution path. Read the ordinary contribution view with all matching family instances/stacks excluded, resolve other contributions under their declared law, then apply this family's bounded declared operation/stack once. Use the same authoritative State/count/version view; reject ambiguous provenance, feedback cycles or unsupported composition before producing a stat result. Constant multiplicative factors use an order-independent product under ordinary numeric law; no final-stat self read or BaseStat rewrite.
+
+Snapshot Runtime consumes that already resolved stat; index reconstruction, save/resume or repeated reads cannot add another factor or reset the retained count. Existing State/modifier refs and lifetime/replay records suffice; no orb Entity, stat-family manager or universal modifier priority. Unauthored baselines retain their previous path.
 
 ---
 
@@ -3812,6 +3836,8 @@ No kill credit yet.
 
 No Reincarnation waiting yet.
 
+This is the ordinary HP_ZERO path. §84's explicit DIRECT_EXECUTE confirmation does not dispatch this ordinary prevention window merely because its atomic post-state has HP0.
+
 ---
 
 # 83. DEATH PREVENTION
@@ -3853,6 +3879,16 @@ deathCommitBatchId
 ```
 
 Then mandatory world/system observers run.
+
+### Explicit DIRECT_EXECUTE request
+
+For normalized lifecycle confirmationPolicy DIRECT_EXECUTE, existing Lifecycle Runtime resolves the authored locked subject/current-instance and upstream dependency/result context under DTH-008. Reuse existing Effect admission and Authority Resolver for actual anti-death conflicts; no Character branch, rank-derived priority or implied Authority exception. Failed/invalid requests close locally without an Execute HP/confirmation delta.
+
+P-060 opens its existing explicit-lethal-condition context carrying this policy, with target HP/lifecycle proposals private rather than an early authoritative HP_ZERO/death-evaluating mutation. Under one protected Transaction Manager barrier, stage HP0 and P-062's confirmed-dead outcome/attribution/ordinary confirmation deltas. Commit together and then publish canonical confirmation to existing mandatory observers. Do not route through §82/83's ordinary HP_ZERO/prevention dispatch or release an intermediate HP0/alive observation. This exception is selected only by explicit normalized policy; other lethal Damage/Cost/loss remains on the ordinary path.
+
+Retain the existing request/candidate, subject/current-instance, policy, lethal cause, death-evaluation/commit identity and terminal outcome through observer/replay work. Revalidate protected subject state at commit; a stale/already-confirmed recipient or replay cannot create a second death or undo another authoritative commit. Existing post-confirmation recovery runs under its own Contracts; it cannot rewrite the prior confirmation, payment/use or immutable Damage receipts. No DamageResult is created from Execute HP assignment and no automatic retarget/refund is introduced.
+
+Before opening P-060 work, check existing terminal identity keyed by the original stable Effect execution/candidate and subject/current-instance. Do not allocate a new candidate/context to bypass it. Preserve that terminal record through the supported replay horizon even after confirmation payloads/observers are released or the target Revives with the same lifeSerial. Too-old delivery is rejected under §168; it is not a fresh lethal request.
 
 ---
 
@@ -5382,6 +5418,8 @@ A complete save needs:
 - ACT-033 required post-action obligation state and its held scheduler handoff, so recovery finishes the same finite settlement before advancing to the next Natural Action.
 - singular HP-policy input/case identity and protected counter updates, immutable post-payment HP receipts, pending Cost-caused lifecycle work and the admitted Action continuation cursor; restore must not debit, consume, process HP_ZERO or replay completed direct Effects twice.
 - transition-completed prevention death-evaluation/candidate/joined-transaction refs, protected survival/Return-retention/allowance inputs and terminal completion identity; restore must never expose or retain staged HP1 after failure, or replay prevention/Return/use/cleanup twice.
+- direct-confirmation lifecycle request policy/subject/cause/attribution, death-evaluation/commit and terminal-request identity through pending observers; restore cannot open an ordinary prevention window, confirm twice or replay committed upstream payment/use.
+- pre-Cost source SnapshotRefs/capture identity, local CostGroup continuation/success-use/lifecycle cursor, and pending shared-recipient allocation membership/phase version/proposed budgets/commit identity; restore completes the same transaction without recapture, duplicate spend or packet-priority allocation.
 
 Reuse existing Trigger candidate / Transaction Manager idempotence records, not a new manager. Observation identity includes the trigger definition and original committed Event identity; stored candidate/dependency IDs remain stable on redelivery. Check terminal observation identity before allocating another candidate, including previously nonqualifying observations. Rebuilding indexes does not reset processed identities. Release receipt payloads once their consumers finish, independently from deduplication identity retention. After a terminal record's replay horizon is retired, reject delivery from before the retained horizon rather than accept it as a fresh observation. Restore cannot recreate notes, additions, consumed sets or already-terminal settlements.
 

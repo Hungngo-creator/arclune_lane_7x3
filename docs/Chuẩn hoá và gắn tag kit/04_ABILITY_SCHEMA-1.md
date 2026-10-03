@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-03-E.5
+**Version:** 2026-10-03-E.6
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -11,6 +11,7 @@
 **Revision E.3:** adds required post-completion settlement, typed result relation context, Shield owner/zero-addition clarification and bounded Final Damage amplification/direct-Action scope. Pre-Pilot-5 data remains unchanged; E.2 ACTION_RESULT_ANY content must explicitly bind readContext before normalization to E.3.
 **Revision E.4:** adds bounded singular HP-payment profiles, immutable post-payment HP reads and explicit admitted-Action continuation through Cost-caused lifecycle processing. Existing exact-payment/default-floor and distributed Cost profiles remain unchanged; no new Tag/Primitive.
 **Revision E.5:** adds a bounded Death Prevention completion profile joining a same-subject Return-to-Deck, survival assignment and selected allowance at one commit. Existing prevention/return/default Cost semantics remain unchanged; no new Tag/Primitive.
+**Revision E.6:** adds explicit DIRECT_EXECUTE confirmation, an own-excluding StatModifier baseline, pre-Cost source snapshots, shared-recipient proportional Damage allocation bounded mitigation-stat overrides and local CostGroup continuation through existing owners. Ordinary HP_ZERO/prevention, joined Return and other stat baselines remain unchanged; no new Tag/Primitive.
 
 ---
 
@@ -447,6 +448,7 @@ ability:
   effects: []
   effectAmountModifiers: []
   damageComponentTransforms: []
+  damageMitigationOverrides: []
   resolution:
   authority:
   attribution:
@@ -1705,8 +1707,16 @@ costGroup:
   costGroupId:
   requiredCostRefs: []
   optionalDistributedCostRefs: []
+  admittedActionRef:    # optional local-graph group only
+  costLifecyclePolicy: # optional CONTINUE_ADMITTED_ACTION under CST-015
   resultBinding:
 ```
+
+### Optional local Cost-group continuation
+
+A finite pre-hit/local settlement inside an existing admitted Action graph may declare `admittedActionRef` to that same enclosing Action and `costLifecyclePolicy: CONTINUE_ADMITTED_ACTION`. CST-015 then applies its lifecycle-before-continuation barrier to that group's complete successful transaction, without creating an Action. Group required Costs remain required for this **local branch**, not automatically for the enclosing Action; explicit local failure/dependency law determines whether the ordinary hit continues. This is bounded CostGroup/Action execution, not a third Action-Intent interposition anchor or arbitrary hook.
+
+Validate same enclosing Action/current-instance, source-Actor HP payer, target/snapshot/result bindings already established, full local-group terminal barrier and declared continuation DAG. Reject foreign Action continuation, new requests, missing failure policy or conflicting Action/group profiles. It does not extend CST-014's allowance exception to arbitrary optional Costs.
 
 ### `requiredCostRefs`
 
@@ -2285,6 +2295,7 @@ Examples:
 ABILITY_START
 ACTION_START
 AFTER_TARGET_SELECTION
+AFTER_ADMISSION_BEFORE_COST_COMMIT
 BEFORE_FIRST_HIT
 AFTER_CHILD_ACTION
 ON_ENTITY_CREATION
@@ -2293,6 +2304,8 @@ AFTER_ACTION_COMPLETION
 ```
 
 Exact legal timing points belong to Contract.
+
+`AFTER_ADMISSION_BEFORE_COST_COMMIT` opts into SNP-006: capture declared source fields once for the successfully admitted Action before any active Cost debit, after read-only admission/payability checks. It is not a probe-time capture or an Effect/Counter/payment phase. Failed active Cost cannot activate snapshot-dependent direct Effects; retain a successful capture for the same admitted Action through explicit Cost-caused lifecycle continuation. Other snapshot timings remain unchanged.
 
 ---
 
@@ -2397,6 +2410,8 @@ SNAPSHOT_OPERATION
 This enum is not a one-to-one mirror of Primitive IDs.
 
 SYSTEM_LIFECYCLE is the already-used §77 Death Prevention family; only its explicitly defined canonical profiles normalize. It is not an arbitrary lifecycle operation/callback escape hatch.
+
+§77.2 also defines the bounded DIRECT_EXECUTE confirmation profile for this family; a lifecycle label alone does not select it.
 
 Normalizer maps EffectSpec to one or multiple Primitive/system-operation requests.
 
@@ -3228,6 +3243,34 @@ No Character ID check is permitted.
 
 ---
 
+# 18C. SCOPED DAMAGE MITIGATION-STAT OVERRIDE
+
+`damageMitigationOverrides` optionally contains bounded `ScopedDamageMitigationSpec` rules, owned by an Ability/System rule including PASSIVE_STATIC. This selects the defensive stat used by a qualifying non-TRUE component; it does not transform Damage type or modify the target's stat.
+
+```yaml
+damageMitigationOverride:
+  overrideId:
+  sourceActionScope:   # same typed Action/Actor scope as §18B
+  recipientScope:      # same typed relation/filters as §18B
+  effectProvenanceScope: # same direct-graph/lineage distinction as §18B
+  componentScope:
+    fromTypes: []      # PHYSICAL and/or WILL, tested after type transformation
+  conditions: []
+  operation:
+    type: SET_MITIGATION_STAT
+    stat: ARM | RES
+  penetration:        # optional existing DamageSpec penetration input, for that stat
+  resolutionPhase: PRE_MITIGATION
+```
+
+Under DMG-009, match against the resulting semantic component type after §18B; TRUE never enters this override/penetration path. Read the selected authoritative resolved ARM/RES under existing stat law, apply compatible explicitly declared Penetration, then its existing mitigation formula. Keep semantic type, source Functional Tags, Effect provenance, Hit Admission, reduction eligibility, Final Multiplier and Shield law unchanged. RES-based PHYSICAL remains PHYSICAL for semantic queries.
+
+Unmatched components use the ordinary PHYSICAL→ARM / WILL→RES mapping. Compatible matching overrides selecting the same stat may share one selection; conflicting stat selections require an explicit canonical conflict/composition law or rejection, never rule/list order. Optional Penetration retains DMG-006 law; multiple inputs whose composition is not defined remain REQUIRED_EXPLICIT, not an invented additive rule. No arbitrary stat key, custom mitigation formula, TRUE mitigation, Authority bypass or target-stat mutation.
+
+Normalizer lowers these rules to `damageMitigationPlan` and existing Damage/Contract Resolver inputs, with stable owner/origin scope and static registration under TRG-014. Reuse the same authoritative phase view as Damage transformation; no callback, new subsystem, Tag or Primitive. Rule persistence/removal follows its explicitly authored owner/lifetime, not a guessed Character policy.
+
+---
+
 # 19. STATE SPEC
 
 Canonical conceptual structure:
@@ -3473,6 +3516,19 @@ Operations may include:
 - floor.
 
 Exact stat stack order belongs to Stat Contract.
+
+Optional bounded baseline profile:
+
+```yaml
+baseline:
+  mode: EXCLUDE_THIS_SOURCE_FAMILY
+```
+
+Under RES-007, read the authoritative stat contribution view with this runtime source-owner + origin Ability + origin Stat Effect-definition family excluded, then apply this family's declared modifier exactly once. Successive instances/stacks of this family share that exclusion key; another runtime owner or Effect definition does not. Use existing provenance/contribution refs, not a new family registry.
+
+This is a pure baseline-read policy, not permanent BaseStat mutation or a second current-stat snapshot. Its declared multiplicative stack may use independent constant factors; bounded ×1.05 stacks yield1.05^N without adding a POW operator/Primitive. Normalize a finite declared stack/count binding with existing Formula/State data, preserving ordinary numeric law and cap/lifetime. Do not read the already family-modified final stat recursively, add a flat percentage instead, or reapply the family when a Snapshot is taken.
+
+Other modifier layers/contributions resolve under their existing explicit law; this profile neither orders incompatible sources nor defines a universal stat-stack order. Reject missing/ambiguous source-family provenance, dependency cycles or an incompatible baseline/stacking combination rather than choose source/list/Event order. Existing unauthored baselines remain unchanged.
 
 ---
 
@@ -4337,6 +4393,7 @@ resolution:
   mode:
   groups: []
   snapshotPolicy:
+  sharedRecipientDamageAllocation:
   commitPolicy:
   hitAdmission:
   reactionBoundary:
@@ -4372,6 +4429,12 @@ groups:
 This is declarative ordering, not arbitrary control flow.
 
 ---
+
+## 34.2A Shared-recipient simultaneous Damage allocation
+
+A named SIMULTANEOUS_BATCH group with several Damage packets sharing one recipient may explicitly set `sharedRecipientDamageAllocation: PROPORTIONAL` under RES-008. Each packet retains its own component resolution/provenance and immutable Damage Result, but shares the recipient's single Shield/HP budgets at the common commit. Allocation is between incoming eligible demands; SHP-002's proportional depletion between Shield source contributions remains a separate axis.
+
+No global multi-target/AoE default is introduced. Reject shared-recipient batches with observable per-packet results if no applicable explicit allocation law exists. Ordinary different-recipient simultaneous groups need no such field. Reject this field on non-simultaneous groups, unavailable membership/results or undeclared observable numeric allocation.
 
 ## 34.3 No general loops
 
@@ -5033,6 +5096,7 @@ normalizedAbility:
   effectGraph:
   effectModifierPlan:
   damageTransformPlan:
+  damageMitigationPlan:
   authorityPlan:
   attributionPlan:
   capabilityIndex:
@@ -5051,6 +5115,8 @@ It is not part of another Ability's `actionSpec` merely because that other Abili
 
 `damageTransformPlan` is generated from constrained `damageComponentTransforms`.
 
+`damageMitigationPlan` is generated from bounded `damageMitigationOverrides` (§18C/DMG-009); it selects mitigation inputs without transforming component type. Resolution groups preserve RES-008 allocation policy and packet/result membership. Snapshot plans preserve SNP-006 pre-Cost timing. All route through existing owners.
+
 The two plans are distinct:
 
 ```text
@@ -5063,9 +5129,11 @@ damageTransformPlan
 
 `costPlan` may carry explicit CostGroup, distributed payer-collection, and typed Cost-result binding plans.
 
-It also preserves bounded singular HP cases, protected counter consumption and the typed commit-HP result binding under CST-014/009. The existing `actionSpec` carries costLifecyclePolicy under CST-015; do not lower it as a new Trigger/Action or generic callback. P-036 remains the HP-payment operation.
+It also preserves bounded singular HP cases, protected counter consumption and the typed commit-HP result binding under CST-014/009. The existing `actionSpec` carries active costLifecyclePolicy under CST-015; an opted-in local CostGroup carries its same enclosing admittedActionRef/continuation and explicit branch-failure/success-use/lifecycle dependencies in `costPlan`/`effectGraph`. Do not lower either as a new Trigger/Action, Intent interposition anchor or generic callback. P-036 remains the HP-payment operation.
 
 An opted-in deathPrevention completion profile lowers to one joined lifecycle/Return transaction under DTH-007, using P-061 and existing deployment/State/Transaction owners. Its referenced Return operand is not also executed as a standalone Effect node.
+
+An explicitly authored lifecycle DIRECT_EXECUTE profile lowers under DTH-008 to the existing P-060 explicit-lethal-condition context and P-062 confirmation transaction. It does not synthesize Damage, HP Loss or an ordinary HP_ZERO prevention candidate.
 
 Target tie policy is normalized into `targetPlan`.
 
@@ -5163,8 +5231,13 @@ Normalizer/compiler must:
 38. Validate postActionSettlement completed-Natural-Action/Mode/owner anchors, bounded same-opportunity DAG and terminal-before-handoff requirement; reject completion cycles and waits on held boundaries.
 39. Preserve declared Shield owner independently from recipient when lowering retention/owner clocks; reject an unresolved required owner reference.
 40. Validate FINAL_DAMAGE_MULTIPLIER Damage/component/operation compatibility, directActionRef own-graph membership and same-Action Cost/Snapshot/result binding visibility; reject implicit root/Attribution scope or raw/FDR phase substitution.
-41. Validate bounded HP case/floor/required-counter compatibility and typed resulting-HP reads; preserve explicit Cost-caused lifecycle continuation in the same admitted Action under CST-014/009/015.
+41. Validate bounded HP case/floor/required-counter compatibility and typed resulting-HP reads; preserve explicit Cost-caused lifecycle continuation in the same admitted Action under CST-014/009/015, including opted-in local CostGroups without a new Action.
 42. Validate deathPrevention survival/subject/completion/counter references and their common transaction under DTH-007; reject duplicate standalone execution, unavailable/cleanup-discarded counter, foreign transition or completion cycle.
+43. Validate DIRECT_EXECUTE subject/current-instance/confirmation/result references and explicit Condition/Cost/dependency bindings; reject an implicit profile, ordinary HP_ZERO/prevention routing, damage-receipt fabrication or Authority bypass.
+44. Validate EXCLUDE_THIS_SOURCE_FAMILY StatModifier provenance/contribution/count/lifetime and pure baseline view under RES-007; reject recursive final-stat reads, ambiguous family keys, unsupported stack composition or snapshot-time reapplication.
+45. Validate RES-008 simultaneous group/recipient/packet/component/result membership, eligible Shield and HP budget conservation and explicit numeric allocation; reject hidden packet/list ordering or ambiguous shared-recipient allocation.
+46. Validate DMG-009 scopes, resulting non-TRUE component type, ARM/RES selection, Penetration compatibility, owner/lifetime and conflict law; reject target-stat mutation, type relabeling, duplicate mitigation or inferred override priority.
+47. Validate SNP-006 successfully admitted Action/source/fields/pre-Cost capture and result lifetime; reject probe/fallback capture, early gameplay mutation or snapshot consumers after failed Cost.
 
 ---
 
@@ -5787,6 +5860,27 @@ This is mandatory P-061 death-evaluation work, not a delayed ordinary Reaction. 
 
 Reuse P-061's prevented/not-prevented terminal outcome in existing typed result/DAG bindings. A success-dependent later Effect binds to **this completion instance's** terminal success, not merely to live Deck/HP state that another transition could produce. Keep that outcome available through dependent work/replay; do not reconstruct success from post-state or replay successful downstream Effects twice.
 
+## 77.2 Explicit direct Execute confirmation
+
+```yaml
+effectType: SYSTEM_LIFECYCLE
+targetRef: <locked legal recipient in the current Combat Instance>
+lifecycle:
+  operation: CONFIRM_DEATH
+  confirmationPolicy: DIRECT_EXECUTE
+  resultBinding: <optional existing P-062 terminal result binding>
+```
+
+This bounded profile selects DTH-008. Its subject is the existing EffectSpec.targetRef; no second conflicting target selector is introduced. Threshold, qualifying Damage/result scope, target revalidation, Cost and use consumption are separately authored with existing Target/Condition/Trigger/Cost/State/Resolution data; the profile invents none of them. It is not a universal meaning for all content named Execute.
+
+On an admitted successful request, one existing lifecycle transaction commits subject HP0 and DEATH_CONFIRMED together, without the ordinary pre-confirmation HP_ZERO/Death-Prevention window. P-060 opens its existing explicit-lethal-condition context with this policy; P-062 supplies confirmation, attribution and observers. No synthetic Damage/HP-Loss/HP-Cost receipt or implicit Shield/Penetration operation is produced.
+
+Ordinary explicit Effect-admission and actual Authority-bearing anti-death conflicts remain authoritative. DIRECT_EXECUTE is not an Authority exception, immunity bypass, automatic rank-based winner or extra kill credit. Lifecycle-invalid/already-confirmed recipients do not receive a duplicate death. Post-confirmation Revive/death-triggered Return and other existing mandatory lifecycle work remain legal; committed upstream payment/use is not reversed merely because recovery occurs.
+
+Normalizer requires an explicit supported profile and available locked subject/current instance, validates provenance/result and existing local DAG scope, and rejects foreign/ambiguous references, hidden retarget, callback confirmation, fabricated Damage or a contradictory request to dispatch ordinary prevention before this confirmation. Ordinary lethal Damage/Cost/loss and other prevention profiles keep their current law.
+
+The request uses existing stable Effect-execution/candidate identity plus subject/current-instance binding. Check its terminal replay identity before allocating a fresh death-evaluation context; a later Revive with unchanged lifeSerial cannot make redelivery of the old request a new Execute. Retain terminal identity for the supported replay horizon under `06_KERNEL_RUNTIME` §168; payloads may be freed independently.
+
 ---
 
 # 78. MATERIALIZATION SCHEMA
@@ -6106,6 +6200,11 @@ At minimum validator must enforce:
 70. `CONTINUE_ADMITTED_ACTION` preserves only the existing admitted Action after mandatory Cost-caused lifecycle. It grants no new Action, payment waiver, resurrection, target replacement or bypass of explicit Effect/cancellation legality; observable source-invalidity outcomes require an applicable explicit policy.
 71. Transition-completed deathPrevention requires an open matching HP_ZERO context, legal survivalHp and same-subject/current-instance local Return operand. Reject foreign/unavailable/independently executing references, duplicate lowering or a completion/dependency cycle.
 72. A prevention consumeCounterRef must resolve with explicit owner/lifetime, be available and retained after completion, and join survival/Return/prevention success at one barrier; reject contradictory eager consumption of that allowance. Failed completion commits no floor/use/cleanup/transition and cannot silently retry the same failed candidate.
+73. DIRECT_EXECUTE must be explicitly authored, current-instance subject-bound and lowered to DTH-008; reject a guessed Execute law, ordinary prevention interposition, foreign confirmation/result, fake Damage result or inferred Authority bypass. Preserve its upstream committed Cost/use and ordinary post-confirmation recovery semantics.
+74. EXCLUDE_THIS_SOURCE_FAMILY requires an unambiguous runtime source-owner/origin Ability/origin Stat Effect family and an acyclic declared contribution view. Preserve constant multiplicative stack composition without adding POW/Tag/Primitive; snapshots consume the resolved stat, never reapply the modifier.
+75. Shared-recipient PROPORTIONAL allocation is opt-in SIMULTANEOUS_BATCH law: commit recipient budgets once, preserve each packet receipt, eligible-layer proportions and bounded conserved numeric totals without packet/list priority.
+76. SET_MITIGATION_STAT changes only a qualifying non-TRUE component's mitigation lookup after type transformation. No semantic type/capability rewrite, target ARM/RES mutation, double mitigation, implicit penetration stacking or Authority bypass.
+77. AFTER_ADMISSION_BEFORE_COST_COMMIT captures once after successful admission and before active Cost debit; no failed probe/Cost may activate direct Effects, and explicit continuation retains the admitted Action's immutable source capture.
 
 ---
 

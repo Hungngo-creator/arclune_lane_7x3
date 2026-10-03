@@ -1635,20 +1635,28 @@ nội tại: khi hp dưới hoặc =11% max hp (từ 1 đến 11), hồi và kho
 
 
 
-56)
+56) Azoth
 mô tả: một char chuyển wil thành atk, thuần atk.
-nội tại: mọi đòn đánh gây sát thương lên mục tiêu đều bỏ qua 20% res của chúng.
+
+Passive — Willforged Principle / Luyện Ý Thành Lực
+mọi đòn đánh gây sát thương lên mục tiêu đều bỏ qua 20% res của chúng.
 chuyển 100% wil sang atk khi gây sát thương, ví dụ hắn có 5 wil và 8 atk thì sát thương đầu ra là 13 atk và không có wil. sát thương của char này vẫn có thể giảm bằng res và đa số cơ chế khác.
 
-đánh thường: bắn 1 phát laze từ xa gây sát thương = 100% wil/atk tức gây sát thương = 100% wil+atk nhưng nguồn ra là atk mà không có wil.
+Basic — Coherent Lance / Đồng Pha Quang Thương
+bắn 1 phát laze từ xa gây sát thương = 100% wil/atk tức gây sát thương = 100% wil+ 100% atk nhưng nguồn ra là atk mà không có wil.
 
-skill 1: trước khi gây sát thương atk lên 1 mục tiêu có hp dưới hoặc = 10% mx hp của chúng, nhận 1 buff excute (kết liễu), - hp = 5% max hp của bản thân (không giảm mx hp) và 15 ae của team đồng minh mỗi lần kích hoạt, tự kích hoạt, bị động, dạng nội tại nhưng tốn cost.
+Skill 1 — True-Self Termination / Chân Ngã Đoạn Tuyệt
+trước khi gây sát thương atk lên 1 mục tiêu có hp dưới hoặc = 10% mx hp của chúng, nhận 1 buff excute (kết liễu), - hp = 5% max hp của bản thân (không giảm mx hp) và 15 ae của team đồng minh mỗi lần kích hoạt, tự kích hoạt, bị động, dạng nội tại nhưng tốn cost, chỉ kích hoạt lên target có chân ngã, kích hoạt tối đa 2 lần/trận.
 
-skill 2: kích hoạt, giảm 30% res hiện tại của mọi mục tiêu trên sân trong 2 turn, có hiệu lực ngay lập tức khi kích hoạt, turn kích hoạt của char này tính là 1 turn trong bộ đếm 2 turn đó. debuff giảm res này các char đồng minh cũng được hưởng, 35 ae, stack với nội tại cùng các debuff, cơ chế giảm res đồng cấp từ nguồn khác, đồng cấp là cấp bậc tag pháp tắc/quy tắc và axiom, nếu char khác có cơ chế giảm res như char này thì cả 2 hoặc nhiều hơn 2 cơ chế có thể stack với nhau nếu kit của đối phương không mô tả là cấm stack, dù vậy nếu kit của họ giới hạn giảm res tối đa của mục tiêu ví dụ là 25% đi thì họ vẫn giảm 25% res của kẻ thù, kit của char này vẫn giảm res bình thường nếu không bị hệ thống tag ưu tiên chặn.
+Skill 2 — Resistance Collapse / Kháng Giới Băng Giải
+kích hoạt, giảm 30% res hiện tại của mọi kẻ thù dưới hoặc bằng rank cuat bản thân trên sân trong 2 natural action của bản thân, có hiệu lực ngay lập tức khi kích hoạt, natural Action kích hoạt của char này tính là 1 trong bộ đếm 2 natural Action đó. debuff giảm res này các char đồng minh cũng được hưởng, tức debuff giảm res của kẻ thù thì sát thương atk của ally lên kẻ thù đó cũng được lợi từ debuff này, 35 ae, stack với nội tại cùng các debuff, cơ chế giảm res từ nguồn khác, nếu char khác có cơ chế giảm res như char này thì cả 2 hoặc nhiều hơn 2 cơ chế có thể stack với nhau nếu kit của đối phương không mô tả là cấm stack, dù vậy nếu kit của họ giới hạn giảm res tối đa của mục tiêu ví dụ là 25% đi thì họ vẫn giảm 25% res của kẻ thù, kit của char này vẫn giảm res bình thường nếu không bị hệ thống tag ưu tiên chặn.
 
-skill 3: triệu hồi vệ tinh bắn 1 chùm lazer toàn sân kẻ thù (vfx), gây sát thương = 180% atk + wil (nguồn ra là atk không có wil vì wil được chuyển 1:1 sang atk) của bản thân, sau đó hắn tóm lấy 1 kẻ địch (tuân theo SSI), gây sát thương chuẩn = 10% mx hp của bản thân hắn lên mục tiêu, 35 ae.
+Skill 3 — Orbital Dominion / Thiên Quỹ Chế Áp
+triệu hồi vệ tinh bắn 1 chùm lazer toàn sân kẻ thù (vfx), gây sát thương = 150% atk + 130% wil (nguồn ra là atk không có wil vì wil được chuyển 1:1 sang atk) của bản thân, sau đó hắn tóm lấy 1 kẻ địch (tuân theo SSI), gây sát thương chuẩn = 10% mx hp của bản thân hắn lên mục tiêu, 35 ae.
 
-ultimate: dùng skill 3 nhưng không tốn ae, +10% sát thương và hồi hp = 10% sát thương gây ra bằng dùng skill 3 bởi ultimate. Axiom: hồi phục từ ultimate này không thể tạo khiên, overheal bị bỏ qua.
+Ultimate — Closed Circuit: Apotheosis / Hồi Lộ · Thăng Hoa
+dùng skill 3 nhưng không tốn ae, và hồi hp = 20% sát thương gây ra bằng dùng skill 3 bởi ultimate, over heal bị bỏ qua, không thể tự tạo khiên nếu không bị ảnh hưởng bởi kit khác.
+
 
 
 57)
