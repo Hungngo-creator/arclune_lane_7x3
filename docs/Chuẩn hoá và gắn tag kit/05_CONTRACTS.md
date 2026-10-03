@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-03-F.7
+**Version:** 2026-10-03-F.8
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -13,6 +13,7 @@
 **Revision F.5:** corrects typed result observation/zero-addition law; adds ACT-033 required post-completion handoff and DMG-008 bounded final amplification/direct-Action scope. No new Tag/Primitive or global priority.
 **Revision F.6:** adds CST-014 bounded singular HP-payment profiles and CST-015 explicit Cost-caused lifecycle continuation; extends CST-009 with immutable resulting HP at payment commit. Existing default/exact/distributed Costs and prior Pilots remain unchanged.
 **Revision F.7:** adds DTH-007 transition-completed prevention atomicity; repairs the distinct Summon Identity Contract to ENT-015 while preserving Puppet death/ordinary Revive at ENT-010 and every other ID. Both blocks were already present at initial tracked commit 8a9876e; neither is obsolete. No universal legacy ENT-010 alias is valid: migrated Summon references use ENT-015, Puppet references retain ENT-010.
+**Revision F.8:** adds opt-in DTH-008 direct Execute, RES-007 own-family baseline, RES-008 shared-recipient proportional Damage, SNP-006 pre-Cost capture, DMG-009 mitigation-stat override and local CostGroup scope of CST-015 continuation. Ordinary pipelines/profiles remain unchanged.
 
 ---
 
@@ -1435,6 +1436,7 @@ A static rule such as:
 - native admission/immunity rule;
 - scoped Effect modifier;
 - scoped Damage-component transform;
+- bounded mitigation-stat override;
 
 is registered from the owning Passive without creating a fake Action.
 
@@ -1959,6 +1961,17 @@ external modifier may influence final death stat snapshot, but the external Buff
 
 ---
 
+## SNP-006 — Explicit Pre-Cost Source Snapshot
+**Status:** `LOCKED EXPLICIT PROFILE`
+
+Snapshot timing AFTER_ADMISSION_BEFORE_COST_COMMIT captures only declared source fields for the actual successfully admitted Action, after ACT-002 read-only validation/payability and before any active Cost debit. Admission probes/rejected fallback candidates neither create a gameplay capture nor mutate/pay/consume anything. The capture is read-only and immutable under SNP-001/002; it introduces no second prerequisite phase, payment, Event or Action.
+
+Cost transaction remains authoritative and may fail revalidation. On failure, no direct Effect may consume this capture to activate the failed cast; discard its unused execution binding under ordinary terminal/replay lifetime law. On successful Cost, explicit CST-015 continuation retains this same SnapshotRef through mandatory source HP_ZERO/death/return/cleanup. Do not re-read dead/deck source stats or recapture per target. Dedicated post-payment HP receipts remain CST-009, not this snapshot.
+
+Existing Action/Snapshot Store owns the binding keyed by admitted Action + snapshot definition, with captured source/fields/state version. Capture once per logical admitted execution; retain through dependent work and replay, release under ordinary terminal-result lifetime. Replay never re-evaluates against newer source state. Other snapshot profiles, including after-Cost captures, are unchanged.
+
+---
+
 # 16. RESOLUTION / COMMIT CONTRACT
 
 ## RES-001 — Calculate vs Commit
@@ -2307,6 +2320,34 @@ are not Authority predicates.
 They do not invoke Authority adjudication merely because they appear in a modifier condition/query.
 
 `AUT-*` applies only if a genuine Authority-bearing rule conflict exists independently.
+
+---
+
+## RES-007 — Own-Excluding Stat Modifier Baseline
+**Status:** `LOCKED EXPLICIT PROFILE`
+
+A StatModifier may explicitly select baseline mode EXCLUDE_THIS_SOURCE_FAMILY. Family identity is its existing runtime source-owner EntityRef plus stable origin Ability and origin Stat Effect-definition refs; successive instances/stacks match, while different runtime owners/Effect definitions do not. This is a contribution-read predicate, not a Functional Tag, Stat/Ability identity rewrite or new family manager.
+
+Resolve the ordinary authoritative contribution view with this entire family excluded, respecting the other contributions' existing declared layers/stack/Authority/lifetime laws; then apply this family's explicitly declared operation/stack to that input once. Snapshot the resulting stat under existing Snapshot law. Snapshot capture, Event delivery, redeploy or contribution-index reconstruction never applies the family again or mutates BaseStat.
+
+Independent constant multiplicative factors combine by product under ordinary numeric law. A finite declared countN of ×1.05 factors gives1.05^N, not1+0.05×N. The normalized count/stack binding must be bounded/legal and protected consistently with the stat read; no arbitrary loop, recursive final-stat ValueRef, implicit infinite stacking or new POW Primitive. An unchanged counter/other input gives the same resolved stat on repeated reads.
+
+The profile does not settle general stat-layer order, incompatible source composition or recursive relationships among foreign modifiers. Reject unavailable family/contribution input, feedback cycles or unsupported noncommutative composition unless an existing explicit law resolves it. No list/Entity/Event order chooses a result. Use P-030 and the existing State/stat contribution store and Snapshot/Transaction owners; retain source/contribution/count/lifetime identity for replay under normal State law. Unauthored baseline semantics are unchanged.
+
+---
+
+## RES-008 — Explicit Shared-Recipient Proportional Damage Allocation
+**Status:** `LOCKED EXPLICIT PROFILE`
+
+A SIMULTANEOUS_BATCH group may select sharedRecipientDamageAllocation PROPORTIONAL for incoming Damage packets sharing a recipient. Under RES-002, freeze membership and required phase state before any sibling delta is visible. Resolve each admitted packet/component's formula, type, mitigation and applicable modifiers independently; keep separate provenance and Damage Results. Invalid locked recipients follow the authored local policy without replacement; failed/zero-demand packets create no competing demand.
+
+For each eligible Shield layer under its existing layer-order/eligibility law, allocate its actual consumed Shield across only the remaining eligible packet/component demands, proportional to those demands. Deduct each share from that demand once. A type-specific layer does not absorb an ineligible component; Shield-piercing demand skips that layer. Within a Standard Shield pool, source contribution depletion still follows SHP-002 independently of the incoming-demand shares. Never independently spend the full same Shield budget on each packet or let main/orb/list order consume first.
+
+After Shield, let R_i be each packet's remaining HP-bound demand, T = sum R_i and H the recipient's available Current HP at this batch's common HP calculation. If T <= H, ActualHP_i = R_i. Otherwise ActualHP_i = H × R_i / T. T=0 allocates zero without division. Overkill is each uncommitted HP-bound remainder; it is not Actual HP Damage. Commit the recipient's net Shield/HP deltas once, then seal each packet's corresponding Shield/ActualHP/Overkill receipt before downstream lifecycle/settlements. A later Execute or recovery cannot rewrite those receipts.
+
+Use the project's applicable numeric policy with bounded, conserved allocations: allocated Shield <= actual Shield consumed; sum ActualHP <= HP actually removed, with exact equality when representable. Preserve packet/result identity. Rounding cannot select a beneficiary by packet/list/Entity/Event order. If the active numeric policy cannot represent an order-independent conserved allocation at the required precision, reject unsupported executable content/require an explicit numeric profile rather than invent a tie-break or silently lose/gain HP. No new global rounding law is supplied here.
+
+Existing Damage/Shield/Transaction/Result owners hold the proposed recipient allocation keyed by batch execution + recipient + participating packet/component refs, together with shared state version and commit identity. It is transient until the common commit; failure publishes no partial allocation/results. Retain committed receipts/dedup identity for dependent work/save/replay under existing result lifetime. Technical permutation yields the same totals and per-provenance shares. No new priority system, Primitive or universal AoE default; undeclared observable shared-recipient allocation is rejected.
 
 ---
 
@@ -2930,6 +2971,11 @@ Successful Return-to-Deck or DEATH_CONFIRMED during that processing does not its
 
 Mandatory lifecycle processing is not an ordinary Reaction interposition. This adds no new global same-window priority and no free opportunity for a dead/off-field Actor to request another Action. Absent this explicit profile, preserve existing laws; reject execution content whose observable Cost-caused source-invalidity outcome lacks an applicable declared policy. Distributed Cost-stage terminal/result barriers remain CST-008/009; neither direct Effects nor post-cost interposition begins while that active transaction is incomplete.
 
+
+**Opted-in local CostGroup:** a finite local settlement already inside an admitted Action may carry CostGroupSpec.admittedActionRef to that same enclosing Action and costLifecyclePolicy CONTINUE_ADMITTED_ACTION. Complete the group's required/optional terminal-result barrier, then its declared success-side use/cap dependency, then mandatory Cost-caused source lifecycle, then resume only the already-admitted local graph/locked hit/request. No extra Action/admission or new Intent interposition anchor. Source death/Return alone does not cancel those admitted nodes; later target/Effect legality still applies, and no new dead/off-field cast is admitted.
+
+Local-group failure uses its explicit branch failure policy; it does not promote an optional activation into a mandatory enclosing-Action Cost or consume success-side use. Existing upstream hit/snapshot/result identities remain intact. CST-005 governs refunds; source death after successful payment/use creates none. Reject foreign continuation anchors, source-payer mismatch, cyclic dependencies, unavailable pre-Cost formula/target bindings or conflicting group/Action continuation policy. The existing Effect DAG/Cost/Action/Lifecycle owners provide this boundary; no callback or extra scheduler.
+
 ---
 
 # 18. RESOURCE CONTRACT
@@ -3003,7 +3049,7 @@ Mixed Damage keeps components separate through relevant mitigation.
 ## DMG-002 — Physical Component
 **Status:** `LOCKED`
 
-Physical Damage uses ARM as its primary mitigation stat subject to Penetration/Contract.
+Physical Damage uses ARM as its primary mitigation stat subject to Penetration/Contract. DMG-009 permits an explicit bounded mitigation-stat override without changing Physical semantics; absent that profile the default is unchanged.
 
 ---
 
@@ -3051,6 +3097,8 @@ True
 → explicitly authored FINAL_DAMAGE_MULTIPLIER (DMG-008)
 → Shield
 ```
+
+The Physical/Will flows above show default defensive lookup; an explicit DMG-009 override substitutes the selected stat/Penetration once while preserving semantic type and these later phases.
 
 Final Damage Reduction does **not** reduce True Damage under the current canonical Damage Contract.
 
@@ -3277,6 +3325,21 @@ The bounded phase accepts only finite MULTIPLY factors >= 1; factors below 1 req
 An optional effectScope.directActionRef binds own-direct provenance under TRG-013 to the resolved existing Action. Child/standalone Damage sharing lineage or Attribution is excluded. A rule's Action-local CostPaymentResultRef/SnapshotRef must belong to that Action and be available before this phase. Successful payment eligibility/locked factors use immutable declared bindings; no HP re-read, payment, Cost waiver inference or result mutation occurs inside modifier evaluation. An Actionless rule need not fabricate an Action; it cannot resolve a required directActionRef that does not exist.
 
 No new Tag/Primitive or mutable multiplier store. Reject wrong Effect/component/phase, unavailable/foreign references and provenance ambiguity before affected Damage commit. The phase defines amount resolution, not a Character reward, global priority or additional hit.
+
+---
+
+## DMG-009 — Scoped Mitigation-Stat Override
+**Status:** `LOCKED EXPLICIT PROFILE`
+
+A normalized ScopedDamageMitigationSpec may SET_MITIGATION_STAT to ARM or RES for scoped PHYSICAL/WILL components at PRE_MITIGATION, **after** DMG-007 has determined semantic type. Test every candidate against the same resulting-type/phase-entry Action, Actor, recipient and Effect-provenance view. TRUE bypasses this path regardless of a rule that matched its original type.
+
+Without a match retain DMG-002/003 defaults. A compatible explicit selection replaces the default lookup; do not apply both defensive stats. Resolve the selected authoritative stat after its ordinary contribution laws, apply that stat's compatible declared Penetration under DMG-006, then use its existing mitigation formula. An override's optional existing penetration input is packet-local, never a target Debuff/stat write. Multiple Penetration inputs require their applicable explicit composition law; this profile supplies no additive/multiplicative stacking default.
+
+Semantic component type remains unchanged. PHYSICAL using RES still answers Physical queries, enters eligible non-TRUE reduction, and retains its ordinary Final Multiplier/Shield/provenance/Hit Admission behavior. No type relabeling, source Tag/capability mutation, Shield Piercing or Authority bypass is inferred.
+
+Matching rules choosing the same stat share one selection; incompatible choices need an applicable explicit canonical conflict law or rejection before Damage commit. Authored list/Effect/Entity/Event order cannot choose a winner. Real Authority-bearing conflicts use AUT contracts; ordinary Rank filters are not Authority. Missing/foreign scopes, unsupported stats/custom formulas and TRUE mitigation are rejected.
+
+Existing Damage Runtime/Contract Resolver owns this read-only selection; static owners register once under TRG-014 and remove/persist per declared lifetime. Reuse existing stat/penetration inputs and phase state; record rule refs/chosen stat/input/state version in trace/receipts needed for replay. No new mutable Character service, Tag or Primitive. Existing unqualified Physical/Will/True pipelines remain unchanged.
 
 ---
 
@@ -3959,6 +4022,8 @@ ALIVE
 → DEATH_CONFIRMED
 ```
 
+This is the ordinary lethal Damage/Cost/HP-loss path. An explicitly authored DIRECT_EXECUTE profile follows DTH-008 instead; the Execute label alone never selects that exception.
+
 ---
 
 ## DTH-002 — HP_ZERO
@@ -4047,6 +4112,33 @@ Earlier independently committed Effects are not rolled back; local failed/zero L
 The existing P-061 terminal result identifies this candidate/completion instance. Success-dependent downstream work reads that outcome, not live Deck/HP state or another return's success. Retain it until dependent work is terminal; replay uses the same outcome and Effect cursor, not a second successful mutation.
 
 Reuse P-061, the existing Return/Lifecycle/State owners and Transaction Manager. Persist death-evaluation/candidate/transaction/outcome identity for replay; restore cannot expose a partial completion or consume/emit/clean up twice. No generic callback, global prevention priority or automatic cleanup profile is created. Unprofiled prevention and standalone Return semantics remain unchanged.
+
+---
+
+## DTH-008 — Explicit Direct Execute Confirmation
+**Status:** `LOCKED EXPLICIT PROFILE`
+
+An admitted lifecycle request with confirmationPolicy DIRECT_EXECUTE is an explicit lethal condition under P-060, not Damage/HP Loss/HP Cost. Authored threshold, qualifying result, target lock/revalidation, Cost/use and local settlement dependencies remain separate inputs. Neither the name Execute nor a display animation supplies those fields or selects a global default. Opening its context keeps target HP/lifecycle proposals private until the protected confirmation barrier; it does not publish an ordinary HP_ZERO or partially admitted death state.
+
+Resolve existing Effect admission and real Authority-bearing anti-death conflicts for the locked current-instance subject. No Authority bypass, Rank/Class/lore winner, Shield removal or Penetration is inferred. A rejected/invalid request commits no Execute HP/lifecycle/confirmation delta; prior independent payment/use follows its explicit upstream Contract and no automatic refund is invented.
+
+For a successful request, the existing lifecycle transaction commits:
+
+```text
+subject Current HP = 0 + DEATH_CONFIRMED
+→ existing confirmation attribution / canonical death and kill observers
+→ ordinary mandatory post-confirmation lifecycle processing
+```
+
+It does **not** offer the ordinary pre-DEATH_CONFIRMED HP_ZERO / Death-Prevention window. Do not publish an intermediate lethal-HP Event that dispatches that ordinary window, invoke P-061 merely because HP becomes0, or expose HP0/alive to ordinary observers between the joined writes. P-060 records the explicit confirmation policy; P-062 records canonical death exactly once using current death-evaluation/commit identity. Already-confirmed/invalid recipients cannot be confirmed again by replay or a stale request.
+
+This operation supplies no Actual HP Damage receipt. Earlier immutable Damage results remain unchanged; nominal Execute HP removal does not augment Heal/Rage/threshold metrics bound to those results. Post-death recovery never changes whether confirmation occurred.
+
+Revive and genuinely **post-DEATH_CONFIRMED** Return/recovery mechanics remain eligible under their own laws. A pre-confirmation prevention such as Nerovar's HP_ZERO Passive cannot intercept this profile. Recovery does not refund already committed activation Cost/use merely because the recipient is alive again. Do not manufacture recovery, fold it into Execute's commit or choose unrelated observers' priority.
+
+Reuse P-060/P-062, existing Lifecycle/Authority/Transaction/Result owners and idempotence records. Persist policy, subject/cause/attribution, death-evaluation/commit and terminal-request identity through pending observers/replay. Ordinary lethal Damage/Cost/loss continues through DTH-001/003; other content called Execute remains REQUIRED_EXPLICIT until its own profile is authored. No new Functional Tag/Primitive or generic priority system.
+
+Request identity comes from the original stable Effect-execution/candidate plus subject/current-instance, not a newly allocated death context. Check terminal identity before opening another context. A later Revive, including ordinary Revive retaining lifeSerial, does not make replay of this old successful/failed request new work. Preserve terminal identity for the replay horizon independently of released result/observer payloads; reject delivery older than the retained horizon rather than confirm anew.
 
 ---
 

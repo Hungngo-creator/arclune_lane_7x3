@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-03-INDEX-7
+**Version:** 2026-10-03-INDEX-8
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-03-INDEX-7`
+**Version:** `2026-10-03-INDEX-8`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-03-E.5`.
+**Version:** `2026-10-03-E.6`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-03-F.7`.
+**Version:** `2026-10-03-F.8`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-03-G.6`
+**Version:** `2026-10-03-G.7`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-03-I.6`
+**Version:** `2026-10-03-I.7`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -150,8 +150,11 @@ In `docs/canon kit/`:
 - Pilot #5: `Polyhymnia_Clarified_Gameplay_Canon.md`; R4 locks Character-local simultaneous Damage/Heal batches within sequential Damage → Heal → Leader Shield groups, target-lock-before-source-snapshot and completion-only notes. Internal kit gameplay is clarified; §7 contains future external-content/profile boundaries. Existing E.3/F.5/G.4 machinery suffices; no new runtime gap. It is not a claim of execution-ready numeric data.
 
 - Pilot #6: `Phan_Tinh_Clarified_Gameplay_Canon.md` R2; complete one-Skill raw kit, mandatory actual-cast HP exchange, common-snapshot simultaneous conditional TRUE AoE and payment-gated own-direct final multiplier. Native Element/budget remain separate metadata.
-- `Nerovar_Clarified_Gameplay_Canon.md` R3, **PARTIALLY_NORMALIZED / CLARIFICATION_IN_PROGRESS**. First #52 Warrior / Death Pays the Fare. Merged E.4/F.6/G.5 Cost semantics remain canonical. Designer now locks survivalHP1 with successful Return in the same prevention transaction; failure retains no proposed survival/use/−3. E.5/F.7/G.6 add only the bounded completion join through existing owners. Damage typing/target/snapshot/batch, Skill2 clock/result and Skill3 HP owner/qualifying Heal-result scope still require designer answers; no full normalization is claimed.
-- `Phanes_Clarified_Gameplay_Canon.md` R1, **CLARIFICATION_IN_PROGRESS**. The later #52 SSR Mage is explicitly named Phanes; raw edit adds only Character/Ability names. Orbs are VFX/counter/stat/Damage data, not gameplay Entities or Summons; Follow-up is forbidden. Stat-bonus basis/lifetime, Basic/Ultimate grouping/targets/Natural lineage, execute/prevention/use and result/order bindings are pending. No Phanes generic gap/Tag/Primitive is accepted merely from raw labels.
+- `Nerovar_Clarified_Gameplay_Canon.md` R4, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. First #52 Warrior. Reuses merged Cost/atomic Return, scope retention and actor-window cap; completes target-local HP Skill3, per-group requery/batches and pre-Cost source snapshot distinct from H_postCost. No internal gameplay question remains.
+- `Phanes_Clarified_Gameplay_Canon.md` R2, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Later #52 SSR Mage. Battle factor1.05^N excluding own input, simultaneous main/orb with proportional shared-recipient Shield/HP allocation, separate packet results, independent snapshots of two same-target child Basics, local S1→2→3, exact AE-only waiver and direct Execute without ordinary prevention are locked. No internal gameplay question remains.
+- `Azoth_Clarified_Gameplay_Canon.md` R1, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw #56 replaced only by latest kit/names. PHYSICAL output uses RES/packet20% Penetration, Basic-only pre-hit paid Execute retains admitted hit through source HP_ZERO, Skill2 snapshots RES delta/replace/refresh on completed-Natural clock, Ultimate calls one Skill3 child and heals20% own committed child Damage with no +10% modifier. External kits may affect Heal/Overheal/Shield. No internal gameplay question remains.
+
+E.6/F.8/G.7/I.7 adds only proved bounded surfaces through existing owners: DIRECT_EXECUTE, own-family stat-baseline exclusion, pre-Cost source capture, explicit shared-recipient proportional Damage allocation, mitigation-stat override, and local CostGroup scope of admitted continuation. No new Functional Tag/Primitive/Character runtime/priority system. Declarative M-056–M-065 cover these and their negative boundaries; no executable build/game tests are implied. Metadata/Cost Budget/unsupported Mode adapters remain NOT BLOCKING, not fabricated execution-ready values.
 
 Earlier canon architecture-base/proposed-delta statements record their drafting context. Current architecture authority remains the latest merged 00–08: PR #5's E.3/F.5/G.4/I.3 corrections are merged, not open gaps to duplicate. PR #6 updated navigation/coverage to I.4; PR #7 selected/named Nerovar and reconstructed its R1 canon. Current E.4/F.6/G.5/I.5 adds bounded singular HP-payment cases, atomic allowance consumption, typed immutable HP at payment commit and explicit Cost-caused lifecycle continuation. Earlier Pilot boundaries remain canonical and must not be duplicated. Current E.5/F.7/G.6/I.6 closes Nerovar’s newly locked prevention/Return completion boundary, adds M-054/M-055 and fixes Summon Identity to ENT-015. ENT-010 still identifies inhabited-Puppet death/ordinary Revive; no other ENT ID is renumbered.
 
@@ -397,7 +400,7 @@ Personal caps use:
 Canonical meaning:
 
 ### Physical
-ARM mitigation applies.
+ARM mitigation applies by default. An explicitly authored DMG-009 profile may select RES without changing Physical semantic type; no double mitigation or target-stat mutation.
 
 ### Will
 RES mitigation applies.
