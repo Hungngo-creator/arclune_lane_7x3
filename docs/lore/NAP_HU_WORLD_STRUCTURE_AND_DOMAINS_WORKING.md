@@ -2344,30 +2344,23 @@ Thiên Đạo khi ấy chưa đủ nhân cách / tình cảm để hoài niệm 
 
 ---
 
-# LII. YÊU TIÊN ĐẦU TIÊN & TÀN HÀI LONG–PHƯỢNG
+# LII. YÊU TIÊN ĐẦU TIÊN, LONG TÂM VÀ THÁP PHONG ẤN
 
-Yêu Tiên đầu tiên:
+**ĐÃ CHỐT:** hắn là Yêu hậu thiên hỗn huyết nhiều loài, **cha long nhân, mẹ người cá**, nghiêng về huyết mạch Long Tổ. Ban đầu điều khiển nước, hô hấp dưới nước; long lân rải ngẫu nhiên, riêng ngực được che đầy đủ. Hắn gian trá, không từ thủ đoạn, biết dùng mưu kế và phản bội cả người đã cứu mình.
 
-> hậu thiên tu luyện đi lên.
+Sau khi Long / Phượng đồng quy, hắn ăn **một phần tim Long Tổ**, lúc ấy chưa chứng Chân. Điều khiển nước mạnh hơn, hấp thu nước để khôi phục; vảy mọc khắp người trừ mặt, một sừng ở phía phải trên đỉnh đầu, răng nhọn, móng tay dài, không có cánh. **30.000 năm sau cái chết hai Tổ**, hắn xuất quan, chứng Chân, bình định quyền lực và mở Hắc Ám Kỷ.
 
-Hắn không phải Long Tổ / Phượng Tổ và không thuộc loại sinh linh Tiên Thiên.
+Pháp Tắc hắn chọn là một nhánh của **Quy Tắc Thôn Phệ**, được mô tả bằng năng lực, không đặt tên riêng. Sát thương bằng linh lực rút sinh mệnh lực của đối thủ để hồi phục; long tâm cường hóa thành đoạt phần sinh mệnh không thể khôi phục, chuyển vào hắn, tăng hạn mức sinh mệnh tối đa và bổ sung tương ứng phần tăng. Không coi hắn đã hoàn chỉnh cả Quy Tắc hoặc tự quy phần hạn mức ấy thành thọ nguyên.
 
-Khi Long / Phượng tới cuối thọ nguyên mở trận tử chiến:
+Phong ấn dùng chính tiên lực Yêu Tiên và hút năng lượng cho tới khi hắn chết. Thương tổn ban đầu và hao mòn lâu dài làm hắn suy yếu; hắn càng yếu phong ấn càng yếu. **Kiếm Tiên giết tới và yêu cầu chúng Yêu phá phong ấn** trước khi phong ấn hút cạn hắn đến chết.
 
-> kẻ về sau trở thành Yêu Tiên đầu tiên tham gia cuộc tranh đoạt tàn hài sau khi cả hai đồng quy; lúc ấy hắn chưa chứng Chân Tiên.
+Phong ấn đặt trong **tháp khổng lồ đúc từ xương của vài hài tử**, được chính họ cho phép. Đến gần thì linh lực và tiên lực bị áp chế. Vị trí, người xây, các đời hiến xương và phạm vi / mức áp chế chưa chốt.
 
-**30.000 năm sau cái chết hai Tổ**, hắn kết thúc bế quan, đột phá Chân Tiên và bình định quyền lực Yêu tộc; Hắc Ám Kỷ bắt đầu.
+Yêu Tiên giữ mẫu cổ của **Tử Mẫu Tâm Sinh Cổ**, cho hồ yêu nuốt tử cổ **trước khi nàng gặp Kiếm Tiên**, lúc nàng đã ở **Khắc Pháp**. Tu vi nàng tiếp tục tăng theo quá trình Kiếm Tiên trưởng thành. Nàng là bạn, đi theo Kiếm Tiên và thỉnh thoảng báo cáo qua tử cổ. **Yêu Tiên chết thì mẫu cổ chết; mẫu cổ chết thì hồ yêu chết nếu ràng buộc còn nguyên.** Kết cục nàng và cách xử lý cổ chưa chốt. Yêu Tiên quan sát qua nguồn tin ấy, quá tin năng lực của mình nên không sợ.
 
-Sau một trận huyết chiến với các kẻ tranh đoạt khác:
+Trong thời gian phong ấn còn hai bán bộ Yêu Tiên: **một thuộc hạ cũ, một kẻ thù**. Họ giữ thân mình, không quá chèn ép Nhân tộc; đạo đức / e sợ Nhân Hoàng Cung và vai trò lúc phá phong ấn còn mở.
 
-> hắn ăn / luyện hóa được một phần huyết nhục của hai Tổ.
-
-Chi tiết hắn lấy được phần nào chưa khóa.
-
-Việc này có thể để lại dị biến Sinh–Tử, căn cơ mạnh hơn hoặc nhược điểm do hai hệ xung đột; tất cả còn mở. Cần quyết định loài gốc, phần tàn hài hắn luyện hóa và Pháp Tắc đặc trưng trước khi xác định ảnh hưởng tới Kiếm Tiên.
-
-**ĐÃ CHỐT:** phong ấn dùng chính tiên lực Yêu Tiên, hắn càng mạnh phong ấn càng mạnh. Cuối cùng hắn cực yếu; Kiếm Tiên giết tới khiến Yêu tộc buộc phải phá phong ấn. Nguyên nhân hắn suy yếu chưa chốt. Trong thời gian ấy còn hai bán bộ Yêu Tiên chủ yếu giữ thân mình, không quá chèn ép Nhân tộc; động cơ đạo đức / e sợ Nhân Hoàng Cung còn mở.
-
+Chi tiết xem mục XVIII, XVIII-A và XXXIV của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
 
 ---
 
