@@ -182,7 +182,15 @@ Nhân Tổ từng là:
 
 Số Quy Tắc từng sở hữu:
 
-> **chưa rõ.**
+> **chưa rõ và chưa nên khóa trước khi thiết kế xong Thập Nhị Thể.**
+
+Mười hai người con được sinh từ mười hai phần Pháp Tắc / thần dị mà Nhân Tổ tách ra, nên cấu trúc của **12 Thể Chất** sẽ là bằng chứng ngược để suy ra:
+
+- Nhân Tổ từng nắm những Quy Tắc nào;
+- các Quy Tắc đó có quan hệ ra sao;
+- hắn đã chia một Quy Tắc thành nhiều nhánh hay chia nhiều Quy Tắc khác nhau.
+
+Vì vậy không chốt Quy Tắc của Nhân Tổ trước khi chốt 12 Thể Chất.
 
 ## Binh giải và Luân Hồi
 
@@ -225,21 +233,72 @@ Một thiên tài bất kỳ có thể là:
 
 Mười hai người con:
 
-- đời đầu là Chân Tiên;
+- đời đầu đều là Chân Tiên;
 - thân đời đó đã chết;
-- Chân Ngã có thể tiếp tục Luân Hồi.
+- Chân Ngã tiếp tục đi vào Luân Hồi.
 
-Trước khi biến mất khỏi đời đầu, họ để lại:
+Trước khi rời đời đầu, mỗi người để lại / khóa với:
 
-> **12 loại Thể Chất / thần dị** trong Nhân tộc.
+> **một Đại Tuyệt Thể tương ứng với phần Pháp Tắc / thần dị của chính mình.**
 
-Luật:
+Từ đó hình thành **12 Đại Tuyệt Thể** của Nhân tộc.
 
-- mỗi loại chỉ có **một chủ** trong cùng thời điểm;
-- mỗi thời đại tối đa 12 người tương ứng;
-- người giữ thể chất không mặc định chắc chắn là chính reincarnation của người con tương ứng.
+## Luật sở hữu đã khóa
 
-Điểm này còn mở.
+- có đúng 12 loại;
+- mỗi loại tại cùng một thời điểm chỉ có **một chủ**;
+- Chân Ngã của người con nào Luân Hồi thì đời đó **luôn mang đúng Thể Chất tương ứng của chính người đó**;
+- vì Chân Ngã tương ứng là duy nhất, không tồn tại một người khác song song mang cùng Đại Tuyệt Thể;
+- mỗi thời đại vì vậy có thể truy dấu mười hai Chân Ngã qua mười hai Đại Tuyệt Thể đang hiện thế.
+
+Nói cách khác:
+
+> **Thể Chất không chỉ là di sản của mười hai người con — nó là dấu nhận dạng bản thể của chính mười hai Chân Ngã qua Luân Hồi.**
+
+## Ký ức Luân Hồi
+
+Một đời mới có thể:
+
+- sinh ra hoàn toàn không biết mình là ai;
+- chỉ cảm thấy thiên phú dị thường;
+- thức tỉnh vài mảnh ký ức sớm do kích thích;
+- hoặc sống rất lâu mà chưa biết mình từng là con của Nhân Tổ.
+
+Nhưng khi tu đến một **đại cảnh giới ngưỡng** đủ cao:
+
+> ký ức đời gốc / chuỗi Luân Hồi sẽ **bắt buộc thức tỉnh**.
+
+Ngưỡng cảnh giới cụ thể chưa khóa.
+
+Sau khi thức tỉnh, họ có thể nhớ:
+
+- thân phận nguyên thủy;
+- Nhân Tổ;
+- các anh/chị/em còn lại;
+- truyền thừa và kẻ thù cũ.
+
+Điều này không có nghĩa tu vi Chân Tiên cũ lập tức trở lại. Ký ức và bản thể là lợi thế khổng lồ, nhưng đời hiện tại vẫn phải tu lại.
+
+## Hệ quả chính trị
+
+Vì vậy tin tức:
+
+> **“một trong Thập Nhị Đại Tuyệt Thể đã xuất thế”**
+
+không chỉ có nghĩa một thiên tài hiếm xuất hiện.
+
+Nó còn có nghĩa:
+
+> **một trong mười hai người con Chân Tiên của Nhân Tổ đã trở lại thế gian.**
+
+Thiên Ma Môn và Cực Lạc Ma Tông có động cơ rất mạnh để:
+
+- dò tìm;
+- bóp chết từ sớm;
+- bắt sống trước khi ký ức thức tỉnh;
+- hoặc tìm cách lợi dụng / ly gián khỏi Nhân Hoàng Cung.
+
+Đây là một trong những nguyên nhân khiến người mang Đại Tuyệt Thể vừa được Nhân Hoàng Cung bảo vệ, vừa bị hai Đại Ma Môn săn giết.
 
 ---
 
@@ -313,17 +372,46 @@ Sức chiến đấu tùy cá thể:
 
 # IX. LONG TỔ & PHƯỢNG TỔ
 
-Ban đầu:
+Ban đầu Long Tổ và Phượng Tổ chưa tồn tại như hai cá thể.
 
-> một Sinh Linh Nguyên Tổ vô giới tính.
+Chỉ có:
 
-Hình thái có thể:
+> **một Linh Sinh Nguyên Sơ.**
+
+Đây là một trong những tồn tại khai linh sớm nhất được biết của Nạp Hư.
+
+Nhưng **bản chất nguyên thủy của nó không được khóa và cũng không nên được giải đáp hoàn toàn**.
+
+Các truyền thuyết có thể đồng thời tồn tại:
+
+- nó là một giọt máu đầu tiên của Thiên Đạo;
+- nó là một mảnh Thiên Đạo rơi vào thế giới;
+- nó vốn chỉ là giọt nước đầu tiên có ý thức;
+- nó là tia nắng đầu tiên chiếu qua Nạp Hư;
+- nó là khoáng vật / quang thể / vật vô tri nào đó hấp thu Linh Khí đến mức khai linh;
+- hoặc tất cả chỉ là cách hậu thế gán ý nghĩa cho một sinh linh có trước lịch sử.
+
+Không phe nào có bằng chứng đủ để khóa đáp án.
+
+Điểm chắc chắn duy nhất:
+
+> **thuở Nạp Hư còn rất sơ khai, nó đã ở đó.**
+
+“Linh Sinh” ở đây được hiểu theo nghĩa rộng:
+
+> **một vật / hiện tượng vốn vô tri của thế giới tự khai linh thành sinh mệnh.**
+
+Do đó nó không bắt buộc phải thuộc nhánh Linh Sinh silicon phổ biến ở Linh Sinh Vực hậu thế.
+
+Hình thái được ghi lại trong thần thoại cũng không thống nhất:
 
 - quang cầu;
 - nhân hình vô giới;
-- một cấu trúc ánh sáng.
+- một giọt sáng;
+- một khối tinh thể sống;
+- hoặc thứ không thể mô tả bằng sinh học hậu thế.
 
-Sau đó do xung đột Sinh–Tử:
+Sau đó do xung đột Sinh–Tử trong chính bản thể:
 
 > tách thành Long Tổ và Phượng Tổ.
 
@@ -512,3 +600,39 @@ Cổ Kiếm Tu mạnh ở:
 Tần Đế:
 
 > **Cổ Kiếm Tu — Đế Kiếm.**
+
+
+---
+
+# XII. RANH GIỚI KHÁI NIỆM VỚI TIÊN THIÊN THẦN ARCLUNE
+
+Ghi chú này chỉ để tránh tương lai trộn hai loại tồn tại với nhau.
+
+**Linh Sinh Nạp Hư**:
+
+> vật / hiện tượng vô tri của Nạp Hư khai linh thành một cá thể.
+
+Nó sinh ra **trong** thế giới, nhưng không nhất thiết là hiện thân bắt buộc của một khái niệm nền.
+
+Sau Đại Hợp Giới, **Tiên Thiên Thần Arclune** sẽ là một nhóm sâu hơn về ontology:
+
+> sinh ra trực tiếp từ **khái niệm của Arclune** và bị khóa bản thể với Arclune.
+
+Một Tiên Thiên Thần:
+
+- tồn tại vì khái niệm tương ứng của Arclune tồn tại;
+- không phải Linh Sinh tiến hóa;
+- không phải Tân Thần nhận Thần Cách;
+- không phải Cổ Thần Thần Huy.
+
+Nguyên tắc định hướng đã khóa:
+
+> **Tiên Thiên Thần không bao giờ phản bội Arclune.**
+
+Đây không nhất thiết là “lập trình trung thành” hay đạo đức.
+
+Nó là:
+
+> **quan hệ bản thể: phản bội Arclune tương đương phủ định nền tồn tại làm chính nó sinh ra.**
+
+Chi tiết này thuộc lore Arclune và sẽ được mở rộng ở world bible Arclune, không nên dùng ngược để định nghĩa mọi Linh Sinh Nạp Hư.
