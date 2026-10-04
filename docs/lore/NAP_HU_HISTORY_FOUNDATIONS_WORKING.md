@@ -11,11 +11,13 @@
 ~~~
 Nạp Hư hình thành
 ↓
-sinh mệnh sơ khai
+sinh mệnh / vật vô tri bắt đầu diễn hóa
 ↓
-Yêu / sinh linh Tiên Thiên xuất hiện trước Nhân tộc
+các Linh Sinh sơ khai xuất hiện
 ↓
-Long–Phượng và các Cổ Sinh Linh
+Linh Sinh Nguyên Sơ về sau tách thành Long Tổ + Phượng Tổ
+↓
+Yêu tộc và các sinh linh Tiên Thiên hậu thế phát triển
 ↓
 Nhân tộc xuất hiện
 ↓
@@ -342,11 +344,27 @@ Nên để là một nhân vật khác để lịch sử không bị vài ngư�
 
 # XIII. LONG–PHƯỢNG THUỘC CỰC CỔ
 
-Long Tổ / Phượng Tổ:
+Trước Long Tổ và Phượng Tổ chỉ có:
 
-> tồn tại từ trước khi hệ thống tu luyện được chuẩn hóa.
+> **một Linh Sinh Nguyên Sơ.**
 
-Họ là sinh linh Tiên Thiên của Nạp Hư.
+Bản chất nguồn gốc của nó cố ý để trống.
+
+Người hậu thế có thể nói nó là:
+
+- giọt máu Thiên Đạo;
+- một phần Thiên Đạo;
+- giọt nước đầu tiên;
+- tia nắng đầu tiên;
+- một vật vô tri khai linh.
+
+Không thuyết nào được xác nhận.
+
+Long Tổ / Phượng Tổ chỉ xuất hiện:
+
+> sau khi Linh Sinh Nguyên Sơ bị tách bởi xung đột Sinh–Tử.
+
+Cả hai tồn tại từ trước khi hệ thống tu luyện được chuẩn hóa.
 
 Cuộc tử chiến cuối đời của họ có thể diễn ra:
 
@@ -379,3 +397,60 @@ Do đó Linh Kiếm Tu có thể là sản phẩm “hiện đại hóa” của
 Không thay thế Cổ Kiếm Tu.
 
 Hai nhánh cùng tồn tại.
+
+
+---
+
+# XV. THẬP NHỊ ĐẠI TUYỆT THỂ LÀ CÁC MỐC LẶP LẠI TRONG LỊCH SỬ
+
+Mười hai người con của Nhân Tổ không chỉ để lại huyết mạch.
+
+Luật đã khóa:
+
+> **Chân Ngã của mỗi người khi Luân Hồi luôn mang đúng Đại Tuyệt Thể tương ứng.**
+
+Do đó mỗi lần một Đại Tuyệt Thể xuất thế:
+
+> đó là một trong mười hai Chân Ngã cổ xưa trở lại.
+
+Ký ức chưa chắc thức tỉnh từ nhỏ.
+
+Nhưng tới một đại cảnh giới đủ cao:
+
+> **bắt buộc nhớ lại.**
+
+Điều này tạo một mô-típ lịch sử lặp:
+
+1. một Đại Tuyệt Thể xuất hiện;
+2. Nhân Hoàng Cung tìm cách bảo vệ / thu nhận;
+3. Thiên Ma Môn và Cực Lạc Ma Tông tìm cách giết hoặc bắt sống;
+4. các thế lực khác tranh đoạt;
+5. nếu người đó sống đủ lâu, ký ức cổ đại thức tỉnh và cán cân chính trị thay đổi.
+
+Vì vậy việc thiết kế **12 Đại Tuyệt Thể** không chỉ là thiết kế power set.
+
+Nó còn quyết định:
+
+- 12 nhân vật lịch sử lặp lại;
+- 12 nhánh Pháp Tắc của Nhân Tổ;
+- nhiều cuộc ám sát / cứu viện / tranh đoạt qua các Đại Kỷ.
+
+---
+
+# XVI. GHI CHÚ VỀ TIÊN THIÊN THẦN ARCLUNE
+
+Không dùng Tiên Thiên Thần Arclune để giải thích ngược lịch sử Nạp Hư.
+
+Linh Sinh Nạp Hư:
+
+> vật / hiện tượng vốn vô tri khai linh.
+
+Tiên Thiên Thần Arclune hậu Đại Hợp Giới:
+
+> sinh trực tiếp từ **khái niệm của Arclune**, ontology sâu hơn và khóa với Arclune.
+
+Nguyên tắc đã định hướng:
+
+> **Tiên Thiên Thần sẽ không phản bội Arclune.**
+
+Đây là khác biệt bản thể, không phải vì họ “ngoan” hơn hay bị giáo dục trung thành.
