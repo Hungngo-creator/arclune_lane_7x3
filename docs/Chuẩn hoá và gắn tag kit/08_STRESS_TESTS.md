@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-03-I.10
+**Version:** 2026-10-04-I.11
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md` F.11+, `06_KERNEL_RUNTIME.md` G.10+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.10+, `05_CONTRACTS.md` F.12+, `06_KERNEL_RUNTIME.md` G.11+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -21,6 +21,8 @@
 ---
 
 **Revision I.10:** adds M-082–M-093 for explicit Slot/occupant binding, bounded seeded relocation/claims/deferred-counter allocation, stable health and opportunity barriers, isolated fixed-area projections, enhancement/child composition, rejection and external unresolved boundaries. Prior cases remain unchanged; Architecture Phase declarative coverage only.
+
+**Revision I.11:** adds M-094–M-099 for exact tag/facet ownership, required atomic projection credit before continuation, no retrospective activation credit, retained accumulator after normal return-State removal, battle-participant/presence guards and malformed composition rejection. All prior case bodies remain unchanged; six additional declarative obligations, not executable test results.
 
 # 0. WHAT THIS FILE IS
 
@@ -3828,6 +3830,60 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 
 ---
 
+## M-094 — Savitar Tags Stay at Their Registered Semantic Owners
+
+**Status:** `MUST_PASS`
+**Fixture:** normalize the R3 Basic, Passive move/counter, fixed-column Skill1, temporal admission/projection/return, enhanced result Heal and exact Ultimate child. Query smallest-owner tags and derived Ability capabilities using active 02.
+
+**Expected:** actual mixed Damage Effects carry DAMAGE/PHYSICAL_DAMAGE/WILL_DAMAGE; only the real Passive move carries POSITION_MUTATION. The temporal admission State carries DAMAGE-scoped IMMUNITY and remains present/selectable at its reserved coordinate. Actual Heal Effects carry HEAL; one exact Ultimate child Damage plus one owned additive Heal retains distinct tag ownership and result basis. Geometry/COUNTER/ability identity, TRULY_EMPTY, clocks, projected values, coefficient branches and damage-derived Heal are facets/composition. AREA is not registered and LIFESTEAL remains deferred; neither enters tags[]. Projection creates no DAMAGE/HEAL capability or actual receipt. AE Costs/discounts are not RESOURCE_MODIFIER, coefficient branches are not ATK/WIL/SPD mutation, and beneficial wording assigns no BUFF identity/Authority. Existing Capability Index derives upward, never copying HEAL/IMMUNITY/POSITION_MUTATION to sibling Damage/VFX nodes.
+
+---
+
+## M-095 — Projection Credit Closes before Continuation under Reaction Hold
+
+**Status:** `MUST_PASS`
+**Fixture:** temporal State already active, owner HP100/MaxHP1000/Shield50, root holds ordinary Reactions. Two separate qualifying fixed-area batches each have post-mitigation demand80. The named temporal exclusion leaves no real admitted recipient. Observe credit/next-group/next-owner-grant cursors; save before credit, during staging and after joined commit. Variant another retained admission rule reduces projected HP Damage to0; aborted batch and lifecycle-retired State.
+
+**Expected:** membership/pinned query inputs exist before admission despite empty actual recipients. Each whole batch reaches terminal/lifecycle, then required credit commits estimate30 and its terminal identity together before the next continuation. Batch2 independently reads real HP100/Shield50, yielding total60; the later return captures60/requestedHeal268. No ordinary Reaction drain is needed, no HEALTH_MUTATION_STABLE is emitted for this counter, and no return can overtake open credit. Valid zero closes once with delta0; abort/retirement closes without credit. Resume/redelivery cannot expose an unrecorded delta, mark success without its delta, count twice, recalculate from newer defence or create actual Damage/HP_ZERO/listeners/RNG. Unrelated conflicting mandatory work still requires explicit composition.
+
+---
+
+## M-096 — Health-triggered Activation Cannot Project Its Triggering Batch
+
+**Status:** `MUST_PASS`
+**Fixture:** Savitar HP180/MaxHP1000, no Shield, unused Skill2/AE15 and no temporal State at pre-Damage batch1. One fixed hostile Natural batch removes40HP, then a separate batch2 would remove80HP. Root holds ordinary Reactions. Include simultaneous siblings within batch1, saved phase views and a retired/new State variant.
+
+**Expected:** the full batch1 commits ActualHP40 before lifecycle/stable-health activation at140/1000. Its sealed query set contains no temporal query, so its actual40 is never projected/credited by the newly created State. Batch2 pins that active State, excludes actual Damage and projects80HP; after required credit avoided80 gives return requested250+24=274. No protection or credit between batch1 siblings, archival query scan, nominal40+80 accumulation or retroactive admission cancellation. Old batch/State identities cannot credit a replacement State; read-only counterfactual still bypasses only the named exclusion and does not rerun actual Damage.
+
+---
+
+## M-097 — Normal Return-State Removal Preserves Captured Terminal Heal
+
+**Status:** `MUST_PASS`
+**Fixture:** active temporal State with completed avoided60, owner HP100/MaxHP1000 at reserved5, first later own opportunity is subsequently CC-lost. Capture accumulator, remove State, save before ordinary Heal. Variants legitimate current MaxHP1200 at Heal calculation, Heal admission block/EffectiveHeal0, death/leave before grant or before remaining Heal, and replacement presence preserving lifeSerial.
+
+**Expected:** graph captures60 in an immutable declared P-002 binding, ends admission at the same owned Slot, then requestedHeal268 (or300+18=318 with declared live MaxHP1200). Its own normal removal unregisters protection/query/clock work, not its already-registered Heal or captured value. Resume after removal uses that Snapshot/original grant once, never live COUNTER_REF=missing/0, a recreated State or duplicate Heal. Ordinary modifiers/Overheal DISCARD apply. Blocked/zero Heal closes with protection ended/no retry, then the same grant undergoes CC without actual Action/completion/extra SSI. Death/leave or invalid original owner cancels under authored lifetime and cannot Heal a replacement presence even with unchanged lifeSerial. Capture retains only the declared accumulator, not stale MaxHP/modifiers or active admission.
+
+---
+
+## M-098 — Battle Use and Presence Controllers Have Different Keys
+
+**Status:** `MUST_PASS`
+**Fixture:** one battle participant successfully used Skill2; death/ordinary Revive/redeploy creates new field-presence controllers in the same owning battle, including a supported instance transfer that retains that battle scope. New presence spends its fresh Passive charge before an old own-Natural completion is delivered again. Also test fresh-battle initialization, failed AE, old Skill3 controller completion and its third enhanced completion/future cooldown completion.
+
+**Expected:** the owning battle/participant use flag stays USED through same-battle local controller/instance transitions, so another low-HP checkpoint cannot grant a second Skill2. A genuinely new battle initializes its own UNUSED flag; failed AE never consumes it. Passive/controller initialization is local AVAILABLE/READY, but the old Action's presence binding cannot refresh a newly spent charge or decrement a new Skill3 controller even when lifeSerial is preserved. Existing same-instance own ACT-033 completion still refreshes. Third enhanced completion creates fresh cooldown1 and cannot consume it; one future actual own completion ends it. Replay/index rebuild does not rerun battle initialization or create another successful use. Unsupported Mode battle ownership remains explicit rather than inferred from a new Combat Instance ID.
+
+---
+
+## M-099 — Reject Deferred Tags, Retroactive Queries and Retired Live Reads
+
+**Status:** `MUST_REJECT`
+**Input:** Functional tags[] containing unregistered AREA or deferred LIFESTEAL; HEAL inherited onto a pure projection/Damage sibling; projection membership discovered after the batch creates its State; required credit queued behind held ordinary Reactions or split from its terminal identity; credit dependent on the future return/continuation it blocks; return Heal reads a retired live counter without a declared capture, substitutes another State/presence, or treats own normal removal as cancellation of the still-required graph; local presence initialization resets an existing battle-use flag.
+
+**Expected:** existing exact Tag/Schema/type/DAG/lifetime/DMG-035/ACT-034 validation rejects before affected mutation or continuation. Supported active tags, geometry/Heal facets, sealed projections, joined terminal credits and captured-return graphs remain legal. Malformed IR fails closed with its unresolved dependency retained for diagnosis; it cannot silently skip credit/Heal, default a missing counter to0, invent Buff/Authority or turn a new instance ID into another battle use. No new Tag/Primitive/Contract family or Character branch is introduced to accept invalid content.
+
+---
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -4641,13 +4697,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 93 character-derived integration tests;
+- 99 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-224 tests / probes / meta-tests (219 A–N cases plus 5 META cases)
+230 tests / probes / meta-tests (225 A–N cases plus 5 META cases)
 
 The count is not a design target.
 

@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-03-G.10
+**Version:** 2026-10-04-G.11
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -21,6 +21,8 @@
 ---
 
 **Revision G.10:** executes E.9/F.11 through existing Target/Area/Position/RNG/Transaction, Damage/Shield/Result, Health/Lifecycle/Trigger and SSI/State owners. Explicit scoped phase/checkpoint/obligation data supplies the missing boundaries; no Character runtime, new Primitive, arbitrary callback or generic priority.
+
+**Revision G.11:** completes projection-credit continuation dependencies and retained State-value consumers during an opportunity-start graph's normal removal, through existing batch/Result/State/Transaction/Snapshot/continuation owners. No new store, service, Contract ID or global priority.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -1326,6 +1328,8 @@ If CC causes loss of action:
 04§7.15 → ACT-034 → existing SSI/Mode opportunity grant, State/Trigger/DAG/Transaction and continuation owners. An actual-completion clock cannot return a retained occupant before a CC-lost opportunity; this extension is a finite pre-control grant dependency.
 
 Once the existing scheduler grants the owner opportunity, record its instance-local serial and register applicable State-instance obligations whose creation serial is earlier. Run their authored termination/Heal graph to terminal status before the same grant's CC/selection/admission. Do not materialize a new Entity/Slot or publish ENTER_FIELD when authoritative presence/ownership never changed. Required Heal uses the ordinary Heal/Overheal pipeline. Then resume the original opportunity; CC may consume it without an Action/completion, Passive refresh, duration decrement or class regeneration.
+
+For a graph that reads a State counter after removing its source State, execute its declared P-002 capture first. Existing Snapshot/Effect cursor records retain the value and original State/owner/instance/grant identity through remaining nodes. Its own expected normal removal retires admission/clock/query registrations, but does not cancel this graph or free still-referenced captured values. Do not require a live State lookup for the remaining Heal. Recheck authored owner life/presence validity; unrelated retirement before handoff or death/leave cannot redirect work to a replacement instance. Terminal Heal/failure releases payloads under the existing replay horizon, without restoring protection or creating a second return.
 
 Retain owner/instance/grant/State/dependency and cancellation/terminal cursor in existing scheduler/Trigger records. Death/leave/State retirement cancels as authored; recovery cannot Heal a newer presence or create an extra opportunity. Reject cycles/waits on this held opportunity's future Action, missing Mode abstraction and unsupported competing settlements. Actor-window grant/reset remains CLK-002; this does not change completion-based clocks or invent private Turn Boundaries.
 
@@ -3025,9 +3029,13 @@ Existing Effect cursor/Transaction/Result lifetimes retain the basis and committ
 
 At the retained area's post-relocation/pre-Damage checkpoint, index active State projection queries by reserved Position/incoming outcome scope. Pin actual Damage definitions/source/threshold bindings and authoritative defence/Shield/HP phase version before real batch effects/lifecycle change them. In a read-only context, omit only the named State-owned recipient-admission clauses, apply all other ordinary pipeline rules and share hypothetical Shield/HP budget across packets under the original allocation profile. Existing source/target-dependent formulas need their declared bindings; absent data is an error, not a live fallback.
 
+Seal query/State-instance membership in that same phase record before actual Damage admission. Actual recipients may be empty after exclusion; retain the query and its valid inputs. Never discover a query from a State created by this batch's later stable-health work or recompute a previous batch for that State.
+
 Never dispatch P-042, ordinary Damage/Event/result aggregation, damage listeners, HP_ZERO or real RNG advancement. Use retained draw facts or a supported pure keyed probe; fail closed on non-projectable inputs. Seal DamageProjectionResultRef with projectedActualHpDamage and query/batch/recipient/State/phase inputs, separately from DamageResultRef. Committed-result readers/P-043 reject this type.
 
 After the real observed batch is terminal, the same still-valid State may add the estimate once through an ordinary State transaction; aborted batch/retired owner closes without credit. A valid local no-recipient terminal outcome caused by the exclusion does not discard a projection. Every later batch reads real current defence/Shield/HP anew; no persistent shadow store. Retain pinned inputs/results until credit terminal and dedup identities through replay. Save/resume cannot recalculate against a newer view or double-add an estimate. No new Primitive, Damage pipeline/type or projection manager.
+
+For an authored creditStateCounterRef, register the finite terminal credit decision with the existing batch/Effect continuation gate. Finish the whole real transaction and mandatory lifecycle/reconciliation, then commit the valid State delta and terminal credit identity together, or close abort/invalid/zero branches under DMG-035. The next direct group/Action/SSI cursor cannot proceed while this dependency is open, even under an ordinary Reaction hold. A zero estimate closes a valid success with zero delta; it is not abort. Do not enqueue this bookkeeping as a held ordinary Reaction, publish HEALTH_MUTATION_STABLE for this non-health counter change, or expose a delta without its dedup record. Explicit unrelated mandatory conflicts still fail closed without composition. No wait on a future continuation/return is permitted.
 
 ---
 
@@ -5535,6 +5543,8 @@ A complete save needs:
 - pre-Cost source SnapshotRefs/capture identity, local CostGroup continuation/success-use/lifecycle cursor, and pending shared-recipient allocation membership/phase version/proposed budgets/commit identity; restore completes the same transaction without recapture, duplicate spend or packet-priority allocation.
 
 E.9/F.11 saves additionally retain locked geometry/pre-Damage phase and common assignment view, coherent move/allowance/Snapshot/deferred-counter identity, counter batch membership/terminal results, distinct projection pinned inputs/credit records, stable-health observations/continuation cursors and ACT-034 grant-start obligations. Restore finishes the same finite phase/transaction without reselecting, spending, counting, countering or returning twice. No new writable HP/Shield/Position copy is created.
+
+E.10/F.12 also retain sealed pre-Damage query membership and required credit dependencies with their atomic terminal identities, plus opportunity-start counter SnapshotRefs and the normal-removal/remaining-Heal cursor. Restoring after State removal resumes the retained original graph; absence of the normally removed State alone cannot cancel it or force a live read. Owner-instance invalidity still cancels under its declared lifetime. Restore never opens continuation before credit/no-credit is terminal or credits a batch to a later-created State.
 
 Reuse existing Trigger candidate / Transaction Manager idempotence records, not a new manager. Observation identity includes the trigger definition and original committed Event identity; stored candidate/dependency IDs remain stable on redelivery. Check terminal observation identity before allocating another candidate, including previously nonqualifying observations. Rebuilding indexes does not reset processed identities. Release receipt payloads once their consumers finish, independently from deduplication identity retention. After a terminal record's replay horizon is retired, reject delivery from before the retained horizon rather than accept it as a fresh observation. Restore cannot recreate notes, additions, consumed sets or already-terminal settlements.
 
