@@ -1,8 +1,8 @@
 # NẠP HƯ — KHUNG LỊCH SỬ NỀN TRƯỚC KHI CHIA ĐẠI KỶ
 
-> **Trạng thái:** Working chronology.
+> **Trạng thái:** Niên biểu đang xây dựng.
 >
-> File này khóa **trật tự tương đối** và một số **khoảng thời gian** giữa các biến cố lớn. Chưa gán niên đại tuyệt đối.
+> Tài liệu này khóa **trật tự tương đối** và một số **khoảng thời gian** giữa các biến cố lớn. Chưa gán niên đại tuyệt đối.
 
 ---
 
@@ -13,9 +13,11 @@ Nạp Hư hình thành; chỉ ghi nhận hai Linh Sinh Nguyên Sơ: Nhân Tổ v
 ↓
 Nguyên Sơ phân hóa Sinh–Tử rồi vỡ; bản nguyên vừa vào hai trứng vừa khuếch tán vào thế giới
 ↓
-Long Tổ + Phượng Tổ nở ra, được Nhân Tổ chăm sóc; Sinh–Tử và Luân Hồi sơ khai dần vận hành
+Long Tổ + Phượng Tổ nở ra, được Nhân Tổ nuôi lớn; Sinh–Tử và Luân Hồi sơ khai dần vận hành
 ↓
-Long / Phượng tự lập rồi rời đi; Nhân Tổ chia quyền năng tạo mười hai người con
+ít nhất 20.000 năm từ thời Nguyên Sơ tới thời mười hai hài tử; Long / Phượng đã có thể hóa hình
+↓
+Long / Phượng tự lập rồi rời đi; Nhân Tổ ngẩn người, sau đó tạo mười hai người con
 ↓
 Nhân Tổ nuôi dạy các con, để lại thanh kiếm bằng máu và xương cánh tay của mình
 ↓
@@ -23,7 +25,8 @@ Nhân Tổ chọn Luân Hồi vì chán đời sống vĩnh hằng; nhìn chúng
 ↓
 các con tạo Nhân tộc và nhiều loài, truyền lời kể về Nhân Tổ và Long / Phượng; lần lượt chọn Luân Hồi
 ↓
-người con cuối cùng chứng kiến Thiên Đạo bắt đầu thức tỉnh; Luân Hồi đã tồn tại nhưng chưa hoàn thiện
+người con cuối cùng chứng kiến Thiên Đạo bắt đầu thức tỉnh rồi cũng vào Luân Hồi;
+thời đại mười hai hài tử đời đầu kết thúc, Luân Hồi đã tồn tại nhưng chưa hoàn thiện
 ↓
 Nhân / Yêu và các cộng đồng hậu thế phát triển
 ↓
@@ -42,18 +45,23 @@ người dùng kiếm tử vong vào Luân Hồi; các hài tử khác đã đ�
 ↓
 Thần Huy nghi có kế nên rút lui; Yêu Tiên chứng kiến Tân Thần cùng cấp bị giết và rút quân
 ↓
-Nhân Hoàng Cung là tịnh thổ cuối cùng của Nhân tộc
+Nhân Hoàng Cung, do một đời của một hài tử dựng lên, là tịnh thổ cuối cùng của Nhân tộc
 ↓
-Chân Tiên Nhân tộc đầu tiên tự hiến tế làm hạt nhân phong ấn Yêu Tiên
+Chân Tiên Nhân tộc đầu tiên tự hiến tế làm hạt nhân phong ấn, lấy tiên lực Yêu Tiên nuôi chính phong ấn
 ↓
-Kiếm Tiên đầu tiên trưởng thành với truyền thừa của sư phụ, sáng tạo Cửu Đại Kiếm Thuật,
-cuối cùng kết thúc Yêu Tiên; Nhân–Yêu bước vào thế cân bằng mới
+trong thời gian phong ấn có hai bán bộ Yêu Tiên giữ thân mình, không quá chèn ép Nhân tộc
+↓
+Kiếm Tiên đầu tiên trưởng thành với truyền thừa của sư phụ, sáng tạo Cửu Đại Kiếm Thuật;
+khi hắn giết tới, Yêu tộc buộc phải phá phong ấn vốn đã yếu vì Yêu Tiên cực yếu
+↓
+Kiếm Tiên kết thúc Yêu Tiên; Nhân–Yêu bước vào thế cân bằng mới
 ↓
 Phật Đạo hình thành; Phật Tổ xuất hiện
 ↓
 Chư Giới tiếp tục giao lưu trước khi Giới Bích siết kín
 ↓
-Ma Đạo Đại Thế Giới xâm lấn; Thần Huy và người giữ bí mật bản địa không báo về thanh kiếm
+Ma Đạo Đại Thế Giới xâm lấn; trước đó Nạp Hư chưa có Ma tu;
+hai nhân chứng bản địa về sau chuyển sang Ma Đạo, Thần Huy không báo bí mật thanh kiếm
 ↓
 quân xâm lược bị đẩy lui nhưng đạo thống ngoại giới ở lại; Thiên Đạo siết Giới Bích
 ↓
@@ -66,14 +74,16 @@ tái thiết; Nhân Vực dần bị gọi Ma Châu; đương thế Main đời 
 
 Các mốc thời gian đã khóa:
 
+- **Ít nhất 20.000 năm:** từ thời Nguyên Sơ tới thời mười hai hài tử, gắn với việc Nhân Tổ nuôi lớn Long / Phượng. Hai Tổ đã có thể hóa hình khi rời đi.
 - **30.000 năm:** từ cái chết Long / Phượng đến khi Yêu Tiên kết thúc bế quan và chứng Chân; sau đó hắn bình định quyền lực và mở Hắc Ám Kỷ.
 - **Ít nhất 100.000 năm:** từ lúc mười hai người con tạo Nhân tộc đến lúc Yêu Tiên áp quân trong sự kiện thanh kiếm. Đây là khoảng bao trùm; chưa đủ dữ kiện để cộng riêng nó với 30.000 năm.
+- **Một khoảng khác ít nhất 100.000 năm:** từ lúc hài tử cuối cùng vào Luân Hồi, kết thúc thời đại mười hai hài tử đời đầu, tới cuộc xâm lấn Ma Đạo Đại Thế Giới. Tác giả giữ cả hai mốc 100.000 năm; không cộng chúng vì có thể bao trùm các chặng lịch sử trùng nhau.
 - **Hơn 20.000 năm:** thời lượng tối thiểu đã có của Hắc Ám Kỷ; phạm vi các giai đoạn chưa chốt hết.
 - **Ít nhất 1.000 năm:** thời gian phong ấn Yêu Tiên; con số cuối chưa khóa.
 
-Vị trí sự kiện thanh kiếm so với các chặng chạy trốn / trưởng thành của Chân Tiên Nhân tộc đầu tiên còn OPEN. Sự kiện xảy ra khi Yêu Tiên còn có thể trực tiếp áp quân, trước phong ấn.
+Vị trí sự kiện thanh kiếm so với các chặng chạy trốn / trưởng thành của Chân Tiên Nhân tộc đầu tiên còn mở. Sự kiện xảy ra khi Yêu Tiên còn có thể trực tiếp áp quân, trước phong ấn.
 
-Một số nhân chứng bản địa của sự kiện thanh kiếm về sau đi vào Ma Đạo, trước cuộc xâm lấn Ma Đạo Đại Thế Giới. Thời điểm chuyển sang Ma Đạo của họ so với phong ấn / giải phóng / Phật Tổ chưa khóa.
+Nhân chứng sự kiện thanh kiếm rất ít. **Hai người trong số đó chỉ chuyển thành Ma tu sau khi Ma Đạo Đại Thế Giới tiến đến.** Họ là sinh vật bản địa Nạp Hư; việc đã biết thanh kiếm từ trước không có nghĩa Ma tu đã có trước ngoại xâm.
 
 ---
 
@@ -115,7 +125,7 @@ Cuộc xâm lấn của Ma Đạo Đại Thế Giới là:
 
 > ảnh hưởng ngoại giới đến sau cuộc giải phóng Nhân tộc.
 
-**Ma tu bản địa đã có trước cuộc xâm lấn này.** Một số sinh vật Nạp Hư chứng kiến thanh kiếm trong Hắc Ám Kỷ về sau đi vào Ma Đạo; họ là nguồn tri thức về thanh kiếm của cao tầng hai Ma Môn bản địa.
+**Trước cuộc xâm lấn này, Nạp Hư không có Ma tu.** Chỉ có rất ít sinh vật bản địa từng chứng kiến sức mạnh thanh kiếm. Hai nhân chứng về sau chuyển sang Ma Đạo khi ngoại giới tiến đến; họ vẫn là người Nạp Hư, không phải quân xâm lược.
 
 Do đó cuộc giải phóng Nhân tộc khỏi thế độc tôn Yêu tộc:
 
@@ -197,7 +207,7 @@ Ngay cả khi quê nhà chúng vẫn giàu:
 
 > giàu hơn vẫn tốt.
 
-Đây là logic đế quốc đủ dùng.
+Đây là lô-gíc đế quốc đủ dùng.
 
 ---
 
@@ -209,7 +219,7 @@ Nhưng:
 
 > **công pháp Ma Đạo ngoại giới ở lại.**
 
-Nạp Hư đã có Ma tu bản địa trước cuộc xâm lấn. Chiến tranh bổ sung ảnh hưởng và truyền thừa ngoại giới; nó không phải nguồn gốc duy nhất của mọi Ma Đạo Nạp Hư.
+Ma Đạo được đưa vào Nạp Hư qua cuộc xâm lấn này. Một số sinh vật bản địa chuyển sang Ma Đạo, trong đó có hai nhân chứng sự kiện thanh kiếm. Quân ngoại giới bị đẩy lui nhưng công pháp và những người bản địa đã tiếp nhận chúng vẫn ở lại.
 
 Nạp Hư học được:
 
@@ -230,7 +240,7 @@ nó lan cực nhanh.
 
 ---
 
-# VIII. GIỚI BÍCH LÀ SECURITY PATCH CỦA THIÊN ĐẠO
+# VIII. GIỚI BÍCH LÀ BIỆN PHÁP BẢO VỆ CỦA THIÊN ĐẠO
 
 Sau ngoại xâm, Thiên Đạo Nạp Hư nhận ra:
 
@@ -253,7 +263,7 @@ Hệ quả:
 
 Đại Kiếp xảy ra khi Ma Đạo trong Nạp Hư đã trở thành:
 
-> vấn đề nội sinh, với cả Ma tu bản địa và ảnh hưởng ngoại giới đã ở lại sau chiến tranh.
+> vấn đề nội sinh: Ma Đạo được du nhập qua ngoại xâm đã có người bản địa tu luyện và tiếp tục truyền bá sau chiến tranh.
 
 Một đại Ma Tu định huyết tế quy mô cực lớn để đột phá.
 
@@ -261,7 +271,7 @@ Nghi thức bị phá trước khi hoàn thành.
 
 Nhưng:
 
-> khoảng **25% sinh linh** đã chết theo ước tính lịch sử working.
+> khoảng **25% sinh linh** đã chết theo ước tính lịch sử đang xây dựng.
 
 Từ đây Ma Tu bị:
 
@@ -329,7 +339,7 @@ Tinh Hải Thần Châu có thể giữ truyền thừa Thần Huy bởi:
 
 > **hai giới đã có tiếp xúc trước Giới Bích.**
 
-Một cửa sổ working cho trao đổi kỹ thuật:
+Một cửa sổ đang xây dựng cho trao đổi kỹ thuật:
 
 > thời đại giao thông Chư Giới hỗn loạn quanh chiến tranh Ma Đạo.
 
@@ -430,17 +440,19 @@ Hắn không hiểu:
 
 Long Tổ và Phượng Tổ từ khi sinh ra đã không hòa hợp.
 
-Khi đã đủ sức tự kiếm ăn / tự tồn tại:
+Nhân Tổ đã nuôi lớn Long Tổ và Phượng Tổ trong quãng thời gian rất dài. Từ thời Nguyên Sơ tới thời mười hai hài tử cách **ít nhất 20.000 năm**; quãng ấy gắn với việc hắn chăm sóc, nuôi lớn hai Tổ. Chưa tách riêng thời gian ấp trứng và thời gian sau khi nở.
+
+Khi rời đi, **cả hai đã có thể hóa hình** và tự tồn tại.
 
 > cả hai lần lượt rời Nhân Tổ.
 
 Chúng cũng không ở cùng nhau.
 
-Nhân Tổ trở lại trạng thái cô độc.
-
-Sự cô độc sau khi Nguyên Sơ rời đi và Long / Phượng tự lập gắn với việc hắn:
+Nhân Tổ ngẩn người sau khi chúng rời đi, rồi:
 
 > **chia quyền năng tạo mười hai người con.**
+
+Chưa viết lời thoại hoặc một cuộc tiễn biệt cụ thể cho khoảnh khắc ấy.
 
 Động cơ chọn Luân Hồi về sau đã khóa: hắn nhàm chán đời sống vĩnh hằng, người bạn thân nhất Nguyên Sơ đã đi, và hắn muốn một con đường tồn tại mới.
 
@@ -482,6 +494,8 @@ Cuối cùng, vì:
 
 mười hai người con cũng lần lượt chọn Luân Hồi.
 
+**Thời đại mười hai hài tử kết thúc khi cả mười hai đều đã rời đời đầu và vào Luân Hồi.** Những lần họ tái sinh sau đó không kéo dài thời đại đời đầu này.
+
 ### Người con cuối cùng
 
 Người con cuối cùng còn ở lại đủ lâu để chứng kiến:
@@ -501,7 +515,7 @@ Lúc này:
 
 > **Luân Hồi đã tồn tại và vận hành, nhưng chưa hoàn thiện.**
 
-Nó có nguồn gốc liên hệ trực tiếp tới hai luồng Sinh–Tử tách khỏi Nguyên Sơ. Cái chết Long / Phượng về sau làm Luân Hồi hoàn thiện hơn. Cơ chế exact và các bước hoàn thiện cụ thể còn OPEN.
+Nó có nguồn gốc liên hệ trực tiếp tới hai luồng Sinh–Tử tách khỏi Nguyên Sơ. Cái chết Long / Phượng về sau làm Luân Hồi hoàn thiện hơn. Cơ chế và các bước hoàn thiện cụ thể còn mở.
 
 ---
 
@@ -589,7 +603,7 @@ Nhưng tới một đại cảnh giới đủ cao:
 4. các thế lực khác tranh đoạt;
 5. nếu người đó sống đủ lâu, ký ức cổ đại thức tỉnh và cán cân chính trị thay đổi.
 
-Vì vậy việc thiết kế **12 Đại Tuyệt Thể** không chỉ là thiết kế power set.
+Vì vậy việc thiết kế **12 Đại Tuyệt Thể** không chỉ là thiết kế tập hợp năng lực.
 
 Nó còn quyết định:
 
@@ -609,7 +623,7 @@ Linh Sinh Nạp Hư:
 
 Tiên Thiên Thần Arclune hậu Đại Hợp Giới:
 
-> sinh trực tiếp từ **khái niệm của Arclune**, ontology sâu hơn và khóa với Arclune.
+> sinh trực tiếp từ **khái niệm của Arclune**, quan hệ bản thể sâu hơn và khóa với Arclune.
 
 Nguyên tắc đã định hướng:
 
@@ -637,18 +651,27 @@ Cuộc sống thường ngày là:
 - không có quyền tự quyết;
 - đứng ở tầng đáy nhất của trật tự Nhân–Yêu.
 
-## Hạn chế tu luyện của nô lệ Nhân tộc
+## Hạn chế tu luyện và cơ chế quản lý nô lệ Nhân tộc
 
-Nhân tộc bị nô dịch **vẫn được phép tu luyện** để sống lâu và làm công tốt hơn. Trật tự áp bức kiểm soát khả năng tiến xa:
+**ĐÃ CHỐT:** Nhân tộc bị nô dịch vẫn được phép tu luyện để sống lâu và làm công tốt hơn, nhưng chủ nhân kiểm soát công pháp và khả năng phản kháng.
 
-- công pháp bị giới hạn, không có phần để tu tới cảnh giới cao hơn;
-- được tăng cảnh giới nhưng không được học thủ đoạn sát phạt;
-- sách bị đốt để cắt nguồn tri thức;
-- thiên tài bị loại bỏ;
-- thức ăn chỉ đủ tránh chết đói;
-- lao động liên tục.
+- Ban đầu chỉ được tu đến **đầu đại cảnh giới thứ hai**; theo cách gọi chuẩn hóa về sau là đầu Khai Mệnh.
+- Họ tiếp tục bị chèn ép và tẩy não. Chỉ khi tâm tư phản kháng đã bị dập tắt mới được cho tu thêm.
+- Dù được cho tu thêm, **không được đột phá đại cảnh giới thứ tư**. Trần cho phép vẫn ở dưới Hiển Tướng; không mặc định mọi nô lệ đều đạt đỉnh cảnh thứ ba.
+- Hạn chế chính là **trần công pháp**: thiếu phần tu cao hơn và thiếu thủ đoạn sát phạt. Sách bị đốt, thiên tài bị loại bỏ; không tự đổi cơ chế này thành khế ước linh hồn hay khóa tu vi bằng phép.
+- Lao động liên tục; khẩu phần của nô lệ lao động bị ép xuống mức chỉ đủ tránh chết đói.
 
-Các cơ chế quản lý cụ thể theo địa phương / loại lao động còn OPEN; không tự thêm khế ước linh hồn hoặc phong ấn nô lệ.
+Tên cảnh hiện tại dùng để đối chiếu cho người đọc. Hắc Ám Kỷ chưa có hệ tám cảnh thống nhất, nên không mặc định người đương thời dùng đúng các tên ấy.
+
+Yêu tộc dùng **chính người Nhân tộc quản lý người Nhân tộc**. Kẻ quản lý có thể độc ác hơn cả chủ Yêu: hắn sợ đồng tộc phản kháng làm sụp đổ quyền lợi của mình. Không đồng nhất toàn bộ Nhân tộc với tầng quản lý được hưởng lợi ấy.
+
+Theo địa phương có:
+
+- nơi nô dịch trực tiếp;
+- nơi phải cống nạp người;
+- nơi còn cộng đồng lẩn trốn.
+
+Tình hình nhìn chung xấu dần theo thời gian, cuối cùng Nhân tộc bị biến thành **lương thực của Yêu tộc**. Trong mô tả giai đoạn ấy, chỉ những nữ nhân được nuôi tốt; nô lệ tử vong bị vứt bỏ. **CÒN MỞ:** lý do và cách lựa chọn nhóm nữ nhân này, loại lao động, khẩu phần cụ thể và khác biệt địa phương. Không tự gán việc nuôi tốt cho một mục đích chưa được tác giả chốt.
 
 Nhưng con gái của chủ nhân Yêu tộc:
 
@@ -714,15 +737,19 @@ Lựa chọn cuối cùng:
 
 Đây là nguyên nhân thật sự hắn chết.
 
+Phong ấn **tồn tại nhờ chính tiên lực của Yêu Tiên**: hắn càng mạnh thì phong ấn càng mạnh.
+
 Phong ấn tạo ra:
 
 > khoảng thời gian cần thiết để đứa trẻ hắn nuôi — Kiếm Tiên đầu tiên — trưởng thành.
+
+Đến cuối, Yêu Tiên đã cực yếu nên phong ấn cũng yếu. Khi Kiếm Tiên giết tới, Yêu tộc buộc phải đánh vỡ phong ấn. **CÒN MỞ:** nguyên nhân và tốc độ Yêu Tiên suy yếu; không suy ra hắn càng mạnh càng bị hút cạn nhanh hơn hoặc biết cách tự suy yếu để thoát.
 
 Kiếm Tiên sau này mới là người có điều kiện triệt để kết thúc Yêu Tiên.
 
 ## Truyền thừa của Kiếm Tiên đầu tiên
 
-Kiếm Tiên được Chân Tiên Nhân tộc đầu tiên truyền thừa, nên các hạn chế công pháp áp lên nô lệ không khóa con đường tu luyện của hắn. Truyền thừa ấy vẫn thuộc hệ sơ khai, chưa phải tám cảnh đã chuẩn hóa.
+Kiếm Tiên được Chân Tiên Nhân tộc đầu tiên truyền thừa và **luôn chạy trốn**, nên trần công pháp của nô lệ không khóa con đường tu luyện của hắn. **Cực ít người biết hắn là đồ đệ của Chân Tiên Nhân tộc đầu tiên.** Truyền thừa ấy vẫn thuộc hệ sơ khai, chưa phải tám cảnh đã chuẩn hóa.
 
 Đã khóa:
 
@@ -736,7 +763,7 @@ Hắn là **một Yêu hậu thiên tự mày mò con đường tu luyện chưa
 
 Hệ tu sơ khai khiến hắn thiếu tổng kết của hậu thế, chưa tối ưu và có những nhược điểm chưa ai biết, nhưng hắn vẫn vượt xa phần lớn sinh linh cùng thời.
 
-Khi Long / Phượng đồng quy, hắn tranh đoạt và ăn / luyện hóa được một phần tàn hài sau huyết chiến. **Lúc ấy hắn chưa chứng Chân Tiên.** Phần tàn hài cụ thể và tác dụng / nhược điểm còn OPEN.
+Khi Long / Phượng đồng quy, hắn tranh đoạt và ăn / luyện hóa được một phần tàn hài sau huyết chiến. **Lúc ấy hắn chưa chứng Chân Tiên.** Phần tàn hài cụ thể và tác dụng / nhược điểm còn mở.
 
 Sau đó Yêu tộc phân tranh, quyền lực phân tán trong **30.000 năm**. Đến cuối khoảng ấy hắn kết thúc bế quan, **đột phá Chân Tiên**, bình định quyền lực và mở trật tự Hắc Ám Kỷ.
 
@@ -744,7 +771,7 @@ Nhân tộc phản kháng nhưng chưa đủ sức thay đổi trật tự này.
 
 Đầu Hắc Ám Kỷ, hắn chưa biết thanh kiếm của Nhân Tổ. Về sau, ngay trước khi đại quân của hắn tiến đến Nhân Hoàng Cung, hắn chứng kiến một Tân Thần Thần Huy cùng cấp với mình bị một kiếm diệt sát. Hắn rút quân; Nhân Hoàng Cung là tịnh thổ cuối cùng của Nhân tộc.
 
-Sau kiếm ấy người dùng đã tử vong vào Luân Hồi, còn các hài tử khác đều đã đầu thai nhưng chưa thức tỉnh ký ức. Thần Huy thiếu thông tin ấy và rút lui vì nghi có kế. Mức độ hiểu biết của Yêu Tiên về cái giá / người dùng kiếm sau khi rút quân còn OPEN.
+Sau kiếm ấy người dùng đã tử vong vào Luân Hồi, còn các hài tử khác đều đã đầu thai nhưng chưa thức tỉnh ký ức. Thần Huy thiếu thông tin ấy và rút lui vì nghi có kế. Mức độ hiểu biết của Yêu Tiên về cái giá / người dùng kiếm sau khi rút quân còn mở.
 
 ---
 
@@ -948,7 +975,7 @@ Khi Nguyên Sơ vỡ:
 
 > hai luồng Sinh–Tử không đơn giản “mỗi luồng chui trọn vào một quả trứng”.
 
-Working model:
+Mô hình đang xây dựng:
 
 1. phần cốt lõi đi vào hai quả trứng;
 2. phần còn lại rò / khuếch tán vào Nạp Hư;
@@ -976,11 +1003,11 @@ Vì vậy Long / Phượng không nhất thiết độc chiếm toàn bộ “Si
 
 # XXV. CÁI CHẾT LONG / PHƯỢNG LÀM LUÂN HỒI HOÀN THIỆN HƠN
 
-**LOCKED:** Luân Hồi đã có trước khi Thiên Đạo thức tỉnh, nhưng chưa hoàn thiện. Cái chết Long Tổ và Phượng Tổ làm nó hoàn thiện hơn.
+**ĐÃ CHỐT:** Luân Hồi đã có trước khi Thiên Đạo thức tỉnh, nhưng chưa hoàn thiện. Cái chết Long Tổ và Phượng Tổ làm nó hoàn thiện hơn.
 
-**WORKING:** khi hai Tổ chết, những mảnh Sinh–Tử từng tập trung trong họ có thể được phân phối sâu hơn vào sinh linh và thiên địa qua tàn hài / bản nguyên.
+**ĐANG XÂY DỰNG:** khi hai Tổ chết, những mảnh Sinh–Tử từng tập trung trong họ có thể được phân phối sâu hơn vào sinh linh và thiên địa qua tàn hài / bản nguyên.
 
-Chưa khóa cơ chế exact, các chức năng Luân Hồi được bổ sung hay việc nó đã đạt trạng thái hoàn thiện cuối cùng hay chưa. Không giải quyết số phận Nguyên Sơ từ sự kiện này.
+Chưa khóa cơ chế cụ thể, các chức năng Luân Hồi được bổ sung hay việc nó đã đạt trạng thái hoàn thiện cuối cùng hay chưa. Không giải quyết số phận Nguyên Sơ từ sự kiện này.
 
 ---
 
@@ -990,7 +1017,7 @@ Một trong mười hai người con của Nhân Tổ mang hệ Pháp Tắc liê
 
 > **Cảm Xúc.**
 
-Working lock:
+Dữ kiện hiện tại:
 
 > đây là người đầu tiên trong mười hai anh/chị/em lựa chọn vào Luân Hồi sau Nhân Tổ.
 
@@ -1032,7 +1059,7 @@ Có thể nói:
 
 Đây là một nguyên tắc thiết kế rất quan trọng cho 12 Đại Tuyệt Thể:
 
-> mỗi người con không chỉ có power; họ có thể đã để lại một “mảnh nhân tính / thế giới” khi bước vào Luân Hồi.
+> mỗi người con không chỉ có sức mạnh; họ có thể đã để lại một “mảnh nhân tính / thế giới” khi bước vào Luân Hồi.
 
 ---
 
@@ -1081,14 +1108,14 @@ Mỗi Đại Tuyệt Thể có:
 Thiên tính:
 
 - không phải lời nguyền có ý thức;
-- không phải debuff;
+- không phải hiệu ứng suy yếu;
 - không phải thứ chủ thể tự nhận ra.
 
 Người mang Thể Chất thường sẽ nghĩ:
 
 > “đó chỉ là tính cách của ta.”
 
-Nhưng người ngoài có thể nhận thấy pattern.
+Nhưng người ngoài có thể nhận thấy khuôn mẫu.
 
 ### Quy luật
 
@@ -1105,7 +1132,7 @@ Nhưng có thể:
 
 để áp chế.
 
-Điều này tạo một tradeoff rất mạnh:
+Điều này tạo một sự đánh đổi rất mạnh:
 
 > muốn Thể Chất mạnh hơn thì bản thân càng bị Pháp Tắc của mình kéo về một kiểu người nhất định.
 
@@ -1161,7 +1188,7 @@ Cuối cùng:
 
 Chi tiết cái chết chưa khóa, nhưng mục tiêu tông màu:
 
-> càng thảm càng tốt, miễn vẫn hợp logic nhân vật và không biến nàng thành đạo cụ vô nghĩa.
+> càng thảm càng tốt, miễn vẫn hợp lô-gíc nhân vật và không biến nàng thành đạo cụ vô nghĩa.
 
 Cái chết của nàng trở thành một trong những lý do Chân Tiên Nhân tộc đầu tiên:
 
@@ -1230,7 +1257,7 @@ Tối thiểu:
 
 > **1.000 năm.**
 
-Nhưng với scale lịch sử hiện tại, khoảng dài hơn là hợp lý.
+Nhưng với quy mô lịch sử hiện tại, khoảng dài hơn là hợp lý.
 
 Kiếm Tiên cần thời gian để:
 
@@ -1241,46 +1268,29 @@ Kiếm Tiên cần thời gian để:
 - học nhiều truyền thừa;
 - đúc kết Cổ Kiếm Đạo.
 
-Vì Hắc Ám Kỷ kéo dài ít nhất **hơn 20.000 năm**, thời gian phong ấn hoàn toàn có thể nằm ở bracket vài nghìn tới hơn mười nghìn năm mà không làm lịch sử chật.
+Vì Hắc Ám Kỷ kéo dài ít nhất **hơn 20.000 năm**, thời gian phong ấn hoàn toàn có thể nằm ở mức vài nghìn tới hơn mười nghìn năm mà không làm lịch sử chật.
 
 Con số cuối chưa khóa.
 
 ---
 
-# XXXIV. YÊU TIÊN TRONG PHONG ẤN VẪN LÀ MỘT NHÂN VẬT HOẠT ĐỘNG
+# XXXIV. YÊU TIÊN TRONG PHONG ẤN — NĂNG LỰC VÀ MỨC CAN THIỆP CẦN THIẾT KẾ
 
-Yêu Tiên không phải boss bị đóng băng hàng nghìn năm.
+Yêu Tiên vẫn có ý thức và phải được xây như một kẻ thù thông minh. Nền đã có cho phép hắn nói chuyện, truyền ý niệm hoặc ảnh hưởng tâm tình ở một mức nào đó; **kênh truyền, phạm vi, điều kiện và người có thể tiếp nhận đều chưa chốt**.
 
-Phong ấn vẫn cho phép hắn ở mức nhất định:
+Không mặc định hắn cảm nhận được mọi bước Kiếm Tiên trưởng thành, biết thân phận sư đồ, hoặc đã trực tiếp thao túng Kiếm Tiên suốt thời gian phong ấn. Việc cực ít người biết thân phận đệ tử phải được giữ khi thiết kế đường thu thập tin tức.
 
-- truyền ý niệm;
-- ảnh hưởng tâm tình;
-- nói chuyện;
-- thao túng người ngoài;
-- gây sức ép lên phong ấn;
-- cảm nhận Kiếm Tiên lớn lên.
+Thứ tự cần quyết định:
 
-Hắn có thể khinh thường Kiếm Tiên lúc đầu vì:
+1. bản thể / loài gốc của Yêu Tiên;
+2. phần tàn hài Long–Phượng hắn đã luyện hóa;
+3. Pháp Tắc và năng lực đặc trưng;
+4. năng lực nào còn đi qua phong ấn, với điều kiện nào;
+5. từ đó mới xác định hắn có thể biết và tác động gì tới Kiếm Tiên.
 
-> trước mắt hắn chỉ là một đứa trẻ được nuôi lớn để giết mình.
+Các phương án dụ dỗ, thử tâm, truyền tri thức hoặc dùng người ngoài chỉ là khả năng cần xét sau các bước trên. Chưa chọn một kế hoạch cụ thể sau khi hắn rút quân khỏi Nhân Hoàng Cung.
 
-Nhưng:
-
-> **hắn không ngu.**
-
-Một sinh linh tự mày mò tu gần / tới Chân Tiên trong thời đại chưa có hệ thống hoàn thiện không thể là phản diện mất não.
-
-Khi Kiếm Tiên trưởng thành, Yêu Tiên:
-
-- quan sát;
-- thử tâm;
-- ảnh hưởng cảm xúc;
-- tìm điểm yếu;
-- thậm chí có thể cố tình dạy / gợi ý một phần tri thức nếu điều đó phục vụ kế hoạch phá phong ấn.
-
-Quan hệ hai người có thể phát triển thành:
-
-> **kẻ thù đã “biết” nhau hàng nghìn năm trước khi thật sự quyết chiến.**
+**ĐÃ CHỐT:** phong ấn dùng chính tiên lực Yêu Tiên, hắn càng mạnh phong ấn càng mạnh; cuối cùng hắn cực yếu, Kiếm Tiên giết tới buộc Yêu tộc phá phong ấn. Nguyên nhân suy yếu còn mở.
 
 ---
 
@@ -1453,7 +1463,7 @@ nếu tồn tại trong hậu thế, nguồn cuối cùng chỉ có thể là:
 
 > ký ức của Nhân Tổ, nhân chứng trực tiếp duy nhất.
 
-Chưa chốt hắn từng kể chuyện Nguyên Sơ cho mười hai người con hay chưa. Vì vậy đường truyền cụ thể của câu này tới hậu thế còn OPEN: qua một đời Nhân Tổ thức tỉnh, hoặc qua lời kể gia đình nếu tác giả chốt rằng hắn đã kể.
+Chưa chốt hắn từng kể chuyện Nguyên Sơ cho mười hai người con hay chưa. Vì vậy đường truyền cụ thể của câu này tới hậu thế còn mở: qua một đời Nhân Tổ thức tỉnh, hoặc qua lời kể gia đình nếu tác giả chốt rằng hắn đã kể.
 
 Hệ quả:
 
@@ -1474,7 +1484,7 @@ Ngay cả độc giả cũng không cần được chứng minh tuyệt đối:
 
 Không chỉ nhân vật trong truyện không biết.
 
-Mà working lore hiện tại cũng cố ý:
+Tài liệu nền thế giới hiện tại cũng cố ý:
 
 > **không quyết định đáp án.**
 
@@ -1494,19 +1504,19 @@ Chỉ lấp hố này khi truyện thật sự cần.
 
 # XLII. THANH KIẾM NHÂN TỔ ĐỂ LẠI & SỰ KIỆN TRONG HẮC ÁM KỶ
 
-## Chế tạo, người dùng và cái giá — LOCKED
+## Chế tạo, người dùng và cái giá — ĐÃ CHỐT
 
 Trước khi tan biến vào Luân Hồi, Nhân Tổ tự rèn thanh kiếm bằng **máu và xương cánh tay của mình**.
 
 - Chỉ **Nhân Tổ hoặc mười hai người con** có thể điều khiển.
 - Nhân Tổ sợ các con lạm sát nên đặt cái giá: **ra một kiếm thì tử vong và vào Luân Hồi**.
-- Chưa có tên chính thức cho thanh kiếm; chưa khóa cơ chế exact của quyền điều khiển và cái giá.
+- Chưa có tên chính thức cho thanh kiếm; chưa khóa cơ chế cụ thể của quyền điều khiển và cái giá.
 
-## Một kiếm diệt Tân Thần — LOCKED
+## Một kiếm diệt Tân Thần — ĐÃ CHỐT
 
 Trong Hắc Ám Kỷ, một Tân Thần từ Thần Huy xuất hiện. Một trong mười hai người con, lúc ấy đã qua **nhiều đời Luân Hồi**, đã thức tỉnh ký ức nhưng tu vi **dưới Chân Tiên**, dùng thanh kiếm diệt sát hắn.
 
-Tân Thần bị giết cùng cấp với Yêu Tiên đầu tiên. Đây là dữ kiện của cá thể ấy; không ánh xạ mọi Tân Thần vào cùng bracket.
+Tân Thần bị giết cùng cấp với Yêu Tiên đầu tiên. Đây là dữ kiện của cá thể ấy; không ánh xạ mọi Tân Thần vào cùng mức.
 
 Người dùng kiếm trả giá bằng tử vong vào Luân Hồi. Những người con còn lại đều **đã đầu thai nhưng chưa thức tỉnh**, nên không còn một hài tử đã thức tỉnh khác để tiếp tục ra kiếm lúc đó. Chân Ngã của họ vẫn tồn tại.
 
@@ -1514,33 +1524,65 @@ Thần Huy không biết khoảng trống này, nghi có kế và rút lui. Yêu
 
 Từ lúc mười hai người con tạo Nhân tộc đến lúc Yêu Tiên áp quân đã cách **ít nhất 100.000 năm**.
 
-## Bí mật và các cuộc xâm nhập — LOCKED
+## Nhân chứng, giới hạn bí mật và các cuộc xâm nhập — ĐÃ CHỐT
 
 Thần Huy không xâm nhập Nạp Hư quá nhiều sau sự kiện này. Khi Ma Đạo Đại Thế Giới về sau xâm lấn, phía Thần Huy không báo bí mật thanh kiếm vì sợ bị hố.
 
-Một số **sinh vật Nạp Hư** đã chứng kiến thanh kiếm về sau trở thành Ma tu. Tri thức này đã có **trước cuộc xâm lấn ngoại giới**; họ không phải quân xâm lược.
+Nhân chứng tận mắt thấy kiếm được dùng **rất ít**. Hai người trong số ấy là sinh vật **bản địa Nạp Hư**, chỉ chuyển sang Ma Đạo **sau khi Ma Đạo Đại Thế Giới tiến đến**. Trước ngoại xâm, Nạp Hư không có Ma tu.
 
-Cao tầng Thiên Ma Môn và Cực Lạc Ma Tông biết bí mật và giữ kín:
+Cao tầng Thiên Ma Môn và Cực Lạc Ma Tông biết phần thông tin mà các hài tử **chủ động muốn cho họ biết** để tránh phiền phức và âm mưu đoạt kiếm:
+
+- có một thanh kiếm do Nhân Tổ tạo;
+- thanh kiếm dùng xương của Nhân Tổ;
+- chỉ Nhân Tổ hoặc mười hai người con có thể điều khiển.
+
+Không gán cho hai Ma Môn hiểu biết về **cái giá ra một kiếm thì tử vong**, toàn bộ vật liệu máu–xương, hoặc tình trạng thức tỉnh của từng người con. Kiến thức người viết có không tự trở thành kiến thức nhân vật.
+
+Hai Ma Môn giữ kín phần mình biết:
 
 - không muốn ngoại địch cướp phần tài nguyên mình đang có;
 - muốn quan sát Nhân Hoàng Cung còn dùng được kiếm khi bị xâm chiếm hay không;
 - chọn tọa sơn quan hổ đấu.
 
-Vì có thanh kiếm, Nhân Hoàng Cung không sợ hai Ma Tôn bản địa theo kiểu chỉ đếm hai Chân Tiên đối một thế lực. **Khả năng có một người đủ điều kiện ra kiếm** là biến số răn đe; không mặc định Nhân Hoàng Cung luôn có một người dùng đã thức tỉnh ở mọi thời điểm.
+Điều này chưa định vị thái độ của **hai tổ chức đã thành hình** vào đúng đợt ngoại xâm đầu tiên. Thời điểm lập hai Ma Môn và đợt ngoại xâm họ dùng để thăm dò còn mở; không tự cho Ma Môn tồn tại trước lúc Ma Đạo được du nhập.
 
-## Còn OPEN
+Vì có thanh kiếm, Nhân Hoàng Cung không sợ hai Ma Tôn bản địa theo cách chỉ đếm số Chân Tiên. **Khả năng có một người đủ điều kiện ra kiếm** là biến số răn đe; không mặc định Nhân Hoàng Cung luôn có một người dùng đã thức tỉnh.
+
+## Còn mở
 
 - Hài tử cụ thể đã dùng kiếm, ngưỡng / tác nhân thức tỉnh của đời ấy.
-- Niên đại thành lập Nhân Hoàng Cung và hai Ma Môn, quan hệ giữa các nhân chứng với cao tầng hậu thế.
-- Cách bí mật được truyền và kiểm chứng qua thời gian; số lần thanh kiếm được dùng ngoài sự kiện đã khóa.
-- Cách người dùng hiện tại có thể được tìm, bảo vệ hoặc che giấu.
+- Thời điểm thành lập hai Ma Môn; quan hệ chính xác của hai nhân chứng với cao tầng hậu thế, tuổi thọ và đường truyền tri thức của họ.
+- Khi nào, bằng kênh nào các hài tử chủ động tiết lộ phần thông tin về kiếm.
+- Thông tin Thần Huy và Yêu Tiên biết sau sự kiện; các lần kiếm được dùng ngoài sự kiện đã chốt.
 
 ---
 
 # XLIII. LỜI KỂ GIA ĐÌNH & KÝ ỨC NGUYÊN SƠ
 
-**LOCKED:** mười hai người con kể cho Nhân tộc / hậu duệ của mình về **Nhân Tổ**, như con kể về phụ huynh. Họ cũng kể về **Long Tổ và Phượng Tổ**.
+**ĐÃ CHỐT:** mười hai người con kể cho Nhân tộc / hậu duệ của mình về **Nhân Tổ**, như con kể về phụ huynh. Họ cũng kể về **Long Tổ và Phượng Tổ**.
 
-**OPEN:** Nhân Tổ có kể cho mười hai người con về Nguyên Sơ hay không; các con có truyền chuyện Nguyên Sơ cho hậu thế hay không.
+**CÒN MỞ:** Nhân Tổ có kể cho mười hai người con về Nguyên Sơ hay không; các con có truyền chuyện Nguyên Sơ cho hậu thế hay không.
 
-Lịch sử nguyên sơ vì vậy có đường truyền qua gia đình, trong khi hiểu biết về Nguyên Sơ vẫn cần xét riêng. Giữ nguyên DELIBERATE MYSTERY về nguồn gốc và số phận thật của Nguyên Sơ.
+Lịch sử nguyên sơ vì vậy có đường truyền qua gia đình, trong khi hiểu biết về Nguyên Sơ vẫn cần xét riêng. Giữ nguyên BÍ ẨN CHỦ Ý về nguồn gốc và số phận thật của Nguyên Sơ.
+
+---
+
+# XLIV. NHÂN HOÀNG CUNG — NGUỒN GỐC VÀ NHẬN DIỆN HÀI TỬ
+
+**ĐÃ CHỐT:** Nhân Hoàng Cung do **một đời của một trong mười hai hài tử** dựng lên. Chưa chọn người nào, đời nào, hoặc đồng nhất người sáng lập với người dùng kiếm trong Hắc Ám Kỷ.
+
+Trước khi vào Luân Hồi, các hài tử đã có **ám hiệu với nhau**. Người dựng Cung còn thiết lập **ảo cảnh kể về quá khứ của bản thân và mười một người còn lại**. Muốn vượt qua phải chọn chính xác những lựa chọn trong quá khứ ấy. Đây là cơ chế chống nội gián cực mạnh, dựa trên ký ức và sự nhận biết giữa mười hai người con; chưa khóa toàn bộ cách vận hành thành một luật bất khả đánh lừa tuyệt đối.
+
+Hài tử dùng kiếm đã **được Cung nhận diện từ trước**. Sau khi thức tỉnh ký ức, người ấy **tự tìm về**. Nhận diện một Đại Tuyệt Thể, thức tỉnh ký ức, vượt ảo cảnh và khôi phục tu vi là các việc khác nhau; chưa định vị từng bước vào cùng một thời điểm.
+
+**CÒN MỞ:** phạm vi áp dụng ảo cảnh, cách tiếp nhận người chưa thức tỉnh và cư dân bình thường, chống đánh cắp ký ức / cưỡng ép, người giữ kiếm qua thời gian. Không mặc định mọi người tị nạn phải vượt thử thách dành cho hài tử.
+
+---
+
+# XLV. HAI BÁN BỘ YÊU TIÊN TRONG THỜI GIAN PHONG ẤN
+
+**ĐÃ CHỐT:** khi Yêu Tiên đầu tiên bị phong ấn, còn **hai bán bộ Yêu Tiên** khác. Họ chủ yếu giữ thân mình, không quá chèn ép Nhân tộc hoặc chủ động gánh việc của Yêu Tiên bị phong ấn.
+
+Họ biết về Nhân Tổ, mười hai hài tử và việc Long Tổ / Phượng Tổ do Nhân Tổ nuôi lớn, nên không quá làm càn. Chưa chốt họ biết gì về thanh kiếm, người dùng hoặc cái giá.
+
+**CÒN MỞ:** sự tiết chế đến từ đạo đức, e sợ Nhân Hoàng Cung, hoặc cả hai. Loài gốc, lãnh địa, lợi ích và vai trò của từng người chưa chốt. Không tự đồng nhất họ với những Yêu tộc cuối cùng đánh vỡ phong ấn.

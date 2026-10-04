@@ -1,10 +1,10 @@
 # NẠP HƯ GIỚI — CẤU TRÚC QUẦN VỰC, GIỚI BÍCH & CÁC ĐẠI VỰC HIỆN HÀNH
 
-> **Trạng thái:** Working Lore Design — dùng để tiếp tục khóa địa lý, lịch sử và vật lý Nạp Hư trước khi viết biên niên sử chính thức.
+> **Trạng thái:** Thiết kế thế giới đang xây dựng — dùng để tiếp tục khóa địa lý, lịch sử và vật lý Nạp Hư trước khi viết biên niên sử chính thức.
 >
 > **Mục tiêu tài liệu:** gom và làm rõ mô hình không gian Nạp Hư, vấn đề trên–dưới/trọng lực, Giới Bích, Phi Thăng, nơi cư trú của Chân Tiên, đồng thời hệ thống hóa các Vực hiện đã được định nghĩa: Hư Minh Lôi Hải, Tần Vực, Phạn Châu, Mộng Châu, Nhân Vực/Ma Châu, Tinh Hải Thần Châu, Yêu Vực và Linh Sinh Vực.
 >
-> Tài liệu này **không mặc định canon hóa những điểm còn được đánh dấu MỞ / CẦN KHÓA**.
+> Tài liệu này **không mặc định coi là dữ kiện đã chốt những điểm còn được đánh dấu MỞ / CẦN KHÓA**.
 
 ---
 
@@ -22,13 +22,13 @@ Nạp Hư có:
 
 - **trọng lực cục bộ của từng Vực**;
 - **hướng trên–dưới cục bộ**;
-- nhưng **không có một vector “xuống” tuyệt đối dùng chung cho toàn bộ Giới Nội Hư Không**.
+- nhưng **không có một vectơ “xuống” tuyệt đối dùng chung cho toàn bộ Giới Nội Hư Không**.
 
 Nói ngắn:
 
 > **“Xuống” là thuộc tính nội tại của một Vực, không phải phương tuyệt đối của toàn Nạp Hư.**
 
-Điều này rất giống việc nhiều hệ tọa độ cục bộ có thể cùng tồn tại trên một không gian cong, nhưng ở Nạp Hư nó còn sâu hơn vì mỗi Đại Vực là một “lá không gian” lớn được Địa Trọng Trường và metric cục bộ ổn định.
+Điều này rất giống việc nhiều hệ tọa độ cục bộ có thể cùng tồn tại trên một không gian cong, nhưng ở Nạp Hư nó còn sâu hơn vì mỗi Đại Vực là một “lá không gian” lớn được Địa Trọng Trường và cấu trúc đo lường cục bộ ổn định.
 
 ---
 
@@ -52,7 +52,7 @@ Vì vậy **không dùng mô hình các lục địa bay Newton thông thường
 
 Mô hình tốt hơn:
 
-# **Quần Vực Nội Giới — Multi-Domain Interior Manifold**
+# **Quần Vực Nội Giới — đa tạp nội giới gồm nhiều miền không gian**
 
 Mỗi Đại Vực là một miền không gian cục bộ có:
 
@@ -61,8 +61,10 @@ Mỗi Đại Vực là một miền không gian cục bộ có:
 - biển;
 - tầng trời;
 - Địa Trọng Trường;
-- metric riêng;
+- cấu trúc đo lường riêng;
 - lối liên kết sang các Vực khác.
+
+Cấu trúc đo lường quy định cách đo khoảng cách và thời gian trong từng Vực; cấu trúc liên thông quy định các miền không gian nối với nhau thế nào.
 
 Các Vực cùng thuộc một Nạp Hư nhưng **không nhất thiết cùng nằm trong một không gian Euclid phẳng để có thể lấy thước đo đường thẳng từ bề mặt A tới bề mặt B**.
 
@@ -76,13 +78,13 @@ Do đó:
 
 “Mặt trên” là:
 
-> phía ngược với vector Địa Trọng cục bộ.
+> phía ngược với vectơ Địa Trọng cục bộ.
 
 “Mặt dưới” là:
 
 > phía mà Địa Trọng cục bộ kéo vật chất về.
 
-Nhưng vector đó chỉ có ý nghĩa trong miền không gian của Vực.
+Nhưng vectơ đó chỉ có ý nghĩa trong miền không gian của Vực.
 
 Ví dụ:
 
@@ -93,9 +95,9 @@ Ví dụ:
 
 Từ góc nhìn toán học/bản thể:
 
-> hai hệ “up” có thể không song song trong embedding cao chiều của Nạp Hư.
+> hai hệ “trên” có thể không song song trong cách nhúng không gian cao chiều của Nạp Hư.
 
-Nhưng cư dân không nhận biết embedding đó.
+Nhưng cư dân không nhận biết cách nhúng không gian đó.
 
 ---
 
@@ -105,7 +107,7 @@ Nhưng cư dân không nhận biết embedding đó.
 
 Đối với sinh linh dưới Chân Tiên:
 
-> hầu như không tồn tại direct line-of-sight giữa hai bề mặt Vực.
+> hầu như không tồn tại đường nhìn trực tiếp giữa hai bề mặt Vực.
 
 Đối với Chân Tiên đi vào Giới Nội Hư Không:
 
@@ -116,24 +118,24 @@ Nhưng hắn không nhất thiết nhìn một “tấm đất” với đáy đ
 Hắn có thể thấy:
 
 - một vùng sáng;
-- một “world-leaf”;
+- một “lá không gian”;
 - một khối địa lý bị ánh sáng và pháp tắc bao quanh;
-- topological surface bị lensing.
+- bề mặt của miền không gian bị biến dạng qua hiệu ứng thấu kính.
 
 Nếu hắn dùng thị giác pháp tắc để “nhìn xuyên”:
 
-> hắn có thể thấy **mặt sinh tồn của Vực** vì thông tin quang/pháp tắc được vận chuyển theo geodesic thích hợp.
+> hắn có thể thấy **mặt sinh tồn của Vực** vì thông tin quang/pháp tắc được vận chuyển theo đường trắc địa thích hợp.
 
 Nói cách khác:
 
-> **cái Chân Tiên nhìn thấy không bắt buộc tuân theo phối cảnh của một camera đặt trong không gian 3D Euclid.**
+> **cái Chân Tiên nhìn thấy không bắt buộc tuân theo phối cảnh của một máy ảnh đặt trong không gian 3 chiều Euclid.**
 
-Một Vực có thể nhìn như đang “ngửa mặt” về phía hắn dù theo embedding, normal vector cục bộ của Vực hoàn toàn khác.
+Một Vực có thể nhìn như đang “ngửa mặt” về phía hắn dù theo cách nhúng không gian, vectơ pháp tuyến cục bộ của Vực hoàn toàn khác.
 
 Đây không phải ảo giác.
 
 Đó là vì:
-> “hướng nhìn” và “hướng cục bộ của Vực” được metric Nạp Hư nối với nhau.
+> “hướng nhìn” và “hướng cục bộ của Vực” được cấu trúc đo lường Nạp Hư nối với nhau.
 
 ---
 
@@ -151,7 +153,7 @@ Lý do:
 
 Do đó:
 
-> **Ngày–đêm là thuộc tính metric / thiên văn cục bộ, không phải eclipse liên Vực.**
+> **Ngày–đêm là thuộc tính cấu trúc đo lường / thiên văn cục bộ, không phải hiện tượng che khuất ánh sáng liên Vực.**
 
 ---
 
@@ -172,7 +174,7 @@ Nó có thể là:
 
 Không bắt buộc phải là ngôi sao nhiệt hạch giống Mặt Trời.
 
-Ánh sáng Đại Nhật được metric Nạp Hư dẫn vào từng Vực theo đường khác nhau.
+Ánh sáng Đại Nhật được cấu trúc đo lường Nạp Hư dẫn vào từng Vực theo đường khác nhau.
 
 Mỗi Vực có một chu kỳ gọi tạm:
 
@@ -180,8 +182,8 @@ Mỗi Vực có một chu kỳ gọi tạm:
 
 Thiên Chu là sự tuần hoàn giữa:
 
-- orientation cục bộ;
-- metric;
+- hướng đặt cục bộ;
+- cấu trúc đo lường;
 - Đại Nhật;
 - tầng khí quyển.
 
@@ -370,15 +372,15 @@ Có kẻ:
 
 Mặc định:
 
-> **quá xa + metric cong + tán xạ + không có direct geodesic thuận lợi.**
+> **quá xa + cấu trúc đo lường cong + tán xạ + không có đường trắc địa trực tiếp thuận lợi.**
 
 Không cần phép tàng hình.
 
 Một Tiên Vực rộng 5000 km vẫn có thể vô nghĩa về kích thước góc nếu:
 
-- cách vài triệu km geodesic;
+- cách vài triệu km theo đường trắc địa;
 - ánh sáng không chiếu trực tiếp vào một Vực;
-- bị tầng trời/metric lọc.
+- bị tầng trời/cấu trúc đo lường lọc.
 
 Nếu Chân Tiên muốn:
 
@@ -421,7 +423,7 @@ Nhưng điểm đáp:
 
 > ngẫu nhiên trong vùng ngoài rìa.
 
-Tên topology tạm:
+Tên cấu trúc liên thông tạm:
 
 # **Phi Thăng Hoàn**
 
@@ -429,7 +431,7 @@ Tên topology tạm:
 
 Là một vành miền quanh ngoại duyên Vực, nơi:
 
-> liên hệ topology giữa Hạ Giới và Nạp Hư dễ nối nhất.
+> liên hệ cấu trúc liên thông giữa Hạ Giới và Nạp Hư dễ nối nhất.
 
 Cơ chế cổ:
 
@@ -439,9 +441,9 @@ Hạ Giới → đạt trần → cộng hưởng → Phi Thăng Đạo → Nạ
 
 # XV. NGẪU NHIÊN NHƯNG CÓ THỂ CÓ TRỌNG SỐ
 
-Không cần Thiên Đạo làm “hệ thống matchmaking đạo đức”.
+Không cần Thiên Đạo làm “hệ thống ghép đôi đạo đức”.
 
-Nhưng có thể có resonance vật lý/pháp tắc:
+Nhưng có thể có cộng hưởng vật lý/pháp tắc:
 
 - thuộc tính;
 - đạo thống;
@@ -474,10 +476,10 @@ Nó không phải điểm bắt buộc của thiên đạo.
 
 Nó giống:
 
-- beacon;
-- radar;
-- anchor;
-- signal amplifier.
+- mốc dẫn đường;
+- hệ thống dò tìm;
+- mốc neo;
+- bộ khuếch đại tín hiệu.
 
 Nó làm tăng xác suất người Phi Thăng rơi vào vùng có thể kiểm soát.
 
@@ -519,7 +521,7 @@ Hệ quả:
 - Phi Thăng Đài hỏng;
 - người chờ hàng vạn năm nhưng cửa không mở.
 
-Đây là nguồn dungeon/lore rất mạnh về sau.
+Đây là nguồn chất liệu cho bí cảnh và lịch sử rất mạnh về sau.
 
 ---
 
@@ -527,11 +529,11 @@ Hệ quả:
 
 ## 1. Vị trí bản thể
 
-“Hư Minh Lôi Hải nằm dưới Nạp Hư” **không nên hiểu là dưới theo vector trọng lực toàn giới**, vì không có vector đó.
+“Hư Minh Lôi Hải nằm dưới Nạp Hư” **không nên hiểu là dưới theo vectơ trọng lực toàn giới**, vì không có vectơ đó.
 
 Nên định nghĩa:
 
-> **Hư Minh Lôi Hải nằm ở Hạ Tầng Topology của mạng Quần Vực.**
+> **Hư Minh Lôi Hải nằm ở Hạ Tầng Liên Thông của mạng Quần Vực.**
 
 Từ nhiều Vực muốn tới đó thường phải:
 
@@ -543,7 +545,7 @@ Vì tuyến hành trình luôn được mô tả là “đi xuống”, người
 
 > **biển nằm dưới Nạp Hư.**
 
-Đây là “dưới” theo topology, không phải bên dưới chân mọi người.
+Đây là “dưới” theo cấu trúc liên thông, không phải bên dưới chân mọi người.
 
 ---
 
@@ -586,7 +588,7 @@ Tầng cao:
 
 Điều này biến Hư Minh thành:
 
-> một vùng tài nguyên cấp cao nhưng cost sinh tồn cực lớn.
+> một vùng tài nguyên cấp cao nhưng chi phí sinh tồn cực lớn.
 
 ---
 
@@ -625,7 +627,7 @@ Tài nguyên có thể gồm:
 
 Tần Vực là:
 
-> **trung tâm topology / giao thông / văn minh của Nạp Hư**, không nhất thiết là tâm hình học Euclid.
+> **trung tâm cấu trúc liên thông / giao thông / văn minh của Nạp Hư**, không nhất thiết là tâm hình học Euclid.
 
 Nó có nhiều Vực Lộ nối nhất.
 
@@ -712,7 +714,7 @@ Tần Đế từng:
 
 > **diệt sát một Ma Tôn.**
 
-Ma Tôn = bracket **Chân Tiên**.
+Ma Tôn = mức **Chân Tiên**.
 
 Chiến tích này được khóa theo **A + B đồng thời**, không phải Định Pháp ở trạng thái bình thường tùy ý vượt đại cảnh giới giết Chân Tiên.
 
@@ -798,13 +800,13 @@ Phật Tổ:
 
 Ông là nhân vật **có trước Huyết Thế Đại Kiếp**, không phải vị Phật tu trong tổ đội ba người dẹp Đại Kiếp.
 
-Trình tự lịch sử working hiện tại:
+Trình tự lịch sử đang xây dựng hiện tại:
 
 1. Long / Phượng chết; Yêu tộc phân tranh 30.000 năm trước khi Yêu Tiên chứng Chân và bình định quyền lực;
 2. trong Hắc Ám Kỷ, thanh kiếm Nhân Tổ diệt một Tân Thần Thần Huy; Nhân Hoàng Cung là tịnh thổ cuối cùng;
 3. Nhân tộc thoát khỏi thế độc tôn của Yêu tộc;
 4. Phật Đạo dần hình thành và Phật Tổ xuất hiện;
-5. ngoại giới Ma Đạo xâm nhập, để lại đạo thống; Ma tu bản địa đã tồn tại trước cuộc xâm lấn;
+5. ngoại giới Ma Đạo xâm nhập, để lại đạo thống; trước đó Nạp Hư chưa có Ma tu, người bản địa bắt đầu chuyển sang Ma Đạo khi ngoại giới tiến đến;
 6. Ma Đạo trong nội giới lan rộng, Huyết Thế Đại Kiếp bùng nổ;
 7. một **Phật tu hậu thế**, cùng Kiếm tu và Ma tu quay đầu, tham gia chấm dứt Đại Kiếp.
 
@@ -903,7 +905,7 @@ Có thể tận dụng:
 - mộng;
 - tâm.
 
-Không nhất thiết chỉ là tông “sex cultivation”.
+Không nhất thiết chỉ là tông “tu luyện qua quan hệ tính dục”.
 
 Nó có thể có học thuật cực sâu về:
 
@@ -918,7 +920,7 @@ Mộng và Thiên Cơ rất hợp:
 - giấc mơ;
 - nhân quả.
 
-Nhưng Mộng Chi Quy Tắc cũng tạo nhiều false-positive.
+Nhưng Mộng Chi Quy Tắc cũng tạo nhiều kết quả nhận diện nhầm.
 
 Thiên Cơ Môn Mộng Châu có thể mạnh nhất về:
 
@@ -982,13 +984,13 @@ Cần sửa một giả định cũ:
 
 Không phải Thiên Đạo tuyệt đối cấm.
 
-Không phải chỉ Nhân Tổ có secret technique độc nhất.
+Không phải chỉ Nhân Tổ có bí thuật độc nhất.
 
 Đa số không có lý do để tự tay bỏ vĩnh sinh. Nhân Tổ đã trưởng thành dù giữ khí tính trẻ con; hắn nhàm chán đời sống vĩnh hằng sau khi Nguyên Sơ đã đi và chọn Luân Hồi, biết mình có thể trở thành bất cứ thứ gì trên một con đường mới chưa rõ.
 
 Thiên Địa Chính Tiên muốn vào Luân Hồi phải tự hạ mình xuống mức Luân Hồi còn có thể tiếp nhận.
 
-Đó là một lựa chọn cực đoan, không phải progression bình thường.
+Đó là một lựa chọn cực đoan, không phải lộ trình phát triển bình thường.
 
 ---
 
@@ -1002,7 +1004,7 @@ Hắn:
 2. chia nhỏ hệ Quy Tắc / quyền năng mà mình đã nắm;
 3. tách thành **12 phần Pháp Tắc / thần dị lớn**;
 4. dùng mười hai phần ấy sinh ra **12 người con**;
-5. mỗi người con đạt bracket **Chân Tiên**;
+5. mỗi người con đạt mức **Chân Tiên**;
 6. bản thân Nhân Tổ sau khi mất cấu trúc Quy Tắc hoàn chỉnh hạ xuống đủ sâu để vào Luân Hồi.
 
 Trước khi tan biến, hắn tự rèn thanh kiếm bằng máu và xương cánh tay để lại cho các con. Hắn để chúng tự chọn cách sống, chỉ trầm mặc nhìn chúng sinh một lát rồi tan biến, không nói gì.
@@ -1063,7 +1065,7 @@ Luật đã khóa:
 - một loại tại một thời điểm chỉ có **một người sở hữu**;
 - mỗi thời đại tối đa có 12 chủ thể tương ứng.
 
-Tên working vẫn có thể dùng:
+Tên đang xây dựng vẫn có thể dùng:
 
 # **Thập Nhị Nhân Ấn / Thập Nhị Thể**
 
@@ -1101,11 +1103,15 @@ Nguồn răn đe đã khóa là **thanh kiếm của Nhân Tổ**: tự rèn b�
 
 Trong Hắc Ám Kỷ, một người con đã thức tỉnh sau nhiều đời Luân Hồi, lúc đó tu vi dưới Chân Tiên, dùng kiếm diệt một Tân Thần Thần Huy cùng cấp Yêu Tiên đầu tiên. Người dùng tử vong; các người con khác đều đã đầu thai nhưng chưa thức tỉnh. Thần Huy không biết khoảng trống này, nghi có kế nên rút lui; Yêu Tiên chứng kiến cũng rút quân. Nhân Hoàng Cung là tịnh thổ cuối cùng của Nhân tộc khi ấy.
 
-Một số sinh vật **bản địa Nạp Hư** chứng kiến sự kiện về sau trở thành Ma tu. Tri thức về kiếm có trước cuộc xâm lấn Ma Đạo Đại Thế Giới. Cao tầng hai Ma Môn giữ kín bí mật, không muốn ngoại địch cướp tài nguyên và muốn quan sát Nhân Hoàng Cung còn ra kiếm được không khi bị xâm chiếm. Phía Thần Huy cũng không báo quân Ma Đạo vì sợ bị hố.
+**Trước ngoại xâm, Nạp Hư chưa có Ma tu.** Rất ít sinh vật bản địa chứng kiến sự kiện kiếm; hai nhân chứng chỉ chuyển sang Ma Đạo sau khi Ma Đạo Đại Thế Giới tiến đến.
+
+Cao tầng hai Ma Môn chỉ biết có kiếm do Nhân Tổ tạo bằng xương của mình, chỉ Nhân Tổ / các hài tử dùng được; các hài tử chủ động cho họ biết để tránh phiền phức và âm mưu đoạt kiếm. Không gán cho họ biết cái giá tử vong hoặc tình trạng người dùng. Họ giữ kín phần mình biết để giữ tài nguyên và thăm dò khả năng Cung còn ra kiếm qua ngoại xâm. Phía Thần Huy cũng không báo quân Ma Đạo vì sợ bị hố; đợt ngoại xâm được hai Ma Môn thăm dò còn mở.
 
 Do đó Nhân Hoàng Cung không sợ hai Ma Tôn theo cách chỉ đếm sức mạnh hiện hữu. **Khả năng tìm được người đủ điều kiện ra kiếm** phải được các phe tính đến, trong khi tình trạng người dùng hiện tại vẫn chưa khóa.
 
-Niên đại thành lập các thế lực, đường truyền bí mật và các lần dùng kiếm khác còn OPEN; xem mục XLII của `NAP_HU_HISTORY_FOUNDATIONS_WORKING.md`.
+**Nhân Hoàng Cung do một đời hài tử dựng lên.** Trước khi vào Luân Hồi, các hài tử có ám hiệu với nhau; người dựng Cung thiết lập ảo cảnh quá khứ của cả mười hai người, chỉ lựa chọn đúng mới qua được. Đây là cơ chế chống nội gián cực mạnh. Hài tử dùng kiếm được Cung nhận diện từ trước, rồi tự tìm về sau khi thức tỉnh.
+
+Chưa chốt danh tính người dựng Cung, niên đại lập hai Ma Môn, phạm vi ảo cảnh và các lần dùng kiếm khác; xem mục XLII, XLIV của `NAP_HU_HISTORY_FOUNDATIONS_WORKING.md`.
 
 ---
 
@@ -1147,7 +1153,7 @@ Nạp Hư và Thần Huy:
 
 Một lần tiếp xúc sớm đã khóa xảy ra **trong Hắc Ám Kỷ**, khi một Tân Thần Thần Huy bị thanh kiếm của Nhân Tổ diệt sát. Chưa chốt đây là lần tiếp xúc đầu tiên tuyệt đối.
 
-Cửa sổ working cho giao lưu / truyền kỹ thuật là:
+Cửa sổ đang xây dựng cho giao lưu / truyền kỹ thuật là:
 
 > thời đại Chư Giới còn đi lại tương đối tự do, quanh hoặc trong chuỗi biến cố khi Ma Đạo Đại Thế Giới bắt đầu xâm lấn Nạp Hư.
 
@@ -1204,12 +1210,12 @@ Nên để mở.
 Nhưng một số hướng tốt:
 
 - họ muốn nhân tạo Chân Tiên bằng máy;
-- xây “Quy Tắc Processor”;
+- xây “bộ xử lý Quy Tắc”;
 - sao chép Thần Cách Thần Huy;
 - mở lại Phi Thăng Đạo;
 - khoan Giới Bích;
 - tạo AI có khả năng cảm ngộ Pháp Tắc;
-- chế tạo World Engine.
+- chế tạo động cơ thế giới.
 
 Đừng khóa sớm.
 
@@ -1229,7 +1235,7 @@ Họ thuộc nhóm:
 
 > **sinh linh sơ khai của Nạp Hư.**
 
-Giống về vai trò lịch sử với Cổ Thần Thần Huy nhưng **không cùng ontology/cấp độ**.
+Giống về vai trò lịch sử với Cổ Thần Thần Huy nhưng **không cùng cấu trúc bản thể/cấp độ**.
 
 Họ trời sinh mạnh.
 
@@ -1265,13 +1271,13 @@ Hậu thế có vô số thuyết:
 - một khối khoáng / tinh thể / quang thể vô tri khai linh;
 - hoặc một hiện tượng hoàn toàn khác mà lịch sử đã không còn ngôn ngữ để mô tả.
 
-Không giả thuyết nào được xác nhận là canon tuyệt đối.
+Không giả thuyết nào được xác nhận là sự thật tuyệt đối.
 
 Điểm duy nhất chắc chắn:
 
 > **thuở sơ khai Nạp Hư liền có nó.**
 
-Danh xưng “Linh Sinh” dùng theo nghĩa rộng: vật hoặc hiện tượng vốn vô tri tự khai linh. Nó không bắt buộc phải là sinh mệnh silicon giống số đông Linh Sinh Vực hậu thế.
+Danh xưng “Linh Sinh” dùng theo nghĩa rộng: vật hoặc hiện tượng vốn vô tri tự khai linh. Nó không bắt buộc phải là sinh mệnh silic giống số đông Linh Sinh Vực hậu thế.
 
 Bản thể của Linh Sinh Nguyên Sơ đồng thời mang hai hệ đối lập:
 
@@ -1313,7 +1319,7 @@ Hai cá thể từ lúc sinh ra đã không thực sự hòa hợp. Khi đủ s�
 
 ## Phân chia Sinh–Tử
 
-Working distribution:
+Phân bố đang xây dựng:
 
 ### Phượng Tổ
 - khoảng **90% tổng các mảnh Pháp Tắc cấu thành Sinh Mệnh**;
@@ -1353,7 +1359,7 @@ Vì vậy cả hai đều mạnh hơn Chân Tiên bình thường rất xa nhưn
 
 > **không ai hoàn chỉnh được Quy Tắc cần thiết để trở thành Thiên Địa Chính Tiên thật sự.**
 
-Bracket gần nhất của họ là:
+Mức sức mạnh gần nhất của họ là:
 
 > **bán bộ Thiên Địa Chính Tiên.**
 
@@ -1416,7 +1422,7 @@ Long Tổ / Phượng Tổ:
 
 > **không có giới tính bản thể cố định.**
 
-Họ có thể chọn avatar:
+Họ có thể chọn hóa thân:
 
 - nam;
 - nữ;
@@ -1440,7 +1446,7 @@ Do đó một Long Tổ biểu hiện dưới hình thái nữ:
 
 > vẫn có thể khiến một sinh linh nữ mang thai nếu phương thức tạo hậu duệ của nàng đặt “hạt bản nguyên” vào đối phương.
 
-Con cháu Long/Phượng vì vậy không phải clone thuần.
+Con cháu Long/Phượng vì vậy không phải bản sao thuần.
 
 Chúng là:
 
@@ -1557,7 +1563,7 @@ Hiện mỗi Vực đã có một trục riêng:
 | Nhân Vực/Ma Châu | nguồn gốc Nhân tộc + Ma Đạo + Thập Nhị Thể |
 | Tinh Hải Thần Châu | khoa học tu tiên + AI + chiến hạm |
 | Yêu Vực | cổ sinh linh + Long/Phượng + huyết mạch |
-| Linh Sinh Vực | sinh mệnh silicon + khoáng học + Linh Khí nghèo + thời gian địa chất |
+| Linh Sinh Vực | sinh mệnh silic + khoáng học + Linh Khí nghèo + thời gian địa chất |
 
 Nếu thêm nữa, chỉ thêm khi lịch sử cần một chức năng chưa có.
 
@@ -1583,7 +1589,7 @@ Linh Sinh Vực là một trong những Vực:
 - rất ít đại Linh Mạch hoạt động;
 - địa hình hoang sơ;
 - nhiều cao nguyên đá, sa mạc khoáng, biển muối, hẻm magma;
-- sinh vật carbon thưa thớt;
+- sinh vật cacbon thưa thớt;
 - chu kỳ sinh thái rất chậm.
 
 Nhìn bằng tiêu chuẩn Tần Vực:
@@ -1596,11 +1602,11 @@ Nhìn bằng tiêu chuẩn Tần Vực:
 
 Cần phân biệt:
 
-> **“Linh Sinh” là phân loại rộng**, còn Linh Sinh Vực chỉ là nơi sinh ra nhánh Linh Sinh silicon/khoáng phổ biến nhất hậu thế.
+> **“Linh Sinh” là phân loại rộng**, còn Linh Sinh Vực chỉ là nơi sinh ra nhánh Linh Sinh silic/khoáng phổ biến nhất hậu thế.
 
 Một Linh Sinh về nguyên tắc có thể bắt đầu từ một vật hoặc hiện tượng vô tri đủ điều kiện khai linh. Linh Sinh Nguyên Sơ từng tách thành Long Tổ / Phượng Tổ là ví dụ cực cổ mà bản chất vật chất thật sự đã không còn xác định được.
 
-Riêng **Linh Sinh Vực**, cơ chế điển hình là silicon/khoáng.
+Riêng **Linh Sinh Vực**, cơ chế điển hình là silic/khoáng.
 
 Linh Sinh ở đây không cần một trận bùng nổ Linh Khí.
 
@@ -1616,7 +1622,7 @@ Chúng cần:
 - hình thành các chu trình điện–Linh Khí;
 - qua hàng chục nghìn / hàng trăm nghìn / lâu hơn nữa mới tích đủ độ phức tạp.
 
-Do sinh vật carbon ít:
+Do sinh vật cacbon ít:
 
 > gần như không có hệ sinh thái nhanh chóng cướp sạch dòng Linh Khí nhỏ đó.
 
@@ -1646,7 +1652,7 @@ Chúng vẫn phải tuân theo một hóa học nền.
 
 Linh Khí cho phép:
 
-> những quá trình vốn quá chậm / quá cứng của hóa học silicon trở nên linh hoạt hơn.
+> những quá trình vốn quá chậm / quá cứng của hóa học silic trở nên linh hoạt hơn.
 
 ---
 
@@ -1660,7 +1666,7 @@ Nhưng Linh Thạch không thay hoàn toàn vật chất xây thân.
 
 Chúng vẫn cần:
 
-- silicon;
+- silic;
 - kim loại;
 - tinh thể;
 - khoáng hiếm.
@@ -1765,7 +1771,7 @@ thì một kiếm nhỏ vẫn có thể kết thúc trận đấu.
 - cực ăn ngộ tính;
 - khó truyền dạy đại trà;
 - nhiều kiếm cần điều kiện tâm cảnh / tri thức;
-- không hiểu target thì kiếm có thể vô dụng;
+- không hiểu đối tượng thì kiếm có thể vô dụng;
 - tiến bộ chậm và dễ mắc kẹt nhiều đời.
 
 ---
@@ -1785,7 +1791,7 @@ Họ dùng:
 - pháp tướng;
 - trận kiếm;
 
-để tạo raw output cực lớn.
+để tạo sức công phá trực tiếp cực lớn.
 
 Không cần hiểu “sinh cơ là gì” sâu như Cổ Kiếm Tu nếu mục tiêu là:
 
@@ -1806,7 +1812,7 @@ Nhược điểm:
 
 - tiêu hao khủng khiếp;
 - chiêu lớn dễ bị phát hiện;
-- target có thể chạy / co Vực / né trước;
+- đối tượng có thể chạy / co Vực / né trước;
 - nếu chém thiếu một phần quan trọng, đối phương có thể tái cấu trúc.
 
 ### Cổ Kiếm Tu
@@ -1832,13 +1838,13 @@ Hai nhánh có ưu thế chiến lược khác nhau.
 **Linh Kiếm Tu**:
 - dễ chuẩn hóa;
 - dễ đào tạo quân đội;
-- output ổn định;
+- sức công phá ổn định;
 - phá trận / phá thành / đánh diện rộng tốt;
-- ít phụ thuộc tâm lý target;
+- ít phụ thuộc tâm lý đối tượng;
 - dùng rất tốt trong chiến tranh quy mô lớn.
 
 **Cổ Kiếm Tu**:
-- ceiling của “cơ chế” cao;
+- giới hạn của “cơ chế” cao;
 - thích hợp thiên tài;
 - tiết kiệm năng lượng;
 - cực khó đoán;
@@ -1888,11 +1894,11 @@ Do đó:
 
 > **vĩnh sinh ≠ không thể bị giết.**
 
-Sức chiến đấu Cổ Thần không có một mapping cố định.
+Sức chiến đấu Cổ Thần không có một ánh xạ cố định.
 
 Tùy cá thể:
 
-- có kẻ chỉ khoảng bracket Chân Tiên cao;
+- có kẻ chỉ khoảng mức Chân Tiên cao;
 - có kẻ vượt xa Chân Tiên;
 - Cổ Thần hàng đầu có thể chạm gần bán bộ Thiên Địa Chính Tiên.
 
@@ -1900,7 +1906,7 @@ Tùy cá thể:
 
 > bản thể Tiên Thiên và quyền năng trời sinh,
 
-không phải progression hoàn chỉnh Pháp Tắc → Quy Tắc như Nạp Hư.
+không phải lộ trình phát triển hoàn chỉnh Pháp Tắc → Quy Tắc như Nạp Hư.
 
 Điều này cũng giúp giải thích vì sao Thiên Đạo Thần Huy ghét chúng:
 
@@ -1914,13 +1920,13 @@ Không phải vì tọa độ (0,0,0).
 
 Nên khóa:
 
-> Tần Vực là **topological hub**.
+> Tần Vực là **đầu mối liên thông**.
 
 Nó có:
 
 - nhiều Vực Lộ;
 - đường thương mại;
-- metric ổn định;
+- cấu trúc đo lường ổn định;
 - nhiều điểm nối;
 - Linh Khí cân bằng.
 
@@ -1938,7 +1944,7 @@ Nếu một ngày mạng Vực Lộ đổi:
 
 # XXXIX. HƯ MINH LÔI HẢI “NẰM DƯỚI” VÀ TẦN VỰC “NẰM GIỮA” KHÔNG MÂU THUẪN
 
-Hai chữ đó dùng hai coordinate khác nhau.
+Hai chữ đó dùng hai hệ tọa độ khác nhau.
 
 **Tần ở giữa**:
 
@@ -1946,7 +1952,7 @@ Hai chữ đó dùng hai coordinate khác nhau.
 
 **Hư Minh ở dưới**:
 
-> ở tầng topology thấp hơn, tuyến đi thường mang cảm giác hạ xuống.
+> ở tầng cấu trúc liên thông thấp hơn, tuyến đi thường mang cảm giác hạ xuống.
 
 Không phải:
 
@@ -1954,7 +1960,7 @@ Không phải:
 
 ---
 
-# XL. LOCAL GRAVITY VÀ ĐỊA TRỌNG TRƯỜNG
+# XL. TRỌNG LỰC CỤC BỘ VÀ ĐỊA TRỌNG TRƯỜNG
 
 Mỗi Vực có Địa Trọng Trường.
 
@@ -1974,11 +1980,11 @@ Tại sao phàm nhân không bị nghiền?
 
 Vì Nạp Hư không dùng tổng khối lượng toàn giới để tạo một trường Newton khổng lồ.
 
-Background gravity là:
+Trọng lực nền là:
 
-> thuộc tính metric/pháp tắc của Vực.
+> thuộc tính cấu trúc đo lường/pháp tắc của Vực.
 
-Khối lượng local vẫn có tác động phụ.
+Khối lượng cục bộ vẫn có tác động phụ.
 
 ---
 
@@ -1992,11 +1998,11 @@ Nếu đất vỡ:
 
 Một mảnh Vực lớn có thể:
 
-- giữ local down;
+- giữ hướng xuống cục bộ;
 - thành đảo trời;
 - tạo mảnh địa giới.
 
-Nếu topology bị phá sâu hơn:
+Nếu cấu trúc liên thông bị phá sâu hơn:
 
 > hướng trọng lực có thể méo.
 
@@ -2033,7 +2039,7 @@ Do đó đối với Chân Tiên:
 
 > một Vực đã gần như cả vũ trụ sống.
 
-Đây là progression không gian rất mạnh.
+Đây là lộ trình phát triển không gian rất mạnh.
 
 ---
 
@@ -2043,7 +2049,7 @@ Cấu trúc Quần Vực khiến lịch sử không nên viết như một đế
 
 Một thế lực mạnh ở Tần Vực có thể:
 
-> không có logistics để trực trị Mộng Châu.
+> không có hậu cần để trực trị Mộng Châu.
 
 Một Chân Tiên có thể đi nhanh.
 
@@ -2071,7 +2077,7 @@ Khi KLC dung hợp Nạp Hư + Thần Huy:
 
 Hắn ghép:
 
-- một Quần Vực manifold của Nạp Hư;
+- một Quần Vực đa tạp của Nạp Hư;
 - một cấu trúc thế giới Thần Huy khác;
 - Thần Quốc;
 - Thần Cách.
@@ -2097,7 +2103,7 @@ Hư Minh Lôi Hải có thể trở thành một tầng đặc biệt của Arcl
 ## Đã khóa
 
 ### 1. Tinh Hải Thần Châu và Thần Huy
-> Hai giới từng tiếp xúc **trước Giới Bích**; đã có một sự kiện Tân Thần Thần Huy bị thanh kiếm diệt sát trong Hắc Ám Kỷ. Cửa sổ trao đổi kỹ thuật quanh chiến tranh Ma Đạo vẫn là working, chưa khóa nguồn đợt truyền thừa Tinh Hải.
+> Hai giới từng tiếp xúc **trước Giới Bích**; đã có một sự kiện Tân Thần Thần Huy bị thanh kiếm diệt sát trong Hắc Ám Kỷ. Cửa sổ trao đổi kỹ thuật quanh chiến tranh Ma Đạo vẫn là đang xây dựng, chưa khóa nguồn đợt truyền thừa Tinh Hải.
 
 ### 2. Nhân Tổ vào Luân Hồi
 > Thiên Địa Chính Tiên **có thể** binh giải và vào Luân Hồi nếu tự tháo quyền năng / Quy Tắc xuống đủ thấp. Không phải cấm thuật duy nhất; chỉ là gần như không ai muốn tự bỏ vĩnh sinh.
@@ -2109,13 +2115,13 @@ Hư Minh Lôi Hải có thể trở thành một tầng đặc biệt của Arcl
 > Từng là một Sinh Linh Nguyên Tổ vô giới tính; tách theo Sinh–Tử; mỗi bên giữ phần lớn một cực và phần nhỏ cực kia; đều bán bộ Thiên Địa Chính Tiên và hữu hạn thọ nguyên. Hai Tổ chết làm Luân Hồi hoàn thiện hơn; 30.000 năm phân tranh Yêu tộc theo sau trước khi Yêu Tiên chứng Chân và mở Hắc Ám Kỷ.
 
 ### 5. Linh Sinh Vực
-> Có thật; nghèo Linh Khí, hoang sơ, ít sinh vật carbon; Linh Sinh silicon hình thành vì tích lũy Linh Khí rất chậm qua thời gian địa chất.
+> Có thật; nghèo Linh Khí, hoang sơ, ít sinh vật cacbon; Linh Sinh silic hình thành vì tích lũy Linh Khí rất chậm qua thời gian địa chất.
 
 ### 6. Hai truyền thống Kiếm Tu
-> Hệ triết học cũ gọi **Cổ Kiếm Tu**; nhánh output trực tiếp gọi **Linh Kiếm Tu**. Kiếm Tiên đầu tiên sáng tạo Cửu Đại Kiếm Thuật, có truyền thừa của Chân Tiên Nhân tộc đầu tiên nên không bị khóa công pháp như nô lệ.
+> Hệ triết học cũ gọi **Cổ Kiếm Tu**; nhánh sức công phá trực tiếp gọi **Linh Kiếm Tu**. Kiếm Tiên đầu tiên sáng tạo Cửu Đại Kiếm Thuật, có truyền thừa của Chân Tiên Nhân tộc đầu tiên nên không bị khóa công pháp như nô lệ.
 
 ### 7. Thanh kiếm của Nhân Tổ
-> Chỉ Nhân Tổ / mười hai người con điều khiển được; ra một kiếm thì tử vong vào Luân Hồi. Sự kiện trong Hắc Ám Kỷ và bí mật cao tầng hai Ma Môn được khóa tại mục XXVI và file lịch sử.
+> Chỉ Nhân Tổ / mười hai người con điều khiển được; ra một kiếm thì tử vong vào Luân Hồi. Sự kiện trong Hắc Ám Kỷ và bí mật cao tầng hai Ma Môn được khóa tại mục XXVI và tài liệu lịch sử.
 
 ## Còn mở
 
@@ -2143,15 +2149,15 @@ Chưa khóa có chủ ý; phụ thuộc thiết kế 12 Thể.
 ### 5. Bản chất Linh Sinh Nguyên Sơ trước khi tách Long–Phượng
 **Cố ý không khóa.** Đây là khoảng trống thần thoại để người đọc tự suy đoán.
 
-### 6. Exact power bracket của từng Cổ Thần Thần Huy
+### 6. Mức sức mạnh cụ thể của từng Cổ Thần Thần Huy
 Không ánh xạ 1:1, cần xét từng nhân vật.
 ---
 
-# XLVI. ĐỀ XUẤT CẤU TRÚC BẢN ĐỒ WORKING
+# XLVI. ĐỀ XUẤT CẤU TRÚC BẢN ĐỒ ĐANG XÂY DỰNG
 
 Không vẽ tọa độ 2D cố định.
 
-Dùng graph:
+Dùng đồ thị:
 
                  [Phạn Châu]
                      |
@@ -2166,26 +2172,26 @@ Dùng graph:
 
 Đây chỉ thể hiện:
 
-> **kết nối / topology**
+> **kết nối / cấu trúc liên thông**
 
 không thể hiện:
 - trên dưới tuyệt đối;
 - khoảng cách thật;
-- orientation vật lý.
+- hướng đặt vật lý.
 
 Khi sau này thêm Vực:
 
-> thêm node/edge, không cần phá logic.
+> thêm đỉnh/cạnh, không cần phá lô-gíc.
 
 ---
 
-# XLVII. WORKING DEFINITIONS — CÓ THỂ KHÓA NGAY
+# XLVII. CÁC ĐỊNH NGHĨA ĐANG XÂY DỰNG — CÓ THỂ KHÓA NGAY
 
 ### Nạp Hư
 Một Đại Thế Giới dạng Quần Vực Nội Giới.
 
 ### Đại Vực
-Một miền địa lý–không gian cực lớn có metric và Địa Trọng cục bộ.
+Một miền địa lý–không gian cực lớn có cấu trúc đo lường và Địa Trọng cục bộ.
 
 ### Giới Nội Hư Không
 Không gian giữa các Đại Vực nhưng vẫn nằm trong Giới Bích.
@@ -2200,10 +2206,10 @@ Các điểm thiên ngoại / Giới Bích hiển hiện thành sao.
 Nguồn quang nội giới lớn dùng chung cho hệ.
 
 ### Thiên Chu
-Chu kỳ ngày–đêm cục bộ do metric của từng Vực.
+Chu kỳ ngày–đêm cục bộ do cấu trúc đo lường của từng Vực.
 
 ### Vực Lộ
-Kết nối địa lý/topology ổn định giữa Vực.
+Kết nối địa lý/cấu trúc liên thông ổn định giữa Vực.
 
 ### Vực Gian
 Không gian chuyển tiếp khó sống giữa các Vực.
@@ -2215,7 +2221,7 @@ Kết nối nhân tạo / tự nhiên dạng cổng.
 Vùng ngoại vi của mỗi Vực nơi Phi Thăng Giả từng có thể xuất hiện.
 
 ### Tiếp Dẫn Đài
-Công trình nhân tạo làm beacon cho Phi Thăng.
+Công trình nhân tạo làm mốc dẫn đường cho Phi Thăng.
 
 ### Đạo Vực / Tiên Vực
 Không gian riêng do Chân Tiên neo trong Giới Nội Hư Không.
@@ -2230,15 +2236,15 @@ Câu trả lời cuối cùng:
 
 Bởi:
 
-1. A và B không nằm trong một không gian Euclid chung với cùng vector gravity.
-2. Mỗi Vực có “up/down” riêng.
-3. Direct light-path giữa bề mặt A và B thường không tồn tại.
-4. Nếu Chân Tiên dùng perception cao cấp để nhìn B, thứ hắn nhận được là thông tin được metric/pháp tắc vận chuyển, nên có thể thấy **mặt sinh tồn/top surface** của B.
-5. Một người đứng trong Giới Nội Hư Không có thể thấy orientation của Vực thay đổi tùy đường quan sát mà không tạo nghịch lý cho cư dân cục bộ.
+1. A và B không nằm trong một không gian Euclid chung với cùng vectơ trọng lực.
+2. Mỗi Vực có “trên/dưới” riêng.
+3. đường truyền ánh sáng trực tiếp giữa bề mặt A và B thường không tồn tại.
+4. Nếu Chân Tiên dùng tri giác cao cấp để nhìn B, thứ hắn nhận được là thông tin được cấu trúc đo lường/pháp tắc vận chuyển, nên có thể thấy **mặt sinh tồn/bề mặt phía trên** của B.
+5. Một người đứng trong Giới Nội Hư Không có thể thấy hướng đặt của Vực thay đổi tùy đường quan sát mà không tạo nghịch lý cho cư dân cục bộ.
 
 Cách hiểu tốt nhất:
 
-> **Một Vực không phải cái đĩa đặt trong căn phòng. Nó là một miền không gian có “đất” và “trời” của chính mình, được gắn vào Nạp Hư bằng topology.**
+> **Một Vực không phải cái đĩa đặt trong căn phòng. Nó là một miền không gian có “đất” và “trời” của chính mình, được gắn vào Nạp Hư bằng cấu trúc liên thông.**
 
 Đây là điểm giúp toàn bộ Nạp Hư:
 
@@ -2258,9 +2264,9 @@ mà vẫn không phải dùng một hành tinh vật lý vô lý.
 
 Sau tài liệu này, thứ tự tốt nhất:
 
-1. **Khóa graph kết nối giữa **8 vùng/Vực hiện có** (tính cả Hư Minh Lôi Hải và Linh Sinh Vực).**
+1. **Khóa đồ thị kết nối giữa **8 vùng/Vực hiện có** (tính cả Hư Minh Lôi Hải và Linh Sinh Vực).**
 2. Khóa Đại Nhật / Nguyệt / lịch pháp từng Vực.
-3. Khóa diện tích working của từng Vực.
+3. Khóa diện tích đang xây dựng của từng Vực.
 4. Khóa số lượng dân cư / mật độ dân.
 5. Khóa các tuyến Vực Lộ và thời gian di chuyển.
 6. Từ đó dựng **các Đại Kỷ lịch sử Nạp Hư**.
@@ -2268,10 +2274,10 @@ Sau tài liệu này, thứ tự tốt nhất:
    - thế lực trung tâm;
    - chủng tộc chủ đạo;
    - ai lên Chân Tiên;
-   - chiến tranh nào đổi topology;
+   - chiến tranh nào đổi cấu trúc liên thông;
    - di tích nào để lại;
    - Vực nào đổi tên.
-8. Sau khi lịch sử Nạp Hư hoàn chỉnh mới build Thần Huy cùng độ phân giải.
+8. Sau khi lịch sử Nạp Hư hoàn chỉnh mới xây Thần Huy với cùng mức chi tiết.
 
 ---
 
@@ -2299,7 +2305,7 @@ Thiên Địa Chính Tiên:
 
 Đây là quy mô thích hợp để sau này Arclune dung hợp từ Nạp Hư + Thần Huy mà vẫn có cảm giác:
 
-> **hai “đại thế giới” thật sự đã bị KLC lấy làm vật liệu, chứ không phải hai lục địa fantasy ghép lại.**
+> **hai “đại thế giới” thật sự đã bị KLC lấy làm vật liệu, chứ không phải hai lục địa kỳ ảo ghép lại.**
 
 
 ---
@@ -2358,14 +2364,9 @@ Sau một trận huyết chiến với các kẻ tranh đoạt khác:
 
 Chi tiết hắn lấy được phần nào chưa khóa.
 
-Việc này có thể để lại:
+Việc này có thể để lại dị biến Sinh–Tử, căn cơ mạnh hơn hoặc nhược điểm do hai hệ xung đột; tất cả còn mở. Cần quyết định loài gốc, phần tàn hài hắn luyện hóa và Pháp Tắc đặc trưng trước khi xác định ảnh hưởng tới Kiếm Tiên.
 
-- dị biến Sinh–Tử;
-- căn cơ Yêu Tiên mạnh hơn;
-- lý do hắn khó bị phong ấn;
-- hoặc một nhược điểm do hai hệ xung đột.
-
-Không khóa hậu quả trước khi thiết kế riêng Yêu Tiên.
+**ĐÃ CHỐT:** phong ấn dùng chính tiên lực Yêu Tiên, hắn càng mạnh phong ấn càng mạnh. Cuối cùng hắn cực yếu; Kiếm Tiên giết tới khiến Yêu tộc buộc phải phá phong ấn. Nguyên nhân hắn suy yếu chưa chốt. Trong thời gian ấy còn hai bán bộ Yêu Tiên chủ yếu giữ thân mình, không quá chèn ép Nhân tộc; động cơ đạo đức / e sợ Nhân Hoàng Cung còn mở.
 
 
 ---
@@ -2394,7 +2395,7 @@ Yêu tộc Hóa Hình thành người là một lựa chọn có lợi cho tu lu
 
 ---
 
-# LIV. THẦN HUY ENCLAVE / DI TÍCH TIẾP XÚC NGOẠI GIỚI
+# LIV. KHU CƯ TRÚ THẦN HUY / DI TÍCH TIẾP XÚC NGOẠI GIỚI
 
 Đã khóa:
 
@@ -2406,7 +2407,7 @@ Do đó có thể tồn tại:
 - thương cảng;
 - viện nghiên cứu;
 - khu ngoại giao;
-- enclave nhỏ;
+- khu cư trú nhỏ;
 - hậu duệ của người Thần Huy mắc kẹt sau khi Giới Bích đóng.
 
 Các địa điểm này đặc biệt phù hợp nằm gần:
@@ -2425,12 +2426,18 @@ Một số chỉ còn:
 
 ---
 
-# LV. KÝ ỨC NGUỒN GỐC & KHOẢNG CÁCH TỚI HẮC ÁM KỶ
+# LV. KÝ ỨC NGUỒN GỐC, THỜI ĐẠI HÀI TỬ VÀ XÃ HỘI HẮC ÁM KỶ
 
-Mười hai người con kể cho Nhân tộc / hậu duệ về **Nhân Tổ và Long / Phượng**. Việc Nhân Tổ có kể chuyện Nguyên Sơ cho các con, và các con có truyền tiếp chuyện ấy, còn OPEN.
+Mười hai người con kể cho Nhân tộc / hậu duệ về **Nhân Tổ và Long / Phượng**. Việc Nhân Tổ có kể chuyện Nguyên Sơ cho các con, và các con có truyền tiếp chuyện ấy, còn mở.
 
-Từ lúc các con tạo Nhân tộc đến lúc Yêu Tiên áp quân trong sự kiện thanh kiếm đã cách **ít nhất 100.000 năm**. Người dùng kiếm lúc ấy đã qua nhiều đời Luân Hồi, đã thức tỉnh ký ức; các người con còn lại đã đầu thai nhưng chưa thức tỉnh.
+Từ thời Nguyên Sơ tới thời mười hai hài tử cách **ít nhất 20.000 năm**, gắn với việc Nhân Tổ nuôi lớn Long / Phượng. Khi hai Tổ rời đi, cả hai đã có thể hóa hình; Nhân Tổ ngẩn người rồi tạo mười hai hài tử. Thời đại đời đầu kết thúc khi cả mười hai đều vào Luân Hồi.
 
-Nhân tộc bị nô dịch được tu luyện để sống lâu và làm công, nhưng bị giới hạn công pháp và thủ đoạn sát phạt; sách bị đốt, thiên tài bị loại bỏ, thức ăn chỉ đủ tránh chết đói, lao động liên tục. Cách các hình thức áp bức này thay đổi theo địa phương / loại lao động còn OPEN.
+Người dùng kiếm trong Hắc Ám Kỷ đã qua nhiều đời Luân Hồi, đã thức tỉnh ký ức; các người con còn lại đã đầu thai nhưng chưa thức tỉnh. Giữ cả hai khoảng **ít nhất 100.000 năm**: từ lúc tạo Nhân tộc tới sự kiện thanh kiếm, và từ lúc hài tử cuối vào Luân Hồi tới ngoại xâm Ma Đạo. Xem mục I của tài liệu lịch sử; không cộng chồng các khoảng bao trùm.
 
-Chưa khóa bảng thọ nguyên Nạp Hư mới. Mỗi Pháp Tắc Chân Tiên lĩnh ngộ thêm tăng tuổi thọ; mốc Bán Thần bốn triệu năm của hệ Main dùng Aether là mốc đối chiếu. Xem mục XX của file ontology.
+Nô lệ được tu đến đầu đại cảnh thứ hai; sau khi bị chèn ép / tẩy não tới mức tâm tư phản kháng bị dập tắt mới được tu thêm, nhưng không được đột phá đại cảnh thứ tư. Trần công pháp và cắt thủ đoạn sát phạt là cơ chế chính; sách bị đốt, thiên tài bị loại bỏ, lao động liên tục.
+
+Yêu tộc dùng người Nhân tộc quản lý đồng tộc; tầng quản lý sợ mất quyền lợi nên có thể tàn ác hơn cả chủ Yêu. Có nơi nô dịch trực tiếp, nơi cống nạp người, nơi còn cộng đồng trốn tránh. Tình hình xấu dần, cuối cùng Nhân tộc thành lương thực; chỉ những nữ nhân được nuôi tốt, nô lệ chết bị vứt bỏ. Mục đích nuôi nhóm nữ nhân và khác biệt từng địa phương chưa chốt.
+
+Kiếm Tiên luôn chạy trốn, nhận truyền thừa riêng của Chân Tiên Nhân tộc đầu tiên nên không chịu trần công pháp nô lệ; cực ít người biết quan hệ sư đồ.
+
+Đã chọn phương án tăng tuổi thọ từ cảnh thứ tư, kết hợp tăng thọ theo Pháp Tắc ở Chân Tiên. Bảng số **đang xây dựng** nằm trong [Hệ thống tu luyện, sức mạnh và tuổi thọ](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md); phần Aether sẽ quyết định sau Nạp Hư và Thần Huy.
