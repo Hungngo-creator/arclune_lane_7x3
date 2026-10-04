@@ -132,6 +132,16 @@ Cổ Kiếm Tu có thể dùng hiểu biết sâu để chém một quan hệ / 
 
 **CÒN MỞ:** tăng hạn mức sinh mệnh ảnh hưởng thọ nguyên thế nào, phạm vi qua Luân Hồi, giới hạn chuyển hóa / tích lũy và những điều kiện khắc chế. Bảng tuổi thọ tại mục III vẫn là phương án hiện tại; chưa đổi số vì cơ chế này.
 
-Hắn còn hấp thu nước để hồi phục. Tuy vậy, thương tổn khi bị phong ấn và hao mòn lâu dài khiến hắn cực yếu; phong ấn dùng chính tiên lực của hắn và được thiết kế hút năng lượng tới chết. Cần chốt riêng lượng nước / sinh lực hắn có thể tiếp cận trong tháp và quan hệ giữa các loại nguồn lực, để không tự suy ra hồi phục sinh mệnh đồng nghĩa bù được mọi hao tổn tiên lực.
+Hắn hấp thu nước để hồi phục, nhưng **không nhận được gì từ bên ngoài khi bị giam**. **Phong Thiên Tháp** phong cấm mọi nguồn năng lượng trong tháp và trong bán kính **50 km**. Phong ấn là cơ chế riêng: hấp thu tiên lực tù nhân để duy trì giam giữ, tạo kết giới bảo hộ tháp và hút năng lượng tới chết. Thương tổn ban đầu cùng hao mòn lâu dài làm hắn cực yếu; quan hệ giữa sinh lực, tiên lực và nguồn lực vốn có trong lúc giam giữ chưa chốt.
 
-Hồ yêu đã ở **Khắc Pháp** khi bị hắn khống chế, trước khi gặp Kiếm Tiên; tu vi tiếp tục tăng trong quá trình Kiếm Tiên trưởng thành. Tiểu cảnh lúc ấy, tuổi đời và cảnh cao nhất về sau chưa chốt. Mốc Khắc Pháp 300.000 năm thuộc đỉnh cảnh, không tự gán tuổi thọ ấy cho nàng từ lúc mới vào cảnh.
+Hồ yêu bị hạ cổ từ sơ sinh, nhưng **đã Khắc Pháp khi gặp Kiếm Tiên**; tu vi tiếp tục tăng trong quá trình hắn trưởng thành. Tiểu cảnh lúc gặp, tuổi đời và cảnh cao nhất chưa chốt. Mốc Khắc Pháp 300.000 năm thuộc đỉnh cảnh, không tự gán tuổi thọ ấy cho nàng chỉ từ tên đại cảnh. Tử cổ gặm nhấm linh hồn khiến nàng phải dùng đan dược chữa trị; đây là một nguồn tổn thương cụ thể, chưa đổi thành hệ số giảm tuổi thọ.
+
+---
+
+# IX. CHUYỂN ĐỜI — TUỔI THỌ, LINH HỒN VÀ KÝ ỨC
+
+**ĐÃ CHỐT:** linh hồn hồ yêu bị tử cổ phá hủy, nhưng Chân Ngã còn và đầu thai **không có ký ức tiền kiếp**. Đời mới không phải một lần tự kéo dài tuổi thọ thân cũ.
+
+**Chân Tiên trở lên** vẫn giữ ký ức khi vào Luân Hồi, dù tự suy yếu; ký ức dần khôi phục theo tu vi đời mới. Tu vi ở lúc chuyển đời, cảnh cao nhất từng chứng và mức nhớ lại của thân mới là những thông tin khác nhau. Không tự dùng tu vi đã hạ thấp để xóa điều kiện “đã chứng Chân Tiên”.
+
+Luật này không đổi bảng tuổi thọ tại mục III, không chốt tuổi đời / tuổi chết hồ yêu hoặc ngưỡng khôi phục ký ức. Cần đối chiếu cảnh cao nhất nàng đạt với kết cục mất ký ức đã chốt. Các hài tử đời gốc đều Chân Tiên, vẫn có luật thức tỉnh riêng và phải tu lại; xem mục VI, XXII của [Bản thể tu luyện và truyền thống kiếm](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).
