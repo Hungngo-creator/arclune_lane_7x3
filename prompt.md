@@ -42,13 +42,14 @@ Read these files first and treat them as the current working base.
 
 ## Tier A — current Nạp Hư working lore
 
-Read all three completely:
+Read all four completely:
 
 1. docs/lore/NAP_HU_HISTORY_FOUNDATIONS_WORKING.md
 2. docs/lore/NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md
 3. docs/lore/NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md
+4. docs/lore/Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md
 
-These three are the most important sources for current Nạp Hư work.
+These four are the most important sources for current Nạp Hư work.
 
 Do not rely on old Nạp Hư lore elsewhere if it conflicts with these.
 
@@ -56,8 +57,8 @@ Do not rely on old Nạp Hư lore elsewhere if it conflicts with these.
 
 Read completely:
 
-4. docs/Nghịch lý Chúa.md
-5. lore mới.md
+5. docs/Nghịch lý Chúa.md
+6. lore mới.md
 
 Use docs/Nghịch lý Chúa.md for:
 - reference systems;
@@ -138,6 +139,8 @@ When reasoning, distinguish facts using these labels where useful:
 - DELIBERATE MYSTERY — author explicitly wants no objective answer yet.
 - INFERENCE — your proposed logical consequence, not yet approved.
 
+Use Vietnamese prose in docs/lore/**. Vietnamese equivalents of these labels are ĐÃ CHỐT / ĐANG XÂY DỰNG / CÒN MỞ / TRUYỀN THUYẾT TRONG THẾ GIỚI / BÍ ẨN CHỦ Ý / SUY LUẬN. Preserve filenames and established proper names.
+
 Do not turn a theory, myth, intentional mystery, or inference into LOCKED lore.
 
 ---
@@ -212,7 +215,8 @@ At the earliest known stage there are two special primordial awakened beings.
 - does not require ordinary food/drink;
 - later possesses a major Diễn Hóa axis;
 - has matured despite his youthful form/temperament; a Thiên Địa Chính Tiên has no finite lifespan;
-- creates twelve children from portions of his own laws/power;
+- spends at least 20,000 years between the Nguyên Sơ age and the Twelve Children age raising Long/Phượng; both can transform when they leave;
+- pauses in a daze after they leave, then creates twelve children from portions of his own laws/power;
 - directly becomes the ancestral source behind humanity;
 - grows bored of eternal life after his closest friend Nguyên Sơ has gone;
 - knows reincarnation is a new, unclear path on which he can become anything;
@@ -321,6 +325,8 @@ They later choose reincarnation one by one because:
 - endless existence becomes boring;
 - weaker beings fear them;
 - reincarnation offers a different way to live.
+
+The original Twelve Children age ends once all twelve have entered reincarnation. At least 100,000 years separate the last child entering reincarnation from the Ma-Dao Great World invasion. Their later reincarnations do not extend that original age. They agreed on recognition signals before reincarnating. Nhân Hoàng Cung is founded by one incarnation of a child, who builds an illusion of the past of all twelve; only correct past choices pass. Do not identify this founder with the sword user without an author decision.
 
 ---
 
@@ -459,9 +465,11 @@ He knows Long/Phượng’s relationship to Nhân Tổ and does not care.
 
 He becomes the brutal oppressor of multiple races, especially humans.
 
-Humans may cultivate to live longer and work better, but their cultivation manuals and access to higher realms are restricted. They lack offensive techniques; books are burned, geniuses eliminated, food limited to avoiding starvation, and labor continuous.
+Slaves may initially cultivate only to the beginning of realm two. Further cultivation is allowed only after sustained oppression and indoctrination extinguish resistance, but they may not break into realm four. The main restriction is the cultivation-manual ceiling, with no offensive techniques; books are burned, geniuses eliminated, food for laboring slaves limited to avoiding starvation, and work continuous. These later realm names describe an earlier, unstandardized system.
 
-At least 100,000 years separate the Twelve Children’s creation of humanity from the Yao Immortal’s army approaching in the sword incident. This is an encompassing interval, not automatically an extra interval to add to the 30,000 years.
+Yao use Human overseers whose privileges depend on preventing resistance and who can be more cruel than their Yao masters. Some areas use direct slavery, some demand tribute in people, and some contain hidden communities. Conditions worsen with time until humans become Yao food. Only the women specified in the author’s account are fed well; dead slaves are discarded. Why those women are fed well remains OPEN; do not invent that purpose.
+
+At least 100,000 years separate the Twelve Children’s creation of humanity from the Yao Immortal’s army approaching in the sword incident. The author retains this alongside the separate minimum 100,000 years from the end of the original Children age to the Ma-Dao invasion. These are encompassing intervals; do not add them together or automatically add the 30,000 years after Long/Phượng’s deaths.
 
 The Dark Age lasts at least:
 
@@ -520,9 +528,11 @@ The first Yao True Immortal remains active within the seal:
 - can speak;
 - is intelligent and does not follow stupid-villain logic.
 
-The first Sword Immortal grows while his future enemy remains a conscious dark presence in the age.
+The seal is sustained by the Yao Immortal’s own immortal power: a stronger captive makes a stronger seal. Eventually he is extremely weak, and Yao break the weakened seal because the Sword Immortal is attacking. The cause of the captive’s weakening remains OPEN. Two other half-step Yao Immortals exist during the seal period; they mostly protect themselves and do not heavily oppress humanity. They know Nhân Tổ, the children, and who raised Long/Phượng; ethics versus fear of Nhân Hoàng Cung remains OPEN.
 
-He inherits the first Human True Immortal’s cultivation legacy, so slave-manual restrictions do not close his path. The inherited system remains primitive.
+Decide the first Yao Immortal’s species/body, consumed remains, and signature Law before deciding the channel, reach, and actual influence he has over the Sword Immortal. Do not assume continuous direct knowledge or contact.
+
+The Sword Immortal inherits the first Human True Immortal’s cultivation legacy and is constantly fleeing, so slave-manual restrictions do not close his path. Very few know he is that immortal’s disciple. The inherited system remains primitive.
 
 He creates the Nine Great Sword Arts (Cửu Đại Kiếm Thuật) and becomes the historical foundation of Cổ Kiếm Tu.
 
@@ -641,10 +651,12 @@ This helps explain Tinh Hải Thần Châu’s later access to Thần Huy techni
 - The user dies; all other children have reincarnated but have not awakened memory.
 - Thần Huy does not know this gap, suspects a trap, and withdraws. The Yao Immortal witnesses the death just before his army arrives and also withdraws. Nhân Hoàng Cung is humanity’s last sanctuary then.
 - Thần Huy later withholds the sword secret from the Ma-Dao Great World, fearing a trap.
-- Some native Nạp Hư witnesses later become Ma cultivators; this knowledge predates the foreign Ma-Dao invasion.
+- Witnesses are very few. Two native Nạp Hư witnesses turn to Ma-Dao only after the foreign Ma-Dao Great World arrives; before that invasion Nạp Hư has no Ma cultivators.
+- The children deliberately disclose limited information to native Ma-sect leadership to deter theft: Nhân Tổ made a sword from his bones and only he/the children can use it. Do not grant that leadership knowledge of the death cost, blood component, or current awakening state.
+- The sword user had already been recognized by the Palace and returns independently after awakening. The Palace founder’s illusion and the children’s prior recognition signals are a strong infiltration defense, not yet an absolute immunity to all possible deception.
 - High leadership of Thiên Ma Môn and Cực Lạc Ma Tông keeps the secret to protect its resources and use foreign attacks to test whether Nhân Hoàng Cung can still deploy the sword.
 - The sword is Nhân Hoàng Cung’s locked deterrent against the two native Ma Tôn. Do not assume an awakened eligible user is always present.
-- The child’s identity, institutional founding dates, transmission of the secret, and additional sword uses remain OPEN.
+- The sword user’s identity, founder’s identity/incarnation, Ma-sect founding dates, timing of disclosure, illusion scope, and additional sword uses remain OPEN. Do not place the organized native Ma sects before Ma-Dao arrives or automatically make their later probing strategy part of the first invasion.
 
 ---
 
@@ -687,7 +699,7 @@ This determines whether:
 
 Do not choose a number immediately.
 
-The author is considering lifespan changes but has not locked a new Nạp Hư table. Each additional Law a True Immortal comprehends increases lifespan. Main’s Demi-God limit of four million years uses higher-order Aether; use it as a comparison, not a direct lifespan conversion.
+The author chose a WORKING lifespan increase from realm four onward: peak realms 4–8 at 10,000 / 30,000 / 100,000 / 300,000 / 600,000 years, and a newly proven one-Law True Immortal at a base 1,000,000 years. Each additional Law increases lifespan; the amount, cap, and deep-union reduction factors remain OPEN. Use the dedicated cultivation/lifespan file. Aether lifespan is deferred until Nạp Hư and Thần Huy are built; Main’s four-million-year Demi-God limit is a comparison, not a conversion.
 
 Work backward from:
 - lifespans;
@@ -944,7 +956,7 @@ Focus on:
 - invasion;
 - why Heaven’s Dao finally closes/tightens the Barrier.
 
-Native Nạp Hư Ma cultivators already existed before the Ma-Dao Great World invasion. Some had witnessed Nhân Tổ’s sword before turning to Ma-Dao. Distinguish them from foreign invaders and the foreign traditions later left behind.
+Before the Ma-Dao Great World invasion, Nạp Hư has no Ma cultivators. Two native witnesses of Nhân Tổ’s sword turn to Ma-Dao only after the foreign force arrives. Distinguish their pre-existing knowledge from their later cultivation path; local adoption begins with the invasion and continues after foreign troops leave.
 
 Do not treat every foreign world as equally important.
 
@@ -1204,6 +1216,7 @@ Existing Nạp Hư files:
 - docs/lore/NAP_HU_HISTORY_FOUNDATIONS_WORKING.md
 - docs/lore/NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md
 - docs/lore/NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md
+- docs/lore/Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md
 
 When enough Thần Huy material is locked, create dedicated files such as:
 

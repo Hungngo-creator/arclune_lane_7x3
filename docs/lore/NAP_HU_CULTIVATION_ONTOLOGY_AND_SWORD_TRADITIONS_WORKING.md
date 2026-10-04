@@ -1,12 +1,12 @@
 # NẠP HƯ — ÁNH XẠ CẢNH GIỚI, CỔ THẦN, NHÂN TỔ & HAI HỆ KIẾM TU
 
-> **Trạng thái:** Working Lore Design.
+> **Trạng thái:** Thiết kế thế giới đang xây dựng.
 >
-> File này gom các điều chỉnh bản thể học / power-scaling vừa được khóa để các file lore khác không dùng mapping cũ.
+> Tài liệu này gom các điều chỉnh bản thể học / đối chiếu sức mạnh vừa được khóa để các tài liệu nền thế giới khác không dùng ánh xạ cũ.
 
 ---
 
-# I. MAPPING NẠP HƯ → HỆ TU LUYỆN CỦA MAIN
+# I. ÁNH XẠ NẠP HƯ → HỆ TU LUYỆN CỦA MAIN
 
 ## 1. Chân Tiên
 
@@ -14,13 +14,13 @@ Chân Tiên Nạp Hư tương đương khoảng:
 
 > **Bán Thần** trong đạo thống Main đời II trở về sau.
 
-Đây là mapping theo **bracket tổng thể**, không có nghĩa kỹ năng, năng lượng hay ontology giống hệt nhau.
+Đây là ánh xạ theo **mức tổng thể**, không có nghĩa kỹ năng, năng lượng hay cấu trúc bản thể giống hệt nhau.
 
 ---
 
 ## 2. Thiên Địa Chính Tiên
 
-Thiên Địa Chính Tiên không map cứng vào đúng một cảnh thần.
+Thiên Địa Chính Tiên không ánh xạ cứng vào đúng một cảnh thần.
 
 Mốc thấp nhất:
 
@@ -33,7 +33,7 @@ Nếu một Thiên Địa Chính Tiên:
 - có độ hoàn chỉnh sâu;
 - có kỹ thuật chiến đấu vượt trội;
 
-thì bracket có thể tiến lên:
+thì mức sức mạnh có thể tiến lên:
 
 > **Trung Vị Thần** hoặc **Thượng Vị Thần**.
 
@@ -55,7 +55,7 @@ Không được viết:
 
 **Thái Sơ** là cảnh giới lý luận của Nạp Hư.
 
-Mapping gần nhất:
+Ánh xạ gần nhất:
 
 > **Thái Sơ ≈ Chí Cao** của hệ Main.
 
@@ -114,7 +114,7 @@ Do đó nhiều cá thể có thể đồng thời nắm các phần khác nhau 
 
 ---
 
-# III. TẦN ĐẾ — SỬA MAPPING
+# III. TẦN ĐẾ — SỬA ÁNH XẠ
 
 Tần Đế:
 
@@ -140,7 +140,7 @@ Tần Đế còn chưa phải Chân Tiên nên không thể đã đứng ở c�
 
 # IV. CHIẾN TÍCH TẦN ĐẾ GIẾT MA TÔN
 
-Ma Tôn = bracket Chân Tiên.
+Ma Tôn = mức Chân Tiên.
 
 Chiến tích được khóa theo hai điều kiện đồng thời:
 
@@ -166,7 +166,7 @@ Ma Tôn:
 - Pháp Tắc thế giới gốc không hoàn toàn tương thích Nạp Hư;
 - có thể có thương thế / tiêu hao.
 
-Vì vậy feat vẫn là:
+Vì vậy chiến tích vẫn là:
 
 > **Định Pháp giết Chân Tiên**
 
@@ -202,7 +202,7 @@ Bất kỳ Thiên Địa Chính Tiên nào **về nguyên tắc** cũng có th�
 
 1. tự tháo quan hệ bất tử với Quy Tắc;
 2. tự suy yếu;
-3. hạ ontology xuống mức Luân Hồi có thể nhận;
+3. hạ tầng bản thể xuống mức Luân Hồi có thể nhận;
 4. vào Luân Hồi.
 
 Không phải cấm thuật riêng của Nhân Tổ.
@@ -216,7 +216,7 @@ Nhân Tổ:
 - chia nhỏ hệ Quy Tắc / quyền năng của mình;
 - phân thành **12 phần Pháp Tắc / thần dị lớn**;
 - dùng chúng sinh ra **12 người con**;
-- mỗi người con đạt bracket **Chân Tiên**;
+- mỗi người con đạt mức **Chân Tiên**;
 - bản thân hắn suy yếu đến cực hạn rồi vào Luân Hồi.
 
 Chân Ngã Nhân Tổ:
@@ -332,11 +332,15 @@ Nguồn răn đe đã khóa của Nhân Hoàng Cung là **thanh kiếm Nhân T�
 
 Sau kiếm ấy, các người con khác đã đầu thai nhưng chưa thức tỉnh. Thần Huy không biết, nghi có kế nên rút lui. Yêu Tiên chứng kiến cũng rút quân; Nhân Hoàng Cung là tịnh thổ cuối cùng của Nhân tộc khi ấy.
 
-Một số nhân chứng **bản địa Nạp Hư** về sau trở thành Ma tu; tri thức về kiếm có trước cuộc xâm lấn Ma Đạo Đại Thế Giới. Cao tầng hai Ma Môn giữ kín bí mật để tránh chia tài nguyên với ngoại địch và dùng ngoại xâm thăm dò khả năng Nhân Hoàng Cung còn ra kiếm. Thần Huy cũng không báo bí mật cho quân Ma Đạo vì sợ bị hố.
+Trước cuộc xâm lấn Ma Đạo Đại Thế Giới, **Nạp Hư không có Ma tu**. Nhân chứng sức mạnh kiếm rất ít; hai người bản địa trong số ấy chỉ chuyển sang Ma Đạo sau khi ngoại giới tiến đến.
+
+Cao tầng hai Ma Môn chỉ biết kiếm do Nhân Tổ tạo bằng xương của mình, chỉ Nhân Tổ / các hài tử dùng được. Các hài tử chủ động cho họ biết phần ấy để ngăn âm mưu đoạt kiếm; **không gán cho họ biết cái giá tử vong hay tình trạng thức tỉnh của người dùng**. Hai Ma Môn giấu phần mình biết để giữ tài nguyên và thăm dò qua ngoại xâm. Thần Huy cũng không báo bí mật cho quân Ma Đạo vì sợ bị hố; thời điểm thành lập Ma Môn và đợt ngoại xâm họ thăm dò còn mở.
 
 Nhân Hoàng Cung còn giữ di sản, Thập Nhị Thể, đại trận, khí vận và hậu thủ. Khả năng hiện tại có một Nhân Tổ / người con đã thức tỉnh cần xét theo thời điểm; chưa mặc định luôn có người sẵn sàng dùng kiếm.
 
-Chi tiết lịch sử và các điểm OPEN xem mục XLII của `NAP_HU_HISTORY_FOUNDATIONS_WORKING.md`.
+Nhân Hoàng Cung do một đời hài tử dựng lên, có ám hiệu và ảo cảnh dựa trên lựa chọn quá khứ của cả mười hai người để chống nội gián. Hài tử dùng kiếm được Cung nhận diện từ trước, rồi tự tìm về sau khi thức tỉnh.
+
+Chi tiết lịch sử và các điểm còn mở xem mục XLII, XLIV của `NAP_HU_HISTORY_FOUNDATIONS_WORKING.md`.
 
 ---
 
@@ -353,7 +357,7 @@ Chúng có đặc tính:
 - không cần tín ngưỡng;
 - tuổi thọ tự nhiên gần như vô hạn;
 - quyền năng bẩm sinh;
-- một phần ontology gợi nhớ Thiên Địa Chính Tiên.
+- một phần cấu trúc bản thể gợi nhớ Thiên Địa Chính Tiên.
 
 Nhưng:
 
@@ -377,12 +381,12 @@ Sức chiến đấu tùy cá thể:
 
 # IX. NHÂN TỔ, NGUYÊN SƠ & NGUỒN GỐC LONG–PHƯỢNG
 
-Thuở sơ khai Nạp Hư, lore hiện tại chỉ xác nhận **hai Linh Sinh Nguyên Sơ**:
+Thuở sơ khai Nạp Hư, nền thế giới hiện tại chỉ xác nhận **hai Linh Sinh Nguyên Sơ**:
 
 1. **Nhân Tổ** — hình hài một bé trai hoạt bát, sáng sủa;
 2. **Nguyên Sơ** — quang thể vô giới tính, ít nói, hình thái biến ảo liên tục.
 
-“Nguyên Sơ” là tên riêng working của bản thể chung trước khi Long Tổ / Phượng Tổ tách ra.
+“Nguyên Sơ” là tên riêng đang xây dựng của bản thể chung trước khi Long Tổ / Phượng Tổ tách ra.
 
 Nhân Tổ và Nguyên Sơ đều không cần ăn uống.
 
@@ -418,7 +422,7 @@ Không phe nào có bằng chứng đủ để khóa đáp án.
 
 > **một vật / hiện tượng vốn vô tri của thế giới tự khai linh thành sinh mệnh.**
 
-Do đó nó không bắt buộc phải thuộc nhánh Linh Sinh silicon phổ biến ở Linh Sinh Vực hậu thế.
+Do đó nó không bắt buộc phải thuộc nhánh Linh Sinh silic phổ biến ở Linh Sinh Vực hậu thế.
 
 Hình thái được ghi lại trong thần thoại cũng không thống nhất:
 
@@ -434,7 +438,7 @@ Sau đó do xung đột Sinh–Tử trong chính bản thể:
 
 ## Phân mảnh Pháp Tắc
 
-Working:
+Đang xây dựng:
 
 ### Phượng Tổ
 - 90% hệ Sinh Mệnh;
@@ -480,7 +484,7 @@ Bản thể:
 
 > không có giới tính cố định.
 
-Avatar có thể:
+Hóa thân có thể:
 - nam;
 - nữ;
 - vô giới.
@@ -489,7 +493,7 @@ Sinh sản không phụ thuộc hoàn toàn vào giao tử.
 
 Nếu đủ nguyên liệu / bản nguyên:
 
-> có thể tạo hạt sinh mệnh cho một cá thể khác mang thai bất kể avatar hiện tại.
+> có thể tạo hạt sinh mệnh cho một cá thể khác mang thai bất kể hóa thân hiện tại.
 
 Do đó:
 
@@ -513,11 +517,11 @@ Bao gồm:
 - Thập Bát Kiếm Lưu;
 - các Đại Kiếm Quyết cơ chế sâu.
 
-Nguồn gốc lịch sử đã khóa: **Kiếm Tiên đầu tiên sáng tạo Cửu Đại Kiếm Thuật**. Hắn nhận truyền thừa của Chân Tiên Nhân tộc đầu tiên nên không bị khóa con đường bởi công pháp giới hạn dành cho nô lệ. Hệ tu lúc ấy vẫn chưa chuẩn hóa.
+Nguồn gốc lịch sử đã khóa: **Kiếm Tiên đầu tiên sáng tạo Cửu Đại Kiếm Thuật**. Hắn nhận truyền thừa của Chân Tiên Nhân tộc đầu tiên và luôn chạy trốn nên không chịu trần công pháp dành cho nô lệ. Cực ít người biết quan hệ sư đồ ấy. Hệ tu lúc ấy vẫn chưa chuẩn hóa.
 
 Hạt nhân:
 
-> **ngộ tính > raw output.**
+> **ngộ tính > sức công phá trực tiếp.**
 
 Cổ Kiếm Tu có thể chém:
 
@@ -538,7 +542,7 @@ Cổ Kiếm Tu có thể chém:
 Nhược:
 - ngộ tính cực cao;
 - khó đại trà;
-- phụ thuộc hiểu đúng target;
+- phụ thuộc hiểu đúng đối tượng;
 - dễ kẹt cảnh.
 
 ---
@@ -547,7 +551,7 @@ Nhược:
 
 Nhánh kiếm tu khác phát triển theo hướng:
 
-> **sát thương trực tiếp + output lớn + dễ chuẩn hóa hơn.**
+> **sát thương trực tiếp + sức công phá lớn + dễ chuẩn hóa hơn.**
 
 Có thể gây:
 
@@ -564,7 +568,7 @@ Không quá cần hiểu một khái niệm sâu như Cổ Kiếm Tu.
 
 ### Linh Kiếm Tu
 
-Target hóa thành vùng không gian.
+Đối tượng hóa thành vùng không gian.
 
 Linh Kiếm Tu:
 
@@ -578,7 +582,7 @@ Nhược:
 - tiêu hao khổng lồ;
 - dễ phát giác;
 - dễ chạy trước;
-- chém thiếu → target hồi phục.
+- chém thiếu → đối tượng hồi phục.
 
 ### Cổ Kiếm Tu
 
@@ -610,7 +614,7 @@ Họ mạnh ở:
 
 Cổ Kiếm Tu mạnh ở:
 
-- solo đỉnh cao;
+- đơn đấu đỉnh cao;
 - cơ chế;
 - tiết kiệm;
 - bất ngờ;
@@ -633,7 +637,7 @@ Ghi chú này chỉ để tránh tương lai trộn hai loại tồn tại với
 
 Nó sinh ra **trong** thế giới, nhưng không nhất thiết là hiện thân bắt buộc của một khái niệm nền.
 
-Sau Đại Hợp Giới, **Tiên Thiên Thần Arclune** sẽ là một nhóm sâu hơn về ontology:
+Sau Đại Hợp Giới, **Tiên Thiên Thần Arclune** sẽ là một nhóm có quan hệ bản thể sâu hơn:
 
 > sinh ra trực tiếp từ **khái niệm của Arclune** và bị khóa bản thể với Arclune.
 
@@ -654,7 +658,7 @@ Nó là:
 
 > **quan hệ bản thể: phản bội Arclune tương đương phủ định nền tồn tại làm chính nó sinh ra.**
 
-Chi tiết này thuộc lore Arclune và sẽ được mở rộng ở world bible Arclune, không nên dùng ngược để định nghĩa mọi Linh Sinh Nạp Hư.
+Chi tiết này thuộc nền thế giới Arclune và sẽ được mở rộng ở tài liệu nền thế giới Arclune, không nên dùng ngược để định nghĩa mọi Linh Sinh Nạp Hư.
 
 
 ---
@@ -783,7 +787,7 @@ Do đó mọi Đại Tuyệt Thể đều có tính chất chung:
 
 > **có thể trưởng thành / mở khóa / biến đổi sâu theo đời sống và tu vi chủ thể.**
 
-Thể Chất không phải gói ability cố định.
+Thể Chất không phải gói năng lực cố định.
 
 Càng trưởng thành:
 
@@ -886,10 +890,12 @@ Thần Huy đã từng tới thăm dò / giao lưu trước khi quá trình chu�
 
 ---
 
-# XX. THỌ NGUYÊN NẠP HƯ — CẦN TỔNG KẾT, CHƯA ĐỔI SỐ
+# XX. THỌ NGUYÊN NẠP HƯ — TĂNG TỪ ĐẠI CẢNH GIỚI THỨ TƯ
 
-**LOCKED:** Thiên Địa Chính Tiên không có thọ nguyên hữu hạn; Chân Tiên mỗi khi lĩnh ngộ thêm một Pháp Tắc cũng tăng tuổi thọ.
+**ĐÃ CHỐT:** nâng tuổi thọ nền từ đại cảnh giới thứ tư trở đi, kết hợp với việc Chân Tiên lĩnh ngộ thêm Pháp Tắc thì tăng thọ. Thiên Địa Chính Tiên không có thọ nguyên hữu hạn.
 
-Mốc **Bán Thần tối đa bốn triệu năm** thuộc đạo thống Main dùng **Aether**, nguồn năng lượng cao hơn. Đây là mốc đối chiếu cho chiều sâu lịch sử, không tự động gán cùng tuổi thọ cho Chân Tiên chỉ vì hai bên cùng bracket sức mạnh.
+**ĐANG XÂY DỰNG, tác giả đã chọn dùng:** trần tuổi thọ ở đỉnh cảnh 4–8 lần lượt là **10.000 / 30.000 / 100.000 / 300.000 / 600.000 năm**; Chân Tiên mới chứng một Pháp Tắc có mốc nền **1.000.000 năm**. Các số là phương án hiện tại, còn điều chỉnh được; không gắn thêm hệ số kéo dài do ngủ / hợp nhất sâu khi chưa chốt.
 
-**OPEN:** có tăng tuổi thọ nền các cảnh Nạp Hư hay không; tuổi thọ nền của Chân Tiên; mức tăng theo từng Pháp Tắc, giới hạn và điều kiện áp dụng. Tác giả muốn khoảng thọ nguyên không lệch quá xa mốc Bán Thần, nhưng chưa khóa một bảng số mới.
+Bảng đầy đủ, định nghĩa và hệ quả lịch sử nằm trong [Hệ thống tu luyện, sức mạnh và tuổi thọ](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md). Tài liệu ấy đã đối chiếu tệp tác giả gửi với dữ kiện mới trong kho mã; các phần xung đột hoặc đề xuất chưa duyệt không tự trở thành dữ kiện đã chốt.
+
+**CÒN MỞ:** mức tăng theo từng Pháp Tắc, giới hạn, điều kiện áp dụng, phân bố tuổi thọ giữa các tiểu cảnh và cơ chế giảm hao thọ. Tuổi thọ khi dùng **Aether** sẽ quyết định sau khi xây xong Nạp Hư và Thần Huy. Mốc Bán Thần bốn triệu năm của hệ Main vẫn là điểm đối chiếu, không phải hệ số chuyển đổi.
