@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-03-F.11
+**Version:** 2026-10-04-F.12
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -20,6 +20,8 @@
 ---
 
 **Revision F.11:** adds TGT-008 Position-binding/default precision, POS-008/009 bounded relocation/deferred-counter/truly-empty law, DMG-035 isolated Damage projection, TRG-016 stable-health mandatory settlement and ACT-034 opportunity-start dependency. All prior IDs/profiles remain intact; no new Tag/Primitive or global priority.
+
+**Revision F.12:** refines ACT-034's captured-value lifetime through authored normal State termination and DMG-035's pre-Damage eligibility/mandatory atomic terminal credit. No new Contract ID, Tag, Primitive or ordering between unrelated settlements.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -1133,6 +1135,8 @@ Keys include observed Action, runtime trigger owner, instantiated candidate and 
 After SSI/Mode grants an owner's Natural Action opportunity, register and finish its declared finite opportunityStartSettlement before ordinary CC, selection or Action admission for that same grant. A retained State's first later grant is anchored by owner + Combat Instance + opportunity serial greater than its creation serial; it cannot consume a still-open creation opportunity. Existing grants/actor-window reset bookkeeping are preserved; this profile neither creates a grant nor advances SSI twice.
 
 A CC-lost opportunity still runs the required start settlement, then follows ACT-012 with no actual Natural Action or completion. Completion-based refresh/durations/class gain remain unchanged. State termination at a retained reserved coordinate is not POS-010/011 materialization when Field Presence/occupancy never left. Heal, if authored, follows ordinary HEL-* rules and is terminal before control continues. Death/leave/State retirement cancels work according to its lifetime, never applying it to a new owner instance.
+
+An authored termination graph may capture declared State values through existing Snapshot semantics before it removes that State. The graph's own expected normal removal does not invalidate its already-registered remaining work or those immutable bindings. Keep the original owner/Combat Instance/life/presence, State instance and grant identity until terminal settlement. Consumers after removal use the captured value, not a live counter on the retired State or a newly created replacement. Death/leave or unrelated retirement before this handoff still cancels as authored; subsequent owner-instance invalidity cannot Heal a replacement presence. A blocked/zero Heal closes the same settlement without restoring the removed State or creating a retry. Other live formula operands/modifiers retain their declared checkpoints.
 
 Keys include owner/instance, observed grant, retained State and dependency. Conditions/clean failure close finite work; no waits on the held grant's future Action, cyclic edges, fake Actions or cross-instance dependencies. Multiple observable competing settlements require explicit composition, not queue priority. Save/resume completes this same grant/settlement once. Other Modes must supply the same opportunity abstraction or explicit 07 adaptation; do not convert it to seconds.
 
@@ -3682,9 +3686,13 @@ Commit Shield/HP and immutable DamageResult through existing P-040/041/042 and T
 
 An active State's opted-in query observes a retained enemy Natural fixed-positional Damage batch whose locked area contains its reserved Position. At POST_POSITIONAL_INTERPOSITION_PRE_DAMAGE, retain the batch's actual authored packet/formula/source/threshold bindings and authoritative defensive State/Shield/HP view. Resolve how much HP this one recipient would lose if only the named State-owned admission clauses were ignored. Other admission/Hit/Authority/mitigation/reduction/Shield/allocation laws stay applicable. No speculative movement, hypothetical downstream lifecycle or damage-listener execution.
 
+Seal query membership against that exact active State at the pre-Damage checkpoint. It is independent from actual recipient admission, so exclusion of every real recipient does not erase a qualifying query. A State created after this batch commits, including by TRG-016, cannot project this earlier batch. Retained inputs are not a license to scan/replay past Damage against a newer State.
+
 Reuse RES-001 calculation/P-040/P-041 with an isolated proposed-delta view. Multiple packet demands share one hypothetical Shield/HP budget under their applicable RES-002/008 policy; no per-packet double spend. Seal a distinct DamageProjectionResultRef(projectedActualHpDamage, batch/recipient/state/rule refs, phase version/input bindings). It is not a committed DamageResult or Actual HP Damage gameplay credit, and cannot enter P-043, Lifesteal, Reflect, HP_ZERO, ordinary listeners or action results.
 
 Calculation consumes no real HP/Shield, emits no Damage, pays no resource and advances no gameplay RNG. Retained applicable draw facts or a declared pure keyed probe may be used; missing/unprojectable inputs require an explicit supported profile, not a guessed average or new ordinary draw. At observed batch terminal, an authored State transaction can credit the estimate once if that same State remains valid; a named-exclusion local no-recipient outcome may still be terminal. Abort/retired-State work receives no credit. A later batch independently reads then-current real state; never carry a shadow HP/Shield timeline forward.
+
+When credit is authored, its credit/no-credit decision is required finite bookkeeping after the complete real batch and mandatory lifecycle/reconciliation, before next direct-group/Action/SSI continuation. Holding ordinary Reactions does not hold this dependency. A still-valid State receives one joined commit of counter delta and terminal credit identity; zero projection closes successfully without inventing positive Damage. Abort/retirement closes without credit. A return/removal graph cannot overtake a pending earlier batch credit. Multiple non-commuting mandatory settlements still need their explicit composition; this law adds no winner or unrelated priority. Reject dependencies that wait on their own held continuation.
 
 Use batch + query/State instance + recipient + phase identity for calculation/credit deduplication. Keep the retained view/result until dependent credit is terminal; retain terminal identity across replay without replaying a committed counter update. Pure calculation and later State credit are separate boundaries. No new Damage type/Tag/Primitive or Character projection branch.
 

@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-03-E.9
+**Version:** 2026-10-04-E.10
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -18,6 +18,8 @@
 **Revision E.8:** adds one opt-in reflected scalar packet profile under DMG-034, explicit packet-kind reduction scope and retained immediate-Damage-Source result grouping through existing owners. No fourth ordinary component type, Tag, Primitive or new lifecycle barrier.
 
 **Revision E.9:** preserves explicit target locks while making the new-content Slot default concrete; adds bounded pre-Damage positional relocation/deferred-counter batching, distinct read-only fixed-area Damage projection, mandatory stable HP/MaxHP and owner-opportunity-start profiles through existing plans. No new Tag, Primitive or callback/priority system.
+
+**Revision E.10:** completes existing projection-credit and opportunity-start lifetime bindings: credit-bearing queries close before batch continuation, and an authored State-termination graph retains captured values through its own terminal Heal. Existing tags/facets, snapshots, State transactions and finite dependency plans suffice; no new field family, Contract ID, Tag or Primitive.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -1261,6 +1263,8 @@ opportunityStartSettlement:
 ```
 
 The first later owner grant may terminate State and resolve an ordinary Heal before the same opportunity's CC/selection/admission. It creates no Action/opportunity and does not turn a CC-lost opportunity into an actually performed/completed Action. Use the existing scheduler's grant identity and retain cleanup/source-validity policies. Reject foreign/stale owner/State refs, waits on the held opportunity's future Action, cycles or unsupported Mode clocks. Existing actual-action clocks/postActionSettlement remain unchanged.
+
+When this finite graph consumes a State-owned counter and then removes that same State, declare the value capture before removal with existing SnapshotSpec/P-002 and a typed SNAPSHOT_REF for later consumers. Retain only the declared values, original State/owner/instance and grant identity until the graph is terminal. Its explicitly authored normal removal does not cancel its own already-registered remaining nodes; death/leave or unrelated retirement follows the declared lifetime and owner-instance guards. A later Heal must not query a retired State's live COUNTER_REF or attach the old settlement to a replacement State. Other formula operands keep their own read checkpoints; capturing a counter does not silently snapshot CurrentMaxHP or final Heal modifiers.
 
 ---
 
@@ -2605,7 +2609,11 @@ damageProjectionQueries:
 
 Only a locked area containing this reserved coordinate qualifies; random/direct targeting does not. Retain original Damage definitions, formula/source/threshold Snapshot bindings and this checkpoint's authoritative defensive/Shield/HP view. Bypass only the named scoped recipient-admission clauses; refs must resolve to DAMAGE-admission clauses of that same active State/subject/Combat Instance. They cannot disable lifecycle or arbitrary foreign rules. Other admission/Hit/mitigation laws still apply. Multiple packets share one hypothetical recipient budget under the original explicit allocation policy. No persistent hypothetical timeline exists between batches.
 
+Freeze query eligibility and its exact State instance at this pre-Damage checkpoint, independently from the batch's actually admitted recipients. A State created by this batch's later stable-health settlement cannot register a query retrospectively or estimate already-committed Damage. An excluded coordinate may still supply the explicitly retained projection inputs when the real recipient set is empty.
+
 `DAMAGE_PROJECTION_REF` reads only this typed result's `projectedActualHpDamage`; it cannot satisfy ACTUAL_HP_DAMAGE_REF, P-043 committed Damage queries or ordinary Damage listeners. The existing State counter can receive this estimate once when that observed batch is terminal (including a local no-admitted-recipient outcome caused by the named exclusion), not if the batch aborts or the owning State has retired. Counter update is an ordinary State transaction; calculation itself makes no mutation/Event/Cost or gameplay RNG advance. Unsupported missing recipient/formula/snapshot/Hit/numeric/projection inputs fail closed. Reuse retained draw facts or an explicitly supported pure keyed probe; never invent expected Damage for a non-projectable random profile.
+
+Authoring `creditStateCounterRef` makes that credit decision a required finite batch-terminal dependency under DMG-035. After the whole real batch and mandatory lifecycle/reconciliation, close it as successful credit or terminal no-credit before the batch's next direct-group/Action/SSI continuation. Ordinary Reaction holds cannot postpone it. The counter delta and terminal credit identity share one State transaction, including a valid zero estimate; do not leave a replayable success marker without its delta or a delta without its marker. This is query-owned bookkeeping, not another health mutation, Action or global priority. Observable conflicts with unrelated mandatory work still require explicit composition. Return/removal graphs consume already-terminal credits; no graph may wait for the future continuation that it blocks.
 
 ---
 
@@ -5368,6 +5376,8 @@ The existing effectGraph/primitiveRequests also preserve the opt-in reflected sc
 
 Existing targetPlan/triggerGraph/effectGraph/snapshot/result plans also retain TGT-008 explicit coordinate/occupant timing, POS-008/009 bounded phase/assignment/success/deferred-counter refs, DMG-035 isolated projection result/query bindings, TRG-016 mandatory health observations and ACT-034 finite grant-start dependencies. Keep their typed query/State/Action/commit/phase identities; do not synthesize a Character runtime, new top-level subsystem or general hook. Prior explicit locks/profiles remain unchanged.
 
+For E.10 credit-bearing queries, the same plans carry the pre-Damage query-membership seal, batch-terminal credit dependency and joined delta/terminal identity. Opportunity-start graphs carry declared counter SnapshotRefs through their own normal State removal and remaining terminal work. Neither lowering path converts these finite dependencies into ordinary Reactions or live reads of retired State.
+
 ## 51.1 Why IR exists
 
 IR isolates Character content from:
@@ -6445,6 +6455,8 @@ At minimum validator must enforce:
 ---
 
 Additional E.9 invariants: explicit movement-sensitive Position/Entity binding; no renderer-based emptiness or hidden coordinate re-selection; bounded fixed-area interposition and supported matching; atomic success-only allowance/obligation; declared counter release/batch/retention/allocation; projection result cannot satisfy committed-result queries; complete isolated input/budget/credit identity; stable-health fields and finite pre-continuation dependency; owner/grant/State-instance anchor before control. Reject cycles, unavailable snapshots/Mode adapters and undeclared observable competing interactions.
+
+Additional E.10 invariants: projection membership is sealed while the exact State is active before Damage, never rebuilt from a later health activation; authored credit dependencies close after complete batch/lifecycle and before continuation, including exclusion-only and zero-result terminals; credit delta and dedup identity commit together. A State-termination graph must capture values it needs after removal, preserve its own registered terminal work and reject live retired-State reads or stale-owner continuation. Tag validation continues to use the exact 02 registry: area geometry and damage-derived Heal are facets/composition, not undeclared AREA or deferred LIFESTEAL Functional Tags.
 
 # 93. SCHEMA NON-GOALS
 

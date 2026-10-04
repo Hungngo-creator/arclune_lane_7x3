@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-03-INDEX-11
+**Version:** 2026-10-04-INDEX-12
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-03-INDEX-11`
+**Version:** `2026-10-04-INDEX-12`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-03-E.9`.
+**Version:** `2026-10-04-E.10`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-03-F.11`.
+**Version:** `2026-10-04-F.12`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-03-G.10`
+**Version:** `2026-10-04-G.11`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-03-I.10`
+**Version:** `2026-10-04-I.11`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -158,7 +158,9 @@ In `docs/canon kit/`:
 
 - `Anatta_Clarified_Gameplay_Canon.md` R1, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw #59 supersedes old Reflect1turn/Heal30%/Authority. Incoming Natural-start recipient MaxHP plus exact received ActualHP outcome, READY→ACTIVE_REFLECT→COOLDOWN actual-completion clocks, source-local35% reflection with explicit ARM/RES bypass/Final DR/Shield and simultaneous multi-source commit, terminal20% committed reflection Heal, paid Rage20→continuous excess AE, one-hit non-Basic Skills and one enhanced Skill3 Ultimate child are normalized. Metadata/adapters remain NOT BLOCKING.
 
-- `Savitar_Clarified_Gameplay_Canon.md` R2, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. New raw4 entry77: explicit Slot-bound Basic/current occupant, fixed-column pre-Damage seeded relocation/claims, retained post-root simultaneous proportional afterimage counters, present reserved temporal Damage-admission protection, isolated per-batch Damage projection, mandatory HP/MaxHP checkpoint and return-before-CC owner opportunity, delayed3+1 coefficient/Cost/Heal controller and one exact Ultimate child. Metadata/old-lock migration/external composition remain NOT BLOCKING.
+- `Savitar_Clarified_Gameplay_Canon.md` R3, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw4 entry77: explicit Slot-bound Basic/current occupant, fixed-column seeded relocation/claims, retained post-root simultaneous afterimage counters, present reserved Damage admission, isolated per-batch projection, mandatory HP/MaxHP and return-before-CC, delayed3+1 controller and one exact Ultimate child. R3 supplies exact smallest-owner Functional Tag/facet mapping, pre-Damage projection eligibility and mandatory terminal credit, captured accumulator through normal temporal-State removal, battle-participant use versus presence-controller clocks, and current-base composition proof. Metadata/old-lock migration/external composition remain NOT BLOCKING.
+
+E.10/F.12/G.11/I.11 completes existing DMG-035 credit and ACT-034 termination graph laws. Credit-bearing projections seal eligibility before Damage and close their joined State-delta/terminal identity before batch continuation, even under ordinary Reaction holds; later health activation cannot project the triggering batch. Opportunity-start graphs capture needed State values before their own normal removal and retain those bindings through terminal Heal without reusing a retired live counter. No new Contract ID, Tag, Primitive or priority/store/service. Savitar uses existing DAMAGE/PHYSICAL_DAMAGE/WILL_DAMAGE, POSITION_MUTATION, HEAL and DAMAGE-scoped IMMUNITY; AREA is geometry, LIFESTEAL remains deferred composition. 01/02/03/07 and recovery audit remain unchanged; M-094–M-099 add six declarative obligations. Root readme.md is removed as requested; AGENTS.md and this INDEX remain the repository entry points.
 
 E.9/F.11/G.10/I.10 adds only bounded typed laws through existing owners: TGT-008 binding/default precision, POS-008/009 relocation/deferred-counter/truly-empty, DMG-035 read-only projected result, TRG-016 stable health and ACT-034 opportunity-start settlement. Slot default applies to new otherwise-undeclared attack binding; approved explicit Entity/Both profiles and all prior Character Canons remain unchanged. No new Tag/Primitive/Character branch/middleware/global priority. 01/02/03/07 remain unchanged; M-082–M-093 are declarative Architecture Phase obligations, not executable results.
 
