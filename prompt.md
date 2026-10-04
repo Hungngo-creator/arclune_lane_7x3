@@ -211,10 +211,14 @@ At the earliest known stage there are two special primordial awakened beings.
 - is one of the earliest known Linh Sinh;
 - does not require ordinary food/drink;
 - later possesses a major Diễn Hóa axis;
-- sees Nguyên Sơ split and naively thinks he should try splitting himself too;
+- has matured despite his youthful form/temperament; a Thiên Địa Chính Tiên has no finite lifespan;
 - creates twelve children from portions of his own laws/power;
 - directly becomes the ancestral source behind humanity;
-- later weakens himself and enters reincarnation.
+- grows bored of eternal life after his closest friend Nguyên Sơ has gone;
+- knows reincarnation is a new, unclear path on which he can become anything;
+- leaves his children to choose their own lives;
+- forges a sword from his blood and arm bones before leaving;
+- later weakens himself, silently watches living beings for a moment, and dissolves into reincarnation without speaking.
 
 ### Nguyên Sơ
 
@@ -311,6 +315,8 @@ It is closer to:
 
 The children eventually mature mentally under Nhân Tổ’s teaching.
 
+They tell humanity / their descendants about Nhân Tổ and Long/Phượng. Whether Nhân Tổ told them about Nguyên Sơ, and whether they passed that story on, remains OPEN.
+
 They later choose reincarnation one by one because:
 - endless existence becomes boring;
 - weaker beings fear them;
@@ -382,7 +388,9 @@ Early Heaven’s Dao:
 - can make beneficial moves;
 - can also be simplistic or stupid.
 
-Reincarnation forms before Heaven’s Dao becomes fully conscious.
+Reincarnation already exists before Heaven’s Dao begins awakening, but is initially incomplete.
+
+Long/Phượng’s deaths later make reincarnation more complete. The exact improvements and mechanism remain OPEN.
 
 Heaven’s Dao does not invent reincarnation from scratch.
 
@@ -420,11 +428,11 @@ They live much longer than ordinary True Immortals but are not truly immortal.
 
 Near the ends of their lifespans, they fight to consume the missing half.
 
-They die before the darkest peak of the Human Dark Age.
+They die before the Human Dark Age. Yao power fragments into 30,000 years of conflict after their deaths. At the end of that interval the later first Yao True Immortal leaves seclusion, breaks through to True Immortal, consolidates power, and the Dark Age begins.
 
 Their descendants later cut up and consume their remains using ancestral weapons.
 
-The first Yao True Immortal also obtains/eats part of those remains after violent competition.
+The being later called the first Yao True Immortal obtains/eats part of those remains after violent competition, while not yet a True Immortal.
 
 Their deaths may be part of the world becoming more complete because Life/Death fragments previously concentrated in them return to the wider world.
 
@@ -450,6 +458,10 @@ He is a later acquired cultivator who climbs through an incomplete early cultiva
 He knows Long/Phượng’s relationship to Nhân Tổ and does not care.
 
 He becomes the brutal oppressor of multiple races, especially humans.
+
+Humans may cultivate to live longer and work better, but their cultivation manuals and access to higher realms are restricted. They lack offensive techniques; books are burned, geniuses eliminated, food limited to avoiding starvation, and labor continuous.
+
+At least 100,000 years separate the Twelve Children’s creation of humanity from the Yao Immortal’s army approaching in the sword incident. This is an encompassing interval, not automatically an extra interval to add to the 30,000 years.
 
 The Dark Age lasts at least:
 
@@ -510,7 +522,9 @@ The first Yao True Immortal remains active within the seal:
 
 The first Sword Immortal grows while his future enemy remains a conscious dark presence in the age.
 
-He eventually becomes the historical foundation of Cổ Kiếm Tu.
+He inherits the first Human True Immortal’s cultivation legacy, so slave-manual restrictions do not close his path. The inherited system remains primitive.
+
+He creates the Nine Great Sword Arts (Cửu Đại Kiếm Thuật) and becomes the historical foundation of Cổ Kiếm Tu.
 
 ---
 
@@ -596,7 +610,7 @@ Before Nạp Hư’s World Barrier is fully tightened:
 - great worlds can contact one another;
 - trade/exploration/espionage/war are possible.
 
-Nạp Hư and Thần Huy did have contact before the Great Fusion.
+Nạp Hư and Thần Huy did have contact before the Great Fusion, including a locked encounter during the Human/Yao Dark Age. Do not place all contact after Phật Tổ; the date of absolute first contact and later technical exchanges remains OPEN.
 
 This may overlap with the wider period around invasion by the Ma-Dao Great World.
 
@@ -614,6 +628,23 @@ It is acceptable and desirable that:
 remain as historical evidence.
 
 This helps explain Tinh Hải Thần Châu’s later access to Thần Huy technical traditions.
+
+---
+
+# 17A. NHÂN TỔ’S SWORD & DARK-AGE CONTACT — LOCKED
+
+- Nhân Tổ forges the sword from his blood and arm bones before reincarnation.
+- Only Nhân Tổ or the Twelve Children can control it.
+- To deter indiscriminate killing, one strike costs the user death and entry into reincarnation.
+- During the Dark Age a child who has lived many reincarnations, awakened memory, and cultivation below True Immortal kills a Thần Huy New God with one strike.
+- That New God is in the first Yao True Immortal’s bracket; do not generalize this to all New Gods.
+- The user dies; all other children have reincarnated but have not awakened memory.
+- Thần Huy does not know this gap, suspects a trap, and withdraws. The Yao Immortal witnesses the death just before his army arrives and also withdraws. Nhân Hoàng Cung is humanity’s last sanctuary then.
+- Thần Huy later withholds the sword secret from the Ma-Dao Great World, fearing a trap.
+- Some native Nạp Hư witnesses later become Ma cultivators; this knowledge predates the foreign Ma-Dao invasion.
+- High leadership of Thiên Ma Môn and Cực Lạc Ma Tông keeps the secret to protect its resources and use foreign attacks to test whether Nhân Hoàng Cung can still deploy the sword.
+- The sword is Nhân Hoàng Cung’s locked deterrent against the two native Ma Tôn. Do not assume an awakened eligible user is always present.
+- The child’s identity, institutional founding dates, transmission of the secret, and additional sword uses remain OPEN.
 
 ---
 
@@ -655,6 +686,8 @@ This determines whether:
 - or only his school/descendants take part.
 
 Do not choose a number immediately.
+
+The author is considering lifespan changes but has not locked a new Nạp Hư table. Each additional Law a True Immortal comprehends increases lifespan. Main’s Demi-God limit of four million years uses higher-order Aether; use it as a comparison, not a direct lifespan conversion.
 
 Work backward from:
 - lifespans;
@@ -911,6 +944,8 @@ Focus on:
 - invasion;
 - why Heaven’s Dao finally closes/tightens the Barrier.
 
+Native Nạp Hư Ma cultivators already existed before the Ma-Dao Great World invasion. Some had witnessed Nhân Tổ’s sword before turning to Ma-Dao. Distinguish them from foreign invaders and the foreign traditions later left behind.
+
 Do not treat every foreign world as equally important.
 
 Only build extra Great Worlds when history needs them.
@@ -919,7 +954,7 @@ Only build extra Great Worlds when history needs them.
 
 Focus on:
 
-- why Ma-Dao becomes internal;
+- development of native Ma cultivators and internalization of foreign Ma-Dao traditions;
 - blood-sacrifice mechanism;
 - scale;
 - coalition;
