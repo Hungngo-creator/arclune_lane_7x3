@@ -11,15 +11,31 @@
 ~~~
 Nạp Hư hình thành
 ↓
-sinh mệnh / vật vô tri bắt đầu diễn hóa
+thuở sơ khai chỉ ghi nhận hai Linh Sinh Nguyên Sơ: Nhân Tổ và Nguyên Sơ
 ↓
-các Linh Sinh sơ khai xuất hiện
+Nhân Tổ mang hình hài bé trai; Nguyên Sơ là quang thể vô giới tính, hình thái biến ảo
 ↓
-Linh Sinh Nguyên Sơ về sau tách thành Long Tổ + Phượng Tổ
+Nguyên Sơ xuất hiện đau đớn, bản thể dần phân hóa Sinh Mệnh / Tử Vong
 ↓
-Yêu tộc và các sinh linh Tiên Thiên hậu thế phát triển
+Nguyên Sơ vỡ thành hai luồng sáng; tại chỗ để lại hai quả trứng
 ↓
-Nhân tộc xuất hiện
+Long Tổ + Phượng Tổ nở ra; Nhân Tổ chăm sóc chúng
+↓
+sinh mệnh hậu thế bắt đầu phong phú nhanh hơn; khái niệm chết trở nên hữu hình với Nhân Tổ
+↓
+Long Tổ + Phượng Tổ đủ sức tự lập rồi rời Nhân Tổ, mỗi bên đi riêng và vẫn không hòa hợp
+↓
+Nhân Tổ vì cô độc / chán nản lựa chọn binh giải, chia Pháp Tắc tạo mười hai người con
+↓
+Nhân Tổ dạy mười hai người con cách dùng huyết của nhau để tạo sinh linh rồi vào Luân Hồi
+↓
+mười hai người con trưởng thành, có kẻ ở lại, có kẻ rời đi; cuối cùng lần lượt chọn Luân Hồi
+↓
+đứa con cuối cùng còn ở lại chứng kiến Thiên Đạo bắt đầu thức tỉnh khi sinh linh đủ nhiều
+↓
+Luân Hồi hình thành trong quan hệ Sinh–Tử bắt nguồn từ hai luồng sáng của Nguyên Sơ
+↓
+Yêu tộc và Nhân tộc hậu thế phát triển
 ↓
 Hắc Ám Kỷ: Yêu tộc thống trị / nô dịch / huyết thực Nhân tộc
 ↓
@@ -320,35 +336,171 @@ Không cần đợi Đại Hợp Giới.
 
 ---
 
-# XII. NHÂN TỔ THUỘC GIAI ĐOẠN NÀO?
+# XII. NHÂN TỔ THUỘC THUỞ SƠ KHAI — KHÔNG PHẢI NHÂN VẬT HẬU KỲ
 
-Nhân Tổ là:
+Điểm cũ đã bị thay thế hoàn toàn.
 
-> Thiên Địa Chính Tiên của Nhân tộc.
+Nhân Tổ không phải người xuất hiện sau khi Nhân tộc đã hình thành nền văn minh.
 
-Exact position trong chronology vẫn cần khóa.
+Hắn là:
 
-Nhưng chắc chắn:
+> **một trong đúng hai Linh Sinh Nguyên Sơ được biết ở thuở đầu Nạp Hư.**
 
-- sau khi Nhân tộc đủ trưởng thành để có hệ tu cao;
-- trước đương thế;
-- đủ sớm để 12 người con, Thập Nhị Thể và Nhân Hoàng Cung trở thành cổ sử.
+Linh Sinh còn lại là:
 
-Nhân Tổ không nhất thiết trùng với:
-- Chân Tiên Nhân tộc đầu tiên;
-- Kiếm Tiên đầu tiên.
+> **Nguyên Sơ**, bản thể tiền thân của Long Tổ + Phượng Tổ.
 
-Nên để là một nhân vật khác để lịch sử không bị vài người gánh toàn bộ.
+### Hình tượng Nhân Tổ
+
+Nhân Tổ mang hình hài:
+
+> **một bé trai hoạt bát, sáng sủa.**
+
+Hắn không cần ăn uống.
+
+Thuở đó thiên địa gần như trống:
+
+- chỉ có những cây nhỏ;
+- một ít cỏ;
+- chưa có hệ sinh thái phong phú;
+- chưa có xã hội để hắn học đạo đức, cái chết hay gia đình theo nghĩa hậu thế.
+
+Nhân Tổ và Nguyên Sơ vì vậy không phải “hai vị đại năng gặp nhau”.
+
+Họ là:
+
+> **hai sinh linh đầu tiên cùng tồn tại trong một thế giới còn gần như chưa có ai khác để nói chuyện.**
+
+### Quan hệ với Nguyên Sơ
+
+Nguyên Sơ ít nói.
+
+Nhân Tổ hoạt bát hơn.
+
+Một ngày, Nguyên Sơ lần đầu nói với hắn:
+
+> **“Ta cảm thấy đau.”**
+
+Sau đó bản thể Nguyên Sơ dần phân màu:
+
+- xanh / sức sống;
+- xám–đen / tử vong.
+
+Nhân Tổ lo lắng nhưng hoàn toàn không có tri thức để cứu.
+
+Sau một khoảng thời gian không rõ:
+
+> Nguyên Sơ vỡ nát.
+
+Hai luồng sáng biến mất khỏi tầm mắt.
+
+Tại chỗ còn:
+
+> **hai quả trứng — Long Tổ và Phượng Tổ.**
+
+Nhân Tổ không hiểu chuyện gì vừa xảy ra, chỉ biết Nguyên Sơ đã không còn nói chuyện với mình.
+
+Hắn ở lại chăm hai quả trứng cho tới khi chúng nở.
+
+### Khi sinh mệnh khác xuất hiện
+
+Sau biến cố Nguyên Sơ:
+
+> Nạp Hư bắt đầu xuất hiện ngày càng nhiều sinh vật.
+
+Nhân Tổ quan sát chúng:
+
+- sinh;
+- lớn;
+- yếu dần;
+- bất động.
+
+Hắn không hiểu:
+
+> **“chết” là gì.**
+
+Đây có thể là một trong những nền tâm lý sâu nhất của Nhân Tổ: hắn tồn tại trước khi “cái chết” trở thành tri thức bình thường của sinh linh.
+
+### Long / Phượng rời đi
+
+Long Tổ và Phượng Tổ từ khi sinh ra đã không hòa hợp.
+
+Khi đã đủ sức tự kiếm ăn / tự tồn tại:
+
+> cả hai lần lượt rời Nhân Tổ.
+
+Chúng cũng không ở cùng nhau.
+
+Nhân Tổ trở lại trạng thái cô độc.
+
+Chính sự cô độc kéo dài là động lực trực tiếp khiến hắn:
+
+> **binh giải chính mình để tạo mười hai người con.**
+
+### Mười hai người con
+
+Nhân Tổ chia Pháp Tắc / quyền năng của mình thành mười hai phần để tạo mười hai người con.
+
+Hắn ở lại đủ lâu để:
+
+- nuôi dạy;
+- cho họ trưởng thành về tâm trí;
+- chỉ họ cách dùng **máu của nhau** làm nguyên liệu / môi giới để tạo sinh linh mới.
+
+Sau đó:
+
+> Nhân Tổ tự suy yếu và vào Luân Hồi.
+
+Mười hai người con có tính cách khác nhau vì:
+
+> **mỗi người là biểu hiện sống của phần Pháp Tắc cấu thành mình.**
+
+Tính cách của họ về sau cũng là chìa khóa để thiết kế 12 Đại Tuyệt Thể.
+
+Một số ở lại.
+
+Một số rời đi.
+
+Cuối cùng, vì:
+
+- thế giới lúc đó còn quá dài và quá trống;
+- những sinh linh yếu khác sợ hãi họ;
+- Luân Hồi hứa hẹn một cách tồn tại bớt nhàm chán hơn;
+
+mười hai người con cũng lần lượt chọn Luân Hồi.
+
+### Người con cuối cùng
+
+Người con cuối cùng còn ở lại đủ lâu để chứng kiến:
+
+> Thiên Đạo bắt đầu thức tỉnh.
+
+Nhưng Thiên Đạo lúc đó chưa có nhân cách hoàn chỉnh.
+
+Nó chỉ bắt đầu có:
+
+- phản xạ;
+- tính toán;
+- khả năng điều chỉnh;
+- những ý niệm cực mơ hồ.
+
+Cùng giai đoạn này:
+
+> **Luân Hồi hình thành tại ranh giới giữa Sinh và Tử, có nguồn gốc liên hệ trực tiếp tới hai luồng bản nguyên tách khỏi Nguyên Sơ.**
+
+Cơ chế exact của việc hai luồng Sinh–Tử sinh Luân Hồi chưa khóa và không nên giải thích quá sớm.
 
 ---
 
 # XIII. LONG–PHƯỢNG THUỘC CỰC CỔ
 
-Trước Long Tổ và Phượng Tổ chỉ có:
+Trước Long Tổ và Phượng Tổ chỉ có bản thể chung được hậu thế gọi đơn giản là:
 
-> **một Linh Sinh Nguyên Sơ.**
+> **Nguyên Sơ.**
 
-Bản chất nguồn gốc của nó cố ý để trống.
+Nguyên Sơ là một trong **hai** Linh Sinh Nguyên Sơ của thuở đầu; người còn lại chính là Nhân Tổ.
+
+Bản chất nguồn gốc của Nguyên Sơ cố ý để trống.
 
 Người hậu thế có thể nói nó là:
 
@@ -454,3 +606,207 @@ Nguyên tắc đã định hướng:
 > **Tiên Thiên Thần sẽ không phản bội Arclune.**
 
 Đây là khác biệt bản thể, không phải vì họ “ngoan” hơn hay bị giáo dục trung thành.
+
+
+---
+
+# XVII. CHÂN TIÊN NHÂN TỘC ĐẦU TIÊN & KIẾM TIÊN ĐẦU TIÊN — NỀN TIỂU SỬ ĐÃ KHÓA
+
+## Chân Tiên Nhân tộc đầu tiên
+
+Hắn không sinh ra trong thế gia hay tông môn.
+
+Thân phận ban đầu:
+
+> **hắc nô của một thế lực Yêu tộc.**
+
+Cuộc sống thường ngày là:
+
+- bị hành hạ;
+- bị xem như tài sản;
+- không có quyền tự quyết;
+- đứng ở tầng đáy nhất của trật tự Nhân–Yêu.
+
+Nhưng con gái của chủ nhân Yêu tộc:
+
+> có tình cảm với hắn.
+
+Nàng giúp hắn trốn đi.
+
+Điểm này trở thành một vết nứt cực quan trọng trong thế giới quan của hắn:
+
+> Yêu tộc là hệ thống áp bức hắn, nhưng một Yêu lại là người đầu tiên cứu hắn.
+
+Sau khi trốn, hắn lang bạt khắp nơi.
+
+Trong một lần, hắn gặp:
+
+> một cô gái chết / hấp hối trong tình trạng bị ngược sát cực kỳ thảm.
+
+Trong ngực nàng là:
+
+> **một đứa trẻ còn quấn tã.**
+
+Hắn mang đứa trẻ đi.
+
+Đứa trẻ đó về sau chính là:
+
+> **Kiếm Tiên đầu tiên.**
+
+Kiếm Tiên đầu tiên là:
+
+> **con lai Nhân + Yêu.**
+
+Điều này cùng với việc sư phụ mình từng được một Yêu cứu là hai lý do căn bản khiến Kiếm Tiên sau này dù căm hận chế độ Yêu tộc vẫn không chọn diệt tuyệt cả giống loài.
+
+## Con đường lên Chân Tiên
+
+Hệ 8 đại cảnh giới lúc ấy:
+
+> **chưa hoàn thiện.**
+
+Không có con đường chuẩn.
+
+Chân Tiên Nhân tộc đầu tiên phải:
+
+- tự thử;
+- học từ dị tộc;
+- trả giá;
+- đi đường vòng;
+- sáng tạo từng mảnh.
+
+Hắn cuối cùng chứng Chân Tiên nhưng là:
+
+> **một Chân Tiên yếu**, bởi tuổi đời, hoàn cảnh và thời gian đều không cho phép hắn tích lũy nhiều Pháp Tắc.
+
+## Cái chết
+
+Khi đối đầu Yêu Tiên đầu tiên:
+
+> hắn biết mình không đủ mạnh để giết đối phương.
+
+Lựa chọn cuối cùng:
+
+> **tự hiến tế bản thân làm hạt nhân phong ấn Yêu Tiên.**
+
+Đây là nguyên nhân thật sự hắn chết.
+
+Phong ấn tạo ra:
+
+> khoảng thời gian cần thiết để đứa trẻ hắn nuôi — Kiếm Tiên đầu tiên — trưởng thành.
+
+Kiếm Tiên sau này mới là người có điều kiện triệt để kết thúc Yêu Tiên.
+
+---
+
+# XVIII. YÊU TIÊN ĐẦU TIÊN KHÔNG PHẢI LONG / PHƯỢNG
+
+Yêu Tiên đầu tiên là:
+
+> **một Yêu hậu thiên tu luyện đi lên.**
+
+Hắn không phải sinh linh Tiên Thiên như Long Tổ / Phượng Tổ.
+
+Điểm đặc biệt là:
+
+> hắn gần như tự mở một con đường tu luyện chưa hoàn chỉnh, đi tới tầng chỉ kém / chạm Chân Tiên rồi cuối cùng chứng Chân.
+
+Vì hệ thống cảnh giới còn thô:
+
+- hắn không tối ưu;
+- thiếu kiến thức hậu thế;
+- nhiều nhược điểm chưa ai biết;
+- nhưng vẫn vượt xa phần lớn sinh linh cùng thời.
+
+Sau này khi Long Tổ / Phượng Tổ tới cuối thọ nguyên mở trận tử chiến và đồng quy:
+
+> Yêu Tiên đầu tiên cũng lao vào cuộc tranh đoạt tàn hài.
+
+Sau một phen huyết chiến:
+
+> hắn giành được / ăn được một phần huyết nhục của hai Tổ.
+
+Điều này có thể là một trong các nguyên nhân khiến hắn mạnh thêm và càng khó bị các bán bộ Chân Tiên hậu thế xử lý.
+
+---
+
+# XIX. NHÂN TỘC & HÌNH NGƯỜI
+
+Một đặc tính nền đã khóa:
+
+> **cơ thể Nhân tộc đặc biệt thích hợp cho việc cảm ngộ Pháp Tắc.**
+
+Đây không nhất thiết nghĩa Nhân tộc có thân thể mạnh.
+
+Ngược lại, ở cảnh thấp:
+
+> Yêu thú thường khỏe hơn rõ rệt.
+
+Nhưng hình người có một cấu trúc:
+
+- thần kinh;
+- nhận thức;
+- linh hồn;
+- khả năng biểu tượng hóa;
+- cân bằng thân–hồn;
+
+rất phù hợp để:
+
+> quan sát và nội hóa quy luật thế giới.
+
+Đó là lý do nhiều Yêu tộc về sau:
+
+> **chọn Hóa Hình thành người khi tu đến một tầng nhất định.**
+
+Không phải vì Nhân tộc “đẹp hơn”.
+
+Mà vì:
+
+> hình người là một cấu trúc tu Pháp Tắc hiệu quả.
+
+---
+
+# XX. TÁM ĐẠI CẢNH GIỚI TRƯỚC CHÂN TIÊN LÀ SẢN PHẨM LỊCH SỬ, KHÔNG PHẢI THIÊN ĐỊNH
+
+Hệ thống:
+
+- Dưỡng Hình;
+- Khai Mệnh;
+- Chiếu Hồn;
+- Hiển Tướng;
+- Hóa Tuyền;
+- Hóa Vực;
+- Khắc Pháp;
+- Định Pháp;
+
+không xuất hiện trọn vẹn từ đầu.
+
+Nó là kết quả:
+
+> **vô số chủng tộc + vô số đại năng + vô số người chết vì thử sai trong thời gian cực dài.**
+
+Trước khi chuẩn hóa:
+
+- cùng một tầng sức mạnh có thể có hàng trăm tên;
+- công pháp khác nhau nhảy bước;
+- rất nhiều đường tu tự hủy;
+- nhiều cảnh giới được phát hiện bằng tai nạn.
+
+Đến:
+
+> **thời Huyết Thế Đại Kiếp**
+
+hệ tám đại cảnh giới mới cơ bản hoàn thiện và trở thành ngôn ngữ tu luyện chung của Nạp Hư.
+
+Trước thời điểm đó:
+
+> Thần Huy đã từng tới Nạp Hư thăm dò / giao lưu / trao đổi.
+
+Vì vậy sự chuẩn hóa cuối cùng của Nạp Hư có thể đã chịu ảnh hưởng gián tiếp từ cách Thần Huy phân loại:
+
+- năng lượng;
+- linh hồn;
+- pháp tắc;
+- chiến lực;
+
+nhưng hệ Nạp Hư vẫn là sản phẩm đa tộc nội sinh, không phải hệ thống nhập khẩu.
