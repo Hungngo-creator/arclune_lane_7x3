@@ -123,3 +123,15 @@ Cổ Kiếm Tu có thể dùng hiểu biết sâu để chém một quan hệ / 
 4. Hợp nhất sâu có kéo dài thời gian tồn tại theo lịch không, phải trả giá gì.
 5. Tuổi thọ và tốc độ tu của các loài Yêu; khoảng cách giữa bán bộ Yêu Tiên và Chân Tiên.
 6. Dùng tuổi thọ đã thống nhất để kiểm tra từng khoảng lịch sử, rồi mới xây phần Aether sau Nạp Hư và Thần Huy.
+
+---
+
+# VIII. TRƯỜNG HỢP YÊU TIÊN ĐẦU TIÊN — SINH MỆNH VÀ NĂNG LƯỢNG
+
+**ĐÃ CHỐT:** Pháp Tắc thuộc một nhánh của Quy Tắc Thôn Phệ, không đặt tên riêng, cho phép sát thương bằng linh lực rút sinh mệnh lực để hồi phục. Luyện hóa một phần tim Long Tổ cường hóa nó thành đoạt phần sinh mệnh không thể khôi phục, tăng hạn mức sinh mệnh của bản thân và bổ sung tương ứng phần tăng.
+
+**CÒN MỞ:** tăng hạn mức sinh mệnh ảnh hưởng thọ nguyên thế nào, phạm vi qua Luân Hồi, giới hạn chuyển hóa / tích lũy và những điều kiện khắc chế. Bảng tuổi thọ tại mục III vẫn là phương án hiện tại; chưa đổi số vì cơ chế này.
+
+Hắn còn hấp thu nước để hồi phục. Tuy vậy, thương tổn khi bị phong ấn và hao mòn lâu dài khiến hắn cực yếu; phong ấn dùng chính tiên lực của hắn và được thiết kế hút năng lượng tới chết. Cần chốt riêng lượng nước / sinh lực hắn có thể tiếp cận trong tháp và quan hệ giữa các loại nguồn lực, để không tự suy ra hồi phục sinh mệnh đồng nghĩa bù được mọi hao tổn tiên lực.
+
+Hồ yêu đã ở **Khắc Pháp** khi bị hắn khống chế, trước khi gặp Kiếm Tiên; tu vi tiếp tục tăng trong quá trình Kiếm Tiên trưởng thành. Tiểu cảnh lúc ấy, tuổi đời và cảnh cao nhất về sau chưa chốt. Mốc Khắc Pháp 300.000 năm thuộc đỉnh cảnh, không tự gán tuổi thọ ấy cho nàng từ lúc mới vào cảnh.

@@ -438,7 +438,7 @@ They die before the Human Dark Age. Yao power fragments into 30,000 years of con
 
 Their descendants later cut up and consume their remains using ancestral weapons.
 
-The being later called the first Yao True Immortal obtains/eats part of those remains after violent competition, while not yet a True Immortal.
+The being later called the first Yao True Immortal obtains/eats part of Long Tổ’s heart after competition for the remains, while not yet a True Immortal.
 
 Their deaths may be part of the world becoming more complete because Life/Death fragments previously concentrated in them return to the wider world.
 
@@ -459,7 +459,11 @@ This is one reason later Yao choose human transformation.
 
 The first Yao True Immortal is not Long or Phượng.
 
-He is a later acquired cultivator who climbs through an incomplete early cultivation path.
+He is a later acquired mixed-blood Yao whose many ancestries cannot be fully enumerated: father a dragon-person, mother a merfolk, bloodline leaning toward Long Tổ. Initially he controls water, breathes underwater, has scattered dragon scales and full chest-scale coverage. He climbs an incomplete early path through cunning, dirty schemes and betrayal, including betrayal of rescuers; do not give him honorable motives.
+
+After eating part of Long Tổ’s heart before becoming a True Immortal, his water control greatly increases and he can absorb water to recover. Scales cover his body except the face; a single dragon horn grows on the right side of the top of his head, with sharp teeth and long nails, but no wings.
+
+His Law is a branch of the Devouring Rule (Quy Tắc Thôn Phệ); do not coin a short Law name. Describe its ability: damage caused by his spiritual power drains enemy vitality to heal him. Long-heart refinement makes the stolen vitality unrecoverable, transfers it to him, increases his maximum vitality capacity, and fills the corresponding increase. Do not assume the full Rule, automatic lifespan gain, or automatic True-Self loss.
 
 He knows Long/Phượng’s relationship to Nhân Tổ and does not care.
 
@@ -521,16 +525,15 @@ The seal lasts at least:
 
 and may last many thousands of years.
 
-The first Yao True Immortal remains active within the seal:
-- can send thought;
-- can influence emotion;
-- can manipulate followers;
-- can speak;
-- is intelligent and does not follow stupid-villain logic.
+The first Yao True Immortal remains conscious and uses an information channel through a fox Yao controlled with Tử Mẫu Tâm Sinh Cổ. He controls her before she meets the Sword Immortal; she is already Khắc Pháp at that time and continues cultivating as the Sword Immortal grows. He holds the mother Gu; she swallows the child Gu; the mother is life-bound to him, so his death kills the mother and then the fox if the bond remains intact. She follows the Sword Immortal as a friend and occasionally reports through the child Gu. He mainly observes through these reports and trusts his formidable devouring ability, so he is not afraid. Her ultimate fate and any way to break the bond remain OPEN. Do not assume continuous direct vision, romance, willing service, a reverse death chain, or a fixed Khắc Pháp level for her entire life.
 
-The seal is sustained by the Yao Immortal’s own immortal power: a stronger captive makes a stronger seal. Eventually he is extremely weak, and Yao break the weakened seal because the Sword Immortal is attacking. The cause of the captive’s weakening remains OPEN. Two other half-step Yao Immortals exist during the seal period; they mostly protect themselves and do not heavily oppress humanity. They know Nhân Tổ, the children, and who raised Long/Phượng; ethics versus fear of Nhân Hoàng Cung remains OPEN.
+The seal is sustained by the Yao Immortal’s own immortal power and is designed to drain his energy until he dies: a stronger captive makes a stronger seal, and as he weakens so does the seal. Initial sealing injuries and long-term attrition are the main causes. Before the drain kills him, the Sword Immortal attacks and demands that the Yao break the weakened seal.
 
-Decide the first Yao Immortal’s species/body, consumed remains, and signature Law before deciding the channel, reach, and actual influence he has over the Sword Immortal. Do not assume continuous direct knowledge or contact.
+The seal is inside a huge tower cast from the bones of several of the Twelve Children, with their permission. Approaching it suppresses spiritual and immortal power; do not describe this as permanent cultivation erasure. Tower builder, donor identities/incarnations, location, suppression range/degree, and how the seal is broken remain OPEN. The tower material and the first Human Immortal’s sacrificial seal core are distinct roles.
+
+Two other half-step Yao Immortals exist during the seal period: one a former subordinate, the other an enemy of the first Yao Immortal. They mostly protect themselves and do not heavily oppress humanity. They know Nhân Tổ, the children, and who raised Long/Phượng; ethics versus fear of Nhân Hoàng Cung and involvement in the final seal-breaking remain OPEN.
+
+The body, Long-heart portion, unnamed devouring-Law ability, Gu-based reports, the fox’s Khắc Pháp level when controlled, and the death chain through the mother Gu are now decided. Still resolve the fox’s knowledge/choices and fate, any way to break the Gu bond, transmission under tower suppression, and the captive’s access to recovery sources. Do not assume a separate power directly influencing the Sword Immortal’s mind or complete knowledge of his hidden master-disciple relationship.
 
 The Sword Immortal inherits the first Human True Immortal’s cultivation legacy and is constantly fleeing, so slave-manual restrictions do not close his path. Very few know he is that immortal’s disciple. The inherited system remains primitive.
 

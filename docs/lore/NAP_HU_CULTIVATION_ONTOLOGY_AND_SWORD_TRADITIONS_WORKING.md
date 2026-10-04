@@ -899,3 +899,17 @@ Thần Huy đã từng tới thăm dò / giao lưu trước khi quá trình chu�
 Bảng đầy đủ, định nghĩa và hệ quả lịch sử nằm trong [Hệ thống tu luyện, sức mạnh và tuổi thọ](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md). Tài liệu ấy đã đối chiếu tệp tác giả gửi với dữ kiện mới trong kho mã; các phần xung đột hoặc đề xuất chưa duyệt không tự trở thành dữ kiện đã chốt.
 
 **CÒN MỞ:** mức tăng theo từng Pháp Tắc, giới hạn, điều kiện áp dụng, phân bố tuổi thọ giữa các tiểu cảnh và cơ chế giảm hao thọ. Tuổi thọ khi dùng **Aether** sẽ quyết định sau khi xây xong Nạp Hư và Thần Huy. Mốc Bán Thần bốn triệu năm của hệ Main vẫn là điểm đối chiếu, không phải hệ số chuyển đổi.
+
+---
+
+# XXI. YÊU TIÊN ĐẦU TIÊN — PHÁP TẮC THÔN PHỆ VÀ HẠN MỨC SINH MỆNH
+
+**ĐÃ CHỐT:** Yêu Tiên đầu tiên chọn **một Pháp Tắc là nhánh của Quy Tắc Thôn Phệ**. Pháp Tắc này không đặt tên riêng; mô tả trực tiếp bằng khả năng. Chứng Chân không đồng nghĩa sở hữu cả Quy Tắc.
+
+Sát thương do linh lực hắn gây ra rút sinh mệnh lực đối thủ để hồi phục cho hắn. Sau khi luyện hóa **một phần tim Long Tổ**, phần sinh mệnh bị đoạt không thể khôi phục, chuyển thành sinh mệnh lực của hắn, tăng hạn mức tối đa và phục hồi tương ứng phần tăng. Sau luyện hóa hắn còn có thể hấp thu nước để hồi phục; chưa gán cho nước tác dụng đoạt / tăng hạn mức như sát thương thôn phệ.
+
+Phân biệt **hồi phục sinh mệnh hiện có**, **tăng hạn mức sinh mệnh tối đa**, **tuổi thọ** và **Chân Ngã qua Luân Hồi**. Quan hệ của cơ chế đã chốt với hai phần sau còn mở. Không tự áp dụng năng lực riêng này cho mọi Chân Tiên hoặc đổi bảng tuổi thọ đang xây dựng.
+
+Phong ấn dùng tiên lực của hắn, đồng thời hút năng lượng tới chết; gần tháp xương hài tử thì linh lực lẫn tiên lực bị áp chế. Kênh thông tin đã chốt khi hắn bị giam là hồ yêu báo cáo qua Tử Mẫu Tâm Sinh Cổ, chưa phải quyền năng trực tiếp biết hoặc ảnh hưởng mọi tâm tư Kiếm Tiên. Nàng đã Khắc Pháp lúc bị khống chế trước khi gặp Kiếm Tiên, rồi tiếp tục tăng tu vi. Mẫu cổ gắn sinh mệnh Yêu Tiên: hắn chết thì mẫu cổ chết, kéo theo nàng nếu ràng buộc còn nguyên; cách xử lý / kết cục còn mở.
+
+Tiểu sử và các giới hạn chưa chốt xem mục XVIII, XVIII-A, XXXIV của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
