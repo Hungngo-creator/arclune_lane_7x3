@@ -180,6 +180,10 @@ Nhân Tổ từng là:
 
 > **Thiên Địa Chính Tiên.**
 
+Hắn không có khái niệm thọ nguyên hữu hạn; có thể giữ hình hài / khí tính trẻ con dù đã trưởng thành. Hắn chọn Luân Hồi vì chán đời sống vĩnh hằng sau khi người bạn thân nhất Nguyên Sơ đã đi, biết mình có thể trở thành bất cứ thứ gì trên con đường mới chưa rõ ấy. Sau khi để lại các con tự quyết định, hắn trầm mặc nhìn chúng sinh một lát rồi tan biến, không nói gì.
+
+Luân Hồi đã có trước khi Thiên Đạo thức tỉnh, nhưng chưa hoàn thiện; cái chết Long / Phượng làm nó hoàn thiện hơn.
+
 Số Quy Tắc từng sở hữu:
 
 > **chưa rõ và chưa nên khóa trước khi thiết kế xong Thập Nhị Thể.**
@@ -203,9 +207,7 @@ Bất kỳ Thiên Địa Chính Tiên nào **về nguyên tắc** cũng có th�
 
 Không phải cấm thuật riêng của Nhân Tổ.
 
-Không ai làm vì:
-
-> đã vĩnh sinh thì không có lý do bình thường để tự tay vứt bỏ vĩnh sinh.
+Đa số không có lý do để tự tay bỏ vĩnh sinh. Nhân Tổ lựa chọn điều ấy vì đã nhàm chán đời sống vĩnh hằng và muốn một cách sống mới.
 
 ## Nhân Tổ đã chia bản thân như thế nào?
 
@@ -284,6 +286,8 @@ Nhưng khi tu đến một **đại cảnh giới ngưỡng** đủ cao:
 
 Ngưỡng cảnh giới cụ thể chưa khóa.
 
+Đã có một trường hợp thức tỉnh **dưới Chân Tiên**: người con qua nhiều đời Luân Hồi dùng thanh kiếm của Nhân Tổ trong Hắc Ám Kỷ. Chưa khóa đó là thức tỉnh tự nhiên tại ngưỡng hay do một kích thích sớm.
+
 Sau khi thức tỉnh, họ có thể nhớ:
 
 - thân phận nguyên thủy;
@@ -318,34 +322,21 @@ Thiên Ma Môn và Cực Lạc Ma Tông có động cơ rất mạnh để:
 
 # VII. VÌ SAO NHÂN HOÀNG CUNG CÂN BẰNG ĐƯỢC HAI MA MÔN?
 
-Hai Ma Môn:
+Thiên Ma Môn và Cực Lạc Ma Tông mỗi bên có **một Ma Tôn = Chân Tiên**.
 
-- Thiên Ma Môn;
-- Cực Lạc Ma Tông;
+Nguồn răn đe đã khóa của Nhân Hoàng Cung là **thanh kiếm Nhân Tổ tự rèn bằng máu và xương cánh tay trước khi vào Luân Hồi**:
 
-mỗi bên có:
+- chỉ Nhân Tổ hoặc mười hai người con điều khiển được;
+- ra một kiếm thì người dùng tử vong vào Luân Hồi, cái giá Nhân Tổ đặt để tránh các con lạm sát;
+- một người con đã thức tỉnh sau nhiều đời Luân Hồi, lúc đó dưới Chân Tiên, từng dùng một kiếm giết Tân Thần Thần Huy cùng cấp Yêu Tiên đầu tiên.
 
-> **một Ma Tôn = Chân Tiên.**
+Sau kiếm ấy, các người con khác đã đầu thai nhưng chưa thức tỉnh. Thần Huy không biết, nghi có kế nên rút lui. Yêu Tiên chứng kiến cũng rút quân; Nhân Hoàng Cung là tịnh thổ cuối cùng của Nhân tộc khi ấy.
 
-Nhân Hoàng Cung có:
+Một số nhân chứng **bản địa Nạp Hư** về sau trở thành Ma tu; tri thức về kiếm có trước cuộc xâm lấn Ma Đạo Đại Thế Giới. Cao tầng hai Ma Môn giữ kín bí mật để tránh chia tài nguyên với ngoại địch và dùng ngoại xâm thăm dò khả năng Nhân Hoàng Cung còn ra kiếm. Thần Huy cũng không báo bí mật cho quân Ma Đạo vì sợ bị hố.
 
-- di sản Nhân Tổ;
-- Thập Nhị Thể;
-- đại trận;
-- khí vận;
-- hậu thủ của mười hai người con;
-- khả năng hiện tại tồn tại một đời Luân Hồi của Nhân Tổ;
-- khả năng một số người con đã thức tỉnh.
+Nhân Hoàng Cung còn giữ di sản, Thập Nhị Thể, đại trận, khí vận và hậu thủ. Khả năng hiện tại có một Nhân Tổ / người con đã thức tỉnh cần xét theo thời điểm; chưa mặc định luôn có người sẵn sàng dùng kiếm.
 
-Deterrence chính:
-
-> không ai biết Nhân Tổ đang là ai, đã thức tỉnh tới đâu, còn bao nhiêu hậu thủ.
-
-Hai Ma Tôn có sức mạnh hiện hữu rõ ràng.
-
-Nhân Hoàng Cung có:
-
-> **rủi ro đánh thức một cựu Thiên Địa Chính Tiên.**
+Chi tiết lịch sử và các điểm OPEN xem mục XLII của `NAP_HU_HISTORY_FOUNDATIONS_WORKING.md`.
 
 ---
 
@@ -521,6 +512,8 @@ Bao gồm:
 - Cửu Đại Kiếm Thuật;
 - Thập Bát Kiếm Lưu;
 - các Đại Kiếm Quyết cơ chế sâu.
+
+Nguồn gốc lịch sử đã khóa: **Kiếm Tiên đầu tiên sáng tạo Cửu Đại Kiếm Thuật**. Hắn nhận truyền thừa của Chân Tiên Nhân tộc đầu tiên nên không bị khóa con đường bởi công pháp giới hạn dành cho nô lệ. Hệ tu lúc ấy vẫn chưa chuẩn hóa.
 
 Hạt nhân:
 
@@ -889,3 +882,14 @@ Trước đó:
 - nhiều phương pháp có tỷ lệ tử vong rất cao.
 
 Thần Huy đã từng tới thăm dò / giao lưu trước khi quá trình chuẩn hóa hoàn tất, nên một phần tư duy phân loại khoa học có thể ảnh hưởng quá trình tổng kết hậu kỳ.
+
+
+---
+
+# XX. THỌ NGUYÊN NẠP HƯ — CẦN TỔNG KẾT, CHƯA ĐỔI SỐ
+
+**LOCKED:** Thiên Địa Chính Tiên không có thọ nguyên hữu hạn; Chân Tiên mỗi khi lĩnh ngộ thêm một Pháp Tắc cũng tăng tuổi thọ.
+
+Mốc **Bán Thần tối đa bốn triệu năm** thuộc đạo thống Main dùng **Aether**, nguồn năng lượng cao hơn. Đây là mốc đối chiếu cho chiều sâu lịch sử, không tự động gán cùng tuổi thọ cho Chân Tiên chỉ vì hai bên cùng bracket sức mạnh.
+
+**OPEN:** có tăng tuổi thọ nền các cảnh Nạp Hư hay không; tuổi thọ nền của Chân Tiên; mức tăng theo từng Pháp Tắc, giới hạn và điều kiện áp dụng. Tác giả muốn khoảng thọ nguyên không lệch quá xa mốc Bán Thần, nhưng chưa khóa một bảng số mới.
