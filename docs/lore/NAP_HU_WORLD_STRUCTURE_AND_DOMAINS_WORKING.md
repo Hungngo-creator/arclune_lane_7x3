@@ -1065,14 +1065,23 @@ Tên working vẫn có thể dùng:
 
 # **Thập Nhị Nhân Ấn / Thập Nhị Thể**
 
-Cơ chế chính xác giữa:
+Cơ chế giữa Chân Ngã và Thể Chất đã khóa:
 
-- Chân Ngã luân hồi của mười hai người con;
-- và người đang giữ Thể Chất tương ứng;
+> **đời Luân Hồi của người con nào luôn là chủ của Đại Tuyệt Thể tương ứng của chính người đó.**
 
-**chưa khóa**.
+Không tồn tại một chủ thể thứ hai song song mang cùng Thể Chất.
 
-Không nên tự động giả định hai thứ luôn là cùng một người cho tới khi thiết kế lịch sử cụ thể.
+Ký ức có thể ngủ yên qua nhiều năm / nhiều đời, nhưng khi đời hiện tại tu tới một đại cảnh giới ngưỡng đủ cao:
+
+> **ký ức bắt buộc thức tỉnh.**
+
+Ngưỡng cụ thể chưa khóa.
+
+Do đó tin một Đại Tuyệt Thể xuất thế cũng đồng thời là tin:
+
+> **một trong mười hai Chân Ngã Chân Tiên của Nhân Tổ đã trở lại.**
+
+Thiên Ma Môn và Cực Lạc Ma Tông vì vậy chủ động săn giết / bắt giữ các Đại Tuyệt Thể từ khi họ còn yếu.
 
 ---
 
@@ -1259,11 +1268,28 @@ Ban đầu không tồn tại “Long” và “Phượng” theo hình thái h�
 
 Chỉ có:
 
-> **một Sinh Linh Nguyên Tổ vô giới tính**, hình thái nguyên thủy có thể là một quả cầu quang hoặc một nhân hình không có giới tính sinh học cố định.
+> **một Linh Sinh Nguyên Sơ**, một trong những tồn tại khai linh sớm nhất được biết của Nạp Hư.
 
-Nó xuất hiện trong thời thiên địa còn rất sơ khai.
+Nó đã tồn tại từ thời thiên địa cực sơ khai, nhưng **bản chất trước khi khai linh / nguồn gốc thật sự cố ý để mở**.
 
-Bản thể của sinh linh này đồng thời mang hai hệ đối lập:
+Hậu thế có vô số thuyết:
+
+- giọt máu của Thiên Đạo;
+- một phần Thiên Đạo tự tách ra;
+- giọt nước đầu tiên của Nạp Hư;
+- tia nắng đầu tiên;
+- một khối khoáng / tinh thể / quang thể vô tri khai linh;
+- hoặc một hiện tượng hoàn toàn khác mà lịch sử đã không còn ngôn ngữ để mô tả.
+
+Không giả thuyết nào được xác nhận là canon tuyệt đối.
+
+Điểm duy nhất chắc chắn:
+
+> **thuở sơ khai Nạp Hư liền có nó.**
+
+Danh xưng “Linh Sinh” dùng theo nghĩa rộng: vật hoặc hiện tượng vốn vô tri tự khai linh. Nó không bắt buộc phải là sinh mệnh silicon giống số đông Linh Sinh Vực hậu thế.
+
+Bản thể của Linh Sinh Nguyên Sơ đồng thời mang hai hệ đối lập:
 
 - **Sinh Mệnh**;
 - **Tử Vong**.
@@ -1561,7 +1587,15 @@ Nhìn bằng tiêu chuẩn Tần Vực:
 
 ## 2. Tại sao nơi nghèo Linh Khí lại sinh Linh Sinh?
 
-Linh Sinh không cần một trận bùng nổ Linh Khí.
+Cần phân biệt:
+
+> **“Linh Sinh” là phân loại rộng**, còn Linh Sinh Vực chỉ là nơi sinh ra nhánh Linh Sinh silicon/khoáng phổ biến nhất hậu thế.
+
+Một Linh Sinh về nguyên tắc có thể bắt đầu từ một vật hoặc hiện tượng vô tri đủ điều kiện khai linh. Linh Sinh Nguyên Sơ từng tách thành Long Tổ / Phượng Tổ là ví dụ cực cổ mà bản chất vật chất thật sự đã không còn xác định được.
+
+Riêng **Linh Sinh Vực**, cơ chế điển hình là silicon/khoáng.
+
+Linh Sinh ở đây không cần một trận bùng nổ Linh Khí.
 
 Chúng cần:
 
@@ -2082,18 +2116,24 @@ Cần chốt:
 - giả chết;
 - phân thân.
 
-### 2. Quan hệ giữa Thập Nhị Thể và Luân Hồi của mười hai người con Nhân Tổ
-Cần chốt:
-- có bắt buộc reincarnation = current holder không;
-- hay có thể là hai người khác nhau.
+### 2. Ngưỡng thức tỉnh ký ức của Thập Nhị Đại Tuyệt Thể
+Đã khóa rằng Chân Ngã Luân Hồi luôn sở hữu đúng Thể Chất tương ứng và tới một đại cảnh giới nhất định sẽ bắt buộc thức tỉnh ký ức.
 
-### 3. Số Quy Tắc Nhân Tổ từng sở hữu
-Chưa rõ.
+Chưa khóa:
+- chính xác là đại cảnh giới nào;
+- có khác nhau giữa 12 Thể hay không;
+- loại kích thích nào có thể ép thức tỉnh sớm.
 
-### 4. Tên / bản chất Sinh Linh Nguyên Tổ trước khi tách Long–Phượng
-Chưa khóa.
+### 3. Mười hai Đại Tuyệt Thể cụ thể
+Phải thiết kế 12 Thể trước khi suy ngược các Quy Tắc của Nhân Tổ.
 
-### 5. Exact power bracket của từng Cổ Thần Thần Huy
+### 4. Số / loại Quy Tắc Nhân Tổ từng sở hữu
+Chưa khóa có chủ ý; phụ thuộc thiết kế 12 Thể.
+
+### 5. Bản chất Linh Sinh Nguyên Sơ trước khi tách Long–Phượng
+**Cố ý không khóa.** Đây là khoảng trống thần thoại để người đọc tự suy đoán.
+
+### 6. Exact power bracket của từng Cổ Thần Thần Huy
 Không ánh xạ 1:1, cần xét từng nhân vật.
 ---
 
