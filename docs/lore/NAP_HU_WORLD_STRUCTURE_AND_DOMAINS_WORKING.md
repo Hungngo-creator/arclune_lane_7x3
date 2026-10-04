@@ -2352,15 +2352,19 @@ Sau khi Long / Phượng đồng quy, hắn ăn **một phần tim Long Tổ**, 
 
 Pháp Tắc hắn chọn là một nhánh của **Quy Tắc Thôn Phệ**, được mô tả bằng năng lực, không đặt tên riêng. Sát thương bằng linh lực rút sinh mệnh lực của đối thủ để hồi phục; long tâm cường hóa thành đoạt phần sinh mệnh không thể khôi phục, chuyển vào hắn, tăng hạn mức sinh mệnh tối đa và bổ sung tương ứng phần tăng. Không coi hắn đã hoàn chỉnh cả Quy Tắc hoặc tự quy phần hạn mức ấy thành thọ nguyên.
 
-Phong ấn dùng chính tiên lực Yêu Tiên và hút năng lượng cho tới khi hắn chết. Thương tổn ban đầu và hao mòn lâu dài làm hắn suy yếu; hắn càng yếu phong ấn càng yếu. **Kiếm Tiên giết tới và yêu cầu chúng Yêu phá phong ấn** trước khi phong ấn hút cạn hắn đến chết.
+Phong ấn dùng chính tiên lực Yêu Tiên để duy trì giam giữ và **kết giới bảo hộ Phong Thiên Tháp**, hút năng lượng cho tới khi hắn chết. **Phong Thiên Tháp** được xây riêng cho lần phong ấn, là cơ chế khác: phong cấm mọi nguồn năng lượng **trong tháp và vùng bên ngoài thuộc bán kính 50 km**. Yêu Tiên không nhận tiếp tế từ ngoài; thương tổn ban đầu và hao mòn lâu dài làm hắn cực yếu, kéo theo phong ấn yếu dần. Vị trí tháp và hệ quả cụ thể của phong cấm đối với môi trường chưa chốt.
 
-Phong ấn đặt trong **tháp khổng lồ đúc từ xương của vài hài tử**, được chính họ cho phép. Đến gần thì linh lực và tiên lực bị áp chế. Vị trí, người xây, các đời hiến xương và phạm vi / mức áp chế chưa chốt.
+Các hài tử tự bảo quản kỹ tàn hài trước khi vào Luân Hồi. **Hài tử duy nhất thức tỉnh lúc ấy**, cũng là người sau đó ra kiếm diệt Tân Thần rồi chết, đề xuất dùng tàn hài của mình và một vài phần của những hài tử khác để tạo tháp. **Nhân Tiên nhận xương và đề xuất trực tiếp từ người ấy trước lần ra kiếm**; tu vi Nhân Tiên lúc nhận và ngày dựng tháp chưa chốt. Điều kiện duy nhất: tháp chịu điều khiển của **kẻ cầm kiếm Nhân Tổ**, chỉ cầm không cần ra kiếm. Những người khác có xương được dùng, đời của tàn hài và người trực tiếp xây chưa chốt; không đồng nhất người đề xuất với người sáng lập Nhân Hoàng Cung.
 
-Yêu Tiên giữ mẫu cổ của **Tử Mẫu Tâm Sinh Cổ**, cho hồ yêu nuốt tử cổ **trước khi nàng gặp Kiếm Tiên**, lúc nàng đã ở **Khắc Pháp**. Tu vi nàng tiếp tục tăng theo quá trình Kiếm Tiên trưởng thành. Nàng là bạn, đi theo Kiếm Tiên và thỉnh thoảng báo cáo qua tử cổ. **Yêu Tiên chết thì mẫu cổ chết; mẫu cổ chết thì hồ yêu chết nếu ràng buộc còn nguyên.** Kết cục nàng và cách xử lý cổ chưa chốt. Yêu Tiên quan sát qua nguồn tin ấy, quá tin năng lực của mình nên không sợ.
+Hồ yêu có thể chất ngoài Thập Nhị Đại Tuyệt Thể, có giá trị bồi dưỡng; Yêu Tiên chọn làm con cờ và **hạ cổ từ lúc chào đời**, còn nàng **không biết**. Nàng đã **Khắc Pháp khi gặp Kiếm Tiên** và tiếp tục tăng tu vi. Tình bạn ngoài kế hoạch Yêu Tiên; nàng yêu đơn phương, hắn chỉ biết khi nàng sắp chết và thổ lộ.
+
+Tử cổ khóa với linh hồn, gặm nhấm một lượng rồi ngủ, khiến nàng đôi khi đau và phải dùng đan dược chữa linh hồn; tử cổ chết thì phát nổ phá hủy linh hồn. Mẫu cổ gắn sinh mệnh Yêu Tiên: hắn chết thì mẫu cổ chết, kéo theo nàng nếu ràng buộc còn nguyên. Kênh báo cáo cũ được thay bằng Yêu Tiên nhìn **mọi thứ nàng thấy** qua cơ chế riêng của cổ, vẫn truyền được qua phong cấm.
+
+Khi đạt Chân Tiên, Kiếm Tiên phát hiện cổ qua tra hỏi / suy đoán. Hắn **yêu cầu chúng Yêu phá phong ấn** với một phần mục đích cứu nàng, nhưng chủ yếu **báo thù cho sư phụ**. Yêu Tiên không muốn nàng sống; linh hồn nàng bị phá, Chân Ngã đầu thai không mang ký ức. Hồ yêu có vết bớt đặc thù trên vai; khả năng Kiếm Tiên gặp thân đầu thai khi tìm đệ tử là **đang xây dựng**, chưa chốt cuộc gặp hoặc việc nhận nàng làm đệ tử.
 
 Trong thời gian phong ấn còn hai bán bộ Yêu Tiên: **một thuộc hạ cũ, một kẻ thù**. Họ giữ thân mình, không quá chèn ép Nhân tộc; đạo đức / e sợ Nhân Hoàng Cung và vai trò lúc phá phong ấn còn mở.
 
-Chi tiết xem mục XVIII, XVIII-A và XXXIV của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
+Chi tiết xem mục XVIII, XVIII-A và XXXIV của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md); luật giữ ký ức của Chân Tiên trở lên xem mục XXII của [Bản thể tu luyện và truyền thống kiếm](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).
 
 ---
 

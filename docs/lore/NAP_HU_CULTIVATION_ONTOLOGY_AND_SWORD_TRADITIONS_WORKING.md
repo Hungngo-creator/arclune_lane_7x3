@@ -910,6 +910,24 @@ Sát thương do linh lực hắn gây ra rút sinh mệnh lực đối thủ đ
 
 Phân biệt **hồi phục sinh mệnh hiện có**, **tăng hạn mức sinh mệnh tối đa**, **tuổi thọ** và **Chân Ngã qua Luân Hồi**. Quan hệ của cơ chế đã chốt với hai phần sau còn mở. Không tự áp dụng năng lực riêng này cho mọi Chân Tiên hoặc đổi bảng tuổi thọ đang xây dựng.
 
-Phong ấn dùng tiên lực của hắn, đồng thời hút năng lượng tới chết; gần tháp xương hài tử thì linh lực lẫn tiên lực bị áp chế. Kênh thông tin đã chốt khi hắn bị giam là hồ yêu báo cáo qua Tử Mẫu Tâm Sinh Cổ, chưa phải quyền năng trực tiếp biết hoặc ảnh hưởng mọi tâm tư Kiếm Tiên. Nàng đã Khắc Pháp lúc bị khống chế trước khi gặp Kiếm Tiên, rồi tiếp tục tăng tu vi. Mẫu cổ gắn sinh mệnh Yêu Tiên: hắn chết thì mẫu cổ chết, kéo theo nàng nếu ràng buộc còn nguyên; cách xử lý / kết cục còn mở.
+Phong ấn hấp thu tiên lực của hắn để duy trì giam giữ, tạo kết giới bảo hộ **Phong Thiên Tháp** và hút năng lượng tới chết. Tháp là cơ chế khác, phong cấm mọi nguồn năng lượng trong tháp và trong bán kính **50 km**; hắn không được tiếp tế từ ngoài. Người cầm thanh kiếm Nhân Tổ điều khiển tháp, chỉ cần cầm chứ không phải ra kiếm.
+
+Hồ yêu bị hạ Tử Mẫu Tâm Sinh Cổ từ sơ sinh, **không biết mình bị hạ cổ**, đã **Khắc Pháp khi gặp Kiếm Tiên**, rồi tiếp tục tăng tu vi. Cổ khóa với linh hồn, gặm nhấm một lượng rồi ngủ, gây những đợt đau và nhu cầu dùng đan dược chữa linh hồn; tử cổ chết thì phát nổ phá linh hồn. Mẫu cổ gắn sinh mệnh Yêu Tiên: hắn chết thì mẫu cổ chết, kéo theo nàng nếu ràng buộc còn nguyên.
+
+Kênh đã chốt là Yêu Tiên quan sát **mọi thứ nàng nhìn thấy**, truyền qua cơ chế riêng của cổ; thiết lập này thay báo cáo chủ động. Chưa gán cho kênh khả năng đọc tâm trí hoặc biết mọi việc ngoài tầm nhìn nàng. Kiếm Tiên phát hiện cổ khi đạt Chân Tiên; tình bạn của họ ngoài kế hoạch Yêu Tiên, nàng yêu đơn phương và chỉ nói ra khi sắp chết. Kết cục linh hồn bị phá hủy, Chân Ngã đầu thai không mang ký ức đã chốt; khả năng gặp lại ở đời mới còn đang xây dựng.
 
 Tiểu sử và các giới hạn chưa chốt xem mục XVIII, XVIII-A, XXXIV của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
+
+---
+
+# XXII. LINH HỒN, CHÂN NGÃ VÀ KÝ ỨC QUA LUÂN HỒI
+
+**ĐÃ CHỐT qua trường hợp hồ yêu:** linh hồn có thể bị phá hủy mà **Chân Ngã vẫn còn**, tiếp tục vào Luân Hồi. Hồ yêu mất linh hồn bởi tử cổ sẽ đầu thai **không có ký ức tiền kiếp**. Không đồng nhất phá hủy linh hồn với diệt Chân Ngã hoặc cắt bỏ mọi khả năng đầu thai.
+
+**ĐÃ CHỐT:** người đã đạt **Chân Tiên trở lên** khác với trường hợp ấy: dù tự suy yếu để vào Luân Hồi, họ **vẫn giữ ký ức**, rồi ký ức **khôi phục dần theo tu vi đời mới**. Giữ ký ức qua chuyển đời không có nghĩa trẻ sơ sinh lập tức nhớ hết hoặc khôi phục tu vi cũ. Cơ chế bảo tồn và mức nhớ lại theo từng cảnh giới chưa chốt.
+
+Luật riêng của **Nhân Tổ / mười hai người con** tiếp tục được giữ. Mười hai người đời gốc đều đã là Chân Tiên; việc một đời hiện tại chưa đạt Chân Tiên không xóa lịch sử đó. Không đổi ngưỡng bắt buộc thức tỉnh riêng của họ thành “chỉ khi lại đạt Chân Tiên”, vì đã có hài tử thức tỉnh và ra kiếm dưới Chân.
+
+Hồ yêu có thể chất có giá trị bồi dưỡng **ngoài Thập Nhị Đại Tuyệt Thể**. Con số mười hai chỉ khóa bộ thể chất gắn với mười hai Chân Ngã ấy, không phải tổng số mọi thể chất có thể tồn tại. Tên và năng lực thể chất của nàng chưa chốt; không tự cấp cho nàng luật mang lại đúng thể chất / ký ức ở mọi đời như các hài tử.
+
+Cảnh cao nhất hồ yêu chưa chốt. Khi kiểm tra niên biểu, phải giữ kết cục mất ký ức của nàng và phân biệt ngoại lệ đã chứng Chân Tiên; không tự thêm một lần chứng Chân rồi bỏ qua luật giữ ký ức. Vết bớt trên vai đã chốt, nhưng việc nó tái hiện ở thân đầu thai và cuộc gặp lại với Kiếm Tiên vẫn đang xây dựng.
