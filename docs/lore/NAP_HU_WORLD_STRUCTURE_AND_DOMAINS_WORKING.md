@@ -1266,11 +1266,16 @@ Vì vậy:
 
 Ban đầu không tồn tại “Long” và “Phượng” theo hình thái hậu thế.
 
-Chỉ có:
+Thuở cực sơ khai, có **hai** Linh Sinh Nguyên Sơ được lịch sử thần thoại nhắc tới:
 
-> **một Linh Sinh Nguyên Sơ**, một trong những tồn tại khai linh sớm nhất được biết của Nạp Hư.
+- **Nhân Tổ** — bé trai hoạt bát, sáng sủa;
+- **Nguyên Sơ** — quang thể vô giới tính, ít nói, biến hình liên tục.
 
-Nó đã tồn tại từ thời thiên địa cực sơ khai, nhưng **bản chất trước khi khai linh / nguồn gốc thật sự cố ý để mở**.
+Bản thể tiền Long/Phượng được gọi riêng là:
+
+> **Nguyên Sơ.**
+
+Nó đã tồn tại từ khi thiên địa còn gần như chỉ có cây nhỏ và ít cỏ, nhưng **nguồn gốc thật sự cố ý để mở**.
 
 Hậu thế có vô số thuyết:
 
@@ -1294,19 +1299,36 @@ Bản thể của Linh Sinh Nguyên Sơ đồng thời mang hai hệ đối lậ
 - **Sinh Mệnh**;
 - **Tử Vong**.
 
-Khi cấu trúc Pháp Tắc / Quy Tắc trong Nạp Hư dần ổn định, hai cực này phát sinh xung đột bản thể.
+Một ngày, Nguyên Sơ nói với Nhân Tổ rằng nó:
 
-Sinh Linh Nguyên Tổ cuối cùng:
+> **“cảm thấy đau.”**
 
-> **tách thành hai cá thể.**
+Sau đó quang thể hỗn độn dần phân thành:
 
-Một cá thể trở thành:
+- sắc xanh — Sinh Mệnh;
+- sắc xám / đen — Tử Vong.
+
+Sau một quãng thời gian không xác định:
+
+> **Nguyên Sơ vỡ nát.**
+
+Hai luồng sáng Sinh–Tử rời đi / biến mất khỏi nhận thức thông thường.
+
+Tại chỗ còn lại:
+
+> **hai quả trứng.**
+
+Nhân Tổ ở lại chăm sóc hai quả trứng.
+
+Khi nở ra, chúng trở thành:
 
 # **Phượng Tổ**
 
-Cá thể còn lại trở thành:
+và:
 
 # **Long Tổ**
+
+Hai cá thể từ lúc sinh ra đã không thực sự hòa hợp. Khi đủ sức tự tồn tại, cả hai rời Nhân Tổ và cũng không chọn ở chung với nhau.
 
 ---
 
@@ -1476,13 +1498,17 @@ Yêu thú cấp thấp:
 
 > trời sinh mạnh hơn Nhân tộc cùng cảnh nhờ thể phách.
 
-Nhưng ưu thế giảm dần khi cảnh giới tăng.
+Nhưng Nhân tộc có một lợi thế cực lớn:
+
+> **hình người đặc biệt thích hợp cảm ngộ Pháp Tắc.**
+
+Vì vậy ưu thế thể phách của Yêu giảm dần khi cảnh giới tăng.
 
 Sau này:
 
-- Yêu hoá hình;
-- học đạo;
-- sử dụng hệ tu chung.
+- Yêu Hóa Hình thành người không chỉ vì giao tiếp / thẩm mỹ;
+- hình người giúp chúng tiến sâu hơn vào tâm cảnh, thần thức và Pháp Tắc;
+- Yêu học đạo và sử dụng hệ tu chung.
 
 Điểm phải khóa:
 
@@ -2290,3 +2316,67 @@ Thiên Địa Chính Tiên:
 Đây là quy mô thích hợp để sau này Arclune dung hợp từ Nạp Hư + Thần Huy mà vẫn có cảm giác:
 
 > **hai “đại thế giới” thật sự đã bị KLC lấy làm vật liệu, chứ không phải hai lục địa fantasy ghép lại.**
+
+
+---
+
+# LI. GHI CHÚ CỰC CỔ: VÌ SAO LONG / PHƯỢNG ÍT TRỰC TIẾP ĐỒ SÁT NHÂN TỘC?
+
+Long Tổ và Phượng Tổ không phải “người bảo hộ Nhân tộc”.
+
+Nhưng cả hai từng được:
+
+> **Nhân Tổ chăm sóc từ khi còn là trứng.**
+
+Khi Nhân tộc hậu thế xuất hiện với hình hài rất gần Nhân Tổ:
+
+> Long / Phượng có xu hướng nhận ra mối liên hệ.
+
+Do đó dù hai Tổ:
+
+- cao ngạo;
+- bất hòa;
+- không đặc biệt yêu thương phàm sinh;
+
+họ cũng rất ít khi chủ động coi Nhân tộc là huyết thực đại trà.
+
+Điều này không ngăn:
+
+> **Yêu tộc hậu thế** áp bức Nhân tộc.
+
+Thiên Đạo khi đã bắt đầu có ý thức cũng không nhìn Long / Phượng như “con ruột” hay thánh vật.
+
+Với Thiên Đạo sơ khai:
+
+> chúng chỉ là hai sinh linh cực mạnh và cực già.
+
+Thiên Đạo khi ấy chưa đủ nhân cách / tình cảm để hoài niệm Nguyên Sơ hay Nhân Tổ.
+
+---
+
+# LII. YÊU TIÊN ĐẦU TIÊN & TÀN HÀI LONG–PHƯỢNG
+
+Yêu Tiên đầu tiên:
+
+> hậu thiên tu luyện đi lên.
+
+Hắn không phải Long Tổ / Phượng Tổ và không thuộc loại sinh linh Tiên Thiên.
+
+Khi Long / Phượng tới cuối thọ nguyên mở trận tử chiến:
+
+> Yêu Tiên đầu tiên tham gia cuộc tranh đoạt tàn hài sau khi cả hai đồng quy.
+
+Sau một trận huyết chiến với các kẻ tranh đoạt khác:
+
+> hắn ăn / luyện hóa được một phần huyết nhục của hai Tổ.
+
+Chi tiết hắn lấy được phần nào chưa khóa.
+
+Việc này có thể để lại:
+
+- dị biến Sinh–Tử;
+- căn cơ Yêu Tiên mạnh hơn;
+- lý do hắn khó bị phong ấn;
+- hoặc một nhược điểm do hai hệ xung đột.
+
+Không khóa hậu quả trước khi thiết kế riêng Yêu Tiên.
