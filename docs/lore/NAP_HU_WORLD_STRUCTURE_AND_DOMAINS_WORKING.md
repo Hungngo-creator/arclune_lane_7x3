@@ -2380,3 +2380,58 @@ Việc này có thể để lại:
 - hoặc một nhược điểm do hai hệ xung đột.
 
 Không khóa hậu quả trước khi thiết kế riêng Yêu Tiên.
+
+
+---
+
+# LIII. NGUỒN GỐC NHÂN TỘC & Ý NGHĨA HÌNH NGƯỜI
+
+Nhân tộc không xuất hiện do tiến hóa ngẫu nhiên độc lập rồi tình cờ giống Nhân Tổ.
+
+Nguồn gốc:
+
+> **mười hai người con của Nhân Tổ phối huyết và vật chất thiên địa để tạo sinh linh; Nhân tộc là một trong các dòng ổn định trực tiếp.**
+
+Nhân Tổ tạo mười hai người con theo hình dạng của chính mình.
+
+Vì vậy Nhân tộc có hình thái người.
+
+Nếu Nhân Tổ ban đầu là một cấu trúc khác:
+
+> “Nhân tộc” hậu thế cũng sẽ mang hình thái khác.
+
+Hình người về sau trở thành hình thái tu luyện phổ biến vì:
+
+> nó vốn được kế thừa từ các sinh linh cấu tạo trực tiếp bởi Pháp Tắc của Nhân Tổ, rất phù hợp để cảm ngộ Pháp Tắc.
+
+Yêu tộc Hóa Hình thành người là một lựa chọn có lợi cho tu luyện, không phải vì hình người là dạng sống mặc định của vũ trụ.
+
+---
+
+# LIV. THẦN HUY ENCLAVE / DI TÍCH TIẾP XÚC NGOẠI GIỚI
+
+Đã khóa:
+
+> trước khi Giới Bích bị siết kín, Nạp Hư từng tiếp xúc trực tiếp Thần Huy.
+
+Do đó có thể tồn tại:
+
+- trạm quan sát Thần Huy;
+- thương cảng;
+- viện nghiên cứu;
+- khu ngoại giao;
+- enclave nhỏ;
+- hậu duệ của người Thần Huy mắc kẹt sau khi Giới Bích đóng.
+
+Các địa điểm này đặc biệt phù hợp nằm gần:
+
+- Tinh Hải Thần Châu;
+- Vực Lộ cổ;
+- Phi Thăng Hoàn;
+- hoặc vùng từng là tiền tuyến Chư Giới.
+
+Không cần toàn bộ còn nguyên.
+
+Một số chỉ còn:
+
+> **di tích công nghệ mà người đời sau hiểu sai là “cổ cơ quan Nạp Hư”.**
