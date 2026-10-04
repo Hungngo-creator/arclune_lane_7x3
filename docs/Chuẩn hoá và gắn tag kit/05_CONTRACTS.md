@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-04-F.12
+**Version:** 2026-10-04-F.13
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -22,6 +22,8 @@
 **Revision F.11:** adds TGT-008 Position-binding/default precision, POS-008/009 bounded relocation/deferred-counter/truly-empty law, DMG-035 isolated Damage projection, TRG-016 stable-health mandatory settlement and ACT-034 opportunity-start dependency. All prior IDs/profiles remain intact; no new Tag/Primitive or global priority.
 
 **Revision F.12:** refines ACT-034's captured-value lifetime through authored normal State termination and DMG-035's pre-Damage eligibility/mandatory atomic terminal credit. No new Contract ID, Tag, Primitive or ordering between unrelated settlements.
+
+**Revision F.13:** refines only TGT-008 with per-attack-owner Slot defaults, exact authored Entity/Both exceptions, non-propagation and Entity-tracking presentation. No new Contract ID, Tag or Primitive; previously approved exact-owner locks remain intact.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -1795,13 +1797,17 @@ If gameplay-observable tie behavior is not declared:
 ---
 
 ## TGT-008 — Position-bound Attack and Current Occupant
-**Status:** `LOCKED_DEFAULT FOR NEW OTHERWISE-UNDECLARED ATTACK BINDING; EXPLICIT PROFILES PRESERVED`
+**Status:** `LOCKED_DEFAULT FOR EVERY ATTACK OWNER; EXACT AUTHORED EXCEPTIONS PRESERVED`
 
-The project attack-reference default is Position/Slot. Normalization must resolve it into explicit Position locks/current-occupant timing before execution. It does not overwrite an explicit designer Entity/Both lock, migrate previous approved Canons, or change non-attack Self/Leader/State references. Entity following requires explicit identity binding; it is separate from Guaranteed Hit.
+For every Character, resolve binding independently for each attack-producing semantic owner: Action, Effect, child Action, triggered settlement, Counter, Follow-up or other attack owner. An otherwise-unresolved authored binding defaults to POSITION / LOCK_POSITIONS. Entity/Both is exceptional and must be explicitly designer-authored for that exact owner, directly or through an explicit owner-scoped binding-profile reference. Preserve existing approved exceptions only at that scope; do not migrate them or change non-attack Self/Leader/State references.
+
+A Character, Ability root, parent Action, sibling Effect or another Ability cannot implicitly grant its Entity/Both binding to other attack owners. Shared target IDs/TargetSetRef, target center, source Snapshot, Action identity, attribution or root lineage are input/provenance, not exception permission. Explicit reuse is legal only with the consuming owner's independently resolved binding; a generic reuse-parent-targets instruction alone cannot make it Entity-bound. Every executable owner must carry its explicit resolved binding/checkpoint in normalized data. Missing resolved binding in an executable plan or foreign-owner substitution fails validation; malformed IR fails closed before the affected attack. No runtime guessing or Character-wide inheritance.
+
+An explicitly Entity-tracking LOCK_ENTITY_IDS attack follows the same legal locked Entity if it moves before impact; presentation addresses that Entity's current authoritative Position. Movement alone does not replace/invalidate the identity, though ordinary lifecycle/target/Hit/Authority rules still apply. No retarget, Guaranteed Hit or attacker Position mutation is inferred. LOCK_BOTH retains its explicitly authored compatible identity/coordinate constraints and cannot silently become Entity-only or Position-only.
 
 For CURRENT_LEGAL_OCCUPANT / POST_POSITIONAL_INTERPOSITION_PRE_DAMAGE, select/retain coordinates first, finish any applicable POS-008 relocation, then resolve current legal occupants immediately before Damage calculation. Freeze those recipients and the shared state through the group's commit. Empty coordinates yield the authored MISS/OMIT outcome; legal replacement occupants may receive the hit. Do not chase originals, reselect coordinates or re-query occupancy between packet calculations. Resolved invalid recipients follow TGT-006 locally, without replacement. Earlier source snapshots remain immutable.
 
-TGT-010/011 still govern geometry and batch membership. A declared Entity-bound area retains its explicit semantics; this default does not force all geometry profiles to add a relocation phase. Missing movement-sensitive binding/checkpoint remains a normalization error, not a hidden Kernel default.
+TGT-010/011 still govern geometry and batch membership. A declared Entity-bound area retains its explicit semantics at its own authored scope; this default does not force all geometry profiles to add a relocation phase. Slot coordinates remain fixed and their occupant is resolved at the authored recipient checkpoint, never by chasing the originally selected Entity. Defaulting binding does not invent selection/geometry/invalidation rules; missing movement-sensitive checkpoint remains a normalization error, not a hidden Kernel default.
 
 ---
 
