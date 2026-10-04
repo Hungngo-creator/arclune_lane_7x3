@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-04-G.11
+**Version:** 2026-10-04-G.12
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -23,6 +23,8 @@
 **Revision G.10:** executes E.9/F.11 through existing Target/Area/Position/RNG/Transaction, Damage/Shield/Result, Health/Lifecycle/Trigger and SSI/State owners. Explicit scoped phase/checkpoint/obligation data supplies the missing boundaries; no Character runtime, new Primitive, arbitrary callback or generic priority.
 
 **Revision G.11:** completes projection-credit continuation dependencies and retained State-value consumers during an opportunity-start graph's normal removal, through existing batch/Result/State/Transaction/Snapshot/continuation owners. No new store, service, Contract ID or global priority.
+
+**Revision G.12:** consumes separately resolved TGT-008 bindings per attack owner through existing Target/Lock/Effect/child plans; rejects inherited or unresolved exceptions and preserves Entity tracking/current-Position presentation. No new store, service, Tag or Primitive.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -2838,6 +2840,10 @@ Later validation reads declared invalidation policy.
 
 No silent reroll.
 
+For an attack, consume the exact executing Action/Effect/request-path or triggered-settlement owner's resolved TargetSpec under TGT-008. Normalization has already defaulted every owner lacking an authored exception to POSITION/LOCK_POSITIONS; runtime never walks Character, Ability, parent, sibling or another Ability to obtain a binding. Shared TargetSetRef/input data is interpreted under this owner's explicit plan, not copied as binding permission. A missing/mismatched owner binding or unsupported checkpoint fails closed before the affected attack. Existing Target/Lock and Effect records suffice; no Character binding cache or new resolver.
+
+LOCK_ENTITY_IDS keeps the legal locked Entity through movement before impact and supplies its current authoritative Position to presentation, without retargeting or moving the attacker. Position locks retain coordinates and resolve current occupants only at their authored checkpoint; they never follow the original Entity. An explicitly authored LOCK_BOTH preserves its own compatible constraints. Presentation reads the resolved result/context and cannot choose binding or recipient; ordinary Hit/Authority/lifecycle validation remains independent.
+
 # 42A. HIT ADMISSION RESOLVER
 
 Target Lock and Hit Admission are separate runtime stages.
@@ -5254,7 +5260,7 @@ A child can:
 - inherit target center;
 - use child-specific TargetSpec.
 
-No implicit behavior from visual sequence.
+These are explicitly authored child target-input policies, not implicit binding inheritance. Under TGT-008, resolve the child and its separately owned attack Effects at their own authored scopes. Reusing parent target IDs/center or the same Ability definition does not copy the parent's Entity/Both exception. Such tracking needs an explicit exception on the exact consuming attack owner; otherwise its resolved plan is POSITION/LOCK_POSITIONS. Preserve approved child-specific locks and explicitly scoped reusable profiles. No implicit behavior from visual sequence, parent/root lineage or Character identity.
 
 ---
 

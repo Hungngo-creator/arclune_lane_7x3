@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-04-E.10
+**Version:** 2026-10-04-E.11
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -20,6 +20,8 @@
 **Revision E.9:** preserves explicit target locks while making the new-content Slot default concrete; adds bounded pre-Damage positional relocation/deferred-counter batching, distinct read-only fixed-area Damage projection, mandatory stable HP/MaxHP and owner-opportunity-start profiles through existing plans. No new Tag, Primitive or callback/priority system.
 
 **Revision E.10:** completes existing projection-credit and opportunity-start lifetime bindings: credit-bearing queries close before batch continuation, and an authored State-termination graph retains captured values through its own terminal Heal. Existing tags/facets, snapshots, State transactions and finite dependency plans suffice; no new field family, Contract ID, Tag or Primitive.
+
+**Revision E.11:** resolves attack binding separately for every attack-producing semantic owner under TGT-008. POSITION/LOCK_POSITIONS is the default across all Characters; Entity/Both exceptions require exact authored scope and never propagate implicitly. Existing TargetSpec/targetRef/request targetPolicy and normalized plans suffice; no new field family, Tag or Primitive.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -2274,7 +2276,11 @@ Defines whether later components re-run Target Selection.
 
 ## 11.11 Position-bound attacks and occupant reads
 
-For new attack content without an explicitly approved binding, the designer's project default is Position/Slot binding under TGT-008. Normalize it into an explicit POSITION / LOCK_POSITIONS profile; executable IR never guesses a missing binding. Existing explicit Entity/Both profiles and previously approved Character locks remain unchanged. Non-attack Entity, Self, Leader, State and other references are not migrated by this default.
+Under TGT-008, Position/Slot is the default for every attack-producing semantic owner in every Character, including an Action, Effect, child Action, triggered settlement, Counter, Follow-up or other attack owner. Resolve each owner independently: absent an explicit designer-approved binding for that exact owner, normalize to POSITION / LOCK_POSITIONS. Preserve approved Entity/Both locks only at their authored scope, including existing exact-owner profiles; this is not migration of those locks. Non-attack Entity, Self, Leader, State and other references retain their own rules.
+
+An Entity/Both declaration on a Character, Ability root, parent Action, sibling Effect or another Ability does not authorize that exception for any other attack owner. The owner's TargetSpec, targetRef or request targetPolicy may explicitly reference a reusable binding profile or supplied target data, but the binding exception must itself be explicitly authored for that owner. Reusing a TargetSetRef, target center, Snapshot, Action identity or root lineage alone does not inherit binding. There is no Character-wide or Ability-wide attack-binding fallback. Resolve selection, geometry, recipient checkpoint and invalidation separately under their existing laws; the Slot default does not invent these operands.
+
+Every executable attack owner carries an explicit resolved binding in its existing target/effect plan. An owner with no exception receives POSITION / LOCK_POSITIONS even when its parent tracks an Entity. Missing/ambiguous resolved binding or unsupported movement-sensitive checkpoint is a normalization error, not a Kernel inference.
 
 An opted-in Position attack can declare:
 
@@ -2289,6 +2295,8 @@ requeryPolicy: DO_NOT_RESELECT_POSITIONS
 At this checkpoint, read current legal occupants of the retained coordinates, then freeze recipient identities and the shared calculation state through commit. This occupancy read is not another Slot selection or retarget: an original Entity moving away is not chased; a legal replacement at that coordinate may receive the hit. Apply the authored invalidPolicy to an invalid resolved recipient, without another coordinate/occupant query inside the same batch. Source Snapshot bindings remain independent. Entity binding does not itself grant Guaranteed Hit; HIT-* still applies. This profile requires retained Position routing; a simultaneous Entity/Both lock needs an explicit compatible Contract, never silently ignored identity fields.
 
 The same policy composes with AreaSpec positionSet/occupancyRule. Explicit Entity-bound areas retain their declared checkpoint. Do not silently convert every prior AoE to a post-movement query or use renderer state for occupancy.
+
+An explicitly authored Entity-tracking attack retains LOCK_ENTITY_IDS: if that legal Entity moves before impact, the attack follows its identity and presentation addresses its current authoritative Position. This does not reselect a target, guarantee a hit or move the attacker. A Slot-bound attack retains the original coordinate and resolves its occupant at the authored recipient checkpoint without chasing the original Entity. An explicit LOCK_BOTH profile keeps its own compatible identity/coordinate constraints; neither half may be silently discarded.
 
 ---
 
@@ -5364,6 +5372,8 @@ An explicitly authored lifecycle DIRECT_EXECUTE profile lowers under DTH-008 to 
 
 Target tie policy is normalized into `targetPlan`.
 
+TGT-008 binding resolution is keyed by each existing attack-owner Action/Effect/request-path or triggered-settlement origin in `targetPlan`/`effectGraph`, not by Character or Ability alone. Lower a separately resolved TargetSpec for every attack owner, preserving exact-owner exception provenance and explicit profile/target-data references. Shared data does not copy binding permission; one Ability-level resolved flag cannot stand in for its independently owned attacks.
+
 `DEPLOYMENT_COST_MODIFICATION` and `RETURN_TO_DECK` remain typed Effect semantics in the normalized Effect/deployment execution plan; they do not imply new Primitive IDs.
 
 None of these plans implies a new Primitive by itself.
@@ -6457,6 +6467,8 @@ At minimum validator must enforce:
 Additional E.9 invariants: explicit movement-sensitive Position/Entity binding; no renderer-based emptiness or hidden coordinate re-selection; bounded fixed-area interposition and supported matching; atomic success-only allowance/obligation; declared counter release/batch/retention/allocation; projection result cannot satisfy committed-result queries; complete isolated input/budget/credit identity; stable-health fields and finite pre-continuation dependency; owner/grant/State-instance anchor before control. Reject cycles, unavailable snapshots/Mode adapters and undeclared observable competing interactions.
 
 Additional E.10 invariants: projection membership is sealed while the exact State is active before Damage, never rebuilt from a later health activation; authored credit dependencies close after complete batch/lifecycle and before continuation, including exclusion-only and zero-result terminals; credit delta and dedup identity commit together. A State-termination graph must capture values it needs after removal, preserve its own registered terminal work and reject live retired-State reads or stale-owner continuation. Tag validation continues to use the exact 02 registry: area geometry and damage-derived Heal are facets/composition, not undeclared AREA or deferred LIFESTEAL Functional Tags.
+
+Additional E.11 invariants: every executable attack owner has an explicit resolved binding; unresolved authoring binding defaults to POSITION/LOCK_POSITIONS. Entity/Both requires an exact-owner authored exception or explicit owner-scoped profile reference. Reject broad exception propagation, foreign-owner binding substitution, unresolved IR and implicit parent/Character/Ability/sibling inheritance. Explicit Entity tracking preserves identity through legal movement and uses current Position for presentation; Slot binding retains coordinates and its declared occupant-read checkpoint. Keep approved exact-owner Entity/Both and non-attack profiles intact.
 
 # 93. SCHEMA NON-GOALS
 

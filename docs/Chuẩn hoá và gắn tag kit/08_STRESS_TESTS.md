@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-04-I.11
+**Version:** 2026-10-04-I.12
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.10+, `05_CONTRACTS.md` F.12+, `06_KERNEL_RUNTIME.md` G.11+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.11+, `05_CONTRACTS.md` F.13+, `06_KERNEL_RUNTIME.md` G.12+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -23,6 +23,8 @@
 **Revision I.10:** adds M-082–M-093 for explicit Slot/occupant binding, bounded seeded relocation/claims/deferred-counter allocation, stable health and opportunity barriers, isolated fixed-area projections, enhancement/child composition, rejection and external unresolved boundaries. Prior cases remain unchanged; Architecture Phase declarative coverage only.
 
 **Revision I.11:** adds M-094–M-099 for exact tag/facet ownership, required atomic projection credit before continuation, no retrospective activation credit, retained accumulator after normal return-State removal, battle-participant/presence guards and malformed composition rejection. All prior case bodies remain unchanged; six additional declarative obligations, not executable test results.
+
+**Revision I.12:** adds M-100–M-102 for per-attack-owner Slot defaults/non-propagation, moved-Entity versus fixed-Slot impact/presentation, and rejection of broad or unresolved binding. Preserve every prior case and approved exact-owner Entity/Both lock. Architecture Phase declarative coverage only.
 
 # 0. WHAT THIS FILE IS
 
@@ -3884,6 +3886,33 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 
 ---
 
+## M-100 — Every Attack Owner Resolves Binding without Propagating Exceptions
+
+**Status:** `MUST_PASS`
+**Fixture:** one Character has a previously approved Entity-bound Basic and a different root attack Action with its own explicitly authored Entity binding. Within the root's graph, a distinct Damage Effect, child Action, child-owned Damage Effect, triggered settlement, Counter, Follow-up and another attack owner each have complete legal selection/geometry/recipient-checkpoint/invalidation data but omit binding. A sibling Effect has its own explicit compatible Both profile; another Ability has its own Entity-bound attack. Variants explicitly reference a reusable Entity profile for just one consuming owner, share target input/Snapshot/root/Ability identity, permute owner enumeration and save/resume.
+
+**Expected:** each unbound attack owner normalizes independently to explicit POSITION/LOCK_POSITIONS, across existing and new Characters. The Basic/root/sibling/other Ability exceptions remain confined to their exact authored owners. Neither the root's Entity binding nor the sibling's Both binding changes any unbound owner. A named Entity profile referenced explicitly for one attack owner preserves only that owner's exception; all others still default to Slot. TargetSetRef/target center/Snapshot reuse and same-root/Ability identity do not authorize Entity/Both. Normalized target/effect plans retain each exact owner and resolved binding; one Ability/Character flag is insufficient. Technical permutation/replay cannot leak one owner's binding to another. Non-attack Heal/Self/Leader references retain their ordinary rules. Previously approved exact Basic, per-group and nested-child locks remain accepted without migration.
+
+---
+
+## M-101 — Entity Tracking Follows Movement while Slot Impact Keeps Its Coordinate
+
+**Status:** `MUST_PASS`
+**Fixture:** two independently authored attack owners select legal enemy X at Slot5 at the same declared selection checkpoint. Owner E explicitly uses ENTITY/LOCK_ENTITY_IDS; owner P omits binding and normalizes to POSITION/LOCK_POSITIONS with current-occupant read at its declared impact checkpoint. Before impact X legally moves5→8 and legal Y occupies5. Variants empty5, invalid X, blocked ordinary Hit admission, explicit compatible Both constraints and source VFX.
+
+**Expected:** E retains X, follows X at8 and presentation addresses X's current authoritative Position8; it does not hit Y, reselect a target, use stale presentation Slot5 or move the attacker. P retains Slot5 and resolves Y at the authored checkpoint; empty5 yields its declared MISS/OMIT outcome, never chase X at8. Freeze resolved recipient/calculation state under the applicable batch law. Invalid X follows E's existing local invalid policy without replacement; Entity binding does not guarantee Hit or bypass Authority/lifecycle. Explicit Both follows its own compatible identity/coordinate law without dropping either constraint. Presentation cannot select recipients or change binding, and the two owners' shared source/selection context cannot merge their semantics.
+
+---
+
+## M-102 — Reject Broad Binding Inheritance and Unresolved Executable Owners
+
+**Status:** `MUST_REJECT`
+**Input:** a Character/Ability-wide Entity/Both exception without exact consuming-owner scope; parent/sibling/another Ability's exception copied into an unbound owner; generic reuse-parent-targets treated as Entity permission; one root-level resolved flag masking unresolved child/Effect/Counter/Follow-up bindings; foreign-owner TargetSpec substituted at execution; Position owner directly consuming an Entity recipient without its declared coordinate/occupant checkpoint; missing compatible Both constraints; runtime/renderer guesses binding or uses visual movement to chase a Slot's original Entity.
+
+**Expected:** responsible Schema/Normalizer rejects unsupported exception propagation or unresolved executable plans; malformed IR fails closed before the affected attack, without guessing a Character-wide fallback. Ordinary authoring with an omitted binding remains legal when its other required targeting data is complete: normalize that exact owner to POSITION/LOCK_POSITIONS. Exact-owner approved Entity/Both and explicit owner-scoped reusable profiles remain accepted. Reuse of target data alone cannot manufacture tracking permission; presentation never supplies targeting authority. No new Contract ID, Tag, Primitive, target store or Character branch is introduced.
+
+---
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -4697,13 +4726,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 99 character-derived integration tests;
+- 102 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-230 tests / probes / meta-tests (225 A–N cases plus 5 META cases)
+233 tests / probes / meta-tests (228 A–N cases plus 5 META cases)
 
 The count is not a design target.
 
