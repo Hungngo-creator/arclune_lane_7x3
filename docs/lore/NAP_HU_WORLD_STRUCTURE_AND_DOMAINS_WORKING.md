@@ -2,7 +2,7 @@
 
 > **Trạng thái:** Working Lore Design — dùng để tiếp tục khóa địa lý, lịch sử và vật lý Nạp Hư trước khi viết biên niên sử chính thức.
 >
-> **Mục tiêu tài liệu:** gom và làm rõ mô hình không gian Nạp Hư, vấn đề trên–dưới/trọng lực, Giới Bích, Phi Thăng, nơi cư trú của Chân Tiên, đồng thời hệ thống hóa các Vực hiện đã được định nghĩa: Hư Minh Lôi Hải, Tần Vực, Phạn Châu, Mộng Châu, Nhân Vực/Ma Châu, Tinh Hải Thần Châu và Yêu Vực.
+> **Mục tiêu tài liệu:** gom và làm rõ mô hình không gian Nạp Hư, vấn đề trên–dưới/trọng lực, Giới Bích, Phi Thăng, nơi cư trú của Chân Tiên, đồng thời hệ thống hóa các Vực hiện đã được định nghĩa: Hư Minh Lôi Hải, Tần Vực, Phạn Châu, Mộng Châu, Nhân Vực/Ma Châu, Tinh Hải Thần Châu, Yêu Vực và Linh Sinh Vực.
 >
 > Tài liệu này **không mặc định canon hóa những điểm còn được đánh dấu MỞ / CẦN KHÓA**.
 
@@ -688,19 +688,21 @@ Chủ tu:
 
 # **Đế Kiếm**
 
-Hắn đã chạm:
+Hắn đang ở tầng:
 
-> **Kiếm Đạo Quy Tắc.**
+> **gần hoàn chỉnh / gần chạm tới một Kiếm Đạo Pháp Tắc.**
 
-Nhưng Kiếm Đạo là một Quy Tắc quá rộng.
+Đây **không phải Quy Tắc**. Trong hệ Nạp Hư hiện hành:
 
-Do đó:
+- hoàn chỉnh **một Pháp Tắc** là điều kiện bước vào **Chân Tiên**;
+- nhiều Pháp Tắc hoàn chỉnh có quan hệ nội tại mới có thể ghép thành **một Quy Tắc**;
+- nắm một Quy Tắc hoàn chỉnh mới là nền của **Thiên Địa Chính Tiên**.
 
-> hiểu rất nhiều nhưng vẫn chưa đủ hoàn chỉnh để lên Thiên Địa Chính Tiên.
+Kiếm Đạo là một hệ quá rộng nên Tần Đế dù đã đứng rất sát cửa Chân Tiên vẫn chưa thể nói là “chạm Quy Tắc Kiếm Đạo”.
 
-Điều này rất hợp với hình tượng:
+Hình tượng đúng của hắn là:
 
-> một Định Pháp cực mạnh nhưng bị chính con đường quá lớn giữ lại.
+> **một Định Pháp cực mạnh đang ép một Pháp Tắc Kiếm Đạo cụ thể đi tới hoàn chỉnh, chứ chưa đứng trước cánh cửa Thiên Địa Chính Tiên.**
 
 ---
 
@@ -710,55 +712,45 @@ Tần Đế từng:
 
 > **diệt sát một Ma Tôn.**
 
-Ma Tôn = bracket Chân Tiên.
+Ma Tôn = bracket **Chân Tiên**.
 
-Nhưng để không phá hệ thống vượt cấp đã khóa, không nên viết:
+Chiến tích này được khóa theo **A + B đồng thời**, không phải Định Pháp ở trạng thái bình thường tùy ý vượt đại cảnh giới giết Chân Tiên.
 
-> “Định Pháp thuần cá nhân, ở đồng bằng, không chuẩn bị, solo Chân Tiên full-state rồi thắng.”
+### Điều kiện A — Đế Kiếm + Quốc Thế
 
-Phương án hợp lý hơn:
-
-### Cách A — Đế Kiếm + Quốc Thế
-Tần Đế chiến trong Tần Vực.
-
-Hắn dùng:
+Trận chiến diễn ra trong phạm vi Tần Vực / khu vực Tần Triều có thể phát huy đầy đủ:
 
 - quốc vận;
 - quân thế;
 - địa thế;
 - linh mạch;
-- Thiên Hạ Đồng Quy.
+- phong thủy;
+- **Thiên Hạ Đồng Quy**.
 
-Về triết học Đế Kiếm:
+Với Đế Kiếm, toàn bộ “Thế” của Tần Triều có thể trở thành một phần của kiếm.
 
-> toàn bộ Tần Triều chính là một phần kiếm của hắn.
+Do đó đây vẫn là chiến tích cá nhân của Tần Đế về mặt **đạo và khả năng điều khiển**, nhưng nguồn Thế mà hắn huy động lớn hơn thân thể đơn độc của hắn.
 
-Đây là external power hay self-power?
+### Điều kiện B — Ma Tôn thuộc tầng yếu nhất và không ở trạng thái hoàn hảo
 
-Chính lore có thể tranh luận.
+Ma Tôn bị giết là:
 
-Nhưng hệ thống không bị phá.
+- một trong những Ma Tôn yếu nhất;
+- chịu bất lợi vì Pháp Tắc Nạp Hư không hoàn toàn tương thích với thế giới gốc;
+- chịu áp lực của Giới Bích / xuyên giới;
+- có thể đã mang thương thế hoặc tiêu hao trước khi quyết chiến.
 
-### Cách B — Ma Tôn yếu nhất / vừa chứng / bị khóa giới
-Ma Tôn là người yếu nhất tầng Chân Tiên và bị:
+### Ý nghĩa
 
-- Giới Bích;
-- pháp tắc Nạp Hư;
-- thương thế xuyên giới;
-
-làm suy.
-
-Tần Đế dựa counter + địa lợi giết.
-
-### Cách tốt nhất
-Kết hợp A + B.
-
-Như vậy chiến tích vẫn kinh người:
+Tần Đế vẫn làm được điều cực kỳ hiếm:
 
 > **Định Pháp giết Chân Tiên.**
 
-Nhưng không biến đại cảnh giới thành vô nghĩa.
+Nhưng chiến tích không phá luật “từ đại cảnh giới cao trở đi gần như không thể vượt đại cảnh bằng thân lực thuần túy”.
 
+Đúng hơn:
+
+> hắn dùng một đạo Đế Kiếm vốn sinh ra để biến **quốc thế, thiên thời, địa lợi** thành kiếm, rồi giết một Ma Tôn vốn đã ở cực thấp của tầng Chân Tiên và bị Nạp Hư áp chế.
 ---
 
 # XX. PHẠN CHÂU
@@ -804,7 +796,21 @@ Phật Tổ:
 
 > **Chân Tiên.**
 
-Ông mang / hoàn thiện đại thần thông:
+Ông là nhân vật **có trước Huyết Thế Đại Kiếp**, không phải vị Phật tu trong tổ đội ba người dẹp Đại Kiếp.
+
+Trình tự lịch sử working hiện tại:
+
+1. Yêu tộc / Yêu Tiên từng chèn ép Nhân tộc trong Hắc Ám Kỷ;
+2. Nhân tộc thoát khỏi thế độc tôn của Yêu tộc;
+3. Phật Đạo dần hình thành và Phật Tổ xuất hiện;
+4. ngoại giới Ma Đạo xâm nhập, để lại đạo thống;
+5. Ma Đạo nội sinh lan rộng;
+6. Huyết Thế Đại Kiếp bùng nổ;
+7. một **Phật tu hậu thế**, cùng Kiếm tu và Ma tu quay đầu, tham gia chấm dứt Đại Kiếp.
+
+Như vậy người dẹp Đại Kiếp thuộc Phật Đạo nhưng **không phải Phật Tổ**. Hắn là người đến sau, thừa hưởng hoặc phát triển một nhánh trong truyền thống Phật Đạo đã tồn tại.
+
+Phật Tổ mang / hoàn thiện đại thần thông:
 
 # **Chưởng Trung Phật Quốc**
 
@@ -817,11 +823,11 @@ Từ:
 
 đưa Phạn Châu thành một trong các Vực có chiến lực rất cao.
 
-“Hữu giáo vô loại” có thể giữ như một triết lý của Phật Tổ:
+“Hữu giáo vô loại” được giữ như một triết lý quan trọng của Phật Tổ:
 
 > không phân tộc loại khi truyền pháp.
 
-Điều này rất đáng chú ý nếu Phạn Châu chứa:
+Điều này đặc biệt phù hợp nếu Phạn Châu chứa:
 
 - Nhân;
 - Yêu;
@@ -948,91 +954,125 @@ Mà vì:
 
 # XXIII. NHÂN HOÀNG CUNG
 
-Thế lực lớn nhất chính đạo truyền thống:
+Thế lực lớn nhất của chính thống Nhân tộc tại Nhân Vực/Ma Châu:
 
 # **Nhân Hoàng Cung**
 
-Được lập bởi:
+Nguồn gốc gắn trực tiếp với:
 
-> tộc duệ / truyền thừa liên quan Nhân Tổ.
+# **Nhân Tổ**
 
-Nhân Tổ:
+Nhân Tổ từng đạt:
 
 > **Thiên Địa Chính Tiên.**
 
-Nhưng hiện có một vấn đề logic phải xử lý:
+Số lượng Quy Tắc mà Nhân Tổ từng hoàn chỉnh **chưa khóa**.
 
-> Thiên Địa Chính Tiên đã cùng thiên địa đồng thọ và Chân Tiên trở lên không tự động vào Luân Hồi.
+Điểm chắc chắn:
 
-Trong khi Nhân Tổ:
-
-> binh giải thành 12 đứa con rồi vào Luân Hồi.
-
-Không thể để đây là hành vi bình thường.
-
-Nó phải là:
-
-# **một đại cấm thuật / sự kiện duy nhất.**
+> hắn từng cao hơn Chân Tiên rất xa và từng có tư cách “cùng thiên địa đồng thọ”.
 
 ---
 
-# XXIV. ĐỀ XUẤT GIẢI QUYẾT NHÂN TỔ
+# XXIV. BINH GIẢI CỦA NHÂN TỔ KHÔNG PHẢI CẤM THUẬT DUY NHẤT
 
-Tên working:
+Cần sửa một giả định cũ:
 
-# **Tự Trảm Tiên Cách**
+> **bất kỳ Thiên Địa Chính Tiên nào về nguyên tắc cũng có thể chủ động binh giải, tự tháo liên hệ với Quy Tắc, suy yếu bản thân rồi quay lại Luân Hồi.**
 
-Nhân Tổ chủ động:
+Không phải Thiên Đạo tuyệt đối cấm.
 
-1. tháo liên hệ bất tử với Quy Tắc;
-2. chia 12 thần dị/bản thể sang 12 huyết hệ;
-3. hạ chính mình khỏi trạng thái Thiên Địa Chính Tiên;
-4. biến Chân Ngã thành dạng Luân Hồi có thể tiếp nhận;
-5. vào Luân Hồi.
+Không phải chỉ Nhân Tổ có secret technique độc nhất.
 
-Cái giá:
+Lý do gần như không ai làm rất đơn giản:
 
-> mất phần lớn quyền năng cũ.
+> **đã vĩnh sinh rồi, tại sao tự tay vứt bỏ vĩnh sinh?**
 
-Như vậy không phá quy tắc.
+Thiên Địa Chính Tiên muốn vào Luân Hồi phải tự hạ mình xuống mức Luân Hồi còn có thể tiếp nhận.
 
-Ngược lại còn tạo một feat cực hiếm:
-
-> một kẻ vĩnh sinh chủ động từ bỏ vĩnh sinh để quay lại dòng chúng sinh.
+Đó là một lựa chọn cực đoan, không phải progression bình thường.
 
 ---
 
-# XXV. THẬP NHỊ THỂ
+## Nhân Tổ đã làm gì?
 
-12 người con của Nhân Tổ đã chết.
+Nhân Tổ chủ động suy yếu bản thân tới cực hạn.
 
-Mỗi người để lại:
+Hắn:
 
-> một loại Thể Chất / Thần Dị.
+1. tháo phần liên kết khiến mình ở trạng thái Thiên Địa Chính Tiên;
+2. chia nhỏ hệ Quy Tắc / quyền năng mà mình đã nắm;
+3. tách thành **12 phần Pháp Tắc / thần dị lớn**;
+4. dùng mười hai phần ấy sinh ra **12 người con**;
+5. mỗi người con đạt bracket **Chân Tiên**;
+6. bản thân Nhân Tổ sau khi mất cấu trúc Quy Tắc hoàn chỉnh hạ xuống đủ sâu để vào Luân Hồi.
 
-Hiện tại:
+Điểm quan trọng:
 
-- có 12 loại;
-- mỗi thời đại chỉ có đúng 12 cá nhân;
-- mỗi loại tại một thời điểm chỉ có **1 chủ**.
+> **Chân Ngã của Nhân Tổ không bị xóa.**
 
-Đây không nên là genetic inheritance xác suất bình thường.
+Hắn vẫn ở trong Luân Hồi.
 
-Hay hơn:
+Không ai biết đã luân hồi bao nhiêu lần.
 
-> 12 “ghế” bản thể được khắc vào Nhân tộc Nhân Vực.
+Một thiên tài Nhân tộc bất kỳ trong lịch sử:
 
-Khi một chủ chết:
+> có thể chỉ là thiên tài bình thường,
 
-> quyền năng tìm vật chủ tương thích mới.
+hoặc:
 
-Tên working:
+> **có thể là một đời của Nhân Tổ chưa thức tỉnh ký ức.**
 
-# **Thập Nhị Nhân Ấn**
+Khi ký ức thức tỉnh, điều trở lại trước tiên không nhất thiết là toàn bộ tu vi cũ, mà là:
 
-Nó giải thích tại sao:
+- nhận thức;
+- kinh nghiệm;
+- phương pháp;
+- quan hệ với những dấu vết cũ;
+- khả năng đi lại con đường từng đi nhanh hơn người thường.
 
-> không bao giờ có hai người cùng một thể chất.
+---
+
+# XXV. MƯỜI HAI NGƯỜI CON & THẬP NHỊ THỂ
+
+Mười hai người con của Nhân Tổ:
+
+> ban đầu đều là Chân Tiên được sinh từ mười hai phần Pháp Tắc / quyền năng mà Nhân Tổ chia ra.
+
+Về sau họ đều đã chết theo nghĩa thân đời đó kết thúc.
+
+Nhưng giống Nhân Tổ:
+
+> **Chân Ngã của họ chưa chắc bị tiêu diệt.**
+
+Họ có thể tiếp tục Luân Hồi.
+
+Do đó trong mỗi thời đại:
+
+> một thiên tài nào đó cũng có khả năng là một trong mười hai người con đang ở đời mới và chưa thức tỉnh.
+
+Trước khi rời đời cũ, mười hai người con còn biến thần dị của mình thành:
+
+> **12 loại Thể Chất** lưu truyền trong Nhân tộc.
+
+Luật đã khóa:
+
+- có đúng 12 loại;
+- một loại tại một thời điểm chỉ có **một người sở hữu**;
+- mỗi thời đại tối đa có 12 chủ thể tương ứng.
+
+Tên working vẫn có thể dùng:
+
+# **Thập Nhị Nhân Ấn / Thập Nhị Thể**
+
+Cơ chế chính xác giữa:
+
+- Chân Ngã luân hồi của mười hai người con;
+- và người đang giữ Thể Chất tương ứng;
+
+**chưa khóa**.
+
+Không nên tự động giả định hai thứ luôn là cùng một người cho tới khi thiết kế lịch sử cụ thể.
 
 ---
 
@@ -1040,33 +1080,49 @@ Nó giải thích tại sao:
 
 Ba cực chính:
 
-- Nhân Hoàng Cung;
-- Thiên Ma Môn;
-- Cực Lạc Ma Tông.
+- **Nhân Hoàng Cung**;
+- **Thiên Ma Môn**;
+- **Cực Lạc Ma Tông**.
 
 Hai Ma Tông:
 
-> mỗi bên có Ma Tôn.
+> mỗi bên có một Ma Tôn.
 
-Ma Tôn = Chân Tiên bracket.
+Ma Tôn = bracket **Chân Tiên**.
 
-Vậy tại sao Nhân Hoàng Cung không bị nghiền?
+Nếu chỉ nhìn số lượng bề mặt:
 
-Có thể nhờ tổ hợp:
+> hai Ma Tôn đáng lẽ đủ khiến Nhân Hoàng Cung cực kỳ khó tồn tại.
 
-- Thập Nhị Nhân Ấn;
-- di sản Nhân Tổ;
-- đại trận;
-- khí vận Nhân tộc;
-- Tiên Tổ cũ;
-- cơ chế Nhân Tổ để lại.
+Nhưng Nhân Hoàng Cung có một biến số mà cả hai Ma Tông đều phải tính:
 
-Không nên cho một bí pháp duy nhất giải quyết hết.
+> **Nhân Tổ và mười hai người con của hắn chưa chắc đã biến mất khỏi lịch sử.**
 
-Tốt hơn là:
+Khả năng working rất cao:
 
-> cả Nhân Hoàng Cung là một “hệ thống phòng thủ di sản” được thiết kế từ thời Nhân Tổ.
+- ít nhất một đời luân hồi của Nhân Tổ đang ở / từng ở Nhân Hoàng Cung;
+- một số người con cũng có thể đã thức tỉnh hoặc lưu lại hậu thủ;
+- Nhân Hoàng Cung nắm di sản trực tiếp của một cựu Thiên Địa Chính Tiên;
+- Thập Nhị Thể liên tục tái xuất trong Nhân tộc;
+- đại trận, khí vận và di sản pháp tắc của Nhân Tổ vẫn còn.
 
+Điểm răn đe lớn nhất không nhất thiết là:
+
+> “Nhân Tổ hiện tại vẫn có full sức mạnh Thiên Địa Chính Tiên.”
+
+Mà là:
+
+> **không ai dám chắc hắn đang là ai, đã thức tỉnh tới đâu, và đã để lại bao nhiêu thủ đoạn từ những đời trước.**
+
+Hai Ma Tôn vì vậy phải cân nhắc việc:
+
+> đẩy Nhân Hoàng Cung tới tuyệt cảnh có thể vô tình ép một tồn tại từng là Thiên Địa Chính Tiên thật sự thức tỉnh hoàn toàn.
+
+Thế cân bằng Ma Châu vì vậy là:
+
+> **hai Chân Tiên Ma Đạo có ưu thế sức mạnh hiện hữu**  
+> đối đầu  
+> **một thế lực giữ di sản, Luân Hồi và biến số lịch sử của Nhân Tổ + mười hai người con.**
 ---
 
 # XXVII. TINH HẢI THẦN CHÂU
@@ -1097,49 +1153,38 @@ Rất phù hợp làm đối trọng văn minh với Tần Vực.
 
 ---
 
-# XXVIII. VẤN ĐỀ THỜI GIAN CỦA “TRUYỀN THỪA THẦN HUY”
+# XXVIII. TRUYỀN THỪA THẦN HUY — ĐÃ XÁC NHẬN CÓ TIẾP XÚC TRƯỚC ĐẠI HỢP GIỚI
 
-Hiện câu:
+Không còn mâu thuẫn thời gian.
 
-> “một đám học sĩ được truyền thừa từ Thần Huy”
+Nạp Hư và Thần Huy:
 
-có thể mâu thuẫn nếu Tinh Hải Thần Châu đã tồn tại **trước Đại Hợp Giới** và Nạp Hư chưa từng tiếp xúc Thần Huy.
+> **đã từng tiếp xúc trước khi Giới Bích của Nạp Hư bị siết kín và rất lâu trước Đại Hợp Giới của KLC.**
 
-Cần khóa một trong ba phương án:
+Một cửa sổ lịch sử rất hợp lý là:
 
-### Phương án 1 — Nạp Hư từng tiếp xúc Thần Huy trước dung hợp
-Hai Đại Thế Giới biết nhau nhưng chưa hợp nhất.
+> thời đại Chư Giới còn đi lại tương đối tự do, quanh hoặc trong chuỗi biến cố khi Ma Đạo Đại Thế Giới bắt đầu xâm lấn Nạp Hư.
 
-Học sĩ lấy được:
-- xác chiến hạm;
-- công nghệ;
-- tù binh;
-- thư tịch.
+Trong thời đó:
 
-### Phương án 2 — Tinh Hải tiền thân có khoa học riêng
-Trước hợp giới:
+- nhiều Đại Thế Giới biết tới nhau;
+- thương mại, thăm dò, gián điệp và chiến tranh cùng tồn tại;
+- công nghệ / lý luận Thần Huy có thể truyền sang Nạp Hư;
+- học giả Nạp Hư thu được chiến hạm, tài liệu, vật mẫu hoặc trực tiếp trao đổi với người Thần Huy.
 
-> đã là Khoa Kỹ Tu Tiên.
+Do đó tầng học sĩ về sau của Tinh Hải Thần Châu có thể thật sự giữ:
 
-Sau Đại Hợp Giới:
+> **truyền thừa kỹ thuật có nguồn Thần Huy.**
 
-> học giả nhận công nghệ Thần Huy và phát cuồng nâng cấp.
+Điều này không có nghĩa toàn bộ khoa học Tinh Hải đều do Thần Huy ban.
 
-Cách này sạch nhất.
+Nạp Hư vẫn có thể có khoa học / luyện khí / trận học riêng; truyền thừa Thần Huy đóng vai trò:
 
-### Phương án 3 — Tinh Hải Thần Châu là địa danh Arclune hậu dung hợp
-Nếu vậy:
+> một hệ tri thức ngoại giới có cấu trúc khác hẳn, khiến một nhóm học sĩ phát cuồng vì thấy những phương pháp mà truyền thống Nạp Hư chưa từng tối ưu theo cùng cách.
 
-> nó không được dùng trong world bible Nạp Hư tiền dung hợp.
+Sau khi Giới Bích bị siết:
 
-**Đề xuất mạnh:** chọn **Phương án 2**.
-
-Như vậy Nạp Hư không mất agency công nghệ.
-
-Thần Huy chỉ:
-
-> châm lửa vào một nền khoa học đã có.
-
+> dòng trao đổi này gần như bị cắt đứt, biến công nghệ Thần Huy thành di sản ngoại giới cực quý.
 ---
 
 # XXIX. “TINH HẢI” CÓ MÂU THUẪN VỚI GIỚI TINH KHÔNG?
@@ -1210,72 +1255,193 @@ Vì vậy:
 
 # XXXII. LONG TỔ VÀ PHƯỢNG TỔ TỪNG LÀ MỘT
 
-Đây là một nền cực mạnh.
+Ban đầu không tồn tại “Long” và “Phượng” theo hình thái hậu thế.
 
-Ban đầu:
+Chỉ có:
 
-> một Sinh Linh Nguyên Tổ.
+> **một Sinh Linh Nguyên Tổ vô giới tính**, hình thái nguyên thủy có thể là một quả cầu quang hoặc một nhân hình không có giới tính sinh học cố định.
 
-Sau đó tách thành:
+Nó xuất hiện trong thời thiên địa còn rất sơ khai.
 
-- Long Tổ;
-- Phượng Tổ.
+Bản thể của sinh linh này đồng thời mang hai hệ đối lập:
 
-Có thể vì:
+- **Sinh Mệnh**;
+- **Tử Vong**.
 
-- âm/dương;
-- vật chất/năng lượng;
-- carbon/silicon;
-- hình/thần;
-- thủy/hỏa;
-- ổn định/biến hóa.
+Khi cấu trúc Pháp Tắc / Quy Tắc trong Nạp Hư dần ổn định, hai cực này phát sinh xung đột bản thể.
 
-**Chưa cần khóa gốc carbon hay silicon.**
+Sinh Linh Nguyên Tổ cuối cùng:
 
-Điểm quan trọng:
+> **tách thành hai cá thể.**
 
-> cả hai đều cảm thấy mình chỉ là “một nửa”.
+Một cá thể trở thành:
 
-Do đó:
+# **Phượng Tổ**
 
-> mỗi bên tin rằng thôn phệ bên kia sẽ trở về hoàn chỉnh.
+Cá thể còn lại trở thành:
 
-Đây là nguyên nhân sâu hơn rất nhiều so với:
-
-> “hai tộc ghét nhau”.
+# **Long Tổ**
 
 ---
 
-# XXXIII. CÁI CHẾT CỦA LONG TỔ VÀ PHƯỢNG TỔ
+## Phân chia Sinh–Tử
 
-Hai người:
+Working distribution:
 
-> đánh sinh tử.
+### Phượng Tổ
+- khoảng **90% tổng các mảnh Pháp Tắc cấu thành Sinh Mệnh**;
+- khoảng **10% tổng các mảnh Pháp Tắc cấu thành Tử Vong**.
 
-Kết quả:
+### Long Tổ
+- khoảng **90% tổng các mảnh Pháp Tắc cấu thành Tử Vong**;
+- khoảng **10% tổng các mảnh Pháp Tắc cấu thành Sinh Mệnh**.
 
-> **đồng quy vu tận.**
+Con số 90/10 là mô hình khái niệm, chưa nhất thiết là phần trăm đo lường vật lý tuyệt đối.
+
+Ý nghĩa:
+
+> mỗi kẻ gần như cực hạn ở một phía nhưng vẫn mang phần bản thể của phía kia.
+
+---
+
+## Tính duy nhất của Pháp Tắc / Quy Tắc
+
+Nạp Hư vận hành theo nguyên tắc:
+
+> **một Pháp Tắc hoàn chỉnh / một Quy Tắc hoàn chỉnh có tính duy nhất ở tầng sở hữu tuyệt đối.**
+
+Không thể có hai Thiên Địa Chính Tiên cùng lúc mỗi người đều sở hữu 100% cùng một Quy Tắc theo cùng nghĩa.
+
+Nhưng một Pháp Tắc hoặc tập Pháp Tắc có thể:
+
+> **bị phân mảnh.**
+
+Long Tổ và Phượng Tổ chính là trường hợp cực đoan:
+
+- phần Sinh Mệnh bị chia;
+- phần Tử Vong bị chia;
+- không ai có đầy đủ tất cả mảnh cần thiết.
+
+Vì vậy cả hai đều mạnh hơn Chân Tiên bình thường rất xa nhưng:
+
+> **không ai hoàn chỉnh được Quy Tắc cần thiết để trở thành Thiên Địa Chính Tiên thật sự.**
+
+Bracket gần nhất của họ là:
+
+> **bán bộ Thiên Địa Chính Tiên.**
+
+Điều này không có nghĩa họ tu theo hệ thống hậu thế từng bước. Họ là sinh linh Tiên Thiên, chỉ dùng hệ cảnh giới đời sau để mô tả gần đúng.
+
+---
+
+## Tại sao họ muốn ăn nhau?
+
+Không chỉ là thù chủng tộc.
+
+Mỗi bên đều cảm nhận:
+
+> **mảnh còn thiếu của mình đang ở trong kẻ kia.**
+
+Nếu Phượng Tổ nuốt trọn Long Tổ, về lý thuyết nàng có cơ hội:
+
+- lấy lại phần Sinh Mệnh còn thiếu;
+- thu đủ phần Tử Vong;
+- tái lập trạng thái nguyên thủy;
+- thậm chí ghép một hoặc nhiều Quy Tắc hoàn chỉnh.
+
+Long Tổ cũng nghĩ tương tự.
+
+Do đó cuộc giằng co của họ mang bản chất:
+
+> **hai nửa của cùng một tồn tại tranh quyền trở thành “toàn thể”.**
+
+---
+
+# XXXIII. THỌ NGUYÊN, SINH SẢN VÀ CÁI CHẾT CỦA LONG/PHƯỢNG TỔ
 
 Cả hai:
 
-> bán bộ Thiên Địa Chính Tiên.
+> **không vĩnh sinh.**
 
-Họ không hoàn toàn dùng hệ thống tu luyện hiện đại nên “bán bộ” chỉ là bracket đối chiếu.
+Dù bản thể Tiên Thiên giúp tuổi thọ dài hơn Chân Tiên bình thường rất nhiều, họ vẫn chưa đạt trạng thái Thiên Địa Chính Tiên có Quy Tắc hoàn chỉnh.
 
-Sau khi chết:
+Do đó:
 
-> con cháu dùng chính binh khí của hai Tổ chia cắt tàn hài rồi ăn.
+> thọ nguyên cuối cùng vẫn cạn.
 
-Đây là một sự kiện cực đen tối nhưng rất hợp Yêu tộc cổ.
+Hay nhất là để Long Tổ và Phượng Tổ:
 
-Nó có thể dẫn đến:
+- giằng co gần như cả một đời;
+- nhiều lần định thôn phệ nhau nhưng không thành;
+- tới cuối thọ nguyên đều nhận ra không còn thời gian;
+- mở trận tử chiến cuối cùng;
+- **đồng quy vu tận**.
 
-- huyết mạch Long hiện đại;
-- huyết mạch Phượng;
-- dị chủng;
-- long-phượng lai;
-- các tộc ăn được từng bộ phận khác nhau.
+Đây làm cuộc chiến có tính bi kịch mạnh hơn rất nhiều:
 
+> họ không còn đánh vì thắng một cuộc chiến chính trị; họ đánh vì nếu không nuốt được nửa kia, cả hai đều sẽ chết không hoàn chỉnh.
+
+---
+
+## Giới tính và sinh sản
+
+Long Tổ / Phượng Tổ:
+
+> **không có giới tính bản thể cố định.**
+
+Họ có thể chọn avatar:
+
+- nam;
+- nữ;
+- vô giới;
+- hình thú;
+- hình người;
+- quang thể.
+
+Khả năng sinh sản của họ không bị khóa bởi sinh học giao tử của phàm sinh.
+
+Nếu đủ:
+
+- vật chất;
+- huyết nhục / tinh chất;
+- Linh Khí;
+- mảnh bản nguyên;
+
+họ có thể tạo hậu duệ.
+
+Do đó một Long Tổ biểu hiện dưới hình thái nữ:
+
+> vẫn có thể khiến một sinh linh nữ mang thai nếu phương thức tạo hậu duệ của nàng đặt “hạt bản nguyên” vào đối phương.
+
+Con cháu Long/Phượng vì vậy không phải clone thuần.
+
+Chúng là:
+
+> bản nguyên Long/Phượng + vật liệu / huyết thống của các sinh linh xuất hiện sau họ.
+
+Điều này giải thích sự đa dạng khổng lồ của Long chủng, Phượng chủng và các chi lai.
+
+---
+
+## Tàn hài bị hậu duệ phân thực
+
+Sau khi hai Tổ đồng quy:
+
+> chính hậu duệ dùng binh khí của Long Tổ và Phượng Tổ để chia cắt tàn hài.
+
+Sau đó:
+
+> **ăn / luyện hóa / cấy ghép các phần tàn hài để tăng huyết mạch.**
+
+Sự kiện này có thể là nguồn trực tiếp của:
+
+- nhiều Hoàng tộc Yêu;
+- Long huyết phân nhánh;
+- Phượng huyết phân nhánh;
+- dị chủng Sinh–Tử;
+- giống lai Long–Phượng;
+- các pháp bảo làm từ Tổ Cốt;
+- những “Tổ Huyết” chỉ còn vài giọt nhưng đủ làm một tộc hưng thịnh.
 ---
 
 # XXXIV. YÊU TỘC VÀ HỆ TU CHUNG
@@ -1358,26 +1524,346 @@ Hiện mỗi Vực đã có một trục riêng:
 | Nhân Vực/Ma Châu | nguồn gốc Nhân tộc + Ma Đạo + Thập Nhị Thể |
 | Tinh Hải Thần Châu | khoa học tu tiên + AI + chiến hạm |
 | Yêu Vực | cổ sinh linh + Long/Phượng + huyết mạch |
+| Linh Sinh Vực | sinh mệnh silicon + khoáng học + Linh Khí nghèo + thời gian địa chất |
 
 Nếu thêm nữa, chỉ thêm khi lịch sử cần một chức năng chưa có.
 
 ---
 
-# XXXVII. CÓ NÊN CÓ LINH SINH VỰC RIÊNG?
+# XXXVII. LINH SINH VỰC — VỰC NGHÈO LINH KHÍ NHƯNG SINH RA SINH MỆNH KHOÁNG
 
-**Chưa bắt buộc.**
+**Có Linh Sinh Vực riêng.**
 
-Linh Sinh có thể:
+Nhưng lý do tồn tại của nó không phải:
 
-- phân bố nhiều Vực;
-- có một vùng tự trị;
-- hoặc sau lịch sử mới hình thành Vực riêng.
+> “mỗi chủng tộc cần một bản đồ riêng”.
 
-Nếu hiện tại tạo riêng chỉ vì “mỗi race một Vực” sẽ quá gamey.
+Nó tồn tại vì địa chất và tuần hoàn Linh Khí đặc thù.
 
-Chỉ thêm khi ta biết:
+---
 
-> tại sao chúng tụ lại ở đó.
+## 1. Môi trường
+
+Linh Sinh Vực là một trong những Vực:
+
+- nghèo Linh Khí bậc nhất;
+- rất ít đại Linh Mạch hoạt động;
+- địa hình hoang sơ;
+- nhiều cao nguyên đá, sa mạc khoáng, biển muối, hẻm magma;
+- sinh vật carbon thưa thớt;
+- chu kỳ sinh thái rất chậm.
+
+Nhìn bằng tiêu chuẩn Tần Vực:
+
+> đây gần như là “đất nghèo”.
+
+---
+
+## 2. Tại sao nơi nghèo Linh Khí lại sinh Linh Sinh?
+
+Linh Sinh không cần một trận bùng nổ Linh Khí.
+
+Chúng cần:
+
+> **thời gian cực dài + cấu trúc khoáng ổn định + dòng Linh Khí nhỏ nhưng liên tục.**
+
+Đá silicat, tinh thể và khoáng kim loại tại đây:
+
+- hấp thu lượng Linh Khí rất nhỏ;
+- giữ nó trong khuyết tật mạng tinh thể;
+- tạo dòng ion;
+- hình thành các chu trình điện–Linh Khí;
+- qua hàng chục nghìn / hàng trăm nghìn / lâu hơn nữa mới tích đủ độ phức tạp.
+
+Do sinh vật carbon ít:
+
+> gần như không có hệ sinh thái nhanh chóng cướp sạch dòng Linh Khí nhỏ đó.
+
+Do địa chất ổn định:
+
+> một khối đá có thể tồn tại nguyên trạng đủ lâu để “tính toán” bằng hóa học–Linh Khí trong vô số năm.
+
+Đến một ngưỡng:
+
+> mạng khoáng tự tổ chức đủ phức tạp để **khai linh**.
+
+Đó là Linh Sinh.
+
+---
+
+## 3. Linh Sinh không phải “hòn đá tự nhiên bỗng mọc mặt”
+
+Bản thể của chúng có thể dựa trên:
+
+- mạng silicat;
+- tạp kim;
+- tinh thể;
+- dòng ion;
+- Linh Khí như chất xúc tác siêu nhiên.
+
+Chúng vẫn phải tuân theo một hóa học nền.
+
+Linh Khí cho phép:
+
+> những quá trình vốn quá chậm / quá cứng của hóa học silicon trở nên linh hoạt hơn.
+
+---
+
+## 4. Văn minh Linh Sinh
+
+Linh Sinh dùng:
+
+> **Linh Thạch như nguồn năng lượng chất lượng cao.**
+
+Nhưng Linh Thạch không thay hoàn toàn vật chất xây thân.
+
+Chúng vẫn cần:
+
+- silicon;
+- kim loại;
+- tinh thể;
+- khoáng hiếm.
+
+Thành phố Linh Sinh có thể đồng thời là:
+
+- mỏ;
+- nhà máy;
+- cơ thể kiến trúc;
+- nơi ươm Tinh Hạch;
+- kho lưu lịch sử.
+
+Tốc độ sống của họ rất chậm.
+
+Một quyết định kéo 100 năm:
+
+> đối với họ có thể chỉ là “cân nhắc kỹ”.
+
+Đây là lý do Linh Sinh có chính trị rất khác Nhân/Yêu.
+
+---
+
+## 5. Quan hệ với Thiên Đạo
+
+Thiên Đạo Nạp Hư có xu hướng dung túng / che chở Linh Sinh hơn nhiều chủng tộc khác vì:
+
+- chúng tiêu hao chậm;
+- ít phá Linh Mạch;
+- gắn chặt địa chất;
+- bản thể gần cấu trúc thế giới.
+
+Nhưng Linh Sinh không mặc định hiền.
+
+Một Sơn Linh có thể xem thành phố Nhân tộc trên lưng mình như:
+
+> lớp rêu khó chịu.
+
+Nếu nó xoay người làm chết hàng triệu người:
+
+> nó chưa chắc hiểu hành vi đó theo cùng hệ đạo đức của con người.
+
+---
+
+## 6. Vai trò lịch sử
+
+Linh Sinh Vực nên là nơi:
+
+- ít bị các đế quốc ham muốn lúc đầu vì nghèo Linh Khí;
+- nhưng cực giàu khoáng vật có tuổi địa chất khủng khiếp;
+- về sau trở thành nơi Tinh Hải Thần Châu rất muốn khai thác;
+- tạo xung đột giữa “tài nguyên công nghiệp” và “sinh mệnh khoáng”.
+
+Đây có thể là một trong những xung đột đạo đức lớn nhất của Nạp Hư hiện đại.
+---
+
+# XXXVII-B. HAI ĐẠI TRUYỀN THỐNG KIẾM TU: CỔ KIẾM TU & LINH KIẾM TU
+
+Từ đây dùng thuật ngữ:
+
+# **Cổ Kiếm Tu**
+
+cho hệ Kiếm Đạo triết học đã xây trước đây:
+
+- Cửu Đại Kiếm Thuật;
+- Thập Bát Kiếm Lưu;
+- Sơn Hà Tại Hạ;
+- Thiên Hạ Đồng Quy;
+- Hồng Trần Nhập Mộng;
+- Vấn Tâm Vô Đáp;
+- Tâm Tượng Phán Kiếm;
+- Quy Khư Tịch Diệt;
+- Nhất Tuyến Sinh Thiên;
+- Thiên Khuyết Nhất Kiếm;
+- Bách Xuyên Quy Hải;
+- các Đại Kiếm Quyết như Mộng Lý Hoa Tạ, Kiếm Hậu Vô Kiếm, v.v.
+
+Hệ này mạnh ở:
+
+> **ngộ tính + ý cảnh + trực chỉ bản chất.**
+
+Một Cổ Kiếm Tu không nhất thiết cần tạo lượng năng lượng khổng lồ.
+
+Nếu đã hiểu đúng thứ cần chém:
+
+- sinh cơ;
+- ý thức;
+- khoảng cách;
+- điểm khuyết;
+- nhân quả;
+- tâm;
+- quan hệ;
+
+thì một kiếm nhỏ vẫn có thể kết thúc trận đấu.
+
+### Ưu
+- tiêu hao tương đối thấp so với hiệu quả;
+- khó phòng bằng giáp thuần;
+- ít cần phá toàn bộ vật chất;
+- có nhiều thủ đoạn thắng kẻ lực lượng thô lớn hơn.
+
+### Nhược
+- cực ăn ngộ tính;
+- khó truyền dạy đại trà;
+- nhiều kiếm cần điều kiện tâm cảnh / tri thức;
+- không hiểu target thì kiếm có thể vô dụng;
+- tiến bộ chậm và dễ mắc kẹt nhiều đời.
+
+---
+
+# **Linh Kiếm Tu**
+
+Linh Kiếm Tu là nhánh xuất hiện / phát triển mạnh về sau, đi con đường gần như ngược lại:
+
+> **năng lượng cao + sát thương trực tiếp + kết cấu đơn giản + tính tái lập cao.**
+
+Họ dùng:
+
+- Linh Khí;
+- kiếm khí;
+- thần thức;
+- linh hồn lực;
+- pháp tướng;
+- trận kiếm;
+
+để tạo raw output cực lớn.
+
+Không cần hiểu “sinh cơ là gì” sâu như Cổ Kiếm Tu nếu mục tiêu là:
+
+> **đánh nát thứ đang mang sinh cơ.**
+
+Ví dụ đối phó Hóa Vực:
+
+### Linh Kiếm Tu
+Tìm toàn bộ phạm vi người kia đã Hóa Vực rồi:
+
+> chém một kiếm đủ mạnh để **phá hủy toàn bộ vùng không gian bản thể**.
+
+Nếu kiếm phủ hết:
+
+> thắng.
+
+Nhược điểm:
+
+- tiêu hao khủng khiếp;
+- chiêu lớn dễ bị phát hiện;
+- target có thể chạy / co Vực / né trước;
+- nếu chém thiếu một phần quan trọng, đối phương có thể tái cấu trúc.
+
+### Cổ Kiếm Tu
+Có thể thử:
+
+> chém “quan hệ đồng nhất giữa ý thức và Vực”,  
+> chém Sinh Mệnh,  
+> chém điểm Khuyết,  
+> hoặc dùng một Kiếm Lưu phù hợp để làm bản thể sụp.
+
+Năng lượng cần ít hơn nhiều.
+
+Nhưng:
+
+> nếu không đủ ngộ / đọc sai bản chất Hóa Vực thì không chém được gì.
+
+---
+
+## Không được viết Linh Kiếm Tu như bản thấp cấp của Cổ Kiếm Tu
+
+Hai nhánh có ưu thế chiến lược khác nhau.
+
+**Linh Kiếm Tu**:
+- dễ chuẩn hóa;
+- dễ đào tạo quân đội;
+- output ổn định;
+- phá trận / phá thành / đánh diện rộng tốt;
+- ít phụ thuộc tâm lý target;
+- dùng rất tốt trong chiến tranh quy mô lớn.
+
+**Cổ Kiếm Tu**:
+- ceiling của “cơ chế” cao;
+- thích hợp thiên tài;
+- tiết kiệm năng lượng;
+- cực khó đoán;
+- có thể thắng bằng một điểm rất nhỏ thay vì phá cả mục tiêu.
+
+Trong một thời đại công nghiệp hóa như Tinh Hải:
+
+> Linh Kiếm Tu có thể bùng nổ số lượng.
+
+Trong các truyền thừa cổ:
+
+> Cổ Kiếm Tu vẫn là nơi sinh những quái vật cá nhân khó hiểu nhất.
+
+Tần Đế hiện là:
+
+> **Cổ Kiếm Tu chủ tu Đế Kiếm.**
+
+---
+
+# XXXVII-C. CỔ THẦN THẦN HUY — KHÔNG ĐƯỢC ÁNH XẠ 1:1 THÀNH CHÂN TIÊN
+
+Cần sửa cách so sánh cũ.
+
+Cổ Thần Thần Huy:
+
+> **không phải “một Chân Tiên nhưng gọi tên khác”.**
+
+Họ là sinh linh Tiên Thiên của **một Đại Thế Giới**, sinh ra trước hệ Tân Thần.
+
+Bản thể có một số đặc tính giống tầng rất cao:
+
+- không lão hóa / tuổi thọ gần như vô hạn theo tự nhiên;
+- quyền năng khái niệm / thiên địa bẩm sinh;
+- không cần tín ngưỡng để duy trì.
+
+Ở điểm **vĩnh sinh**, họ mang một phần tính chất gợi nhớ Thiên Địa Chính Tiên.
+
+Nhưng họ thiếu một đặc tính rất quan trọng:
+
+> **chết là có thể chết thật.**
+
+Nếu Cổ Thần bị tiêu diệt hoàn toàn:
+
+> Thần Huy không mặc định dựa vào một Quy Tắc để dựng lại họ như cơ chế bất tử của Thiên Địa Chính Tiên Nạp Hư.
+
+Do đó:
+
+> **vĩnh sinh ≠ không thể bị giết.**
+
+Sức chiến đấu Cổ Thần không có một mapping cố định.
+
+Tùy cá thể:
+
+- có kẻ chỉ khoảng bracket Chân Tiên cao;
+- có kẻ vượt xa Chân Tiên;
+- Cổ Thần hàng đầu có thể chạm gần bán bộ Thiên Địa Chính Tiên.
+
+Điểm mạnh của chúng đến từ:
+
+> bản thể Tiên Thiên và quyền năng trời sinh,
+
+không phải progression hoàn chỉnh Pháp Tắc → Quy Tắc như Nạp Hư.
+
+Điều này cũng giúp giải thích vì sao Thiên Đạo Thần Huy ghét chúng:
+
+> chúng vừa khó kiểm soát, vừa không cần hệ Thần Cách/Tín Ngưỡng do Thiên Đạo thao túng.
 
 ---
 
@@ -1565,40 +2051,50 @@ Hư Minh Lôi Hải có thể trở thành một tầng đặc biệt của Arcl
 
 ---
 
-# XLV. NHỮNG MÂU THUẪN CẦN KHÓA TRƯỚC KHI VIẾT BIÊN NIÊN SỬ
+# XLV. NHỮNG ĐIỂM ĐÃ KHÓA / CÒN MỞ TRƯỚC KHI VIẾT BIÊN NIÊN SỬ
 
-## 1. Tinh Hải Thần Châu và Thần Huy
-Phải chọn:
-- đã tiếp xúc trước;
-- hay nền khoa học riêng rồi hậu dung hợp mới hấp thu Thần Huy.
+## Đã khóa
 
-## 2. Nhân Tổ vào Luân Hồi
-Phải canon một cơ chế đặc biệt kiểu:
-> Tự Trảm Tiên Cách.
+### 1. Tinh Hải Thần Châu và Thần Huy
+> Hai giới từng tiếp xúc **trước Giới Bích**, có thể trong cùng đại thời kỳ ngoại giới hoạt động mạnh quanh cuộc xâm lấn Ma Đạo.
 
-Không thể cho Thiên Địa Chính Tiên bình thường thích thì Luân Hồi.
+### 2. Nhân Tổ vào Luân Hồi
+> Thiên Địa Chính Tiên **có thể** binh giải và vào Luân Hồi nếu tự tháo quyền năng / Quy Tắc xuống đủ thấp. Không phải cấm thuật duy nhất; chỉ là gần như không ai muốn tự bỏ vĩnh sinh.
 
-## 3. Tần Đế giết Ma Tôn
-Phải ghi rõ:
-> đây là trận có điều kiện / quốc thế / địa lợi / Ma Tôn yếu và bị suy.
+### 3. Tần Đế giết Ma Tôn
+> Khóa theo **A + B**: Đế Kiếm huy động Quốc Thế / địa lợi + Ma Tôn thuộc tầng yếu, bị bất lợi xuyên giới / Pháp Tắc.
 
-Nếu không sẽ phá giới hạn vượt cảnh.
+### 4. Long Tổ + Phượng Tổ
+> Từng là một Sinh Linh Nguyên Tổ vô giới tính; tách theo Sinh–Tử; mỗi bên giữ phần lớn một cực và phần nhỏ cực kia; đều bán bộ Thiên Địa Chính Tiên và hữu hạn thọ nguyên.
 
-## 4. Tàn hài Mộng Châu
-Cần chốt sau:
+### 5. Linh Sinh Vực
+> Có thật; nghèo Linh Khí, hoang sơ, ít sinh vật carbon; Linh Sinh silicon hình thành vì tích lũy Linh Khí rất chậm qua thời gian địa chất.
+
+### 6. Hai truyền thống Kiếm Tu
+> Hệ triết học cũ gọi **Cổ Kiếm Tu**; nhánh output trực tiếp gọi **Linh Kiếm Tu**.
+
+## Còn mở
+
+### 1. Tàn hài Mộng Châu
+Cần chốt:
 - chết;
 - ngủ;
 - giả chết;
 - phân thân.
 
-## 5. Long Tổ + Phượng Tổ
-Cần chọn:
-- gốc carbon;
-- silicon;
-- hay dạng tiền-sinh-học vượt phân loại.
+### 2. Quan hệ giữa Thập Nhị Thể và Luân Hồi của mười hai người con Nhân Tổ
+Cần chốt:
+- có bắt buộc reincarnation = current holder không;
+- hay có thể là hai người khác nhau.
 
-Không cần chọn ngay.
+### 3. Số Quy Tắc Nhân Tổ từng sở hữu
+Chưa rõ.
 
+### 4. Tên / bản chất Sinh Linh Nguyên Tổ trước khi tách Long–Phượng
+Chưa khóa.
+
+### 5. Exact power bracket của từng Cổ Thần Thần Huy
+Không ánh xạ 1:1, cần xét từng nhân vật.
 ---
 
 # XLVI. ĐỀ XUẤT CẤU TRÚC BẢN ĐỒ WORKING
@@ -1612,10 +2108,11 @@ Dùng graph:
               [Tần Vực]----[Mộng Châu]
                 /   \            |
         [Yêu Vực]  [Tinh Hải]  [Ma Châu]
-                \      |
-                 \     |
-              [Hư Minh Lôi Hải]
-                (hạ tầng)
+            |        /    \         |
+      [Linh Sinh Vực]      \        |
+                \           \       |
+                 \        [Hư Minh Lôi Hải]
+                          (hạ tầng)
 
 Đây chỉ thể hiện:
 
@@ -1711,7 +2208,7 @@ mà vẫn không phải dùng một hành tinh vật lý vô lý.
 
 Sau tài liệu này, thứ tự tốt nhất:
 
-1. **Khóa graph kết nối giữa 7 Vực hiện có.**
+1. **Khóa graph kết nối giữa **8 vùng/Vực hiện có** (tính cả Hư Minh Lôi Hải và Linh Sinh Vực).**
 2. Khóa Đại Nhật / Nguyệt / lịch pháp từng Vực.
 3. Khóa diện tích working của từng Vực.
 4. Khóa số lượng dân cư / mật độ dân.
