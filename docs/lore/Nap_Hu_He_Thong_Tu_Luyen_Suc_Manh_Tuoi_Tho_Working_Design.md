@@ -132,7 +132,9 @@ Cổ Kiếm Tu có thể dùng hiểu biết sâu để chém một quan hệ / 
 
 **CÒN MỞ:** tăng hạn mức sinh mệnh ảnh hưởng thọ nguyên thế nào, phạm vi qua Luân Hồi, giới hạn chuyển hóa / tích lũy và những điều kiện khắc chế. Bảng tuổi thọ tại mục III vẫn là phương án hiện tại; chưa đổi số vì cơ chế này.
 
-Hắn hấp thu nước để hồi phục, nhưng **không nhận được gì từ bên ngoài khi bị giam**. **Phong Thiên Tháp** phong cấm mọi nguồn năng lượng trong tháp và trong bán kính **50 km**. Phong ấn là cơ chế riêng: hấp thu tiên lực tù nhân để duy trì giam giữ, tạo kết giới bảo hộ tháp và hút năng lượng tới chết. Thương tổn ban đầu cùng hao mòn lâu dài làm hắn cực yếu; quan hệ giữa sinh lực, tiên lực và nguồn lực vốn có trong lúc giam giữ chưa chốt.
+Hắn hấp thu nước để hồi phục, nhưng **không nhận được gì từ bên ngoài khi bị giam** và **không thể hô hấp**. **Phong Thiên Tháp** phong cấm mọi nguồn năng lượng trong tháp và trong bán kính **50 km**. Phong ấn riêng hấp thu **cả tiên lực lẫn sinh mệnh lực**, duy trì giam giữ / kết giới bảo hộ tháp và hút tới chết. Thương tổn khi bị phong ấn và hao mòn lâu dài là nguyên nhân chính khiến hắn cực yếu; chưa chốt tỷ lệ giữa các nguồn lực hoặc lượng bị hút.
+
+Kiếm Tiên tự tin thắng đối phương đã suy yếu và tin có cách cứu linh hồn hồ yêu dù biết ràng buộc tử vong. Khi được thả, Yêu Tiên nhờ Pháp Tắc dần chiếm thượng phong; chiến thắng vẫn cần kịch chiến và một số hy sinh. Không quy cuộc chiến chỉ về lượng năng lượng còn lại hoặc tự gán tăng sinh mệnh tối đa thành tăng thọ nguyên.
 
 Hồ yêu bị hạ cổ từ sơ sinh, nhưng **đã Khắc Pháp khi gặp Kiếm Tiên**; tu vi tiếp tục tăng trong quá trình hắn trưởng thành. Tiểu cảnh lúc gặp, tuổi đời và cảnh cao nhất chưa chốt. Mốc Khắc Pháp 300.000 năm thuộc đỉnh cảnh, không tự gán tuổi thọ ấy cho nàng chỉ từ tên đại cảnh. Tử cổ gặm nhấm linh hồn khiến nàng phải dùng đan dược chữa trị; đây là một nguồn tổn thương cụ thể, chưa đổi thành hệ số giảm tuổi thọ.
 
@@ -140,7 +142,9 @@ Hồ yêu bị hạ cổ từ sơ sinh, nhưng **đã Khắc Pháp khi gặp Ki�
 
 # IX. CHUYỂN ĐỜI — TUỔI THỌ, LINH HỒN VÀ KÝ ỨC
 
-**ĐÃ CHỐT:** linh hồn hồ yêu bị tử cổ phá hủy, nhưng Chân Ngã còn và đầu thai **không có ký ức tiền kiếp**. Đời mới không phải một lần tự kéo dài tuổi thọ thân cũ.
+**ĐÃ CHỐT:** Yêu Tiên chết kéo mẫu cổ / tử cổ chết; linh hồn hồ yêu **tan dần**, ý thức mơ hồ, còn một khoảng để nàng thổ lộ và Kiếm Tiên thử cứu nhưng thất bại. Di thể còn hồng hào, xinh đẹp; Chân Ngã đầu thai **không có ký ức tiền kiếp**. Giữ di thể không giữ được người còn sống và đời mới không phải kéo dài tuổi thọ thân cũ.
+
+**Chân Tiên không thể thao tác Chân Ngã**, dù biết đó là gì; **Thiên Địa Chính Tiên mới có thể giữ Chân Ngã và tạo linh hồn**. Khả năng nhớ lại của một Chân Tiên tự Luân Hồi không tự trở thành quyền giữ Chân Ngã người khác / tạo linh hồn mới. Cách cứu Kiếm Tiên đã tin tưởng và vì sao thất bại chưa chốt.
 
 **Chân Tiên trở lên** vẫn giữ ký ức khi vào Luân Hồi, dù tự suy yếu; ký ức dần khôi phục theo tu vi đời mới. Tu vi ở lúc chuyển đời, cảnh cao nhất từng chứng và mức nhớ lại của thân mới là những thông tin khác nhau. Không tự dùng tu vi đã hạ thấp để xóa điều kiện “đã chứng Chân Tiên”.
 
