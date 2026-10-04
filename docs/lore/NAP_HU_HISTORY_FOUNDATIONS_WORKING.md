@@ -19,7 +19,8 @@ Long Tổ + Phượng Tổ nở ra, được Nhân Tổ nuôi lớn; Sinh–Tử
 ↓
 Long / Phượng tự lập rồi rời đi; Nhân Tổ ngẩn người, sau đó tạo mười hai người con
 ↓
-Nhân Tổ nuôi dạy các con, để lại thanh kiếm bằng máu và xương cánh tay của mình
+Nhân Tổ nuôi dạy các con, để lại Nhân Tổ Kiếm bằng máu và xương cánh tay của mình,
+kiếm có linh, cấp bán bộ Thiên Địa Chính Tiên
 ↓
 Nhân Tổ chọn Luân Hồi vì chán đời sống vĩnh hằng; nhìn chúng sinh một lát rồi lặng lẽ tan biến
 ↓
@@ -39,13 +40,15 @@ kẻ về sau gọi là Yêu Tiên đầu tiên kết thúc bế quan, đột ph
 ↓
 Hắc Ám Kỷ bắt đầu; phản kháng Nhân tộc bị đàn áp; Yêu Tiên ban đầu chưa biết thanh kiếm
 ↓
-trong Hắc Ám Kỷ, hài tử duy nhất đã thức tỉnh đề xuất dùng tàn hài được bảo quản để làm tháp;
-Nhân Tiên trực tiếp nhận xương từ người ấy trước lần ra kiếm
+Nhân Tiên vừa chứng Chân, cảm thấy nhân quả bị tính toán, truy tới Nhân Hoàng Cung;
+hắn cách không gặp hài tử duy nhất đã thức tỉnh, nhận kế hoạch phong ấn và phương pháp dựng tháp;
+hắn xé hư không lấy tàn hài của hài tử ấy / một phần của vài hài tử khác, trước lần ra kiếm
 ↓
 một Tân Thần Thần Huy xuất hiện; hài tử ấy đã qua nhiều đời Luân Hồi,
-đã thức tỉnh nhưng tu vi dưới Chân Tiên dùng thanh kiếm của Nhân Tổ chém chết hắn
+đã thức tỉnh nhưng tu vi dưới Chân Tiên dùng Nhân Tổ Kiếm nhanh chóng chém chết hắn
 ↓
-người dùng kiếm tử vong vào Luân Hồi; các hài tử khác đã đầu thai nhưng chưa thức tỉnh
+hài tử rút sâu vào Nhân Hoàng Cung, che mọi ánh nhìn rồi thân thể tiêu tán vào Luân Hồi;
+Nhân Tổ Kiếm tự di chuyển về chỗ nó nên ở; các hài tử khác đã đầu thai nhưng chưa thức tỉnh
 ↓
 Thần Huy nghi có kế nên rút lui; Yêu Tiên chứng kiến Tân Thần cùng cấp bị giết và rút quân
 ↓
@@ -53,21 +56,26 @@ Nhân Hoàng Cung, do một đời của một hài tử dựng lên, là tịnh
 ↓
 Phong Thiên Tháp, được xây riêng cho lần giam giữ này, phong cấm năng lượng trong tháp
 và trong bán kính 50 km; Chân Tiên Nhân tộc đầu tiên tự hiến tế làm hạt nhân phong ấn;
-phong ấn dùng tiên lực Yêu Tiên để duy trì giam giữ và kết giới bảo hộ tháp, hút năng lượng tới chết
+phong ấn hút cả tiên lực và sinh mệnh lực Yêu Tiên, duy trì giam giữ / kết giới bảo hộ;
+hắn bị đóng đinh treo trên thập tự giá, không thể hô hấp, mắt bị móc, tóc tai bù xù
 ↓
 trong thời gian phong ấn có hai bán bộ Yêu Tiên giữ thân mình: một thuộc hạ cũ, một kẻ thù;
 hồ yêu đã bị hạ cổ từ sơ sinh nhưng không biết; đã Khắc Pháp khi gặp Kiếm Tiên;
 tình bạn hình thành ngoài kế hoạch Yêu Tiên; cổ cho hắn nhìn những gì nàng thấy
 ↓
 Kiếm Tiên đầu tiên trưởng thành với truyền thừa của sư phụ, sáng tạo Cửu Đại Kiếm Thuật;
-khi đạt Chân Tiên hắn phát hiện cổ, muốn cứu nàng và chủ yếu báo thù cho sư phụ;
-hắn giết tới, yêu cầu chúng Yêu phá phong ấn vốn đã yếu vì Yêu Tiên cực yếu
+Kiếm Tiên biết tình cảm nàng, định cưới sau khi giết Yêu Tiên;
+khi đạt Chân Tiên hắn biết cổ, trước khi giải phong ấn;
+hắn biết ràng buộc tử vong, tin còn cách cứu linh hồn nên đánh liều thả Yêu Tiên đã cực yếu
 ↓
-cuộc đối đầu cuối: Kiếm Tiên kết thúc Yêu Tiên; hồ yêu sắp chết mới thổ lộ tình yêu đơn phương,
-linh hồn bị cổ phá hủy, Chân Ngã vào Luân Hồi không mang ký ức tiền kiếp;
-thứ tự chi tiết giữa lời thổ lộ, cổ chết và Yêu Tiên chết chưa chốt
+Yêu Tiên không chịu giải cổ, tấn công rồi dần chiếm thượng phong nhờ Pháp Tắc;
+sau kịch chiến và một số hy sinh, Kiếm Tiên thắng; Yêu Tiên hấp hối tiết lộ cổ ăn sâu từ sơ sinh
 ↓
-Nhân–Yêu bước vào thế cân bằng mới
+Yêu Tiên chết, mẫu cổ / tử cổ chết theo; linh hồn hồ yêu tan dần, ý thức mơ hồ;
+Kiếm Tiên kiếm độn tìm tới, nghe nàng thổ lộ, thử cách cứu nhưng thất bại; nàng chết, Chân Ngã vào Luân Hồi
+↓
+Nhân–Yêu bước vào thế cân bằng mới; Kiếm Tiên giữ di thể nàng và tự trách,
+phiêu bạt tìm thân Luân Hồi; việc gặp lại chưa chốt
 ↓
 Phật Đạo hình thành; Phật Tổ xuất hiện
 ↓
@@ -94,7 +102,7 @@ Các mốc thời gian đã khóa:
 - **Hơn 20.000 năm:** thời lượng tối thiểu đã có của Hắc Ám Kỷ; phạm vi các giai đoạn chưa chốt hết.
 - **Ít nhất 1.000 năm:** thời gian phong ấn Yêu Tiên; con số cuối chưa khóa.
 
-Sự kiện thanh kiếm xảy ra khi Yêu Tiên còn có thể trực tiếp áp quân, trước phong ấn. Người đề xuất dùng tàn hài là chính hài tử sau đó ra kiếm diệt Tân Thần. **Nhân Tiên nhận xương và đề xuất trực tiếp từ hài tử trước lần ra kiếm ấy.** Tu vi / chặng đời của Nhân Tiên lúc nhận, khoảng cách tới lần ra kiếm và thời điểm dựng tháp trong chuỗi này chưa chốt. Danh xưng Nhân Tiên dùng để nhận diện cùng một người, không tự chứng minh hắn đã là Chân Tiên ngay lúc nhận xương.
+Sự kiện Nhân Tổ Kiếm xảy ra khi Yêu Tiên còn có thể trực tiếp áp quân, trước phong ấn. **Nhân Tiên vừa đột phá Chân Tiên** khi cảm thấy nhân quả bị tính toán, truy tới Nhân Hoàng Cung và **cách không gặp chính hài tử sau đó ra kiếm**. Hắn nhận kế hoạch / phương pháp, **xé hư không lấy tàn hài trước lần ra kiếm** rồi tự dựng Phong Thiên Tháp. Khoảng cách từ cuộc gặp tới lần ra kiếm, thứ tự hoàn thành tháp so với lần ra kiếm và thời điểm phong ấn tuyệt đối chưa chốt; không tự biến cuộc gặp cách không thành cùng có mặt tại một nơi.
 
 Nhân chứng sự kiện thanh kiếm rất ít. **Hai người trong số đó chỉ chuyển thành Ma tu sau khi Ma Đạo Đại Thế Giới tiến đến.** Họ là sinh vật bản địa Nạp Hư; việc đã biết thanh kiếm từ trước không có nghĩa Ma tu đã có trước ngoại xâm.
 
@@ -738,6 +746,8 @@ Hắn cuối cùng chứng Chân Tiên nhưng là:
 
 > **một Chân Tiên yếu**, bởi tuổi đời, hoàn cảnh và thời gian đều không cho phép hắn tích lũy nhiều Pháp Tắc.
 
+Vừa đột phá, hắn cảm thấy nhân quả bản thân bị tính toán. Truy tra dẫn tới **Nhân Hoàng Cung**; hắn **cách không gặp một hài tử của Nhân Tổ** và nhận kế hoạch phong ấn Yêu Tiên. Với tư cách người Nhân tộc, Nhân Tiên cũng thuộc bậc **con cháu của các hài tử**. Hắn xé hư không lấy tàn hài được cung cấp, dựa vào phương pháp hài tử truyền để **tự tạo Phong Thiên Tháp**; chi tiết xem mục XXXIV.
+
 ## Cái chết
 
 Khi đối đầu Yêu Tiên đầu tiên:
@@ -750,7 +760,7 @@ Lựa chọn cuối cùng:
 
 Đây là nguyên nhân thật sự hắn chết.
 
-Phong ấn **tồn tại nhờ chính tiên lực của Yêu Tiên**: hắn càng mạnh thì phong ấn càng mạnh. Nó hút năng lượng tới khi hắn chết, đồng thời dùng phần hấp thu để tạo kết giới bảo hộ **Phong Thiên Tháp**. Tháp được xây riêng cho lần giam giữ này từ tàn hài các hài tử, phong cấm mọi nguồn năng lượng bên trong và trong bán kính **50 km**. Tháp phong cấm và phong ấn hấp thu là hai cơ chế riêng, tạo thành hai lớp bảo hiểm do Nhân Tiên cân nhắc; xem mục XXXIV.
+Phong ấn **tồn tại nhờ chính tiên lực của Yêu Tiên**: hắn càng mạnh thì phong ấn càng mạnh. Nó hút **cả tiên lực và sinh mệnh lực** tới khi hắn chết, đồng thời dùng năng lượng hấp thu để tạo kết giới bảo hộ **Phong Thiên Tháp**. Tháp được xây riêng cho lần giam giữ này từ tàn hài các hài tử, phong cấm mọi nguồn năng lượng bên trong và trong bán kính **50 km**. Tháp phong cấm và phong ấn hấp thu là hai cơ chế riêng, tạo thành hai lớp bảo hiểm do Nhân Tiên cân nhắc; xem mục XXXIV.
 
 Phong ấn tạo ra:
 
@@ -1333,65 +1343,75 @@ Con số cuối chưa khóa.
 
 # XXXIV. PHONG THIÊN THÁP, PHONG ẤN VÀ HỒ YÊU
 
-## Hai lớp bảo hiểm — ĐÃ CHỐT
+## Hai lớp bảo hiểm và trạng thái tù nhân — ĐÃ CHỐT
 
-**Phong Thiên Tháp** là tòa tháp khổng lồ được xây dựng **riêng cho lần phong ấn Yêu Tiên đầu tiên**. Tháp phong cấm **mọi nguồn năng lượng trong tháp và vùng bên ngoài thuộc bán kính 50 km**, gồm linh lực lẫn tiên lực. Đây là áp chế / phong cấm trong phạm vi công trình, không phải xóa tu vi vĩnh viễn.
+**Phong Thiên Tháp** là tòa tháp khổng lồ được xây dựng **riêng cho lần phong ấn Yêu Tiên đầu tiên**. Tháp phong cấm **mọi nguồn năng lượng trong tháp và vùng bên ngoài thuộc bán kính 50 km**, gồm linh lực lẫn tiên lực. Đây là phong cấm trong phạm vi công trình, không phải xóa tu vi vĩnh viễn.
 
-**Phong ấn giam giữ** là cơ chế riêng. Chân Tiên Nhân tộc đầu tiên tự hiến tế làm hạt nhân; phong ấn hấp thu **chính tiên lực của Yêu Tiên** để tự duy trì, đồng thời dùng năng lượng hấp thu tạo **kết giới bảo hộ Phong Thiên Tháp**. Nó được thiết kế để hút năng lượng cho tới khi tù nhân chết.
+**Phong ấn giam giữ** là cơ chế riêng. Chân Tiên Nhân tộc đầu tiên tự hiến tế làm hạt nhân; phong ấn hấp thu **cả tiên lực và sinh mệnh lực của Yêu Tiên**. Năng lượng lấy từ tù nhân duy trì phong ấn và **kết giới bảo hộ Phong Thiên Tháp**; nó hút cho tới khi hắn chết.
 
-Đây là **hai lớp bảo hiểm do Nhân Tiên cân nhắc**: tháp phong cấm năng lượng, còn phong ấn duy trì giam giữ và kết giới bằng năng lượng của chính tù nhân. Không đồng nhất tháp với phong ấn hoặc đồng nhất việc phá một lớp với việc cả hai đều mất tác dụng.
+Đây là **hai lớp bảo hiểm do Nhân Tiên cân nhắc**: tháp phong cấm năng lượng, phong ấn duy trì giam giữ và kết giới bằng năng lượng của chính tù nhân. Chưa đồng nhất việc phá một lớp với việc cả hai mất tác dụng.
 
-Yêu Tiên **không nhận được gì từ bên ngoài**, không có nguồn tiếp tế nước, sinh lực hoặc năng lượng để bù hao mòn. Thương tổn khi bị phong ấn và hao mòn lâu dài là nguyên nhân chính khiến hắn cực yếu. Hắn càng mạnh thì phong ấn càng mạnh; hắn yếu đi thì phong ấn cũng yếu dần.
+Yêu Tiên **không nhận được gì từ bên ngoài**. Trong tháp, hắn **không thể hô hấp, không thể nhìn cảnh vật bằng mắt**; thân thể bị **đóng đinh treo trên thập tự giá**, **mắt bị móc**, tóc tai bù xù. Đây là tình trạng của tù nhân; chưa tự áp dụng việc không thể hô hấp hoặc mất mắt cho mọi người trong bán kính 50 km. Kênh nhìn qua cổ là cơ chế riêng, xem dưới.
 
-Trước khi phong ấn hút cạn hắn đến chết, Kiếm Tiên giết tới và **yêu cầu chúng Yêu phá phong ấn**. Tốc độ hao mòn, lượng nguồn lực vốn ở trong lúc giam giữ, cách phá, trạng thái tháp / kết giới khi thả tù nhân và hệ quả cụ thể của việc phong cấm mọi năng lượng còn mở. Không tự đặt một tiến độ suy yếu hoặc giải thích tháp bằng việc mọi chuyển động vật chất đều dừng lại.
+Thương tổn khi bị phong ấn và hao mòn lâu dài khiến hắn cực yếu. Hắn càng mạnh thì phong ấn càng mạnh; hắn yếu đi thì phong ấn yếu dần. Trước khi nó hút cạn hắn đến chết, Kiếm Tiên giết tới và **yêu cầu chúng Yêu phá phong ấn**.
 
-## Tàn hài và người đề xuất — ĐÃ CHỐT
+**CÒN MỞ:** cách phá, trạng thái tháp / kết giới khi thả tù nhân, hệ quả phong cấm đối với môi trường và người ngoài, nhịp hao mòn và tình trạng cơ thể khi được thả. Không tự quyết định mắt mọc lại hoặc hắn được tiếp tế / hồi phục trước cuộc chiến.
 
-Các hài tử đã **tự bảo quản kỹ tàn hài của mình trước khi vào Luân Hồi**. Trong quãng lịch sử này, chỉ **một hài tử đã thức tỉnh ký ức**. Chính người ấy đề xuất và tự quyết định dùng **tàn hài của bản thân cùng một vài phần tàn hài của những hài tử khác** để tạo tháp; **Nhân Tiên là người nhận xương**.
+## Nhân Tiên nhận phương pháp và dựng tháp — ĐÃ CHỐT
 
-Người đề xuất này cũng chính là hài tử sau đó **ra một kiếm diệt Tân Thần Thần Huy rồi tử vong vào Luân Hồi**. **Nhân Tiên nhận xương và đề xuất trực tiếp từ người ấy trước lần ra kiếm**, không nhận qua di vật / trung gian sau khi người ấy chết. Tu vi Nhân Tiên lúc nhận, khoảng cách tới lần ra kiếm và ngày dựng tháp chưa chốt.
+**Vừa đột phá Chân Tiên**, Nhân Tiên cảm thấy **nhân quả bản thân bị tính toán**. Hắn truy tra và biết nguồn ở **Nhân Hoàng Cung**, rồi **cách không gặp hài tử duy nhất đã thức tỉnh ký ức trong quãng ấy**.
 
-Việc dùng xương được các hài tử cho phép. Chưa chốt hình thức bảo quản / cho phép, tàn hài thuộc những đời nào, những hài tử khác có phần xương được dùng là ai, hoặc người trực tiếp xây / đúc tháp. Người đề xuất chưa tự đồng nhất với người sáng lập Nhân Hoàng Cung.
+Hài tử nói về **kế hoạch phong ấn Yêu Tiên**, phương pháp dựng tháp và việc cung cấp **tàn hài của bản thân cùng một phần tàn hài của vài hài tử khác**. Các hài tử đã **tự bảo quản kỹ tàn hài trước khi vào Luân Hồi**; việc dùng xương được cho phép.
 
-**Điều kiện duy nhất:** Phong Thiên Tháp phải chịu sự điều khiển của **kẻ cầm thanh kiếm Nhân Tổ**. **Chỉ cầm kiếm, không cần ra kiếm**; không gán cái giá tử vong của một nhát kiếm cho việc điều khiển tháp bằng cách cầm giữ.
+Nhân Tiên **xé rách hư không lấy tàn hài**, rồi dựa vào **phương pháp do hài tử cung cấp để tự tạo Phong Thiên Tháp**. Đây là nhận trực tiếp từ nguồn hài tử qua cuộc gặp cách không và lấy vật liệu bằng hư không, không phải nhận qua người trung gian sau cái chết của hài tử. Nhân Tiên là người Nhân tộc, thuộc bậc **con cháu của các hài tử Nhân Tổ**; không biến hắn thành một trong mười hai Chân Ngã.
 
-Điều kiện điều khiển tháp và điều kiện điều khiển / ra kiếm là hai việc riêng. Cách tháp nhận biết người cầm, phạm vi quyền điều khiển, người giữ kiếm ở từng thời điểm và đường Kiếm Tiên biết điều kiện này chưa chốt.
+Người đề xuất cũng chính là hài tử sau đó **ra một kiếm diệt Tân Thần Thần Huy rồi tử vong vào Luân Hồi**. Cuộc gặp / lấy xương thuộc **trước lần ra kiếm**. Chưa khóa khoảng thời gian giữa các việc, thứ tự hoàn thành tháp so với lần ra kiếm, các hài tử khác có xương được dùng hoặc đời của tàn hài. Người đề xuất chưa đồng nhất với người sáng lập Nhân Hoàng Cung.
+
+**Điều kiện duy nhất:** Phong Thiên Tháp phải chịu điều khiển của **kẻ cầm Nhân Tổ Kiếm**. **Chỉ cầm kiếm, không cần ra kiếm**; không gán cái giá tử vong của một nhát kiếm cho việc điều khiển tháp bằng cầm giữ.
+
+Cách tháp nhận biết người cầm, phạm vi quyền điều khiển và đường Kiếm Tiên biết điều kiện này chưa chốt. Nhân Tổ Kiếm có linh, tự di chuyển về chỗ nó nên ở sau khi hài tử tiêu tán; vị trí cụ thể và việc cầm giữ ở từng thời điểm xem mục XLII.
 
 ## Hồ yêu từ lúc chào đời — ĐÃ CHỐT
 
-Nàng có **một thể chất có giá trị bồi dưỡng và tiềm năng không nhỏ**, nằm **ngoài Thập Nhị Đại Tuyệt Thể**. Yêu Tiên chọn nàng làm con cờ, bắt giữ từ nhỏ và **hạ Tử Mẫu Tâm Sinh Cổ ngay từ lúc nàng chào đời**. Nàng **không biết mình bị hạ cổ**.
+Nàng có **một thể chất có giá trị bồi dưỡng và tiềm năng không nhỏ**, nằm **ngoài Thập Nhị Đại Tuyệt Thể**. Yêu Tiên chọn làm con cờ, bắt giữ từ nhỏ và **hạ Tử Mẫu Tâm Sinh Cổ ngay từ lúc nàng chào đời**. Nàng **không biết mình bị hạ cổ**.
 
-**Khi gặp Kiếm Tiên, nàng đã ở Khắc Pháp**, đại cảnh giới thứ bảy. Tu vi tiếp tục tăng theo quá trình Kiếm Tiên trưởng thành; cảnh cao nhất, tuổi đời và tốc độ tăng chưa chốt. Mốc này thay cách ghi cũ “đã Khắc Pháp lúc bị hạ cổ”: hạ cổ thuộc lúc sơ sinh, Khắc Pháp thuộc lúc gặp Kiếm Tiên.
-
-Tên, tính chất cụ thể và cơ chế bồi dưỡng của thể chất chưa chốt. Không biến nàng thành người con thứ mười ba của Nhân Tổ hoặc tự gán cho thể chất ấy luật đi theo Chân Ngã của mười hai người con.
+**Khi gặp Kiếm Tiên, nàng đã ở Khắc Pháp**, đại cảnh giới thứ bảy. Tu vi tiếp tục tăng theo quá trình hắn trưởng thành; cảnh cao nhất, tuổi đời và tốc độ tăng chưa chốt. Tên, tính chất và cách bồi dưỡng thể chất chưa chốt; không tự gán luật đi theo Chân Ngã của mười hai người con cho nàng.
 
 ## Tử cổ bám linh hồn và đường quan sát — ĐÃ CHỐT
 
-Yêu Tiên giữ **mẫu cổ**, đã gắn sinh mệnh của nó với mình: **hắn chết thì mẫu cổ chết**, kéo theo cái chết hồ yêu nếu ràng buộc chưa được tháo. Tử cổ **khóa chặt với linh hồn nàng**. **Khi tử cổ chết, nó phát nổ và phá hủy luôn linh hồn**.
+Yêu Tiên giữ **mẫu cổ**, sinh mệnh gắn với hắn. **Hắn chết → mẫu cổ chết → tử cổ chết → linh hồn hồ yêu dần tan biến**, ý thức mơ hồ rồi nàng chết nếu ràng buộc vẫn còn. Đây là diễn tiến đã chốt ở đoạn cuối; không mô tả tử cổ phát nổ làm nàng chết tức khắc.
 
-Tử cổ từ từ **gặm nhấm linh hồn**, ăn một lượng nhất định rồi ngủ say. Vì vậy nàng đôi khi đau đớn, phải dùng **đan dược chữa trị linh hồn**. Chưa chốt độ dài chu kỳ, lượng bị ăn hoặc khả năng xử lý cổ bằng đan dược; chữa phần linh hồn tổn thương không tự đồng nghĩa đã lấy được cổ ra.
+Tử cổ **khóa chặt với linh hồn**, từ từ **gặm nhấm một lượng nhất định rồi ngủ say**. Vì vậy nàng đôi khi đau đớn, cần **đan dược chữa trị linh hồn**. Chưa chốt độ dài chu kỳ hoặc lượng bị ăn; chữa tổn thương từng đợt không tự đồng nghĩa lấy được cổ ra.
 
-Thiết lập mới thay kênh báo cáo chủ động: Yêu Tiên **quan sát mọi thứ nàng nhìn thấy** qua cổ, còn nàng không biết mình đang bị dùng làm nguồn tin. **Cổ truyền tin bằng cơ chế riêng**, vẫn hoạt động qua vùng phong cấm của tháp. Hắn quá tin vào năng lực thôn phệ của mình nên không sợ Kiếm Tiên. Chưa mở rộng kênh ấy thành đọc suy nghĩ, nghe mọi âm thanh, biết sự việc nàng không thấy hoặc trực tiếp thao túng tâm trí Kiếm Tiên.
+Yêu Tiên **quan sát mọi thứ nàng nhìn thấy** qua **cơ chế riêng của cổ**, vẫn hoạt động qua vùng phong cấm; nàng không biết mình là nguồn tin. Hắn quá tin vào Pháp Tắc thôn phệ nên không sợ Kiếm Tiên. Chưa gán kênh này đọc suy nghĩ, biết sự việc ngoài tầm nhìn nàng hoặc trực tiếp thao túng tâm trí Kiếm Tiên. Không tự thêm chiều tử cổ / hồ yêu chết khiến mẫu cổ hoặc Yêu Tiên chết.
 
-Không tự thêm chiều ngược lại rằng tử cổ hoặc hồ yêu chết thì mẫu cổ / Yêu Tiên cũng chết. Cưỡng ép ý chí, truyền mệnh lệnh và tác động khác ngoài những khả năng đã chốt vẫn còn mở.
+## Tình cảm và điều Kiếm Tiên biết trước trận cuối — ĐÃ CHỐT
 
-## Tình bạn, tình yêu và phát hiện của Kiếm Tiên — ĐÃ CHỐT
+Tình bạn giữa nàng và Kiếm Tiên **hình thành ngoài kế hoạch Yêu Tiên**. Nàng có tình cảm với hắn; **Kiếm Tiên thực ra đã biết**, nhưng giữa loạn thế hắn chưa dành thời gian cho yêu đương. Hắn **định cưới nàng sau khi giết Yêu Tiên**.
 
-Tình bạn giữa nàng và Kiếm Tiên **hình thành ngoài kế hoạch Yêu Tiên**. Nàng **yêu đơn phương Kiếm Tiên**, nhưng hắn không biết.
+**Dự định cưới có từ trước khi biết vụ tử cổ.** Khi đạt Chân Tiên, hắn phát hiện cổ qua tra hỏi / suy đoán, **trước khi giải phong ấn**. Hắn biết ràng buộc khiến Yêu Tiên chết kéo nàng chết, nên muốn thả Yêu Tiên để giải cứu nàng; động cơ lớn hơn vẫn là **báo thù cho sư phụ**.
 
-**Khi Kiếm Tiên đạt Chân Tiên**, hắn phát hiện vấn đề; qua tra hỏi và suy đoán, hắn biết nàng đã bị hạ cổ. Chưa chốt hắn hỏi ai, phát hiện dấu hiệu nào trước, hoặc biết hết chuỗi tử vong của cổ ngay lúc ấy hay không.
+Hắn tự tin thắng vì đối phương đã bị hút quá nhiều **tiên lực lẫn sinh mệnh lực**. Đồng thời hắn **cho rằng mình có một biện pháp cứu linh hồn nàng**, nên mới đánh liều. Đây là niềm tin dẫn tới lựa chọn, không phải một biện pháp đã được chứng minh chắc chắn.
 
-Giải cứu nàng là **một lý do** khiến hắn muốn phá phong ấn, nhưng **động cơ lớn hơn là báo thù cho sư phụ**, Chân Tiên Nhân tộc đầu tiên. Không gán cho hắn đã có sẵn một phương pháp giải cổ chắc chắn.
+## Giải phong ấn, kịch chiến và cái chết hồ yêu — ĐÃ CHỐT
 
-Yêu Tiên **không muốn nàng sống**. Đến cuối, khi sắp chết, nàng mới đủ can đảm **thổ lộ tình yêu**; Kiếm Tiên lúc ấy mới biết. Linh hồn nàng bị tử cổ phá hủy; **Chân Ngã còn lại đi vào Luân Hồi, đầu thai không có ký ức tiền kiếp**. Thứ tự chi tiết giữa lời thổ lộ, mẫu cổ / tử cổ chết và cái chết Yêu Tiên chưa chốt; không tự chọn hắn chủ động giết mẫu cổ trước hay cổ chết khi hắn bị giết.
+Yêu Tiên được thả nhưng **không đồng ý giải tử cổ**, rồi lao vào tấn công Kiếm Tiên. Nhờ bản chất Pháp Tắc, hắn **dần chiếm thượng phong** dù ban đầu đã cực yếu. Sau một trận kịch chiến và **một số hy sinh**, Kiếm Tiên thắng; chưa chọn những hy sinh ấy là gì hoặc của ai.
 
-## Vết bớt và thân đầu thai — ĐÃ CHỐT / ĐANG XÂY DỰNG
+Khi hấp hối, Yêu Tiên nói hắn **hạ cổ từ lúc nàng còn là trẻ sơ sinh**, nay đã quá muộn vì **tử cổ ăn sâu vào linh hồn**. Hắn còn trêu chọc Kiếm Tiên ngu ngốc vì không nhận ra tâm ý nàng. Đây là **lời trêu chọc của Yêu Tiên**, không phải sự thật khách quan: Kiếm Tiên đã biết và đã có dự định cưới.
 
-**ĐÃ CHỐT:** hồ yêu có **một vết bớt đặc thù trên vai**. Chưa chọn vai trái / phải hoặc hình dạng.
+Yêu Tiên **không chủ động giết mẫu cổ**; hắn chết thì mẫu cổ / tử cổ chết theo. Kiếm Tiên **kiếm độn tìm đến hồ yêu**, thấy linh hồn nàng **đang chết dần**, ý thức mơ hồ. Nàng nói về tình cảm của mình. Hắn **thử biện pháp cứu đã trông cậy nhưng không dùng được**; nàng chết.
 
-**ĐANG XÂY DỰNG:** sau này, khi Kiếm Tiên đi tìm đệ tử, hắn **có thể gặp thân đầu thai của nàng**. Chưa chốt chắc chắn cuộc gặp, việc thu làm đệ tử, dấu hiệu nhận ra, khả năng vết bớt tái hiện hoặc ký ức có thể trở lại. Không tự gán tình yêu đời trước cho người của đời mới.
+Di thể vẫn **hồng hào, xinh đẹp**, nhưng chỉ còn **thân xác không có linh hồn**. **Chân Ngã đi vào Luân Hồi không mang ký ức tiền kiếp**. Kiếm Tiên **giữ di thể**, tự trách vô cùng và phiêu bạt khắp nơi **tìm thân Luân Hồi của nàng**. Không tự chốt cách bảo quản di thể hoặc biến việc tìm kiếm thành đã tìm thấy.
 
-Luật ký ức đã chốt thêm: **Chân Tiên trở lên vẫn giữ ký ức khi vào Luân Hồi, dù đã tự suy yếu; ký ức dần khôi phục theo tu vi của đời mới**. Vì vậy cần phân biệt trường hợp hồ yêu mất linh hồn / ký ức với người đã chứng Chân. Luật riêng của Nhân Tổ và mười hai Chân Ngã vẫn được giữ; xem mục XXII của [Bản thể tu luyện và truyền thống kiếm](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).
+## Giới hạn cứu sống, vết bớt và thân đầu thai
+
+**ĐÃ CHỐT:** Chân Tiên biết Chân Ngã là gì nhưng **không thể thao tác Chân Ngã**. **Chỉ tới Thiên Địa Chính Tiên mới có thể giữ lại Chân Ngã và tạo linh hồn**. Giữ ký ức của bản thân qua Luân Hồi không đồng nghĩa có quyền giữ Chân Ngã người khác hoặc tạo lại linh hồn để cứu người.
+
+**ĐÃ CHỐT:** hồ yêu có **vết bớt đặc thù trên vai**; chưa chọn vai trái / phải hoặc hình dạng.
+
+**ĐANG XÂY DỰNG:** khi tìm thân Luân Hồi / tìm đệ tử về sau, Kiếm Tiên **có thể gặp thân đầu thai của nàng**. Chưa chốt chắc chắn cuộc gặp, việc thu làm đệ tử, dấu hiệu nhận ra, vết bớt có tái hiện hay ký ức có trở lại. Không tự gán tình cảm đời trước cho đời mới.
+
+**CÒN MỞ:** biện pháp cứu hắn đã tin tưởng và vì sao không dùng được, các hy sinh trong trận chiến, thời gian tự trách / tìm kiếm, cơ chế bảo quản di thể và hậu quả đối với việc dẫn dắt Nhân tộc sau giải phóng. Luật ký ức của Chân Tiên trở lên và mười hai Chân Ngã được giữ; xem mục XXII của [Bản thể tu luyện và truyền thống kiếm](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).
 
 ---
 
@@ -1603,15 +1623,16 @@ Chỉ lấp hố này khi truyện thật sự cần.
 
 ---
 
-# XLII. THANH KIẾM NHÂN TỔ ĐỂ LẠI & SỰ KIỆN TRONG HẮC ÁM KỶ
+# XLII. NHÂN TỔ KIẾM & SỰ KIỆN TRONG HẮC ÁM KỶ
 
 ## Chế tạo, người dùng và cái giá — ĐÃ CHỐT
 
-Trước khi tan biến vào Luân Hồi, Nhân Tổ tự rèn thanh kiếm bằng **máu và xương cánh tay của mình**.
+Trước khi tan biến vào Luân Hồi, Nhân Tổ tự rèn **Nhân Tổ Kiếm** bằng **máu và xương cánh tay của mình**. Kiếm **có linh**, phẩm cấp **bán bộ Thiên Địa Chính Tiên**; đây là phẩm cấp thanh kiếm, không biến người cầm thành người ở cảnh ấy.
 
 - Chỉ **Nhân Tổ hoặc mười hai người con** có thể điều khiển.
 - Nhân Tổ sợ các con lạm sát nên đặt cái giá: **ra một kiếm thì tử vong và vào Luân Hồi**.
-- Chưa có tên chính thức cho thanh kiếm; chưa khóa cơ chế cụ thể của quyền điều khiển và cái giá.
+- Kiếm có thể **tự di chuyển về chỗ nó nên ở**. Chưa khóa vị trí cụ thể, cơ chế quyền điều khiển / cái giá, hoặc nhân cách và các khả năng khác của linh trong kiếm.
+- Tự di chuyển không đồng nghĩa tự do ra kiếm thay người dùng hoặc cho người ngoài mười hai hài tử quyền sử dụng sức mạnh kiếm.
 
 ## Một kiếm diệt Tân Thần — ĐÃ CHỐT
 
@@ -1619,7 +1640,9 @@ Trong Hắc Ám Kỷ, một Tân Thần từ Thần Huy xuất hiện. Một tro
 
 Tân Thần bị giết cùng cấp với Yêu Tiên đầu tiên. Đây là dữ kiện của cá thể ấy; không ánh xạ mọi Tân Thần vào cùng mức.
 
-Người dùng kiếm trả giá bằng tử vong vào Luân Hồi. Đây cũng là **hài tử duy nhất đã thức tỉnh trong quãng ấy**, người trước đó đề xuất dùng tàn hài của mình / các hài tử khác để làm Phong Thiên Tháp; Nhân Tiên là người nhận xương. Những người con còn lại đều **đã đầu thai nhưng chưa thức tỉnh**, nên không còn một hài tử đã thức tỉnh khác để tiếp tục ra kiếm lúc đó. Chân Ngã của họ vẫn tồn tại.
+Hài tử **nhanh chóng diệt Tân Thần**, rồi **rút vào chỗ sâu của Nhân Hoàng Cung, che giấu mọi ánh nhìn**. Sau đó thân thể mới bắt đầu **tiêu tán**, trả giá bằng tử vong vào Luân Hồi; **Nhân Tổ Kiếm tự di chuyển về chỗ nó nên ở**. Cái giá vẫn là ra một kiếm thì tử vong, nhưng diễn tiến không phải chết lộ ngay trước các nhân chứng.
+
+Đây cũng là **hài tử duy nhất đã thức tỉnh trong quãng ấy**, người trước đó gặp Nhân Tiên vừa chứng Chân qua hư không, cung cấp tàn hài / phương pháp dựng Phong Thiên Tháp. Những người con còn lại đều **đã đầu thai nhưng chưa thức tỉnh**, nên không còn hài tử đã thức tỉnh khác để ra kiếm lúc đó. Chân Ngã của họ vẫn tồn tại.
 
 Thần Huy không biết khoảng trống này, nghi có kế và rút lui. Yêu Tiên chứng kiến cái chết Tân Thần ngay trước lúc áp quân, cũng rút quân. Nhân Hoàng Cung là tịnh thổ cuối cùng của Nhân tộc.
 
