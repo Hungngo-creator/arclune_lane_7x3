@@ -233,9 +233,23 @@ Một thiên tài bất kỳ có thể là:
 
 Mười hai người con:
 
+- được Nhân Tổ tạo từ mười hai phần Pháp Tắc / thần dị của chính mình;
 - đời đầu đều là Chân Tiên;
 - thân đời đó đã chết;
-- Chân Ngã tiếp tục đi vào Luân Hồi.
+- Chân Ngã tiếp tục đi vào Luân Hồi;
+- **tính cách căn bản của mỗi người phản ánh Pháp Tắc tạo nên họ**.
+
+Do đó 12 Đại Tuyệt Thể sau này không chỉ là bộ kỹ năng.
+
+Mỗi Thể nên đồng thời gợi ra:
+
+- thiên hướng tâm lý;
+- sở thích;
+- cách phản ứng;
+- ưu / khuyết tính cách;
+- loại Pháp Tắc của Nhân Tổ mà người đó mang.
+
+Thiết kế 12 Thể vì vậy phải đi cùng thiết kế 12 nhân cách.
 
 Trước khi rời đời đầu, mỗi người để lại / khóa với:
 
@@ -370,15 +384,27 @@ Sức chiến đấu tùy cá thể:
 
 ---
 
-# IX. LONG TỔ & PHƯỢNG TỔ
+# IX. NHÂN TỔ, NGUYÊN SƠ & NGUỒN GỐC LONG–PHƯỢNG
 
-Ban đầu Long Tổ và Phượng Tổ chưa tồn tại như hai cá thể.
+Thuở sơ khai Nạp Hư, lore hiện tại chỉ xác nhận **hai Linh Sinh Nguyên Sơ**:
 
-Chỉ có:
+1. **Nhân Tổ** — hình hài một bé trai hoạt bát, sáng sủa;
+2. **Nguyên Sơ** — quang thể vô giới tính, ít nói, hình thái biến ảo liên tục.
 
-> **một Linh Sinh Nguyên Sơ.**
+“Nguyên Sơ” là tên riêng working của bản thể chung trước khi Long Tổ / Phượng Tổ tách ra.
 
-Đây là một trong những tồn tại khai linh sớm nhất được biết của Nạp Hư.
+Nhân Tổ và Nguyên Sơ đều không cần ăn uống.
+
+Nguyên Sơ có thể biến đổi hình dạng:
+
+- thú;
+- chim;
+- long;
+- phượng;
+- người;
+- hoặc bất kỳ sinh vật nào mà hình thái của nó từng chạm tới / dự báo được.
+
+Không khóa Nguyên Sơ thực chất là gì.
 
 Nhưng **bản chất nguyên thủy của nó không được khóa và cũng không nên được giải đáp hoàn toàn**.
 
@@ -636,3 +662,77 @@ Nó là:
 > **quan hệ bản thể: phản bội Arclune tương đương phủ định nền tồn tại làm chính nó sinh ra.**
 
 Chi tiết này thuộc lore Arclune và sẽ được mở rộng ở world bible Arclune, không nên dùng ngược để định nghĩa mọi Linh Sinh Nạp Hư.
+
+
+---
+
+# XIII. VÌ SAO HÌNH NGƯỜI TRỞ THÀNH HÌNH THÁI TU LUYỆN PHỔ BIẾN?
+
+Nhân tộc không có ưu thế thể phách so với Yêu thú.
+
+Nhưng cơ thể / linh hồn Nhân tộc có một đặc tính quan trọng:
+
+> **rất thích hợp cảm ngộ Pháp Tắc.**
+
+Điều này khiến hình người trở thành một “kiến trúc tu luyện” hiệu quả.
+
+Vì vậy Yêu tộc Hóa Hình không chỉ vì xã hội Nhân tộc mạnh hay vì thẩm mỹ.
+
+Nó có lợi trực tiếp cho:
+
+- thần thức;
+- tâm cảnh;
+- biểu tượng hóa khái niệm;
+- cân bằng hồn–thân;
+- cảm ngộ Pháp Tắc.
+
+Yêu thú cảnh thấp vẫn thường:
+
+> mạnh hơn Nhân tộc cùng cảnh về thân thể.
+
+Nhưng càng lên cao:
+
+> lợi thế của khả năng cảm ngộ càng quan trọng.
+
+Đây là một lý do lịch sử giúp Nhân tộc từ “huyết thực / nô lệ” dần trở thành một đại tộc.
+
+---
+
+# XIV. HỆ TÁM CẢNH TRƯỚC CHÂN TIÊN LÀ ĐẠO THỐNG TẬP THỂ
+
+Không có “một tổ sư duy nhất” phát minh toàn bộ tám cảnh.
+
+Hệ hoàn chỉnh là sản phẩm của:
+
+- Nhân;
+- Yêu;
+- Linh Sinh;
+- Phi Thăng Giả;
+- học giả;
+- kiếm tu;
+- thể tu;
+- hồn tu;
+- Phật tu;
+- những kẻ thử sai rồi chết.
+
+Trước thời Huyết Thế Đại Kiếp:
+
+> hệ thống vẫn còn rất nhiều phiên bản cạnh tranh.
+
+Đến thời Đại Kiếp:
+
+> tám đại cảnh giới mới gần như hoàn chỉnh và được chuẩn hóa thành hệ chung.
+
+Thần Huy đã từng tiếp xúc Nạp Hư trước thời điểm chuẩn hóa hoàn tất, nên một số:
+
+- thuật ngữ phân loại;
+- phương pháp đo;
+- tư duy khoa học;
+
+có thể gián tiếp ảnh hưởng quá trình tổng kết.
+
+Nhưng hệ thống không thuộc riêng Nhân tộc hay Thần Huy.
+
+Nó là:
+
+> **kết quả cộng dồn của lịch sử Nạp Hư.**
