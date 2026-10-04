@@ -810,3 +810,674 @@ Vì vậy sự chuẩn hóa cuối cùng của Nạp Hư có thể đã chịu �
 - chiến lực;
 
 nhưng hệ Nạp Hư vẫn là sản phẩm đa tộc nội sinh, không phải hệ thống nhập khẩu.
+
+---
+
+# XXI. NGUỒN GỐC NHÂN TỘC — MƯỜI HAI NGƯỜI CON LÀ TỔ NGUỒN TRỰC TIẾP
+
+Nhân tộc hậu thế không phải một loài tự tiến hóa độc lập rồi tình cờ giống Nhân Tổ.
+
+Nguồn gốc trực tiếp:
+
+> **mười hai người con của Nhân Tổ phối hợp huyết của mình để tạo ra những sinh linh mới; từ quá trình đó sinh ra Nhân tộc và vô số chủng tộc hậu thế.**
+
+Nhân tộc có:
+
+- hai tay;
+- hai chân;
+- mắt;
+- mũi;
+- miệng;
+- hình người;
+
+vì khi Nhân Tổ tạo mười hai người con:
+
+> hắn dùng chính bản thân mình làm mẫu hình.
+
+Nếu Nhân Tổ có hình thái khác:
+
+> cái gọi là “Nhân tộc” hậu thế cũng sẽ có hình thái khác.
+
+Đây không phải vì hình người là hình thái tuyệt đối của vũ trụ.
+
+Nó là:
+
+> **một di sản hình thái học bắt đầu từ lựa chọn rất đơn giản của Nhân Tổ: tạo con giống mình.**
+
+---
+
+# XXII. MƯỜI HAI ĐỨA TRẺ & THỜI ĐẠI “TẠO BẠN”
+
+Sau khi Nhân Tổ vào Luân Hồi:
+
+> mười hai người con sợ những người bạn khác của mình cũng sẽ rời đi.
+
+Họ bắt đầu thử tạo càng nhiều sinh linh càng tốt.
+
+Phương thức rất nguyên thủy:
+
+- máu của hai hoặc nhiều người con;
+- đất;
+- đá;
+- cây;
+- xác chết;
+- vật chất quanh mình;
+- Linh Khí;
+- những mảnh Pháp Tắc họ mang.
+
+Không có “phòng thí nghiệm tạo giống”.
+
+Đó gần hơn với:
+
+> **mười hai đứa trẻ có quyền năng khủng khiếp đang cố làm cho thế giới bớt cô độc.**
+
+Từ những thử nghiệm ấy:
+
+- có loài ổn định;
+- có loài thất bại;
+- có loài sống rất ngắn;
+- có loài biến thành tổ tiên của các chủng tộc lớn;
+- có những dạng sống về sau không ai biết do đứa trẻ nào tạo.
+
+Đây là một nguồn rất phù hợp để giải thích vì sao Nạp Hư có sinh vật cực kỳ đa dạng mà vẫn mang nhiều dấu vết hình thái / linh hồn chung.
+
+---
+
+# XXIII. TRƯỚC NGUYÊN SƠ VỠ — “CHẾT” CHƯA TỒN TẠI
+
+Trước khi Nguyên Sơ vỡ:
+
+> **khái niệm Sinh–Tử theo nghĩa hoàn chỉnh chưa tồn tại.**
+
+Thế giới khi ấy gần như chỉ có:
+
+- cây nhỏ;
+- một ít cỏ;
+- các dạng sống cực sơ khai.
+
+Chúng có thể:
+
+- phát triển;
+- dừng phát triển;
+- hư hao theo nghĩa vật chất;
+
+nhưng chưa có chu trình:
+
+> Sinh → Già → Chết → Luân Hồi.
+
+Sau khi Nguyên Sơ phân tách:
+
+- Sinh Mệnh bắt đầu trở thành cấu trúc riêng;
+- Tử Vong xuất hiện;
+- Luân Hồi dần thành hình;
+- sinh giới bắt đầu diễn hóa thật sự.
+
+Quá trình từ:
+
+> đơn bào → đa bào → sinh vật phức tạp
+
+vẫn mất thời gian rất dài.
+
+Linh Khí tăng tốc tiến hóa nhưng:
+
+> **không biến hàng tỷ bước diễn hóa thành vài ngày.**
+
+---
+
+# XXIV. HAI LUỒNG SINH–TỬ: VỪA VÀO TRỨNG, VỪA RÒ VÀO THẾ GIỚI
+
+Khi Nguyên Sơ vỡ:
+
+> hai luồng Sinh–Tử không đơn giản “mỗi luồng chui trọn vào một quả trứng”.
+
+Working model:
+
+1. phần cốt lõi đi vào hai quả trứng;
+2. phần còn lại rò / khuếch tán vào Nạp Hư;
+3. chính phần khuếch tán tham gia định hình:
+   - Sinh Mệnh;
+   - Tử Vong;
+   - Luân Hồi;
+   - quá trình diễn hóa sinh giới.
+
+Điều này mở một khả năng quan trọng:
+
+> **Quy Tắc Sinh / Tử / Luân Hồi không nhất thiết chỉ có đúng một nhánh duy nhất.**
+
+Có thể tồn tại:
+
+- nhiều Pháp Tắc Sinh khác nhau;
+- nhiều Pháp Tắc Tử khác nhau;
+- nhiều cơ chế liên quan Luân Hồi;
+- các phần bị Long / Phượng giữ;
+- các phần hòa vào thiên địa.
+
+Vì vậy Long / Phượng không nhất thiết độc chiếm toàn bộ “Sinh” và “Tử”.
+
+---
+
+# XXV. CÁI CHẾT CỦA LONG / PHƯỢNG CÓ THỂ LÀ MỘT PHẦN CỦA VIỆC THẾ GIỚI HOÀN THIỆN
+
+Working interpretation:
+
+> Long Tổ và Phượng Tổ phải chết để phần Sinh–Tử còn khóa trong hai cá thể được trả lại / phân phối sâu hơn cho Nạp Hư.
+
+Điều này chưa cần giải thích thành cơ chế tuyệt đối.
+
+Có thể hiểu như:
+
+- khi còn sống, họ giữ quá nhiều mảnh Sinh–Tử ở dạng cá nhân;
+- khi chết, tàn hài bị phân thực, luyện hóa, phát tán;
+- các mảnh Pháp Tắc từ đó đi vào nhiều chủng tộc và thế giới;
+- Nạp Hư trở nên “hoàn chỉnh” hơn về Sinh–Tử.
+
+Đây là một nền rất mạnh cho việc cái chết của hai Tổ vừa là bi kịch cá nhân vừa là bước tiến hóa của cả Đại Thế Giới.
+
+---
+
+# XXVI. ĐỨA CON “CẢM XÚC” — NGƯỜI ĐẦU TIÊN VÀO LUÂN HỒI
+
+Một trong mười hai người con của Nhân Tổ mang hệ Pháp Tắc liên quan:
+
+> **Cảm Xúc.**
+
+Working lock:
+
+> đây là người đầu tiên trong mười hai anh/chị/em lựa chọn vào Luân Hồi sau Nhân Tổ.
+
+Lý do:
+
+> bản thân nó cảm nhận quá nhiều.
+
+Khi Nhân Tổ biến mất:
+
+- buồn;
+- nhớ;
+- sợ bị bỏ lại;
+- yêu thương anh/chị/em;
+- chán nản;
+- đau đớn;
+
+đều sâu hơn những người còn lại.
+
+Nó lựa chọn Luân Hồi vì:
+
+> không chịu nổi việc tiếp tục tồn tại như cũ.
+
+Hệ quả đối với thế giới:
+
+> sau khi nó đi vào Luân Hồi, cảm xúc của các sinh linh hậu thế bắt đầu trở nên phong phú hơn.
+
+Mười một người còn lại cũng dần:
+
+- biết buồn sâu hơn;
+- biết yêu sâu hơn;
+- biết ghen;
+- biết giận;
+- biết sợ;
+- biết cô độc.
+
+Có thể nói:
+
+> **việc người con Cảm Xúc rời đi khiến những người còn lại “người” hơn và bớt “thần” hơn.**
+
+Đây là một nguyên tắc thiết kế rất quan trọng cho 12 Đại Tuyệt Thể:
+
+> mỗi người con không chỉ có power; họ có thể đã để lại một “mảnh nhân tính / thế giới” khi bước vào Luân Hồi.
+
+---
+
+# XXVII. QUY TẮC DIỄN HÓA CỦA NHÂN TỔ
+
+Nhân Tổ từng sở hữu:
+
+> **Quy Tắc Diễn Hóa** hoặc một hệ Quy Tắc có Diễn Hóa là trục lớn.
+
+Đây là lý do hắn:
+
+- nhìn Nguyên Sơ phân tách;
+- nảy ra ý nghĩ “ta cũng thử phân tách xem có trứng không”;
+- thật sự có thể chia bản thân thành mười hai người con.
+
+Đây là một động cơ rất đúng tính cách sơ khai:
+
+> không phải đại kế hoạch tạo giống loài, mà là một đứa trẻ bắt chước điều vừa thấy.
+
+Mười hai người con đều nhận:
+
+> **một phần Pháp Tắc Diễn Hóa.**
+
+Vì vậy 12 Đại Tuyệt Thể có một đặc tính chung:
+
+> **có khả năng trưởng thành / tiến hóa theo chủ thể.**
+
+Chúng không phải thể chất cố định từ lúc sinh.
+
+Càng lớn mạnh:
+
+- năng lực càng mở;
+- thiên tính càng mạnh;
+- biểu hiện Pháp Tắc càng sâu.
+
+Khi Nhân Tổ vào Luân Hồi:
+
+> phần lớn Quy Tắc Diễn Hóa vốn tập trung ở hắn được giải phóng / tái phân phối vào Nạp Hư.
+
+Hệ quả:
+
+> thế giới có nhiều “khả năng” hơn, tốc độ và độ đa dạng diễn hóa sinh linh tăng rõ rệt.
+
+---
+
+# XXVIII. THIÊN TÍNH CỦA THẬP NHỊ ĐẠI TUYỆT THỂ
+
+Mỗi Đại Tuyệt Thể có:
+
+> **một thiên tính bắt nguồn trực tiếp từ Pháp Tắc tạo nên người con tương ứng.**
+
+Thiên tính:
+
+- không phải lời nguyền có ý thức;
+- không phải debuff;
+- không phải thứ chủ thể tự nhận ra.
+
+Người mang Thể Chất thường sẽ nghĩ:
+
+> “đó chỉ là tính cách của ta.”
+
+Nhưng người ngoài có thể nhận thấy pattern.
+
+### Quy luật
+
+> **Thể Chất càng trưởng thành → thiên tính càng mạnh.**
+
+Chủ thể không thể đơn giản dùng ý chí để “tắt” thiên tính.
+
+Nhưng có thể:
+
+- dùng công pháp;
+- bảo vật;
+- phong ấn;
+- ngoại lực;
+
+để áp chế.
+
+Điều này tạo một tradeoff rất mạnh:
+
+> muốn Thể Chất mạnh hơn thì bản thân càng bị Pháp Tắc của mình kéo về một kiểu người nhất định.
+
+---
+
+# XXIX. QUAN HỆ GIỮA MƯỜI HAI NGƯỜI CON
+
+Mười hai người con:
+
+> không phải một gia đình luôn hòa thuận.
+
+Do Pháp Tắc khác nhau:
+
+- có cặp tự nhiên thân nhau;
+- có cặp tự nhiên xung đột;
+- có người yêu Nhân Tổ cực đoan;
+- có người bất mãn;
+- có người muốn giữ gia đình;
+- có người muốn rời đi.
+
+Một hướng đã được chấp nhận:
+
+> có ít nhất một người con mang thiên tính **Quy Nhất / Thôn Hợp / Hoàn Chỉnh** đến mức muốn thôn phệ Nhân Tổ và thậm chí các anh/chị/em.
+
+Kẻ đó không nhất thiết “ác”.
+
+Nó có thể chân thành tin rằng:
+
+> **phân tách là sai, trở về một mới là đúng.**
+
+Đây là một hố quan trọng để thiết kế sau.
+
+---
+
+# XXX. CHÂN TIÊN NHÂN TỘC ĐẦU TIÊN — NGƯỜI YÊU YÊU TỘC
+
+Cô gái Yêu tộc cứu hắn không chỉ thả hắn rồi biến mất.
+
+Nàng:
+
+> **chạy cùng hắn.**
+
+Bi kịch:
+
+- một nhà Yêu tộc khác muốn cưới nàng;
+- nàng lại chọn hắc nô Nhân tộc;
+- điều đó đồng thời xúc phạm huyết thống, địa vị và liên minh;
+- cả hai bị truy đuổi.
+
+Cuối cùng:
+
+> **nàng chết trong quãng thời gian chạy trốn cùng hắn.**
+
+Chi tiết cái chết chưa khóa, nhưng mục tiêu tông màu:
+
+> càng thảm càng tốt, miễn vẫn hợp logic nhân vật và không biến nàng thành đạo cụ vô nghĩa.
+
+Cái chết của nàng trở thành một trong những lý do Chân Tiên Nhân tộc đầu tiên:
+
+- hận chế độ Yêu tộc;
+- nhưng không thể tin “mọi Yêu đều ác”.
+
+---
+
+# XXXI. MẸ CỦA KIẾM TIÊN ĐẦU TIÊN
+
+Mẹ của Kiếm Tiên:
+
+> **một phụ nữ vô danh.**
+
+Khi được tìm thấy:
+
+- tình trạng cực kỳ thảm;
+- giống nạn nhân bị ngược sát;
+- trong ngực ôm đứa trẻ còn quấn tã.
+
+Chân Tiên Nhân tộc đầu tiên:
+
+> mang đứa trẻ đi.
+
+Người mẹ:
+
+> chết không lâu sau khi hắn rời đi.
+
+Danh tính của bà hiện tại:
+
+> **không cần khóa.**
+
+Sự vô danh có thể mạnh hơn việc gắn bà vào một gia tộc lớn.
+
+---
+
+# XXXII. KIẾM TIÊN ĐẦU TIÊN ĐƯỢC NHÂN TỘC KHÍ VẬN CHỌN
+
+Kiếm Tiên là:
+
+> con lai Nhân + Yêu.
+
+Nhưng vào đúng thời đại Nhân tộc cần một biểu tượng / người kết thúc Hắc Ám Kỷ:
+
+> **Nhân tộc khí vận chọn hắn.**
+
+Hệ quả:
+
+- tốc độ tu luyện rất nhanh;
+- cơ duyên liên tục;
+- khả năng gặp đúng truyền thừa;
+- cảm ngộ hồng trần thuận lợi;
+- dễ trở thành điểm quy tụ hy vọng của Nhân tộc.
+
+Điểm hay:
+
+> Nhân tộc khí vận chọn **một kẻ không thuần Nhân** làm người đại diện.
+
+Đây là lời phủ định mạnh với tư tưởng huyết thống thuần khiết.
+
+---
+
+# XXXIII. THỜI GIAN PHONG ẤN YÊU TIÊN
+
+Tối thiểu:
+
+> **1.000 năm.**
+
+Nhưng với scale lịch sử hiện tại, khoảng dài hơn là hợp lý.
+
+Kiếm Tiên cần thời gian để:
+
+- trưởng thành;
+- du lịch nhiều Vực;
+- sống giữa nhiều tầng xã hội;
+- cảm ngộ Hồng Trần;
+- học nhiều truyền thừa;
+- đúc kết Cổ Kiếm Đạo.
+
+Vì Hắc Ám Kỷ kéo dài ít nhất **hơn 20.000 năm**, thời gian phong ấn hoàn toàn có thể nằm ở bracket vài nghìn tới hơn mười nghìn năm mà không làm lịch sử chật.
+
+Con số cuối chưa khóa.
+
+---
+
+# XXXIV. YÊU TIÊN TRONG PHONG ẤN VẪN LÀ MỘT NHÂN VẬT HOẠT ĐỘNG
+
+Yêu Tiên không phải boss bị đóng băng hàng nghìn năm.
+
+Phong ấn vẫn cho phép hắn ở mức nhất định:
+
+- truyền ý niệm;
+- ảnh hưởng tâm tình;
+- nói chuyện;
+- thao túng người ngoài;
+- gây sức ép lên phong ấn;
+- cảm nhận Kiếm Tiên lớn lên.
+
+Hắn có thể khinh thường Kiếm Tiên lúc đầu vì:
+
+> trước mắt hắn chỉ là một đứa trẻ được nuôi lớn để giết mình.
+
+Nhưng:
+
+> **hắn không ngu.**
+
+Một sinh linh tự mày mò tu gần / tới Chân Tiên trong thời đại chưa có hệ thống hoàn thiện không thể là phản diện mất não.
+
+Khi Kiếm Tiên trưởng thành, Yêu Tiên:
+
+- quan sát;
+- thử tâm;
+- ảnh hưởng cảm xúc;
+- tìm điểm yếu;
+- thậm chí có thể cố tình dạy / gợi ý một phần tri thức nếu điều đó phục vụ kế hoạch phá phong ấn.
+
+Quan hệ hai người có thể phát triển thành:
+
+> **kẻ thù đã “biết” nhau hàng nghìn năm trước khi thật sự quyết chiến.**
+
+---
+
+# XXXV. LONG / PHƯỢNG CHẾT TRƯỚC HẮC ÁM KỶ CỰC THỊNH
+
+Đã khóa:
+
+> **Long Tổ và Phượng Tổ chết trước khi Hắc Ám Kỷ đạt đỉnh.**
+
+Hệ quả lịch sử rất quan trọng:
+
+Khi hai Tổ còn sống:
+
+- họ rất ít chủ động tàn sát Nhân tộc;
+- Yêu tộc vẫn biết hai biểu tượng tối cao có quan hệ với Nhân Tổ.
+
+Sau khi họ chết:
+
+> một tầng kiềm chế mang tính biểu tượng biến mất.
+
+Hậu duệ:
+
+- tranh tàn hài;
+- tăng huyết mạch;
+- phân quyền;
+- dựng trật tự Yêu tộc mới.
+
+Yêu Tiên đầu tiên:
+
+> biết chuyện Long / Phượng từng được Nhân Tổ nuôi và vẫn không quan tâm.
+
+Đó không phải vô tri.
+
+Đó là:
+
+> **chủ động phủ nhận giá trị của quan hệ cổ xưa trước lợi ích / quyền lực hiện tại.**
+
+---
+
+# XXXVI. PHẬT TỔ — HẬU DUỆ ĐA NHÁNH CỦA MƯỜI HAI NGƯỜI CON
+
+Phật Tổ thuộc Nhân tộc.
+
+Hắn không phải hậu duệ thuần một nhánh.
+
+Do thời gian đã quá dài:
+
+> huyết mạch nhiều người con của Nhân Tổ đã giao hòa.
+
+Phật Tổ là:
+
+> **hậu đại đa nhánh của Thập Nhị Hệ.**
+
+Đây hợp với việc Phật Đạo về sau có tính:
+
+- dung nạp;
+- tín ngưỡng;
+- chúng sinh;
+- đồng hóa;
+- tâm.
+
+---
+
+# XXXVII. PHẬT TỔ “CHÍNH NHƯNG HƠI TÀ”
+
+Phật Tổ không phải thánh mẫu.
+
+Nguyên tắc:
+
+> **nên giết thì giết.**
+
+Hắn có thể:
+
+- giết một thành đã hoàn toàn Ma nhiễm để cứu một Vực;
+- cưỡng ép độ hóa trong tình huống cực đoan;
+- chấp nhận hy sinh số ít;
+- dùng thủ đoạn tâm linh rất nặng;
+- thử đạo tâm bằng phương pháp người đời sau xem là tàn nhẫn.
+
+Nhưng hắn không phải Ma Tăng.
+
+Khác biệt nằm ở:
+
+> mục đích + giới hạn cuối cùng + việc hắn có coi chúng sinh chỉ là nguyên liệu hay không.
+
+Điểm hay:
+
+> Chính Tăng và Ma Tăng hậu thế đều có thể trích lời Phật Tổ để biện minh cho mình.
+
+Một bên nói:
+
+> “Phật Tổ từ bi.”
+
+Bên kia nói:
+
+> “Phật Tổ từng giết cả vạn người để cứu triệu người.”
+
+Cả hai đều không hoàn toàn bịa.
+
+---
+
+# XXXVIII. THIÊN ĐẠO KHÔNG BIẾT ĐẦY ĐỦ NHÂN TỔ
+
+Khi Thiên Đạo bắt đầu có ý thức:
+
+> Nhân Tổ đã vào Luân Hồi từ lâu.
+
+Thiên Đạo sơ khai chỉ quan sát thấy:
+
+- thế giới đầy sinh linh;
+- 12 cấu trúc Pháp Tắc dị thường;
+- Luân Hồi;
+- Long / Phượng;
+- các chủng tộc hậu thế.
+
+Nó không có ký ức xã hội để nói:
+
+> “à, đó là Nhân Tổ.”
+
+Do đó Thiên Đạo:
+
+> **không biết đầy đủ hắn là ai.**
+
+Về sau có thể suy luận.
+
+Nhưng không sở hữu toàn bộ ký ức của thuở sơ khai.
+
+---
+
+# XXXIX. LUÂN HỒI CÓ TRƯỚC THIÊN ĐẠO CÓ Ý THỨC
+
+Đã khóa theo hướng:
+
+> Luân Hồi hình thành **trước khi Thiên Đạo có ý thức rõ ràng**.
+
+Thiên Đạo không phát minh Luân Hồi.
+
+Nó tỉnh dậy trong một thế giới mà:
+
+- Sinh;
+- Tử;
+- Luân Hồi;
+- Linh Mạch;
+
+đã bắt đầu vận hành.
+
+Sau này Thiên Đạo:
+
+> **tiếp quản / điều chỉnh / quản lý Luân Hồi.**
+
+Ví dụ dễ hình dung:
+
+> Thiên Đạo giống một trí tuệ tỉnh dậy trong một cơ thể mà tim và phổi đã hoạt động từ trước khi não có tự ý thức.
+
+---
+
+# XL. KÝ ỨC “NGUYÊN SƠ NÓI TA ĐAU” CHỈ CÓ THỂ ĐẾN TỪ NHÂN TỔ
+
+Thuở đó:
+
+> không có nhân chứng thứ ba.
+
+Vì vậy câu:
+
+> **“Ta cảm thấy đau.”**
+
+nếu tồn tại trong hậu thế, nguồn cuối cùng chỉ có thể là:
+
+> ký ức một đời Luân Hồi đã thức tỉnh của Nhân Tổ.
+
+Hệ quả:
+
+- có người tin;
+- có người cho là kinh điển;
+- có người xem là chuyện thần thoại;
+- có người cho rằng kẻ kể chuyện tự xưng Nhân Tổ là kẻ điên.
+
+Ngay cả độc giả cũng không cần được chứng minh tuyệt đối:
+
+> ký ức ấy có chính xác từng chữ hay không.
+
+---
+
+# XLI. NGUYÊN SƠ CÓ THỰC SỰ CHẾT KHÔNG?
+
+**Không khóa.**
+
+Không chỉ nhân vật trong truyện không biết.
+
+Mà working lore hiện tại cũng cố ý:
+
+> **không quyết định đáp án.**
+
+Có thể:
+
+- Nguyên Sơ chết;
+- trở thành Sinh/Tử;
+- trở thành Luân Hồi;
+- phân tán trong Long/Phượng;
+- một phần vẫn tồn tại;
+- hoặc tất cả đồng thời đúng theo các lớp khác nhau.
+
+Chỉ lấp hố này khi truyện thật sự cần.
