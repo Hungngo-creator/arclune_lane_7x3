@@ -736,3 +736,156 @@ Nhưng hệ thống không thuộc riêng Nhân tộc hay Thần Huy.
 Nó là:
 
 > **kết quả cộng dồn của lịch sử Nạp Hư.**
+
+
+---
+
+# XV. NHÂN TỘC LÀ HẬU DUỆ TRỰC TIẾP CỦA THẬP NHỊ TỬ
+
+Nhân tộc hậu thế được tạo trực tiếp từ quá trình mười hai người con của Nhân Tổ phối huyết.
+
+Hình thái người:
+
+- hai tay;
+- hai chân;
+- mắt;
+- mũi;
+- miệng;
+
+không phải “mẫu hình tối ưu tuyệt đối của vũ trụ”.
+
+Nó tồn tại vì:
+
+> **Nhân Tổ dùng chính hình hài mình làm mẫu khi tạo mười hai người con.**
+
+Mười hai người con sau đó tiếp tục dùng:
+
+- máu của nhau;
+- đất;
+- đá;
+- xác chết;
+- vật chất môi trường;
+
+để tạo thêm bạn và sinh linh.
+
+Nhân tộc là một trong những kết quả trực tiếp ổn định nhất của quá trình đó.
+
+Điều này cũng giúp giải thích vì sao thân người phù hợp cảm ngộ Pháp Tắc:
+
+> nó bắt nguồn từ những sinh linh vốn được tạo trực tiếp từ các mảnh Pháp Tắc của một Thiên Địa Chính Tiên.
+
+---
+
+# XVI. QUY TẮC DIỄN HÓA CỦA NHÂN TỔ & TÍNH TRƯỞNG THÀNH CỦA 12 ĐẠI TUYỆT THỂ
+
+Nhân Tổ từng nắm:
+
+> **Quy Tắc Diễn Hóa** hoặc một Quy Tắc lấy Diễn Hóa làm trục cốt lõi.
+
+Mười hai người con đều nhận một phần:
+
+> **Pháp Tắc Diễn Hóa.**
+
+Do đó mọi Đại Tuyệt Thể đều có tính chất chung:
+
+> **có thể trưởng thành / mở khóa / biến đổi sâu theo đời sống và tu vi chủ thể.**
+
+Thể Chất không phải gói ability cố định.
+
+Càng trưởng thành:
+
+- năng lực càng hoàn thiện;
+- mảnh Pháp Tắc riêng càng sâu;
+- thiên tính càng mạnh.
+
+Khi Nhân Tổ vào Luân Hồi:
+
+> phần lớn Diễn Hóa vốn tập trung ở hắn được giải phóng vào Nạp Hư.
+
+Thế giới từ đó có nhiều khả năng sinh thành và biến hóa hơn.
+
+---
+
+# XVII. THIÊN TÍNH KHÔNG PHẢI THỨ CHỦ THỂ CÓ THỂ TỰ Ý “TẮT”
+
+Mỗi trong 12 Đại Tuyệt Thể mang:
+
+> **một thiên tính gắn trực tiếp với Pháp Tắc tương ứng.**
+
+Thiên tính:
+
+- nằm sâu hơn thói quen;
+- được chủ thể cảm nhận như tính cách tự nhiên;
+- càng mạnh khi Thể Chất trưởng thành;
+- thường không bị chính chủ thể nhận ra là ngoại lực Pháp Tắc.
+
+Ý chí thuần túy không đủ để xóa.
+
+Nhưng có thể áp chế bằng:
+
+- công pháp;
+- pháp bảo;
+- phong ấn;
+- dược / trận đặc thù;
+- cơ chế khắc Pháp Tắc.
+
+Điều này cho phép 12 Thể vừa là thiên phú tuyệt đỉnh vừa mang rủi ro nhân cách.
+
+---
+
+# XVIII. NGƯỜI CON CẢM XÚC
+
+Một trong mười hai người con mang hệ Pháp Tắc:
+
+> **Cảm Xúc.**
+
+Người này là:
+
+> **người đầu tiên trong mười hai anh/chị/em vào Luân Hồi sau Nhân Tổ.**
+
+Nguyên nhân:
+
+> cảm nhận mất mát Nhân Tổ quá sâu.
+
+Sau khi người này rời đi:
+
+- cảm xúc của sinh linh phong phú hơn;
+- mười một người còn lại cũng trở nên giàu cảm xúc hơn;
+- thần tính lạnh / xa cách giảm;
+- “tính người” tăng.
+
+Đây mở một nguyên tắc quan trọng cần tiếp tục thiết kế:
+
+> mỗi trong mười hai người con khi bước vào Luân Hồi có thể để lại một thay đổi nền nào đó cho sinh linh / thế giới.
+
+Chưa khóa điều này cho 11 người còn lại.
+
+---
+
+# XIX. HỆ TÁM CẢNH LÀ THÀNH QUẢ THỬ SAI CỦA TOÀN NẠP HƯ
+
+Dưỡng Hình → Khai Mệnh → Chiếu Hồn → Hiển Tướng → Hóa Tuyền → Hóa Vực → Khắc Pháp → Định Pháp
+
+không phải hệ thống có sẵn từ thuở đầu.
+
+Nó được đúc kết qua thời gian rất dài bởi:
+
+- Nhân;
+- Yêu;
+- Linh Sinh;
+- Phi Thăng Giả;
+- các đạo thống ngoại giới;
+- vô số người thử sai rồi chết.
+
+Đến **Huyết Thế Đại Kiếp**:
+
+> hệ tám cảnh mới cơ bản hoàn thiện và được chấp nhận như ngôn ngữ chung.
+
+Trước đó:
+
+- tên cảnh không thống nhất;
+- lộ tuyến khác nhau;
+- nhiều công pháp nhảy tầng;
+- nhiều phương pháp có tỷ lệ tử vong rất cao.
+
+Thần Huy đã từng tới thăm dò / giao lưu trước khi quá trình chuẩn hóa hoàn tất, nên một phần tư duy phân loại khoa học có thể ảnh hưởng quá trình tổng kết hậu kỳ.
