@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-04-I.12
+**Version:** 2026-10-05-I.13
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.11+, `05_CONTRACTS.md` F.13+, `06_KERNEL_RUNTIME.md` G.12+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.12+, `05_CONTRACTS.md` F.14+, `06_KERNEL_RUNTIME.md` G.13+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -25,6 +25,8 @@
 **Revision I.11:** adds M-094–M-099 for exact tag/facet ownership, required atomic projection credit before continuation, no retrospective activation credit, retained accumulator after normal return-State removal, battle-participant/presence guards and malformed composition rejection. All prior case bodies remain unchanged; six additional declarative obligations, not executable test results.
 
 **Revision I.12:** adds M-100–M-102 for per-attack-owner Slot defaults/non-propagation, moved-Entity versus fixed-Slot impact/presentation, and rejection of broad or unresolved binding. Preserve every prior case and approved exact-owner Entity/Both lock. Architecture Phase declarative coverage only.
+
+**Revision I.13:** adds M-103–M-109 for live waiting contribution/all-entry/cohort/transfer atomicity, last-completion shared Shield refresh, root-direct absorbed-Damage settlement, random Slot/current-occupant batch, identity Revive/empty-claim restoration and invalid-profile rejection. Seven declarative Architecture Phase obligations; all previous case bodies remain unchanged, no executable test results.
 
 # 0. WHAT THIS FILE IS
 
@@ -3910,6 +3912,81 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 **Input:** a Character/Ability-wide Entity/Both exception without exact consuming-owner scope; parent/sibling/another Ability's exception copied into an unbound owner; generic reuse-parent-targets treated as Entity permission; one root-level resolved flag masking unresolved child/Effect/Counter/Follow-up bindings; foreign-owner TargetSpec substituted at execution; Position owner directly consuming an Entity recipient without its declared coordinate/occupant checkpoint; missing compatible Both constraints; runtime/renderer guesses binding or uses visual movement to chase a Slot's original Entity.
 
 **Expected:** responsible Schema/Normalizer rejects unsupported exception propagation or unresolved executable plans; malformed IR fails closed before the affected attack, without guessing a Character-wide fallback. Ordinary authoring with an omitted binding remains legal when its other required targeting data is complete: normalize that exact owner to POSITION/LOCK_POSITIONS. Exact-owner approved Entity/Both and explicit owner-scoped reusable profiles remain accepted. Reuse of target data alone cannot manufacture tracking permission; presentation never supplies targeting authority. No new Contract ID, Tag, Primitive, target store or Character branch is introduced.
+
+---
+
+## M-103 — Live Waiting Contribution Preserves Progress and Transitions Every Qualifier
+
+**Status:** `MUST_PASS`
+**Fixture:** ordinary World waiting base4; two active source rules each ADD2 give8. Current waiting progress is A7, B6, C6, D5, E4, F4, G4, H3; equal-progress same-cohort B/C and E/F/G. Registration/source enumeration is permuted and rebuilt.
+
+**Expected:** one source leaves: final threshold6, A/B/C all transition, D–H retain their exact progress; this is3 entries, not a forced quota2. Independent fresh fixture with both sources leaving at one checkpoint: final4, A–G all transition (7 entries), H remains3; no quota4 or split tied cohort. One-source re-entry raises remaining ordinary threshold without resetting progress or reopening closed records. Default with no active rule stays4; old ordinary entries lacking their own modifier are still affected by an active world contribution. Each source registration counts once; renderer changes/no-op presence writes create no contribution change or death.
+
+**Forbidden:** reset/recount/subtract progress; count corpses/casts instead of active declared presence; RNG/Entity/Slot/list cutoff; threshold permanently frozen at death; repeated static registration adds2 again; re-entering ordinary waiting after a later threshold increase. Preserve REC-004/005 and no extra Action/SSI/AE.
+
+---
+
+## M-104 — Coherent Source Leave, Death Cohort, Transfer and Revive Race
+
+**Status:** `MUST_PASS`
+**Fixture:** threshold8 with two ADD2 sources. Old A/B are same-cohort waiting3, C waiting2. Both sources die in one qualifying simultaneous cohort of size2 and lose presence. Ordinary Revive(A) is queued. Variants reverse technical death/leave enumeration, resume between proposed deltas and world-checkpoint terminal, and atomically transfer an active source between supported Main/Arena presence without changing final sum.
+
+**Expected:** snapshot pre-cohort waiting membership; final active sum0 gives threshold4; old A/B advance once to5, C to4, all enter Reincarnation before ordinary queued Revive(A), which fails. Newly dead source cohort entries start0 and do not count one another. No intermediate one-source leave decision or extra qualifying death from leave. Transfer variant uses one final availability view: old/new presence net sum unchanged, waiting7 at threshold8 stays WAITING; transient leave cannot irreversibly enter it at6. A truly separate later committed leave is a separate checkpoint. Replay does not advance progress, remove contribution, transition or close a record twice; failed/stale protected input exposes no half-eligibility.
+
+**Layers:** REC-001/004/020, POS-005/006, Lifecycle, existing world ledger/static registration/Transaction; INS-003 keeps one world ontology rather than inventing Arena-local death rules.
+
+---
+
+## M-105 — Positive Skill1 Addition Saves Shared Shield at Its Last Completion
+
+**Status:** `MUST_PASS`
+**Fixture:** Nephthys CurrentMaxHP1000, own Skill1 family remaining800 with shared duration1, unrelated Shield100. Affordable Natural Skill1's sealed own-direct ActualHPDamage1000 requests250 new Shield. All state/result/cost observations may be redelivered.
+
+**Expected:** own root ADEC/lifecycle → addition against current family cap admits200, receipt actualAdded200 → family1000 and shared clock freshly2 → root completion clock does not decrement/expire this refreshed family. Both old and new contributions survive; unrelated100 is untouched. One future actually-performed Natural completion gives1; CC and non-Natural work leave1. A later own Natural Skill1 at still-full cap requests250 but actualAdded0: no receipt-backed refresh/duration mutation, then its completion decrements old1→0 and naturally expires only Skill1 family, not Damage absorption. No expire800→then add250 alternative. Source/batch replay cannot recreate addition, refresh or tick.
+
+**Basis variant:** with ample headroom, own-direct ActualHP160 plus Shield-absorbed40/Overkill90 and child/Passive ActualHP400 still requests only40. Unrelated/foreign family Shield affects Standard pooling, not this cap/clock identity. Existing SHP-005/006 and M-034 remain unchanged; the authored root blocking dependency closes even on denied/zero addition, and no own completion can overtake its Shield decision.
+
+---
+
+## M-106 — Skill2 One Root-direct Absorption Outcome, Paid Deduplicated Heal
+
+**Status:** `MUST_PASS`
+**Fixture:** hostile actually-performed Natural root starts with Nephthys MaxHP1000, then later MaxHP2000. Its direct hits absorb200+151 across different Shield sources; children/Counter/Follow-up/Reaction/DoT/Mark/Passive also absorb Damage but are separately owned. Shared AE15; post-payment Nephthys ATK100/WIL50.
+
+**Expected:** finish whole root-direct Damage and mandatory lifecycle, sum351 from exact committed root-own receipts, compare once to350 (start1000), then valid Nephthys pays15 once and shared requestedHeal105 resolves SIMULTANEOUS to self+valid allied Leader. Leader=Nephthys emits one105 Heal, never210. Missing/invalid Leader omits locally but self still heals after one payment; invalid/dead Nephthys creates no payment/Heal. Each recipient's ordinary Heal modifiers/HP bounds remain local.
+
+**Variants:** direct absorption350 fails strict threshold even if ignored children absorb1000; direct349 cannot be rescued by expiry/manual removal or nominal Damage. AE14 skips with no debit/Heal/retry; later AE grant/redelivery does not requalify that Action. A genuinely new qualifying Natural Action may trigger anew. Snapshot/result/terminal candidate identity survives replay and source lifetime changes. A root may contain several direct batches/hits but produces at most one Skill2 activation; no per-hit heal, new Action/SSI/class regen or ancestry-only inclusion.
+
+---
+
+## M-107 — Skill3 Random DISTINCT Slots and Current-occupant Simultaneous Hits
+
+**Status:** `MUST_PASS`
+**Fixture:** legal occupied enemy Slot pool has2 and5 only. Nephthys source snapshot ATK80/WIL120. After locking both coordinates, original X leaves2 and legal Y enters2; occupant at5 leaves it empty. Also test at least4 legal occupied Slots with seeded choice of3, technical pool permutation, all empty at impact and ordinary Hit rejection.
+
+**Expected:** fewer-than3 locks all available coordinates, no Entity random lock. At one recipient checkpoint read Y at2 and no recipient at5. One hit at2 has requested PHYSICAL100 + WILL150 before ordinary mitigation; empty5 misses locally. Do not chase X, replace5, reroll or use another source snapshot. Full-pool variant selects3 DISTINCT coordinates once via seeded RNG and commits admitted current-occupant hits SIMULTANEOUS from the common phase view; one sibling death/stat mutation cannot contaminate another calculation. Selection/recipient/hit validity is distinct; ordinary Hit admission is not Guaranteed.
+
+**Layers:** existing TargetSpec, TGT-005/008/011, RNG, Snapshot, RES-002; preserve M-100–102 exact-owner binding and prior approved Entity/Both exceptions.
+
+---
+
+## M-108 — Ultimate Chân Ngã Lock, TRULY_EMPTY Destination and Atomic Restore
+
+**Status:** `MUST_PASS`
+**Fixture:** allied ordinary Revive-eligible waiting pool includes an eligible Leader where the active Mode still permits combat/Revive; random target L has death Slot5. Variants truly-empty/legal5, claimed5 and empty allied2/8, no eligible target, no truly-empty destination and target becomes Reincarnated after lock. Claimed positions include active occupant, reservation, pending Revive, temporary-absence owner and death-waiting/lifecycle claim.
+
+**Expected:** target seeded selection is of one waiting Chân Ngã, with Leader included and no attack Slot-default. Prefer legal TRULY_EMPTY5; otherwise seed one alternate legal empty Slot. Claims, including a claim owned by the dead target, are not waived to make5 available. Empty target/destination pool prevents Ultimate activation, not cast→pending retry. Post-lock identity invalidity fails locally with NO RETARGET/NO WAIT/no second ally. Protected destination/restore failure publishes no partial stats/HP/Rage/presence/waiting closure or hidden draw/reselection.
+
+**Restore variant:** normal baseline MaxHP1000 plus own-kit explicitly retained battle progression200 and an old temporary MaxHP buff300: remove old temporary Buff/Debuff/Mark/Shield/field-life state, obey retained/reset target-kit law, stabilize restoredMaxHP1200 → assign HP420/Rage5 → materialize/close waiting record atomically. Same trueSelfId/lifeSerial remains; no Heal/Overheal, DEPLOY_FROM_DECK, Deck price/full Rage or repeated battle initialization. Unmarked generic persistence is not invented; exact exceptional target restore laws require explicit compatible composition. If revived target owns a waiting-threshold rule, its committed new presence and waiting-record closure participate in the same coherent world availability checkpoint. Battle termination and ordinary entitlement still apply.
+
+---
+
+## M-109 — Reject Unbounded or Ambiguous Live Waiting Rules
+
+**Status:** `MUST_REJECT`
+**Input:** WAITING_THRESHOLD_CONTRIBUTION with negative/zero/fractional/nonfinite or dynamic formula amount; unresolved runtime owner/Combat Instance/ledger scope/origin; non-static Action-owned registration; per-record force/advance co-authored with the contribution; oldest quota/RNG tie fields; progress subtraction; queued per-leave instead of coherent world checkpoint; incompatible explicit waiting policy without its governing law; IR missing exact registration lifetime/protected revision/terminal identity.
+
+**Expected:** responsible §30.1/REC-001 normalization or malformed-IR validation rejects before affected presence/ledger mutation becomes observably half-committed. Repeated index reconstruction is not a new valid contribution. No callback, new Primitive/Tag/Character branch, rule/list priority, fabricated default or deferred retry makes invalid content executable. Supported positive static ADD and existing unprofiled/explicitly compatible policies remain valid.
 
 ---
 

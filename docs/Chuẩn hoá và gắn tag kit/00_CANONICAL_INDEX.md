@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-04-INDEX-13
+**Version:** 2026-10-05-INDEX-14
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-04-INDEX-13`
+**Version:** `2026-10-05-INDEX-14`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-04-E.11`.
+**Version:** `2026-10-05-E.12`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-04-F.13`.
+**Version:** `2026-10-05-F.14`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-04-G.12`
+**Version:** `2026-10-05-G.13`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-04-I.12`
+**Version:** `2026-10-05-I.13`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -159,6 +159,10 @@ In `docs/canon kit/`:
 - `Anatta_Clarified_Gameplay_Canon.md` R1, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw #59 supersedes old Reflect1turn/Heal30%/Authority. Incoming Natural-start recipient MaxHP plus exact received ActualHP outcome, READY→ACTIVE_REFLECT→COOLDOWN actual-completion clocks, source-local35% reflection with explicit ARM/RES bypass/Final DR/Shield and simultaneous multi-source commit, terminal20% committed reflection Heal, paid Rage20→continuous excess AE, one-hit non-Basic Skills and one enhanced Skill3 Ultimate child are normalized. Metadata/adapters remain NOT BLOCKING.
 
 - `Savitar_Clarified_Gameplay_Canon.md` R3, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw4 entry77: explicit Slot-bound Basic/current occupant, fixed-column seeded relocation/claims, retained post-root simultaneous afterimage counters, present reserved Damage admission, isolated per-batch projection, mandatory HP/MaxHP and return-before-CC, delayed3+1 controller and one exact Ultimate child. R3 supplies exact smallest-owner Functional Tag/facet mapping, pre-Damage projection eligibility and mandatory terminal credit, captured accumulator through normal temporal-State removal, battle-participant use versus presence-controller clocks, and current-base composition proof. Metadata/old-lock migration/external composition remain NOT BLOCKING.
+
+- `Nephthys_Clarified_Gameplay_Canon.md` R1, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw4 entry11: live +2 per active Field Presence/all-waiting threshold re-evaluation without quota; own-direct25% Skill1 Shield with positive-only shared2-actual-completion refresh winning same-checkpoint expiry; hostile-start MaxHP/direct-root Shield absorption paid once with deduplicated simultaneous self/Leader Heal; distinct random locked Slots/current occupants; Chân Ngã Revive with Leader inclusion, TRULY_EMPTY death/alternate Slot, atomic normal-baseline/target-kit retention HP35%/Rage5 and no Deck-only effects. Latest explicit completion sequence supersedes raw after-action wording. Only REC-001's bounded live threshold law is extended; other mechanics use existing composition. Metadata/unsupported external profiles remain NOT BLOCKING.
+
+E.12/F.14/G.13/I.13 adds only a bounded static live waiting-threshold contribution under existing REC-001/static registration/Field Presence/world-ledger owners. Positive integer ADD, coherent all-entry re-evaluation, preserved laterDeathCount, atomic same-checkpoint availability/cohort/transfer and before-ordinary-Revive eligibility use no new Tag/Primitive/Contract ID/manager/priority. M-103–M-109 add seven declarative regression obligations; shared Shield clocks, absorbed result metrics, Slot/RNG and Revive restore already compose. 01/02/03/07/recovery audit and all prior case bodies remain unchanged. No runtime/build test execution is implied.
 
 E.11/F.13/G.12/I.12 refines existing TGT-008: every attack-producing Action/Effect/child/triggered settlement/Counter/Follow-up or other attack owner in every Character defaults independently to POSITION/LOCK_POSITIONS. Entity/Both requires an explicit exact-owner authored exception or owner-scoped reusable profile reference; Character/Ability/root/parent/sibling/other-Ability declarations and shared target data never implicitly propagate it. Every executable owner has a resolved binding; runtime does not guess. Explicit Entity tracking follows the legal locked Entity after movement and presents at its current Position; Slot binding keeps its coordinate and declared occupant-read checkpoint. Approved old exact-owner Entity/Both locks and all Character Canons remain unchanged. 01/02/03/07 remain unchanged; M-100–M-102 add three declarative obligations, no new Contract ID/Tag/Primitive/runtime owner.
 
