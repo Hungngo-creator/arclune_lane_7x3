@@ -892,15 +892,17 @@ Thần Huy đã từng tới thăm dò / giao lưu trước khi quá trình chu�
 
 ---
 
-# XX. THỌ NGUYÊN NẠP HƯ — TĂNG TỪ ĐẠI CẢNH GIỚI THỨ TƯ
+# XX. THỌ NGUYÊN NẠP HƯ — CỘNG DỒN VÀ DUNG NHẬP THIÊN ĐỊA
 
-**ĐÃ CHỐT:** nâng tuổi thọ nền từ đại cảnh giới thứ tư trở đi, kết hợp với việc Chân Tiên lĩnh ngộ thêm Pháp Tắc thì tăng thọ. Thiên Địa Chính Tiên không có thọ nguyên hữu hạn.
+**ĐÃ CHỐT:** các khoản tăng khi đột phá **cộng vào thọ nguyên còn lại**, không thay bằng trần tuổi thọ của cảnh mới. Thiên Địa Chính Tiên không có thọ nguyên hữu hạn.
 
-**ĐANG XÂY DỰNG, tác giả đã chọn dùng:** trần tuổi thọ ở đỉnh cảnh 4–8 lần lượt là **10.000 / 30.000 / 100.000 / 300.000 / 600.000 năm**; Chân Tiên mới chứng một Pháp Tắc có mốc nền **1.000.000 năm**. Các số là phương án hiện tại, còn điều chỉnh được; không gắn thêm hệ số kéo dài do ngủ / hợp nhất sâu khi chưa chốt.
+**ĐANG XÂY DỰNG, tác giả đã chọn dùng:** khoản tăng tham chiếu ở cảnh 4–8 lần lượt là **+10.000 / +30.000 / +100.000 / +300.000 / +600.000 năm**. **ĐÃ CHỐT mới:** chứng Chân Tiên được **+1.000.000 năm**, cộng với phần còn lại từ các cảnh trước. Mỗi Pháp Tắc cảm ngộ thêm tăng thọ **trung bình khoảng +80.000 năm**; có ít / nhiều tùy Pháp Tắc, tăng thọ nhiều thì khó cảm ngộ hơn. Không dùng trung bình làm khoản cố định cho mọi Pháp Tắc.
 
-Bảng đầy đủ, định nghĩa và hệ quả lịch sử nằm trong [Hệ thống tu luyện, sức mạnh và tuổi thọ](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md). Tài liệu ấy đã đối chiếu tệp tác giả gửi với dữ kiện mới trong kho mã; các phần xung đột hoặc đề xuất chưa duyệt không tự trở thành dữ kiện đã chốt.
+Bảng đầy đủ, ví dụ **170 + 800 = 970 năm còn lại khi đột phá Khai Mệnh ở tuổi 30**, định nghĩa và hệ quả lịch sử nằm trong [Hệ thống tu luyện, sức mạnh và tuổi thọ](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md). Tài liệu ấy đã đối chiếu tệp tác giả gửi với dữ kiện mới trong kho mã; các phần xung đột hoặc đề xuất chưa duyệt không tự trở thành dữ kiện đã chốt.
 
-**CÒN MỞ:** mức tăng theo từng Pháp Tắc, giới hạn, điều kiện áp dụng, phân bố tuổi thọ giữa các tiểu cảnh và cơ chế giảm hao thọ. Tuổi thọ khi dùng **Aether** sẽ quyết định sau khi xây xong Nạp Hư và Thần Huy. Mốc Bán Thần bốn triệu năm của hệ Main vẫn là điểm đối chiếu, không phải hệ số chuyển đổi.
+**ĐÃ CHỐT:** Chân Tiên có thể hòa làm một với Pháp Tắc đã cảm ngộ, **dung nhập thiên địa và ngủ say để khôi phục thương thế**. Ngủ càng lâu **ý thức càng bị mài mòn**, nguy cơ đồng hóa càng cao. Nếu bị đồng hóa, **Chân Ngã, linh hồn và ý thức bị ma diệt**, phần tồn tại thành **một phần Thiên Đạo**; vĩnh sinh nhưng cá nhân cũ đã mất. Không đồng nhất với mọi lần bế quan hoặc cho Chân Tiên quyền tùy ý ma diệt Chân Ngã người khác.
+
+**CÒN MỞ:** ngưỡng cảm ngộ và mức tăng riêng của từng Pháp Tắc, giới hạn tích lũy nếu có, phân bố theo tiểu cảnh, khả năng tự tỉnh / thoát khỏi dung nhập thiên địa, tốc độ đồng hóa và cơ chế giảm hao thọ. Tuổi thọ khi dùng **Aether** sẽ quyết định sau khi xây xong Nạp Hư và Thần Huy. Mốc Bán Thần bốn triệu năm của hệ Main vẫn là điểm đối chiếu, không phải hệ số chuyển đổi.
 
 ---
 
@@ -954,4 +956,14 @@ Chúng sinh sơ khai tôn sùng vũ lực, thử nhiều đường tu phần l�
 
 Kiếm Tiên gần đạt Chân Tiên mới được một kẻ địch bị ép hạ cổ tiết lộ về mạng nạn nhân của Yêu Tiên. Hồ yêu bị hạ cổ từ sơ sinh là trường hợp riêng. Quá trình Cổ Kiếm Tu từ sơ khai đến có khả năng can thiệp Chân Ngã hoàn thiện hơn còn mở; không lấy hạn chế của tổ sư ở trận cuối làm giới hạn vĩnh viễn của mọi kiếm tu.
 
-Kiếm tu dẹp Huyết Thế Đại Kiếp đã chốt là **người khác**, không phải Kiếm Tiên đầu tiên. Việc tổ sư còn sống và gặp thân Luân Hồi hồ yêu vẫn **ĐANG XÂY DỰNG / CÒN MỞ**. Nếu còn sống, nguyên nhân hắn vắng mặt chưa được chọn: mệt mỏi vì mất người yêu / sư phụ và tìm kiếm trong vô vọng, bị vây khốn trong bí cảnh, hoặc bế quan tu luyện để hoàn thiện Cửu Đại Kiếm Thuật. Đây là các hướng thay thế; chưa khóa việc bế quan, giai đoạn hoàn thiện kiếm thuật hoặc lấy không chọn phe làm lời giải duy nhất. Niên biểu và các mốc chi tiết ở mục I, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
+Kiếm tu dẹp Huyết Thế Đại Kiếp đã chốt là **người khác**, không phải Kiếm Tiên đầu tiên. Việc tổ sư còn sống và gặp thân Luân Hồi hồ yêu vẫn **ĐANG XÂY DỰNG / CÒN MỞ**. Hướng mới tác giả đang xét **kết hợp**: mệt mỏi vì mất người yêu / sư phụ → du hành tìm người yêu → vô tình bị vây trong bí cảnh không ra được → môi trường tốt nên bế quan tu luyện, hoàn thiện Cửu Đại Kiếm Thuật đã sáng tạo trước đó. Chưa khóa thời điểm, thời lượng hoặc việc thật sự mắc kẹt; không tự đồng nhất bế quan với dung nhập thiên địa ngủ chữa thương. Niên biểu và các mốc chi tiết ở mục I, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
+
+---
+
+# XXIV. MA ĐẠO — SỨC HÚT, TRỞ NGẠI ĐỘT PHÁ VÀ THIÊN KHIỂN
+
+**ĐÃ CHỐT:** Ma Đạo tu nhanh, chiến lực cao nhưng tai họa ngầm lớn; có người chọn vì không còn lựa chọn khác. Tai họa đã xác định gồm **khó tăng cảnh giới**, **Thiên Kiếp mạnh hơn vì khắc chế chí mạng Ma Đạo**, và **Thiên Khiển nếu giết quá nhiều**. Không suy từ tu nhanh ra đột phá dễ, hoặc đồng nhất Thiên Kiếp với Thiên Khiển.
+
+**ĐÃ CHỐT về lịch sử:** sau quân ngoại giới rút, Ma tu cấp thấp quá nhiều nên giết không hết; ngay cả giết sạch người thì công pháp vẫn còn, vẫn có người mới tìm tới tu. Nguồn tái phát không được đặt vào một người chủ động giữ lại / truyền bá Ma Đạo. Các thế lực tiền thân hai Ma Môn nảy sinh về sau; không vì vậy suy ra họ đã tổ chức một kế hoạch lưu truyền ngay từ lúc rút quân.
+
+**CÒN MỞ:** cách Ma Đạo bị khắc chế, các bước tăng cảnh khó ở đâu, ngưỡng / cách tính giết chóc dẫn tới Thiên Khiển, và những hậu quả cụ thể theo từng công pháp. Chưa đặt một hệ số, ngưỡng số người chết hoặc cơ chế tự động bắt mọi Ma tu giết người để tu.

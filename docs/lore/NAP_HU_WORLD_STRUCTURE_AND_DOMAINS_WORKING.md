@@ -2439,7 +2439,9 @@ Yêu tộc dùng người Nhân tộc quản lý đồng tộc; tầng quản l�
 
 Kiếm Tiên luôn chạy trốn, nhận truyền thừa riêng của Chân Tiên Nhân tộc đầu tiên nên không chịu trần công pháp nô lệ; cực ít người biết quan hệ sư đồ.
 
-Đã chọn phương án tăng tuổi thọ từ cảnh thứ tư, kết hợp tăng thọ theo Pháp Tắc ở Chân Tiên. Bảng số **đang xây dựng** nằm trong [Hệ thống tu luyện, sức mạnh và tuổi thọ](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md); phần Aether sẽ quyết định sau Nạp Hư và Thần Huy.
+**ĐÃ CHỐT mới:** khoản tăng thọ khi đột phá **cộng vào thọ nguyên còn lại**. Chứng Chân Tiên được **+1.000.000 năm**, không phải trần tổng tuổi thọ; mỗi Pháp Tắc cảm ngộ thêm tăng thọ **trung bình khoảng +80.000 năm**, thực tế ít / nhiều tùy Pháp Tắc và tăng thọ nhiều khó cảm ngộ hơn. Bảng các khoản tăng tham chiếu nằm trong [Hệ thống tu luyện, sức mạnh và tuổi thọ](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md); phần Aether sẽ quyết định sau Nạp Hư và Thần Huy.
+
+**ĐÃ CHỐT:** Chân Tiên có thể hòa làm một với Pháp Tắc đã cảm ngộ, **dung nhập thiên địa, ngủ say để khôi phục thương thế**. Ngủ càng lâu ý thức càng bị mài mòn, nguy cơ bị đồng hóa càng cao. Nếu bị đồng hóa, Chân Ngã, linh hồn và ý thức bị ma diệt; phần tồn tại trở thành một phần Thiên Đạo, vĩnh sinh nhưng cá nhân cũ không còn. Vị trí / biểu hiện trong Quần Vực, khả năng tự tỉnh / thoát và thời lượng an toàn chưa chốt; không tự dùng một bí cảnh bất kỳ làm nơi buộc mọi Chân Tiên vào trạng thái này.
 
 ---
 
@@ -2458,5 +2460,9 @@ Sau giải phóng ở mốc 16, nhiều Yêu cấp cao bị Kiếm Tiên chém, 
 **16 → 17 ≥ 80.000 năm; 17 → 18 ≥ 40.000 năm; 18 → 19 ≥ 15.000 năm.** Những chặng này tạo cửa sổ lịch sử để phát triển công pháp, giao lưu, thế lực và văn minh; lịch sử hình thành cụ thể của Tần Triều / Tinh Hải và các tổ chức khác còn mở. “Kỷ A” chỉ là ví dụ chưa được dùng làm tên chính thức.
 
 Sau quân Ma Đạo ngoại giới rút, Thiên Đạo siết Giới Bích trong tối đa khoảng **10 năm**. **ĐÃ CHỐT:** khoảng **30 năm kể từ lúc quân ngoại giới rút**, Ma Đạo bản địa bùng lại. Siết Giới Bích nằm trong cùng quãng 30 năm ấy, không cộng thêm khoảng siết bích vào tổng. Các thế lực nảy sinh lúc ấy là **tiền thân** của hai Ma Môn; chưa khóa ngày lập Thiên Ma Môn / Cực Lạc Ma Tông. Khoảng **70 năm sau lần bùng lại** là Đại Kiếp sơ hiện; khoảng **100 năm sau sơ hiện** là chiến thắng đầu tiên của Ma tu, chưa phải Đại Kiếp kết thúc.
+
+**ĐÃ CHỐT về nguồn tái phát:** không đặt vào một người chủ động giữ lại / truyền bá Ma Đạo. Ma tu cấp thấp quá nhiều nên giết không hết; ngay cả giả sử giết sạch người thì công pháp vẫn còn, vẫn có người mới tu vì nhanh, chiến lực cao hoặc không còn lựa chọn khác. Các thế lực tiền thân nảy sinh trong quá trình ấy, không phải điều kiện để Ma Đạo tồn tại sau rút quân. Ma Đạo khó tăng cảnh giới, chịu Thiên Kiếp mạnh hơn vì bị khắc chế chí mạng; giết quá nhiều còn gặp Thiên Khiển. Phân bố người tu / công pháp còn sót, địa điểm hình thành các thế lực và ngưỡng Thiên Khiển chưa chốt.
+
+**ĐANG XÂY DỰNG:** Kiếm Tiên đầu tiên có thể mệt mỏi vì mất mát, du hành tìm hồ yêu, vô tình bị vây trong bí cảnh không ra được rồi thấy môi trường tốt nên ở lại tu luyện / hoàn thiện Cửu Đại Kiếm Thuật. Đây là một chuỗi kết hợp đang xét, chưa khóa sự kiện, địa điểm, thời điểm hoặc kết quả tìm người yêu. Không tự đồng nhất bế quan ở bí cảnh với dung nhập thiên địa ngủ chữa thương.
 
 **22 → 23 ≥ 30.000 năm** từ chặng tái thiết / Nhân Vực dần gọi Ma Châu tới thời Main đời I. Toàn bộ mốc đối thoại 01–24 và phần chưa chốt ở mục I, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).

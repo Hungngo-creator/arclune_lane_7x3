@@ -92,7 +92,7 @@ Số 01–24 giữ nguyên trục đã dùng trong đối thoại với tác gi�
    │
    │ Ít nhất 15.000 năm chiến tranh
    │
-19 ● Quân ngoại giới bị đẩy lui; đạo thống Ma Đạo ở lại — lấy làm năm 0
+19 ● Quân ngoại giới bị đẩy lui; còn Ma tu cấp thấp và công pháp — năm 0
    │
    │ Trong tối đa khoảng 10 năm kể từ 19
    │
@@ -278,7 +278,9 @@ Nhưng:
 
 > **công pháp Ma Đạo ngoại giới ở lại.**
 
-Ma Đạo được đưa vào Nạp Hư qua cuộc xâm lấn này. Một số sinh vật bản địa chuyển sang Ma Đạo, trong đó có hai nhân chứng sự kiện thanh kiếm. Quân ngoại giới bị đẩy lui nhưng công pháp và những người bản địa đã tiếp nhận chúng vẫn ở lại.
+Ma Đạo được đưa vào Nạp Hư qua cuộc xâm lấn này. Một số sinh vật bản địa chuyển sang Ma Đạo, trong đó có hai nhân chứng sự kiện thanh kiếm. Quân ngoại giới bị đẩy lui nhưng công pháp và những người đã tiếp nhận chúng vẫn còn.
+
+**ĐÃ CHỐT:** không đặt nguồn gốc tái phát vào việc có một người chủ động giữ lại và truyền bá Ma Đạo. **Ma tu cấp thấp quá nhiều, giết không hết**; ngay cả giả sử giết sạch người tu thì **công pháp vẫn còn**, vẫn có người mới tìm tới tu. Chưa chốt phân bố số người còn lại theo xuất thân ngoại giới / bản địa hoặc cách công pháp được lưu giữ.
 
 Nạp Hư học được:
 
@@ -288,12 +290,9 @@ Nạp Hư học được:
 - huyết tế;
 - coi sinh linh là nguyên liệu.
 
-Vì Ma Đạo:
-- nhanh;
-- mạnh;
-- trả giá bằng người khác;
+**ĐÃ CHỐT về sức hút:** Ma Đạo tu nhanh, chiến lực cao nên vẫn có người mới chọn, dù tai họa ngầm lớn; có người vì **không còn lựa chọn nào khác** mới phải tu. Các đường luyện huyết / luyện hồn / huyết tế đã du nhập có thể lấy sinh linh làm nguyên liệu, nhưng không tự gán mọi người bắt đầu tu Ma Đạo cùng một động cơ.
 
-nó lan cực nhanh.
+**ĐÃ CHỐT về cái giá:** Ma Đạo **khó tăng cảnh giới**, **Thiên Kiếp mạnh hơn vì khắc chế chí mạng Ma Đạo**; **giết quá nhiều còn bị Thiên Khiển**. Tu nhanh và chiến lực cao không đồng nghĩa dễ đột phá lên mọi cảnh. Phân biệt Thiên Kiếp với Thiên Khiển do giết chóc quá nhiều; ngưỡng, cách tính và diễn biến cụ thể chưa chốt.
 
 Đây là “tro tàn” về sau cháy thành Huyết Thế Đại Kiếp.
 
@@ -322,11 +321,13 @@ Hệ quả:
 
 Đại Kiếp xảy ra khi Ma Đạo trong Nạp Hư đã trở thành:
 
-> vấn đề nội sinh: Ma Đạo được du nhập qua ngoại xâm đã có người bản địa tu luyện và tiếp tục truyền bá sau chiến tranh.
+> vấn đề nội sinh: Ma Đạo đã được du nhập qua ngoại xâm; Ma tu cấp thấp và công pháp còn sót, nên sau chiến tranh vẫn liên tục có người mới chọn tu.
 
 Một đại Ma Tu định huyết tế quy mô cực lớn để đột phá.
 
 Nghi thức bị phá trước khi hoàn thành.
+
+**CÒN MỞ sau luật Thiên Khiển mới:** kẻ mưu huyết tế tính cách đối phó Thiên Khiển do giết chóc quy mô lớn như thế nào; chưa chọn chống trả, che giấu / né tránh hoặc chấp nhận nguy cơ. Không tự gán một thủ đoạn miễn Thiên Khiển cho nghi thức.
 
 Nhưng:
 
@@ -1788,7 +1789,8 @@ Khí vận Nhân tộc tăng, thiên tài lớp lớp xuất hiện, công pháp
 - **18 → 19 ≥ 15.000 năm:** cuộc chiến với Ma Đạo Đại Thế Giới tới khi quân ngoại giới bị đẩy lui.
 - Thiên Đạo siết Giới Bích **trong tối đa khoảng 10 năm sau khi quân ngoại giới bị đẩy lui**; tách hai mốc này.
 - **Khoảng 30 năm kể từ lúc quân ngoại giới rút (19)**, Ma Đạo bản địa bùng lại. Điểm neo này **ĐÃ CHỐT**. Siết Giới Bích xảy ra trong tối đa khoảng 10 năm đầu của cùng quãng ấy; không cộng thêm khoảng siết bích vào 30 năm.
-- Xuất hiện các thế lực Ma Đạo là **tiền thân**, chưa đồng nhất với Thiên Ma Môn / Cực Lạc Ma Tông đã thành hình.
+- Nguồn tái phát **không cần một người giữ lại / truyền bá**: Ma tu cấp thấp quá nhiều nên giết không hết; ngay cả giết sạch người thì công pháp vẫn còn, vẫn có người mới tu vì nhanh, chiến lực cao hoặc không còn lựa chọn khác. Tai họa ngầm đã chốt là khó tăng cảnh giới, Thiên Kiếp mạnh hơn vì khắc chế Ma Đạo, và Thiên Khiển nếu giết quá nhiều.
+- Xuất hiện các thế lực Ma Đạo là **tiền thân**, chưa đồng nhất với Thiên Ma Môn / Cực Lạc Ma Tông đã thành hình. Vai trò tổ chức về sau không được dùng làm một kế hoạch chủ động giữ lại Ma Đạo ngay từ lúc rút quân.
 - Khoảng **70 năm kể từ lúc Ma Đạo bản địa bùng lại**, Huyết Thế Đại Kiếp sơ hiện, giết chóc và chinh phạt khắp nơi, tàn khốc hơn đại quân Yêu Tiên đầu tiên.
 - Chính đạo tập hợp thảo luận, nâng chiến lực và hoàn thiện hệ tu luyện. Tám cảnh chỉ cơ bản hoàn thiện / chuẩn hóa quanh Đại Kiếp.
 - Khoảng **100 năm từ sơ hiện**, Ma tu giành **chiến thắng lớn đầu tiên**. Giai đoạn đầu không lặp trật tự nô dịch, tẩy não và triệt hạ tu sĩ cao như Hắc Ám Kỷ; chính đạo vẫn có chiến lực chống trả, hai bên ban đầu tương đương. Phân biệt mức tàn khốc của hành vi với khả năng tàn sát không bị chống trả.
@@ -1800,14 +1802,29 @@ Khí vận Nhân tộc tăng, thiên tài lớp lớp xuất hiện, công pháp
 
 ## Kiếm Tiên đầu tiên tại Đại Kiếp — ĐANG XÂY DỰNG
 
-Chưa chốt hắn còn sống hay không. Nếu còn sống, tác giả vẫn **chưa quyết định nguyên nhân hắn vắng mặt**. Các hướng đang xét là những khả năng thay thế, chưa ghép thành một chuỗi sự kiện:
+Chưa chốt hắn còn sống tại Đại Kiếp hay không. Tác giả đang xét **kết hợp cả ba hướng thành một chuỗi**, thay vì bắt buộc chọn một:
 
-- Mệt mỏi vì người yêu và sư phụ đã chết, tìm thân Luân Hồi hồ yêu trong vô vọng.
-- Bị vây khốn trong một bí cảnh, không thể ra ngoài can thiệp.
-- Bế quan tu luyện và hoàn thiện Cửu Đại Kiếm Thuật.
+```text
+Mệt mỏi vì mất người yêu và sư phụ
+→ du hành, tìm thân Luân Hồi người yêu
+→ vô tình bị vây trong một bí cảnh, không ra được
+→ môi trường bên trong tốt nên ở lại tu luyện, hoàn thiện Cửu Đại Kiếm Thuật.
+```
+
+Chuỗi này là **ĐANG XÂY DỰNG**, chưa phải các sự kiện đã chốt. Chưa xác định hắn mắc kẹt trước hay trong Đại Kiếp, thời lượng, nguyên nhân không thoát được hoặc lúc trở về. Đây là hoàn thiện kiếm thuật đã sáng tạo trước đó, không dời nguồn gốc Cửu Đại sang thời Đại Kiếp.
 
 Hướng từng xét là hắn coi mình thủ hộ Nhân tộc, không chọn phe trong chính–ma đại chiến mà phần lớn hai bên đều là Nhân tộc; đó vẫn chỉ là **ĐANG XÂY DỰNG**, chưa được chọn làm nguyên nhân. Bản thân hắn lai Yêu và không mang tư tưởng thuần huyết cổ hủ. Khả năng hắn đã gặp thân Luân Hồi hồ yêu cũng **CÒN MỞ**; hướng tìm kiếm trong vô vọng chưa tự khóa kết quả cuối cùng của cuộc tìm kiếm.
 
-Cần phân biệt hắn không muốn can thiệp với không thể can thiệp. Khi chọn hướng, còn phải xác định hắn biết gì về Đại Kiếp, vắng mặt từ lúc nào và vì sao sự vắng mặt kéo dài qua các bước leo thang. Chưa gán cho hắn thái độ chấp nhận thảm sát hoặc một lịch trình bí cảnh / bế quan cụ thể.
+Cần phân biệt hắn không muốn can thiệp với không thể can thiệp. Trong chuỗi đang xét, mệt mỏi dẫn hắn đi xa, còn bí cảnh có thể khiến hắn không ra được; chưa chốt mức hắn biết về Đại Kiếp và vì sao bị giữ qua các bước leo thang. Chưa gán cho hắn thái độ chấp nhận thảm sát hoặc một lịch trình bí cảnh / bế quan cụ thể. Bế quan tại chỗ trong bí cảnh **không tự đồng nghĩa** dung nhập thiên địa ngủ chữa thương.
 
-**SUY LUẬN:** riêng các chặng 16 → 17 → 18 → 19 có tổng tối thiểu **135.000 năm**. Nối ba quãng khoảng 30 + 70 + 100 năm tính từ lúc quân ngoại giới rút, Đại Kiếp sơ hiện khoảng **100 năm**, chiến thắng đầu tiên của Ma tu khoảng **200 năm** kể từ mốc 19. Siết Giới Bích nằm trong 30 năm đầu, không cộng thêm tối đa 10 năm. Nếu các chặng dài gần mức tối thiểu, chiến thắng đầu tiên đến sau mốc 16 vào khoảng **135.200 năm**. Đây không phải niên đại cố định hoặc thời điểm kết thúc Đại Kiếp. Với nền tuổi thọ Chân Tiên 1.000.000 năm đang xây dựng, lịch sử này **cho phép** Kiếm Tiên còn sống, nhưng các khoảng không có cận trên và tuổi thọ thực tế / tổn thương vẫn cần xét.
+**SUY LUẬN:** riêng các chặng 16 → 17 → 18 → 19 có tổng tối thiểu **135.000 năm**. Nối ba quãng khoảng 30 + 70 + 100 năm tính từ lúc quân ngoại giới rút, Đại Kiếp sơ hiện khoảng **100 năm**, chiến thắng đầu tiên của Ma tu khoảng **200 năm** kể từ mốc 19. Siết Giới Bích nằm trong 30 năm đầu, không cộng thêm tối đa 10 năm. Nếu các chặng dài gần mức tối thiểu, chiến thắng đầu tiên đến sau mốc 16 vào khoảng **135.200 năm**. Đây không phải niên đại cố định hoặc thời điểm kết thúc Đại Kiếp. **+1.000.000 năm khi chứng Chân** là khoản cộng vào thọ nguyên còn lại từ các cảnh trước, không phải trần tuổi thọ đời người; mỗi Pháp Tắc bổ sung tăng thọ **trung bình khoảng 80.000 năm**, có ít / nhiều tùy Pháp Tắc và mức tăng nhiều khó cảm ngộ hơn. Vì vậy Kiếm Tiên có thể sống lâu hơn một triệu năm rất nhiều. Lịch sử này **cho phép** hắn còn sống, nhưng các khoảng không có cận trên và tuổi thọ thực tế / tổn thương vẫn cần xét.
+
+---
+
+# XLVII. THỌ NGUYÊN CỘNG DỒN VÀ CHÂN TIÊN NGỦ CHỮA THƯƠNG
+
+**ĐÃ CHỐT:** khi đột phá, khoản tăng thọ cộng vào **thọ nguyên còn lại**. Ví dụ Dưỡng Hình cửu trọng có nền 200 năm, đột phá Khai Mệnh lúc 30 tuổi thì còn **170 + 800 = 970 năm**; nếu không hao thọ thêm có thể sống tới 1.000 tuổi. Chứng Chân Tiên cộng **1.000.000 năm**, không đặt tổng tuổi thọ thành một triệu năm. Mỗi Pháp Tắc cảm ngộ thêm tăng thọ **trung bình khoảng 80.000 năm**, thực tế tùy Pháp Tắc; tăng thọ nhiều khó cảm ngộ hơn.
+
+**ĐÃ CHỐT:** Chân Tiên có thể chọn hòa làm một với Pháp Tắc đã cảm ngộ, **dung nhập thiên địa để ngủ say khôi phục thương thế**. Ngủ càng lâu **ý thức càng bị mài mòn**, nguy cơ đồng hóa càng cao. Nếu bị đồng hóa, **Chân Ngã, linh hồn và ý thức bị ma diệt**; tồn tại ấy thành một phần Thiên Đạo, vĩnh sinh nhưng không còn cá nhân cũ. Đây là cái giá không ai muốn nhận khi chữa thương.
+
+**CÒN MỞ:** khả năng tự tỉnh / thoát, tốc độ đồng hóa, phòng ngừa và hao thọ trong trạng thái đó. Không tự áp dụng cơ chế này cho Kiếm Tiên chỉ vì đang xét hắn bế quan, hoặc biến đồng hóa thành bằng chứng Chân Tiên thường có thể ma diệt Chân Ngã của người khác. Công thức và bảng hiện tại ở mục III–IV của [Hệ thống tu luyện, sức mạnh và tuổi thọ](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md).

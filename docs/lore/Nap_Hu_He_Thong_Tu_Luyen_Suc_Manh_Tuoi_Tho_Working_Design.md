@@ -2,7 +2,7 @@
 
 > **Trạng thái:** Thiết kế đang xây dựng, đã đối chiếu với lời chốt mới của tác giả và các tài liệu hiện tại trong `docs/lore`.
 >
-> **ĐÃ CHỐT:** tác giả đã quyết định nguyên tắc. **ĐANG XÂY DỰNG:** phương án được chọn để tiếp tục phát triển, còn điều chỉnh được. **CÒN MỞ:** chưa có đáp án. Các số tuổi thọ mới thuộc phương án đang xây dựng.
+> **ĐÃ CHỐT:** tác giả đã quyết định nguyên tắc. **ĐANG XÂY DỰNG:** phương án được chọn để tiếp tục phát triển, còn điều chỉnh được. **CÒN MỞ:** chưa có đáp án. Cơ chế cộng thọ nguyên, khoản **+1.000.000 năm khi chứng Chân Tiên**, mức tăng trung bình **+80.000 năm cho mỗi Pháp Tắc bổ sung** và nguy cơ đồng hóa khi dung nhập thiên địa đã được tác giả chốt; các số tham chiếu khác giữ phương án hiện tại.
 
 ---
 
@@ -41,42 +41,64 @@ Tên và trình tự đã có trong tài liệu hiện tại. Các chi tiết Si
 
 ---
 
-# III. BẢNG TUỔI THỌ HIỆN TẠI
+# III. BẢNG THỌ NGUYÊN HIỆN TẠI — CỘNG DỒN KHI ĐỘT PHÁ
 
-**ĐÃ CHỐT về hướng:** nâng tuổi thọ nền từ đại cảnh giới thứ tư trở đi, kết hợp với tăng thọ khi Chân Tiên lĩnh ngộ thêm Pháp Tắc.
+**ĐÃ CHỐT:** các khoản tăng thọ khi đột phá được **cộng vào thọ nguyên còn lại**, không thay tuổi thọ của người tu bằng một trần mới. Chứng Chân Tiên được **cộng 1.000.000 năm**; tuổi đã sống và thọ nguyên tích lũy trước đó không bị đặt lại.
 
-**ĐANG XÂY DỰNG, tác giả đã chọn dùng:** bảng dưới đây. Ba cảnh đầu giữ mốc tham khảo cũ; sáu cảnh từ Hiển Tướng tới Chân Tiên dùng phương án mới.
+Ba cảnh đầu giữ số tham khảo; các mức tăng từ Hiển Tướng tới Định Pháp giữ phương án đang xây dựng đã chọn. Bảng dưới được sửa về **cách hiểu**, không tự đổi các số ấy.
 
-| Đại cảnh giới | Mốc tuổi thọ | Phạm vi áp dụng |
+| Đại cảnh giới | Mốc thọ nguyên / khoản tăng | Cách dùng |
 |---|---:|---|
-| Dưỡng Hình | 200 năm | Đỉnh cảnh; giữ mốc tham khảo |
-| Khai Mệnh | 800 năm | Đỉnh cảnh; giữ mốc tham khảo |
-| Chiếu Hồn | 1.400 năm | Đỉnh cảnh; giữ mốc tham khảo |
-| Hiển Tướng | **10.000 năm** | Đỉnh cảnh; phương án tăng mới |
-| Hóa Tuyền | **30.000 năm** | Đỉnh cảnh; phương án tăng mới |
-| Hóa Vực | **100.000 năm** | Đỉnh cảnh; chưa cộng kéo dài do hợp nhất sâu |
-| Khắc Pháp | **300.000 năm** | Đỉnh cảnh; phương án tăng mới |
-| Định Pháp | **600.000 năm** | Đỉnh cảnh; phương án tăng mới |
-| Chân Tiên | **1.000.000 năm** | Nền tham chiếu khi mới chứng một Pháp Tắc |
+| Dưỡng Hình | 200 năm | Nền tham chiếu tại cửu trọng trong ví dụ tác giả; không đột phá thì 200 tuổi hết thọ nếu không duyên thọ |
+| Khai Mệnh | +800 năm | Cộng vào thọ nguyên còn lại khi đột phá, theo ví dụ tác giả |
+| Chiếu Hồn | +1.400 năm | Khoản tăng tham chiếu; giữ số cũ |
+| Hiển Tướng | **+10.000 năm** | Khoản tăng theo phương án đã chọn |
+| Hóa Tuyền | **+30.000 năm** | Khoản tăng theo phương án đã chọn |
+| Hóa Vực | **+100.000 năm** | Khoản tăng tham chiếu; chưa cộng hiệu quả giảm hao thọ |
+| Khắc Pháp | **+300.000 năm** | Khoản tăng theo phương án đã chọn |
+| Định Pháp | **+600.000 năm** | Khoản tăng theo phương án đã chọn |
+| Chân Tiên | **+1.000.000 năm** | **ĐÃ CHỐT:** khoản cộng khi chứng Chân, không phải tổng tuổi thọ tối đa |
 | Thiên Địa Chính Tiên | Không có thọ nguyên hữu hạn | Theo quan hệ bản thể với thiên địa đã chốt |
 
-Các mốc là trần tuổi thọ tham chiếu khi có điều kiện duy trì sinh mệnh phù hợp, không bị giết, trọng thương vĩnh viễn hoặc hao tổn căn cơ. Tuổi thọ thực tế có thể thấp hơn nhiều. Với tám cảnh đầu, chưa có bảng phân bố từ lúc mới vào cảnh tới đỉnh cảnh.
+**Công thức tại thời điểm đột phá:**
 
-**Không cộng các hàng thành tổng tuổi thọ của một người.** Bảng cũng chưa xác định số năm còn lại ngay lúc đột phá: tuổi đã sống, hao tổn trước đó, trẻ hóa và cơ chế nối thọ cần thiết kế riêng. Không dùng mốc cửu trọng để gán cho người chỉ ở đầu cảnh.
+```text
+Thọ nguyên còn lại sau đột phá
+= thọ nguyên còn lại trước đột phá + khoản tăng của lần đột phá.
+```
+
+**Ví dụ tác giả:** Dưỡng Hình cửu trọng có nền 200 năm. Đột phá Khai Mệnh lúc **30 tuổi**, khi còn **170 năm**, thì còn **170 + 800 = 970 năm**. Nếu không hao thọ thêm, cá nhân đó có thể sống tới **1.000 tuổi**. Nếu không đột phá và không duyên thọ thì chết ở 200 tuổi.
+
+**SUY LUẬN theo bảng hiện tại:** lấy 200 năm làm nền Dưỡng Hình rồi tích lũy đầy đủ các khoản từ Khai Mệnh tới Chân Tiên, tổng quỹ thọ nguyên là **2.042.400 năm**, chưa tính các Pháp Tắc bổ sung, duyên thọ hoặc hao tổn. Đây là tổng quỹ tham chiếu, **không phải số năm còn lại tại lúc chứng Chân** và không phải tuổi chết đã chốt của một nhân vật. Số năm đã sống và những lần hao thọ phải trừ khỏi quỹ ấy.
+
+Thương tổn, bị giết, thiêu đốt thọ nguyên và hao tổn căn cơ có thể làm tuổi thọ thực tế ngắn hơn. Phân bố mức tăng giữa các tiểu cảnh chưa có bảng riêng; không tự cộng lặp toàn bộ khoản của một đại cảnh ở mỗi tiểu cảnh.
 
 ---
 
-# IV. CHÂN TIÊN, PHÁP TẮC VÀ TRẠNG THÁI KÉO DÀI TUỔI THỌ
+# IV. CHÂN TIÊN, PHÁP TẮC VÀ DUNG NHẬP THIÊN ĐỊA
 
-**ĐÃ CHỐT:** mỗi Pháp Tắc Chân Tiên lĩnh ngộ thêm cũng tăng tuổi thọ. Vì vậy một triệu năm là mốc nền cho phương án hiện tại, **không phải trần chung của mọi Chân Tiên**.
+## Thọ nguyên từ các Pháp Tắc bổ sung — ĐÃ CHỐT
 
-**CÒN MỞ:**
+Sau khoản **+1.000.000 năm khi chứng Chân**, mỗi khi Chân Tiên cảm ngộ thêm một Pháp Tắc thì được tăng thọ nguyên, **trung bình khoảng +80.000 năm**.
 
-- mức tăng của mỗi Pháp Tắc, có giống nhau giữa các Pháp Tắc không;
-- chỉ hoàn chỉnh một Pháp Tắc mới được tăng thọ hay lĩnh ngộ từng phần cũng có tác dụng;
-- giới hạn tích lũy, quan hệ với hao tổn căn cơ và thọ nguyên đã tiêu;
-- khi tiến tới bán bộ Thiên Địa Chính Tiên thì tuổi thọ biến đổi thế nào;
-- hệ số tiêu hao khi ngủ, bế quan hoặc hợp nhất sâu với Vực.
+- Mức tăng thực tế tùy Pháp Tắc: có Pháp Tắc tăng ít, có Pháp Tắc tăng nhiều.
+- Pháp Tắc tăng thọ nhiều **khó cảm ngộ hơn**.
+- 80.000 năm là mức trung bình, không phải khoản cố định cho mọi Pháp Tắc.
+- Pháp Tắc đầu tiên để chứng Chân thuộc lần đột phá; không tự tính nó thêm một lần như Pháp Tắc bổ sung.
+
+**SUY LUẬN để ước lượng:** với n Pháp Tắc bổ sung, có thể dùng khoảng **80.000 × n năm** làm tham chiếu. Thọ nguyên thực tế phải cộng mức tăng riêng của từng Pháp Tắc, không mặc định mọi cá nhân đúng bằng trung bình.
+
+**CÒN MỞ:** ngưỡng cảm ngộ được tính là thêm một Pháp Tắc; mức tăng riêng của từng Pháp Tắc; giới hạn tích lũy nếu có; quan hệ với hao tổn căn cơ, thọ nguyên đã tiêu và bán bộ Thiên Địa Chính Tiên. Không tự chọn ngưỡng “hoàn chỉnh” hay cho mỗi phần cảm ngộ nhỏ một khoản +80.000 năm.
+
+## Dung nhập thiên địa để chữa thương — ĐÃ CHỐT
+
+Chân Tiên có thể **chọn hòa làm một với Pháp Tắc đã cảm ngộ, dung nhập thiên địa**, lâm vào ngủ say để khôi phục thương thế.
+
+Ngủ càng lâu thì **ý thức bị mài mòn dần** và **khả năng bị thiên địa đồng hóa càng cao**. Nếu bị đồng hóa hoàn toàn, cá nhân không còn là chính mình: **Chân Ngã, linh hồn và ý thức bị ma diệt**, phần tồn tại ấy trở thành **một phần của Thiên Đạo**. Đó là vĩnh sinh trong thiên địa nhưng mất người vốn có, là cái giá không ai muốn nhận khi chữa thương.
+
+Không đồng nhất trạng thái này với mọi lần bế quan, tu luyện tại chỗ hoặc hợp nhất với Vực ở Hóa Vực. Nó cũng không tự cho mọi Chân Tiên khả năng hủy Chân Ngã của người khác.
+
+**CÒN MỞ:** điều kiện vào / thoát, khả năng tự tỉnh hoặc nhận ra nguy cơ khi ý thức đang mòn dần, mức độ khôi phục thương thế, tốc độ / các giai đoạn cụ thể của đồng hóa, cách chống đồng hóa, cùng tốc độ hao thọ khi ngủ. Chưa chốt một thời hạn an toàn, hệ số giảm hao thọ hay việc có thể chữa mọi thương tổn.
 
 Bản tham khảo từng nêu hợp nhất sâu tiêu hao còn 1/3 ở Hóa Vực và các hệ số thấp hơn ở cảnh cao. **Chưa nhập những hệ số ấy vào bảng mới.** Nhân Tổ và các hài tử có lựa chọn tự suy yếu để vào Luân Hồi; không giải thích mọi lần chuyển đời của họ bằng việc chết vì hết thọ.
 
@@ -108,7 +130,7 @@ Cổ Kiếm Tu có thể dùng hiểu biết sâu để chém một quan hệ / 
 - Từ Hiển Tướng trở lên, một đời tu sĩ có thể bao trùm nhiều thế hệ phàm nhân, nhiều chính quyền và cuộc di cư; cần phân biệt tuổi tu sĩ với tuổi của tổ chức.
 - Tuổi thọ dài tạo khả năng tích lũy tri thức, tài nguyên và quyền lực, nhưng không bảo đảm đột phá. Chưa đặt tỷ lệ thành công, tốc độ tu luyện hoặc số lượng Chân Tiên.
 - Các cộng đồng trốn tránh trong Hắc Ám Kỷ có thể tồn tại qua nhiều thế hệ mà không đồng nghĩa cùng một người lãnh đạo sống trọn thời đại.
-- Trần công pháp nô lệ **dưới cảnh thứ tư** cắt họ khỏi bước tăng thọ mới ở Hiển Tướng. Mốc Khai Mệnh 800 năm là đỉnh cảnh trong điều kiện phù hợp; không gán cho nô lệ chỉ được tu đầu cảnh và bị vắt kiệt.
+- Trần công pháp nô lệ **dưới cảnh thứ tư** cắt họ khỏi khoản tăng thọ lớn ở Hiển Tướng. Khai Mệnh **+800 năm** là khoản cộng trong ví dụ đột phá, không phải trần 800 tuổi. Nô lệ bị vắt kiệt vẫn có thể chết sớm; không tự suy ra mọi nô lệ đều nhận đủ các khoản của bảng.
 - Kiếm Tiên đầu tiên có truyền thừa riêng, luôn chạy trốn và giấu quan hệ sư đồ, nên việc hắn tiến xa không phải bằng chứng nô lệ thông thường được phép học công pháp cao.
 - Bảng mới mở rộng khả năng Kiếm Tiên sống tới các biến cố hậu Hắc Ám Kỷ; **chưa kết luận hắn có mặt ở Huyết Thế Đại Kiếp** trước khi giải quyết khoảng thời gian và hành trạng.
 - Có hai khoảng ít nhất 100.000 năm: từ lúc tạo Nhân tộc tới sự kiện thanh kiếm, và từ lúc hài tử cuối vào Luân Hồi tới ngoại xâm Ma Đạo. Chúng không tự xác định tuổi từng đời tái sinh hoặc được cộng thành 200.000 năm. Số lần Luân Hồi của người dùng kiếm đã được tác giả chốt riêng là nhiều lần.
@@ -117,12 +139,12 @@ Cổ Kiếm Tu có thể dùng hiểu biết sâu để chém một quan hệ / 
 
 # VII. NHỮNG ĐIỂM CẦN CHỐT SAU
 
-1. Tuổi thọ ở lúc mới vào từng đại cảnh và cách tăng qua các tiểu cảnh.
-2. Tác dụng tăng thọ của từng Pháp Tắc và giới hạn tích lũy.
+1. Phân bố khoản tăng thọ giữa các tiểu cảnh; không hỏi lại nguyên tắc cộng dồn đã chốt.
+2. Mức tăng riêng và ngưỡng cảm ngộ của từng Pháp Tắc; giới hạn tích lũy nếu có. Mức trung bình 80.000 năm và quan hệ tăng thọ nhiều / khó cảm ngộ hơn đã chốt.
 3. Hao thọ, trẻ hóa, thương tổn và điều kiện sống khi thiếu Linh Khí / dinh dưỡng.
-4. Hợp nhất sâu có kéo dài thời gian tồn tại theo lịch không, phải trả giá gì.
+4. Khả năng tự tỉnh / thoát khi dung nhập thiên địa, dấu hiệu đồng hóa, phòng ngừa và hệ số hao thọ. Mục đích chữa thương và nguy cơ ma diệt bản thân đã chốt.
 5. Tuổi thọ và tốc độ tu của các loài Yêu; khoảng cách giữa bán bộ Yêu Tiên và Chân Tiên.
-6. Dùng tuổi thọ đã thống nhất để kiểm tra từng khoảng lịch sử, rồi mới xây phần Aether sau Nạp Hư và Thần Huy.
+6. Dùng thọ nguyên cộng dồn để kiểm tra từng khoảng lịch sử, rồi mới xây phần Aether sau Nạp Hư và Thần Huy.
 
 ---
 
@@ -136,7 +158,7 @@ Hắn hấp thu nước để hồi phục, nhưng **không nhận được gì 
 
 Kiếm Tiên tự tin thắng đối phương đã suy yếu và tin có cách cứu linh hồn hồ yêu dù biết ràng buộc tử vong. Khi được thả, Yêu Tiên nhờ Pháp Tắc dần chiếm thượng phong; chiến thắng vẫn cần kịch chiến và một số hy sinh. Không quy cuộc chiến chỉ về lượng năng lượng còn lại. Tăng tuổi thọ của Yêu Tiên đã chốt riêng, không suy ra một công thức chung từ hạn mức sinh mệnh.
 
-Hồ yêu bị hạ cổ từ sơ sinh, nhưng **đã Khắc Pháp khi gặp Kiếm Tiên**; tu vi tiếp tục tăng trong quá trình hắn trưởng thành. Tiểu cảnh lúc gặp, tuổi đời và cảnh cao nhất chưa chốt. Mốc Khắc Pháp 300.000 năm thuộc đỉnh cảnh, không tự gán tuổi thọ ấy cho nàng chỉ từ tên đại cảnh. Tử cổ gặm nhấm linh hồn khiến nàng phải dùng đan dược chữa trị; đây là một nguồn tổn thương cụ thể, chưa đổi thành hệ số giảm tuổi thọ.
+Hồ yêu bị hạ cổ từ sơ sinh, nhưng **đã Khắc Pháp khi gặp Kiếm Tiên**; tu vi tiếp tục tăng trong quá trình hắn trưởng thành. Tiểu cảnh lúc gặp, tuổi đời và cảnh cao nhất chưa chốt. Khắc Pháp **+300.000 năm** là khoản tăng tham chiếu của cảnh trong bảng hiện tại, không phải tuổi chết của nàng. Tuổi đã sống, thọ nguyên tích lũy, phân bố khoản tăng và hao tổn của nàng chưa chốt. Tử cổ gặm nhấm linh hồn khiến nàng phải dùng đan dược chữa trị; đây là một nguồn tổn thương cụ thể, chưa đổi thành hệ số giảm tuổi thọ.
 
 ---
 
@@ -162,8 +184,18 @@ Kiếm Tiên **khoảng 4.000 tuổi khi sư phụ chứng Chân tại mốc 11*
 
 Kiếm Tiên gặp hồ yêu sau cái chết sư phụ. Nàng đã Khắc Pháp khi gặp; kẻ địch tiết lộ việc bị ép hạ cổ khi hắn gần chứng Chân. Không đồng nhất tuổi nàng với tuổi hắn hoặc dùng tuổi 7.000 của hắn làm tuổi chứng Chân.
 
-**SUY LUẬN:** 16 → 17 → 18 → 19 tối thiểu **135.000 năm**. Điểm neo 30 năm đã chốt là lúc quân ngoại giới rút (19): khoảng 30 năm tới Ma Đạo bản địa bùng lại, thêm khoảng 70 năm tới Đại Kiếp sơ hiện, thêm khoảng 100 năm tới chiến thắng đầu tiên của Ma tu; tổng khoảng **200 năm kể từ 19**. Siết Giới Bích trong tối đa khoảng 10 năm đầu nằm trong quãng 30 năm, không cộng thêm vào tổng. Các con số khoảng 30 / 70 / 100 vẫn là ước lượng. Nếu các chặng gần mức tối thiểu, nền Chân Tiên **1.000.000 năm đang xây dựng** cho phép Kiếm Tiên sống tới Đại Kiếp. Các chặng ≥ không có cận trên, còn thời lượng đến khi dẹp kiếp chưa biết, nên **chưa kết luận hắn thực tế còn sống**.
+**SUY LUẬN:** 16 → 17 → 18 → 19 tối thiểu **135.000 năm**. Điểm neo 30 năm đã chốt là lúc quân ngoại giới rút (19): khoảng 30 năm tới Ma Đạo bản địa bùng lại, thêm khoảng 70 năm tới Đại Kiếp sơ hiện, thêm khoảng 100 năm tới chiến thắng đầu tiên của Ma tu; tổng khoảng **200 năm kể từ 19**. Siết Giới Bích trong tối đa khoảng 10 năm đầu nằm trong quãng 30 năm, không cộng thêm vào tổng. Các con số khoảng 30 / 70 / 100 vẫn là ước lượng. Khoản **+1.000.000 năm khi chứng Chân** cộng vào phần thọ nguyên hắn còn từ các cảnh trước; mỗi Pháp Tắc bổ sung còn tăng thọ trung bình khoảng **80.000 năm**. Vì vậy tuổi thọ tiềm năng của Kiếm Tiên có thể vượt một triệu năm rất nhiều. Các chặng ≥ không có cận trên, còn thời lượng đến khi dẹp kiếp, hao thọ và hành trạng chưa biết, nên **chưa kết luận hắn thực tế còn sống**.
 
-Kiếm tu trong tổ đội dẹp kiếp là **người khác**. Nếu Kiếm Tiên đầu tiên còn sống, nguyên nhân vắng mặt vẫn **CÒN MỞ**: mệt mỏi vì mất mát và tìm hồ yêu trong vô vọng, bị vây khốn trong bí cảnh, hoặc bế quan tu luyện / hoàn thiện Cửu Đại Kiếm Thuật. Không ghép các hướng này thành sự kiện đã xảy ra, tự khóa thời lượng bế quan hoặc suy ra bế quan giảm hao tổn tuổi thọ. Hướng không chọn phe trong nội chiến và khả năng gặp thân Luân Hồi hồ yêu cũng vẫn **ĐANG XÂY DỰNG**, không dùng làm dữ kiện đã chốt để ép niên biểu.
+Kiếm tu trong tổ đội dẹp kiếp là **người khác**. Tác giả đang xét **một chuỗi kết hợp** cho Kiếm Tiên đầu tiên: mệt mỏi vì mất mát → du hành tìm người yêu → vô tình bị vây trong bí cảnh không ra được → thấy môi trường tốt nên tu luyện tại chỗ, hoàn thiện Cửu Đại Kiếm Thuật. Đây vẫn là **ĐANG XÂY DỰNG**, chưa khóa hắn còn sống tại Đại Kiếp, thời điểm mắc kẹt, thời lượng bế quan hoặc kết quả tìm hồ yêu. Không tự gán cho hắn trạng thái dung nhập thiên địa / ngủ chữa thương, nguy cơ đồng hóa hoặc hệ số giảm hao thọ chỉ vì đang bế quan.
 
-Các mốc còn lại và diễn tiến dân số / thế lực nằm tại mục I, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md); không cộng bảng tuổi thọ từng cảnh thành tuổi đời hoặc tự thay bảng số đang xây dựng.
+Các mốc còn lại và diễn tiến dân số / thế lực nằm tại mục I, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md). Khi kiểm tra tuổi, cộng các khoản tăng thọ đã nhận và trừ thời gian đã sống / hao tổn; không lấy riêng hàng Chân Tiên làm trần đời người.
+
+---
+
+# XI. MA ĐẠO — ĐÁNH ĐỔI TRÊN ĐƯỜNG TU
+
+**ĐÃ CHỐT:** Ma Đạo tu nhanh, chiến lực cao nhưng **khó tăng cảnh giới**. **Thiên Kiếp mạnh hơn và khắc chế chí mạng Ma Đạo**; **giết quá nhiều còn bị Thiên Khiển**. Đó là các tai họa ngầm khiến người tu phải đánh đổi, không xóa sức hút trước mắt; có người không còn lựa chọn khác mới phải tu.
+
+Phân biệt tốc độ tu, chiến lực, khả năng đột phá và khả năng qua kiếp. Thiên Kiếp khắc chế Ma Đạo và Thiên Khiển do giết quá nhiều là hai điều đã chốt riêng; chưa đặt ngưỡng giết chóc, hệ số kiếp, cảnh bắt đầu chịu kiếp hoặc cách vượt qua.
+
+**ĐÃ CHỐT về hậu chiến:** Ma tu cấp thấp quá nhiều nên giết không hết; dù giết sạch người thì công pháp còn vẫn có người mới tu. Không cần một người chủ động giữ lại / truyền bá làm nguồn tái phát. Chuỗi ngoại xâm → Ma Đạo bản địa bùng lại → Đại Kiếp nằm ở mục I, VII, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
