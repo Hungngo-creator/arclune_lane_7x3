@@ -962,8 +962,18 @@ Kiếm tu dẹp Huyết Thế Đại Kiếp đã chốt là **người khác**, 
 
 # XXIV. MA ĐẠO — SỨC HÚT, TRỞ NGẠI ĐỘT PHÁ VÀ THIÊN KHIỂN
 
-**ĐÃ CHỐT:** Ma Đạo tu nhanh, chiến lực cao nhưng tai họa ngầm lớn; có người chọn vì không còn lựa chọn khác. Tai họa đã xác định gồm **khó tăng cảnh giới**, **Thiên Kiếp mạnh hơn vì khắc chế chí mạng Ma Đạo**, và **Thiên Khiển nếu giết quá nhiều**. Không suy từ tu nhanh ra đột phá dễ, hoặc đồng nhất Thiên Kiếp với Thiên Khiển.
+**ĐÃ CHỐT:** Ma Đạo tu nhanh, chiến lực cao nhưng tai họa ngầm lớn; có người chọn vì không còn lựa chọn khác. Công pháp **đánh đổi tiềm năng / hạn mức phát triển cao nhất để lấy chiến lực và tốc độ tu**, nên **khó tăng cảnh giới**. **Thiên Kiếp mạnh hơn vì khắc chế chí mạng Ma Đạo**; **giết quá nhiều còn bị Thiên Khiển**. Không suy từ tu nhanh ra đột phá dễ, hoặc đồng nhất Thiên Kiếp với Thiên Khiển.
+
+**ĐÃ CHỐT về tâm trí:** oán khí sinh ra khi các nạn nhân bị dùng như “tài nguyên hai chân” chết **ô nhiễm tâm tình Ma tu**, khiến tinh thần thường không ổn định. Công pháp **thấp kém** thường dẫn tới **tẩu hỏa nhập ma**. Chưa chốt mức ô nhiễm hoặc cách khắc phục; không tự biến tác động này thành mất trí hoàn toàn của mọi người tu Ma Đạo.
 
 **ĐÃ CHỐT về lịch sử:** sau quân ngoại giới rút, Ma tu cấp thấp quá nhiều nên giết không hết; ngay cả giết sạch người thì công pháp vẫn còn, vẫn có người mới tìm tới tu. Nguồn tái phát không được đặt vào một người chủ động giữ lại / truyền bá Ma Đạo. Các thế lực tiền thân hai Ma Môn nảy sinh về sau; không vì vậy suy ra họ đã tổ chức một kế hoạch lưu truyền ngay từ lúc rút quân.
 
-**CÒN MỞ:** cách Ma Đạo bị khắc chế, các bước tăng cảnh khó ở đâu, ngưỡng / cách tính giết chóc dẫn tới Thiên Khiển, và những hậu quả cụ thể theo từng công pháp. Chưa đặt một hệ số, ngưỡng số người chết hoặc cơ chế tự động bắt mọi Ma tu giết người để tu.
+## Đại Ma tu cuối Huyết Thế Đại Kiếp — ĐÃ CHỐT
+
+Hắn dùng **nhóm tạo vật thuộc truyền thừa Ma Đạo Đại Thế Giới** giết chóc / thôn phệ sinh linh theo phương pháp nuôi cổ, đến khi còn một **Cổ Vương** rồi dùng **bí pháp đi kèm thôn phệ**. Huyết tế chỉ là một phần. Các tạo vật và cách giải quyết Cổ Vương đều thuộc truyền thừa ấy; chưa gán cách đối phó này cho tổ đội ba người.
+
+Truyền thừa có **vật phẩm che thiên cơ / nhân quả bản thân**, nhờ đó **hắn không gặp Thiên Khiển khi thôn phệ Cổ Vương**. Không tự nâng thành miễn Thiên Kiếp, xóa sạch nhân quả hoặc che đậy mọi tạo vật.
+
+Hắn **thôn phệ thành công**, nhưng **đột phá không trọn vẹn** do tiềm năng đã bị công pháp đánh đổi, chỉ trở thành **bán bộ Chân Tiên** và là **đối thủ cuối Đại Kiếp**. Chưa chốt hắn thiếu cấu trúc bản thể / mức hoàn chỉnh Pháp Tắc nào. Không suy thành mọi Ma tu đều bị chặn ở bán bộ Chân Tiên; các Ma Tôn Chân Tiên đã chốt ở chỗ khác vẫn giữ nguyên.
+
+**CÒN MỞ:** mức và cách đánh đổi tiềm năng theo từng công pháp; cách Ma Đạo bị Thiên Kiếp khắc chế; ngưỡng / cách tính giết chóc dẫn tới Thiên Khiển; mức che thiên cơ / nhân quả; các tạo vật có chịu Thiên Khiển hay không; cách xử lý ô nhiễm tâm tình. Chưa đặt hệ số, ngưỡng số người chết, quyền miễn kiếp tuyệt đối hoặc cơ chế bắt mọi Ma tu giết người để tu.

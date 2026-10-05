@@ -113,6 +113,10 @@ Số 01–24 giữ nguyên trục đã dùng trong đối thoại với tác gi�
    │
 20b● Ma tu giành chiến thắng lớn đầu tiên; chính đạo suy yếu
    │ Ma tu càng bừa bãi; chưa chốt thời lượng tới khi Đại Kiếp kết thúc
+   │ Thời điểm bắt đầu nuôi cổ chưa chốt riêng
+   │
+20c● Đại Ma tu thôn phệ Cổ Vương thành công, nhưng chỉ đạt bán bộ Chân Tiên
+   │ Đối thủ cuối của Đại Kiếp; huyết tế chỉ là một phần của phương pháp
    │
 21 ● Ma tu quay đầu + Phật tu hậu thế + một Kiếm tu khác dẹp kiếp
    │ Kiếm tu này không phải Kiếm Tiên đầu tiên
@@ -292,7 +296,9 @@ Nạp Hư học được:
 
 **ĐÃ CHỐT về sức hút:** Ma Đạo tu nhanh, chiến lực cao nên vẫn có người mới chọn, dù tai họa ngầm lớn; có người vì **không còn lựa chọn nào khác** mới phải tu. Các đường luyện huyết / luyện hồn / huyết tế đã du nhập có thể lấy sinh linh làm nguyên liệu, nhưng không tự gán mọi người bắt đầu tu Ma Đạo cùng một động cơ.
 
-**ĐÃ CHỐT về cái giá:** Ma Đạo **khó tăng cảnh giới**, **Thiên Kiếp mạnh hơn vì khắc chế chí mạng Ma Đạo**; **giết quá nhiều còn bị Thiên Khiển**. Tu nhanh và chiến lực cao không đồng nghĩa dễ đột phá lên mọi cảnh. Phân biệt Thiên Kiếp với Thiên Khiển do giết chóc quá nhiều; ngưỡng, cách tính và diễn biến cụ thể chưa chốt.
+**ĐÃ CHỐT về cái giá:** công pháp Ma Đạo **đánh đổi tiềm năng và hạn mức phát triển cao nhất để lấy chiến lực, tốc độ tu luyện**, khiến tăng cảnh giới khó hơn. **Thiên Kiếp mạnh hơn vì khắc chế chí mạng Ma Đạo**; **giết quá nhiều còn bị Thiên Khiển**. Tu nhanh và chiến lực cao không đồng nghĩa dễ đột phá lên mọi cảnh. Phân biệt Thiên Kiếp với Thiên Khiển do giết chóc quá nhiều; ngưỡng, cách tính và diễn biến cụ thể chưa chốt.
+
+**ĐÃ CHỐT về tâm trí:** oán khí sinh ra khi các nạn nhân bị coi là “tài nguyên hai chân” chết **ô nhiễm tâm tình người tu Ma Đạo**, khiến tinh thần thường không ổn định. Dùng **công pháp thấp kém** dễ / thường dẫn tới **tẩu hỏa nhập ma**. Chưa chốt mức ô nhiễm, chu kỳ hoặc cách xử lý; không biến mọi Ma tu thành người mất hoàn toàn khả năng suy nghĩ và tính toán.
 
 Đây là “tro tàn” về sau cháy thành Huyết Thế Đại Kiếp.
 
@@ -323,11 +329,26 @@ Hệ quả:
 
 > vấn đề nội sinh: Ma Đạo đã được du nhập qua ngoại xâm; Ma tu cấp thấp và công pháp còn sót, nên sau chiến tranh vẫn liên tục có người mới chọn tu.
 
-Một đại Ma Tu định huyết tế quy mô cực lớn để đột phá.
+## Phương pháp nuôi cổ và đối thủ cuối — ĐÃ CHỐT
 
-Nghi thức bị phá trước khi hoàn thành.
+Huyết tế **chỉ là một phần**, không phải toàn bộ phương pháp đột phá của đại Ma tu.
 
-**CÒN MỞ sau luật Thiên Khiển mới:** kẻ mưu huyết tế tính cách đối phó Thiên Khiển do giết chóc quy mô lớn như thế nào; chưa chọn chống trả, che giấu / né tránh hoặc chấp nhận nguy cơ. Không tự gán một thủ đoạn miễn Thiên Khiển cho nghi thức.
+Hắn có **một nhóm tạo vật thuộc truyền thừa của Ma Đạo Đại Thế Giới**, thả chúng giết chóc và thôn phệ sinh linh theo một phương pháp nuôi cổ. Quá trình diễn ra **đến khi chỉ còn một con — Cổ Vương**. Sau đó hắn dùng **bí pháp đi kèm để thôn phệ Cổ Vương**. Các tạo vật và cách giải quyết Cổ Vương đều thuộc truyền thừa Ma Đạo ngoại giới; chưa tự đặt tên tạo vật / bí pháp hoặc quy trình tuyển loại chi tiết.
+
+Truyền thừa Ma Đạo có **vật phẩm che đậy thiên cơ và nhân quả của bản thân**. Nhờ đó, **hắn thôn phệ Cổ Vương mà không gặp Thiên Khiển**. Đây là sự che đậy trong trường hợp đã chốt, không tự biến thành việc xóa mọi nhân quả, miễn mọi Thiên Kiếp hoặc bảo vệ toàn bộ tạo vật.
+
+**Thôn phệ Cổ Vương thành công, nhưng đột phá không hoàn toàn thành công.** Công pháp đã đánh đổi tiềm năng và hạn mức phát triển của hắn, nên hắn chỉ trở thành **bán bộ Chân Tiên**. Hắn là **đối thủ cuối của Huyết Thế Đại Kiếp** mà tổ đội ba người giải quyết. Thất bại nằm ở việc chứng Chân không trọn vẹn; bước thôn phệ Cổ Vương đã thành công.
+
+```text
+Nhóm tạo vật đi giết chóc / thôn phệ sinh linh
+→ quá trình nuôi cổ còn một Cổ Vương
+→ đại Ma tu dùng bí pháp thôn phệ Cổ Vương thành công
+→ đột phá không trọn vì tiềm năng đã bị công pháp đánh đổi
+→ bán bộ Chân Tiên, đối thủ cuối Đại Kiếp
+→ tổ đội ba người dẹp kiếp.
+```
+
+**CÒN MỞ:** thời điểm bắt đầu / thời lượng nuôi cổ; vai trò cụ thể của huyết tế; cách tuyển loại để chỉ còn Cổ Vương; mức che đậy và tình trạng Thiên Khiển của các tạo vật; đại Ma tu biết gì về tiềm năng thiếu hụt; thời điểm tổ đội bắt đầu can thiệp và cách họ thắng. Chưa đồng nhất bộ truyền thừa này với Tử Mẫu Tâm Sinh Cổ của Yêu Tiên, hoặc tự gán phương pháp đối phó Cổ Vương cho tổ đội.
 
 Nhưng:
 
@@ -381,7 +402,7 @@ Dùng:
 - Phật pháp;
 - chúng sinh lực;
 
-tham gia chống huyết tế.
+tham gia dẹp Đại Kiếp mà đối thủ cuối là đại Ma tu đã thôn phệ Cổ Vương, trở thành bán bộ Chân Tiên. Huyết tế là một phần của phương pháp nuôi cổ; vai trò cụ thể của Phật tu trong từng giai đoạn còn mở.
 
 Chiến thắng này cũng vô tình chứng minh:
 
@@ -1795,10 +1816,12 @@ Khí vận Nhân tộc tăng, thiên tài lớp lớp xuất hiện, công pháp
 - Chính đạo tập hợp thảo luận, nâng chiến lực và hoàn thiện hệ tu luyện. Tám cảnh chỉ cơ bản hoàn thiện / chuẩn hóa quanh Đại Kiếp.
 - Khoảng **100 năm từ sơ hiện**, Ma tu giành **chiến thắng lớn đầu tiên**. Giai đoạn đầu không lặp trật tự nô dịch, tẩy não và triệt hạ tu sĩ cao như Hắc Ám Kỷ; chính đạo vẫn có chiến lực chống trả, hai bên ban đầu tương đương. Phân biệt mức tàn khốc của hành vi với khả năng tàn sát không bị chống trả.
 - Sau chiến thắng ấy, chính đạo suy yếu và Ma tu càng bừa bãi. Thời lượng từ đây tới tổ đội dẹp kiếp **CÒN MỞ**; không lấy 100 năm làm toàn bộ thời lượng Đại Kiếp.
-- Tổ đội cuối là Ma tu quay đầu, Phật tu hậu thế và **một Kiếm tu khác**, không phải Kiếm Tiên đầu tiên.
+- **ĐÃ CHỐT về đoạn cuối:** đại Ma tu nuôi một nhóm tạo vật giết chóc / thôn phệ sinh linh đến khi còn một Cổ Vương, rồi dùng bí pháp thôn phệ nó. Huyết tế chỉ là một phần. Vật phẩm của truyền thừa che thiên cơ / nhân quả bản thân giúp hắn không gặp Thiên Khiển khi thôn phệ Cổ Vương.
+- Hắn **thôn phệ thành công nhưng chỉ đột phá thành bán bộ Chân Tiên**, do công pháp đã đánh đổi tiềm năng / hạn mức cao nhất; là đối thủ cuối Đại Kiếp. Thời điểm bắt đầu nuôi cổ chưa chốt riêng; không suy từ vị trí mốc 20c ra toàn bộ quá trình chỉ bắt đầu sau chiến thắng đầu tiên.
+- Tổ đội cuối là Ma tu quay đầu, Phật tu hậu thế và **một Kiếm tu khác**, không phải Kiếm Tiên đầu tiên. Vai trò và thời điểm can thiệp từng người còn mở.
 - **22 → 23 ≥ 30.000 năm:** từ chặng tái thiết / Nhân Vực dần gọi Ma Châu tới thời Main đời I.
 
-Ước tính khoảng 25% sinh linh tử vong là của thảm họa đang xây dựng; phạm vi dân số, phân bố theo các giai đoạn và thời điểm bắt đầu đại huyết tế còn mở. Không gán tất cả tử vong cho 100 năm đầu.
+Ước tính khoảng 25% sinh linh tử vong là của thảm họa đang xây dựng; phạm vi dân số, phân bố theo các giai đoạn, thời điểm bắt đầu nuôi cổ và phần huyết tế còn mở. Không gán tất cả tử vong cho 100 năm đầu hoặc riêng một nghi thức huyết tế.
 
 ## Kiếm Tiên đầu tiên tại Đại Kiếp — ĐANG XÂY DỰNG
 

@@ -194,8 +194,16 @@ Các mốc còn lại và diễn tiến dân số / thế lực nằm tại mụ
 
 # XI. MA ĐẠO — ĐÁNH ĐỔI TRÊN ĐƯỜNG TU
 
-**ĐÃ CHỐT:** Ma Đạo tu nhanh, chiến lực cao nhưng **khó tăng cảnh giới**. **Thiên Kiếp mạnh hơn và khắc chế chí mạng Ma Đạo**; **giết quá nhiều còn bị Thiên Khiển**. Đó là các tai họa ngầm khiến người tu phải đánh đổi, không xóa sức hút trước mắt; có người không còn lựa chọn khác mới phải tu.
+**ĐÃ CHỐT:** công pháp Ma Đạo **đánh đổi tiềm năng và hạn mức phát triển cao nhất để lấy tốc độ tu luyện, chiến lực**, nên tu nhanh nhưng **khó tăng cảnh giới**. **Thiên Kiếp mạnh hơn và khắc chế chí mạng Ma Đạo**; **giết quá nhiều còn bị Thiên Khiển**. Đó là các tai họa ngầm không xóa sức hút trước mắt; có người không còn lựa chọn khác mới phải tu.
+
+**ĐÃ CHỐT về tinh thần:** oán khí sinh ra khi các nạn nhân bị coi là “tài nguyên hai chân” chết **ô nhiễm tâm tình Ma tu**, khiến tinh thần thường không ổn định. Công pháp **thấp kém** thường dẫn tới **tẩu hỏa nhập ma**. Mức ô nhiễm, tốc độ tích lũy và cách khắc phục chưa chốt.
 
 Phân biệt tốc độ tu, chiến lực, khả năng đột phá và khả năng qua kiếp. Thiên Kiếp khắc chế Ma Đạo và Thiên Khiển do giết quá nhiều là hai điều đã chốt riêng; chưa đặt ngưỡng giết chóc, hệ số kiếp, cảnh bắt đầu chịu kiếp hoặc cách vượt qua.
 
 **ĐÃ CHỐT về hậu chiến:** Ma tu cấp thấp quá nhiều nên giết không hết; dù giết sạch người thì công pháp còn vẫn có người mới tu. Không cần một người chủ động giữ lại / truyền bá làm nguồn tái phát. Chuỗi ngoại xâm → Ma Đạo bản địa bùng lại → Đại Kiếp nằm ở mục I, VII, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
+
+## Trường hợp đại Ma tu cuối Đại Kiếp — ĐÃ CHỐT
+
+Huyết tế chỉ là một phần của phương pháp. Hắn có một nhóm tạo vật thuộc truyền thừa Ma Đạo ngoại giới, thả giết chóc / thôn phệ sinh linh theo cách nuôi cổ đến khi còn một **Cổ Vương**, rồi dùng **bí pháp đi kèm thôn phệ** nó. Các tạo vật và cách giải quyết Cổ Vương đều từ truyền thừa ấy. Vật phẩm che thiên cơ / nhân quả bản thân giúp **hắn không gặp Thiên Khiển khi thôn phệ Cổ Vương**; phạm vi đối với tạo vật và Thiên Kiếp còn mở.
+
+**Thôn phệ thành công nhưng đột phá không hoàn toàn thành công**, do tiềm năng đã bị công pháp đánh đổi. Hắn chỉ trở thành **bán bộ Chân Tiên**, là đối thủ cuối Huyết Thế Đại Kiếp. Không tự gán khoản **+1.000.000 năm khi chứng Chân trọn vẹn** cho trường hợp này; lượng tăng thọ thực tế chưa chốt. Cũng không suy ra bán bộ Chân Tiên là trần của mọi công pháp Ma Đạo hoặc xóa các Ma Tôn Chân Tiên đã có.
