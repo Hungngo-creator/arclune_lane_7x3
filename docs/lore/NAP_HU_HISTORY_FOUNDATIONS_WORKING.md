@@ -92,15 +92,16 @@ Số 01–24 giữ nguyên trục đã dùng trong đối thoại với tác gi�
    │
    │ Ít nhất 15.000 năm chiến tranh
    │
-19 ● Quân ngoại giới bị đẩy lui; đạo thống Ma Đạo ở lại
+19 ● Quân ngoại giới bị đẩy lui; đạo thống Ma Đạo ở lại — lấy làm năm 0
    │
-   │ Tối đa khoảng 10 năm
+   │ Trong tối đa khoảng 10 năm kể từ 19
    │
 19a● Thiên Đạo siết Giới Bích; giao thương / Phi Thăng bị đoạn tuyệt
    │
-   │ Khoảng 30 năm; điểm neo đang xây dựng là 19a, cần xác nhận
+   │ Vẫn nằm trong cùng quãng 30 năm tính từ 19
    │
-19b● Ma Đạo bản địa lại bùng lên; xuất hiện các thế lực tiền thân
+19b● Ma Đạo bản địa lại bùng lên — khoảng năm 30 kể từ 19;
+   │ xuất hiện các thế lực tiền thân
    │ của Thiên Ma Môn / Cực Lạc Ma Tông
    │
    │ Khoảng 70 năm kể từ 19b
@@ -137,9 +138,9 @@ Số 01–24 giữ nguyên trục đã dùng trong đối thoại với tác gi�
 - **Ít nhất 1.000 năm** ở 11 → 12 là thời gian học pháp / tìm vật liệu trước lần hài tử ra kiếm. **Ít nhất 1.000 năm** ở 13 → 15 là thời gian Yêu Tiên bị giam. Đây là **hai khoảng khác nhau**, không đồng nhất.
 - Kiếm Tiên khoảng **4.000 tuổi tại mốc 11**, ít nhất **7.000 tuổi khi chia tay sư phụ trước mốc 13**. Tuổi của hắn tại mốc 12 chưa chốt riêng; quãng 11 → chia tay sư phụ vào khoảng 3.000 năm trở lên, suy từ các tuổi trên.
 - **16 → 17 ≥ 80.000 năm; 17 → 18 ≥ 40.000 năm; 18 → 19 ≥ 15.000 năm; 22 → 23 ≥ 30.000 năm.** Các dấu ≥ không được đổi thành thời lượng chính xác.
-- Các mốc khoảng 30 / 70 / 100 năm là ước lượng. Khoảng 70 năm lấy gốc ở lúc Ma Đạo bản địa bùng lại; 100 năm lấy gốc ở Đại Kiếp sơ hiện và kết thúc tại **chiến thắng đầu tiên của Ma tu**, không phải tổ đội dẹp kiếp.
+- Các mốc khoảng 30 / 70 / 100 năm là ước lượng. **ĐÃ CHỐT:** khoảng 30 năm lấy gốc ở lúc quân ngoại giới rút (19); siết Giới Bích (19a) xảy ra trong quãng này, không cộng thêm tối đa 10 năm vào tổng. Khoảng 70 năm lấy gốc ở lúc Ma Đạo bản địa bùng lại; 100 năm lấy gốc ở Đại Kiếp sơ hiện và kết thúc tại **chiến thắng đầu tiên của Ma tu**, không phải tổ đội dẹp kiếp. **SUY LUẬN:** Đại Kiếp sơ hiện khoảng năm 100, Ma tu thắng lần đầu khoảng năm 200 kể từ 19.
 
-Nhân Tiên lấy tàn hài và nhận phương pháp **trước** lần ra kiếm, trực tiếp qua cuộc gặp cách không / xé hư không. Ngày hoàn thành Phong Thiên Tháp so với lần ra kiếm còn mở. Khoảng 30 năm sau chiến tranh đang được đặt sau siết Giới Bích trên trục để tiếp tục thảo luận; **chưa khóa điểm neo rút quân hay siết bích**.
+Nhân Tiên lấy tàn hài và nhận phương pháp **trước** lần ra kiếm, trực tiếp qua cuộc gặp cách không / xé hư không. Ngày hoàn thành Phong Thiên Tháp so với lần ra kiếm còn mở. Khoảng 30 năm tới lúc Ma Đạo bản địa bùng lại **tính từ lúc quân ngoại giới rút**, theo xác nhận của tác giả; siết Giới Bích là một mốc nằm trong cùng quãng đó.
 
 Nhân chứng sự kiện thanh kiếm rất ít. Hai nhân chứng bản địa chỉ chuyển sang Ma Đạo khi ngoại giới Ma Đạo tiến đến; không đặt Ma tu hoặc hai Ma Môn đã thành hình vào Hắc Ám Kỷ.
 
@@ -1786,7 +1787,7 @@ Khí vận Nhân tộc tăng, thiên tài lớp lớp xuất hiện, công pháp
 
 - **18 → 19 ≥ 15.000 năm:** cuộc chiến với Ma Đạo Đại Thế Giới tới khi quân ngoại giới bị đẩy lui.
 - Thiên Đạo siết Giới Bích **trong tối đa khoảng 10 năm sau khi quân ngoại giới bị đẩy lui**; tách hai mốc này.
-- Sau bước ấy có khoảng **30 năm** tới khi Ma Đạo bản địa bùng lại. Điểm neo cụ thể của khoảng 30 năm vẫn **CÒN MỞ**; trục hiện tạm lấy siết Giới Bích làm gốc.
+- **Khoảng 30 năm kể từ lúc quân ngoại giới rút (19)**, Ma Đạo bản địa bùng lại. Điểm neo này **ĐÃ CHỐT**. Siết Giới Bích xảy ra trong tối đa khoảng 10 năm đầu của cùng quãng ấy; không cộng thêm khoảng siết bích vào 30 năm.
 - Xuất hiện các thế lực Ma Đạo là **tiền thân**, chưa đồng nhất với Thiên Ma Môn / Cực Lạc Ma Tông đã thành hình.
 - Khoảng **70 năm kể từ lúc Ma Đạo bản địa bùng lại**, Huyết Thế Đại Kiếp sơ hiện, giết chóc và chinh phạt khắp nơi, tàn khốc hơn đại quân Yêu Tiên đầu tiên.
 - Chính đạo tập hợp thảo luận, nâng chiến lực và hoàn thiện hệ tu luyện. Tám cảnh chỉ cơ bản hoàn thiện / chuẩn hóa quanh Đại Kiếp.
@@ -1799,8 +1800,14 @@ Khí vận Nhân tộc tăng, thiên tài lớp lớp xuất hiện, công pháp
 
 ## Kiếm Tiên đầu tiên tại Đại Kiếp — ĐANG XÂY DỰNG
 
-Chưa chốt hắn còn sống hay không. Nếu còn sống, hướng tác giả đang xét là hắn coi mình thủ hộ Nhân tộc, không đứng về một phe trong chính–ma đại chiến mà phần lớn hai bên đều là Nhân tộc; bản thân lai Yêu nên không mang tư tưởng thuần huyết cổ hủ. Có thể hắn đã gặp thân Luân Hồi hồ yêu, nhưng **chưa khóa cuộc gặp**.
+Chưa chốt hắn còn sống hay không. Nếu còn sống, tác giả vẫn **chưa quyết định nguyên nhân hắn vắng mặt**. Các hướng đang xét là những khả năng thay thế, chưa ghép thành một chuỗi sự kiện:
 
-Cần làm rõ giới hạn của việc không can thiệp khi chiến tranh chuyển thành huyết tế dân chúng. Không tự dùng lý do “nội chiến Nhân tộc” để biến hắn thành người mặc nhiên chấp nhận mọi thảm sát.
+- Mệt mỏi vì người yêu và sư phụ đã chết, tìm thân Luân Hồi hồ yêu trong vô vọng.
+- Bị vây khốn trong một bí cảnh, không thể ra ngoài can thiệp.
+- Bế quan tu luyện và hoàn thiện Cửu Đại Kiếm Thuật.
 
-**SUY LUẬN:** riêng các chặng 16 → 17 → 18 → 19 có tổng tối thiểu **135.000 năm**. Nếu dùng các khoảng gần mức tối thiểu, cộng khoảng 30 + 70 + 100 năm quanh các mốc sau chiến tranh thì chiến thắng đầu tiên của Ma tu đến sau mốc 16 vào khoảng **135.200 năm**, cộng tối đa khoảng 10 năm siết bích. Đây không phải niên đại cố định hoặc thời điểm kết thúc Đại Kiếp. Với nền tuổi thọ Chân Tiên 1.000.000 năm đang xây dựng, lịch sử này **cho phép** Kiếm Tiên còn sống, nhưng các khoảng không có cận trên và tuổi thọ thực tế / tổn thương vẫn cần xét.
+Hướng từng xét là hắn coi mình thủ hộ Nhân tộc, không chọn phe trong chính–ma đại chiến mà phần lớn hai bên đều là Nhân tộc; đó vẫn chỉ là **ĐANG XÂY DỰNG**, chưa được chọn làm nguyên nhân. Bản thân hắn lai Yêu và không mang tư tưởng thuần huyết cổ hủ. Khả năng hắn đã gặp thân Luân Hồi hồ yêu cũng **CÒN MỞ**; hướng tìm kiếm trong vô vọng chưa tự khóa kết quả cuối cùng của cuộc tìm kiếm.
+
+Cần phân biệt hắn không muốn can thiệp với không thể can thiệp. Khi chọn hướng, còn phải xác định hắn biết gì về Đại Kiếp, vắng mặt từ lúc nào và vì sao sự vắng mặt kéo dài qua các bước leo thang. Chưa gán cho hắn thái độ chấp nhận thảm sát hoặc một lịch trình bí cảnh / bế quan cụ thể.
+
+**SUY LUẬN:** riêng các chặng 16 → 17 → 18 → 19 có tổng tối thiểu **135.000 năm**. Nối ba quãng khoảng 30 + 70 + 100 năm tính từ lúc quân ngoại giới rút, Đại Kiếp sơ hiện khoảng **100 năm**, chiến thắng đầu tiên của Ma tu khoảng **200 năm** kể từ mốc 19. Siết Giới Bích nằm trong 30 năm đầu, không cộng thêm tối đa 10 năm. Nếu các chặng dài gần mức tối thiểu, chiến thắng đầu tiên đến sau mốc 16 vào khoảng **135.200 năm**. Đây không phải niên đại cố định hoặc thời điểm kết thúc Đại Kiếp. Với nền tuổi thọ Chân Tiên 1.000.000 năm đang xây dựng, lịch sử này **cho phép** Kiếm Tiên còn sống, nhưng các khoảng không có cận trên và tuổi thọ thực tế / tổn thương vẫn cần xét.

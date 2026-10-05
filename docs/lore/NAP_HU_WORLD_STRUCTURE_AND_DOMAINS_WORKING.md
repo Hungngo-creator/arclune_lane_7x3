@@ -2457,6 +2457,6 @@ Sau giải phóng ở mốc 16, nhiều Yêu cấp cao bị Kiếm Tiên chém, 
 
 **16 → 17 ≥ 80.000 năm; 17 → 18 ≥ 40.000 năm; 18 → 19 ≥ 15.000 năm.** Những chặng này tạo cửa sổ lịch sử để phát triển công pháp, giao lưu, thế lực và văn minh; lịch sử hình thành cụ thể của Tần Triều / Tinh Hải và các tổ chức khác còn mở. “Kỷ A” chỉ là ví dụ chưa được dùng làm tên chính thức.
 
-Sau quân Ma Đạo ngoại giới rút, Thiên Đạo siết Giới Bích trong tối đa khoảng **10 năm**. Khoảng **30 năm** tới Ma Đạo bản địa bùng lại đang được neo tạm vào siết bích, cần xác nhận. Các thế lực nảy sinh lúc ấy là **tiền thân** của hai Ma Môn; chưa khóa ngày lập Thiên Ma Môn / Cực Lạc Ma Tông. Khoảng **70 năm sau lần bùng lại** là Đại Kiếp sơ hiện; khoảng **100 năm sau sơ hiện** là chiến thắng đầu tiên của Ma tu, chưa phải Đại Kiếp kết thúc.
+Sau quân Ma Đạo ngoại giới rút, Thiên Đạo siết Giới Bích trong tối đa khoảng **10 năm**. **ĐÃ CHỐT:** khoảng **30 năm kể từ lúc quân ngoại giới rút**, Ma Đạo bản địa bùng lại. Siết Giới Bích nằm trong cùng quãng 30 năm ấy, không cộng thêm khoảng siết bích vào tổng. Các thế lực nảy sinh lúc ấy là **tiền thân** của hai Ma Môn; chưa khóa ngày lập Thiên Ma Môn / Cực Lạc Ma Tông. Khoảng **70 năm sau lần bùng lại** là Đại Kiếp sơ hiện; khoảng **100 năm sau sơ hiện** là chiến thắng đầu tiên của Ma tu, chưa phải Đại Kiếp kết thúc.
 
 **22 → 23 ≥ 30.000 năm** từ chặng tái thiết / Nhân Vực dần gọi Ma Châu tới thời Main đời I. Toàn bộ mốc đối thoại 01–24 và phần chưa chốt ở mục I, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
