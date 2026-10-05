@@ -1,10 +1,8 @@
 # ARCLUNE — NEPHTHYS — CLARIFIED GAMEPLAY CANON
 
 **Revision:** R1 — designer answers for Passive, Skill1/2, Skill3/Ultimate and same-completion Shield refresh supersede the R0 suggestions.
-**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED; final document audit and verified delivery recorded in §5.
-**Source:** `Ý tưởng nhân vật 4.md`, identified entry `11) Nephthys`; latest designer correction in this task. Raw formulas remain provenance; no unrelated raw entry is replaced.
-**Verified architecture base:** actual merged main `9f7eb05252b49f0d247d234cd520dde965cd1c0f`; INDEX-13 / E.11 / F.13 / G.12 / H.1 / I.12. Proposed architecture refinements are working-branch deltas until merged.
-**Phase/scope:** Architecture Phase, .md only. Follow current root AGENTS.md; no implementation reads/build/runtime tests.
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED.
+**Source:** `Ý tưởng nhân vật 4.md`, identified entry `11) Nephthys`; later explicit designer corrections recorded below. Raw formulas remain provenance; no unrelated raw entry is replaced.
 
 ## 1. Identity, authority and boundaries
 
@@ -130,93 +128,22 @@ Successful restore, in the same lifecycle/materialization transaction:
 
 Revive HP assignment is lifecycle initialization, **not Heal/Overheal**. Restoring Rage is initialization under this Revive profile, not an extra Damage-derived gain. Do not emit DEPLOY_FROM_DECK or trigger Deck-only effects, payment or full-Rage deployment initialization. Special target-owned restoration laws are composed explicitly; ordinary lifeSerial preservation is not a reason to keep temporary field-life states.
 
-## 3. Shared-clock composition and latest-source precedence
+## 3. Shared-clock lifetime and designer precedence
 
 The final designer reply locks grant/positive refresh before completion-clock expiry. It supersedes the earlier shorthand “after the Natural Action completes” wherever that shorthand would delay the grant until after expiry. No gameplay question remains pending for the mechanics in §2.
 
-Bind the shared clock to one existing source-owned StateRef for the Skill1 Shield family, keyed by runtime owner, stable origin Skill/Shield-Effect definitions and the applicable retained family lifetime. Contributions retain their own immutable addition/result provenance but reference that family clock. Maintain its remaining actual-completion count and positive-refresh originating ActionRef/version; these are ordinary State/clock composition, not new reference namespaces or global runtime fields.
+The Skill1 family has one source-owned clock keyed by runtime owner, stable origin Skill/Shield-Effect definitions and the applicable retained family lifetime. Contributions keep their immutable addition/result provenance. Retain the remaining actual-completion count and positive-refresh originating Action reference/version; the same completion cannot decrement its own fresh clock.
 
-At Skill1 root ADEC, seal the own-direct ActualHP projection, then commit P-047's cap-clipped addition and its typed ShieldAdditionResultRef. Only a positive committed amount updates the family clock and refresh-origin evidence. Register this finite ACT-032 dependency before root completion; the last-unit old Shield is still present during cap evaluation. At ACTION_COMPLETED, the same root's successful refresh preserves the fresh2 instead of decrementing it; other actually-performed Natural completions decrement the existing count once and reaching0 removes only that family. CC, non-Natural Actions, zero-addition receipts and duplicate deliveries cannot create a refresh or double tick.
+Duplicate deliveries cannot add, refresh or tick twice. Preserve the applicable lifecycle/retention law and exact family identity; terminal/expired/replaced clock work cannot mutate another family or new life. The last-unit old Shield remains present during cap evaluation, and denied/zero addition closes the Shield decision without refresh. Complete this root's Shield decision before its completion clock, and complete clock work before the next Natural Action.
 
-State/counter updates, Shield removal, result conditions and local dependency edges use existing P-020/021/022, P-047/048, Clock/State/Shield/Transaction ownership. Preserve replay identity and the applicable lifecycle/retention law; terminal/expired/replaced StateRef delivery cannot mutate another family or new life. M-034 / Sanguinius already demonstrates positive shared refresh, actual-action counting, CC exclusion and zero-addition expiry. The new Nephthys M-105 fixture proves the now-authorized last-completion ordering; no generic Shield extension is required.
+Ultimate HP/Rage/stat initialization does not become an independent Heal, Reincarnation, RESOURCE_MODIFIER or STAT_MODIFIER Effect merely by using restoration fields.
 
-## 4. Independent current-base composition review
+## 4. Unresolved / not blocking
 
-| Mechanic | Exact existing input → Contract → runtime owner | Conclusion |
-| --- | --- | --- |
-| Direct mixed Damage | 04 DamageSpec + source Snapshot + exact attack-owner TargetSpec → DMG-001–003/TGT-008/RES-002 → P-040–042, Target/Damage/Transaction owners | Existing composition. Skill3 explicitly binds selected Slots and current occupants. |
-| Damage-derived Skill1 Shield | 04§35.1 own-direct ActualHP aggregate → ACT-032/SHP-005/006 → Result/P-043, P-046/P-047, Shield/Transaction | Existing25% basis, shared-family cap and positive addition receipt; pre-completion grant is a finite declared blocker, not a new metric/Primitive. |
-| Shared Skill1 clock | source-owned State/duration/stacking + positive ShieldAdditionResultRef condition → existing Clock/State/ACT-032/033/SHP laws → P-020/021/022, P-047/048, State/Shield/Clock owners | One StateRef clock and source-family removal filter; positive refresh wins last-unit expiry and excludes its own Action, with required completion work before handoff. M-034 plus M-105 cover this existing composition. |
-| Skill2 root-direct absorbed metric | hostile-start Snapshot + sealed root own-direct DamageResultRef projection → DMG-020/021/TRG-013/ACT-032 → Snapshot/Result/P-043/completion graph | shieldAbsorbed is already allowed by04§35.1 and P-043. Child exclusion is Effect provenance, not an ancestry shortcut. |
-| Paid deduplicated Heal batch | required AE15 + explicit SELF/Leader Entity union/filter + one post-Cost Snapshot → TRG-003/CST-010/RES-002/HEL-* → P-034/035/044/045, Target/Cost/Heal/Transaction | Existing finite settlement; local recipient invalidity, paid-once identity and batch are Character data. |
-| Revive selection/destination/restore | ReviveSpec eligibility/position/statRestore/stateRestore/resourceRestore + POS-009 → TGT/RNG/REV-001–007/ENT-020 → P-010/011/012/085/069 and Lifecycle/Restore/Transaction | Existing profile-based composition. No attack Slot default on Chân Ngã selection, no new Deck/Heal semantics. |
-| Live waiting threshold | Passive-static owner/Field Presence + world waitingWindow declaration → REC-001/004/020 → existing static registration, Field Presence, Reincarnation ledger/Transaction | Current per-record threshold and per-record advance/force operations do not specify live contribution/all-entry re-evaluation/atomic source-leave law. This is the only presently proved generic extension. |
+Rank, Class, native Element, numeric base stats, Basic selector/profile and deployment Cost Budget remain unresolved metadata/profile inputs; they do not weaken §2's locks or establish fully numeric executable Character data.
 
-### 4.1 Proven bounded waiting-policy gap
+Future incompatible threshold rules, unsupported Mode adapters or external retention conflicts require their own explicit compatible law. These remain **UNRESOLVED / NOT BLOCKING** unless the immediate task depends on them; Nephthys supplies no broad global default for them.
 
-**Locked requirement:** +2 per active source presence, preserve laterDeathCount, evaluate every waiting entry immediately when availability changes, one final view for simultaneous removals and no quota/tie winner.
+## 5. Normalization status
 
-**Composition attempted:** fixed waitingWindow at entry; P-065 waiting-progress advance/reduce; P-066 force-enter over oldest2/4; ordinary ENTER_FIELD/LEAVE_FIELD Reaction-triggered updates; static State/rule registration plus existing ledger.
-
-**Exact failure:** fixed entry threshold leaves old records stale; subtracting progress changes the meaning/history and mishandles fresh entries; force-top-N splits tied cohorts and imposes a rejected quota; queued per-source leave listeners expose intermediate thresholds and can lose the Revive race. Registration can own the rule but lacks the typed waiting-threshold law consumed by the existing ledger. Missing semantics affect observable eligibility, not merely convenient authoring.
-
-**Smallest extension:** a bounded positive-integer **live threshold contribution** in existing Reincarnation/waitingWindow authoring, owned by a static rule and existing Field Presence lifetime; extend **REC-001** and the existing world-ledger checkpoint. Derive one effective threshold from base plus currently active declared contributions, retain death progress, and atomically seal all-entry threshold decisions before ordinary observers. No new Tag/Primitive/Contract ID, callback, global priority or runtime manager.
-
-Reusable for any source-presence rule extending a death-order waiting window, independent of Character ID. Preserve ordinary base4; without active contributions effective threshold is4. Ordinary entries without their own modifier still read active World-ledger contributions. Special restoration/routing behavior is unchanged. Reject unproven interactions with incompatible external threshold policies; a future policy needs its own explicit composition law.
-
-### 4.2 Smallest-owner Tag mapping
-
-- Passive waiting policy: **REINCARNATION** on the real world-system interaction.
-- Skill1/Skill3 Damage: **DAMAGE**, with **PHYSICAL_DAMAGE/WILL_DAMAGE** on their components.
-- Skill1 Shield: **SHIELD**.
-- Skill2 Heal: **HEAL**.
-- Ultimate materialization/restore: **REVIVE**; HP/Rage/stat initialization does not become an independent Heal, Reincarnation, RESOURCE_MODIFIER or STAT_MODIFIER Effect merely by using restore fields.
-
-AE prices, random selection, threshold, Slot binding, automatic settlement, clocks, caps, retention and Action identity are Schema/Contract facets. No new Functional Tag or Primitive is justified.
-
-### 4.3 Nephthys binding of the bounded waiting profile
-
-The Passive's PASSIVE_STATIC registration binds the existing REINCARNATION Effect family to this §30.1 data:
-
-```yaml
-reincarnation:
-  operation: WAITING_THRESHOLD_CONTRIBUTION
-  waitingWindow:
-    thresholdContribution:
-      sourceOwnerRef: <Nephthys runtime ENTITY_REF>
-      presenceCombatInstanceRef: <owning Field Presence COMBAT_INSTANCE_REF>
-      scope: WORLD_LEDGER
-      amount: 2
-      composition: ADD
-      availability: ACTIVE_FIELD_PRESENCE
-      reevaluation: LIVE_ALL_WAITING_AT_COMMIT
-```
-
-These placeholders must resolve to existing typed refs; stable origin definitions and the presence lifetime remain required normalization inputs under §30.1. The amount2 is Character data, while base4, additive composition, coherent all-entry predicate and required world checkpoint are REC-001 law. The resulting optional waitingThresholdContributionPlan is static Effect/System registration, never a per-record P-065/P-066 loop or a Nephthys runtime branch. The remaining Skills/Ultimate bind the existing input/result/dependency/restore composition in §4 without another architecture extension.
-
-## 5. Architecture impact and validation status
-
-Deliverable versions: **INDEX-14 / E.12 / F.14 / G.13 / H.1 / I.13**. These are branch proposals until verified merge; the header's verified base records the independently inspected architecture used for composition, not a claim that an unmerged proposal was already canon.
-
-00 updates navigation/version references and actual semantic deltas. 01/02/03/07: **NO CHANGE**; meanings/capabilities/operations/Mode ownership already exist. 04§30.1/51/52, 05 REC-001/required checks and 06§4/88/90 add only the proved waiting-policy authoring/law/existing-owner execution extension. 08 adds declarative **M-103–M-109**: live/tied thresholds; cohort and transfer atomicity; last-completion positive/zero Shield grants; root-direct all-source absorption and paid/deduplicated Heal; Slot binding/shared simultaneous snapshot; identity Revive/restoration; malformed-profile rejection. These are specification fixtures, never executable game-test results.
-
-Raw kit remains provenance and is not rewritten as a replacement request. Previously merged Pilots, explicit owner-scoped Entity/Both exceptions and special Revive profiles are preserved.
-
-No new broad global default answers future incompatible threshold rules, unsupported Mode adapters or external retention conflicts. Such future-content/profile questions remain **UNRESOLVED / NOT BLOCKING** unless the immediate task depends on them. Metadata/Basic selector profiles still prevent a claim of fully numeric executable Character data.
-
-The six-pass audit and actual PR/head/current-main checks below must close before merging under AGENTS.md§39.4. No app code, src/, dist/app.js, builds or runtime tests are part of this Architecture Phase delivery.
-
-### 5.1 Six-pass document self-audit
-
-| Pass | Result and evidence |
-| --- | --- |
-| 1 — Semantic fidelity | PASS. Designer locks in §2 cover live4+2N/no quota/cohort ties, positive-added-only last-completion Shield refresh, hostile-start35% strict own-direct absorption, AE15 once/Heal70%+70%/Entity dedup, distinct current-occupant Slot hits125%+125%, and identity Revive/empty destination/HP35%/Rage5/target-owned restore. Latest completion sequence is explicit in §2.2/3. |
-| 2 — Independent composition | PASS. Existing SHP-005/006, 04§35.1/P-043, M-034, ACT-032/033, TGT-008 and REV-001–007 express Shield/result/clock/Slot/restore requirements. §4.1 independently rejects fixed-entry thresholds, progress offsets, quota forcing and queued per-leave approximations. Only the bounded REC-001 live contribution law is extended. |
-| 3 — Layer / namespace / lifetime | PASS. Schema owns the typed profile/optional plan; REC-001 owns predicate/order; existing presence/static registration/world ledger/Transaction own execution. Existing ENTITY/COMBAT_INSTANCE/definition/State/Action refs remain distinct. Exact source/origin/presence lifetime, retirement, protected revisions and terminal replay identities prevent duplicate contribution/clock work. No new Tag/Primitive/Contract ID/manager or Character branch. |
-| 4 — Determinism / negative space | PASS as document review. M-103–109 specify all tied qualifiers, final simultaneous removals/cohorts/transfer, positive partial versus zero capped addition, CC exclusion, direct provenance/start snapshot/strict cutoff, insufficient AE/no retry, dedup/missing Leader, empty/replaced Slot and invalid locked Revive/claimed destination/atomic failure. Required dependencies are finite and acyclic; unrelated competing observers retain their own explicit law. |
-| 5 — Prompt / source contradiction | PASS. Latest designer replies supersede the R0 suggestions and raw shorthand, including the final grant-before-clock sequence. Raw entry11 and unrelated entries remain provenance; work is .md only with no implementation reads or execution. Ordinary Revive preserves lifeSerial and target-kit exceptions; no metadata or future external-policy answer is guessed. |
-| 6 — Mergeability | PASS for the reviewed document delta against actual main9f7eb05. Exactly six .md paths: this Canon plus00/04/05/06/08. All228 prior stress-case bodies are identical; M-103–109 add7. All240 Contract IDs remain, and only REC-001's body changes. Version links/fences, source-family/typed-ref scope and whitespace diff were checked; 01/02/03/07/AGENTS/raw/prior Character Canons remain untouched. Delivery still requires the actual PR/head/target checks in §5.2. |
-
-### 5.2 Verified-delivery boundary
-
-Delivery uses [PR #22](https://github.com/Hungngo-creator/arclune_lane_7x3/pull/22) on `codex/nephthys-gameplay-canon`. Before merge, inspect GitHub's actual six-file diff, verify its exact head and recheck main; reconcile any movement. After merge, verify merged status and the resulting main content. The PR/merged commit records the delivered ref; this Canon's reviewed base and proposed-version history do not substitute for that verification. No executable gameplay/build result is claimed.
+Generic architecture delta: a bounded static live waiting-threshold contribution under the existing Reincarnation law, Field Presence and World-ledger owners. Shield clocks, result settlement, Slot targeting and Revive restoration use existing composition.

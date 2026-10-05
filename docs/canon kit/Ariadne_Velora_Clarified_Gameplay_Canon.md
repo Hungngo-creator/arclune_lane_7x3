@@ -1,32 +1,17 @@
 # ARIADNE VELORA — CLARIFIED GAMEPLAY CANON
-## Gameplay logic before Tag / Primitive / Contract normalization
+## Clarified gameplay logic
 
 **Character:** Ariadne Velora  
 **Source:** Ariadne  
-**Status:** Clarified Gameplay Canon — ready for semantic normalization  
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED
 **Primary focus:** Turn-based mode. Chess/Monopoly may reuse grid-relative logic later, but are not normalized here.  
-**Important:** This document describes **what the kit does**. It does not yet assign Functional Tags, Primitives, Contract IDs, or Kernel implementation.
+**Important:** This document describes **what the kit does**.
 
 ---
 
 # 0. PURPOSE
 
 This file resolves the gameplay ambiguities in Ariadne Velora's original prose before architecture mapping.
-
-Required workflow after this file:
-
-```text
-Original Kit
-→ Clarified Gameplay Canon
-→ Terminology mapping
-→ Tag audit
-→ Ability Schema normalization
-→ Primitive composition
-→ Contract mapping
-→ Kernel dry-run / Stress Test
-```
-
-Do not skip directly from raw prose to Tags.
 
 ---
 
@@ -1373,21 +1358,3 @@ The following are considered resolved for the current Ariadne design:
 44. DEATH_CONFIRMED by itself does not define leave-field; actual presence transition does.
 
 ---
-
-# 40. READY FOR SEMANTIC NORMALIZATION
-
-This clarified kit is ready for:
-
-```text
-A. Terminology mapping
-B. Functional Tag audit
-C. Ability Schema normalization
-D. Primitive composition
-E. Contract impact analysis
-F. Kernel dry-run
-G. Stress-test comparison
-```
-
-The next model should compare the raw kit against this clarified file and should **not reopen resolved gameplay questions** unless it discovers a genuine contradiction with newer user canon or the canonical architecture.
-
-If the current architecture cannot represent one of these clarified mechanics, that is an architecture-impact finding — not permission to reinterpret Ariadne's gameplay.

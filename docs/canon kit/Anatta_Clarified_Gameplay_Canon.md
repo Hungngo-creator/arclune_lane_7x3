@@ -1,9 +1,8 @@
 # ARCLUNE — ANATTA / VÔ LƯỢNG — CLARIFIED GAMEPLAY CANON
 
-**Revision:** R1 — current-turn replacement of raw #59, nine designer locks and explicit reflected-Damage mitigation/multi-source batch/root-Reaction answers.
+**Revision:** R1 — replacement of raw #59, nine designer locks and explicit reflected-Damage mitigation/multi-source batch/root-Reaction answers.
 **Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED. Architecture Phase documentation, not generated executable Character data.
 **Source:** newest ANATTA / VÔ LƯỢNG — DESIGNER LOCK and current replacement of #59 in `ý tưởng nhân vật 3.md`. Old Reflect1turn / terminal Heal30% / Pháp Tắc and old Costs/Ultimate are superseded.
-**Architecture base inspected:** actual merged main `46ba568`, INDEX-9 / E.7 / F.9 / G.8 / H.1 / I.8. Corrected E.8/F.10/G.9/I.9 deltas below are working-branch changes until merged; they do not replace the inspected base during the gap proof.
 
 ## 1. Identity and boundaries
 
@@ -103,28 +102,18 @@ After child direct settlement/lifecycle is terminal, grant **own Rage+10**, subj
 
 Buff active immediately after Ultimate, persists through Anatta's **next1 actually completed Natural Action**, then expires at that ACTION_COMPLETED. Origin Ultimate, CC-lost opportunities and non-Natural/child Actions do not consume it. Same-source recast replaces/refreshes to fresh1 without stacking percentages. Finite post-completion origin exclusion/recast instance guards prevent the origin Action's later completion or stale clock work decrementing the fresh duration. Ordinary lifecycle retention applies; there is no battle-persistent retention exception.
 
-## 3. Normalization and composition proof
+## 3. Settlement, lifetime and replay boundaries
 
-Use existing Trigger/State/Duration/Cost/Snapshot/Target/Area/Effect DAG/Result/Transaction owners. Existing primitives suffice: P-002, P-010–014, P-020–022, P-030, P-033–035, P-040–045, and P-001 only for the real Ultimate Skill3 child. No new Functional Tag, Primitive, Character runtime branch, callback system or priority service.
+- **Incoming package:** bind the immutable Snapshot/results to Combat Instance + observed enemy Natural Action + receiving Anatta + controller/activation identity. Capture receiving MaxHP at ACTION_STARTED with explicit enemy/Natural filters, not at the last hit/trigger. Filter exact declared Damage-outcome membership and recipient, then sum ActualHP; source grouping uses immediate Damage Source, never Damage Attribution.
+- **S1:** the declared Natural Damage-outcome must be terminal before required Rage debit and Side AE gain. A finite local dependency can close this authored settlement before incoming root completion; failed Cost closes only this branch. Resource work requests no new Action.
+- **Reflect activation:** grant after the activating ACTION_COMPLETED and before the next Natural handoff. Do not block the completion this settlement observes. Root/children keep their own identities; no per-child duplicate activation.
+- **Active Reflect:** eligibility belongs to the exact State instance at package observation. Reflected packets target the locked immediate Source refs in one SIMULTANEOUS batch per incoming outcome, then mandatory lifecycle. Registration alone creates no Action/Effect. Fold same-source receipts once; retain exact reflected activation membership through terminal readers/replay. Reflected lineage cannot requalify the original Natural outcome.
+- **Active expiry / early removal:** cause-aware removal and retained result/counter bindings drive one local Heal20% terminal settlement, then cooldown. Guard terminal work by retired activation identity and cause; lifecycle removal wins over a stale ordinary-expiry callback. Finish already committed result accounting before Heal, without waiting for another Action. Natural-expiry decrement/removal/Heal/cooldown must finish before next handoff; early removal inside an Action uses finite dependencies. Actionless external removal uses its explicit System-step settlement boundary, never a fake Action or a wait for a future Natural Action.
+- **Clocks / reset:** count actually completed owner-Natural Actions, not global TURN_BOUNDARY or opportunity-default clocks. Controller/Active/Cooldown are current-life/current-Presence State; exact instance guards distinguish Revive/redeploy from old work without inventing a lifeSerial increment. Cleanup retires only authored work; it is not an Alcestis-wide Buff/Mark/Shield purge.
+- **Skill3:** common Snapshot and one simultaneous direct group contain Damage and Resource drain. The fixed drain needs no intermediate live read or cross-target priority. Mandatory lifecycle follows this complete group, preserving ordinary death cohorts/prevention and admission.
+- **Ultimate:** one real child with the declared waived Cost and explicit enhanced profile for that request. After child terminal, root Resource/State effects remain under its AFTER_DIRECT_EFFECTS_COMPLETE hold. The next-actual-Natural stat clock reads the live baseline excluding its own family. Observable Resource gain origin is ACTION_GENERATED by this Ultimate, not an exemption from matching prevention.
 
-- **Incoming package:** key existing immutable Snapshot/result references by Combat Instance + observed enemy Natural Action + receiving Anatta + controller/activation identity. Capture receiving MaxHP at ACTION_STARTED with explicit enemy/Natural filters, not at the last hit/trigger. P-043 filters exact declared Damage-outcome membership and recipient, then sums ActualHP; source grouping uses the canonical immediate Damage Source axis, never Damage Attribution. This is an existing result projection, not new history/aggregation storage.
-- **S1:** existing DAMAGE_ACTION_COMPLETED/declared Natural-outcome terminal readiness, TRG-003 required Cost, P-035 Rage debit → P-033 Side AE gain. A bounded ACT-032 dependency can close this authored settlement before incoming root completion; failed Cost closes only this branch. No Action request for Resource work.
-- **Reflect activation:** ACTION_COMPLETED with ACT-033 NATURAL_ONLY postActionSettlement ensures grant after activating Action and before next Natural handoff. No cyclic dependency blocking the completion it observes. Root/children retain own identities; no per-child duplicate activation.
-- **Active Reflect:** exact State-instance eligibility at the package observation under TRG-002, P-043 source groups → finite reflected Damage Effects against those locked Source refs in one explicitly authored SIMULTANEOUS batch per incoming outcome, then mandatory lifecycle. Registration creates no Action/Effect by itself. Same-source receipts are folded once per incoming outcome; result bookkeeping retains exact reflected activation membership through terminal readers/replay. Reflected lineage cannot requalify the original Natural outcome.
-- **Active expiry / early removal:** State/Duration/cause-aware STATE_REMOVED plus retained result/counter bindings drive one local Heal20% terminal settlement and then cooldown State. Guard terminal work by retired activation identity and cause; lifecycle removal wins over a stale ordinary-expiry callback. Use existing bounded dependency edges to finish already committed result accounting before Heal, not an arbitrary middleware or wait for another Action. Natural-expiry decrement/removal/Heal/cooldown is one required ACT-033 completion settlement before next handoff; an early removal inside an executing Action uses its finite ACT-032 dependencies. Actionless external removal requires its existing explicit System-step settlement boundary, never a fake Action or a wait for a future Natural Action.
-- **Clocks / reset:** explicit actually-completed owner-Natural profile, not global TURN_BOUNDARY or opportunity-default clock. Controller/Active/Cooldown are current-life/current-Presence State; exact State instance guards distinguish ordinary Revive/redeploy from old work without inventing a lifeSerial increment. Cleanup retires only authored work; it is not Alcestis-wide Buff/Mark/Shield purge.
-- **Skill3:** existing §12 Area geometry + common Snapshot + named SIMULTANEOUS_BATCH effects `[Damage, Resource drain]`, RES-002/005 and existing P-042/P-033 transaction delegation. Its fixed drain needs no intermediate live read, cross-target priority or new lifecycle-boundary profile. Mandatory lifecycle occurs after this complete explicit group, preserving ordinary death cohorts/prevention and admission.
-- **Ultimate:** ACT-020–024 real child / waived child Cost / explicit enhanced profile branch for that exact request. After child terminal, ordinary Resource/State effects under the root's explicit AFTER_DIRECT_EFFECTS_COMPLETE hold; next-actual-Natural live-stat clock uses RES-007. Resource gain origin is ACTION_GENERATED by this Ultimate where observable under CST-016, not an exemption from matching prevention.
-
-Functional mapping uses existing DAMAGE/PHYSICAL_DAMAGE/WILL_DAMAGE, HEAL, BUFF/STAT_MODIFIER and RESOURCE_MODIFIER. REFLECTED_DAMAGE remains an established semantic/query distinction, **not a newly registered Functional Tag**. No old Authority is attached.
-
-### 3.1 Proven bounded gap
-
-**Schema input → governing Contract → current runtime owner → exact insufficiency → smallest extension:**
-
-Received-result P-043 projection ×0.35 → DMG-030–033/DMG-010/011 plus designer's explicit reduction law → existing P-040/041/042, Damage Runtime §45, execution provenance §15A, Contract Resolver §28A and Result Store §25A/56 → E.7 §16 can author only PHYSICAL/WILL/TRUE component profiles; relabeling Reflect as TRUE bypasses required Final DR, relabeling PHYSICAL/WILL reintroduces mitigation/type semantics; transform/Penetration cannot preserve dedicated reflection identity and the correct pipeline → add an opt-in **reflected scalar packet profile** under DMG-034, using the same Damage primitives/results, explicit retained committed source-group basis, bypass ARM/RES then existing matching Final DR then ordinary Shield. A packet-kind modifier scope selects this non-component profile without changing old component scopes. Retain immediate Damage Source in receipts/source grouping; existing P-043 grouping/filter service performs the read.
-
-Other mechanics passed composition; in particular **no new Damage→drain lifecycle barrier** is needed because both Effects are already one authored outer direct group. General unrelated Reaction priority, unsupported external modifier phases/reflect policies and numeric scale remain with their own owners.
+REFLECTED_DAMAGE remains distinct from ordinary PHYSICAL/WILL/TRUE components; it is not a newly registered Functional Tag. No old Authority is attached. Invalid source refs skip locally without retargeting. Freeze semantic source-group Effect/RNG identities before technical enumeration; retained immediate Source, packet kind and committed basis cannot drift when receipts or State are removed.
 
 ## 4. Remaining items
 
@@ -132,31 +121,6 @@ Other mechanics passed composition; in particular **no new Damage→drain lifecy
 
 Future external content may add Authority/admission conflicts, special reflected mitigation/modifier phases, retention overrides or observable ordering against unrelated work. Those boundaries require their own explicit law; they do not justify a hidden priority or a current kit rewrite.
 
-## 5. Impact audit across 00–08
+## 5. Normalization status
 
-| File | Decision |
-| --- | --- |
-| 00 | PATCH Canon navigation and affected version references. |
-| 01 | NO CHANGE — REFLECTED_DAMAGE, immediate Damage Source/Attribution, Damage/Cost/Heal/Natural semantics already exist. |
-| 02 | NO CHANGE — no new Tag-use need; reflected packet uses DAMAGE, deferred Reflect Tag stays deferred. |
-| 03 | NO CHANGE — P-040–043/P-044–045 and existing State/Cost/Resource/Transaction operations suffice. |
-| 04 | PATCH bounded reflected scalar profile, compatible packet-kind reduction scope, explicit source-group result input and IR/validation. |
-| 05 | PATCH DMG-034 only; retain existing DMG-030–033 defaults and ordinary component laws. |
-| 06 | PATCH existing Damage/modifier/result owners for that profile; no new service. |
-| 07 | NO CHANGE — existing side-relative Slot geometry/Resource/SSI ownership suffices; raw column membership is local data. |
-| 08 | PATCH declarative threshold/Reflect/removal/clock/resource/line/child and rejection regression obligations. No executable game/build tests. |
-
-## 6. Final audit
-
-Completed against actual main `46ba568` and the corrected seven-file diff:
-
-1. **Semantic fidelity:** checked nine locks plus all three answered gaps; one-hit100/200% typed components, strict25%/18% gates, enemy-Natural-start receiving MaxHP, exact ActualHP/provenance/source groups,35% reflection bypass ARM/RES but retain Final DR/Shield, source-batch simultaneity,20% committed-reflection terminal Heal, full Rage20/AE20+Rage5/AE30 Costs, continuous excess3AE, actual-completion active2→Heal→cooldown2 and next1 liveARM/RES, one enhanced child and root Reaction hold.
-2. **Independent composition:** retried current Cost/State/Duration/Snapshot/Area/Result/child/Transaction paths after the first draft. Only scalar reflected packet/reduction scope remained a proved representation gap. Source grouping clarifies existing P-043's canonical immediate Source axis. Damage/drain use one existing outer group; no new barrier/Tag/Primitive/manager/priority or Character runtime.
-3. **Layer/namespace/lifetime:** Schema input/DMG-034/current Damage+Contract+Result+provenance owners and IR/validation align. Exactly one new Contract ID; prior233 Contract bodies are unchanged, including distinct ENT-010/015. Current activation/Presence/lifecycle keys, retained original source/kind/basis and finite terminal accounting guard old State work across ordinary Revive with unchanged lifeSerial. No loss of committed credit at removal or recreated cooldown after death/conversion.
-4. **Determinism/negative space:** attacked exact thresholds, changed MaxHP, nominal/Shield/Overkill/foreign same-root Damage, distinct immediate sources sharing credit, invalid sources/locks, source iteration/RNG identity, simultaneous reflection/life cohorts, zero/blocked/converted Heal, early removal versus cleanup, CC/non-Natural/child clocks, same-event fresh cooldown, insufficient Rage/atomic Skill2 payment, one-child overrides, refresh and duplicate delivery/save-resume. Existing bounded dependencies finish finite required bookkeeping; no future-Action wait or global Reaction ordering.
-5. **Prompt/source contradiction:** current raw #59 and new names supersede all old values/Authority. Three genuine choices were asked and answered, not guessed. Raw bytes outside #59, ten prior Canons and 01/02/03/07 are unchanged. Metadata/Mode/numeric/external-content boundaries stay NOT BLOCKING; Architecture Phase only, no code/build/game tests.
-6. **Mergeability:** refreshed actual main and checked anchors/diff, seven-file scope, versions/navigation, UTF-8/fences, unique/resolved Contract/Primitive refs, all199 prior case bodies and affected Schema/Kernel section bounds. Added M-074–M-081 declarative obligations; fixture arithmetic and whitespace checks pass. No detached competing canonical artifact.
-
-The deliberate second draft audit made the multi-source reflected batch and outer-Ultimate Reaction boundary explicit after designer answers, propagated immediate Source/kind on **ordinary as well as reflected** receipts, froze semantic source-group Effect/RNG identity before technical enumeration, guarded terminal credit/cooldown against removed or renewed instances, and restored the raw file's original EOF so unrelated content remains byte-identical. It independently rejected an unnecessary Damage→drain lifecycle extension: P-042/P-033 already delegate to the same explicit outer transaction. No genuine internal designer question remains.
-
-Changed sections: raw #59; this Canon §§1–6; 00§2/2A and current version navigation; 04§8.3/16.1/16.5/18A/35.1/51/70/92 plus revision header; 05§23 DMG-034 plus revision header; 06§15A/28A/45C/56 plus revision header; 08 M-074–M-081 plus version/dependency/revision header.
+Generic architecture delta: an opt-in reflected scalar packet/reduction scope and retained immediate Damage Source receipts through existing Damage/modifier/result owners. Damage and Rage drain remain one existing simultaneous direct group.

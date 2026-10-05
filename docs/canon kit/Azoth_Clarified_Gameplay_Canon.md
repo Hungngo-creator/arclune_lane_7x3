@@ -3,7 +3,6 @@
 **Revision:** R1 — newest raw #56 replacement and complete designer-locked gameplay normalization.
 **Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED. Unspecified metadata/adapters are separate; not generated execution-ready Character data.
 **Source:** latest designer description replacing only #56 of `ý tưởng nhân vật 3.md`, then the explicit clarifications/corrections below. All other raw kits are untouched. Old180% laser, +10% Ultimate Damage, Heal10%, all-Rank Skill2, same-Authority stacking restriction and self Axiom prohibition are superseded. The final answer locks Skill1 **Basic only**, pre-hit settlement with pre-Cost Basic snapshot.
-**Architecture base inspected:** actual merged main `13c11d4`, E.5/F.7/G.6/H.1/I.6. Bounded mitigation override and local CostGroup continuation below are proposed E.6/F.8/G.7/I.7 until merged. Phanes's separately proved direct Execute profile is shared, not duplicated.
 
 ## 1. Identity and boundaries
 
@@ -66,38 +65,10 @@ After that exact child's Damage aggregate is terminal, root Heal requested = **2
 
 Child laser batch → mandatory lifecycle → select/lock current single target → TRUE hit → mandatory lifecycle/result processing → seal child aggregate → root Heal → direct Effects complete → ordinary eligible Reactions. No ordinary window between laser/TRUE/Heal; this is local authored order, not universal sequential-Ability policy.
 
-## 3. Independent composition and exact gap proof
-
-| Locked input → existing composition tried | Governing Contract → current owner | Verdict / smallest extension |
-| --- | --- | --- |
-| ATK/WIL coefficients, one PHYSICAL packet, packet Penetration | DamageSpec components/Formula/penetration → DMG-001/006 → Damage/Snapshot/stat owners | REUSE arithmetic and Penetration; WIL is formula input only. No live conversion Stat mutation or new Tag. |
-| PHYSICAL semantic type but RES defensive lookup | Scoped type-transform or Penetration attempted → DMG-002/003/007 → Damage/Contract Resolver | Exact gap: PHYSICAL default selects ARM. Relabeling WILL loses Physical semantics; Penetration alone cannot replace ARM with RES, using both violates kit. Smallest bounded ScopedDamageMitigationSpec SET_MITIGATION_STAT ARM/RES, §18C/DMG-009/§45B after type transform, using existing mitigation inputs. Optional existing Penetration input scopes the20% to qualifying packets. |
-| Basic-only pre-hit paid activation, target True Self/<=10%, cap2, full HP+AE | Conditions/CostGroup/State/lifecycle + admitted Basic local DAG → CST/identity-property/TRG/DTH → Cost/State/Action/Result/Lifecycle | REUSE gate/transaction/floor0/cap/locked target and shared DTH-008 Execute profile. Latest answers supersede old post-hit qualification/new-child-Action proposal. |
-| Local optional Cost kills source but same admitted Basic/Execute continues after mandatory lifecycle | CostGroup + local DAG, ActionSpec active-Cost continuation attempted → CST-015, §23/24 → Cost/Action/Lifecycle owners | Exact gap: merged CST-015/§23 only guarantees continuation after **active whole-Action Cost**, not this optional in-graph pre-hit CostGroup. Making S1 Basic's required active Cost would cancel the Basic on failure; separate Action changes identity. Smallest extension: same CONTINUE_ADMITTED_ACTION profile on CostGroup with same enclosing admittedActionRef, terminal local success/use/lifecycle barrier in §24. No new hook/Action/priority. |
-| Snapshot RES delta, same-source replace/refresh, independent contributions and completion clock | Target/StatModifier/State/Duration → State/stat/clock contracts → current Target/State/stat contribution/duration owners | REUSE. NATURAL_ACTION_OF_OWNER + ACTION_COMPLETED counts cast if Natural, excludes CC/non-Natural; source leave is not removal. Rank filter is data. |
-| Simultaneous laser then current-pool single TRUE hit, one post-Cost source snapshot | Area/Target/Snapshot/Resolution/ResultRefs → RES-002/003/SNP/DMG → current owners | REUSE independent group target planning/commit/lifecycle; SSI no hidden recipient order. |
-| Exact one child Skill3 AE waiver, child-direct aggregate Heal20% | ActionSpec/CostSpec waiver/result projection/HealSpec → ACT-020/021/023, CST-006, TRG-013/DMG-012/HEL → Action/Cost/Result/Heal/DAG | REUSE child identity and exact Effect graph aggregation. No root-wide ownership/Cost override or old amplification. |
-
-Each extension is bounded and reusable for an explicitly authored alternate mitigator or a local Cost-funded hit continuation. Existing owner/ref/state-version/commit/result lifetimes supply persistence; no new mutable Character registry, Functional Tag, Primitive or generic priority. Rejected missing scope/conflicting override/unsupported Penetration law is not silently made a winner.
-
 ## 4. Remaining items
 
 **No unresolved internal gameplay choice after the Basic-only scope answer.** Rank/Class/native Element/Cost Budget and unsupported Mode adapters remain **UNRESOLVED / NOT BLOCKING** for this architecture work. External noncommutative Penetration/RES composition, numeric profiles and Authority protections require their applicable law. SSI/player/autonomy uses the current Mode's ordinary selector; the kit adds no default target priority or Rank-derived Authority.
 
-## 5. Impact audit across 00–08
+## 5. Normalization status
 
-| File | Azoth decision |
-| --- | --- |
-| 00 | PATCH new source/Canon navigation and versions. |
-| 01 / 02 / 03 | NO CHANGE: existing meanings retain default Physical/Will mapping subject to Contract; parameters/mitigation selection are not Tags or new atomic operations. |
-| 04 | PATCH bounded mitigation override, local CostGroup continuation/lowering/validation. Existing targets/formulas/Duration/State/child/result refs reused. |
-| 05 | PATCH DMG-009 and opt-in local scope of CST-015; reuse shared DTH-008, preserve defaults/Authority. |
-| 06 | PATCH existing §24 local Cost barrier and §45B mitigation selection; no Azoth branch/service. |
-| 07 | NO CHANGE: existing Mode target/SSI/AE ownership, no new adaptation. |
-| 08 | PATCH M-063–M-065 for routing/stat snapshot, pre-hit Cost continuation, child result Heal20%, failure/invalidation and reject cases. |
-
-## 6. Six-pass and adversarial audit
-
-Six passes completed: (1) newest coefficients/Heal20%/no amplification/Basic-only pre-hit Cost/snapshots/clock checked; (2) retry exact composition, prove only alternate mitigation lookup and local continuation; (3) correct layer/namespace/owner, target contribution versus source clock, source battle cap; (4) attack equality10/5, no True Self, insufficient HP/AE, source HP_ZERO/Return/death, invalid lock, blocked Execute, Rank filter, same-source recast, CC/non-Natural count, source leave, empty post-laser pool, foreign child receipts; (5) later corrections beat older raw/answers, no Axiom prohibition or post-hit activation; (6) actual source/diff/base/cross-file/declarative stress review, no build/game tests.
-
-Same-author second audit rejected relabeling Damage to WILL merely to obtain RES, replacing the optional local Cost with required Basic active Cost, copying Skill3 inline and restoring old10% Heal/+10% Damage. Pre-hit qualification/payment attaches Execute to the existing hit while preserving original Damage-first resolution and later ordinary target legality; no persistent buff or extra Action.
+Generic architecture delta: bounded mitigation-stat override and local CostGroup continuation of an already-admitted Action through existing owners.

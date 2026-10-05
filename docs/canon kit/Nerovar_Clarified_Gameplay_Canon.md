@@ -3,7 +3,6 @@
 **Revision:** R4 — complete locked gameplay normalization, including retention, actor-window, formulas, group checkpoints and pre-Cost source snapshot correction.
 **Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED. Numeric metadata/unsupported Mode adapters are separate; this document is not generated execution-ready Character data.
 **Source:** current `ý tưởng nhân vật 3.md`, first #52 Warrior / Death Pays the Fare, named Nerovar by the designer; all latest explicit designer answers below supersede earlier questions. Later #52 Phanes is a distinct kit; raw numbering is not runtime identity.
-**Architecture base inspected:** actual merged main `13c11d4`, INDEX-7/E.5/F.7/G.6/H.1/I.6. Cost and atomic prevention/Return machinery are already merged. This revision proves only a pre-Cost source-capture extension, proposed E.6/F.8/G.7/I.7 until merged.
 
 ## 1. Identity and common Action policy
 
@@ -87,36 +86,10 @@ Use ordinary Ultimate readiness/Cost rules; no free cast/extra Heal/cooldown inv
 
 Locked invalid targets drop locally with no retarget. Group2 eligibility cannot be changed by its siblings' commits.
 
-## 3. Normalized composition and proof against the current base
-
-| Locked input → existing composition tried | Contract → current runtime owner | Verdict / smallest extension |
-| --- | --- | --- |
-| HP_ZERO Leader Heal → survival+Return+use → later−3 | deathPrevention/ReturnToDeck/State/DeploymentCost → DTH-007, DEP-006/007/008, HEL → Lifecycle/Deployment/State/Transaction/Heal | REUSE merged joined P-061/Return barrier and terminal result gating. Independent Heal/later−3 remain outside. Scope retention is data, no new cleanup service. |
-| AE30+HP5%; strict-below safeguarded/consumed cases; post-payment HP; admitted meteor continuation | requiredCostRefs/hpPaymentPolicy/COST_PAYMENT_REF + costLifecyclePolicy CONTINUE_ADMITTED_ACTION → CST-008/009/014/015 → Cost/State/Result/Action/Lifecycle, P-036 | REUSE all merged capabilities. Pure MIN/MAX substitution loses requestedAmount; probe/effect-side counter consumption violates atomicity. Do not duplicate the existing solution. |
-| Admitted source ATK/WIL/MaxHP captured **before active Cost**, retained through source death/Return | SnapshotSpec → SNP-001/002/003 + CST-015 → Action/Snapshot Store | Exact gap: merged §23 reaches ordinary snapshots only after active Cost/lifecycle; generic timing placeholder has no contracted pre-Cost capture. ACTION_START would capture too late. Smallest extension: AFTER_ADMISSION_BEFORE_COST_COMMIT / SNP-006, §23 step4A using existing store. Read-only capture, not new prerequisite/payment/Trigger. |
-| Typed groups, Slot-local requery/Entity lock, per-target HP snapshot, committed result Heal | Target/Area/Snapshot/Resolution/ResultRefs → TGT/SNP/RES-002/003/DMG/HEL → existing Target/Spatial/Damage/Transaction/Result/Heal | REUSE. Per-group timing/recipients/components/DAG are declarative data; no hidden order. |
-| Optional Basic Heal, paid-use and actor-window cap | Trigger/Conditions/Cost/State + own-direct result projection → TRG-013, CLK-002/CST/HEL → Trigger/Cost/State/Result | REUSE. Window opportunity differs from actual-Natural completion and global Turn Boundary. |
-
-No new Functional Tag, Primitive, Character runtime, callback or priority system. Formula/snapshot/Counter refs are owned and typed; Action lineage does not replace Effect provenance. Native metadata is not an architecture gap.
-
 ## 4. Remaining items
 
 **No unresolved internal gameplay choice.** Rank/native Element/Cost Budget and unsupported Mode adaptation remain **UNRESOLVED / NOT BLOCKING** for this architecture work. Fixed Slots/actor windows/battle clocks require explicit Mode profiles where absent; do not convert them to seconds. Foreign cancellation/retention/Authority or competing unrelated settlements must supply their own applicable law; this kit defines no global priority.
 
-## 5. Impact audit across 00–08
+## 5. Normalization status
 
-| File | Nerovar decision |
-| --- | --- |
-| 00 | PATCH normalization/navigation and versions. |
-| 01 / 02 / 03 | NO CHANGE: existing meanings/capabilities/atomic operations; no duplicated Tag/Primitive. |
-| 04 | PATCH only explicit pre-Cost source Snapshot timing/lowering/validation. Other kit fields reuse existing Schema. |
-| 05 | PATCH SNP-006; merged Cost/Return/retention/window contracts remain unchanged. |
-| 06 | PATCH admitted-Action pre-Cost capture through existing owner; no new source snapshot manager. |
-| 07 | NO CHANGE: current Slot/SSI/resource ownership. Unsupported modes require explicit adaptation. |
-| 08 | PATCH M-056/M-061 and M-065 negative timing/lifetime obligations; preserve M-051–M-055 Cost/atomic Return regressions. |
-
-## 6. Final self-audit and adversarial correction
-
-All six AGENTS passes completed: (1) coefficients/strict-versus-inclusive Cost gates, recipients/group requery/pre-Cost versus H_postCost checked; (2) independently retry current Cost/Return/clock/target/result composition, retain only SNP-006 gap; (3) correct Schema/Contract/runtime owners, battle counters and actor-window key, no ID collisions; (4) attack equality, successful zero payment, AE failure, Return failure, source death, changed Slot occupants, invalid locks, CC/child/window/reset/replay; (5) newest retention/clock/pre-Cost answers supersede older questions, no Alcestis cleanup; (6) actual main base/diff/reference/coverage audit, Architecture Phase only.
-
-Same-author second audit corrected the tempting after-Cost source capture and whole-Action target lock: source values are pre-Cost, while Skill1/Ultimate later groups deliberately re-query recipients. HP1 and prevention use remain joined to Return; no duplicate runtime extension for these already merged laws. This Canon does not claim executable build/game-test results.
+Generic architecture delta: bounded HP-payment and atomic prevention/Return semantics, plus pre-Cost source capture through existing owners.
