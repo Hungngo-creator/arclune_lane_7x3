@@ -198,12 +198,59 @@ Các mốc còn lại và diễn tiến dân số / thế lực nằm tại mụ
 
 **ĐÃ CHỐT về tinh thần:** oán khí sinh ra khi các nạn nhân bị coi là “tài nguyên hai chân” chết **ô nhiễm tâm tình Ma tu**, khiến tinh thần thường không ổn định. Công pháp **thấp kém** thường dẫn tới **tẩu hỏa nhập ma**. Mức ô nhiễm, tốc độ tích lũy và cách khắc phục chưa chốt.
 
-Phân biệt tốc độ tu, chiến lực, khả năng đột phá và khả năng qua kiếp. Thiên Kiếp khắc chế Ma Đạo và Thiên Khiển do giết quá nhiều là hai điều đã chốt riêng; chưa đặt ngưỡng giết chóc, hệ số kiếp, cảnh bắt đầu chịu kiếp hoặc cách vượt qua.
+Phân biệt tốc độ tu, chiến lực, khả năng đột phá và khả năng qua kiếp. **ĐÃ CHỐT:** thành tiên kiếp gồm **Thiên → Nhân → Địa**, lần lượt khảo nghiệm thân–ý–linh. **Thiên Khiển** do nghiệp lực đủ nhiều là sét đánh cả **thân–linh–ý cùng lúc**, mang tính trừng phạt, **Thiên Địa Chính Tiên mới cứu nổi**. Sinh linh có nghiệp lực ngang nhau giết đối phương không tăng nghiệp lực; **thôn phệ không chuyển nghiệp lực sẵn có của nạn nhân sang kẻ ăn**. Ngưỡng nghiệp, hệ số kiếp và khả năng tránh còn mở; xem mục XII.
 
 **ĐÃ CHỐT về hậu chiến:** Ma tu cấp thấp quá nhiều nên giết không hết; dù giết sạch người thì công pháp còn vẫn có người mới tu. Không cần một người chủ động giữ lại / truyền bá làm nguồn tái phát. Chuỗi ngoại xâm → Ma Đạo bản địa bùng lại → Đại Kiếp nằm ở mục I, VII, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
 
 ## Trường hợp đại Ma tu cuối Đại Kiếp — ĐÃ CHỐT
 
-Huyết tế chỉ là một phần của phương pháp. Hắn có một nhóm tạo vật thuộc truyền thừa Ma Đạo ngoại giới, thả giết chóc / thôn phệ sinh linh theo cách nuôi cổ đến khi còn một **Cổ Vương**, rồi dùng **bí pháp đi kèm thôn phệ** nó. Các tạo vật và cách giải quyết Cổ Vương đều từ truyền thừa ấy. Vật phẩm che thiên cơ / nhân quả bản thân giúp **hắn không gặp Thiên Khiển khi thôn phệ Cổ Vương**; phạm vi đối với tạo vật và Thiên Kiếp còn mở.
+Huyết tế chỉ là một phần của phương pháp. Hắn có một nhóm tạo vật thuộc truyền thừa Ma Đạo ngoại giới, thả giết chóc / thôn phệ sinh linh theo cách nuôi cổ đến khi còn một **Cổ Vương**, rồi dùng **bí pháp đi kèm thôn phệ** nó. Các tạo vật và cách giải quyết Cổ Vương đều từ truyền thừa ấy. Vật phẩm che thiên cơ / nhân quả bản thân giúp **hắn không gặp Thiên Khiển khi thôn phệ Cổ Vương**; **các tạo vật vẫn chịu Thiên Khiển**. Chưa tự cho vật phẩm khả năng miễn ba kiếp khảo nghiệm chứng Chân.
 
-**Thôn phệ thành công nhưng đột phá không hoàn toàn thành công**, do tiềm năng đã bị công pháp đánh đổi. Hắn chỉ trở thành **bán bộ Chân Tiên**, là đối thủ cuối Huyết Thế Đại Kiếp. Không tự gán khoản **+1.000.000 năm khi chứng Chân trọn vẹn** cho trường hợp này; lượng tăng thọ thực tế chưa chốt. Cũng không suy ra bán bộ Chân Tiên là trần của mọi công pháp Ma Đạo hoặc xóa các Ma Tôn Chân Tiên đã có.
+Hắn biết Cổ Vương là **hy vọng duy nhất để cưỡng ép đột phá Ma Tôn**, biết có nguy cơ thất bại nhưng vẫn cược. Tổ đội ba người can thiệp **khi hắn đã nuốt Cổ Vương, đang chuẩn bị đột phá Chân Tiên**.
+
+**Thôn phệ thành công nhưng đột phá không hoàn toàn thành công**, do tiềm năng đã bị công pháp đánh đổi. **ĐÃ CHỐT:** hắn không vượt trọn một trong ba kiếp, chỉ trở thành **bán bộ Chân Tiên**, là đối thủ cuối Huyết Thế Đại Kiếp. Kiếp cụ thể và diễn biến trận đánh với quá trình độ kiếp còn mở. Không tự gán khoản **+1.000.000 năm khi chứng Chân trọn vẹn** cho trường hợp này; lượng tăng thọ thực tế chưa chốt. Cũng không suy ra bán bộ Chân Tiên là trần của mọi công pháp Ma Đạo hoặc xóa các Ma Tôn Chân Tiên đã có.
+
+---
+
+# XII. THÀNH TIÊN KIẾP VÀ THIÊN KHIỂN
+
+## Ba kiếp từ Định Pháp lên Chân Tiên — ĐÃ CHỐT
+
+Ba kiếp là **khảo nghiệm của Thiên Đạo** dành cho người đột phá từ Định Pháp lên Chân Tiên, luôn theo thứ tự **Thiên → Nhân → Địa**.
+
+| Thứ tự | Kiếp | Đối tượng khảo nghiệm | Biểu hiện |
+|---|---|---|---|
+| 1 | Thiên Kiếp | **Thân / nhục thân** | Sét đánh |
+| 2 | Nhân Kiếp | **Ý / ý thức** | Hàng loạt hình chiếu tu sĩ Định Pháp mạnh nhất về tấn công ý thức; ải trảm ý |
+| 3 | Địa Kiếp | **Linh / linh hồn** | Các lưỡi dao gió không thương nhục thân, chỉ thương linh hồn |
+
+**Nhân Kiếp:** Thiên Đạo hiển hóa các tu sĩ Định Pháp có thủ đoạn tấn công ý thức mạnh nhất, không gọi người thật tới đánh. Trước khi Cổ Kiếm Tu xuất hiện là **một nhóm khác chưa chọn**; về sau hình chiếu đều thuộc **Cổ Kiếm Tu mạnh nhất cổ kim**, vì Thiên Đạo nhận ra họ mạnh nhất về mặt này ở Định Pháp. Nếu một hệ chuyên công kích ý thức phát triển tới Định Pháp và mạnh hơn, hình chiếu có thể thuộc hệ ấy; không buộc mọi thời đại phải là Cổ Kiếm Tu. Số lượng, danh tính và kỹ thuật cụ thể chưa chốt.
+
+**Không qua Thiên Kiếp:** linh hồn và Chân Ngã vẫn còn để tái tạo nhục thân; người tu suy yếu nhiều. **Nhân Kiếp và Địa Kiếp vẫn đến**, nên rất khó sống. Không tự dừng cả quá trình sau thất bại ở ải thân.
+
+**Qua Thiên Kiếp nhưng bị Nhân Kiếp trảm mất ý thức:** linh hồn vẫn tồn tại, cực mạnh dù vô tri. Tác giả mô tả nhánh này không còn thân xác; linh hồn còn **bản năng chạy trốn / tấn công**. Nếu qua tiếp Địa Kiếp, nó là **tài liệu tuyệt hảo cho Hồn Đạo / khôi lỗi**. Nhánh tồn tại lâu rồi khai linh xem mục XIII.
+
+**CÒN MỞ:** cơ chế / thời điểm nhục thân mất và số phận Chân Ngã cũ trong nhánh trảm ý; hậu quả cụ thể khi không qua Địa Kiếp; mức qua / thất bại từng phần, cách can thiệp bên ngoài và cường độ khảo nghiệm. Không tự đồng nhất trảm ý với ma diệt Chân Ngã.
+
+## Thiên Khiển do nghiệp lực — ĐÃ CHỐT
+
+Giết chóc đủ nhiều làm sinh linh, kể cả **các tạo vật nuôi cổ**, dính **oán khí và nghiệp lực**. Khi nghiệp lực đủ nhiều, **Thiên Khiển** tới bằng sét đánh **thân–linh–ý cùng lúc**. Đó là trừng phạt, không phải ba ải khảo nghiệm có sinh cơ như thành tiên kiếp; **Thiên Địa Chính Tiên mới có thể cứu**.
+
+- Sinh linh có **nghiệp lực ngang nhau giết đối phương không tăng nghiệp lực**.
+- **Thôn phệ không chuyển nghiệp lực sẵn có của nạn nhân sang kẻ ăn**.
+- Nghiệp cũ của kẻ thắng không vì hai luật trên mà mất; vẫn xét những hành vi giết chóc do chính nó thực hiện.
+- Oán khí ô nhiễm tâm tình và nghiệp lực dẫn tới Thiên Khiển là hai tác động liên quan đã chốt, không coi chúng là cùng một đại lượng.
+
+Ngưỡng nghiệp, thế nào là ngang nhau, cách tính khi không ngang nhau, biểu hiện của cứu viện và mức che đậy bằng vật phẩm còn mở. Vật phẩm của đại Ma tu che thiên cơ / nhân quả bản thân giúp hắn tránh Thiên Khiển khi nuốt Cổ Vương; **các tạo vật vẫn chịu Thiên Khiển**, và chưa cho phép suy ra miễn thành tiên kiếp.
+
+---
+
+# XIII. LINH HỒN KHAI LINH SAU NHÂN KIẾP — BÁN BỘ QUỶ TIÊN
+
+**ĐÃ CHỐT:** linh hồn cực mạnh đã mất ý thức ở Nhân Kiếp, nếu vượt Địa Kiếp và ẩn nấp tồn tại được, thì sau **ít nhất 10.000 năm** sẽ sinh **linh trí / ý thức mới**. Ý thức này là **một cá thể mới**, không phải người cũ tỉnh lại.
+
+Đó là một dạng **Linh Sinh**: **không có cơ thể, không có Chân Ngã, chỉ có linh và ý**. Chúng sinh gọi là **bán bộ Quỷ Tiên**. Không đồng nhất với mọi tu sĩ chỉ tạm rời nhục thân hoặc một Chân Tiên đã vào Luân Hồi.
+
+Nó vẫn có thể tu luyện và độ thành tiên kiếp lần nữa, nhưng **chỉ cần Nhân Kiếp và Địa Kiếp**, theo thứ tự Nhân → Địa. Sau khi đạt Chân Tiên thì đã tới **cực hạn tiềm năng**, **không thể đạt Thiên Địa Chính Tiên**.
+
+**CÒN MỞ:** nhục thân và Chân Ngã người cũ mất / rời đi ở bước nào; điều kiện ẩn nấp, tốc độ khai linh ngoài cận dưới 10.000 năm, ký ức / dấu tích còn lại của người cũ, thọ nguyên và quan hệ với Luân Hồi. Không tự tạo một Chân Ngã mới cho nhánh này hoặc dùng cá thể mới làm phục sinh người cũ.

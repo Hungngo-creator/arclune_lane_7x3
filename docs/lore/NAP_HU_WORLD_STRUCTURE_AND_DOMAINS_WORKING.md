@@ -2473,4 +2473,20 @@ Sau quân Ma Đạo ngoại giới rút, Thiên Đạo siết Giới Bích trong
 
 Vật phẩm của truyền thừa **che thiên cơ / nhân quả bản thân**, giúp **hắn không gặp Thiên Khiển khi thôn phệ Cổ Vương**. Hắn thôn phệ thành công nhưng do công pháp đã đánh đổi tiềm năng nên đột phá không trọn vẹn, chỉ đạt **bán bộ Chân Tiên**; là đối thủ cuối Đại Kiếp. Không đặt cơ chế kết thúc là huyết tế bị phá trước khi hoàn tất, hoặc gán trần bán bộ này cho các Ma Tôn Chân Tiên khác.
 
-**CÒN MỞ:** nơi thả tạo vật, phạm vi tàn phá, cách còn lại một Cổ Vương, mức che đậy đối với các tạo vật, dấu tích địa lý / di cư và vai trò của tổ đội ba người. Ước tính 25% sinh linh chết vẫn là ước tính của toàn thảm họa đang xây dựng, không tự gán riêng cho huyết tế hoặc giai đoạn nuôi cổ.
+**ĐÃ CHỐT:** hắn biết Cổ Vương là hy vọng duy nhất để cưỡng ép đột phá Ma Tôn, biết nguy cơ thất bại nhưng vẫn cược. Tổ đội ba người can thiệp **khi hắn đã nuốt Cổ Vương và chuẩn bị đột phá Chân Tiên**. **ĐÃ CHỐT:** hắn không vượt trọn một trong ba kiếp nên dừng ở bán bộ; kiếp cụ thể và diễn biến trận đánh còn mở.
+
+**ĐÃ CHỐT về tạo vật:** chúng vẫn chịu Thiên Khiển. Giết chóc đủ nhiều tích oán khí / nghiệp lực; đủ nghiệp thì Thiên Khiển bằng sét đánh **thân, linh hồn và ý thức cùng lúc**, Thiên Địa Chính Tiên mới cứu nổi. Sinh linh có nghiệp lực ngang nhau giết đối phương không tăng nghiệp lực. **Thôn phệ không chuyển nghiệp lực sẵn có của nạn nhân sang kẻ ăn**; nghiệp cũ của kẻ ăn vẫn còn.
+
+**CÒN MỞ:** nơi thả tạo vật, phạm vi tàn phá, cách còn lại một Cổ Vương, ngưỡng nghiệp / cách tránh Thiên Khiển, dấu tích địa lý / di cư và vai trò từng người trong tổ đội. Ước tính 25% sinh linh chết vẫn là ước tính của toàn thảm họa đang xây dựng, không tự gán riêng cho huyết tế hoặc giai đoạn nuôi cổ.
+
+---
+
+# LVII. LINH SINH TỪ LINH HỒN VÀ THIÊN KHIỂN TRONG NỘI GIỚI
+
+**ĐÃ CHỐT:** Linh Sinh là phân loại rộng, không chỉ sinh mệnh silic / khoáng ở Linh Sinh Vực. Một linh hồn cực mạnh bị trảm ý ở Nhân Kiếp, nếu qua Địa Kiếp và ẩn nấp được **ít nhất 10.000 năm**, có thể sinh **ý thức mới là một cá thể mới**. Nhánh này được gọi **bán bộ Quỷ Tiên**, **không có thân hoặc Chân Ngã, chỉ có linh và ý**. Trước khai linh nó vẫn còn bản năng chạy trốn / tấn công và là tài liệu tuyệt hảo cho Hồn Đạo / khôi lỗi nếu đã qua Địa.
+
+Nó có thể tu luyện và độ **Nhân → Địa Kiếp** lần nữa, không cần Thiên Kiếp; Chân Tiên là cực hạn, không thể đạt Thiên Địa Chính Tiên. Chưa chốt nơi ẩn nấp, lịch sử cộng đồng hoặc cơ chế nhục thân / Chân Ngã cũ mất; không tự đặt nhánh này chỉ cư trú ở Linh Sinh Vực hoặc một châu mới.
+
+**ĐÃ CHỐT về ba kiếp:** bình thường từ Định Pháp lên Chân Tiên theo **Thiên → Nhân → Địa**, khảo nghiệm thân–ý–linh. Thiên Kiếp là sét; Nhân Kiếp là hình chiếu Định Pháp mạnh nhất về công kích ý thức; Địa Kiếp là dao gió chỉ thương linh hồn. Trước Cổ Kiếm Tu, hình chiếu thuộc nhóm khác; về sau đều là Cổ Kiếm Tu, nhưng có thể đổi khi hệ chuyên công kích ý thức mạnh hơn xuất hiện.
+
+**Thiên Khiển** do đủ nghiệp lực đánh **thân–linh–ý cùng lúc**, mang tính trừng phạt; **Thiên Địa Chính Tiên mới cứu nổi**. Các tạo vật vẫn chịu cơ chế này. Sinh linh có nghiệp lực ngang nhau giết nhau không tăng nghiệp; **thôn phệ không chuyển nghiệp lực sẵn có của nạn nhân sang kẻ ăn**. Phạm vi biểu hiện, ngưỡng nghiệp và giới hạn can thiệp chưa chốt.
