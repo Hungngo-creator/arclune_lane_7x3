@@ -257,6 +257,8 @@ Trước khi rời đời đầu, mỗi người để lại / khóa với:
 
 > **một Đại Tuyệt Thể tương ứng với phần Pháp Tắc / thần dị của chính mình.**
 
+**ĐÃ CHỐT mới:** mỗi người còn rèn từ bản thân **một vũ khí / tiên bảo**, làm vũ khí và hậu thủ cho đời sau. Nhận diện Chân Ngã là cực hạn của can thiệp hạn chế ở mức Chân Tiên. Không đồng nhất tiên bảo nhận diện với thể chất, ký ức đã thức tỉnh, phục hồi tu vi hoặc quyền sử dụng Nhân Tổ Kiếm. Tên / loại / nơi lưu giữ từng tiên bảo còn mở.
+
 Từ đó hình thành **12 Đại Tuyệt Thể** của Nhân tộc.
 
 ## Luật sở hữu đã khóa
@@ -908,7 +910,7 @@ Bảng đầy đủ, định nghĩa và hệ quả lịch sử nằm trong [Hệ
 
 Sát thương do linh lực hắn gây ra rút sinh mệnh lực đối thủ để hồi phục cho hắn. Sau khi luyện hóa **một phần tim Long Tổ**, phần sinh mệnh bị đoạt không thể khôi phục, chuyển thành sinh mệnh lực của hắn, tăng hạn mức tối đa và phục hồi tương ứng phần tăng. Sau luyện hóa hắn còn có thể hấp thu nước để hồi phục; chưa gán cho nước tác dụng đoạt / tăng hạn mức như sát thương thôn phệ.
 
-Phân biệt **hồi phục sinh mệnh hiện có**, **tăng hạn mức sinh mệnh tối đa**, **tuổi thọ** và **Chân Ngã qua Luân Hồi**. Quan hệ của cơ chế đã chốt với hai phần sau còn mở. Không tự áp dụng năng lực riêng này cho mọi Chân Tiên hoặc đổi bảng tuổi thọ đang xây dựng.
+Phân biệt **hồi phục sinh mệnh hiện có**, **tăng hạn mức sinh mệnh tối đa**, **tuổi thọ** và **Chân Ngã qua Luân Hồi**. **ĐÃ CHỐT mới:** năng lực riêng của Yêu Tiên có tác dụng **tăng tuổi thọ**; cách định lượng và phạm vi qua Luân Hồi còn mở. Không tự áp dụng năng lực riêng này cho mọi Chân Tiên hoặc đổi bảng tuổi thọ đang xây dựng.
 
 Phong ấn hấp thu **cả tiên lực và sinh mệnh lực** để duy trì giam giữ, tạo kết giới bảo hộ **Phong Thiên Tháp** và hút tới chết. Tháp là cơ chế khác, phong cấm mọi nguồn năng lượng trong tháp và trong bán kính **50 km**; hắn không được tiếp tế từ ngoài, không thể hô hấp, bị đóng đinh treo trên thập tự giá và móc mắt. Người cầm **Nhân Tổ Kiếm** điều khiển tháp, chỉ cần cầm chứ không phải ra kiếm. Nhân Tiên nhận phương pháp qua cuộc gặp cách không với hài tử ngay khi vừa chứng Chân, xé hư không lấy vật liệu trước lần hài tử ra kiếm rồi tự xây tháp; ngày hoàn thành chưa chốt.
 
@@ -926,7 +928,11 @@ Tiểu sử và các giới hạn chưa chốt xem mục XVIII, XVIII-A, XXXIV c
 
 **ĐÃ CHỐT qua trường hợp hồ yêu:** khi tử cổ chết, linh hồn **tan dần** và ý thức mơ hồ, nhưng **Chân Ngã vẫn còn** để vào Luân Hồi. Nàng đầu thai **không có ký ức tiền kiếp**. Thân xác có thể còn hồng hào, xinh đẹp sau khi mất linh hồn; không coi hình dáng nguyên vẹn là bằng chứng người vẫn sống.
 
-**ĐÃ CHỐT:** Chân Tiên biết Chân Ngã là gì nhưng **không thể thao tác Chân Ngã**; **chỉ Thiên Địa Chính Tiên mới có thể giữ lại Chân Ngã và tạo linh hồn**. Biết hoặc tự giữ ký ức qua Luân Hồi không đồng nghĩa điều khiển Chân Ngã người khác. Chữa linh hồn đang tổn thương bằng đan dược khác với giữ Chân Ngã / tạo linh hồn mới; không tự cấp quyền sau cho Chân Tiên. Phương pháp Kiếm Tiên trông cậy và lý do thất bại cụ thể chưa chốt.
+**ĐÃ CHỐT mới, thay mệnh đề tuyệt đối cũ:** **Chân Tiên có thể thao tác Chân Ngã nhưng rất hạn chế**. Các hài tử rèn vũ khí / tiên bảo từ bản thân và khiến chúng nhận diện Chân Ngã đời sau; đây là cực hạn của dạng can thiệp ấy. Không lập quy tắc mọi Chân Tiên đều bất khả can thiệp Chân Ngã.
+
+**Kiếm Tiên đầu tiên không làm được khi cứu hồ yêu** vì thời gian tu tập chưa dài, là hậu thiên tu luyện đi lên và Cổ Kiếm Tu lúc ấy còn sơ khai, chưa hoàn thiện khả năng can thiệp Chân Ngã. Biện pháp cứu cụ thể / cơ chế thất bại chi tiết vẫn còn mở. Chữa thương linh hồn, nhận diện Chân Ngã, giữ Chân Ngã và tạo lại linh hồn là những mức tác động khác nhau; năng lực hạn chế không tự cho mọi Chân Tiên quyền phục sinh người khác. Thiên Địa Chính Tiên có khả năng giữ Chân Ngã / tạo linh hồn đã nêu trước đây.
+
+**ĐÃ CHỐT qua Nhân Tiên:** đại chiến phong ấn Yêu Tiên có việc **thiêu đốt một phần Chân Ngã của chính mình**, trên nền Pháp Tắc liên quan trao đổi, trả giá, sinh mệnh / tuổi thọ và bộc phát. Chưa đặt tên Pháp Tắc; số phận phần Chân Ngã còn lại và quan hệ giữa thiêu đốt tự thân với các mức thao tác khác còn mở.
 
 **ĐÃ CHỐT:** người đã đạt **Chân Tiên trở lên** khác với trường hợp ấy: dù tự suy yếu để vào Luân Hồi, họ **vẫn giữ ký ức**, rồi ký ức **khôi phục dần theo tu vi đời mới**. Giữ ký ức qua chuyển đời không có nghĩa trẻ sơ sinh lập tức nhớ hết hoặc khôi phục tu vi cũ. Cơ chế bảo tồn và mức nhớ lại theo từng cảnh giới chưa chốt.
 
@@ -937,3 +943,15 @@ Hồ yêu có thể chất có giá trị bồi dưỡng **ngoài Thập Nhị �
 Cảnh cao nhất hồ yêu chưa chốt. Khi kiểm tra niên biểu, phải giữ kết cục mất ký ức của nàng và phân biệt ngoại lệ đã chứng Chân Tiên; không tự thêm một lần chứng Chân rồi bỏ qua luật giữ ký ức. Vết bớt trên vai đã chốt, nhưng việc nó tái hiện ở thân đầu thai và cuộc gặp lại với Kiếm Tiên vẫn đang xây dựng.
 
 **CÒN MỞ:** linh hồn / Chân Ngã phát sinh thế nào khi mười hai hài tử phối huyết và vật chất để tạo Nhân tộc. Sự kiện tạo Nhân tộc vẫn đã chốt; chưa đồng nhất tạo hình sinh linh với tự thao tác Chân Ngã hoặc tạo linh hồn bằng quyền năng Thiên Địa Chính Tiên, cũng không tự nâng cảnh giới đời gốc của các hài tử.
+
+---
+
+# XXIII. TRUYỀN THỪA VÀ ĐỘ HOÀN THIỆN CỦA CỔ KIẾM TU QUA LỊCH SỬ
+
+**ĐÃ CHỐT:** Nhân Tiên được khí vận Nhân tộc che chở, nhận truyền thừa của một hài tử rồi mới chứng Chân, có nhiệm vụ tìm / nuôi Kiếm Tiên đầu tiên. Không biến hắn thành chính Chân Ngã của hài tử hoặc tự hoàn thiện toàn bộ tám cảnh.
+
+Chúng sinh sơ khai tôn sùng vũ lực, thử nhiều đường tu phần lớn tiềm năng thấp; ngoại lệ thiên tài có thể tạo công pháp mạnh và tiến xa. Yêu Tiên là một ngoại lệ. Sau giải phóng, **ít nhất 80.000 năm tới Phật Tổ**, rồi **ít nhất 40.000 năm tới ngoại xâm Ma Đạo**, cho phép các ý tưởng / cổ pháp phát triển nhưng không khóa sẵn nội dung từng hệ.
+
+Kiếm Tiên gần đạt Chân Tiên mới được một kẻ địch bị ép hạ cổ tiết lộ về mạng nạn nhân của Yêu Tiên. Hồ yêu bị hạ cổ từ sơ sinh là trường hợp riêng. Quá trình Cổ Kiếm Tu từ sơ khai đến có khả năng can thiệp Chân Ngã hoàn thiện hơn còn mở; không lấy hạn chế của tổ sư ở trận cuối làm giới hạn vĩnh viễn của mọi kiếm tu.
+
+Kiếm tu dẹp Huyết Thế Đại Kiếp đã chốt là **người khác**, không phải Kiếm Tiên đầu tiên. Việc tổ sư còn sống, đứng ngoài đại chiến và gặp thân Luân Hồi hồ yêu vẫn **ĐANG XÂY DỰNG / CÒN MỞ**. Niên biểu và các mốc chi tiết ở mục I, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).

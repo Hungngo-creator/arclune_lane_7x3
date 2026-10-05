@@ -130,11 +130,11 @@ Cổ Kiếm Tu có thể dùng hiểu biết sâu để chém một quan hệ / 
 
 **ĐÃ CHỐT:** Pháp Tắc thuộc một nhánh của Quy Tắc Thôn Phệ, không đặt tên riêng, cho phép sát thương bằng linh lực rút sinh mệnh lực để hồi phục. Luyện hóa một phần tim Long Tổ cường hóa nó thành đoạt phần sinh mệnh không thể khôi phục, tăng hạn mức sinh mệnh của bản thân và bổ sung tương ứng phần tăng.
 
-**CÒN MỞ:** tăng hạn mức sinh mệnh ảnh hưởng thọ nguyên thế nào, phạm vi qua Luân Hồi, giới hạn chuyển hóa / tích lũy và những điều kiện khắc chế. Bảng tuổi thọ tại mục III vẫn là phương án hiện tại; chưa đổi số vì cơ chế này.
+**ĐÃ CHỐT mới:** năng lực riêng của Yêu Tiên còn **tăng tuổi thọ**. **CÒN MỞ:** cách định lượng, giới hạn tăng thọ, phạm vi qua Luân Hồi, giới hạn chuyển hóa / tích lũy và những điều kiện khắc chế. Bảng tuổi thọ tại mục III vẫn là phương án hiện tại; chưa đổi số vì cơ chế này.
 
 Hắn hấp thu nước để hồi phục, nhưng **không nhận được gì từ bên ngoài khi bị giam** và **không thể hô hấp**. **Phong Thiên Tháp** phong cấm mọi nguồn năng lượng trong tháp và trong bán kính **50 km**. Phong ấn riêng hấp thu **cả tiên lực lẫn sinh mệnh lực**, duy trì giam giữ / kết giới bảo hộ tháp và hút tới chết. Thương tổn khi bị phong ấn và hao mòn lâu dài là nguyên nhân chính khiến hắn cực yếu; chưa chốt tỷ lệ giữa các nguồn lực hoặc lượng bị hút.
 
-Kiếm Tiên tự tin thắng đối phương đã suy yếu và tin có cách cứu linh hồn hồ yêu dù biết ràng buộc tử vong. Khi được thả, Yêu Tiên nhờ Pháp Tắc dần chiếm thượng phong; chiến thắng vẫn cần kịch chiến và một số hy sinh. Không quy cuộc chiến chỉ về lượng năng lượng còn lại hoặc tự gán tăng sinh mệnh tối đa thành tăng thọ nguyên.
+Kiếm Tiên tự tin thắng đối phương đã suy yếu và tin có cách cứu linh hồn hồ yêu dù biết ràng buộc tử vong. Khi được thả, Yêu Tiên nhờ Pháp Tắc dần chiếm thượng phong; chiến thắng vẫn cần kịch chiến và một số hy sinh. Không quy cuộc chiến chỉ về lượng năng lượng còn lại. Tăng tuổi thọ của Yêu Tiên đã chốt riêng, không suy ra một công thức chung từ hạn mức sinh mệnh.
 
 Hồ yêu bị hạ cổ từ sơ sinh, nhưng **đã Khắc Pháp khi gặp Kiếm Tiên**; tu vi tiếp tục tăng trong quá trình hắn trưởng thành. Tiểu cảnh lúc gặp, tuổi đời và cảnh cao nhất chưa chốt. Mốc Khắc Pháp 300.000 năm thuộc đỉnh cảnh, không tự gán tuổi thọ ấy cho nàng chỉ từ tên đại cảnh. Tử cổ gặm nhấm linh hồn khiến nàng phải dùng đan dược chữa trị; đây là một nguồn tổn thương cụ thể, chưa đổi thành hệ số giảm tuổi thọ.
 
@@ -144,8 +144,26 @@ Hồ yêu bị hạ cổ từ sơ sinh, nhưng **đã Khắc Pháp khi gặp Ki�
 
 **ĐÃ CHỐT:** Yêu Tiên chết kéo mẫu cổ / tử cổ chết; linh hồn hồ yêu **tan dần**, ý thức mơ hồ, còn một khoảng để nàng thổ lộ và Kiếm Tiên thử cứu nhưng thất bại. Di thể còn hồng hào, xinh đẹp; Chân Ngã đầu thai **không có ký ức tiền kiếp**. Giữ di thể không giữ được người còn sống và đời mới không phải kéo dài tuổi thọ thân cũ.
 
-**Chân Tiên không thể thao tác Chân Ngã**, dù biết đó là gì; **Thiên Địa Chính Tiên mới có thể giữ Chân Ngã và tạo linh hồn**. Khả năng nhớ lại của một Chân Tiên tự Luân Hồi không tự trở thành quyền giữ Chân Ngã người khác / tạo linh hồn mới. Cách cứu Kiếm Tiên đã tin tưởng và vì sao thất bại chưa chốt.
+**ĐÃ CHỐT mới:** **Chân Tiên có thể thao tác Chân Ngã rất hạn chế**. Các hài tử rèn từ bản thân một vũ khí / tiên bảo làm hậu thủ; nhận diện Chân Ngã đời sau là cực hạn của dạng thao tác ấy. **Không có cấm đoán tuyệt đối đối với mọi Chân Tiên.** Kiếm Tiên đầu tiên không làm được khi cứu hồ yêu vì tu tập chưa dài, là hậu thiên đi lên và Cổ Kiếm Tu còn sơ khai. Thiên Địa Chính Tiên có khả năng giữ Chân Ngã / tạo linh hồn đã nêu trước đây; nhận diện hoặc tác động hạn chế không tự cho mọi Chân Tiên quyền phục sinh hoàn chỉnh. Biện pháp cứu cụ thể còn mở.
+
+Nhân Tiên trong trận phong ấn đã **thiêu đốt một phần Chân Ngã**, trên nền Pháp Tắc liên quan trao đổi, trả giá, sinh mệnh / tuổi thọ và bộc phát. Không tự gán lượng hao tổn hoặc việc Chân Ngã còn lại chắc chắn tiêu tán / Luân Hồi; số phận đó chưa chốt.
 
 **Chân Tiên trở lên** vẫn giữ ký ức khi vào Luân Hồi, dù tự suy yếu; ký ức dần khôi phục theo tu vi đời mới. Tu vi ở lúc chuyển đời, cảnh cao nhất từng chứng và mức nhớ lại của thân mới là những thông tin khác nhau. Không tự dùng tu vi đã hạ thấp để xóa điều kiện “đã chứng Chân Tiên”.
 
 Luật này không đổi bảng tuổi thọ tại mục III, không chốt tuổi đời / tuổi chết hồ yêu hoặc ngưỡng khôi phục ký ức. Cần đối chiếu cảnh cao nhất nàng đạt với kết cục mất ký ức đã chốt. Các hài tử đời gốc đều Chân Tiên, vẫn có luật thức tỉnh riêng và phải tu lại; xem mục VI, XXII của [Bản thể tu luyện và truyền thống kiếm](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).
+
+---
+
+# X. CÁC MỐC TUỔI VÀ KIỂM TRA NIÊN BIỂU MỚI
+
+**ĐÃ CHỐT:** Hắc Ám Kỷ bắt đầu → Nhân Tiên chứng Chân **ít nhất 35.000 năm**. Nhân Tiên sinh trong khoảng đó; chưa chốt tuổi của hắn khi chứng Chân. Khí vận Nhân tộc che chở và truyền thừa một hài tử mở con đường của hắn; không gán 35.000 năm thành tuổi đời hắn.
+
+Kiếm Tiên **khoảng 4.000 tuổi khi sư phụ chứng Chân tại mốc 11**, và **ít nhất 7.000 tuổi khi sư phụ rời đi trước mốc 13**. Quãng 11 → chia tay sư phụ vào khoảng 3.000 năm trở lên; đây là suy từ tuổi đã chốt, không phải một thời lượng chính xác mới. **11 → 12 ≥ 1.000 năm** chuẩn bị khác với **13 → 15 ≥ 1.000 năm** phong ấn. Khi sư phụ chết, Kiếm Tiên còn xa Chân Tiên.
+
+Kiếm Tiên gặp hồ yêu sau cái chết sư phụ. Nàng đã Khắc Pháp khi gặp; kẻ địch tiết lộ việc bị ép hạ cổ khi hắn gần chứng Chân. Không đồng nhất tuổi nàng với tuổi hắn hoặc dùng tuổi 7.000 của hắn làm tuổi chứng Chân.
+
+**SUY LUẬN:** 16 → 17 → 18 → 19 tối thiểu **135.000 năm**; khoảng 200 năm tới chiến thắng đầu tiên của Ma tu sau các bước siết bích / Ma Đạo bùng lại / Đại Kiếp sơ hiện còn dùng các ước lượng và một điểm neo chưa chốt. Nếu các chặng gần mức tối thiểu, nền Chân Tiên **1.000.000 năm đang xây dựng** cho phép Kiếm Tiên sống tới Đại Kiếp. Các chặng ≥ không có cận trên, còn thời lượng đến khi dẹp kiếp chưa biết, nên **chưa kết luận hắn thực tế còn sống**.
+
+Kiếm tu trong tổ đội dẹp kiếp là **người khác**. Hướng Kiếm Tiên đứng ngoài đại chiến Nhân tộc và có thể gặp thân Luân Hồi hồ yêu vẫn **ĐANG XÂY DỰNG**, không dùng làm dữ kiện đã chốt để ép niên biểu.
+
+Các mốc còn lại và diễn tiến dân số / thế lực nằm tại mục I, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md); không cộng bảng tuổi thọ từng cảnh thành tuổi đời hoặc tự thay bảng số đang xây dựng.

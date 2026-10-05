@@ -2350,7 +2350,7 @@ Thiên Đạo khi ấy chưa đủ nhân cách / tình cảm để hoài niệm 
 
 Sau khi Long / Phượng đồng quy, hắn ăn **một phần tim Long Tổ**, lúc ấy chưa chứng Chân. Điều khiển nước mạnh hơn, hấp thu nước để khôi phục; vảy mọc khắp người trừ mặt, một sừng ở phía phải trên đỉnh đầu, răng nhọn, móng tay dài, không có cánh. **30.000 năm sau cái chết hai Tổ**, hắn xuất quan, chứng Chân, bình định quyền lực và mở Hắc Ám Kỷ.
 
-Pháp Tắc hắn chọn là một nhánh của **Quy Tắc Thôn Phệ**, được mô tả bằng năng lực, không đặt tên riêng. Sát thương bằng linh lực rút sinh mệnh lực của đối thủ để hồi phục; long tâm cường hóa thành đoạt phần sinh mệnh không thể khôi phục, chuyển vào hắn, tăng hạn mức sinh mệnh tối đa và bổ sung tương ứng phần tăng. Không coi hắn đã hoàn chỉnh cả Quy Tắc hoặc tự quy phần hạn mức ấy thành thọ nguyên.
+Pháp Tắc hắn chọn là một nhánh của **Quy Tắc Thôn Phệ**, được mô tả bằng năng lực, không đặt tên riêng. Sát thương bằng linh lực rút sinh mệnh lực của đối thủ để hồi phục; long tâm cường hóa thành đoạt phần sinh mệnh không thể khôi phục, chuyển vào hắn, tăng hạn mức sinh mệnh tối đa và bổ sung tương ứng phần tăng. Không coi hắn đã hoàn chỉnh cả Quy Tắc. **ĐÃ CHỐT mới:** năng lực riêng của hắn còn **tăng tuổi thọ**; lượng tăng và giới hạn chưa chốt, không áp dụng tự động cho mọi sinh linh.
 
 Phong ấn hút **cả tiên lực và sinh mệnh lực Yêu Tiên**, duy trì giam giữ và **kết giới bảo hộ Phong Thiên Tháp** tới khi hắn chết. **Phong Thiên Tháp** được xây riêng cho lần phong ấn, là cơ chế khác: phong cấm mọi nguồn năng lượng **trong tháp và vùng bên ngoài thuộc bán kính 50 km**. Tù nhân không được tiếp tế, không thể hô hấp, bị đóng đinh treo trên thập tự giá, mắt bị móc, tóc tai bù xù. Thương tổn và hao mòn làm hắn cực yếu, kéo theo phong ấn yếu dần; không tự áp tình trạng tù nhân cho mọi người trong phạm vi. Vị trí tháp và hệ quả môi trường chưa chốt.
 
@@ -2362,7 +2362,7 @@ Tử cổ khóa với linh hồn, gặm nhấm một lượng rồi ngủ, gây 
 
 Khi đạt Chân Tiên, Kiếm Tiên biết cổ **trước khi giải phong ấn**, biết chuỗi tử vong nhưng tin có cách cứu linh hồn. Hắn thả đối phương đã cực yếu, một phần để cứu nàng, chủ yếu **báo thù cho sư phụ**. Yêu Tiên không chịu giải cổ, tấn công và nhờ Pháp Tắc dần chiếm thượng phong; kịch chiến / một số hy sinh rồi Kiếm Tiên thắng. Hấp hối, Yêu Tiên nói cổ ăn sâu từ sơ sinh, trêu chọc hắn không biết tâm ý nàng — lời trêu chọc không đúng thực tế — rồi chết, **không chủ động giết mẫu cổ**.
 
-Kiếm Tiên **kiếm độn tới nàng**, nghe thổ lộ khi linh hồn tan dần; cách cứu hắn đã trông cậy thất bại. Di thể còn hồng hào, xinh đẹp nhưng không còn linh hồn; Chân Ngã đầu thai không mang ký ức. Hắn **giữ di thể, tự trách và phiêu bạt tìm thân Luân Hồi**. Chân Tiên không thao tác Chân Ngã; Thiên Địa Chính Tiên mới có thể giữ Chân Ngã / tạo linh hồn. Nàng có vết bớt trên vai; khả năng gặp lại khi tìm đệ tử vẫn **đang xây dựng**, chưa chốt cuộc gặp hoặc thu làm đệ tử.
+Kiếm Tiên **kiếm độn tới nàng**, nghe thổ lộ khi linh hồn tan dần; cách cứu hắn đã trông cậy thất bại. Di thể còn hồng hào, xinh đẹp nhưng không còn linh hồn; Chân Ngã đầu thai không mang ký ức. Hắn **giữ di thể, tự trách và phiêu bạt tìm thân Luân Hồi**. **Chân Tiên có thể thao tác Chân Ngã rất hạn chế**, điển hình là tiên bảo của hài tử nhận diện đúng Chân Ngã đời sau. Kiếm Tiên đầu tiên chưa cứu được hồ yêu vì tu tập chưa dài, là hậu thiên đi lên và Cổ Kiếm Tu còn sơ khai. Không dùng trường hợp này làm cấm đoán tuyệt đối. Năng lực giữ Chân Ngã / tạo linh hồn của Thiên Địa Chính Tiên không tự trở thành quyền phục sinh đầy đủ của mọi Chân Tiên. Nàng có vết bớt trên vai; khả năng gặp lại khi tìm đệ tử vẫn **đang xây dựng**, chưa chốt cuộc gặp hoặc thu làm đệ tử.
 
 Trong thời gian phong ấn còn hai bán bộ Yêu Tiên: **một thuộc hạ cũ, một kẻ thù**. Họ giữ thân mình, không quá chèn ép Nhân tộc; đạo đức / e sợ Nhân Hoàng Cung và vai trò lúc phá phong ấn còn mở.
 
@@ -2440,3 +2440,23 @@ Yêu tộc dùng người Nhân tộc quản lý đồng tộc; tầng quản l�
 Kiếm Tiên luôn chạy trốn, nhận truyền thừa riêng của Chân Tiên Nhân tộc đầu tiên nên không chịu trần công pháp nô lệ; cực ít người biết quan hệ sư đồ.
 
 Đã chọn phương án tăng tuổi thọ từ cảnh thứ tư, kết hợp tăng thọ theo Pháp Tắc ở Chân Tiên. Bảng số **đang xây dựng** nằm trong [Hệ thống tu luyện, sức mạnh và tuổi thọ](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md); phần Aether sẽ quyết định sau Nạp Hư và Thần Huy.
+
+---
+
+# LVI. ĐỊA LÝ VÀ THẾ LỰC TRÊN TRỤC LỊCH SỬ MỚI
+
+**ĐÃ CHỐT:** sau khi các hài tử ngừng tạo loài, chúng sinh tự phát triển khoảng **50.000 năm**, nhiều chủng tộc có ngôn ngữ riêng nhưng chưa có thế lực thống nhất liên tộc hoặc toàn bộ một tộc. Các hài tử ít quản lý. Hài tử đầu tiên rồi người cuối cùng rời đời đầu cách **100.000 năm**; khoảng từ người cuối / Thiên Đạo thức tỉnh tới hai Tổ chết vẫn còn mở.
+
+Nhân Tiên ban đầu ở **Nhân Vực** — vùng hậu thế gọi Ma Châu. Trong quá trình bí mật tìm phụ liệu đặc thù cho tháp và phong ấn phẩm cấp cao, hắn qua các vùng tương ứng **Linh Sinh Vực, Tần Vực, Mộng Châu và Phạn Châu hậu thế**. Tác giả xác nhận “Phật Châu” ở đoạn này là vùng đất về sau gọi Phạn Châu. **Không đặt Phật Đạo / Phật Tổ vào trước Hắc Ám Kỷ**, cũng không suy ra các triều đại và tông môn đương thế đã tồn tại lúc ấy.
+
+Hài tử thức tỉnh tìm về Nhân Hoàng Cung và dùng nhiều tài nguyên, có cốt liệu của bản thân / các hài tử khác nhưng thiếu phụ liệu. Nguyên nhân chính là **phẩm cấp tháp cao, vật liệu cực khó tìm**. Khoảng nhận phương pháp tới lần ra kiếm **ít nhất 1.000 năm**; ngày hoàn thành tháp so với lần ra kiếm, vị trí tháp và hậu quả môi trường vẫn mở.
+
+Mỗi hài tử còn để lại một vũ khí / tiên bảo rèn từ bản thân để nhận diện Chân Ngã và làm hậu thủ cho đời sau. Các tiên bảo này khác Nhân Tổ Kiếm; chưa định vị hoặc đặt tên từng món.
+
+Sau giải phóng ở mốc 16, nhiều Yêu cấp cao bị Kiếm Tiên chém, Yêu tộc rút vào **một châu chưa xác định**; Nhân tộc phát triển thịnh thế. Không tự khóa châu ấy là Yêu Vực hiện hành hoặc gán việc thống nhất toàn tộc / toàn giới cho Nhân tộc.
+
+**16 → 17 ≥ 80.000 năm; 17 → 18 ≥ 40.000 năm; 18 → 19 ≥ 15.000 năm.** Những chặng này tạo cửa sổ lịch sử để phát triển công pháp, giao lưu, thế lực và văn minh; lịch sử hình thành cụ thể của Tần Triều / Tinh Hải và các tổ chức khác còn mở. “Kỷ A” chỉ là ví dụ chưa được dùng làm tên chính thức.
+
+Sau quân Ma Đạo ngoại giới rút, Thiên Đạo siết Giới Bích trong tối đa khoảng **10 năm**. Khoảng **30 năm** tới Ma Đạo bản địa bùng lại đang được neo tạm vào siết bích, cần xác nhận. Các thế lực nảy sinh lúc ấy là **tiền thân** của hai Ma Môn; chưa khóa ngày lập Thiên Ma Môn / Cực Lạc Ma Tông. Khoảng **70 năm sau lần bùng lại** là Đại Kiếp sơ hiện; khoảng **100 năm sau sơ hiện** là chiến thắng đầu tiên của Ma tu, chưa phải Đại Kiếp kết thúc.
+
+**22 → 23 ≥ 30.000 năm** từ chặng tái thiết / Nhân Vực dần gọi Ma Châu tới thời Main đời I. Toàn bộ mốc đối thoại 01–24 và phần chưa chốt ở mục I, XLVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
