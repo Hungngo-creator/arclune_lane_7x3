@@ -4,7 +4,7 @@
 **Rank:** UR  
 **Class:** Warrior  
 **Native Element:** Blood  
-**Status:** Clarified Gameplay Canon — ready for Pilot Normalization #3.  
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED.
 **Scope:** Turn-based mode first.
 
 ## 0. Design intent
@@ -174,8 +174,3 @@ One enemy:
 - Skill 3: 10 AE, Heal 8% MaxHP, low-HP threshold <=30%.
 - Ultimate: 25% MaxHP nominal HP Cost, floor 2%, arrow True = actual HP paid, slash 170% ATK Physical +170% WIL Will on 2/5/8.
 - Basic: 100% ATK Physical +100% WIL Will.
-
-## 13. Ready for Pilot Normalization #3
-The next model should compare raw legacy kit against this Clarified Gameplay Canon, normalize terminology, map mechanics into existing architecture, classify each mechanic as `EXISTING`, `SCHEMA/PARAMETER ONLY`, `GENERIC ARCHITECTURE GAP`, or `CHARACTER-SPECIFIC COMPOSITION`, and produce an Architecture Impact Matrix 01–08.
-
-Do not create new Tag/Primitive/Contract IDs merely because Sanguinius is complex.

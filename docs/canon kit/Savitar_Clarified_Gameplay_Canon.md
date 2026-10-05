@@ -1,9 +1,8 @@
 # ARCLUNE — SAVITAR — CLARIFIED GAMEPLAY CANON
 
-**Revision:** R3 — completes R2's tag/facet mapping, projection-credit timing and return-value lifetime against the actual merged architecture; preserves all nine designer locks and later root-order/health answers.
+**Revision:** R3 — preserves all nine designer locks and later root-order/health answers, including projection-credit timing and captured return-value lifetime.
 **Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED. Architecture Phase documentation; not executable Character data.
 **Source:** current Savitar raw description and SAVITAR — DESIGNER LOCK supplied by the designer; raw entry77 in `Ý tưởng nhân vật 4.md`. Explicit locks supersede contrary raw examples, including Basic itself activating the fixed-AoE Passive.
-**Architecture base inspected:** actual merged main `2d41b3d4d8a5207d79151bc15883ab64a54a1239`, INDEX-11 / E.9 / F.11 / G.10 / H.1 / I.10. PR #14 already merged the original Savitar architecture. R3 refines existing DMG-035/ACT-034 through E.10 / F.12 / G.11 / I.11; the latest merged indexed 00–08 remain architecture authority. Historical E.8-base gap analysis is provenance, not a set of still-open gaps.
 
 ## 1. Identity and negative boundaries
 
@@ -97,45 +96,17 @@ After the whole Skill1 child Damage batch/result projection is terminal, one dam
 
 **Local root order for Skill1/Ultimate:** fixed-AoE Damage batch → mandatory lifecycle/result processing, including required stable health settlements → attacker-owned Heal if applicable → remaining root direct Effects → ACTION_DIRECT_EFFECTS_COMPLETE → enemy afterimage counter batch/ordinary Reactions. No ordinary Counter interposes between Damage and Heal. Mandatory lifecycle/health work is not an ordinary Reaction. This explicit local profile is not a global default for all Abilities.
 
-## 3. Normalization against the verified architecture
+## 3. Character-specific semantic distinctions
 
-The inspected merged base already contains E.9/F.11/G.10/I.10. Reuse those positional, health, projection and grant profiles; do not recreate their original gaps. R3 only completes the existing projection credit/termination lifetime laws and Character composition under E.10/F.12/G.11/I.11. This is semantic architecture normalization, not execution-ready numeric Character data.
+Damage Effects use DAMAGE with PHYSICAL_DAMAGE/WILL_DAMAGE components; successful relocation is POSITION_MUTATION, the temporal State is DAMAGE-scoped IMMUNITY, and return/result-derived restoration is HEAL. These capability labels do not copy one owner's target, timing or admission rules to sibling Effects.
 
-| Mechanic | Schema / composition | Contracts / operations | Exact runtime path |
-|---|---|---|---|
-| Basic | TargetSpec POSITION/LOCK_POSITIONS, current-occupant checkpoint, MISS, local invalid drop; Basic-start ATK/WIL Snapshot; one Damage Effect/two components | TGT-004/008, HIT-001–003, SNP-001–003, P-013/014/040–042 | Target/Lock/Area40–42B → Hit42A → Damage45/Transaction31; no Entity chase or Passive-AoE qualification |
-| Charged fixed-area relocation | Passive State/actual-completion reset under postActionSettlement; explicit incoming ROOT Natural declared outcome; positionalDamageInterposition/PositionMutationSpec RANDOM_REPOSITION/TRULY_EMPTY; success State/counter/Snapshot operands | ACT-033, POS-001–009, TRG-007/013, RNG-001–003, RES-005, P-020/021/050 | Indexed rules + PositionState/claim readers/RNG/Transaction at42B; atomic group move + allowance + frozen obligation; ordinary movement failure means no move and continue original Damage |
-| Afterimage | Snapshot-bound independent COUNTER Effect, locked hostile Natural Actor; RETAIN_CREATED_SETTLEMENT; observed-root ADEC common counter profile; simultaneous proportional result allocation | POS-008, RES-002/008, TRG-011/013, P-040–043 | Existing Trigger/Reaction/Effect records → root direct gate →31 shared counter transaction; not Basic, fake Action, hostile direct outcome or Character branch |
-| Skill1 | Required AE20; after-Cost common column/ATK/WIL; locked side-relative column coordinates/current occupants; one simultaneous batch | CST-001/007, TGT-008/010/011, POS-004/008, SNP-003, RES-002/003, P-034/035/040–042 | Existing Cost/Spatial/42B/31; declared root AFTER_DIRECT_EFFECTS_COMPLETE holds ordinary counters until owned Heal/direct work terminal |
-| Skill2 activation | stableHealthSettlement on both CurrentHP/CurrentMaxHP, strict ratio/validity/unused Conditions; AE15 and cap; own scoped admission State | TRG-003/006/016, CST-001, STA-014, RES-005, P-020/021/034/035 | Health writers/Lifecycle →35B mandatory finite settlement before next group; failed AE terminal, no poll/AE-only retry |
-| Skill2 protection | SYSTEM_STATE with explicit DAMAGE/enemy Natural direct-or-declared-outcome admission scope, retained present occupancy | STA-014/POS-005; existing IMMUNITY classification | State61/Admission64A; no POS-010, no lifecycle type, no renderer-based vacancy, no universal invulnerability |
-| Skill2 estimate | state.damageProjectionQueries, pre-Damage active-State membership, reserved coordinate, exact excluded own rule refs, pinned batch/defence inputs; DAMAGE_PROJECTION_REF and creditStateCounterRef | DMG-035, RES-001/002/008, P-040/041 then joined P-021/terminal identity |45D/Shield pure proposals/Result Store → required terminal State credit before continuation; no retrospective query, P-042/P-043 actual credit or shadow timeline |
-| Skill2 return | opportunityStartSettlement, creation/grant/State anchors; accumulator capture → terminate protection → ordinary self Heal/DISCARD | ACT-012/034, CLK-002, SNP-001–003, HEL-*; P-002/022/044/045 |19A finite grant graph retains Snapshot/owner validity after its own removal → terminal Heal → same grant's CC/control; no live retired-counter read, extra Action/materialization/SSI |
-| Skill3 | finite pending→active3→cooldown1 State Conditions/actual-start-completion Duration; AE25; explicit coefficient/Cost branches; exact result-derived Heal10% | CLK-003/004, TRG-006/013, ACT-040, HEL-005, existing Cost/State/Result primitives | Existing State/DAG/Action/Cost/Result owners; no SPD, timer/callback/priority system or new modifier service |
-| Ultimate | one real RequestAction Skill1 child; AE override0; common after-root-Cost Snapshot reuse; coefficient+15; exact child ActualHP aggregate/additive Heal | ACT-020/021/023, CST-006, RES-002/003, HEL-005, P-001/043/044/045 | Existing child/Cost/Snapshot/Result/Heal owners;170/170 or200/200; Heal10% or20% before ordinary counter batch |
+**Classification:** AREA is geometry/selection, not a registered Functional Tag. LIFESTEAL remains a deferred Functional Tag and is expressed here as committed Damage aggregation plus Heal. Neither label is inserted into `tags[]`. COUNTER/Ability identity, TRULY_EMPTY, phase/checkpoint/profile values, projected-result type and State/controller names remain facets or typed data.
 
-### 3.1 Exact Functional Tags and non-Tag facets
-
-Use the exact active registry in `02_TAG_vNext.md`, attached to the smallest semantic owner. Ability/Character search capabilities may derive upward from these owners; they do not copy tags down to sibling Effects.
-
-| Smallest semantic owner | Functional Tags | Separate Schema facets / composition |
-|---|---|---|
-| Basic Damage Effect | DAMAGE, PHYSICAL_DAMAGE, WILL_DAMAGE | BASIC_ATTACK identity; one hit/two components; enemy Slot lock/current occupant |
-| Passive's real successful move | POSITION_MUTATION | fixed-area Trigger; RANDOM_REPOSITION; TRULY_EMPTY; charge and seeded matching |
-| Passive's frozen afterimage Damage Effect | DAMAGE, PHYSICAL_DAMAGE, WILL_DAMAGE | COUNTER behavior/provenance; retained settlement; hostile Actor lock; simultaneous proportional batch |
-| Skill1 Damage Effect, including its exact Ultimate child | DAMAGE, PHYSICAL_DAMAGE, WILL_DAMAGE | SKILL identity; fixed COLUMN AreaSpec; retained coordinates/post-move occupants; source Snapshot |
-| Skill2 temporal admission State | IMMUNITY | DAMAGE only, enemy Natural direct/declared outcome; State61/Admission64A; unchanged present occupancy |
-| Skill2 return Heal Effect | HEAL | retained accumulator Snapshot; CurrentMaxHP formula; opportunity-start dependency; Overheal DISCARD |
-| Skill3's conditional result-derived Heal Effect | HEAL | exact Basic/Skill1 committed basis and coefficient0.10; finite controller/Cost/formula branches |
-| Ultimate's one owned result-derived Heal Effect | HEAL | exact real child result; HEL-005 coefficient0.10 + qualifying Skill3 coefficient0.10 |
-
-**Correction to R2:** AREA is not a registered Functional Tag; area geometry/selection belongs TargetSpec/AreaSpec. LIFESTEAL is still **DEFERRED** in 02§13.4 and is expressed here as committed Damage aggregation + HEAL/HEL-005. Neither label is inserted into `tags[]`. COUNTER/Ability identity, TRULY_EMPTY, phase/checkpoint/profile values, projected-result type and State/controller names remain facets or typed data.
-
-Skill2 grants neither TEMPORARY_ABSENCE nor TARGET_EXCLUSION: it retains geometry/selection eligibility and rejects scoped Damage admission. Projection alone has no DAMAGE/HEAL capability or actual result credit. Skill3's coefficient choices do not mutate ATK/WIL/SPD, and an AE Cost/discount is not RESOURCE_MODIFIER. Beneficial prose does not assign BUFF identity/Authority; future external classification/dispel interactions need the applicable declared Status profile. VFX creates no gameplay tag. Existing Primitive operations suffice; P-041's pure calculation is wrapped in the distinct projection domain, never relabeled committed.
+Skill2 grants neither TEMPORARY_ABSENCE nor TARGET_EXCLUSION: it retains geometry/selection eligibility and rejects scoped Damage admission. Projection alone has no DAMAGE/HEAL capability or actual result credit. Skill3's coefficient choices do not mutate ATK/WIL/SPD, and an AE Cost/discount is not RESOURCE_MODIFIER. Beneficial prose does not assign BUFF identity/Authority; future external classification/dispel interactions need the applicable declared Status profile. VFX creates no gameplay tag. A pure projected calculation stays in its distinct result domain, never relabeled committed Damage.
 
 For delayed Skill3, read-only payability of the authored Natural Skill1 form may choose its15AE branch while the enhancement is pending for that very next actual Action; it does not start/consume the State during a probe or CC-lost opportunity. Skill3's own eligibility requires its controller READY: a pending enhancement would already be active for the prospective next actual Action, so another Skill3 candidate is rejected without changing State. Actual Action start promotes pending to active before qualifying formula resolution; rejected candidate probes leave it pending. The explicitly authored Ultimate child override is0 and never receives a negative debit/refund. Non-Natural work alone does not start pending enhancement or consume actual-action units. These are bounded Condition/Cost/profile branches, not raw code or a generic modifier-priority system.
 
-### 3.2 Finite controller composition
+### 3.1 Finite controller behavior
 
 | Controller / state | Authored transition | Terminal/read boundary |
 |---|---|---|
@@ -150,22 +121,9 @@ RETURNING describes an existing retained finite settlement cursor, not a new tar
 
 No internal Savitar gameplay question remains from the four original answer groups. Counter batching/root hold, source snapshots, mandatory Skill2 timing and both health fields are locked.
 
-**UNRESOLVED / NOT BLOCKING:** whether to re-author earlier Characters' explicitly approved Entity locks into Slot locks. This patch preserves those Canons and normalized explicit profiles. The separate designer instruction establishes Slot as the project default for new otherwise-undeclared attack binding; it does not supply replacement checkpoints for old explicit locks. Savitar's own Slot profiles are explicit and independent of that migration.
+**UNRESOLVED / NOT BLOCKING:** whether to re-author earlier Characters' explicitly approved Entity locks into Slot locks. Those explicit profiles retain their own authority. The separate designer instruction establishes Slot as the project default for new otherwise-undeclared attack binding; it does not supply replacement checkpoints for old explicit locks. Savitar's own Slot profiles are explicit and independent of that migration.
 
 Rank/Class/Native Element/base stats and Cost Budget remain metadata, not invented DC-derived gameplay. Future Mode/Hit/numeric/affiliation/Authority profiles, unequal-destination matching graphs, observable competing mandatory shared-AE settlements, unrelated Reaction priority, observed-root cancellation and battle-terminal ordinary queue cutoff remain **REQUIRED_EXPLICIT / NOT BLOCKING** until that content needs them. No resource winner, average Damage estimate or global Counter precedence is invented. These external composition limits are not internal kit defaults.
-
-## 5. Independent composition / smallest correction proof
-
-Start from the verified **merged E.9/F.11/G.10**, not R2's older E.8 draft baseline. Current TGT-008/POS-008/009, TRG-016, DMG-035 and ACT-034 already exist. Original Slot lookup, matching, afterimage batch, projected-result type, health and opportunity laws are **REUSE**, not seven new gaps to accept again. PR #14 and repository history retain that original proof.
-
-| Locked semantic / current Schema input → governing Contract | Existing runtime owner / composition attempt → exact failure | Smallest E.10/F.12/G.11 correction / rejection consequence |
-|---|---|---|
-| An already-active temporal State accumulates each qualifying batch once before a later return; state.damageProjectionQueries + DAMAGE_PROJECTION_REF + creditStateCounterRef → DMG-035/RES-002/005 | Damage/Result/State/Transaction45D can calculate and credit. F.11 says credit at terminal but does not classify its continuation dependency: ordinary held Reaction delivery can postpone credit until return removes State, losing an otherwise-valid estimate. Allocating query membership at that late point could also retroactively count the very Damage that activated Skill2. | Extend existing query lowering/DMG-035/45D with sealed pre-Damage active-State membership and finite credit/no-credit dependency after complete batch/lifecycle, before continuation. Counter delta and terminal identity join one State transaction. No new field family/ID/queue; reject retrospective queries, held credit or cyclic/unsupported mandatory conflicts. |
-| Return ends temporal protection, then Heals from the completed accumulator; opportunityStartSettlement + State removal + COUNTER_REF/Heal → ACT-034/SNP-001–003/HEL-* | SSI19A/State/Snapshot/Heal/Effect cursor already compose capture → removal → Heal with P-002/022/044/045. F.11's generic retirement cancellation and an unretained live counter could cancel that very graph or erase its formula basis after its own expected removal. | Use existing typed SnapshotRef before removal; refine ACT-034/19A to retain this registered graph's captured values through normal own termination while preserving original owner-instance guards. No new lifecycle/manager/state retention exemption; reject live retired-counter reads, stale owner continuation or missing capture lifetime. |
-
-These are reusable boundaries for any credit-bearing read-only query and finite State-termination/terminal-effect graph. They are semantic timing/lifetime failures, not authoring convenience. Pure projection still mutates nothing; its credit remains an ordinary **State transaction** with mandatory dependency timing, not an ordinary Reaction. Captured return values do not preserve active admission, resurrect a State or snapshot unrelated formula inputs.
-
-Exact Functional Tag mapping, battle-participant use, presence-instance clocks, retained occupancy, Skill3 finite3+1 controller, coefficient+30/+15 branches, AE overrides, exact real child and HEL-005 additive Heal all use existing composition. No new Tag, Primitive, Contract ID, top-level runtime owner, arbitrary hook or global priority is justified. `01`, `02`, `03` and `07` require no semantic change. Unsupported external matching/ordering/Mode profiles remain explicit.
 
 ## 6. Mutable state ownership / failure / replay
 
@@ -182,29 +140,6 @@ Exact Functional Tag mapping, battle-participant use, presence-instance clocks, 
 
 Ordinary relocation failure has no success mutations and original Damage continues under the authored no-move policy. Unsupported content/IR is a separate normalization/fail-closed error. Empty/invalid coordinate branches have no replacement; committed Costs are not automatically refunded. No actual health observer runs between sibling packets of a simultaneous or mixed group, inside joined survival/Return/Revive staging, or before mandatory HP_ZERO. Projection records never enter actual Damage outcome metrics.
 
-## 7. R3 impact across 00–08 and validation obligations
+## 7. Normalization status
 
-| Canonical file | R3 decision / exact scope |
-|---|---|
-|00|PATCH: INDEX-12, Savitar R3 navigation and E.10/F.12/G.11/I.11 summary. Recovery audit unchanged. |
-|01|NO CHANGE: existing Target/Position/Hit, Actual HP Damage, Snapshot and State-retention meanings suffice. |
-|02|NO CHANGE: correct this Character's tag use against the exact existing registry; AREA is a facet, LIFESTEAL remains deferred. |
-|03|NO CHANGE: P-002/021/022/040/041/044/045 and existing transaction/movement composition suffice. |
-|04|PATCH: E.10, §7.15 capture-through-termination composition, §16.6 pre-Damage eligibility/mandatory atomic credit, §51 lowering and §92 validation. No new Schema field family. |
-|05|PATCH: F.12, extend only existing ACT-034 and DMG-035; no Contract ID additions/renumbering or unrelated block change. |
-|06|PATCH: G.11, §19A retained return bindings, §45D sealed query/required credit continuation and §168 serialization through existing owners. |
-|07|NO CHANGE: H.1 supplies Main Slot/SSI grant/CC and owning Mode context; no new mode rule or seconds conversion. |
-|08|PATCH: I.11/dependency versions; M-094–M-099 for tags, required credit, no retrospective projection, captured return lifetime, battle/presence guards and rejection. Prior cases remain unchanged. |
-
-Raw Savitar entry77 and all unrelated raw entries/Character Canons remain unchanged in R3. Root `readme.md` is deleted under the current explicit maintenance request; `AGENTS.md` and indexed canonical files retain their entry-point role. No executable implementation file, build or game/runtime test is part of this Architecture Phase change.
-
-The final six-pass audit must check the actual R3 diff against the pinned base and latest target before delivery:
-
-| Pass | Required evidence / regression anchors |
-|---|---|
-|1 — Semantic fidelity|Preserve R2 thresholds/formulas, enemy-root Heal before counters, present reserved occupancy and completion-versus-opportunity clocks. M-082–M-093 stay byte-identical; M-095–M-098 make previously incomplete credit/lifetime bindings explicit. |
-|2 — Independent composition|Use existing P-002 snapshots and State/Effect/Result/Transaction continuation. §5 proves only two bounded refinements; exact tag correction and battle/presence ownership do not grow architecture. |
-|3 — Layer / namespace / lifetime|Existing Contract ID set unchanged; only ACT-034/DMG-035 bodies refined. §6 maps capture/creation/mutation/terminal/replay. Validate every Functional Tag against active 02, not historical candidates. |
-|4 — Determinism / negative space|Attack held Reactions, exclusion-only/zero/abort/retired batch, same-batch activation, remove-before-Heal/resume, blocked Heal, unchanged lifeSerial/new presence and same-battle use. No unrelated resource winner/priority is added. |
-|5 — Prompt / source contradiction|Use actual merged main, current raw77 and R2 gameplay locks; separate old drafting proof from current capability. Preserve metadata/external boundaries without invented classification/Authority/numerics. Only proven files change; requested README removal is included. |
-|6 — Mergeability|Inspect actual diff; run git diff --check, UTF-8/fence, exact ID/tag/reference/version and prior-body checks. Verify 230 named cases/probes/meta-tests (225 A–N +5 META), including six additions. Recheck PR head/target and merged content. These checks do not assert executable gameplay results. |
+Generic architecture deltas: bounded Slot relocation/matching, projected Damage with required terminal credit, stable-health settlement and opportunity-start termination graphs with captured-value lifetime. Existing owners retain the distinct battle-use and presence-controller identities.

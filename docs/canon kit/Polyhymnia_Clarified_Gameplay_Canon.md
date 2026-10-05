@@ -1,9 +1,8 @@
 # ARCLUNE — POLYHYMNIA — CLARIFIED GAMEPLAY CANON
 
 **Revision:** R4 — final designer-authored Ultimate Damage/Heal simultaneous batch policies locked; R3 completion-only note collection remains authoritative.
-**Status:** internal kit gameplay clarified for architecture normalization. §7 records future external-content/profile boundaries, not unresolved internal kit mechanics.
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED. §7 records future external-content/profile boundaries, not unresolved internal kit mechanics.
 **Source:** repository `Ý tưởng nhân vật 4.md`, Character #63, lines 805–999; later explicit designer answers take precedence on the points recorded below.
-**Architecture base inspected:** latest merged `main` at `97b0f77` (PR #5 merged; E.3/F.5/G.4/H.1/I.3). Reuse those merged surfaces; the R4 batch clarification requires no additional Schema, Contract or Kernel extension.
 
 This file states Character gameplay. It does not silently add Schema fields, Contracts, Tags, Primitives, or Kernel services. Character remains declarative composition. No Character-ID runtime branch is permitted.
 
@@ -138,7 +137,7 @@ The source-stat snapshot does not freeze Leader's later cap MaxHP read or recipi
 
 ### 5.1A Recipient-local calculations and group commit
 
-For each Damage/Heal group, existing RES-002 and `06` §31 capture that group's shared calculation-state version, build every target-local result without exposing sibling deltas, then commit the whole group before mandatory lifecycle/result processing. This transaction view is distinct from the common Ultimate source-formula snapshot and the earlier target/relation lock. Heal uses its own group-start calculation state after the Damage group and required processing; it does not freeze every ally's missing HP at Ultimate start.
+For each Damage/Heal group, the RES-002 simultaneous-batch law captures that group's shared calculation-state version, builds every target-local result without exposing sibling deltas, then commits the whole group before mandatory lifecycle/result processing. This transaction view is distinct from the common Ultimate source-formula snapshot and the earlier target/relation lock. Heal uses its own group-start calculation state after the Damage group and required processing; it does not freeze every ally's missing HP at Ultimate start.
 
 No enemy is considered to resolve before another enemy for gameplay purposes. Entity ID, Slot, authored list order, Event order and runtime iteration order cannot make one enemy's result change another's eligibility, formula, relation, Damage type, Hit Admission, mitigation or Shield interaction within this batch. Ordinary target-local mitigation, Shield and HP calculation remain independent per target. Likewise, one ally's Heal cannot change another ally's eligibility, formula, target order or locked relation within the Heal batch. Technical iteration/trace order confers no gameplay priority.
 
@@ -184,7 +183,7 @@ Use existing generic owners:
 | Three voice flags | Passive runtime owner in its field-presence lifetime | Created empty; qualified result sets a flag; Chord consumes all three; source leave clears; preserve flag state and consumed checkpoints across save/load. No Character-only manager. |
 | Action observation | Existing Action result/provenance and Trigger execution context | Immutable committed direct results, with Action/Effect provenance and an explicitly declared relation-read context; one observation at ACTION_COMPLETED; preserve terminal processed identity through the replay horizon even after receipt cleanup and note consumption. An explicit typed relation readContext selects observation-state facts or a retained SnapshotRef; locked own-Action relations use their target-context snapshot. |
 | Skill-3 contribution duration | Existing Shield contribution `durationState` keyed by the contribution | Two future actual source Action completions; exclude creating Action; source leave removes remaining Skill3 contributions with its lifecycle cause; expiry/removal/depletion stay distinct. |
-| Ultimate cap membership | Existing Shield ledger; target plus `sourceOwnerRef + originAbilityId + originEffectId` | Query remaining active matching contributions at addition, not nominal original values or total Standard pool; reuse stable Effect identity from `06` §15A, and preserve the provenance across save/load. |
+| Ultimate cap membership | Existing Shield ledger; target plus `sourceOwnerRef + originAbilityId + originEffectId` | Query remaining active matching contributions at addition, not nominal original values or total Standard pool; use stable Effect identity and preserve the provenance across save/load. |
 
 Already-created Chord belongs to existing Scheduler/Transaction Manager required post-action work, keyed by observed Action + trigger runtime owner + instantiated candidate/dependency. Its terminal execution identity outlives freed receipts through the supported replay horizon. Source identity remains an authoritative stat reference for the fresh Chord snapshot even after field leave; field presence is not an implicit source-stat-read condition. It does not wait for a future Action. These requirements reuse current owners. The flags' internal representation is a normalization/runtime choice; this canon does not invent a new Buff/Mark classification or a new Functional Tag for a voice.
 
@@ -202,69 +201,6 @@ The final within-group Ultimate batch question is resolved in §5 and removed fr
 
 `TBD_BY_COST_BUDGET` is a later budgeting input, not unresolved gameplay.
 
-## 8. Current composition attempted before any extension
+## 8. Normalization status
 
-The following already compose and should not create another Tag, Primitive or subsystem:
-
-1. Mixed Damage: current `DAMAGE`, `WILL_DAMAGE`, `PHYSICAL_DAMAGE`; `BUILD_DAMAGE_PACKET → RESOLVE_DAMAGE_PACKET → COMMIT_DAMAGE_RESULT` under `DMG-*` / `SHP-*`, one hit per target.
-2. Heal and discarded Overheal: `04` §17 → existing P-044/P-045; `HEL-001`/`HEL-002`; `06` §57 committed `actualRestore`.
-3. Random distinct Skill1 targets: `04` §11 random/duplicate/count fields; `TGT-005`, `RNG-*`; existing Target Resolver/RNG.
-4. Source snapshot, ordered groups and simultaneous recipients: `04` §13 and §§34/36 COMPOSITE + SIMULTANEOUS_BATCH; `SNP-001`/`SNP-003`, RES-001/002/003 and local AFTER_DIRECT_EFFECTS_COMPLETE; `06` §§30–32 shared-version Transaction Manager plus existing Snapshot/Effect Graph owners. Each group starts its own calculation view; no new middleware, global AoE policy or priority.
-5. Skill3 independent Shield contributions and actual completed-source-Action clock: `04` §§18–20; `SHP-002` and existing actual-action-duration support; `06` §§51/54. Current `08` M-034 proves the distinction from CC opportunities, but its Sanguinius refresh profile must not be copied.
-6. Recorded binary voices: existing bounded `counter`/Condition/result/event composition (`04` §§7.6/8, §§19–20); existing Trigger/State owners. A count of three categories is not three arbitrary events.
-7. Chord Heal/+8 Side AE and no recurrence: existing Heal/resource operations, non-Natural trigger resolution and `TRG-010`–`TRG-013` provenance. No extra Natural Action or custom callback.
-
-## 9. Current support, prior gap proof and 00–08 impact
-
-### 9.1 Current support and previously merged gap corrections
-
-Current main already supports ACTION_RESULT_ANY, ShieldAdditionResultRef, EXPLICIT_SLOT_ORDER/top-N, sourceFamilyCap, typed result relation reads, zero-addition receipts, durable replay identity, source-owned Shield cleanup and ACT-033 post-action obligations. PR #4 and PR #5 merged the previously identified corrections. The table retains the R3 proof as **historical rationale for merged support**, not new insufficiencies or proposed deltas:
-
-| Locked input | Existing merged input / Contract / runtime owner | Earlier insufficiency → correction now merged |
-| --- | --- | --- |
-| Locked relation context for completion receipt reads | 04 §8.4 ACTION_RESULT_ANY; TRG-015; 06 §25A Result Store/Condition evaluator | Earlier prose lacked a typed snapshot binding → merged required recipientFilter.readContext OBSERVATION_STATE or covered SNAPSHOT SnapshotRef; no live fallback. |
-| Cap-to-zero creates no Shield entry | sourceFamilyCap + ShieldAdditionResultRef; SHP-005/006; 06 §51 ledger/Transaction Manager | Earlier cap flow unconditionally committed a contribution → merged successful zero receipt with empty refs, no ledger/clock mutation. |
-| Replay after notes consumed/receipts freed | result view + owner-keyed candidates; TRG-015; 06 §25A/168 existing Trigger/Transaction records | Earlier payload retention lost terminal deduplication after cleanup → merged replay-horizon observation/consume-create/settlement identity independent of payload; reject retired-horizon input. |
-| Skill3 source leave removes entries on other recipients | Existing shield.owner, FIELD_PRESENCE_SCOPED, source ledger; SHP-002; 06 §51/Lifecycle owner indexes | Earlier owner/recipient and cross-recipient cleanup wording was insufficient → merged separate owner reference, owner presence-cycle lowering and matching contribution cleanup with lifecycle cause. No new field/manager. |
-| Completion-created Chord must finish before next SSI Action | Existing required post-action phase ACT-001 / 06 §20; rootCompletionDependency ACT-032; ordinary completion queue | Earlier root blocker cycled, while ordinary nonblocking queue allowed late work → merged trigger.postActionSettlement BEFORE_NEXT_NATURAL_ACTION, ACT-033 and current Scheduler/Trigger/Transaction owners. No global priority or new queue. |
-
-Those corrections are already present in 04 §§7.13/8.4/18/validators, 05 ACT-033/TRG-015/SHP-002/005/006 and 06 §§20/23/25A/36/39B/51/168/202. For the new R4 requirement, the proof is: designer-authored per-group simultaneous recipients → merged ResolutionSpec §§34/36 → RES-002/003 → current `06` §§30–32 Transaction Manager. Shared calculation state and whole-group commit already prevent sibling contamination while explicit group dependencies preserve Damage → Heal → Shield. **Exact current insufficiency: none; runtime extension: none.** Update Canon and its declarative coverage without duplicating these capabilities.
-
-### 9.2 All-files impact; audit does not mean modify all files
-
-| Canonical file | Decision | Exact reason / anchor |
-|---|---|---|
-| `00_CANONICAL_INDEX.md` | **PATCH** | Navigate Polyhymnia R4 and its locked local batch policy. |
-| `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` | **NO CHANGE** | Existing Action/opportunity, actual result, Shield, presence and Snapshot distinctions suffice. |
-| `02_TAG_vNext.md` | **NO CHANGE** | Existing Damage/Heal/Shield capabilities; flags, checkpoints, tie policies and provenance anchors are data. |
-| `03_PRIMITIVE.md` | **NO CHANGE** | Existing Damage/Heal/Shield/State/resource operations; corrections concern law/query/scheduling. |
-| `04_ABILITY_SCHEMA-1.md` | **NO CHANGE** | Existing COMPOSITE/SIMULTANEOUS_BATCH, SnapshotSpec, graph dependencies and local Reaction boundary express the final policy. |
-| `05_CONTRACTS.md` | **NO CHANGE** | RES-002/003, TGT-006 and current completion/result laws already govern it. |
-| `06_KERNEL_RUNTIME.md` | **NO CHANGE** | §§30–32 already implement shared-state batch calculation, whole commit and sequential group boundaries; reuse current services. |
-| `07_MODE_PROFILES.md` | **NO CHANGE** | Standard nine-Slot/Leader8 mapping is already merged. Natural-action-free Mode adaptation remains REQUIRED_EXPLICIT; Class AE hook remains separate. |
-| `08_STRESS_TESTS.md` | **PATCH** | Update M-040 from a synthetic simultaneous choice to the locked Character policy; add recipient-permutation, sibling-contamination and explicit invalid-recipient variants. Other cases remain unchanged; no executable tests/build. |
-
-### 9.3 Regression obligations for 08
-
-`MUST_PASS` / `MUST_REJECT` as appropriate:
-
-- One mixed hit contains two component results but records only one Harm; fully Shield-absorbed damage and overkill do not create false positive Harm.
-- One Action records several voices; repeated same voice is idempotent; exact owner/direct-graph filtering excludes same-root child Actions and independent Passive effects.
-- All note collectors, including own Ultimate and other runtime owners, record only at actual completion. Record→check→consume/create is atomic/ordered; Chord settles before next SSI Natural Action without blocking its already-published completion. Source leave before creation prevents Chord; leave after creation does not cancel it. CC-lost opportunities record/decrement nothing.
-- Discarded Overheal does not count as Mercy or create Shelter; existing unrelated Shield and zero/rejected/capped additions do not count as Shelter.
-- Slot tie order applies only within exact equal HP% groups, including top-k cutoff; varying list/entity/Event order yields the same targets. Preserve Alcestis `RANDOM_AMONG_TIED` behavior.
-- Skill1 selects two distinct targets or one target once; all-ally Ultimate includes self and Slot8 Leader once, never an extra tenth Leader.
-- Ult source WIL/ATK/MaxHP mutation between groups does not change snapshotted formulas; current Leader MaxHP at Shield addition controls cap.
-- Damage/Heal commit as separate simultaneous batches under ordered group dependencies. Permuting entity/Slot/list/Event/technical iteration cannot affect sibling calculations; mandatory lifecycle follows the completed group, not each recipient. A lifecycle-invalid locked recipient follows the fixture's explicitly authored ordinary policy without replacement or changing other recipients. This local policy is not a default for unrelated AoE.
-- Two new Skill3 casts have independent contributions: creating Action excluded only for its own contribution; older contributions still decrement; no whole-pool refresh and expiry leaves other sources untouched.
-- Ultimate family cap uses remaining matching contributions; unrelated owner/Skill3 contributions are excluded; two grants cannot overspend shared headroom; an explicit addition-only fixture does not mutate old contributions. Lower Leader MaxHP preserves old contributions and permits zero future additions; higher MaxHP grants future headroom only. Zero additions create no ledger contribution. Ultimate contributions persist across source leave without a duration clock.
-- Chord consumes voices once, adds +8 Side AE once, remains non-Natural and cannot feed any direct-Natural-Action voice collector with its generated Heal.
-- Save/load restores consumed Action checkpoints, flags and contribution provenance/durations without replaying completed additions or Chord.
-
-Future §7 external-content/profile branches require their own declared policies; a fixture must not turn an absent external policy into a kit or global default. The Ultimate batch policy itself is locked and covered by MUST_PASS, not PROBE_UNRESOLVED.
-
-## 10. Canon self-audit and drafting correction
-
-R4 preserves all R3 completion-only collectors, fresh Chord snapshots/DISCARD/full-HP eligibility, source-scoped Skill3 cleanup, persistent Ultimate provenance and future-addition-only cap behavior. It locks separate simultaneous Damage/Heal batches, exact target-lock-before-source-snapshot order and ordinary Reaction hold through all three direct groups. Reconstructing the latest requirements corrected the earlier draft's obsolete test-only batch caveat and its stale claim that PR #5 architecture corrections were still unmerged. The shared formula snapshot, locked target context and separate per-group transaction views are explicitly distinct.
-
-Canon audit preserves raw numerical formulas, distinct source/recipient identities, direct Effect provenance, actual completion versus opportunity clocks, result positivity, explicit Slot ties, source snapshot scope, contribution lifetime and genuine unresolved gameplay. The architecture draft received an independent adversarial review and corrections for checkpoint scope, actionless static Effects, historical evidence and family provenance. Actual diff inspection, cross-file consistency and the six-pass self-audit were performed on the corrected draft against current merged main; no implementation build/test is implied.
+Generic architecture deltas: bounded completion-result observation, Shield addition receipts/source-family caps, explicit Slot ties and required post-completion settlement. The locked local simultaneous batches within sequential groups use existing composition.

@@ -3,7 +3,6 @@
 **Revision:** R2 — complete locked gameplay normalization, including per-child snapshots and proportional shared-recipient allocation.
 **Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED. Numeric metadata/adapters remain separate; not generated execution-ready Character data.
 **Source:** current designer description and later #52 SSR Mage of `ý tưởng nhân vật 3.md`, after Nerovar. Raw adds Character/Ability labels only; mechanic prose is preserved. Latest explicit answers below govern gameplay; raw numbering is not runtime identity.
-**Architecture base inspected:** actual merged main `13c11d4`, E.5/F.7/G.6/H.1/I.6. Three bounded extensions below are proposed E.6/F.8/G.7/I.7 until merged, not assumed merged capability.
 
 ## 1. Identity and presentation boundary
 
@@ -58,36 +57,14 @@ Each child resolves batch → mandatory lifecycle → local settlements **Skill1
 
 Waive **only the authored AE30/10/5 of these children's S1/S2/S3 activations**. Conditions, caps/use, readiness, foreign Costs and unrelated descendant Costs remain in force. Existing exact child/root/provenance guards and CostSpec.waiverPolicy express this, not a blanket root-wide free cast. Parent waits for exactly two children/linked work; neither is a Follow-up or a new Natural Action. No new Ultimate readiness/Rage policy is invented.
 
-## 3. Independent composition and exact gap proof
+## 3. Execute replay boundary
 
-| Locked input → composition attempted | Contract → current runtime owner | Exact verdict / smallest extension |
-| --- | --- | --- |
-| Capped battle orb counter, multiplicative ATK/WIL product excluding own input | State/StatModifier/COUNTER_REF → P-030, State/stat contribution/Snapshot owners | Counter/product REUSE. Merged baseline placeholder lacks whole-own-family exclusion law; final-stat self-read recurses, BaseStat rewrites lose foreign dynamic modifiers. Add §21 EXCLUDE_THIS_SOURCE_FAMILY / RES-007 through current contribution view and §61; no new stat manager/operator. |
-| Same-recipient simultaneous main/orb, separate ActualHP receipts | ResolutionSpec/typed Damage/ResultRefs → RES-002, SHP-002/DMG-010 → Damage/Shield/Transaction/Result owners | RES-002 isolates calculations but does not allocate shared Shield/HP; SHP-002 allocates **Shield contributions**, a different axis. Independent commits double-spend or prioritize a packet. Add opt-in group sharedRecipientDamageAllocation PROPORTIONAL / RES-008, §31 existing transaction. No universal AoE default. |
-| Direct Execute with no ordinary prevention but real AUT/recovery | SYSTEM_LIFECYCLE → P-060/P-062, DTH/AUT → Lifecycle/Authority/Transaction/Result owners | Ordinary lethal Damage/HP Loss opens prevention and supplies wrong Damage receipts. §77 lacks the direct-confirmation policy. Add §77.2 confirmationPolicy DIRECT_EXECUTE / DTH-008 and existing §84 routing; no new Primitive/Tag/Execute manager. |
-| Immutable Basic package, local S1→2→3, actor behavior ban, linear Rage and AE-only waiver | Conditions/Trigger/Cost/Heal/Resource/ResultRefs/Action restrictions → TRG-013, ACT/CST/HEL/DMG-020/021 → current owners | REUSE typed package/provenance/denominator refs, terminal local DAG, finite arithmetic and exact waived Cost definitions. Failed dependency is terminal, not suppression of later Skills. |
-| Same-target sequential child Basics with independent snapshots | TargetRef/ActionSpec childCostPolicy/childSnapshotPolicy/Resolution → ACT-020/021/023/032 + SNP/RES → Action/Target/Snapshot/Cost/DAG owners | REUSE. Do not turn shared root into root-owned direct Effect, grant Natural status or blanket cost freedom. |
-
-Each new plan preserves owner/origin, lifetime/transaction key, commit barrier and replay identity. Deferred EXECUTE Tag/EXECUTE_TARGET Primitive candidates remain deferred; no independent new capability query/atomic operation was proved. No Character-specific runtime, generic priority or callbacks.
+Execute terminal dedup uses stable original request identity before opening another death context, including post-Revive with unchanged lifeSerial; releasing a receipt cannot permit re-execution.
 
 ## 4. Remaining items
 
 **No unresolved internal gameplay choice.** Native Element/Cost Budget and unsupported Mode adapters are **UNRESOLVED / NOT BLOCKING** for this work. Foreign Authority protections, numeric precision profiles and unrelated same-window candidates need their applicable explicit law; Phanes does not define a global default or ordering for them. Missing numeric support rejects unsupported executable allocation rather than inventing packet priority.
 
-## 5. Impact audit across 00–08
+## 5. Normalization status
 
-| File | Phanes decision |
-| --- | --- |
-| 00 | PATCH source/normalization navigation and versions. |
-| 01 / 02 / 03 | NO CHANGE: existing meanings/Damage/Stat/Heal/Resource/lifecycle operations; no orb Entity, new Tag or Primitive. |
-| 04 | PATCH bounded own-family baseline, lifecycle confirmation and opt-in shared-recipient allocation/lowering/validation. |
-| 05 | PATCH RES-007/008, DTH-008 and ordinary death-path qualification. Existing other profiles preserved. |
-| 06 | PATCH through current §31/61/84 owners and pending/receipt persistence, no new manager. |
-| 07 | NO CHANGE: existing SSI/Side AE/Rage ownership; no automatic other-Mode conversion. |
-| 08 | PATCH M-057–M-060 and M-062/M-065 for allocation, per-child snapshots, receipts, thresholds, waivers, replay/Authority and rejection. |
-
-## 6. Final six-pass and adversarial audit
-
-Six passes: (1) all formulas/gates/caps/lifetimes/snapshot/target/result bindings match latest answers; (2) retry existing composition and retain only the three bounded gaps; (3) correct Schema/Contract/runtime namespace/owner/lifetime, no collisions; (4) attack N0/N10, HP/Shield exhaustion, type-specific layers, packet permutation, thresholds5/15/40, full Rage, missing AE, death/recovery, child2 invalidity, same-root foreign Damage, repeated activation/replay; (5) latest direct-Execute/per-child/proportional answers override older pending tables; (6) actual diff/base/refs/declarative coverage checked, no build/game tests.
-
-Same-author second audit corrected two plausible errors: proportional Shield **source depletion** does not prove incoming-packet allocation, and a target shared by two children does not imply a shared stat/MaxHP snapshot. Execute terminal dedup uses stable original request identity before opening another death context, including post-Revive with unchanged lifeSerial; releasing a receipt cannot permit re-execution. No executable validation result is claimed.
+Generic architecture delta: own-family stat-baseline exclusion, opt-in proportional shared-recipient Damage allocation and direct Execute through existing owners.

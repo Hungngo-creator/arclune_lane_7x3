@@ -3,7 +3,6 @@
 **Revision:** R2 — all three designer clarification groups applied.
 **Status:** core gameplay clarified and normalized as declarative composition; later Element/Cost Budget metadata and external override policy are separately identified below.
 **Source:** repository `ý tưởng nhân vật 3.md`, Character #29, lines 1195–1205, followed by the explicit designer decisions recorded here.
-**Architecture base:** current merged main `93839ba` (E.2/F.4/G.3/H.1/I.2, PR #4 merged). This branch's E.3/F.5/G.4/I.3 is proposed delta. Current main still lacks FINAL_DAMAGE_MULTIPLIER/directActionRef; composition was independently rechecked after the merge.
 
 ## 1. Identity / complete raw kit
 
@@ -67,58 +66,11 @@ Per-target branch: A at 29% → TRUE+TRUE; B at 31% → PHYSICAL+WILL. No target
 
 Target set is not requeried during the group. A lifecycle-invalid locked recipient before commit is dropped/skipped locally, no replacement; valid recipients retain snapshotted threshold even if current HP changed. Use ordinary simultaneous transaction revalidation with explicit DROP_INVALID/no-requery; do not freshen threshold/source snapshot as an incidental retry. Entity/list/Slot/eventSeq iteration is trace mechanics, never gameplay priority.
 
-## 5. Normalization / current composition first
+## 5. Payment-bound multiplier lifetime
 
-| Requirement | Composition / governing current owner |
-| --- | --- |
-| Mandatory HP + AE/readiness | Existing CostSpec costs on Skill1/Ultimate, payer SELF, HP formula 0.15 × authoritative HP at Cost; required full-payment policy and singular CostPaymentResultRef. CST-001/003/005–009/013; existing Cost Transaction/Action admission. No passive callback/middleware. |
-| All actual Skill/Ultimate casts | The authored Ability definitions own the Costs, so ordinary/child/Forced casts use them; caller waiver follows CST-006 without mutating base definitions. No Natural-only filter. |
-| Source snapshot / locks | Existing SnapshotSpec, EXPLICIT target selection, preserved Intent selected reference, TGT-003/006 and SNP-*; Target Resolver/Snapshot/Intent owners. |
-| Conditional TRUE AoE | Existing Condition branch in Damage Effect graph, using target-context HP SnapshotRef: select one of normal mixed versus TRUE+TRUE profiles **before packet build**; keep one logical hit. RES-002 simultaneous group, DMG-001/004/007 type boundary. No outgoing extension of Alcestis's incoming transform is necessary. |
-| Payment-gated action-local bonus | Existing scoped amount-modifier rule/Condition/pure MULTIPLY operation plus Action-local committed Cost binding; current Scope/Attribution alone does not prove own-direct membership. Exact bounded extension below. |
+Bind the multiplier to this executing Ability/Action instance. Successful Cost/result and factor are immutable for its lifetime. Own-direct membership uses Effect provenance, not Attribution/root equality. Do not grant the bonus to a waived/failed payment by inventing “counts as paid”; a future explicit Cost override must define its exchange entitlement.
 
-Functional capability mapping reuses DAMAGE plus PHYSICAL_DAMAGE/WILL_DAMAGE for normal profiles, TRUE_DAMAGE for the conditional True profile, and SELF_HP_COST for the exchange. Capability derivation inspects declared conditional branches; runtime type choice does not rewrite source Ability identity/Tags or infer Fire. No new Tag.
-
-Existing pure formula ×1.40 was tried first and rejected as a faithful normalization: it multiplies pre-mitigation raw amounts, not the locked **Final Damage** checkpoint. Existing FINAL_DAMAGE_REDUCTION was tried and rejected: TRUE must bypass that reduction phase and a bonus is not reduction. Neither preserves the locked typed phase and TRUE interaction.
-
-## 6. Proven generic gap / smallest draft
-
-**Locked input:** fully paid actual Skill/Ultimate → ×1.40 on its own direct components at Final Damage, including TRUE.
-
-**Current capability:** 04 §18A / RES-006 / 06 §28A already support scoped MULTIPLY rules and deterministic combined factors, but only PRE_OVERHEAL / FINAL_DAMAGE_REDUCTION. Existing source Attribution matching is not own-direct Action ownership, and an ACTION_RESULT_ANY consumer would require a sealed checkpoint that this resolving hit has not reached.
-
-**Exact insufficiency:** no typed Final Damage multiplier phase visited by TRUE, nor a modifier scope that explicitly binds resolving Effect membership to this Action's own graph.
-
-**Smallest reusable extension:** existing ScopedEffectAmountModifierSpec gains `resolutionPhase = FINAL_DAMAGE_MULTIPLIER` plus optional `effectScope.directActionRef` using existing ActionRef anchor/relation shape. Governing **DMG-008** reuses RES-006 and TRG-013: resolve after type-specific mitigation/applicable reduction and before Shield; explicitly selected PHYSICAL/WILL/TRUE components; own-direct provenance; Action-local Cost/Snapshot/result binding. Existing Contract Resolver/Damage Runtime execute it. Only finite factors >= 1 are supported at this amplification phase; it cannot disguise reduction against TRUE. No new multiplier subsystem, mutable bonus flag, outgoing transform, Tag or Primitive.
-
-Normalized Skill1/Ultimate modifier:
-
-```text
-sourceScope = explicitly selected caster matching SELF
-recipientScope = ANY (do not re-filter already-locked target relations)
-effectScope = DAMAGE; components PHYSICAL/WILL/TRUE
-directActionRef = { anchor: CURRENT_ACTION, relation: SELF }
-conditions = this runtime Actor; Action identity SKILL/ULTIMATE;
-             Action-local HP exchange result committed and fully paid
-amountOperation = MULTIPLY 1.40, locked after successful payment
-resolutionPhase = FINAL_DAMAGE_MULTIPLIER
-```
-
-Bind the rule to this executing Ability/Action instance with existing result visibility; successful Cost/result and factor are immutable for its lifetime. Own-direct membership uses provenance, not attribution/root equality. Do not grant bonus to a waived/failed payment by inventing “counts as paid”; a future explicit Cost override must define its exchange entitlement.
-
-## 7. Audit impact across all 00–08
-
-| File | Decision / reason |
-| --- | --- |
-| 00 | PATCH: source/navigation, this canon and bounded phase/direct-scope delta. |
-| 01 | NO CHANGE: existing Action/Cost/provenance/typed Damage meanings suffice. A phase enum is not a new terminology noun. |
-| 02 | NO CHANGE: reuse SELF_HP_COST, DAMAGE and PHYSICAL/WILL/TRUE_DAMAGE; phase/provenance anchor is not a new Tag. |
-| 03 | NO CHANGE: existing HP payment/Damage/Condition/Snapshot operations compose. |
-| 04 | PATCH §18A and validators: FINAL_DAMAGE_MULTIPLIER plus directActionRef; reuse existing scopes/Cost result binding. |
-| 05 | PATCH DMG-008, component flows and RES-006 phase compatibility; preserve True bypass of reduction. |
-| 06 | PATCH §28A, §45–48 Damage flow and relevant input/Intent plan clarification; existing owners, no Character branch. |
-| 07 | NO CHANGE for Phần Tinh: AE/readiness/Rage/auto selection stay ordinary Mode-owned rules. |
-| 08 | PATCH M-048–050 declarative obligations; no executable test/build in architecture phase. |
+Apply the ×1.40 after type-specific mitigation/applicable reduction and before Shield, including TRUE components. It is not pre-mitigation raw-formula scaling or Final Damage Reduction. Do not re-filter already-locked target relations when applying this Action-local bonus.
 
 ## 8. UNRESOLVED / NOT BLOCKING
 
@@ -130,8 +82,7 @@ Bind the rule to this executing Ability/Action instance with existing result vis
 
 None reopens the locked HP exchange, typing, strict threshold, simultaneous group, common snapshots or local invalid-target behavior.
 
-## 9. Canon and corrected-draft audit
+## 9. Normalization status
 
-Preserved every raw coefficient and topology, and all later designer answers. First draft was deliberately attacked: removed unresolved markers answered by the designer, rejected raw-formula scaling/FDR emulation, clarified global versus private HP floor, separated Action identity from behavior, locked threshold for both components/common AoE snapshot, and prevented same-root child effects from inheriting bonus or re-paying a parent Cost.
-
-Regression obligations cover paid/nonpaid/rounded-zero/truncated Cost, non-Natural genuine casts, Effect node versus child Skill, direct graph versus same-root attribution, TRUE bonus with ordinary Shield, exact 30% threshold, common snapshots, invalid locked target, simultaneous list permutation and one combined final-phase factor. Actual diff/cross-file/six-pass audit was performed on the corrected proposed delta against latest merged main; no implementation test/build is claimed.
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED.
+Generic architecture delta: bounded FINAL_DAMAGE_MULTIPLIER with own-direct Action scope through existing modifier/Damage owners.

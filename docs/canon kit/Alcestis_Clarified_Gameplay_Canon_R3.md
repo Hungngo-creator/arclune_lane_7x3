@@ -2,6 +2,7 @@
 # ALCestis — CLARIFIED GAMEPLAY CANON
 
 **Revision:** Pilot #4 Clarification R3 — R2 semantics preserved; Ultimate secondary-target selection timing locked by later designer correction
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED.
 
 > **Purpose:** This file is the authoritative gameplay interpretation for Alcestis Pilot #4.
 >
@@ -1159,13 +1160,7 @@ Leader Overheal
 
 ---
 
-# 14. PILOT #4 ARCHITECTURE-PROVING PRESSURE POINTS
-
-These are **questions for normalization**, not pre-approved architecture patches.
-
-The normalizer must first attempt composition from current canonical architecture.
-
-High-risk pressure points:
+# 14. CHARACTER-SPECIFIC SEMANTIC DISTINCTIONS
 
 1. **Target-scoped incoming Damage-component conversion**
    - Effective-Class Assassin;
@@ -1215,8 +1210,6 @@ High-risk pressure points:
 8. **Deployment Cost Bar +3**
    - modifies the Side's Deployment Cost Bar;
    - must not be confused with Character Deployment Cost.
-
-Do not assume any of the above requires a new Tag, Primitive or subsystem until current composition fails.
 
 ---
 

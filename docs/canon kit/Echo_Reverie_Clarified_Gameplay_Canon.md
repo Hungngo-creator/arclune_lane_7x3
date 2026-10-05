@@ -1,19 +1,17 @@
 # ECHO REVERIE — CLARIFIED GAMEPLAY CANON
-## Gameplay-logic clarification before Tag / Primitive / Contract normalization
+## Clarified gameplay logic
 
 **Character:** Echo Reverie  
 **Source:** Echo in the myth of Narcissus, especially the Ovidian motif of being unable to initiate speech and only repeating what was last spoken.  
 **Class:** Mage  
 **Element:** Not specified in this source.  
-**Status:** Clarified Gameplay Canon — ready for semantic normalization after the current canonical architecture is up to date.  
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED.
 **Scope:** Turn-based mode first.  
-**Important:** This document defines **gameplay behavior and semantic intent**. It does **not** yet assign new Functional Tags, Primitive IDs, Contract IDs, or Kernel implementation.
+**Important:** This document defines **gameplay behavior and semantic intent**.
 
 ---
 
 # 0. PURPOSE
-
-Echo Reverie is intended as a difficult Pilot-Normalization character.
 
 The design identity is:
 
@@ -30,19 +28,6 @@ The kit deliberately combines:
 - shield-to-damage scaling;
 - shield-to-Max-HP conversion;
 - child Skill execution from Ultimate.
-
-The workflow is:
-
-```text
-Original Echo kit
-→ this Clarified Gameplay Canon
-→ Terminology normalization
-→ Architecture Impact Matrix
-→ existing Tag / Schema / Primitive / Contract mapping
-→ only then consider generic architecture gaps
-```
-
-Do not create `ECHO_*` architecture abstractions merely because this Character is complex.
 
 ---
 
@@ -1416,39 +1401,3 @@ The following are considered clarified:
 53. Opposing Echoes cannot create passive recursion or passive-memory feedback loops.
 
 ---
-
-# 23. READY FOR PILOT NORMALIZATION #2
-
-Recommended next step:
-
-```text
-1. compare raw Echo kit vs this Clarified Gameplay Canon;
-2. normalize Terminology only;
-3. map each mechanic to existing canonical architecture;
-4. classify each mechanic:
-   - EXISTING
-   - SCHEMA/PARAMETER ONLY
-   - GENERIC ARCHITECTURE GAP
-   - CHARACTER-SPECIFIC COMPOSITION
-5. produce Architecture Impact Matrix 01–08;
-6. do not create new Tag/Primitive/Contract ID merely because Echo is complex;
-7. only propose generic patches after proving current architecture cannot represent a clarified mechanic cleanly.
-```
-
-Architecture stress areas to inspect:
-- root/child Action ancestry;
-- Actual HP Damage attribution;
-- no-recursion provenance;
-- latest qualifying Action-memory record;
-- actor-Natural-Action windows;
-- autonomous Action-form restriction/fallback;
-- Authority-gated Shield admission;
-- independent Shield pools and absorption priority;
-- Action-level aggregation;
-- DEATH_CONFIRMED attribution to Action outcome;
-- once-per-Natural-Action trigger cap;
-- battle-scoped activation counter;
-- child Skill Cost override;
-- linked-effect settlement before class AE regeneration.
-
-These are inspection targets, not permission to create new abstractions automatically.

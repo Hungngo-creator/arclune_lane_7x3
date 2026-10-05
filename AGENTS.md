@@ -1009,6 +1009,34 @@ ask the designer
 
 Never invent gameplay merely to make architecture easier.
 
+## Durable Character Canon ownership
+
+Keep three layers distinct:
+
+```text
+Clarified Gameplay Canon → WHAT the Character means
+00–08 → HOW generic architecture represents/executes it
+active task / PR / Git history → WHY a repository change was made
+```
+
+A Character `Clarified_Gameplay_Canon.md` is durable gameplay authority. Keep raw-kit/source provenance, later designer corrections and precedence, known identity/metadata, fully locked gameplay, meaningful Character-specific negative space, explicit unresolved gameplay and compact normalization status. Preserve all relevant Action, target, snapshot, timing, Cost, failure, lifetime and cleanup behavior; the Canon must remain sufficient to reconstruct gameplay.
+
+Do not put transient process or patch justification into durable Character Canon:
+
+- working-branch status, pending/proposed merge language or PR delivery instructions;
+- current/base/head/temporary merge-base SHAs or architecture revision labels such as E.x/F.x/G.x/I.x as gameplay authority;
+- six-pass logs, full architecture-gap proof, patch-generation history or superseded architecture proposals;
+- before/after-merge procedure, PR/head/current-main verification or future merge-verification requirements;
+- large implementation mapping tables whose purpose is to justify an architecture patch.
+
+Nothing in permanent Canon should automatically become false when its PR merges. Record branch-only claims in the task/PR report. A finished merged Canon must not still call its architecture delta proposed, pending, working-branch only or awaiting merge verification.
+
+Use stable semantic vocabulary such as `ACTION_COMPLETED`, `POSITION / LOCK_POSITIONS` and `DEATH_CONFIRMED`. Architecture's use of a semantic term does not prohibit it in gameplay Canon; gameplay meaning must not depend on volatile section numbers or architecture revision labels. When process and gameplay are interwoven, separate them without dropping gameplay or designer precedence.
+
+Future Canons should normally converge toward identity/provenance/precedence → locked gameplay → Character-specific negative space where needed → unresolved/not-blocking gameplay if any → compact normalization status. This is an ownership guide, not a rigid heading template or a reason to rewrite clean Canons for style.
+
+A compact `Status: GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED` and, when useful, a short generic architecture-delta summary are sufficient bookkeeping; omit transient repository state. Detailed composition/gap proof and audit evidence remain required by sections 6/9/33, but belong in the active task/PR history. Preserve durable generic architecture law in its owning 00–08 layer. Git/PR history records rationale and provenance; it does not override current canon or the source-precedence rules.
+
 ## Character selection when the user does not name one
 
 If asked to continue normalization without a specified Character, Codex may choose the next raw kit.
@@ -1218,6 +1246,8 @@ This is a default, not a requirement that every Pilot changes every file.
 `02` and `03` have especially high burden of proof.
 
 Past `NO CHANGE` and `PATCH REQUIRED` conclusions are hypotheses until checked against current canon.
+
+`00_CANONICAL_INDEX.md` owns navigation and architecture bookkeeping, not a second Character Canon or a PR diary. Prefer Character → Canon path → clarification/normalization status → short generic architecture delta, if any. Do not duplicate full mechanics, audit reasoning, branch state or delivery procedure. Preserve semantically useful generic architecture history, actual deltas, unresolved architecture and current file/version navigation; target clearly transient/stale process text rather than rewriting 00 wholesale.
 
 ---
 
@@ -1509,6 +1539,8 @@ PROBE_UNRESOLVED
 
 Do not convert an unresolved global question into a passing default.
 
+Character normalization alone does not justify new Character-specific cases in 08. Add/extend coverage only for a genuinely new generic semantic boundary, dangerous interaction class or regression not already covered; otherwise reference/reuse existing generic cases. Retain existing merged cases, including Character examples, when they prove a distinct generic invariant. Establish and report actual redundancy before removing a case; do not renumber stable IDs for tidiness.
+
 ---
 
 # 35. REPOSITORY HYGIENE
@@ -1534,6 +1566,8 @@ If canonical filenames are normalized:
 - treat canonical ID renames as migrations, not cosmetic cleanup.
 
 Do not infer currentness from filename suffix alone.
+
+Detailed six-pass reports, exact base/head SHAs, PR verification, diff statistics, proposal-versus-current comparisons and full gap proof belong in active task/PR/Git history unless they define durable generic architecture. Do not create a permanent audit artifact without an independently justified noncanonical purpose; history is already recoverable there.
 
 ---
 
