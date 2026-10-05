@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-04-F.13
+**Version:** 2026-10-05-F.14
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -24,6 +24,8 @@
 **Revision F.12:** refines ACT-034's captured-value lifetime through authored normal State termination and DMG-035's pre-Damage eligibility/mandatory atomic terminal credit. No new Contract ID, Tag, Primitive or ordering between unrelated settlements.
 
 **Revision F.13:** refines only TGT-008 with per-attack-owner Slot defaults, exact authored Entity/Both exceptions, non-propagation and Entity-tracking presentation. No new Contract ID, Tag or Primitive; previously approved exact-owner locks remain intact.
+
+**Revision F.14:** extends existing REC-001 with a bounded live positive waiting-threshold contribution and coherent presence/death/all-entry checkpoint; REC-004/020 retain cohort and before-ordinary-Revive law. No new Contract ID, Tag, Primitive, generic Reaction priority or default Shield/Revive policy.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -4426,6 +4428,29 @@ A reaches Reincarnation transition threshold
 
 Deaths from both Sides can count.
 
+### Opt-in live threshold contributions
+
+04§30.1 declares an immutable positive-integer ADD contribution owned by one normalized static rule and its exact active Entity × Combat Instance Field Presence lifetime in the existing World Luân Hồi ledger. The ordinary live policy is:
+
+```text
+effectiveThreshold = baseWaitingThreshold + sum(active admitted contributions)
+baseWaitingThreshold = 4 for the ordinary policy
+eligible(record) = record.state is WAITING
+                   and record.laterDeathCount >= effectiveThreshold
+```
+
+Different declared source rules/lifetimes contribute independently; rebuilding the same registration does not add it twice. Field leave removes availability, not accumulated death progress. Apply a changed threshold immediately to every current waiting record without resetting laterDeathCount, re-counting historical deaths or creating synthetic deaths. Increased threshold cannot reopen a closed/Revived/Reincarnated record.
+
+One owning committed transaction/checkpoint supplies the coherent final active-contribution view and waiting progress. Apply all its additions/removals/instance transfers before one all-entry threshold decision. Two removals causing8→4 do not publish irreversible8→6 decisions first; a coherent transfer with unchanged final contribution sum causes no transient shrink. A separate sequential transaction is a genuinely later checkpoint, not coalesced by convenience.
+
+If the same checkpoint also commits a qualifying Death Cohort, preserve REC-004's pre-cohort membership: advance old waiting entries once by the qualifying cohort size, evaluate them against the coherent resulting contribution threshold, and create new cohort entries at0. Coherent presence changes caused by confirmed source deaths are part of this world-law read view. New cohort members never advance one another or become old waiting entries merely due to service/list order. Mandatory presence/lifecycle and threshold bookkeeping closes before ordinary queued Revive/Reactions or later Action work sees eligibility; after a non-death leave, a pending Revive cannot bypass the required threshold update.
+
+This is a threshold predicate over all waiting entries, not an oldest2/4 quota. Every same-progress entry satisfying it transitions, including all tied qualifying cohort members. No RNG/Entity/Slot/list/Event order may split equal threshold outcomes. Each transition retains existing REC-005 routing separation and normal waiting-record closure.
+
+Protect the presence/registration revision, ledger/progress read set, threshold decision and transition identity through the existing transaction/required world checkpoint. Do not expose final presence with stale revive-eligibility or a partial waiting-pool decision to ordinary observers. Resume/redelivery reuses terminal checkpoint/record identities, never re-removes a contribution or advances a cohort twice. Retire a contribution's index at the owning presence end and terminal work at the existing replay horizon; retain immutable origin/checkpoint evidence.
+
+With no active contributions, the ordinary effective threshold remains4. Ordinary waiting entries from Characters without their own modifier still use the current World-ledger contributions. This profile does not silently override a separate explicit waiting-window/Authority/retention rule: compose only under its actual compatible law, otherwise reject executable ambiguity. No new Authority tier, Primitive, runtime subsystem, callback or global Reaction priority is inferred.
+
 ---
 
 ## REC-002 — What Counts as a Qualifying Death
@@ -6522,6 +6547,8 @@ Normalizer must block or warn when:
 47. Revive-dependent MaxHP reset commits independently, runs after the HP formula, changes explicit Snapshot input or survives failed materialization.
 
 48. a non-Natural postActionSettlement lacks the explicit source profile, observes an uncompleted/foreign-instance Action, guesses a parent Natural key or waits for the handoff it holds.
+
+49. For an opted-in live waiting rule, validate REC-001/04§30.1's exact source/instance/presence lifetime and ledger scope, immutable positive-integer ADD, coherent all-entry threshold decision and cohort/Revive boundary. Reject quota, progress-offset, queued per-leave, duplicate-registration or incompatible-policy approximations.
 
 # 60. WHAT IS ACTUALLY LOCKED ENOUGH NOW
 

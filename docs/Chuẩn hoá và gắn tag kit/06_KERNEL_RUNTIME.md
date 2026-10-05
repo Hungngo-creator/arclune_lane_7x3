@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-04-G.12
+**Version:** 2026-10-05-G.13
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -25,6 +25,8 @@
 **Revision G.11:** completes projection-credit continuation dependencies and retained State-value consumers during an opportunity-start graph's normal removal, through existing batch/Result/State/Transaction/Snapshot/continuation owners. No new store, service, Contract ID or global priority.
 
 **Revision G.12:** consumes separately resolved TGT-008 bindings per attack owner through existing Target/Lock/Effect/child plans; rejects inherited or unresolved exceptions and preserves Entity tracking/current-Position presentation. No new store, service, Tag or Primitive.
+
+**Revision G.13:** executes opt-in live waiting-threshold rules through existing static registration, Field Presence, Reincarnation ledger and Transaction/Lifecycle owners. Derive one protected final contribution sum and all-entry decision at the world-law checkpoint; no new manager/store/Primitive/Contract ID or Character branch. Existing Shield/Slot/Revive owners remain unchanged.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -205,6 +207,7 @@ snapshotPlan
 effectGraph
 effectModifierPlan
 damageTransformPlan
+waitingThresholdContributionPlan
 authorityPlan
 attributionPlan
 capabilityIndex
@@ -218,6 +221,8 @@ validationHash
 `effectModifierPlan` is generated from bounded `ScopedEffectAmountModifierSpec`.
 
 `damageTransformPlan` is generated from bounded `ScopedDamageComponentTransformSpec` and is distinct from numeric amount modification. `targetPlan` preserves the declared metric tie policy independently from target lock/invalidation. Typed `DEPLOYMENT_COST_MODIFICATION` and `RETURN_TO_DECK` nodes use the existing Effect/deployment execution plan and Contract Resolver, not new Primitive IDs.
+
+`waitingThresholdContributionPlan` lowers only 04§30.1's bounded static world-waiting rule into the existing Effect/System registration plan, using REC-001/004/020 and the existing Field Presence/ledger owners. It is not a per-record advance/force request, ordinary Reaction, arbitrary State parameter script or new Primitive. No such plan is generated for unprofiled content.
 
 `costPlan` may contain:
 - ordinary singular/fixed Cost execution;
@@ -4092,6 +4097,18 @@ waitingRecords:
 Current standard threshold:
 `4`.
 
+### Live waiting-threshold view under REC-001
+
+Existing static registration/Contract Resolver binds waitingThresholdContributionPlan to the owning normalized Ability/Effect rule, runtime source Entity, exact Combat Instance/presence lifetime and its existing World Reincarnation-ledger scope. The positive integer amount is immutable rule data. Source presence availability is read through POS-005; no second authoritative presence flag or progress store is introduced. Multiple registrations for the same origin/owner/presence lifetime reuse one identity.
+
+The Reincarnation ledger remains authoritative for waiting progress/state and resulting threshold decisions. Derive ordinary base4 plus currently active admitted ADD contributions from one protected final presence/rule/ledger version. A cached sum/index carries its version and rebuilds without mutation. Do not permanently snapshot the contribution sum when a record first enters waiting or emulate a shrink by changing laterDeathCount.
+
+Creation: register the normalized source rule at its owning lifetime; it contributes when its declared presence is active. Mutation: authoritative availability/Field Presence commit invalidates the read view and requires one coherent all-entry checkpoint. Terminal: presence ends/rule lifetime retires; the amount stops contributing. Cleanup: remove only the retired index, retain terminal checkpoint/record evidence for the supported replay horizon. Serialization stores original owner/origin/lifetime, transaction/checkpoint, protected revisions and existing waiting/lifecycle outcomes; recovery reconstructs availability and never adds a second contribution.
+
+For one owning transaction/checkpoint, stage all availability changes and any cohort progress, derive the final threshold once, and seal all still-waiting predicate/transition outcomes before releasing ordinary observers/continuation. A supported atomic instance transfer applies the final old/new presence availability together, not an irreversible transient departure shrink. If source deaths share a cohort, snapshot pre-cohort waiting membership, advance it once, evaluate with final availability, then create new members at0 under REC-004. Do not count new cohort records against one another.
+
+Reuse existing Transaction Manager, presence/lifecycle writers, static-rule index, privileged world-ledger checkpoint and existing Reincarnation transition operations. No leave-Event callback can release Revive against stale eligibility; no renderer/list order or Character-ID scan computes the sum. Failed/stale protected inputs expose no half-decision and must revalidate the same checkpoint through existing transaction law; they never create a later gameplay retry token. Default unprofiled base4, special explicitly governed waiting/routing profiles and identity/Revive rules remain intact.
+
 ---
 
 # 89. QUALIFYING LUÂN HỒI DEATH
@@ -4122,7 +4139,7 @@ On Death Cohort commit:
 6. then release ordinary reaction queue
 ```
 
-This is mandatory world-law bookkeeping, not an ordinary delayed Reaction.
+This is mandatory world-law bookkeeping, not an ordinary delayed Reaction. An opted-in live waiting policy also runs the coherent REC-001 checkpoint on committed contribution/presence availability changes without a death. When that checkpoint also contains a cohort, use its final contribution threshold in steps4/5 while preserving pre-cohort membership and zero new progress. Do not release ordinary observers between source availability, progress, threshold and lifecycle decisions.
 
 ---
 

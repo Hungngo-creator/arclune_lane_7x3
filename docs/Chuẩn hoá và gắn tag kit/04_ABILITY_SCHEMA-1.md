@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-04-E.11
+**Version:** 2026-10-05-E.12
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -22,6 +22,8 @@
 **Revision E.10:** completes existing projection-credit and opportunity-start lifetime bindings: credit-bearing queries close before batch continuation, and an authored State-termination graph retains captured values through its own terminal Heal. Existing tags/facets, snapshots, State transactions and finite dependency plans suffice; no new field family, Contract ID, Tag or Primitive.
 
 **Revision E.11:** resolves attack binding separately for every attack-producing semantic owner under TGT-008. POSITION/LOCK_POSITIONS is the default across all Characters; Entity/Both exceptions require exact authored scope and never propagate implicitly. Existing TargetSpec/targetRef/request targetPolicy and normalized plans suffice; no new field family, Tag or Primitive.
+
+**Revision E.12:** adds only an opt-in live waiting-threshold contribution in the existing Reincarnation family: exact static-rule/presence ownership, positive integer ADD, all-waiting re-evaluation and one coherent world-ledger checkpoint under REC-001. Existing Shield clock/result/Slot/Revive composition suffices; no new Tag, Primitive, Contract ID or callback.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -4161,8 +4163,38 @@ Possible operation family:
 - MATERIALIZE_NEW_LIFE
 - BLOCK_ROUTE
 - SET_EXHAUSTED
+- WAITING_THRESHOLD_CONTRIBUTION — bounded static profile in §30.1, not a per-record lifecycle request
 
-Exact execution compiles into multiple lifecycle Primitives.
+Per-record execution compiles into multiple lifecycle Primitives. The bounded static profile in §30.1 lowers through existing rule registration.
+
+## 30.1 Opt-in live waiting-threshold contribution
+
+The existing REINCARNATION Effect family may declare a bounded static rule instead of a per-record advance/force operation:
+
+```yaml
+reincarnation:
+  operation: WAITING_THRESHOLD_CONTRIBUTION
+  waitingWindow:
+    thresholdContribution:
+      sourceOwnerRef: <ENTITY_REF>
+      presenceCombatInstanceRef: <COMBAT_INSTANCE_REF>
+      scope: WORLD_LEDGER
+      amount: <positive integer constant>
+      composition: ADD
+      availability: ACTIVE_FIELD_PRESENCE
+      reevaluation: LIVE_ALL_WAITING_AT_COMMIT
+```
+
+This is an explicitly new typed profile/value, not a new Functional Tag/Primitive or an arbitrary waiting-state mutation. Bind scope to the existing World Luân Hồi ledger associated with the declared Combat Instance. Bind sourceOwnerRef and its authoritative instance-local Field Presence under POS-005, including that presence lifetime; do not use renderer visibility or a Character-wide boolean. Stable origin Ability/Effect definition refs plus runtime owner, ledger and presence lifetime identify one contribution. Registration/index reconstruction reuses that identity under TRG-014.
+
+Normalize only PASSIVE_STATIC ownership with finite positive integer CONSTANT amount, ADD, this fixed world-ledger scope/availability/re-evaluation law, compatible enabled Mode and resolvable Entity/Combat-Instance ownership. Reject negative/noninteger/nonfinite/zero amount, arbitrary formula/callback, missing origin/presence/ledger scope, coexistence with a per-record operation in the same rule, quota/top-N/tie selection, progress mutation or guessed interaction with an incompatible explicit waiting policy. Different supported contributions add; no list winner or duplicated identical registration.
+
+At each owning committed presence-availability change, existing Transaction/Lifecycle/Field Presence and Reincarnation-ledger owners apply REC-001 to the whole coherent checkpoint. Preserve laterDeathCount; re-evaluate all still-waiting records against the final threshold before ordinary observers. A same-checkpoint transfer/removal/addition resolves final active contributions once; no intermediate threshold decision may become irreversible. This rule creates no Action, SSI opportunity, qualifying death, RNG draw, pending retry or route/materialization by itself.
+
+Lower to a bounded waitingThresholdContributionPlan in the existing static registration/Effect/System plan and retain the existing REC-001/004/020 refs. Availability is derived from authoritative presence; any cached sum/index is a versioned read model, not another writable threshold/progress owner. Existing per-record operations still use their current lifecycle Primitives. Ordinary waiting entries, including those without their own modifier, use the live World-ledger threshold; with no active contributions its effective value is base4. Existing explicitly exceptional policies require their actual governing composition, not silent conversion to live/fixed semantics.
+
+Migration: prior authoring without this profile requires no new plan or registration; ordinary entries still use active World-ledger contributions when another source owns the profile. With no active contribution, prior ordinary threshold behavior remains4. A normalized use must carry this exact typed rule/ownership and current schema version; old quota/per-leave Reaction approximations are not accepted aliases. Revive restoration, Shield clocks and attack-owner Slot defaults are unrelated existing composition.
+
 
 ---
 
@@ -5332,6 +5364,7 @@ normalizedAbility:
   effectModifierPlan:
   damageTransformPlan:
   damageMitigationPlan:
+  waitingThresholdContributionPlan:
   authorityPlan:
   attributionPlan:
   capabilityIndex:
@@ -5351,6 +5384,8 @@ It is not part of another Ability's `actionSpec` merely because that other Abili
 `damageTransformPlan` is generated from constrained `damageComponentTransforms`.
 
 `damageMitigationPlan` is generated from bounded `damageMitigationOverrides` (§18C/DMG-009); it selects mitigation inputs without transforming component type. Resolution groups preserve RES-008 allocation policy and packet/result membership. Snapshot plans preserve SNP-006 pre-Cost timing. All route through existing owners.
+
+Optional `waitingThresholdContributionPlan` is generated only from §30.1, preserving the exact static origin/owner, ledger and presence lifetime, immutable ADD amount and required coherent live checkpoint under REC-001/004/020. It remains part of existing Effect/System registration; unprofiled content generates no contribution plan or extra registration.
 
 The two plans are distinct:
 
@@ -5483,6 +5518,7 @@ Normalizer/compiler must:
 45. Validate RES-008 simultaneous group/recipient/packet/component/result membership, eligible Shield and HP budget conservation and explicit numeric allocation; reject hidden packet/list ordering or ambiguous shared-recipient allocation.
 46. Validate DMG-009 scopes, resulting non-TRUE component type, ARM/RES selection, Penetration compatibility, owner/lifetime and conflict law; reject target-stat mutation, type relabeling, duplicate mitigation or inferred override priority.
 47. Validate SNP-006 successfully admitted Action/source/fields/pre-Cost capture and result lifetime; reject probe/fallback capture, early gameplay mutation or snapshot consumers after failed Cost.
+48. Validate WAITING_THRESHOLD_CONTRIBUTION only through §30.1/REC-001: exact static rule and presence/ledger binding, positive-integer ADD, all-waiting/live checkpoint and incompatible-policy rejection; never lower it to progress subtraction, top-N forcing or queued per-leave Actions.
 
 ---
 
@@ -6469,6 +6505,8 @@ Additional E.9 invariants: explicit movement-sensitive Position/Entity binding; 
 Additional E.10 invariants: projection membership is sealed while the exact State is active before Damage, never rebuilt from a later health activation; authored credit dependencies close after complete batch/lifecycle and before continuation, including exclusion-only and zero-result terminals; credit delta and dedup identity commit together. A State-termination graph must capture values it needs after removal, preserve its own registered terminal work and reject live retired-State reads or stale-owner continuation. Tag validation continues to use the exact 02 registry: area geometry and damage-derived Heal are facets/composition, not undeclared AREA or deferred LIFESTEAL Functional Tags.
 
 Additional E.11 invariants: every executable attack owner has an explicit resolved binding; unresolved authoring binding defaults to POSITION/LOCK_POSITIONS. Entity/Both requires an exact-owner authored exception or explicit owner-scoped profile reference. Reject broad exception propagation, foreign-owner binding substitution, unresolved IR and implicit parent/Character/Ability/sibling inheritance. Explicit Entity tracking preserves identity through legal movement and uses current Position for presentation; Slot binding retains coordinates and its declared occupant-read checkpoint. Keep approved exact-owner Entity/Both and non-attack profiles intact.
+
+Additional E.12 invariants: WAITING_THRESHOLD_CONTRIBUTION is a bounded static positive-integer ADD rule with exact origin/owner/ledger/presence lifetime. Its optional normalized plan preserves REC-001's protected final availability/progress view and all-waiting threshold decisions; reject quota, progress mutation, duplicate registration, per-leave ordinary Reaction lowering or an incompatible explicit policy without a composition law.
 
 # 93. SCHEMA NON-GOALS
 
