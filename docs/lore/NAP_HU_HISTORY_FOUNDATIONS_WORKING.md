@@ -8,23 +8,33 @@
 
 # I. TRÌNH TỰ TỔNG QUÁT VÀ CÁC MỐC ĐỐI THOẠI
 
-Số 01–24 giữ nguyên trục đã dùng trong đối thoại với tác giả; 06a, 19a–19b và 20a–20b là các mốc được bổ sung. Chúng không phải tên Đại Kỷ hoặc niên đại tuyệt đối. Khoảng cách trên hình chỉ biểu diễn thứ tự; **?** là khoảng chưa chốt. Mốc 20 cũ được tách thành sơ hiện / chiến thắng đầu tiên; mốc 19 cũ được tách thành rút quân / siết Giới Bích.
+Số 01–24 giữ nguyên trục đã dùng trong đối thoại với tác giả; 01a, 06a, 19a–19b và 20a–20d là các mốc được bổ sung. Chúng không phải tên Đại Kỷ hoặc niên đại tuyệt đối. Khoảng cách trên hình chỉ biểu diễn thứ tự; **?** là khoảng chưa chốt. Mốc 20 cũ được tách thành sơ hiện / chiến thắng đầu tiên; mốc 19 cũ được tách thành rút quân / siết Giới Bích.
 
 
 ~~~text
-01 ● Nhân Tổ và Nguyên Sơ tồn tại trong Nạp Hư sơ khai
+01 ● Nạp Hư đã có 3 hoặc 4 Đại Vực; Nhân Tổ và Nguyên Sơ
+   │ trời sinh Thiên Địa Chính Tiên; cây cỏ Tiên Thiên chưa có linh trí
+   │ Hai người sống cùng nhau ít nhất 20.000.000 năm
    │
-02 ● Nguyên Sơ phân hóa Sinh–Tử rồi vỡ; để lại hai trứng
-   │ Bản nguyên vừa vào trứng vừa khuếch tán vào thế giới
+01a● Một Vực tách làm hai khi hai người chơi đùa; sau đó họ tránh náo động lớn
+   │ Một phần là Nhân Vực; phần kia có thể thành Mộng Châu — đang xây dựng
+   │ Thời điểm trong quãng sống chung chưa chốt
    │
-03 ● Long / Phượng nở; Nhân Tổ nuôi lớn; Luân Hồi sơ khai vận hành
+02 ● Pháp Tắc do Nguyên Sơ diễn hóa trong cơ thể đạt giới hạn; hắn đau rồi vỡ
+   │ Sinh Mệnh / Tử Vong Quy Tắc được ráp lại, Luân Hồi mới hình thành
+   │ Để lại hai trứng; bản nguyên còn khuếch tán vào thế giới
+   │ Sinh vật / động vật mới xuất hiện với tần suất tính bằng ngày
+   │
+03 ● Long / Phượng nở; Nhân Tổ nuôi lớn; Luân Hồi sơ khai đã vận hành
    │
 04 ● Long / Phượng rời đi; Nhân Tổ tạo mười hai hài tử
    │ Từ thời Nguyên Sơ tới thời hài tử: ít nhất 20.000 năm
    │
-05 ● Nhân Tổ nuôi dạy các con, để lại Nhân Tổ Kiếm rồi vào Luân Hồi
+05 ● Nhân Tổ nuôi dạy các con, truyền ký ức về Nguyên Sơ,
+   │ để lại Nhân Tổ Kiếm rồi vào Luân Hồi
    │
-06 ● Các hài tử tạo Nhân tộc và nhiều loài
+06 ● Các hài tử tạo Nhân tộc và nhiều loài; dùng đan dược tạo Chân Ngã
+   │ cho tạo vật, từ nguyên liệu Luân Hồi và quả Tiên Thiên tái tạo được
    │ Sau đó ngừng tạo loài; chưa chốt thời lượng giai đoạn tạo loài
    │
    │ Khoảng 50.000 năm phát triển sau khi ngừng tạo loài
@@ -34,6 +44,8 @@ Số 01–24 giữ nguyên trục đã dùng trong đối thoại với tác gi�
    │ 100.000 năm kể từ khi người đầu tiên rời đi
    │
 07 ● Hài tử cuối cùng vào Luân Hồi; Thiên Đạo bắt đầu thức tỉnh
+   │ Đến đây toàn bộ cây cỏ Tiên Thiên đã khai linh / thành Chân Tiên;
+   │ thời gian trưởng thành của họ tính bằng hàng trăm triệu năm
    │
    │ ? năm — chưa chốt khoảng từ 07 đến 08
    │
@@ -137,6 +149,9 @@ Số 01–24 giữ nguyên trục đã dùng trong đối thoại với tác gi�
 
 
 ## Khoảng bao trùm và giới hạn suy luận
+
+- **Ít nhất 20.000.000 năm:** quãng Nhân Tổ sống cùng Nguyên Sơ trước biến cố vỡ. Đây không phải thời gian nuôi Long / Phượng; không thay hoặc cộng trùng với khoảng tối thiểu 20.000 năm đã chốt cho quãng sau.
+- **Hàng trăm triệu năm:** quy mô thời gian để cây cỏ Tiên Thiên sống đủ lâu, khai linh và tự nhiên thành Chân Tiên. Đến lúc Thiên Đạo thức tỉnh, tất cả đã thành tiên. Chưa định vị phần lớn quãng này trước hay sau Nguyên Sơ vỡ, chưa chốt năm tuyệt đối hoặc thời điểm lập vương quốc riêng. Các khoảng hậu tạo loài 50.000 / 100.000 năm vẫn giữ, chưa tự kéo dài chúng.
 
 - **Khoảng 50.000 năm:** ngừng tạo loài → hài tử đầu tiên vào Luân Hồi. Tác giả đã xác nhận cách hiểu này; không tính từ lúc bắt đầu tạo loài.
 - **100.000 năm:** hài tử đầu tiên vào Luân Hồi → người cuối cùng rời đi / Thiên Đạo bắt đầu thức tỉnh. Như vậy từ ngừng tạo loài tới mốc 07 là **khoảng 150.000 năm**; không phải thời lượng 07 → 08.
@@ -445,9 +460,9 @@ Nhân Tổ không phải người xuất hiện sau khi Nhân tộc đã hình t
 
 Hắn là:
 
-> **một trong đúng hai Linh Sinh Nguyên Sơ được biết ở thuở đầu Nạp Hư.**
+> **một trong hai cá thể có linh trí đã biết ở thuở đầu Nạp Hư; cả Nhân Tổ và Nguyên Sơ đều trời sinh Thiên Địa Chính Tiên.**
 
-Linh Sinh còn lại là:
+Cá thể còn lại là:
 
 > **Nguyên Sơ**, bản thể tiền thân của Long Tổ + Phượng Tổ.
 
@@ -457,28 +472,25 @@ Nhân Tổ mang hình hài:
 
 > **một bé trai hoạt bát, sáng sủa.**
 
-Hắn không cần ăn uống.
+Hắn không cần ăn uống để duy trì tồn tại, nhưng vẫn cùng Nguyên Sơ rong chơi và ăn hoa quả.
 
-Nhân Tổ từng là Thiên Địa Chính Tiên, **không có khái niệm thọ nguyên hữu hạn**. Hắn có thể giữ hình hài và khí tính trẻ con dù đã trưởng thành. Đến khi chọn Luân Hồi, hắn hiểu lựa chọn của mình; vẻ ngoài bé trai không xác định mức trưởng thành ấy.
+Nhân Tổ **trời sinh Thiên Địa Chính Tiên**, không có khái niệm thọ nguyên hữu hạn. Nguyên Sơ cũng trời sinh ở tầng ấy, nắm Quy Tắc Diễn Hóa; hệ Quy Tắc cụ thể của Nhân Tổ chưa chốt. Hắn có thể giữ hình hài và khí tính trẻ con dù đã trưởng thành. Đến khi chọn Luân Hồi, hắn hiểu lựa chọn của mình; vẻ ngoài bé trai không xác định mức trưởng thành ấy.
 
-Thuở đó thiên địa gần như trống:
+Thuở đó Nạp Hư đã có **3 hoặc 4 Đại Vực**, nhưng chỉ có cực ít cây cỏ sinh từ khai thiên tích địa. Những cây cỏ ấy là **Tiên Thiên Sinh Linh**, có thể xem là anh em của Nhân Tổ / Nguyên Sơ, lúc đầu chưa có linh trí. Chưa có động vật hoặc xã hội hậu thế.
 
-- chỉ có những cây nhỏ;
-- một ít cỏ;
-- chưa có hệ sinh thái phong phú;
-- chưa có xã hội để hắn học đạo đức, cái chết hay gia đình theo nghĩa hậu thế.
+Trong ít nhất **20.000.000 năm** sống chung, hai người rong chơi khắp Nạp Hư và ăn hoa quả. Họ có thể đến bất cứ đâu trong nháy mắt, ít khi dùng sức mạnh. Một lần chơi đùa làm một Vực tách thành hai; từ đó họ tránh náo động lớn. Một phần là Nhân Vực; phần còn lại **có thể** là Mộng Châu hậu thế, chưa chốt. Các Vực về sau còn sinh từ phân vỡ các Vực sơ khai hoặc được tạo thêm.
 
 Nhân Tổ và Nguyên Sơ vì vậy không phải “hai vị đại năng gặp nhau”.
 
 Họ là:
 
-> **hai sinh linh đầu tiên cùng tồn tại trong một thế giới còn gần như chưa có ai khác để nói chuyện.**
+> **hai người bạn có linh trí trong một thế giới mà các anh em cây cỏ Tiên Thiên chưa khai linh.**
 
 ### Quan hệ với Nguyên Sơ
 
-Nguyên Sơ ít nói.
+Nguyên Sơ ít nói; Nhân Tổ hoạt bát hơn.
 
-Nhân Tổ hoạt bát hơn.
+**ĐÃ CHỐT:** Nguyên Sơ nắm **Quy Tắc Diễn Hóa**. Ngoại hình biến đổi liên tục vì cơ thể hắn luôn diễn hóa mọi hình thái sinh linh sẽ xuất hiện ở Nạp Hư, đồng thời diễn hóa vô số Pháp Tắc mạnh yếu. Khi số Pháp Tắc trong cơ thể đạt giới hạn, hắn cảm thấy đau. Số lượng không cần làm rõ: có thể tính bằng chục vạn, ít hơn hoặc nhiều hơn. Không dùng quá trình này để xếp Diễn Hóa cao hơn các Quy Tắc khác; mọi Quy Tắc đều có vô số khả năng.
 
 Một ngày, Nguyên Sơ lần đầu nói với hắn:
 
@@ -507,9 +519,7 @@ Hắn ở lại chăm hai quả trứng cho tới khi chúng nở.
 
 ### Khi sinh mệnh khác xuất hiện
 
-Sau biến cố Nguyên Sơ:
-
-> Nạp Hư bắt đầu xuất hiện ngày càng nhiều sinh vật.
+Sau biến cố Nguyên Sơ, **Sinh Mệnh Quy Tắc hình thành**, cây cối và sinh vật xuất hiện nhiều hơn. Sinh vật / động vật mới xuất hiện với **tần suất tính bằng ngày**, theo các hình thái Nguyên Sơ đã diễn hóa; không đặt một chặng bắt buộc từ đơn bào tới đa bào kéo dài trước mọi loài mới.
 
 Nhân Tổ quan sát chúng:
 
@@ -603,7 +613,7 @@ Lúc này:
 
 > **Luân Hồi đã tồn tại và vận hành, nhưng chưa hoàn thiện.**
 
-Nó có nguồn gốc liên hệ trực tiếp tới hai luồng Sinh–Tử tách khỏi Nguyên Sơ. Cái chết Long / Phượng về sau làm Luân Hồi hoàn thiện hơn. Cơ chế và các bước hoàn thiện cụ thể còn mở.
+Nó hình thành đúng lúc Nguyên Sơ vỡ, khi Sinh Mệnh / Tử Vong Quy Tắc được ráp lại; trước đó chưa có Luân Hồi. Cái chết Long / Phượng về sau làm Luân Hồi hoàn thiện hơn. Cơ chế và các bước hoàn thiện cụ thể còn mở.
 
 ---
 
@@ -629,7 +639,7 @@ Không thuyết nào được xác nhận.
 
 Long Tổ / Phượng Tổ chỉ xuất hiện:
 
-> sau khi Linh Sinh Nguyên Sơ bị tách bởi xung đột Sinh–Tử.
+> sau khi Pháp Tắc Nguyên Sơ diễn hóa đạt giới hạn, hắn đau rồi vỡ và để lại hai trứng.
 
 Cả hai tồn tại từ trước khi hệ thống tu luyện được chuẩn hóa.
 
@@ -1072,44 +1082,15 @@ Từ những thử nghiệm ấy:
 
 ---
 
-# XXIII. TRƯỚC NGUYÊN SƠ VỠ — “CHẾT” CHƯA TỒN TẠI
+# XXIII. TRƯỚC VÀ SAU NGUYÊN SƠ VỠ — SINH GIỚI VÀ LUÂN HỒI
 
-Trước khi Nguyên Sơ vỡ:
+**ĐÃ CHỐT:** trước khi Nguyên Sơ vỡ, khái niệm Sinh–Tử hoàn chỉnh và Luân Hồi chưa tồn tại. Ngoài Nhân Tổ / Nguyên Sơ chỉ có cực ít thực vật Tiên Thiên sinh từ khai thiên tích địa, lúc đầu chưa có linh trí.
 
-> **khái niệm Sinh–Tử theo nghĩa hoàn chỉnh chưa tồn tại.**
+Nguyên Sơ đã diễn hóa mọi hình thái sinh linh tương lai và vô số Pháp Tắc ngay trong cơ thể. Khi Pháp Tắc đạt giới hạn, hắn đau rồi vỡ. **Sinh Mệnh / Tử Vong Quy Tắc được ráp lại, hình thành Luân Hồi**. Sinh Mệnh Quy Tắc hình thành khiến cây cối và sinh vật xuất hiện nhiều hơn; sinh vật / động vật mới xuất hiện với tần suất **tính bằng ngày**.
 
-Thế giới khi ấy gần như chỉ có:
+Điều này thay mô hình cũ bắt buộc sinh giới sau biến cố phải đi từ đơn bào tới đa bào qua một chặng tiến hóa rất dài. Chưa chọn cơ chế sinh ra từng loài, số cá thể hoặc thứ tự xuất hiện. Quá trình cây cỏ **Tiên Thiên** khai linh thành Chân Tiên tính bằng hàng trăm triệu năm là một trục riêng, không được áp sang tần suất xuất hiện sinh vật mới sau biến cố.
 
-- cây nhỏ;
-- một ít cỏ;
-- các dạng sống cực sơ khai.
-
-Chúng có thể:
-
-- phát triển;
-- dừng phát triển;
-- hư hao theo nghĩa vật chất;
-
-nhưng chưa có chu trình:
-
-> Sinh → Già → Chết → Luân Hồi.
-
-Sau khi Nguyên Sơ phân tách:
-
-- Sinh Mệnh bắt đầu trở thành cấu trúc riêng;
-- Tử Vong xuất hiện;
-- Luân Hồi dần thành hình;
-- sinh giới bắt đầu diễn hóa thật sự.
-
-Quá trình từ:
-
-> đơn bào → đa bào → sinh vật phức tạp
-
-vẫn mất thời gian rất dài.
-
-Linh Khí tăng tốc tiến hóa nhưng:
-
-> **không biến hàng tỷ bước diễn hóa thành vài ngày.**
+Mọi sinh linh / hình thái sinh vật hậu thế đã biết và chưa biết của Nạp Hư, gồm mười hai hài tử và các chủng tộc do họ tạo, thuộc Diễn Hóa của Nguyên Sơ. **Nhân Tổ, Thiên Đạo và cây cỏ Tiên Thiên cùng thời khai thiên tích địa nằm ngoài Diễn Hóa ấy.** Diễn Hóa bao quát hình thái không xóa các sự kiện tạo sinh linh trực tiếp của Nhân Tổ / các hài tử.
 
 ---
 
@@ -1119,15 +1100,9 @@ Khi Nguyên Sơ vỡ:
 
 > hai luồng Sinh–Tử không đơn giản “mỗi luồng chui trọn vào một quả trứng”.
 
-Mô hình đang xây dựng:
+**ĐÃ CHỐT:** bản nguyên vừa đi vào hai trứng vừa khuếch tán vào Nạp Hư. Khi Nguyên Sơ vỡ, **Sinh Mệnh / Tử Vong Quy Tắc được ráp lại và Luân Hồi mới hình thành**. Sinh giới xuất hiện nhiều hơn theo các hình thái đã được hắn diễn hóa.
 
-1. phần cốt lõi đi vào hai quả trứng;
-2. phần còn lại rò / khuếch tán vào Nạp Hư;
-3. chính phần khuếch tán tham gia định hình:
-   - Sinh Mệnh;
-   - Tử Vong;
-   - Luân Hồi;
-   - quá trình diễn hóa sinh giới.
+**CÒN MỞ:** cách ráp Quy Tắc, tỷ lệ bản nguyên giữa trứng / thế giới / Luân Hồi và số phận các Pháp Tắc khác trong cơ thể Nguyên Sơ. Không suy rằng Long / Phượng độc chiếm toàn bộ Sinh–Tử.
 
 Điều này mở một khả năng quan trọng:
 
@@ -1207,39 +1182,15 @@ Có thể nói:
 
 ---
 
-# XXVII. QUY TẮC DIỄN HÓA CỦA NHÂN TỔ
+# XXVII. QUY TẮC DIỄN HÓA THUỘC NGUYÊN SƠ
 
-Nhân Tổ từng sở hữu:
+**ĐÃ CHỐT mới, thay chủ sở hữu cũ:** **Nguyên Sơ nắm Quy Tắc Diễn Hóa**, không tiếp tục mặc định Quy Tắc ấy thuộc Nhân Tổ. Cơ thể / ngoại hình hắn diễn hóa mọi sinh linh tương lai của Nạp Hư, đồng thời sinh vô số Pháp Tắc mạnh yếu. Đau là lúc Pháp Tắc trong cơ thể đạt giới hạn; không cần chốt số lượng.
 
-> **Quy Tắc Diễn Hóa** hoặc một hệ Quy Tắc có Diễn Hóa là trục lớn.
+Diễn Hóa không được xếp cao hơn các Quy Tắc tạo từ những Pháp Tắc ấy. Mọi Quy Tắc đều có vô số khả năng; quan hệ sinh ra trong lịch sử không tự tạo một thứ bậc sức mạnh.
 
-Diễn Hóa là cơ sở để hắn thật sự chia quyền năng thành mười hai người con. Biến cố Nguyên Sơ là một gợi mở về phân tách trong lịch sử hắn đã trải qua.
+Mười hai hài tử vẫn do **Nhân Tổ trực tiếp chia quyền năng tạo ra**, mỗi người mang Pháp Tắc / thiên tính riêng. Họ và mọi chủng tộc do họ tạo đều thuộc các hình thái Nguyên Sơ diễn hóa. Không đồng nhất phạm vi Diễn Hóa với việc Nguyên Sơ trực tiếp chế tạo từng cá thể.
 
-Nhân Tổ đã trưởng thành và có thể giữ khí tính trẻ con trong đời sống vĩnh hằng. Động cơ rời đi là sự nhàm chán vĩnh sinh và lựa chọn một con đường mới, chưa rõ, qua Luân Hồi.
-
-Mười hai người con đều nhận:
-
-> **một phần Pháp Tắc Diễn Hóa.**
-
-Vì vậy 12 Đại Tuyệt Thể có một đặc tính chung:
-
-> **có khả năng trưởng thành / tiến hóa theo chủ thể.**
-
-Chúng không phải thể chất cố định từ lúc sinh.
-
-Càng lớn mạnh:
-
-- năng lực càng mở;
-- thiên tính càng mạnh;
-- biểu hiện Pháp Tắc càng sâu.
-
-Khi Nhân Tổ vào Luân Hồi:
-
-> phần lớn Quy Tắc Diễn Hóa vốn tập trung ở hắn được giải phóng / tái phân phối vào Nạp Hư.
-
-Hệ quả:
-
-> thế giới có nhiều “khả năng” hơn, tốc độ và độ đa dạng diễn hóa sinh linh tăng rõ rệt.
+**ĐÃ CHỐT được giữ:** các Đại Tuyệt Thể có thể trưởng thành / tiến hóa, thiên tính mạnh dần. **CÒN MỞ:** hệ Quy Tắc cụ thể của Nhân Tổ và cơ chế trưởng thành của các Thể sau điều chỉnh này. Bỏ giải thích cũ rằng cả mười hai nhận mảnh Diễn Hóa từ Nhân Tổ hoặc hắn giải phóng Quy Tắc Diễn Hóa khi vào Luân Hồi.
 
 ---
 
@@ -1649,21 +1600,23 @@ Ví dụ dễ hình dung:
 
 ---
 
-# XL. KÝ ỨC “NGUYÊN SƠ NÓI TA ĐAU” CHỈ CÓ THỂ ĐẾN TỪ NHÂN TỔ
+# XL. KÝ ỨC “NGUYÊN SƠ NÓI TA ĐAU” VÀ ĐƯỜNG TRUYỀN TỪ NHÂN TỔ
 
 Thuở đó:
 
-> không có nhân chứng thứ ba.
+> Nhân Tổ là nhân chứng có linh trí trực tiếp duy nhất đã được xác nhận; không tự cấp ký ức quan sát thuở ấy cho cây cỏ Tiên Thiên lúc chưa khai linh.
 
 Vì vậy câu:
 
 > **“Ta cảm thấy đau.”**
 
-nếu tồn tại trong hậu thế, nguồn cuối cùng chỉ có thể là:
+nếu tồn tại trong hậu thế, đường truyền đã được xác định bắt nguồn từ:
 
-> ký ức của Nhân Tổ, nhân chứng trực tiếp duy nhất.
+> ký ức của Nhân Tổ, nhân chứng trực tiếp đã xác nhận.
 
-Chưa chốt hắn từng kể chuyện Nguyên Sơ cho mười hai người con hay chưa. Vì vậy đường truyền cụ thể của câu này tới hậu thế còn mở: qua một đời Nhân Tổ thức tỉnh, hoặc qua lời kể gia đình nếu tác giả chốt rằng hắn đã kể.
+Thời điểm cây cỏ Tiên Thiên khai linh so với biến cố Nguyên Sơ vỡ chưa định vị, nên chưa kết luận họ có thể là nhân chứng khác hay không. Không tự gán cho họ lời kể hoặc ký ức thuở chưa khai linh.
+
+**ĐÃ CHỐT:** Nhân Tổ truyền ký ức về Nguyên Sơ cho các con. Hắn không muốn người bạn đã sống chung với mình **ít nhất 20.000.000 năm** biến mất khỏi lịch sử; lúc truyền ký ức hắn đã muốn vào Luân Hồi. Đường Nhân Tổ → các con đã xác định; việc các con truyền tiếp từng chi tiết / nguyên văn câu nói tới hậu thế còn mở.
 
 Hệ quả:
 
@@ -1764,9 +1717,9 @@ Vì có thanh kiếm, Nhân Hoàng Cung không sợ hai Ma Tôn bản địa the
 
 **ĐÃ CHỐT:** mười hai người con kể cho Nhân tộc / hậu duệ của mình về **Nhân Tổ**, như con kể về phụ huynh. Họ cũng kể về **Long Tổ và Phượng Tổ**.
 
-**CÒN MỞ:** Nhân Tổ có kể cho mười hai người con về Nguyên Sơ hay không; các con có truyền chuyện Nguyên Sơ cho hậu thế hay không.
+**ĐÃ CHỐT:** Nhân Tổ truyền ký ức Nguyên Sơ cho mười hai người con vì không muốn người bạn chung sống ít nhất 20.000.000 năm bị quên; khi ấy hắn đã muốn Luân Hồi. **CÒN MỞ:** cách truyền ký ức, nội dung cụ thể và đường các con truyền tiếp cho hậu thế.
 
-Lịch sử nguyên sơ vì vậy có đường truyền qua gia đình, trong khi hiểu biết về Nguyên Sơ vẫn cần xét riêng. Giữ nguyên BÍ ẨN CHỦ Ý về nguồn gốc và số phận thật của Nguyên Sơ.
+Lịch sử nguyên sơ có đường truyền qua gia đình; các con đã được nhận ký ức Nguyên Sơ, nhưng hiểu biết của từng thế hệ hậu thế vẫn cần xét riêng. Giữ nguyên BÍ ẨN CHỦ Ý về nguồn gốc và số phận thật của Nguyên Sơ.
 
 ---
 
@@ -1874,3 +1827,24 @@ Linh hồn bị trảm ý nhưng vượt Địa Kiếp, nếu ẩn nấp đượ
 **ĐÃ CHỐT về Thiên Khiển:** tạo vật nuôi cổ tích oán khí / nghiệp lực qua giết chóc; đủ nghiệp thì sét đánh **thân–linh–ý cùng lúc**, Thiên Địa Chính Tiên mới cứu nổi. Hai sinh linh có nghiệp lực ngang nhau giết nhau không tăng nghiệp; thôn phệ **không chuyển nghiệp cũ của nạn nhân sang kẻ ăn**. Ngưỡng / cách tính chưa chốt. Giữ riêng tác động ô nhiễm tâm tình của oán khí và sự trừng phạt vì nghiệp lực.
 
 Đại Ma tu cuối Đại Kiếp biết nguy cơ thất bại nhưng cược Cổ Vương là hy vọng duy nhất. Tổ đội ba người can thiệp khi hắn đã nuốt Cổ Vương, chuẩn bị đột phá; hắn **không vượt trọn một trong ba kiếp** và chỉ thành bán bộ Chân Tiên. Kiếp cụ thể, thương tổn và diễn biến trận đánh còn mở. Chi tiết ở mục XII–XIII của [Hệ thống tu luyện, sức mạnh và tuổi thọ](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md).
+
+
+---
+
+# XLIX. TIÊN THIÊN SINH LINH, Á KHÔNG GIAN LUÂN HỒI VÀ ĐAN DƯỢC TẠO CHÂN NGÃ
+
+## Cây cỏ từ khai thiên tích địa — ĐÃ CHỐT
+
+Các thực vật cực ít cùng thời Nhân Tổ / Nguyên Sơ được gọi là **Tiên Thiên Sinh Linh**, nằm ngoài Diễn Hóa của Nguyên Sơ. Mỗi cây, mỗi cọng cỏ đều có thể sống đủ lâu để khai linh trí và tự nhiên thành **Chân Tiên**, không cần tu luyện. Quá trình tính bằng **hàng trăm triệu năm**; đến khi Thiên Đạo thức tỉnh, tất cả đã thành tiên. Chưa định vị phần lớn quãng ấy trước hay sau Nguyên Sơ vỡ, không tự thay các khoảng hậu tạo loài đã chốt.
+
+Họ thiện lương do bản chất cây cỏ, cùng tạo **một vương quốc riêng** trong á không gian thuộc Nạp Hư, ẩn mình quan sát ngoại giới cho tới Đại Hợp Giới. **Chân Tiên trở lên mới thấy được vùng á không gian ấy.** Chưa đặt tên vương quốc, ngày thành lập, vị trí, luật vào / ra, cách quan sát hoặc số phận sau Đại Hợp Giới. Không đồng nhất họ với mọi thực vật hậu thế hoặc nhánh Linh Sinh khoáng.
+
+## Luân Hồi và cối xay — ĐÃ CHỐT
+
+Luân Hồi là **một vùng á không gian**. Nơi đó có **cối xay bay lơ lửng**; bên dưới là đất, một dòng sông uốn lượn và **hoa bỉ ngạn**. Chân Ngã đến Luân Hồi bị hút về cối xay, trở nên mê mang / mơ hồ ý thức; **Chân Tiên có thể kháng, dưới Chân Tiên không thể kháng**. Chưa khóa chức năng từng bước của cối xay, quyền vượt khỏi nó, quan hệ với xóa / giữ ký ức hoặc cơ chế phân phối đầu thai. Luật giữ và dần khôi phục ký ức của Chân Tiên trở lên tiếp tục được giữ.
+
+## Các hài tử tạo Chân Ngã cho tạo vật — ĐÃ CHỐT
+
+Các hài tử thu thập **hoa bỉ ngạn, nước sông Luân Hồi và vài nguyên liệu đặc thù**, trong đó có nguyên liệu từ Tiên Thiên Sinh Linh, để tạo **một loại đan dược có thể tạo Chân Ngã**. Họ dùng đan dược cho tạo vật của mình trong quá trình tạo sinh linh.
+
+Nguyên liệu Tiên Thiên ở đây là **một loại trái cây có thể tái tạo**; **không Tiên Thiên Sinh Linh nào chết vì việc tạo đan dược**. Chưa đặt tên đan, loại quả, công thức, sản lượng, cách thu thập hoặc cơ chế linh hồn / ý thức hình thành sau khi có Chân Ngã. Đây là phương pháp qua đan dược, không tự nâng cảnh giới các hài tử hoặc cấp cho mọi Chân Tiên khả năng trực tiếp tạo Chân Ngã.

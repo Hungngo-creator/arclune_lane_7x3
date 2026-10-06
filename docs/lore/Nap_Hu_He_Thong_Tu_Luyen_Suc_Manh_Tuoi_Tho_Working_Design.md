@@ -102,6 +102,8 @@ Không đồng nhất trạng thái này với mọi lần bế quan, tu luyện
 
 Bản tham khảo từng nêu hợp nhất sâu tiêu hao còn 1/3 ở Hóa Vực và các hệ số thấp hơn ở cảnh cao. **Chưa nhập những hệ số ấy vào bảng mới.** Nhân Tổ và các hài tử có lựa chọn tự suy yếu để vào Luân Hồi; không giải thích mọi lần chuyển đời của họ bằng việc chết vì hết thọ.
 
+**Nhân Tổ và Nguyên Sơ trời sinh Thiên Địa Chính Tiên**; quãng sống chung ít nhất **20.000.000 năm** không phải trần thọ nguyên. **Cây cỏ Tiên Thiên** từ khai thiên tích địa sống đủ lâu sẽ khai linh / tự nhiên thành Chân Tiên, không cần tu luyện; quá trình tính bằng **hàng trăm triệu năm**, đến khi Thiên Đạo thức tỉnh tất cả đã thành tiên. Chưa tự áp khoản cộng khi đột phá của tu sĩ hậu thiên cho quá trình tự nhiên này hoặc chốt tuổi chết của họ. Vị trí phần lớn quãng trưởng thành so với Nguyên Sơ vỡ còn mở.
+
 Long Tổ / Phượng Tổ ở bán bộ Thiên Địa Chính Tiên, sống dài hơn Chân Tiên bình thường rất nhiều nhưng vẫn hữu hạn. Tuổi đời cụ thể của hai Tổ chưa chốt; quãng nuôi lớn ít nhất 20.000 năm không phải toàn bộ tuổi thọ của họ.
 
 **Aether:** phần tuổi thọ khi dùng nguồn năng lượng này sẽ quyết định sau khi xây xong Nạp Hư và Thần Huy. Mốc Bán Thần bốn triệu năm của hệ Main chỉ dùng để đối chiếu; không chốt tỷ lệ Aether / Linh Khí hoặc trần bốn triệu năm cho Chân Tiên.
@@ -171,6 +173,10 @@ Hồ yêu bị hạ cổ từ sơ sinh, nhưng **đã Khắc Pháp khi gặp Ki�
 Nhân Tiên trong trận phong ấn đã **thiêu đốt một phần Chân Ngã**, trên nền Pháp Tắc liên quan trao đổi, trả giá, sinh mệnh / tuổi thọ và bộc phát. Không tự gán lượng hao tổn hoặc việc Chân Ngã còn lại chắc chắn tiêu tán / Luân Hồi; số phận đó chưa chốt.
 
 **Chân Tiên trở lên** vẫn giữ ký ức khi vào Luân Hồi, dù tự suy yếu; ký ức dần khôi phục theo tu vi đời mới. Tu vi ở lúc chuyển đời, cảnh cao nhất từng chứng và mức nhớ lại của thân mới là những thông tin khác nhau. Không tự dùng tu vi đã hạ thấp để xóa điều kiện “đã chứng Chân Tiên”.
+
+**ĐÃ CHỐT mới:** Luân Hồi là á không gian có cối xay bay lơ lửng, phía dưới là đất, sông uốn lượn và hoa bỉ ngạn. Chân Ngã đến đó bị hút về cối xay và mê mang / mơ hồ ý thức; Chân Tiên có thể kháng, dưới Chân Tiên không thể kháng. Cơ chế từng bước của cối xay chưa chốt; không tự đổi luật giữ / khôi phục ký ức đã có.
+
+Các hài tử dùng hoa bỉ ngạn, nước sông Luân Hồi và nguyên liệu đặc thù để luyện **đan dược tạo Chân Ngã** cho tạo vật. Phần Tiên Thiên Sinh Linh dùng làm nguyên liệu là **một loại trái cây tái tạo được**; không Tiên Thiên Sinh Linh nào chết vì tạo đan. Không tự nâng cảnh giới các hài tử hoặc thêm quyền trực tiếp tạo Chân Ngã cho mọi Chân Tiên; công thức và cơ chế sinh linh hồn còn mở.
 
 Luật này không đổi bảng tuổi thọ tại mục III, không chốt tuổi đời / tuổi chết hồ yêu hoặc ngưỡng khôi phục ký ức. Cần đối chiếu cảnh cao nhất nàng đạt với kết cục mất ký ức đã chốt. Các hài tử đời gốc đều Chân Tiên, vẫn có luật thức tỉnh riêng và phải tu lại; xem mục VI, XXII của [Bản thể tu luyện và truyền thống kiếm](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).
 

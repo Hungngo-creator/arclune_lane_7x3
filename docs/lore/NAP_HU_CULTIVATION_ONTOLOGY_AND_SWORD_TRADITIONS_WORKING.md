@@ -176,9 +176,7 @@ nhưng không phá nguyên tắc vượt đại cảnh.
 
 # V. NHÂN TỔ
 
-Nhân Tổ từng là:
-
-> **Thiên Địa Chính Tiên.**
+Nhân Tổ và Nguyên Sơ đều **trời sinh Thiên Địa Chính Tiên**. Nguyên Sơ nắm **Quy Tắc Diễn Hóa**; hệ Quy Tắc cụ thể của Nhân Tổ chưa chốt.
 
 Hắn không có khái niệm thọ nguyên hữu hạn; có thể giữ hình hài / khí tính trẻ con dù đã trưởng thành. Hắn chọn Luân Hồi vì chán đời sống vĩnh hằng sau khi người bạn thân nhất Nguyên Sơ đã đi, biết mình có thể trở thành bất cứ thứ gì trên con đường mới chưa rõ ấy. Sau khi để lại các con tự quyết định, hắn trầm mặc nhìn chúng sinh một lát rồi tan biến, không nói gì.
 
@@ -383,14 +381,14 @@ Sức chiến đấu tùy cá thể:
 
 # IX. NHÂN TỔ, NGUYÊN SƠ & NGUỒN GỐC LONG–PHƯỢNG
 
-Thuở sơ khai Nạp Hư, nền thế giới hiện tại chỉ xác nhận **hai Linh Sinh Nguyên Sơ**:
+Thuở sơ khai Nạp Hư, hai cá thể có linh trí đã xác nhận, đều **trời sinh Thiên Địa Chính Tiên**, là:
 
 1. **Nhân Tổ** — hình hài một bé trai hoạt bát, sáng sủa;
 2. **Nguyên Sơ** — quang thể vô giới tính, ít nói, hình thái biến ảo liên tục.
 
 “Nguyên Sơ” là tên riêng đang xây dựng của bản thể chung trước khi Long Tổ / Phượng Tổ tách ra.
 
-Nhân Tổ và Nguyên Sơ đều không cần ăn uống.
+Nhân Tổ và Nguyên Sơ không cần ăn uống để tồn tại, nhưng vẫn rong chơi khắp Nạp Hư và ăn hoa quả. Họ sống cùng nhau ít nhất **20.000.000 năm**; có thể đến bất cứ đâu trong nháy mắt và ít dùng sức mạnh.
 
 Nguyên Sơ có thể biến đổi hình dạng:
 
@@ -399,7 +397,9 @@ Nguyên Sơ có thể biến đổi hình dạng:
 - long;
 - phượng;
 - người;
-- hoặc bất kỳ sinh vật nào mà hình thái của nó từng chạm tới / dự báo được.
+- mọi hình thái sinh vật sẽ sinh ra ở Nạp Hư.
+
+**ĐÃ CHỐT:** hình dạng liên tục khác vì cơ thể hắn **diễn hóa sinh linh tương lai**, đồng thời diễn hóa vô số Pháp Tắc mạnh yếu. Mọi sinh linh hậu thế đã biết / chưa biết, cả mười hai hài tử và các chủng tộc do họ tạo, thuộc Diễn Hóa này. **Nhân Tổ, Thiên Đạo và cây cỏ Tiên Thiên cùng thời khai thiên tích địa là các ngoại lệ.** Không đồng nhất phạm vi hình thái ấy với việc Nguyên Sơ trực tiếp chế tạo mọi cá thể, hoặc xếp Diễn Hóa mạnh hơn các Quy Tắc khác.
 
 Không khóa Nguyên Sơ thực chất là gì.
 
@@ -434,9 +434,7 @@ Hình thái được ghi lại trong thần thoại cũng không thống nhất:
 - một khối tinh thể sống;
 - hoặc thứ không thể mô tả bằng sinh học hậu thế.
 
-Sau đó do xung đột Sinh–Tử trong chính bản thể:
-
-> tách thành Long Tổ và Phượng Tổ.
+Khi Pháp Tắc do hắn diễn hóa trong cơ thể **đạt giới hạn**, Nguyên Sơ cảm thấy đau rồi vỡ; số Pháp Tắc có thể tính bằng chục vạn, ít hoặc nhiều hơn, **không cần khóa số lượng**. **Sinh Mệnh / Tử Vong Quy Tắc được ráp lại, Luân Hồi mới hình thành**; sinh vật / động vật mới xuất hiện với tần suất tính bằng ngày. Hai trứng để lại nở thành Long Tổ / Phượng Tổ. Nguồn gốc và số phận thật của Nguyên Sơ vẫn là bí ẩn chủ ý.
 
 ## Phân mảnh Pháp Tắc
 
@@ -775,33 +773,15 @@ Nhân tộc là một trong những kết quả trực tiếp ổn định nhấ
 
 ---
 
-# XVI. QUY TẮC DIỄN HÓA CỦA NHÂN TỔ & TÍNH TRƯỞNG THÀNH CỦA 12 ĐẠI TUYỆT THỂ
+# XVI. DIỄN HÓA CỦA NGUYÊN SƠ & TÍNH TRƯỞNG THÀNH CỦA 12 ĐẠI TUYỆT THỂ
 
-Nhân Tổ từng nắm:
+**ĐÃ CHỐT mới:** **Nguyên Sơ nắm Quy Tắc Diễn Hóa**, thay chủ sở hữu được mô tả ở bản cũ. Cơ thể hắn diễn hóa mọi sinh linh tương lai của Nạp Hư và vô số Pháp Tắc mạnh yếu. Hắn đau khi Pháp Tắc đạt giới hạn rồi vỡ; Sinh Mệnh / Tử Vong Quy Tắc được ráp lại để hình thành Luân Hồi.
 
-> **Quy Tắc Diễn Hóa** hoặc một Quy Tắc lấy Diễn Hóa làm trục cốt lõi.
+Mọi hình thái sinh linh hậu thế, gồm mười hai hài tử, thuộc Diễn Hóa ấy; **Nhân Tổ, Thiên Đạo và cây cỏ Tiên Thiên từ khai thiên tích địa nằm ngoài**. Các hài tử vẫn do Nhân Tổ trực tiếp chia quyền năng tạo ra. Không đồng nhất phạm vi hình thái với nguồn tạo cá thể hoặc cấp cho Nhân Tổ Quy Tắc Diễn Hóa.
 
-Mười hai người con đều nhận một phần:
+Diễn Hóa không được mặc định mạnh hơn Quy Tắc hình thành từ các Pháp Tắc Nguyên Sơ diễn hóa: **mọi Quy Tắc có vô số khả năng**.
 
-> **Pháp Tắc Diễn Hóa.**
-
-Do đó mọi Đại Tuyệt Thể đều có tính chất chung:
-
-> **có thể trưởng thành / mở khóa / biến đổi sâu theo đời sống và tu vi chủ thể.**
-
-Thể Chất không phải gói năng lực cố định.
-
-Càng trưởng thành:
-
-- năng lực càng hoàn thiện;
-- mảnh Pháp Tắc riêng càng sâu;
-- thiên tính càng mạnh.
-
-Khi Nhân Tổ vào Luân Hồi:
-
-> phần lớn Diễn Hóa vốn tập trung ở hắn được giải phóng vào Nạp Hư.
-
-Thế giới từ đó có nhiều khả năng sinh thành và biến hóa hơn.
+**ĐÃ CHỐT được giữ:** Đại Tuyệt Thể có thể trưởng thành / mở khóa / biến đổi sâu theo đời sống và tu vi; năng lực và thiên tính mạnh dần. **CÒN MỞ:** cơ chế trưởng thành sau điều chỉnh này và hệ Quy Tắc cụ thể của Nhân Tổ. Bỏ giải thích cũ rằng mười hai người nhận mảnh Diễn Hóa của Nhân Tổ hoặc hắn giải phóng Quy Tắc ấy khi vào Luân Hồi.
 
 ---
 
@@ -944,7 +924,11 @@ Hồ yêu có thể chất có giá trị bồi dưỡng **ngoài Thập Nhị �
 
 Cảnh cao nhất hồ yêu chưa chốt. Khi kiểm tra niên biểu, phải giữ kết cục mất ký ức của nàng và phân biệt ngoại lệ đã chứng Chân Tiên; không tự thêm một lần chứng Chân rồi bỏ qua luật giữ ký ức. Vết bớt trên vai đã chốt, nhưng việc nó tái hiện ở thân đầu thai và cuộc gặp lại với Kiếm Tiên vẫn đang xây dựng.
 
-**CÒN MỞ:** linh hồn / Chân Ngã phát sinh thế nào khi mười hai hài tử phối huyết và vật chất để tạo Nhân tộc. Sự kiện tạo Nhân tộc vẫn đã chốt; chưa đồng nhất tạo hình sinh linh với tự thao tác Chân Ngã hoặc tạo linh hồn bằng quyền năng Thiên Địa Chính Tiên, cũng không tự nâng cảnh giới đời gốc của các hài tử.
+**ĐÃ CHỐT mới:** các hài tử tạo một loại **đan dược có thể tạo Chân Ngã**, dùng cho tạo vật của mình. Nguyên liệu gồm **hoa bỉ ngạn, nước sông Luân Hồi và vài nguyên liệu đặc thù**, trong đó phần Tiên Thiên Sinh Linh là **một loại trái cây tái tạo được**; không ai trong nhóm cây cỏ ấy chết vì việc tạo đan.
+
+Luân Hồi là á không gian có **cối xay bay lơ lửng**, đất / sông uốn lượn / hoa bỉ ngạn bên dưới. Chân Ngã đến đó bị hút về cối xay và mê mang / mơ hồ ý thức; Chân Tiên có thể kháng, dưới Chân Tiên không thể kháng. Cơ chế từng bước của cối xay còn mở; không tự dùng nó để đổi luật ký ức đã chốt.
+
+**CÒN MỞ:** công thức, lượng Chân Ngã tạo được, cơ chế linh hồn / ý thức hình thành và cách thu thập nguyên liệu. Tạo Chân Ngã qua đan dược không tự nâng cảnh giới đời gốc của các hài tử hoặc cấp cho mọi Chân Tiên quyền trực tiếp tạo Chân Ngã.
 
 ---
 
