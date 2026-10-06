@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-05-F.14
+**Version:** 2026-10-06-F.15
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -26,6 +26,8 @@
 **Revision F.13:** refines only TGT-008 with per-attack-owner Slot defaults, exact authored Entity/Both exceptions, non-propagation and Entity-tracking presentation. No new Contract ID, Tag or Primitive; previously approved exact-owner locks remain intact.
 
 **Revision F.14:** extends existing REC-001 with a bounded live positive waiting-threshold contribution and coherent presence/death/all-entry checkpoint; REC-004/020 retain cohort and before-ordinary-Revive law. No new Contract ID, Tag, Primitive, generic Reaction priority or default Shield/Revive policy.
+
+**Revision F.15:** extends existing SHP-002/HEL-003/TRG-016/CST-011 with bounded opt-in first-family depletion, per-Heal Shield-conversion denial, stable predicate checkpoints and atomic Rage-limit/current reconciliation. Unprofiled law and all prior IDs remain unchanged; no global priority, Tag or Primitive.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -1580,6 +1582,18 @@ Observation/candidate identity includes Combat Instance, original commit/recipie
 
 ---
 
+### TRG-016 opt-in stable predicate checkpoints
+
+The existing HEALTH_MUTATION_STABLE / stableHealthSettlement law is unchanged. A separately opted-in 04§7.16 profile observes PREDICATE_CHECKPOINT_STABLE for the exact selected CurrentHP/CurrentMaxHP/CurrentRage fields and/or valid Field initialization. This bounded profile does not observe arbitrary State fields, poll Conditions or relabel Resource mutation as health Damage.
+
+Record actual changed selected fields on their authoritative transaction/subject, with original result/semantic kind and exact finite-settlement origin. One joined commit/subject yields one checkpoint, including joined entry and field changes. Field initialization qualifies only after authoritative presence/values, mandatory lifecycle and reconciliation are stable. No-op/rolled-back/AE-only/unselected writes do not qualify. A Rage-limit reconciliation qualifies only when it actually changes selected Current Rage.
+
+Before the next direct-group/Action/SSI continuation, evaluate the one owner/trigger/checkpoint candidate against that stable view and close its finite Condition/Cost/cap/Effect graph. Failed qualification/payment closes without use or retry; no ordinary Reaction window or continuous fixpoint is needed. Costs and limit/use writes that are explicitly joined retain their protected atomic commit.
+
+EXCLUDE_THIS_TRIGGER_ACTIVATION suppresses observations caused by that exact activation's own finite settlement, including its payments, limit/current reconciliation and grants; retain that origin even through replay. It is not a whole-root/Ability/Actor ban. After this activation is terminal, a later independently caused qualifying commit may activate the same trigger, even in the same Natural root or from a later terminal-Heal settlement of a previously created Shield. A given original checkpoint cannot re-deliver a second activation.
+
+Existing Transaction/Health/Resource/Presence/Lifecycle/Trigger/State/dependency owners retain checkpoint identity, selected-field evidence, origin, stable owner life/presence and terminal candidate outcome through dependent work/save/replay. Never run between sibling writes/packets or restore a retired candidate in a new presence. Cycles, waits on held future work, duplicate competing profiles and observable non-commuting candidates without an explicit composition law fail closed. This adds no global priority or mutable predicate manager.
+
 # 12. TARGET SELECTION CONTRACT
 
 ## TGT-001 — Candidate Pool
@@ -3068,6 +3082,16 @@ Rage is per Combat Unit by default.
 
 ---
 
+### CST-011 opt-in limit mutation and Current reconciliation
+
+04§23.3 / P-033 explicitly mutates a per-unit Rage pool's authoritative limit with a finite delta, declared nonnegative minimum and CLAMP_DOWN. Stage `L' = max(minimum, L + delta)` and `C' = min(C_after_joined_payments, L')`; commit both and the immutable Resource result together. Raising L grants no C. This profile does not alter ordinary Current-resource operations/overflow or implicit Battle/Mode initialization.
+
+Retain the limit and BATTLE_SCOPED mutation identity through death/Revive/leave/redeploy. Explicit restoration/initialization laws must respect the applicable target-owned retained pool state; do not silently discard battle evidence as field State. Battle end retires it under ordinary pool lifetime.
+
+A declared activation transaction may include required Current Rage payment and success-use mutation. Read its admission/threshold/cap and payer on a protected view, validate all required members, then commit payment/result, limit/current and use together. Failure/abort consumes none; do not spend then undo. Other observable competing mutations require explicit order/composition rather than technical retry/list priority.
+
+Limit reconciliation is neither a Cost receipt nor a positive Current grant; it does not trigger CST-016 grant admission, class Action regeneration or a new Action. It supplies ordinary mutation provenance to TRG-016's opted-in predicate observer if Current actually changed. Max Rage0 is legal for this profile; readiness under CST-013 still creates no spontaneous Ultimate/SSI opportunity. Preserve finite numeric conservation and terminal commit identity for save/replay.
+
 ## CST-012 — Non-Natural Action Resource Gain
 **Status:** `LOCKED_DEFAULT`
 
@@ -3484,6 +3508,16 @@ Special Shield Profiles such as “only blocks Will Damage” may form distinct 
 
 Implementation should use deterministic high-precision/fixed-point accounting so proportional depletion does not create source-order gameplay artifacts.
 
+### SHP-002 opt-in exclusive first source family
+
+04§18.2 may declare EXCLUSIVE_FIRST_SOURCE_FAMILY. Derive its exact recipient/source-family key from existing provenance, not a Character ID or list position. At a recipient's Damage calculation view, eligible contributions of that family form one first layer ahead of every other source's ordinary preference. Within the layer, absorbed Damage depletes contributions proportionally to eligible remaining values; independent clocks/source removal/terminal causes are unchanged.
+
+Apply Damage eligibility and Shield Piercing first. Allocate participating simultaneous packet demand through this layer under RES-008, then pass only residual demand to the remaining valid Shield profiles and HP. First-layer priority cannot make an ineligible Shield absorb Damage, bypass Hit/Effect admission, change Authority or hide committed per-packet/source receipts.
+
+Only one exclusive first family is supported at a recipient. Another incompatible exclusive family has no inferred winner; reject its affected addition/transfer before partial commit unless a separate approved conflict profile resolves it. Same-family independent contributions coexist. A zero/rejected addition creates no first-layer membership or terminal entitlement. Source/clock/lifecycle cleanup removes only real contributions with their actual causes; it never fabricates depletion or a terminal Heal.
+
+Unprofiled Standard Shields retain proportional pooling. Ordinary consume-first metadata cannot outrank the opted-in exclusive family and does not itself define how other Shields are ordered. Save/replay retains the profile/family per contribution and applies one authoritative allocation/commit without grant/depletion duplication.
+
 ## SHP-003 — Shield Piercing
 **Status:** `LOCKED`
 
@@ -3821,6 +3855,16 @@ SSR Warrior:
 - no re-aggregation of all Overheal into one fake Heal result.
 
 ---
+
+### HEL-003 explicit Shield-conversion denial
+
+An opted-in 04§17.2 Heal may deny Overheal-to-Shield conversion for its exact immutable result. Keep ordinary requested/modified Heal, actualRestore and numeric Overheal unchanged; DISCARD without the new denial retains existing external-conversion behavior.
+
+A conversion binds its originating HealResultRef(s) through supported typed Overheal/Snapshot/delayed derivations. Before any conversion Shield mutation, consult those retained result policies. A denied origin closes that conversion locally with no grant/addition/refresh/cap mutation, regardless of converter allegiance/owner. The already-committed Heal is not rolled back, reduced or failed.
+
+Copying a number, changing issuer/Action lineage, removing the Heal source or delaying the converter cannot erase a declared conversion's causal origin. Missing/unavailable origins and nominal/live reconstruction are invalid conversion inputs. Retain immutable origin/policy refs while a declared conversion depends on them, including save/replay. Independently sourced Shields and supported conversions of another Heal remain governed by their own law; numeric equality/root identity alone proves no denial.
+
+This is typed result eligibility for Shield conversion, not a new Immunity State, Authority tier, global Overheal ban or general numeric taint/foreign-hook registry. A future explicit override requires its own approved law; ordinary converter capability cannot override DENY.
 
 ## HEL-004 — Heal Does Not Revive
 **Status:** `LOCKED`

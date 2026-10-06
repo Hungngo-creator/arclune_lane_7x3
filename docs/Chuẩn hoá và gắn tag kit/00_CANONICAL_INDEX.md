@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-05-INDEX-14
+**Version:** 2026-10-06-INDEX-15
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-05-INDEX-14`
+**Version:** `2026-10-06-INDEX-15`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-05-E.12`.
+**Version:** `2026-10-06-E.13`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-05-F.14`.
+**Version:** `2026-10-06-F.15`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-05-G.13`
+**Version:** `2026-10-06-G.14`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-05-I.13`
+**Version:** `2026-10-06-I.14`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -162,7 +162,9 @@ In `docs/canon kit/`:
 
 - `Nephthys_Clarified_Gameplay_Canon.md` R1, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw4 entry11: live +2 per active Field Presence/all-waiting threshold re-evaluation without quota; own-direct25% Skill1 Shield with positive-only shared2-actual-completion refresh winning same-checkpoint expiry; hostile-start MaxHP/direct-root Shield absorption paid once with deduplicated simultaneous self/Leader Heal; distinct random locked Slots/current occupants; Chân Ngã Revive with Leader inclusion, TRULY_EMPTY death/alternate Slot, atomic normal-baseline/target-kit retention HP35%/Rage5 and no Deck-only effects. Latest explicit completion sequence supersedes raw after-action wording. Only REC-001's bounded live threshold law is extended; other mechanics use existing composition. Metadata/unsupported external profiles remain NOT BLOCKING.
 
-- **Rotania** → `docs/canon kit/Rotania_Clarified_Gameplay_Canon.md` → **GAMEPLAY_PARTIALLY_CLARIFIED / ARCHITECTURE_NORMALIZATION_BLOCKED** on Canon §4.1–§4.4. No architecture delta established.
+- **Rotania** → `docs/canon kit/Rotania_Clarified_Gameplay_Canon.md` → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → first-depletion Shield family, per-Heal conversion denial, stable predicate checkpoints and bounded Rage-limit reconciliation.
+
+E.13/F.15/G.14/I.14 adds four bounded opt-in profiles under existing SHP-002/HEL-003/TRG-016/CST-011: first-source-family Shield depletion with proportional same-family allocation; immutable per-Heal Shield-conversion denial; coherent HP/MaxHP/Rage/entry predicate checkpoints with exact own-settlement exclusion; and atomic Rage-limit/current reconciliation. Existing Trigger/Transaction/Shield/Heal/Resource owners execute them. No new Tag, Primitive, Contract ID or priority/callback manager; 01/02/03/07 remain unchanged. M-110–M-114 prove the new boundaries and reject malformed profiles; existing generic cases cover other Rotania composition.
 
 E.12/F.14/G.13/I.13 adds only a bounded static live waiting-threshold contribution under existing REC-001/static registration/Field Presence/world-ledger owners. Positive integer ADD, coherent all-entry re-evaluation, preserved laterDeathCount, atomic same-checkpoint availability/cohort/transfer and before-ordinary-Revive eligibility use no new Tag/Primitive/Contract ID/manager/priority. M-103–M-109 add seven declarative regression obligations; shared Shield clocks, absorbed result metrics, Slot/RNG and Revive restore already compose. 01/02/03/07/recovery audit and all prior case bodies remain unchanged. No runtime/build test execution is implied.
 

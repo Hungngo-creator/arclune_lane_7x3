@@ -3,128 +3,206 @@
 ## 1. Identity, provenance and precedence
 
 - Character: **Rotania**. Class: **Mage**.
-- Raw-kit source: root `Ý tưởng nhân vật 4.md`, item **13) Rotania**, identified by the Character name and the five named abilities below.
-- The designer's explicitly supplied Rotania kit confirms that entry. Later explicit designer corrections take precedence over this Canon; this Canon takes precedence over older raw wording on clarified gameplay points.
-- Rank, native Element, base stats, deployment metadata and Basic Attack formula are not supplied. They remain unresolved metadata; no value is inferred from the example Rage values.
-- This document records gameplay meaning. An unresolved execution decision below is not an approved default or an architecture gap.
+- Raw-kit provenance: root `Ý tưởng nhân vật 4.md`, item **13) Rotania**, identified by the name and the five named abilities below.
+- The explicit **ROTANIA DESIGNER LOCKS** supersede older raw wording and the earlier unresolved interpretations of Action identity, clocks, reward retention, charge recast and Shield termination. Later explicit designer corrections take precedence over this Canon; this Canon takes precedence over older raw wording.
+- Rank, native Element, base stats, Basic Attack formula and deployment budget are not supplied. No value is inferred from the illustrative Rage values.
 
 ## 2. Locked gameplay
 
 ### 2.1 Passive — Orbital Recurrence / Quỹ Đạo Hồi Quy
 
-Rotania's Natural Actions alternate within one Field presence:
+**Rhythm.** Each new Rotania Field Presence starts a fresh alternating cycle:
 
 ```text
-ENTER_FIELD
-→ first Natural Action: no Passive activation
-→ second Natural Action: Passive activation
-→ third Natural Action: no Passive activation
-→ fourth Natural Action: Passive activation
-→ continue alternating until LEAVE_FIELD
+actually-performed Natural Action #1 → OFF
+actually-performed Natural Action #2 → ON
+actually-performed Natural Action #3 → OFF
+actually-performed Natural Action #4 → ON
+...
 ```
 
-Deployment's ordinary full-Rage rule can make the first Natural Action an Ultimate when no other kit intervenes; the example does not grant an immediate Action on entry or require the first Action to be an Ultimate.
+Only Rotania's **actually-performed Natural Actions** advance this phase. CC-lost opportunities and all non-Natural Actions advance nothing. **LEAVE_FIELD resets the cycle**; the first actual Natural Action of a new presence is OFF. Ordinary Deck full-Rage initialization can make that first Action an Ultimate, but entry itself grants no immediate Natural Action.
 
-On an activating Natural Action, after that Action's Damage is finished, each qualifying target receives additional **TRUE Damage = 30% of the Actual HP Damage that target received from Rotania in the qualifying damage scope**. The additional attack is a **Follow-up**. The designer describes it as counting together with the main attack as **one Action**; the observable scope of that statement and the exact qualifying receipt membership remain unresolved in §4.1.
+**Basis.** For each target, let `P_target` be the aggregate committed Actual HP Damage received from Rotania's qualifying direct outcome of the ON Natural Action. Include root Basic/Skill direct Damage and explicitly authored direct child Damage, including Skill 1 called by Ultimate. Exclude this Passive's own follow-up, DoT, Counter, Reaction, unrelated Follow-up, Mark Damage and unrelated Passive Damage. Sharing rootActionId or Damage Attribution is insufficient. Shield absorption and Overkill are excluded.
 
-- Per activation, at most **9 targets** receive the Passive follow-up.
-- The basis is committed Actual HP Damage, not requested Damage, Shield absorption or Overkill. The designer's example is **100 Actual HP Damage → 30 requested TRUE Damage**.
-- The follow-up itself must not recursively enter its own 30% basis.
-- Ultimate can activate the Passive. Skill 2's charging Action deals no immediate Damage and therefore supplies no immediate Damage basis.
-- Confirmed deaths caused by the Passive belong to the explicitly stated Skill 1/Ultimate reward scope described below.
-- A missed opportunity's effect on the alternating counter is unresolved; non-Natural Actions do not become extra Natural Actions merely because they belong to the same attack sequence.
+After direct Damage and its mandatory lifecycle, for each still-lifecycle-valid qualifying recipient with **P_target > 0**:
+
+```text
+follow-up requested TRUE Damage = 30% × P_target
+```
+
+A recipient already DEATH_CONFIRMED by the primary Damage is not hit again. The follow-up is one layer only; it never feeds its own basis. Example: committed Actual HP Damage100 → requested TRUE Damage30, subject to the ordinary TRUE/Shield pipeline.
+
+**Identity and cap.** The Passive creates a separate non-Natural **FOLLOW_UP Action/settlement** with its own Action/effect provenance and the same root Natural-Action outcome. “One Action with the main attack” means one Natural opportunity, not one shared Action identity. It grants no SSI advance, class Action regeneration or Passive-phase advance.
+
+At most **9 target follow-up activations** are allowed per ON Natural Action. If a profile permits more than nine qualifying targets, selection must use an existing explicitly declared deterministic target-selection policy; no Entity/Slot/list order may be invented. The unsupported greater-than-nine profile is addressed in §4.
+
+**Local sequence.**
+
+```text
+qualifying direct Damage
+→ mandatory lifecycle
+→ Passive follow-up on still-valid qualifying recipients
+→ mandatory lifecycle for follow-up results
+→ death-reward settlement
+→ Ultimate Heal, if this root is Ultimate
+→ remaining direct/root settlements
+→ ACTION_DIRECT_EFFECTS_COMPLETE
+→ ordinary eligible Reactions
+```
+
+No ordinary Reaction window is inserted before the declared follow-up, rewards or Ultimate Heal. Mandatory lifecycle remains mandatory.
 
 ### 2.2 Skill 1 — Fivefold Singularity / Ngũ Trùng Kỳ Điểm
 
-- Base Cost: **30 AE**.
-- Attack area: the enemy Side's fixed Positions **2 / 4 / 5 / 6 / 8**.
-- Each occupied qualifying target receives one hit with **150% Rotania WIL + 120% Rotania ATK**.
-- If fewer than five targets are present, each target is hit only once. Empty Positions do not redirect their hits or create repeat hits on another target.
-- Presentation: five black holes; VFX varies with actual targets and is absent at targetable empty Positions. Presentation does not change target selection or Damage multiplicity.
-- Each target with **True Self** reaching **DEATH_CONFIRMED** from this Skill's stated attack scope reduces Skill 1's AE Cost by **4 AE**.
-- If Orbital Recurrence activates, deaths from its follow-up also qualify for this Skill 1 reward. Merely reaching HP zero without DEATH_CONFIRMED is insufficient.
-- When Skill 1 is called by Ultimate, the explicitly different reward in §2.5 applies. Cost-reduction accumulation, floor, retention and exact attribution boundaries remain unresolved in §4.2.
+- Active Skill; base standalone Cost **30 AE**.
+- This exact attack owner uses **POSITION / LOCK_POSITIONS** on enemy Slots **2 / 4 / 5 / 6 / 8**.
+- At the recipient checkpoint, query each locked Slot's current legal occupant. Empty Slots have no recipient. If the original occupant moved and another legal Entity occupies the Slot, that current occupant receives the hit.
+- No chase, reroll or retarget. The five distinct Slots give each recipient at most one Skill 1 hit; fewer than five occupied Slots do not repeat hits.
+- All occupied legal locked Slots resolve as **one SIMULTANEOUS batch**, with one common Rotania ATK/WIL source snapshot at that batch's calculation checkpoint.
+- Per recipient: **PHYSICAL = 120% ATK; WILL = 150% WIL**.
+- Presentation: five black holes; VFX varies with the actual target count and is absent at empty targetable Slots. It does not alter hit multiplicity.
+
+**Standalone death reward.** For an ordinary paid Skill 1, each unique qualifying **Chân Ngã DEATH_CONFIRMED** caused by this cast's own direct Damage or its qualifying Rotania Passive follow-up reduces **future standalone Skill 1 AE Cost by4**. Each death rewards exactly once. Exclude unrelated Damage, DoT, Counter, Reaction, another Action merely sharing root/attribution, and targets without Chân Ngã. HP zero alone is insufficient.
+
+The accumulated reduction is **BATTLE_SCOPED**, retained through death, Revive, LEAVE_FIELD and redeploy, and reset at battle end unless a later explicit mechanic modifies it.
+
+```text
+future standalone Cost = max(0, 30 − accumulated reduction)
+30 → 26 → 22 → 18 → ... → minimum0 AE
+```
+
+No negative Cost, retroactive refund of the already-paid cast, or AE refund below zero. The reward route follows cast context, not positive payment: a standalone cast at Cost0 still uses the standalone route under ordinary successful zero-Cost semantics.
+
+**Ultimate route.** A Skill 1 called by Ultimate costs **0 AE** and grants the Max Rage reward in §2.5 instead. A qualifying death never grants both reward types.
 
 ### 2.3 Skill 2 — Arrested Orbit / Quỹ Đạo Đình Chuyển
 
-- Cost: **25 AE**.
-- Activation uses **one Natural Action**, with a charging animation and **no immediate Damage**.
-- It prepares the **next Natural Action**: Damage coefficients of that Action's Ultimate, Skill or Basic Attack increase by **40%**, for that one Natural Action.
-- This multiplies the affected coefficients by **1.40**. It is not a replacement with a final-Damage amplification rule.
-- Locked example: Skill 1 becomes **210% WIL + 168% ATK** per target.
-- If the Passive activates on that Skill 1, it still requests **30% of Skill 1's qualifying Actual HP Damage** as TRUE Damage. Its 30% factor does not become 42%; its amount can grow because the primary attack's committed Damage grows.
-- The example's five qualifying Skill 1 deaths reduce that Skill's Cost by **20 AE**; this does not define an unstated Cost floor or cumulative lifetime.
-- Charge consumption, reapplication, CC and lifecycle decisions remain unresolved in §4.3.
+- Active Skill; Cost **25 AE**.
+- Successful activation uses one actually-performed Natural Action, has a charging animation and deals **no immediate Damage**.
+- It creates one pending enhancement for Rotania's **next actually-performed Natural Action**. CC-lost opportunities do not consume it.
+- That one enhanced Natural Action's qualifying Basic/Skill/Ultimate Damage coefficients are multiplied by **1.40**, including the explicitly authored Skill 1 child of an enhanced Ultimate.
+- Example Skill 1: **150% WIL → 210% WIL; 120% ATK → 168% ATK**. This is coefficient multiplication, not +40 percentage points or a substituted final-Damage multiplier.
+- Counter, Reaction, independent Follow-up and non-Natural attacks outside the qualifying Natural root do not gain the enhancement merely because the State exists.
+- The Passive's factor remains **30%** of the resulting committed Actual HP Damage; it is not independently multiplied by1.40.
+
+**Recast is allowed.** If the next actual Natural Action is Skill 2 again, it consumes the old enhancement window. That old bonus deals no Damage because Skill 2 deals none. A successful new activation creates one fresh pending enhancement for the following actual Natural Action. No stacking of pending1.40 charges and no recast prohibition.
+
+Pending charge is temporary **current-life/current-presence State**. DEATH_CONFIRMED or LEAVE_FIELD clears it; Revive/redeploy does not restore the old charge. Already bound Action evidence remains distinct from an unconsumed pending charge.
 
 ### 2.4 Skill 3 — Event Horizon Aegis / Hộ Thuẫn Chân Trời Sự Kiện
 
-Automatic eligibility requires both:
+Automatic self-save Skill, with at most **2 successful activations per battle**.
 
 ```text
-Current HP <= 15% Current Max HP
-Current Rage >= 40
+CurrentHP <= 15% CurrentMaxHP
+AND Current Rage >= 40
+AND successful battle uses < 2
 ```
 
-On activation:
+Exactly15% HP qualifies. Eligibility is a state predicate, not a Damage-only trigger. Evaluate after stable authoritative changes capable of changing it: CurrentHP, CurrentMaxHP, Current Rage from an external/ordinary gameplay source, and valid Field entry/initialization after authoritative values are established. No continuous polling.
 
-- **Current Rage decreases by 20**.
-- **Max Rage increases by 20**. This is a resource-limit change, not payment of 20 Max Rage.
-- Rotania receives a self Shield worth **45% of her Max HP**.
-- The Shield lasts **3 Natural Actions** and disappears after those three.
-- Damage consumes this Skill 3 Shield before other Shields, including an external Shield whose own description requests first consumption. This explicit ordering must be preserved; no Authority tier is invented from it.
-- When this Shield disappears, Rotania heals **25% of her Max HP**. Which terminal causes qualify for this Heal remains unresolved in §4.4.
-- Skill 3 can activate at most **2 times per battle**. Leaving/re-entering Field is not a new battle and does not reset that cap.
+**One activation per qualifying checkpoint.** This activation's own Current Rage−20, Max Rage+20 and Shield grant must not recursively create another Skill 3 activation inside the same settlement/checkpoint. A second activation requires a later independent qualifying authoritative checkpoint after the first settlement is terminal.
 
-Locked illustration, with no other Rage changes: **40/100 → 20/120**. Higher Max Rage delays ordinary full-Rage Ultimate readiness; the example is not a lock of Rotania's base Max Rage.
+On successful activation, atomically:
 
-Activation checkpoints, overlapping activations, the exact three-action clock, Max HP read checkpoints and terminal/lifecycle behavior remain unresolved in §4.4.
+```text
+Current Rage -= 20
+Max Rage += 20
+successful battle uses += 1
+```
+
+Both Rage mutations belong to the same activation transaction. If the required Rage condition/payment fails, no activation or use consumption occurs. Max Rage increase is a limit mutation and the intended readiness nerf, not Max Rage spending. The use cap persists through death/Revive/leave/redeploy; a new presence is not a new battle.
+
+Example without unrelated Rage changes: **40/100 → 20/120**. At HP<=15% with Rage100, one checkpoint gives Rage80 and Max Rage+20; it does not immediately spend the second use even though Rage remains>=40.
+
+**Independent Shields.** Each successful activation creates its own Shield contribution:
+
+```text
+requested Shield = 45% CurrentMaxHP at that grant checkpoint
+```
+
+The granted amount snapshots that checkpoint's Max HP. A later independent checkpoint can activate Skill 3 while the first Shield remains. The second contribution does not replace the first or refresh its clock. Each has its own duration and terminal-Heal entitlement.
+
+**Depletion priority.** All Rotania Skill 3 contributions share the highest depletion layer, before every other Shield source, including an external Shield requesting its own first consumption. Within this highest layer, coexistence uses ordinary **proportional source-ledger depletion**, with no FIFO/LIFO or contribution-order priority. This is a depletion rule, not an inferred Authority tier.
+
+**Duration.** Each contribution lasts through Rotania's next **3 actually-performed Natural Actions after grant**, expiring at the third qualifying Natural Action completion. The Natural Action already in progress at grant does not retroactively count. CC-lost opportunities and non-Natural Actions decrement nothing. Each contribution has an independent clock.
+
+**Terminal Heal.** One actual contribution removal caused by natural expiry, full Damage depletion/break, or explicit dispel/removal while Rotania remains alive and Field-present triggers that contribution's own Heal:
+
+```text
+requested Heal = 25% CurrentMaxHP at that Heal settlement checkpoint
+```
+
+The Heal reads current Max HP, not the grant snapshot. Two separate Shields terminating can each produce a Heal. Settle after the removal/Damage group's commit and mandatory lifecycle; do not insert Heal between Shield depletion and the same Damage's HP spillover. A dead/retired original owner cannot be healed, revived or held for a later retry. Ordinary Heal admission/modifiers/Overheal law applies.
+
+Removal due to **DEATH_CONFIRMED, LEAVE_FIELD, battle termination or lifecycle/presence cleanup grants no terminal Heal**. Cleanup is not break, expiry or dispel. A nonexistent/zero-added contribution grants no terminal-Heal entitlement.
 
 ### 2.5 Ultimate — Grand Orrery: Black-Star Revolution / Đại Thiên Nghi: Vòng Quay Hắc Tinh
 
-- Cast **Skill 1 exactly once**, with that cast's **AE Cost waived**. This does not waive unrelated Costs or create an additional Natural Action.
-- For each qualifying target with **True Self** reaching **DEATH_CONFIRMED** from this Ultimate's Skill 1 attack, **including Orbital Recurrence**, **Max Rage decreases by 3**. The designer gives this different reward because the Ultimate's Skill 1 already costs no AE; exact coexistence with the ordinary Skill 1 reduction, retention and floor remain unresolved in §4.2.
-- After the attack, Rotania heals **20% of total qualifying Actual HP Damage caused by Ultimate's Skill 1**.
-- That Heal basis **excludes the Passive's TRUE Damage**. It does not include Shield absorption, nominal requested Damage or Overkill.
-- **Overheal from this Ultimate is discarded. It cannot be converted to Shield by an allied or enemy kit**, even if that kit ordinarily converts Overheal to Shield.
-- Ultimate can activate Orbital Recurrence; its Skill 1 reward's death membership includes the Passive, while its 20% Heal basis excludes the Passive. These are intentionally different scopes.
+**Root and child.** Root identity **ULTIMATE**. It calls exactly one **SKILL** Skill 1 child, non-Natural, with the Ultimate rootAction and **child AE Cost override0**. The child retains Skill 1's fixed Slots/current-occupant semantics, common source snapshot, simultaneous batch and base Damage profile. An enhanced Natural Ultimate supplies Skill 2's1.40 coefficient multiplier to that child. An ON Natural Ultimate may also activate the Passive.
 
-The exact completion/settlement ordering relative to the Passive and other reactions remains unresolved in §4.1. Ordinary Ultimate admission and Rage consumption are separate from the explicitly declared AE waiver and Max Rage reward.
+The AE waiver does not waive unrelated Costs or create another Natural Action.
 
-## 3. Character-specific negative space
+**Context-specific death reward.** After child direct Damage and the qualifying Passive, with their mandatory lifecycle stable, collect each unique Chân Ngã DEATH_CONFIRMED caused by that child's own direct Damage or that outcome's Rotania Passive follow-up. Each rewards:
 
-- A follow-up is not another Natural Action opportunity. Sharing an attack sequence does not by itself make every child/reaction/DoT receipt part of the original attack's Damage basis.
-- Skill 1 does not seek five Entity targets elsewhere when its declared fixed Positions are empty.
-- Skill 2's primary-Damage coefficient increase does not multiply Orbital Recurrence's 30% factor.
-- No Skill 1 Cost refund, successful activation on failed payment, or reward for a target lacking True Self is implied.
-- Skill 3 is not an anti-death or Revive rule. A Heal does not restore a DEATH_CONFIRMED Rotania to Field.
-- Shield depletion, natural expiry, Cleanse and transition cleanup are different terminal causes. Their eligibility for the Skill 3 Heal must not be silently equated.
-- Ultimate's Overheal exclusion is scoped to this Ultimate's Heal; it is not a global ban on Overheal conversion or an inferred restriction on Skill 3's Heal.
-- No native Element, Rank or Authority level is inferred from the Character name, Class or VFX.
+```text
+Max Rage -= 3
+Max Rage floor = 0
+after each Max Rage mutation:
+  Current Rage = min(Current Rage, new Max Rage)
+```
 
-## 4. Unresolved gameplay
+Never also reduce standalone Skill 1 Cost for that death. The reduction is **BATTLE_SCOPED**, retained through death/Revive/leave/redeploy and reset at battle end unless later explicit gameplay modifies it. Reduction is not Rage spending and does not create an Ultimate cast.
 
-### 4.1 Passive Action scope and completion
+**Heal.** Let `U` be the sealed aggregate committed Actual HP Damage from the Ultimate-called Skill 1's **own direct Damage only**. Exclude the Passive TRUE follow-up, Shield absorption, Overkill, DoT, Counter, Reaction and unrelated Damage.
 
-**BLOCKING:** clarify what “one Action with the main attack” exposes to gameplay observers: one Natural Action containing a distinct non-Natural follow-up, or one shared Action identity. Lock which direct/child Damage receipts feed the per-target 30% basis, the activation counter's CC behavior, and the settlement order relative to Skill 1/Ultimate death rewards and Ultimate Heal.
+```text
+requested self Heal = 20% × U
+```
 
-### 4.2 Skill 1 / Ultimate death rewards
+Settle after child Damage, Passive, their mandatory lifecycle and unique death rewards are stable. Overheal from this exact Ultimate Heal is **DISCARD and cannot be converted into Shield** by Rotania, an ally, an enemy or generic Overheal→Shield conversion. This explicit denial does not prohibit conversion of a different Heal's Overheal.
 
-**BLOCKING:** lock ordinary Skill 1's Cost-reduction lifetime, cumulative floor and application to later casts; whether Ultimate replaces or also grants that reduction; Max Rage reduction's lifetime/floor and Current Rage reconciliation; and whether only this attack/its Passive's confirmed deaths qualify, with one reward per qualifying confirmed-death instance.
+**Ultimate sequence.**
 
-### 4.3 Skill 2 charge consumption and cleanup
+```text
+Ultimate root admitted
+→ exactly one Skill 1 child with AE Cost waived
+→ child simultaneous direct Damage
+→ mandatory lifecycle
+→ ON-phase qualifying Passive follow-up
+→ mandatory lifecycle
+→ unique qualifying death rewards (Max Rage−3 each; clamp)
+→ Heal20% of Skill 1-direct Actual HP Damage only
+→ remaining root direct settlements complete
+→ ACTION_DIRECT_EFFECTS_COMPLETE
+→ ordinary eligible Reactions
+```
 
-**BLOCKING:** lock whether a CC-lost opportunity consumes the charge, what occurs if the next Natural Action is another Skill 2 or otherwise nondamaging, whether repeated charges stack/replace/are forbidden, and death/leave/redeploy retention. Define whether the coefficient increase covers the Ultimate's called Skill 1 and excludes independent non-Natural attacks.
+Event/list/Entity order does not decide death rewards or Heal. Mandatory lifecycle is not an ordinary Reaction window.
 
-### 4.4 Skill 3 activation, Shield lifetime and terminal Heal
+## 3. Cross-mechanic examples and negative space
 
-**BLOCKING:** lock automatic reevaluation checkpoints (including entry/Rage gain/Max HP change), retrigger eligibility while a prior Shield is active, repeated-Shield stacking, which three Natural Actions are counted (including CC/origin Action), Max HP read checkpoints for Shield and Heal, qualifying Shield terminal causes, and death/leave cleanup. The per-battle two-use cap and precedence over external Shields are already locked.
+- Standalone Skill 1, OFF, kills two Chân Ngã: future Skill 1 Cost−8.
+- Standalone Skill 1, ON, leaves a target alive then the Passive kills it: future Skill 1 Cost−4.
+- Ultimate, ON, child kills one Chân Ngã and Passive kills another: Max Rage−6, standalone Skill 1 Cost unchanged, Heal basis includes only child direct Actual HP Damage.
+- Skill 2 → next actual Natural Ultimate: child coefficients1.40; Passive may activate according to phase and uses the enhanced committed Damage basis.
+- A later independent qualifying HP/MaxHP/Rage checkpoint can spend the remaining Skill 3 use even while the first Shield exists; Skill 3's own settlement cannot recursively spend it.
+- Failed admission/payment grants no successful activation; mere probing is not an actually-performed Natural Action.
+- TRUE Damage is not automatically Shield Piercing; committed HP Damage excludes Shield and Overkill.
+- Field entry/deployment, full Rage and Max Rage0 do not independently create a Natural Action or Ultimate.
+- Skill 3 is not an anti-death/Revive rule; terminal Heal cannot materialize a DEATH_CONFIRMED Rotania.
+- Class, Rank, lore and VFX imply no Authority tier.
+- No shared Action identity, recursive Passive, double reward route, negative Cost/Max Rage, CC duration decrement, arbitrary non-Natural enhancement, FIFO/LIFO Shield priority or cleanup Heal is permitted.
 
-### 4.5 Metadata and external boundaries
+## 4. Unresolved / not-blocking boundaries
 
-**UNRESOLVED / NOT BLOCKING clarification:** Rank, native Element, base stats, Basic Attack formula and deployment budget. Executable content must resolve metadata it actually uses before runtime admission; this Canon does not guess values. Conflicts with unspecified future kits do not authorize inventing additional Rotania rules.
+- **Metadata:** Rank, native Element, base stats, Basic Attack formula and deployment budget. Resolve only when authoring/runtime actually needs them; do not invent values.
+- **Greater-than-nine target profile:** the current fixed-Slot Skill 1/Ultimate cannot exceed five recipients, and the current opposing nine-Slot board bounds that roster. A future Mode/attack admitting more than nine qualifying recipients must supply its deterministic cap-selection policy. An undeclared policy is rejected; the cap does not grant a hidden first-nine order.
+- **External content / Modes:** foreign rules and Modes need their own explicit compatible admission, conflict, numeric and spatial profiles. They do not weaken these locked Rotania semantics or silently change prior Character rules.
 
 ## 5. Normalization status
 
-**Status: GAMEPLAY_PARTIALLY_CLARIFIED / ARCHITECTURE_NORMALIZATION_BLOCKED_ON_§4.1–§4.4.**
+**Status: GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED.**
 
-The locked gameplay remains authoritative while those decisions are unresolved. No architecture extension is asserted by this status.
+Generic normalization deltas: first-depletion Shield source-family layer; exact-Heal Overheal-to-Shield denial; stable predicate checkpoints with own-activation exclusion; bounded Rage-limit/current reconciliation. Other locked mechanics use existing generic composition.

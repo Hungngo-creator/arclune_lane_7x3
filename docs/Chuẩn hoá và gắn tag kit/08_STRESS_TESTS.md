@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-05-I.13
+**Version:** 2026-10-06-I.14
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.12+, `05_CONTRACTS.md` F.14+, `06_KERNEL_RUNTIME.md` G.13+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.13+, `05_CONTRACTS.md` F.15+, `06_KERNEL_RUNTIME.md` G.14+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -27,6 +27,8 @@
 **Revision I.12:** adds M-100–M-102 for per-attack-owner Slot defaults/non-propagation, moved-Entity versus fixed-Slot impact/presentation, and rejection of broad or unresolved binding. Preserve every prior case and approved exact-owner Entity/Both lock. Architecture Phase declarative coverage only.
 
 **Revision I.13:** adds M-103–M-109 for live waiting contribution/all-entry/cohort/transfer atomicity, last-completion shared Shield refresh, root-direct absorbed-Damage settlement, random Slot/current-occupant batch, identity Revive/empty-claim restoration and invalid-profile rejection. Seven declarative Architecture Phase obligations; all previous case bodies remain unchanged, no executable test results.
+
+**Revision I.14:** adds M-110–M-114 only for first-family Shield depletion, immutable per-Heal Shield-conversion denial, stable predicate origin/coherent checkpoints, atomic capacity reconciliation and malformed bounded profiles. Reuse existing clock/child/Slot/result/lifecycle cases; prior cases and IDs remain unchanged. Architecture Phase documentation only.
 
 # 0. WHAT THIS FILE IS
 
@@ -3987,6 +3989,90 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 **Input:** WAITING_THRESHOLD_CONTRIBUTION with negative/zero/fractional/nonfinite or dynamic formula amount; unresolved runtime owner/Combat Instance/ledger scope/origin; non-static Action-owned registration; per-record force/advance co-authored with the contribution; oldest quota/RNG tie fields; progress subtraction; queued per-leave instead of coherent world checkpoint; incompatible explicit waiting policy without its governing law; IR missing exact registration lifetime/protected revision/terminal identity.
 
 **Expected:** responsible §30.1/REC-001 normalization or malformed-IR validation rejects before affected presence/ledger mutation becomes observably half-committed. Repeated index reconstruction is not a new valid contribution. No callback, new Primitive/Tag/Character branch, rule/list priority, fabricated default or deferred retry makes invalid content executable. Supported positive static ADD and existing unprofiled/explicitly compatible policies remain valid.
+
+---
+
+## M-110 — Exclusive First Shield Family Preserves Proportional Sources
+
+**Status:** `MUST_PASS`
+**Purpose:** prove the new depletion boundary, not a Character-only arithmetic example.
+
+**Fixture:** one recipient has two EXCLUSIVE_FIRST_SOURCE_FAMILY contributions from the same runtime owner/Ability/Shield Effect definition: A90/B30, independent clocks. Other valid Standard contributions C100/D200 include an ordinary consume-first preference. Damage eligibility is identical.
+
+**Expected:** Damage60 absorbs only in the first family, leaving A45/B15 and C100/D200. Next Damage100 exhausts the first60 and consumes40 from C/D in their1:2 proportions; no first-grant/FIFO/LIFO/list priority. Contributions retain individual terminal causes/entitlements; source removal/expiry never removes a sibling. Existing M-034/M-056 govern clocks versus transition cleanup.
+
+**Variants:** simultaneous eligible packets allocate each layer's budget under RES-008 and retain separate receipts (M-062), with one net ledger/HP commit. Shield Piercing/ineligible demand bypasses the family under existing law. Terminal observers wait for the complete removal/Damage group and mandatory lifecycle; a break cannot interpose Heal between Shield depletion and the same packet's HP spillover, or revive a dead/retired owner. Grant/transfer checks use exact family provenance, not equal Character names or recipient ownership; rejected/zero addition creates no membership. Permuting technical contribution/packet enumeration and save/replay preserves allocations and one terminal outcome.
+
+**Forbidden:** Standard source depletion while first-family budget remains; another ordinary first preference outranks it; first layer pierces Hit/Authority/eligibility law; different exclusive families silently get an insertion winner; cleanup creates a break Heal.
+
+**Layers:** 04§18.2, SHP-002/RES-008, 06§51–53A; M-034/M-056/M-062 remain authoritative.
+
+---
+
+## M-111 — Immutable Heal Denial Survives Foreign Delayed Conversion
+
+**Status:** `MUST_PASS`
+**Purpose:** distinguish numeric Overheal from exact-result Shield-conversion eligibility.
+
+**Fixture:** source S heals Field-present recipient R with H1: request/after modifiers100, missingHP20, overhealPolicy DISCARD and overhealConversion.shield DENY. H1 commits actualRestore20 and numericOverheal80; R already has Shield40. Self/allied/hostile/system converters bind H1's typed Overheal origin; an independently owned converter captures a declared Snapshot and runs after S leaves while R remains legal. After an unrelated HP mutation restores missingHP20, independent Heal H2 has the same numeric Overheal80 with no denial.
+
+**Expected:** every supported H1-derived Shield conversion closes locally without Shield/addition/refresh/cap mutation; preexisting Shield40 and H1's result remain unchanged. H2's otherwise legal conversion can grant Shield under ordinary admission; numeric equality/shared source/root cannot inherit H1 denial. An unrelated Shield80 without an Overheal causal basis is also unaffected. Policy/origin survives retained Snapshot/delay/save and source removal; redelivery cannot add twice.
+
+**Forbidden:** reducing requested Heal to20 or falsifying H1 Overheal0; denial stored only as a live source flag; foreign issuer/number copying launders a declared H1 conversion; DENY globally blocks other Heals/Shields; conversion failure rolls back H1.
+
+**Layers:** 04§17.2/Result/Snapshot bindings, HEL-001/002/003, 06§57 and existing Effect/Shield/Result owners. Existing SSR Warrior independent conversions remain valid.
+
+---
+
+## M-112 — Stable Predicate Coalesces Initialization and Excludes Only Own Settlement
+
+**Status:** `MUST_PASS`
+**Purpose:** prove resource/entry observation and exact causal suppression without blocking later same-root gameplay.
+
+**Fixture:** a bounded profile watches HP/MaxHP/CurrentRage plus valid entry, with guard HP<=15% MaxHP, Rage>=40, battle uses<2. Its finite activation joins Rage payment20, limit+20 and use+1, then creates one independent Shield. Initial stable HP100/MaxHP1000/Rage100/limit100.
+
+**Expected:** a joined entry/field initialization or joined external selected-field commit gives one checkpoint/candidate. One activation yields Rage80/limit120/uses1; its own writes do not recursively spend use2, despite continuing eligibility. A later independent external CurrentRage+5 commit after activation terminal, even with the same rootActionId, qualifies again: Rage65/limit140/uses2, with a separate Shield/clock. Merely comparing root/Ability would wrongly suppress it.
+
+**Variants:** resource-only external Rage39→40 at exactly HP150/MaxHP1000 qualifies without Damage or health change. MaxHP change/ordinary Heal/HP Cost use their distinct committed semantics and stable post-lifecycle view. A later State-terminal settlement is independent of the original finite activation. No-op/rolled-back/AE-only writes do not observe or retry. Payment/admission/cap failure consumes no use. Dead/left subject and stale-presence candidate cannot activate a replacement. Save/redelivery preserves one candidate and origin-suppression outcome.
+
+**Forbidden:** polling to cap2; duplicate entry/health/Rage observers; activation between sibling writes/packets or before mandatory death/prevention; resource-only crossing waits for a held ordinary Reaction; whole-root self ban; pending retry after a failed unchanged checkpoint.
+
+**Layers:** 04§7.16/§23.3, TRG-016/CST-011, 06§29B/35C; M-086/M-089 retain health-only/opportunity semantics.
+
+---
+
+## M-113 — Resource Limit, Reconciliation and Paid Use Commit Together
+
+**Status:** `MUST_PASS`
+**Purpose:** prove typed capacity versus Current resource, atomic reconciliation and battle retention.
+
+**Fixture:** per-unit Rage limit100/Current95; an opted-in limit delta−6, minimum0/CLAMP_DOWN/BATTLE_SCOPED. Separately, a legal automatic activation requires Current>=40 and remaining battle use, pays Current20 and raises limit20 in the same protected transaction with use consumption.
+
+**Expected:** limit mutation commits limit94/Current94 together, with a Resource result rather than a paid-Rage/positive-grant receipt. A sufficiently large negative delta floors limit/Current at0; readiness0 creates no Action. Raising a limit alone increases no Current. The activation starting40/100 commits20/120 and one use atomically; guard failure at39 or failed required payment/admission/transaction commits no payment, capacity or use.
+
+**Variants:** unique death rewards bound to declared direct/follow-up provenance can supply separate retained capacity deltas; repeated death/candidate delivery cannot repeat a committed delta. All-decreasing reward deltas may use one equivalent final fold only when it preserves the declared clamp and observer boundary; unrelated writes are not ordered by Event/list. Death/Revive/leave/redeploy retain battle pool limit evidence; other Current restoration/deployment assignments remain their own explicit law. A new battle initializes its own pool, not an extra field-entry delta. Joining other required Costs retains their failure/atomicity law.
+
+**Forbidden:** treating limit+20 as Current gain or payment; observing an unclamped intermediate; successful use without its required payment/limit; field cleanup resets capacity; new Ultimate from limit0; replay adds/subtracts again.
+
+**Layers:** 04§23.3/Cost/Result, CST-011/013/016 and existing Transaction, 06§29B/35C.
+
+---
+
+## M-114 — Reject Unsupported Bounded Profiles and Lost Provenance
+
+**Status:** `MUST_REJECT`
+**Purpose:** fail closed at the four new typed boundaries; accepted legacy profiles are unchanged.
+
+| Owner | Invalid input |
+| --- | --- |
+| Shield | inferred depletion from numeric priority/Character ID; unresolved family/recipient; nonproportional same-layer allocation; overlapping exclusive families without governing conflict law; partial incompatible addition/transfer. |
+| Heal/conversion | DENY attached to a foreign/unavailable result; lost Snapshot/delayed origin; requested-minus-restored/live reconstruction instead of typed Overheal; number equality used as denial; unsupported laundering/bypass or mixing of denied origins. |
+| Predicate | arbitrary watched field (including unselected Max Rage/AE), callback/poll/fixpoint; missing finite activation-origin exclusion; exclusion of the entire root/Ability; duplicate stable-health/predicate profile on one trigger; cycle/wait on held continuation; stale life/presence or unordered non-commuting candidates. |
+| Resource limit | ordinary operation/value co-authored with limitMutation; wrong pool/kind/lifetime/reconciliation; negative/nonfinite minimum or nonfinite delta; ambiguous competing writes; split joined payment/limit/use commit; reconciliation mislabeled as positive grant/Cost. |
+
+**Expected:** responsible Schema/Contract/IR owner rejects malformed static shape before execution; dynamic family/pool/reference conflicts fail before the affected commit. No partial delta of that affected transaction, fake Action, delayed retry or hidden winner. Previously committed independent work follows its own failure/refund law; a later local Shield failure does not invent a Cost/use rollback. A conversion denial closes only its local conversion and cannot invalidate an already-committed Heal. Existing health-only profile, ordinary Current grants/Costs, Standard Shields and independent ordinary conversions remain accepted.
+
+**Layers:** 04§7.16/17.2/18.2/23.3/51/92, TRG-016/HEL-003/SHP-002/CST-011, existing 06 owners.
 
 ---
 
