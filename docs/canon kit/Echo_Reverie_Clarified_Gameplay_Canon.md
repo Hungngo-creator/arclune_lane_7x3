@@ -1,19 +1,23 @@
 # ECHO REVERIE — CLARIFIED GAMEPLAY CANON
-## Gameplay-logic clarification before Tag / Primitive / Contract normalization
+## Durable Character gameplay authority
 
 **Character:** Echo Reverie  
+**Gender:** Female
+
+**Raw source:** `Ý tưởng nhân vật 4.md`, Echo Reverie entry.
+
+**Precedence:** Later explicit designer corrections supersede this Canon; its non-superseded gameplay locks supersede raw prose, including linked passive-kill eligibility for Skill 3.
+
 **Source:** Echo in the myth of Narcissus, especially the Ovidian motif of being unable to initiate speech and only repeating what was last spoken.  
 **Class:** Mage  
 **Element:** Not specified in this source.  
-**Status:** Clarified Gameplay Canon — ready for semantic normalization after the current canonical architecture is up to date.  
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED
 **Scope:** Turn-based mode first.  
-**Important:** This document defines **gameplay behavior and semantic intent**. It does **not** yet assign new Functional Tags, Primitive IDs, Contract IDs, or Kernel implementation.
+**Authority:** This document defines gameplay behavior and semantic intent. Generic representation/execution belongs to the current architecture; change rationale belongs to PR/git history.
 
 ---
 
 # 0. PURPOSE
-
-Echo Reverie is intended as a difficult Pilot-Normalization character.
 
 The design identity is:
 
@@ -31,26 +35,13 @@ The kit deliberately combines:
 - shield-to-Max-HP conversion;
 - child Skill execution from Ultimate.
 
-The workflow is:
-
-```text
-Original Echo kit
-→ this Clarified Gameplay Canon
-→ Terminology normalization
-→ Architecture Impact Matrix
-→ existing Tag / Schema / Primitive / Contract mapping
-→ only then consider generic architecture gaps
-```
-
-Do not create `ECHO_*` architecture abstractions merely because this Character is complex.
-
 ---
 
 # 1. GLOBAL SYSTEM CONTEXT USED BY ECHO
 
 ## 1.1 Natural Action
 
-A Natural Action is the Action opportunity granted by SSI to the Character.
+SSI grants a Natural Action opportunity. A Natural Action is the Action actually performed from that opportunity; a CC-lost opportunity performs no Natural Action.
 
 A Natural Action may execute:
 - Basic Attack;
@@ -1417,38 +1408,18 @@ The following are considered clarified:
 
 ---
 
-# 23. READY FOR PILOT NORMALIZATION #2
+# 23. UNRESOLVED / NOT BLOCKING
 
-Recommended next step:
+- Native Element, numeric stat/budget metadata and non-turn-based adapters are not supplied by this gameplay source.
+- A future incoming simultaneous outcome containing different qualifying Action forms or different Ultimate child fallback forms needs an explicit memory tie policy. "Latest" does not choose a winner within one unordered commit; Event/Entity/list order is not a gameplay lock.
+- Future incompatible special Shield orders or cap-affecting transfer/replacement/MaxHP-reduction mechanics need their explicit external composition where existing rules do not determine the outcome. Do not invent a winner or a retroactive Shield removal.
 
-```text
-1. compare raw Echo kit vs this Clarified Gameplay Canon;
-2. normalize Terminology only;
-3. map each mechanic to existing canonical architecture;
-4. classify each mechanic:
-   - EXISTING
-   - SCHEMA/PARAMETER ONLY
-   - GENERIC ARCHITECTURE GAP
-   - CHARACTER-SPECIFIC COMPOSITION
-5. produce Architecture Impact Matrix 01–08;
-6. do not create new Tag/Primitive/Contract ID merely because Echo is complex;
-7. only propose generic patches after proving current architecture cannot represent a clarified mechanic cleanly.
-```
+These boundaries do not change the locked ordinary kit and are not silently compiled into defaults.
 
-Architecture stress areas to inspect:
-- root/child Action ancestry;
-- Actual HP Damage attribution;
-- no-recursion provenance;
-- latest qualifying Action-memory record;
-- actor-Natural-Action windows;
-- autonomous Action-form restriction/fallback;
-- Authority-gated Shield admission;
-- independent Shield pools and absorption priority;
-- Action-level aggregation;
-- DEATH_CONFIRMED attribution to Action outcome;
-- once-per-Natural-Action trigger cap;
-- battle-scoped activation counter;
-- child Skill Cost override;
-- linked-effect settlement before class AE regeneration.
+---
 
-These are inspection targets, not permission to create new abstractions automatically.
+# 24. NORMALIZATION STATUS
+
+Status: GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED
+
+Generic architecture delta: a recipient-owned Shield ledger partition supports independent new-addition caps and proportional external-pool-before-Skill-1 depletion while retaining each source's provenance.

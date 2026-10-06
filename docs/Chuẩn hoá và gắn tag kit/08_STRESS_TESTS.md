@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-06-I.14
+**Version:** 2026-10-06-I.15
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.13+, `05_CONTRACTS.md` F.15+, `06_KERNEL_RUNTIME.md` G.14+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.14+, `05_CONTRACTS.md` F.16+, `06_KERNEL_RUNTIME.md` G.15+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -29,6 +29,8 @@
 **Revision I.13:** adds M-103–M-109 for live waiting contribution/all-entry/cohort/transfer atomicity, last-completion shared Shield refresh, root-direct absorbed-Damage settlement, random Slot/current-occupant batch, identity Revive/empty-claim restoration and invalid-profile rejection. Seven declarative Architecture Phase obligations; all previous case bodies remain unchanged, no executable test results.
 
 **Revision I.14:** adds M-110–M-114 only for first-family Shield depletion, immutable per-Heal Shield-conversion denial, stable predicate origin/coherent checkpoints, atomic capacity reconciliation and malformed bounded profiles. Reuse existing clock/child/Slot/result/lifecycle cases; prior cases and IDs remain unchanged. Architecture Phase documentation only.
+
+**Revision I.15:** adds only M-115/M-116 for shared multi-source remainder cap/receipts and two-part depletion/provenance/rejection. All prior stable IDs and case bodies remain unchanged; declarative Architecture Phase obligations only.
 
 # 0. WHAT THIS FILE IS
 
@@ -4075,6 +4077,48 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 **Layers:** 04§7.16/17.2/18.2/23.3/51/92, TRG-016/HEL-003/SHP-002/CST-011, existing 06 owners.
 
 ---
+
+## M-115 — Recipient Partition Shares Remainder Cap Across Unrelated Shield Sources
+
+**ID:** `M-115`
+**Status:** `MUST_PASS`
+**Purpose:** prove recipient-owned group headroom differs from one cap per source family while preserving actual addition receipts.
+
+**Initial State:** recipient R has CurrentMaxHP1000 and an active 04§18.3 rule. Matched family F has remaining600; unrelated admitted Standard family A in the remainder has600. Both partition maxima read100% CurrentMaxHP. Addition operations below are explicitly sequential. Each source keeps its own owner, origin, duration and ledger entry.
+
+**Input / Expected Resolution:**
+
+1. Unrelated remainder family B requests700: remainder headroom400; commit400, total remainder1000 and matched600. Its SHP-005 receipt records requested700/committed400 and B's real contribution ref. It does not receive an independent1000 cap.
+2. Family F requests500: matched headroom400; commit400, matched1000/remainder1000. B does not consume F's cap. An additional F source-family cap, if present with the same maximum, cannot double-credit the addition.
+3. Either full partition requests50: successful zero receipt, empty contribution refs, no contribution/refresh/expiry work. A denied grant consumes neither cap nor positive receipt evidence.
+4. A expires: remove only its remaining600. A later unrelated family C may add up to released remainder headroom600; F is untouched. Permuting ledger storage produces the same amounts.
+5. Replay any terminal grant: reuse its receipt/transaction identity, never add again. A stale headroom read must revalidate. Unordered competing remainder grants with incompatible provenance/duration allocation and insufficient headroom are rejected absent an explicit allocation law.
+6. On a fresh view with matched600/CurrentMaxHP1000, a committed MaxHP increase to1500 precedes an F grant requesting700: current matched headroom900 admits700. Do not cache the former maximum1000/headroom400. Under this explicit CLIP_NEW_ADDITION profile, lowering a maximum leaves existing contributions intact and only changes future headroom.
+
+**Forbidden Outcomes:** cap1000 for each external source; one combined cap for both groups; synthetic shared source owner; clipping after publishing an excessive positive receipt; cap-to-zero refresh; source expiry removes the whole group; duplicate registration/grant consumes headroom twice.
+
+**Layers Under Test:** 04§18.3, SHP-005/006, STA-014, static registration, Shield/Transaction/Result owners.
+
+## M-116 — Recipient Partition Depletes Remainder Proportionally Before Matched Family
+
+**ID:** `M-116`
+**Status:** `MUST_PASS / MUST_REJECT`
+**Purpose:** prove two-stage Damage allocation preserves unrelated source identity and does not become non-Damage removal priority.
+
+**Initial State:** R has admitted remainder contributions A600/B300, and matched family F400. An active partition rule declares REMAINDER_BEFORE_MATCHED_FAMILY. All are ordinary Standard Shields eligible for the following Damage; HP is sufficient.
+
+**Input / Expected Resolution:**
+
+1. A simultaneous two-packet group requests300 and150 after mitigation: Shield consumes450 from remainder, with A reduced to300 and B to150. F remains400; HP unchanged. Each packet retains its own absorbed result300/150. Swapping packet/ledger enumeration changes no allocation.
+2. B expires: remove only its remaining150; A300/F400 remain.
+3. A later Damage requests500: deplete A300, then F200; F remains200, HP unchanged. Partial remainder depletion may not touch F early.
+4. On a fresh view A600/B300/F400, an explicitly authored non-Damage conversion removes50% of all contributions: A300/B150/F200 remain; removed650 can supply the separately authored MaxHP mutation. This does not remove650 from the first layer alone, emit ActualHP Damage, or create break/expiry semantics.
+5. Shield Piercing/ineligible demands skip applicable layers under existing law; no partition priority grants damage eligibility. Lifecycle cleanup and expiry retain actual causes and independent clocks.
+6. Reject missing/ambiguous family refs, nonfinite/negative maxima, unsupported order/cap enums, a second incompatible partition rule, an exclusive first-family/special-layer overlap without approved composition, and positive SET/TRANSFER/replacement without a cap mapping before the affected mutation. Prior independent terminal commits are preserved; failed registration/grant creates no partial ledger/rule/HP result.
+
+**Forbidden Outcomes:** global Standard proportional depletion across A/B/F; FIFO/LIFO among A/B; merging A/B origins; using Event/list order for a competing profile; non-Damage conversion inherits Damage-layer order; source expiry retires F; changing existing M-110/M-114 exclusive-family law.
+
+**Layers Under Test:** 04§18.3, SHP-002/006, RES-008, Shield/Duration/Transaction/Result/static-rule owners; existing M-021–M-029 remain obligations for Echo's other composition.
 
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 

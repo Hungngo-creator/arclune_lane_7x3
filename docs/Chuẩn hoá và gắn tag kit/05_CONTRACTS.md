@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-06-F.15
+**Version:** 2026-10-06-F.16
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -28,6 +28,8 @@
 **Revision F.14:** extends existing REC-001 with a bounded live positive waiting-threshold contribution and coherent presence/death/all-entry checkpoint; REC-004/020 retain cohort and before-ordinary-Revive law. No new Contract ID, Tag, Primitive, generic Reaction priority or default Shield/Revive policy.
 
 **Revision F.15:** extends existing SHP-002/HEL-003/TRG-016/CST-011 with bounded opt-in first-family depletion, per-Heal Shield-conversion denial, stable predicate checkpoints and atomic Rage-limit/current reconciliation. Unprofiled law and all prior IDs remain unchanged; no global priority, Tag or Primitive.
+
+**Revision F.16:** extends existing SHP-002/006 with one opt-in recipient exact-family/complement partition: shared remainder cap, separate matched cap and explicit remainder-first proportional depletion. Existing admission, receipts, source lifetimes and prior profiles remain unchanged; no new Contract ID.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -3518,6 +3520,14 @@ Only one exclusive first family is supported at a recipient. Another incompatibl
 
 Unprofiled Standard Shields retain proportional pooling. Ordinary consume-first metadata cannot outrank the opted-in exclusive family and does not itself define how other Shields are ordered. Save/replay retains the profile/family per contribution and applies one authoritative allocation/commit without grant/depletion duplication.
 
+### SHP-002 opt-in recipient ledger partition
+
+04§18.3 registers one recipient-owned exact-family/complement partition. Required source/origin evidence must prove membership; explicitly standalone grants may be remainder, but ambiguous legacy/proposed origins cannot be classified by absence and are rejected before affected registration/mutation. On the authoritative Damage calculation view, classify each admitted contribution once by immutable source-family provenance. Eligible remainder contributions form the first layer; eligible matched-family contributions form the second. Each layer depletes proportionally to its eligible remaining amounts, regardless of source count, grant order or expiry clock. Apply RES-008 packet allocation at each layer and pass only residual demands onward to HP. Piercing/ineligibility still skips the relevant layer.
+
+This is a recipient rule; foreign producers retain their original source/owner/Ability/Effect refs. Cap group, Damage layer and source contribution identity are distinct. A source's expiry/removal retires only its remaining contribution, not a whole partition. Non-Damage conversion/removal follows its own selected set, not this Damage ordering.
+
+Unsupported competing partition/exclusive-family/special-layer orders require an explicit composition law or rejection before the affected mutation, never a Character/Authority/list winner. No rule changes unprofiled Standard pooling or the existing exclusive first-family profile.
+
 ## SHP-003 — Shield Piercing
 **Status:** `LOCKED`
 
@@ -3588,6 +3598,14 @@ The cap read set and ledger mutation must be transaction-consistent so two addit
 Uncapped Shields and `SHP-002` proportional Standard Shield depletion remain unchanged. Reject missing/ambiguous family provenance, unsupported operations, negative/nonfinite or otherwise invalid cap references and stale transaction reads rather than guessing a global or per-cast cap.
 
 ---
+
+### SHP-006 opt-in recipient-partition cap
+
+04§18.3 reuses this addition law for two independent recipient-local ledger views: an exact matched source family and its complement. Before a supported CREATE/ADD_VALUE commit, apply ordinary admission, resolve the active rule, classify the proposed grant, and protect the partition membership/remaining sum, maximum and registration revision with the ledger write. Clip the new addition to that partition's nonnegative headroom. Multiple unrelated remainder sources consume one common cap; matched contributions consume only the other cap. An applicable source-family cap additionally bounds the same addition by the minimum supported headroom, without a second grant/receipt.
+
+Preserve each contribution's real provenance, stacking/duration/retention and SHP-005 positive/zero receipts. A zero grant has no contribution, refresh or terminal entitlement. Expiry/depletion/removal releases future headroom; lower caps do not trim existing entries under CLIP_NEW_ADDITION. Registration/removal of the rule changes the derived view, never rewrites prior receipts or silently discards Shield.
+
+Protect both the applicable rule and ledger against stale reads; revalidate on conflict under existing transaction law. Explicitly ordered additions observe prior committed usage; unordered competing additions with observable allocation differences reject absent an approved allocation law. Unsupported positive SET/TRANSFER/replacement cannot bypass the cap and requires a compatible mapping or rejection before affected commit. Prior independently committed work follows its own failure/refund law.
 
 # 21. ACTUAL HP DAMAGE / OVERKILL
 
