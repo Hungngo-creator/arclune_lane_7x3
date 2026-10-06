@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-06-G.14
+**Version:** 2026-10-06-G.15
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -29,6 +29,8 @@
 **Revision G.13:** executes opt-in live waiting-threshold rules through existing static registration, Field Presence, Reincarnation ledger and Transaction/Lifecycle owners. Derive one protected final contribution sum and all-entry decision at the world-law checkpoint; no new manager/store/Primitive/Contract ID or Character branch. Existing Shield/Slot/Revive owners remain unchanged.
 
 **Revision G.14:** executes E.13/F.15 through existing Transaction/Trigger/Health/Resource/Presence, Shield/Damage and Heal/Result/Effect owners. Exact checkpoint/activation/result/family refs supply the new boundaries; no Character branch, new store/service, Tag/Primitive or generic priority.
+
+**Revision G.15:** executes a bounded recipient-owned Shield ledger partition through existing static-rule/Shield/Damage/Transaction/Result owners. Real source provenance, independent cap views and remainder-first proportional allocation require no new subsystem or Character branch.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -3267,6 +3269,16 @@ Do not create special layers merely because sources differ.
 At the shared recipient calculation view, partition eligible contributions into that first family and the remaining separately valid profiles. Shield Piercing/ineligibility still bypasses them. Allocate the first family's budget to participating packet demand using existing RES-008; deplete its source contributions proportionally, then resolve residual packet demand through the remaining layers and HP. Preserve each Damage receipt's Shield/ActualHP/Overkill and each contribution's provenance/remaining value.
 
 Commit ledger/HP/results once under the existing transaction. Independent contribution clocks and terminal causes remain in the existing Duration/Shield owners; same-family grants do not merge/refresh. Zero additions create no membership. Cleanup removes membership with the actual transition cause, not a break/expiry Heal. Save/resume retains normalized profile/family/allocation/terminal identity and cannot deplete or grant twice. §52 continues to govern unprofiled Standard Shields.
+
+## 53B. RECIPIENT-OWNED SHIELD LEDGER PARTITION
+
+04§18.3 → SHP-002/SHP-006 → existing static Rule/State registry, Shield ledger, Damage/RES-008, Transaction and Result owners. Register the bounded partition plan with exact runtime owner/origin, recipient and lifecycle scope. Index it by recipient/Combat Instance; the index and partition totals are derived views of the source ledger, not independent writable pools. Duplicate delivery of the same registration does not create another cap/order. Validate unsupported overlaps before the affected registration/Shield commit.
+
+At supported addition commit, require provable source-family membership (including explicitly known standalone remainder grants), query the current rule, apply STA-014 admission, and classify the new contribution against the exact matched source family. The other partition includes all remaining real sources without changing their origin refs. Protect rule revision, relevant ledger entries and maximum reads in the transaction; clip the admitted new amount to that partition's nonnegative headroom and any independently applicable source-family headroom. Commit one ledger addition plus SHP-005 receipt, or successful zero with no ledger/clock mutation. Preserve explicit grant ordering; reject unsupported competing allocation or positive mutations that could evade the cap.
+
+At Damage calculation, use one shared authoritative view of rule/membership, eligibility and remaining amounts. Allocate eligible remainder budget to packet demands under RES-008 and deplete its contributions proportionally. Continue residual demands through the matched-family layer the same way, then HP. Commit source deltas, HP and per-packet Shield/ActualHP results once. Piercing/ineligibility and all source-specific duration/removal causes remain separate.
+
+An explicit non-Damage percentage reduction can select both partitions and reduce its selected contributions proportionally in its own transaction; do not accidentally use first-layer Damage order or emit Damage/break semantics. Rule removal merely retires its derived partition/order view; surviving Shield keeps its source/lifetime and resumes its otherwise valid profile. Save/replay retains rule/ledger/provenance and terminal transaction identities; never reconstruct grant receipts from live totals or consume twice. Unprofiled §52 and §53A remain unchanged; no Character branch, cap manager or global priority.
 
 # 54. SHIELD EXPIRY
 

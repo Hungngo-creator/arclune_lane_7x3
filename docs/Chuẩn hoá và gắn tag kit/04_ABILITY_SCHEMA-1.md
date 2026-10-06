@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-06-E.13
+**Version:** 2026-10-06-E.14
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -26,6 +26,8 @@
 **Revision E.12:** adds only an opt-in live waiting-threshold contribution in the existing Reincarnation family: exact static-rule/presence ownership, positive integer ADD, all-waiting re-evaluation and one coherent world-ledger checkpoint under REC-001. Existing Shield clock/result/Slot/Revive composition suffices; no new Tag, Primitive, Contract ID or callback.
 
 **Revision E.13:** adds bounded opt-in first-family Shield depletion, immutable per-Heal Shield-conversion denial, stable HP/MaxHP/Rage/entry predicate settlement and Rage-limit/current reconciliation. Existing owners/IDs and unprofiled behavior remain unchanged; no new Tag, Primitive, callback or priority manager.
+
+**Revision E.14:** adds one bounded recipient-owned exact-family/complement Shield partition with independent new-addition caps and explicit remainder-first proportional depletion under existing SHP-002/006. All earlier profiles/IDs remain unchanged; no new Tag, Primitive or priority/pool manager.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -2811,6 +2813,37 @@ This opt-in SHP-002 profile is a depletion exception, not Authority or Damage el
 Eligible Damage consumes this family before every other Shield source, including another source's ordinary consume-first preference. All eligible contributions in the first family deplete proportionally; no FIFO/LIFO, numeric priority or source/list ordering. Remaining Damage then follows the separately valid remaining Shield profiles and ordinary HP pipeline. Shield Piercing/eligibility and RES-008 simultaneous packet allocation remain applicable.
 
 Only one exclusive first family may be active per recipient. An incompatible second exclusive family requires an independently approved conflict profile; absence is rejected, not resolved by arrival, Slot, Rank or Authority metadata. Validate this at normalization where overlap is provable and before an affected addition/transfer commit otherwise. Omission preserves Standard Shield proportional pooling. Never infer this profile from a `priority` value, source identity alone or Character name; unsupported existing priority descriptions still need their own explicit law.
+
+## 18.3 Recipient-owned two-part Shield ledger rule
+
+```yaml
+shieldLedgerPartition:
+  ruleId: <stable authored rule ref>
+  recipientRef: SELF
+  matchedFamily:
+    sourceOwnerRef: <runtime EntityRef>
+    originAbilityId: <stable Ability definition ref>
+    originEffectId: <stable Shield Effect definition ref>
+  matchedMaximum: <pure nonnegative finite ValueRef>
+  remainderMaximum: <pure nonnegative finite ValueRef>
+  capPolicy: CLIP_NEW_ADDITION
+  readTiming: SHIELD_COMMIT
+  depletionOrder: REMAINDER_BEFORE_MATCHED_FAMILY
+  lifecycle:
+    retentionScope: FIELD_PRESENCE_SCOPED | BATTLE_SCOPED
+```
+
+Membership must be provable for both existing and proposed contributions. A known standalone grant may belong to the remainder; missing required source/origin data is not proof of nonmembership. Reject ambiguous membership before registration or affected mutation instead of guessing a partition.
+
+This bounded opt-in rule belongs to a recipient's PASSIVE_STATIC/System rule, not to each foreign Shield producer. Existing static registration owns its runtime owner/origin/lifetime; SELF resolves that rule's recipient. Lower to a shieldLedgerPartitionPlan in the existing rule/Shield plan. It defines exactly two disjoint ledger views: the exact matched source family, and every other admitted contribution on that recipient. Source-family identity reuses §18.1 provenance; the remainder may contain many unrelated runtime owners/Abilities, including standalone System grants. Do not rewrite those origins into a synthetic common source or create another writable pool.
+
+SHP-006 applies the explicit maximum independently to each partition for supported CREATE/ADD_VALUE positive additions. Admission remains STA-014; rejected grants occupy no headroom. In the protected Shield commit, classify the proposed addition, read that partition's remaining total and maximum, and clip only the new addition. Any independently applicable source-family cap also bounds the same addition; use the minimum of the supported headrooms from one view. Zero follows SHP-005 without contribution creation/refresh. Existing contributions are not trimmed or merged; a lower maximum prevents new gains without inventing a removal rule.
+
+SHP-002 consumes eligible remainder contributions before eligible matched-family contributions, proportionally within each partition. Preserve eligibility/Piercing, RES-008 simultaneous packet allocation, separate source ledgers/clocks and terminal causes. Ordinary non-Damage removal/conversion still uses its explicitly selected contribution set; it does not inherit Damage depletion order.
+
+At most one partition rule may govern a recipient. Re-delivery of the same registration is idempotent, not another rule/cap. Incompatible overlapping rules, EXCLUSIVE_FIRST_SOURCE_FAMILY or special layer orders need an independently approved composition law; reject the affected rule-registration/grant/transfer before commit otherwise. Ordinary unprofiled Standard contributions are supported. Priority metadata alone supplies no conflicting special law or winner. Positive SET/TRANSFER/replacement without an explicit compatible partition-cap mapping is rejected where it would bypass this rule; ordinary depletion, expiry, removal and proportional value reduction remain supported.
+
+Validate exact available family/recipient refs, finite nonnegative maxima, lifecycle/registration ownership, fixed cap/read/order enums and protected cap reads. Competing additions with insufficient shared headroom require an existing explicit allocation/dependency law; never select by source/list/Event order. No arbitrary partition list, numeric priority, callback, Tag, Primitive or new Contract ID. Omission preserves all earlier Shield profiles.
 
 # 18A. SCOPED EFFECT-AMOUNT MODIFIER SPEC
 
@@ -6585,6 +6618,8 @@ Additional E.10 invariants: projection membership is sealed while the exact Stat
 Additional E.11 invariants: every executable attack owner has an explicit resolved binding; unresolved authoring binding defaults to POSITION/LOCK_POSITIONS. Entity/Both requires an exact-owner authored exception or explicit owner-scoped profile reference. Reject broad exception propagation, foreign-owner binding substitution, unresolved IR and implicit parent/Character/Ability/sibling inheritance. Explicit Entity tracking preserves identity through legal movement and uses current Position for presentation; Slot binding retains coordinates and its declared occupant-read checkpoint. Keep approved exact-owner Entity/Both and non-attack profiles intact.
 
 Additional E.12 invariants: WAITING_THRESHOLD_CONTRIBUTION is a bounded static positive-integer ADD rule with exact origin/owner/ledger/presence lifetime. Its optional normalized plan preserves REC-001's protected final availability/progress view and all-waiting threshold decisions; reject quota, progress mutation, duplicate registration, per-leave ordinary Reaction lowering or an incompatible explicit policy without a composition law.
+
+Additional E.14 invariants: validate one recipient partition registration, exact family/complement membership, independent protected headrooms and fixed remainder-first proportional depletion. Preserve real sources/receipts/clocks; reject unsupported overlaps, cap-bypassing positive mutations and ambiguous competing additions before affected commit. No synthetic source or writable cap pool.
 
 Additional E.13 invariants: validate the bounded predicate fields/initialization, exact own-activation origin and finite dependencies; immutable exact-Heal conversion origins/denial; exclusive first-family eligibility/overlap/proportional allocation; and finite limit/current/battle-lifetime/atomic joined writes. Reject broad root/Ability exclusion, inferred priority, reconstructed Overheal, missing result origins, invalid minimum/pool/reconciliation or split transactions before affected mutation. Omission preserves prior profiles and all prior IDs.
 
