@@ -1,5 +1,7 @@
 # NẠP HƯ GIỚI — CẤU TRÚC QUẦN VỰC, GIỚI BÍCH & CÁC ĐẠI VỰC HIỆN HÀNH
 
+> **Bàn giao mới 2026-10-06:** [hội thoại về Thiên Đạo, Luân Hồi và thế giới riêng](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md). Mục LIX–LX giữ các quyết định mới và giới hạn của giả thuyết sáng thế chủ.
+
 > **Trạng thái:** Thiết kế thế giới đang xây dựng — dùng để tiếp tục khóa địa lý, lịch sử và vật lý Nạp Hư trước khi viết biên niên sử chính thức.
 >
 > **Mục tiêu tài liệu:** gom và làm rõ mô hình không gian Nạp Hư, vấn đề trên–dưới/trọng lực, Giới Bích, Phi Thăng, nơi cư trú của Chân Tiên, đồng thời hệ thống hóa các Vực hiện đã được định nghĩa: Hư Minh Lôi Hải, Tần Vực, Phạn Châu, Mộng Châu, Nhân Vực/Ma Châu, Tinh Hải Thần Châu, Yêu Vực và Linh Sinh Vực.
@@ -1002,8 +1004,8 @@ Hắn:
 
 1. tháo phần liên kết khiến mình ở trạng thái Thiên Địa Chính Tiên;
 2. chia nhỏ hệ Quy Tắc / quyền năng mà mình đã nắm;
-3. tách thành **12 phần Pháp Tắc / thần dị lớn**;
-4. dùng mười hai phần ấy sinh ra **12 người con**;
+3. tách **mười hai phần Chân Ngã** cùng **12 phần Pháp Tắc / thần dị lớn**, làm suy yếu linh hồn;
+4. dùng những phần ấy sinh ra **12 người con**, Chân Ngã của họ từng là các phần của hắn;
 5. mỗi người con đạt mức **Chân Tiên**;
 6. bản thân Nhân Tổ sau khi mất cấu trúc Quy Tắc hoàn chỉnh hạ xuống đủ sâu để vào Luân Hồi.
 
@@ -2512,6 +2514,32 @@ Họ thiện lương do bản chất cây cỏ, cùng lập **một vương qu�
 
 ## Luân Hồi — ĐÃ CHỐT
 
-Luân Hồi là **một vùng á không gian**, có **cối xay bay lơ lửng**; dưới cối xay là đất, sông uốn lượn và **hoa bỉ ngạn**. Chân Ngã đến đó bị hút về cối xay, mê mang / mơ hồ ý thức; **Chân Tiên có thể kháng, dưới Chân Tiên không thể kháng**. Chưa tự áp ngưỡng nhìn vương quốc cây cỏ sang Luân Hồi hoặc khóa chức năng từng bước / đường đầu thai của cối xay.
+Luân Hồi là **một vùng á không gian**, có **cối xay bay lơ lửng**; dưới cối xay là đất, sông uốn lượn và **hoa bỉ ngạn**. **Trình tự mới đã chốt:** linh hồn vào Luân Hồi Chi Địa → đi sâu chịu hoa bỉ ngạn làm ý thức mơ hồ → bơi qua sông Luân Hồi gội rửa ký ức và linh hồn → tới cối xay chỉ còn Chân Ngã → **Lục Đạo Luân Hồi Bàn** phân phối đầu thai theo nghiệp lực. Sáu đạo: Thiên, A-tu-la, Nhân, Súc Sinh, Ngạ Quỷ, Địa Ngục. Khả năng kháng mê mang của Chân Tiên không tự là miễn gội rửa; cơ chế bảo tồn ký ức, cối xay và thời điểm hoàn thiện các bước còn mở. Không áp ngưỡng nhìn vương quốc cây cỏ sang Luân Hồi.
 
 Các hài tử đã thu thập **hoa bỉ ngạn, nước sông Luân Hồi và vài nguyên liệu đặc thù**, trong đó nguyên liệu Tiên Thiên Sinh Linh là **một loại trái cây tái tạo được**, để luyện **đan dược tạo Chân Ngã** và dùng cho tạo vật. **Không Tiên Thiên Sinh Linh nào chết vì việc tạo đan.** Công thức, cách tiếp cận hai á không gian, sản lượng và cơ chế linh hồn / ý thức còn mở. Chi tiết lịch sử tại mục XLIX của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
+
+---
+
+# LIX. THIÊN ĐẠO, LUÂN HỒI ẨN VÀ SINH LINH MỚI
+
+**ĐÃ CHỐT:** Thiên Đạo là tập hợp ý thức của sinh linh có ý thức, ban đầu máy móc, dần hình thành ý thức riêng. Nó **không đọc được suy nghĩ Chân Tiên trở lên**; quan sát / suy luận dấu vết hành động vẫn có thể.
+
+Sinh linh mới sau Nguyên Sơ vỡ xuất hiện hằng ngày bằng **tự ngưng tụ từ thiên địa, từ cây cỏ / vật chất có sẵn, và qua những sinh linh đầu tiên**. Tạo sinh linh đem lại **công đức**, nước cờ của Thiên Đạo mà chúng sinh mơ hồ phát hiện. Không nhập một nhân cách Thiên Đạo trưởng thành vào thời chưa thức tỉnh.
+
+Thiên Đạo che **biểu hiện Quy Tắc Luân Hồi ở hiện thế**, không muốn ai sở hữu vì nó can thiệp Sinh–Tử và ảnh hưởng được Thiên Đạo. Muốn cảm ngộ cần nền Sinh Mệnh / Tử Vong; Chính Tiên không vào được khi chưa hạ tu vi. Hạ tu vi giữ cảm ngộ nhưng bỏ quyền; người khác chiếm Sinh–Tử sẽ chặn khôi phục. Các kế hoạch chia Chân Ngã / quy nhất phải che dấu vết và có thời gian; chưa xác nhận ca thành công.
+
+Thiên Đạo không thể thu hồi Quy Tắc thuộc Chính Tiên, nhưng có thể làm nó suy yếu. Thiên địa nguồn suy yếu làm toàn bộ Pháp Tắc / Quy Tắc nguồn suy yếu; cấp thế giới ảnh hưởng sức mạnh của mọi quyền năng ấy.
+
+# LX. THẾ GIỚI RIÊNG, LUẬT NỀN VÀ GIẢ THUYẾT SÁNG THẾ CHỦ
+
+**ĐÃ CHỐT:** cảnh Chính Tiên không phân nguồn Quy Tắc. Một cá thể có thể đồng thời nắm nền của Nạp Hư và thế giới riêng; sức mạnh tùy cấp độ / độ hoàn thiện nguồn. Từ bỏ quyền Nạp Hư chỉ làm yếu nếu nền riêng chưa đủ cấp.
+
+**ĐANG XÂY DỰNG:** thiên địa riêng có Thiên Đạo riêng, chịu quyền sáng thế chủ. Sáng thế chủ có thể đóng vai Chính Tiên; không bắt buộc là cùng một ý thức với Thiên Đạo. **Luật sở hữu là luật nền**, không phải Quy Tắc tu luyện; sáng thế chủ giả định có thể sửa luật nền trong thế giới mình.
+
+**Hướng Thái Sơ tác giả chọn:** chỉ tạo và sở hữu một thế giới làm neo duy nhất giữ vị cách. Thu / ngoại phóng không xóa quan hệ giữ cảnh; hòa tan neo dẫn tới ngã cảnh. Thế giới riêng được so với Nạp Hư để hình dung mức hoàn thiện, không phải theo sức mạnh Nạp Hư hiện tại. Không có việc làm Nạp Hư yếu đi để tự đạt Thái Sơ.
+
+**BÍ ẨN CHỦ Ý:** chính Nạp Hư có thể là thiên địa được sáng thế chủ tạo; Thiên Đạo có thể là khôi lỗi / ý thức quản lý, Nhân Tổ hoặc Nguyên Sơ có thể là sáng thế chủ. Giữ là giả thuyết của nhân vật / độc giả, chưa đặt vào bản đồ hay niên biểu như sự thật.
+
+Thần vực của đạo thống Main ở thiên ngoại và không thể tùy ý thu vào cơ thể; thần vực cùng thần cách tạo hai điểm neo cho chuyển tiếp lên Chí Cao. Không đồng nhất thần vực ấy với mọi Tiên Vực / Đạo Vực của Chân Tiên Nạp Hư hoặc thần cách Tân Thần Thần Huy.
+
+Giải thích từng lượt và phần đáp ở [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md); cơ chế ở mục XXVII–XXXII của [Bản thể tu luyện](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).

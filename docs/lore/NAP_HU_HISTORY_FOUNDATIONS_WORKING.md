@@ -1,5 +1,7 @@
 # NẠP HƯ — KHUNG LỊCH SỬ NỀN TRƯỚC KHI CHIA ĐẠI KỶ
 
+> **Bàn giao mới 2026-10-06:** đọc [chín lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md) trước khi mở câu hỏi mới. Các bổ sung L–LI và mốc Nhân Quả cập nhật câu trả lời mới nhất; không xác nhận Thái Sơ / sáng thế chủ chỉ từ giả thuyết.
+
 > **Trạng thái:** Niên biểu đang xây dựng.
 >
 > Tài liệu này khóa **trật tự tương đối** và một số **khoảng thời gian** giữa các biến cố lớn. Chưa gán niên đại tuyệt đối.
@@ -139,7 +141,9 @@ Số 01–24 giữ nguyên trục đã dùng trong đối thoại với tác gi�
    │
 22 ● Tái thiết; Nhân Vực dần mang tên Ma Châu
    │
-   │ Ít nhất 30.000 năm
+   │ Ít nhất 30.000 năm; tác giả muốn phát triển lịch sử dài hơn
+   │ Trong cửa sổ sau 21, trước 23 có âm mưu đồng hóa người chứng đạo Nhân Quả;
+   │ vị trí cụ thể / thời lượng chưa chốt, không cộng thêm một số năm mới
    │
 23 ● Thời Main đời I tại Nạp Hư
    │
@@ -519,7 +523,7 @@ Hắn ở lại chăm hai quả trứng cho tới khi chúng nở.
 
 ### Khi sinh mệnh khác xuất hiện
 
-Sau biến cố Nguyên Sơ, **Sinh Mệnh Quy Tắc hình thành**, cây cối và sinh vật xuất hiện nhiều hơn. Sinh vật / động vật mới xuất hiện với **tần suất tính bằng ngày**, theo các hình thái Nguyên Sơ đã diễn hóa; không đặt một chặng bắt buộc từ đơn bào tới đa bào kéo dài trước mọi loài mới.
+Sau biến cố Nguyên Sơ, **Sinh Mệnh Quy Tắc hình thành**, cây cối và sinh vật xuất hiện nhiều hơn. Sinh vật / động vật mới xuất hiện với **tần suất tính bằng ngày**, theo các hình thái Nguyên Sơ đã diễn hóa: **tự ngưng tụ từ thiên địa, từ cây cỏ / vật chất có sẵn, và qua những sinh linh đầu tiên**. Tạo thêm sinh linh có chỗ tốt mà chúng sinh mơ hồ phát hiện, gọi là **công đức**; đó là nước cờ của Thiên Đạo. Không tự gán Thiên Đạo sơ khai một nhân cách trưởng thành khi cơ chế này vận hành; không đặt một chặng bắt buộc từ đơn bào tới đa bào kéo dài trước mọi loài mới.
 
 Nhân Tổ quan sát chúng:
 
@@ -552,11 +556,11 @@ Nhân Tổ ngẩn người sau khi chúng rời đi, rồi:
 
 Chưa viết lời thoại hoặc một cuộc tiễn biệt cụ thể cho khoảnh khắc ấy.
 
-Động cơ chọn Luân Hồi về sau đã khóa: hắn nhàm chán đời sống vĩnh hằng, người bạn thân nhất Nguyên Sơ đã đi, và hắn muốn một con đường tồn tại mới.
+Động cơ chọn Luân Hồi đã khóa: hắn nhàm chán đời sống vĩnh hằng, người bạn thân nhất Nguyên Sơ đã đi, và hắn muốn một con đường tồn tại mới. Tuổi đời rất dài khiến hắn có nhận thức dù môi trường ít áp lực; nhiều đời Luân Hồi về sau mới khiến hắn đa mưu túc trí và dần nghĩ tới quy nhất để đạt Thái Sơ. Không đọc động cơ về sau ngược vào việc tạo hài tử ban đầu.
 
 ### Mười hai người con
 
-Nhân Tổ chia Pháp Tắc / quyền năng của mình thành mười hai phần để tạo mười hai người con.
+Nhân Tổ tách **mười hai phần Chân Ngã** cùng các phần Pháp Tắc / quyền năng và linh hồn để tạo mười hai người con; Chân Ngã chủ thể còn lại vẫn tồn tại. Hắn biết điều này làm mất vĩnh sinh, có thể rơi xuống Chân Tiên hoặc thấp hơn, nhưng vẫn chọn vì chán nản và muốn Luân Hồi. **Lúc tạo hài tử chưa có âm mưu quy nhất để đạt Thái Sơ.**
 
 Hắn ở lại đủ lâu để:
 
@@ -1258,6 +1262,8 @@ Nó có thể chân thành tin rằng:
 
 > **phân tách là sai, trở về một mới là đúng.**
 
+**ĐÃ CHỐT mới:** Chân Ngã các hài tử là những phần từng thuộc Nhân Tổ. Người muốn thôn phệ suy đoán đúng và xa về nguồn gốc chung: cha và các con từng là một, sau quy nhất vấn đề là ai làm chủ. Nhân Tổ ngoài Luân Hồi có khả năng quy nhất, nhưng phải có tu vi cao hơn để chủ đạo; hài tử mạnh hơn có thể đảo khách thành chủ, thôn phệ Chân Ngã hắn. Chưa khóa người con cụ thể, cuộc hợp nhất hay kết quả.
+
 Đây là một hố quan trọng để thiết kế sau.
 
 ---
@@ -1841,10 +1847,38 @@ Họ thiện lương do bản chất cây cỏ, cùng tạo **một vương qu�
 
 ## Luân Hồi và cối xay — ĐÃ CHỐT
 
-Luân Hồi là **một vùng á không gian**. Nơi đó có **cối xay bay lơ lửng**; bên dưới là đất, một dòng sông uốn lượn và **hoa bỉ ngạn**. Chân Ngã đến Luân Hồi bị hút về cối xay, trở nên mê mang / mơ hồ ý thức; **Chân Tiên có thể kháng, dưới Chân Tiên không thể kháng**. Chưa khóa chức năng từng bước của cối xay, quyền vượt khỏi nó, quan hệ với xóa / giữ ký ức hoặc cơ chế phân phối đầu thai. Luật giữ và dần khôi phục ký ức của Chân Tiên trở lên tiếp tục được giữ.
+Luân Hồi là **một vùng á không gian**. Nơi đó có **cối xay bay lơ lửng**; bên dưới là đất, một dòng sông uốn lượn và **hoa bỉ ngạn**. **Trình tự mới đã chốt:** vào Luân Hồi Chi Địa → càng sâu ý thức càng mơ hồ do hoa bỉ ngạn → bơi qua sông Luân Hồi gội rửa ký ức và linh hồn → tới cối xay chỉ còn Chân Ngã → Lục Đạo Luân Hồi Bàn phân phối đầu thai theo nghiệp lực. Sáu đạo: Thiên, A-tu-la, Nhân, Súc Sinh, Ngạ Quỷ, Địa Ngục.
+
+Khả năng kháng mê mang đã nêu của Chân Tiên không tự là miễn gội rửa. **Luân Hồi là Quy Tắc, có thể rửa trước quyền năng cấp Pháp Tắc**, kể cả cấm quên. Các kết quả thức tỉnh của Nhân Tổ / hài tử đã có vẫn giữ; cơ chế bảo tồn ký ức nói chung được tác giả yêu cầu xây sau khi bàn khả năng từng cảnh, có thể dùng công pháp / thần thông Chân Ngã. Cơ chế cối xay, điều kiện giữ ký ức và thời điểm lịch sử hoàn thiện từng bước còn mở.
 
 ## Các hài tử tạo Chân Ngã cho tạo vật — ĐÃ CHỐT
 
 Các hài tử thu thập **hoa bỉ ngạn, nước sông Luân Hồi và vài nguyên liệu đặc thù**, trong đó có nguyên liệu từ Tiên Thiên Sinh Linh, để tạo **một loại đan dược có thể tạo Chân Ngã**. Họ dùng đan dược cho tạo vật của mình trong quá trình tạo sinh linh.
 
 Nguyên liệu Tiên Thiên ở đây là **một loại trái cây có thể tái tạo**; **không Tiên Thiên Sinh Linh nào chết vì việc tạo đan dược**. Chưa đặt tên đan, loại quả, công thức, sản lượng, cách thu thập hoặc cơ chế linh hồn / ý thức hình thành sau khi có Chân Ngã. Đây là phương pháp qua đan dược, không tự nâng cảnh giới các hài tử hoặc cấp cho mọi Chân Tiên khả năng trực tiếp tạo Chân Ngã.
+
+---
+
+# L. THIÊN ĐẠO, ÂM MƯU NHÂN QUẢ VÀ KHOẢNG TRƯỚC MAIN ĐỜI I
+
+**ĐÃ CHỐT mới:** Thiên Đạo ban đầu là tập hợp ý thức của các sinh linh có ý thức, vận hành như cơ chế máy móc; phát triển dần ý thức riêng tới mức giống một cá nhân. Nó **không đọc được suy nghĩ Chân Tiên trở lên**, nhưng có thể quan sát dấu vết hành động và suy luận.
+
+**Nhân Quả là Quy Tắc**, biểu hiện thành **Nhân Quả Đại Võng** vô hình đan xen bao trùm thiên địa. Nó đã có từ các Pháp Tắc Nguyên Sơ diễn hóa; ban đầu biểu hiện yếu / mờ. Chứng đạo làm hiển hóa mạnh lên; người chứng chết khiến yếu đi nhưng không về mức chưa từng được chứng.
+
+**ĐÃ CHỐT về trục sự kiện:** sau Huyết Thế Đại Kiếp, trước Main đời I, có âm mưu của các Chân Tiên nhằm khiến người chứng đạo hệ Nhân Quả đồng hóa thiên địa khi hệ ấy đủ mạnh. Mục đích là giữ thành quả hữu dụng mà loại cá nhân nguy hiểm. Đồng hóa giữ thành quả hiển hóa thay vì làm nó suy yếu như chết; quyền sở hữu không được giữ nguyên dưới tên cá nhân cũ. Người khác còn có thể chứng khi trống chủ, nhưng khó hơn.
+
+**CÒN MỞ:** danh tính, Pháp Tắc cụ thể, mức cảnh của mục tiêu, diễn biến và thời điểm trong cửa sổ lịch sử. Chân Tiên không sở hữu trọn Quy Tắc; nếu mục tiêu thực sự chưởng quản toàn Nhân Quả thì phải xét tầng Chính Tiên. Không dùng cách gọi tắt để tạo ngoại lệ cảnh giới.
+
+Tác giả muốn kéo dài lịch sử, nhưng chưa đặt số năm mới. Giữ **22 → 23 ≥ 30.000 năm** là cận dưới đang có; âm mưu nằm trong khoảng sau 21 trước 23, chưa quyết định vị trí chính xác so với tái thiết hoặc các sự kiện chưa dựng. Không cộng một độ dài tự đặt vào niên biểu.
+
+# LI. CỰC ÍT CHÍNH TIÊN VÀ LỊCH SỬ NGHIÊN CỨU THÁI SƠ
+
+**ĐÃ CHỐT:** toàn bộ dòng thời gian Nạp Hư có **không quá mười Thiên Địa Chính Tiên**. Danh sách, thời đại từng người, có Thái Sơ hay không còn mở. Không thêm hàng loạt Chính Tiên chỉ để lấp thời gian lịch sử.
+
+**ĐANG XÂY DỰNG:** mô hình Thái Sơ một thế giới / một điểm neo có đường cụt khi muốn hòa tan neo để quy tụ sức mạnh; đạo thống Main về sau tổng hợp kinh nghiệm Nạp Hư / Thần Huy, dùng thần cách và thần vực làm hai điểm neo chuyển tiếp. Lịch sử dài có thể chứa nghiên cứu, thất bại, thiếu thông tin và che giấu thành quả, chưa xác nhận một cuộc chứng Thái Sơ.
+
+Trong mắt các Chí Cao, từ khi Chư Thiên sinh ra chỉ sư phụ Main được biết đã đạt Giả Siêu Thoát. Các Chí Cao hiện có trời sinh ở tầng ấy, vẫn tìm đường. Thiếu ca thành công và đồng đạo đủ cảnh là giới hạn thực tế, không phải bằng chứng họ không biết suy nghĩ.
+
+**BÍ ẨN CHỦ Ý:** Nạp Hư có thể được sáng thế chủ tạo, Thiên Đạo có thể là khôi lỗi / ý thức quản lý; sáng thế chủ có thể đóng vai Chính Tiên, có thể là Nhân Tổ hoặc Nguyên Sơ. Chưa xác nhận giả thuyết nào hoặc lấy nó làm mốc lịch sử thật.
+
+Câu hỏi / trả lời và triết lý đầy đủ ở [bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), L01–L09. Cơ chế mới ở mục XXVII–XXXII của [Bản thể tu luyện](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).

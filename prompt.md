@@ -1,5 +1,32 @@
 # CODEX PLAN PROMPT — ARCLUNE LORE HISTORY WORKSTREAM
 
+# BÀN GIAO CUỘC THẢO LUẬN MỚI NHẤT — ĐỌC TRƯỚC
+
+**Cập nhật 2026-10-06.** Tác giả yêu cầu lưu các câu hỏi, câu trả lời, triết lý và quá trình sửa lý luận để một phiên Codex mới nối tiếp được. Đọc hoàn toàn [Bàn giao hội thoại lore Nạp Hư](docs/lore/NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md) **trước** các bản tóm tắt cũ bên dưới. Tệp này lưu chín lượt, gồm đủ năm lượt tác giả chỉ qua ảnh và các lượt trước đó.
+
+**Câu hỏi lore gần nhất nằm ở L09:** vì sao tự tạo thế giới rồi tự làm Thiên Đạo / Chính Tiên có thể thành một vòng tròn; vì sao Thái Sơ một thế giới bị kẹt bởi một điểm neo; vì sao đạo thống Main dùng thần vực và thần cách làm hai điểm neo để chuyển tiếp; và vì sao cực ít người đủ cảnh, thiếu thông tin / thực tiễn / thời gian khiến đường cao chưa được tìm ra. L09.A giữ đầy đủ ý câu hỏi dài, L09.B giữ phần trả lời cuối, L09.C ghi đề nghị Codex chưa được tác giả xác nhận.
+
+Những điểm phải mang sang phiên mới:
+
+- Luật sở hữu là luật nền, không phải Quy Tắc tu luyện. Nếu có sáng thế chủ, người ấy có thể sửa luật trong thế giới mình.
+- Hướng đang xây dựng cho thế giới riêng có Thiên Đạo riêng dưới quyền sáng thế chủ; không bắt buộc người tạo là cùng ý thức với Thiên Đạo.
+- Nạp Hư là mốc so sánh hình dung, không phải tiêu chuẩn biến động. Làm Nạp Hư suy yếu không khiến người khác đạt Thái Sơ.
+- Mô hình Thái Sơ tác giả chọn có **một thế giới / một điểm neo**. Thu hoặc ngoại phóng chưa giải quyết dung hợp; hòa tan thế giới làm ngã cảnh. Chưa xác nhận Nạp Hư từng có Thái Sơ.
+- Đạo thống Main có **thần vực thiên ngoại không thể thu tùy ý** và **thần cách khác loại Thần Huy**. Thần cách giữ Thượng Vị Thần trong lúc dung hợp thần vực với thân để đạt Chí Cao; sau đó dung hợp thần cách để ổn định Chí Cao. Giả Siêu Thoát là bước tiếp theo.
+- Cơ chế “giai đoạn chuyển tiếp khi neo cũ mất tác dụng mà neo mới chưa hoàn thành” là đề nghị Codex chưa được tác giả xác nhận. Không ghi thành canon tự động.
+- Toàn lịch sử Nạp Hư có không quá **mười Chính Tiên**. Các Chí Cao Chư Thiên hiện có trời sinh ở tầng ấy; trong mắt họ chỉ sư phụ Main được biết đã đạt Giả Siêu Thoát. Main về sau tổng hợp kinh nghiệm Nạp Hư / Thần Huy để xây đường tu tới Chí Cao, không công bố đường cao hơn.
+- Nhân Tổ tạo hài tử **chưa có âm mưu**; Chân Ngã các con là mười hai phần của hắn. Hắn biết sẽ suy yếu / mất vĩnh sinh và vẫn chọn. Nhiều đời về sau mới hình thành mưu đồ quy nhất; hài tử mạnh hơn có thể đảo khách thành chủ.
+- Thiên Đạo **không đọc suy nghĩ Chân Tiên trở lên**. B trong ví dụ Chỉ Dẫn **ngăn lời nhắc Nhân Vực được nói ra**. Lãng Quên / Chỉ Dẫn thuộc Quy Tắc Ký Ức.
+- Luân Hồi cấp Quy Tắc gội rửa được trước quyền năng cấp Pháp Tắc. Cơ chế giữ / thức tỉnh ký ức đang phải xây sau khi bàn khả năng từng cảnh; không lấy điều kiện từng chứng Chân làm đáp án tự động.
+- Âm mưu đồng hóa người chứng đạo Nhân Quả xảy ra sau Huyết Thế Đại Kiếp, trước Main đời I; chưa chốt niên đại. Chân Tiên không sở hữu trọn Quy Tắc, nên phải xác định Pháp Tắc / mức cảnh của mục tiêu.
+- Nạp Hư có sáng thế chủ, Thiên Đạo là khôi lỗi, Nhân Tổ / Nguyên Sơ là sáng thế chủ vẫn là giả thuyết / bí ẩn, chưa xác nhận.
+
+**Nối tiếp đúng việc:** tác giả muốn bàn khả năng tấn công / can thiệp của từng đại cảnh, rồi xây nền ký ức qua Luân Hồi; chi tiết Chính Tiên Kiếp và các mốc lịch sử chưa chốt. Không khởi động lại Stage 0, hỏi lại những điểm đã trả lời hoặc chuyển sang Thần Huy chỉ vì mẫu khởi đầu bên dưới. Câu hỏi mới nhất của tác giả trong phiên đang hoạt động luôn được ưu tiên.
+
+**Quy trình lưu đã được tác giả yêu cầu:** sau một nhóm trao đổi lore có nội dung mới, lưu cả ý câu hỏi lẫn phần trả lời, cập nhật mục đọc trước của bản bàn giao và các tài liệu liên quan trong phạm vi đã được cho phép; không chờ tác giả phải nhắc lưu lần nữa. Đề nghị chưa được trả lời giữ trạng thái SUY LUẬN / CÒN MỞ. Nếu chưa ghi vào repo được, nói rõ chưa lưu. Ngữ cảnh chat không được coi là lưu trữ bền vững.
+
+---
+
 ## PURPOSE
 
 This task is NOT a gameplay/kit audit, not an architecture audit, not a naming exercise, and not a request to finish all lore in one pass.
@@ -42,14 +69,15 @@ Read these files first and treat them as the current working base.
 
 ## Tier A — current Nạp Hư working lore
 
-Read all four completely:
+Read all five completely:
 
 1. docs/lore/NAP_HU_HISTORY_FOUNDATIONS_WORKING.md
 2. docs/lore/NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md
 3. docs/lore/NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md
 4. docs/lore/Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md
+5. docs/lore/NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md — read this first for the latest question, answer, corrections and unresolved proposals.
 
-These four are the most important sources for current Nạp Hư work.
+These five are the most important sources for current Nạp Hư work.
 
 Do not rely on old Nạp Hư lore elsewhere if it conflicts with these.
 
@@ -57,8 +85,8 @@ Do not rely on old Nạp Hư lore elsewhere if it conflicts with these.
 
 Read completely:
 
-5. docs/Nghịch lý Chúa.md
-6. lore mới.md
+6. docs/Nghịch lý Chúa.md
+7. lore mới.md
 
 Use docs/Nghịch lý Chúa.md for:
 - reference systems;
@@ -114,11 +142,12 @@ Old files can contain superseded worldbuilding and should not silently contamina
 Use this precedence order:
 
 1. The author’s newest answer in the active Codex conversation
-2. Current docs/lore/** working files
-3. docs/Nghịch lý Chúa.md for its specific cosmology/transcendence scope
-4. lore mới.md for KLC/Main/Arclune where not superseded
-5. optional legacy references
-6. your own inference
+2. The newest saved author decisions in docs/lore/NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md, respecting status labels and later corrections; Codex proposals there remain inference unless approved
+3. Current topical docs/lore/** working files
+4. docs/Nghịch lý Chúa.md for its specific cosmology/transcendence scope
+5. lore mới.md for KLC/Main/Arclune where not superseded
+6. optional legacy references
+7. your own inference
 
 Never silently fix a contradiction by choosing the interpretation you like.
 
@@ -213,10 +242,12 @@ At the earliest known stage there are two special primordial awakened beings.
 - appears as a bright, lively young boy;
 - is one of the earliest known Linh Sinh;
 - does not require ordinary food/drink;
-- later possesses a major Diễn Hóa axis;
+- relates to splitting / unification; exact Rules remain open; Nguyên Sơ owns Diễn Hóa;
 - has matured despite his youthful form/temperament; a Thiên Địa Chính Tiên has no finite lifespan;
 - spends at least 20,000 years between the Nguyên Sơ age and the Twelve Children age raising Long/Phượng; both can transform when they leave;
-- pauses in a daze after they leave, then creates twelve children from portions of his own laws/power;
+- pauses in a daze after they leave, then creates twelve children from twelve portions of his True Self together with laws/power and soul; his residual True Self remains;
+- knows this will weaken him, cost immortality and may drop him to True Immortal or lower; creates them from boredom / desire for reincarnation, with no initial Thái Sơ conspiracy;
+- later lives gradually make him more cunning and lead to unification ambitions; a stronger child can dominate unification and consume his residual True Self;
 - directly becomes the ancestral source behind humanity;
 - grows bored of eternal life after his closest friend Nguyên Sơ has gone;
 - knows reincarnation is a new, unclear path on which he can become anything;
@@ -319,7 +350,7 @@ It is closer to:
 
 The children eventually mature mentally under Nhân Tổ’s teaching.
 
-They tell humanity / their descendants about Nhân Tổ and Long/Phượng. Whether Nhân Tổ told them about Nguyên Sơ, and whether they passed that story on, remains OPEN.
+They tell humanity / their descendants about Nhân Tổ and Long/Phượng. Nhân Tổ transmits memories of Nguyên Sơ to the children because he does not want his friend forgotten. The transmission mechanism and which details each later lineage preserves remain OPEN.
 
 They later choose reincarnation one by one because:
 - endless existence becomes boring;
@@ -533,7 +564,7 @@ The Sword Immortal discovers the Gu on attaining True Immortal, before releasing
 
 Dying, the Yao reveals the Gu was implanted in infancy and is now deeply embedded, saying it is too late. He mocks the Sword Immortal for failing to notice her affection; this is an inaccurate taunt, since the Sword Immortal already knew and intended marriage. The Yao does not deliberately kill the mother Gu; it dies with him. The Sword Immortal uses sword escape to reach the fox, hears her affection while her soul dissolves, tries his expected remedy, and fails. Her body remains rosy and beautiful but is empty of soul. Her True Self reincarnates without memories. He keeps her remains, blames himself deeply, and wanders in search of her reincarnated self. A shoulder birthmark is locked; finding her, mark recurrence, taking her as a disciple, recovered memories and renewed affection remain WORKING / OPEN. Do not make her dying confession the first time he learns of her affection.
 
-True Immortals and above retain memories through reincarnation even after deliberately weakening themselves; memories gradually return with new cultivation. This does not instantly restore cultivation or replace the Twelve Children’s awakening rule. A True Immortal can know what True Self is but cannot manipulate it; only at Thiên Địa Chính Tiên can one retain True Self and create a soul. Soul-healing pills or preservation of a body do not automatically grant that higher power. The attempted remedy and why it fails remain OPEN.
+Earlier lore retains the intended outcome of memory returning gradually for True Immortals and the Twelve Children, but the author now wants the preservation / awakening mechanism built after discussing each realm's powers, possibly through a True-Self method or ability. Reincarnation is a Rule and can wash memories despite Law-level prohibitions on forgetting; do not use past True-Immortal attainment as an automatic mechanism. Preserve the children’s established awakenings, including the sword user below True Immortal. True Immortals can manipulate True Self very limitedly, as in treasures recognizing a child's later True Self; this does not give all of them resurrection. Thiên Địa Chính Tiên can retain True Self and create a soul. The failed remedy and memory-preservation conditions remain OPEN.
 
 Phong Thiên Tháp is built specifically for this imprisonment and suppresses every energy source inside and in a 50 km radius outside. The captive receives nothing, cannot breathe, is nailed to a cross, has gouged-out eyes and disheveled hair; do not generalize the prisoner’s condition to everyone in the radius. The seal is separate: the first Human True Immortal sacrifices himself as its core; it drains both the Yao’s immortal power and vitality, sustaining confinement and a protective barrier for the tower. These are two layers of insurance. Injury and attrition weaken the captive and consequently the seal; the Sword Immortal demands release before it kills him. Release procedure, the prisoner’s bodily recovery and environmental consequences remain OPEN.
 
@@ -591,9 +622,9 @@ Current broad mapping:
 - Thiên Địa Chính Tiên spans roughly Hạ / Trung / Thượng Vị Thần depending on number/depth/quality of Rules.
 - Thái Sơ ≈ Chí Cao in theoretical bracket.
 
-Thái Sơ is not a normal grindable next realm.
+Thái Sơ is theoretical and not confirmed historically. The latest working model uses one world as its only realm-maintaining anchor and encounters a dead end when dissolving it. Main’s Divine Realm and Divinity are two anchors for sequential fusion into stable Chí Cao; further ascent is a separate problem. Read the latest handoff, L09, rather than treating creation or world retraction as a complete advancement method.
 
-Do not flatten all Thiên Địa Chính Tiên to exactly one divine tier.
+Do not flatten all Thiên Địa Chính Tiên to exactly one divine tier. World-source quality matters; Nạp Hư weakening does not automatically qualify someone for Thái Sơ.
 
 ---
 
@@ -1223,6 +1254,9 @@ When editing:
 - revise contradictions caused by newer answers;
 - do not clean up deliberate mysteries;
 - mark unresolved points instead of inventing answers;
+- preserve the author's questions, reasoning, analogies and the corresponding answers in the discussion handoff, not only final conclusions;
+- keep the handoff's latest-question pointer current; distinguish approved decisions, current models, corrected ideas and unanswered Codex proposals;
+- follow the ongoing persistence request at the top; do not treat chat-only context as saved lore;
 - avoid destructive rewrites unrelated to the current stage.
 
 Existing Nạp Hư files:
@@ -1294,7 +1328,9 @@ Do not start writing era names.
 
 Do not begin Thần Huy immediately.
 
-Start by checking the latest Nạp Hư primordial / Dark Age material.
+Read the discussion handoff first and resume the latest active lore topic. The generic Stage 0 / first-action template applies only when there is no newer continuation context.
+
+Start by checking the latest Nạp Hư material relevant to that topic.
 
 Return:
 

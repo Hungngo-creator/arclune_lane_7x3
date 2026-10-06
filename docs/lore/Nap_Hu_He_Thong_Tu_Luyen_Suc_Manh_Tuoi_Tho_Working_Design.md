@@ -1,5 +1,7 @@
 # NẠP HƯ — HỆ THỐNG TU LUYỆN, SỨC MẠNH VÀ TUỔI THỌ
 
+> **Bàn giao mới 2026-10-06:** đọc [hội thoại và triết lý một / hai điểm neo](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md); mục XIV cập nhật hướng sức mạnh và cơ chế ký ức còn phải xây.
+
 > **Trạng thái:** Thiết kế đang xây dựng, đã đối chiếu với lời chốt mới của tác giả và các tài liệu hiện tại trong `docs/lore`.
 >
 > **ĐÃ CHỐT:** tác giả đã quyết định nguyên tắc. **ĐANG XÂY DỰNG:** phương án được chọn để tiếp tục phát triển, còn điều chỉnh được. **CÒN MỞ:** chưa có đáp án. Cơ chế cộng thọ nguyên, khoản **+1.000.000 năm khi chứng Chân Tiên**, mức tăng trung bình **+80.000 năm cho mỗi Pháp Tắc bổ sung** và nguy cơ đồng hóa khi dung nhập thiên địa đã được tác giả chốt; các số tham chiếu khác giữ phương án hiện tại.
@@ -33,7 +35,7 @@ Tài liệu này không chốt vật lý thế giới, thời gian đi lại, s�
 | 7 | Khắc Pháp | Khắc những phần lĩnh ngộ Pháp Tắc vào bản thể |
 | 8 | Định Pháp | Cấu trúc Pháp Tắc dần ổn định, vẫn chưa hoàn chỉnh |
 | 9 | Chân Tiên | Hoàn chỉnh một Pháp Tắc Nạp Hư |
-| 10 | Thiên Địa Chính Tiên | Hoàn chỉnh một Quy Tắc từ nhiều Pháp Tắc cùng hệ |
+| 10 | Thiên Địa Chính Tiên | Hoàn chỉnh một Quy Tắc từ nhiều Pháp Tắc cùng hệ, độ kiếp cao hơn Chân Tiên; chi tiết kiếp chưa chốt |
 
 Tên và trình tự đã có trong tài liệu hiện tại. Các chi tiết Sinh Mệnh Hồ, Linh Tuyền, tái tạo thân và giới hạn thần thức từ bản tham khảo là **nền mô tả đang xây dựng**, không tự chốt mọi cơ chế sinh tồn, đoạt xá hay tín ngưỡng của bản cũ.
 
@@ -172,9 +174,9 @@ Hồ yêu bị hạ cổ từ sơ sinh, nhưng **đã Khắc Pháp khi gặp Ki�
 
 Nhân Tiên trong trận phong ấn đã **thiêu đốt một phần Chân Ngã**, trên nền Pháp Tắc liên quan trao đổi, trả giá, sinh mệnh / tuổi thọ và bộc phát. Không tự gán lượng hao tổn hoặc việc Chân Ngã còn lại chắc chắn tiêu tán / Luân Hồi; số phận đó chưa chốt.
 
-**Chân Tiên trở lên** vẫn giữ ký ức khi vào Luân Hồi, dù tự suy yếu; ký ức dần khôi phục theo tu vi đời mới. Tu vi ở lúc chuyển đời, cảnh cao nhất từng chứng và mức nhớ lại của thân mới là những thông tin khác nhau. Không tự dùng tu vi đã hạ thấp để xóa điều kiện “đã chứng Chân Tiên”.
+**Kết quả đã nêu trước đây, cơ chế đang xây dựng lại:** Chân Tiên trở lên có hướng giữ ký ức khi tự suy yếu và khôi phục dần theo tu vi đời mới; các lần thức tỉnh đã có của Nhân Tổ / hài tử vẫn giữ. Tác giả yêu cầu **bàn khả năng từng cảnh trước**, rồi tạo công pháp / thần thông Chân Ngã hoặc cơ chế hợp nền sức mạnh. Không dùng việc từng đạt Chân Tiên làm lời giải tự động miễn gội rửa. Tu vi chuyển đời, cảnh cao nhất từng chứng, cảm ngộ còn và điều kiện bảo tồn ký ức phải xét riêng.
 
-**ĐÃ CHỐT mới:** Luân Hồi là á không gian có cối xay bay lơ lửng, phía dưới là đất, sông uốn lượn và hoa bỉ ngạn. Chân Ngã đến đó bị hút về cối xay và mê mang / mơ hồ ý thức; Chân Tiên có thể kháng, dưới Chân Tiên không thể kháng. Cơ chế từng bước của cối xay chưa chốt; không tự đổi luật giữ / khôi phục ký ức đã có.
+**ĐÃ CHỐT mới:** Luân Hồi là á không gian có cối xay bay lơ lửng, đất, sông và hoa bỉ ngạn. Linh hồn đi sâu bị hoa làm ý thức mơ hồ, bơi qua sông gội rửa ký ức / linh hồn; tới cối xay chỉ còn Chân Ngã; Lục Đạo Luân Hồi Bàn xét nghiệp lực phân phối đầu thai. Sáu đạo: Thiên, A-tu-la, Nhân, Súc Sinh, Ngạ Quỷ, Địa Ngục. Kháng mê mang không tự là miễn gội rửa. **Luân Hồi là Quy Tắc, rửa được trước quyền năng cấp Pháp Tắc**, kể cả cấm quên. Cơ chế bảo tồn ký ức, công pháp / thần thông, ngưỡng thức tỉnh và chi tiết cối xay còn mở.
 
 Các hài tử dùng hoa bỉ ngạn, nước sông Luân Hồi và nguyên liệu đặc thù để luyện **đan dược tạo Chân Ngã** cho tạo vật. Phần Tiên Thiên Sinh Linh dùng làm nguyên liệu là **một loại trái cây tái tạo được**; không Tiên Thiên Sinh Linh nào chết vì tạo đan. Không tự nâng cảnh giới các hài tử hoặc thêm quyền trực tiếp tạo Chân Ngã cho mọi Chân Tiên; công thức và cơ chế sinh linh hồn còn mở.
 
@@ -260,3 +262,21 @@ Ngưỡng nghiệp, thế nào là ngang nhau, cách tính khi không ngang nhau
 Nó vẫn có thể tu luyện và độ thành tiên kiếp lần nữa, nhưng **chỉ cần Nhân Kiếp và Địa Kiếp**, theo thứ tự Nhân → Địa. Sau khi đạt Chân Tiên thì đã tới **cực hạn tiềm năng**, **không thể đạt Thiên Địa Chính Tiên**.
 
 **CÒN MỞ:** nhục thân và Chân Ngã người cũ mất / rời đi ở bước nào; điều kiện ẩn nấp, tốc độ khai linh ngoài cận dưới 10.000 năm, ký ức / dấu tích còn lại của người cũ, thọ nguyên và quan hệ với Luân Hồi. Không tự tạo một Chân Ngã mới cho nhánh này hoặc dùng cá thể mới làm phục sinh người cũ.
+
+---
+
+# XIV. KHẢ NĂNG TỪNG CẢNH VÀ ĐIỂM NEO GIỮ VỊ CÁCH
+
+**Yêu cầu đang tiếp tục:** thảo luận khả năng tấn công, những gì từng đại cảnh làm được, rồi mới thiết kế cơ chế giữ / thức tỉnh ký ức qua Luân Hồi. Chưa có bảng sát thương / phạm vi quyền năng cuối cùng; không tự thêm các con số.
+
+**ĐÃ CHỐT về quyền năng:** Chân Tiên sở hữu Pháp Tắc, không sở hữu trọn Quy Tắc. Chính Tiên cần kiếp cao hơn khi chưởng quản Quy Tắc; chi tiết bàn sau. Thiên Đạo không đọc được tâm trí Chân Tiên trở lên. Chủ có thể cấm dùng quyền năng và chủ động can thiệp sâu vào quá trình tự nhiên phù hợp; không tự đồng nhất cấm dùng với mọi quá trình ngừng vận hành.
+
+**ĐÃ CHỐT:** một người có thể là Chính Tiên của cả Nạp Hư và thế giới riêng. Cấp độ / độ hoàn thiện thế giới quyết định Quy Tắc mạnh yếu. Bỏ quyền Nạp Hư chỉ làm yếu khi chưa có nền riêng cùng cấp hoặc cao hơn; hạ cảnh không xóa cảm ngộ nhưng có thể mất quyền vào tay chủ mới.
+
+**ĐANG XÂY DỰNG, hướng tác giả chọn:** Thái Sơ có một thế giới làm điểm neo duy nhất. Thu / thả vẫn giữ thế giới vận hành; hòa tan nó làm mất nền duy trì và ngã cảnh. Nạp Hư là mốc so sánh hình dung, không phải tiêu chuẩn biến động; làm Nạp Hư yếu không giúp đạt Thái Sơ.
+
+**Hướng Main đã được tác giả xác định:** thần vực ở ngoài thân, không thể thu tùy ý. Thần cách giữ vị cách Thượng Vị Thần trong lúc dung hợp thần vực với bản thân để đạt Chí Cao; sau đó dung hợp thần cách để ổn định Chí Cao. Hai điểm neo giữ quá trình luân phiên, như hai chân leo thang. Giả Siêu Thoát là bước tiếp theo, không tự có từ hai lần dung hợp ấy.
+
+**SUY LUẬN Codex, chưa xác nhận:** chuyển hóa có giai đoạn neo cũ mất tác dụng trước nền mới hoàn thành, và thao tác Thái Sơ đòi hỏi giữ vị cách suốt quá trình. Giữ riêng đề nghị này khỏi quyết định ngã cảnh của tác giả.
+
+Toàn lịch sử Nạp Hư có không quá **mười Chính Tiên**, chưa xác nhận Thái Sơ. Không tự viết bảng tuổi thọ Thái Sơ hoặc ca thành công. Triết lý, các chỉnh sửa và đủ câu hỏi / phần đáp ở [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), đặc biệt L09; chi tiết sở hữu / ký ức ở mục XXVII–XXXII của [Bản thể tu luyện](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).
