@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-05-G.13
+**Version:** 2026-10-06-G.14
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -27,6 +27,8 @@
 **Revision G.12:** consumes separately resolved TGT-008 bindings per attack owner through existing Target/Lock/Effect/child plans; rejects inherited or unresolved exceptions and preserves Entity tracking/current-Position presentation. No new store, service, Tag or Primitive.
 
 **Revision G.13:** executes opt-in live waiting-threshold rules through existing static registration, Field Presence, Reincarnation ledger and Transaction/Lifecycle owners. Derive one protected final contribution sum and all-entry decision at the world-law checkpoint; no new manager/store/Primitive/Contract ID or Character branch. Existing Shield/Slot/Revive owners remain unchanged.
+
+**Revision G.14:** executes E.13/F.15 through existing Transaction/Trigger/Health/Resource/Presence, Shield/Damage and Heal/Result/Effect owners. Exact checkpoint/activation/result/family refs supply the new boundaries; no Character branch, new store/service, Tag/Primitive or generic priority.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -2238,6 +2240,14 @@ Only then may `POST_COST_PRE_EFFECT` or the first direct Ability Effect proceed.
 
 ---
 
+## 29B. RESOURCE-LIMIT TRANSACTION
+
+04§23.3 → CST-011 → existing Resource/P-033, Cost/P-035, State/use, Transaction and Result owners. Resolve typed per-unit Rage CURRENT/LIMIT reads, finite delta/minimum, CLAMP_DOWN reconciliation and BATTLE_SCOPED pool lifetime. Keep limit writes separate from ordinary Current grants and Stat/MaxHP mutation.
+
+Protect the pool/admission/cap view; stage the new limit and downward-only Current reconciliation, using Current after any explicitly joined required payment. A joined activation's payment/result, limit/current and successful-use writes share one commit or abort. No partially spent Rage, limit change without its use, implicit refund or class gain escapes. Unordered conflicting writes fail closed; retries reuse the original transaction identity and revalidate protected reads under existing law.
+
+Record immutable limit/current before/after, origin and commit result, retaining battle ownership across lifecycle transitions. Dispatch §35C only for actual selected-field changes after the full stable commit; the origin distinguishes own finite activation from a later independent checkpoint. A limit raise alone is not a positive Rage grant; CST-016's existing grant policies remain unchanged. Readiness at limit0 still waits for ordinary legal Action selection. Replay cannot reapply a delta/use, and field cleanup cannot retire battle capacity evidence.
+
 # 30. STATE VERSION
 
 Authoritative state has monotonically increasing logical state versions.
@@ -2570,6 +2580,16 @@ Before the direct-group/Action/SSI continuation cursor proceeds, register/evalua
 Save/resume retains dirty/stable observation refs, finite obligations, original candidate/terminal identity and continuation cursor. Owner life/presence/State-instance guards prevent retired work from mutating a new instance. Existing Damage/Heal/Cost meanings and ordinary Trigger timing remain intact.
 
 ---
+
+## 35C. REQUIRED STABLE PREDICATE SETTLEMENT
+
+04§7.16 → TRG-016 → existing Transaction/Health/Resource/Presence/Lifecycle/Trigger/State/dependency owners. Dispatch the normalized PREDICATE_CHECKPOINT_STABLE profile; resource-only predicate changes and coherent initialization cannot be supplied by the health-only observer or a delayed ordinary Reaction. Keep §35B unchanged.
+
+Writers record selected actual field changes and exact settlement origin in the existing commit/result context. Presence initialization supplies the same committed subject checkpoint after values are established. Coalesce fields/entry by commit + subject; finish the entire atomic group and mandatory lifecycle/reconciliation before exposing a stable view. No second writable HP/Rage copy, arbitrary watcher, polling or fixpoint service.
+
+Register one finite obligation keyed by Combat Instance, original checkpoint/subject, runtime trigger owner/definition and dependency. Exact owner life/presence/activation refs qualify Conditions, required Cost and cap. Stage explicitly joined payment/limit/use changes under §29/Resource/State transactions. Close nonqualification, failure or success before continuation, even under ordinary Reaction holds.
+
+Use normalized EXCLUDE_THIS_TRIGGER_ACTIVATION plus immutable commit-origin refs to suppress mutations of the same finite activation. Do not filter all events sharing rootActionId/Ability/source; independently committed later work in that root, and future State-terminal settlements, remain eligible after terminal completion. Retain suppression and terminal candidate evidence for redelivery/save/replay without a mutable “currently suppressing” Character flag. Retired life/presence work cannot activate a replacement. Reject ungrounded origins, cyclic/held-future dependencies or unordered competing effects before affected mutation.
 
 # 36. TRIGGER CANDIDATE
 
@@ -3240,6 +3260,14 @@ Do not create special layers merely because sources differ.
 
 ---
 
+## 53A. EXCLUSIVE FIRST SOURCE-FAMILY DEPLETION
+
+04§18.2 → SHP-002 → existing Shield ledger/eligibility, Damage/RES-008 allocation and Transaction/Result owners. Each opted-in contribution stores EXCLUSIVE_FIRST_SOURCE_FAMILY and its existing recipient/source-family key. At addition/transfer, validate one supported exclusive family; an incompatible new family fails before affected commit without an arrival/Rank/Authority winner. No new shield-priority manager.
+
+At the shared recipient calculation view, partition eligible contributions into that first family and the remaining separately valid profiles. Shield Piercing/ineligibility still bypasses them. Allocate the first family's budget to participating packet demand using existing RES-008; deplete its source contributions proportionally, then resolve residual packet demand through the remaining layers and HP. Preserve each Damage receipt's Shield/ActualHP/Overkill and each contribution's provenance/remaining value.
+
+Commit ledger/HP/results once under the existing transaction. Independent contribution clocks and terminal causes remain in the existing Duration/Shield owners; same-family grants do not merge/refresh. Zero additions create no membership. Cleanup removes membership with the actual transition cause, not a break/expiry Heal. Save/resume retains normalized profile/family/allocation/terminal identity and cannot deplete or grant twice. §52 continues to govern unprofiled Standard Shields.
+
 # 54. SHIELD EXPIRY
 
 When one source contribution expires:
@@ -3381,6 +3409,14 @@ Compute one canonical sum of the explicit base coefficient and all matching ADD 
 Register the finite settlement dependency before its completion barrier; its Damage basis readiness comes from the explicitly selected terminal Damage graph, not an ADEC/completion Event that a later dependent direct Effect is still blocking. A dependent MaxHP mutation waits for this Heal attempt's terminal outcome, including rejection/EffectiveHeal0, rather than positive Heal success. Existing local DAG edges express this order without ordering unrelated Reactions.
 
 ---
+
+### Per-Heal Shield-conversion eligibility
+
+04§17.2 / HEL-003 lowers to this Heal execution/result's immutable Shield-conversion denial and the existing conversion Effect's typed origin bindings. Numeric restoration/Overheal remain as above. Omission preserves prior conversions.
+
+Before an Overheal-derived Shield request reaches P-046/P-047, resolve its retained exact Heal-result origins, including declared Snapshot/delayed bindings. DENY closes only that conversion branch without any Shield/cap/clock mutation; log its origin/reason and terminal Effect identity. Heal source leave/removal cannot erase immutable eligibility. Unsupported/lost/reconstructed conversion origins fail closed rather than becoming an independent Shield.
+
+Retain result/policy/origin refs until declared dependent converters terminate; replay resumes their existing Effect/commit identities without another Shield. A genuinely unrelated Shield or another Heal result uses its own law. No live global veto State, Character branch, numerical-equality filter or general taint service.
 
 # 58. HP COST
 

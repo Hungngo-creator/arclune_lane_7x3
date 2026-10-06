@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-05-E.12
+**Version:** 2026-10-06-E.13
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -24,6 +24,8 @@
 **Revision E.11:** resolves attack binding separately for every attack-producing semantic owner under TGT-008. POSITION/LOCK_POSITIONS is the default across all Characters; Entity/Both exceptions require exact authored scope and never propagate implicitly. Existing TargetSpec/targetRef/request targetPolicy and normalized plans suffice; no new field family, Tag or Primitive.
 
 **Revision E.12:** adds only an opt-in live waiting-threshold contribution in the existing Reincarnation family: exact static-rule/presence ownership, positive integer ADD, all-waiting re-evaluation and one coherent world-ledger checkpoint under REC-001. Existing Shield clock/result/Slot/Revive composition suffices; no new Tag, Primitive, Contract ID or callback.
+
+**Revision E.13:** adds bounded opt-in first-family Shield depletion, immutable per-Heal Shield-conversion denial, stable HP/MaxHP/Rage/entry predicate settlement and Rage-limit/current reconciliation. Existing owners/IDs and unprofiled behavior remain unchanged; no new Tag, Primitive, callback or priority manager.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -1271,6 +1273,28 @@ The first later owner grant may terminate State and resolve an ordinary Heal bef
 When this finite graph consumes a State-owned counter and then removes that same State, declare the value capture before removal with existing SnapshotSpec/P-002 and a typed SNAPSHOT_REF for later consumers. Retain only the declared values, original State/owner/instance and grant identity until the graph is terminal. Its explicitly authored normal removal does not cancel its own already-registered remaining nodes; death/leave or unrelated retirement follows the declared lifetime and owner-instance guards. A later Heal must not query a retired State's live COUNTER_REF or attach the old settlement to a replacement State. Other formula operands keep their own read checkpoints; capturing a counter does not silently snapshot CurrentMaxHP or final Heal modifiers.
 
 ---
+
+## 7.16 Required stable predicate settlement
+
+An optional `trigger.stablePredicateSettlement` uses TRG-016's bounded `PREDICATE_CHECKPOINT_STABLE` observation. It does not broaden the existing HEALTH_MUTATION_STABLE event/profile.
+
+```yaml
+event: PREDICATE_CHECKPOINT_STABLE
+stablePredicateSettlement:
+  subjectRef: EVENT_SUBJECT
+  changedFields: [CURRENT_HP, CURRENT_MAX_HP, CURRENT_RAGE]
+  includeFieldInitialization: true
+  mode: MANDATORY_BEFORE_CONTINUATION
+  ownSettlementPolicy: EXCLUDE_THIS_TRIGGER_ACTIVATION
+  dependencyId: <local finite settlement ID>
+  dependsOn: []
+```
+
+The changed-field whitelist is exactly CURRENT_HP, CURRENT_MAX_HP and per-subject CURRENT_RAGE; select a nonempty supported subset, or opt into valid Field initialization. Initialization observes established authoritative values/presence, not provisional entry. Ordinary ConditionSpec selects thresholds; Cost/cap/State/Effect graphs retain their own semantics. A joined commit/subject is one checkpoint even if multiple selected fields and entry change together. No-op/rolled-back writes, AE-only changes and Max Rage changes that leave selected fields unchanged create no mutation checkpoint.
+
+This finite mandatory graph closes before the next direct-group/Action/SSI continuation, after full group commit, mandatory lifecycle and reconciliation. At most one activation candidate of this trigger/runtime owner belongs to that checkpoint; no polling, fixpoint or delayed retry token. EXCLUDE_THIS_TRIGGER_ACTIVATION excludes mutations produced by that exact activation's finite settlement (including joined payment/limit reconciliation), not every later mutation sharing Ability, Actor or rootActionId. A later independent commit, including one in the same root or a later State-terminal settlement, can qualify after the activation is terminal.
+
+Do not co-author stableHealthSettlement and stablePredicateSettlement on one trigger. Normalize exact commit/subject, origin-settlement, owner life/presence and local dependency bindings; reject arbitrary watched fields/events/callbacks, missing exclusion provenance, unsupported Mode checkpoints, cycles and observable competing activation/resource order without a governing composition law. This is an opt-in checkpoint profile, not a new Trigger subsystem.
 
 # 8. CONDITION SPEC
 
@@ -2670,6 +2694,21 @@ At the declared settlement checkpoint, §18A may add qualifying coefficients at 
 
 ---
 
+## 17.2 Per-Heal Overheal-to-Shield denial
+
+```yaml
+heal:
+  overhealPolicy: DISCARD
+  overhealConversion:
+    shield: DENY
+```
+
+This optional HEL-003 policy belongs to this exact Heal instance. It does not reduce requested/modified Heal or replace its numeric Overheal with0. Preserve the denial on the immutable Heal result alongside actualRestore/overheal. Omission preserves existing external-conversion law; DISCARD alone is not a denial of independent foreign conversion.
+
+Every Overheal-to-Shield consumer must retain the exact originating HealResultRef through its typed OVERHEAL_REF/sourceResult, bounded Formula and any declared Snapshot/delayed binding. Normalize the existing conversion Effect graph with those origin refs. A derived conversion cannot shed a denied origin by copying its amount; missing/foreign/unretained origins or reconstructing Overheal from requested-minus-restored/live HP are invalid conversion bindings. An unrelated Shield with a numerically equal value has no such causal origin and is unaffected.
+
+If a declared conversion's origin denies Shield conversion, the conversion branch closes locally without a Shield grant/addition/refresh/cap mutation; the already-committed Heal remains valid. Apply this before P-046/P-047, for self/allied/hostile/system converters. Supported independent other-Heal conversions retain their own policy; no automatic mixing/subtraction of Heal instances, general numeric taint, immunity State, Authority tier or Character-ID rule is introduced.
+
 # 18. SHIELD EFFECT SPEC
 
 Conceptual families:
@@ -2759,6 +2798,19 @@ This optional cap sums active remaining matching ledger contributions on this re
 At addition commit, atomically read the family sum and nonnegative finite cap ValueRef, then bound the new admitted amount to `max(0, maximum - familyRemaining)`. Do not clamp, refresh, merge or remove older contributions implicitly. New-contribution reapplication and independent duration remain authored `stacking`/duration semantics. No separate mutable cap pool or absorption priority is created. Multiple new grants competing for the same cap require an explicit existing sequential allocation order, or are rejected when allocation affects gameplay. `SHP-006` owns the transaction law.
 
 ---
+
+## 18.2 Explicit first-depletion source-family layer
+
+```yaml
+shield:
+  depletionProfile: EXCLUSIVE_FIRST_SOURCE_FAMILY
+```
+
+This opt-in SHP-002 profile is a depletion exception, not Authority or Damage eligibility. Its layer key uses the existing source-family identity: Combat Instance + recipient + runtime source owner + origin Ability + Shield Effect definition. Successive grants of that family share the first layer while retaining separate contribution refs, values, clocks and terminal causes.
+
+Eligible Damage consumes this family before every other Shield source, including another source's ordinary consume-first preference. All eligible contributions in the first family deplete proportionally; no FIFO/LIFO, numeric priority or source/list ordering. Remaining Damage then follows the separately valid remaining Shield profiles and ordinary HP pipeline. Shield Piercing/eligibility and RES-008 simultaneous packet allocation remain applicable.
+
+Only one exclusive first family may be active per recipient. An incompatible second exclusive family requires an independently approved conflict profile; absence is rejected, not resolved by arrival, Slot, Rank or Authority metadata. Validate this at normalization where overlap is provable and before an affected addition/transfer commit otherwise. Omission preserves Standard Shield proportional pooling. Never infer this profile from a `priority` value, source identity alone or Character name; unsupported existing priority descriptions still need their own explicit law.
 
 # 18A. SCOPED EFFECT-AMOUNT MODIFIER SPEC
 
@@ -3774,6 +3826,30 @@ immunity:
 This optional Resource-only actionBinding captures the matching restriction on the next **actually performed** Natural Action at start, before grant-bearing Effect/Mode work; probes/CC do not capture/consume it. Existing Action/Snapshot storage retains the normalized rule/scope and bound ActionRef until its explicitly tracked Action-linked Resource obligations are terminal. Closing the source window at ACTION_COMPLETED prevents binding another Action, but cannot erase this captured restriction from late grants of the same Action. Another Action's grant does not match merely by occurring during the window. A pending-window lifecycle removal does not undo already captured execution evidence. No new callback/protection registry or Functional Tag is needed.
 
 ---
+
+## 23.3 Bounded Resource-limit mutation
+
+The existing Resource Modifier semantic includes capacity. The following bounded P-033/CST-011 profile makes a per-unit Rage limit write and Current reconciliation explicit; it is not a Stat or Current Rage grant.
+
+```yaml
+resource:
+  resourceKind: RAGE
+  pool: <typed per-unit pool ref>
+  limitMutation:
+    delta: <finite pure scalar ValueRef>
+    minimum: 0
+    currentReconciliation: CLAMP_DOWN
+    retentionScope: BATTLE_SCOPED
+  resultBinding: <existing Resource mutation result>
+```
+
+Do not co-author ordinary operation/value with limitMutation. Minimum is an explicit finite nonnegative constant. Read the protected authoritative limit, stage `newLimit = max(minimum, oldLimit + delta)`, and stage `newCurrent = min(currentAfterJoinedPayments, newLimit)`; raising a limit grants no Current resource. The new limit/current/result commit together. Typed RESOURCE_REF reads distinguish CURRENT and LIMIT; a required Cost still uses its own CostSpec/payment result.
+
+The pool limit and battle-retained mutation evidence use the existing Resource/Transaction owner, not a Buff/Stat, field-life State or another writable cap manager. BATTLE_SCOPED does not reset on death, Revive, leave or redeploy; explicit pool initialization/battle-end and other independently declared restore laws remain separate. Ordinary Current operations/overflow and ungated positive grants are unchanged.
+
+An authored activation can join a required Current Rage payment, limit delta and success-use counter in one existing protected transaction. Validate its threshold, payer/admission and cap first; on failure publish no partial payment/limit/use delta. CLAMP_DOWN is a limit consequence, not Cost, positive grant, class regeneration or an extra Action. Preserve the exact mutation origin for §7.16; a limit-only change is not a watched CURRENT_RAGE change.
+
+Normalizer rejects unsupported pool/kind/reconciliation/retention, missing/unavailable typed reads, negative/nonfinite minimum, nonfinite delta, ambiguous overlapping writes or split joined commits. No general resource-limit stack/expiry system, new Primitive or automatic Ultimate cast is added.
 
 # 23A. DEPLOYMENT COST MODIFICATION SPEC
 
@@ -5465,6 +5541,8 @@ Exact naming/versioning belongs Chặng F.
 
 ---
 
+The opt-in §7.16/§17.2/§18.2/§23.3 data lowers into existing triggerGraph/effectGraph/costPlan/Snapshot/Result/Resource/Shield plans under TRG-016/HEL-003/SHP-002/CST-011. Preserve exact checkpoint/own-settlement exclusion, conversion Heal origins/immutable denial, recipient/source-family depletion profile and limit/current/atomic-use provenance. No new top-level runtime system or Primitive is generated.
+
 # 52. NORMALIZER RESPONSIBILITIES
 
 Normalizer/compiler must:
@@ -6507,6 +6585,8 @@ Additional E.10 invariants: projection membership is sealed while the exact Stat
 Additional E.11 invariants: every executable attack owner has an explicit resolved binding; unresolved authoring binding defaults to POSITION/LOCK_POSITIONS. Entity/Both requires an exact-owner authored exception or explicit owner-scoped profile reference. Reject broad exception propagation, foreign-owner binding substitution, unresolved IR and implicit parent/Character/Ability/sibling inheritance. Explicit Entity tracking preserves identity through legal movement and uses current Position for presentation; Slot binding retains coordinates and its declared occupant-read checkpoint. Keep approved exact-owner Entity/Both and non-attack profiles intact.
 
 Additional E.12 invariants: WAITING_THRESHOLD_CONTRIBUTION is a bounded static positive-integer ADD rule with exact origin/owner/ledger/presence lifetime. Its optional normalized plan preserves REC-001's protected final availability/progress view and all-waiting threshold decisions; reject quota, progress mutation, duplicate registration, per-leave ordinary Reaction lowering or an incompatible explicit policy without a composition law.
+
+Additional E.13 invariants: validate the bounded predicate fields/initialization, exact own-activation origin and finite dependencies; immutable exact-Heal conversion origins/denial; exclusive first-family eligibility/overlap/proportional allocation; and finite limit/current/battle-lifetime/atomic joined writes. Reject broad root/Ability exclusion, inferred priority, reconstructed Overheal, missing result origins, invalid minimum/pool/reconciliation or split transactions before affected mutation. Omission preserves prior profiles and all prior IDs.
 
 # 93. SCHEMA NON-GOALS
 
