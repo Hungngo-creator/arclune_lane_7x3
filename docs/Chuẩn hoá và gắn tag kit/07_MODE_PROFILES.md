@@ -1,6 +1,6 @@
 # ARCLUNE — MODE PROFILES
 ## Chặng H — Mode-Specific Runtime Profiles
-**Version:** 2026-10-02-H.1
+**Version:** 2026-10-07-H.2
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`, `06_KERNEL_RUNTIME.md`
 **Purpose:** define which runtime rules are active in each game mode without forking Character identity, Tag semantics, Primitive meanings, or Kernel foundations.
@@ -8,6 +8,8 @@
 **Revision H.1:** clarifies the designer-confirmed nine-position Main battlefield and Leader occupancy at Slot 8. No scheduler, clock, lifecycle or alternate-Mode policy changes.
 
 ---
+
+**Revision H.2:** binds admitted post-death reserved-Slot waits to SSI cadence without Actor Action/duration/class gain. SELF_LEADER_PENDING_RECOVERY protects roster extinction and only the exact Leader's own admitted entitlement; another Actor cannot defer terminal Leader loss. No Character-ID branch or continuous-mode substitute clock is introduced.
 
 # 0. MODE PROFILE PRINCIPLE
 
@@ -207,6 +209,10 @@ Side A eligible Natural Action
 
 ---
 
+An explicitly admitted04§29.3/ACT-011 profile may supply a POSTMORTEM_WAIT checkpoint from a reserved confirmed-dead Slot. Consume it through the same Side pointer/pass and ensuing global boundary, with no Actor Natural opportunity, CC/form selection, ordinary Actor-duration tick, Action or class AE/Rage. The pending Lifecycle record owns bounded attempts; successful replacement only makes the next ordinary SSI visit playable. Unprofiled dead/empty Slots still skip. Slot reservation remains authoritative occupancy under POS-009, not a render/HP heuristic.
+
+`recoverableParticipation` must bind supported Mode law; Main uses SELF_LEADER_PENDING_RECOVERY below. Count a valid pending participant against ordinary roster-extinction/no-active-participant defeat. Independent Leader-objective defeat follows §9 rather than a blanket pending override. Missing/unsupported bindings reject normalization; continuous Modes require an explicit scheduler adaptation rather than fake SSI visits.
+
 # 8. TURN-BASED BATTLEFIELD
 
 Current battlefield concept:
@@ -259,10 +265,18 @@ Leader:
 - has HP;
 - can participate as combat unit;
 - can act according to its profile;
-- true/confirmed Leader death ends battle under battle-end Contract.
+- terminal confirmed Leader death ends battle under ACT-050 after immediately valid admitted lifecycle/recovery adjudication.
 
 Leader death checks:
 > `DEATH_CONFIRMED`, not HP_ZERO.
+
+### SELF_LEADER_PENDING_RECOVERY
+
+This typed Main binding is supported for an explicitly admitted04§29.3 postDeathMaterialization entitlement. It compares the exact **battle participant** owning the pending original-death record with the Mode's Leader identity, not a Character-ID string, shared Side, current Slot occupant or unrelated old runtime reference.
+
+- A non-Leader pending/finished replacement cannot save another Leader. After that Leader's immediate lawful recovery processing, terminal dead status loses the Side immediately; do not wait for the non-Leader's future checkpoints.
+- The Leader's **own** valid unused entitlement defers its Leader loss through its permitted SSI wait checkpoints, retaining the death reservation. Success preserves the logical Leader identity across chassis generations and continues combat. Terminal failure/no entitlement loses the Side. Only an expressly admitted self-recovery profile creates this exception; ordinary external Revive eligibility is unchanged.
+- Ordinary roster-extinction/no-active-participant evaluation counts valid pending recoverability independently. The dead participant gains no playable/Damage-eligible presence. Terminal battle cleanup retires remaining claims/work under existing lifecycle law; pending records cannot reopen a finished battle.
 
 ---
 

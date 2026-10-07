@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-07-I.17
+**Version:** 2026-10-07-I.18
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.16+, `05_CONTRACTS.md` F.18+, `06_KERNEL_RUNTIME.md` G.17+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.2+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.17+, `05_CONTRACTS.md` F.19+, `06_KERNEL_RUNTIME.md` G.18+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -35,6 +35,8 @@
 **Revision I.16:** adds M-117–M-125 for restricted Basic projection/closure/frozen identity, whole-cohort local order, exact-position/paid failure, independent Summon clocks/causes, dismissal snapshots and final-live-set Ultimate Shield composition. Previous fixtures/IDs remain unchanged; declarative Architecture Phase obligations only.
 
 **Revision I.17:** adds M-126–M-134 for battle-base mutation and complete-entry route settlement, including fresh pool/host acquisition and coordinated child continuation interactions. G-001 specifies its surviving old host is INHABITED to keep its multiplicity fixture compatible with the clarified EMPTY blocker. Other prior case bodies/IDs remain unchanged; these are declarative Architecture Phase obligations, not executable test results.
+
+**Revision I.18:** adds M-135–M-146 for bounded dead-Slot scheduling/restoration, retained-stat projection, mandatory receipt folds, reserved actual-Heal payment, required SSI predicates, causal grant capture and authored-shape movement eligibility. M-144/M-145 lock exact self-Leader recovery and generic proportional component receipts. M-065 updates only its allocation admission premise/control for the now-resolved generic law; other prior case bodies/IDs remain unchanged. Declarative Architecture Phase obligations only.
 
 # 0. WHAT THIS FILE IS
 
@@ -3582,9 +3584,9 @@ Save/resume at local Cost success/use/lifecycle/hit/Execute/child aggregate/Heal
 ## M-065 — Reject Unproved Allocation, Mitigator or Continuation Defaults
 
 **Status:** `MUST_REJECT`
-**Fixture/input:** observable shared-recipient simultaneous receipts without allocation law; PROPORTIONAL on sequential group; unavailable/foreign packet membership; separate full Shield/HP budgets per packet; list-order rounding; incompatible mitigation overrides without applicable composition/AUT law; unsupported defensive stat/custom formula; TRUE ARM/RES mitigation; passive stat mutation masquerading as packet penetration; undefined multiple-Penetration composition; probe-time pre-Cost capture; unavailable source fields; snapshot consumers after failed Cost; foreign/cyclic local admittedActionRef; local Cost branch lacking failure policy or conflicting continuation scope; continuation creating a new dead-actor Action/retarget/free cast.
+**Fixture/input:** unsupported shared-recipient allocation conflicting with generic RES-008 PROPORTIONAL; PROPORTIONAL on sequential group; unavailable/foreign packet membership; separate full Shield/HP budgets per packet; list-order rounding; incompatible mitigation overrides without applicable composition/AUT law; unsupported defensive stat/custom formula; TRUE ARM/RES mitigation; passive stat mutation masquerading as packet penetration; undefined multiple-Penetration composition; probe-time pre-Cost capture; unavailable source fields; snapshot consumers after failed Cost; foreign/cyclic local admittedActionRef; local Cost branch lacking failure policy or conflicting continuation scope; continuation creating a new dead-actor Action/retarget/free cast.
 
-**Expected:** reject malformed/unsupported executable content at the responsible Schema/Contract boundary, with no partial affected state/result commit. Valid default different-recipient simultaneous Damage, default mitigation, ordinary active Cost and unrelated admitted graphs remain accepted. Missing numeric precision law remains explicit and cannot become packet priority. No Character callback, new Primitive/Tag, global AoE default or generic priority is required.
+**Expected:** reject malformed/unsupported executable content at the responsible Schema/Contract boundary, with no partial affected state/result commit. Valid shared-recipient input omitting the allocation field lowers to generic PROPORTIONAL; different-recipient simultaneous Damage, default mitigation, ordinary active Cost and unrelated admitted graphs remain accepted. Missing numeric precision law remains explicit and cannot become packet priority. No Character callback, new Primitive/Tag, global AoE default or generic priority is required.
 
 ---
 
@@ -4283,6 +4285,103 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 **Initial State:** Ultimate schedule freezes creator, empty H and inhabited J with one seeded permutation; a preceding child/required lifecycle route legitimately binds a new definition into H. New host K appears afterward.
 **Expected Resolution:** when H's child begins, pin its now-current Basic; a later mutation cannot rewrite it. K never joins. Each Basic selects its own Slot/Entity/AoE/random targets and uses its own stat policy; arbitrary secondary behavior settles sequentially with mandatory lifecycle. Ordinary unrelated Reactions triggered by an earlier child wait until the complete root direct sequence is terminal; child-local direct completion cannot flush the root hold. Creator invalidity skips only an unstarted invalid creator child; valid scheduled host children continue with retained attribution, not source substitution. Requested Basic Cost is waived, independent triggered Cost remains under its own law. Direct attribution stays creator, secondary source/Authority stay their exact owners.
 **Layers Under Test:** existing RequestAction/RES-003/06§157, ENT-006/007, TGT-008, REC-006/definition pinning and child provenance. This is composition coverage, not a new global multi-child profile.
+
+## M-135 — Dead-slot Wait Is Scheduling, Not an Actor Action
+
+**ID:** `M-135`
+**Status:** `MUST_PASS`
+**Initial State:** confirmed-dead participant has an admitted two-attempt postDeathMaterialization profile, its exact death Position claim and remaining successful-use allowance. SSI has not yet reached that Slot.
+**Expected Resolution:** no background tick or attempt. On the actual pointer visit consume one POSTMORTEM_WAIT checkpoint; create no Action/Basic/Skill/Ultimate, class AE, Action Rage, Natural result, actor-window or ordinary Actor-duration tick. The protected end-attempt closes, the Side pointer/control advances once, and the ordinary global boundary follows. A successful materialization makes only the next ordinary SSI visit playable; the consumed Slot is not revisited. Other dead/empty Slots still skip. Pending recovery never makes the dead participant targetable. Save/resume/redelivery preserves the same visit/attempt/boundary identity.
+**Layers Under Test:** E.17 §29.3, ACT-011/CLK-001, existing SSI/Lifecycle/Position and H.2.
+
+## M-136 — Validate Placement Before Payment, Bound Attempts and Count Success Only
+
+**ID:** `M-136`
+**Status:** `MUST_PASS`
+**Input:** required15 Side AE is affordable but a lawful materialization admission condition blocks the first due checkpoint; alternative fixture has insufficient AE. A third actor tries to deploy into the reserved death Position.
+**Expected Resolution:** fail the first attempt with no debit, body or successful-use increment, preserve only the second own wait and reject the competing deployment. At second END, jointly validate Cost/claim/restore/admission: success debits15, materializes and increments once; failure removes the participant for this battle and releases its claim with no debit/use. No alternate Position, third wait or background retry. Three successful materializations exhaust the allowance; the next confirmed death creates no wait. Duplicate success/failure delivery cannot spend, increment, remove or release twice.
+**Layers Under Test:** CST-001, REV-004/006, POS-009, existing protected Transaction/Lifecycle/SSI.
+
+## M-137 — Fresh Cause-only Restore Preserves Structural Presence
+
+**ID:** `M-137`
+**Status:** `MUST_PASS`
+**Initial State:** dead body left temporary Buff/Debuff/Mark/Shield, cooldowns and life/presence charges; declared retained battle counter/adaptations also exist. Its admitted restore profile initializes full new HP/Rage.
+**Expected Resolution:** one successful transaction retains only explicitly surviving battle state, retires old temporary records without Cleanse/expiry/depletion effects, rebuilds always-on definition capabilities and initializes CurrentHP=new CurrentMaxHP and CurrentRage=CurrentMaxRage. Actual occupancy/presence bookkeeping and structural ENTER_FIELD evidence remain coherent, carrying CHASSIS_REPLACEMENT/CAUSE_ONLY. Generic deployed/field-entry/battle-start listeners create no Effects; an explicitly replacement-bound listener may run. No old exact HP/Rage, new True Self, fabricated lifeSerial or battle-counter reinitialization. Stale old-generation callbacks cannot mutate the new body.
+**Layers Under Test:** POS-005, REV-004, E.17 restore profile, existing Materialization/State/Result owners.
+
+## M-138 — Retention-projected Stat Read Excludes Discarded Runtime Contributions
+
+**ID:** `M-138`
+**Status:** `MUST_PASS`
+**Input:** death snapshot with base persistent RES100, discarded temporary RES+50 and a30% adaptation. Variant has a retained battle contribution+20; another variant already has persistent RES130.
+**Expected Resolution:** first replacement persistent RES130 rather than195; retained+20 participates in the death baseline120, producing156, represented once rather than156+20. Already-adapted130 produces169. ARM uses the same projection and MaxHP uses its declared25% factor. Snapshot captures death inputs before cleanup and excludes only contributions the exact transition discards. Ordinary leave/Deck/redeploy does not reset battle adaptations, while battle end does. No modifier object is copied because it affected displayed stats; no BaseStats rewrite or universal stat ordering follows.
+**Layers Under Test:** E.17 §13.5, SNP-002, existing Stat/State/Snapshot retention and contribution graph.
+
+## M-139 — Lethal and Actionless Receipts Fold Before Death-dependent Snapshots
+
+**ID:** `M-139`
+**Status:** `MUST_PASS`
+**Initial State:** per-chassis counters and exact original record generation are registered. Fixture component ActualHP shares are explicitly supplied by a supported allocation profile; an ordinary DAMAGE_COMMITTED Reaction is held until root completion.
+**Input:** earlier DoT/Follow-up plus a lethal simultaneous mixed commit. Separate variants have zero qualifying Damage or equal positive highest totals.
+**Expected Resolution:** fold all positive ordinary PHYSICAL/WILL/TRUE component receipts once, including actionless/child and lethal receipts, before the death-dependent information snapshot even while ordinary Reactions remain held. Shield absorption, overkill, HP Cost/non-Damage HP Loss, direct Execute without Damage and unmapped scalar packets do not enter those three counters. Zero earns no branch; a positive tie draws exactly one tied branch with seeded RNG at the later authored death decision, never inside the fold. Replay neither re-adds nor redraws. An old receipt cannot fold into a replacement record or mutate health/Rage/AE at this bookkeeping checkpoint.
+**Layers Under Test:** E.17 §7.18, TRG-015, existing State/P-021/Result/Transaction; lifecycle and existing seeded choice composition.
+
+## M-140 — Actual Restoration Prices a Reserved Budget
+
+**ID:** `M-140`
+**Status:** `MUST_PASS`
+**Initial State:** M=1000, CurrentHP100, AE budget10, positive divisor15HP/AE and ceiling30.
+**Expected Resolution:** requested base repair150; ordinary restoration150 spends10. A50% Heal reduction restores75 and spends5; amplification restoring300 spends at most the reserved10. Blocked or entirely Damage-converted Heal restores0 and spends0; converted Damage keeps its own actual provenance. Unused AE claim releases at settlement. With M=1000, HP340 and budget30, repair can restore450 to790 rather than stopping at35%. An affordable fractional budget2.5 requests37.5HP before ordinary numeric normalization; do not first quantize into whole AE chunks. Later consumers read exact committed Heal/Cost results rather than reconstructing requested Heal.
+**Layers Under Test:** E.17 §17.3, CST-009/HEL-001, existing Heal/conversion/Resource/Transaction/Result owners.
+
+## M-141 — Joined Heal Payment Prevents Free Restoration and Reservation Races
+
+**ID:** `M-141`
+**Status:** `MUST_PASS`
+**Input:** one protected Heal transaction claims the available Side-AE budget, then an independent debit validates before it settles. Separately exercise abort, owner retirement, save/resume and duplicate commit delivery.
+**Expected Resolution:** independent debit cannot consume claimed AE; the owning transaction can consume its own exact claim. Restoration/conversion outcome, actualRestore evidence, capped proportional payment receipt and release commit together or expose no partial HP/payment. Abort/cancellation releases once without free restoration. Save/resume retains claim ownership and projected/terminal results, rather than a second resource balance or new invocation. Numeric normalization conserves the budget; successful restoration cannot exceed its validated payable settlement. Concurrent candidates with observable, ungoverned claim competition require explicit composition/rejection, not an Event/Slot/list winner.
+**Layers Under Test:** CST-009, existing Resource availability/Transaction/Result retention and replay.
+
+## M-142 — Required SSI Predicates, Stable Health and No Same-checkpoint Repair Loop
+
+**ID:** `M-142`
+**Status:** `MUST_PASS`
+**Input:** living HP<35% owner receives a Natural opportunity lost to CC; later global boundary and independent HP/MaxHP commits occur. Variants have exactly35%, zero budget, denied Heal, and HP_ZERO.
+**Expected Resolution:** finite owner-start predicate/repair closes before CC/selection even without a State expiry; global-boundary predicate closes before next control. Stable health observation runs after mandatory lethal/prevention handling: DEATH_CONFIRMED prevents repair, lawful prevention leaving alive low HP may qualify. Exactly35% does not. At most one activation per originating checkpoint; that invocation's Heal/conversion/payment mutations cannot activate itself again, even if HP stays low. Independent later health mutation/owner start/boundary can qualify; AE-only mutation never polls/retries. No Action, cooldown, fake future grant or infinite finite-graph loop is introduced.
+**Layers Under Test:** E.17 §7.19, ACT-034/CLK-001/TRG-016, existing stable predicate origins and SSI continuation.
+
+## M-143 — Cause-time Rage Denial and Shape Eligibility Survive Delivery Changes
+
+**ID:** `M-143`
+**Status:** `MUST_PASS`
+**Input:** restoration arms existing concurrent three-own-consumed-opportunity and two-global-boundary counters; one own opportunity is CC-lost. Qualifying Action/Damage causes occur while suppression applies, but their Rage settlements are delivered after expiry. Also exercise standalone DoT, performed non-Natural Basic and explicitly external/system grants.
+**Expected Resolution:** expire only after both counters finish; CC counts without creating an Action cause, non-Natural Action does not consume the opportunity counter. Captured Action-generated and Damage-received Rage remain denied after expiry/leave/death; external/system unrelated grants keep their law. Full replacement Rage initialization is not a generated grant. For mitigation, authored AoE remains AoE with one recipient, multi-component single-target remains single-target, and independent non-Natural children do not inherit a root-direct shape/provenance. TRUE bypasses ordinary Final DR. An explicitly movement-suppressing full-field ray removes only attack-shape movement eligibility without charge/counter creation; ordinary MODE_DEFAULT miss, Authority, absence and unrelated defenses remain possible.
+**Layers Under Test:** E.17 §23.2/34.5, CST-016/POS-008, existing clocks/Action/Damage-result context and component filters.
+
+## M-144 — Exact Self-leader Recovery Does Not Rescue Another Dead Leader
+
+**ID:** `M-144`
+**Status:** `MUST_PASS`
+**Input:** Main Leader DEATH_CONFIRMED with ordinary immediate lifecycle/recovery adjudication. Case A has a different non-Leader participant's pending/finished replacement. Case B has this exact Leader's own admitted SELF_LEADER_PENDING_RECOVERY entitlement.
+**Expected Resolution:** A's Leader remaining terminally dead loses the Side immediately; do not wait for the other participant's first/second checkpoint, even if that other replacement is affordable or already succeeded. An actually admitted immediate rule saving the real Leader is a separate lawful control, not another Actor's entitlement. In B, valid pending entitlement defers the Leader loss through only its permitted wait(s); first failure retains the second, success preserves logical Leader identity across generations and combat continues. Second failure or cap-exhausted/no entitlement loses the Side; failed attempts spend/consume nothing. The consumed dead checkpoint still owns its one mandatory following boundary, with no extra wait/Action. Ordinary roster extinction independently counts valid pending participants. Replay/stale old-generation Events cannot defeat the successfully restored Leader, impersonate a new Leader or reopen a terminal battle. No external Revive/True Self is granted.
+**Layers Under Test:** ACT-050/ACT-011/CLK-001, Main SELF_LEADER_PENDING_RECOVERY, existing Lifecycle/Mode/SSI/Position/Transaction identity.
+
+## M-145 — Generic Proportional Allocation Seals Per-component ActualHP Receipts
+
+**ID:** `M-145`
+**Status:** `MUST_PASS`
+**Input:** admitted common-recipient concurrent demands PHYSICAL100/WILL100/TRUE100 with HP100/no Shield; variant post-mitigation/post-Shield demands50/100/150. Exercise both one mixed hit and several same-commit packets, omitted versus explicit PROPORTIONAL input, enumeration permutations and save/replay. Another fixture has type-eligible finite Shield.
+**Expected Resolution:** existing generic RES-008 yields100/3 each in the first fixture and50/3,100/3,50 in the second before ordinary conserved normalization; each sums to100 and has separate immutable component receipts. Lifetime counters read these exact committed shares: equal highest totals select one seeded tied branch, second fixture uniquely selects TRUE. With PHYSICAL-only Shield30 against demands100/100/100, remaining demands70/100/100 yield700/27,1000/27,1000/27 ActualHP. A Standard Shield30 eligible to all three absorbs10 per component, including TRUE; TRUE receives no implicit Shield Piercing. Abundant HP commits each full remaining demand, zero demand does not divide, and aggregate receipts cannot double-credit components. Component/type/authoring/Event/list order supplies no priority; omitted input resolves to the same generic policy. One-hit miss/rejection commits none of its components, with no TRUE fallback/retarget. Separate sequential commits remain separate. Later death/recovery cannot rewrite receipts; replay cannot refold them. Unsupported allocation/numeric conservation fails closed, with no Lamarck-specific calculator.
+**Layers Under Test:** existing RES-008/RES-002, Damage/Shield/Transaction/Result component view, Hit Admission and TRG-015 lifetime receipt fold.
+
+## M-146 — Reject Unsupported New Profiles without Expanding Ordinary Defaults
+
+**ID:** `M-146`
+**Status:** `MUST_REJECT`
+**Input:** dead wait without exact claim/generation or explicit enabled Mode binding; third retry; Cost before placement validation; replay into a new body; retention projection with uncovered/cyclic contribution rules; damage fold containing Heal/RNG/arbitrary graph or unknown type conversion; result-linked Heal with nonpositive divisor/distributed payer/unjointable conversion/payment cycle; causal grant with missing/foreign result; shape/movement suppression that removes unrelated defenses; unordered competing reservations/SSI settlements.
+**Expected Resolution:** reject affected executable IR before partial mutations; retain independently committed prior results. Do not invent new Tag/Primitive/Contract ID/manager, global priority, ordinary Revive admission, True Self, whole-AE rounding, guessed component order or a Leader exemption from another participant's entitlement. Correct self-Leader Mode binding and generic proportional input remain legal. Ordinary upfront Costs, unprofiled dead-slot skips/entry triggers/movement, prior scalar reflection and existing approved Entity-binding exceptions retain their own law.
+**Layers Under Test:** E.17 lowering/validation, existing Contract/State/Result/Transaction/Lifecycle/SSI/Mode owners.
 
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 

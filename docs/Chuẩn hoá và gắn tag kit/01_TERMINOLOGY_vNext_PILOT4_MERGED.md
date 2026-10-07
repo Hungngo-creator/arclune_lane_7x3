@@ -1,6 +1,6 @@
 # ARCLUNE — TERMINOLOGY vNext
 ## Canonical Combat, Runtime & System Terminology
-**Version:** 2026-09-25-B.1  
+**Version:** 2026-10-07-B.2
 **Stage:** Chặng B — Terminology Reconstruction  
 **Source basis:** `terminology.md` + `00_CANONICAL_RECOVERY_AUDIT.md` + các correction hiện hành của user được Audit ghi nhận.  
 **Scope:** định nghĩa nghĩa canonical của khái niệm. File này **không** phải Tag Registry, Primitive Registry, Ability Schema, Contract hay Kernel implementation.
@@ -8,6 +8,8 @@
 **Revision B.1:** incorporates Pilot Normalization #4 terminology for Base vs Current Character Deployment Cost, explicit Return-to-Deck, and lifecycle/deployment State Retention Scope. No new Functional Tag or Primitive is introduced.
 
 ---
+
+**Revision B.2:** distinguishes an admitted postmortem Slot checkpoint from Actor Natural opportunities and a chassis-replacement materialization cause from ordinary Revive/deployment. Structural presence evidence and cause-specific Effect activation remain separate. No Tag or Primitive is introduced.
 
 # 0. MỤC ĐÍCH VÀ QUY TẮC ĐỌC
 
@@ -1127,13 +1129,13 @@ Không có nghĩa side đó hành động liên tục không xen kẽ.
 ---
 
 ## 5.4 Turn Boundary
-**VI:** Biên giữa hai Natural Action  
+**VI:** Biên scheduling SSI
 **ID:** `TURN_BOUNDARY`  
 **Status:** CANONICAL CORE
 
-Ranh giới SSI nằm giữa hai Natural Action liên tiếp trong turn-based mode.
+Ranh giới SSI sau một cơ hội scheduling đã được resolve/consumed trong turn-based mode. Flow thông thường nằm giữa hai Natural Action opportunities; một profile POSTMORTEM_WAIT được khai báo tường minh cũng có boundary sau checkpoint chờ đã tiêu thụ, dù Actor đã chết không thực hiện Action.
 
-Canonical sequence:
+Ordinary conceptual sequence:
 
 `Natural Action → Turn Boundary → Natural Action → Turn Boundary → ...`
 
@@ -1141,7 +1143,7 @@ Turn Boundary:
 - không phải Natural Action;
 - không phải Round;
 - không phải riêng “lượt của cùng một Actor”;
-- là global SSI boundary giữa hai Natural Action opportunities đã được resolve/consumed.
+- là global SSI boundary sau một scheduling opportunity/checkpoint đã được resolve/consumed; POSTMORTEM_WAIT chỉ là ngoại lệ tường minh, không phải personal clock.
 
 Các mechanic kiểu:
 - “1 lần trong lượt bản thân”;
@@ -3008,6 +3010,18 @@ Nếu một successful Materialization làm entity chuyển từ not active-pres
 Deploy, Revive, Return và Rebirth có thể dùng chung materialization machinery nhưng vẫn giữ cause semantic riêng.
 
 ---
+
+## 13.24A Postmortem Wait
+**ID:** `POSTMORTEM_WAIT`
+**Status:** CANONICAL EXPLICIT PROFILE
+
+Consumed dead-Slot scheduling checkpoint owned by a pending post-death materialization entitlement. It shares the Side's SSI cadence and ensuing global boundary but is neither an actually performed Action nor an ordinary Actor Natural Action opportunity. Deadness, reserved occupancy and recoverability are separate properties; a recoverable participant is not thereby alive/present/targetable. Timing/admission/defeat interaction belongs to Contracts and the enabled Mode profile.
+
+## 13.24B Chassis Replacement
+**ID:** `CHASSIS_REPLACEMENT`
+**Status:** CANONICAL EXPLICIT MATERIALIZATION CAUSE
+
+Special post-confirmed-death body materialization with explicit retention/initialization, distinct from ordinary Revive, Chân Ngã retrieval and Deck deployment. Shared materialization operations do not equate those causes or fabricate a True Self. Structural presence-transition evidence, if a real transition occurs, remains ENTER_FIELD; an explicit cause-only activation profile can exclude generic entry/deployment/battle-start Effects while allowing replacement-authored Effects. This distinction does not delete authoritative presence bookkeeping.
 
 # 14. AUTHORITY & AXIOM
 

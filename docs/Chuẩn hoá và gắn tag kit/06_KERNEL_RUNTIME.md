@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-07-G.17
+**Version:** 2026-10-07-G.18
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -35,6 +35,8 @@
 **Revision G.16:** consumes E.15/F.17 restricted Basic projection and complete-cohort local settlement through existing compiler/definition/Snapshot/State/Spawn and Lifecycle/Trigger/RNG/Transaction owners. No new mutable store, manager, Primitive, Contract ID or Character branch.
 
 **Revision G.17:** executes only the two E.16/F.18 Reincarnation extensions through existing world-ledger, lifecycle-result, Target/RNG, reservation, Effect/System and Transaction owners. Clarified Pygmalion creation/inheritance/Ultimate retain existing composition; no new store, queue, manager, ID or global priority.
+
+**Revision G.18:** executes E.17/F.19 through existing SSI/Lifecycle/Position, State/stat/Result, Resource/Transaction and Trigger/Action owners. Bounded dead waits, causal grant scope and reserved Heal-result payment retain explicit terminal/save identities. Existing battle-end adjudication distinguishes roster recovery from exact self-Leader pending recovery; existing RES-008 allocation seals per-component receipts for every supported simultaneous common-recipient commit. No Character branch, new subsystem, allocator or priority manager.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -1315,6 +1317,8 @@ Skipping an empty slot does not swap Side.
 
 ---
 
+An admitted04§29.3 pending record exposes POSTMORTEM_WAIT at its reserved death Slot under ACT-011. Existing SSI Slot search selects that checkpoint instead of skipping only this declared dead claim. Lifecycle owns subject/death/profile/generation, frozen restore inputs, success-counter ref, attempt index/max and pending/terminal status; Position owns its exact reservation. A visit consumes a scheduler checkpoint serial, not naturalActionSerial/Actor window. No Action/CC/form resolver/class gain/ordinary Actor duration occurs. Close its protected end-attempt, advance pointer once and dispatch the global boundary. Success changes future eligibility only; do not act/revisit immediately. Failure1 retains claim for the declared second visit; final failure/cap exhaustion retires participant/claim/pending work coherently. Replay never repeats payment/use/attempt/Side swap or binds a newer owner at the Slot.
+
 # 19. NATURAL ACTION OPPORTUNITY
 
 Kernel distinguishes:
@@ -1825,6 +1829,8 @@ Trigger Engine can use this view to update ordinary field-scoped State/counters 
 
 ---
 
+For04§7.18/TRG-015 receipt folds, Result/State execution captures the exact pre-Damage recipient record generation, then closes complete-batch component ADD bookkeeping before death-dependent snapshots. State/P-021 and Transaction join the counter deltas with processed commit/recipient/Trigger/record identity. No health/resource Effect or RNG can interpose here; committed receipts remain distinct from the counters. Actionless/child/DoT ownership is retained; scalar packets are not relabeled. Counter records reset only by their authored lifetime law. Snapshot/old-receipt consumers and dedup evidence survive cleanup/replay independently; expired original record never redirects to the same Actor's new record.
+
 # 26. PRIMITIVE DISPATCHER
 
 Primitive Dispatcher:
@@ -2254,6 +2260,12 @@ Protect the pool/admission/cap view; stage the new limit and downward-only Curre
 
 Record immutable limit/current before/after, origin and commit result, retaining battle ownership across lifecycle transitions. Dispatch §35C only for actual selected-field changes after the full stable commit; the origin distinguishes own finite activation from a later independent checkpoint. A limit raise alone is not a positive Rage grant; CST-016's existing grant policies remain unchanged. Readiness at limit0 still waits for ordinary legal Action selection. Replay cannot reapply a delta/use, and field cleanup cannot retire battle capacity evidence.
 
+## 29C. Reserved Heal-result payment
+
+04§17.3 → CST-009/HEL-001 → existing Resource/Transaction, P-034/035, P-044/045, conversion and Result owners. One transaction owns claim identity, exact Side-AE pool, unreserved B, positive divisor Snapshot, source/recipient generation, projected Heal/conversion outcome and terminal cursor. Reserve on a protected availability view before resolution; ordinary independent debit validation excludes claims; the owning settlement may debit its own exact claim. A competing undefined reservation/preemption policy rejects, never uses technical order as gameplay priority.
+
+Calculate ordinary Heal and its capped proportional debit from the exact projected actualRestore; validate all joined deltas, then atomically commit Heal/conversion result + matching payment receipt + claim release. Persist immutable result references and transaction identity; there is no interval exposing restored HP without funded settlement. Invalid/abort/clean rejection releases the reservation with no partial HP/debit; conversion Damage follows its real semantics, actualRestore0 costs0; a denied Heal does not fabricate HEAL_COMMITTED. Revalidation may not reroll/recreate already committed work. Completion/cancellation/battle cleanup closes claims once; save/resume retains unresolved claims and terminal receipt/claim identities, not a second resource balance. Committed results govern later observers; no nominal/live reconstruction or whole-AE quantization.
+
 # 30. STATE VERSION
 
 Authoritative state has monotonically increasing logical state versions.
@@ -2288,9 +2300,9 @@ This prevents calculation contamination.
 
 ### Shared-recipient allocation under RES-008
 
-If a normalized simultaneous group opts into sharedRecipientDamageAllocation PROPORTIONAL, the existing Transaction Manager groups incoming packet/component demands by locked recipient, using the same shared phase state. Damage Runtime calculates each independent pre-Shield demand; existing Shield Runtime allocates each eligible layer's consumed budget across eligible demands proportionally and separately depletes source contributions under §52/SHP-002. Remaining HP-bound demand shares one recipient HP budget proportionally under RES-008. No independently proposed packet may spend that budget twice.
+Every supported simultaneous common-recipient Damage commit uses its normalized sharedRecipientDamageAllocation PROPORTIONAL plan, including concurrent mixed components within one hit. The existing Transaction Manager groups exact component/packet demand units by recipient/common commit, using the shared phase state. Damage Runtime calculates each independent pre-Shield demand; existing Shield Runtime allocates each eligible layer's consumed budget across eligible demands proportionally and separately depletes source contributions under §52/SHP-002. Remaining HP-bound demand shares one recipient HP budget proportionally under RES-008. No independently proposed component/packet may spend that budget twice; separate sequential commits are not coalesced.
 
-Commit one recipient net Shield/HP delta within the batch, retain separate immutable DamageResultRef receipts for all participating packets, then publish mandatory lifecycle/ordinary downstream work at the existing boundaries. Validate numeric conservation and permutation invariance before commit; reject unsupported allocation rather than round by list order. Batch/recipient/packet identities, shared state version and proposed shares belong to this existing transaction; pending save/load preserves them, successful commit seals receipts once, abort discards proposals and replay reuses terminal commit/results.
+Commit one recipient net Shield/HP delta within the batch, retain separate immutable component DamageResultRef receipts and their packet aggregate references, then publish mandatory lifecycle/ordinary downstream work at existing boundaries. Receipt identity includes common commit, recipient, packet/Effect and exact component; aggregates cannot double-credit component observers. Validate numeric conservation and permutation invariance before commit; reject unsupported allocation rather than round by type/authoring/list/Event order. These identities, shared state version and proposed shares belong to the existing transaction; pending save/load preserves them, successful commit seals receipts once, abort discards proposals and replay reuses terminal commit/results. TRUE keeps its mitigation/Shield eligibility; it is not automatically Shield Piercing. No second allocation service is introduced.
 
 ## 31A. Parent-owned child-Damage batch
 
@@ -2596,6 +2608,8 @@ Writers record selected actual field changes and exact settlement origin in the 
 Register one finite obligation keyed by Combat Instance, original checkpoint/subject, runtime trigger owner/definition and dependency. Exact owner life/presence/activation refs qualify Conditions, required Cost and cap. Stage explicitly joined payment/limit/use changes under §29/Resource/State transactions. Close nonqualification, failure or success before continuation, even under ordinary Reaction holds.
 
 Use normalized EXCLUDE_THIS_TRIGGER_ACTIVATION plus immutable commit-origin refs to suppress mutations of the same finite activation. Do not filter all events sharing rootActionId/Ability/source; independently committed later work in that root, and future State-terminal settlements, remain eligible after terminal completion. Retain suppression and terminal candidate evidence for redelivery/save/replay without a mutable “currently suppressing” Character flag. Retired life/presence work cannot activate a replacement. Reject ungrounded origins, cyclic/held-future dependencies or unordered competing effects before affected mutation.
+
+04§7.19 uses existing required SSI continuation records for an exact owner-start/boundary predicate graph without a retained-State/first-later-grant anchor. Key by original grant/boundary + Trigger + owner generation; close qualification/finite settlement before CC/selection at owner start or next-control handoff at boundary. A CC-lost grant can therefore settle an automatic Heal without an Action. For repair-style health observation use existing stablePredicateSettlement with EXCLUDE_THIS_TRIGGER_ACTIVATION, so its own Heal/conversion/payment does not reenter; separately caused later health/checkpoint work remains eligible. False predicate/zero budget/failure is terminal, AE-only mutation creates no retry, and retired owner cannot redirect a candidate to a new chassis. Observable unrelated competition still needs a governing law.
 
 # 36. TRIGGER CANDIDATE
 
@@ -2918,6 +2932,8 @@ No new Hit Primitive is dispatched solely for Guaranteed Hit.
 04§11.11/26.1 → TGT-008/POS-008/009 → existing Target/Area/Lock, PositionState, indexed Trigger rules, RNG and Transaction owners. Current coordinate lookup already composes through P-013/014; the extension supplies the bounded pre-calculation relocation and explicit read checkpoint, not a new Slot resolver.
 
 Keep the locked geometry/coordinate refs separately from resolved recipients. At the fixed-area boundary, the Trigger index finds only normalized positionalDamageInterposition rules with matching incoming Action/outcome/geometry and available owner State. Freeze candidate facts and the authoritative union of occupancy/reservation claims via existing owners. RNG POSITION_SELECTION uses a stable domain keyed by incoming batch/profile to select/assign the common legal set under POS-008. Candidate identities preserve seed mapping across enumeration permutations, never grant Slot/ID priority.
+
+E.17 §34.5 additionally retains each exact Damage owner's normalized authored attackShape in the existing Effect/outcome context; shared root or current recipient count cannot replace it. Target/Trigger eligibility applies an explicitly selected full-field SUPPRESS_ATTACK_TRIGGERED policy to the matching attack-shape movement clauses before positional assignment or later ordinary movement-Reaction admission. Suppressed clauses create no move, allowance debit or movement-dependent counter; other clauses of the same kit remain independently eligible. Preserve ordinary Hit Admission/Authority/absence and unrelated defenses. Result/Amount scopes read this immutable owner facet with the original direct/non-Natural provenance; no Character branch or new protection store.
 
 Stage assigned P-050 moves, success-only allowance/State changes, post-move source snapshots/hostile Actor refs and deferred-counter records in the existing Transaction Manager. Commit coherently; no assignment/abort leaves any success payload. Emit the existing one POSITION_MUTATION_COMMITTED result under §33A/TRG-007, preserving required prior Position Mark bookkeeping and ordinary listener eligibility. Old source Slots do not become frozen assignment destinations. No fixpoint re-evaluation of already processed movers.
 
@@ -3534,6 +3550,8 @@ Snapshot Runtime consumes that already resolved stat; index reconstruction, save
 
 ---
 
+For04§13.5/SNP-002 retained-stat Snapshot fields, Stat/State evaluates its existing contribution graph projected by the referenced typed transition retention profile. Capture death-checkpoint inputs before record retirement, apply retained contributions once and store only resolved scalar/provenance fields. It is not a mutation, modifier copy, arbitrary hypothetical state simulation or BaseStats rewrite. Unsupported conditional dependencies/retention/stack composition fail closed. Existing final-stat/family-exclusion reads retain their own semantics; Snapshot capture cannot add a second adaptation.
+
 # 62. STATE ATTACHMENT
 
 Kernel supports:
@@ -3677,6 +3695,8 @@ Existing Resource Runtime/P-033 supplies validated positive-grant kind/origin/gr
 The source window may close at completion/death/leave, while already captured Action scope remains available until its Action-linked Resource obligations and dedup horizon are terminal. Late own-Action grants still reject; a different Action's grant does not inherit the captured scope. Save/resume preserves rule/scope/Action refs and terminal grant receipts. Do not erase this evidence on window cleanup/re-registration; delivery beyond the retained horizon rejects rather than guessing an exemption. A newly armed window binds a future Action separately.
 
 Commit admission plus Resource delta/result consistently, never add then subtract a forbidden gain. Rejection records zero committed grant/reason and provenance without changing the pool; admitted overflow/caps remain ordinary. Rage-only scope leaves AE and required Costs/drains untouched. Missing observable origin/Action/transfer/SET mapping or conflicting rules without applicable law fail closed. Existing State/Duration/Snapshot/Action owners suffice; no extra Resource gate service.
+
+For the additional causeBinding profile, validate DAMAGE_RECEIVED/grantDamageResultRef separately from ACTION_GENERATED/grantActionRef. Existing Action-start and Damage-commit contexts capture matching normalized rule/scope before cause-linked grants or expiry; immutable receipt/Action evidence survives the source State's end. A Damage cause validates exact receiving Actor/pool and can be actionless; a performed non-Natural Action can be an Action cause. No CC/probe Action is fabricated. Grant admission checks the retained cause scope, rejecting unsupported/lost/foreign bindings rather than relying on current State/delivery order. Retain through declared Resource obligations and replay horizon, then retire payloads under existing ownership. No extra writable protection store is introduced.
 
 ### State Admission
 
@@ -4823,18 +4843,20 @@ No hidden logic.
 
 # 121. BATTLE TERMINATION
 
-Leader confirmed death can mark Combat Instance terminal.
+Leader DEATH_CONFIRMED is adjudicated by existing Lifecycle/Mode battle-end ownership under ACT-050, after its admitted immediate recovery and mandatory world-law work. Terminal Leader death marks the Side defeated even if a different participant has a pending/finished replacement; cancel that participant's future wait with ordinary terminal cleanup rather than resolving it as a rescue.
+
+For07§9's SELF_LEADER_PENDING_RECOVERY, the same owner reads the exact Leader battle-participant identity, original death/generation and its admitted pending Lifecycle record. Defer terminal Leader loss only for this Leader's own valid entitlement; keep its reserved SSI checkpoints live without declaring it alive. Existing record attempt/outcome/claim identities supply save/replay evidence, not a new defeat store. Successful materialization preserves the logical Leader role across runtime generations and closes this death's pending reason; final failure/no entitlement makes the Leader loss terminal. Stale dead-generation status cannot defeat a successfully restored Leader, and another participant's record cannot satisfy this check.
 
 Working terminal behavior:
 
 ```text
-finish atomic death + mandatory world-law bookkeeping
+finish atomic death + mandatory world-law/immediate recovery adjudication
 → mark terminal
 → cancel ordinary future actions that cannot alter already-confirmed termination
 → cleanup
 ```
 
-Battle-end prevention must intervene before terminal confirmed death.
+An admitted pending self-Leader recovery defers terminality before the terminal flag is committed; it never reopens an already-terminal Combat Instance. Roster-extinction checks separately count valid pending participants. A consumed POSTMORTEM_WAIT retains its ACT-011/CLK-001 mandatory following boundary bookkeeping even when its end-attempt decides terminal failure; cleanup cannot invent another wait/Action or discard that consumed-checkpoint identity. Ordinary future queue cutoff remains the existing policy.
 
 Exact terminal queue cleanup remains Kernel policy to be finalized with stress tests.
 
@@ -5294,6 +5316,8 @@ initial HP/resource/state
 Then Entity becomes visible as active.
 
 ---
+
+For an admitted postDeathMaterialization, P-069/Transaction joins validated Cost, exact claim, declared old-state retention/cleanup, initialized health/resources, new lifecycle generation and successful-use counter. Original participant battle ownership persists; no True Self is created. Failure exposes none of these staged changes and follows bounded wait policy. State cleanup records replacement cause, not expiry/Cleanse/Shield depletion; Core presence/World bookkeeping sees one coherent commit. CAUSE_ONLY preserves structural presence evidence if a real ENTER_FIELD occurs but excludes generic entry/deployment/start Effect activation, dispatching only explicitly replacement-bound listeners. Always-on registration must not replay battle initialization or reset retained battle counters. Mode defeat binding is validated independently and cannot reopen a terminal battle or silently override Leader death.
 
 # 149. REVIVE ENTITY REFERENCE
 
