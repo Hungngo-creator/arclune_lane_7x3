@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-06-F.16
+**Version:** 2026-10-07-F.17
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -30,6 +30,8 @@
 **Revision F.15:** extends existing SHP-002/HEL-003/TRG-016/CST-011 with bounded opt-in first-family depletion, per-Heal Shield-conversion denial, stable predicate checkpoints and atomic Rage-limit/current reconciliation. Unprofiled law and all prior IDs remain unchanged; no global priority, Tag or Primitive.
 
 **Revision F.16:** extends existing SHP-002/006 with one opt-in recipient exact-family/complement partition: shared remainder cap, separate matched cap and explicit remainder-first proportional depletion. Existing admission, receipts, source lifetimes and prior profiles remain unchanged; no new Contract ID.
+
+**Revision F.17:** extends existing TRG-001/002 and ACT-040 with complete-cohort local settlement and restricted Basic projection/frozen binding. Existing cohort/world-law, attribution, target binding, State/Spawn/clock/Shield and unprofiled behavior remain unchanged; no new Contract ID or global priority.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -1178,12 +1180,24 @@ At minimum architecture must distinguish:
 
 ---
 
+### Opt-in complete-cohort local settlement
+
+04§7.17 is one finite Trigger settlement of the **complete original confirmed-death batch**, not one activation per member Event. Existing cohort/batch identity and immutable death results supply membership; REC-004's Luân Hồi-qualified subset/count is unchanged. Pin the registered owning presence and required subject/relation-anchor facts at the original confirmation checkpoint; later registration/Side change/reentry does not retroactively qualify. Retain requested authoritative death-position/Basic-FORM inputs before cleanup/recovery; do not reconstruct from current live entities.
+
+After mandatory cohort lifecycle/presence/world-ledger work is coherent, apply the whole-cohort owner gate. EXCLUDE_OWNER_CONFIRMED_IN_COHORT closes the candidate as clean nonqualification, without entry mutation or enclosing Action failure, if that owner was confirmed in the original cohort; earlier publication cannot process a prefix and later recovery cannot undo the gate. Revalidate the exact owning Field Presence. Entry filters use pinned death facts/explicit relation anchor.
+
+Freeze the complete eligible set and bind one deterministic seeded permutation for that owner-presence/Trigger/cohort. Set enumeration/Slot/Entity/Event order supplies no priority. Run finite entry graphs in that order, with required lifecycle between commits; local failure preserves earlier commits and follows declared continuation, not inferred outer failure/refund. No ordinary Reaction window is introduced between this settlement's dependent steps. Unrelated work gets no priority from this profile; observable conflicts without an explicit law remain REQUIRED_EXPLICIT/rejected.
+
+Required finite checkpoint work closes before dependent Action/SSI continuation. It creates no Natural opportunity/extra Action, changes no prior simultaneous calculation, and does not advance Luân Hồi by its private permutation. Deduplicate individual Event delivery against one candidate and protected per-entry progress. Save/resume reuses membership/permutation/inputs/terminal decisions, never recreates evicted records, respawns failed entries or retries a consumed death. Owner leave cancels only uncommitted work under its actual cause.
+
 ## TRG-002 — Trigger Evaluation Snapshot
 **Status:** `LOCKED_DEFAULT`
 
 A Trigger evaluates using authoritative state at its event's committed point unless it explicitly references an earlier SnapshotRef or result object.
 
 It must not read presentation state.
+
+For opted-in complete-cohort settlement under TRG-001, distinguish immutable death-checkpoint subject/definition inputs from current post-mandatory owner/placement eligibility. A later live view cannot supply both. Ordinary single-Event snapshots remain unchanged.
 
 ---
 
@@ -5016,6 +5030,18 @@ SSR Warrior Skill 1 therefore:
 - does not receive Cuồng Bạo Basic-only effect merely because of formula source.
 
 ---
+
+### Restricted declarative Basic projection and frozen ownership
+
+04§16.3A selects fixed BASIC_DIRECT_DAMAGE projection, not unrestricted Ability/Combat Definition inheritance. Preserve only dependency-closed direct Damage/hit grouping and declared exact-Basic-owner targeting inputs. Drop excluded effects/listeners/resources/identity/Authority/child behavior; reject retained formulas/target dependencies requiring excluded semantics. Temporary runtime modifiers are not source-definition coefficients.
+
+Scale typed numeric coefficients once, bind generic source-stat/HP reads to the receiving actor at declared retained checkpoints, and preserve supported target/world reads. Do not multiply resolved Damage or retain deceased values. Unsupported damaging profiles remain REQUIRED_EXPLICIT; only genuinely no-Direct-Damage Basics use explicit final fallback, without another scaling pass.
+
+Projection data supplies no Action identity/behavior. A receiving actor declaring BASIC_ATTACK/FOLLOW_UP performs a real non-Natural Basic; an outer Skill merely using the fragment remains a Skill. Exact-owner explicit projection may preserve that Basic's Entity/Both exception or targeting-profile Guaranteed Hit, but grants none to siblings/parent/other attacks and retains no Authority. Ordinary Hit/lifecycle admission and TGT-008 still govern.
+
+Record creation identity is distinct from profile equality/source trueSelfId/lifeSerial. Repeated qualifying deaths, even of the same ordinary-Revived life identity, may create distinct records; redelivery of the **same** death/candidate cannot. Freeze payload at declared actor creation. Store eviction removes membership only; dependent actor bindings retain immutable profile and original creation identity. Snapshot retention follows all declared State/actor/pending consumers, then ordinary cleanup/replay lifetime. No mutable link to the deceased actor or retained-store choice.
+
+Materialization atomically commits actor initialization, placement and Basic binding through existing P-051/definition/Transaction owners. Invalid source checkpoint/profile/owner/placement creates no half-bound actor or record mutation for that failed operation. A prior independent successful record creation is not rolled back by local Spawn failure. Full-inheritance and ordinary profile-copy Contracts remain unchanged.
 
 ## ACT-041 — Forced Basic
 **Status:** `LOCKED`

@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-06-G.15
+**Version:** 2026-10-07-G.16
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -31,6 +31,8 @@
 **Revision G.14:** executes E.13/F.15 through existing Transaction/Trigger/Health/Resource/Presence, Shield/Damage and Heal/Result/Effect owners. Exact checkpoint/activation/result/family refs supply the new boundaries; no Character branch, new store/service, Tag/Primitive or generic priority.
 
 **Revision G.15:** executes a bounded recipient-owned Shield ledger partition through existing static-rule/Shield/Damage/Transaction/Result owners. Real source provenance, independent cap views and remainder-first proportional allocation require no new subsystem or Character branch.
+
+**Revision G.16:** consumes E.15/F.17 restricted Basic projection and complete-cohort local settlement through existing compiler/definition/Snapshot/State/Spawn and Lifecycle/Trigger/RNG/Transaction owners. No new mutable store, manager, Primitive, Contract ID or Character branch.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -3170,6 +3172,18 @@ not:
 
 ---
 
+## 49A. Restricted Basic projection bindings
+
+04§16.3A / ACT-040: Normalizer validates fixed whitelist/dependency closure, expands authoritative Basic FORM direct hit graph, rewrites typed coefficient slots/source-stat bindings and resolves consuming Basic's target-owner permissions. Runtime selects only a validated definition variant pinned at the source checkpoint; it never clones a live Ability or executes callbacks. Unsupported variants fail before affected State/Spawn work, with no damaging-profile-to-Blank substitution.
+
+Existing Snapshot storage holds immutable normalized data without deceased gameplay identity/stats/Authority/resources. Source death/result refs may remain trace/provenance evidence, not receiving identity/formula inputs. State parameters hold SnapshotRef and normal creation StateRef. Owner-scoped recency uses existing counters/State transactions driven by explicit local order; equal payload/source trueSelfId/lifeSerial does not deduplicate creations.
+
+At P-051 materialization, definition binding consumes declared base Summon plus Basic-only override; placement, stat initialization, behavior binding and capability-index update share one protected commit. Existing P-082 applies where needed; no P-083/full inheritance. Attribution follows receiving actor's own declaration. Each child has its own Target/Effect refs and Action identity, not deceased Basic Action instance or parent exception permissions.
+
+Retain immutable payload while retained State, live receiving actor or declared pending consumer references it. Store eviction retires membership only; actor's frozen payload/creation-identity comparison stays readable without dereferencing a retired live State. Terminal actor removal releases its binding; owning presence leave clears scoped States/owned entities and retires source-dependent pending work, preserving committed results. These refs/terminal identities serialize with existing Snapshot/State/Entity/Action owners; resume cannot re-extract a newer FORM or live-switch actors.
+
+No new projection service or writable source-stat/Ability copy. Retain only validated fragments and declared consumers, release unused data at ordinary terminal/replay horizons. Unprofiled §49 behavior is unchanged.
+
 # 50. STANDARD SHIELD POOL
 
 Each entity can expose:
@@ -5464,6 +5478,18 @@ This preserves:
 - cohort-level Luân Hồi semantics.
 
 ---
+
+## 159A. Complete-cohort local settlement
+
+04§7.17 → TRG-001/002 → existing Lifecycle/Death-result, Trigger, Snapshot, RNG, Effect-DAG and Transaction owners. The original cohort/batch supplies a read-only confirmed-entry collection; §85/REC-004 retain Luân Hồi-qualified subset/count. At CONFIRM_DEATH, capture eligible registered owner/presence, required relation-anchor facts and requested death-position/Basic-FORM/subject facts before cleanup/recovery, as immutable result/Snapshot data rather than a writable death/occupancy ledger. Later registration/Side mutation/new presence cannot allocate a fresh candidate for those past entries.
+
+Finish mandatory lifecycle/presence/world-ledger work for the batch, then instantiate one required finite candidate keyed by Combat Instance + owner Entity/presence + Trigger definition + original cohort/batch. If its owner was confirmed in that batch, close clean nonqualification with no entry mutation/Action failure: no publication prefixes or later-Revive survival inference. Revalidate exact current presence and freeze entries using retained death facts. A zero-entry candidate also closes cleanly without drawing a permutation or creating work.
+
+Existing RNG binds one eligible-set permutation with equal participation and enumeration-invariant set-to-draw mapping. Persist it with candidate progress. Expand only that finite collection into sequential entry graphs; close mandatory lifecycle between commits. State/recency/cap/Spawn dependencies follow the authored order. Unrelated candidates with ungoverned shared-cap/Slot/Resource conflicts are rejected, not sorted by this plan.
+
+Member commits and progress markers share protected transaction/terminal identity before the next dependent step. Local failure/skip follows declared continuation, preserving earlier commits without redraw. Duplicate DEATH_CONFIRMED Events reuse the candidate. Serialize original membership, definition/Position snapshots, permutation, member/step, owner-presence revision and terminal results through replay. Retired presence cannot resume in a new one; completed/failed candidate cannot allocate another State/Spawn for the same originating death. Replay-horizon retirement does not admit too-old delivery as fresh work.
+
+Close per-entry work before dependent Action/SSI continuation. This bounded required settlement introduces no ordinary Reaction window between its own dependencies, extra Action or new Event level. Single-subject Events still publish; Luân Hồi sees the original simultaneous cohort. Competing unrelated candidates require their actual composition or fail closed. No Character branch, queue/record/permutation manager, callbacks or polling.
 
 # 160. DEATH COHORT COUNT
 

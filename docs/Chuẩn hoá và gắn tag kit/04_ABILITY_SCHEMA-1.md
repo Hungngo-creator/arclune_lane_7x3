@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-06-E.14
+**Version:** 2026-10-07-E.15
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -28,6 +28,8 @@
 **Revision E.13:** adds bounded opt-in first-family Shield depletion, immutable per-Heal Shield-conversion denial, stable HP/MaxHP/Rage/entry predicate settlement and Rage-limit/current reconciliation. Existing owners/IDs and unprofiled behavior remain unchanged; no new Tag, Primitive, callback or priority manager.
 
 **Revision E.14:** adds one bounded recipient-owned exact-family/complement Shield partition with independent new-addition caps and explicit remainder-first proportional depletion under existing SHP-002/006. All earlier profiles/IDs remain unchanged; no new Tag, Primitive or priority/pool manager.
+
+**Revision E.15:** adds two bounded opt-in profiles: restricted Basic direct-Damage projection with immutable Snapshot/State/Spawn binding, and complete-cohort local seeded settlement. Existing Target/Action/State/Spawn/Trigger plans and Primitives suffice; no new Tag, Primitive, Contract ID, callback or runtime subsystem.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -1297,6 +1299,34 @@ The changed-field whitelist is exactly CURRENT_HP, CURRENT_MAX_HP and per-subjec
 This finite mandatory graph closes before the next direct-group/Action/SSI continuation, after full group commit, mandatory lifecycle and reconciliation. At most one activation candidate of this trigger/runtime owner belongs to that checkpoint; no polling, fixpoint or delayed retry token. EXCLUDE_THIS_TRIGGER_ACTIVATION excludes mutations produced by that exact activation's finite settlement (including joined payment/limit reconciliation), not every later mutation sharing Ability, Actor or rootActionId. A later independent commit, including one in the same root or a later State-terminal settlement, can qualify after the activation is terminal.
 
 Do not co-author stableHealthSettlement and stablePredicateSettlement on one trigger. Normalize exact commit/subject, origin-settlement, owner life/presence and local dependency bindings; reject arbitrary watched fields/events/callbacks, missing exclusion provenance, unsupported Mode checkpoints, cycles and observable competing activation/resource order without a governing composition law. This is an opt-in checkpoint profile, not a new Trigger subsystem.
+
+## 7.17 Complete-cohort local death settlement
+
+An explicitly opted-in `trigger.deathCohortSettlement` consumes a complete committed death-batch view, rather than multiplying §7.4's `ANY` result or executing individual death Events in publication order:
+
+```yaml
+deathCohortSettlement:
+  cohortRef: <originating confirmed death's existing cohort/batch reference>
+  ownerRef: <EntityRef>
+  ownerScope: FIELD_PRESENCE_SCOPED
+  subjectFilter: <typed death-entry predicates with explicit relationAnchor>
+  ownerGate: EXCLUDE_OWNER_CONFIRMED_IN_COHORT
+  entrySnapshotFields: [<declared death-checkpoint fields>]
+  entryOrder: SEEDED_RANDOM_PERMUTATION
+  entryEffectGraph: <finite per-entry Effect graph reference>
+  settlementTiming: AFTER_MANDATORY_COHORT_LIFECYCLE
+  failurePolicy: <explicit entry/branch local failure and continuation>
+```
+
+Bind one owner × Combat Instance × owning Field Presence × Trigger definition × original cohort/batch. Pin the eligible registered owner/presence and required relation-anchor facts at the originating death checkpoint; a later registration, Side change or fresh Field Presence cannot claim past deaths. Entries are that batch's immutable confirmed-death results; Luân Hồi's qualifying subset/count remains REC-004's property. Entry filters read death-checkpoint subject/anchor facts, not a later battlefield pool. Declare death Position/authoritative Basic FORM fields only when required; capture them at confirmation before cleanup/Revive replaces them. A definition reference is not a dead actor's stat snapshot.
+
+Close mandatory cohort lifecycle/presence/world-ledger work first. If the owner was confirmed in that original cohort, suppress the whole settlement, even if later recovery changes current survival. Otherwise revalidate the exact owner/presence and freeze eligible entries. Use one deterministic seeded permutation with stable set-to-draw mapping, equal participation and input-enumeration invariance. It supplies no Slot/Entity/list/Event priority or global Reaction order.
+
+Expand that finite member set into a sequential execution of the declared entry graph. Dependencies may create State, remove a selected retained State and attempt Spawn; later entries see previous local commits. Required lifecycle closes between commits. No ordinary Reaction window is introduced between this settlement's own dependent steps. Competing unrelated work retains its governing composition/priority law or is rejected if order is observable. Neither earlier simultaneous Damage calculations nor Luân Hồi cohort ordering change.
+
+Terminal identity is once per bound owner-presence/Trigger/cohort, with protected per-entry progress/results. Individual DEATH_CONFIRMED publication/redelivery reuse that candidate; no redraw/recreation/restart. Owner leave retires uncommitted work; committed results remain. Local failure/skip must be terminal before dependent Action/SSI continuation. No polling, pending retry or extra Action.
+
+Reject incomplete membership, ambiguous owner/presence/anchor, unavailable death snapshots, unsupported order/gate, arbitrary loops/callbacks, cycles, missing failure/continuation or ungoverned competing mutation. Existing ANY, ordinary per-death Triggers and unresolved global Reaction priority remain unchanged.
 
 # 8. CONDITION SPEC
 
@@ -2589,6 +2619,38 @@ This does not copy:
 unless explicitly declared elsewhere.
 
 ---
+
+## 16.3A Restricted Basic direct-Damage projection
+
+An opt-in fixed projection extends the existing Ability-profile reference; ordinary §16.3 copying is unchanged:
+
+```yaml
+profile:
+  source: ABILITY_PROFILE
+  abilityRef: <authoritative Basic FORM/definition bound at source checkpoint>
+  scale: <finite nonnegative CONSTANT coefficient scale>
+  projection:
+    kind: BASIC_DIRECT_DAMAGE
+    sourceCheckpointRef: <retained definition/death Snapshot binding>
+    sourceStatPolicy: EXECUTING_ACTOR
+    targetingPolicy: EXACT_BASIC_OWNER
+    noDirectDamageFallback: <explicit complete normalized profile>
+    resultBinding: <existing SnapshotRef binding>
+```
+
+Normalizer derives a dependency-closed immutable Basic fragment from the authoritative source FORM: direct Damage components/types/formulas, hit count and sequential/simultaneous groups, and only the pure Target/Area/Snapshot inputs needed by those nodes. Preserve the exact Basic owner's declared binding/target pattern, recipient-read checkpoints and targeting-profile Hit behavior. Guaranteed Hit survives only if explicitly part of that retained targeting profile; no Authority survives. Unresolved source grouping/target/snapshot semantics cannot be repaired by guessed defaults.
+
+Whitelist excludes every non-Damage Effect, Buff/Debuff/Mark/Heal/Shield/CC, Passive listener, Cost/Rage/class-resource regeneration, deceased identity/Chân Ngã, Authority, child Action and unrelated Counter/Reaction/Follow-up behavior. Do not bake temporary runtime modifiers into the graph. If excluded nodes supply required retained semantics, the graph is unsupported, not silently shortened.
+
+Scale each declared projectable numeric coefficient slot exactly once before execution. This is not post-mitigation multiplication or scaling every literal: selection/hit counts, clocks, thresholds and non-coefficient operands are not coefficient slots. Rebind valid generic source-stat/HP reads to the executing projected actor, including source Snapshot capture at the retained declared checkpoint. Preserve supported typed target/world reads. Reject unclassified coefficients, deceased private resources/stacks/state identities, callbacks and unavailable child results; no dead-source reconstruction. Unsupported future variants remain REQUIRED_EXPLICIT before affected execution.
+
+Fallback is allowed only for genuinely no own-direct Damage nodes. Unsupported damaging graphs never select fallback. A declared fallback is already a complete final profile and is not scaled again; its types/hit count/targeting must be explicit or validly defaulted under TGT-008.
+
+Bind the immutable fragment through existing SnapshotRef data. An existing State may retain that SnapshotRef in typed `parameters`; its creation StateRef is record identity, distinct from deceased identity/profile equality. Retained-store membership and dependent actor ownership are independent. Evicting/removing store State does not mutate frozen dependent payloads or their creation-identity comparison. Release data only after retained States, live actor bindings and pending declared consumers release it. Recency is owner-scoped State/counter data advanced by an explicit ordered graph, not Event/Entity priority.
+
+`spawn.definition` may bind the payload as a **Basic-only override** of a separately declared Summon definition. P-051 atomically initializes actor and behavior binding; existing P-082 applies where needed. Generated Basic resolves its own target-owner refs/exception provenance under TGT-008. Explicit projection authoring grants only that exact Basic the retained binding; no implicit Character/parent/sibling inheritance. Action identity/behavior/Natural status, stats/Class/Element/Rank, identity/resources/Authority/lifecycle and attribution come from the receiving actor's declaration, not full Combat Definition inheritance.
+
+Lower through existing effectGraph, Snapshot/State bindings and Target/Spawn/definition plans. Normalizer may precompute validated immutable variants for the supported source Basic FORMs; the checkpoint selects/pins that variant rather than performing runtime code transformation. No new namespace, Effect Primitive, projection manager or script interpreter. Validate dependency closure/types, finite scale, source checkpoint, supported grammar and output retention/owner scope before State creation/materialization. Existing ordinary copies/full-inheritance policies are unchanged.
 
 ## 16.4 Damage result binding
 
@@ -5516,6 +5578,8 @@ An explicitly authored lifecycle DIRECT_EXECUTE profile lowers under DTH-008 to 
 
 Target tie policy is normalized into `targetPlan`.
 
+E.15's restricted Basic projection lowers to immutable profile data in existing Snapshot/State/definition bindings and a separately resolved consuming Basic Target/Effect plan. Its complete-cohort profile lowers to existing triggerGraph/effectGraph finite member expansion, death snapshots, local permutation, owner-presence gate and protected per-entry progress. Neither adds a top-level IR service; unsupported source variants/competing work fail closed before the affected operation. Unprofiled content is unchanged.
+
 TGT-008 binding resolution is keyed by each existing attack-owner Action/Effect/request-path or triggered-settlement origin in `targetPlan`/`effectGraph`, not by Character or Ability alone. Lower a separately resolved TargetSpec for every attack owner, preserving exact-owner exception provenance and explicit profile/target-data references. Shared data does not copy binding permission; one Ability-level resolved flag cannot stand in for its independently owned attacks.
 
 `DEPLOYMENT_COST_MODIFICATION` and `RETURN_TO_DECK` remain typed Effect semantics in the normalized Effect/deployment execution plan; they do not imply new Primitive IDs.
@@ -6622,6 +6686,8 @@ Additional E.12 invariants: WAITING_THRESHOLD_CONTRIBUTION is a bounded static p
 Additional E.14 invariants: validate one recipient partition registration, exact family/complement membership, independent protected headrooms and fixed remainder-first proportional depletion. Preserve real sources/receipts/clocks; reject unsupported overlaps, cap-bypassing positive mutations and ambiguous competing additions before affected commit. No synthetic source or writable cap pool.
 
 Additional E.13 invariants: validate the bounded predicate fields/initialization, exact own-activation origin and finite dependencies; immutable exact-Heal conversion origins/denial; exclusive first-family eligibility/overlap/proportional allocation; and finite limit/current/battle-lifetime/atomic joined writes. Reject broad root/Ability exclusion, inferred priority, reconstructed Overheal, missing result origins, invalid minimum/pool/reconciliation or split transactions before affected mutation. Omission preserves prior profiles and all prior IDs.
+
+Additional E.15 invariants: restricted Basic fragments must be dependency-closed/type-checked with marked coefficient slots, receiving-source bindings, exact-owner targeting and retained immutable payloads. Unsupported damaging graphs cannot take no-Damage fallback. Complete-cohort plans require whole original membership, death-checkpoint captures, clean whole-owner gate, explicit local permutation/failure and protected per-entry progress; reject arbitrary iteration, per-Event ordering, stale-presence continuation and ungoverned competing work. Preserve all existing IDs, ANY behavior and unprofiled copies/cohorts.
 
 # 93. SCHEMA NON-GOALS
 

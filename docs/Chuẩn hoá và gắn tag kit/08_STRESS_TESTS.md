@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-06-I.15
+**Version:** 2026-10-07-I.16
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.14+, `05_CONTRACTS.md` F.16+, `06_KERNEL_RUNTIME.md` G.15+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.15+, `05_CONTRACTS.md` F.17+, `06_KERNEL_RUNTIME.md` G.16+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -31,6 +31,8 @@
 **Revision I.14:** adds M-110–M-114 only for first-family Shield depletion, immutable per-Heal Shield-conversion denial, stable predicate origin/coherent checkpoints, atomic capacity reconciliation and malformed bounded profiles. Reuse existing clock/child/Slot/result/lifecycle cases; prior cases and IDs remain unchanged. Architecture Phase documentation only.
 
 **Revision I.15:** adds only M-115/M-116 for shared multi-source remainder cap/receipts and two-part depletion/provenance/rejection. All prior stable IDs and case bodies remain unchanged; declarative Architecture Phase obligations only.
+
+**Revision I.16:** adds M-117–M-125 for restricted Basic projection/closure/frozen identity, whole-cohort local order, exact-position/paid failure, independent Summon clocks/causes, dismissal snapshots and final-live-set Ultimate Shield composition. Previous fixtures/IDs remain unchanged; declarative Architecture Phase obligations only.
 
 # 0. WHAT THIS FILE IS
 
@@ -4119,6 +4121,89 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 **Forbidden Outcomes:** global Standard proportional depletion across A/B/F; FIFO/LIFO among A/B; merging A/B origins; using Event/list order for a competing profile; non-Damage conversion inherits Damage-layer order; source expiry retires F; changing existing M-110/M-114 exclusive-family law.
 
 **Layers Under Test:** 04§18.3, SHP-002/006, RES-008, Shield/Duration/Transaction/Result/static-rule owners; existing M-021–M-029 remain obligations for Echo's other composition.
+
+## M-117 — Restricted Projection Keeps Form, Direct Hit Graph and Exact-owner Binding
+
+**ID:** `M-117`
+**Status:** `MUST_PASS`
+**Purpose:** distinguish normalized restricted attack data from live Ability cloning or full Combat Definition inheritance.
+**Initial State:** a qualifying Character's authoritative death FORM Basic has two sequential direct hits, each PHYSICAL150% ATK + WILL80% WIL, exact-owner Entity tracking and an explicitly targeting-profile Guaranteed-Hit flag. Its live temporary Buff doubles Damage and its Ability also includes Heal, Mark, a Passive listener and child Basic.
+**Input:** project BASIC_DIRECT_DAMAGE at scale0.70, then materialize a declared Summon with ATK100/WIL50. It later performs that bound Basic after source cleanup/Revive.
+**Expected Resolution:** two sequential direct hits, each PHYSICAL105 + WILL28 before ordinary pipeline; source temporary×2 and all excluded nodes/listeners/child/resource/identity/Authority are absent. Preserve the declared target/snapshot checkpoints and only that generated Basic's explicit Entity tracking/targeting-profile flag. Thespis/Blank/sibling attacks still default independently to Slot; ordinary Hit/lifecycle/Authority law remains. Source FORM changing later cannot change the frozen fragment. A genuinely no-Direct-Damage source uses explicit final PHYSICAL70%ATK + WILL70%WIL fallback: one hit/two components, not another×0.70.
+**Forbidden Outcomes:** final-receipt copy, dead-source stat reads, two components→two hits, removed Heal/Mark/child executing, temporary modifiers baked in, Rank/Class/Element/Chân Ngã/Authority inheritance or Character-wide target exception.
+**Layers Under Test:** 04§16.3A, ACT-040, TGT-008/HIT, Snapshot/definition/State/Spawn owners.
+
+## M-118 — Unsupported Damaging Projection Cannot Become Blank
+
+**ID:** `M-118`
+**Status:** `MUST_REJECT / MUST_PASS`
+**Purpose:** prove projection dependency closure and coefficient typing rather than permissive object copying.
+**Input:** Basic Damage depends on deceased Rage/private stacks/state identity, a callback or unavailable child result; alternatively a coefficient is unclassified, source FORM/snapshot/grouping/binding is unavailable, scale is nonfinite/negative or the author includes Authority/non-Damage effects.
+**Expected Resolution:** reject the executable affected variant before profile/State/materialization mutation; retain REQUIRED_EXPLICIT for unsupported external content. A damaging unsupported Basic never selects Blank. Accepted control: a fully typed direct formula `1.5×SOURCE.ARM + 0.2×TARGET.CurrentMaxHP`, with only those two coefficients marked projectable, becomes `1.05×UNDERSTUDY.ARM + 0.14×TARGET.CurrentMaxHP`; it retains typed target reads/checkpoints and ordinary Damage rules. Hit count, target count, threshold and clock operands do not scale. A no-Damage source alone may use the explicit final fallback.
+**Forbidden Outcomes:** dead resource→Understudy stat guessing, arbitrary literal scaling, whole-final-amount substitution for declared coefficient rewriting, script escape or unsupported→Blank.
+**Layers Under Test:** 04§16.3A/Normalizer, ACT-040, 06§49A.
+
+## M-119 — Record Identity, Retained Eviction and Live Payload Ownership Diverge
+
+**ID:** `M-119`
+**Status:** `MUST_PASS`
+**Initial State:** store R1/R2; live U1 plays R1. A new qualifying death creates R3. Later the Character supplying R2 is ordinarily Revived and dies again, with the same trueSelfId/lifeSerial and identical Basic profile, creating R4.
+**Input / Expected Resolution:** R3 insertion evicts R1 from retained membership only; U1 continues R1. R4 is NEW creation identity, not R2 replacement/deduplication. Final retained store R3/R4; U1 still R1 and occupies one live cap unit. A Skill2 chooses newest unrepresented exact identity R4 even when an evicted U has identical profile. Role snapshot survives while U/pending consumers hold it; unused evicted payload eventually releases. Reviving original source does not dismiss U. Redelivery of R4's SAME death/candidate does not create R5. Insertion/eviction uses a protected State group, not an observable over-cap store.
+**Forbidden Outcomes:** compare profiles/source identity instead of creation refs; live-switch U1; source Revive link; removing payload still owned by U; replay recreating evicted record or counting it against retained-cap2.
+**Layers Under Test:** StateRef/SnapshotRef/State transactions, 04§16.3A, ACT-040, 06§49A.
+
+## M-120 — One Complete-cohort Permutation and Whole-owner-death Gate
+
+**ID:** `M-120`
+**Status:** `MUST_PASS`
+**Initial State:** Thespis has one active Understudy and retained old Role X. A/B/C qualify in one simultaneous death batch; all their exact death Positions are legal and truly empty. Bound seeded permutation is B→A→C.
+**Expected Resolution:** create B then A then C Roles; B wins the one remaining auto-summon capacity and permanently binds its B Role. Final retained store A/C; B's live actor keeps its evicted Role. Reverse Event/list/Slot enumeration with same semantic inputs/seed: same permutation/results. Existing waiting entries advance by original qualifying cohort size; new members stay0, not by private order. Source death FORM/Position inputs are retained even after cleanup. Resume after B commit does not redraw/recreate/resummon B.
+**Owner-death variant:** Thespis also confirmed in that SAME batch; all A/B/C work is suppressed, even if his Event publishes last or a later recovery revives him. No processed prefix. Existing owner cleanup occurs only at actual LEAVE_FIELD. HP_ZERO/prevented owner death does not trigger the confirmed-death gate if the owner remains otherwise valid.
+**Forbidden Outcomes:** eventSeq/Entity/Slot/list winner, per-member RNG producing unrelated orderings for recency/cap, source-only live read after cleanup, shared permutation as global Reaction/Luân Hồi priority or partial owner-death processing.
+**Layers Under Test:** 04§7.17, TRG-001/002, REC-004, Lifecycle/Trigger/RNG/Snapshot/Transaction owners.
+
+## M-121 — Exact Death Position, Paid Placement Failure and Creation Snapshot
+
+**ID:** `M-121`
+**Status:** `MUST_PASS`
+**Initial State:** a qualifying death Position looks empty but is claimed by pending Revive/death waiting/temporary absence/deployment. Another allied Slot is free.
+**Expected Resolution:** create/retain the Role, fail the exact auto-spawn locally; no alternate Slot/wait/retry/AE. Releasing the original claim later does not retry. Skill2 may instead select normal legal placement and newest exact unrepresented Role. If its AE20 commits but intended Slot/cap becomes stale: no actor/alternative Role/Slot/retry/refund; preserved prior Role store stays valid.
+**Initialization control:** immediately before successful materialization, Thespis current values are MaxHP1000/ATK200/WIL100/ARM80/RES60, including valid temporary stat modifiers. U initializes MaxHP450/CurrentHP450/ATK110/WIL55/ARM44/RES33. Later Thespis values changing does not change U. Each successful Skill2/Ultimate spawn takes its own initialization snapshot after required root Cost is terminal; Passive has no payment. Invalid protected placement/profile commits no half-bound U or consumed live cap.
+**Layers Under Test:** POS-009, P-051/definition initialization, Snapshot/Spawn/Cost/Transaction, 04§7.17/16.3A.
+
+## M-122 — Summon Completes Action3 Before Non-death Expiry
+
+**ID:** `M-122`
+**Status:** `MUST_PASS`
+**Input / Expected Resolution:** U starts remaining3. First actual Natural completion→2; CC-lost opportunity stays2; real Skill1 non-Natural BASIC_ATTACK Follow-up stays2 and grants no child class AE/Rage; second Natural completion→1. Third Natural fully commits direct Effects/required lifecycle/blocking work and reaches ACTION_COMPLETED→0, then DESPAWN before dependent Natural handoff. No death listener/Luân Hồi/Revive. An ordinary lethal U instead emits Summon DEATH_CONFIRMED and explicit Summon-death listeners, then removes/releases cap. Skill3 and owner-leave cleanup retain dismissal/owner causes, never death or natural expiry.
+**Cleanup/replay variant:** owner LEAVE_FIELD despawns live owned U and retires pending source-dependent child work with no substitution/refund; already committed receipts remain. A U already confirmed dead in the same batch retains its real Death result/listeners rather than being relabeled as owner-cleanup despawn. Reentry has empty store/cap; stale completion delivery cannot tick/despawn a new U or presence. Repeated Action-completion delivery ticks once.
+**Layers Under Test:** Action/Natural facets, CLK/ACT-033, ENT-011/015, State/Spawn/Despawn/presence/terminal replay; reuse B-005/006 SSI placement law.
+
+## M-123 — Dismissal Snapshots Survive Removal and Heal Branches Stay Independent
+
+**ID:** `M-123`
+**Status:** `MUST_PASS`
+**Initial State:** two owned U have equal remaining lifetime, different HP%. Skill1 first minimizes lifetime, then exact current HP%, then seeded residual ties; Skill3 uses lifetime then seeded ties with no inserted HP% metric. Thespis is a legal non-Leader Character in the Heal candidate pool.
+**Input:** Skill3 chooses/locks U; after AE15, capture U.CurrentHP200 and Thespis.WIL100 and lock Leader + lowest living non-Leader Character at the pre-despawn checkpoint.
+**Expected Resolution:** successful non-death despawn, then simultaneous Heal batch requested90 per valid recipient (60+30), same immutable inputs, Overheal DISCARD. U/other Summons/dead/waiting Characters cannot be recipient B. Thespis may be B; equal HP% ties use seeded exact minima. Missing/invalid Leader skips only A; locked B invalid later skips only B without retarget. If chosen U is invalid before despawn commit: no Heal/reselection/refund. Later WIL/HP changes and erased U state cannot rewrite snapshots. Skill1 selected-U invalidity likewise fails only the child, without choosing another U or refunding AE.
+**Layers Under Test:** P-010–014 ordered metrics/ties, Target/Snapshot, P-053, RES-002/004, Heal/Cost/Result/terminal ownership.
+
+## M-124 — Useful Ultimate Admission, Missing-role Order and New Shield Identities
+
+**ID:** `M-124`
+**Status:** `MUST_PASS`
+**Initial State:** store R1/R2, newer R2; existing U plays an evicted R0 and has one free cap/Slot. U has remaining1 and old Shield contribution A50.
+**Expected Resolution:** useful admission succeeds due live U; process missing R2 first and materialize its U; cap stops R1 without retry. After all attempts terminal, take final live owned set, reset both remaining:=3 and add separate20%CurrentMaxHP contributions, including new U. For an existing U of MaxHP500, A50+B100 coexist. A later Ultimate adds C100, retaining identities, ordinary proportional ledger/caps and no extra action expiry; reset is3 rather than+3. If planned spawn becomes stale after root Cost, no alternate Role/Slot/refund, but existing U still resets/gets Shield. A failed Role spawn never produces Blank.
+**Admission controls:** empty store/no live U plus legal placement attempts exactly1 Blank; same state without placement rejects before Cost. Stored missing Role without live U/legal placement also rejects no-op cast. Existing U with no spawn Slot remains useful. Role/profile identity and private cohort recency, not profile equality/list order, govern missing/newest selection. CurrentMaxHP is sampled at final Shield grant, independently of initialization values.
+**Layers Under Test:** admission/Cost, Target/State/Spawn DAG, P-021/P-046, SHP-002/005/006, Shield ledger/presence lifecycle.
+
+## M-125 — Reject Malformed Cohort Plans and Ungoverned Competing Settlements
+
+**ID:** `M-125`
+**Status:** `MUST_REJECT`
+**Input:** incomplete cohort membership, missing owner-presence or relation-anchor facts, unavailable death FORM/Position, arbitrary callback/iteration, guessed order/failure/continuation, cyclic dependency or resume against a retired presence. A new registration/presence or changed Side attempts to claim past cohort deaths. Two unrelated candidates contend for the same death Slot/resource with no approved composition law; alternatively a projected Basic imports a parent/sibling Entity exception or dereferences evicted live State instead of retained payload.
+**Expected Resolution:** reject affected executable content/work before new partial mutations; preserve independently committed prior results. No Event/Slot/ID winner or generic global priority. Replay cannot bypass a terminal candidate or rebind a new presence. Valid control: a plain §7.4 ANY filter still returns one Boolean and does not multiply activations; ordinary single-death triggers, §16.3 profile copies, full inheritance and REC-004 waiting cohorts retain prior laws.
+**Layers Under Test:** E.15 lowering/validation, TRG-001/002/005, ACT-040/TGT-008, existing Trigger/State/Snapshot/RNG/Transaction/replay owners.
 
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
