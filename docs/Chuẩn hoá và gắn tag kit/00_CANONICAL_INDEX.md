@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-07-INDEX-17
+**Version:** 2026-10-07-INDEX-18
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-07-INDEX-17`
+**Version:** `2026-10-07-INDEX-18`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-06-E.14`.
+**Version:** `2026-10-07-E.15`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-06-F.16`.
+**Version:** `2026-10-07-F.17`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-06-G.15`
+**Version:** `2026-10-07-G.16`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-06-I.15`
+**Version:** `2026-10-07-I.16`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -164,7 +164,9 @@ In `docs/canon kit/`:
 
 - **Rotania** → `docs/canon kit/Rotania_Clarified_Gameplay_Canon.md` → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → first-depletion Shield family, per-Heal conversion denial, stable predicate checkpoints and bounded Rage-limit reconciliation.
 
-- **Thespis** → `docs/canon kit/Thespis_Clarified_Gameplay_Canon.md` R0 → **PARTIALLY_CLARIFIED / NORMALIZATION_BLOCKED_BY_GAMEPLAY_DECISIONS** → raw4 entry84; damage-only Role projection and real Understudy Summons. §8 preserves nine unresolved gameplay decision groups; proposed answers are not locks.
+- **Thespis** → `docs/canon kit/Thespis_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry84; restricted Basic projection, distinct frozen Role bindings, owner-gated seeded Death Cohort settlement and independent real Summon lifetime/dismissal/Ultimate Shield composition. Metadata and unsupported future external profiles remain NOT BLOCKING.
+
+E.15/F.17/G.16/I.16 adds two bounded opt-in profiles on existing objects: restricted Basic direct-Damage projection into immutable Snapshot/State/Spawn bindings, and complete-cohort local seeded Trigger settlement with retained death inputs/owner gate/per-entry progress. Existing owners execute both; no new Tag/Primitive/Contract ID/subsystem/global priority. M-117–M-125 cover projection closure/identity, cohort/placement/replay, clocks/causes, dismissal and final-live-set Ultimate composition. 01/02/03/07 and prior fixtures remain unchanged; unsupported damaging Basics never silently become Blank.
 
 E.14/F.16/G.15/I.15 adds one bounded recipient-owned exact-family/complement Shield partition under existing SHP-002/006 and static-rule/Shield/Transaction owners. It preserves real source provenance while sharing a cap across unrelated remainder sources and depleting that group before the matched family. M-115/M-116 prove the distinct cap/receipt and depletion/identity boundaries; earlier cases and profiles remain unchanged. No new Tag, Primitive, Contract ID or subsystem; 01/02/03/07 remain unchanged.
 
