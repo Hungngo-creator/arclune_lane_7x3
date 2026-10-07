@@ -1054,3 +1054,151 @@ Root ULTIMATE gọi đúng một Skill1 child thật, giữ SKILL identity/non-N
 
 82) .
 83) .
+
+84) THESPIS
+
+RAWKIT / NOT CANON
+AI ORIGINAL CHARACTER #4 — GPT-5.6 Sol
+Rank: SSR — Rank Mult 1.10
+Class: Summoner
+Element: Dark
+Giới tính: nam
+Role: Attrition Summoner / Replacement Actor / Comeback Utility
+Thespis lấy cảm hứng từ người được truyền thống Hy Lạp gắn với hình tượng diễn viên đầu tiên. Nhưng fantasy tao muốn không phải “nhà hát ma”.
+Signature là:
+Diễn viên có thể chết. Vai diễn thì không.
+Khi một đồng minh chết, Thespis không hồi sinh họ, không lấy Chân Ngã của họ, cũng không clone Character đó.
+Hắn cho một Kẻ Thế Vai bước lên sân và diễn lại đúng một phần nhỏ của người vừa ngã xuống.
+Đấy là điểm phân biệt cực rõ với Pygmalion.
+
+Passive — No Role Dies With Its Actor
+Vai Diễn Không Chết Cùng Diễn Viên
+Khi một allied Character có Chân Ngã, không phải Leader, không phải Summon, đạt DEATH_CONFIRMED trong lúc Thespis đang trên sân, Thespis tạo một Role Record từ Basic Attack của Character đó.
+Role Record chỉ ghi:
+Target pattern + Direct Damage Profile của Basic Attack.
+Nó không ghi:
+buff, debuff, mark, heal, shield, CC, passive trigger, cost, Rage interaction, Authority, identity của người chết hay bất cứ child action nào.
+Tối đa giữ 2 Role Record. Role thứ ba thay Role cũ nhất.
+Ngay sau Death resolution, nếu Thespis đang có dưới 2 Kẻ Thế Vai và position vừa bỏ trống hợp lệ để summon, hắn tự triệu hồi một:
+Understudy — Kẻ Thế Vai
+vào chính vị trí đó.
+Không tốn AE.
+Kẻ Thế Vai
+Kẻ Thế Vai là Summon thật:
+không Chân Ngã;
+không vào Luân Hồi;
+không có Rage;
+không có Skill/Ultimate;
+chỉ có Natural Action + Basic Attack;
+không thể Revive;
+tối đa 2 con cùng lúc.
+Khi sinh ra, snapshot từ Thespis:
+45% Max HP
+55% ATK
+55% WIL
+55% ARM
+55% RES
+Các stat khác dùng profile riêng của Summon nếu sau này cần chuẩn hóa.
+Basic của nó dùng Role Record nhưng toàn bộ coefficient chỉ còn 70% giá trị gốc.
+Ví dụ ally chết có Basic:
+100% ATK + 100% WIL
+thì Kẻ Thế Vai dùng:
+70% ATK + 70% WIL
+bằng stat của chính Kẻ Thế Vai, không phải stat người chết.
+Nếu Basic cũ là:
+150% ATK + 80% WIL
+thì thành:
+105% ATK + 56% WIL.
+Damage type thuộc Direct Damage Profile được giữ. Nhưng mọi hiệu ứng ngoài Damage bị bỏ.
+Nếu Character chết có Basic không gây Direct Damage, Role đó dùng fallback:
+70% ATK + 70% WIL lên một target.
+Mỗi Kẻ Thế Vai tồn tại tối đa 3 Natural Action thực sự của chính nó rồi tự despawn. Despawn này không phải Death.
+Nếu Character gốc được Revive trong lúc Kẻ Thế Vai còn sống, Kẻ Thế Vai không biến mất.
+Vì:
+nó chưa bao giờ là người đó.
+Nó chỉ đang diễn vai của họ.
+Khi Thespis rời sân, toàn bộ Kẻ Thế Vai despawn và Role Record bị xóa.
+VFX
+Character chết.
+Không có linh hồn bay sang Thespis.
+Thay vào đó, một mặt nạ sân khấu xuất hiện trên position vừa trống.
+Một hình người mặc đồ đen bước ra khỏi màn nhung vô hình, đeo mặt nạ mang một vài nét biểu tượng của Character chết.
+Nếu nó diễn Basic của một kiếm sĩ, nó không biến thành kiếm sĩ đó. Nó dùng một đạo cụ đen đơn giản và bắt chước chuyển động.
+Đúng fantasy:
+không sao chép người.
+chỉ sao chép vai.
+Basic — House Lights Down
+Hạ Đăng
+Thespis dùng cây gậy chỉ huy sân khấu gõ xuống sàn.
+Một đèn rọi từ trên cao khóa một enemy:
+100% WIL + 100% ATK
+Không effect phụ.
+
+Skill 1 — Take Your Cue
+Đến Lượt Ngươi
+15 AE.
+Chỉ dùng được nếu có ít nhất một Kẻ Thế Vai.
+Chọn Kẻ Thế Vai có thời lượng còn lại thấp nhất; nếu bằng nhau, chọn cái có HP% thấp hơn.
+Nó lập tức thực hiện 1 Basic Attack dưới dạng Follow-up.
+Follow-up này:
+dùng Role hiện tại;
+không tiêu Natural Action của Summon;
+không giảm bộ đếm 3 Natural Action;
+không tạo class AE;
+không tạo Rage riêng cho Summon.
+Gameplay rất rõ:
+một diễn viên sắp hết thời gian trên sân được Thespis gọi tên thêm một lần trước khi màn khép lại.
+
+Skill 2 — Understudy, Take the Stage
+Kẻ Thế Vai, Lên Sân
+20 AE.
+Điều kiện:
+có ít nhất một position đồng minh trống;
+dưới 2 Kẻ Thế Vai.
+Ưu tiên Role Record mới nhất hiện chưa có Kẻ Thế Vai nào đang diễn.
+Nếu mọi Role đều đang được diễn hoặc chưa từng có đồng minh chết, tạo một Kẻ Thế Vai với Blank Role:
+70% ATK + 70% WIL, đơn mục tiêu.
+Dùng normal Summon placement; không tạo luật vị trí đặc biệt chỉ cho Thespis.
+Điểm quan trọng là Thespis không phải chờ team chết mới chơi được. Nhưng những Understudy “trống vai” rõ ràng yếu hơn một Role thật.
+
+Skill 3 — Exit to Applause
+Rời Sân Trong Tiếng Vỗ Tay
+15 AE.
+Chọn Kẻ Thế Vai có thời lượng còn lại thấp nhất.
+Nó cúi chào rồi despawn.
+Không DEATH_CONFIRMED.
+Không kích hoạt effect “khi Summon chết”.
+Sau đó Heal:
+Leader và một allied Character có HP% thấp nhất ngoài Leader.
+Mỗi người nhận:
+60% WIL của Thespis + 15% Current HP còn lại của Kẻ Thế Vai vừa rời sân.
+Overheal bị bỏ qua.
+Nếu không có ally thứ hai hợp lệ, chỉ Leader nhận.
+Đây cũng là nút giải quyết vấn đề Summon chiếm slot. Kẻ Thế Vai có giá trị nhưng đôi lúc player cần đẩy nó khỏi sân để deploy Character thật.
+
+Ultimate — The Curtain Rises on the Missing
+Màn Nhung Mở Cho Kẻ Vắng Mặt
+Khi cast:
+Thespis kiểm tra tối đa 2 Role Record đang giữ. Với mỗi Role chưa có Kẻ Thế Vai tương ứng trên sân, hắn triệu hồi nó nếu còn slot và chưa đạt cap 2.
+Nếu:
+không có Role Record;
+không có Kẻ Thế Vai;
+thì tạo 1 Blank Understudy.
+Sau đó mọi Kẻ Thế Vai đang có:
+reset lifetime về 3 Natural Action
+và nhận Shield:
+20% Max HP của chính Kẻ Thế Vai
+Shield tồn tại tối đa cho tới khi summon đó despawn hoặc bị phá.
+Ultimate không gây Damage.
+Không Revive.
+Không kéo Chân Ngã khỏi waiting window.
+Nó chỉ:
+đưa những vai diễn còn thiếu trở lại sân khấu.
+
+Thespis rất linh hoạt nhưng phải mất người mới lấy được Role tốt.
+Kẻ Thế Vai chỉ có 55% offensive stats của một SSR Summoner rồi coefficient copy lại còn ×0.70. Nó không thay thế được Character thật.
+Không Full Kit copy, không Chân Ngã, không Authority, không permanent scaling, không Revive.
+Nhưng trong trận attrition, hắn làm một thứ rất khó định giá chỉ bằng damage:
+đội hình mất một Character nhưng không lập tức mất luôn một ô hành động.
+Câu gameplay của Thespis là:
+“Khi một người ngã xuống, mày muốn giữ lại phần nào của họ thêm ba lượt nữa?”

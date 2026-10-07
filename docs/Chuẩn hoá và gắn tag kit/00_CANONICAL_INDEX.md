@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-06-INDEX-16
+**Version:** 2026-10-07-INDEX-17
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-06-INDEX-16`
+**Version:** `2026-10-07-INDEX-17`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -163,6 +163,8 @@ In `docs/canon kit/`:
 - `Nephthys_Clarified_Gameplay_Canon.md` R1, **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw4 entry11: live +2 per active Field Presence/all-waiting threshold re-evaluation without quota; own-direct25% Skill1 Shield with positive-only shared2-actual-completion refresh winning same-checkpoint expiry; hostile-start MaxHP/direct-root Shield absorption paid once with deduplicated simultaneous self/Leader Heal; distinct random locked Slots/current occupants; Chân Ngã Revive with Leader inclusion, TRULY_EMPTY death/alternate Slot, atomic normal-baseline/target-kit retention HP35%/Rage5 and no Deck-only effects. Latest explicit completion sequence supersedes raw after-action wording. Only REC-001's bounded live threshold law is extended; other mechanics use existing composition. Metadata/unsupported external profiles remain NOT BLOCKING.
 
 - **Rotania** → `docs/canon kit/Rotania_Clarified_Gameplay_Canon.md` → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → first-depletion Shield family, per-Heal conversion denial, stable predicate checkpoints and bounded Rage-limit reconciliation.
+
+- **Thespis** → `docs/canon kit/Thespis_Clarified_Gameplay_Canon.md` R0 → **PARTIALLY_CLARIFIED / NORMALIZATION_BLOCKED_BY_GAMEPLAY_DECISIONS** → raw4 entry84; damage-only Role projection and real Understudy Summons. §8 preserves nine unresolved gameplay decision groups; proposed answers are not locks.
 
 E.14/F.16/G.15/I.15 adds one bounded recipient-owned exact-family/complement Shield partition under existing SHP-002/006 and static-rule/Shield/Transaction owners. It preserves real source provenance while sharing a cap across unrelated remainder sources and depleting that group before the matched family. M-115/M-116 prove the distinct cap/receipt and depletion/identity boundaries; earlier cases and profiles remain unchanged. No new Tag, Primitive, Contract ID or subsystem; 01/02/03/07 remain unchanged.
 
