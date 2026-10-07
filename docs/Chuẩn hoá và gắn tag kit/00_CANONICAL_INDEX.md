@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-07-INDEX-20
+**Version:** 2026-10-07-INDEX-21
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-07-INDEX-20`
+**Version:** `2026-10-07-INDEX-21`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -142,6 +142,8 @@ Authored Character data không nên tham chiếu raw engine code.
 ## 2A. Current Character canon navigation
 
 In `docs/canon kit/`:
+
+- **Lamarck** → `docs/canon kit/Lamarck_Clarified_Gameplay_Canon.md` R0 → **GAMEPLAY_PARTIALLY_CLARIFIED / NEED_DESIGNER_DECISIONS / NOT_NORMALIZED** → AI/chassis replacement and cumulative adaptation intent; §8 retains explicit unresolved gameplay questions. No generic architecture delta is established.
 
 - Pilot #1: `Ariadne_Velora_Clarified_Gameplay_Canon.md`.
 - **Echo Reverie** → `docs/canon kit/Echo_Reverie_Clarified_Gameplay_Canon.md` → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → recipient-owned two-part Shield ledger: independent caps and remainder-first proportional depletion.
