@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-07-INDEX-21
+**Version:** 2026-10-07-INDEX-22
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-07-INDEX-21`
+**Version:** `2026-10-07-INDEX-22`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -71,9 +71,9 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`
 **Role:** Chặng B — canonical meanings and semantic distinctions.  
-**Version:** `2026-09-25-B.1`.
+**Version:** `2026-10-07-B.2`.
 **Read when:** gần như mọi normalization task.  
-**Important:** `TURN_BOUNDARY` hiện nghĩa là global SSI boundary giữa hai Natural Actions liên tiếp. Personal “own turn” mechanics dùng Actor Natural Action Window / Natural Action clocks.
+**Important:** `TURN_BOUNDARY` là global SSI boundary theo CLK-001, gồm ngoại lệ POSTMORTEM_WAIT được khai báo tường minh. Personal “own turn” mechanics dùng Actor Natural Action Window / Natural Action clocks; dead wait không tiến personal Actor clock.
 
 ## `02_TAG_vNext.md`
 **Role:** Chặng C — Canonical Functional Tag Registry.  
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-07-E.16`.
+**Version:** `2026-10-07-E.17`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-07-F.18`.
+**Version:** `2026-10-07-F.19`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,18 +122,18 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-07-G.17`
+**Version:** `2026-10-07-G.18`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
 ## `07_MODE_PROFILES.md`
 **Role:** Chặng H — mode-specific scheduler/spatial/lifecycle/resource profiles.  
-**Version:** `2026-10-02-H.1`
+**Version:** `2026-10-07-H.2`
 **Read when:** mechanic khác nhau theo turn-based / Arena / Exploration-Defense.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-07-I.17`
+**Version:** `2026-10-07-I.18`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -143,7 +143,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 In `docs/canon kit/`:
 
-- **Lamarck** → `docs/canon kit/Lamarck_Clarified_Gameplay_Canon.md` R0 → **GAMEPLAY_PARTIALLY_CLARIFIED / NEED_DESIGNER_DECISIONS / NOT_NORMALIZED** → AI/chassis replacement and cumulative adaptation intent; §8 retains explicit unresolved gameplay questions. No generic architecture delta is established.
+- **Lamarck** → `docs/canon kit/Lamarck_Clarified_Gameplay_Canon.md` R1 → **Q1_Q15_LOCKED / NEED_INTEGRATION_DECISIONS / NOT_NORMALIZED** → all fifteen designer groups locked; no-Chân-Ngã chassis replacement, bounded dead-slot wait, persistent adaptation, result-linked repair and Rank-gated Entity Follow-up. Only successful replacement with an already-dead Main Leader and observable concurrent-component ActualHP allocation remain integration decisions; metadata/future Mode adapters remain nonblocking.
 
 - Pilot #1: `Ariadne_Velora_Clarified_Gameplay_Canon.md`.
 - **Echo Reverie** → `docs/canon kit/Echo_Reverie_Clarified_Gameplay_Canon.md` → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → recipient-owned two-part Shield ledger: independent caps and remainder-first proportional depletion.
@@ -169,6 +169,8 @@ In `docs/canon kit/`:
 - **Thespis** → `docs/canon kit/Thespis_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry84; restricted Basic projection, distinct frozen Role bindings, owner-gated seeded Death Cohort settlement and independent real Summon lifetime/dismissal/Ultimate Shield composition. Metadata and unsupported future external profiles remain NOT BLOCKING.
 
 - **Pygmalion** → `docs/canon kit/Pygmalion_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry26; Q1–Q10 locked: first-cycle BATTLE_START basis/later current bases, success-only quota/EMPTY blocker, independent PUPPET bodies, complete-entry router and uniform roster pool, host-preserving fresh kit state, battle-global base reduction, next-consumed-opportunity defense family and coordinated seeded full Basic sequence. Only metadata/future external profiles/Mode adaptations remain NOT BLOCKING.
+
+B.2/E.17/F.19/G.18/H.2/I.18 adds bounded opt-in laws through existing owners for dead-Slot scheduling/cause-only restoration, retained-stat snapshots, pre-death receipt folds, reserved actual-Heal payment, required SSI predicates, causal Rage admission and authored-shape movement eligibility. M-135–M-146 cover only those new boundaries/interactions and malformed profiles; two probes retain the unresolved post-success Leader-death and observable component-allocation decisions. No new Tag/Primitive/Contract ID/subsystem/global priority;02/03/raw/src remain unchanged. Lamarck's fifteen designer locks are authoritative, but execution-ready Main normalization waits for those two integration decisions.
 
 E.16/F.18/G.17/I.17 adds only two bounded profiles on existing Reincarnation objects: battle-base threshold reduction and complete-entry local route settlement. REC-001/006 and existing ledger/lifecycle/Target/RNG/reservation/Transaction owners execute them. Pygmalion creation, full-kit state and root-held coordinated Ultimate use existing composition. M-126–M-134 cover the new boundaries/interactions; G-001 specifies an INHABITED old host. No new Tag/Primitive/Contract ID/subsystem/global priority; 01/02/03/07/raw/src remain unchanged.
 

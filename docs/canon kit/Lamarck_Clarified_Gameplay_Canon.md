@@ -1,139 +1,233 @@
 # ARCLUNE — LAMARCK — CLARIFIED GAMEPLAY CANON
 
-**Revision:** R0.
-**Status:** GAMEPLAY_PARTIALLY_CLARIFIED / NEED_DESIGNER_DECISIONS / NOT_NORMALIZED.
-**Source:** latest designer-supplied Lamarck kit, matching `41) Lamarck` in root `Ý tưởng nhân vật 4.md`.
+**Revision:** R1.
+**Status:** Q1_Q15_LOCKED / NEED_INTEGRATION_DECISIONS / NOT_NORMALIZED.
+**Source:** latest explicit Lamarck Q1–Q15 FINAL DESIGNER LOCK and cross-mechanic locks; these supersede conflicting shorthand in `41) Lamarck`, root `Ý tưởng nhân vật 4.md`.
 
-This R0 preserves explicit gameplay and isolates unresolved choices. Suggestions in §8 are questions, not approved gameplay. No executable normalization or generic architecture extension is established by this document.
+## 1. Identity, presentation and Passive
 
-## 1. Identity and presentation
+Lamarck is an AI operating replaceable chassis, with no original biological body and **no Chân Ngã**. Default: heavy mechanical chassis. Male and female biosynthetic skins are chassis of the same AI. All retain the mechanical voice signature. The current name is **Lamarck**; older closing raw prose about an undecided name is superseded.
 
-Lamarck is an AI operating replaceable chassis. It has no biological original body and no Chân Ngã. The latest explicit name is **Lamarck**, superseding the raw closing paragraph's older “name not yet determined” wording.
+**Passive — Inheritance Without a Soul / Di Truyền Không Linh Hồn.** Chassis destruction reaches **DEATH_CONFIRMED**. Lamarck never enters the Luân Hồi waiting window or Reincarnation. Every foreign kit's Revive is ineffective; no Chân Ngã creation, foreign chassis replacement or same-battle revival/redeployment of a finally removed Lamarck is permitted.
 
-The default presentation is a heavy mechanical chassis. Male and female biosynthetic skins are also chassis operated by the same AI. All presentations retain the mechanical voice signature. Gender/art direction and commercial positioning do not supply Rank, Class, native Element, Authority or numeric stats.
+Lamarck's own Skill3 Heal is permitted. For every external Heal, evaluate the **executing healer Actor's current Effective Rank at Heal admission**: only **Prime** passes this exception. The original author of copied/inherited behavior is irrelevant. A lower-Rank Puppet using a Prime's Heal fails; a Prime Actor using a copied lower-Rank Heal meets the Rank condition. Other Heal legality/modifiers still apply. This is only a Heal exception, never an external Revive entitlement.
 
-Rank, Class, native Element, deployment budget, base stats and final skin art are **UNRESOLVED / NOT BLOCKING** for gameplay clarification. Rank-dependent formulas can retain a parameter without inventing its value.
+No additional Damage/Shield/HP Cost/Death Prevention immunity or Authority tier follows from “AI / not living.” Ordinary eligibility and actual confirmed-death observers retain their own laws; no Chân Ngã death/waiting record is fabricated.
 
-## 2. Passive — Inheritance Without a Soul / Di Truyền Không Linh Hồn
+## 2. Chassis information and persistent adaptation
 
-- Lamarck does not enter the Luân Hồi waiting window or Reincarnation. The destroyed chassis reaches **DEATH_CONFIRMED**; its special replacement route does not retrieve a Chân Ngã.
-- Every external kit's Revive is ineffective on Lamarck. The Prime exception below applies to **Heal**, not external Revive.
-- Heal from Lamarck's own kit is permitted. External kit Heal is ineffective except Heal from a Character of **Prime** Rank. The Rank subject for copied/inherited Heal remains Q15.
-- This is a Character rule. “AI / not a living being” does not silently add immunity to Damage, Shield, ordinary death observers, Death Prevention, HP Cost or unrelated mechanics. Each retains its own eligibility and effect law.
-- A confirmed chassis death remains a real confirmed death for ordinary on-death/on-kill meaning. Luân Hồi eligibility/counting still uses its actual Chân Ngã-based predicates; no soul is fabricated for Lamarck.
+### 2.1 Lifetime information and dominant branch
 
-## 3. Skill 1 — Postmortem Revision / Hiệu Chỉnh Hậu Tử
+Each chassis lifetime accumulates incoming positive **committed Actual HP Damage**, by **TRUE / WILL / PHYSICAL** component, from its field entry/replacement through its DEATH_CONFIRMED. Include qualifying DoT, Follow-up and other Damage in this information; the Natural-only restriction below belongs to mitigation, not information collection.
 
-### 3.1 Replacement entitlement and payment
+Use committed component shares, excluding Shield absorption, raw/nominal Damage, overkill beyond HP actually removed, HP Cost, non-Damage HP Loss and direct Execute removal without a Damage receipt. A mixed hit contributes each actual component share, not one whole-hit category inferred from its scaling stat.
 
-On **DEATH_CONFIRMED**, the kit initiates its own delayed replacement process. The raw timing is “after one Natural Action of Lamarck.” A beam descends and the mothership supplies a replacement chassis at the death Position, restored to the fresh-field state associated with the most recent deployment.
+At DEATH_CONFIRMED, freeze the completed lifetime totals. A unique positive maximum selects that branch. Exact positive ties select **exactly one** tied highest branch by deterministic seeded RANDOM, without fixed type priority. All-zero information selects **no new branch** and preserves previous adaptations. Redelivery does not choose again.
 
-The stated limit is **3 activations per battle**. A successful replacement requires **15 Side AE** in turn-based combat. If that amount is unavailable at the first due checkpoint, wait one additional own-Natural checkpoint and attempt again. If still unaffordable, Lamarck disappears from the battle.
+### 2.2 Persistent death baseline and inheritance
 
-Dead-clock ownership, actual due checkpoints, availability/use-count consumption, placement claims, other materialization failure, final removal and restoration details remain Q1–Q4. Do not reinterpret this as ordinary Chân Ngã Revive or a performed attack by a dead Actor.
+At that death checkpoint use the **persistent chassis stat baseline**, excluding temporary contributions that do not survive chassis replacement. An explicitly battle-persistent contribution whose own retention law survives replacement legitimately participates. Temporary State objects are never copied merely because they influenced a displayed stat.
 
-### 3.2 Chassis-lifetime Damage information
-
-Each chassis lifetime collects incoming **committed Actual HP Damage**, from its field entry/replacement until its DEATH_CONFIRMED. Freeze the completed lifetime's information for the associated replacement decision.
-
-Use committed component results, excluding Shield absorption, nominal/raw Damage and overkill beyond actual HP removed. HP Cost, non-Damage HP Loss and direct Execute removal are not Damage receipts. A dual-component attack contributes each component's actual committed share; do not classify the whole attack solely by its scaling stat or actor.
-
-The raw “total received Damage during the lifetime” includes Damage from DoT and non-Natural Follow-up/Counter/Reaction sources in this **information tally**. The later Natural-only restriction applies to mitigation bonuses, not this tally.
-
-Among TRUE, WILL and PHYSICAL/ATK Damage, the highest share selects the next adaptation. Comparing their positive actual totals gives the same winner as comparing their proportions of the same total. Exact ties and no qualifying Damage remain Q5.
-
-### 3.3 Cumulative inheritance
-
-| Dominant received component | New adaptation on the replacement chassis |
+| Selected branch | New adaptation for the next successful replacement |
 | --- | --- |
-| TRUE | Max HP increases by **25%** of the applicable Max HP at the preceding triggering death. |
-| WILL | RES increases by **30%** of the applicable RES at that death; inherited eligible-AoE reduction increases by **5 percentage points**. |
-| PHYSICAL/ATK | ARM increases by **30%** of the applicable ARM at that death; inherited eligible-single-target reduction increases by **5 percentage points**. |
+| TRUE | Increase persistent Max HP by **25%** of the qualifying persistent death baseline. |
+| WILL | Increase persistent RES by **30%** of that baseline and add **5 percentage points** of eligible-AoE reduction. |
+| PHYSICAL | Increase persistent ARM by **30%** of that baseline and add **5 percentage points** of eligible-single-target reduction. |
 
-These gains are inherited by subsequent replacement chassis, including when later deaths select a different branch. They are not lost merely because that later branch differs.
+Example: persistent RES100 plus temporary50 yields next persistent RES130, **not195**. Repeated WILL selection: `100 → 130 → 169 → 219.7`. ARM follows the same1.30 compounding. Repeated TRUE selection: `H → 1.25H → 1.5625H → 1.953125H`.
 
-When a relevant death baseline contains only the previously inherited value and no other change:
+All earned branches are **BATTLE_SCOPED**. Later branch changes preserve earlier gains. They survive chassis death/replacement, ordinary LEAVE_FIELD, Return-to-Deck and same-battle redeployment; reset at battle end. Three WILL selections give15% eligible-AoE reduction; three PHYSICAL selections give15% eligible-single-target reduction. Mixed selections preserve the separate accumulated reductions. TRUE grants no5% mitigation increment.
+
+Freeze the selected branch and derived next persistent adaptation baseline **at death**, before starting replacement wait. Successful replacement builds the chassis from that derived adaptation and legitimately retained battle state; it does not reread lifetime Damage or choose a branch after materialization. Retained contributions are represented once, not baked into a new baseline and then added a second time.
+
+### 2.3 Reduction eligibility
+
+Use the **authored attack/effect shape**, not actual recipient count. AoE with one recipient remains AoE; fixed full-field, fixed positional and random-target AoE all qualify as AoE. Authored single-target remains single-target even with multiple direct components/hits on that target.
+
+WILL-earned reduction applies to qualifying **enemy Natural Action own-direct AoE Damage**. PHYSICAL-earned reduction applies to qualifying **enemy Natural Action own-direct single-target Damage**.
+
+Exclude independent DoT, Follow-up, Counter, Reaction, Mark/passive secondary Damage and other non-Natural outcomes. Shared root lineage is insufficient: a child qualifies only if architecture actually classifies its Damage as the root Natural Action's own direct component. Pygmalion's coordinated Puppet Basics remain non-Natural Follow-ups and bypass these reductions.
+
+These are ordinary **Final Damage Reduction** modifiers. **TRUE bypasses both**, while still contributing to lifetime information. No Character-specific TRUE reduction is created.
+
+## 3. Skill1 — Postmortem Revision / Hiệu Chỉnh Hậu Tử
+
+### 3.1 Death decision and pending Slot
+
+At DEATH_CONFIRMED, in order:
+
+1. freeze completed chassis-lifetime Damage information;
+2. select its dominant branch/zero outcome;
+3. derive the next persistent adaptation baseline;
+4. if fewer than3 successful Skill1 replacements have occurred and a legal replacement entitlement remains, create **POSTMORTEM_WAIT**.
+
+With3 successful replacements already consumed, create no wait: Lamarck is finally removed from this battle.
+
+While pending, the death Position remains **RESERVED** by this replacement process, and its SSI Slot remains a special POSTMORTEM_WAIT checkpoint. It is not an ordinary empty deployment Slot; another Actor/deployment cannot claim it. Lamarck remains dead and performs no Action.
+
+### 3.2 Two bounded attempts
+
+On SSI's next visit to that Slot, consume one **wait opportunity**. It is cadence-equivalent to Lamarck's own SSI opportunity but is **not an actually performed Natural Action or an ordinary Actor Natural opportunity**:
+
+- no Basic/Skill/Ultimate;
+- no class AE or Action Rage;
+- no ordinary Actor-duration progression;
+- advance the SSI pointer/control and produce the ordinary following global TURN_BOUNDARY.
+
+At the **END** of the first wait checkpoint, validate replacement admission/materialization and availability of **15 Side AE** before payment. Success commits payment, chassis materialization and one successful-use increment together. Lamarck does not act immediately; the next ordinary SSI visit is its next playable Natural Action.
+
+Failure of **any** required condition commits no payment/use and waits exactly one more own POSTMORTEM_WAIT checkpoint. At the second checkpoint's end, make the same attempt. Success uses the same atomic law. Failure terminates entitlement and permanently removes Lamarck from the battle. **No third wait, background retry, alternate Position or same-battle redeploy.**
+
+The cap3 counts successful materializations only. Payable AE with blocked materialization is still a no-payment attempt failure.
+
+### 3.3 Battle-end participation
+
+A valid pending POSTMORTEM_WAIT entitlement makes Lamarck a **recoverable participant** for battle-end evaluation. If it is its Side's only remaining member, do not declare defeat while its remaining wait checkpoint(s) are pending. Ordinary defeat evaluation may proceed after terminal failure/final removal. This does not turn the dead Actor into a playable or Damage-eligible living participant.
+
+### 3.4 Fresh chassis materialization
+
+Successful **CHASSIS_REPLACEMENT** applies inherited adaptations and legitimately retained battle-persistent state, then initializes:
 
 ```text
-RES: 100 → 130 → 169 → 219.7 for three WILL adaptations
-ARM: 100 → 130 → 169 → 219.7 for three PHYSICAL adaptations
-Max HP: H → 1.25H → 1.5625H → 1.953125H for three TRUE adaptations
+CurrentHP = 100% NEW CurrentMaxHP
+CurrentRage = CurrentMaxRage
 ```
 
-The raw third-life “30% of 130” is an **increase by 39**, yielding 169, not replacement of total RES with39.
+Reset old-chassis life/presence-scoped cooldowns, temporary counters/charges, Buff, Debuff, Mark, Shield and other temporary states. Preserve successful Skill1 use count, earned adaptations, battle counters/state and any explicitly BATTLE_SCOPED state whose own retention law survives replacement. The old body's precise HP/Rage and temporary objects are not replayed.
 
-Each relevant mitigation branch adds 5 percentage points: three WILL selections produce 15% AoE reduction; three PHYSICAL selections produce 15% single-target reduction. Mixed selections retain their separately accumulated bonuses. The TRUE branch grants no additional 5% reduction in the supplied kit.
+CHASSIS_REPLACEMENT is its own special materialization cause: **not DEPLOY_FROM_DECK, ordinary Revive or ordinary deployment entry**. It does not replay generic/kit “when deployed,” “when entering Field” or “at battle start” effects. Only effects explicitly authored for the replacement event may run. Initialization HP is lifecycle restoration, not Heal/Overheal.
 
-The stat baseline's treatment of temporary modifiers and retention through unrelated leave/redeploy remain Q4. Eligibility by attack shape and whether TRUE Damage is reduced remain Q6.
+### 3.5 Concurrent post-replacement Rage suppression
 
-### 3.4 Mitigation and post-replacement Rage restriction
+Successful materialization arms two concurrent clocks:
 
-The WILL reduction covers random-target AoE and fixed-cell AoE. The PHYSICAL branch's reduction covers single-target Natural damage, described in the raw as “Natural Action target count =1.” Both mitigation families apply only to Damage from qualifying **Natural Actions**; DoT and Follow-up Damage bypass these bonuses.
+- next **3 own Natural Action opportunities**;
+- next **2 global TURN_BOUNDARY events**.
 
-The supplied Pygmalion example is consistent with its current kit: coordinated Puppet Basics are non-Natural FOLLOW_UP children. BASIC_ATTACK identity or shared root lineage does not turn such a child into a Natural Action. The same principle applies to Pygmalion's own non-Natural coordinated child Basic. These attacks can still contribute to Lamarck's actual-Damage lifetime information.
+Suppression expires only after **both** complete, at the later endpoint. CC-lost own opportunities count; non-Natural Actions do not. A POSTMORTEM_WAIT opportunity is not an ordinary Actor-duration tick.
 
-After a Skill 1 replacement, Lamarck cannot gain Rage from Actions or receiving Damage for the stated **3 Natural Actions and 2 TURN_BOUNDARY** period. Other explicitly sourced Rage grants are not banned by this wording alone. Exact duration composition is Q7. No AE-gain ban is inferred.
+While prohibited, deny **Lamarck Action-generated Rage** and **Rage generated from Damage received by Lamarck**. Explicit unrelated external/system grants remain eligible. A gain causally attributable to an Action/Damage event occurring during prohibition remains denied even if payment/grant settlement occurs after suppression expiry. Capture cause-time scope rather than using incidental Event/delivery order. Initial full-Rage assignment remains the replacement initialization, not an Action/Damage grant.
 
-## 4. Skill 2 — Invariant Breach / Xuyên Phá Bất Biến
+## 4. Skill2 — Invariant Breach / Xuyên Phá Bất Biến
 
-Cost **20 Side AE**. One target receives the stated **155% WIL/ATK** single-target Damage and, concurrently, **TRUE Damage equal to 1% of that target's Max HP**. The percentage has **no boss-specific reduction**.
+Required active Cost **20 Side AE** commits before Damage. Ordinary **POSITION/SLOT** binding, with no retarget.
 
-The slash formula and exact one-hit/component snapshot arrangement remain Q8. TRUE Damage uses ordinary TRUE/Shield law unless a later explicit gameplay correction supplies an exception; “boss not reduced” does not itself grant Shield bypass or Guaranteed Hit.
+At Damage calculation read one coherent source/current-recipient snapshot. One hit contains concurrent components:
 
-## 5. Skill 3 — Closed-Loop Repair / Tự Sửa Chữa Vòng Kín
+```text
+PHYSICAL = 155% Lamarck ATK
+WILL     = 155% Lamarck WIL
+TRUE     = 1% recipient CurrentMaxHP
+```
 
-Self-Heal with **no cooldown**. It can activate during a Natural Action or at TURN_BOUNDARY. Below **35% Current Max HP**, it automatically activates without consuming a Natural Action; at exactly 35%, the stated automatic threshold is not satisfied.
+The1% denominator is the actual current recipient's Max HP in that same snapshot; no boss-specific reduction. All three share the same Hit Admission: miss, rejection or no legal current recipient resolves **none**. TRUE is not an independent fallback hit. Ordinary TRUE/Shield law applies.
 
-Conversion: **1 AE per 1.5% of Lamarck's Max HP healed**, at most **30 AE per invocation**. Thirty AE is a ceiling, not a mandatory fixed Cost. At the unmodified full conversion and sufficient missing HP, 30 AE corresponds to 45% Max HP restoration.
+## 5. Skill3 — Closed-Loop Repair / Tự Sửa Chữa Vòng Kín
 
-“Pay according to HP actually healed” must not be rewritten as pay 30 regardless of restoration, nominal Heal or Overheal. Exact requested quantity, affordable partial payment, fractional-unit policy and externally modified/denied Heal interaction remain Q10. Trigger checkpoints, lethal timing, manual use and same-checkpoint repetition remain Q9/Q11.
+### 5.1 Automatic checkpoints and lifecycle
 
-This Heal does not restore a DEATH_CONFIRMED chassis; only Skill 1's special replacement route does so. Revive HP initialization is distinct from this Heal.
+**AUTOMATIC ONLY**, no selected Action, no Natural Action consumption and no cooldown. Predicate: living/lifecycle-valid Lamarck with **CurrentHP <35% CurrentMaxHP**. Exactly35% fails.
+
+Evaluate at:
+
+- authoritative stable checkpoints following actual committed CurrentHP or CurrentMaxHP mutation;
+- start of Lamarck's own Natural Action opportunity;
+- each global TURN_BOUNDARY.
+
+No continuous polling or AE-only retry. Never interpose repair between HP_ZERO and mandatory death/prevention adjudication. DEATH_CONFIRMED cannot repair; lawful prevention leaving a living Actor below35% may qualify at the resulting stable post-lifecycle checkpoint. This Heal is not Death Prevention or chassis replacement.
+
+### 5.2 Budget and result-linked AE settlement
+
+Per invocation snapshot `M = CurrentMaxHP` and missing HP. Validate/reserve usable **Side AE budget B = min(current available AE,30)**, excluding other valid reservations. Nonpositive missing HP/budget produces no repair settlement.
+
+```text
+R_base = min(missingHP, 0.015 × M × B)
+```
+
+Repair as much as possible; do not stop at35%. Ten AE budget gives up to15% Max HP base repair;30 gives45%. Fractional requested AE is permitted before ordinary project numeric normalization; do not round into whole1-AE chunks first.
+
+Run the repair through ordinary Heal admission/modifier/conversion law. Bind **H_actual = committed Actual HP restoration of this exact repair**:
+
+```text
+AE_spent = min(B, H_actual / (0.015 × M))
+```
+
+Then apply ordinary numeric normalization. Never reconstruct nominal Heal after commit. Heal reduction lowers proportional payment. Blocked Heal or Heal wholly converted into Damage restores0 and spends0. Amplification may make the reserved budget more efficient, but payment never exceeds B or30 AE. Release unused reservation. Reservation/validation prevents a concurrent resource mutation from producing restoration without affordable final payment.
+
+### 5.3 Non-recursion
+
+At most **one activation per qualifying checkpoint**. Health/Heal/Damage/resource mutations produced by that invocation cannot recursively create another Skill3 activation at that same checkpoint. Still below35% after repair creates no self-loop. Another independent HP/MaxHP mutation, own Natural-start or later TURN_BOUNDARY is a new eligible checkpoint. No cooldown does not imply unbounded recursive activation.
 
 ## 6. Ultimate — Mothership Directive: Artificial Selection / Chỉ Lệnh Mẫu Hạm: Chọn Lọc Nhân Tạo
 
-The mothership fires a death ray at the full battlefield's fixed area. Each admitted recipient receives **175% WIL +175% ATK** Damage. It is fixed full-field AoE, not random-target AoE or single-target Damage.
+### 6.1 Main death ray
 
-The designer explicitly excludes movement reactions triggered by this incoming AoE/single-target attack: relocation does not avoid this fixed full-field ray, and the unnecessary movement trigger is not activated. This does not establish general immunity to unrelated movement or ordinary miss/evasion. Exact recipient Side, hit/batch snapshot and ordinary Hit Admission remain Q12.
+Fixed **full-enemy-field AoE**, never allies. Lock the full enemy Position set, then resolve legal current occupants at the recipient checkpoint, including enemy Leader, Characters, Summons/Puppets and other legal Damage recipients.
 
-Eligible targets whose **Rank ≤ Lamarck's Rank** receive an additional **Ultimate Follow-up** dealing **TRUE Damage equal to10% of Lamarck's Max HP at Ultimate use**. That Max HP reference belongs to the Ultimate, not a later live read after a stat change/replacement. Follow-up membership, Rank checkpoint, attack binding, invalidation and retained-source policy remain Q13.
+One common Lamarck ATK/WIL source snapshot and one **simultaneous** main-Damage batch. Per legal recipient: **175% ATK PHYSICAL +175% WIL**.
 
-No additional AE Cost, Guaranteed Hit, universal damage immunity bypass or Authority tier is supplied. Ordinary Ultimate readiness/Cost rules remain separate; missing full numeric roster data is not a reason to invent them.
+Hit Admission is **MODE_DEFAULT**, not inherently GUARANTEED. Suppress this incoming ray's special movement reactions triggered by “move/dodge because this is AoE” or “move because this is single-target.” The full-field ray explicitly does not activate those movement triggers. Do not generalize to ordinary Hit Admission, Authority, unrelated admission denial, temporary absence or other defensive semantics.
+
+### 6.2 Rank-gated Entity follow-up
+
+At the main recipient snapshot freeze each target identity/Effective Rank, Lamarck Effective Rank and Lamarck CurrentMaxHP for the follow-up. Only **successfully HIT-ADMITTED** main recipients participate; positive Actual HP Damage is unnecessary, so Shield-absorbed hits can qualify.
+
+Require comparable Effective Rank and `target Rank <= Lamarck Rank`. A recipient without comparable Rank does not qualify.
+
+Local order:
+
+```text
+main simultaneous Damage
+→ mandatory lifecycle
+→ construct/freeze surviving legal Rank-qualified Follow-up recipients
+→ simultaneous Follow-up TRUE batch
+→ mandatory lifecycle
+→ remaining Ultimate direct effects terminal
+→ ACTION_DIRECT_EFFECTS_COMPLETE
+→ ordinary Reactions
+```
+
+The child is non-Natural **ULTIMATE/FOLLOW_UP** and explicitly **ENTITY-BOUND** to those main-hit identities. This exception does not propagate to Basic, Skill2 or the main ray. Each receives **TRUE Damage =10% snapshotted Lamarck CurrentMaxHP**. Movement alone does not change the locked identity; later invalidity/death/removal drops it, with no replacement/reroll/requery. Main-batch deaths are excluded before child creation.
+
+No ordinary Reaction window opens between main ray and this child. Once its obligation has been created/frozen from a completed main batch, later Lamarck death/LEAVE_FIELD does not cancel it; immutable snapshot/target obligations finish. Source invalidity before creation synthesizes no future follow-up from incomplete main resolution.
 
 ## 7. Basic — Calibration Shot / Xạ Kích Hiệu Chuẩn
 
-Single-target laser Basic: **100% WIL +100% ATK**. Each Basic has **20% probability** of increasing its coefficients by 20%, giving **120% WIL +120% ATK** on the enhanced outcome.
+Single-target **POSITION/SLOT** laser. Every actually executed Lamarck Basic performs exactly **one deterministic seeded20% roll**, including Natural and non-Natural/Forced/Follow-up Basics that really execute this definition. The one roll governs both concurrent components:
 
-The random outcome changes the coefficients, not Critical Hit meaning. Current-hit versus persistent growth and the exact shared-roll policy remain Q14. Seeded gameplay randomness and the current per-attack Position-binding default apply unless the designer explicitly supplies another binding; no Entity tracking is inferred from presentation.
+| Outcome | PHYSICAL | WILL |
+| --- | --- | --- |
+| Failure | 100% ATK | 100% WIL |
+| Success | 120% ATK | 120% WIL |
 
-## 8. UNRESOLVED / NEED USER DECISION
+Only that execution is enhanced. No permanent growth, retained Buff, stack or cumulative proc; later Basics roll independently. It is not Critical Hit meaning.
 
-All suggestions below are **PROPOSED ANSWERS / NOT APPROVED**. They provide concrete choices for one designer response. They must not be compiled or promoted to locked gameplay by silence.
+## 8. UNRESOLVED / NOT BLOCKING
 
-1. **Q1 — Dead clock and return timing.** How does a dead Lamarck consume the stated own-Natural waiting checkpoints? Suggested: preserve its death Slot as a pending-replacement claim in SSI; each pointer visit consumes one wait opportunity with no attack/class AE/Rage, checks payment at its end, and a successful replacement first acts at the next normal visit. Is that the intended clock?
-2. **Q2 — Position, final removal and battle end.** Is the death Slot reserved throughout waiting? If materialization is denied despite payable AE, should it retry, fail permanently or follow another policy? Suggested: the 3-use cap counts successful replacements only; the fourth death or second unaffordable checkpoint removes this participant without same-battle redeployment. If only a pending Lamarck remains, should combat wait for these checkpoints rather than declare defeat?
-3. **Q3 — Fresh-field restoration.** Does replacement restore 100% **new** Max HP, full Rage as at ordinary deployment, fresh baseline stats/cooldowns, and clear Buff/Debuff/Mark/Shield while retaining the 3-use battle count and inherited adaptations? Or does “most recent fresh-field state” mean a literal stored entry snapshot, including entry-only states/resources? Should replacement replay on-entry/deployment effects?
-4. **Q4 — Stat baseline and retention.** Does each percentage use actual final stats at death, including temporary modifiers? Example: permanent RES 100 + temporary 50 gives next RES 195 if the full 150 is inherited, or 130 if temporary 50 is excluded. Do adaptations persist through Return-to-Deck/redeploy and other same-battle field transitions? Suggested retention: all inherited adaptations last to battle end; external temporary objects are not themselves copied.
-5. **Q5 — Dominance tie/zero.** Suggested: seeded random choice among the tied highest **positive** totals; zero qualifying Damage gives no new adaptation but preserves earlier gains. Or should ties grant every tied branch/use a fixed declared priority?
-6. **Q6 — Reduction eligibility.** Is single-target defined by authored attack shape, or does an AoE with only one actual recipient qualify? Suggested: shape-based; AoE remains AoE with one recipient, and both families exclude independent DoT/Follow-up/Counter/Reaction outcomes. Does the 5% reduction also affect TRUE components, as “every single-target Damage” could imply, or only PHYSICAL/WILL under ordinary Final Damage Reduction law? Clarify full-field AoE coverage as well.
-7. **Q7 — Rage duration.** Choose the exact expiry: **A**, concurrent counters requiring both 3 own Natural opportunities and 2 global boundaries; **B**, 3 own opportunities followed by 2 more global boundaries; or **C**, expire at the boundary immediately after the third own opportunity. Own CC-lost opportunities count under current ordinary duration law unless explicitly overridden; an already-running opportunity should count only if specified.
-8. **Q8 — Skill 2 formula.** Is 155% WIL/ATK **155% WIL +155% ATK**, or a selected scaling stat? Suggested packet: one hit with concurrent WILL/PHYSICAL/TRUE components using one source/target calculation snapshot; TRUE uses that snapshot's target Max HP. No TRUE branch after a missed/invalid original hit and no target replacement. Confirm or specify a different packet/conditional law.
-9. **Q9 — Repair checkpoint/manual use.** Does “immediate” mean after every committed HP/MaxHP change, or only own Natural-start and global boundary checks? Should an HP-zero lethal transaction finish death handling before repair can qualify? Suggested: stable post-health-change plus own-Natural-start/boundary checks, alive HP strictly below 35%, never interpose repair between HP_ZERO and death handling; repair can qualify if lawful prevention leaves a living actor. Automatic-only use is proposed. If manual use exists, state its threshold and Action consumption.
-10. **Q10 — Repair quantity/payment.** Does each invocation restore as much as possible under missing HP, available AE and 30 AE, or only up to 35%/another chosen HP target? Are fractional AE allowed? Suggested unmodified quantity: `H = min(missingHP, 0.015 × MaxHP × min(availableAE, 30))`, actual restored HP determines AE spent. If Heal modifiers alter/deny/convert restoration, does the same actual-HP price apply, and is the 30 AE ceiling still enforced on the final result?
-11. **Q11 — Repair repetition.** If one repair ends below 35%, does it trigger again at that same checkpoint, or at most once until another qualifying checkpoint? Suggested: once per checkpoint, no recursive self-Heal loop or AE-only polling retry; a new independent health change/Natural-start/boundary may trigger again.
-12. **Q12 — Main Ultimate.** Is the area the enemy battlefield only, including ordinary legal Leaders/Summons? Suggested: one simultaneous main-Damage batch, common source/recipient calculation snapshot, ordinary Hit Admission (not GUARANTEED), and the stated incoming-attack movement triggers are suppressed. Confirm recipient scope, guaranteed-hit intent and snapshot checkpoint if different.
-13. **Q13 — Ultimate Follow-up.** Must a target have been admitted by the main ray, remain valid, and pass the Rank comparison frozen at main-batch selection? Suggested: one non-Natural ULTIMATE/FOLLOW_UP child over those locked target identities, simultaneous TRUE batch, no reroll/requery; a target invalidated before child resolution is dropped. Should an already-created child survive Lamarck's later death/leave, or cancel with invalid source?
-14. **Q14 — Basic proc.** Suggested: one seeded 20% roll per actually executed Basic, including non-Natural Basics, raises both coefficients for **that Basic only**, and never permanently stacks across attacks. Is that intended, or is the coefficient increase persistent?
-15. **Q15 — Prime Heal subject.** For a Puppet/copy/inherited kit, does the exception compare the **executing healer's current Rank** or the **original Character whose Heal definition was copied**? Suggested: executing healer Rank at Heal admission; Lamarck's own actual kit remains the separate self-Heal exception. A Prime Heal exception never enables external Revive.
+Rank, Class, native Element, deployment/base-stat budget and final skin art remain unspecified. Use Rank parameters where required; lack of a target's comparable Rank explicitly excludes the follow-up. The locked SSI/Side-AE mechanics target the turn-based profile. Future Modes require explicit compatible adapters and cannot invent own SSI checkpoints where their scheduler has none. Unsupported external conflict profiles remain fail-closed rather than supplying hidden gameplay priority. No internal Q1–Q15 gameplay question remains open.
 
-## 9. Current architectural boundaries
+## 9. UNRESOLVED / NEED DESIGNER DECISION — current integration boundaries
 
-These are existing laws relevant to clarification, not a completed gap proof:
+All Q1–Q15 locks above remain authoritative. These are additional observable cross-rule choices, not a reopening of their answered mechanics.
 
-- ACT-011/CLK-002 currently skip dead Actors and do not advance their own window merely because global boundaries occur. Q1 must define the intended replacement clock before deciding whether existing scheduler composition is sufficient.
-- REV-004/006 require explicit restoration/placement. Skill 1 has no Chân Ngã and must preserve its declared special route rather than borrow ordinary waiting-window retrieval.
-- DMG-010/SHP-004 distinguish Actual HP Damage from Shield absorption/nominal amounts. DMG-005 excludes TRUE from ordinary Final Damage Reduction; Q6 must lock any intended exception before architecture analysis.
-- HEL-001/REV-005 distinguish committed Heal restoration, Overheal and lifecycle HP initialization. Q9–Q11 determine the required repair observation/payment law.
-- Natural status, Basic/Ultimate identity, Action lineage, Effect provenance and Attribution remain separate. Pygmalion's inherited/source identity does not turn its coordinated child Basics into Natural Actions.
+1. **Successful replacement with an already-dead Main Leader.** §3.3 is locked: do not end the battle while the valid wait remains, including when Lamarck is the Side's only remaining member. TURN_BASED_MAIN otherwise ends on true Leader DEATH_CONFIRMED (07§9 / ACT-050). If replacement succeeds after the Leader has already died, does combat resume with the dead Leader, or is that deferred Leader-death terminal condition then evaluated? This post-success interaction is not specified; pending-period deferral and terminal-failure removal are not reopened.
+2. **Concurrent component Actual-HP shares.** One simultaneous mixed hit can have several admitted components competing for finite shared Shield/HP, and §2's adaptation observes the per-type committed shares. RES-008 provides an explicitly selected PROPORTIONAL policy but no universal default. Must these components use proportional allocation of each eligible Shield budget and remaining HP demand, or another declared law? A simple no-Shield example: HP100 with concurrent PHYSICAL100/WILL100/TRUE100 has total ActualHP100; proportional shares are100/3 each, while an undeclared component order could grant100 to only one type and change the dominant branch. Choose the policy for Lamarck's mixed attacks and the component shares consumed by its lifetime information; do not change total Damage or Hit Admission.
 
-No new Tag, Primitive, Contract ID, runtime subsystem or global priority is declared. Normalization and any architecture patch depend only on the gameplay decisions that affect them. Numeric metadata and future unsupported Mode adaptations remain nonblocking for this clarification document.
+Execution-ready Main normalization remains blocked only where these choices are required. The enabled profile/result view must reject unresolved binding instead of assuming an outcome.
+
+## 10. Declarative semantic bindings
+
+| Authored mechanic | Exact composition/boundary |
+| --- | --- |
+| External Heal/Revive restrictions | Existing scoped Effect admission/STA-014, executing-Actor Effective Rank predicate at Heal admission, exact own-Skill3 exception and foreign return denial. HEAL capability belongs to Heal nodes; Rank is not Authority. |
+| Chassis information | DAMAGE_COMMITTED/04§7.18/TRG-015 mandatory positive ordinary-component actualHpDamage fold into original State counters, before death snapshots. Capture/reset record generation per chassis; use committed shares with an explicitly governed allocation law. |
+| Dominance/adaptation | Existing Conditions, one seeded tie choice, State/P-021, Snapshot/P-002 with04§13.5/SNP-002 retained-stat projection, P-030 Stat/P-031 MaxHP contribution and BATTLE_SCOPED retention. Zero branch does not create a new gain; no Character-specific manager. |
+| Natural reductions | Existing DAMAGE_REDUCTION/FINAL_DAMAGE_REDUCTION, own-direct provenance + hostile actual-Natural Action + authored SINGLE_TARGET/AOE facet under04§18A/34.5. Select PHYSICAL/WILL only. |
+| Replacement | SYSTEM_LIFECYCLE/04§29.3 typed CHASSIS_REPLACEMENT; existing pending State, reserved Position, P-034/035 Cost, P-069 materialization and successful-use counter joined under ACT-011/REV-004/006. Cause/clock values are not Tags or ordinary Revive routing. Main defeat binding remains §9. |
+| Rage restriction | Two existing counters/clock observations and ALL condition, origin-aware Resource admission/CST-016 with exact cause-time Action/Damage scope; expired State cannot erase late-grant evidence. No composite-duration subsystem. |
+| Skill2/Basic | Existing ordinary mixed Damage profile/Hit Admission, per-owner Slot binding, one coherent calculation snapshot; Skill2 one shared hit and Basic one execution-owned seeded roll. Actual component allocation remains §9. |
+| Repair | Stable predicate observation/TRG-016 with EXCLUDE_THIS_TRIGGER_ACTIVATION plus04§7.19 owner-start/boundary finite settlements; existing exact own-Skill3 Effect/activation-origin recursion filter across those checkpoint entry definitions.04§17.3/CST-009 reserved actual-Heal-linked AE payment. Existing HEAL and Cost receipts, no Action or free recursion. |
+| Main ray | Fixed enemy Position set/current legal occupants, shared source and simultaneous recipients, MODE_DEFAULT; bounded04§34.5/POS-008 attack-triggered movement eligibility suppression. |
+| Rank follow-up | Existing admitted-hit result/Rank Snapshot, required main→lifecycle→child local DAG and AFTER_DIRECT_EFFECTS_COMPLETE hold; explicit Entity-bound non-Natural ULTIMATE/FOLLOW_UP with immutable source payload/retained-created-obligation validity. Shield absorption does not imply miss. |
+
+These are declarative Character bindings, not implementation code or a claim that unresolved Mode/result choices compile. Shared materialization operations do not imply ordinary Revive cause or foreign revival entitlement; no chassis-specific Functional Tag is created.

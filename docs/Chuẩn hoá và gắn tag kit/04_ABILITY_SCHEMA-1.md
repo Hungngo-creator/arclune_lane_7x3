@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-07-E.16
+**Version:** 2026-10-07-E.17
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -32,6 +32,8 @@
 **Revision E.15:** adds two bounded opt-in profiles: restricted Basic direct-Damage projection with immutable Snapshot/State/Spawn binding, and complete-cohort local seeded settlement. Existing Target/Action/State/Spawn/Trigger plans and Primitives suffice; no new Tag, Primitive, Contract ID, callback or runtime subsystem.
 
 **Revision E.16:** adds only two bounded Reincarnation profiles: battle-base waiting-threshold reduction and complete-entry local route settlement. Existing ledger, lifecycle, RNG, Snapshot, Target, reservation and Effect/System plans execute them. Pygmalion quota/inheritance/Ultimate use existing composition; no new Tag, Primitive, Contract ID, subsystem or global priority.
+
+**Revision E.17:** adds bounded post-death Slot waits/cause-specific restoration, retained-stat reads, pre-death receipt folding, reserved actual-Heal payment and cause-time Resource admission; makes authored attack shape/movement-trigger suppression explicit. Existing owners/operations execute these profiles. No new Tag, Primitive, Contract ID or global priority; unresolved Mode defeat interactions fail closed.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -1330,6 +1332,26 @@ Terminal identity is once per bound owner-presence/Trigger/cohort, with protecte
 
 Reject incomplete membership, ambiguous owner/presence/anchor, unavailable death snapshots, unsupported order/gate, arbitrary loops/callbacks, cycles, missing failure/continuation or ungoverned competing mutation. Existing ANY, ordinary per-death Triggers and unresolved global Reaction priority remain unchanged.
 
+## 7.18 Mandatory Damage-receipt counter fold
+
+```yaml
+trigger:
+  event: DAMAGE_COMMITTED
+  damageReceiptFold:
+    subjectRef: <exact receiving EntityRef>
+    counterRefs: {PHYSICAL: <CounterRef>, WILL: <CounterRef>, TRUE: <CounterRef>}
+    metric: ACTUAL_HP_DAMAGE
+    checkpoint: BEFORE_DEATH_DEPENDENT_SNAPSHOTS
+```
+
+TRG-015 permits only ADD of the complete commit's positive ordinary component receipts into these existing counters. Capture the owning record/generation before Damage; fold the whole simultaneous commit before dependent DEATH_CONFIRMED snapshots/retirement. DoT/actionless/child receipts retain their own provenance. No health/resource mutation, Heal, Action, RNG or arbitrary Effect graph is permitted here. Scalar packets without an explicit ordinary-component mapping are outside these counters; a requested unsupported mapping fails closed rather than relabeling the packet PHYSICAL/WILL/TRUE. Counters' creation/reset/lifetime remain authored State law; CURRENT_LIFE_CYCLE does not require a Chân Ngã or an incremented lifeSerial.
+
+Lower to existing committed-Result/State/P-021/Transaction bookkeeping, keyed by original commit + recipient + Trigger + record generation. Redelivery folds once. Missing component ownership, incomplete batch, retired original record or conflicting writes without composition is rejected; never deliver old receipts into a replacement record. Ordinary DAMAGE_COMMITTED Reactions retain their own later timing.
+
+## 7.19 Required SSI checkpoint predicate settlement
+
+`trigger.checkpointSettlement: {anchor: OWNER_NATURAL_OPPORTUNITY_START | TURN_BOUNDARY, mode: BEFORE_SSI_CONTINUATION}` opts an ordinary finite Condition/Effect graph into ACT-034/CLK-001's existing required scheduler work. Unlike §7.15's State-termination graph, this profile requires no expiring State; bind the exact living owner generation and originating opportunity/boundary identity. At owner start close before that same grant's CC/selection/admission; at global boundary close before next Side control/opportunity. False predicate, zero budget or local failure closes without retry. No future-Action dependency, Action/class regeneration, continuous polling or global ordering of unrelated competing candidates. Do not co-author another settlement profile on that trigger; observable competition requires an actual law or rejection.
+
 # 8. CONDITION SPEC
 
 Conditions must be declarative expressions, not arbitrary scripts.
@@ -2473,6 +2495,10 @@ Examples:
 
 ---
 
+## 13.5 Retained-stat projection
+
+An explicit Snapshot may select `statRetentionProjection: {transitionProfileRef: <typed restore/retention profile>}` for whitelisted Stat/MaxHP fields. SNP-002 evaluates the existing stat-contribution graph with only contributions that the exact profile retains. Capture at the declared death checkpoint before cleanup; include already-earned retained modifiers once, exclude discarded temporary contributions, and preserve resolved value/provenance in SnapshotRef. This pure view does not mutate State/HP, copy modifier objects or imply universal stat ordering. Retention rules must cover every contributing record; unavailable/cyclic/incompatible contribution evaluation rejects instead of falling back to displayed final stats. Later adaptation writes use ordinary retained contributions; do not bake a retained object into BaseStats and then add it again.
+
 # 14. EFFECT SPEC — CENTRAL AUTHORING LAYER
 
 This is the central semantic composition object.
@@ -2546,6 +2572,8 @@ This enum is not a one-to-one mirror of Primitive IDs.
 SYSTEM_LIFECYCLE is the already-used §77 Death Prevention family; only its explicitly defined canonical profiles normalize. It is not an arbitrary lifecycle operation/callback escape hatch.
 
 §77.2 also defines the bounded DIRECT_EXECUTE confirmation profile for this family; a lifecycle label alone does not select it.
+
+§29.3 additionally defines the bounded postDeathMaterialization profile. SYSTEM_LIFECYCLE never licenses another undeclared return/termination policy.
 
 Normalizer maps EffectSpec to one or multiple Primitive/system-operation requests.
 
@@ -2774,6 +2802,26 @@ This optional HEL-003 policy belongs to this exact Heal instance. It does not re
 Every Overheal-to-Shield consumer must retain the exact originating HealResultRef through its typed OVERHEAL_REF/sourceResult, bounded Formula and any declared Snapshot/delayed binding. Normalize the existing conversion Effect graph with those origin refs. A derived conversion cannot shed a denied origin by copying its amount; missing/foreign/unretained origins or reconstructing Overheal from requested-minus-restored/live HP are invalid conversion bindings. An unrelated Shield with a numerically equal value has no such causal origin and is unaffected.
 
 If a declared conversion's origin denies Shield conversion, the conversion branch closes locally without a Shield grant/addition/refresh/cap mutation; the already-committed Heal remains valid. Apply this before P-046/P-047, for self/allied/hostile/system converters. Supported independent other-Heal conversions retain their own policy; no automatic mixing/subtraction of Heal instances, general numeric taint, immunity State, Authority tier or Character-ID rule is introduced.
+
+## 17.3 Reserved actual-Heal-linked Resource payment
+
+```yaml
+heal:
+  formula: <pure requested Heal using the captured budget>
+  resultBinding: <HealResultRef>
+  resultLinkedPayment:
+    payer: <one Side AE pool>
+    budgetCeiling: <finite positive AE ceiling>
+    budgetBinding: <captured available/reserved AE scalar>
+    divisorSnapshotRef: <finite positive HP-per-AE scalar Snapshot>
+    resultMetric: ACTUAL_RESTORE
+    payment: CAPPED_PROPORTIONAL
+    settlement: JOIN_HEAL_AND_PAYMENT
+```
+
+This Heal-owned CST-009/HEL-001 profile is not an ordinary active upfront Cost or a Resource drain. Validate/reserve `B = min(unreserved available AE, ceiling)` before resolving Heal; reject missing pool/positive divisor/formula bindings. B<=0 closes without Heal/payment. Fractional values use ordinary numeric normalization, not invented whole-AE chunks. Resolve ordinary admission/modifiers/conversion/restoration, then stage `paid = min(B, actualRestore/divisor)` from this exact projected result. Commit Heal/conversion outcome, exact immutable restoration evidence, payment receipt and reservation release together. A denied Heal closes with actualRestore0 evidence, not a fabricated HEAL_COMMITTED Event. The owning settlement may debit its own exact claim; other debit validation excludes it. Reject conversion graphs that cannot join this finite settlement or cyclically depend on its payment. A blocked/converted zero-restoration outcome spends0; positive amplification can use the budget more efficiently but never debit above B. Abort/owner invalidity releases the claim without free restoration or duplicate debit.
+
+Only this explicit singular Side-AE/Actual-Restore profile is supported; no arbitrary cross-effect price callback, distributed payer or HP/Rage payment. Later consumers use committed Heal/Cost results, never nominal/live reconstruction. Overheal conversions remain separate finite consumers with their ordinary origin policy. Competing reservations require their actual dependency/allocation law; no list/Slot/Event winner. Ordinary upfront Cost law is unchanged.
 
 # 18. SHIELD EFFECT SPEC
 
@@ -3113,6 +3161,8 @@ A DAMAGE scope may additionally select `damagePacketKinds` with values ORDINARY 
 `conditions` uses existing `ConditionSpec`.
 
 No executable condition string is permitted.
+
+Optional `effectScope.attackShape: SINGLE_TARGET | AOE` selects the resolving Damage owner's immutable authored shape under §34.5, independently from recipient count. Existing own-direct Action/provenance, enemy relation and component filters compose normally; this facet is not a Functional Tag or a new target-selection rule.
 
 ## Modifier Tags
 
@@ -3763,7 +3813,7 @@ UNTIL_CONDITION
 
 Turn-based should not use `REAL_TIME` for ordinary turn mechanics.
 
-`TURN_BOUNDARY` means the SSI boundary between consecutive Natural Actions.  
+`TURN_BOUNDARY` means the global SSI boundary under CLK-001: ordinary Natural opportunities and explicitly admitted POSTMORTEM_WAIT checkpoints produce it; dead waits do not tick personal Actor clocks.
 Personal mechanics such as “until my next turn” or “once per own turn” must use `NATURAL_ACTION_OF_*` or `ACTOR_NATURAL_ACTION_WINDOW_OF_*`, not an actor-specific Turn Boundary.
 
 ---
@@ -3923,6 +3973,12 @@ immunity:
 This optional Resource-only actionBinding captures the matching restriction on the next **actually performed** Natural Action at start, before grant-bearing Effect/Mode work; probes/CC do not capture/consume it. Existing Action/Snapshot storage retains the normalized rule/scope and bound ActionRef until its explicitly tracked Action-linked Resource obligations are terminal. Closing the source window at ACTION_COMPLETED prevents binding another Action, but cannot erase this captured restriction from late grants of the same Action. Another Action's grant does not match merely by occurring during the window. A pending-window lifecycle removal does not undo already captured execution evidence. No new callback/protection registry or Functional Tag is needed.
 
 ---
+
+### Cause-time Action and received-Damage capture
+
+An additional explicit profile supports `grantOrigin: DAMAGE_RECEIVED` with `grantDamageResultRef` naming the exact committed Damage result whose recipient owns this grant. It is not inferred from a shared root, issuer or delivery time. Existing origins retain their meanings.
+
+Resource-only State admission may declare `causeBinding: CAPTURE_AT_CAUSE_CHECKPOINT` for ACTION_GENERATED and/or DAMAGE_RECEIVED, exact recipient/pool and REJECT. Capture matching scope in the existing Action context at any actually performed qualifying Action's start, or in the Damage-result context at its authoritative commit checkpoint. Probes/CC create no Action cause; actionless DoT can still supply a real Damage result. Retain the normalized rule/scope snapshot through declared causal Resource obligations, even after source State expiry/death/leave. Late settlement uses that exact causal evidence under CST-016; independently external/system grants are unaffected. Do not co-author causeBinding with the older Natural-only actionBinding on the same rule; missing/foreign/unretained causal evidence or incompatible operation mapping rejects.
 
 ## 23.3 Bounded Resource-limit mutation
 
@@ -4309,6 +4365,35 @@ INCREMENT
 Global default remains unresolved until Contracts.
 
 ---
+
+## 29.3 Bounded post-death materialization
+
+This SYSTEM_LIFECYCLE profile shares existing materialization/restore payloads, not ordinary Revive cause/eligibility:
+
+```yaml
+lifecycle:
+  postDeathMaterialization:
+    subjectRef: <original confirmed-dead battle participant>
+    cause: CHASSIS_REPLACEMENT
+    checkpoint: POSTMORTEM_WAIT
+    positionPolicy: RESERVED_DEATH_POSITION
+    maxAttempts: <constant 1 or 2>
+    successCounterRef: <BATTLE_SCOPED existing counter>
+    successLimit: <finite positive integer>
+    requiredCostRef: <singular required Side-AE Cost>
+    restoreProfileRef: <explicit typed state/stat/resource restore profile>
+    entryTriggerPolicy: CAUSE_ONLY
+    terminalFailure: REMOVE_FOR_BATTLE
+    recoverableParticipation: <explicit Mode defeat-profile binding or REQUIRED_EXPLICIT>
+```
+
+Create the existing pending Lifecycle/State/reservation record only after original confirmation and required death snapshots. Pending identity is original subject generation + death result + instance + profile; no Chân Ngã/waiting record or arbitrary lifecycle callback. Author one finite attempt graph using existing P-034/035, P-069 and State/counter operations; use count increments only with successful materialization.
+
+SSI opts into ACT-011's consumed dead-Slot checkpoint. Each visit performs no Action, class regeneration, ordinary actor-window/duration tick or Natural Action result; it does advance Side pointer/control and global boundary. Attempt at checkpoint END. Validate all Cost/placement/restore inputs on one protected view, then atomically join payment, restoration/materialization, reserved claim transition, success count and future-normal SSI eligibility. A failed attempt spends/consumes/restores nothing. Advance only the authored remaining wait; terminal failure or exhausted success limit removes participant and releases claim once. No alternative Position, third/background retry or stale callback into a later generation.
+
+The restore profile covers all old-chassis State/cooldown/counter/charge/Shield retention, persistent Stat contributions, initialized HP/Rage and replacement-only Effects. Generic ENTER_FIELD presence evidence remains structurally correct but CAUSE_ONLY admits only explicitly cause-bound replacement listeners, not deployment/field-entry/battle-start Effect replay. Static capability registration is separate from those trigger activations. No Heal or Deck deployment is synthesized.
+
+An authored recoverability claim is not living/present/targetable status. Mode defeat law must resolve its interaction with every enabled terminal predicate, including Leader-confirmed-death; no implicit priority or terminal-battle reopening. Normalization rejects an unresolved Mode binding. Other return causes keep their own explicit policies.
 
 # 30. REINCARNATION SPEC
 
@@ -4966,6 +5051,12 @@ If a composite Ability contains resolution groups with different Hit Admission p
 No Accuracy/Evasion formula is introduced here.
 
 ---
+
+## 34.5 Authored attack shape and incoming movement eligibility
+
+Each Damage owner's normalized Target/Area plan supplies immutable `attackShape: SINGLE_TARGET | AOE`, based on its authored semantic profile rather than current recipient count. Fixed/rand/full-field AoE remains AOE with0/1 recipients; multihit on one authored target remains SINGLE_TARGET. Unsupported/contradictory shape must be explicit or rejected; no child inherits shape solely from root lineage.
+
+A fixed full-enemy-field group may explicitly declare `incomingMovementReactions: SUPPRESS_ATTACK_TRIGGERED`. TGT-011/POS-008 remove eligibility only for movement clauses triggered by this incoming attack's AoE/single-target shape, before the positional interposition phase. No movement, charge debit or movement-dependent Counter obligation is created for a suppressed clause. Other defenses, ordinary MODE_DEFAULT Hit Admission, Authority, temporary absence, unrelated movement/admission and mandatory lifecycle remain unchanged. This is bounded eligibility data, not general Dodge immunity, invulnerability or a generic Reaction cancellation hook. Omission preserves existing movement law; unsupported reaction-category mappings reject rather than suppress unrelated Effects.
 
 # 35. RESULT BINDINGS
 

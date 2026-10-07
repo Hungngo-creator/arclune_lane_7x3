@@ -1,6 +1,6 @@
 # ARCLUNE — MODE PROFILES
 ## Chặng H — Mode-Specific Runtime Profiles
-**Version:** 2026-10-02-H.1
+**Version:** 2026-10-07-H.2
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`, `06_KERNEL_RUNTIME.md`
 **Purpose:** define which runtime rules are active in each game mode without forking Character identity, Tag semantics, Primitive meanings, or Kernel foundations.
@@ -8,6 +8,8 @@
 **Revision H.1:** clarifies the designer-confirmed nine-position Main battlefield and Leader occupancy at Slot 8. No scheduler, clock, lifecycle or alternate-Mode policy changes.
 
 ---
+
+**Revision H.2:** binds admitted post-death reserved-Slot waits to SSI cadence without Actor Action/duration/class gain; requires explicit recoverability-versus-defeat composition. No implicit Leader-death exception or continuous-mode substitute clock is introduced.
 
 # 0. MODE PROFILE PRINCIPLE
 
@@ -206,6 +208,10 @@ Side A eligible Natural Action
 ```
 
 ---
+
+An explicitly admitted04§29.3/ACT-011 profile may supply a POSTMORTEM_WAIT checkpoint from a reserved confirmed-dead Slot. Consume it through the same Side pointer/pass and ensuing global boundary, with no Actor Natural opportunity, CC/form selection, ordinary Actor-duration tick, Action or class AE/Rage. The pending Lifecycle record owns bounded attempts; successful replacement only makes the next ordinary SSI visit playable. Unprofiled dead/empty Slots still skip. Slot reservation remains authoritative occupancy under POS-009, not a render/HP heuristic.
+
+`recoverableParticipation` must bind a supported defeat predicate before this profile is execution-ready. An expressly selected pending-recoverability override defers its bound defeat predicates without declaring the dead actor alive. The current Main Leader-confirmed-death rule below otherwise applies: if a pending claim defers that terminal reason, its post-success treatment must also be explicit. Do not infer cancellation or immediate reevaluation of the deferred reason merely from materialization. Unresolved Main binding rejects normalization; continuous Modes require an explicit scheduler adaptation rather than fake SSI visits.
 
 # 8. TURN-BASED BATTLEFIELD
 
