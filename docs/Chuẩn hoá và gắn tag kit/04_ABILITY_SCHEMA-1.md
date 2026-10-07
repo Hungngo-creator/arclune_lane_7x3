@@ -33,7 +33,7 @@
 
 **Revision E.16:** adds only two bounded Reincarnation profiles: battle-base waiting-threshold reduction and complete-entry local route settlement. Existing ledger, lifecycle, RNG, Snapshot, Target, reservation and Effect/System plans execute them. Pygmalion quota/inheritance/Ultimate use existing composition; no new Tag, Primitive, Contract ID, subsystem or global priority.
 
-**Revision E.17:** adds bounded post-death Slot waits/cause-specific restoration, retained-stat reads, pre-death receipt folding, reserved actual-Heal payment and cause-time Resource admission; makes authored attack shape/movement-trigger suppression explicit. Existing owners/operations execute these profiles. No new Tag, Primitive, Contract ID or global priority; unresolved Mode defeat interactions fail closed.
+**Revision E.17:** adds bounded post-death Slot waits/cause-specific restoration, retained-stat reads, pre-death receipt folding, reserved actual-Heal payment and cause-time Resource admission; makes authored attack shape/movement-trigger suppression explicit. Main participation distinguishes roster recovery from the exact Leader's own pending return. Generic common-recipient simultaneous Damage resolves to existing RES-008 PROPORTIONAL, including per-component receipts. Existing owners/operations execute these profiles; no new Tag, Primitive, Contract ID, allocator or global priority.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -1350,7 +1350,7 @@ Lower to existing committed-Result/State/P-021/Transaction bookkeeping, keyed by
 
 ## 7.19 Required SSI checkpoint predicate settlement
 
-`trigger.checkpointSettlement: {anchor: OWNER_NATURAL_OPPORTUNITY_START | TURN_BOUNDARY, mode: BEFORE_SSI_CONTINUATION}` opts an ordinary finite Condition/Effect graph into ACT-034/CLK-001's existing required scheduler work. Unlike §7.15's State-termination graph, this profile requires no expiring State; bind the exact living owner generation and originating opportunity/boundary identity. At owner start close before that same grant's CC/selection/admission; at global boundary close before next Side control/opportunity. False predicate, zero budget or local failure closes without retry. No future-Action dependency, Action/class regeneration, continuous polling or global ordering of unrelated competing candidates. Do not co-author another settlement profile on that trigger; observable competition requires an actual law or rejection.
+`trigger.checkpointSettlement: {anchor: OWNER_NATURAL_OPPORTUNITY_START | TURN_BOUNDARY, mode: BEFORE_SSI_CONTINUATION}` opts an ordinary finite Condition/Effect graph into ACT-034/CLK-001's existing required scheduler work. Unlike §7.15's retained-State/first-later-grant profile, this profile requires no State instance or creation-serial anchor; bind the exact living owner generation and originating opportunity/boundary identity. At owner start close before that same grant's CC/selection/admission; at global boundary close before next Side control/opportunity. False predicate, zero budget or local failure closes without retry. No future-Action dependency, Action/class regeneration, continuous polling or global ordering of unrelated competing candidates. Do not co-author another settlement profile on that trigger; observable competition requires an actual law or rejection.
 
 # 8. CONDITION SPEC
 
@@ -2605,6 +2605,8 @@ Canonical ordinary component types:
 - TRUE
 
 Mixed Damage is multiple components. The opt-in reflected scalar packet in §16.5 is a separate packet semantic, not a fourth ordinary component or mixed profile.
+
+Concurrent mixed components of one hit share its Hit Admission and common commit. §34.2A/RES-008 supplies their generic shared-recipient allocation and separate immutable component receipts; it does not split one hit into independent fallback hits.
 
 No required Functional Tag:
 `MIXED_DAMAGE`.
@@ -4384,7 +4386,7 @@ lifecycle:
     restoreProfileRef: <explicit typed state/stat/resource restore profile>
     entryTriggerPolicy: CAUSE_ONLY
     terminalFailure: REMOVE_FOR_BATTLE
-    recoverableParticipation: <explicit Mode defeat-profile binding or REQUIRED_EXPLICIT>
+    recoverableParticipation: <supported Mode binding; Main uses SELF_LEADER_PENDING_RECOVERY>
 ```
 
 Create the existing pending Lifecycle/State/reservation record only after original confirmation and required death snapshots. Pending identity is original subject generation + death result + instance + profile; no Chân Ngã/waiting record or arbitrary lifecycle callback. Author one finite attempt graph using existing P-034/035, P-069 and State/counter operations; use count increments only with successful materialization.
@@ -4393,7 +4395,7 @@ SSI opts into ACT-011's consumed dead-Slot checkpoint. Each visit performs no Ac
 
 The restore profile covers all old-chassis State/cooldown/counter/charge/Shield retention, persistent Stat contributions, initialized HP/Rage and replacement-only Effects. Generic ENTER_FIELD presence evidence remains structurally correct but CAUSE_ONLY admits only explicitly cause-bound replacement listeners, not deployment/field-entry/battle-start Effect replay. Static capability registration is separate from those trigger activations. No Heal or Deck deployment is synthesized.
 
-An authored recoverability claim is not living/present/targetable status. Mode defeat law must resolve its interaction with every enabled terminal predicate, including Leader-confirmed-death; no implicit priority or terminal-battle reopening. Normalization rejects an unresolved Mode binding. Other return causes keep their own explicit policies.
+An authored recoverability claim is not living/present/targetable status. Main's SELF_LEADER_PENDING_RECOVERY binding under07§9 counts a valid pending participant for roster extinction and defers Leader defeat only when that exact battle participant is the Leader and owns the admitted entitlement. It cannot save a different terminally dead Leader. Bind stable participant/Leader identity, original death/generation and pending record; success preserves the Leader role, final failure/no entitlement applies terminal defeat. Normalization rejects missing/unsupported Mode bindings rather than reopening a terminal battle. Other return causes keep their own explicit policies.
 
 # 30. REINCARNATION SPEC
 
@@ -4979,9 +4981,9 @@ This is declarative ordering, not arbitrary control flow.
 
 ## 34.2A Shared-recipient simultaneous Damage allocation
 
-A named SIMULTANEOUS_BATCH group with several Damage packets sharing one recipient may explicitly set `sharedRecipientDamageAllocation: PROPORTIONAL` under RES-008. Each packet retains its own component resolution/provenance and immutable Damage Result, but shares the recipient's single Shield/HP budgets at the common commit. Allocation is between incoming eligible demands; SHP-002's proportional depletion between Shield source contributions remains a separate axis.
+A supported simultaneous common commit with several Damage components/packets sharing one recipient resolves `sharedRecipientDamageAllocation: PROPORTIONAL` under existing RES-008. The Normalizer records that generic policy even if authored input omits the field; an explicit PROPORTIONAL declaration selects the same law. This includes concurrent components of one mixed hit, not only separately authored packet Effects. Each component retains its own formula/type/mitigation/provenance and immutable committed receipt, while sharing the recipient's single eligible Shield/HP budgets. Allocation is between incoming eligible demands; SHP-002's proportional depletion between Shield source contributions remains a separate axis.
 
-No global multi-target/AoE default is introduced. Reject shared-recipient batches with observable per-packet results if no applicable explicit allocation law exists. Ordinary different-recipient simultaneous groups need no such field. Reject this field on non-simultaneous groups, unavailable membership/results or undeclared observable numeric allocation.
+This does not choose attack geometry, recipient membership or simultaneous versus sequential execution. Different recipients have separate budgets; separate sequential commits are not coalesced. Reject an unsupported alternative allocation, PROPORTIONAL on a non-simultaneous group, unavailable membership/component receipts or unsupported numeric conservation. TRUE keeps its own mitigation/Shield eligibility and gains no Shield Piercing. Existing approved proportional profiles lower to the same plan; no Character-specific allocator.
 
 ## 34.2B Explicit child-Damage participation in one batch
 
@@ -5091,6 +5093,8 @@ Allowed metrics:
 - per-target result.
 
 Ordinary and reflected Damage bindings used by source-group consumers retain immutable immediate damageSourceRef and packetKind (ORDINARY by default); DMG-034 additionally retains exact causal basis refs with ordinary ActualHP/Shield/Overkill metrics. A grouped basis/receipt remains immutable through dependent terminal readers; later source death/removal does not rewrite its committed evidence. Source validity is checked for the new reflected recipient, not retroactively for historical incoming results.
+
+RES-008 retains a separate immutable component receipt for every committed ordinary Damage component, identified by common commit + packet/Effect + component + recipient. Packet/Action aggregate results reference those receipts without counting both levels twice. Per-type lifetime consumers read their final actualHpDamage, not a reconstructed nominal split or a whole mixed packet assigned one type. Scalar packets retain their own packet semantic; this does not invent an ordinary component type for them.
 
 ---
 

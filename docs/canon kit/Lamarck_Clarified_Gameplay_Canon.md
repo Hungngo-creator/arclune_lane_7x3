@@ -1,8 +1,8 @@
 # ARCLUNE — LAMARCK — CLARIFIED GAMEPLAY CANON
 
-**Revision:** R1.
-**Status:** Q1_Q15_LOCKED / NEED_INTEGRATION_DECISIONS / NOT_NORMALIZED.
-**Source:** latest explicit Lamarck Q1–Q15 FINAL DESIGNER LOCK and cross-mechanic locks; these supersede conflicting shorthand in `41) Lamarck`, root `Ý tưởng nhân vật 4.md`.
+**Revision:** R2.
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED.
+**Source:** latest explicit Lamarck Q1–Q15 FINAL DESIGNER LOCK, cross-mechanic locks and additional Q16–Q17 designer locks; these supersede conflicting shorthand in `41) Lamarck`, root `Ý tưởng nhân vật 4.md`.
 
 ## 1. Identity, presentation and Passive
 
@@ -21,6 +21,8 @@ No additional Damage/Shield/HP Cost/Death Prevention immunity or Authority tier 
 Each chassis lifetime accumulates incoming positive **committed Actual HP Damage**, by **TRUE / WILL / PHYSICAL** component, from its field entry/replacement through its DEATH_CONFIRMED. Include qualifying DoT, Follow-up and other Damage in this information; the Natural-only restriction below belongs to mitigation, not information collection.
 
 Use committed component shares, excluding Shield absorption, raw/nominal Damage, overkill beyond HP actually removed, HP Cost, non-Damage HP Loss and direct Execute removal without a Damage receipt. A mixed hit contributes each actual component share, not one whole-hit category inferred from its scaling stat.
+
+Simultaneous components/packets sharing a recipient/common commit use existing generic **RES-008 PROPORTIONAL** allocation after each component's own mitigation and eligible Shield processing. Lifetime information reads its separate final immutable per-component Actual HP Damage receipts. No type/authoring/Event/list order gets first consumption; TRUE does not gain Shield Piercing. This is a generic shared-recipient transaction binding, not a Lamarck-specific allocator.
 
 At DEATH_CONFIRMED, freeze the completed lifetime totals. A unique positive maximum selects that branch. Exact positive ties select **exactly one** tied highest branch by deterministic seeded RANDOM, without fixed type priority. All-zero information selects **no new branch** and preserves previous adaptations. Redelivery does not choose again.
 
@@ -82,7 +84,11 @@ The cap3 counts successful materializations only. Payable AE with blocked materi
 
 ### 3.3 Battle-end participation
 
-A valid pending POSTMORTEM_WAIT entitlement makes Lamarck a **recoverable participant** for battle-end evaluation. If it is its Side's only remaining member, do not declare defeat while its remaining wait checkpoint(s) are pending. Ordinary defeat evaluation may proceed after terminal failure/final removal. This does not turn the dead Actor into a playable or Damage-eligible living participant.
+A valid pending POSTMORTEM_WAIT entitlement makes Lamarck a **recoverable participant for ordinary roster-extinction/no-active-participant defeat**. If it is its Side's only remaining member, this predicate does not declare defeat while its permitted wait checkpoints remain. Terminal failure/final removal ends that protection. This does not make the dead Actor playable or Damage-eligible and does not globally override independent Leader-objective defeat.
+
+**Leader is another Character:** allied Leader DEATH_CONFIRMED runs ordinary immediate lifecycle/recovery processing. If no immediately valid Leader-recovery rule saves that Leader and it remains terminally dead, the Side loses immediately. Pending or successfully replaced non-Leader Lamarck does not rescue it; do not wait for Lamarck's replacement checkpoints.
+
+**Lamarck is the Leader:** its own valid unused Skill1 entitlement explicitly defers its Leader defeat through the permitted one/two POSTMORTEM_WAIT checkpoints. Successful CHASSIS_REPLACEMENT preserves Lamarck's Leader identity and combat continues; this remains its own replacement rather than ordinary external Revive. Terminal replacement failure, or confirmed death with no entitlement, makes Leader death terminal and the Side loses. No other Leader inherits this exception from Lamarck's presence.
 
 ### 3.4 Fresh chassis materialization
 
@@ -204,30 +210,23 @@ Only that execution is enhanced. No permanent growth, retained Buff, stack or cu
 
 ## 8. UNRESOLVED / NOT BLOCKING
 
-Rank, Class, native Element, deployment/base-stat budget and final skin art remain unspecified. Use Rank parameters where required; lack of a target's comparable Rank explicitly excludes the follow-up. The locked SSI/Side-AE mechanics target the turn-based profile. Future Modes require explicit compatible adapters and cannot invent own SSI checkpoints where their scheduler has none. Unsupported external conflict profiles remain fail-closed rather than supplying hidden gameplay priority. No internal Q1–Q15 gameplay question remains open.
+Rank, Class, native Element, deployment/base-stat budget and final skin art remain unspecified. Use Rank parameters where required; lack of a target's comparable Rank explicitly excludes the follow-up. The locked SSI/Side-AE mechanics target the turn-based profile. Future Modes require explicit compatible adapters and cannot invent own SSI checkpoints where their scheduler has none. Unsupported external conflict profiles remain fail-closed rather than supplying hidden gameplay priority. No internal Q1–Q17 gameplay question remains open.
 
-## 9. UNRESOLVED / NEED DESIGNER DECISION — current integration boundaries
-
-All Q1–Q15 locks above remain authoritative. These are additional observable cross-rule choices, not a reopening of their answered mechanics.
-
-1. **Successful replacement with an already-dead Main Leader.** §3.3 is locked: do not end the battle while the valid wait remains, including when Lamarck is the Side's only remaining member. TURN_BASED_MAIN otherwise ends on true Leader DEATH_CONFIRMED (07§9 / ACT-050). If replacement succeeds after the Leader has already died, does combat resume with the dead Leader, or is that deferred Leader-death terminal condition then evaluated? This post-success interaction is not specified; pending-period deferral and terminal-failure removal are not reopened.
-2. **Concurrent component Actual-HP shares.** One simultaneous mixed hit can have several admitted components competing for finite shared Shield/HP, and §2's adaptation observes the per-type committed shares. RES-008 provides an explicitly selected PROPORTIONAL policy but no universal default. Must these components use proportional allocation of each eligible Shield budget and remaining HP demand, or another declared law? A simple no-Shield example: HP100 with concurrent PHYSICAL100/WILL100/TRUE100 has total ActualHP100; proportional shares are100/3 each, while an undeclared component order could grant100 to only one type and change the dominant branch. Choose the policy for Lamarck's mixed attacks and the component shares consumed by its lifetime information; do not change total Damage or Hit Admission.
-
-Execution-ready Main normalization remains blocked only where these choices are required. The enabled profile/result view must reject unresolved binding instead of assuming an outcome.
-
-## 10. Declarative semantic bindings
+## 9. Declarative semantic bindings
 
 | Authored mechanic | Exact composition/boundary |
 | --- | --- |
-| External Heal/Revive restrictions | Existing scoped Effect admission/STA-014, executing-Actor Effective Rank predicate at Heal admission, exact own-Skill3 exception and foreign return denial. HEAL capability belongs to Heal nodes; Rank is not Authority. |
-| Chassis information | DAMAGE_COMMITTED/04§7.18/TRG-015 mandatory positive ordinary-component actualHpDamage fold into original State counters, before death snapshots. Capture/reset record generation per chassis; use committed shares with an explicitly governed allocation law. |
+| External Heal/Revive restrictions | Existing scoped Effect admission/STA-014: IMMUNITY only for the conditional external-HEAL scope, executing-Actor Effective Rank predicate at Heal admission and exact executing-Lamarck/own-Skill3 exception. A copied definition alone is not self execution. Foreign return denial follows lifecycle eligibility; no immunity to unrelated Effects. HEAL capability belongs to Heal nodes; Rank is not Authority. |
+| Chassis information | DAMAGE_COMMITTED/04§7.18/TRG-015 mandatory positive ordinary-component actualHpDamage fold into original State counters, before death snapshots. Capture/reset record generation per chassis; consume generic RES-008 immutable proportional component receipts. |
 | Dominance/adaptation | Existing Conditions, one seeded tie choice, State/P-021, Snapshot/P-002 with04§13.5/SNP-002 retained-stat projection, P-030 Stat/P-031 MaxHP contribution and BATTLE_SCOPED retention. Zero branch does not create a new gain; no Character-specific manager. |
-| Natural reductions | Existing DAMAGE_REDUCTION/FINAL_DAMAGE_REDUCTION, own-direct provenance + hostile actual-Natural Action + authored SINGLE_TARGET/AOE facet under04§18A/34.5. Select PHYSICAL/WILL only. |
-| Replacement | SYSTEM_LIFECYCLE/04§29.3 typed CHASSIS_REPLACEMENT; existing pending State, reserved Position, P-034/035 Cost, P-069 materialization and successful-use counter joined under ACT-011/REV-004/006. Cause/clock values are not Tags or ordinary Revive routing. Main defeat binding remains §9. |
-| Rage restriction | Two existing counters/clock observations and ALL condition, origin-aware Resource admission/CST-016 with exact cause-time Action/Damage scope; expired State cannot erase late-grant evidence. No composite-duration subsystem. |
-| Skill2/Basic | Existing ordinary mixed Damage profile/Hit Admission, per-owner Slot binding, one coherent calculation snapshot; Skill2 one shared hit and Basic one execution-owned seeded roll. Actual component allocation remains §9. |
+| Natural reductions | Functional Tag DAMAGE_REDUCTION with reductionPhase=FINAL, own-direct provenance + hostile actual-Natural Action + authored SINGLE_TARGET/AOE facet under04§18A/34.5. Select PHYSICAL/WILL only; FINAL_DAMAGE_REDUCTION is not a separate Tag. |
+| Replacement | SYSTEM_LIFECYCLE/04§29.3 typed CHASSIS_REPLACEMENT; existing pending State, reserved Position, P-034/035 Cost, P-069 materialization and successful-use counter joined under ACT-011/REV-004/006. The materializing owner reuses broad REVIVE post-confirmed-return capability under REV-004, without ordinary Revive cause/events or foreign eligibility. Main SELF_LEADER_PENDING_RECOVERY protects roster extinction and only the exact Leader's own entitlement under ACT-050/07§9. |
+| Rage restriction | Two existing counters/clock observations and ALL condition on the exact post-replacement State/generation, origin-aware Resource admission/CST-016 with exact cause-time Action/Damage scope; expired/retired State cannot erase late-grant evidence. Old-chassis temporary window is not copied into a replacement. No composite-duration subsystem. |
+| Skill2/Basic | Existing ordinary mixed Damage profile/Hit Admission, per-owner Slot binding, one coherent calculation snapshot and generic RES-008 component allocation; Skill2 one shared hit and Basic one execution-owned seeded roll. |
 | Repair | Stable predicate observation/TRG-016 with EXCLUDE_THIS_TRIGGER_ACTIVATION plus04§7.19 owner-start/boundary finite settlements; existing exact own-Skill3 Effect/activation-origin recursion filter across those checkpoint entry definitions.04§17.3/CST-009 reserved actual-Heal-linked AE payment. Existing HEAL and Cost receipts, no Action or free recursion. |
 | Main ray | Fixed enemy Position set/current legal occupants, shared source and simultaneous recipients, MODE_DEFAULT; bounded04§34.5/POS-008 attack-triggered movement eligibility suppression. |
 | Rank follow-up | Existing admitted-hit result/Rank Snapshot, required main→lifecycle→child local DAG and AFTER_DIRECT_EFFECTS_COMPLETE hold; explicit Entity-bound non-Natural ULTIMATE/FOLLOW_UP with immutable source payload/retained-created-obligation validity. Shield absorption does not imply miss. |
 
-These are declarative Character bindings, not implementation code or a claim that unresolved Mode/result choices compile. Shared materialization operations do not imply ordinary Revive cause or foreign revival entitlement; no chassis-specific Functional Tag is created.
+These are declarative Character bindings, not implementation code. Shared materialization operations do not imply ordinary Revive cause or foreign revival entitlement; no chassis-specific Functional Tag is created.
+
+Functional Tags attach to the smallest owning Effect/component: PHYSICAL owns DAMAGE + PHYSICAL_DAMAGE; WILL owns DAMAGE + WILL_DAMAGE; Skill2's1% and Ultimate's10% TRUE child own DAMAGE + TRUE_DAMAGE without inheriting other components from the root. Repair owns HEAL; retained ARM/RES adaptations own STAT_MODIFIER, retained MaxHP adaptation owns MAX_HP_MUTATION, and Rage-gain restriction owns RESOURCE_MODIFIER with IMMUNITY limited to its positive-Resource-grant denial scope. Private information/wait/use counters do not become Buff/Mark identities. Attack shape, Position/Entity binding, RNG, Rank, clocks and replacement cause remain typed facets rather than new Tags.

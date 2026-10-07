@@ -36,7 +36,7 @@
 
 **Revision G.17:** executes only the two E.16/F.18 Reincarnation extensions through existing world-ledger, lifecycle-result, Target/RNG, reservation, Effect/System and Transaction owners. Clarified Pygmalion creation/inheritance/Ultimate retain existing composition; no new store, queue, manager, ID or global priority.
 
-**Revision G.18:** executes E.17/F.19 through existing SSI/Lifecycle/Position, State/stat/Result, Resource/Transaction and Trigger/Action owners. Bounded dead waits, causal grant scope and reserved Heal-result payment retain explicit terminal/save identities; no Character branch, new subsystem or priority manager. Unresolved Mode terminal-predicate binding remains a normalization blocker.
+**Revision G.18:** executes E.17/F.19 through existing SSI/Lifecycle/Position, State/stat/Result, Resource/Transaction and Trigger/Action owners. Bounded dead waits, causal grant scope and reserved Heal-result payment retain explicit terminal/save identities. Existing battle-end adjudication distinguishes roster recovery from exact self-Leader pending recovery; existing RES-008 allocation seals per-component receipts for every supported simultaneous common-recipient commit. No Character branch, new subsystem, allocator or priority manager.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -2300,9 +2300,9 @@ This prevents calculation contamination.
 
 ### Shared-recipient allocation under RES-008
 
-If a normalized simultaneous group opts into sharedRecipientDamageAllocation PROPORTIONAL, the existing Transaction Manager groups incoming packet/component demands by locked recipient, using the same shared phase state. Damage Runtime calculates each independent pre-Shield demand; existing Shield Runtime allocates each eligible layer's consumed budget across eligible demands proportionally and separately depletes source contributions under §52/SHP-002. Remaining HP-bound demand shares one recipient HP budget proportionally under RES-008. No independently proposed packet may spend that budget twice.
+Every supported simultaneous common-recipient Damage commit uses its normalized sharedRecipientDamageAllocation PROPORTIONAL plan, including concurrent mixed components within one hit. The existing Transaction Manager groups exact component/packet demand units by recipient/common commit, using the shared phase state. Damage Runtime calculates each independent pre-Shield demand; existing Shield Runtime allocates each eligible layer's consumed budget across eligible demands proportionally and separately depletes source contributions under §52/SHP-002. Remaining HP-bound demand shares one recipient HP budget proportionally under RES-008. No independently proposed component/packet may spend that budget twice; separate sequential commits are not coalesced.
 
-Commit one recipient net Shield/HP delta within the batch, retain separate immutable DamageResultRef receipts for all participating packets, then publish mandatory lifecycle/ordinary downstream work at the existing boundaries. Validate numeric conservation and permutation invariance before commit; reject unsupported allocation rather than round by list order. Batch/recipient/packet identities, shared state version and proposed shares belong to this existing transaction; pending save/load preserves them, successful commit seals receipts once, abort discards proposals and replay reuses terminal commit/results.
+Commit one recipient net Shield/HP delta within the batch, retain separate immutable component DamageResultRef receipts and their packet aggregate references, then publish mandatory lifecycle/ordinary downstream work at existing boundaries. Receipt identity includes common commit, recipient, packet/Effect and exact component; aggregates cannot double-credit component observers. Validate numeric conservation and permutation invariance before commit; reject unsupported allocation rather than round by type/authoring/list/Event order. These identities, shared state version and proposed shares belong to the existing transaction; pending save/load preserves them, successful commit seals receipts once, abort discards proposals and replay reuses terminal commit/results. TRUE keeps its mitigation/Shield eligibility; it is not automatically Shield Piercing. No second allocation service is introduced.
 
 ## 31A. Parent-owned child-Damage batch
 
@@ -2609,7 +2609,7 @@ Register one finite obligation keyed by Combat Instance, original checkpoint/sub
 
 Use normalized EXCLUDE_THIS_TRIGGER_ACTIVATION plus immutable commit-origin refs to suppress mutations of the same finite activation. Do not filter all events sharing rootActionId/Ability/source; independently committed later work in that root, and future State-terminal settlements, remain eligible after terminal completion. Retain suppression and terminal candidate evidence for redelivery/save/replay without a mutable “currently suppressing” Character flag. Retired life/presence work cannot activate a replacement. Reject ungrounded origins, cyclic/held-future dependencies or unordered competing effects before affected mutation.
 
-04§7.19 uses existing required SSI continuation records for an exact owner-start/boundary predicate graph without a State-expiry requirement. Key by original grant/boundary + Trigger + owner generation; close qualification/finite settlement before CC/selection at owner start or next-control handoff at boundary. A CC-lost grant can therefore settle an automatic Heal without an Action. For repair-style health observation use existing stablePredicateSettlement with EXCLUDE_THIS_TRIGGER_ACTIVATION, so its own Heal/conversion/payment does not reenter; separately caused later health/checkpoint work remains eligible. False predicate/zero budget/failure is terminal, AE-only mutation creates no retry, and retired owner cannot redirect a candidate to a new chassis. Observable unrelated competition still needs a governing law.
+04§7.19 uses existing required SSI continuation records for an exact owner-start/boundary predicate graph without a retained-State/first-later-grant anchor. Key by original grant/boundary + Trigger + owner generation; close qualification/finite settlement before CC/selection at owner start or next-control handoff at boundary. A CC-lost grant can therefore settle an automatic Heal without an Action. For repair-style health observation use existing stablePredicateSettlement with EXCLUDE_THIS_TRIGGER_ACTIVATION, so its own Heal/conversion/payment does not reenter; separately caused later health/checkpoint work remains eligible. False predicate/zero budget/failure is terminal, AE-only mutation creates no retry, and retired owner cannot redirect a candidate to a new chassis. Observable unrelated competition still needs a governing law.
 
 # 36. TRIGGER CANDIDATE
 
@@ -4843,18 +4843,20 @@ No hidden logic.
 
 # 121. BATTLE TERMINATION
 
-Leader confirmed death can mark Combat Instance terminal.
+Leader DEATH_CONFIRMED is adjudicated by existing Lifecycle/Mode battle-end ownership under ACT-050, after its admitted immediate recovery and mandatory world-law work. Terminal Leader death marks the Side defeated even if a different participant has a pending/finished replacement; cancel that participant's future wait with ordinary terminal cleanup rather than resolving it as a rescue.
+
+For07§9's SELF_LEADER_PENDING_RECOVERY, the same owner reads the exact Leader battle-participant identity, original death/generation and its admitted pending Lifecycle record. Defer terminal Leader loss only for this Leader's own valid entitlement; keep its reserved SSI checkpoints live without declaring it alive. Existing record attempt/outcome/claim identities supply save/replay evidence, not a new defeat store. Successful materialization preserves the logical Leader role across runtime generations and closes this death's pending reason; final failure/no entitlement makes the Leader loss terminal. Stale dead-generation status cannot defeat a successfully restored Leader, and another participant's record cannot satisfy this check.
 
 Working terminal behavior:
 
 ```text
-finish atomic death + mandatory world-law bookkeeping
+finish atomic death + mandatory world-law/immediate recovery adjudication
 → mark terminal
 → cancel ordinary future actions that cannot alter already-confirmed termination
 → cleanup
 ```
 
-Battle-end prevention must intervene before terminal confirmed death.
+An admitted pending self-Leader recovery defers terminality before the terminal flag is committed; it never reopens an already-terminal Combat Instance. Roster-extinction checks separately count valid pending participants. A consumed POSTMORTEM_WAIT retains its ACT-011/CLK-001 mandatory following boundary bookkeeping even when its end-attempt decides terminal failure; cleanup cannot invent another wait/Action or discard that consumed-checkpoint identity. Ordinary future queue cutoff remains the existing policy.
 
 Exact terminal queue cleanup remains Kernel policy to be finalized with stress tests.
 

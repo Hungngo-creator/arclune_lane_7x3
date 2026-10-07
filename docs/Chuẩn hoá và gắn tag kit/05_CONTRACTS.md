@@ -35,7 +35,7 @@
 
 **Revision F.18:** extends only existing REC-001/006 with battle-base threshold mutation and complete-entry local route settlement; aligns existing Pygmalion ENT clauses with clarified quota/body/coordination policies. Other laws/IDs remain intact; no new Tag, Primitive, subsystem or global priority.
 
-**Revision F.19:** extends existing ACT/CLK, TRG-015, SNP-002, CST-009/016, HEL-001, POS-005/008 and REV-004/006 with the bounded E.17 profiles. Ordinary Cost, Revive, TRUE, clocks, field evidence and prior Pilot law remain unchanged; no new Contract ID or implicit Mode defeat override.
+**Revision F.19:** extends existing ACT/CLK, TRG-015, SNP-002, CST-009/016, HEL-001, POS-005/008 and REV-004/006 with the bounded E.17 profiles. ACT-050 distinguishes terminal Leader death from its own expressly admitted pending return; another participant's entitlement protects only roster extinction. RES-008 is the generic common-recipient simultaneous allocation law with immutable component receipts. Ordinary Cost/Revive/TRUE and prior proportional profiles remain intact; no new Contract ID, allocator or global priority.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -2445,18 +2445,18 @@ The profile does not settle general stat-layer order, incompatible source compos
 
 ---
 
-## RES-008 — Explicit Shared-Recipient Proportional Damage Allocation
-**Status:** `LOCKED EXPLICIT PROFILE`
+## RES-008 — Shared-Recipient Proportional Damage Allocation
+**Status:** `LOCKED GENERIC COMMON-COMMIT LAW`
 
-A SIMULTANEOUS_BATCH group may select sharedRecipientDamageAllocation PROPORTIONAL for incoming Damage packets sharing a recipient. Under RES-002, freeze membership and required phase state before any sibling delta is visible. Resolve each admitted packet/component's formula, type, mitigation and applicable modifiers independently; keep separate provenance and Damage Results. Invalid locked recipients follow the authored local policy without replacement; failed/zero-demand packets create no competing demand.
+A simultaneous common Damage commit uses sharedRecipientDamageAllocation PROPORTIONAL for components/packets sharing a recipient, including concurrent components of one hit. Resolve this generic law in normalized IR even when authored input omits the field; no Character-specific opt-in or type/authoring/Event/list first-consume priority. Under RES-002, freeze membership and required phase state before any sibling delta is visible. Resolve each admitted component/packet's formula, type, mitigation and applicable modifiers independently; keep separate provenance and Damage Results. Invalid locked recipients follow the authored local policy without replacement; failed/zero-demand components create no competing demand. Shared Hit Admission is unchanged.
 
 For each eligible Shield layer under its existing layer-order/eligibility law, allocate its actual consumed Shield across only the remaining eligible packet/component demands, proportional to those demands. Deduct each share from that demand once. A type-specific layer does not absorb an ineligible component; Shield-piercing demand skips that layer. Within a Standard Shield pool, source contribution depletion still follows SHP-002 independently of the incoming-demand shares. Never independently spend the full same Shield budget on each packet or let main/orb/list order consume first.
 
-After Shield, let R_i be each packet's remaining HP-bound demand, T = sum R_i and H the recipient's available Current HP at this batch's common HP calculation. If T <= H, ActualHP_i = R_i. Otherwise ActualHP_i = H × R_i / T. T=0 allocates zero without division. Overkill is each uncommitted HP-bound remainder; it is not Actual HP Damage. Commit the recipient's net Shield/HP deltas once, then seal each packet's corresponding Shield/ActualHP/Overkill receipt before downstream lifecycle/settlements. A later Execute or recovery cannot rewrite those receipts.
+After Shield, let R_i be each component/packet demand unit's remaining HP-bound demand, T = sum R_i and H the recipient's available Current HP at this batch's common HP calculation. If T <= H, ActualHP_i = R_i. Otherwise ActualHP_i = H × R_i / T. T=0 allocates zero without division. Overkill is each uncommitted HP-bound remainder; it is not Actual HP Damage. Commit the recipient's net Shield/HP deltas once, then seal a separate immutable Shield/ActualHP/Overkill receipt for every committed component with its exact packet/Effect/component/recipient identity before downstream lifecycle/settlements. Packet aggregates derive from these receipts, never duplicate their credit. A later Execute or recovery cannot rewrite them. TRUE receives its existing mitigation and eligible Shield law, not implicit Shield Piercing.
 
 Use the project's applicable numeric policy with bounded, conserved allocations: allocated Shield <= actual Shield consumed; sum ActualHP <= HP actually removed, with exact equality when representable. Preserve packet/result identity. Rounding cannot select a beneficiary by packet/list/Entity/Event order. If the active numeric policy cannot represent an order-independent conserved allocation at the required precision, reject unsupported executable content/require an explicit numeric profile rather than invent a tie-break or silently lose/gain HP. No new global rounding law is supplied here.
 
-Existing Damage/Shield/Transaction/Result owners hold the proposed recipient allocation keyed by batch execution + recipient + participating packet/component refs, together with shared state version and commit identity. It is transient until the common commit; failure publishes no partial allocation/results. Retain committed receipts/dedup identity for dependent work/save/replay under existing result lifetime. Technical permutation yields the same totals and per-provenance shares. No new priority system, Primitive or universal AoE default; undeclared observable shared-recipient allocation is rejected.
+Existing Damage/Shield/Transaction/Result owners hold the proposed recipient allocation keyed by common commit + recipient + participating packet/component refs, together with shared state version and commit identity. It is transient until commit; failure publishes no partial allocation/results. Retain committed receipts/dedup identity for dependent work/save/replay under existing result lifetime. Technical permutation yields the same totals and per-provenance shares. No new priority system, Primitive, allocator or universal AoE geometry/batch default. Separate commits are not merged; unsupported competing allocation/numeric profiles are rejected.
 
 ---
 
@@ -4485,7 +4485,7 @@ Ký Ức:
 
 04§29.3 uses shared restoration/materialization operations with cause CHASSIS_REPLACEMENT, not ordinary Revive/Deck deployment/Chân Ngã retrieval. Protect original dead generation, pending reserved claim, all required Cost/restore/placement inputs and battle success counter. One commit joins payment, retained Stat/State projection, old-temporary cleanup, initialized HP/Rage, new active generation/presence, claim conversion and success count. Failure commits none and follows its bounded attempt policy. No higher Authority is invented for retention; cleanup is transition retirement, not Cleanse, expiry/depletion or Heal.
 
-An explicit fresh restore keeps declared BATTLE_SCOPED state/contributions and resets discarded old-chassis life/presence/cooldown/charge/Shield registrations; rebuild always-on definition capabilities without replaying initialization Effects. Ordinary lifeSerial law remains untouched; no Chân Ngã/lifeSerial is fabricated for a soulless entity, and stale references cannot bind its new generation. Only explicitly cause-authored replacement Effects run. Recoverability is Mode-owned defeat eligibility, not active presence or targetability; unresolved terminal-predicate interaction is REQUIRED_EXPLICIT, never a silent Leader-death exception.
+An explicit fresh restore keeps declared BATTLE_SCOPED state/contributions and resets discarded old-chassis life/presence/cooldown/charge/Shield registrations; rebuild always-on definition capabilities without replaying initialization Effects. Ordinary lifeSerial law remains untouched; no Chân Ngã/lifeSerial is fabricated for a soulless entity, and stale references cannot bind its new generation. Only explicitly cause-authored replacement Effects run. Recoverability is Mode-owned defeat eligibility, not active presence or targetability. Main's exact self-Leader binding follows ACT-050/07§9; another participant's entitlement never overrides terminal Leader defeat.
 
 ## REV-005 — Revive HP Is Not Heal
 **Status:** `LOCKED`
@@ -6579,14 +6579,18 @@ If Revive(A) committed before B's qualifying death:
 ## ACT-050 — Leader Death
 **Status:** `LOCKED CORE / exact queue cutoff WORKING_PROPOSAL`
 
-True Leader DEATH_CONFIRMED ends battle under turn-based win/loss rule.
+True Leader DEATH_CONFIRMED enters the Mode's immediate mandatory lifecycle/recovery adjudication. If no immediately valid, expressly admitted Leader-recovery rule saves that Leader and no admitted self-Leader pending-return entitlement exists, Leader death is terminal and the Side loses. Ordinary future queued Revive/Actions/Reactions do not delay this decision.
+
+07§9's SELF_LEADER_PENDING_RECOVERY binding admits a bounded04§29.3 entitlement only for the exact Leader participant's own original death. While valid and pending, defer that Leader's terminal defeat and keep the permitted SSI wait checkpoints live. Success preserves its logical Leader identity and continues battle; terminal failure or confirmed death without entitlement applies defeat. This does not create ordinary external Revive eligibility or a Chân Ngã. A different participant's pending/successful replacement can protect roster-extinction predicates, never an independently terminal dead Leader; do not resolve its future waits before declaring that Leader loss.
 
 Working proposal:
 - finish the atomic death commit and mandatory same-commit World Axiom bookkeeping;
-- mark Combat Instance terminal;
+- mark Combat Instance terminal only after the above adjudication finds terminal Leader death;
 - cancel ordinary future queued Actions/Reactions that cannot alter already-confirmed battle termination.
 
-Axiom/explicit battle-end prevention mechanics would need earlier intervention before Leader DEATH_CONFIRMED.
+Pre-confirmation Death Prevention retains its own earlier law. Immediately valid Leader recovery or the explicit self-Leader pending profile must be admitted at this mandatory checkpoint, not synthesized from ordinary queue priority, another Actor's return or a later deployment. Consume/retire pending success/failure and its exact claim coherently before subsequent battle-end evaluation; never reopen a terminal Combat Instance.
+
+A consumed POSTMORTEM_WAIT retains ACT-011/CLK-001's mandatory following boundary bookkeeping even when its end-attempt decides terminal Leader failure. Close that consumed-checkpoint obligation before terminal cleanup, without another wait/Action or reversal of the terminal result.
 
 Exact terminal cleanup belongs Kernel Runtime.
 
