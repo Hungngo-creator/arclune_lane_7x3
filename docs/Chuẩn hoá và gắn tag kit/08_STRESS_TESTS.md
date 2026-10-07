@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-07-I.16
+**Version:** 2026-10-07-I.17
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.15+, `05_CONTRACTS.md` F.17+, `06_KERNEL_RUNTIME.md` G.16+, `07_MODE_PROFILES.md` H.1+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.16+, `05_CONTRACTS.md` F.18+, `06_KERNEL_RUNTIME.md` G.17+, `07_MODE_PROFILES.md` H.1+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -33,6 +33,8 @@
 **Revision I.15:** adds only M-115/M-116 for shared multi-source remainder cap/receipts and two-part depletion/provenance/rejection. All prior stable IDs and case bodies remain unchanged; declarative Architecture Phase obligations only.
 
 **Revision I.16:** adds M-117–M-125 for restricted Basic projection/closure/frozen identity, whole-cohort local order, exact-position/paid failure, independent Summon clocks/causes, dismissal snapshots and final-live-set Ultimate Shield composition. Previous fixtures/IDs remain unchanged; declarative Architecture Phase obligations only.
+
+**Revision I.17:** adds M-126–M-134 for battle-base mutation and complete-entry route settlement, including fresh pool/host acquisition and coordinated child continuation interactions. G-001 specifies its surviving old host is INHABITED to keep its multiplicity fixture compatible with the clarified EMPTY blocker. Other prior case bodies/IDs remain unchanged; these are declarative Architecture Phase obligations, not executable test results.
 
 # 0. WHAT THIS FILE IS
 
@@ -1049,7 +1051,7 @@ The only proposed solution is bespoke Character runtime code.
 **ID:** `G-001`  
 **Status:** `MUST_PASS`  
 **Purpose:** core corrected Pygmalion invariant.  
-**Initial State:** Life Cycle 1 created P1; P1 survives. Pygmalion enters Life Cycle 2.  
+**Initial State:** Life Cycle 1 created P1; P1 survives INHABITED. Pygmalion enters Life Cycle 2.
 **Input:** Life Cycle 2 creation trigger.  
 **Expected Resolution:** new quota scope permits creation of P2; P1 remains.  
 **Forbidden Outcomes:** `if any Puppet exists → block`.  
@@ -4204,6 +4206,83 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 **Input:** incomplete cohort membership, missing owner-presence or relation-anchor facts, unavailable death FORM/Position, arbitrary callback/iteration, guessed order/failure/continuation, cyclic dependency or resume against a retired presence. A new registration/presence or changed Side attempts to claim past cohort deaths. Two unrelated candidates contend for the same death Slot/resource with no approved composition law; alternatively a projected Basic imports a parent/sibling Entity exception or dereferences evicted live State instead of retained payload.
 **Expected Resolution:** reject affected executable content/work before new partial mutations; preserve independently committed prior results. No Event/Slot/ID winner or generic global priority. Replay cannot bypass a terminal candidate or rebind a new presence. Valid control: a plain §7.4 ANY filter still returns one Boolean and does not multiply activations; ordinary single-death triggers, §16.3 profile copies, full inheritance and REC-004 waiting cohorts retain prior laws.
 **Layers Under Test:** E.15 lowering/validation, TRG-001/002/005, ACT-040/TGT-008, existing Trigger/State/Snapshot/RNG/Transaction/replay owners.
+
+
+## M-126 — Battle Base Changes Before Live Contributions, All Waiting Entries Re-evaluate
+
+**ID:** `M-126`
+**Status:** `MUST_PASS`
+**Initial State:** ordinary base4, active live +2 contribution, waiting entries X/Y with laterDeathCount5 and Z4, all from older lives.
+**Input:** required Cost succeeds; authored base reduction1/floor1 commits without a new death.
+**Expected Resolution:** base3, effective5; X/Y both enter Reincarnation in one complete entry checkpoint, Z remains WAITING at4. Preserve history/progress and route separation. Never subtract the effective6 into a separate fixed5 record value, advance counts, force top1 or omit owners without a modifier. A later contribution removal yields effective3 and re-evaluates Z under its new checkpoint.
+**Layers Under Test:** E.16 §30.2, REC-001/004/020, world-ledger/Cost/required lifecycle checkpoint.
+
+## M-127 — Base Floor, Atomic Cost, Battle Lifetime and Replay
+
+**ID:** `M-127`
+**Status:** `MUST_PASS`
+**Initial State:** base2; required25AE/HP50%MaxHP; MaxHP500.
+**Expected Resolution:** with CurrentHP251 and sufficient AE, full payment leaves1HP and base becomes1. With CurrentHP250, required nonlethal payment fails with no AE/HP debit or base change. Base1 rejects before payment even if live+2 makes effective3. Multiple owners on either Side reduce the same current base without lost updates; owner Death/LEAVE/redeploy does not restore it. Duplicate delivery/save-resume reuses committed payment/write/checkpoint outcomes. A stale invalid post-Cost Effect follows local failure without refund/retry; it cannot write below floor. Battle end retires the base, and a fresh ordinary battle initializes4.
+**Forbidden Outcomes:** Side-local base, source cleanup reset, payment at known floor, fake HP Damage, partial Cost, duplicate subtraction or old battle-base leakage.
+**Layers Under Test:** CST-001/003, REC-001, existing Transaction/world ledger/replay.
+
+## M-128 — Coherent Base, Presence and Original Death-cohort Membership
+
+**ID:** `M-128`
+**Status:** `MUST_PASS`
+**Input:** one legally authored protected world checkpoint includes base3→2, contribution removal and an original qualifying Death Cohort of size2. Old waiting entries have progress0; new cohort members are also eligible ordinary lives.
+**Expected Resolution:** advance only old entries0→2, derive final effective2 once and transition every eligible old entry. New cohort members start0 and never advance one another. Ordinary queued Revive/continuation cannot observe intermediate threshold/progress/partial transitions. A separately committed later transaction is a separate checkpoint, rather than being coalesced. Replay preserves original old/new membership and terminal outcomes.
+**Reject controls:** negative/noninteger reduction, floor0, owner-presence or Side scope, missing Cost/admission binding, progress writes, callbacks, partial all-entry settlement and guessed exceptional waiting policy.
+**Layers Under Test:** E.16 validation, REC-001/004/020, existing required world checkpoint and protected transaction.
+
+## M-129 — Complete Reincarnation Entrants Without a New Death Cohort
+
+**ID:** `M-129`
+**Status:** `MUST_PASS`
+**Initial State:** three old waiting lives from different death cohorts qualify together after base reduction; the routing profile has scarce eligible empty hosts across multiple live owners.
+**Expected Resolution:** build one complete eligible entry set from the threshold result, one checkpoint/profile seeded permutation and finite route graphs. Host selection uses the current allowed pool per entrant; later entries see earlier commits. Reordering Entity/Slot/Event/list enumeration with the same seed preserves logical order/draws/outcomes. Do not substitute the last death cohort, invoke Thespis's owner-death gate or draw independent per-owner entrant orders. A later entrant belongs to a later checkpoint.
+**Layers Under Test:** E.16 §30.3, REC-006, lifecycle-result/Snapshot/RNG/route owners.
+
+## M-130 — Current Router Availability, Fixed Side and Re-entered Blocker
+
+**ID:** `M-130`
+**Status:** `MUST_PASS`
+**Input:** alive/present owners on both Sides, then one owner's leave/death; host bodies persist independently. Test a Luân Hồi Chi Chủ incarnation leave/death and legitimate reentry between checkpoints.
+**Expected Resolution:** with both eligible owner Sides, an entrant uses only hosts matching its death-record Side, even if the other Side alone has an empty host. With only one eligible owner Side, either entrant Side may route there. A selected host retains creation Side; Chân Ngã does not flip it. Absent/dead owner cannot route through its surviving host. Alive/present Chi Chủ blocks either alliance, real leave/death removes blocker and reentry restores it; VFX/non-targetability does not. Current entry read/revalidation owns these decisions, without replaying a stale availability snapshot.
+**Layers Under Test:** REC-006/007, POS-005, relation/death records, current eligibility/reservation.
+
+## M-131 — Uniform Canonical Definition Pool and Fresh Per-entry Reads
+
+**ID:** `M-131`
+**Status:** `MUST_PASS`
+**Initial State:** same-Rank base roster A/B/C/D/E/F/G. A represented in Deck, B active Field, C ordinary waiting, D inhabited host; E is entrant's immediate previous life, F only an older completed life and G unrepresented. F has two FORMs without separate roster registration.
+**Expected Resolution:** frozen pool contains F/G once each, uniform draw. A distinct independently registered roster definition may be its own entry. A successful first route selecting F makes F currently represented and excluded for a later route that rebuilds after commit; the later pool is not a shared stale snapshot. Later mutation cannot rewrite the frozen chosen definition; invalid-before-commit follows failure without redraw. No permanent ban on older completed lives, FORM weighting or rank mismatch.
+**Layers Under Test:** 04§72, P-010–014, REC-006, Definition Registry/representation/identity/Snapshot/RNG.
+
+## M-132 — Failed Route Releases Reservation, Ordinary Exit and Replay Remain Terminal
+
+**ID:** `M-132`
+**Status:** `MUST_PASS`
+**Input:** variants with no host, empty definition pool after host reservation, stale reservation, invalid host and invalid selected definition before commit. Another independently legal route intercept may or may not exist.
+**Expected Resolution:** no partial host binding, release uncommitted reservation, close this route and continue ordinary exit/other legal intercept. No reroll/replacement host/retry token/limbo. Earlier successful entries remain committed; later entry queries current state. Save/resume preserves complete membership/order/selected pool/definition/host and member progress, never binds twice or generates fresh draws from duplicate checkpoint delivery.
+**Reject controls:** partial entrant set, per-owner/Event priority, cyclic graph, unbounded iteration and unrelated competing router families contending for capacity without their actual law.
+**Layers Under Test:** REC-006, route/identity/definition/Transaction/terminal replay and reservation owners.
+
+## M-133 — Definition Acquisition Preserves Host, Fresh State and Explicit Creation Checkpoint
+
+**ID:** `M-133`
+**Status:** `MUST_PASS`
+**Initial State:** empty old host H has HP120/MaxHP400, Rage42/100 and legitimate retained host State. Owner's new kit-cycle quota is UNUSED but blocked by H. Inherited definition has actor-owned counters/cooldowns and entry/battle-start Passives.
+**Expected Resolution:** binding preserves H's body/basis/HP/Rage/retained State, initializes only new actor kit state fresh/default and reads shared world/team state currently. Class changes, Element remains host. Always-on Passive registers; no synthetic entry/battle-start trigger, Heal or Revive. H becoming inhabited removes the empty blocker and closes the explicit current-unused-quota creation checkpoint before dependent next-entry host reads; successful ordinary placement creates one full-HP host using this later cycle's current pre-materialization basis and consumes quota. Failure keeps UNUSED without Slot-freed retry. A consumed quota is never reopened; owner leave/death preserves existing hosts but prohibits new routing while invalid. First-cycle delayed creation control uses its immutable BATTLE_START basis, not current later-cycle stats.
+**Layers Under Test:** P-082/083/084/051, TRG-014, ENT-001–005/008/009, inheritance/State/capability/required local route settlement.
+
+## M-134 — Coordinated Basic Sequence Keeps Root Reaction Window Across Route Changes
+
+**ID:** `M-134`
+**Status:** `MUST_PASS`
+**Initial State:** Ultimate schedule freezes creator, empty H and inhabited J with one seeded permutation; a preceding child/required lifecycle route legitimately binds a new definition into H. New host K appears afterward.
+**Expected Resolution:** when H's child begins, pin its now-current Basic; a later mutation cannot rewrite it. K never joins. Each Basic selects its own Slot/Entity/AoE/random targets and uses its own stat policy; arbitrary secondary behavior settles sequentially with mandatory lifecycle. Ordinary unrelated Reactions triggered by an earlier child wait until the complete root direct sequence is terminal; child-local direct completion cannot flush the root hold. Creator invalidity skips only an unstarted invalid creator child; valid scheduled host children continue with retained attribution, not source substitution. Requested Basic Cost is waived, independent triggered Cost remains under its own law. Direct attribution stays creator, secondary source/Authority stay their exact owners.
+**Layers Under Test:** existing RequestAction/RES-003/06§157, ENT-006/007, TGT-008, REC-006/definition pinning and child provenance. This is composition coverage, not a new global multi-child profile.
 
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 

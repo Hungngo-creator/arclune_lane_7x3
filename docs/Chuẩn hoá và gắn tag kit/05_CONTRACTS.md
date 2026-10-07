@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-07-F.17
+**Version:** 2026-10-07-F.18
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -32,6 +32,8 @@
 **Revision F.16:** extends existing SHP-002/006 with one opt-in recipient exact-family/complement partition: shared remainder cap, separate matched cap and explicit remainder-first proportional depletion. Existing admission, receipts, source lifetimes and prior profiles remain unchanged; no new Contract ID.
 
 **Revision F.17:** extends existing TRG-001/002 and ACT-040 with complete-cohort local settlement and restricted Basic projection/frozen binding. Existing cohort/world-law, attribution, target binding, State/Spawn/clock/Shield and unprofiled behavior remain unchanged; no new Contract ID or global priority.
+
+**Revision F.18:** extends only existing REC-001/006 with battle-base threshold mutation and complete-entry local route settlement; aligns existing Pygmalion ENT clauses with clarified quota/body/coordination policies. Other laws/IDs remain intact; no new Tag, Primitive, subsystem or global priority.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -4510,7 +4512,8 @@ Deaths from both Sides can count.
 
 ```text
 effectiveThreshold = baseWaitingThreshold + sum(active admitted contributions)
-baseWaitingThreshold = 4 for the ordinary policy
+baseWaitingThreshold initially = 4 for the ordinary policy
+                     then the current admitted battle-ledger base
 eligible(record) = record.state is WAITING
                    and record.laterDeathCount >= effectiveThreshold
 ```
@@ -4525,9 +4528,15 @@ This is a threshold predicate over all waiting entries, not an oldest2/4 quota. 
 
 Protect the presence/registration revision, ledger/progress read set, threshold decision and transition identity through the existing transaction/required world checkpoint. Do not expose final presence with stale revive-eligibility or a partial waiting-pool decision to ordinary observers. Resume/redelivery reuses terminal checkpoint/record identities, never re-removes a contribution or advances a cohort twice. Retire a contribution's index at the owning presence end and terminal work at the existing replay horizon; retain immutable origin/checkpoint evidence.
 
-With no active contributions, the ordinary effective threshold remains4. Ordinary waiting entries from Characters without their own modifier still use the current World-ledger contributions. This profile does not silently override a separate explicit waiting-window/Authority/retention rule: compose only under its actual compatible law, otherwise reject executable ambiguity. No new Authority tier, Primitive, runtime subsystem, callback or global Reaction priority is inferred.
+With no active contributions, the ordinary effective threshold equals the current base; without admitted base mutation it remains4. Ordinary waiting entries from Characters without their own modifier still use the current World-ledger contributions. This profile does not silently override a separate explicit waiting-window/Authority/retention rule: compose only under its actual compatible law, otherwise reject executable ambiguity. No new Authority tier, Primitive, runtime subsystem, callback or global Reaction priority is inferred.
 
----
+### Opt-in battle-base reduction
+
+04§30.2 writes the current battle-global base in the same World ledger, not a Side's window or a source-presence contribution. Required admission reads base above the authored floor before payment; validate/pay required Cost atomically under CST, then execute the bounded reduction under ordinary Effect validity. At application, revalidate current base above floor, subtract the declared positive amount and clamp at the declared positive floor. No-headroom/invalid input fails locally rather than increasing the base. A stale/invalid post-Cost branch follows existing local failure, no refund/retry; no direct mutation of already-computed effective threshold or waiting progress.
+
+The protected write, resulting live contribution view and all-entry threshold decision form one coherent required world-law checkpoint. Preserve laterDeathCount/history and transition every eligible waiting entry; increased/changed live modifiers cannot be bypassed. REC-004 old/new cohort membership and REC-020 before-ordinary-Revive ordering remain intact, including a base change without death. A same-checkpoint cohort/presence/base write uses their final coherent view, not irreversible intermediate decisions.
+
+Each base write is keyed by originating Effect/transaction terminal identity, persists until battle end and is independent of source death/leave/Side. Separate successful writes from multiple owners compose on the current base without lost updates. Serialize ledger base/revision and committed operation/checkpoint identities with existing waiting outcomes; resume cannot subtract twice. No new ledger, per-record count, Authority tier or global priority is introduced.
 
 ## REC-002 — What Counts as a Qualifying Death
 **Status:** `LOCKED DEFAULT FROM PROJECT RULE`
@@ -4621,14 +4630,20 @@ A route may:
 - select presentation;
 subject to its own rules.
 
----
+### Opt-in complete-entry local settlement
+
+04§30.3 binds one immutable complete Reincarnation-entry checkpoint set, one profile-scoped candidate and one deterministic seeded permutation across its eligible entrants. These are entering lives, not necessarily members of the death cohort that caused a threshold change. Repeated publication and different Entity/Slot/list enumeration cannot create different membership/order or a second candidate. The profile's multiple owners share this order; it supplies no global route priority.
+
+Each entry reads current declared owner/Side/host eligibility after the previous entry is terminal, selects/reserves a host under its authored seeded rule, freezes the full eligible definition pool and one draw, then validates and commits binding/materialization. Preserve selection/pool snapshots through replay. Never import transient candidate-source state or manufacture a field-entry event. Host/True Self reservation and definition/capability/body updates share their existing protected commit.
+
+Close route work, mandatory lifecycle and declared required local settlements before the next dependent entry. No available host, empty pool or stale selected host/definition/reservation closes a local failed route, releases only uncommitted reservations and continues ordinary exit/another separately legal intercept. No reroll, alternate host, wait token or rollback of prior entries. Competing unrelated route families sharing capacity require their actual law; otherwise reject the affected executable composition.
 
 ## REC-007 — Pygmalion Route
 **Status:** `LOCKED CURRENT CHARACTER DIRECTION`
 
 An eligible Chân Ngã entering Reincarnation may route into an eligible empty Pygmalion Puppet when the route is not blocked by Luân Hồi Chi Chủ and other eligibility rules.
 
-The Puppet route does not ordinary-Revive the prior body.
+The Puppet route does not ordinary-Revive the prior body. Its Q4–Q7 policies are declared in Pygmalion Clarified Canon: router alive/Field Present; fixed host creation Side; both eligible owner Sides restrict by entrant death-record Side, one owner Side accepts either; alive/present Luân Hồi Chi Chủ blocks regardless of alliance. Use 04§30.3's complete-entry settlement, current EMPTY host reservation, uniform canonical same-Rank definition pool and exact current-representation/immediate-previous-life exclusions. Failed routes follow REC-006 without reroll/limbo.
 
 ---
 
@@ -4660,12 +4675,14 @@ quotaKey = CREATE_PUPPET
 max = 1
 ```
 
+UNUSED becomes CONSUMED only with successful materialization; failed/stale placement keeps it unused. A live EMPTY owned Puppet blocks creation; an INHABITED one does not. Successful owner Revive starts a fresh kit-cycle marker independent of ordinary lifeSerial; missed quotas do not accumulate. Entry/new-cycle/empty-blocker-removal or inheritance are explicit creation checkpoints, while a freed Slot alone is not a retry. Binding Chân Ngã never reopens consumed quota.
+
 ---
 
 ## ENT-002 — Old Puppets Persist
 **Status:** `LOCKED`
 
-Puppets from previous Pygmalion Life Cycles persist independently until they themselves are removed.
+Puppets from previous Pygmalion Life Cycles persist independently until they themselves are removed. Owner Death, Revive and non-death LEAVE_FIELD do not despawn them; absence/death still disables new routing through that owner.
 
 Therefore:
 - multiple Puppets may coexist;
@@ -4687,6 +4704,8 @@ At creation, current known rules include:
 - non-rank-multiplied stats currently 0;
 - cultivation same as Pygmalion.
 
+First-kit-cycle basis is immutable BATTLE_START after authoritative static roster initialization, retained even for delayed creation. Later kit cycles use current authoritative creator basis immediately before successful materialization. New bodies start full HP, with no later creator stat link. Placement uses ordinary Mode Puppet law.
+
 These are Character data, not global Summon rules.
 
 ---
@@ -4699,6 +4718,8 @@ When inhabited:
 - host Puppet stat basis remains its own unless inheritance policy says otherwise;
 - Presentation can remain Puppet;
 - inherited kit may modify current stats through its own effects.
+
+Pygmalion preserves current HP/Rage, MaxRage100 and legitimate host States under their retention rules. Newly required actor-owned kit state starts fresh/default; shared team/world state is read currently, never reset. Register inherited Passive behavior immediately without replaying BATTLE_START/ENTER_FIELD/DEPLOY_FROM_DECK. Definition acquisition is not Heal, Revive or redeployment.
 
 ---
 
@@ -4720,6 +4741,8 @@ If host Puppet has no explicit Element yet, this only means:
 If a Puppet scheduled to perform Pygmalion Ultimate follow-up dies before its follow-up:
 - no Action occurs;
 - no replacement Puppet is selected.
+
+At Ultimate start freeze eligible Puppet identities plus Pygmalion and one local seeded permutation across all scheduled actors. Each sequential real non-Natural Basic pins its current definition at its own child start and uses its own targeting/stat/Authority policy. Waive only the requested Basic Cost. Under root RES-003 AFTER_DIRECT_EFFECTS_COMPLETE, hold ordinary unrelated Reactions until all scheduled children and required local settlements are terminal; mandatory lifecycle closes between children. Child-local completion does not release the still-open root direct sequence. No common target, pure simultaneous-Damage flattening or self-first priority. Once scheduled, a valid Puppet child does not require Pygmalion to remain alive/present; skip invalid sources without replacement, preserve earlier results.
 
 ---
 

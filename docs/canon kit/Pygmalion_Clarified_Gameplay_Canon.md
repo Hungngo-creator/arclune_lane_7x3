@@ -1,164 +1,231 @@
 # ARCLUNE — PYGMALION — CLARIFIED GAMEPLAY CANON
 
-**Revision:** R0.
-**Status:** PARTIALLY_CLARIFIED / NORMALIZATION_BLOCKED_BY_GAMEPLAY_DECISIONS.
-**Source:** `26) Pygmalion` in root `Ý tưởng nhân vật 4.md`, from Passive through the text before `27) Galatea`. Existing explicit Pygmalion locks in 00§18, ENT-001–010, REV-003, REC-001–007/020 and the G-series obligations supersede older unresolved/example shorthand on those exact points. Suggestions embedded in raw prose are not independently designer locks.
+**Revision:** R1.
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED.
+**Source:** `26) Pygmalion` in root `Ý tưởng nhân vật 4.md`; latest explicit **PYGMALION Q1–Q10 FINAL DESIGNER LOCK** replaces all ten R0 questions/proposals and conflicting raw shorthand. Existing non-superseded PUPPET/Revive/attribution locks remain applicable.
 
-## 1. Character and identity boundaries
+## 1. Character, actor and lifetime boundaries
 
-Pygmalion creates Puppet bodies awaiting Chân Ngã. A Chân Ngã reaching Reincarnation can inhabit an eligible empty Puppet and receive a constrained random Combat Definition. This is full-kit behavior inheritance under a host policy, rather than Thespis's restricted damage-only Role projection.
+Pygmalion creates Puppet bodies awaiting Chân Ngã. A Chân Ngã entering Reincarnation may inhabit an eligible empty Puppet and receive a constrained random full Combat Definition. Body, Chân Ngã, inherited behavior, actor and attribution remain separate.
 
-Puppet is **entityKind=PUPPET**, distinct from SUMMON. Summon-only targeting, bonuses, lifecycle or cleanup do not apply automatically. Each Puppet is an independent actor with its own identity, stats, resources, presence and lifecycle. One Puppet hosts at most one Chân Ngã; one Chân Ngã cannot simultaneously occupy two hosts. Ownership does not make the Puppet Pygmalion's own body or give it his Chân Ngã.
+Puppet is **entityKind=PUPPET**, distinct from SUMMON. Summon-only targeting, bonuses, death listeners and owner-cleanup do not apply automatically. Each Puppet has independent identity, host basis, current stats/resources, State, presence and lifecycle. One Puppet hosts at most one Chân Ngã; a Chân Ngã cannot occupy two active hosts simultaneously.
 
-Pygmalion's Rank/Class/Element/full stat budget/Base Deployment Cost are not specified by this raw entry. Do not infer UR from the note about making simpler UR definitions for the pool. Host Element and empty-Puppet Class remain unspecified profile metadata; inherited Class/Element policy is already locked in §4.
+Pygmalion Death, Revive or actual non-death **LEAVE_FIELD does not automatically remove already-created Puppets**. They survive until their own lifecycle removes them. Multiple old/inhabited Puppets may coexist; there is no authored live-cap1. Creation quota, live empty-host blocker and existing host ownership are different things.
+
+Pygmalion Rank/Class/native Element/full budget/Base Deployment Cost and empty-host Class/Element remain unspecified metadata. Do not infer UR from the note about making simpler UR definitions for the lottery. Full-kit Class/Element inheritance is nevertheless explicitly settled in §5.
 
 ## 2. Passive — A Masterpiece Awaiting a Soul / Kiệt Tác Chờ Một Linh Hồn
 
-### 2.1 Creation quota and independent old bodies
+### 2.1 One new-Puppet quota per kit Life Cycle
 
-Field entry can create one new Puppet, subject to the kit's creation conditions and legal materialization. Each Pygmalion **Life Cycle has at most one new-Puppet quota**. Receiving a Chân Ngã does not reopen a consumed quota in that same cycle. Pygmalion DEATH_CONFIRMED followed by successful Revive starts another kit creation cycle. Ordinary Revive still preserves trueSelfId/lifeSerial under REV-003: the quota cycle marker is not an implicit lifeSerial increment.
+Each Pygmalion kit Life Cycle owns exactly one maximum creation allowance, **UNUSED → CONSUMED only on successful materialization**. Pygmalion DEATH_CONFIRMED followed by successful Revive starts a new kit cycle with UNUSED quota. Ordinary Revive retains trueSelfId/lifeSerial under REV-003; kit cycle serial is a separate quota-generation marker.
 
-Old Puppets continue independently until their own removal. Multiple Puppets and multiple inhabited Puppets can coexist. There is no authored total live-Puppet cap1 and no singleton `activePuppet`. Pygmalion's confirmed death does not itself kill/despawn either empty or inhabited Puppets.
+Any currently live/materialized **EMPTY** Puppet owned by that Pygmalion blocks new creation. INHABITED bodies do not block. An empty body that died/disappeared does not block. Never use “any Puppet exists” or a singleton as the condition.
 
-Raw additionally delays creation after Revive while an old Puppet remains uninhabited, then permits creation when that body receives a Chân Ngã if the current cycle is still eligible. The exact blocker set, dead-empty-body case, unused-cycle carry and materialization-failure law are **UNRESOLVED Q2/Q3**. Preserve that specific gate without turning all existing Puppets into blockers or treating inheritance as a same-cycle quota reset. Entry/redeploy alone does not authorize a second quota in the same cycle.
+If a live empty old body survives owner Revive, defer the current unused quota. When that body becomes inhabited or is actually removed/dies, attempt current-cycle creation if the quota remains UNUSED and ordinary source/materialization legality permits it. Receiving Chân Ngã never reopens CONSUMED quota. Missed earlier cycles supply no stored extra allowances.
 
-### 2.2 Host stat and resource basis
+Explicit creation checkpoints include current-unused-quota ENTER_FIELD, successful Revive/new kit cycle, and removal/inheritance of an old live empty blocker. Redeploy/entry without a new kit cycle does not reset consumed quota. Duplicate checkpoint delivery cannot create another host.
 
-Known creation rules:
+### 2.2 First basis versus later bases
 
-| Host field | Authored rule |
+For the **first Puppet of Pygmalion's first kit Life Cycle**, capture one immutable creator basis at **BATTLE_START**, after authoritative roster/rank/cultivation/static pre-battle initialization and before combat Actions/temporary in-battle effects. The first-cycle Puppet uses that same basis even if actual creation is delayed. Failed first-cycle materialization does not replace it with current combat stats.
+
+For Puppets of **later kit Life Cycles**, snapshot Pygmalion's current authoritative declared basis **immediately before successful materialization**. No live link afterward. Temporary modifiers genuinely present in those later current stats affect that snapshot; unrelated Buff/State objects are not copied.
+
+| Host field | Initialization |
 | --- | --- |
 | Rank | Same as Pygmalion |
 | Cultivation / tu vi | Same as Pygmalion |
-| Rank-multiplied stats | 80% of the declared Pygmalion snapshot |
-| Non-rank-multiplied stats | 0, subject to separately explicit resource/metadata fields rather than erasing those fields |
-| Initial Rage | 0 |
-| Initial Rage maximum | 100 |
+| Rank-multiplied stats | 80% of the applicable immutable creator basis |
+| Non-rank-multiplied stats | 0; separately explicit resources/metadata retain their own declared initialization |
+| CurrentHP | Initialized MaxHP: full HP |
+| Current Rage | 0 |
+| Max Rage | 100 |
 
-The basis is a snapshot, not a live stat link. Later Pygmalion stat changes do not update an existing Puppet. A new Puppet uses its own declared creation snapshot; inheritance does not replace that host basis with the random Character's roster budget. The inherited kit may modify the Puppet's current stats through its own legitimate effects.
+Snapshot only the declared host basis. Later creator changes and random inherited roster budgets do not update/replace it. The Puppet's own legitimate kit modifiers can affect current stats afterward. The rank-scaling field registry/numeric budget is separate metadata.
 
-The first Puppet's raw battle-start snapshot wording versus later creation-current snapshot, the precise initialization checkpoint and initial CurrentHP are **UNRESOLVED Q2**. Numeric budget and the canonical rank-scaling field registry are separate metadata; do not derive them from old implementation tables.
+### 2.3 Placement, failure and quota commit
 
-### 2.3 Empty Puppet definition
+Use **ordinary Mode Puppet placement**, without Character-specific Slot geometry. Protect source/current-cycle eligibility, absence of live empty blockers, intended placement, initialized behavior/basis and quota through ordinary materialization.
 
-An empty Puppet has its own minimal Combat Definition; it does not have “no kit”. It receives SSI Natural Action opportunities and normally uses its own Basic. Raw describes `100% WIL/ATK` of the Puppet; the exact component/hit profile is **UNRESOLVED Q1**, rather than silently converting slash shorthand into a typed formula.
+No legal Slot, stale placement or failed materialization means **no Puppet and quota stays UNUSED**. Success atomically materializes a complete body and consumes its one quota; no half-body or consumed allowance on failure.
 
-Its minimal Ultimate pays Rage and performs an unenhanced Basic, without additional damage amplification. The real-child versus profile-only Basic identity is **UNRESOLVED Q1**. Its Skill availability remains minimal until inheritance; no borrowed Character's Skill exists beforehand.
+No pending wait-for-Slot or background retry token. Simply freeing a Slot is not a creation event. Only a later explicit creation checkpoint may attempt the still-unused current quota. Technical replay cannot convert one failed attempt into an unrequested later success.
 
-## 3. Reincarnation routing and definition pool
+## 3. Empty Puppet Combat Definition
 
-Entry condition is a Chân Ngã **leaving waiting and entering Reincarnation**, not HP_ZERO, initial Death, ordinary Revive or waiting-entry creation. REC-001/004/020 still governs progress, simultaneous Death Cohorts and closure before ordinary queued Revive. Routing is distinct from that transition, host reservation, definition selection and materialization. It never ordinary-Revives the previous body.
+An empty body has a minimal own definition, SSI Natural Action + Basic, no inherited Skills yet, and its own MaxRage100 pool.
 
-Raw permits Chân Ngã from either Side. With two Pygmalions on the field, it assigns the Chân Ngã to a Puppet of its Side. Luân Hồi Chi Chủ's field incarnation blocks the Puppet route regardless of alliance. Exact route-owner availability, Side assignment/anchor, non-death leave and blocker checkpoint are **UNRESOLVED Q4**; owner death does not by itself remove surviving bodies.
+Its Basic is one attack/one hit with two components:
 
-Select a random Combat Definition with **Rank equal to the host Puppet's Rank** from a Definition pool, rather than a battlefield Entity pool. Declared exclusions:
+- **PHYSICAL =100% ATK**;
+- **WILL =100% WIL**.
 
-- Characters already in the battle's Decks, on the field or represented by Chân Ngã currently waiting;
-- the routed Chân Ngã's previous-life Character definition.
+One enemy, default **POSITION/SLOT** binding under TGT-008; no secondary Effect. Two components are not two hits.
 
-A Character whose life already entered Reincarnation is not excluded merely for having existed earlier, but previous-life exclusion still applies. Exact current-membership versus history semantics, definition identity/FORM scope, pool freeze/update checkpoint and weighting are **UNRESOLVED Q6**.
+Its legal Ultimate follows ordinary Rage Cost/readiness: root identity **ULTIMATE**, then exactly one real **BASIC_ATTACK** child, **non-Natural**, using its current Basic without coefficient increase/amplification. Root and child identities remain distinct. Generic non-Natural resource-gain law applies; no invented Rage autocast or SSI opportunity.
 
-Every random draw uses deterministic seeded RNG and a fully filtered eligible set under RNG-001/002. No Entity/Slot/list/Event order is an authored winner. Shared-capacity routing of multiple entrants, reservation failure, empty pool, missing host and whether any route waits/retries are **UNRESOLVED Q5**. Do not invent a competing-router priority or a route that succeeds with an unsupported/absent definition.
+## 4. Pygmalion Reincarnation route
 
-## 4. Inhabited Puppet and full-kit inheritance
+### 4.1 Checkpoint, owner availability and Side
 
-The routed **Chân Ngã remains that Chân Ngã**; the random kit's author identity does not replace it. Reincarnation/new-life transition uses its actual identity policy, distinct from ordinary Revive. Body Rank/cultivation/host stat basis remain host-owned. Do not clone a Character instance or the deceased actor's live temporary state.
+Routing occurs when a Chân Ngã leaves waiting and **enters Reincarnation**. It is not initial Death, ordinary Revive, waiting creation or revival of the previous body. Existing World waiting/Death Cohort/Revive race remains REC-001/004/020.
 
-Known inheritance dimensions:
+A router requires its owning Pygmalion **ALIVE AND Field Present in the routing Combat Instance**. A surviving empty Puppet with absent/dead owner cannot newly receive Chân Ngã through that router.
 
-- use the random Combat Definition's Basic, Skills, Ultimate, Passive behavior and explicitly authored clauses;
-- **Effective Class is inherited** from that definition;
-- **Element is not inherited** from that definition; retain the host's own Element profile;
-- preserve Puppet body appearance; inherited action motion, effects and voice follow the kit as raw explicitly describes;
-- preserve host stat basis; kit-authored subsequent scaling/modifiers remain legitimate;
-- rebuild capabilities for the receiving actor's current definition; each attack resolves its own exact-owner target binding under TGT-008.
+A Puppet keeps the creator's Side at its creation. Incoming Chân Ngã does not flip it.
 
-Pygmalion's Rank, lore or ownership grants no extra Authority. Inherited explicit clauses retain their own declared semantics/Adjudication Owner profile; Damage Attribution is a separate axis. Full behavior inheritance must not be reduced to a damage-only projection or converted into foreign live-Ability invocation.
+Build eligible Pygmalion owners under that availability rule. If owners are present on **both opposing Sides**, use only hosts of an owner whose Side matches the entrant's **death-record Side**. If eligible owners exist on **only one Side**, its router can accept entrants from either Side. Host scarcity does not silently redefine the two-Side owner rule; then select among currently eligible hosts within its allowed owner/Side scope.
 
-Rage/HP retention at binding, inherited cooldown/counter/resource initialization, passive registration versus entry-style activation and treatment of existing host States are **UNRESOLVED Q7**. Binding a definition to an already-present Puppet is not an ENTER_FIELD transition; an authored initialization activation would need its own semantics.
+### 4.2 Luân Hồi Chi Chủ blocker
 
-## 5. Death and ordinary Revive
+A Luân Hồi Chi Chủ incarnation **ALIVE AND Field Present in that Combat Instance** blocks this routing regardless of alliance. Confirmed death or true field leave removes the blocker; a legitimate later field reentry restores it. VFX absence/non-targetability is not LEAVE_FIELD. Ordinary presence/lifecycle provides the authoritative view.
 
-**Empty Puppet:** raw explicitly uses DEATH_CONFIRMED; the body disappears. With no Chân Ngã it creates no Luân Hồi waiting entry and cannot ordinary-Revive. A distinct Puppet-death listener may observe that confirmed death, but it is not a Summon death or a qualifying Chân Ngã death merely because the body was created by Pygmalion. Death and non-death removal causes remain distinct.
+### 4.3 Complete entrant set and local permutation
 
-**Inhabited Puppet:** DEATH_CONFIRMED removes active body presence and creates ordinary waiting for its hosted Chân Ngã. Preserve the Puppet-life host relation and inherited Combat Definition in the death/Revive record. Before the Chân Ngã enters Reincarnation, eligible ordinary Revive can rematerialize **the same Puppet-life, same trueSelfId, same lifeSerial and same inherited definition**. Do not randomize another kit or host on ordinary Revive.
+If multiple Chân Ngã reach this routing checkpoint together, form the **complete eligible entrant set** and bind **one deterministic seeded permutation local to this checkpoint**. Process entries in that frozen order. Entity/Slot/Event/list order supplies no gameplay priority. This is not a global Reincarnation/Reaction priority or Thespis's death-entry order.
 
-After that Chân Ngã enters Reincarnation, ordinary Revive of the old Puppet-life is invalid. A later legitimate route can inhabit another eligible host as a new life. The inherited kit may author self-Revive under these same identity/lifecycle gates.
+For each entrant:
 
-Revive retains/restores the host stat basis, with subsequent current-stat retention governed by the inherited kit's actual restoration/scaling rules. It does not re-snapshot the current creator or replace the basis with the inherited Character's budget. Generic Revive position/HP/State/resource restoration and target-kit rules apply; this Canon does not invent a universal revive percentage or full resource reset.
+1. Query current eligible EMPTY Puppets under §§4.1–4.2.
+2. Seeded RANDOM select one eligible host.
+3. Reserve that host.
+4. Build/freeze its exact Definition pool under §4.4.
+5. Make one seeded uniform definition draw and freeze the selection.
+6. Validate and commit identity/definition binding and any required materialization.
 
-## 6. Pygmalion Actions
+Later entrants read the world after earlier route commits. Reservations prohibit double-binding a host or True Self; body/identity/definition/capability changes share a coherent protected commit. A host already on the field does not acquire a synthetic field-entry transition.
 
-### 6.1 Own Basic
+No host, empty definition pool, stale reservation, invalid selected host or invalid selected definition means **local route failure**. Release uncommitted reservation; **no reroll, replacement host or retry token**. The entrant continues ordinary Reincarnation exit unless another separately legal kit/system intercepts it. Do not hold it in limbo. This kit-local rule grants no priority over independent routers without their actual governing law.
 
-The entry does not author a standalone Pygmalion Basic formula/profile. Its Ultimate requests his Basic, making **Q1 an internal gameplay decision** rather than just missing numeric roster metadata.
+### 4.4 Uniform base-roster lottery and exact exclusions
 
-### 6.2 Skill1 — Chisel Away the Afterlife / Đục Mòn Cõi Luân Hồi
+Use canonical roster/base **Character Definition identity**, with candidate **Rank = selected Puppet Rank**, and **UNIFORM** weighting among every eligible candidate. FORM is not another lottery entry; only an independently registered roster Character Definition is independent.
 
-Required Cost: **25 Side AE + HP Cost requested50% Pygmalion MaxHP**. Check the affected waiting-window value **>1 before payment**; validate all required Costs before their atomic commit, then apply the declared **window−1**, with floor1. Window1 makes this Skill inadmissible: no payment-first failure.
+At that route's pool checkpoint, exclude definitions currently represented anywhere in either Side's:
 
-The HP debit is Cost, not Damage/HP Loss: no Shield absorption, Reflect, Lifesteal or ordinary Damage trigger. No lethal override is explicit in raw. Consequently current CST-001/003's required-payment and nonlethal minimum1HP defaults govern; do not silently make lethal payment or successful shortfall merely because the design says payment makes him die sooner. If full requested HP/AE cannot be paid under that law, the required group fails without either debit or the window effect.
+- Deck;
+- active Field;
+- current ordinary waiting entries;
+- inhabited Puppet/current inherited kit.
 
-Window owner/scope, base versus effective value, duration/stacking across casts/owners and interaction with live Nephthys contributions are **UNRESOLVED Q8**. Do not approximate threshold reduction by adding per-record death progress or force-entering selected entries; those are different observable mechanics.
+Also exclude the entrant's **IMMEDIATELY PREVIOUS LIFE Character Definition**. Older lives are not permanently banned. A completed-Reincarnation life with no current Deck/Field/waiting/inhabited representation may be eligible again; mere archived history does not create membership.
 
-### 6.3 Skill2 — Carve the Imperfect / Khắc Gọt Kẻ Bất Toàn
+Build/filter full pool → freeze candidate set → uniform seeded draw → freeze chosen definition → protected route commit. No hidden reroll after invalidation. Later routes rebuild after earlier commits: a newly inhabited definition can exclude that same candidate from the next route.
 
-Required Cost: **20 Side AE**, paid before damage. Target: one enemy. Authored damage coefficients: **130% WIL +150% ATK**; typed components/hit profile are **UNRESOLVED Q1**.
+## 5. Full-kit binding without body/state cloning
 
-At paid activation, self defense increases by the authored **15% ARM and7% RES**, before the attack resolves. The benefit lasts through the end of Pygmalion's **next Natural Action**, excluding the granting Natural Action as demonstrated in raw, and ends before the following global TURN_BOUNDARY. It is not a global-turn duration; non-Natural actions do not decrement it. Ordinary CLK-003 counts a CC-consumed opportunity unless explicitly overridden.
+The routed Chân Ngã remains that Chân Ngã, distinct from the lottery definition's original author identity. Reincarnation/new life follows its identity transition; ordinary Revive does not masquerade as that transition.
 
-Relative versus percentage-point change and reapplication/stack/refresh behavior are **UNRESOLVED Q9**. Do not select stat semantics from old implementation representation or allow repeated application to create undeclared permanent growth.
+Preserve Puppet body/appearance, host MaxHP/stat basis, **CurrentHP**, **Current Rage**, **Max Rage100** and legitimate existing host States under their own retention rules. Receiving a kit is **not Heal, Revive, ENTER_FIELD, DEPLOY_FROM_DECK or BATTLE_START**.
 
-### 6.4 Ultimate — At My Gesture, Every Form Moves / Theo Một Cử Chỉ, Vạn Hình Chuyển Động
+Use inherited Basic/Skills/Ultimate/Passive/explicit clauses. **Effective Class is inherited; Element is not**: keep the host Element profile. Inherited action motion/effects/voice follow raw; appearance remains Puppet. Subsequent kit-authored stat/Rage-limit/resource modifications may operate normally; preserving initialization does not prevent those effects.
 
-Pygmalion and his valid Puppets perform one current Basic each. Snapshot the eligible Puppet identities **when Ultimate begins**. New Puppets created later do not enter that list. A listed Puppet invalid/dead before its execution does not attack and is not replaced; no transferring its request to another Puppet/Slot.
+New actor-owned definition state—counters, cooldowns, charges, private resources, battle-use allowances and other required fields—starts at ordinary fresh/default values for **this Puppet**. Import no historical live values from the previous corpse, roster author or another instance. Shared world/team state is read currently and is not reset.
 
-Each Puppet request uses its own **current Basic as a real BASIC_ATTACK Follow-up**, non-Natural, consuming no SSI opportunity. The generic non-Natural default grants no class Action AE/Rage merely for acting; explicitly kit-authored effects/resource operations keep their own semantics. Existing 04§47 specifies waived child Cost for these Puppet requests; this does not rewrite the inherited Basic's base cost.
+Register inherited Passive behavior immediately. Always-on/current-condition rules can function from that point. Do not replay entry/deployment/battle-start triggers unless that kit explicitly supports definition-acquisition/Reincarnation activation; emit no synthetic event.
 
-For those Puppet Follow-ups:
+Binding and capability rebuild belong to the receiving actor. Each attack independently preserves its own authored pattern/binding/checkpoints. Full kit does not turn into Character cloning or Thespis's restricted Basic projection. Rank/lore/creator ownership grants no extra Authority; exact inherited clauses retain their declared Adjudication Owner profiles.
 
-| Axis | Meaning |
+## 6. Puppet Death and ordinary Revive
+
+**Empty Puppet:** raw-authored DEATH_CONFIRMED removes the body, without Chân Ngã waiting/counting or ordinary Revive entitlement. It may satisfy a Puppet-death listener; it is not Summon death merely because the actor was created. Removing an empty blocker exposes only a currently unused owner quota under §2.
+
+**Inhabited Puppet:** DEATH_CONFIRMED removes active body presence and creates ordinary waiting for its hosted Chân Ngã. Preserve host relation, basis and inherited definition in the death/Revive record. Before Reincarnation, eligible ordinary Revive restores **same Puppet-life, same trueSelfId, same lifeSerial, same inherited definition**. No random rerouting/new kit/new creator snapshot.
+
+After that Chân Ngã enters Reincarnation, old Puppet-life ordinary Revive is invalid. A later legitimate route may inhabit another host/new life. Inherited self-Revive follows its actual eligibility/restore law. Current-stat retention and resources/HP/position restoration follow the target kit and generic Revive policy, not an invented universal percentage/reset.
+
+Owner death/leave remains independent of these Puppet terminal causes.
+
+## 7. Pygmalion Actions
+
+### 7.1 Own Basic
+
+One enemy, one attack/one hit: **PHYSICAL100% ATK + WILL100% WIL**, no secondary Effect. Ordinary TGT-008 POSITION/SLOT default.
+
+### 7.2 Skill1 — Chisel Away the Afterlife / Đục Mòn Cõi Luân Hồi
+
+Required **25 Side AE + requested HP Cost50% Pygmalion MaxHP**. Existing required-payment/nonlethal CST-001/003 defaults remain: HP Cost leaves minimum1HP and is not Damage/HP Loss/Shield absorption/Reflect/Lifesteal. No lethal override or successful-shortfall policy is inferred.
+
+Affected value is **BATTLE-GLOBAL BASE Reincarnation waiting threshold**, initially4 unless another explicit global rule changes it. Each successful reduction subtracts1 with **floor1**, persists until battle end and stacks across casts/owners/both Sides.
+
+Admission requires **current base >1 BEFORE payment**, then validate required AE/HP → atomically pay → reduce base. Base1 rejects activation without debit. Generic Cost/failure/Effect admission remains authoritative; no automatic post-payment refund.
+
+Compose with valid live contributions/modifiers **after** the base:
+
+`effectiveThreshold = currentBaseThreshold + validLiveContributions/modifiers`
+
+Example: base4 + Nephthys2 =6; Skill1 gives base3 +2 =5. Do not subtract an already-computed effective value or make a Side-local window.
+
+Base change immediately re-evaluates **ALL current waiting entries** against the coherent effective threshold, preserving death progress/history. Every newly qualified entry proceeds through ordinary Reincarnation/routing; no fake deaths/progress reset/quota/tie winner. Existing complete Death Cohort semantics and mandatory-before-ordinary-Revive boundary remain applicable.
+
+### 7.3 Skill2 — Carve the Imperfect / Khắc Gọt Kẻ Bất Toàn
+
+Required **20 Side AE** before activation. One enemy, **one hit**: **PHYSICAL150% ATK + WILL130% WIL**.
+
+Successful Cost immediately grants one self defense Buff **before Damage**:
+
+- live ARM multiplier **1.15**;
+- live RES multiplier **1.07**.
+
+Exclude the same source-family contribution from its own stat baseline; no recursive stat growth or flat percentage-point interpretation.
+
+One Skill2 defense family per actor. Recast **REPLACE/REFRESH**, no self stacking. Successful refresh wins same-checkpoint old expiry without a transient remove/recreate gap.
+
+The granting Natural Action does not consume new duration. Expire at the end/consumption of the actor's **NEXT Natural Action opportunity**, before following TURN_BOUNDARY. CLK-003 **CC-lost opportunity counts**; non-Natural Actions do not. **DEATH_CONFIRMED or LEAVE_FIELD clears it**; later Revive/redeploy does not restore that old Buff.
+
+### 7.4 Ultimate — At My Gesture, Every Form Moves / Theo Một Cử Chỉ, Vạn Hình Chuyển Động
+
+Ordinary root Ultimate Cost/readiness applies. At Ultimate start freeze eligible owned Puppet **identities**, and schedule one real Basic child for **Pygmalion + every listed Puppet**. New hosts do not join.
+
+Use **one local deterministic seeded permutation across all scheduled actors INCLUDING Pygmalion**. He has no always-first priority. Freeze this order; never replace an invalid/dead scheduled actor.
+
+Execute sequentially as **one local Ultimate direct-action window**:
+
+`validate actor → pin its CURRENT Basic at child start → resolve child and required root-linked/local settlements → mandatory lifecycle → next scheduled child`
+
+Ordinary unrelated Reactions remain held until the entire coordinated direct sequence and every scheduled child are terminal. Mandatory lifecycle is never held. This is a local profile, not a universal multiple-child rule; presentation may animate together.
+
+Each child is **real BASIC_ATTACK, non-Natural**; Puppet children use FOLLOW_UP. Pin the Basic at that child's own start: a legitimate earlier definition change may supply its new Basic, while mutation after pin cannot rewrite the started child.
+
+Each Basic uses **its own authored stat read/snapshot policy at child start** and independently resolves its own selection/pattern/binding/geometry. Ordinary Slot Basic, explicit Entity-tracking, AoE and seeded random Basic retain those meanings. **No common target, Pygmalion target anchor, shared creator stat snapshot or inherited parent binding**.
+
+Waive **only the requested Basic child's own Cost**. Do not waive independent triggered/local-settlement/nested costs unless their exact governing policy says so. Generic non-Natural law grants no class Action AE/Rage merely for executing; explicit kit effects remain legitimate.
+
+After the admitted Ultimate creates the schedule, later Pygmalion invalidity does not cancel already-scheduled valid Puppet children. Skip his own child if he is invalid before it begins. Each remaining Puppet/source branch obeys its own validity; already committed results stay committed.
+
+For Puppet children:
+
+| Axis | Value |
 | --- | --- |
 | Actor | That Puppet |
-| Behavior Source | Its current Combat Definition, inherited when inhabited |
+| Behavior Source | Its pinned current inherited definition, or own minimal definition when empty |
 | Direct attack Damage Attribution | Pygmalion |
-| Inherited secondary Effect source/attribution | Puppet/immediate Effect source unless explicitly overridden |
-| Authority adjudication | Exact clause's declared Adjudication Owner, independently of damage credit |
+| Inherited secondary source/attribution | Immediate Puppet/Effect source unless explicitly overridden |
+| Authority adjudication | Exact inherited clause's declared owner/profile |
 
-Keep the current Basic's secondary behavior. A Bleed/Heal/other secondary node is not stripped because its parent was requested by Ultimate; its provenance is not automatically reassigned to Pygmalion. Child Actions and later secondary outcomes are not made root-owned direct effects merely by sharing rootActionId.
+Retain full Basic secondary behavior; rootActionId does not turn secondary/child results into root-owned direct Effects. Damage credit does not transfer Passive identity or Authority.
 
-The own-Basic child's identity, simultaneous versus ordered execution, actor/target/definition snapshot checkpoints, enemy-target policy and parent-invalidity continuation are **UNRESOLVED Q10**. “Together” is presentation intent, not enough to choose a commit batch/order. Raw's scheduled-child invalidation does not itself select a global Reaction priority.
+## 8. Declarative normalization bindings
 
-## 7. Declarative bindings for the already-determined core
-
-These are bounded Character-owned bindings, not a claim of a fully normalized executable kit. Questions in §8 prevent final Action/routing plans.
-
-| Component | Existing composition |
+| Semantic owner | Tags / resolved facets / existing composition |
 | --- | --- |
-| New host/quota | SpawnEntitySpec/P-051 + lifecycle quota/P-084 + materialization validation/P-085, governing ENT-001–003/020. A cycle marker and independent host refs replace a singleton; quota is State, not a Tag. Join successful protected writes under existing transaction law. Q2/Q3 supplies remaining eligibility/failure values. |
-| Host basis | Snapshot/P-002, explicit whitelist/initialization, SNP-001/002/005. Host basis, current modifiers and resources remain separate. |
-| Route/definition | Separate typed TRUE_SELF_POOL, PUPPET Entity pool and CHARACTER_DEFINITION_POOL. REC-005–007, P-067/P-080/P-082/083 and reservation/materialization owners provide identity/behavior/capability binding. Actual routing and inheritance nodes carry REINCARNATION and COMBAT_DEFINITION_INHERITANCE respectively. No SUMMON capability is inferred. |
-| Inheritance | 04§31 dimensions: preserve host basis/body/Element, inherit Class and full declared behavior. ENT-004/005/009/010 and TGT-008 resolve the receiving actor's policies; no Character clone or broad target exception. |
-| Death/Revive | Ordinary Death/lifecycle/Revive and record retention, REV-003/REC-020/ENT-010. Actual Revive operation may carry REVIVE; receiving a Chân Ngã through routing does not. |
-| Skill1 | CostSpec validates known HP/AE law before activation. The window operation carries REINCARNATION; its exact owner/value/lifetime waits for Q8. Cost alone does not grant RESOURCE_MODIFIER. |
-| Skill2 | Cost→defense State/STAT_MODIFIER→Damage graph. DAMAGE applies to direct Damage nodes; exact component capabilities and State policy await Q1/Q9. |
-| Ultimate | Existing RequestAction/P-001, actor-set Snapshot, independent Basic/FOLLOW_UP identities, waived Puppet child Cost and AttributionSpec/ENT-006/007. Whole-kit secondary capabilities belong to their semantic owners. Q10 supplies local grouping/target/read/continuation values. |
+| Own Basic / Skill2 hit | DAMAGE on that hit, PHYSICAL_DAMAGE/WILL_DAMAGE on matching components; one hit, independent TGT-008 Slot default |
+| Empty definition | Own BASIC_ATTACK and Rage-paid ULTIMATE root → one real non-Natural Basic child; root identity is not a Functional Tag |
+| First creation basis | TRG-014 static participant initialization → P-002 immutable BATTLE_START basis; no field-entry recapture |
+| Creation / quota | P-051 + P-084 joined success under RES-005; independent kit-cycle State marker, current EMPTY blocker, ordinary Mode placement |
+| Current host / owner / Side query | Existing typed Target/Presence/relation/identity filters and current death-record Side; no lore-derived Authority |
+| Reincarnation base reduction | REINCARNATION owner, 04§30.2 → existing world-ledger Effect/System plan/P-021 authorized base-field write/P-066 entry, REC-001/004/020; protected Cost guard, battle lifetime, all-entry re-evaluation |
+| Complete entrant routing | REINCARNATION route owner, 04§30.3 / REC-006/007; checkpoint-local seeded permutation, per-entry current host reservation/definition pool/commit |
+| Full-kit binding | COMBAT_DEFINITION_INHERITANCE, P-082/083 and 04§31 dimension policies; preserve host, fresh new actor state, no synthetic lifecycle events |
+| Skill2 defense State | BUFF on self State, STAT_MODIFIER on ARM/RES contributions, MULTIPLY ARM/RES, RES-007 EXCLUDE_THIS_SOURCE_FAMILY; single-family REPLACE/REFRESH and CLK-003 next consumed opportunity, death/leave cleanup |
+| Coordinated Ultimate | Finite RequestAction expansion over frozen seeded actor list; own child identity/cost/target/snapshot/attribution/Authority; root SEQUENTIAL + AFTER_DIRECT_EFFECTS_COMPLETE under RES-003 |
+| Puppet lifecycle | PUPPET distinct from SUMMON, ENT-008/010, REV-003 and ordinary identity/Revive retention; owner absence does not remove body |
 
-## 8. UNRESOLVED — internal gameplay decisions
+The Ultimate's root-owned window waits for its scheduled child work and required local settlements; child-local completion is not root-window completion. Its independent source validity lets scheduled valid Puppets continue after creator invalidity. Definition, stat-read and target policies bind at each child's own start, rather than at the actor-list snapshot. These are explicit Character declarations on existing Action/Resolution policy fields.
 
-No proposed answer below is a lock. These groups identify exact missing gameplay; they do not claim generic architecture gaps.
+## 9. UNRESOLVED / NOT BLOCKING
 
-| ID | Designer decision required |
-| --- | --- |
-| Q1 | Own Basic; empty Puppet's slash-formula types/hit/targeting; Skill2 types/hit count; minimal Puppet Ultimate's real-Basic identity. |
-| Q2 | First-versus-later creator snapshot checkpoint, full/partial starting HP, placement, unsuccessful spawn/quota and retry law. |
-| Q3 | Which live/dead empty old hosts delay creation; deferred unused current cycle; whether missed cycles accumulate quotas. |
-| Q4 | Puppet survival on non-death owner leave, router owner availability, Side anchor/ownership and the Luân Hồi Chi Chủ blocker on non-death leave. |
-| Q5 | Entrants competing for hosts, local ordering/selection, absent host/definition/invalid reservation and terminal retry/exit behavior. |
-| Q6 | Exact roster definition pool, current exclusion identities/FORM/history and previous-life scope, pool read checkpoint/weighting. |
-| Q7 | HP/Rage/resource/State/cooldown/counter initialization or retention on inheritance; initial Passive activation versus registered ongoing behavior. |
-| Q8 | Skill1's affected waiting-window owner/base/effective value, persistence/repeated reduction, live-contribution composition and all-waiting re-evaluation. |
-| Q9 | Skill2 ARM/RES arithmetic and temporary State reapplication/stacking/refresh/retention. |
-| Q10 | Own real Basic child, grouping/order, per-child definition/source/recipient checkpoints, common versus independent enemy targets and pending children after parent invalidation. |
+Rank/Class/native Element, full numeric budget/Base Deployment Cost, empty-host metadata/rank-scaling registry and future Mode adaptations remain unspecified. They do not reopen Q1–Q10.
 
-Rank/Class/native Element, full numeric budget/Base Deployment Cost, host metadata/stat-scaling registry and future Mode adaptations remain **UNRESOLVED / NOT BLOCKING for clarification**. A future external inherited kit requiring unsupported explicit actor/identity/resource/Authority semantics must be handled when encountered; do not pre-approve callbacks or invent translation. These boundaries do not erase the ten internal groups blocking complete normalization.
+A future external inherited definition requiring unsupported explicit actor/identity/resource/Authority semantics needs its actual later binding/profile; do not pre-approve callbacks, guess translation or reset shared state. Current locked gameplay is complete; numeric roster execution still requires its ordinary metadata.

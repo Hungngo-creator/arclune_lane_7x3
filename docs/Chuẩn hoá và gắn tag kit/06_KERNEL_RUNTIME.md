@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-07-G.16
+**Version:** 2026-10-07-G.17
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -33,6 +33,8 @@
 **Revision G.15:** executes a bounded recipient-owned Shield ledger partition through existing static-rule/Shield/Damage/Transaction/Result owners. Real source provenance, independent cap views and remainder-first proportional allocation require no new subsystem or Character branch.
 
 **Revision G.16:** consumes E.15/F.17 restricted Basic projection and complete-cohort local settlement through existing compiler/definition/Snapshot/State/Spawn and Lifecycle/Trigger/RNG/Transaction owners. No new mutable store, manager, Primitive, Contract ID or Character branch.
+
+**Revision G.17:** executes only the two E.16/F.18 Reincarnation extensions through existing world-ledger, lifecycle-result, Target/RNG, reservation, Effect/System and Transaction owners. Clarified Pygmalion creation/inheritance/Ultimate retain existing composition; no new store, queue, manager, ID or global priority.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -4163,7 +4165,7 @@ Current standard threshold:
 
 Existing static registration/Contract Resolver binds waitingThresholdContributionPlan to the owning normalized Ability/Effect rule, runtime source Entity, exact Combat Instance/presence lifetime and its existing World Reincarnation-ledger scope. The positive integer amount is immutable rule data. Source presence availability is read through POS-005; no second authoritative presence flag or progress store is introduced. Multiple registrations for the same origin/owner/presence lifetime reuse one identity.
 
-The Reincarnation ledger remains authoritative for waiting progress/state and resulting threshold decisions. Derive ordinary base4 plus currently active admitted ADD contributions from one protected final presence/rule/ledger version. A cached sum/index carries its version and rebuilds without mutation. Do not permanently snapshot the contribution sum when a record first enters waiting or emulate a shrink by changing laterDeathCount.
+The Reincarnation ledger remains authoritative for waiting progress/state and resulting threshold decisions. Derive the current authoritative battle base (initially4) plus currently active admitted ADD contributions from one protected final presence/rule/ledger version. A cached sum/index carries its version and rebuilds without mutation. Do not permanently snapshot the contribution sum when a record first enters waiting or emulate a shrink by changing laterDeathCount.
 
 Creation: register the normalized source rule at its owning lifetime; it contributes when its declared presence is active. Mutation: authoritative availability/Field Presence commit invalidates the read view and requires one coherent all-entry checkpoint. Terminal: presence ends/rule lifetime retires; the amount stops contributing. Cleanup: remove only the retired index, retain terminal checkpoint/record evidence for the supported replay horizon. Serialization stores original owner/origin/lifetime, transaction/checkpoint, protected revisions and existing waiting/lifecycle outcomes; recovery reconstructs availability and never adds a second contribution.
 
@@ -4171,7 +4173,13 @@ For one owning transaction/checkpoint, stage all availability changes and any co
 
 Reuse existing Transaction Manager, presence/lifecycle writers, static-rule index, privileged world-ledger checkpoint and existing Reincarnation transition operations. No leave-Event callback can release Revive against stale eligibility; no renderer/list order or Character-ID scan computes the sum. Failed/stale protected inputs expose no half-decision and must revalidate the same checkpoint through existing transaction law; they never create a later gameplay retry token. Default unprofiled base4, special explicitly governed waiting/routing profiles and identity/Revive rules remain intact.
 
----
+### Battle-base write under REC-001
+
+Lower 04§30.2 into the existing Reincarnation Effect/System plan, binding P-021 to the exact REC-001-authorized ledger-owned system-state base field and P-066 to resulting eligible entry transitions. Other ledger/progress fields remain unavailable to this write profile. The existing World ledger owns current base/revision for the battle; ordinary initialization writes4 unless an explicitly compatible law supplies another initial value. No per-Side/source-presence State mirrors it. Before required payment, Cost/admission protects the base-above-floor read with its ledger revision. After Cost is terminal, revalidate positive headroom and apply the declared bounded base reduction at the Effect commit, under ordinary stale-input/local-failure law and with no automatic refund. A stale base at/below floor never increases.
+
+Base write and coherent final contribution/progress view require all-entry eligibility settlement before releasing ordinary observers or Action/SSI continuation. Reuse the same REC-001/004/020 checkpoint as §88 presence/cohort changes; preserve laterDeathCount and pre-cohort membership. Only actual qualifying deaths advance progress. No source cleanup restores the base; terminal battle cleanup retires it.
+
+Persist current base/revision, originating operation/transaction terminal key, threshold checkpoint and complete transition results alongside existing ledger/replay data. Separate committed reductions read the last committed base, and duplicate/resumed Effects reuse their outcome without subtracting again. Transaction abort exposes no partial base/eligibility decision. Cached views are versioned reads; no independent threshold store or polling/leave listener releases stale Revive work.
 
 # 89. QUALIFYING LUÂN HỒI DEATH
 
@@ -4300,7 +4308,9 @@ quota max = 1 new Puppet
 
 Creating new Life Cycle initializes a new quota scope.
 
-Old Puppet refs persist.
+Old Puppet refs persist independently across owner Death/Revive/LEAVE_FIELD. Creation checks any live EMPTY owned host as a blocker, not total Puppet count. Quota consumes only with successful materialization; failed placement remains unused and is retried only at an explicitly authored entry/new-cycle/empty-blocker transition checkpoint. Kit cycle marker is independent of ordinary lifeSerial; do not accumulate missed quotas.
+
+The first kit-cycle basis is a retained BATTLE_START Snapshot after required static participant initialization under §35A. Later kit cycles capture current creator stats immediately before successful materialization. Both use ordinary Mode Puppet placement and initialize full HP; neither live-links to later creator stats.
 
 ---
 
@@ -4409,9 +4419,9 @@ actionIdentity = Puppet current Basic Attack identity
 naturalActionStatus = NON_NATURAL
 ```
 
-If Puppet dies before execution:
-- drop child;
-- no replacement.
+At Ultimate start retain the eligible Puppet identities plus the creator and one seeded permutation across this complete scheduled actor set. Reuse finite RequestAction expansion and root SEQUENTIAL/AFTER_DIRECT_EFFECTS_COMPLETE resolution under §157; the root hold remains open across child-local completion and required settlements, while mandatory lifecycle closes between children. Each child validates its own actor, pins that actor's current Basic at child start and uses that Basic's own snapshot/target policy. Waive requested Basic Cost only; source identity/attribution/Authority remain independent.
+
+If a scheduled actor dies/becomes invalid before its child begins, skip it without replacement. Once scheduled, valid Puppet children survive creator invalidity; the creator's own invalid child is skipped. No shared target or pure simultaneous-Damage barrier replaces arbitrary full Basic behavior.
 
 ---
 
@@ -5205,6 +5215,8 @@ Presentation = preserve Puppet
 trueSelfId = routed True Self
 ```
 
+Preserve CurrentHP/Rage, MaxRage100 and host States under their own retention law. Newly acquired actor-owned kit state initializes fresh/default; team/world state is read, not reset. Register inherited Passive behavior without synthetic ENTER_FIELD/DEPLOY_FROM_DECK/BATTLE_START. Existing binding/capability transactions implement this selective profile; receiving a definition is not Heal, Revive or redeployment.
+
 ---
 
 # 144. DAMAGE ATTRIBUTION VS RULE OWNER
@@ -5329,7 +5341,15 @@ query eligible empty Puppets
 
 Reservation prevents two simultaneous route operations from taking same Puppet.
 
----
+### Complete-entry route settlement under REC-006
+
+The existing ledger/lifecycle checkpoint supplies its immutable complete newly-entering Reincarnation collection, including all-entry qualification caused by a no-death threshold change. Contract Resolver binds 04§30.3 to one Combat Instance + original entry checkpoint + normalized router-profile candidate, shared across matching router owners. Profile eligibility filters that original collection; do not infer membership from published single Events, use the death cohort as a substitute, or allocate one ordering per owner.
+
+Existing RNG supplies one enumeration-invariant seeded entrant permutation; keep it in the candidate's existing Action/System execution data. Expand a finite Effect DAG, with member/step progress protected by Transaction/terminal identity. Each member queries current owner/Side/presence/blocker/empty-host eligibility after previous required work closes, draws/reserves one host, freezes its full definition pool and uniform selection, then validates and commits through existing reservation/identity/definition/materialization/capability operations. No registry snapshot of old owner availability replaces these current reads.
+
+Close mandatory lifecycle and declared required local settlements before the next member; a host binding that exposes an unused creation quota can therefore close its authored creation checkpoint before that next read. Preserve host body/resources/retained States, initialize only newly acquired actor-owned kit state under the inheritance profile and never replay lifecycle-triggered Passives. Shared world/team state remains current. Existing definition pool/Rank/representation queries own the lottery; no Character service computes it.
+
+No pool/host or invalid selected reservation/definition closes failed routing, releases uncommitted reservations and hands the entrant to ordinary exit/another independently legal intercept. Never reroll, substitute host, hold in limbo, create retry work or roll back earlier members. Serialize membership, permutation, pool/draw/host reservations, protected revisions, per-entry commits and terminal outcomes; resume cannot change draws, replay bindings or add a late entrant. Retire terminal candidate evidence under the existing replay horizon, without accepting old delivery as a fresh checkpoint. Ungoverned competing profile families fail closed rather than gaining a generic priority.
 
 # 153. CHILD ACTION TARGET INHERITANCE
 
@@ -5563,7 +5583,7 @@ max
 
 Starting a new Pygmalion Life Cycle creates new quota scope.
 
-Old Puppet count is irrelevant.
+Total old Puppet count is not the blocker: any live EMPTY owned Puppet blocks new creation, while INHABITED old Puppets do not. Quota is consumed by successful materialization only; failed earlier-cycle opportunities never accumulate.
 
 ---
 
