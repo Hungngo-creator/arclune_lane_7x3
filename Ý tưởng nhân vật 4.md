@@ -726,7 +726,7 @@ Hoá Thân của Kiếm Chủ, Kiếm Chủ là tiên thiên thần sinh ra từ
 class warrior.
 
 Passive — The Sword Precedes All Law
-Kiếm Tiên Ư Vạn Pháp: mọi sát thương natural Action gây ra đều là sát thương chuẩn, heal cho bản thân = 50% lượng sát thương chuẩn gây ra bằng natural Action từ nội tại, nếu over heal, chuyển thành khiên với tỉ lệ 1% lượng sát thương over heal = 1% max hp của nhân vật này sang 0,5% max hp khiên của nhân vật này, tức nhân vật này có 100/150 max hp, gây sát thương chuẩn bằng nội tại là 70, 20 là over heal, trong đó 1% max hp của nhân vật này là 1,5, vậy 20 over heal đó mỗi 1,5 over heal thì hắn nhận 1,5/2 là 0,75 khiên.
+Kiếm Tiên Ư Vạn Pháp: mọi sát thương natural Action gây ra đều là sát thương chuẩn, heal cho bản thân = 50% lượng sát thương chuẩn gây ra bằng natural Action từ nội tại, nếu over heal, chuyển thành khiên với tỉ lệ 1% max hp over heal sang 0,5% max hp khiên của nhân vật này, tức chuyển đổi liên tục = 50% over heal, không chia thành từng chunk 1% max hp. Ví dụ không có modifier khác, nhân vật này có 100/150 max hp: D = 70 Actual HP Damage hợp lệ từ nội tại thì heal 35, hp lên 135, over heal 0 và khiên 0; D = 140 thì heal 70, thực hồi 50, over heal 20, nhận khiên 10. Giữ hệ số heal 50%, không đổi thành 100% để giữ ví dụ cũ.
 
 Thần tính: không nhận debuff/buff/mark từ mọi nguồn bên ngoài thuộc cấp Quy Tắc và Quy Tắc trở xuống.
 

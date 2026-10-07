@@ -1,6 +1,6 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-07-I.18
+**Version:** 2026-10-07-I.19
 **Status:** Working Canonical Validation Suite  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.2+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.17+, `05_CONTRACTS.md` F.19+, `06_KERNEL_RUNTIME.md` G.18+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
@@ -37,6 +37,8 @@
 **Revision I.17:** adds M-126–M-134 for battle-base mutation and complete-entry route settlement, including fresh pool/host acquisition and coordinated child continuation interactions. G-001 specifies its surviving old host is INHABITED to keep its multiplicity fixture compatible with the clarified EMPTY blocker. Other prior case bodies/IDs remain unchanged; these are declarative Architecture Phase obligations, not executable test results.
 
 **Revision I.18:** adds M-135–M-146 for bounded dead-Slot scheduling/restoration, retained-stat projection, mandatory receipt folds, reserved actual-Heal payment, required SSI predicates, causal grant capture and authored-shape movement eligibility. M-144/M-145 lock exact self-Leader recovery and generic proportional component receipts. M-065 updates only its allocation admission premise/control for the now-resolved generic law; other prior case bodies/IDs remain unchanged. Declarative Architecture Phase obligations only.
+
+**Revision I.19:** adds only M-147/M-148 for exact accepted-child ActionRef/provenance conversion composed with shared-recipient Damage, one outcome Heal/Overheal contribution, and frozen waiting-pool Axiom force-entry with independent local failure/coherent observers. Existing E.17/F.19/G.18 machinery suffices; no new semantic field family, Tag, Primitive, Contract ID or runtime owner. Prior case bodies/IDs remain unchanged; coverage counts reflect the actual suite. Declarative Architecture Phase obligations only.
 
 # 0. WHAT THIS FILE IS
 
@@ -4383,6 +4385,41 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 **Expected Resolution:** reject affected executable IR before partial mutations; retain independently committed prior results. Do not invent new Tag/Primitive/Contract ID/manager, global priority, ordinary Revive admission, True Self, whole-AE rounding, guessed component order or a Leader exemption from another participant's entitlement. Correct self-Leader Mode binding and generic proportional input remain legal. Ordinary upfront Costs, unprofiled dead-slot skips/entry triggers/movement, prior scalar reflection and existing approved Entity-binding exceptions retain their own law.
 **Layers Under Test:** E.17 lowering/validation, existing Contract/State/Result/Transaction/Lifecycle/SSI/Mode owners.
 
+## M-147 — Exact Accepted-child Conversion, Shared Damage and One Heal/Shield Outcome
+
+**ID:** `M-147`
+**Status:** `MUST_PASS`
+**Purpose:** compose an existing own-direct component transform with exact real child-request results, one shared Slot/HP window and one damage-derived Heal/conversion; exclude a same-root invocation of the same Skill without changing direct ownership.
+
+**Fixture:** a Natural root ULTIMATE requests exactly one real Skill1 child and one real Skill2 child through two named direct RequestAction nodes. P-001 acceptance binds two distinct ActionRefs before RES-009 preparation. Both remain SKILL/non-Natural, authored AE waived0, with one post-root-Cost source Snapshot ATK100/WIL100. Skill1 locks Slots8/2/4/6, one hit PHYSICAL150 + WILL135 each; Skill2 locks2/5/8, one hit PHYSICAL180 + WILL160 each. Root actor HP100/MaxHP150, prior Standard Shield contribution20. Before the common recipient read, an admitted pre-Damage Position transaction swaps the original Slot2 occupant into Slot9 and puts a legal recipient T into Slot2; all other attack Slots are empty. T has Standard Shield100, HP140 and ARM/RES/Final DR that would affect non-TRUE Damage.
+
+**Composition under test:** use 04§18B's unchanged `DIRECT_EFFECT_GRAPH_OF_SCOPED_ACTION` on the immediate Damage-owning Action. The root-direct branch requires that exact Actor's actual Natural status. The two child branches require an actual Natural parent plus **equality to the accepted ActionRef returned by the exact declared RequestAction node**, retaining each child's own direct Effect/node provenance. Do not replace this equality with same root, parent, Skill ID or Attribution. These refs are existing P-001 outputs/04§35 bindings and 04§8.3 typed Action-reference comparisons, retained by the existing graph; no new child-membership mode, global child index or Character branch. Bind refs before participant PRE_MITIGATION evaluation, not from a future completed parent ActionResult. A rejected/skipped request never grants a phantom child binding.
+
+**Expected Resolution:** both children observe T at the common Slot checkpoint. Each has one distinct hit with two components; all four selected components become TRUE at PRE_MITIGATION, without duplication or prior ARM/RES/Final DR. One RES-009/RES-008 simultaneous transaction shares T's Shield/HP. Skill1 commits Shield45.6/ActualHP63.84/Overkill175.56; Skill2 Shield54.4/ActualHP76.16/Overkill209.44. Exact totals are Shield100, ActualHP140, Overkill385, with separate per-component/packet/child receipts. Mandatory lifecycle runs once for the batch. Original occupant in Slot9 is not chased.
+
+Seal exactly the declared receipts after terminal Damage/lifecycle, before dependent root Heal/ADEC: D140 → one requested Heal70 → actualRestore50 → Overheal20 → requested Shield10. Positive committed conversion creates a new contribution10 alongside the unchanged old20; no replace, shared refresh, hidden cap/clock or chunk1% quantization. Ordinary Counter/Reaction waits until root Damage → lifecycle → Heal → committed-Overheal conversion → remaining direct work → ADEC; child preparation never waits on its own completion, and Heal never waits on the ADEC it precedes.
+
+**Negative space / replay:** a third same-root SKILL invocation, even with the same actor/Skill definition/parent, lacks either exact accepted ref and receives no child-branch conversion or D credit; independent Counter/Reaction/DoT/Mark/Passive receipts likewise fail membership. A qualifying already-TRUE component remains TRUE and contributes its committed ActualHP once. Empty/invalid locked recipients close OMIT/DROP_LOCAL without retarget, D0 follows ordinary zero-Heal and grants no Shield. At HP100/150 with D70, requested/actual Heal35 gives HP135/O0/no addition. Generic Heal admission/modifiers and foreign Shield caps keep their laws; a zero committed addition does not erase/refresh old contributions. Invalid/dead Heal owner cannot revive through Heal or redirect to a new presence. Permute requests, packet/component/Slot/Entity enumeration and pause/save around acceptance, preparation, common commit, lifecycle, aggregate, Heal and Shield; retain original refs/snapshots/receipts/terminal identities, with no second child/debit/hit/Heal/contribution. Cleanup preserves the real cause and produces no Shield-terminal Heal.
+
+**Forbidden Outcomes:** root-wide type rewrite; declaring children Natural or inline anonymous Damage; Skill1/Skill2 priority; summing nominal625 or Shield/Overkill into D; merging the two hits; independent packets double-spending T's HP140; per-target/child Heal; relabeling child receipts as root-own direct; requiring future completion to evaluate refs; absent/foreign/unresolved ref guessed by Skill name; assigning Axiom to Damage from Prime or lifecycle Authority.
+**Layers Under Test:** P-001/002, 04§8.3/18B/28/34.2A–B/35/36, DMG-004/005/007/010–012, RES-002/008/009, ACT-020/023/032, TGT-008, HEL-001–003, SHP-002/005 and existing Action/Effect/Result/Transaction/Shield owners. This adds interaction coverage to M-067/M-091/M-100/M-145; it does not replace them or introduce a new profile.
+
+## M-148 — Frozen Waiting-pool Force-entry with Local Authority Failure and Coherent Observers
+
+**ID:** `M-148`
+**Status:** `MUST_PASS`
+**Purpose:** exercise existing FORCE_ENTER/P-066, TRUE_SELF TargetSpec, per-clause Authority and simultaneous Effect/ledger transactions together, including post-Cost membership and route/Revive observers.
+
+**Fixture:** one active Skill consumes a Natural Action and costs Side AE30. Its read-only admission probe requires at least one eligible enemy WAITING Chân Ngã. Only its force WAITING→REINCARNATION clause is AXIOM. After successful Cost, TRUE_SELF_POOL/ENEMY relative to the caster captures ALL currently legal waiting records on one protected settlement view: A/B/C are enemies, L is allied and excluded, E was revived/closed before capture and is excluded. B has a currently valid conflicting AXIOM deny clause whose different Character owner wins the existing AUT-004 comparison: both adjudication owners same Rank/Tu Vi/Stars/Awaken, deny owner CP200 versus force owner CP100. C has only a conflicting QUY_TAC denial. Freeze exact record/life identities and per-candidate Effect refs; a later-created waiting record F is not in this set. Queue ordinary Revive observers and downstream complete-entry route work.
+
+**Expected Resolution:** independently adjudicate each force clause over the common protected view. A admits; B fails locally to the valid same-tier winner; C admits because AXIOM beats QUY_TAC under AUT-003. Stage A/C's WAITING→REINCARNATION/ordinary-Revive-eligibility changes in **one coherent batch**, preserving B WAITING and L unaffected. No candidate's entry, observer or host reservation changes another candidate's decision inside this force batch. No list/Entity/death/Slot/Event priority, pool re-query, replacement or retry. This uses existing `resolution.mode=SIMULTANEOUS_BATCH`, per-Effect conditions/Authority/local failure, TRUE_SELF refs and P-066 through the existing Transaction/World ledger; it is not a new force subsystem or global Authority ordering.
+
+Only after entry commit and required world bookkeeping may ordinary observers/downstream entry routing consume the completed transition set. Revive cannot retrieve A/C after entry; B remains governed by ordinary waiting/Revive law. F is not force-entered by this cast merely because it appears later. No new DEATH_CONFIRMED, DamageResult, fake death-count advancement, host/definition/Side selection, Revive or materialization originates from the force Skill. Routing/Rebirth, if eligible, follows its own REC-006/04§30.3 settlement; force entry does not merge it into this transaction or choose route winners.
+
+**Failure / replay variants:** empty admission pool rejects before Cost/Action begin; read-only probes pay nothing. If the admitted pool disappears before post-Cost capture, or all captured candidates subsequently fail local legality/Authority, close the already-paid Skill under ordinary local failure with no automatic AE refund, pending retry, substitute pool or synthetic success. Invalid frozen generation cannot bind a later death of the same trueSelfId. A generic protected transaction abort publishes no partial transitions; it is distinct from an independently blocked candidate. Pause/save before capture, adjudication, commit or observer publication; resume retains the original candidate/transaction/record and terminal outcomes, never debiting twice, forcing a later pool, publishing prefixes or routing an entry twice. Clause Authority stays local: unrelated Damage/root Ultimate/other Skills do not acquire Axiom from Rank, identity or this Skill.
+
+**Layers Under Test:** 04§6/8/10/11/30/32/34–36/72–73, CST-001/005/007/010, RES-001/002/004/005, AUT-001–004/005, REC-005/006/020, P-066 and existing Target/Lifecycle/Authority/Transaction/Reincarnation-ledger/result owners. This covers force-clause batch/admission interaction absent from ordinary threshold/cohort cases E-006–010 and routing M-126–M-134, without changing their laws.
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -5196,13 +5233,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 102 character-derived integration tests;
+- 148 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-233 tests / probes / meta-tests (228 A–N cases plus 5 META cases)
+279 tests / probes / meta-tests (274 A–N cases plus 5 META cases)
 
 The count is not a design target.
 
