@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-07-E.15
+**Version:** 2026-10-07-E.16
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -30,6 +30,8 @@
 **Revision E.14:** adds one bounded recipient-owned exact-family/complement Shield partition with independent new-addition caps and explicit remainder-first proportional depletion under existing SHP-002/006. All earlier profiles/IDs remain unchanged; no new Tag, Primitive or priority/pool manager.
 
 **Revision E.15:** adds two bounded opt-in profiles: restricted Basic direct-Damage projection with immutable Snapshot/State/Spawn binding, and complete-cohort local seeded settlement. Existing Target/Action/State/Spawn/Trigger plans and Primitives suffice; no new Tag, Primitive, Contract ID, callback or runtime subsystem.
+
+**Revision E.16:** adds only two bounded Reincarnation profiles: battle-base waiting-threshold reduction and complete-entry local route settlement. Existing ledger, lifecycle, RNG, Snapshot, Target, reservation and Effect/System plans execute them. Pygmalion quota/inheritance/Ultimate use existing composition; no new Tag, Primitive, Contract ID, subsystem or global priority.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -4218,7 +4220,7 @@ Examples:
 - CONTAINER
 - MODE_OBJECT
 
-Puppet classification as Summon remains unresolved.
+PUPPET is distinct from SUMMON under ENT-008. A profile explicitly including both kinds may match both.
 
 ---
 
@@ -4233,7 +4235,7 @@ quota:
   max: 1
 ```
 
-This does not check whether previous Puppets still exist.
+This quota is separate from live-host eligibility. Pygmalion checks for any live EMPTY owned Puppet as a blocker; an INHABITED old Puppet does not block. Consume quota only together with successful materialization.
 
 ---
 
@@ -4335,6 +4337,7 @@ Possible operation family:
 - BLOCK_ROUTE
 - SET_EXHAUSTED
 - WAITING_THRESHOLD_CONTRIBUTION — bounded static profile in §30.1, not a per-record lifecycle request
+- REDUCE_BASE_WAITING_THRESHOLD — bounded battle-ledger profile in §30.2, not per-record progress
 
 Per-record execution compiles into multiple lifecycle Primitives. The bounded static profile in §30.1 lowers through existing rule registration.
 
@@ -4362,12 +4365,55 @@ Normalize only PASSIVE_STATIC ownership with finite positive integer CONSTANT am
 
 At each owning committed presence-availability change, existing Transaction/Lifecycle/Field Presence and Reincarnation-ledger owners apply REC-001 to the whole coherent checkpoint. Preserve laterDeathCount; re-evaluate all still-waiting records against the final threshold before ordinary observers. A same-checkpoint transfer/removal/addition resolves final active contributions once; no intermediate threshold decision may become irreversible. This rule creates no Action, SSI opportunity, qualifying death, RNG draw, pending retry or route/materialization by itself.
 
-Lower to a bounded waitingThresholdContributionPlan in the existing static registration/Effect/System plan and retain the existing REC-001/004/020 refs. Availability is derived from authoritative presence; any cached sum/index is a versioned read model, not another writable threshold/progress owner. Existing per-record operations still use their current lifecycle Primitives. Ordinary waiting entries, including those without their own modifier, use the live World-ledger threshold; with no active contributions its effective value is base4. Existing explicitly exceptional policies require their actual governing composition, not silent conversion to live/fixed semantics.
+Lower to a bounded waitingThresholdContributionPlan in the existing static registration/Effect/System plan and retain the existing REC-001/004/020 refs. Availability is derived from authoritative presence; any cached sum/index is a versioned read model, not another writable threshold/progress owner. Existing per-record operations still use their current lifecycle Primitives. Ordinary waiting entries, including those without their own modifier, use the live World-ledger threshold; with no active contributions its effective value is the current base (initially4 under the ordinary policy). Existing explicitly exceptional policies require their actual governing composition, not silent conversion to live/fixed semantics.
 
-Migration: prior authoring without this profile requires no new plan or registration; ordinary entries still use active World-ledger contributions when another source owns the profile. With no active contribution, prior ordinary threshold behavior remains4. A normalized use must carry this exact typed rule/ownership and current schema version; old quota/per-leave Reaction approximations are not accepted aliases. Revive restoration, Shield clocks and attack-owner Slot defaults are unrelated existing composition.
+Migration: prior authoring without this profile requires no new plan or registration; ordinary entries still use active World-ledger contributions when another source owns the profile. With no active contribution or admitted base mutation, prior ordinary threshold behavior remains4. A normalized use must carry this exact typed rule/ownership and current schema version; old quota/per-leave Reaction approximations are not accepted aliases. Revive restoration, Shield clocks and attack-owner Slot defaults are unrelated existing composition.
 
 
 ---
+
+## 30.2 Opt-in battle-base threshold reduction
+
+```yaml
+reincarnation:
+  operation: REDUCE_BASE_WAITING_THRESHOLD
+  waitingWindow:
+    scope: WORLD_LEDGER
+    amount: <positive integer constant>
+    floor: <positive integer constant>
+    admission: BASE_ABOVE_FLOOR_BEFORE_REQUIRED_COST
+    lifetime: BATTLE
+    reevaluation: LIVE_ALL_WAITING_AT_COMMIT
+```
+
+This operation writes only the existing ledger's battle-global base threshold. Bind its ledger and originating Effect/Cost transaction; required Cost commits before this Effect. The admission guard is a protected authoritative base read before payment. Use ordinary post-Cost validity/local-failure law, without refund or a later retry token; never admit a known floor no-op. Revalidate current base above floor at application; stale/no-headroom inputs fail locally and never increase the base. Apply `max(floor, currentBase - amount)` once at the declared Effect checkpoint. Live contributions compose afterward under REC-001, not into the value being reduced. The ordinary initial base is4; different explicit initialization/composition requires its actual governing law.
+
+Normalizer accepts finite positive integer amount/floor, the fixed battle lifetime and all-entry re-evaluation, supported ledger/Mode, required Cost ordering and compatible base policy. Reject Side/owner-presence lifetime, per-record progress writes, fake deaths, negative contributions, arbitrary formulas/callbacks, missing guard/Cost lineage or guessed exceptional-policy composition. Lower a bounded base-threshold operation in the existing Reincarnation Effect/System plan: exact ledger-owned system-state base field, protected read/revision, amount/floor, Cost/Effect terminal identity and required re-evaluation. Existing P-021 performs only that REC-001-authorized field mutation; P-066 and existing route operations close resulting entry transitions. P-021 does not authorize arbitrary ledger writes. No State/Resource holder is a second authoritative base.
+
+## 30.3 Opt-in complete-entry route settlement
+
+```yaml
+reincarnation:
+  operation: ROUTE
+  route:
+    entrantSettlement:
+      checkpointRef: <COMPLETE_REINCARNATION_ENTRY_RESULT_REF>
+      combatInstanceRef: <COMBAT_INSTANCE_REF>
+      routerProfileRef: <NORMALIZED_ROUTE_PROFILE_REF>
+      membership: COMPLETE_ELIGIBLE_ENTRANTS_AT_CHECKPOINT
+      entryOrder: SEEDED_RANDOM_PERMUTATION
+      entryGraphRef: <FINITE_TYPED_ROUTE_GRAPH_REF>
+      worldRead: AFTER_PREVIOUS_ENTRY_TERMINAL
+      failure: RELEASE_UNCOMMITTED_CONTINUE_ORDINARY_EXIT
+```
+
+The checkpoint supplies the complete immutable set of newly entering lives, including transitions caused by a threshold change without a new death. Eligibility is declarative profile filtering of those entrants, not individual Event publication prefixes. This is not §7.17's original Death Cohort/per-owner survival gate. One candidate belongs to Combat Instance × original entry checkpoint × router profile, across all runtime owners of that profile. Owner/Side/host availability is resolved by the entry graph; it does not allocate a separate ordering per owner.
+
+Bind one enumeration-invariant seeded permutation and retain it. Expand only that finite entry collection into sequential typed graphs. Each graph may query current eligible owners/hosts, choose and reserve one host, build/freeze a definition pool, draw/freeze one definition and commit binding/materialization through existing operations. Declare every target/Side/identity/stat/resource/attribution/Authority policy. Candidate pools use existing §72/P-010–014 support; definition eligibility is not a callback.
+
+Finish each entry's route, declared required local settlements and mandatory lifecycle before dependent next-entry reads. Release uncommitted reservations on local failure, close that branch and continue ordinary exit/other independently legal intercepts. Earlier commits remain committed. No reroll, alternative host, pending wait or implicit priority over another router family.
+
+Lower one bounded settlement in the existing route/Effect DAG, lifecycle-result, Snapshot/RNG, reservation and Transaction plans under REC-006. Protect membership/order, entry progress, selected host/definition revisions and commit/terminal identity through replay. Re-delivery/resume cannot redraw, bind twice or treat new entrants as members of an old checkpoint. Reject partial membership, per-owner/Event/list priority, missing terminal failure policy, arbitrary iteration, cyclic dependencies, ungoverned shared-capacity conflicts or executable ambiguity. Prior unprofiled routes remain under their own existing law.
 
 # 30A. RETURN-TO-DECK SPEC
 
@@ -5407,7 +5453,7 @@ spawn:
 No condition:
 > no Puppet currently exists.
 
-Therefore old Puppets persist.
+Old Puppets persist independently. The actual blocker is a live EMPTY owned Puppet; creation consumes the current kit-cycle quota only on success. Binding Chân Ngã removes that blocker without reopening a consumed quota.
 
 ---
 
@@ -5427,8 +5473,8 @@ inheritance:
   sourceDefinition: RANDOM_SAME_RANK_DEFINITION
   presentationPolicy: PRESERVE_HOST
   statPolicy: PRESERVE_HOST_BASIS
-  classPolicy: UNRESOLVED
-  elementPolicy: UNRESOLVED
+  classPolicy: INHERIT_SOURCE_DEFINITION
+  elementPolicy: PRESERVE_HOST
 ```
 
 True Self routing and definition selection remain separate.
@@ -5762,7 +5808,7 @@ Warnings must not change semantics.
 Project-level ambiguity known to exist.
 
 Example:
-- Pygmalion `classPolicy = UNRESOLVED`.
+- An external inheritance profile omits a required identity/resource/Authority policy. Pygmalion Class inheritance and host Element preservation are already locked.
 
 Such Character data cannot be declared “implementation ready”.
 
@@ -6860,7 +6906,7 @@ This schema passes Stage E only if all are true:
 
 # 99. OPEN QUESTIONS LEFT FOR CONTRACTS
 
-Stage E intentionally leaves these unresolved:
+This legacy Stage E inventory is not an override of later Contracts or Clarified Canons; resolved entries below refer to their current owners:
 
 1. Exact Action Completion event boundary.
 2. Exact Turn Boundary event timing.
@@ -6882,10 +6928,10 @@ Stage E intentionally leaves these unresolved:
 18. Arena close/return object policy.
 19. Narrative Belief formula.
 20. Knowledge propagation delay.
-21. Pygmalion Class inheritance.
-22. Pygmalion Element inheritance.
-23. Pygmalion inherited secondary-effect attribution.
-24. Puppet exact `entityKind` / Summon classification.
+21. Pygmalion Class inheritance — resolved ENT-005.
+22. Pygmalion Element non-inheritance — resolved ENT-005.
+23. Pygmalion secondary-effect attribution — resolved ENT-007.
+24. PUPPET distinct from SUMMON — resolved ENT-008.
 25. exploration-mode AE ownership.
 
 These belong mainly to Chặng F — Contracts.

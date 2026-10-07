@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-07-INDEX-19
+**Version:** 2026-10-07-INDEX-20
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-07-INDEX-19`
+**Version:** `2026-10-07-INDEX-20`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-07-E.15`.
+**Version:** `2026-10-07-E.16`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-07-F.17`.
+**Version:** `2026-10-07-F.18`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-07-G.16`
+**Version:** `2026-10-07-G.17`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-07-I.16`
+**Version:** `2026-10-07-I.17`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -166,7 +166,9 @@ In `docs/canon kit/`:
 
 - **Thespis** → `docs/canon kit/Thespis_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry84; restricted Basic projection, distinct frozen Role bindings, owner-gated seeded Death Cohort settlement and independent real Summon lifetime/dismissal/Ultimate Shield composition. Metadata and unsupported future external profiles remain NOT BLOCKING.
 
-- **Pygmalion** → `docs/canon kit/Pygmalion_Clarified_Gameplay_Canon.md` R0 → **PARTIALLY_CLARIFIED / NORMALIZATION_BLOCKED_BY_GAMEPLAY_DECISIONS** → raw4 entry26; consolidates locked PUPPET identity, life-cycle quota, host/full-kit/Class/Element policy and ordinary Revive/Ultimate attribution. §8 lists ten internal gameplay groups; proposed answers remain non-canonical until designer lock.
+- **Pygmalion** → `docs/canon kit/Pygmalion_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry26; Q1–Q10 locked: first-cycle BATTLE_START basis/later current bases, success-only quota/EMPTY blocker, independent PUPPET bodies, complete-entry router and uniform roster pool, host-preserving fresh kit state, battle-global base reduction, next-consumed-opportunity defense family and coordinated seeded full Basic sequence. Only metadata/future external profiles/Mode adaptations remain NOT BLOCKING.
+
+E.16/F.18/G.17/I.17 adds only two bounded profiles on existing Reincarnation objects: battle-base threshold reduction and complete-entry local route settlement. REC-001/006 and existing ledger/lifecycle/Target/RNG/reservation/Transaction owners execute them. Pygmalion creation, full-kit state and root-held coordinated Ultimate use existing composition. M-126–M-134 cover the new boundaries/interactions; G-001 specifies an INHABITED old host. No new Tag/Primitive/Contract ID/subsystem/global priority; 01/02/03/07/raw/src remain unchanged.
 
 E.15/F.17/G.16/I.16 adds two bounded opt-in profiles on existing objects: restricted Basic direct-Damage projection into immutable Snapshot/State/Spawn bindings, and complete-cohort local seeded Trigger settlement with retained death inputs/owner gate/per-entry progress. Existing owners execute both; no new Tag/Primitive/Contract ID/subsystem/global priority. M-117–M-125 cover projection closure/identity, cohort/placement/replay, clocks/causes, dismissal and final-live-set Ultimate composition. 01/02/03/07 and prior fixtures remain unchanged; unsupported damaging Basics never silently become Blank.
 
@@ -725,7 +727,7 @@ Critical correction:
 
 > one **new** Puppet per Pygmalion Life Cycle, not one total Puppet.
 
-Old Puppets persist independently.
+Old Puppets persist independently across owner Death/Revive/leave. Any live EMPTY owned Puppet blocks new creation; an INHABITED old Puppet does not. Current-cycle quota is consumed only on successful materialization, never accumulates and is not reopened by Chân Ngã binding.
 
 Therefore multiple Puppets can coexist.
 
