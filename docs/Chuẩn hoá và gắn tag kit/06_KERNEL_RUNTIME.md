@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-07-G.18
+**Version:** 2026-10-07-G.19
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -37,6 +37,8 @@
 **Revision G.17:** executes only the two E.16/F.18 Reincarnation extensions through existing world-ledger, lifecycle-result, Target/RNG, reservation, Effect/System and Transaction owners. Clarified Pygmalion creation/inheritance/Ultimate retain existing composition; no new store, queue, manager, ID or global priority.
 
 **Revision G.18:** executes E.17/F.19 through existing SSI/Lifecycle/Position, State/stat/Result, Resource/Transaction and Trigger/Action owners. Bounded dead waits, causal grant scope and reserved Heal-result payment retain explicit terminal/save identities. Existing battle-end adjudication distinguishes roster recovery from exact self-Leader pending recovery; existing RES-008 allocation seals per-component receipts for every supported simultaneous common-recipient commit. No Character branch, new subsystem, allocator or priority manager.
+
+**Revision G.19:** consumes E.18/F.20 Rank-first competing route claims through existing complete-entry execution, progression/stat, Target/RNG, Authority, reservation, identity and Transaction owners. Explicit empty-body death creates no True Self/REC progress. Other Kenoma mechanics use existing State/stat/Shield/Clock/Action/Result composition; no new subsystem or Character branch.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -4208,6 +4210,7 @@ Default qualifying:
 - relevant NPC/real life entity as defined by mode/system.
 
 Default excluded:
+- any explicitly empty body without bound Chân Ngã, including collection Characters;
 - Summon without Chân Ngã;
 - Despawn;
 - Fusion Consumption;
@@ -5374,6 +5377,16 @@ Existing RNG supplies one enumeration-invariant seeded entrant permutation; keep
 Close mandatory lifecycle and declared required local settlements before the next member; a host binding that exposes an unused creation quota can therefore close its authored creation checkpoint before that next read. Preserve host body/resources/retained States, initialize only newly acquired actor-owned kit state under the inheritance profile and never replay lifecycle-triggered Passives. Shared world/team state remains current. Existing definition pool/Rank/representation queries own the lottery; no Character service computes it.
 
 No pool/host or invalid selected reservation/definition closes failed routing, releases uncommitted reservations and hands the entrant to ordinary exit/another independently legal intercept. Never reroll, substitute host, hold in limbo, create retry work or roll back earlier members. Serialize membership, permutation, pool/draw/host reservations, protected revisions, per-entry commits and terminal outcomes; resume cannot change draws, replay bindings or add a late entrant. Retire terminal candidate evidence under the existing replay horizon, without accepting old delivery as a fresh checkpoint. Ungoverned competing profile families fail closed rather than gaining a generic priority.
+
+### Rank-first contention inside the existing route plan
+
+When 04§30.4 is declared, Contract Resolver lowers its participating route clauses into one shared complete-entry candidate, replacing independent family-order work for that governed domain. Existing World ledger/Lifecycle supplies original entrants; RNG/Snapshot retains one enumeration-invariant permutation; existing progression/stat reads supply current claimant Effective Rank. For each entrant after prior required settlement is terminal, query current legal owners/routes/hosts and required pool feasibility without mutating or drawing. Retain eligibility/Rank/protected revisions. Remove ineligible claims, then compare eligible claimant Rank before consulting Authority.
+
+At the highest eligible Rank, coalesce only explicitly equivalent semantic-family host-multiplicity claims. Existing Authority Resolver adjudicates actual remaining incompatible clause/owner contexts with AUT-002–004 and the complete conflict graph. Its exact NO_OVERRIDE remains no winner, not a random or incidental ordering. Missing actual context/incompatible outside capacity claims fail closed before affected binding. This route-specific order does not alter AUT or global Trigger/Reaction priority.
+
+Once one claim is legitimately admitted, existing Target/RNG selects its legal host under the route rule, reservation protects host/entrant exclusivity, and the finite route DAG performs binding/materialization. A host-only graph binds identity without P-081 presentation replacement or P-082/083 Combat Definition inheritance or copying old-life resources/States. Normal Death/Revive reads this bound life; an empty body's death does not allocate a True Self, waiting record or death-count increment. Bound identity storage follows its declared battle/life retention, independently of field-scoped controller cleanup.
+
+Transaction validates shared entrant, current claim/Rank/Authority/host/definition evidence and commits the admitted route under REC-006. Store candidate/permutation/claims/conflict outcomes/reservation/per-entry terminal evidence in existing execution/transaction data. Interrupted/replayed work resumes the same decision, not a new candidate, lottery or binding. Chosen-host/pool invalidity releases only uncommitted reservations and closes locally; ordinary exit/separately legal intercepts keep their law. Later entries may use other currently legal hosts, but no failed entry gets an implicit substitute/retry. Retire evidence at the existing horizon. No Character dispatch, additional store/service/queue or priority registry.
 
 # 153. CHILD ACTION TARGET INHERITANCE
 

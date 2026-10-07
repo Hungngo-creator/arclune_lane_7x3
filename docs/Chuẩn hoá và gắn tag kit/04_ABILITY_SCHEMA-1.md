@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-07-E.17
+**Version:** 2026-10-07-E.18
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -34,6 +34,8 @@
 **Revision E.16:** adds only two bounded Reincarnation profiles: battle-base waiting-threshold reduction and complete-entry local route settlement. Existing ledger, lifecycle, RNG, Snapshot, Target, reservation and Effect/System plans execute them. Pygmalion quota/inheritance/Ultimate use existing composition; no new Tag, Primitive, Contract ID, subsystem or global priority.
 
 **Revision E.17:** adds bounded post-death Slot waits/cause-specific restoration, retained-stat reads, pre-death receipt folding, reserved actual-Heal payment and cause-time Resource admission; makes authored attack shape/movement-trigger suppression explicit. Main participation distinguishes roster recovery from the exact Leader's own pending return. Generic common-recipient simultaneous Damage resolves to existing RES-008 PROPORTIONAL, including per-component receipts. Existing owners/operations execute these profiles; no new Tag, Primitive, Contract ID, allocator or global priority.
+
+**Revision E.18:** adds only bounded Rank-first contention across declared Reincarnation route profiles, using current eligible claimant Rank, existing same-Rank Authority adjudication and protected complete-entry host reservations. Existing host-only binding, receipts, controllers and clocks compose without new fields. No new Tag, Primitive, Contract ID, subsystem or global priority.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -4501,6 +4503,43 @@ Bind one enumeration-invariant seeded permutation and retain it. Expand only tha
 Finish each entry's route, declared required local settlements and mandatory lifecycle before dependent next-entry reads. Release uncommitted reservations on local failure, close that branch and continue ordinary exit/other independently legal intercepts. Earlier commits remain committed. No reroll, alternative host, pending wait or implicit priority over another router family.
 
 Lower one bounded settlement in the existing route/Effect DAG, lifecycle-result, Snapshot/RNG, reservation and Transaction plans under REC-006. Protect membership/order, entry progress, selected host/definition revisions and commit/terminal identity through replay. Re-delivery/resume cannot redraw, bind twice or treat new entrants as members of an old checkpoint. Reject partial membership, per-owner/Event/list priority, missing terminal failure policy, arbitrary iteration, cyclic dependencies, ungoverned shared-capacity conflicts or executable ambiguity. Prior unprofiled routes remain under their own existing law.
+
+## 30.4 Opt-in Rank-first route contention
+
+```yaml
+reincarnation:
+  operation: ROUTE
+  route:
+    contention:
+      arbitrationProfileRef: <NORMALIZED_ENTRY_ARBITRATION_PROFILE_REF>
+      checkpointRef: <COMPLETE_REINCARNATION_ENTRY_RESULT_REF>
+      combatInstanceRef: <COMBAT_INSTANCE_REF>
+      participatingRouteProfileRefs: [<NORMALIZED_ROUTE_PROFILE_REF>]
+      rankBasis: CLAIMANT_EFFECTIVE_RANK
+      sameRankConflict: EXISTING_AUTHORITY_ADJUDICATION
+      claims:
+        - routeProfileRef: <NORMALIZED_ROUTE_PROFILE_REF>
+          governingClauseRef: <EXACT_ROUTE_CLAUSE_REF>
+          claimantRef: <ELIGIBLE_ROUTE_OWNER_REF>
+          eligibilityRef: <TYPED_CURRENT_ENTRY_ROUTE_LEGALITY_PREDICATE_REF>
+          hostMultiplicity: DISTINCT_CLAIM # or SAME_SEMANTIC_FAMILY_HOST_POOL
+      hostSelection: DECLARED_ROUTE_RULE_AFTER_CLAIM_ADMISSION
+      noWinner: CONTINUE_ORDINARY_EXIT_OR_SEPARATELY_LEGAL_ROUTE
+```
+
+This optional bounded policy supplies the contention law missing from family-local §30.3; it is not a universal Reincarnation priority. Claims reference actual normalized route clauses/owners, not Character names, host rarity or inferred Authority. `participatingRouteProfileRefs` declares the complete governed contention domain. Reject a shared exclusive entrant/host conflict with an outside route unless another actual compatible law governs that intersection.
+
+Bind one Combat Instance × complete-entry checkpoint × arbitration-profile candidate, immutable complete entrant membership and one seeded entrant permutation, shared across participating families/owners. Reuse §30.3's protected finite per-entry progress and the same original checkpoint/Combat Instance refs; incompatible duplicate bindings reject. The arbitration candidate owns the common order; do not run competing per-family permutations for those entries. At each entry's current protected read, evaluate all declared eligible claims, including entrant restrictions, owner validity, legal host/capacity and any required definition-pool feasibility. Presence alone is not legal eligibility. Ineligible higher-Rank claims cannot suppress a lower eligible claim. Eligibility queries are read-only and cannot reserve hosts, spend Cost or draw definitions to manufacture eligibility.
+
+Capture each eligible claimant's Effective Rank from existing progression/stat data. Compare Rank **first**, before clause Authority, across claims to the same entrant. Only highest eligible Rank claims reach the same-Rank conflict step. Rank-first is this route policy, not AUT's general comparator or a new Authority tier. Host Rank and previous-life definition Rank cannot replace claimant Rank.
+
+`SAME_SEMANTIC_FAMILY_HOST_POOL` is an explicit multiplicity policy for identical normalized route semantics at that winning Rank. Coalesce only these equivalent claims into one family claim with their current legal hosts; do not treat multiple hosts as semantic Authority competitors. After that family claim is admitted, use its declared enumeration-invariant seeded host selection. A family label alone cannot coalesce different semantic clauses, owner policies or Rank strata. `DISTINCT_CLAIM` preserves actual different-owner/semantic conflicts, even when a display label matches.
+
+For remaining same-Rank incompatible claims, use their actual governing clause/owner contexts and existing AUT-002–004 conflict edges. No Rank-derived clause tier, invented comparator, Event/Slot/Entity/list priority or random route winner. Three-or-more claims require the actual conflict graph; a pair result cannot silently admit a third conflicting claim. Commit only an unambiguously admitted route claim. Exact NO_OVERRIDE leaves that contested intersection uncommitted; it does not trigger a random choice, artificial Rank demotion or invented fallback. Ordinary exit or another separately legal outcome remains under its actual law.
+
+After admission, select/reserve one legal host and run the admitted route's finite binding/materialization graph. A host cannot receive two entrants and one entrant cannot bind twice. Shared entry/claim, Rank, eligibility, host/definition and Authority read revisions are protected through validation/commit. Stale chosen resources follow REC-006's terminal local failure, releasing only uncommitted reservations; do not redraw, substitute a host or rerun arbitration as an implicit retry. Close required local settlement/lifecycle before the next entrant's current reads. Unrelated prior commits remain committed.
+
+Lower this optional input into existing `reincarnationPlan`, route/Effect DAG, Target/Snapshot/RNG, Authority, reservation and Transaction plans. Serialize original candidate/membership/permutation, eligible-claim and conflict evidence, admitted or no-winner outcome, reservations and per-entry terminal identity. Replay/resume reuses those facts, not a new rank lottery or a second binding. Retire evidence at the existing replay horizon. Reject missing claimant/Rank/eligibility/actual conflict context, partial checkpoint membership, unsupported coalescing, ambiguous shared capacity, cycles or a missing terminal law. Unprofiled routes keep their own compatible existing rules.
 
 # 30A. RETURN-TO-DECK SPEC
 

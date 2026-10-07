@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-07-I.19
+**Version:** 2026-10-07-I.20
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.2+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.17+, `05_CONTRACTS.md` F.19+, `06_KERNEL_RUNTIME.md` G.18+, `07_MODE_PROFILES.md` H.2+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.2+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.18+, `05_CONTRACTS.md` F.20+, `06_KERNEL_RUNTIME.md` G.19+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -39,6 +39,8 @@
 **Revision I.18:** adds M-135–M-146 for bounded dead-Slot scheduling/restoration, retained-stat projection, mandatory receipt folds, reserved actual-Heal payment, required SSI predicates, causal grant capture and authored-shape movement eligibility. M-144/M-145 lock exact self-Leader recovery and generic proportional component receipts. M-065 updates only its allocation admission premise/control for the now-resolved generic law; other prior case bodies/IDs remain unchanged. Declarative Architecture Phase obligations only.
 
 **Revision I.19:** adds only M-147/M-148 for exact accepted-child ActionRef/provenance conversion composed with shared-recipient Damage, one outcome Heal/Overheal contribution, and frozen waiting-pool Axiom force-entry with independent local failure/coherent observers. Existing E.17/F.19/G.18 machinery suffices; no new semantic field family, Tag, Primitive, Contract ID or runtime owner. Prior case bodies/IDs remain unchanged; coverage counts reflect the actual suite. Declarative Architecture Phase obligations only.
+
+**Revision I.20:** adds M-149–M-154 for Rank-first eligible route claims/same-Rank Authority, cross-family complete-entry host reservations, host-only binding/empty death/Deck retention, exact attached-outcome controller and binding-time cast pinning/Entity continuation. M-130 replaces only the superseded presence-only blocker with actual route eligibility. Existing target, mixed Damage/Rage, Shield, Heal, clock and child tests remain reusable. Declarative Architecture Phase obligations, not executable results.
 
 # 0. WHAT THIS FILE IS
 
@@ -4247,12 +4249,12 @@ Seeded selection gives no duplicates/replacement. Fewer than3 candidates selects
 **Expected Resolution:** build one complete eligible entry set from the threshold result, one checkpoint/profile seeded permutation and finite route graphs. Host selection uses the current allowed pool per entrant; later entries see earlier commits. Reordering Entity/Slot/Event/list enumeration with the same seed preserves logical order/draws/outcomes. Do not substitute the last death cohort, invoke Thespis's owner-death gate or draw independent per-owner entrant orders. A later entrant belongs to a later checkpoint.
 **Layers Under Test:** E.16 §30.3, REC-006, lifecycle-result/Snapshot/RNG/route owners.
 
-## M-130 — Current Router Availability, Fixed Side and Re-entered Blocker
+## M-130 — Current Router Availability, Fixed Side and Eligible Higher-rank Claim
 
 **ID:** `M-130`
 **Status:** `MUST_PASS`
-**Input:** alive/present owners on both Sides, then one owner's leave/death; host bodies persist independently. Test a Luân Hồi Chi Chủ incarnation leave/death and legitimate reentry between checkpoints.
-**Expected Resolution:** with both eligible owner Sides, an entrant uses only hosts matching its death-record Side, even if the other Side alone has an empty host. With only one eligible owner Side, either entrant Side may route there. A selected host retains creation Side; Chân Ngã does not flip it. Absent/dead owner cannot route through its surviving host. Alive/present Chi Chủ blocks either alliance, real leave/death removes blocker and reentry restores it; VFX/non-targetability does not. Current entry read/revalidation owns these decisions, without replaying a stale availability snapshot.
+**Input:** alive/present owners on both Sides, then one owner's leave/death; host bodies persist independently. Test a Luân Hồi Chi Chủ incarnation leave/death and legitimate reentry between checkpoints; declare its legal route/host availability separately from presence.
+**Expected Resolution:** with both eligible owner Sides, an entrant uses only hosts matching its death-record Side, even if the other Side alone has an empty host. With only one eligible owner Side, either entrant Side may route there. A selected host retains creation Side; Chân Ngã does not flip it. Absent/dead owner cannot route through its surviving host. An actually eligible higher-Rank Chi Chủ route has first claim regardless of alliance. Mere presence without legal route/host cannot suppress Pygmalion. Real leave/death/reentry changes current eligibility under the route law; reentry with a legal route restores first claim, while VFX/non-targetability alone does not change presence. Same-Rank semantic conflict remains Authority-governed, not a presence or RNG shortcut. Current entry read/revalidation owns these decisions, without replaying a stale availability snapshot.
 **Layers Under Test:** REC-006/007, POS-005, relation/death records, current eligibility/reservation.
 
 ## M-131 — Uniform Canonical Definition Pool and Fresh Per-entry Reads
@@ -4419,6 +4421,57 @@ Only after entry commit and required world bookkeeping may ordinary observers/do
 **Failure / replay variants:** empty admission pool rejects before Cost/Action begin; read-only probes pay nothing. If the admitted pool disappears before post-Cost capture, or all captured candidates subsequently fail local legality/Authority, close the already-paid Skill under ordinary local failure with no automatic AE refund, pending retry, substitute pool or synthetic success. Invalid frozen generation cannot bind a later death of the same trueSelfId. A generic protected transaction abort publishes no partial transitions; it is distinct from an independently blocked candidate. Pause/save before capture, adjudication, commit or observer publication; resume retains the original candidate/transaction/record and terminal outcomes, never debiting twice, forcing a later pool, publishing prefixes or routing an entry twice. Clause Authority stays local: unrelated Damage/root Ultimate/other Skills do not acquire Axiom from Rank, identity or this Skill.
 
 **Layers Under Test:** 04§6/8/10/11/30/32/34–36/72–73, CST-001/005/007/010, RES-001/002/004/005, AUT-001–004/005, REC-005/006/020, P-066 and existing Target/Lifecycle/Authority/Transaction/Reincarnation-ledger/result owners. This covers force-clause batch/admission interaction absent from ordinary threshold/cohort cases E-006–010 and routing M-126–M-134, without changing their laws.
+
+## M-149 — Rank-first Claims Require Actual Entrant/Route/Host Eligibility
+
+**ID:** `M-149`
+**Status:** `MUST_PASS / MUST_REJECT`
+**Purpose:** distinguish eligible claimant Rank precedence from presence, host Rank and Authority-tier priority.
+**Fixture:** one complete Reincarnation-entry checkpoint, entering True Self T and a declared 04§30.4 arbitration domain with Prime/UR/SSR route claimants. The SSR route binds to an existing empty body; all hosts are independently legal under their declared route semantics. Give the SSR clause AXIOM and the UR clause QUY_TAC solely to distinguish this Rank-first profile from ordinary AUT ordering.
+**Expected Resolution:** eligible Prime has first claim; if Prime's entrant restriction/host/capacity makes its route ineligible, eligible UR wins; if UR also lacks a legal route/required definition pool, eligible SSR may win. Presence of either higher claimant alone cannot block it. Rank reads the route claimant, never host rarity or the entrant's old definition. Lower-Rank Axiom does not beat eligible UR under this opted-in route policy. Do not alter AUT-003 for other semantic conflicts. Admission precedes host/definition draws; rejected/ineligible claims cannot spend/reserve/draw. A conflicting outside route without an actual compatible governing law rejects affected executable composition, rather than disappearing from the domain.
+**Layers Under Test:** 04§30.3–4, REC-006/007, progression/Target/Authority/Transaction/route plan.
+
+## M-150 — Same-Rank Semantic Contention, NO_OVERRIDE and Equivalent Host Families
+
+**ID:** `M-150`
+**Status:** `MUST_PASS / MUST_REJECT`
+**Fixture:** two different route semantics at the same Effective Rank compete exclusively for T. Both actual clauses have QUY_TAC; all remaining AUT-004 comparison facts tie except snapshot CP200 versus100. Variant all comparator facts tie; another variant three incompatible claims; separate control uses two identical route semantics explicitly declared SAME_SEMANTIC_FAMILY_HOST_POOL.
+**Expected Resolution:** existing Authority adjudication admits the actual CP winner in the first fixture. Exact NO_OVERRIDE commits neither contested claim, then ordinary/separately legal outcomes retain their actual law; no random winner, Entity/Slot/Event priority or automatic lower-Rank retry. Three claims retain their complete actual conflict graph; pairwise evidence cannot silently choose a third conflicting claim. Identical declared same-family host multiplicity is one claim at the winning Rank, followed by its seeded host rule; it does not invoke semantic adjudication among equivalent hosts. Different semantics/owner policies cannot be coalesced by family label. Unsupported/missing actual conflict context fails closed. Same seed and logical identities preserve outcomes under list/Slot/Event permutations and replay.
+**Layers Under Test:** 04§30.4, REC-006, AUT-002–004, existing Snapshot/RNG/Authority/Transaction.
+
+## M-151 — Cross-family Complete-entry Order, Host Reservation and Resume
+
+**ID:** `M-151`
+**Status:** `MUST_PASS / MUST_REJECT`
+**Fixture:** A/B/C enter Reincarnation together after a threshold change without a new death. One UR route has capacity1; two empty SSR hosts share an identical host-only route family, no Side restriction. Use one arbitration checkpoint/domain. All pools/hosts otherwise legal. Pause before claim selection, after host reservation, after binding and between entries; permute publication/family/host enumeration.
+**Expected Resolution:** one retained seeded entrant permutation spans both families. First entrant sees and consumes the eligible UR route; subsequent entries see that capacity exhausted and may select the SSR family. Seeded host selection occurs only after its family legitimately wins. Host reservations commit at most one entrant per host/one host per entrant; later entries see earlier required settlement terminal. Resume uses original order/adjudication/draw/reservation/terminal evidence. Invalid selected host after reservation closes that entry locally and releases uncommitted reservation, with no substitute/redraw/arbitration retry/limbo; another entrant may later use a legal remaining host. Prior committed bindings remain. Partial membership/per-family independent orders or an ungoverned shared-capacity conflict reject before affected binding. Event order cannot become entrant order.
+**Layers Under Test:** 04§30.3–4, REC-006, entry results, route/Effect DAG, reservation/RNG/Transaction.
+
+## M-152 — Host-only Binding Retains Body and Deck Identity; Empty Death Has No Soul
+
+**ID:** `M-152`
+**Status:** `MUST_PASS`
+**Fixture:** an SSR collection body starts empty, alive/present with its own Side/kit/stats/resources and active source-owned field controller. T from the other Side legitimately enters Reincarnation and the host-only family wins. Compare non-death Return-to-Deck/redeploy, bound death followed by ordinary Revive before entry, bound death whose T enters first, and an empty-body death while another True Self waits at3/4.
+**Expected Resolution:** binding closes T's old route and binds exactly one True Self; retain host body/Side/stats/definition and existing controller/admitted casts. No prior-life kit/Class/Element/resources/cooldowns/States/Shield transfer, fake deployment/Revive/DEATH_CONFIRMED or second Soul. Non-death Deck return retains T and battle-once cost mutation, while declared field controller/growth reset; redeploy remains bound and READY. Bound death creates ordinary waiting for that Kenoma life; pre-entry Revive restores the same bound life, but after entry cannot retrieve it. Empty death creates no waiting/ordinary True-Self Revive entitlement and does not advance3/4, despite collection identity. Another explicit non-True-Self lifecycle mechanic remains separate. Occupied/dead/absent host is ineligible; no overwrite.
+**Layers Under Test:** REC-002/005/006/020, P-080 identity policy, DEP/State/Field Presence and existing lifecycle/True-Self ledger; M-129–134's Definition-inheriting routes remain distinct.
+
+## M-153 — Attached Natural Outcome, Paired Capacity Controller and Live Binding Growth
+
+**ID:** `M-153`
+**Status:** `MUST_PASS / MUST_REJECT`
+**Fixture:** recipient atHP160/Max200 snapshots M200 at enemy Natural start. Root own-direct ActualHP60 plus an explicitly outcome-attached damaging Passive ActualHP20 settle with mandatory lifecycle and finite linked dependency refs; unrelated same-root DoT/Counter/Passive Damage are excluded. READY response costsAE5. Another variant D70 exactly; lethal outcome variants confirmed dead/prevented alive. After successful activation, source-specific Shield120 shares ordinary proportional depletion with a foreign Shield; by normal end own remainderR30, foreign remainderF40. While ACTIVE, unrelated capacity ADD20 commits and a legitimate host-only True-Self binding occurs. Use three consumed owner opportunities, including CC, then two cooldown opportunities.
+**Expected Resolution:** D80>70 qualifies once only after the declared complete outcome is terminal; exactly70 does not. Confirmed-dead owner cannot activate; lawful prevention leaving it alive may. Post-Cost HP80/Max200 gives E120, preserving HP80, Max80 and own Shield120; D80 is not the exchange amount. Failed Cost creates no controller/capacity/Shield delta. Broken own Shield leaves ACTIVE/-E intact through deadline. At normal third completion capture ownR30, remove only own Shield/-E, recompute Max220, preserveHP80, ordinary Heal30→HP110, live bound-Soul gate adds5%×220=11→Max231 without HP growth, then freshCD2. ForeignF40 remains. Same opportunity does not tick newCD; next two consumed opportunities do, non-Natural does not. New cycle compounds from then-current capacity. Actual death/leave cancels paired/controller/CD/growth with no terminal Heal/growth; bound Soul independently retains through non-death Deck.
+
+Zero-missing-HP after intervening lawful recovery gives E0: ordinary zero-delta/zero-Shield rules create no positive contribution, but do not invent an E>0 admission requirement or change the successful controller clock. Capture exact paired refs/remaining result; never recover old MaxHP snapshot or count foreign Shield. Missing/unsealed/foreign result refs, root-only membership, completion-wait cycles or stale presence callbacks reject/close under existing law. Save/replay cannot aggregate twice, pay twice, restore twice or repeat growth. This is exact-result/DAG/State/MaxHP/Shield/Clock composition, not a new outcome collector or controller service.
+**Layers Under Test:** ACT-032, TRG-013, P-043, CST, P-031/032/046/048, RES-002/008, CLK, State/Duration/Transaction/identity; existing M-074/M-090/M-108 supply isolated threshold/controller boundaries.
+
+## M-154 — Binding During a Pinned Cast and Local Entity-bound Damage Continuation
+
+**ID:** `M-154`
+**Status:** `MUST_PASS`
+**Fixture:** an empty host admits one Natural Ultimate, pins hasBoundTrueSelf=false, requests exactly one real SKILL/non-Natural child with AE0 and passes that flag. A legitimate binding turns live state true before child Damage. Ordinary Skill1 top-Rage actor selection locks Slots; pre-Damage movement replaces one selected actor with a legal occupant lacking Rage. Separately, strengthened Skill3 pins true and post-Cost CurrentMaxHP200, then resolves its one main Slot8 hit with committed ActualHP10 on X. X remains legal and moves away before the explicit continuation; variant X dies and Y occupies8, or main Shield-only ActualHP0.
+**Expected Resolution:** Ultimate child retains135/135 coefficients/drain15 for this cast despite binding; next admitted Natural Skill1 may use150/150/drain20 and discounted AE. Replacement recipient receives legal Damage; no-Rage subeffect is local no-op. Shield-only admitted Rage-bearing recipients still drain; missed/invalid branches do neither. Complete simultaneous child direct receipts/lifecycle precede one root Heal50% of only their ActualHP, with no native Overheal Shield. Actual Skill identities/Natural counts remain intact. Skill3's positive main receipt emits one direct TRUE10 hit on the **same X identity**, using cast Max200; legal movement does not replace X with Y. Death/invalidity or mainActualHP0 skips locally. Bonus cannot recurse or query Slot8 anew; ordinary Reaction waits for the explicit main→lifecycle→bonus→lifecycle graph. Live binding changes neither pinned profile nor an admitted Action's identity/clock.
+**Layers Under Test:** host-only REC-006 binding, Action/Snapshot/P-001/040–045, TGT-007/008, RES-002, ACT-020/023/032, CST-006, HEL-001; reuses M-080/M-082/M-091/M-147's isolated branch/child/result laws.
 
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
@@ -5233,13 +5286,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 148 character-derived integration tests;
+- 154 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-279 tests / probes / meta-tests (274 A–N cases plus 5 META cases)
+285 tests / probes / meta-tests (280 A–N cases plus 5 META cases)
 
 The count is not a design target.
 
