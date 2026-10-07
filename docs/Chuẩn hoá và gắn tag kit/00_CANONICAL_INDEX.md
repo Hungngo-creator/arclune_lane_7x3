@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-07-INDEX-18
+**Version:** 2026-10-07-INDEX-19
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-07-INDEX-18`
+**Version:** `2026-10-07-INDEX-19`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -165,6 +165,8 @@ In `docs/canon kit/`:
 - **Rotania** → `docs/canon kit/Rotania_Clarified_Gameplay_Canon.md` → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → first-depletion Shield family, per-Heal conversion denial, stable predicate checkpoints and bounded Rage-limit reconciliation.
 
 - **Thespis** → `docs/canon kit/Thespis_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry84; restricted Basic projection, distinct frozen Role bindings, owner-gated seeded Death Cohort settlement and independent real Summon lifetime/dismissal/Ultimate Shield composition. Metadata and unsupported future external profiles remain NOT BLOCKING.
+
+- **Pygmalion** → `docs/canon kit/Pygmalion_Clarified_Gameplay_Canon.md` R0 → **PARTIALLY_CLARIFIED / NORMALIZATION_BLOCKED_BY_GAMEPLAY_DECISIONS** → raw4 entry26; consolidates locked PUPPET identity, life-cycle quota, host/full-kit/Class/Element policy and ordinary Revive/Ultimate attribution. §8 lists ten internal gameplay groups; proposed answers remain non-canonical until designer lock.
 
 E.15/F.17/G.16/I.16 adds two bounded opt-in profiles on existing objects: restricted Basic direct-Damage projection into immutable Snapshot/State/Spawn bindings, and complete-cohort local seeded Trigger settlement with retained death inputs/owner gate/per-entry progress. Existing owners execute both; no new Tag/Primitive/Contract ID/subsystem/global priority. M-117–M-125 cover projection closure/identity, cohort/placement/replay, clocks/causes, dismissal and final-live-set Ultimate composition. 01/02/03/07 and prior fixtures remain unchanged; unsupported damaging Basics never silently become Blank.
 
