@@ -730,19 +730,19 @@ Kiếm Tiên Ư Vạn Pháp: mọi sát thương natural Action gây ra đều l
 
 Thần tính: không nhận debuff/buff/mark từ mọi nguồn bên ngoài thuộc cấp Quy Tắc và Quy Tắc trở xuống.
 
-đánh thường: gây sát thương chuẩn = 100% wil + 100% atk lên 1 target.
+đánh thường: gây sát thương chuẩn từ nội tại = 100% wil + 100% atk lên 1 target.
 
 Skill 1 — Four Directions, One Edge
-Tứ Phương Nhất Nhận: đứng tại chỗ loạn trảm ra 4 đạo kiếm khí, gây sát thương chuẩn lên ô 8/2/4/6 của kẻ địch, 15 ae, mỗi kẻ nhận sát thương = 135% wil + 150% atk của nhân vật này.
+Tứ Phương Nhất Nhận: đứng tại chỗ loạn trảm ra 4 đạo kiếm khí, gây sát thương chuẩn lên ô 8/2/4/6 của kẻ địch, 15 ae, mỗi kẻ nhận sát thương chuẩn từ nội tại = 135% wil + 150% atk của nhân vật này.
 
 Skill II — Sever Heaven
-Đoạn Thiên: chém dọc, một đạo kiếm khí khổng lồ lao về ô 2/5/8 của sân kẻ địch bất kể nhân vật này đứng ở đâu, mỗi kẻ trúng nhận sát thương chuẩn = 160% wil và 180% atk của nhân vật này, 25 ae.
+Đoạn Thiên: chém dọc, một đạo kiếm khí khổng lồ lao về ô 2/5/8 của sân kẻ địch bất kể nhân vật này đứng ở đâu, mỗi kẻ trúng nhận sát thương chuẩn từ nội tại = 160% wil và 180% atk của nhân vật này, 25 ae.
 
 Skill 3 — No Interval Between Death and Rebirth
 Sinh Tử Vô Gian: rút kiếm, thu kiếm, mọi chân ngã trong hàng chờ luân hồi thuộc phe kẻ thù lập tức vào luân hồi, chân ngã phe đồng minh không bị ảnh hưởng, cần 1 natural Action, 30 ae.
 hắn chém khoảng cách giữa hàng chờ luân hồi và luân hồi của chân ngã thuộc phe kẻ thù.
 
-One Sword Defines Heaven and Earth / Nhất Kiếm Định Thiên Địa: cast skill 1 và 2 cùng lúc nhưng không tốn ae.
+ultimate: One Sword Defines Heaven and Earth / Nhất Kiếm Định Thiên Địa: cast skill 1 và 2 cùng lúc nhưng không tốn ae.
 
 
 57) .
