@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-07-F.19
+**Version:** 2026-10-07-F.20
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -36,6 +36,8 @@
 **Revision F.18:** extends only existing REC-001/006 with battle-base threshold mutation and complete-entry local route settlement; aligns existing Pygmalion ENT clauses with clarified quota/body/coordination policies. Other laws/IDs remain intact; no new Tag, Primitive, subsystem or global priority.
 
 **Revision F.19:** extends existing ACT/CLK, TRG-015, SNP-002, CST-009/016, HEL-001, POS-005/008 and REV-004/006 with the bounded E.17 profiles. ACT-050 distinguishes terminal Leader death from its own expressly admitted pending return; another participant's entitlement protects only roster extinction. RES-008 is the generic common-recipient simultaneous allocation law with immutable component receipts. Ordinary Cost/Revive/TRUE and prior proportional profiles remain intact; no new Contract ID, allocator or global priority.
+
+**Revision F.20:** extends REC-006 with E.18's opt-in eligible-claim Rank-first route law. REC-007 uses eligible higher-rank routing rather than presence as a priority proxy; REC-002 explicitly requires a real bound Chân Ngã for the ordinary Character death count. Host-only binding, empty-body death and existing controller/result composition add no Contract ID or Authority tier.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -4592,10 +4594,11 @@ Each base write is keyed by originating Effect/transaction terminal identity, pe
 **Status:** `LOCKED DEFAULT FROM PROJECT RULE`
 
 Count:
-- collection Characters/Chân Ngã-bearing combatants;
+- collection Characters/combatants whose confirmed life actually bears a Chân Ngã;
 - NPCs that participate as relevant real combat lives under the system.
 
 Do not count by default:
+- any body without a bound Chân Ngã, including an explicitly empty collection Character (collection identity is not a synthetic True Self);
 - Summons without Chân Ngã;
 - Despawn;
 - Fusion Consumption;
@@ -4688,12 +4691,26 @@ Each entry reads current declared owner/Side/host eligibility after the previous
 
 Close route work, mandatory lifecycle and declared required local settlements before the next dependent entry. No available host, empty pool or stale selected host/definition/reservation closes a local failed route, releases only uncommitted reservations and continues ordinary exit/another separately legal intercept. No reroll, alternate host, wait token or rollback of prior entries. Competing unrelated route families sharing capacity require their actual law; otherwise reject the affected executable composition.
 
+### Opt-in Rank-first competing route claims
+
+04§30.4 extends the same complete-entry settlement with one shared arbitration profile and complete participating-route domain. For each entrant, first read **current actual eligibility** of every declared claim, including legal route/host and required pool feasibility. Alive/present ownership alone supplies no claim. Read the eligible **claimant's Effective Rank**, not the host or entrant definition Rank; highest eligible Rank has first claim. Higher ineligible routes do not block lower eligible routes.
+
+Only incompatible claims at the highest eligible Rank enter existing Authority Conflict Adjudication, using actual clauses/owners and AUT-002–004. Rank-first is route contention policy, independent from clause Authority tier. Exact NO_OVERRIDE creates no winner in that intersection. No RNG, Entity/Slot/Event/list order, implicit lower-Rank retry or synthetic Authority is a substitute. Separately legal routes/ordinary exit follow their own law; 3+ claims preserve every actual conflict edge.
+
+An explicitly declared identical semantic route family's host multiplicity coalesces at that Rank before semantic adjudication. Once the family legitimately wins, seeded selection among its legal hosts is host selection, not an Authority tie-break. Distinct semantics/owner policies cannot use family-label equality to bypass a conflict. Claimant/host reservation protects exclusive entrant binding and one occupant per host.
+
+Use one immutable checkpoint/entrant membership, one enumeration-invariant seeded entry order and protected per-entry progress across the governed families. Later entrants read after prior entry/local lifecycle is terminal. Protect Rank, eligibility, conflict evidence and chosen host/definition revisions; invalid chosen work fails locally under the existing no-reroll/no-alternative/no-limbo rule. Replay preserves the original candidate/adjudication/draw/reservation/terminal identities. Do not create a route-priority manager or let a family-local permutation/Event publication race win contention.
+
+### Host-only True-Self binding
+
+A route may declare binding of one entering True Self to an existing empty body while retaining that body's Side, presentation, stats and Combat Definition. This uses existing identity/reservation operations; no Definition inheritance, old-life transient state, new Character, synthetic DEATH_CONFIRMED, Revive or field-entry event follows implicitly. An occupied host cannot be overwritten. Ordinary non-death deployment transitions retain the bound True Self unless an explicit law removes it; independent Field Presence-scoped kit State may reset. On bound-life death, existing True-Self waiting/Revive law applies. An explicitly empty body's confirmed death supplies no waiting record, ordinary True-Self Revive entitlement or REC-002 progress; another explicit non-True-Self lifecycle rule remains separate.
+
 ## REC-007 — Pygmalion Route
 **Status:** `LOCKED CURRENT CHARACTER DIRECTION`
 
-An eligible Chân Ngã entering Reincarnation may route into an eligible empty Pygmalion Puppet when the route is not blocked by Luân Hồi Chi Chủ and other eligibility rules.
+An eligible Chân Ngã entering Reincarnation may route into an eligible empty Pygmalion Puppet when current route/host/definition eligibility and governing route contention permit it.
 
-The Puppet route does not ordinary-Revive the prior body. Its Q4–Q7 policies are declared in Pygmalion Clarified Canon: router alive/Field Present; fixed host creation Side; both eligible owner Sides restrict by entrant death-record Side, one owner Side accepts either; alive/present Luân Hồi Chi Chủ blocks regardless of alliance. Use 04§30.3's complete-entry settlement, current EMPTY host reservation, uniform canonical same-Rank definition pool and exact current-representation/immediate-previous-life exclusions. Failed routes follow REC-006 without reroll/limbo.
+The Puppet route does not ordinary-Revive the prior body. Its Q4–Q7 policies are declared in Pygmalion Clarified Canon: router alive/Field Present; fixed host creation Side; both eligible owner Sides restrict by entrant death-record Side, one owner Side accepts either; an actually eligible higher-Effective-Rank route has first claim under REC-006/04§30.4, regardless of alliance; Luân Hồi Chi Chủ presence alone is not that eligibility. Use 04§30.3's complete-entry settlement, current EMPTY host reservation, uniform canonical same-Rank definition pool and exact current-representation/immediate-previous-life exclusions. Failed routes follow REC-006 without reroll/limbo.
 
 ---
 

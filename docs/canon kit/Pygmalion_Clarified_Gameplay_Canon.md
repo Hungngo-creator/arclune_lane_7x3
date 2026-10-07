@@ -1,8 +1,8 @@
 # ARCLUNE — PYGMALION — CLARIFIED GAMEPLAY CANON
 
-**Revision:** R1.
+**Revision:** R2.
 **Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED.
-**Source:** `26) Pygmalion` in root `Ý tưởng nhân vật 4.md`; latest explicit **PYGMALION Q1–Q10 FINAL DESIGNER LOCK** replaces all ten R0 questions/proposals and conflicting raw shorthand. Existing non-superseded PUPPET/Revive/attribution locks remain applicable.
+**Source:** `26) Pygmalion` in root `Ý tưởng nhân vật 4.md`; latest explicit **PYGMALION Q1–Q10 FINAL DESIGNER LOCK** replaces all ten R0 questions/proposals and conflicting raw shorthand. Existing non-superseded PUPPET/Revive/attribution locks remain applicable. Latest **KENOMA Q1A FINAL DESIGNER LOCK** supplies the shared eligible-route Rank-first contention law and supersedes the presence-only priority proxy in §4.2.
 
 ## 1. Character, actor and lifetime boundaries
 
@@ -77,9 +77,11 @@ A Puppet keeps the creator's Side at its creation. Incoming Chân Ngã does not 
 
 Build eligible Pygmalion owners under that availability rule. If owners are present on **both opposing Sides**, use only hosts of an owner whose Side matches the entrant's **death-record Side**. If eligible owners exist on **only one Side**, its router can accept entrants from either Side. Host scarcity does not silently redefine the two-Side owner rule; then select among currently eligible hosts within its allowed owner/Side scope.
 
-### 4.2 Luân Hồi Chi Chủ blocker
+### 4.2 Eligible higher-Rank route contention
 
-A Luân Hồi Chi Chủ incarnation **ALIVE AND Field Present in that Combat Instance** blocks this routing regardless of alliance. Confirmed death or true field leave removes the blocker; a legitimate later field reentry restores it. VFX absence/non-targetability is not LEAVE_FIELD. Ordinary presence/lifecycle provides the authoritative view.
+For the same entering Chân Ngã, actually eligible routes compete by **claimant Effective Rank first**, regardless of alliance. An eligible Prime Luân Hồi Chi Chủ route has first claim over UR Pygmalion; eligible UR Pygmalion has first claim over SSR Kenoma. **Presence alone is insufficient**: the higher-rank route must satisfy that entrant's real eligibility and have a legal route/host. If ineligible or without a legal host, the next eligible route may compete. Death/actual leave/reentry changes current eligibility under each route's own law; VFX absence/non-targetability is not LEAVE_FIELD.
+
+Same-Rank different semantic/owner claims use existing Authority Conflict Adjudication; exact NO_OVERRIDE invents no winner. Equivalent same-family host multiplicity uses its declared host-selection law only after that family wins. Complete-entry ordering/reservation remains shared/protected, without Event/Slot/list/RNG semantic priority. No new restriction on Pygmalion's own host Side or definition pool is supplied by this contention rule.
 
 ### 4.3 Complete entrant set and local permutation
 
@@ -216,7 +218,7 @@ Retain full Basic secondary behavior; rootActionId does not turn secondary/child
 | Creation / quota | P-051 + P-084 joined success under RES-005; independent kit-cycle State marker, current EMPTY blocker, ordinary Mode placement |
 | Current host / owner / Side query | Existing typed Target/Presence/relation/identity filters and current death-record Side; no lore-derived Authority |
 | Reincarnation base reduction | REINCARNATION owner, 04§30.2 → existing world-ledger Effect/System plan/P-021 authorized base-field write/P-066 entry, REC-001/004/020; protected Cost guard, battle lifetime, all-entry re-evaluation |
-| Complete entrant routing | REINCARNATION route owner, 04§30.3 / REC-006/007; checkpoint-local seeded permutation, per-entry current host reservation/definition pool/commit |
+| Complete entrant routing | REINCARNATION route owner, 04§30.3–4 / REC-006/007; checkpoint-local seeded permutation, per-entry current host reservation/definition pool/commit |
 | Full-kit binding | COMBAT_DEFINITION_INHERITANCE, P-082/083 and 04§31 dimension policies; preserve host, fresh new actor state, no synthetic lifecycle events |
 | Skill2 defense State | BUFF on self State, STAT_MODIFIER on ARM/RES contributions, MULTIPLY ARM/RES, RES-007 EXCLUDE_THIS_SOURCE_FAMILY; single-family REPLACE/REFRESH and CLK-003 next consumed opportunity, death/leave cleanup |
 | Coordinated Ultimate | Finite RequestAction expansion over frozen seeded actor list; own child identity/cost/target/snapshot/attribution/Authority; root SEQUENTIAL + AFTER_DIRECT_EFFECTS_COMPLETE under RES-003 |

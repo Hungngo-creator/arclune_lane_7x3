@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-07-INDEX-25
+**Version:** 2026-10-07-INDEX-26
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-07-INDEX-25`
+**Version:** `2026-10-07-INDEX-26`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-07-E.17`.
+**Version:** `2026-10-07-E.18`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-07-F.19`.
+**Version:** `2026-10-07-F.20`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-07-G.18`
+**Version:** `2026-10-07-G.19`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-07-I.19`
+**Version:** `2026-10-07-I.20`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -170,9 +170,11 @@ In `docs/canon kit/`:
 
 - **Renchu / Nhận Sơ** → `docs/canon kit/Renchu_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry56; Q1–Q6 locked: exact Natural/direct-request child scope, PRE_MITIGATION TRUE conversion, one committed-outcome Heal50% then continuous Overheal Shield50% with independent contributions, two real non-Natural Skill children/common Snapshot/Slot batch and Axiom-only force-entry clause with nonempty admission/frozen enemy waiting pool/local failures. Existing 01–07 composition suffices; M-147/M-148 add only generic interaction coverage. No internal gameplay ambiguity remains; metadata/future Mode adapters remain NOT BLOCKING.
 
-- **Kenoma** → `docs/canon kit/Kenoma_Clarified_Gameplay_Canon.md` R0 → **GAMEPLAY_PARTIALLY_CLARIFIED / NORMALIZATION_BLOCKED_BY_INTERNAL_GAMEPLAY** → raw4 entry61 already exists; empty-True-Self body, battle-once Current deployment cost−2, conditional Rage-ranked shots, damage-triggered capacity/Shield3→CD2 cycle, conditional MaxHP growth5%, Slot8 shot and Skill1/Heal Ultimate. Canon §7 groups nine internal decisions; proposed host/target/conversion/clock/outcome profiles are not approved. No generic gap is proven yet; current01–08/raw remain unchanged. Metadata/future external profiles remain NOT BLOCKING.
+- **Kenoma** → `docs/canon kit/Kenoma_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry61; Q1–Q9/Q1A–B locked: initial empty SSR body, host-only either-Side routing with eligible claimant Rank-first/same-Rank Authority, bound Soul retained through Deck/redeploy, pinned cast profiles, Rage-ranked Slot-bound simultaneous bullets/drain, exact attached received-Natural outcome, missing-HP paired capacity/Shield ACTIVE3→freshCD2, live Soul-gated compounding field growth, Slot8 main/exact-recipient TRUE continuation and one real Ultimate child/receipt Heal. Only route contention needs the bounded generic extension below; all other mechanics compose. No internal gameplay question remains; metadata/future external profiles remain NOT BLOCKING.
 
-- **Pygmalion** → `docs/canon kit/Pygmalion_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry26; Q1–Q10 locked: first-cycle BATTLE_START basis/later current bases, success-only quota/EMPTY blocker, independent PUPPET bodies, complete-entry router and uniform roster pool, host-preserving fresh kit state, battle-global base reduction, next-consumed-opportunity defense family and coordinated seeded full Basic sequence. Only metadata/future external profiles/Mode adaptations remain NOT BLOCKING.
+- **Pygmalion** → `docs/canon kit/Pygmalion_Clarified_Gameplay_Canon.md` R2 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry26; Q1–Q10 locked: first-cycle BATTLE_START basis/later current bases, success-only quota/EMPTY blocker, independent PUPPET bodies, complete-entry router and uniform roster pool, host-preserving fresh kit state, battle-global base reduction, next-consumed-opportunity defense family and coordinated seeded full Basic sequence. Only metadata/future external profiles/Mode adaptations remain NOT BLOCKING.
+
+E.18/F.20/G.19/I.20 adds only opt-in Rank-first contention to the existing Reincarnation route plan. Composition of family-local 04§30.3/REC-006 cannot choose between eligible competing families by Rank; ordinary AUT cannot substitute because this route policy compares Rank before clause tier. 04§30.4 binds one complete arbitration domain/checkpoint/order, actual current legal claims and claimant Rank, existing same-Rank Authority, equivalent-family host multiplicity, protected reservation/failure/replay. Pygmalion R2/REC-007/M-130 replace the superseded presence-only blocker with actual eligible higher-Rank first claim; REC-002/Kernel explicitly exclude empty-body death. M-149–M-154 cover the new generic boundaries/interactions. No Tag/Primitive/Contract ID/subsystem/global priority; 01/02/03/07/raw/src remain unchanged. Kenoma host binding, damage/result/controller/growth/child mechanics use existing composition.
 
 B.2/E.17/F.19/G.18/H.2/I.18 adds bounded profiles through existing owners for dead-Slot scheduling/cause-only restoration, retained-stat snapshots, pre-death receipt folds, reserved actual-Heal payment, required SSI predicates, causal Rage admission and authored-shape movement eligibility. ACT-050/Main distinguish roster recovery from exact self-Leader pending recovery; RES-008 supplies generic proportional common-recipient allocation and immutable component receipts. M-135–M-146 cover these boundaries/interactions and malformed profiles; M-065's allocation premise/control is updated to the resolved generic law. No new Tag/Primitive/Contract ID/subsystem/allocator/global priority;02/03/raw/src remain unchanged. Lamarck Q1–Q17 has no pending internal gameplay decision.
 
