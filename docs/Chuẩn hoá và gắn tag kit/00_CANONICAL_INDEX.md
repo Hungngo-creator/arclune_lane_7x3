@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-07-INDEX-24
+**Version:** 2026-10-07-INDEX-25
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-07-INDEX-24`
+**Version:** `2026-10-07-INDEX-25`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -169,6 +169,8 @@ In `docs/canon kit/`:
 - **Thespis** → `docs/canon kit/Thespis_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry84; restricted Basic projection, distinct frozen Role bindings, owner-gated seeded Death Cohort settlement and independent real Summon lifetime/dismissal/Ultimate Shield composition. Metadata and unsupported future external profiles remain NOT BLOCKING.
 
 - **Renchu / Nhận Sơ** → `docs/canon kit/Renchu_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry56; Q1–Q6 locked: exact Natural/direct-request child scope, PRE_MITIGATION TRUE conversion, one committed-outcome Heal50% then continuous Overheal Shield50% with independent contributions, two real non-Natural Skill children/common Snapshot/Slot batch and Axiom-only force-entry clause with nonempty admission/frozen enemy waiting pool/local failures. Existing 01–07 composition suffices; M-147/M-148 add only generic interaction coverage. No internal gameplay ambiguity remains; metadata/future Mode adapters remain NOT BLOCKING.
+
+- **Kenoma** → `docs/canon kit/Kenoma_Clarified_Gameplay_Canon.md` R0 → **GAMEPLAY_PARTIALLY_CLARIFIED / NORMALIZATION_BLOCKED_BY_INTERNAL_GAMEPLAY** → raw4 entry61 already exists; empty-True-Self body, battle-once Current deployment cost−2, conditional Rage-ranked shots, damage-triggered capacity/Shield3→CD2 cycle, conditional MaxHP growth5%, Slot8 shot and Skill1/Heal Ultimate. Canon §7 groups nine internal decisions; proposed host/target/conversion/clock/outcome profiles are not approved. No generic gap is proven yet; current01–08/raw remain unchanged. Metadata/future external profiles remain NOT BLOCKING.
 
 - **Pygmalion** → `docs/canon kit/Pygmalion_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry26; Q1–Q10 locked: first-cycle BATTLE_START basis/later current bases, success-only quota/EMPTY blocker, independent PUPPET bodies, complete-entry router and uniform roster pool, host-preserving fresh kit state, battle-global base reduction, next-consumed-opportunity defense family and coordinated seeded full Basic sequence. Only metadata/future external profiles/Mode adaptations remain NOT BLOCKING.
 
