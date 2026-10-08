@@ -67,7 +67,7 @@ Cost **15 AE**. Khi cast, Luân Hồi Chi Chủ rời hiện thế dưới trạ
 
 Khi trở lại thành công: **Heal 20% Max HP hiện tại trước**, sau đó thêm **5% Max HP** dựa trên giá trị lúc **rời sân dùng chính Skill 2**. Đây là anchor được câu cuối raw chỉ định; không đổi thành Max HP tại thời điểm trở lại chỉ vì câu đầu dùng chữ “vào sân”. Phần tăng đã tích lũy **được giữ qua các lần ẩn/trở lại bằng Skill 2**, không xóa bonus cũ rồi chỉ thay bằng một bonus mới. Heal và lần tăng mới chỉ xảy ra khi return thành công, không lặp trong retry thất bại. Không tạo Natural Action hoặc reset SSI cursor.
 
-**Tăng trưởng đã chốt:** khi không có biến động Max HP khác, mỗi lần dùng và return thành công cho **Max HP mới = 1,05 × Max HP lúc rời sân**: **100 → 105 → 110,25 → 115,7625…**. Chốt này thay thế câu cũ “bonus mất khi rời sân vì chính Skill 2”. **UNRESOLVED:** phần tăng tích lũy có mất khi rời sân bằng cơ chế khác hoặc vào waiting window/Luân Hồi hay không; không mặc định biến thành bonus vĩnh viễn cho mọi transition.
+**Tăng trưởng và lifetime đã chốt:** khi không có biến động Max HP khác, mỗi lần dùng và return thành công cho **Max HP mới = 1,05 × Max HP lúc rời sân**: **100 → 105 → 110,25 → 115,7625…**. Chốt này thay thế câu cũ “bonus mất khi rời sân vì chính Skill 2”. **Giữ toàn bộ phần tăng tích lũy qua các chu kỳ ẩn/trở lại bằng Skill 2; xóa toàn bộ phần tăng đó khi rời sân bằng cơ chế khác hoặc vào waiting window/Luân Hồi.** Đây là retention theo nguyên nhân transition, không phải bonus vĩnh viễn cho mọi lần rời sân hay một lần Cleanse. Chỉ xóa contribution của Skill 2, không xóa phần Max HP từ nguồn khác.
 
 ## IX. Skill 3 — Tam Tượng Quy Ấn
 
@@ -112,7 +112,7 @@ Nếu Luân Hồi Chi Chủ xuất hiện trong Giác Đấu Trường, Arena v�
 
 ## XV. Lỗ hổng cần chốt trước implementation
 
-Đã chốt: kế thừa **30% → 50% → 70%**; mỗi stage/cast có bộ đếm riêng, phải đủ **cả Natural Action và Turn Boundary**; stage đổi ở đầu Natural Action kế tiếp; Skill 1 hết penalty khi đủ cả 3 Natural Action và 2 Turn Boundary. Phần tăng trưởng Skill 2 được chốt là nhân 1,05 mỗi lần; phạm vi giữ/xóa phần tăng ngoài chu kỳ Skill 2 chưa chốt (§VIII).
+Đã chốt: kế thừa **30% → 50% → 70%**; mỗi stage/cast có bộ đếm riêng, phải đủ **cả Natural Action và Turn Boundary**; stage đổi ở đầu Natural Action kế tiếp; Skill 1 hết penalty khi đủ cả 3 Natural Action và 2 Turn Boundary. Skill 2 tăng nhân **1,05** mỗi lần và **giữ phần tăng qua chính Skill 2; xóa khi rời sân bằng cơ chế khác hoặc vào waiting window/Luân Hồi** (§VIII).
 
 Các boundary chưa đủ dữ liệu thực thi:
 
