@@ -1991,10 +1991,10 @@ Sau khi nhận:
 73) Hoá Thân Ký Ức Chi Chủ
 
 Nội tại, Ngã Tự Bất Vong: Khi HP về 0 và tử vong được xác nhận, sau 2 natural action của ô nơi hắn chết (mỗi khi đến natural action của ô đó tính 1, bất kể ô đó có ai đứng hay không), hắn phục sinh tối đa 3 lần trong trận. Max HP mới bằng 100% Max HP đã snapshot ở lần tử vong ngay trước; Current HP khi phục sinh lần lượt bằng 30% / 45% / 60% Max HP đó. ATK, WIL, ARM, RES và HP Regen cũng lấy 100% giá trị đã được rank multiplier scale và chịu các thay đổi chỉ số lúc tử vong ngay trước, không nhân rank multiplier thêm lần nữa. Sau mỗi lần phục sinh, hắn bị mọi đơn vị kẻ thù Lãng Quên trong 1 natural action cá nhân kế tiếp của hắn. Đây là trạng thái đặc thù trên bản thân hắn, không gán mark/buff/hiệu ứng xấu lên kẻ thù. Ở 2 lần phục sinh đầu, player/NPC kẻ thù vẫn thấy hắn; ở lần phục sinh thứ 3, hắn biến mất khỏi tầm mắt nhân vật trong game và player kẻ thù trong thời gian Lãng Quên. Trong Lãng Quên, hắn vẫn có thể tấn công; vị trí, buff/debuff/hiệu ứng/mark/HP bar của hắn không hiển thị cho player kẻ thù thấy. AI địch bỏ qua hắn khi chọn mục tiêu. Player và AI có thể biết hắn đang tấn công trong Lãng Quên, nhưng không thể chọn hắn làm mục tiêu bởi bất kỳ kit nào, dù gây sát thương hay không. Hắn vẫn chiếm vị trí trên sân và vẫn có thể bị AoE có vùng tác động đã xác định đánh trúng.
-Vì chỉ số lấy từ lần tử vong ngay trước nên nếu bị ảnh hưởng chỉ số thì sức mạnh của hắn sẽ biến động theo. Trong Lãng Quên, vị trí, buff/debuff/hiệu ứng/mark/HP bar của hắn đều mất tác dụng và không hiển thị cho player kẻ thù thấy.
+Vì chỉ số lấy từ lần tử vong ngay trước nên nếu bị ảnh hưởng chỉ số thì sức mạnh của hắn sẽ biến động theo. Trong Lãng Quên, vị trí, buff/debuff/hiệu ứng/mark/HP bar chỉ bị ẩn khỏi đối thủ và không thể dùng để chọn hắn làm mục tiêu; hiệu ứng đã áp dụng và chỉ số của hắn không bị tạm ngừng tác dụng hay xóa đi vì Lãng Quên.
 Nhân vật này có Thần Tính.
 toàn bộ nội tại mang tag Quy Tắc, riêng thần tính mang tag Axiom.
-Thần tính miễn nhiễm mọi kit gây hiệu ứng xấu nên không sợ Viên Chúc, mọi Prime có thần tính đều không sợ hắn.
+Thần Tính chặn mọi hiệu ứng ngoài thuộc scope của nó, có lợi/hại/trung tính, kể cả Buff/Debuff/Mark và buff từ đồng minh. Không tự động chặn sát thương trực tiếp. Viên Chúc không vượt được Thần Tính bằng hiệu ứng xấu thông thường; mọi Prime có Thần Tính đều có bảo vệ này. Chỉ khi hiệu ứng ngoài trực tiếp mâu thuẫn với Thần Tính mới phán định Authority; hiệu ứng thắng được Axiom tương ứng và thực sự áp dụng trước death mới có hậu quả chỉ số được snapshot.
 
 Skill 1 — Quên Lãng Kỹ Năng: khi kích hoạt, chọn ngẫu nhiên tối đa 3 kẻ thù khác nhau; mỗi mục tiêu quên ngẫu nhiên 1 kỹ năng chủ động hoặc ultimate trong natural action cá nhân kế tiếp của chính mục tiêu. Không chọn nội tại hoặc đánh thường. Trong natural action đó không thể dùng kỹ năng bị quên dù đã hết cooldown hoặc ultimate đầy Rage; sau khi lượt đó kết thúc, kỹ năng dùng lại được. Cost 25 AE, cấp Pháp Tắc.
 Sau khi dùng, Skill 1 vào CD 2 natural action của bản thân Ký Ức Chi Chủ. Các Skill 2/3 tự kích hoạt không phải hành động giảm CD này.
@@ -2013,7 +2013,7 @@ Nếu không đủ AE ở thời điểm đòn thứ ba xảy ra:
 skill không kích hoạt và chuỗi reset.
 vậy nếu cả 3 còn sống thì khi kích hoạt skill này + điều kiện kích hoạt thì 3 kẻ đó sẽ đánh thường mỗi kẻ 3 lần liên tiếp.
 
-ultimate: gây aoe toàn sân = 200% wil/atk của bản thân, tự hồi hp cho bản thân = 20% tổng sát thương ult này gây ra.
+Ultimate: gây AoE toàn sân = 200% ATK + 200% WIL của bản thân, tự hồi HP bằng 20% tổng Actual HP Damage do chính Ultimate này gây ra.
 ta không hồi phục, đau đớn khiến chúng nghĩ về ta, ký ức về ta càng thêm sâu đậm, càng nghĩ thì càng ám ảnh.
 
 Mỗi lần phục sinh lấy:
@@ -2197,7 +2197,7 @@ Không tăng rage.
 Không kích hoạt hiệu ứng “sau khi hành động”.
 Không kích hoạt hiệu ứng “khi dùng skill” nếu hệ thống không ghi rõ.
 Ultimate:
-AoE toàn sân = 200% WIL/ATK.
+AoE toàn sân = 200% ATK + 200% WIL.
 Hồi HP bằng tổng 20% sát thương ultimate gây ra.
 Nên tính hồi dựa trên:
 Tổng actual HP damage gây lên mọi mục tiêu.
