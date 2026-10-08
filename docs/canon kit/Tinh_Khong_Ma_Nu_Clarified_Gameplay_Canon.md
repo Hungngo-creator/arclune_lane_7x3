@@ -92,7 +92,7 @@ Increase qualifying **action-generated Rage by40%**. A received-Damage Rage caus
 
 At an independently caused committed HP/AE mutation checkpoint, admit automatic rescue only if the allied Leader is alive/present with **CurrentHP ≤0.15 × MaxHP**, Ma Nữ is eligible and can pay both:
 
-- HP Cost0.30 × **Ma Nữ MaxHP**, with **nonlethal payment**, leaving CurrentHP >0;
+- HP Cost0.30 × **Ma Nữ MaxHP**, with exact **nonlethal payment**, leaving at least1 HP under CST-003;
 - Side AE20.
 
 After admission/payability, snapshot Ma Nữ ATK/WIL before Cost; atomically pay the two required Costs, then immediately request Leader Heal:
