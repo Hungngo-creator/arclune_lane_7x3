@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-07-E.18
+**Version:** 2026-10-08-E.19
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -36,6 +36,8 @@
 **Revision E.17:** adds bounded post-death Slot waits/cause-specific restoration, retained-stat reads, pre-death receipt folding, reserved actual-Heal payment and cause-time Resource admission; makes authored attack shape/movement-trigger suppression explicit. Main participation distinguishes roster recovery from the exact Leader's own pending return. Generic common-recipient simultaneous Damage resolves to existing RES-008 PROPORTIONAL, including per-component receipts. Existing owners/operations execute these profiles; no new Tag, Primitive, Contract ID, allocator or global priority.
 
 **Revision E.18:** adds only bounded Rank-first contention across declared Reincarnation route profiles, using current eligible claimant Rank, existing same-Rank Authority adjudication and protected complete-entry host reservations. Existing host-only binding, receipts, controllers and clocks compose without new fields. No new Tag, Primitive, Contract ID, subsystem or global priority.
+
+**Revision E.19:** exposes the existing AUT-004/Kernel Adjudication Owner binding in Authority Spec and makes clause/conflict validation ownership explicit. Existing defaults, snapshot law and normalized Authority plan are retained; no new field family or resolver.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -4535,7 +4537,7 @@ Capture each eligible claimant's Effective Rank from existing progression/stat d
 
 `SAME_SEMANTIC_FAMILY_HOST_POOL` is an explicit multiplicity policy for identical normalized route semantics at that winning Rank. Coalesce only these equivalent claims into one family claim with their current legal hosts; do not treat multiple hosts as semantic Authority competitors. After that family claim is admitted, use its declared enumeration-invariant seeded host selection. A family label alone cannot coalesce different semantic clauses, owner policies or Rank strata. `DISTINCT_CLAIM` preserves actual different-owner/semantic conflicts, even when a display label matches.
 
-For remaining same-Rank incompatible claims, use their actual governing clause/owner contexts and existing AUT-002–004 conflict edges. No Rank-derived clause tier, invented comparator, Event/Slot/Entity/list priority or random route winner. Three-or-more claims require the actual conflict graph; a pair result cannot silently admit a third conflicting claim. Commit only an unambiguously admitted route claim. Exact NO_OVERRIDE leaves that contested intersection uncommitted; it does not trigger a random choice, artificial Rank demotion or invented fallback. Ordinary exit or another separately legal outcome remains under its actual law.
+For remaining same-Rank incompatible claims, first prove directly incompatible Authority-bearing claims over the same semantic domain and applicable entrant/scope under AUT-002. Shared resource/capacity competition alone does not establish an AUT conflict. Use their actual governing clause/owner contexts and existing AUT-002–004 conflict edges only after that proof; otherwise require the route's explicit compatible composition law or reject. No Rank-derived clause tier, invented comparator, Event/Slot/Entity/list priority or random route winner. Three-or-more claims require the actual conflict graph; a pair result cannot silently admit a third conflicting claim. Commit only an unambiguously admitted route claim. Exact NO_OVERRIDE leaves that contested intersection uncommitted; it does not trigger a random choice, artificial Rank demotion or invented fallback. Ordinary exit or another separately legal outcome remains under its actual law.
 
 After admission, select/reserve one legal host and run the admitted route's finite binding/materialization graph. A host cannot receive two entrants and one entrant cannot bind twice. Shared entry/claim, Rank, eligibility, host/definition and Authority read revisions are protected through validation/commit. Stale chosen resources follow REC-006's terminal local failure, releasing only uncommitted reservations; do not redraw, substitute a host or rerun arbitration as an implicit retry. Close required local settlement/lifecycle before the next entrant's current reads. Unrelated prior commits remain committed.
 
@@ -4877,9 +4879,14 @@ authority:
   tier:
   dynamic:
   conflictScope:
+  adjudicationOwnerRef: # existing AUT-004 owner; omit only when its ordinary kit-owner default is valid
   explicitExceptions: []
   childPolicy:
 ```
+
+This declaration governs its exact Ability/Effect/rule clause. A broader authoring declaration must lower only to its explicitly governed clauses; Axiom identity or one winning clause cannot grant tiers/priority to siblings. `authorityPlan` preserves exact Rule/Effect identity, normalized semantic conflict key, applicable subject/target/scope and resolved `adjudicationOwnerRef` under AUT-001–005 / 06 §§69–75, 122–125. Inherited/summoned/hosted behavior binds the declared owner, never Damage Attribution by inference. No parallel profile/comparator: use the existing Adjudication Profile Snapshot and revision law (06 §§72/75/128).
+
+Validation proves direct incompatible, simultaneously applicable claims before AUT dispatch. Mere coexistence, incoming tier metadata, different semantic domains or ordinary NORMAL interaction do not dispatch progression adjudication. Same-owner/Character-definition impossible contradictions without an explicit compatible local composition/exception are rejected or REQUIRED_EXPLICIT; progression cannot repair them. Authority results never become Action/Reaction/Event/batch/SSI/packet priority. Tier/comparator/NO_OVERRIDE semantics remain normative in `05` AUT-*.
 
 ---
 
@@ -7055,7 +7062,7 @@ This legacy Stage E inventory is not an override of later Contracts or Clarified
 11. failed auto-trigger cost and Trigger Cap interaction.
 12. Revive global lifeSerial default.
 13. Reincarnation waiting “4” clock.
-14. same-tier Authority resolution.
+14. same-tier Authority resolution — resolved AUT-004; bind the existing owner/profile law in §32.
 15. dynamic Authority sampling point.
 16. random target invalidation/reroll defaults.
 17. materialization retry defaults.

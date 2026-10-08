@@ -1,10 +1,10 @@
 # Kenoma — Clarified Gameplay Canon
 
-**Revision:** R1
+**Revision:** R2
 
 **Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED
 
-**Source:** mục `61) Kenoma` trong [Ý tưởng nhân vật 4.md](../../Ý%20tưởng%20nhân%20vật%204.md) và **KENOMA Q1–Q9 FINAL DESIGNER LOCK**, gồm Q1A/Q1B và explicit correction về giữ Chân Ngã qua Deck/redeploy. Các khóa dưới đây thay thế mọi unresolved/proposal Q1–Q9 cũ; designer lock có precedence cao hơn raw shorthand.
+**Source:** mục `61) Kenoma` trong [Ý tưởng nhân vật 4.md](../../Ý%20tưởng%20nhân%20vật%204.md) và **KENOMA Q1–Q9 FINAL DESIGNER LOCK**, gồm Q1A/Q1B và explicit correction về giữ Chân Ngã qua Deck/redeploy; bổ sung designer lock 2026-10-08 về nhiều Chân Ngã đồng thời tranh một empty Kenoma body. Các khóa dưới đây thay thế mọi unresolved/proposal Q1–Q9 cũ; designer lock có precedence cao hơn raw shorthand.
 
 ## 1. Identity và Passive — Life Before the Soul / Sinh Mệnh Có Trước Linh Hồn
 
@@ -32,11 +32,13 @@ Các eligible route claims tranh **cùng entering Chân Ngã** so **Effective Ra
 
 Với identities hiện được declared: **Prime Luân Hồi Chi Chủ > UR Pygmalion > SSR Kenoma**. Đây là hệ quả của Effective Rank comparison, không Character-name priority. Nếu higher route ineligible/không legal host, next eligible route được compete. Không SSR Kenoma steal entrant từ một legal eligible higher claim.
 
-**Different route semantics/owners cùng Effective Rank** dùng **existing Authority Conflict Adjudication** với actual conflicting clauses/contexts. Không Event/Slot/Entity/list/iteration/RNG winner, không suy Authority tier từ Rank. Exact **NO_OVERRIDE** không tạo winner; entrant tiếp tục theo other separately legal route/ordinary Reincarnation outcome còn lại.
+**Different route semantics/owners cùng Effective Rank** chỉ dùng **existing Authority Conflict Adjudication** sau khi actual gameplay clauses được chứng minh là Authority-bearing claims trực tiếp không tương thích trên cùng semantic và entrant/scope. Shared resource/capacity tự nó không đủ; thiếu proof/law thì yêu cầu explicit compatible composition hoặc reject. Không Event/Slot/Entity/list/iteration/RNG Authority winner, không suy Authority tier từ Rank. Exact **NO_OVERRIDE** không tạo winner; entrant tiếp tục theo other separately legal route/ordinary Reincarnation outcome còn lại.
 
 Nhiều EMPTY Kenoma hosts trong **cùng Kenoma route family** là host-selection multiplicity, không Authority conflict mới. Sau family legitimately thắng contention: seeded deterministic **RANDOM giữa eligible empty Kenoma hosts** → reserve một host → protected binding commit. Không host nhận hai entrants.
 
 Nhiều entrants ở một **complete Reincarnation-entry checkpoint** dùng complete-entry settlement với deterministic protected ordering/reservation; không Event/list prefix priority. Một family selection không cấp priority cho unrelated world systems hoặc cho tranh chấp Authority thật.
+
+**Khóa nhiều entrants / một empty body:** nếu hơn một Chân Ngã legitimately vào Luân Hồi cùng checkpoint, Kenoma alive + trên sân + chưa bound Chân Ngã và không bị kit khác can thiệp, **ngẫu nhiên đúng một entrant hợp lệ nhập cơ thể Kenoma**. Dùng existing enumeration-invariant **seeded entrant permutation** rồi reserve/bind host; các entrant sau đọc occupied capacity và tiếp tục ordinary legal outcome. Đây là random entrant selection, không Authority tie-break hoặc AUT conflict chỉ vì tranh capacity. Same seed/logical identities/replay giữ nguyên entrant đã chọn; không overwrite/double-bind, và eligibility/actual higher-route intervention vẫn theo luật trên.
 
 ### 2.3 Binding giữ nguyên Kenoma
 

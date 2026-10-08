@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-07-INDEX-26
+**Version:** 2026-10-08-INDEX-27
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-07-INDEX-26`
+**Version:** `2026-10-08-INDEX-27`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -71,7 +71,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`
 **Role:** Chặng B — canonical meanings and semantic distinctions.  
-**Version:** `2026-10-07-B.2`.
+**Version:** `2026-10-08-B.3`.
 **Read when:** gần như mọi normalization task.  
 **Important:** `TURN_BOUNDARY` là global SSI boundary theo CLK-001, gồm ngoại lệ POSTMORTEM_WAIT được khai báo tường minh. Personal “own turn” mechanics dùng Actor Natural Action Window / Natural Action clocks; dead wait không tiến personal Actor clock.
 
@@ -83,13 +83,13 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `03_PRIMITIVE.md`
 **Role:** Chặng D — reusable executable operations.  
-**Version:** `2026-09-10-D`  
+**Version:** `2026-10-08-D.1`\
 **Read when:** kit có mechanic mới có vẻ không composition được bằng operations hiện hữu.  
 **Important:** Tag ↔ Primitive là many-to-many. Không tạo một Primitive cho mỗi Character.
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-07-E.18`.
+**Version:** `2026-10-08-E.19`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-07-F.20`.
+**Version:** `2026-10-08-F.21`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-07-I.20`
+**Version:** `2026-10-08-I.21`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -170,7 +170,7 @@ In `docs/canon kit/`:
 
 - **Renchu / Nhận Sơ** → `docs/canon kit/Renchu_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry56; Q1–Q6 locked: exact Natural/direct-request child scope, PRE_MITIGATION TRUE conversion, one committed-outcome Heal50% then continuous Overheal Shield50% with independent contributions, two real non-Natural Skill children/common Snapshot/Slot batch and Axiom-only force-entry clause with nonempty admission/frozen enemy waiting pool/local failures. Existing 01–07 composition suffices; M-147/M-148 add only generic interaction coverage. No internal gameplay ambiguity remains; metadata/future Mode adapters remain NOT BLOCKING.
 
-- **Kenoma** → `docs/canon kit/Kenoma_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry61; Q1–Q9/Q1A–B locked: initial empty SSR body, host-only either-Side routing with eligible claimant Rank-first/same-Rank Authority, bound Soul retained through Deck/redeploy, pinned cast profiles, Rage-ranked Slot-bound simultaneous bullets/drain, exact attached received-Natural outcome, missing-HP paired capacity/Shield ACTIVE3→freshCD2, live Soul-gated compounding field growth, Slot8 main/exact-recipient TRUE continuation and one real Ultimate child/receipt Heal. Only route contention needs the bounded generic extension below; all other mechanics compose. No internal gameplay question remains; metadata/future external profiles remain NOT BLOCKING.
+- **Kenoma** → `docs/canon kit/Kenoma_Clarified_Gameplay_Canon.md` R2 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry61; Q1–Q9/Q1A–B locked: initial empty SSR body, host-only either-Side routing with eligible claimant Rank-first/same-Rank direct Authority conflict, seeded selection of one eligible simultaneous entrant for one empty body absent kit intervention, bound Soul retained through Deck/redeploy, pinned cast profiles, Rage-ranked Slot-bound simultaneous bullets/drain, exact attached received-Natural outcome, missing-HP paired capacity/Shield ACTIVE3→freshCD2, live Soul-gated compounding field growth, Slot8 main/exact-recipient TRUE continuation and one real Ultimate child/receipt Heal. Only route contention needs the bounded generic extension below; all other mechanics compose. No internal gameplay question remains; metadata/future external profiles remain NOT BLOCKING.
 
 - **Pygmalion** → `docs/canon kit/Pygmalion_Clarified_Gameplay_Canon.md` R2 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → raw4 entry26; Q1–Q10 locked: first-cycle BATTLE_START basis/later current bases, success-only quota/EMPTY blocker, independent PUPPET bodies, complete-entry router and uniform roster pool, host-preserving fresh kit state, battle-global base reduction, next-consumed-opportunity defense family and coordinated seeded full Basic sequence. Only metadata/future external profiles/Mode adaptations remain NOT BLOCKING.
 
@@ -624,7 +624,9 @@ If Revive(A) committed before B death:
 
 ---
 
-# 14. AUTHORITY CORE
+# 14. AUTHORITY CORE — PHÁN ĐỊNH XUNG ĐỘT QUYỀN HẠN
+
+First-class normalization invariant: reuse the existing Authority Conflict Adjudication; never infer a second system from legacy “tag conflict” wording.
 
 Authority tiers:
 
@@ -635,12 +637,12 @@ Axiom
 > Normal
 ```
 
-Functional Tags themselves do not “fight”.
+Authority belongs to the exact Ability/Effect/rule clause declaring it. Authority Tier is not a Functional Tag; Rank/Prime, rarity, Class, Element, lore/godhood and Axiom identity do not assign it to a Character's other clauses.
 
-Authority adjudication occurs only when exact semantic rules directly conflict.
+Authority conflict: directly incompatible claims in the same relevant semantic domain, overlapping applicable subject/target/scope, simultaneously applicable. Coexistence, concurrent Actions or an incoming Authority field alone do not adjudicate. Ordinary NORMAL interactions use ordinary Contracts.
 
-If special Authority tiers differ:
-> higher tier wins conflicting semantic.
+If Authority tiers differ:
+> higher tier wins the conflicting semantic; no progression comparison.
 
 If same:
 - Axiom vs Axiom;
@@ -650,14 +652,22 @@ If same:
 use:
 
 ```text
-Rank
+Effective Rank
 → Tu vi / Cultivation
 → Character Stars
 → Awaken Count
 → Adjudication CP
 ```
 
-CP is last and should be based on adjudication/battle-entry profile, not ordinary temporary combat Buffs.
+Compare declared Adjudication Owners lexicographically; stop at the first difference, higher wins. Exact total tie → `NO_OVERRIDE` (§16). Use the canonical adjudication/battle-entry profile; ordinary temporary combat Buffs do not rewrite it, and legitimate adjudication-input changes require the existing revision/cache law. Authority is not Action/Reaction/Event/target/batch/SSI/Damage-packet priority.
+
+Canonical ownership/navigation:
+
+- [01 §14 — Authority & Axiom](01_TERMINOLOGY_vNext_PILOT4_MERGED.md#14-authority--axiom): meaning, tier and identity distinctions.
+- [04 §32 — Authority Spec](04_ABILITY_SCHEMA-1.md#32-authority-spec): clause declaration, scope and Adjudication Owner binding.
+- [05 §33 — AUT-001–007](05_CONTRACTS.md#33-authority-contract): normative conflict, comparator, scope, NO_OVERRIDE and revision laws.
+- [03 §6.5 — existing Authority Resolver](03_PRIMITIVE.md#65-authority-resolver) and [06 §§65–79](06_KERNEL_RUNTIME.md#65-authority-model), [§§122–130](06_KERNEL_RUNTIME.md#122-normalized-conflict-edge): runtime Rule/edge, profile snapshot, cache and suppression ownership.
+- [08 Group F — F-001–F-018](08_STRESS_TESTS.md#10-test-group-f--authority-adjudication): deterministic foundation, negative and metamorphic regression obligations; N-007 reuses simultaneous NO_OVERRIDE coverage.
 
 ---
 
@@ -683,6 +693,8 @@ If B1 wins against A1:
 
 Persistent rules may create cached suppression edges.
 
+Each exact clause pair/set is independent; never cache “Character A beats B”. Relevant Rule/owner/profile/scope revisions invalidate reuse under AUT-004 / 06 §§74–75. Same-Character impossible contradictions need explicit local composition or validation rejection, not comparison against the Character's own progression.
+
 Instant losing effect:
 > fails that interaction only and does not return later.
 
@@ -703,18 +715,7 @@ CP equal
 result:
 `NO_OVERRIDE`.
 
-Do not use:
-- iid;
-- slot;
-- RNG;
-- cast order;
-as fake tie-breaker.
-
-Existing protection vs incoming mutation:
-> protection remains.
-
-Two simultaneous opposite mutations:
-> conflicting overlap does not commit.
+The resolver returns this explicit no-winner result. Technical Entity/iid/Slot/Side, Action/Event/registration/list/animation order, RNG/seed and attacker/defender role cannot manufacture a winner. The owning conflict Contract applies the observable outcome: AUT-004 retains existing protection against incoming mutation and blocks simultaneous contradictory mutation overlap. Other interactions need their actual Contract; the resolver invents no fallback.
 
 ---
 
@@ -935,7 +936,7 @@ Raw Kit
 → apply to affected canonical repo files
 → inspect diff / cross-file audit
 → update declarative 08 only when needed
-→ six-pass final self-audit
+→ scope-proportionate final self-audit under root AGENTS §33
 ```
 
 Audit across 00–08 does not require modifying all nine files. Preserve nonblocking unknowns as `UNRESOLVED / NOT BLOCKING`; do not manufacture defaults or require unrelated answers before continuing architecture work. Architecture Phase uses documentation/consistency checks, not implementation builds or executable game tests.
