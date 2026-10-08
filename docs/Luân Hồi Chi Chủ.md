@@ -1,7 +1,7 @@
 # Hoá Thân LUÂN HỒI CHI CHỦ
-## Prime / Mage — Chuẩn hóa Legacy Kit
+## Prime / Mage — Gameplay theo raw kit hiện hành
 
-> Mục tiêu: chuẩn hóa Luân Hồi Chi Chủ theo combat contract hiện tại, giữ fantasy gốc nhưng tách rõ Identity/Presentation/Combat Definition, Life State, Turn Boundary, Natural Action, Authority, Axiom, Luân Hồi và Duy Nhất. Các điểm dưới đây là những đề xuất/đồng thuận từ phân tích trước; phần chưa đủ dữ kiện được đánh dấu cần chốt.
+> Tài liệu gameplay cho mục 76 trong `ý tưởng nhân vật 3.md`. Mô tả raw và chốt mới của designer có ưu tiên cao hơn khuyến nghị cũ. Identity, Presentation, Combat Definition, Natural Action, Turn Boundary, Authority và Luân Hồi phải được phân biệt; một đề xuất trình bày hoặc clock chưa chốt không tự trở thành luật thực thi.
 
 ## I. Hồ sơ & Lục Cực Đồ
 
@@ -9,27 +9,43 @@
 
 ## II. Identity architecture
 
-Luân Hồi Chi Chủ phải tách ít nhất ba lớp: **Identity** = trueSelfId + lifeSerial; **Presentation Definition** = ngoại hình/skeleton/animation/VFX/voice fallback; **Combat Definition** = Passive/Basic/Skill/Ultimate/Class/Rank và combat logic của đời hiện tại. Một đời tái sinh có thể có ngoại hình của character A nhưng Combat Definition/kế thừa từ Chân Ngã B. Ví dụ Silas chết → Chân Ngã Silas vào Luân Hồi → kén nở ra đời mới có ngoại hình Đạo Mộng Dao nhưng vẫn mang Chân Ngã Silas, kế thừa lineage/kit/stat của Silas theo giai đoạn. Đây không phải clone definition của Đạo Mộng Dao. VFX/animation không nên ép dùng toàn bộ VFX của source kit; ưu tiên animation hợp lệ của Presentation Definition, còn logic damage/effect lấy từ Combat Definition. Nếu presentation không có animation phù hợp, dùng fallback theo action type. Voice có thể lấy theo nguồn Combat Definition nếu muốn giữ bản sắc đời trước.
+Luân Hồi Chi Chủ tách ba lớp: **Identity** = trueSelfId + lifeSerial; **Presentation Definition** = ngoại hình/skeleton/animation/VFX/voice; **Combat Definition** = Passive/Basic/Skill/Ultimate/Class/Rank và combat logic kế thừa từ đời trước. Ngoại hình A không cấp kit hoặc Rank của A cho Chân Ngã B. Ngoại hình được chọn khi đời mới xuất hiện và **không thay đổi qua bốn giai đoạn**. Ví dụ Chân Ngã Silas phe địch → kén phe Luân Hồi Chi Chủ → đời mới ngoại hình Đạo Mộng Dao, nhưng Rank/Passive/Basic/Ultimate/Class và chỉ số kế thừa vẫn từ Silas.
+
+**Voice đã nêu trong raw:** Basic dùng giọng của ngoại hình A; Ultimate dùng giọng của nguồn kit/Chân Ngã B. Vì vậy ví dụ trên đánh thường có giọng Đạo Mộng Dao, dùng Ultimate có giọng Silas. Không đổi logic Basic sang kit A chỉ vì voice lấy từ A. Raw chưa chốt nguồn voice cho từng Skill khác hoặc cách fallback khi thiếu asset.
+
+**VFX/animation:** raw hướng tới VFX của ngoại hình mà kén sao chép; câu hỏi giữ animation Basic Đạo Mộng Dao khi kit gốc Silas dùng súng vẫn là boundary asset cần chốt. Khuyến nghị: dùng skeleton/animation hợp lệ của ngoại hình A và ánh xạ cue phát đòn sang projectile/VFX tương thích; Damage/target/Mark/Authority vẫn lấy từ kit B. Không buộc model không có súng chạy nguyên animation cần súng của Silas. Fallback theo action type là đề xuất trình bày, không tự thay số hit, target hoặc sát thương của kit.
 
 ## III. Nội tại — Kén Luân Hồi
 
-Khi **một ALIVE actor có Chân Ngã thuộc bất kỳ phe nào đạt DEATH_CONFIRMED và tiến vào Luân Hồi**, Luân Hồi Chi Chủ tạo một **Kén Luân Hồi** thuộc phe đồng minh của hắn. Kén là một combat object/container chứa reincarnation payload, không phải một bản sao trực tiếp của nhân vật chết và không tự được coi là Chân Ngã mới. Kén tồn tại **1 Turn Boundary của Luân Hồi Chi Chủ**. Max HP của kén = **80% Max HP của Luân Hồi Chi Chủ**. Kén nhận **65% generic Damage Reduction**, ngoại lệ True Damage theo Damage Contract hiện tại; True Damage vẫn bị Shield chặn nếu có và không tự động xuyên mọi Authority. Sau khi hết 1 Boundary, kén hatch thành một đời mới.
+Khi **một Chân Ngã của đồng minh hoặc kẻ thù thực sự tiến vào Luân Hồi**, nội tại tạo một **Kén Luân Hồi** thuộc phe của Luân Hồi Chi Chủ. Chỉ HP_ZERO hoặc DEATH_CONFIRMED chưa đồng nghĩa đã vào Luân Hồi: waiting window và checkpoint vào Luân Hồi là hai trạng thái khác nhau. Kén là combat object/container của reincarnation payload, không phải một Chân Ngã mới hoặc summon mang Chân Ngã riêng. HP của kén khi tạo = **80% Max HP của Luân Hồi Chi Chủ**. Kén giảm **65% sát thương từ mọi nguồn trừ True Damage**; True Damage không chịu phần giảm này nhưng không tự xuyên Shield hay mọi Authority.
+
+**Clock nở kén:** chờ **Natural Action tiếp theo của Luân Hồi Chi Chủ mà hắn thực thi thành công**. Một cơ hội bị CC làm mất lượt không làm nở kén; kén tiếp tục chờ tới một Natural Action thành công sau đó. Auto/Reaction/Counter/Follow-up và global Turn Boundary không thay cho Natural Action đó. Việc hoàn tất lượt thành công là điều kiện nở, không phải chỉ tới lượt, nhận quyền hành động hoặc bắt đầu một Action rồi bị hủy. Kén được tạo trong một Natural Action đang chạy chờ Natural Action tiếp theo, không dùng completion của chính lượt đang chạy để giả thành “lượt kế tiếp”. Quy định này thay thế thời hạn cũ một Turn Boundary và ví dụ “một turn sau tự nở”.
 
 Appearance selection: ngoại hình của đời mới là ngoại hình bất kỳ character có trong Collection nhưng **không được chọn ngoại hình của các character đang tham gia/tồn tại trong Deck của trận đấu đó**. Đời mới thuộc phe của Luân Hồi Chi Chủ bất kể Chân Ngã trước khi chết thuộc phe nào. Nếu definition có tag **Duy Nhất**, phải kiểm tra Duy Nhất trước khi materialize; không được để random appearance phá Axiom Duy Nhất.
 
-**Second reincarnation lock:** mỗi Chân Ngã chỉ được Luân Hồi Chi Chủ thao túng để tái sinh **một lần trong một trận đấu**. Nếu đời tái sinh sau đó lại DEATH_CONFIRMED và tiến vào Luân Hồi lần thứ hai, Chân Ngã chuyển sang trạng thái kiểu **REINCARNATION_EXHAUSTED**: Luân Hồi Chi Chủ không được tạo kén lần nữa và Chân Ngã không được đầu thai lần nữa trong cùng encounter. Không gọi trạng thái này là ERASED trừ khi lore/kernel xác nhận Chân Ngã thực sự bị xóa khỏi tồn tại.
+**Second reincarnation lock:** mỗi Chân Ngã chỉ được nội tại này thao túng để đầu thai **một lần trong trận**. Đời nở từ kén lại chết và vào Luân Hồi lần thứ hai → không tạo kén mới, không bị nội tại này thao túng và **không đầu thai trở lại trận đấu nữa**. Trạng thái mô tả là `REINCARNATION_EXHAUSTED`, không cấp một route/host khác để lách giới hạn đó. Đây là giới hạn trong trận; không suy diễn thành Chân Ngã bị ERASED khỏi tồn tại trong lore. Lore có thể cho đầu thai vô hạn nhưng kit chiến đấu này không cho lặp vô hạn.
 
 ## IV. Các giai đoạn tái sinh
 
-Khuyến nghị dùng **Natural Action count của chính đời mới làm progression clock chính**, Turn Boundary là commit/timing point. Không nên có hai clock cạnh tranh mô tả cùng progression.
+Đời mới có **bốn giai đoạn**, không phải ba. Raw dùng cả Natural Action của đời mới và Turn Boundary; không tự bỏ một clock hoặc rút mỗi giai đoạn còn một Natural Action như khuyến nghị cũ. `TURN_BOUNDARY` vẫn là boundary SSI toàn cục, không có một loại boundary riêng của đời mới.
 
-**Giai đoạn I — Ấu Niên:** kế thừa 30% các stat hợp lệ của đời trước, cùng Passive, Basic Attack, Ultimate và Class của đời trước; không có Skill 1/2/3; không thể sử dụng skill. **Giai đoạn II — Thành Niên:** trên nền Giai đoạn I, inherited contribution tăng thêm 20% theo hệ thống stat inheritance đã chốt; mở Skill 1 của đời trước. **Giai đoạn III — Tráng Niên:** tiếp tục tăng inherited contribution thêm 20%; mở Skill 2 và Skill 3. **Giai đoạn IV — Lão Niên:** trên nền Giai đoạn III, mỗi Natural Action của chính đời này làm giảm **20% inherited contribution** theo kiểu linear từ inherited baseline, không compound: 100% → 80% → 60% → 40% → 20% → 0%. Khi inherited Max HP contribution đạt 0 và Max HP do lineage giảm về 0, kích hoạt ngay **DEATH_CONFIRMED**; đây là life-expiry condition nhưng vẫn đi qua death lifecycle.
+**Giai đoạn I — Ấu Niên:** kế thừa **30%** mọi chỉ số thuộc profile kế thừa đời trước; giữ **Rank, Class, Passive, Basic và Ultimate của Chân Ngã B**, không kế thừa chúng từ ngoại hình A. Không thể dùng Skill 1/2/3. **Giai đoạn II — Thành Niên:** kế thừa **50%** mọi chỉ số đời trước, mở Skill 1. **Giai đoạn III — Tráng Niên:** kế thừa **70%** mọi chỉ số đời trước, giữ Skill 1 và mở thêm Skill 2/3. Mỗi lần tăng là **20 điểm phần trăm của chỉ số đời trước**, không nhân 1,2 phần kế thừa hiện có.
 
-Mốc chuyển giai đoạn: hatch → Stage I; sau Natural Action đầu tiên, tại Boundary kế tiếp → Stage II; sau action tiếp theo → Stage III; sau action tiếp theo → Stage IV. Không dùng các mô tả “1 turn/2 turn/3 turn” mơ hồ nếu chúng chỉ mô tả cùng progression.
+**Giai đoạn IV — Lão Niên:** giữ kit đã mở ở giai đoạn III; mỗi lượt cá nhân giảm 20% phần chỉ số kế thừa từ đời trước cho tới khi chết. Tài liệu trước mô tả decay tuyến tính theo inherited baseline, không compound; raw mới không chỉ định công thức khác. Khi **Max HP thực tế về 0, lập tức DEATH_CONFIRMED**, rồi vào Luân Hồi lần thứ hai và áp dụng giới hạn không đầu thai lại. Không đợi một hit sát thương hoặc một Natural Action mới để xác nhận death. Phần chỉ số kế thừa giảm không mặc định xóa modifier độc lập khác; điều kiện kết thúc raw là Max HP thực tế bằng 0.
+
+**Clock progression đã chốt:** đếm riêng từ lúc bắt đầu **từng giai đoạn**, phải đủ **cả hai điều kiện** rồi chuyển ở **đầu Natural Action cá nhân kế tiếp**. Không đếm lũy kế từ lúc nở và không chuyển chỉ vì một clock đã đủ.
+
+| Chuyển giai đoạn | Natural Action của đời mới trong giai đoạn đang có | Turn Boundary toàn cục kể từ khi giai đoạn bắt đầu |
+| --- | ---: | ---: |
+| I → II | 1 | 1 |
+| II → III | 2 | 3 |
+| III → IV | 3 | 4 |
+
+Khi chuyển, hai bộ đếm của giai đoạn mới bắt đầu từ 0; Natural Action sắp thực hiện thuộc giai đoạn mới. Counter duration cá nhân dùng Natural Action clock hiện hành (CLK-003); non-natural child/Follow-up/Counter không tính. Quy tắc **thực thi thành công mới nở** là ngoại lệ riêng của kén, không tự áp sang mọi duration khác. Turn Boundary không trở thành Actor-private boundary chỉ vì counter thuộc một đời mới.
 
 ## V. Interaction với Luân Hồi, Death và Identity
 
-DEATH_CONFIRMED của nhân vật trong đời tái sinh là death thật và được World Axiom Luân Hồi quan sát. Death Prevention/Revive thông thường có thể xử lý trước khi DEATH_CONFIRMED; chỉ khi death được confirm mới tiến vào Luân Hồi. Một đời đã vào Luân Hồi lần thứ hai sau khi REINCARNATION_EXHAUSTED không thể bị Luân Hồi Chi Chủ tạo kén lần nữa trong encounter.
+DEATH_CONFIRMED của đời tái sinh là death thật và được World Axiom Luân Hồi quan sát. Với death thông thường, Death Prevention xử lý trước xác nhận; **Revive là cơ chế sau DEATH_CONFIRMED**, không đồng nghĩa Death Prevention. Chân Ngã confirmed-dead có waiting window trước khi vào Luân Hồi theo luật hiện hành; không tạo kén ngay từ mọi death event. Điều kiện Max HP = 0 ở Lão Niên có quy định xác nhận ngay riêng tại §IV. Chân Ngã vào Luân Hồi lần hai không được tạo kén hoặc đầu thai trở lại encounter.
 
 ## VI. Axiom / Authority
 
@@ -37,23 +53,35 @@ DEATH_CONFIRMED của nhân vật trong đời tái sinh là death thật và đ
 
 ## VII. Skill 1 — Cưỡng Hành Luân Hồi
 
-**Authority:** Quy Tắc. Khi cast thành công, tất cả **enemy trueSelfId đang ở waiting window của Luân Hồi** lập tức chuyển sang Luân Hồi, bỏ qua waiting window. Không tác động đến Chân Ngã đã `REINCARNATION_EXHAUSTED`. Cost phải thỏa đầy đủ trước khi skill được dùng: **25 AE và 5 Rage**; đồng thời Luân Hồi Chi Chủ chịu **temporary Max HP reduction 20%** trong **2 Turn Boundary + 3 Natural Actions** theo legacy; cần chọn một clock chính trước implementation nếu không muốn hai timer cạnh tranh. Khuyến nghị coi Max HP reduction là temporary Max HP mutation, không phải Damage/HP Cost. Khi cửa sổ hết, Max HP bị giảm được trả lại và hồi đúng lượng HP tương ứng với phần Max HP đã mất do effect này; không tự động đầy HP nếu Current HP trước đó thấp. Mọi cost không đủ → Skill 1 không cast.
+**Authority Quy Tắc | Cost 25 AE + 5 Rage + chịu giảm tạm 20% Max HP.** Khi cast thành công, tất cả **Chân Ngã kẻ thù đang chờ vào Luân Hồi** lập tức vào Luân Hồi, bỏ qua thời gian chờ. Không chuyển Chân Ngã đồng minh hoặc Chân Ngã đã exhausted thành mục tiêu. Đây là cưỡng hành transition của waiting entry, không gây một death mới hay tự tạo một Chân Ngã khác.
+
+Giảm Max HP tồn tại cho tới khi đủ **cả 2 Turn Boundary toàn cục và 3 Natural Action cá nhân kế tiếp của caster**, đếm **riêng từ mỗi lần cast**. Không rút cửa sổ còn hai boundary hoặc ba action tùy clock nào đến trước. Child/auto cast không tạo thêm tick Natural Action; duration cá nhân theo CLK-003 hiện hành. Cửa sổ kết thúc khi điều kiện còn thiếu cuối cùng đã đủ.
+
+Phần Max HP đã mất do chính lần dùng Skill 1 là một lượng riêng `X`; hết cửa sổ, **trả lại X Max HP rồi Heal = 20% × X**, không Heal toàn bộ X. Ví dụ Max HP 100 → giảm 20 → còn 80; hết cửa sổ trả Max HP về 100 và lượng Heal từ kit là **4 HP**, trước các điều khoản Heal thông thường. Không tự hồi đầy HP. Giảm Max HP không phải Damage hay Current-HP Cost; không tạo Damage/Shield/Lifesteal chỉ vì được đặt trong phần cost của raw.
+
+Bất kỳ điều kiện Cost bắt buộc nào chưa thỏa → không thể dùng Skill 1. Child Skill 1 qua Ultimate chỉ được miễn **AE**, vẫn giữ **5 Rage và phần giảm Max HP/cửa sổ hoàn trả**. Profile xử lý Current HP khi giảm/trả Max HP, stacking nhiều lần dùng và failure composition của child phải được khai báo trước dữ liệu thực thi; không suy diễn hoàn trả Max HP là Heal thứ hai.
 
 ## VIII. Skill 2 — Ẩn Nhập Luân Hồi
 
-Cost **15 AE**. Khi cast, Luân Hồi Chi Chủ rời hiện thế dưới trạng thái **Temporarily Absent / Hidden in Reincarnation**, không phải DEATH_CONFIRMED, không vào waiting window và không phát death event. Sau thời gian được chỉ định theo **một clock của Leader** (cần chốt là 1 Natural Action hay 1 Turn Boundary; khuyến nghị Turn Boundary để đồng bộ thuật ngữ), hắn thử materialize trở lại tại một slot ngẫu nhiên còn trống của phe mình. Nếu sân đầy, mỗi Turn Boundary của Leader thử materialize lại một lần cho đến khi thành công; retry không tạo natural turn.
+Cost **15 AE**. Khi cast, Luân Hồi Chi Chủ rời hiện thế dưới trạng thái **Temporary Absence**, không DEATH_CONFIRMED, không vào waiting window và không phát death event. Sau **1 lượt của Leader tính từ khi dùng Skill 2**, thử trở lại tại một ô ngẫu nhiên đang trống của phe mình. Nếu sân đầy, tiếp tục vắng mặt và thử một lần ở mỗi boundary gắn với lượt Leader cho tới khi trở lại thành công. Retry không tạo lượt mới, không trả lại 15 AE rồi thu lại cho mỗi lần thử và không phải một lần cast mới. `TURN_BOUNDARY` là toàn cục; exact Leader checkpoint phải được khai báo, không tạo một loại boundary riêng của Leader. Raw chưa phân biệt lượt Leader bị CC mất có tính cho clock này không.
 
-Khi materialize thành công: hồi **20% Max HP** và nhận **temporary Max HP bonus 5%** dựa trên Max HP tại thời điểm rời sân dùng skill. Bonus 5% này mất khi kết thúc trạng thái rời sân/return cycle, khi vào waiting window của Luân Hồi, hoặc khi bị loại khỏi hiện thế theo lifecycle tương ứng. Nếu Skill 2 dùng nhiều lần, bonus có thể tạo compound growth vì mỗi lần tính theo Max HP lúc rời sân; đây là intentional scaling nhưng phải là temporary mutation, không permanent mutation. Không tạo natural turn, không reset SSI cursor.
+Khi trở lại thành công: **Heal 20% Max HP hiện tại trước**, sau đó thêm **5% Max HP** dựa trên giá trị lúc **rời sân dùng chính Skill 2**. Đây là anchor được câu cuối raw chỉ định; không đổi thành Max HP tại thời điểm trở lại chỉ vì câu đầu dùng chữ “vào sân”. Phần tăng đã tích lũy **được giữ qua các lần ẩn/trở lại bằng Skill 2**, không xóa bonus cũ rồi chỉ thay bằng một bonus mới. Heal và lần tăng mới chỉ xảy ra khi return thành công, không lặp trong retry thất bại. Không tạo Natural Action hoặc reset SSI cursor.
+
+**Tăng trưởng đã chốt:** khi không có biến động Max HP khác, mỗi lần dùng và return thành công cho **Max HP mới = 1,05 × Max HP lúc rời sân**: **100 → 105 → 110,25 → 115,7625…**. Chốt này thay thế câu cũ “bonus mất khi rời sân vì chính Skill 2”. **UNRESOLVED:** phần tăng tích lũy có mất khi rời sân bằng cơ chế khác hoặc vào waiting window/Luân Hồi hay không; không mặc định biến thành bonus vĩnh viễn cho mọi transition.
 
 ## IX. Skill 3 — Tam Tượng Quy Ấn
 
-Đứng tại chỗ, tạo 3 orb và gây **150% Basic Attack damage** lên 3 target ngẫu nhiên; orb có thể trùng target nếu target resolution cho phép. Damage của Skill 3 **không phải Basic Attack**. Đây là **một Natural Action** dù có 3 orb/multihit, nên mọi effect kiểu “1 lần/Natural Action” chỉ trigger một lần theo rule chung.
+**Cost 20 AE.** Đứng tại chỗ, tạo 3 orb và gây **150% sát thương Basic của bản thân lên mỗi mục tiêu trong ba mục tiêu ngẫu nhiên**, đồng thời gắn Mark. Damage của Skill 3 **không phải Basic Attack**; lấy công thức Basic không đổi Action Identity. Khi trực tiếp được chọn làm hành động chính trong SSI, đây là một Natural Action, không phải ba. **Khi cast qua Ultimate, Skill 3 là child không tạo thêm Natural Action**, miễn AE theo §X. Không tự cho orb trùng target; duplicate policy/khi ít hơn ba mục tiêu là dữ liệu còn phải chốt trước executable normalization.
 
 Mỗi target trúng Skill 3 được gắn một **Mark cấp Quy Tắc**, không mang harmful effect và tồn tại vô hạn cho tới khi target rời sân; effect/kit xóa mark dưới cấp Quy Tắc không thể xóa mark này. Khi một marked enemy đạt **DEATH_CONFIRMED** trong lúc Luân Hồi Chi Chủ còn ALIVE và có mặt trên sân, hắn nhận **+100% Current HP Regen** (hiểu là nhân đôi current HP Regen, không phải +100 điểm) cho tới khi chính Luân Hồi Chi Chủ đạt DEATH_CONFIRMED và nhận **+15 Rage**. Nếu Luân Hồi Chi Chủ đang Temporarily Absent/Hidden, điều kiện “có mặt trên sân” không thỏa và không trigger. Mark vẫn giữ trên target nếu target chưa rời sân.
 
 ## X. Ultimate — Composite Cast
 
-Ultimate thực hiện **Basic Attack + Skill 3**, sau đó **Skill 1**; các skill cast qua Ultimate **không tốn AE** nhưng giữ nguyên effect và authority của chính skill đó. Khi conflict, phán định theo Tag/Authority của **Skill 1 hoặc Skill 3**, không dùng authority của Ultimate để nâng cấp chúng. Trình tự đề xuất: Ultimate mở → Basic Attack và Skill 3 resolve → 3 orb hoàn tất → commit damage/marks/deaths/reactions → Skill 1 resolve. Về VFX, player chỉ cần thấy một chưởng tạo **4 orb**: 1 orb đại diện cho Basic Attack, 3 orb cho Skill 3; sau khi 4 orb hoàn tất, Skill 1 được resolve. Visual composition không thay đổi source logic.
+Ultimate cast **Basic Attack và Skill 3 cùng lúc**, sau đó cast **Skill 1**. Player thấy **một chưởng tạo bốn orb**: một orb Basic chọn mục tiêu theo SSI, ba orb Skill 3 chọn ngẫu nhiên. **Cả bốn orb** hoàn tất sát thương trước khi bước sang Skill 1; không chờ chỉ ba orb Skill 3 hoặc để Skill 1 resolve chen giữa các orb.
+
+Hai child Skill 1/3 được miễn **AE** và giữ nguyên effect/cost khác/Authority riêng. Skill 3 không thu 20 AE; Skill 1 không thu 25 AE nhưng vẫn yêu cầu 5 Rage và chịu phần giảm 20% Max HP cùng rule hoàn trả. Authority của Ultimate không nâng các child; phán định đúng clause của Skill 1 hoặc Skill 3, bao gồm Mark Quy Tắc. Basic vẫn có logic Basic riêng; một presentation chưởng không hợp nhất bốn orb thành một Basic hoặc bốn Natural Actions.
+
+Phải giữ rõ ranh giới direct Damage đã hoàn tất, Mark/death và work bắt buộc trước child Skill 1. Việc có bốn orb không tự chốt snapshot/batch allocation hoặc thứ tự Reaction tùy ý. Trường hợp remaining Cost của child Skill 1 không đủ sau nhóm orb cần failure profile riêng; không coi AE waiver là miễn tất cả Cost hoặc tự rollback sát thương đã commit.
 
 ## XI. Basic Attack
 
@@ -71,29 +99,33 @@ Nếu Luân Hồi Chi Chủ xuất hiện trong Giác Đấu Trường, Arena v�
 
 1. **Identity ≠ Presentation ≠ Combat Definition.**
 2. **Kén không phải Chân Ngã.**
-3. **DEATH_CONFIRMED là death thật; HP_ZERO chưa đủ nếu còn Death Prevention/Revive.**
+3. **DEATH_CONFIRMED là death thật; HP_ZERO chưa đủ nếu còn Death Prevention. Revive xử lý sau xác nhận; Max HP = 0 ở Lão Niên có điều kiện xác nhận ngay riêng.**
 4. **Stage IV decay tuyến tính theo inherited baseline.**
 5. **REINCARNATION_EXHAUSTED ≠ ERASED.**
 6. **Mark Quy Tắc có Identity riêng; dispel dưới Quy Tắc không thể tự xóa.**
 7. **Temporary Max HP mutation phải xử lý reduction/return đúng Current HP; không “heal giả”.**
 8. **Duy Nhất phải được phán định trước materialization.**
-9. **Natural Action count là clock chính cho life-stage progression; Turn Boundary là timing/commit point.**
+9. **Clock life-stage giữ cả Natural Action và Turn Boundary của raw; không tự bỏ một điều kiện. Kén chỉ nở sau Natural Action chủ thể thực thi thành công.**
 10. **Ultimate composite không biến Skill 1/3 thành authority của Ultimate.**
-11. **Skill 3 là một Natural Action dù chứa 3 orb.**
+11. **Skill 3 trực tiếp là một Natural Action chứa 3 orb; child Skill 3 qua Ultimate không tạo thêm Natural Action.**
 12. **World Axiom Luân Hồi vẫn hoạt động trong Arena; Arena chỉ cô lập battlefield, không sở hữu luật sinh tử riêng.**
 
 ## XV. Lỗ hổng cần chốt trước implementation
 
-1. Skill 1 duration hiện mô tả đồng thời “2 Turn Boundary + 3 Natural Actions”; cần chọn một clock chính hoặc quy định rõ hai điều kiện.
-2. Skill 2 “1 turn của Leader” cần chốt là Natural Action hay Turn Boundary.
-3. Skill 2 temporary +5% Max HP là additive hay compound; legacy hiện cho phép compound vì tính theo Max HP lúc rời sân.
-4. Giai đoạn kế thừa “tăng 20% trên cơ sở giai đoạn trước” cần thống nhất công thức inherited stat; nên lưu inherited baseline và tăng contribution theo baseline để tránh compound ngoài ý muốn.
-5. Nếu mark target chết trong cùng composite Ultimate, Skill 3 death reward nên resolve trước Skill 1.
-6. Skill 1 nếu force-enter nhiều Chân Ngã vào Luân Hồi nên batch-resolve và không tạo kén trung gian giữa từng target làm thay đổi target pool của cùng action.
-7. Interaction Arena ↔ Kén cần rule transfer/cleanup.
-8. Duy Nhất ↔ random appearance cần resolution cụ thể.
-9. Cần quyết định nguồn voice của đời mới: Presentation Definition hay Combat Definition.
-10. Cần quyết định exact fields nào của đời trước được kế thừa ở từng stage; Max HP/ATK/WIL/ARM/RES có thể kế thừa nhưng Rage/Max Rage/AE/cooldown/temporary state/resources không nên tự động coi là “mọi chỉ số”.
+Đã chốt: kế thừa **30% → 50% → 70%**; mỗi stage/cast có bộ đếm riêng, phải đủ **cả Natural Action và Turn Boundary**; stage đổi ở đầu Natural Action kế tiếp; Skill 1 hết penalty khi đủ cả 3 Natural Action và 2 Turn Boundary. Phần tăng trưởng Skill 2 được chốt là nhân 1,05 mỗi lần; phạm vi giữ/xóa phần tăng ngoài chu kỳ Skill 2 chưa chốt (§VIII).
+
+Các boundary chưa đủ dữ liệu thực thi:
+
+1. Exact Leader checkpoint/CC-lost opportunity cho lần trở lại đầu và retry Skill 2; không có Actor-private Turn Boundary.
+2. Exact fields và source checkpoint của “mọi chỉ số” kế thừa; không tự copy Current HP/Rage/AE/cooldown/temporary State như object hoặc cho ngoại hình A cấp kit. Scope khóa Skill ở từng stage đối với auto/child cast của Passive/Ultimate đời trước phải được khai báo, không ngầm bỏ Ultimate hoặc tự mở đủ ba Skill ở Ấu Niên.
+3. Profile Current HP khi giảm/trả/tăng Max HP; stacking Skill 1 và failure của child Skill 1; không tự Heal phần hoàn Max HP.
+4. Eligibility/placement khi sân đầy hoặc Collection không còn ngoại hình hợp lệ, kén bị phá, owner chết/rời sân, và route contention với các kit khác. Các route hiện hành chỉ xét claimant thực sự eligible/có legal host; presence riêng lẻ không đủ.
+5. Skill 3 duplicate/ít-target policy, Mark refresh và multiple-marked-death batch/reward ordering; đọc Mark trước cleanup death để không làm mất quyền reward đã đủ điều kiện.
+6. Exact simultaneous Damage/snapshot/completion và settlement trước Skill 1 trong Ultimate; không lấy iteration/animation order làm gameplay priority.
+7. Kén Arena transfer/cleanup; Duy Nhất phải kiểm tra applicability thực tế trước materialization, không tự cấp Axiom từ ngoại hình.
+8. Voice ngoài Basic/Ultimate, VFX/animation và fallback asset của đời mới (§II); Basic/Ultimate voice trong ví dụ đã rõ, không còn câu hỏi chung “lấy toàn bộ giọng A hay B”.
+
+Những boundary này được ghi **UNRESOLVED / NOT BLOCKING** đối với đồng bộ raw/gameplay hiện tại; chúng chặn phần executable normalization thực sự phụ thuộc chúng. Tài liệu không khẳng định hoàn tất normalization mới của toàn bộ kit hay chứng minh cần mở rộng Kernel.
 
 ## XVI. Identity thiết kế
 
@@ -103,7 +135,7 @@ Luân Hồi Chi Chủ không phải Summoner thông thường. Bản sắc của
 
 Player có thể thấy:
 
-> **“Ngoại hình A, giọng B, kit C.”**
+> **“Ngoại hình A, Basic giọng A, Ultimate giọng B, kit B.”**
 
 Engine phải hiểu:
 
