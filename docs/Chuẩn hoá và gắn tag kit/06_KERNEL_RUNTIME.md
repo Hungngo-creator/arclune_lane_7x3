@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-07-G.19
+**Version:** 2026-10-08-G.20
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -39,6 +39,8 @@
 **Revision G.18:** executes E.17/F.19 through existing SSI/Lifecycle/Position, State/stat/Result, Resource/Transaction and Trigger/Action owners. Bounded dead waits, causal grant scope and reserved Heal-result payment retain explicit terminal/save identities. Existing battle-end adjudication distinguishes roster recovery from exact self-Leader pending recovery; existing RES-008 allocation seals per-component receipts for every supported simultaneous common-recipient commit. No Character branch, new subsystem, allocator or priority manager.
 
 **Revision G.19:** consumes E.18/F.20 Rank-first competing route claims through existing complete-entry execution, progression/stat, Target/RNG, Authority, reservation, identity and Transaction owners. Explicit empty-body death creates no True Self/REC progress. Other Kenoma mechanics use existing State/stat/Shield/Clock/Action/Result composition; no new subsystem or Character branch.
+
+**Revision G.20:** executes E.19/F.21 through existing Entity/State/definition/provider, Target/Area, SSI, Snapshot/modifier/Resource and Materialization/Transaction owners. Parts alias one life without duplicating ledgers; contact/deferred/pool observations carry exact identities. No Character branch, new store/service, Tag/Primitive or global priority.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -361,6 +363,15 @@ presence[Arena] = active-present
 while preserving identity data required by the transfer Contract.
 
 ---
+
+## 6A. Declared body part/provider bindings
+
+04§3.9 → ENT-023 → existing Entity/definition, State/stat, Position/materialization, capability, Health/Shield/Resource/Lifecycle and Transaction owners. Store body membership in the owner's existing entity binding, keyed by owner EntityRef + body generation + profile. Each declared part binds a real EntityRef/partKey, exact occupied Position, behavior/form/eligibility and provider refs. NEW_COMBAT_OBJECT does not create a separate lifecycle participant, Chân Ngã or Leader objective; keep ownerRef/lifecycleOwnerRef explicit.
+
+Resolve HP/MaxHP/Rage/Shield and declared status providers to the owner before writers/result allocation. Keep contacted part/Action Actor/source independent of the shared recipient. Target/Area retains coordinates and coverage, then applies declared life projection per hit and unique-life random/Heal candidate policy. Shared-recipient RES-008 receives one actual ledger, never repeated part-local copies. Owner HP_ZERO/confirmation/cleanup applies once and coherently retires all attached eligibility/parts; no extra death events/REC increments. CC checks use the declared status provider, while arm opportunities remain independently scheduled. ownerClockActors maps their actual grant/consumption/completion evidence to the compatible lifecycle-owner personal clocks once; preserve clock qualification and expiry checkpoints, so shared CC durations can advance on lost opportunities without consuming actual-only buff counts.
+
+Stat reads use one retained entry Snapshot plus allowed compatible contribution families under the explicit isolated provider; neither foreign State nor a renderer/stat cache may overwrite that basis. The owner’s own stat/capacity readers and P-031/032 reconciliation use this same projected view, without an independently writable MaxHP limit. State lifetime and stat-view eligibility are separate. Retention/reconciliation/capability/body/position changes commit together. Redundant same-generation requests reuse the active binding, never heal/reset Rage, replay initialization or recreate arms. Preserve body/member/generation/provider/retention/commit identity through save/replay; cleanup releases exact part refs/occupancy/registrations without invalidating still-referenced immutable Action receipts. Existing single-entity bodies retain their ordinary behavior.
+
 
 # 7. ENTITY KIND
 
@@ -1321,6 +1332,15 @@ Skipping an empty slot does not swap Side.
 
 An admitted04§29.3 pending record exposes POSTMORTEM_WAIT at its reserved death Slot under ACT-011. Existing SSI Slot search selects that checkpoint instead of skipping only this declared dead claim. Lifecycle owns subject/death/profile/generation, frozen restore inputs, success-counter ref, attempt index/max and pending/terminal status; Position owns its exact reservation. A visit consumes a scheduler checkpoint serial, not naturalActionSerial/Actor window. No Action/CC/form resolver/class gain/ordinary Actor duration occurs. Close its protected end-attempt, advance pointer once and dispatch the global boundary. Success changes future eligibility only; do not act/revisit immediately. Failure1 retains claim for the declared second visit; final failure/cap exhaustion retires participant/claim/pending work coherently. Replay never repeats payment/use/attempt/Side swap or binds a newer owner at the Slot.
 
+## 18A. Non-consuming contact during real Slot search
+
+04§7.20 → ACT-016/CLK-005 → existing SSI/State/Trigger/DAG/Transaction/Result owners. When the actual pointer inspects a subscribed anchored non-acting object, retain original instance/Side/pass/Position/object-generation/subscription visit identity and suspend only this search continuation. Execute its finite contact graph once, keeping counter/recipient draws/snapshots/Heal terminals and terminal cleanup in the ordinary execution cursor.
+
+An explicitly normalized `AFTER_DIRECT_EFFECTS_COMPLETE` boundary uses the existing Reaction gate with this contact graph's terminal scope, without forging an Action/ADEC Event. Capture declared values before recipient lock/batch, finish simultaneous Heal and necessary lifecycle/result work, then release declared dependent contribution/cleanup nodes. Empty/denied/zero batch terminals still release unconditional dependents. Hold ordinary Reaction resolution until the whole scoped graph, including terminal cleanup, is closed; mandatory lifecycle/result settlement still runs when required. Keep snapshot/batch/contribution-owner/dependency/gate terminal identity through save/resume so a paused boundary cannot recapture values, publish the bonus early, remove foreign contributions or deliver a grant/Heal twice. This does not change the global default or order unrelated contact graphs.
+
+Then advance that inspected Slot once and continue the same Side search. Do not increment naturalActionSerial, emit an Actor Action/global boundary/class gain, swap Side, revisit newly changed occupancy at that coordinate or invoke POSTMORTEM_WAIT. Real later eligible Actor selection remains ordinary SSI. Object removal retires future subscription, not a completed receipt; save/resume cannot duplicate contact, third-contact Heal or cleanup. A passed-position object waits for the next real visit. Multiple noncommuting graphs require declared law rather than callback delivery order.
+
+
 # 19. NATURAL ACTION OPPORTUNITY
 
 Kernel distinguishes:
@@ -2047,6 +2067,13 @@ These are trace/debug data, not gameplay Events.
 
 ---
 
+## 28A.1. Action-captured positive Rage amount evaluation
+
+04§18A.1 → RES-006/CST-016 → existing modifier/State/Action/Snapshot/Resource/Result owners. Before a qualifying actually performed Natural's grant work, freeze active matching amount-rule bindings, exact Action Actor/body membership, lifecycle pool owner and creating-Action exclusion. Associate that capture with the existing causal grantActionRef. Actual-completion State expiration affects future capture only.
+
+For each positive ACTION_GENERATED Rage grant, obtain its one immutable unmodified requested basis, sum compatible captured additive rates, evaluate once before ordinary admission/cap/overflow/result commit and retain source/cause/rule/base/receipt identity. Received-Damage/external/Cost/SET/transfer do not inherit this scope from a shared root or issuing service. No compensating second grant, expired-State requery, per-part independent Rage copy or replay application. Reject ambiguous grant provenance/incompatible noncommutative modifiers; ordinary unprofiled grants remain unchanged.
+
+
 # 29. TRANSACTION MANAGER
 
 Transaction Manager protects atomicity.
@@ -2612,6 +2639,13 @@ Register one finite obligation keyed by Combat Instance, original checkpoint/sub
 Use normalized EXCLUDE_THIS_TRIGGER_ACTIVATION plus immutable commit-origin refs to suppress mutations of the same finite activation. Do not filter all events sharing rootActionId/Ability/source; independently committed later work in that root, and future State-terminal settlements, remain eligible after terminal completion. Retain suppression and terminal candidate evidence for redelivery/save/replay without a mutable “currently suppressing” Character flag. Retired life/presence work cannot activate a replacement. Reject ungrounded origins, cyclic/held-future dependencies or unordered competing effects before affected mutation.
 
 04§7.19 uses existing required SSI continuation records for an exact owner-start/boundary predicate graph without a retained-State/first-later-grant anchor. Key by original grant/boundary + Trigger + owner generation; close qualification/finite settlement before CC/selection at owner start or next-control handoff at boundary. A CC-lost grant can therefore settle an automatic Heal without an Action. For repair-style health observation use existing stablePredicateSettlement with EXCLUDE_THIS_TRIGGER_ACTIVATION, so its own Heal/conversion/payment does not reenter; separately caused later health/checkpoint work remains eligible. False predicate/zero budget/failure is terminal, AE-only mutation creates no retry, and retired owner cannot redirect a candidate to a new chassis. Observable unrelated competition still needs a governing law.
+
+## 35D. Opted-in exact Side-AE predicate subscription
+
+04§7.16 / TRG-016 adds SIDE_CURRENT_AE only to subscribers declaring that exact pool and lifecycle subject. Existing Resource/Transaction writers record the actual committed Side-pool change and origin; Trigger's existing dependency records fan out to valid subscribers keyed by commit/subscriber/subject/generation. Coalesce joined subject-field/AE changes before mandatory settlement. Never synthesize an Actor AE copy, Damage event, AE-only health checkpoint for an unopted listener or subscriber-priority winner.
+
+Keep EXCLUDE_THIS_TRIGGER_ACTIVATION and terminal evidence through Cost/Heal/replay; own writes cannot recurse. Independent later AE mutation can reconsider the predicate after terminal execution. Candidate failure/nonqualification is terminal, not polling; observable shared-AE contention requires its actual composition law. Other stable/health/checkpoint profiles stay unchanged.
+
 
 # 36. TRIGGER CANDIDATE
 
@@ -5321,6 +5355,15 @@ Then Entity becomes visible as active.
 ---
 
 For an admitted postDeathMaterialization, P-069/Transaction joins validated Cost, exact claim, declared old-state retention/cleanup, initialized health/resources, new lifecycle generation and successful-use counter. Original participant battle ownership persists; no True Self is created. Failure exposes none of these staged changes and follows bounded wait policy. State cleanup records replacement cause, not expiry/Cleanse/Shield depletion; Core presence/World bookkeeping sees one coherent commit. CAUSE_ONLY preserves structural presence evidence if a real ENTER_FIELD occurs but excludes generic entry/deployment/start Effect activation, dispatching only explicitly replacement-bound listeners. Always-on registration must not replay battle initialization or reset retained battle counters. Mode defeat binding is validated independently and cannot reopen a terminal battle or silently override Leader death.
+
+## 148A. Accepted occupancy-deferred payloads
+
+04§78.1 → ENT-024 → existing State/Materialization/Position/Cost/Transaction/dependency owners. Store one pending record per exact owner generation/profile, including accepted activation, successful paid receipts, immutable payload/Snapshot refs, form lock, current release state and terminal commit identity. Acceptance/payment/pending publication is atomic. Originating Action completes without waiting for future Slot capacity; deferred release is System work with no replayed Action or SSI grant.
+
+A completed real occupancy transaction supplies FIELD_OCCUPANCY_COMMITTED_STABLE after mandatory lifecycle. Inspect final reservation/occupancy under one protected view, never transient writer order. Insufficient capacity retains the same pending record without RNG/payments. With capacity, use the declared seeded distinct-position/relocation assignment and revalidate generation/claims/payload; one transaction joins entire spawn/body binding and lock/pending retirement. Resume retains exact draw/selection/commit, without spawn/debit twice or consuming Rage gained since acceptance.
+
+Owner death/battle end retires pending/ref/lock with declared no-refund cause. Failure/foreign transfer/conflicting claimants require explicit supported policies. Do not add an arbitrary background queue, deadline, Character flag or occupancy-priority subsystem. Derived reservation/index caches are read models of the existing authoritative Position/State records. Preserve terminal dedup identity after payloads can be released.
+
 
 # 149. REVIVE ENTITY REFERENCE
 

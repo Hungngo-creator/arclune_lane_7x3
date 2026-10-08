@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-07-E.18
+**Version:** 2026-10-08-E.19
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -36,6 +36,8 @@
 **Revision E.17:** adds bounded post-death Slot waits/cause-specific restoration, retained-stat reads, pre-death receipt folding, reserved actual-Heal payment and cause-time Resource admission; makes authored attack shape/movement-trigger suppression explicit. Main participation distinguishes roster recovery from the exact Leader's own pending return. Generic common-recipient simultaneous Damage resolves to existing RES-008 PROPORTIONAL, including per-component receipts. Existing owners/operations execute these profiles; no new Tag, Primitive, Contract ID, allocator or global priority.
 
 **Revision E.18:** adds only bounded Rank-first contention across declared Reincarnation route profiles, using current eligible claimant Rank, existing same-Rank Authority adjudication and protected complete-entry host reservations. Existing host-only binding, receipts, controllers and clocks compose without new fields. No new Tag, Primitive, Contract ID, subsystem or global priority.
+
+**Revision E.19:** adds bounded body/provider bindings, real skipped-Slot contacts with an explicitly scoped existing Reaction gate, prepaid occupancy-deferred materialization, action-captured additive Rage amount modifiers and explicitly watched Side AE. Existing Tags/Primitives, consumed dead waits and unprofiled defaults remain unchanged.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -447,6 +449,48 @@ They are not inferred from:
 ```text
 deployment.fromDeck.enabled
 ```
+
+---
+
+## 3.9 Optional multi-part body profile
+
+`combatBodyProfile` is finite declarative binding data, not new Character identities:
+
+```yaml
+combatBodyProfile:
+  lifecycleOwnerRef: <existing EntityRef>
+  generationRef: <body binding generation>
+  parts:
+    - partKey: <unique local key>
+      entityBinding: OWNER_ENTITY | NEW_COMBAT_OBJECT
+      positionRef: <required Mode PositionRef>
+      naturalActionEligibility: true | false
+      combatDefinitionRef: <exact behavior definition>
+      naturalActionFormProfileRef: <explicit existing Action-form profile>
+  providers:
+    hpAndMaxHp: LIFECYCLE_OWNER
+    rage: LIFECYCLE_OWNER
+    shield: LIFECYCLE_OWNER
+    statusStates: LIFECYCLE_OWNER | PART_LOCAL
+    abilityOwnerRef: LIFECYCLE_OWNER
+    progressionProviderRef: LIFECYCLE_OWNER
+    statBasisSnapshotRef: <retained immutable whitelisted Snapshot>
+    allowedStatContributionFamilyRefs: [<exact source families>]
+    actionClassProviderRef: <explicit owner/definition binding>
+    ownerClockActors: NATURAL_ACTION_ELIGIBLE_PARTS
+  targetProjection:
+    damagePerAreaHit: DISTINCT_LIFECYCLE_OWNER | EACH_PART
+    healSelection: DISTINCT_LIFECYCLE_OWNER
+    randomLifeWeight: ONE_PER_LIFECYCLE_OWNER
+  retentionProfileRef: <explicit definition/HP/Rage/Shield/State reconciliation>
+  lifetime: BATTLE_SCOPED
+```
+
+This initial profile supports one existing life, a finite Mode-valid part set, shared HP/MaxHP/Rage/Shield and explicitly shared or part-local status. Arms remain separate Action Actors with real EntityRefs; they are COMBAT_OBJECT parts, not separately counted lives/Summons/Leaders. The owner may be a non-acting occupied part. Target legality and status recipient routing use the declared part/life projection, never a guessed entityKind alias. Ability/progression queries use the declared existing owner, never manufacture part Rank or Chân Ngã. Action source/provenance remains the selected Actor; credited Attribution requires its own declaration. ownerClockActors delegates lifecycle-owner personal-clock evidence to these real part Actors: consumed opportunities advance opted owner opportunity clocks, and performed/completed Naturals advance only compatible actual-Action clocks. One arm opportunity is one owner-clock tick, never a torso/global boundary tick. CC shared on the owner therefore uses its declared ordinary duration law, while an actual-only Rage-buff clock stays frozen on CC loss.
+
+The stat provider reads the retained Snapshot plus only declared compatible contribution families. Capture does not bake future modifiers into BaseStats. Other old/native/foreign stat contributions cannot affect this explicit isolated view; their State records retain their actual retention/admission law. Missing family bindings do not admit all modifiers. This isolated provider is the owner’s authoritative stat view as well as the parts’ view. All formula/mitigation/MaxHP-capacity readers, including P-031/032 reconciliation, use it; no writable CurrentMaxHP cache may disagree with it. Out-of-view foreign stat records do not change its effective capacity or grant HP. CurrentHP/Rage remain authoritative owner pools, not snapshot copies. Capacity reconciliation, status/Shield retention, actor-local charges and provider Class/Element are explicit; body binding never invents them.
+
+Atomic body materialization validates every required position, displaced occupant and distinct destination together. It joins P-050 relocation, P-051/069 part presence, P-082 definition binding, provider/retention reconciliation, capability registration and SSI eligibility through ENT-023. Failure publishes none; existing life/Leader identity is preserved. Reject provider cycles, independent HP/Rank/Chân Ngã on a shared-life part, duplicate claims/parts, unbounded memberships, missing projections/retention and unsupported cross-instance body splits. Unprofiled entities are unchanged.
 
 ---
 
@@ -1300,11 +1344,17 @@ stablePredicateSettlement:
   dependsOn: []
 ```
 
-The changed-field whitelist is exactly CURRENT_HP, CURRENT_MAX_HP and per-subject CURRENT_RAGE; select a nonempty supported subset, or opt into valid Field initialization. Initialization observes established authoritative values/presence, not provisional entry. Ordinary ConditionSpec selects thresholds; Cost/cap/State/Effect graphs retain their own semantics. A joined commit/subject is one checkpoint even if multiple selected fields and entry change together. No-op/rolled-back writes, AE-only changes and Max Rage changes that leave selected fields unchanged create no mutation checkpoint.
+Without the explicit Side-AE extension below, the changed-field whitelist is exactly CURRENT_HP, CURRENT_MAX_HP and per-subject CURRENT_RAGE; select a nonempty supported subset, or opt into valid Field initialization. Initialization observes established authoritative values/presence, not provisional entry. Ordinary ConditionSpec selects thresholds; Cost/cap/State/Effect graphs retain their own semantics. A joined commit/subject is one checkpoint even if multiple selected fields and entry change together. No-op/rolled-back writes, AE-only changes and Max Rage changes that leave selected fields unchanged create no mutation checkpoint.
 
 This finite mandatory graph closes before the next direct-group/Action/SSI continuation, after full group commit, mandatory lifecycle and reconciliation. At most one activation candidate of this trigger/runtime owner belongs to that checkpoint; no polling, fixpoint or delayed retry token. EXCLUDE_THIS_TRIGGER_ACTIVATION excludes mutations produced by that exact activation's finite settlement (including joined payment/limit reconciliation), not every later mutation sharing Ability, Actor or rootActionId. A later independent commit, including one in the same root or a later State-terminal settlement, can qualify after the activation is terminal.
 
 Do not co-author stableHealthSettlement and stablePredicateSettlement on one trigger. Normalize exact commit/subject, origin-settlement, owner life/presence and local dependency bindings; reject arbitrary watched fields/events/callbacks, missing exclusion provenance, unsupported Mode checkpoints, cycles and observable competing activation/resource order without a governing composition law. This is an opt-in checkpoint profile, not a new Trigger subsystem.
+
+### Explicit Side-AE mutation observation
+
+An opted-in `stablePredicateSettlement` may additionally watch `SIDE_CURRENT_AE`, with both `subjectRef` bound to the declared lifecycle subject and `sidePoolRef` bound to that owner's exact Side-AE pool. CurrentHP/MaxHP/Rage retain their subject providers. AE remains Side-owned: one committed pool change fans out to separately keyed eligible subscribers, not fake HP writes or per-Actor AE copies.
+
+Add `SIDE_CURRENT_AE` to changedFields only when this exact binding is present. Coalesce selected subject/pool fields by original commit + subscriber + subject. EXCLUDE_THIS_TRIGGER_ACTIVATION still excludes the activation's own Cost/Heal; a later independent AE commit can qualify. Other profiles remain health/Rage-only; no-op, rolled-back, wrong-Side or unwatched AE changes still create no candidate. Observable shared-budget competition requires an actual composition law; no subscriber ordering is supplied.
 
 ## 7.17 Complete-cohort local death settlement
 
@@ -1353,6 +1403,28 @@ Lower to existing committed-Result/State/P-021/Transaction bookkeeping, keyed by
 ## 7.19 Required SSI checkpoint predicate settlement
 
 `trigger.checkpointSettlement: {anchor: OWNER_NATURAL_OPPORTUNITY_START | TURN_BOUNDARY, mode: BEFORE_SSI_CONTINUATION}` opts an ordinary finite Condition/Effect graph into ACT-034/CLK-001's existing required scheduler work. Unlike §7.15's retained-State/first-later-grant profile, this profile requires no State instance or creation-serial anchor; bind the exact living owner generation and originating opportunity/boundary identity. At owner start close before that same grant's CC/selection/admission; at global boundary close before next Side control/opportunity. False predicate, zero budget or local failure closes without retry. No future-Action dependency, Action/class regeneration, continuous polling or global ordering of unrelated competing candidates. Do not co-author another settlement profile on that trigger; observable competition requires an actual law or rejection.
+
+## 7.20 SSI pass-contact settlement
+
+```yaml
+trigger:
+  event: SSI_PASS_CONTACT
+  passContactSettlement:
+    subjectRef: <anchored living/present Combat Object>
+    positionBinding: CURRENT_ANCHORED_POSITION
+    checkpoint: BEFORE_SKIP_ADVANCE
+    mode: MANDATORY_BEFORE_CONTINUATION
+    countRef: <existing contact-owned State counter>
+    terminalCount: <finite positive integer>
+    settlementGraphRef: <finite acyclic existing Effect graph>
+    terminalGraphRef: <cleanup after that contact's settlement>
+    reactionBoundary: <existing explicit boundary when observable>
+```
+
+Only Main's declared contact adapter is currently admitted. ACT-016/CLK-005 bind actual Side/pass/position visit identity and guarantee one finite settlement before advancing the skipped Slot. Count/Heal/State/cleanup use existing operations. A contact never requests an Actor opportunity or global boundary. Capture membership/recipient/values at the declared local checkpoints; Effects retain ordinary validity and failure laws. Reject round substitutes, contact-forged Actions/class grants, future-Action dependencies, multiple contact policies with observable undeclared order and subscriptions on a body part already receiving a Natural opportunity. An empty/dead/retired object cannot produce contact.
+
+For an authored `AFTER_DIRECT_EFFECTS_COMPLETE` contact boundary, reuse RES-003's ordinary-Reaction hold across this finite **System graph**, including its declared local contribution/terminal cleanup dependencies. Its end is contact graph terminal, not a fabricated ACTION_DIRECT_EFFECTS_COMPLETE Event. Simultaneous Heal/result readiness may release a later local grant/removal node; positive Effective Heal is a Condition only if expressly authored. Mandatory lifecycle/result settlement remains immediate where required. Missing observable snapshot→batch→grant/removal edges, cyclic waits on their held continuation or an unspecified observable Reaction boundary are rejected; no global Reaction default or unrelated contact priority follows.
+
 
 # 8. CONDITION SPEC
 
@@ -3302,6 +3374,33 @@ Kernel = resolver/runtime
 ```
 
 ---
+
+## 18A.1 Action-captured positive Rage amount profile
+
+The existing scoped amount-modifier pipeline may opt into one additional bounded Effect scope:
+
+```yaml
+effectScope:
+  effectType: RESOURCE_MODIFICATION
+  resourceScope:
+    resourceKind: RAGE
+    operation: POSITIVE_GRANT
+    grantOrigin: ACTION_GENERATED
+    poolOwnerRef: <exact authoritative owner pool>
+    grantActionActors: <one Actor or current Natural Actor set of an exact lifecycle owner>
+amountOperation:
+  type: ADD_RATE_ON_UNMODIFIED_AMOUNT
+  value: <finite nonnegative coefficient>
+resolutionPhase: PRE_RESOURCE_GRANT_COMMIT
+causeBinding: CAPTURE_AT_PERFORMED_NATURAL_ACTION_START
+```
+
+RES-006/CST-016 capture the matching active rule for the exact performed Action, using existing Action/Snapshot/State bindings. A pending start-after-activation rule excludes its creating Action and arms at its next qualifying performed Natural; subsequent actual-completion duration counts preserve that Action's captured grant evidence after State expiry. CC-lost opportunities/child Actions do not start or decrement an explicitly performed-Natural clock. At each Action start resolve the current validated Actor set, including the ordinary sole owner before a deferred body transition; capture membership only for that Action. A body-owned counter may filter exact currently bound arm Actors through lifecycleOwnerRef; this is one budget, not one per member or a private TURN_BOUNDARY.
+
+For a base positive grant `b`, compatible coefficients on the same unmodified basis add: `amount = b × (1 + sum(rates))`, before existing admission, overflow and cap/result commit. No Cost/drain/SET/transfer, received-Damage grant or unrelated external cause is converted into a qualifying grant. A non-Natural grant requires its own explicit compatible profile, rather than becoming Natural through lineage. No add-after-cap correction grant or nominal zero-Cost refund is synthesized. Source provenance and declared same-family REFRESH/no-stack law retain their ordinary identity; incompatible noncommutative resource modifiers need an explicit law or rejection.
+
+This profile extends the earlier HEAL/DAMAGE-only minimum scope; other amount scopes/phases remain closed. For this Resource-only profile, source matching uses the exact grantActionActors binding; a separately present ordinary sourceScope independently filters existing Effect Attribution and never substitutes the issuing service for the causal Actor. The normalized Effect/modifier/Resource plan retains the exact base/cause/rule/pool/result refs and terminal identity through replay. No new Resource Primitive or global gain formula.
+
 
 # 18B. SCOPED DAMAGE-COMPONENT TRANSFORM SPEC
 
@@ -6544,6 +6643,32 @@ materialization:
 
 ---
 
+## 78.1 Occupancy-deferred materialization
+
+```yaml
+materialization:
+  deferred:
+    ownerRef: <living existing lifecycle owner>
+    operation: ENTITY_SPAWN | ATOMIC_BODY_BIND
+    payloadProfileRef: <finite typed spawn/body payload>
+    acceptedActivationRef: <already admitted activation>
+    requiredPaidCostResultRefs: [<successful immutable receipts, or empty>]
+    releaseCheckpoint: FIELD_OCCUPANCY_COMMITTED_STABLE
+    positionSelection: RANDOM_DISTINCT_LEGAL_EMPTY
+    blockedActionProfileRef: <existing State-driven Action-form restriction>
+    ownerInvalidation: CANCEL_NO_REFUND
+    terminalBattle: CANCEL_NO_REFUND
+    multiplicity: ONE_PENDING_PER_OWNER_PROFILE
+```
+
+ENT-024 admits this exact absence-of-capacity pending record. Payment/result and pending creation share one protected acceptance transaction; no paid request can disappear between them. For deferred body binding, empty Cost refs are legal and the old body/kit remains authoritative until the full atomic success. A cast creating a pending spawn closes its own Action/Natural opportunity after acceptance; future materialization is a separate finite System settlement, never an unresolved root that blocks SSI until a Slot opens.
+
+Snapshot immutable payload inputs at their declared source checkpoints, but choose/reserve real positions only when enough legal capacity exists. After a complete occupancy commit and mandatory lifecycle, query final availability. No transient free Slot, arbitrary polling, event-order claimant priority or speculative RNG draw. Release revalidates owner generation/instance, pending identity, actual reservations and the payload's eligibility. Insufficient capacity keeps the same pending record; owner death/battle termination retires it without refund. Other failure/invalidation must carry an explicit policy, not an automatic reroll/retry default.
+
+Success atomically materializes the full payload and retires the request/its form lock. Do not pay again, consume newly earned Rage, recreate the originating Action, replay entry initialization or create an extra SSI turn. Competing pending/independent occupancy claimants require an explicit supported reservation law; otherwise reject conflicting execution content. Normal entities with no deferred profile keep their existing retry/failure law. Save/replay retains paid receipts/payload/generation/progress/terminal identity in existing State/Materialization/Transaction owners.
+
+---
+
 # 79. UNIQUENESS
 
 Uniqueness belongs to Axiom/System metadata.
@@ -6868,6 +6993,11 @@ Additional E.14 invariants: validate one recipient partition registration, exact
 Additional E.13 invariants: validate the bounded predicate fields/initialization, exact own-activation origin and finite dependencies; immutable exact-Heal conversion origins/denial; exclusive first-family eligibility/overlap/proportional allocation; and finite limit/current/battle-lifetime/atomic joined writes. Reject broad root/Ability exclusion, inferred priority, reconstructed Overheal, missing result origins, invalid minimum/pool/reconciliation or split transactions before affected mutation. Omission preserves prior profiles and all prior IDs.
 
 Additional E.15 invariants: restricted Basic fragments must be dependency-closed/type-checked with marked coefficient slots, receiving-source bindings, exact-owner targeting and retained immutable payloads. Unsupported damaging graphs cannot take no-Damage fallback. Complete-cohort plans require whole original membership, death-checkpoint captures, clean whole-owner gate, explicit local permutation/failure and protected per-entry progress; reject arbitrary iteration, per-Event ordering, stale-presence continuation and ungoverned competing work. Preserve all existing IDs, ANY behavior and unprofiled copies/cohorts.
+
+E.19 lowering retains body/provider/retention/pending payloads in the existing materialization/effect plan, pass-contact/Side-AE subscriptions in the trigger plan, and captured Rage scope in effectModifierPlan/Action/resource bindings. Preserve exact typed refs and Contract IDs; no raw callback or independent writable alias ledger.
+
+Additional E.19 invariants: every multi-part provider/target/retention binding resolves before mutation; one owner HP/Rage/Shield ledger cannot be allocated per part; DISTINCT_LIFECYCLE_OWNER is per authored hit/group, not whole-Action deduplication; body actor clocks use declared actual Action evidence. Contact must bind a real skipped-position visit, finite terminal graph and explicit observable dependency/Reaction-boundary scope; unconditional post-batch settlement cannot require positive Heal or suppress mandatory lifecycle. Deferred materialization cannot block its old Action, debit again, select a phantom Slot or transfer to another owner generation. SIDE_CURRENT_AE observation requires exact subject/Side-pool and activation-origin bindings. Positive Rage amount rules require unmodified-basis additive composition and retained performed-Action capture; unsupported scope/phase/ordering fails closed. No new Tag or Primitive is introduced.
+
 
 # 93. SCHEMA NON-GOALS
 
