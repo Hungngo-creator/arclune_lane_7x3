@@ -1,14 +1,14 @@
 # ARCLUNE — TINH KHÔNG MA NỮ — CLARIFIED GAMEPLAY CANON
 
 **Revision:** R1 — replacement raw kit and current designer answers.
-**Status:** GAMEPLAY_CORE_CLARIFIED / ARCHITECTURE_NORMALIZED; final local settlement order awaiting designer answer. Main core semantics are locked; metadata/external adapters in §8 are not generated execution-ready numeric data.
+**Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED. All internal gameplay and local settlement dependencies are locked; metadata/external adapters in §8 are not generated execution-ready numeric data.
 **Source:** #78 **Tinh Không Ma Nữ**, identified by name and kit in `ý tưởng nhân vật 3.md`; latest replacement and explicit answers supplied on 2026-10-08. The following unnamed #78 Mage is a different entry.
 
 ## 1. Identity and source precedence
 
 **Tinh Không Ma Nữ — UR, Summoner.** Native Element, stat budget, Ki metadata and Base Deployment Cost remain separate metadata. Rarity/Class supply no Authority. Orb, beam and stars are VFX rather than independently acting units.
 
-The replacement kit supersedes the old Skill3 Counter entirely: there is no attack-received counter, five-AE payment or one-counter-per-hostile-Action rule in this version. The primary corrected kit supersedes its appended old examples: Skill1 counts **four performed Natural Actions**, not three personal “Turn Boundaries”; Skill3 grants **two 160% Basics**; Ultimate C costs **15 AE**. Chi Tâm's ARM/RES snapshot is at its first healing activation, not at creation.
+The replacement kit supersedes the old Skill3 Counter entirely: there is no attack-received counter, five-AE payment or one-counter-per-hostile-Action rule in this version. The primary corrected kit supersedes its appended old examples: Skill1 counts **four performed Natural Actions**, not three personal “Turn Boundaries”; Skill3 grants **two 160% Basics**; Ultimate C costs **15 AE**. Chi Tâm's ARM/RES snapshot is at the first real SSI Pass Contact checkpoint before its Heal batch/bonus, not at creation.
 
 Explicit designer answers, including all accepted follow-up proposals, lock: Leader Ultimate replaces the chosen arm's Basic; the Leader buff counts both arms together; every star is one mixed hit including its own2% MaxHP TRUE component; C pays Rage and AE immediately; the ally/Cost rules in §§3–4 apply. No older proposal changes those answers.
 
@@ -34,7 +34,7 @@ Chi Tâm's explicitly authored ARM/RES contribution in §3.3 is a separate decla
 
 ### 2.3 Damage-derived healing from Ma Nữ's Ultimate
 
-For one successful **Tinh Quang Đại Xạ** cast, bind the exact Basic Action invoked by that cast and its direct Damage receipts for at most three recipients. After qualifying Damage/lifecycle is terminal, one Leader Heal requests:
+For one successful **Tinh Quang Đại Xạ** cast, bind the exact Basic Action invoked by that cast and its direct Damage receipts for at most three recipients. After qualifying Damage/lifecycle is terminal, seal that exact committed Actual HP Damage projection; before activating the free Skill1, one Leader Heal requests:
 
 `0.10 × sum(committed Actual HP Damage of that exact Basic outcome)`.
 
@@ -72,13 +72,21 @@ Chi Tâm has a Slot, CurrentHP/MaxHP =0.65 × Leader MaxHP, no Rank and no other
 
 An **SSI Pass Contact** is one real visit by the owning Side's pointer to the anchored Slot while the object is present. It is an observation within skip/search, not a consumed Natural opportunity, actor duration, postmortem wait, personal TURN_BOUNDARY, Side swap or class AE/Rage grant. Creation in a passed Slot waits for the next actual visit; global boundaries/round timers do not substitute for contacts.
 
-Each contact selects up to **two distinct** random eligible allied lives; each requests Heal0.20 × Leader MaxHP. A recipient can be selected again at another contact. Fewer than two eligible lives means at most the available number, never duplicate selection to fill the count.
+Each contact selects/locks up to **two distinct** random eligible allied lives; each requests Heal0.20 × Leader MaxHP. Resolve their Heal as one **simultaneous batch** with ordinary recipient validity. A recipient can be selected again at another contact. Fewer than two eligible lives means at most the available number, never duplicate selection to fill the count.
 
-At the **first healing activation**, capture the Leader's then-applicable ARM/RES and create one nonstacking contribution of10% each. Retain that immutable amount through contacts2/3; no recapture or compounding. End the contribution when that Chi Tâm disappears. Resolve the third contact's Heal before natural disappearance. At contact1, snapshot before this object’s bonus is applied and grant it even when there are no valid Heal recipients or Heal is denied/zero. Destruction removes the object and its contribution immediately with destruction cleanup, not a fabricated third contact. There is no missing-Rank inference, independent natural turn, ordinary Revive or REC eligibility for this object.
+The following local dependency edges are locked:
+
+1. **Contact1:** at the contact checkpoint, lock the Leader's then-applicable ARM/RES **before this Chi Tâm's bonus** → select/lock Heal recipients → resolve the simultaneous Heal batch → grant one nonstacking contribution of10% ARM/RES from that locked snapshot. The bonus is independent of requested/effective Heal: empty recipients, denied Heal and requested/effective Heal0 still settle the grant. Contact1 Heal cannot observe or be affected by the contribution created after it. No ordinary Reaction resolves between this Heal batch and the local bonus settlement.
+2. **Contact2:** resolve its simultaneous Heal batch and retain the exact Contact1 contribution. No new snapshot, refresh, stack or compounding; the contribution persists across contacts until this object's terminal cause.
+3. **Contact3:** finish its simultaneous Heal batch → close necessary mandatory lifecycle/result settlement → natural disappearance → remove exactly this Chi Tâm's contribution with cleanup. The third Heal always precedes disappearance/contribution removal. Mandatory lifecycle still runs whenever required; holding ordinary Reactions never postpones it.
+
+These finite contact graphs declare the existing `AFTER_DIRECT_EFFECTS_COMPLETE` boundary scoped to their whole local graph, including required terminal cleanup. Ordinary Reactions follow that graph's terminal settlement; contact remains System work without an Actor Action or synthetic ADEC Event.
+
+If destroyed by another cause before Contact3, clean up immediately and remove only this object's contribution. Do not fabricate Contact3 or deliver terminal Heal. There is no missing-Rank inference, independent natural turn, ordinary Revive or REC eligibility for this object.
 
 ### 3.4 Allied Heal membership
 
-“Allies” includes Ma Nữ, the cast owner and Leader when alive, present and otherwise eligible. For B and Chi Tâm random selection, three Tàn Thần parts represent **one Heal candidate/pool**, not three recipients or three lottery weights. Chi Tâm is excluded from this Heal pool. This does not decide hostile multi-part attack multiplicity; see §8.1.
+“Allies” includes Ma Nữ, the cast owner and Leader when alive, present and otherwise eligible. For B and Chi Tâm random selection, three Tàn Thần parts represent **one Heal candidate/pool**, not three recipients or three lottery weights. Chi Tâm is excluded from this Heal pool. Independently authored area-hit/wave multiplicity follows §§2.1/3.1; unsupported foreign body/attack profiles follow §8.
 
 ## 4. Ma Nữ Skill1 — action-generated Rage
 
@@ -117,11 +125,26 @@ The stationary orb beam attacks one enemy column, up to three occupied legal pos
 
 The cast is a real **ULTIMATE** invoking exactly one real **BASIC_ATTACK** Action with the same column geometry and components **PHYSICAL280% ATK + WILL280% WIL**. The invoked Basic is non-Natural and does not consume another SSI opportunity. Its Basic identity is visible to future Basic-trigger effects; the parent retains its own Ultimate identity/provenance.
 
-Skill3 never changes280/280 and this Basic explicitly **does not consume Skill3 charges**, despite being a Basic Action. After that Basic, invoke Skill1 with **all Skill1 Costs waived**; retain its40% modifier, next-Natural start and four performed-Action duration. Ma Nữ Ultimate requires full Rage and pays all current Rage; Skill1’s waiver does not waive that root Cost. Passive Heal in §2.3 consumes only this accepted Basic's direct committed Damage results.
+Skill3 never changes280/280 and this Basic explicitly **does not consume Skill3 charges**, despite being a Basic Action. Ma Nữ Ultimate requires full Rage and pays all current Rage; Skill1’s waiver does not waive that root Cost.
+
+The complete local dependency chain is locked:
+
+```text
+Ultimate root admitted / Cost committed
+→ real non-Natural Basic child280/280
+→ complete Basic Damage + mandatory lifecycle
+→ seal that exact Basic's committed Actual HP Damage projection
+→ one Tàn Thần Heal =10% of that projection
+→ activate Skill1 with all Skill1 Costs waived
+→ root direct work complete
+→ ordinary Reactions under existing Contracts
+```
+
+Keep the root's explicit `AFTER_DIRECT_EFFECTS_COMPLETE` gate across **Basic280 → Tàn Thần Heal → free Skill1**. The child's local completion does not open an ordinary Reaction window while this root direct sequence remains open. Mandatory lifecycle steps still run wherever required and ordinary recipient/source validity remains authoritative. Passive Heal in §2.3 consumes only this accepted Basic's direct committed Damage results, before free Skill1. Skill1 retains its40% modifier, next-Natural start and four performed-Action duration; it cannot retroactively change the completed Basic's Rage or result. Its fresh buff starts only on each recipient's next actually performed Natural Action under §4.
 
 ## 8. External content, metadata and Mode boundaries
 
-One final local-order question is pending: proposed Chi Tâm capture→simultaneous Heal→first-contact bonus/third-contact cleanup, and proposed Ma Nữ Ultimate Basic→Leader Heal→free Skill1. These proposed dependency edges are not locked until the designer answers. Existing locked mechanics and architecture composition remain independent; executable lowering must reject an unspecified observable order. Main attack owners retain Position binding and use the current Mode/Leader Ki primary selection and beam-column adapters; this Canon fixes allowed column sets and per-target formulas without inventing another nearest-target/tie rule. Numeric Element/budget/Ki/deployment fields remain to be supplied before execution-ready data compilation.
+There is no pending internal gameplay or local-order decision. Main attack owners retain Position binding and use the current Mode/Leader Ki primary selection and beam-column adapters; this Canon fixes allowed column sets and per-target formulas without inventing another nearest-target/tie rule. Numeric Element/budget/Ki/deployment fields remain to be supplied before execution-ready data compilation.
 
 Future foreign content that moves/splits parts, transfers a whole body to another instance, changes provider/retention law, contends for the same empty Slot, or supplies incompatible Rage modifiers needs an explicitly compatible profile/composition law. This is **UNRESOLVED / NOT BLOCKING** for the current Main normalization, not permission to guess status/target/resource ordering. Ordinary Authority and target admission remain authoritative; no cosmetic part creates another independent life.
 
@@ -136,10 +159,10 @@ Examples illustrate the locked formulas only; they do not override clocks, targe
 | A with fixed target MaxHP10,000 and3 stars | Ordinary240% ATK +240% WIL before mitigation, plus TRUE600 across three mixed hits. |
 | B with pre-Cost HP10,000, ATK600, WIL400 and actual payment500 | Each eligible ally requests Heal1,500; not1,025 and not a divided share. |
 | C with Leader MaxHP10,000 | Chi Tâm HP/MaxHP6,500; each selected ally requests Heal2,000 per contact. |
-| First C healing activation at ARM200/RES300 | Fixed contribution+20 ARM/+30 RES until that object's end, regardless of later reads. |
+| First C contact checkpoint at ARM200/RES300 | Lock200/300 before Heal; grant fixed+20 ARM/+30 RES after that batch, even if Heal0/denied/empty. Keep it until that object's end. |
 | Skill1 with an otherwise unmodified action grant10 | Requested qualifying Rage14 before the ordinary pool cap. Four combined arm Actions spend the Leader's four counts. |
 | Skill2 at Leader HP1,500/10,000; Ma Nữ HP1,501/5,000, ATK400/WIL600, AE20 | Pay Ma Nữ HP1,500 and AE20, request Leader Heal2,850. At Ma Nữ HP1,500 payment would reach0, so no activation. |
 | Three Naturals on one continuing target, no initial Skill3 charges | Three ordinary Basics =300/300; Skill3 activation + two enhanced Basics =320/320, +20 coefficient points ≈6.67% before mitigation. |
-| Ma Nữ Ultimate's actual recipient HP losses1,000/2,000/3,000 | One Leader Heal600; unchanged Skill3 charges. |
+| Ma Nữ Ultimate's actual recipient HP losses1,000/2,000/3,000 | Seal total6,000, then one Leader Heal600, then free Skill1; unchanged Skill3 charges and no retroactive Rage bonus. |
 
 Gameplay definitions belong here. Composition/gap proof, draft architecture and delivery/audit evidence belong to the architecture review/PR, not hidden gameplay locks in this Canon.

@@ -2537,13 +2537,13 @@ Chi Tâm là một vật thể năng lượng có vị trí và HP, không phả
 
 Mỗi lần con trỏ SSI thật của phe đi qua slot Chi Tâm đang neo, nhận đúng một SSI Pass Contact:
 
-1. Chọn tối đa hai đồng minh khác nhau, ngẫu nhiên trong nhóm hợp lệ; mỗi người nhận Heal = 20% Max HP Leader.
-2. Ở contact đầu tiên, snapshot ARM/RES của Leader trước bonus của Chi Tâm, tại checkpoint heal đó và cấp một bonus bằng 10% mỗi chỉ số. Bonus vẫn cấp nếu không có người hợp lệ hoặc Heal bị chặn/bằng 0; không stack, không chụp lại ở lần 2/3 và tồn tại đến khi Chi Tâm tan biến.
-3. Sau lần contact thứ ba, hoàn tất heal rồi Chi Tâm tan biến và bonus ARM/RES đi cùng kết thúc. Nếu Chi Tâm bị phá hủy trước đó, bonus cũng kết thúc.
+1. Contact 1: khóa/snapshot ARM/RES Leader tại checkpoint contact, trước bonus Chi Tâm → chọn/lock tối đa hai đồng minh khác nhau → resolve Heal batch đồng thời cho người còn hợp lệ, mỗi người nhận requested Heal = 20% Max HP Leader → sau batch cấp contribution +10% ARM/+10% RES từ snapshot đã khóa.
+2. Bonus đầu không phụ thuộc requested/effective Heal dương: không có recipient, Heal bị deny hoặc bằng 0 vẫn cấp. Heal Contact 1 chưa hưởng/chịu ảnh hưởng từ bonus vừa tạo; không ordinary Reaction chen giữa Heal batch và bonus settlement. Contribution giữ nguyên xuyên Contact 2/3 đến terminal cause; Contact 2 chỉ Heal batch, không snapshot lại, refresh hay stack.
+3. Contact 3: hoàn tất Heal batch → mandatory lifecycle/result settlement cần thiết → Chi Tâm tự tan biến → remove đúng contribution ARM/RES của Chi Tâm cùng cleanup. Heal thứ ba luôn trước disappearance/cleanup; mandatory lifecycle vẫn chạy khi cần. Nếu Chi Tâm bị phá hủy trước Contact 3, cleanup ngay và remove contribution; không giả lập Contact 3 hoặc Heal terminal.
 
 SSI Pass Contact không phải Natural Action, Natural Action opportunity hay TURN_BOUNDARY riêng. Không đổi phe, cấp AE/Rage theo class hoặc dùng timer round giả chỉ vì bỏ qua slot Chi Tâm.
 
-Ví dụ: tại lần heal đầu, ARM = 200 và RES = 300 thì bonus cố định là +20 ARM/+30 RES. Không dùng thời điểm tạo Chi Tâm như ví dụ cũ. Nếu mỗi lần contact có hai đồng minh hợp lệ và Max HP Leader giữ ở 10.000 thì mỗi người được chọn nhận requested Heal 2.000; ba contact cho tối đa sáu lượt Heal, có thể chọn lại người ở contact khác.
+Ví dụ: tại checkpoint Contact 1, khóa ARM = 200 và RES = 300 trước Heal; sau batch cấp bonus cố định +20 ARM/+30 RES kể cả Heal bằng 0/bị chặn/không có recipient. Không dùng thời điểm tạo Chi Tâm như ví dụ cũ. Nếu mỗi lần contact có hai đồng minh hợp lệ và Max HP Leader giữ ở 10.000 thì mỗi người được chọn nhận requested Heal 2.000; ba contact cho tối đa sáu lượt Heal, có thể chọn lại người ở contact khác.
 
 ### Hồi phục Tàn Thần từ Ultimate Ma Nữ
 
@@ -2563,7 +2563,7 @@ Ví dụ: không có bonus khác, hành động vốn sinh 10 Rage sẽ sinh 14 
 
 ## Skill 2 — Tự cứu Leader
 
-Tự kích hoạt khi Leader còn sống, trên sân và HP hiện tại ≤ 15% Max HP, đồng thời Ma Nữ đủ trả cả 30% Max HP của mình và 20 AE. HP Cost không được đưa Ma Nữ về 0 HP.
+Tự kích hoạt khi Leader còn sống, trên sân và HP hiện tại ≤ 15% Max HP, đồng thời Ma Nữ đủ trả cả 30% Max HP của mình và 20 AE. HP Cost phải để Ma Nữ còn ít nhất 1 HP theo CST-003.
 
 Snapshot ATK/WIL Ma Nữ sau admission, trước Cost. Trả đủ hai Cost rồi lập tức heal Leader = 25% Max HP Leader + 35% ATK Ma Nữ + 35% WIL Ma Nữ. Khoản 30% lấy Max HP Ma Nữ; khoản 25% lấy Max HP Leader. HP Cost không phải Damage, không bị Shield hấp thụ và không tự kích hoạt on-damage.
 
@@ -2591,7 +2591,9 @@ Cần đầy Rage, trả toàn bộ Rage hiện có, rồi cast đúng một Bas
 
 Giữ identity ULTIMATE của cast và một Basic Attack Action thật được gọi bên trong; Basic này không thêm Natural Action. Vì vậy effect “khi thực hiện Basic Attack” có thể quan sát Basic Action đúng phạm vi, không chỉ một Damage Profile giả làm Basic.
 
-Sau đòn đó, kích hoạt Skill 1 miễn toàn bộ Cost Skill 1; vẫn giữ buff +40%, mốc Natural Action tiếp theo và thời lượng bốn hành động. Cost Ultimate riêng vẫn theo luật hợp lệ. Nội tại hồi Tàn Thần dùng kết quả Damage thực của đúng Basic thuộc cast này.
+Thứ tự đã khóa: Ultimate root admitted / Cost committed → Basic child thật 280/280 → hoàn tất Basic Damage và mandatory lifecycle → seal exact committed Actual HP Damage projection của Basic đó → Heal Tàn Thần bằng 10% projection → kích hoạt Skill 1 miễn toàn bộ Cost Skill 1 → root direct work hoàn tất → ordinary Reactions theo Contract hiện hành.
+
+Heal Tàn Thần xảy ra trước free Skill 1. Không mở ordinary Reaction window giữa Basic280 → Heal Tàn Thần → free Skill 1; mandatory lifecycle bắt buộc vẫn chạy khi cần. Skill 1 không sửa ngược Rage/result của Basic vừa xong; buff +40% chỉ bắt đầu ở Natural Action thực sự tiếp theo của mỗi bên và giữ thời lượng bốn hành động. Cost Ultimate riêng vẫn theo luật hợp lệ.
 
 ### Nhóm mục tiêu Heal đã chốt
 

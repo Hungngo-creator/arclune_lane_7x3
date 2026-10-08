@@ -37,7 +37,7 @@
 
 **Revision E.18:** adds only bounded Rank-first contention across declared Reincarnation route profiles, using current eligible claimant Rank, existing same-Rank Authority adjudication and protected complete-entry host reservations. Existing host-only binding, receipts, controllers and clocks compose without new fields. No new Tag, Primitive, Contract ID, subsystem or global priority.
 
-**Revision E.19:** adds bounded body/provider bindings, real skipped-Slot contacts, prepaid occupancy-deferred materialization, action-captured additive Rage amount modifiers and explicitly watched Side AE. Existing Tags/Primitives, consumed dead waits and unprofiled defaults remain unchanged.
+**Revision E.19:** adds bounded body/provider bindings, real skipped-Slot contacts with an explicitly scoped existing Reaction gate, prepaid occupancy-deferred materialization, action-captured additive Rage amount modifiers and explicitly watched Side AE. Existing Tags/Primitives, consumed dead waits and unprofiled defaults remain unchanged.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -1418,9 +1418,12 @@ trigger:
     terminalCount: <finite positive integer>
     settlementGraphRef: <finite acyclic existing Effect graph>
     terminalGraphRef: <cleanup after that contact's settlement>
+    reactionBoundary: <existing explicit boundary when observable>
 ```
 
 Only Main's declared contact adapter is currently admitted. ACT-016/CLK-005 bind actual Side/pass/position visit identity and guarantee one finite settlement before advancing the skipped Slot. Count/Heal/State/cleanup use existing operations. A contact never requests an Actor opportunity or global boundary. Capture membership/recipient/values at the declared local checkpoints; Effects retain ordinary validity and failure laws. Reject round substitutes, contact-forged Actions/class grants, future-Action dependencies, multiple contact policies with observable undeclared order and subscriptions on a body part already receiving a Natural opportunity. An empty/dead/retired object cannot produce contact.
+
+For an authored `AFTER_DIRECT_EFFECTS_COMPLETE` contact boundary, reuse RES-003's ordinary-Reaction hold across this finite **System graph**, including its declared local contribution/terminal cleanup dependencies. Its end is contact graph terminal, not a fabricated ACTION_DIRECT_EFFECTS_COMPLETE Event. Simultaneous Heal/result readiness may release a later local grant/removal node; positive Effective Heal is a Condition only if expressly authored. Mandatory lifecycle/result settlement remains immediate where required. Missing observable snapshot→batch→grant/removal edges, cyclic waits on their held continuation or an unspecified observable Reaction boundary are rejected; no global Reaction default or unrelated contact priority follows.
 
 
 # 8. CONDITION SPEC
@@ -6993,7 +6996,7 @@ Additional E.15 invariants: restricted Basic fragments must be dependency-closed
 
 E.19 lowering retains body/provider/retention/pending payloads in the existing materialization/effect plan, pass-contact/Side-AE subscriptions in the trigger plan, and captured Rage scope in effectModifierPlan/Action/resource bindings. Preserve exact typed refs and Contract IDs; no raw callback or independent writable alias ledger.
 
-Additional E.19 invariants: every multi-part provider/target/retention binding resolves before mutation; one owner HP/Rage/Shield ledger cannot be allocated per part; DISTINCT_LIFECYCLE_OWNER is per authored hit/group, not whole-Action deduplication; body actor clocks use declared actual Action evidence. Contact must bind a real skipped-position visit and finite terminal graph. Deferred materialization cannot block its old Action, debit again, select a phantom Slot or transfer to another owner generation. SIDE_CURRENT_AE observation requires exact subject/Side-pool and activation-origin bindings. Positive Rage amount rules require unmodified-basis additive composition and retained performed-Action capture; unsupported scope/phase/ordering fails closed. No new Tag or Primitive is introduced.
+Additional E.19 invariants: every multi-part provider/target/retention binding resolves before mutation; one owner HP/Rage/Shield ledger cannot be allocated per part; DISTINCT_LIFECYCLE_OWNER is per authored hit/group, not whole-Action deduplication; body actor clocks use declared actual Action evidence. Contact must bind a real skipped-position visit, finite terminal graph and explicit observable dependency/Reaction-boundary scope; unconditional post-batch settlement cannot require positive Heal or suppress mandatory lifecycle. Deferred materialization cannot block its old Action, debit again, select a phantom Slot or transfer to another owner generation. SIDE_CURRENT_AE observation requires exact subject/Side-pool and activation-origin bindings. Positive Rage amount rules require unmodified-basis additive composition and retained performed-Action capture; unsupported scope/phase/ordering fails closed. No new Tag or Primitive is introduced.
 
 
 # 93. SCHEMA NON-GOALS
