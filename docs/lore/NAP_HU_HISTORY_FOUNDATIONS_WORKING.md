@@ -1,6 +1,6 @@
 # NẠP HƯ — KHUNG LỊCH SỬ NỀN TRƯỚC KHI CHIA ĐẠI KỶ
 
-> **Bàn giao mới 2026-10-06:** đọc [chín lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md) trước khi mở câu hỏi mới. Các bổ sung L–LI và mốc Nhân Quả cập nhật câu trả lời mới nhất; không xác nhận Thái Sơ / sáng thế chủ chỉ từ giả thuyết.
+> **Bàn giao mới 2026-10-08:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md). L10 và mục LII cập nhật tín ngưỡng, quãng các hài tử học hiểu Pháp Tắc; L09 giữ câu hỏi dài về điểm neo. Không tự xác nhận Thái Sơ / sáng thế chủ.
 
 > **Trạng thái:** Niên biểu đang xây dựng.
 >
@@ -577,6 +577,8 @@ Khoảnh khắc cuối:
 > **Nhân Tổ trầm mặc, nhìn chúng sinh một lát rồi tan biến; không nói gì.**
 
 Hắn tự suy yếu để vào Luân Hồi. Chân Ngã tiếp tục tồn tại.
+
+**ĐÃ CHỐT mới 2026-10-08:** các hài tử sinh ra đã Chân Tiên và là chủ Pháp Tắc, nhưng phải mài mò / luyện tập để hiểu rõ quyền năng. Họ **chọn cảm ngộ Pháp Tắc của mình rồi mới vào Luân Hồi**; không dùng quyền sở hữu trời sinh làm bằng chứng họ biết hết ngay khi sinh. Thời lượng / mức hiểu trước từng lần rời đời đầu chưa chốt.
 
 Mười hai người con có tính cách khác nhau vì:
 
@@ -1882,3 +1884,15 @@ Trong mắt các Chí Cao, từ khi Chư Thiên sinh ra chỉ sư phụ Main đ�
 **BÍ ẨN CHỦ Ý:** Nạp Hư có thể được sáng thế chủ tạo, Thiên Đạo có thể là khôi lỗi / ý thức quản lý; sáng thế chủ có thể đóng vai Chính Tiên, có thể là Nhân Tổ hoặc Nguyên Sơ. Chưa xác nhận giả thuyết nào hoặc lấy nó làm mốc lịch sử thật.
 
 Câu hỏi / trả lời và triết lý đầy đủ ở [bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), L01–L09. Cơ chế mới ở mục XXVII–XXXII của [Bản thể tu luyện](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).
+
+---
+
+# LII. TÍN NGƯỠNG VÀ QUÃNG HỌC HỎI CỦA TIÊN TRỜI SINH
+
+**ĐÃ CHỐT mới:** tín ngưỡng là **Linh Khí + cảm xúc của sinh vật có Chân Ngã**. Cảm xúc cần **hướng về đối tượng tin tưởng / tôn thờ**. Phàm nhân hấp thu thụ động qua hô hấp; tu sĩ cao tạo tín ngưỡng chất lượng cao hơn vì hấp thu nhiều hơn và vị cách cao hơn. Cảm Xúc là Quy Tắc đặc thù; hài tử có Pháp Tắc hệ ấy luôn chìm đắm trong cảm xúc.
+
+Các hài tử có quyền Pháp Tắc từ lúc sinh nhưng cần hiểu và luyện dùng; chọn cảm ngộ rồi mới Luân Hồi. Giữ việc người con Cảm Xúc rời đi đầu tiên và tác động cảm xúc lên sinh linh đã chốt; **không tự suy ra trước lúc ấy hoàn toàn không có cảm xúc / tín ngưỡng**.
+
+**CÒN MỞ:** lúc sinh linh bắt đầu thu / sử dụng tín ngưỡng, lúc xuất hiện đạo thống khai thác, thời điểm mỗi hài tử đạt mức hiểu nhất định và mức hiển hóa Pháp Tắc trời sinh. Không tự thêm các mốc này vào niên biểu bằng tuổi tham khảo.
+
+Đề nghị mới cho tám cảnh là cơ sở để bàn tiếp, chưa phải hệ hoàn chỉnh xuất hiện sẵn trong thời hài tử. Giữ sự chuẩn hóa quanh Huyết Thế Đại Kiếp và nguồn tổng hợp đa chủng tộc. Câu hỏi / phần đáp tại [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), L10.

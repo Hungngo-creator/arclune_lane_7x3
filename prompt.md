@@ -2,28 +2,31 @@
 
 # BÀN GIAO CUỘC THẢO LUẬN MỚI NHẤT — ĐỌC TRƯỚC
 
-**Cập nhật 2026-10-06.** Tác giả yêu cầu lưu các câu hỏi, câu trả lời, triết lý và quá trình sửa lý luận để một phiên Codex mới nối tiếp được. Đọc hoàn toàn [Bàn giao hội thoại lore Nạp Hư](docs/lore/NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md) **trước** các bản tóm tắt cũ bên dưới. Tệp này lưu chín lượt, gồm đủ năm lượt tác giả chỉ qua ảnh và các lượt trước đó.
+**Cập nhật 2026-10-08.** Đọc hoàn toàn [Bàn giao hội thoại lore Nạp Hư](docs/lore/NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md) trước các bản tóm tắt cũ. Tệp lưu **mười lượt hỏi–đáp**, gồm năm lượt tác giả chỉ bằng ảnh, các lượt trước đó và câu hỏi mới nhất.
 
-**Câu hỏi lore gần nhất nằm ở L09:** vì sao tự tạo thế giới rồi tự làm Thiên Đạo / Chính Tiên có thể thành một vòng tròn; vì sao Thái Sơ một thế giới bị kẹt bởi một điểm neo; vì sao đạo thống Main dùng thần vực và thần cách làm hai điểm neo để chuyển tiếp; và vì sao cực ít người đủ cảnh, thiếu thông tin / thực tiễn / thời gian khiến đường cao chưa được tìm ra. L09.A giữ đầy đủ ý câu hỏi dài, L09.B giữ phần trả lời cuối, L09.C ghi đề nghị Codex chưa được tác giả xác nhận.
+**Câu hỏi lore gần nhất là L10:** tín ngưỡng hình thành thế nào; tiên trời sinh có quyền trước khi hiểu khác tiên hậu thiên ra sao; tám cảnh trước Chân Tiên cường hóa gì. L10.A là ý tác giả, L10.B là phần đáp / bảng đề nghị Codex, L10.C là các điểm chưa được trả lời. L09 giữ nguyên đầy đủ câu hỏi dài và phần đáp về Thái Sơ / điểm neo.
 
-Những điểm phải mang sang phiên mới:
+**ĐÃ CHỐT mới từ tác giả:**
+- Tín ngưỡng là năng lượng đặc thù từ Linh Khí + cảm xúc của sinh vật có Chân Ngã; cảm xúc **phải hướng về đối tượng tin tưởng / tôn thờ**, theo câu trả lời làm rõ của tác giả. Phàm nhân hấp thu thụ động qua hô hấp; tu sĩ cao tạo tín ngưỡng chất lượng cao hơn nhờ hấp thu nhiều hơn và vị cách cao hơn.
+- Cảm Xúc là Quy Tắc đặc thù; hài tử có Pháp Tắc hệ ấy chìm đắm trong cảm xúc. Không nâng người con Chân Tiên thành chủ toàn Quy Tắc.
+- Nhân Tổ / hài tử có quyền trời sinh rồi mài mò, luyện tập / cảm ngộ; Chân Tiên hậu thiên hiểu Pháp Tắc rồi chứng thành chủ. Các hài tử cảm ngộ Pháp Tắc bản thân trước khi chọn Luân Hồi.
 
-- Luật sở hữu là luật nền, không phải Quy Tắc tu luyện. Nếu có sáng thế chủ, người ấy có thể sửa luật trong thế giới mình.
-- Hướng đang xây dựng cho thế giới riêng có Thiên Đạo riêng dưới quyền sáng thế chủ; không bắt buộc người tạo là cùng ý thức với Thiên Đạo.
-- Nạp Hư là mốc so sánh hình dung, không phải tiêu chuẩn biến động. Làm Nạp Hư suy yếu không khiến người khác đạt Thái Sơ.
-- Mô hình Thái Sơ tác giả chọn có **một thế giới / một điểm neo**. Thu hoặc ngoại phóng chưa giải quyết dung hợp; hòa tan thế giới làm ngã cảnh. Chưa xác nhận Nạp Hư từng có Thái Sơ.
-- Đạo thống Main có **thần vực thiên ngoại không thể thu tùy ý** và **thần cách khác loại Thần Huy**. Thần cách giữ Thượng Vị Thần trong lúc dung hợp thần vực với thân để đạt Chí Cao; sau đó dung hợp thần cách để ổn định Chí Cao. Giả Siêu Thoát là bước tiếp theo.
-- Cơ chế “giai đoạn chuyển tiếp khi neo cũ mất tác dụng mà neo mới chưa hoàn thành” là đề nghị Codex chưa được tác giả xác nhận. Không ghi thành canon tự động.
-- Toàn lịch sử Nạp Hư có không quá **mười Chính Tiên**. Các Chí Cao Chư Thiên hiện có trời sinh ở tầng ấy; trong mắt họ chỉ sư phụ Main được biết đã đạt Giả Siêu Thoát. Main về sau tổng hợp kinh nghiệm Nạp Hư / Thần Huy để xây đường tu tới Chí Cao, không công bố đường cao hơn.
-- Nhân Tổ tạo hài tử **chưa có âm mưu**; Chân Ngã các con là mười hai phần của hắn. Hắn biết sẽ suy yếu / mất vĩnh sinh và vẫn chọn. Nhiều đời về sau mới hình thành mưu đồ quy nhất; hài tử mạnh hơn có thể đảo khách thành chủ.
-- Thiên Đạo **không đọc suy nghĩ Chân Tiên trở lên**. B trong ví dụ Chỉ Dẫn **ngăn lời nhắc Nhân Vực được nói ra**. Lãng Quên / Chỉ Dẫn thuộc Quy Tắc Ký Ức.
-- Luân Hồi cấp Quy Tắc gội rửa được trước quyền năng cấp Pháp Tắc. Cơ chế giữ / thức tỉnh ký ức đang phải xây sau khi bàn khả năng từng cảnh; không lấy điều kiện từng chứng Chân làm đáp án tự động.
-- Âm mưu đồng hóa người chứng đạo Nhân Quả xảy ra sau Huyết Thế Đại Kiếp, trước Main đời I; chưa chốt niên đại. Chân Tiên không sở hữu trọn Quy Tắc, nên phải xác định Pháp Tắc / mức cảnh của mục tiêu.
-- Nạp Hư có sáng thế chủ, Thiên Đạo là khôi lỗi, Nhân Tổ / Nguyên Sơ là sáng thế chủ vẫn là giả thuyết / bí ẩn, chưa xác nhận.
+**Chưa chốt:** lượng / chất, điều kiện đối tượng và đường thu / dùng tín ngưỡng. Bảng tám cảnh là đề nghị Codex, phải chờ tác giả xác nhận từng phần. Trục đề nghị: thân → sinh mệnh → hồn–ý → Pháp Tướng → nguồn linh lực → bản thể Vực → khắc Pháp → định Pháp. Dưỡng Hình chủ động dẫn Linh Khí tới đâu và Khai Mệnh mở bước nào còn cần bàn. Không tự đổi bảng thọ nguyên, công pháp, năng lực Chân Ngã hoặc cơ chế giữ ký ức.
 
-**Nối tiếp đúng việc:** tác giả muốn bàn khả năng tấn công / can thiệp của từng đại cảnh, rồi xây nền ký ức qua Luân Hồi; chi tiết Chính Tiên Kiếp và các mốc lịch sử chưa chốt. Không khởi động lại Stage 0, hỏi lại những điểm đã trả lời hoặc chuyển sang Thần Huy chỉ vì mẫu khởi đầu bên dưới. Câu hỏi mới nhất của tác giả trong phiên đang hoạt động luôn được ưu tiên.
+**Các quyết định trước vẫn phải nhớ:**
+- Nạp Hư là mốc so sánh hình dung; làm nó yếu không giúp đạt Thái Sơ. Luật độc chiếm là luật nền; sáng thế chủ giả định có thể sửa luật trong thế giới mình.
+- Mô hình Thái Sơ được chọn có một thế giới / một điểm neo; thu / thả chưa giải quyết dung hợp, hòa tan neo làm ngã cảnh. Thế giới riêng có thể có Thiên Đạo riêng dưới quyền người tạo.
+- Đạo thống Main có thần vực thiên ngoại không thể thu tùy ý và thần cách khác loại Thần Huy. Thần cách giữ Thượng Vị Thần lúc dung hợp thần vực với thân lên Chí Cao; sau đó dung hợp thần cách ổn định Chí Cao. Giả Siêu Thoát là bước tiếp theo.
+- “Khoảng chuyển tiếp neo cũ mất tác dụng trước nền mới hoàn thành” là đề nghị Codex ở L09.C, chưa xác nhận.
+- Toàn lịch sử Nạp Hư không quá mười Chính Tiên, chưa xác nhận Thái Sơ. Các Chí Cao hiện có trời sinh; trong mắt họ chỉ sư phụ Main được biết đã đạt Giả Siêu Thoát. Main tổng hợp Nạp Hư / Thần Huy xây đường tới Chí Cao, không công bố đường cao hơn.
+- Chân Ngã hài tử là các phần của Nhân Tổ. Hắn biết mất vĩnh sinh / suy yếu và vẫn tạo con, chưa âm mưu lúc ấy; nhiều đời mới nghĩ quy nhất. Hài tử mạnh hơn có thể đảo khách thành chủ.
+- Thiên Đạo không đọc suy nghĩ Chân Tiên trở lên. B trong ví dụ Chỉ Dẫn ngăn lời nhắc Nhân Vực được nói ra. Lãng Quên / Chỉ Dẫn thuộc Quy Tắc Ký Ức.
+- Luân Hồi Quy Tắc gội rửa được trước Pháp Tắc; cơ chế giữ ký ức phải xây từ khả năng từng cảnh. Âm mưu đồng hóa người chứng đạo Nhân Quả nằm sau Huyết Thế Đại Kiếp trước Main đời I, chưa chốt ngày / Pháp Tắc / mức cảnh.
+- Nạp Hư có sáng thế chủ, Thiên Đạo là khôi lỗi, Nhân Tổ / Nguyên Sơ là người ấy vẫn là giả thuyết / bí ẩn.
 
-**Quy trình lưu đã được tác giả yêu cầu:** sau một nhóm trao đổi lore có nội dung mới, lưu cả ý câu hỏi lẫn phần trả lời, cập nhật mục đọc trước của bản bàn giao và các tài liệu liên quan trong phạm vi đã được cho phép; không chờ tác giả phải nhắc lưu lần nữa. Đề nghị chưa được trả lời giữ trạng thái SUY LUẬN / CÒN MỞ. Nếu chưa ghi vào repo được, nói rõ chưa lưu. Ngữ cảnh chat không được coi là lưu trữ bền vững.
+**Nối tiếp:** bàn tín ngưỡng và hạt nhân / sức mạnh tám cảnh theo câu hỏi mới nhất, rồi mới đi tới bảo tồn ký ức. Không khởi động lại Stage 0 hoặc hỏi lại điểm đã trả lời. Câu hỏi đang hoạt động của tác giả luôn ưu tiên hơn phần bàn giao.
+
+**Lưu liên tục đã được tác giả yêu cầu:** sau nhóm trao đổi có nội dung mới, lưu cả ý câu hỏi, phần trả lời, triết lý và đề nghị; cập nhật chỉ dẫn đọc trước cùng tài liệu liên quan trong phạm vi được phép. Không chờ tác giả nhắc lại. Không biến đề nghị thành canon; nếu chưa ghi được vào repo phải nói rõ chưa lưu. Ngữ cảnh chat không phải lưu trữ bền vững.
 
 ---
 

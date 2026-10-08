@@ -1,6 +1,6 @@
 # NẠP HƯ GIỚI — CẤU TRÚC QUẦN VỰC, GIỚI BÍCH & CÁC ĐẠI VỰC HIỆN HÀNH
 
-> **Bàn giao mới 2026-10-06:** [hội thoại về Thiên Đạo, Luân Hồi và thế giới riêng](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md). Mục LIX–LX giữ các quyết định mới và giới hạn của giả thuyết sáng thế chủ.
+> **Bàn giao mới 2026-10-08:** [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), đặc biệt L10 về nguồn tín ngưỡng và đề nghị tám cảnh; mục XX.2 / LXI cập nhật điều kiện hướng về đối tượng.
 
 > **Trạng thái:** Thiết kế thế giới đang xây dựng — dùng để tiếp tục khóa địa lý, lịch sử và vật lý Nạp Hư trước khi viết biên niên sử chính thức.
 >
@@ -776,6 +776,8 @@ Không cần sửa tên thành Phạn Vực nếu người bản địa đã g�
 ---
 
 ## 2. Hiện tượng tín ngưỡng
+
+**ĐÃ CHỐT mới 2026-10-08:** tín ngưỡng là năng lượng đặc thù hình thành từ **Linh Khí + cảm xúc của sinh vật có Chân Ngã**. Phàm nhân hấp thu Linh Khí thụ động qua hô hấp; tín ngưỡng tu sĩ cao có chất lượng cao hơn nhờ hấp thu nhiều hơn và vị cách cao hơn. **ĐÃ CHỐT làm rõ:** cảm xúc cần hướng về đối tượng tin tưởng / tôn thờ. Cách tín ngưỡng đến người nhận còn mở; không tự chốt mọi cảm xúc chỉ chảy về Phật.
 
 Ở cảnh giới đủ cao, tu sĩ nhìn được:
 
@@ -2543,3 +2545,13 @@ Thiên Đạo không thể thu hồi Quy Tắc thuộc Chính Tiên, nhưng có 
 Thần vực của đạo thống Main ở thiên ngoại và không thể tùy ý thu vào cơ thể; thần vực cùng thần cách tạo hai điểm neo cho chuyển tiếp lên Chí Cao. Không đồng nhất thần vực ấy với mọi Tiên Vực / Đạo Vực của Chân Tiên Nạp Hư hoặc thần cách Tân Thần Thần Huy.
 
 Giải thích từng lượt và phần đáp ở [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md); cơ chế ở mục XXVII–XXXII của [Bản thể tu luyện](NAP_HU_CULTIVATION_ONTOLOGY_AND_SWORD_TRADITIONS_WORKING.md).
+
+---
+
+# LXI. TÍN NGƯỠNG — NGUỒN NĂNG LƯỢNG VÀ GIỚI HẠN ĐỊA LÝ CÒN MỞ
+
+Nguồn tín ngưỡng đã chốt ở mục XX.2. Nó không chỉ đến từ tu sĩ; phàm nhân có Chân Ngã, cảm xúc và Linh Khí thụ động cũng có nền để tạo. Linh Sinh / các chủng tộc phải xét điều kiện có Chân Ngã, không áp hình thái cơ thể người cho mọi trường hợp.
+
+**ĐÃ CHỐT làm rõ:** cần cảm xúc hướng về đối tượng tin tưởng / tôn thờ. **CÒN MỞ:** điều kiện đối tượng, cách dòng đến người nhận, liên hệ người nhận / tín đồ, khả năng tích trữ hoặc chuyển qua Giới Bích và giới hạn quan sát. Không thêm khoảng cách / thời gian truyền hoặc tự coi mọi tâm niệm là cùng một loại năng lượng.
+
+Các dòng sáng ở Phạn Châu và việc Phật Đạo dùng tín ngưỡng đã có vẫn giữ; cơ chế nền mới chưa tự mở năng lực nhìn dòng cho mọi tu sĩ Chiếu Hồn. Bảng tám cảnh đang được Codex đề nghị để tác giả chọn, không phải một thang quan sát tín ngưỡng đã chốt. Lượt hỏi / phần đáp ở [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), L10.

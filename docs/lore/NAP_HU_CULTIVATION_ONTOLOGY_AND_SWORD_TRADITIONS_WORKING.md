@@ -1,6 +1,6 @@
 # NẠP HƯ — ÁNH XẠ CẢNH GIỚI, CỔ THẦN, NHÂN TỔ & HAI HỆ KIẾM TU
 
-> **Bàn giao mới 2026-10-06:** đọc [các lượt hỏi–đáp và triết lý điểm neo](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md). Mục XXVII–XXXII cập nhật độc chiếm, Luân Hồi, Thái Sơ và đạo thống Main; đề nghị chưa được tác giả xác nhận được đánh dấu riêng.
+> **Bàn giao mới 2026-10-08:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), đặc biệt L10 về tín ngưỡng / tiên trời sinh. Mục XXXIII–XXXIV ghi quyết định mới; bảng tám cảnh và những đề nghị chưa được tác giả xác nhận giữ trạng thái riêng.
 
 > **Trạng thái:** Thiết kế thế giới đang xây dựng.
 >
@@ -73,7 +73,7 @@ Nó là mô hình đang được xây dựng từ dấu vết các tồn tại c
 
 # II. PHÁP TẮC VÀ QUY TẮC
 
-Hệ hiện tại:
+**Con đường hậu thiên hiện tại**; tiên trời sinh có quyền sở hữu trước rồi phải luyện tập / cảm ngộ, xem mục XXXIV:
 
 ~~~
 Định Pháp
@@ -818,9 +818,7 @@ Nhưng có thể áp chế bằng:
 
 # XVIII. NGƯỜI CON CẢM XÚC
 
-Một trong mười hai người con mang hệ Pháp Tắc:
-
-> **Cảm Xúc.**
+Một trong mười hai người con mang Pháp Tắc hệ **Cảm Xúc**. **ĐÃ CHỐT mới 2026-10-08:** Cảm Xúc là một Quy Tắc đặc thù; người con Chân Tiên chưởng quản một Pháp Tắc thuộc hệ ấy, không tự sở hữu trọn Quy Tắc. Người này luôn chìm đắm trong cảm xúc. Quyền có từ lúc sinh không đồng nghĩa đã hiểu hết; các hài tử cảm ngộ Pháp Tắc của mình trước khi chọn Luân Hồi.
 
 Người này là:
 
@@ -1089,3 +1087,25 @@ Trong mắt các Chí Cao Chư Thiên, từ thuở Chư Thiên chỉ sư phụ M
 Main về sau nghiên cứu, tổng hợp kinh nghiệm **Nạp Hư và Thần Huy** mới xây con đường tu tới Chí Cao. Sự thiếu ca thực nghiệm, thời gian nghiên cứu hữu ích, thông tin và đồng đạo giải thích đường cụt của phương pháp Nạp Hư đang xét.
 
 Giữ trần **Bán Chí Cao** của Arclune mô phỏng theo [Nghịch lý Chúa](<../Nghịch lý Chúa.md>). Bàn thiết kế đường tu không đồng nghĩa Main đã đạt Chí Cao trong mô phỏng. Chi tiết đầy đủ cả câu hỏi và phần đáp tại [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), L01–L09.
+
+---
+
+# XXXIII. TÍN NGƯỠNG — CẢM XÚC, CHÂN NGÃ VÀ LINH KHÍ
+
+**ĐÃ CHỐT từ tác giả 2026-10-08:** tín ngưỡng là năng lượng đặc thù hình thành từ **Linh Khí + cảm xúc của sinh vật có Chân Ngã**. Có cảm xúc là điều kiện; không dùng bản công thức thiếu điều kiện Chân Ngã.
+
+Phàm nhân vẫn hấp thu Linh Khí **thụ động qua hô hấp**, nên không phải tu sĩ mới tạo được tín ngưỡng. Tín ngưỡng của tu sĩ cấp cao có **chất lượng cao hơn**, vì họ hấp thu Linh Khí nhiều hơn và vị cách cao hơn. Chưa có tỷ lệ chuyển đổi, giới hạn lượng hoặc phép quy đổi một tu sĩ thành bao nhiêu phàm nhân.
+
+**ĐÃ CHỐT làm rõ:** cảm xúc phải **hướng về một đối tượng được tin tưởng / tôn thờ** để tạo tín ngưỡng. Không dùng phương án mọi cảm xúc tự sinh tín ngưỡng rồi mới định hướng. **CÒN MỞ:** điều kiện đối tượng, loại cảm xúc tương thích, cơ chế thu / dùng và cách năng lượng đến người nhận hoặc đi qua thế giới.
+
+**SUY LUẬN Codex:** điều kiện chủ thể có Chân Ngã không tự cho thấy Chân Ngã bị tiêu hao / phân tách khi phát sinh tín ngưỡng; chưa chốt cảm xúc bị tiêu thụ. Sinh linh không Chân Ngã cần xét riêng khả năng tự tạo, thu nhận và sử dụng.
+
+# XXXIV. TIÊN TRỜI SINH VÀ TIÊN HẬU THIÊN — QUYỀN SỞ HỮU VÀ MỨC THÀNH THẠO
+
+**ĐÃ CHỐT từ tác giả:** Nhân Tổ và các hài tử khác người hậu thiên tu thành tiên. Tiên trời sinh có vị cách / quyền chưởng quản từ lúc sinh, nhưng phải **mài mò, luyện tập và cảm ngộ** để hiểu rõ quyền năng của bản thân. Chân Tiên hậu thiên trở thành chủ vì đã hiểu Pháp Tắc qua con đường tu luyện / chứng Chân.
+
+**Các hài tử chọn cảm ngộ Pháp Tắc bản thân rồi mới vào Luân Hồi.** Không ghi rằng vừa sinh ra họ đã biết mọi cách vận dụng, hoặc bỏ qua quãng học hỏi ấy. Không đặt thêm thời lượng / ngưỡng cảm ngộ cụ thể.
+
+**SUY LUẬN Codex:** quyền sở hữu và mức thành thạo ứng dụng là hai mặt riêng. Chủ trời sinh có thể chưa khai thác hết năng lực; không vì vậy mất quyền, không có sức mạnh hoặc luôn yếu hơn chủ hậu thiên. Cách mức hiển hóa thay đổi khi chủ trời sinh học sâu hơn vẫn **CÒN MỞ**.
+
+Tên / thứ tự tám cảnh hậu thiên giữ nguyên. Bảng đề nghị mỗi cảnh cường hóa gì ở mục XV của [Hệ thống sức mạnh](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md) và phần đáp đầy đủ tại lượt L10 của [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md). Chưa tự dùng tám cảnh để giải thích sự sinh ra của Nhân Tổ / các hài tử.
