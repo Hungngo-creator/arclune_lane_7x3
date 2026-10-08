@@ -223,7 +223,7 @@ Markdown/reference consistency
 canonical ID/reference consistency
 cross-file semantic consistency
 duplicate/conflicting definition checks
-AGENTS.md six-pass self-audit
+AGENTS.md scope-proportionate self-audit (§33)
 ```
 
 Do not run executable tests merely because they exist in the repository.
@@ -1069,7 +1069,7 @@ When the user authorizes Codex to continue Character work autonomously, use this
 14. inspect the resulting diff
 15. run cross-file architecture consistency checks
 16. update 08 only when new regression coverage is actually required
-17. perform the mandatory six-pass final self-audit
+17. perform the scope-proportionate final self-audit in §33
 18. report changed files and unresolved gameplay
 ```
 
@@ -1283,7 +1283,7 @@ When authorized to modify the repository:
 4. make only requested/proven edits;
 5. run checks appropriate to the active Project Phase;
 6. inspect the actual diff;
-7. run the six-pass self-audit;
+7. run the scope-proportionate self-audit in §33;
 8. fix issues found;
 9. rerun affected checks;
 10. report changed files, checks, and unresolved items.
@@ -1363,117 +1363,35 @@ Do not preserve wording merely because you wrote it.
 
 ---
 
-# 33. MANDATORY SIX-PASS FINAL SELF-AUDIT
+# 33. SCOPE-PROPORTIONATE FINAL SELF-AUDIT
 
-Before calling substantial architecture/canon work final or merge-ready, run all six passes.
+Audit depth follows the semantic impact of the change, not a fixed number of rereads.
 
-## Pass 1 — Semantic fidelity
+For substantial architecture/canon changes, cover these three groups before calling the work final or merge-ready. They are distinct review questions, not a requirement to reread the entire source set three times. Reuse evidence already inspected when it remains current and applicable.
 
-Verify:
+For wording/navigation-only or other low-impact changes, inspect the actual diff, verify meaning and affected references, and run the relevant lightweight checks. Do not force unrelated semantic/lifecycle reviews or three ceremonial passes.
 
-```text
-meaning
-thresholds/formulas
-owner/source/recipient
-target relation
-timing checkpoint
-snapshot/re-query
-clock
-lifetime
-failure
-transition cause
-```
+## Check 1 — Intent / semantic fidelity / composition
 
-## Pass 2 — Independent composition
+Verify the current user scope and authoritative sources: latest actual repository canon, later designer corrections, and unresolved gameplay. Do not let AGENTS overconstrain the task, stale proposals replace current canon, or unrelated improvements enter the diff.
 
-Ask again:
+For affected gameplay, verify meaning, thresholds/formulas, owner/source/recipient, target relation, timing checkpoint, snapshot/re-query, clock, lifetime, failure and transition cause. Attempt existing composition independently of the proposal; prove any gap and prefer the smallest typed extension. Preserve prior-Pilot semantics unless explicitly superseded.
 
-```text
-Can current architecture already express this?
-Did a proposal bias the gap conclusion?
-Can a smaller typed extension solve it?
-Are new Tags/Primitives genuinely necessary?
-```
+## Check 2 — Architecture boundaries / adversarial cases
 
-## Pass 3 — Layer / namespace / lifetime
+Verify correct file/layer and ID namespace, no alias/collision or duplicate abstraction, and affected state owner/key/lifetime, persistence/retention scope and authoritative commit boundaries.
 
-Verify:
+Challenge the changed semantics with relevant negative and order-sensitive cases: ties/list order, multiple matching rules, zero result, failed Cost/partial commit, invalid locked target, child Action sharing a root, CC-lost opportunity, cleanup versus expiry, redeploy/reinitialize, repeated registration, same-window unrelated candidates and snapshot/live-read drift. Select cases that can actually expose a defect in this change; do not mechanically repeat the whole list.
 
-```text
-correct file/layer
-correct ID namespace
-no alias/collision
-state owner/key/lifetime
-correct persistence/retention scope
-```
+Ask: what would a buggy but superficially plausible Kernel do? If multiple incompatible outcomes remain legal, fix the Contract or mark REQUIRED_EXPLICIT / unresolved. Add or reuse stress coverage only where it proves a relevant invariant.
 
-## Pass 4 — Determinism / negative space
+## Check 3 — Actual diff / validation / delivery
 
-Attack with:
+Inspect the latest actual target base and resulting diff: edits/anchors, changed-file scope, affected references/IDs, migration impact and self-contained delivery. Inspect phase-appropriate check results; executable builds/tests apply only when the active Project Phase/task requires them.
 
-```text
-tied targets
-list-order dependence
-multiple matching rules
-zero actual result
-failed Cost
-partial commit
-invalid locked target
-child Action sharing root
-CC-lost opportunity
-cleanup vs expiry
-redeploy/reinitialize
-repeated static registration
-same-window unrelated candidates
-```
+Before publishing or merging, verify the actual head/diff and target branch under the repository delivery rules. Do not call a proposed or unverified result merged canon.
 
-Ask:
-
-> What would a buggy but superficially plausible Kernel do?
-
-If multiple incompatible outcomes remain legal:
-
-```text
-fix the Contract
-or
-mark REQUIRED_EXPLICIT / unresolved
-```
-
-## Pass 5 — Prompt / source contradiction
-
-Verify:
-
-```text
-current user scope followed
-later designer correction beats older wording
-current repo beats stale proposal/snapshot
-unresolved gameplay not silently chosen
-AGENTS.md did not overconstrain the task
-unrelated improvements not smuggled into scope
-```
-
-## Pass 6 — Mergeability
-
-Verify:
-
-```text
-latest actual target base read
-edits/anchors correct
-prior Pilot semantics preserved
-no duplicate abstraction
-migration impact understood
-relevant stress coverage present or scheduled
-diff and phase-appropriate checks inspected; executable build/tests only when applicable to the active Project Phase
-final artifact/diff self-contained
-```
-
-If any pass fails or remains uncertain:
-
-```text
-revise
-rerun affected checks
-do not call the result final
-```
+If a check fails or material uncertainty remains, revise and rerun the affected checks. Repeat broader review only when new changes, source/base movement or unresolved concerns invalidate earlier evidence. Report concrete findings, relevant validation and genuine unresolved items; a ritual pass count is not evidence of correctness.
 
 ---
 
@@ -1623,7 +1541,7 @@ I preserved intentional unresolved gameplay.
 
 I preserved already-merged prior-Pilot semantics unless explicitly superseded.
 
-I ran the six-pass self-audit before calling substantial work final.
+I completed the applicable checks in §33 before calling the work final.
 
 I respected the active Project Phase.
 

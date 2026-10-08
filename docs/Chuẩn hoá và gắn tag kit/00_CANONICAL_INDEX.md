@@ -936,7 +936,7 @@ Raw Kit
 → apply to affected canonical repo files
 → inspect diff / cross-file audit
 → update declarative 08 only when needed
-→ six-pass final self-audit
+→ scope-proportionate final self-audit under root AGENTS §33
 ```
 
 Audit across 00–08 does not require modifying all nine files. Preserve nonblocking unknowns as `UNRESOLVED / NOT BLOCKING`; do not manufacture defaults or require unrelated answers before continuing architecture work. Architecture Phase uses documentation/consistency checks, not implementation builds or executable game tests.
