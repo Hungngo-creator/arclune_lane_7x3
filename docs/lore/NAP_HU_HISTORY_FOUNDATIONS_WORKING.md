@@ -1,6 +1,6 @@
 # NẠP HƯ — KHUNG LỊCH SỬ NỀN TRƯỚC KHI CHIA ĐẠI KỶ
 
-> **Bàn giao mới 2026-10-08:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md). L10 và mục LII cập nhật tín ngưỡng, quãng các hài tử học hiểu Pháp Tắc; L09 giữ câu hỏi dài về điểm neo. Không tự xác nhận Thái Sơ / sáng thế chủ.
+> **Bàn giao mới 2026-10-08:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L11** và mục LIII–LIV về nền công pháp / Đạo Ngân, Địa Tiên, các hệ quả lịch sử chưa đặt ngày. L10 giữ tín ngưỡng / hài tử học hiểu, L09 giữ đầy đủ triết lý điểm neo. Không tự xác nhận Thái Sơ / sáng thế chủ.
 
 > **Trạng thái:** Niên biểu đang xây dựng.
 >
@@ -1841,6 +1841,8 @@ Linh hồn bị trảm ý nhưng vượt Địa Kiếp, nếu ẩn nấp đượ
 
 # XLIX. TIÊN THIÊN SINH LINH, Á KHÔNG GIAN LUÂN HỒI VÀ ĐAN DƯỢC TẠO CHÂN NGÃ
 
+> **CÒN MỞ sau L11:** hai miền dưới được gọi “á không gian” trong lore cũ, có vật chất / cảnh vật riêng. Định nghĩa Á Không Gian mới là lớp trống không vật chất, nên vị trí / quan hệ giữa hai miền và lớp ấy cần giải thích thêm. Giữ sự tồn tại, cảnh vật và các sự kiện; chưa đổi chúng thành bí cảnh thông thường. Đề nghị miền có cấu trúc neo trong lớp trống tại mục LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md) chưa được tác giả xác nhận.
+
 ## Cây cỏ từ khai thiên tích địa — ĐÃ CHỐT
 
 Các thực vật cực ít cùng thời Nhân Tổ / Nguyên Sơ được gọi là **Tiên Thiên Sinh Linh**, nằm ngoài Diễn Hóa của Nguyên Sơ. Mỗi cây, mỗi cọng cỏ đều có thể sống đủ lâu để khai linh trí và tự nhiên thành **Chân Tiên**, không cần tu luyện. Quá trình tính bằng **hàng trăm triệu năm**; đến khi Thiên Đạo thức tỉnh, tất cả đã thành tiên. Chưa định vị phần lớn quãng ấy trước hay sau Nguyên Sơ vỡ, không tự thay các khoảng hậu tạo loài đã chốt.
@@ -1895,4 +1897,37 @@ Các hài tử có quyền Pháp Tắc từ lúc sinh nhưng cần hiểu và lu
 
 **CÒN MỞ:** lúc sinh linh bắt đầu thu / sử dụng tín ngưỡng, lúc xuất hiện đạo thống khai thác, thời điểm mỗi hài tử đạt mức hiểu nhất định và mức hiển hóa Pháp Tắc trời sinh. Không tự thêm các mốc này vào niên biểu bằng tuổi tham khảo.
 
-Đề nghị mới cho tám cảnh là cơ sở để bàn tiếp, chưa phải hệ hoàn chỉnh xuất hiện sẵn trong thời hài tử. Giữ sự chuẩn hóa quanh Huyết Thế Đại Kiếp và nguồn tổng hợp đa chủng tộc. Câu hỏi / phần đáp tại [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), L10.
+**L11 đã bổ sung các cơ chế tám cảnh / Đạo Ngân / Chi Tâm**, xem mục LIII. Bảng đề nghị L10 được giữ để lưu quá trình thảo luận, không phải hệ hoàn chỉnh xuất hiện sẵn trong thời hài tử. Giữ sự chuẩn hóa quanh Huyết Thế Đại Kiếp và nguồn tổng hợp đa chủng tộc. Câu hỏi / phần đáp tại [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), L10.
+
+---
+
+# LIII. CÔNG PHÁP, NHẬP ĐẠO VÀ CÁI GIÁ CỦA CHỨNG CHÂN
+
+**ĐÃ CHỐT L11:** tư chất giới hạn tốc độ hấp thu Linh Khí; công pháp cao phẩm giúp tốc độ / chất lượng nhưng không vượt giới hạn tư chất, đòi ngộ tính cao hơn. Ngộ tính cao không tất yếu tư chất cao; người tư chất thấp hoặc thương tổn chặn đột phá vẫn có thể tự ngộ pháp thuật tới Nhập Đạo.
+
+Bảy mức thành thạo: **Nhập Môn → Tiểu Thành → Đại Thành → Viên Mãn → Đại Viên Mãn → Hoàn Mỹ → Nhập Đạo**. Nhập Đạo vượt lý niệm người sáng tạo, cảm ngộ **Đạo Ngân** từ sớm, không truyền được; mạnh hơn Hoàn Mỹ và tốn tổng linh lực hơn. Thời gian cảm ngộ cạnh tranh với việc tăng cảnh để kéo dài thọ nguyên, nên là lựa chọn của thiên tài muốn mạnh đồng cảnh hoặc người ngộ tính tốt nhưng khó đột phá.
+
+Đạo Ngân là mảnh Pháp Tắc. Hóa Vực → Khắc Pháp: Linh Tuyền thành Sinh Mệnh Chi Tâm, cảm ngộ / khắc Đạo Ngân. Chi Tâm khắc đầy → Định Pháp, tạo thêm Chi Tâm. Đủ toàn bộ Đạo Ngân của một Pháp Tắc → Chi Tâm nối như chòm sao → qua Chân Tiên Kiếp → nội không gian trống chứa Pháp Tắc / Đạo Ngân. Ráp đủ một Quy Tắc → Thiên Đạo hạ Chính Tiên Kiếp → qua kiếp mới khai thiên tích địa. Tác giả làm rõ **cả Khắc Pháp lẫn Định Pháp đều hao thọ**; ngưng tụ Chi Tâm cần sinh mệnh lực.
+
+**SUY LUẬN Codex về xã hội, chưa chốt sự kiện:** công pháp tốt có thể làm lợi thế truyền thừa lâu dài qua chất lượng Chi Tâm; việc Tiên Phẩm đòi Tiên Khí từ Định Pháp có thể tạo phụ thuộc tài nguyên vào tiên / thế lực. Nhập Đạo là kinh nghiệm không truyền thẳng, không phải chỉ có bí kíp là nhân bản được toàn bộ thành tựu.
+
+**Ranh giới niên biểu:** chưa đặt ngày phát minh từng mức / phẩm giai hoặc một nhân vật khai sáng toàn bộ. Giữ tám cảnh là thành quả thử sai nhiều chủng tộc, chuẩn hóa quanh Huyết Thế Đại Kiếp; tiên trời sinh / hài tử không phải tu hết tám cảnh mới có quyền.
+
+Các năng lực thân / hồn, phẩm giai còn xây dựng và thọ nguyên chi tiết tại mục XVI–XVIII của [Hệ thống sức mạnh](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md).
+
+---
+
+# LIV. CÔNG ĐỨC, ĐỊA TIÊN VÀ BÍ CẢNH — CƠ CHẾ CHƯA ĐẶT NIÊN ĐẠI
+
+**ĐÃ CHỐT L11:** với người có rất nhiều công đức tử vong, Thiên Đạo dẫn độ Chân Ngã / tái tạo linh hồn và có thể bổ nhiệm làm **Địa Tiên** quản lý **Thiên Địa Bí Cảnh**, các tiểu thế giới sinh trong Nạp Hư. Cùng bí cảnh đồng thọ, neo bởi bí cảnh, kinh doanh nơi ấy tốt thì mạnh lên; tiềm năng tu riêng đã hao hết, hiểu mọi Pháp Tắc bí cảnh mà không phải tự cảm ngộ. Thiên Đạo có thể đuổi.
+
+Địa Tiên còn Chân Ngã, khác người bị đồng hóa thiên địa hoàn toàn. Trung thành khá cao; Nạp Hư nổ thì bí cảnh / Địa Tiên cũng chết. Giới Bích bí cảnh bị phá chỉ rò Linh Khí ra Nạp Hư, **không tự hủy bí cảnh / giết Địa Tiên**.
+
+**SUY LUẬN Codex, chưa chốt động cơ Thiên Đạo:** cơ chế này vừa là phần thưởng công đức vừa gắn người quản lý với thành bại lãnh thổ. Có thể làm nền cho truyền thuyết về người công đức lớn “sau chết trông coi bí cảnh”, nhưng chưa thêm một Địa Tiên cụ thể vào lịch sử.
+
+**CÒN MỞ:** thời điểm bắt đầu bổ nhiệm, người đầu tiên, công đức / tiêu chí chọn, ký ức giữ sau tái tạo, phạm vi hoạt động, hậu quả cách chức. Không xếp toàn bộ thời sơ khai dưới một Thiên Đạo đã có nhân cách nếu chưa xác định mốc thức tỉnh.
+
+Á Không Gian là tuyến di chuyển / xâm nhập của Chân Tiên, nhưng **Giới Bích Nạp Hư vẫn là một và bao phủ cả hiện thế lẫn lớp ấy**. Không tự sửa chiến tranh Ma Đạo / chuyện Giới Bích thành xâm nhập không cần phá biên giới.
+
+Hướng Kiếm Tiên đầu tiên bị vây trong bí cảnh vẫn **ĐANG XÂY DỰNG**, chưa thành sự kiện. Độ khó phá tường bí cảnh mới là cơ sở bàn cách mắc kẹt, không tự gán mốc ba Hóa Vực Nhập Đạo cho bí cảnh đủ sức giữ một Chân Tiên. Cấu trúc đầy đủ tại mục LXII–LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
+

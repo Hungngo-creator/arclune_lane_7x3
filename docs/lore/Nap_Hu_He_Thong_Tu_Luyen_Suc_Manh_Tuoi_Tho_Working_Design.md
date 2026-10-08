@@ -1,6 +1,6 @@
 # NẠP HƯ — HỆ THỐNG TU LUYỆN, SỨC MẠNH VÀ TUỔI THỌ
 
-> **Bàn giao mới 2026-10-08:** đọc [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), đặc biệt L10. Mục XV là bảng đề nghị tám cảnh / tín ngưỡng, chưa được tác giả xác nhận toàn bảng.
+> **Bàn giao mới 2026-10-08:** đọc [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L11**: tư chất, phẩm giai, Nhập Đạo / Đạo Ngân, Sinh Mệnh Chi Tâm, Địa Tiên và hai loại không gian. Mục XVI–XIX ghi các cơ chế tác giả vừa chốt; bảng đề nghị L10 ở mục XV được giữ để lưu lịch sử, các phần khác đã được L11 sửa phải đọc theo L11.
 
 > **Trạng thái:** Thiết kế đang xây dựng, đã đối chiếu với lời chốt mới của tác giả và các tài liệu hiện tại trong `docs/lore`.
 >
@@ -24,20 +24,21 @@ Tài liệu này không chốt vật lý thế giới, thời gian đi lại, s�
 
 **ĐÃ CHỐT:** tám đại cảnh giới trước Chân Tiên là thành quả thử sai lâu dài của nhiều chủng tộc, không phải hệ thống hoàn chỉnh sẵn từ thuở đầu. Chúng mới cơ bản được chuẩn hóa quanh Huyết Thế Đại Kiếp.
 
-| Thứ tự | Đại cảnh giới | Hạt nhân mô tả từ bản tham khảo |
+| Thứ tự | Đại cảnh giới | Hạt nhân hiện tại |
 |---|---|---|
-| 1 | Dưỡng Hình | Cường hóa hình thể và hệ vận động |
-| 2 | Khai Mệnh | Cải tạo sinh mệnh nội tại; dựng Sinh Mệnh Hồ |
-| 3 | Chiếu Hồn | Cường hóa linh hồn và thần thức; bắt đầu thoát sự lệ thuộc tuyệt đối vào thân |
-| 4 | Hiển Tướng | Linh hồn ngưng thực, có khả năng mang hình và dựng Pháp Tướng |
-| 5 | Hóa Tuyền | Sinh Mệnh Hồ thăng hoa thành Linh Tuyền có thể ngoại hiện |
-| 6 | Hóa Vực | Thân–hồn–thức có thể hợp thành bản thể không gian |
-| 7 | Khắc Pháp | Khắc những phần lĩnh ngộ Pháp Tắc vào bản thể |
-| 8 | Định Pháp | Cấu trúc Pháp Tắc dần ổn định, vẫn chưa hoàn chỉnh |
-| 9 | Chân Tiên | Hậu thiên: hiểu / hoàn chỉnh một Pháp Tắc để chứng Chân; trời sinh có quyền trước rồi phải luyện tập / cảm ngộ |
-| 10 | Thiên Địa Chính Tiên | Hoàn chỉnh một Quy Tắc từ nhiều Pháp Tắc cùng hệ, độ kiếp cao hơn Chân Tiên; chi tiết kiếp chưa chốt |
+| 1 | Dưỡng Hình | Rèn thân, hô hấp, vận động, gân cốt, da; đã dùng được pháp thuật đơn giản |
+| 2 | Khai Mệnh | Cường hóa nội tạng, mắt, não; Sinh Mệnh Hồ, chuyển năng lượng thành sinh mệnh lực để hồi phục / mọc lại chi thể |
+| 3 | Chiếu Hồn | Bắt đầu cường hóa ý thức và linh hồn; chưa phát giác nổi Chỉ Dẫn / Lãng Quên của Chân Tiên |
+| 4 | Hiển Tướng | Dựng Pháp Tướng, duy trì bằng linh lực; vỡ thì ngưng tụ lại, dùng Sinh Mệnh Hồ tăng tốc sẽ suy yếu bản thể |
+| 5 | Hóa Tuyền | Sinh Mệnh Hồ thuế biến thành Sinh Mệnh Linh Tuyền; các chi tiết ngoại hiện / lưu thông chưa được chốt hết |
+| 6 | Hóa Vực | Cường hóa khả năng biến bản thân thành Vực và dung nhập thiên địa, chuẩn bị cảm ngộ Pháp Tắc |
+| 7 | Khắc Pháp | Sinh Mệnh Linh Tuyền thành Sinh Mệnh Chi Tâm; cảm ngộ và khắc Đạo Ngân vào Chi Tâm |
+| 8 | Định Pháp | Khi Chi Tâm khắc đầy thì đột phá; tạo thêm Chi Tâm để chứa đủ Đạo Ngân của một Pháp Tắc |
+| 9 | Chân Tiên | Đủ toàn bộ Đạo Ngân → Chi Tâm nối như chòm sao → hoàn chỉnh Pháp Tắc → qua Chân Tiên Kiếp; nội không gian chứa Pháp Tắc / Đạo Ngân |
+| 10 | Thiên Địa Chính Tiên | Nhiều Pháp Tắc ráp đủ một Quy Tắc → Thiên Đạo hạ kiếp → qua kiếp mới khai thiên tích địa trong nội không gian |
 
-Tên và trình tự đã có trong tài liệu hiện tại. Các chi tiết Sinh Mệnh Hồ, Linh Tuyền, tái tạo thân và giới hạn thần thức từ bản tham khảo là **nền mô tả đang xây dựng**, không tự chốt mọi cơ chế sinh tồn, đoạt xá hay tín ngưỡng của bản cũ.
+**Nguồn:** L11 của tác giả bổ sung cơ chế tám cảnh; Sinh Mệnh Hồ / quá trình Hóa Tuyền giữ nền mô tả trước đó. Phần tiên trời sinh có quyền trước rồi học hiểu vẫn là ngoại lệ của con đường chứng đạo hậu thiên. Nhập Đạo từ cảnh thấp chỉ tiếp xúc Đạo Ngân / da lông, không tự biến người ấy thành Khắc Pháp. Hóa Vực thực sự cảm ngộ Pháp Tắc trên nền thân–linh–ý đủ mạnh thì đã chuyển sang Khắc Pháp.
+
 
 **Thái Sơ** là cảnh lý luận, không phải một đại cảnh hậu thiên bình thường có thể đạt bằng tích lũy tài nguyên. Chân Tiên tương đương khoảng Bán Thần về mức sức mạnh tổng thể; Thiên Địa Chính Tiên có thể trải từ Hạ tới Thượng Vị Thần tùy Quy Tắc. Các phép đối chiếu ấy không tự đồng nhất năng lượng, kỹ thuật, tuổi thọ hay bản thể.
 
@@ -73,6 +74,8 @@ Thọ nguyên còn lại sau đột phá
 
 **SUY LUẬN theo bảng hiện tại:** lấy 200 năm làm nền Dưỡng Hình rồi tích lũy đầy đủ các khoản từ Khai Mệnh tới Chân Tiên, tổng quỹ thọ nguyên là **2.042.400 năm**, chưa tính các Pháp Tắc bổ sung, duyên thọ hoặc hao tổn. Đây là tổng quỹ tham chiếu, **không phải số năm còn lại tại lúc chứng Chân** và không phải tuổi chết đã chốt của một nhân vật. Số năm đã sống và những lần hao thọ phải trừ khỏi quỹ ấy.
 
+**ĐÃ CHỐT L11:** phẩm giai công pháp không tự làm chênh khoản thọ nguyên cùng cảnh, trừ công pháp duyên thọ đặc thù. **Cả Khắc Pháp lẫn Định Pháp đều hao thọ** trên đường xây nền Sinh Mệnh Chi Tâm; ngưng tụ Chi Tâm cần sinh mệnh lực và tiêu thọ nguyên. Đây là khoản chi, không sửa khoản cộng của bảng trên. Vì tuổi đã sống / mức hao khác nhau, số thọ nguyên còn lại vẫn có thể chênh nhau.
+
 Thương tổn, bị giết, thiêu đốt thọ nguyên và hao tổn căn cơ có thể làm tuổi thọ thực tế ngắn hơn. Phân bố mức tăng giữa các tiểu cảnh chưa có bảng riêng; không tự cộng lặp toàn bộ khoản của một đại cảnh ở mỗi tiểu cảnh.
 
 ---
@@ -98,7 +101,7 @@ Chân Tiên có thể **chọn hòa làm một với Pháp Tắc đã cảm ng�
 
 Ngủ càng lâu thì **ý thức bị mài mòn dần** và **khả năng bị thiên địa đồng hóa càng cao**. Nếu bị đồng hóa hoàn toàn, cá nhân không còn là chính mình: **Chân Ngã, linh hồn và ý thức bị ma diệt**, phần tồn tại ấy trở thành **một phần của Thiên Đạo**. Đó là vĩnh sinh trong thiên địa nhưng mất người vốn có, là cái giá không ai muốn nhận khi chữa thương.
 
-Không đồng nhất trạng thái này với mọi lần bế quan, tu luyện tại chỗ hoặc hợp nhất với Vực ở Hóa Vực. Nó cũng không tự cho mọi Chân Tiên khả năng hủy Chân Ngã của người khác.
+**ĐÃ CHỐT L11:** Hóa Vực không có nguy cơ bị thiên địa đồng hóa qua việc dung nhập để tu ở cảnh ấy: chưa sở hữu Pháp Tắc để bị đồng hóa theo cơ chế này. Không đồng nhất trạng thái Chân Tiên ngủ chữa thương với mọi lần bế quan, tu luyện tại chỗ hoặc hợp nhất với Vực ở Hóa Vực. Nó cũng không tự cho mọi Chân Tiên khả năng hủy Chân Ngã của người khác.
 
 **CÒN MỞ:** điều kiện vào / thoát, khả năng tự tỉnh hoặc nhận ra nguy cơ khi ý thức đang mòn dần, mức độ khôi phục thương thế, tốc độ / các giai đoạn cụ thể của đồng hóa, cách chống đồng hóa, cùng tốc độ hao thọ khi ngủ. Chưa chốt một thời hạn an toàn, hệ số giảm hao thọ hay việc có thể chữa mọi thương tổn.
 
@@ -301,7 +304,7 @@ Cần phân biệt lượng tín ngưỡng tạo ra với chất lượng của 
 
 ## Phương án tám cảnh Codex đưa ra để thảo luận
 
-**Trạng thái toàn bảng: ĐANG XÂY DỰNG / SUY LUẬN, chưa được tác giả xác nhận.** Tên và thứ tự cảnh đã chốt; bảng này là đề nghị cường hóa và năng lực, không phải lời chốt mới của tác giả. Mỗi cảnh vẫn tăng các năng lực cũ; cột hạt nhân chỉ phần biến đổi chính.
+**BẢN LƯU ĐỀ NGHỊ L10:** toàn bảng ban đầu là ĐANG XÂY DỰNG / SUY LUẬN. L11 ở mục XVI–XVIII đã chốt Dưỡng Hình dùng pháp thuật, Khai Mệnh mọc lại chi thể, giới hạn Chiếu Hồn, vị trí khắc Đạo Ngân và cấu trúc Chi Tâm. Những câu “chưa chốt” tương ứng dưới đây chỉ phản ánh thời điểm L10, không phải trạng thái hiện tại. Các phần tác giả chưa xác nhận vẫn là đề nghị. Tên và thứ tự cảnh đã chốt; bảng này là đề nghị cường hóa và năng lực, không phải lời chốt mới của tác giả. Mỗi cảnh vẫn tăng các năng lực cũ; cột hạt nhân chỉ phần biến đổi chính.
 
 | Cảnh | Cường hóa chủ yếu | Đề nghị thay đổi năng lực |
 |---|---|---|
@@ -324,3 +327,109 @@ Chưa xếp việc trực tiếp cường hóa / thao tác Chân Ngã thành nă
 
 
 Tác giả mới yêu cầu thảo luận, chưa xác nhận toàn bảng. Sau trả lời phải cập nhật trạng thái từng dòng; không biến một bảng dễ đọc thành canon tự động. Tên / thứ tự cảnh, bảng thọ nguyên và ba kiếp Chân Tiên đã có không bị đổi. Câu hỏi và phần đáp này được lưu tại L10 trong [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md).
+
+---
+
+# XVI. TƯ CHẤT, NGỘ TÍNH VÀ TÁM CẢNH — CHỐT TỪ L11
+
+## Tốc độ, chất lượng và thọ nguyên
+
+**ĐÃ CHỐT:**
+
+- **Tư chất** là hạn mức tốc độ hấp thu Linh Khí cao nhất của cá nhân.
+- **Công pháp** là thủ đoạn hấp thu. Phẩm giai cao giúp hấp thu nhanh hơn, nhưng không vượt trần tư chất; đồng thời yêu cầu **ngộ tính** cao hơn để hiểu.
+- Phẩm giai công pháp còn quyết định **chất lượng năng lượng tu tập được**. Hai người cùng cảnh có thể lệch chiến lực vì chất lượng ấy, không chỉ vì lượng.
+- Tư chất và ngộ tính là hai yếu tố khác nhau. Ngộ tính cao vẫn có thể kẹt do tư chất thấp, hoặc bị thương không thể đột phá.
+- Tu cùng cảnh không tự có thọ nguyên khác nhau vì phẩm giai công pháp, trừ công pháp duyên thọ đặc thù. Thời gian đã sống và hao thọ chủ động phải tính riêng.
+
+**SUY LUẬN / đề nghị Codex:** tốc độ thực tế còn bị nguồn cung Linh Khí tại nơi tu và mức hiểu công pháp giới hạn. Có thể diễn đạt là không vượt mức thấp nhất giữa trần tư chất, năng lực công pháp đã lĩnh hội và nguồn cung. Chưa chốt trần tư chất có đổi theo cảnh / thương thế hoặc có thể nâng bằng cách nào.
+
+## Năng lực cụ thể tác giả đã xác nhận
+
+| Cảnh | Cường hóa / cơ chế | Khả năng và giới hạn đã nêu |
+|---|---|---|
+| Dưỡng Hình | Thân, hệ hô hấp và vận động; gân cốt, da, độ dẻo dai / linh hoạt, hồi phục hệ vận động | Dùng Linh Khí trong thân thi triển Hỏa Cầu, Phong Đao, Thủy Cầu. Chịu dao chém phàm thường, vẫn sợ dao đâm. Từ **7 trọng** dùng Lôi Độn: chuyển Linh Khí không thuộc tính thành lôi linh khí ở **hai chân**, bộc phát tốc độ trong chớp mắt. |
+| Khai Mệnh | Ngũ tạng lục phủ, mắt, não; nền Sinh Mệnh Hồ | Phàm khí không đâm thủng da, có thể để lại vết xước. Hấp thu năng lượng chuyển trực tiếp thành sinh mệnh lực, thúc đẩy tái tạo tế bào, cầm máu và **mọc lại tay chân**. Thời gian / chi phí từng thương thế chưa định. |
+| Chiếu Hồn | Bắt đầu cường hóa ý thức và linh hồn | **Không phát giác** Chỉ Dẫn / Lãng Quên do Chân Tiên thi triển, kể cả nhíu mày. Không suy từ bước đầu luyện hồn ra khả năng chống hai Pháp Tắc ấy. |
+| Hiển Tướng | Pháp Tướng ngoại hiện | Pháp Tướng cần linh lực duy trì; bị đánh vỡ phải tốn thời gian ngưng tụ. Dùng Sinh Mệnh Hồ tăng tốc được nhưng khiến bản thể suy yếu. Quan hệ với thương tổn linh hồn chưa chốt. |
+| Hóa Tuyền | Sinh Mệnh Hồ → Sinh Mệnh Linh Tuyền | Giữ biến đổi hạt nhân đã có; các ưu thế cung ứng / ngoại hiện trong bảng L10 vẫn cần xác nhận riêng. |
+| Hóa Vực | Cường hóa bản thể Vực và dung nhập thiên địa để chuẩn bị cảm ngộ | Chưa cảm ngộ Pháp Tắc theo mức của Khắc Pháp; một khi làm được thì không còn Hóa Vực. Không là Pháp Tắc Chi Chủ; **không bị đồng hóa thiên địa** theo cơ chế sở hữu Pháp Tắc. |
+| Khắc Pháp | Thân–linh–ý đủ mạnh để cảm ngộ; Linh Tuyền → Sinh Mệnh Chi Tâm | Cảm ngộ Đạo Ngân, khắc vào Chi Tâm để tăng sức mạnh. Khắc đầy Chi Tâm là điều kiện chuyển Định Pháp. |
+| Định Pháp | Tạo thêm Sinh Mệnh Chi Tâm | Số lượng, chất lượng, kích thước / sức chứa / độ vững của Chi Tâm tùy công pháp; khắc đủ mọi Đạo Ngân của một Pháp Tắc để dựng liên kết chòm sao. |
+
+Không tự nâng Lôi Độn hai chân thành hóa thân tia sét hoặc dịch chuyển không gian. Độ bền trước phàm khí không tự là bất hoại trước pháp khí hay đòn của tu sĩ mạnh hơn. Phạm vi phá hoại, tốc độ cụ thể và chi phí mọc chi thể chưa có con số.
+
+---
+
+# XVII. PHẨM GIAI VÀ ĐỘ THUẦN THỤC
+
+## Phẩm giai dùng chung — ĐANG XÂY DỰNG
+
+Tác giả yêu cầu công pháp / pháp khí có thể dùng chung tên giai, đưa ví dụ **Hoàng → Huyền → Địa → Thiên → Tiên**, mỗi đại giai **Hạ → Trung → Thượng**. Codex đề nghị giữ bộ tên này để bàn tiếp; chưa gán cứng từng phẩm cho từng đại cảnh.
+
+| Đối tượng | Đề nghị tiêu chí định phẩm của Codex |
+|---|---|
+| Công pháp | Hiệu quả hấp thu / luyện hóa, chất lượng năng lượng và khả năng dựng nền tu, đặc biệt Chi Tâm |
+| Pháp thuật / thần thông nếu dùng chung thang | Cấu trúc, giới hạn uy lực / công năng và điều kiện thi triển |
+| Pháp khí | Vật liệu, cấu trúc luyện chế, sức chịu / dẫn năng lượng và công năng |
+
+Đây là các trục **phẩm giai**, khác cảnh giới người dùng và độ thuần thục. Người Dưỡng Hình không tự vận dụng hết vật phẩm cao giai; một pháp thuật nhập đạo không tự biến thành tiên phẩm. **CÒN MỞ:** Phàm Khí có là vật thường ngoài thang hay giai riêng; phẩm trên Tiên nếu cần; vật phẩm cấp Chính Tiên / Thái Sơ phân nội bộ thế nào; có dùng toàn thang cho đan dược, trận pháp không.
+
+**ĐÃ CHỐT:** công pháp **Tiên Phẩm cần Tiên Khí**. Bình thường tới **Định Pháp** mới tu được; cảnh thấp hơn không hấp thu Tiên Khí được nếu không có thủ đoạn đặc thù hoặc Chân Tiên giúp. Định Pháp đủ điều kiện không đồng nghĩa mọi người ở cảnh ấy buộc có công pháp Tiên Phẩm hay Tiên Khí vô hạn. Nguồn Tiên Khí / phương thức tiếp tế còn mở.
+
+## Bảy mức thuần thục — ĐÃ CHỐT
+
+**Nhập Môn → Tiểu Thành → Đại Thành → Viên Mãn → Đại Viên Mãn → Hoàn Mỹ → Nhập Đạo.**
+
+Tác giả ví như thanh kinh nghiệm kỹ năng. Các mức trước Nhập Đạo giúp dùng pháp thuật ít tiêu hao hơn, nhanh hơn và sát thương cao hơn. **Hoàn Mỹ** hoàn tất trong khuôn phép hiện có; **Nhập Đạo** vượt cực hạn / lý niệm người sáng tạo, chạm Đạo Ngân.
+
+**Làm rõ đã trả lời:** tại **Nhập Đạo**, cùng pháp thuật mạnh hơn Hoàn Mỹ nhưng **tốn tổng linh lực nhiều hơn**. Không tiếp tục áp quy luật giảm tiêu hao của các mức trước vào Nhập Đạo. Không tự thêm mức giảm chi phí trên mỗi đơn vị sát thương vì tác giả chưa chốt điều ấy.
+
+Mọi pháp thuật trên lý luận đều có khả năng Nhập Đạo. Pháp thuật đại cảnh thấp có ít thâm ảo để cảm ngộ, không phải bị cấm đạt mức này. Tu sĩ Khai Mệnh / Chiếu Hồn có thể Nhập Đạo nếu ngộ tính đủ và chịu bỏ thời gian. **Cảm ngộ Nhập Đạo không thể truyền, chỉ có thể tự ngộ.**
+
+Nhập Đạo từ sớm là mò da lông Pháp Tắc / cảm ngộ Đạo Ngân, chưa cảm nhận Pháp Tắc toàn diện như khi thân–linh–ý đã đủ nền ở Khắc Pháp. Nó tăng ưu thế đồng cảnh, không cấp quyền sở hữu Pháp Tắc. Vẫn chịu luật độc chiếm: không tiếp tục cảm ngộ hệ đã có chủ bằng cách đổi tên thành Nhập Đạo.
+
+**ĐÃ CHỐT về lựa chọn:** thọ nguyên hữu hạn khiến nhiều người ưu tiên tăng cảnh để sống lâu hơn. Người theo Nhập Đạo thường là thiên tài tu nhanh muốn mạnh nhất đồng cảnh, hoặc ngộ tính cao nhưng tư chất thấp / bị thương khiến khó vượt cảnh. Ngộ tính cao không tự xóa trần hấp thu.
+
+---
+
+# XVIII. ĐẠO NGÂN → CHI TÂM → NỘI KHÔNG GIAN → THẾ GIỚI
+
+**ĐÃ CHỐT:** các mảnh cấu thành Pháp Tắc gọi là **Đạo Ngân**. Một Pháp Tắc cần nhiều Đạo Ngân ráp thành, thường lấy hàng trăm mà tính; số lượng giữa các Pháp Tắc khác nhau, không có một con số dùng chung.
+
+Con đường hậu thiên:
+
+1. **Hóa Vực → Khắc Pháp:** Sinh Mệnh Linh Tuyền thuế biến thành **Sinh Mệnh Chi Tâm**. Người chưa Nhập Đạo từ sớm bắt đầu cảm ngộ Đạo Ngân tại đây; khắc vào Chi Tâm để tăng sức mạnh.
+2. **Chi Tâm khắc đầy → Định Pháp:** bắt đầu tạo thêm Chi Tâm. Công pháp quyết định số lượng, chất lượng, kích thước / sức chứa và độ vững.
+3. **Đủ tất cả Đạo Ngân của một Pháp Tắc:** đủ Chi Tâm chứa chúng; các Chi Tâm kết nối như **một chòm sao**, Đạo Ngân ráp thành Pháp Tắc hoàn chỉnh. Chưa vượt kiếp không tự được tính Chân Tiên.
+4. **Qua Chân Tiên Kiếp:** những Chi Tâm đã nối trở thành **một nội không gian nhỏ, trống không**, chỉ chứa Pháp Tắc sở hữu và Đạo Ngân, **không có đất đá**. Chưa phải thiên địa đã sáng thế.
+5. **Chân Tiên tích lũy:** càng cảm ngộ nhiều Pháp Tắc, nội không gian càng lớn; cũng là quá trình tích lũy năng lượng.
+6. **Ráp thành một Quy Tắc:** Thiên Đạo hạ **Thiên Địa Chính Tiên Kiếp**. Không có quyền giữ Quy Tắc hoàn chỉnh ở Chân Tiên mà bỏ qua kiếp này.
+7. **Qua Chính Tiên Kiếp mới khai thiên tích địa:** nội không gian thành thế giới. Chưa qua kiếp chưa có khai thiên tích địa; chi tiết khảo nghiệm Chính Tiên còn mở.
+
+**Hao thọ:** ngưng tụ Chi Tâm cần sinh mệnh lực, làm hao tuổi thọ. Tác giả xác nhận **cả Khắc Pháp lẫn Định Pháp đều hao thọ**. Pháp Tắc có nhiều Đạo Ngân đòi nhiều Chi Tâm, nên chất lượng công pháp và quỹ thọ nguyên quan trọng đối với nền Chân Tiên mạnh. Mức hao của từng giai đoạn / mỗi Chi Tâm chưa chốt; không sửa các khoản cộng khi đột phá.
+
+**Đề nghị Codex, chưa chốt:** đừng coi cứ tạo thêm Chi Tâm là tăng chiến lực vô hạn; nên bàn sức chứa / giới hạn / chất lượng và giá sinh mệnh của công pháp. Cần phân biệt nhiều Đạo Ngân, độ khó ghép và ưu thế chiến đấu cụ thể, chưa dựng bảng mọi Pháp Tắc có nhiều mảnh đều thắng mọi Pháp Tắc có ít mảnh.
+
+**Ranh giới giữ nguyên:** nội không gian Chân Tiên, thế giới nội Chính Tiên, bí cảnh Nạp Hư, Tiên Vực ngoại giới và thần vực Main là các cấu trúc khác nhau. Việc Chính Tiên có thế giới nội là nền cho nghiên cứu Thái Sơ, chưa giải quyết bước chuyển neo hay cho một cá thể nhiều thế giới Thái Sơ.
+
+---
+
+# XIX. ĐỊA TIÊN — VỊ CÁCH DO THIÊN ĐẠO BỔ NHIỆM
+
+**ĐÃ CHỐT:** sinh linh có **rất nhiều công đức** khi tử vong có thể được Thiên Đạo dẫn độ Chân Ngã, **tái tạo linh hồn**, trở thành tồn tại đặc thù quản lý Thiên Địa Bí Cảnh, gọi chung **Địa Tiên**.
+
+- Không là đại cảnh thứ chín thay Chân Tiên hoặc bước bắt buộc của mọi người chết.
+- Chiến lực **thấp hơn Chân Tiên một chút**, chưa có hệ số định lượng.
+- **Bí cảnh là điểm neo vị cách**. Cùng bí cảnh đồng thọ; bí cảnh còn thì bất tử, **bí cảnh nổ / bị hủy thì Địa Tiên chết**, không phụ thuộc đang ở đâu.
+- Thiên Đạo quyền cao hơn, **muốn đuổi thì đuổi**. Hậu quả khi bị đuổi với linh hồn / neo / tính mạng chưa được chốt.
+- Tiềm năng cá nhân trước khi thành Địa Tiên không tiếp tục làm nền thăng tiến; đã hao hết. Muốn mạnh phải kinh doanh bí cảnh, khiến nó lớn / giàu Pháp Tắc hơn.
+- Không cần tự cảm ngộ: khi được bổ nhiệm hiểu **mọi Pháp Tắc bí cảnh ấy có**. Thiên Đạo có lý trí cũng hiểu Pháp Tắc / Quy Tắc của chính nó hơn bất kỳ cá thể nào.
+- Trung thành khá cao với Thiên Đạo: Nạp Hư nổ → bí cảnh nổ → Địa Tiên chết.
+
+Địa Tiên còn Chân Ngã, linh hồn được tái tạo; **khác Chân Tiên bị đồng hóa hoàn toàn**, mất Chân Ngã / linh hồn / ý thức cá nhân. Hiểu các Pháp Tắc của bí cảnh chưa được xác định là sở hữu độc chiếm mọi Pháp Tắc Nạp Hư. Quan hệ quyền quản lý với luật độc chiếm nguồn còn mở.
+
+**Phá Giới Bích bí cảnh không đồng nghĩa phá hủy bí cảnh**, do đó không tự giết Địa Tiên. Cấu trúc / lối ra / Á Không Gian xem mục LXII–LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
+
+**CÒN MỞ:** ngưỡng công đức / lựa chọn bổ nhiệm, ký ức sau tái tạo linh hồn, khả năng ra ngoài bí cảnh, hậu quả bị cách chức, quy mô tối đa của bí cảnh và nâng cấp giới hạn ấy. Không mặc định Địa Tiên giữ mọi ký ức tiền kiếp hoặc vượt được Luân Hồi bằng cùng cơ chế này.
+

@@ -1,6 +1,6 @@
 # NẠP HƯ — ÁNH XẠ CẢNH GIỚI, CỔ THẦN, NHÂN TỔ & HAI HỆ KIẾM TU
 
-> **Bàn giao mới 2026-10-08:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), đặc biệt L10 về tín ngưỡng / tiên trời sinh. Mục XXXIII–XXXIV ghi quyết định mới; bảng tám cảnh và những đề nghị chưa được tác giả xác nhận giữ trạng thái riêng.
+> **Bàn giao mới 2026-10-08:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L11** về Đạo Ngân, Chi Tâm, Địa Tiên và Á Không Gian. Mục XXXV–XXXVI bổ sung cơ chế chứng đạo; L10 giữ các quyết định về tín ngưỡng / tiên trời sinh. Không biến đề nghị tham khảo thành canon.
 
 > **Trạng thái:** Thiết kế thế giới đang xây dựng.
 >
@@ -76,17 +76,23 @@ Nó là mô hình đang được xây dựng từ dấu vết các tồn tại c
 **Con đường hậu thiên hiện tại**; tiên trời sinh có quyền sở hữu trước rồi phải luyện tập / cảm ngộ, xem mục XXXIV:
 
 ~~~
-Định Pháp
+Hóa Vực → Khắc Pháp: Linh Tuyền thành Sinh Mệnh Chi Tâm
 ↓
-hoàn chỉnh một Pháp Tắc
+cảm ngộ Đạo Ngân, khắc đầy Chi Tâm → Định Pháp
 ↓
-Chân Tiên
+tạo thêm Chi Tâm, khắc đủ toàn bộ Đạo Ngân của một Pháp Tắc
 ↓
-hoàn chỉnh nhiều Pháp Tắc cùng hệ
+Chi Tâm nối như chòm sao → Pháp Tắc hoàn chỉnh
 ↓
-ghép thành một Quy Tắc
+qua Chân Tiên Kiếp → Chân Tiên
 ↓
-Thiên Địa Chính Tiên
+Chi Tâm nối thành nội không gian trống chứa Pháp Tắc / Đạo Ngân
+↓
+cảm ngộ thêm Pháp Tắc, nội không gian lớn dần
+↓
+ráp đủ một Quy Tắc → Thiên Đạo hạ Chính Tiên Kiếp
+↓
+qua kiếp → Thiên Địa Chính Tiên, nội không gian khai thiên tích địa
 ~~~
 
 Ví dụ:
@@ -928,7 +934,9 @@ Cảnh cao nhất hồ yêu chưa chốt. Khi kiểm tra niên biểu, phải gi
 
 **ĐÃ CHỐT mới:** các hài tử tạo một loại **đan dược có thể tạo Chân Ngã**, dùng cho tạo vật của mình. Nguyên liệu gồm **hoa bỉ ngạn, nước sông Luân Hồi và vài nguyên liệu đặc thù**, trong đó phần Tiên Thiên Sinh Linh là **một loại trái cây tái tạo được**; không ai trong nhóm cây cỏ ấy chết vì việc tạo đan.
 
-Luân Hồi là á không gian có **cối xay bay lơ lửng**, đất / sông uốn lượn / hoa bỉ ngạn bên dưới. **Trình tự mới đã chốt:** linh hồn vào Luân Hồi Chi Địa, càng sâu càng mơ hồ do hoa bỉ ngạn; bơi qua sông Luân Hồi gội rửa ký ức và linh hồn; tới cối xay chỉ còn Chân Ngã; **Lục Đạo Luân Hồi Bàn** xét nghiệp lực để phân phối đầu thai. Sáu đạo: Thiên, A-tu-la, Nhân, Súc Sinh, Ngạ Quỷ, Địa Ngục. Khả năng kháng mê mang đã nêu của Chân Tiên không tự bảo đảm miễn gội rửa. Cơ chế cối xay, bảo tồn ký ức và thời điểm lịch sử hoàn thiện từng bước còn mở; xem mục XXIX.
+**CÒN MỞ sau L11 về vị trí:** lore trước gọi Luân Hồi là á không gian, nhưng định nghĩa Á Không Gian mới không có vật chất. Giữ đất / sông / hoa / cối xay đã chốt; chưa tự quyết định đây là bí cảnh hoặc một miền có cấu trúc nằm trong Á Không Gian. Xem mục LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
+
+Luân Hồi Chi Địa có **cối xay bay lơ lửng**, đất / sông uốn lượn / hoa bỉ ngạn bên dưới. **Trình tự mới đã chốt:** linh hồn vào Luân Hồi Chi Địa, càng sâu càng mơ hồ do hoa bỉ ngạn; bơi qua sông Luân Hồi gội rửa ký ức và linh hồn; tới cối xay chỉ còn Chân Ngã; **Lục Đạo Luân Hồi Bàn** xét nghiệp lực để phân phối đầu thai. Sáu đạo: Thiên, A-tu-la, Nhân, Súc Sinh, Ngạ Quỷ, Địa Ngục. Khả năng kháng mê mang đã nêu của Chân Tiên không tự bảo đảm miễn gội rửa. Cơ chế cối xay, bảo tồn ký ức và thời điểm lịch sử hoàn thiện từng bước còn mở; xem mục XXIX.
 
 **CÒN MỞ:** công thức, lượng Chân Ngã tạo được, cơ chế linh hồn / ý thức hình thành và cách thu thập nguyên liệu. Tạo Chân Ngã qua đan dược không tự nâng cảnh giới đời gốc của các hài tử hoặc cấp cho mọi Chân Tiên quyền trực tiếp tạo Chân Ngã.
 
@@ -1027,7 +1035,9 @@ Quy Tắc đã có từ các Pháp Tắc Nguyên Sơ diễn hóa, ban đầu hi�
 
 Ví dụ A muốn tới Nhân Vực dự đại hội, B muốn A tới Tần Vực. Ý định của A dần thành “ta phải đến Tần Vực”; **B ngăn lời sửa “ngươi phải tới Nhân Vực” được nói ra**. Không dùng phiên bản lời nhắc đã nói nhưng A không tiếp nhận.
 
-Ý thức / linh hồn mạnh có thể khiến A nhăn mày, lưỡng lự; mạnh hơn có thể nhận biết “ta bị Chỉ Dẫn”. Nếu chỉ đủ ngờ vực, vẫn có thể đi Tần Vực. Sau khi tác động ngừng, người đủ năng lực mới phát hiện; không tự xóa mọi hậu quả hoặc phục hồi ký ức cho người yếu. Cả hai Pháp Tắc xét phát giác theo tu vi, nhân quả, che giấu và sức mạnh tâm thức / linh hồn.
+**ĐÃ CHỐT L11:** Chiếu Hồn mới bắt đầu cường hóa ý thức / linh hồn, không phát giác Chỉ Dẫn hoặc Lãng Quên của Chân Tiên, kể cả nhíu mày. Điều kiện phát giác tổng quát sau đây không bảo đảm áp được ở Chiếu Hồn.
+
+Ý thức / linh hồn đủ mạnh có thể khiến A nhăn mày, lưỡng lự; mạnh hơn có thể nhận biết “ta bị Chỉ Dẫn”. Nếu chỉ đủ ngờ vực, vẫn có thể đi Tần Vực. Sau khi tác động ngừng, người đủ năng lực mới phát hiện; không tự xóa mọi hậu quả hoặc phục hồi ký ức cho người yếu. Cả hai Pháp Tắc xét phát giác theo tu vi, nhân quả, che giấu và sức mạnh tâm thức / linh hồn.
 
 **Hai mức quyền cấm:** thông thường cấm vận dụng Pháp Tắc thi triển quyền năng, không tự cấm mọi quá trình tự nhiên tương ứng. Chủ có thể chủ động can thiệp sâu hơn, khiến cá thể không thể quên / ngủ / già / chết trong phạm vi quyền năng phù hợp. Chủ Lãng Quên có thể cấm quên; lợi hại tùy hoàn cảnh. Phạm vi bảo vệ thân–linh–ý–Chân Ngã còn phải bàn cho từng năng lực. Cấm quên cấp Pháp Tắc không vượt việc gội rửa của Luân Hồi cấp Quy Tắc.
 
@@ -1108,4 +1118,37 @@ Phàm nhân vẫn hấp thu Linh Khí **thụ động qua hô hấp**, nên khô
 
 **SUY LUẬN Codex:** quyền sở hữu và mức thành thạo ứng dụng là hai mặt riêng. Chủ trời sinh có thể chưa khai thác hết năng lực; không vì vậy mất quyền, không có sức mạnh hoặc luôn yếu hơn chủ hậu thiên. Cách mức hiển hóa thay đổi khi chủ trời sinh học sâu hơn vẫn **CÒN MỞ**.
 
-Tên / thứ tự tám cảnh hậu thiên giữ nguyên. Bảng đề nghị mỗi cảnh cường hóa gì ở mục XV của [Hệ thống sức mạnh](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md) và phần đáp đầy đủ tại lượt L10 của [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md). Chưa tự dùng tám cảnh để giải thích sự sinh ra của Nhân Tổ / các hài tử.
+Tên / thứ tự tám cảnh hậu thiên giữ nguyên. **L11 bổ sung cơ chế cụ thể và sửa các điểm còn mở của L10**, xem mục XVI–XIX của [Hệ thống sức mạnh](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md). Bảng đề nghị cũ mỗi cảnh cường hóa gì ở mục XV của [Hệ thống sức mạnh](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md) và phần đáp đầy đủ tại lượt L10 của [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md). Chưa tự dùng tám cảnh để giải thích sự sinh ra của Nhân Tổ / các hài tử.
+
+---
+
+# XXXV. ĐẠO NGÂN VÀ CẤU TRÚC CHỨNG ĐẠO HẬU THIÊN
+
+**ĐÃ CHỐT L11:** **Đạo Ngân** là những mảnh cấu thành Pháp Tắc; cần nhiều mảnh, thường tính bằng hàng trăm, số lượng tùy Pháp Tắc. **Nhập Đạo** ở pháp thuật cho phép cảm ngộ Đạo Ngân từ sớm, mới là da lông, chưa bằng mức cảm nhận khi thân–linh–ý đủ mạnh ở Khắc Pháp.
+
+Hóa Vực cường hóa khả năng biến bản thân thành Vực, dung nhập thiên địa để chuẩn bị cảm ngộ. Một khi thực sự cảm ngộ Pháp Tắc theo bước ấy thì đã là Khắc Pháp. **Hóa Vực không là Pháp Tắc Chi Chủ và không bị đồng hóa thiên địa theo cơ chế này.** Không nhập nguy cơ Chân Tiên ngủ chữa thương vào Hóa Vực.
+
+Sinh Mệnh Linh Tuyền → **Sinh Mệnh Chi Tâm** ở Khắc Pháp; khắc Đạo Ngân vào Chi Tâm. Khắc đầy → Định Pháp, bắt đầu tạo thêm Chi Tâm. Công pháp quyết định số lượng / chất lượng / kích thước, sức chứa và độ vững. **Đủ toàn bộ Đạo Ngân của một Pháp Tắc** thì Chi Tâm nối như chòm sao, ráp hoàn chỉnh Pháp Tắc; vẫn phải qua Chân Tiên Kiếp.
+
+Sau kiếp, các Chi Tâm đã nối thành **nội không gian nhỏ trống không**, chỉ chứa Pháp Tắc sở hữu và Đạo Ngân, chưa có đất đá. Tích lũy thêm Pháp Tắc làm không gian lớn dần. Ráp đủ một Quy Tắc thì Thiên Đạo hạ **Thiên Địa Chính Tiên Kiếp**; **qua kiếp mới khai thiên tích địa** thành thế giới. Chưa qua kiếp không có Quy Tắc hoàn chỉnh để giữ nguyên cảnh Chân Tiên.
+
+Ngưng tụ Chi Tâm dùng sinh mệnh lực / hao thọ; tác giả làm rõ **cả Khắc Pháp lẫn Định Pháp đều hao thọ**. Công pháp cao giai giúp chất lượng nền tu nhưng vẫn chịu trần hấp thu tư chất và đòi ngộ tính. Không áp con đường hậu thiên này làm lời giải sự sinh ra của Nhân Tổ / Nguyên Sơ / mười hai hài tử trời sinh.
+
+**Độc chiếm vẫn áp dụng:** Đạo Ngân từ pháp thuật Nhập Đạo không cấp quyền sở hữu hoàn chỉnh và không mở đường tiếp tục cảm ngộ Pháp Tắc đã có chủ. Những cảm ngộ đã có vẫn giữ, khả năng vận dụng chịu quyền cấm của chủ. Hoàn chỉnh cấu trúc ở Định Pháp không tự cho hai người cùng chiếm Pháp Tắc; cơ chế kiểm tra / tranh chấp trong kiếp khi đã có chủ còn cần triển khai.
+
+Bảy mức thuần thục, điều kiện Tiên Khí và phân phẩm giai xem mục XVII–XVIII của [Hệ thống sức mạnh](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md). **Nhập Đạo mạnh hơn Hoàn Mỹ và tốn tổng linh lực nhiều hơn**; cảm ngộ không thể truyền.
+
+---
+
+# XXXVI. ĐỊA TIÊN, CHÂN NGÃ VÀ QUYỀN QUẢN LÝ BÍ CẢNH
+
+**ĐÃ CHỐT L11:** với sinh linh tử vong có rất nhiều công đức, Thiên Đạo có thể dẫn độ **Chân Ngã còn tồn tại**, tái tạo linh hồn và bổ nhiệm làm **Địa Tiên** quản lý Thiên Địa Bí Cảnh. Đây là đường bổ nhiệm đặc thù, không là tu cảnh bắt buộc, không chứng minh mọi Chân Tiên có thể tái tạo linh hồn.
+
+Địa Tiên hiểu mọi Pháp Tắc bí cảnh có, không cần tự cảm ngộ để phát triển; tiềm năng tu riêng trước bổ nhiệm đã hao hết. Kinh doanh bí cảnh lớn / giàu Pháp Tắc hơn làm bản thân mạnh. Bí cảnh neo vị cách / tính mạng: cùng thọ, còn bí cảnh thì bất tử, hủy bí cảnh thì chết. Thiên Đạo quyền cao hơn và có thể đuổi; hậu quả cách chức chưa xác định.
+
+**Không đồng hóa người:** Địa Tiên giữ Chân Ngã, được tái tạo linh hồn; Chân Tiên đồng hóa hoàn toàn mất Chân Ngã / linh hồn / ý thức. Không coi hai trạng thái này là cùng một phần thưởng. Chưa chốt Địa Tiên giữ được ký ức cũ tới mức nào.
+
+**CÒN MỞ:** nguồn Pháp Tắc riêng / kế thừa của bí cảnh và quan hệ giữa biết mọi Pháp Tắc bí cảnh với độc chiếm Pháp Tắc Nạp Hư. Không tự đồng nhất quyền quản lý lãnh thổ với sở hữu toàn hệ, hoặc cho Địa Tiên miễn luật nền. Thiên Đạo hiểu rõ Pháp Tắc / Quy Tắc của chính nó khi có lý trí không đồng nghĩa đọc được suy nghĩ riêng của Chân Tiên.
+
+Cấu trúc bí cảnh, Giới Bích, Á Không Gian và giới hạn Địa Tiên tại mục LXII–LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
+

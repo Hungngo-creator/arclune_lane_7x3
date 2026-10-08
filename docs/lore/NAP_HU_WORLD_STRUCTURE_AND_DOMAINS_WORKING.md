@@ -1,6 +1,6 @@
 # NẠP HƯ GIỚI — CẤU TRÚC QUẦN VỰC, GIỚI BÍCH & CÁC ĐẠI VỰC HIỆN HÀNH
 
-> **Bàn giao mới 2026-10-08:** [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), đặc biệt L10 về nguồn tín ngưỡng và đề nghị tám cảnh; mục XX.2 / LXI cập nhật điều kiện hướng về đối tượng.
+> **Bàn giao mới 2026-10-08:** [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L11**; mục LXII–LXV phân biệt Thiên Địa Bí Cảnh, Á Không Gian, Địa Tiên và ghi xung đột cần bàn với hai miền cổ. L10 / mục XX.2 / LXI giữ điều kiện tín ngưỡng hướng về đối tượng.
 
 > **Trạng thái:** Thiết kế thế giới đang xây dựng — dùng để tiếp tục khóa địa lý, lịch sử và vật lý Nạp Hư trước khi viết biên niên sử chính thức.
 >
@@ -2500,6 +2500,8 @@ Nó có thể tu luyện và độ **Nhân → Địa Kiếp** lần nữa, khô
 
 # LVIII. QUẦN VỰC SƠ KHAI VÀ HAI Á KHÔNG GIAN CỔ
 
+> **CÒN MỞ sau L11:** “á không gian” trong mô tả cũ của vương quốc thực vật / Luân Hồi chưa được đối chiếu xong với Á Không Gian mới không có vật chất. Giữ sự tồn tại và cảnh vật hai miền; chưa mặc định chúng là lớp trống dùng đi lại hoặc đổi thành Thiên Địa Bí Cảnh. Xem mục LXV.
+
 ## Các Vực sơ khai và lần phân vỡ — ĐÃ CHỐT
 
 Nạp Hư đã có cấu trúc **Quần Vực** từ sơ khai, ban đầu chỉ **3 hoặc 4 Vực**; chưa chọn chính xác ba hay bốn. Các Vực hậu thế sinh từ những Vực ấy phân vỡ và còn có Vực được tạo thêm; chưa khóa tác nhân, ngày hoặc đồ thị phân tách của từng Vực.
@@ -2555,3 +2557,85 @@ Nguồn tín ngưỡng đã chốt ở mục XX.2. Nó không chỉ đến từ 
 **ĐÃ CHỐT làm rõ:** cần cảm xúc hướng về đối tượng tin tưởng / tôn thờ. **CÒN MỞ:** điều kiện đối tượng, cách dòng đến người nhận, liên hệ người nhận / tín đồ, khả năng tích trữ hoặc chuyển qua Giới Bích và giới hạn quan sát. Không thêm khoảng cách / thời gian truyền hoặc tự coi mọi tâm niệm là cùng một loại năng lượng.
 
 Các dòng sáng ở Phạn Châu và việc Phật Đạo dùng tín ngưỡng đã có vẫn giữ; cơ chế nền mới chưa tự mở năng lực nhìn dòng cho mọi tu sĩ Chiếu Hồn. Bảng tám cảnh đang được Codex đề nghị để tác giả chọn, không phải một thang quan sát tín ngưỡng đã chốt. Lượt hỏi / phần đáp ở [Bàn giao hội thoại](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), L10.
+
+---
+
+# LXII. THIÊN ĐỊA BÍ CẢNH — TIỂU THẾ GIỚI TRONG NẠP HƯ
+
+**ĐÃ CHỐT L11:** **Thiên Địa Bí Cảnh** là cụm từ chỉ các tiểu thế giới sinh ra trong Nạp Hư, mỗi nơi có vùng thiên địa riêng và **giới hạn kích thước**. Ví như một gian phòng / căn nhà, bình thường có **một cửa kết nối** với thiên địa Nạp Hư; bao quanh là **Giới Bích yếu hóa**.
+
+Không mặc định bí cảnh là Đại Vực, nội không gian của Chân Tiên, thế giới nội Chính Tiên, Tiên Vực ngoại giới hoặc Á Không Gian dùng di chuyển.
+
+## Giới Bích bị phá và lối ra
+
+- Phá Giới Bích **không làm bí cảnh chịu hủy diệt**, chỉ làm Linh Khí lọt ra ngoại giới **vẫn trong Nạp Hư**.
+- Người ở ngoài thấy khu vực **gần cửa vào** đột nhiên đậm Linh Khí hơn.
+- Qua chỗ Giới Bích đã phá sẽ ra bí cảnh tại **vị trí ngẫu nhiên gần cửa vào**, không tự ra Chư Thiên.
+- Tu vi **dưới Chân Tiên** nhìn qua chỗ vỡ chỉ thấy **sương mù xám cuồn cuộn**; đi vào vùng sương mù là ra ngoài.
+- Với **bí cảnh cấp Chân Tiên**, Chân Tiên phá được Giới Bích rồi nhìn ra sẽ thấy **cảnh vật ngoài bí cảnh**, không phải sương mù. Tương tác quan sát ở các trường hợp khác chưa định, không tự mở rộng ví dụ này thành luật mọi cấp.
+
+**Mốc độ khó đã chốt:** bí cảnh cấp **Hóa Vực** cần **tối thiểu ba Hóa Vực đã Nhập Đạo cùng xuất thủ** mới có hy vọng phá Giới Bích. “Có hy vọng” không bảo đảm thành công, không là công thức nhân ba dùng cho mọi phẩm bí cảnh. Nhập Đạo ở đây là mức thuần thục / cảm ngộ Đạo Ngân, không nâng ba người thành chủ Pháp Tắc.
+
+**CÒN MỞ:** cơ chế tự hồi phục Giới Bích, mức rò / thời gian Linh Khí thoát, giới hạn vùng ngẫu nhiên quanh cửa, cấp bí cảnh được đo theo tiêu chí nào, làm lớn bí cảnh trong giới hạn và có nâng giới hạn / phẩm cấp không. Chưa thêm hậu quả bí cảnh tự sập sau khi thủng.
+
+---
+
+# LXIII. Á KHÔNG GIAN — LỚP DI CHUYỂN VÀ GIỚI BÍCH CHUNG
+
+**ĐÃ CHỐT L11:** hiện thế Nạp Hư là một lớp; **Á Không Gian** là lớp không gian thấp hơn. Chân Tiên có thể đấm / đánh vỡ không gian, tạo vết nứt tồn tại ngắn rồi đi vào Á Không Gian. Dùng lớp này di chuyển là thủ đoạn thường gặp của Chân Tiên, tác giả ví như lỗ sâu.
+
+Á Không Gian:
+
+- Không có trên / dưới / trái / phải, không có vật chất.
+- Linh Khí cực ít.
+- Thời gian nhanh hoặc chậm hơn hiện thế Nạp Hư tùy vùng.
+- Giới hạn của nó là giới hạn **Chư Thiên**, vì thế là tuyến có thể dùng xâm nhập.
+
+**Giới Bích Nạp Hư ở hiện thế và Á Không Gian là cùng một Giới Bích**, tồn tại trong cả hai. Vào Á Không Gian không tự vượt được phong tỏa Nạp Hư; tuyến xâm nhập vẫn phải giải quyết Giới Bích khi cần vào / ra Nạp Hư.
+
+Tầng này là **lớp không gian**, không tự là hệ quy chiếu thấp của siêu thoát, không chứng minh Chân Tiên đã rời Chư Thiên. Rạn không gian để di chuyển, xuyên Giới Bích tiểu thế giới và vượt Giới Bích Nạp Hư là những hành động khác nhau.
+
+**CÒN MỞ:** cách định hướng / chọn điểm ra khi không có phương hướng, mức sai lệch thời gian, thời gian / độ ổn định vết nứt, tốc độ và cự ly đi lại. **SUY LUẬN Codex:** ít Linh Khí có thể gây khó cho bế quan dù có vùng lệch thời gian; chưa tạo sẵn phương án tăng tốc tu không giới hạn.
+
+---
+
+# LXIV. ĐỊA TIÊN — NGƯỜI QUẢN LÝ THIÊN ĐỊA BÍ CẢNH
+
+**ĐÃ CHỐT L11:** khi sinh linh có **rất nhiều công đức** tử vong, Thiên Đạo có thể dẫn độ Chân Ngã, tái tạo linh hồn, bổ nhiệm làm tồn tại đặc thù quản lý bí cảnh như Thiên Đạo của nơi ấy; gọi chung **Địa Tiên**.
+
+| Mặt | Cơ chế tác giả xác nhận |
+|---|---|
+| Vị cách / tu vi | Neo bởi bí cảnh; chiến lực thấp hơn Chân Tiên một chút |
+| Tính mạng | Cùng bí cảnh đồng thọ; bí cảnh chưa nổ thì bất tử; bí cảnh nổ / bị hủy thì chết dù đang ở đâu |
+| Quyền quản lý | Có vai trò như Thiên Đạo bí cảnh, nhưng Thiên Đạo Nạp Hư cao hơn, muốn đuổi thì đuổi |
+| Tri thức | Hiểu mọi Pháp Tắc bí cảnh có ngay khi thành Địa Tiên; không cần tự cảm ngộ |
+| Thăng tiến | Tiềm năng cá nhân trước bổ nhiệm hao hết; kinh doanh bí cảnh càng lớn / giàu Pháp Tắc thì càng mạnh |
+| Trung thành | Khá cao; Nạp Hư nổ thì bí cảnh nổ, bản thân cũng chết |
+
+Bí cảnh đối với Địa Tiên được ví với thế giới nội đối với Chính Tiên; không từ ví dụ ấy đồng nhất mức sức mạnh, tự chủ hay quyền sở hữu. Đây không phải người sáng thế vượt quyền Thiên Đạo, cũng không là cá nhân đã bị đồng hóa mất Chân Ngã.
+
+**Thủng Giới Bích ≠ bí cảnh nổ.** Vì vậy phá tường bí cảnh làm rò Linh Khí không tự giết Địa Tiên. Chưa chốt rò lâu làm suy yếu quản lý tới đâu.
+
+**CÒN MỞ:** ngưỡng công đức / cách chọn người, ký ức giữ sau tái tạo linh hồn, điều kiện ra ngoài, hậu quả bị cách chức, phạm vi quyền Pháp Tắc và quan hệ với độc chiếm nguồn Nạp Hư. Tiềm năng hết không cấm phát triển lãnh thổ theo con đường đã chốt; giới hạn kích thước có cho phép nâng phẩm hay không vẫn cần tác giả quyết định.
+
+---
+
+# LXV. HAI MIỀN CỔ VÀ VIỆC PHÂN BIỆT CÁC KHÔNG GIAN
+
+**CÒN MỞ thật sự sau định nghĩa mới:** lore trước gọi **Luân Hồi Chi Địa** và **vương quốc Tiên Thiên Sinh Linh** là “á không gian”, nhưng Luân Hồi có đất / sông / hoa / cối xay, vương quốc có cây cỏ sinh sống. Á Không Gian mới được tác giả định là không có vật chất. Không thể coi cả hai mô tả đều đã khớp mà không giải thích.
+
+**Đề nghị Codex chưa được xác nhận:** Á Không Gian là lớp trống dùng đi lại; hai miền cổ là những miền có cấu trúc / thiên địa riêng nằm hoặc được neo trong lớp ấy. Cách này giữ nội dung cũ mà không cho lớp trống tự có đất đá. Chưa tự đặt hai nơi thành Thiên Địa Bí Cảnh thông thường có một cửa, Địa Tiên hay Giới Bích cấp Hóa Vực. Bản thể / nơi đặt / cách vào cần bàn riêng; ngưỡng nhìn vương quốc Chân Tiên trở lên và cấm Chính Tiên vào Luân Hồi vẫn giữ.
+
+Các cấu trúc còn phải phân biệt:
+
+| Cấu trúc | Nền hiện tại |
+|---|---|
+| Nội không gian Chân Tiên | Chi Tâm sau kiếp nối thành vùng trống chỉ chứa Pháp Tắc / Đạo Ngân |
+| Thế giới nội Chính Tiên | Qua Chính Tiên Kiếp mới khai thiên tích địa |
+| Thiên Địa Bí Cảnh | Tiểu thế giới sinh trong Nạp Hư, hữu hạn, cửa nối và Giới Bích yếu hóa |
+| Tiên Vực / Đạo Vực | Miền Chân Tiên neo vào Pháp Tắc Nạp Hư theo lore trước; chưa tự đồng nhất với bí cảnh hay nội không gian |
+| Á Không Gian | Lớp di chuyển trống, ít Linh Khí, thời gian biến thiên, chịu cùng Giới Bích Nạp Hư |
+| Thần vực Main | Ngoài cơ thể, không thu tùy ý, là điểm neo bên cạnh thần cách; không lấy luật bí cảnh Nạp Hư áp vào |
+
+Không dùng Á Không Gian để vượt miễn phí Giới Bích Nạp Hư, không dùng nội không gian Chân Tiên thay một thế giới đã khai thiên tích địa, không dùng đường Địa Tiên để tự giải cơ chế giữ ký ức qua Luân Hồi.
+
