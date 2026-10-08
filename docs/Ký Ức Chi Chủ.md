@@ -1,76 +1,95 @@
 # HOÁ THÂN KÝ ỨC CHI CHỦ, Memento
-## Prime / Mage — Chuẩn hóa Legacy Kit
+## Prime / Mage — Gameplay theo raw kit hiện hành
 
-**Rank:** Prime. **Class:** Mage. **Element:** chưa gắn cố định; Effective Element về sau có thể do build/Công Pháp quyết định. **Axiom:** Thần Tính. **Authority chính:** Quy Tắc.
+**Rank:** Prime. **Class:** Mage. **Element:** chưa gắn cố định; Effective Element về sau có thể do build/Công Pháp quyết định. **Axiom:** Thần Tính. **Authority:** nội tại Ngã Tự Bất Vong và Lãng Quên cấp Quy Tắc; Skill 1 và Skill 2 cấp Pháp Tắc. Thần Tính có Axiom riêng, không nâng toàn bộ kit lên Axiom. Raw kit không chốt riêng cấp Authority của Skill 3 hoặc Ultimate.
 
-"
-"## Lục Cực Đồ
-**DMG 5/5 | SUR 5/5 | CTL 5/5 | CMP 5/5 | MIC 5/5 | VIS 2/5.** DMG 5 vì Ultimate 200% toàn sân, Skill 2 echo 50% Actual HP Damage dưới dạng True Damage, và stat snapshot xuyên death có thể được nâng bởi support trước khi chết. SUR 5 vì tối đa 3 revive và lần revive thứ ba có Lãng Quên loại khỏi target selection. CTL 5 vì Skill 1 quên Active Skill/Ultimate, Skill 3 khóa Skill/Ultimate của 3 enemy, Lãng Quên loại actor khỏi target resolver. CMP/MIC 5 vì chạm Death, Revive, snapshot, Turn Boundary, Natural Action, target selection, AOE resolution, Authority và Axiom. VIS 2 vì player phải hiểu life state, snapshot và Forgotten presentation.
+## Lục Cực Đồ
+**DMG 5/5 | SUR 5/5 | CTL 5/5 | CMP 5/5 | MIC 5/5 | VIS 2/5.** DMG 5 vì Ultimate 200% toàn sân, Skill 2 echo 50% Actual HP Damage dưới dạng True Damage, và stat snapshot xuyên death có thể được nâng bởi support trước khi chết. SUR 5 vì tối đa 3 revive và Lãng Quên loại khỏi target selection sau cả ba lần; lần thứ ba còn ẩn nhân vật khỏi tầm nhìn đối thủ. CTL 5 vì Skill 1 quên Active Skill/Ultimate, Skill 3 khóa Skill/Ultimate của 3 enemy, Lãng Quên loại actor khỏi target resolver. CMP/MIC 5 vì chạm Death, Revive, snapshot, Natural Action, Slot Clock, target selection, AOE resolution, Authority và Axiom. VIS 2 vì player phải hiểu life state, snapshot và Forgotten presentation. Các điểm số này là đánh giá thiết kế, không phải cơ chế chiến đấu.
 
-"
-"## 1. Identity và Snapshot
-**trueSelfId giữ nguyên, lifeSerial tăng khi revive.** Snapshot stat lấy từ state cuối cùng ngay trước death; không copy Buff/Debuff/Mark object, cooldown hoặc duration object. Chỉ giá trị stat cuối cùng sau modifier được ghi thành nền của life tiếp theo. Ví dụ Base Max HP 100 → Buff +50% → Max HP lúc chết 150 → Revive 1 Max HP 150, Current HP 45/150; buff +50% cũ không tồn tại nhưng 150 trở thành nền mới. Đây là memory snapshot, không phải tái áp buff. Cơ chế này tạo interaction hai chiều: support buff trước death có giá trị thật ở đời sau; enemy debuff trước death có thể làm đời sau yếu hơn.
+## 1. Identity và Snapshot
+**trueSelfId giữ nguyên, lifeSerial tăng khi revive.** Snapshot lấy **Max HP, ATK, WIL, ARM, RES và HP Regen** từ trạng thái lúc tử vong ngay trước. Đây là 100% giá trị sau rank multiplier và sau những thay đổi chỉ số đã thực sự tác động, không scale rank thêm lần nữa. Chỉ sáu giá trị này trở thành nền chiến đấu mới của đời tiếp theo; **Max HP được snapshot, không phải Current HP**. Không copy Buff/Debuff/Mark object, cooldown hoặc duration object; thời hạn buff cũ không đi sang đời mới. Ví dụ Base Max HP 100 → Buff +50% → Max HP lúc chết 150 → Revive 1 Max HP 150, Current HP 45/150; buff +50% cũ không tồn tại nhưng 150 trở thành nền mới. Đây là memory snapshot, không phải tái áp buff. Support có thể “viết lại ký ức về bản thể” bằng buff trước death; enemy có thể làm nền đời sau yếu hơn bằng thay đổi chỉ số đã vượt qua miễn nhiễm/Authority và thực sự tác động trước death.
 
-"
-"## 2. Nội tại — Ngã Tự Bất Vong
+## 2. Nội tại — Ngã Tự Bất Vong
 Khi **DEATH_CONFIRMED**, nhân vật mở cửa sổ tái sinh và revive tối đa 3 lần/trận. Mỗi lần revive lấy 100% Max HP, ATK, WIL, ARM, RES và HP Regen từ trạng thái snapshot lúc tử vong trước; resources, cooldown, Buff/Debuff/Mark object và temporary state không tự động sao chép nếu không có rule riêng. Current HP khi materialize: lần 1 = 30% Max HP snapshot, lần 2 = 45%, lần 3 = 60%; đây là Current HP, không phải Heal. Sau revive lần 3, death tiếp theo không revive lần 4.
 
-"
-"Thời gian revive legacy: **2 lượt tính theo slot/turn của ô nơi hắn chết**, bất kể ô đó có unit đứng hay không. Đây cần được formalize trong SSI thành một counter độc lập với occupancy; không để unit đứng ở slot làm đổi thời gian.
+Thời gian revive: **2 cơ hội Natural Action được scheduler tính cho ô nơi hắn chết**, bất kể ô đó trống hay có unit khác đứng. Mỗi lần đến cơ hội Natural Action của đúng ô đó, counter tăng 1; tới lần thứ hai thì phục sinh. Đây là clock của ô chết, độc lập với occupancy, không phải 2 hành động của unit đang đứng trong ô, 2 hành động của hắn khi chết hoặc 2 global Turn Boundaries bất kỳ. Gameplay này dùng khái niệm Slot Clock hiện có; Mode phải cung cấp checkpoint tương ứng khi chuẩn hóa dữ liệu thực thi.
 
-"
-"## 3. Lãng Quên
-Sau mỗi revive, trong 1 Natural Action của chính hắn có state Lãng Quên; lần 1/2 player và NPC enemy vẫn thấy hắn, lần 3 hắn biến mất khỏi tầm mắt/player enemy trong cửa sổ này. Lãng Quên **không phải external Buff/Debuff/Mark**. Trong Forgotten: không thể được target; không vào random target pool; AI địch bỏ qua; enemy UI không hiển thị vị trí/HP bar/effect; hắn vẫn có thể action và gây damage; slot occupancy vẫn tồn tại. **Target Selection ≠ Area Resolution:** random/single-target không chọn hắn; fixed AoE, full-board AoE, column/row AoE hoặc radius đã tạo từ unit khác vẫn có thể trúng nếu vị trí hắn nằm trong vùng. Không được để gameplay kernel phụ thuộc visibility/UI. Lần 3 chỉ ẩn presentation và loại khỏi target resolver, không phải damage immunity.
+## 3. Lãng Quên
+Lãng Quên bắt đầu sau **mỗi lần phục sinh** và tồn tại qua **1 Natural Action cá nhân kế tiếp của chính hắn**, kết thúc sau lượt đó theo duration CLK-003. Trong cả ba lần: không thể chọn hắn làm mục tiêu bởi bất kỳ kit nào, dù gây sát thương hay không; hắn không xuất hiện trong random target pool và AI địch bỏ qua hắn khi chọn mục tiêu. Hắn vẫn có thể hành động, tấn công và chiếm vị trí trên sân. Lãng Quên là trạng thái đặc thù trên bản thân, **không gán Buff/Debuff/Mark lên kẻ thù**; việc enemy có miễn nhiễm debuff không tự chống được trạng thái này.
 
-"
-"## 4. Thần Tính — Axiom
-Thần Tính ngăn external **status/effect**: Buff, Debuff, Mark và các external effect có lợi/hại/trung tính thuộc scope của Thần Tính, kể cả từ đồng minh. **Thần Tính không tự động ngăn direct Damage.** Damage vẫn resolve theo Damage Contract. Thần Tính cũng không xóa stat history đã snapshot; nếu external modifier đã thay đổi stat trước death thì state cuối cùng có thể được ghi nhớ và trở thành stat nền của life sau. Thần Tính không khiến toàn bộ skill của character thành Axiom.
+**Presentation đối với phe địch:** lần 1/2 player và NPC vẫn thấy nhân vật; lần 3 nhân vật biến mất khỏi tầm mắt của cả player và nhân vật địch trong game. Trong cửa sổ Lãng Quên, vị trí, HP bar, Buff/Debuff/Mark và chỉ báo hiệu ứng của hắn không hiển thị cho player địch. Player/AI có thể nhận biết hắn đang tấn công nhưng vẫn không thể chọn hắn làm target. Visibility không quyết định kết quả gameplay.
 
-"
-"## 5. Skill 1 — Quên Lãng Kỹ Năng
-**Cost 25 AE | Authority Quy Tắc | CD 2 Natural Actions của caster.** Các auto Skill 2/3 không giảm CD. Khi kích hoạt, chọn ngẫu nhiên tối đa 3 enemy khác nhau. Với từng target chọn ngẫu nhiên 1 **Active Skill hoặc Ultimate** đang tồn tại; không chọn Passive/Basic. Nếu target không có skill hợp lệ thì không tiêu hao target slot và tìm target hợp lệ khác nếu còn. Target quên skill trong **Natural Action kế tiếp của chính target**; trong action đó skill bị quên không thể dùng dù hết CD/đầy Rage, sau action trạng thái hết. CC làm mất lượt vẫn tiêu hao natural turn theo SSI; Forget không kéo dài vô hạn. Conflict: chọn target → chọn skill → kiểm tra anti-forget → chỉ khi có direct conflict mới phán định Authority/Tag; nếu không có conflict, Quy Tắc chắc chắn thành công. Các auto Skill 2/3 không tính là hành động giảm CD.
+**UNRESOLVED — tác dụng của hiệu ứng đang có:** raw kit còn dùng câu Buff/Debuff/Mark/hiệu ứng “mất tác dụng” trong Lãng Quên. Chưa chốt liệu đây là tạm ngừng tác động thật sự hay chỉ ẩn chỉ báo và không dùng được để chọn hắn làm target. Không suy diễn thành xóa object, xóa chỉ số snapshot hoặc vô hiệu hóa mọi kit của hắn.
 
-"
-"## 6. Skill 2 — Đau Đớn Hồi Tưởng
-**Auto/Reaction | Authority Pháp Tắc | cost 30 AE mỗi trigger | không dùng thủ công | không target enemy Leader.** Sau khi **một Damage Action của đồng minh hoàn toàn kết thúc**, tổng hợp Actual HP Damage từng enemy mất từ chính action đó. Target hợp lệ nếu không phải Leader và mất ≥30% Max HP trong action. Nếu có ít nhất một target hợp lệ và đủ 30 AE, Skill 2 trigger **đúng một lần cho toàn action**. Multihit 10 hit không tạo 10 trigger; AoE trúng 5 target vẫn chỉ trả 30 AE một lần. Mỗi target hợp lệ nhận echo riêng = **50% Actual HP Damage** mà đồng minh gây lên target, dưới dạng True Damage. Không sao chép Debuff, Mark, Control, Buff, Lifesteal, Follow-up identity hay secondary effects. Không tính Shield damage hoặc overkill. **DEATH_CONFIRMED trước Skill 2 resolve → target không còn valid target**, nên không nhận echo. Damage của Skill 2 không tự kích hoạt lại Skill 2, không tạo AE, không tạo turn, không giảm CD Skill 1 và không phải damage “do đồng minh”.
+**Target Selection ≠ Area Resolution:** Lãng Quên loại hắn khỏi danh sách mục tiêu được chọn nhưng không xóa vị trí chiến đấu. AoE đã xác định vùng tác động vẫn có thể chạm hắn nếu hắn nằm trong vùng; sát thương và hiệu ứng sau đó còn phải qua các admission/miễn nhiễm riêng, bao gồm Thần Tính. Lãng Quên không tự cấp Damage Immunity.
 
-"
-"## 7. Skill 3 — Tái Diễn Ký Ức
-**Auto/Reaction | cost 15 AE | CD 2 Natural Actions của caster | không dùng thủ công.** Chỉ ghi nhận chuỗi gồm **3 Natural Actions liên tiếp của phe địch**, thuộc **3 enemy khác nhau**, và cả ba Natural Actions đều là Basic Attack chính. Hợp lệ: A Basic → B Basic → C Basic. Không hợp lệ: A → B → A. Không tính Follow-up, Counter, Reaction, Summon attack, Forced Basic, Extra Hit, Linked Cast, Basic ngoài natural turn. Một action khác phá chuỗi. Tới action thứ ba, nếu đủ 15 AE thì trigger; thiếu AE → không trigger và reset chuỗi. Sau trigger, ba target chỉ được dùng Basic Attack trong **2 Natural Actions tiếp theo của từng target**; Skill/Ultimate bị khóa, Rage không thể dùng để vượt khóa. Duration độc lập theo từng target; target chết không cần hoàn thành duration, target còn sống vẫn giữ lock đủ 2 Natural Actions. Trong CD, Skill 3 không ghi nhận chuỗi mới. Auto Skill 2/3 không tạo Natural Action, không tạo AE, không tăng Rage và không giảm CD Skill 1.
+## 4. Thần Tính — Axiom
+**Đã chốt từ raw kit hiện hành:** Thần Tính có **Authority Axiom**, miễn nhiễm kit gây **hiệu ứng xấu** trong scope của nó; Viên Chúc không vượt được miễn nhiễm này bằng hiệu ứng xấu thông thường. **Thần Tính không tự động ngăn direct Damage** và không nâng các Skill khác của hắn lên Axiom. Chỉ khi điều khoản hiệu ứng trực tiếp mâu thuẫn với miễn nhiễm mới phán định Authority theo cơ chế hiện hành.
 
-"
-"## 8. Ultimate
-AOE toàn sân = **200% ATK + 200% WIL**. Hoàn tất Damage Action rồi hồi **20% tổng Actual HP Damage** mà chính Ultimate gây lên enemy. Không tính Shield damage, overkill, Reflect hay damage từ source khác. Nếu heal vượt Max HP, overheal bị bỏ qua. Thần Tính không chuyển overheal thành immunity và cũng không tự tạo Shield; chỉ external kit phù hợp mới có thể chuyển overheal nếu thắng được authority/axiom contract tương ứng.
+Thần Tính không xóa stat history đã snapshot. Chỉ modifier đã thực sự được áp dụng trước death mới có hậu quả được ghi thành nền đời sau; một modifier bị chặn không đóng góp vào snapshot. Ràng buộc Thần Tính Axiom đối với chuyển overheal thành Shield được ghi tại Ultimate.
 
-"
-"## 9. Target Selection / Area Resolution contract
-Trong Forgotten, actor bị filter khỏi Target Selection nhưng không bị xóa khỏi battlefield geometry. Vì vậy: random target không chọn; single target không chọn; full-board AoE vẫn trúng; fixed column/row AoE vẫn trúng nếu đúng vùng; radius AoE không thể lấy Forgotten làm tâm nhưng có thể trúng nếu tâm là actor khác và Forgotten nằm trong vùng. Đây là **target exclusion + presentation hiding**, không phải immunity.
+**UNRESOLVED — buff có lợi và hiệu ứng trung tính:** tài liệu cũ và STA-011 trong 05 mô tả scope rộng, chặn cả hiệu ứng ngoài có lợi/hại/trung tính và buff đồng minh; raw hiện hành chỉ nêu miễn nhiễm hiệu ứng xấu, đồng thời giữ interaction support buff trước death. Chưa khẳng định mọi buff có lợi được miễn phán định hoặc đều bị chặn. Câu cũ “chặn tất cả external effect” không được coi là quyết định mới của raw kit. Phải chốt scope này trước normalization phụ thuộc nó; cập nhật mô tả nhân vật không tự sửa Contract chung.
 
-"
-"## 10. Duy Nhất
+## 5. Skill 1 — Quên Lãng Kỹ Năng
+**Cost 25 AE | Authority Pháp Tắc | CD 2 Natural Actions của caster.** Khi kích hoạt, chọn ngẫu nhiên tối đa 3 enemy hợp lệ khác nhau trước. Với từng target chọn ngẫu nhiên 1 **Active Skill hoặc Ultimate** đang tồn tại; không chọn Passive/Basic. Một target chỉ quên một kỹ năng trong một lần cast. Target không có skill hợp lệ không tiêu hao lượt chọn; tìm target hợp lệ khác nếu còn. Target quên skill trong **Natural Action cá nhân kế tiếp của chính target**; trong lượt đó skill bị quên không thể dùng dù hết CD/đầy Rage, sau lượt trạng thái hết. CC làm mất cơ hội Natural Action vẫn tiêu hao duration theo CLK-003 hiện hành. Conflict: chọn target → chọn skill → kiểm tra cơ chế anti-forget → chỉ khi có mâu thuẫn trực tiếp mới phán định Authority; không có cơ chế chống lại thì Quên Lãng chắc chắn thành công. CD bắt đầu sau khi dùng Skill 1 và giảm theo 2 cơ hội Natural Action kế tiếp của caster theo CLK-004; auto Skill 2/3 không giảm CD. Mô tả này thay thế cấp Quy Tắc và câu cũ “chỉ quên ultimate”.
+
+## 6. Skill 2 — Đau Đớn Hồi Tưởng
+**Auto/Reaction | Authority Pháp Tắc | cost 30 AE mỗi trigger | không dùng thủ công | không target enemy Leader.** Sau khi **một Damage Action của đồng minh hoàn toàn kết thúc**, tổng hợp Actual HP Damage từng enemy mất từ chính action đó. Target hợp lệ nếu không phải Leader và mất ≥30% Max HP trong action. Nếu có ít nhất một target hợp lệ và team đủ 30 AE, Skill 2 trigger **đúng một lần cho toàn action**, trả 30 AE một lần; thiếu AE thì không kích hoạt. Multihit 10 hit không tạo 10 trigger; AoE trúng 5 target vẫn chỉ trả 30 AE một lần. Mỗi target hợp lệ nhận echo riêng = **50% Actual HP Damage** mà đồng minh gây lên target, dưới dạng True Damage. Đây là sát thương riêng của Skill 2 lên enemy, không gây gì lên đồng minh.
+
+Actual HP Damage là HP thực sự mất sau ARM/RES và giảm sát thương; không tính phần Shield hấp thụ, overkill hoặc vật thể không có HP hợp lệ. Không sao chép Debuff, Mark, Control, Buff, Lifesteal hoặc hiệu ứng kèm theo đòn đồng minh. Ví dụ Max HP 1.000, đồng minh làm mất thật 400 HP → echo 200 True Damage. Khi các điều kiện sát thương tiếp theo cho phép, đòn gốc mất 30% / 50% / khoảng 66,67% Max HP cho echo danh nghĩa 15% / 25% / khoảng 33,33%; đây không phải công thức bỏ qua mọi rule nhận sát thương.
+
+**DEATH_CONFIRMED trước Skill 2 resolve → target không còn valid target**, nên không nhận echo. Damage của Skill 2 không tự kích hoạt lại Skill 2, không được coi là damage của hành động đồng minh để tạo vòng lặp; quy tắc chung của auto Skill 2/3 nằm tại §7.
+
+## 7. Skill 3 — Tái Diễn Ký Ức
+**Auto/Reaction | cost 15 AE | CD 2 Natural Actions của caster | không dùng thủ công.** Chỉ ghi nhận **3 Natural Actions cá nhân liên tiếp trong chuỗi hành động của phe địch**, thuộc **3 enemy khác nhau**, cả ba đều chọn Basic Attack làm hành động chính. Hợp lệ: A Basic → B Basic → C Basic. Không hợp lệ: A → B → A. Hành động phe đồng minh xen giữa không phải một lượt trong chuỗi phe địch. Không tính Follow-up, Counter, Reaction, Linked Cast, đòn phụ, summon đánh thay, Basic ngoài lượt, extra turn hoặc Basic do chính Skill 3 cưỡng chế. Skill, Ultimate, chủ động phòng thủ/bỏ lượt hoặc hành động chính không phải Basic của phe địch làm reset chuỗi.
+
+Tới hành động thứ ba, nếu đủ 15 AE thì Skill 3 kích hoạt một lần; thiếu AE → không kích hoạt và reset chuỗi, không giữ 3/3 để chờ AE. Ba target vừa tạo chuỗi chỉ được chọn Basic Attack trong **2 cơ hội Natural Action cá nhân tiếp theo của từng target**; không dùng Skill/Ultimate dù đầy Rage, không tiêu hao Rage và không khóa nội tại. Theo CLK-003, cơ hội bị CC tiêu hao vẫn tính duration. Mỗi mục tiêu còn sống giữ đủ duration riêng; một mục tiêu chết không rút ngắn khóa trên mục tiêu khác. Nếu cả ba sống và thực hiện được các lượt khóa, mỗi người có một Basic tạo chuỗi rồi hai Basic cưỡng chế.
+
+**Skill 3 vào cooldown ngay khi kích hoạt thành công**, rồi giảm theo 2 cơ hội Natural Action kế tiếp của caster theo CLK-004. CD độc lập với duration của ba target, kể cả khi một target chết; không chờ các target còn sống đánh thường đủ hai lượt mới bắt đầu CD. Trong CD không ghi nhận hoặc lưu chuỗi mới. Basic bị cưỡng chế bởi Skill 3 không tạo chuỗi mới kể cả khi CD đã hết. Quy định này thay thế câu legacy trì hoãn CD khi có target chết.
+
+**Quy tắc chung của auto Skill 2/3:** không thể kích hoạt thủ công, không tiêu hao/tạo lượt, không tạo AE, không tăng Rage, không giảm CD Skill 1 và không tính là hành động của Ký Ức Chi Chủ. Chúng không kích hoạt “sau khi hành động”, “khi đồng minh dùng skill” hoặc “khi dùng skill”, trừ ngoại lệ được hệ thống/kit ghi rõ. Cost AE của mỗi lần kích hoạt vẫn phải trả đủ.
+
+## 8. Ultimate
+AoE cố định **toàn sân = 200% WIL/ATK của bản thân**, giữ đúng công thức raw kit. **UNRESOLVED — ý nghĩa dấu “/”:** chưa chốt cách chọn WIL/ATK hoặc cộng hai chỉ số; không tự đổi thành **200% ATK + 200% WIL** như tài liệu cũ.
+
+Hoàn tất Damage Action rồi tự hồi HP bằng **20% tổng Actual HP Damage do chính Ultimate gây lên các mục tiêu hợp lệ**. Không tính Shield absorption, overkill, damage lên vật thể không hợp lệ, Reflect hoặc damage phụ từ nguồn khác. Ví dụ Ultimate gây tổng Actual HP Damage 1.000 → lượng hồi tính từ damage là 200 HP, rồi áp dụng giới hạn/điều khoản hồi phục tương ứng. Không tính echo Skill 2 hay damage đồng minh vào tổng này.
+
+HP vượt Max HP trở thành overheal và mặc định bị bỏ qua, không tự tạo Shield. Ngoại lệ đã chốt: kit của **nhân vật khác** có hiệu ứng chuyển overheal đồng minh sang Shield chỉ làm được nếu điều khoản tương ứng **thắng Thần Tính cấp Axiom của hắn**. Raw kit yêu cầu một Prime khác có lực chiến cao hơn để khả thi; lực chiến cao hơn riêng lẻ không thay thế kết quả phán định Authority hiện hành. Scope ngoại lệ này không tự quyết định mọi buff đồng minh ở §4.
+
+Ý niệm Ultimate: “Ta không hồi phục; đau đớn khiến chúng nghĩ về ta, ký ức về ta càng thêm sâu đậm, càng nghĩ thì càng ám ảnh.”
+
+## 9. Target Selection / Area Resolution contract
+Trong Forgotten, actor bị filter khỏi Target Selection nhưng không bị xóa khỏi battlefield geometry. Random AoE chọn ba enemy khác nhau không thể chọn hắn. AoE cố định toàn sân vẫn bao gồm hắn; AoE hàng/cột chỉ bao gồm hắn nếu đứng đúng vùng. AoE lấy unit làm tâm không thể chọn hắn làm tâm, nhưng vùng tạo từ một unit khác vẫn có thể bao gồm hắn. Ví dụ Skill 3/Ultimate của Đạo Mộng Dao dùng vùng cố định: nếu vùng Skill 3 không bao phủ hàng hắn đứng thì hắn không trúng. Việc không target được không tự chặn Damage hoặc bỏ qua Thần Tính khi Effect thật sự resolve vào vùng.
+
+## 10. Duy Nhất
 **Không có Axiom Duy Nhất.** Độ phức tạp của kit không phải lý do để cấp Duy Nhất. Duy Nhất chỉ nên xuất hiện nếu lore xác nhận chỉ một bản thể Ký Ức Chi Chủ có thể tồn tại tại một thời điểm. Thần Tính + Quy Tắc Lãng Quên đã đủ tạo identity. Nếu một presentation/combat definition mà nhân vật tạm thời mang có tag Duy Nhất riêng thì Duy Nhất của definition đó vẫn được phán định theo Axiom; điều đó không biến cả character thành Duy Nhất.
 
-"
-"## 11. Rank/Class
+## 11. Rank/Class
 **Prime / Mage** là phù hợp. Prime vì có Thần Tính, Quy Tắc về Quên Lãng, memory snapshot xuyên death, nhiều revive và interaction sâu với death/identity. Mage vì core fantasy là thao túng ký ức/nhận thức bằng rule-level effects chứ không phải physical combat, ranged weapon, summon hay support healing thuần.
 
-"
-"## 12. Engine invariants
-1) trueSelfId giữ nguyên, lifeSerial tăng khi revive. 2) Death Prevention xử lý trước DEATH_CONFIRMED. 3) DEATH_CONFIRMED trước Skill 2 → target không còn valid. 4) Snapshot stat là state cuối đời, không copy Buff/Debuff/Mark object. 5) Forgotten không phải external debuff trên enemy. 6) Forgotten actor vẫn occupancy slot. 7) Area Resolution không bị target exclusion hồi tố. 8) Skill 2 một trigger mỗi Damage Action. 9) Echo chỉ tái hiện damage quantity. 10) Echo không recursion vào Skill 2. 11) Skill 3 cần 3 enemy Basic Natural Actions liên tiếp của 3 unit khác nhau. 12) Skill 3 lock tính theo Natural Actions của từng target. 13) Skill 1 CD chỉ giảm bằng Natural Actions của caster. 14) Auto Skill 2/3 không tạo Natural Action. 15) Thần Tính chặn external status/effect, không mặc định chặn direct Damage. 16) Thần Tính không xóa stat history. 17) Character không có Duy Nhất. 18) Lục Cực Đồ và Engine Risk là hai hệ đánh giá riêng.
+## 12. Engine invariants
+1. trueSelfId giữ nguyên, lifeSerial tăng sau special Revive; Death Prevention xử lý trước DEATH_CONFIRMED.
+2. Snapshot đúng sáu giá trị chỉ số của lần death ngay trước; không copy object hiệu ứng/duration và không rank-scale hai lần. Current HP phục sinh là 30% / 45% / 60% Max HP snapshot, không phải Heal.
+3. Clock chờ revive thuộc ô chết, không phụ thuộc unit đang chiếm ô.
+4. Lãng Quên tồn tại sau cả ba revive, chỉ lần thứ ba ẩn nhân vật; không phải debuff trên enemy và không xóa occupancy.
+5. Target Selection và Area Resolution độc lập; fixed AoE không được bỏ hắn chỉ vì không target được.
+6. Skill 1 cấp Pháp Tắc, quên một Active Skill/Ultimate trên mỗi target riêng biệt; CD của caster tách khỏi duration của target.
+7. Skill 2 một trigger/Cost mỗi Damage Action đồng minh, không target Leader, không echo target đã DEATH_CONFIRMED; chỉ lấy committed Actual HP Damage và không recursion.
+8. Skill 3 đòi ba Basic Natural Actions chính liên tiếp của ba enemy khác nhau; khóa riêng từng target và vào CD caster ngay khi kích hoạt. Thiếu AE ở đòn thứ ba thì reset chuỗi.
+9. Auto Skill 2/3 không tạo/tốn Natural Action, AE gain hoặc Rage, không giảm CD Skill 1 và không phát sinh action/skill-use trigger ngoài ngoại lệ tường minh.
+10. Ultimate heal chỉ dùng own Actual HP Damage, không tính Shield absorption/overkill/damage khác; chuyển overheal thành Shield phải thắng scope Axiom tương ứng.
+11. Thần Tính chặn hiệu ứng xấu trong scope, không tự chặn direct Damage hoặc xóa stat history. Không tự chọn scope buff có lợi khi chưa chốt.
+12. Không có Axiom Duy Nhất cho toàn nhân vật. Lục Cực Đồ và Engine Risk là hai hệ đánh giá riêng.
 
-"
-"## 13. Câu hỏi còn mở trước implementation
-- “2 turn theo slot chết” được biểu diễn bằng counter SSI nào để không phụ thuộc occupancy?
-- Revive lần 1/2 có Forgotten presentation state hay chỉ lần 3? Logic hiện tại: lần 3 mới ẩn hoàn toàn.
-- Nếu target bị Forget rồi bị CC mất Natural Action, Forget kết thúc ở natural turn đó đúng không? Khuyến nghị có.
-- Nếu target chưa DEATH_CONFIRMED khi Skill 2 tạo target list nhưng chết trong cùng resolution trước echo, death commit order phải được kernel chốt; canon đã đồng ý trường hợp **DEATH_CONFIRMED trước Skill 2 → không còn valid target**.
-- Skill 3 khi một target chết: CD giữ đúng legacy “đếm sau khi target còn sống hoàn tất 2 Natural Actions” hay chuyển sang một clock cố định của caster? Bản hiện tại ưu tiên legacy.
-- UI Forgotten: player cùng phe có thấy HP/vị trí không, hay chỉ enemy presentation bị ẩn? Gameplay state không phụ thuộc UI.
-- Ultimate simultaneous damage phải lấy Actual HP Damage theo commit của action; overkill không tính vào heal.
-- Nếu một external Prime có Thần Tính chịu Skill 2 True Damage trực tiếp, Thần Tính không chặn damage chỉ vì damage có nguồn ngoài; chỉ status/effect nằm trong scope Thần Tính bị chặn.
+## 13. Các điểm chưa chốt và boundary normalization
+Các điểm đã chốt không còn là câu hỏi: chờ revive theo ô chết và không phụ thuộc occupancy; Lãng Quên sau cả ba revive/lần thứ ba mới ẩn nhân vật; duration cá nhân theo CLK-003; Skill 3 CD bắt đầu ngay và độc lập với khóa; target đã DEATH_CONFIRMED trước echo không nhận echo; heal Ultimate dùng own Actual HP Damage và loại overkill.
+
+Ba diễn giải cần designer chốt trước normalization phụ thuộc chúng: tác dụng thật sự của Buff/Debuff/Mark trong Lãng Quên (§3), scope Thần Tính với buff có lợi/trung tính (§4), và công thức WIL/ATK của Ultimate (§8). **UNRESOLVED / NOT BLOCKING** đối với việc đồng bộ mô tả raw hiện tại; không coi chúng là executable defaults.
+
+Các boundary chưa cung cấp dữ liệu thực thi: checkpoint Slot Clock tương ứng trong từng Mode, trình bày UI cho phe đồng minh, cấp Authority riêng của Skill 3/Ultimate và profile sát thương Ultimate. Không tự cấp Authority từ Rank/Class. Đây là gameplay của kit legacy với các điểm mở được ghi rõ, không khẳng định đã hoàn tất một normalization mới của toàn bộ 00–08.
 
 ## 14. Identity thiết kế
-Hoá Thân Ký Ức Chi Chủ không phải “character có 3 mạng”. Bản sắc là: **hắn không hồi sinh về cùng state; hắn nhớ lại chính mình từ state cuối cùng trước death.** Support có thể “viết” một bản thể mạnh hơn bằng buff trước death; enemy có thể “viết” bản thể yếu hơn bằng debuff/stat reduction trước death. Max HP/current HP và các stat đời sau là hậu quả được ký ức giữ lại, trong khi object Buff/Debuff/Mark và duration cũ biến mất. Lần revive thứ ba mở Lãng Quên: chính nhận thức của đối thủ không còn có thể target hắn, nhưng vùng damage đã tồn tại vẫn có thể chạm hắn. Core fantasy: **“Ta không hồi sinh. Ta chỉ nhớ lại hình dạng mình từng có.”**
+Hoá Thân Ký Ức Chi Chủ nhớ lại chính mình từ state cuối cùng trước death. Support có thể “viết” một bản thể mạnh hơn bằng buff đã tác động trước death; enemy có thể “viết” bản thể yếu hơn bằng thay đổi chỉ số đã vượt qua miễn nhiễm/Authority. Max HP và các stat snapshot trở thành nền đời sau, Current HP được tính lại theo 30% / 45% / 60%, còn object Buff/Debuff/Mark và duration cũ không đi theo. **Sau cả ba lần revive, đối thủ không thể chọn hắn làm target; lần thứ ba còn xóa hắn khỏi tầm nhìn đối thủ.** Vùng AoE đã xác định vẫn có thể chạm hắn. Core fantasy: **“Ta không hồi sinh. Ta chỉ nhớ lại hình dạng mình từng có.”**
 
 ## 15. Thoại
 1. “Ta không hồi sinh. Ta chỉ nhớ lại hình dạng mình từng có.”
