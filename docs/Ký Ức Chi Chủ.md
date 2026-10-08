@@ -19,6 +19,8 @@ Lãng Quên bắt đầu sau **mỗi lần phục sinh** và tồn tại qua **1
 
 **Presentation đối với phe địch:** lần 1/2 player và NPC vẫn thấy nhân vật; lần 3 nhân vật biến mất khỏi tầm mắt của cả player và nhân vật địch trong game. Trong cửa sổ Lãng Quên, vị trí, HP bar, Buff/Debuff/Mark và chỉ báo hiệu ứng của hắn không hiển thị cho player địch. Player/AI có thể nhận biết hắn đang tấn công nhưng vẫn không thể chọn hắn làm target. Visibility không quyết định kết quả gameplay.
 
+**UNRESOLVED / NOT BLOCKING — cách trình bày lần 1/2:** “vẫn thấy bản thể” và “ẩn thông tin vị trí/chỉ báo” đều là yêu cầu đã chốt; raw chưa chỉ định cách hiển thị hình ảnh bản thể mà không hiển thị tọa độ của hắn. Chưa chọn một cách render cụ thể cho hai lần này. Không tự mở chỉ báo vị trí thật hoặc ẩn toàn bộ bản thể như lần 3. Boundary UI này không làm thay đổi Target Selection, occupancy hoặc Area Resolution.
+
 **Hiệu ứng đang có vẫn tác động bình thường.** Buff/Debuff/Mark/hiệu ứng và các chỉ số của hắn chỉ bị ẩn khỏi đối thủ, không thể dùng để chọn hắn làm target; Lãng Quên không tạm ngừng tác dụng, không xóa object hoặc chỉ số snapshot. Đây là nghĩa đã chốt của câu raw cũ “mất tác dụng”.
 
 **Target Selection ≠ Area Resolution:** Lãng Quên loại hắn khỏi danh sách mục tiêu được chọn nhưng không xóa vị trí chiến đấu. AoE đã xác định vùng tác động vẫn có thể chạm hắn nếu hắn nằm trong vùng; sát thương và hiệu ứng sau đó còn phải qua các admission/miễn nhiễm riêng, bao gồm Thần Tính. Lãng Quên không tự cấp Damage Immunity.
@@ -86,7 +88,7 @@ Các điểm đã chốt không còn là câu hỏi: chờ revive theo ô chết
 
 Các diễn giải đã được designer chốt: hiệu ứng trong Lãng Quên chỉ ẩn khỏi đối thủ, vẫn có tác dụng; Thần Tính chặn cả buff đồng minh và hiệu ứng ngoài có lợi/hại/trung tính; Ultimate cộng 200% ATK + 200% WIL. Không còn câu hỏi trên ba điểm này.
 
-Các boundary chưa cung cấp dữ liệu thực thi: checkpoint Slot Clock tương ứng trong từng Mode, trình bày UI cho phe đồng minh, cấp Authority riêng của Skill 3/Ultimate và profile sát thương của hai thành phần Ultimate. Không tự cấp Authority từ Rank/Class. Chúng không chặn việc đồng bộ mô tả kit; tài liệu này không khẳng định đã hoàn tất một normalization mới của toàn bộ 00–08.
+Các boundary chưa cung cấp dữ liệu thực thi: checkpoint Slot Clock tương ứng trong từng Mode, cách trình bày bản thể còn nhìn thấy nhưng ẩn thông tin vị trí ở revive 1/2 (§3), trình bày UI cho phe đồng minh, cấp Authority riêng của Skill 3/Ultimate và profile sát thương của hai thành phần Ultimate. Không tự cấp Authority từ Rank/Class. Chúng không chặn việc đồng bộ mô tả kit; tài liệu này không khẳng định đã hoàn tất một normalization mới của toàn bộ 00–08.
 
 ## 14. Identity thiết kế
 Hoá Thân Ký Ức Chi Chủ nhớ lại chính mình từ state cuối cùng trước death. Support có thể “viết” một bản thể mạnh hơn bằng buff đã tác động trước death; enemy có thể “viết” bản thể yếu hơn bằng thay đổi chỉ số đã vượt qua miễn nhiễm/Authority. Max HP và các stat snapshot trở thành nền đời sau, Current HP được tính lại theo 30% / 45% / 60%, còn object Buff/Debuff/Mark và duration cũ không đi theo. **Sau cả ba lần revive, đối thủ không thể chọn hắn làm target; lần thứ ba còn xóa hắn khỏi tầm nhìn đối thủ.** Vùng AoE đã xác định vẫn có thể chạm hắn. Core fantasy: **“Ta không hồi sinh. Ta chỉ nhớ lại hình dạng mình từng có.”**
