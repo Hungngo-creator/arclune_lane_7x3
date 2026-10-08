@@ -1,6 +1,6 @@
 # ARCLUNE — TERMINOLOGY vNext
 ## Canonical Combat, Runtime & System Terminology
-**Version:** 2026-10-07-B.2
+**Version:** 2026-10-08-B.3
 **Stage:** Chặng B — Terminology Reconstruction  
 **Source basis:** `terminology.md` + `00_CANONICAL_RECOVERY_AUDIT.md` + các correction hiện hành của user được Audit ghi nhận.  
 **Scope:** định nghĩa nghĩa canonical của khái niệm. File này **không** phải Tag Registry, Primitive Registry, Ability Schema, Contract hay Kernel implementation.
@@ -10,6 +10,8 @@
 ---
 
 **Revision B.2:** distinguishes an admitted postmortem Slot checkpoint from Actor Natural opportunities and a chassis-replacement materialization cause from ordinary Revive/deployment. Structural presence evidence and cause-specific Effect activation remain separate. No Tag or Primitive is introduced.
+
+**Revision B.3:** reconciles Authority terminology with locked AUT-001–005; removes the stale unresolved same-tier claim without adding a term or runtime law.
 
 # 0. MỤC ĐÍCH VÀ QUY TẮC ĐỌC
 
@@ -3030,7 +3032,7 @@ Special post-confirmed-death body materialization with explicit retention/initia
 **ID:** `AUTHORITY`  
 **Status:** CANONICAL CORE
 
-Cấp precedence/force của Ability/Effect/Rule trong conflict resolution.
+Quyền của exact Ability/Effect/rule clause trong direct semantic conflict resolution theo AUT-001–005; không phải power level toàn Character hay Action/Event priority.
 
 ---
 
@@ -3042,6 +3044,8 @@ Cấp precedence/force của Ability/Effect/Rule trong conflict resolution.
 Current hierarchy:
 
 `Normal Effect < Pháp Tắc < Quy Tắc < Axiom`
+
+Authority Tier là structured Authority field, không phải Functional Tag. Rank, rarity/Prime, Class, Element, lore/godhood và Axiom identity không tự cấp tier cho một clause.
 
 ---
 
@@ -3092,12 +3096,9 @@ Không thay thế `authorityTier`.
 **ID:** `AUTHORITY_CONFLICT`  
 **Status:** CANONICAL CORE
 
-Tình huống hai hay nhiều rule/effect tranh quyền mutate/deny/override cùng semantic state.
+Tình huống hai hay nhiều Authority-bearing clauses cùng applicable và trực tiếp đưa ra claims không tương thích trên cùng semantic domain với subject/target/scope giao nhau. Coexistence hoặc shared resource tự nó chưa chứng minh conflict.
 
-Higher tier là một yếu tố chính.
-
-Exact same-tier resolver:
-**UNRESOLVED CONTRACT**.
+Exact resolution thuộc locked `AUT-002–004`: different tier → higher tier; same special tier → declared Adjudication Owners' Effective Rank → Cultivation → Character Stars → Awaken Count → Adjudication CP; exact total tie → `NO_OVERRIDE`. Ordinary NORMAL interactions dùng ordinary Contracts. Terminology không định nghĩa resolver thứ hai.
 
 ---
 
@@ -4439,7 +4440,7 @@ Các cặp/nhóm sau **không được collapse**:
 
 # 29. UNRESOLVED REGISTER
 
-Các điểm dưới đây **cố ý chưa chốt** trong Terminology vNext.
+Historical Terminology inventory: mục được đánh dấu **RESOLVED** dẫn tới current Contract ownership; không coi nó là open gap. Không tự chốt các mục còn unresolved.
 
 ## 29.1 Death / Life
 1. Global default Revive có tăng `lifeSerial` không?
@@ -4479,7 +4480,7 @@ Các điểm dưới đây **cố ý chưa chốt** trong Terminology vNext.
 27. DEATH_TRIGGER có cần Functional Tag không?
 
 ## 29.6 Authority
-28. Same-tier Authority resolver.
+28. Same-tier Authority resolver — **RESOLVED**, AUT-004; không còn là unresolved gap. Các mục 29–32 giữ scope riêng, không mở lại comparator đã khóa.
 29. Specificity vs higher Authority.
 30. Explicit Exception vs same-tier Axiom.
 31. Dynamic Authority sampling timing.

@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-07-F.20
+**Version:** 2026-10-08-F.21
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -38,6 +38,8 @@
 **Revision F.19:** extends existing ACT/CLK, TRG-015, SNP-002, CST-009/016, HEL-001, POS-005/008 and REV-004/006 with the bounded E.17 profiles. ACT-050 distinguishes terminal Leader death from its own expressly admitted pending return; another participant's entitlement protects only roster extinction. RES-008 is the generic common-recipient simultaneous allocation law with immutable component receipts. Ordinary Cost/Revive/TRUE and prior proportional profiles remain intact; no new Contract ID, allocator or global priority.
 
 **Revision F.20:** extends REC-006 with E.18's opt-in eligible-claim Rank-first route law. REC-007 uses eligible higher-rank routing rather than presence as a priority proxy; REC-002 explicitly requires a real bound Chân Ngã for the ordinary Character death count. Host-only binding, empty-body death and existing controller/result composition add no Contract ID or Authority tier.
+
+**Revision F.21:** hardens existing AUT-002–005 wording for direct conflict, clause scope, lexicographic comparison, NORMAL/priority boundaries and Contract-owned NO_OVERRIDE consequences. REC-006 explicitly requires semantic-conflict proof before route AUT dispatch. No Contract ID, snapshot law or subsystem is added.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -4695,7 +4697,7 @@ Close route work, mandatory lifecycle and declared required local settlements be
 
 04§30.4 extends the same complete-entry settlement with one shared arbitration profile and complete participating-route domain. For each entrant, first read **current actual eligibility** of every declared claim, including legal route/host and required pool feasibility. Alive/present ownership alone supplies no claim. Read the eligible **claimant's Effective Rank**, not the host or entrant definition Rank; highest eligible Rank has first claim. Higher ineligible routes do not block lower eligible routes.
 
-Only incompatible claims at the highest eligible Rank enter existing Authority Conflict Adjudication, using actual clauses/owners and AUT-002–004. Rank-first is route contention policy, independent from clause Authority tier. Exact NO_OVERRIDE creates no winner in that intersection. No RNG, Entity/Slot/Event/list order, implicit lower-Rank retry or synthetic Authority is a substitute. Separately legal routes/ordinary exit follow their own law; 3+ claims preserve every actual conflict edge.
+Only claims at the highest eligible Rank proven to be directly incompatible Authority-bearing claims over the same relevant semantic domain and applicable entrant/scope enter existing Authority Conflict Adjudication, using actual clauses/owners and AUT-002–004. Resource/capacity contention alone is insufficient; absent this proof, the route must supply an explicit compatible law or reject affected executable ambiguity. Rank-first is route contention policy, independent from clause Authority tier. Exact NO_OVERRIDE creates no winner in that intersection. No RNG, Entity/Slot/Event/list order, implicit lower-Rank retry or synthetic Authority is a substitute. Separately legal routes/ordinary exit follow their own law; 3+ claims preserve every actual conflict edge.
 
 An explicitly declared identical semantic route family's host multiplicity coalesces at that Rank before semantic adjudication. Once the family legitimately wins, seeded selection among its legal hosts is host selection, not an Authority tie-break. Distinct semantics/owner policies cannot use family-label equality to bypass a conflict. Claimant/host reservation protects exclusive entrant binding and one occupant per host.
 
@@ -4947,9 +4949,13 @@ NORMAL
 ## AUT-002 — Authority Only on Direct Conflict
 **Status:** `LOCKED CHARACTER-SUPPORTED DEFAULT`
 
-Do not invoke Authority merely because an Ability has a high tier.
+Authority belongs to the exact Ability/Effect/rule clause declaring it. Do not infer it from Rank/Prime, rarity, Class, Element, lore/godhood or Axiom identity, or extend one clause's win to its Character's other clauses.
 
-Authority resolves when two semantic rules directly conflict.
+Authority resolves only when two or more Authority-bearing clauses simultaneously apply and directly make incompatible claims in the same relevant semantic/conflict domain, with overlapping applicable subject/target/scope. Coexistence, concurrent Characters/Actions, different semantic domains or an incoming Authority field alone do not trigger adjudication.
+
+Ordinary NORMAL interactions use their existing Damage/Shield/Heal/State/Target/Cost/lifecycle Contracts. NORMAL vs NORMAL does not automatically invoke progression; same-tier progression is bounded to AUT-004's special tiers. A real special-tier conflict with a NORMAL clause still follows AUT-003. Existing explicit exceptions/Axiom relations retain their declared scope.
+
+Authority selects the governing conflicting semantic, never Action/Reaction/target/batch/SSI/Damage-packet order or a generic priority number. Technical Event/list processing order supplies no Authority precedence.
 
 Ký Ức Skill 1 example:
 - select target;
@@ -4989,12 +4995,14 @@ If Authority Tier differs:
 Canonical comparison order for same-tier conflict:
 
 ```text
-Rank
+Effective Rank
 → Cultivation / Tu vi
 → Character Stars
 → Awaken Count
 → Adjudication CP
 ```
+
+Compare the declared Adjudication Owners' canonical profiles **lexicographically**: stop at the first difference; the higher value wins. Never sum/weight fields or let Cultivation/Stars/Awaken/CP override an earlier difference.
 
 Rank order uses the project Rank order:
 `Prime > UR > SSR > SR > R > N`.
@@ -5061,12 +5069,14 @@ A result on edge A↔B does not affect C unless a direct conflict edge exists wi
 
 ### Same Character
 Contradictory rules belonging to the same Character do not adjudicate Rank against themselves.
-Resolve through explicit exception, internal kit ordering, or Schema validation.
+Compose only through a declared compatible local policy/exception/ordering; impossible contradictions without it are rejected or REQUIRED_EXPLICIT by Schema/normalization. Same-owner/Character-definition authoring cannot be repaired by comparing progression against itself.
 
 ### Exact total tie
 If Rank, Tu vi, Stars, Awaken and Adjudication CP are exactly equal:
 
 `NO_OVERRIDE`
+
+The Authority resolver returns this explicit no-winner result. The owning conflict Contract determines its observable consequence; the resolver must not invent a winner or fallback. The following existing AUT-004 defaults govern these particular interactions:
 
 For existing protection/status quo against incoming mutation:
 > incoming rule cannot override the existing protection.
@@ -5074,12 +5084,14 @@ For existing protection/status quo against incoming mutation:
 For simultaneous opposite mutations with no prior state:
 > the directly conflicting mutation intersection does not commit.
 
-Do not use iid, slot, RNG, cast order or animation order as arbitrary tie-breakers.
+Do not use Entity ID/iid, Slot, Side, Action/Event/registration/list/animation order, RNG/seed or attacker/defender role as arbitrary tie-breakers. Other interactions require their actual conflict Contract; these defaults are not a general attacker/defender preference.
 
 ## AUT-005 — Axiom Identity vs Authority
 **Status:** `LOCKED`
 
 Being related to an Axiom does not automatically assign AXIOM tier to every Ability.
+
+Only exact gameplay clauses explicitly declaring AXIOM receive that tier, including any explicitly governed child inheritance policy; identity is not a Functional Tag or a blanket Authority grant.
 
 ---
 

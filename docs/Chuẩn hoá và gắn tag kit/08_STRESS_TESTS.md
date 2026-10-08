@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-07-I.20
+**Version:** 2026-10-08-I.21
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.2+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.18+, `05_CONTRACTS.md` F.20+, `06_KERNEL_RUNTIME.md` G.19+, `07_MODE_PROFILES.md` H.2+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.3+, `02_TAG_vNext.md`, `03_PRIMITIVE.md` D.1+, `04_ABILITY_SCHEMA-1.md` E.19+, `05_CONTRACTS.md` F.21+, `06_KERNEL_RUNTIME.md` G.19+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -41,6 +41,8 @@
 **Revision I.19:** adds only M-147/M-148 for exact accepted-child ActionRef/provenance conversion composed with shared-recipient Damage, one outcome Heal/Overheal contribution, and frozen waiting-pool Axiom force-entry with independent local failure/coherent observers. Existing E.17/F.19/G.18 machinery suffices; no new semantic field family, Tag, Primitive, Contract ID or runtime owner. Prior case bodies/IDs remain unchanged; coverage counts reflect the actual suite. Declarative Architecture Phase obligations only.
 
 **Revision I.20:** adds M-149–M-154 for Rank-first eligible route claims/same-Rank Authority, cross-family complete-entry host reservations, host-only binding/empty death/Deck retention, exact attached-outcome controller and binding-time cast pinning/Entity continuation. M-130 replaces only the superseded presence-only blocker with actual route eligibility. Existing target, mixed Damage/Rage, Shield, Heal, clock and child tests remain reusable. Declarative Architecture Phase obligations, not executable results.
+
+**Revision I.21:** reuses F-001–F-016 with explicit comparator/profile/independent-owner and negative/metamorphic fixtures; adds only F-017/F-018 for NORMAL-vs-special Rank separation and Authority-vs-Action priority. Reuses N-007's simultaneous NO_OVERRIDE and extends M-151's single-empty-host entrant lottery control. No executable test result or new Authority subsystem.
 
 # 0. WHAT THIS FILE IS
 
@@ -838,6 +840,10 @@ The only proposed solution is bespoke Character runtime code.
 
 # 10. TEST GROUP F — AUTHORITY ADJUDICATION
 
+Foundation coverage: no direct conflict → F-012; different tier → F-001/F-017; same-tier Rank/Cultivation/Stars/Awaken/CP → F-002–F-006; exact tie → F-007 + N-007; independent clause pairs → F-011; Rank ≠ Authority → F-017 + K-007; same-Character rejection → F-013; temporary combat mutation/profile revision → F-015/F-016; Authority ≠ Action/Event priority → F-018. F-008–F-010/F-014 retain scope, persistent/instant and owner/Attribution guards.
+
+Shared fixture law: profiles belong to declared Adjudication Owners and use 06 §§72/75/128's existing snapshot/revision law. Every positive comparator case proves simultaneous direct incompatibility on the same semantic domain and overlapping subject/target/scope. Unless overridden below, special-tier comparison fixtures use QUY_TAC, Effective Rank SSR, Cultivation70, Stars5, Awaken0 and snapshot CP100; each changed comparison field is explicitly declared. Technical-order permutations preserve applicability, exact claims, owner bindings and profile revisions. These are declarative MUST_PASS/MUST_REJECT obligations, not executed game tests.
+
 ---
 
 ## F-001 — Higher Tier Wins Without Progression Comparison
@@ -845,10 +851,10 @@ The only proposed solution is bespoke Character runtime code.
 **ID:** `F-001`  
 **Status:** `MUST_PASS`  
 **Purpose:** basic Authority hierarchy.  
-**Initial State:** A Quy Tắc no-Heal; B Pháp Tắc self-Heal.  
+**Initial State:** A SSR Quy Tắc no-Heal, Cultivation70/Stars4/Awaken0/snapshot CP100; B Prime Pháp Tắc explicit self-Heal permission against that denial, Cultivation72/Stars5/Awaken1/snapshot CP1000.\
 **Input:** B attempts self-Heal.  
 **Expected Resolution:** A's conflicting rule wins by tier; do not compare Rank/Tu vi/Stars/Awaken/CP.  
-**Forbidden Outcomes:** B wins because higher CP.  
+**Forbidden Outcomes:** B wins by Rank/progression/CP; invokes same-tier comparator or RNG despite different tiers. Vary all progression fields and input order with tiers/conflict fixed: A still governs.\
 **Layers Under Test:** Authority Contract.
 
 ---
@@ -858,7 +864,7 @@ The only proposed solution is bespoke Character runtime code.
 **ID:** `F-002`  
 **Status:** `MUST_PASS`  
 **Purpose:** legacy comparator first criterion.  
-**Initial State:** both Quy Tắc; A Prime, B UR; lower progression otherwise irrelevant.  
+**Initial State:** both Quy Tắc; owners A Effective Rank Prime, B UR. A Cultivation70/Stars4/Awaken0/CP100; B Cultivation72/Stars5/Awaken1/CP1000.\
 **Input:** direct semantic conflict.  
 **Expected Resolution:** A wins at Rank comparison; stop.  
 **Forbidden Outcomes:** continue to CP and reverse result.  
@@ -871,7 +877,7 @@ The only proposed solution is bespoke Character runtime code.
 **ID:** `F-003`  
 **Status:** `MUST_PASS`  
 **Purpose:** comparator order.  
-**Initial State:** both UR Quy Tắc; A cultivation 70, B 72; A CP higher.  
+**Initial State:** both UR Quy Tắc; A Cultivation70/Stars5/Awaken1/CP1000; B Cultivation72/Stars4/Awaken0/CP100.\
 **Input:** direct conflict.  
 **Expected Resolution:** B wins at Tu vi; CP never considered.  
 **Forbidden Outcomes:** A wins on CP.  
@@ -884,7 +890,7 @@ The only proposed solution is bespoke Character runtime code.
 **ID:** `F-004`  
 **Status:** `MUST_PASS`  
 **Purpose:** progression priority.  
-**Initial State:** same Rank/Tu vi; A 5★ Awaken0 CP low, B 4★ CP high.  
+**Initial State:** both SSR Quy Tắc, same Cultivation70; A Stars5/Awaken0/CP100, B Stars4/Awaken0/CP1000.\
 **Input:** same-tier conflict.  
 **Expected Resolution:** A wins at Stars.  
 **Forbidden Outcomes:** B wins because CP.  
@@ -897,7 +903,7 @@ The only proposed solution is bespoke Character runtime code.
 **ID:** `F-005`  
 **Status:** `MUST_PASS`  
 **Purpose:** progression priority.  
-**Initial State:** same Rank/Tu vi/5★; A Awaken1 CP lower, B Awaken0 CP higher.  
+**Initial State:** both UR Quy Tắc, same Cultivation70/Stars5; A Awaken1/CP100, B Awaken0/CP1000.\
 **Input:** conflict.  
 **Expected Resolution:** A wins at Awaken.  
 **Forbidden Outcomes:** CP reverses result.  
@@ -910,7 +916,7 @@ The only proposed solution is bespoke Character runtime code.
 **ID:** `F-006`  
 **Status:** `MUST_PASS`  
 **Purpose:** build differentiation only after progression tie.  
-**Initial State:** all Rank/Tu vi/Stars/Awaken equal; A CP 500001, B CP 500000.  
+**Initial State:** both SSR Quy Tắc, equal Cultivation70/Stars5/Awaken0; canonical snapshot Adjudication CP A500001, B500000.\
 **Input:** same-tier conflict.  
 **Expected Resolution:** A wins.  
 **Forbidden Outcomes:** random or slot-order tie-break.  
@@ -926,7 +932,8 @@ The only proposed solution is bespoke Character runtime code.
 **Initial State:** every comparison field equal. A incoming “kill”; B existing “cannot die”; both same Quy Tắc.  
 **Input:** A lethal rule attempts override.  
 **Expected Resolution:** `NO_OVERRIDE`; existing protection remains; incoming conflict fails.  
-**Forbidden Outcomes:** actor/slot/RNG/cast-order decides.  
+**Metamorphic obligation:** preserve claims/profile/applicability but bijectively rename technical Entity/iid refs, relocate Slots, relabel Sides with scopes preserved, permute Action/Event/registration/list/animation processing and vary RNG seed. The resolver always returns `NO_OVERRIDE`; AUT-004 owns the protection outcome. Reuse N-007 for simultaneous opposite mutations without a prior protection, applying the same permutations.\
+**Forbidden Outcomes:** technical identity/order, attacker/defender role or RNG chooses a winner; resolver invents a fallback; tie is silently reported as A_WINS/B_WINS.\
 **Layers Under Test:** Authority Contract.
 
 ---
@@ -975,9 +982,9 @@ The only proposed solution is bespoke Character runtime code.
 **ID:** `F-011`  
 **Status:** `MUST_PASS`  
 **Purpose:** pairwise independence.  
-**Initial State:** A Skill1 Quy Tắc conflicts with B Skill2 Quy Tắc; A wins. A Skill3 Pháp Tắc conflicts with B Skill1 Pháp Tắc; B wins.  
-**Input:** both interactions occur.  
-**Expected Resolution:** both pair-specific results coexist.  
+**Initial State:** A Skill1 Quy Tắc denies Heal to T; B Skill2 Quy Tắc permits that Heal. Owners default to A/B: both SSR/Cultivation70/Stars5/Awaken0, snapshot CP A200/B100 → A wins. Independently A Skill3 has an inherited Pháp Tắc movement-denial clause explicitly declaring valid Character C as Adjudication Owner (same earlier fields, CP50); B Skill1 Pháp Tắc permits that movement with owner B/CP100 → B wins. The two domains/scopes and exact Rule instances are declared; C ownership is an explicit supported inheritance policy, not inferred Damage Attribution.\
+**Input:** both interactions occur; repeat with their processing order reversed and reuse the first cached result before resolving the second.\
+**Expected Resolution:** both pair-specific results coexist; exact Rule identities/owners/profile revisions/scope distinguish cache entries. A's unrelated NORMAL Basic gets no special tier or priority from its winning clause.\
 **Forbidden Outcomes:** “A beats B” global character result.  
 **Layers Under Test:** Conflict graph/cache.
 
@@ -988,10 +995,10 @@ The only proposed solution is bespoke Character runtime code.
 **ID:** `F-012`  
 **Status:** `MUST_PASS`  
 **Purpose:** avoid waste and overreach.  
-**Initial State:** A and B both have Quy Tắc effects but they affect unrelated semantics.  
-**Input:** both active.  
-**Expected Resolution:** no comparison.  
-**Forbidden Outcomes:** precompute one “stronger rules character”.  
+**Initial State:** A Quy Tắc Heal denial and B Quy Tắc Position protection coexist, both currently applicable but on different semantic domains. Controls: same-domain clauses with disjoint subjects/scopes; opposing claims with one inactive; compatible same-domain claims.\
+**Input:** evaluate each fixture at its declared applicability checkpoint.\
+**Expected Resolution:** no adjudication/comparator/cache conflict edge in any control. Ordinary NORMAL Damage/Shield and Heal/State interaction controls compose through their existing Contracts without progression adjudication. Reordering technical enumeration preserves those outcomes.\
+**Forbidden Outcomes:** adjudicate merely from high tier, coexistence, same Character action window or incoming Authority field; precompute one “stronger rules character”; compare NORMAL owners for mundane interaction.\
 **Layers Under Test:** Conflict detector.
 
 ---
@@ -1003,7 +1010,7 @@ The only proposed solution is bespoke Character runtime code.
 **Purpose:** do not compare Character against itself.  
 **Initial State:** same Character has two same-tier internal rules with contradictory outcome and no explicit ordering/exception.  
 **Input:** normalized kit.  
-**Expected Resolution:** validation requires internal priority/exception or better semantic spec.  
+**Expected Resolution:** reject executable normalization / REQUIRED_EXPLICIT until a compatible explicit local composition/exception/ordering is supplied. A control sharing the same Character definition/owner cannot evade this through different Skill IDs or technical registration order.\
 **Forbidden Outcomes:** run Rank/Tu vi comparison using same owner; rely on effect list order accidentally.  
 **Layers Under Test:** Schema/Contract validation.
 
@@ -1028,7 +1035,7 @@ The only proposed solution is bespoke Character runtime code.
 **Status:** `MUST_PASS`  
 **Purpose:** revision-driven cache.  
 **Initial State:** A vs B result cached.  
-**Input:** legitimate mechanic changes B's adjudication Tu vi/profile.  
+**Input:** an explicitly valid mechanic changes B's canonical adjudication Cultivation/profile under existing revision law, with clause scope/owner otherwise unchanged; control separately changes the declared Adjudication Owner/profile or Rule semantic/scope revision.\
 **Expected Resolution:** revision changes; relevant cache invalidates; next conflict recomputes.  
 **Forbidden Outcomes:** stale result persists forever.  
 **Layers Under Test:** Authority cache.
@@ -1040,11 +1047,37 @@ The only proposed solution is bespoke Character runtime code.
 **ID:** `F-016`  
 **Status:** `MUST_PASS`  
 **Purpose:** ordinary combat stats should not make comparator unstable.  
-**Initial State:** cached conflict result; B receives +50% ATK Buff.  
+**Initial State:** both SSR Quy Tắc owners tie through Awaken; snapshot CP A200/B100 gives cached A_WINS. B receives +50% ATK Buff; live displayed/CP-like combat value now exceeds200. Controls apply an HP/RES Debuff or temporary equipment-like combat Effect that does not explicitly mutate the canonical Adjudication Profile.\
 **Input:** same conflict later.  
-**Expected Resolution:** cache remains valid because adjudication profile did not change.  
+**Expected Resolution:** existing snapshot/profile and adjudication revisions remain unchanged; cache remains valid and A_WINS persists. A fresh exact-clause conflict using those same canonical profiles also returns A_WINS. Only F-015's legitimate adjudication-input mutation follows revision invalidation.\
 **Forbidden Outcomes:** derive CP dynamically from buffed combat stats and flip result.  
 **Layers Under Test:** CP snapshot.
+
+---
+
+## F-017 — Prime NORMAL Does Not Outrank SSR QUY_TAC
+
+**ID:** `F-017`\
+**Status:** `MUST_PASS`\
+**Purpose:** prove Rank and Axiom identity cannot create clause Authority.\
+**Initial State:** A Prime has an explicitly NORMAL self-Heal permission claim; B SSR has an applicable QUY_TAC denial over that exact Heal/target. A Cultivation72/Stars5/Awaken1/snapshot CP1000 versus B Cultivation70/Stars5/Awaken0/CP100. A may carry Axiom identity metadata, but the NORMAL clause declares no special tier.\
+**Input:** the directly conflicting Heal attempt.\
+**Expected Resolution:** QUY_TAC governs under AUT-003; no progression comparison. Vary Rank/lore/identity and technical order while clause tiers/claims remain fixed: result is unchanged. K-007 separately rejects normalization that auto-assigns Prime→AXIOM.\
+**Forbidden Outcomes:** Prime/identity grants A a tier, CP/Rank wins against QUY_TAC, or ordinary Rank is used before tier.\
+**Layers Under Test:** AUTHORITY_TIER/RANK/AXIOM_IDENTITY, AUT-001–005, Effect Admission.
+
+---
+
+## F-018 — Authority Result Is Not Action or Event Priority
+
+**ID:** `F-018`\
+**Status:** `MUST_PASS`\
+**Purpose:** separate semantic governance from scheduling/technical iteration.\
+**Initial State:** already-active directly conflicting QUY_TAC Heal claims have declared owners A/B, equal earlier fields and snapshot CP100/200. The shared applicable conflict view/profiles are fixed; the actual Mode/Action Contract independently supplies legal Action scheduling.\
+**Input:** resolve with A processed first, B processed first and permuted Event/list delivery. Control uses equal CP/profile for explicit NO_OVERRIDE. Independently vary legal declared Action ordering while preserving the simultaneous applicable claims.\
+**Expected Resolution:** B_WINS in every non-tie run; NO_OVERRIDE in every tie control. The resolver neither reorders Actions/Reactions/targets/batches/SSI/Damage packets nor exports a generic priority number; scheduling follows its owning Contract. A higher-tier non-conflicting sibling clause cannot alter either result or scheduling.\
+**Forbidden Outcomes:** first/last processed claimant wins; higher Authority schedules its Character first; Action order breaks a tie; Event sequence becomes semantic precedence.\
+**Layers Under Test:** AUT-002–004, Authority Resolver, Action/Trigger/SSI ownership.
 
 ---
 
@@ -4445,6 +4478,7 @@ Only after entry commit and required world bookkeeping may ordinary observers/do
 **Status:** `MUST_PASS / MUST_REJECT`
 **Fixture:** A/B/C enter Reincarnation together after a threshold change without a new death. One UR route has capacity1; two empty SSR hosts share an identical host-only route family, no Side restriction. Use one arbitration checkpoint/domain. All pools/hosts otherwise legal. Pause before claim selection, after host reservation, after binding and between entries; permute publication/family/host enumeration.
 **Expected Resolution:** one retained seeded entrant permutation spans both families. First entrant sees and consumes the eligible UR route; subsequent entries see that capacity exhausted and may select the SSR family. Seeded host selection occurs only after its family legitimately wins. Host reservations commit at most one entrant per host/one host per entrant; later entries see earlier required settlement terminal. Resume uses original order/adjudication/draw/reservation/terminal evidence. Invalid selected host after reservation closes that entry locally and releases uncommitted reservation, with no substitute/redraw/arbitration retry/limbo; another entrant may later use a legal remaining host. Prior committed bindings remain. Partial membership/per-family independent orders or an ungoverned shared-capacity conflict reject before affected binding. Event order cannot become entrant order.
+**Single-host lottery control:** A/B/C are all eligible entrants at the same complete checkpoint, one alive/present empty SSR host, no competing route/kit intervention. Existing seeded entrant permutation selects exactly one entrant to bind; subsequent entries see occupied capacity and continue their ordinary legal outcome. This lottery selects entrants, not an Authority winner; invoke no AUT merely for shared capacity. With fixed seed/logical identities, input/Event/Slot permutations and replay preserve the chosen entrant and one binding; changed seeds may select a different eligible entrant. Occupied/absent/dead host admits none, and an explicit other-kit intervention follows its actual route/conflict law rather than an unconditional lottery.
 **Layers Under Test:** 04§30.3–4, REC-006, entry results, route/Effect DAG, reservation/RNG/Transaction.
 
 ## M-152 — Host-only Binding Retains Body and Deck Identity; Empty Death Has No Soul
@@ -4924,6 +4958,9 @@ Future automated test harness should generate many states and assert:
 - exact total tie never invokes RNG
 - conflict suppression never extends outside overlap scope
 - unrelated rules are never adjudicated
+- tier/profile results never become Action/Reaction/Event/SSI/packet priority
+- same-owner impossible contradiction requires explicit composition or rejection
+- ordinary combat CP-like mutations never rewrite the canonical profile
 
 ## SSI
 - non-natural child actions do not advance Side pointer by default
@@ -5279,7 +5316,7 @@ Current suite defines:
 - 8 target/snapshot tests;
 - 17 damage/shield/heal/HP tests;
 - 12 death/revive/reincarnation tests;
-- 16 Authority tests;
+- 18 Authority tests;
 - 12 Pygmalion tests;
 - 4 Arena tests;
 - 7 Narrative/capability tests;
@@ -5292,7 +5329,7 @@ Current suite defines:
 
 Total named test cases:
 
-285 tests / probes / meta-tests (280 A–N cases plus 5 META cases)
+287 tests / probes / meta-tests (282 A–N cases plus 5 META cases)
 
 The count is not a design target.
 

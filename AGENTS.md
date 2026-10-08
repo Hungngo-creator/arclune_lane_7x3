@@ -850,20 +850,18 @@ Do not invent cleanup beyond declared categories/scopes.
 
 # 21. AUTHORITY
 
-Authority is semantic-conflict authority, not general power level.
+## AUTHORITY CONFLICT CHECK
 
-Do not infer Authority from:
+When gameplay clauses appear incompatible, inspect current `00` Authority navigation and `05` AUT-001–005:
 
-- Rank;
-- Class;
-- Element;
-- rarity;
-- lore status;
-- god/vampire/etc.
+1. Prove direct incompatible claims over the same semantic domain and overlapping subject/target/scope, simultaneously applicable.
+2. Inspect each exact clause's explicit Authority tier: NORMAL < PHÁP TẮC < QUY TẮC < AXIOM.
+3. Different tiers → higher tier governs the conflicting semantic; no progression comparison.
+4. Same special tier → AUT-004 compares declared Adjudication Owners: Effective Rank → Cultivation → Character Stars → Awaken Count → Adjudication CP; stop at first difference.
+5. Exact profile tie → NO_OVERRIDE; the owning Contract determines the observable outcome.
+6. No direct conflict → do not adjudicate. Ordinary NORMAL interactions retain their ordinary Contracts.
 
-Enter Authority adjudication only when actual Authority-bearing clauses directly conflict.
-
-Do not solve same-Character contradictory clauses by progression-ranking the Character against itself.
+Authority is clause-scoped, not a Functional Tag or Character-wide win. Never infer it from Rank/Prime, rarity, Class, Element, lore/godhood or Axiom identity. Never use Authority as Action/Reaction/Event/SSI/packet priority or repair a same-Character contradiction through progression comparison; require explicit local composition or reject.
 
 ---
 

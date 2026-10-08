@@ -1,10 +1,12 @@
 # ARCLUNE — PRIMITIVE REGISTRY
 ## Chặng D — Executable Building Blocks for Kernel Runtime
-**Version:** 2026-09-10-D  
+**Version:** 2026-10-08-D.1\
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext.md`, `02_TAG_vNext.md`, `00_CANONICAL_RECOVERY_AUDIT.md`  
 **Primary stress tests:** SSR Warrior True Damage/Overheal/Turn Boundary; Hoá Thân Ký Ức Chi Chủ; Luân Hồi Chi Chủ; Cố Sự Chi Thần; Pygmalion current rules.  
 **Scope:** executable operations and resolver operations. This file does **not** finalize Ability Schema, event ordering, SSI timing, same-tier Authority, or full Contract behavior.
+
+**Revision D.1:** updates existing Authority Resolver references to locked AUT ownership; no Primitive or resolver is added.
 
 ---
 
@@ -418,13 +420,13 @@ Owns:
 
 ## 6.5 Authority Resolver
 
-Applies Authority Contract:
+Applies current `05` AUT-001–007 through the existing `06` Authority Adjudication Engine (§§65–79):
 - Normal < Pháp Tắc < Quy Tắc < Axiom;
 - dynamic authority;
 - explicit exceptions;
-- same-tier rules once canonicalized.
+- locked same-special-tier adjudication under AUT-004, including explicit NO_OVERRIDE.
 
-Primitives call the resolver when an effect conflict requires it.
+Primitives call the resolver only for an actual Authority-bearing direct semantic conflict under AUT-002; an Authority field alone is insufficient. Resolver output governs that conflicting semantic, not Action/Event priority.
 
 ---
 
@@ -2653,7 +2655,7 @@ That is Chặng E.
 ---
 
 ## Contracts
-Still not canonical:
+Historical Stage D inventory; current `05` Contracts supersede this list where resolved:
 - SSI event ordering;
 - exact Turn Boundary timing;
 - reaction priority;
@@ -2663,7 +2665,7 @@ Still not canonical:
 - Cost reservation/refund;
 - Revive lifeSerial default;
 - Reincarnation waiting clock;
-- same-tier Authority;
+- same-tier Authority — resolved AUT-004;
 - Arena return fallback;
 - Narrative formula/delay.
 
