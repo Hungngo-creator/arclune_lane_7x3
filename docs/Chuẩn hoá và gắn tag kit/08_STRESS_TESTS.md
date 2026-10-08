@@ -1,6 +1,6 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-08-I.21
+**Version:** 2026-10-08-I.22
 **Status:** Working Canonical Validation Suite  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.2+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.18+, `05_CONTRACTS.md` F.20+, `06_KERNEL_RUNTIME.md` G.19+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
@@ -43,6 +43,8 @@
 **Revision I.20:** adds M-149–M-154 for Rank-first eligible route claims/same-Rank Authority, cross-family complete-entry host reservations, host-only binding/empty death/Deck retention, exact attached-outcome controller and binding-time cast pinning/Entity continuation. M-130 replaces only the superseded presence-only blocker with actual route eligibility. Existing target, mixed Damage/Rage, Shield, Heal, clock and child tests remain reusable. Declarative Architecture Phase obligations, not executable results.
 
 **Revision I.21:** adds M-155–M-164 for atomic multi-part life projection/retention, arm clocks, non-consuming SSI contact with locked snapshot/Heal/bonus/cleanup edges, prepaid deferred creation, action-captured additive Rage, exact Side-AE rescue, and real Basic→exact outcome→Leader Heal→free Skill1 under the existing root gate. All earlier case bodies/IDs remain unchanged; ten declarative Architecture Phase obligations, not executable test results.
+
+**Revision I.22:** adds only M-165–M-167 for received exact-Action receipt aggregation/strict thresholds, source-local MaxHP cleanup including HP_ZERO without confirmed death, and rejection of incomplete observable threshold/tick/resource profiles. Gideon R1 remains partly clarified; synthetic reconciliation fixtures do not approve its pending choices. Preserve all prior case bodies/IDs. Architecture Phase declarative obligations, not executable test results.
 
 # 0. WHAT THIS FILE IS
 
@@ -4555,6 +4557,36 @@ Zero-missing-HP after intervening lawful recovery gives E0: ordinary zero-delta/
 **Expected:** fail closed before affected partial mutation. No hidden body/source priority, per-part writable pool, invented initializer/callback/Primitive/Tag or unsupported Mode timer. Ordinary single-body, unopted health/Rage observer, Damage/Heal modifiers, independent materialization and existing consumed-wait fixtures remain admitted with their prior laws.
 **Layers:** 04 validation/Normalizer, ACT-016, ENT-023/024, RES-006, TRG-016, existing ownership/Mode/Transaction guards.
 
+## M-165 — Received Exact-Action Threshold, Receipt Granularity and One Gain
+
+**ID:** `M-165`
+**Status:** `MUST_PASS`
+**Purpose:** validate Gideon's locked whole-Action aggregation without choosing its unresolved mid-Action MaxHP reference or CurrentHP policy.
+**Fixture:** receiver MaxHP remains10,000 throughout each observed Action. One hostile Action A has committed ActualHP receipts1,700 and1,400 on this receiver; packet aggregate and component projections refer to the same receipts. A same-root child B contributes separate Damage. The mutation fixture explicitly chooses preserve-absolute/clamp reconciliation for this synthetic execution; this fixture is not approval of Gideon Q2.
+**Expected:** exact A projection sums3,100 once, excluding B, Shield absorption, overkill and non-Damage HP writes. At A's full-result checkpoint the strict>3,000 predicate qualifies once; existing P-031 requests1,300 from currentMaxHP10,000 and yields11,300. Neither two packets nor duplicate receipt projections create two gains. Control A actual3,000 does not qualify; distinct Actions actual1,600/1,500 are separately evaluated and cannot be pooled into3,100. Receipt/activation redelivery cannot duplicate the gain. A different explicitly declared child-outcome aggregate remains a distinct valid profile, never an alias for exact A membership.
+**Forbidden:** per-hit activation, grouping by root/credited source, nominal Damage threshold, double-crediting packet/component receipts, hidden CurrentHP adjustment or using this constant-MaxHP fixture to choose a global denominator default.
+**Layers:** DMG-010/011/012/020/021, TRG-013, P-043, P-031/032, Action/Effect provenance and Result/Transaction.
+
+## M-166 — Source-local MaxHP Reset, HP_ZERO Cause and Replay
+
+**ID:** `M-166`
+**Status:** `MUST_PASS`
+**Purpose:** preserve the distinction between earned-capacity removal, unrelated contributions and lifecycle causes.
+**Fixture:** base capacity10,000; an independent BATTLE_SCOPED flat contribution1,000; this passive's earned contribution1,430; displayed MaxHP12,430. The synthetic cleanup profile explicitly preserves absolute CurrentHP/clamps on capacity reduction. All handles have separate source/lifetime identity.
+**Inputs:** separately exercise an authored owner Field leave, Return-to-Deck, Reincarnation entry and HP_ZERO reset. In the HP_ZERO control, Death Prevention later avoids DEATH_CONFIRMED. Also replay redundant reset causes and rebuild contribution indexes/redeploy after removal.
+**Expected:** each applicable reset removes only earned1,430; with the external contribution retained, capacity resolves11,000. HP_ZERO remains a reset cause despite subsequent prevention; no false death/Reincarnation Event is emitted. Cleanup follows the declared cause, with P-031/032 reconciliation under the same authoritative health/contribution transaction; CurrentHP0 stays0 in the zero control. Duplicate reset/redelivery does not subtract1,430 twice, reapply the earned contribution or remove the external1,000. Historical immutable Damage receipts may remain for trace without recreating a retired contribution. A late reward after within-Action recovery still requires its separate explicit eligibility profile; this test supplies no such default.
+**Forbidden:** writing all MaxHP to BaseStat, treating source cleanup as Cleanse/Heal/Damage/natural expiry, equating HP_ZERO with DEATH_CONFIRMED or applying an old mutable handle to a replacement generation.
+**Layers:** STA-001/002, MaxHpMutationSpec/lifecycle retention, existing State/contribution/Lifecycle/Field Presence/Transaction and replay identity.
+
+## M-167 — Incomplete Threshold, Early-expiry Heal and Post-action Budget Profiles
+
+**ID:** `M-167`
+**Status:** `MUST_REJECT`
+**Purpose:** keep pending internal gameplay visible rather than manufacture a fully normalized Gideon from plausible defaults.
+**Inputs:** a MaxHP-mutating Action with omitted threshold reference; MaxHP mutation with omitted reconciliation; Skill1 two-Natural duration with unresolved start/expiry qualification; a Taunt/HoT that expires at the second owner start but omits observable tick-versus-expiry/CC policy; repeated activation with no effect identity/refresh law; forced-child CD behavior or foreign Taunt target categories unspecified; observable competition between post-completion+5 AE and a15-AE activation with no dependency. With SideAE10 before completion, these two funding orders disagree.
+**Expected:** reject only dependent executable content until an explicit profile supplies the missing meaning. Preserve rawkit/locked clauses and independently normalized subgraphs. Do not label proposed options MUST_PASS, convert owner clocks to global boundaries, infer performed Action from a CC-lost grant or let callback/list/Event order select the resource/Heal outcome. ACT-033 can close a finite post-action obligation but does not grant it priority over every class-regeneration hook. Supported ordinary duration defaults retain CLK-003/004; rejection concerns an incomplete observable combined profile, not every use of those defaults.
+**Layers:** 04 Normalizer/fail-closed validation, DMG-021, STA-002, ACT-033/034, CLK-003/004, State/Cost/Heal/target behavior and local dependency laws.
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -5368,13 +5400,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 164 character-derived integration tests;
+- 167 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-295 tests / probes / meta-tests (290 A–N cases plus 5 META cases)
+298 tests / probes / meta-tests (293 A–N cases plus 5 META cases)
 
 The count is not a design target.
 

@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-08-INDEX-27
+**Version:** 2026-10-08-INDEX-28
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-08-INDEX-27`
+**Version:** `2026-10-08-INDEX-28`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-08-I.21`
+**Version:** `2026-10-08-I.22`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -142,6 +142,8 @@ Authored Character data không nên tham chiếu raw engine code.
 ## 2A. Current Character canon navigation
 
 In `docs/canon kit/`:
+
+- **Gideon Vale** → `docs/canon kit/Gideon_Vale_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_PARTIALLY_CLARIFIED / PARTIAL_NORMALIZATION / INTERNAL_DECISIONS_PENDING**. Raw3 named entry79 updated to Heal150% WIL+120% ATK, owner Natural clocks, one-lost-Natural Stun and sequential free Skill2→Skill3. Exact-Action ActualHP aggregation, strict>30%,13% current-MaxHP mutation and source-specific reset compose through existing primitives. Threshold/reconciliation, precise ticks/CC/expiry, automatic waiting observations/recast/CD bypass, Taunt scope and same-completion Tanker AE ordering remain Q1–Q7; do not call the kit execution-ready or promote proposals to defaults. No01–07 extension is yet proved. I.22 adds only M-165–M-167 for received-Action/reset/ambiguity obligations.
 
 - **Tinh Không Ma Nữ** → `docs/canon kit/Tinh_Khong_Ma_Nu_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw #78 replaced with the corrected kit/examples and all current designer answers. One Leader life/HP/Rage/Shield/status provider across torso8 and arm Actors7/9; per-hit life-deduplicated AoE, arm-selected Ultimate and combined four performed-Natural Rage clock. Contact1 locks ARM/RES before simultaneous Heal, then grants its contribution even on zero/denied/empty Heal; third Heal precedes cleanup. Ultimate locks Basic280→exact outcome→Leader Heal→free Skill1 before ordinary Reactions, without retroactive Rage modification. C prepays Rage/AE15 and waits without blocking SSI; rescue watches independent HP/exact Side-AE mutations. B uses actual paid HP, Skill3 resets two160% charges and Ultimate preserves them. B.3/E.19/F.21/G.20/H.3/I.21 supply bounded provider/contact/deferred/resource extensions; M-155–M-164 preserve prior obligations. No internal gameplay/local-order question remains; numeric metadata/foreign conflicting body or Mode adapters remain nonblocking.
 
