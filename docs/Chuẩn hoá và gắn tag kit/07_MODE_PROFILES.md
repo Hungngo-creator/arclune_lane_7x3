@@ -1,6 +1,6 @@
 # ARCLUNE — MODE PROFILES
 ## Chặng H — Mode-Specific Runtime Profiles
-**Version:** 2026-10-07-H.2
+**Version:** 2026-10-08-H.3
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`, `06_KERNEL_RUNTIME.md`
 **Purpose:** define which runtime rules are active in each game mode without forking Character identity, Tag semantics, Primitive meanings, or Kernel foundations.
@@ -10,6 +10,8 @@
 ---
 
 **Revision H.2:** binds admitted post-death reserved-Slot waits to SSI cadence without Actor Action/duration/class gain. SELF_LEADER_PENDING_RECOVERY protects roster extinction and only the exact Leader's own admitted entitlement; another Actor cannot defer terminal Leader loss. No Character-ID branch or continuous-mode substitute clock is introduced.
+
+**Revision H.3:** admits explicitly bound multi-part bodies and non-consuming real SSI pass contacts in Main. Player-selected Leader form restrictions use existing Action-form data; postmortem consumed waits and ordinary scheduling remain unchanged.
 
 # 0. MODE PROFILE PRINCIPLE
 
@@ -212,6 +214,16 @@ Side A eligible Natural Action
 An explicitly admitted04§29.3/ACT-011 profile may supply a POSTMORTEM_WAIT checkpoint from a reserved confirmed-dead Slot. Consume it through the same Side pointer/pass and ensuing global boundary, with no Actor Natural opportunity, CC/form selection, ordinary Actor-duration tick, Action or class AE/Rage. The pending Lifecycle record owns bounded attempts; successful replacement only makes the next ordinary SSI visit playable. Unprofiled dead/empty Slots still skip. Slot reservation remains authoritative occupancy under POS-009, not a render/HP heuristic.
 
 `recoverableParticipation` must bind supported Mode law; Main uses SELF_LEADER_PENDING_RECOVERY below. Count a valid pending participant against ordinary roster-extinction/no-active-participant defeat. Independent Leader-objective defeat follows §9 rather than a blanket pending override. Missing/unsupported bindings reject normalization; continuous Modes require an explicit scheduler adaptation rather than fake SSI visits.
+
+## 7A. Explicit multi-part and contact adapters
+
+Main admits04§3.9 bodies within its nine positions. A part eligible for Natural Action is inspected as its own Actor under ordinary Side pointer/pass law; an occupied non-acting part does not receive a torso turn. Body binding preserves the one logical Leader/lifecycle objective and declared HP/Rage/Shield/status providers. Successful creation uses the real unpassed/passed Slot rule, never immediate insertion or twice-per-pass Action. Cross-instance body splitting/moving a composite without explicit geometry/retention adapters is not implied.
+
+Main admits04§7.20 / ACT-016 contact at BEFORE_SKIP_ADVANCE for a subscribed non-acting anchored object. Complete that finite graph, advance the Slot once and continue **the same Side's search**. Contact creates no Natural opportunity, Side swap, global boundary or class AE/Rage. It is distinct from the explicit POSTMORTEM_WAIT exception, which consumes a checkpoint and swaps Side. Passed-Slot creation waits for next pass; a timer/round/other Actor's opportunity cannot forge contact.
+
+A Leader's explicitly player-chosen Ultimate may replace a declared arm Basic in that arm's existing Natural. When no choice is present, a declared BASIC-only fallback overrides Main's ordinary automatic Ultimate form priority without spending Rage. Pending materialization form locks likewise use04§6.3A; payment/pending acceptance does not create an interrupt or extra torso opportunity. This is admitted profile data, not a universal override of ordinary Character Ultimate priority.
+
+Other Modes need actual body/spatial/scheduler/contact/resource adapters before these Main profiles can execute. No continuous timer or fabricated Slot visit is supplied by default.
 
 # 8. TURN-BASED BATTLEFIELD
 

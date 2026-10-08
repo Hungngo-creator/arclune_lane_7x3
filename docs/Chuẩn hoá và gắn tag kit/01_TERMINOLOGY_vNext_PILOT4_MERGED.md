@@ -1,6 +1,6 @@
 # ARCLUNE — TERMINOLOGY vNext
 ## Canonical Combat, Runtime & System Terminology
-**Version:** 2026-10-07-B.2
+**Version:** 2026-10-08-B.3
 **Stage:** Chặng B — Terminology Reconstruction  
 **Source basis:** `terminology.md` + `00_CANONICAL_RECOVERY_AUDIT.md` + các correction hiện hành của user được Audit ghi nhận.  
 **Scope:** định nghĩa nghĩa canonical của khái niệm. File này **không** phải Tag Registry, Primitive Registry, Ability Schema, Contract hay Kernel implementation.
@@ -10,6 +10,8 @@
 ---
 
 **Revision B.2:** distinguishes an admitted postmortem Slot checkpoint from Actor Natural opportunities and a chassis-replacement materialization cause from ordinary Revive/deployment. Structural presence evidence and cause-specific Effect activation remain separate. No Tag or Primitive is introduced.
+
+**Revision B.3:** separates a multi-part physical/scheduling body from its one lifecycle/resource owner, and an actual SSI pass contact from a consumed opportunity. Existing entity kinds, Action identity and clocks remain unchanged.
 
 # 0. MỤC ĐÍCH VÀ QUY TẮC ĐỌC
 
@@ -386,6 +388,17 @@ Combat Object không mặc định:
 - có Chân Ngã;
 - có Natural Action;
 - dùng Class/Rank như Character.
+
+---
+
+## 2.5A Multi-part Combat Body
+**VI:** Hình thể chiến đấu nhiều phần
+**ID:** `MULTI_PART_COMBAT_BODY`
+**Status:** CANONICAL CORE / EXPLICIT PROFILE
+
+One existing lifecycle owner may have several physical parts and more than one scheduling Actor. A part reference/Action Actor is not another independent life, Leader, Summon or resource pool. The declared body profile binds part occupancy/eligibility to the one lifecycle owner and the specified HP/Rage/State/stat providers.
+
+Physical coverage, distinct life selection, Action Actor/source and Damage Attribution remain separate. An explicitly life-deduplicated AoE can cover three positions yet produce one hit against that life; separate authored hits remain separate. Sharing a life does not silently choose status, Shield, stat, target-weight or clock policy: the profile must declare them.
 
 ---
 
@@ -1169,6 +1182,17 @@ Ví dụ:
 CC làm Actor mất Natural Action opportunity vẫn có thể làm actor-window tiến triển theo SSI Contract.
 
 `ACTOR_NATURAL_ACTION_WINDOW ≠ TURN_BOUNDARY`.
+
+---
+
+## 5.4B SSI Pass Contact
+**VI:** Tiếp xúc con trỏ SSI với vị trí
+**ID:** `SSI_PASS_CONTACT`
+**Status:** CANONICAL CORE / EXPLICIT MAIN PROFILE
+
+Observation when a Side's real SSI pointer visits a position carrying a declared contact subscription during Slot search. An occupied non-acting Combat Object can use this observation without becoming an Actor.
+
+Contact is not an Action, Natural opportunity, consumed postmortem wait, actor-window tick, global TURN_BOUNDARY or Side swap. It advances only explicitly contact-owned counts. Passed-position creation and replay cannot manufacture an extra visit. The Mode/Contract defines the exact observation/continuation boundary; a round timer is not contact evidence.
 
 ---
 

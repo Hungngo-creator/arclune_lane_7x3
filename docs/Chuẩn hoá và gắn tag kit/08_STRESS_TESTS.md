@@ -1,6 +1,6 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-07-I.20
+**Version:** 2026-10-08-I.21
 **Status:** Working Canonical Validation Suite  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.2+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.18+, `05_CONTRACTS.md` F.20+, `06_KERNEL_RUNTIME.md` G.19+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
@@ -41,6 +41,8 @@
 **Revision I.19:** adds only M-147/M-148 for exact accepted-child ActionRef/provenance conversion composed with shared-recipient Damage, one outcome Heal/Overheal contribution, and frozen waiting-pool Axiom force-entry with independent local failure/coherent observers. Existing E.17/F.19/G.18 machinery suffices; no new semantic field family, Tag, Primitive, Contract ID or runtime owner. Prior case bodies/IDs remain unchanged; coverage counts reflect the actual suite. Declarative Architecture Phase obligations only.
 
 **Revision I.20:** adds M-149–M-154 for Rank-first eligible route claims/same-Rank Authority, cross-family complete-entry host reservations, host-only binding/empty death/Deck retention, exact attached-outcome controller and binding-time cast pinning/Entity continuation. M-130 replaces only the superseded presence-only blocker with actual route eligibility. Existing target, mixed Damage/Rage, Shield, Heal, clock and child tests remain reusable. Declarative Architecture Phase obligations, not executable results.
+
+**Revision I.21:** adds M-155–M-164 for atomic multi-part life projection/retention, arm clocks, non-consuming SSI contact, prepaid deferred creation, action-captured additive Rage, exact Side-AE rescue, and corrected Basic/Ultimate/star outcomes. All earlier case bodies/IDs remain unchanged; ten declarative Architecture Phase obligations, not executable test results.
 
 # 0. WHAT THIS FILE IS
 
@@ -4473,6 +4475,86 @@ Zero-missing-HP after intervening lawful recovery gives E0: ordinary zero-delta/
 **Expected Resolution:** Ultimate child retains135/135 coefficients/drain15 for this cast despite binding; next admitted Natural Skill1 may use150/150/drain20 and discounted AE. Replacement recipient receives legal Damage; no-Rage subeffect is local no-op. Shield-only admitted Rage-bearing recipients still drain; missed/invalid branches do neither. Complete simultaneous child direct receipts/lifecycle precede one root Heal50% of only their ActualHP, with no native Overheal Shield. Actual Skill identities/Natural counts remain intact. Skill3's positive main receipt emits one direct TRUE10 hit on the **same X identity**, using cast Max200; legal movement does not replace X with Y. Death/invalidity or mainActualHP0 skips locally. Bonus cannot recurse or query Slot8 anew; ordinary Reaction waits for the explicit main→lifecycle→bonus→lifecycle graph. Live binding changes neither pinned profile nor an admitted Action's identity/clock.
 **Layers Under Test:** host-only REC-006 binding, Action/Snapshot/P-001/040–045, TGT-007/008, RES-002, ACT-020/023/032, CST-006, HEL-001; reuses M-080/M-082/M-091/M-147's isolated branch/child/result laws.
 
+## M-155 — Atomic Multi-part Binding, Capacity and Battle-entry Snapshot
+
+**ID:** `M-155`
+**Status:** `MUST_PASS`
+**Fixture:** a living Leader at8 owns the battle-entry stat Snapshot; later stats differ. Its body profile requires arms7/9, both occupied, with only Slot1 empty. Ma Nữ entry requests transformation; after another complete occupancy commit frees Slot2, both displaced occupants can be assigned distinctly. Retain current HP/Rage/Shield/status with explicit downward capacity clamp and isolated Snapshot stat view.
+**Expected:** with only one destination, no movement/arm/new kit/provider/eligibility change, no speculative draw, old Leader stays playable. With enough capacity, seeded distinct destinations, definition, arms, providers/retention/capabilities commit together. Stats use battle-entry values, not Ma Nữ-entry or later placement; HP is preserved/clamped without Heal/Damage, Rage/Shield/CC retained. New arms in unpassed Slots may later act; passed Slots wait. Ma Nữ departure/reentry does not reset the persistent form/pools or duplicate actors. Inject a final stale claim: none of the staged body/moves escape. Save/replay at pending/preparation/commit has one binding and unchanged receipts.
+**Layers:** 04§3.9/78.1, ENT-023/024, ACT-013/014, SNP-001/002, P-050/051/069/082 and existing provider/Position/Transaction owners.
+
+## M-156 — One Life Projection, Shared Shield/HP and Exactly One Leader Death
+
+**ID:** `M-156`
+**Status:** `MUST_PASS`
+**Fixture:** profile DISTINCT_LIFECYCLE_OWNER, body parts7/8/9, shared HP500/Shield100. One homogeneous area hit with post-mitigation amount300 covers all three; later a separate post-mitigation hit deals400. Preserve coverage Position refs and distinct Action Actor/source identity.
+**Expected:** first authored hit is one mixed/declared hit against the Leader, Shield100/ActualHP200, leaving HP300, not three hits or three ledgers. Second hit independently removes300 HP with Overkill100; one Leader lifecycle/death/defeat decision, no arm deaths/REC increments. A Heal or random two-ally selection has one Leader candidate/weight, not three. DISTINCT projection never erases separate hits/waves or chases a moved original occupant. Shared CC on one part can make both real arm opportunities CC-lost without an Action; their consumed evidence advances compatible shared status opportunity clocks once per arm opportunity, preventing a never-expiring torso-owned CC. Actual-only Skill1 counts still freeze. EACH_PART control is legal only with an explicit compatible profile and still uses one ledger/RES-008. Conflicting per-part admission/calculation cannot pick the first Slot. Retain contacted coverage while receipt recipient remains the life owner.
+**Layers:** ENT-023, TGT-008, RES-008, ACT-012/050, shared provider and Health/Shield/Result/Lifecycle owners.
+
+## M-157 — Chosen Arm Ultimate and Combined Performed-Action Rage Clock
+
+**ID:** `M-157`
+**Status:** `MUST_PASS`
+**Fixture:** torso8 skips; each arm has Basic plus player-selected Ultimate exception. Shared full Rage with no choice, then explicit A choice for arm9. Skill1 gives Ma Nữ and Leader separate next-performed-Natural/four-completion clocks; shared Leader CC consumes intervening opportunities.
+**Expected:** unchosen full-Rage arm Basic spends no Rage; selected A replaces exactly arm9's existing Natural with one joined admitted payment, no torso or arm7 bonus Action. Torso skip/CC/non-Natural Ultimate Basic children do not consume Skill1 budgets. Four actually performed arm Actions in any valid SSI sequence spend the one Leader count, not four per arm/round/global boundary; Ma Nữ count is independent. An active Leader buff created while its old sole Actor was waiting for body capacity keeps its owner counts through binding and then follows the current arms, with no stale-Actor filter/reset. Recast refreshes rather than doubling40%, excludes its creating Action for new capture and preserves already captured old-Action grant evidence. No new Actor-private TURN_BOUNDARY.
+**Layers:** 04§6.3A/18A.1, ACT-003/010–015, CLK-002/003 explicit exception, CST-013/016, Main7A.
+
+## M-158 — Real Non-consuming SSI Contact, Passed Creation and Third-contact Cleanup
+
+**ID:** `M-158`
+**Status:** `MUST_PASS`
+**Fixture:** living Chi Tâm in one empty allied Slot with contact limit3 and two distinct random Heal recipients per contact. Leader MaxHP10,000, first-contact ARM200/RES300. Create a second fixture after that Slot was already passed; another fixture has no valid recipients/denied Heal.
+**Expected:** only actual owning-Side pointer visit produces one contact. Each resolves at most two distinct Heal2,000 requests, then advances the Slot within the same search. No Natural Action/serial/window tick, Side swap, class AE/Rage or new TURN_BOUNDARY; ordinary next eligible Actor is unchanged. First contact snapshots before its own bonus and grants+20/+30 even with empty/zero/denied Heal; later contacts do not recapture/stack. Third contact Heal reaches terminal before Despawn/contribution removal. Early destruction cleans without a forged third contact/expiry Heal. Passed creation waits next pass. Pause/save/redeliver at visit/count/Heal/cleanup has no double contact. POSTMORTEM_WAIT control still consumes/switches and global clocks preserve M-135/M-136.
+**Layers:** SSI_PASS_CONTACT, 04§7.20, ACT-016/CLK-005, Main7A, P-010/020–022/030/053 and existing SSI/dependency/Result owners.
+
+## M-159 — Prepaid Pending Creation without SSI Deadlock or Future Rage Debit
+
+**ID:** `M-159`
+**Status:** `MUST_PASS`
+**Fixture:** full field, accepted C with Rage100/AE20. Payment creates pending with Rage0/AE5; later arms gain40 Rage. A whole joined placement transaction temporarily frees then reoccupies a Slot; a later final commit truly frees one legal Slot.
+**Expected:** acceptance pays Rage100 and AE15 atomically with exactly one pending record. Original chosen-arm Natural completes, torso still skips and arms may later act; A/B/new C remain locked while pending. The transient empty intermediate state does not release/draw. At real final capacity, seed/select once, create Chi Tâm HP6,500 at MaxHP Leader10,000, retire lock/pending in the same commit. Rage40 and AE5 remain, no second payment/Action/turn or root waiting for its own future creation. Owner death/battle end cancels without refund; future owner generation cannot release old work. One active Chi Tâm excludes another C. Failed AE affordability commits no Rage/token. Concurrent ambiguous claimant has no Event/list priority; unsupported contention rejects. Replay acceptance/release retains payment/payload/selection/terminal identity.
+**Layers:** 04§78.1/6.3A, ENT-024, CST-001/005/009, existing State/Position/Materialization/Transaction and Action completion.
+
+## M-160 — Additive Positive Rage Basis, Late Fourth-action Grant and Cause Exclusion
+
+**ID:** `M-160`
+**Status:** `MUST_PASS`
+**Fixture:** performed Natural grant base10, Skill1 captured rate0.40 plus compatible other-family rate0.20. The fourth qualifying Action completes and expires future scope before its causal grant is delivered; a received-Damage grant and an unrelated external grant also arrive.
+**Expected:** exact captured Action grant requests16 before cap, not16.8 or a post-cap extra grant. Fourth-action grant still uses capture after State retirement; fifth Action has no stale Skill1 capture. Received-Damage/external causes do not borrow this scope from root/issuer/recipient. With pool room3 only committed3 enters Rage; record base10/modifier evidence without rebuilding from capped3. Same-source refresh does not add another0.40. Save/replay preserves original cause/rules and cannot create compensating credit. Unsupported SET/transfer/noncommutative rate/basis cannot enter this phase.
+**Layers:** 04§18A.1/23.2, RES-006/CST-016, modifier/Action/Snapshot/Resource/Result owners.
+
+## M-161 — Side-AE-only Rescue, Pre-Cost Snapshot and Own-activation Exclusion
+
+**ID:** `M-161`
+**Status:** `MUST_PASS`
+**Fixture:** Leader HP1,500/10,000; Ma Nữ HP1,501/5,000, pre-Cost ATK400/WIL600; Side AE19. Independently grant AE1. Include cost-sensitive foreign stat control, joined HP+AE change, wrong-Side/no-op AE, denied Heal and Ma Nữ HP1,500 control.
+**Expected:** opted-in exact Side AE20 checkpoint rechecks low Leader once. Snapshot400/600 before Cost, atomically pay HP1,500/AE20 and request Heal2,850. HP exactly15% qualifies; payer HP1,500 is insufficient under exact nonlethal Cost and commits neither debit/Heal. Failed Cost is terminal, no polling. Own Cost/Heal changes never self-repeat; a later independent qualifying HP/AE change may activate after terminal. Joined watched writes yield one candidate, not one per field. Wrong/unwatched/no-op pool changes and unopted health-only listeners do not qualify. Competing rescuers obtain no subscriber-order resource winner. Retain commit/subscriber/subject/pool/source-Snapshot/origin/payment identity through replay.
+**Layers:** 04§7.16/13.1, TRG-016 Side-AE extension, SNP-006, CST-001/003/009, P-034/035/010 and existing Resource/Trigger/Health dependencies.
+
+## M-162 — Enhanced Real Basic, Charge Exception and Exact Ultimate Heal Outcome
+
+**ID:** `M-162`
+**Status:** `MUST_PASS`
+**Fixture:** Ma Nữ has two Skill3 charges. Full-Rage Tinh Quang Đại Xạ invokes one accepted Basic child against up to three column recipients, fixed280/280. Direct committed ActualHP receipts are1,000/2,000/3,000; unrelated same-root Damage and absorbed Shield/overkill also exist.
+**Expected:** root ULTIMATE plus one real non-Natural BASIC_ATTACK child, not anonymous Damage or another SSI turn. Exactly that child's qualifying direct ActualHP total6,000 requests one Leader Heal600. Same-root independent/other Basic refs, Shield and overkill do not qualify. Skill3 count remains2 even when Basic-trigger observers run; next ordinary performed Basic uses160/160 and spends one charge for the whole AoE, including zero-Damage execution. CC without Basic spends none. Skill3 recast resets2. Skill1 child has all its Costs waived and next-Natural/four-action clock; root Rage Cost remains paid. Compare three Naturals: Basic×3 gives300/300 versus activation+Basic×2 gives320/320, not20% total increase. Heal/child/root terminal ordering follows explicit local dependencies and ordinary validity.
+**Layers:** ACT-020/024/040, 04§28/35, CST-006, P-001/043/010, exact Action/Effect provenance and existing counter/modifier/Result owners.
+
+## M-163 — Three Star Waves and Per-impact MaxHP TRUE Components
+
+**ID:** `M-163`
+**Status:** `MUST_PASS`
+**Fixture:** seeded star counts A3/B1/C2. Each wave is a simultaneous batch and waves are sequential. With ATK100/WIL200 and constant target MaxHP10,000, each star has PHYSICAL80/WILL160/TRUE200. A control supplies a legal declared MaxHP change to12,000 before wave2.
+**Expected:** wave1 A/B/C, wave2 A/C, wave3 A; each star one hit with three typed components and one2% current-MaxHP TRUE component. Constant-MaxHP A receives ordinary240/480 plus TRUE600 across three hits; ARM/RES mitigate only their applicable ordinary components. Changed-MaxHP subsequent TRUE is240, never stale200; common-wave reads and receipts are frozen before that batch commits. Invalid/dead later recipients drop without replacement/count redraw. Full-field multi-part coverage projects one life hit per wave, not triple parts or one hit for the whole Ultimate. Hit/observer caps remain independently declared; components do not multiply Counter/Basic events. Replay preserves per-life draws/wave cursors/receipts, without another star.
+**Layers:** DMG-001, RES-002/003/008, ENT-023, SNP/TGT-008, RNG/Damage/Result/Transaction.
+
+## M-164 — Bounded Body, Contact, Deferred, Rage and Side-AE Rejection
+
+**ID:** `M-164`
+**Status:** `MUST_REJECT`
+**Inputs:** cyclic/shared-part HP providers; missing body retention/status/projection/entry Snapshot; independent arm life/Leader/Rank; duplicate positions/relocation claims; first-Slot projection of incompatible part hits; contact as Actor Action/round timer/postmortem wait or future-Action dependency; pending release waiting on old root completion/phantom Slot/repaid Rage or missing owner generation/cancellation; arbitrary watched AE pool or absent subject/exclusion; ungrounded grantActionRef, received-Damage relabeled ACTION_GENERATED, undefined resource basis/rate composition or undeclared claimant priority.
+**Expected:** fail closed before affected partial mutation. No hidden body/source priority, per-part writable pool, invented initializer/callback/Primitive/Tag or unsupported Mode timer. Ordinary single-body, unopted health/Rage observer, Damage/Heal modifiers, independent materialization and existing consumed-wait fixtures remain admitted with their prior laws.
+**Layers:** 04 validation/Normalizer, ACT-016, ENT-023/024, RES-006, TRG-016, existing ownership/Mode/Transaction guards.
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -5286,13 +5368,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 154 character-derived integration tests;
+- 164 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-285 tests / probes / meta-tests (280 A–N cases plus 5 META cases)
+295 tests / probes / meta-tests (290 A–N cases plus 5 META cases)
 
 The count is not a design target.
 

@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-07-INDEX-26
+**Version:** 2026-10-08-INDEX-27
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-07-INDEX-26`
+**Version:** `2026-10-08-INDEX-27`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -71,7 +71,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`
 **Role:** Chặng B — canonical meanings and semantic distinctions.  
-**Version:** `2026-10-07-B.2`.
+**Version:** `2026-10-08-B.3`.
 **Read when:** gần như mọi normalization task.  
 **Important:** `TURN_BOUNDARY` là global SSI boundary theo CLK-001, gồm ngoại lệ POSTMORTEM_WAIT được khai báo tường minh. Personal “own turn” mechanics dùng Actor Natural Action Window / Natural Action clocks; dead wait không tiến personal Actor clock.
 
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-07-E.18`.
+**Version:** `2026-10-08-E.19`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-07-F.20`.
+**Version:** `2026-10-08-F.21`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,18 +122,18 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-07-G.19`
+**Version:** `2026-10-08-G.20`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
 ## `07_MODE_PROFILES.md`
 **Role:** Chặng H — mode-specific scheduler/spatial/lifecycle/resource profiles.  
-**Version:** `2026-10-07-H.2`
+**Version:** `2026-10-08-H.3`
 **Read when:** mechanic khác nhau theo turn-based / Arena / Exploration-Defense.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-07-I.20`
+**Version:** `2026-10-08-I.21`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -142,6 +142,8 @@ Authored Character data không nên tham chiếu raw engine code.
 ## 2A. Current Character canon navigation
 
 In `docs/canon kit/`:
+
+- **Tinh Không Ma Nữ** → `docs/canon kit/Tinh_Khong_Ma_Nu_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw #78 replaced with the corrected kit/examples and all current designer answers. One Leader life/HP/Rage/Shield/status provider across torso8 and arm Actors7/9; per-hit life-deduplicated AoE, arm-selected Ultimate and combined four performed-Natural Rage clock. Main SSI contact heals before third-object cleanup; C prepays Rage/AE15 and waits without blocking SSI; rescue watches independent HP/exact Side-AE mutations. B uses actual paid HP, Skill3 resets two160% charges, Ultimate preserves those charges and exact real-Basic outcome Heal. B.3/E.19/F.21/G.20/H.3/I.21 supply bounded provider/contact/deferred/resource extensions; M-155–M-164 preserve prior obligations. Numeric metadata/foreign conflicting body or Mode adapters remain nonblocking.
 
 - **Lamarck** → `docs/canon kit/Lamarck_Clarified_Gameplay_Canon.md` R2 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED** → Q1–Q17 locked; no-Chân-Ngã chassis replacement, bounded dead-slot wait, persistent adaptation, result-linked repair and Rank-gated Entity Follow-up. Main roster recovery cannot rescue another dead Leader; exact self-Leader pending replacement may defer loss. Mixed component receipts reuse generic RES-008 PROPORTIONAL. Metadata/future Mode adapters remain nonblocking.
 

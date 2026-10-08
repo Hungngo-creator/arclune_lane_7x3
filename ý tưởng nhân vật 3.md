@@ -2475,97 +2475,129 @@ tức skill 1 và 2 cast không thông qua ult để cast thì sẽ không có t
 đánh thường: chém 1 kiếm gây sát thương = 100% wil/atk của bản thân lên 1 mục tiêu, mỗi lần đánh thường đều sẽ áp dụng buff cuồng bạo (tăng 10% sát thương gây ra thì phải, không nhớ rõ) lên đánh thường.
 
 78) Tinh Không Ma Nữ
-UR, summoner.
+UR, Summoner.
 
-nội tại, Tàn Thần Tinh Khải: khi vào sân sẽ biến đổi leader thành Tinh Không Tàn Thần. Toàn bộ kit của leader sẽ bị thay đổi, hắn vẫn là leader như kit sẽ khác.
-Tinh Không Tàn Thần: 
-vị trí 7 và 9 cần trống, khi ra sân sẽ chiếm 2 vị trí này, mọc ra thêm 2 cánh tay, có lượt riêng tuân theo Ssi, nếu ô 7 và 9 có nhân vật đứng khi hắn ra sân, chuyển đơn vị đó sang 1 ô trống ngẫu nhiên khác, nếu sân đầy, Tinh Không Tàn Thần không ra sân cho đến khi có ô trống, mỗi cánh tay của hắn chỉ có thể đánh thường, mỗi đánh thường có chỉ số bằng đánh thường của leader (100% wil/atk).
-Ultimate, Quần Tinh Vẫn Lạc: Triệu hồi quần tinh, các ngôi sao nhỏ tấn công mỗi mục tiêu trên sân, mỗi kẻ bị ngẫu nhiên 1 đến 3 ngôi sao tấn công, mỗi ngôi sao gây sát thương = 80% wil/atk của leader + sát thương chuẩn = 2% max hp lúc bị tấn công của kẻ thù.
-ultimate B: tập hợp tinh thần chi lực, mất 5% hp hiện tại, hồi phục cho mọi đồng minh trên sân = 100% wil + atk và phần hp tương ứng với 5% hp đã mất từ skill này cho mỗi đồng minh có mặt trên sân.
-ultimate C: Tiêu hao 100% rage hiện có + 5 ae, Ngưng tụ và tạo ra đơn vị Tinh Thần Chi Tâm, thứ này có hp = 65% hp max của leader, không rank, trừ hp ra không có chỉ số gì khác, không thể tấn công, ssi bỏ qua nó, mỗi turn bị ssi bỏ qua nó hồi hp cho 2 đồng minh ngẫu nhiên = 20% max hp của leader, leader cũng nhận 10% res/arm của bản thân lúc kích hoạt hồi hp cho đồng minh, hiệu ứng tăng res/arm không thể stack, chỉ kích hoạt 1 lần cho đến khi Tinh Thần Chi Tâm tan biến sau khi bị ssi bỏ qua 3 lần cũng sẽ biến mất theo.
+## Nội tại — Tàn Thần Tinh Khải
 
-Đánh thường của Tàn Thần: mỗi khi đến turn của bản thân thì cánh tay sẽ tát đối phương gây sát thương = 100% wil/atk của bản thân leader, leader tức thân của tàn thần đứng ô 8 sẽ không thể tấn công và bị ssi bỏ qua nhưng 2 cánh tay ở ô 7 và 9 thì có thể tấn công và tuân theo ssi, cánh tay và thân đều tăng rage khi bị đánh, thanh rage và hp của leader chỉ có 1.
-chỉ số của leader Tàn Thần = 100% chỉ số của leader lúc vào trận, tức không bị tăng hay giảm từ kit ngoài leader hoặc bản thân leader.
-mỗi khi nhân vật này cast ultimate thành công, hồi hp cho tàn thần = 10% tổng sát thương ultimate nhân vật này gây ra lên tối đa 3 mục tiêu.
-phần trên là kit của leader sau khi biến đổi cũng là nội tại của char này.
+Khi Ma Nữ vào sân, Leader đồng minh biến thành Tinh Không Tàn Thần và toàn bộ kit cũ được thay thế. Tàn Thần vẫn là Leader, không phải Summon.
 
-Skill 1: kích hoạt sau đó turn tiếp theo kể từ turn kích hoạt skill này bản thân và leader rage nhận được từ hành động tăng 40% trong 3 turn của bản thân leader và nhân vật này, 20 ae. Hiệu ứng tăng rage từ skill 1 không stack, kích hoạt skill này khi hiệu ứng tăng rage cũ vẫn còn chỉ làm mới thời gian tồn tại của hiệu ứng, không stack với bản thân nhưng có thể cộng dồn với hiệu ứng tăng rage khác.
+### Thân, hai tay và SSI
 
-skill 2: tự kích hoạt khi hp của leader dưới 15%, lập tức hồi hp = 25% max hp + 35% wil/atk của bản thân cho leader, tự kích hoạt khi đủ điều kiện, cost: - hp = 30% mx hp, -20 ae, chỉ tự kích hoạt khi cost và hp leader đồng minh dưới hoặc = 15% đều thoả mãn.
-cost HP của Ma Nữ là HP Cost, không phải Damage.
+- Thân chính đứng ở slot 8; không tấn công, không có Natural Action và bị SSI bỏ qua.
+- Hai tay chiếm slot 7 và 9. Mỗi tay là một actor có cơ hội Natural Action riêng theo SSI. Khi không dùng Ultimate đã được player chọn, tay chỉ có thể Basic Attack.
+- Ultimate A/B/C được thực hiện thay Basic Attack trong Natural Action của tay được chọn; không cấp thêm lượt cho thân hoặc tay còn lại.
+- Thân và hai tay dùng chung đúng một pool HP và một pool Rage của Leader. Cả ba phần nhận Rage khi bị đánh theo quy tắc nhận Rage hiện hành.
+- Nếu slot 7 hoặc 9 có đơn vị khác, chuyển đơn vị đó sang một ô trống ngẫu nhiên hợp lệ khác. Các điểm đến phải khác nhau và không chiếm slot cần cho hai tay. Chỉ có một ô trống chưa chắc đủ nếu phải chuyển cả hai đơn vị; không tạo nửa hình thể.
+- Khi chưa đủ chỗ, hoãn toàn bộ biến đổi: Leader giữ kit cũ cho đến khi cả hình thể mới đặt được đồng thời. Một AoE quét nhiều phần 7/8/9 chỉ gây một hit lên sinh mệnh Leader trong mỗi hit/đợt đã khai báo, không nhân ba. Các hit/đợt riêng vẫn riêng.
+- Tay mới ở slot chưa được con trỏ SSI quét có thể tham gia side pass hiện tại; tay ở slot đã được quét chờ pass sau. Biến đổi không chen lượt tức thời hay cho tay hành động hai lần trong cùng pass.
 
-skill 3: khi bị tấn công, khi đòn tấn công đó đã kết thúc, đánh thường lên hàng của kẻ tấn công, skill này không được tính là đánh thường, cách hoạt động như nội tại thiện xạ của Silas, không tính là 1 turn. -5 ae.
+Biến đổi thành công giữ đến hết trận dù Ma Nữ rời sân; Ma Nữ vào lại không reset HP/Rage hay tạo thêm tay. Khi biến đổi giữ HP hiện tại, clamp xuống Max HP snapshot nếu vượt, giữ Rage/Shield/trạng thái hợp lệ. CC dùng chung: CC lên bất kỳ phần nào có thể chặn cả hai tay theo luật CC đó.
 
-đánh thường: đứng tại chỗ, orb trên đầu nàng bắn ra tia sáng mạnh mẽ gây sát thương aoe lên tối đa 3 mục tiêu (tuân theo ssi), 1/4/7, 2/5/8 hoặc 3/6/9 tùy theo vị trí đứng của bản thân và đơn vị mục tiêu.
-mỗi kẻ bị tia sáng quét trúng nhận sát thương = 100% wil/atk của nàng.
+Snapshot bằng 100% chỉ số Leader tại thời điểm Leader vào trận. Các buff/debuff/mutation về sau không tự sửa snapshot này. Chi Tâm có hiệu ứng ARM/RES được khai báo riêng bên dưới; không lấy ví dụ cũ để đổi thời điểm snapshot.
 
-Một hostile action lên Ma Nữ = tối đa một lần Skill 3.
-Nếu một action có 7 hit:
-vẫn chỉ một counter.
-Nếu cùng một action đánh Ma Nữ và tạo nhiều attacker/linked effects thì xử lý theo danh sách attacker hợp lệ, nhưng cần tránh “mỗi packet = một phản kích”.
+### Basic Attack của Tàn Thần
 
-ultimate, Tinh Quang Đại Xạ: cast 1 lần đánh thường nhưng tỉ lệ sát thương từ 100% lên 280% wil/atk, sau đó kích hoạt skill 1 mà không tốn cost.
+Tay đến Natural Action thì tát một mục tiêu theo targeting SSI. Công thức dùng chỉ số Leader đã snapshot: mặc định PHYSICAL = 100% ATK và WILL = 100% WIL; nếu Basic gốc của Leader có hệ số riêng theo Ki, giữ đúng các hệ số đó. Kế thừa hệ số không có nghĩa giữ lại toàn bộ kit hoặc hiệu ứng phụ cũ.
 
-Basic Attack action được cường hóa.
-Như vậy nếu sau này nàng có effect:
-“khi thực hiện Basic Attack...”
-thì Ultimate vẫn có thể tương tác đúng theo fantasy.
+Leader đủ Rage nhưng player không chọn Ultimate thì vẫn Basic Attack. Việc Basic Attack không tự tiêu hao Rage; những kit khác có thể giảm Rage theo luật riêng.
 
-Khi Tinh Không Ma Nữ vào sân:
-Leader biến thành Tinh Không Tàn Thần.
-Bộ kit cũ của Leader bị thay thế.
-Leader vẫn là Leader, không phải summon.
-Thân thể chính ở slot 8.
-Hai cánh tay chiếm slot 7 và 9.
-Hai cánh tay là các actor có lượt SSI riêng.
-Thân ở slot 8 không có lượt tự nhiên và bị SSI bỏ qua.
-HP và Rage của thân + hai tay dùng chung một pool.
-Chỉ số của Tàn Thần được snapshot bằng 100% chỉ số Leader tại thời điểm vào trận.
-Các mutation/buff/debuff của Leader về sau không tự thay đổi snapshot này, theo đúng mô tả của mày.
-Điểm này rất quan trọng: Tàn Thần có ba vị trí vật lý nhưng chỉ là một sinh mệnh.
-Tức Leader đổi:
-1 actor → 2 actor chiến đấu
-Đây là buff lớn hơn rất nhiều so với +stat.
-Nhưng vì hai tay chỉ Basic Attack.
-Nếu actor mới xuất hiện ở slot chưa được quét → có thể tham gia side pass hiện tại.
-Nếu slot đã đi qua → chờ pass sau.
-Điều này tránh tình trạng:
-Ma Nữ vào sân → Leader biến đổi → hai tay lập tức được chen vào → rồi SSI lại quét chúng lần nữa.
-ultimate A
-Một ngôi sao có phải một hit riêng.
-Nếu đúng:
-Enemy A: 3 stars
-Enemy B: 1 star
-Enemy C: 2 stars
-thì A/B/C có số lần chịu damage khác nhau.
-Điều đó cũng có nghĩa các effect:
-“khi nhận damage”
-counter
-shield
-lifesteal
-threshold
-on-hit
-có thể bị kích hoạt nhiều lần.
-ultimate BMỗi đồng minh nhận:
-100% ATK + 100% WIL + 5% HP đã mất của leader.
-ultimate C
-Hiện tại chưa có khái niệm:
-“một actor có slot nhưng không phải actor SSI, và mỗi lần cursor đi qua nó lại nhận một trigger.”
-Tao nghĩ nên định nghĩa cho riêng loại này một khái niệm:
-SSI Pass Contact
-Không cần biến nó thành actor.
-Mỗi khi con trỏ SSI của phe nó đi qua slot mà Tinh Thần Chi Tâm đang neo vào, nó nhận một “lần bị bỏ qua”.
-Sau 3 lần:
-FUSION/energy structure tan biến.
-Như vậy nó thực sự gắn với SSI thay vì dùng timer giả.
-bonus Tinh Thần Chi Tâm:
-+10% ARM và +10% RES của Leader tại thời điểm Tinh Thần Chi Tâm được tạo.
-Snapshot một lần.
-Không stack.
-skill 1 của ma nữ
-3 Turn Boundary của từng người
-chứ không phải 3 round.
-Và reset duration khi cast lại nhưng không stack.
+### Ultimate A — Quần Tinh Vẫn Lạc
+
+Mỗi mục tiêu địch trên sân nhận ngẫu nhiên 1–3 ngôi sao. Mỗi sao là một hit riêng, gồm:
+
+- PHYSICAL = 80% ATK của Leader.
+- WILL = 80% WIL của Leader.
+- TRUE = 2% Max HP của mục tiêu tại thời điểm hit đó tấn công.
+
+ARM/RES giảm hai thành phần PHYSICAL/WILL theo luật thường; thành phần TRUE đi qua pipeline TRUE hiện hành. Ba thành phần không biến thành ba hit.
+
+Ví dụ, nếu Max HP mục tiêu không đổi giữa các hit:
+
+| Số sao trúng | Tổng PHYSICAL trước giảm | Tổng WILL trước giảm | Tổng TRUE |
+| --- | --- | --- | --- |
+| 1 | 80% ATK | 80% WIL | 2% Max HP |
+| 2 | 160% ATK | 160% WIL | 4% Max HP |
+| 3 | 240% ATK | 240% WIL | 6% Max HP |
+
+Chốt số sao một lần trên mỗi sinh mệnh địch; resolve ba đợt 1→2→3 tuần tự, các hit cùng đợt simultaneous và đọc Max HP mục tiêu đầu đợt. Mục tiêu không còn hợp lệ bị bỏ, không đổi người/reroll. Nếu A nhận 3 sao, B nhận 1 sao và C nhận 2 sao thì số hit tương ứng là 3/1/2. Hiệu ứng on-hit/on-damage/counter/shield/lifesteal vẫn theo trigger và cap riêng; không mặc định mọi effect kích hoạt một lần trên mỗi component.
+
+### Ultimate B — Tinh thần chi lực
+
+Ultimate A/B cần đầy Rage và trả toàn bộ Rage hiện có. Ultimate B trả thêm HP Cost bằng 5% HP hiện tại; hai Cost của B là bắt buộc và được trả cùng một transaction. Mỗi đồng minh hợp lệ trên sân nhận Heal = 100% ATK + 100% WIL của Leader + lượng HP thực tế Leader đã trả cho cast này. Không lấy thêm 5% của lượng đã trả.
+
+Ví dụ: trước Cost, Leader có 10.000 HP hiện tại, 600 ATK và 400 WIL. Nếu trả đủ 500 HP thì mỗi đồng minh nhận requested Heal = 600 + 400 + 500 = 1.500; phần 500 không chia theo số đồng minh. HP thực hồi vẫn theo pipeline Heal và HP còn thiếu.
+
+### Ultimate C — Tinh Thần Chi Tâm
+
+Ultimate C theo điều kiện đầy Rage thường của Ultimate. Ngay khi lựa chọn hợp lệ được chấp nhận, trả toàn bộ Rage hiện có và 15 AE của phe, rồi tạo yêu cầu Chi Tâm. Mỗi Leader chỉ có tối đa một Chi Tâm tồn tại; không tạo thêm yêu cầu C khi một C đang chờ.
+
+Chi Tâm xuất hiện ở một ô trống ngẫu nhiên hợp lệ bên đồng minh. Nếu không có ô trống, giữ yêu cầu đã trả Cost cho đến khi có chỗ; không trừ Rage/AE lần nữa. Trong thời gian chờ không thể đổi sang Ultimate A/B hoặc Ultimate khác. Hai tay vẫn hành động bình thường và Leader vẫn nhận Rage mới; Rage mới không thuộc khoản đã trả trước. Natural Action chọn C kết thúc sau khi ghi nhận yêu cầu chờ; tạo Chi Tâm về sau không thêm Natural Action. Leader chết hoặc trận kết thúc thì hủy yêu cầu đang chờ, không hoàn Cost.
+
+Chi Tâm là một vật thể năng lượng có vị trí và HP, không phải actor có Natural Action: HP ban đầu và Max HP = 65% Max HP Leader; không Rank, không chỉ số khác, không tấn công. SSI bỏ qua slot của nó.
+
+Mỗi lần con trỏ SSI thật của phe đi qua slot Chi Tâm đang neo, nhận đúng một SSI Pass Contact:
+
+1. Chọn tối đa hai đồng minh khác nhau, ngẫu nhiên trong nhóm hợp lệ; mỗi người nhận Heal = 20% Max HP Leader.
+2. Ở contact đầu tiên, snapshot ARM/RES của Leader trước bonus của Chi Tâm, tại checkpoint heal đó và cấp một bonus bằng 10% mỗi chỉ số. Bonus vẫn cấp nếu không có người hợp lệ hoặc Heal bị chặn/bằng 0; không stack, không chụp lại ở lần 2/3 và tồn tại đến khi Chi Tâm tan biến.
+3. Sau lần contact thứ ba, hoàn tất heal rồi Chi Tâm tan biến và bonus ARM/RES đi cùng kết thúc. Nếu Chi Tâm bị phá hủy trước đó, bonus cũng kết thúc.
+
+SSI Pass Contact không phải Natural Action, Natural Action opportunity hay TURN_BOUNDARY riêng. Không đổi phe, cấp AE/Rage theo class hoặc dùng timer round giả chỉ vì bỏ qua slot Chi Tâm.
+
+Ví dụ: tại lần heal đầu, ARM = 200 và RES = 300 thì bonus cố định là +20 ARM/+30 RES. Không dùng thời điểm tạo Chi Tâm như ví dụ cũ. Nếu mỗi lần contact có hai đồng minh hợp lệ và Max HP Leader giữ ở 10.000 thì mỗi người được chọn nhận requested Heal 2.000; ba contact cho tối đa sáu lượt Heal, có thể chọn lại người ở contact khác.
+
+### Hồi phục Tàn Thần từ Ultimate Ma Nữ
+
+Khi Ma Nữ cast thành công Tinh Quang Đại Xạ, Tàn Thần nhận Heal = 10% tổng Actual HP Damage của lần cast đó lên tối đa ba mục tiêu. Không tính Shield hấp thụ, overkill hay sát thương từ Ultimate A của Leader. Một pool Leader chỉ được heal một lần cho kết quả này.
+
+Ví dụ: ba mục tiêu thực mất 1.000, 2.000 và 3.000 HP thì requested Heal của Tàn Thần là 600.
+
+## Skill 1
+
+Cost: 20 AE. Bản thân và Leader nhận buff tăng 40% Rage sinh ra từ hành động, bắt đầu ở Natural Action kế tiếp của từng bên sau lần kích hoạt.
+
+Buff tồn tại trong bốn Natural Action thực sự thực hiện của mỗi bên. Ma Nữ đếm hành động của bản thân; Leader đếm gộp hành động của hai tay, mỗi hành động của một tay tính một. CC làm mất cơ hội mà không thực hiện Action không tiêu một hành động trong bộ đếm này. Hai bộ đếm có thể hết ở thời điểm khác nhau.
+
+Cùng Skill 1 không stack; cast lại làm mới thời lượng và mốc bắt đầu. Các bonus tăng Rage khác có thể cộng dồn theo luật nguồn đó.
+
+Ví dụ: không có bonus khác, hành động vốn sinh 10 Rage sẽ sinh 14 Rage trước giới hạn pool. Leader thực hiện tay 7, tay 9, tay 7, tay 9 là bốn Natural Action; không phải bốn round hoặc bốn TURN_BOUNDARY riêng. Rage nhận do bị đánh không tự thuộc bonus Rage từ hành động này.
+
+## Skill 2 — Tự cứu Leader
+
+Tự kích hoạt khi Leader còn sống, trên sân và HP hiện tại ≤ 15% Max HP, đồng thời Ma Nữ đủ trả cả 30% Max HP của mình và 20 AE. HP Cost không được đưa Ma Nữ về 0 HP.
+
+Snapshot ATK/WIL Ma Nữ sau admission, trước Cost. Trả đủ hai Cost rồi lập tức heal Leader = 25% Max HP Leader + 35% ATK Ma Nữ + 35% WIL Ma Nữ. Khoản 30% lấy Max HP Ma Nữ; khoản 25% lấy Max HP Leader. HP Cost không phải Damage, không bị Shield hấp thụ và không tự kích hoạt on-damage.
+
+Tái kiểm tra sau thay đổi HP/AE độc lập đã commit và sau khi lần kích hoạt trước kết thúc. Cost/Heal của chính Skill 2 không tự lặp Skill 2; không chen lần kích hoạt mới giữa Cost và Heal của chính lần đó. Không đủ một trong hai Cost thì không trả Cost còn lại và không Heal.
+
+Ví dụ: Ma Nữ có Max HP 5.000, HP hiện tại 1.501, ATK 400, WIL 600 và phe đủ 20 AE. Leader Max HP 10.000, HP 1.500 đủ điều kiện. Ma Nữ trả 1.500 HP, còn 1 HP; Leader nhận requested Heal = 2.500 + 140 + 210 = 2.850. Nếu Ma Nữ chỉ có 1.500 HP thì không kích hoạt theo Cost không gây HP0 đã chốt.
+
+## Skill 3 — Cường hóa hai đòn
+
+Cost: 10 AE và một Natural Action để kích hoạt. Cường hóa hai Basic Attack thực sự tiếp theo của Ma Nữ: hệ số mỗi mục tiêu từ 100% ATK + 100% WIL thành 160% ATK + 160% WIL.
+
+Mỗi lần thực sự Basic Attack tiêu một charge cho toàn bộ đòn, không tiêu một charge trên mỗi mục tiêu. Không đánh thường thì không tiêu charge. Tinh Quang Đại Xạ không dùng hoặc tiêu charge này. Cast lại Skill 3 đặt số charge còn lại về 2, không cộng dồn. Basic thực sự thực hiện vẫn tiêu charge nếu không gây được Damage; cơ hội bị CC mà không có Basic thì không tiêu.
+
+Ví dụ trong ba Natural Action, nếu bắt đầu không có charge: ba Basic thường cho tổng 300% ATK + 300% WIL trên cùng một mục tiêu còn hợp lệ. Dùng một Action kích hoạt Skill 3 rồi đánh hai Basic cường hóa cho tổng 320% ATK + 320% WIL. Chênh lệch là +20 điểm hệ số trên mỗi stat, tương đương khoảng +6,67%, không phải +20% tổng sát thương. Ví dụ so sánh hệ số, chưa tính mitigation hay thay đổi chỉ số.
+
+## Basic Attack của Ma Nữ
+
+Đứng tại chỗ, orb trên đầu bắn tia sáng quét một cột địch, tối đa ba mục tiêu theo targeting SSI: 1/4/7, 2/5/8 hoặc 3/6/9 tùy vị trí/đơn vị mục tiêu. Tia sáng/orb là VFX, không tạo đơn vị độc lập.
+
+Mỗi mục tiêu trúng nhận một hit gồm PHYSICAL = 100% ATK và WILL = 100% WIL Ma Nữ; khi Skill 3 hợp lệ thì dùng 160% cho mỗi thành phần.
+
+## Ultimate — Tinh Quang Đại Xạ
+
+Cần đầy Rage, trả toàn bộ Rage hiện có, rồi cast đúng một Basic Attack được cường hóa, cùng geometry tối đa ba mục tiêu; mỗi mục tiêu trúng nhận PHYSICAL = 280% ATK và WILL = 280% WIL Ma Nữ. Nếu Skill 3 đang có charge thì vẫn là 280%, không cộng 160% và không tiêu charge.
+
+Giữ identity ULTIMATE của cast và một Basic Attack Action thật được gọi bên trong; Basic này không thêm Natural Action. Vì vậy effect “khi thực hiện Basic Attack” có thể quan sát Basic Action đúng phạm vi, không chỉ một Damage Profile giả làm Basic.
+
+Sau đòn đó, kích hoạt Skill 1 miễn toàn bộ Cost Skill 1; vẫn giữ buff +40%, mốc Natural Action tiếp theo và thời lượng bốn hành động. Cost Ultimate riêng vẫn theo luật hợp lệ. Nội tại hồi Tàn Thần dùng kết quả Damage thực của đúng Basic thuộc cast này.
+
+### Nhóm mục tiêu Heal đã chốt
+
+“Đồng minh” của Ultimate B và Chi Tâm tính Ma Nữ, chính người cast và Leader nếu sống/trên sân/hợp lệ. Thân và hai tay Tàn Thần là một mục tiêu Heal theo pool chung, không nhân ba; Chi Tâm không nằm trong nhóm được chọn. Chi Tâm chọn tối đa hai người khác nhau ở mỗi contact; có thể chọn lại ở contact sau.
+
+Canon gameplay đã chốt và ranh giới profile còn lại: [Tinh Không Ma Nữ — Clarified Gameplay Canon](docs/canon%20kit/Tinh_Khong_Ma_Nu_Clarified_Gameplay_Canon.md).
 
 78) 
 mage, ssr
