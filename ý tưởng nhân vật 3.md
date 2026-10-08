@@ -1990,19 +1990,19 @@ Sau khi nhận:
 
 73) Hoá Thân Ký Ức Chi Chủ
 
-Nội tại, Ngã Tự Bất Vong: Khi Hp về 0, 2 turn sau (mỗi khi đến turn của ô hắn chết tính 1 turn bất kể ô đó có ai đứng hay không) phục sinh với hp = 30% max hp/100% max hp có lúc tử vong ở lần trước (+15%/lần phục sinh) và 100% mọi chỉ số được rank mul scale của lần tử vong trước, phục sinh tối đa 3 lần trong trận, trong 1 turn của hắn sau phục sinh, bị mọi đơn vị kẻ thù lãng quên trong 1 turn đó, không phải và không gán mark/buff/hiệu ứng xấu lên kẻ thù, đây là hiệu ứng đặc thù áp dụng lên bản thân hắn, ở 2 lần phục sinh đầu player/npc kẻ thù vẫn có thể thấy hắn, ở lần phục sinh thứ 3 hắn biết mất khỏi tầm mắt của nhân vật trong game lẫn player đang chơi game trong thời gian lãng quên tác dụng, trong quãng thời gian lãng quên kích hoạt, hắn vẫn có thể tấn công nhưng vị trí hắn đứng, debuff/buff/hiệu ứng/mark/hp bar của hắn đều mất tác dụng và không hiển thị cho player kẻ thù thấy, nếu pve thì AI địch cũng sẽ bỏ qua hắn khỏi suy nghĩ, đương nhiên vì tấn công nên player chơi game biết hắn đang ở trạng thái lãng quên, AI cũng biết nhưng chính là không thể target mục tiêu bởi bất kỳ kit nào dù có gây sát thương hay không khi hắn ở trạng thái Lãng Quên.
-Vì chỉ số lấy từ lần phục sinh trước nên nếu bị ảnh hưởng chỉ số thì sức mạnh của hắn sẽ biến động theo.
+Nội tại, Ngã Tự Bất Vong: Khi HP về 0 và tử vong được xác nhận, sau 2 natural action của ô nơi hắn chết (mỗi khi đến natural action của ô đó tính 1, bất kể ô đó có ai đứng hay không), hắn phục sinh tối đa 3 lần trong trận. Max HP mới bằng 100% Max HP đã snapshot ở lần tử vong ngay trước; Current HP khi phục sinh lần lượt bằng 30% / 45% / 60% Max HP đó. ATK, WIL, ARM, RES và HP Regen cũng lấy 100% giá trị đã được rank multiplier scale và chịu các thay đổi chỉ số lúc tử vong ngay trước, không nhân rank multiplier thêm lần nữa. Sau mỗi lần phục sinh, hắn bị mọi đơn vị kẻ thù Lãng Quên trong 1 natural action cá nhân kế tiếp của hắn. Đây là trạng thái đặc thù trên bản thân hắn, không gán mark/buff/hiệu ứng xấu lên kẻ thù. Ở 2 lần phục sinh đầu, player/NPC kẻ thù vẫn thấy hắn; ở lần phục sinh thứ 3, hắn biến mất khỏi tầm mắt nhân vật trong game và player kẻ thù trong thời gian Lãng Quên. Trong Lãng Quên, hắn vẫn có thể tấn công; vị trí, buff/debuff/hiệu ứng/mark/HP bar của hắn không hiển thị cho player kẻ thù thấy. AI địch bỏ qua hắn khi chọn mục tiêu. Player và AI có thể biết hắn đang tấn công trong Lãng Quên, nhưng không thể chọn hắn làm mục tiêu bởi bất kỳ kit nào, dù gây sát thương hay không. Hắn vẫn chiếm vị trí trên sân và vẫn có thể bị AoE có vùng tác động đã xác định đánh trúng.
+Vì chỉ số lấy từ lần tử vong ngay trước nên nếu bị ảnh hưởng chỉ số thì sức mạnh của hắn sẽ biến động theo. Trong Lãng Quên, vị trí, buff/debuff/hiệu ứng/mark/HP bar chỉ bị ẩn khỏi đối thủ và không thể dùng để chọn hắn làm mục tiêu; hiệu ứng đã áp dụng và chỉ số của hắn không bị tạm ngừng tác dụng hay xóa đi vì Lãng Quên.
 Nhân vật này có Thần Tính.
 toàn bộ nội tại mang tag Quy Tắc, riêng thần tính mang tag Axiom.
-Thần tính miễn nhiễm mọi kit gây hiệu ứng xấu nên không sợ Viên Chúc, mọi Prime có thần tính đều không sợ hắn.
+Thần Tính chặn mọi hiệu ứng ngoài thuộc scope của nó, có lợi/hại/trung tính, kể cả Buff/Debuff/Mark và buff từ đồng minh. Không tự động chặn sát thương trực tiếp. Viên Chúc không vượt được Thần Tính bằng hiệu ứng xấu thông thường; mọi Prime có Thần Tính đều có bảo vệ này. Chỉ khi hiệu ứng ngoài trực tiếp mâu thuẫn với Thần Tính mới phán định Authority; hiệu ứng thắng được Axiom tương ứng và thực sự áp dụng trước death mới có hậu quả chỉ số được snapshot.
 
-skill 1, : khi kích hoạt khiến 3 kẻ thù ngẫu nhiên quên mất 1 kỹ năng của chúng trong 1 turn, tức trong 1 turn đó không thể dùng kỹ năng bị quên, 25 ae. 1 turn đó tính từ turn hành động của chúng, nên khi bị dính skill này khi đến turn của kẻ bị dính chúng không thể dùng skill bị lãng quên, đến turn sau mới có thể dùng, quy tắc.
-khi dùng skill này xong, lâm vào cd 2 turn, mỗi khi hắn hành động cd -1 turn. Quy Tắc.
-chỉ khiến mục tiêu quên lãng ultimate, target trước, nếu mục tiêu có mội tại chống quên lãng skill thì phán định xung đột tag theo quy trình, nếu không có xung đột tag thì chắc chắn khiến mục tiêu quên lãng 1 skill, không chọn target trùng tức skill này không thể khiến 1 target quên 2 skill trong 1 lần cast skill này.
+Skill 1 — Quên Lãng Kỹ Năng: khi kích hoạt, chọn ngẫu nhiên tối đa 3 kẻ thù khác nhau; mỗi mục tiêu quên ngẫu nhiên 1 kỹ năng chủ động hoặc ultimate trong natural action cá nhân kế tiếp của chính mục tiêu. Không chọn nội tại hoặc đánh thường. Trong natural action đó không thể dùng kỹ năng bị quên dù đã hết cooldown hoặc ultimate đầy Rage; sau khi lượt đó kết thúc, kỹ năng dùng lại được. Cost 25 AE, cấp Pháp Tắc.
+Sau khi dùng, Skill 1 vào CD 2 natural action của bản thân Ký Ức Chi Chủ. Các Skill 2/3 tự kích hoạt không phải hành động giảm CD này.
+Chọn target trước, chọn kỹ năng sau; nếu mục tiêu có cơ chế chống quên lãng kỹ năng thì chỉ khi có xung đột trực tiếp mới phán định Authority theo quy trình. Không có cơ chế chống lại thì Quên Lãng chắc chắn thành công. Không chọn target trùng: một lần cast không thể khiến cùng một target quên 2 kỹ năng.
 
 skill 2, Đau Đớn Hồi Tưởng: tự kích hoạt khi 1 đồng minh gây sát thương lên 1 hoặc nhiều mục tiêu và khiến chúng mất tối thiểu 30% max hp của bản thân chúng, khiến những kẻ đó nhận thêm 1 lần sát thương (sát thương chuẩn) nữa nhưng = 50% sát thương đồng minh khiến chúng mất hp tối thiểu = 30% max hp, mỗi lần kích hoạt bất kể ảnh hưởng 1 hay nhiều mục tiêu đều tốn 30 ae, không target leader địch. Ví dụ, đồng minh gây aoe đánh 2 kẻ thù gây ra sát thương = 30% max hp của kẻ thù, skill này tự kích hoạt, trừ ae, kẻ thù đó lập tức nhận thêm 50% sát thương đồng minh gây ra lên chúng dưới dạng sát thương chuẩn. Đồng minh gây sát thương> skill này gây thêm sát thương, không ảnh hưởng đến đồng minh. Skill này chỉ tái hiện sát thương đồng minh gây ra dưới dạng sát thương chuẩn, đồng minh gây sát thương có debuff/mark hoặc bất kỳ hiệu ứng nào skill này đều sẽ không tái hiện, đây là 1 skill thuần sát thương, Pháp Tắc. Không tự kích hoạt khi thiếu ae, skill này và skill 3 không thể kích hoạt thủ công.
 
-Skill 3 — Tái Diễn Ký Ức: tự kích hoạt khi có 3 kẻ thù đánh thường liên tiếp, tức có 1 kẻ thù đánh thường, đến lượt tiếp theo của phe kẻ thù lại có thêm 1 kẻ đánh thường nữa và đến turn tiếp của kẻ thù lại có thêm 1 kẻ đánh thường nữa thì skill này sẽ tự kích hoạt. Khiến 3 kẻ đó không thể dùng skill/ultimate bất kể đầy rage mà chỉ có thể đánh thường trong 2 turn tiếp theo của cá nhân chúng, -15 ae/lần kích hoạt, không kích hoạt khi thiếu ae. Nếu trong 3 kẻ đó có kẻ chết thì cd bắt đầu đếm khi những kẻ còn sống bị ảnh hưởng bởi skill này thực thi xong 2 turn đánh thường.
+Skill 3 — Tái Diễn Ký Ức: tự kích hoạt khi 3 natural action cá nhân liên tiếp của phe địch do 3 kẻ thù khác nhau thực hiện đều chọn đánh thường làm hành động chính. Khiến 3 kẻ đó không thể dùng skill/ultimate bất kể đầy Rage, chỉ có thể đánh thường trong 2 natural action cá nhân kế tiếp của mỗi mục tiêu; không khóa nội tại và không tiêu hao Rage. Cost 15 AE/lần kích hoạt; thiếu AE ở hành động thứ ba thì không kích hoạt và chuỗi reset. Cooldown và thời hạn khóa là hai clock độc lập: mục tiêu chết không trì hoãn việc bắt đầu CD của caster.
 Skill 3 vào cooldown ngay sau khi kích hoạt.
 CD 2 lượt hành động của Ký Ức Chi Chủ.
 Trong thời gian CD, skill không thể ghi nhận chuỗi mới.
@@ -2013,7 +2013,7 @@ Nếu không đủ AE ở thời điểm đòn thứ ba xảy ra:
 skill không kích hoạt và chuỗi reset.
 vậy nếu cả 3 còn sống thì khi kích hoạt skill này + điều kiện kích hoạt thì 3 kẻ đó sẽ đánh thường mỗi kẻ 3 lần liên tiếp.
 
-ultimate: gây aoe toàn sân = 200% wil/atk của bản thân, tự hồi hp cho bản thân = 20% tổng sát thương ult này gây ra.
+Ultimate: gây AoE toàn sân = 200% ATK + 200% WIL của bản thân, tự hồi HP bằng 20% tổng Actual HP Damage do chính Ultimate này gây ra.
 ta không hồi phục, đau đớn khiến chúng nghĩ về ta, ký ức về ta càng thêm sâu đậm, càng nghĩ thì càng ám ảnh.
 
 Mỗi lần phục sinh lấy:
@@ -2197,7 +2197,7 @@ Không tăng rage.
 Không kích hoạt hiệu ứng “sau khi hành động”.
 Không kích hoạt hiệu ứng “khi dùng skill” nếu hệ thống không ghi rõ.
 Ultimate:
-AoE toàn sân = 200% WIL/ATK.
+AoE toàn sân = 200% ATK + 200% WIL.
 Hồi HP bằng tổng 20% sát thương ultimate gây ra.
 Nên tính hồi dựa trên:
 Tổng actual HP damage gây lên mọi mục tiêu.
