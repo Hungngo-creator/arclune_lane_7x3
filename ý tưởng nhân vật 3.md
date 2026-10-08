@@ -2630,7 +2630,7 @@ Max HP 10.000
 Tổng actual HP damage từ toàn bộ damage packet của một action lên hắn.
 Không phải từng hit.
 
-skill 1: cầu nguyện Quang Chủ che chở, hồi hp = 70% wil và atk của bản thân cho bản thân và cường hoá khả năng phòng thủ, tăng 10% res và arm của bản thân trong 2 Turn Boundary, hiệu ứng tăng res/arm này không stack, kích hoạt chỉ làm mới thời gian tồn tại hiệu ứng cũ, 20 ae.
+skill 1: cầu nguyện Quang Chủ che chở, hồi hp = 150% wil và 120% atk của bản thân cho bản thân và cường hoá khả năng phòng thủ, tăng 10% res và arm của bản thân trong 2 natural Action, hiệu ứng tăng res/arm này không stack, kích hoạt chỉ làm mới thời gian tồn tại hiệu ứng cũ, 20 ae.
 
 Heal nên tính theo stat snapshot khi cast.
 ARM/RES buff là percentage modifier của chỉ số hiện tại.
@@ -2638,16 +2638,16 @@ Recast chỉ refresh duration, không stack.
 
 skill 2: tiếp cận kẻ địch, tán mạnh khiên vào đầu kẻ địch, gây sát thương = 100% wil và atk lên kẻ địch đó, có 15% tỉ lệ gây choáng mục tiêu trong 1 turn, 25 ae.
 di chuyển tới mục tiêu chỉ là animation.
+choáng: không thể thực thi 1 natural Action.
 
-skill 3: khi hp trên hoặc bằng 70% max hp, tự kích hoạt và nhận taunt trong 2 Turn Boundary, khi đạt điều kiện sẽ kích hoạt ngay lập tức khi nhân vật đã thực thi hành động xong và đang đợi đến lượt ssi tiếp theo của bản thân, cd 1 Turn Boundary, cost: 15 ae. Trong thời gian kích hoạt mỗi Turn Boundary hồi 4% max hp của bản thân cho bản thân và leader đồng minh.
+skill 3: khi hp trên hoặc bằng 70% max hp, tự kích hoạt và nhận taunt trong 2 natural action (mất khi đầu natural action 2 khi kích hoạt), khi đạt điều kiện sẽ kích hoạt ngay lập tức khi nhân vật đã thực thi hành động xong và đang đợi đến lượt ssi tiếp theo của bản thân, cd 1 natural action, cost: 15 ae. Trong thời gian kích hoạt mỗi natural Action hồi 4% max hp của bản thân cho bản thân và leader đồng minh.
 Ví dụ:
 A action
 → Skill 3 trigger
-→ Taunt 2T
-→ cooldown = 1T
-thì Boundary tiếp theo:
+→ Taunt 2 nt
+→ cooldown = 1 nt
+thì natural Action tiếp theo:
 cooldown giảm về 0,
-nhưng Taunt vẫn còn 1 Boundary.
 Nếu HP vẫn ≥70% khi A action tiếp theo kết thúc:
 Skill 3 có thể lập tức trigger lại.
 
@@ -2660,6 +2660,8 @@ Ultimate
 → Taunt + heal-over-time effect
 → Ultimate complete
 Không cần simultaneous.
+
+Canon gameplay và normalization: [Gideon Vale — Clarified Gameplay Canon](docs/canon%20kit/Gideon_Vale_Clarified_Gameplay_Canon.md).
 
 80) Roth Vargan
 
