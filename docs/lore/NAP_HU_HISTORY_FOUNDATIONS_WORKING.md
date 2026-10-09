@@ -1,6 +1,6 @@
 # NẠP HƯ — KHUNG LỊCH SỬ NỀN TRƯỚC KHI CHIA ĐẠI KỶ
 
-> **Bàn giao mới 2026-10-08:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L11** và mục LIII–LIV về nền công pháp / Đạo Ngân, Địa Tiên, các hệ quả lịch sử chưa đặt ngày. L10 giữ tín ngưỡng / hài tử học hiểu, L09 giữ đầy đủ triết lý điểm neo. Không tự xác nhận Thái Sơ / sáng thế chủ.
+> **Bàn giao mới 2026-10-09:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L12** và mục LV–LVI về hai thế lực / sự hiếm Chính Tiên. Á Không Gian mang vật chất vào được. Giữ niên đại hai thế lực còn mở, L09–L11 giữ lập luận điểm neo / tín ngưỡng / Chi Tâm.
 
 > **Trạng thái:** Niên biểu đang xây dựng.
 >
@@ -1841,7 +1841,7 @@ Linh hồn bị trảm ý nhưng vượt Địa Kiếp, nếu ẩn nấp đượ
 
 # XLIX. TIÊN THIÊN SINH LINH, Á KHÔNG GIAN LUÂN HỒI VÀ ĐAN DƯỢC TẠO CHÂN NGÃ
 
-> **CÒN MỞ sau L11:** hai miền dưới được gọi “á không gian” trong lore cũ, có vật chất / cảnh vật riêng. Định nghĩa Á Không Gian mới là lớp trống không vật chất, nên vị trí / quan hệ giữa hai miền và lớp ấy cần giải thích thêm. Giữ sự tồn tại, cảnh vật và các sự kiện; chưa đổi chúng thành bí cảnh thông thường. Đề nghị miền có cấu trúc neo trong lớp trống tại mục LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md) chưa được tác giả xác nhận.
+> **ĐÃ LÀM RÕ L12:** Á Không Gian không có vật chất sẵn nhưng **mang vật chất vào được**; cảnh vật hai miền không còn tạo mâu thuẫn về khả năng chứa vật chất. Nguồn / phương pháp hình thành cụ thể và cách ổn định từng miền vẫn chưa chốt. Không đổi các miền thành bí cảnh thông thường; xem mục LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
 
 ## Cây cỏ từ khai thiên tích địa — ĐÃ CHỐT
 
@@ -1877,7 +1877,7 @@ Tác giả muốn kéo dài lịch sử, nhưng chưa đặt số năm mới. Gi
 
 # LI. CỰC ÍT CHÍNH TIÊN VÀ LỊCH SỬ NGHIÊN CỨU THÁI SƠ
 
-**ĐÃ CHỐT:** toàn bộ dòng thời gian Nạp Hư có **không quá mười Thiên Địa Chính Tiên**. Danh sách, thời đại từng người, có Thái Sơ hay không còn mở. Không thêm hàng loạt Chính Tiên chỉ để lấp thời gian lịch sử.
+**ĐÃ CHỐT:** toàn bộ dòng thời gian Nạp Hư có **không quá mười Thiên Địa Chính Tiên**. **L12:** thế lực Tiên Thiên Sinh Linh có **tối thiểu hai** Chính Tiên, tính trong tổng này; danh tính / thời đại chưa chốt. Tác giả muốn ít Chính Tiên vì đường tu khó và Chân Tiên lục đục, người sắp đột phá thường bị tính toán. Có Thái Sơ hay không vẫn còn mở; không thêm hàng loạt Chính Tiên để lấp lịch sử.
 
 **ĐANG XÂY DỰNG:** mô hình Thái Sơ một thế giới / một điểm neo có đường cụt khi muốn hòa tan neo để quy tụ sức mạnh; đạo thống Main về sau tổng hợp kinh nghiệm Nạp Hư / Thần Huy, dùng thần cách và thần vực làm hai điểm neo chuyển tiếp. Lịch sử dài có thể chứa nghiên cứu, thất bại, thiếu thông tin và che giấu thành quả, chưa xác nhận một cuộc chứng Thái Sơ.
 
@@ -1930,4 +1930,38 @@ Các năng lực thân / hồn, phẩm giai còn xây dựng và thọ nguyên c
 Á Không Gian là tuyến di chuyển / xâm nhập của Chân Tiên, nhưng **Giới Bích Nạp Hư vẫn là một và bao phủ cả hiện thế lẫn lớp ấy**. Không tự sửa chiến tranh Ma Đạo / chuyện Giới Bích thành xâm nhập không cần phá biên giới.
 
 Hướng Kiếm Tiên đầu tiên bị vây trong bí cảnh vẫn **ĐANG XÂY DỰNG**, chưa thành sự kiện. Độ khó phá tường bí cảnh mới là cơ sở bàn cách mắc kẹt, không tự gán mốc ba Hóa Vực Nhập Đạo cho bí cảnh đủ sức giữ một Chân Tiên. Cấu trúc đầy đủ tại mục LXII–LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
+
+
+---
+
+# LV. HAI THẾ LỰC TRONG Á KHÔNG GIAN — CHƯA ĐẶT MỐC XUẤT HIỆN
+
+**ĐÃ CHỐT L12:** Á Không Gian không có vật chất sẵn nhưng có thể mang vật chất vào; tiểu thiên địa / kiến trúc ở lớp ấy là khả thi. Giữ Luân Hồi và vương quốc Tiên Thiên Sinh Linh đã có, không thêm một sự kiện di chuyển vật chất cụ thể khi chưa có lời chốt.
+
+**Tam Thập Tam Trọng Thiên:** một tiểu thiên địa trong Á Không Gian có **33 Chân Tiên ngang địa vị**, không lãnh đạo. Kiến trúc đặc thù dồn sức 33 người vào một người; mỗi lần xuất thủ **một người nhận gia trì của 32 người còn lại**, đạt **chiến lực bán bộ Chính Tiên**. Đây chưa là một lần chứng Quy Tắc / Chính Tiên thật. **Tác giả chưa quyết định thời điểm xuất hiện**; không tự đặt trước / sau Huyết Thế Đại Kiếp hoặc âm mưu Nhân Quả.
+
+**Thế lực Tiên Thiên Sinh Linh:** quy mô chưa chốt cụ thể, **hơn 50 Chân Tiên**, **ít nhất 2 Chính Tiên**. Nối cộng đồng cây cỏ Tiên Thiên / vương quốc riêng đã có; tên mới, danh sách, thời điểm đạt quy mô và đường chứng của hai Chính Tiên còn mở. Hai vị nằm trong tổng không quá mười của toàn lịch sử. Không tự gán hai vị là Nhân Tổ / Nguyên Sơ hoặc đặt họ sẵn ở Chính Tiên ngay từ lúc khai linh.
+
+**CÒN MỞ về lịch sử:** hai thế lực có giao thiệp / xung đột gì, đóng vai trò trong các Đại Kiếp hay âm mưu Nhân Quả không, thời điểm tương ứng. Không biến việc tồn tại ở vùng ẩn thành hoàn toàn không biết hoặc hoàn toàn chi phối ngoại giới.
+
+Mô tả hiện tại ở mục LXVI–LXVII của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
+
+---
+
+# LVI. CHÍNH TIÊN HIẾM — KHÓ CHỨNG ĐẠO VÀ CẢN TRỞ CỦA ĐỒNG ĐẠO
+
+**ĐÃ CHỐT L12:** tác giả muốn Chính Tiên ít; **đường tu khó** và **Chân Tiên lục đục với nhau**, kẻ sắp chứng Chính Tiên thường bị tính toán. Không biến thành xác suất / tỷ lệ chết cố định hoặc luật tất cả Chân Tiên buộc phải chống mọi người đột phá.
+
+**Phân tích / đề nghị Codex, chưa chốt từng thủ đoạn:**
+
+1. Độc chiếm Pháp Tắc làm thiếu nền có thể tiếp tục cảm ngộ; muốn đủ một Quy Tắc phải giải quyết quyền sở hữu / những phần còn thiếu.
+2. Tu nhanh nhờ tư chất / tài nguyên chưa đủ để cảm ngộ và ráp Pháp Tắc đúng hệ.
+3. Chân Tiên có thể tính toán người đang gom các Pháp Tắc cần thiết, cắt nguồn tài nguyên / phá chỗ dựa / dùng mâu thuẫn để đánh nhau; thủ đoạn cụ thể và nhân vật chưa được đặt.
+4. Một khi ráp đủ Quy Tắc, Thiên Đạo tự hạ Chính Tiên Kiếp. Không đề nghị trạng thái Chân Tiên đã sở hữu toàn Quy Tắc nhưng hoãn kiếp vô thời hạn.
+5. Chính Tiên Kiếp là cửa khó riêng; chi tiết kiếp chưa chốt, không tự dùng ba kiếp Chân Tiên cho Chính Tiên.
+6. Có đồng đạo / thế lực bảo vệ có thể giúp vượt tính toán, vẫn phải đủ nền và qua kiếp. Nhận định lợi thế bảo vệ của cộng đồng Tiên Thiên Sinh Linh là suy luận, chưa giải thích chính thức hai Chính Tiên của họ.
+
+Âm mưu Nhân Quả sau Huyết Thế Đại Kiếp trước Main đời I vẫn là sự kiện riêng, chưa gán 33 Chân Tiên / hai Chính Tiên mới làm thủ phạm. Thiên Đạo không đọc tâm trí Chân Tiên trở lên; các âm mưu xét dấu vết, nhân quả và thủ đoạn đã có, không thêm năng lực đọc mọi suy nghĩ.
+
+**Thiên tài theo niên đại:** chuẩn tốc độ đề nghị mới dùng thời hệ hậu thiên đã hoàn thiện; không áp ngược để phủ nhận những người chứng Chân trong thời sơ khai / Hắc Ám Kỷ có điều kiện khác. “Hắc Ám Kỷ bắt đầu → Nhân Tiên chứng Chân ít nhất 35.000 năm” vẫn là khoảng giữa sự kiện, không tự thành tuổi tu của Nhân Tiên. Bảng dự thảo ở mục XX của [Hệ thống sức mạnh](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md).
 

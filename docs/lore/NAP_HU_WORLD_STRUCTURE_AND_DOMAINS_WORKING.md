@@ -1,6 +1,6 @@
 # NẠP HƯ GIỚI — CẤU TRÚC QUẦN VỰC, GIỚI BÍCH & CÁC ĐẠI VỰC HIỆN HÀNH
 
-> **Bàn giao mới 2026-10-08:** [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L11**; mục LXII–LXV phân biệt Thiên Địa Bí Cảnh, Á Không Gian, Địa Tiên và ghi xung đột cần bàn với hai miền cổ. L10 / mục XX.2 / LXI giữ điều kiện tín ngưỡng hướng về đối tượng.
+> **Bàn giao mới 2026-10-09:** [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L12**; Á Không Gian không có vật chất sẵn nhưng có thể mang vào. Mục LXVI–LXVII bổ sung Tam Thập Tam Trọng Thiên và thế lực Tiên Thiên Sinh Linh; niên đại chưa chốt. L11 / mục LXII–LXV giữ bí cảnh / Địa Tiên.
 
 > **Trạng thái:** Thiết kế thế giới đang xây dựng — dùng để tiếp tục khóa địa lý, lịch sử và vật lý Nạp Hư trước khi viết biên niên sử chính thức.
 >
@@ -2500,7 +2500,7 @@ Nó có thể tu luyện và độ **Nhân → Địa Kiếp** lần nữa, khô
 
 # LVIII. QUẦN VỰC SƠ KHAI VÀ HAI Á KHÔNG GIAN CỔ
 
-> **CÒN MỞ sau L11:** “á không gian” trong mô tả cũ của vương quốc thực vật / Luân Hồi chưa được đối chiếu xong với Á Không Gian mới không có vật chất. Giữ sự tồn tại và cảnh vật hai miền; chưa mặc định chúng là lớp trống dùng đi lại hoặc đổi thành Thiên Địa Bí Cảnh. Xem mục LXV.
+> **ĐÃ LÀM RÕ L12:** Á Không Gian không có vật chất sẵn, **có thể mang vật chất vào**. Vì vậy đất / sông / hoa, cây cỏ và kiến trúc trong các miền riêng không tạo mâu thuẫn về khả năng chứa vật chất. Nguồn vật chất cụ thể và cách ổn định từng miền còn mở; không tự đổi hai miền cổ thành bí cảnh thường. Xem mục LXV.
 
 ## Các Vực sơ khai và lần phân vỡ — ĐÃ CHỐT
 
@@ -2586,7 +2586,7 @@ Không mặc định bí cảnh là Đại Vực, nội không gian của Chân 
 
 Á Không Gian:
 
-- Không có trên / dưới / trái / phải, không có vật chất.
+- Không có trên / dưới / trái / phải theo nền lớp không gian, **không có vật chất sẵn nhưng có thể đem vật chất vào** (tác giả làm rõ L12). Điều kiện phương hướng trong các miền có cấu trúc riêng chưa được chốt.
 - Linh Khí cực ít.
 - Thời gian nhanh hoặc chậm hơn hiện thế Nạp Hư tùy vùng.
 - Giới hạn của nó là giới hạn **Chư Thiên**, vì thế là tuyến có thể dùng xâm nhập.
@@ -2622,9 +2622,12 @@ Bí cảnh đối với Địa Tiên được ví với thế giới nội đố
 
 # LXV. HAI MIỀN CỔ VÀ VIỆC PHÂN BIỆT CÁC KHÔNG GIAN
 
-**CÒN MỞ thật sự sau định nghĩa mới:** lore trước gọi **Luân Hồi Chi Địa** và **vương quốc Tiên Thiên Sinh Linh** là “á không gian”, nhưng Luân Hồi có đất / sông / hoa / cối xay, vương quốc có cây cỏ sinh sống. Á Không Gian mới được tác giả định là không có vật chất. Không thể coi cả hai mô tả đều đã khớp mà không giải thích.
+**ĐÃ LÀM RÕ L12:** “Á Không Gian không có vật chất” chỉ trạng thái nền không có vật chất sẵn, **không cấm đem vật chất vào**. Nhận định của Codex ở L11 rằng cảnh vật Luân Hồi / vương quốc thực vật tạo mâu thuẫn đã được sửa.
 
-**Đề nghị Codex chưa được xác nhận:** Á Không Gian là lớp trống dùng đi lại; hai miền cổ là những miền có cấu trúc / thiên địa riêng nằm hoặc được neo trong lớp ấy. Cách này giữ nội dung cũ mà không cho lớp trống tự có đất đá. Chưa tự đặt hai nơi thành Thiên Địa Bí Cảnh thông thường có một cửa, Địa Tiên hay Giới Bích cấp Hóa Vực. Bản thể / nơi đặt / cách vào cần bàn riêng; ngưỡng nhìn vương quốc Chân Tiên trở lên và cấm Chính Tiên vào Luân Hồi vẫn giữ.
+Giữ **Luân Hồi Chi Địa** có đất / sông / hoa / cối xay, **vương quốc Tiên Thiên Sinh Linh** trong Á Không Gian và Tam Thập Tam Trọng Thiên là tiểu thiên địa có kiến trúc ở lớp ấy. Các miền này không phải bản thân toàn lớp Á Không Gian trống dùng di chuyển.
+
+**CÒN MỞ:** vật chất cụ thể tới mỗi miền bằng cách nào, phương pháp dựng / ổn định thiên địa riêng, liên hệ với cơ chế Thiên Địa Bí Cảnh. Không bắt buộc gọi chúng là bí cảnh thường có một cửa / Địa Tiên hoặc áp ngưỡng phá tường cấp Hóa Vực. Ngưỡng nhìn vương quốc Chân Tiên trở lên và hạn chế Chính Tiên vào Luân Hồi vẫn giữ.
+
 
 Các cấu trúc còn phải phân biệt:
 
@@ -2634,8 +2637,47 @@ Các cấu trúc còn phải phân biệt:
 | Thế giới nội Chính Tiên | Qua Chính Tiên Kiếp mới khai thiên tích địa |
 | Thiên Địa Bí Cảnh | Tiểu thế giới sinh trong Nạp Hư, hữu hạn, cửa nối và Giới Bích yếu hóa |
 | Tiên Vực / Đạo Vực | Miền Chân Tiên neo vào Pháp Tắc Nạp Hư theo lore trước; chưa tự đồng nhất với bí cảnh hay nội không gian |
-| Á Không Gian | Lớp di chuyển trống, ít Linh Khí, thời gian biến thiên, chịu cùng Giới Bích Nạp Hư |
+| Á Không Gian | Nền không có vật chất sẵn nhưng mang vật chất vào được; ít Linh Khí, thời gian biến thiên, chịu cùng Giới Bích Nạp Hư |
 | Thần vực Main | Ngoài cơ thể, không thu tùy ý, là điểm neo bên cạnh thần cách; không lấy luật bí cảnh Nạp Hư áp vào |
 
 Không dùng Á Không Gian để vượt miễn phí Giới Bích Nạp Hư, không dùng nội không gian Chân Tiên thay một thế giới đã khai thiên tích địa, không dùng đường Địa Tiên để tự giải cơ chế giữ ký ức qua Luân Hồi.
+
+
+---
+
+# LXVI. TAM THẬP TAM TRỌNG THIÊN
+
+**ĐÃ CHỐT L12 — nguồn tác giả:**
+
+- Một vùng **tiểu thiên địa trong Á Không Gian**.
+- Có **33 Chân Tiên**, địa vị ngang nhau, **không có lãnh đạo**.
+- Có **kiến trúc đặc thù** liên kết sức mạnh 33 người vào **một người**.
+- Khi thế lực xuất thủ chỉ **một người mang gia trì của 32 Chân Tiên còn lại**.
+- Người được gia trì có **chiến lực bán bộ Thiên Địa Chính Tiên**.
+- **Thời điểm xuất hiện chưa quyết định**, chưa đặt vào một Đại Kỷ / mốc niên biểu.
+
+**Ranh giới:** chiến lực gia trì không tự là hoàn chỉnh Quy Tắc, qua Chính Tiên Kiếp hay sở hữu thế giới nội Chính Tiên. Không đếm người đại diện là Chính Tiên thật hoặc cả 33 người đều có chiến lực bán bộ Chính Tiên đồng thời.
+
+**CÒN MỞ:** hình thức / nguồn gốc kiến trúc, cách chọn người mang gia trì, phạm vi hoạt động, thời gian duy trì, tiêu hao / rủi ro, yêu cầu vị trí của 32 người, quan hệ với các thế lực khác. Không tự quyết định gia trì dùng được ở mọi cự ly hoặc có một người cố định làm thủ lĩnh. Tên 33 trọng chưa tự xác nhận có 33 tầng kiến trúc hoặc mỗi người sở hữu một tầng.
+
+**SUY LUẬN Codex, chưa chốt:** hình thức này cho phép nhiều Chân Tiên hợp tác đạt sức chiến đấu cao khi từng người vẫn giữ quyền / địa vị riêng. Có thể khai thác bài toán đồng thuận và lựa chọn đại diện; chưa mặc định họ liên minh nhằm chống Chính Tiên hoặc mọi Chân Tiên bên ngoài đều thù địch.
+
+---
+
+# LXVII. THẾ LỰC TIÊN THIÊN SINH LINH
+
+**ĐÃ CHỐT L12 — nguồn tác giả:**
+
+- Một thế lực của **Tiên Thiên Sinh Linh**, nối phần vương quốc cây cỏ Tiên Thiên đã có ở mục LVIII.
+- Số Chân Tiên chưa chốt chính xác nhưng **hơn 50 Chân Tiên**.
+- Có **tối thiểu 2 Thiên Địa Chính Tiên**.
+- Chưa đặt tên mới cho thế lực, lãnh đạo, danh sách thành viên, hệ Quy Tắc hoặc niên đại đạt quy mô này.
+
+Các cận dưới là quy mô thế lực tác giả đặt; không tự đặt toàn bộ quy mô ấy ngay lúc Thiên Đạo vừa thức tỉnh, không thay câu trước rằng tới lúc ấy cây cỏ Tiên Thiên đều đã tự nhiên thành Chân Tiên. Thời điểm có hai Chính Tiên / quan hệ với Đại Hợp Giới còn mở.
+
+**Giới hạn toàn lịch sử giữ nguyên:** tối thiểu hai Chính Tiên của thế lực này **nằm trong tổng không quá mười Chính Tiên Nạp Hư**, không phải phần thêm ngoài giới hạn. Chưa gán Nhân Tổ / Nguyên Sơ làm hai vị ấy hoặc đếm mỗi đời Luân Hồi thành một người mới.
+
+**SUY LUẬN Codex, chưa chốt:** thời gian tồn tại rất lâu và cộng đồng đồng đạo có thể tạo lợi thế tích lũy / bảo vệ người sắp chứng đạo. Chưa đặt đây là nguyên nhân thật hai vị đạt Chính Tiên, chưa cho thế lực toàn tri, thống trị Nạp Hư hoặc quyết định họ có tham gia các Đại Kiếp.
+
+Hạt nhân lịch sử / giới hạn Chính Tiên xem mục LV–LVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md); tiêu chuẩn thiên tài hậu thiên là đề nghị riêng, không áp máy móc cho tiên trời sinh.
 

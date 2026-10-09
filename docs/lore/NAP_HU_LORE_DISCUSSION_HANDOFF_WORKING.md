@@ -1,14 +1,14 @@
 # BÀN GIAO HỘI THOẠI LORE NẠP HƯ — ĐIỂM NEO, TU LUYỆN VÀ LUÂN HỒI
 
-> **Ngày lưu đầu:** 2026-10-06. **Cập nhật mới nhất:** 2026-10-08.
+> **Ngày lưu đầu:** 2026-10-06. **Cập nhật mới nhất:** 2026-10-09.
 >
-> **Phạm vi:** mười một lượt trao đổi liên quan, gồm đủ năm lượt tác giả chỉ bằng ảnh, các lượt trước đó, lượt tín ngưỡng / tám cảnh và L11 về Đạo Ngân / Chi Tâm / Địa Tiên, kèm hai câu trả lời làm rõ. Nội dung được tóm lược theo ý nghĩa; đây không phải bản chép nguyên văn. Phân biệt lời tác giả, phần đáp của Codex, đề nghị chưa được xác nhận và ý đã bị sửa.
+> **Phạm vi:** mười hai lượt trao đổi liên quan, giữ đủ năm lượt tác giả chỉ bằng ảnh, các lượt trước đó và L09–L11; L12 sửa Á Không Gian, bổ sung hai thế lực, đề nghị tiêu chuẩn thiên tài và sự hiếm Chính Tiên. Nội dung được tóm lược theo ý nghĩa; đây không phải bản chép nguyên văn. Phân biệt lời tác giả, phần đáp của Codex, đề nghị chưa được xác nhận và ý đã bị sửa.
 >
 > **Yêu cầu của tác giả:** khi mở một cuộc trò chuyện lore mới, Codex phải đọc được câu hỏi lore gần nhất trước yêu cầu lưu này và phần trả lời tương ứng, đồng thời giữ được các câu hỏi / trả lời trước đó. Không để những thảo luận có giá trị chỉ tồn tại trong ngữ cảnh chat.
 
 ## 1. Đọc trước để nối tiếp cuộc thảo luận
 
-**Lượt lore gần nhất là L11 (2026-10-08): tư chất / ngộ tính, công pháp và pháp khí, bảy mức thuần thục, tám cảnh, Đạo Ngân / Chi Tâm / nội không gian, Địa Tiên, bí cảnh / Á Không Gian, và tham khảo bốn bộ truyện.** Đọc L11.A cho ý tác giả, L11.B cho hai đáp án làm rõ, L11.C cho phần trả lời / đề nghị Codex và nguồn web, L11.D cho phần còn mở. L10 giữ tín ngưỡng / tiên trời sinh, L09 giữ đầy đủ câu hỏi dài và phần trả lời về một / hai điểm neo; không xóa lịch sử lý luận.
+**Lượt lore gần nhất là L12 (2026-10-09): Á Không Gian mang vật chất vào được; Tam Thập Tam Trọng Thiên; thế lực Tiên Thiên Sinh Linh; cần mốc thiên tài theo tuổi thọ / khí vận / tư chất / ngộ tính; Chính Tiên ít vì khó tu và bị đồng đạo tính toán.** Đọc L12.A cho lời tác giả, L12.B cho phần đáp / bảng đề nghị, L12.C cho phần còn mở. L09–L11 và các lượt trước giữ đầy đủ lý luận / phần đáp, không xóa lịch sử.
 
 Trạng thái mới nhất cần mang sang cuộc trò chuyện sau:
 
@@ -18,7 +18,11 @@ Trạng thái mới nhất cần mang sang cuộc trò chuyện sau:
 - **Cập nhật L11:** cơ chế tác giả vừa nêu sửa nhiều dòng của bảng đề nghị L10: Dưỡng Hình có pháp thuật, Khai Mệnh mọc chi thể, Chiếu Hồn chưa phát giác Chỉ Dẫn, Khắc Pháp khắc vào Chi Tâm. Những phần L10 chưa được xác nhận vẫn là đề nghị.
 - **ĐÃ CHỐT L11:** Nhập Đạo mạnh hơn Hoàn Mỹ và tốn tổng linh lực hơn; cả Khắc Pháp lẫn Định Pháp đều hao thọ. Đạo Ngân → Chi Tâm nối chòm sao → qua Chân Tiên Kiếp mới có nội không gian trống; qua Chính Tiên Kiếp mới khai thiên tích địa.
 - **ĐÃ CHỐT L11:** Địa Tiên giữ Chân Ngã / tái tạo linh hồn, neo bởi bí cảnh; thủng tường bí cảnh không tự hủy bí cảnh. Á Không Gian khác bí cảnh và vẫn có cùng Giới Bích Nạp Hư.
-- **CÒN MỞ L11:** hai miền cổ Luân Hồi / vương quốc thực vật có vật chất cần giải thích quan hệ với lớp Á Không Gian mới không có vật chất.
+- **ĐÃ LÀM RÕ L12:** Á Không Gian không có vật chất sẵn nhưng **mang vật chất vào được**; cảnh vật hai miền cổ không còn là mâu thuẫn về khả năng chứa vật chất. Nguồn cụ thể / cách dựng và ổn định từng miền còn mở.
+- **ĐÃ CHỐT L12:** Tam Thập Tam Trọng Thiên là tiểu thiên địa trong Á Không Gian, 33 Chân Tiên ngang địa vị / không lãnh đạo, kiến trúc gia trì 32 người vào người xuất thủ để đạt chiến lực bán bộ Chính Tiên. Niên đại chưa chốt.
+- **ĐÃ CHỐT L12:** thế lực Tiên Thiên Sinh Linh **hơn 50 Chân Tiên, tối thiểu 2 Chính Tiên**, tính trong tổng toàn lịch sử không quá mười. Danh tính / thời điểm còn mở.
+- **ĐÃ CHỐT L12:** Chính Tiên ít vì đường tu khó và Chân Tiên lục đục, người sắp đột phá thường bị tính toán. Các thủ đoạn cụ thể chưa được chọn.
+- **ĐỀ NGHỊ L12:** bảng thiên tài theo thời gian từ bắt đầu tu và quỹ thọ nguyên cộng dồn; các số / cách đặt cấp chưa canon, đang chờ lựa chọn cách tính thời gian.
 - **ĐÃ CHỐT làm rõ L10:** cần cảm xúc hướng về đối tượng tin tưởng / tôn thờ. Lượng / chất, thu nhận và đường đi vẫn chưa có cơ chế cuối.
 
 - **ĐÃ CHỐT:** Nạp Hư chỉ là mốc so sánh để hình dung cấp độ hoàn thiện của thế giới riêng. Nạp Hư suy yếu không làm ai tự nhiên đủ điều kiện Thái Sơ.
@@ -429,6 +433,81 @@ Ba bộ đầu dùng nguồn Wuxiaworld; Tinh Thần Biến dùng bản dịch �
 - Thời lượng mọc chi thể, chi phí Lôi Độn / Pháp Tướng, phạm vi phá hoại và số liệu chiến lực từng cảnh. Những năng lực đã chốt không còn “chưa chốt có mọc tay chân không”.
 - **Đề nghị mốc thảo luận tiếp:** nền Chi Tâm / nguồn Tiên Khí trước, vì quyết định công pháp cao giai có giá trị gì ngoài hấp thu nhanh; sau đó mới nối với giữ ký ức qua Luân Hồi.
 
+
+### L12. Á Không Gian, hai thế lực và tiêu chuẩn thiên tài — 2026-10-09
+
+**A. Ý tác giả / phần mới đã chốt**
+
+1. **Á Không Gian không có vật chất sẵn nhưng mang vật chất vào được.** Vì vậy không được coi việc cây cỏ / đất đá / kiến trúc nằm trong đó là mâu thuẫn. L11 Codex đã hiểu hạn chế quá rộng; phần ấy được sửa, không thay cảnh vật Luân Hồi / vương quốc cổ.
+2. **Tam Thập Tam Trọng Thiên:** tiểu thiên địa trong Á Không Gian, có **33 Chân Tiên tồn tại**, địa vị ngang nhau, **không lãnh đạo**. Kiến trúc đặc thù liên kết sức mạnh 33 người vào **một người**; khi xuất thủ một người nhận gia trì của **32 người còn lại**, có **chiến lực bán bộ Chính Tiên**. Chưa biết mốc xuất hiện, tác giả chưa quyết định.
+3. **Thế lực Tiên Thiên Sinh Linh:** số lượng cụ thể còn mở, nhưng **hơn 50 Chân Tiên**, **ít nhất 2 Thiên Địa Chính Tiên**. Tên / danh sách / niên đại chưa có.
+4. Cần định **tu tới cảnh nào trong bao lâu gọi là thiên tài**, dựa tuổi thọ từng cảnh, khí vận / tư chất / ngộ tính.
+5. Tác giả muốn Chính Tiên ít: một phần đường tu khó, phần khác **Chân Tiên lục đục**, kẻ sắp chứng Chính Tiên **thường bị tính toán**. Chưa chọn âm mưu riêng hoặc xác suất đột phá.
+
+**B. Phần đáp, phân tích và đề nghị Codex**
+
+#### Sửa cơ chế Á Không Gian và lưu hai thế lực
+
+“Không có vật chất sẵn” không cấm chứa vật chất được đem vào. Giữ hai miền cổ ở Á Không Gian; nguồn / cách ổn định cụ thể vẫn mở. Không cần ép Luân Hồi hoặc vương quốc thực vật thành bí cảnh thường để giải một mâu thuẫn do Codex suy quá rộng. Giới Bích Nạp Hư vẫn là một ở cả hiện thế / Á Không Gian.
+
+Tam Thập Tam Trọng Thiên có thể dồn sức để một người **đánh ở mức bán bộ Chính Tiên** trong khi 33 người giữ vị cách Chân Tiên. Chưa có việc ráp trọn Quy Tắc / qua Chính Tiên Kiếp / khai thiên tích địa; không đếm thêm một Chính Tiên thật hoặc 33 người cùng được gia trì đồng thời.
+
+**Đề nghị / suy luận chưa chốt:** thế lực có thể khai thác bài toán đồng thuận và chọn đại diện. Chưa tự chọn người cố định, luật luân phiên, tầm gia trì vô hạn, hình thức 33 tầng kiến trúc hoặc động cơ thành lập nhằm chống Chính Tiên.
+
+Tối thiểu hai Chính Tiên của Tiên Thiên Sinh Linh tính trong **tổng không quá mười toàn lịch sử**. Không xác nhận danh tính họ là Nhân Tổ / Nguyên Sơ, thời điểm đạt Chính Tiên ngay lúc khai linh hoặc vai trò trong Đại Kiếp. Cộng đồng lâu đời có đồng đạo bảo vệ là một lợi thế có thể bàn, chưa chốt đó là nguyên nhân hai vị chứng thành.
+
+#### Tiêu chuẩn thiên tài đề nghị
+
+Codex hỏi tác giả: dùng thời gian từ bắt đầu tu, áp tu sĩ hậu thiên trong thời hệ tám cảnh đã hoàn thiện, hay tuổi tính từ sinh? **Tại lúc soạn chưa có trả lời**; tạm trình bày bảng theo thời gian từ bắt đầu tu, mọi con số là **ĐANG XÂY DỰNG / đề nghị**.
+
+| Mốc đạt được | Quỹ thọ nguyên danh nghĩa để đối chiếu | Tổng thời gian tu đề nghị để gọi thiên tài |
+|---|---:|---:|
+| Dưỡng Hình cửu trọng | 200 năm ở Dưỡng Hình | Trong 10 năm |
+| Khai Mệnh | 200 năm của Dưỡng Hình | Trong 20 năm |
+| Chiếu Hồn | 1.000 năm tới Khai Mệnh | Trong 80 năm |
+| Hiển Tướng | 2.400 năm tới Chiếu Hồn | Trong 250 năm |
+| Hóa Tuyền | 12.400 năm tới Hiển Tướng | Trong 1.500 năm |
+| Hóa Vực | 42.400 năm tới Hóa Tuyền | Trong 5.000 năm |
+| Khắc Pháp | 142.400 năm tới Hóa Vực | Trong 15.000 năm |
+| Định Pháp | 442.400 năm tới Khắc Pháp | Trong 50.000 năm |
+| Chân Tiên | 1.042.400 năm tới Định Pháp | Trong 150.000 năm |
+
+Thời gian **tổng từ bắt đầu tu**, không cộng từng hàng. Dưỡng Hình là cửu trọng / viên mãn; các hàng khác là lần đầu bước vào cảnh; Chân Tiên là qua trọn kiếp. Quỹ thọ ở hàng Khai Mệnh trở đi là tổng danh nghĩa ở cảnh **trước mốc đột phá**, chưa trừ tuổi đã sống / hao Chi Tâm, chưa cộng duyên thọ. Không đổi các khoản cộng bảng thọ nguyên.
+
+**Lập luận:** tu sĩ thiên tài đạt mốc với nhiều dư địa sống để đi tiếp. Nền dựng ở Khắc Pháp / Định Pháp vẫn tiêu thọ, nên đạt nhanh mà hao gần hết quỹ chưa tự có tiềm năng dài hạn tốt. Không dùng tốc độ thuần để so người chọn một Pháp Tắc ít mảnh với người chuẩn bị Pháp Tắc phức tạp mà bỏ qua nền / lượng Đạo Ngân.
+
+**Đề nghị phân hạng chưa chốt:** đạt mốc trong khoảng một nửa thời gian bảng với nền tương xứng có thể là thiên tài đứng đầu thế hệ. Chưa đặt tên cấp bắt buộc / tỷ lệ toàn dân hoặc luật đạt một mốc nhanh thì cả đời đều thiên tài.
+
+Tách ba mặt và thành tựu:
+
+- **Tư chất:** trần hấp thu đã chốt; cao giúp gom năng lượng, chưa tự quyết định cảm ngộ.
+- **Ngộ tính:** hiểu công pháp / Nhập Đạo / Đạo Ngân đã có; đề nghị đánh giá tốc độ / độ sâu / khả năng tự tìm lời giải.
+- **Khí vận:** trong lịch sử có cơ duyên / che chở; đề nghị xem cơ hội truyền thừa, tài nguyên, nền chưa bị độc chiếm, người bảo vệ và thoát tính toán. Chưa có thang số hay quyền chắc thắng kiếp.
+- **Thành tựu:** tốc độ đạt cảnh + chất lượng nền + điều kiện xuất phát. Người được hỗ trợ nhiều tu nhanh không tự chứng ngộ tính cực cao; người ngộ tính cao / tư chất thấp vẫn có thể giỏi Nhập Đạo và chậm lên cảnh.
+
+Không bắt buộc mọi thiên tài đều cực cao cả ba mặt. Các trường hợp tư chất cao nhưng ngộ tính yếu có thể nhanh đoạn đầu / chậm Khắc Pháp; ngộ tính cao nhưng tư chất thấp tu chậm / thuật mạnh; khí vận tốt hoặc nhiều tài nguyên làm nhanh nhưng phải xét năng lực tự hiểu. Không áp bảng hậu thiên cho tiên trời sinh / cây cỏ tự khai linh qua hàng trăm triệu năm.
+
+#### Vì sao Chính Tiên hiếm
+
+Ý tác giả **đã chốt**: khó tu và lục đục / tính toán. Đề nghị Codex cụ thể hóa thành nhiều cửa, chưa chốt từng sự kiện:
+
+1. Độc chiếm khiến không phải ai cũng có đủ nền Pháp Tắc để tiếp tục cảm ngộ / ráp đúng Quy Tắc.
+2. Tư chất / tài nguyên giúp tăng năng lượng, nhưng phải có ngộ tính và sự tích lũy phù hợp.
+3. Người đang gom nền có thể bị cắt tài nguyên, phá chỗ dựa / đẩy vào xung đột; kế hoạch / nhân vật / thời điểm chưa chọn.
+4. Ráp đủ Quy Tắc thì Thiên Đạo **tự hạ Chính Tiên Kiếp**; qua kiếp mới khai thiên tích địa. Không dùng phương án sở hữu cả Quy Tắc ở Chân Tiên rồi hoãn kiếp mãi.
+5. Người có thế lực / đồng đạo bảo vệ có thể chống tính toán, vẫn phải đủ nền và vượt kiếp.
+
+Không đặt hạn tuổi cứng cho Chính Tiên; Chân Tiên chứng sớm chưa chắc chứng Chính Tiên. Không tự lấy ba loại Chân Tiên Kiếp làm Chính Tiên Kiếp, không thêm năng lực đọc tâm trí Chân Tiên cho Thiên Đạo. Âm mưu Nhân Quả đã có vẫn giữ khung sau Huyết Thế Đại Kiếp trước Main I, chưa gán hai thế lực mới làm thủ phạm.
+
+**C. Còn mở / điểm tiếp theo**
+
+- Mốc tuổi thiên tài, cách tính thời gian, điều kiện nguồn lực và tên các cấp thiên tài chưa được tác giả xác nhận.
+- Gia trì 33 người duy trì / đi xa / tiêu hao tới đâu; người hỗ trợ phải ở kiến trúc không, cách chọn người đại diện.
+- Tên / danh tính / Quy Tắc của tối thiểu hai Chính Tiên Tiên Thiên Sinh Linh, số lượng thật và thời điểm có quy mô trên.
+- Nguồn / cách ổn định vật chất ở mỗi miền Á Không Gian; khả năng mang vào đã chốt, không hỏi lại như mâu thuẫn.
+- Thủ đoạn cản Chính Tiên cụ thể, ai được bảo vệ, Chính Tiên Kiếp.
+- Hướng bàn tiếp của Codex: chốt bảng tốc độ và điều kiện chuẩn, sau đó chọn cửa bị tính toán ở quá trình gom Pháp Tắc / thời điểm độ kiếp. Giữ việc cần định sức mạnh / Chi Tâm trước giải cơ chế bảo tồn ký ức.
+
 ## 3. Các chỉnh sửa bắt buộc nhớ, không quay về ý cũ
 
 | Ý trước đây | Trạng thái cần dùng |
@@ -476,4 +555,5 @@ Arclune mô phỏng vẫn có trần **Bán Chí Cao**. Con đường tu Main v�
 Sau một nhóm câu trả lời lore có nội dung mới, cập nhật các tài liệu liên quan và phần bàn giao trước khi kết thúc lượt trong phạm vi tác giả đã cho phép. Lưu cả câu hỏi, giải thích, triết lý và đề nghị còn mở, thay vì chỉ lưu vài kết luận. Nếu chưa ghi được vào repo, nói rõ trạng thái chưa lưu; không gọi việc còn trong ngữ cảnh chat là đã lưu lâu dài.
 
 [prompt.md](../../prompt.md) phải trỏ tới bản bàn giao này để phiên Codex mới đọc nó trước các bản tóm tắt cũ. Khi có trao đổi mới, cập nhật mục đọc trước và lưu lượt mới; không để câu hỏi gần nhất cố định mãi ở L09.
+
 

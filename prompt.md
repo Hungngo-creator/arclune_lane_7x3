@@ -2,11 +2,20 @@
 
 # BÀN GIAO CUỘC THẢO LUẬN MỚI NHẤT — ĐỌC TRƯỚC
 
-**Cập nhật 2026-10-08.** Đọc hoàn toàn [Bàn giao hội thoại lore Nạp Hư](docs/lore/NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md) trước các bản tóm tắt cũ. Tệp lưu **mười một lượt hỏi–đáp**, gồm đủ năm lượt tác giả chỉ bằng ảnh, các lượt trước đó, L10 và L11; không xóa lập luận đã tích lũy.
+**Cập nhật 2026-10-09.** Đọc hoàn toàn [Bàn giao hội thoại lore Nạp Hư](docs/lore/NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md) trước các bản tóm tắt cũ. Tệp lưu **mười hai lượt hỏi–đáp**, giữ đủ năm lượt tác giả chỉ bằng ảnh, các lượt trước đó và L09–L12; không xóa lập luận đã tích lũy.
 
-**Câu hỏi lore gần nhất là L11:** tư chất / ngộ tính, phân phẩm công pháp và pháp khí, bảy mức thuần thục, tám cảnh, Đạo Ngân / Sinh Mệnh Chi Tâm, nội không gian / thế giới, Địa Tiên, bí cảnh / Á Không Gian, tham khảo bốn bộ truyện. L11.A lưu ý tác giả, L11.B lưu hai đáp án làm rõ, L11.C lưu phần trả lời / lập luận / nguồn web, L11.D lưu các vấn đề chưa chốt. L09 giữ đầy đủ câu hỏi dài và phần đáp về Thái Sơ / điểm neo; L10 giữ tín ngưỡng / tiên trời sinh.
+**Câu hỏi lore gần nhất là L12:** Á Không Gian không có vật chất sẵn nhưng mang vào được; bổ sung Tam Thập Tam Trọng Thiên và thế lực Tiên Thiên Sinh Linh; định tốc độ tu để gọi thiên tài theo thọ nguyên / khí vận / tư chất / ngộ tính; giữ Chính Tiên hiếm vì khó tu và Chân Tiên lục đục, người sắp lên thường bị tính toán. L12.A là lời tác giả, L12.B là phần đáp / bảng đề nghị, L12.C là phần còn mở. L09–L11 giữ đầy đủ triết lý điểm neo, tín ngưỡng, Đạo Ngân / Chi Tâm và nguồn truyện.
 
-**ĐÃ CHỐT mới từ tác giả:**
+**ĐÃ CHỐT mới L12 từ tác giả:**
+
+- Á Không Gian **không có vật chất sẵn nhưng mang vật chất vào được**. Cảnh vật / cây cỏ / kiến trúc trong các miền riêng không là mâu thuẫn về khả năng chứa vật chất; nhận định quá rộng của Codex ở L11 được sửa. Nguồn cụ thể / cách ổn định từng miền còn mở.
+- **Tam Thập Tam Trọng Thiên:** tiểu thiên địa trong Á Không Gian có **33 Chân Tiên ngang địa vị, không lãnh đạo**; kiến trúc đặc thù gia trì sức của **32 người vào một người xuất thủ**, cho **chiến lực bán bộ Chính Tiên**. Không tự là chứng Quy Tắc / Chính Tiên thật. Mốc xuất hiện chưa quyết định.
+- **Thế lực Tiên Thiên Sinh Linh:** số cụ thể còn mở, **hơn 50 Chân Tiên, tối thiểu 2 Chính Tiên**. Hai vị nằm trong **tổng không quá mười Chính Tiên toàn lịch sử**; tên / danh tính / Quy Tắc / thời điểm còn mở.
+- Chính Tiên ít vì đường tu khó và Chân Tiên lục đục, kẻ sắp chứng thường bị tính toán. Chưa đặt một âm mưu cụ thể hay giới hạn tuổi bảo đảm Chính Tiên.
+
+**Đề nghị mới L12, chưa canon:** bảng thiên tài ở mục XX của Hệ thống sức mạnh, tạm tính tổng thời gian từ bắt đầu tu cho hậu thiên trong thời hệ đã hoàn thiện. Các mốc đề nghị từ Dưỡng Hình cửu trọng trong 10 năm tới Chân Tiên trong 150.000 năm, đối chiếu quỹ thọ ở cảnh trước. Codex đã hỏi chọn thời gian tu hay tuổi từ sinh, tại lúc soạn chưa có đáp án. Không tự coi các số / cách tính là lời chốt. Không áp bảng cho tiên trời sinh.
+
+**Các cơ chế L10–L11 tiếp tục giữ:**
 
 - Tư chất là trần tốc độ hấp thu Linh Khí; công pháp cao phẩm tăng tốc / chất lượng nhưng không vượt trần và đòi ngộ tính cao. Cùng cảnh không tự chênh thọ nguyên vì phẩm, trừ công pháp duyên thọ đặc thù.
 - Công pháp Tiên Phẩm cần Tiên Khí, bình thường **Định Pháp** mới tu được; thấp hơn cần thủ đoạn đặc thù / Chân Tiên giúp.
@@ -16,11 +25,11 @@
 - Đạo Ngân là mảnh Pháp Tắc. Hóa Vực → Khắc Pháp: Linh Tuyền thành Chi Tâm, khắc Đạo Ngân; đầy → Định Pháp tạo thêm Chi Tâm. Đủ toàn bộ Đạo Ngân một Pháp Tắc → Chi Tâm nối chòm sao → qua Chân Tiên Kiếp mới thành nội không gian trống chứa Pháp Tắc / Đạo Ngân. Ráp đủ Quy Tắc → Thiên Đạo hạ Chính Tiên Kiếp → **qua kiếp mới khai thiên tích địa**.
 - Ngưng tụ Chi Tâm cần sinh mệnh lực / tiêu thọ; tác giả xác nhận **cả Khắc Pháp lẫn Định Pháp đều hao thọ**. Không đổi các khoản cộng bảng thọ nguyên.
 - Thiên Địa Bí Cảnh là tiểu thế giới hữu hạn trong Nạp Hư, bình thường một cửa, Giới Bích yếu hóa. Tường thủng chỉ rò Linh Khí / cho lối ra ngẫu nhiên gần cửa, **không làm bí cảnh nổ**. Hóa Vực-grade cần ít nhất ba Hóa Vực Nhập Đạo cùng ra tay mới có hy vọng phá.
-- Á Không Gian khác bí cảnh: lớp di chuyển không vật chất / phương hướng, ít Linh Khí, thời gian khác theo vùng; Chân Tiên xé không gian vào. **Giới Bích Nạp Hư là một**, tồn tại ở cả hiện thế / lớp ấy, không bị đường này vượt miễn phí.
+- Á Không Gian khác bí cảnh: lớp di chuyển không có vật chất sẵn **nhưng mang vào được**, không có phương hướng theo nền lớp, ít Linh Khí, thời gian khác theo vùng; Chân Tiên xé không gian vào. **Giới Bích Nạp Hư là một**, tồn tại ở cả hiện thế / lớp ấy, không bị đường này vượt miễn phí.
 - Người rất nhiều công đức chết có thể được Thiên Đạo dẫn Chân Ngã / tái tạo linh hồn, bổ nhiệm **Địa Tiên** quản lý bí cảnh. Neo / đồng thọ với bí cảnh, bí cảnh hủy thì chết ở mọi nơi; tiềm năng tu riêng hao hết, mạnh bằng phát triển bí cảnh, hiểu mọi Pháp Tắc nơi ấy không cần tự ngộ. Thiên Đạo muốn đuổi thì đuổi. Không là người bị đồng hóa mất Chân Ngã.
 - L10 vẫn giữ: tín ngưỡng là Linh Khí + cảm xúc của sinh vật có Chân Ngã, **hướng về đối tượng tin tưởng / tôn thờ**; tiên trời sinh có quyền trước rồi học hiểu, hậu thiên hiểu rồi chứng. Các hài tử cảm ngộ trước khi Luân Hồi.
 
-**ĐANG XÂY DỰNG / CÒN MỞ:** bộ phẩm dùng chung **Hoàng–Huyền–Địa–Thiên–Tiên**, mỗi giai Hạ / Trung / Thượng là phương án từ ví dụ tác giả / đề nghị Codex, chưa gán cứng với cảnh. Cần bàn Chi Tâm / nguồn Tiên Khí; quyền Pháp Tắc Địa Tiên và hậu quả bị đuổi; bí cảnh có nâng giới hạn không. Luân Hồi / vương quốc thực vật có cảnh vật nhưng lore cũ gọi á không gian, cần hòa giải với lớp mới không vật chất. Đề nghị hai nơi là miền có cấu trúc neo trong Á Không Gian **chưa chốt**. Nguồn truyện chỉ tham khảo, không nhập canon. Bảng L10 có phần được L11 sửa, không hỏi lại Dưỡng Hình có pháp thuật / Khai Mệnh mọc chi thể / vị trí khắc.
+**ĐANG XÂY DỰNG / CÒN MỞ:** bộ phẩm dùng chung **Hoàng–Huyền–Địa–Thiên–Tiên**, mỗi giai Hạ / Trung / Thượng là phương án từ ví dụ tác giả / đề nghị Codex, chưa gán cứng với cảnh. Cần bàn Chi Tâm / nguồn Tiên Khí; quyền Pháp Tắc Địa Tiên và hậu quả bị đuổi; bí cảnh có nâng giới hạn không. Luân Hồi / vương quốc thực vật có thể chứa vật chất theo L12; chỉ nguồn cụ thể / cách ổn định miền còn mở. Không hỏi lại như một mâu thuẫn về khả năng chứa vật chất. Nguồn truyện chỉ tham khảo, không nhập canon. Bảng L10 có phần được L11 sửa, không hỏi lại Dưỡng Hình có pháp thuật / Khai Mệnh mọc chi thể / vị trí khắc.
 
 
 **Các quyết định trước vẫn phải nhớ:**
@@ -34,7 +43,7 @@
 - Luân Hồi Quy Tắc gội rửa được trước Pháp Tắc; cơ chế giữ ký ức phải xây từ khả năng từng cảnh. Âm mưu đồng hóa người chứng đạo Nhân Quả nằm sau Huyết Thế Đại Kiếp trước Main đời I, chưa chốt ngày / Pháp Tắc / mức cảnh.
 - Nạp Hư có sáng thế chủ, Thiên Đạo là khôi lỗi, Nhân Tổ / Nguyên Sơ là người ấy vẫn là giả thuyết / bí ẩn.
 
-**Nối tiếp:** trả lời câu hỏi đang hoạt động; hướng gần nhất là phẩm công pháp / nền Chi Tâm / nguồn Tiên Khí, hòa giải các không gian và cơ chế Địa Tiên. Khả năng tám cảnh đã có nhiều điểm chốt; sau đó mới thiết kế bảo tồn ký ức. Không khởi động lại Stage 0 hoặc hỏi lại điểm đã trả lời. Câu hỏi đang hoạt động của tác giả luôn ưu tiên hơn phần bàn giao.
+**Nối tiếp:** trả lời câu hỏi đang hoạt động; hướng gần nhất là mốc thiên tài / điều kiện chuẩn, phạm vi gia trì 33 người và cách cản / bảo vệ người sắp chứng Chính Tiên. Phẩm công pháp / Chi Tâm / nguồn Tiên Khí và quyền Địa Tiên vẫn còn phần cần bàn. Khả năng tám cảnh đã có nhiều điểm chốt; sau đó mới thiết kế bảo tồn ký ức. Không khởi động lại Stage 0 hoặc hỏi lại điểm đã trả lời. Câu hỏi đang hoạt động của tác giả luôn ưu tiên hơn phần bàn giao.
 
 **Lưu liên tục đã được tác giả yêu cầu:** sau nhóm trao đổi có nội dung mới, lưu cả ý câu hỏi, phần trả lời, triết lý và đề nghị; cập nhật chỉ dẫn đọc trước cùng tài liệu liên quan trong phạm vi được phép. Không chờ tác giả nhắc lại. Không biến đề nghị thành canon; nếu chưa ghi được vào repo phải nói rõ chưa lưu. Ngữ cảnh chat không phải lưu trữ bền vững.
 
@@ -1372,4 +1381,5 @@ Each question should:
 Then stop.
 
 Do not edit files until the author answers.
+
 

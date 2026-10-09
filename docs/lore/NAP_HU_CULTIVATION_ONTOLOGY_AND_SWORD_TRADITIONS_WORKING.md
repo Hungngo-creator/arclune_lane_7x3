@@ -1,6 +1,6 @@
 # NẠP HƯ — ÁNH XẠ CẢNH GIỚI, CỔ THẦN, NHÂN TỔ & HAI HỆ KIẾM TU
 
-> **Bàn giao mới 2026-10-08:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L11** về Đạo Ngân, Chi Tâm, Địa Tiên và Á Không Gian. Mục XXXV–XXXVI bổ sung cơ chế chứng đạo; L10 giữ các quyết định về tín ngưỡng / tiên trời sinh. Không biến đề nghị tham khảo thành canon.
+> **Bàn giao mới 2026-10-09:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L12**: mang vật chất vào Á Không Gian, hai thế lực, chuẩn thiên tài và sự hiếm Chính Tiên. Mục XXXVII phân biệt gia trì chiến lực với chứng đạo; L11 / mục XXXV–XXXVI giữ Đạo Ngân / Địa Tiên.
 
 > **Trạng thái:** Thiết kế thế giới đang xây dựng.
 >
@@ -934,7 +934,7 @@ Cảnh cao nhất hồ yêu chưa chốt. Khi kiểm tra niên biểu, phải gi
 
 **ĐÃ CHỐT mới:** các hài tử tạo một loại **đan dược có thể tạo Chân Ngã**, dùng cho tạo vật của mình. Nguyên liệu gồm **hoa bỉ ngạn, nước sông Luân Hồi và vài nguyên liệu đặc thù**, trong đó phần Tiên Thiên Sinh Linh là **một loại trái cây tái tạo được**; không ai trong nhóm cây cỏ ấy chết vì việc tạo đan.
 
-**CÒN MỞ sau L11 về vị trí:** lore trước gọi Luân Hồi là á không gian, nhưng định nghĩa Á Không Gian mới không có vật chất. Giữ đất / sông / hoa / cối xay đã chốt; chưa tự quyết định đây là bí cảnh hoặc một miền có cấu trúc nằm trong Á Không Gian. Xem mục LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
+**ĐÃ LÀM RÕ L12:** Á Không Gian không có vật chất sẵn nhưng mang vật chất vào được; giữ Luân Hồi Chi Địa ở lớp ấy với đất / sông / hoa / cối xay. Khả năng chứa vật chất không còn là mâu thuẫn. Nguồn vật chất cụ thể / cách ổn định miền riêng chưa chốt; xem mục LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
 
 Luân Hồi Chi Địa có **cối xay bay lơ lửng**, đất / sông uốn lượn / hoa bỉ ngạn bên dưới. **Trình tự mới đã chốt:** linh hồn vào Luân Hồi Chi Địa, càng sâu càng mơ hồ do hoa bỉ ngạn; bơi qua sông Luân Hồi gội rửa ký ức và linh hồn; tới cối xay chỉ còn Chân Ngã; **Lục Đạo Luân Hồi Bàn** xét nghiệp lực để phân phối đầu thai. Sáu đạo: Thiên, A-tu-la, Nhân, Súc Sinh, Ngạ Quỷ, Địa Ngục. Khả năng kháng mê mang đã nêu của Chân Tiên không tự bảo đảm miễn gội rửa. Cơ chế cối xay, bảo tồn ký ức và thời điểm lịch sử hoàn thiện từng bước còn mở; xem mục XXIX.
 
@@ -1151,4 +1151,19 @@ Bảy mức thuần thục, điều kiện Tiên Khí và phân phẩm giai xem 
 **CÒN MỞ:** nguồn Pháp Tắc riêng / kế thừa của bí cảnh và quan hệ giữa biết mọi Pháp Tắc bí cảnh với độc chiếm Pháp Tắc Nạp Hư. Không tự đồng nhất quyền quản lý lãnh thổ với sở hữu toàn hệ, hoặc cho Địa Tiên miễn luật nền. Thiên Đạo hiểu rõ Pháp Tắc / Quy Tắc của chính nó khi có lý trí không đồng nghĩa đọc được suy nghĩ riêng của Chân Tiên.
 
 Cấu trúc bí cảnh, Giới Bích, Á Không Gian và giới hạn Địa Tiên tại mục LXII–LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
+
+
+---
+
+# XXXVII. GIA TRÌ CHIẾN LỰC VÀ SỰ HIẾM THIÊN ĐỊA CHÍNH TIÊN
+
+**ĐÃ CHỐT L12:** Tam Thập Tam Trọng Thiên có 33 Chân Tiên ngang địa vị, không lãnh đạo; kiến trúc đặc thù gia trì sức mạnh 32 người vào người xuất thủ, cho **chiến lực bán bộ Chính Tiên**. Không có lời chốt người ấy hoàn chỉnh Quy Tắc hay vượt Chính Tiên Kiếp; tăng chiến lực không tự đổi vị cách sở hữu. Không coi mọi người được tăng lên cảnh ấy đồng thời.
+
+Thế lực Tiên Thiên Sinh Linh có **hơn 50 Chân Tiên**, **ít nhất hai Chính Tiên thật**. Hai vị tính trong giới hạn toàn lịch sử không quá mười; danh tính, Quy Tắc / phương thức chứng và mốc thời gian còn mở. Không áp con đường hậu thiên thông thường để phủ nhận tiên trời sinh / cây cỏ tự nhiên thành Chân Tiên đã có.
+
+**ĐÃ CHỐT về chủ đích:** Chính Tiên ít vì khó tu và Chân Tiên lục đục, người sắp lên thường bị tính toán. **Đề nghị Codex:** xét riêng tốc độ hấp thu, ngộ tính ráp Quy Tắc, cơ duyên tiếp cận nền chưa bị độc chiếm, sự bảo vệ và khả năng qua kiếp. Không suy từ đạt Chân Tiên sớm ra chắc đạt Chính Tiên; không có hạn tuổi duy nhất bảo đảm Chính Tiên.
+
+Vẫn giữ **ráp đủ Quy Tắc → Thiên Đạo hạ Chính Tiên Kiếp → qua kiếp mới khai thiên tích địa**. Muốn khai thác thủ đoạn cản chứng nên xác định chúng xảy ra trong quá trình gom / cảm ngộ nền hoặc lúc kiếp, chưa tự chốt diễn biến / loại kiếp.
+
+Tiêu chuẩn thiên tài / các mốc thời gian ở mục XX của [Hệ thống sức mạnh](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md) là **đề nghị**, không phải luật nền hoặc ngưỡng bắt buộc chứng đạo.
 

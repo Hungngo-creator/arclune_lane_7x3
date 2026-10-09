@@ -1,6 +1,6 @@
 # NẠP HƯ — HỆ THỐNG TU LUYỆN, SỨC MẠNH VÀ TUỔI THỌ
 
-> **Bàn giao mới 2026-10-08:** đọc [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L11**: tư chất, phẩm giai, Nhập Đạo / Đạo Ngân, Sinh Mệnh Chi Tâm, Địa Tiên và hai loại không gian. Mục XVI–XIX ghi các cơ chế tác giả vừa chốt; bảng đề nghị L10 ở mục XV được giữ để lưu lịch sử, các phần khác đã được L11 sửa phải đọc theo L11.
+> **Bàn giao mới 2026-10-09:** đọc [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L12**. Mục XX đề nghị mốc thiên tài đối chiếu quỹ thọ nguyên cộng dồn; mục XXI giữ ranh giới chiến lực gia trì / Chính Tiên. Các số thiên tài chưa được tác giả chốt; cơ chế tám cảnh / Chi Tâm L11 vẫn giữ.
 
 > **Trạng thái:** Thiết kế đang xây dựng, đã đối chiếu với lời chốt mới của tác giả và các tài liệu hiện tại trong `docs/lore`.
 >
@@ -432,4 +432,73 @@ Con đường hậu thiên:
 **Phá Giới Bích bí cảnh không đồng nghĩa phá hủy bí cảnh**, do đó không tự giết Địa Tiên. Cấu trúc / lối ra / Á Không Gian xem mục LXII–LXV của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md).
 
 **CÒN MỞ:** ngưỡng công đức / lựa chọn bổ nhiệm, ký ức sau tái tạo linh hồn, khả năng ra ngoài bí cảnh, hậu quả bị cách chức, quy mô tối đa của bí cảnh và nâng cấp giới hạn ấy. Không mặc định Địa Tiên giữ mọi ký ức tiền kiếp hoặc vượt được Luân Hồi bằng cùng cơ chế này.
+
+
+---
+
+# XX. TIÊU CHUẨN THIÊN TÀI — ĐỀ NGHỊ ĐỂ TÁC GIẢ THẢO LUẬN
+
+**Yêu cầu ĐÃ CHỐT L12:** cần định tu tới cảnh nào trong bao lâu được gọi là thiên tài, đối chiếu tuổi thọ mỗi cảnh, khí vận, tư chất và ngộ tính. **Các ngưỡng số dưới đây là đề nghị Codex, chưa là canon**, không thay bảng tăng thọ nguyên mục III.
+
+## Phạm vi và cách tính đề nghị
+
+Tạm dùng **thời gian từ lúc bắt đầu tu**, lấy tu sĩ hậu thiên trong thời hệ tám cảnh / công pháp đã tương đối hoàn thiện làm chuẩn. Codex đã hỏi tác giả muốn lấy thời gian này hay tuổi từ sinh; tại lúc soạn chưa có trả lời. Không dùng tuổi sinh của tiên trời sinh / cây cỏ Tiên Thiên để đánh giá theo bảng hậu thiên.
+
+Dưỡng Hình trong bảng là **cửu trọng / viên mãn**; các hàng khác là **lần đầu bước vào đại cảnh**, Chân Tiên là vượt trọn kiếp. Một người bắt đầu tu muộn có thể đạt mốc thời gian tu dù tuổi đời lớn hơn, phải ghi riêng tuổi và thọ nguyên còn lại.
+
+**Quỹ thọ nguyên danh nghĩa** là cộng các khoản tăng đang có, chưa trừ số năm đã sống, hao Chi Tâm, thương tổn hoặc thiêu đốt; chưa cộng duyên thọ đặc thù. Cột này dùng đối chiếu độ dư thời gian, không phải thời gian còn lại của mọi người ở cảnh ấy.
+
+## Bảng tham chiếu — SUY LUẬN / ĐANG XÂY DỰNG
+
+| Mốc đạt được | Quỹ thọ nguyên danh nghĩa để đối chiếu | Tổng thời gian tu đề nghị để gọi thiên tài |
+|---|---:|---:|
+| Dưỡng Hình cửu trọng | 200 năm ở Dưỡng Hình | Trong 10 năm |
+| Khai Mệnh | 200 năm của Dưỡng Hình | Trong 20 năm |
+| Chiếu Hồn | 1.000 năm tới Khai Mệnh | Trong 80 năm |
+| Hiển Tướng | 2.400 năm tới Chiếu Hồn | Trong 250 năm |
+| Hóa Tuyền | 12.400 năm tới Hiển Tướng | Trong 1.500 năm |
+| Hóa Vực | 42.400 năm tới Hóa Tuyền | Trong 5.000 năm |
+| Khắc Pháp | 142.400 năm tới Hóa Vực | Trong 15.000 năm |
+| Định Pháp | 442.400 năm tới Khắc Pháp | Trong 50.000 năm |
+| Chân Tiên | 1.042.400 năm tới Định Pháp | Trong 150.000 năm |
+
+Các thời gian là **tổng từ bắt đầu**, không cộng lần lượt 10 + 20 + 80… Cột thọ nguyên từ hàng Khai Mệnh trở đi dùng quỹ ở **cảnh trước mốc cần đạt**, tránh lấy thọ nguyên được cộng sau đột phá làm vốn để chờ chính lần đột phá ấy.
+
+Ý nghĩa đề nghị: người được gọi thiên tài đạt mốc khi còn nhiều dư địa thọ nguyên cho con đường tiếp theo. Bảng không là thời gian trung bình toàn dân, không bảo đảm mọi người có tư chất / tài nguyên giống nhau. Đến Khắc Pháp / Định Pháp, hao thọ Chi Tâm chưa có mức định lượng, vì vậy số **thọ nguyên còn lại thực tế** vẫn phải tính riêng; đạt mốc nhanh mà tự tiêu gần hết thọ chưa tự có tiềm năng đường dài tốt.
+
+**Đề nghị phân biệt thêm:** người đạt mốc trong khoảng một nửa thời gian bảng với nền tương xứng có thể được gọi thiên tài đứng đầu cùng thế hệ. Tên cấp / tỷ lệ này chưa chốt; không dùng chỉ một mốc sớm để bảo đảm người ấy tiếp tục giỏi ở mọi cảnh. Những nhân vật vài nghìn / vài chục nghìn năm đã chứng Chân có thể vượt xa chuẩn, không sửa tuổi nhân vật có sẵn để khớp bảng.
+
+## Tư chất, ngộ tính và khí vận
+
+| Mặt | Cơ chế đã có / hướng đánh giá đề nghị |
+|---|---|
+| Tư chất | **ĐÃ CHỐT:** trần tốc độ hấp thu Linh Khí. Tốc độ tăng năng lượng có ý nghĩa rõ ở các cảnh thấp; không tự quyết định hiểu Đạo Ngân / Quy Tắc. |
+| Ngộ tính | **ĐÃ CHỐT:** hiểu công pháp cao phẩm / tự cảm ngộ Nhập Đạo, Đạo Ngân và Pháp Tắc. Đề nghị đánh giá tốc độ, độ sâu và khả năng tự tìm lời giải; không dùng số tài nguyên đã ăn làm ngộ tính. |
+| Khí vận | Có vai trò che chở / cơ duyên trong lịch sử đã có. **Đề nghị:** đánh giá cơ hội gặp truyền thừa / tài nguyên, nền Pháp Tắc có thể cảm ngộ, người bảo vệ và thoát tính toán; chưa tạo thang số hoặc quyền bảo đảm sống sót / qua kiếp. |
+| Thành tựu thực tế | Đề nghị dùng mốc tu nhanh kèm chất lượng nền / công pháp / Đạo Ngân để đánh giá, xem rõ hoàn cảnh và tài nguyên. Thành tựu nhanh chưa tự chứng ba mặt trên đều cao. |
+
+**Các trường hợp đề nghị dùng khi viết truyện:**
+
+- Tư chất cao, ngộ tính thấp: tăng tu nhanh ở đoạn đầu, có thể bị chậm khi việc hiểu Đạo Ngân trở thành cửa chính.
+- Ngộ tính cao, tư chất thấp: có thể Nhập Đạo / dùng thuật giỏi trong cùng cảnh, nhưng gom năng lượng chậm; khớp lựa chọn đã chốt ở L11.
+- Khí vận tốt / nhiều tài nguyên: có thể đạt mốc sớm; phải xem năng lực tự hiểu trước khi kết luận là thiên tài ngộ tính.
+- Nhiều mặt đều cao: có nền thuận lợi hơn, vẫn gặp độc chiếm Pháp Tắc, kiếp và tính toán của đồng đạo.
+
+Không bắt buộc mọi thiên tài cả ba mặt đều cực cao. **Chính Tiên** không đưa vào một ngưỡng tuổi cứng: hoàn chỉnh nền Quy Tắc, độc chiếm, kiếp và cản trở chính trị khiến “đạt Chân Tiên sớm” chưa bảo đảm chứng Chính Tiên. Tốc độ hoàn thành một Pháp Tắc / tiến tới Quy Tắc có thể bàn riêng sau khi biết số Đạo Ngân và mức hao thọ.
+
+**CÒN MỞ:** tác giả chọn thời gian tu hay tuổi từ sinh; điều kiện xuất phát / tài nguyên dùng làm chuẩn, cách đặt cấp thiên tài, khác biệt chủng tộc / thời đại / công pháp, đánh giá người tạm ngừng tu hoặc bị thương. Trước khi được xác nhận, không dùng các ngưỡng số này làm giới hạn tu luyện hoặc ngày bắt buộc của nhân vật.
+
+---
+
+# XXI. TAM THẬP TAM TRỌNG THIÊN VÀ CHÍNH TIÊN THẬT
+
+**ĐÃ CHỐT L12:** kiến trúc đặc thù của Tam Thập Tam Trọng Thiên liên kết sức 33 Chân Tiên vào một người; người ấy nhận gia trì của 32 người còn lại, đạt **chiến lực bán bộ Chính Tiên**. 33 người địa vị ngang nhau, không lãnh đạo. Thời lượng, tiêu hao, phạm vi liên kết, vị trí người hỗ trợ / yếu điểm kiến trúc chưa chốt.
+
+Một mức **chiến lực** không tự là **cảnh chứng đạo**: chưa có lời chốt sở hữu Quy Tắc / qua Chính Tiên Kiếp / khai thiên tích địa. Không dùng thế lực này làm trường hợp ngoại lệ “một Chân Tiên sở hữu hoàn chỉnh Quy Tắc mà không chịu kiếp”.
+
+Thế lực Tiên Thiên Sinh Linh có **hơn 50 Chân Tiên và tối thiểu hai Chính Tiên**, tính hai vị trong tổng toàn lịch sử không quá mười. Đây là quy mô tác giả đặt, chưa khóa mốc xuất hiện hoặc số Chính Tiên của thế lực vượt con số tối thiểu.
+
+**ĐÃ CHỐT chủ đích:** ít Chính Tiên vì đường tu khó và Chân Tiên lục đục, người sắp chứng thường bị tính toán. **Đề nghị Codex:** đồng thời xét nền Quy Tắc có thể cảm ngộ, tri thức, tài nguyên / quỹ thọ, sự bảo vệ và kiếp; không chỉ giảm tốc hấp thu để làm Chính Tiên hiếm.
+
+Chi tiết thế lực tại mục LXVI–LXVII của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md), các hệ quả lịch sử còn mở ở mục LV–LVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md).
 
