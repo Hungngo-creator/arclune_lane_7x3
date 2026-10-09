@@ -17,7 +17,7 @@ const events = (b, type) => b.trace.filter(e => e.type === type);
 const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-7, `${actual} != ${expected}`);
 const constant = (amount, type = 'PHYSICAL') => ({ type, amount: { constant: amount } });
 const hostileKit = (effects) => { const k = clone(KITS); k.trainingWarrior.abilities.basic.effects = effects; return k; };
-const damage = (...amounts) => ({ op: 'DAMAGE', components: amounts.map(n => constant(n)) });
+const damage = (...amounts) => ({ op: 'DAMAGE', binding: 'POSITION', recipientCheckpoint: 'PRE_DAMAGE', emptyPolicy: 'MISS', invalidPolicy: 'SKIP', components: amounts.map(n => constant(n)) });
 function basicStep(b) {
   if (b.active.blocked) return b.step();
   const u = b.unit(b.active.actorId), id = b.ultimateReady(u) ? 'ultimate' : 'basic';
@@ -56,7 +56,7 @@ test('actual completed Basic/Ultimate use runtime Effective Class across all sev
 
 test('mixed components mitigate independently and preserve proportional receipts', () => {
   const units = specs(); units[0].baseStats = { ...base, arm: 100, res: 300 };
-  const b = battle({}, units, hostileKit([{ op: 'DAMAGE', components: [constant(1000), constant(1000, 'WILL')] }]));
+  const b = battle({}, units, hostileKit([{ ...damage(), components: [constant(1000), constant(1000, 'WILL')] }]));
   b.runAction(b.unit('enemy'), 'basic', [b.unit('guard')]);
   const r = events(b, 'DAMAGE_RECEIPT').at(-1);
   close(r.actualHpDamage, 750); close(r.components[0].actualHpDamage, 500); close(r.components[1].actualHpDamage, 250);

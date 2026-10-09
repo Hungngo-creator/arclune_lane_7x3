@@ -240,6 +240,8 @@ implementing/running executable game tests
 
 When `IMPLEMENTATION PHASE` is explicitly activated, revisit this restriction. At that point implementation code, runtime tests, simulation tests, builds, and integration validation become normal required work.
 
+An explicitly authorized prototype remains subordinate to current canon. Before extending it, compare its relevant assumptions with the latest merged architecture and designer locks; correct stale assumptions in the prototype, preserve exact authored exceptions, and reject unsupported semantics. Record the verified source/ref and experimental scope in the prototype's own documentation. Prototype defaults, successful traces and passing tests are not gameplay authority or proof of full architecture support; never feed them back into Character Canon or `00–08` as design constraints. Prototype authorization alone does not change the Project Phase.
+
 ---
 
 # 5. MINIMUM NECESSARY SOURCE LOADING

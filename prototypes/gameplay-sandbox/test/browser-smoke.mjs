@@ -69,6 +69,7 @@ try {
   await call('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 });
   assert.equal(await evaluate(`document.querySelectorAll('.slot').length`), 18);
   assert.match(await evaluate(`document.querySelector('#active-name').textContent`), /Gideon Vale · Đội A/);
+  assert.match(await evaluate(`document.querySelector('#selection-note').textContent`), /Slot B\/1.*occupant/);
   let screen = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true });
   await writeFile(join(artifacts, 'desktop.png'), Buffer.from(screen.data, 'base64'));
   await click('[data-ability="skill2"]'); await click('[data-unit="b-guard"]'); await click('#execute');
@@ -80,6 +81,10 @@ try {
   const replayFile = join(temporary, 'arclune-replay-79.json');
   for (let i = 0; i < 100; i++) { try { await access(replayFile); break; } catch { await delay(50); } }
   const saved = JSON.parse(await readFile(replayFile, 'utf8')); assert.equal(saved.commands.length, 1);
+  assert.equal(saved.format, 'sandbox-v2');
+  assert.equal(saved.kits.gideon.abilities.basic.target.binding, 'POSITION');
+  assert.equal(saved.kits.gideon.abilities.skill2.effects[0].binding, 'POSITION');
+  assert.equal(saved.kits.phanTinh.abilities.basic.effects[0].binding, 'ENTITY');
   await click('#reset'); assert.match(await evaluate(`document.querySelector('#active-name').textContent`), /Đội A/);
   const doc = await call('DOM.getDocument');
   const input = await call('DOM.querySelector', { nodeId: doc.root.nodeId, selector: '#import' });

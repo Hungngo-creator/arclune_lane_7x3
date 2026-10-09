@@ -59,9 +59,12 @@ function renderActions() {
   }).join('') : '';
   const choices = unit && chosenAbility ? battle.targetChoices(unit, chosenAbility) : [];
   const shape = unit && chosenAbility ? battle.kit(unit).abilities[chosenAbility].target.shape : null;
+  const binding = unit && chosenAbility ? battle.kit(unit).abilities[chosenAbility].target.binding : null;
+  const selected = choices.find(u => u.id === chosenTarget);
   $('targets').innerHTML = choices.map(u => `<button data-target="${escape(u.id)}" class="${u.id === chosenTarget ? 'chosen' : ''}" ${opponent || blocked || shape !== 'SELECTABLE_SINGLE' ? 'disabled' : ''}>${escape(battle.kit(u).name)} · ${u.side}/${u.slot}</button>`).join('');
   $('target-panel').hidden = !unit || blocked;
-  $('selection-note').textContent = blocked ? 'Cơ hội bị CC tiêu thụ; không có Action hay class AE gain.' : unit && chosenAbility ? `${battle.kit(unit).abilities[chosenAbility].name} → ${shape === 'ALL' ? 'toàn bộ mục tiêu hợp lệ' : choices.find(u => u.id === chosenTarget) ? name(chosenTarget) : 'mục tiêu theo profile'}` : '';
+  const destination = shape === 'ALL' ? binding === 'POSITION' ? 'các Slot đã chọn' : 'toàn bộ mục tiêu hợp lệ (Entity lock)' : selected ? binding === 'POSITION' ? `Slot ${selected.side}/${selected.slot} · đọc occupant khi resolve` : `${name(chosenTarget)} · Entity lock` : 'mục tiêu theo profile';
+  $('selection-note').textContent = blocked ? 'Cơ hội bị CC tiêu thụ; không có Action hay class AE gain.' : unit && chosenAbility ? `${battle.kit(unit).abilities[chosenAbility].name} → ${destination}` : '';
   $('execute').disabled = !!battle.outcome || !!opponent || !!timer;
   $('execute').innerHTML = blocked ? 'Tiêu thụ cơ hội CC <span>→</span>' : 'Thực thi Action <span>→</span>';
   $('ai-step').disabled = !!battle.outcome || !!timer;
@@ -88,6 +91,8 @@ function eventText(e) {
     case 'STUN_RESULT': return `${who}: ${e.success ? 'bị choáng' : 'không nhận choáng'} · xác suất ${e.chance * 100}%`;
     case 'CC_OPPORTUNITY_LOST': return `${who}: mất cơ hội do choáng · không Action, không class AE`;
     case 'HIT_MISSED': return `${who}: đòn đánh trượt`;
+    case 'TARGET_MISSED': return `${e.actionId}: không có recipient hợp lệ tại reference đã khóa · không chọn lại`;
+    case 'DAMAGE_TARGETS_RESOLVED': return `${e.actionId}: ${e.binding === 'POSITION' ? 'Slot → occupant hiện tại' : 'Entity lock'} · ${e.targets.map(name).join(', ') || 'không có recipient'}`;
     case 'HP_ZERO': return `${who}: HP về 0`;
     case 'DEATH_CONFIRMED': return `${who}: xác nhận chết`;
     case 'ACTION_COMPLETED': return `${who}: Action hoàn tất${e.natural ? ' · Natural' : ''}`;
