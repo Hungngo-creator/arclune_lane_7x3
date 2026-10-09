@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-08-F.21
+**Version:** 2026-10-09-F.22
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -40,6 +40,8 @@
 **Revision F.20:** extends REC-006 with E.18's opt-in eligible-claim Rank-first route law. REC-007 uses eligible higher-rank routing rather than presence as a priority proxy; REC-002 explicitly requires a real bound Chân Ngã for the ordinary Character death count. Host-only binding, empty-body death and existing controller/result composition add no Contract ID or Authority tier.
 
 **Revision F.21:** binds declared multi-part life/provider/target projection, real SSI contact, occupancy-deferred paid requests, positive action-generated Rage amounts and exact Side-AE predicate observation to existing owners. Earlier postmortem waits, clocks, Damage receipts and unprofiled defaults remain unchanged.
+
+**Revision F.22:** extends only ACT-033 with an opt-in same-completed-Natural class-AE prerequisite and TGT-001 with a bounded State-owned legal single-recipient Damage compulsion. Earlier clocks, Costs, exact attack bindings, Hit/Authority and unopted ordering remain unchanged. No new Contract ID, Tag, Primitive, global Reaction priority or callback.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -1166,6 +1168,16 @@ Keys include observed Action, runtime trigger owner, instantiated candidate and 
 
 ---
 
+### Opt-in same-Action Mode class-AE prerequisite
+
+04§7.13 `afterModeHook: AE_ACTION_REGEN_BY_CLASS` binds an existing hook terminal of the **same actually completed owner Natural Action**. Register its post-completion obligation normally; defer only this opted observer's predicate/payability/graph until that hook is terminal, then finish before SSI handoff. The hook executes once under its existing Mode/Resource law; capped/denied/zero is a terminal result, not a deadlock. This allows actual committed class AE to fund this local post-completion activation, never a root-linked pre-completion settlement.
+
+Require NATURAL_ONLY, matching Action Actor/runtime trigger owner, same Combat Instance and Mode support. Do not manufacture a hook for child/non-Natural/future/foreign Actions. Unopted observers retain their existing timing, and unrelated candidates acquire no order from this declaration. Other Mode hooks keep their law; only this named prerequisite is exposed. A general string hook registry, arbitrary phase wait, circular completion/handoff prerequisite or ambiguous shared-budget competition is rejected.
+
+Existing Scheduler/Trigger/dependency records retain observed Action, hook terminal, owner/candidate and original obligation identity through save/resume. A completed or zero-grant hook is not executed again to release a replayed observer; a terminal failed payment is not retried from the same completion Event. Persistent later waiting observations, if authored, are separate State/checkpoint candidates under TRG-016. Own activation guards/exclusions prevent the initial payment from recursively creating another mutation-triggered activation.
+
+---
+
 ## ACT-034 — Required Owner-opportunity-start Settlement before Control
 **Status:** `LOCKED FOR EXPLICIT OPPORTUNITY-START PROFILES`
 
@@ -1670,6 +1682,18 @@ Candidate Source
 → final Candidate Pool
 → selection rule
 ```
+
+---
+
+### Opt-in State-owned legal recipient compulsion
+
+04§19.6 `targetSelectionConstraint` declares `SELECTABLE_SINGLE_RECIPIENT_DAMAGE` / `FORCE_RECIPIENT_IF_LEGAL` at PRE_SELECTION. Query only active source-State contributions for the same Combat Instance and declared acting relation. Prove that the Action actually has one ordinary recipient decision governing single-target Damage, rather than selecting an AoE center, resolving authored Slot/Position geometry or filtering a multi-target result down to one. Basic/Skill/Ultimate names do not prove that scope; Heal/Buff/non-Damage/debuff-only/self-target and fixed/multi-target attacks are excluded.
+
+Resolve each declared recipient against the same ordinary legal pool, including lifecycle/presence, relation/kind, range/filters, admission and Target Exclusion. Manual/AI/metric/random target preference is downstream of this legal pool; a previously requested explicit target is not a new legality exclusion. If one eligible forced recipient remains, select it instead of the ordinary preference, without a target-choice RNG draw. No eligible rule leaves selection unchanged. Equal Entity references compose as one forced choice; incompatible distinct forced recipients need their governing explicit composition law or rejection, not list/source/Event/entity priority. This bounded profile supplies no general Taunt priority.
+
+Preserve original per-attack binding/lock/invalidation, Action identity, Hit/Authority and Damage pipeline. A legal selectable recipient may subsequently be Position-locked by its own existing attack plan; this does not convert an authored fixed Position into an Entity decision or make Damage follow a moving recipient. Already committed locks are not retroactively changed by State activation/removal. The constraint grants neither Hit guarantee nor immunity/Target Exclusion bypass.
+
+State creation/refresh/removal governs future query eligibility through existing State contribution ownership. TargetSetRef retains the selected rule/recipient/checkpoint evidence, while immutable resolved selection/results survive later State invalidity. Reject missing/unsupported shape, owner/lifetime/recipient/phase bindings and conflicts without an applicable law before affected selection; no Character lookup or new Target/State service.
 
 ---
 

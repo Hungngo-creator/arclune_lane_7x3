@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-08-I.22
+**Version:** 2026-10-09-I.23
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.2+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.18+, `05_CONTRACTS.md` F.20+, `06_KERNEL_RUNTIME.md` G.19+, `07_MODE_PROFILES.md` H.2+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.2+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.20+, `05_CONTRACTS.md` F.22+, `06_KERNEL_RUNTIME.md` G.21+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -45,6 +45,8 @@
 **Revision I.21:** adds M-155–M-164 for atomic multi-part life projection/retention, arm clocks, non-consuming SSI contact with locked snapshot/Heal/bonus/cleanup edges, prepaid deferred creation, action-captured additive Rage, exact Side-AE rescue, and real Basic→exact outcome→Leader Heal→free Skill1 under the existing root gate. All earlier case bodies/IDs remain unchanged; ten declarative Architecture Phase obligations, not executable test results.
 
 **Revision I.22:** adds only M-165–M-167 for received exact-Action receipt aggregation/strict thresholds, source-local MaxHP cleanup including HP_ZERO without confirmed death, and rejection of incomplete observable threshold/tick/resource profiles. Gideon R1 remains partly clarified; synthetic reconciliation fixtures do not approve its pending choices. Preserve all prior case bodies/IDs. Architecture Phase declarative obligations, not executable test results.
+
+**Revision I.23:** final Gideon R2 resolves Q1–Q7. Correct only M-165–M-167's superseded partial fixtures and add M-168–M-171 for distinct opportunity expiry/refresh, same-completion class-AE funding plus finite waiting observations, legal recipient compulsion and bounded malformed-profile rejection. All earlier test bodies/IDs remain unchanged. Four new declarative Architecture Phase obligations, not executable results; current E.20/F.22/G.21 only.
 
 # 0. WHAT THIS FILE IS
 
@@ -4557,35 +4559,70 @@ Zero-missing-HP after intervening lawful recovery gives E0: ordinary zero-delta/
 **Expected:** fail closed before affected partial mutation. No hidden body/source priority, per-part writable pool, invented initializer/callback/Primitive/Tag or unsupported Mode timer. Ordinary single-body, unopted health/Rage observer, Damage/Heal modifiers, independent materialization and existing consumed-wait fixtures remain admitted with their prior laws.
 **Layers:** 04 validation/Normalizer, ACT-016, ENT-023/024, RES-006, TRG-016, existing ownership/Mode/Transaction guards.
 
-## M-165 — Received Exact-Action Threshold, Receipt Granularity and One Gain
+## M-165 — Received Exact-Action Threshold, Receipt Granularity and Dual MaxHP Basis
 
 **ID:** `M-165`
 **Status:** `MUST_PASS`
-**Purpose:** validate Gideon's locked whole-Action aggregation without choosing its unresolved mid-Action MaxHP reference or CurrentHP policy.
-**Fixture:** receiver MaxHP remains10,000 throughout each observed Action. One hostile Action A has committed ActualHP receipts1,700 and1,400 on this receiver; packet aggregate and component projections refer to the same receipts. A same-root child B contributes separate Damage. The mutation fixture explicitly chooses preserve-absolute/clamp reconciliation for this synthetic execution; this fixture is not approval of Gideon Q2.
-**Expected:** exact A projection sums3,100 once, excluding B, Shield absorption, overkill and non-Damage HP writes. At A's full-result checkpoint the strict>3,000 predicate qualifies once; existing P-031 requests1,300 from currentMaxHP10,000 and yields11,300. Neither two packets nor duplicate receipt projections create two gains. Control A actual3,000 does not qualify; distinct Actions actual1,600/1,500 are separately evaluated and cannot be pooled into3,100. Receipt/activation redelivery cannot duplicate the gain. A different explicitly declared child-outcome aggregate remains a distinct valid profile, never an alias for exact A membership.
-**Forbidden:** per-hit activation, grouping by root/credited source, nominal Damage threshold, double-crediting packet/component receipts, hidden CurrentHP adjustment or using this constant-MaxHP fixture to choose a global denominator default.
-**Layers:** DMG-010/011/012/020/021, TRG-013, P-043, P-031/032, Action/Effect provenance and Result/Transaction.
+**Purpose:** validate final Q1/Q2's deliberately different threshold/gain checkpoints.
+**Fixture:** hostile Action A starts with receiver CurrentHP5,000/CurrentMaxHP10,000; capture M_start10,000. An independent legal capacity mutation during A raises current MaxHP to20,000 while preserving CurrentHP. A has committed ActualHP receipts1,700/1,400; packet/component projections reference the same immutable receipts. Same-root child B has separate receipts.
+**Expected:** after A's qualifying receipts/mandatory lifecycle terminal, exact-A D3,100 exceeds0.30×M_start3,000 once, despite current capacity20,000. Exclude B, Shield, overkill and non-Damage HP writes. Gain is0.13×live20,000=2,600; capacity becomes22,600, CurrentHP remains1,900 if no other HP change occurred. Unchanged-capacity control10,000 produces11,300 without Heal. D3,000 does not qualify; distinct Actions1,600/1,500 cannot be pooled. Receipt/activation replay produces no duplicate gain. Any wider explicitly authored child-outcome projection remains a different profile, not exact-A membership.
+**Forbidden:** end/current denominator, per-hit gains, shared-root/credited-source grouping, nominal threshold, packet/component double credit or CurrentHP+2,600.
+**Layers:** DMG-010/011/012/020/021, TRG-013, P-002/043/031/032, exact Action/Snapshot/Effect/Result/Transaction.
 
 ## M-166 — Source-local MaxHP Reset, HP_ZERO Cause and Replay
 
 **ID:** `M-166`
 **Status:** `MUST_PASS`
-**Purpose:** preserve the distinction between earned-capacity removal, unrelated contributions and lifecycle causes.
-**Fixture:** base capacity10,000; an independent BATTLE_SCOPED flat contribution1,000; this passive's earned contribution1,430; displayed MaxHP12,430. The synthetic cleanup profile explicitly preserves absolute CurrentHP/clamps on capacity reduction. All handles have separate source/lifetime identity.
-**Inputs:** separately exercise an authored owner Field leave, Return-to-Deck, Reincarnation entry and HP_ZERO reset. In the HP_ZERO control, Death Prevention later avoids DEATH_CONFIRMED. Also replay redundant reset causes and rebuild contribution indexes/redeploy after removal.
-**Expected:** each applicable reset removes only earned1,430; with the external contribution retained, capacity resolves11,000. HP_ZERO remains a reset cause despite subsequent prevention; no false death/Reincarnation Event is emitted. Cleanup follows the declared cause, with P-031/032 reconciliation under the same authoritative health/contribution transaction; CurrentHP0 stays0 in the zero control. Duplicate reset/redelivery does not subtract1,430 twice, reapply the earned contribution or remove the external1,000. Historical immutable Damage receipts may remain for trace without recreating a retired contribution. A late reward after within-Action recovery still requires its separate explicit eligibility profile; this test supplies no such default.
-**Forbidden:** writing all MaxHP to BaseStat, treating source cleanup as Cleanse/Heal/Damage/natural expiry, equating HP_ZERO with DEATH_CONFIRMED or applying an old mutable handle to a replacement generation.
-**Layers:** STA-001/002, MaxHpMutationSpec/lifecycle retention, existing State/contribution/Lifecycle/Field Presence/Transaction and replay identity.
+**Purpose:** preserve final Q2's source removal/reconciliation and distinct lifecycle causes.
+**Fixture:** base10,000; independent retained flat contribution1,000; earned passive contribution1,430; capacity12,430. Exercise CurrentHP5,000 and12,000 controls under preserve-absolute/clamp reconciliation. All source handles/lifetimes are distinct.
+**Inputs:** separately exercise declared Field leave, Return-to-Deck, Reincarnation entry and HP_ZERO. HP_ZERO control later prevents DEATH_CONFIRMED. Replay duplicate causes, rebuild indexes and redeploy.
+**Expected:** remove only earned1,430; capacity11,000 retains external1,000. CurrentHP5,000 stays5,000;12,000 clamps11,000; HP_ZERO control stays0 at cleanup. Emit no Heal/Damage/HP-Loss/Cleanse/natural-expiry/fake death. Redelivery does not subtract twice or reapply a removed handle to a new presence. Historical exact-Action M_start/receipts remain immutable; any subsequent admitted reward for the still-valid original subject uses those sealed inputs and live application capacity, never fabricated recovery or a replacement subject.
+**Forbidden:** global BaseStat assignment, implicit capacity Heal/Damage, HP_ZERO=DEATH_CONFIRMED, erased historical threshold evidence or revived stale contribution.
+**Layers:** STA-001/002, MaxHpMutationSpec, State/contribution/Lifecycle/Presence/Transaction and replay.
 
-## M-167 — Incomplete Threshold, Early-expiry Heal and Post-action Budget Profiles
+## M-167 — Missing or Contradictory Threshold, Opportunity and Budget Profiles
 
 **ID:** `M-167`
 **Status:** `MUST_REJECT`
-**Purpose:** keep pending internal gameplay visible rather than manufacture a fully normalized Gideon from plausible defaults.
-**Inputs:** a MaxHP-mutating Action with omitted threshold reference; MaxHP mutation with omitted reconciliation; Skill1 two-Natural duration with unresolved start/expiry qualification; a Taunt/HoT that expires at the second owner start but omits observable tick-versus-expiry/CC policy; repeated activation with no effect identity/refresh law; forced-child CD behavior or foreign Taunt target categories unspecified; observable competition between post-completion+5 AE and a15-AE activation with no dependency. With SideAE10 before completion, these two funding orders disagree.
-**Expected:** reject only dependent executable content until an explicit profile supplies the missing meaning. Preserve rawkit/locked clauses and independently normalized subgraphs. Do not label proposed options MUST_PASS, convert owner clocks to global boundaries, infer performed Action from a CC-lost grant or let callback/list/Event order select the resource/Heal outcome. ACT-033 can close a finite post-action obligation but does not grant it priority over every class-regeneration hook. Supported ordinary duration defaults retain CLK-003/004; rejection concerns an incomplete observable combined profile, not every use of those defaults.
-**Layers:** 04 Normalizer/fail-closed validation, DMG-021, STA-002, ACT-033/034, CLK-003/004, State/Cost/Heal/target behavior and local dependency laws.
+**Purpose:** validate fail-closed generic content; final Gideon R2 is the fully explicit valid control, not pending gameplay.
+**Inputs:** mutating-MaxHP threshold missing/contradicting its Action-start Snapshot; omitted reconciliation; a count2-start-expiring effect requesting an old tick after it was removed; performed-only clock claimed to satisfy an explicit consumed-opportunity profile; refresh identity absent while duplicate stacks are emitted; pre-completion blocker waiting for its own completion/class hook; post-hook funding claimed without the named dependency; foreign Taunt categories unspecified while the resolver picks a target by list order.
+**Expected:** reject only malformed affected content before partial mutation. R2's explicit M_start, preserve/clamp, first-start tick/second-start expiry, Skill1 second-consumption end, consumed-opportunity clocks, one-family refresh, forced shared child graph and same-Action afterModeHook are valid composition. No unresolved Q1–Q7 remains. Keep generic missing-reference/competing-profile rejection; do not promote it into a new global default.
+**Layers:** Normalizer, DMG-021, STA-002, ACT-033/034, CLK-003/004, TGT-001, State/Cost/Heal/dependency.
+
+## M-168 — Start Tick vs End Duration, CC Loss and Refreshed Window Identity
+
+**ID:** `M-168`
+**Status:** `MUST_PASS`
+**Fixture:** after A, Skill3 family active/CD1 with no activation Heal; Skill1 has two later opportunities remaining. First later B has live owner MaxHP12,000; owner and Leader are legal Heal recipients.
+**Expected:** B start closes prior waiting gate, then requests480 for each recipient from the same live checkpoint; the skill's activation-time MaxHP does not set the amount. B counts and CD1→0 even if CC prevents its Action. No class AE/Natural completion/new waiting gate arises from that CC loss. Without refresh, C start removes old Skill3 before Heal eligibility, producing no second tick. Skill1 remains active during B and C and expires only after C consumption/completion, including CC consumption. A successful B-completion Skill3 refresh replaces future window/CD1; C becomes its first later opportunity and may heal once, D expires before its old tick. Skill1 recast during its old count2 Action similarly protects the new window from the old end decrement/expiry. Save/resume/old scheduled cursor delivery cannot expire or tick a refreshed window twice; zero/denied Heal still closes that start settlement.
+**Forbidden:** immediate activation Heal, two uninterrupted ticks, CC-frozen clock, Skill1 second-start expiry, auto-trigger from B's own start Heal/CD decrement while waiting is closed, or a stale old-window cursor acting on the refreshed record.
+**Layers:** ACT-012/034, CLK-003/004, §7.15/7.19 State/Duration/Counter/Heal/Snapshot, window revision and Scheduler/Transaction/replay.
+
+## M-169 — Same-action Class-AE Funding and Finite Waiting Mutation Observations
+
+**ID:** `M-169`
+**Status:** `MUST_PASS`
+**Fixture:** owner Tanker completes Natural A, HP>=70%, CD legal and SideAE10. Observer opts into afterModeHook AE_ACTION_REGEN_BY_CLASS of that exact Action. No eligible waiting gate exists on field entry.
+**Expected:** completion registers gated observation; existing class hook commits+5 once; then predicate sees15, pays15 once, refreshes one family/CD1 and leavesAE0 with no immediate Heal. Unopted observers retain prior timing; pre-completion costs cannot use this5. Denied/zero/capped hook still releases the initial check using actual pool; insufficient payment closes without refresh/CD mutation. A failed initial check still opens the waiting interval: later independent HP/MaxHP or exact Side-AE commit may activate once when the full predicate becomes legal. Same-root independent later commits remain eligible; no-op/rolled-back/wrong-Side/field-entry/own activation changes do not create nested or delayed retry activations. Next owner start closes waiting before periodic Heal and CC/CD handling; a lost opportunity performs no Action and opens no replacement interval. Save/resume at hook terminal and payment/window terminal repeats neither grant, check, payment nor refresh.
+**Forbidden:** pay-before+5, global class-hook priority, a new Natural child, polling, field-entry auto, indefinite failure token, blanket same-Ability/root exclusion or regranting on replay.
+**Layers:** ACT-033/034, TRG-016, §7.13/7.16, existing Mode class hook/Resource/Trigger/State/DAG/Transaction.
+
+## M-170 — Legal Selectable-single-recipient Compulsion and Preserved Attack Binding
+
+**ID:** `M-170`
+**Status:** `MUST_PASS`
+**Fixture:** active source-State owner G is legal in an enemy Action's ordinary candidate pool; player/metric/random preference selects another legal Entity. Compulsion profile is SELECTABLE_SINGLE_RECIPIENT_DAMAGE/FORCE_RECIPIENT_IF_LEGAL.
+**Expected:** qualified single-target damaging Basic/Skill/Ultimate selects G before preference, without target-choice RNG. Excluded/illegal/absent G leaves ordinary selection unchanged. AoE center, multi-target/random-multi, fixed authored Slot/Position, self, Heal/Buff/Debuff-only remain unchanged even if only one recipient currently survives. A single ordinary random recipient decision may be compelled. Preserve own binding: Entity lock follows its normal Entity rule; selectable-Entity→Position lock uses the selected Position at impact and never follows G after movement; an authored fixed Position is never rewritten. State activation/removal after lock cannot retarget it. Same-recipient constraints compose once; different forced legal recipients require explicit law/rejection, never enumeration priority. Hit/immunity/Authority/target validity can still reject Damage. Replayed selection uses its retained TargetSetRef/rule/checkpoint without another draw.
+**Forbidden:** count1/name-only classification, fixed-Slot rewrite, effect-wide AoE redirect, Guaranteed Hit/protection bypass or State/source/list/Event winner.
+**Layers:** TGT-001/002/006/008, State §19.6, existing Target/Area/State/query/Hit/Snapshot/Result.
+
+## M-171 — Bounded Hook/Constraint Admission and Forced Shared-family Refresh
+
+**ID:** `M-171`
+**Status:** `MUST_REJECT`
+**Inputs:** arbitrary hook strings; missing Mode hook or non-Natural/child/foreign/future Action prerequisite; wrong trigger owner or cyclic handoff/completion edge; force-recipient constraint with unavailable owner, cross-instance binding, unsupported shape/operation/phase, fixed/AoE rewrite, illegal-target bypass or incompatible legal recipients lacking a governing law; old compatibility/validation hash purporting to authorize these new profiles.
+**Expected:** reject malformed authored profiles before affected execution; preserve ordinary unopted paths. If dynamically incompatible legal constraints are detected at selection, reject that affected selection before TargetSet commit; any earlier ordinary Cost retains existing CST failure/refund law, not an invented rollback. Valid control: an admitted Ultimate's free Skill2→Skill3 uses the same family while HP<70%, CD1 and an old effect exists; bypass only automatic eligibility, refresh exactly one window and freshCD1, no immediate Heal/no extra child class AE. The root's later automatic check cannot charge15 again against that freshCD1 even if HP is high. Root readiness/foreign costs and owner validity remain ordinary laws. Failed status/zero Damage alone does not cancel the legal second stage; replay does not create an independent second family.
+**Layers:** E.20 Normalizer/compatibility, ACT-020/021/033, TGT-001, shared Effect/State family, Cost/Action/DAG/Target/Transaction.
 
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
@@ -5400,13 +5437,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 167 character-derived integration tests;
+- 171 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-298 tests / probes / meta-tests (293 A–N cases plus 5 META cases)
+302 tests / probes / meta-tests (297 A–N cases plus 5 META cases)
 
 The count is not a design target.
 

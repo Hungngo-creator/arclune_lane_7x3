@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-08-G.20
+**Version:** 2026-10-09-G.21
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -41,6 +41,8 @@
 **Revision G.19:** consumes E.18/F.20 Rank-first competing route claims through existing complete-entry execution, progression/stat, Target/RNG, Authority, reservation, identity and Transaction owners. Explicit empty-body death creates no True Self/REC progress. Other Kenoma mechanics use existing State/stat/Shield/Clock/Action/Result composition; no new subsystem or Character branch.
 
 **Revision G.20:** executes E.19/F.21 through existing Entity/State/definition/provider, Target/Area, SSI, Snapshot/modifier/Resource and Materialization/Transaction owners. Parts alias one life without duplicating ledgers; contact/deferred/pool observations carry exact identities. No Character branch, new store/service, Tag/Primitive or global priority.
+
+**Revision G.21:** executes E.20/F.22's opt-in class-AE prerequisite and legal selectable-recipient constraint through existing Scheduler/Trigger/dependency and State/Target owners. Retains hook/selection/State provenance and terminals for replay, preserving unopted ordering and original attack bindings. No new service, Character branch or priority registry.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -1523,11 +1525,14 @@ Canonical high-level path:
 
 23. publish/queue ACTION_COMPLETED-dependent work under existing Trigger/Reaction Contracts
     ordinary unmarked work remains non-blocking
-    register/evaluate declared ACT-033 postActionSettlement obligations
-    finish their required finite settlement work before Natural-Action handoff
+    register declared ACT-033 postActionSettlement obligations
+    evaluate/finish unopted obligations at their existing stage
+    retain explicitly afterModeHook-gated obligations for the exact hook terminal
 
 24. if Natural Action:
       execute Mode Profile post-Natural-Action system hooks
+      release opted ACT-033 observers only after their named same-Action hook is terminal
+      finish all required finite post-action obligations before handoff
       SSI pointer advance
       Turn Boundary
 ```
@@ -2863,6 +2868,16 @@ The existing Scheduler refuses TURN_BOUNDARY/next Natural Action opportunity unt
 
 ---
 
+### Same-completed-Natural class-AE prerequisite
+
+04§7.13 → ACT-033 → the existing Scheduler/Mode hook, Resource, Trigger/DAG and Transaction owners. Preserve the obligation's observed completed Natural Action/Actor/owner, exact `AE_ACTION_REGEN_BY_CLASS` hook node and pending/released/terminal cursor. Step23 registers it without evaluating its gated predicate; step24 executes the existing hook once and releases only its dependents after the grant's terminal result, including zero/denial/cap. Complete those finite graphs before pointer/boundary handoff. No new queue, callback or hook execution is allocated by the observer.
+
+On resume, a recorded hook terminal releases the same obligation without another AE grant. A recorded observation/payment/refresh terminal is not recreated. Other completion obligations/hooks keep their prior law; future/foreign/non-Natural hook refs, cycles and unsupported Mode plans fail closed. Source/State lifecycle guards still retire uncommitted work rather than bind a new owner. A persistent waiting State and subsequent HP/MaxHP/Side-AE observers use existing §35C/TRG-016 and exact generation/checkpoint identity, independently of this finite initial obligation. Their own in-progress/activation-origin guards suppress recursive payment observations, not later independent changes.
+
+The hook cursor belongs to the existing Scheduler/Mode record keyed by Combat Instance × completed Action × named hook. Bind/create it when that Action's post-phase is registered; transition PENDING→TERMINAL once the ordinary grant attempt or supported zero/denied outcome finishes. It is not a second Resource-pool writer. Retain the terminal/result references through all dependent post-action work and the normal Action replay horizon; release them only when that work is terminal and replay references permit cleanup. Serialize both hook and dependent cursors together, so retiring a waiting State cannot cause the original class grant to run again.
+
+---
+
 # 40. TARGET RESOLVER
 
 Target Resolver is a pure/read-only subsystem until an effect mutates state later.
@@ -2893,6 +2908,16 @@ For metric top-N, freeze unique candidates' metrics and positions at one selecti
 For explicit Slot ties, validate position coverage and uniqueness via the existing Mode Spatial Adapter. Reject unresolved/duplicate order positions, unmapped tied entities or multiple tied entities sharing a position without a declared law. Leader is resolved through its actual position. Do not read the SSI cursor as target priority. This local authored order does not modify the scheduler or global Reaction priority.
 
 Store the selected Entity/Entity set in `TargetSetRef` at the declared target-context checkpoint. `LOCK_ENTITY_IDS` with later `DROP_INVALID` consumes that reference once: no metric re-query, tie reroll or replacement after intervening Effects. An invalid locked target follows its declared branch failure policy. A tie policy does not supply invalidation semantics or a global random-tie default; undeclared observable tie behavior remains `REQUIRED_EXPLICIT`.
+
+---
+
+### State-owned selectable-recipient constraint
+
+04§19.6 `targetSelectionConstraint` (SELECTABLE_SINGLE_RECIPIENT_DAMAGE / FORCE_RECIPIENT_IF_LEGAL) → TGT-001 → existing State/query contribution registration and Target Resolver. At the owning target decision, derive the validated Action shape/recipient-selection eligibility from its actual target/area/Damage plans. After ordinary legality and Target Exclusion, query matching active constraints using one authoritative checkpoint view. Resolve OWNER/recipient from original State/owner/Combat Instance/generation; constrain only the qualified single-recipient Damage decision to a legal forced recipient before ordinary preference/metric/RNG selection. Count1, Action name or a prior explicit preference alone cannot establish shape or illegality.
+
+Collect compatible equal-recipient constraints as one choice, retaining the participating source refs. Different legal forced recipients require the declared supported composition law; otherwise fail the affected selection, never choose an iterator winner. No qualifying constraint uses the previous selection path. Forced singleton commits no extra target-choice RNG draw. Existing TargetSetRef stores selected recipient, constraint refs and selection checkpoint; ordinary exact attack binding/Position conversion, locks, invalidation, Hit/Authority and result laws remain separate.
+
+P-020/021/022 own contribution activation/refresh/retirement through the ordinary State store; any capability index is a derived query projection, not a mutable priority owner. Source leave/removal/window refresh retires future eligibility under State law without erasing an already committed selection. Save/resume retains the target selection terminal and source/checkpoint evidence; never reselect/reroll after compulsion already resolved. Invalid original refs, unsupported shapes/phases/operations, geometry rewrite/protection bypass and ungoverned conflicts reject before affected selection. No Character ID check, new registry or per-Taunt manager.
 
 ---
 
