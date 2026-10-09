@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-08-E.19
+**Version:** 2026-10-09-E.20
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -38,6 +38,8 @@
 **Revision E.18:** adds only bounded Rank-first contention across declared Reincarnation route profiles, using current eligible claimant Rank, existing same-Rank Authority adjudication and protected complete-entry host reservations. Existing host-only binding, receipts, controllers and clocks compose without new fields. No new Tag, Primitive, Contract ID, subsystem or global priority.
 
 **Revision E.19:** adds bounded body/provider bindings, real skipped-Slot contacts with an explicitly scoped existing Reaction gate, prepaid occupancy-deferred materialization, action-captured additive Rage amount modifiers and explicitly watched Side AE. Existing Tags/Primitives, consumed dead waits and unprofiled defaults remain unchanged.
+
+**Revision E.20:** adds only an opt-in same-completed-Natural class-AE hook dependency and a State-owned legal selectable-single-recipient Damage constraint. Existing State/Target/Trigger/Action plans execute them under ACT-033/TGT-001; no new Tag, Primitive, hook registry or global priority. Unauthored data retains prior behavior; opted content requires current E.20/F.22/G.21 compatibility and fresh normalization.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -1279,6 +1281,7 @@ postActionSettlement:
   mode: BEFORE_NEXT_NATURAL_ACTION
   observedActionRef: EVENT_ACTION
   completionSourcePolicy: NATURAL_ONLY # optional; existing default
+  afterModeHook: AE_ACTION_REGEN_BY_CLASS # optional bounded same-Action edge
   dependencyId:
   dependsOn: []
 ```
@@ -1288,6 +1291,12 @@ The default NATURAL_ONLY requires an actually completed Natural Action in the sa
 Completion dispatch registers the authored obligation before SSI handoff; its eligibility check and any created settlement become terminal before that handoff. A false condition/clean failed activation closes it under existing failure law. After consume/create commits, an independently authored settlement's validity/lifetime governs later source leave; Trigger re-eligibility does not undo committed creation. Finite scheduler save state is not a pending token for a later Action.
 
 Normalizer rejects missing Action/owner/Mode anchors, non-completed sources/non-Natural sources without this explicit profile, cross-observation/opportunity edges, cycles, waits for the next Action/TURN_BOUNDARY being blocked, unbounded creation and combining this obligation with a blocker for its own completion. A Mode must expose the same Natural Action/required post-action phase or require an explicit 07 adaptation. No ordering of unrelated observers follows from this marker.
+
+### Opt-in same-Action class-AE dependency
+
+`afterModeHook` currently accepts only `AE_ACTION_REGEN_BY_CLASS`, with `completionSourcePolicy: NATURAL_ONLY` and an observed actual completed Natural Action whose Actor is the declared trigger owner. Resolve the hook from that Action's existing Mode post-action plan. Register the obligation at completion, but defer its predicate/payability evaluation and finite graph until this exact hook is terminal, before SSI handoff. Terminal includes zero/capped/denied grant, not only positive AE; conditions read the then-authoritative pool. The Mode must expose that named hook. No completion blocker may wait on it, and no child/foreign/future Action or arbitrary hook string may supply the prerequisite.
+
+This adds a typed prerequisite to the existing local dependency plan, not a callback or universal ordering of observers. Store the original Action/hook/owner and obligation identity; replay reuses both terminals without repaying or regranting. An unopted observer keeps its existing timing. A later independent resource checkpoint is not a substitute for the initial completion check or a retry of it; persistent waiting eligibility is separately authored ordinary State and §7.16 observations.
 
 ---
 
@@ -2936,6 +2945,7 @@ shield:
   owner:
   lifecycle:
     retentionScope:
+  targetSelectionConstraint: # optional; bounded profile in §19.6
   resultBinding:
 ```
 
@@ -3874,6 +3884,31 @@ removeStateIds:
 ```
 
 because that would turn lifecycle transition data into Character scripting.
+
+---
+
+## 19.6 State-owned selectable-recipient constraint
+
+An active Entity-attached State may carry this bounded target-selection capability:
+
+```yaml
+targetSelectionConstraint:
+  actingRelation: ENEMY
+  relationAnchor: OWNER
+  actionScope: SELECTABLE_SINGLE_RECIPIENT_DAMAGE
+  recipientRef: OWNER
+  operation: FORCE_RECIPIENT_IF_LEGAL
+  resolutionPhase: PRE_SELECTION
+  conflictPolicy: REQUIRED_EXPLICIT_FOR_DIFFERENT_RECIPIENTS
+```
+
+OWNER resolves the State's declared runtime owner, with exact source/State/Combat Instance and lifetime; it is not the attacker, credited Damage source or an inferred Slot. TGT-001 applies the rule only to a damaging Action's single ordinary recipient-selection decision. Basic/Skill/Ultimate identity does not determine shape. Normalize scope from the owning Action's actual target/area/Damage plans, not count1 alone: an AoE center, one occupied Slot, one surviving multi-target recipient or a fixed Position is not a selectable single-target Damage Action. Exclude Heal/Buff/Debuff-only/non-Damage, self-target, AoE/multi-target and authored fixed-Slot/Position decisions. A single ordinary recipient selected randomly is still a recipient decision; random multi-target is excluded.
+
+At the existing target-selection checkpoint, first resolve ordinary legality/Target Exclusion. If the referenced recipient is legal, constrain that decision to it before manual/AI/metric/RNG preference. Explicit player choice is a preference, not permission to hide another ordinarily legal candidate. If no constraint qualifies, preserve ordinary selection. Do not create an extra target RNG draw for a forced singleton, rewrite geometry, acquire Guaranteed Hit or retarget an existing lock. Preserve the exact attack-owner binding under §11.11/TGT-008, including a legal selectable Entity whose ordinary downstream binding locks its Position; an authored fixed Position has no such selection and remains excluded.
+
+Compatible rules forcing the same Entity compose as one choice. Different eligible forced recipients require a supported explicit composition law; otherwise normalization/runtime validation rejects the ambiguous affected selection, never chooses by State/list/Event/Entity order. This profile defines no numeric priority or general Taunt-source winner.
+
+Lower the capability into the existing State/target query contribution and Target Resolver plans, retaining State owner/source/generation, recipient, scope, phase, lifetime and selected rule evidence. P-020/021/022 create/refresh/retire the State; existing selection queries and TargetSetRef commit the outcome. A refreshed source family replaces future clock/constraint registrations under normal State law rather than adding another priority entry. Removal retires eligibility, not already committed TargetSetRefs/results. Reject unavailable/foreign owner refs, unsupported operation/phase/shape, fixed-position rewrite, protection bypass and ungoverned conflicts. No new Functional Tag, Primitive or query manager. Unauthored State/Target data is unchanged.
 
 ---
 
@@ -5835,6 +5870,8 @@ It is not part of another Ability's `actionSpec` merely because that other Abili
 
 `damageMitigationPlan` is generated from bounded `damageMitigationOverrides` (§18C/DMG-009); it selects mitigation inputs without transforming component type. Resolution groups preserve RES-008 allocation policy and packet/result membership. Snapshot plans preserve SNP-006 pre-Cost timing. All route through existing owners.
 
+E.20 additionally lowers §7.13's optional `afterModeHook` into the existing trigger/dependency plan with exact observed Natural Action/Actor/Mode-hook terminal refs. §19.6's `targetSelectionConstraint` becomes a State-owned contribution read by the existing target plan, with legal recipient/shape/phase/conflict/lifetime evidence. No new top-level IR service is generated; old unopted plans remain unchanged. Opted plans must pin current Schema/Contract/Kernel compatibility and validationHash; old ad-hoc Character callbacks are not accepted aliases.
+
 Optional `waitingThresholdContributionPlan` is generated only from §30.1, preserving the exact static origin/owner, ledger and presence lifetime, immutable ADD amount and required coherent live checkpoint under REC-001/004/020. It remains part of existing Effect/System registration; unprofiled content generates no contribution plan or extra registration.
 
 The two plans are distinct:
@@ -5973,6 +6010,8 @@ Normalizer/compiler must:
 46. Validate DMG-009 scopes, resulting non-TRUE component type, ARM/RES selection, Penetration compatibility, owner/lifetime and conflict law; reject target-stat mutation, type relabeling, duplicate mitigation or inferred override priority.
 47. Validate SNP-006 successfully admitted Action/source/fields/pre-Cost capture and result lifetime; reject probe/fallback capture, early gameplay mutation or snapshot consumers after failed Cost.
 48. Validate WAITING_THRESHOLD_CONTRIBUTION only through §30.1/REC-001: exact static rule and presence/ledger binding, positive-integer ADD, all-waiting/live checkpoint and incompatible-policy rejection; never lower it to progress subtraction, top-N forcing or queued per-leave Actions.
+49. Validate §7.13 afterModeHook only as AE_ACTION_REGEN_BY_CLASS of the same completed owner Natural Action/Mode; retain hook/obligation terminals, zero-grant release and fresh compatibility/validation hash. Reject arbitrary hooks, foreign/child/future/non-Natural sources, completion cycles and ungoverned budget order.
+50. Validate §19.6 State-owned targetSelectionConstraint source/owner/recipient/instance/lifetime, PRE_SELECTION and actual single-recipient Damage decision. Preserve normal legality/binding/Hit; reject count/name-only shape inference, fixed/AoE rewrite, arbitrary operations and incompatible forced recipients without a governing law.
 
 ---
 
