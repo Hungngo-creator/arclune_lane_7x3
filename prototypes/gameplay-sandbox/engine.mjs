@@ -24,6 +24,7 @@ const validFormula = (formula, path) => {
   }
   if (formula.constant === undefined && !formula.terms?.length) fail(`${path}: empty formula`);
 };
+const kitDamaging = (kit, id, ancestors = []) => !ancestors.includes(id) && !!kit.abilities[id]?.effects?.some(e => e.op === 'DAMAGE' || e.op === 'CHILD' && kitDamaging(kit, e.ability, [...ancestors, id]));
 
 // A bounded prototype input format, NOT a replacement compiler for 04.
 // Anything outside the supported subset must reject, never silently degrade.
@@ -74,13 +75,16 @@ export function validateKits(kits) {
       }
       const target = ability.target;
       knownKeys(target, ['relation', 'shape', 'binding', 'slot'], abilityId);
-      if (!['SELF', 'ALLY', 'ENEMY'].includes(target.relation) || !['SELF', 'ALL', 'SELECTABLE_SINGLE', 'FIXED_SLOT'].includes(target.shape) || !['ENTITY', 'POSITION'].includes(target.binding)) fail(`${abilityId}: unsupported target profile`);
-      if ((target.shape === 'SELF') !== (target.relation === 'SELF') || (target.shape === 'FIXED_SLOT') !== (target.binding === 'POSITION')) fail(`${abilityId}: incompatible target binding`);
+      const binding = target.binding ?? (target.shape === 'SELF' ? 'ENTITY' : kitDamaging(kit, abilityId) ? 'POSITION' : null);
+      if (!['SELF', 'ALLY', 'ENEMY'].includes(target.relation) || !['SELF', 'ALL', 'SELECTABLE_SINGLE', 'FIXED_SLOT'].includes(target.shape) || !['ENTITY', 'POSITION'].includes(binding)) fail(`${abilityId}: unsupported target profile`);
+      if ((target.shape === 'SELF') !== (target.relation === 'SELF') || target.shape === 'SELF' && binding !== 'ENTITY' || target.shape === 'FIXED_SLOT' && binding !== 'POSITION') fail(`${abilityId}: incompatible target binding`);
       if (target.shape === 'FIXED_SLOT' ? !Number.isInteger(target.slot) || target.slot < 1 || target.slot > 9 : target.slot !== undefined) fail(`${abilityId}: invalid fixed Slot`);
       if (!Array.isArray(ability.effects) || !ability.effects.length) fail(`${abilityId}: empty graph`);
       for (const effect of ability.effects) {
         if (effect.op === 'DAMAGE') {
-          knownKeys(effect, ['op', 'components', 'convertToTrueBelowTargetHp'], abilityId);
+          knownKeys(effect, ['op', 'binding', 'recipientCheckpoint', 'emptyPolicy', 'invalidPolicy', 'components', 'convertToTrueBelowTargetHp'], abilityId);
+          if (effect.binding !== undefined && !['ENTITY', 'POSITION'].includes(effect.binding)) fail(`${abilityId}: unsupported Damage binding`);
+          if (effect.recipientCheckpoint !== 'PRE_DAMAGE' || effect.emptyPolicy !== 'MISS' || effect.invalidPolicy !== 'SKIP') fail(`${abilityId}: unsupported Damage recipient checkpoint/policy`);
           if (!Array.isArray(effect.components) || !effect.components.length) fail(`${abilityId}: missing components`);
           for (const c of effect.components) {
             knownKeys(c, ['type', 'amount'], abilityId);
@@ -106,6 +110,8 @@ export function validateKits(kits) {
         } else if (effect.op === 'CHILD') {
           knownKeys(effect, ['op', 'ability', 'waiveAE'], abilityId);
           if (!owns(kit.abilities, effect.ability) || typeof effect.waiveAE !== 'boolean' || ['ULTIMATE', 'BASIC'].includes(kit.abilities[effect.ability].form)) fail(`${abilityId}: invalid child`);
+          const childTarget = kit.abilities[effect.ability].target;
+          if (childTarget.shape !== 'SELF' && (childTarget.relation !== target.relation || childTarget.shape !== target.shape || childTarget.slot !== target.slot)) fail(`${abilityId}: unsupported child target selection`);
         } else fail(`${abilityId}: unsupported operation ${effect.op}`);
       }
     }
@@ -115,6 +121,18 @@ export function validateKits(kits) {
     };
     for (const id of Object.keys(kit.abilities)) visit(id, []);
   }
+}
+
+// Resolve each attack owner independently. Parent/Ability binding is never an
+// exception grant to a Damage Effect or child. Runtime consumes resolved data.
+export function normalizeKits(authored) {
+  validateKits(authored);
+  const kits = clone(authored);
+  for (const kit of Object.values(kits)) for (const [id, ability] of Object.entries(kit.abilities)) {
+    ability.target.binding ??= ability.target.shape === 'SELF' ? 'ENTITY' : kitDamaging(kit, id) ? 'POSITION' : null;
+    for (const effect of ability.effects) if (effect.op === 'DAMAGE') effect.binding ??= 'POSITION';
+  }
+  return kits;
 }
 
 export function matchup(attacker, defender, options) {
@@ -134,8 +152,8 @@ export class Battle {
     requireNumber(o.hitChance, 'hitChance', 0, 1);
     for (const flag of ['rankEnabled', 'classBonusEnabled', 'elementBonusEnabled']) if (typeof o[flag] !== 'boolean') fail(`Invalid ${flag}`);
     if (!owns(AE_BY_CLASS, o.trainingClass) || !owns(RANK_MULT, o.trainingRank) || !owns(ELEMENT_COUNTER, o.alliedElement) || !owns(ELEMENT_COUNTER, o.enemyElement)) fail('Unsupported fixture metadata');
-    validateKits(kits);
-    this.kits = clone(kits);
+    this.kits = normalizeKits(kits);
+    this.authoredKits = clone(kits);
     this.specs = clone(unitSpecs ?? scenarioUnits(o));
     this.trace = []; this.commands = []; this.processed = {}; this.actionSerial = 0; this.windowSerial = 0;
     this.rngState = o.seed || 0x6d2b79f5; this.drawSerial = 0;
@@ -230,6 +248,20 @@ export class Battle {
     if (ordinary && choices.length === 1 && Object.values(choices[0].states).some(s => s.profile.targetConstraint)) return choices;
     fail('Invalid selected recipient');
   }
+  lockTargets(targets) {
+    // Retain supplied selection data, including coordinates, for independently
+    // bound consuming owners. Entity data here does not authorize tracking.
+    return { entityIds: targets.map(u => u.id), positions: targets.map(u => ({ side: u.side, slot: u.slot })) };
+  }
+  resolveTargets(actor, input, binding) {
+    if (!['ENTITY', 'POSITION'].includes(binding)) fail('Unresolved executable target binding');
+    if (binding === 'ENTITY') return input.entityIds.map(id => this.unit(id)).filter(u => this.valid(u));
+    return input.positions.flatMap(position => {
+      const occupants = this.units.filter(u => this.valid(u) && u.side === position.side && u.slot === position.slot);
+      if (occupants.length > 1) fail('Ambiguous occupied Slot');
+      return occupants;
+    });
+  }
   recipients(actor, targets, kind) { return kind === 'SELF' ? [actor] : kind === 'ALLIED_LEADER' ? [this.leader(actor.side)] : targets; }
 
   prepare() {
@@ -306,6 +338,10 @@ export class Battle {
   runAction(actor, abilityId, targets, invocation = {}) {
     if (!this.valid(actor) || this.outcome) return null;
     const ability = this.kit(actor).abilities[abilityId];
+    const targetInput = clone(Array.isArray(targets) ? this.lockTargets(targets) : targets);
+    // Admission retains coordinates/identity data once; no subsequent selection
+    // or Taunt observation may replace this input. Each Damage owns its binding.
+    targets = this.resolveTargets(actor, targetInput, ability.target.binding);
     const aeCost = invocation.waiveAE ? 0 : ability.ae;
     const rageCost = ability.form === 'ULTIMATE' ? NUMERIC_PROFILE.rageMax : 0;
     const hpCost = actor.hp * (ability.hpCostRate ?? 0);
@@ -315,12 +351,12 @@ export class Battle {
     this.emit('COST_COMMITTED', { actionId: id, actorId: actor.id, ae: aeCost, rage: rageCost, hp: hpCost, waivedAE: !!invocation.waiveAE });
     const context = {
       id, rootId: invocation.rootId ?? id, parentId: invocation.parentId ?? null, actor, abilityId,
-      natural: !!invocation.natural, targets: [...targets], sourceSnapshot: this.stats(actor), actualDamage: {},
-      targetSnapshots: Object.fromEntries(targets.map(u => [u.id, { hp: u.hp, maxHp: this.maxHp(u) }])),
+      natural: !!invocation.natural, targets: [...targets], targetInput, sourceSnapshot: this.stats(actor), actualDamage: {},
+      targetSnapshots: Object.fromEntries(targetInput.entityIds.map(unitId => { const u = this.unit(unitId); return [u.id, { hp: u.hp, maxHp: this.maxHp(u) }]; })),
       thresholdSnapshots: Object.fromEntries(this.units.filter(u => this.valid(u) && u.side !== actor.side && this.kit(u).passive).map(u => [u.id, this.maxHp(u)])),
       directMultiplier: ability.hpCostRate !== undefined ? ability.paidDirectMultiplier ?? 1 : 1,
     };
-    this.emit('ACTION_BEGIN', { actionId: id, rootId: context.rootId, parentId: context.parentId, actorId: actor.id, abilityId, natural: context.natural, targets: targets.map(u => u.id), sourceSnapshot: context.sourceSnapshot, thresholdSnapshots: context.thresholdSnapshots });
+    this.emit('ACTION_BEGIN', { actionId: id, rootId: context.rootId, parentId: context.parentId, actorId: actor.id, abilityId, natural: context.natural, targets: targets.map(u => u.id), targetLock: { binding: ability.target.binding, checkpoint: 'ACTION_TARGET_CONTEXT', ...(ability.target.binding === 'POSITION' ? { positions: targetInput.positions } : { entityIds: targetInput.entityIds }) }, sourceSnapshot: context.sourceSnapshot, thresholdSnapshots: context.thresholdSnapshots });
     this.observeMutations([{ field: 'SIDE_AE', side: actor.side }, { field: 'HP', actorId: actor.id }].filter(m => m.field === 'SIDE_AE' ? aeCost > 0 : hpCost > 0), invocation.automatic ? actor.id : null);
     for (const effect of ability.effects) {
       if (!this.valid(actor) || this.outcome) break;
@@ -335,7 +371,9 @@ export class Battle {
         actor.cdReadyAt = actor.opportunity + effect.laterOpportunities;
         this.emit('COOLDOWN_WRITTEN', { actionId: id, actorId: actor.id, remaining: effect.laterOpportunities });
       } else if (effect.op === 'STUN') {
-        for (const unit of targets) {
+        // Skill2 status stays on the resolved hit recipient, including a miss;
+        // death after Damage skips status rather than querying a replacement.
+        for (const unit of context.damageTargets ?? targets) {
           if (!this.valid(unit)) { this.emit('STUN_TARGET_INVALID', { actionId: id, actorId: unit.id }); continue; }
           const value = this.random(`${id}:stun:${unit.id}`);
           const success = value < effect.chance;
@@ -344,9 +382,10 @@ export class Battle {
         }
       } else if (effect.op === 'CHILD') {
         const child = this.kit(actor).abilities[effect.ability];
-        const recipients = child.target.relation === 'SELF' ? [actor] : targets.filter(u => this.valid(u));
-        // Preserve inherited recipient lock; an empty invalid child branch skips.
-        if (recipients.length) this.runAction(actor, effect.ability, recipients, { rootId: context.rootId, parentId: id, waiveAE: effect.waiveAE });
+        const childInput = child.target.relation === 'SELF' ? this.lockTargets([actor]) : targetInput;
+        // Inherit supplied selection data, never the parent's binding exception.
+        // An empty coordinate remains an admitted Slot attack with a MISS result.
+        if (child.target.binding === 'POSITION' || this.resolveTargets(actor, childInput, child.target.binding).length) this.runAction(actor, effect.ability, childInput, { rootId: context.rootId, parentId: id, waiveAE: effect.waiveAE });
         else this.emit('CHILD_TARGET_INVALID', { actionId: id, child: effect.ability });
       }
     }
@@ -370,14 +409,25 @@ export class Battle {
   }
 
   damage(context, effect) {
+    if (!['ENTITY', 'POSITION'].includes(effect.binding) || effect.recipientCheckpoint !== 'PRE_DAMAGE' || effect.emptyPolicy !== 'MISS' || effect.invalidPolicy !== 'SKIP') fail('Unresolved executable Damage target plan');
+    const ability = this.kit(context.actor).abilities[context.abilityId];
+    const legal = this.pool(context.actor, ability.target);
+    const resolved = this.resolveTargets(context.actor, context.targetInput, effect.binding).filter(u => legal.includes(u));
+    // One occupant read at PRE_DAMAGE, then freeze recipients through commit.
+    // Do not invoke selection/Taunt again or query between typed components.
+    context.damageTargets = resolved;
+    this.emit('DAMAGE_TARGETS_RESOLVED', { actionId: context.id, binding: effect.binding, checkpoint: effect.recipientCheckpoint, ...(effect.binding === 'POSITION' ? { positions: context.targetInput.positions } : { entityIds: context.targetInput.entityIds }), targets: resolved.map(u => u.id) });
+    if (!resolved.length) this.emit('TARGET_MISSED', { actionId: context.id, reason: effect.binding === 'POSITION' ? 'NO_LEGAL_SLOT_OCCUPANT' : 'LOCKED_ENTITY_INVALID' });
     const plans = [];
-    for (const unit of context.targets) {
+    for (const unit of resolved) {
       if (!this.valid(unit)) continue;
       const hitValue = this.options.hitChance === 1 ? null : this.random(`${context.id}:hit:${unit.id}`);
       if (hitValue !== null && hitValue >= this.options.hitChance) {
         this.emit('HIT_MISSED', { actionId: context.id, actorId: unit.id, value: hitValue }); continue;
       }
-      const targetSnapshot = context.targetSnapshots[unit.id];
+      // Explicit Entity threshold snapshots retain their Action context; Slot
+      // attacks snapshot the occupant at this Damage group's resolution point.
+      const targetSnapshot = effect.binding === 'ENTITY' ? context.targetSnapshots[unit.id] : { hp: unit.hp, maxHp: this.maxHp(unit) };
       const conversion = effect.convertToTrueBelowTargetHp !== undefined && targetSnapshot.hp / targetSnapshot.maxHp < effect.convertToTrueBelowTargetHp;
       const counter = matchup(context.actor, unit, this.options), stats = this.stats(unit);
       const components = effect.components.map(component => {
@@ -486,7 +536,7 @@ export class Battle {
     const index = (this.rngState ^ this.opportunities) >>> 0;
     return { abilityId: id, targetId: tied[index % tied.length].id };
   }
-  exportReplay() { return { format: PROFILE_VERSION, sourceRef: SOURCE_REF, options: clone(this.options), unitSpecs: clone(this.specs), kits: clone(this.kits), commands: clone(this.commands) }; }
+  exportReplay() { return { format: PROFILE_VERSION, sourceRef: SOURCE_REF, options: clone(this.options), unitSpecs: clone(this.specs), kits: clone(this.authoredKits), commands: clone(this.commands) }; }
   snapshot() { return clone({ units: this.units, ae: this.ae, active: this.active, outcome: this.outcome, pointer: this.pointer, side: this.side, rngState: this.rngState, drawSerial: this.drawSerial, opportunities: this.opportunities, actionSerial: this.actionSerial, windowSerial: this.windowSerial, trace: this.trace }); }
 }
 

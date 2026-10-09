@@ -1,7 +1,7 @@
 // Experimental numeric profile. Semantic tables below cite merged canon;
 // numeric fixtures must never become the authority for future kit design.
-export const SOURCE_REF = '064f71758fd20b46472e0a834f70bc7106975e9c';
-export const PROFILE_VERSION = 'sandbox-v1';
+export const SOURCE_REF = '0a474a73223246c7d8496629003ec89f36538ff9';
+export const PROFILE_VERSION = 'sandbox-v2';
 export const AE_BY_CLASS = Object.freeze({ Support: 10, Mage: 7, Summoner: 7, Warrior: 5, Tanker: 5, Ranger: 5, Assassin: 3 });
 export const CLASS_BONUS = Object.freeze({
   Assassin: { Mage: .10, Support: .05 }, Mage: { Warrior: .10, Tanker: .05 },
@@ -29,10 +29,13 @@ export const CLASS_STATS = Object.freeze({
 
 const component = (type, stat, rate) => ({ type, amount: { terms: [{ stat, rate }] } });
 const mixed = (rate = 1) => [component('PHYSICAL', 'atk', rate), component('WILL', 'wil', rate)];
-const single = { relation: 'ENEMY', shape: 'SELECTABLE_SINGLE', binding: 'ENTITY' };
+// 04 §11.11 / TGT-008: attack owners default independently to retained Slots.
+// Selection shape is independent of binding; a selectable Slot is still tauntable.
+const single = { relation: 'ENEMY', shape: 'SELECTABLE_SINGLE', binding: 'POSITION' };
+const entitySingle = { ...single, binding: 'ENTITY' };
 const self = { relation: 'SELF', shape: 'SELF', binding: 'ENTITY' };
-const allEnemies = { relation: 'ENEMY', shape: 'ALL', binding: 'ENTITY' };
-const damage = (components, extra = {}) => ({ op: 'DAMAGE', components, ...extra });
+const allEnemies = { relation: 'ENEMY', shape: 'ALL', binding: 'POSITION' };
+const damage = (components, extra = {}) => ({ op: 'DAMAGE', binding: 'POSITION', recipientCheckpoint: 'PRE_DAMAGE', emptyPolicy: 'MISS', invalidPolicy: 'SKIP', components, ...extra });
 const basic = { name: 'Đánh thường', form: 'BASIC', ae: 0, target: single, effects: [damage(mixed())] };
 
 export const KITS = {
@@ -61,9 +64,11 @@ export const KITS = {
   phanTinh: {
     name: 'Phần Tinh', class: 'Mage', rank: 'SSR', provenance: 'Phần Tinh Canon R2', states: {},
     abilities: {
-      basic,
-      skill1: { name: 'Viêm Bạo', form: 'SKILL', ae: 25, hpCostRate: .15, paidDirectMultiplier: 1.4, target: single, effects: [damage([component('WILL', 'wil', 2)])] },
-      ultimate: { name: 'Tinh Hỏa Liệu Nguyên', form: 'ULTIMATE', ae: 0, hpCostRate: .15, paidDirectMultiplier: 1.4, target: allEnemies, effects: [damage(mixed(3), { convertToTrueBelowTargetHp: .30 })] },
+      // Canon R2 §§3–4 explicitly locks these exact attacks to Entity IDs.
+      // Declare each consuming Damage owner too; this is no shared default.
+      basic: { ...basic, target: entitySingle, effects: [damage(mixed(), { binding: 'ENTITY' })] },
+      skill1: { name: 'Viêm Bạo', form: 'SKILL', ae: 25, hpCostRate: .15, paidDirectMultiplier: 1.4, target: entitySingle, effects: [damage([component('WILL', 'wil', 2)], { binding: 'ENTITY' })] },
+      ultimate: { name: 'Tinh Hỏa Liệu Nguyên', form: 'ULTIMATE', ae: 0, hpCostRate: .15, paidDirectMultiplier: 1.4, target: { ...allEnemies, binding: 'ENTITY' }, effects: [damage(mixed(3), { binding: 'ENTITY', convertToTrueBelowTargetHp: .30 })] },
     },
   },
   trainingSupport: {
@@ -85,8 +90,12 @@ export const KITS = {
   },
 };
 
-// Authoring templates must not alias mutable definitions across Characters.
-for (const key of Object.keys(KITS)) KITS[key] = structuredClone(KITS[key]);
+// Authoring templates must not alias mutable definitions across Characters or
+// Ability owners; editing one exact binding must not rewrite another owner.
+for (const key of Object.keys(KITS)) {
+  KITS[key] = structuredClone(KITS[key]);
+  KITS[key].abilities = Object.fromEntries(Object.entries(KITS[key].abilities).map(([id, ability]) => [id, structuredClone(ability)]));
+}
 
 export const DEFAULT_OPTIONS = Object.freeze({ seed: 79, startingAE: 35, startingRage: 0, rankEnabled: true, classBonusEnabled: true, elementBonusEnabled: true, trainingRank: 'SSR', trainingClass: 'Warrior', alliedElement: 'Light', enemyElement: 'Dark', hitChance: NUMERIC_PROFILE.hitChance });
 
