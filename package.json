@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "prototype": "node prototypes/gameplay-sandbox/serve.mjs",
+    "build:prototype": "node prototypes/gameplay-sandbox/make-standalone.mjs",
+    "test:prototype": "node --test prototypes/gameplay-sandbox/test/*.test.mjs",
+    "check:prototype:browser": "node prototypes/gameplay-sandbox/test/browser-smoke.mjs",
     "build": "npm run build:prod",
     "build:dev": "node tools/generate-loithienanh-svg.mjs && node build.mjs --mode=development",
     "build:prod": "node tools/generate-loithienanh-svg.mjs && node build.mjs --mode=production",

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10191b">
+  <title>Arclune · Phòng đấu thử</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main>
+    <header class="masthead">
+      <div><div class="eyebrow">ARCLUNE / PLAYABLE EXPERIMENT 01</div><h1>Phòng đấu thử<span>Những luật trên giấy, một trận trên sân.</span></h1></div>
+      <div class="header-actions"><button id="reset" class="quiet">Trận mới</button><button id="export" class="quiet">Lưu replay</button><label class="quiet upload">Mở replay<input id="import" type="file" accept="application/json,.json"></label></div>
+    </header>
+    <div class="scope"><span class="dot"></span>Gideon R2 · Phần Tinh R2 · 3 vs 3<span class="scope-note">Stat, Rage gain và rank multiplier dùng profile thử nghiệm.</span></div>
+    <details class="setup"><summary>Thiết lập trận <span>Seed · class · nguyên tố · rank</span></summary>
+      <form id="setup">
+        <label>Seed<input name="seed" type="number" min="0" max="4294967295" step="1" value="79" required></label>
+        <label>AE khởi đầu mỗi đội<input name="startingAE" type="number" min="0" max="100" value="35" required></label>
+        <label>Rage khởi đầu<input name="startingRage" type="number" min="0" max="100" value="0" required></label>
+        <label>Class quân thử đội B<select name="trainingClass" id="classes"></select></label>
+        <label>Rank quân thử đội B<select name="trainingRank" id="ranks"></select></label>
+        <label>Nguyên tố thử đội A<select name="alliedElement" id="element-a"></select></label>
+        <label>Nguyên tố thử đội B<select name="enemyElement" id="element-b"></select></label>
+        <div class="checks"><label><input name="rankEnabled" type="checkbox" checked>Nhân stat theo rank</label><label><input name="classBonusEnabled" type="checkbox" checked>Class bonus</label><label><input name="elementBonusEnabled" type="checkbox" checked>Element bonus</label><label><input name="alwaysHit" type="checkbox">Hit 100% để kiểm tra số</label></div>
+        <button class="primary" type="submit">Bắt đầu với thiết lập này</button>
+      </form>
+      <p>Gideon và Phần Tinh giữ SSR cùng class canon. Nguyên tố của họ chưa được chốt: lựa chọn ở đây chỉ là fixture. Không mô phỏng Deck, Luân Hồi, gear, sao hay tu vi.</p>
+    </details>
+    <section class="arena" aria-label="Sân đấu">
+      <div class="teams"><div><span class="eyebrow">ĐỘI A / BẠN</span><h2>Quang hộ <span id="ae-a"></span></h2></div><div class="round"><span id="opportunity"></span><small>SSI · luân phiên hai đội</small></div><div class="enemy-heading"><span class="eyebrow">ĐỘI B / ĐỐI THỦ</span><h2>Thử thách <span id="ae-b"></span></h2></div></div>
+      <div class="board"><div id="side-a" class="side-grid"></div><div class="divider"><span>VS</span></div><div id="side-b" class="side-grid"></div></div>
+      <div id="result" role="status"></div>
+    </section>
+    <section class="action-panel" aria-label="Chọn hành động">
+      <div class="actor-heading"><div><div class="eyebrow">CƠ HỘI HIỆN TẠI</div><h2 id="active-name"></h2><p id="active-note"></p></div><div class="automation"><label><input id="control-b" type="checkbox">Điều khiển cả đội B</label><button id="ai-step" class="quiet">AI chọn 1 Action</button><button id="auto" class="quiet">Tự chạy trận</button></div></div>
+      <div id="abilities" class="abilities"></div>
+      <div id="target-panel"><span>Chọn mục tiêu trên sân hoặc tại đây</span><div id="targets"></div></div>
+      <div class="execute-row"><p id="selection-note" aria-live="polite"></p><button id="execute" class="primary">Thực thi Action <span>→</span></button></div>
+      <p id="error" role="alert"></p>
+    </section>
+    <section class="lower">
+      <div class="journal"><div class="section-heading"><h2>Diễn biến trận</h2><div><select id="trace-filter" aria-label="Lọc diễn biến"><option value="ALL">Tất cả</option><option value="DAMAGE">Sát thương / hồi phục</option><option value="RESOURCE">AE / Rage / Cost</option><option value="STATE">State / CC / đồng hồ</option></select><button id="trace-export" class="quiet">Tải trace</button></div></div><ol id="trace" aria-live="polite"></ol></div>
+      <aside><div class="eyebrow">ĐỌC TRẬN ĐẤU</div><h2>Những gì đang được thử</h2><p>Taunt ép đòn đơn hợp lệ vào Gideon; đòn toàn đội và Slot cố định giữ mục tiêu riêng.</p><p>Skill3 không hồi ngay lúc kích hoạt. Tick đầu dùng MaxHP sống, kể cả khi cơ hội bị mất do choáng.</p><p>Phần Tinh trả HP Cost khi dùng Skill/Ultimate. Mục tiêu dưới 30% HP tại snapshot Ultimate nhận hai component TRUE.</p><div class="rule-table" id="class-table"></div><p class="small">Canon quyết định luật. Prototype chỉ kiểm tra phần đã triển khai; cơ chế chưa hỗ trợ không giới hạn kit tương lai.</p><a href="./README.md">Phạm vi, nguồn và cách kiểm tra ↗</a></aside>
+    </section>
+    <footer>ARCLUNE / SANDBOX V1 <span>Không phải runtime chính thức · Không đóng băng kiến trúc</span></footer>
+  </main>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
