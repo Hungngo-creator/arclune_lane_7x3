@@ -1,6 +1,6 @@
 # NẠP HƯ — ÁNH XẠ CẢNH GIỚI, CỔ THẦN, NHÂN TỔ & HAI HỆ KIẾM TU
 
-> **Bàn giao mới 2026-10-09:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L12**: mang vật chất vào Á Không Gian, hai thế lực, chuẩn thiên tài và sự hiếm Chính Tiên. Mục XXXVII phân biệt gia trì chiến lực với chứng đạo; L11 / mục XXXV–XXXVI giữ Đạo Ngân / Địa Tiên.
+> **Bàn giao mới 2026-10-09:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L13**, nguồn Đế Thế và Nhập Đạo Cổ Kiếm Tu. Mục XXXVIII–XXXIX giữ quyết định mới; [bản combat](NAP_HU_ANCIENT_SWORD_COMBAT_WORKING.md) phân tích kỹ pháp / phản chế theo tên Nạp Hư, dưới trạng thái đề nghị.
 
 > **Trạng thái:** Thiết kế thế giới đang xây dựng.
 >
@@ -1166,4 +1166,33 @@ Thế lực Tiên Thiên Sinh Linh có **hơn 50 Chân Tiên**, **ít nhất hai
 Vẫn giữ **ráp đủ Quy Tắc → Thiên Đạo hạ Chính Tiên Kiếp → qua kiếp mới khai thiên tích địa**. Muốn khai thác thủ đoạn cản chứng nên xác định chúng xảy ra trong quá trình gom / cảm ngộ nền hoặc lúc kiếp, chưa tự chốt diễn biến / loại kiếp.
 
 Tiêu chuẩn thiên tài / các mốc thời gian ở mục XX của [Hệ thống sức mạnh](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md) là **đề nghị**, không phải luật nền hoặc ngưỡng bắt buộc chứng đạo.
+
+
+---
+
+# XXXVIII. NGUỒN ĐẾ KIẾM, TIÊN VƯƠNG VÀ TÍNH MỚI CỦA CỬU ĐẠI
+
+**ĐÃ CHỐT L13:** Kiếm Tiên đầu tiên nhận di sản **vận dụng Thế / Đế Thế** từ **đồ tôn của một Chân Tiên vương quốc Tiên Thiên Sinh Linh**, trong **Thiên Địa Bí Cảnh**. Truyền thừa ít liên quan kiếm; hắn kết hợp lý niệm của mình, đúc kết **Đế Kiếm**. Giữ nguồn Nhân Tiên truyền nền tu / nuôi dưỡng riêng.
+
+**Tiên Vương** là danh hiệu vương của vương quốc, được khí vận vương quốc gia trì và tăng **Thế**; không là cảnh tu vi, chưa gán Quy Tắc / danh tính hoặc cho luôn Chính Tiên.
+
+Chín đại kiếm thuật do Kiếm Tiên đầu tiên sáng tạo là mới mẻ trong mắt các Chân Tiên thực vật của vương quốc. Họ nhìn chung lười nhác / ôn hòa do bản tính thực vật, nhưng có ngoại lệ. Không từ tri thức / tu vi cao suy họ đã có mọi lý niệm kiếm đạo hoặc phủ nhận thành tựu của tổ sư.
+
+**CÒN MỞ:** định nghĩa / giới hạn Thế, phân biệt nguồn gia trì và kỹ thuật dẫn Thế, cách chuyển vào kiếm ở từng cảnh, bộ tên gốc Cửu Đại / Thập Bát và vị trí Đế Kiếm trong phân loại. **Tác giả chọn ưu tiên tên và triết lý Nạp Hư hiện có**; các bộ tên Arclune chỉ đối chiếu, không thay danh sách gốc.
+
+[Phân tích ứng dụng / phản chế](NAP_HU_ANCIENT_SWORD_COMBAT_WORKING.md) có bảng các kỹ pháp Nạp Hư đã được nhắc, ba bước dựng / tranh / dùng Thế, phân lớp thuật / lưu / quyết / chiêu và đoạn giao chiến. Toàn bộ cơ chế Codex đề nghị chưa tự thành canon.
+
+---
+
+# XXXIX. NHẬP ĐẠO CỔ KIẾM TU, PHÁP TẮC HỮU HẠN VÀ GIỚI HẠN
+
+**ĐÃ CHỐT L13:** mọi đại kiếm quyết / kiếm lưu / kiếm thuật Cổ Kiếm Tu đều có thể **Nhập Đạo**. Cổ Kiếm Tu Nhập Đạo được chúng tu sĩ nhận định là **Nhập Đạo Giả mạnh nhất cùng cảnh so với tu sĩ Nhập Đạo**. Không chặn đường Nhập Đạo bằng phẩm thấp hoặc cảnh thấp.
+
+Vẫn giữ Nhập Đạo là tự ngộ Đạo Ngân sớm, chưa tự nắm Pháp Tắc hoàn chỉnh / Quy Tắc; mạnh hơn Hoàn Mỹ và tốn tổng linh lực hơn. Kiếm có tên Không / Thời / Nhân Quả không tự cho người cảnh thấp toàn bộ quyền năng tương ứng; giới hạn cụ thể phải xây theo cảnh / cảm ngộ.
+
+**ĐÃ CHỐT:** Pháp Tắc thiên địa **có hạn**, chưa khóa số lượng. Người tư chất và ngộ tính đều thấp cần khí vận **bậc cao nhất** mới có khả năng tới Chân Tiên, trong tình huống chưa bị Chân Tiên để mắt. Không biến điều kiện ấy thành bảo đảm tu thành hoặc vượt độc chiếm. Pháp Tắc có chủ không tiếp tục cảm ngộ; thành tựu cũ / quyền cấm vẫn giữ theo mục XXVII.
+
+**Suy luận Codex:** ưu thế mạnh nhất đồng cảnh của hệ không tự miễn điều kiện chọn / tiếp cận đúng mục tiêu và chịu phản chế. Chém hồn / ý / quan hệ Vực không tự ma diệt Chân Ngã; mệnh đề mọi Cổ Kiếm Tu làm được ở mọi cảnh chưa được chốt.
+
+**ĐANG XÂY DỰNG:** Thiên Đạo thúc đẩy Kiếm Tiên để kiếm đạo nâng chiến lực chúng sinh / phòng ngoại giới là hướng tác giả nghiêng về, chưa thành động cơ lịch sử được xác nhận. Không cho Thiên Đạo đọc tâm trí Chân Tiên trở lên hoặc coi di sản vận dụng Thế là truyền trực tiếp cảm ngộ Nhập Đạo.
 

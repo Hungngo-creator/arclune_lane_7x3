@@ -1,6 +1,6 @@
 # NẠP HƯ GIỚI — CẤU TRÚC QUẦN VỰC, GIỚI BÍCH & CÁC ĐẠI VỰC HIỆN HÀNH
 
-> **Bàn giao mới 2026-10-09:** [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L12**; Á Không Gian không có vật chất sẵn nhưng có thể mang vào. Mục LXVI–LXVII bổ sung Tam Thập Tam Trọng Thiên và thế lực Tiên Thiên Sinh Linh; niên đại chưa chốt. L11 / mục LXII–LXV giữ bí cảnh / Địa Tiên.
+> **Bàn giao mới 2026-10-09:** [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L13**; thế lực Tiên Thiên Sinh Linh là vương quốc, vương mang danh hiệu Tiên Vương nhận khí vận / tăng Thế. Mục LXVIII nối nguồn Đế Thế với Đế Kiếm; [bản combat](NAP_HU_ANCIENT_SWORD_COMBAT_WORKING.md) lưu ứng dụng đề nghị.
 
 > **Trạng thái:** Thiết kế thế giới đang xây dựng — dùng để tiếp tục khóa địa lý, lịch sử và vật lý Nạp Hư trước khi viết biên niên sử chính thức.
 >
@@ -2671,7 +2671,7 @@ Không dùng Á Không Gian để vượt miễn phí Giới Bích Nạp Hư, kh
 - Một thế lực của **Tiên Thiên Sinh Linh**, nối phần vương quốc cây cỏ Tiên Thiên đã có ở mục LVIII.
 - Số Chân Tiên chưa chốt chính xác nhưng **hơn 50 Chân Tiên**.
 - Có **tối thiểu 2 Thiên Địa Chính Tiên**.
-- Chưa đặt tên mới cho thế lực, lãnh đạo, danh sách thành viên, hệ Quy Tắc hoặc niên đại đạt quy mô này.
+- **L13:** thế lực là **vương quốc**, vương gọi **Tiên Vương**; danh hiệu không phải tu vi, được khí vận vương quốc gia trì và tăng **Thế**. Chưa chốt tên riêng của vương quốc, danh tính / tu vi Tiên Vương, danh sách thành viên, hệ Quy Tắc hoặc niên đại đạt quy mô này.
 
 Các cận dưới là quy mô thế lực tác giả đặt; không tự đặt toàn bộ quy mô ấy ngay lúc Thiên Đạo vừa thức tỉnh, không thay câu trước rằng tới lúc ấy cây cỏ Tiên Thiên đều đã tự nhiên thành Chân Tiên. Thời điểm có hai Chính Tiên / quan hệ với Đại Hợp Giới còn mở.
 
@@ -2680,4 +2680,27 @@ Các cận dưới là quy mô thế lực tác giả đặt; không tự đặt
 **SUY LUẬN Codex, chưa chốt:** thời gian tồn tại rất lâu và cộng đồng đồng đạo có thể tạo lợi thế tích lũy / bảo vệ người sắp chứng đạo. Chưa đặt đây là nguyên nhân thật hai vị đạt Chính Tiên, chưa cho thế lực toàn tri, thống trị Nạp Hư hoặc quyết định họ có tham gia các Đại Kiếp.
 
 Hạt nhân lịch sử / giới hạn Chính Tiên xem mục LV–LVI của [Khung lịch sử nền](NAP_HU_HISTORY_FOUNDATIONS_WORKING.md); tiêu chuẩn thiên tài hậu thiên là đề nghị riêng, không áp máy móc cho tiên trời sinh.
+
+
+---
+
+# LXVIII. VƯƠNG QUỐC TIÊN THIÊN SINH LINH, TIÊN VƯƠNG VÀ NGUỒN ĐẾ THẾ
+
+**ĐÃ CHỐT L13 — nguồn tác giả:**
+
+- Thế lực Tiên Thiên Sinh Linh là **vương quốc**; vương được gọi **Tiên Vương**.
+- **Tiên Vương là danh hiệu**, không phải cảnh giới. Người mang danh hiệu được **khí vận vương quốc gia trì**, **Thế cũng tăng**.
+- Các Chân Tiên của vương quốc đều là **thực vật thành tinh**. Bản tính nhìn chung **lười nhác, ôn hòa**, luôn có ngoại lệ; không suy thành tuyệt đối không chiến đấu hoặc không có âm mưu.
+- Chín đại kiếm thuật của Kiếm Tiên đầu tiên thực sự **mới mẻ trong mắt họ**.
+- Nguồn di sản Kiếm Tiên nhận trong **Thiên Địa Bí Cảnh** là vận dụng **Thế / Đế Thế**, ít liên quan kiếm, đến từ **một đồ tôn của một Chân Tiên thuộc vương quốc**. Kiếm Tiên kết hợp lý niệm riêng, đúc kết **Đế Kiếm**.
+
+Giữ **hơn 50 Chân Tiên, tối thiểu hai Chính Tiên** và cận tổng toàn lịch sử không quá mười. Danh hiệu Tiên Vương không tự chốt người làm vương là một trong hai Chính Tiên, không tạo một cảnh mới hoặc thêm một Chính Tiên vào tổng.
+
+**CÒN MỞ:** tên vương quốc / người giữ danh hiệu, cách chọn / kế nhiệm, phạm vi và cơ chế gia trì khí vận / Thế, danh tính Chân Tiên / đệ tử / đồ tôn để lại di sản, thời điểm và vị trí bí cảnh. Không mặc định bí cảnh ấy là vương quốc hoặc chính nơi tổ sư mắc kẹt về sau.
+
+**Đề nghị Codex:** khí vận vương quốc gia trì người giữ vị trí, còn kỹ thuật vận dụng Thế là tri thức có thể được truyền qua di sản theo nội dung tác giả đặt. Quan hệ giữa hai phần cần triển khai; không coi truyền thừa là trao quyền cai trị hoặc chép cảm ngộ Nhập Đạo vào người nhận.
+
+Đế Kiếm Tần Đế huy động Quốc Thế theo mục XIX vẫn giữ đầy đủ điều kiện và giới hạn chiến tích. Tần Đế không đồng nhất với Tiên Vương; gia trì danh hiệu, vận dụng kiếm, chứng Pháp Tắc và vị cách tu là các mặt cần xét riêng.
+
+[Ứng dụng / phản chế Cổ Kiếm Tu](NAP_HU_ANCIENT_SWORD_COMBAT_WORKING.md) phân tích Đế Kiếm và các kỹ pháp có tên trong lore, dưới trạng thái đề nghị. Danh sách đầy đủ Cửu Đại / Thập Bát chưa có bộ thống nhất được tác giả xác nhận; L13 tác giả chọn **ưu tiên tên và triết lý Nạp Hư hiện có**, không lấy bộ tên Arclune thay thế.
 
