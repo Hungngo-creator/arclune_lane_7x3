@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-09-INDEX-29
+**Version:** 2026-10-09-INDEX-30
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-09-INDEX-29`
+**Version:** `2026-10-09-INDEX-30`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -71,9 +71,9 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`
 **Role:** Chặng B — canonical meanings and semantic distinctions.  
-**Version:** `2026-10-08-B.3`.
+**Version:** `2026-10-09-B.4`.
 **Read when:** gần như mọi normalization task.  
-**Important:** `TURN_BOUNDARY` là global SSI boundary theo CLK-001, gồm ngoại lệ POSTMORTEM_WAIT được khai báo tường minh. Personal “own turn” mechanics dùng Actor Natural Action Window / Natural Action clocks; dead wait không tiến personal Actor clock.
+**Important:** `TURN_BOUNDARY` là global SSI boundary theo CLK-001, gồm ngoại lệ POSTMORTEM_WAIT được khai báo tường minh. Personal windows dùng Actor Natural Action Window / Natural Action clocks; explicitly boundary-timed work có thể qualify original consumed Natural-opportunity owner của chính global boundary (CC loss vẫn qualifies), không tạo private boundary; dead wait không tiến personal Actor clock.
 
 ## `02_TAG_vNext.md`
 **Role:** Chặng C — Canonical Functional Tag Registry.  
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-09-E.20`.
+**Version:** `2026-10-09-E.21`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-09-F.22`.
+**Version:** `2026-10-09-F.23`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-09-G.21`
+**Version:** `2026-10-09-G.22`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-09-I.23`
+**Version:** `2026-10-09-I.24`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -142,6 +142,8 @@ Authored Character data không nên tham chiếu raw engine code.
 ## 2A. Current Character canon navigation
 
 In `docs/canon kit/`:
+
+- **Lạc Thanh Hà / Qinghe** → `docs/canon kit/Lac_Thanh_Ha_Clarified_Gameplay_Canon.md` R2 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Complete Passive/three-Skill/Ultimate kit locks consumed-owner global boundaries including CC, per-ally one-success episodes, payment-time persistent MaxHP Cost/post-Cost Heal, seeded Slot Debuff, final-request Heal→TRUE/Shield/floor2, exact-instance strict35% threshold/cause-only30% payout, common-M_cast direct-death growth and full-field snapshot Heals. Final decisions freeze all armed Skill1 HP% at one checkpoint with lowest-first/seeded ties and live per-Reaction payment; same-source Skill2 REFRESH preserves initial M/D while resetting only duration; confirmed source death/actual leave/Return cleans all owned instances and uncommitted payouts, with no freeze/restore and no temporary-absence cleanup. B.4/E.21/F.23/G.22 bind these through existing owners; I.24 M-172–M-183 cover valid/rejection/replay boundaries. No internal gameplay decision remains pending; unsupported cross-source conversion/global-priority/Mode interactions and missing roster metadata remain nonblocking. No new Tag/Primitive/Contract ID or implementation code; no unrelated raw entry overwritten.
 
 - **Gideon Vale** → `docs/canon kit/Gideon_Vale_Clarified_Gameplay_Canon.md` R2 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Final Q1–Q7 supersede every pending R1 alternative: hostile-Action-start MaxHP threshold/current-application13% gain, absolute-HP/clamp reconciliation, Skill1 active through two consumed opportunities, one next-start live4% tick/second-start expiry, CC-counted clocks, own-completed-Natural waiting HP/MaxHP/exact Side-AE observations, one-family refresh and Ultimate HP/CD bypass. Taunt compels only legal ordinarily selectable single-target Damage, retaining attack bindings/Hit. E.20/F.22/G.21 add only same-Action class-AE-before-observer dependency and State-owned selectable-recipient constraint; no new Tag/Primitive/Contract ID. I.23 corrects M-165–M-167 and adds M-168–M-171 boundary/rejection coverage. Q1–Q7 are resolved; external numeric/foreign-profile/Mode boundaries remain nonblocking.
 

@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-09-G.21
+**Version:** 2026-10-09-G.22
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -43,6 +43,8 @@
 **Revision G.20:** executes E.19/F.21 through existing Entity/State/definition/provider, Target/Area, SSI, Snapshot/modifier/Resource and Materialization/Transaction owners. Parts alias one life without duplicating ledgers; contact/deferred/pool observations carry exact identities. No Character branch, new store/service, Tag/Primitive or global priority.
 
 **Revision G.21:** executes E.20/F.22's opt-in class-AE prerequisite and legal selectable-recipient constraint through existing Scheduler/Trigger/dependency and State/Target owners. Retains hook/selection/State provenance and terminals for replay, preserving unopted ordering and original attack bindings. No new service, Character branch or priority registry.
+
+**Revision G.22:** executes E.21/F.23 profiles through existing Scheduler/Duration, Trigger/Target/Snapshot/RNG/Action, Cost/Stat, State/Heal/Damage/Shield/Counter/Result/Transaction owners with exact generation, frozen local candidate order, duration-only refresh, source cleanup, battle retention and replay terminals. No Character branch, new service or priority registry.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -1378,6 +1380,12 @@ Retain owner/instance/grant/State/dependency and cancellation/terminal cursor in
 
 ---
 
+## 19B. Qualified global boundary settlement
+
+04§7.21/§20.1 → CLK-001 → existing SSI Scheduler, Duration, Trigger/dependency and Transaction owners. Each global boundary retains its actual consumed scheduling origin kind, Natural-opportunity owner/generation/serial and grant/consumption identity, including CC loss without an Action. Match qualified subscribers against that origin, never last Action/current pointer. Hold next SSI continuation until their finite declared work is terminal; performed Action/blocking work closes first. No private boundary, new clock service or fabricated Action/Event.
+
+An opted-in later-than-activation Duration record stores activation/latest-owner-grant serial, source/State/window revision, remaining count and terminal cursor. Ignore casting/earlier/nonmatching boundaries; decrement at a later qualifying global boundary even after CC. Replacement retires its old registrations; source lifetime governs removal/pause. Save/replay preserves the original origin and cursor so delivery cannot heal/decrement/expire twice or redirect an old generation. Unsupported Mode provenance and undeclared noncommuting work reject.
+
 # 20. TURN BOUNDARY
 
 Canonical:
@@ -2652,6 +2660,14 @@ Use normalized EXCLUDE_THIS_TRIGGER_ACTIVATION plus immutable commit-origin refs
 Keep EXCLUDE_THIS_TRIGGER_ACTIVATION and terminal evidence through Cost/Heal/replay; own writes cannot recurse. Independent later AE mutation can reconsider the predicate after terminal execution. Candidate failure/nonqualification is terminal, not polling; observable shared-AE contention requires its actual composition law. Other stable/health/checkpoint profiles stay unchanged.
 
 
+## 35E. Checkpoint-local ordered automatic Reactions
+
+04§7.22 → TRG-016 → existing stable writers/Lifecycle/Trigger, Target/Snapshot/RNG, State/Cost/Action/dependency/Transaction records. At the originating complete stable checkpoint, perform required episode bookkeeping, collect the entire valid armed subject set and snapshot HP/MaxHP/episode generation before any member Action/payment. One same-commit owner/Trigger set supersedes per-subscriber notification order; no new global cohort or predicate ledger is written.
+
+Freeze ascending unrounded HP% groups and seeded RANDOM_AMONG_TIED no-duplicate permutations with stable set-to-draw mapping. Existing Reaction queue/release policy owns admission timing; this observation cannot execute through an ordinary Reaction hold. Create actual non-Natural Reaction member Actions under the finite local after-member-terminal dependency cursor. Revalidate exact owner/subject/episode allowance and current required Cost group immediately before each admission/payment commit. Failed payment/invalid subject terminalizes that member without consuming the episode; successful payment joins allowance consumption. Finish each member's Action and required blocking work before the next member reads live AE/MaxHP. Effects after successful admission retain their own invalidity/local-failure policy.
+
+Save candidate membership, ratios, draw/permutation, original checkpoint/owner presence, member episode/admission/Action refs and per-member terminals in existing execution records. Resume never rebuilds the set from current HP, redraws a tie, pays a committed member or redirects to a new episode/presence. Member-origin Cost/Heal suppresses nested collection while ordinary bookkeeping can end recovered episodes. Later independently caused checkpoints are distinct candidates and still revalidate the same episode allowance; no polling/failed-checkpoint retry. Reject malformed/mixed settlement profiles, incomplete membership, ambiguous unrelated contention and cyclic continuation before mutation. Existing scalar required settlements and unprofiled Reaction behavior remain unchanged.
+
 # 36. TRIGGER CANDIDATE
 
 When an Event is published:
@@ -3420,7 +3436,7 @@ Every ordinary or reflected Damage receipt consumed by BY_DAMAGE_SOURCE retains 
 
 # 57. HEAL RUNTIME
 
-Heal Runtime resolves one Heal instance as:
+Heal Runtime resolves one ordinary unconverted Heal instance as:
 
 ```text
 requestedHeal
@@ -3523,6 +3539,22 @@ Before an Overheal-derived Shield request reaches P-046/P-047, resolve its retai
 
 Retain result/policy/origin refs until declared dependent converters terminate; replay resumes their existing Effect/commit identities without another Shield. A genuinely unrelated Shield or another Heal result uses its own law. No live global veto State, Character branch, numerical-equality filter or general taint service.
 
+## 57A. State-owned Heal request replacement and receipt settlement
+
+04§19.7 → HEL-001/DMG-010/RES-008 → existing State rule registry, Heal/Damage/Shield, Snapshot/Counter/Result, Transaction and dependency owners. P-044's existing Heal preparation supplies the final admitted/modifier-adjusted request before restoration/Overheal. Query only active exact recipient-State generations; validate semantic intrinsic-Regen exclusion and one supported claimant. Do not dispatch post-Heal Damage from a committed restoration result.
+
+Retain one original Heal request/terminal ID, sealed amount/provenance, conversion State/source/recipient/generation and converted Damage refs. The ordinary finite transaction cancels restoration and stages a TRUE Shield-input packet, then eligible Shield and post-Shield above-floor HP budget. Converted restoration is0 and has no Overheal; its actual Damage receipt remains distinct. For equal-floor common-recipient conversions reuse existing proportional RES-008 allocation; incompatible mixed claims/floors need actual law/rejection. CurrentHP at/below floor is not assigned upward. Ordinary unconverted P-044/045 and TRUE flows remain unchanged.
+
+Protect/revalidate generation/recipient and all joined writes before publication. No cancel-only or both-Heal-and-Damage commit, second modifier pass, duplicated incoming request, implicit Shield Piercing or nominal receipt. Retire/abort stale work with declared terminal law; replay resumes the original cursor/claim rather than selecting another historical claimant. Unsupported competition cannot be hidden by registry enumeration.
+
+Fold only committed ActualHP from the exact conversion instance into its existing State counter, with immutable processed receipt/commit identity, before its dependent threshold/removal/continuation. Complete common commits first and count packet/component receipts once. An admitted completion captures D/cause/instance into existing Snapshot/result bindings before retiring State; retain its finite payout records until terminal even though the live State is gone. Noncompletion cleanup retires without creating those records.
+
+For an explicit common-checkpoint SUM payout, existing dependency/Result owners freeze eligible sealed records, reduce requested amounts deterministically and issue one ordinary Heal. Keep batch membership, per-instance consumption and Heal/terminal IDs across save/load. Source validity/retention remains authored; denied/zero/converted/local failure closes once. Target/source leave, cleanse and replacement cannot become expiry or reconstruct discarded D. Battle cleanup cancels uncommitted work/releases refs at the existing lifetime boundary, without a new mutable accumulator/priority/conversion service.
+
+For an authored duration-only REFRESH, State Runtime finds one active source-family instance by Combat Instance + exact source/owning presence + origin Ability/State + recipient. Its transaction changes only activation/duration/window revision; preserve original threshold SnapshotRef, cumulative counter, processed receipts and stable instance identity. Clock cursors guard window revision independently of instance generation, so old expiry fails while valid same-instance receipts still fold. No removal/recreation, counter reset or payout. After actual retirement a new admitted application initializes a fresh instance; index reconstruction cannot restore old membership.
+
+An authored source-owned cleanup uses existing State source/provenance registrations and lifecycle/transition termination graphs to enumerate every affected recipient instance of that exact source presence. Confirmed death, actual leave or Return cause removes conversion/clock registrations and cancels uncommitted source payout records before their next commit; no completion payout, pending Heal or frozen cursor survives. Temporary absence without actual leave does not enter this cleanup path; HP_ZERO is not a substitute for its confirmed-death binding. Source/State/window/terminal guards make overlapping deliveries idempotent and prevent old cleanup/expiry from touching redeployed fresh instances. Keep committed receipts only as historical replay evidence; no Character-name scans, restoration token or new cleanup subsystem.
+
 # 58. HP COST
 
 HP Cost path:
@@ -3541,6 +3573,12 @@ leaves at least 1 HP.
 Explicit normalized `hpPaymentPolicy` is evaluated through §29A / CST-014; selected floor0 and permitted successful shortfall do not change that default for other Costs. The existing P-036 payment output supplies immutable post-payment HP before Cost-caused lifecycle; do not route through Damage/Heal Runtime. Under the declared continuation profile, §23 / CST-015 complete mandatory lifecycle before this admitted Action's direct Effects.
 
 ---
+
+## 58A. Committed battle-persistent MaxHP Cost
+
+04§10.3B → CST-001/009/STA-001/002 → existing Cost validator/P-034, AE payer/P-035, Stat/MaxHP P-031/032 and Transaction owners. Protected validation captures payment-time CurrentMaxHP/requested capacity and required AE/payability together. Stage the exact battle-participant debit handle and preserve-absolute/clamp HP with required resources and successful activation cap consumption, then publish one admission/payment barrier and immutable Cost receipts. Failure leaves AE, capacity and use unchanged. Post-Cost Snapshot reads the committed cap.
+
+Keep debit handle owner/battle lifetime, requested/paid capacity and old/new-cap refs in existing contribution/Cost/result records. Leave/death/Revive/reinitialization rebuild read models from retained contributions; do not restore or charge them again. Explicit governed restoration/battle reset mutates/removes only governed capacity state; receipts remain historical. Stable health observation records real cap/clamp changes without Damage/Heal/HP-Loss events. Later branch invalidity follows ordinary no-refund local failure; no special Character-ID Cost, Resource pool, hidden minimum or Counter/Damage reaction is introduced.
 
 # 59. NON-COST HP LOSS
 

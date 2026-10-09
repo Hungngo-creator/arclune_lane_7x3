@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-09-E.20
+**Version:** 2026-10-09-E.21
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -40,6 +40,8 @@
 **Revision E.19:** adds bounded body/provider bindings, real skipped-Slot contacts with an explicitly scoped existing Reaction gate, prepaid occupancy-deferred materialization, action-captured additive Rage amount modifiers and explicitly watched Side AE. Existing Tags/Primitives, consumed dead waits and unprofiled defaults remain unchanged.
 
 **Revision E.20:** adds only an opt-in same-completed-Natural class-AE hook dependency and a State-owned legal selectable-single-recipient Damage constraint. Existing State/Target/Trigger/Action plans execute them under ACT-033/TGT-001; no new Tag, Primitive, hook registry or global priority. Unauthored data retains prior behavior; opted content requires current E.20/F.22/G.21 compatibility and fresh normalization.
+
+**Revision E.21:** adds bounded consumed-owner global-boundary qualification/later-activation window, singular battle-persistent MAX_HP payment, State-owned pre-restoration Heal-to-TRUE conversion with exact-instance receipts/cause settlement, and checkpoint-local HP%-ordered Reaction candidates. Existing State family/window/termination bindings express duration-only refresh and source cleanup. No new Tag/Primitive/Contract ID/global priority.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -1435,6 +1437,54 @@ Only Main's declared contact adapter is currently admitted. ACT-016/CLK-005 bind
 For an authored `AFTER_DIRECT_EFFECTS_COMPLETE` contact boundary, reuse RES-003's ordinary-Reaction hold across this finite **System graph**, including its declared local contribution/terminal cleanup dependencies. Its end is contact graph terminal, not a fabricated ACTION_DIRECT_EFFECTS_COMPLETE Event. Simultaneous Heal/result readiness may release a later local grant/removal node; positive Effective Heal is a Condition only if expressly authored. Mandatory lifecycle/result settlement remains immediate where required. Missing observable snapshot→batch→grant/removal edges, cyclic waits on their held continuation or an unspecified observable Reaction boundary are rejected; no global Reaction default or unrelated contact priority follows.
 
 
+## 7.21 Qualified global boundary provenance
+
+An existing TURN_BOUNDARY trigger/checkpointSettlement may explicitly qualify its consumed scheduling origin:
+
+```yaml
+boundaryQualification:
+  originKind: CONSUMED_NATURAL_OPPORTUNITY
+  opportunityOwnerRef: <exact owner EntityRef>
+```
+
+CLK-001 resolves this against the boundary's original opportunity identity/owner/generation, not the previous Action Actor, current SSI pointer or ACTION_COMPLETED. The opportunity can be lost to CC. Child/non-Natural Actions, another owner's opportunity, pass-contact and POSTMORTEM_WAIT do not qualify. Bind ordinary required finite settlement before SSI continuation through §7.19. One origin has one global boundary; this filter manufactures neither a boundary nor a personal clock.
+
+Reject missing/foreign origin or owner, Action-completion substitutes, a private boundary enum and a Mode without the declared scheduling provenance. Existing unqualified TURN_BOUNDARY triggers retain global behavior.
+
+## 7.22 Checkpoint-local ordered Reaction candidates
+
+Optional `trigger.checkpointCandidateOrder` reuses TRG-016's stable commit/initialization providers to collect a complete finite subject set for **ordinary automatic Reaction admission**, rather than execute §7.16's mandatory non-Action graph:
+
+```yaml
+event: PREDICATE_CHECKPOINT_STABLE
+checkpointCandidateOrder:
+  changedFields: [CURRENT_HP, CURRENT_MAX_HP, SIDE_CURRENT_AE]
+  includeFieldInitialization: true
+  sidePoolRef: <exact Side-AE pool when watched>
+  subjectPoolRef: <existing TargetSpec / explicit relation and lifecycle filters>
+  episodeRef: <subject-keyed State generation / armed allowance>
+  snapshotFields: [CURRENT_HP, CURRENT_MAX_HP]
+  selection: LOWEST_HP_PERCENT
+  tiePolicy: RANDOM_AMONG_TIED
+  duplicatePolicy: NO_DUPLICATES
+  membershipPolicy: SNAPSHOT_ALL_ELIGIBLE_AT_CHECKPOINT
+  dispatch: ORDINARY_REACTION_ADMISSION
+  memberActionRef: <owning automatic REACTION Action plan>
+  memberContinuation: AFTER_MEMBER_ACTION_TERMINAL
+  invalidPolicy: DROP_INVALID
+  ownSettlementPolicy: EXCLUDE_THIS_TRIGGER_ACTIVATION
+```
+
+At the originating stable checkpoint, finish the complete commit, mandatory lifecycle/reconciliation and episode bookkeeping; then capture all valid armed subjects/episode generations and HP/MaxHP in **one** snapshot for this runtime owner/Trigger. Coalesce per-subject/pool notifications from that same commit into one set candidate. A relevant subject change may expose other still-armed members; exact Side-AE change can expose the whole eligible set. No arbitrary field watching, polling, list of Event-order candidates or partial simultaneous-batch collection. Initialization must observe established valid values. Selected changed fields reuse §7.16's bounded whitelist and exact provider/pool bindings.
+
+Rank the immutable set by authoritative unrounded HP ratio, ascending. Within each equal-ratio group, repeatedly apply seeded RANDOM_AMONG_TIED without replacement to freeze its permutation. Stable set-to-draw mapping guarantees input-enumeration invariance; Entity/Slot/list/Event order supplies no gameplay priority. Retain original membership, ratios, order and RNG results. No later resnapshot/re-sort, addition, reroll or substitution.
+
+The snapshot/order barrier does not pay Cost or perform a Reaction while its ordinary release boundary is held. Release the member Actions under existing Trigger/Action/Reaction laws; each is a real non-Natural REACTION, not a System settlement. This local dependency closes each member Action and its required blocking work before the next member's admission; it adds no priority or new Reaction window against unrelated candidates. Immediately before each payment, revalidate exact owner/subject/episode, current admission and full live required Costs. Atomically join successful payment with that episode's allowance consumption. Failure/invalidity closes that member only, with no payment/consumption, replacement or retry from the same checkpoint; later independent qualifying checkpoints may reconsider an armed episode. An already admitted member's later Effect failure retains ordinary paid-Cost/successful-consumption law.
+
+Exact member-activation origin excludes this profile's own Cost/Heal from collecting a nested candidate set, while mandatory episode maintenance can still end episodes. Other independently caused commits keep their own provenance; deduplicate repeated original checkpoints and protect episode generation/allowance across competing queued sets. Persist group candidate and per-member admission/Action/terminal cursor through replay. Retired owners/episodes cannot redirect to reentry, redraw ties or repay committed members.
+
+Do not co-author stableHealthSettlement, stablePredicateSettlement, deathCohortSettlement or another required-settlement profile on this same trigger. Existing scalar profiles/unprofiled Reactions remain unchanged. Reject missing complete membership/snapshots, unsupported metric/tie/dispatch, mismatched subject/pool/episode/Action refs, live re-ranking, premature dispatch, cyclic held-future dependencies or observable unrelated competition without an actual supported composition law. Lower to existing Trigger/Target/Snapshot/RNG/Action/Cost/State/Transaction/dependency plans; no candidate-order manager or generic priority.
+
 # 8. CONDITION SPEC
 
 Conditions must be declarative expressions, not arbitrary scripts.
@@ -1733,6 +1783,7 @@ cost:
   refundPolicy:
   resultBinding:
   hpPaymentPolicy:
+  maxHpPayment: # optional singular MAX_HP payment profile
 ```
 
 A CostSpec uses either:
@@ -1864,6 +1915,7 @@ Examples:
 AE
 RAGE
 HP
+MAX_HP
 CUSTOM_RESOURCE
 ```
 
@@ -1906,6 +1958,27 @@ The selected case explicitly owns this payment's HP payability/floor. Do not co-
 If supplied, `consumeCounterRef` consumes one available remaining-use unit only with successful required-group commit and Action admission; protect its read/write in that transaction. Failed probes, another required Cost failure or an uncommitted/aborted transaction consume nothing. Independent matching Costs may not compete for the same payer HP/counter without an explicit supported allocation law. No hidden payment order or partial required-group commit.
 
 Example composition for a once-only safeguard: BELOW_REQUESTED + allowance available → floor1/CLAMP_SUCCESS/consume allowance; BELOW_REQUESTED + exhausted → floor0/CLAMP_SUCCESS; AT_OR_ABOVE_REQUESTED → floor0/REQUIRE_FULL. Those are authored cases, not Character-ID rules. Existing unprofiled Costs, ordinary full-payment exchanges and distributed optional-payer semantics remain unchanged.
+
+---
+
+## 10.3B Bounded CurrentMaxHP payment
+
+CostSpec additionally supports singular `kind: MAX_HP`, with this explicit profile:
+
+```yaml
+maxHpPayment:
+  basis: CURRENT_MAX_HP_AT_PAYMENT
+  operation: SUBTRACT_CAPACITY
+  retentionScope: BATTLE_SCOPED
+  reconciliation: PRESERVE_ABSOLUTE_CURRENT_HP_THEN_CLAMP
+  paymentPolicy: REQUIRE_FULL
+```
+
+The ordinary amount Formula may reference this payer's protected payment-time CurrentMaxHP. Validate the entire required CostGroup before any debit; CST-001/009 join this payment's P-031/032 capacity/reconciliation mutation, resource payments and explicitly consumed successful cap/use at one admission commit. This is not a post-activation MaxHpMutation Effect, CurrentHP payment, CUSTOM_RESOURCE pool or SELF_HP_COST. Preserve exact requested/paid capacity, before/after MaxHP and mutation-handle refs in its typed Cost result. Snapshot consumers after payment see the committed cap.
+
+Required capacity must remain in the ordinary legal numeric/capacity domain; underpayment, missing legal policy, unsupported payerCollection, nonfinite/negative amounts, missing reconciliation/retention or incompatible joined writes reject/fail before partial payment. No new minimum-capacity constant, lethal HP floor or auto-restoration is inferred. Zero normalized amount follows existing Cost success law.
+
+The capacity debit belongs to the battle participant, surviving ordinary field leave/death/Revive. Do not rerun or remove it on lifecycle initialization or treat later growth as refund. Only battle reset or an explicit MaxHP restoration targeting the governed mutation may restore it. Existing CurrentHP Costs and Resource Costs remain unchanged; P-034 validates, P-035 pays AE and P-031/032 execute the joined capacity change. No new Primitive is necessary.
 
 ---
 
@@ -3738,6 +3811,7 @@ Canonical conceptual structure:
 state:
   stateId:
   stateIdentity:
+  incomingHealTransform: # optional §19.7
   classification:
   attachment:
   duration:
@@ -3912,6 +3986,37 @@ Lower the capability into the existing State/target query contribution and Targe
 
 ---
 
+## 19.7 State-owned incoming-Heal conversion
+
+An Entity-attached active State may own this bounded HEL-001 conversion:
+
+```yaml
+incomingHealTransform:
+  recipientRef: OWNER
+  input: ORDINARY_HEAL
+  exclude: RECIPIENT_INTRINSIC_HP_REGEN
+  readAmountAt: FINAL_REQUESTED_BEFORE_RESTORATION
+  operation: REPLACE_RESTORATION_WITH_TRUE_DAMAGE
+  damageAmountBinding: SEALED_HEAL_REQUEST_AT_SHIELD_INPUT
+  shieldPolicy: ORDINARY_TRUE_DAMAGE
+  hpFloor: <finite nonnegative constant>
+  resultOwnerRef: THIS_STATE_INSTANCE
+```
+
+Final requested amount means the admitted Heal after applicable Heal modifiers, before missing-HP clipping/restoration/Overheal. Derive intrinsic Regen classification only from the governed native HP_REGEN settlement producer; an active/pulse Heal cannot relabel itself intrinsic. Self-cast/source-equals-recipient is insufficient to exclude. Seal exact Heal request, recipient and selected active State-generation refs before redirecting it. Replaced restoration emits no restoration/Overheal; preserve terminal conversion evidence and a separate real Damage result. Denied Heal is not converted into a positive request. No second Heal/Damage formula or duplicate modifier pass.
+
+The sealed amount enters this TRUE packet at Shield input; existing TRUE admission/eligible Shield semantics remain, with no implicit Shield Piercing. Post-Shield HP demand is bounded by `max(0, currentHP - hpFloor)`; a floor is a damage ceiling, not an HP assignment/Heal. Fixed floor2 is authored kit data, not a global TRUE default. Equal-floor converted packets sharing one simultaneous recipient use the common remaining HP-above-floor budget proportionally under RES-008. A common commit mixing incompatible floors or unrestricted Damage requires an explicit supported allocation law, otherwise reject the affected unresolved composition; no packet/list order wins.
+
+Ordinary State parameters/counters, SnapshotSpec and finite terminal graphs compose an instance accumulator: bind only immutable ActualHP receipts with that exact resultOwnerRef; fold the complete conversion commit once before dependent threshold/removal/continuation. State instances do not share counters through Ability/root/source equality. Threshold inputs must declare snapshot versus live basis and strict comparison. Capture required sealed values and exact terminal cause before State retirement; consume only explicitly admitted completion causes. A common-checkpoint terminal graph may explicitly SUM same-recipient requested settlement amounts into one ordinary Heal, before Heal modifiers/restoration, with exact instance membership and one terminal identity. This is not global coalescing of unrelated Heals.
+
+Reapplication/source/target retention, completion versus cleanup and exact claimant policy remain explicit State law. One incoming Heal may be claimed only once; simultaneously applicable distinct converters require a supported conflict law or rejection, never duplicated Damage/counters or insertion-order selection. A State admitted after request selection cannot retroactively claim it. Already committed receipts cannot migrate to a replacement State; explicitly claimed in-flight work follows its declared lifetime/terminal law. Reject unsupported source classifications, retired/foreign refs, Effective-Heal/nominal reconstruction, pre-Shield floor, omitted causes/retention, cyclic terminal work or ungoverned competing claims before affected mutation.
+
+Existing State family/reapplication and parameter/counter/duration plans may bind **duration-only REFRESH**: family = Combat Instance + exact runtime source/owning presence + origin Ability/State definition + recipient; reuse one active instance, preserve declared initial threshold SnapshotRefs/counters/processed receipts, increment only window revision and reset its activation/later-opportunity cursor. This is neither removal/completion nor a counter reset/payout. New-instance initialization runs only when no active matching family exists. Distinct sources remain distinct; family identity does not resolve simultaneous converter claims.
+
+Existing lifecycle/State termination graphs may also bind an exact **source-owned cleanup** policy, independently of recipient attachment: on source DEATH_CONFIRMED, actual LEAVE_FIELD or Return-to-Deck retire every instance in that source family across recipients, conversion registrations and window cursors. Classify the terminal cause as cleanup, admit no completion payout and cancel source-owned uncommitted payout work; retain no pending Heal/frozen window/redeployment restoration. Temporary absence without actual leave is not this cause. Guard original source presence/instance and overlapping transition delivery; source HP_ZERO alone cannot substitute for explicitly confirmed-death cleanup. Committed results remain immutable. These are explicit bindings of existing State/transition/termination operations, not new retention scopes or a universal source-death default.
+
+Lower into existing State/rule, Heal/Damage, Counter/Snapshot/Result and Transaction plans; no conversion manager, new Tag/Primitive/Contract ID or Authority tier. Ordinary Heal/State data without this profile is unchanged.
+
 # 20. DURATION SPEC
 
 Every persistent effect must declare its clock explicitly.
@@ -3952,7 +4057,23 @@ UNTIL_CONDITION
 Turn-based should not use `REAL_TIME` for ordinary turn mechanics.
 
 `TURN_BOUNDARY` means the global SSI boundary under CLK-001: ordinary Natural opportunities and explicitly admitted POSTMORTEM_WAIT checkpoints produce it; dead waits do not tick personal Actor clocks.
-Personal mechanics such as “until my next turn” or “once per own turn” must use `NATURAL_ACTION_OF_*` or `ACTOR_NATURAL_ACTION_WINDOW_OF_*`, not an actor-specific Turn Boundary.
+Personal mechanics such as “until my next turn” or “once per own turn” use `NATURAL_ACTION_OF_*` or `ACTOR_NATURAL_ACTION_WINDOW_OF_*`, not an actor-specific Turn Boundary. An explicitly boundary-timed mechanic can instead qualify the existing global boundary as below.
+
+### Opt-in boundary-timed owner window
+
+```yaml
+duration:
+  amount: 1
+  clock: TURN_BOUNDARY
+  boundaryQualification:
+    originKind: CONSUMED_NATURAL_OPPORTUNITY
+    opportunityOwnerRef: <exact source/owner EntityRef>
+  start: FIRST_OWNER_OPPORTUNITY_GRANTED_AFTER_ACTIVATION
+  decrement: QUALIFIED_BOUNDARY
+  expire: AT_ZERO_BEFORE_SSI_CONTINUATION
+```
+
+Capture activation identity and the latest granted owner-opportunity serial at activation, even for non-Natural activation. Only boundaries whose original owner grant serial is later qualify; the casting opportunity's following boundary is excluded. Do not move expiry to next opportunity start/completion or count intervening foreign/child/dead-wait boundaries. CC-lost later grants count. Persist source/State/window revision, activation/serial and terminal cursor; replacement invalidates the old cursor. Source removal/pause/retention still requires explicit State law. This opt-in combines global phase and original-owner qualification, not a new clock enum or default for earlier duration data.
 
 ---
 
@@ -5955,6 +6076,12 @@ Exact naming/versioning belongs Chặng F.
 ---
 
 The opt-in §7.16/§17.2/§18.2/§23.3 data lowers into existing triggerGraph/effectGraph/costPlan/Snapshot/Result/Resource/Shield plans under TRG-016/HEL-003/SHP-002/CST-011. Preserve exact checkpoint/own-settlement exclusion, conversion Heal origins/immutable denial, recipient/source-family depletion profile and limit/current/atomic-use provenance. No new top-level runtime system or Primitive is generated.
+
+## 51A. E.21 normalization/IR closure
+
+Lower §7.21/§20.1 into existing boundary/Trigger/Duration plans with exact origin-kind/owner/generation/serial, activation and window revision; §7.22 into Trigger/Target/Snapshot/RNG/Action dependency plans with complete checkpoint membership/episode refs, frozen HP ratios/tie permutation, ordinary Reaction release, live admission/payment and protected member cursor; §10.3B into the existing required Cost plan with payment-time capacity/retained debit/reconciliation/receipt refs; §19.7 into State/rule and Heal/Damage/Counter/Snapshot/Result/finite dependency plans with one claim, sealed pre-restoration amount, Shield-input/floor, exact receipt owner, admitted causes and batch membership. Preserve duration-only refresh's instance/M/D/receipt refs and source-owned cleanup/cancellation bindings in those existing State plans. Bind current E.21/F.23/G.22 compatibility and fresh validation hash. No arbitrary scripts or new top-level IR/service are permitted.
+
+Reject malformed refs/lifetime/numeric domain, CurrentHP or post-admission capacity emulation, missing request/claim/receipt/cause semantics, duplicate conversion claims, pre-Shield floor, future-held/cyclic dependencies and ungoverned observable competition before affected execution. Only supported equal-floor converted common commits inherit RES-008's bounded budget adaptation; mixed unrestricted/incompatible-floor profiles require a proved law. Ordinary older content retains prior semantics; an old compatibility hash cannot authorize the new fields.
 
 # 52. NORMALIZER RESPONSIBILITIES
 
