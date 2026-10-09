@@ -4,8 +4,8 @@ import { resolve, dirname } from 'node:path';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 const output = resolve(process.argv[2] ?? resolve(root, 'artifacts/arclune-sandbox.html'));
-const [html, css, ...modules] = await Promise.all(['index.html', 'style.css', 'profiles.mjs', 'engine.mjs', 'app.mjs'].map(name => readFile(resolve(root, name), 'utf8')));
-// These three controlled modules have named exports and one-line local imports.
+const [html, css, ...modules] = await Promise.all(['index.html', 'style.css', 'profiles.mjs', 'engine.mjs', 'trace-report.mjs', 'app.mjs'].map(name => readFile(resolve(root, name), 'utf8')));
+// These controlled modules have named exports and one-line local imports.
 // This is packaging only: no runtime dependency or alternate gameplay engine.
 const script = modules.map(source => source.replace(/^import .+ from '.+';\n/gm, '').replace(/^export /gm, '')).join('\n');
 const standalone = html.replace('<link rel="stylesheet" href="./style.css">', `<style>${css}</style>`)

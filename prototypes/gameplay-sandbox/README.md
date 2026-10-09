@@ -29,6 +29,10 @@ Node 20+ để chạy server/tests/build. Trình duyệt hiện đại có ES mo
 
 ## Canon và thử nghiệm là hai thứ khác nhau
 
+Mặc định tải **Báo cáo gọn**: metadata, số cơ hội/lý do kết thúc, tổng theo Actor, trạng thái hiện tại, sáu Action đầu và12 Action gần nhất. Đây là tóm tắt để đọc nhanh; không thay receipt/snapshot/checkpoint đầy đủ để chứng minh luật. Chọn **Trace chi tiết** khi cần toàn bộ event. Hai dạng xuất JSON không thụt dòng; trace trong bộ nhớ và số học engine vẫn nguyên vẹn. Replay vẫn là file riêng.
+
+UI hiển thị giới hạn400 cơ hội và nói rõ khi dừng hòa do hết giới hạn. Đây là policy sandbox, không phải luật canon. Hồi máu có thể kéo dài trận; bản thử không thêm anti-heal hoặc đổi kit để ép thắng/thua. Regression tái hiện seed79: chọn Skill1 Gideon đầu trận rồi AI → dừng hòa ở400; chọn Skill2 rồi AI → độiB thắng ở34.
+
 **Canon quyết định gameplay. Giới hạn hoặc cách triển khai của prototype không ràng buộc thiết kế kit mới. Kit chưa hỗ trợ phải được ghi nhận hoặc từ chối, không sửa canon để vừa code.** Một trận chạy đúng không chứng minh toàn bộ kiến trúc 00–08. Không sửa AGENTS.md, raw kit, Character Canon, 00–08 hoặc runtime game cũ trong thay đổi này.
 
 `engine.mjs` diễn giải các operation/profile có kiểu hữu hạn trong `profiles.mjs`; không rẽ nhánh theo Character ID. Định dạng prototype là tập con thực nghiệm, **không phải compiler/Normalized IR hoàn chỉnh của 04**. Bộ validator từ chối operation, trường, clock, binding, dependency, child cycle và shared-AE automatic contention chưa hỗ trợ. Không có callback gameplay hoặc priority registry. Multiple khác-recipient Taunt không có composition law bị từ chối khi chọn, trước Cost của lệnh sandbox; đây không phải refund một Cost đã commit.
