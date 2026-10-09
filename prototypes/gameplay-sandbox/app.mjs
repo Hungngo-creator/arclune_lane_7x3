@@ -1,5 +1,6 @@
 import { Battle, replay } from './engine.mjs';
 import { AE_BY_CLASS, ELEMENT_COUNTER, RANK_MULT, DEFAULT_OPTIONS, NUMERIC_PROFILE } from './profiles.mjs';
+import { traceReport } from './trace-report.mjs';
 
 const $ = id => document.getElementById(id);
 const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -44,8 +45,9 @@ function renderBoard() {
     }).join('');
     $('ae-' + side.toLowerCase()).textContent = `${number(battle.ae[side])} / ${NUMERIC_PROFILE.aeCap} AE`;
   }
-  $('opportunity').textContent = 'Cơ hội #' + battle.opportunities;
-  $('result').textContent = battle.outcome ? battle.outcome === 'DRAW' ? 'Trận thử kết thúc hòa' : 'Đội ' + battle.outcome + ' thắng' : '';
+  $('opportunity').textContent = `Cơ hội #${battle.opportunities} / ${NUMERIC_PROFILE.maxOpportunities}`;
+  const limited = battle.outcome === 'DRAW' && battle.trace.at(-1)?.type === 'SANDBOX_LIMIT';
+  $('result').textContent = limited ? `Dừng hòa: đạt giới hạn thử nghiệm ${NUMERIC_PROFILE.maxOpportunities} cơ hội. Các bên vẫn còn sống.` : battle.outcome ? battle.outcome === 'DRAW' ? 'Trận thử kết thúc hòa' : 'Đội ' + battle.outcome + ' thắng' : '';
 }
 function renderActions() {
   const unit = actor(), blocked = battle.active?.blocked, opponent = unit?.side === 'B' && !$('control-b').checked;
@@ -93,6 +95,7 @@ function eventText(e) {
     case 'OPPORTUNITY_END': return `${who}: cơ hội đã tiêu thụ`;
     case 'TURN_BOUNDARY': return `Global Turn Boundary · chuyển khỏi đội ${e.afterSide}`;
     case 'BATTLE_ENDED': return `Kết thúc trận · ${e.winner === 'DRAW' ? 'hòa' : 'đội ' + e.winner + ' thắng'}`;
+    case 'SANDBOX_LIMIT': return `Dừng hòa tại ${e.opportunities} cơ hội · giới hạn của bản thử`;
     case 'RNG': return `Seeded draw #${e.draw} · ${e.cause}`;
     default: return e.type;
   }
@@ -136,12 +139,16 @@ $('auto').addEventListener('click', () => {
 });
 $('control-b').addEventListener('change', render);
 $('trace-filter').addEventListener('change', renderTrace);
-function download(filename, data) {
-  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+function download(filename, data, spacing = 2) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, spacing)], { type: 'application/json' }));
   const link = document.createElement('a'); link.href = url; link.download = filename; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 $('export').addEventListener('click', () => download(`arclune-replay-${battle.options.seed}.json`, battle.exportReplay()));
-$('trace-export').addEventListener('click', () => download(`arclune-trace-${battle.options.seed}.json`, { options: battle.options, outcome: battle.outcome, trace: battle.trace }));
+$('trace-export').addEventListener('click', () => {
+  const detail = $('trace-detail').value;
+  const currentUnits = battle.units.map(u => ({ actorId: u.id, alive: u.alive, hp: u.hp, maxHp: battle.maxHp(u), rage: u.rage }));
+  download(`arclune-${detail === 'full' ? 'trace' : 'summary'}-${battle.options.seed}.json`, traceReport({ options: battle.options, outcome: battle.outcome, trace: battle.trace, currentUnits }, detail), 0);
+});
 $('import').addEventListener('change', async event => {
   try {
     stopAuto(); const file = event.target.files[0]; if (!file) return;

@@ -93,6 +93,22 @@ try {
   await evaluate(`for(let i=0;i<80 && !document.querySelector('#ai-step').disabled;i++) document.querySelector('#ai-step').click()`);
   assert.match(await evaluate(`document.querySelector('#result').textContent`), /thắng|hòa/);
   assert.equal(await evaluate(`document.querySelector('#execute').disabled`), true);
+  await click('#reset'); await click('[data-ability="skill1"]'); await click('#execute');
+  for (let batch = 0; batch < 4; batch++) await evaluate(`for(let i=0;i<100 && !document.querySelector('#ai-step').disabled;i++) document.querySelector('#ai-step').click()`);
+  assert.match(await evaluate(`document.querySelector('#result').textContent`), /giới hạn thử nghiệm 400/);
+  assert.match(await evaluate(`document.querySelector('#opportunity').textContent`), /400 \/ 400/);
+  assert.equal(await evaluate(`document.querySelector('#auto').disabled`), true);
+  assert.equal(await evaluate(`document.querySelector('#trace-detail').value`), 'summary');
+  await click('#trace-export');
+  const summaryFile = join(temporary, 'arclune-summary-79.json');
+  for (let i = 0; i < 100; i++) { try { await access(summaryFile); break; } catch { await delay(50); } }
+  const compact = await readFile(summaryFile, 'utf8'), summary = JSON.parse(compact);
+  assert.equal(summary.progress.ending, 'SANDBOX_LIMIT'); assert.ok(Buffer.byteLength(compact) < 15000);
+  await evaluate(`document.querySelector('#trace-detail').value='full'`); await click('#trace-export');
+  const fullFile = join(temporary, 'arclune-trace-79.json');
+  for (let i = 0; i < 100; i++) { try { await access(fullFile); break; } catch { await delay(50); } }
+  const full = JSON.parse(await readFile(fullFile, 'utf8'));
+  assert.equal(full.trace.length, summary.eventCount); assert.equal(full.trace.at(-1).type, 'SANDBOX_LIMIT');
   await evaluate(`document.querySelector('[name=seed]').value='201';document.querySelector('[name=trainingClass]').value='Assassin';document.querySelector('[name=trainingRank]').value='UR';document.querySelector('[name=alliedElement]').value='Fire';document.querySelector('[name=enemyElement]').value='Metal';document.querySelector('[name=alwaysHit]').checked=true;document.querySelector('#setup').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))`);
   assert.match(await evaluate(`document.querySelector('[data-unit="b-striker"]').textContent`), /UR · Assassin · Metal/);
   assert.equal(await evaluate(`document.querySelector('#result').textContent`), '');
@@ -112,7 +128,7 @@ try {
   await click('[data-ability="skill2"]'); await click('#execute');
   assert.match(await evaluate(`document.querySelector('#ae-a').textContent`), /^0 \/ 100 AE/);
   assert.deepEqual(errors, []);
-  console.log('PASS browser: single HTML with networking disabled after load; manual skill/target; Taunt/AE; export/import replay; AI battle termination; profile/rank/class/element; full-Rage priority; mobile layout; HTTP module entry; zero uncaught JS errors.');
+  console.log('PASS browser: offline gameplay; manual/AI; replay; reproduced400 cap and visible reason; compact/full report downloads; profile changes; mobile; module entry; zero uncaught errors.');
 } finally {
   socket?.close(); chrome.kill(); server.kill();
   await new Promise(resolve => { if (chrome.exitCode !== null) resolve(); else { chrome.once('exit', resolve); setTimeout(resolve, 3000); } });
