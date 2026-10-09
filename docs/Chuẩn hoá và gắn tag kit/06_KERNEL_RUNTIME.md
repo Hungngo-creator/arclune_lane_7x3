@@ -44,7 +44,7 @@
 
 **Revision G.21:** executes E.20/F.22's opt-in class-AE prerequisite and legal selectable-recipient constraint through existing Scheduler/Trigger/dependency and State/Target owners. Retains hook/selection/State provenance and terminals for replay, preserving unopted ordering and original attack bindings. No new service, Character branch or priority registry.
 
-**Revision G.22:** executes E.21/F.23 profiles through existing Scheduler/Duration, Cost/Stat, State/Heal/Damage/Shield/Counter/Result/Transaction owners with exact generation, battle retention and replay terminals. No Character branch, new service or priority registry.
+**Revision G.22:** executes E.21/F.23 profiles through existing Scheduler/Duration, Trigger/Target/Snapshot/RNG/Action, Cost/Stat, State/Heal/Damage/Shield/Counter/Result/Transaction owners with exact generation, frozen local candidate order, duration-only refresh, source cleanup, battle retention and replay terminals. No Character branch, new service or priority registry.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -2660,6 +2660,14 @@ Use normalized EXCLUDE_THIS_TRIGGER_ACTIVATION plus immutable commit-origin refs
 Keep EXCLUDE_THIS_TRIGGER_ACTIVATION and terminal evidence through Cost/Heal/replay; own writes cannot recurse. Independent later AE mutation can reconsider the predicate after terminal execution. Candidate failure/nonqualification is terminal, not polling; observable shared-AE contention requires its actual composition law. Other stable/health/checkpoint profiles stay unchanged.
 
 
+## 35E. Checkpoint-local ordered automatic Reactions
+
+04§7.22 → TRG-016 → existing stable writers/Lifecycle/Trigger, Target/Snapshot/RNG, State/Cost/Action/dependency/Transaction records. At the originating complete stable checkpoint, perform required episode bookkeeping, collect the entire valid armed subject set and snapshot HP/MaxHP/episode generation before any member Action/payment. One same-commit owner/Trigger set supersedes per-subscriber notification order; no new global cohort or predicate ledger is written.
+
+Freeze ascending unrounded HP% groups and seeded RANDOM_AMONG_TIED no-duplicate permutations with stable set-to-draw mapping. Existing Reaction queue/release policy owns admission timing; this observation cannot execute through an ordinary Reaction hold. Create actual non-Natural Reaction member Actions under the finite local after-member-terminal dependency cursor. Revalidate exact owner/subject/episode allowance and current required Cost group immediately before each admission/payment commit. Failed payment/invalid subject terminalizes that member without consuming the episode; successful payment joins allowance consumption. Finish each member's Action and required blocking work before the next member reads live AE/MaxHP. Effects after successful admission retain their own invalidity/local-failure policy.
+
+Save candidate membership, ratios, draw/permutation, original checkpoint/owner presence, member episode/admission/Action refs and per-member terminals in existing execution records. Resume never rebuilds the set from current HP, redraws a tie, pays a committed member or redirects to a new episode/presence. Member-origin Cost/Heal suppresses nested collection while ordinary bookkeeping can end recovered episodes. Later independently caused checkpoints are distinct candidates and still revalidate the same episode allowance; no polling/failed-checkpoint retry. Reject malformed/mixed settlement profiles, incomplete membership, ambiguous unrelated contention and cyclic continuation before mutation. Existing scalar required settlements and unprofiled Reaction behavior remain unchanged.
+
 # 36. TRIGGER CANDIDATE
 
 When an Event is published:
@@ -3542,6 +3550,10 @@ Protect/revalidate generation/recipient and all joined writes before publication
 Fold only committed ActualHP from the exact conversion instance into its existing State counter, with immutable processed receipt/commit identity, before its dependent threshold/removal/continuation. Complete common commits first and count packet/component receipts once. An admitted completion captures D/cause/instance into existing Snapshot/result bindings before retiring State; retain its finite payout records until terminal even though the live State is gone. Noncompletion cleanup retires without creating those records.
 
 For an explicit common-checkpoint SUM payout, existing dependency/Result owners freeze eligible sealed records, reduce requested amounts deterministically and issue one ordinary Heal. Keep batch membership, per-instance consumption and Heal/terminal IDs across save/load. Source validity/retention remains authored; denied/zero/converted/local failure closes once. Target/source leave, cleanse and replacement cannot become expiry or reconstruct discarded D. Battle cleanup cancels uncommitted work/releases refs at the existing lifetime boundary, without a new mutable accumulator/priority/conversion service.
+
+For an authored duration-only REFRESH, State Runtime finds one active source-family instance by Combat Instance + exact source/owning presence + origin Ability/State + recipient. Its transaction changes only activation/duration/window revision; preserve original threshold SnapshotRef, cumulative counter, processed receipts and stable instance identity. Clock cursors guard window revision independently of instance generation, so old expiry fails while valid same-instance receipts still fold. No removal/recreation, counter reset or payout. After actual retirement a new admitted application initializes a fresh instance; index reconstruction cannot restore old membership.
+
+An authored source-owned cleanup uses existing State source/provenance registrations and lifecycle/transition termination graphs to enumerate every affected recipient instance of that exact source presence. Confirmed death, actual leave or Return cause removes conversion/clock registrations and cancels uncommitted source payout records before their next commit; no completion payout, pending Heal or frozen cursor survives. Temporary absence without actual leave does not enter this cleanup path; HP_ZERO is not a substitute for its confirmed-death binding. Source/State/window/terminal guards make overlapping deliveries idempotent and prevent old cleanup/expiry from touching redeployed fresh instances. Keep committed receipts only as historical replay evidence; no Character-name scans, restoration token or new cleanup subsystem.
 
 # 58. HP COST
 

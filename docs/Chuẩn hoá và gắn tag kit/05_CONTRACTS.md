@@ -43,7 +43,7 @@
 
 **Revision F.22:** extends only ACT-033 with an opt-in same-completed-Natural class-AE prerequisite and TGT-001 with a bounded State-owned legal single-recipient Damage compulsion. Earlier clocks, Costs, exact attack bindings, Hit/Authority and unopted ordering remain unchanged. No new Contract ID, Tag, Primitive, global Reaction priority or callback.
 
-**Revision F.23:** extends existing CLK-001, CST-001/009 and HEL-001/DMG-010/RES-008 for E.21 profiles: preserved consumed-origin including CC, atomic capacity/resource payment, final-request restoration replacement, Shield-before-floor and exact-instance completion accounting. Ordinary pipelines/earlier Pilots retain their laws; no new Contract ID/global priority.
+**Revision F.23:** extends existing CLK-001, TRG-016, CST-001/009 and HEL-001/DMG-010/RES-008 for E.21 profiles: consumed-origin including CC, frozen local Reaction ordering/live payment, atomic capacity/resource payment, final-request replacement/Shield-before-floor, exact-instance completion, duration-only refresh and cause-specific source cleanup. Ordinary pipelines/earlier Pilots retain their laws; no new Contract ID/global priority.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -1675,6 +1675,14 @@ Existing Transaction/Health/Resource/Presence/Lifecycle/Trigger/State/dependency
 
 EXCLUDE_THIS_TRIGGER_ACTIVATION suppresses own Cost/Heal and keeps their immutable origin through replay. A separately caused later AE change can reconsider a still-low-HP subject after terminal activation. Failed qualification/payment closes without polling/background retry. Competing subscribers sharing the same budget require actual dependency/allocation law; the fan-out enumeration creates no priority. Non-opted profiles and HEALTH_MUTATION_STABLE still exclude AE-only changes. Existing Transaction/Resource/Trigger/dependency owners retain terminal checkpoint identity; no new manager or general watched-field API.
 
+
+### TRG-016 opt-in checkpoint-local Reaction candidate order
+
+04§7.22 uses the stable commit/initialization providers for checkpoint observation and episode maintenance; it does **not** admit the scalar mandatory-settlement execution policy as an ordinary Reaction. After complete commit/lifecycle/reconciliation and episode maintenance, freeze all eligible armed subjects/episode generations and HP ratios for one owner/Trigger/original checkpoint. Coalesce same-commit subscriber notifications before any member payment. Existing Target metric/tie selection alone cannot provide this sequential admission law.
+
+Sort frozen authoritative HP% ascending, permuting exact equal-ratio groups with seeded RANDOM_AMONG_TIED without replacement and enumeration bias. Ratios/membership/order remain immutable. When ordinary Reaction release is legal, admit each actual non-Natural REACTION under this group's finite AFTER_MEMBER_ACTION_TERMINAL dependencies. Revalidate exact subject/episode/owner and current AE/capacity payability before every protected payment+success-consumption commit. Invalidity/failure closes only that member and retains an unconsumed episode; subsequent members see previous committed capacity/resource changes. No re-sort, retarget, refund of already committed Cost or same-checkpoint retry. Later independent qualifying checkpoints remain legal. This supplies local order only; ungoverned observable competition against unrelated candidates still requires explicit composition/rejection.
+
+Own member Cost/Heal retains exact activation origin and cannot recursively collect another group, while ordinary episode maintenance still closes recovered episodes. Key set candidate by Combat Instance + original checkpoint + runtime owner/presence + Trigger; retain member/episode/admission/Action/terminal cursor and frozen draws through save/replay. Repeated delivery cannot create a second group or bypass one-success episode allowance. Do not revive old work in a new presence or redraw invalid members. Reject incomplete sets, live ranking, unsupported dispatch/metric/tie/provider, mixed mandatory/Reaction profiles or cyclic dependencies before affected execution. No global Reaction priority or new Trigger subsystem follows.
 
 # 12. TARGET SELECTION CONTRACT
 
@@ -4007,6 +4015,10 @@ Threshold and duration termination must preserve distinct causes. For an explici
 When authored same-owner/same-recipient completion work shares an actual checkpoint, freeze eligible completion records and SUM their requested settlement amounts once before ordinary Heal admission/modifiers/restoration. Record one batch/Heal terminal and separate consumed completion refs atomically. Do not combine independent checkpoints/unrelated Heals, sum Effective Heal or pick instance order. Zero/denied/converted payout still closes its records; invalid source/recipient fails locally under explicit lifetime law without retarget/refund/retry. Required local dependencies do not define global Reaction priority.
 
 State reapplication, source retention and overlapping claimant selection must be explicit. Two matching converters cannot both claim one Heal; absent supported composition reject rather than pick source/State/Slot/Event insertion. Missing snapshot/cause/result/lifetime, nominal reconstruction, cyclic settlement or incompatible numeric/allocation policy rejects before affected mutation. Prior Heal/Overheal/conversion policies remain unchanged.
+
+For an authored duration-only same-source REFRESH, preserve exact State instance, original threshold snapshot, cumulative ActualHP counter and processed receipt identities; reset only duration/activation binding with a fresh window revision. Do not allocate another instance, run new-instance counter initialization, pay completion Heal or expose a remove/recreate gap. State Admission and exact runtime source-family identity remain authoritative; other sources are separate without an inferred overlapping-claim law.
+
+For an authored source-owned cleanup policy, source DEATH_CONFIRMED/actual LEAVE_FIELD/Return-to-Deck retires all that source's affected recipient States and uncommitted payout obligations with cleanup cause. No completion Heal, pending payout, frozen duration or restoration on redeploy is allowed. Mandatory lifecycle/source cleanup closes before dependent uncommitted payout admission/commit; unrelated normal State retirement cannot preserve this canceled source work through a captured D. Retain already committed results only as historical evidence. Temporary absence without actual leave does not qualify, and HP_ZERO alone cannot stand in for confirmed death. Exact source presence and State/window/terminal identities protect idempotence and new deployments. This adds no global source-retention or lifecycle-priority default.
 
 ## HEL-002 — Overheal
 **Status:** `LOCKED`
