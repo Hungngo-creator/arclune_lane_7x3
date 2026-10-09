@@ -2,7 +2,7 @@
 
 **Revision:** R2 — explicit designer kit and final local ordering, refresh and source-cleanup locks.
 **Source:** designer-supplied Lạc Thanh Hà kit in the current task, 2026-10-09. No confidently matching complete repository raw entry was identified; do not replace an unrelated numbered entry.
-**Architecture inspection base:** merged main `1c28bbf1cae17aeac91c8844f6788863d2b84167` (B.3/E.20/F.22/G.21/H.3/I.23). Working changes are proposed delta until verified merged.
+**Architecture inspection base:** merged main `e42e89a9a5f40587c8029fa6522ce1a4b01c4c1e` (B.3/E.20/F.22/G.21/H.3/I.23). Its intervening lore-only update preserves the inspected architecture from `1c28bbf1cae17aeac91c8844f6788863d2b84167`. Working changes are proposed delta until verified merged.
 **Status:** GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED. The three final designer decisions supersede R1's pending alternatives. Architecture Phase documentation only; no implementation/build result is asserted.
 
 ## 1. Identity and common semantics

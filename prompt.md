@@ -2,18 +2,30 @@
 
 # BÀN GIAO CUỘC THẢO LUẬN MỚI NHẤT — ĐỌC TRƯỚC
 
-**Cập nhật 2026-10-09.** Đọc hoàn toàn [Bàn giao hội thoại lore Nạp Hư](docs/lore/NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md) trước các bản tóm tắt cũ. Tệp lưu **mười hai lượt hỏi–đáp**, giữ đủ năm lượt tác giả chỉ bằng ảnh, các lượt trước đó và L09–L12; không xóa lập luận đã tích lũy.
+**Cập nhật 2026-10-09.** Đọc hoàn toàn [Bàn giao hội thoại lore Nạp Hư](docs/lore/NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md) trước các bản tóm tắt cũ. Tệp lưu **mười ba lượt hỏi–đáp**, giữ đủ năm lượt tác giả chỉ bằng ảnh, các lượt trước đó và L09–L13; không xóa lập luận đã tích lũy.
 
-**Câu hỏi lore gần nhất là L12:** Á Không Gian không có vật chất sẵn nhưng mang vào được; bổ sung Tam Thập Tam Trọng Thiên và thế lực Tiên Thiên Sinh Linh; định tốc độ tu để gọi thiên tài theo thọ nguyên / khí vận / tư chất / ngộ tính; giữ Chính Tiên hiếm vì khó tu và Chân Tiên lục đục, người sắp lên thường bị tính toán. L12.A là lời tác giả, L12.B là phần đáp / bảng đề nghị, L12.C là phần còn mở. L09–L11 giữ đầy đủ triết lý điểm neo, tín ngưỡng, Đạo Ngân / Chi Tâm và nguồn truyện.
+**Câu hỏi lore gần nhất là L13:** xác nhận mốc thiên tài từ bắt đầu tu / một nửa bảng; tư chất và ngộ tính thấp cần khí vận bậc cao nhất khi chưa bị Chân Tiên để mắt, Pháp Tắc hữu hạn; vương quốc Tiên Thiên Sinh Linh / Tiên Vương; di sản vận dụng Thế trong bí cảnh làm nguồn Đế Kiếm; phân tích kiếm chiêu / quyết / lưu và cách viết Cổ Kiếm Tu giao chiến; hỏi Thiên Đạo thúc đẩy Kiếm Tiên để giết Yêu Tiên hay nâng chiến lực phòng ngoại giới. L13.A là lời tác giả, L13.B là đáp án chọn nguồn, L13.C là phần đáp / lý luận, L13.D là phần còn mở. [Cổ Kiếm Tu — combat](docs/lore/NAP_HU_ANCIENT_SWORD_COMBAT_WORKING.md) lưu đầy đủ ứng dụng / điều kiện / phản chế và ví dụ **đề nghị**. Giữ toàn bộ các lượt trước.
 
-**ĐÃ CHỐT mới L12 từ tác giả:**
+**ĐÃ CHỐT mới L13 từ tác giả:**
+
+- Mốc thiên tài tính **từ lúc bắt đầu tu**; dùng **một nửa bảng** để xét đứng đầu thế hệ được đồng ý. Không hỏi lại như đang chờ trả lời; các mốc gốc tiếp tục là khung tham chiếu đang xây dựng.
+- Người **tư chất thấp lẫn ngộ tính thấp** cần **khí vận bậc cao nhất** mới có khả năng tới Chân Tiên, đang xét tình huống **chưa bị Chân Tiên để mắt**. **Pháp Tắc thiên địa hữu hạn**, chưa khóa số lượng; khí vận không tự giải độc chiếm.
+- Thế lực Tiên Thiên Sinh Linh là **vương quốc**, vương mang danh hiệu **Tiên Vương**, không phải tu vi. Có khí vận vương quốc gia trì và tăng **Thế**. Giữ hơn 50 Chân Tiên, ít nhất hai Chính Tiên trong tổng không quá mười.
+- Chân Tiên vương quốc đều là thực vật thành tinh, nhìn chung **lười nhác / ôn hòa**, có ngoại lệ. **Cửu Đại mới mẻ** trong mắt họ.
+- Kiếm Tiên nhận **di sản vận dụng Thế / Đế Thế trong Thiên Địa Bí Cảnh** từ **đồ tôn một Chân Tiên vương quốc**, ít liên quan kiếm; tự kết hợp lý niệm đúc **Đế Kiếm**. Giữ nguồn Nhân Tiên truyền nền tu riêng. Không tự đồng nhất bí cảnh này với nơi mắc kẹt về sau.
+- Mọi đại kiếm quyết / kiếm lưu / kiếm thuật Cổ Kiếm Tu đều có thể **Nhập Đạo**; được chúng tu sĩ nhận định Nhập Đạo Giả mạnh nhất cùng cảnh so với tu sĩ Nhập Đạo. Vẫn giữ tiêu hao tăng so Hoàn Mỹ / tự ngộ / độc chiếm / giới hạn theo cảnh.
+- Tác giả đã trả lời **ưu tiên tên và triết lý Nạp Hư hiện có**. Tệp Arclune nhiều phiên bản chỉ đối chiếu; không thay danh sách Cửu Đại / Thập Bát bằng tên Tàng Kiếm–Huyễn Không–Vô Ngân.
+
+**ĐANG XÂY DỰNG L13:** động cơ Thiên Đạo thúc đẩy Kiếm Tiên để kiếm đạo nâng chiến lực / phòng các Đại Thế Giới, mức đại khí vận và đất diễn lịch sử; cơ chế từng chiêu / quyết / lưu, định nghĩa Thế và danh sách đầy đủ các bộ kiếm. Các ứng dụng / mẫu trận Codex lưu trong bản combat không tự là canon.
+
+**Các quyết định L12 tiếp tục giữ:**
 
 - Á Không Gian **không có vật chất sẵn nhưng mang vật chất vào được**. Cảnh vật / cây cỏ / kiến trúc trong các miền riêng không là mâu thuẫn về khả năng chứa vật chất; nhận định quá rộng của Codex ở L11 được sửa. Nguồn cụ thể / cách ổn định từng miền còn mở.
 - **Tam Thập Tam Trọng Thiên:** tiểu thiên địa trong Á Không Gian có **33 Chân Tiên ngang địa vị, không lãnh đạo**; kiến trúc đặc thù gia trì sức của **32 người vào một người xuất thủ**, cho **chiến lực bán bộ Chính Tiên**. Không tự là chứng Quy Tắc / Chính Tiên thật. Mốc xuất hiện chưa quyết định.
 - **Thế lực Tiên Thiên Sinh Linh:** số cụ thể còn mở, **hơn 50 Chân Tiên, tối thiểu 2 Chính Tiên**. Hai vị nằm trong **tổng không quá mười Chính Tiên toàn lịch sử**; tên / danh tính / Quy Tắc / thời điểm còn mở.
 - Chính Tiên ít vì đường tu khó và Chân Tiên lục đục, kẻ sắp chứng thường bị tính toán. Chưa đặt một âm mưu cụ thể hay giới hạn tuổi bảo đảm Chính Tiên.
 
-**Đề nghị mới L12, chưa canon:** bảng thiên tài ở mục XX của Hệ thống sức mạnh, tạm tính tổng thời gian từ bắt đầu tu cho hậu thiên trong thời hệ đã hoàn thiện. Các mốc đề nghị từ Dưỡng Hình cửu trọng trong 10 năm tới Chân Tiên trong 150.000 năm, đối chiếu quỹ thọ ở cảnh trước. Codex đã hỏi chọn thời gian tu hay tuổi từ sinh, tại lúc soạn chưa có đáp án. Không tự coi các số / cách tính là lời chốt. Không áp bảng cho tiên trời sinh.
+**Bảng thiên tài:** mục XX của Hệ thống sức mạnh giữ khung L12 từ Dưỡng Hình cửu trọng trong 10 năm tới Chân Tiên trong 150.000 năm, đối chiếu quỹ thọ ở cảnh trước. **L13 đã chốt thời gian từ bắt đầu tu và đồng ý một nửa bảng**; cột đứng đầu từ 5 năm tới 75.000 năm được tính theo tỷ lệ ấy. Các mốc gốc là khung đang xây dựng, không bảo đảm đi tiếp / không là thời gian thọ còn lại. Không áp cho tiên trời sinh.
 
 **Các cơ chế L10–L11 tiếp tục giữ:**
 
@@ -43,7 +55,7 @@
 - Luân Hồi Quy Tắc gội rửa được trước Pháp Tắc; cơ chế giữ ký ức phải xây từ khả năng từng cảnh. Âm mưu đồng hóa người chứng đạo Nhân Quả nằm sau Huyết Thế Đại Kiếp trước Main đời I, chưa chốt ngày / Pháp Tắc / mức cảnh.
 - Nạp Hư có sáng thế chủ, Thiên Đạo là khôi lỗi, Nhân Tổ / Nguyên Sơ là người ấy vẫn là giả thuyết / bí ẩn.
 
-**Nối tiếp:** trả lời câu hỏi đang hoạt động; hướng gần nhất là mốc thiên tài / điều kiện chuẩn, phạm vi gia trì 33 người và cách cản / bảo vệ người sắp chứng Chính Tiên. Phẩm công pháp / Chi Tâm / nguồn Tiên Khí và quyền Địa Tiên vẫn còn phần cần bàn. Khả năng tám cảnh đã có nhiều điểm chốt; sau đó mới thiết kế bảo tồn ký ức. Không khởi động lại Stage 0 hoặc hỏi lại điểm đã trả lời. Câu hỏi đang hoạt động của tác giả luôn ưu tiên hơn phần bàn giao.
+**Nối tiếp:** trả lời câu hỏi đang hoạt động; hướng gần nhất là ứng dụng / điều kiện / phản chế Cổ Kiếm Tu, định nghĩa Thế và nguồn Đế Kiếm, các kiếm quyết theo ưu tiên Nạp Hư. Mốc thiên tài / cách cản Chính Tiên, phạm vi gia trì 33 người vẫn có phần cần bàn. Phẩm công pháp / Chi Tâm / nguồn Tiên Khí và quyền Địa Tiên vẫn còn phần cần bàn. Khả năng tám cảnh đã có nhiều điểm chốt; sau đó mới thiết kế bảo tồn ký ức. Không khởi động lại Stage 0 hoặc hỏi lại điểm đã trả lời. Câu hỏi đang hoạt động của tác giả luôn ưu tiên hơn phần bàn giao.
 
 **Lưu liên tục đã được tác giả yêu cầu:** sau nhóm trao đổi có nội dung mới, lưu cả ý câu hỏi, phần trả lời, triết lý và đề nghị; cập nhật chỉ dẫn đọc trước cùng tài liệu liên quan trong phạm vi được phép. Không chờ tác giả nhắc lại. Không biến đề nghị thành canon; nếu chưa ghi được vào repo phải nói rõ chưa lưu. Ngữ cảnh chat không phải lưu trữ bền vững.
 
@@ -98,6 +110,8 @@ Read all five completely:
 3. docs/lore/NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md
 4. docs/lore/Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md
 5. docs/lore/NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md — read this first for the latest question, answer, corrections and unresolved proposals.
+
+For this sword-combat discussion, also read docs/lore/NAP_HU_ANCIENT_SWORD_COMBAT_WORKING.md. It records L13 author decisions separately from proposed mechanics / counters / examples, prioritizes current Nạp Hư names, and identifies incomplete / conflicting legacy sword lists. Do not treat those proposals as confirmed canon.
 
 These five are the most important sources for current Nạp Hư work.
 
@@ -1381,5 +1395,6 @@ Each question should:
 Then stop.
 
 Do not edit files until the author answers.
+
 
 

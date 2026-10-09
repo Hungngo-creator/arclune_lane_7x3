@@ -2,13 +2,13 @@
 
 > **Ngày lưu đầu:** 2026-10-06. **Cập nhật mới nhất:** 2026-10-09.
 >
-> **Phạm vi:** mười hai lượt trao đổi liên quan, giữ đủ năm lượt tác giả chỉ bằng ảnh, các lượt trước đó và L09–L11; L12 sửa Á Không Gian, bổ sung hai thế lực, đề nghị tiêu chuẩn thiên tài và sự hiếm Chính Tiên. Nội dung được tóm lược theo ý nghĩa; đây không phải bản chép nguyên văn. Phân biệt lời tác giả, phần đáp của Codex, đề nghị chưa được xác nhận và ý đã bị sửa.
+> **Phạm vi:** mười ba lượt trao đổi liên quan, giữ đủ năm lượt tác giả chỉ bằng ảnh và toàn bộ các lượt trước; L13 xác nhận cách tính thiên tài, bổ sung Tiên Vương / di sản Đế Thế, yêu cầu phân tích chiến đấu Cổ Kiếm Tu và hỏi động cơ Thiên Đạo. Nội dung được tóm lược theo ý nghĩa; đây không phải bản chép nguyên văn. Phân biệt lời tác giả, phần đáp của Codex, đề nghị chưa được xác nhận và ý đã bị sửa.
 >
 > **Yêu cầu của tác giả:** khi mở một cuộc trò chuyện lore mới, Codex phải đọc được câu hỏi lore gần nhất trước yêu cầu lưu này và phần trả lời tương ứng, đồng thời giữ được các câu hỏi / trả lời trước đó. Không để những thảo luận có giá trị chỉ tồn tại trong ngữ cảnh chat.
 
 ## 1. Đọc trước để nối tiếp cuộc thảo luận
 
-**Lượt lore gần nhất là L12 (2026-10-09): Á Không Gian mang vật chất vào được; Tam Thập Tam Trọng Thiên; thế lực Tiên Thiên Sinh Linh; cần mốc thiên tài theo tuổi thọ / khí vận / tư chất / ngộ tính; Chính Tiên ít vì khó tu và bị đồng đạo tính toán.** Đọc L12.A cho lời tác giả, L12.B cho phần đáp / bảng đề nghị, L12.C cho phần còn mở. L09–L11 và các lượt trước giữ đầy đủ lý luận / phần đáp, không xóa lịch sử.
+**Lượt lore gần nhất là L13 (2026-10-09): thời gian thiên tài từ bắt đầu tu / nửa bảng; tư chất và ngộ tính thấp cần khí vận bậc cao nhất khi chưa bị Chân Tiên để mắt; Pháp Tắc hữu hạn; vương quốc / Tiên Vương; nguồn Đế Thế trong bí cảnh; phân tích kiếm thuật / quyết / lưu và mô tả Cổ Kiếm Tu giao chiến; giả thuyết Thiên Đạo thúc đẩy Kiếm Tiên.** Đọc L13.A cho lời tác giả, L13.B cho đáp án chọn nguồn, L13.C cho phần đáp / lý luận, L13.D cho phần còn mở. [Bản combat Cổ Kiếm Tu](NAP_HU_ANCIENT_SWORD_COMBAT_WORKING.md) giữ đầy đủ bảng ứng dụng / phản chế và tình huống đề nghị. Không xóa L01–L12.
 
 Trạng thái mới nhất cần mang sang cuộc trò chuyện sau:
 
@@ -22,7 +22,13 @@ Trạng thái mới nhất cần mang sang cuộc trò chuyện sau:
 - **ĐÃ CHỐT L12:** Tam Thập Tam Trọng Thiên là tiểu thiên địa trong Á Không Gian, 33 Chân Tiên ngang địa vị / không lãnh đạo, kiến trúc gia trì 32 người vào người xuất thủ để đạt chiến lực bán bộ Chính Tiên. Niên đại chưa chốt.
 - **ĐÃ CHỐT L12:** thế lực Tiên Thiên Sinh Linh **hơn 50 Chân Tiên, tối thiểu 2 Chính Tiên**, tính trong tổng toàn lịch sử không quá mười. Danh tính / thời điểm còn mở.
 - **ĐÃ CHỐT L12:** Chính Tiên ít vì đường tu khó và Chân Tiên lục đục, người sắp đột phá thường bị tính toán. Các thủ đoạn cụ thể chưa được chọn.
-- **ĐỀ NGHỊ L12:** bảng thiên tài theo thời gian từ bắt đầu tu và quỹ thọ nguyên cộng dồn; các số / cách đặt cấp chưa canon, đang chờ lựa chọn cách tính thời gian.
+- **ĐÃ ĐỒNG Ý L13:** tính mốc thiên tài từ bắt đầu tu; dùng **một nửa thời gian bảng** để xét đứng đầu thế hệ. Bảng gốc L12 tiếp tục làm khung tham chiếu đang xây dựng, không là hạn tu / bảo đảm đường dài.
+- **ĐÃ CHỐT L13:** tư chất thấp và ngộ tính thấp cần khí vận **bậc cao nhất** để có khả năng tới Chân Tiên, đang xét tình huống **chưa bị Chân Tiên để mắt**. Pháp Tắc thiên địa hữu hạn, chưa chốt con số; khí vận không tự vượt độc chiếm.
+- **ĐÃ CHỐT L13:** thế lực Tiên Thiên Sinh Linh là vương quốc; **Tiên Vương là danh hiệu**, được quốc vận gia trì / tăng Thế, không là cảnh tu vi. Chân Tiên thực vật nhìn chung lười nhác / ôn hòa, luôn có ngoại lệ.
+- **ĐÃ CHỐT L13:** Kiếm Tiên nhận di sản **vận dụng Thế / Đế Thế** trong bí cảnh từ đồ tôn một Chân Tiên vương quốc, tự kết hợp lý niệm đúc **Đế Kiếm**; Cửu Đại mới mẻ trong mắt các tiên thực vật.
+- **ĐÃ CHỐT L13:** mọi đại kiếm quyết / kiếm lưu / kiếm thuật Cổ Kiếm Tu có thể Nhập Đạo; được chúng tu sĩ nhận định Nhập Đạo Giả mạnh nhất cùng cảnh so với tu sĩ Nhập Đạo.
+- **ĐÃ TRẢ LỜI L13:** ưu tiên tên và triết lý Nạp Hư hiện có; các tên Arclune chỉ đối chiếu, không ghép thành danh sách chính thức.
+- **ĐANG XÂY DỰNG L13:** động cơ Thiên Đạo muốn Cổ Kiếm Tu ra đời để tăng chiến lực / phòng ngoại giới, mức đại khí vận và hoạt động lịch sử Kiếm Tiên; mọi cơ chế combat Codex đề nghị chưa canon.
 - **ĐÃ CHỐT làm rõ L10:** cần cảm xúc hướng về đối tượng tin tưởng / tôn thờ. Lượng / chất, thu nhận và đường đi vẫn chưa có cơ chế cuối.
 
 - **ĐÃ CHỐT:** Nạp Hư chỉ là mốc so sánh để hình dung cấp độ hoàn thiện của thế giới riêng. Nạp Hư suy yếu không làm ai tự nhiên đủ điều kiện Thái Sơ.
@@ -508,6 +514,85 @@ Không đặt hạn tuổi cứng cho Chính Tiên; Chân Tiên chứng sớm ch
 - Thủ đoạn cản Chính Tiên cụ thể, ai được bảo vệ, Chính Tiên Kiếp.
 - Hướng bàn tiếp của Codex: chốt bảng tốc độ và điều kiện chuẩn, sau đó chọn cửa bị tính toán ở quá trình gom Pháp Tắc / thời điểm độ kiếp. Giữ việc cần định sức mạnh / Chi Tâm trước giải cơ chế bảo tồn ký ức.
 
+
+### L13. Tiên Vương, nguồn Đế Thế và ứng dụng chiến đấu Cổ Kiếm Tu — 2026-10-09
+
+**A. Ý tác giả và các xác nhận**
+
+1. **Thời gian từ lúc bắt đầu tu.** Mức thiên tài đứng đầu thế hệ dùng **một nửa thời gian bảng** Codex đề nghị là hợp lý. Cách tính không còn chờ đáp án.
+2. Tư chất **thấp lẫn ngộ tính thấp** cần khí vận **ở bậc cao nhất** mới có khả năng tu tới Chân Tiên, đang xét tình huống **không bị Chân Tiên để mắt**. **Pháp Tắc thiên địa có hạn**, chưa đặt số.
+3. Thế lực Tiên Thiên Sinh Linh là **vương quốc**. Vương gọi **Tiên Vương**: **danh hiệu**, không phải tu vi; có **khí vận vương quốc gia trì**, **Thế tăng**.
+4. Chân Tiên vương quốc là **thực vật thành tinh**, nhìn chung **lười nhác / ôn hòa** nhưng luôn có ngoại lệ.
+5. Kiếm Tiên đầu tiên nhận truyền thừa liên quan **Đế Thế** từ **đồ tôn của một Chân Tiên thuộc vương quốc**, trong **Thiên Địa Bí Cảnh**. Truyền thừa dạy **vận dụng Thế**, ít liên quan kiếm; hắn kết hợp lý niệm riêng, đúc kết **Đế Kiếm**.
+6. **Cửu Đại Kiếm Thuật mới mẻ trong mắt các Chân Tiên thực vật**. Không đổi thành nhận sẵn bộ kiếm thuật.
+7. Tác giả muốn phân tích kiếm chiêu / đại kiếm quyết / kiếm lưu để hoàn thiện Cổ Kiếm Tu, gợi ý ứng dụng và cách viết giao chiến.
+8. Tác giả hỏi: Nhân Tiên có khí vận che chở để tìm Kiếm Tiên, vậy Kiếm Tiên hẳn đại khí vận; Thiên Đạo thúc đẩy hắn nhằm giết Yêu Tiên hay cho lý niệm Cổ Kiếm Tu ra đời? **Hướng tác giả nghiêng về / chưa chốt động cơ thật:** tăng chiến lực chúng sinh, có thể phòng các Đại Thế Giới khác. Đất diễn lịch sử của tổ sư có thể nhiều hơn, chưa thêm sự kiện cụ thể.
+9. **ĐÃ CHỐT:** mọi đại kiếm quyết / kiếm lưu / kiếm thuật Cổ Kiếm Tu có thể **Nhập Đạo**; Cổ Kiếm Tu Nhập Đạo được chúng tu sĩ nhận định là **Nhập Đạo Giả mạnh nhất cùng cảnh so với tu sĩ Nhập Đạo**.
+
+**B. Câu hỏi chọn nguồn và đáp án tác giả**
+
+Codex tìm thấy tệp kiếm cũ có nhiều bộ tên Cửu Đỉnh / Cửu Đại, thiếu danh sách đầy đủ 18 lưu; hỏi ưu tiên Nạp Hư như Đế Kiếm / Sơn Hà Tại Hạ / Thiên Hạ Đồng Quy hay bộ Tàng Kiếm / Huyễn Không / Vô Ngân của Arclune.
+
+Tác giả đáp: **“Ưu tiên tên và triết lý Nạp Hư hiện có.”** Đây là lựa chọn đã chốt; không hỏi lại hoặc thay bộ tên chính thức bằng tên Arclune.
+
+**C. Phần đáp / lập luận của Codex**
+
+#### Những phần được cập nhật thẳng
+
+- Bảng thiên tài ghi tổng thời gian từ bắt đầu tu; cột đứng đầu là nửa bảng: Dưỡng Hình cửu trọng **5 năm**, Khai Mệnh **10**, Chiếu Hồn **40**, Hiển Tướng **125**, Hóa Tuyền **750**, Hóa Vực **2.500**, Khắc Pháp **7.500**, Định Pháp **25.000**, Chân Tiên **75.000**. Đây là phép tính từ khung gốc đang dùng, không đặt hạn chứng đạo / số thọ nguyên còn lại giống nhau.
+- Khí vận tối cao của người tư chất / ngộ tính thấp là điều kiện cần trong phạm vi tác giả nêu, không bảo đảm Chân Tiên hoặc giải độc chiếm. Khi bị Chân Tiên để mắt phải xét can thiệp cụ thể, không tự kết luận chắc chết / chắc không tu được.
+- Tiên Vương được gia trì là danh hiệu, không tự là Chính Tiên, không tăng số Chính Tiên của thế lực. Giữ hơn 50 Chân Tiên, tối thiểu hai Chính Tiên trong cận tổng không quá mười.
+- Giữ riêng truyền thừa Nhân Tiên nuôi / truyền nền tu và nguồn di sản Đế Thế của đồ tôn Chân Tiên vương quốc. **Bí cảnh nhận di sản không tự là bí cảnh tổ sư bị vây về sau**.
+
+#### Khung để xây chiến đấu — đề nghị, chưa canon
+
+Phân lớp: **kiếm thuật** là nguyên lý tác động; **kiếm lưu** là tác phong / cách tổ chức trận; **đại kiếm quyết** là cơ chế cần dựng / vận hành; **kiếm chiêu** là hành động cụ thể trong thời điểm. Không là thang cảnh giới hoặc bắt học hết chín rồi mười tám.
+
+Trận Cổ Kiếm Tu nên có tiến trình **đọc đối tượng → thử kiếm → tạo / ép điều kiện → chém mục tiêu cụ thể → đối thủ phản chế / đổi cấu trúc → kiểm chứng / đổi kiếm**. Ngộ đúng không tự thay khả năng cảm nhận, tiếp cận, dẫn lực và chịu phản kích.
+
+**Đế Kiếm:** đề nghị **lập thế → tranh thế → dùng thế**. Di sản giúp nhận / dẫn nguồn thuận nghịch; Kiếm Tiên đưa lý niệm riêng vào cách biến quyền chủ động thành kiếm. Đối thủ phá bố trí, đổi chiến trường, cắt nguồn hoặc ép xuất sớm. Chưa chốt người dùng buộc là hoàng đế hay luôn có Quốc Thế; giữ điều kiện Tần Đế đã có.
+
+Phân biệt các quyết đã được lore Nạp Hư nhắc, **cơ chế mới đều là đề nghị**:
+
+| Tên | Công dụng đề nghị |
+|---|---|
+| Sơn Hà Tại Hạ | Dựng thế trên địa hình / đường lực, ép vị trí |
+| Thiên Hạ Đồng Quy | Quy tụ nguồn Thế / lực có thể huy động vào đòn quyết định |
+| Hồng Trần Nhập Mộng | Dựng tình huống tâm cảnh khiến đối thủ tự lựa chọn sai |
+| Vấn Tâm Vô Đáp | Khai xung đột ý định, phá một nhịp quyết định |
+| Tâm Tượng Phán Kiếm | Khai hình ảnh / cách đối thủ đánh giá người dùng để dẫn phòng sai |
+| Quy Khư Tịch Diệt | Đánh nguồn / dòng duy trì để một cấu trúc lụi |
+| Nhất Tuyến Sinh Thiên | Tìm / tạo một đường sống qua vây, chuyển thành phản kích |
+| Thiên Khuyết Nhất Kiếm | Chém đúng điểm / quan hệ đang khuyết |
+| Bách Xuyên Quy Hải | Thu / dẫn các dòng lực tương thích về một nguồn / đường kiếm |
+| Mộng Lý Hoa Tạ | Làm nhận sai diễn biến, tưởng đòn đã hết / đã đỡ rồi thả phòng |
+| Kiếm Hậu Vô Kiếm | Dấu tác động đã đặt tiếp tục vận hành sau đường kiếm hữu hình |
+
+Đã lưu đầy đủ điều kiện, dấu hiệu, ứng dụng và phản chế trong [Cổ Kiếm Tu — combat](NAP_HU_ANCIENT_SWORD_COMBAT_WORKING.md), cùng phân tích 9 hướng tham khảo / 10 tên lưu tìm được từ các phiên bản Arclune. Chúng là đối chiếu thứ cấp, không danh sách đủ Cửu Đại / Thập Bát Nạp Hư. Không lấy một tên “Thời / Không / Nhân Quả” cho mọi cảnh toàn quyền tương ứng.
+
+Các tình huống mẫu trong tệp: hai Hóa Vực dùng đòn thử để tìm đầu mối, người thủ dựng khuyết giả, người công kiểm chứng rồi đánh khe khi cấu trúc đổi; Đế Kiếm đối đầu tâm kiếm, giành vị trí / khai xung đột ý định và kiểm tra phản hồi để phát giác mộng. Đây là ví dụ hư cấu, chưa bổ sung trận lịch sử.
+
+**Cách viết đề nghị:** cho người đọc thấy dấu hiệu → phán đoán / kiểm tra → hành động → hậu quả cụ thể → phản chế. Dấu hiệu có thể là nhịp vận lực, câu trả lời, vị trí, Pháp Tướng chậm ngưng tụ; tránh chỉ tuyên bố “chém bản chất” thiếu cách tiếp cận.
+
+Nhập Đạo vẫn tốn tổng linh lực hơn Hoàn Mỹ; độc chiếm / Chân Ngã / kiếp giữ giới hạn. Danh tiếng Nhập Đạo Giả mạnh nhất không tự chắc thắng mọi trận, không biến một người cảnh thấp thành chủ Pháp Tắc hoặc mọi chiêu thành ma diệt Chân Ngã.
+
+#### Động cơ Thiên Đạo và đất diễn tổ sư — đang xây dựng
+
+Codex nghiêng về hai lợi ích cùng tồn tại: xử lý Yêu Tiên là mục tiêu gần, truyền thống tăng chiến lực hậu thế là mục tiêu rộng; đề phòng ngoại giới là hướng hợp lý để bàn, chưa xác nhận Thiên Đạo biết tương lai hay tự tạo Cửu Đại qua tổ sư.
+
+Gợi ý chặng đất diễn: thời Hắc Ám nhận di sản / tự sáng tạo kiếm; sau giải phóng lưu truyền lý niệm; truyền thống giúp thế hệ sau đối ngoại; về sau Cổ Kiếm Tu trở thành hình chiếu Nhân Kiếp theo tiêu chí đã có. Hoạt động cụ thể của tổ sư trong từng chặng chưa chốt.
+
+Giữ **kiếm tu dẹp Huyết Thế Đại Kiếp là người khác**, hướng tổ sư mắc kẹt / tìm hồ yêu còn mở. Không dùng đại khí vận làm vĩnh sinh / miễn kiếp / miễn độc chiếm. Thiên Đạo không đọc tâm trí Chân Tiên trở lên.
+
+**D. Còn mở**
+
+- Đủ bộ tên gốc Cửu Đại / Thập Bát và vị trí Đế Kiếm trong phân loại; tên Nạp Hư đã được chọn ưu tiên.
+- Cơ chế / giới hạn / tiêu hao / phản chế từng quyết và chiêu ở các bảng đề nghị; phạm vi theo cảnh.
+- Thế là gì, gia trì khí vận tăng Thế bằng cách nào, người không làm vương vận dụng đến đâu.
+- Danh tính Chân Tiên / đệ tử / đồ tôn, ngày nhận di sản / đúc Đế Kiếm, bí cảnh nào.
+- Động cơ Thiên Đạo / mức đại khí vận, lịch sử hoạt động cụ thể của tổ sư.
+- Mốc thiên tài gốc là khung đang dùng; clock từ bắt đầu / một nửa bảng đã được đồng ý, không hỏi lại như chưa trả lời.
+
 ## 3. Các chỉnh sửa bắt buộc nhớ, không quay về ý cũ
 
 | Ý trước đây | Trạng thái cần dùng |
@@ -555,5 +640,6 @@ Arclune mô phỏng vẫn có trần **Bán Chí Cao**. Con đường tu Main v�
 Sau một nhóm câu trả lời lore có nội dung mới, cập nhật các tài liệu liên quan và phần bàn giao trước khi kết thúc lượt trong phạm vi tác giả đã cho phép. Lưu cả câu hỏi, giải thích, triết lý và đề nghị còn mở, thay vì chỉ lưu vài kết luận. Nếu chưa ghi được vào repo, nói rõ trạng thái chưa lưu; không gọi việc còn trong ngữ cảnh chat là đã lưu lâu dài.
 
 [prompt.md](../../prompt.md) phải trỏ tới bản bàn giao này để phiên Codex mới đọc nó trước các bản tóm tắt cũ. Khi có trao đổi mới, cập nhật mục đọc trước và lưu lượt mới; không để câu hỏi gần nhất cố định mãi ở L09.
+
 
 

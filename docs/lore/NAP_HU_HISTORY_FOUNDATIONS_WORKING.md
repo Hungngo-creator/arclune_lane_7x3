@@ -1,6 +1,6 @@
 # NẠP HƯ — KHUNG LỊCH SỬ NỀN TRƯỚC KHI CHIA ĐẠI KỶ
 
-> **Bàn giao mới 2026-10-09:** đọc [các lượt hỏi–đáp](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L12** và mục LV–LVI về hai thế lực / sự hiếm Chính Tiên. Á Không Gian mang vật chất vào được. Giữ niên đại hai thế lực còn mở, L09–L11 giữ lập luận điểm neo / tín ngưỡng / Chi Tâm.
+> **Bàn giao mới 2026-10-09:** đọc [hội thoại lore](NAP_HU_LORE_DISCUSSION_HANDOFF_WORKING.md), **L13** và mục LVII–LVIII: Tiên Vương / nguồn Đế Thế của Đế Kiếm, sự mới mẻ Cửu Đại, giả thuyết Thiên Đạo thúc đẩy Kiếm Tiên. Giữ riêng truyền thừa Nhân Tiên, bí cảnh nhận di sản và hướng bí cảnh mắc kẹt về sau.
 
 > **Trạng thái:** Niên biểu đang xây dựng.
 >
@@ -868,6 +868,8 @@ Kiếm Tiên được Chân Tiên Nhân tộc đầu tiên truyền thừa và *
 Đã khóa:
 
 > **Kiếm Tiên đầu tiên là người sáng tạo Cửu Đại Kiếm Thuật của Nạp Hư.**
+
+**Bổ sung ĐÃ CHỐT L13:** hắn nhận di sản **vận dụng Thế / Đế Thế** trong một **Thiên Địa Bí Cảnh**, từ **đồ tôn của một Chân Tiên thuộc vương quốc Tiên Thiên Sinh Linh**. Di sản ít liên quan kiếm; hắn kết hợp lý niệm riêng, đúc kết **Đế Kiếm**. Cửu Đại mới mẻ trong mắt các Chân Tiên thực vật, không biến thành bộ kiếm thuật được trao sẵn. Xem mục LVII.
 
 ---
 
@@ -1964,4 +1966,46 @@ Mô tả hiện tại ở mục LXVI–LXVII của [Cấu trúc thế giới](NA
 Âm mưu Nhân Quả sau Huyết Thế Đại Kiếp trước Main đời I vẫn là sự kiện riêng, chưa gán 33 Chân Tiên / hai Chính Tiên mới làm thủ phạm. Thiên Đạo không đọc tâm trí Chân Tiên trở lên; các âm mưu xét dấu vết, nhân quả và thủ đoạn đã có, không thêm năng lực đọc mọi suy nghĩ.
 
 **Thiên tài theo niên đại:** chuẩn tốc độ đề nghị mới dùng thời hệ hậu thiên đã hoàn thiện; không áp ngược để phủ nhận những người chứng Chân trong thời sơ khai / Hắc Ám Kỷ có điều kiện khác. “Hắc Ám Kỷ bắt đầu → Nhân Tiên chứng Chân ít nhất 35.000 năm” vẫn là khoảng giữa sự kiện, không tự thành tuổi tu của Nhân Tiên. Bảng dự thảo ở mục XX của [Hệ thống sức mạnh](Nap_Hu_He_Thong_Tu_Luyen_Suc_Manh_Tuoi_Tho_Working_Design.md).
+
+
+---
+
+# LVII. TIÊN VƯƠNG VÀ TRUYỀN THỪA ĐẾ THẾ CỦA KIẾM TIÊN ĐẦU TIÊN
+
+**ĐÃ CHỐT L13:** thế lực Tiên Thiên Sinh Linh là **vương quốc**, vương mang danh hiệu **Tiên Vương**, **không là cảnh tu vi**. Người mang danh hiệu được khí vận vương quốc gia trì, **Thế tăng**. Chưa chốt danh tính / tu vi vị vương ấy hoặc buộc thuộc tối thiểu hai Chính Tiên đã có.
+
+Các Chân Tiên của vương quốc đều là **thực vật thành tinh**, bản tính nhìn chung **lười nhác, ôn hòa**, nhưng luôn có ngoại lệ. Chín đại kiếm thuật của Kiếm Tiên đầu tiên là **thực sự mới mẻ với họ**.
+
+**Nguồn truyền thừa Đế Kiếm ĐÃ CHỐT:**
+
+Chân Tiên thuộc vương quốc → đệ tử → **đồ tôn** → di sản **Đế Thế / vận dụng Thế trong Thiên Địa Bí Cảnh** → Kiếm Tiên đầu tiên nhận → kết hợp lý niệm riêng → **đúc kết Đế Kiếm**.
+
+Di sản ít liên quan kiếm. Không thay việc Kiếm Tiên sáng tạo Cửu Đại bằng nhận kiếm pháp hoàn chỉnh; cũng không thay nguồn **Nhân Tiên nuôi dưỡng / truyền nền tu** đã chốt. Đồ tôn là quan hệ sư thừa, chưa gán huyết thống hoặc người ấy là Tiên Vương.
+
+**CÒN MỞ:** danh tính ba đời truyền thừa, tên / địa điểm / hình thức di sản bí cảnh, thời điểm Kiếm Tiên nhận và đúc kết Đế Kiếm so các mốc cụ thể. Đế Kiếm phải có nguồn trước khi được đúc kết, nhưng chưa đặt tuổi / ngày hoặc chuyển mốc sáng tạo Cửu Đại sang Đại Kiếp.
+
+**Không đồng nhất hai bí cảnh:** nơi nhận di sản Đế Thế là bổ sung đã chốt; hướng tổ sư bị vây trong bí cảnh / hoàn thiện Cửu Đại về sau vẫn **ĐANG XÂY DỰNG**. Chưa có lời chốt đó là cùng một nơi hoặc cùng một chuyến đi.
+
+Chi tiết vương quốc ở mục LXVIII của [Cấu trúc thế giới](NAP_HU_WORLD_STRUCTURE_AND_DOMAINS_WORKING.md); [Cổ Kiếm Tu — ứng dụng chiến đấu](NAP_HU_ANCIENT_SWORD_COMBAT_WORKING.md) giải thích sự chuyển từ vận dụng Thế sang kiếm dưới dạng đề nghị.
+
+---
+
+# LVIII. ĐẠI KHÍ VẬN, THIÊN ĐẠO VÀ ĐẤT DIỄN CỦA TỔ SƯ — ĐANG XÂY DỰNG
+
+**ĐÃ CHỐT trước:** Nhân Tiên được khí vận Nhân tộc che chở, nhận truyền thừa một hài tử, có nhiệm vụ tìm / nuôi Kiếm Tiên. Không đổi Nhân Tiên thành chính hài tử hoặc lấy đoạn Hắc Ám Kỷ → chứng Chân làm tuổi của hắn.
+
+**L13, tác giả đề nghị / nghiêng về:** Kiếm Tiên là người **đại khí vận**, Thiên Đạo thúc đẩy trưởng thành vì muốn **Cổ Kiếm Tu ra đời**, tăng chiến lực chúng sinh, có thể để phòng các Đại Thế Giới khác. Tác giả hỏi động cơ là muốn Yêu Tiên chết hay muốn lý niệm kiếm đạo ra đời. **Động cơ thật và mức can thiệp vẫn chưa chốt.**
+
+**Suy luận Codex:** hai mục tiêu có thể cùng tồn tại: giải khủng hoảng Yêu Tiên là ích lợi gần, truyền thống kiếm đạo làm chiến lực hậu thế mạnh hơn là ích lợi rộng. Cơ duyên có thể được mở, nhưng cảm ngộ / lý niệm vẫn là thành tựu cá nhân Kiếm Tiên. Không coi Thiên Đạo trực tiếp sáng tạo kiếm thuật qua hắn hoặc biết sẵn chính xác cuộc ngoại xâm.
+
+Các hướng đất diễn **để tác giả chọn, chưa thành sự kiện**:
+
+- Hắc Ám Kỷ: nhận di sản Thế / tự sáng tạo kiếm, đối phó Yêu Tiên; giữ thất bại cứu hồ yêu và những hạn chế Cổ Kiếm Tu sơ khai.
+- Sau giải phóng: truyền bá / lưu truyền lý niệm và phương thức chiến đấu; chưa khóa tổ chức / đế quốc hắn lập.
+- Quãng đối ngoại: truyền thống do hắn mở giúp thế hệ sau ứng phó cơ chế sinh linh ngoại giới; chưa xác nhận hắn trực tiếp tham chiến.
+- Hậu thế: Cổ Kiếm Tu trở thành nguồn hình chiếu Nhân Kiếp theo tiêu chí công kích ý thức đã chốt; không bắt mọi hình chiếu là tổ sư.
+
+**Giữ ranh giới:** kiếm tu dẹp Huyết Thế Đại Kiếp là người khác; tổ sư mắc kẹt / tìm thân Luân Hồi hồ yêu / có còn sống chưa chốt toàn bộ. Đại khí vận không tự cấp vĩnh sinh, miễn kiếp hay vô hạn Pháp Tắc; Pháp Tắc thiên địa **có hạn** và độc chiếm vẫn áp dụng. Thiên Đạo không đọc tâm trí Chân Tiên trở lên.
+
+**ĐÃ CHỐT L13 về Nhập Đạo:** mọi đại kiếm quyết / kiếm lưu / kiếm thuật Cổ Kiếm Tu đều có thể đạt; được tu sĩ nhận định Nhập Đạo Giả mạnh nhất cùng cảnh so với tu sĩ Nhập Đạo. Danh tiếng / ứng dụng từng thời đại cần xây tiếp, không gán mọi chiêu hậu thế đã hoàn thiện ngay đời tổ sư.
 
