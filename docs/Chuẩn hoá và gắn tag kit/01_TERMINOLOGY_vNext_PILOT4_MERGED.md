@@ -1,6 +1,6 @@
 # ARCLUNE — TERMINOLOGY vNext
 ## Canonical Combat, Runtime & System Terminology
-**Version:** 2026-10-08-B.3
+**Version:** 2026-10-09-B.4
 **Stage:** Chặng B — Terminology Reconstruction  
 **Source basis:** `terminology.md` + `00_CANONICAL_RECOVERY_AUDIT.md` + các correction hiện hành của user được Audit ghi nhận.  
 **Scope:** định nghĩa nghĩa canonical của khái niệm. File này **không** phải Tag Registry, Primitive Registry, Ability Schema, Contract hay Kernel implementation.
@@ -12,6 +12,8 @@
 **Revision B.2:** distinguishes an admitted postmortem Slot checkpoint from Actor Natural opportunities and a chassis-replacement materialization cause from ordinary Revive/deployment. Structural presence evidence and cause-specific Effect activation remain separate. No Tag or Primitive is introduced.
 
 **Revision B.3:** separates a multi-part physical/scheduling body from its one lifecycle/resource owner, and an actual SSI pass contact from a consumed opportunity. Existing entity kinds, Action identity and clocks remain unchanged.
+
+**Revision B.4:** distinguishes explicitly qualified consumed-owner global-boundary provenance from a new/private boundary or ordinary personal-window clock. No new term/ID; CC-lost opportunity remains distinct from performed Action.
 
 # 0. MỤC ĐÍCH VÀ QUY TẮC ĐỌC
 
@@ -1163,7 +1165,7 @@ Các mechanic kiểu:
 - “tới Natural Action tiếp theo của chính Actor”;
 - “2 Natural Actions của target”;
 
-không dùng `TURN_BOUNDARY` như một personal clock. Chúng dùng `ACTOR_NATURAL_ACTION_WINDOW` hoặc `NATURAL_ACTION_OF_ACTOR`.
+không tạo một private `TURN_BOUNDARY` như personal clock. Chúng dùng `ACTOR_NATURAL_ACTION_WINDOW` hoặc `NATURAL_ACTION_OF_ACTOR` khi gameplay đếm personal opportunities/windows. Một mechanic explicitly settle tại global boundary sau consumed Natural opportunity của owner có thể qualify provenance của chính boundary đó theo CLK-001; qualification không tạo boundary type mới và không đòi owner đã thực hiện Action.
 
 ---
 

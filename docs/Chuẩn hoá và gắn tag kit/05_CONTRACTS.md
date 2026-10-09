@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-09-F.22
+**Version:** 2026-10-09-F.23
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -42,6 +42,8 @@
 **Revision F.21:** binds declared multi-part life/provider/target projection, real SSI contact, occupancy-deferred paid requests, positive action-generated Rage amounts and exact Side-AE predicate observation to existing owners. Earlier postmortem waits, clocks, Damage receipts and unprofiled defaults remain unchanged.
 
 **Revision F.22:** extends only ACT-033 with an opt-in same-completed-Natural class-AE prerequisite and TGT-001 with a bounded State-owned legal single-recipient Damage compulsion. Earlier clocks, Costs, exact attack bindings, Hit/Authority and unopted ordering remain unchanged. No new Contract ID, Tag, Primitive, global Reaction priority or callback.
+
+**Revision F.23:** extends existing CLK-001, CST-001/009 and HEL-001/DMG-010/RES-008 for E.21 profiles: preserved consumed-origin including CC, atomic capacity/resource payment, final-request restoration replacement, Shield-before-floor and exact-instance completion accounting. Ordinary pipelines/earlier Pilots retain their laws; no new Contract ID/global priority.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -892,6 +894,14 @@ Turn Boundary is not:
 - inherently tied to the same Actor as previous/next action.
 
 ---
+
+### Qualified consumed-owner boundary
+
+04§7.21/§20.1 may qualify this same global boundary by its original **consumed Natural opportunity owner/generation/serial**. Preserve that origin even when CC consumed the opportunity without ACTION_BEGIN/ACTION_COMPLETED. Close any performed Action and its required blocking/post-action work first, then the qualified finite boundary settlement, then next SSI control. The filter does not emit an additional boundary or count a child/foreign Action, pass-contact or POSTMORTEM_WAIT as that owner's Natural opportunity.
+
+For an explicitly later-than-activation owner window, snapshot activation identity/latest owner grant serial and count only later grants' following qualified boundaries. The immediate post-cast boundary cannot decrement that new window; the next CC-lost owner opportunity can. Expiry occurs at that boundary, not at its opportunity start/Action completion. State/window revision guards retire old expiry cursors after replacement. Ordinary source retention/pause/lifecycle remains explicitly governed; no dead/source-absent personal progress is invented.
+
+Existing unqualified boundaries and CLK-002 personal-window defaults remain unchanged. Missing origin/Mode support, private-boundary aliases and undeclared observable competition fail closed.
 
 ## CLK-002 — Actor Natural Action Window
 **Status:** `LOCKED CONCEPT / exact reset event LOCKED_DEFAULT`
@@ -3167,6 +3177,16 @@ Local-group failure uses its explicit branch failure policy; it does not promote
 
 ---
 
+### CST-001/009 bounded MaxHP Cost
+
+04§10.3B `kind: MAX_HP` is payer-owned capacity payment. On one protected pre-payment view evaluate normalized requested capacity from payment-time CurrentMaxHP; validate ordinary payer legality, legal resulting capacity and **all** required resource/capacity Costs. Under REQUIRE_FULL an unpayable member commits no required debit/use. A normalized zero request may still succeed under ordinary Cost law.
+
+Successful admission joins P-035 resource payment, P-031 MaxHP debit, P-032 preserve-absolute/clamp reconciliation, immutable Cost receipts and explicitly consumed successful activation allowance at one barrier. Preserve requested/actual paid capacity, old/new MaxHP, mutation-handle and source/battle-participant identity. No intermediate AE-only payment or capacity mutation is observable; a downstream snapshot occurs after the complete successful barrier. A target that subsequently invalidates cannot refund committed Costs or undo success consumption under ordinary local-failure law.
+
+MAX_HP is not CurrentHP Cost/P-036, Damage, non-Cost HP Loss or a fake Resource pool. Clamped CurrentHP is reconciliation, not Damage/Heal/Reflect/Lifesteal. Record any real health mutation under existing stable observation law while preserving semantic kind. Full required payment cannot be emulated by a post-admission capacity Effect.
+
+The committed debit is BATTLE_SCOPED on the actual battle participant: leave/death/Revive/reinitialization retain it without repaying or resetting a baseline. Growth is a separate contribution, not refund. Only battle reset or an explicit governed restoration changes this retained debit; old payment receipts remain immutable. Invalid numeric domain/unsupported conflicting capacity restoration or write profiles require actual law/rejection, not an invented minimum or implicit rollback. Existing ordinary HP/resource/distributed Costs are unchanged.
+
 # 18. RESOURCE CONTRACT
 
 ## CST-010 — AE Ownership
@@ -3872,7 +3892,7 @@ Use batch + query/State instance + recipient + phase identity for calculation/cr
 ## HEL-001 — Heal Calculation
 **Status:** `LOCKED`
 
-Heal resolves conceptually:
+Ordinary unconverted Heal resolves conceptually:
 
 ```text
 requested Heal amount
@@ -3965,6 +3985,28 @@ Effective Element = Light
 ---
 
 For the opt-in04§17.3 profile, HEL-001 calculations feed the joined CST-009 Heal/payment transaction. No Heal becomes externally committed before its funded result-linked payment can commit. Ordinary modifiers/Overheal remain unchanged, including amplified restoration whose proportional debit is capped by the captured budget. A denied/converted Heal supplies terminal actualRestore0 for this exact settlement, without making the converted Damage a Heal receipt.
+
+### HEL-001 State-owned pre-restoration conversion
+
+04§19.7 selects an active recipient-State claimant on the protected incoming Heal view. Complete ordinary Heal admission and applicable Heal amount modifiers, then seal the **final requested amount before restoration/Overheal**. Intrinsic recipient HP Regen is excluded only through its semantic provenance; active self-Heal, Passive, Lifesteal, pulses and ally/global Heal remain ordinary Heal regardless of source-equals-recipient.
+
+Replace restoration once with a separate instance-owned TRUE Damage request equal to that sealed amount. No HP restoration, Effective Heal, missing-HP clipping or fabricated Overheal is committed for the converted branch. A full-HP recipient can therefore take the entire converted request. A denied request supplies terminal zero-restoration evidence without fabricating HEAL_COMMITTED/positive conversion. Retain original Heal source/Attribution/request separately from converting State source/owner/instance and converted Damage lineage; root/credited source does not make it the original Heal Action's direct Damage.
+
+The sealed scalar is already this conversion's Shield-input demand, not another pre-mitigation source-stat formula or permission to run Heal/Damage amplification twice. It remains TRUE for admission/Shield/result/ordinary Damage observers and does not Pierce Shield without an independently applicable explicit law. Resolve eligible Shield first, then cap HP removal at max(0, HP_before - authored floor). HP below/equal floor is never raised. Non-lethal discarded demand, absorbed Shield and overkill are not ActualHP.
+
+RES-008 applies one conserved above-floor HP budget to equal-floor converted demands in one common commit. This extension does not silently choose an allocation when unrestricted Damage/incompatible floors compete in the same commit; require supported explicit law or reject that affected composition. Unprofiled TRUE Damage/DMG-008 and ordinary simultaneous Damage keep their current behavior.
+
+The conversion claim, canceled restoration, converted Damage/result and terminal request identity are one finite protected transaction/dependency graph, without an ordinary Reaction window between cancellation and replacement. Revalidate recipient and claimed active State generation before commit; abort/stale claim publishes neither partial restoration nor Damage, and cannot manufacture a duplicate incoming Heal. In-flight retirement follows declared claim lifetime, not State list order. Reflect/Counter/lifecycle use the real committed Damage and governing caller boundary afterward.
+
+### HEL-001/DMG-010 instance completion accounting
+
+An authored State accumulator receives only immutable converted-Damage ActualHP receipts explicitly bound to that same State instance. Fold the complete conversion commit once, with counter delta and processed receipt identity at one barrier; close dependent strict-threshold comparison/removal before continuation. Shield/requested amounts, truncation, packet/component double credit, another instance/source and same-root unrelated Damage are excluded. This is existing Result/Counter/Transaction bookkeeping, not a new Damage metric or manager.
+
+Threshold and duration termination must preserve distinct causes. For an explicitly admitted early-threshold or natural-window completion, capture/seal D and original instance/source/recipient/cause before normal State retirement. Its finite registered settlement can consume the sealed value afterward; it cannot read a retired live counter, pay twice or bind a replacement State. Cleanse/purge/death/leave/replacement or other unadmitted removal never becomes completion by invoking a generic on-remove listener.
+
+When authored same-owner/same-recipient completion work shares an actual checkpoint, freeze eligible completion records and SUM their requested settlement amounts once before ordinary Heal admission/modifiers/restoration. Record one batch/Heal terminal and separate consumed completion refs atomically. Do not combine independent checkpoints/unrelated Heals, sum Effective Heal or pick instance order. Zero/denied/converted payout still closes its records; invalid source/recipient fails locally under explicit lifetime law without retarget/refund/retry. Required local dependencies do not define global Reaction priority.
+
+State reapplication, source retention and overlapping claimant selection must be explicit. Two matching converters cannot both claim one Heal; absent supported composition reject rather than pick source/State/Slot/Event insertion. Missing snapshot/cause/result/lifetime, nominal reconstruction, cyclic settlement or incompatible numeric/allocation policy rejects before affected mutation. Prior Heal/Overheal/conversion policies remain unchanged.
 
 ## HEL-002 — Overheal
 **Status:** `LOCKED`

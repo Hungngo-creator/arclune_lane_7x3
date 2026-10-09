@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-09-I.23
+**Version:** 2026-10-09-I.24
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.2+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.20+, `05_CONTRACTS.md` F.22+, `06_KERNEL_RUNTIME.md` G.21+, `07_MODE_PROFILES.md` H.2+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.4+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.21+, `05_CONTRACTS.md` F.23+, `06_KERNEL_RUNTIME.md` G.22+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -47,6 +47,8 @@
 **Revision I.22:** adds only M-165–M-167 for received exact-Action receipt aggregation/strict thresholds, source-local MaxHP cleanup including HP_ZERO without confirmed death, and rejection of incomplete observable threshold/tick/resource profiles. Gideon R1 remains partly clarified; synthetic reconciliation fixtures do not approve its pending choices. Preserve all prior case bodies/IDs. Architecture Phase declarative obligations, not executable test results.
 
 **Revision I.23:** final Gideon R2 resolves Q1–Q7. Correct only M-165–M-167's superseded partial fixtures and add M-168–M-171 for distinct opportunity expiry/refresh, same-completion class-AE funding plus finite waiting observations, legal recipient compulsion and bounded malformed-profile rejection. All earlier test bodies/IDs remain unchanged. Four new declarative Architecture Phase obligations, not executable results; current E.20/F.22/G.21 only.
+
+**Revision I.24:** adds M-172–M-180 for qualified boundary/CC/cast exclusion, atomic persistent capacity Cost, threshold episode/funding, request conversion/floor, exact-instance accounting/causes, Slot admission and common-cast death growth. M-181 preserves three pending designer decisions as PROBE_UNRESOLVED. Declarative Architecture Phase specifications only; earlier fixtures remain unchanged.
 
 # 0. WHAT THIS FILE IS
 
@@ -4623,6 +4625,95 @@ Zero-missing-HP after intervening lawful recovery gives E0: ordinary zero-delta/
 **Inputs:** arbitrary hook strings; missing Mode hook or non-Natural/child/foreign/future Action prerequisite; wrong trigger owner or cyclic handoff/completion edge; force-recipient constraint with unavailable owner, cross-instance binding, unsupported shape/operation/phase, fixed/AoE rewrite, illegal-target bypass or incompatible legal recipients lacking a governing law; old compatibility/validation hash purporting to authorize these new profiles.
 **Expected:** reject malformed authored profiles before affected execution; preserve ordinary unopted paths. If dynamically incompatible legal constraints are detected at selection, reject that affected selection before TargetSet commit; any earlier ordinary Cost retains existing CST failure/refund law, not an invented rollback. Valid control: an admitted Ultimate's free Skill2→Skill3 uses the same family while HP<70%, CD1 and an old effect exists; bypass only automatic eligibility, refresh exactly one window and freshCD1, no immediate Heal/no extra child class AE. The root's later automatic check cannot charge15 again against that freshCD1 even if HP is high. Root readiness/foreign costs and owner validity remain ordinary laws. Failed status/zero Damage alone does not cancel the legal second stage; replay does not create an independent second family.
 **Layers:** E.20 Normalizer/compatibility, ACT-020/021/033, TGT-001, shared Effect/State family, Cost/Action/DAG/Target/Transaction.
+
+## M-172 — Qualified Global Boundary, Cast Exclusion and CC Consumption
+
+**ID:** `M-172`
+**Status:** `MUST_PASS`
+**Fixture:** owner Q casts a boundary-window State during granted opportunity17. The immediate global boundary belongs to consumed opportunity17. A later Q grant18 is lost to CC; unrelated Actor boundaries, child Actions, pass-contact and POSTMORTEM_WAIT occur between them.
+**Expected:** Passive settles once at Q's boundary17 from a common source/eligible allied-field snapshot after Action/blocking work, including Summon/Leader/self and excluding the exact authored Prime+Thần Tính pool. Newly activated window excludes17, remains active through18's opportunity and expires at its following global boundary before SSI continues. CC loss needs no ACTION_COMPLETED, grants no class/action completion work, but still yields Passive Heal/window expiry. Foreign/child/contact/dead-wait origins never qualify. Redelivery/save-resume neither doubles Heal nor decrements/retires a replacement window. Invalid recipient fails locally without replacing it.
+**Forbidden:** private boundary enum, ACTION_COMPLETED filter, next-start expiry, cast-immediate expiry, matching previous Action/current pointer, recipient-by-recipient resnapshot or Summon omission.
+**Layers:** CLK-001, ACT-012/034, §7.19/7.21/20.1, Scheduler/Duration/Trigger/Snapshot/Heal/Transaction.
+
+## M-173 — Required Capacity Cost, Persistent Debit and Post-payment Snapshot
+
+**ID:** `M-173`
+**Status:** `MUST_PASS`
+**Fixture:** payer MaxHP10,000, HP9,900, WIL100, ATK200, required15AE plus2% payment-time MaxHP; other contributions remain separately owned. Exercise AE14, legal AE15 and illegal resulting capacity controls.
+**Expected:** failure changes no AE/capacity/HP/episode allowance. Success pays15AE and capacity200 atomically; MaxHP9,800, HP clamps9,800 without Damage/Heal, and post-Cost requested Heal=100+200+294=594. A next independent successful payment reads9,800 and debits196, yielding9,604; ordinary numeric policy governs precision. Leave/death/Revive retain both debit handles; battle reset or explicit governed restoration is required to restore them. Independent growth never rewrites old receipts or refunds Cost. Invalid locked ally after admission causes Heal-local failure with paid Cost/consumed allowance retained. Replay charges/debits/clamps once.
+**Forbidden:** CurrentHP Cost, fake Resource, debit-AE-before-payability, pre-Cost3% basis, Shadow Damage/Reflect, implicit capacity restoration, invented minimum or post-activation mutation standing in for required payment.
+**Layers:** CST-001/009, STA-001/002, §10.3B, P-034/035/031/032, Cost/Stat/Counter/Snapshot/Transaction.
+
+## M-174 — Per-subject Threshold Episode and Failed-funding Reconsideration
+
+**ID:** `M-174`
+**Status:** `MUST_PASS`
+**Fixture:** other allied Character with Chân Ngã enters/stably changes to HP12/MaxHP100; owner has AE14. Repeat independent DoT/health mutations while target stays positive/below12%, then independently grant correct SideAE1.
+**Expected:** one armed episode persists through failed payment; wrong-pool/no-op/rolled-back writes create no retry. Exact SideAE15 enables one paid activation in that same episode. Repeated low mutations after success create none; Heal above12% ends the episode and a later fall to exactly12% creates a fresh one. Effective MaxHP mutation can change the predicate. Own Heal still runs episode-end bookkeeping but cannot recursively pay from its own settlement. Denied/converted/zero Heal and post-admission target invalidity do not unconsume success. HP_ZERO is not a rescue opportunity; fresh lifecycle/presence cannot inherit stale armed work. Eligible Prime+Thần Tính is healable by this Skill; ordinary Summon/non-Chân-Ngã/Q itself is excluded from this watcher.
+**Forbidden:** every-HP-write activation, HP_ZERO prevention, failed-payment consumption, background polling, whole-root suppression, own-Heal reset omission or inherited stale generation.
+**Layers:** TRG-016, §7.16 exact Side-AE, internal State/cap/episode generation, Cost/Health/Lifecycle/Trigger/Transaction.
+
+## M-175 — Final-request Heal Replacement, Regen Identity and Shield-before-floor
+
+**ID:** `M-175`
+**Status:** `MUST_PASS`
+**Fixture:** active converter; admitted ordinary Heal raw400 receives×1.25 PRE_OVERHEAL modifier, final request500; recipient HP300, Standard Shield100. Also exercise fullHP300, no Shield, HP2 and HP1 controls; compare intrinsic recipient Regen and active self-cast Heal with equal numeric amounts.
+**Expected:** request500 cancels restoration without Overheal; TRUE consumes Shield100 first and removes ActualHP298, leavingHP2; discarded102 adds no accumulator credit. With no Shield, Actual298/discard202; full HP still converts500. AtHP2/1, Shield remains eligible but ActualHP0; floor never raises HP1. Intrinsic Regen restores normally; active self-Heal/Passive/Lifesteal/pulse/global/ally Heal converts. Denied Heal creates no positive conversion or fake HEAL_COMMITTED. One protected request terminal retains original Heal and exact converter/Damage refs; no second modifier/formula pass. Equal-floor same-recipient simultaneous converted demands share conserved above-floor HP proportionally; order permutations preserve receipts.
+**Forbidden:** Effective Heal basis, restore-then-damage, Overheal from canceled restoration, self-source exemption, Shield bypass, floor-before-Shield, HP assignment2 or duplicated redirected request.
+**Layers:** HEL-001, DMG-004/010, RES-008, SHP-002, §19.7, Heal/Damage/Shield/State/Result/Transaction.
+
+## M-176 — Exact-instance ActualHP Fold, Fixed Denominator and Strict Threshold
+
+**ID:** `M-176`
+**Status:** `MUST_PASS`
+**Fixture:** converter instanceA applies at recipientMaxHP1,000 (threshold350); later capacity doubles. Exact A converted receipts yieldActual200 then150; independent Damage and another instance/source produce additional receipts. A later positive exact-A receipt adds1.
+**Expected:** D200→350 remains active at equality despite nominal amounts/absorbed Shield/foreign Damage or currentMaxHP2,000. Receipt+1 makesD351 and immediately completes A, sealing requested source Heal105.3 before retiring its counter. Duplicate packet/component projection/redelivery adds no credit/payout. Independent instanceB keeps its own M/D and cannot inherit A's receipts/threshold/terminal identity. Floor-truncated0 does not advanceD. Replay between Damage/fold/removal/payout resumes each joined terminal exactly once; no retired live CounterRef read.
+**Forbidden:** >=350 expiry, live denominator700, Shield/truncation/overkill credit, source/root-wide accumulator, damage after removal attributed to replacement, or lost/doubled credit at retirement.
+**Layers:** DMG-010, HEL-001 completion accounting, State/Counter/Snapshot/Result/Transaction/dependency.
+
+## M-177 — Completion-cause Batch versus Noncompletion Removal
+
+**ID:** `M-177`
+**Status:** `MUST_PASS`
+**Fixture:** instances with sealedD100 and200 complete at one qualified owner boundary; a thirdD300 is cleansed/purged, and separate controls die/leave before threshold or natural expiry. Source is valid. An applicable supported live-HP-conditioned MULTIPLY modifier distinguishes one batch from successive Heals.
+**Expected:** only eligible completions produce one request0.30×(100+200)=90 before ordinary modifiers/restoration; permutation preserves batch/request. Early-threshold completion receives the same payout entitlement. Cleanse/purge/death/leave create no payout/expiry records. Zero/denied/converted payout closes its exact members; ordinary branch invalidity cannot move settlement to another source or replay it. A completed sealed record survives its own normal State retirement until terminal; unrelated later checkpoints/Heals are not coalesced.
+**Forbidden:** sum Effective Heal, two per-instance restoration calls, cleanse-triggered30%, stale live counter, generic on-remove expiry or global coalescing.
+**Layers:** HEL-001, CLK-001, State terminal causes, Snapshot/Result/Heal/dependency/Transaction.
+
+## M-178 — Seeded Distinct Slot Binding and Ordinary Debuff Admission
+
+**ID:** `M-178`
+**Status:** `MUST_PASS`
+**Fixture:** random maximum3 State targets and maximum2 mixed-Damage targets; seeded eligible occupied enemy Slot pool includes immune and nonimmune occupants. Move/replace/vacate occupants after target lock.
+**Expected:** State initial pool admits only ordinary legal Debuff candidates; zero legal pool yields no cast/Cost/target draw. Select distinct eligible Slots using the same seeded set-to-draw law regardless of input enumeration; use all when undersized. State application/Damage reads current occupant, revalidates admission/lifecycle and skips invalid branches without reroll/retarget/refund. A replacement Prime+Thần Tính can reject ordinary State at application; Skill3 Damage does not inherit that State-immunity filter. Locks stay coordinates, never chase original Entities. Save/replay retains draws/locks/current-read checkpoint.
+**Forbidden:** Entity tracking, immunity-piercing Authority inferred from names, duplicate random Slots, implicit target replacement, paid zero-pool cast or shared State/Damage eligibility shortcut.
+**Layers:** TGT-001/006/008, STA-010/011, RNG/Target/State/Damage/Cost/Snapshot.
+
+## M-179 — Common Cast-MaxHP Confirmed-direct-death Growth
+
+**ID:** `M-179`
+**Status:** `MUST_PASS`
+**Fixture:** Skill3 starts with sourceMaxHP10,000; two simultaneous direct mixed-hit recipients become DEATH_CONFIRMED from this direct Damage. Independent source capacity changes after start. Controls include prevention, later DoT/Reaction/Follow-up/child Damage sharing root or Qinghe credit, overkill and post-confirmation Revive.
+**Expected:** two qualifying unique target lives grant+400 from retained M_cast10,000; one grants+200. No iterative+404 or live-basis drift, no CurrentHP increase/Heal. Preserve ordinary PHYSICAL/WILL mitigation/separate conserved receipts in the simultaneous batch. Unconfirmed/prevented deaths and later non-direct causes grant0; same-root/Attribution alone proves no entitlement. Later Revive does not erase a confirmed direct death. Grant/terminal identity replay once, and battle-persistent growth survives later source leave/death/Revive.
+**Forbidden:** all-deaths observer, nominal overkill credit, live/per-death capacity snapshot, source-credit/root-equality substitution or capacity-as-Heal.
+**Layers:** SNP-*, DMG-010/011, DTH confirmed cause, direct Effect provenance, State/MaxHP/Result/Transaction.
+
+## M-180 — Closed Boundary/Capacity/Conversion Normalization
+
+**ID:** `M-180`
+**Status:** `MUST_REJECT`
+**Inputs:** private owner-boundary enum or missing consumed-origin/Mode binding; ACTION_COMPLETED-only claimed as CC coverage; MaxHP Cost encoded as CurrentHP/fake Resource/post-admission Effect or missing legal resulting-capacity/full-payment/reconciliation/retention; conversion using Effective Heal, self-source Regen guessing, retired/foreign State, pre-Shield floor, missing terminal cause/result binding, both restoration and Damage, duplicate same-Heal claims, incompatible mixed floors/unrestricted Damage without allocation law, cyclic payout and stale compatibility hash claiming these profiles are supported.
+**Expected:** reject malformed affected content before partial mutation; unrelated valid content and unprofiled prior-Pilot semantics retain existing laws. New-profile compatibility must bind the validated E.21/F.23/G.22 surfaces and exact owner/lifetime/checkpoints, never revive old rejected defaults. The three pending internal Character decisions remain PROBE_UNRESOLVED rather than compiled guesses.
+**Layers:** Normalizer/IR/compatibility, CLK/CST/HEL/DMG/State, existing owner/Transaction/dependency validation.
+
+## M-181 — Pending Local Subject Order, Reapplication and Source Lifetime
+
+**ID:** `M-181`
+**Status:** `PROBE_UNRESOLVED`
+**Purpose:** preserve three outstanding Qinghe designer decisions without promoting a candidate answer to canon.
+**Fixture:** multiple armed allies share15AE and sequential capacity payment; Skill2 recasts onto a still-active same-source recipient; source leaves/dies before its next owner boundary.
+**Expected:** require explicit local candidate order/requery, same-source reapplication/claimant law and source retention/removal/payout validity before affected executable normalization. Independent one-subject/nonoverlapping/source-valid fixtures above remain unblocked. Do not choose Slot/list/Event order, replace/stack or source cleanup/pause merely from an example. Once the designer locks these decisions, replace this probe with the corresponding declarative obligations and keep unrelated global priority unresolved.
+**Layers:** Character Canon §8, TRG-016, State/Duration/Cost/Heal/Result/lifetime/composition.
 
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
