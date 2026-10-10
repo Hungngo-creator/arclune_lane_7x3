@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-10-E.23
+**Version:** 2026-10-10-E.24
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -46,6 +46,8 @@
 **Revision E.22:** adds bounded State-owned ordinary hit-probability multiplication, explicit all-Damage receive multiplication, external exact-State removal requests at two safe scheduler checkpoints, and finite effect-package/once-per-Field-Presence grant data. Existing State/Effect/Target/Trigger/Transaction/RNG owners execute them; no new Tag, Primitive, Contract ID, callback or Character runtime.
 
 **Revision E.23:** extends only the existing component-transform operation with bounded fraction-to-TRUE splitting at PRE_MITIGATION. Preserve one hit, resolved amount, actual-recipient phase reads, source provenance and conserved derived receipts. Existing whole-type transforms/profiles remain unchanged; no new Tag, Primitive, Contract ID or runtime owner. Opted content requires E.23/F.25/G.24 and fresh normalization/compatibility hashes.
+
+**Revision E.24:** exposes conditional World-History dependencies, profile-driven capture, separate record/restore scopes, strict pre-Natural SnapshotRef selection, bounded non-resource Side restore/receipt-backed partial refund and finite Forced Basic cohorts through existing Snapshot/Effect/System/Action plans. Fresh normalization must preserve exclusion/identity/occupancy/replay operands under F.26/G.25; no new Tag, Primitive, Contract ID or subsystem.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -219,6 +221,7 @@ character:
   class:
   nativeElement:
   axiomIdentities: []
+  historyDependencies: []
   uniquenessIdentity:
   baseStats:
   resources:
@@ -2658,6 +2661,111 @@ Examples:
 ## 13.5 Retained-stat projection
 
 An explicit Snapshot may select `statRetentionProjection: {transitionProfileRef: <typed restore/retention profile>}` for whitelisted Stat/MaxHP fields. SNP-002 evaluates the existing stat-contribution graph with only contributions that the exact profile retains. Capture at the declared death checkpoint before cleanup; include already-earned retained modifiers once, exclude discarded temporary contributions, and preserve resolved value/provenance in SnapshotRef. This pure view does not mutate State/HP, copy modifier objects or imply universal stat ordering. Retention rules must cover every contributing record; unavailable/cyclic/incompatible contribution evaluation rejects instead of falling back to displayed final stats. Later adaptation writes use ordinary retained contributions; do not bake a retained object into BaseStats and then add it again.
+
+## 13.6 World-History dependency and capture profile
+
+History reuses SnapshotSpec and the existing Effect/System plan. A normalized participant, Deck roster definition or acquired capability may declare:
+
+```yaml
+historyDependencies:
+  - providerIdentity: RIVER_OF_LIGHT_AND_SHADOW
+    importPolicy: CONDITIONAL_IMPORT
+    lifetime: COMBAT_INSTANCE
+    accessSide: OWN_SIDE
+    captureProfileRef: ALLIED_PERFORMED_NATURAL_COMPLETED
+    recordScope: HISTORY_RECORD_SCOPE
+    recordedFields: [<finite typed battle-field whitelist>]
+```
+
+This is System/Axiom metadata, not Functional Tags or blanket AXIOM Authority. Resolve dependencies from all setup participants/Deck/bound definitions before gameplay; Field Presence is not required. Missing dependency means no import. A newly acquired normalized dependency uses its authoritative capability checkpoint for first import/baseline; no earlier timeline synthesis. Once imported, retain the single provider until Combat Instance end, independently of source lifetime. The dependency binds Side access separately from provider ownership.
+
+Supported capture profile ALLIED_PERFORMED_NATURAL_COMPLETED binds eligible Side + actually performed Natural root + ACTION_COMPLETED + BEFORE_SSI_CONTINUATION. It includes blocking children/outcomes/settlements in the root's committed view. CC-only opportunity loss and each non-Natural/child/hit/tick cannot create a marker. Pin the root-completion committed view before ordinary post-completion observers/settlements can mutate it; this capture grants no ordering between those observers. Baseline is immutable P-002 data retained by HistoryState at import; P-120 appends qualifying completed-Action markers. Do not require a fabricated ActionRef for baseline or change Primitive identities.
+
+Record fields are a finite typed whitelist, not arbitrary paths. Current HistoryField categories and projections:
+
+| Fields | Recorded projection | SIDE_BATTLE_STATE_NON_RESOURCE restore |
+| --- | --- | --- |
+| BATTLE_MEMBERSHIP, FIELD_PRESENCE, POSITION | exact participant/life/Presence/Side/Position refs | eligible allied layout/life reconciliation |
+| CURRENT_HP, CURRENT_MAX_HP, STAT_CONTRIBUTIONS | coherent health/stat graph/value/provenance | eligible allied battle contributions/health, no double application |
+| SHIELD_LEDGER | exact contribution amounts/source/clocks | eligible allied Shield ledger |
+| STATE_INSTANCES, COUNTERS_STACKS, STATE_DURATIONS | exact owner/source/recipient/instance/clock refs | eligible allied State/counter/duration |
+| COOLDOWN, FORM, CHARACTER_BATTLE_STATE | typed definition/current-life battle data | eligible allied declared fields |
+| SIDE_AE, ACTOR_RAGE, OTHER_RESOURCES | explicit typed pool/provider observations | OBSERVABLE_ONLY; other resources need a separate supported profile |
+| RNG_STATE, REINCARNATION_LEDGER, REINCARNATION_PROGRESS, TRUE_SELF_IDENTITY, NEW_LIFE_IDENTITY, DEPLOYMENT_COST_BAR | optional read-only historical evidence | NON_RESTORABLE |
+
+Select a supported nonempty subset; shape/coverage/provider refs must validate. State graphs retain source identities, not detached final values applied again as modifiers. HISTORY_RECORD_SCOPE never implies HISTORY_RESTORE_SCOPE. Recording resource/world/identity fields grants no mutation permission.
+
+## 13.7 History selection and bounded side restore
+
+An Effect can reference these bounded operands through its existing snapshot/effect plan:
+
+```yaml
+historySnapshotSelection:
+  providerIdentity: RIVER_OF_LIGHT_AND_SHADOW
+  sideRef: OWN_SIDE
+  selector: LATEST_COMMITTED_SIDE_MARKER_STRICTLY_BEFORE_ACTION
+  actionAnchor: CURRENT_NATURAL_ROOT_START
+  fallback: IMPORT_BASELINE
+  resultBinding: SELECTED_HISTORY_SNAPSHOT_REF
+historyRestore:
+  operation: SIDE_SCOPED_HISTORY_RESTORE
+  snapshotRef: SELECTED_HISTORY_SNAPSHOT_REF
+  sideRef: OWN_SIDE
+  restoreScope: HISTORY_RESTORE_SCOPE
+  restoreProfileRef: SIDE_BATTLE_STATE_NON_RESOURCE
+  restoredFields: [<explicit supported eligible battle fields>]
+  exclusionProfile:
+    observableOnly: [SIDE_AE, ACTOR_RAGE]
+    neverRestore: [RNG_STATE, REINCARNATION_LEDGER, REINCARNATION_PROGRESS,
+                   TRUE_SELF_IDENTITY, NEW_LIFE_IDENTITY, DEPLOYMENT_COST_BAR]
+  identityPolicy: SAME_LIFE_NOT_ENTERED_REINCARNATION
+  occupancyPolicy: ATOMIC_SNAPSHOT_LAYOUT_KEEP_NON_REWINDABLE
+  localFailurePolicy: SKIP_INELIGIBLE_BRANCH_CONTINUE
+  eventPolicy: HISTORY_RESTORE_ONLY
+  deploymentRollbackRefund:
+    eligibility: SNAPSHOT_DECK_CURRENT_PAID_POST_SNAPSHOT_DEPLOYMENT
+    amountBasis: COMMITTED_DEPLOYMENT_PAYMENT_RECEIPT
+    fraction: 0.50
+    rounding: FLOOR
+    destination: CURRENT_OWN_SIDE_DEPLOYMENT_COST_BAR
+    overflowPolicy: CLIP_TO_ACTIVE_CAP_DISCARD_OVERFLOW
+    deduplication: EXACT_UNDONE_DEPLOYMENT_PRESENCE_RECEIPT
+```
+
+SIDE_BATTLE_STATE_NON_RESOURCE restores declared allied membership/presence/Position, HP/MaxHP, stats via retained contribution graph, Shield ledger, State/counter/duration/cooldown/form and Character battle state only. Whitelist coverage must exist in the chosen snapshot; unknown fields are rejected, never guessed as full-state copy. Any other resource restore requires its own supported explicit profile; this profile supplies none.
+
+SIDE_AE/ACTOR_RAGE are hard non-restorable in this profile, including caster, enemy and same-life returning Actors. Neither a direct SET/delta/refund nor an indirect resource-cap reconciliation/entry initialization may change their current values. Excluded writes cannot be smuggled through State parameters or restored contribution graphs. DEPLOYMENT_COST_BAR is never copied; the separately authored finite refund operand writes current Bar once from the exact undone paid deployment receipt, not nominal Cost. No generic “undo every delta” operation, custom callbacks or arbitrary rollback language.
+
+Select committed Side Natural markers whose capture checkpoint strictly precedes the current Natural root start. Retain baseline as fallback; don't substitute latest global/enemy/child/current-Action marker. Selection consumes no RNG. Current root capture occurs only after the restore/children/blocking work completes.
+
+Same-life waiting restoration reconciles current battle presence and active waiting eligibility while preserving world ledger/progress/history. Entered-Reincarnation old lives and protected new-life destinations fail locally, without identity rewrite or displacement. Derive layout before staging removals; failed protected branches cannot make allocation depend on iteration. Remove eligible allied creations absent at snapshot without Death, excluding protected non-rewindable Reincarnation results; only an actual paid roster deployment can earn the authored refund. Keep out-of-scope enemy values/contributions untouched.
+
+Normalizer rejects missing/foreign provider, Side/Action/checkpoint/snapshot/receipt refs; unavailable field coverage; RNG/AE/Rage/ledger/identity/Bar copy; implied ordinary Heal/Revive/Return; ambiguous occupancy; duplicate receipt payout; unsupported cap/fraction/rounding/refund eligibility or cross-instance mutation. The current bounded refund profile is FLOOR50% with active-cap clipping, not an arbitrary formula/callback. Raw “full rewind” is not an accepted alias. Lower dependency/capture/selection/restore/refund into existing snapshotPlan/effectGraph/System plans with current compatibility hashes and explicit Contract refs HIS-001–004.
+
+## 13.8 Finite Forced Basic cohort
+
+The existing Action/Target/Resolution plans can author this bounded cohort, independently of History:
+
+```yaml
+forcedBasicCohort:
+  cohortScope: ALLIED_BATTLEFIELD_ACTORS
+  eligibility: BATTLEFIELD_VALID_WITH_EXECUTABLE_BASIC
+  capture: AT_EFFECT_EXECUTION
+  order: SEEDED_ENUMERATION_INVARIANT_PERMUTATION
+  memberAction:
+    actionIdentity: BASIC_ATTACK
+    behavior: FORCED_ACTION
+    naturalActionPolicy: DOES_NOT_CONSUME_NATURAL_ACTION
+    abilityBinding: MEMBER_EXECUTABLE_BASIC
+    targetPolicy: MEMBER_BASIC_DEFAULT
+    snapshotPolicy: MEMBER_BASIC_OWN
+  settlement: EACH_MEMBER_FULLY_TERMINAL_BEFORE_NEXT
+  invalidMemberPolicy: SKIP_NO_REPLACEMENT
+  reactionBoundary: AFTER_EACH_MEMBER_ACTION_REACTIONS_TERMINAL
+  reactionReleaseScope: EXACT_MEMBER_CURRENTLY_DUE_CAUSAL_REACTION_CHAIN
+```
+
+Freeze exact actor cohort once, then use P-001 for each valid member under ACT-041/RES-003. No Character-only pool, common target/stat snapshot, Natural opportunity, class-Natural AE/Rage, Natural-duration tick or own History marker. Basic-only effects retain identity visibility. Preserve ordinary required Basic admission/Costs and declared child Authority/provenance; this profile grants no unprovided waiver. Member invalidity skips locally without adding later entrants. Save/replay retains one permutation/member cursor/terminal ActionRefs; technical enumeration never assigns a different draw/order. This opted profile uses RES-003 AFTER_EACH_MEMBER_ACTION_REACTIONS_TERMINAL: after each independent member completes lifecycle/blocking/Action work, release ordinary Counter/Reaction causally belonging to that exact member and settle the currently due chain to terminal, then revalidate the next frozen member. Do not hold until cohort end or reorder/extend the cohort. Preserve exact Action/cause refs; shared rootActionId alone is insufficient. Lower release scope/terminal dependencies/cursor through existing queue/gate records. The choice is explicit profile data, not a global default. Existing AFTER_DIRECT_EFFECTS_COMPLETE cohorts remain valid when separately authored; missing/unsupported observable boundary or incompatible enclosing gates remains REQUIRED_EXPLICIT. Normalize this finite expansion through the existing Action/Effect dependency graph, not an extra scheduler or Character branch.
 
 # 14. EFFECT SPEC — CENTRAL AUTHORING LAYER
 
@@ -6136,6 +6244,8 @@ E.15's restricted Basic projection lowers to immutable profile data in existing 
 TGT-008 binding resolution is keyed by each existing attack-owner Action/Effect/request-path or triggered-settlement origin in `targetPlan`/`effectGraph`, not by Character or Ability alone. Lower a separately resolved TargetSpec for every attack owner, preserving exact-owner exception provenance and explicit profile/target-data references. Shared data does not copy binding permission; one Ability-level resolved flag cannot stand in for its independently owned attacks.
 
 `DEPLOYMENT_COST_MODIFICATION` and `RETURN_TO_DECK` remain typed Effect semantics in the normalized Effect/deployment execution plan; they do not imply new Primitive IDs.
+
+E.24 lowers §§13.6–13.8 into the existing snapshotPlan/effectGraph/Action/System dependency plans: preserve provider/Side/import checkpoint, capture qualification/coverage, strict Action-start selector/baseline, exclusion/identity/occupancy/event profiles, committed deployment receipt and terminal refund identity, frozen cohort/permutation/cursor and exact member-causal Reaction release/terminal refs. No standalone History service is generated. Reject stale pre-E.24 blanket restore plans; regenerate opted data with current Schema/Contract/Kernel compatibility and validationHash.
 
 None of these plans implies a new Primitive by itself.
 

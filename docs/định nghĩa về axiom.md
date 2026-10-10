@@ -17,182 +17,75 @@ tự động tồn tại trong mọi trận và theo dõi tất cả đối tư�
 Hiện có thể tính:
 Luân Hồi — quản lý thời hạn phục sinh, Chân Ngã và trạng thái bước vào vòng đầu thai.
 Thiên Lôi Vô Tư — mệnh đề Lôi Kiếp không thiên vị phe nào. Phần kiểm tra điều kiện và gây sát thương vẫn do Quy Tắc triển khai, không phải toàn bộ cú sét đều mang Axiom.
-Quang Ảnh Chi Hà — quản lý lịch sử trạng thái và quyền hồi quy.
-Tên chính thức:
-Quang Ảnh Chi Hà
+Quang Ảnh Chi Hà — World-Axiom History provider; ngoại lệ CONDITIONAL_IMPORT, không tự động resident trong mọi trận. Chi tiết ghi nhận/quyền hồi quy ở phần Quang Ảnh Chi Hà dưới đây.
+## Quang Ảnh Chi Hà
 
-Tên gọi thông thường:
-Thời Gian Trường Hà
+**Axiom Identity:** `RIVER_OF_LIGHT_AND_SHADOW`.
+Tên gọi thông thường: **Thời Gian Trường Hà**. Đơn vị dữ liệu: **Quang Ảnh**. Điểm lưu lịch sử: **Mốc Quang Ảnh**.
 
-Đơn vị dữ liệu:
-Quang Ảnh
+Quang Ảnh Chi Hà là **World-Axiom History provider**, dùng chung cho các kit thời gian. Phạm vi World-Axiom không đồng nghĩa mặc định resident trong mọi Combat Instance. Provider áp dụng **CONDITIONAL_IMPORT**:
 
-Mỗi điểm lưu:
-Mốc Quang Ảnh
-Mệnh đề Axiom:
-Axiom — Quang Ảnh Chi Hà: Mọi hành động đã hoàn tất đều để lại một Quang Ảnh không thể bị xóa khỏi dòng thời gian. Quang Ảnh ghi nhận trạng thái của chiến trường tại thời điểm ấy, nhưng chỉ những quyền năng được dòng sông thừa nhận mới có thể gọi trạng thái cũ trở lại.
-Điểm quan trọng:
-Axiom chỉ ghi nhận lịch sử. Kit mới quyết định được quay lại đâu, quay lại cái gì và phải trả giá thế nào.
-Như vậy Axiom không tự động hồi máu, phục sinh hoặc tua ngược trận đấu. Nó chỉ cung cấp cơ sở dữ liệu tuyệt đối cho các kit thời gian.
-Một Mốc Quang Ảnh nên ghi:
-Vị trí và đối tượng đang chiếm từng ô.
-Nhân vật đang trên sân, trong deck, đã chết hoặc đã rời trận.
-Current HP và Max HP.
-Rage cá nhân.
-AE cá nhân nếu có.
-AE pool chung.
-Cost pool.
-Chỉ số hiện tại.
-Buff, debuff và mark.
-Stack, thời hạn, tag và nguồn của mỗi trạng thái.
-Cooldown.
-Trạng thái niệm chú, vận sức, biến hình.
-Tuổi thọ và chủ sở hữu summon.
-Class hiện tại.
-Các bộ đếm nội tại.
-Trạng thái leader.
-Bộ đếm tử vong và Luân Hồi.
-Thứ tự hành động đang chờ.
-Không ghi:
-Animation.
-VFX.
-Cài đặt thiết bị.
-Trạng thái collection ngoài trận.
-Nâng sao, awaken hoặc trang bị vĩnh viễn.
-Thời điểm tạo snapshot:
-Một nhân vật bắt đầu hành động.
-→ mọi hit, follow-up bắt buộc, phản ứng và hiệu ứng phát sinh được resolve.
-→ toàn bộ chuỗi kết thúc.
-→ ACTION_COMMIT.
-→ Quang Ảnh Chi Hà tạo một Mốc Quang Ảnh.
-Bao gồm hành động của:
-Nhân vật collection.
-Leader.
-Summon.
-NPC.
-Boss.
-Kiếp Thân.
-Creep có lượt hành động riêng.
-Không tạo mốc riêng cho:
-Từng hit của multihit.
-Từng lần phản damage.
-Mỗi stack được áp.
-Drone chỉ là VFX.
-Một vật thể không thực hiện hành động độc lập.
-Phải có hai loại quay ngược
-Nếu không tách, game sẽ đầy nghịch lý và exploit.
-1. Hồi Quy Cá Thể
-Chỉ đưa một mục tiêu về trạng thái cá nhân trong Mốc Quang Ảnh:
-HP.
-Rage.
-Chỉ số.
-Buff/debuff/mark.
-Cooldown.
-Hình thái.
-Nó không mặc định:
-Hoàn lại Cost.
-Đưa đơn vị khác về deck.
-Hủy damage mục tiêu từng gây.
-Phục hồi toàn bộ chiến trường.
-Trả AE pool chung.
-Vị trí cũ chỉ được phục hồi nếu ô ấy đang trống. Nếu ô bị chiếm, có thể:
-Giữ nguyên vị trí hiện tại.
-Đưa mục tiêu đến ô hợp lệ gần nhất.
-Đưa vào một ô Dòng Thời Gian tạm thời.
-Không nên đẩy A về deck và hoàn Cost trong một hồi quy cá thể, vì sẽ có exploit:
-Triệu hồi A.
-A gây damage và dùng skill.
-Quay B về ô cũ.
-A về deck và được hoàn Cost.
-Damage A đã gây vẫn còn.
-Như vậy player được dùng A miễn phí.
-2. Hồi Quy Chiến Trường
-Khôi phục toàn bộ global checkpoint.
-ví dụ: A về deck.
-Cost triệu hồi A được hoàn lại.
-B sống lại tại ô 7.
-Damage, buff, cái chết và mọi thay đổi sau mốc đều bị hoàn tác.
-AE, Rage, Cost và vị trí đều trở lại đúng mốc đó.
-Cost hoàn lại vẫn bị clamp:
-Cost sau hồi quy = min(Cost tại snapshot, 30)
-Nếu thời điểm snapshot có 28 Cost thì trở lại 28, không phải “cộng lại Cost đã tiêu” rồi vượt cap.
-Loại Hồi Quy Chiến Trường nên cực hiếm, thường chỉ dành cho:
-Prime.
-Ultimate UR rất đắt.
-Một cơ chế chỉ kích hoạt một lần mỗi trận.
-Hoặc phải phá hủy một Mốc Quang Ảnh sau khi dùng.
-Quan hệ với Luân Hồi:
-Đã chết nhưng chưa vào Luân Hồi:
-Có thể hồi quy về trước cái chết.
+- Combat Instance không chứa nội dung có normalized dependency vào River: không import.
+- Participant, Deck hoặc definition có dependency: import lúc Combat Instance initialize, trước gameplay, kể cả Character thời gian đang trong Deck.
+- Capability xuất hiện động giữa trận: import tại checkpoint đó và tạo baseline tại thời điểm import; không giả tạo lịch sử trước đó.
+- Một khi import, giữ provider tới hết Combat Instance dù Character truy cập nó chết/rời sân. Import có thể có Presentation event/VFX; Presentation không quyết định Kernel timing.
 
-Đã vào Luân Hồi:
-Quang Ảnh vẫn tồn tại như một bản ghi,
-nhưng không thể gọi Chân Ngã trở lại đời cũ.
-Tức là:
-DEATH_CONFIRMED
-→ vẫn còn cửa sổ phục sinh/hồi quy
-→ đủ bốn cái chết hợp lệ xảy ra sau đó
-→ ENTERED_REINCARNATION
-→ snapshot cũ mất quyền tái hiện Chân Ngã.
-Điều này giữ cho Luân Hồi có giá trị. Nếu Thời Gian có thể tùy tiện kéo người đã vào Luân Hồi trở lại, toàn bộ luật “chết quá lâu không thể phục sinh” sẽ mất ý nghĩa.
-Quay về trước cái chết không được tính là phục sinh:
-Phục sinh:
-Cái chết đã xảy ra, sau đó người chết trở lại.
+Lậu Khắc chỉ là một Character có quyền truy cập; River không thuộc riêng Character và không ban AXIOM Authority cho mọi Skill của họ. Reuse Snapshot Primitive, HIS Contracts và generic History Runtime hiện hành; không tạo History subsystem khác.
 
-Hồi quy:
-Dòng trạng thái trở về thời điểm trước khi cái chết được xác nhận.
-Tuy nhiên, nếu một Axiom cá thể ghi:
-Sau khi DEATH_CONFIRMED, tồn tại này không thể trở lại bằng bất kỳ con đường nào.
-thì Quang Ảnh Chi Hà cũng không được tự động kéo nó về; đây là xung đột Axiom trực tiếp.
-Summon không có Chân Ngã vẫn có thể được khôi phục bằng hồi quy, vì nó không bước vào Luân Hồi. Nó chỉ là trạng thái chiến trường được dựng lại.
-Quan hệ với Thần Tính
-Nên tách ghi nhận với can thiệp.
-Ghi nhận
-Quang Ảnh Chi Hà snapshot tất cả đối tượng hợp lệ, kể cả Prime có Thần Tính.
-Việc được ghi lại không phải:
-Buff.
-Debuff.
-Mark.
-Hiệu ứng có lợi hoặc có hại.
-Nên Thần Tính không chặn việc snapshot.
-Gọi lại trạng thái
-Khi một kit muốn hồi quy Prime:
-Nếu hồi quy chỉ mang Quy Tắc, Thần Tính có thể ngăn phần can thiệp từ ngoại nguồn.
-Nếu kit mang Axiom, tiến hành phán định Axiom trực tiếp.
-Nếu là Hồi Quy Chiến Trường do chính Thiên Điều thực hiện, phải ghi rõ Thần Tính có được miễn hay không.
-Tao nghiêng về:
-Thần Tính không miễn nhiễm Hồi Quy Chiến Trường toàn cục, vì đó không phải trạng thái được áp lên Prime mà là toàn bộ chiến trường trở về một Mốc Quang Ảnh.
-Nhưng Hồi Quy Cá Thể từ kẻ khác vẫn có thể bị Thần Tính ngăn.
-không khôi phục RNG mặc định.
-Quang Ảnh khôi phục:
-Trạng thái.
-Vị trí.
-Tài nguyên.
-Sinh tử.
-Nhưng không bắt tương lai phải diễn lại giống hệt.
-Câu lore:
-Dòng sông có thể đưa vạn vật trở về bờ cũ, nhưng không bắt chúng bước lại đúng dấu chân xưa.
-Sau khi hồi quy:
-Skill random có thể chọn mục tiêu khác.
-Crit có thể khác.
-Class random có thể khác nếu được roll lại sau mốc.
-Hai phe có thể hành động khác.
-Nếu snapshot cả RNG seed, player có thể biết chắc một đòn sẽ crit hoặc random ra mục tiêu nào rồi tua lại để khai thác. Chỉ một kit đặc biệt liên quan đến định mệnh tái diễn mới nên buộc kết quả lặp lại.
-Vấn đề hiệu năng
-Lore có thể nói dòng sông lưu mọi Quang Ảnh, nhưng engine không cần sao chép toàn bộ trận đấu sau mỗi hành động.
-Dùng:
-Một snapshot nền.
-+
-delta sau từng hành động.
-Ví dụ sau hành động chỉ lưu:
-A mất 200 HP.
-B nhận 1 mark.
-C từ ô 4 sang ô 5.
-Cost giảm từ 18 xuống 10.
-Summon D được tạo.
-Khi rewind, engine áp ngược các delta.
-Nên có một cửa sổ truy cập:
-Giữ tối đa 12–20 Mốc Quang Ảnh gần nhất
-hoặc
-toàn bộ một vòng hành động.
-Axiom về lore vẫn ghi nhận toàn bộ lịch sử. Nhưng kit chiến đấu chỉ được quyền truy cập những mốc còn nằm trong Tầm Hồi Quang. Những mốc đặc biệt có thể được một Prime chủ động đóng neo để giữ lâu hơn.
+### Baseline và capture profile
+
+At import tạo immutable **BASELINE**. Sau đó capture checkpoint theo profile, không theo luật global “snapshot sau mọi complete Action”. Current Lậu Khắc Side-access profile:
+
+```text
+actually performed allied Natural root
+→ blocking child/outcome/settlement hoàn tất
+→ ACTION_COMPLETED
+→ capture committed Side Mốc Quang Ảnh
+→ SSI tiếp tục
+```
+
+CC-lost Natural opportunity không thực hiện Action, Forced/Follow-up/Counter/Reaction, child riêng, mỗi hit và State tick không tạo checkpoint riêng. Blocking work đã nằm trong resulting state của root.
+
+Mốc cần thiết cho selection phải được giữ immutable/available, gồm baseline. Cách lưu snapshot/delta là implementation detail; không được dùng inverse delta để vượt restore whitelist hoặc tùy tiện bỏ mốc còn được gameplay truy cập.
+
+### Ghi nhận khác quyền hồi quy
+
+**HISTORY_RECORD_SCOPE ≠ HISTORY_RESTORE_SCOPE.** Profile có thể ghi battlefield/Deck/waiting membership, Position, CurrentHP/CurrentMaxHP, effective stats/stat contributions, Shield/contribution ledger, Buff/Debuff/Mark, counter/stack/duration, cooldown/form/Character battle state, Side AE, actor Rage và other resources cùng source/provenance. Historical observation không cấp quyền mutation.
+
+Đối với Nghịch Lưu / **SIDE_BATTLE_STATE_NON_RESOURCE**:
+
+- Eligible allied HP/MaxHP/State/Position/membership và battle fields đã khai báo có thể restore.
+- Side AE và mọi actor Rage: **OBSERVABLE_ONLY / NON_RESTORABLE**, kể cả caster. Current values tại restore barrier giữ nguyên chính xác; không SET snapshot, tạo delta, refund Cost, undo gain hoặc reset/clamp qua Field-entry/derived resource logic.
+- RNG stream/cursor: **NON_RESTORABLE**; dòng sông lưu state history, không rewind future destiny.
+- Reincarnation ledger/progress/death order và True-Self/new-life identity: **NON_RESTORABLE**.
+- Side Deployment Cost Bar: **NON_RESTORABLE** từ snapshot.
+
+```text
+AE_before_restore == AE_after_restore
+Rage_before_restore(actor) == Rage_after_restore(actor)
+```
+
+AE/Rage có mặt trong Quang Ảnh vẫn chỉ là dữ liệu quan sát. Không có exception cho Ultimate caster; Rage đã tiêu không được hoàn.
+
+### Bounded History Restore
+
+Nghịch Lưu chọn latest committed allied Side Mốc **strictly before current Ultimate Natural Action**, fallback BASELINE nếu chưa có previous Natural snapshot. Current Ultimate chỉ có thể capture resulting state sau completion, không ghi đè input nó đang đọc.
+
+Restore phe đồng minh bằng **SIDE_SCOPED_HISTORY_RESTORE** typed transaction. Enemy HP/State/Sa/Position/resources giữ nguyên. Historical state changes không là ordinary Damage/Heal/Overheal/HP Loss/Cleanse/Buff apply/Debuff apply/Revive/Return-to-Deck/deploy và không kích hoạt các trigger đó; explicit HISTORY_RESTORE observation có thể đọc cause riêng. Không xóa trace hay un-emit Event cũ.
+
+Allied same life DEATH_CONFIRMED còn Waiting, chưa ENTERED_REINCARNATION, có thể về snapshot alive/on Field bằng HISTORY_RESTORE, không ON_REVIVE. Reconcile active battle/waiting eligibility nhưng không rewind ledger/progress. Old life đã ENTERED_REINCARNATION local fail; giữ Chân Ngã/new life/progress hiện tại và tiếp tục other eligible branches. Không thiết kế lại Luân Hồi foundation.
+
+Derive desired allied snapshot layout trước, stage out rewindable post-snapshot occupants, commit occupancy atomically. Protected Reincarnation result chiếm old-life Slot làm old-life branch fail; không displace new life hoặc chọn owner theo iteration. Eligible allied entity created after snapshot và absent trong snapshot bị remove bằng HISTORY_RESTORE reconciliation, không DEATH_CONFIRMED/summon-death. Protected non-rewindable Reincarnation results không thuộc removal branch này.
+
+### Character-authored deployment refund riêng
+
+Nếu roster Character ở Deck tại snapshot, nay Field qua paid DEPLOY_FROM_DECK sau snapshot và Presence đó bị undo, restore về Deck. Kit có thể author partial refund riêng từ **actual committed deployment payment receipt**. Current Lậu Khắc lock:
+
+```text
+floor(actualCommittedDeploymentCost ×0.50)
+15→7; 14→7; 9→4; 7→3; 1→0
+```
+
+Cộng vào current Side Deployment Cost Bar theo active cap; overflow mất. Không dùng Base/Current/nominal cost, không copy snapshot Bar, không double refund. Return/refund/undone receipt commit cùng transaction; replay không trả lại lần hai. Unpaid creations không nhận refund. History return không phải ordinary RETURN_TO_DECK cause.
+
+Phần này thay thế mọi proposal cũ về rewind AE/Rage/Cost, ACTION_COMMIT sau mọi Action, full-field rollback mặc định hoặc Thần Tính exemption suy từ ví dụ. Nó không bổ sung thiết kế Thiên Lôi, Thần Tính, Duy Nhất hay cơ chế Luân Hồi ngoài interaction đã khóa. Exact eligibility/conflicts còn lại dùng Contract hiện hành, không suy Authority từ tên Axiom.

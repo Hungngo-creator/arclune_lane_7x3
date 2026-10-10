@@ -1,6 +1,6 @@
 # ARCLUNE — MODE PROFILES
 ## Chặng H — Mode-Specific Runtime Profiles
-**Version:** 2026-10-08-H.3
+**Version:** 2026-10-10-H.4
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`, `06_KERNEL_RUNTIME.md`
 **Purpose:** define which runtime rules are active in each game mode without forking Character identity, Tag semantics, Primitive meanings, or Kernel foundations.
@@ -12,6 +12,8 @@
 **Revision H.2:** binds admitted post-death reserved-Slot waits to SSI cadence without Actor Action/duration/class gain. SELF_LEADER_PENDING_RECOVERY protects roster extinction and only the exact Leader's own admitted entitlement; another Actor cannot defer terminal Leader loss. No Character-ID branch or continuous-mode substitute clock is introduced.
 
 **Revision H.3:** admits explicitly bound multi-part bodies and non-consuming real SSI pass contacts in Main. Player-selected Leader form restrictions use existing Action-form data; postmortem consumed waits and ordinary scheduling remain unchanged.
+
+**Revision H.4:** binds conditional River import and performed-Natural Side capture to existing Main initialization/completion/SSI gates; clarifies CC loss/Forced Basic negative space and historical entry versus ordinary deployment. No unrelated Mode or Authority/lifecycle foundation change.
 
 # 0. MODE PROFILE PRINCIPLE
 
@@ -609,12 +611,23 @@ Normal effects do not automatically use progression adjudication.
 
 # 19. TURN-BASED HISTORY PROFILE
 
-Quang Ảnh Chi Hà can record:
-> one historical snapshot after each complete Action.
+TURN_BASED_MAIN binds RIVER_OF_LIGHT_AND_SHADOW as CONDITIONAL_IMPORT under HIS-001, not automatic residence. After resolving participant/Deck/definition profiles at setup, import normalized dependencies before gameplay and capture immutable baseline; no dependent content means no River. First dynamic dependency imports/baselines at its checkpoint only. Imported provider persists until instance end, independently of time Character death/leave.
 
-This is independent of animation.
+For a Side with ALLIED_PERFORMED_NATURAL_COMPLETED access:
 
-Exact time-regression semantics remain Contract-heavy.
+```text
+actually performed allied Natural root
+→ required blocking child/outcome/settlement terminal
+→ ACTION_COMPLETED → capture Side Mốc → SSI continues
+```
+
+CC-lost opportunity creates no marker. Follow-up/Counter/Reaction/Forced/non-Natural/each child/hit/tick creates no own marker. Required children are part of the completed root state. Current Ultimate reads only a committed marker strictly before its Natural start (baseline fallback), then may capture resulting state after completion. Presentation never owns this timing.
+
+TIME_STOP uses ACT-012: consumes exactly one next Natural opportunity, performs no Basic/Skill/Ultimate, advances SSI and global Turn Boundary, with no Action-generated resources or History marker. Explicit follow-on two-opportunity TIME_IMMUNITY uses the target's later opportunity clock; CC counts, the stopped opportunity and non-Natural work do not. This is kit profile binding, not a new global control default.
+
+A finite Forced Basic cohort uses ACT-041/04§13.8: freeze eligible battlefield Actors with executable Basics, seeded permutation, one fully resolved BASIC_ATTACK/FORCED_ACTION/non-Natural per member; invalid member skips without replacement. No Natural opportunity/SSI advancement, Natural class AE/Rage, Natural timer tick or own History marker. Basic-only mechanics may observe identity. For the explicit Thuận Lưu cohort profile, each independent member completes mandatory lifecycle/blocking/Action work, then its ordinary Counter/Reaction chain reaches terminal before next-member revalidation. Reactions do not reorder the frozen cohort; invalid later member skips/no replacement. This local boundary does not become a global multi-Action default.
+
+Restore scope/exclusions/atomic occupancy/lifecycle and receipt-backed partial refund belong to HIS/Kernel. Main's full-Rage DEPLOY_FROM_DECK rule and ordinary Return triggers do not run for HISTORY_RESTORE. Side AE/all actor Rage stay current; Bar is not snapshot-restored, only the declared refund clips at its resolved active cap. This binds no numeric global cap or continuous-Mode timer conversion.
 
 ---
 
