@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-09-G.22
+**Version:** 2026-10-10-G.23
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -45,6 +45,8 @@
 **Revision G.21:** executes E.20/F.22's opt-in class-AE prerequisite and legal selectable-recipient constraint through existing Scheduler/Trigger/dependency and State/Target owners. Retains hook/selection/State provenance and terminals for replay, preserving unopted ordering and original attack bindings. No new service, Character branch or priority registry.
 
 **Revision G.22:** executes E.21/F.23 profiles through existing Scheduler/Duration, Trigger/Target/Snapshot/RNG/Action, Cost/Stat, State/Heal/Damage/Shield/Counter/Result/Transaction owners with exact generation, frozen local candidate order, duration-only refresh, source cleanup, battle retention and replay terminals. No Character branch, new service or priority registry.
+
+**Revision G.23:** consumes E.22/F.24 through existing State/Hit/Target, Damage/modifier/Shield/Transaction, Scheduler input and Definition/Trigger/RNG/Effect owners. Exact State/window/request/presence/package refs retain finite work and replay terminals; no Character branch, new service, callback or global priority.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -249,6 +251,8 @@ validationHash
 - typed Cost-payment Result Binding plan.
 
 None of these plans creates a new Primitive by itself.
+
+E.22 adds only bounded fields to existing plans: State/target-plan hitProbabilityModifier; effectModifierPlan's explicit all-Damage receive phase; Scheduler/State removal-input binding; field-State grant membership and finite Effect-package definition/selection refs. Missing finite pool content is non-executable CONTENT_TBD rather than an invented no-op plan. Reject outdated compatibility/validation hashes for opted-in data; current E.22/F.24/G.23 is required. Existing unprofiled IR remains unchanged.
 
 Kernel may reject IR if:
 - version mismatch;
@@ -1386,6 +1390,12 @@ Retain owner/instance/grant/State/dependency and cancellation/terminal cursor in
 
 An opted-in later-than-activation Duration record stores activation/latest-owner-grant serial, source/State/window revision, remaining count and terminal cursor. Ignore casting/earlier/nonmatching boundaries; decrement at a later qualifying global boundary even after CC. Replacement retires its old registrations; source lifetime governs removal/pause. Save/replay preserves the original origin and cursor so delivery cannot heal/decrement/expire twice or redirect an old generation. Unsupported Mode provenance and undeclared noncommuting work reject.
 
+## 19C. External exact-State removal input
+
+04§19.9 → ACT-034/CLK-001 → existing Scheduler input tape, State/P-022 and Transaction owners. Accept only a supported key/profile for an exact active State/owner/battle/Combat Instance/generation; retain the authoritative accepted input serial, origin opportunity/checkpoint, pending/terminal status and removal cause on existing scheduler records. Enemy-opportunity input queues until its next safe post-terminal boundary. Own-start input closes before that State's CC read/consumption. Presentation never mutates State synchronously; no wall-clock callback/Action request creates combat ordering.
+
+At the finite checkpoint, revalidate exact State identity/lifecycle, commit one permitted removal with EXTERNAL_REQUEST cause, and close/coalesce request records. Already removed/replaced/dead/left subjects close as stale no-op; no request redirects to a new sleep/owner generation. Atomic Effect/batch, mandatory lifecycle/result and held Action work finish before boundary dispatch. Removal retires only this State's rules/clocks; independent battle progress survives per retention. Continue the same original opportunity after own-start settlement, check other control, and never refund consumed opportunities/grant Action AE/Rage. Preserve accepted/checkpoint/State/terminal refs across save/resume; duplicate delivery cannot remove twice. Unsupported competing finite graphs reject without input/list/Event priority.
+
 # 20. TURN BOUNDARY
 
 Canonical:
@@ -1962,6 +1972,8 @@ Effect reaches declared phase
 ```
 
 For DMG-034 reflected scalar Damage at FINAL_DAMAGE_REDUCTION, pass packetKind REFLECTED_DAMAGE without an ordinary component type. Existing source/recipient/Condition/value-query/multiplicative law remains; a component filter cannot match that scalar and reflected-only incompatible phase data is rejected. Omitted packet-kind filter adds no restriction; existing explicit component scopes stay intact. No synthetic TRUE component or new modifier service.
+
+EXPLICIT_DAMAGE_RECEIVE_MULTIPLIER instead requires ALL_DAMAGE and a finite factor in[0,1], with no component/packet restriction. Evaluate it for every supported incoming component/scalar at the final Shield-input checkpoint, including TRUE or sealed packets entering directly there. Combine matching scoped factors once, preserve original sealed basis and record transformed demand separately; no double pass/per-rule rounding. Resolve all simultaneous participants from one protected phase view before shared Shield/HP allocation. State wake/removal follows the subsequent stable lifecycle checkpoint and cannot alter siblings' sealed demand. Cost/HP-Loss/Heal paths remain outside this phase. Unsupported insertion paths fail closed; omission preserves prior Damage behavior.
 
 ### Source scope
 
@@ -2970,6 +2982,8 @@ LOCK_ENTITY_IDS keeps the legal locked Entity through movement before impact and
 
 Target Lock and Hit Admission are separate runtime stages.
 
+04§19.8 → HIT-002/003 → existing State rule index, Target/Hit resolver and RNG/Result context. At one hit's validated recipient checkpoint, retain exact attack-owner identity/immutable shape/non-random single-recipient selection and active matching State/window revisions. Query the Mode/System's ordinary probability, multiply by the canonical product of qualifying factors, and make **one** ordinary decision/draw for the hit, shared by mixed components. A same-source refreshed State contributes one factor; old window cursors/registration rebuilds contribute none. GUARANTEED bypasses this ordinary step while preserving special denial/admission law. Missing probability/decision interfaces reject instead of supplying hit math. Retain original/modified probability, matching rules and decision evidence through replay; no target movement/rebinding or Damage reduction.
+
 Conceptual flow for effects using Hit Admission:
 resolve / reuse TargetSetRef
 → apply declared target invalidation/current-recipient validation
@@ -3076,6 +3090,7 @@ Damage Profile
 → selected-stat Penetration and mitigation
 → scoped FINAL_DAMAGE_REDUCTION phase for eligible non-True components
 → explicitly authored FINAL_DAMAGE_MULTIPLIER for selected components, including True
+→ explicit ALL_DAMAGE receive multiplier at final Shield input
 → combine eligible post-mitigation components
 → Shield interaction
 → Current HP-bound result
@@ -3179,6 +3194,7 @@ raw Physical
 → ARM mitigation
 → Final Damage Reduction
 → explicitly authored Final Damage Multiplier (DMG-008 / §28A)
+→ opt-in ALL_DAMAGE receive multiplier (DMG-008 / §28A)
 → Shield
 → HP
 ```
@@ -3207,6 +3223,7 @@ raw Will
 → RES mitigation
 → Final Damage Reduction
 → explicitly authored Final Damage Multiplier (DMG-008 / §28A)
+→ opt-in ALL_DAMAGE receive multiplier (DMG-008 / §28A)
 → Shield
 → HP
 ```
@@ -3233,6 +3250,7 @@ raw True
 → bypass RES
 → bypass generic/final Damage Reduction
 → explicitly authored Final Damage Multiplier (DMG-008 / §28A)
+→ opt-in ALL_DAMAGE receive multiplier (DMG-008 / §28A)
 → Standard Shield unless Shield Piercing
 → HP
 ```
@@ -3646,6 +3664,20 @@ parameters
 For a State/stat contribution selecting baseline EXCLUDE_THIS_SOURCE_FAMILY, derive its family from existing source-owner/origin Ability/origin Stat Effect refs and evaluate RES-007 through the existing P-030/stat contribution path. Read the ordinary contribution view with all matching family instances/stacks excluded, resolve other contributions under their declared law, then apply this family's bounded declared operation/stack once. Use the same authoritative State/count/version view; reject ambiguous provenance, feedback cycles or unsupported composition before producing a stat result. Constant multiplicative factors use an order-independent product under ordinary numeric law; no final-stat self read or BaseStat rewrite.
 
 Snapshot Runtime consumes that already resolved stat; index reconstruction, save/resume or repeated reads cannot add another factor or reset the retained count. Existing State/modifier refs and lifetime/replay records suffice; no orb Entity, stat-family manager or universal modifier priority. Unauthored baselines retain their previous path.
+
+Existing capped stack/threshold and hard-control compositions retain the protected pre-change Snapshot, committed State mutation result, source/recipient/cycle and one terminal threshold-attempt ref on their State/DAG records. Use shared hit/packet commit identity when gameplay grants once per hit; component receipts do not create multiple stack candidates. A legal Shield-only/zero-HP hit still has admitted committed hit evidence; MISS/rejection/abort does not. State Admission rejection never rewinds already committed Damage/stacks. Normal-full-expiry-only cleanup consumes exact linked refs/causes after that opportunity is consumed; early removal/lifecycle cleanup cannot masquerade as full expiry or wake a surviving hard control by changing visible stacks.
+
+ACT-012/CLK-003 count consumed owner opportunities, including lost ones, with the authored start/expiry policy; finite State-owned counter/stat work commits once per original grant without creating/completing an Action. A declared later-than-activation profile excludes its creating Action/opportunity; non-Natural Actions do not count. Keep earned BATTLE_SCOPED additive contributions on the stable participant separately from the active field-scoped control State; rebuild from retained count/contributions once across death/Revive/leave/Return/redeploy, never reset at wake or compound percentages. Ordinary explicit transition discard/removal and battle-end retirement still govern. These are existing State/stat/Duration/Trigger/Transaction plans, not a control/growth service.
+
+## 61A. Field-State finite package grants
+
+04§19.10/§72.1 → POS-006/CLK-001/STA-010/014 → existing Definition Registry, State/Presence/Trigger, Target/RNG, Effect/DAG/Transaction and Result owners. Registry stores only validated immutable finite package definitions/pool distributions. Existing presence records expose their retention cycle refs; actual entry creates a new ref, redundant active write/reconstruction/binding does not. Do not infer it from Slot/lifeSerial/Event order or create a second writable presence truth.
+
+The field State retains source-family/Side anchor, independent owner/lifetime, activation/global-boundary cursor/revision and processed grants keyed by exact presence-cycle ref. Grant records retain frozen membership/pool/selected-package/draw, original grant identity and per-Effect finite terminal/dependency refs. Creation captures current committed membership once; later actual entry supplies one new cycle. Protect the first selection/processed write so duplicate registration/entry publication cannot select twice, then execute the selected graph through normal Effects. Zero/denied/local failure does not erase processing or retry. No boundary polling/roll; no new package per removed effect. Stable draw keys derive from field instance/presence/grant and immutable entry refs, preserving enumeration/replay invariance.
+
+Persistent State grants index their exact field instance plus shorter entry-duration bound, using existing State lifetime/termination refs. Field termination retires linked States with its cause, not every recipient State/Shield or committed immediate Effect. Same-source replacement protects retirement and fresh-field creation in the existing transaction; retain stable runtime-source family across source-presence transitions, then use new instance/grant/cursor identities. Old source death/leave cannot clean an independently owned surviving field. Source-independent progression ticks global boundaries, excluding the creating opportunity's closing boundary; dead source personal clocks are irrelevant. Explicit instance/battle termination retires field, indexes/pending grants and lifetime work.
+
+Save/resume retains field/grant/selected-draw/linked-State and processed/terminal evidence until the existing replay horizon; index rebuilding does not reroll or restore retired members. New true presence is eligible even for the same Entity; different source fields remain distinct. In-flight stale/replaced instance work closes under its declared failure/lifetime, never targets a fresh instance. Noncommuting package/field graphs need an actual supported dependency law before mutation; no Entity/Slot/list/Event order or RNG stream order supplies it. Missing package content prevents selected execution while structural normalization may retain CONTENT_TBD refs. No Field/Dream manager, package VM, callback or new Primitive is required.
 
 ---
 

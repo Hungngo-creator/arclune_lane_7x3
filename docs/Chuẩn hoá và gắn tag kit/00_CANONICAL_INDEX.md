@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-09-INDEX-30
+**Version:** 2026-10-10-INDEX-31
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-09-INDEX-30`
+**Version:** `2026-10-10-INDEX-31`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-09-E.21`.
+**Version:** `2026-10-10-E.22`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-09-F.23`.
+**Version:** `2026-10-10-F.24`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-09-G.22`
+**Version:** `2026-10-10-G.23`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-09-I.24`
+**Version:** `2026-10-10-I.25`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -142,6 +142,8 @@ Authored Character data không nên tham chiếu raw engine code.
 ## 2A. Current Character canon navigation
 
 In `docs/canon kit/`:
+
+- **Mộng Yểm / Meng Yan** → `docs/canon kit/Mong_Yem_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw A.1 cleanup preserves State labels; locked mixed Slot attacks, capped hit-stack hard Sleep, Basic-only probability protection, self-Sleep battle growth/TRUE protection/safe wake, frozen Skill3 ignore/spread and independent once-per-Presence field composition. E.22/F.24/G.23 add four bounded existing-owner profiles; I.25 M-184–M-194 cover new boundaries and reuse prior regressions. Sole content blocker: `CONTENT_TBD / DESIGNER_POOL_DEFINITION_REQUIRED` for exact finite allied/enemy Dream effect-package pools; structural orchestration and other kit graphs remain normalizable. No new Tag/Primitive/Contract ID or implementation code.
 
 - **Lạc Thanh Hà / Qinghe** → `docs/canon kit/Lac_Thanh_Ha_Clarified_Gameplay_Canon.md` R2 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Complete Passive/three-Skill/Ultimate kit locks consumed-owner global boundaries including CC, per-ally one-success episodes, payment-time persistent MaxHP Cost/post-Cost Heal, seeded Slot Debuff, final-request Heal→TRUE/Shield/floor2, exact-instance strict35% threshold/cause-only30% payout, common-M_cast direct-death growth and full-field snapshot Heals. Final decisions freeze all armed Skill1 HP% at one checkpoint with lowest-first/seeded ties and live per-Reaction payment; same-source Skill2 REFRESH preserves initial M/D while resetting only duration; confirmed source death/actual leave/Return cleans all owned instances and uncommitted payouts, with no freeze/restore and no temporary-absence cleanup. B.4/E.21/F.23/G.22 bind these through existing owners; I.24 M-172–M-183 cover valid/rejection/replay boundaries. No internal gameplay decision remains pending; unsupported cross-source conversion/global-priority/Mode interactions and missing roster metadata remain nonblocking. No new Tag/Primitive/Contract ID or implementation code; no unrelated raw entry overwritten.
 

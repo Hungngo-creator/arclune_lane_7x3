@@ -197,9 +197,8 @@ char trong mục A là dành cho player, vào gacha trong tương lai, mục B l
 A. Các char cho player gacha.
 1) [SSR] ÁC MỘNG NGỌT NGÀO – MỘNG YỂM (Meng Yan), Class: Mage
 1. NỘI TẠI: Mê Ca Dẫn Thụy
- * Tags: [Nội Tại], [Debuff: Mê Hoặc], [Khống Chế: Ngủ], [Cộng Dồn], [Không Thể Tẩy Xóa], [VFX: Biến Đổi].
  * Logic:
-   * Trigger: Mỗi khi Mộng Yểm gây sát thương (Đánh thường / Skill 1 / Skill 3).
+   * Trigger: Mỗi khi Mộng Yểm gây sát thương (Đánh thường / Skill 3).
    * Hiệu ứng: Gắn 1 stack [Mê Hoặc] lên mục tiêu.
    * Cơ chế Ngủ (Sleep):
      * Check: Khi đạt đủ 3 Stack.
@@ -241,7 +240,6 @@ A. Các char cho player gacha.
      * Bỏ qua 30% ARM và 30% RES.
      * Lan truyền: Lấy 1 stack [Mê Hoặc] từ mục tiêu chính -> Gắn sang 2 Kẻ Địch Ngẫu Nhiên khác. (Không vượt quá cap 3 stack của nạn nhân mới).
 6. ULTIMATE: Thế Giới Thứ Hai
- * Tags: [Tự Động], [Toàn Sân], [Địa Hình: Biến Đổi], [RNG: Buff/Debuff], [Hiệu Ứng Vĩnh Cửu (Trong Turn)].
  * Logic:
    * Trigger: Đầy Nộ (Auto-cast).
    * Hiệu ứng Môi Trường (Field Effect):

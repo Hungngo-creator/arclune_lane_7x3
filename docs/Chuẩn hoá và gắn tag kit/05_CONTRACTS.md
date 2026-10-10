@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-09-F.23
+**Version:** 2026-10-10-F.24
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -44,6 +44,8 @@
 **Revision F.22:** extends only ACT-033 with an opt-in same-completed-Natural class-AE prerequisite and TGT-001 with a bounded State-owned legal single-recipient Damage compulsion. Earlier clocks, Costs, exact attack bindings, Hit/Authority and unopted ordering remain unchanged. No new Contract ID, Tag, Primitive, global Reaction priority or callback.
 
 **Revision F.23:** extends existing CLK-001, TRG-016, CST-001/009 and HEL-001/DMG-010/RES-008 for E.21 profiles: consumed-origin including CC, frozen local Reaction ordering/live payment, atomic capacity/resource payment, final-request replacement/Shield-before-floor, exact-instance completion, duration-only refresh and cause-specific source cleanup. Ordinary pipelines/earlier Pilots retain their laws; no new Contract ID/global priority.
+
+**Revision F.24:** governs bounded ordinary Hit probability multiplication, explicit all-Damage receive protection, safe queued exact-State removal and finite once-per-Presence package grants through existing HIT/DMG/RES/ACT/CLK/STA/POS laws. Reuses stack snapshots, hard-control opportunity consumption and terminal causes; no new Contract ID, Tag, Primitive, callback or global priority.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -819,6 +821,8 @@ The actor did not execute a Basic Attack/Skill/Ultimate Action, but its schedule
 
 This distinction must be traceable.
 
+An explicitly hard-control State composes this law with its declared opportunity clock and finite counter/stat/termination graph. For a declared later-than-activation clock, count only later grants; the casting opportunity is not retroactively a controlled opportunity. A consumed-control graph folds once per exact grant even without ACTION_BEGIN/ACTION_COMPLETED, then expires a one-opportunity State at that consumed opportunity's end. Non-Natural Actions never tick it. No Action-generated AE/Rage is emitted. An explicitly hard Sleep with no damage-wake clause remains through incoming hits; visible stack reduction is not State termination. Use declared terminal causes for linked cleanup, never generic on-remove = normal expiry. These are existing State/Duration/Counter/DAG operations, not a new control manager.
+
 ---
 
 ## ACT-013 — Move Into Passed Slot
@@ -902,6 +906,10 @@ Turn Boundary is not:
 For an explicitly later-than-activation owner window, snapshot activation identity/latest owner grant serial and count only later grants' following qualified boundaries. The immediate post-cast boundary cannot decrement that new window; the next CC-lost owner opportunity can. Expiry occurs at that boundary, not at its opportunity start/Action completion. State/window revision guards retire old expiry cursors after replacement. Ordinary source retention/pause/lifecycle remains explicitly governed; no dead/source-absent personal progress is invented.
 
 Existing unqualified boundaries and CLK-002 personal-window defaults remain unchanged. Missing origin/Mode support, private-boundary aliases and undeclared observable competition fail closed.
+
+A field/window explicitly counting **later global boundaries** retains its activation boundary identity/cursor. If created during a Natural opportunity, exclude the boundary closing that creating opportunity and count subsequent global boundaries; do not qualify them by source owner or require source life/presence. This composes the existing duration start/decrement/expire fields. An independent instance owner and explicit retention law keep it alive after source death/leave; source attribution alone is not a cleanup binding. Refresh/replacement invalidates old cursors. Boundary origin support and instance/battle terminal cleanup remain ordinary law.
+
+For 04§19.9's queued removal request, this safe boundary is after the exact originating enemy opportunity and its admitted Action/blocking/post-action work are terminal. Complete any in-progress transaction and mandatory lifecycle/result work, then resolve that State request before next SSI continuation. Requests never open a mid-Effect Reaction window or compete through Event/list order. Already retired-State requests are terminal no-ops. Unrelated boundary mutations still require their actual composition law.
 
 ## CLK-002 — Actor Natural Action Window
 **Status:** `LOCKED CONCEPT / exact reset event LOCKED_DEFAULT`
@@ -1198,6 +1206,10 @@ A CC-lost opportunity still runs the required start settlement, then follows ACT
 An authored termination graph may capture declared State values through existing Snapshot semantics before it removes that State. The graph's own expected normal removal does not invalidate its already-registered remaining work or those immutable bindings. Keep the original owner/Combat Instance/life/presence, State instance and grant identity until terminal settlement. Consumers after removal use the captured value, not a live counter on the retired State or a newly created replacement. Death/leave or unrelated retirement before this handoff still cancels as authored; subsequent owner-instance invalidity cannot Heal a replacement presence. A blocked/zero Heal closes the same settlement without restoring the removed State or creating a retry. Other live formula operands/modifiers retain their declared checkpoints.
 
 Keys include owner/instance, observed grant, retained State and dependency. Conditions/clean failure close finite work; no waits on the held grant's future Action, cyclic edges, fake Actions or cross-instance dependencies. Multiple observable competing settlements require explicit composition, not queue priority. Save/resume completes this same grant/settlement once. Other Modes must supply the same opportunity abstraction or explicit 07 adaptation; do not convert it to seconds.
+
+### External State removal at own opportunity start
+
+04§19.9 is a separate bounded input path, not REQUEST_ACTION or Action Intent interposition: accept/retain only the deterministic checkpoint's inputs for the exact active State and owner. Resolve pending/accepted exact-State removals before that State's CC/opportunity-consumption read, then evaluate remaining control and ordinary Action selection on the **same** grant. Enemy-opportunity requests settle at CLK-001's next safe boundary after their origin is terminal. Duplicate requests coalesce; replay/stale input cannot remove a new application, grant resources or return a consumed opportunity. Lifecycle retirement cancels the old request. Do not order noncommuting foreign input/start graphs without an explicit supported dependency.
 
 ### Required SSI predicate settlement
 
@@ -1970,6 +1982,12 @@ Dodge stat formula;
 Miss probability;
 RNG formula for ordinary hit checks.
 Those systems remain outside this Pilot patch.
+
+### Opt-in ordinary probability multiplication
+
+04§19.8 extends this interface only where the active Mode/System supplies a validated ordinary probability `p` in[0,1] and supported seeded hit decision. After target validity, freeze the exact attack owner's Action identity, authored shape/selection and active recipient-State view at this Hit Admission point. Collect matching State rule factors, form their order-independent product, and use `p_modified = p × product(factors)` for **one** ordinary hit decision. Do not run an additional dodge draw, per-component check, intermediate factor rounding or a later second check. Record exact rule/State/window revisions, original/modified probability and retained decision evidence for replay.
+
+ORDINARY_NON_RANDOM_SINGLE_RECIPIENT excludes authored random/multi-target/fixed-area/AoE decisions regardless of current count, and non-attack/VFX/ancestry substitutions. Slot binding remains unchanged. Same-family REFRESH registers one active modifier; no duplicate factor from old cursors/static reconstruction. GUARANTEED bypasses these ordinary Evasion modifiers under HIT-003; special denial still follows its actual generic Contract. Missing probability/selection/decision interface rejects this profile; it does not authorize inventing Mode hit math or ignoring the factor.
 ## HIT-003 — Guaranteed Hit
 Status: LOCKED
 If:
@@ -2475,6 +2493,9 @@ FINAL_DAMAGE_REDUCTION
 
 FINAL_DAMAGE_MULTIPLIER
 → DMG-008
+
+EXPLICIT_DAMAGE_RECEIVE_MULTIPLIER
+→ DMG-008 explicit all-Damage receive profile
 ```
 
 A modifier may not run at an undeclared or custom string phase.
@@ -3329,18 +3350,21 @@ Physical
 → ARM/Penetration
 → qualifying FINAL_DAMAGE_REDUCTION modifiers
 → explicitly authored FINAL_DAMAGE_MULTIPLIER
+→ opt-in EXPLICIT_DAMAGE_RECEIVE_MULTIPLIER (ALL_DAMAGE)
 → Shield
 
 Will
 → RES/Penetration
 → qualifying FINAL_DAMAGE_REDUCTION modifiers
 → explicitly authored FINAL_DAMAGE_MULTIPLIER
+→ opt-in EXPLICIT_DAMAGE_RECEIVE_MULTIPLIER (ALL_DAMAGE)
 → Shield
 
 True
 → bypass ARM/RES
 → bypass FINAL_DAMAGE_REDUCTION
 → explicitly authored FINAL_DAMAGE_MULTIPLIER (DMG-008)
+→ opt-in EXPLICIT_DAMAGE_RECEIVE_MULTIPLIER (ALL_DAMAGE)
 → Shield
 ```
 
@@ -3571,6 +3595,12 @@ The bounded phase accepts only finite MULTIPLY factors >= 1; factors below 1 req
 An optional effectScope.directActionRef binds own-direct provenance under TRG-013 to the resolved existing Action. Child/standalone Damage sharing lineage or Attribution is excluded. A rule's Action-local CostPaymentResultRef/SnapshotRef must belong to that Action and be available before this phase. Successful payment eligibility/locked factors use immutable declared bindings; no HP re-read, payment, Cost waiver inference or result mutation occurs inside modifier evaluation. An Actionless rule need not fabricate an Action; it cannot resolve a required directActionRef that does not exist.
 
 No new Tag/Primitive or mutable multiplier store. Reject wrong Effect/component/phase, unavailable/foreign references and provenance ambiguity before affected Damage commit. The phase defines amount resolution, not a Character reward, global priority or additional hit.
+
+### Explicit all-Damage receive profile
+
+04§18A's EXPLICIT_DAMAGE_RECEIVE_MULTIPLIER with damageCoverage ALL_DAMAGE is a separately authored exception to ordinary Damage Reduction bypass. It accepts finite MULTIPLY factors in[0,1] and covers all supported incoming Damage, including semantic TRUE and reflected scalar packets. Resolve at final Shield input after earlier applicable mitigation/reduction/amplification, before shared Shield/HP allocation. TRUE still bypasses ordinary FDR, but cannot bypass this explicitly declared phase. Packet paths inserting a sealed amount directly at Shield input also run it once; retain the original sealed basis and record the transformed demand separately. No duplicate earlier modifier pass or nominal-basis rewrite.
+
+RES-006 combines matching receive factors once with ordinary numeric/conservation law and no per-rule rounding/priority. Preserve recipient/source scope, type/provenance, Hit Admission and eligible Shield policy. Factor0 is committed zero Damage demand, not failed hit; Costs/HP Loss/Heal remain excluded. Supported simultaneous siblings read one phase-state view: a wake/removal caused by that batch's later stable checkpoint cannot reduce protection on siblings retroactively. Explicit special packets must expose one governed insertion checkpoint or reject affected composition; no unsupported packet is silently skipped. Omission preserves prior pipelines and all ordinary TRUE/FDR controls. This is a typed existing modifier phase, not a new protection subsystem or FDR Tag.
 
 ---
 
@@ -4160,6 +4190,8 @@ SSR Warrior Skill 3 adaptation therefore compares exact Debuff Identity.
 
 They are not interchangeable.
 
+Existing State `dispel`/removal eligibility may explicitly reject ordinary Cleanse/Dispel removal **and stack reduction**. This does not grant Authority or prevent target lifecycle/transition cleanup, declared non-Cleanse redistribution, normal expiry or separately explicit stronger conflict law. Keep State Admission separate. A declared crossing-threshold composition captures protected pre-mutation stack count, commits a capped State change through P-020/021, then tests the immutable below-threshold→threshold transition. One committed transition arms one attempt; rejection closes it without rolling back already committed stacks or retrying while capped. A later below-threshold then upward transition is a distinct episode. Bind linked control/stack cleanup to exact source/cycle and terminal cause; early control removal cannot masquerade as normal full expiry. These use existing Snapshot/State/Trigger/finite dependency/results, without a new threshold Primitive or polling.
+
 ## STA-014 — Scoped Effect Admission
 **Status:** `LOCKED DEFAULT`
 
@@ -4333,11 +4365,21 @@ emit:
 LEAVE_FIELD
 for Combat Instance X.
 A repeated write that does not change the presence truth value does not emit another presence-transition Event.
+
+The existing presence-cycle identity must be retained in presence records and transition evidence: one committed inactive→active entry starts a new cycle, true→true/index reconstruction does not. A leave/entry pair on the same Entity/Combat Instance has a new cycle ref even when Entity/Slot did not change. This exposes the same cycle already used by field-scoped State/Shield retention, not a parallel presence store.
 Presence Events must preserve:
 Combat Instance ID;
 entity reference;
 transaction/cause context needed by downstream listeners.
 Listeners observe the committed presence state.
+
+### Once-per-field-instance package grant
+
+04§19.10/§72.1 compose existing field State/Trigger/Target/RNG/Effect transactions. A field's creation checkpoint freezes its complete current presence membership, and real later entry checkpoints supply new cycle refs after coherent presence/lifecycle commit. Key each grant by field instance × Entity/Combat Instance presence cycle. Freeze side-relative pool and one selected package/draw, and mark the original grant processed exactly once even if package Effects are denied, fail locally or resolve zero. Boundary tick, repeated registration/active write, expiry/removal of a granted effect or input enumeration cannot create another draw. Leave followed by a new genuine cycle is separately eligible. Require a complete finite typed pool and explicit distribution for executable content; absent Dream content stays CONTENT_TBD, not an architecture default.
+
+Execute only the selected finite Effect graph with explicit source/recipient/field/grant refs and ordinary admission/Authority. Persistent States lacking a shorter duration are bounded to this field's remaining lifetime; expiry/replacement removes linked States with actual cause. Immediate Effects and non-State ledger objects keep their own semantics. Field source independence, later-global-boundary clock and same-source replacement compose existing State family/retention/DAG operations. Protect old instance/bound-State retirement and fresh field creation as one declared replacement commit; new grant membership belongs only to the new instance. Same-source family identity survives ordinary source leave/reentry and never includes cast/presence ID. Different sources remain distinct unless an actual generic composition says otherwise.
+
+Protect processed/draw/Effect-terminal refs and membership through save/resume. No reroll after invalidity, duplicate input or replacement; no all-units sequence inferred from Entity/Slot/list/Event order. Noncommuting packages/fields require explicit supported composition before affected execution. Existing local failure and finite DAG semantics apply; no arbitrary package callback or new global priority.
 
 ## POS-007 — Presence Cause Separation
 Status: LOCKED
