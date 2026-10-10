@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-09-E.21
+**Version:** 2026-10-10-E.22
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -42,6 +42,8 @@
 **Revision E.20:** adds only an opt-in same-completed-Natural class-AE hook dependency and a State-owned legal selectable-single-recipient Damage constraint. Existing State/Target/Trigger/Action plans execute them under ACT-033/TGT-001; no new Tag, Primitive, hook registry or global priority. Unauthored data retains prior behavior; opted content requires current E.20/F.22/G.21 compatibility and fresh normalization.
 
 **Revision E.21:** adds bounded consumed-owner global-boundary qualification/later-activation window, singular battle-persistent MAX_HP payment, State-owned pre-restoration Heal-to-TRUE conversion with exact-instance receipts/cause settlement, and checkpoint-local HP%-ordered Reaction candidates. Existing State family/window/termination bindings express duration-only refresh and source cleanup. No new Tag/Primitive/Contract ID/global priority.
+
+**Revision E.22:** adds bounded State-owned ordinary hit-probability multiplication, explicit all-Damage receive multiplication, external exact-State removal requests at two safe scheduler checkpoints, and finite effect-package/once-per-Field-Presence grant data. Existing State/Effect/Target/Trigger/Transaction/RNG owners execute them; no new Tag, Primitive, Contract ID, callback or Character runtime.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -3389,6 +3391,7 @@ Current minimum phases introduced here:
 PRE_OVERHEAL
 FINAL_DAMAGE_REDUCTION
 FINAL_DAMAGE_MULTIPLIER
+EXPLICIT_DAMAGE_RECEIVE_MULTIPLIER
 DAMAGE_DERIVED_HEAL_COEFFICIENT
 ```
 
@@ -3425,7 +3428,26 @@ Valid only for DAMAGE. Existing MULTIPLY with a finite factor >= 1 applies to ex
 
 ### `DAMAGE_DERIVED_HEAL_COEFFICIENT`
 
-Valid only for HEAL with §17.1 `damageDerived`, no Damage component scope. The only operation here is bounded **ADD** of a finite nonnegative dimensionless coefficient, not ADD to HP or arbitrary Effect amount. Existing source/recipient/Condition/value-query scopes qualify each contribution. A rule needing a particular outcome projection must bind that exact basis/observed Action, not just root ancestry. HEL-005 sums matching contributions once before requested Heal and the existing PRE_OVERHEAL phase; MULTIPLY remains the operation at the three amount phases above. No custom phase or general operation-order system is introduced.
+Valid only for HEAL with §17.1 `damageDerived`, no Damage component scope. The only operation here is bounded **ADD** of a finite nonnegative dimensionless coefficient, not ADD to HP or arbitrary Effect amount. Existing source/recipient/Condition/value-query scopes qualify each contribution. A rule needing a particular outcome projection must bind that exact basis/observed Action, not just root ancestry. HEL-005 sums matching contributions once before requested Heal and the existing PRE_OVERHEAL phase; MULTIPLY remains the operation at the declared amount phases. No custom phase or general operation-order system is introduced.
+
+### `EXPLICIT_DAMAGE_RECEIVE_MULTIPLIER`
+
+This opt-in Damage-only receive profile is the explicit higher law permitted by DMG-005/008, not ordinary FDR or amplification:
+
+```yaml
+effectScope:
+  effectType: DAMAGE
+  damageCoverage: ALL_DAMAGE
+recipientScope: <explicit already-resolving recipient binding/filter>
+amountOperation:
+  type: MULTIPLY
+  value: <finite scalar in [0, 1]>
+resolutionPhase: EXPLICIT_DAMAGE_RECEIVE_MULTIPLIER
+```
+
+`ALL_DAMAGE` explicitly covers PHYSICAL/WILL/TRUE after any type transform and supported scalar Damage packet kinds, including REFLECTED_DAMAGE. Do not co-author component/packet-kind restrictions or infer this coverage from loose prose/Tags. Existing source/recipient/Condition scopes may bound applicability; missing source restriction does not exclude Actionless Damage. An active State may own/register this ordinary effectAmountModifier for its declared lifetime. No ordinary FINAL_DAMAGE_REDUCTION Tag is attached to this distinct phase.
+
+DMG-008 applies it once at Damage's final **Shield input**, after prior applicable mitigation/FDR/amplification and before shared Shield/HP allocation. An explicitly supported packet entering directly at Shield input (including §19.7 converted TRUE) still passes this phase once; retain its sealed original request/basis. Ordinary numeric/conservation law applies without per-rule intermediate rounding. Zero is an amount outcome, not MISS or failed admission. HP Cost/Loss/Heal are outside Damage. Reject wrong phase/coverage/operation, nonfinite/out-of-range factors, unavailable scopes or unsupported special packet insertion instead of letting TRUE bypass it or applying twice. Without this opt-in, prior TRUE/FDR/FINAL_DAMAGE_MULTIPLIER laws are unchanged.
 
 ## Multiple rules
 
@@ -4016,6 +4038,73 @@ Existing State family/reapplication and parameter/counter/duration plans may bin
 Existing lifecycle/State termination graphs may also bind an exact **source-owned cleanup** policy, independently of recipient attachment: on source DEATH_CONFIRMED, actual LEAVE_FIELD or Return-to-Deck retire every instance in that source family across recipients, conversion registrations and window cursors. Classify the terminal cause as cleanup, admit no completion payout and cancel source-owned uncommitted payout work; retain no pending Heal/frozen window/redeployment restoration. Temporary absence without actual leave is not this cause. Guard original source presence/instance and overlapping transition delivery; source HP_ZERO alone cannot substitute for explicitly confirmed-death cleanup. Committed results remain immutable. These are explicit bindings of existing State/transition/termination operations, not new retention scopes or a universal source-death default.
 
 Lower into existing State/rule, Heal/Damage, Counter/Snapshot/Result and Transaction plans; no conversion manager, new Tag/Primitive/Contract ID or Authority tier. Ordinary Heal/State data without this profile is unchanged.
+
+## 19.8 State-owned ordinary Hit Admission probability modifier
+
+An Entity-attached active State may carry one bounded HIT-002 rule:
+
+```yaml
+hitProbabilityModifier:
+  recipientRef: OWNER
+  attackOwnerScope:
+    actionIdentity: BASIC_ATTACK
+    selectionScope: ORDINARY_NON_RANDOM_SINGLE_RECIPIENT
+  operation: MULTIPLY_ORDINARY_PROBABILITY
+  factor: <finite scalar in [0, 1]>
+  resolutionPhase: ORDINARY_HIT_ADMISSION
+```
+
+This profile requires OWNER to resolve the Entity attachment/recipient independently of its granting source; reject a mismatched binding. Match the exact attack-producing semantic owner's actual Action identity and immutable Target/Area/selection plan. The supported selection scope requires an ordinary non-random, single selectable recipient and single-target geometry. Exclude AoE centers, fixed positional areas, multi-target plans even with only one current recipient, random decisions, non-attack Effects and Basic-like presentation. A Slot-bound ordinarily selected single-target Basic can qualify: downstream POSITION binding is not random/fixed-area selection. Children use their own actual profile, never their root's identity or VFX.
+
+Multiply the Mode/System's validated ordinary probability, without defining its Accuracy/Evasion formula or making a second hit check. Guaranteed/special hit law remains HIT-003. State reapplication uses explicit source-family REFRESH/no-stack and lifetime data; an expired/replaced window contributes no extra factor. Lower into existing State/Target/Hit Admission plans, with exact rule/State generation and phase view. Reject malformed/unsupported selection mappings, factors or phase data; no movement, target rewrite, Damage Reduction, Authority inference or new Tag.
+
+## 19.9 External exact-State removal request
+
+An active State may explicitly expose this bounded input profile:
+
+```yaml
+externalRemovalRequest:
+  requestKey: <authored semantic input key>
+  operation: REMOVE_THIS_STATE
+  acceptance:
+    - DURING_OPPOSING_NATURAL_OPPORTUNITY
+    - OWNER_NATURAL_OPPORTUNITY_START
+  settlement:
+    queued: NEXT_SAFE_TURN_BOUNDARY_AFTER_ORIGIN_TERMINAL
+    ownStart: BEFORE_CONTROL_AND_ACTION_SELECTION
+  stalePolicy: DISCARD
+  removalCause: EXTERNAL_REQUEST
+```
+
+The key maps presentation input to this fixed semantic operation; it is not a callback, arbitrary Event or Ability request. A request is no-Cost/no-Action/no-opportunity/no-Action-resource-gain and can remove only the exact State exposing it. ACT-034/CLK-001 govern the two safe checkpoints. Preserve accepted input/checkpoint order as deterministic replay data, exact battle/instance/owner-generation/State-instance and originating enemy opportunity. A request with no matching active State closes as a no-op; it cannot arm a future application. Removal/lifecycle retirement invalidates queued work. Coalesce repeated requests for the same State; no input timing can interpose into an atomic Effect, mandatory lifecycle or held direct/completion transaction.
+
+At own start, accept the checkpoint's input before CC reads and resolve pending accepted requests before that State consumes the opportunity. Remaining control rules are still checked; removal cannot refund an already consumed opportunity. Unsupported acceptance/checkpoints/operations, foreign/stale bindings, Cost/Action-producing interpretations or observable ungoverned competing mutations reject. Lower into existing Scheduler input/State/P-022/Transaction plans, with terminal request identity; no generic mid-Effect hook registry.
+
+## 19.10 Field-instance finite effect-package grants
+
+An existing BATTLEFIELD/SYSTEM_INSTANCE State used as a field/window may author:
+
+```yaml
+fieldPresenceGrant:
+  initialRecipients: CURRENT_FIELD_PRESENCES_AT_CREATION
+  laterRecipients: COMMITTED_NEW_FIELD_PRESENCE
+  frequency: ONCE_PER_FIELD_INSTANCE_PRESENCE
+  relationAnchor: <retained field source Side context>
+  poolByRelation:
+    ALLY: <finite EffectPackagePoolRef>
+    ENEMY: <finite EffectPackagePoolRef>
+  selection: RANDOM_ONE_PACKAGE
+  retryPolicy: NONE
+  persistentStateLifetime: END_WITH_FIELD_OR_EARLIER_ENTRY_EXPIRY
+```
+
+§72.1 supplies the closed package/pool type. One field instance × exact existing Entity/Combat Instance **presence-cycle ref** owns one grant record. Creation freezes established present membership; later committed ENTER_FIELD supplies a new presence, not repeated active writes/definition binding. Retain the relation anchor independently of current source presence. Select one package using explicit authored pool selection law and enumeration-invariant seeded RNG; record the package/result and processed identity before downstream package completion. Failed/denied/zero package Effects do not reroll. Read-only admission probes create no grant record/draw. Boundary ticks affect duration only.
+
+Bindings for selected package Effects reuse the field source, this recipient, field instance and originating presence/grant refs, with ordinary Effect/State Admission, Authority, snapshots/results and finite DAG failure policies. Persistent State entries without a shorter declared duration inherit the remaining exact field lifetime; retain separate clocks/termination guards rather than comparing numeric counts from different clocks; field end retires those linked States with the field's actual terminal cause. Immediate Heal/Shield and other non-State commits retain their own semantics. Missing package content remains CONTENT_TBD and cannot produce an executable selected graph.
+
+Field lifetime itself composes existing State ownership/duration: independent instance lifetime, later-global-boundary activation exclusion and explicit source-retention policy; no source-alive listener/poll or private boundary. Explicit same-source REPLACE uses the existing source-family and transaction operations: key by battle/Combat Instance + stable runtime source + origin Ability/field definition, **not** source presence/cast ID; retire old field and its bound States with replacement cause, then create a fresh instance/clock/grant membership. Do not replay old expiry or processed-presence work against it. Different runtime sources remain distinct; overlapping generic field laws still need their actual supported composition.
+
+Declare existing resolution groups/dependencies if package grants share resources or mutate one another's observable selection/calculation state. Independent grants may commute; recipient/list/Entity/Event/RNG stream order is not a new gameplay priority. Reject unsupported noncommuting package composition instead of inventing a per-unit order. This bounded registration/grant plan belongs to existing State/Trigger/Target/RNG/Effect/Transaction owners, not a Field manager or scripting interpreter.
 
 # 20. DURATION SPEC
 
@@ -5346,6 +5435,8 @@ These two fields are deliberately independent.
 If a composite Ability contains resolution groups with different Hit Admission policies, a named Resolution group may explicitly override the parent policy for that group.
 No Accuracy/Evasion formula is introduced here.
 
+§19.8/HIT-002 may multiply the ordinary probability returned by that existing policy. It does not replace MODE_DEFAULT/GUARANTEED or define missing ordinary hit math. Unsupported Mode hit interfaces still fail closed.
+
 ---
 
 ## 34.5 Authored attack shape and incoming movement eligibility
@@ -6083,6 +6174,14 @@ Lower §7.21/§20.1 into existing boundary/Trigger/Duration plans with exact ori
 
 Reject malformed refs/lifetime/numeric domain, CurrentHP or post-admission capacity emulation, missing request/claim/receipt/cause semantics, duplicate conversion claims, pre-Shield floor, future-held/cyclic dependencies and ungoverned observable competition before affected execution. Only supported equal-floor converted common commits inherit RES-008's bounded budget adaptation; mixed unrestricted/incompatible-floor profiles require a proved law. Ordinary older content retains prior semantics; an old compatibility hash cannot authorize the new fields.
 
+## 51B. E.22 normalization/IR closure
+
+Lower §19.8 to existing State/Target/Hit Admission plans with immutable attack-owner selection facets, probability interface, factor/rule/window revisions and one shared hit decision. Lower §18A ALL_DAMAGE protection to effectModifierPlan's governed Shield-input phase, not FDR/amplification or a raw-formula rewrite. Lower §19.9 to exact Scheduler input/State/P-022 transactions with deterministic accepted checkpoint/origin refs, pending/terminal cursor and two supported safe settlement anchors. Lower §19.10/§72.1 to field State/Presence/Definition/Target/RNG/Effect/DAG/result plans with retained source-family/Side, independent clock, presence-cycle membership, selected package/draw and field-bound State causes.
+
+Validate exact refs, factor domains/phase/coverage, Mode probability support, finite pool entries/distribution/graphs, State family/lifetime and protected replacement/processed-grant transactions. Reject inferred shape from current count/VFX/root; component-multiplied stack/hit evidence; TRUE protection lowered as FDR; mid-Effect input/callbacks; stale requests; per-boundary reroll; field-source-lifetime conflation; cast/presence-keyed same-source stacking; ungoverned noncommuting packages and cyclic/foreign results. Missing pool entries retain narrow non-executable CONTENT_TBD refs, never dummy content or an architectural blocker for independent graphs. Existing State stack/control/Snapshot/stat/clock/terminal-cause compositions require their explicit bindings and ordinary admission; no new operations/managers are generated for them.
+
+Opted-in data requires E.22/F.24/G.23 compatibility and a fresh validation hash. Earlier unprofiled data and approved prior-Pilot semantics remain unchanged. No arbitrary script, new top-level runtime service, Functional Tag or Primitive.
+
 # 52. NORMALIZER RESPONSIBILITIES
 
 Normalizer/compiler must:
@@ -6618,11 +6717,20 @@ RUNTIME_ENTITY_POOL
 CHARACTER_DEFINITION_POOL
 TRUE_SELF_POOL
 POSITION_POOL
+EFFECT_PACKAGE_DEFINITION_POOL
 ```
 
 Pygmalion random inherited Combat Definition uses Definition Pool.
 
 This cannot be faked as selecting battlefield targets.
+
+## 72.1 Finite typed Effect package pool
+
+`EFFECT_PACKAGE_DEFINITION_POOL` is a finite immutable definition collection whose entries are bounded existing EffectSpec/resolution graphs, not Entities, Abilities to auto-cast or Character definitions. Selection returns a typed `EffectPackageRef`; ordinary finite Effect execution follows with the explicit source/recipient/instance bindings supplied by its owning graph. Existing P-010–012 candidate/selection and deterministic RNG services suffice; no new Primitive/Action identity.
+
+An executable pool must author a nonempty finite entry set with unique stable entry refs, complete typed Effects/numbers/Authority/duration/stacking where relevant, local snapshot/failure/dependency data and an explicit supported random distribution (`UNIFORM` or finite strictly positive `EXPLICIT_WEIGHTS`). Weighted selection uses normalized positive weights and the existing seeded draw, with stable entry-to-draw mapping independent of input enumeration; validate total/weights under ordinary finite numeric law. No implicit weights, list-order preference, recursive pool expansion, executable strings, arbitrary callbacks or unsupported Effect packages. Declared entries compose existing supported Effects only; a future entry proving its own gap must follow the ordinary gap workflow.
+
+A declared pool ref with absent entry data may be retained in a structurally normalized **non-executable** plan marked `CONTENT_TBD / DESIGNER_POOL_DEFINITION_REQUIRED`; do not invent an empty/no-op entry or claim full executable Ability readiness. This is missing content, not a new architecture gap. Distribution/entry parameters remain content-owned, with no default inferred from illustrative examples or “Buff pool” prose.
 
 ---
 

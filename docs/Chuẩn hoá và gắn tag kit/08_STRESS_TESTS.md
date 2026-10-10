@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-09-I.24
+**Version:** 2026-10-10-I.25
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.4+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.21+, `05_CONTRACTS.md` F.23+, `06_KERNEL_RUNTIME.md` G.22+, `07_MODE_PROFILES.md` H.2+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.4+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.22+, `05_CONTRACTS.md` F.24+, `06_KERNEL_RUNTIME.md` G.23+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -49,6 +49,8 @@
 **Revision I.23:** final Gideon R2 resolves Q1–Q7. Correct only M-165–M-167's superseded partial fixtures and add M-168–M-171 for distinct opportunity expiry/refresh, same-completion class-AE funding plus finite waiting observations, legal recipient compulsion and bounded malformed-profile rejection. All earlier test bodies/IDs remain unchanged. Four new declarative Architecture Phase obligations, not executable results; current E.20/F.22/G.21 only.
 
 **Revision I.24:** adds M-172–M-183 for qualified boundary/CC/cast exclusion, atomic persistent capacity Cost, threshold episode/funding, request conversion/floor, exact-instance accounting/causes, Slot admission, common-cast death growth and final frozen Reaction order/duration-only refresh/source cleanup. M-181's former probe is superseded by the final designer locks. Declarative Architecture Phase specifications only; earlier fixtures remain unchanged.
+
+**Revision I.25:** adds M-184–M-194 for admitted-hit stack/control/cause composition and the four bounded E.22/F.24/G.23 extensions: Hit probability, all-Damage receive, safe removal input and finite once-per-Presence packages. Prior fixtures/IDs remain unchanged. Package fixtures are synthetic architecture data, never authored Dream pool content. Declarative Architecture Phase obligations only; no executable tests are asserted.
 
 # 0. WHAT THIS FILE IS
 
@@ -4734,6 +4736,94 @@ Zero-missing-HP after intervening lawful recovery gives E0: ordinary zero-delta/
 **Redeploy / replay:** Q redeploy/Revive restores none of the old Debuffs/M/D/windows/payouts. A fresh legal cast can create new instances; repeated old death/leave/Return/expiry or receipt delivery cannot remove them, recreate old membership or pay accumulated Damage. Save/resume before cleanup, after retirement and before stale payout delivery retains terminal cause and canceled work. Overlapping confirmed-death/leave/Return cleanup terminalizes old instances once. No generic on-remove path relabels source cleanup as natural expiry/threshold completion.
 **Layers:** exact State source/presence index, Lifecycle/Return transition/Duration/Trigger, completion Snapshot/Result/Heal/dependency/Transaction/replay.
 
+## M-184 — Admitted Direct Hit Is Distinct from Component Count and Positive HP Damage
+
+**ID:** `M-184`
+**Status:** `MUST_PASS`
+**Boundary:** one landed-hit stack settlement using existing Damage/State/Snapshot/DAG receipts.
+**Fixture:** Mộng Yểm Basic is one Slot-bound hit with100%ATK PHYSICAL and100%WIL WILL; Skill3 is also one mixed hit. The recipient's Shield absorbs the whole legal hit. Controls: MISS, invalid locked Slot, rejected Damage, aborted batch, direct legal zero amount, Skill1/Ultimate with no Damage, DoT/Counter/Reaction/unrelated Follow-up/Passive Damage sharing root ancestry/credit.
+**Expected:** an admitted committed own-direct Basic/Skill3 hit grants at most one capped stack despite two components/zero ActualHP. MISS/invalid/rejected/uncommitted and nonqualifying sources grant none. Ordinary State Admission may reject the grant without rolling back Damage. No fabricated Damage node for Skill1 or Ultimate; the Basic raw stack sentence is the same Passive grant, never a second operation. Preserve hit/Effect/packet and per-component receipt identity across replay; shared root/credit alone never qualifies. Mandatory lifecycle closes before the State recipient is revalidated.
+**Reuse:** A-002, D-008, M-038/M-039, M-145 prove mixed/ActualHP/provenance/result distinctions; this case supplies the distinct once-per-admitted-hit boundary.
+
+## M-185 — Threshold Attempt, Hard Opportunity Control and Cause-specific Stack Cleanup
+
+**ID:** `M-185`
+**Status:** `MUST_PASS`
+**Fixture:** capped cleanse-resistant State at2 receives a committed+1; test admitted and rejected hard-control application separately. Follow with hits at3, ordinary Cleanse/removal/reduction, explicit spread removal3→2→3, incoming hits during active Sleep, a non-Natural Action and the target's next Natural grant. A legal synthetic early-Sleep-removal control does not author stack removal.
+**Expected:**2→3 arms exactly one attempt. Rejected control leaves3 and later capped hits never retry; falling below3 and reaching3 creates a new episode. Ordinary Cleanse/Dispel cannot remove/reduce stacks and confers no Authority; explicit redistribution/lifecycle cleanup retain their own law. Hard Sleep survives hits and stack reduction, consumes exactly one next owner opportunity without an Action/class Action AE/Rage, then expires and clears only remaining source/cycle-linked stacks before ordinary SSI continuation. Non-Natural Action does not tick. Early control removal preserves stacks; leave/death cleanup uses lifecycle cause. Independent source/cycle records are untouched. Duplicate grant/expiry/removal delivery cannot consume twice, retry admission or clear a replacement cycle.
+**Reuse:** B-003/B-008, M-097/M-177 cover consumed clocks and captured termination causes; this case adds failed-threshold-no-retry/linked-hard-control composition.
+
+## M-186 — Frozen Pre-hit State Controls Packet Ignore and Non-attack Redistribution
+
+**ID:** `M-186`
+**Status:** `MUST_PASS`
+**Fixture:** independent Skill3 casts at pre-hit counts0/1/2/3 and a passive-created Sleep with reduced visible count. Declare25AE required payment and cast State Snapshot before the mixed hit; primary Slot may later have a replacement occupant. Other legal enemies include two distinct recipients at2 and3; variants have1/0 legal others, rejected State admission and primary lifecycle removal.
+**Expected:** coefficients180/200/220/240 for both typed components. Pre-hit2 uses220/220 and no30%ARM/RES ignore/spread even when its Passive grant reaches3. Pre-hit3 or captured Sleep grants packet-local30%ARM/RES ignore, without target Debuff. Keep captured decisions despite later occupant/State drift, while Damage resolves the selected Slot's current legal occupant. Close Damage/result/lifecycle, then the qualifying primary Passive grant, then eligible spread if a valid current primary has>=1 stack. Remove exactly1, draw up to2 distinct other current legal recipients seeded without replacement, add1 to each capped3. Their2→3 transitions may arm Sleep. With no others removal still occurs; rejected grants do not reroll. Primary Sleep stays active after reduction. Required payment failure produces no hit/grant/spread; primary lifecycle removal supplies no live stack. Enumeration/save-resume cannot redraw or apply packet ignore retroactively.
+**Reuse:** C-007, M-100/M-101, M-107/M-178 cover seeded selection and independent Slot/recipient binding; this case adds pre-hit/Passive/spread dependencies.
+
+## M-187 — Ordinary Hit Probability Scope, One Decision and Refresh Clock
+
+**ID:** `M-187`
+**Status:** `MUST_PASS`
+**Fixture:** synthetic Mode hit provider returns ordinary p1 or0.8 with retained seeded decision. Skill1 State has factor0.5 and3 later owner opportunities. Recast while active; controls include GUARANTEED, real Skill/Ultimate, random single target, AoE/multi-target Basic with one survivor, fixed positional area, non-attack/DoT and Counter/Reaction using Basic-like VFX. One ordinary selected Slot-bound Basic qualifies.
+**Expected:** qualifying ordinary probabilities0.5/0.4 and one shared decision for mixed components. Same-source recast resets duration3 and still contributes one factor0.5, never0.25. Casting opportunity is excluded; later CC-lost consumption counts; non-Natural does not. Expire after third counted opportunity, guarding refresh revision. No target rewrite/movement/Damage reduction; excluded shapes/sources retain ordinary p. GUARANTEED bypasses ordinary Evasion; special denial law remains unchanged. Probes/registration rebuild/resume do not draw twice or restore expired factors. Missing actual probability/selection interface is rejected by M-194, never guessed.
+**Reuse:** B-008, M-168/M-171 and HIT-003 controls retain their original clock/refresh/Guaranteed laws.
+
+## M-188 — Explicit All-Damage Receive Protection Including TRUE and Shield-input Packets
+
+**ID:** `M-188`
+**Status:** `MUST_PASS`
+**Fixture:** recipient has active ALL_DAMAGE receive factor0.5 and Shield60. Separate otherwise-resolving100-demand PHYSICAL/WILL/TRUE/reflected scalar/typed converted TRUE-at-Shield-input packets; test a simultaneous mixed commit and factor0 control. Ordinary FDR-only control remains separate. HP Cost/Loss are non-Damage controls.
+**Expected:** each otherwise-resolving100 demand becomes50 once before eligible Shield/HP. TRUE's ordinary FDR bypass cannot bypass this explicit phase; a single demand uses Shield50/HP0. Converted request's sealed100 basis remains100 while transformed demand is50; no duplicate Heal/Damage modifier pass. Reflected scalar remains scalar. Simultaneous siblings share one protected phase view and allocate a single Shield/HP budget under RES-008; factors combine without per-rule rounding/order dependence. Factor0 gives a legal zero result, not MISS. HP Cost/Loss are unchanged. Without opt-in, preserve D-001/D-003's TRUE/FDR results. Replay/insertion path never applies twice or skips a supported packet; unsupported special insertion rejects.
+**Reuse:** D-001–D-003, M-050/M-081/M-145/M-175 preserve prior FDR/amplification/scalar/allocation/conversion boundaries.
+
+## M-189 — Self-control Opportunity Fold and Separate Battle Growth Lifetime
+
+**ID:** `M-189`
+**Status:** `MUST_PASS`
+**Fixture:**30AE required Skill2 casting Natural opportunity c creates SELF_SLEEP. Later opportunities c+1/c+2 consume sleep. Synthetic later wake/re-sleep, LEAVE_FIELD, Return-to-Deck/redeploy and death/Revive exercise separate active-control and earned-growth lifetimes; no explicit progression-discard mechanic is present.
+**Expected:** c grants0 growth; each later consumed sleeping opportunity grants exactly+7/+7 percentage points once, so two stacks contribute+14%ATK/+14%WIL, never1.07². No Action/Action-generated AE/Rage or repeated Cost on slept opportunities. Non-Natural Actions grant0. Wake stops accumulation and preserves earned battle count; re-cast costs30AE and future slept grants add. Leave/death removes active SELF_SLEEP while earned count survives all listed same-battle transitions/reinitialization; next battle resets it. Replay cannot double-fold a grant, recreate control, bake modified stats into base or compound contributions.
+**Reuse:** TRG-014, M-060/M-098/M-173 cover stable battle identity, contribution rebuilding and retention; this case joins lost-opportunity fold with separate control/growth scopes.
+
+## M-190 — Stable Wake Cannot Interpose into HP_ZERO or a Simultaneous Batch
+
+**ID:** `M-190`
+**Status:** `MUST_PASS`
+**Fixture:** active SELF_SLEEP at MaxHP1,000; committed health checkpoints leave HP350/351. Separate effective MaxHP changes, joined HP/MaxHP, activation already below35%, lethal Damage with no prevention, and ordinary prevention leaving alive at300. A simultaneous Damage batch crosses the threshold; another direct group follows it.
+**Expected:**350 qualifies/351 does not; use current stable HP/capacity, coalesce joined writes once and inspect established activation state. No-op/rolled-back writes produce no new mutation check. Whole Damage/Shield/HP batch and mandatory HP_ZERO/lifecycle close before wake. Unprevented death cleans State normally, never wake-as-prevention. Saved alive300 may wake at the resulting stable checkpoint. All siblings retain the old protection view; only a genuinely later direct group's admission/calculation sees wake. Earned growth remains. No polling, mid-lifecycle callback, fake Heal/HP-Loss or repeated request from replay.
+**Reuse:** E-001/E-002, M-086/M-096/M-142/M-172 retain stable/lifecycle/checkpoint law; this case adds protection removal as a dependent consequence.
+
+## M-191 — Safe Removal Input Is Neither Action nor Mid-Effect Callback
+
+**ID:** `M-191`
+**Status:** `MUST_PASS`
+**Fixture:** MANUAL_WAKE_REQUEST accepted during a hostile Natural opportunity with multiple sequential/atomic Effects and held blocking work. Separate own-start input, pending duplicate input, already consumed own opportunity, removed/replaced SELF_SLEEP and source death/leave cuts; earned battle growth exists.
+**Expected:** record exact active State/origin and accepted deterministic input; no removal during the enemy opportunity's Effect/batch or lifecycle. Settle at next safe global boundary after that opportunity/work terminal, before SSI continues. Own-start pending/accepted request removes SELF_SLEEP before its consumption read, allowing that same opportunity to act if other control permits. No AE/Cost/Rage/Action/completion/new opportunity; removal affects only SELF_SLEEP and preserves growth. Other CC still blocks. A late request never refunds an already consumed grant. No-active-State input is no-op; State retirement invalidates queued requests and later re-sleep is untouched. Save/resume/coalescing duplicates cannot double-remove or move old input to a new State. No arbitrary timestamp/Effect callback decides ordering.
+**Reuse:** ACT-034/CLK-001 and M-089/M-142 provide existing finite safe checkpoint continuations.
+
+## M-192 — Field Instance Rolls Once per Real Presence and Counts Later Global Boundaries
+
+**ID:** `M-192`
+**Status:** `MUST_PASS`
+**Fixture:** synthetic source-independent field F created during Natural opportunity17; current allied/enemy gameplay presences include its source. The test-only allied pool has two UNIFORM entries A/B; the enemy pool has two UNIFORM entries C/D. Each entry is one ordinary CREATE_STATE of its distinct neutral marker on this recipient, Authority NORMAL, count1/no-stack, no independent duration and field-bound lifetime. Explicit source/recipient/field refs and ordinary local-failure policy apply. A recipient immunity control denies its selected marker; another complete test-only zero-request Heal package exercises zero outcome. These synthetic definitions are not Dream content. Source dies/leaves after creation. Later entry produces presence P2; one Entity leaves and genuinely re-enters as P3. Controls repeat active writes/entry delivery, change Combat Definition, remove the prior granted effect and advance boundaries.
+**Expected:** each original presence selects once from its source-Side-relative pool, including source while present. F ignores casting boundary17 and counts18/19/20; source death/leave neither cleans nor pauses it. P2/P3 each select once before F ends, even when the same Entity was processed earlier. Denied/zero/removed effects, registration reconstruction, ordinary boundary ticks and true→true writes create no reroll. Retain exact field/presence-cycle/Side/package/draw/process refs. Replay and enumeration permutation preserve selected package per presence; a probe consumes none. Test packages do not define ALLY_DREAM_EFFECT_POOL or ENEMY_DREAM_EFFECT_POOL content.
+**Reuse:** POS-005/006, M-098/M-104/M-172 supply presence identity/coherence and boundary provenance; this case adds grant cardinality/source-independent global lifetime.
+
+## M-193 — Field Replacement Retires Bound States and Refreshes Presence Grants
+
+**ID:** `M-193`
+**Status:** `MUST_PASS`
+**Fixture:** synthetic F grants persistent State S with no shorter duration, shorter State T (one later global boundary), immediate Heal H (request10) and Shield ledger L (CREATE20, ordinary ledger lifetime) using test-only typed packages with explicit NORMAL admission/source/recipient refs and sequential finite Effect dependencies. Source recasts while F active, including after source leave/reentry. A distinct source owns independent field G. Force failed replacement validation and replay old expiry/entry/grant work separately.
+**Expected:** S lifetime is remaining F, T may expire earlier. Successful same-source replacement atomically retires F and its remaining bound States with replacement cause, creates F2 with fresh3-later-boundary duration and one new roll per current presence. Never two simultaneous same-source fields; family excludes cast/source-presence IDs. No natural-expiry-only settlement is fabricated. Already committed H and ordinarily surviving L are not undone merely because the field ended; their own semantics govern. G remains independent. Failed replacement commits no partial retirement/new field/roll. Old cursors/grants/requests cannot mutate F2, reroll G or resurrect retired S/T. New actual presence in F2 receives its own one grant.
+**Reuse:** M-042/M-177/M-182 and ordinary State/Transaction family/cause law; this case adds field-bound package lifetime/replacement interaction.
+
+## M-194 — Bounded Normalization Rejects Semantic Emulation and Separates Missing Content
+
+**ID:** `M-194`
+**Status:** `MUST_REJECT`
+**Invalid fixtures:** probability modifier missing Mode p/actual attack-owner selection, invalid factors/phase/VFX count inference; ALL_DAMAGE receive rewritten as FDR/under1 amplification, restricted components/nonfinite factor/double insertion; external removal as an Action or arbitrary callback/foreign State/safe-anchor omission; field grant with Entity-only processing/per-boundary reroll/source-alive clock/cast-keyed stacking; package pools with duplicate refs, missing distribution/weights/numbers, recursive callbacks, unsupported Effect or ungoverned noncommuting shared-resource order; stale compatibility hashes.
+**Expected:** reject affected executable content before mutation/draw/payment; no hidden fallback, source/list/Event priority or Character branch. A separately declared structural field plan referencing **unwritten Dream pools** retains narrow CONTENT_TBD / DESIGNER_POOL_DEFINITION_REQUIRED and emits no selected executable Ultimate graph. It does not reject already complete Passive/Basic/Skill1/Skill2/Skill3 or structural orchestration, and never fabricates a dummy pool to pass. Synthetic complete pools from M-192/M-193 prove architecture support only; no exact Dream entries/weights become canon. Existing independent graph/Mode/numeric prerequisites remain explicitly validated.
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -5547,13 +5637,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 171 character-derived integration tests;
+- 194 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-302 tests / probes / meta-tests (297 A–N cases plus 5 META cases)
+325 tests / probes / meta-tests (320 A–N cases plus 5 META cases)
 
 The count is not a design target.
 
