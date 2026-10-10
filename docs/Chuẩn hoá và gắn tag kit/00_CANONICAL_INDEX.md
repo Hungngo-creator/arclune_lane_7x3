@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-10-INDEX-31
+**Version:** 2026-10-10-INDEX-32
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-10-INDEX-31`
+**Version:** `2026-10-10-INDEX-32`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-10-E.22`.
+**Version:** `2026-10-10-E.23`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-10-F.24`.
+**Version:** `2026-10-10-F.25`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,7 +122,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-10-G.23`
+**Version:** `2026-10-10-G.24`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
@@ -133,7 +133,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-10-I.25`
+**Version:** `2026-10-10-I.26`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -142,6 +142,8 @@ Authored Character data không nên tham chiếu raw engine code.
 ## 2A. Current Character canon navigation
 
 In `docs/canon kit/`:
+
+- **Diệp Lâm / Ye Lin** → `docs/canon kit/Diep_Lam_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. A.3 raw fully replaced; exact-source infinite Law seeds/target decay, capped battle MaxHP growth/separate Heal, retained-until-death form, per-hit recipient conversion, tied-maximum Slot palms and snapshot explosion/Leader Ultimate are locked. E.23/F.25/G.24 add only a bounded fraction-to-TRUE operation to the existing component transform; I.26 M-195–M-197 cover its conservation/read/overlap/replay boundaries and reuse earlier cases. `CONTENT_TBD — FEAR/BLEED EFFECT DEFINITIONS` remains the only secondary-content blocker. Adjacent global raw hierarchy remains legacy provenance. No new Tag/Primitive/Contract ID or executable implementation.
 
 - **Mộng Yểm / Meng Yan** → `docs/canon kit/Mong_Yem_Clarified_Gameplay_Canon.md` R1 → **GAMEPLAY_CLARIFIED / ARCHITECTURE_NORMALIZED**. Raw A.1 cleanup preserves State labels; locked mixed Slot attacks, capped hit-stack hard Sleep, Basic-only probability protection, self-Sleep battle growth/TRUE protection/safe wake, frozen Skill3 ignore/spread and independent once-per-Presence field composition. E.22/F.24/G.23 add four bounded existing-owner profiles; I.25 M-184–M-194 cover new boundaries and reuse prior regressions. Sole content blocker: `CONTENT_TBD / DESIGNER_POOL_DEFINITION_REQUIRED` for exact finite allied/enemy Dream effect-package pools; structural orchestration and other kit graphs remain normalizable. No new Tag/Primitive/Contract ID or implementation code.
 

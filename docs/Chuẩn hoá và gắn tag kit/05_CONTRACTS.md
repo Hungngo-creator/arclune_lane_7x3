@@ -1,6 +1,6 @@
 # ARCLUNE — CONTRACT REGISTRY
 ## Chặng F — Deterministic Resolution Contracts
-**Version:** 2026-10-10-F.24
+**Version:** 2026-10-10-F.25
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary source corpus:** project rules already established in conversation + standardized character files for Hoá Thân Ký Ức Chi Chủ, Luân Hồi Chi Chủ, Cố Sự Chi Thần, SSR Warrior True Damage/Overheal, and current Pygmalion rules.  
@@ -46,6 +46,8 @@
 **Revision F.23:** extends existing CLK-001, TRG-016, CST-001/009 and HEL-001/DMG-010/RES-008 for E.21 profiles: consumed-origin including CC, frozen local Reaction ordering/live payment, atomic capacity/resource payment, final-request replacement/Shield-before-floor, exact-instance completion, duration-only refresh and cause-specific source cleanup. Ordinary pipelines/earlier Pilots retain their laws; no new Contract ID/global priority.
 
 **Revision F.24:** governs bounded ordinary Hit probability multiplication, explicit all-Damage receive protection, safe queued exact-State removal and finite once-per-Presence package grants through existing HIT/DMG/RES/ACT/CLK/STA/POS laws. Reuses stack snapshots, hard-control opportunity consumption and terminal causes; no new Contract ID, Tag, Primitive, callback or global priority.
+
+**Revision F.25:** extends DMG-007 only with a conserved bounded fraction-to-TRUE mapping of resolved non-TRUE components. Existing scopes, phase views, hit/Shield/allocation, overlap rejection and whole-type behavior are preserved; no new Contract ID, Tag, Primitive or priority.
 
 # 0. IMPORTANT STATUS MODEL
 
@@ -3582,6 +3584,18 @@ If applicable transforms are incompatible and no explicit future composition Con
 Ordinary Rank/Class/Element/relation predicates do not invoke Authority.
 
 Authority is entered only when a real Authority-bearing semantic conflict exists under `AUT-*`.
+
+### Bounded partial conversion of an existing component
+
+04§18B's SPLIT_COMPONENT_FRACTION is an opt-in PRE_MITIGATION operation for PHYSICAL/WILL→TRUE only. After applicable Damage-receipt redirection, freeze actual recipient/life and authoritative phase-entry view. Read pure R once per rule/hit/recipient; an authored current source-owned State query reads that exact runtime source family on that actual life. No selection-time N, Attribution substitute, source-family union or inter-component State mutation. Simultaneous groups read their shared view; later sequential hits read again and may see a prior committed State grant.
+
+For each eligible original component amount Q, derive C=Q×R and remainder Q−C with finite0<=R<=1 under the existing conserved numeric policy. Preserve Q=C+remainder through normalization; do not independently round both branches to create/destroy demand. R0 is identity, R1 yields full TRUE; already-TRUE is unaffected. Zero segments follow existing zero-result receipt law without positive demand/separate hits. Each nonzero segment enters its resulting type's pipeline before ARM/RES: original remainder uses ordinary mitigation/reduction, TRUE bypasses them and still uses applicable later modifiers/Shield. Conversion adds no Shield bypass or TRUE mitigation through original Penetration.
+
+All segments retain original packet/hit, immediate source, Effect provenance, attribution, component origin and supported Shield policy. R0/R1 retain the original component ref for the identity/full-conversion path. A partial split derives refs deterministically from original component ref plus segment role; equivalent mappings use that same representation and retain all matching provenance. These refs are bounded children, not new Effects/Actions. One Hit Admission covers them: MISS/rejection/abort commits none. RES-008 allocates shared Shield/HP against resulting demands, seals separate type/segment receipts and the ordinary aggregate. Never also credit unsplit Q; per-hit grants occur once, not per receipt. Mandatory lifecycle and declared post-hit State work follow the original group boundary, never interpose during splitting.
+
+Every candidate matches the same frozen original component/context. Fraction0 is identity and adds no competing mutation. Equivalent non-identity mappings (same destination/effective fraction, or full conversion matching SET_COMPONENT_TYPE(TRUE)) collapse once while retaining all participating provenance. Different nonzero effective fractions, partial split versus whole-type change, or conflicting destinations are incompatible without an independently explicit composition law; reject before affected Damage commit. Never sum/compound fractions, split produced segments again or choose source/list/Event order. Authority applies only to real Authority-bearing conflicts; Rank supplies no transform priority.
+
+Whole-type SET_COMPONENT_TYPE is unchanged. Native mixed profiles can reproduce isolated numbers, but formula copying changes component identity/type before this governed checkpoint and can hide incompatible runtime-transform overlap. Neither that rewrite, an amount modifier, post-mitigation relabeling, Penetration nor a separate TRUE hit is equivalent to conversion of the resolved component.
 
 ---
 

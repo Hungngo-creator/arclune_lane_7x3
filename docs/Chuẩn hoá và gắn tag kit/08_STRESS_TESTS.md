@@ -1,8 +1,8 @@
 # ARCLUNE — ARCHITECTURE STRESS TESTS
 ## Chặng I — Reverse Validation of Terminology / Tags / Schema / Primitives / Contracts / Kernel
-**Version:** 2026-10-10-I.25
+**Version:** 2026-10-10-I.26
 **Status:** Working Canonical Validation Suite  
-**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.4+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.22+, `05_CONTRACTS.md` F.24+, `06_KERNEL_RUNTIME.md` G.23+, `07_MODE_PROFILES.md` H.2+
+**Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md` B.4+, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md` E.23+, `05_CONTRACTS.md` F.25+, `06_KERNEL_RUNTIME.md` G.24+, `07_MODE_PROFILES.md` H.2+
 **Revision I.1:** adds Pilot Normalization #3 stress coverage for bounded Action Intent interposition/revalidation, dynamic distributed multi-payer Cost, immutable typed Cost-payment results, scoped Effect-amount modifiers, and the explicit local `AFTER_DIRECT_EFFECTS_COMPLETE` sequential Reaction-boundary profile.  
 **Purpose:** thử ngược kiến trúc bằng mechanic thật và edge case nhân tạo trước khi bulk-normalize hơn 200 kit.
 
@@ -51,6 +51,8 @@
 **Revision I.24:** adds M-172–M-183 for qualified boundary/CC/cast exclusion, atomic persistent capacity Cost, threshold episode/funding, request conversion/floor, exact-instance accounting/causes, Slot admission, common-cast death growth and final frozen Reaction order/duration-only refresh/source cleanup. M-181's former probe is superseded by the final designer locks. Declarative Architecture Phase specifications only; earlier fixtures remain unchanged.
 
 **Revision I.25:** adds M-184–M-194 for admitted-hit stack/control/cause composition and the four bounded E.22/F.24/G.23 extensions: Hit probability, all-Damage receive, safe removal input and finite once-per-Presence packages. Prior fixtures/IDs remain unchanged. Package fixtures are synthetic architecture data, never authored Dream pool content. Declarative Architecture Phase obligations only; no executable tests are asserted.
+
+**Revision I.26:** adds only M-195–M-197 for conserved fraction-to-TRUE splitting, actual-recipient/source-family phase reads with sequential State settlement, and overlap/provenance/replay rejection. Diệp Lâm's other mechanics reuse existing cases/Contracts with explicit Canon validation fixtures. Earlier case bodies/IDs remain unchanged; no guessed Fear/Bleed behavior or executable test results.
 
 # 0. WHAT THIS FILE IS
 
@@ -4824,6 +4826,37 @@ Zero-missing-HP after intervening lawful recovery gives E0: ordinary zero-delta/
 **Invalid fixtures:** probability modifier missing Mode p/actual attack-owner selection, invalid factors/phase/VFX count inference; ALL_DAMAGE receive rewritten as FDR/under1 amplification, restricted components/nonfinite factor/double insertion; external removal as an Action or arbitrary callback/foreign State/safe-anchor omission; field grant with Entity-only processing/per-boundary reroll/source-alive clock/cast-keyed stacking; package pools with duplicate refs, missing distribution/weights/numbers, recursive callbacks, unsupported Effect or ungoverned noncommuting shared-resource order; stale compatibility hashes.
 **Expected:** reject affected executable content before mutation/draw/payment; no hidden fallback, source/list/Event priority or Character branch. A separately declared structural field plan referencing **unwritten Dream pools** retains narrow CONTENT_TBD / DESIGNER_POOL_DEFINITION_REQUIRED and emits no selected executable Ultimate graph. It does not reject already complete Passive/Basic/Skill1/Skill2/Skill3 or structural orchestration, and never fabricates a dummy pool to pass. Synthetic complete pools from M-192/M-193 prove architecture support only; no exact Dream entries/weights become canon. Existing independent graph/Mode/numeric prerequisites remain explicitly validated.
 
+## M-195 — Conserved Fraction Conversion Retains One Hit and Type-specific Pipeline
+
+**ID:** `M-195`
+**Status:** `MUST_PASS / MUST_REJECT controls`
+**Purpose:** prove the new bounded mapping operates on resolved component requests before mitigation without duplicating amount, Hit decisions or receipts.
+**Fixture:** one admitted direct hit requests PHYSICAL100/WILL100 and already-TRUE20. Current source-owned recipient count N10 gives R=min(1,N×.02)=.20. Original ARM/RES/reduction fixture leaves50% of each ordinary remainder; standard Shield40 and abundant HP. Controls use N0/50/70, zero amounts, limited HP/shared allocation, MISS and invalid split inputs.
+**Expected Resolution:** pre-mitigation segments are PHYSICAL80, WILL80, converted TRUE20+20, untouched TRUE20: total220, not260/420. Ordinary segments mitigate to40 each; TRUE total60 bypasses ARM/RES/FDR. Shield40 absorbs proportionally from final demand140 including TRUE; ActualHP100 is conserved across immutable segment receipts. Original parent amounts are not credited again. One original hit/Hit decision and one per-hit grant survive segment expansion. N0 keeps original requests; N50/70 converts eligible200 fully and preserves existingTRUE20; no cap on State count is invented by the fraction clamp. Zero demand creates no division or extra hit. MISS/rejection/abort commits no segment or landed-hit grant. Standard Shield remains applicable to TRUE.
+**Rejection controls:** R outside[0,1]/nonfinite, unsupported destination/phase, TRUE/reflected input, post-mitigation basis, duplicate parent+segments, two Hit checks or ungoverned numeric/allocation policy fail closed. Replay/permutation of technical component/segment order preserves conserved amounts/receipts and one terminal hit.
+**Layers Under Test:** E.23 §18B, F.25 DMG-007, G.24 §45A; existing HIT, DMG-001–005, RES-008, M-145/M-184.
+
+## M-196 — Actual-recipient Family Read and Sequential Palm State Settlement
+
+**ID:** `M-196`
+**Status:** `MUST_PASS`
+**Purpose:** integrate partial conversion with existing own-source families, target locks/redirection, shared palm views and sequential hit reads.
+**Fixture:** source Y is in MA_CHU; actual recipient T has Y's10 seeds and another Y2's40. A legal target constraint changes Leader intent before Slot binding. For the separate receipt-routing control, the resolving packet is supplied with actual recipient T by an explicitly contract-complete legal routing fixture; this tests the transform's recipient input, not a new/universal Damage-redirection implementation or associated State routing. Two-palm Skill locks a maximum-own-seed enemy's current center Slot, main100/100 plus up to4 orthogonal70/70 splashes per palm. Main landed grants+1 only after its simultaneous palm batch/lifecycle. Controls move/empty center before palm2, tie own maxima, absorb all Damage by Shield, use MISS, Prime+Thần Tính or source death/leave.
+**Expected Resolution:** redirected hit reads only Y's10 on actual T, R20%, not intended Leader's count or combined50. No Entity-follow is manufactured. Where T remains main for both palms, first uses N10/R20%, then grants once; second reads N11/R22%, then grants once. All recipients/components within one palm use its common pre-mitigation view and their own families; splash grants no seed and stays SKILL, although form conversion applies to its eligible direct Damage. Shield-only main can grant; MISS cannot. Prime+Thần Tính may take legal Damage but its seed grant is rejected before Authority adjudication, without a refresh. Empty center skips second main but still allows current adjacent splash around the original center; no reselect/Entity chase. Highest-stack ties use seeded exact-max RNG; other-source counts never rank candidates.
+**Lifetime controls:** successful grants refresh only Y×target-life to3 later target opportunities; application does not tick, CC counts, non-Natural does not. A refresh before third opportunity prevents old expiry; absent refresh the third clears all that family. Y2's window stays independent. Source death/leave does not erase attached families; target DEATH_CONFIRMED/replacement clears old-life refs. Sequential continuation cannot read old-life seeds on a replacement occupant. No ordinary Reaction between palms; mandatory lifecycle remains required.
+**Layers Under Test:** E.23/F.25/G.24 fraction read with existing STA-010, AUT, CLK-003, TGT-001/007/008/010, SNP-004, RES-002/003 and State/DAG plans. Reuses B-003/B-008/C-005/M-017/M-184 and whole-profile lifetime cases.
+
+## M-197 — Fraction Mapping Overlap, Provenance and Prepared-result Replay
+
+**ID:** `M-197`
+**Status:** `MUST_PASS / MUST_REJECT`
+**Purpose:** avoid hidden transform ordering and parent/segment replay duplication while preserving earlier whole-type profiles.
+**Fixture:** the same original PHYSICAL100 sees one splitR.20 toTRUE. Controls add an equivalent split, splitR.30, whole SET_COMPONENT_TYPE(TRUE), splitR1, identityR0 and scoped foreign/standalone Damage; save/resume after preparation/commit changes current count and form.
+**Expected Resolution:** equivalentR.20 rules yield one80/20 mapping with both provenance refs, not compounded64/36 or summed60/40. R1 plus whole-toTRUE is one equivalent full mapping. IdentityR0 adds no second mutation. R.20 versusR.30 or versus full conversion lacks a composition law and rejects before commit; no first-registered/list/Event/Rank winner. Candidates match original types/context; produced TRUE/remainder is not a fresh input. Existing whole-type-only tests retain their path/amount.
+**Provenance controls:** only exact actor/source-owned direct Basic/Skill/Ultimate hits enter an authored form conversion scope. DoT/periodic Mark/Counter/Reaction/unrelated Passive/foreign same-root Damage do not qualify merely by ancestry or VFX. Current form validity and admitted Ultimate variant are separate: pinned root identity/profile never switches midway, and no ended form is resurrected by replay/Revive.
+**Replay/rejection controls:** prepared hit stores checkpoint recipient/life, source-family/read values, R, original/derived refs and eventual terminal receipts; resume does not reread changed N or resplit committed segments. Sealed receipt consumers see resulting types exactly once. Missing/foreign/stale family/snapshot/Action provenance, selection-time N replacing current phase read, unknown overlap, recursive callbacks or incompatible hashes reject affected executable content. Fear/Bleed definitions remain CONTENT_TBD; no behavior is synthesized to pass a test.
+**Layers Under Test:** §18B/DMG-007/§45A, TRG-013/014, existing State/Action/Snapshot/Result/Transaction and deterministic replay; preserves M-147 whole-transform controls and M-154 pinned profiles.
+
 # 18. TEST GROUP N — SYNTHETIC CROSS-SYSTEM TORTURE TESTS
 
 ---
@@ -5637,13 +5670,13 @@ Current suite defines:
 - 7 Mode tests;
 - 14 anti-scripting/validation tests;
 - 7 unresolved Contract probes;
-- 194 character-derived integration tests;
+- 197 character-derived integration tests;
 - 9 cross-system torture tests;
 - 5 meta-tests.
 
 Total named test cases:
 
-325 tests / probes / meta-tests (320 A–N cases plus 5 META cases)
+328 tests / probes / meta-tests (323 A–N cases plus 5 META cases)
 
 The count is not a design target.
 
