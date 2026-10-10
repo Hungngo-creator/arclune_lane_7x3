@@ -334,80 +334,116 @@ GHI CHÚ CHIẾN THUẬT (Dành cho Coder & Player):
  * Bất Tử Giả: Chừng nào Clone còn sống, Chân Ngã gần như bất tử. Nhưng sau khi Đoạt Xá, hắn sẽ rất yếu (dính Linh Mệt). Đây là lúc kẻ địch cần dồn sát thương kết liễu.
 
 3) [UR] MA TÔN – DIỆP LÂM (Ye Lin)
- * Class: Mage / Fighter (Scaling Bruiser).
- * Role: Infinite Stacker (Tích số vô hạn), True Damage Dealer, Drain Tank.
-1. NỘI TẠI: Chú Ấn Ma Chủng
- * Tags: [Nội Tại], [Gắn Dấu Ấn], [Pháp Tắc: Ma Đạo], [Buff: Tốc Độ], [Cơ Chế: Phân Hủy].
- * Logic:
-   * Ma Chủng (Demon Seed):
-     * Trigger: Đòn Đánh Thường áp dụng 1 Ma Chủng lên mục tiêu.
-     * Stack: Vô Hạn (Infinite).
-     * Decay: Nếu mục tiêu không bị cấy thêm Ma Chủng mới trong 3 Turn, toàn bộ stack trên mục tiêu đó biến mất.
-   * Pháp Tắc (Law): Hiệu ứng Ma Chủng thuộc cấp độ [Pháp Tắc].
-     * Hạn chế: Vô hiệu trước các thực thể có [Thần Tính] (Prime).
-   * Vào Trận: Tăng vĩnh viễn +10% SPD.
-2. ĐÁNH THƯỜNG: Ma Chưởng
- * Tags: [Đơn Mục Tiêu], [Sát Thương Hỗn Hợp], [Gắn Dấu Ấn].
- * Logic:
-   * Gây sát thương = 100% (WIL + ATK).
-   * Gắn +1 Ma Chủng.
-3. KỸ NĂNG 1: Thôn Chủng Dưỡng Thể
- * Tags: [Chủ Động], [Toàn Sân], [Tiêu Hao: Dấu Ấn], [Buff Vĩnh Viễn: Max HP], [Hồi Phục], [Tiêu Hao: Aether].
- * Logic:
-   * Cost: 30 Aether.
-   * Hành động: Thu hồi (Xóa) TẤT CẢ Ma Chủng đang có trên sân địch.
-   * Hiệu ứng:
-     * Mỗi Ma Chủng thu hồi \rightarrow Tăng +5% Max HP vĩnh viễn cho Diệp Lâm (Đồng thời hồi lượng máu tương ứng).
-     * Giới hạn: Tăng tối đa +100% Max HP (Gấp đôi máu gốc). Sau khi đạt trần, kỹ năng chỉ hồi máu (Heal) chứ không tăng Max HP nữa.
-4. KỸ NĂNG 2: Ma Chủ Hiển Thân
- * Tags: [Chủ Động], [Biến Hình], [Tiêu Hao: Dấu Ấn], [Buff: Sát Thương Chuẩn], [Thay Đổi Ult], [Tiêu Hao: Aether].
- * Logic:
-   * Điều kiện: Tổng số Ma Chủng trên 1 mục tiêu bất kỳ \ge 12.
-   * Cost: 25 Aether.
-   * Hành động:
-     * Thu hồi toàn bộ Ma Chủng trên mục tiêu đó.
-     * Biến thân thành [Ma Chủ] (Duy trì đến hết trận hoặc đến khi chết).
-   * Trạng Thái Ma Chủ:
-     * Nội tại mới: Mỗi đòn đánh/kỹ năng khi trúng đích sẽ kiểm tra số Ma Chủng trên mục tiêu.
-     * Chuyển Hóa Sát Thương Chuẩn:
-       * Mỗi 1 Ma Chủng = Chuyển 2% Tổng Sát Thương thành Sát Thương Chuẩn (True Damage - Bỏ qua RES/ARM).
-       * Công thức: True_Ratio = Min(100%, Stack * 2%).
-       * Ví dụ: 10 Stack -> 20% True Dmg + 80% Normal Dmg. 50 Stack -> 100% True Dmg.
-     * Thay Đổi Ultimate: Mở khóa Ult mới [Thiên Ma Độc Tôn].
-5. KỸ NĂNG 3: Nhiếp Chủng Song Chưởng
- * Tags: [Chủ Động], [Đơn Mục Tiêu: Ưu Tiên], [Đa Hit], [Sát Thương Lan], [Tính Là Đánh Thường], [Tiêu Hao: Aether].
- * Logic:
-   * Cost: 25 Aether.
-   * Mục tiêu: Kẻ địch Gần Nhất đang có Ma Chủng (Nếu không ai có, chọn ngẫu nhiên).
-   * Hành động: Tung 2 chưởng liên tiếp.
-   * Hiệu quả (Mỗi chưởng):
-     * Gây 100% Sát Thương Đánh Thường lên mục tiêu chính.
-     * Lan (Splash): Gây 70% Sát Thương cho 2 kẻ địch gần mục tiêu chính nhất. (Phần lan không tính là đánh thường, không gắn Ma Chủng).
-     * Tổng kết: Mục tiêu chính dính 2 hit (+2 Ma Chủng).
-6. ULTIMATE (Dạng Thường): Ma Chủng Phán Quyết
- * Tags: [Tự Động], [AOE: Toàn Sân], [Tiêu Hao: Dấu Ấn], [Sát Thương: Max HP], [Debuff: Sợ Hãi/Chảy Máu].
- * Logic:
-   * Trigger: Đầy Nộ ở dạng người thường.
-   * Hành động: Kích nổ toàn bộ Ma Chủng trên sân.
-   * Sát thương:
-     * Gây 100% (WIL + ATK) cơ bản.
-     * Cộng thêm: (5% Max HP của Diệp Lâm) \times Số lượng Ma Chủng.
-     * Lưu ý: Max HP của Diệp Lâm càng cao (do Skill 1), Ult nổ càng đau.
-   * Hiệu ứng Debuff (Theo số stack kích hoạt):
-     * Cứ mỗi 2 Ma Chủng: Áp dụng 1 tầng [Sợ Hãi] và [Chảy Máu] trong 1 Turn.
-   * Hậu quả: Sau khi nổ, số Ma Chủng trên địch về 0.
-7. ULTIMATE (Dạng Ma Chủ): Thiên Ma Độc Tôn
- * Logic:
-   * Lý do thay đổi: Khi đã thành Ma Chủ, Diệp Lâm cần giữ Ma Chủng để duy trì khả năng đánh Sát Thương Chuẩn (theo Skill 2), nên Ult này KHÔNG ĐƯỢC XÓA MARK.
-   * Trigger: Đầy Nộ ở dạng Ma Chủ.
-   * Hành động: Tụ lực bắn chưởng cực đại vào 1 mục tiêu (ưu tiên Boss/Nhiều máu nhất).
-   * Sát thương: Gây 300% (WIL + ATK).
-   * Cơ chế: Đòn này được hưởng trọn vẹn Nội tại chuyển hóa Sát Thương Chuẩn của dạng Ma Chủ.
-     * Ví dụ: Mục tiêu đang có 50 Ma Chủng -> Cú Ult 300% này là Sát Thương Chuẩn 100%. (One-shot Tanker).
-TỔNG KẾT & CÂN BẰNG:
- * Giai đoạn đầu: Dùng Skill 1 để ăn Ma Chủng \rightarrow Tăng Max HP để trâu bò và Ult (Dạng thường) nổ đau hơn.
- * Giai đoạn sau (Khi đủ 12 stack): Dùng Skill 2 hóa Ma Chủ. Lúc này không ăn Ma Chủng nữa mà để dành stack trên người địch. Stack càng cao, tỷ lệ Sát thương chuẩn càng lớn.
- * Ult mới (Thiên Ma Độc Tôn): Giải quyết vấn đề "mất Ult". Nó biến Diệp Lâm thành khẩu đại bác bắn True Damage, không cần xóa stack, giữ nguyên áp lực lên kẻ địch.
+
+Class: Mage
+
+Role: Infinite Stacker, True Damage Dealer, Drain Tank.
+
+### Nội tại — Chú Ấn Ma Chủng
+
+Đòn Đánh Thường áp dụng 1 Ma Chủng lên mục tiêu.
+
+Ma Chủng có thể cộng dồn vô hạn.
+
+Nếu mục tiêu không nhận thêm Ma Chủng mới từ Diệp Lâm này trong 3 Natural Action của chính mục tiêu, toàn bộ Ma Chủng của Diệp Lâm này trên mục tiêu biến mất.
+
+Ma Chủng là hiệu ứng cấp Pháp Tắc.
+
+Ma Chủng không thể được áp dụng lên Prime có Thần Tính.
+
+### Đánh thường — Ma Chưởng
+
+Gây sát thương: 100% WIL + 100% ATK lên một mục tiêu.
+
+Sau đòn đánh hợp lệ, áp dụng +1 Ma Chủng.
+
+### Skill 1 — Thôn Chủng Dưỡng Thể
+
+Cost: 30 AE.
+
+Thu hồi toàn bộ Ma Chủng của Diệp Lâm đang tồn tại trên phe địch.
+
+Mỗi Ma Chủng thu hồi:
+
+- tăng +5% Max HP cho Diệp Lâm;
+- đồng thời Heal một lượng HP tương ứng.
+
+Tổng Max HP tăng từ Skill 1 bị cap tại +100% Max HP gốc của Diệp Lâm.
+
+Sau khi đạt cap Max HP, các Ma Chủng được thu hồi tiếp theo vẫn Heal nhưng không tăng Max HP thêm.
+
+### Skill 2 — Ma Chủ Hiển Thân
+
+Điều kiện: ít nhất một kẻ địch đang có >=12 Ma Chủng của Diệp Lâm.
+
+Cost: 25 AE.
+
+Chọn một kẻ địch hợp lệ có >=12 Ma Chủng, thu hồi toàn bộ Ma Chủng của Diệp Lâm trên mục tiêu đó và biến thân thành Ma Chủ.
+
+Dạng Ma Chủ tồn tại đến khi Diệp Lâm chết hoặc battle kết thúc.
+
+Trong dạng Ma Chủ, mỗi direct Damage hit từ Basic/Skill/Ultimate của Diệp Lâm đọc số Ma Chủng hiện có trên chính recipient đó.
+
+Mỗi 1 Ma Chủng chuyển 2% phần Damage đủ điều kiện thành TRUE Damage.
+
+TrueRatio: `min(100%, numberOfSeeds × 2%)`.
+
+Ví dụ:
+
+- 10 Ma Chủng → 20% TRUE + 80% type gốc.
+- 50 Ma Chủng → 100% TRUE.
+
+Dạng Ma Chủ thay Ultimate thường bằng `Thiên Ma Độc Tôn`.
+
+### Skill 3 — Nhiếp Chủng Song Chưởng
+
+Cost: 25 AE.
+
+Chọn kẻ địch đang có số Ma Chủng của Diệp Lâm cao nhất.
+
+Nếu không có kẻ địch nào có Ma Chủng: chọn ngẫu nhiên một kẻ địch hợp lệ.
+
+Tung hai chưởng liên tiếp.
+
+Mỗi chưởng:
+
+- target chính nhận Damage bằng một Đánh Thường: 100% WIL + 100% ATK;
+- target chính nhận +1 Ma Chủng khi hit hợp lệ;
+- tối đa 4 occupied enemy Slots trực giao quanh Slot trung tâm (trên / dưới / trái / phải), mỗi recipient nhận 70% Damage của Đánh Thường.
+
+Splash không phải Basic Attack và không áp Ma Chủng.
+
+Do đó nếu cả hai main hits hợp lệ, target chính nhận tổng cộng +2 Ma Chủng.
+
+### Ultimate dạng thường — Ma Chủng Phán Quyết
+
+Auto-cast theo luật Ultimate chung khi đầy Rage và Ability legal.
+
+Kích nổ Ma Chủng của Diệp Lâm trên phe địch.
+
+Mỗi recipient mang Ma Chủng nhận: 100% WIL + 100% ATK, cộng thêm `5% Max HP của Diệp Lâm × số Ma Chủng trên recipient đó`.
+
+Theo số Ma Chủng bị kích nổ trên recipient: cứ mỗi 2 Ma Chủng tạo 1 tầng Sợ Hãi và 1 tầng Chảy Máu trong 1 Natural Action của recipient.
+
+Sau khi Ultimate xử lý xong, toàn bộ Ma Chủng của Diệp Lâm trên các recipient đã tham gia vụ nổ được xóa.
+
+`Sợ Hãi` và `Chảy Máu` hiện chưa có gameplay definition hoàn chỉnh.
+
+### Ultimate dạng Ma Chủ — Thiên Ma Độc Tôn
+
+Auto-cast theo luật Ultimate chung khi đầy Rage và Ability legal.
+
+Nhắm Leader địch.
+
+Taunt, target-redirection và Damage-redirection hợp lệ vẫn có thể ảnh hưởng Ability theo Contracts chung.
+
+Gây một hit: 230% WIL + 230% ATK.
+
+Hit này sử dụng đầy đủ cơ chế chuyển đổi TRUE Damage của dạng Ma Chủ.
+
+Ví dụ: recipient thực tế có 50 Ma Chủng của Diệp Lâm → TrueRatio =100% → toàn bộ phần Damage đủ điều kiện của hit trở thành TRUE.
+
+Ultimate này KHÔNG tiêu thụ Ma Chủng.
 
 
 4) 🔴 GIẢI ĐÁP: HỆ THỐNG ƯU TIÊN (HIERARCHY) Trong Arclune, khi các hiệu ứng va chạm nhau, hệ thống sẽ xét theo cấp bậc sau:

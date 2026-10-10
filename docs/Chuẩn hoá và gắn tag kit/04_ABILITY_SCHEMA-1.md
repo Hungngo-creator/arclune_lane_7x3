@@ -1,6 +1,6 @@
 # ARCLUNE — ABILITY SCHEMA
 ## Chặng E — Declarative Character / Ability Composition Schema
-**Version:** 2026-10-10-E.22
+**Version:** 2026-10-10-E.23
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `00_CANONICAL_RECOVERY_AUDIT-1.md`
 **Primary goal:** cho phép AI/Designer khai báo hơn 200 kit bằng semantic + composition mà không biến Character thành code, Tag thành pseudo-code, hoặc Ability Schema thành một scripting language trá hình.
@@ -44,6 +44,8 @@
 **Revision E.21:** adds bounded consumed-owner global-boundary qualification/later-activation window, singular battle-persistent MAX_HP payment, State-owned pre-restoration Heal-to-TRUE conversion with exact-instance receipts/cause settlement, and checkpoint-local HP%-ordered Reaction candidates. Existing State family/window/termination bindings express duration-only refresh and source cleanup. No new Tag/Primitive/Contract ID/global priority.
 
 **Revision E.22:** adds bounded State-owned ordinary hit-probability multiplication, explicit all-Damage receive multiplication, external exact-State removal requests at two safe scheduler checkpoints, and finite effect-package/once-per-Field-Presence grant data. Existing State/Effect/Target/Trigger/Transaction/RNG owners execute them; no new Tag, Primitive, Contract ID, callback or Character runtime.
+
+**Revision E.23:** extends only the existing component-transform operation with bounded fraction-to-TRUE splitting at PRE_MITIGATION. Preserve one hit, resolved amount, actual-recipient phase reads, source provenance and conserved derived receipts. Existing whole-type transforms/profiles remain unchanged; no new Tag, Primitive, Contract ID or runtime owner. Opted content requires E.23/F.25/G.24 and fresh normalization/compatibility hashes.
 
 # 0. ARCHITECTURE DECISION OF STAGE E
 
@@ -3567,6 +3569,7 @@ damageComponentTransform:
   transformOperation:
     type:
     toType:
+    fraction: # only SPLIT_COMPONENT_FRACTION; pure finite scalar in [0,1]
 
   resolutionPhase:
 ```
@@ -3722,6 +3725,28 @@ It does not merely change presentation/label text.
 It does not imply Shield Piercing.
 
 A transformed component subsequently follows the Contract of its resulting component type.
+
+### Bounded fraction-to-TRUE split
+
+The existing operation additionally admits:
+
+```yaml
+transformOperation:
+  type: SPLIT_COMPONENT_FRACTION
+  toType: TRUE
+  fraction: <pure ValueRef in [0,1]>
+resolutionPhase: PRE_MITIGATION
+componentScope:
+  fromTypes: [PHYSICAL, WILL]
+```
+
+This opt-in splits **each already-resolved eligible component amount Q**, not copied source-stat formulas or mitigated Damage: converted TRUE request Q×R and original-type remainder Q−Q×R. Only PHYSICAL/WILL inputs and TRUE destination are currently supported; already-TRUE is untouched. R0 is identity; R1 converts the full eligible amount. Segments remain inside the original hit/packet with one shared Hit Admission/commit; no extra Action, hit, Effect or stack trigger. Preserve ordinary later type-specific mitigation/modifiers, Shield policy and shared-recipient allocation; no Shield Piercing is implied.
+
+`fraction` uses existing pure Formula/STACK_REF/SNAPSHOT_REF vocabulary. Bind owner/source family, actual Damage recipient/life and checkpoint explicitly. Evaluate/freeze R once per rule × hit × actual recipient from DMG-007's authoritative PRE_MITIGATION view, after applicable receipt redirection and before component mitigation. All eligible components of that hit share this read; simultaneous siblings use the shared phase view, later sequential hits their own checkpoint. A snapshot is legal only when explicitly captured for that checkpoint/read; admission/selection snapshots cannot replace authored current-State reads. An absent family's count is0 only when the bounded query explicitly declares that identity value, not by missing-ref fallback.
+
+Lower to existing `damageTransformPlan` operation/fraction bindings and bounded derived segments under the original component/packet context. Retain original component reference, resulting type/amount and transform/read provenance for immutable receipts; never commit both original full amount and split amounts. Conserved numeric normalization belongs to DMG-007/RES-008, without per-segment/rule rounding priority or new receipt namespace. Formula copies can author native mixed Damage, but cannot substitute for a semantic transform of the already-resolved component.
+
+Validate finite R in[0,1], supported phase/types, read availability/family/life, one-hit membership and direct-Action provenance before affected commit. Do not silently clamp an invalid operand; the author may explicitly use MIN/CLAMP in its pure formula. Reject callbacks, mitigated/result amount substitution, split-on-TRUE/reflected scalar, arbitrary destinations, duplicate Damage, stale/foreign snapshots, early target reads and unsupported overlap. Candidates test the same original component: no recursive splitting/transform chain. DMG-007 governs equivalent mapping versus incompatible overlap without a priority law.
 
 ---
 
@@ -6214,6 +6239,7 @@ Normalizer/compiler must:
 
 25. Validate `ScopedDamageComponentTransformSpec` source Action scope, recipient scope, direct-Effect provenance scope, component filter, typed transform operation and Damage-pipeline phase compatibility.
 26. Reject overlapping incompatible Damage-component transforms when no explicit canonical composition Contract exists.
+    SPLIT_COMPONENT_FRACTION additionally validates §18B's bounded TRUE destination, PHYSICAL/WILL inputs, PRE_MITIGATION read bindings and conserved one-hit segments; never lower it to source-formula copies, post-mitigation relabeling or duplicated packets.
 27. Preserve the distinction `BASE_DEPLOYMENT_COST ≠ CURRENT_DEPLOYMENT_COST ≠ DEPLOYMENT_COST_BAR` and normalize Deployment-Cost mutation/lock Effects to deployment-system semantics rather than ResourceSpec.
 28. Validate Return-to-Deck source/destination deployment state, presence policy, Deck-membership policy and transition-owned retention profile.
 29. Validate State/Shield lifecycle-retention scopes referenced by a transition profile without converting transition cleanup into Cleanse/Authority behavior.

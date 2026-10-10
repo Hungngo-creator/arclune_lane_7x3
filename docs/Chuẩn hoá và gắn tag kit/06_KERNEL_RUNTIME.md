@@ -1,6 +1,6 @@
 # ARCLUNE — KERNEL RUNTIME
 ## Chặng G — Deterministic Runtime Architecture
-**Version:** 2026-10-10-G.23
+**Version:** 2026-10-10-G.24
 **Status:** Working Canonical Candidate  
 **Depends on:** `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`, `02_TAG_vNext.md`, `03_PRIMITIVE.md`, `04_ABILITY_SCHEMA-1.md`, `05_CONTRACTS.md`
 **Scope:** runtime architecture, state ownership, schedulers, queues, transaction boundaries, execution pipeline, deterministic ordering, authority adjudication, lifecycle systems, traceability.  
@@ -47,6 +47,8 @@
 **Revision G.22:** executes E.21/F.23 profiles through existing Scheduler/Duration, Trigger/Target/Snapshot/RNG/Action, Cost/Stat, State/Heal/Damage/Shield/Counter/Result/Transaction owners with exact generation, frozen local candidate order, duration-only refresh, source cleanup, battle retention and replay terminals. No Character branch, new service or priority registry.
 
 **Revision G.23:** consumes E.22/F.24 through existing State/Hit/Target, Damage/modifier/Shield/Transaction, Scheduler input and Definition/Trigger/RNG/Effect owners. Exact State/window/request/presence/package refs retain finite work and replay terminals; no Character branch, new service, callback or global priority.
+
+**Revision G.24:** extends only §45A's existing transform plan to conserved fraction-to-TRUE segments, phase-local recipient/family reads and original-component receipt provenance under DMG-007. Existing Damage/Contract/Result/Transaction owners suffice; no Character branch, manager, callback or new mutable subsystem.
 
 # 0. EXECUTIVE ARCHITECTURE
 
@@ -3137,18 +3139,24 @@ freeze incoming component type and phase-entry context
 → resolve declared source Action reference / lineage relation
 → test its Natural-Action status, Actor relation and structured Actor filters
 → test recipient scope, direct-Effect provenance, fromTypes and Conditions
-→ collect applicable typed SET_COMPONENT_TYPE results
-→ determine one compatible resulting type
-→ dispatch that type's ordinary Damage pipeline
+→ collect applicable typed component-transform mappings
+→ determine one compatible resulting mapping
+→ dispatch each resulting type/amount segment through its ordinary Damage pipeline
 ```
 
 Actor filters read the Actor performing the scoped Action, including authoritative Effective Class; they do not substitute Damage Attribution, Caster, Owner or Effect Source. Direct-graph scope uses §15A membership, never shared `rootActionId` alone. Matching is recipient/component-local and read-only; it does not retarget or produce a new Action/packet.
 
-All candidates are evaluated against the same incoming component/context, not the preceding transform's output. Compatible matching operations with the same resulting type are applied as one result. Incompatible overlapping transforms without an explicit composition Contract are rejected; unsupported content that escaped normalization fails visibly before affected Damage commits. No list/Effect/entity/Event order chooses a transform winner and no hidden transform chain is created.
+All candidates are evaluated against the same incoming component/context, not the preceding transform's output. Compatible whole-type operations with the same resulting type are applied as one result; opt-in fraction mappings use DMG-007's equivalence/overlap law below. Incompatible overlapping transforms without an explicit composition Contract are rejected; unsupported content that escaped normalization fails visibly before affected Damage commits. No list/Effect/entity/Event order chooses a transform winner and no hidden transform chain is created.
 
 Without a match, preserve the incoming type. A Physical/Will component transformed to `TRUE` keeps its pre-mitigation amount and enters §48 before any ARM/RES or Final Damage Reduction. Already-True components excluded by `fromTypes` remain True. Shield eligibility/piercing, attribution and Effect provenance remain independent; source Ability identity, authored Functional Tags and capability contributions are not rewritten.
 
 Ordinary source Class/relation predicates invoke no Authority. Genuine Authority-bearing semantic conflicts use existing `AUT-*` adjudication. Trace records the scoped Action/Actor, Effect membership, matching transform refs, original/resulting component types, phase and state version without turning this evaluation into a gameplay Event.
+
+For E.23's SPLIT_COMPONENT_FRACTION, the existing prepared hit/recipient context retains one pure fraction/read binding per matching rule at PRE_MITIGATION, after applicable receipt redirection. Resolve exact runtime source-family/actual-recipient life from existing State refs and freeze the phase view; all original eligible components of that hit share R. Simultaneous groups use §31's common state, later sequential groups take their own view. No State write, new target lock, gameplay RNG or event occurs in this read. Validate fraction/type/phase/provenance and reject incompatible overlap before commit, including unsupported content escaping normalization.
+
+Apply DMG-007's compatible mapping once to each original Q. Identity/full-conversion paths retain the original component ref; partial splitting derives bounded original-remainder/converted-TRUE refs from that ref and segment role, independent of matching-rule order. Conserve Q using the existing numeric policy. Preserve hit/packet and Effect/source/attribution/Shield inputs. Feed segments to §45B and their resulting type pipelines, then existing shared Shield/HP allocation. A produced segment is not a new transform input. SET_COMPONENT_TYPE's one-component path remains unchanged; excluded already-TRUE inputs retain their existing path.
+
+Existing prepared Effect/Transaction/Result records retain original component, R/read checkpoint/state version, participating transform refs and derived segment amounts/receipts through commit and dependent consumers. Aggregate only terminal segment receipts, never original Q plus segments. Per-hit observers use original hit identity; type-based receipt consumers use resulting types. Replay/resume reuses prepared bindings/terminal results without rereading N, re-splitting, double-credit or repeated hit grants. Later lifecycle/State changes cannot rewrite sealed evidence; retire temporary prepared payloads with their existing transaction/consumer lifetime. No second writable component/seed ledger or service is introduced.
 
 ---
 
