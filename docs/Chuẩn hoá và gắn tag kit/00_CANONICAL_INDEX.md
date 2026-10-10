@@ -1,7 +1,7 @@
 # ARCLUNE — CANONICAL INDEX / NEW-CHAT HANDOFF
 ## Điểm vào duy nhất cho các chat tiếp theo
 
-**Version:** 2026-10-10-INDEX-33
+**Version:** 2026-10-10-INDEX-34
 **Status:** CANONICAL HANDOFF INDEX  
 **Purpose:** cho model mới biết phải đọc gì, tin gì, bỏ qua gì, workflow nào phải dùng, và những quyết định nền nào đã được khóa trước khi tiếp tục chuẩn hóa hơn 200 kit.
 
@@ -60,7 +60,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `00_CANONICAL_INDEX.md`
 **Role:** new-chat handoff / navigation / precedence / workflow.  
-**Version:** `2026-10-10-INDEX-33`
+**Version:** `2026-10-10-INDEX-34`
 **Read:** after root `AGENTS.md`.
 
 ## `00_CANONICAL_RECOVERY_AUDIT-1.md`
@@ -71,7 +71,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `01_TERMINOLOGY_vNext_PILOT4_MERGED.md`
 **Role:** Chặng B — canonical meanings and semantic distinctions.  
-**Version:** `2026-10-10-B.5`.
+**Version:** `2026-10-10-B.6`.
 **Read when:** gần như mọi normalization task.  
 **Important:** `TURN_BOUNDARY` là global SSI boundary theo CLK-001, gồm ngoại lệ POSTMORTEM_WAIT được khai báo tường minh. Personal windows dùng Actor Natural Action Window / Natural Action clocks; explicitly boundary-timed work có thể qualify original consumed Natural-opportunity owner của chính global boundary (CC loss vẫn qualifies), không tạo private boundary; dead wait không tiến personal Actor clock.
 
@@ -89,7 +89,7 @@ Reasoning/workflow: current user instructions and root `AGENTS.md`. Architecture
 
 ## `04_ABILITY_SCHEMA-1.md`
 **Role:** Chặng E — declarative Character/Ability authoring schema + normalized IR boundary.  
-**Version:** `2026-10-10-E.24`.
+**Version:** `2026-10-10-E.25`.
 **Read when:** chuẩn hóa kit.  
 **Important architecture:**
 
@@ -104,7 +104,7 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `05_CONTRACTS.md`
 **Role:** Chặng F — exact timing/order/snapshot/authority/lifecycle rules.  
-**Version:** `2026-10-10-F.26`.
+**Version:** `2026-10-10-F.27`.
 **Read when:** mechanic phụ thuộc timing, conflict, snapshot, damage, death, revive, reincarnation, authority, child action, materialization.
 
 **Important maintenance note:** nếu bản local vẫn còn §59/§61 cũ, phải dùng corrected checklist hiện hành; các vấn đề sau **đã resolved** và không còn được liệt kê là unresolved:
@@ -122,18 +122,18 @@ Authored Character data không nên tham chiếu raw engine code.
 
 ## `06_KERNEL_RUNTIME.md`
 **Role:** Chặng G — deterministic runtime architecture.  
-**Version:** `2026-10-10-G.25`
+**Version:** `2026-10-10-G.26`
 **Read when:** kiểm tra liệu mechanic có cần subsystem/runtime state mới.  
 **Important:** no ordinary `switch(characterId)` special-case.
 
 ## `07_MODE_PROFILES.md`
 **Role:** Chặng H — mode-specific scheduler/spatial/lifecycle/resource profiles.  
-**Version:** `2026-10-10-H.4`
+**Version:** `2026-10-10-H.5`
 **Read when:** mechanic khác nhau theo turn-based / Arena / Exploration-Defense.
 
 ## `08_STRESS_TESTS.md`
 **Role:** Chặng I — reverse architecture validation.  
-**Version:** `2026-10-10-I.27`
+**Version:** `2026-10-10-I.28`
 **Read when:** architecture impact, hard kit normalization, pre-freeze validation.  
 **Important:** some tests pass by rejecting invalid data or preserving unresolved contracts.
 
@@ -801,7 +801,7 @@ Arena-owned objects do not automatically transfer back to parent.
 ## EXPLORATION_DEFENSE
 Current high-level direction:
 - no SSI;
-- no Luân Hồi;
+- Luân Hồi/Thiên Lôi ALWAYS_RESIDENT in real Combat Instances; unsupported cadence/scheduling adapter REQUIRED_EXPLICIT; River conditional import;
 - continuous/spatial Room gameplay;
 - movement speed;
 - attack speed;
@@ -904,6 +904,45 @@ SIDE_BATTLE_STATE_NON_RESOURCE never restores Side AE or any actor Rage, includi
 
 ---
 
+# 19C. AXIOM FOUNDATION — WORLD SYSTEMS AND TRAITS
+
+Foundation base is merged PR #48 (`e08eab99`), preserving §19B and every River exclusion/capture/import decision. `docs/định nghĩa về axiom.md` now distinguishes two ownership families; 01§§14–15, 04§§32.4–32.5/31.2/79–80, 05 INS-003/STA-011/REC/ENT-021–022, 06§§88A/146–147/64 and 07 bind the same foundation. 08 N-010–N-027 supplies declarative stress coverage, not executable test results.
+
+| Identity | Family / owner | Residency or clause |
+| --- | --- | --- |
+| WORLD_AXIOM_REINCARNATION | WORLD_AXIOM / Combat-System ledger | ALWAYS_RESIDENT in every real Combat Instance |
+| HEAVENLY_THUNDER_IMPARTIALITY | WORLD_AXIOM / Combat-System observation | ALWAYS_RESIDENT in every real Combat Instance |
+| RIVER_OF_LIGHT_AND_SHADOW | WORLD_AXIOM / existing generic History provider | CONDITIONAL_IMPORT under normalized dependency/access |
+| DIVINE_NATURE | AXIOMATIC_TRAIT / Character-Identity-Life metadata | Explicit AXIOM State-admission clause; no World registration |
+| UNIQUENESS | AXIOMATIC_TRAIT / canonical identity metadata | AXIOM materialization claim clause; no World registration |
+
+Iron invariants: Rank≠Axiom access; Prime≠automatic DIVINE_NATURE; Axiom Identity≠Authority≠Functional Tag≠Capability. Heavenly baseline/count follows trueSelfId per instance across bodies; tracked stats only authoritative Rank-Multiplier-scaled metadata,>=3.5baseline or enabled MaxRage<=50, one strike/checkpoint. Damage20%currentMaxHP; first3 Shield absorption allowed,4+Shield untouched bypass; CC-lost Natural still periodic, non-Natural not periodic, Death Prevention remains distinct.
+
+No bound True Self ever enters Waiting. Luân Hồi owns immutable previous-life lineage basis without River, default inheritance excludes transient contributions; no eligible route exits True Self without auto new Character. Unique Deck membership does not claim; success acquires by actual request/transaction order; retain claim through leave/death/waiting/Revive, release at actual entry absent atomic same-key continuation or no-True-Self terminal exit. Blocked card stays in Deck/slot without reroll. Divinity rejects only external BUFF/DEBUFF/MARK<=QUY_TAC; self-owned remains ordinarily legal and external AXIOM uses AUT. Damage/Heal/Shield/resources/system bookkeeping are not default-blocked.
+
+History cannot copy/reset World records/lineage/claims; historical presence respects current Unique validation and actual terminal-exit lifetime; River AE/Rage/RNG/Reincarnation/Cost Bar exclusions remain. Relevant restored stats may generate a subsequent mandatory World observation/strike; the History assignment itself still emits no ordinary Damage/Heal. Non-Natural-Action Mode cadence and unsupported System-vs-AXIOM adjudication profiles remain REQUIRED_EXPLICIT, not invented seconds/Prime/infinite tier.
+
+### Proved generic gaps and smallest composition delta
+
+| Locked requirement → existing capability → attempted composition | Exact observable failure on PR #48 base | Smallest reusable typed extension / existing owner |
+| --- | --- | --- |
+| Explicit two families/residency/access → Definition/Combat Instance/System dependency + River§13.6 → register typed laws and consume metadata | Axiom prose says all resident/UR-Prime access;07 can disable Luân Hồi; unclassified axiomIdentities cannot distinguish Trait registration from World law. | Typed family/residency/observation profile refs in existing Registry/System plan; reuse River dependency path. 02/03 operations/vocabulary suffice. |
+| Immutable True-Self baseline/finite predicate checkpoint/count → P-002 Snapshot, Stat/Resource/Identity views, existing System transactions → bind basis and evaluate bounded predicates | No typed baseline subject key/lifetime/stat metadata/cause/dedup binding; recapture per body can evade, absent Rage can be mistaken for0, multiple causes can multi-strike. | Existing System/Snapshot plan retains finite metadata/provider/key/static-view/checkpoint/counter operands; existing CombatInstanceState record, no Character manager. |
+| Fixed AXIOM-owned20% strike + first3Shield/fourth untouched → TRUE Damage/Authority/Shield/HP_ZERO → ordinary packet with declared profile | Ordinary TRUE flow permits amount modifiers/hit/redirect; ordinary Shield pierce alone cannot select based on immutable subject ordinal and commit count with Damage. | Bounded fixed-request/admission/ordinal Shield policy in existing Damage/Transaction plan under INS-003; no Damage type/Tag/Primitive or new pipeline. |
+| Default previous-life inheritance without River → REC ledger/identity/death records + P-002 + inheritance.statPolicy → capture candidate then use route's stat profile | No immutable candidate→sealed lineage record bound to exact death/entry; Effective Stat snapshot can bake transient Buffs; River dependency fabricates wrong ownership. | Bounded lineage basis/profile/provenance/state payload in existing ReincarnationState; preserve all current route/host policies. |
+| Unique acquire/retain/release/Deck behavior → existing uniquenessIdentity + materialization.uniquenessPolicy/validator/reservations → validate canonical key | Presence-only duplicate check releases on leave/death; no typed claim lifetime/atomic same-key continuation; generic invalid-candidate prose can reroll Deck. | Claim data/terminal lifetime policy in existing instance/identity constraints and Materialization/lifecycle transaction; no global Deck lottery/priority. |
+| Divinity external categories<=Rule/self/Axiom conflict → STA-010/011 + Authority + semantic owner refs → admission scope | Current STA-011/Ký prose can read all external effects and omits tier/self boundary. | Exact existing admission policy categories/owner predicate/cutoff/AUT handling. Reuse axiomIdentities and clause Authority; no generic all-Effect trait gate. |
+
+### Migration and impact
+
+00/01/04/05/06/07/08 PATCH REQUIRED. 02/03/root AGENTS NO CHANGE: Functional Tags already separate system metadata, existing Snapshot/Damage/State/lifecycle/materialization operations suffice, AGENTS already forbids Rank/lore inference of Authority and mandates composition. No new Functional Tag, Primitive or Contract ID.
+
+Existing explicit Divinity/Uniqueness metadata maps to traits, without adding traits to every Prime or migrating all Tags. Luân Hồi routes keep world ledger; fresh normalization uses the lineage basis only for a semantically matching previous-life stat policy. Pygmalion R2 retains creator/host stats and Kenoma host-only binding; Renchu's explicit Divinity already matches. Small exact cleanup in current `docs/Luân Hồi Chi Chủ.md`/`docs/Ký Ức Chi Chủ.md` removes material taxonomy/admission contradictions, keeps authored fractions and special ordinary-Revive/Overheal clauses. No raw, old kernel/prototype/code rewrite.
+
+PR #48 River data needs no semantic rewrite. System/trait content and Mode profiles must fresh-normalize with B.6/E.25/F.27/G.26/H.5 compatibility/hash; no implicit callbacks, mass Character rewrite or silent fallback. Main foundation is executable at architecture level with resolved active stat/baseline metadata. Non-Natural Mode cadence, other missing lifecycle scheduling adapters, Luân Hồi Chi Chủ exact stat list and future System-owner equal-AXIOM adjudication input remain explicit content/profile requirements, not blockers for the locked Main foundation.
+
+---
+
 # 20. CURRENT MAJOR UNRESOLVED AREAS
 
 Do not silently resolve these.
@@ -916,7 +955,7 @@ Do not silently resolve these.
 ## Damage / Materialization
 - default Max-HP reference for a damage threshold when Max HP mutates within same Action;
 - full-slot materialization fallback;
-- invalid Duy Nhất materialization fallback.
+- invalid random-materializer Uniqueness fallback when no explicit profile; Deck rejection/slot retention/no-reroll is now locked.
 
 ## Authority
 - final edge-case confirmation for Dynamic Authority sampling when one atomic resolution upgrades its own Authority.
@@ -1341,7 +1380,7 @@ A future model is ready to continue Arclune only if it can answer “yes” to a
 24. Do I know Puppet is not automatically SUMMON?
 25. Do I know Puppet inherits Class but not Element from inherited Combat Definition?
 26. Do I know Arena is a child Combat Instance?
-27. Do I know Exploration has no SSI and no Luân Hồi?
+27. Do I know Exploration has no SSI but Luân Hồi/Thiên Lôi ALWAYS_RESIDENT, with unsupported cadence/scheduling REQUIRED_EXPLICIT rather than invented seconds?
 28. Do I know unresolved mechanics must remain unresolved?
 29. Do I know a new kit must first try composition before changing architecture?
 30. Do I know current repository workflow applies corrected edits only to proven affected files, with manual output only when requested?

@@ -1,6 +1,6 @@
 # ARCLUNE — TERMINOLOGY vNext
 ## Canonical Combat, Runtime & System Terminology
-**Version:** 2026-10-10-B.5
+**Version:** 2026-10-10-B.6
 **Stage:** Chặng B — Terminology Reconstruction  
 **Source basis:** `terminology.md` + `00_CANONICAL_RECOVERY_AUDIT.md` + các correction hiện hành của user được Audit ghi nhận.  
 **Scope:** định nghĩa nghĩa canonical của khái niệm. File này **không** phải Tag Registry, Primitive Registry, Ability Schema, Contract hay Kernel implementation.
@@ -16,6 +16,8 @@
 **Revision B.4:** distinguishes explicitly qualified consumed-owner global-boundary provenance from a new/private boundary or ordinary personal-window clock. No new term/ID; CC-lost opportunity remains distinct from performed Action.
 
 **Revision B.5:** corrects existing River terminology: conditional provider/import baseline, profile-driven Mốc and record/restore distinction with non-restorable resources under the bounded Side profile. No new Functional Tag or runtime law is defined here.
+
+**Revision B.6:** separates explicit World residency/access from Axiomatic Traits; hardens Thunder/True-Self lineage/Unique claim/Divinity meanings. B.5 River import/capture/record≠restore/AE-Rage exclusions remain unchanged.
 
 # 0. MỤC ĐÍCH VÀ QUY TẮC ĐỌC
 
@@ -2813,15 +2815,11 @@ State sau confirmed death khi entity có quyền Revive nhưng chưa materialize
 ## 13.8 Waiting Window
 **VI:** Cửa sổ chờ Luân Hồi  
 **ID:** `REINCARNATION_WAITING_WINDOW`  
-**Status:** CANONICAL CORE / TURN-BASED LIFE SYSTEM
+**Status:** CANONICAL CORE / WORLD-RESIDENT LIFE SYSTEM
 
 Khoảng logic sau DEATH_CONFIRMED trong đó Chân Ngã còn ở trạng thái chờ trước khi chính thức vào Luân Hồi/Reincarnation.
 
-Current design value thường dùng:
-> `4`
-
-Nhưng exact clock/event decrement:
-**UNRESOLVED CONTRACT**.
+Current standard là4 later qualifying bound-True-Self deaths theo REC-001/004; battle base/contributions có thể sửa threshold dưới profile hiện hành. Mode không có supported scheduling/event adapter giữ REQUIRED_EXPLICIT, không tắt World residency.
 
 Không hiểu là wall-clock time.
 
@@ -3124,8 +3122,7 @@ Tình huống hai hay nhiều rule/effect tranh quyền mutate/deny/override cù
 
 Higher tier là một yếu tố chính.
 
-Exact same-tier resolver:
-**UNRESOLVED CONTRACT**.
+Exact same-tier resolver dùng AUT-002–004 hiện hành trên clause conflict; System-owned clause thiếu supported adjudication input phải REQUIRED_EXPLICIT, không invent Rank/owner/tier.
 
 ---
 
@@ -3164,60 +3161,52 @@ Không có global default duy nhất đủ cho mọi kit hiện có.
 
 ---
 
-# 15. AXIOM SYSTEMS
+# 15. WORLD AXIOMS / AXIOMATIC TRAITS
+
+World Axiom thuộc Combat/System layer, không Character owner hoặc Trait attachment. Explicit residency ALWAYS_RESIDENT hoặc CONDITIONAL_IMPORT; không suy từ lore/Rank. Character access/dependency phải được normalized content khai rõ. WORLD_AXIOM_REINCARNATION và HEAVENLY_THUNDER_IMPARTIALITY ALWAYS_RESIDENT; RIVER_OF_LIGHT_AND_SHADOW CONDITIONAL_IMPORT. Axiomatic Trait là explicit Character/Identity/Life metadata, không World registration. Axiom Identity ≠ Authority Tier ≠ Functional Tag ≠ Capability. Prime ≠ automatic Thần Tính; Rank ≠ Axiom access.
 
 ## 15.1 Thần Tính
 **EN:** Divine Nature  
 **ID:** `DIVINE_NATURE`  
-**Status:** SYSTEM-SPECIFIC / CANONICAL CORE
+**Status:** CANONICAL AXIOMATIC_TRAIT
 
-Axiom identity/protection của một số high-order characters.
+Explicit Character/Identity/Life metadata, admission clause Authority AXIOM. External = semantic Effect/State owner != recipient self, ally/enemy irrelevant. External BUFF/DEBUFF/MARK incoming NORMAL/PHAP_TAC/QUY_TAC is rejected, beneficial/harmful/neutral included. Self-owned low-tier State passes ordinary legality. External AXIOM State is actual AUT conflict, not automatic Divinity victory.
 
-Canonical:
-- có thể chặn external status/effect theo scope;
-- exact scope thuộc Thần Tính Contract/kit;
-- **không mặc định chặn direct Damage**;
-- không làm mọi Ability của character thành Axiom Authority.
-
-Thần Tính ≠ Damage Immunity.
+Thần Tính ≠ generic Effect immunity: Damage/Heal/Shield/resources/MaxHP/Cost/Position/History observation/Reincarnation bookkeeping/Uniqueness validation are not default-blocked. Separate explicit clauses may govern them. Prime without authored trait gets none; trait does not promote Ability Authority or register a World system.
 
 ---
 
 ## 15.2 Duy Nhất
 **EN:** Uniqueness  
 **ID:** `UNIQUENESS`  
-**Status:** SYSTEM-SPECIFIC / CANONICAL CORE
+**Status:** CANONICAL AXIOMATIC_TRAIT
 
-Axiom/identity rule giới hạn bản thể/definition hợp lệ theo Contract.
+Canonical Character/Identity metadata with AXIOM materialization clause. Key uses existing uniquenessIdentity/canonical ownership, not one new key per FORM. Deck does not claim; successful materialization/deployment acquires by authoritative gameplay request/transaction order, never Entity/Slot/list iteration.
 
-Canonical distinction:
-- Character có Axiom Duy Nhất là metadata/identity issue;
-- Ability tương tác với Duy Nhất là system-interaction issue;
-- không gắn Functional Tag UNIQUENESS lên mọi Ability chỉ vì Character mang Axiom này.
+Retain claim through leave/Return/Temporary Absence/HP_ZERO/DEATH_CONFIRMED/Waiting/ordinary Revive. True-Self old-life claim ends at actual ENTERED_REINCARNATION absent atomic same-key continuation; same-key new life retains/transfers atomically. No-True-Self holder releases only at terminal instance exit. Blocked same-key Deck card keeps its slot and rejects deploy without reroll/replace; other random materializers retain explicit filter/failure law. Not a resident World subsystem or Functional Tag on bearer abilities.
 
 ---
 
 ## 15.3 Luân Hồi
 **EN:** Reincarnation World Axiom  
 **ID:** `WORLD_AXIOM_REINCARNATION`  
-**Status:** SYSTEM-SPECIFIC / CANONICAL CORE
+**Status:** CANONICAL WORLD_AXIOM / ALWAYS_RESIDENT
 
-World Axiom govern:
-- Chân Ngã;
-- DEATH_CONFIRMED observation;
-- waiting window;
-- entry into Reincarnation;
-- rebirth/routing.
+World-owned ledger/lifecycle in every real Combat Instance, including Arena/Exploration. Valid authoritative bound True Self at DEATH_CONFIRMED is required for Waiting; NO BOUND TRUE SELF → NEVER WAITING, including originally empty bodies or removed bindings. Reuse Death Cohort/current waiting threshold/contributions/routing/race. ENTERED_REINCARNATION closes old-life ordinary Revive; no eligible in-combat route defaults to True-Self exit, not automatic new Character.
+
+PREVIOUS_LIFE_INHERITANCE_BASIS is immutable lineage data owned by Luân Hồi, candidate at exact qualifying death, retired with pre-entry ordinary Revive, sealed at actual entry. Default previous-life N% stats include intrinsic/static Rank-Multiplied basis plus explicitly inheritable battle-persistent contributions, exclude transient Buff/Debuff/temporary State/Field contributions. Not full History, CurrentHP/resources/Shield/State objects/CD. Explicit kit profiles remain independent; no River dependency.
 
 ---
 
 ## 15.4 Thiên Lôi Vô Tư
 **ID:** `HEAVENLY_THUNDER_IMPARTIALITY`  
-**Status:** SYSTEM-SPECIFIC / CANONICAL CORE AS AXIOM IDENTITY
+**Status:** CANONICAL WORLD_AXIOM / ALWAYS_RESIDENT
 
-Axiom/Thiên Điều liên quan Lôi Kiếp và phán xét vô tư.
+Side-neutral World-owned law over eligible Field-Present Damage/lifecycle-valid authoritative HP units, no caster/Leader/Prime/Divinity exemption. Subject key bound trueSelfId × CombatInstance else actor/life × CombatInstance. Immutable HEAVENLY_STAT_BASELINE at first eligible static initialization after Rank/Star/progression before transient contributions; tracks only authoritative Rank-Multiplier-scaled Stat metadata. Baseline and heavenlyStrikeCount persist through True-Self new bodies/lives. Binding a True Self switches to its record, never resets/merges body-only record.
 
-Exact effect semantics thuộc character/system file riêng.
+Violation: any tracked Effective Stat>=3.5baseline (+250%, equality) OR actual enabled Rage CurrentMaxRage<=50; absent Rage≠0. One strike/cause set per stable authoritative checkpoint: eligible entry/reentry, relevant committed stat/binding/MaxRage mutation, Main owner Natural opportunity start. CC-lost Natural still qualifies, non-Natural not periodic; absent Field pauses without reset. Non-Natural modes keep residency and require explicit periodic adapter.
+
+Every strike TRUE Damage20%currentMaxHP at checkpoint, System clause AXIOM; ordinary mitigation/reduction/cap/modifier/miss/redirect/lower-tier denial cannot alter it. First3 strikes allow ordinary Shield absorption;4+ bypass Shield untouched. Full Shield absorption increments count. Mandatory HP_ZERO/Death Prevention remains ordinary; not ERASE/cannot-save. INS-003 supplies exact transaction/checkpoint/AUT/replay semantics, not Character file/lore defaults.
 
 ---
 
@@ -3506,7 +3495,7 @@ Stat được tính từ stat khác theo formula.
 **ID:** `RANK_MULTIPLIER`  
 **Status:** CANONICAL CORE
 
-Hệ số stat phụ thuộc Rank.
+Hệ số stat phụ thuộc Rank. Authoritative Stat Definition/profile phải khai stat nào Rank-Multiplier-scaled và binding CurrentEffectiveStat tương ứng; Thiên Lôi đọc metadata đó, không suy theo Character hoặc tracking CurrentHP thay HP capacity. Missing/non-positive Heavenly denominator cần explicit supported profile, không invent ratio semantics.
 
 ---
 
